@@ -1,0 +1,103 @@
+{
+ "alone": "iso2-A",
+ "concurrent": [
+  "iso2-B",
+  "iso2-C",
+  "iso2-D",
+  "iso2-E"
+ ],
+ "workers": {
+  "iso2-A": {
+   "targets": 7,
+   "mutants": 14,
+   "killed": 14,
+   "baseline_failures": {},
+   "timeouts": 0,
+   "owned": {
+    "exit": 1,
+    "owned_before": 0,
+    "owned_at_exit": 0,
+    "owned_after": 0,
+    "escaped": [],
+    "residual": [],
+    "released_empty": true,
+    "harness_orphans_before": 0,
+    "harness_orphans_after": 0
+   }
+  },
+  "iso2-B": {
+   "targets": 7,
+   "mutants": 14,
+   "killed": 14,
+   "baseline_failures": {},
+   "timeouts": 0,
+   "owned": {
+    "exit": 1,
+    "owned_before": 0,
+    "owned_at_exit": 0,
+    "owned_after": 0,
+    "escaped": [],
+    "residual": [],
+    "released_empty": true,
+    "harness_orphans_before": 0,
+    "harness_orphans_after": 0
+   }
+  },
+  "iso2-C": {
+   "targets": 7,
+   "mutants": 14,
+   "killed": 14,
+   "baseline_failures": {},
+   "timeouts": 0,
+   "owned": {
+    "exit": 1,
+    "owned_before": 0,
+    "owned_at_exit": 0,
+    "owned_after": 0,
+    "escaped": [],
+    "residual": [],
+    "released_empty": true,
+    "harness_orphans_before": 0,
+    "harness_orphans_after": 0
+   }
+  },
+  "iso2-D": {
+   "targets": 7,
+   "mutants": 14,
+   "killed": 14,
+   "baseline_failures": {},
+   "timeouts": 0,
+   "owned": {
+    "exit": 1,
+    "owned_before": 0,
+    "owned_at_exit": 0,
+    "owned_after": 0,
+    "escaped": [],
+    "residual": [],
+    "released_empty": true,
+    "harness_orphans_before": 0,
+    "harness_orphans_after": 0
+   }
+  },
+  "iso2-E": {
+   "targets": 7,
+   "mutants": 14,
+   "killed": 14,
+   "baseline_failures": {},
+   "timeouts": 0,
+   "owned": {
+    "exit": 1,
+    "owned_before": 0,
+    "owned_at_exit": 0,
+    "owned_after": 0,
+    "escaped": [],
+    "residual": [],
+    "released_empty": true,
+    "harness_orphans_before": 0,
+    "harness_orphans_after": 0
+   }
+  }
+ },
+ "problems": [],
+ "isolation": "HOLDS"
+}

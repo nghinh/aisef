@@ -1,0 +1,4929 @@
+{
+ "phase": "V2.1",
+ "worktree": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pre-cc53596",
+ "timeout_s": 900,
+ "files": {
+  "tests/v2/p2/test_calibration.py": {
+   "passed": true,
+   "seconds": 0.4,
+   "timed_out": false,
+   "leaked": 0,
+   "failed": [],
+   "error": null
+  },
+  "tests/v2/p2/test_static_admission.py": {
+   "passed": true,
+   "seconds": 0.3,
+   "timed_out": false,
+   "leaked": 0,
+   "failed": [],
+   "error": null
+  },
+  "tests/v2/test_app_run.py": {
+   "passed": true,
+   "seconds": 32.1,
+   "timed_out": false,
+   "leaked": 0,
+   "failed": [],
+   "error": null
+  },
+  "tests/v2/test_app_units.py": {
+   "passed": true,
+   "seconds": 6.2,
+   "timed_out": false,
+   "leaked": 0,
+   "failed": [],
+   "error": null
+  },
+  "tests/v2/test_c2_cli_calibration.py": {
+   "passed": true,
+   "seconds": 38.4,
+   "timed_out": false,
+   "leaked": 0,
+   "failed": [],
+   "error": null
+  },
+  "tests/v2/test_c2_cli_invocation.py": {
+   "passed": true,
+   "seconds": 66.3,
+   "timed_out": false,
+   "leaked": 0,
+   "failed": [],
+   "error": null
+  },
+  "tests/v2/test_c2_cli_protocol.py": {
+   "passed": true,
+   "seconds": 61.9,
+   "timed_out": false,
+   "leaked": 0,
+   "failed": [],
+   "error": null
+  },
+  "tests/v2/test_c2_cli_verdicts.py": {
+   "passed": true,
+   "seconds": 0.4,
+   "timed_out": false,
+   "leaked": 0,
+   "failed": [],
+   "error": null
+  },
+  "tests/v2/test_c2_file_artifact.py": {
+   "passed": true,
+   "seconds": 4.7,
+   "timed_out": false,
+   "leaked": 0,
+   "failed": [],
+   "error": null
+  },
+  "tests/v2/test_c2_k_nowork_001.py": {
+   "passed": true,
+   "seconds": 37.5,
+   "timed_out": false,
+   "leaked": 0,
+   "failed": [],
+   "error": null
+  },
+  "tests/v2/test_c2_k_presat_001.py": {
+   "passed": true,
+   "seconds": 20.2,
+   "timed_out": false,
+   "leaked": 0,
+   "failed": [],
+   "error": null
+  },
+  "tests/v2/test_c2_orchestration_conformance.py": {
+   "passed": true,
+   "seconds": 35.5,
+   "timed_out": false,
+   "leaked": 0,
+   "failed": [],
+   "error": null
+  },
+  "tests/v2/test_p6_orchestration.py": {
+   "passed": true,
+   "seconds": 69.1,
+   "timed_out": false,
+   "leaked": 0,
+   "failed": [],
+   "error": null
+  },
+  "tests/v2/test_p6_stages.py": {
+   "passed": true,
+   "seconds": 6.9,
+   "timed_out": false,
+   "leaked": 0,
+   "failed": [],
+   "error": null
+  },
+  "tests/v2/test_probe_process_effect.py": {
+   "passed": true,
+   "seconds": 41.5,
+   "timed_out": false,
+   "leaked": 0,
+   "failed": [],
+   "error": null
+  },
+  "tests/v2/test_probe_process_effect_bytecode.py": {
+   "passed": true,
+   "seconds": 5.8,
+   "timed_out": false,
+   "leaked": 0,
+   "failed": [],
+   "error": null
+  },
+  "tests/v2/test_probe_process_effect_units.py": {
+   "passed": true,
+   "seconds": 1.8,
+   "timed_out": false,
+   "leaked": 0,
+   "failed": [],
+   "error": null
+  },
+  "tests/v2/test_python_callable_v2.py": {
+   "passed": true,
+   "seconds": 99.8,
+   "timed_out": false,
+   "leaked": 0,
+   "failed": [],
+   "error": null
+  },
+  "tests/v2/test_python_callable_v2_bytecode.py": {
+   "passed": true,
+   "seconds": 6.0,
+   "timed_out": false,
+   "leaked": 0,
+   "failed": [],
+   "error": null
+  },
+  "tests/v2/test_release_s2_kernel.py": {
+   "passed": true,
+   "seconds": 6.7,
+   "timed_out": false,
+   "leaked": 0,
+   "failed": [],
+   "error": null
+  },
+  "tests/v2/test_s2_kills.py": {
+   "passed": true,
+   "seconds": 22.4,
+   "timed_out": false,
+   "leaked": 0,
+   "failed": [],
+   "error": null
+  },
+  "tests/v2/test_s2_kills_deterministic.py": {
+   "passed": true,
+   "seconds": 0.4,
+   "timed_out": false,
+   "leaked": 0,
+   "failed": [],
+   "error": null
+  },
+  "tests/v2/test_s2_kills_k.py": {
+   "passed": true,
+   "seconds": 0.5,
+   "timed_out": false,
+   "leaked": 0,
+   "failed": [],
+   "error": null
+  },
+  "tests/v2/test_s2_kills_rc2.py": {
+   "passed": true,
+   "seconds": 1.0,
+   "timed_out": false,
+   "leaked": 0,
+   "failed": [],
+   "error": null
+  },
+  "tests/v2/test_v21_bundle_tools.py": {
+   "passed": true,
+   "seconds": 1.4,
+   "timed_out": false,
+   "leaked": 0,
+   "failed": [],
+   "error": null
+  },
+  "tests/v2/test_v21_continue_integrity.py": {
+   "passed": true,
+   "seconds": 211.6,
+   "timed_out": false,
+   "leaked": 0,
+   "failed": [],
+   "error": null
+  },
+  "tests/v2/test_v21_continue_usage.py": {
+   "passed": true,
+   "seconds": 48.1,
+   "timed_out": false,
+   "leaked": 0,
+   "failed": [],
+   "error": null
+  },
+  "tests/v2/test_v21_identity.py": {
+   "passed": true,
+   "seconds": 1.5,
+   "timed_out": false,
+   "leaked": 0,
+   "failed": [],
+   "error": null
+  },
+  "tests/v2/test_v21_inputs.py": {
+   "passed": true,
+   "seconds": 1.5,
+   "timed_out": false,
+   "leaked": 0,
+   "failed": [],
+   "error": null
+  },
+  "tests/v2/test_v21_orchestration.py": {
+   "passed": true,
+   "seconds": 18.7,
+   "timed_out": false,
+   "leaked": 0,
+   "failed": [],
+   "error": null
+  },
+  "tests/v2/test_v21_python_imports.py": {
+   "passed": true,
+   "seconds": 0.6,
+   "timed_out": false,
+   "leaked": 0,
+   "failed": [],
+   "error": null
+  },
+  "tests/v2/test_v21_review.py": {
+   "passed": true,
+   "seconds": 15.8,
+   "timed_out": false,
+   "leaked": 0,
+   "failed": [],
+   "error": null
+  },
+  "tests/v2/test_v21_review_chain.py": {
+   "passed": true,
+   "seconds": 144.2,
+   "timed_out": false,
+   "leaked": 0,
+   "failed": [],
+   "error": null
+  },
+  "tests/v2/test_v21_review_ocr.py": {
+   "passed": true,
+   "seconds": 0.4,
+   "timed_out": false,
+   "leaked": 0,
+   "failed": [],
+   "error": null
+  },
+  "tests/v2/test_v21_transport.py": {
+   "passed": true,
+   "seconds": 3.1,
+   "timed_out": false,
+   "leaked": 0,
+   "failed": [],
+   "error": null
+  },
+  "tests/v2/test_v21_verify.py": {
+   "passed": true,
+   "seconds": 30.2,
+   "timed_out": false,
+   "leaked": 0,
+   "failed": [],
+   "error": null
+  }
+ },
+ "targets": {
+  "aisef2/app/adapters.py::Developer.implement": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "mutants": 48,
+   "baseline_passes": true,
+   "est_seconds": 297.6
+  },
+  "aisef2/app/adapters.py::Reviewer.__init__": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "mutants": 13,
+   "baseline_passes": true,
+   "est_seconds": 80.6
+  },
+  "aisef2/app/adapters.py::Reviewer._model": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "mutants": 24,
+   "baseline_passes": true,
+   "est_seconds": 148.8
+  },
+  "aisef2/app/adapters.py::Reviewer._ocr": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "mutants": 272,
+   "baseline_passes": true,
+   "est_seconds": 1686.4
+  },
+  "aisef2/app/adapters.py::Reviewer._verify": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "mutants": 6,
+   "baseline_passes": true,
+   "est_seconds": 37.2
+  },
+  "aisef2/app/adapters.py::Reviewer.review": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "mutants": 54,
+   "baseline_passes": true,
+   "est_seconds": 334.8
+  },
+  "aisef2/app/adapters.py::_bounded": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "mutants": 10,
+   "baseline_passes": true,
+   "est_seconds": 62.0
+  },
+  "aisef2/app/adapters.py::_unchanged": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "mutants": 16,
+   "baseline_passes": true,
+   "est_seconds": 99.2
+  },
+  "aisef2/app/adapters.py::attempt_of": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "mutants": 15,
+   "baseline_passes": true,
+   "est_seconds": 93.0
+  },
+  "aisef2/app/adapters.py::tree_of": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "mutants": 14,
+   "baseline_passes": true,
+   "est_seconds": 86.8
+  },
+  "aisef2/app/bundle.py::Project.order": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills_k.py"
+   ],
+   "mutants": 10,
+   "baseline_passes": true,
+   "est_seconds": 62.0
+  },
+  "aisef2/app/bundle.py::_HEX64": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "mutants": 1,
+   "baseline_passes": true,
+   "est_seconds": 6.2
+  },
+  "aisef2/app/bundle.py::_strings": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "mutants": 14,
+   "baseline_passes": true,
+   "est_seconds": 86.8
+  },
+  "aisef2/app/bundle.py::load": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "mutants": 74,
+   "baseline_passes": true,
+   "est_seconds": 458.8
+  },
+  "aisef2/app/bundle.py::read": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "mutants": 9,
+   "baseline_passes": true,
+   "est_seconds": 55.8
+  },
+  "aisef2/app/bundle.py::shape_problems": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "mutants": 115,
+   "baseline_passes": true,
+   "est_seconds": 713.0
+  },
+  "aisef2/app/bundle_cli.py::AUTHORING_KEYS": {
+   "kill_tests": [
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 9,
+   "baseline_passes": true,
+   "est_seconds": 12.6
+  },
+  "aisef2/app/bundle_cli.py::CONTRACT_KEYS": {
+   "kill_tests": [
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 8,
+   "baseline_passes": true,
+   "est_seconds": 11.2
+  },
+  "aisef2/app/bundle_cli.py::CRITERION_KEYS": {
+   "kill_tests": [
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 6,
+   "baseline_passes": true,
+   "est_seconds": 8.4
+  },
+  "aisef2/app/bundle_cli.py::EXAMPLES": {
+   "kill_tests": [
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 1,
+   "baseline_passes": true,
+   "est_seconds": 1.4
+  },
+  "aisef2/app/bundle_cli.py::RELEASES": {
+   "kill_tests": [
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 42,
+   "baseline_passes": true,
+   "est_seconds": 58.8
+  },
+  "aisef2/app/bundle_cli.py::_closed": {
+   "kill_tests": [
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 11,
+   "baseline_passes": true,
+   "est_seconds": 15.4
+  },
+  "aisef2/app/bundle_cli.py::_create": {
+   "kill_tests": [
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 3,
+   "baseline_passes": true,
+   "est_seconds": 4.2
+  },
+  "aisef2/app/bundle_cli.py::_earlier": {
+   "kill_tests": [
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 7,
+   "baseline_passes": true,
+   "est_seconds": 9.8
+  },
+  "aisef2/app/bundle_cli.py::_mint": {
+   "kill_tests": [
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 13,
+   "baseline_passes": true,
+   "est_seconds": 18.2
+  },
+  "aisef2/app/bundle_cli.py::_read": {
+   "kill_tests": [
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 7,
+   "baseline_passes": true,
+   "est_seconds": 9.8
+  },
+  "aisef2/app/bundle_cli.py::_refs": {
+   "kill_tests": [
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 3,
+   "baseline_passes": true,
+   "est_seconds": 4.2
+  },
+  "aisef2/app/bundle_cli.py::_spec_rows": {
+   "kill_tests": [
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 38,
+   "baseline_passes": true,
+   "est_seconds": 53.2
+  },
+  "aisef2/app/bundle_cli.py::_write_new": {
+   "kill_tests": [
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 3,
+   "baseline_passes": true,
+   "est_seconds": 4.2
+  },
+  "aisef2/app/bundle_cli.py::approve": {
+   "kill_tests": [
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 24,
+   "baseline_passes": true,
+   "est_seconds": 33.6
+  },
+  "aisef2/app/bundle_cli.py::continue_from": {
+   "kill_tests": [
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 180,
+   "baseline_passes": true,
+   "est_seconds": 252.0
+  },
+  "aisef2/app/bundle_cli.py::coverage": {
+   "kill_tests": [
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 32,
+   "baseline_passes": true,
+   "est_seconds": 44.8
+  },
+  "aisef2/app/bundle_cli.py::explain": {
+   "kill_tests": [
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 31,
+   "baseline_passes": true,
+   "est_seconds": 43.4
+  },
+  "aisef2/app/bundle_cli.py::init": {
+   "kill_tests": [
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 12,
+   "baseline_passes": true,
+   "est_seconds": 16.8
+  },
+  "aisef2/app/bundle_cli.py::lint": {
+   "kill_tests": [
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 57,
+   "baseline_passes": true,
+   "est_seconds": 79.8
+  },
+  "aisef2/app/bundle_cli.py::main": {
+   "kill_tests": [
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 152,
+   "baseline_passes": true,
+   "est_seconds": 212.8
+  },
+  "aisef2/app/bundle_cli.py::migrate": {
+   "kill_tests": [
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 83,
+   "baseline_passes": true,
+   "est_seconds": 116.2
+  },
+  "aisef2/app/bundle_cli.py::seal": {
+   "kill_tests": [
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 160,
+   "baseline_passes": true,
+   "est_seconds": 224.0
+  },
+  "aisef2/app/bundle_cli.py::unapproved": {
+   "kill_tests": [
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 19,
+   "baseline_passes": true,
+   "est_seconds": 26.6
+  },
+  "aisef2/app/cli.py::_parser": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "mutants": 31,
+   "baseline_passes": true,
+   "est_seconds": 192.2
+  },
+  "aisef2/app/cli.py::run": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "mutants": 116,
+   "baseline_passes": true,
+   "est_seconds": 719.2
+  },
+  "aisef2/app/client.py::Budget.__init__": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_transport.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "mutants": 19,
+   "baseline_passes": true,
+   "est_seconds": 117.8
+  },
+  "aisef2/app/client.py::Budget.account": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_transport.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "mutants": 15,
+   "baseline_passes": true,
+   "est_seconds": 93.0
+  },
+  "aisef2/app/client.py::Budget.reached": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_transport.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "mutants": 20,
+   "baseline_passes": true,
+   "est_seconds": 124.0
+  },
+  "aisef2/app/client.py::Budget.spend": {
+   "kill_tests": [
+    "tests/v2/test_s2_kills_deterministic.py",
+    "tests/v2/test_v21_transport.py",
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "mutants": 48,
+   "baseline_passes": true,
+   "est_seconds": 19.2
+  },
+  "aisef2/app/client.py::environment": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_transport.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "mutants": 37,
+   "baseline_passes": true,
+   "est_seconds": 229.4
+  },
+  "aisef2/app/client.py::read_session": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_transport.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "mutants": 82,
+   "baseline_passes": true,
+   "est_seconds": 508.4
+  },
+  "aisef2/app/client.py::redact": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_transport.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "mutants": 8,
+   "baseline_passes": true,
+   "est_seconds": 49.6
+  },
+  "aisef2/app/client.py::session": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_transport.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "mutants": 114,
+   "baseline_passes": true,
+   "est_seconds": 706.8
+  },
+  "aisef2/app/client.py::wait_within": {
+   "kill_tests": [
+    "tests/v2/test_s2_kills_k.py",
+    "tests/v2/test_v21_transport.py",
+    "tests/v2/test_s2_kills.py",
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "mutants": 23,
+   "baseline_passes": true,
+   "est_seconds": 11.5
+  },
+  "aisef2/app/feedback.py::retry_feedback": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "mutants": 141,
+   "baseline_passes": true,
+   "est_seconds": 874.2
+  },
+  "aisef2/app/lineage.py::ANCHOR_LINE": {
+   "kill_tests": [
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 1,
+   "baseline_passes": true,
+   "est_seconds": 48.1
+  },
+  "aisef2/app/lineage.py::JOURNAL": {
+   "kill_tests": [
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 3,
+   "baseline_passes": true,
+   "est_seconds": 144.3
+  },
+  "aisef2/app/lineage.py::SPEND": {
+   "kill_tests": [
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 4,
+   "baseline_passes": true,
+   "est_seconds": 192.4
+  },
+  "aisef2/app/lineage.py::_git": {
+   "kill_tests": [
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 1,
+   "baseline_passes": true,
+   "est_seconds": 48.1
+  },
+  "aisef2/app/lineage.py::_gone": {
+   "kill_tests": [
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 22,
+   "baseline_passes": true,
+   "est_seconds": 1058.2
+  },
+  "aisef2/app/lineage.py::_sha": {
+   "kill_tests": [
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 1,
+   "baseline_passes": true,
+   "est_seconds": 48.1
+  },
+  "aisef2/app/lineage.py::account_of": {
+   "kill_tests": [
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 59,
+   "baseline_passes": true,
+   "est_seconds": 2837.9
+  },
+  "aisef2/app/lineage.py::child_state": {
+   "kill_tests": [
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 8,
+   "baseline_passes": true,
+   "est_seconds": 384.8
+  },
+  "aisef2/app/lineage.py::claim": {
+   "kill_tests": [
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 68,
+   "baseline_passes": true,
+   "est_seconds": 3270.8
+  },
+  "aisef2/app/lineage.py::claimant": {
+   "kill_tests": [
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 7,
+   "baseline_passes": true,
+   "est_seconds": 336.7
+  },
+  "aisef2/app/lineage.py::claims": {
+   "kill_tests": [
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 12,
+   "baseline_passes": true,
+   "est_seconds": 577.2
+  },
+  "aisef2/app/lineage.py::continued_by": {
+   "kill_tests": [
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 17,
+   "baseline_passes": true,
+   "est_seconds": 817.7
+  },
+  "aisef2/app/lineage.py::events_of": {
+   "kill_tests": [
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 4,
+   "baseline_passes": true,
+   "est_seconds": 192.4
+  },
+  "aisef2/app/lineage.py::lineage_account": {
+   "kill_tests": [
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 45,
+   "baseline_passes": true,
+   "est_seconds": 2164.5
+  },
+  "aisef2/app/lineage.py::predecessor_of": {
+   "kill_tests": [
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 12,
+   "baseline_passes": true,
+   "est_seconds": 577.2
+  },
+  "aisef2/app/lineage.py::process_started": {
+   "kill_tests": [
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 18,
+   "baseline_passes": true,
+   "est_seconds": 865.8
+  },
+  "aisef2/app/lineage.py::read_anchor": {
+   "kill_tests": [
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 6,
+   "baseline_passes": true,
+   "est_seconds": 288.6
+  },
+  "aisef2/app/lineage.py::reconcile": {
+   "kill_tests": [
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 147,
+   "baseline_passes": true,
+   "est_seconds": 7070.7
+  },
+  "aisef2/app/lineage.py::usage_lineage": {
+   "kill_tests": [
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 80,
+   "baseline_passes": true,
+   "est_seconds": 3848.0
+  },
+  "aisef2/app/lineage.py::write_anchor": {
+   "kill_tests": [
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 9,
+   "baseline_passes": true,
+   "est_seconds": 432.9
+  },
+  "aisef2/app/preflight.py::accounting": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_transport.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "mutants": 26,
+   "baseline_passes": true,
+   "est_seconds": 161.2
+  },
+  "aisef2/app/preflight.py::deployment": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_transport.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "mutants": 7,
+   "baseline_passes": true,
+   "est_seconds": 43.4
+  },
+  "aisef2/app/preflight.py::fingerprint_fields": {
+   "kill_tests": [
+    "tests/v2/test_s2_kills_deterministic.py",
+    "tests/v2/test_v21_transport.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "mutants": 22,
+   "baseline_passes": true,
+   "est_seconds": 8.8
+  },
+  "aisef2/app/preflight.py::http_transport": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_transport.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "mutants": 62,
+   "baseline_passes": true,
+   "est_seconds": 384.4
+  },
+  "aisef2/app/preflight.py::identity_problems": {
+   "kill_tests": [
+    "tests/v2/test_s2_kills_rc2.py",
+    "tests/v2/test_v21_transport.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "mutants": 60,
+   "baseline_passes": true,
+   "est_seconds": 60.0
+  },
+  "aisef2/app/preflight.py::run": {
+   "kill_tests": [
+    "tests/v2/test_s2_kills_rc2.py",
+    "tests/v2/test_v21_transport.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "mutants": 134,
+   "baseline_passes": true,
+   "est_seconds": 134.0
+  },
+  "aisef2/app/review_ocr.py::NOT_FULL": {
+   "kill_tests": [
+    "tests/v2/test_v21_review_ocr.py",
+    "tests/v2/test_v21_review_chain.py"
+   ],
+   "mutants": 3,
+   "baseline_passes": true,
+   "est_seconds": 1.2
+  },
+  "aisef2/app/review_ocr.py::NOT_REVIEWABLE": {
+   "kill_tests": [
+    "tests/v2/test_v21_review_ocr.py",
+    "tests/v2/test_v21_review_chain.py"
+   ],
+   "mutants": 2,
+   "baseline_passes": true,
+   "est_seconds": 0.8
+  },
+  "aisef2/app/review_ocr.py::OCR": {
+   "kill_tests": [
+    "tests/v2/test_v21_review_ocr.py",
+    "tests/v2/test_v21_review_chain.py"
+   ],
+   "mutants": 8,
+   "baseline_passes": true,
+   "est_seconds": 3.2
+  },
+  "aisef2/app/review_ocr.py::REPRODUCER_FENCE": {
+   "kill_tests": [
+    "tests/v2/test_v21_review_ocr.py",
+    "tests/v2/test_v21_review_chain.py"
+   ],
+   "mutants": 1,
+   "baseline_passes": true,
+   "est_seconds": 0.4
+  },
+  "aisef2/app/review_ocr.py::SCRUB_PREFIXES": {
+   "kill_tests": [
+    "tests/v2/test_v21_review_ocr.py",
+    "tests/v2/test_v21_review_chain.py"
+   ],
+   "mutants": 4,
+   "baseline_passes": true,
+   "est_seconds": 1.6
+  },
+  "aisef2/app/review_ocr.py::TERMINAL": {
+   "kill_tests": [
+    "tests/v2/test_v21_review_ocr.py",
+    "tests/v2/test_v21_review_chain.py"
+   ],
+   "mutants": 4,
+   "baseline_passes": true,
+   "est_seconds": 1.6
+  },
+  "aisef2/app/review_ocr.py::argv": {
+   "kill_tests": [
+    "tests/v2/test_v21_review_ocr.py",
+    "tests/v2/test_v21_review_chain.py"
+   ],
+   "mutants": 56,
+   "baseline_passes": true,
+   "est_seconds": 22.4
+  },
+  "aisef2/app/review_ocr.py::coverage": {
+   "kill_tests": [
+    "tests/v2/test_v21_review_ocr.py",
+    "tests/v2/test_v21_review_chain.py"
+   ],
+   "mutants": 137,
+   "baseline_passes": true,
+   "est_seconds": 54.8
+  },
+  "aisef2/app/review_ocr.py::environment": {
+   "kill_tests": [
+    "tests/v2/test_v21_review_ocr.py",
+    "tests/v2/test_v21_review_chain.py"
+   ],
+   "mutants": 24,
+   "baseline_passes": true,
+   "est_seconds": 9.6
+  },
+  "aisef2/app/review_ocr.py::finding_id": {
+   "kill_tests": [
+    "tests/v2/test_v21_review_ocr.py",
+    "tests/v2/test_v21_review_chain.py"
+   ],
+   "mutants": 13,
+   "baseline_passes": true,
+   "est_seconds": 5.2
+  },
+  "aisef2/app/review_ocr.py::findings": {
+   "kill_tests": [
+    "tests/v2/test_v21_review_ocr.py",
+    "tests/v2/test_v21_review_chain.py"
+   ],
+   "mutants": 69,
+   "baseline_passes": true,
+   "est_seconds": 27.6
+  },
+  "aisef2/app/review_ocr.py::item_id": {
+   "kill_tests": [
+    "tests/v2/test_v21_review_ocr.py",
+    "tests/v2/test_v21_review_chain.py"
+   ],
+   "mutants": 12,
+   "baseline_passes": true,
+   "est_seconds": 4.8
+  },
+  "aisef2/app/review_ocr.py::pinned": {
+   "kill_tests": [
+    "tests/v2/test_v21_review_ocr.py",
+    "tests/v2/test_v21_review_chain.py"
+   ],
+   "mutants": 12,
+   "baseline_passes": true,
+   "est_seconds": 4.8
+  },
+  "aisef2/app/review_ocr.py::read_output": {
+   "kill_tests": [
+    "tests/v2/test_v21_review_ocr.py",
+    "tests/v2/test_v21_review_chain.py"
+   ],
+   "mutants": 5,
+   "baseline_passes": true,
+   "est_seconds": 2.0
+  },
+  "aisef2/app/review_ocr.py::reproducer_of": {
+   "kill_tests": [
+    "tests/v2/test_v21_review_ocr.py",
+    "tests/v2/test_v21_review_chain.py"
+   ],
+   "mutants": 11,
+   "baseline_passes": true,
+   "est_seconds": 4.4
+  },
+  "aisef2/app/review_ocr.py::scrubbed_names": {
+   "kill_tests": [
+    "tests/v2/test_v21_review_ocr.py",
+    "tests/v2/test_v21_review_chain.py"
+   ],
+   "mutants": 2,
+   "baseline_passes": true,
+   "est_seconds": 0.8
+  },
+  "aisef2/app/review_verify.py::POLICIES": {
+   "kill_tests": [
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_review_ocr.py",
+    "tests/v2/test_v21_review_chain.py"
+   ],
+   "mutants": 2,
+   "baseline_passes": true,
+   "est_seconds": 31.6
+  },
+  "aisef2/app/review_verify.py::REPRODUCER_KEYS": {
+   "kill_tests": [
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_review_ocr.py",
+    "tests/v2/test_v21_review_chain.py"
+   ],
+   "mutants": 4,
+   "baseline_passes": true,
+   "est_seconds": 63.2
+  },
+  "aisef2/app/review_verify.py::SEVERITIES": {
+   "kill_tests": [
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_review_ocr.py",
+    "tests/v2/test_v21_review_chain.py"
+   ],
+   "mutants": 4,
+   "baseline_passes": true,
+   "est_seconds": 63.2
+  },
+  "aisef2/app/review_verify.py::Verification.evidence": {
+   "kill_tests": [
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_review_ocr.py",
+    "tests/v2/test_v21_review_chain.py"
+   ],
+   "mutants": 5,
+   "baseline_passes": true,
+   "est_seconds": 79.0
+  },
+  "aisef2/app/review_verify.py::_NUMBER": {
+   "kill_tests": [
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_review_ocr.py",
+    "tests/v2/test_v21_review_chain.py"
+   ],
+   "mutants": 1,
+   "baseline_passes": true,
+   "est_seconds": 15.8
+  },
+  "aisef2/app/review_verify.py::_approved_by_clause": {
+   "kill_tests": [
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_review_ocr.py",
+    "tests/v2/test_v21_review_chain.py"
+   ],
+   "mutants": 22,
+   "baseline_passes": true,
+   "est_seconds": 347.6
+  },
+  "aisef2/app/review_verify.py::_canon": {
+   "kill_tests": [
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_review_ocr.py",
+    "tests/v2/test_v21_review_chain.py"
+   ],
+   "mutants": 7,
+   "baseline_passes": true,
+   "est_seconds": 110.6
+  },
+  "aisef2/app/review_verify.py::_scalars": {
+   "kill_tests": [
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_review_ocr.py",
+    "tests/v2/test_v21_review_chain.py"
+   ],
+   "mutants": 7,
+   "baseline_passes": true,
+   "est_seconds": 110.6
+  },
+  "aisef2/app/review_verify.py::_states": {
+   "kill_tests": [
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_review_ocr.py",
+    "tests/v2/test_v21_review_chain.py"
+   ],
+   "mutants": 13,
+   "baseline_passes": true,
+   "est_seconds": 205.4
+  },
+  "aisef2/app/review_verify.py::_stimulus": {
+   "kill_tests": [
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_review_ocr.py",
+    "tests/v2/test_v21_review_chain.py"
+   ],
+   "mutants": 8,
+   "baseline_passes": true,
+   "est_seconds": 126.4
+  },
+  "aisef2/app/review_verify.py::anchor": {
+   "kill_tests": [
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_review_ocr.py",
+    "tests/v2/test_v21_review_chain.py"
+   ],
+   "mutants": 82,
+   "baseline_passes": true,
+   "est_seconds": 1295.6
+  },
+  "aisef2/app/review_verify.py::blocks": {
+   "kill_tests": [
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_review_ocr.py",
+    "tests/v2/test_v21_review_chain.py"
+   ],
+   "mutants": 8,
+   "baseline_passes": true,
+   "est_seconds": 126.4
+  },
+  "aisef2/app/review_verify.py::detail": {
+   "kill_tests": [
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_review_ocr.py",
+    "tests/v2/test_v21_review_chain.py"
+   ],
+   "mutants": 36,
+   "baseline_passes": true,
+   "est_seconds": 568.8
+  },
+  "aisef2/app/review_verify.py::reproducer_contract": {
+   "kill_tests": [
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_review_ocr.py",
+    "tests/v2/test_v21_review_chain.py"
+   ],
+   "mutants": 58,
+   "baseline_passes": true,
+   "est_seconds": 916.4
+  },
+  "aisef2/app/review_verify.py::severity_of": {
+   "kill_tests": [
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_review_ocr.py",
+    "tests/v2/test_v21_review_chain.py"
+   ],
+   "mutants": 5,
+   "baseline_passes": true,
+   "est_seconds": 79.0
+  },
+  "aisef2/app/review_verify.py::verify": {
+   "kill_tests": [
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_review_ocr.py",
+    "tests/v2/test_v21_review_chain.py"
+   ],
+   "mutants": 30,
+   "baseline_passes": true,
+   "est_seconds": 474.0
+  },
+  "aisef2/app/run.py::_close": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "mutants": 3,
+   "baseline_passes": true,
+   "est_seconds": 18.6
+  },
+  "aisef2/app/run.py::_content_sha": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "mutants": 10,
+   "baseline_passes": true,
+   "est_seconds": 62.0
+  },
+  "aisef2/app/run.py::admit": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "mutants": 15,
+   "baseline_passes": true,
+   "est_seconds": 93.0
+  },
+  "aisef2/app/run.py::anchor_in": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "mutants": 4,
+   "baseline_passes": true,
+   "est_seconds": 24.8
+  },
+  "aisef2/app/run.py::anchor_of": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "mutants": 7,
+   "baseline_passes": true,
+   "est_seconds": 43.4
+  },
+  "aisef2/app/run.py::calibrations": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "mutants": 11,
+   "baseline_passes": true,
+   "est_seconds": 68.2
+  },
+  "aisef2/app/run.py::check_git": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "mutants": 22,
+   "baseline_passes": true,
+   "est_seconds": 136.4
+  },
+  "aisef2/app/run.py::check_repository": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "mutants": 38,
+   "baseline_passes": true,
+   "est_seconds": 235.6
+  },
+  "aisef2/app/run.py::delivery": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "mutants": 46,
+   "baseline_passes": true,
+   "est_seconds": 285.2
+  },
+  "aisef2/app/run.py::evidence_manifest": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "mutants": 21,
+   "baseline_passes": true,
+   "est_seconds": 130.2
+  },
+  "aisef2/app/run.py::execute": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "mutants": 315,
+   "baseline_passes": true,
+   "est_seconds": 1953.0
+  },
+  "aisef2/app/run.py::kernel_digest": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "mutants": 3,
+   "baseline_passes": true,
+   "est_seconds": 18.6
+  },
+  "aisef2/app/run.py::layers_of": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "mutants": 79,
+   "baseline_passes": true,
+   "est_seconds": 489.8
+  },
+  "aisef2/app/run.py::outcomes_from": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "mutants": 16,
+   "baseline_passes": true,
+   "est_seconds": 99.2
+  },
+  "aisef2/app/run.py::probe_interpreter": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "mutants": 21,
+   "baseline_passes": true,
+   "est_seconds": 130.2
+  },
+  "aisef2/app/run.py::productproof": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "mutants": 62,
+   "baseline_passes": true,
+   "est_seconds": 384.4
+  },
+  "aisef2/app/run.py::regression_tests": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "mutants": 14,
+   "baseline_passes": true,
+   "est_seconds": 86.8
+  },
+  "aisef2/app/run.py::runspec_of": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "mutants": 51,
+   "baseline_passes": true,
+   "est_seconds": 316.2
+  },
+  "aisef2/app/run.py::unfinished": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "mutants": 18,
+   "baseline_passes": true,
+   "est_seconds": 111.6
+  },
+  "aisef2/app/settings.py::FINDERS": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "mutants": 2,
+   "baseline_passes": true,
+   "est_seconds": 12.4
+  },
+  "aisef2/app/settings.py::LOOPBACK": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "mutants": 3,
+   "baseline_passes": true,
+   "est_seconds": 18.6
+  },
+  "aisef2/app/settings.py::OCR_KEYS": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "mutants": 4,
+   "baseline_passes": true,
+   "est_seconds": 24.8
+  },
+  "aisef2/app/settings.py::OPTIONAL": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "mutants": 2,
+   "baseline_passes": true,
+   "est_seconds": 12.4
+  },
+  "aisef2/app/settings.py::REVIEW_ABSENT": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "mutants": 9,
+   "baseline_passes": true,
+   "est_seconds": 55.8
+  },
+  "aisef2/app/settings.py::Settings.prices": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "mutants": 2,
+   "baseline_passes": true,
+   "est_seconds": 12.4
+  },
+  "aisef2/app/settings.py::_count": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "mutants": 7,
+   "baseline_passes": true,
+   "est_seconds": 43.4
+  },
+  "aisef2/app/settings.py::endpoint_problem": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "mutants": 36,
+   "baseline_passes": true,
+   "est_seconds": 223.2
+  },
+  "aisef2/app/settings.py::load": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "mutants": 254,
+   "baseline_passes": true,
+   "est_seconds": 1574.8
+  },
+  "aisef2/app/settings.py::read": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "mutants": 9,
+   "baseline_passes": true,
+   "est_seconds": 55.8
+  },
+  "aisef2/app/usage.py::CLASSES": {
+   "kill_tests": [
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 5,
+   "baseline_passes": true,
+   "est_seconds": 240.5
+  },
+  "aisef2/app/usage.py::PRICE_KEYS": {
+   "kill_tests": [
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 7,
+   "baseline_passes": true,
+   "est_seconds": 336.7
+  },
+  "aisef2/app/usage.py::_DATE": {
+   "kill_tests": [
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 1,
+   "baseline_passes": true,
+   "est_seconds": 48.1
+  },
+  "aisef2/app/usage.py::_usd": {
+   "kill_tests": [
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 10,
+   "baseline_passes": true,
+   "est_seconds": 481.0
+  },
+  "aisef2/app/usage.py::no_progress": {
+   "kill_tests": [
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 33,
+   "baseline_passes": true,
+   "est_seconds": 1587.3
+  },
+  "aisef2/app/usage.py::price_problem": {
+   "kill_tests": [
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 45,
+   "baseline_passes": true,
+   "est_seconds": 2164.5
+  },
+  "aisef2/app/usage.py::session_tokens": {
+   "kill_tests": [
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 42,
+   "baseline_passes": true,
+   "est_seconds": 2020.2
+  },
+  "aisef2/app/usage.py::usage": {
+   "kill_tests": [
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "mutants": 115,
+   "baseline_passes": true,
+   "est_seconds": 5531.5
+  },
+  "aisef2/app/verify.py::_runspec_problems": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "mutants": 45,
+   "baseline_passes": true,
+   "est_seconds": 279.0
+  },
+  "aisef2/app/verify.py::_spend": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "mutants": 14,
+   "baseline_passes": true,
+   "est_seconds": 86.8
+  },
+  "aisef2/app/verify.py::verify": {
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "mutants": 173,
+   "baseline_passes": true,
+   "est_seconds": 1072.6
+  },
+  "aisef2/orchestrate/adapters.py::Finding.blocks": {
+   "kill_tests": [
+    "tests/v2/test_p6_stages.py",
+    "tests/v2/test_v21_orchestration.py",
+    "tests/v2/test_release_s2_kernel.py"
+   ],
+   "mutants": 2,
+   "baseline_passes": true,
+   "est_seconds": 13.8
+  },
+  "aisef2/orchestrate/adapters.py::Implemented.__post_init__": {
+   "kill_tests": [
+    "tests/v2/test_p6_stages.py",
+    "tests/v2/test_v21_orchestration.py",
+    "tests/v2/test_release_s2_kernel.py"
+   ],
+   "mutants": 27,
+   "baseline_passes": true,
+   "est_seconds": 186.3
+  },
+  "aisef2/orchestrate/adapters.py::Merge.__post_init__": {
+   "kill_tests": [
+    "tests/v2/test_p6_stages.py",
+    "tests/v2/test_v21_orchestration.py",
+    "tests/v2/test_release_s2_kernel.py"
+   ],
+   "mutants": 6,
+   "baseline_passes": true,
+   "est_seconds": 41.4
+  },
+  "aisef2/orchestrate/adapters.py::ReadOnlyScope.files": {
+   "kill_tests": [
+    "tests/v2/test_p6_stages.py",
+    "tests/v2/test_v21_orchestration.py",
+    "tests/v2/test_release_s2_kernel.py"
+   ],
+   "mutants": 8,
+   "baseline_passes": true,
+   "est_seconds": 55.2
+  },
+  "aisef2/orchestrate/adapters.py::ReadOnlyScope.read": {
+   "kill_tests": [
+    "tests/v2/test_p6_stages.py",
+    "tests/v2/test_v21_orchestration.py",
+    "tests/v2/test_release_s2_kernel.py"
+   ],
+   "mutants": 1,
+   "baseline_passes": true,
+   "est_seconds": 6.9
+  },
+  "aisef2/orchestrate/adapters.py::confine": {
+   "kill_tests": [
+    "tests/v2/test_p6_stages.py",
+    "tests/v2/test_v21_orchestration.py",
+    "tests/v2/test_release_s2_kernel.py"
+   ],
+   "mutants": 9,
+   "baseline_passes": true,
+   "est_seconds": 62.1
+  },
+  "aisef2/orchestrate/adapters.py::unconfine": {
+   "kill_tests": [
+    "tests/v2/test_p6_stages.py",
+    "tests/v2/test_v21_orchestration.py",
+    "tests/v2/test_release_s2_kernel.py"
+   ],
+   "mutants": 5,
+   "baseline_passes": true,
+   "est_seconds": 34.5
+  },
+  "aisef2/orchestrate/review.py::_result": {
+   "kill_tests": [
+    "tests/v2/test_p6_stages.py",
+    "tests/v2/test_v21_review.py"
+   ],
+   "mutants": 10,
+   "baseline_passes": true,
+   "est_seconds": 69.0
+  },
+  "aisef2/orchestrate/review.py::review": {
+   "kill_tests": [
+    "tests/v2/test_p6_stages.py",
+    "tests/v2/test_v21_review.py"
+   ],
+   "mutants": 121,
+   "baseline_passes": true,
+   "est_seconds": 834.9
+  },
+  "aisef2/orchestrate/story_runner.py::StoryResult.committed": {
+   "kill_tests": [
+    "tests/v2/test_p6_stages.py",
+    "tests/v2/test_v21_orchestration.py",
+    "tests/v2/test_release_s2_kernel.py",
+    "tests/v2/test_c2_k_nowork_001.py",
+    "tests/v2/test_c2_k_presat_001.py",
+    "tests/v2/test_c2_orchestration_conformance.py"
+   ],
+   "mutants": 3,
+   "baseline_passes": true,
+   "est_seconds": 20.7
+  },
+  "aisef2/orchestrate/story_runner.py::StoryResult.revision": {
+   "kill_tests": [
+    "tests/v2/test_p6_stages.py",
+    "tests/v2/test_v21_orchestration.py",
+    "tests/v2/test_release_s2_kernel.py",
+    "tests/v2/test_c2_k_nowork_001.py",
+    "tests/v2/test_c2_k_presat_001.py",
+    "tests/v2/test_c2_orchestration_conformance.py"
+   ],
+   "mutants": 1,
+   "baseline_passes": true,
+   "est_seconds": 6.9
+  },
+  "aisef2/orchestrate/story_runner.py::_Held.__call__": {
+   "kill_tests": [
+    "tests/v2/test_p6_stages.py",
+    "tests/v2/test_v21_orchestration.py",
+    "tests/v2/test_release_s2_kernel.py",
+    "tests/v2/test_c2_k_nowork_001.py",
+    "tests/v2/test_c2_k_presat_001.py",
+    "tests/v2/test_c2_orchestration_conformance.py"
+   ],
+   "mutants": 3,
+   "baseline_passes": true,
+   "est_seconds": 20.7
+  },
+  "aisef2/orchestrate/story_runner.py::_Held.__init__": {
+   "kill_tests": [
+    "tests/v2/test_p6_stages.py",
+    "tests/v2/test_v21_orchestration.py",
+    "tests/v2/test_release_s2_kernel.py",
+    "tests/v2/test_c2_k_nowork_001.py",
+    "tests/v2/test_c2_k_presat_001.py",
+    "tests/v2/test_c2_orchestration_conformance.py"
+   ],
+   "mutants": 6,
+   "baseline_passes": true,
+   "est_seconds": 41.4
+  },
+  "aisef2/orchestrate/story_runner.py::_Held.release": {
+   "kill_tests": [
+    "tests/v2/test_p6_stages.py",
+    "tests/v2/test_v21_orchestration.py",
+    "tests/v2/test_release_s2_kernel.py",
+    "tests/v2/test_c2_k_nowork_001.py",
+    "tests/v2/test_c2_k_presat_001.py",
+    "tests/v2/test_c2_orchestration_conformance.py"
+   ],
+   "mutants": 3,
+   "baseline_passes": true,
+   "est_seconds": 20.7
+  },
+  "aisef2/orchestrate/story_runner.py::_attempt": {
+   "kill_tests": [
+    "tests/v2/test_p6_stages.py",
+    "tests/v2/test_v21_orchestration.py",
+    "tests/v2/test_release_s2_kernel.py",
+    "tests/v2/test_c2_k_nowork_001.py",
+    "tests/v2/test_c2_k_presat_001.py",
+    "tests/v2/test_c2_orchestration_conformance.py",
+    "tests/v2/test_p6_orchestration.py"
+   ],
+   "mutants": 324,
+   "baseline_passes": true,
+   "est_seconds": 2235.6
+  },
+  "aisef2/orchestrate/story_runner.py::_committed": {
+   "kill_tests": [
+    "tests/v2/test_p6_stages.py",
+    "tests/v2/test_v21_orchestration.py",
+    "tests/v2/test_release_s2_kernel.py",
+    "tests/v2/test_c2_k_nowork_001.py",
+    "tests/v2/test_c2_k_presat_001.py",
+    "tests/v2/test_c2_orchestration_conformance.py"
+   ],
+   "mutants": 6,
+   "baseline_passes": true,
+   "est_seconds": 41.4
+  },
+  "aisef2/orchestrate/story_runner.py::_fail": {
+   "kill_tests": [
+    "tests/v2/test_p6_stages.py",
+    "tests/v2/test_v21_orchestration.py",
+    "tests/v2/test_release_s2_kernel.py",
+    "tests/v2/test_c2_k_nowork_001.py",
+    "tests/v2/test_c2_k_presat_001.py",
+    "tests/v2/test_c2_orchestration_conformance.py"
+   ],
+   "mutants": 34,
+   "baseline_passes": true,
+   "est_seconds": 234.6
+  },
+  "aisef2/orchestrate/story_runner.py::_freeze_plan": {
+   "kill_tests": [
+    "tests/v2/test_p6_stages.py",
+    "tests/v2/test_v21_orchestration.py",
+    "tests/v2/test_release_s2_kernel.py",
+    "tests/v2/test_c2_k_nowork_001.py",
+    "tests/v2/test_c2_k_presat_001.py",
+    "tests/v2/test_c2_orchestration_conformance.py"
+   ],
+   "mutants": 9,
+   "baseline_passes": true,
+   "est_seconds": 62.1
+  },
+  "aisef2/orchestrate/story_runner.py::_probe": {
+   "kill_tests": [
+    "tests/v2/test_p6_stages.py",
+    "tests/v2/test_v21_orchestration.py",
+    "tests/v2/test_release_s2_kernel.py",
+    "tests/v2/test_c2_k_nowork_001.py",
+    "tests/v2/test_c2_k_presat_001.py",
+    "tests/v2/test_c2_orchestration_conformance.py"
+   ],
+   "mutants": 9,
+   "baseline_passes": true,
+   "est_seconds": 62.1
+  },
+  "aisef2/orchestrate/story_runner.py::run_story": {
+   "kill_tests": [
+    "tests/v2/test_p6_stages.py",
+    "tests/v2/test_v21_orchestration.py",
+    "tests/v2/test_release_s2_kernel.py",
+    "tests/v2/test_c2_k_nowork_001.py",
+    "tests/v2/test_c2_k_presat_001.py",
+    "tests/v2/test_c2_orchestration_conformance.py",
+    "tests/v2/test_p6_orchestration.py"
+   ],
+   "mutants": 11,
+   "baseline_passes": true,
+   "est_seconds": 75.9
+  },
+  "aisef2/orchestrate/workspace.py::Checkout.__init__": {
+   "kill_tests": [
+    "tests/v2/test_p6_stages.py",
+    "tests/v2/test_v21_orchestration.py",
+    "tests/v2/test_release_s2_kernel.py"
+   ],
+   "mutants": 10,
+   "baseline_passes": true,
+   "est_seconds": 69.0
+  },
+  "aisef2/orchestrate/workspace.py::Checkout.release": {
+   "kill_tests": [
+    "tests/v2/test_p6_stages.py",
+    "tests/v2/test_v21_orchestration.py",
+    "tests/v2/test_release_s2_kernel.py"
+   ],
+   "mutants": 8,
+   "baseline_passes": true,
+   "est_seconds": 55.2
+  },
+  "aisef2/orchestrate/workspace.py::GitMerger.base": {
+   "kill_tests": [
+    "tests/v2/test_p6_stages.py",
+    "tests/v2/test_v21_orchestration.py",
+    "tests/v2/test_release_s2_kernel.py"
+   ],
+   "mutants": 1,
+   "baseline_passes": true,
+   "est_seconds": 6.9
+  },
+  "aisef2/orchestrate/workspace.py::GitMerger.merge": {
+   "kill_tests": [
+    "tests/v2/test_p6_stages.py",
+    "tests/v2/test_v21_orchestration.py",
+    "tests/v2/test_release_s2_kernel.py"
+   ],
+   "mutants": 46,
+   "baseline_passes": true,
+   "est_seconds": 317.4
+  },
+  "aisef2/orchestrate/workspace.py::GitMerger.revert": {
+   "kill_tests": [
+    "tests/v2/test_p6_stages.py",
+    "tests/v2/test_v21_orchestration.py",
+    "tests/v2/test_release_s2_kernel.py"
+   ],
+   "mutants": 15,
+   "baseline_passes": true,
+   "est_seconds": 103.5
+  },
+  "aisef2/orchestrate/workspace.py::GitWorkspace.checkout": {
+   "kill_tests": [
+    "tests/v2/test_p6_stages.py",
+    "tests/v2/test_v21_orchestration.py",
+    "tests/v2/test_release_s2_kernel.py"
+   ],
+   "mutants": 16,
+   "baseline_passes": true,
+   "est_seconds": 110.4
+  },
+  "aisef2/orchestrate/workspace.py::GitWorkspace.diff": {
+   "kill_tests": [
+    "tests/v2/test_p6_stages.py",
+    "tests/v2/test_v21_orchestration.py",
+    "tests/v2/test_release_s2_kernel.py"
+   ],
+   "mutants": 9,
+   "baseline_passes": true,
+   "est_seconds": 62.1
+  },
+  "aisef2/orchestrate/workspace.py::GitWorkspace.move": {
+   "kill_tests": [
+    "tests/v2/test_p6_stages.py",
+    "tests/v2/test_v21_orchestration.py",
+    "tests/v2/test_release_s2_kernel.py"
+   ],
+   "mutants": 26,
+   "baseline_passes": true,
+   "est_seconds": 179.4
+  },
+  "aisef2/orchestrate/workspace.py::GitWorkspace.scratch": {
+   "kill_tests": [
+    "tests/v2/test_p6_stages.py",
+    "tests/v2/test_v21_orchestration.py",
+    "tests/v2/test_release_s2_kernel.py"
+   ],
+   "mutants": 4,
+   "baseline_passes": true,
+   "est_seconds": 27.6
+  },
+  "aisef2/orchestrate/workspace.py::Scratch.__init__": {
+   "kill_tests": [
+    "tests/v2/test_p6_stages.py",
+    "tests/v2/test_v21_orchestration.py",
+    "tests/v2/test_release_s2_kernel.py"
+   ],
+   "mutants": 6,
+   "baseline_passes": true,
+   "est_seconds": 41.4
+  },
+  "aisef2/orchestrate/workspace.py::Scratch.release": {
+   "kill_tests": [
+    "tests/v2/test_p6_stages.py",
+    "tests/v2/test_v21_orchestration.py",
+    "tests/v2/test_release_s2_kernel.py"
+   ],
+   "mutants": 3,
+   "baseline_passes": true,
+   "est_seconds": 20.7
+  },
+  "aisef2/orchestrate/workspace.py::_NO_BACKGROUND_GIT": {
+   "kill_tests": [
+    "tests/v2/test_p6_stages.py",
+    "tests/v2/test_v21_orchestration.py",
+    "tests/v2/test_release_s2_kernel.py"
+   ],
+   "mutants": 11,
+   "baseline_passes": true,
+   "est_seconds": 75.9
+  },
+  "aisef2/orchestrate/workspace.py::_env": {
+   "kill_tests": [
+    "tests/v2/test_p6_stages.py",
+    "tests/v2/test_v21_orchestration.py",
+    "tests/v2/test_release_s2_kernel.py"
+   ],
+   "mutants": 6,
+   "baseline_passes": true,
+   "est_seconds": 41.4
+  },
+  "aisef2/orchestrate/workspace.py::_sha": {
+   "kill_tests": [
+    "tests/v2/test_p6_stages.py",
+    "tests/v2/test_v21_orchestration.py",
+    "tests/v2/test_release_s2_kernel.py"
+   ],
+   "mutants": 13,
+   "baseline_passes": true,
+   "est_seconds": 89.7
+  },
+  "aisef2/orchestrate/workspace.py::commit_all": {
+   "kill_tests": [
+    "tests/v2/test_p6_stages.py",
+    "tests/v2/test_v21_orchestration.py",
+    "tests/v2/test_release_s2_kernel.py"
+   ],
+   "mutants": 19,
+   "baseline_passes": true,
+   "est_seconds": 131.1
+  },
+  "aisef2/orchestrate/workspace.py::config_problems": {
+   "kill_tests": [
+    "tests/v2/test_p6_stages.py",
+    "tests/v2/test_v21_orchestration.py",
+    "tests/v2/test_release_s2_kernel.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "mutants": 34,
+   "baseline_passes": true,
+   "est_seconds": 234.6
+  },
+  "aisef2/orchestrate/workspace.py::git": {
+   "kill_tests": [
+    "tests/v2/test_p6_stages.py",
+    "tests/v2/test_v21_orchestration.py",
+    "tests/v2/test_release_s2_kernel.py"
+   ],
+   "mutants": 22,
+   "baseline_passes": true,
+   "est_seconds": 151.8
+  },
+  "aisef2/plan/static_admission.py::_cycle": {
+   "kill_tests": [
+    "tests/v2/p2/test_static_admission.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 21,
+   "baseline_passes": true,
+   "est_seconds": 6.3
+  },
+  "aisef2/plan/static_admission.py::admit": {
+   "kill_tests": [
+    "tests/v2/p2/test_static_admission.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 21,
+   "baseline_passes": true,
+   "est_seconds": 6.3
+  },
+  "aisef2/plan/static_admission.py::check_contract_spec_integrity": {
+   "kill_tests": [
+    "tests/v2/p2/test_static_admission.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 13,
+   "baseline_passes": true,
+   "est_seconds": 3.9
+  },
+  "aisef2/plan/static_admission.py::check_contradictions": {
+   "kill_tests": [
+    "tests/v2/p2/test_static_admission.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 32,
+   "baseline_passes": true,
+   "est_seconds": 9.6
+  },
+  "aisef2/plan/static_admission.py::check_dependency_dag": {
+   "kill_tests": [
+    "tests/v2/p2/test_static_admission.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 9,
+   "baseline_passes": true,
+   "est_seconds": 2.7
+  },
+  "aisef2/plan/static_admission.py::check_ownership": {
+   "kill_tests": [
+    "tests/v2/p2/test_static_admission.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 20,
+   "baseline_passes": true,
+   "est_seconds": 6.0
+  },
+  "aisef2/plan/static_admission.py::check_plan_structure": {
+   "kill_tests": [
+    "tests/v2/p2/test_static_admission.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 8,
+   "baseline_passes": true,
+   "est_seconds": 2.4
+  },
+  "aisef2/plan/static_admission.py::check_probe_calibration": {
+   "kill_tests": [
+    "tests/v2/p2/test_static_admission.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 19,
+   "baseline_passes": true,
+   "est_seconds": 5.7
+  },
+  "aisef2/plan/static_admission.py::check_proof_capability": {
+   "kill_tests": [
+    "tests/v2/p2/test_static_admission.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 16,
+   "baseline_passes": true,
+   "est_seconds": 4.8
+  },
+  "aisef2/plan/static_admission.py::check_requirement_coverage": {
+   "kill_tests": [
+    "tests/v2/p2/test_static_admission.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 6,
+   "baseline_passes": true,
+   "est_seconds": 1.8
+  },
+  "aisef2/plan/static_admission.py::check_traceability": {
+   "kill_tests": [
+    "tests/v2/p2/test_static_admission.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 11,
+   "baseline_passes": true,
+   "est_seconds": 3.3
+  },
+  "aisef2/plan/static_admission.py::depends_on_story": {
+   "kill_tests": [
+    "tests/v2/p2/test_static_admission.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 12,
+   "baseline_passes": true,
+   "est_seconds": 3.6
+  },
+  "aisef2/plan/static_admission.py::story_graph": {
+   "kill_tests": [
+    "tests/v2/p2/test_static_admission.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 4,
+   "baseline_passes": true,
+   "est_seconds": 1.2
+  },
+  "aisef2/probe/calibration.py::calibrate": {
+   "kill_tests": [
+    "tests/v2/p2/test_calibration.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 40,
+   "baseline_passes": true,
+   "est_seconds": 16.0
+  },
+  "aisef2/probe/calibration.py::calibration_for": {
+   "kill_tests": [
+    "tests/v2/p2/test_calibration.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 9,
+   "baseline_passes": true,
+   "est_seconds": 3.6
+  },
+  "aisef2/probe/calibration.py::demonstrates_contrast": {
+   "kill_tests": [
+    "tests/v2/p2/test_calibration.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 5,
+   "baseline_passes": true,
+   "est_seconds": 2.0
+  },
+  "aisef2/probe/calibration.py::executing": {
+   "kill_tests": [
+    "tests/v2/p2/test_calibration.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 3,
+   "baseline_passes": true,
+   "est_seconds": 1.2
+  },
+  "aisef2/probe/cli_invocation.py::AGENT/flush": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_protocol.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_c2_cli_invocation.py"
+   ],
+   "mutants": 4,
+   "baseline_passes": true,
+   "est_seconds": 247.6
+  },
+  "aisef2/probe/cli_invocation.py::AGENT/guarded": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_protocol.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_c2_cli_invocation.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "mutants": 19,
+   "baseline_passes": true,
+   "est_seconds": 1176.1
+  },
+  "aisef2/probe/cli_invocation.py::AGENT/op_bye": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_protocol.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_c2_cli_invocation.py"
+   ],
+   "mutants": 1,
+   "baseline_passes": true,
+   "est_seconds": 61.9
+  },
+  "aisef2/probe/cli_invocation.py::AGENT/op_call": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_protocol.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_c2_cli_invocation.py"
+   ],
+   "mutants": 38,
+   "baseline_passes": true,
+   "est_seconds": 2352.2
+  },
+  "aisef2/probe/cli_invocation.py::AGENT/op_construct": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_protocol.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_c2_cli_invocation.py"
+   ],
+   "mutants": 13,
+   "baseline_passes": true,
+   "est_seconds": 804.7
+  },
+  "aisef2/probe/cli_invocation.py::AGENT/op_import": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_protocol.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_c2_cli_invocation.py"
+   ],
+   "mutants": 22,
+   "baseline_passes": true,
+   "est_seconds": 1361.8
+  },
+  "aisef2/probe/cli_invocation.py::AGENT/op_invoke": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_protocol.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_c2_cli_invocation.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "mutants": 36,
+   "baseline_passes": true,
+   "est_seconds": 2228.4
+  },
+  "aisef2/probe/cli_invocation.py::AGENT/op_resolve": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_protocol.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_c2_cli_invocation.py"
+   ],
+   "mutants": 16,
+   "baseline_passes": true,
+   "est_seconds": 990.4
+  },
+  "aisef2/probe/cli_invocation.py::AGENT/op_value": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_protocol.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_c2_cli_invocation.py"
+   ],
+   "mutants": 2,
+   "baseline_passes": true,
+   "est_seconds": 123.8
+  },
+  "aisef2/probe/cli_invocation.py::AGENT/plain": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_protocol.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_c2_cli_invocation.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "mutants": 4,
+   "baseline_passes": true,
+   "est_seconds": 247.6
+  },
+  "aisef2/probe/cli_invocation.py::AGENT/redirect": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_protocol.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_c2_cli_invocation.py"
+   ],
+   "mutants": 15,
+   "baseline_passes": true,
+   "est_seconds": 928.5
+  },
+  "aisef2/probe/cli_invocation.py::AGENT/send": {
+   "kill_tests": [
+    "tests/v2/test_s2_kills_k.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_s2_kills.py",
+    "tests/v2/test_c2_cli_protocol.py",
+    "tests/v2/test_c2_cli_invocation.py"
+   ],
+   "mutants": 2,
+   "baseline_passes": true,
+   "est_seconds": 1.0
+  },
+  "aisef2/probe/cli_invocation.py::AGENT/tagged": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_protocol.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_c2_cli_invocation.py"
+   ],
+   "mutants": 16,
+   "baseline_passes": true,
+   "est_seconds": 990.4
+  },
+  "aisef2/probe/cli_invocation.py::CLASSES": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_verdicts.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 5,
+   "baseline_passes": true,
+   "est_seconds": 2.0
+  },
+  "aisef2/probe/cli_invocation.py::CLASS_TABLE": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_verdicts.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 212,
+   "baseline_passes": true,
+   "est_seconds": 84.8
+  },
+  "aisef2/probe/cli_invocation.py::COMPARATORS": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_verdicts.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 2,
+   "baseline_passes": true,
+   "est_seconds": 0.8
+  },
+  "aisef2/probe/cli_invocation.py::CliInvocationProbe.__init__": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_protocol.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_c2_cli_invocation.py"
+   ],
+   "mutants": 4,
+   "baseline_passes": true,
+   "est_seconds": 247.6
+  },
+  "aisef2/probe/cli_invocation.py::CliInvocationProbe._observe": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_protocol.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_c2_cli_invocation.py"
+   ],
+   "mutants": 15,
+   "baseline_passes": true,
+   "est_seconds": 928.5
+  },
+  "aisef2/probe/cli_invocation.py::CliInvocationProbe._observe_equality": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_protocol.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_c2_cli_calibration.py"
+   ],
+   "mutants": 73,
+   "baseline_passes": true,
+   "est_seconds": 4518.7
+  },
+  "aisef2/probe/cli_invocation.py::CliInvocationProbe._observe_in": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_protocol.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_c2_cli_invocation.py"
+   ],
+   "mutants": 45,
+   "baseline_passes": true,
+   "est_seconds": 2785.5
+  },
+  "aisef2/probe/cli_invocation.py::CliInvocationProbe.enforcement": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_verdicts.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 3,
+   "baseline_passes": true,
+   "est_seconds": 1.2
+  },
+  "aisef2/probe/cli_invocation.py::CliInvocationProbe.harness_preconditions": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_verdicts.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 9,
+   "baseline_passes": true,
+   "est_seconds": 3.6
+  },
+  "aisef2/probe/cli_invocation.py::CliInvocationProbe.observe": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_protocol.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_c2_cli_invocation.py"
+   ],
+   "mutants": 48,
+   "baseline_passes": true,
+   "est_seconds": 2971.2
+  },
+  "aisef2/probe/cli_invocation.py::DIGEST": {
+   "kill_tests": [
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_c2_cli_calibration.py"
+   ],
+   "mutants": 4,
+   "baseline_passes": true,
+   "est_seconds": 6.0
+  },
+  "aisef2/probe/cli_invocation.py::FILE_SHAPES": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_verdicts.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 4,
+   "baseline_passes": true,
+   "est_seconds": 1.6
+  },
+  "aisef2/probe/cli_invocation.py::HARNESS/answer_to": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_protocol.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_c2_cli_invocation.py"
+   ],
+   "mutants": 12,
+   "baseline_passes": true,
+   "est_seconds": 742.8
+  },
+  "aisef2/probe/cli_invocation.py::HARNESS/ask": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_protocol.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_c2_cli_invocation.py"
+   ],
+   "mutants": 4,
+   "baseline_passes": true,
+   "est_seconds": 247.6
+  },
+  "aisef2/probe/cli_invocation.py::HARNESS/conclude": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_protocol.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_c2_cli_invocation.py"
+   ],
+   "mutants": 4,
+   "baseline_passes": true,
+   "est_seconds": 247.6
+  },
+  "aisef2/probe/cli_invocation.py::HARNESS/deadline": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_protocol.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_c2_cli_invocation.py"
+   ],
+   "mutants": 5,
+   "baseline_passes": true,
+   "est_seconds": 309.5
+  },
+  "aisef2/probe/cli_invocation.py::HARNESS/emit": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_protocol.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_c2_cli_invocation.py"
+   ],
+   "mutants": 10,
+   "baseline_passes": true,
+   "est_seconds": 619.0
+  },
+  "aisef2/probe/cli_invocation.py::HARNESS/ended": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_protocol.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_c2_cli_invocation.py"
+   ],
+   "mutants": 13,
+   "baseline_passes": true,
+   "est_seconds": 804.7
+  },
+  "aisef2/probe/cli_invocation.py::HARNESS/file_fact": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_protocol.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_c2_cli_invocation.py"
+   ],
+   "mutants": 8,
+   "baseline_passes": true,
+   "est_seconds": 495.2
+  },
+  "aisef2/probe/cli_invocation.py::HARNESS/finish": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_protocol.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_c2_cli_invocation.py"
+   ],
+   "mutants": 12,
+   "baseline_passes": true,
+   "est_seconds": 742.8
+  },
+  "aisef2/probe/cli_invocation.py::HARNESS/inside": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_protocol.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_c2_cli_invocation.py"
+   ],
+   "mutants": 4,
+   "baseline_passes": true,
+   "est_seconds": 247.6
+  },
+  "aisef2/probe/cli_invocation.py::HARNESS/invoke": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_protocol.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_c2_cli_invocation.py"
+   ],
+   "mutants": 41,
+   "baseline_passes": true,
+   "est_seconds": 2537.9
+  },
+  "aisef2/probe/cli_invocation.py::HARNESS/main": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_protocol.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_c2_cli_invocation.py"
+   ],
+   "mutants": 127,
+   "baseline_passes": true,
+   "est_seconds": 7861.3
+  },
+  "aisef2/probe/cli_invocation.py::HARNESS/resolve": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_protocol.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_c2_cli_invocation.py"
+   ],
+   "mutants": 15,
+   "baseline_passes": true,
+   "est_seconds": 928.5
+  },
+  "aisef2/probe/cli_invocation.py::HARNESS/sha": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_protocol.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_c2_cli_invocation.py"
+   ],
+   "mutants": 3,
+   "baseline_passes": true,
+   "est_seconds": 185.7
+  },
+  "aisef2/probe/cli_invocation.py::HARNESS/stream_fact": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_protocol.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_c2_cli_invocation.py"
+   ],
+   "mutants": 13,
+   "baseline_passes": true,
+   "est_seconds": 804.7
+  },
+  "aisef2/probe/cli_invocation.py::ON_DEADLINE": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_verdicts.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 15,
+   "baseline_passes": true,
+   "est_seconds": 6.0
+  },
+  "aisef2/probe/cli_invocation.py::PROBE_SOURCES": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_protocol.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_c2_cli_invocation.py"
+   ],
+   "mutants": 3,
+   "baseline_passes": true,
+   "est_seconds": 185.7
+  },
+  "aisef2/probe/cli_invocation.py::QUANTIFIERS": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_verdicts.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 3,
+   "baseline_passes": true,
+   "est_seconds": 1.2
+  },
+  "aisef2/probe/cli_invocation.py::STREAM_SHAPES": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_verdicts.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 5,
+   "baseline_passes": true,
+   "est_seconds": 2.0
+  },
+  "aisef2/probe/cli_invocation.py::_argv_ok": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_verdicts.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 2,
+   "baseline_passes": true,
+   "est_seconds": 0.8
+  },
+  "aisef2/probe/cli_invocation.py::_await": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_protocol.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_c2_cli_invocation.py"
+   ],
+   "mutants": 22,
+   "baseline_passes": true,
+   "est_seconds": 1361.8
+  },
+  "aisef2/probe/cli_invocation.py::_bytes_of": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_verdicts.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 11,
+   "baseline_passes": true,
+   "est_seconds": 4.4
+  },
+  "aisef2/probe/cli_invocation.py::_child_env": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_verdicts.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 26,
+   "baseline_passes": true,
+   "est_seconds": 10.4
+  },
+  "aisef2/probe/cli_invocation.py::_concluded": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_protocol.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_c2_cli_invocation.py"
+   ],
+   "mutants": 62,
+   "baseline_passes": true,
+   "est_seconds": 3837.8
+  },
+  "aisef2/probe/cli_invocation.py::_content_ok": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_verdicts.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 28,
+   "baseline_passes": true,
+   "est_seconds": 11.2
+  },
+  "aisef2/probe/cli_invocation.py::_deadline": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_protocol.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_c2_cli_invocation.py"
+   ],
+   "mutants": 10,
+   "baseline_passes": true,
+   "est_seconds": 619.0
+  },
+  "aisef2/probe/cli_invocation.py::_disposed": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_protocol.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_c2_cli_invocation.py"
+   ],
+   "mutants": 3,
+   "baseline_passes": true,
+   "est_seconds": 185.7
+  },
+  "aisef2/probe/cli_invocation.py::_equal": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_verdicts.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 11,
+   "baseline_passes": true,
+   "est_seconds": 4.4
+  },
+  "aisef2/probe/cli_invocation.py::_equality_ok": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_verdicts.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 24,
+   "baseline_passes": true,
+   "est_seconds": 9.6
+  },
+  "aisef2/probe/cli_invocation.py::_equality_verdict": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_verdicts.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 28,
+   "baseline_passes": true,
+   "est_seconds": 11.2
+  },
+  "aisef2/probe/cli_invocation.py::_file_fact": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_verdicts.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 7,
+   "baseline_passes": true,
+   "est_seconds": 2.8
+  },
+  "aisef2/probe/cli_invocation.py::_file_matches": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_verdicts.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 31,
+   "baseline_passes": true,
+   "est_seconds": 12.4
+  },
+  "aisef2/probe/cli_invocation.py::_file_shape_ok": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_verdicts.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 35,
+   "baseline_passes": true,
+   "est_seconds": 14.0
+  },
+  "aisef2/probe/cli_invocation.py::_half_ok": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_verdicts.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 6,
+   "baseline_passes": true,
+   "est_seconds": 2.4
+  },
+  "aisef2/probe/cli_invocation.py::_harness_argv": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_verdicts.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_c2_cli_protocol.py",
+    "tests/v2/test_c2_cli_invocation.py"
+   ],
+   "mutants": 20,
+   "baseline_passes": true,
+   "est_seconds": 8.0
+  },
+  "aisef2/probe/cli_invocation.py::_harness_failure": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_protocol.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_c2_cli_invocation.py"
+   ],
+   "mutants": 27,
+   "baseline_passes": true,
+   "est_seconds": 1671.3
+  },
+  "aisef2/probe/cli_invocation.py::_is_int": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_verdicts.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 3,
+   "baseline_passes": true,
+   "est_seconds": 1.2
+  },
+  "aisef2/probe/cli_invocation.py::_mac": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_verdicts.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_c2_cli_protocol.py",
+    "tests/v2/test_c2_cli_invocation.py"
+   ],
+   "mutants": 3,
+   "baseline_passes": true,
+   "est_seconds": 1.2
+  },
+  "aisef2/probe/cli_invocation.py::_name_ok": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_verdicts.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 3,
+   "baseline_passes": true,
+   "est_seconds": 1.2
+  },
+  "aisef2/probe/cli_invocation.py::_no_result": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_protocol.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_c2_cli_invocation.py"
+   ],
+   "mutants": 20,
+   "baseline_passes": true,
+   "est_seconds": 1238.0
+  },
+  "aisef2/probe/cli_invocation.py::_normalization_ok": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_verdicts.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 15,
+   "baseline_passes": true,
+   "est_seconds": 6.0
+  },
+  "aisef2/probe/cli_invocation.py::_normalize": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_verdicts.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 7,
+   "baseline_passes": true,
+   "est_seconds": 2.8
+  },
+  "aisef2/probe/cli_invocation.py::_preflight": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_protocol.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_c2_cli_invocation.py"
+   ],
+   "mutants": 18,
+   "baseline_passes": true,
+   "est_seconds": 1114.2
+  },
+  "aisef2/probe/cli_invocation.py::_prepare": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_verdicts.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 77,
+   "baseline_passes": true,
+   "est_seconds": 30.8
+  },
+  "aisef2/probe/cli_invocation.py::_probe_digest": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_protocol.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_c2_cli_invocation.py"
+   ],
+   "mutants": 1,
+   "baseline_passes": true,
+   "est_seconds": 61.9
+  },
+  "aisef2/probe/cli_invocation.py::_protocol": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_verdicts.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 14,
+   "baseline_passes": true,
+   "est_seconds": 5.6
+  },
+  "aisef2/probe/cli_invocation.py::_public": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_verdicts.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 16,
+   "baseline_passes": true,
+   "est_seconds": 6.4
+  },
+  "aisef2/probe/cli_invocation.py::_sha_file": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_verdicts.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 12,
+   "baseline_passes": true,
+   "est_seconds": 4.8
+  },
+  "aisef2/probe/cli_invocation.py::_silent": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_protocol.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_c2_cli_invocation.py"
+   ],
+   "mutants": 11,
+   "baseline_passes": true,
+   "est_seconds": 680.9
+  },
+  "aisef2/probe/cli_invocation.py::_stimulus_ok": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_verdicts.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 37,
+   "baseline_passes": true,
+   "est_seconds": 14.8
+  },
+  "aisef2/probe/cli_invocation.py::_stream_bytes": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_verdicts.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 7,
+   "baseline_passes": true,
+   "est_seconds": 2.8
+  },
+  "aisef2/probe/cli_invocation.py::_stream_fact": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_verdicts.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 11,
+   "baseline_passes": true,
+   "est_seconds": 4.4
+  },
+  "aisef2/probe/cli_invocation.py::_stream_matches": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_verdicts.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 38,
+   "baseline_passes": true,
+   "est_seconds": 15.2
+  },
+  "aisef2/probe/cli_invocation.py::_stream_shape_ok": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_verdicts.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 41,
+   "baseline_passes": true,
+   "est_seconds": 16.4
+  },
+  "aisef2/probe/cli_invocation.py::_streams_ok": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_verdicts.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 6,
+   "baseline_passes": true,
+   "est_seconds": 2.4
+  },
+  "aisef2/probe/cli_invocation.py::_substitute": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_verdicts.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 8,
+   "baseline_passes": true,
+   "est_seconds": 3.2
+  },
+  "aisef2/probe/cli_invocation.py::_watch": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_protocol.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_c2_cli_invocation.py"
+   ],
+   "mutants": 43,
+   "baseline_passes": true,
+   "est_seconds": 2661.7
+  },
+  "aisef2/probe/cli_invocation.py::_ws_key_ok": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_verdicts.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 3,
+   "baseline_passes": true,
+   "est_seconds": 1.2
+  },
+  "aisef2/probe/cli_invocation.py::_ws_name": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_verdicts.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 1,
+   "baseline_passes": true,
+   "est_seconds": 0.4
+  },
+  "aisef2/probe/cli_invocation.py::observation_class": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_verdicts.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 55,
+   "baseline_passes": true,
+   "est_seconds": 22.0
+  },
+  "aisef2/probe/cli_invocation.py::spec_class": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_verdicts.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 13,
+   "baseline_passes": true,
+   "est_seconds": 5.2
+  },
+  "aisef2/probe/cli_invocation.py::verdict_of": {
+   "kill_tests": [
+    "tests/v2/test_c2_cli_verdicts.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 44,
+   "baseline_passes": true,
+   "est_seconds": 17.6
+  },
+  "aisef2/probe/file_artifact.py::CLASSES": {
+   "kill_tests": [
+    "tests/v2/test_c2_file_artifact.py",
+    "tests/v2/test_v21_python_imports.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 4,
+   "baseline_passes": true,
+   "est_seconds": 18.8
+  },
+  "aisef2/probe/file_artifact.py::DIGEST": {
+   "kill_tests": [
+    "tests/v2/test_v21_python_imports.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_c2_file_artifact.py"
+   ],
+   "mutants": 4,
+   "baseline_passes": true,
+   "est_seconds": 2.4
+  },
+  "aisef2/probe/file_artifact.py::FileArtifactProbe.__init__": {
+   "kill_tests": [
+    "tests/v2/test_c2_file_artifact.py",
+    "tests/v2/test_v21_python_imports.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 5,
+   "baseline_passes": true,
+   "est_seconds": 23.5
+  },
+  "aisef2/probe/file_artifact.py::FileArtifactProbe._reader": {
+   "kill_tests": [
+    "tests/v2/test_c2_file_artifact.py",
+    "tests/v2/test_v21_python_imports.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 15,
+   "baseline_passes": true,
+   "est_seconds": 70.5
+  },
+  "aisef2/probe/file_artifact.py::FileArtifactProbe.enforcement": {
+   "kill_tests": [
+    "tests/v2/test_c2_file_artifact.py",
+    "tests/v2/test_v21_python_imports.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 3,
+   "baseline_passes": true,
+   "est_seconds": 14.1
+  },
+  "aisef2/probe/file_artifact.py::FileArtifactProbe.harness_preconditions": {
+   "kill_tests": [
+    "tests/v2/test_c2_file_artifact.py",
+    "tests/v2/test_v21_python_imports.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 7,
+   "baseline_passes": true,
+   "est_seconds": 32.9
+  },
+  "aisef2/probe/file_artifact.py::FileArtifactProbe.observe": {
+   "kill_tests": [
+    "tests/v2/test_c2_file_artifact.py",
+    "tests/v2/test_v21_python_imports.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 137,
+   "baseline_passes": true,
+   "est_seconds": 643.9
+  },
+  "aisef2/probe/file_artifact.py::MODES": {
+   "kill_tests": [
+    "tests/v2/test_c2_file_artifact.py",
+    "tests/v2/test_v21_python_imports.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 4,
+   "baseline_passes": true,
+   "est_seconds": 18.8
+  },
+  "aisef2/probe/file_artifact.py::NEWLINES": {
+   "kill_tests": [
+    "tests/v2/test_c2_file_artifact.py",
+    "tests/v2/test_v21_python_imports.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 2,
+   "baseline_passes": true,
+   "est_seconds": 9.4
+  },
+  "aisef2/probe/file_artifact.py::ON_DEADLINE": {
+   "kill_tests": [
+    "tests/v2/test_c2_file_artifact.py",
+    "tests/v2/test_v21_python_imports.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 12,
+   "baseline_passes": true,
+   "est_seconds": 56.4
+  },
+  "aisef2/probe/file_artifact.py::ObjectStore.__init__": {
+   "kill_tests": [
+    "tests/v2/test_c2_file_artifact.py",
+    "tests/v2/test_v21_python_imports.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 10,
+   "baseline_passes": true,
+   "est_seconds": 47.0
+  },
+  "aisef2/probe/file_artifact.py::ObjectStore._parse": {
+   "kill_tests": [
+    "tests/v2/test_c2_file_artifact.py",
+    "tests/v2/test_v21_python_imports.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 18,
+   "baseline_passes": true,
+   "est_seconds": 84.6
+  },
+  "aisef2/probe/file_artifact.py::ObjectStore.blob": {
+   "kill_tests": [
+    "tests/v2/test_c2_file_artifact.py",
+    "tests/v2/test_v21_python_imports.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 3,
+   "baseline_passes": true,
+   "est_seconds": 14.1
+  },
+  "aisef2/probe/file_artifact.py::ObjectStore.entries": {
+   "kill_tests": [
+    "tests/v2/test_c2_file_artifact.py",
+    "tests/v2/test_v21_python_imports.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 5,
+   "baseline_passes": true,
+   "est_seconds": 23.5
+  },
+  "aisef2/probe/file_artifact.py::ObjectStore.holds_revision": {
+   "kill_tests": [
+    "tests/v2/test_c2_file_artifact.py",
+    "tests/v2/test_v21_python_imports.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 8,
+   "baseline_passes": true,
+   "est_seconds": 37.6
+  },
+  "aisef2/probe/file_artifact.py::ObjectStore.lookup": {
+   "kill_tests": [
+    "tests/v2/test_c2_file_artifact.py",
+    "tests/v2/test_v21_python_imports.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 6,
+   "baseline_passes": true,
+   "est_seconds": 28.2
+  },
+  "aisef2/probe/file_artifact.py::ObjectStore.run": {
+   "kill_tests": [
+    "tests/v2/test_c2_file_artifact.py",
+    "tests/v2/test_v21_python_imports.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 3,
+   "baseline_passes": true,
+   "est_seconds": 14.1
+  },
+  "aisef2/probe/file_artifact.py::ObjectStore.walk": {
+   "kill_tests": [
+    "tests/v2/test_c2_file_artifact.py",
+    "tests/v2/test_v21_python_imports.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 6,
+   "baseline_passes": true,
+   "est_seconds": 28.2
+  },
+  "aisef2/probe/file_artifact.py::PROBE_SOURCES": {
+   "kill_tests": [
+    "tests/v2/test_c2_file_artifact.py",
+    "tests/v2/test_v21_python_imports.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 2,
+   "baseline_passes": true,
+   "est_seconds": 9.4
+  },
+  "aisef2/probe/file_artifact.py::PlainTree._full": {
+   "kill_tests": [
+    "tests/v2/test_c2_file_artifact.py",
+    "tests/v2/test_v21_python_imports.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 2,
+   "baseline_passes": true,
+   "est_seconds": 9.4
+  },
+  "aisef2/probe/file_artifact.py::PlainTree._row": {
+   "kill_tests": [
+    "tests/v2/test_c2_file_artifact.py",
+    "tests/v2/test_v21_python_imports.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 15,
+   "baseline_passes": true,
+   "est_seconds": 70.5
+  },
+  "aisef2/probe/file_artifact.py::PlainTree.blob": {
+   "kill_tests": [
+    "tests/v2/test_c2_file_artifact.py",
+    "tests/v2/test_v21_python_imports.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 1,
+   "baseline_passes": true,
+   "est_seconds": 4.7
+  },
+  "aisef2/probe/file_artifact.py::PlainTree.entries": {
+   "kill_tests": [
+    "tests/v2/test_c2_file_artifact.py",
+    "tests/v2/test_v21_python_imports.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 3,
+   "baseline_passes": true,
+   "est_seconds": 14.1
+  },
+  "aisef2/probe/file_artifact.py::PlainTree.lookup": {
+   "kill_tests": [
+    "tests/v2/test_c2_file_artifact.py",
+    "tests/v2/test_v21_python_imports.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 10,
+   "baseline_passes": true,
+   "est_seconds": 47.0
+  },
+  "aisef2/probe/file_artifact.py::PlainTree.walk": {
+   "kill_tests": [
+    "tests/v2/test_c2_file_artifact.py",
+    "tests/v2/test_v21_python_imports.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 7,
+   "baseline_passes": true,
+   "est_seconds": 32.9
+  },
+  "aisef2/probe/file_artifact.py::_HEX64": {
+   "kill_tests": [
+    "tests/v2/test_c2_file_artifact.py",
+    "tests/v2/test_v21_python_imports.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 1,
+   "baseline_passes": true,
+   "est_seconds": 4.7
+  },
+  "aisef2/probe/file_artifact.py::_MODULE_NAME": {
+   "kill_tests": [
+    "tests/v2/test_v21_python_imports.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_c2_file_artifact.py"
+   ],
+   "mutants": 1,
+   "baseline_passes": true,
+   "est_seconds": 0.6
+  },
+  "aisef2/probe/file_artifact.py::_compiles": {
+   "kill_tests": [
+    "tests/v2/test_c2_file_artifact.py",
+    "tests/v2/test_v21_python_imports.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 10,
+   "baseline_passes": true,
+   "est_seconds": 47.0
+  },
+  "aisef2/probe/file_artifact.py::_probe_digest": {
+   "kill_tests": [
+    "tests/v2/test_c2_file_artifact.py",
+    "tests/v2/test_v21_python_imports.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 1,
+   "baseline_passes": true,
+   "est_seconds": 4.7
+  },
+  "aisef2/probe/file_artifact.py::content_facts": {
+   "kill_tests": [
+    "tests/v2/test_c2_file_artifact.py",
+    "tests/v2/test_v21_python_imports.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 12,
+   "baseline_passes": true,
+   "est_seconds": 56.4
+  },
+  "aisef2/probe/file_artifact.py::entry": {
+   "kill_tests": [
+    "tests/v2/test_c2_file_artifact.py",
+    "tests/v2/test_v21_python_imports.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 27,
+   "baseline_passes": true,
+   "est_seconds": 126.9
+  },
+  "aisef2/probe/file_artifact.py::expected_sha256": {
+   "kill_tests": [
+    "tests/v2/test_c2_file_artifact.py",
+    "tests/v2/test_v21_python_imports.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 10,
+   "baseline_passes": true,
+   "est_seconds": 47.0
+  },
+  "aisef2/probe/file_artifact.py::facts_of": {
+   "kill_tests": [
+    "tests/v2/test_c2_file_artifact.py",
+    "tests/v2/test_v21_python_imports.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 88,
+   "baseline_passes": true,
+   "est_seconds": 413.6
+  },
+  "aisef2/probe/file_artifact.py::git_env": {
+   "kill_tests": [
+    "tests/v2/test_c2_file_artifact.py",
+    "tests/v2/test_v21_python_imports.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 49,
+   "baseline_passes": true,
+   "est_seconds": 230.3
+  },
+  "aisef2/probe/file_artifact.py::grep_facts": {
+   "kill_tests": [
+    "tests/v2/test_c2_file_artifact.py",
+    "tests/v2/test_v21_python_imports.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 38,
+   "baseline_passes": true,
+   "est_seconds": 178.6
+  },
+  "aisef2/probe/file_artifact.py::import_facts": {
+   "kill_tests": [
+    "tests/v2/test_v21_python_imports.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_c2_file_artifact.py"
+   ],
+   "mutants": 52,
+   "baseline_passes": true,
+   "est_seconds": 31.2
+  },
+  "aisef2/probe/file_artifact.py::normalised": {
+   "kill_tests": [
+    "tests/v2/test_c2_file_artifact.py",
+    "tests/v2/test_v21_python_imports.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 5,
+   "baseline_passes": true,
+   "est_seconds": 23.5
+  },
+  "aisef2/probe/file_artifact.py::observation_class": {
+   "kill_tests": [
+    "tests/v2/test_c2_file_artifact.py",
+    "tests/v2/test_v21_python_imports.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 94,
+   "baseline_passes": true,
+   "est_seconds": 441.8
+  },
+  "aisef2/probe/file_artifact.py::read": {
+   "kill_tests": [
+    "tests/v2/test_c2_file_artifact.py",
+    "tests/v2/test_v21_python_imports.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 3,
+   "baseline_passes": true,
+   "est_seconds": 14.1
+  },
+  "aisef2/probe/file_artifact.py::refusal": {
+   "kill_tests": [
+    "tests/v2/test_c2_file_artifact.py",
+    "tests/v2/test_v21_python_imports.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 29,
+   "baseline_passes": true,
+   "est_seconds": 136.3
+  },
+  "aisef2/probe/file_artifact.py::run_git": {
+   "kill_tests": [
+    "tests/v2/test_c2_file_artifact.py",
+    "tests/v2/test_v21_python_imports.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 8,
+   "baseline_passes": true,
+   "est_seconds": 37.6
+  },
+  "aisef2/probe/file_artifact.py::selected": {
+   "kill_tests": [
+    "tests/v2/test_c2_file_artifact.py",
+    "tests/v2/test_v21_python_imports.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 3,
+   "baseline_passes": true,
+   "est_seconds": 14.1
+  },
+  "aisef2/probe/file_artifact.py::spec_class": {
+   "kill_tests": [
+    "tests/v2/test_c2_file_artifact.py",
+    "tests/v2/test_v21_python_imports.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 12,
+   "baseline_passes": true,
+   "est_seconds": 56.4
+  },
+  "aisef2/probe/file_artifact.py::verdict_of": {
+   "kill_tests": [
+    "tests/v2/test_c2_file_artifact.py",
+    "tests/v2/test_v21_python_imports.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 20,
+   "baseline_passes": true,
+   "est_seconds": 94.0
+  },
+  "aisef2/probe/file_artifact.py::window_of": {
+   "kill_tests": [
+    "tests/v2/test_c2_file_artifact.py",
+    "tests/v2/test_v21_python_imports.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 8,
+   "baseline_passes": true,
+   "est_seconds": 37.6
+  },
+  "aisef2/probe/process_effect.py::CLASSES": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect_units.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 3,
+   "baseline_passes": true,
+   "est_seconds": 5.4
+  },
+  "aisef2/probe/process_effect.py::CLASS_TABLE": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect_units.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 118,
+   "baseline_passes": true,
+   "est_seconds": 212.4
+  },
+  "aisef2/probe/process_effect.py::DIGEST": {
+   "kill_tests": [
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_probe_process_effect_units.py"
+   ],
+   "mutants": 4,
+   "baseline_passes": true,
+   "est_seconds": 6.0
+  },
+  "aisef2/probe/process_effect.py::FAULTED": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect_units.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 3,
+   "baseline_passes": true,
+   "est_seconds": 5.4
+  },
+  "aisef2/probe/process_effect.py::FAULTS": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect_units.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 28,
+   "baseline_passes": true,
+   "est_seconds": 50.4
+  },
+  "aisef2/probe/process_effect.py::FILE_SHAPES": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect_units.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 6,
+   "baseline_passes": true,
+   "est_seconds": 10.8
+  },
+  "aisef2/probe/process_effect.py::HARNESS/answer_to": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_probe_process_effect_bytecode.py"
+   ],
+   "mutants": 12,
+   "baseline_passes": true,
+   "est_seconds": 498.0
+  },
+  "aisef2/probe/process_effect.py::HARNESS/answered": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_probe_process_effect_bytecode.py"
+   ],
+   "mutants": 6,
+   "baseline_passes": true,
+   "est_seconds": 249.0
+  },
+  "aisef2/probe/process_effect.py::HARNESS/ask": {
+   "kill_tests": [
+    "tests/v2/test_s2_kills.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_probe_process_effect.py",
+    "tests/v2/test_probe_process_effect_bytecode.py"
+   ],
+   "mutants": 4,
+   "baseline_passes": true,
+   "est_seconds": 89.6
+  },
+  "aisef2/probe/process_effect.py::HARNESS/count_lines": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_probe_process_effect_bytecode.py"
+   ],
+   "mutants": 4,
+   "baseline_passes": true,
+   "est_seconds": 166.0
+  },
+  "aisef2/probe/process_effect.py::HARNESS/do_call": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_probe_process_effect_bytecode.py"
+   ],
+   "mutants": 23,
+   "baseline_passes": true,
+   "est_seconds": 954.5
+  },
+  "aisef2/probe/process_effect.py::HARNESS/do_construct": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_probe_process_effect_bytecode.py"
+   ],
+   "mutants": 21,
+   "baseline_passes": true,
+   "est_seconds": 871.5
+  },
+  "aisef2/probe/process_effect.py::HARNESS/do_edit": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_probe_process_effect_bytecode.py"
+   ],
+   "mutants": 52,
+   "baseline_passes": true,
+   "est_seconds": 2158.0
+  },
+  "aisef2/probe/process_effect.py::HARNESS/do_expect": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_probe_process_effect_bytecode.py"
+   ],
+   "mutants": 62,
+   "baseline_passes": true,
+   "est_seconds": 2573.0
+  },
+  "aisef2/probe/process_effect.py::HARNESS/do_fault": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_probe_process_effect_bytecode.py"
+   ],
+   "mutants": 4,
+   "baseline_passes": true,
+   "est_seconds": 166.0
+  },
+  "aisef2/probe/process_effect.py::HARNESS/do_subprocess": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_probe_process_effect_bytecode.py"
+   ],
+   "mutants": 41,
+   "baseline_passes": true,
+   "est_seconds": 1701.5
+  },
+  "aisef2/probe/process_effect.py::HARNESS/do_workspace": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_probe_process_effect_bytecode.py"
+   ],
+   "mutants": 8,
+   "baseline_passes": true,
+   "est_seconds": 332.0
+  },
+  "aisef2/probe/process_effect.py::HARNESS/do_write": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_probe_process_effect_bytecode.py"
+   ],
+   "mutants": 16,
+   "baseline_passes": true,
+   "est_seconds": 664.0
+  },
+  "aisef2/probe/process_effect.py::HARNESS/emit": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_probe_process_effect_bytecode.py"
+   ],
+   "mutants": 10,
+   "baseline_passes": true,
+   "est_seconds": 415.0
+  },
+  "aisef2/probe/process_effect.py::HARNESS/ended": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_probe_process_effect_bytecode.py"
+   ],
+   "mutants": 37,
+   "baseline_passes": true,
+   "est_seconds": 1535.5
+  },
+  "aisef2/probe/process_effect.py::HARNESS/file_fact": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_probe_process_effect_bytecode.py"
+   ],
+   "mutants": 27,
+   "baseline_passes": true,
+   "est_seconds": 1120.5
+  },
+  "aisef2/probe/process_effect.py::HARNESS/files_now": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_probe_process_effect_bytecode.py"
+   ],
+   "mutants": 4,
+   "baseline_passes": true,
+   "est_seconds": 166.0
+  },
+  "aisef2/probe/process_effect.py::HARNESS/finish": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_probe_process_effect_bytecode.py"
+   ],
+   "mutants": 12,
+   "baseline_passes": true,
+   "est_seconds": 498.0
+  },
+  "aisef2/probe/process_effect.py::HARNESS/guarded": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_probe_process_effect_bytecode.py"
+   ],
+   "mutants": 27,
+   "baseline_passes": true,
+   "est_seconds": 1120.5
+  },
+  "aisef2/probe/process_effect.py::HARNESS/identity": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_probe_process_effect_bytecode.py"
+   ],
+   "mutants": 9,
+   "baseline_passes": true,
+   "est_seconds": 373.5
+  },
+  "aisef2/probe/process_effect.py::HARNESS/inside": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_probe_process_effect_bytecode.py"
+   ],
+   "mutants": 4,
+   "baseline_passes": true,
+   "est_seconds": 166.0
+  },
+  "aisef2/probe/process_effect.py::HARNESS/main": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_probe_process_effect_bytecode.py"
+   ],
+   "mutants": 160,
+   "baseline_passes": true,
+   "est_seconds": 6640.0
+  },
+  "aisef2/probe/process_effect.py::HARNESS/reported": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_probe_process_effect_bytecode.py"
+   ],
+   "mutants": 26,
+   "baseline_passes": true,
+   "est_seconds": 1079.0
+  },
+  "aisef2/probe/process_effect.py::HARNESS/resolve": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_probe_process_effect_bytecode.py"
+   ],
+   "mutants": 15,
+   "baseline_passes": true,
+   "est_seconds": 622.5
+  },
+  "aisef2/probe/process_effect.py::HARNESS/row_of": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_probe_process_effect_bytecode.py"
+   ],
+   "mutants": 9,
+   "baseline_passes": true,
+   "est_seconds": 373.5
+  },
+  "aisef2/probe/process_effect.py::HARNESS/run": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_probe_process_effect_bytecode.py"
+   ],
+   "mutants": 59,
+   "baseline_passes": true,
+   "est_seconds": 2448.5
+  },
+  "aisef2/probe/process_effect.py::HARNESS/same": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_probe_process_effect_bytecode.py"
+   ],
+   "mutants": 7,
+   "baseline_passes": true,
+   "est_seconds": 290.5
+  },
+  "aisef2/probe/process_effect.py::HARNESS/subject_call": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_probe_process_effect_bytecode.py"
+   ],
+   "mutants": 38,
+   "baseline_passes": true,
+   "est_seconds": 1577.0
+  },
+  "aisef2/probe/process_effect.py::HARNESS/unresolved": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_probe_process_effect_bytecode.py"
+   ],
+   "mutants": 16,
+   "baseline_passes": true,
+   "est_seconds": 664.0
+  },
+  "aisef2/probe/process_effect.py::HARNESS/unws": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_probe_process_effect_bytecode.py"
+   ],
+   "mutants": 10,
+   "baseline_passes": true,
+   "est_seconds": 415.0
+  },
+  "aisef2/probe/process_effect.py::ON_DEADLINE": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect_units.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 9,
+   "baseline_passes": true,
+   "est_seconds": 16.2
+  },
+  "aisef2/probe/process_effect.py::PROBE_SOURCES": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect_units.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 4,
+   "baseline_passes": true,
+   "est_seconds": 7.2
+  },
+  "aisef2/probe/process_effect.py::ProcessEffectProbe.__init__": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect_units.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_probe_process_effect.py",
+    "tests/v2/test_probe_process_effect_bytecode.py"
+   ],
+   "mutants": 4,
+   "baseline_passes": true,
+   "est_seconds": 7.2
+  },
+  "aisef2/probe/process_effect.py::ProcessEffectProbe._observe_in": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect_units.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_probe_process_effect.py",
+    "tests/v2/test_probe_process_effect_bytecode.py"
+   ],
+   "mutants": 38,
+   "baseline_passes": true,
+   "est_seconds": 68.4
+  },
+  "aisef2/probe/process_effect.py::ProcessEffectProbe.enforcement": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect_units.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 3,
+   "baseline_passes": true,
+   "est_seconds": 5.4
+  },
+  "aisef2/probe/process_effect.py::ProcessEffectProbe.harness_preconditions": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect_units.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 11,
+   "baseline_passes": true,
+   "est_seconds": 19.8
+  },
+  "aisef2/probe/process_effect.py::ProcessEffectProbe.observe": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect_units.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_probe_process_effect.py",
+    "tests/v2/test_probe_process_effect_bytecode.py"
+   ],
+   "mutants": 54,
+   "baseline_passes": true,
+   "est_seconds": 97.2
+  },
+  "aisef2/probe/process_effect.py::STEPS": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect_units.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 67,
+   "baseline_passes": true,
+   "est_seconds": 120.6
+  },
+  "aisef2/probe/process_effect.py::_CONTENT": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect_units.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 3,
+   "baseline_passes": true,
+   "est_seconds": 5.4
+  },
+  "aisef2/probe/process_effect.py::_FILE_HOLDS": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect_units.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 19,
+   "baseline_passes": true,
+   "est_seconds": 34.2
+  },
+  "aisef2/probe/process_effect.py::_FILE_SHAPE_OK": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect_units.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 27,
+   "baseline_passes": true,
+   "est_seconds": 48.6
+  },
+  "aisef2/probe/process_effect.py::_HOLDS": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect_units.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 3,
+   "baseline_passes": true,
+   "est_seconds": 5.4
+  },
+  "aisef2/probe/process_effect.py::_SHAPES": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect_units.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 8,
+   "baseline_passes": true,
+   "est_seconds": 14.4
+  },
+  "aisef2/probe/process_effect.py::_concluded": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect_units.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 53,
+   "baseline_passes": true,
+   "est_seconds": 95.4
+  },
+  "aisef2/probe/process_effect.py::_content_of": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect_units.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 2,
+   "baseline_passes": true,
+   "est_seconds": 3.6
+  },
+  "aisef2/probe/process_effect.py::_edit_ok": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect_units.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 8,
+   "baseline_passes": true,
+   "est_seconds": 14.4
+  },
+  "aisef2/probe/process_effect.py::_expect_ok": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect_units.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 4,
+   "baseline_passes": true,
+   "est_seconds": 7.2
+  },
+  "aisef2/probe/process_effect.py::_fault_ok": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect_units.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 5,
+   "baseline_passes": true,
+   "est_seconds": 9.0
+  },
+  "aisef2/probe/process_effect.py::_file_shape_ok": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect_units.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 11,
+   "baseline_passes": true,
+   "est_seconds": 19.8
+  },
+  "aisef2/probe/process_effect.py::_files_hold": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect_units.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 15,
+   "baseline_passes": true,
+   "est_seconds": 27.0
+  },
+  "aisef2/probe/process_effect.py::_flat_ok": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect_units.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 3,
+   "baseline_passes": true,
+   "est_seconds": 5.4
+  },
+  "aisef2/probe/process_effect.py::_harness_argv": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect_units.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_probe_process_effect.py",
+    "tests/v2/test_probe_process_effect_bytecode.py"
+   ],
+   "mutants": 20,
+   "baseline_passes": true,
+   "est_seconds": 36.0
+  },
+  "aisef2/probe/process_effect.py::_ident_ok": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect_units.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 3,
+   "baseline_passes": true,
+   "est_seconds": 5.4
+  },
+  "aisef2/probe/process_effect.py::_identity": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect_units.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 11,
+   "baseline_passes": true,
+   "est_seconds": 19.8
+  },
+  "aisef2/probe/process_effect.py::_invocation_ok": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect_units.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 10,
+   "baseline_passes": true,
+   "est_seconds": 18.0
+  },
+  "aisef2/probe/process_effect.py::_jsonl_holds": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect_units.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 8,
+   "baseline_passes": true,
+   "est_seconds": 14.4
+  },
+  "aisef2/probe/process_effect.py::_observed_files": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect_units.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 11,
+   "baseline_passes": true,
+   "est_seconds": 19.8
+  },
+  "aisef2/probe/process_effect.py::_prepare": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect_units.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_probe_process_effect.py",
+    "tests/v2/test_probe_process_effect_bytecode.py"
+   ],
+   "mutants": 55,
+   "baseline_passes": true,
+   "est_seconds": 99.0
+  },
+  "aisef2/probe/process_effect.py::_probe_digest": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect_units.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 1,
+   "baseline_passes": true,
+   "est_seconds": 1.8
+  },
+  "aisef2/probe/process_effect.py::_raises_hold": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect_units.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 8,
+   "baseline_passes": true,
+   "est_seconds": 14.4
+  },
+  "aisef2/probe/process_effect.py::_resolved": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect_units.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 31,
+   "baseline_passes": true,
+   "est_seconds": 55.8
+  },
+  "aisef2/probe/process_effect.py::_returns_hold": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect_units.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 28,
+   "baseline_passes": true,
+   "est_seconds": 50.4
+  },
+  "aisef2/probe/process_effect.py::_same": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect_units.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 7,
+   "baseline_passes": true,
+   "est_seconds": 12.6
+  },
+  "aisef2/probe/process_effect.py::_scenario_ok": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect_units.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 28,
+   "baseline_passes": true,
+   "est_seconds": 50.4
+  },
+  "aisef2/probe/process_effect.py::_step_ok": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect_units.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 18,
+   "baseline_passes": true,
+   "est_seconds": 32.4
+  },
+  "aisef2/probe/process_effect.py::_subprocess_ok": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect_units.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 8,
+   "baseline_passes": true,
+   "est_seconds": 14.4
+  },
+  "aisef2/probe/process_effect.py::_substitute": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect_units.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 14,
+   "baseline_passes": true,
+   "est_seconds": 25.2
+  },
+  "aisef2/probe/process_effect.py::_watch": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect_units.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_probe_process_effect.py",
+    "tests/v2/test_probe_process_effect_bytecode.py"
+   ],
+   "mutants": 44,
+   "baseline_passes": true,
+   "est_seconds": 79.2
+  },
+  "aisef2/probe/process_effect.py::_workspace_ok": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect_units.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 6,
+   "baseline_passes": true,
+   "est_seconds": 10.8
+  },
+  "aisef2/probe/process_effect.py::_write_ok": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect_units.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 7,
+   "baseline_passes": true,
+   "est_seconds": 12.6
+  },
+  "aisef2/probe/process_effect.py::_ws_path_ok": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect_units.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 3,
+   "baseline_passes": true,
+   "est_seconds": 5.4
+  },
+  "aisef2/probe/process_effect.py::observation_class": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect_units.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 74,
+   "baseline_passes": true,
+   "est_seconds": 133.2
+  },
+  "aisef2/probe/process_effect.py::spec_class": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect_units.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 13,
+   "baseline_passes": true,
+   "est_seconds": 23.4
+  },
+  "aisef2/probe/process_effect.py::verdict_of": {
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect_units.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 9,
+   "baseline_passes": true,
+   "est_seconds": 16.2
+  },
+  "aisef2/probe/python_callable_v2.py::CLASSES": {
+   "kill_tests": [
+    "tests/v2/test_python_callable_v2.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 7,
+   "baseline_passes": true,
+   "est_seconds": 698.6
+  },
+  "aisef2/probe/python_callable_v2.py::DIGEST": {
+   "kill_tests": [
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_python_callable_v2.py"
+   ],
+   "mutants": 4,
+   "baseline_passes": true,
+   "est_seconds": 6.0
+  },
+  "aisef2/probe/python_callable_v2.py::HARNESS/answer_to": {
+   "kill_tests": [
+    "tests/v2/test_python_callable_v2.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_python_callable_v2_bytecode.py"
+   ],
+   "mutants": 12,
+   "baseline_passes": true,
+   "est_seconds": 1197.6
+  },
+  "aisef2/probe/python_callable_v2.py::HARNESS/answered": {
+   "kill_tests": [
+    "tests/v2/test_python_callable_v2.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_python_callable_v2_bytecode.py"
+   ],
+   "mutants": 8,
+   "baseline_passes": true,
+   "est_seconds": 798.4
+  },
+  "aisef2/probe/python_callable_v2.py::HARNESS/ask": {
+   "kill_tests": [
+    "tests/v2/test_python_callable_v2.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_python_callable_v2_bytecode.py"
+   ],
+   "mutants": 4,
+   "baseline_passes": true,
+   "est_seconds": 399.2
+  },
+  "aisef2/probe/python_callable_v2.py::HARNESS/conclude": {
+   "kill_tests": [
+    "tests/v2/test_python_callable_v2.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_python_callable_v2_bytecode.py"
+   ],
+   "mutants": 4,
+   "baseline_passes": true,
+   "est_seconds": 399.2
+  },
+  "aisef2/probe/python_callable_v2.py::HARNESS/deadline": {
+   "kill_tests": [
+    "tests/v2/test_python_callable_v2.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_python_callable_v2_bytecode.py"
+   ],
+   "mutants": 5,
+   "baseline_passes": true,
+   "est_seconds": 499.0
+  },
+  "aisef2/probe/python_callable_v2.py::HARNESS/emit": {
+   "kill_tests": [
+    "tests/v2/test_python_callable_v2.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_python_callable_v2_bytecode.py"
+   ],
+   "mutants": 10,
+   "baseline_passes": true,
+   "est_seconds": 998.0
+  },
+  "aisef2/probe/python_callable_v2.py::HARNESS/ended": {
+   "kill_tests": [
+    "tests/v2/test_python_callable_v2.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_python_callable_v2_bytecode.py"
+   ],
+   "mutants": 31,
+   "baseline_passes": true,
+   "est_seconds": 3093.8
+  },
+  "aisef2/probe/python_callable_v2.py::HARNESS/finish": {
+   "kill_tests": [
+    "tests/v2/test_python_callable_v2.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_python_callable_v2_bytecode.py"
+   ],
+   "mutants": 12,
+   "baseline_passes": true,
+   "est_seconds": 1197.6
+  },
+  "aisef2/probe/python_callable_v2.py::HARNESS/inside": {
+   "kill_tests": [
+    "tests/v2/test_python_callable_v2.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_python_callable_v2_bytecode.py"
+   ],
+   "mutants": 5,
+   "baseline_passes": true,
+   "est_seconds": 499.0
+  },
+  "aisef2/probe/python_callable_v2.py::HARNESS/main": {
+   "kill_tests": [
+    "tests/v2/test_python_callable_v2.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_python_callable_v2_bytecode.py"
+   ],
+   "mutants": 157,
+   "baseline_passes": true,
+   "est_seconds": 15668.6
+  },
+  "aisef2/probe/python_callable_v2.py::HARNESS/value_of": {
+   "kill_tests": [
+    "tests/v2/test_python_callable_v2.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_python_callable_v2_bytecode.py"
+   ],
+   "mutants": 19,
+   "baseline_passes": true,
+   "est_seconds": 1896.2
+  },
+  "aisef2/probe/python_callable_v2.py::ON_DEADLINE": {
+   "kill_tests": [
+    "tests/v2/test_python_callable_v2.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 21,
+   "baseline_passes": true,
+   "est_seconds": 2095.8
+  },
+  "aisef2/probe/python_callable_v2.py::PROBE_SOURCES": {
+   "kill_tests": [
+    "tests/v2/test_python_callable_v2.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 4,
+   "baseline_passes": true,
+   "est_seconds": 399.2
+  },
+  "aisef2/probe/python_callable_v2.py::PythonCallableV2Probe.__init__": {
+   "kill_tests": [
+    "tests/v2/test_python_callable_v2_bytecode.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 4,
+   "baseline_passes": true,
+   "est_seconds": 24.0
+  },
+  "aisef2/probe/python_callable_v2.py::PythonCallableV2Probe.enforcement": {
+   "kill_tests": [
+    "tests/v2/test_python_callable_v2.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 3,
+   "baseline_passes": true,
+   "est_seconds": 299.4
+  },
+  "aisef2/probe/python_callable_v2.py::PythonCallableV2Probe.observe": {
+   "kill_tests": [
+    "tests/v2/test_python_callable_v2.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_python_callable_v2_bytecode.py"
+   ],
+   "mutants": 148,
+   "baseline_passes": true,
+   "est_seconds": 14770.4
+  },
+  "aisef2/probe/python_callable_v2.py::_concluded": {
+   "kill_tests": [
+    "tests/v2/test_python_callable_v2.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "mutants": 75,
+   "baseline_passes": true,
+   "est_seconds": 7485.0
+  },
+  "aisef2/probe/python_callable_v2.py::_file_ok": {
+   "kill_tests": [
+    "tests/v2/test_python_callable_v2.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 15,
+   "baseline_passes": true,
+   "est_seconds": 1497.0
+  },
+  "aisef2/probe/python_callable_v2.py::_harness_argv": {
+   "kill_tests": [
+    "tests/v2/test_python_callable_v2_bytecode.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "mutants": 16,
+   "baseline_passes": true,
+   "est_seconds": 96.0
+  },
+  "aisef2/probe/python_callable_v2.py::_is_hex": {
+   "kill_tests": [
+    "tests/v2/test_python_callable_v2.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 3,
+   "baseline_passes": true,
+   "est_seconds": 299.4
+  },
+  "aisef2/probe/python_callable_v2.py::_probe_digest": {
+   "kill_tests": [
+    "tests/v2/test_python_callable_v2.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 1,
+   "baseline_passes": true,
+   "est_seconds": 99.8
+  },
+  "aisef2/probe/python_callable_v2.py::_substituted": {
+   "kill_tests": [
+    "tests/v2/test_python_callable_v2.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 9,
+   "baseline_passes": true,
+   "est_seconds": 898.2
+  },
+  "aisef2/probe/python_callable_v2.py::_unsubstituted": {
+   "kill_tests": [
+    "tests/v2/test_python_callable_v2.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 9,
+   "baseline_passes": true,
+   "est_seconds": 898.2
+  },
+  "aisef2/probe/python_callable_v2.py::_watch": {
+   "kill_tests": [
+    "tests/v2/test_python_callable_v2.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "mutants": 33,
+   "baseline_passes": true,
+   "est_seconds": 3293.4
+  },
+  "aisef2/probe/python_callable_v2.py::_workspace_ok": {
+   "kill_tests": [
+    "tests/v2/test_python_callable_v2.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 4,
+   "baseline_passes": true,
+   "est_seconds": 399.2
+  },
+  "aisef2/probe/python_callable_v2.py::_write_workspace": {
+   "kill_tests": [
+    "tests/v2/test_python_callable_v2.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 10,
+   "baseline_passes": true,
+   "est_seconds": 998.0
+  },
+  "aisef2/probe/python_callable_v2.py::observation_class": {
+   "kill_tests": [
+    "tests/v2/test_python_callable_v2.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 75,
+   "baseline_passes": true,
+   "est_seconds": 7485.0
+  },
+  "aisef2/probe/python_callable_v2.py::spec_class": {
+   "kill_tests": [
+    "tests/v2/test_python_callable_v2.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 13,
+   "baseline_passes": true,
+   "est_seconds": 1297.4
+  },
+  "aisef2/probe/python_callable_v2.py::verdict_of": {
+   "kill_tests": [
+    "tests/v2/test_python_callable_v2.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "mutants": 47,
+   "baseline_passes": true,
+   "est_seconds": 4690.6
+  }
+ },
+ "failing_files": [],
+ "targets_whose_baseline_fails": [],
+ "mutants": 11363,
+ "est_worker_hours": 63.8
+}

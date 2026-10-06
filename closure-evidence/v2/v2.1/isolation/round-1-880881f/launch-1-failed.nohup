@@ -1,0 +1,11 @@
+run:1: read-only file system: /iso-alone.store-before.json
+zsh: can't open input file: /worker.sh
+run:7: read-only file system: /iso-alone.store-after.json
+run:8: read-only file system: /iso-alone.done
+run:1: read-only file system: /iso-concurrent.store-before.json
+zsh: can't open input file: /worker.sh
+zsh: can't open input file: /worker.sh
+zsh: can't open input file: /worker.sh
+zsh: can't open input file: /worker.sh
+run:7: read-only file system: /iso-concurrent.store-after.json
+run:8: read-only file system: /iso-concurrent.done

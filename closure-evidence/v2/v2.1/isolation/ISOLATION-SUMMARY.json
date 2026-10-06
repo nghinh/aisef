@@ -1,0 +1,62 @@
+{
+ "record": "AISEF V2.1 — B-03b ISOLATION PROOF (before the concurrent mutation campaign)",
+ "authority": {
+  "ledger": "closure-evidence/v2/cycle2/RELEASE-DECISIONS.json",
+  "seq": 5,
+  "owner_words": "Chạy trong môi trường kiểm thử riêng, không sử dụng client/provider thật, credential hoặc dữ liệu người vận hành. Chỉ chạy đồng thời khi cơ chế cách ly và quyền sở hữu tài nguyên đã được kiểm chứng."
+ },
+ "method": "the same 7 V2.1 targets (14 mutants; git worktrees, child processes, process ownership, the CLI and process probes, the review OCR) run by one worker alone, then by four workers at once, each worker a detached git worktree at the snapshot with env -i, a PATH holding no `opencode`, its own HOME/XDG_*/TMPDIR, wrapped by validation/v2/owned_run.py; the whole round under the machine-wide heavy lock. Isolation HOLDS when every concurrent worker's per-mutant verdicts equal the alone worker's, no run errors, no cleanup signals a process, owned_run reports no escaped process and no orphan, and the operator's real OpenCode store (os.stat metadata only, tools/store_stat.py) is not changed by the workers.",
+ "rounds": [
+  {
+   "round": 1,
+   "snapshot": "880881f9976df891b8db6a48887c85dc50f44702",
+   "dir": "round-1-880881f",
+   "isolation": "FAILS",
+   "problems": [
+    "iso-B aisef2/app/lineage.py::_sha: error kill tests fail on the unmutated tree (leaked 0)",
+    "iso-B aisef2/app/lineage.py::_sha: verdicts differ from the worker that ran alone"
+   ],
+   "cause": "not leakage between workers (every path of the failing run was under that worker's own TMPDIR): the baseline of aisef2/app/lineage.py::_sha in iso-B failed in tests/v2/test_v21_continue_integrity.py::ClaimLifecycle.test_two_runs_at_once_one_claims_and_the_other_spends_nothing — under load the second run's look for an earlier claim found the first's ('claimed by .../a ... has not begun'), so it never reached the O_EXCL race the test measures. A test-timing fault, measured from the run's own failure output (iso-B.record.json, baseline.failed).",
+   "fixed_by": "7fe1062 (the driver holds both runs at the CONTINUED-BY create and the test releases them together; expectation unchanged; old test red / new green with a run arriving 3 s late)",
+   "launch_1": "the first launch of round 1 ran nothing: campaign.sh's `zsh -c` function did not see $D/$SP (launch-1-failed.nohup: writes to / refused, worker.sh not found); fixed by campaign-run.sh",
+   "operator_store": "iso-alone: .local/share/opencode/log newest_entry_mtime moved 01:10:18 → 02:10:19 (entries 12 = 12; db, auth, config unchanged) — written by the operator's own OpenCode desktop app (pid 9792, started 2026-10-06 05:58 by launchd, outside every worker's process tree), on its hourly cadence (01:10, 02:10, 03:10); the workers have a scratch HOME and no opencode on PATH. iso-concurrent: unchanged."
+  },
+  {
+   "round": 2,
+   "snapshot": "cc5359699c057f666f1693b90f1beb4762676478",
+   "dir": "round-2-cc53596",
+   "isolation": "HOLDS",
+   "problems": [],
+   "workers": {
+    "iso2-A": {
+     "targets": 7,
+     "mutants": 14,
+     "killed": 14
+    },
+    "iso2-B": {
+     "targets": 7,
+     "mutants": 14,
+     "killed": 14
+    },
+    "iso2-C": {
+     "targets": 7,
+     "mutants": 14,
+     "killed": 14
+    },
+    "iso2-D": {
+     "targets": 7,
+     "mutants": 14,
+     "killed": 14
+    },
+    "iso2-E": {
+     "targets": 7,
+     "mutants": 14,
+     "killed": 14
+    }
+   },
+   "operator_store": "unchanged in both windows (the app's 03:10:19 write came before the round's 03:15 start)"
+  }
+ ],
+ "verdict": "HOLDS at cc5359699c05 (round 2); the campaign may run its four workers concurrently at that snapshot",
+ "tools": "tools/ (worker.sh, campaign.sh, campaign-run.sh, heavy.sh, isolation_compare.py, preflight.py, store_stat.py, iso-chain.sh, iso2-chain.sh), byte copies of what ran"
+}

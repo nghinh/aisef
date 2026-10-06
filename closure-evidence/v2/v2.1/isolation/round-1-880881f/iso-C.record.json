@@ -1,0 +1,172 @@
+{
+ "record": "AISEF V2 — V2.1 MUTATION",
+ "tool": "validation/v2/mutation.py",
+ "targets": [
+  {
+   "target": "aisef2/app/lineage.py::_git",
+   "kill_tests": [
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "source_sha256": "d99c0fd0276b1a4de37aeb3bf048927910030e7af82848ff9a72ca7922dffdec",
+   "mutants": 1,
+   "killed": 1,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L174 returns None",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/app/lineage.py::_sha",
+   "kill_tests": [
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ],
+   "source_sha256": "d99c0fd0276b1a4de37aeb3bf048927910030e7af82848ff9a72ca7922dffdec",
+   "mutants": 1,
+   "killed": 1,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L60 returns None",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/app/review_ocr.py::scrubbed_names",
+   "kill_tests": [
+    "tests/v2/test_v21_review_ocr.py",
+    "tests/v2/test_v21_review_chain.py"
+   ],
+   "source_sha256": "043f8adca928861b290d8723a9a7a256cbe04566c1e44985b7c424f3ddca1609",
+   "mutants": 2,
+   "killed": 2,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L222 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L222 sorted() -> list()",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/orchestrate/story_runner.py::_Held.release",
+   "kill_tests": [
+    "tests/v2/test_p6_stages.py",
+    "tests/v2/test_v21_orchestration.py",
+    "tests/v2/test_release_s2_kernel.py",
+    "tests/v2/test_c2_k_nowork_001.py",
+    "tests/v2/test_c2_k_presat_001.py",
+    "tests/v2/test_c2_orchestration_conformance.py"
+   ],
+   "source_sha256": "db394816ee96297205094282647c5896bf3a417c9ebd1ba04f15dd32fe70a4d0",
+   "mutants": 3,
+   "killed": 3,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L127 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L127 And swapped",
+     "killed": true
+    },
+    {
+     "mutant": "L127 Eq->NotEq",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/orchestrate/workspace.py::Scratch.release",
+   "kill_tests": [
+    "tests/v2/test_p6_stages.py",
+    "tests/v2/test_v21_orchestration.py",
+    "tests/v2/test_release_s2_kernel.py"
+   ],
+   "source_sha256": "aa5ff45302d77f6f76b6c15e4bc1b7d0758fec8c85c68c980e7ac6b17b1cdb20",
+   "mutants": 3,
+   "killed": 3,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L93 condition negated",
+     "killed": true
+    },
+    {
+     "mutant": "L94 string 'scratch ' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L94 string ' survived its cleanup at ' emptied",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/probe/cli_invocation.py::_argv_ok",
+   "kill_tests": [
+    "tests/v2/test_c2_cli_verdicts.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "source_sha256": "d13f62cd66bf88c6548de971941d00eedd2e1b0837d9fe4c3ad13dbd2ac4f0b0",
+   "mutants": 2,
+   "killed": 2,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L260 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L260 And swapped",
+     "killed": true
+    }
+   ]
+  },
+  {
+   "target": "aisef2/probe/process_effect.py::_content_of",
+   "kill_tests": [
+    "tests/v2/test_probe_process_effect_units.py",
+    "tests/v2/test_v21_identity.py"
+   ],
+   "source_sha256": "7b5d60cef52e96dcb0a9f5dfd915f43802850a926592c41d7920610dc250aa3c",
+   "mutants": 2,
+   "killed": 2,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 0,
+   "results": [
+    {
+     "mutant": "L215 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L215 In->NotIn",
+     "killed": true
+    }
+   ]
+  }
+ ]
+}

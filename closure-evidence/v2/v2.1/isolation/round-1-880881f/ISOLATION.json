@@ -1,0 +1,113 @@
+{
+ "alone": "iso-A",
+ "concurrent": [
+  "iso-B",
+  "iso-C",
+  "iso-D",
+  "iso-E"
+ ],
+ "workers": {
+  "iso-A": {
+   "targets": 7,
+   "mutants": 14,
+   "killed": 14,
+   "baseline_failures": {},
+   "timeouts": 0,
+   "owned": {
+    "exit": 1,
+    "owned_before": 0,
+    "owned_at_exit": 0,
+    "owned_after": 0,
+    "escaped": [],
+    "residual": [],
+    "released_empty": true,
+    "harness_orphans_before": 0,
+    "harness_orphans_after": 0
+   }
+  },
+  "iso-B": {
+   "targets": 7,
+   "mutants": 13,
+   "killed": 13,
+   "baseline_failures": {
+    "aisef2/app/lineage.py::_sha": {
+     "timed_out": [],
+     "failed": [
+      "tests/v2/test_v21_continue_integrity.py exit 1: unclosed file <_io.TextIOWrapper name=10 encoding='utf-8'>\n  self._held.clear()\nResourceWarning: Enable tracemalloc to get the object allocation traceback\n/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/iso-B.env/tmp/tmpma49ctbo/tree/aisef2/orchestrate/story_runner.py:277: ResourceWarning: unclosed file <_io.TextIOWrapper name=9 encoding='utf-8'>\n  tests_held.release()\nResourceWarning: Enable tracemalloc to get the object allocation traceback\n.F\n======================================================================\nFAIL: test_two_runs_at_once_one_claims_and_the_other_spends_nothing (v2.test_v21_continue_integrity.ClaimLifecycle.test_two_runs_at_once_one_claims_and_the_other_spends_nothing)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/iso-B.env/tmp/tmpma49ctbo/tree/tests/v2/test_v21_continue_integrity.py\", line 484, in test_two_runs_at_once_one_claims_and_the_other_spends_nothing\n    self.assertIn(\"a run is continued once\", recs[loser][\"failure\"][\"detail\"])\n    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 'a run is continued once' not found in '/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/iso-B.env/tmp/tmpzarkg83m/first is claimed by /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/iso-B.env/tmp/tmpzarkg83m/a (CONTINUED-BY.json), whose claimant is alive and which has not begun: not superseded without evidence (an operator may name it: --supersede-claim 23736370c2ddd3327342f53cd5fe97cd5db026da7306512aa1f243a2f0b59790)'\n\n----------------------------------------------------------------------\nRan 11 tests in 141.592s\n\nFAILED (failures=1)\n"
+     ]
+    }
+   },
+   "timeouts": 0,
+   "owned": {
+    "exit": 1,
+    "owned_before": 0,
+    "owned_at_exit": 0,
+    "owned_after": 0,
+    "escaped": [],
+    "residual": [],
+    "released_empty": true,
+    "harness_orphans_before": 0,
+    "harness_orphans_after": 0
+   }
+  },
+  "iso-C": {
+   "targets": 7,
+   "mutants": 14,
+   "killed": 14,
+   "baseline_failures": {},
+   "timeouts": 0,
+   "owned": {
+    "exit": 1,
+    "owned_before": 0,
+    "owned_at_exit": 0,
+    "owned_after": 0,
+    "escaped": [],
+    "residual": [],
+    "released_empty": true,
+    "harness_orphans_before": 0,
+    "harness_orphans_after": 0
+   }
+  },
+  "iso-D": {
+   "targets": 7,
+   "mutants": 14,
+   "killed": 14,
+   "baseline_failures": {},
+   "timeouts": 0,
+   "owned": {
+    "exit": 1,
+    "owned_before": 0,
+    "owned_at_exit": 0,
+    "owned_after": 0,
+    "escaped": [],
+    "residual": [],
+    "released_empty": true,
+    "harness_orphans_before": 0,
+    "harness_orphans_after": 0
+   }
+  },
+  "iso-E": {
+   "targets": 7,
+   "mutants": 14,
+   "killed": 14,
+   "baseline_failures": {},
+   "timeouts": 0,
+   "owned": {
+    "exit": 1,
+    "owned_before": 0,
+    "owned_at_exit": 0,
+    "owned_after": 0,
+    "escaped": [],
+    "residual": [],
+    "released_empty": true,
+    "harness_orphans_before": 0,
+    "harness_orphans_after": 0
+   }
+  }
+ },
+ "problems": [
+  "iso-B aisef2/app/lineage.py::_sha: error kill tests fail on the unmutated tree (leaked 0)",
+  "iso-B aisef2/app/lineage.py::_sha: verdicts differ from the worker that ran alone"
+ ],
+ "isolation": "FAILS"
+}

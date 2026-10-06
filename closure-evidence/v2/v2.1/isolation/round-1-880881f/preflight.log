@@ -1,0 +1,43 @@
+OK       0.6s tests/v2/p2/test_calibration.py
+OK       0.5s tests/v2/p2/test_static_admission.py
+OK      48.5s tests/v2/test_app_run.py
+OK       9.2s tests/v2/test_app_units.py
+OK      53.3s tests/v2/test_c2_cli_calibration.py
+OK      82.8s tests/v2/test_c2_cli_invocation.py
+OK      62.3s tests/v2/test_c2_cli_protocol.py
+OK       0.6s tests/v2/test_c2_cli_verdicts.py
+OK       7.2s tests/v2/test_c2_file_artifact.py
+OK      56.4s tests/v2/test_c2_k_nowork_001.py
+OK      30.5s tests/v2/test_c2_k_presat_001.py
+OK      50.7s tests/v2/test_c2_orchestration_conformance.py
+OK     101.7s tests/v2/test_p6_orchestration.py
+OK      10.1s tests/v2/test_p6_stages.py
+OK      57.3s tests/v2/test_probe_process_effect.py
+OK       8.1s tests/v2/test_probe_process_effect_bytecode.py
+OK       2.0s tests/v2/test_probe_process_effect_units.py
+OK     124.6s tests/v2/test_python_callable_v2.py
+OK       9.2s tests/v2/test_python_callable_v2_bytecode.py
+OK      10.2s tests/v2/test_release_s2_kernel.py
+OK      29.9s tests/v2/test_s2_kills.py
+OK       0.6s tests/v2/test_s2_kills_deterministic.py
+OK       0.8s tests/v2/test_s2_kills_k.py
+OK       1.2s tests/v2/test_s2_kills_rc2.py
+OK       2.4s tests/v2/test_v21_bundle_tools.py
+OK     257.0s tests/v2/test_v21_continue_integrity.py
+OK      49.0s tests/v2/test_v21_continue_usage.py
+OK       1.5s tests/v2/test_v21_identity.py
+OK       1.6s tests/v2/test_v21_inputs.py
+OK      19.5s tests/v2/test_v21_orchestration.py
+OK       0.6s tests/v2/test_v21_python_imports.py
+OK      15.7s tests/v2/test_v21_review.py
+OK     147.4s tests/v2/test_v21_review_chain.py
+OK       0.4s tests/v2/test_v21_review_ocr.py
+OK       3.0s tests/v2/test_v21_transport.py
+OK      31.1s tests/v2/test_v21_verify.py
+{
+ "failing_files": [],
+ "targets_whose_baseline_fails": [],
+ "mutants": 11363,
+ "est_worker_hours": 76.2
+}
+exit 0
