@@ -396,7 +396,10 @@ class Uncontainable(unittest.TestCase):
         self.assertEqual(result["counts"][eb.RERAISES], 8)
         self.assertEqual({(b["catches"], b["disposition"]) for b in result["boundaries"] if b["path"] == "aisef2/app/run.py"},
                          {("BaseException", eb.RERAISES), ("Exception", eb.STRUCTURAL), ("ImportError", eb.STRUCTURAL),
-                          ("(OSError, subprocess.SubprocessError)", eb.STRUCTURAL), ("ShutdownRefused", eb.STRUCTURAL)})
+                          ("(OSError, subprocess.SubprocessError)", eb.STRUCTURAL), ("ShutdownRefused", eb.STRUCTURAL),
+                          # V2.1 (V2-02): the record's canonical form (ValueError), the evidence anchor's read
+                          # ((OSError, ValueError)) and the manifest's write (OSError, re-raised when the run succeeded)
+                          ("ValueError", eb.STRUCTURAL), ("(OSError, ValueError)", eb.STRUCTURAL), ("OSError", eb.STRUCTURAL)})
 
     def test_the_audit_flags_every_swallowing_pattern_and_accepts_every_re_raise(self):
         def v(src):

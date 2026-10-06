@@ -143,12 +143,12 @@ class Continue(ProductBase):
                          {"C-ADD": ("CARRIED", "VERIFY"), "C-MUL": ("S2", "INTRODUCE")})
         self.assertEqual((doc["contracts"], doc["approvals"]), (self.doc["contracts"], self.doc["approvals"]))
         self.project = project
-        rec = self.execute("second", source=self.first / "repo", parent=self.first)
+        rec = self.execute("second", source=self.first / "repo", predecessor=self.first)
         self.assertEqual(rec["story_outcomes"]["CARRIED"], ["COMMIT"])
         events = self.journal("second").events
         self.assertEqual([e.data["budget_owner"] for e in events if e.type == "provider/request"
                           and e.data.get("story_id") == "CARRIED"], ["REVIEW"])      # no developer call; K-NOWORK-001's review
-        self.assertEqual(rec["parent"], {"path": str(self.first), "evidence_anchor": R.anchor_in(self.first)})
+        self.assertEqual(rec["continues"], {"path": str(self.first), "evidence_anchor": R.anchor_in(self.first)})
         self.assertEqual(hashlib.sha256((self.first / "RUN.json").read_bytes()).hexdigest(), before)   # untouched
 
     def test_a_merge_the_journal_never_committed_is_left_out(self):
@@ -176,7 +176,7 @@ class Continue(ProductBase):
             bundle_cli.continue_from(self.doc, moved)
         self.assertIn("another kernel", str(c.exception))
         with self.assertRaises(R.RunRefused):
-            self.execute("third", parent=self.tmp / "nowhere")
+            self.execute("third", predecessor=self.tmp / "nowhere")
 
 
 if __name__ == "__main__":

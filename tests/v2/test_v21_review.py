@@ -18,6 +18,7 @@ import json
 import os
 import pathlib
 import shutil
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -36,17 +37,14 @@ MAIN = {"kind": "cli_invocation", "locator": "ledgerlock:__main__"}
 
 
 def _ledger_bytes(*lines_of) -> bytes:
-    """A valid LedgerLock file, written by the reference's own Ledger.put."""
-    sys.path.insert(0, str(REFERENCE.parent))
-    try:
-        from ledgerlock import ledger as L
-    finally:
-        sys.path.remove(str(REFERENCE.parent))
-        sys.modules.pop("ledgerlock", None)
+    """A valid LedgerLock file, written by the reference's own Ledger.put in a process of its own (this one's import
+    path is never touched)."""
     with tempfile.TemporaryDirectory() as d:
         path = os.path.join(d, "L")
-        for n, (key, value) in enumerate(lines_of, 1):
-            L.Ledger(path).put(key, value, f"r-{key}", n)
+        code = ("import json, sys; from ledgerlock.ledger import Ledger\n"
+                "for n, (k, v) in enumerate(json.loads(sys.argv[2]), 1): Ledger(sys.argv[1]).put(k, v, 'r-' + k, n)")
+        subprocess.run([sys.executable, "-c", code, path, json.dumps(lines_of)], cwd=REFERENCE.parent, check=True,
+                       capture_output=True, encoding="utf-8")
         return pathlib.Path(path).read_bytes()
 
 

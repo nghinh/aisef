@@ -114,11 +114,10 @@ class PthChannel(unittest.TestCase):
             f"import pathlib; pathlib.Path({str(self.marker)!r}).write_text('ran')\n", encoding="utf-8")
 
     def test_the_mechanism_minus_I_runs_it_minus_S_does_not(self):
+        subprocess.run([self.python, "-I", "-S", "-B", "-c", "pass"], check=True)     # first, so nothing is deleted
+        self.assertFalse(self.marker.exists())
         subprocess.run([self.python, "-I", "-B", "-c", "pass"], check=True)
         self.assertTrue(self.marker.exists(), "2.0.0's controller flags (-I -B) run the .pth")
-        self.marker.unlink()
-        subprocess.run([self.python, "-I", "-S", "-B", "-c", "pass"], check=True)
-        self.assertFalse(self.marker.exists())
 
     def test_every_active_probe_launch_carries_minus_S(self):
         for mod in (ci, pc2, pe):

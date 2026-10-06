@@ -92,11 +92,8 @@ def usage(out: pathlib.Path, events: list[dict], prices: Mapping | None, rec: Ma
     except (OSError, ValueError, KeyError):
         pre = None
     requests = sum(1 for e in events if e["type"] == "provider/request")
-    retries: dict[str, int] = {}
-    for e in events:
-        if e["type"] == "story/retry":
-            sid = e["data"].get("story_id")
-            retries[sid] = retries.get(sid, 0) + 1
+    retried = [e["data"].get("story_id") for e in events if e["type"] == "story/retry"]    # the journal's decisions,
+    retries = {s: retried.count(s) for s in sorted(set(retried))}                           # read — never a side counter
     started, finished = rec.get("started"), rec.get("finished")
     money: dict = {"value": None, "status": "unknown", "why": "the settings give no price table"}
     if prices:

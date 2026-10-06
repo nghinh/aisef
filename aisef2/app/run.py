@@ -306,21 +306,22 @@ def budget_stops(not_run: list[str], sessions: list[dict], budget) -> str | None
 
 def execute(project: Project, settings: Settings, source: pathlib.Path, out: pathlib.Path, *, transport=None,
             client_exe: str | None = None, cals: tuple | None = None, clock=time.time,
-            parent: pathlib.Path | None = None) -> dict:
-    """Run the project; the record (also written to <out>/RUN.json, whatever happens). `parent`: the run this one
-    continues (V2.1: its path and evidence anchor are recorded; nothing of it is read or written)."""
+            predecessor: pathlib.Path | None = None) -> dict:
+    """Run the project; the record (also written to <out>/RUN.json, whatever happens). `predecessor`: the run this one
+    continues (`aisef run --parent`, V2.1: its path and evidence anchor are recorded; nothing of it is read or
+    written — and it is a run, never a revision: nothing runs at it)."""
     if out.exists():
         raise RunRefused(f"{out} exists: a run directory is never reused or overwritten")
     lineage = None
-    if parent is not None:
-        if not (parent / "RUN.json").is_file():
-            raise RunRefused(f"--parent {parent}: no run record there")
-        lineage = {"path": str(parent), "evidence_anchor": anchor_in(parent)}
+    if predecessor is not None:
+        if not (predecessor / "RUN.json").is_file():
+            raise RunRefused(f"--parent {predecessor}: no run record there")
+        lineage = {"path": str(predecessor), "evidence_anchor": anchor_in(predecessor)}
     out.mkdir(parents=True)
     rec: dict = {"format": FORMAT, "bundle_digest": project.digest, "project": project.name, "plan_hash": project.plan.plan_hash,
                  "settings": settings.content, "started": clock(), "stage": "repository", "kernel_digest": kernel_digest(),
                  "platform": {"system": platform.system().lower(), "python": platform.python_version()},
-                 **({"parent": lineage} if lineage else {})}
+                 **({"continues": lineage} if lineage else {})}
     run = None
     developer = reviewer = budget = None
     results: dict = {}

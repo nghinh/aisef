@@ -64,7 +64,7 @@ def run(argv: list[str]) -> int:
             _print({"project": project.name, "plan_hash": project.plan.plan_hash, "route": s.route, "admission": adm,
                     "ready": adm["admitted"]})
             return 0 if adm["admitted"] else 2
-        rec = R.execute(project, s, a.repo, a.out, **({"parent": a.parent} if a.parent is not None else {}))
+        rec = R.execute(project, s, a.repo, a.out, **({"predecessor": a.parent} if a.parent is not None else {}))
     except (bundle.BundleError, settings.SettingsError, R.RunRefused, preflight.IdentityStop, SessionRefused) as e:
         print(f"aisef run: refused: {e}", file=sys.stderr)
         return 2
