@@ -1,10 +1,12 @@
 """C2-P5 acceptance boundary: the real approvals are content-addressed, bound to the accepted proposal and given by the
-established owner identity; a tampered or synthetic approval is refused; the acceptance re-derives on this tree."""
+established owner identity; a tampered or synthetic approval is refused; the acceptance re-derives on this tree — on 2.1
+(owner B-03a) as the 2.0 record kept as history plus the v2.1 re-verification, compared exactly."""
 
 import copy
 import dataclasses
 import json
 import unittest
+from unittest import mock
 
 from aisef2.plan.obligation import Plan
 from validation.qualification import p5_acceptance as A
@@ -43,7 +45,10 @@ class Approvals(unittest.TestCase):
 
 class Acceptance(unittest.TestCase):
     def test_the_acceptance_re_derives_on_this_tree(self):
-        self.assertEqual(A.check(), [])
+        # V2.1 (owner B-03a): the owner's 2.0 acceptance is history (its v2.0.0 blob, its verdict, the closed C2-P5 history,
+        # the approvals never rewritten); the boundary re-derives on this tree as the v2.1 re-verification, exactly
+        self.assertEqual(A.history_problems(), [])
+        self.assertEqual(A.reverification_problems(), [])
 
     def test_the_admission_holds_only_under_every_real_approval(self):
         doc = json.loads((A.ROOT / A.OUT_REL).read_text(encoding="utf-8"))
@@ -53,6 +58,16 @@ class Acceptance(unittest.TestCase):
         self.assertFalse(adm["one_approval_removed"]["admitted"])
         self.assertFalse(adm["no_approvals"]["admitted"])
         self.assertEqual(doc["verification"]["semantic_change"], "NONE")
+
+    def test_a_2_0_record_not_its_v2_0_0_blob_is_not_history_and_no_writer_writes_outside_v2_1(self):
+        from validation.qualification import rebind
+        with mock.patch.object(rebind, "lf_sha_at", return_value="0" * 64):
+            self.assertEqual(A.history_problems(), [f"{A.OUT_REL} is not its v2.0.0 blob (history)",
+                                                    f"{A.APPROVALS_REL} is not its v2.0.0 blob (history)"])
+            self.assertIn(f"{A.PROPOSAL_REL} is not its v2.0.0 blob (history)", A.proposal_history_problems())
+        for rel in (A.OUT_REL, A.PROPOSAL_REL, "closure-evidence/v2/C2-P5-ACCEPTANCE-REVERIFICATION.json"):
+            with self.assertRaises(SystemExit):
+                A._write_once(rel, {})
 
 
 
@@ -100,19 +115,28 @@ class KernelProvenance(unittest.TestCase):
         self.assertIsNotNone(A.aid_provenance())        # on this tree: the aid changed in calibrations() alone
 
     def test_on_this_tree_the_committed_proposal_is_current(self):
-        # up to the kernel provenance, the authoring aid's own sha (its calibrations() reads the release's shipped
-        # calibrations) and the release's probe-identity re-binding (ProbeIdentityRebinding)
-        r = A.current_proposal_currency()
+        # V2.1 (owner B-03a): the admission engine moved (ProbeIdentityRebinding measures it), so the proposal current on
+        # this tree is the v2.1 record — EXACTLY, with no kernel provenance, aid sha or probe-identity re-binding
+        # tolerated; the accepted 2.0 proposal and its document are history (their v2.0.0 blobs, as recorded)
+        r = A.v21_proposal_currency()
         self.assertTrue(r["current"], r)
-        self.assertTrue(r["document_current"], r)
-        self.assertLessEqual(set(r["differing_paths"]), {A.PROVENANCE_PATH, A.AID_PATH})
+        self.assertEqual(A.proposal_history_problems(), [])
+        self.assertEqual(r["differing_paths"], [])
 
 
 class ProbeIdentityRebinding(unittest.TestCase):
     """The release's B1 moved three probe digests, hence the spec id and semantic hash of every spec on those probes,
     the plan hash and the proposal digest. The committed proposal is current up to probe identity
     (validation/qualification/rebind.py) — and nothing else may move with it: each case below changes one more thing
-    and is refused."""
+    and is refused. On 2.1 the admission engine moved as well: the re-binding leaves exactly its digests (owner B-03a:
+    no engine-digest tolerance; a v2.1 proposal record replaces this one, KernelProvenance)."""
+    #: measured on 2.1: aisef2/plan/static_admission.py's check 9 changed (919a271), hence the engine digest and every
+    #: admission result digest; the re-binding does not absorb them
+    ENGINE_PATHS = ["identities.admission_engine_digest",
+                    "static_admission.with_synthetic_approvals.engine_digest",
+                    "static_admission.with_synthetic_approvals.result_digest",
+                    "static_admission.without_approvals.engine_digest",
+                    "static_admission.without_approvals.result_digest"]
 
     @classmethod
     def setUpClass(cls):
@@ -135,10 +159,13 @@ class ProbeIdentityRebinding(unittest.TestCase):
         return d
 
     def test_the_re_binding_alone_is_current(self):
+        # V2.1: what is left after the re-binding is exactly the engine change, so it is NOT current; the record it
+        # compares with is history
         self.assertNotEqual(self.derived["plan"]["plan_hash"], self.committed["plan"]["plan_hash"])
         r = self.currency(self.derived)
-        self.assertEqual((r["current"], r["differing_paths"]), (True, []))
+        self.assertEqual((r["current"], sorted(r["differing_paths"])), (False, self.ENGINE_PATHS))
         self.assertGreater(r["identities_rebound"], 0)
+        self.assertEqual(A.proposal_history_problems(), [])
 
     def test_a_contract_hash_change_is_refused(self):
         r = self.currency(self.changed(contract_hash="0" * 64))

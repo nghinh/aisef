@@ -10,8 +10,12 @@ For every registered checker, the checker's REAL decision function is run three 
 
 A checker whose fixture no longer fails it is itself a Q0 failure (`--check` exits non-zero).
 
-    python -P validation/v2/checker_calibration.py            # write closure-evidence/v2/Q0-CHECKER-CALIBRATION.json
+    python -P validation/v2/checker_calibration.py            # write closure-evidence/v2/v2.1/Q0-CHECKER-CALIBRATION.json
     python -P validation/v2/checker_calibration.py --check    # fail if any checker is uncalibrated or the record is stale
+
+V2.1 (owner B-03a, RELEASE-DECISIONS seq 5): the record is a NEW one under closure-evidence/v2/v2.1/, written once; 2.0's
+closure-evidence/v2/Q0-CHECKER-CALIBRATION.json is HISTORY — its blob is v2.0.0's and every checker it records was
+calibrated (`history_problems`, part of --check).
 """
 
 from __future__ import annotations
@@ -30,7 +34,10 @@ from typing import Callable
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 V2 = ROOT / "validation" / "v2"
 FIXTURES = ROOT / "tests" / "v2" / "fixtures" / "known_bad"
-OUT_REL = "closure-evidence/v2/Q0-CHECKER-CALIBRATION.json"
+OUT_REL = "closure-evidence/v2/v2.1/Q0-CHECKER-CALIBRATION.json"
+HISTORY_REL = "closure-evidence/v2/Q0-CHECKER-CALIBRATION.json"
+#: the commit tag v2.0.0 names: HISTORY_REL is its blob there
+V2_0_0 = "ca2631374602da45dae75b7f6907ff4729d0b2f7"
 
 
 def _load(name: str, path: pathlib.Path):
@@ -597,6 +604,16 @@ def render(result: dict) -> str:
     return json.dumps(result, indent=1, ensure_ascii=False) + "\n"
 
 
+def history_problems() -> list[str]:
+    """2.0's record as history: its LF-normalised bytes are its blob at v2.0.0, and it records every checker calibrated."""
+    at = subprocess.run(["git", "-C", str(ROOT), "cat-file", "-p", f"{V2_0_0}:{HISTORY_REL}"], capture_output=True)
+    path = ROOT / HISTORY_REL
+    now = path.read_bytes().replace(b"\r\n", b"\n") if path.is_file() else None
+    if at.returncode != 0 or now != at.stdout.replace(b"\r\n", b"\n"):
+        return [f"{HISTORY_REL} is not its v2.0.0 blob (history)"]
+    return [f"{HISTORY_REL} (history): {p}" for p in problems_of(json.loads(now))]
+
+
 def main(argv: list[str] | None = None) -> int:
     argv = sys.argv[1:] if argv is None else argv
     result = run()
@@ -605,6 +622,7 @@ def main(argv: list[str] | None = None) -> int:
         committed = ROOT / OUT_REL
         if not committed.exists() or committed.read_text(encoding="utf-8") != render(result):
             problems.append(f"{OUT_REL} is missing or stale")
+        problems += history_problems()
     for r in result["checkers"]:
         print(f"{'OK  ' if r['calibrated'] else 'FAIL'} {r['checker']:22s} clean={r.get('clean_passes')} "
               f"rejects={r.get('rejects_for_the_expected_reason')} "
@@ -614,7 +632,13 @@ def main(argv: list[str] | None = None) -> int:
     print(f"calibrated {result['calibrated_count']}/{result['checker_count']}; "
           f"always-PASS mutants rejected {result['always_pass_mutants_rejected']}/{result['checker_count']}")
     if "--check" not in argv and not problems:
-        (ROOT / OUT_REL).write_text(render(result), encoding="utf-8")
+        (ROOT / OUT_REL).parent.mkdir(parents=True, exist_ok=True)
+        try:
+            with open(ROOT / OUT_REL, "x", encoding="utf-8") as f:   # written once, never rewritten
+                f.write(render(result))
+        except FileExistsError:
+            print(f"FAIL  refused: {OUT_REL} exists")
+            return 1
         print(f"wrote {OUT_REL}")
     return 1 if problems else 0
 

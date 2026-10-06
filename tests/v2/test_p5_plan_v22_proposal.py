@@ -7,7 +7,8 @@ P5-4 the DECISION-1 rules (undeclared quantifier, a DECISION-1 spec declared exh
 P5-4b C2-P5-FINDING-001: a prohibition written as its permitted condition under MUST_NOT_HOLD is refused; P5-5 the
 coverage matrix: every spec traces to a normative clause, every normative clause is covered, every other clause carries
 its reason, R-11 stays engineering-test; P5-6 no spec rests on a PLAN-V2.1-only surface; P5-7 one witness per spec in the
-P5 corpus; P5-8 the committed record and document are current.
+P5 corpus; P5-8 the committed record and document are current (on 2.1, owner B-03a: the v2.1 record exactly, the 2.0
+record and document as history).
 """
 
 import importlib.util
@@ -135,15 +136,15 @@ class Coverage(unittest.TestCase):
 
 class Record(unittest.TestCase):
     def test_P5_8_committed_record_is_current(self):
-        # current up to the authoring-kernel provenance, the one field an authorized later kernel changes (owner, 2026-10-01),
-        # and up to probe identity: the release's B1 re-bound three probe digests (validation/qualification/rebind.py) —
-        # the record and the document compared with this tree's identities mapped back, every other field as committed
+        # V2.1 (owner B-03a): the admission engine digest moved, so the record current on this tree is the v2.1 one — the
+        # aid's record() EXACTLY, no provenance tolerated, no probe-identity re-binding (it has no document); the accepted
+        # 2.0 record and its document are history: their v2.0.0 blobs, as recorded (p5_acceptance.proposal_history_problems)
         from validation.qualification import p5_acceptance as PA
         found = A.check()
-        currency = PA.current_proposal_currency()
-        if currency["current"]:
+        history = PA.proposal_history_problems()
+        if PA.v21_proposal_currency()["current"] and not history:
             found = [p for p in found if p != f"{A.OUT_REL} is not what the authoring aid derives from this tree"]
-        if currency["document_current"]:
+        if not history:
             found = [p for p in found if p != f"{A.DOC_REL} is not what the authoring aid derives from this tree"]
         self.assertEqual(found, [])
         rec = json.loads((ROOT / A.OUT_REL).read_text(encoding="utf-8"))

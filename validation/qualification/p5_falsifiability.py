@@ -3,6 +3,7 @@ closure-evidence/v2/cycle2/P5-FALSIFIABILITY.json (RFC §9.1.2, §27).
 
     python -P validation/qualification/p5_falsifiability.py --seal    # binds each P5 mutant's materialised digests
     python -P validation/qualification/p5_falsifiability.py --run     # the evidence run
+    python -P validation/qualification/p5_falsifiability.py --run-v21 # the same run into closure-evidence/v2/v2.1/ (once)
 
 **Its own witness per spec.** The P0 mutants (P0-REFERENCE-FIXTURE.json) prove the reference ACCEPTANCE falsifiable; they
 are not reused as this package's witnesses. Each retained spec has one controlled mutation of its own in the P5 corpus
@@ -37,6 +38,9 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 OUT_REL = "closure-evidence/v2/cycle2/P5-FALSIFIABILITY.json"
+#: V2.1 (owner B-03a): the behaviour evidence for the 2.1 spec identities — run() on this tree, every spec compiled under
+#: its probes and re-executed, pristine and witness; the 2.0 record (OUT_REL) stays byte-identical
+V21_OUT_REL = "closure-evidence/v2/v2.1/P5-FALSIFIABILITY.json"
 PACKAGE = "WP-2.5.2"
 MECHANISM = "controlled_product_mutation"
 FIX_REL = "tests/v2/fixtures/workloads/ledgerlock-reference"
@@ -351,15 +355,34 @@ def run(matrix: bool = True) -> dict:
     return body
 
 
+def write_v21() -> dict:
+    """run() into V21_OUT_REL, written once and only without a problem (refused before the run if the record exists)."""
+    path = ROOT / V21_OUT_REL
+    if path.exists():
+        raise SystemExit(f"refused: {V21_OUT_REL} exists — a record is never rewritten")
+    rec = run()
+    if rec["problems"]:
+        raise SystemExit("refused: " + "; ".join(rec["problems"]))
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "x", encoding="utf-8", newline="\n") as f:
+        f.write(json.dumps(rec, indent=1, ensure_ascii=False) + "\n")
+    return rec
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     g = ap.add_mutually_exclusive_group(required=True)
     g.add_argument("--seal", action="store_true")
     g.add_argument("--run", action="store_true")
+    g.add_argument("--run-v21", action="store_true")
     a = ap.parse_args(argv)
     if a.seal:
         doc = seal()
         print(f"{MUTANTS_REL}: {len(doc['mutants'])} mutants sealed, corpus {doc['corpus_sha256'][:12]}")
+        return 0
+    if a.run_v21:
+        rec = write_v21()
+        print(f"{V21_OUT_REL}: {rec['verdict']}; {rec['summary']}; {rec['elapsed_s']} s")
         return 0
     rec = run()
     (ROOT / OUT_REL).write_text(json.dumps(rec, indent=1, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")

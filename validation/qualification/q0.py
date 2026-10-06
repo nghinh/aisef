@@ -325,10 +325,14 @@ def run(ident: dict) -> dict:
         "probe_rule_checkers": {k: checkers.get(k) for k in ("probe_catalog_closure", "no_clock_in_probe_facts", "no_test_artefact_in_probes",
                                                               "closed_dispatch_in_scenario_probes", "single_placeholder_token",
                                                               "protocol_channel_discipline", "cycle2_baseline")},
+        # V2.1 (owner B-03a): the owner's 2.0 acceptance is history (its v2.0.0 blob, its verdict as recorded); the
+        # boundary is re-verified on this tree by the v2.1 record, literally, with no new owner acceptance
         "c2_p5_acceptance": {"record": C.C2_P5_ACCEPTANCE_REL, "sha256": C.lf_sha(C.ROOT / C.C2_P5_ACCEPTANCE_REL),
-                             "verdict": acceptance["verdict"], "re_derivation_problems": pa.check(),
+                             "verdict": acceptance["verdict"], "history_problems": pa.history_problems(),
                              "approvals": acceptance["contract_approvals"]["count"],
-                             "aggregate_digest": acceptance["contract_approvals"]["aggregate_digest"], "cases": acceptance_cases},
+                             "aggregate_digest": acceptance["contract_approvals"]["aggregate_digest"], "cases": acceptance_cases,
+                             "reverification": {"record": pa.V21_OUT_REL, "problems": pa.reverification_problems(),
+                                                "sha256": C.lf_sha(C.ROOT / pa.V21_OUT_REL) if (C.ROOT / pa.V21_OUT_REL).is_file() else None}},
     }
     if active != CYCLE2_ACTIVE or cycle2["catalog_problems"]:
         problems.append(f"the active probe set is not the Cycle-2 one: {active} {cycle2['catalog_problems']}")
@@ -336,8 +340,9 @@ def run(ident: dict) -> dict:
         problems.append(f"the Cycle-1 probe is not resolvable at its frozen digest and inactive: {cycle2['cycle1_probe']}")
     if not all(v and v["calibrated"] and v["rejects_known_bad"] for v in cycle2["probe_rule_checkers"].values()):
         problems.append("a Cycle-2 probe rule checker is missing, uncalibrated or does not reject its known-bad probe fixture")
-    if cycle2["c2_p5_acceptance"]["re_derivation_problems"] or not acceptance["verdict"].startswith("C2-P5 ACCEPTED"):
-        problems.append(f"the C2-P5 acceptance does not re-derive: {cycle2['c2_p5_acceptance']['re_derivation_problems']}")
+    acc = cycle2["c2_p5_acceptance"]
+    if acc["history_problems"] or acc["reverification"]["problems"] or not acceptance["verdict"].startswith("C2-P5 ACCEPTED"):
+        problems.append(f"the C2-P5 acceptance is not history or not re-verified: {acc['history_problems'] + acc['reverification']['problems']}")
 
     cases = admission + catalog_tests + [drifted_pin] + acceptance_cases + policy_cases
     status = C.status_of(cases, problems, harness)

@@ -4,6 +4,9 @@ INTERPRETATIONS / AUTHORIZE QP-2.6 ...', 2026-09-30).
     python -P validation/qualification/p5_acceptance.py --approve   # write P5-CONTRACT-APPROVALS.json (once; refuses if present)
     python -P validation/qualification/p5_acceptance.py --write     # verify, then write C2-P5-ACCEPTANCE.json (once)
     python -P validation/qualification/p5_acceptance.py --check     # re-derive everything but the guard runs; exit 1 on drift
+    python -P validation/qualification/p5_acceptance.py --write-v21-proposal   # v2.1: closure-evidence/v2/v2.1/P5-PLAN-V2.2-PROPOSAL.json (once)
+    python -P validation/qualification/p5_acceptance.py --write-v21           # v2.1: C2-P5-ACCEPTANCE-REVERIFICATION.json (once)
+    python -P validation/qualification/p5_acceptance.py --check-v21           # the 2.0 acceptance as history + the v2.1 re-verification
 
 **Real approvals.** One ContractApproval per retained contract, approver `OWNER` — the repository's established owner
 identity (`"approver": "owner"` in the owner-approval records, `owner_identity_records()`) written in the kernel's
@@ -15,6 +18,13 @@ version). The synthetic identity of the proposal never appears in it and is neve
 approvals; its contract hash, spec id and semantic hash, every requirement hash, the plan hash and the proposal digest
 must equal the accepted ones, and the P5 corpus must reproduce its sealed digests. The three interface rulings bind
 the contracts that already encode them (found mechanically below); none of them edits a contract.
+
+**V2.1 (owner B-03a, RELEASE-DECISIONS seq 5).** The admission engine digest and the probe identities moved, and the
+owner chose new v2.1 records over any tolerance: the 2.0 acceptance and proposal are HISTORY (their blobs are v2.0.0's,
+their verdicts as recorded: `history_problems`, `proposal_history_problems`); the v2.1 proposal is the authoring aid's
+record on this tree, compared exactly; the v2.1 re-verification (`reverify`) re-derives the boundary with literal
+comparisons only — no rebind, no new owner acceptance, no new approval. `verify`, `record`, `check` and `--write` keep
+their 2.0 behaviour.
 """
 
 from __future__ import annotations
@@ -75,6 +85,20 @@ RULINGS = {
 }
 D3_APPROVED = {"AC-STORY-05-01-1": "S-D3-05-01-1", "AC-STORY-05-01-2": "S-D3-05-01-2"}
 D3_ENGINEERING = ("AC-STORY-05-01-3", "AC-STORY-05-02-1", "AC-STORY-05-02-2", "AC-STORY-05-02-3")
+ACCEPTED_VERDICT = "C2-P5 ACCEPTED BY THE OWNER — ACCEPTANCE BOUNDARY RECORDED"
+PROPOSAL_VERDICT = "PROPOSAL ADMITTED STATICALLY (synthetic, non-authoritative approvals); OWNER REVIEW PENDING"
+#: V2.1 (owner B-03a): the records the engine-digest change affected are NEW v2.1 records; the 2.0 ones are history
+V21 = "closure-evidence/v2/v2.1"
+V21_OUT_REL = f"{V21}/C2-P5-ACCEPTANCE-REVERIFICATION.json"
+V21_PROPOSAL_REL = f"{V21}/P5-PLAN-V2.2-PROPOSAL.json"
+V21_VERDICT = "C2-P5 ACCEPTANCE BOUNDARY RE-VERIFIED ON 2.1 — NO NEW OWNER ACCEPTANCE"
+#: the commit tag v2.0.0 names: a 2.0 record kept as history is its blob there
+V2_0_0 = "ca2631374602da45dae75b7f6907ff4729d0b2f7"
+DECISIONS_REL = f"{CYC}/RELEASE-DECISIONS.json"
+B03_ID = "AISEF_V2_1_B03_REQUALIFICATION_ROUND"
+#: the owner's B-03a text, verbatim from the decision ledger entry B03_ID
+V21_AUTHORITY = ("Chọn tạo bản ghi v2.1 mới cho các artifact bị ảnh hưởng. Không thêm luật dung sai engine digest chỉ vì verdict "
+                 "không đổi. Không dùng ánh xạ rebind để che thay đổi hành vi chưa kiểm chứng.")
 
 
 def _sha(data: bytes) -> str:
@@ -322,11 +346,8 @@ def current_proposal_currency() -> dict:
 
 def verify(run_guards: bool) -> dict:
     """Everything the acceptance binds, re-derived on this tree; `run_guards` also runs the five guard commands."""
-    from aisef2.plan import static_admission as sa
     from aisef2.probe import catalog
-    from aisef2.probe import python_callable as pc
     from aisef2.product.compiler import ProbeRef, compile_spec
-    from aisef2.product.contract import plain
     from validation.qualification import p5_falsifiability as pf
     from validation.qualification import rebind
     aid = _aid()
@@ -393,48 +414,13 @@ def verify(run_guards: bool) -> dict:
     stale = [a.contract_id for a in real if (a.requirement_hash, a.contract_hash) !=
              (reqs[a.requirement_id].requirement_hash, cs[a.contract_id[len("BC-V22-"):]].contract_hash)]
     problems += [f"{c}: the approval does not bind the current hashes" for c in stale]
-    cals = aid.calibrations()
-    catalogue, registry = catalog.catalogue(), catalog.registry()
-    contracts_by_id = {c.id: c for c in cs.values()}
-    engine = sa.StaticPlanAdmissionEngine()
-    admitted = engine.admit(plan, sa.AdmissionInputs(reqs, contracts_by_id, real, specs, catalogue, cals, registry))
-    dropped = engine.admit(plan, sa.AdmissionInputs(reqs, contracts_by_id, real[1:], specs, catalogue, cals, registry))
-    bare = engine.admit(plan, sa.AdmissionInputs(reqs, contracts_by_id, (), specs, catalogue, cals, registry))
-    synthetic_passed = any(a.approver == aid.SYNTHETIC_APPROVER for a in real)
-    passed = sum(1 for c in admitted.checks if c.passed)
-    if not admitted.admitted or passed != 9 or synthetic_passed:
-        problems.append(f"not admitted 9/9 under the real approvals alone ({passed}/9)")
-    if dropped.admitted or bare.admitted:
-        problems.append("admitted with an approval missing: the approval gate did not hold")
+    admission = _admission(plan, reqs, cs, real, specs)
+    problems += _admission_problems(admission)
     # the rulings: bound to contracts that already encode them — no contract is edited
-    bindings = ruling_bindings(cs)
-    expected_empty = sorted(s for s in aid.INTERFACE_BINDINGS["IB-EMPTY"]["gap"].split("(")[-1].split(")")[0].replace(",", " ").split()
-                            if s.startswith("S-"))
-    rulings = {k: {**v, "interface_binding_as_proposed": aid.INTERFACE_BINDINGS[v["binding"]],
-                   "contracts": [{"spec_id": s, "contract_id": cs[s].id, "contract_hash": cs[s].contract_hash} for s in bindings[k]],
-                   "count": len(bindings[k]), "semantic_edit_required": False} for k, v in RULINGS.items()}
-    rulings["OR-IFACE-2"]["delete_value_null_contracts"] = bindings["OR-IFACE-2:delete_value_null"]
-    rulings["OR-IFACE-3"]["as_named_by_the_proposal"] = expected_empty
+    rulings, bindings = _rulings(cs)
     if not all(bindings[k] for k in RULINGS):
         problems.append("a ruling binds no contract")
-    # disclosed, not a semantic change: the proposal's IB-EMPTY prose named S-5-a among the zero-byte specs, but S-5-a (like
-    # every process_effect contract) constructs Ledger(<ws>/l.jsonl) over a path holding no file — a fresh start under
-    # the Ledger(path) binding of OR-IFACE-1, encoded in its exact approved hash; no contract is edited
-    rulings["OR-IFACE-3"]["prose_vs_content"] = {
-        "named_by_the_proposal_prose": expected_empty, "zero_byte_file_in_the_contract": sorted(bindings["OR-IFACE-3"]),
-        "named_but_no_zero_byte_file": sorted(set(expected_empty) - set(bindings["OR-IFACE-3"])),
-        "zero_byte_file_but_not_named": sorted(set(bindings["OR-IFACE-3"]) - set(expected_empty)),
-        "no_file_start_contracts": [s for s in bindings["OR-IFACE-1"]
-                                    if not any(isinstance(x, dict) and "bytes_hex" in x for x in _walk(plain(cs[s].stimulus)))],
-        "reading": "the zero-byte ruling binds the contracts whose content holds a zero-byte ledger file; a process_effect contract "
-                   "that constructs Ledger(path) over a path with no file starts fresh under OR-IFACE-1's Ledger(path) binding, "
-                   "as its exact approved hash encodes; the prose inaccuracy is disclosed, no contract changes"}
-    # Cycle-1 compatibility: the frozen probe resolvable at its digest, inactive for its kind
-    entry = next(e for e in catalog.CATALOG if e.probe_id == FROZEN_CYCLE1_PROBE[0])
-    drift = {"probe_id": entry.probe_id, "catalog_digest": entry.probe_digest, "module_digest": pc.DIGEST, "active": entry.active,
-             "active_for_kind": catalog.active()[entry.subject_kind].probe_id, "frozen": FROZEN_CYCLE1_PROBE[1]}
-    drift["ok"] = entry.probe_digest == pc.DIGEST == FROZEN_CYCLE1_PROBE[1] and not entry.active \
-        and drift["active_for_kind"] == "probe.python_callable_v2"
+    drift = _cycle1_drift()
     if not drift["ok"]:
         problems.append(f"Cycle-1 drift: {drift}")
     out = {
@@ -447,17 +433,7 @@ def verify(run_guards: bool) -> dict:
                                    for e in catalog.CATALOG}},
         "semantic_change": "NONE" if not [p for p in problems if "differ" in p or "changed" in p] else "CHANGED",
         "rulings": rulings,
-        "admission": {"engine_digest": admitted.engine_digest, "admitted": admitted.admitted, "checks_passed": passed,
-                      "result_digest": admitted.result_digest,
-                      "checks": [{"number": c.number, "name": c.name, "passed": c.passed, "problems": list(c.problems[:3])}
-                                 for c in admitted.checks],
-                      "synthetic_approval_used": synthetic_passed,
-                      "approvals_given": [approval_fields(a) | {"approval_digest": _sha(_canon(approval_fields(a)))} for a in real],
-                      "one_approval_removed": {"admitted": dropped.admitted,
-                                               "failed_checks": [c.number for c in dropped.checks if not c.passed]},
-                      "no_approvals": {"admitted": bare.admitted, "failed_checks": [c.number for c in bare.checks if not c.passed]},
-                      "plan_structure": "the authoring aid's obligations (p10_contracts.build); its in-memory synthetic compilation "
-                                        "never reaches this admission, which receives exactly the persisted approvals"},
+        "admission": admission,
         "cycle1_drift": drift,
         "proposal_kernel_provenance": currency,
         "probe_identity_rebinding": {
@@ -475,6 +451,79 @@ def verify(run_guards: bool) -> dict:
         out["guards"] = guards()
         problems += [f"guard {k}: exit {v['exit']}" for k, v in out["guards"].items() if v["exit"] != 0]
     return out
+
+
+def _admission(plan, reqs: dict, cs: dict, real: tuple, specs: dict) -> dict:
+    """The static admission of `plan` under the persisted approvals alone, with one of them removed and with none."""
+    from aisef2.plan import static_admission as sa
+    from aisef2.probe import catalog
+    aid = _aid()
+    cals = aid.calibrations()
+    catalogue, registry = catalog.catalogue(), catalog.registry()
+    contracts_by_id = {c.id: c for c in cs.values()}
+    engine = sa.StaticPlanAdmissionEngine()
+    admitted = engine.admit(plan, sa.AdmissionInputs(reqs, contracts_by_id, real, specs, catalogue, cals, registry))
+    dropped = engine.admit(plan, sa.AdmissionInputs(reqs, contracts_by_id, real[1:], specs, catalogue, cals, registry))
+    bare = engine.admit(plan, sa.AdmissionInputs(reqs, contracts_by_id, (), specs, catalogue, cals, registry))
+    return {"engine_digest": admitted.engine_digest, "admitted": admitted.admitted,
+            "checks_passed": sum(1 for c in admitted.checks if c.passed), "result_digest": admitted.result_digest,
+            "checks": [{"number": c.number, "name": c.name, "passed": c.passed, "problems": list(c.problems[:3])}
+                       for c in admitted.checks],
+            "synthetic_approval_used": any(a.approver == aid.SYNTHETIC_APPROVER for a in real),
+            "approvals_given": [approval_fields(a) | {"approval_digest": _sha(_canon(approval_fields(a)))} for a in real],
+            "one_approval_removed": {"admitted": dropped.admitted,
+                                     "failed_checks": [c.number for c in dropped.checks if not c.passed]},
+            "no_approvals": {"admitted": bare.admitted, "failed_checks": [c.number for c in bare.checks if not c.passed]},
+            "plan_structure": "the authoring aid's obligations (p10_contracts.build); its in-memory synthetic compilation "
+                              "never reaches this admission, which receives exactly the persisted approvals"}
+
+
+def _admission_problems(adm: dict) -> list[str]:
+    out = []
+    if not adm["admitted"] or adm["checks_passed"] != 9 or adm["synthetic_approval_used"]:
+        out.append(f"not admitted 9/9 under the real approvals alone ({adm['checks_passed']}/9)")
+    if adm["one_approval_removed"]["admitted"] or adm["no_approvals"]["admitted"]:
+        out.append("admitted with an approval missing: the approval gate did not hold")
+    return out
+
+
+def _rulings(cs: dict) -> tuple[dict, dict]:
+    """The three interface rulings with the contracts each binds (found from their content), and the bindings."""
+    from aisef2.product.contract import plain
+    aid = _aid()
+    bindings = ruling_bindings(cs)
+    expected_empty = sorted(s for s in aid.INTERFACE_BINDINGS["IB-EMPTY"]["gap"].split("(")[-1].split(")")[0].replace(",", " ").split()
+                            if s.startswith("S-"))
+    rulings = {k: {**v, "interface_binding_as_proposed": aid.INTERFACE_BINDINGS[v["binding"]],
+                   "contracts": [{"spec_id": s, "contract_id": cs[s].id, "contract_hash": cs[s].contract_hash} for s in bindings[k]],
+                   "count": len(bindings[k]), "semantic_edit_required": False} for k, v in RULINGS.items()}
+    rulings["OR-IFACE-2"]["delete_value_null_contracts"] = bindings["OR-IFACE-2:delete_value_null"]
+    rulings["OR-IFACE-3"]["as_named_by_the_proposal"] = expected_empty
+    # disclosed, not a semantic change: the proposal's IB-EMPTY prose named S-5-a among the zero-byte specs, but S-5-a (like
+    # every process_effect contract) constructs Ledger(<ws>/l.jsonl) over a path holding no file — a fresh start under
+    # the Ledger(path) binding of OR-IFACE-1, encoded in its exact approved hash; no contract is edited
+    rulings["OR-IFACE-3"]["prose_vs_content"] = {
+        "named_by_the_proposal_prose": expected_empty, "zero_byte_file_in_the_contract": sorted(bindings["OR-IFACE-3"]),
+        "named_but_no_zero_byte_file": sorted(set(expected_empty) - set(bindings["OR-IFACE-3"])),
+        "zero_byte_file_but_not_named": sorted(set(bindings["OR-IFACE-3"]) - set(expected_empty)),
+        "no_file_start_contracts": [s for s in bindings["OR-IFACE-1"]
+                                    if not any(isinstance(x, dict) and "bytes_hex" in x for x in _walk(plain(cs[s].stimulus)))],
+        "reading": "the zero-byte ruling binds the contracts whose content holds a zero-byte ledger file; a process_effect contract "
+                   "that constructs Ledger(path) over a path with no file starts fresh under OR-IFACE-1's Ledger(path) binding, "
+                   "as its exact approved hash encodes; the prose inaccuracy is disclosed, no contract changes"}
+    return rulings, bindings
+
+
+def _cycle1_drift() -> dict:
+    """Cycle-1 compatibility: the frozen probe resolvable at its digest, inactive for its kind."""
+    from aisef2.probe import catalog
+    from aisef2.probe import python_callable as pc
+    entry = next(e for e in catalog.CATALOG if e.probe_id == FROZEN_CYCLE1_PROBE[0])
+    drift = {"probe_id": entry.probe_id, "catalog_digest": entry.probe_digest, "module_digest": pc.DIGEST, "active": entry.active,
+             "active_for_kind": catalog.active()[entry.subject_kind].probe_id, "frozen": FROZEN_CYCLE1_PROBE[1]}
+    drift["ok"] = entry.probe_digest == pc.DIGEST == FROZEN_CYCLE1_PROBE[1] and not entry.active \
+        and drift["active_for_kind"] == "probe.python_callable_v2"
+    return drift
 
 
 GUARDS = {"cycle2_baseline": ["validation/v2/cycle2_baseline.py", "--check"],
@@ -548,7 +597,7 @@ def record() -> dict:
         "authorized_successors": "QP-2.6 (Q0-Q3 on one exact Cycle-2 candidate); after it is GREEN, LANE-Q (QP-2.7 -> QP-2.8 -> QP-2.9) "
                                  "in parallel with LANE-X (WP-2.10.1 -> WP-2.10.2)",
     }
-    body["verdict"] = "C2-P5 ACCEPTED BY THE OWNER — ACCEPTANCE BOUNDARY RECORDED" if not v["problems"] else "PROBLEMS"
+    body["verdict"] = ACCEPTED_VERDICT if not v["problems"] else "PROBLEMS"
     return json.loads(json.dumps(body))
 
 
@@ -565,8 +614,242 @@ def check() -> list[str]:
     h = json.loads((ROOT / HISTORY_REL).read_text(encoding="utf-8"))["entries"]
     if len(h) != doc["attempt_history"]["total_attempts"]:
         out.append("the closed C2-P5 history changed")
-    if doc["verdict"] != "C2-P5 ACCEPTED BY THE OWNER — ACCEPTANCE BOUNDARY RECORDED":
+    if doc["verdict"] != ACCEPTED_VERDICT:
         out.append("the acceptance verdict is not recorded")
+    return out
+
+
+# ------------------------------------------------------------------------------------------- V2.1 (owner B-03a)
+
+def _is_blob_at(rel: str, rev: str) -> bool:
+    """`rel`'s LF-normalised bytes on this tree are its blob at `rev`."""
+    from validation.qualification import rebind
+    return (ROOT / rel).is_file() and _file(rel)["sha256"] == rebind.lf_sha_at(rev, rel)
+
+
+def _json_or_none(rel: str) -> dict | None:
+    return json.loads((ROOT / rel).read_text(encoding="utf-8")) if (ROOT / rel).is_file() else None
+
+
+def history_problems() -> list[str]:
+    """The 2.0 acceptance as HISTORY: the record and its approvals are their v2.0.0 blobs, its verdict is the one
+    recorded, the closed C2-P5 history keeps its count, the approvals file was never rewritten. Nothing is re-derived
+    on this tree (`reverification_problems` re-verifies the boundary on it)."""
+    out = [f"{rel} is not its v2.0.0 blob (history)" for rel in (OUT_REL, APPROVALS_REL) if not _is_blob_at(rel, V2_0_0)]
+    doc = json.loads((ROOT / OUT_REL).read_text(encoding="utf-8"))
+    if doc["verdict"] != ACCEPTED_VERDICT:
+        out.append("the acceptance verdict is not recorded")
+    if len(json.loads((ROOT / HISTORY_REL).read_text(encoding="utf-8"))["entries"]) != doc["attempt_history"]["total_attempts"]:
+        out.append("the closed C2-P5 history changed")
+    if not committed_versions_identical(APPROVALS_REL)["identical"]:
+        out.append(f"{APPROVALS_REL} was rewritten")
+    return out
+
+
+def proposal_history_problems() -> list[str]:
+    """The accepted 2.0 proposal and its document as HISTORY: their v2.0.0 blobs; the record the accepted candidate's,
+    with its own verdict and no problem, as recorded."""
+    aid = _aid()
+    out = [f"{rel} is not its v2.0.0 blob (history)" for rel in (PROPOSAL_REL, aid.DOC_REL) if not _is_blob_at(rel, V2_0_0)]
+    if not _is_blob_at(PROPOSAL_REL, ACCEPTED["candidate"]):
+        out.append(f"{PROPOSAL_REL} is not the accepted candidate's")
+    prop = json.loads((ROOT / PROPOSAL_REL).read_text(encoding="utf-8"))
+    if prop["problems"] or prop["verdict"] != PROPOSAL_VERDICT:
+        out.append(f"{PROPOSAL_REL} does not record its admission (history)")
+    return out
+
+
+def v21_proposal_currency() -> dict:
+    """The v2.1 proposal record against the authoring aid on this tree: current iff EXACTLY equal — no probe-identity
+    re-binding, no provenance tolerance."""
+    from validation.qualification import rebind
+    derived, committed = _aid().record(), _json_or_none(V21_PROPOSAL_REL)
+    return {"record": V21_PROPOSAL_REL, "current": committed == derived,
+            "differing_paths": ["(no record)"] if committed is None else rebind.paths(derived, committed)}
+
+
+def _write_once(rel: str, doc: dict) -> None:
+    if not rel.startswith(V21 + "/"):
+        raise SystemExit(f"refused: {rel} is not a v2.1 record")
+    (ROOT / rel).parent.mkdir(parents=True, exist_ok=True)
+    try:
+        with open(ROOT / rel, "x", encoding="utf-8", newline="\n") as f:
+            f.write(json.dumps(doc, indent=1, ensure_ascii=False) + "\n")
+    except FileExistsError:
+        raise SystemExit(f"refused: {rel} exists — a record is never rewritten") from None
+
+
+def write_v21_proposal() -> dict:
+    """The v2.1 proposal record: the authoring aid's record() on this tree, verbatim (no document), written once."""
+    rec = _aid().record()
+    if rec["problems"]:
+        raise SystemExit("refused: " + "; ".join(rec["problems"]))
+    _write_once(V21_PROPOSAL_REL, rec)
+    return rec
+
+
+def reverify(run_guards: bool = True) -> dict:
+    """The C2-P5 acceptance boundary RE-VERIFIED on 2.1 (owner B-03a). Every comparison is literal — no probe-identity
+    re-binding, no engine-digest tolerance — and there is NO new owner acceptance: the 2.0 acceptance is quoted as
+    history, never re-asserted, and no approval is written (the persisted ones are read). The 2.1 identities are this
+    tree's facts, equal to the v2.1 proposal exactly; their behaviour evidence is the v2.1 falsifiability record (every
+    spec re-executed under this tree's probes, pristine and witness). `run_guards` also runs the five guards."""
+    from aisef2.probe import catalog
+    from aisef2.product.compiler import ProbeRef, compile_spec
+    from validation.qualification import p5_falsifiability as pf
+    from validation.qualification import release_calibration as rc
+    from validation.qualification.rebind import IDENTITY, ROW
+    aid = _aid()
+    checks: list[tuple[bool, str]] = []
+    accepted = json.loads((ROOT / OUT_REL).read_text(encoding="utf-8"))
+    prop = json.loads((ROOT / PROPOSAL_REL).read_text(encoding="utf-8"))
+    v21, fals = _json_or_none(V21_PROPOSAL_REL) or {}, _json_or_none(pf.V21_OUT_REL) or {}
+    entry = next((e for e in json.loads((ROOT / DECISIONS_REL).read_text(encoding="utf-8"))["entries"] if e.get("id") == B03_ID), {})
+    reqs, real, cs = aid.requirements(), load_approvals(), contracts()
+    approved = {a.contract_id: a for a in real}
+    refs = {k: ProbeRef(e.probe_id, e.probe_digest) for k, e in catalog.active().items()}
+    plan = aid.build()["plan"]
+    derived = aid.record()
+    v21_rows = {s["spec_id"]: s for s in v21.get("specs", [])}
+    specs, rows, table = {}, [], {}
+    for s in prop["specs"]:
+        sid, c = s["spec_id"], cs[s["spec_id"]]
+        spec = compile_spec(c, requirements=reqs, approvals=real, probes=refs)
+        specs[spec.id] = spec
+        here = dict(zip(ROW, (c.id, c.contract_hash, spec.id, spec.semantic_hash, spec.probe_id, spec.probe_digest), strict=True))
+        a = approved.get(c.id)
+        row = {"spec_id": sid, **here,
+               "contract_is_the_accepted_and_the_approved": (c.id, c.contract_hash) == (s["contract_id"], s["contract_hash"])
+               == ((a.contract_id, a.contract_hash) if a else None),
+               "probe_id_is_the_accepted": spec.probe_id == s["probe_id"],
+               "identities_are_the_v21_proposal_s": all(here[k] == v21_rows.get(sid, {}).get(k) for k in ROW)}
+        rows.append(row)
+        table[sid] = {"accepted": {k: s[k] for k in IDENTITY}, "v2_1": {k: here[k] for k in IDENTITY}}
+        checks += [(row[k], f"{sid}: {k} is false") for k in ("contract_is_the_accepted_and_the_approved", "probe_id_is_the_accepted",
+                                                               "identities_are_the_v21_proposal_s")]
+    checks.append((len(rows) == ACCEPTED["retained"] and set(v21_rows) == {r["spec_id"] for r in rows},
+                   "the retained specs are not the accepted 59, or not the v2.1 proposal's"))
+    req = {rid: r.requirement_hash for rid, r in reqs.items()}
+    requirements = {"hashes": req, "are_the_accepted": req == {k: v["hash"] for k, v in prop["requirements"].items()},
+                    "are_the_v21_proposal_s": req == {k: v["hash"] for k, v in v21.get("requirements", {}).items()}}
+    checks += [(requirements[k], f"requirements: {k} is false") for k in ("are_the_accepted", "are_the_v21_proposal_s")]
+    plan_facts = {"plan_hash": plan.plan_hash, "is_the_v21_proposal_s": plan.plan_hash == v21.get("plan", {}).get("plan_hash"),
+                  "every_spec_id_compiled_here_under_the_real_approvals": {o.product_proof_spec_id for o in plan.obligations} <= set(specs),
+                  "accepted_plan_hash": ACCEPTED["plan_hash"]}
+    checks += [(plan_facts[k], f"plan: {k} is false") for k in ("is_the_v21_proposal_s", "every_spec_id_compiled_here_under_the_real_approvals")]
+    proposal = {"v2_1": {"record": _file(V21_PROPOSAL_REL) if v21 else None, "proposal_digest": derived["proposal_digest"],
+                         "verdict": derived["verdict"], "current_exactly": derived == v21},
+                "accepted": {"record": _file(PROPOSAL_REL), "proposal_digest": prop["proposal_digest"],
+                             "history_problems": proposal_history_problems()}}
+    checks += [(proposal["v2_1"]["current_exactly"], f"{V21_PROPOSAL_REL} is not what the authoring aid derives from this tree"),
+               (not proposal["accepted"]["history_problems"], f"{PROPOSAL_REL}: {proposal['accepted']['history_problems']}")]
+    stale = [a.contract_id for a in real if (a.requirement_hash, a.contract_hash) !=
+             (reqs[a.requirement_id].requirement_hash, cs[a.contract_id[len("BC-V22-"):]].contract_hash)]
+    approvals = {"record": _file(APPROVALS_REL), "count": len(real),
+                 "aggregate_digest": json.loads((ROOT / APPROVALS_REL).read_text(encoding="utf-8"))["aggregate_digest"],
+                 "one_per_retained_contract": set(approved) == {c.id for c in cs.values()} and len(real) == ACCEPTED["retained"],
+                 "not_binding_the_current_hashes": stale, "committed_versions": committed_versions_identical(APPROVALS_REL)}
+    checks += [(approvals["one_per_retained_contract"], "the approvals are not exactly one per retained contract"),
+               (not stale, f"approvals not binding the current hashes: {stale}"),
+               (approvals["committed_versions"]["identical"], f"{APPROVALS_REL} was rewritten")]
+    admission = _admission(plan, reqs, cs, real, specs)
+    admission["engine_digest_is_the_v21_proposal_s"] = admission["engine_digest"] == v21.get("identities", {}).get("admission_engine_digest")
+    checks += [(False, p) for p in _admission_problems(admission)]
+    checks.append((admission["engine_digest_is_the_v21_proposal_s"], "admission: the engine digest is not the v2.1 proposal's"))
+    rulings, _ = _rulings(cs)
+    drift = _cycle1_drift()
+    corpus = {"problems": pf.corpus_problems(), "corpus_sha256": pf.corpus()["corpus_sha256"], "file": _file(pf.MUTANTS_REL)}
+    literal = {"rulings_are_the_accepted_record_s": json.loads(json.dumps(rulings)) == accepted["verification"]["rulings"],
+               "cycle1_drift_is_the_accepted_record_s": drift == accepted["verification"]["cycle1_drift"] and drift["ok"],
+               "p5_corpus_is_the_accepted_record_s": corpus == accepted["verification"]["identities"]["p5_corpus"],
+               "p5_falsifiability_2_0_is_the_accepted_candidate_s": _is_blob_at(FALSIFIABILITY_REL, ACCEPTED["candidate"]),
+               "p5_falsifiability_2_0_is_its_v2_0_0_blob": _is_blob_at(FALSIFIABILITY_REL, V2_0_0)}
+    checks += [(v, f"{k} is false") for k, v in literal.items()]
+    here_semantic = {r["spec_id"]: r["semantic_hash"] for r in rows}
+    f_rows = fals.get("specs", [])
+    falsifiability = {
+        "record": _file(pf.V21_OUT_REL) if fals else None, "verdict": fals.get("verdict"), "summary": fals.get("summary"),
+        "plan_hash_is_this_tree_s": fals.get("identities", {}).get("plan_hash") == plan.plan_hash,
+        "semantic_hashes_are_this_tree_s": {r["spec_id"]: r["semantic_hash"] for r in f_rows} == here_semantic,
+        "every_spec_qualified": bool(fals) and not fals.get("problems") and len(f_rows) == len(rows)
+        and all(r["status"] == "QUALIFIED" for r in f_rows),
+        "specs": [{k: r.get(k) for k in ("spec_id", "probe_id", "expectation", "pristine", "mutant_id", "mutant_verdict", "status")}
+                  for r in f_rows],
+        "rule": "the behaviour evidence for the 2.1 identities: p5_falsifiability.run() re-executed every retained spec, compiled "
+                "under this tree's probes, against the pristine reference and its own witness"}
+    checks += [(falsifiability[k], f"{pf.V21_OUT_REL}: {k} is false")
+               for k in ("plan_hash_is_this_tree_s", "semantic_hashes_are_this_tree_s", "every_spec_qualified")]
+    calibrations = {"shipped": _file(rc.SHIPPED_REL),
+                    "newest_release_record": _file(rc.RECORD_REL) if (ROOT / rc.RECORD_REL).is_file() else None}
+    checks.append((calibrations["newest_release_record"] is not None, f"{rc.RECORD_REL} is missing"))
+    authority = {"quote": V21_AUTHORITY, "decision": {"path": DECISIONS_REL, "id": B03_ID, "seq": entry.get("seq"),
+                                                      "approver": entry.get("approver")},
+                 "quoted_verbatim": V21_AUTHORITY in entry.get("owner_text", ""),
+                 "not_authorized_by_the_decision": entry.get("not_authorized_by_this_entry")}
+    checks.append((authority["quoted_verbatim"], f"the B-03a text is not in {DECISIONS_REL} entry {B03_ID}"))
+    history_now = history_problems()
+    checks.append((not history_now, f"{OUT_REL}: {history_now}"))
+    body = {
+        "record": "AISEF V2.1 — C2-P5 ACCEPTANCE BOUNDARY RE-VERIFICATION (no new owner acceptance)",
+        "id": "AISEF-V2.1-C2-P5-ACCEPTANCE-REVERIFICATION",
+        "authority": authority,
+        "claims_owner_acceptance": False,
+        "new_approvals": [],
+        "historical_acceptance": {"path": OUT_REL, "sha256": _file(OUT_REL)["sha256"], "blob_at_v2_0_0": _git("rev-parse", f"{V2_0_0}:{OUT_REL}"),
+                                  "verdict_as_recorded": accepted["verdict"], "authority_as_recorded": accepted["authority"],
+                                  "history_problems": history_now,
+                                  "rule": "quoted, not re-asserted: the owner's acceptance is this 2.0 record; this record accepts "
+                                          "nothing and approves nothing"},
+        "rule": "every comparison is literal: this tree's identities against the accepted proposal, the persisted approvals "
+                "and the v2.1 proposal, with no probe-identity re-binding (validation/qualification/rebind.py) and no "
+                "engine-digest tolerance; the contracts, their hashes and the approvals are the accepted ones, the spec "
+                "identities and the admission engine are 2.1's",
+        "specs": rows,
+        "requirements": requirements,
+        "plan": plan_facts,
+        "proposal": proposal,
+        "approvals": approvals,
+        "admission": admission,
+        "literal": literal,
+        "cycle1_drift": drift,
+        "p5_corpus": corpus,
+        "p5_falsifiability": falsifiability,
+        "calibrations": calibrations,
+        "identity_table": {"label": "identity mapping, not a behaviour proof", "rows": table},
+    }
+    problems = [m for ok, m in checks if not ok]
+    if run_guards:
+        body["guards"] = guards()
+        problems += [f"guard {k}: exit {v['exit']}" for k, v in body["guards"].items() if v["exit"] != 0]
+    body["problems"] = problems
+    body["verdict"] = V21_VERDICT if not problems else "PROBLEMS"
+    return json.loads(json.dumps(body))
+
+
+def write_v21() -> dict:
+    """`reverify` with the guards into the v2.1 record, written once and only without a problem."""
+    if (ROOT / V21_OUT_REL).exists():
+        raise SystemExit(f"refused: {V21_OUT_REL} exists — a record is never rewritten")
+    rec = reverify(run_guards=True)
+    if rec["problems"]:
+        raise SystemExit("refused: " + "; ".join(rec["problems"]))
+    _write_once(V21_OUT_REL, rec)
+    return rec
+
+
+def reverification_problems() -> list[str]:
+    """The committed v2.1 re-verification is exactly what `reverify` derives on this tree (its guard runs recorded, not
+    repeated: each must have exited 0); [] when current."""
+    committed = _json_or_none(V21_OUT_REL)
+    if committed is None:
+        return [f"{V21_OUT_REL} is missing"]
+    ran = committed.pop("guards", {})
+    fresh = reverify(run_guards=False)
+    out = list(fresh["problems"])
+    if committed != fresh:
+        out.append(f"{V21_OUT_REL} is not what this tree re-verifies")
+    if set(ran) != set(GUARDS) or any(g["exit"] != 0 for g in ran.values()):
+        out.append(f"{V21_OUT_REL}: the recorded guard runs did not all exit 0")
     return out
 
 
@@ -576,7 +859,21 @@ def main(argv: list[str] | None = None) -> int:
     g.add_argument("--approve", action="store_true")
     g.add_argument("--write", action="store_true")
     g.add_argument("--check", action="store_true")
+    g.add_argument("--write-v21-proposal", action="store_true")
+    g.add_argument("--write-v21", action="store_true")
+    g.add_argument("--check-v21", action="store_true")
     a = ap.parse_args(argv)
+    if a.write_v21_proposal:
+        rec = write_v21_proposal()
+        print(f"{V21_PROPOSAL_REL}: {rec['verdict']}; plan {rec['plan']['plan_hash'][:12]}; proposal {rec['proposal_digest'][:12]}")
+        return 0
+    if a.write_v21:
+        print(f"{V21_OUT_REL}: {write_v21()['verdict']}")
+        return 0
+    if a.check_v21:
+        found = history_problems() + reverification_problems()
+        print("\n".join(found) if found else "PASS")
+        return 1 if found else 0
     if a.approve:
         doc = approve()
         print(f"{APPROVALS_REL}: {doc['count']} approvals by {doc['approver']}; aggregate {doc['aggregate_digest']}")

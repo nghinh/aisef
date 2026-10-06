@@ -24,9 +24,17 @@ class CheckerCalibration(unittest.TestCase):
         cls.result = cc.run()
 
     def test_every_checker_is_calibrated_and_the_committed_record_is_current(self):
+        # V2.1 (owner B-03a): the committed record is the v2.1 one (cc.OUT_REL); 2.0's is history (below)
         self.assertEqual(cc.problems_of(self.result), [])
         self.assertEqual(self.result["calibrated_count"], len(cc.REGISTRY))
         self.assertEqual((ROOT / cc.OUT_REL).read_text(encoding="utf-8"), cc.render(self.result))
+
+    def test_the_2_0_record_is_history(self):
+        self.assertNotEqual(cc.OUT_REL, cc.HISTORY_REL)
+        self.assertEqual(cc.history_problems(), [])
+        tampered = (ROOT / cc.HISTORY_REL).read_bytes() + b" "
+        with mock.patch.object(pathlib.Path, "read_bytes", return_value=tampered):
+            self.assertEqual(cc.history_problems(), [f"{cc.HISTORY_REL} is not its v2.0.0 blob (history)"])
 
     def test_every_checker_has_a_committed_fixture_that_fails_it_for_the_named_reason(self):
         for r in self.result["checkers"]:

@@ -5,8 +5,13 @@ Same contract as `p1_evidence.py`: every record carries `properties`, named fact
 Records hold outcomes only (statuses, verdicts, satisfactions, owners) — never a temporary path or a duration — so a
 rebuild is byte-identical.
 
-    python -P validation/v2/p2_evidence.py            # write every record whose package is implemented
+    python -P validation/v2/p2_evidence.py            # write the v2.1 WP-2.3 record (refuses an existing file)
     python -P validation/v2/p2_evidence.py --check    # fail on drift or on a false property
+
+V2.1 (owner B-03a, RELEASE-DECISIONS seq 5): the admission engine digest moved, so WP-2.3 is a NEW record under
+closure-evidence/v2/v2.1/ and its 2.0 record is HISTORY — its blob is v2.0.0's and its own properties hold; nothing
+re-derived on this tree is compared with it. The other four records are compared as before and never written again
+(P2-CALIBRATION.json is immutable).
 """
 
 from __future__ import annotations
@@ -844,10 +849,16 @@ def _raises_invariant(fn, exc) -> bool:
     return False
 
 
+#: the commit tag v2.0.0 names: a 2.0 record kept as history is its blob there
+V2_0_0 = "ca2631374602da45dae75b7f6907ff4729d0b2f7"
+V21_STATIC_ADMISSION_REL = "closure-evidence/v2/v2.1/P2-STATIC-ADMISSION.json"
+#: 2.0 records a v2.1 record replaces as current, by work package: checked as history only; `main` writes only the
+#: v2.1 records of these packages
+HISTORY = {"WP-2.3": "closure-evidence/v2/P2-STATIC-ADMISSION.json"}
 BUILDERS: dict[str, tuple[str, Callable[[], dict], str]] = {
     "WP-2.1": ("closure-evidence/v2/P2-PROBE-PROTOCOL.json", probe_protocol, "aisef2/probe/protocol.py"),
     "WP-2.2": (CALIBRATION_REL, calibration, "aisef2/probe/calibration.py"),
-    "WP-2.3": ("closure-evidence/v2/P2-STATIC-ADMISSION.json", static_admission, "aisef2/plan/static_admission.py"),
+    "WP-2.3": (V21_STATIC_ADMISSION_REL, static_admission, "aisef2/plan/static_admission.py"),
     "WP-2.4": ("closure-evidence/v2/P2-STORY-ADMISSION.json", story_admission, "aisef2/plan/story_admission.py"),
     "WP-2.5": ("closure-evidence/v2/P2-PLAN-DRIFT.json", plan_drift, "aisef2/plan/drift.py"),
 }
@@ -875,6 +886,19 @@ def check(root: pathlib.Path = ROOT) -> list[str]:
             out.append(f"{rel} is missing")
         elif committed.read_text(encoding="utf-8") != render(fresh):
             out.append(f"{rel} is stale: regenerate it")
+    return out + history_problems(root)
+
+
+def history_problems(root: pathlib.Path = ROOT) -> list[str]:
+    """Each 2.0 record of HISTORY: its LF-normalised bytes are its blob at v2.0.0, and its own properties hold."""
+    out = []
+    for rel in HISTORY.values():
+        at = subprocess.run(["git", "-C", str(root), "cat-file", "-p", f"{V2_0_0}:{rel}"], capture_output=True)
+        now = (root / rel).read_bytes().replace(b"\r\n", b"\n") if (root / rel).is_file() else None
+        if at.returncode != 0 or now != at.stdout.replace(b"\r\n", b"\n"):
+            out.append(f"{rel} is not its v2.0.0 blob (history)")
+        else:
+            out += [f"{rel} (history): {p}" for p in problems_of(json.loads(now))]
     return out
 
 
@@ -884,13 +908,19 @@ def main(argv: list[str] | None = None) -> int:
         problems = check()
     else:
         problems = []
-        for rel, build, needs in BUILDERS.values():
+        for wp in HISTORY:
+            rel, build, needs = BUILDERS[wp]
             if (ROOT / needs).exists():
                 record = build()
                 problems += problems_of(record)
                 if not problems_of(record):
-                    (ROOT / rel).write_text(render(record), encoding="utf-8")
-                    print(f"wrote {rel}")
+                    (ROOT / rel).parent.mkdir(parents=True, exist_ok=True)
+                    try:
+                        with open(ROOT / rel, "x", encoding="utf-8") as f:   # a record is never rewritten
+                            f.write(render(record))
+                        print(f"wrote {rel}")
+                    except FileExistsError:
+                        problems.append(f"refused: {rel} exists")
     for p in problems:
         print(f"FAIL  {p}")
     print("p2 evidence: " + ("FAIL" if problems else "PASS"))
