@@ -321,6 +321,10 @@ def execute(project: Project, settings: Settings, source: pathlib.Path, out: pat
     evidence anchor recorded, its lineage's spend counted against this run's ceilings; a lineage with unaccounted spend
     starts nothing unless `accept_unaccounted`. Nothing of the predecessor's evidence is written — and it is a run,
     never a revision: nothing runs at it."""
+    # every path the run hands git or records is absolute: a relative --out given to `git -C out clone ... out/repo`
+    # would clone into out/out/repo (found by the CLI integration run, V2.1)
+    out, source = pathlib.Path(out).absolute(), pathlib.Path(source).absolute()
+    predecessor = pathlib.Path(predecessor).absolute() if predecessor is not None else None
     if out.exists():
         raise RunRefused(f"{out} exists: a run directory is never reused or overwritten")
     continues = None

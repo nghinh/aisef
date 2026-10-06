@@ -189,3 +189,19 @@ class Continue(ProductBase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+@unittest.skipUnless(os.name == "posix", "the fake client is a script started by its shebang")
+class RelativePaths(ProductBase):
+    """`aisef run --out run1 --repo repo` from the operator's directory: relative paths (the CLI integration found
+    them cloned into run1/run1/repo before 2.1 made them absolute)."""
+
+    def test_a_run_and_its_continuation_given_relative_paths(self):
+        import contextlib
+        from tests.v2.test_app_run import provider
+        with contextlib.chdir(self.tmp):
+            rec = R.execute(self.project, self.settings, pathlib.Path("source"), pathlib.Path("rel-out"),
+                            transport=provider(), client_exe=str(self.client), cals=R.calibrations())
+        self.assertEqual((rec["story_outcomes"], rec["delivery_verdict"]), ({"S1": ["COMMIT"]}, "PASS"))
+        self.assertTrue((self.tmp / "rel-out" / "repo" / ".git").exists())
+        self.assertFalse((self.tmp / "rel-out" / "rel-out").exists())
