@@ -105,6 +105,58 @@
     "rulings": "RC1 rejected and the narrow smoke #2 amendment (2026-10-05); S6-SMOKE-2-FALSE-ROLLBACK-S10A waived, single case (2026-10-06) — V2-RELEASE-FINDINGS.json"
    },
    "not_authorized_by_this_entry": "creating the tag, approving the pypi deployment, any paid or provider smoke — each still the owner's own action"
+  },
+  {
+   "seq": 4,
+   "id": "AISEF_V2_1_B01_ARCHITECTURE_EXCEPTION_V2_007",
+   "authority": "owner directive 2026-10-06 (chat), B-01: \"Tôi, chủ dự án AISEF, PHÊ DUYỆT B-01 và CHO PHÉP triển khai B-03 theo các khuyến nghị trong báo cáo ngày 06/10/2026, với phạm vi cụ thể sau.\" … \"Phê duyệt ARCHITECTURE-EXCEPTION-V2-007\"",
+   "approver": "human:owner",
+   "decision": {
+    "ARCHITECTURE_EXCEPTION": "ARCHITECTURE-EXCEPTION-V2-007",
+    "VERDICT": "APPROVED",
+    "IDENTITIES": [
+     "contract semantic identity",
+     "probe capability/API version",
+     "digest of the executed bytes"
+    ]
+   },
+   "owner_text": "Tôi, chủ dự án AISEF, PHÊ DUYỆT B-01 và CHO PHÉP triển khai B-03 theo các khuyến nghị trong báo cáo ngày 06/10/2026, với phạm vi cụ thể sau.\n1. B-01 — Phê duyệt ba danh tính\nPhê duyệt ARCHITECTURE-EXCEPTION-V2-007, tách:\n\n* Danh tính ngữ nghĩa contract.\n* Phiên bản năng lực/API của probe.\n* Digest bản thực thi thực tế.\n\nGhi quyết định này vào sổ quyết định hiện có theo đúng schema, dẫn lại nguyên văn chỉ thị và gắn với hồ sơ ADR/implementation đang áp dụng. Giữ nguyên lịch sử phê duyệt cũ.\nPhê duyệt kiến trúc không đồng nghĩa xác nhận implementation đã đúng; vẫn phải kiểm chứng tương thích, migration và ràng buộc evidence.",
+   "recorded_by": "transcribed verbatim by engineering (Claude Code session 845c9f11) from the owner's chat message of 2026-10-06; the owner wrote the text, engineering wrote this file — the owner did not sign it",
+   "basis": {
+    "dossier": "docs/v2.1/decisions/B-01-V2-007-THREE-IDENTITIES.md (option A)",
+    "adr": "docs/v2.1/ADR-V2.1.md ADR-2",
+    "implementation": [
+     "919a271",
+     "06d4e62",
+     "4d4c53a"
+    ],
+    "applied_before_approval": "the three identities were implemented on v2.1/foundation (919a271, 2026-10-06 11:27 +07) before this approval; this entry does not backdate it",
+    "exception_record": "closure-evidence/v2/v2.1/ARCHITECTURE-EXCEPTION-V2-007.json (written by the B-01 lane; bound by AISEF-V2-RFC-AMENDMENT-V2-007.json)"
+   },
+   "conditions": "an architecture approval does not confirm the implementation: compatibility, migration and the evidence bindings are still to be verified (owner text)",
+   "not_authorized_by_this_entry": "B-02 (2.0.1 release), B-04, B-08, B-09, B-10; any push, tag, publish, deploy or paid provider call; a 2.1 release or RC freeze; any new owner acceptance of the C2-P5 boundary — each still the owner's own decision"
+  },
+  {
+   "seq": 5,
+   "id": "AISEF_V2_1_B03_REQUALIFICATION_ROUND",
+   "authority": "owner directive 2026-10-06 (chat), B-03: \"Tôi, chủ dự án AISEF, PHÊ DUYỆT B-01 và CHO PHÉP triển khai B-03 theo các khuyến nghị trong báo cáo ngày 06/10/2026, với phạm vi cụ thể sau.\" … \"B-03 — Cho phép mở vòng tái thẩm định 2.1\"",
+   "approver": "human:owner",
+   "decision": {
+    "REQUALIFICATION_ROUND": "V2.1",
+    "VERDICT": "AUTHORIZED",
+    "B-03a": "new v2.1 records for the artifacts the engine digest affected; no engine-digest tolerance; no rebind mapping hiding unverified behaviour",
+    "B-03b": "a new mutation phase (RECORDS/SUPERSEDED): the 320 reported targets checked against the tree, plus lineage, usage, review_ocr, review_verify, bundle_cli and needed dependencies; isolated environment, no real client/provider/credential/operator data; concurrency only after isolation and resource ownership are verified",
+    "B-03c": "bundle_cli.migrate and review_verify.verify into the PRODUCT_TRUTH inventory within the stated limits, enforced by an architecture check",
+    "B-03d": "a ruling naming 2.1's behaviour changes and a new Q5 corpus; 2.0's corpus, rulings and evidence kept"
+   },
+   "owner_text": "Tôi, chủ dự án AISEF, PHÊ DUYỆT B-01 và CHO PHÉP triển khai B-03 theo các khuyến nghị trong báo cáo ngày 06/10/2026, với phạm vi cụ thể sau.\n2. B-03 — Cho phép mở vòng tái thẩm định 2.1\nB-03a — Engine digest\nChọn tạo bản ghi v2.1 mới cho các artifact bị ảnh hưởng. Không thêm luật dung sai engine digest chỉ vì verdict không đổi. Không dùng ánh xạ rebind để che thay đổi hành vi chưa kiểm chứng.\nB-03b — Mutation\nCho phép chạy phase mutation mới theo cơ chế RECORDS/SUPERSEDED, gồm 320 target cũ được báo cáo và bổ sung các module mới của 2.1: lineage, usage, review_ocr, review_verify, bundle_cli cùng phần phụ thuộc cần thiết.\nCon số 320 phải đối chiếu với cây thực tế trước khi chạy. Ước lượng khoảng 32 giờ một worker được ghi nhận; không cần hỏi lại chỉ vì thời gian chạy dài.\nChạy trong môi trường kiểm thử riêng, không sử dụng client/provider thật, credential hoặc dữ liệu người vận hành. Chỉ chạy đồng thời khi cơ chế cách ly và quyền sở hữu tài nguyên đã được kiểm chứng.\nB-03c — Hai thẩm quyền mới\nChấp nhận đưa `bundle_cli.migrate` và `review_verify.verify` vào inventory PRODUCT_TRUTH với đúng phạm vi đã mô tả:\n\n* migrate tạo bundle mới; không tự phê duyệt bundle.\n* verify thực hiện kiểm chứng bằng probe và trả kết quả theo chính sách.\n* Cả hai không trực tiếp commit/merge sản phẩm hoặc tạo đường quyết định cuối thứ hai.\n\nCập nhật inventory và kiểm tra kiến trúc để cưỡng chế các giới hạn này. Nếu implementation hiện tại vượt phạm vi trên, sửa lại.\nB-03d — Conformance và Q5\nCho phép tạo ruling nêu rõ thay đổi hành vi của 2.1 và corpus Q5 mới tương ứng. Giữ nguyên corpus, ruling và evidence của 2.0.\nMỗi thay đổi kỳ vọng phải truy được tới requirement/quyết định đã duyệt và bằng chứng hành vi; không sửa kỳ vọng chỉ để test xanh.\n3. Trình tự thực hiện\n\n1. Xác minh HEAD, working tree và các thay đổi chưa commit. Bảo toàn công việc của phiên khác.\n2. Ghi phê duyệt B-01/B-03; lập manifest phạm vi tái thẩm định gồm commit, target, checker, corpus và môi trường.\n3. Chạy preflight và các kiểm tra ngắn để phát hiện lỗi cấu hình trước chiến dịch mutation dài.\n4. Sinh evidence vào thư mục ngoài cây được đo. Kiểm tra từng kết quả, phân loại mọi failure/survivor.\n5. Đưa evidence hợp lệ vào cấu trúc phiên bản 2.1 theo quy trình, giữ lịch sử superseded. Không ghi đè evidence 2.0.\n6. Chạy lại các checker đang đỏ và suite trên commit ứng viên cuối. Nếu mã thay đổi sau khi đo, xác định và chạy lại phần bằng chứng bị ảnh hưởng.\n7. Cập nhật REPORT.md, RED-SUITE.md và trạng thái tái thẩm định.\n\nKhông bỏ test, giảm assertion, thêm skip/xfail hoặc nới oracle để đạt PASS. Nếu kiểm chứng phát hiện lỗi thật, sửa và kiểm lại; giữ bằng chứng của lượt thất bại.\n4. Phạm vi chưa được duyệt\nChỉ thị này không duyệt B-02, B-04, B-08, B-09 hoặc B-10; không cho phép push, tag, publish, deploy hay gọi provider trả tiền.\nCác công việc cải tiến đã được giao trước đó vẫn còn hiệu lực. B-03 hoàn thành không đồng nghĩa toàn bộ A–E hoàn thành. Báo riêng trạng thái sandbox Linux, context/checkpoint theo MiMo, kiểm thử live và đối chứng hiệu quả.",
+   "recorded_by": "transcribed verbatim by engineering (Claude Code session 845c9f11) from the owner's chat message of 2026-10-06; the owner wrote the text, engineering wrote this file — the owner did not sign it",
+   "basis": {
+    "report": "docs/v2.1/REPORT.md §7 (b9fb825)",
+    "red_suite": "docs/v2.1/RED-SUITE.md (b9fb825)",
+    "evidence_directory": "closure-evidence/v2/v2.1/ (2.0 evidence never overwritten)"
+   },
+   "not_authorized_by_this_entry": "B-02 (2.0.1 release), B-04, B-08, B-09, B-10; any push, tag, publish, deploy or paid provider call; a 2.1 release or RC freeze; any new owner acceptance of the C2-P5 boundary — each still the owner's own decision"
   }
  ]
 }
