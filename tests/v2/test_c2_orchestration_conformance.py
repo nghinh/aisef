@@ -481,8 +481,9 @@ class MixedStory(unittest.TestCase):
 
 
 class ReproofOfAnotherKind(unittest.TestCase):
-    """After a merge, a prior committed story's PRESERVE obligation (a cli_invocation spec) is re-proved at the merged
-    revision with its own probe, although every spec of the current story is a file_artifact spec."""
+    """A prior committed story's PRESERVE obligation (a cli_invocation spec) is proved with its own probe, although every
+    spec of the current story is a file_artifact spec — at the candidate (V2.1, V21-38: a regression there is the
+    developer's) and again at the merged revision."""
 
     @classmethod
     def setUpClass(cls):
@@ -514,14 +515,16 @@ class ReproofOfAnotherKind(unittest.TestCase):
                          {"file_artifact"})
         self.assertEqual(self.post_merge("S4"), [("S4:post-merge:C-M4", True), ("S4:post-merge:C-K0", True)])
         k = [e.data["record"] for e in self.w.records("S4", "C-K0")]
-        self.assertEqual(len(k), 2)
-        self.assertEqual({(x["probe_id"], x["probe_digest"], x["revision"], verdict_of(x)) for x in k},
-                         {(SPECS["K_SUB"].probe_id, SPECS["K_SUB"].probe_digest, self.r4.revision, "SATISFIED")})
+        self.assertEqual(len(k), 4)     # V21-38: both parties at the candidate, both again at the merged revision
+        self.assertEqual({(x["probe_id"], x["probe_digest"], verdict_of(x)) for x in k},
+                         {(SPECS["K_SUB"].probe_id, SPECS["K_SUB"].probe_digest, "SATISFIED")})
+        self.assertEqual([x["revision"] for x in k][2:], [self.r4.revision] * 2)   # the last two: the merged revision
 
-    def test_a_regression_of_the_prior_spec_of_another_kind_is_POST_MERGE_REGRESSION_and_rolled_back(self):
-        self.assertEqual(self.w.failures("S3"), [("POST_MERGE_REGRESSION", "INTEGRATION", False)])
-        self.assertEqual(self.w.details("S3"), ["post-merge C-K0: POST_MERGE_REGRESSION"])
-        self.assertEqual(self.post_merge("S3"), [("S3:post-merge:C-M3", True), ("S3:post-merge:C-K0", False)])
+    def test_a_regression_of_the_prior_spec_of_another_kind_is_the_developer_s_at_the_candidate_and_never_merged(self):
+        """V2.1 (V21-38); on 2.0.0 it was found after the merge, POST_MERGE_REGRESSION / INTEGRATION."""
+        self.assertEqual(self.w.failures("S3"), [("CONTRACT_UNSATISFIED", "DEVELOPER", True)] * 2)
+        self.assertEqual(self.w.details("S3"), ["proof of C-K0: CONTRACT_UNSATISFIED"] * 2)
+        self.assertEqual(self.post_merge("S3"), [])
         self.assertEqual({(e.data["record"]["probe_id"], verdict_of(e.data["record"])) for e in self.w.records("S3", "C-K0")},
                          {(SPECS["K_SUB"].probe_id, "REFUTED")})
         self.assertEqual(self.after3, self.tip)
@@ -529,14 +532,14 @@ class ReproofOfAnotherKind(unittest.TestCase):
     def test_a_prior_spec_whose_probe_the_harness_did_not_wire_is_PROBE_INVALID_SPEC_never_a_crash(self):
         self.assertEqual([a.outcome for a in self.r2.attempts], ["ROLLBACK"])
         self.assertEqual(self.w.failures("S2"), [("PROBE_INVALID_SPEC", "INTEGRATION", False)])
-        self.assertEqual(self.w.details("S2"), ["post-merge C-K0: PROBE_INVALID_SPEC"])
-        self.assertEqual(self.post_merge("S2"), [("S2:post-merge:C-M2", True), ("S2:post-merge:C-K0", False)])
+        self.assertEqual(self.w.details("S2"), ["proof of C-K0: PROBE_INVALID_SPEC"])   # V21-38: found at the candidate
+        self.assertEqual(self.post_merge("S2"), [])
         self.assertEqual(self.w.records("S2", "C-K0"), [])   # nothing measured, no record made by a party (invariant III)
         self.assertEqual([e for e in self.w.events("proof/verified", "S2") if e.data["criterion_id"] == "C-K0"], [])
         last = self.r2.attempts[-1].proofs[-1]
         self.assertEqual((last.criterion_id, last.implementer_seq, last.verifier_seq, last.verified_seq, last.agreement,
                           last.satisfaction, last.failure.code), ("C-K0", None, None, None, False, None, F.PROBE_INVALID_SPEC))
-        self.assertEqual(self.after2, self.tip)          # the merge was reverted
+        self.assertEqual(self.after2, self.tip)          # nothing was merged
         self.assertEqual(self.w.run.state(P.STORY_STATE)["S2"]["state"], "ENDED")
 
 

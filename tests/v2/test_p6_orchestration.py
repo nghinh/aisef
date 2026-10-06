@@ -623,6 +623,10 @@ class Orchestration(unittest.TestCase):
         self.assert_disposed("S1")
 
     def test_ORCH_9_and_10_a_post_merge_regression_of_a_prior_PRESERVE_obligation_is_INTEGRATION_and_rolled_back(self):
+        """V2.1 (V21-38): a regression the developer's candidate carries is found at the candidate and is the
+        developer's (test_v21_orchestration.PreserveAtCandidate). What is left to INTEGRATION is a regression the
+        merge itself makes: here main moves under the candidate (a concurrent change breaks S0's preserved `sub`),
+        the candidate is clean — C0 holds at the candidate — and only the merged revision refutes it."""
         plan = plan_of(self.base, obligation("C1", self.s1.id, "S0", ObligationRole.INTRODUCE),
                        obligation("C0", self.s0.id, "S0", ObligationRole.PRESERVE),
                        obligation("C2", self.s2.id, "S2", ObligationRole.INTRODUCE))
@@ -631,22 +635,22 @@ class Orchestration(unittest.TestCase):
             self.assertTrue(r0.committed, seen.report())
             self.assertEqual([e.data["check"] for e in self.events("gate/check") if e.data["check"].startswith("S0:post")],
                              ["S0:post-merge:C1", "S0:post-merge:C0"])
-            tip = self.merger.base()
-            breaking = Dev({"app/mul.py": MUL, "tests/test_s2.py": TEST_MUL,
-                            "app/calc.py": "def sub(a, b):\n    return a + b\n"})       # breaks S0's preserved behaviour
-            r2 = self.story(plan, "S2", breaking, inputs=self.inputs("S2", tests=("tests/test_s2.py",), regressions=("tests/test_other.py",)),
+            concurrent = Dev({"app/mul.py": MUL, "tests/test_s2.py": TEST_MUL}, repo=self.repo,
+                             on_trunk={"app/calc.py": "def sub(a, b):\n    return a + b\n" + ADD})   # main moves: S0's `sub` broken there
+            r2 = self.story(plan, "S2", concurrent, inputs=self.inputs("S2", tests=("tests/test_s2.py",), regressions=("tests/test_other.py",)),
                             tests_block=False)
         self.observed = seen   # read back by validation/qualification/diag_orch9.py after the case ran
         self.assertFalse(r2.committed, seen.report())
         codes = self.failures("S2")
         self.assertEqual(codes, [("POST_MERGE_REGRESSION", "INTEGRATION", False)], seen.report())
         self.assertEqual(self.details("S2"), ["post-merge C0: POST_MERGE_REGRESSION"], seen.report())
-        self.assertEqual(self.merger.base(), tip)           # the merge was rolled back
+        self.assertEqual(git(self.repo, "log", "-1", "--format=%s", "main").stdout.strip(),
+                         "concurrent change on main")      # the merge was rolled back: main is the moved main again
+        candidate_checks = [(e.data["check"], e.data["passed"]) for e in self.events("gate/check") if e.data["check"] == "S2:proof:C0"]
+        self.assertEqual(candidate_checks, [("S2:proof:C0", True)])      # the candidate kept S0's behaviour
         checks = [(e.data["check"], e.data["passed"]) for e in self.events("gate/check") if e.data["check"].startswith("S2:post")]
         self.assertEqual(checks, [("S2:post-merge:C2", True), ("S2:post-merge:C0", False)])   # the prior story's PRESERVE, re-proved
         self.assertAttempts(r2, ["ROLLBACK"])
-        adequacy = self.events("tests/adequacy", "S2")[0].data
-        self.assertEqual((adequacy["outcome"], adequacy["regressions"]["outcome"]), ("INADEQUATE", "FAILED"))  # the policy let it through; the proof did not
         self.assert_disposed("S2")
 
     def test_JOURNAL_AUTHORITY_the_decision_cites_every_check_row_of_the_story_gate(self):
@@ -1044,14 +1048,15 @@ class Orchestration(unittest.TestCase):
             r2 = self.story(plan, "S2", dated,
                             inputs=self.inputs("S2", tests=("tests/test_s2.py",), regressions=("tests/test_other.py",)), tests_block=False)
         self.assertFalse(r2.committed, seen.report())
-        self.assertEqual(self.failures("S2"), [("POST_MERGE_REGRESSION", "INTEGRATION", False)], seen.report())
-        self.assertEqual(self.details("S2"), ["post-merge C0: POST_MERGE_REGRESSION"], seen.report())
+        # V2.1 (V21-38): the regression is the developer's, found at the candidate — retried once (LIMITS), then rolled back
+        self.assertEqual(self.failures("S2"), [("CONTRACT_UNSATISFIED", "DEVELOPER", True)] * 2, seen.report())
+        self.assertEqual(self.details("S2"), ["proof of C0: CONTRACT_UNSATISFIED"] * 2, seen.report())
         self.assertEqual(self.merger.base(), tip)
-        self.assertAttempts(r2, ["ROLLBACK"])
+        self.assertAttempts(r2, ["RETRY", "ROLLBACK"])
         self.assertEqual(seen.disagreements, [])
-        c0 = next(e for e in seen.proofs if (e["story_id"], e["criterion_id"], e["point"]) == ("S2", "C0", "POST_MERGE"))
+        c0 = next(e for e in seen.proofs if (e["story_id"], e["criterion_id"], e["point"]) == ("S2", "C0", "CANDIDATE"))
         self.assertTrue(c0["agreement"])
-        self.assertEqual(c0["failure"], "POST_MERGE_REGRESSION")
+        self.assertEqual(c0["failure"], "CONTRACT_UNSATISFIED")
         self.assertEqual(c0["predicted_divergence"], {"implementer_reads_stale_bytecode": True, "verifier_reads_stale_bytecode": False, "divergence": True})
         before = c0["before"]["implementer"]   # the condition, present: the collision an in-tree reader would take
         self.assertEqual((before["source_mtime_s"], before["bytecode_header"]["source_mtime"], before["bytecode_header"]["source_size"],
@@ -1075,7 +1080,7 @@ class Orchestration(unittest.TestCase):
         for e in seen.proofs:
             self.assertTrue(e["agreement"], seen.report())
             self.assertEqual([e["before"][party]["bytecode"] for party in ("implementer", "verifier")], [None, None], seen.report())
-        self.assertEqual(self.failures("S2"), [("POST_MERGE_REGRESSION", "INTEGRATION", False)], seen.report())
+        self.assertEqual(self.failures("S2"), [("CONTRACT_UNSATISFIED", "DEVELOPER", True)] * 2, seen.report())   # V21-38
 
 
 if __name__ == "__main__":

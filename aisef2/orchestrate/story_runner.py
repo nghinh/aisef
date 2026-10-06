@@ -12,7 +12,7 @@ from dataclasses import dataclass, field
 from typing import Callable, Mapping
 
 from aisef2.arch.enums import (
-    ContractSatisfaction, ControlProjection as P, EventType as T, MeasurementPoint, Owner, SubjectAbsence,
+    ContractSatisfaction, ControlProjection as P, EventType as T, MeasurementPoint, ObligationRole, Owner, SubjectAbsence,
 )
 from aisef2.control import budget
 from aisef2.control.owner import Classification, FailureCode, classify
@@ -22,7 +22,7 @@ from aisef2.orchestrate import gate, seam
 from aisef2.orchestrate.adapters import (
     Developer, Merger, ProviderOutage, ResourceUnavailable, Reviewer, Scanner, Workspace, confine, unconfine,
 )
-from aisef2.orchestrate.merge import merge, reprove
+from aisef2.orchestrate.merge import affected_preserve, merge, reprove
 from aisef2.orchestrate.proof import Party, Proof, Ranged, obligations_of, prove
 from aisef2.orchestrate.quality import Dependencies, DeveloperTests, Runner, TestsPolicy, assess
 from aisef2.orchestrate.review import review
@@ -240,8 +240,14 @@ def _attempt(run, plan: Plan, story_id: str, inputs: StoryInputs, adapters: Adap
                     failure, detail = classify(FailureCode.RESOURCE_ACQUISITION_FAILED), f"candidate checkout: {e}"
                     checks.append(gate.check(run, story_id, "candidate", False, detail))
             if failure is None:
-                for cid in continuation.verify_at_candidate:
-                    spec_id, role = obligations[cid]
+                # V2.1 (V21-38): every PRESERVE obligation of a committed story this change could break is proved at the
+                # candidate as well — a regression the developer made is the developer's (CONTRACT_UNSATISFIED, the
+                # criterion fed back on a retry the policy permits), found before any merge. The post-merge re-proof
+                # stays for what the merge itself changes, and that is INTEGRATION's.
+                preserved = {cid: (spec_id, ObligationRole.PRESERVE)
+                             for cid, (_, spec_id) in affected_preserve(plan, story_id, _committed(run)).items()}
+                for cid in (*continuation.verify_at_candidate, *preserved):
+                    spec_id, role = obligations.get(cid) or preserved[cid]
                     p = prove(run, story_id, cid, specs[spec_id], role, implementer=implementer, verifier=verifier,
                               candidate=candidate, implementer_root=str(impl.path), verifier_root=str(verifier_wt.path),
                               env=inputs.env, point=MeasurementPoint.CANDIDATE)
