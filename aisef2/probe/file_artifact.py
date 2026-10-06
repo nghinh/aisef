@@ -15,6 +15,7 @@ one gives an expired window no meaning and is INVALID_SPEC. Negation is the cont
 | `exists` | `{"condition": "exists", "within_s": W}` | `{}` | the path is an entry of the tree |
 | `content` | `{"sha256": H, ["newline": N,] "within_s": W}` or `{"equals_text": T, "newline": N, "within_s": W}` | `{}` | the blob hashes to H / equals T |
 | `grep_count` | `{"matches": M, "within_s": W}` | `{"grep": R, ["suffixes": [".py", ...]]}` | exactly M lines match R |
+| `python_imports` | `{"matches": M, "within_s": W}` | `{"imports_outside": {"stdlib": B, "allowed": [N, ...]}, ["suffixes": [".py", ...]]}` | exactly M import statements name a module outside the set |
 
 `newline` (`"\\n"` or `"\\r\\n"`) declares the line convention: when it is declared the blob's line endings are
 normalised to it (CRLF to LF, then LF to the declared one) before hashing or comparing, and `equals_text` is a text
@@ -26,6 +27,14 @@ NUL byte is binary: skipped and named in the detail. A file that is not UTF-8 le
 REFUTED, the file named. A file over `FILE_CAP` bytes is a harness refusal, never a verdict. `content` over a
 directory is observed and REFUTED (a tree has no blob). Every class means REFUTED by an expired window
 (`ON_DEADLINE`): a read that did not complete in W is not an observation of presence.
+
+`python_imports` (V2.1, V21-37 — a line regex counted a docstring line beginning `from` as an import and rolled back a
+correct story) reads the same files as `grep_count` (default suffix `.py`) and parses each with this interpreter's
+`ast`: it counts the `import` / `from ... import` statements (relative imports excluded: they are the project's own)
+whose top-level module is neither in `allowed` nor, when `stdlib` is true, in this interpreter's
+`sys.stdlib_module_names`. Comments, strings and docstrings are never statements. A file that does not parse leaves the
+count unestablished: REFUTED, the file and line named. It sees the syntax only: `importlib.import_module(...)` and
+`__import__` are calls, not import statements, and are not counted.
 
 **Reading rule — the object store, never the working file.** When the checkout root is itself the top level of a
 git repository (a worktree the harness made of the revision), existence, mode and content are read from that
@@ -65,6 +74,7 @@ identity is a RunSpec capability), or the bytes of a directory that is not a rep
 
 from __future__ import annotations
 
+import ast
 import hashlib
 import json
 import math
@@ -74,8 +84,10 @@ import re
 import shutil
 import stat
 import subprocess
+import sys
 import tempfile
 import time
+from typing import Mapping
 
 from aisef2.arch.enums import BehaviorVerdict, Enforcement
 from aisef2.probe.protocol import ExecutionEnv, HarnessProbe, Observation, ObservationKind, ProbeMetadata, RevisionRef
@@ -83,10 +95,10 @@ from aisef2.product.spec import ProductProofSpec
 
 PROBE_ID = "probe.file_artifact"
 PROBE_SOURCES = ("probe/protocol.py", "probe/file_artifact.py")
-CLASSES = ("exists", "content", "grep_count")
+CLASSES = ("exists", "content", "grep_count", "python_imports")
 #: Each class's meaning of an expired observation window (§9.2): a read that did not complete is no observation.
 ON_DEADLINE = {"exists": BehaviorVerdict.REFUTED, "content": BehaviorVerdict.REFUTED,
-               "grep_count": BehaviorVerdict.REFUTED}
+               "grep_count": BehaviorVerdict.REFUTED, "python_imports": BehaviorVerdict.REFUTED}
 WEAKEST_PATH = ("no subject code runs: the weakest path is git's own object store at the revision SHA (the binary "
                 "resolved once at construction, its identity a RunSpec capability), or the bytes of a directory that "
                 "is not a repository")
@@ -96,6 +108,7 @@ FILE_CAP = 4 * 1024 * 1024    # bytes of one file read for content or grep
 #: tree entry modes this probe reads: regular file, executable file, symlink, directory
 MODES = ("100644", "100755", "120000", "040000")
 _HEX64 = re.compile(r"[0-9a-f]{64}")
+_MODULE_NAME = re.compile(r"[A-Za-z_]\w*")      # a top-level module name, as python_imports compares them
 _PREFIX = "path:"
 _LOCATIONS = 50               # match locations kept in the detail
 
@@ -114,7 +127,7 @@ def _probe_digest() -> str:
 #: (a stimulus grammar, a verdict rule, a class's meaning). The bytes that run are EXECUTION_DIGEST: a calibration row
 #: and the run's RunSpec bind them, so a byte change needs its calibrations demonstrated again before anything admits.
 #: A matching digest is not evidence that two executions behave alike; the calibration contrast is the evidence.
-CAPABILITY_VERSION = 1
+CAPABILITY_VERSION = 2     # 2: the class python_imports (V21-37)
 EXECUTION_DIGEST = _probe_digest()
 DIGEST = hashlib.sha256(json.dumps([PROBE_ID, CAPABILITY_VERSION, list(CLASSES)]).encode("utf-8")).hexdigest()
 
@@ -156,6 +169,14 @@ def observation_class(observable, stimulus) -> str | None:
             and set(stim) in ({"grep"}, {"grep", "suffixes"}) and _compiles(stim["grep"]) \
             and isinstance(suffixes, (list, tuple)) and all(isinstance(s, str) and len(s) > 1 and s[0] == "." for s in suffixes):
         return "grep_count"
+    outside = stim.get("imports_outside")
+    if set(obs) == {"matches"} and isinstance(m, int) and not isinstance(m, bool) and m >= 0 \
+            and set(stim) in ({"imports_outside"}, {"imports_outside", "suffixes"}) and isinstance(outside, Mapping) \
+            and set(outside) == {"stdlib", "allowed"} and isinstance(outside["stdlib"], bool) \
+            and isinstance(outside["allowed"], (list, tuple)) and all(isinstance(n, str) and _MODULE_NAME.fullmatch(n)
+                                                                       for n in outside["allowed"]) \
+            and isinstance(suffixes, (list, tuple)) and all(isinstance(s, str) and len(s) > 1 and s[0] == "." for s in suffixes):
+        return "python_imports"
     return None
 
 
@@ -232,6 +253,34 @@ def grep_facts(pattern: re.Pattern, files: list[tuple[str, bytes]]) -> dict:
                 if len(where) < _LOCATIONS:
                     where.append([rel, n])
     return {"present": True, "files": len(files), "matches": matches, "skipped_binary": skipped, "locations": where}
+
+
+def import_facts(outside, files: list[tuple[str, bytes]]) -> dict:
+    """Import statements (by syntax, this interpreter's `ast`) naming a top-level module outside `outside`, one per
+    statement. A file that is not UTF-8 or does not parse leaves the count unestablished (no `matches`)."""
+    allowed = set(outside["allowed"]) | (set(sys.stdlib_module_names) if outside["stdlib"] else set())
+    matches, where = 0, []
+    for rel, data in files:
+        try:
+            tree = ast.parse(data.decode("utf-8"), filename=rel)
+        except UnicodeDecodeError:
+            return {"present": True, "undecodable": rel}
+        except (SyntaxError, ValueError) as e:     # ValueError: a NUL byte in the source
+            return {"present": True, "unparsable": f"{rel}:{getattr(e, 'lineno', None)}"}
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                names = [a.name for a in node.names]
+            elif isinstance(node, ast.ImportFrom) and node.level == 0 and node.module:
+                names = [node.module]
+            else:
+                continue
+            outside_names = sorted({n.split(".")[0] for n in names} - allowed)
+            if outside_names:
+                matches += 1
+                if len(where) < _LOCATIONS:
+                    where.append([rel, node.lineno, outside_names])
+    return {"present": True, "files": len(files), "matches": matches, "locations": where,
+            "stdlib_of": f"python {sys.version_info.major}.{sys.version_info.minor}"}
 
 
 def selected(path: str, suffixes) -> bool:
@@ -418,11 +467,14 @@ def facts_of(reader, cls: str, rel: str, observable, stim: dict) -> dict:
             return {"present": True, "path": rel, "kind": "tree"}
         return {"path": rel, "mode": mode, **content_facts(read(reader, rel, oid, size), observable)}
     files = reader.walk(rel) if mode == "040000" else [(rel, mode, oid, size)]
-    chosen = [f for f in files if selected(f[0], stim.get("suffixes"))]
+    suffixes = stim.get("suffixes") or ((".py",) if cls == "python_imports" else ())
+    chosen = [f for f in files if selected(f[0], suffixes)]
     odd = [f"{f[0]} ({f[1]})" for f in chosen if f[1] not in ("100644", "100755")]
     if odd:
         raise Refused(f"entries under {rel!r} selected for grep that are not files: {odd[:5]}; a link is never read")
     contents = [(f[0], read(reader, f[0], f[2], f[3])) for f in chosen]
+    if cls == "python_imports":
+        return {"path": rel, "mode": mode, **import_facts(stim["imports_outside"], contents)}
     return {"path": rel, "mode": mode, **grep_facts(re.compile(stim["grep"]), contents)}
 
 
@@ -490,7 +542,7 @@ class FileArtifactProbe(HarnessProbe):
             return Observation(ObservationKind.SUBJECT_DEADLINE, ON_DEADLINE[cls],
                                detail=f"the {window:g}s observation window expired ({cls}); " + detail)
         if facts.get("present") is not True:
-            over_absent = verdict_of(cls, pi["observable"], {"matches": 0}) if cls == "grep_count" \
+            over_absent = verdict_of(cls, pi["observable"], {"matches": 0}) if cls in ("grep_count", "python_imports") \
                 else BehaviorVerdict.REFUTED
             return Observation(ObservationKind.SUBJECT_ABSENT, over_absent, detail=detail)
         return Observation(ObservationKind.OBSERVED, verdict_of(cls, pi["observable"], facts), detail=detail)

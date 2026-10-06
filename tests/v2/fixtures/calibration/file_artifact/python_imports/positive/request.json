@@ -1,0 +1,17 @@
+{
+ "subject": {
+  "kind": "file_artifact",
+  "locator": "path:app"
+ },
+ "stimulus": {
+  "imports_outside": {
+   "allowed": [],
+   "stdlib": true
+  }
+ },
+ "observable": {
+  "matches": 1,
+  "within_s": 5
+ },
+ "subject_absence": "ABSENCE_IS_DECIDABLE"
+}

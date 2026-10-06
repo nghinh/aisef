@@ -1,0 +1,87 @@
+{
+ "controls": "tests/v2/test_v21_python_imports.py: on the LedgerLock reference package, both SATISFIED; with the smoke-2 docstring line both SATISFIED (the approved regex REFUTED); with `import yaml` both REFUTED",
+ "decision_needed": "the owner picks A or B (or neither) and approves its contract_hash; `aisef bundle migrate` is not involved — a new contract is a new approval",
+ "options": {
+  "A_enumerated": {
+   "contract": {
+    "contract_hash": "6fca926456790281a4b6ad20807158d9601c04165be71160127d250d2c8fc330",
+    "id": "BC-V22-S-10-a",
+    "observable": {
+     "matches": 0,
+     "within_s": 30
+    },
+    "polarity": "MUST_HOLD",
+    "rationale": "no import statement of the package names a module outside the allowed set (§10) — by syntax (file_artifact python_imports), so a docstring or comment line beginning with `from`/`import` is not an import (V21-37). Allowed: §10's list, `unittest` excepted (see the draft's note).",
+    "requirement_ids": [
+     "R-10"
+    ],
+    "stimulus": {
+     "imports_outside": {
+      "allowed": [
+       "hashlib",
+       "json",
+       "os",
+       "sys",
+       "pathlib",
+       "tempfile",
+       "argparse",
+       "typing",
+       "unicodedata",
+       "uuid",
+       "__future__",
+       "ledgerlock"
+      ],
+      "stdlib": false
+     },
+     "suffixes": [
+      ".py"
+     ]
+    },
+    "subject": {
+     "kind": "file_artifact",
+     "locator": "path:ledgerlock"
+    },
+    "subject_absence": "REQUIRES_SUBJECT"
+   },
+   "differs_from_the_approved_regex": "only for `unittest`: a contract may not name `unittest` (invariant IX, aisef2.product.contract._TEST_ARTEFACT, recognises test artefacts by name), so an `import unittest` inside ledgerlock/ would be REFUTED here though §10 allows it — stricter, never wider. Relative imports stay excluded as the regex's `\\.` alternative did."
+  },
+  "B_stdlib": {
+   "contract": {
+    "contract_hash": "d08d229c80cc4c96dc1c21d701ffa4b8e7fde3d19b38c5e601cc847a7f53a472",
+    "id": "BC-V22-S-10-a",
+    "observable": {
+     "matches": 0,
+     "within_s": 30
+    },
+    "polarity": "MUST_HOLD",
+    "rationale": "no import statement of the package names a module outside the allowed set (§10) — by syntax (file_artifact python_imports), so a docstring or comment line beginning with `from`/`import` is not an import (V21-37). Allowed: the standard library of the observing interpreter.",
+    "requirement_ids": [
+     "R-10"
+    ],
+    "stimulus": {
+     "imports_outside": {
+      "allowed": [
+       "ledgerlock"
+      ],
+      "stdlib": true
+     },
+     "suffixes": [
+      ".py"
+     ]
+    },
+    "subject": {
+     "kind": "file_artifact",
+     "locator": "path:ledgerlock"
+    },
+    "subject_absence": "REQUIRES_SUBJECT"
+   },
+   "differs_from_the_approved_regex": "wider: any module of the observing interpreter's standard library (sys.stdlib_module_names, recorded in each observation's detail) is allowed — §10's 'Stdlib only' read without its list"
+  }
+ },
+ "replaces": {
+  "contract_hash": "e36258c68051219eb917cc3c67b29d577c0db3d94aed9ff189d320255e6b9227",
+  "contract_id": "BC-V22-S-10-a",
+  "why": "V21-37 (S6-SMOKE-2-FALSE-ROLLBACK-S10A): the regex counted the docstring line `    from disk without trusting …` of ledgerlock/ledger.py:261 as an import"
+ },
+ "status": "DRAFT — NOT APPROVED. An approval binds one of these contract_hashes and is the owner's (approver human:owner); nothing in this repository approves either. Until then the release workload keeps BC-V22-S-10-a as approved (contract_hash e36258c6…), whose line regex is V21-37's false rollback."
+}

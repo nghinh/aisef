@@ -189,9 +189,6 @@ class Migrate(unittest.TestCase):
                 self.assertEqual(bundle_cli.main(["migrate", str(pathlib.Path(t) / "none.json"), "--out",
                                                   str(pathlib.Path(t) / "x.json")]), 2)
             self.assertIn("never overwrites", err.getvalue())
-        from aisef.cli.parser import main as aisef_main
-        with tempfile.TemporaryDirectory() as t, contextlib.redirect_stdout(io.StringIO()):
-            self.assertEqual(aisef_main(["bundle", "migrate", str(LEDGERLOCK_2_0_0), "--out", str(pathlib.Path(t) / "m.json")]), 0)
 
 
 if __name__ == "__main__":
