@@ -14,6 +14,7 @@ version they were written for; a dated record is never rewritten to match a late
 | [v2/V2-STABLE-RELEASE-CHARTER.md](v2/V2-STABLE-RELEASE-CHARTER.md) · [v2/RELEASE-PROCESS.md](v2/RELEASE-PROCESS.md) | how 2.0 was qualified and released |
 | [../closure-evidence/v2/release/V2.0-FINAL-RELEASE-REPORT.md](../closure-evidence/v2/release/V2.0-FINAL-RELEASE-REPORT.md) | the 2.0 release evidence |
 | [SALEKIT.html](SALEKIT.html) | one-page overview for evaluators |
+| [DANH-GIA-360-V2.0-2026-10-06.md](DANH-GIA-360-V2.0-2026-10-06.md) | independent 360° assessment of 2.0 (Vietnamese): eleven dimensions, findings, 2.0.1/2.1 plan |
 
 ## The 1.x framework — still shipped
 
@@ -33,6 +34,6 @@ version they were written for; a dated record is never rewritten to match a late
 - Decisions: `ADR-002` … `ADR-011`.
 - Benchmarks: `BENCH-*` (v0.3.0, v1.3, C-1, C-1b, C-2), `E4-COST-DECOMPOSITION.md`, `O1-RECOMPUTE-AFTER-158.md`, `MEMORY-BENCH.md`, `MEMORY-VALIDATION.md`, `MEMORY-RESEARCH-PLAN.md`.
 - Releases and plans: `RELEASE-*`, `PLAN-v0.4.0.md`, `ROADMAP-POST-1.0.md`, `V1-READINESS.md`, `STABILITY.md`, `EXECUTION-PLAN.md`, `ACTION-PLAN-2026-09-05.md`, `SPIKE-REPORT.md`, `REQUIREMENTS-EVIDENCE.md`.
-- Reviews and status: `DEEP-REVIEW-2026-09-05.md`, `DANH-GIA-360-*.md`, `ASSESSMENT-360-v2.html`, `STATUS-2026-09-05.md`, `CLAIM-AUDIT-1.7.2.md`, `DOGFOOD-*.md`, `handoff/`.
+- Reviews and status: `DEEP-REVIEW-2026-09-05.md`, `DANH-GIA-360-2026-09-12.md`, `DANH-GIA-360-VA-LO-TRINH.md`, `ASSESSMENT-360-v2.html`, `STATUS-2026-09-05.md`, `CLAIM-AUDIT-1.7.2.md`, `DOGFOOD-*.md`, `handoff/`.
 - External validation of 1.x (G6): `EXTERNAL-VALIDATION-v1.1.0.md`, `EXTERNAL-VALIDATION-QUICKSTART.md`, `TEMPLATE-EXTERNAL-VALIDATION-REPORT.md`, `G6-RETURN-PLAYBOOK.md`.
 - 2.0 working material: `implementation/v2/`, `research/v2/`.

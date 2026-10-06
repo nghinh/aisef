@@ -6,7 +6,7 @@ AISEF 2.0 provides deterministic, evidence-bound orchestration and product verif
 delivery. `aisef run` executes an owner-approved plan on a git repository: for each story a developer session (the
 OpenCode client, on one fixed model route) changes the code, and the V2 kernel decides — from independent probes of
 the product, never from the developer's word — whether the story is delivered, retried or rolled back. Every decision
-is written to a hash-chained journal that the run directory keeps, and that `aisef run --verify` re-derives.
+is written to a hash-chained journal that the run directory keeps, and that `aisef run --verify` checks.
 
 ## Install
 
@@ -61,10 +61,11 @@ and `listed_owner`, when not null, the owner its model listing must name — nev
 model. The client's own configuration (`opencode.json` under `XDG_CONFIG_HOME` or `~/.config/opencode/`) must send
 the provider to `endpoint`, or the run is refused before any request; `api_key_env: null` takes the key from that
 configuration (a literal or `{env:VAR}`).
-`client_env` names the operator variables the client receives; its whole environment is otherwise built (PATH, HOME,
-locale, XDG and temporary directories), never inherited. `limits` are the retries each failure owner may consume.
-The key is read at run time and never written anywhere; every value the client receives is redacted from the
-session logs.
+`client_env` names the operator variables the client receives; the rest of its environment is built from a fixed
+list (PATH, HOME, locale, XDG and temporary directories, with the operator's own values), never inherited wholesale —
+so the client still runs with the operator's home, global OpenCode configuration and network. `limits` are the
+retries each failure owner may consume. The key is read at run time and never written anywhere; the values of
+`client_env` and the provider key (8 characters or longer) are redacted from the session logs.
 
 ## Commands
 
@@ -80,7 +81,7 @@ identity stop; no session was started.
 
 A run, in order: the repository is cloned (never written) at the plan's baseline and its requirements document
 checked; the plan is admitted; a private probe interpreter is created (a venv without pip or the host's site
-packages); the **preflight** lists the provider's models and sends `chat_probes` one-token completions — the route is
+packages); the **preflight** lists the provider's models and sends `chat_probes` tiny completions (at most 16 tokens) — the route is
 attested only if every answer was served by the declared model under one deployment fingerprint, otherwise the run
 stops (an identity stop) before any session; then the stories run in dependency order. The budget is re-derived from
 the evidence (the preflight ledger, the journal, the session streams) before and during every session; a ceiling
@@ -104,9 +105,10 @@ was refused; **NOT_REACHED** when no story reached its gate. `plan_quality_verdi
 
 ## What 2.0 claims, and what it does not
 
-Claimed: deterministic, evidence-bound orchestration and product verification. Candidate code (what the developer
-writes) runs only in the probe's agent process; the verdict comes from a controller that never imports it, over an
-authenticated channel, so the candidate cannot manufacture a probe result. Raw run evidence is preserved.
+Claimed: deterministic, evidence-bound orchestration and product verification. During a proof, candidate code (what
+the developer writes) runs only in the probe's agent process; the verdict comes from a controller that never imports
+it, over an authenticated channel, so within an evaluation the candidate cannot manufacture a probe result (a gap
+across evaluations is listed under Known limitations). Raw run evidence is preserved.
 
 Threat model: a trusted operator; generated code may be faulty or opportunistic. Not claimed: generalization across
 arbitrary workloads, superiority over V1, model quality, hostile multi-tenant isolation, full isolation against a
@@ -114,19 +116,34 @@ malicious process of the same OS user, protection against the machine's owner. P
 and the candidate's own source only (no third-party dependencies of the project). A model review is informational
 and never blocks; the scanner (`ruff`, when installed) is informational.
 
-Platforms: `aisef run` is supported on Linux and macOS. On Windows the package installs and the kernel's test suite
-runs, but a live `aisef run` is not part of the 2.0 claim.
+Platforms: `aisef run` is supported on Linux and macOS; every live run so far ran on macOS (Linux is exercised in CI
+with a fake client and provider). On Windows the package installs and the kernel's test suite runs, but a live
+`aisef run` is not part of the 2.0 claim.
 
 ## Known limitations
 
 - **Plan criteria that read Python source with line patterns can refute correct code.** In the 2.0 release smoke a
   correct story was rolled back because a "stdlib only" criterion matched a docstring line beginning with `from …`
-  as an import (S6-SMOKE-2-FALSE-ROLLBACK-S10A). The kernel failed closed — no incorrect code reached the delivered
-  product — but the story did not land. Syntax-aware criteria are planned for 2.1 (V21-37).
+  as an import (S6-SMOKE-2-FALSE-ROLLBACK-S10A). The kernel failed closed — no code failing one of the bundle's specs
+  reached `main` — but the story did not land. Syntax-aware criteria are planned for 2.1 (V21-37).
 - **A regression found after the merge goes back to nobody.** It is owned by INTEGRATION and not retryable, so the
   developer neither learns the failing criterion nor gets a retry (V21-38, planned for 2.1).
+- **Acceptance is relative to the bundle's specs.** "0 false acceptances" means no story landed that fails one of
+  its own contracts. In the release smoke the model review found 5 reproducible defects outside the 59 specs; they
+  shipped, because the review is informational.
+- **The developer is not confined.** The client runs as the operator's OS user with the operator's HOME, PATH, XDG
+  directories, global OpenCode configuration (plugins, MCP servers) and network. In the release smoke, developer
+  sessions read outside their worktree — probe scratch, the live journal, the bundle holding the proofs' stimuli, the
+  installed kernel — before a story committed (V21-02).
+- **The probe interpreter is writable.** Probe controllers run the run's own venv with `-I` but not `-S`, so a `.pth`
+  file planted in its site-packages by the developer's tests or session runs inside later controllers, which hold the
+  channel key. The verdict-channel claim holds within an evaluation, not across evaluations (V21-28; a fix is planned
+  for 2.0.1).
+- **`--verify` proves consistency, not authenticity.** The journal chain is unkeyed and `RUN.json` sits beside it;
+  story outcomes, a budget stop and story errors are read from `RUN.json`, and a consistent rewrite of both still
+  verifies (V21-30).
 
-The whole 2.1 backlog, with a reproducer for every item: [V2.1-BACKLOG.md](V2.1-BACKLOG.md).
+The whole 2.1 backlog, each item with its reproducer status: [V2.1-BACKLOG.md](V2.1-BACKLOG.md).
 
 ## Coming from AISEF 1.x
 

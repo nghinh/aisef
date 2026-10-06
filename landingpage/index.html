@@ -830,7 +830,7 @@ section { padding: 100px 0; }
     <div class="eyebrow">Core differentiators</div>
     <h2>What the 2.0 kernel guarantees</h2>
     <p class="diff-sub">
-      Each mechanism exists because a real agent run exposed the gap it fills.
+      What each mechanism guarantees &mdash; and where it stops: the limits are listed under Benchmark honesty below.
     </p>
     <ul class="diff-list">
       <li class="diff-item">
@@ -844,7 +844,7 @@ section { padding: 100px 0; }
         <span class="diff-label">Sealed verdict channel</span>
         <div class="diff-desc">
           <h3>The code under test cannot manufacture a pass</h3>
-          <p>Candidate code runs only inside the probe&rsquo;s agent process. The verdict comes from a controller that never imports it, over an authenticated channel.</p>
+          <p>During a proof, candidate code runs only inside the probe&rsquo;s agent process, and the verdict comes from a controller that never imports it, over an authenticated channel. This holds within an evaluation; one known gap across evaluations (a writable probe interpreter) is scheduled for 2.0.1.</p>
         </div>
       </li>
       <li class="diff-item">
@@ -857,15 +857,15 @@ section { padding: 100px 0; }
       <li class="diff-item">
         <span class="diff-label">Route attestation</span>
         <div class="diff-desc">
-          <h3>The model you declared is the model that answers</h3>
-          <p>The preflight lists the provider&rsquo;s models and sends one-token probes; the route is accepted only if every answer was served by the declared model under one deployment fingerprint. Anything else is an identity stop: no session starts.</p>
+          <h3>The declared model is attested before any session</h3>
+          <p>The preflight lists the provider&rsquo;s models and sends tiny probes; the route is accepted only if every answer was served by the declared model under one deployment fingerprint. Anything else is an identity stop: no session starts. The check runs once, at preflight.</p>
         </div>
       </li>
       <li class="diff-item">
         <span class="diff-label">Preservation</span>
         <div class="diff-desc">
-          <h3>What earlier stories proved is proved again after every merge</h3>
-          <p>Every behaviour an earlier story proved is re-proved on the merged result. A regression rolls the story back instead of reaching the delivered <code>main</code>.</p>
+          <h3>Preserved behaviour is proved again after every merge</h3>
+          <p>The story&rsquo;s own obligations and the PRESERVE obligations of the stories already committed are re-proved on the merged result. A refutation rolls the story back instead of reaching the delivered <code>main</code>.</p>
         </div>
       </li>
       <li class="diff-item">
@@ -885,8 +885,8 @@ section { padding: 100px 0; }
       <li class="diff-item">
         <span class="diff-label">Re-verifiable runs</span>
         <div class="diff-desc">
-          <h3>A hash-chained journal is the only source of a verdict</h3>
-          <p>The run directory keeps the raw journal, every candidate and merge, every session stream. <code>aisef run --verify</code> re-derives the whole run from the journal alone.</p>
+          <h3>Every decision lands in a hash-chained journal</h3>
+          <p>The run directory keeps the raw journal, every candidate and merge, every session stream. <code>aisef run --verify</code> checks the chain and re-derives the delivery verdict from it &mdash; a consistency check, not proof against someone who can rewrite the run directory.</p>
         </div>
       </li>
       <li class="diff-item">
@@ -914,18 +914,21 @@ section { padding: 100px 0; }
       <br>
       <div><span class="label">  Tests</span> <span class="val">5,454</span> <span class="ok">✓ 0 failing, hermetic</span></div>
       <div><span class="label">  CI</span> <span class="val">green</span> <span class="ok">✓ Linux 3.11–3.14 · macOS · Windows</span></div>
-      <div><span class="label">  Mutants</span> <span class="val">6,463</span> <span class="ok">✓ all killed, 0 survivors</span></div>
+      <div><span class="label">  Mutants</span> <span class="val">6,463</span> <span class="ok">✓ all killed (changed code; 256 of 261 targets carried over)</span></div>
       <div><span class="label">  Differential</span> <span class="val">100,000</span> <span class="ok">✓ traces matched the model</span></div>
       <div><span class="label">  Reproduction</span> <span class="val">12/12</span> <span class="ok">✓ recorded corpus, no drift</span></div>
       <div><span class="label">  Rebuilds</span> <span class="val">3</span> <span class="ok">✓ byte-identical wheel + sdist</span></div>
-      <div><span class="label">  Release smoke</span> <span class="val">59/59</span> <span class="ok">✓ acceptance specs, 0 false accepts</span></div>
+      <div><span class="label">  Release smoke</span> <span class="val">6/7</span> <span class="ok" style="color:#F59E0B">✗ delivery FAIL &mdash; released on an owner waiver</span></div>
+      <div><span class="label">  Acceptance</span> <span class="val">59/59</span> <span class="ok">✓ the bundle&rsquo;s own specs, 0 false accepts</span></div>
       <div><span class="label">  Dependencies</span> <span class="val">0</span> <span class="ok">✓ stdlib only</span></div>
       <div><span class="label">  Version</span> <span class="val">2.0.0</span> <span class="ok">✓ stable</span></div>
     </div>
     <p class="evidence-note">
-      The live release smoke ran 7 stories and 67 proof obligations on a real model route: 6 stories were delivered,
-      and one correct story was rolled back because a plan criterion read a docstring line as an import &mdash; the
-      kernel failed closed, and the limitation is published below. Every row is a record in
+      The live release smoke ran one workload (LedgerLock), 7 stories and 67 proof obligations on one real model route,
+      on macOS. It did not pass its own preregistered criteria: 6 stories were delivered, one correct story was rolled
+      back because a plan criterion read a docstring line as an import, and 2.0.0 was released on a single-case owner
+      waiver. &ldquo;0 false accepts&rdquo; is measured against the bundle&rsquo;s own 59 specs; the run&rsquo;s model
+      review found 5 defects outside them, which shipped. Every row is a record in
       <code style="color:#A1A1AA">closure-evidence/v2/release/</code>, starting from
       <code style="color:#A1A1AA">V2.0-FINAL-RELEASE-REPORT.md</code>.
     </p>
@@ -945,7 +948,7 @@ section { padding: 100px 0; }
       <div class="benchmark-col proven">
         <h3><span style="color:var(--verify)">●</span> Measured and verified</h3>
         <ul>
-          <li><strong>2.0:</strong> on a real model route, 7 stories and 67 proof obligations: the delivered product satisfied all 59 acceptance specs and no incorrect story was accepted. one story committed on its third attempt after two retries; one correct story was rolled back by a plan criterion&rsquo;s false positive</li>
+          <li><strong>2.0:</strong> on a real model route, 7 stories and 67 proof obligations: the delivered product satisfied all 59 of the bundle&rsquo;s acceptance specs (0 false acceptances against them); one story committed on its third attempt after two retries; one correct story was rolled back by a plan criterion&rsquo;s false positive. The run&rsquo;s model review found 5 defects outside the specs, which shipped, and the run did not pass its own release criteria</li>
           <li><strong>2.0:</strong> the kernel against its reference model on 100,000 generated traces, a 12-item recorded corpus reproduced with no drift, 6,463 of 6,463 mutants of the release-critical code killed</li>
           <li><strong>1.x</strong> (the measurements below are of the 1.x execution path, which 2.0 keeps as <code>aisef legacy run</code>):</li>
           <li>On simple bug-fix tasks, correctness was saturated for both harnessed and bare agents. On the hard tasks with a non-frontier model, the corpus cannot currently detect a difference at all: across 339 recorded attempts, 12 of 340 cross-arm pairs (3.5%) came out differently, and 25 of the 30 tasks never separated the two arms even once. C-1b's published +0.06 does not survive re-reading — all three of its failing attempts were sessions the CLI cut, and under the attempt definition its own protocol pre-registered, all three tasks read 1.00/1.00 in both arms. So no correctness claim is supportable, in either direction</li>
@@ -965,6 +968,8 @@ section { padding: 100px 0; }
           <li><strong>2.0:</strong> plan criteria that read Python source with line patterns can refute correct code (V21-37), and a regression found after the merge is not routed back to the developer (V21-38). Both are planned for 2.1</li>
           <li><strong>2.0:</strong> a live <code>aisef run</code> on Windows (the package installs and the kernel&rsquo;s suite runs there), hostile multi-tenant isolation, and isolation against a malicious process of the same OS user</li>
           <li><strong>2.0:</strong> bundle authoring &mdash; 2.0 runs an approved project bundle; it does not write one, and there is no automatic conversion from a 1.x project</li>
+          <li><strong>2.0:</strong> developer confinement &mdash; the developer client runs as the operator&rsquo;s user, with the operator&rsquo;s home, global client configuration and network, and in the release smoke it read outside its worktree (V21-02). A <code>.pth</code> file planted in the run&rsquo;s writable probe interpreter runs inside later probe controllers (V21-28, scheduled for 2.0.1)</li>
+          <li><strong>2.0:</strong> a delivery PASS on a live run &mdash; none of the live V2 runs so far has reached one</li>
           <li>That the harness helps an agent solve more — every cohort so far (v0.3.0, C-1, C-1b, C-2) returned a null or an inconclusive result. The measured value is elsewhere: refusing to call unfinished work done, and leaving evidence why</li>
           <li>No external user has independently adopted the framework — all evidence is internal. The G6 handoff bundle for the public 1.7.2 release is ready and frozen; independent external-human validation is awaited, and until a genuine participant's report is in, this line stands</li>
           <li>1.x: distributed execution (multi-machine) is designed but untested in production</li>
@@ -1020,7 +1025,7 @@ section { padding: 100px 0; }
     <div class="eyebrow">Developer experience</div>
     <h2>Three modes: check, run, verify</h2>
     <p class="cli-sub">
-      One approved bundle. One run directory. Every verdict re-derivable from the journal.
+      One approved bundle. One run directory. The output below is illustrative &mdash; no live run has reached PASS yet.
     </p>
     <div class="cli-steps">
       <div class="cli-step">

@@ -382,7 +382,7 @@ section { padding: 80px 0; }
       <div class="usp-card">
         <div class="usp-num">02</div>
         <h3>A Verdict the Code Cannot Forge</h3>
-        <p>Candidate code runs only inside the probe's agent process; the verdict comes from a controller that never imports it, over an authenticated channel. The code under test cannot manufacture a passing result.</p>
+        <p>Candidate code runs only inside the probe's agent process; the verdict comes from a controller that never imports it, over an authenticated channel, so within an evaluation the code under test cannot manufacture a passing result. Known gap across evaluations: a <code>.pth</code> planted in the run&rsquo;s writable probe interpreter runs inside later controllers (V21-28, scheduled for 2.0.1).</p>
         <span class="usp-tag">Structural guarantee</span>
       </div>
       <div class="usp-card">
@@ -394,19 +394,19 @@ section { padding: 80px 0; }
       <div class="usp-card">
         <div class="usp-num">04</div>
         <h3>The Model You Declared</h3>
-        <p>Preflight route attestation: the provider's model listing plus one-token probes. The route is accepted only if every answer was served by the declared model under one deployment fingerprint; anything else stops the run before a session starts.</p>
+        <p>Preflight route attestation: the provider's model listing plus tiny probes. The route is accepted only if every answer was served by the declared model under one deployment fingerprint; anything else stops the run before a session starts. The check runs once, at preflight.</p>
         <span class="usp-tag">Identity stop</span>
       </div>
       <div class="usp-card">
         <div class="usp-num">05</div>
         <h3>Preservation and Typed Ownership</h3>
-        <p>Behaviour earlier stories proved is re-proved after every merge; a regression rolls the story back. Every failure has one of seven owners and consumes only that owner's retry budget, and a retry names the failed criterion in public facts, never the hidden stimulus.</p>
+        <p>After every merge the story&rsquo;s own obligations and the PRESERVE obligations of committed stories are re-proved; a refutation rolls the story back. Every failure has one of seven owners and consumes only that owner's retry budget, and a retry names the failed criterion in public facts, never the hidden stimulus.</p>
         <span class="usp-tag">Fail closed</span>
       </div>
       <div class="usp-card">
         <div class="usp-num">06</div>
         <h3>Re-verifiable, Accounted Runs</h3>
-        <p>Requests, turns and tokens are re-derived from evidence before and during every session; unaccounted spend ends the run. The run directory keeps the raw hash-chained journal, and <code>aisef run --verify</code> re-derives the verdict from it alone.</p>
+        <p>Requests, turns and tokens are re-derived from evidence before and during every session; unaccounted spend ends the run. The run directory keeps the raw hash-chained journal, and <code>aisef run --verify</code> checks the chain and re-derives the delivery verdict from it (a consistency check, not proof against someone who can rewrite the run directory).</p>
         <span class="usp-tag">Re-derivable</span>
       </div>
     </div>
@@ -422,7 +422,7 @@ section { padding: 80px 0; }
       <div class="usp-card">
         <div class="usp-num">01</div>
         <h3>SHA-Bound Evidence</h3>
-        <p>Every check records the exact commit it ran on. Evidence from another SHA is classified as stale — a different outcome from failure, and a different outcome from success. No other framework ties verification to a frozen candidate.</p>
+        <p>Every check records the exact commit it ran on. Evidence from another SHA is classified as stale — a different outcome from failure, and a different outcome from success.</p>
         <span class="usp-tag">Measured</span>
       </div>
       <div class="usp-card">
@@ -487,7 +487,7 @@ section { padding: 80px 0; }
 <section class="compare">
   <div class="wrap">
     <h2>Compared to what exists</h2>
-    <p class="subtitle">1.x capabilities checked against publicly documented features of leading agent frameworks as of September 2026. The 2.0 kernel guarantees above are not part of this comparison.</p>
+    <p class="subtitle">1.x capabilities against publicly documented features of leading agent frameworks as of September 2026. The cells carry no source citations yet and have not been re-verified; treat them as unverified until each is sourced. The 2.0 kernel guarantees above are not part of this comparison.</p>
     <div class="compare-table-wrap">
       <table class="compare-table">
         <thead>
@@ -607,7 +607,7 @@ section { padding: 80px 0; }
       </div>
       <div class="stat-card">
         <div class="stat-num">6,463 / 6,463</div>
-        <div class="stat-label">Mutants of the release-critical code killed, 0 survivors</div>
+        <div class="stat-label">Mutants of the changed release-critical code killed (256 of 261 targets carried over after a mechanical proof)</div>
       </div>
       <div class="stat-card">
         <div class="stat-num">100,000</div>
@@ -619,14 +619,14 @@ section { padding: 80px 0; }
       </div>
       <div class="stat-card">
         <div class="stat-num">59 / 59</div>
-        <div class="stat-label">Acceptance specs satisfied by the delivered product in the live release smoke; 0 false acceptances</div>
+        <div class="stat-label">The bundle&rsquo;s own acceptance specs satisfied by the delivered product in the live release smoke (0 false acceptances against them); the smoke itself did not pass its release criteria</div>
       </div>
       <div class="stat-card">
         <div class="stat-num">3</div>
         <div class="stat-label">Independent rebuilds byte-identical to the frozen wheel and sdist</div>
       </div>
     </div>
-    <p class="subtitle" style="margin-top: 32px;">The live release smoke ran 7 stories and 67 proof obligations on a real model route: 6 stories were delivered, and one correct story was rolled back because a plan criterion read a docstring line as an import &mdash; the kernel failed closed. Not claimed in 2.0: generalisation across arbitrary workloads, model quality, superiority over 1.x, hostile multi-tenant isolation, a live run on Windows. The evidence is published in <code>closure-evidence/v2/release/</code>.</p>
+    <p class="subtitle" style="margin-top: 32px;">The live release smoke ran one workload (LedgerLock), 7 stories and 67 proof obligations on one real model route, on macOS. It did not pass its own preregistered criteria: 6 stories were delivered, one correct story was rolled back because a plan criterion read a docstring line as an import, and 2.0.0 was released on a single-case owner waiver. The 59/59 is measured against the bundle&rsquo;s own specs; the run&rsquo;s model review found 5 defects outside them, which shipped. Not claimed in 2.0: generalisation across arbitrary workloads, model quality, superiority over 1.x, hostile multi-tenant or same-user isolation, a live run on Windows. Known gaps: the developer client is not confined (V21-02), and the probe interpreter is writable across evaluations (V21-28). The evidence is published in <code>closure-evidence/v2/release/</code>.</p>
   </div>
 </section>
 

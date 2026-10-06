@@ -12,8 +12,8 @@ Nguyên tắc nền, xuyên suốt mọi quyết định trong kho này:
 **AISEF 2.0** biến nguyên tắc đó thành runtime. `aisef run` thực thi một kế hoạch đã được chủ dự án phê duyệt trên một
 repository git: với mỗi story, một phiên developer sửa code, và kernel V2 quyết định — dựa trên các probe độc lập kiểm
 tra sản phẩm, không bao giờ dựa trên lời của developer hay test do chính developer viết — story được giao, chạy lại
-hay rollback. Mọi quyết định được ghi vào một journal chuỗi băm, và `aisef run --verify` dựng lại toàn bộ lần chạy từ
-journal đó.
+hay rollback. Mọi quyết định được ghi vào một journal chuỗi băm, và `aisef run --verify` kiểm một lần chạy đã xong
+đối chiếu với journal đó.
 
 ```bash
 pip install aisef==2.0.0
@@ -33,26 +33,29 @@ pip install aisef==2.0.0
    kế hoạch đã được duyệt theo; repository được clone tại baseline của kế hoạch và không bao giờ bị ghi.
 2. **Kế hoạch được kiểm duyệt tĩnh.** Chín phép kiểm chạy trước khi gọi bất kỳ model nào; kế hoạch không qua bị từ chối
    kèm lý do.
-3. **Route model được chứng thực.** Preflight liệt kê các model của provider và gửi vài probe một token; route chỉ được
+3. **Route model được chứng thực.** Preflight liệt kê các model của provider và gửi vài probe rất nhỏ (≤16 token); route chỉ được
    chấp nhận nếu mọi câu trả lời đều do đúng model đã khai phục vụ, dưới cùng một fingerprint triển khai. Mọi trường hợp
    khác là *identity stop*: không phiên nào được mở.
 4. **Story chạy theo thứ tự phụ thuộc.** Với mỗi story, phiên developer (OpenCode, trên đúng route đã chứng thực) sửa
-   code trong một workspace bị giới hạn. Sau đó kernel chứng minh candidate:
+   code trong git worktree riêng — một workspace, không phải sandbox: client chạy dưới user hệ điều hành của người vận
+   hành (xem [Giới hạn đã biết](#giới-hạn-đã-biết-của-20)). Sau đó kernel chứng minh candidate:
    - **ProductProof** — các probe do harness sở hữu (gọi hàm Python, gọi CLI, hiệu ứng tiến trình, file artifact) kiểm
      từng behaviour contract trên candidate. Mã candidate chỉ chạy trong tiến trình agent của probe; kết luận do một
-     controller không bao giờ import mã đó đưa ra, qua một kênh đã xác thực, nên mã đang bị kiểm không thể tự chế ra
-     kết quả đạt.
+     controller không bao giờ import mã đó đưa ra, qua một kênh đã xác thực, nên trong một lần đánh giá mã đang bị
+     kiểm không thể tự chế ra kết quả đạt (có một lỗ đã biết giữa các lần đánh giá, xem dưới).
    - **Độ đầy đủ của test kỹ thuật** — test của developer phải chạy được, không rỗng và có liên quan; chúng là bằng
-     chứng về chất lượng kỹ thuật, không bao giờ là bằng chứng sản phẩm đúng.
-   - **Bảo toàn** — sau khi merge, mọi hành vi các story trước đã chứng minh được chứng minh lại; một hồi quy làm story
-     bị rollback.
+     chứng về chất lượng kỹ thuật, không bao giờ là bằng chứng sản phẩm đúng. Khi không quyết được tính rỗng, kết quả
+     là INCOMPLETE và không bao giờ chặn.
+   - **Bảo toàn** — sau khi merge, các nghĩa vụ của chính story và các nghĩa vụ PRESERVE của những story đã commit được
+     chứng minh lại trên cây đã merge; một lần bị bác bỏ làm story bị rollback.
 5. **Lỗi có chủ.** Mọi lỗi được định kiểu (PLAN, DEVELOPER, ENVIRONMENT, PROVIDER, INTEGRATION, REVIEW, SECURITY) và
    chỉ tiêu vào ngân sách chạy lại của chủ nó; một lần chạy lại cho developer biết, bằng sự thật công khai, criterion
    nào đã hỏng — không bao giờ lộ stimulus ẩn của phép chứng minh.
 6. **Chi tiêu được đối soát, không ước lượng.** Request, lượt và token được tính lại từ bằng chứng trước và trong mọi
    phiên; chạm trần, hoặc chi tiêu không đối soát được, sẽ kết thúc lần chạy.
 7. **Mọi thứ được giữ lại.** Thư mục chạy chứa journal thô, mọi candidate và lần merge trong bản clone, mọi luồng phiên
-   và ledger preflight. `aisef run --verify` dựng lại kết luận chỉ từ journal.
+   và ledger preflight. `aisef run --verify` kiểm chuỗi băm và dựng lại kết luận giao hàng, sổ ProductProof và `main`
+   cuối từ journal; kết quả từng story, điểm dừng ngân sách và lỗi story vẫn đọc từ `RUN.json` (V21-30).
 
 Đứng sau là chín bất biến của kernel, được bật trong mọi lần chạy test — trong đó có *Requirement Authority* (chỉ
 contract đã duyệt mới định nghĩa sự thật sản phẩm), *Independent Evidence* (tác nhân viết code không bao giờ định nghĩa
@@ -89,21 +92,22 @@ Bản ứng viên RC2 (`1565bcc`) được đóng băng cùng digest wheel và s
 |---|---|
 | toàn bộ bộ test, môi trường kín, trên đúng bản ứng viên | 5.454 test, 0 lỗi |
 | CI | Linux (Python 3.11–3.14), macOS, Windows, lint, wheel — đều xanh |
-| mutation testing phần mã quan trọng đã đổi | 261 target, 6.463 / 6.463 mutant bị diệt, 0 sống sót |
+| mutation testing phần mã quan trọng đã đổi | 261 target (5 đo lại trên mã cuối, 256 dùng lại sau phép chứng minh cơ học), 6.463 / 6.463 mutant bị diệt |
 | các bậc kiểm định Q0–Q3 (toàn vẹn tĩnh, tuân thủ ngữ nghĩa, độ đầy đủ, tiêm lỗi) | GREEN trên Linux và Windows |
 | Q4 — các projection điều khiển của kernel so với một mô hình tham chiếu độc lập, 100.000 lần chạy sinh ra | 100.000 / 100.000 khớp |
 | Q5 — chạy lại thật một tập 12 lần chạy đã ghi, phát lại luồng model | 12 / 12 tái hiện, không lệch |
 | build tái lập được | ba lần build lại độc lập trùng từng byte với wheel và sdist đã đóng băng |
 | cài sạch | wheel đã cài: version, CLI, `aisef run --check / run / --verify` offline — PASS |
-| smoke phát hành thật (7 story, 67 nghĩa vụ chứng minh, route model thật) | 6/7 story được giao; sản phẩm cuối thoả **toàn bộ 59 spec nghiệm thu**; 0 lần chấp nhận sai; một story đúng bị rollback do criterion của kế hoạch báo sai — xem dưới |
+| smoke phát hành thật (một workload — LedgerLock, cũng là workload phát triển — 7 story, 67 nghĩa vụ chứng minh, một route model thật, macOS) | **RELEASE_SMOKE_PASS: NO** — giao hàng FAIL, 6/7 story commit, ProductProof 66/67, trượt 4/9 ngưỡng đăng ký trước; phát hành nhờ miễn trừ một lần của chủ dự án. Sản phẩm cuối thoả 59/59 spec nghiệm thu (0 chấp nhận sai, tính theo chính spec của bundle); review của model tìm ra 5 lỗi ngoài các spec đó, và chúng đã được giao — xem dưới |
 
 Bằng chứng nằm trong [`closure-evidence/v2/release/`](closure-evidence/v2/release/), bắt đầu từ
 [`V2.0-FINAL-RELEASE-REPORT.md`](closure-evidence/v2/release/V2.0-FINAL-RELEASE-REPORT.md).
 
 ## 2.0 khẳng định gì, và không khẳng định gì
 
-**Khẳng định:** điều phối và kiểm chứng sản phẩm tất định, gắn với bằng chứng; mã candidate không thể điều khiển kênh
-kết luận; bằng chứng thô của lần chạy được giữ lại và kiểm lại được.
+**Khẳng định:** điều phối và kiểm chứng sản phẩm tất định, gắn với bằng chứng; trong một lần đánh giá, mã candidate
+không thể điều khiển kênh kết luận (lỗ giữa các lần đánh giá được nêu dưới); bằng chứng thô của lần chạy được giữ lại
+và kiểm lại được.
 
 **Mô hình đe doạ:** người vận hành đáng tin; mã sinh ra có thể sai hoặc "lách".
 
@@ -117,16 +121,31 @@ có tính thù địch; cô lập hoàn toàn trước tiến trình độc hạ
   phê duyệt bên ngoài `aisef run`; không có chuyển đổi tự động từ dự án 1.x.
 - **Criterion đọc mã Python bằng mẫu theo dòng có thể bác bỏ mã đúng.** Trong smoke phát hành 2.0, một story đúng bị
   rollback vì criterion "stdlib only" coi một dòng docstring bắt đầu bằng `from …` là một câu lệnh import
-  (S6-SMOKE-2-FALSE-ROLLBACK-S10A). Kernel dừng an toàn — không có mã sai nào vào sản phẩm đã giao — nhưng story đó
-  không được giao. Criterion nhận biết cú pháp được lên kế hoạch cho 2.1 (V21-37).
+  (S6-SMOKE-2-FALSE-ROLLBACK-S10A). Kernel dừng an toàn — không mã nào trượt một spec của bundle lọt vào `main` — nhưng
+  story đó không được giao. Criterion nhận biết cú pháp được lên kế hoạch cho 2.1 (V21-37).
 - **Hồi quy phát hiện sau merge không quay về ai.** Nó thuộc INTEGRATION và không được chạy lại, nên developer không
   được biết criterion bị hỏng và không có lượt chạy lại (V21-38, kế hoạch 2.1).
-- **Nền tảng.** Một lần `aisef run` thật được khẳng định trên Linux và macOS; trên Windows gói cài được và bộ test của
-  kernel chạy được, nhưng chạy thật không thuộc phạm vi khẳng định của 2.0.
+- **Nghiệm thu chỉ tương đối với spec của bundle.** "0 chấp nhận sai" nghĩa là không story nào trượt chính contract
+  của nó mà vẫn được giao. Trong smoke phát hành, review của model tìm ra 5 lỗi tái hiện được nằm ngoài 59 spec (crash,
+  sai mã thoát ở những đường không contract nào chạm tới); chúng đã được giao vì review chỉ mang tính tham khảo.
+- **Developer không bị giới hạn.** Client chạy dưới user hệ điều hành của người vận hành, với HOME, PATH, thư mục XDG,
+  cấu hình OpenCode toàn cục (plugin, MCP server) và mạng của người đó. Trong smoke phát hành, các phiên developer đã
+  đọc ra ngoài worktree — scratch của probe, journal đang chạy, bundle chứa stimulus của phép chứng minh, kernel đã cài
+  — trước khi một story commit (V21-02, kế hoạch 2.1).
+- **Interpreter của probe ghi được.** Controller của probe chạy venv của lần chạy với `-I` nhưng không `-S`, nên một
+  file `.pth` cài vào site-packages của nó — bởi test của developer hoặc phiên developer — sẽ chạy bên trong các
+  controller sau, nơi giữ khoá của kênh. Khẳng định về kênh kết luận đúng trong một lần đánh giá, không đúng giữa các
+  lần đánh giá (V21-28; bản vá dự kiến ở 2.0.1).
+- **`--verify` chứng minh tính nhất quán, không chứng minh tính xác thực.** Chuỗi băm không có khoá và `RUN.json` nằm
+  cạnh nó trong cùng thư mục ghi được; viết lại nhất quán cả hai vẫn VERIFIED (V21-30).
+- **Nền tảng.** `aisef run` thật được hỗ trợ trên Linux và macOS; mọi lần chạy thật đến nay đều trên macOS (Linux được
+  kiểm trong CI với client và provider giả). Trên Windows gói cài được và bộ test của kernel chạy được, nhưng chạy thật
+  không thuộc phạm vi khẳng định của 2.0.
 - **Probe** chạy với thư viện chuẩn và chính mã nguồn của candidate (không có phụ thuộc bên thứ ba của dự án). Review
   của model và scanner (`ruff`, nếu đã cài) chỉ mang tính tham khảo, không bao giờ chặn.
 
-Toàn bộ backlog 2.1, mỗi mục có cách tái hiện: [docs/v2/V2.1-BACKLOG.md](docs/v2/V2.1-BACKLOG.md).
+Toàn bộ backlog 2.1, kèm trạng thái tái hiện của từng mục: [docs/v2/V2.1-BACKLOG.md](docs/v2/V2.1-BACKLOG.md). Đánh
+giá 360° độc lập về 2.0: [docs/DANH-GIA-360-V2.0-2026-10-06.md](docs/DANH-GIA-360-V2.0-2026-10-06.md).
 
 ## Chuyển từ AISEF 1.x
 

@@ -12,8 +12,8 @@ The principle behind every decision in this repository:
 **AISEF 2.0** makes that principle the runtime. `aisef run` executes an owner-approved plan on a git repository:
 for each story a developer session changes the code, and the V2 kernel decides — from independent probes of the
 product, never from the developer's word or the developer's own tests — whether the story is delivered, retried or
-rolled back. Every decision is written to a hash-chained journal, and `aisef run --verify` re-derives the whole run
-from it.
+rolled back. Every decision is written to a hash-chained journal, and `aisef run --verify` checks a finished run
+against it.
 
 ```bash
 pip install aisef==2.0.0
@@ -33,26 +33,30 @@ pip install aisef==2.0.0
    one the plan was approved against; the repository is cloned at the plan's baseline and never written.
 2. **The plan is admitted statically.** Nine admission checks run before any model is called; a plan that does not
    admit is refused with its reasons.
-3. **The model route is attested.** The preflight lists the provider's models and sends a few one-token probes; the
+3. **The model route is attested.** The preflight lists the provider's models and sends a few tiny (≤16-token) probes; the
    route is accepted only if every answer was served by the declared model under one deployment fingerprint.
    Anything else is an *identity stop*: no session starts.
 4. **Stories run in dependency order.** For each story the developer session (OpenCode, on the one attested route)
-   changes the code inside a confined workspace. Then the kernel proves the candidate:
+   changes the code in its own git worktree — a workspace, not a sandbox: the client runs as the operator's OS user
+   (see [Known limitations](#known-limitations-of-20)). Then the kernel proves the candidate:
    - **ProductProof** — harness-owned probes (a Python callable, a CLI invocation, a process effect, a file artifact)
      check each behaviour contract against the candidate. Candidate code runs only in the probe's agent process; the
-     verdict comes from a controller that never imports it, over an authenticated channel, so the code under test
-     cannot manufacture a passing result.
+     verdict comes from a controller that never imports it, over an authenticated channel, so within an evaluation
+     the code under test cannot manufacture a passing result (one known gap across evaluations, below).
    - **Engineering test adequacy** — the developer's tests must run, must not be vacuous, and must be relevant; they
-     are evidence of engineering quality, never of product correctness.
-   - **Preservation** — after the merge, every behaviour earlier stories proved is proved again; a regression rolls
-     the story back.
+     are evidence of engineering quality, never of product correctness. When vacuity cannot be decided the result is
+     INCOMPLETE, which never blocks.
+   - **Preservation** — after the merge, the story's own obligations and the PRESERVE obligations of the stories
+     already committed are proved again on the merged tree; a refutation rolls the story back.
 5. **Failures have owners.** Every failure is typed (PLAN, DEVELOPER, ENVIRONMENT, PROVIDER, INTEGRATION, REVIEW,
    SECURITY) and consumes only its owner's retry budget; a retry tells the developer, in public facts, which
    criterion failed — never the proof's hidden stimulus.
 6. **Spend is accounted, not estimated.** Requests, turns and tokens are re-derived from the evidence before and
    during every session; a ceiling reached, or spend that cannot be accounted for, ends the run.
 7. **Everything is kept.** The run directory holds the raw journal, every candidate and merge in the clone, every
-   session stream and the preflight ledger. `aisef run --verify` re-derives the verdict from the journal alone.
+   session stream and the preflight ledger. `aisef run --verify` checks the hash chain and re-derives the delivery
+   verdict, the ProductProof account and the final `main` from the journal; story outcomes, a budget stop and story
+   errors are still read from `RUN.json` (V21-30).
 
 Behind it are nine kernel invariants, armed in every test run — among them *Requirement Authority* (only approved
 contracts define product truth), *Independent Evidence* (the actor that writes the code never defines the evidence
@@ -89,13 +93,13 @@ Release candidate RC2 (`1565bcc`) was frozen with its wheel and sdist digests an
 |---|---|
 | full test suite, hermetic, on the exact candidate | 5,454 tests, 0 failed |
 | CI | Linux (Python 3.11–3.14), macOS, Windows, lint, wheel — all green |
-| mutation testing of the changed release-critical code | 261 targets, 6,463 / 6,463 mutants killed, 0 survivors |
+| mutation testing of the changed release-critical code | 261 targets (5 re-measured on the final code, 256 carried over after a mechanical proof), 6,463 / 6,463 mutants killed |
 | qualification rungs Q0–Q3 (static integrity, semantic conformance, adequacy, fault injection) | GREEN on Linux and Windows |
 | Q4 — the kernel's control-critical projections against an independent reference model, 100,000 generated runs | 100,000 / 100,000 matched |
 | Q5 — real re-execution of a recorded 12-run corpus, model stream replayed | 12 / 12 reproduced, no drift |
 | reproducible build | three independent rebuilds byte-identical to the frozen wheel and sdist |
 | clean install | installed wheel: version, CLI, `aisef run --check / run / --verify` offline — PASS |
-| live release smoke (7 stories, 67 proof obligations, real model route) | 6 of 7 stories delivered; the final product satisfied **all 59 acceptance specs**; 0 false acceptances; one correct story rolled back by a plan criterion's false positive — see below |
+| live release smoke (one workload — LedgerLock, also the development workload — 7 stories, 67 proof obligations, one real model route, macOS) | **RELEASE_SMOKE_PASS: NO** — delivery FAIL, 6 of 7 stories committed, ProductProof 66 / 67, 4 of 9 preregistered thresholds missed; released on a single-case owner waiver. The final product satisfied all 59 acceptance specs (0 false acceptances against the bundle's own specs); the model review found 5 defects outside those specs, and they shipped — see below |
 
 The evidence is in [`closure-evidence/v2/release/`](closure-evidence/v2/release/), starting from
 [`V2.0-FINAL-RELEASE-REPORT.md`](closure-evidence/v2/release/V2.0-FINAL-RELEASE-REPORT.md).
@@ -103,7 +107,8 @@ The evidence is in [`closure-evidence/v2/release/`](closure-evidence/v2/release/
 ## What 2.0 claims, and what it does not
 
 **Claimed:** deterministic, evidence-bound orchestration and product verification; candidate code cannot control
-a verdict channel; raw run evidence is preserved and re-verifiable.
+a verdict channel within an evaluation (a gap across evaluations is listed below); raw run evidence is preserved and
+re-verifiable.
 
 **Threat model:** a trusted operator; generated code may be faulty or opportunistic.
 
@@ -117,16 +122,31 @@ machine's owner. `plan_quality_verdict` is always `NOT_CLAIMED` in 2.0.
   and approved outside `aisef run`; there is no automatic conversion from a 1.x project.
 - **Plan criteria that read Python source with line patterns can refute correct code.** In the 2.0 release smoke a
   correct story was rolled back because a "stdlib only" criterion matched a docstring line beginning with
-  `from …` as an import (S6-SMOKE-2-FALSE-ROLLBACK-S10A). The kernel failed closed — no incorrect code reached the
-  delivered product — but the story did not land. Syntax-aware criteria are planned for 2.1 (V21-37).
+  `from …` as an import (S6-SMOKE-2-FALSE-ROLLBACK-S10A). The kernel failed closed — no code failing one of the
+  bundle's specs reached `main` — but the story did not land. Syntax-aware criteria are planned for 2.1 (V21-37).
 - **A regression found after the merge goes back to nobody.** It is owned by INTEGRATION and not retryable, so the
   developer neither learns the failing criterion nor gets a retry (V21-38, planned for 2.1).
-- **Platforms.** A live `aisef run` is claimed on Linux and macOS; on Windows the package installs and the kernel's
-  test suite runs, but a live run is not part of the 2.0 claim.
+- **Acceptance is relative to the bundle's specs.** "0 false acceptances" means no story landed that fails one of
+  its own contracts. In the release smoke the model review found 5 reproducible defects outside the 59 specs (crashes
+  and wrong exit codes on paths no contract exercises); they shipped, because the review is informational.
+- **The developer is not confined.** The client runs as the operator's OS user with the operator's HOME, PATH, XDG
+  directories, global OpenCode configuration (plugins, MCP servers) and network. In the release smoke, developer
+  sessions read outside their worktree — probe scratch, the live journal, the bundle holding the proofs' stimuli, the
+  installed kernel — before a story committed (V21-02, planned for 2.1).
+- **The probe interpreter is writable.** Probe controllers run the run's own venv with `-I` but not `-S`, so a `.pth`
+  file planted in its site-packages — by the developer's test code or the developer session — runs inside later
+  controllers, which hold the channel key. The verdict-channel claim holds within an evaluation, not across
+  evaluations (V21-28; a fix is planned for 2.0.1).
+- **`--verify` proves consistency, not authenticity.** The journal chain is unkeyed and `RUN.json` sits beside it in
+  the same writable directory; a consistent rewrite of both still verifies (V21-30).
+- **Platforms.** A live `aisef run` is supported on Linux and macOS; every live run so far ran on macOS (Linux is
+  exercised in CI with a fake client and provider). On Windows the package installs and the kernel's test suite runs,
+  but a live run is not part of the 2.0 claim.
 - **Probes** run with the standard library and the candidate's own source (no third-party project dependencies).
   The model review and the scanner (`ruff`, when installed) are informational and never block.
 
-The full 2.1 backlog, with a reproducer for every item: [docs/v2/V2.1-BACKLOG.md](docs/v2/V2.1-BACKLOG.md).
+The full 2.1 backlog, each item with its reproducer status: [docs/v2/V2.1-BACKLOG.md](docs/v2/V2.1-BACKLOG.md). An
+independent 360° assessment of 2.0: [docs/DANH-GIA-360-V2.0-2026-10-06.md](docs/DANH-GIA-360-V2.0-2026-10-06.md).
 
 ## Coming from AISEF 1.x
 

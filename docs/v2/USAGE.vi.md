@@ -6,8 +6,8 @@ AISEF 2.0 điều phối và kiểm chứng sản phẩm một cách tất đị
 của AI. `aisef run` thực thi một kế hoạch đã được chủ dự án phê duyệt trên một repository git: với mỗi story, một phiên
 developer (client OpenCode, trên đúng một route model cố định) sửa code, và kernel V2 quyết định — dựa trên các probe
 độc lập kiểm tra sản phẩm, không bao giờ dựa trên lời của developer — story đó được giao, chạy lại hay rollback. Mọi
-quyết định được ghi vào một journal chuỗi băm (hash-chained) mà thư mục chạy lưu lại, và `aisef run --verify` dựng lại
-toàn bộ lần chạy từ journal đó.
+quyết định được ghi vào một journal chuỗi băm (hash-chained) mà thư mục chạy lưu lại, và `aisef run --verify` kiểm
+một lần chạy đã xong đối chiếu với journal đó.
 
 ## Cài đặt
 
@@ -63,10 +63,11 @@ router có thể báo tên upstream: route `9router/ds/deepseek-v4-pro` được
 khác. Cấu hình riêng của client (`opencode.json` dưới `XDG_CONFIG_HOME` hoặc `~/.config/opencode/`) phải gửi provider
 tới đúng `endpoint`, nếu không lần chạy bị từ chối trước mọi request; `api_key_env: null` lấy key từ cấu hình đó (giá
 trị trực tiếp hoặc `{env:VAR}`).
-`client_env` liệt kê các biến của người vận hành mà client được nhận; toàn bộ môi trường còn lại của client được dựng
-mới (PATH, HOME, locale, XDG và thư mục tạm), không bao giờ thừa kế. `limits` là số lần chạy lại mà mỗi chủ sở hữu lỗi
-được dùng. Key chỉ được đọc lúc chạy và không bao giờ được ghi ra đâu; mọi giá trị client nhận được đều bị che khỏi log
-phiên.
+`client_env` liệt kê các biến của người vận hành mà client được nhận; phần môi trường còn lại được dựng từ một danh
+sách cố định (PATH, HOME, locale, XDG và thư mục tạm, lấy giá trị của chính người vận hành), không thừa kế nguyên khối
+— nên client vẫn chạy với thư mục home, cấu hình OpenCode toàn cục và mạng của người vận hành. `limits` là số lần chạy
+lại mà mỗi chủ sở hữu lỗi được dùng. Key chỉ được đọc lúc chạy và không bao giờ được ghi ra đâu; giá trị của
+`client_env` và key của provider (từ 8 ký tự) bị che khỏi log phiên.
 
 ## Lệnh
 
@@ -82,7 +83,7 @@ một identity stop; không phiên nào được mở.
 
 Một lần chạy, theo thứ tự: repository được clone (không bao giờ bị ghi) tại baseline của kế hoạch và file yêu cầu được
 kiểm tra; kế hoạch được kiểm duyệt; một trình thông dịch probe riêng được tạo (một venv không có pip và không có gói
-site của máy); **preflight** liệt kê các model của provider và gửi `chat_probes` lần completion một token — route chỉ
+site của máy); **preflight** liệt kê các model của provider và gửi `chat_probes` lần completion rất nhỏ (tối đa 16 token) — route chỉ
 được chứng thực nếu mọi câu trả lời đều do đúng model đã khai phục vụ, dưới cùng một fingerprint triển khai, nếu không
 lần chạy dừng (identity stop) trước mọi phiên; rồi các story chạy theo thứ tự phụ thuộc. Ngân sách được tính lại từ
 bằng chứng (ledger preflight, journal, luồng phiên) trước và trong mọi phiên; chạm trần — hoặc chi tiêu không đối soát
@@ -107,9 +108,10 @@ nào bị từ chối; **NOT_REACHED** khi không story nào tới được cổ
 
 ## 2.0 khẳng định gì, và không khẳng định gì
 
-Khẳng định: điều phối và kiểm chứng sản phẩm tất định, gắn với bằng chứng. Mã candidate (thứ developer viết) chỉ chạy
-trong tiến trình agent của probe; kết luận do một controller không bao giờ import nó đưa ra, qua một kênh đã xác thực,
-nên candidate không thể tự chế ra kết quả probe. Bằng chứng thô của lần chạy được giữ nguyên.
+Khẳng định: điều phối và kiểm chứng sản phẩm tất định, gắn với bằng chứng. Trong một phép chứng minh, mã candidate
+(thứ developer viết) chỉ chạy trong tiến trình agent của probe; kết luận do một controller không bao giờ import nó đưa
+ra, qua một kênh đã xác thực, nên trong một lần đánh giá candidate không thể tự chế ra kết quả probe (lỗ giữa các lần
+đánh giá được nêu ở Giới hạn đã biết). Bằng chứng thô của lần chạy được giữ nguyên.
 
 Mô hình đe doạ: người vận hành đáng tin; mã sinh ra có thể sai hoặc "lách". Không khẳng định: tổng quát hoá cho mọi
 loại workload, vượt trội so với V1, chất lượng model, cô lập đa người thuê có tính thù địch, cô lập hoàn toàn trước
@@ -117,19 +119,34 @@ một tiến trình độc hại của cùng người dùng hệ điều hành, 
 mã nguồn của candidate (không có phụ thuộc bên thứ ba của dự án). Review của model chỉ mang tính tham khảo và không bao
 giờ chặn; scanner (`ruff`, nếu đã cài) cũng chỉ tham khảo.
 
-Nền tảng: `aisef run` được hỗ trợ trên Linux và macOS. Trên Windows gói cài được và bộ test của kernel chạy được, nhưng
-một lần `aisef run` thật không thuộc phạm vi khẳng định của 2.0.
+Nền tảng: `aisef run` được hỗ trợ trên Linux và macOS; mọi lần chạy thật đến nay đều trên macOS (Linux được kiểm trong
+CI với client và provider giả). Trên Windows gói cài được và bộ test của kernel chạy được, nhưng một lần `aisef run`
+thật không thuộc phạm vi khẳng định của 2.0.
 
 ## Giới hạn đã biết
 
 - **Criterion đọc mã Python bằng mẫu theo dòng có thể bác bỏ mã đúng.** Trong smoke phát hành 2.0, một story đúng bị
   rollback vì một criterion "stdlib only" coi một dòng docstring bắt đầu bằng `from …` là một câu lệnh import
-  (S6-SMOKE-2-FALSE-ROLLBACK-S10A). Kernel dừng an toàn — không có mã sai nào vào sản phẩm đã giao — nhưng story đó
-  không được giao. Criterion nhận biết cú pháp được lên kế hoạch cho 2.1 (V21-37).
+  (S6-SMOKE-2-FALSE-ROLLBACK-S10A). Kernel dừng an toàn — không mã nào trượt một spec của bundle lọt vào `main` — nhưng
+  story đó không được giao. Criterion nhận biết cú pháp được lên kế hoạch cho 2.1 (V21-37).
 - **Hồi quy phát hiện sau merge không quay về developer.** Nó thuộc INTEGRATION và không được chạy lại, nên developer
   không được biết criterion bị hỏng và không có lượt chạy lại (V21-38, kế hoạch 2.1).
+- **Nghiệm thu chỉ tương đối với spec của bundle.** "0 chấp nhận sai" nghĩa là không story nào trượt chính contract
+  của nó mà vẫn được giao. Trong smoke phát hành, review của model tìm ra 5 lỗi tái hiện được nằm ngoài 59 spec; chúng
+  đã được giao vì review chỉ mang tính tham khảo.
+- **Developer không bị giới hạn.** Client chạy dưới user hệ điều hành của người vận hành, với HOME, PATH, thư mục XDG,
+  cấu hình OpenCode toàn cục (plugin, MCP server) và mạng của người đó. Trong smoke phát hành, các phiên developer đã
+  đọc ra ngoài worktree — scratch của probe, journal đang chạy, bundle chứa stimulus của phép chứng minh, kernel đã cài
+  — trước khi một story commit (V21-02).
+- **Interpreter của probe ghi được.** Controller của probe chạy venv của lần chạy với `-I` nhưng không `-S`, nên một
+  file `.pth` do test hoặc phiên developer cài vào site-packages của nó sẽ chạy bên trong các controller sau, nơi giữ
+  khoá của kênh. Khẳng định về kênh kết luận đúng trong một lần đánh giá, không đúng giữa các lần đánh giá (V21-28;
+  bản vá dự kiến ở 2.0.1).
+- **`--verify` chứng minh tính nhất quán, không chứng minh tính xác thực.** Chuỗi băm không có khoá và `RUN.json` nằm
+  cạnh nó; kết quả từng story, điểm dừng ngân sách và lỗi story được đọc từ `RUN.json`, và viết lại nhất quán cả hai
+  vẫn VERIFIED (V21-30).
 
-Toàn bộ backlog 2.1, mỗi mục có cách tái hiện: [V2.1-BACKLOG.md](V2.1-BACKLOG.md).
+Toàn bộ backlog 2.1, kèm trạng thái tái hiện của từng mục: [V2.1-BACKLOG.md](V2.1-BACKLOG.md).
 
 ## Chuyển từ AISEF 1.x
 
