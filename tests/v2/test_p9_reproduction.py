@@ -3,10 +3,14 @@ execution recorded, then reproduced with the model stream alone replayed; the tw
 (a changed request with the same call count does not bind; a changed tool behaviour is a diff, never a satisfied
 recording); assertConsumed's refusals; normalization that cannot hide a regression; the recording as expectation only.
 
-Every case here records its own scratch stream in a temporary directory: nothing reads or writes the Q5 corpus.
+Every case here records its own scratch stream in a temporary directory: nothing writes a Q5 corpus; Q5_14 reads 2.0's
+(release/Q5-RC2) as history only.
 """
 
+import importlib
+import json
 import pathlib
+import subprocess
 import sys
 import unittest
 
@@ -133,14 +137,78 @@ class Reproduction(unittest.TestCase):
             self.assertEqual(set(r["response"]) - {"kind", "files", "message", "detail", "findings"}, set())
 
 
+def _failures(base, story):
+    return [(e["data"]["code"], e["data"]["owner"], e["data"]["retryable"], e["data"]["detail"]) for e in base["journal"]
+            if e["type"] == "failure/observed" and e["data"].get("story_id") == story]
+
+
+def _checks(base, story):
+    return [(e["data"]["check"], e["data"]["passed"]) for e in base["journal"]
+            if e["type"] == "gate/check" and e["data"]["check"].startswith(f"{story}:")]
+
+
 class MultiStory(unittest.TestCase):
+    """V2.1 (V21-38; validation/qualification/v21_q5_changes.py): 2.0's item `post-merge-regression` — S2's candidate breaks
+    S0's preserved `sub` — is the developer's at the candidate (Q5_13); the post-merge path it covered is
+    `post-merge-integration-regression`, main moving under a clean candidate (Q5_12); 2.0's record stays (Q5_14)."""
+
     def test_Q5_12_a_two_story_run_with_a_post_merge_regression_reproduces(self):
-        item = next(i for i in q5.CORPUS if i.id == "post-merge-regression")
+        item = next(i for i in q5.CORPUS if i.id == "post-merge-integration-regression")
         base = _record(item)
         v = _reproduce(base, item)
         self.assertEqual(v["status"], "GREEN", (v["errors"], v["journal_diffs"][:1], v["notes"]))
         self.assertEqual(v["outcomes"]["observed"], {"S0": ["COMMIT"], "S2": ["ROLLBACK"]})
         self.assertEqual(v["model_calls"]["observed"], 4)
+        self.assertEqual([r["header_class"] for r in base["model_ledger"]], ["DEVELOPER_IMPLEMENT", "REVIEWER_REVIEW"] * 2)
+        self.assertTrue(base["consumption"]["ok"], base["consumption"])                  # every scripted answer was asked for
+        self.assertEqual(_failures(base, "S2"), [("POST_MERGE_REGRESSION", "INTEGRATION", False, "post-merge C0: POST_MERGE_REGRESSION")])
+        checks = _checks(base, "S2")
+        self.assertIn(("S2:proof:C0", True), checks)                                    # the candidate kept S0's behaviour
+        self.assertEqual(checks[-2:], [("S2:post-merge:C2", True), ("S2:post-merge:C0", False)])   # the merged revision did not
+
+    def test_Q5_13_a_regression_the_developer_made_is_found_at_the_candidate_retried_and_never_merged(self):
+        item = next(i for i in q5.CORPUS if i.id == "developer-regression-at-candidate")
+        base = _record(item)
+        v = _reproduce(base, item)
+        self.assertEqual(v["status"], "GREEN", (v["errors"], v["journal_diffs"][:1], v["notes"]))
+        self.assertEqual(v["outcomes"]["observed"], {"S0": ["COMMIT"], "S2": ["RETRY", "ROLLBACK"]})
+        self.assertEqual(v["model_calls"]["observed"], 4)
+        self.assertEqual([r["header_class"] for r in base["model_ledger"]],
+                         ["DEVELOPER_IMPLEMENT", "REVIEWER_REVIEW", "DEVELOPER_IMPLEMENT", "DEVELOPER_IMPLEMENT"])   # S2 is never reviewed
+        self.assertTrue(base["consumption"]["ok"], base["consumption"])                  # every scripted answer was asked for
+        self.assertEqual(base["model_ledger"][3]["request"]["prior_failures"], ["CONTRACT_UNSATISFIED"])     # fed back to the retry
+        self.assertEqual(_failures(base, "S2"), [("CONTRACT_UNSATISFIED", "DEVELOPER", True, "proof of C0: CONTRACT_UNSATISFIED")] * 2)
+        checks = _checks(base, "S2")
+        self.assertEqual(checks.count(("S2:proof:C0", False)), 2)
+        self.assertEqual([c for c, _ in checks if c.endswith(":merge") or ":post-merge:" in c], [])            # nothing merged
+
+    def test_Q5_14_HISTORY_2_0_s_item_stays_as_recorded_and_every_2_1_change_is_traced(self):
+        from validation.qualification import v21_q5_changes as X
+        rc2 = ROOT / "closure-evidence/v2/release/Q5-RC2"
+        for rel in ("CORPUS.json", "corpus/post-merge-regression.json", "REPRODUCTION.json", "reproduction/post-merge-regression.json"):
+            blob = subprocess.run(["git", "cat-file", "blob", f"{X.V2_0_0}:closure-evidence/v2/release/Q5-RC2/{rel}"], cwd=ROOT,
+                                  capture_output=True, check=True).stdout
+            self.assertEqual((rc2 / rel).read_bytes().replace(b"\r\n", b"\n"), blob, rel)
+        load = lambda rel: json.loads((rc2 / rel).read_text(encoding="utf-8"))   # noqa: E731
+        corpus, rec = load("CORPUS.json"), load("corpus/post-merge-regression.json")
+        self.assertEqual((load("REPRODUCTION.json")["status"], load("reproduction/post-merge-regression.json")["status"]), ("GREEN", "GREEN"))
+        quote, row = X.RC2_POST_MERGE_REGRESSION, corpus["items"]["post-merge-regression"]
+        self.assertEqual({k: row[k] for k in ("outcomes", "model_calls", "tool_calls", "events", "ledger_digest")} | {"coverage": corpus["coverage"][quote["item"]]},
+                         {k: quote[k] for k in ("outcomes", "model_calls", "tool_calls", "events", "ledger_digest", "coverage")})
+        self.assertEqual([{"seq": e["seq"], **{k: e["data"][k] for k in ("story_id", "code", "owner", "retryable", "detail")}}
+                          for e in rec["journal"] if e["type"] == "failure/observed"], [quote["failure"]])
+        by_id = {i.id: i for i in q5.CORPUS}
+        self.assertNotIn(quote["item"], by_id)                                  # its meaning changed: the id is not reused
+        self.assertEqual(set(corpus["items"]) - {quote["item"]} | set(X.CHANGES), set(by_id))
+        self.assertEqual(set(X.UNCHANGED["identical_up_to_kernel_identity"]) | set(X.UNCHANGED["identity_only"]["items"]),
+                         set(corpus["items"]) - {quote["item"]})
+        for item_id, change in X.CHANGES.items():
+            self.assertEqual(change["expectation_2_1"]["outcomes"], by_id[item_id].expected_outcomes, item_id)
+            self.assertEqual(len(change["expectation_2_1"]["model_calls"]), len(by_id[item_id].developer) + len(by_id[item_id].reviewer))
+            self.assertTrue(change["requirement"] and change["decision"] and change["cause_commit"] == X.V21_38, item_id)
+            for name in change["behaviour_tests"]:
+                module, cls, method = name.rsplit(".", 2)
+                self.assertTrue(callable(getattr(getattr(importlib.import_module(module), cls), method, None)), name)
 
 
 if __name__ == "__main__":

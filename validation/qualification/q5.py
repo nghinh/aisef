@@ -27,6 +27,11 @@ a file the probe observes changed on the trunk outside the model stream (the req
 V2.0 release (charter S5, "Q5 fresh/reproduction"): once the RC1 freeze record exists, the subject is the RC
 (common.candidate()), the records go to closure-evidence/v2/release/Q5-RC1 and the differential below is Q4-RC1's.
 
+V2.1 (owner B-03d, RELEASE-DECISIONS seq 5): 2.0's `post-merge-regression` becomes `developer-regression-at-candidate`
+(V21-38: a committed story's PRESERVE is proved at the candidate), and `post-merge-integration-regression` keeps the
+post-merge path (main moves under a clean candidate); validation/qualification/v21_q5_changes.py traces both, measured.
+2.0's corpora stay as recorded.
+
 Determinism is normalization after observation: the run's clock is the real clock and event times are dropped; temp
 roots become tokens. Nothing semantic is normalized (control outcomes, owners, retryability, revisions, semantic hashes,
 probe digests, request content, tool exit status, report content, file contents, test verdicts, the workspace diff).
@@ -119,6 +124,7 @@ TEST_ADD = ("import unittest\nfrom app import calc\n\n\nclass T(unittest.TestCas
 TEST_MUL = "import unittest\nfrom app import mul\n\n\nclass T(unittest.TestCase):\n    def test_mul(self):\n        self.assertEqual(mul.mul(2, 3), 6)\n"
 CONTRACTS = {"C1": ("app.calc:add", [1, 2], 3), "C2": ("app.mul:mul", [2, 3], 6), "C0": ("app.calc:sub", [3, 1], 2)}
 S1_FILES = {"app/calc.py": CALC + ADD, "tests/test_s1.py": TEST_ADD}
+S2_FILES = {"app/mul.py": MUL, "tests/test_s2.py": TEST_MUL}
 
 
 def completed(files: dict, message: str) -> dict:
@@ -150,6 +156,9 @@ class Item:
     limits: dict = field(default_factory=dict)   # owner name -> retries (default 1 each)
     expected_outcomes: dict = field(default_factory=dict)
     kind: str | None = None                       # Cycle 2: the subject kind every story of the item is proved with (KIND_CONTRACTS)
+    #: V2.1: (story id, files) — landed on the trunk by somebody else right after that story's developer answer is
+    #: applied (_LandsAfter); never in any request
+    lands_after: tuple = ()
 
 
 #: Cycle 2: cid -> (subject kind, locator, stimulus, observable, subject absence), each proved by the catalog's active probe
@@ -170,6 +179,10 @@ COUNTER = "class Counter:\n    def __init__(self):\n        self.n = 0\n\n    de
 CODEC = "def encode(text):\n    return text.encode('utf-8')\n"
 TEST_C2 = ("import unittest\n\n\nclass T(unittest.TestCase):\n    def test_package(self):\n        import app\n"
            "        self.assertTrue(app.__name__)\n")
+
+#: S0 introduces C1 and preserves C0 (`sub`); S2 introduces C2 and is committed after S0
+TWO_STORIES = (Story("S0", (("C1", "INTRODUCE"), ("C0", "PRESERVE"))),
+               Story("S2", (("C2", "INTRODUCE"),), tests=("tests/test_s2.py",), tests_block=False))
 
 CORPUS: tuple[Item, ...] = (
     Item("normal-completion", ("normal story completion", "developer tool execution", "candidate proof", "independent verification",
@@ -192,11 +205,19 @@ CORPUS: tuple[Item, ...] = (
     Item("developer-outage-rollback", ("provider failure", "retry path", "rollback path"),
          (Story("S1", (("C1", "INTRODUCE"),)),), ({"kind": "OUTAGE", "detail": "503 from the developer capability"},) * 2, (),
          expected_outcomes={"S1": ["RETRY", "ROLLBACK"]}),
-    Item("post-merge-regression", ("merge path", "post-merge path", "PRESERVE re-proof", "rollback path", "two stories"),
-         (Story("S0", (("C1", "INTRODUCE"), ("C0", "PRESERVE"))),
-          Story("S2", (("C2", "INTRODUCE"),), tests=("tests/test_s2.py",), tests_block=False)),
-         (completed(S1_FILES, "S0: C1"), completed({"app/mul.py": MUL, "tests/test_s2.py": TEST_MUL, "app/calc.py": SUB_BROKEN}, "S2: C2")),
-         (reviewed(), reviewed()), expected_outcomes={"S0": ["COMMIT"], "S2": ["ROLLBACK"]}),
+    # V2.1 (V21-38; validation/qualification/v21_q5_changes.py): 2.0's `post-merge-regression` (release/Q5-RC2) — S2's
+    # candidate breaks S0's preserved `sub` — is found at the candidate under 2.1: the developer's, retryable, fed back,
+    # retried with the same answer, rolled back; nothing is merged and S2 never reaches review
+    Item("developer-regression-at-candidate", ("PRESERVE proof at the candidate", "developer regression fed back", "retry path",
+                                               "rollback path", "developer budget", "two stories"),
+         TWO_STORIES, (completed(S1_FILES, "S0: C1"),) + (completed({**S2_FILES, "app/calc.py": SUB_BROKEN}, "S2: C2"),) * 2,
+         (reviewed(),), expected_outcomes={"S0": ["COMMIT"], "S2": ["RETRY", "ROLLBACK"]}),
+    # V2.1: the post-merge path 2.0's item covered — main moves under S2's clean candidate (ORCH_9): C0 holds at the
+    # candidate and is refuted only at the merged revision, INTEGRATION's; the merge is rolled back
+    Item("post-merge-integration-regression", ("merge path", "post-merge path", "PRESERVE re-proof", "PRESERVE proof at the candidate",
+                                               "trunk moved under the candidate", "rollback path", "two stories"),
+         TWO_STORIES, (completed(S1_FILES, "S0: C1"), completed(S2_FILES, "S2: C2")), (reviewed(), reviewed()),
+         lands_after=("S2", {"app/calc.py": SUB_BROKEN + ADD}), expected_outcomes={"S0": ["COMMIT"], "S2": ["ROLLBACK"]}),
     # Cycle 2: one item per active Cycle-2 probe, and a refuted-then-retried one
     Item("cli-proved-story", ("probe.cli_invocation", "candidate proof", "independent verification", "review path", "security path",
                               "merge path", "post-merge path"),
@@ -240,16 +261,17 @@ def kind_contract(cid: str) -> tuple:
 
 
 class _LandsAfter:
-    """The `changed_probe_fixture` variant: the developer answers from the stream as always; after its answer is applied,
-    a file the probe observes is landed on the trunk by somebody else (never in any request)."""
+    """The developer answers from the stream as always; after its answer to `story` (None: the first answer) is applied,
+    `files` are landed on the trunk by somebody else (never in any request) — once. The `changed_probe_fixture` variant
+    (a file the probe observes) and an item's `lands_after` (V2.1: main moves under a story's candidate)."""
 
-    def __init__(self, dev, repo: str, files: dict) -> None:
-        self.dev, self.repo, self.files, self.landed = dev, repo, files, 0
+    def __init__(self, dev, repo: str, files: dict, story: str | None = None) -> None:
+        self.dev, self.repo, self.files, self.story, self.landed = dev, repo, files, story, 0
 
     def implement(self, story_id: str, criteria: tuple[str, ...], checkout: str):
         from tests.v2 import test_p6_orchestration as T
         out = self.dev.implement(story_id, criteria, checkout)
-        if not self.landed:
+        if not self.landed and self.story in (None, story_id):
             T.land(self.repo, self.files, "a change on the trunk the model stream never saw")
             self.landed += 1
         return out
@@ -695,6 +717,8 @@ def execute(item: Item, mode: str, *, ledger: list[dict] | None = None, variant:
             dev = StreamDeveloper(run, stream, capability=cap_id, semantic_hashes=semantic, profile=profile)
             rev = StreamReviewer(run, stream, capability=cap_id, semantic_hashes=semantic, profile=profile)
             env = ExecutionEnv(sys.executable, 60, Enforcement.PARTIAL)
+            if item.lands_after:
+                dev = _LandsAfter(dev, repo, item.lands_after[1], story=item.lands_after[0])
             if variant == "changed_probe_fixture":
                 dev = _LandsAfter(dev, repo, TRUNK_FIXTURE_CHANGE)
             obligations = [T.obligation(cid, built[cid][1].id, st.id, ObligationRole[role]) for st in item.stories for cid, role in st.obligations]
@@ -924,7 +948,7 @@ def record(out_dir: pathlib.Path) -> int:
                "definition": {"stories": [{"id": s.id, "obligations": list(map(list, s.obligations)), "tests": list(s.tests), "regressions": list(s.regressions),
                                            "tests_block": s.tests_block} for s in item.stories], "developer": list(item.developer), "reviewer": list(item.reviewer),
                               "pre_landed": item.pre_landed, "scanner_findings": [list(f) for f in item.scanner_findings], "limits": item.limits,
-                              "expected_outcomes": item.expected_outcomes},
+                              "expected_outcomes": item.expected_outcomes, "lands_after": list(item.lands_after)},
                "platform": platform.system().lower(), "python": platform.python_version(), "execution_commit": C.git("rev-parse", "HEAD"), **obs}
         rec["ledger_digest"] = ledger_digest(rec["model_ledger"])
         good = rec["outcomes"] == item.expected_outcomes and all(v == 0 for v in rec["errors"].values()) and rec["consumption"]["ok"]
