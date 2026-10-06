@@ -35,7 +35,7 @@ import tempfile
 import time
 
 from aisef2.app import adapters as ad
-from aisef2.app import client, preflight
+from aisef2.app import client, preflight, usage
 from aisef2.app.bundle import Project
 from aisef2.app.settings import Settings
 from aisef2.arch.enums import Enforcement
@@ -305,14 +305,22 @@ def budget_stops(not_run: list[str], sessions: list[dict], budget) -> str | None
 
 
 def execute(project: Project, settings: Settings, source: pathlib.Path, out: pathlib.Path, *, transport=None,
-            client_exe: str | None = None, cals: tuple | None = None, clock=time.time) -> dict:
-    """Run the project; the record (also written to <out>/RUN.json, whatever happens)."""
+            client_exe: str | None = None, cals: tuple | None = None, clock=time.time,
+            parent: pathlib.Path | None = None) -> dict:
+    """Run the project; the record (also written to <out>/RUN.json, whatever happens). `parent`: the run this one
+    continues (V2.1: its path and evidence anchor are recorded; nothing of it is read or written)."""
     if out.exists():
         raise RunRefused(f"{out} exists: a run directory is never reused or overwritten")
+    lineage = None
+    if parent is not None:
+        if not (parent / "RUN.json").is_file():
+            raise RunRefused(f"--parent {parent}: no run record there")
+        lineage = {"path": str(parent), "evidence_anchor": anchor_in(parent)}
     out.mkdir(parents=True)
     rec: dict = {"format": FORMAT, "bundle_digest": project.digest, "project": project.name, "plan_hash": project.plan.plan_hash,
                  "settings": settings.content, "started": clock(), "stage": "repository", "kernel_digest": kernel_digest(),
-                 "platform": {"system": platform.system().lower(), "python": platform.python_version()}}
+                 "platform": {"system": platform.system().lower(), "python": platform.python_version()},
+                 **({"parent": lineage} if lineage else {})}
     run = None
     developer = reviewer = budget = None
     results: dict = {}
@@ -424,6 +432,10 @@ def execute(project: Project, settings: Settings, source: pathlib.Path, out: pat
                        sessions=[{k: v for k, v in s.items() if k != "text"} for s in sessions],
                        failure=None if failure is None else {"type": type(failure).__name__, "detail": str(failure)[:2000],
                                                              "stage": rec.get("stage")})
+            try:    # V2.1 (D): what the run used, from its evidence; a fault here never costs the record
+                rec["usage"], rec["no_progress"] = usage.usage(out, events, settings.prices, rec), usage.no_progress(events)
+            except Exception as e:  # noqa: BLE001 — named in the record, re-derived by --verify
+                rec["usage"] = {"error": f"{type(e).__name__}: {e}"[:500]}
             (out / "RUN.json").write_text(json.dumps(rec, indent=1, sort_keys=True, default=str) + "\n", encoding="utf-8")
             try:    # after the record: the manifest binds it; its digest is the anchor the operator keeps
                 (out / MANIFEST).write_text(json.dumps(evidence_manifest(out), indent=1, sort_keys=True) + "\n", encoding="utf-8")

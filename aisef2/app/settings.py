@@ -37,7 +37,8 @@ KEYS = ("format", "client", "route", "provider", "client_env", "budget", "max_tu
         "preflight")
 #: V2.1: optional keys. Absent, the run is exactly a 2.0.0 run and the record says which rule applied:
 #: review — {"policy": "fix-loop" | "advisory", "min_severity": "low" | "medium" | "high" | "critical"} (app/review_verify)
-OPTIONAL = ("review",)
+#: prices — the price table money is computed with (app/usage); absent, every cost is unknown (null), never 0
+OPTIONAL = ("review", "prices")
 #: what an absent `review` means: 2.0.0's rule (no finding blocks), named, never a silent default
 REVIEW_ABSENT = {"policy": "advisory", "min_severity": "critical", "given": False}
 
@@ -90,6 +91,11 @@ class Settings:
     review: dict = None     # V2.1: the review policy; REVIEW_ABSENT when the settings name none
 
     @property
+    def prices(self) -> dict | None:
+        """V2.1: the operator's price table (app/usage), or None: then every cost is unknown, never 0."""
+        return self.content.get("prices")
+
+    @property
     def model(self) -> str:
         return self.route.split("/", 1)[1]
 
@@ -114,6 +120,11 @@ def load(data: Mapping) -> Settings:
                 or r["min_severity"] not in SEVERITIES:
             raise SettingsError(f"review is {{policy: one of {list(POLICIES)}, min_severity: one of {list(SEVERITIES)}}}")
         review = {"policy": r["policy"], "min_severity": r["min_severity"], "given": True}
+    if "prices" in data:
+        from aisef2.app.usage import price_problem
+        why = price_problem(data["prices"])
+        if why:
+            raise SettingsError(why)
     if data["client"] not in CLIENTS:
         raise SettingsError(f"client is one of {CLIENTS}")
     route = data["route"]

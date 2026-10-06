@@ -17,7 +17,7 @@ import hashlib
 import json
 import pathlib
 
-from aisef2.app import client, preflight, settings
+from aisef2.app import client, preflight, settings, usage
 from aisef2.app import run as R
 from aisef2.app.bundle import Project
 from aisef2.arch.enums import Enforcement, IdentityGrade
@@ -131,6 +131,14 @@ def verify(project: Project, out: pathlib.Path, expect_anchor: str | None = None
         problems.append(f"the record says {rec.get('delivery_verdict')}; the journal re-derives {verdict}")
     if events and rec.get("productproof") != R.productproof(project, events, committed):
         problems.append("the record's ProductProof account is not the one the journal re-derives")
+    if isinstance(rec.get("usage"), dict) and "error" not in rec["usage"]:     # V2.1: the account is the evidence's
+        try:
+            prices = settings.load(rec.get("settings") or {}).prices
+        except settings.SettingsError:
+            prices = None
+        if rec["usage"] != json.loads(json.dumps(usage.usage(out, events, prices, rec), default=str)) \
+                or rec.get("no_progress") != usage.no_progress(events):
+            problems.append("the record's usage is not what the evidence re-derives")
     if rec.get("final_main") and (out / "repo").exists():
         if git(out / "repo", "rev-parse", "main").stdout.strip() != rec["final_main"]:
             problems.append("the run's repository main is not the record's final main")

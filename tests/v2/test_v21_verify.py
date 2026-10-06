@@ -96,8 +96,11 @@ class RecordAlone(ProductBase):
         self.assertIn('"output": 7', text)
         log.write_text(text.replace('"output": 7', '"output": 0').replace('"reasoning": 3', '"reasoning": 0'), encoding="utf-8")
         spent = dict(self.rec["budget"]["spent"], output_tokens=self.rec["budget"]["spent"]["output_tokens"] - 10)
+        from aisef2.app import usage
+        events = [{"seq": e.seq, "type": e.type, "data": e.data} for e in self.journal().events]
         self.forge(budget_stop=None, delivery_verdict="PASS", delivery_blocked_by=[],
-                   budget=dict(self.rec["budget"], spent=spent))
+                   budget=dict(self.rec["budget"], spent=spent),
+                   usage=json.loads(json.dumps(usage.usage(self.out, events, None, self.rec), default=str)))
         from aisef2.app import run as R
         (self.out / R.MANIFEST).write_text(json.dumps(R.evidence_manifest(self.out), indent=1, sort_keys=True) + "\n",
                                            encoding="utf-8")

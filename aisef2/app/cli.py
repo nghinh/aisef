@@ -32,6 +32,8 @@ def _parser() -> argparse.ArgumentParser:
     p.add_argument("--out", type=pathlib.Path, help="the run directory (a new one to run; an existing one to verify)")
     p.add_argument("--expect-anchor", metavar="SHA256",
                    help="verify only: the evidence anchor the run printed, kept outside the run directory")
+    p.add_argument("--parent", type=pathlib.Path,
+                   help="run only: the run this one continues (`aisef bundle continue`), recorded with its anchor")
     return p
 
 
@@ -62,7 +64,7 @@ def run(argv: list[str]) -> int:
             _print({"project": project.name, "plan_hash": project.plan.plan_hash, "route": s.route, "admission": adm,
                     "ready": adm["admitted"]})
             return 0 if adm["admitted"] else 2
-        rec = R.execute(project, s, a.repo, a.out)
+        rec = R.execute(project, s, a.repo, a.out, **({"parent": a.parent} if a.parent is not None else {}))
     except (bundle.BundleError, settings.SettingsError, R.RunRefused, preflight.IdentityStop, SessionRefused) as e:
         print(f"aisef run: refused: {e}", file=sys.stderr)
         return 2

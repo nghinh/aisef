@@ -7,6 +7,16 @@
     aisef bundle lint B                                     approvals, admission (RFC §12), calibration, clause coverage
     aisef bundle explain B                                  per story: each criterion, its contract, probe and class
     aisef bundle migrate IN --out OUT     a bundle of an earlier release, its plan re-bound to this release's spec ids
+    aisef bundle continue B --from-run DIR --out B2   the stories DIR's run did not commit, from what it did commit
+
+`continue` (V2.1, proposal D): a run that was interrupted or stopped is never resumed in place and never modified. Its
+journal says which stories committed and at which revision; the continuation's baseline is the last of them (journal
+truth: a merge the journal never committed is reported and left out, never trusted). The committed stories' obligations
+become one story's VERIFY obligations, proved again at that baseline by the kernel — with no developer call when they
+hold; the one review request K-NOWORK-001 keeps for a story without developer work is the only provider spend of
+inheriting — and the other stories run as they were. Contracts and approvals are
+untouched (their semantics did not change). Run it against DIR/repo, the run's own clone, which holds the baseline,
+with `aisef run --parent DIR` to record the lineage. A bundle or kernel that changed is a new project, not a continuation.
 
 The authoring document (AUTHORING_FORMAT, schema: docs/v2.1/bundle-authoring.schema.json) is the bundle without what
 the kernel derives: no requirement, contract or plan hash, no spec id, no approval. `seal` derives them with the
@@ -353,6 +363,69 @@ def init(example: str, out: pathlib.Path) -> None:
     _write_new(out / "authoring.json", doc["authoring"])
 
 
+def continue_from(data: Mapping, run_dir: pathlib.Path) -> tuple[dict, dict]:
+    """(the continuation bundle, the report) of `data`'s run in `run_dir` (module docstring)."""
+    from aisef2.app import run as R
+    from aisef2.journal import format3
+    project = B.load(data)
+    try:
+        rec = json.loads((run_dir / "RUN.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError) as e:
+        raise B.BundleError(f"{run_dir}: no run record ({type(e).__name__})") from e
+    if rec.get("bundle_digest") != project.digest:
+        raise B.BundleError(f"{run_dir} is a run of another bundle: a continuation is of the same project")
+    if rec.get("kernel_digest") != R.kernel_digest():
+        raise B.BundleError(f"{run_dir} ran another kernel ({str(rec.get('kernel_digest'))[:12]}): a new project, "
+                            "not a continuation")
+    try:
+        events = format3.reconstruct((run_dir / rec["journal"]["path"]).read_text(encoding="utf-8")).events
+    except Exception as e:  # noqa: BLE001 — any refusal of the reader is the answer
+        raise B.BundleError(f"{run_dir}: the journal does not reconstruct ({type(e).__name__}: {e})"[:400]) from e
+    commits = [(e.data["story_id"], e.data["revision"]) for e in events if e.type == "story/commit"]
+    if not commits:
+        raise B.BundleError(f"{run_dir} committed no story: run the bundle itself again")
+    done = [s for s, _ in commits]
+    baseline = commits[-1][1]
+    repo = run_dir / "repo"
+    if R.git(repo, "cat-file", "-e", f"{baseline}^{{commit}}").returncode != 0:
+        raise B.BundleError(f"{repo} does not hold the journal's last commit {baseline[:12]}")
+    main = R.git(repo, "rev-parse", "main").stdout.strip()
+    blob = R.git(repo, "cat-file", "blob", f"{baseline}:{project.requirements_path}")
+    if blob.returncode != 0 or R._sha(blob.stdout.encode("utf-8")) != project.requirements_sha256:
+        raise B.BundleError(f"the requirements document at {baseline[:12]} is not the bundle's: a new project")
+    carried = "CARRIED"
+    while carried in project.stories:
+        carried += "_"
+    plan = project.plan
+    anchor = R.anchor_in(run_dir)
+    obligations = []
+    for o in plan.obligations:
+        if o.story_id in done:
+            obligations.append(PlanObligation(o.criterion_id, o.product_proof_spec_id, carried, ObligationRole.VERIFY,
+                                              EXPECTED_AT_PARENT[ObligationRole.VERIFY], o.depends_on,
+                                              f"carried: {o.story_id} committed it in the run anchored "
+                                              f"{(anchor or 'without a manifest')[:16]} ({o.criterion_id})"))
+        else:
+            obligations.append(o)
+    new_plan = Plan.create(id=f"{plan.id}-continued", baseline=baseline, obligations=tuple(obligations),
+                           plan_quality_policy=plan.plan_quality_policy)
+    stories = {carried: {"depends_on": [], "tests": sorted({t for s in done for t in project.stories[s]["tests"]})}}
+    for sid, s in project.stories.items():
+        if sid not in done:
+            deps = list(dict.fromkeys(carried if d in done else d for d in s["depends_on"]))
+            stories[sid] = {"depends_on": deps, "tests": list(s["tests"])}
+    out = {**dict(data), "plan": plain(new_plan), "stories": stories,
+           "description": f"{data['description']} — continued from the run anchored {anchor or '(no manifest)'}"}
+    B.load(out)
+    report = {"carried": done, "carried_as": carried, "baseline": baseline, "run": str(run_dir), "evidence_anchor": anchor,
+              "in_flight": None if main == baseline else
+              f"the run's main {main[:12]} is not its journal's last commit {baseline[:12]}: what the journal did "
+              "not commit (a merge in flight) is left out",
+              "remaining": [s for s in project.stories if s not in done],
+              "next": f"aisef run --project <this bundle> --repo {repo} --parent {run_dir} --settings S --out NEW"}
+    return out, report
+
+
 def _read(path: pathlib.Path) -> dict:
     try:
         return json.loads(path.read_text(encoding="utf-8"))
@@ -384,6 +457,10 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--out", type=pathlib.Path, required=True)
     for name, text in (("lint", "approvals, admission, calibration, clause coverage"), ("explain", "each criterion, plainly")):
         sub.add_parser(name, help=text).add_argument("bundle", type=pathlib.Path)
+    c = sub.add_parser("continue", help="the stories a run did not commit, from what it did commit")
+    c.add_argument("bundle", type=pathlib.Path)
+    c.add_argument("--from-run", type=pathlib.Path, required=True)
+    c.add_argument("--out", type=pathlib.Path, required=True)
     m = sub.add_parser("migrate", help="re-bind an earlier release's bundle to this release's spec ids")
     m.add_argument("bundle", type=pathlib.Path)
     m.add_argument("--out", type=pathlib.Path, required=True, help="the migrated bundle (a new file; never the input)")
@@ -405,6 +482,11 @@ def main(argv: list[str] | None = None) -> int:
             _write_new(a.out, doc)
             print(json.dumps({"written": str(a.out), "approved": a.contract, "by": a.approver,
                               "still_to_approve": unapproved(doc)}, indent=1, sort_keys=True))
+            return 0
+        if a.command == "continue":
+            doc, report = continue_from(_read(a.bundle), a.from_run)
+            _write_new(a.out, doc)
+            print(json.dumps({"written": str(a.out), **report}, indent=1, sort_keys=True))
             return 0
         if a.command in ("lint", "explain"):
             doc = _read(a.bundle)

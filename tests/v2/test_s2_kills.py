@@ -433,7 +433,10 @@ class AppExecute(unittest.TestCase):
             "format", "bundle_digest", "project", "plan_hash", "settings", "started", "stage", "kernel_digest", "platform",
             "admission", "preflight", "runspec_hash", "aggregate_min_grade", "scanner", "journal", "finished", "story_outcomes",
             "story_errors", "final_main", "delivery_verdict", "delivery_blocked_by", "plan_quality_verdict",
-            "generalization_claim", "productproof", "budget", "budget_stop", "sessions", "failure"]))
+            "generalization_claim", "productproof", "budget", "budget_stop", "sessions", "failure",
+            "usage", "no_progress"]))      # V2.1 (D): the account re-derived from the evidence
+        self.assertEqual((rec["usage"]["cost"]["value"], rec["usage"]["cost"]["status"], rec["no_progress"]),
+                         (None, "unknown", []))     # no price table: unknown, never 0
         main = subprocess.run(["git", "-C", str(out / "repo"), "rev-parse", "main"], capture_output=True, text=True,
                               encoding="utf-8", check=True).stdout.strip()
         import platform as pf
