@@ -2,8 +2,12 @@
 reproduced and the correction measured, under both kernels, through the real story runner. No provider, no model, no
 LedgerLock repository; recorded separately from K-PRESAT-001.
 
-    python -P validation/qualification/c2_k_nowork_001.py --write   # -> closure-evidence/v2/cycle2/K-NOWORK-001-REHEARSAL.json (minutes)
-    python -P validation/qualification/c2_k_nowork_001.py --check   # the record's bound identities are this tree's (nothing is re-run)
+    python -P validation/qualification/c2_k_nowork_001.py --write   # -> closure-evidence/v2/v2.1/K-NOWORK-001-REHEARSAL.json (minutes; new file only)
+    python -P validation/qualification/c2_k_nowork_001.py --check   # that record's bound identities are this tree's (nothing is re-run)
+
+B-03a (owner, 2026-10-06): the 2.0 record (`OUT_REL`, made on the 2.0 release tree) is history — its blob is tag
+v2.0.0's, its verdict and problems as recorded (`history_problems`); the current one is the v2.1 record (`V21_OUT_REL`),
+which binds the v2.1 plan correction.
 
 Two measurements, each made twice — on the kernel before the correction (`BEFORE`, read from git's object store into a
 temporary directory) and on this tree's kernel — in a child process whose `aisef2` is the kernel under measurement:
@@ -41,14 +45,15 @@ ROOT = HERE.parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-OUT_REL = "closure-evidence/v2/cycle2/K-NOWORK-001-REHEARSAL.json"
+OUT_REL = "closure-evidence/v2/cycle2/K-NOWORK-001-REHEARSAL.json"            # 2.0: history
+V21_OUT_REL = "closure-evidence/v2/v2.1/K-NOWORK-001-REHEARSAL.json"
 AUTHORITY = ("owner ruling 'AISEF V2 — K-NOWORK-001 MEASURED ARCHITECTURE CORRECTION / OWNER RULING / NO PROVIDER CALL / NO "
              "LEDGERLOCK RUN / NO Q4-Q5' (2026-10-02)")
 BEFORE = "d427299376d7af48d3dd6d86242bf5def6a43003"         # K-PRESAT-001: the kernel the defect was measured on
 BEFORE_TREE = "4fe9ccaab17d7cac03b5e578ee1ecb57d04b8160"
 CASES = "tests.v2.test_c2_k_nowork_001"
 BOUND = ("aisef2/orchestrate/story_runner.py", "tests/v2/test_c2_k_nowork_001.py", "validation/qualification/c2_k_nowork_001.py",
-         "closure-evidence/v2/cycle2/PLAN-V2.2-CORRECTION-1.json", "validation/qualification/c2_p9.py")
+         "closure-evidence/v2/v2.1/PLAN-V2.2-CORRECTION-1.json", "validation/qualification/c2_p9.py")
 #: the reference mutant a partly over-delivering developer's first delivery is (R-7: repair-tail on an intact chain removes
 #: its last line — S-7-d, STORY-04-01's to introduce), and the story that then has developer work
 PARTIAL, PARTIAL_STORY, PARTIAL_SPEC = "M-7-1", "STORY-04-01", "S-7-d"
@@ -255,7 +260,12 @@ def _rp():
 
 def _bound() -> dict:
     rp = _rp()
-    return {rel: rp._lf((ROOT / rel).read_bytes()) for rel in BOUND}
+    return {rel: rp._lf((ROOT / rel).read_bytes()) if (ROOT / rel).exists() else None for rel in BOUND}
+
+
+def _history() -> dict:
+    return {"path": OUT_REL, "sha256": _rp()._lf((ROOT / OUT_REL).read_bytes()),
+            "rule": "the 2.0 record, made on the 2.0 release tree: kept byte for byte, its blob tag v2.0.0's (history_problems)"}
 
 
 def measured_before_the_ruling() -> dict:
@@ -271,6 +281,15 @@ def measured_before_the_ruling() -> dict:
 
 
 def write() -> dict:
+    """Measures and writes the v2.1 record to a new file; an existing file, the 2.0 path or a bound file missing from this
+    tree (the v2.1 plan correction comes first) is refused before anything runs."""
+    from validation.qualification import c2_plan_correction as pc
+    path = ROOT / V21_OUT_REL
+    if path.resolve() == (ROOT / OUT_REL).resolve() or path.exists():
+        raise SystemExit(f"refused: {V21_OUT_REL} exists or is the 2.0 record")
+    missing = [rel for rel, sha in _bound().items() if sha is None]
+    if missing:
+        raise SystemExit(f"refused: bound but not on this tree: {missing}")
     rp = _rp()
     started = time.monotonic()
     with tempfile.TemporaryDirectory(prefix="aisef2-kernel-before-k-nowork-") as t:
@@ -285,6 +304,8 @@ def write() -> dict:
         "record": "AISEF V2 — K-NOWORK-001: a story with no developer work was sent to the developer and falsely rolled back — "
                   "the defect reproduced and the correction measured under both kernels",
         "authority": AUTHORITY,
+        "requalification": pc.V21_AUTHORITY,
+        "history": _history(),
         "separate_from": "K-PRESAT-001 (every obligation PRE_SATISFIED): its records and history are untouched",
         "defect": "a story admitted with every INTRODUCE obligation PRE_SATISFIED and its remaining PRESERVE / VERIFY obligations "
                   "already SATISFIED at the parent has no product behaviour left to introduce, yet a satisfied PRESERVE and any "
@@ -334,7 +355,9 @@ def write() -> dict:
     rec["problems"] = problems(rec)
     rec["verdict"] = "REPRODUCED AND CORRECTED" if not rec["problems"] else "PROBLEMS"
     rec["seconds"] = round(time.monotonic() - started, 1)
-    (ROOT / OUT_REL).write_text(json.dumps(rec, indent=1, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("x", encoding="utf-8", newline="\n") as f:
+        f.write(json.dumps(rec, indent=1, ensure_ascii=False) + "\n")
     return rec
 
 
@@ -376,17 +399,35 @@ def problems(rec: dict) -> list[str]:
     return out
 
 
-def check() -> list[str]:
+def history_problems() -> list[str]:
+    """The 2.0 record as history: its blob is tag v2.0.0's, its verdict and problems are the recorded ones, and the rule
+    finds none in it. Nothing is re-run or re-bound for it on this tree."""
+    from validation.qualification import c2_plan_correction as pc
+    from validation.qualification import rebind
     path = ROOT / OUT_REL
     if not path.exists():
         return [f"{OUT_REL} is missing"]
+    rec = json.loads(path.read_text(encoding="utf-8"))
+    out = [] if _rp()._lf(path.read_bytes()) == rebind.lf_sha_at(pc.V2_0_0, OUT_REL) else [f"{OUT_REL} is not the record of tag v2.0.0"]
+    if (rec.get("verdict"), rec.get("problems")) != ("REPRODUCED AND CORRECTED", []):
+        out.append(f"{OUT_REL}: the recorded verdict is {rec.get('verdict')}")
+    return out + problems(rec)
+
+
+def check() -> list[str]:
+    """The v2.1 record binds this tree; the 2.0 record holds as history."""
+    path = ROOT / V21_OUT_REL
+    if not path.exists():
+        return [f"{V21_OUT_REL} is missing", *history_problems()]
     rec = json.loads(path.read_text(encoding="utf-8"))
     out = [] if rec.get("verdict") == "REPRODUCED AND CORRECTED" and not rec.get("problems") else [f"the record's verdict is {rec.get('verdict')}"]
     out += problems(rec)
     out += [f"{rel} changed since the record" for rel, sha in _bound().items() if rec["bound"].get(rel) != sha]
     if rec["measured_before_the_ruling"] != measured_before_the_ruling():
         out.append("the real run's rows differ from the record")
-    return out
+    if rec.get("history") != _history():
+        out.append(f"the 2.0 record it names as history is not {OUT_REL} on this tree")
+    return out + history_problems()
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -397,7 +438,7 @@ def main(argv: list[str] | None = None) -> int:
     a = ap.parse_args(argv)
     if a.write:
         rec = write()
-        print(f"{OUT_REL}: {rec['verdict']} ({rec['seconds']} s)")
+        print(f"{V21_OUT_REL}: {rec['verdict']} ({rec['seconds']} s)")
         for x in rec["problems"]:
             print(f"FAIL  {x}")
         return 0 if not rec["problems"] else 1

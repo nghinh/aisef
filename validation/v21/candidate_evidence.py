@@ -77,8 +77,8 @@ def _k_nowork(out: pathlib.Path, rel: str) -> str:
     """K-NOWORK-001's own writer, its output path pointed into OUT (it re-runs its cases under both kernels, ~13 min)."""
     kn = _load("validation/qualification/c2_k_nowork_001.py")
     target = out / rel
-    kn.OUT_REL = os.path.relpath(target, ROOT)
-    if not (ROOT / kn.OUT_REL).resolve().is_relative_to(out.resolve()):
+    kn.V21_OUT_REL = os.path.relpath(target, ROOT)
+    if not (ROOT / kn.V21_OUT_REL).resolve().is_relative_to(out.resolve()):
         raise SystemExit("refused: the writer's path is not inside the candidate directory")
     target.parent.mkdir(parents=True, exist_ok=True)
     kn.write()

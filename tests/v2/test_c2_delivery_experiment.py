@@ -54,8 +54,46 @@ class PlanCorrection(unittest.TestCase):
         cls.rec = pc.record()
 
     def test_the_committed_record_is_what_this_tree_derives(self):
+        """B-03a: the committed v2.1 record is what this tree derives, exactly; the 2.0 record (made on the 2.0 kernel)
+        is history — its blob is tag v2.0.0's, its verdict the recorded one."""
         self.assertEqual(pc.check(), [])
-        self.assertEqual(self.rec["verdict"], "PLAN CORRECTION ADMITTED STATICALLY")
+        self.assertEqual(pc.record_v21(self.b)["verdict"], "PLAN CORRECTION ADMITTED STATICALLY")
+        self.assertEqual(pc.history_problems(), [])
+        self.assertEqual(json.loads((ROOT / pc.OUT_REL).read_text(encoding="utf-8"))["verdict"], "PLAN CORRECTION ADMITTED STATICALLY")
+
+    def test_the_v2_1_record_states_literal_facts_and_labels_the_re_binding(self):
+        """B-03a: no claim derived through the probe-identity re-binding is stated as a proof; the contracts are compared
+        literally, this tree's spec identities are listed as they are (none equal to the accepted), and the mapping
+        build() relies on is labelled as an identity mapping."""
+        rec = pc.record_v21(self.b)
+        s = rec["proofs"]["product_proof_specs"]
+        self.assertFalse({"all_equal_to_accepted", "semantic_hash_changes"} & set(s))
+        self.assertFalse(any("equal_to_accepted" in r for r in s["specs"]))
+        self.assertEqual((s["count"], s["all_contracts_unchanged"], s["all_probe_ids_unchanged"], s["identities_equal_to_accepted"]),
+                         (59, True, True, {"spec_hash_id": 0, "semantic_hash": 0, "probe_digest": 0}))
+        accepted = rebind.accepted_rows()
+        self.assertEqual([[r["spec_id"], *(r[k] for k in rebind.ROW)] for r in s["specs"]], pc._rows(self.b))
+        self.assertTrue(all(r["contract_hash"] == accepted[r["spec_id"]]["contract_hash"] for r in s["specs"]))
+        m = rec["identity_mapping"]
+        self.assertEqual(m["label"], "identity mapping (rebind), not a behaviour proof; behaviour: closure-evidence/v2/v2.1/P5-FALSIFIABILITY.json")
+        self.assertEqual((m["accepted_plan_hash"], m["old_plan_mapped_back_plan_hash"]), (OLD_HASH, OLD_HASH))
+        self.assertEqual({k: v["spec_hash_id"][0] for k, v in m["specs"].items()}, {k: v["spec_hash_id"] for k, v in accepted.items()})
+        self.assertEqual(rec["identities"]["admission_engine_digest"], sa.StaticPlanAdmissionEngine().digest)
+        self.assertEqual(rec["history"]["path"], pc.OUT_REL)
+        body = copy.deepcopy(rec)
+        body["proofs"]["product_proof_specs"]["all_contracts_unchanged"] = False
+        self.assertIn("a ProductProofSpec's contract or probe differs from the accepted one", pc.problems(body))
+
+    def test_the_v2_1_writer_refuses_the_2_0_record_and_an_existing_file(self):
+        before = (ROOT / pc.OUT_REL).read_bytes()
+        with tempfile.TemporaryDirectory() as t:
+            there = pathlib.Path(t) / "x.json"
+            there.write_text("{}", encoding="utf-8")
+            for rel in (pc.OUT_REL, str(there)):
+                with self.subTest(rel=rel), mock.patch.object(pc, "V21_OUT_REL", rel), self.assertRaises((SystemExit, FileExistsError)):
+                    pc.write_v21()
+            self.assertEqual(there.read_text(encoding="utf-8"), "{}")
+        self.assertEqual((ROOT / pc.OUT_REL).read_bytes(), before)
 
     def test_the_eight_obligations_are_where_the_owner_put_them(self):
         new = {o.criterion_id: o for o in self.b["new"].obligations}

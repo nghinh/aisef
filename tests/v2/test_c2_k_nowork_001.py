@@ -23,7 +23,8 @@ The cases, through the one real path (the Cycle-1 fixture of test_p6_orchestrati
      routed for it, the existing developer path is kept (VERIFY_NO_INTRODUCER_UNSATISFIED: the owner's to rule)
 
 On the kernel before the correction (d427299, tree 4fe9ccaa) A and B are red — the developer is called and the story
-rolled back — and C, D, E are green: closure-evidence/v2/cycle2/K-NOWORK-001-REHEARSAL.json records both runs.
+rolled back — and C, D, E are green: closure-evidence/v2/cycle2/K-NOWORK-001-REHEARSAL.json records both runs (2.0,
+history), closure-evidence/v2/v2.1/K-NOWORK-001-REHEARSAL.json the same on the 2.1 kernel.
 """
 
 from __future__ import annotations
@@ -250,8 +251,30 @@ class DeveloperWorkRemains(Fixture):
                      "validation/qualification is not in this tree (the mutation runner's copy); the suite runs it")
 class Record(unittest.TestCase):
     def test_the_record_binds_this_tree_and_shows_the_cases_red_before_and_green_after(self):
+        """B-03a: the v2.1 record binds this tree (and the v2.1 plan correction); the 2.0 record is history — its blob
+        is tag v2.0.0's, its verdict and problems the recorded ones."""
         from validation.qualification import c2_k_nowork_001 as kn
         self.assertEqual(kn.check(), [])
+        self.assertIn("closure-evidence/v2/v2.1/PLAN-V2.2-CORRECTION-1.json", kn.BOUND)
+        self.assertEqual(kn.history_problems(), [])
+
+    def test_the_writer_refuses_the_2_0_record_and_an_existing_file_before_running_anything(self):
+        import json
+        import tempfile
+        from unittest import mock
+        from validation.qualification import c2_k_nowork_001 as kn
+        before = (ROOT / kn.OUT_REL).read_bytes()
+        with tempfile.TemporaryDirectory() as t:
+            there = pathlib.Path(t) / "x.json"
+            there.write_text("{}", encoding="utf-8")
+            for rel in (kn.OUT_REL, str(there)):
+                with self.subTest(rel=rel), mock.patch.object(kn, "V21_OUT_REL", rel), mock.patch.object(kn, "in_kernel") as run, \
+                        self.assertRaises(SystemExit):
+                    kn.write()
+                self.assertEqual(run.call_count, 0)
+            self.assertEqual(there.read_text(encoding="utf-8"), "{}")
+        self.assertEqual((ROOT / kn.OUT_REL).read_bytes(), before)
+        self.assertEqual(json.loads(before)["verdict"], "REPRODUCED AND CORRECTED")
 
 
 if __name__ == "__main__":
