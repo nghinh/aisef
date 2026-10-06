@@ -7,6 +7,7 @@ the product proof identical (R2); parent-side developer artefacts that explode n
 immutable reference selects evidence, whatever the timestamps say (R4); retry state is the journal and nothing beside
 it (R5); every control decision rests on journal facts that precede it (R6)."""
 
+import hashlib
 import importlib.util
 import importlib
 import json
@@ -45,8 +46,19 @@ def _load(name, rel):
 
 opa = _load("aisef_v2_old_path_audit", "validation/v2/old_path_audit.py")
 #: V2.0: the release tree's inventory (validation/qualification/release_inventory.py). P6's stays sealed as the P6
-#: tree's; the release audits its own tree, with the same audit, against its own inventory.
-RELEASE_INVENTORY_REL = "closure-evidence/v2/release/AUTHORITY-INVENTORY.json"
+#: tree's; the release audits its own tree, with the same audit, against its own inventory. V2.1 (B-03c): the 2.1
+#: tree's own inventory; the 2.0 release's stays as released (history).
+RELEASE_INVENTORY_REL = "closure-evidence/v2/v2.1/AUTHORITY-INVENTORY.json"
+RELEASE_2_0_REL = "closure-evidence/v2/release/AUTHORITY-INVENTORY.json"
+#: B-03c: the two authorities 2.1 adds to 2.0's inventory, and all they may draw on — product truth by compiling an
+#: approved contract (migrate) and by a bound probe run (verify): no control event, no control type, no merge, gate
+#: or classification (their limits beyond the row: validation/qualification/authority_limits.py)
+V2_1_ROWS = {
+    "aisef2/app/bundle_cli.py::migrate": 'AST: {"calls": ["aisef2.product.compiler.compile_spec"], "events": [], '
+                                         '"types": []}; import graph from run_story: not reachable',
+    "aisef2/app/review_verify.py::verify": 'AST: {"calls": ["aisef2.probe.protocol.bound_result", '
+                                           '"aisef2.probe.protocol.run_probe"], "events": [], "types": []}; import graph '
+                                           'from run_story: not reachable'}
 COPIED = ("aisef2", "aisef", "validation/v2", "tests/v2", "pyproject.toml")
 
 
@@ -72,10 +84,15 @@ class Inventory(unittest.TestCase):
         self.assertEqual(opa.check(snapshot()), [])
         inv = json.loads((ROOT / RELEASE_INVENTORY_REL).read_text(encoding="utf-8"))
         p6 = json.loads((ROOT / opa.INVENTORY_REL).read_text(encoding="utf-8"))
-        # the release adds exactly the product runtime's two authorities to the sealed P6 inventory, and removes none
-        self.assertEqual({r["id"] for r in inv["rows"]} - {r["id"] for r in p6["rows"]},
-                         {"aisef2/app/bundle.py::load", "aisef2/app/run.py::execute"})
-        self.assertEqual({r["id"] for r in p6["rows"]} - {r["id"] for r in inv["rows"]}, set())
+        r20 = json.loads((ROOT / RELEASE_2_0_REL).read_text(encoding="utf-8"))
+        ids = {name: {r["id"] for r in d["rows"]} for name, d in (("2.1", inv), ("P6", p6), ("2.0", r20))}
+        # 2.0 added exactly the product runtime's two authorities to the sealed P6 inventory (history, unchanged) and
+        # 2.1 exactly migrate and the review's verification to 2.0's; neither removed any
+        self.assertEqual(ids["2.0"] - ids["P6"], {"aisef2/app/bundle.py::load", "aisef2/app/run.py::execute"})
+        self.assertEqual(ids["2.1"] - ids["2.0"], set(V2_1_ROWS))
+        self.assertEqual(ids["P6"] - ids["2.0"], set())
+        self.assertEqual(ids["2.0"] - ids["2.1"], set())
+        self.assertEqual(ids["P6"] - ids["2.1"], set())
         self.assertEqual(inv["summary"]["UNCLASSIFIABLE"], 0)
         self.assertEqual(inv["summary"]["REMOVED"], 0)
         self.assertEqual(inv["legacy_references"], [])
@@ -87,6 +104,13 @@ class Inventory(unittest.TestCase):
         self.assertEqual({r["disposition"] for r in inv["rows"] if r["path"].startswith("tests/")}, {"HISTORICAL_ONLY"})
         self.assertEqual(inv["entrypoints"]["v2_console_script"], False)
         self.assertEqual(opa.inventory_digest(inv), opa.inventory_digest(opa.inventory(ROOT)))
+
+    def test_the_2_1_authorities_draw_on_product_truth_only(self):
+        rows = {r["id"]: r for r in json.loads((ROOT / RELEASE_INVENTORY_REL).read_text(encoding="utf-8"))["rows"]}
+        for rid, evidence in V2_1_ROWS.items():
+            with self.subTest(row=rid):
+                self.assertEqual((rows[rid]["authority_kind"], rows[rid]["disposition"], rows[rid]["evidence"]),
+                                 (["PRODUCT_TRUTH"], "ACTIVE_V2_AUTHORITY", evidence))
 
     def test_an_unenumerated_authority_and_a_stale_row_each_fail_the_audit(self):
         d = snapshot()
@@ -170,6 +194,35 @@ class ReleaseInventory(unittest.TestCase):
         problems = ri.check(d)
         self.assertEqual(len(problems), 1, problems)
         self.assertTrue(problems[0].startswith("the release inventory is not the content-addressed one"), problems)
+
+    def test_the_2_0_release_inventory_is_history_byte_identical_to_its_pin_and_to_v2_0_0(self):
+        # no git here (this file is a P6 kill file; a mutation run's copy has no git objects): the blob at v2.0.0 is
+        # pinned (RELEASE_2_0_BLOB) and tests/v2/test_v21_authority_limits.py asserts the pin against the tag
+        self.assertEqual((ri.RELEASE_2_0_REL, ri.INVENTORY_REL), (RELEASE_2_0_REL, RELEASE_INVENTORY_REL))
+        self.assertEqual(ri.RELEASE_2_0_SHA256, "6dba7d62cae22d505033d09ca26fcb8ad4e79df49491a9aa519a6f75de51015c")
+        self.assertEqual(ri.RELEASE_2_0_BLOB, "97f680948a3c2d1553100130b299905f6dc5d942")
+        self.assertEqual(ri.digest(ROOT / RELEASE_2_0_REL), ri.RELEASE_2_0_SHA256)
+        self.assertEqual(ri.history_problems(), [])
+        changed = (ROOT / RELEASE_2_0_REL).read_bytes().replace(b"\r\n", b"\n").replace(b"judge_only", b"judge_onlx", 1)
+        sha, blob = hashlib.sha256(changed).hexdigest(), hashlib.sha1(b"blob %d\0" % len(changed) + changed).hexdigest()
+        changed_sha = (f"the 2.0 release inventory is history and was changed: {RELEASE_2_0_REL} has sha256 {sha}, "
+                       f"release_inventory.RELEASE_2_0_SHA256 pins {ri.RELEASE_2_0_SHA256}")
+        with tempfile.TemporaryDirectory() as t:     # one byte changed: refused by both pins
+            d = pathlib.Path(t)
+            (d / RELEASE_2_0_REL).parent.mkdir(parents=True)
+            (d / RELEASE_2_0_REL).write_bytes(changed)
+            self.assertEqual(ri.history_problems(d), [changed_sha, f"{RELEASE_2_0_REL} is not its blob at v2.0.0 (ca2631374602): "
+                                                      f"git blob {blob}, release_inventory.RELEASE_2_0_BLOB pins {ri.RELEASE_2_0_BLOB}"])
+            self.assertEqual(ri.history_problems(d / "none"), [f"{RELEASE_2_0_REL} (the 2.0 release inventory, history) is missing"])
+        # each half alone: the released bytes against a pin that is not theirs
+        with mock.patch.object(ri, "RELEASE_2_0_BLOB", "0" * 40):
+            self.assertEqual(ri.history_problems(), [f"{RELEASE_2_0_REL} is not its blob at v2.0.0 (ca2631374602): git blob "
+                                                     f"97f680948a3c2d1553100130b299905f6dc5d942, release_inventory.RELEASE_2_0_BLOB "
+                                                     f"pins {'0' * 40}"])
+        with mock.patch.object(ri, "RELEASE_2_0_SHA256", "0" * 64):
+            self.assertEqual(ri.history_problems(), [f"the 2.0 release inventory is history and was changed: {RELEASE_2_0_REL} "
+                                                     "has sha256 6dba7d62cae22d505033d09ca26fcb8ad4e79df49491a9aa519a6f75de51015c, "
+                                                     f"release_inventory.RELEASE_2_0_SHA256 pins {'0' * 64}"])
 
     def test_the_sealed_p6_inventory_is_byte_identical_to_its_seal(self):
         seal = json.loads((ROOT / "closure-evidence/v2/P6-FINAL-SEAL.json").read_text(encoding="utf-8"))

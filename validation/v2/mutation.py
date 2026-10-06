@@ -650,7 +650,7 @@ _V21_NEW = {
                                   "tests/v2/test_v21_continue_usage.py", "tests/v2/test_v21_continue_integrity.py"], (
         "AUTHORING_KEYS", "CONTRACT_KEYS", "CRITERION_KEYS", "EXAMPLES", "RELEASES", "_earlier", "migrate", "_mint",
         "_refs", "_closed", "seal", "unapproved", "approve", "_spec_rows", "coverage", "lint", "explain", "init",
-        "continue_from", "_read", "_write_new", "main")),
+        "continue_from", "_read", "_write_new", "_create", "main")),
     # names 2.1 added, or whose body 2.1 changed, in modules that already had targets (or none, feedback.py)
     **{f"aisef2/app/{m}.py": (["tests/v2/test_app_units.py", *_V21_REG[f"aisef2/app/{m}.py"], "tests/v2/test_app_run.py"], fs)
        for m, fs in (("adapters", ("Reviewer._model", "Reviewer._ocr", "Reviewer._verify", "tree_of", "_unchanged",

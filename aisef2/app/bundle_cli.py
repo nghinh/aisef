@@ -135,8 +135,9 @@ def migrate(data: Mapping) -> tuple[dict, dict]:
 
 
 def _mint(contract: BehaviorContract, ref: ProbeRef, compiler_digest: str = COMPILER_DIGEST) -> ProductProofSpec:
-    """The spec `contract` compiles to under `ref`: compile_spec's mapping, without its approval gate — for ids only;
-    `B.load` compiles every spec again through compile_spec, so a drift between the two is refused at load."""
+    """The spec `contract` compiles to under `ref`: compile_spec's mapping, without its approval gate — the ids the
+    tools name, and the review reproducer review_verify runs (never approved, never in a plan); `B.load` compiles every
+    plan spec again through compile_spec, so a drift between the two is refused at load."""
     return ProductProofSpec.create(
         contract_id=contract.id, probe_id=ref.probe_id, probe_digest=ref.probe_digest,
         probe_input={"subject": {"kind": contract.subject.kind.value, "locator": contract.subject.locator},
@@ -355,11 +356,13 @@ def init(example: str, out: pathlib.Path) -> None:
     """`example`'s authoring document at out/authoring.json and its repository's files under out/repo/ (a new
     directory: the operator makes it a git repository and commits it — the baseline `seal` reads)."""
     doc = _read(EXAMPLES / f"{example}.json")
-    if out.exists():
-        raise B.BundleError(f"{out} exists: init writes a new directory and never into one")
+    try:
+        out.mkdir(parents=True)
+    except FileExistsError:
+        raise B.BundleError(f"{out} exists: init writes a new directory and never into one") from None
     for rel, text in doc["repo"].items():
         (out / "repo" / rel).parent.mkdir(parents=True, exist_ok=True)
-        (out / "repo" / rel).write_text(text, encoding="utf-8")
+        _create(out / "repo" / rel, text)
     _write_new(out / "authoring.json", doc["authoring"])
 
 
@@ -456,10 +459,18 @@ def _read(path: pathlib.Path) -> dict:
         raise B.BundleError(f"{path}: cannot be read as JSON ({type(e).__name__})") from e
 
 
+def _create(path: pathlib.Path, text: str) -> None:
+    """`text` to a NEW file, created exclusively (O_EXCL): every output of the bundle tools goes through here, so none
+    ever writes over a file — not even one created between a check and the write."""
+    try:
+        with path.open("x", encoding="utf-8") as fh:
+            fh.write(text)
+    except FileExistsError:
+        raise B.BundleError(f"{path} exists: the bundle tools write a new file and never overwrite one") from None
+
+
 def _write_new(path: pathlib.Path, doc: dict) -> None:
-    if path.exists():
-        raise B.BundleError(f"{path} exists: the bundle tools write a new file and never overwrite one")
-    path.write_text(json.dumps(doc, indent=1, sort_keys=True, ensure_ascii=False) + "\n", encoding="utf-8")
+    _create(path, json.dumps(doc, indent=1, sort_keys=True, ensure_ascii=False) + "\n")
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -520,16 +531,16 @@ def main(argv: list[str] | None = None) -> int:
             report = lint(doc) if a.command == "lint" else explain(doc)
             print(json.dumps(report, indent=1, sort_keys=True, default=str))
             return 0 if a.command == "explain" or report["verdict"] == "READY" else 1
-        if a.out.exists():
+        if a.out.exists():      # refused before any work; the exclusive create below is what guarantees it
             raise MigrationError(f"{a.out} exists: migrate writes a new file and never overwrites one")
         out, report = migrate(_read(a.bundle))
+        _create(a.out, json.dumps(out, indent=1, sort_keys=True) + "\n")     # 2.0's bytes (non-ASCII escaped)
     except B.BundleError as e:
         print(f"refused: {e}", file=sys.stderr)
         return 2
     except (KeyError, TypeError, ValueError) as e:     # a document whose kernel objects do not hold
         print(f"refused: {type(e).__name__}: {e}"[:2000], file=sys.stderr)
         return 2
-    a.out.write_text(json.dumps(out, indent=1, sort_keys=True) + "\n", encoding="utf-8")
     print(json.dumps({"written": str(a.out), **report}, indent=1, sort_keys=True))
     return 0
 
