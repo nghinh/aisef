@@ -633,8 +633,9 @@ class Verification(e2e.ProductBase):
         out = self.tmp / "out"
         rec = json.loads((out / "RUN.json").read_text(encoding="utf-8"))
 
-        def with_record(**changes) -> dict:
+        def with_record(**changes) -> dict:     # as if the run had written it so (V2.1: its manifest made again)
             (out / "RUN.json").write_text(json.dumps({**rec, **changes}), encoding="utf-8")
+            (out / R.MANIFEST).write_text(json.dumps(R.evidence_manifest(out)), encoding="utf-8")
             return verify(self.project, out)
         self.assertEqual(with_record(format="x"), {"verdict": "REFUTED", "problems": [f"RUN.json is not a run record of format {R.FORMAT}"]})
         self.assertIn("the run is not of this project bundle", with_record(bundle_digest="0")["problems"])

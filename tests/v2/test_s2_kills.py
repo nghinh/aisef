@@ -547,14 +547,20 @@ class AppVerify(unittest.TestCase):
         self.rec = json.loads((self.out / "RUN.json").read_text(encoding="utf-8"))
 
     def verify(self, **changes):
+        """The record as if the run had written it so (V2.1: its manifest made again — an edit without that is
+        refuted by the manifest, `test_v21_verify`)."""
+        from aisef2.app import run as R
         from aisef2.app.verify import verify
         (self.out / "RUN.json").write_text(json.dumps({**self.rec, **changes}), encoding="utf-8")
+        (self.out / R.MANIFEST).write_text(json.dumps(R.evidence_manifest(self.out)), encoding="utf-8")
         return verify(self.base.project, self.out)
 
     def test_the_answer_is_whole_and_every_branch_is_its_own(self):
+        from aisef2.app import run as R
         from aisef2.journal import format3
         n = len(self.base.journal().events)
-        self.assertEqual(self.verify(), {"verdict": "VERIFIED", "problems": [], "delivery_verdict": "PASS", "journal_events": n})
+        self.assertEqual(self.verify(), {"verdict": "VERIFIED", "problems": [], "delivery_verdict": "PASS", "journal_events": n,
+                                         "evidence_anchor": R.anchor_in(self.out), "notes": []})
         refused = self.verify(story_errors=[{"story": "S1", "error": "RuntimeError: x"}], delivery_verdict="FAIL")
         self.assertEqual((refused["verdict"], refused["delivery_verdict"]), ("VERIFIED", "FAIL"))
         self.assertEqual(self.verify(final_main=None)["verdict"], "VERIFIED")

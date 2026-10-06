@@ -8,6 +8,9 @@
     <out>/sessions     one event stream per model session
     <out>/RUN.json     the record — written in a `finally`, so a run that breaks (an exception, an invariant failure,
                        a refused shutdown, an interruption) still leaves it beside its journal (B3)
+    <out>/EVIDENCE.json the evidence manifest (V2.1): the sha256 of the record, the journal, every session stream and
+                       the preflight's files, written after the record; its own digest is the run's evidence anchor,
+                       printed for the operator to keep outside the run directory (`aisef run --verify --expect-anchor`)
 
 Order: the bundle and the settings load (every seal re-checked); the repository is cloned and its requirements document
 checked against the bundle; the plan is admitted (RFC §12); the probe interpreter is made; the route is attested by
@@ -48,6 +51,8 @@ from aisef2.runtime.run_scope import RunScope, ShutdownRefused
 from aisef2.runtime.runspec import resolve
 
 FORMAT = "aisef-v2-run-record/1"
+MANIFEST = "EVIDENCE.json"
+MANIFEST_FORMAT = "aisef-v2-evidence/1"
 
 
 class RunRefused(Exception):
@@ -158,6 +163,19 @@ def client_identity(exe: str | None) -> str:
     return f"opencode {version} binary-sha256:{_sha(pathlib.Path(exe).read_bytes())}"
 
 
+def layers_of(project: Project, settings: Settings) -> dict:
+    """The RunSpec's settings layers (everything but the revision): what `runspec_hash` binds of the bundle and the
+    settings — and so what `verify` re-derives the hash from to bind RUN.json's settings to the journal."""
+    return {"workload": {"value": project.name, "layer": "bundle"}, "bundle_digest": {"value": project.digest, "layer": "bundle"},
+            "plan_hash": {"value": project.plan.plan_hash, "layer": "plan"},
+            "requirements_sha256": {"value": project.requirements_sha256, "layer": "bundle"},
+            "settings_sha256": {"value": _sha(json.dumps(settings.content, sort_keys=True).encode()), "layer": "settings"},
+            "limits": {"value": {k.value: v for k, v in settings.limits.items()}, "layer": "settings"},
+            "budget": {"value": settings.budget, "layer": "settings"},
+            "max_turns_per_session": {"value": settings.max_turns_per_session, "layer": "settings"},
+            "timeouts_s": {"value": settings.timeouts_s, "layer": "settings"}}
+
+
 def runspec_of(project: Project, settings: Settings, pre: dict, client_id: str, python: str, scanner):
     obs = pre["observation"]
     identity = {"provider": settings.provider, "endpoint": settings.endpoint, "declared_model": settings.model,
@@ -171,15 +189,7 @@ def runspec_of(project: Project, settings: Settings, pre: dict, client_id: str, 
             verified("git", pathlib.Path(shutil.which("git")), Enforcement.PARTIAL),
             *[verified(e.probe_id, e.probe_digest.encode(), Enforcement.PARTIAL) for e in catalog.CATALOG if e.active],
             *models, scan]
-    layers = {"workload": {"value": project.name, "layer": "bundle"}, "bundle_digest": {"value": project.digest, "layer": "bundle"},
-              "plan_hash": {"value": project.plan.plan_hash, "layer": "plan"},
-              "requirements_sha256": {"value": project.requirements_sha256, "layer": "bundle"},
-              "settings_sha256": {"value": _sha(json.dumps(settings.content, sort_keys=True).encode()), "layer": "settings"},
-              "limits": {"value": {k.value: v for k, v in settings.limits.items()}, "layer": "settings"},
-              "budget": {"value": settings.budget, "layer": "settings"},
-              "max_turns_per_session": {"value": settings.max_turns_per_session, "layer": "settings"},
-              "timeouts_s": {"value": settings.timeouts_s, "layer": "settings"}}
-    return resolve(caps, layers, project.plan.baseline)
+    return resolve(caps, layers_of(project, settings), project.plan.baseline)
 
 
 def productproof(project: Project, events: list[dict], committed: set[str]) -> dict:
@@ -218,6 +228,61 @@ def delivery(project: Project, events: list[dict], results: dict, budget_stop: s
         + ([f"{len(errors)} stories were refused"] if errors else [])
     verdict = "NOT_REACHED" if not decided else ("FAIL" if blocked else "PASS")
     return verdict, blocked, committed
+
+
+def outcomes_from(events: list[dict]) -> dict[str, list[str]]:
+    """Each story's outcomes, in order, as the journal records its decisions (story/commit, story/rollback,
+    story/retry) — the story_state projection's words."""
+    word = {"story/commit": "COMMIT", "story/rollback": "ROLLBACK", "story/retry": "RETRY"}
+    out: dict[str, list[str]] = {}
+    for e in events:
+        if e["type"] in word:
+            out.setdefault(e["data"]["story_id"], []).append(word[e["type"]])
+    return out
+
+
+def unfinished(events: list[dict]) -> list[str]:
+    """Stories the journal shows begun more often than ended: an attempt that broke off (a refused story)."""
+    begun: dict[str, int] = {}
+    for e in events:
+        if e["type"] in ("story/begin", "story/end"):
+            s = e["data"]["story_id"]
+            begun[s] = begun.get(s, 0) + (1 if e["type"] == "story/begin" else -1)
+    return sorted(s for s, n in begun.items() if n > 0)
+
+
+def _content_sha(p: pathlib.Path) -> str:
+    """A file's sha256 — for the record, of its canonical JSON content (a re-serialised identical record is the same
+    record; any changed value is not)."""
+    data = p.read_bytes()
+    if p.name == "RUN.json":
+        try:
+            data = json.dumps(json.loads(data), sort_keys=True, separators=(",", ":")).encode("utf-8")
+        except ValueError:
+            pass
+    return _sha(data)
+
+
+def evidence_manifest(out: pathlib.Path) -> dict:
+    """The sha256 of every file a verification re-derives from (the repository aside: `final_main` is checked in it):
+    the record, the journal, each session stream, the preflight's ledger and observation."""
+    files = [out / "RUN.json", *sorted((out / "run" / "journals").glob("*.jsonl")), *sorted((out / "sessions").glob("*.jsonl")),
+             *sorted((out / "preflight").glob("*"))]
+    return {"format": MANIFEST_FORMAT,
+            "files": {p.relative_to(out).as_posix(): _content_sha(p) for p in files if p.is_file()}}
+
+
+def anchor_in(out: pathlib.Path) -> str | None:
+    """The evidence anchor of the run directory `out` as its manifest says, or None (no manifest)."""
+    try:
+        return anchor_of(json.loads((out / MANIFEST).read_text(encoding="utf-8")))
+    except (OSError, ValueError):
+        return None
+
+
+def anchor_of(manifest: dict) -> str:
+    """The run's evidence anchor: the digest of its manifest's canonical JSON."""
+    return _sha(json.dumps(manifest, sort_keys=True, separators=(",", ":")).encode("utf-8"))
 
 
 def budget_stops(not_run: list[str], sessions: list[dict], budget) -> str | None:
@@ -349,6 +414,11 @@ def execute(project: Project, settings: Settings, source: pathlib.Path, out: pat
                        failure=None if failure is None else {"type": type(failure).__name__, "detail": str(failure)[:2000],
                                                              "stage": rec.get("stage")})
             (out / "RUN.json").write_text(json.dumps(rec, indent=1, sort_keys=True, default=str) + "\n", encoding="utf-8")
+            try:    # after the record: the manifest binds it; its digest is the anchor the operator keeps
+                (out / MANIFEST).write_text(json.dumps(evidence_manifest(out), indent=1, sort_keys=True) + "\n", encoding="utf-8")
+            except OSError:
+                if failure is None:
+                    raise
     return rec
 
 
