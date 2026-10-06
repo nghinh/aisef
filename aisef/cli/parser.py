@@ -185,6 +185,8 @@ def build_parser() -> argparse.ArgumentParser:
     # `run` to aisef2.app.cli.run before this parser runs; the entry here only lists the command and its pointer.
     sub.add_parser("run", help="run the V2 runtime (authoritative); arguments go to aisef2.app.cli — "
                                "see docs/v2/USAGE.md")
+    # V2.1: `aisef bundle ...` → aisef2.app.bundle_cli.main, the bundle's own tools (no run, no provider)
+    sub.add_parser("bundle", help="the V2 project bundle's tools (migrate, ...); arguments go to aisef2.app.bundle_cli")
 
     # V1 execution survives only behind this explicitly named legacy surface, never as the default.
     lg = sub.add_parser("legacy", help="V1 compatibility surface (legacy, never the default): `aisef legacy run ...`")
@@ -419,6 +421,9 @@ def main(argv: list[str] | None = None) -> int:
                   "aisef; V1 execution is only `aisef legacy run`", file=sys.stderr)
             return EXIT_USAGE
         return v2_run(argv[:i] + argv[i + 1:])
+    if argv[i:i + 1] == ["bundle"]:
+        from aisef2.app.bundle_cli import main as v2_bundle
+        return v2_bundle(argv[i + 1:])
     parser = build_parser()
     _cho_moi_lenh_nhan_project(parser)
     args = parser.parse_args(argv)

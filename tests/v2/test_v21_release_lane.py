@@ -46,8 +46,10 @@ class Subject(Tree):
         self.frozen("V2.0-RC2-FREEZE.json")
         self.assertEqual(R.subject(self.root), ("2.0.0", "RC2", "RC2", "closure-evidence/v2/release/V2.0-RC2-FREEZE.json"))
 
-    def test_the_repository_is_2_0_0_s_record_unchanged(self):
-        self.assertEqual((R.RC, R.TAG, R.OUT_REL), ("RC2", "RC2", "closure-evidence/v2/release/V2.0-RC2-FREEZE.json"))
+    def test_the_repository_keeps_2_0_0_s_candidates_and_this_tree_is_not_2_0_0(self):
+        self.assertEqual(R.frozen_rcs("2.0.0"), ["RC1", "RC2"])
+        self.assertNotEqual(R.VERSION, "2.0.0")    # a build of this tree never claims to be the released 2.0.0
+        self.assertEqual(R.OUT_REL, R.freeze_rel(R.VERSION, R.RC))
 
     def test_a_patch_version_has_its_own_candidates_never_2_0_0_s(self):
         self.version("2.0.1")

@@ -22,7 +22,7 @@ from typing import Callable, Mapping
 from aisef2.arch.enums import ObligationRole, SubjectKind
 from aisef2.errors import InvariantError
 from aisef2.plan.obligation import EXPECTED_AT_PARENT, Plan, PlanError, PlanObligation
-from aisef2.probe.calibration import ProbeCapabilityCalibration, calibration_for
+from aisef2.probe.calibration import ProbeCapabilityCalibration, calibration_for, executing
 from aisef2.probe.protocol import Probe, ProbeRegistry
 from aisef2.product.approval import ContractApproval, Requirement, require_approved
 from aisef2.product.compiler import ProbeRef, compile_spec
@@ -264,8 +264,9 @@ def check_probe_calibration(plan: Plan, inputs: AdmissionInputs) -> list[str]:
         cls = inputs.registry.observation_class(probe.id, probe.digest, spec)
         if cls is None:
             out.append(f"spec {sid}: {probe.id} does not support the observation it asks for")
-        elif calibration_for(inputs.calibrations, probe.id, probe.digest, cls) is None:
-            out.append(f"spec {sid}: no ProbeCapabilityCalibration for {probe.id}@{probe.digest[:12]} class {cls!r}")
+        elif calibration_for(inputs.calibrations, probe.id, executing(probe), cls) is None:     # V2.1: the bytes that run
+            out.append(f"spec {sid}: no ProbeCapabilityCalibration for {probe.id}@{probe.digest[:12]} executing "
+                       f"{executing(probe)[:12]} class {cls!r}")
     return out
 
 

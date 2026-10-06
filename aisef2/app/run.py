@@ -3,7 +3,9 @@
     <out>/repo         the project cloned at the plan's baseline: main, every candidate and every merge
     <out>/run          the kernel's RunScope: the raw hash-chained journal (journals/<run_id>.jsonl), lease, sentinel
     <out>/work         the kernel's worktrees (each released by the story that owns it)
-    <out>/probe-python the interpreter probes and developer tests run with: a venv of its own, no site packages (B6)
+    <out>/test-python  the interpreter the developer's tests run with: a venv of its own, no site packages (B6). The
+                       probes never run on it (V2.1): they run on the interpreter this kernel runs on, -I -S, so what
+                       test code writes into its own interpreter's tree (a `.pth`, the interpreter) reaches no proof
     <out>/preflight    the provider preflight's ledger and observation
     <out>/sessions     one event stream per model session
     <out>/RUN.json     the record — written in a `finally`, so a run that breaks (an exception, an invariant failure,
@@ -13,7 +15,7 @@
                        printed for the operator to keep outside the run directory (`aisef run --verify --expect-anchor`)
 
 Order: the bundle and the settings load (every seal re-checked); the repository is cloned and its requirements document
-checked against the bundle; the plan is admitted (RFC §12); the probe interpreter is made; the route is attested by
+checked against the bundle; the plan is admitted (RFC §12); the test interpreter is made; the route is attested by
 the preflight (an identity stop otherwise); the RunSpec is resolved and the run begins; the stories run in dependency
 order through the kernel's story runner while the budget holds. The delivery verdict comes from the journal only;
 plan quality is NOT_CLAIMED (no PlanQualityPolicy is preregistered by a run)."""
@@ -42,7 +44,7 @@ from aisef2.orchestrate.quality import TestsPolicy
 from aisef2.orchestrate.workspace import REFUSED, GitMerger, GitWorkspace, git
 from aisef2.plan import static_admission as sa
 from aisef2.probe import catalog
-from aisef2.probe.calibration import ProbeCapabilityCalibration
+from aisef2.probe.calibration import ProbeCapabilityCalibration, executing
 from aisef2.probe.protocol import ExecutionEnv
 from aisef2.product.contract import plain
 from aisef2.quality import test_execution as te
@@ -135,8 +137,9 @@ def check_repository(project: Project, repo: pathlib.Path, *, clone: bool = True
 
 
 def probe_interpreter(where: pathlib.Path, python: str = sys.executable) -> str:
-    """B6: the interpreter probes and developer tests run with — a fresh venv of this run's own, without pip and
-    without the host's site packages, so no `.pth` file of the host runs in a proof."""
+    """B6: the interpreter the developer's tests run with — a fresh venv of this run's own, without pip and without the
+    host's site packages. V2.1: the probes do not run on it (360° security W1: test code wrote a `.pth` into it, which
+    the probes' `-I` interpreter then ran): they run on `sys.executable` with `-I -S`, outside the run directory."""
     subprocess.run([python, "-I", "-m", "venv", "--without-pip", str(where)], check=True, capture_output=True)
     exe = where / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
     if not exe.exists():
@@ -177,6 +180,8 @@ def layers_of(project: Project, settings: Settings) -> dict:
 
 
 def runspec_of(project: Project, settings: Settings, pre: dict, client_id: str, python: str, scanner):
+    """The run's RunSpec. `python` is the developer tests' interpreter; the probes' is this process's (V2.1), and each
+    active probe is bound by the digest of the bytes that run (its EXECUTION_DIGEST, V2-007)."""
     obs = pre["observation"]
     identity = {"provider": settings.provider, "endpoint": settings.endpoint, "declared_model": settings.model,
                 "route": settings.route, "client": client_id}
@@ -185,9 +190,10 @@ def runspec_of(project: Project, settings: Settings, pre: dict, client_id: str, 
     scan = (verified("scanner", pathlib.Path(scanner.exe), Enforcement.PARTIAL, tool="ruff") if scanner.name == "ruff"
             else opaque("scanner", Enforcement.PARTIAL, tool="none"))
     caps = [verified("kernel", kernel_digest().encode(), Enforcement.FULL),
-            verified("python", pathlib.Path(python), Enforcement.PARTIAL, version=platform.python_version()),
+            verified("python", pathlib.Path(sys.executable), Enforcement.PARTIAL, version=platform.python_version()),
+            verified("test-python", pathlib.Path(python), Enforcement.PARTIAL),
             verified("git", pathlib.Path(shutil.which("git")), Enforcement.PARTIAL),
-            *[verified(e.probe_id, e.probe_digest.encode(), Enforcement.PARTIAL) for e in catalog.CATALOG if e.active],
+            *[verified(e.probe_id, executing(e.factory).encode(), Enforcement.PARTIAL) for e in catalog.CATALOG if e.active],
             *models, scan]
     return resolve(caps, layers_of(project, settings), project.plan.baseline)
 
@@ -323,8 +329,8 @@ def execute(project: Project, settings: Settings, source: pathlib.Path, out: pat
         rec["admission"] = admit(project, calibrations() if cals is None else cals)
         if not rec["admission"]["admitted"]:
             raise RunRefused(f"the plan is not admitted (RFC §12): {rec['admission']['failed']}")
-        rec["stage"] = "probe interpreter"
-        python = probe_interpreter(out / "probe-python")
+        rec["stage"] = "test interpreter"
+        python = probe_interpreter(out / "test-python")
         rec["stage"] = "preflight"
         # exactly the PATH the run gives the client: none given, nothing found (never the os.defpath fallback)
         exe = client_exe or shutil.which("opencode", path=client.environment(settings.client_env, {}).get("PATH", ""))
@@ -367,7 +373,7 @@ def execute(project: Project, settings: Settings, source: pathlib.Path, out: pat
         adapters = sr.Adapters(developer, reviewer, scanner, merger, ws)
         factories = {e.probe_id: (lambda on_range, scratch, f=e.factory: f(on_range=on_range, scratch=scratch))
                      for e in catalog.CATALOG}
-        env = ExecutionEnv(python, settings.timeouts_s["probe"], Enforcement.PARTIAL)
+        env = ExecutionEnv(sys.executable, settings.timeouts_s["probe"], Enforcement.PARTIAL)   # V2.1: never the tests' venv
         policy = sr.Policy(settings.limits, TestsPolicy(True), tool_timeout_s=settings.timeouts_s["tool"])
         delivered: dict[str, bool] = {}
         for story in project.order():
@@ -379,7 +385,8 @@ def execute(project: Project, settings: Settings, source: pathlib.Path, out: pat
             tests = tuple(project.stories[story]["tests"])
             inputs = sr.StoryInputs(project.specs, factories, env, te.DeveloperTests(story, tests),
                                     te.DeveloperTests(story, regression_tests(repo, project, story, delivered)),
-                                    te.Dependencies(frozenset(), frozenset(project.product_roots)), te.UNITTEST)
+                                    te.Dependencies(frozenset(), frozenset(project.product_roots)), te.UNITTEST,
+                                    test_interpreter=python)
             try:
                 r = sr.run_story(run, project.plan, story, inputs, adapters, policy)
                 results[story] = [a.outcome for a in r.attempts]

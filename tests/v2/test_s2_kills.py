@@ -125,7 +125,7 @@ class CallableHarnessArgv(unittest.TestCase):
 
     def test_the_harness_command_line_names_the_fresh_cache_prefix(self):
         self.assertEqual(pc2._harness_argv("/py", "/w/ask.json", "/w/pyc"),
-                         ["/py", "-I", "-B", "-X", "pycache_prefix=/w/pyc", "-c", pc2.HARNESS, "/w/ask.json"])
+                         ["/py", "-I", "-S", "-B", "-X", "pycache_prefix=/w/pyc", "-c", pc2.HARNESS, "/w/ask.json"])
 
 
 class WorkspaceConfigListing(unittest.TestCase):
@@ -316,7 +316,8 @@ class AppRunSpec(unittest.TestCase):
                 probes = {e.probe_id: ("VERIFIED", "PARTIAL") for e in catalog.CATALOG if e.active}
                 self.assertEqual(caps, {"kernel": ("VERIFIED", "FULL"), "python": ("VERIFIED", "PARTIAL"),
                                         "git": ("VERIFIED", "PARTIAL"), "developer": ("ATTESTED", "PARTIAL"),
-                                        "reviewer": ("ATTESTED", "PARTIAL"), "scanner": (grade, "PARTIAL"), **probes})
+                                        "reviewer": ("ATTESTED", "PARTIAL"), "scanner": (grade, "PARTIAL"),
+                                        "test-python": ("VERIFIED", "PARTIAL"), **probes})
                 self.assertEqual(dict({c.name: c for c in spec.capabilities}["scanner"].tuple_).get("tool"), tool)
                 self.assertEqual(plain(spec.settings), {
                     "revision": {"value": "a" * 40, "layer": "run"},
@@ -449,7 +450,7 @@ class AppExecute(unittest.TestCase):
                           "generalization_claim": "NONE", "budget_stop": None, "failure": None})
         self.assertEqual(rec["journal"]["closed"], "SHUTDOWN")
         self.assertTrue(rec["sessions"] and all("text" not in s for s in rec["sessions"]))
-        self.assertTrue(all(d.is_dir() for d in (out / "work" / "ws", out / "work" / "merge", out / "probe-python")))
+        self.assertTrue(all(d.is_dir() for d in (out / "work" / "ws", out / "work" / "merge", out / "test-python")))
         self.assertEqual(seen["delivered"], {"S1": True})
         self.assertEqual(seen["secrets"], ("env-provider-key-0001",))
         self.assertEqual(seen["policy"], sr.Policy(self.st.limits, TestsPolicy(True), tool_timeout_s=self.st.timeouts_s["tool"]))
@@ -477,7 +478,7 @@ class AppExecute(unittest.TestCase):
         msg, stage = self.refusal(self.tmp / "o3", cals=())
         self.assertEqual(stage, "admission")
         with mock.patch.object(R, "probe_interpreter", side_effect=R.RunRefused("no interpreter")):
-            self.assertEqual(self.refusal(self.tmp / "o4"), ("no interpreter", "probe interpreter"))
+            self.assertEqual(self.refusal(self.tmp / "o4"), ("no interpreter", "test interpreter"))
         import shutil
         (self.tmp / "gitonly").mkdir()
         (self.tmp / "gitonly" / "git").symlink_to(shutil.which("git"))     # git, and no client, on the run's PATH
@@ -730,7 +731,8 @@ class AppBundleLoad(unittest.TestCase):
         with self.assertRaises(bundle.BundleError) as c:
             bundle.load({**doc, "contracts": []})
         self.assertEqual(str(c.exception), f"the plan names {len(named)} spec(s) no approved contract compiles to under this "
-                                           f"release's probes: {named[:3]}")
+                                           f"release's probes: {named[:3]} — a bundle of an earlier release: "
+                                           "`aisef bundle migrate`")
 
 
 FAKE_OPENCODE = """

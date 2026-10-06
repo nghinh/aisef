@@ -5,6 +5,8 @@
   be `SATISFIED`. "Observed producing REFUTED" would qualify a probe that always returns REFUTED — for a
   MUST_NOT_HOLD contract that is exactly the probe calibration exists to reject.
 * **`ProbeCapabilityCalibration`** (§9.1.1) qualifies a probe implementation *at a digest* for one observation class,
+  the digest of the bytes that ran (`execution_digest`, V2.1 / V2-007: a spec binds the probe's capability, a
+  calibration the execution it demonstrated — `executing(probe)`; a probe without the split has one digest for both),
   against a committed positive fixture (the observable IS present) and a committed negative one (it is ABSENT). The
   positive fixture is the counterexample for a REFUTED expectation, the negative one for a SATISFIED expectation, so a
   record exists only when both contrasts are demonstrated: one record qualifies the class for both polarities, and a
@@ -61,6 +63,11 @@ class SpecFalsifiabilityEvidence:
             raise InvariantError("observed is a BehaviorVerdict")
         if not self.counterexample_ref:
             raise InvariantError("a counterexample is named by a journal or fixture locator")
+
+
+def executing(probe) -> str:
+    """The digest of the bytes `probe` runs: its EXECUTION_DIGEST, or its one digest when it has no split (Cycle 1)."""
+    return getattr(probe, "execution_digest", None) or probe.digest
 
 
 class NotQualified(InvariantError):
@@ -121,12 +128,13 @@ def calibrate(probe: Probe, observation_class: str, positive: pathlib.Path, nega
         raise NotQualified(f"{probe.id}@{probe.digest[:12]} is not qualified for {observation_class!r}: "
                            + "; ".join(problems))
     pos, neg = names or (str(positive), str(negative))
-    return ProbeCapabilityCalibration(probe.id, probe.digest, observation_class, pos, neg, float(clock()))
+    return ProbeCapabilityCalibration(probe.id, executing(probe), observation_class, pos, neg, float(clock()))
 
 
 def calibration_for(calibrations, probe_id: str, probe_digest: str, observation_class: str
                     ) -> ProbeCapabilityCalibration | None:
-    """The record qualifying (probe id, digest, class), if any: a record for another digest qualifies nothing."""
+    """The record qualifying (probe id, executing digest, class), if any: a record for another digest qualifies
+    nothing."""
     return next((c for c in calibrations if isinstance(c, ProbeCapabilityCalibration)
                  and (c.probe_id, c.probe_digest, c.observation_class) == (probe_id, probe_digest, observation_class)),
                 None)

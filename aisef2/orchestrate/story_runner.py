@@ -52,6 +52,9 @@ class StoryInputs:
     legacy: Mapping[str, str] = field(default_factory=dict)
     declarations: Mapping[str, SubjectAbsence] = field(default_factory=dict)
     migration_table: Mapping | None = None
+    #: V2.1: the interpreter the developer's tests run on, never the probes' (`env.interpreter`): test code that writes
+    #: into its own interpreter's tree (a `.pth`, the interpreter itself) does not reach a probe. None: env's (tests).
+    test_interpreter: str | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -262,7 +265,8 @@ def _attempt(run, plan: Plan, story_id: str, inputs: StoryInputs, adapters: Adap
                     try:
                         q = assess(run, story_id, str(verifier_wt.path), diff, inputs.story_tests,
                                    inputs.regression_tests, inputs.deps, inputs.runner, policy.tests,
-                                   interpreter=inputs.env.interpreter, timeout_s=policy.tool_timeout_s, on_range=tests_held)
+                                   interpreter=inputs.test_interpreter or inputs.env.interpreter,
+                                   timeout_s=policy.tool_timeout_s, on_range=tests_held)
                     finally:
                         tests_held.release()
                     checks.append(gate.check(run, story_id, "quality", q.failure is None,

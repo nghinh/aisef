@@ -185,7 +185,15 @@ def _probe_digest() -> str:
     return h.hexdigest()
 
 
-DIGEST = _probe_digest()
+#: V2.1 (ARCHITECTURE-EXCEPTION-V2-007): three identities, no longer one. A spec binds the probe's CAPABILITY — its id,
+#: this version and its observation classes — so a change to the bytes that does not change what any class observes
+#: leaves every spec, approval and plan valid; such a change is bumped here by hand when it does change an observation
+#: (a stimulus grammar, a verdict rule, a class's meaning). The bytes that run are EXECUTION_DIGEST: a calibration row
+#: and the run's RunSpec bind them, so a byte change needs its calibrations demonstrated again before anything admits.
+#: A matching digest is not evidence that two executions behave alike; the calibration contrast is the evidence.
+CAPABILITY_VERSION = 1
+EXECUTION_DIGEST = _probe_digest()
+DIGEST = hashlib.sha256(json.dumps([PROBE_ID, CAPABILITY_VERSION, list(CLASSES)]).encode("utf-8")).hexdigest()
 
 
 # --------------------------------------------------------------------------------------- shapes
@@ -456,7 +464,7 @@ def emit(tag, body=""):
     proto.flush()
     FSYNC(proto.fileno())
 emit("READY")
-agent = subprocess.Popen([req["interpreter"], "-I", "-B", "-X", "pycache_prefix=" + req["agent_pycache"], "-X", "utf8=1",
+agent = subprocess.Popen([req["interpreter"], "-I", "-S", "-B", "-X", "pycache_prefix=" + req["agent_pycache"], "-X", "utf8=1",
                           "-c", req["agent"], root, work], stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                          stderr=open(os.path.join(work, "agent.log"), "wb"), cwd=req["cwd"], env=req["env"])
 replies = queue.Queue()
@@ -674,7 +682,7 @@ def do_edit(step, state):
 def do_subprocess(step, state):
     prefix = os.path.join(work, "pycache-step" + str(state["i"]))
     os.mkdir(prefix)
-    cmd = [req["interpreter"], "-I", "-B", "-X", "pycache_prefix=" + prefix, "-X", "utf8=1", "-c", req["boot"],
+    cmd = [req["interpreter"], "-I", "-S", "-B", "-X", "pycache_prefix=" + prefix, "-X", "utf8=1", "-c", req["boot"],
            root] + step["argv"]
     done = guarded(state, lambda: subprocess.run(cmd, cwd=ws, env=req["env"], stdin=subprocess.DEVNULL,
                                                  stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL))
@@ -791,7 +799,7 @@ runpy.run_module(module, run_name="__main__", alter_sys=True)
 def _harness_argv(interpreter: str, ask: str, pycache: str) -> list[str]:
     """The harness command line: isolated mode, no bytecode written, the bytecode cache under a fresh prefix and UTF-8
     mode — each on the command line, because `-I` discards every PYTHON* variable (P7-FINDING-001)."""
-    return [interpreter, "-I", "-B", "-X", f"pycache_prefix={pycache}", "-X", "utf8=1", "-c", HARNESS, ask]
+    return [interpreter, "-I", "-S", "-B", "-X", f"pycache_prefix={pycache}", "-X", "utf8=1", "-c", HARNESS, ask]
 
 
 def _prepare(work: str, root: str, locator: str, steps: list, files: dict, nonce: str, key: str,
@@ -814,6 +822,7 @@ def _prepare(work: str, root: str, locator: str, steps: list, files: dict, nonce
 class ProcessEffectProbe(HarnessProbe):
     id = PROBE_ID
     digest = DIGEST
+    execution_digest = EXECUTION_DIGEST
 
     def __init__(self, on_range=None, scratch: str | None = None) -> None:
         """`on_range` and `scratch` as python_callable and cli_invocation: harness-owned hooks — the range is acquired

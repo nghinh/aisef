@@ -30,7 +30,31 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 SHIPPED_REL = "aisef2/app/calibrations.py"
-RECORD_REL = "closure-evidence/v2/release/PROBE-CALIBRATIONS.json"
+
+
+def record_rel(version: str, n: int = 1) -> str:
+    """The n-th record of `version`'s calibrations: 2.0.0's keeps its name; a later version writes its own beside it,
+    and a recalibration of the same version (other bytes) the next number — a record is never rewritten."""
+    if version == "2.0.0":
+        return "closure-evidence/v2/release/PROBE-CALIBRATIONS.json"
+    return f"closure-evidence/v2/release/V{version}-PROBE-CALIBRATIONS{'' if n == 1 else f'-{n}'}.json"
+
+
+def newest_rel(version: str) -> tuple[str, int]:
+    """The version's newest calibration record (its path and number); number 1's path when there is none yet."""
+    n = 1
+    while version != "2.0.0" and (ROOT / record_rel(version, n + 1)).exists():
+        n += 1
+    return record_rel(version, n), n
+
+
+def _version() -> str:
+    import tomllib
+    return tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]["version"]
+
+
+#: V2.1: the record follows pyproject's version, so recalibrating a later tree never writes over 2.0.0's record
+RECORD_REL = newest_rel(_version())[0]
 FIXTURES_REL = "tests/v2/fixtures/calibration"
 KEYS = ("probe_id", "probe_digest", "observation_class", "positive_fixture", "negative_fixture")
 HEADER = '''"""The probe capability calibrations this release ships: one row per (active probe digest, observation class), each a
@@ -88,7 +112,8 @@ def shipped_source(rows: list[dict]) -> str:
 
 def record(rows: list[dict], problems: list[str], fixtures: dict) -> dict:
     from validation.qualification import common as C
-    return {"record": "AISEF V2.0 — THE PROBE CAPABILITY CALIBRATIONS THE RELEASE SHIPS",
+    return {"record": f"AISEF {_version()} — THE PROBE CAPABILITY CALIBRATIONS THE RELEASE SHIPS",
+            "keyed_by": "each active probe's EXECUTION_DIGEST (V2.1, V2-007): the bytes the contrast was demonstrated on",
             "generator": {"path": "validation/qualification/release_calibration.py", "sha256": C.lf_sha(HERE / "release_calibration.py")},
             "aisef2_tree": C.git("rev-parse", "HEAD:aisef2"), "shipped": SHIPPED_REL,
             "rows": [{k: r[k] for k in KEYS} for r in rows], "fixtures": fixtures, "problems": problems,
@@ -123,10 +148,19 @@ def main(argv: list[str] | None = None) -> int:
     if a.print or problems:
         print(json.dumps(rec, indent=1, sort_keys=True))
         return 1 if problems else 0
+    rel, n = newest_rel(_version())
+    if (ROOT / rel).exists():
+        if json.loads((ROOT / rel).read_text(encoding="utf-8")).get("rows") == rec["rows"]:
+            print(f"{rel} already records these rows: nothing written")
+            return 0
+        if _version() == "2.0.0":
+            print(f"{rel} is 2.0.0's record: never rewritten", file=sys.stderr)
+            return 1
+        rel = record_rel(_version(), n + 1)      # other bytes: the next record, the earlier one stays as history
     (ROOT / SHIPPED_REL).write_text(shipped_source(rows), encoding="utf-8")
-    (ROOT / RECORD_REL).parent.mkdir(parents=True, exist_ok=True)
-    (ROOT / RECORD_REL).write_text(json.dumps(rec, indent=1, sort_keys=True) + "\n", encoding="utf-8")
-    print(f"wrote {SHIPPED_REL} ({len(rows)} rows) and {RECORD_REL}")
+    (ROOT / rel).parent.mkdir(parents=True, exist_ok=True)
+    (ROOT / rel).write_text(json.dumps(rec, indent=1, sort_keys=True) + "\n", encoding="utf-8")
+    print(f"wrote {SHIPPED_REL} ({len(rows)} rows) and {rel}")
     return 0
 
 

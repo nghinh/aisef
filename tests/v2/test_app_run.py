@@ -28,7 +28,7 @@ from aisef2.arch.enums import ObligationRole, Owner, Polarity, SubjectAbsence, S
 from aisef2.journal import format3  # noqa: E402
 from aisef2.plan.obligation import EXPECTED_AT_PARENT, NOT_PREREGISTERED, Plan, PlanObligation  # noqa: E402
 from aisef2.probe import catalog  # noqa: E402
-from aisef2.probe.calibration import ProbeCapabilityCalibration  # noqa: E402
+from aisef2.probe.calibration import ProbeCapabilityCalibration, executing  # noqa: E402
 from aisef2.product.approval import ContractApproval, Requirement  # noqa: E402
 from aisef2.product.compiler import ProbeRef, compile_spec  # noqa: E402
 from aisef2.product.contract import BehaviorContract, Subject  # noqa: E402
@@ -135,8 +135,8 @@ def client_config(root: pathlib.Path, endpoint: str = "https://provider.invalid/
 
 
 def calibrations() -> tuple:
-    e = catalog.active()[SubjectKind.PYTHON_CALLABLE]
-    return (ProbeCapabilityCalibration(e.probe_id, e.probe_digest, "returns", "fixture:positive", "fixture:negative", 1.0),)
+    e = catalog.active()[SubjectKind.PYTHON_CALLABLE]     # V2.1 (V2-007): a row binds the bytes that run
+    return (ProbeCapabilityCalibration(e.probe_id, executing(e.factory), "returns", "fixture:positive", "fixture:negative", 1.0),)
 
 
 class ProductBase(unittest.TestCase):

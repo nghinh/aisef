@@ -174,7 +174,7 @@ def load(data: Mapping) -> Project:
     unknown = sorted({o.product_proof_spec_id for o in plan.obligations} - set(specs))
     if unknown:
         raise BundleError(f"the plan names {len(unknown)} spec(s) no approved contract compiles to under this release's "
-                          f"probes: {unknown[:3]}")
+                          f"probes: {unknown[:3]} — a bundle of an earlier release: `aisef bundle migrate`")
     criteria = {o.criterion_id for o in plan.obligations}
     facts = {k: dict(v) for k, v in data["facts"].items()}
     if set(facts) != criteria or any(set(v) != set(FACT_FIELDS) or not all(isinstance(x, str) for x in v.values())

@@ -108,7 +108,15 @@ def _probe_digest() -> str:
     return h.hexdigest()
 
 
-DIGEST = _probe_digest()
+#: V2.1 (ARCHITECTURE-EXCEPTION-V2-007): three identities, no longer one. A spec binds the probe's CAPABILITY — its id,
+#: this version and its observation classes — so a change to the bytes that does not change what any class observes
+#: leaves every spec, approval and plan valid; such a change is bumped here by hand when it does change an observation
+#: (a stimulus grammar, a verdict rule, a class's meaning). The bytes that run are EXECUTION_DIGEST: a calibration row
+#: and the run's RunSpec bind them, so a byte change needs its calibrations demonstrated again before anything admits.
+#: A matching digest is not evidence that two executions behave alike; the calibration contrast is the evidence.
+CAPABILITY_VERSION = 1
+EXECUTION_DIGEST = _probe_digest()
+DIGEST = hashlib.sha256(json.dumps([PROBE_ID, CAPABILITY_VERSION, list(CLASSES)]).encode("utf-8")).hexdigest()
 
 
 def window_of(observable) -> float | None:
@@ -421,6 +429,7 @@ def facts_of(reader, cls: str, rel: str, observable, stim: dict) -> dict:
 class FileArtifactProbe(HarnessProbe):
     id = PROBE_ID
     digest = DIGEST
+    execution_digest = EXECUTION_DIGEST
 
     def __init__(self, on_range=None, scratch: str | None = None) -> None:
         """`on_range` and `scratch` are the harness-owned constructor convention every catalog probe accepts
