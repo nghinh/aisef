@@ -177,8 +177,9 @@ def layers_of(project: Project, settings: Settings) -> dict:
             "budget": {"value": settings.budget, "layer": "settings"},
             "max_turns_per_session": {"value": settings.max_turns_per_session, "layer": "settings"},
             "timeouts_s": {"value": settings.timeouts_s, "layer": "settings"},
-            # V2.1: bound only when the settings name it, so a 2.0.0 run's RunSpec re-derives unchanged
-            **({"review": {"value": {k: settings.review[k] for k in ("policy", "min_severity")}, "layer": "settings"}}
+            # V2.1: bound only when the settings name it, so a 2.0.0 run's RunSpec re-derives unchanged — as given
+            # (policy and floor, and the finder with its pinned binary when named)
+            **({"review": {"value": dict(settings.content["review"]), "layer": "settings"}}
                if settings.review and settings.review.get("given") else {})}
 
 
@@ -382,7 +383,10 @@ def execute(project: Project, settings: Settings, source: pathlib.Path, out: pat
               "secrets": tuple(v for v in (*(os.environ.get(n, "") for n in settings.client_env), key) if len(v) >= 8)}
         developer = ad.Developer(run, project, logs, kw, settings.timeouts_s["developer"])
         reviewer = ad.Reviewer(run, project, logs, kw, settings.timeouts_s["reviewer"], review=settings.review,
-                               probe_timeout_s=settings.timeouts_s["probe"])
+                               probe_timeout_s=settings.timeouts_s["probe"], interpreter=sys.executable,
+                               route={"url": settings.endpoint, "token": key, "model": settings.model,
+                                      "env": {k: v for k, v in client.environment(settings.client_env, {}).items()
+                                              if k != "OPENCODE_CONFIG_CONTENT"}})
         adapters = sr.Adapters(developer, reviewer, scanner, merger, ws)
         factories = {e.probe_id: (lambda on_range, scratch, f=e.factory: f(on_range=on_range, scratch=scratch))
                      for e in catalog.CATALOG}

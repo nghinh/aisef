@@ -36,11 +36,15 @@ PROVIDER_KEYS = ("api_key_env", "endpoint", "listed_owner", "model_limit", "name
 KEYS = ("format", "client", "route", "provider", "client_env", "budget", "max_turns_per_session", "limits", "timeouts_s",
         "preflight")
 #: V2.1: optional keys. Absent, the run is exactly a 2.0.0 run and the record says which rule applied:
-#: review — {"policy": "fix-loop" | "advisory", "min_severity": "low" | "medium" | "high" | "critical"} (app/review_verify)
+#: review — {"policy": "fix-loop" | "advisory", "min_severity": "low" | "medium" | "high" | "critical"} (app/review_verify),
+#:   and optionally "finder": "model" (the default, 2.0.0's model reviewer) | "ocr" with "ocr": {"exe": <absolute path>,
+#:   "sha256": <the binary's>, "timeout_min": n, "max_tokens": n} (app/review_ocr)
 #: prices — the price table money is computed with (app/usage); absent, every cost is unknown (null), never 0
 OPTIONAL = ("review", "prices")
 #: what an absent `review` means: 2.0.0's rule (no finding blocks), named, never a silent default
-REVIEW_ABSENT = {"policy": "advisory", "min_severity": "critical", "given": False}
+REVIEW_ABSENT = {"policy": "advisory", "min_severity": "critical", "finder": "model", "ocr": None, "given": False}
+FINDERS = ("model", "ocr")
+OCR_KEYS = ("exe", "max_tokens", "sha256", "timeout_min")
 
 
 class SettingsError(ValueError):
@@ -116,10 +120,24 @@ def load(data: Mapping) -> Settings:
     if "review" in data:
         from aisef2.app.review_verify import POLICIES, SEVERITIES
         r = data["review"]
-        if not isinstance(r, Mapping) or sorted(r) != ["min_severity", "policy"] or r["policy"] not in POLICIES \
-                or r["min_severity"] not in SEVERITIES:
-            raise SettingsError(f"review is {{policy: one of {list(POLICIES)}, min_severity: one of {list(SEVERITIES)}}}")
-        review = {"policy": r["policy"], "min_severity": r["min_severity"], "given": True}
+        if not isinstance(r, Mapping) or not {"min_severity", "policy"} <= set(r) <= {"min_severity", "policy", "finder", "ocr"} \
+                or r["policy"] not in POLICIES or r["min_severity"] not in SEVERITIES:
+            raise SettingsError(f"review is {{policy: one of {list(POLICIES)}, min_severity: one of {list(SEVERITIES)}}}"
+                                f" and optionally finder: one of {list(FINDERS)}")
+        finder = r.get("finder", "model")
+        if finder not in FINDERS or (finder == "ocr") != ("ocr" in r):
+            raise SettingsError(f"review.finder is one of {list(FINDERS)}; review.ocr is given exactly when it is ocr")
+        ocr = None
+        if finder == "ocr":
+            o = r["ocr"]
+            if not isinstance(o, Mapping) or sorted(o) != list(OCR_KEYS) or not isinstance(o["exe"], str) \
+                    or not pathlib.PurePath(o["exe"]).is_absolute() \
+                    or not (isinstance(o["sha256"], str) and len(o["sha256"]) == 64
+                            and all(ch in "0123456789abcdef" for ch in o["sha256"])):
+                raise SettingsError(f"review.ocr is {{{', '.join(OCR_KEYS)}}}: the binary by absolute path and its sha256")
+            ocr = {"exe": o["exe"], "sha256": o["sha256"], "timeout_min": _count(o["timeout_min"], "review.ocr.timeout_min"),
+                   "max_tokens": _count(o["max_tokens"], "review.ocr.max_tokens")}
+        review = {"policy": r["policy"], "min_severity": r["min_severity"], "finder": finder, "ocr": ocr, "given": True}
     if "prices" in data:
         from aisef2.app.usage import price_problem
         why = price_problem(data["prices"])

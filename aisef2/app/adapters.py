@@ -1,35 +1,49 @@
 """The developer, the reviewer and the scanner the kernel's story runner calls (aisef2.orchestrate.adapters protocols).
 
 The developer works in the kernel's checkout of the story and the harness commits what it changed (every git the
-kernel runs is under the isolated configuration of aisef2.orchestrate.workspace, B4). A model review never blocks
-(RFC §25): its findings carry no corroboration. The scanner is informational: ruff when the operator has it, else a
+kernel runs is under the isolated configuration of aisef2.orchestrate.workspace, B4). A finding blocks only when the
+kernel's own probe reproduces it and the bundle's approved contracts anchor its expectation (V2.1, app/review_verify);
+a review alone never does (RFC §25). The scanner is informational: ruff when the operator has it, else a
 scanner that reports nothing — the record says which."""
 
 from __future__ import annotations
 
 import hashlib
 import json
+import os
 import pathlib
 import re
 import shutil
 import sys
+import time
 
-from aisef2.app import client, feedback, review_verify
+from aisef2.app import client, feedback, review_ocr, review_verify
 from aisef2.app.bundle import Project
 from aisef2.arch.enums import ControlProjection
 from aisef2.journal.format2 import OperationOutcome as O
-from aisef2.orchestrate.adapters import Finding, Implemented, ProviderOutage, Reviewed, Scanned
+from aisef2.orchestrate.adapters import CapabilityUnrunnable, Finding, Implemented, ProviderOutage, Reviewed, Scanned
+from aisef2.orchestrate.workspace import _ISOLATED_GIT as ISOLATED_GIT
 from aisef2.orchestrate.workspace import commit_all, git
+from aisef2.runtime.process_range import ProcessRange
 
 REVIEW_PROMPT = ("Review the implementation of story {story} of {name} in this read-only checkout against {requirements} "
                  "and these clauses:\n{clauses}\nDo not modify any file. Answer with ONLY one JSON object: "
                  '{{"findings": [{{"id": "short-id", "blocking": true or false, "severity": "low|medium|high|critical", '
-                 '"summary": "one line", "reproducer": null or {{"clause": "<requirement id>/<n>", "subject": '
+                 '"summary": "one line", "reproducer": null or {{"clause": "<requirement id>/<clause> as listed above, e.g. R-9/3", "subject": '
                  '{{"kind": "cli_invocation|python_callable|file_artifact|process_effect", "locator": "..."}}, '
                  '"stimulus": {{...}}, "observable": {{..., "within_s": 10}}}}}}]}}\n'
                  "A finding is acted on only when its reproducer — the behaviour the cited clause demands, in the probe's "
-                 "grammar — is observed NOT to hold when the kernel runs it; one without a reproducer is recorded for a "
-                 "person to triage.")
+                 "grammar — is observed NOT to hold when the kernel runs it, and the clause's approved criteria expect "
+                 "exactly that behaviour; any other finding is recorded for a person to triage.")
+#: what Open Code Review is told besides the diff (`--background-file`): the clauses, and how a comment states a
+#: behaviour the kernel can check (app/review_ocr.REPRODUCER_FENCE)
+OCR_BACKGROUND = ("You review a change to {name}. {requirements} in the repository is the authoritative specification; the "
+                  "change must satisfy these requirement clauses:\n{clauses}\n\nWhen a comment says the change violates "
+                  "one of these clauses, end the comment with a fenced block whose info string is aisef-reproducer, "
+                  "holding one JSON object: {{\"clause\": \"<requirement id>/<clause> as listed, e.g. R-9/3\", \"subject\": {{\"kind\": "
+                  "\"cli_invocation|python_callable|file_artifact|process_effect\", \"locator\": \"...\"}}, \"stimulus\": "
+                  "{{...}}, \"observable\": {{..., \"within_s\": 10}}}} — the behaviour the clause demands, which the change "
+                  "does not have. A comment without one is recorded for a person; it never blocks the change.")
 
 
 def _sha(data: bytes) -> str:
@@ -72,16 +86,52 @@ class Developer:
 
 
 class Reviewer:
+    """The review stage's finder and the verification of what it finds (V2.1). The finder is the model reviewer (an
+    OpenCode session, 2.0.0's) or Open Code Review (settings review.finder = "ocr": app/review_ocr). Whichever finds,
+    the kernel's probe verifies each reproducer and the bundle's approved contracts anchor its expectation
+    (app/review_verify); and the reviewed checkout must not change while the review runs: the candidate is captured
+    before the finder starts and every file of the checkout is compared after the finder and after the verification —
+    a change discards every finding (CapabilityUnrunnable: the review did not run on the candidate)."""
+
     def __init__(self, run, project: Project, logs: pathlib.Path, session_kw: dict, timeout_s: float,
-                 review: dict | None = None, probe_timeout_s: float = 60.0) -> None:
+                 review: dict | None = None, probe_timeout_s: float = 60.0, interpreter: str | None = None,
+                 route: dict | None = None) -> None:
         self.run, self.project, self.logs, self.kw, self.timeout_s = run, project, logs, session_kw, timeout_s
         self.sessions: list[dict] = []
         from aisef2.app.settings import REVIEW_ABSENT
         self.review_policy = review or REVIEW_ABSENT     # V2.1 (app/review_verify): what a confirmed finding does
         self.probe_timeout_s = probe_timeout_s
+        self.interpreter = interpreter or sys.executable     # the probes' (app/run: the run's probe interpreter)
+        self.route = route or {}                             # OCR's endpoint {url, token, model} and base environment
 
     def review(self, scope, criteria: tuple[str, ...]) -> Reviewed:
         attempt, _ = attempt_of(self.run, scope.story_id)
+        head = git(scope.root, "rev-parse", "HEAD")
+        if head.returncode != 0:
+            raise CapabilityUnrunnable("the checkout to review has no revision")
+        head = head.stdout.strip()
+        before = tree_of(scope.root)
+        ocr = self.review_policy.get("finder") == "ocr"
+        found, s, coverage = (self._ocr(scope, attempt, head) if ocr else self._model(scope, attempt))
+        _unchanged(scope.root, head, before, "the finder")
+        typed = []
+        for f in found:     # a finding is evidence only when the kernel's probe reproduces it and its clause anchors it
+            v = self._verify(f, scope.root, head)
+            a = review_verify.anchor(f, self.project) if isinstance(f.get("reproducer"), dict) else None
+            f["verification"] = {"status": v.status, "why": v.reason, "probe": v.probe, "observed": v.observed}
+            if a is not None:
+                f["anchor"] = {"status": a.status, "why": a.reason, "contracts": list(a.contracts)}
+            confirmed = review_verify.blocks(v, f, self.review_policy["policy"], self.review_policy["min_severity"], a)
+            typed.append(Finding(str(f.get("id")), confirmed or bool(f.get("blocking")),
+                                 (v.evidence(),) if confirmed else (), review_verify.detail(f, v, a)))
+        _unchanged(scope.root, head, before, "the verification")
+        s["findings"] = found
+        confirmed = sum(1 for t in typed if t.blocks)
+        return Reviewed(O.COMPLETED, tuple(typed), f"{len(found)} findings" + (f", {coverage}" if coverage else "")
+                        + (f", parsed={s.get('parsed')}" if not ocr else "")
+                        + (f", confirmed={confirmed}" if confirmed else ""))
+
+    def _model(self, scope, attempt: int) -> tuple[list, dict, str | None]:
         prompt = REVIEW_PROMPT.format(story=scope.story_id, name=self.project.name, requirements=self.project.requirements_path,
                                       clauses=feedback.clauses(self.project, scope.story_id))
         s = client.session(f"reviewer {scope.story_id}", prompt, scope.root,
@@ -96,28 +146,140 @@ class Reviewer:
             found = json.loads(m.group(0))["findings"] if m else []
         except (ValueError, KeyError):  # a {...} match loads as an object or not at all: no TypeError is possible
             found = []
-        found = [f for f in found if isinstance(f, dict)] if isinstance(found, list) else []
-        typed = []
-        for f in found:     # V2.1: a finding is evidence only when the kernel's probe reproduces it (review_verify)
-            v = self._verify(f, scope.root)
-            f["verification"] = {"status": v.status, "why": v.reason, "probe": v.probe, "observed": v.observed}
-            confirmed = review_verify.blocks(v, f, self.review_policy["policy"], self.review_policy["min_severity"])
-            typed.append(Finding(str(f.get("id")), confirmed or bool(f.get("blocking")),
-                                 (v.evidence(),) if confirmed else (), review_verify.detail(f, v)))
-        s["findings"] = found
-        confirmed = sum(1 for t in typed if t.blocks)
-        return Reviewed(O.COMPLETED, tuple(typed), f"{len(found)} findings, parsed={m is not None}"
-                        + (f", confirmed={confirmed}" if confirmed else ""))
+        s["parsed"] = m is not None
+        return ([f for f in found if isinstance(f, dict)] if isinstance(found, list) else []), s, None
 
-    def _verify(self, finding: dict, root: str) -> review_verify.Verification:
+    def _ocr(self, scope, attempt: int, head: str) -> tuple[list, dict, str]:
+        """Open Code Review on exactly the story's change (app/review_ocr): the controller's scope, its pinned binary,
+        its environment and HOME, a preview then the review, one session stream the budget and the evidence read."""
+        pin = self.review_policy["ocr"]
+        why = review_ocr.pinned(pin["exe"], pin["sha256"])
+        if why:
+            raise CapabilityUnrunnable(why)
+        story = scope.story_id
+        base = next((e.data["parent"] for e in reversed(self.run.events)
+                     if e.type == "story/begin" and e.data.get("story_id") == story), None)
+        if base is None:
+            raise CapabilityUnrunnable(f"the journal names no parent of {story}")
+        changed = git(scope.root, "diff", "--name-status", "--no-renames", f"{base}..{head}")
+        if changed.returncode != 0:
+            raise CapabilityUnrunnable(f"git diff {base[:12]}..{head[:12]} exited {changed.returncode}")
+        rows = [ln.split("\t", 1) for ln in changed.stdout.splitlines() if "\t" in ln]
+        mine = [(k, p) for k, p in rows if p.split("/")[0] in self.project.product_roots]
+        required = sorted(p for k, p in mine if k != "D")
+        log = self.logs / f"{story}.reviewer.{attempt}.jsonl"
+        budget = self.kw["budget"]
+        stopped = f"{log.name} exists: a session's evidence is never overwritten" if log.exists() \
+            else budget.reached(in_progress=True)
+        if stopped:
+            raise ProviderOutage(stopped)
+        work = self.logs.parent / "review" / f"{story}.{attempt}"
+        (work / "home").mkdir(parents=True)
+        rule, background = work / "rule.json", work / "background.md"
+        rule.write_text(json.dumps({"include": [f"{r}/**" for r in self.project.product_roots]}), encoding="utf-8")
+        background.write_text(OCR_BACKGROUND.format(name=self.project.name, requirements=self.project.requirements_path,
+                                                    clauses=feedback.clauses(self.project, story)), encoding="utf-8")
+        env = review_ocr.environment({**self.route.get("env", {}), **ISOLATED_GIT}, work / "home",
+                                     {k: self.route[k] for k in ("url", "token", "model")})
+        spent = budget.spend()
+        room = max(1, sum(budget.limits[k] - spent[k] for k in ("input_tokens", "output_tokens")))
+        common = {"repo": scope.root, "base": base, "head": head, "rule": str(rule), "model": self.route["model"],
+                  "max_tokens": pin["max_tokens"], "budget_tokens": room, "timeout_min": pin["timeout_min"],
+                  "background_file": str(background)}
+        started = time.monotonic()
+        code_p = _bounded(review_ocr.argv(pin["exe"], output=str(work / "preview.json"), preview=True, **common),
+                          scope.root, env, work / "preview.log", self.timeout_s, f"ocr preview {story}")
+        preview = review_ocr.read_output(work / "preview.json")
+        log.parent.mkdir(parents=True, exist_ok=True)
+        with log.open("x", encoding="utf-8") as fh:     # before the review starts: a stream that exists may have spent
+            fh.write(json.dumps({"type": "ocr_started", "finder": f"ocr {review_ocr.OCR['version']}"}) + "\n")
+        code = _bounded(review_ocr.argv(pin["exe"], output=str(work / "output.json"), **common), scope.root, env,
+                        work / "ocr.log", self.timeout_s, f"ocr review {story}")
+        output = review_ocr.read_output(work / "output.json")
+        summary = (output or {}).get("summary") or {}
+        counts = [summary.get(k) for k in ("input_tokens", "output_tokens")]
+        tokens = ({"input": counts[0], "output": counts[1], "reasoning": 0,
+                   "cache": {"read": int(summary.get("cache_read_tokens") or 0),
+                             "write": int(summary.get("cache_write_tokens") or 0)}}
+                  if all(isinstance(c, int) and not isinstance(c, bool) for c in counts) else None)
+        lines = [{"type": "ocr_preview", "exit": code_p, "document": preview},
+                 {"type": "ocr_output", "exit": code, "document": output},
+                 {"type": "text", "part": {"text": str((output or {}).get("message") or "")}},
+                 {"type": "step_finish", "part": {"tokens": tokens} if tokens else {}}]  # no tokens: unaccounted
+        with log.open("a", encoding="utf-8") as fh:
+            fh.write("".join(json.dumps(x, sort_keys=True) + "\n" for x in lines))
+        redacted = client.redact(log, (*self.kw.get("secrets", ()), self.route["token"]))
+        seen = client.read_session(log)
+        s = {"exit": code, "timed_out": code is None, "stopped": None, "started": True, "error": seen["error"],
+             "text": seen["text"], "turns": seen["turns"], "tokens": seen["tokens"],
+             "seconds": round(time.monotonic() - started, 1), "log": log.name, "redacted": redacted,
+             "story_id": story, "attempt": attempt, "role": "reviewer", "finder": f"ocr {review_ocr.OCR['version']}",
+             "required": required, "deleted": sorted(p for k, p in mine if k == "D")}
+        self.sessions.append(s)
+        cov = review_ocr.coverage(output, -1 if code is None else code, required=required, base=base, head=head,
+                                  preview=preview)
+        s["coverage"] = {"status": cov.status, "reasons": list(cov.reasons), "not_reviewable": list(cov.not_reviewable)}
+        if cov.status != review_ocr.COMPLETE:
+            what = ("timed out: " if code is None else "") + "; ".join(cov.reasons)
+            if cov.failure == "provider" or (cov.failed and all(i.get("classification") == "provider" for i in cov.failed)):
+                raise ProviderOutage(f"OCR could not reach the provider: {what}"[:600])
+            if self.review_policy["policy"] == "fix-loop":
+                raise CapabilityUnrunnable(f"review coverage INDETERMINATE (the candidate was not fully reviewed): {what}"[:600])
+        return review_ocr.findings(output, required), s, f"coverage {cov.status}" + (
+            f" ({'; '.join(cov.reasons)[:300]})" if cov.reasons else "")
+
+    def _verify(self, finding: dict, root: str, head: str) -> review_verify.Verification:
         if not isinstance(finding.get("reproducer"), dict):
             return review_verify.Verification(review_verify.UNVERIFIABLE, "no reproducer: the finding states no observable behaviour")
-        head = git(root, "rev-parse", "HEAD")
-        if head.returncode != 0:
-            return review_verify.Verification(review_verify.UNVERIFIABLE, "the reviewed checkout has no revision")
         return review_verify.verify(finding, requirements=self.project.requirements,
-                                    product_roots=self.project.product_roots, root=root, revision=head.stdout.strip(),
-                                    timeout_s=self.probe_timeout_s, interpreter=sys.executable)
+                                    product_roots=self.project.product_roots, root=root, revision=head,
+                                    timeout_s=self.probe_timeout_s, interpreter=self.interpreter)
+
+
+def tree_of(root: str) -> dict[str, str]:
+    """Every entry of a checkout but its .git, by relative path: a file's sha256, a link's target, a directory."""
+    out = {}
+    for d, dirs, files in os.walk(root):
+        dirs[:] = sorted(x for x in dirs if x != ".git")
+        for name in [*dirs, *files]:
+            p = pathlib.Path(d, name)
+            rel = p.relative_to(root).as_posix()
+            if p.is_symlink():
+                out[rel] = "link:" + os.readlink(p)
+            elif p.is_dir():
+                out[rel] = "dir"
+            else:
+                try:
+                    out[rel] = _sha(p.read_bytes())
+                except OSError as e:
+                    out[rel] = f"unreadable:{type(e).__name__}"
+    return out
+
+
+def _unchanged(root: str, head: str, before: dict, during: str) -> None:
+    now = git(root, "rev-parse", "HEAD")
+    if now.returncode != 0 or now.stdout.strip() != head:
+        raise CapabilityUnrunnable(f"the reviewed checkout changed during {during}: HEAD is no longer {head[:12]} "
+                                   "(every finding discarded)")
+    after = tree_of(root)
+    if after != before:
+        diff = sorted(k for k in set(before) | set(after) if before.get(k) != after.get(k))
+        raise CapabilityUnrunnable(f"the reviewed checkout changed during {during}: {diff[:10]} (every finding discarded)")
+
+
+def _bounded(argv: list[str], cwd: str, env: dict, out: pathlib.Path, timeout_s: float, name: str) -> int | None:
+    """One process in a range of its own, its output to `out`; its exit status, or None when `timeout_s` ran out (the
+    range is released either way)."""
+    with out.open("x", encoding="utf-8") as fh:
+        r = ProcessRange(name, argv, cwd=cwd, env=env, output=fh)
+        r.start()
+        try:
+            deadline, code = time.monotonic() + timeout_s, None
+            while code is None and time.monotonic() < deadline:
+                code = r.wait(min(client.POLL_S, max(0.0, deadline - time.monotonic())))
+            return code
+        finally:
+            r.release()
 
 
 class RuffScanner:
