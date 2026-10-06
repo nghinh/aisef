@@ -104,13 +104,19 @@ GENERATED = {
 }
 NOT_GENERATED = {
     "closure-evidence/v2/release/S2-MUTATION.json (+ P2/P6/cycle2 P1 mutation records)":
-        "320 targets stale (whole-module digests), 7482 mutants, ~32 h of one worker; mutation.py writes the fixed records "
-        "and its reuse proof needs byte-identical targets: a new phase in RECORDS/SUPERSEDED — the owner's design",
+        "never regenerated (320 targets stale by whole-module digest, 7482 mutants). Decided by the owner, B-03b "
+        "(RELEASE-DECISIONS seq 5): the phase V2.1 in RECORDS/SUPERSEDED takes them over with the 2.1 modules; its record is "
+        "closure-evidence/v2/v2.1/MUTATION.json (validation/qualification/v21_mutation_record.py); the 2.0 records stay history",
     "closure-evidence/v2/cycle2/C2-ORCHESTRATION-CONFORMANCE-REPAIR.json":
-        "historical; release_differences tolerates only V2.0's changed files: a ruling naming the v2.1 changes",
+        "historical, never re-written (c2_orchestration_repair --write refuses on 2.1). Decided by the owner, B-03d "
+        "(RELEASE-DECISIONS seq 5): the v2.1 changes are named, each by content, in "
+        "closure-evidence/v2/v2.1/CONFORMANCE-RULING.json (validation/qualification/v21_conformance_ruling.py), which "
+        "release_differences reads",
     "validation/qualification/q5.py corpus item post-merge-regression (release/Q5-RC2/CORPUS.json frozen)":
-        "an oracle: V21-38 proves PRESERVE at the candidate, so the item's expected outcome and model calls change — the "
-        "owner's decision; the frozen 2.0 corpus is never edited",
+        "the frozen 2.0 corpora are never edited. Decided by the owner, B-03d (RELEASE-DECISIONS seq 5): q5.CORPUS's two 2.1 "
+        "items developer-regression-at-candidate (replaces it: V21-38) and post-merge-integration-regression (keeps its "
+        "post-merge coverage), traced in validation/qualification/v21_q5_changes.py and measured under both kernels in "
+        "closure-evidence/v2/v2.1/Q5-KERNEL-COMPARISON.json",
 }
 
 

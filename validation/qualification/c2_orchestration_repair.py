@@ -45,6 +45,9 @@ the mutation record of the phase that owns story_runner.py's targets now.
 
 `--check` re-derives (d), (e) and (f) and compares them with the record, and requires the verdict the record states;
 (a), (b), (c) and (g) are executions — `--write` runs them and `--check` reads what they recorded.
+
+V2.1 (owner B-03d): the record is cycle-2 history. `--write` refuses before measuring once q5.CORPUS lacks a Cycle-1 item
+(`cycle1_items_refusal`); release_differences accepts the 2.1 changes only as the v2.1 conformance ruling names them.
 """
 
 from __future__ import annotations
@@ -215,7 +218,20 @@ CYCLE1_ITEMS = ("normal-completion", "retry-then-commit", "review-finding-rollba
                 "developer-outage-rollback", "post-merge-regression")
 
 
+def cycle1_items_refusal() -> str | None:
+    """V2.1 (owner B-03d): (b) needs every CYCLE1_ITEMS name in q5.CORPUS. 2.1 replaced post-merge-regression
+    (validation/qualification/v21_q5_changes.py), so on 2.1 nothing is measured: the record is cycle-2 history, never
+    re-written on 2.1 (its 2.1 standing: closure-evidence/v2/v2.1/CONFORMANCE-RULING.json and release_differences)."""
+    from validation.qualification import q5
+    missing = [i for i in CYCLE1_ITEMS if i not in {x.id for x in q5.CORPUS}]
+    return (f"refused before measuring: q5.CORPUS has no {missing}, which (b) measures by name — {OUT_REL} is cycle-2 "
+            "history and is never re-written on 2.1 (the 2.1 changes are named by closure-evidence/v2/v2.1/"
+            "CONFORMANCE-RULING.json; release_differences checks this tree against both)") if missing else None
+
+
 def _job_q5() -> dict:
+    if why := cycle1_items_refusal():
+        raise SystemExit(why)
     import aisef2
     from validation.qualification import q5
     kernel = pathlib.Path(aisef2.__file__).resolve().parent
@@ -543,6 +559,8 @@ def verdict_problems(rec: dict) -> list[str]:
 
 
 def write() -> dict:
+    if why := cycle1_items_refusal():
+        raise SystemExit(why)
     started = time.monotonic()
     with tempfile.TemporaryDirectory(prefix="aisef2-kernel-6311254-") as t:
         old_root = pathlib.Path(t)
@@ -646,14 +664,26 @@ def release_differences() -> list[str]:
     `check` and this function differ from its recorded commit (rebind.code_moved); identities that differ only in the
     ones a probe change moves (`probe_moved`), the probe sources only in `changed` files, the C2-P5 acceptance current up
     to probe identity (p5_acceptance.check, the re-binding rule); the mutation summary while every mutation record holds
-    (validation/v2/mutation.py check)."""
+    (validation/v2/mutation.py check).
+
+    V2.1 (owner B-03d, RELEASE-DECISIONS seq 5): the 2.1 changes are named by the committed ruling
+    closure-evidence/v2/v2.1/CONFORMANCE-RULING.json (v21_conformance_ruling.py), each BY CONTENT — a file is accepted
+    through it only while its LF sha256 is the ruling's sha256_2_1; no ruling, nothing new accepted. B-03a: the (e) gate
+    is the 2.0 acceptance kept as history and its literal v2.1 re-verification (p5_acceptance.history_problems,
+    reverification_problems), never p5_acceptance.check's probe-identity re-binding, never an engine-digest rule."""
     from validation.qualification import p5_acceptance as pa
     from validation.qualification import rebind
+    from validation.qualification import v21_conformance_ruling as ruling
     changed = {"aisef2/orchestrate/story_runner.py": "B7", "aisef2/orchestrate/adapters.py": "B4",
                "aisef2/orchestrate/workspace.py": "B4, B6, B7", "aisef2/probe/catalog.py": "B1",
                "aisef2/probe/cli_invocation.py": "B1, B1-BLOCKS-STOP-001", "aisef2/probe/process_effect.py": "B1, B1-BLOCKS-STOP-001",
                "aisef2/probe/python_callable_v2.py": "B1, B1-BLOCKS-STOP-001", "validation/v2/mutation.py": "S2 mutation phase",
                "tests/v2/test_c2_orchestration_conformance.py": "probe-identity re-binding; this rule"}
+    named = ruling.tolerated()   # V2.1: path -> its sha256 at 2.1, from the committed ruling ({} without one)
+
+    def ruled(rel: str) -> bool:   # content-bound: the ruling names the file at the bytes it has now
+        f = ROOT / rel
+        return rel in named and f.is_file() and _lf(f.read_bytes()) == named[rel]
     probe_moved = ("all_equal_to_accepted", "contract_spec_semantic_digest", "plan_hash", "plan_ok", "catalog",
                    "catalog_matches_the_brief", "probe_sources_vs_6311254", "probe_sources_identical_to_6311254")
     me = "validation/qualification/c2_orchestration_repair.py"
@@ -666,13 +696,15 @@ def release_differences() -> list[str]:
     for x in check(now):
         parts = x.split(" ", 2)
         if parts[0] == "(d)" and parts[2] in ("changed since the record", "changed since the base and is not in the record") and (
-                parts[1] in changed or parts[1] == me and rebind.code_moved(me, "4f6dfc1", ("check", "release_differences"))):
+                parts[1] in changed or ruled(parts[1])
+                or parts[1] == me and rebind.code_moved(me, "4f6dfc1", ("check", "release_differences"))):
             continue
         if x == "(e) the identities differ from the record":
-            stray = [k for k in moved if k not in probe_moved] + [r for r in sources if r not in changed]
-            if not stray and not pa.check():
+            stray = [k for k in moved if k not in probe_moved] + [r for r in sources if r not in changed and not ruled(r)]
+            if not stray and not pa.history_problems() and not pa.reverification_problems():
                 continue
-            x += f": beyond the release's probe change {stray}, or the C2-P5 acceptance is not current up to probe identity"
+            x += (f": beyond the V2.0 release's and the 2.1 ruling's probe changes {stray}, or the C2-P5 acceptance is not "
+                  "its v2.0.0 history or not re-verified on 2.1")
         if x == "(f) the mutation summary differs from the record" and not _load("aisef_v2_mutation", "validation/v2/mutation.py").check():
             continue
         out.append(x)
