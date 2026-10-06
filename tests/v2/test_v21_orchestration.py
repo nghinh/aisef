@@ -24,7 +24,7 @@ class DiffFailure(orch.Orchestration):
         self.assertEqual(self.failures("S1"), [("RESOURCE_ACQUISITION_FAILED", "ENVIRONMENT", True)])
         detail = f"candidate diff: git diff {self.base[:12]}..{dev.candidates[0][:12]} exited 128"
         self.assertEqual(self.details("S1"), [detail])
-        self.assertEqual(self.rows("S1")[-1], ("S1:quality", False, detail))
+        self.assertEqual(self.rows("S1")[-1], ("S1:candidate", False, detail))
         self.assertEqual([a.outcome for a in r.attempts], ["ROLLBACK"])
         self.assertEqual(self.merger.base(), self.base)
         self.assert_disposed("S1")

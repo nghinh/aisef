@@ -256,7 +256,7 @@ def _attempt(run, plan: Plan, story_id: str, inputs: StoryInputs, adapters: Adap
                     diff = ws.diff(base, candidate)
                 except ResourceUnavailable as e:
                     failure, detail = classify(FailureCode.RESOURCE_ACQUISITION_FAILED), f"candidate diff: {e}"
-                    checks.append(gate.check(run, story_id, "quality", False, detail))
+                    checks.append(gate.check(run, story_id, "candidate", False, detail))   # reading the candidate, after its move
                 else:
                     tests_held = _Held(scope, "tests")
                     try:
