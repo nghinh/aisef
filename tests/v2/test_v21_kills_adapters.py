@@ -152,5 +152,29 @@ class ReviewerReview(_Reviewer):
             self.assertEqual(rev.review(self.scope(), ("C-ADD",)).detail, "0 findings, coverage COMPLETE")
 
 
+class Unchanged(_Reviewer):
+    """_unchanged — "L262 string ' (every finding discarded)' emptied", "L266 sorted() -> list()", "L267 string ': '
+    emptied", "L267 string ' (every finding discarded)' emptied": a review whose checkout moved says what moved — a new
+    HEAD, or the changed paths in order — and that every finding was discarded."""
+
+    def test_a_moved_head_or_changed_paths_are_named_in_order_and_every_finding_discarded(self):
+        repo = self.tmp / "repo"
+        head = e2e.git(repo, "rev-parse", "HEAD")
+        before = ad.tree_of(str(repo))
+        names = ["zeta.txt", "alpha.txt", "mid.txt", "kilo.txt", "echo.txt", "yank.txt", "bravo.txt", "papa.txt"]
+        for name in names:     # eight: an unsorted set order is in sorted order by chance once in 40 320 runs
+            (repo / name).write_text("x\n")
+        with self.assertRaises(ad.CapabilityUnrunnable) as c:
+            ad._unchanged(str(repo), head, before, "the finder")
+        self.assertEqual(str(c.exception), f"the reviewed checkout changed during the finder: {sorted(names)} "
+                                           "(every finding discarded)")
+        e2e.git(repo, "add", "-A")
+        e2e.git(repo, "commit", "-qm", "moved")
+        with self.assertRaises(ad.CapabilityUnrunnable) as c:
+            ad._unchanged(str(repo), head, before, "the verification")
+        self.assertEqual(str(c.exception), f"the reviewed checkout changed during the verification: HEAD is no longer "
+                                           f"{head[:12]} (every finding discarded)")
+
+
 if __name__ == "__main__":
     unittest.main()
