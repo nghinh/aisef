@@ -122,8 +122,14 @@ UNCHANGED = {
                   "bytes-returning-python-callable"),
         "differing": "every request hash; plan/frozen plan_hash; probe/evaluated probe_digest, spec_id, semantic_hash, record_digest; "
                      "proof/verified spec_id, semantic_hash; the probe process-range names, which carry the spec id",
+        #: v2.0.0 -> 2.1, measured: COMPARISON_REL records each side's probe digests, v21_q5_compare.check requires these
         "probe_digests_by_kind": {"cli_invocation": ("d42449fd8e3a", "330ae4a88cc8"), "file_artifact": ("31465b73cbe2", "be1485d12a4d"),
                                   "process_effect": ("815e4c865274", "409c41aea16f"), "python_callable": ("b1f25878d350", "0821c14651a9")},
+        "probe_ids_by_kind": {"cli_invocation": "probe.cli_invocation", "file_artifact": "probe.file_artifact",
+                              "process_effect": "probe.process_effect", "python_callable": "probe.python_callable_v2"},
+        "probe_digests_evidence": MEASUREMENT + " (each side's probe digests; v21_q5_compare.check compares them with these)",
+        "cause_commits_evidence": "the lane's scratch measurement only, in no record (COMPARISON_REL measures v2.0.0 and this tree, "
+                                  "never 919a271: the file_artifact step 46737ca1c479 is not in it)",
         "cause_commits": {V2_007: "V2-007: a probe's digest is its capability digest (all four; file_artifact 31465b73cbe2 -> 46737ca1c479)",
                           V21_37: "V21-37 (engineering change, not owner-approved): file_artifact python_imports, capability version 2 "
                                   "(46737ca1c479 -> be1485d12a4d)"},

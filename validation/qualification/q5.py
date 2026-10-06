@@ -32,7 +32,8 @@ V2.1 (owner B-03d, RELEASE-DECISIONS seq 5): 2.0's `post-merge-regression` becom
 (V21-38: a committed story's PRESERVE is proved at the candidate), and `post-merge-integration-regression` keeps the
 post-merge path (main moves under a clean candidate); validation/qualification/v21_q5_changes.py traces both, and
 validation/qualification/v21_q5_compare.py measures every 2.0 and 2.1 item under the v2.0.0 kernel and this one. 2.0's
-corpora stay as recorded: every mode refuses to write into a 2.0 record directory (V2_0_RECORD_DIRS).
+corpora stay as recorded: inside closure-evidence/ every mode writes only under closure-evidence/v2/v2.1 or, in
+release mode on a frozen candidate of a version after 2.0.0, into that candidate's own Q5 directory (refused_out).
 
 Determinism is normalization after observation: the run's clock is the real clock and event times are dropped; temp
 roots become tokens. Nothing semantic is normalized (control outcomes, owners, retryability, revisions, semantic hashes,
@@ -72,6 +73,8 @@ CYCLE1_OUT_REL = "closure-evidence/v2/Q5"
 #: one (main); a 2.1 run writes a directory of its own
 V2_0_RECORD_DIRS = (CYCLE1_OUT_REL, "closure-evidence/v2/cycle2/Q5", "closure-evidence/v2/cycle2/Q5-FINAL",
                     "closure-evidence/v2/release/Q5-RC1", "closure-evidence/v2/release/Q5-RC2")
+#: V2.1: inside closure-evidence/ the only places a mode writes (refused_out): this directory, or a 2.1 candidate's Q5 one
+V21_DIR = "closure-evidence/v2/v2.1"
 SEMANTIC_CANDIDATE = C.SEMANTIC_CANDIDATE
 KERNEL_TREE = C.KERNEL_TREE
 PROBE_DIGEST = "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf"   # the Cycle-1 probe (P7-FINDING-001 correction), frozen
@@ -948,16 +951,32 @@ def definition(item: Item) -> dict:
             "expected_outcomes": item.expected_outcomes, "lands_after": list(item.lands_after)}
 
 
+def within(p: pathlib.Path, d: pathlib.Path) -> bool:
+    """`p` (resolved) is `d` or lies below it — by path, or by file identity (a case-insensitive or linked file system)."""
+    d = d.resolve()
+    return p.is_relative_to(d) or (d.exists() and any(os.path.samefile(q, d) for q in (p, *p.parents) if q.exists()))
+
+
+def release_q5_dir() -> pathlib.Path | None:
+    """V2.1: in release mode on a frozen candidate of a version after 2.0.0, that candidate's own Q5 directory."""
+    s = C.candidate()   # its freeze record exists in release mode only
+    return ROOT / s["q5_out_rel"] if s["freeze"] and s["freeze"]["rc"]["version"] != "2.0.0" else None
+
+
 def refused_out(out_dir: pathlib.Path) -> str | None:
-    """V2.1: the 2.0-era record directory (V2_0_RECORD_DIRS) `out_dir` is or lies in — by path, or by file identity on a
-    case-insensitive or linked file system — else None."""
+    """V2.1: why a mode must not write into `out_dir`, else None. An allow-list: inside closure-evidence/ only below
+    V21_DIR or exactly release_q5_dir(); never in a 2.0-era Q5 record directory (V2_0_RECORD_DIRS). Path or file identity."""
     p = out_dir.resolve()
-    chain = [q for q in (p, *p.parents) if q.exists()]
     for rel in V2_0_RECORD_DIRS:
-        d = (ROOT / rel).resolve()
-        if p.is_relative_to(d) or (d.exists() and any(os.path.samefile(q, d) for q in chain)):
-            return rel
-    return None
+        if within(p, ROOT / rel):
+            return f"{out_dir} is in {rel}, a 2.0 Q5 record directory; 2.0's records stay as recorded"
+    if not within(p, ROOT / "closure-evidence") or within(p, ROOT / V21_DIR):
+        return None
+    rc = release_q5_dir()
+    if rc is not None and (p == rc.resolve() or (p.exists() and rc.exists() and os.path.samefile(p, rc))):
+        return None
+    return (f"{out_dir} is in closure-evidence/ outside {V21_DIR} and is not a 2.1 release candidate's own Q5 directory "
+            f"({rc or 'none frozen'}); 2.0's records stay as recorded")
 
 
 def record(out_dir: pathlib.Path) -> int:
@@ -1204,8 +1223,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--out", default=OUT_REL)
     a = ap.parse_args(argv)
     out_dir = (ROOT / a.out) if not os.path.isabs(a.out) else pathlib.Path(a.out)
-    if (rel := refused_out(out_dir)) is not None:      # before anything is created or written
-        print(f"REFUSED: {out_dir} is in {rel}, a 2.0 Q5 record directory; 2.0's records stay as recorded")
+    if (why := refused_out(out_dir)) is not None:      # before anything is created or written
+        print(f"REFUSED: {why}")
         return 2
     out_dir.mkdir(parents=True, exist_ok=True)
     import tests.v2  # noqa: F401 — invariants I–IX armed at tier ROOT for every mode

@@ -5,7 +5,7 @@ recording); assertConsumed's refusals; normalization that cannot hide a regressi
 
 Every case here records its own scratch stream in a temporary directory: nothing writes a Q5 corpus; Q5_14 reads 2.0's
 (release/Q5-RC2, release/Q5-RC1, cycle2/Q5-FINAL, cycle2/Q5) as history only; Q5_15 proves q5 refuses to write into any
-of them; Q5_16-Q5_19 are the V2.1 kernel comparison (validation/qualification/v21_q5_compare.py) and its record.
+of them, or anywhere in closure-evidence/ but 2.1's own places; Q5_16-Q5_19 are the V2.1 kernel comparison (validation/qualification/v21_q5_compare.py) and its record.
 """
 
 import contextlib
@@ -241,24 +241,42 @@ class Writers(unittest.TestCase):
         fresh = [f"{rel}/v2.1-attempt" for rel in q5.V2_0_RECORD_DIRS]          # inside one, not yet existing: never created
         outs = [*q5.V2_0_RECORD_DIRS, *fresh, f"{q5.CYCLE1_OUT_REL}/corpus", str(ROOT / "closure-evidence/v2/release/Q5-RC2")]
         outs += [rel.upper() for rel in q5.V2_0_RECORD_DIRS if (ROOT / rel.upper()).exists()]   # a case-insensitive file system
-        for rel in fresh:
-            self.addCleanup(lambda p=ROOT / rel: p.rmdir() if p.is_dir() else None)
+        # the allow-list: any other 2.0-era record directory (Q4's, P10's), closure-evidence itself, a sibling of a 2.0 Q5
+        # directory or of 2.1's, a 2.1 candidate's directory while none is frozen; the repository named in another case
+        outs += ["closure-evidence/v2/Q4", "closure-evidence/v2/cycle2/Q4-FINAL", "closure-evidence/v2/P10", "closure-evidence",
+                 "closure-evidence/v2/cycle2/Q5-FINAL-2", f"{q5.V21_DIR}-attempt", "closure-evidence/v2/release/Q5-2.1.0-RC1"]
+        alt = pathlib.Path(str(ROOT).swapcase())
+        outs += [str(alt / "closure-evidence/v2/Q4")] if alt.exists() else []
         from validation.qualification import q4_aggregate
         with mock.patch.multiple(q5, record=_reached, reproduce=_reached, calibrate=_reached, freeze=_reached), \
-                mock.patch.object(q4_aggregate, "conformance", _reached):
-            for out in outs:
+                mock.patch.object(q4_aggregate, "conformance", _reached), mock.patch.object(pathlib.Path, "mkdir", _reached):
+            for out in outs:                                               # refused before a directory is made: nothing to remove
                 for m in modes:
                     with contextlib.redirect_stdout(io.StringIO()) as said:
                         self.assertEqual(q5.main([*m, "--out", out]), 2, (m, out))
                     self.assertIn("REFUSED", said.getvalue(), (m, out))
             for rel in fresh:
                 self.assertFalse((ROOT / rel).exists(), rel)
-            with tempfile.TemporaryDirectory() as t:                       # a directory of its own reaches the writer
-                self.assertIsNone(q5.refused_out(pathlib.Path(t)))
-                with self.assertRaisesRegex(AssertionError, "a q5 writer was reached"):
-                    q5.main(["--freeze", "--out", t])
-        self.assertIsNone(q5.refused_out(ROOT / "closure-evidence/v2/release/Q5-2.1.0-RC1"))
-        self.assertIsNone(q5.refused_out(ROOT / "closure-evidence/v2/cycle2/Q5-FINAL-2"))   # a sibling, not inside one
+        with mock.patch.multiple(q5, record=_reached, reproduce=_reached, calibrate=_reached, freeze=_reached), \
+                tempfile.TemporaryDirectory() as t:                        # a directory of its own reaches the writer
+            self.assertIsNone(q5.refused_out(pathlib.Path(t)))
+            with self.assertRaisesRegex(AssertionError, "a q5 writer was reached"):
+                q5.main(["--freeze", "--out", t])
+        self.assertIsNone(q5.refused_out(ROOT / q5.V21_DIR))
+        self.assertIsNone(q5.refused_out(ROOT / q5.V21_DIR / "Q5-2.1.0-scratch"))
+        rc21 = {"mode": "release", "q5_out_rel": "closure-evidence/v2/release/Q5-2.1.0-RC1", "freeze": {"rc": {"version": "2.1.0"}}}
+        with mock.patch.object(q5.C, "candidate", return_value=rc21):     # a frozen 2.1 candidate: its own directory, exactly
+            self.assertIsNone(q5.refused_out(ROOT / "closure-evidence/v2/release/Q5-2.1.0-RC1"))
+            for rel in ("closure-evidence/v2/release/Q5-2.1.0-RC1/corpus", "closure-evidence/v2/release/Q5-2.1.0-RC10",
+                        "closure-evidence/v2/release/Q5-RC2", "closure-evidence/v2/cycle2/Q5-FINAL-2"):
+                self.assertIsNotNone(q5.refused_out(ROOT / rel), rel)
+        rc20 = {"mode": "release", "q5_out_rel": "closure-evidence/v2/release/Q5-RC3", "freeze": {"rc": {"version": "2.0.0"}}}
+        with mock.patch.object(q5.C, "candidate", return_value=rc20):     # a 2.0.0 candidate's: never
+            self.assertIsNotNone(q5.refused_out(ROOT / "closure-evidence/v2/release/Q5-RC3"))
+        none = {"mode": "cycle2", "q5_out_rel": "closure-evidence/v2/cycle2/Q5-NEXT", "freeze": None}
+        with mock.patch.object(q5.C, "candidate", return_value=none):     # no candidate frozen: no release directory at all
+            self.assertIsNotNone(q5.refused_out(ROOT / "closure-evidence/v2/cycle2/Q5-NEXT"))
+        self.assertIsNotNone(q5.refused_out(ROOT / "closure-evidence/v2/cycle2/Q5-FINAL-2"))   # a sibling: not 2.1's either
 
 
 def _obs(**over):
@@ -294,10 +312,25 @@ class KernelComparison(unittest.TestCase):
         failed["journal"][0]["data"]["record"]["passed"] = False
         longer = _obs()
         longer["journal"].append(longer["journal"][0])
+        criterion = _obs()                                             # a request gains a criterion: structure, not identity
+        criterion["requests"][0]["semantic_hashes"]["C9"] = "u" * 64
+        gained = _obs()                                                # a probe record gains a field an identity is named by
+        gained["journal"][0]["data"]["record"]["probe_digest"] = "d" * 64
+        lost = _obs()
+        lost["journal"][0]["data"]["record"]["spec_id"] = None
         for new, field in ((renamed, "journal story/resource-acquired: data.resource"), (failed, "journal probe/evaluated: data.record.passed"),
-                           (longer, "journal"), (_obs(outcomes={"S1": ["ROLLBACK"]}), "outcomes.S1[]"), (moved | {"outcomes": {}}, "outcomes.S1")):
+                           (longer, "journal"), (_obs(outcomes={"S1": ["ROLLBACK"]}), "outcomes.S1[]"), (moved | {"outcomes": {}}, "outcomes.S1"),
+                           (criterion, "requests[].semantic_hashes.C9"), (gained, "journal probe/evaluated: data.record.probe_digest"),
+                           (lost, "journal probe/evaluated: data.record.spec_id")):
             got = M.classify(_obs(), new)
             self.assertEqual((got["classification"], list(got["other_fields"])), ("differs", [field]), field)
+        obs = _obs() | {"errors": {}, "notes": [], "consumption": {"ok": True}, "replay_failure": None, "tool_ledger": [],
+                        "final_workspace": None, "replay": {}}
+        obs["requests"][0] |= {"header_class": "DEVELOPER_IMPLEMENT", "story_id": "S1"}
+        obs["journal"][0]["data"]["record"] |= {"probe_id": "probe.cli_invocation", "probe_digest": "d" * 64}
+        obs["journal"].append(json.loads(json.dumps(obs["journal"][0])))
+        obs["journal"][-1]["data"]["record"]["probe_digest"] = "e" * 64
+        self.assertEqual(M.summary(obs)["probe_digests"], {"probe.cli_invocation": ["d" * 64, "e" * 64]})   # each side's, by value
 
     def test_Q5_17_the_items_are_2_0_s_and_2_1_s_with_rc2_s_definitions_and_the_record_is_written_once_outside_2_0(self):
         M = self.M
@@ -322,8 +355,25 @@ class KernelComparison(unittest.TestCase):
             with mock.patch.object(M, "derive", side_effect=AssertionError("measured")), contextlib.redirect_stdout(io.StringIO()):
                 for out in (existing, ROOT / "closure-evidence/v2/release/Q5-RC2/Q5-KERNEL-COMPARISON.json", ROOT / "validation/x.json"):
                     self.assertEqual(M.write(out), 2, out)
+                with mock.patch.object(M, "dirty", return_value=[" M aisef2/x.py"]):   # uncommitted: refused before measuring
+                    self.assertEqual(M.write(fresh), 2)
+            with mock.patch.object(M, "dirty", return_value=[]), contextlib.redirect_stdout(io.StringIO()):
+                with mock.patch.object(M, "derive", return_value={"tree_dirty": ["?? validation/x.py"], "summary": {}}):
+                    self.assertEqual(M.write(fresh), 2)                       # the tree moved while measured: nothing written
+                self.assertFalse(fresh.exists())
+                with mock.patch.object(M, "derive", return_value={"tree_dirty": [], "summary": {}}):
+                    self.assertEqual(M.write(fresh), 0)                       # clean: written once
+                self.assertEqual(json.loads(fresh.read_text(encoding="utf-8")), {"tree_dirty": [], "summary": {}})
+                self.assertIn("exists", M.refused(fresh))
+        with mock.patch.object(M.C, "git", return_value=" M aisef2/x.py\n?? validation/y.py") as g:
+            self.assertEqual(M.dirty(), [" M aisef2/x.py", "?? validation/y.py"])
+        g.assert_called_once_with("status", "--porcelain", "--", "aisef2", "tests/v2", "validation")
         self.assertIsNone(M.refused(ROOT / M.V21_DIR / "never-written.json"))
         self.assertIn("outside closure-evidence/v2/v2.1", M.refused(ROOT / "closure-evidence/v2/cycle2/Q5/x.json"))
+        alt = pathlib.Path(str(ROOT).swapcase())
+        if alt.exists():                                                   # the repository named in another case is the repository
+            self.assertIn("outside closure-evidence/v2/v2.1", M.refused(alt / "closure-evidence/v2/cycle2/Q5/x.json"))
+            self.assertIn("outside closure-evidence/v2/v2.1", M.refused(alt / "validation/x.json"))
 
     def test_Q5_18_check_binds_the_record_to_q5_both_kernels_the_corpus_and_the_ruling_s_data(self):
         from validation.qualification import v21_q5_changes as X
@@ -332,10 +382,19 @@ class KernelComparison(unittest.TestCase):
             {i: "identity-only" for i in X.UNCHANGED["identity_only"]["items"]} | {i: "differs" for i in [*X.CHANGES, "post-merge-regression"]}
         now = M.bindings()
         helpers = {"fixture_helpers": now["fixture_helpers"]}
-        rec = {"bindings": now, "kernels": {"v2.0.0": helpers, "2.1": helpers},
+        rec = {"bindings": now, "kernels": {"v2.0.0": helpers, "2.1": helpers}, "tree_dirty": [],
                "items": {i.id: {"in_2_0_corpus": a, "in_2_1_corpus": b, "classification": stated[i.id],
                                 "2.1": {"outcomes": i.expected_outcomes, "consumption_ok": True, "replay": {"status": "GREEN"}}}
                          for i, a, b in M.items()}}
+        q = X.RC2_POST_MERGE_REGRESSION
+        rec["items"][q["item"]]["v2.0.0"] = {"outcomes": q["outcomes"], "model_calls": ["call"] * q["model_calls"], "tool_calls": q["tool_calls"],
+                                            "events": q["events"], "failures": [q["failure"]]}
+        ident = X.UNCHANGED["identity_only"]
+        for n, (kind, pid) in enumerate(ident["probe_ids_by_kind"].items()):   # one probe per identity-only item, both sides
+            item = rec["items"][ident["items"][n]]
+            old, new = ident["probe_digests_by_kind"][kind]
+            item["v2.0.0"] = {"probe_digests": {pid: [old + "0" * 52]}}
+            item["2.1"]["probe_digests"] = {pid: [new + "0" * 52]}
         rec["summary"] = {c: sorted(k for k, v in rec["items"].items() if v["classification"] == c) for c in ("identical", "identity-only", "differs")}
         with tempfile.TemporaryDirectory() as t:
             path = pathlib.Path(t) / "r.json"
@@ -366,7 +425,23 @@ class KernelComparison(unittest.TestCase):
             self.assertEqual(len(check(reclassify)), 2)                               # identical and identity-only both disagree with the data
             self.assertIn("the summary is not the items' classification", check(lambda r: r["summary"]["differs"].pop()))
             got = check(lambda r: r["items"].pop("post-merge-regression"))                # not measured, so neither classified nor summarised
-            self.assertEqual([g.split(":")[0] for g in got], ["the items measured are not 2.0's and 2.1's corpora", "the summary is not the items' classification", "differs"], got)
+            self.assertEqual([g.split(":")[0] for g in got], ["the items measured are not 2.0's and 2.1's corpora", "post-merge-regression",
+                                                              "the summary is not the items' classification", "differs"], got)
+            self.assertEqual(check(lambda r: r.update(tree_dirty=["?? validation/x.py"])), ["measured on a tree with uncommitted changes: ['?? validation/x.py']"])
+            self.assertEqual(check(lambda r: r.pop("tree_dirty")), ["measured on a tree with uncommitted changes: None"])
+            self.assertEqual(check(lambda r: r["items"]["post-merge-regression"]["v2.0.0"].update(events=144)),
+                             [f"post-merge-regression: the v2.0.0 kernel did not measure what {q['source']} recorded"])
+            self.assertEqual(check(lambda r: r["items"]["post-merge-regression"]["v2.0.0"]["failures"][0].update(seq=135)),
+                             [f"post-merge-regression: the v2.0.0 kernel did not measure what {q['source']} recorded"])
+            cli = rec["items"][ident["items"][0]]
+            self.assertEqual(check(lambda r: r["items"][ident["items"][0]]["2.1"]["probe_digests"].update({"probe.cli_invocation": ["f" * 64]})),
+                             [f"probe.cli_invocation: measured {cli['v2.0.0']['probe_digests']['probe.cli_invocation']} -> {['f' * 64]}, "
+                              "v21_q5_changes states d42449fd8e3a -> 330ae4a88cc8"])
+            self.assertEqual(len(check(lambda r: r["items"][ident["items"][0]]["v2.0.0"]["probe_digests"]["probe.cli_invocation"].append("d42449fd8e3a" + "1" * 52))), 1)
+            self.assertEqual(len(check(lambda r: r["items"][ident["items"][1]]["2.1"]["probe_digests"].update({"probe.file_artifact": []}))), 1)
+            self.assertEqual(check(lambda r: [r["items"][ident["items"][3]][side].pop("probe_digests") for side in ("v2.0.0", "2.1")]),
+                             [f"probes measured {sorted(set(ident['probe_ids_by_kind'].values()) - {'probe.python_callable_v2'})}, "
+                              f"v21_q5_changes states {sorted(ident['probe_ids_by_kind'].values())}"])
             self.assertEqual(check(lambda r: r["kernels"]["2.1"].update(fixture_helpers={})),
                              ["q5's fixture helpers differ between the two kernels' trees: the comparison is not the kernels' alone"])
         self.assertEqual(M.check(pathlib.Path(t) / "absent.json"), [f"{pathlib.Path(t) / 'absent.json'}: no record (v21_q5_compare.py --write)"])

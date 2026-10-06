@@ -14,10 +14,14 @@ own, the sources of the fixture helpers q5 calls recorded per tree and required 
 (c2_orchestration_repair._neutral neutralises exactly that identity in the journals). Classification of an item:
 `identical` — no observation differs; `identity-only` — every differing field is a derived identity (IDENTITY_KEYS, the
 criteria's semantic hashes, a process-range name differing only by its spec id); `differs` — anything else. Every
-differing field is listed. --write opens its output with mode "x" and refuses any path in the repository outside
-closure-evidence/v2/v2.1/. --check re-derives the bindings (q5.py, this tool, q5's fixture helpers, both kernel digests)
-and the definitions, and requires the record's 2.1 side to meet q5.CORPUS's expected outcomes and the classification
-v21_q5_changes states; the executions are --write's, read as recorded.
+differing field is listed; a leaf only one side has, or not a string on both, is never an identity. Each side records the
+digests its probes evaluated with. --write opens its output with mode "x", refuses any path in the repository outside
+closure-evidence/v2/v2.1/ (by path or file identity), and refuses a tree whose aisef2/, tests/v2/ or validation/ is not
+committed (before measuring and after: the record names the commit it measured). --check re-derives the bindings (q5.py,
+this tool, q5's fixture helpers, both kernel digests) and the definitions, and requires a clean measured tree, the
+record's 2.1 side to meet q5.CORPUS's expected outcomes, its v2.0.0 side of 2.0's post-merge-regression to be what
+release/Q5-RC2 recorded, the probe digests and the classification v21_q5_changes states; the executions are --write's,
+read as recorded.
 """
 
 from __future__ import annotations
@@ -47,6 +51,7 @@ V21_DIR = "closure-evidence/v2/v2.1"
 RC2 = "closure-evidence/v2/release/Q5-RC2"
 FIXTURE_REL = "tests/v2/test_p6_orchestration.py"
 FIXTURE_HELPERS = ("contract", "land", "make_repo", "obligation", "plan_of")   # q5.execute calls these (T.git is the kernel's)
+DEPENDS = ("aisef2", "tests/v2", "validation")   # committed when measured: the record's execution_commit then names them all
 IDENTITY_KEYS = frozenset({"plan_hash", "probe_digest", "record_digest", "request_hash", "semantic_hash", "spec_id"})
 SPEC_ID = re.compile(r"PPS-[0-9a-f]{64}")
 METHOD = ("every item of q5.CORPUS (2.1) and of release/Q5-RC2's corpus (2.0; an item q5.CORPUS no longer has rebuilt from its "
@@ -172,9 +177,12 @@ def _leaves(a, b, at: str = ""):
 
 
 def is_identity(path: str, a, b) -> bool:
+    """A derived identity whose value moved; a leaf one side lacks (or holds as None or a non-string) is structure."""
+    if not (isinstance(a, str) and isinstance(b, str)):
+        return False
     keys = re.sub(r"\[\d+\]", "", path).split(".")
     return keys[-1] in IDENTITY_KEYS or keys[-2:-1] == ["semantic_hashes"] or (
-        keys[-1] == "resource" and isinstance(a, str) and isinstance(b, str) and SPEC_ID.sub("PPS-", a) == SPEC_ID.sub("PPS-", b))
+        keys[-1] == "resource" and SPEC_ID.sub("PPS-", a) == SPEC_ID.sub("PPS-", b))
 
 
 def _field(obs: dict, path: str) -> str:
@@ -199,6 +207,11 @@ def classify(old: dict, new: dict) -> dict:
 def summary(obs: dict) -> dict:
     j = obs["journal"]
     refused = obs["replay_failure"]
+    probes: dict[str, set] = {}
+    for e in j:
+        if e["type"] == "probe/evaluated":
+            r = e["data"]["record"]
+            probes.setdefault(str(r.get("probe_id")), set()).add(str(r.get("probe_digest")))
     return {"outcomes": obs["outcomes"], "errors": obs["errors"], "notes": obs["notes"], "consumption_ok": obs["consumption"]["ok"],
             "model_calls": [f"{r['header_class']} {r['story_id']}" for r in obs["requests"]],
             "refused_request": refused and f"{refused['kind']}: {refused['detail']}",
@@ -206,6 +219,7 @@ def summary(obs: dict) -> dict:
                          for e in j if e["type"] == "failure/observed"],
             "gate_checks": [[e["data"]["check"], e["data"]["passed"]] for e in j if e["type"] == "gate/check"],
             "events": len(j), "tool_calls": len(obs["tool_ledger"]), "final_tip": (obs["final_workspace"] or {}).get("tip"),
+            "probe_digests": {k: sorted(v) for k, v in sorted(probes.items())},
             "journal_digest": _sha(json.dumps(j, sort_keys=True).encode()), "replay": obs["replay"]}
 
 
@@ -222,12 +236,18 @@ def bindings(v2_0_0_kernel_digest: str | None = None) -> dict:
 
 
 def refused(out: pathlib.Path) -> str | None:
+    from validation.qualification import q5
     p = out.resolve()
-    if p.is_relative_to(ROOT.resolve()) and not p.is_relative_to((ROOT / V21_DIR).resolve()):
+    if q5.within(p, ROOT) and not q5.within(p, ROOT / V21_DIR):
         return f"{p} is in the repository outside {V21_DIR} (2.0's records are never written)"
     if p.exists():
         return f"{p} exists (a record is written once)"
     return None
+
+
+def dirty() -> list[str]:
+    """The uncommitted changes under DEPENDS (git status --porcelain)."""
+    return [ln for ln in C.git("status", "--porcelain", "--", *DEPENDS).splitlines() if ln.strip()]
 
 
 def derive() -> dict:
@@ -242,12 +262,11 @@ def derive() -> dict:
         old, new = runs["v2.0.0"]["items"][item.id], runs["2.1"]["items"][item.id]
         out[item.id] = {"in_2_0_corpus": in_2_0, "in_2_1_corpus": in_2_1, "expected_outcomes": item.expected_outcomes,
                         "v2.0.0": summary(old), "2.1": summary(new), **classify(old, new)}
-    dirty = [ln for ln in C.git("status", "--porcelain", "--", "aisef2", "tests/v2", "validation").splitlines() if ln.strip()]
     return {
         "record": "AISEF V2.1 — Q5-KERNEL-COMPARISON: every 2.0 and 2.1 Q5 corpus item under the v2.0.0 kernel and the 2.1 kernel",
         "status": "ENGINEERING MEASUREMENT (not owner-approved evidence; cited by validation/qualification/v21_q5_changes.py)",
         "authority": X.DECISION[1], "tool": "validation/qualification/v21_q5_compare.py", "measured_at": C.now(),
-        "execution_commit": C.git("rev-parse", "HEAD"), "tree_dirty": dirty, "bindings": bindings(k200["kernel_digest"]),
+        "execution_commit": C.git("rev-parse", "HEAD"), "tree_dirty": dirty(), "bindings": bindings(k200["kernel_digest"]),
         "kernels": {"v2.0.0": {"commit": X.V2_0_0, "aisef2_tree": k200["aisef2_tree"], "kernel_digest": k200["kernel_digest"],
                                "fixture_helpers": runs["v2.0.0"]["fixture_helpers"]},
                     "2.1": {"kernel_digest": runs["2.1"]["kernel_digest"], "fixture_helpers": runs["2.1"]["fixture_helpers"]}},
@@ -257,17 +276,43 @@ def derive() -> dict:
     }
 
 
+def _dirty_why(lines: list[str]) -> str:
+    return f"{' '.join(DEPENDS)} not committed ({lines[:5]}): measure a committed tree" if lines else ""
+
+
 def write(out: pathlib.Path) -> int:
-    why = refused(out) or "; ".join(definition_problems())
+    why = refused(out) or _dirty_why(dirty()) or "; ".join(definition_problems())
     if why:
         print(f"REFUSED: {why}")
         return 2
     rec = derive()
+    if why := _dirty_why(rec["tree_dirty"]):   # the tree moved while it was measured
+        print(f"REFUSED: {why}")
+        return 2
     out.parent.mkdir(parents=True, exist_ok=True)
     with out.open("x", encoding="utf-8", newline="\n") as f:
         f.write(C.render(rec))
     print(f"{out}: {rec['summary']}")
     return 0
+
+
+def probe_digest_problems(rec: dict) -> list[str]:
+    """The identity-only items' probes, per probe and side, are the one digest each UNCHANGED states (by prefix)."""
+    stated = X.UNCHANGED["identity_only"]
+    kind_of = {pid: kind for kind, pid in stated["probe_ids_by_kind"].items()}
+    got: dict[str, tuple[set, set]] = {}
+    for item in stated["items"]:
+        for i, side in enumerate(("v2.0.0", "2.1")):
+            for pid, ds in ((((rec["items"].get(item) or {}).get(side) or {}).get("probe_digests")) or {}).items():
+                got.setdefault(pid, (set(), set()))[i].update(ds)
+    if set(got) != set(kind_of):
+        return [f"probes measured {sorted(got)}, v21_q5_changes states {sorted(kind_of)}"]
+    out = []
+    for pid, (old, new) in sorted(got.items()):
+        want = stated["probe_digests_by_kind"][kind_of[pid]]
+        if not (len(old) == len(new) == 1 and min(old).startswith(want[0]) and min(new).startswith(want[1])):
+            out.append(f"{pid}: measured {sorted(old)} -> {sorted(new)}, v21_q5_changes states {want[0]} -> {want[1]}")
+    return out
 
 
 def check(path: pathlib.Path | None = None) -> list[str]:
@@ -280,6 +325,8 @@ def check(path: pathlib.Path | None = None) -> list[str]:
     out = [f"stale: {k} recorded {rec['bindings'].get(k)}, now {v}" for k, v in now.items() if rec["bindings"].get(k) != v]
     out += [f"stale: {k} recorded, not derived" for k in sorted(set(rec["bindings"]) - set(now))]
     out += definition_problems()
+    if rec.get("tree_dirty") != []:
+        out.append(f"measured on a tree with uncommitted changes: {rec.get('tree_dirty')}")
     measured = {(k, v["in_2_0_corpus"], v["in_2_1_corpus"]) for k, v in rec["items"].items()}
     if measured != {(i.id, a, b) for i, a, b in items()}:
         out.append(f"the items measured are not 2.0's and 2.1's corpora: {sorted(measured)}")
@@ -288,6 +335,12 @@ def check(path: pathlib.Path | None = None) -> list[str]:
         if (got.get("outcomes"), got.get("consumption_ok"), (got.get("replay") or {}).get("status")) != (item.expected_outcomes, True, "GREEN"):
             out.append(f"{item.id}: 2.1 measured {got.get('outcomes')} consumed {got.get('consumption_ok')} replay "
                        f"{(got.get('replay') or {}).get('status')}; q5.CORPUS expects {item.expected_outcomes}, every answer consumed, GREEN")
+    q = X.RC2_POST_MERGE_REGRESSION
+    old = (rec["items"].get(q["item"]) or {}).get("v2.0.0") or {}
+    if (old.get("outcomes"), len(old.get("model_calls") or ()), old.get("tool_calls"), old.get("events"), old.get("failures")) != (
+            q["outcomes"], q["model_calls"], q["tool_calls"], q["events"], [q["failure"]]):
+        out.append(f"{q['item']}: the v2.0.0 kernel did not measure what {q['source']} recorded")
+    out += probe_digest_problems(rec)
     by_class = {c: sorted(k for k, v in rec["items"].items() if v["classification"] == c) for c in ("identical", "identity-only", "differs")}
     stated = {"identical": sorted(X.UNCHANGED["identical_up_to_kernel_identity"]), "identity-only": sorted(X.UNCHANGED["identity_only"]["items"]),
               "differs": sorted(set(X.CHANGES) | {X.RC2_POST_MERGE_REGRESSION["item"]})}
