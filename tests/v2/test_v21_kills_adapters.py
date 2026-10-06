@@ -87,5 +87,70 @@ class ReviewerInit(_Reviewer):
         self.assertEqual(seen, ["/opt/run/bin/python3", sys.executable])
 
 
+class ReviewerReview(_Reviewer):
+    """Reviewer.review — "L111 string 'the checkout to review has no revision' emptied", "L116 string 'the finder'
+    emptied", "L127 string 'the verification' emptied", "L123 dict entry 0/1/2 dropped", "L123 string 'anchor'/'status'/
+    'why'/'contracts' emptied", "L130 string ', ' emptied", "L132 string ', confirmed=' emptied": what the review
+    refuses says why and during which stage; each finding's record carries its anchor (status, why, contracts) next to
+    its verification; the review's detail names the OCR coverage and how many findings were confirmed."""
+
+    RV = ad.review_verify
+
+    def scope(self, root=None):
+        return types.SimpleNamespace(story_id="S1", root=str(root or self.tmp / "repo"))
+
+    def reviewer(self, **review):
+        return ad.Reviewer(self.run, self.project, self.tmp / "logs", {}, 5,
+                           review={"policy": "fix-loop", "min_severity": "low", "finder": "model", "ocr": None,
+                                   "given": True, **review})
+
+    def test_a_checkout_with_no_revision_is_refused_saying_so(self):
+        (self.tmp / "plain").mkdir()
+        with self.assertRaises(ad.CapabilityUnrunnable) as c:
+            self.reviewer().review(self.scope(self.tmp / "plain"), ("C-ADD",))
+        self.assertEqual(str(c.exception), "the checkout to review has no revision")
+
+    def test_a_change_to_the_checkout_names_the_stage_it_happened_in(self):
+        repo = self.tmp / "repo"
+
+        def touch(name):
+            def run(*a, **k):
+                (repo / name).write_text("changed\n")
+                return ([{"id": "F1"}], {}, None) if name == "by-finder.txt" else self.RV.Verification(self.RV.UNVERIFIABLE, "x")
+            return run
+        rev = self.reviewer()
+        with mock.patch.object(rev, "_model", touch("by-finder.txt")), self.assertRaises(ad.CapabilityUnrunnable) as c:
+            rev.review(self.scope(), ("C-ADD",))
+        self.assertEqual(str(c.exception), "the reviewed checkout changed during the finder: ['by-finder.txt'] "
+                                           "(every finding discarded)")
+        (repo / "by-finder.txt").unlink()
+        rev = self.reviewer()
+        with mock.patch.object(rev, "_model", return_value=([{"id": "F1"}], {}, None)), \
+                mock.patch.object(rev, "_verify", touch("by-verification.txt")), self.assertRaises(ad.CapabilityUnrunnable) as c:
+            rev.review(self.scope(), ("C-ADD",))
+        self.assertEqual(str(c.exception), "the reviewed checkout changed during the verification: ['by-verification.txt'] "
+                                           "(every finding discarded)")
+
+    def test_the_findings_record_carries_its_anchor_and_the_detail_counts_the_confirmed(self):
+        rev, s = self.reviewer(), {"parsed": True}
+        found = [{"id": "F1", "severity": "high", "reproducer": {"kind": "python_callable"}}, {"id": "F2"}]
+        with mock.patch.object(rev, "_model", return_value=(found, s, None)), \
+                mock.patch.object(rev, "_verify", return_value=self.RV.Verification(self.RV.CONFIRMED, "reproduced", "pc2", "VIOLATED")), \
+                mock.patch.object(self.RV, "anchor", return_value=self.RV.Anchor(self.RV.ANCHORED, "clause C1", ("BC-ADD",))):
+            r = rev.review(self.scope(), ("C-ADD",))
+        self.assertEqual(s["findings"][0]["anchor"], {"status": "ANCHORED", "why": "clause C1", "contracts": ["BC-ADD"]})
+        self.assertNotIn("anchor", s["findings"][1])          # no reproducer, nothing to anchor
+        self.assertEqual(s["findings"][0]["verification"], {"status": self.RV.CONFIRMED, "why": "reproduced", "probe": "pc2",
+                                                            "observed": "VIOLATED"})
+        # F2 is CONFIRMED by the (stubbed) probe but has no reproducer to anchor: under fix-loop it does not block
+        self.assertEqual([(f.id, f.blocks) for f in r.findings], [("F1", True), ("F2", False)])
+        self.assertEqual(r.detail, "2 findings, parsed=True, confirmed=1")
+
+    def test_the_ocr_review_s_detail_names_its_coverage(self):
+        rev = self.reviewer(finder="ocr")
+        with mock.patch.object(rev, "_ocr", return_value=([], {}, "coverage COMPLETE")):
+            self.assertEqual(rev.review(self.scope(), ("C-ADD",)).detail, "0 findings, coverage COMPLETE")
+
+
 if __name__ == "__main__":
     unittest.main()
