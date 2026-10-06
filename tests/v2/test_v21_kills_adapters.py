@@ -20,10 +20,8 @@ from aisef2.arch.enums import ControlProjection  # noqa: E402
 from tests.v2 import test_app_run as e2e  # noqa: E402
 
 
-class ReviewerModel(unittest.TestCase):
-    """Reviewer._model — "L137 string 'reviewer ' emptied", "L138 string '.reviewer.' emptied", "L139 string 'reviewer'
-    emptied": the model review's session is the reviewer's by the title the client is run with (`--title`), by the name
-    of its evidence log (the run's sessions/ directory) and by the role its session record carries into RUN.json."""
+class _Reviewer(unittest.TestCase):
+    """A Reviewer over the two-story calc bundle and its repository (no test of its own)."""
 
     def setUp(self) -> None:
         t = tempfile.TemporaryDirectory()
@@ -33,6 +31,12 @@ class ReviewerModel(unittest.TestCase):
         self.project = bundle.load(e2e.project_bundle("a" * 40))
         self.run = types.SimpleNamespace(events=[], state=lambda proj: {"S1": {"attempt": 2}}
                                          if proj is ControlProjection.STORY_STATE else None)
+
+
+class ReviewerModel(_Reviewer):
+    """Reviewer._model — "L137 string 'reviewer ' emptied", "L138 string '.reviewer.' emptied", "L139 string 'reviewer'
+    emptied": the model review's session is the reviewer's by the title the client is run with (`--title`), by the name
+    of its evidence log (the run's sessions/ directory) and by the role its session record carries into RUN.json."""
 
     def test_the_review_session_is_titled_logged_and_recorded_as_the_reviewer_s(self):
         calls = []
@@ -48,6 +52,21 @@ class ReviewerModel(unittest.TestCase):
         self.assertEqual(calls, [("reviewer S1", "S1.reviewer.3.jsonl")])
         self.assertEqual((s["role"], s["story_id"], s["attempt"], s["log"]), ("reviewer", "S1", 3, "S1.reviewer.3.jsonl"))
         self.assertEqual(rev.sessions, [s])
+
+
+class ReviewerVerify(_Reviewer):
+    """Reviewer._verify — "L233 string 'no reproducer: the finding states no observable behaviour' emptied": a finding
+    with no reproducer is UNVERIFIABLE, and the reason the run records for the operator (finding.verification.why) says
+    why; no probe is run for it."""
+
+    def test_a_finding_without_a_reproducer_is_unverifiable_for_a_stated_reason_and_runs_nothing(self):
+        rev = ad.Reviewer(self.run, self.project, self.tmp / "logs", {}, 5)
+        with mock.patch.object(ad.review_verify, "verify", side_effect=AssertionError("no probe for a finding without one")):
+            for finding in ({"id": "F1"}, {"id": "F2", "reproducer": "run it"}, {"id": "F3", "reproducer": None}):
+                with self.subTest(finding=finding):
+                    v = rev._verify(finding, str(self.tmp / "repo"), "a" * 40)
+                    self.assertEqual((v.status, v.reason), (ad.review_verify.UNVERIFIABLE,
+                                                            "no reproducer: the finding states no observable behaviour"))
 
 
 if __name__ == "__main__":
