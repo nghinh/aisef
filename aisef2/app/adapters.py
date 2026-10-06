@@ -190,6 +190,9 @@ class Reviewer:
         code_p = _bounded(review_ocr.argv(pin["exe"], output=str(work / "preview.json"), preview=True, **common),
                           scope.root, env, work / "preview.log", self.timeout_s, f"ocr preview {story}")
         preview = review_ocr.read_output(work / "preview.json")
+        log.parent.mkdir(parents=True, exist_ok=True)
+        with log.open("x", encoding="utf-8") as fh:     # before the review starts: a stream that exists may have spent
+            fh.write(json.dumps({"type": "ocr_started", "finder": f"ocr {review_ocr.OCR['version']}"}) + "\n")
         code = _bounded(review_ocr.argv(pin["exe"], output=str(work / "output.json"), **common), scope.root, env,
                         work / "ocr.log", self.timeout_s, f"ocr review {story}")
         output = review_ocr.read_output(work / "output.json")
@@ -203,8 +206,7 @@ class Reviewer:
                  {"type": "ocr_output", "exit": code, "document": output},
                  {"type": "text", "part": {"text": str((output or {}).get("message") or "")}},
                  {"type": "step_finish", "part": {"tokens": tokens} if tokens else {}}]  # no tokens: unaccounted
-        log.parent.mkdir(parents=True, exist_ok=True)
-        with log.open("x", encoding="utf-8") as fh:
+        with log.open("a", encoding="utf-8") as fh:
             fh.write("".join(json.dumps(x, sort_keys=True) + "\n" for x in lines))
         redacted = client.redact(log, (*self.kw.get("secrets", ()), self.route["token"]))
         seen = client.read_session(log)
