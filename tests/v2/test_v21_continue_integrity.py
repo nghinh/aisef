@@ -166,8 +166,19 @@ elif point == "in-probe":
         die()
     threading.Thread(target=watch, daemon=True).start()
 elif point == "together":
-    while not pathlib.Path(cfg["go"]).exists():
-        time.sleep(0.005)
+    # both runs past the claim's look for an earlier claim, then both create at once: the O_EXCL race itself, under any
+    # load (a fixed head start let a loaded machine serialise them, and the later run met the claim, not the race)
+    real_os = lineage.os
+    class Os:
+        def __getattr__(self, name):
+            return getattr(real_os, name)
+        def open(self, path, flags, *a):
+            if pathlib.Path(path).name.startswith("CONTINUED-BY"):
+                pathlib.Path(cfg["ready"]).write_text("ready")
+                while not pathlib.Path(cfg["go"]).exists():
+                    time.sleep(0.005)
+            return real_os.open(path, flags, *a)
+    lineage.os = Os()
 project = bundle.load(json.loads(pathlib.Path(cfg["bundle"]).read_text()))
 s = settings.load(json.loads(pathlib.Path(cfg["settings"]).read_text()))
 parent = pathlib.Path(cfg["parent"]) if cfg.get("parent") else None
@@ -470,10 +481,14 @@ class ClaimLifecycle(LineageBase):
 
     def test_two_runs_at_once_one_claims_and_the_other_spends_nothing(self):
         go = self.tmp / "go"
+        ready = {n: self.tmp / f"ready-{n}" for n in ("a", "b")}
         procs = {n: self.drive(n, self.cont, point="together", parent=self.first, source=self.first / "repo", wait=False,
-                               go=str(go)) for n in ("a", "b")}
-        time.sleep(1.5)
-        go.write_text("go")
+                               go=str(go), ready=str(ready[n])) for n in ready}
+        deadline = time.monotonic() + 300
+        while not all(r.exists() for r in ready.values()) and time.monotonic() < deadline:
+            time.sleep(0.05)
+        go.write_text("go")     # before the assertion: neither run is left waiting
+        self.assertTrue(all(r.exists() for r in ready.values()), "both runs were to be at the claim's create before either made it")
         recs = {}
         for n, p in procs.items():
             p.communicate(timeout=600)
