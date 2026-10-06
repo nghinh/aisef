@@ -25,6 +25,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
@@ -188,6 +189,20 @@ class Migrate(unittest.TestCase):
                 self.assertEqual(bundle_cli.main(["migrate", str(pathlib.Path(t) / "none.json"), "--out",
                                                   str(pathlib.Path(t) / "x.json")]), 2)
             self.assertIn("never overwrites", err.getvalue())
+
+    def test_the_write_is_exclusive_so_a_file_that_appears_after_the_check_is_never_replaced(self):
+        # B-03c: the exists() check only refuses early; the create itself is exclusive (O_EXCL), so a file created
+        # between the check and the write (here: the check made blind to it) is refused, never written over
+        with tempfile.TemporaryDirectory() as t:
+            out = pathlib.Path(t) / "migrated.json"
+            out.write_text("theirs", encoding="utf-8")
+            real = pathlib.Path.exists
+            err = io.StringIO()
+            with mock.patch.object(pathlib.Path, "exists", autospec=True, side_effect=lambda p: p != out and real(p)), \
+                    contextlib.redirect_stderr(err), contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(bundle_cli.main(["migrate", str(LEDGERLOCK_2_0_0), "--out", str(out)]), 2)
+            self.assertEqual(out.read_text(encoding="utf-8"), "theirs")
+            self.assertIn(f"{out} exists: the bundle tools write a new file and never overwrite one", err.getvalue())
 
 
 if __name__ == "__main__":

@@ -108,7 +108,7 @@ def reproducer_contract(finding: Mapping, requirements: Mapping[str, object], pr
 def verify(finding: Mapping, *, requirements: Mapping, product_roots, root: str, revision: str,
            timeout_s: float, interpreter: str) -> Verification:
     """Run the finding's reproducer with the active probe of its subject kind on the checkout `root` at `revision`."""
-    from aisef2.app.bundle_cli import _mint      # compile_spec's mapping, without the approval gate (ids only)
+    from aisef2.app.bundle_cli import _mint      # compile_spec's mapping, without the approval gate: never approved
     c = reproducer_contract(finding, requirements, product_roots)
     if isinstance(c, str):
         return Verification(UNVERIFIABLE, c)

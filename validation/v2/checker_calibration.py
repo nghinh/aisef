@@ -351,11 +351,22 @@ def _release_inventory_module():
 
 
 def _release_inventory() -> Checker:
-    """V2.0-S2: the release tree against its own inventory. Known bad: the release inventory weakened by hand so that a
-    real V1 old authority still in the tree is no longer admitted — Q0 must name it UNENUMERATED."""
+    """V2.0-S2: the release tree against its own inventory (V2.1: the 2.1 one; the 2.0 one is history, byte-identical).
+    Known bad: the release inventory weakened by hand so that a real V1 old authority still in the tree is no longer
+    admitted — Q0 must name it UNENUMERATED."""
+    ri = _release_inventory_module()
     # the same hand-edit audit as old_path_audit's known bad; the fixture names the release inventory
-    return Checker("release_inventory", "V2.0-S2", lambda: _release_inventory_module().check(ROOT),
+    return Checker("release_inventory", "V2.0-S2", lambda: ri.check(ROOT) + ri.history_problems(ROOT),
                    _old_path_audit().known_bad, ("validation/qualification/release_inventory.py",))
+
+
+def _authority_limits() -> Checker:
+    """V2.1 (B-03c): migrate and the review's verification inside the owner's limits — never approve, never commit or
+    merge, verify through binding and calibration, one decision path. Known bad: a migration that adds an approval."""
+    al = _load("aisef_v21_authority_limits", ROOT / "validation/qualification/authority_limits.py")
+    return Checker("authority_limits", "V2.1 (B-03c)", lambda: al.check(ROOT),
+                   lambda fx: al.check(ROOT, {fx["path"]: _edit((ROOT / fx["path"]).read_text(encoding="utf-8"), fx)}),
+                   ("validation/qualification/authority_limits.py",))
 
 
 def _owned_run() -> Checker:
@@ -510,7 +521,7 @@ REGISTRY: list[Callable[[], Checker]] = [
     _kernel_rule("no_developer_artefact_at_parent", "NO_DEVELOPER_ARTEFACT_AT_PARENT", "WP-5.5 (invariant IX)"),
     _except_boundaries, _invariants_doc,
     _mutation, _cleanup_authority, _destructive_authority, _p1_evidence, _p2_evidence, _p3_evidence, _p4_evidence, _p5_evidence, _owned_run, _refmodel_independence, _gen_specs, _plan_semantics, _plan_baseline,
-    _migration_table, _p6_evidence, _old_path_audit, _release_inventory,
+    _migration_table, _p6_evidence, _old_path_audit, _release_inventory, _authority_limits,
     # Cycle 2 (WP-2.0.1): the baseline guard, the probe catalog closure and the probe source rules
     _cycle2_baseline, _probe_catalog_closure,
     _probe_rule("no_clock_in_probe_facts", "NO_CLOCK_IN_PROBE_FACTS"),

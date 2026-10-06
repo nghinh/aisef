@@ -1,0 +1,9 @@
+{
+ "checker": "authority_limits",
+ "package": "V2.1 (B-03c)",
+ "kind": "hand_edit",
+ "path": "aisef2/app/bundle_cli.py",
+ "find": "    out = {**dict(data), \"plan\": plain(new_plan)}",
+ "replace": "    out = {**dict(data), \"plan\": plain(new_plan), \"approvals\": approve(data, contracts[0].id, \"human:migrate\", 0.0)[\"approvals\"]}",
+ "expect": "MIGRATE_NEVER_APPROVES aisef2/app/bundle_cli.py:129 bundle_cli.migrate writes an 'approvals' key"
+}
