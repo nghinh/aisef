@@ -21,7 +21,7 @@ import zipfile
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 SHIPPED = ("aisef", "aisef2")
 #: sdist members outside the shipped trees that setuptools itself writes (metadata, the build config, the readme)
-SDIST_METADATA = ("PKG-INFO", "pyproject.toml", "README.md", "setup.cfg", "MANIFEST.in", "aisef.egg-info")
+SDIST_METADATA = ("PKG-INFO", "pyproject.toml", "README.md", "LICENSE", "setup.cfg", "MANIFEST.in", "aisef.egg-info")
 
 
 def repo_packages(root: pathlib.Path = ROOT) -> list[str]:

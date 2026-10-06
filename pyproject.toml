@@ -10,15 +10,31 @@ name = "aisef"             # gói, module và lệnh cùng một tên từ 0.2.0
 # V2.0-RC1 freeze (docs/v2/V2-STABLE-RELEASE-CHARTER.md §10/§11); a stable `vX.Y.Z` tag must equal it or
 # .github/workflows/release.yml refuses to publish.
 version = "2.0.0"
-description = "AISEF — AI Software Engineering Framework: input is docs/requirements.md, output is gate-verified code with SHA-bound evidence"
+# V2.1 (360° §3.11): the 2.0.0 summary described 1.x; this is what `aisef run` is now
+description = "AISEF 2 — deterministic, evidence-bound orchestration for coding agents: runs a prepared project bundle story by story, merges only what its probes prove, and journals every decision"
 readme = "README.md"
 requires-python = ">=3.11"
 license = "MIT"
+license-files = ["LICENSE"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Operating System :: MacOS",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Software Development :: Quality Assurance",
+]
 dependencies = []          # toàn bộ khung chạy bằng thư viện chuẩn
 
 [project.urls]
+# the repository is private (owner, 2026-10-06): no link a reader of the package page cannot open
 Homepage = "https://aisef.io/"
-Repository = "https://github.com/nghinh/aisef"
 
 [project.scripts]
 aisef = "aisef.cli:main"
