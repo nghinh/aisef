@@ -93,8 +93,12 @@ làm điều finding nói — không chứng minh finding đọc đúng yêu c�
 
 Journal có schema đóng; resume tại chỗ cần đổi format. Thay vào đó `aisef bundle continue`: baseline = commit cuối journal
 xác nhận (merge chưa commit bị loại và báo); obligation đã giao thành story VERIFY mà kernel chứng minh lại, không gọi
-developer (một lượt review mà luật K-NOWORK-001 của chủ dự án giữ — không đổi); `aisef run --parent` ghi dòng dõi. Thư
-mục lượt cũ không bị sửa. `usage`: token theo lớp, request, retry, thời gian; tiền chỉ từ bảng giá trong settings.
+developer (một lượt review mà luật K-NOWORK-001 của chủ dự án giữ — không đổi); `aisef run --parent` ghi dòng dõi và
+**giữ quyền nối tiếp độc quyền** (`CONTINUED-BY.json`, tạo bằng O_EXCL: dòng dõi không bao giờ rẽ nhánh). Bằng chứng của
+lượt cũ không bị sửa (một tệp claim được thêm). `RUN.started.json` cho phép nối tiếp một lượt bị giết trước khi ghi record.
+`usage`: token theo lớp, request, retry, thời gian; tiền chỉ từ bảng giá trong settings; `lineage_usage` cộng mỗi run một
+lần, chi phí của run bị giết không bao giờ `known`. Đã đo bằng SIGKILL ở năm điểm (`test_v21_continue_integrity`).
+Mô hình đe doạ của anchor: [ANCHOR-THREAT-MODEL.md](ANCHOR-THREAT-MODEL.md).
 
 ## ADR-9 — Thí nghiệm: niêm phong trước khi tiêu
 

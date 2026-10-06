@@ -399,7 +399,9 @@ class Uncontainable(unittest.TestCase):
                           ("(OSError, subprocess.SubprocessError)", eb.STRUCTURAL), ("ShutdownRefused", eb.STRUCTURAL),
                           # V2.1 (V2-02): the record's canonical form (ValueError), the evidence anchor's read
                           # ((OSError, ValueError)) and the manifest's write (OSError, re-raised when the run succeeded)
-                          ("ValueError", eb.STRUCTURAL), ("(OSError, ValueError)", eb.STRUCTURAL), ("OSError", eb.STRUCTURAL)})
+                          ("ValueError", eb.STRUCTURAL), ("(OSError, ValueError)", eb.STRUCTURAL), ("OSError", eb.STRUCTURAL),
+                          # V2.1 (D): a predecessor already continued — the claim exists — refuses the run naming it
+                          ("FileExistsError", eb.STRUCTURAL)})
 
     def test_the_audit_flags_every_swallowing_pattern_and_accepts_every_re_raise(self):
         def v(src):

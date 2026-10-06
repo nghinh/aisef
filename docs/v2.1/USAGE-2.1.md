@@ -65,7 +65,8 @@ cần duyệt lại. Một obligation mà không bản phát hành nào biết �
 
 ## 4. Sau một lượt chạy
 
-- Lượt chạy in `evidence_anchor`; **giữ nó ngoài thư mục lượt chạy**. Kiểm:
+- Lượt chạy in `evidence_anchor` (và ghi vào tệp mới với `--anchor-out FILE`); **giữ nó nơi developer không ghi được**
+  — ngoài thư mục run thôi là chưa đủ khi developer chạy cùng user ([ANCHOR-THREAT-MODEL.md](ANCHOR-THREAT-MODEL.md)). Kiểm:
 ```bash
 aisef run --verify --project bundle.json --out run1 --expect-anchor <anchor>
 ```
@@ -82,8 +83,26 @@ aisef bundle continue bundle.json --from-run run1 --out continued.json
 aisef run --project continued.json --repo run1/repo --parent run1 --settings settings.json --out run2
 ```
 Baseline mới = commit cuối mà journal của `run1` xác nhận; các story đã giao thành story `CARRIED` (VERIFY) được kernel
-chứng minh lại mà không gọi developer. `run1` không bị sửa; `run2/RUN.json` ghi `continues` (đường dẫn + anchor). Bundle/kernel
-khác ⇒ từ chối (đó là dự án mới, không phải nối tiếp).
+chứng minh lại mà không gọi developer. Bundle/kernel khác ⇒ từ chối (đó là dự án mới, không phải nối tiếp).
+
+Bảo đảm (đã đo bằng SIGKILL thật, `test_v21_continue_integrity`):
+- **Một run được nối tiếp đúng một lần.** `--parent` tạo độc quyền `run1/CONTINUED-BY.json` ngay trước khi run bắt đầu;
+  run thứ hai (đồng thời hay sau) bị từ chối, nêu tên run đã nối. Ngoài tệp đó, bằng chứng của `run1` giữ nguyên từng byte.
+- **Run bị giết vẫn nối được.** `RUN.started.json` được ghi một lần trước mọi việc (danh tính bundle/kernel/plan/settings);
+  thiếu `RUN.json` thì `continue` đọc nó, báo `recorded: false`.
+- **Không commit/merge lặp, không mất nghĩa vụ.** Merge mà journal chưa commit bị bỏ ra (báo `in_flight`); mỗi story được
+  commit đúng một lần trong cả dòng dõi; nghĩa vụ đã giao được chứng minh lại (CARRIED), phần còn lại được giao.
+- **Không mất, không đếm đôi chi phí.** `usage` của mỗi run chỉ đếm luồng phiên của chính nó; `run2/RUN.json` ghi
+  `lineage_usage` = dòng dõi của run trước + của mình, mỗi run một lần. Chi phí của một run bị giết không bao giờ là
+  `known` (bước đang chạy khi bị giết có thể thiếu): tổng dòng dõi khi đó là `null`.
+- **Đuôi journal bị cắt** (mất điện giữa một lần ghi; một tín hiệu không cắt được: mỗi sự kiện là một `write` + `fsync`):
+  dùng phần đầu đã kiểm chuỗi hash, báo `torn_tail: true`, sự kiện bị cắt coi như chưa xảy ra. Một dòng hỏng ở giữa ⇒ từ chối.
+- **Tiến trình của run bị giết.** Watchdog của mỗi process range giết cả nhóm khi controller mất (đo: 2 tiến trình probe
+  sống lúc kill, 0 còn lại sau 0,1 s).
+
+Khác với resume tại chỗ: không có gì của `run1` được chạy tiếp hay ghi thêm vào journal của nó; `run2` là một lượt chạy
+mới, journal mới, bắt đầu từ commit cuối đã xác nhận — công việc đang dở trong `run1` (một phiên, một merge chưa commit)
+được làm lại từ đầu, và chi phí của nó vẫn được tính trong dòng dõi.
 
 ## 6. Thay đổi có thể làm hỏng quy trình cũ
 

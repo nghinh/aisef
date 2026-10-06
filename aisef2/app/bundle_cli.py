@@ -368,17 +368,23 @@ def continue_from(data: Mapping, run_dir: pathlib.Path) -> tuple[dict, dict]:
     from aisef2.app import run as R
     from aisef2.journal import format3
     project = B.load(data)
+    recorded = True
     try:
         rec = json.loads((run_dir / "RUN.json").read_text(encoding="utf-8"))
     except (OSError, ValueError) as e:
-        raise B.BundleError(f"{run_dir}: no run record ({type(e).__name__})") from e
+        try:    # V2.1: a run killed before its record still names its identities (RUN.started.json)
+            rec = json.loads((run_dir / R.STARTED).read_text(encoding="utf-8"))
+            rec["journal"], recorded = {"path": "run/journals/aisef-run.jsonl"}, False
+        except (OSError, ValueError):
+            raise B.BundleError(f"{run_dir}: no run record ({type(e).__name__})") from e
     if rec.get("bundle_digest") != project.digest:
         raise B.BundleError(f"{run_dir} is a run of another bundle: a continuation is of the same project")
     if rec.get("kernel_digest") != R.kernel_digest():
         raise B.BundleError(f"{run_dir} ran another kernel ({str(rec.get('kernel_digest'))[:12]}): a new project, "
                             "not a continuation")
     try:
-        events = format3.reconstruct((run_dir / rec["journal"]["path"]).read_text(encoding="utf-8")).events
+        journal = format3.reconstruct((run_dir / rec["journal"]["path"]).read_text(encoding="utf-8"))
+        events = journal.events
     except Exception as e:  # noqa: BLE001 — any refusal of the reader is the answer
         raise B.BundleError(f"{run_dir}: the journal does not reconstruct ({type(e).__name__}: {e})"[:400]) from e
     commits = [(e.data["story_id"], e.data["revision"]) for e in events if e.type == "story/commit"]
@@ -417,7 +423,15 @@ def continue_from(data: Mapping, run_dir: pathlib.Path) -> tuple[dict, dict]:
     out = {**dict(data), "plan": plain(new_plan), "stories": stories,
            "description": f"{data['description']} — continued from the run anchored {anchor or '(no manifest)'}"}
     B.load(out)
+    try:
+        continued_by = json.loads((run_dir / R.CLAIM).read_text(encoding="utf-8")).get("run")
+    except (OSError, ValueError):
+        continued_by = None
     report = {"carried": done, "carried_as": carried, "baseline": baseline, "run": str(run_dir), "evidence_anchor": anchor,
+              "recorded": recorded, "already_continued_by": continued_by,
+              # a cut last line (a power loss mid-append: one write and one fsync per event) is the reader's verified
+              # prefix: the cut event did not happen, and what it would have recorded is left out like a merge in flight
+              "torn_tail": bool(journal.torn_tail),
               "in_flight": None if main == baseline else
               f"the run's main {main[:12]} is not its journal's last commit {baseline[:12]}: what the journal did "
               "not commit (a merge in flight) is left out",

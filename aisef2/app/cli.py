@@ -1,6 +1,7 @@
 """`aisef run`: the V2 product command.
 
-    aisef run --project BUNDLE --settings SETTINGS --repo REPO --out DIR    run the project's plan on REPO (a new DIR)
+    aisef run --project BUNDLE --settings SETTINGS --repo REPO --out DIR [--anchor-out FILE] [--parent RUN]
+                                                                          run the project's plan on REPO (a new DIR)
     aisef run --check --project BUNDLE --settings SETTINGS --repo REPO      everything before the provider: no request
     aisef run --verify --project BUNDLE --out DIR [--expect-anchor A]     re-derive a finished run from its journal
                                                                           and evidence (A: the anchor the run printed)
@@ -34,6 +35,9 @@ def _parser() -> argparse.ArgumentParser:
                    help="verify only: the evidence anchor the run printed, kept outside the run directory")
     p.add_argument("--parent", type=pathlib.Path,
                    help="run only: the run this one continues (`aisef bundle continue`), recorded with its anchor")
+    p.add_argument("--anchor-out", type=pathlib.Path,
+                   help="run only: a new file (never overwritten) the evidence anchor is written to — keep it where the "
+                        "developer cannot write (docs/v2.1/ANCHOR-THREAT-MODEL.md)")
     return p
 
 
@@ -50,6 +54,8 @@ def run(argv: list[str]) -> int:
         p.error(f"this mode needs {' '.join(missing)}")
     if a.expect_anchor is not None and not a.verify:
         p.error("--expect-anchor is given to --verify")
+    if a.anchor_out is not None and (a.verify or a.check or a.anchor_out.exists()):
+        p.error("--anchor-out names a new file, for a run")
     try:
         project = bundle.read(a.project)
         if a.verify:
@@ -69,6 +75,9 @@ def run(argv: list[str]) -> int:
         print(f"aisef run: refused: {e}", file=sys.stderr)
         return 2
     anchor = R.anchor_in(a.out)     # V2.1: keep it outside the run directory; `--verify --expect-anchor` checks it
+    if anchor and a.anchor_out is not None:
+        with a.anchor_out.open("x", encoding="utf-8") as f:
+            f.write(anchor + "\n")
     _print({k: rec.get(k) for k in ("project", "delivery_verdict", "delivery_blocked_by", "story_outcomes", "final_main",
                                      "journal", "plan_quality_verdict")} | {"record": str(a.out / "RUN.json")}
            | ({"evidence_anchor": anchor} if anchor else {}))

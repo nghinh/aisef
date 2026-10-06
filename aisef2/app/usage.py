@@ -127,3 +127,45 @@ def no_progress(events: list[dict]) -> list[dict]:
         if same:
             out.append({"story": sid, "attempts_repeating_the_one_before": [n + 1 for n in same], "failures": rows[same[0]]})
     return out
+
+
+def _own(run_dir: pathlib.Path, prices: Mapping | None) -> dict:
+    """A run's own account, as one lineage entry: from its record when it has one, else re-derived from its session
+    streams and journal (a run killed before its record: the step in flight when it stopped may be missing, so its
+    cost is never `known`)."""
+    try:
+        rec = json.loads((run_dir / "RUN.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        rec = None
+    if rec is not None and isinstance(rec.get("usage"), Mapping) and "error" not in rec["usage"]:
+        u, recorded = rec["usage"], True
+    else:
+        from aisef2.journal import format3
+        try:
+            events = [{"seq": e.seq, "type": e.type, "data": dict(e.data)} for e in format3.reconstruct(
+                (run_dir / "run" / "journals" / "aisef-run.jsonl").read_text(encoding="utf-8")).events]
+        except Exception:  # noqa: BLE001 — a journal that does not reconstruct accounts for nothing; its streams still do
+            events = []
+        u, recorded = usage(run_dir, events, prices, {}), False
+    cost = dict(u.get("cost") or {})
+    if not recorded and cost.get("value") is not None:
+        cost = {**cost, "value": None, "status": "partial: the run has no record (killed): its last step may be missing"}
+    return {"run": str(run_dir), "recorded": recorded, "tokens": dict(u.get("tokens") or {}), "cost": cost}
+
+
+def lineage(predecessor: pathlib.Path, own: Mapping, prices: Mapping | None) -> dict:
+    """What a lineage of continued runs used: the predecessor's lineage (or its own account when it continues none)
+    followed by this run's own — each run once, so nothing is counted twice; a total whose any part is unknown is
+    unknown (`null`), never a partial sum shown as the whole."""
+    try:
+        before = json.loads((predecessor / "RUN.json").read_text(encoding="utf-8")).get("lineage_usage")
+    except (OSError, ValueError):
+        before = None
+    runs = list(before["runs"]) if isinstance(before, Mapping) else [_own(predecessor, prices)]
+    runs.append({"run": "this run", "recorded": True, "tokens": dict(own.get("tokens") or {}), "cost": dict(own.get("cost") or {})})
+    tokens = {k: sum(int((r["tokens"] or {}).get(k, 0)) for r in runs) for k in CLASSES}
+    values = [(r["cost"] or {}).get("value") for r in runs]
+    known = all(isinstance(v, (int, float)) for v in values)
+    return {"runs": runs, "tokens": tokens,
+            "cost": {"value": round(sum(values), 6) if known else None,
+                     "status": "known" if known else "unknown: some run's cost is not known (not 0)"}}
