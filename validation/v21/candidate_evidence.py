@@ -99,7 +99,8 @@ GENERATED = {
                             "review_verify.verify); INVENTORY_SHA256 and test_no_dual_authority's release delta edited by hand"),
     "closure-evidence/v2/Q0-CHECKER-CALIBRATION.json": (
         _checker_calibration, "only after mutation, P2 and the inventory are current; its known-bad observation changes"),
-    "closure-evidence/v2/cycle2/K-NOWORK-001-REHEARSAL.json": (None, "after the plan correction (it is BOUND)"),
+    "closure-evidence/v2/cycle2/K-NOWORK-001-REHEARSAL.json": (None, "after the plan correction (it is BOUND): needs the v2.1 correction committed in the "
+                                                               "repository; the candidate run refuses before it exists"),
 }
 NOT_GENERATED = {
     "closure-evidence/v2/release/S2-MUTATION.json (+ P2/P6/cycle2 P1 mutation records)":

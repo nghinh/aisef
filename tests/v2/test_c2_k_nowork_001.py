@@ -259,11 +259,23 @@ class Record(unittest.TestCase):
         self.assertEqual(kn.history_problems(), [])
 
     def test_the_writer_refuses_the_2_0_record_and_an_existing_file_before_running_anything(self):
+        """Each guard on its own, before the kernel is materialised or a case runs: the 2.0 path, an existing file (every
+        bound file present, so nothing else can refuse), and a bound file missing from the tree (a fresh output path)."""
         import json
         import tempfile
         from unittest import mock
         from validation.qualification import c2_k_nowork_001 as kn
+        from validation.qualification import c2_orchestration_repair as rp
         before = (ROOT / kn.OUT_REL).read_bytes()
+        present = dict.fromkeys(kn.BOUND, "0" * 64)
+
+        def refused(want: str, **patch) -> None:
+            with mock.patch.multiple(kn, **patch), mock.patch.object(kn, "in_kernel") as run, \
+                    mock.patch.object(rp, "materialise", side_effect=AssertionError("the kernel was materialised")) as made:
+                with self.assertRaises(SystemExit) as cm:
+                    kn.write()
+                self.assertIn(want, str(cm.exception))
+                self.assertEqual((run.call_count, made.call_count), (0, 0))
         with tempfile.TemporaryDirectory() as t:
             there = pathlib.Path(t) / "x.json"
             there.write_text("{}", encoding="utf-8")
@@ -272,9 +284,50 @@ class Record(unittest.TestCase):
                         self.assertRaises(SystemExit):
                     kn.write()
                 self.assertEqual(run.call_count, 0)
+            for rel in (kn.OUT_REL, str(there)):
+                with self.subTest(rel=rel, bound="present"):
+                    refused("exists or is the 2.0 record", V21_OUT_REL=rel, _bound=mock.Mock(return_value=present))
+            absent = str(pathlib.Path(t) / "absent" / "K.json")          # the 2.0 path itself, not on disk: the path guard alone
+            with self.subTest(two_point_o="absent"):
+                refused("exists or is the 2.0 record", V21_OUT_REL=absent, OUT_REL=absent, _bound=mock.Mock(return_value=present))
+            fresh = pathlib.Path(t) / "new" / "K.json"
+            with self.subTest(bound="missing"):
+                refused("bound but not on this tree: ['closure-evidence/v2/v2.1/NOT-ON-THIS-TREE.json']", V21_OUT_REL=str(fresh),
+                        BOUND=(*kn.BOUND[:3], "closure-evidence/v2/v2.1/NOT-ON-THIS-TREE.json", kn.BOUND[4]))
+                self.assertFalse(fresh.exists())
             self.assertEqual(there.read_text(encoding="utf-8"), "{}")
         self.assertEqual((ROOT / kn.OUT_REL).read_bytes(), before)
         self.assertEqual(json.loads(before)["verdict"], "REPRODUCED AND CORRECTED")
+
+    def test_the_check_binds_the_kernel_digest_and_the_b03a_authority(self):
+        """A v2.1 record (the 2.0 measurements bound to this tree here, in a temporary file) holds only while this tree's
+        aisef2 has the kernel digest it records and it names the B-03a authority."""
+        import copy
+        import json
+        import tempfile
+        from unittest import mock
+        from validation.qualification import c2_k_nowork_001 as kn
+        from validation.qualification import c2_orchestration_repair as rp
+        from validation.qualification import c2_plan_correction as pc
+        rec = json.loads((ROOT / kn.OUT_REL).read_text(encoding="utf-8"))
+        rec.update(bound=kn._bound(), history=kn._history(), requalification=pc.V21_AUTHORITY)
+        rec["kernel"]["after"]["kernel_digest"] = rp.kernel_digest(ROOT / "aisef2")
+        with tempfile.TemporaryDirectory() as t:
+            path = pathlib.Path(t) / "K-NOWORK-001-REHEARSAL.json"
+            for name, edit, want in (
+                    ("as bound", lambda r: None, []),
+                    ("another kernel", lambda r: r["kernel"]["after"].update(kernel_digest="0" * 64),
+                     ["the kernel changed since the record: kernel.after.kernel_digest is not this tree's aisef2"]),
+                    ("no kernel digest", lambda r: r["kernel"].pop("after"),
+                     ["the kernel changed since the record: kernel.after.kernel_digest is not this tree's aisef2"]),
+                    ("no authority", lambda r: r.pop("requalification"), ["the record's requalification is not the B-03a authority"]),
+                    ("another authority", lambda r: r.update(requalification=pc.AUTHORITY),
+                     ["the record's requalification is not the B-03a authority"])):
+                body = copy.deepcopy(rec)
+                edit(body)
+                path.write_text(json.dumps(body), encoding="utf-8")
+                with self.subTest(name), mock.patch.object(kn, "V21_OUT_REL", str(path)):
+                    self.assertEqual(kn.check(), want)
 
 
 if __name__ == "__main__":

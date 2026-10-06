@@ -6,8 +6,10 @@ CALL', 2026-10-02): the owner's planning decisions applied to the accepted PLAN-
 
 A plan-level (level 4) change only: eight obligations move to an existing implementation story (`DECISIONS`), which
 leaves STORY-05-01 and STORY-05-03 without an obligation — they are no longer stories of the plan. No BehaviorContract,
-ProductProofSpec, approval or requirement is touched: the plan is rebuilt from the accepted plan's own obligations, the
-59 specs are the ones compiled under the persisted real approvals, and the record proves they are the accepted ones.
+ProductProofSpec, approval or requirement is touched: the plan is rebuilt from the accepted plan's own obligations and
+the 59 specs are the ones compiled under the persisted real approvals. That they are the accepted ones is the 2.0
+record's claim, made through the probe-identity re-binding (rebind.py); the v2.1 record compares the contract id, contract
+hash and probe id literally and lists the 2.1 spec identities as they are.
 A moved obligation depends on the INTRODUCE criteria of every story its new story depends on — the authoring aid's own
 rule (p10_contracts.build) — so its new story is ordered after the story that introduced the behaviour.
 
@@ -17,7 +19,9 @@ B-03a (owner, 2026-10-06): the 2.0 record (`OUT_REL`, written on the 2.0 kernel)
 and it is never re-derived or rewritten (`history_problems`). The current record is the v2.1 one (`V21_OUT_REL`,
 `record_v21`), compared EXACTLY with this tree's derivation: it states literal facts only — per spec key the contract id,
 contract hash and probe id against the accepted proposal's, the spec ids and semantic hashes this tree's — and lists the
-probe-identity re-binding build() applies (rebind.py) apart, labelled as what it is: no behaviour proof.
+probe-identity re-binding build() applies (rebind.py) apart, labelled as what it is: no behaviour proof. The mapping is
+backed: the record binds the v2.1 falsifiability record (`V21_FALSIFIABILITY_REL`, path, LF sha256, verdict) and has a
+problem unless every spec is QUALIFIED there at this tree's semantic hash — so it is written after that record.
 """
 
 from __future__ import annotations
@@ -42,6 +46,8 @@ V21_AUTHORITY = ("owner directive 2026-10-06, B-03a (closure-evidence/v2/cycle2/
                  "engine-digest tolerance; no rebind mapping hiding unverified behaviour")
 IDENTITY_MAPPING = ("identity mapping (rebind), not a behaviour proof; behaviour: "
                     "closure-evidence/v2/v2.1/P5-FALSIFIABILITY.json")
+V21_FALSIFIABILITY_REL = "closure-evidence/v2/v2.1/P5-FALSIFIABILITY.json"   # the behaviour evidence the mapping names
+FALSIFIABILITY_PASSED = "COMPLETE — EVERY RETAINED SPEC QUALIFIED"           # p5_falsifiability.run()'s passing verdict
 PLAN_ID = "LEDGERLOCK-PLAN-V2.2-CORRECTION-1"
 AUTHORITY = ("owner ruling 'AISEF V2 — FINAL PLAN CORRECTION + DELIVERY RUN PREREGISTRATION / NO PROVIDER CALL' "
              "(2026-10-02), decisions 1-4")
@@ -207,15 +213,21 @@ def record(b: dict | None = None) -> dict:
 
 def problems(body: dict) -> list[str]:
     p, a = body["proofs"], body["static_admission"]
+    s = p["product_proof_specs"]
+    v21 = "all_contracts_unchanged" in s        # the v2.1 record: literal, no re-binding
     out = [f"corrected plan, check {c['number']} {c['name']}: {'; '.join(c['problems'])}" for c in a["corrected_plan"]["checks"] if not c["passed"]]
     if not a["accepted_plan"]["admitted"]:
-        out.append("the accepted plan is not admitted on this tree")
+        out.append("this tree's old plan (the accepted plan's obligations, 2.1 spec ids) is not admitted on this tree" if v21
+                   else "the accepted plan is not admitted on this tree")
     if a["corrected_plan_without_approvals"]["admitted"]:
         out.append("admitted without any approval: the approval gate did not hold")
-    s = p["product_proof_specs"]
-    if "all_contracts_unchanged" in s:          # the v2.1 record: literal, no re-binding
+    if v21:
         if s["count"] != 59 or not (s["all_contracts_unchanged"] and s["all_probe_ids_unchanged"] and s["spec_of_each_criterion_unchanged"]):
             out.append("a ProductProofSpec's contract or probe differs from the accepted one")
+        f = body.get("identity_mapping", {}).get("behaviour") or {}
+        if f.get("sha256") is None or f.get("verdict") != FALSIFIABILITY_PASSED or f.get("qualified_at_this_tree_s_semantic_hash") != s["count"]:
+            out.append(f"the identity mapping is not backed: {f.get('path', V21_FALSIFIABILITY_REL)} is missing, not passing, or does not have every spec "
+                       "QUALIFIED at this tree's semantic hash")
     elif s["count"] != 59 or not s["all_equal_to_accepted"] or s["semantic_hash_changes"] or not s["spec_of_each_criterion_unchanged"]:
         out.append("a ProductProofSpec differs from the accepted one")
     if not p["requirement_coverage"]["unchanged"]:
@@ -266,7 +278,12 @@ def record_v21(b: dict | None = None) -> dict:
         "old_plan_mapped_back_plan_hash": rebind.plan_back(b["old"], b["rebind"]).plan_hash,
         "pairs": "[accepted, this tree's]",
         "specs": {r["spec_id"]: {k: [accepted[r["spec_id"]][k], r[k]] for k in ("spec_hash_id", "semantic_hash")}
-                  | {"mapped_by_rebind": b["rebind"].get(r["spec_hash_id"]) == accepted[r["spec_id"]]["spec_hash_id"]} for r in rows}}
+                  | {"mapped_by_rebind": b["rebind"].get(r["spec_hash_id"]) == accepted[r["spec_id"]]["spec_hash_id"]} for r in rows},
+        "behaviour": _behaviour(rows)}
+    body["static_admission"]["note"] = (
+        f"accepted_plan is this tree's old plan {b['old'].plan_hash} (the accepted plan's obligations with the 2.1 spec ids), "
+        f"admitted under this tree's engine; its identity with the accepted PLAN-V2.2 {pa.ACCEPTED['plan_hash']} is "
+        "identity_mapping's (rebind.plan_back), not a fact of this admission")
     body["record"] = "AISEF V2.1 — LEDGERLOCK PLAN-V2.2 CORRECTION 1 on the 2.1 kernel (owner planning decisions applied; plan only)"
     body["requalification"] = V21_AUTHORITY
     body["history"] = {"path": OUT_REL, "sha256": c2_p9.C.lf_sha(ROOT / OUT_REL),
@@ -276,6 +293,19 @@ def record_v21(b: dict | None = None) -> dict:
     body["problems"] = problems(body)
     body["verdict"] = "PLAN CORRECTION ADMITTED STATICALLY" if not body["problems"] else "PROBLEMS"
     return json.loads(json.dumps(body))
+
+
+def _behaviour(rows: list[dict]) -> dict:
+    """The v2.1 falsifiability record, bound: its LF sha256, its verdict and how many of this tree's specs it has QUALIFIED
+    at this tree's semantic hash (None / 0 when it is missing)."""
+    from validation.qualification import c2_p9
+    path = ROOT / V21_FALSIFIABILITY_REL
+    rec = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
+    qualified = {r.get("spec_id"): r.get("semantic_hash") for r in rec.get("specs", []) if r.get("status") == "QUALIFIED"}
+    return {"path": V21_FALSIFIABILITY_REL, "sha256": c2_p9.C.lf_sha(path) if path.exists() else None, "verdict": rec.get("verdict"),
+            "qualified_at_this_tree_s_semantic_hash": sum(1 for r in rows if qualified.get(r["spec_id"]) == r["semantic_hash"]),
+            "rule": f"every spec QUALIFIED there (the pristine reference meets the spec's expectation, its own witness the contrary) at this tree's semantic hash, "
+                    f"verdict '{FALSIFIABILITY_PASSED}'; write_v21 refuses otherwise"}
 
 
 def history_problems() -> list[str]:
@@ -303,7 +333,8 @@ def check() -> list[str]:
 
 
 def write_v21() -> dict:
-    """Writes the v2.1 record to a new file: an existing file, a 2.0 path or a record with problems is refused."""
+    """Writes the v2.1 record to a new file: a 2.0 path, a record with problems (among them an identity mapping the v2.1
+    falsifiability record does not back) or an existing file is refused."""
     path = ROOT / V21_OUT_REL
     if path.resolve() == (ROOT / OUT_REL).resolve():
         raise SystemExit(f"refused: {OUT_REL} is the 2.0 record")

@@ -748,6 +748,7 @@ def record(ready: dict, m: dict | None = None) -> dict:
                      "start_sha": plan.baseline, "requirements_sha256": P10.REQUIREMENTS_SHA256, "repository": m["workload"]},
         "plan": {"id": plan.id, "plan_hash": plan.plan_hash, "stories": len({o.story_id for o in plan.obligations}), "obligations": len(plan.obligations),
                  "execution_order": c2_p9.order(plan, pc.build()["graph"]),
+                 # B-03a: pc.check() is now the v2.1 record's exact check + the 2.0 history; no new preregistration is authorized
                  "correction": {"path": pc.OUT_REL, "sha256": C.lf_sha(ROOT / pc.OUT_REL), "check": pc.check()}},
         "profile": {"name": EXPERIMENT["id"], "limits": c2_p9.PROFILES[c2_p9.EXPERIMENT], "developer_attempts_per_story": attempts,
                     "tests_policy": "TestsPolicy(blocking=True), as attempts 1 and 2"},

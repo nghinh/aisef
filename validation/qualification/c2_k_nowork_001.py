@@ -3,7 +3,7 @@ reproduced and the correction measured, under both kernels, through the real sto
 LedgerLock repository; recorded separately from K-PRESAT-001.
 
     python -P validation/qualification/c2_k_nowork_001.py --write   # -> closure-evidence/v2/v2.1/K-NOWORK-001-REHEARSAL.json (minutes; new file only)
-    python -P validation/qualification/c2_k_nowork_001.py --check   # that record's bound identities are this tree's (nothing is re-run)
+    python -P validation/qualification/c2_k_nowork_001.py --check   # that record's bound files and kernel digest are this tree's (nothing is re-run)
 
 B-03a (owner, 2026-10-06): the 2.0 record (`OUT_REL`, made on the 2.0 release tree) is history — its blob is tag
 v2.0.0's, its verdict and problems as recorded (`history_problems`); the current one is the v2.1 record (`V21_OUT_REL`),
@@ -415,7 +415,8 @@ def history_problems() -> list[str]:
 
 
 def check() -> list[str]:
-    """The v2.1 record binds this tree; the 2.0 record holds as history."""
+    """The v2.1 record binds this tree — its files, its kernel digest, the B-03a authority; the 2.0 record holds as history."""
+    from validation.qualification import c2_plan_correction as pc
     path = ROOT / V21_OUT_REL
     if not path.exists():
         return [f"{V21_OUT_REL} is missing", *history_problems()]
@@ -427,6 +428,10 @@ def check() -> list[str]:
         out.append("the real run's rows differ from the record")
     if rec.get("history") != _history():
         out.append(f"the 2.0 record it names as history is not {OUT_REL} on this tree")
+    if rec.get("kernel", {}).get("after", {}).get("kernel_digest") != _rp().kernel_digest(ROOT / "aisef2"):
+        out.append("the kernel changed since the record: kernel.after.kernel_digest is not this tree's aisef2")
+    if rec.get("requalification") != pc.V21_AUTHORITY:
+        out.append("the record's requalification is not the B-03a authority")
     return out + history_problems()
 
 

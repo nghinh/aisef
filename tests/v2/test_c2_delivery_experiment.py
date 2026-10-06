@@ -83,13 +83,87 @@ class PlanCorrection(unittest.TestCase):
         body = copy.deepcopy(rec)
         body["proofs"]["product_proof_specs"]["all_contracts_unchanged"] = False
         self.assertIn("a ProductProofSpec's contract or probe differs from the accepted one", pc.problems(body))
+        # the admission named accepted_plan is of this tree's old plan; its identity with the accepted one is the mapping's
+        note = rec["static_admission"]["note"]
+        self.assertNotEqual(self.b["old"].plan_hash, OLD_HASH)
+        self.assertIn(f"accepted_plan is this tree's old plan {self.b['old'].plan_hash} ", note)
+        self.assertIn(f"the accepted PLAN-V2.2 {OLD_HASH} is identity_mapping's (rebind.plan_back)", note)
+        self.assertNotIn("note", self.rec["static_admission"])
+        for body, want, other in ((copy.deepcopy(rec), "this tree's old plan (the accepted plan's obligations, 2.1 spec ids) is not admitted on "
+                                   "this tree", "the accepted plan is not admitted on this tree"),
+                                  (copy.deepcopy(self.rec), "the accepted plan is not admitted on this tree",
+                                   "this tree's old plan (the accepted plan's obligations, 2.1 spec ids) is not admitted on this tree")):
+            body["static_admission"]["accepted_plan"]["admitted"] = False
+            with self.subTest(want=want):
+                self.assertIn(want, pc.problems(body))
+                self.assertNotIn(other, pc.problems(body))
+
+    def test_the_identity_mapping_is_backed_by_the_v2_1_falsifiability_record(self):
+        """B-03a (fix round): the mapping is backed, not only labelled — the record binds the v2.1 falsifiability record
+        (path, LF sha256, verdict) and has a problem unless every spec is QUALIFIED there at this tree's semantic hash;
+        check()'s exact compare then holds the binding, and the writer refuses an unbacked record."""
+        good = {"verdict": "COMPLETE — EVERY RETAINED SPEC QUALIFIED",
+                "specs": [{"spec_id": r[0], "semantic_hash": r[4], "status": "QUALIFIED"} for r in pc._rows(self.b)]}
+        unbacked = "the identity mapping is not backed: "
+
+        def changed(edit):
+            doc = copy.deepcopy(good)
+            edit(doc)
+            return doc
+        with tempfile.TemporaryDirectory() as t:
+            path, out = pathlib.Path(t) / "P5-FALSIFIABILITY.json", pathlib.Path(t) / "v2.1" / "PLAN-V2.2-CORRECTION-1.json"
+            with mock.patch.object(pc, "V21_FALSIFIABILITY_REL", str(path)), mock.patch.object(pc, "V21_OUT_REL", str(out)):
+                rec = pc.record_v21(self.b)
+                self.assertEqual(rec["identity_mapping"]["behaviour"]["sha256"], None)
+                self.assertEqual(([x for x in rec["problems"] if x.startswith(unbacked)], rec["verdict"]),
+                                 ([f"{unbacked}{path} is missing, not passing, or does not have every spec QUALIFIED at this tree's "
+                                   "semantic hash"], "PROBLEMS"))
+                with self.assertRaises(SystemExit) as refused:
+                    pc.write_v21()
+                self.assertIn(unbacked, str(refused.exception))
+                self.assertFalse(out.exists())
+                path.write_text(json.dumps(good), encoding="utf-8")
+                rec = pc.record_v21(self.b)
+                f = rec["identity_mapping"]["behaviour"]
+                self.assertEqual((f["path"], f["sha256"], f["verdict"], f["qualified_at_this_tree_s_semantic_hash"]),
+                                 (str(path), c2_p9.C.lf_sha(path), "COMPLETE — EVERY RETAINED SPEC QUALIFIED", 59))
+                self.assertEqual((rec["problems"], rec["verdict"]), ([], "PLAN CORRECTION ADMITTED STATICALLY"))
+                for name, doc in (("verdict", changed(lambda d: d.update(verdict="PROBLEMS"))),
+                                  ("a spec not qualified", changed(lambda d: d["specs"][0].update(status="NOT_QUALIFIED"))),
+                                  ("another semantic hash", changed(lambda d: d["specs"][-1].update(semantic_hash="0" * 64))),
+                                  ("a spec missing", changed(lambda d: d["specs"].pop()))):
+                    path.write_text(json.dumps(doc), encoding="utf-8")
+                    with self.subTest(name):
+                        rec = pc.record_v21(self.b)
+                        self.assertEqual(rec["verdict"], "PROBLEMS")
+                        self.assertTrue(any(x.startswith(unbacked) for x in rec["problems"]))
+                path.write_text(json.dumps(good), encoding="utf-8")
+                pc.write_v21()
+                self.assertEqual(pc.check(), [])
+                path.write_text(json.dumps({**good, "elapsed_s": 1.0}), encoding="utf-8")     # still passing, another file
+                self.assertEqual(pc.check(), [f"{out} is not what this tree derives"])
 
     def test_the_v2_1_writer_refuses_the_2_0_record_and_an_existing_file(self):
+        """Each guard on its own: the 2.0 path before anything is derived, a record with problems, then mode 'x'."""
         before = (ROOT / pc.OUT_REL).read_bytes()
         with tempfile.TemporaryDirectory() as t:
             there = pathlib.Path(t) / "x.json"
             there.write_text("{}", encoding="utf-8")
-            for rel in (pc.OUT_REL, str(there)):
+            fresh = pathlib.Path(t) / "new" / "y.json"
+            with mock.patch.object(pc, "V21_OUT_REL", pc.OUT_REL), mock.patch.object(pc, "record_v21", return_value={"problems": []}) as derive:
+                with self.assertRaises(SystemExit) as refused:
+                    pc.write_v21()
+                self.assertEqual(str(refused.exception), f"refused: {pc.OUT_REL} is the 2.0 record")
+                self.assertEqual(derive.call_count, 0)
+            with mock.patch.object(pc, "V21_OUT_REL", str(fresh)), mock.patch.object(pc, "record_v21", return_value={"problems": ["p1", "p2"]}):
+                with self.assertRaises(SystemExit) as refused:
+                    pc.write_v21()
+                self.assertEqual(str(refused.exception), "refused: p1; p2")
+                self.assertFalse(fresh.exists())
+            with mock.patch.object(pc, "V21_OUT_REL", str(there)), mock.patch.object(pc, "record_v21", return_value={"problems": []}):
+                with self.assertRaises(FileExistsError):
+                    pc.write_v21()
+            for rel in (pc.OUT_REL, str(there)):        # the real derivation as well: refused either way
                 with self.subTest(rel=rel), mock.patch.object(pc, "V21_OUT_REL", rel), self.assertRaises((SystemExit, FileExistsError)):
                     pc.write_v21()
             self.assertEqual(there.read_text(encoding="utf-8"), "{}")
@@ -125,6 +199,9 @@ class PlanCorrection(unittest.TestCase):
             self.assertEqual(o.product_proof_spec_id, was[o.criterion_id].product_proof_spec_id)
 
     def test_the_59_specs_and_what_they_cover_are_the_accepted_ones(self):
+        """An identity-mapping check of the 2.0-shape record (record()): its all_equal_to_accepted / semantic_hash_changes
+        hold through the probe-identity re-binding (rebind rule 2), not literally; the behaviour backing of that mapping is
+        the v2.1 falsifiability record (closure-evidence/v2/v2.1/P5-FALSIFIABILITY.json, bound by record_v21)."""
         p = self.rec["proofs"]
         s = p["product_proof_specs"]
         # the record states this tree's contract-spec digest; mapped back by the probe-identity re-binding (release B1,
