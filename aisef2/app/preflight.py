@@ -21,11 +21,24 @@ class IdentityStop(Exception):
     """The route cannot be attested: no session may start."""
 
 
+class _NoRedirect(urllib.request.HTTPRedirectHandler):
+    """A redirect is never followed: urllib's default handler re-sends every header, the bearer key included, to the
+    redirect's target (V2.1, 360° security W8). The 3xx answer comes back as an HTTPError instead."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
+
+
+#: the preflight's opener: no redirect handling beyond refusing one, no proxy auth prompts — the endpoint or nothing
+_OPENER = urllib.request.build_opener(_NoRedirect)
+
+
 def http_transport(endpoint: str, key: str, timeout_s: float = 60.0):
     """(path, body | None) -> (status, json): GET when `body` is None, else POST with "stream": false (one JSON answer
     is read: without it the router answers as an event stream, S6-SMOKE-1-PREFLIGHT-OPAQUE); `key` sent as a bearer
     token, never recorded. A failed request keeps its HTTP status (0 only when no HTTP answer came) and says why in
-    `transport_error` (the error or parse class) and `content_type`."""
+    `transport_error` (the error or parse class) and `content_type`. A redirect is refused, never followed with the key:
+it comes back as its 3xx status with `transport_error` "redirect refused"."""
     if not key:
         raise IdentityStop("no provider key: the key variable is not set, or the client's configuration holds none")
 
@@ -35,11 +48,12 @@ def http_transport(endpoint: str, key: str, timeout_s: float = 60.0):
                                      headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"})
         status, ctype = 0, None
         try:
-            with urllib.request.urlopen(req, timeout=timeout_s) as r:
+            with _OPENER.open(req, timeout=timeout_s) as r:
                 status, ctype = r.status, r.headers.get("Content-Type")
                 return status, json.loads(r.read().decode("utf-8") or "{}")
         except urllib.error.HTTPError as e:
-            return e.code, {"transport_error": "HTTPError", "content_type": e.headers.get("Content-Type") if e.headers else None}
+            why = "redirect refused" if 300 <= e.code < 400 else "HTTPError"
+            return e.code, {"transport_error": why, "content_type": e.headers.get("Content-Type") if e.headers else None}
         except (urllib.error.URLError, OSError, ValueError) as e:
             return status, {"transport_error": type(e).__name__, "content_type": ctype}
     return call

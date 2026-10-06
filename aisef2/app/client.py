@@ -165,6 +165,8 @@ REDACTED = b"[REDACTED]"
 def redact(log: pathlib.Path, secrets) -> int:
     """Every occurrence of a secret value in the session's stream replaced (a tool the model ran may print its
     environment); how many. The stream stays JSON: the values are replaced inside their strings."""
+    if not log.exists():
+        return 0
     data = log.read_bytes()
     count = 0
     for s in sorted({x.encode("utf-8") for x in secrets if x}, key=len, reverse=True):
@@ -195,14 +197,16 @@ def session(name: str, prompt: str, cwd: str, log: pathlib.Path, timeout_s: floa
             raise SessionRefused("the client (opencode) is not on the PATH the run gives it")
         argv = [exe, "run", "--format", "json", "--model", model, "--title", name, "--dir", cwd, prompt]
         log.parent.mkdir(parents=True, exist_ok=True)
-        with log.open("w", encoding="utf-8") as fh:
-            r = ProcessRange(name, argv, cwd=cwd, env=env, output=fh)
-            r.start()
-            try:
-                code, stopped = wait_within(r, log, timeout_s, budget, turn_cap)
-            finally:
-                r.release()
-        redacted = redact(log, secrets)
+        try:
+            with log.open("w", encoding="utf-8") as fh:
+                r = ProcessRange(name, argv, cwd=cwd, env=env, output=fh)
+                r.start()
+                try:
+                    code, stopped = wait_within(r, log, timeout_s, budget, turn_cap)
+                finally:
+                    r.release()
+        finally:    # however the session ends — an interrupt, a budget read that fails — its stream is redacted (V2.1)
+            redacted = redact(log, secrets)
         seen = read_session(log)
         return {"exit": code, "timed_out": code is None and not stopped, "stopped": stopped, "started": True,
                 "error": seen["error"], "text": seen["text"], "turns": seen["turns"], "tokens": seen["tokens"],

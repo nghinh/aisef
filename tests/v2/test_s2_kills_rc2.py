@@ -70,7 +70,7 @@ class Transport(unittest.TestCase):
             if isinstance(answer, Exception):
                 raise answer
             return answer
-        with mock.patch.object(preflight.urllib.request, "urlopen", urlopen):
+        with mock.patch.object(preflight._OPENER, "open", urlopen):      # V2.1: the preflight's own no-redirect opener
             got = preflight.http_transport("https://router.invalid/v1", "k-1", **kw)(path, body)
         return got, seen
 
