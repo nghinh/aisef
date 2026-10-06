@@ -69,5 +69,23 @@ class ReviewerVerify(_Reviewer):
                                                             "no reproducer: the finding states no observable behaviour"))
 
 
+class ReviewerInit(_Reviewer):
+    """Reviewer.__init__ — "L104 Or swapped" (`sys.executable or interpreter`): the interpreter the run gives the review is
+    the one its probes run under (app/run: the run's probe interpreter, V2.1 A1); without one, this Python."""
+
+    def test_the_verification_runs_the_probe_under_the_interpreter_the_run_gave(self):
+        seen = []
+
+        def verify(finding, **kw):
+            seen.append(kw["interpreter"])
+            return ad.review_verify.Verification(ad.review_verify.UNVERIFIABLE, "stub")
+        finding = {"id": "F1", "reproducer": {"kind": "python_callable"}}
+        with mock.patch.object(ad.review_verify, "verify", verify):
+            ad.Reviewer(self.run, self.project, self.tmp / "logs", {}, 5, interpreter="/opt/run/bin/python3")._verify(
+                finding, str(self.tmp / "repo"), "a" * 40)
+            ad.Reviewer(self.run, self.project, self.tmp / "logs", {}, 5)._verify(finding, str(self.tmp / "repo"), "a" * 40)
+        self.assertEqual(seen, ["/opt/run/bin/python3", sys.executable])
+
+
 if __name__ == "__main__":
     unittest.main()
