@@ -58,8 +58,9 @@
  "adr": {
   "path": "docs/v2.1/ADR-V2.1.md",
   "section": "ADR-2 — Ba danh tính tách rời (ARCHITECTURE-EXCEPTION-V2-007)",
-  "sha256": "27ef63e6cdda9fa9f82de1d4ce868d972455ecc8d8d0e49bfaf43036f1410f98",
-  "note": "sha256 of the ADR with its ADR-2 status paragraph naming this record"
+  "read_at": "dc9774f81abb6d3421beda5fb71e08abe69fbb4d",
+  "git_blob": "2c04b8383e2333e1572c6726b5fff2a64208b9a3",
+  "note": "ADR-2 as applied when the owner decided ('gắn với hồ sơ ADR/implementation đang áp dụng'); the ADR is a living document, so this record names it by path, section and its git blob at the commit it was read at, never by its current bytes"
  },
  "contradiction_discovered": "2.0.0 bound two different facts to one digest: a probe's digest (sha256 over its source files) was both what a ProductProofSpec, its semantic_hash, the plan and approval-through-plan bind (what is proved) and what calibration and the RunSpec bind (what ran). A byte change that observes nothing differently — a comment, a launch flag — therefore changed every spec id, made every bundle re-bind and every derived record red, while RFC §5.1, §8 ('content-addressed'), §9.1.1, §12 check 6/9 and §35 ('a probe change bumps probe_digest and therefore every dependent semantic_hash') state exactly that single-digest rule.",
  "concrete_reproducer": "tests/v2/test_v21_identity.py ThreeIdentities.test_a_spec_binds_the_capability_and_the_bytes_are_their_own_digest; one contract compiled by compile_spec (COMPILER_DIGEST unchanged since 2.0.0) has semantic_hash d6a14f9c39a5… under the python_callable_v2 source digest 2.0.0 bound (b1f25878d350…) and 33d9a64dd084… under the capability digest this candidate binds (0821c14651a9…), measured at dc9774f (digests.semantic_hash_of_one_contract_by_probe_digest)",
@@ -171,7 +172,7 @@
    "by": "tests/v2/test_v21_identity.py Migrate.test_migration_rebinds_the_plan_and_nothing_else (asserted; passed at dc9774f)"
   },
   "one_launch_flag_reddens_37_tests": {
-   "claim": "ADR-2 / the B-01 dossier: adding -S alone under the single digest made 37 tests red",
+   "claim": "ADR-2 (as read at dc9774f) / the B-01 dossier: adding -S alone under the single digest made 37 tests red",
    "status": "UNMEASURED",
    "why": "no committed measurement artefact exists; re-measuring needs a full-suite run of 2.0.0 (610a593) with -S added, which this lane may not run"
   },
@@ -297,8 +298,11 @@
    "tests/v2/test_v21_identity.py ThreeIdentities (5: a spec binds the capability and the bytes are their own digest; the Cycle-1 probe keeps its one frozen digest; the shipped calibrations name every class at the bytes that run now; calibrations of other bytes admit nothing; the RunSpec binds each probe's bytes)",
    "tests/v2/test_v21_identity.py Migrate (4: a 2.0.0 bundle is refused naming the command; migration re-binds the plan and nothing else, 59 specs / 67 obligations; a spec no release compiles is refused, not guessed; the command writes a new file, never the input)"
   ],
-  "tests_sha256": {
-   "tests/v2/test_v21_identity.py": "a5f26022385a7bc4fe36172fa8b5e2f2b5918c9cc4c2c12f830aa170b95ae047"
+  "tests_read_at": {
+   "commit": "dc9774f81abb6d3421beda5fb71e08abe69fbb4d",
+   "git_blob": {
+    "tests/v2/test_v21_identity.py": "3a3047b0b4999f465dce854f0059b2b030cef444"
+   }
   },
   "implementation_commits": [
    "919a271",

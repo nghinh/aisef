@@ -100,6 +100,21 @@ class ArchitectureBaseline(unittest.TestCase):
                                              cwd=ROOT, capture_output=True, encoding="utf-8", check=True).stdout)
         self.assertEqual([a["record"] for a in at_2_0_0["architecture_baseline"]["amendments"]], through_v2_006)
 
+    def test_WP_0_1_names_the_manifest_its_checker_writes_and_keeps_the_2_0_one(self):
+        """2.1: WP-0.1's checker writes the v2.1 manifest; the 2.0 manifest it wrote in Cycle 1 is kept, as history."""
+        spec = importlib.util.spec_from_file_location("fm_for_plan_semantics", ROOT / "validation" / "v2" / "freeze_manifest.py")
+        fm = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(fm)
+        wp = next(p for p in pv.load()["work_packages"] if p["id"] == "WP-0.1")
+        self.assertEqual(wp["evidence_artifact"], fm.MANIFEST_REL)
+        self.assertEqual(wp["files_expected"], ["validation/v2/freeze_manifest.py", fm.MANIFEST_REL, fm.HISTORY_MANIFEST_REL])
+        at_2_0_0 = json.loads(subprocess.run(["git", "show", "v2.0.0:docs/implementation/v2/cycle1-manifest.json"],
+                                             cwd=ROOT, capture_output=True, encoding="utf-8", check=True).stdout)
+        old = next(p for p in at_2_0_0["work_packages"] if p["id"] == "WP-0.1")
+        self.assertEqual((old["evidence_artifact"], old["files_expected"]),
+                         (fm.HISTORY_MANIFEST_REL, ["validation/v2/freeze_manifest.py", fm.HISTORY_MANIFEST_REL]))
+        self.assertEqual(fm.history_problems(ROOT), [])
+
     def test_citing_the_pre_exception_baseline_fails(self):
         m = pv.load()
         m["architecture_baseline"]["rfc_normative_digest"] = m["architecture_baseline"]["original_rfc_normative_digest"]

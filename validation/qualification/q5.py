@@ -865,7 +865,8 @@ def identity(out_dir: pathlib.Path) -> dict:
         "head_kernel_tree": C.git("rev-parse", "HEAD:aisef2"), "kernel_tree_is_the_candidates": C.git("rev-parse", "HEAD:aisef2") == KERNEL_TREE,
         "working_tree_clean": not dirty, "dirty": dirty, "kernel_digest": kernel_digest(),
         "rfc": {"effective_normative_digest": eff.get("rfc_normative_digest"), "effective_freeze_table_digest": eff.get("freeze_table_digest"),
-                "lineage_end": pathlib.Path(links[-1]["record"]).name if links else None, "broken_links": broken},
+                "lineage_end": pathlib.Path(links[-1]["record"]).name if links else None, "broken_links": broken,
+                "lineage": [pathlib.Path(x["record"]).name for x in links], "v2_0_manifest_history_problems": fm.history_problems(ROOT)},
         "f1_identity": _over(f1), "f9_identity": _over(f9), "harness_digest": _over(harness), "fixture_digest": _over(fixtures),
         "files": {"harness": harness, "fixtures": fixtures, "f1": f1, "f9": f9},
         "corpus": corpus, "request_class_catalog_digest": _sha(canonical(HEADER_CLASSES)), "normalization_digest": _sha(canonical(NORMALIZATION)),
@@ -899,8 +900,11 @@ def subject_problems(ident: dict) -> list[str]:
         out.append(f"HEAD's aisef2 tree {ident['head_kernel_tree']} is not the candidate's {KERNEL_TREE}")
     if not ident["working_tree_clean"]:
         out.append(f"the working tree is dirty under aisef2, tests/v2 or validation: {ident['dirty'][:5]}")
-    if ident["rfc"]["broken_links"] or ident["rfc"]["lineage_end"] != "AISEF-V2-RFC-AMENDMENT-V2-007.json":
+    if ident["rfc"]["broken_links"] or ident["rfc"]["lineage_end"] != "AISEF-V2-RFC-AMENDMENT-V2-007.json" \
+            or ident["rfc"]["lineage"][-2:] != ["AISEF-V2-RFC-AMENDMENT-V2-006.json", "AISEF-V2-RFC-AMENDMENT-V2-007.json"]:
         out.append("the effective RFC lineage does not end at V2-007 unbroken")   # 2.1: V2-007 follows V2-006
+    if ident["rfc"]["v2_0_manifest_history_problems"]:   # history: the 2.0 manifest froze the lineage up to V2-006
+        out.append(f"the 2.0 freeze manifest is not intact history: {ident['rfc']['v2_0_manifest_history_problems']}")
     if not ident["probe"]["corrected"]:
         out.append(f"the probe digest is not the corrected {PROBE_DIGEST[:12]}")
     if not ident["corpus"]["items"]:

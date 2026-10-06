@@ -115,6 +115,20 @@ def _files_mentioning(digest: str) -> list[str]:
     return out
 
 
+def v21_lineage_history(root, latest: dict) -> dict:
+    """2.1 (V2-007), measured: the 2.0 freeze manifest (history) froze the lineage ending at V2-006; V2-007 changes no
+    F1-F11 row — the row sha256 values the 2.0 and the 2.1 manifests carry are equal (not read from the amendment's own
+    claim, which must agree with them)."""
+    import freeze_manifest as fm
+    old, new = (json.loads((root / rel).read_text(encoding="utf-8")) for rel in (fm.HISTORY_MANIFEST_REL, fm.MANIFEST_REL))
+    rows_2_0, rows_2_1 = ({i["id"]: i["row_sha256"] for i in m["frozen_items"]} for m in (old, new))
+    frozen = old["approval_lineage"]
+    return {"lineage_ends_at_V2_006": bool(frozen) and frozen[-1]["record"].endswith("AMENDMENT-V2-006.json"),
+            "v2_007_changes_no_row": list(rows_2_0) == fm.FROZEN_IDS and rows_2_0 == rows_2_1
+                                     and latest["frozen_items_changed"] == []
+                                     and latest["freeze_table_digest"]["before"] == latest["freeze_table_digest"]["after"]}
+
+
 def run(ident: dict) -> dict:
     import checker_calibration as cc
     import freeze_conformance as fc
@@ -218,14 +232,17 @@ def run(ident: dict) -> dict:
     old_specs = [w for d in OLD_PROBE_DIGESTS for w in _specs_binding(d)]
     mentions = sorted({f for d in OLD_PROBE_DIGESTS for f in _files_mentioning(d)})
     historical = lambda f: f in HISTORICAL_OLD_DIGEST_FILES or f.startswith(HISTORICAL_OLD_DIGEST_PREFIXES)  # noqa: E731
+    measured = v21_lineage_history(C.ROOT, latest)
     v2_006 = {
+        # history (2.0): the 2.0 freeze manifest, byte-identical to v2.0.0's, froze the lineage ending at V2-006
+        "lineage_ends_at_V2_006": measured["lineage_ends_at_V2_006"],
         "lineage_ends_at_V2_007": bool(links) and links[-1]["record"].endswith("AMENDMENT-V2-007.json") and not broken,
         "effective_digests_equal_the_amendment": (eff.get("rfc_normative_digest"), eff.get("freeze_table_digest"))
             == (latest["rfc_normative_digest"]["after"], latest["freeze_table_digest"]["after"]),
         # history: V2-006 is the link before the end, as the 2.0 freeze manifest (byte-identical to v2.0.0's) froze it;
-        # V2-007 changes no freeze-table row, so the F5 row below is still V2-006's
+        # V2-007 changes no freeze-table row (measured), so the F5 row below is still V2-006's
         "v2_006_precedes_V2_007": {"link_before_the_end": len(links) > 1 and links[-2]["record"].endswith("AMENDMENT-V2-006.json"),
-                                   "v2_007_changes_no_row": latest["frozen_items_changed"] == [],
+                                   "v2_007_changes_no_row": measured["v2_007_changes_no_row"],
                                    "v2_0_manifest_history_problems": fm.history_problems(C.ROOT)},
         "f5_row_sha256": {"rfc_now": rows.get("F5"), "amendment_after": amendment["f5_row_sha256"]["after"],
                           "match": rows.get("F5") == amendment["f5_row_sha256"]["after"]},
@@ -244,7 +261,7 @@ def run(ident: dict) -> dict:
             (C.ROOT / "closure-evidence/v2/P2-CALIBRATION.json").read_text(encoding="utf-8"))["calibrations"]}),
     }
     history = v2_006["v2_006_precedes_V2_007"]
-    if not (v2_006["lineage_ends_at_V2_007"] and v2_006["effective_digests_equal_the_amendment"] and v2_006["f5_row_sha256"]["match"]
+    if not (v2_006["lineage_ends_at_V2_006"] and v2_006["lineage_ends_at_V2_007"] and v2_006["effective_digests_equal_the_amendment"] and v2_006["f5_row_sha256"]["match"]
             and history["link_before_the_end"] and history["v2_007_changes_no_row"] and not history["v2_0_manifest_history_problems"]
             and v2_006["probe_digest"]["match"] and v2_006["f4_semantic_hash_incorporates_the_probe_digest"]["differs"]):
         problems.append("the V2-006 amendment (with the P7-FINDING-001 probe correction), followed by V2-007 at the lineage end, "

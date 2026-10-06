@@ -161,7 +161,7 @@ def identity() -> dict:
             ln[3:].startswith(s["out_rel"]) or ln[3:].startswith("validation/qualification") for ln in dirty.splitlines()),
         "rfc": {"effective_normative_digest": eff.get("rfc_normative_digest"), "effective_freeze_table_digest": eff.get("freeze_table_digest"),
                 "lineage": [pathlib.Path(x["record"]).name for x in links], "lineage_end": pathlib.Path(links[-1]["record"]).name if links else None,
-                "broken_links": broken},
+                "broken_links": broken, "v2_0_manifest_history_problems": fm.history_problems(ROOT)},
         "probe": {"id": pc.PROBE_ID, "digest": pc.DIGEST},   # the frozen Cycle-1 identity (resolvable, inactive for its kind)
         "probes": {e.probe_id: {"digest": e.probe_digest, "kind": e.subject_kind.value, "active": e.active, "cycle": e.cycle}
                    for e in catalog.CATALOG},
@@ -184,8 +184,11 @@ def subject_problems(ident: dict) -> list[str]:
             out.append(f"HEAD's {rel} tree {t['head']} is not the candidate's {t['frozen']}: a new candidate, restart from Q0")
     if not ident["v1_product_tree_unchanged"]:
         out.append("the V1 product tree changed")
-    if ident["rfc"]["broken_links"] or ident["rfc"]["lineage_end"] != "AISEF-V2-RFC-AMENDMENT-V2-007.json":
+    if ident["rfc"]["broken_links"] or ident["rfc"]["lineage_end"] != "AISEF-V2-RFC-AMENDMENT-V2-007.json" \
+            or ident["rfc"]["lineage"][-2:] != ["AISEF-V2-RFC-AMENDMENT-V2-006.json", "AISEF-V2-RFC-AMENDMENT-V2-007.json"]:
         out.append("the effective RFC lineage does not end at V2-007 unbroken")   # 2.1: V2-007 follows V2-006
+    if ident["rfc"]["v2_0_manifest_history_problems"]:   # history: the 2.0 manifest froze the lineage up to V2-006
+        out.append(f"the 2.0 freeze manifest is not intact history: {ident['rfc']['v2_0_manifest_history_problems']}")
     return out
 
 

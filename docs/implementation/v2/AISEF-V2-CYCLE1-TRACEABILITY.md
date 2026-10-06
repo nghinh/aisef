@@ -16,7 +16,7 @@ Architecture baseline: RFC normative digest `4cc7867372536e2a…`, freeze-table 
 
 | package | RFC §§ | key adversarial tests | evidence artifact |
 |---|---|---|---|
-| `WP-0.1` | status header, Normative freeze table | a one-byte edit inside the normative body fails the check; a status-header edit does NOT fail the check | `closure-evidence/v2/AISEF-V2-FREEZE-MANIFEST.json` |
+| `WP-0.1` | status header, Normative freeze table | a one-byte edit inside the normative body fails the check; a status-header edit does NOT fail the check | `closure-evidence/v2/v2.1/AISEF-V2-FREEZE-MANIFEST.json` |
 | `WP-0.3` | Normative freeze table | a renamed enum member fails its F check; an added Owner member fails F3 | `closure-evidence/v2/F-CONFORMANCE.json` |
 | `WP-3.1` | 20, 20.1 | a seq gap on decode is rejected; the writer API exposes no update/delete (asserted by introspection) | `closure-evidence/v2/P3-JOURNAL-WRITER.json` |
 | `WP-3.2` | 20, 35 | unknown required type -> refuse to reconstruct (never partial); unknown ignorable type -> skipped and reconstruction proceeds | `closure-evidence/v2/P3-FORMAT-COMPAT.json` |
@@ -32,7 +32,7 @@ Architecture baseline: RFC normative digest `4cc7867372536e2a…`, freeze-table 
 
 | package | RFC §§ | key adversarial tests | evidence artifact |
 |---|---|---|---|
-| `WP-0.1` | status header, Normative freeze table | a one-byte edit inside the normative body fails the check; a status-header edit does NOT fail the check | `closure-evidence/v2/AISEF-V2-FREEZE-MANIFEST.json` |
+| `WP-0.1` | status header, Normative freeze table | a one-byte edit inside the normative body fails the check; a status-header edit does NOT fail the check | `closure-evidence/v2/v2.1/AISEF-V2-FREEZE-MANIFEST.json` |
 | `WP-0.2` | 4, 10, 10.1, 11, 13, 15.0, 22, 23 | adding an enum member without regenerating fails --check; removing a member still listed in the catalog fails --check | `docs/implementation/v2/arch-catalog.md + CI --check` |
 | `WP-0.3` | Normative freeze table | a renamed enum member fails its F check; an added Owner member fails F3 | `closure-evidence/v2/F-CONFORMANCE.json` |
 | `WP-1.3` | 10, 10.1, 10.2 | NEG-1 MUST_NOT_HOLD violated at parent -> UNSATISFIED (never PRE_SATISFIED); NEG-2 MUST_NOT_HOLD absent + ABSENCE_IS_DECIDABLE -> SATISFIED | `closure-evidence/v2/P1-OUTCOME-POLARITY.json` |
@@ -48,7 +48,7 @@ Architecture baseline: RFC normative digest `4cc7867372536e2a…`, freeze-table 
 
 | package | RFC §§ | key adversarial tests | evidence artifact |
 |---|---|---|---|
-| `WP-0.1` | status header, Normative freeze table | a one-byte edit inside the normative body fails the check; a status-header edit does NOT fail the check | `closure-evidence/v2/AISEF-V2-FREEZE-MANIFEST.json` |
+| `WP-0.1` | status header, Normative freeze table | a one-byte edit inside the normative body fails the check; a status-header edit does NOT fail the check | `closure-evidence/v2/v2.1/AISEF-V2-FREEZE-MANIFEST.json` |
 | `WP-0.2` | 4, 10, 10.1, 11, 13, 15.0, 22, 23 | adding an enum member without regenerating fails --check; removing a member still listed in the catalog fails --check | `docs/implementation/v2/arch-catalog.md + CI --check` |
 | `WP-0.3` | Normative freeze table | a renamed enum member fails its F check; an added Owner member fails F3 | `closure-evidence/v2/F-CONFORMANCE.json` |
 | `WP-1.4` | 22, 10 | REFUTED can never route to ENVIRONMENT; UNRUNNABLE can never route to DEVELOPER | `closure-evidence/v2/P1-ROUTING-TABLE.json` |
@@ -65,7 +65,7 @@ Architecture baseline: RFC normative digest `4cc7867372536e2a…`, freeze-table 
 
 | package | RFC §§ | key adversarial tests | evidence artifact |
 |---|---|---|---|
-| `WP-0.1` | status header, Normative freeze table | a one-byte edit inside the normative body fails the check; a status-header edit does NOT fail the check | `closure-evidence/v2/AISEF-V2-FREEZE-MANIFEST.json` |
+| `WP-0.1` | status header, Normative freeze table | a one-byte edit inside the normative body fails the check; a status-header edit does NOT fail the check | `closure-evidence/v2/v2.1/AISEF-V2-FREEZE-MANIFEST.json` |
 | `WP-0.3` | Normative freeze table | a renamed enum member fails its F check; an added Owner member fails F3 | `closure-evidence/v2/F-CONFORMANCE.json` |
 | `WP-1.1` | 6, 7 | editing rationale alone changes contract_hash (bound) and is detected; an unapproved contract cannot be compiled | `closure-evidence/v2/P1-CONTRACT-SHAPES.json` |
 | `WP-1.2` | 8, 35 | a contract edit that leaves the spec unchanged is impossible (hash binds it); attempting to set a story field on a spec is a type error | `closure-evidence/v2/P1-SPEC-COMPILER.json` |
@@ -77,7 +77,7 @@ Architecture baseline: RFC normative digest `4cc7867372536e2a…`, freeze-table 
 
 | package | RFC §§ | key adversarial tests | evidence artifact |
 |---|---|---|---|
-| `WP-0.1` | status header, Normative freeze table | a one-byte edit inside the normative body fails the check; a status-header edit does NOT fail the check | `closure-evidence/v2/AISEF-V2-FREEZE-MANIFEST.json` |
+| `WP-0.1` | status header, Normative freeze table | a one-byte edit inside the normative body fails the check; a status-header edit does NOT fail the check | `closure-evidence/v2/v2.1/AISEF-V2-FREEZE-MANIFEST.json` |
 | `WP-0.3` | Normative freeze table | a renamed enum member fails its F check; an added Owner member fails F3 | `closure-evidence/v2/F-CONFORMANCE.json` |
 | `WP-0.5` | 27 (Q0), 9.1 | a checker that always passes is rejected by its calibration | `closure-evidence/v2/Q0-CHECKER-CALIBRATION.json` |
 | `WP-2.1` | 9, 24 | PROBE-ABS-1 observation harness unavailable (interpreter or tool missing, sandbox cannot execute, cannot inspect) -> UNRUNNABLE / ENVIRONMENT, no BehaviorVerdict; PROBE-ABS-2 REQUIRES_SUBJECT, subject absent -> EXECUTED + INDETERMINATE(PRECONDITION_ABSENT); never UNRUNNABLE, never a blanket verdict | `closure-evidence/v2/P2-PROBE-PROTOCOL.json` |
@@ -90,7 +90,7 @@ Architecture baseline: RFC normative digest `4cc7867372536e2a…`, freeze-table 
 
 | package | RFC §§ | key adversarial tests | evidence artifact |
 |---|---|---|---|
-| `WP-0.1` | status header, Normative freeze table | a one-byte edit inside the normative body fails the check; a status-header edit does NOT fail the check | `closure-evidence/v2/AISEF-V2-FREEZE-MANIFEST.json` |
+| `WP-0.1` | status header, Normative freeze table | a one-byte edit inside the normative body fails the check; a status-header edit does NOT fail the check | `closure-evidence/v2/v2.1/AISEF-V2-FREEZE-MANIFEST.json` |
 | `WP-0.2` | 4, 10, 10.1, 11, 13, 15.0, 22, 23 | adding an enum member without regenerating fails --check; removing a member still listed in the catalog fails --check | `docs/implementation/v2/arch-catalog.md + CI --check` |
 | `WP-0.3` | Normative freeze table | a renamed enum member fails its F check; an added Owner member fails F3 | `closure-evidence/v2/F-CONFORMANCE.json` |
 | `WP-2.3` | 11, 12 | duplicate INTRODUCE ownership for one spec is rejected; a cyclic dependency DAG is rejected | `closure-evidence/v2/P2-STATIC-ADMISSION.json` |
@@ -105,7 +105,7 @@ Architecture baseline: RFC normative digest `4cc7867372536e2a…`, freeze-table 
 
 | package | RFC §§ | key adversarial tests | evidence artifact |
 |---|---|---|---|
-| `WP-0.1` | status header, Normative freeze table | a one-byte edit inside the normative body fails the check; a status-header edit does NOT fail the check | `closure-evidence/v2/AISEF-V2-FREEZE-MANIFEST.json` |
+| `WP-0.1` | status header, Normative freeze table | a one-byte edit inside the normative body fails the check; a status-header edit does NOT fail the check | `closure-evidence/v2/v2.1/AISEF-V2-FREEZE-MANIFEST.json` |
 | `WP-0.2` | 4, 10, 10.1, 11, 13, 15.0, 22, 23 | adding an enum member without regenerating fails --check; removing a member still listed in the catalog fails --check | `docs/implementation/v2/arch-catalog.md + CI --check` |
 | `WP-0.3` | Normative freeze table | a renamed enum member fails its F check; an added Owner member fails F3 | `closure-evidence/v2/F-CONFORMANCE.json` |
 | `WP-2.4` | 13 | an abbreviated parent SHA is refused; probe UNRUNNABLE -> PROBE_UNRUNNABLE / ENVIRONMENT | `closure-evidence/v2/P2-STORY-ADMISSION.json` |
@@ -119,7 +119,7 @@ Architecture baseline: RFC normative digest `4cc7867372536e2a…`, freeze-table 
 
 | package | RFC §§ | key adversarial tests | evidence artifact |
 |---|---|---|---|
-| `WP-0.1` | status header, Normative freeze table | a one-byte edit inside the normative body fails the check; a status-header edit does NOT fail the check | `closure-evidence/v2/AISEF-V2-FREEZE-MANIFEST.json` |
+| `WP-0.1` | status header, Normative freeze table | a one-byte edit inside the normative body fails the check; a status-header edit does NOT fail the check | `closure-evidence/v2/v2.1/AISEF-V2-FREEZE-MANIFEST.json` |
 | `WP-0.3` | Normative freeze table | a renamed enum member fails its F check; an added Owner member fails F3 | `closure-evidence/v2/F-CONFORMANCE.json` |
 | `WP-4.1` | 17, 17.1, 18 | acquisition during dispose is rejected; a disposal failure is recorded and can fail DISPOSE | `closure-evidence/v2/P4-STORY-SCOPE.json` |
 | `WP-4.2` | 17.1 | a grandchild holding a write prevents worktree deletion (D-024 reproducer); a setsid-escaped child is detected and reported as a residual | `closure-evidence/v2/P4-RANGE-EMPTINESS.json` |
@@ -134,7 +134,7 @@ Architecture baseline: RFC normative digest `4cc7867372536e2a…`, freeze-table 
 
 | package | RFC §§ | key adversarial tests | evidence artifact |
 |---|---|---|---|
-| `WP-0.1` | status header, Normative freeze table | a one-byte edit inside the normative body fails the check; a status-header edit does NOT fail the check | `closure-evidence/v2/AISEF-V2-FREEZE-MANIFEST.json` |
+| `WP-0.1` | status header, Normative freeze table | a one-byte edit inside the normative body fails the check; a status-header edit does NOT fail the check | `closure-evidence/v2/v2.1/AISEF-V2-FREEZE-MANIFEST.json` |
 | `WP-0.3` | Normative freeze table | a renamed enum member fails its F check; an added Owner member fails F3 | `closure-evidence/v2/F-CONFORMANCE.json` |
 | `WP-1.2` | 8, 35 | a contract edit that leaves the spec unchanged is impossible (hash binds it); attempting to set a story field on a spec is a type error | `closure-evidence/v2/P1-SPEC-COMPILER.json` |
 | `WP-4.4` | 23, 24 | scenario H: provider implementation changes with an unchanged version string -> detected for VERIFIED, graded ATTESTED otherwise; an OPAQUE capability blocks Q6 eligibility | `closure-evidence/v2/P4-RUNSPEC-IDENTITY.json` |
@@ -148,7 +148,7 @@ Architecture baseline: RFC normative digest `4cc7867372536e2a…`, freeze-table 
 
 | package | RFC §§ | key adversarial tests | evidence artifact |
 |---|---|---|---|
-| `WP-0.1` | status header, Normative freeze table | a one-byte edit inside the normative body fails the check; a status-header edit does NOT fail the check | `closure-evidence/v2/AISEF-V2-FREEZE-MANIFEST.json` |
+| `WP-0.1` | status header, Normative freeze table | a one-byte edit inside the normative body fails the check; a status-header edit does NOT fail the check | `closure-evidence/v2/v2.1/AISEF-V2-FREEZE-MANIFEST.json` |
 | `WP-0.3` | Normative freeze table | a renamed enum member fails its F check; an added Owner member fails F3 | `closure-evidence/v2/F-CONFORMANCE.json` |
 | `WP-5.5` | 4 | an invariant violation escapes a try/except boundary (the required demonstration); an invariant with no named mechanism fails registration | `closure-evidence/v2/P5-INVARIANTS.json` |
 | `QP-7` | 27 | a rung that cannot run reports UNRUNNABLE, never FAILED; test-layout invariance: permuted test layouts give identical product verdicts | `closure-evidence/v2/Q0-Q3/SUMMARY.json` |
@@ -159,7 +159,7 @@ Architecture baseline: RFC normative digest `4cc7867372536e2a…`, freeze-table 
 
 | package | RFC §§ | key adversarial tests | evidence artifact |
 |---|---|---|---|
-| `WP-0.1` | status header, Normative freeze table | a one-byte edit inside the normative body fails the check; a status-header edit does NOT fail the check | `closure-evidence/v2/AISEF-V2-FREEZE-MANIFEST.json` |
+| `WP-0.1` | status header, Normative freeze table | a one-byte edit inside the normative body fails the check; a status-header edit does NOT fail the check | `closure-evidence/v2/v2.1/AISEF-V2-FREEZE-MANIFEST.json` |
 | `WP-0.3` | Normative freeze table | a renamed enum member fails its F check; an added Owner member fails F3 | `closure-evidence/v2/F-CONFORMANCE.json` |
 | `WP-3.3` | 21 | a stale cache is never treated as authority; a version-mismatched cache row is discarded, not migrated | `closure-evidence/v2/P3-FOLD-ORACLE.json` |
 | `WP-3.4` | 21, 29 | a seventh projection cannot be cited by a gate; budgets derived from the journal cannot disagree with it (no side counter exists) | `closure-evidence/v2/P3-CONTROL-PROJECTIONS.json` |
@@ -178,7 +178,7 @@ Architecture baseline: RFC normative digest `4cc7867372536e2a…`, freeze-table 
 
 | package | phase | depends on | evidence |
 |---|---|---|---|
-| `WP-0.1` | P0 | — | `closure-evidence/v2/AISEF-V2-FREEZE-MANIFEST.json` |
+| `WP-0.1` | P0 | — | `closure-evidence/v2/v2.1/AISEF-V2-FREEZE-MANIFEST.json` |
 | `WP-0.2` | P0 | `WP-0.4` | `docs/implementation/v2/arch-catalog.md + CI --check` |
 | `WP-0.3` | P0 | `WP-0.2` | `closure-evidence/v2/F-CONFORMANCE.json` |
 | `WP-0.4` | P0 | `WP-0.1` | `closure-evidence/v2/V1-EVIDENCE-BASELINE.json` |

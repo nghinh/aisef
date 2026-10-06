@@ -122,7 +122,7 @@ def assemble() -> dict:
         "rungs": rungs,
         "q0": {"checker_calibration_count": (q0 or {}).get("calibrated"), "checkers_discovered": (q0 or {}).get("discovered"),
                "f1_f11": pick("Q0", "f1_f11", {}).get("summary") if pick("Q0", "f1_f11") else None,
-               "v2_006": {k: v for k, v in (pick("Q0", "v2_006") or {}).items() if k in ("lineage_ends_at_V2_007", "v2_006_precedes_V2_007", "f5_row_sha256", "probe_digest")}},
+               "v2_006": {k: v for k, v in (pick("Q0", "v2_006") or {}).items() if k in ("lineage_ends_at_V2_006", "lineage_ends_at_V2_007", "v2_006_precedes_V2_007", "f5_row_sha256", "probe_digest")}},
         "q2": {"mutation": (q2 or {}).get("totals"), "mutation_records": {k: {"path": v["path"], "sha256": v["sha256"]} for k, v in ((q2 or {}).get("phases") or {}).items()},
                "calibration_inventory": (q2c or {}).get("fresh"), "calibration_digest": C.sha_text(json.dumps((q2c or {}).get("fresh"), sort_keys=True)) if q2c else None},
         "q3": {"fault_matrix_rows": (q3 or {}).get("rows"), "fault_matrix_classes": (q3 or {}).get("classes"),

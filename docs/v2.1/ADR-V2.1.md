@@ -28,7 +28,8 @@ máy hoặc gói aisef đã cài; sandbox OS (V2-05) là việc riêng.
 
 **Vấn đề.** 2.0.0: `probe_digest` = sha256 các tệp nguồn probe; spec id, semantic hash, plan, approval-qua-plan, bản ghi
 hiệu chuẩn đều buộc vào nó. Sửa một chú thích trong probe ⇒ đổi mọi spec id ⇒ mọi bundle phải buộc lại, mọi bản ghi phái
-sinh đỏ (đo: chỉ thêm `-S` làm đỏ 37 test).
+sinh đỏ (**chưa đo**: tuyên bố "chỉ thêm `-S` làm đỏ 37 test" không có bản ghi đo đã commit; bản ghi V2-007 ghi
+UNMEASURED).
 
 **Quyết định.** Ba danh tính:
 
@@ -49,8 +50,9 @@ tương phản hiệu chuẩn trên fixture đã commit. Kỷ luật tăng versi
 **Di trú:** spec id của 2.0.0 đổi một lần → `aisef bundle migrate` (LedgerLock: 59 spec, 67 obligation, admit 9/9, không
 duyệt lại). Bằng chứng cũ giữ nguyên byte.
 
-**Trạng thái của ngoại lệ:** **ĐÃ DUYỆT** — chủ dự án phê duyệt B-01 ngày 2026-10-06 (nguyên văn trong
-`closure-evidence/v2/cycle2/RELEASE-DECISIONS.json`, seq 4). Bản ghi:
+**Trạng thái của ngoại lệ:** **ĐÃ DUYỆT** — chủ dự án phê duyệt B-01 trong chat ngày 2026-10-06; kỹ thuật chép nguyên
+văn vào `closure-evidence/v2/cycle2/RELEASE-DECISIONS.json` (seq 4) theo chỉ thị của chủ dự án "Ghi quyết định này vào sổ
+quyết định hiện có" — chủ dự án **không ký** sổ đó hay bản ghi ngoại lệ. Bản ghi:
 [`closure-evidence/v2/v2.1/ARCHITECTURE-EXCEPTION-V2-007.json`](../../closure-evidence/v2/v2.1/ARCHITECTURE-EXCEPTION-V2-007.json),
 nối vào lineage phê duyệt của RFC bằng
 [`AISEF-V2-RFC-AMENDMENT-V2-007.json`](../../closure-evidence/v2/v2.1/AISEF-V2-RFC-AMENDMENT-V2-007.json); RFC sửa ở

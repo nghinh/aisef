@@ -157,21 +157,30 @@ def build(root: pathlib.Path = ROOT) -> dict:
 
 def history_problems(root: pathlib.Path = ROOT) -> list[str]:
     """The 2.0 manifest is history: its LF bytes are its blob at HISTORY_TAG, it recorded no drift, and the lineage it
-    froze is the head of the current one."""
-    path = root / HISTORY_MANIFEST_REL
-    if not path.exists():
-        return [f"{HISTORY_MANIFEST_REL} is missing"]
-    data = path.read_bytes().replace(b"\r\n", b"\n")
+    froze is the head of the current one. Never raises: an unreadable file is a problem, not an exception."""
+    try:
+        data = (root / HISTORY_MANIFEST_REL).read_bytes().replace(b"\r\n", b"\n")
+    except OSError as exc:
+        return [f"{HISTORY_MANIFEST_REL} is missing or unreadable: {exc.strerror or exc}"]
     out = []
     if hashlib.sha1(b"blob %d\0" % len(data) + data).hexdigest() != HISTORY_BLOB:
         out.append(f"{HISTORY_MANIFEST_REL} differs from its blob at {HISTORY_TAG}: the 2.0 freeze is history, "
                    "never rewritten")
-    old = json.loads(data)
-    if (old.get("rfc_normative_digest"), old.get("freeze_table_digest")) \
-            != (old.get("approved_rfc_normative_digest"), old.get("approved_freeze_table_digest")):
+    try:
+        old = json.loads(data)
+        drifted = (old.get("rfc_normative_digest"), old.get("freeze_table_digest")) \
+            != (old.get("approved_rfc_normative_digest"), old.get("approved_freeze_table_digest"))
+        frozen = old.get("approval_lineage")
+    except (ValueError, AttributeError) as exc:
+        return out + [f"{HISTORY_MANIFEST_REL} is not a readable manifest: {exc}"]
+    # implied by the blob pin today; kept so that a re-pinned HISTORY_BLOB that recorded drift still fails
+    if drifted:
         out.append(f"{HISTORY_MANIFEST_REL} records a drifted baseline")
-    frozen = old.get("approval_lineage") or []
-    if not frozen or lineage(root)[1][:len(frozen)] != frozen:
+    try:
+        current = lineage(root)[1]
+    except (OSError, ValueError, KeyError, TypeError) as exc:
+        return out + [f"the current lineage cannot be read: {exc!r}"]
+    if not isinstance(frozen, list) or not frozen or current[:len(frozen)] != frozen:
         out.append(f"the lineage {HISTORY_MANIFEST_REL} froze is not the head of the current lineage")
     return out
 
@@ -190,11 +199,13 @@ def check(root: pathlib.Path = ROOT) -> list[str]:
     ids = [i["id"] for i in m["frozen_items"]]
     if ids != FROZEN_IDS:
         problems.append(f"frozen items must be exactly {FROZEN_IDS}, found {ids}")
-    committed = root / MANIFEST_REL
-    if not committed.exists():
+    try:   # bytes, never decoded: an unreadable or non-UTF-8 file is a problem, not an exception
+        stale = (root / MANIFEST_REL).read_bytes().replace(b"\r\n", b"\n") != render(m).encode("utf-8")
+    except OSError:
         problems.append(f"{MANIFEST_REL} is missing")
-    elif committed.read_bytes().replace(b"\r\n", b"\n").decode("utf-8") != render(m):
-        problems.append(f"{MANIFEST_REL} is stale: regenerate it")
+    else:
+        if stale:
+            problems.append(f"{MANIFEST_REL} is stale: regenerate it")
     return problems + history_problems(root)
 
 
@@ -205,16 +216,19 @@ def render(m: dict) -> str:
 def main(argv: list[str] | None = None) -> int:
     argv = sys.argv[1:] if argv is None else argv
     if "--check" in argv:
-        problems = check()
+        problems = check(ROOT)
         for p in problems:
             print(f"FAIL  {p}")
         print("freeze manifest: " + ("FAIL" if problems else "PASS"))
         return 1 if problems else 0
-    m = build()
+    m = build(ROOT)
     if m["rfc_normative_digest"] != m["approved_rfc_normative_digest"] \
-            or m["freeze_table_digest"] != m["approved_freeze_table_digest"] or lineage(ROOT)[2] \
-            or history_problems(ROOT):
+            or m["freeze_table_digest"] != m["approved_freeze_table_digest"] or lineage(ROOT)[2]:
         print("REFUSED: the RFC at HEAD does not match the approval record; a manifest will not bless drift")
+        return 1
+    history = history_problems(ROOT)
+    if history:
+        print("REFUSED: the 2.0 manifest is not intact history: " + "; ".join(history))
         return 1
     if MANIFEST_REL == HISTORY_MANIFEST_REL or not MANIFEST_REL.startswith("closure-evidence/v2/v2.1/"):
         print(f"REFUSED: {MANIFEST_REL} is not a 2.1 path; a 2.0 record is never rewritten")
@@ -225,7 +239,7 @@ def main(argv: list[str] | None = None) -> int:
         with open(out, "x", encoding="utf-8") as f:
             f.write(render(m))
     except FileExistsError:
-        print(f"REFUSED: {MANIFEST_REL} exists; a record is never overwritten (remove it to re-bind)")
+        print(f"REFUSED: {MANIFEST_REL} exists; a record is never overwritten")
         return 1
     print(f"wrote {MANIFEST_REL}: {len(m['frozen_items'])} frozen items")
     return 0

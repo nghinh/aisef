@@ -50,7 +50,7 @@
    },
    {
     "record": "closure-evidence/v2/v2.1/AISEF-V2-RFC-AMENDMENT-V2-007.json",
-    "sha256": "aa6ef86e014f55b19164f47df177b3213f43b598e0e6e6c715954d024e6aa335",
+    "sha256": "ec5a47f12fdc6c937902a1d2d49351c36ccb6d49856b63225c923232a0db27a7",
     "exception": "closure-evidence/v2/v2.1/ARCHITECTURE-EXCEPTION-V2-007.json",
     "frozen_items_changed": []
    }
@@ -252,6 +252,7 @@
    "v1_defect_families": [],
    "files_expected": [
     "validation/v2/freeze_manifest.py",
+    "closure-evidence/v2/v2.1/AISEF-V2-FREEZE-MANIFEST.json",
     "closure-evidence/v2/AISEF-V2-FREEZE-MANIFEST.json"
    ],
    "dependencies": [],
@@ -274,7 +275,7 @@
     "validation/v2/freeze_manifest.py::normative_digest"
    ],
    "fault_injection_targets": [],
-   "evidence_artifact": "closure-evidence/v2/AISEF-V2-FREEZE-MANIFEST.json",
+   "evidence_artifact": "closure-evidence/v2/v2.1/AISEF-V2-FREEZE-MANIFEST.json",
    "exit_criteria": [
     "CI fails on normative drift",
     "CI passes on non-normative preamble edits"
