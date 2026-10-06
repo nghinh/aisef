@@ -7,8 +7,8 @@ witness, the evidence passing the frozen `falsifiability_problems` (one spec per
 cannot refute is classified NOT_QUALIFIED, never hidden; P5F-5 C2-P5-FINDING-001 stays reproducible; P5F-4 the committed
 record: every retained spec QUALIFIED, none NOT_QUALIFIED, none unsatisfied by the reference, none without a witness;
 P5F-4b (owner B-03a) the v2.1 record is the same measurement on 2.1, naming the v2.1 proposal and the B-03a decision; P5F-6
-the writers: the v2.1 record is run() under its own header, written once, a refused run kept outside the evidence
-tree; the 2.0 record and the sealed corpus are never rewritten.
+the writers: the v2.1 record is run() under its own header, written once and never from an uncommitted kernel, a
+refused run kept outside the evidence tree; the 2.0 record and the sealed corpus are never rewritten.
 """
 
 import copy
@@ -135,6 +135,9 @@ class Writers(unittest.TestCase):
                       mock.patch.object(PA, "_file", return_value=self.FILE), mock.patch.object(F, "_plan_hash", return_value="p")):
             patch.start()
             self.addCleanup(patch.stop)
+        git = mock.patch.object(PA, "_git", return_value="")     # the kernel committed: git status mocked, never the real tree's
+        self.pa_git = git.start()
+        self.addCleanup(git.stop)
         self.PA = PA
 
     def proposal(self, rec):
@@ -198,6 +201,19 @@ class Writers(unittest.TestCase):
         with self.proposal(self.PROPOSAL), mock.patch.object(F, "run", side_effect=AssertionError("run")), self.assertRaises(SystemExit):
             F.write_v21()                                     # an existing record: refused before the run
         self.assertEqual(json.loads(path.read_text(encoding="utf-8")), rec)
+
+    def test_the_v2_1_writer_refuses_an_uncommitted_kernel_before_it_runs(self):
+        dirty = " M aisef2/product/outcome.py"
+        self.pa_git.return_value = dirty
+        with self.proposal(self.PROPOSAL), mock.patch.object(F, "run", side_effect=AssertionError("run")), \
+                self.assertRaises(SystemExit) as refused:
+            F.write_v21()
+        self.pa_git.assert_called_once_with("status", "--porcelain", "--", "aisef2")
+        self.assertEqual(str(refused.exception), f"refused: aisef2 has uncommitted changes {[dirty]} — a v2.1 record binds HEAD:aisef2")
+        self.assertEqual(list(self.root.rglob("*")), [])
+        self.pa_git.return_value = ""                    # committed: the writer goes on to the run
+        with self.proposal(self.PROPOSAL), mock.patch.object(F, "run", side_effect=AssertionError("run")), self.assertRaises(AssertionError):
+            F.write_v21()
 
     def test_the_sealed_corpus_is_never_rewritten(self):
         ref = f"{F.FIX_REL}/reference/ledgerlock"

@@ -404,11 +404,13 @@ def _write_new(rel: str, rec: dict) -> None:
 
 def write_v21() -> dict:
     """run() as the v2.1 record (`as_v21`) into V21_OUT_REL, written once and only without a problem (refused before
-    the run if the record exists, or the v2.1 proposal does not or names another plan than this tree's). A refused run
-    is kept, never discarded: its full record goes outside the evidence tree (`p5_acceptance.keep_failed_run`)."""
+    the run if the record exists, the kernel has uncommitted changes, or the v2.1 proposal does not exist or names
+    another plan than this tree's). A refused run is kept, never discarded: its full record goes outside the evidence
+    tree (`p5_acceptance.keep_failed_run`)."""
     from validation.qualification import p5_acceptance as pa
     if (ROOT / V21_OUT_REL).exists():
         raise SystemExit(f"refused: {V21_OUT_REL} exists — a record is never rewritten")
+    pa.refuse_uncommitted_kernel()
     prop = pa.v21_proposal_record()
     if not prop:
         raise SystemExit(f"refused: {pa.V21_PROPOSAL_REL} is missing")

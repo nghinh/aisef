@@ -99,6 +99,23 @@ class V21Writers(unittest.TestCase):
         with mock.patch.object(ev, "problems_of", return_value=["WP-2.3: property p is false"]):
             self.assertEqual(ev.history_problems(), [f"{rel} (history): WP-2.3: property p is false"])
 
+    def test_each_check_reports_its_2_0_record_s_history(self):
+        result = {"checkers": [], "uncovered_checker_modules": [], "checker_count": 0, "calibrated_count": 0,
+                  "always_pass_mutants_rejected": 0}
+        with tempfile.TemporaryDirectory() as tmp, mock.patch.object(cc, "ROOT", pathlib.Path(tmp)), \
+                mock.patch.object(cc, "run", return_value=result), contextlib.redirect_stdout(io.StringIO()) as out:
+            (pathlib.Path(tmp) / cc.OUT_REL).parent.mkdir(parents=True)
+            (pathlib.Path(tmp) / cc.OUT_REL).write_text(cc.render(result), encoding="utf-8")    # the v2.1 record current
+            with mock.patch.object(cc, "history_problems", return_value=[]):
+                self.assertEqual(cc.main(["--check"]), 0)
+            with mock.patch.object(cc, "history_problems", return_value=["2.0 record tampered"]):
+                self.assertEqual(cc.main(["--check"]), 1)
+            self.assertIn("FAIL  2.0 record tampered", out.getvalue())
+        ev = cc._load("aisef_v2_p2_evidence", cc.V2 / "p2_evidence.py")
+        with tempfile.TemporaryDirectory() as tmp, mock.patch.object(ev, "history_problems", return_value=["2.0 record tampered"]) as history:
+            self.assertEqual(ev.check(pathlib.Path(tmp)), ["2.0 record tampered"])   # no builder's module here: history alone
+        history.assert_called_once_with(pathlib.Path(tmp))
+
     def test_the_p2_writer_writes_only_the_v2_1_record_and_never_rewrites_it(self):
         ev = cc._load("aisef_v2_p2_evidence", cc.V2 / "p2_evidence.py")
         rel, _, needs = ev.BUILDERS["WP-2.3"]

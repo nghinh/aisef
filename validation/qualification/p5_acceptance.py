@@ -26,7 +26,8 @@ record on this tree inside a v2.1 envelope that names the B-03a decision and cla
 compared exactly; the v2.1 re-verification (`reverify`) re-derives the boundary with literal comparisons only — no
 rebind, no new owner acceptance, no new approval — and binds the v2.1 falsifiability record (its header, the v2.1
 proposal, this tree's corpus, kernel, runner, authoring aid, probe execution digests, plan and spec hashes; its test
-runs and verdict). A refused v2.1 run is kept outside the evidence tree (`keep_failed_run`). `verify`, `record`,
+runs and verdict). A v2.1 record is written and re-verified from a committed kernel only (`kernel_changes`). A
+refused v2.1 run is kept outside the evidence tree (`keep_failed_run`). `verify`, `record`,
 `check` and `--write` keep their 2.0 behaviour.
 """
 
@@ -640,6 +641,19 @@ def _json_or_none(rel: str) -> dict | None:
     return json.loads((ROOT / rel).read_text(encoding="utf-8")) if (ROOT / rel).is_file() else None
 
 
+def kernel_changes() -> list[str]:
+    """`git status --porcelain -- aisef2`: the kernel's uncommitted changes. A v2.1 record binds the kernel as
+    HEAD:aisef2, so it is written and re-verified only while this is []."""
+    return _git("status", "--porcelain", "--", "aisef2").splitlines()
+
+
+def refuse_uncommitted_kernel() -> None:
+    """A v2.1 writer's first step: refused before any run while the working-tree kernel is not HEAD's."""
+    changes = kernel_changes()
+    if changes:
+        raise SystemExit(f"refused: aisef2 has uncommitted changes {changes} — a v2.1 record binds HEAD:aisef2")
+
+
 def history_problems() -> list[str]:
     """The 2.0 acceptance as HISTORY: the record and its approvals are their v2.0.0 blobs, its verdict is the one
     recorded, the closed C2-P5 history keeps its count, the approvals file was never rewritten. Nothing is re-derived
@@ -742,8 +756,7 @@ def reverify(run_guards: bool = True) -> dict:
     from validation.qualification.rebind import IDENTITY, ROW
     aid = _aid()
     checks: list[tuple[bool, str]] = []
-    accepted = json.loads((ROOT / OUT_REL).read_text(encoding="utf-8"))
-    prop = json.loads((ROOT / PROPOSAL_REL).read_text(encoding="utf-8"))
+    accepted, prop = _json_or_none(OUT_REL), _json_or_none(PROPOSAL_REL)   # the 2.0 records, through the one reader
     v21, fals = v21_proposal_record(), _json_or_none(pf.V21_OUT_REL) or {}
     entry = next((e for e in json.loads((ROOT / DECISIONS_REL).read_text(encoding="utf-8"))["entries"] if e.get("id") == B03_ID), {})
     reqs, real, cs = aid.requirements(), load_approvals(), contracts()
@@ -840,6 +853,11 @@ def reverify(run_guards: bool = True) -> dict:
                          "runner_is_this_tree_s", "authoring_aid_is_this_tree_s", "probe_execution_digests_are_this_tree_s",
                          "plan_hash_is_this_tree_s", "semantic_hashes_are_this_tree_s", "every_spec_qualified", "tests_all_ok",
                          "verdict_is_complete")]
+    changes = kernel_changes()
+    kernel = {"aisef2_tree": _git("rev-parse", "HEAD:aisef2"), "uncommitted": changes, "kernel_is_committed": not changes,
+              "rule": "the kernel every fact above was derived with is HEAD:aisef2 only while `git status --porcelain -- aisef2` "
+                      "is empty; an uncommitted kernel change is never re-verified as HEAD's"}
+    checks.append((kernel["kernel_is_committed"], "kernel: kernel_is_committed is false"))
     calibrations = {"shipped": _file(rc.SHIPPED_REL),
                     "newest_release_record": _file(rc.RECORD_REL) if (ROOT / rc.RECORD_REL).is_file() else None}
     checks.append((calibrations["newest_release_record"] is not None, f"{rc.RECORD_REL} is missing"))
@@ -877,6 +895,7 @@ def reverify(run_guards: bool = True) -> dict:
         "cycle1_drift": drift,
         "p5_corpus": corpus,
         "p5_falsifiability": falsifiability,
+        "kernel": kernel,
         "calibrations": calibrations,
         "identity_table": {"label": "identity mapping, not a behaviour proof", "rows": table},
     }
@@ -905,10 +924,11 @@ def guard_problems(ran: dict) -> list[str]:
 
 
 def write_v21() -> dict:
-    """`reverify` with the guards into the v2.1 record, written once and only without a problem (a refused run is
-    kept: `keep_failed_run`)."""
+    """`reverify` with the guards into the v2.1 record, written once, from a committed kernel only (both refused before
+    the run) and only without a problem (a refused run is kept: `keep_failed_run`)."""
     if (ROOT / V21_OUT_REL).exists():
         raise SystemExit(f"refused: {V21_OUT_REL} exists — a record is never rewritten")
+    refuse_uncommitted_kernel()
     rec = reverify(run_guards=True)
     if rec["problems"]:
         raise SystemExit(f"refused: {'; '.join(rec['problems'])} — the run is kept at {keep_failed_run(V21_OUT_REL, rec)}")

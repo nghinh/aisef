@@ -107,7 +107,8 @@ class Acceptance(unittest.TestCase):
     def test_a_refused_re_verification_run_is_kept_outside_the_evidence_tree(self):
         rec = {"problems": ["guard checker_calibration: exit 1"], "verdict": "PROBLEMS", "guards": {"checker_calibration": {"exit": 1}}}
         with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as kept, tempfile.TemporaryDirectory() as fallback, \
-                mock.patch.object(A, "ROOT", pathlib.Path(tmp)):                         # never the real tree
+                mock.patch.object(A, "ROOT", pathlib.Path(tmp)), \
+                mock.patch.object(A, "_git", return_value=""):   # never the real tree; its kernel committed (git status mocked)
             root, kept = pathlib.Path(tmp), pathlib.Path(kept).resolve()
             with mock.patch.dict(os.environ, {"AISEF_FAILED_RUN_DIR": str(kept)}), mock.patch.object(A, "reverify", return_value=rec), \
                     self.assertRaises(SystemExit) as refused:
@@ -127,6 +128,46 @@ class Acceptance(unittest.TestCase):
             with mock.patch.object(A, "reverify", side_effect=AssertionError("run")), self.assertRaises(SystemExit) as refused:
                 A.write_v21()                                                              # an existing record: before the run
             self.assertIn("exists", str(refused.exception))
+
+    def test_the_re_verification_writer_refuses_an_uncommitted_kernel_before_it_runs(self):
+        dirty = " M aisef2/product/outcome.py"
+        with tempfile.TemporaryDirectory() as tmp, mock.patch.object(A, "ROOT", pathlib.Path(tmp)), \
+                mock.patch.object(A, "_git", return_value=dirty) as git, mock.patch.object(A, "reverify", side_effect=AssertionError("run")):
+            with self.assertRaises(SystemExit) as refused:
+                A.write_v21()
+            git.assert_called_once_with("status", "--porcelain", "--", "aisef2")
+            self.assertEqual(str(refused.exception), f"refused: aisef2 has uncommitted changes {[dirty]} — a v2.1 record binds HEAD:aisef2")
+            self.assertEqual(list(pathlib.Path(tmp).rglob("*")), [])
+            git.return_value = ""                        # committed: the writer goes on to the run
+            with self.assertRaises(AssertionError):
+                A.write_v21()
+
+    def test_a_2_0_record_that_does_not_record_its_own_verdict_is_not_history(self):
+        docs = A._json_or_none
+        admission = f"{A.PROPOSAL_REL} does not record its admission (history)"
+        for rel, history, change, expected in (
+                (A.OUT_REL, A.history_problems, lambda d: d.update(verdict="PROBLEMS"), ["the acceptance verdict is not recorded"]),
+                (A.HISTORY_REL, A.history_problems, lambda d: d["entries"].pop(), ["the closed C2-P5 history changed"]),
+                (A.PROPOSAL_REL, A.proposal_history_problems, lambda d: d.update(verdict="PROBLEMS"), [admission]),
+                (A.PROPOSAL_REL, A.proposal_history_problems, lambda d: d.update(problems=["x"]), [admission])):
+            doc = docs(rel)
+            change(doc)
+            with self.subTest(rel=rel, expected=expected), \
+                    mock.patch.object(A, "_json_or_none", side_effect=lambda r, rel=rel, doc=doc: doc if r == rel else docs(r)):
+                self.assertEqual(history(), expected)
+
+    def test_the_admission_holds_only_9_of_9_under_the_real_approvals_and_never_with_one_missing(self):
+        good = {"admitted": True, "checks_passed": 9, "synthetic_approval_used": False, "one_approval_removed": {"admitted": False},
+                "no_approvals": {"admitted": False}}
+        self.assertEqual(A._admission_problems(good), [])
+        gate = "admitted with an approval missing: the approval gate did not hold"
+        for path, value, expected in ((("admitted",), False, ["not admitted 9/9 under the real approvals alone (9/9)"]),
+                                      (("checks_passed",), 8, ["not admitted 9/9 under the real approvals alone (8/9)"]),
+                                      (("synthetic_approval_used",), True, ["not admitted 9/9 under the real approvals alone (9/9)"]),
+                                      (("one_approval_removed", "admitted"), True, [gate]),
+                                      (("no_approvals", "admitted"), True, [gate])):
+            with self.subTest(path=path):
+                self.assertEqual(A._admission_problems(_set(copy.deepcopy(good), path, value)), expected)
 
     def test_a_guard_run_is_recorded_with_its_time_never_rounded_to_zero(self):
         done = mock.Mock(returncode=0, stdout="PASS\n", stderr="")
@@ -195,7 +236,8 @@ class V21Records(unittest.TestCase):
         """This tree once its v2.1 records exist, served to the readers from memory or a temp file and never written into
         the repository: the v2.1 proposal (the aid's record in its envelope, or state['proposal']), the falsifiability
         record (2.0's run made this tree's — its plan, kernel, runner, aid and semantic hashes — then `as_v21`:
-        state['fals']) and the re-verification (the file state['reverification'] names)."""
+        state['fals']) and the re-verification (the file state['reverification'] names); a 2.0 record a case tampered is
+        served as state['serve'][rel]."""
         from validation.qualification import p5_falsifiability as pf
         derived = A._aid().record()
         written = {rel: {"path": rel, "sha256": c * 64} for rel, c in ((A.V21_PROPOSAL_REL, "f"), (pf.V21_OUT_REL, "e"))}
@@ -204,6 +246,8 @@ class V21Records(unittest.TestCase):
         state = {"derived": derived, "two_oh": two_oh}
 
         def json_or_none(rel):
+            if rel in state.get("serve", {}):
+                return state["serve"][rel]
             if rel == A.V21_PROPOSAL_REL:
                 return state.get("proposal") or A.v21_proposal(derived)
             if rel == pf.V21_OUT_REL:
@@ -278,6 +322,7 @@ class V21Records(unittest.TestCase):
             rec = A.reverify(run_guards=False)
             self.assertEqual((rec["problems"], rec["verdict"], rec["claims_owner_acceptance"], rec["new_approvals"]),
                              ([], A.V21_VERDICT, False, []))
+            self.assertEqual(A.reverification_problems(), [f"{A.V21_OUT_REL} is missing"])
             state["reverification"] = at = pathlib.Path(tmp) / "C2-P5-ACCEPTANCE-REVERIFICATION.json"
 
             def problems(change=lambda doc: None):
@@ -311,6 +356,8 @@ class V21Records(unittest.TestCase):
             self.assertEqual(problems(), [])
 
     def test_each_re_verification_check_refuses_for_its_own_reason(self):
+        from validation.qualification import p5_falsifiability as pf
+        from validation.qualification import rebind
         from validation.qualification import release_calibration as rc
         with self.on_2_1() as state, tempfile.TemporaryDirectory() as tmp:
             self.assertEqual(A.reverify(run_guards=False)["problems"], [])
@@ -330,6 +377,34 @@ class V21Records(unittest.TestCase):
             current = f"{A.V21_PROPOSAL_REL} is not what the authoring aid derives from this tree"
             missing = "closure-evidence/v2/v2.1/NO-RELEASE-CALIBRATION.json"
             rewritten = {"commits": 2, "distinct_blobs": ["a", "b"], "identical": False}
+            two_oh = {rel: json.loads((A.ROOT / rel).read_text(encoding="utf-8")) for rel in (A.PROPOSAL_REL, A.OUT_REL)}
+            sid20, req20 = two_oh[A.PROPOSAL_REL]["specs"][0]["spec_id"], next(iter(two_oh[A.PROPOSAL_REL]["requirements"]))
+            real, lf_sha_at, git = A.load_approvals(), rebind.lf_sha_at, A._git
+            sid0 = real[0].contract_id[len("BC-V22-"):]                  # the spec of the first persisted approval
+            retained = "the retained specs are not the accepted 59, or not the v2.1 proposal's"
+            one_per = "the approvals are not exactly one per retained contract"
+            dirty = " M aisef2/product/outcome.py"
+
+            def served(rel, path, value):     # the 2.0 record `rel` with the value at `path` replaced, through the one reader
+                return mock.patch.dict(state, {"serve": {rel: _set(copy.deepcopy(two_oh[rel]), path, value)}})
+
+            def fals(path, value):            # the v2.1 falsifiability record with the value at `path` replaced
+                return mock.patch.dict(state, {"fals": _set(copy.deepcopy(state["fals"]), path, value)})
+
+            @contextlib.contextmanager
+            def each(*patches):
+                with contextlib.ExitStack() as stack:
+                    for p in patches:
+                        stack.enter_context(p)
+                    yield
+
+            def approvals(given):             # the persisted approvals as `given`; the admission's own verdict set aside
+                return each(mock.patch.object(A, "load_approvals", return_value=given),
+                            mock.patch.object(A, "_admission_problems", return_value=[]))
+
+            def not_blob_at(rev):             # the 2.0 falsifiability record is not its blob at `rev` (and is at the other)
+                return mock.patch.object(rebind, "lf_sha_at", side_effect=lambda r, rel: "0" * 64 if (r, rel) == (rev, A.FALSIFIABILITY_REL)
+                                         else lf_sha_at(r, rel))
             for name, patch, expected in (   # each patch made when its case runs (one ledger file at a time)
                     ("the 2.0 acceptance is not history", lambda: mock.patch.object(A, "history_problems", return_value=["h"]), [f"{A.OUT_REL}: ['h']"]),
                     ("the 2.0 proposal is not history", lambda: mock.patch.object(A, "proposal_history_problems", return_value=["p"]),
@@ -350,9 +425,73 @@ class V21Records(unittest.TestCase):
                     ("the admission", lambda: mock.patch.object(A, "_admission_problems", return_value=["not admitted"]), ["not admitted"]),
                     ("a literal comparison", lambda: mock.patch.object(A, "_cycle1_drift", return_value={**A._cycle1_drift(), "ok": False}),
                      ["cycle1_drift_is_the_accepted_record_s is false"]),
-                    ("the release calibration", lambda: mock.patch.object(rc, "RECORD_REL", missing), [f"{missing} is missing"])):
+                    ("the release calibration", lambda: mock.patch.object(rc, "RECORD_REL", missing), [f"{missing} is missing"]),
+                    # the accepted 2.0 proposal, served tampered: each literal comparison with it alone
+                    ("an accepted row's probe id", lambda: served(A.PROPOSAL_REL, ("specs", 0, "probe_id"), "probe.python_callable"),
+                     [f"{sid20}: probe_id_is_the_accepted is false"]),
+                    ("an accepted row's contract hash", lambda: served(A.PROPOSAL_REL, ("specs", 0, "contract_hash"), "0" * 64),
+                     [f"{sid20}: contract_is_the_accepted_and_the_approved is false"]),
+                    ("an accepted requirement hash", lambda: served(A.PROPOSAL_REL, ("requirements", req20, "hash"), "0" * 64),
+                     ["requirements: are_the_accepted is false"]),
+                    # (a plan spec id not compiled here also leaves the admission and the falsifiability rows short)
+                    ("an accepted row missing: a plan spec id not compiled here",
+                     lambda: served(A.PROPOSAL_REL, ("specs",), two_oh[A.PROPOSAL_REL]["specs"][:-1]),
+                     [retained, "plan: every_spec_id_compiled_here_under_the_real_approvals is false",
+                      "not admitted 9/9 under the real approvals alone (7/9)",
+                      f"{pf.V21_OUT_REL}: semantic_hashes_are_this_tree_s is false", f"{pf.V21_OUT_REL}: every_spec_qualified is false"]),
+                    ("not the accepted count", lambda: mock.patch.dict(A.ACCEPTED, {"retained": 58}), [retained, one_per]),
+                    ("a v2.1 proposal row not retained",
+                     lambda: proposal(("record", "specs"), [*derived["specs"], {**derived["specs"][0], "spec_id": "S-EXTRA"}]),
+                     [retained, current]),
+                    # the persisted approvals
+                    ("a second approval of one contract", lambda: approvals((*real, real[0])), [one_per]),
+                    ("an approval not binding the current hashes",
+                     lambda: approvals((*real, dataclasses.replace(real[0], requirement_hash="0" * 64))),
+                     [one_per, f"approvals not binding the current hashes: {[real[0].contract_id]}"]),
+                    ("an approval of the contract at another hash",           # the approval a contract is compared with
+                     lambda: approvals((*real, dataclasses.replace(real[0], contract_hash="0" * 64))),
+                     [f"{sid0}: contract_is_the_accepted_and_the_approved is false", one_per,
+                      f"approvals not binding the current hashes: {[real[0].contract_id]}"]),
+                    ("an approval of a contract not retained",
+                     lambda: each(mock.patch.dict(A.ACCEPTED, {"retained": 60}),
+                                  approvals((*real, dataclasses.replace(real[0], contract_id="XX-V22-" + sid0)))),
+                     [retained, one_per]),
+                    # the accepted 2.0 record, served tampered
+                    ("the accepted record's rulings", lambda: served(A.OUT_REL, ("verification", "rulings", "OR-IFACE-1", "count"), 0),
+                     ["rulings_are_the_accepted_record_s is false"]),
+                    ("the accepted record's P5 corpus",
+                     lambda: served(A.OUT_REL, ("verification", "identities", "p5_corpus", "corpus_sha256"), "0" * 64),
+                     ["p5_corpus_is_the_accepted_record_s is false"]),
+                    ("the accepted record's Cycle-1 drift",
+                     lambda: served(A.OUT_REL, ("verification", "cycle1_drift", "catalog_digest"), "0" * 64),
+                     ["cycle1_drift_is_the_accepted_record_s is false"]),
+                    ("a Cycle-1 drift not ok, as the accepted record has it",
+                     lambda: each(served(A.OUT_REL, ("verification", "cycle1_drift", "ok"), False),
+                                  mock.patch.object(A, "_cycle1_drift", return_value={**A._cycle1_drift(), "ok": False})),
+                     ["cycle1_drift_is_the_accepted_record_s is false"]),
+                    # the 2.0 falsifiability record as history
+                    ("the 2.0 falsifiability record is not the accepted candidate's", lambda: not_blob_at(A.ACCEPTED["candidate"]),
+                     ["p5_falsifiability_2_0_is_the_accepted_candidate_s is false"]),
+                    ("the 2.0 falsifiability record is not its v2.0.0 blob", lambda: not_blob_at(A.V2_0_0),
+                     ["p5_falsifiability_2_0_is_its_v2_0_0_blob is false"]),
+                    # the v2.1 falsifiability record: a problem under a COMPLETE verdict, a row missing
+                    ("a falsifiability record with a problem", lambda: fals(("problems",), ["x"]),
+                     [f"{pf.V21_OUT_REL}: every_spec_qualified is false"]),
+                    ("a falsifiability record with a row missing", lambda: fals(("specs",), state["fals"]["specs"][1:]),
+                     [f"{pf.V21_OUT_REL}: semantic_hashes_are_this_tree_s is false", f"{pf.V21_OUT_REL}: every_spec_qualified is false"]),
+                    ("the ledger entry without its B-03a part", lambda: decisions(lambda e: e["decision"].pop("B-03a")),
+                     [f"{at} entry {A.B03_ID} is not {A.B03_REF}"]),
+                    ("an uncommitted kernel", lambda: mock.patch.object(A, "_git", side_effect=lambda *a: dirty if a[0] == "status" else git(*a)),
+                     ["kernel: kernel_is_committed is false"])):
                 with self.subTest(name), patch():
                     self.assertEqual(A.reverify(run_guards=False)["problems"], expected)
+            kernel = A.reverify(run_guards=False)["kernel"]
+            self.assertEqual((kernel["aisef2_tree"], kernel["uncommitted"], kernel["kernel_is_committed"]),
+                             (A._git("rev-parse", "HEAD:aisef2"), [], True))
+            with mock.patch.object(A, "_git", side_effect=lambda *a: dirty if a[0] == "status" else git(*a)) as g:
+                rec = A.reverify(run_guards=False)
+            self.assertEqual((rec["kernel"]["uncommitted"], rec["kernel"]["kernel_is_committed"], rec["verdict"]), ([dirty], False, "PROBLEMS"))
+            g.assert_any_call("status", "--porcelain", "--", "aisef2")
 
 
 
