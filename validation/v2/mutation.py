@@ -673,7 +673,8 @@ V21_TARGETS.update({
        for n in ("_MODULE_NAME", "import_facts", "DIGEST")},
     # B-01 (ARCHITECTURE-EXCEPTION-V2-007): the capability digest, sha256 of [PROBE_ID, CAPABILITY_VERSION, CLASSES]
     "aisef2/probe/cli_invocation.py::DIGEST": [_V21_ID, "tests/v2/test_c2_cli_calibration.py"],
-    "aisef2/probe/process_effect.py::DIGEST": [_V21_ID, "tests/v2/test_c2_effect_calibration.py"],
+    "aisef2/probe/process_effect.py::DIGEST": [_V21_ID, "tests/v2/test_probe_process_effect_units.py"],  # not
+    # test_c2_effect_calibration.py: it imports validation/qualification, which the mutation copy does not hold (preflight)
     "aisef2/probe/python_callable_v2.py::DIGEST": [_V21_ID, *_C2_P4_TESTS],
 })
 SUPERSEDED.update({t: "V2.1" for t in V21_TARGETS})
