@@ -19,7 +19,7 @@ cải tiến của chủ dự án.
 | A8 | `git diff` lỗi → InvariantError kết thúc cả lượt | đọc mã | `test_v21_orchestration.DiffFailure` | trung bình | `51c5241` + `4ea4276` (bằng chứng tĩnh của repo bắt lỗi nhãn) | RESOURCE_ACQUISITION_FAILED, ENVIRONMENT, retry | **XONG** |
 | A9 | công cụ phát hành cứng 2.0.0 | đọc mã | `test_v21_release_lane` | trung bình (không phát hành nổi 2.0.1) | `aa3c18a` | theo phiên bản; bản ghi 2.0.0 giữ tên | **XONG** |
 | A10 | metadata PyPI nói về 1.x; không có LICENSE; link repo private | 360 | `packaging_check` + METADATA của wheel | thấp–TB | `b819a57` | wheel mang `License-Expression: MIT`, LICENSE | **XONG**; link tương đối của README trên PyPI: **CHẶN** (chủ dự án chọn nơi đăng tài liệu) |
-| A11 | bản vá phát hành được | — | suite đầy đủ trên `c0ec1a5` + cài sạch wheel | — | `release/v2.0.1-prep` | build + `packaging_check` PASS; cài sạch: `--check` ready, `--verify` REFUTED không traceback | **CHUẨN BỊ XONG**; CI/staging/RC freeze/Q0–Q5/tag/PyPI: **CHẶN** (của chủ dự án) |
+| A11 | bản vá phát hành được | — | suite đầy đủ trên `c0ec1a5` + cài sạch wheel | — | `release/v2.0.1-prep` | build + `packaging_check` PASS; cài sạch: `--check` ready, `--verify` REFUTED không traceback | **CHUẨN BỊ XONG** (`5e46fe9`); suite: 5 test bản ghi phái sinh đỏ ⇒ cần lập lại bản ghi (REPORT §4); CI/staging/RC freeze/Q0–Q5/tag/PyPI: **CHẶN** (của chủ dự án) |
 
 ## 2. Ưu tiên B–E
 
