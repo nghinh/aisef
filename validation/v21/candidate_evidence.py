@@ -77,8 +77,8 @@ def _k_nowork(out: pathlib.Path, rel: str) -> str:
     """K-NOWORK-001's own writer, its output path pointed into OUT (it re-runs its cases under both kernels, ~13 min)."""
     kn = _load("validation/qualification/c2_k_nowork_001.py")
     target = out / rel
-    kn.OUT_REL = os.path.relpath(target, ROOT)
-    if not (ROOT / kn.OUT_REL).resolve().is_relative_to(out.resolve()):
+    kn.V21_OUT_REL = os.path.relpath(target, ROOT)
+    if not (ROOT / kn.V21_OUT_REL).resolve().is_relative_to(out.resolve()):
         raise SystemExit("refused: the writer's path is not inside the candidate directory")
     target.parent.mkdir(parents=True, exist_ok=True)
     kn.write()
@@ -99,7 +99,8 @@ GENERATED = {
                             "review_verify.verify); INVENTORY_SHA256 and test_no_dual_authority's release delta edited by hand"),
     "closure-evidence/v2/Q0-CHECKER-CALIBRATION.json": (
         _checker_calibration, "only after mutation, P2 and the inventory are current; its known-bad observation changes"),
-    "closure-evidence/v2/cycle2/K-NOWORK-001-REHEARSAL.json": (None, "after the plan correction (it is BOUND)"),
+    "closure-evidence/v2/cycle2/K-NOWORK-001-REHEARSAL.json": (None, "after the plan correction (it is BOUND): needs the v2.1 correction committed in the "
+                                                               "repository; the candidate run refuses before it exists"),
 }
 NOT_GENERATED = {
     "closure-evidence/v2/release/S2-MUTATION.json (+ P2/P6/cycle2 P1 mutation records)":

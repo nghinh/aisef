@@ -1,17 +1,27 @@
 """PLAN-V2.2 CORRECTION 1 (owner ruling 'AISEF V2 — FINAL PLAN CORRECTION + DELIVERY RUN PREREGISTRATION / NO PROVIDER
 CALL', 2026-10-02): the owner's planning decisions applied to the accepted PLAN-V2.2, and nothing else.
 
-    python -P validation/qualification/c2_plan_correction.py --write    # -> closure-evidence/v2/cycle2/PLAN-V2.2-CORRECTION-1.json
-    python -P validation/qualification/c2_plan_correction.py --check    # the committed record is what this tree derives
+    python -P validation/qualification/c2_plan_correction.py --write    # -> closure-evidence/v2/v2.1/PLAN-V2.2-CORRECTION-1.json (new file only)
+    python -P validation/qualification/c2_plan_correction.py --check    # that record is what this tree derives; the 2.0 one is history
 
 A plan-level (level 4) change only: eight obligations move to an existing implementation story (`DECISIONS`), which
 leaves STORY-05-01 and STORY-05-03 without an obligation — they are no longer stories of the plan. No BehaviorContract,
-ProductProofSpec, approval or requirement is touched: the plan is rebuilt from the accepted plan's own obligations, the
-59 specs are the ones compiled under the persisted real approvals, and the record proves they are the accepted ones.
+ProductProofSpec, approval or requirement is touched: the plan is rebuilt from the accepted plan's own obligations and
+the 59 specs are the ones compiled under the persisted real approvals. That they are the accepted ones is the 2.0
+record's claim, made through the probe-identity re-binding (rebind.py); the v2.1 record compares the contract id, contract
+hash and probe id literally and lists the 2.1 spec identities as they are.
 A moved obligation depends on the INTRODUCE criteria of every story its new story depends on — the authoring aid's own
 rule (p10_contracts.build) — so its new story is ordered after the story that introduced the behaviour.
 
 Static admission is the engine's nine checks under the persisted real approvals. No probe runs, no model is called.
+
+B-03a (owner, 2026-10-06): the 2.0 record (`OUT_REL`, written on the 2.0 kernel) is history — its blob is tag v2.0.0's
+and it is never re-derived or rewritten (`history_problems`). The current record is the v2.1 one (`V21_OUT_REL`,
+`record_v21`), compared EXACTLY with this tree's derivation: it states literal facts only — per spec key the contract id,
+contract hash and probe id against the accepted proposal's, the spec ids and semantic hashes this tree's — and lists the
+probe-identity re-binding build() applies (rebind.py) apart, labelled as what it is: no behaviour proof. The mapping is
+backed: the record binds the v2.1 falsifiability record (`V21_FALSIFIABILITY_REL`, path, LF sha256, verdict) and has a
+problem unless every spec is QUALIFIED there at this tree's semantic hash — so it is written after that record.
 """
 
 from __future__ import annotations
@@ -28,7 +38,16 @@ ROOT = HERE.parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-OUT_REL = "closure-evidence/v2/cycle2/PLAN-V2.2-CORRECTION-1.json"
+OUT_REL = "closure-evidence/v2/cycle2/PLAN-V2.2-CORRECTION-1.json"          # 2.0: history, pinned by sha elsewhere
+V21_OUT_REL = "closure-evidence/v2/v2.1/PLAN-V2.2-CORRECTION-1.json"
+V2_0_0 = "ca2631374602da45dae75b7f6907ff4729d0b2f7"                         # tag v2.0.0: what a 2.0 record's blob must be
+V21_AUTHORITY = ("owner directive 2026-10-06, B-03a (closure-evidence/v2/cycle2/RELEASE-DECISIONS.json seq 5, "
+                 "AISEF_V2_1_B03_REQUALIFICATION_ROUND): a new v2.1 record for each artifact the engine digest affected; no "
+                 "engine-digest tolerance; no rebind mapping hiding unverified behaviour")
+IDENTITY_MAPPING = ("identity mapping (rebind), not a behaviour proof; behaviour: "
+                    "closure-evidence/v2/v2.1/P5-FALSIFIABILITY.json")
+V21_FALSIFIABILITY_REL = "closure-evidence/v2/v2.1/P5-FALSIFIABILITY.json"   # the behaviour evidence the mapping names
+FALSIFIABILITY_PASSED = "COMPLETE — EVERY RETAINED SPEC QUALIFIED"           # p5_falsifiability.run()'s passing verdict
 PLAN_ID = "LEDGERLOCK-PLAN-V2.2-CORRECTION-1"
 AUTHORITY = ("owner ruling 'AISEF V2 — FINAL PLAN CORRECTION + DELIVERY RUN PREREGISTRATION / NO PROVIDER CALL' "
              "(2026-10-02), decisions 1-4")
@@ -194,13 +213,22 @@ def record(b: dict | None = None) -> dict:
 
 def problems(body: dict) -> list[str]:
     p, a = body["proofs"], body["static_admission"]
+    s = p["product_proof_specs"]
+    v21 = "all_contracts_unchanged" in s        # the v2.1 record: literal, no re-binding
     out = [f"corrected plan, check {c['number']} {c['name']}: {'; '.join(c['problems'])}" for c in a["corrected_plan"]["checks"] if not c["passed"]]
     if not a["accepted_plan"]["admitted"]:
-        out.append("the accepted plan is not admitted on this tree")
+        out.append("this tree's old plan (the accepted plan's obligations, 2.1 spec ids) is not admitted on this tree" if v21
+                   else "the accepted plan is not admitted on this tree")
     if a["corrected_plan_without_approvals"]["admitted"]:
         out.append("admitted without any approval: the approval gate did not hold")
-    s = p["product_proof_specs"]
-    if s["count"] != 59 or not s["all_equal_to_accepted"] or s["semantic_hash_changes"] or not s["spec_of_each_criterion_unchanged"]:
+    if v21:
+        if s["count"] != 59 or not (s["all_contracts_unchanged"] and s["all_probe_ids_unchanged"] and s["spec_of_each_criterion_unchanged"]):
+            out.append("a ProductProofSpec's contract or probe differs from the accepted one")
+        f = body.get("identity_mapping", {}).get("behaviour") or {}
+        if f.get("sha256") is None or f.get("verdict") != FALSIFIABILITY_PASSED or f.get("qualified_at_this_tree_s_semantic_hash") != s["count"]:
+            out.append(f"the identity mapping is not backed: {f.get('path', V21_FALSIFIABILITY_REL)} is missing, not passing, or does not have every spec "
+                       "QUALIFIED at this tree's semantic hash")
+    elif s["count"] != 59 or not s["all_equal_to_accepted"] or s["semantic_hash_changes"] or not s["spec_of_each_criterion_unchanged"]:
         out.append("a ProductProofSpec differs from the accepted one")
     if not p["requirement_coverage"]["unchanged"]:
         out.append("requirement coverage changed")
@@ -219,33 +247,104 @@ def problems(body: dict) -> list[str]:
     return out
 
 
-def currency(b: dict, rec: dict, committed: dict) -> dict:
-    """The committed record against this tree's derivation `rec`, up to probe identity (validation/qualification/rebind.py):
-    the re-bound identities mapped back, and the hashes over them — both plans' and the contract-spec digest — recomputed
-    over the mapped-back content. Provenance tolerated: the kernel tree and this generator's sha256, each the committed
-    value as of the commit that wrote the record and the derived one this tree's — the generator's only while build,
-    record, check, currency and _rows are all that changed in it since."""
+def record_v21(b: dict | None = None) -> dict:
+    """The v2.1 record (B-03a): the plan facts of `record` — both plans, the moves, static admission under this tree's
+    engine, coverage, the graph — and, for the 59 specs, literal comparisons only. The re-binding build() applies is
+    listed apart under `identity_mapping`, labelled; nothing in `proofs` is derived through it."""
     from validation.qualification import c2_p9, rebind
-    subst = dict(b["rebind"])
-    subst.update({p.plan_hash: rebind.plan_back(p, b["rebind"]).plan_hash for p in (b["old"], b["new"])})
-    subst[rec["proofs"]["product_proof_specs"]["contract_spec_semantic_digest"]] = \
-        _sha(json.dumps(rebind.back(_rows(b), b["rebind"]), sort_keys=True).encode())
-    written = c2_p9.C.git("log", "-1", "--format=%H", "--", OUT_REL)
-    gen = "validation/qualification/c2_plan_correction.py"
-    tolerated = {"identities.aisef2_tree": (c2_p9.C.git("rev-parse", f"{written}:aisef2"), c2_p9.C.git("rev-parse", "HEAD:aisef2"))}
-    if rebind.code_moved(gen, written, ("build", "record", "check", "currency", "_rows")):
-        tolerated["identities.generator.sha256"] = (rebind.lf_sha_at(written, gen), c2_p9.C.lf_sha(ROOT / gen))
-    return rebind.compare(rec, committed, subst, tolerated)
+    from validation.qualification import p5_acceptance as pa
+    b = b or build()
+    body = record(b)
+    accepted = rebind.accepted_rows()                   # read literally from the accepted proposal, by spec key
+    rows = [dict(zip(("spec_id", *rebind.ROW), r, strict=True)) for r in _rows(b)]
+    specs = [{**r, "contract_unchanged": all(r[k] == accepted[r["spec_id"]][k] for k in ("contract_id", "contract_hash")),
+              "probe_id_unchanged": r["probe_id"] == accepted[r["spec_id"]]["probe_id"]} for r in rows]
+    was = body["proofs"]["product_proof_specs"]
+    body["proofs"]["product_proof_specs"] = {
+        "count": len(specs),
+        "rule": "per spec key, literally against the accepted proposal (identities.accepted_proposal): the contract id, contract "
+                "hash and probe id; the spec id, semantic hash and probe digest listed are this tree's",
+        "all_contracts_unchanged": all(r["contract_unchanged"] for r in specs),
+        "all_probe_ids_unchanged": all(r["probe_id_unchanged"] for r in specs),
+        "identities_equal_to_accepted": {k: sum(1 for r in specs if r[k] == accepted[r["spec_id"]][k]) for k in rebind.IDENTITY},
+        "contract_spec_semantic_digest": was["contract_spec_semantic_digest"], "contract_spec_semantic_digest_rule": was["rule"],
+        "spec_of_each_criterion_unchanged": was["spec_of_each_criterion_unchanged"],
+        "specs": specs}
+    body["identity_mapping"] = {
+        "label": IDENTITY_MAPPING,
+        "rule": "validation/qualification/rebind.py: build() refuses unless the old plan with this tree's spec ids mapped back has "
+                "the accepted plan hash",
+        "accepted_plan_hash": pa.ACCEPTED["plan_hash"],
+        "old_plan_mapped_back_plan_hash": rebind.plan_back(b["old"], b["rebind"]).plan_hash,
+        "pairs": "[accepted, this tree's]",
+        "specs": {r["spec_id"]: {k: [accepted[r["spec_id"]][k], r[k]] for k in ("spec_hash_id", "semantic_hash")}
+                  | {"mapped_by_rebind": b["rebind"].get(r["spec_hash_id"]) == accepted[r["spec_id"]]["spec_hash_id"]} for r in rows},
+        "behaviour": _behaviour(rows)}
+    body["static_admission"]["note"] = (
+        f"accepted_plan is this tree's old plan {b['old'].plan_hash} (the accepted plan's obligations with the 2.1 spec ids), "
+        f"admitted under this tree's engine; its identity with the accepted PLAN-V2.2 {pa.ACCEPTED['plan_hash']} is "
+        "identity_mapping's (rebind.plan_back), not a fact of this admission")
+    body["record"] = "AISEF V2.1 — LEDGERLOCK PLAN-V2.2 CORRECTION 1 on the 2.1 kernel (owner planning decisions applied; plan only)"
+    body["requalification"] = V21_AUTHORITY
+    body["history"] = {"path": OUT_REL, "sha256": c2_p9.C.lf_sha(ROOT / OUT_REL),
+                       "rule": "the 2.0 record, written on the 2.0 kernel: kept byte for byte, its blob tag v2.0.0's (history_problems)"}
+    for k in ("problems", "verdict"):
+        body.pop(k)
+    body["problems"] = problems(body)
+    body["verdict"] = "PLAN CORRECTION ADMITTED STATICALLY" if not body["problems"] else "PROBLEMS"
+    return json.loads(json.dumps(body))
+
+
+def _behaviour(rows: list[dict]) -> dict:
+    """The v2.1 falsifiability record, bound: its LF sha256, its verdict and how many of this tree's specs it has QUALIFIED
+    at this tree's semantic hash (None / 0 when it is missing)."""
+    from validation.qualification import c2_p9
+    path = ROOT / V21_FALSIFIABILITY_REL
+    rec = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
+    qualified = {r.get("spec_id"): r.get("semantic_hash") for r in rec.get("specs", []) if r.get("status") == "QUALIFIED"}
+    return {"path": V21_FALSIFIABILITY_REL, "sha256": c2_p9.C.lf_sha(path) if path.exists() else None, "verdict": rec.get("verdict"),
+            "qualified_at_this_tree_s_semantic_hash": sum(1 for r in rows if qualified.get(r["spec_id"]) == r["semantic_hash"]),
+            "rule": f"every spec QUALIFIED there (the pristine reference meets the spec's expectation, its own witness the contrary) at this tree's semantic hash, "
+                    f"verdict '{FALSIFIABILITY_PASSED}'; write_v21 refuses otherwise"}
+
+
+def history_problems() -> list[str]:
+    """The 2.0 record as history: its blob is tag v2.0.0's, its verdict and problems are the recorded ones, and the rule
+    finds none in it. Nothing is re-derived for it on this tree."""
+    from validation.qualification import c2_p9, rebind
+    path = ROOT / OUT_REL
+    if not path.exists():
+        return [f"{OUT_REL} is missing"]
+    rec = json.loads(path.read_text(encoding="utf-8"))
+    out = [] if c2_p9.C.lf_sha(path) == rebind.lf_sha_at(V2_0_0, OUT_REL) else [f"{OUT_REL} is not the record of tag v2.0.0"]
+    if (rec.get("verdict"), rec.get("problems")) != ("PLAN CORRECTION ADMITTED STATICALLY", []):
+        out.append(f"{OUT_REL}: the recorded verdict is {rec.get('verdict')}")
+    return out + problems(rec)
 
 
 def check() -> list[str]:
-    b = build()
-    rec = record(b)
+    """The v2.1 record is what this tree derives, exactly (no re-binding, no tolerance), and the 2.0 record holds as history."""
+    rec = record_v21()
     out = list(rec["problems"])
-    path = ROOT / OUT_REL
-    if not path.exists() or not currency(b, rec, json.loads(path.read_text(encoding="utf-8")))["current"]:
-        out.append(f"{OUT_REL} is not what this tree derives")
-    return out
+    path = ROOT / V21_OUT_REL
+    if not path.exists() or json.loads(path.read_text(encoding="utf-8")) != rec:
+        out.append(f"{V21_OUT_REL} is not what this tree derives")
+    return out + history_problems()
+
+
+def write_v21() -> dict:
+    """Writes the v2.1 record to a new file: a 2.0 path, a record with problems (among them an identity mapping the v2.1
+    falsifiability record does not back) or an existing file is refused."""
+    path = ROOT / V21_OUT_REL
+    if path.resolve() == (ROOT / OUT_REL).resolve():
+        raise SystemExit(f"refused: {OUT_REL} is the 2.0 record")
+    rec = record_v21()
+    if rec["problems"]:
+        raise SystemExit("refused: " + "; ".join(rec["problems"]))
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("x", encoding="utf-8", newline="\n") as f:
+        f.write(json.dumps(rec, indent=1, ensure_ascii=False) + "\n")
+    return rec
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -255,11 +354,8 @@ def main(argv: list[str] | None = None) -> int:
     g.add_argument("--check", action="store_true")
     a = ap.parse_args(argv)
     if a.write:
-        rec = record()
-        if rec["problems"]:
-            raise SystemExit("refused: " + "; ".join(rec["problems"]))
-        (ROOT / OUT_REL).write_text(json.dumps(rec, indent=1, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
-        print(f"{OUT_REL}: {rec['verdict']}; {rec['old_plan']['plan_hash'][:12]} -> {rec['new_plan']['plan_hash'][:12]}; "
+        rec = write_v21()
+        print(f"{V21_OUT_REL}: {rec['verdict']}; {rec['old_plan']['plan_hash'][:12]} -> {rec['new_plan']['plan_hash'][:12]}; "
               f"stories {rec['old_plan']['stories']} -> {rec['new_plan']['stories']}; obligations {rec['new_plan']['obligations']}")
         return 0
     found = check()
