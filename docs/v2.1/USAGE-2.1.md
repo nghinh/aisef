@@ -54,13 +54,26 @@ cần duyệt lại. Một obligation mà không bản phát hành nào biết �
 ## 3. Settings: khoá tuỳ chọn mới (vắng = đúng hành vi 2.0.0)
 
 ```json
-"review": {"policy": "fix-loop", "min_severity": "high"},
+"review": {"policy": "fix-loop", "min_severity": "high",
+           "finder": "ocr", "ocr": {"exe": "/abs/path/ocr", "sha256": "<sha256 của binary>", "timeout_min": 20,
+                                    "max_tokens": 8000}},
 "prices": {"currency": "USD", "input_per_mtok": 1.32, "cache_read_per_mtok": 0.044, "cache_write_per_mtok": 1.32,
            "output_per_mtok": 3.96, "source": "<trang giá>", "effective_date": "YYYY-MM-DD"}
 ```
-- `review` vắng ⇒ review advisory như 2.0.0. `fix-loop` ⇒ một finding có **reproducer** mà probe của AISEF tái hiện ở
-  candidate, mức ≥ `min_severity`, sẽ chặn story (REVIEW_FINDING, retry trong giới hạn REVIEW) và nội dung được đưa cho
-  developer ở lượt sau. Finding không tái hiện được: chỉ ghi lại để người phân loại.
+- `review` vắng ⇒ review advisory như 2.0.0. `fix-loop` ⇒ một finding chỉ chặn story khi đủ **cả ba**: có
+  **reproducer** mà probe của AISEF tái hiện ở candidate (CONFIRMED); kỳ vọng của nó **được neo** vào contract đã duyệt
+  của mệnh đề nó trích (ANCHORED — xem ADR-7); mức ≥ `min_severity`. Khi đó: REVIEW_FINDING, retry trong giới hạn
+  REVIEW, nội dung được đưa cho developer ở lượt sau. Mọi finding khác (không tái hiện, không neo được, mâu thuẫn với
+  contract đã duyệt) chỉ được ghi lại để người phân loại.
+- Reproducer trích mệnh đề theo dạng `<requirement>/<clause>` như danh sách mệnh đề (ví dụ `R-9/3`, `R-ADD/1.1`).
+- `finder` vắng hoặc `"model"` ⇒ reviewer là phiên mô hình như 2.0.0. `"ocr"` ⇒ Open Code Review v1.12.12 (binary
+  theo đường dẫn tuyệt đối, kiểm sha256 trước mỗi lần chạy): preview rồi review đúng thay đổi của story; coverage do
+  AISEF kiểm. Review không phủ hết candidate (partial, hết thời gian, hết token budget của nó, schema manifest không hỗ
+  trợ) ⇒ dưới `fix-loop` story không được commit (CAPABILITY_UNRUNNABLE; lỗi provider ⇒ PROVIDER_UNAVAILABLE); dưới
+  `advisory` chỉ ghi lại. Một lượt OCR bị dừng vì hết giờ có chi phí không xác định ⇒ ngân sách "unaccounted", run
+  không mở thêm phiên trả tiền nào.
+- Checkout được review không được đổi trong lúc review (cả với finder mô hình): đổi tệp hay commit ⇒ mọi finding bị bỏ,
+  CAPABILITY_UNRUNNABLE.
 - `prices` vắng ⇒ `usage.cost.value = null`, `status: unknown` — không bao giờ 0.
 
 ## 4. Sau một lượt chạy
@@ -101,5 +114,8 @@ khác ⇒ từ chối (đó là dự án mới, không phải nối tiếp).
 - Không có sandbox: developer và mã test chạy dưới user của người vận hành (V2-05 mở).
 - `--verify` không có anchor chỉ chứng minh nhất quán.
 - Review CONFIRMED không chứng minh người review đọc đúng yêu cầu.
-- Bộ chuyển OCR chưa chạy với nhị phân thật; chưa nối vào `aisef run`.
+- OCR đã nối vào `aisef run` và đã chạy **nhị phân thật** (build từ commit đã ghim) với một mô hình giả trên loopback;
+  chưa chạy với mô hình thật (cần ngân sách).
+- Neo kỳ vọng là quy tắc cơ học trên contract đã duyệt: nó không quyết định được một stimulus **mới** có thuộc điều kiện
+  của mệnh đề hay không (giới hạn đã đo bằng test).
 - Chưa có số đo hiệu quả so với agent chạy trực tiếp — xem [EXPERIMENT-PLAN.md](EXPERIMENT-PLAN.md).

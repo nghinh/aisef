@@ -80,14 +80,41 @@ chọn và duyệt. **Không thấy:** `importlib.import_module`/`__import__`.
 duyệt**; `approve` một contract mỗi lệnh, `human:<tên>`. **Không tuyên bố:** công cụ không biết ai gõ lệnh — giữ bundle và
 lệnh ngoài tầm developer agent.
 
-## ADR-7 — Review: tìm thì tự do, chặn chỉ khi probe tái hiện
+## ADR-7 — Review: tìm thì tự do; chặn chỉ khi probe tái hiện VÀ contract đã duyệt neo kỳ vọng
 
 Finding có thể kèm **reproducer** (hành vi mệnh đề yêu cầu, theo ngữ pháp probe); AISEF chạy bằng probe của chính nó, đã
-hiệu chuẩn, ở candidate. CONFIRMED ⇔ probe bác hành vi đã nêu — chính là "thẩm quyền chứng thực" D-002 đòi. Chính sách
-`fix-loop`: CONFIRMED ≥ `min_severity` chặn (REVIEW_FINDING, giới hạn REVIEW của taxonomy làm vòng sửa có biên), nội dung vào
-prompt retry. Settings **không có** `review` ⇒ luật 2.0.0 (advisory), ghi rõ trong record — không đổi hành vi âm thầm.
-OCR (v1.12.12, Apache-2.0) chỉ là bên tìm; coverage do AISEF kiểm. **Không tuyên bố:** xác nhận chứng minh candidate không
-làm điều finding nói — không chứng minh finding đọc đúng yêu cầu (đã đo trong test).
+hiệu chuẩn, ở candidate. CONFIRMED ⇔ probe bác hành vi đã nêu. Nhưng CONFIRMED chỉ chứng minh candidate *không làm* điều
+finding nói — **không** chứng minh yêu cầu đòi điều đó. Theo chỉ thị của chủ dự án ("finding tái hiện được nhưng kỳ vọng
+sai requirement không tự trở thành blocker"), chặn còn cần **neo** (`review_verify.anchor`), quyết định chỉ từ contract đã
+duyệt và mệnh đề đã niêm phong của bundle, không bao giờ từ chữ của reviewer:
+
+| Trạng thái | Khi nào |
+|---|---|
+| ANCHORED | contract đã duyệt của mệnh đề được trích, cùng subject, quan sát mọi khoá được kỳ vọng và đều kỳ vọng đúng giá trị của finding; giá trị đó là *hằng* của mệnh đề: ≥ 2 contract với stimulus khác nhau, hoặc 1 contract mà văn bản mệnh đề nêu đúng giá trị và không số nào khác |
+| CONTRADICTS_APPROVED | một contract đã duyệt của yêu cầu, cùng subject, **cùng stimulus**, kỳ vọng khác; hoặc hằng của mệnh đề khác giá trị finding nêu |
+| UNANCHORED | mọi trường hợp khác (không contract nào khai báo mệnh đề; không cùng subject/khoá; contract của mệnh đề kỳ vọng các giá trị khác nhau ⇒ kết quả phụ thuộc đầu vào) |
+
+`fix-loop`: CONFIRMED ∧ ANCHORED ∧ mức ≥ `min_severity` ⇒ REVIEW_FINDING (giới hạn REVIEW làm vòng sửa có biên), nội
+dung vào prompt retry. Đo trên bundle LedgerLock 2.0.0: 4/5 lỗi smoke #2 neo được (R-9/2, R-9/3 ×2, R-9/5); lỗi thứ năm
+trích R-7/1 (contract quan sát tệp, không quan sát mã thoát) ⇒ UNANCHORED, chỉ phân loại. Finding hiểu sai `add(2,2)=5`
+và `snapshot thiếu tệp → 4` không chặn.
+
+**Toàn vẹn.** Reviewer chụp HEAD và mọi tệp của checkout trước finder; so lại sau finder và sau các probe kiểm chứng. Đổi
+⇒ bỏ mọi finding, CAPABILITY_UNRUNNABLE. Kiểm chứng chạy ở SHA đã chụp.
+
+**OCR** (v1.12.12 = 182898c, Apache-2.0) là một finder, chạy như tiến trình ngoài: binary ghim theo sha256, route chỉ qua
+biến OCR_LLM_* (không `--provider`, không tệp cấu hình, HOME riêng), phạm vi do AISEF tính từ journal. Coverage do AISEF kiểm
+(module review_ocr). Không đủ ⇒ dưới `fix-loop`: CAPABILITY_UNRUNNABLE (lỗi provider ⇒ PROVIDER_UNAVAILABLE). Token của OCR
+vào ngân sách của run qua một luồng phiên; không báo token ⇒ "unaccounted" ⇒ run dừng chi tiêu. Settings **không có**
+`review` ⇒ luật 2.0.0 (advisory), ghi rõ trong record.
+
+**Đã kiểm chứng:** offline với finder giả (6 nhóm trường hợp, `test_v21_review_chain`); với **nhị phân OCR thật** build từ
+commit đã ghim: preview, và một lượt review đầy đủ mà mô hình là server giả trên loopback (manifest thật COMPLETE theo luật
+của adapter, finding có reproducer được đọc). **Chưa:** mô hình thật.
+
+**Không tuyên bố:** neo không quyết định được một stimulus **mới** có thuộc điều kiện của mệnh đề hay không — reviewer gọi
+tệp hỏng là "lỗi I/O" (R-9/3) vẫn neo được (đo bằng `test_known_limit_a_new_stimulus_under_the_wrong_clause_anchors`).
+Stimulus mà một contract đã duyệt quyết định khác thì bị bắt (CONTRADICTS_APPROVED).
 
 ## ADR-8 — Nối tiếp thay cho resume tại chỗ; chi phí không biết là `null`
 
