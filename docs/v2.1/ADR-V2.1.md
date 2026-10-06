@@ -123,8 +123,9 @@ xác nhận; obligation đã giao thành story VERIFY mà kernel chứng minh l�
 K-NOWORK-001 của chủ dự án giữ — không đổi); `aisef run --parent` ghi dòng dõi. Bằng chứng của lượt cũ không bị sửa (chỉ
 thêm tệp claim). Quy tắc (module `aisef2/app/lineage.py`):
 
-- **Journal hoàn tất ≠ bền ≠ nguyên tử ≠ tác dụng.** Một append là `write` + `fsync`: hoàn tất khi `write` trả về, bền khi
-  `fsync` trả về, *không* nguyên tử (lần ghi ngắn có thể để lại dòng cuối bị cắt). Một sự kiện ghi lại một tác dụng đã
+- **Journal hoàn tất ≠ đồng bộ ≠ nguyên tử ≠ tác dụng.** Một append là `write` + `fsync`: hoàn tất khi `write` trả đủ byte,
+  đồng bộ khi `fsync` trả về — sống qua việc tiến trình bị giết; trước mất điện thì tuỳ thiết bị (trên macOS `fsync` không
+  ép cache của ổ, `F_FULLFSYNC` không dùng) — *không* nguyên tử (chết giữa lần ghi để lại dòng cuối bị cắt). Một sự kiện ghi lại một tác dụng đã
   xảy ra; thiếu nó không có nghĩa tác dụng chưa xảy ra. *(Rút lại nhận định trước đó — "SIGKILL không thể cắt giữa dòng" —
   trong commit 7e0aac0: sai; một tín hiệu chết người có thể làm lần ghi ngắn, và nhận định ấy lẫn tính hoàn tất với tính
   nguyên tử.)*
