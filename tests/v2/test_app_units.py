@@ -748,8 +748,11 @@ class Command(Temp):
         self.assertEqual(self.cli("--check", "--verify", *p)[0], ("exit", 2))
 
     def test_a_missing_bundle_file_is_an_error_not_a_verdict(self):
-        with self.assertRaises(FileNotFoundError):
-            cli.run(["--verify", "--project", str(self.tmp / "absent.json"), "--out", str(self.tmp)])
+        # V2.1 (360° claims W5): a bundle that cannot be read is a refusal (exit 2) naming the file — 2.0.0 let
+        # FileNotFoundError escape as a traceback with exit 1, the code of a delivery FAIL
+        code, _, err = self.cli("--verify", "--project", str(self.tmp / "absent.json"), "--out", str(self.tmp))
+        self.assertEqual(code, 2)
+        self.assertIn("absent.json: cannot be read", err)
         (self.tmp / "p.json").write_text(json.dumps({"format": "x"}), encoding="utf-8")
         code, _, err = self.cli("--verify", "--project", str(self.tmp / "p.json"), "--out", str(self.tmp))
         self.assertEqual(code, 2)

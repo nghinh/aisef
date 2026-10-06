@@ -22,6 +22,7 @@ from __future__ import annotations
 import hashlib
 import json
 import pathlib
+import re
 from dataclasses import dataclass
 from typing import Any, Mapping
 
@@ -41,6 +42,57 @@ KEYS = ("format", "name", "description", "requirements_document", "product_roots
 
 class BundleError(ValueError):
     """The bundle is not a project this release can run: refused, never repaired."""
+
+
+_HEX64 = re.compile(r"[0-9a-f]{64}")
+
+
+def _strings(v, where: str, *, empty: bool = True) -> list[str]:
+    """`v` as a list of non-empty strings — never a string read as its letters."""
+    if not isinstance(v, list) or not all(isinstance(x, str) and x for x in v) or (not empty and not v):
+        raise BundleError(f"{where}: a{'' if empty else ' non-empty'} list of non-empty strings, not {type(v).__name__}")
+    return v
+
+
+def shape_problems(data: Mapping) -> None:
+    """The bundle's JSON types, checked before any kernel constructor sees them; the first problem names its path."""
+    for k in ("name", "description"):
+        if not isinstance(data[k], str):
+            raise BundleError(f"$.{k}: a string")
+    for k in ("requirements", "contracts", "approvals"):
+        if not isinstance(data[k], list) or not all(isinstance(x, Mapping) for x in data[k]):
+            raise BundleError(f"$.{k}: a list of objects")
+    doc = data["requirements_document"]
+    if not isinstance(doc, Mapping):
+        raise BundleError("$.requirements_document: an object of exactly path and sha256")
+    for k in sorted({"path", "sha256"} ^ set(doc)):
+        raise BundleError(f"$.requirements_document.{k}: {'missing' if k in ('path', 'sha256') else 'not a field of it'}")
+    path = doc["path"]
+    if not isinstance(path, str) or not path or path.startswith("/") or ".." in pathlib.PurePosixPath(path).parts:
+        raise BundleError("$.requirements_document.path: a path relative to the repository root")
+    if not isinstance(doc["sha256"], str) or not _HEX64.fullmatch(doc["sha256"]):
+        raise BundleError("$.requirements_document.sha256: 64 lowercase hex characters")
+    roots = _strings(data["product_roots"], "$.product_roots", empty=False)
+    if any("/" in r or r in (".", "..") for r in roots):
+        raise BundleError("$.product_roots: top-level names of the project's own source tree")
+    if not isinstance(data["plan"], Mapping):
+        raise BundleError("$.plan: an object")
+    facts = data["facts"]
+    if not isinstance(facts, Mapping) or not all(isinstance(v, Mapping) for v in facts.values()):
+        raise BundleError("$.facts: an object of criterion id -> its public facts")
+    stories = data["stories"]
+    if not isinstance(stories, Mapping):
+        raise BundleError("$.stories: an object of story id -> {depends_on, tests}")
+    for sid, s in stories.items():
+        if not isinstance(s, Mapping) or sorted(s) != ["depends_on", "tests"]:
+            raise BundleError(f"$.stories.{sid}: an object of exactly depends_on and tests"
+                              + (f" (it holds {sorted(s)})" if isinstance(s, Mapping) else ""))
+        unknown = sorted(set(_strings(s["depends_on"], f"$.stories.{sid}.depends_on")) - set(stories))
+        if unknown:
+            raise BundleError(f"$.stories.{sid}.depends_on: names stories the bundle does not hold: {unknown}")
+        for t in _strings(s["tests"], f"$.stories.{sid}.tests"):
+            if t.startswith("/") or ".." in pathlib.PurePosixPath(t).parts:
+                raise BundleError(f"$.stories.{sid}.tests: {t!r} is not a path relative to the repository root")
 
 
 @dataclass(frozen=True)
@@ -103,6 +155,7 @@ def load(data: Mapping) -> Project:
         raise BundleError(f"not a project bundle of format {FORMAT}")
     if sorted(data) != sorted(KEYS):
         raise BundleError(f"a bundle holds exactly {sorted(KEYS)}; it holds {sorted(data)}")
+    shape_problems(data)
     try:
         requirements = {r["id"]: Requirement(**r) for r in data["requirements"]}
         contracts = {c["id"]: BehaviorContract.from_json(c) for c in data["contracts"]}
@@ -142,4 +195,14 @@ def load(data: Mapping) -> Project:
 
 
 def read(path: str | pathlib.Path) -> Project:
-    return load(json.loads(pathlib.Path(path).read_text(encoding="utf-8")))
+    """The project of the bundle file at `path`; a file that cannot be read or is not JSON is refused like any other
+    bundle that does not hold."""
+    try:
+        text = pathlib.Path(path).read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError) as e:
+        raise BundleError(f"{path}: cannot be read ({type(e).__name__}: {e})") from e
+    try:
+        data = json.loads(text)
+    except ValueError as e:
+        raise BundleError(f"{path}: not JSON ({e})") from e
+    return load(data)

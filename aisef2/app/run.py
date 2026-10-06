@@ -26,6 +26,7 @@ import re
 import shutil
 import subprocess
 import sys
+import tempfile
 import time
 
 from aisef2.app import adapters as ad
@@ -35,7 +36,7 @@ from aisef2.app.settings import Settings
 from aisef2.arch.enums import Enforcement
 from aisef2.orchestrate import story_runner as sr
 from aisef2.orchestrate.quality import TestsPolicy
-from aisef2.orchestrate.workspace import GitMerger, GitWorkspace, git
+from aisef2.orchestrate.workspace import REFUSED, GitMerger, GitWorkspace, git
 from aisef2.plan import static_admission as sa
 from aisef2.probe import catalog
 from aisef2.probe.calibration import ProbeCapabilityCalibration
@@ -104,10 +105,25 @@ def check_git() -> None:
         raise RunRefused(f"git {MIN_GIT[0]}.{MIN_GIT[1]} or newer is required (B4): found {v or 'nothing'}")
 
 
-def check_repository(project: Project, repo: pathlib.Path) -> None:
-    """The project's repository holds the plan's baseline, and its requirements document there is the bundle's."""
-    if git(repo, "cat-file", "-e", f"{project.plan.baseline}^{{commit}}").returncode != 0:
-        raise RunRefused(f"{repo} does not hold the plan's baseline {project.plan.baseline}")
+def check_repository(project: Project, repo: pathlib.Path, *, clone: bool = True, shown: pathlib.Path | None = None) -> None:
+    """The project's repository holds the plan's baseline, and its requirements document there is the bundle's.
+    Checked as the run applies it — on a clone of `repo` (`clone`; the run passes its own clone with `clone=False`) —
+    so a key of the source's own configuration that a clone does not carry neither refuses `--check` nor goes
+    unnoticed. A repository git refuses (B4: its own configuration names a key that is not inert) says so — never
+    that the baseline is missing."""
+    if clone:
+        if not pathlib.Path(repo).is_dir():
+            raise RunRefused(f"{repo} is not a directory")
+        with tempfile.TemporaryDirectory(prefix="aisef-check-") as tmp:
+            cloned = git(tmp, "clone", "--quiet", "--no-hardlinks", "--no-checkout", str(pathlib.Path(repo).resolve()), "repo")
+            if cloned.returncode != 0:
+                raise RunRefused(f"the project repository could not be cloned: {cloned.stderr.strip()[:200]}")
+            return check_repository(project, pathlib.Path(tmp) / "repo", clone=False, shown=repo)
+    held = git(repo, "cat-file", "-e", f"{project.plan.baseline}^{{commit}}")
+    if held.returncode == REFUSED and held.stderr.startswith("refused:"):
+        raise RunRefused(held.stderr)
+    if held.returncode != 0:
+        raise RunRefused(f"{shown or repo} does not hold the plan's baseline {project.plan.baseline}")
     blob = git(repo, "cat-file", "blob", f"{project.plan.baseline}:{project.requirements_path}")   # text: LF line endings
     if blob.returncode != 0 or _sha(blob.stdout.encode("utf-8")) != project.requirements_sha256:
         raise RunRefused(f"the requirements document {project.requirements_path} at the baseline is not the bundle's")
@@ -235,7 +251,7 @@ def execute(project: Project, settings: Settings, source: pathlib.Path, out: pat
         cloned = git(out, "clone", "--quiet", "--no-hardlinks", str(source.resolve()), str(repo))
         if cloned.returncode != 0:
             raise RunRefused(f"the project repository could not be cloned: {cloned.stderr.strip()[:200]}")
-        check_repository(project, repo)
+        check_repository(project, repo, clone=False)     # the run's own clone
         if git(repo, "checkout", "-q", "-B", "main", project.plan.baseline).returncode != 0:
             raise RunRefused("the baseline could not be checked out as main")
         rec["stage"] = "admission"

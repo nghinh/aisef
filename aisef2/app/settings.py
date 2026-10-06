@@ -23,6 +23,7 @@ from __future__ import annotations
 import json
 import math
 import pathlib
+import urllib.parse
 from dataclasses import dataclass
 from typing import Mapping
 
@@ -38,6 +39,30 @@ KEYS = ("format", "client", "route", "provider", "client_env", "budget", "max_tu
 
 class SettingsError(ValueError):
     """The settings do not bound a run: refused (fail closed)."""
+
+
+#: the only hosts a plaintext (http) endpoint may name — the provider key travels in clear otherwise
+LOOPBACK = ("127.0.0.1", "localhost", "::1")
+
+
+def endpoint_problem(endpoint) -> str | None:
+    """Why `endpoint` cannot carry the provider key, or None: https to a named host, or http to a loopback host —
+    decided on the parsed URL (a host that merely begins with "localhost" is not loopback), with no credentials,
+    query or fragment in it."""
+    if not isinstance(endpoint, str):
+        return "the provider endpoint is a URL string"
+    try:
+        u = urllib.parse.urlsplit(endpoint)
+        host, _port = u.hostname, u.port        # a malformed port raises here
+    except ValueError as e:
+        return f"the provider endpoint is not a URL: {e}"
+    if u.scheme not in ("https", "http") or not host:
+        return "the provider endpoint is an https URL (or http to a loopback address) with a host"
+    if u.username is not None or u.password is not None or u.query or u.fragment:
+        return "the provider endpoint carries no credentials, query or fragment (the key is sent as a header)"
+    if u.scheme == "http" and host not in LOOPBACK:
+        return f"the provider endpoint is https (or http to {', '.join(LOOPBACK)}): {host} is not loopback"
+    return None
 
 
 @dataclass(frozen=True)
@@ -82,8 +107,9 @@ def load(data: Mapping) -> Settings:
     p = data["provider"]
     if not isinstance(p, Mapping) or sorted(p) != list(PROVIDER_KEYS) or p["name"] != route.split("/", 1)[0]:
         raise SettingsError(f"provider is {{{', '.join(PROVIDER_KEYS)}}}, its name the route's provider")
-    if not str(p["endpoint"]).startswith(("https://", "http://127.0.0.1", "http://localhost")):
-        raise SettingsError("the provider endpoint is https (or a loopback address)")
+    problem = endpoint_problem(p["endpoint"])
+    if problem:
+        raise SettingsError(problem)
     if p["api_key_env"] is not None and not (isinstance(p["api_key_env"], str) and p["api_key_env"]):
         raise SettingsError("provider.api_key_env names a variable, or is null (the client's configuration holds the key)")
     if not (isinstance(p["served_model"], str) and p["served_model"]):
@@ -126,4 +152,13 @@ def load(data: Mapping) -> Settings:
 
 
 def read(path: str | pathlib.Path) -> Settings:
-    return load(json.loads(pathlib.Path(path).read_text(encoding="utf-8")))
+    """The settings of the file at `path`; a file that cannot be read or is not JSON is refused."""
+    try:
+        text = pathlib.Path(path).read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError) as e:
+        raise SettingsError(f"{path}: cannot be read ({type(e).__name__}: {e})") from e
+    try:
+        data = json.loads(text)
+    except ValueError as e:
+        raise SettingsError(f"{path}: not JSON ({e})") from e
+    return load(data)

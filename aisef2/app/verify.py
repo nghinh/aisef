@@ -18,8 +18,11 @@ from aisef2.product.contract import plain
 
 def verify(project: Project, out: pathlib.Path) -> dict:
     problems: list[str] = []
-    rec = json.loads((out / "RUN.json").read_text(encoding="utf-8"))
-    if rec.get("format") != R.FORMAT:
+    try:
+        rec = json.loads((out / "RUN.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError) as e:     # no record, or not one: nothing to verify against
+        return {"verdict": "REFUTED", "problems": [f"{out / 'RUN.json'}: no readable run record ({type(e).__name__})"]}
+    if not isinstance(rec, dict) or rec.get("format") != R.FORMAT:
         return {"verdict": "REFUTED", "problems": [f"RUN.json is not a run record of format {R.FORMAT}"]}
     if rec.get("bundle_digest") != project.digest:
         problems.append("the run is not of this project bundle")
