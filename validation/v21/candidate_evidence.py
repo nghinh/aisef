@@ -3,7 +3,11 @@ directory — never over a sealed record, never read by anything that decides a 
 
     python3 -P validation/v21/candidate_evidence.py OUT [--only REL ...]
 
-OUT is a new directory under closure-evidence/v2.1-candidate/ (or outside the repository). For each sealed record a
+OUT is a new directory OUTSIDE the repository. Never inside it: generators of sealed records scan the tree — measured:
+gen_migration_table counted a candidate copy of P5-PLAN-V2.2-PROPOSAL.json as evidence carrying a V1 proof mode (its
+table drifted), and the V1 evidence guard reported the untracked copies as changes to protected evidence — so a set
+written inside the repository changes what it is meant to observe. To keep a set with the repository, commit an
+archive of it (a .tar.gz is not a text file any scanner reads). For each sealed record a
 red record-binding test compares with the tree (docs/v2.1/RED-SUITE.md), the record's own generator derives what it
 would hold now; the copy goes to OUT/<the record's path>, and OUT/CANDIDATE-MANIFEST.json names the commit, the
 environment, the command, each copy's sha256, the sealed record's sha256 and the JSON paths where they differ.
@@ -27,7 +31,6 @@ import sys
 import time
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
-CANDIDATES = ROOT / "closure-evidence" / "v2.1-candidate"
 MANIFEST = "CANDIDATE-MANIFEST.json"
 
 
@@ -141,9 +144,9 @@ def generate(out: pathlib.Path, only: list[str] | None = None) -> dict:
     out = out.absolute()
     if out.exists():
         raise SystemExit(f"refused: {out} exists — a candidate set is never rewritten")
-    inside = out.resolve().is_relative_to(ROOT.resolve())
-    if inside and not out.resolve().is_relative_to(CANDIDATES.resolve()):
-        raise SystemExit(f"refused: inside the repository a candidate set lives under {CANDIDATES.relative_to(ROOT)}/ only")
+    if out.resolve().is_relative_to(ROOT.resolve()):
+        raise SystemExit("refused: a candidate set is written outside the repository (generators scan the tree: see the "
+                         "module docstring)")
     wanted = only or list(GENERATED)
     unknown = [r for r in wanted if r not in GENERATED]
     if unknown:

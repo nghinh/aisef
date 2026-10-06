@@ -1,6 +1,7 @@
 """The candidate evidence tool keeps every control (validation/v21/candidate_evidence.py): it writes a new directory
-only, never under closure-evidence/ outside v2.1-candidate/, never over a sealed record; nothing that decides a
-release or a test reads a candidate set; a sealed record is byte-identical after a run."""
+outside the repository only (a set inside it changed what repository-scanning generators derive — measured), never
+over a sealed record; nothing that decides a release or a test reads a candidate set; a sealed record is
+byte-identical after a run."""
 
 from __future__ import annotations
 
@@ -34,11 +35,12 @@ class CandidateEvidence(unittest.TestCase):
             self.assertIn("not_generated", m)
         self.assertEqual({r: hashlib.sha256((ROOT / r).read_bytes()).hexdigest() for r in CE.GENERATED}, before)
 
-    def test_it_refuses_an_existing_set_a_place_beside_sealed_evidence_and_an_unknown_record(self):
+    def test_it_refuses_an_existing_set_any_place_inside_the_repository_and_an_unknown_record(self):
         with tempfile.TemporaryDirectory() as t:
             with self.assertRaises(SystemExit):
                 CE.generate(pathlib.Path(t), FAST)                                   # exists
-        for place in (ROOT / "closure-evidence" / "v2" / "x", ROOT / "docs" / "x"):  # inside the repo, not the candidate root
+        for place in (ROOT / "closure-evidence" / "v2.1-candidate" / "x", ROOT / "closure-evidence" / "v2" / "x",
+                      ROOT / "docs" / "x"):                                          # anywhere inside the repository
             with self.assertRaises(SystemExit):
                 CE.generate(place, FAST)
             self.assertFalse(place.exists())
