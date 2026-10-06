@@ -20,8 +20,9 @@ expectation, never evidence: evidence is the current execution plus the comparis
 Cycle 2 (QP-2.8; CYCLE2-QUALIFICATION-PLAN §6): the same mechanism on the Cycle-2 candidate, the corpus extended with
 items proved by each active Cycle-2 probe — a CLI-proved story (and its refuted-then-retried variant), a file-artifact
 prohibition, a scenario-proved story and a bytes-returning python_callable — each story proved by the catalog's active
-probe for its kind, re-executed at reproduction exactly like every other tool. The seven Cycle-1 items stay, proved by
-the frozen Cycle-1 python_callable probe (a Cycle-1 compatibility item on the Cycle-2 kernel). A new adversarial case:
+probe for its kind, re-executed at reproduction exactly like every other tool. The seven Cycle-1 items stay (V2.1: six
+of them; post-merge-regression is replaced by two items, below), proved by the frozen Cycle-1 python_callable probe (a
+Cycle-1 compatibility item on the Cycle-2 kernel). A new adversarial case:
 a file the probe observes changed on the trunk outside the model stream (the request unchanged) is a diff.
 
 V2.0 release (charter S5, "Q5 fresh/reproduction"): once the RC1 freeze record exists, the subject is the RC
@@ -29,8 +30,9 @@ V2.0 release (charter S5, "Q5 fresh/reproduction"): once the RC1 freeze record e
 
 V2.1 (owner B-03d, RELEASE-DECISIONS seq 5): 2.0's `post-merge-regression` becomes `developer-regression-at-candidate`
 (V21-38: a committed story's PRESERVE is proved at the candidate), and `post-merge-integration-regression` keeps the
-post-merge path (main moves under a clean candidate); validation/qualification/v21_q5_changes.py traces both, measured.
-2.0's corpora stay as recorded.
+post-merge path (main moves under a clean candidate); validation/qualification/v21_q5_changes.py traces both, and
+validation/qualification/v21_q5_compare.py measures every 2.0 and 2.1 item under the v2.0.0 kernel and this one. 2.0's
+corpora stay as recorded: every mode refuses to write into a 2.0 record directory (V2_0_RECORD_DIRS).
 
 Determinism is normalization after observation: the run's clock is the real clock and event times are dropped; temp
 roots become tokens. Nothing semantic is normalized (control outcomes, owners, retryability, revisions, semantic hashes,
@@ -66,6 +68,10 @@ from validation.qualification import common as C  # noqa: E402
 #: the QP-2.8 run on the QP-2.6 candidate stays in cycle2/Q5), or in V2.0 release mode the frozen RC1 (release/Q5-RC1)
 OUT_REL = C.Q5_OUT_REL
 CYCLE1_OUT_REL = "closure-evidence/v2/Q5"
+#: V2.1: the 2.0-era Q5 record directories (Cycle 1, QP-2.8, Cycle 2's final, RC1, RC2) — every mode refuses to write into
+#: one (main); a 2.1 run writes a directory of its own
+V2_0_RECORD_DIRS = (CYCLE1_OUT_REL, "closure-evidence/v2/cycle2/Q5", "closure-evidence/v2/cycle2/Q5-FINAL",
+                    "closure-evidence/v2/release/Q5-RC1", "closure-evidence/v2/release/Q5-RC2")
 SEMANTIC_CANDIDATE = C.SEMANTIC_CANDIDATE
 KERNEL_TREE = C.KERNEL_TREE
 PROBE_DIGEST = "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf"   # the Cycle-1 probe (P7-FINDING-001 correction), frozen
@@ -934,6 +940,26 @@ def subject_problems(ident: dict) -> list[str]:
 
 # ----------------------------------------------------------------------------------------------------------- modes
 
+def definition(item: Item) -> dict:
+    """An item's definition as its corpus record states it."""
+    return {"stories": [{"id": s.id, "obligations": list(map(list, s.obligations)), "tests": list(s.tests), "regressions": list(s.regressions),
+                         "tests_block": s.tests_block} for s in item.stories], "developer": list(item.developer), "reviewer": list(item.reviewer),
+            "pre_landed": item.pre_landed, "scanner_findings": [list(f) for f in item.scanner_findings], "limits": item.limits,
+            "expected_outcomes": item.expected_outcomes, "lands_after": list(item.lands_after)}
+
+
+def refused_out(out_dir: pathlib.Path) -> str | None:
+    """V2.1: the 2.0-era record directory (V2_0_RECORD_DIRS) `out_dir` is or lies in — by path, or by file identity on a
+    case-insensitive or linked file system — else None."""
+    p = out_dir.resolve()
+    chain = [q for q in (p, *p.parents) if q.exists()]
+    for rel in V2_0_RECORD_DIRS:
+        d = (ROOT / rel).resolve()
+        if p.is_relative_to(d) or (d.exists() and any(os.path.samefile(q, d) for q in chain)):
+            return rel
+    return None
+
+
 def record(out_dir: pathlib.Path) -> int:
     corpus_dir = out_dir / "corpus"
     corpus_dir.mkdir(parents=True, exist_ok=True)
@@ -945,11 +971,7 @@ def record(out_dir: pathlib.Path) -> int:
     for item in CORPUS:
         obs = execute(item, "record")
         rec = {"record": "AISEF V2 — Q5 corpus item (a real execution, its model stream recorded)", "item": item.id, "covers": list(item.covers),
-               "definition": {"stories": [{"id": s.id, "obligations": list(map(list, s.obligations)), "tests": list(s.tests), "regressions": list(s.regressions),
-                                           "tests_block": s.tests_block} for s in item.stories], "developer": list(item.developer), "reviewer": list(item.reviewer),
-                              "pre_landed": item.pre_landed, "scanner_findings": [list(f) for f in item.scanner_findings], "limits": item.limits,
-                              "expected_outcomes": item.expected_outcomes, "lands_after": list(item.lands_after)},
-               "platform": platform.system().lower(), "python": platform.python_version(), "execution_commit": C.git("rev-parse", "HEAD"), **obs}
+               "definition": definition(item), "platform": platform.system().lower(), "python": platform.python_version(), "execution_commit": C.git("rev-parse", "HEAD"), **obs}
         rec["ledger_digest"] = ledger_digest(rec["model_ledger"])
         good = rec["outcomes"] == item.expected_outcomes and all(v == 0 for v in rec["errors"].values()) and rec["consumption"]["ok"]
         ok &= good
@@ -1182,6 +1204,9 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--out", default=OUT_REL)
     a = ap.parse_args(argv)
     out_dir = (ROOT / a.out) if not os.path.isabs(a.out) else pathlib.Path(a.out)
+    if (rel := refused_out(out_dir)) is not None:      # before anything is created or written
+        print(f"REFUSED: {out_dir} is in {rel}, a 2.0 Q5 record directory; 2.0's records stay as recorded")
+        return 2
     out_dir.mkdir(parents=True, exist_ok=True)
     import tests.v2  # noqa: F401 — invariants I–IX armed at tier ROOT for every mode
     if a.record:

@@ -4,15 +4,20 @@ execution recorded, then reproduced with the model stream alone replayed; the tw
 recording); assertConsumed's refusals; normalization that cannot hide a regression; the recording as expectation only.
 
 Every case here records its own scratch stream in a temporary directory: nothing writes a Q5 corpus; Q5_14 reads 2.0's
-(release/Q5-RC2) as history only.
+(release/Q5-RC2, release/Q5-RC1, cycle2/Q5-FINAL, cycle2/Q5) as history only; Q5_15 proves q5 refuses to write into any
+of them; Q5_16-Q5_19 are the V2.1 kernel comparison (validation/qualification/v21_q5_compare.py) and its record.
 """
 
+import contextlib
 import importlib
+import io
 import json
 import pathlib
 import subprocess
 import sys
+import tempfile
 import unittest
+from unittest import mock
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
@@ -152,6 +157,16 @@ class MultiStory(unittest.TestCase):
     S0's preserved `sub` — is the developer's at the candidate (Q5_13); the post-merge path it covered is
     `post-merge-integration-regression`, main moving under a clean candidate (Q5_12); 2.0's record stays (Q5_14)."""
 
+    def assert_as_stated(self, base, item_id):
+        """The 2.1 behaviour the B-03d ruling's data states (v21_q5_changes.CHANGES[item]['expectation_2_1']) is this
+        execution's: its outcomes, every model call by header class and story, every failure of every story."""
+        from validation.qualification import v21_q5_changes as X
+        stated = X.CHANGES[item_id]["expectation_2_1"]
+        self.assertEqual(base["outcomes"], stated["outcomes"])
+        self.assertEqual([f"{r['header_class']} {r['request']['story_id']}" for r in base["model_ledger"]], stated["model_calls"])
+        self.assertEqual([{k: e["data"][k] for k in ("story_id", "code", "owner", "retryable", "detail")} for e in base["journal"]
+                          if e["type"] == "failure/observed"], stated["failures"])
+
     def test_Q5_12_a_two_story_run_with_a_post_merge_regression_reproduces(self):
         item = next(i for i in q5.CORPUS if i.id == "post-merge-integration-regression")
         base = _record(item)
@@ -165,6 +180,7 @@ class MultiStory(unittest.TestCase):
         checks = _checks(base, "S2")
         self.assertIn(("S2:proof:C0", True), checks)                                    # the candidate kept S0's behaviour
         self.assertEqual(checks[-2:], [("S2:post-merge:C2", True), ("S2:post-merge:C0", False)])   # the merged revision did not
+        self.assert_as_stated(base, item.id)
 
     def test_Q5_13_a_regression_the_developer_made_is_found_at_the_candidate_retried_and_never_merged(self):
         item = next(i for i in q5.CORPUS if i.id == "developer-regression-at-candidate")
@@ -181,14 +197,18 @@ class MultiStory(unittest.TestCase):
         checks = _checks(base, "S2")
         self.assertEqual(checks.count(("S2:proof:C0", False)), 2)
         self.assertEqual([c for c, _ in checks if c.endswith(":merge") or ":post-merge:" in c], [])            # nothing merged
+        self.assert_as_stated(base, item.id)
 
     def test_Q5_14_HISTORY_2_0_s_item_stays_as_recorded_and_every_2_1_change_is_traced(self):
         from validation.qualification import v21_q5_changes as X
         rc2 = ROOT / "closure-evidence/v2/release/Q5-RC2"
-        for rel in ("CORPUS.json", "corpus/post-merge-regression.json", "REPRODUCTION.json", "reproduction/post-merge-regression.json"):
-            blob = subprocess.run(["git", "cat-file", "blob", f"{X.V2_0_0}:closure-evidence/v2/release/Q5-RC2/{rel}"], cwd=ROOT,
-                                  capture_output=True, check=True).stdout
-            self.assertEqual((rc2 / rel).read_bytes().replace(b"\r\n", b"\n"), blob, rel)
+        for d in ("release/Q5-RC2", "release/Q5-RC1", "cycle2/Q5-FINAL", "cycle2/Q5"):   # closure-evidence/v2/Q5: cycle2_baseline's
+            for rel in ("CORPUS.json", "corpus/post-merge-regression.json", "REPRODUCTION.json", "reproduction/post-merge-regression.json"):
+                path = f"closure-evidence/v2/{d}/{rel}"
+                blob = subprocess.run(["git", "cat-file", "blob", f"{X.V2_0_0}:{path}"], cwd=ROOT, capture_output=True, check=True).stdout
+                self.assertEqual((ROOT / path).read_bytes().replace(b"\r\n", b"\n"), blob, path)
+            status = lambda rel, d=d: json.loads((ROOT / "closure-evidence/v2" / d / rel).read_text(encoding="utf-8"))["status"]   # noqa: E731
+            self.assertEqual((status("REPRODUCTION.json"), status("reproduction/post-merge-regression.json")), ("GREEN", "GREEN"), d)
         load = lambda rel: json.loads((rc2 / rel).read_text(encoding="utf-8"))   # noqa: E731
         corpus, rec = load("CORPUS.json"), load("corpus/post-merge-regression.json")
         self.assertEqual((load("REPRODUCTION.json")["status"], load("reproduction/post-merge-regression.json")["status"]), ("GREEN", "GREEN"))
@@ -209,6 +229,152 @@ class MultiStory(unittest.TestCase):
             for name in change["behaviour_tests"]:
                 module, cls, method = name.rsplit(".", 2)
                 self.assertTrue(callable(getattr(getattr(importlib.import_module(module), cls), method, None)), name)
+
+
+def _reached(*a, **k):
+    raise AssertionError("a q5 writer was reached")
+
+
+class Writers(unittest.TestCase):
+    def test_Q5_15_every_q5_mode_refuses_a_2_0_record_directory_before_it_creates_or_writes_anything(self):
+        modes = (["--record"], ["--reproduce"], ["--calibrate"], ["--freeze"], ["--conformance", "start"], ["--conformance", "end"])
+        fresh = [f"{rel}/v2.1-attempt" for rel in q5.V2_0_RECORD_DIRS]          # inside one, not yet existing: never created
+        outs = [*q5.V2_0_RECORD_DIRS, *fresh, f"{q5.CYCLE1_OUT_REL}/corpus", str(ROOT / "closure-evidence/v2/release/Q5-RC2")]
+        outs += [rel.upper() for rel in q5.V2_0_RECORD_DIRS if (ROOT / rel.upper()).exists()]   # a case-insensitive file system
+        for rel in fresh:
+            self.addCleanup(lambda p=ROOT / rel: p.rmdir() if p.is_dir() else None)
+        from validation.qualification import q4_aggregate
+        with mock.patch.multiple(q5, record=_reached, reproduce=_reached, calibrate=_reached, freeze=_reached), \
+                mock.patch.object(q4_aggregate, "conformance", _reached):
+            for out in outs:
+                for m in modes:
+                    with contextlib.redirect_stdout(io.StringIO()) as said:
+                        self.assertEqual(q5.main([*m, "--out", out]), 2, (m, out))
+                    self.assertIn("REFUSED", said.getvalue(), (m, out))
+            for rel in fresh:
+                self.assertFalse((ROOT / rel).exists(), rel)
+            with tempfile.TemporaryDirectory() as t:                       # a directory of its own reaches the writer
+                self.assertIsNone(q5.refused_out(pathlib.Path(t)))
+                with self.assertRaisesRegex(AssertionError, "a q5 writer was reached"):
+                    q5.main(["--freeze", "--out", t])
+        self.assertIsNone(q5.refused_out(ROOT / "closure-evidence/v2/release/Q5-2.1.0-RC1"))
+        self.assertIsNone(q5.refused_out(ROOT / "closure-evidence/v2/cycle2/Q5-FINAL-2"))   # a sibling, not inside one
+
+
+def _obs(**over):
+    """A minimal observation in the shape v21_q5_compare.observation gives."""
+    spec = "PPS-" + "a" * 64
+    base = {"outcomes": {"S1": ["COMMIT"]}, "requests": [{"semantic_hashes": {"C3": "s" * 64}, "plan_hash": "p" * 64}],
+            "journal": [{"type": "probe/evaluated", "data": {"record": {"spec_id": spec, "passed": True}}},
+                        {"type": "story/resource-acquired", "data": {"resource": f"probe {spec} [admission 1]"}}]}
+    return json.loads(json.dumps(base)) | over
+
+
+class KernelComparison(unittest.TestCase):
+    """V2.1: validation/qualification/v21_q5_compare.py — the engineering measurement v21_q5_changes cites."""
+
+    @classmethod
+    def setUpClass(cls):
+        from validation.qualification import v21_q5_compare as M
+        cls.M = M
+
+    def test_Q5_16_classification_identical_identity_only_differs(self):
+        M, other = self.M, "PPS-" + "b" * 64
+        self.assertEqual(M.classify(_obs(), _obs()), {"classification": "identical", "identity_fields": {}, "other_fields": {}})
+        moved = _obs()
+        moved["journal"][0]["data"]["record"]["spec_id"] = other
+        moved["journal"][1]["data"]["resource"] = f"probe {other} [admission 1]"
+        moved["requests"][0].update(semantic_hashes={"C3": "t" * 64}, plan_hash="q" * 64)
+        self.assertEqual(M.classify(_obs(), moved), {"classification": "identity-only", "other_fields": {}, "identity_fields": {
+            "journal probe/evaluated: data.record.spec_id": 1, "journal story/resource-acquired: data.resource": 1,
+            "requests[].plan_hash": 1, "requests[].semantic_hashes.C3": 1}})
+        renamed = _obs()
+        renamed["journal"][1]["data"]["resource"] = f"probe {other} [admission 2]"      # more than the spec id
+        failed = _obs()
+        failed["journal"][0]["data"]["record"]["passed"] = False
+        longer = _obs()
+        longer["journal"].append(longer["journal"][0])
+        for new, field in ((renamed, "journal story/resource-acquired: data.resource"), (failed, "journal probe/evaluated: data.record.passed"),
+                           (longer, "journal"), (_obs(outcomes={"S1": ["ROLLBACK"]}), "outcomes.S1[]"), (moved | {"outcomes": {}}, "outcomes.S1")):
+            got = M.classify(_obs(), new)
+            self.assertEqual((got["classification"], list(got["other_fields"])), ("differs", [field]), field)
+
+    def test_Q5_17_the_items_are_2_0_s_and_2_1_s_with_rc2_s_definitions_and_the_record_is_written_once_outside_2_0(self):
+        M = self.M
+        got = [(i.id, a, b) for i, a, b in M.items()]
+        self.assertEqual(got, [(i.id, i.id != "developer-regression-at-candidate" and i.id != "post-merge-integration-regression", True)
+                               for i in q5.CORPUS] + [("post-merge-regression", True, False)])
+        self.assertEqual(M.definition_problems(), [])
+        item, a, b = M.items()[0]
+        changed = q5.Item(item.id, item.covers, item.stories, item.developer + item.developer, item.reviewer, kind=item.kind,
+                          expected_outcomes=item.expected_outcomes)
+        with mock.patch.object(M, "items", return_value=[(changed, a, b)]):
+            self.assertEqual(M.definition_problems(), [f"{item.id}: the definition measured is not {M.RC2}'s"])
+        old = next(i for i, _, in_2_1 in M.items() if not in_2_1)
+        foreign = q5.Item(old.id, old.covers, (q5.Story("S0", (("C3", "INTRODUCE"),)),), old.developer, old.reviewer)
+        with mock.patch.object(M, "items", return_value=[(foreign, True, False)]):
+            self.assertIn(f"{old.id}: rebuilt with a criterion outside q5.CONTRACTS (its kind is not recorded)", M.definition_problems())
+        with tempfile.TemporaryDirectory() as t:
+            fresh, existing = pathlib.Path(t) / "Q5-KERNEL-COMPARISON.json", pathlib.Path(t) / "there.json"
+            existing.write_text("{}", encoding="utf-8")
+            self.assertIsNone(M.refused(fresh))
+            self.assertIn("exists", M.refused(existing))
+            with mock.patch.object(M, "derive", side_effect=AssertionError("measured")), contextlib.redirect_stdout(io.StringIO()):
+                for out in (existing, ROOT / "closure-evidence/v2/release/Q5-RC2/Q5-KERNEL-COMPARISON.json", ROOT / "validation/x.json"):
+                    self.assertEqual(M.write(out), 2, out)
+        self.assertIsNone(M.refused(ROOT / M.V21_DIR / "never-written.json"))
+        self.assertIn("outside closure-evidence/v2/v2.1", M.refused(ROOT / "closure-evidence/v2/cycle2/Q5/x.json"))
+
+    def test_Q5_18_check_binds_the_record_to_q5_both_kernels_the_corpus_and_the_ruling_s_data(self):
+        from validation.qualification import v21_q5_changes as X
+        M = self.M
+        stated = {i: "identical" for i in X.UNCHANGED["identical_up_to_kernel_identity"]} | \
+            {i: "identity-only" for i in X.UNCHANGED["identity_only"]["items"]} | {i: "differs" for i in [*X.CHANGES, "post-merge-regression"]}
+        now = M.bindings()
+        helpers = {"fixture_helpers": now["fixture_helpers"]}
+        rec = {"bindings": now, "kernels": {"v2.0.0": helpers, "2.1": helpers},
+               "items": {i.id: {"in_2_0_corpus": a, "in_2_1_corpus": b, "classification": stated[i.id],
+                                "2.1": {"outcomes": i.expected_outcomes, "consumption_ok": True, "replay": {"status": "GREEN"}}}
+                         for i, a, b in M.items()}}
+        rec["summary"] = {c: sorted(k for k, v in rec["items"].items() if v["classification"] == c) for c in ("identical", "identity-only", "differs")}
+        with tempfile.TemporaryDirectory() as t:
+            path = pathlib.Path(t) / "r.json"
+
+            def check(edit=lambda r: None):
+                r = json.loads(json.dumps(rec))
+                edit(r)
+                path.write_text(json.dumps(r), encoding="utf-8")
+                with mock.patch.object(M, "bindings", return_value=now):
+                    return M.check(path)
+
+            path.write_text(json.dumps(rec), encoding="utf-8")
+            self.assertEqual(M.check(path), [])                                       # the bindings derived for real
+            self.assertEqual(check(), [])
+            self.assertEqual(check(lambda r: r["bindings"].update(kernel_2_1="0" * 64)), [f"stale: kernel_2_1 recorded {'0' * 64}, now {now['kernel_2_1']}"])
+            self.assertEqual(check(lambda r: r["bindings"].update(kernel_v2_0_0="0" * 64)), [f"stale: kernel_v2_0_0 recorded {'0' * 64}, now {now['kernel_v2_0_0']}"])
+            q5_rel = "validation/qualification/q5.py"
+            self.assertEqual(check(lambda r: r["bindings"].update({q5_rel: "0" * 64})), [f"stale: {q5_rel} recorded {'0' * 64}, now {now[q5_rel]}"])
+            got = check(lambda r: r["items"]["normal-completion"]["2.1"].update(outcomes={"S1": ["ROLLBACK"]}))
+            self.assertEqual(len(got), 1)
+            self.assertTrue(got[0].startswith("normal-completion: 2.1 measured {'S1': ['ROLLBACK']}"), got)
+            self.assertEqual(len(check(lambda r: r["items"]["post-merge-integration-regression"]["2.1"]["replay"].update(status="FAILED"))), 1)
+            self.assertEqual(len(check(lambda r: r["items"]["pre-satisfied"]["2.1"].update(consumption_ok=False))), 1)
+
+            def reclassify(r):
+                r["items"]["normal-completion"]["classification"] = "identity-only"
+                r["summary"] = {c: sorted(k for k, v in r["items"].items() if v["classification"] == c) for c in ("identical", "identity-only", "differs")}
+            self.assertEqual(len(check(reclassify)), 2)                               # identical and identity-only both disagree with the data
+            self.assertIn("the summary is not the items' classification", check(lambda r: r["summary"]["differs"].pop()))
+            got = check(lambda r: r["items"].pop("post-merge-regression"))                # not measured, so neither classified nor summarised
+            self.assertEqual([g.split(":")[0] for g in got], ["the items measured are not 2.0's and 2.1's corpora", "the summary is not the items' classification", "differs"], got)
+            self.assertEqual(check(lambda r: r["kernels"]["2.1"].update(fixture_helpers={})),
+                             ["q5's fixture helpers differ between the two kernels' trees: the comparison is not the kernels' alone"])
+        self.assertEqual(M.check(pathlib.Path(t) / "absent.json"), [f"{pathlib.Path(t) / 'absent.json'}: no record (v21_q5_compare.py --write)"])
+
+    def test_Q5_19_the_kernel_comparison_record_binds_this_tree(self):
+        """Red until the lead writes closure-evidence/v2/v2.1/Q5-KERNEL-COMPARISON.json (v21_q5_compare.py --write) on the
+        final 2.1 kernel; then it fails whenever q5.py, the tool, the fixture helpers or the kernel move."""
+        self.assertEqual(self.M.check(), [])
 
 
 if __name__ == "__main__":

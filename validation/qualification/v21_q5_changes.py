@@ -2,10 +2,16 @@
 added, traced to the approved requirement and decision, to the commit that changed the behaviour and to the tests that
 prove it — data the B-03d ruling reads. Nothing here is executed and nothing is written.
 
-Measured at dc9774f with this lane's q5.py: every item recorded and replayed in temporary directories as
-tests/v2/test_p9_reproduction does (never `q5 --record`), under this tree's aisef2 and under aisef2 materialised at
-v2.0.0 (c2_orchestration_repair.materialise); the change attributed under aisef2 at 919a271 and at 91a8968. 2.0's corpora
-(closure-evidence/v2/Q5, cycle2/Q5, cycle2/Q5-FINAL, release/Q5-RC1, release/Q5-RC2) stay as recorded.
+The behaviour evidence is `behaviour_tests` (tests/v2/test_p9_reproduction Q5_12 and Q5_13 assert the 2.1 failures and
+model calls stated here, from this data). `measured` and UNCHANGED are ENGINEERING MEASUREMENTS, not owner-approved
+evidence: the cross-kernel comparison (every 2.0 and 2.1 item recorded and replayed in temporary directories under
+aisef2 materialised at v2.0.0 and under this tree's) is the record COMPARISON_REL, written by
+validation/qualification/v21_q5_compare.py --write once the 2.1 kernel is final; its --check binds it to q5.py and both
+kernels and requires the classification UNCHANGED and CHANGES state. Until the record exists the values below are the
+lane's measurement at dc9774f; the attribution under aisef2 at 919a271 and at 91a8968 is in no record (the lane's
+scratch measurement only: COMPARISON_REL compares v2.0.0 with this tree). 2.0's corpora
+(closure-evidence/v2/Q5, cycle2/Q5, cycle2/Q5-FINAL, release/Q5-RC1, release/Q5-RC2) stay as recorded: Q5_14 and
+cycle2_baseline check them, and q5 refuses to write into them.
 """
 
 V2_0_0 = "ca2631374602da45dae75b7f6907ff4729d0b2f7"   # tag v2.0.0
@@ -13,6 +19,8 @@ V21_38 = "91a89684e6c5a3ed7f2cf5fc52ef955d3a661cde"
 V2_007 = "919a271ecfca246381b1de036a874f3b6935c0be"
 V21_37 = "06d4e62c0b0666506cd95d663dfa8d3300e060a4"
 RC2_CORPUS_REL = "closure-evidence/v2/release/Q5-RC2/CORPUS.json"
+COMPARISON_REL = "closure-evidence/v2/v2.1/Q5-KERNEL-COMPARISON.json"
+MEASUREMENT = f"engineering measurement, record: {COMPARISON_REL}"
 
 DECISION = ("docs/v2.1/STATUS.md §2 row B1: 'PRESERVE chỉ kiểm sau merge (V21-38)', fixed by 91a8968; docs/v2.1/ADR-V2.1.md ADR-4",
             "owner B-03d approval, closure-evidence/v2/cycle2/RELEASE-DECISIONS.json seq 5 (AISEF_V2_1_B03_REQUALIFICATION_ROUND): "
@@ -57,6 +65,8 @@ CHANGES = {
             "test_a_regression_of_the_prior_spec_of_another_kind_is_the_developer_s_at_the_candidate_and_never_merged",
         ),
         "measured": {
+            "evidence": MEASUREMENT,
+            "attribution_evidence": "919a271 and 91a8968: the lane's scratch measurement only, in no record",
             "2.0 item under aisef2 v2.0.0 and 919a271": "COMMIT / ROLLBACK, 4 calls (DEV, REV, DEV, REV), 143 events, "
                                                          "POST_MERGE_REGRESSION INTEGRATION at seq 134; replay GREEN (as release/Q5-RC2)",
             "2.0 item under aisef2 91a8968 and dc9774f": "S0 COMMIT, then EXTRA_MODEL_CALL: the script has no DEVELOPER_IMPLEMENT answer for "
@@ -91,6 +101,7 @@ CHANGES = {
             "test_ORCH_9_and_10_a_post_merge_regression_of_a_prior_PRESERVE_obligation_is_INTEGRATION_and_rolled_back",
         ),
         "measured": {
+            "evidence": MEASUREMENT,
             "this item under dc9774f": "COMMIT / ROLLBACK, 4 calls (DEV, REV, DEV, REV), 151 events, POST_MERGE_REGRESSION INTEGRATION "
                                        "at seq 142; replay GREEN",
             "this item under aisef2 v2.0.0": "the same outcomes, calls and failure (seq 134), 143 events: without the candidate's C0 "
@@ -99,9 +110,11 @@ CHANGES = {
     },
 }
 
-#: the other eleven 2.0 items, measured the same way: outcomes, failures, gate rows, event and tool counts and the
-#: assertConsumed result equal under both kernels, replay GREEN under each — no expectation changed
+#: the other eleven 2.0 items, measured the same way (engineering measurement, COMPARISON_REL): outcomes, failures, gate
+#: rows, event and tool counts and the assertConsumed result equal under both kernels, replay GREEN under each — no
+#: expectation changed
 UNCHANGED = {
+    "evidence": MEASUREMENT,
     "identical_up_to_kernel_identity": ("normal-completion", "retry-then-commit", "review-finding-rollback", "pre-satisfied",
                                         "security-finding-rollback", "developer-outage-rollback"),
     "identity_only": {
@@ -112,8 +125,9 @@ UNCHANGED = {
         "probe_digests_by_kind": {"cli_invocation": ("d42449fd8e3a", "330ae4a88cc8"), "file_artifact": ("31465b73cbe2", "be1485d12a4d"),
                                   "process_effect": ("815e4c865274", "409c41aea16f"), "python_callable": ("b1f25878d350", "0821c14651a9")},
         "cause_commits": {V2_007: "V2-007: a probe's digest is its capability digest (all four; file_artifact 31465b73cbe2 -> 46737ca1c479)",
-                          V21_37: "V21-37: file_artifact python_imports, capability version 2 (46737ca1c479 -> be1485d12a4d)"},
+                          V21_37: "V21-37 (engineering change, not owner-approved): file_artifact python_imports, capability version 2 "
+                                  "(46737ca1c479 -> be1485d12a4d)"},
         "decision": ("ARCHITECTURE-EXCEPTION-V2-007 approved: RELEASE-DECISIONS seq 4 (AISEF_V2_1_B01_ARCHITECTURE_EXCEPTION_V2_007)",
-                     "docs/v2.1/STATUS.md §2 row B3 (V21-37)"),
+                     "V21-37: engineering change (ADR-5, 06d4e62), not owner-approved; no Q5 expectation depends on it (identity only)"),
     },
 }
