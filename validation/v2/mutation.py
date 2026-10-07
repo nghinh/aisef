@@ -1010,7 +1010,13 @@ def _residue(tg: _Target) -> dict:
     except (OSError, UnicodeDecodeError):
         held = False
     changed += [] if held else [tg.rel]
-    return {k: v[:50] for k, v in (("added", added), ("removed", removed), ("changed", changed)) if v}
+    # the cwd is the tree, so '../x' and '../../x' are reachable too: the tree's holder must hold only the tree, and the
+    # target's scratch only that holder and its own pristine copy (filesystem-state lens: residue beside the tree)
+    beside = sorted(set(os.listdir(tg.tree.parent)) - {"tree"})
+    scratch = sorted(set(os.listdir(tg.scratch)) - {tg.tree.parent.name, *(
+        [tg.pristine.name] if tg.pristine.parent == tg.scratch else [])})
+    return {k: v[:50] for k, v in (("added", added), ("removed", removed), ("changed", changed), ("beside", beside),
+                                   ("scratch", scratch)) if v}
 
 
 def _env(run: pathlib.Path, token: str) -> dict[str, str]:
@@ -1249,7 +1255,9 @@ def _run_file(tg: _Target, rel: str, rows: list, *, select: str | None = None, f
             residue = _residue(tg)
             if residue:
                 row["residue"] = residue
-                _new_tree(tg)
+                if "scratch" in residue:   # nothing the runner may remove holds it (no destructive site): stop
+                    raise _Stop(f"RESIDUE_UNREMOVABLE: {residue['scratch']} left in the target's scratch directory")
+                _new_tree(tg)   # a new holder too, so what was left beside the tree goes with the old one
     except _Stop as e:
         row.setdefault("outcome", "INFRA")
         row["stopped"] = str(e)

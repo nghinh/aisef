@@ -249,6 +249,60 @@ class Env(unittest.TestCase):
             r = m.run_target(root, "aisef2/toy.py::tidy", kill)
         self.assertIn("kill tests fail on the unmutated tree", r["error"])
 
+    def test_what_a_run_leaves_beside_the_tree_is_residue_too(self):
+        """Filesystem-state lens: the cwd is the tree, so '../outside.txt' lands in the tree's holder, which the
+        manifest did not cover; it masked the kills of `test_a` (it sees the file already there) in both orders, and
+        the bracket could not help (its runs started dirty too). Now the holder must hold only the tree: the run that
+        left it names it on its row and a new holder is built. Something left in the target's scratch itself
+        ('../../x') cannot be removed by the runner, so the target stops."""
+        par = ("import pathlib\n\n\ndef mark(flag=False, other=False):\n    if flag:\n"
+               "        pathlib.Path('../outside.txt').write_text('x')\n        return 2\n    if other:\n"
+               "        pathlib.Path('../outside.txt').write_text('y')\n    return 1\n")
+        files = {
+            "test_a.py": """
+                import pathlib, unittest
+                from aisef2.toy import mark
+                OUT = pathlib.Path("..").resolve() / "outside.txt"
+                class A(unittest.TestCase):
+                    def test_mark_leaves_the_directory_beside_the_tree_alone(self):
+                        before = OUT.exists()
+                        mark()
+                        self.assertEqual(OUT.exists(), before)
+                """,
+            "test_b.py": """
+                import unittest
+                from aisef2.toy import mark
+                class B(unittest.TestCase):
+                    def test_mark_returns_one(self):
+                        self.assertEqual(mark(), 1)
+                """,
+            "test_s.py": """
+                import pathlib, unittest
+                class S(unittest.TestCase):
+                    def test_writes_into_the_scratch(self):
+                        (pathlib.Path("../..").resolve() / "x").write_text("x")
+                """}
+        root = toy(self.dir, par, files)
+        found = m.mutants(par, "mark", {})   # two of them are both called "L4 False->True": compared by position
+        writes = [any(w in s for w in ("def mark(flag=True", "other=True)", "if not flag", "if not other")) for _, s in found]
+        truth = ["KILLED" if w or d == "L10 returns None" else "SURVIVED" for w, (d, _) in zip(writes, found, strict=True)]
+        self.assertEqual(sum(writes), 4)
+        a, b = "tests/v2/test_a.py", "tests/v2/test_b.py"
+        for order in ([a, b], [b, a]):
+            with self.subTest(order=order):
+                r = m.run_target(root, "aisef2/toy.py::mark", order)
+                self.assertEqual(classes(r), truth)
+                self.assertTrue([x for _, x in rows_of(r) if x.get("residue") == {"beside": ["outside.txt"]}])
+        # the old failure, with the holder left unchecked: what the first writing run left decides later runs
+        real = m._residue
+        with mock.patch.object(m, "_residue", lambda tg: {k: v for k, v in real(tg).items() if k != "beside"}):
+            r = m.run_target(root, "aisef2/toy.py::mark", [b, a])
+        self.assertNotEqual(classes(r), truth)
+        r = m.run_target(root, "aisef2/toy.py::mark", [b, "tests/v2/test_s.py"])
+        self.assertTrue(r["stopped"])
+        self.assertEqual(r["error"], "RESIDUE_UNREMOVABLE before mutant 1 (T0 tests/v2/test_s.py): ['x'] left in the "
+                                     "target's scratch directory")
+
     def test_the_live_record_never_enters_a_tree(self):
         rec = "closure-evidence/v2/toy/MUTATION.json"
         files = {"test_r.py": f"""
