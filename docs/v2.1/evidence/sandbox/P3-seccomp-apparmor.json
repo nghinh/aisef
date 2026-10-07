@@ -1,0 +1,123 @@
+{
+ "container": {
+  "APPARMOR": "unconfined",
+  "PROFILE": "P3-seccomp-apparmor",
+  "SECCOMP": "unconfined",
+  "SYSTEMPATHS": "default"
+ },
+ "controls": {
+  "fake_client_runs": {
+   "exit": 1,
+   "out": "bwrap: Can't mount proc on /proc: Operation not permitted",
+   "started": true
+  },
+  "workspace_writable": {
+   "exit": 1,
+   "out": "bwrap: Can't mount proc on /proc: Operation not permitted",
+   "started": true
+  }
+ },
+ "denials": {
+  "connect_host_port": {
+   "exit": 1,
+   "out": "bwrap: Can't mount proc on /proc: Operation not permitted",
+   "started": true
+  },
+  "raise_capability": {
+   "exit": 1,
+   "out": "bwrap: Can't mount proc on /proc: Operation not permitted",
+   "started": true
+  },
+  "read_file_outside_workspace": {
+   "exit": 1,
+   "out": "bwrap: Can't mount proc on /proc: Operation not permitted",
+   "started": true
+  },
+  "read_home_secret_absolute": {
+   "exit": 1,
+   "out": "bwrap: Can't mount proc on /proc: Operation not permitted",
+   "started": true
+  },
+  "read_verifier": {
+   "exit": 1,
+   "out": "bwrap: Can't mount proc on /proc: Operation not permitted",
+   "started": true
+  },
+  "see_host_processes": {
+   "exit": 1,
+   "out": "bwrap: Can't mount proc on /proc: Operation not permitted",
+   "started": true
+  },
+  "write_anchor": {
+   "exit": 1,
+   "out": "bwrap: Can't mount proc on /proc: Operation not permitted",
+   "started": true
+  },
+  "write_run_directory": {
+   "exit": 1,
+   "out": "bwrap: Can't mount proc on /proc: Operation not permitted",
+   "started": true
+  },
+  "write_runtime": {
+   "exit": 1,
+   "out": "bwrap: Can't mount proc on /proc: Operation not permitted",
+   "started": true
+  }
+ },
+ "host": {
+  "anchor_unchanged": true,
+  "pids_sample": [
+   " 1",
+   " 100",
+   " 113",
+   " 146",
+   " 184"
+  ],
+  "port": 63414,
+  "runtime_unchanged": true,
+  "written_in_run_dir": false
+ },
+ "measure": {
+  "backend": "bwrap",
+  "bwrap": "/usr/bin/bwrap",
+  "bwrap_sha256": "b3b829e18a7d43ee589dc37e351cb9480ff7301b493d8227b8c754294638b976",
+  "bwrap_version": "bubblewrap 0.12.0",
+  "created_outside_workspace": {
+   "interpreter_site": false,
+   "kernel": false,
+   "run_directory": false
+  },
+  "inside": {
+   "capabilities": {
+    "CapAmb": null,
+    "CapBnd": null,
+    "CapEff": null,
+    "CapInh": null,
+    "CapPrm": null
+   },
+   "home_listing": [],
+   "mounts": [],
+   "namespaces": {},
+   "network_interfaces": [],
+   "no_new_privs": null,
+   "routed_interfaces": [],
+   "seccomp": null,
+   "uid": null
+  },
+  "network": "none",
+  "operator_can": {
+   "write_interpreter_site": false,
+   "write_kernel": false
+  },
+  "operator_uid": 1000,
+  "problems": [
+   "the sandbox did not run the probe (exit 1): bwrap: Can't mount proc on /proc: Operation not permitted"
+  ],
+  "read_only": [],
+  "setsid_survivors": [],
+  "system": "linux",
+  "tried": {}
+ },
+ "network": "none",
+ "uid": 1000
+}

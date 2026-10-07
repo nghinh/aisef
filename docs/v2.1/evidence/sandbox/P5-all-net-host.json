@@ -1,0 +1,269 @@
+{
+ "container": {
+  "APPARMOR": "unconfined",
+  "PROFILE": "P5-all-net-host",
+  "SECCOMP": "unconfined",
+  "SYSTEMPATHS": "unconfined"
+ },
+ "controls": {
+  "fake_client_runs": {
+   "exit": 0,
+   "out": "{\"type\": \"text\", \"part\": {\"text\": \"done\"}}",
+   "started": true
+  },
+  "workspace_writable": {
+   "exit": 0,
+   "out": "ok",
+   "started": true
+  }
+ },
+ "denials": {
+  "connect_host_port": {
+   "exit": 0,
+   "out": "UP: reached host host.docker.internal",
+   "started": true
+  },
+  "raise_capability": {
+   "exit": 0,
+   "out": "CapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t0000000000000000",
+   "started": true
+  },
+  "read_file_outside_workspace": {
+   "exit": 1,
+   "out": "cat: /tmp/aisef/run-dir/canary: No such file or directory",
+   "started": true
+  },
+  "read_home_secret_absolute": {
+   "exit": 1,
+   "out": "cat: /tmp/aisef/op-home/.ssh/id: No such file or directory",
+   "started": true
+  },
+  "read_verifier": {
+   "exit": 1,
+   "out": "cat: /tmp/aisef/verifier/hidden.json: No such file or directory",
+   "started": true
+  },
+  "see_host_processes": {
+   "exit": 0,
+   "out": "1 2 3 4 5 6",
+   "started": true
+  },
+  "write_anchor": {
+   "exit": 0,
+   "out": "",
+   "started": true
+  },
+  "write_run_directory": {
+   "exit": 0,
+   "out": "",
+   "started": true
+  },
+  "write_runtime": {
+   "exit": 2,
+   "out": "/bin/sh: 1: cannot create /tmp/aisef/runtime/opencode: Directory nonexistent",
+   "started": true
+  }
+ },
+ "host": {
+  "anchor_unchanged": true,
+  "pids_sample": [
+   " 1",
+   " 100",
+   " 113",
+   " 146",
+   " 184"
+  ],
+  "port": 63414,
+  "runtime_unchanged": true,
+  "written_in_run_dir": false
+ },
+ "measure": {
+  "backend": "bwrap",
+  "bwrap": "/usr/bin/bwrap",
+  "bwrap_sha256": "b3b829e18a7d43ee589dc37e351cb9480ff7301b493d8227b8c754294638b976",
+  "bwrap_version": "bubblewrap 0.12.0",
+  "created_outside_workspace": {
+   "interpreter_site": false,
+   "kernel": false,
+   "run_directory": false
+  },
+  "inside": {
+   "capabilities": {
+    "CapAmb": "0000000000000000",
+    "CapBnd": "0000000000000000",
+    "CapEff": "0000000000000000",
+    "CapInh": "0000000000000000",
+    "CapPrm": "0000000000000000"
+   },
+   "home_listing": [
+    ".config"
+   ],
+   "mounts": [
+    {
+     "access": "rw",
+     "at": "/",
+     "fs": "tmpfs"
+    },
+    {
+     "access": "ro",
+     "at": "/usr",
+     "fs": "overlay"
+    },
+    {
+     "access": "ro",
+     "at": "/etc",
+     "fs": "overlay"
+    },
+    {
+     "access": "ro",
+     "at": "/etc/hostname",
+     "fs": "ext4"
+    },
+    {
+     "access": "ro",
+     "at": "/etc/hosts",
+     "fs": "ext4"
+    },
+    {
+     "access": "ro",
+     "at": "/etc/resolv.conf",
+     "fs": "ext4"
+    },
+    {
+     "access": "rw",
+     "at": "/proc",
+     "fs": "proc"
+    },
+    {
+     "access": "rw",
+     "at": "/dev",
+     "fs": "tmpfs"
+    },
+    {
+     "access": "rw",
+     "at": "/dev/null",
+     "fs": "tmpfs"
+    },
+    {
+     "access": "rw",
+     "at": "/dev/zero",
+     "fs": "tmpfs"
+    },
+    {
+     "access": "rw",
+     "at": "/dev/full",
+     "fs": "tmpfs"
+    },
+    {
+     "access": "rw",
+     "at": "/dev/random",
+     "fs": "tmpfs"
+    },
+    {
+     "access": "rw",
+     "at": "/dev/urandom",
+     "fs": "tmpfs"
+    },
+    {
+     "access": "rw",
+     "at": "/dev/tty",
+     "fs": "tmpfs"
+    },
+    {
+     "access": "rw",
+     "at": "/dev/pts",
+     "fs": "devpts"
+    },
+    {
+     "access": "rw",
+     "at": "/tmp",
+     "fs": "tmpfs"
+    },
+    {
+     "access": "rw",
+     "at": "/aisef-home",
+     "fs": "tmpfs"
+    },
+    {
+     "access": "ro",
+     "at": "/tmp/aisef/op-home/.config/opencode",
+     "fs": "overlay"
+    },
+    {
+     "access": "rw",
+     "at": "/tmp/aisef/run-dir/confinement/ws",
+     "fs": "overlay"
+    }
+   ],
+   "namespaces": {
+    "ipc": "own",
+    "mnt": "own",
+    "net": "shared",
+    "pid": "own",
+    "user": "own",
+    "uts": "own"
+   },
+   "network_interfaces": [
+    "lo",
+    "tunl0",
+    "gre0",
+    "gretap0",
+    "erspan0",
+    "ip_vti0",
+    "ip6_vti0",
+    "sit0",
+    "ip6tnl0",
+    "ip6gre0",
+    "eth0"
+   ],
+   "no_new_privs": "1",
+   "routed_interfaces": [
+    "eth0"
+   ],
+   "seccomp": "0",
+   "uid": "1000"
+  },
+  "network": "host",
+  "operator_can": {
+   "write_interpreter_site": false,
+   "write_kernel": false
+  },
+  "operator_uid": 1000,
+  "problems": [],
+  "read_only": [],
+  "setsid_survivors": [],
+  "system": "linux",
+  "tried": {
+   "read_canary": {
+    "exit": 1,
+    "output": "cat: /tmp/aisef/run-dir/confinement/canary: No such file or directory"
+   },
+   "setsid": {
+    "exit": 0,
+    "output": ""
+   },
+   "user_namespace": {
+    "exit": 1,
+    "output": "unshare: unshare failed: No space left on device"
+   },
+   "workspace": {
+    "exit": 0,
+    "output": "ok"
+   },
+   "write_interpreter_site": {
+    "exit": 2,
+    "output": "probe: 12: cannot create /usr/local/lib/python3.14/site-packages/.aisef-confine-probe-cba55f5d843424ed: Read-only file system"
+   },
+   "write_kernel": {
+    "exit": 2,
+    "output": "probe: 11: cannot create /repo/aisef2/.aisef-confine-probe-cba55f5d843424ed: Directory nonexistent"
+   },
+   "write_run_directory": {
+    "exit": 0,
+    "output": ""
+   }
+  }
+ },
+ "network": "host",
+ "uid": 1000
+}

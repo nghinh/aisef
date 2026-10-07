@@ -52,7 +52,7 @@ cao nhất có bằng chứng; mục ở M3/M4 đã qua M1–M2, trừ E1 và A9
 | D5 | tệp anchor an toàn (`--anchor-out`) | M4 | `AnchorThreatModel`; CLI thật: tệp 0444 | nơi giữ tin cậy (§4.3) |
 | E1 | harness thí nghiệm | M3 | `test_v21_experiment` (replay offline) | công cụ riêng, không thuộc đường sản phẩm |
 | E2 | chiến dịch đối chứng | **M6** | — | ngân sách chưa duyệt (B-09) |
-| F | cách ly Linux tối thiểu | **M6** | §6 | chưa có mã cách ly nào trên nhánh |
+| F | cách ly Linux tối thiểu (bwrap, opt-in) | **M4** | argv + fail-closed: `test_v21_confine` (M3); ranh giới trong container Linux thật qua docker: `validation/v21/sandbox` + [evidence/sandbox](evidence/sandbox/), từng claim một thao tác bị từ chối ([SANDBOX-LINUX.md](SANDBOX-LINUX.md)) | nối vào `aisef run` thật trên Linux: **M6**; nested bwrap chỉ chạy khi nới seccomp/systempaths của container (§6) |
 
 ## 3. Phạm vi chính xác của bảo đảm (thay câu "developer không còn sửa được kết quả kiểm tra")
 
@@ -181,12 +181,16 @@ sát — bị loại; công cụ giờ từ chối mọi đường ra trong repo
 
 ## 6. Giới hạn còn tồn tại
 
-- **Không có cách ly hệ điều hành** (§3). Cách ly Linux tối thiểu chưa làm; phản hồi của tôi bị hệ thống dừng hai lần khi
-  soạn phần này, nên không có mã nào trên nhánh. Đã đo môi trường (chưa phải bằng chứng cách ly): host macOS không có backend
-  nào; Docker Desktop (server linux/arm64) có Linux guest; trong container `python:3.14-slim-trixie@sha256:3353bb7e…`,
-  bwrap 0.12.0 chạy được với uid 1000 (user namespace, network namespace, `--tmp-overlay`) **chỉ khi** container được nới
-  `seccomp=unconfined`, `apparmor=unconfined`, `systempaths=unconfined` — tức nới chính ranh giới của container. Chưa có:
-  báo cáo user/mount/network/capability/socket và thao tác bị từ chối chứng minh ranh giới.
+- **Cách ly OS cho phiên model: có mã opt-in, đo bằng thao tác bị từ chối** ([SANDBOX-LINUX.md](SANDBOX-LINUX.md),
+  `aisef2/app/confine.py`, `validation/v21/sandbox`). Trong container `python:3.14-slim-trixie@sha256:3353bb7e…`, bwrap
+  0.12.0 (uid 1000) **chỉ chạy khi** container nới `seccomp=unconfined` **và** `systempaths=unconfined` (apparmor không
+  phải cổng chặn trên kernel này; `systempaths` mới cho mount `/proc`) — tức nới chính ranh giới của container. Khi đã
+  chạy (`--network none`), mọi claim được chứng minh bằng thao tác bị từ chối: không đọc được ngoài workspace, không ghi
+  được runtime/anchor/run-dir (host không đổi), không thấy tiến trình host, không mạng, capability = 0, NoNewPrivs = 1,
+  namespace riêng, tiến trình `setsid` chết theo phiên; `--network host` thì egress **không** bị cách ly ([evidence/sandbox](evidence/sandbox/)).
+  Khi xin cách ly mà không cấp được thì run/`--check`/phiên **từ chối trước request provider** (fail-closed). **Chưa**: nối
+  vào `aisef run` thật trên Linux; không coi nested-bwrap thay cho profile container (khuyến nghị F giữ nguyên).
+  Kernel đổi (`aisef2/`): cần mutation + tái thẩm định ngoài snapshot hiện tại.
 - Không có lượt live nào: hiệu quả, chất lượng finding, chi phí thật — không biết.
 - Anchor chỉ có nghĩa khi bản tin cậy nằm ngoài tầm ghi của developer; hiện chưa có nơi đó.
 - Tiến trình con tách session thoát việc dọn dẹp.

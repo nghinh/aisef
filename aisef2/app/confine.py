@@ -32,13 +32,16 @@ HOME = "/aisef-home"
 #: the system a client needs, read-only: a link (merged /usr) stays a link
 SYSTEM = ("/usr", "/etc", "/bin", "/sbin", "/lib", "/lib32", "/lib64", "/libx32")
 MARK = "@@aisef-confine "
-#: what the measurement runs inside the wrapper: $1 canary, $2 run-directory file, $3 kernel file, $4 site-packages
-#: file, $5 the operator's HOME, $6 workspace file, $7 a sleep duration no other process has
+#: what the measurement runs inside the wrapper: $1 canary (its CONTENT is the secret token, so its leak is seen even
+#: though a denial may echo a file's path), $2 run-directory file, $3 kernel file, $4 site-packages file, $5 the
+#: operator's HOME, $6 workspace file, $7 a sleep duration no other process has. The probe-file paths carry a nonce,
+#: never the token, so a "cannot create <path>" message can never look like a canary leak.
 PROBE = r'''m() { printf '@@aisef-confine %s\n' "$*"; }
 m uid "$(id -u)"
 for n in user pid net ipc uts mnt; do m ns "$n" "$(readlink /proc/self/ns/$n 2>&1)"; done
 m section status; cat /proc/self/status 2>&1
 m section mountinfo; cat /proc/self/mountinfo 2>&1
+m section route; cat /proc/net/route 2>&1
 m section netdev; cat /proc/net/dev 2>&1
 m section home; if [ -e "$5" ]; then ls -A -- "$5" 2>&1; fi
 m try read_canary; cat -- "$1" 2>&1; m rc $?
@@ -190,13 +193,13 @@ def measure(spec: Mapping, where: pathlib.Path, system: str = sys.platform, envi
         rep["bwrap_version"] = subprocess.run([str(exe), "--version"], capture_output=True, text=True, timeout=30).stdout.strip()
     except (OSError, subprocess.SubprocessError) as e:
         rep["bwrap_version"] = f"unavailable: {type(e).__name__}"
-    token = secrets.token_hex(16)
-    canary, written = where / "canary", where / "written-from-inside"
+    token, nonce = secrets.token_hex(16), secrets.token_hex(8)   # token: only the canary's content; nonce: the file paths
+    canary, written = where / "canary", where / f"written-{nonce}"
     canary.write_text(token + "\n", encoding="utf-8")
-    kernel = pathlib.Path(__file__).resolve().parents[1] / f".aisef-confine-probe-{token}"
-    site = pathlib.Path(sysconfig.get_paths()["purelib"]) / f".aisef-confine-probe-{token}"
+    kernel = pathlib.Path(__file__).resolve().parents[1] / f".aisef-confine-probe-{nonce}"
+    site = pathlib.Path(sysconfig.get_paths()["purelib"]) / f".aisef-confine-probe-{nonce}"
     home = env.get("HOME") or "/nonexistent"
-    sleep = f"30.{int(token[:8], 16) % 10**6:06d}"
+    sleep = f"30.{int(nonce, 16) % 10**6:06d}"
     args = [str(canary), str(written), str(kernel), str(site), home, str(ws / ".aisef-confine-probe"), sleep]
     rep["argv"] = full[:-len(cmd)] + ["/bin/sh", "-c", "<PROBE>", "probe"]
     try:
@@ -219,10 +222,14 @@ def measure(spec: Mapping, where: pathlib.Path, system: str = sys.platform, envi
     caps = {k: status.get(k) for k in ("CapInh", "CapPrm", "CapEff", "CapBnd", "CapAmb")}
     mounts = _mounts(sections.get("mountinfo", []))
     netdev = [ln.split(":", 1)[0].strip() for ln in sections.get("netdev", [])[2:] if ":" in ln]
+    # /proc/net/route rows after the header: an interface with a route. A fresh netns (--unshare-net) has none, even
+    # though this kernel pre-creates DOWN tunnel pseudo-devices, so routes — not interface names — show reachability.
+    routes = [ln.split("\t")[0] for ln in sections.get("route", [])[1:] if "\t" in ln]
     outside_ns = {n: (os.readlink(f"/proc/self/ns/{n}") if os.path.exists(f"/proc/self/ns/{n}") else None)
                   for n in values.get("ns", {})}
     rep["inside"] = {"uid": values.get("uid"), "capabilities": caps, "no_new_privs": status.get("NoNewPrivs"),
-                     "seccomp": status.get("Seccomp"), "network_interfaces": netdev, "mounts": mounts,
+                     "seccomp": status.get("Seccomp"), "network_interfaces": netdev, "routed_interfaces": sorted(set(routes)),
+                     "mounts": mounts,
                      "namespaces": {n: ("own" if v != outside_ns.get(n) else "shared") for n, v in values.get("ns", {}).items()},
                      "home_listing": sections.get("home", [])}
     rep["tried"] = {k: {"exit": rc, "output": o} for k, (rc, o) in tries.items()}
@@ -254,8 +261,8 @@ def _judge(rep: dict, token: str, out: str, tries: dict, values: dict, home: str
         bad.append(f"NoNewPrivs is {inside['no_new_privs']}, not 1")
     need = ("user", "pid", "ipc", "uts", "mnt", *(("net",) if rep["network"] == "none" else ()))
     bad += [f"the {n} namespace is not the session's own" for n in need if inside["namespaces"].get(n) != "own"]
-    if rep["network"] == "none" and inside["network_interfaces"] != ["lo"]:
-        bad.append(f"network none shows interfaces {inside['network_interfaces']}")
+    if rep["network"] == "none" and inside["routed_interfaces"]:
+        bad.append(f"network none has routes on {inside['routed_interfaces']} (a reachable network)")
     host_backed = [m for m in inside["mounts"] if m["access"] == "rw" and m["fs"] not in ("tmpfs", "proc", "devpts", "mqueue")
                    and not m["at"].startswith("/dev/") and m["at"] != str(ws)]
     if host_backed:

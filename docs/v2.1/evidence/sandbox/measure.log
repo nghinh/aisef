@@ -1,0 +1,90 @@
+== host
+docker 29.8.0 server linux/arm64
+host: Darwin 25.5.0 arm64  (this host runs no Linux backend itself; the guest below is a Docker Desktop VM container)
+== build aisef-sandbox-measure (pinned python:3.14-slim-trixie@sha256:3353bb7e9ae99c7cce6cad2b2f2b174e8f22813ac43e3b13e7a742627d2b01d8)
+sha256:a7416c247033f1554c78ef7860a409f6dec8ccc67b794733546923a22c065711
+host listener on 127.0.0.1:63414; host-gateway seen from the container as host.docker.internal
+
+== profile P1-default (network=none) flags: 
+  bwrap ran: NO; measure problems: 1
+    - the sandbox did not run the probe (exit 1): bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user namespaces. See <https://deb.li/bubblewrap> or <file:///usr/share/doc/bubblewrap/README.Debian.gz>.
+  deny connect_host_port: exit 1: bwrap: No permissions to create a new namespace, likely because the ke
+  deny raise_capability: exit 1: bwrap: No permissions to create a new namespace, likely because the ke
+  deny read_file_outside_workspace: exit 1: bwrap: No permissions to create a new namespace, likely because the ke
+  deny read_home_secret_absolute: exit 1: bwrap: No permissions to create a new namespace, likely because the ke
+  deny read_verifier: exit 1: bwrap: No permissions to create a new namespace, likely because the ke
+  deny see_host_processes: exit 1: bwrap: No permissions to create a new namespace, likely because the ke
+  deny write_anchor: exit 1: bwrap: No permissions to create a new namespace, likely because the ke
+  deny write_run_directory: exit 1: bwrap: No permissions to create a new namespace, likely because the ke
+  deny write_runtime: exit 1: bwrap: No permissions to create a new namespace, likely because the ke
+  control workspace_writable: {'exit': 1, 'out': 'bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user namespaces. See <https://deb.li/bubblewrap> or <file:///usr/share/doc/bubblewrap/README.Debian.gz>.', 'started': True}
+  control fake_client_runs: {'exit': 1, 'out': 'bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user namespaces. See <https://deb.li/bubblewrap> or <file:///usr/share/doc/bubblewrap/README.Debian.gz>.', 'started': True}
+  host after run: runtime_unchanged=True anchor_unchanged=True written_in_run_dir=False
+
+== profile P2-seccomp (network=none) flags: --security-opt seccomp=unconfined
+  bwrap ran: NO; measure problems: 1
+    - the sandbox did not run the probe (exit 1): bwrap: Can't mount proc on /proc: Operation not permitted
+  deny connect_host_port: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  deny raise_capability: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  deny read_file_outside_workspace: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  deny read_home_secret_absolute: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  deny read_verifier: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  deny see_host_processes: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  deny write_anchor: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  deny write_run_directory: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  deny write_runtime: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  control workspace_writable: {'exit': 1, 'out': "bwrap: Can't mount proc on /proc: Operation not permitted", 'started': True}
+  control fake_client_runs: {'exit': 1, 'out': "bwrap: Can't mount proc on /proc: Operation not permitted", 'started': True}
+  host after run: runtime_unchanged=True anchor_unchanged=True written_in_run_dir=False
+
+== profile P3-seccomp-apparmor (network=none) flags: --security-opt seccomp=unconfined --security-opt apparmor=unconfined
+  bwrap ran: NO; measure problems: 1
+    - the sandbox did not run the probe (exit 1): bwrap: Can't mount proc on /proc: Operation not permitted
+  deny connect_host_port: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  deny raise_capability: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  deny read_file_outside_workspace: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  deny read_home_secret_absolute: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  deny read_verifier: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  deny see_host_processes: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  deny write_anchor: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  deny write_run_directory: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  deny write_runtime: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  control workspace_writable: {'exit': 1, 'out': "bwrap: Can't mount proc on /proc: Operation not permitted", 'started': True}
+  control fake_client_runs: {'exit': 1, 'out': "bwrap: Can't mount proc on /proc: Operation not permitted", 'started': True}
+  host after run: runtime_unchanged=True anchor_unchanged=True written_in_run_dir=False
+
+== profile P4-all (network=none) flags: --security-opt seccomp=unconfined --security-opt apparmor=unconfined --security-opt systempaths=unconfined
+  bwrap ran: yes; measure problems: 0
+  deny connect_host_port: exit 0: DOWN: OSError: [Errno 101] Network is unreachable
+  deny raise_capability: exit 0: CapPrm:	0000000000000000
+CapEff:	0000000000000000
+CapBnd:	000000000000
+  deny read_file_outside_workspace: exit 1: cat: /tmp/aisef/run-dir/canary: No such file or directory
+  deny read_home_secret_absolute: exit 1: cat: /tmp/aisef/op-home/.ssh/id: No such file or directory
+  deny read_verifier: exit 1: cat: /tmp/aisef/verifier/hidden.json: No such file or directory
+  deny see_host_processes: exit 0: 1 2 3 4 5 6
+  deny write_anchor: exit 0: 
+  deny write_run_directory: exit 0: 
+  deny write_runtime: exit 2: /bin/sh: 1: cannot create /tmp/aisef/runtime/opencode: Directory nonex
+  control workspace_writable: {'exit': 0, 'out': 'ok', 'started': True}
+  control fake_client_runs: {'exit': 0, 'out': '{"type": "text", "part": {"text": "done"}}', 'started': True}
+  host after run: runtime_unchanged=True anchor_unchanged=True written_in_run_dir=False
+
+== profile P5-all-net-host (network=host) flags: --security-opt seccomp=unconfined --security-opt apparmor=unconfined --security-opt systempaths=unconfined
+  bwrap ran: yes; measure problems: 0
+  deny connect_host_port: exit 0: UP: reached host host.docker.internal
+  deny raise_capability: exit 0: CapPrm:	0000000000000000
+CapEff:	0000000000000000
+CapBnd:	000000000000
+  deny read_file_outside_workspace: exit 1: cat: /tmp/aisef/run-dir/canary: No such file or directory
+  deny read_home_secret_absolute: exit 1: cat: /tmp/aisef/op-home/.ssh/id: No such file or directory
+  deny read_verifier: exit 1: cat: /tmp/aisef/verifier/hidden.json: No such file or directory
+  deny see_host_processes: exit 0: 1 2 3 4 5 6
+  deny write_anchor: exit 0: 
+  deny write_run_directory: exit 0: 
+  deny write_runtime: exit 2: /bin/sh: 1: cannot create /tmp/aisef/runtime/opencode: Directory nonex
+  control workspace_writable: {'exit': 0, 'out': 'ok', 'started': True}
+  control fake_client_runs: {'exit': 0, 'out': '{"type": "text", "part": {"text": "done"}}', 'started': True}
+  host after run: runtime_unchanged=True anchor_unchanged=True written_in_run_dir=False
+
+== done; per-profile JSON in /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/prod/sandbox/measure-out/*.json
