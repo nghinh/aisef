@@ -661,18 +661,23 @@ _V21_NEW = {
         "AUTHORING_KEYS", "CONTRACT_KEYS", "CRITERION_KEYS", "EXAMPLES", "RELEASES", "_earlier", "migrate", "_mint",
         "_refs", "_closed", "seal", "unapproved", "approve", "_spec_rows", "coverage", "lint", "explain", "init",
         "continue_from", "_read", "_write_new", "_create", "main")),
+    # V2.1 (F, v21p/sandbox 9c36070): the sessions' bubblewrap confinement. Not targets: HOME, MARK, PROBE and
+    # SURVIVOR_GRACE (no mutant), PROBE_TIMEOUT and SLEEPER (one tuple assignment: _root resolves a single name only)
+    "aisef2/app/confine.py": (["tests/v2/test_v21_confine.py"], (
+        "KEYS", "NETWORKS", "SYSTEM", "USERNS_REFUSED", "problem", "git_dir", "config_dir", "argv", "wrap", "_sections",
+        "_mounts", "targets", "_worktree", "measure", "_probe", "_survivors", "namespaces", "_link", "_within", "_judge")),
     # names 2.1 added, or whose body 2.1 changed, in modules that already had targets (or none, feedback.py)
     **{f"aisef2/app/{m}.py": (["tests/v2/test_app_units.py", *_V21_REG[f"aisef2/app/{m}.py"], "tests/v2/test_app_run.py"], fs)
        for m, fs in (("adapters", ("Reviewer._model", "Reviewer._ocr", "Reviewer._verify", "tree_of", "_unchanged",
                                    "_bounded", "Reviewer.__init__")),
                      ("bundle", ("_HEX64", "_strings", "shape_problems", "read")),
                      ("run", ("layers_of", "outcomes_from", "unfinished", "_content_sha", "evidence_manifest",
-                              "anchor_in", "anchor_of")),
+                              "anchor_in", "anchor_of", "client_on_path")),
                      ("settings", ("OPTIONAL", "REVIEW_ABSENT", "FINDERS", "OCR_KEYS", "LOOPBACK", "endpoint_problem",
                                    "Settings.prices", "read")),
                      ("verify", ("_runspec_problems", "_spend")),
                      ("cli", ("_parser",)), ("client", ("Budget.account", "redact")), ("preflight", ("http_transport",)),
-                     ("feedback", ("retry_feedback",)))},
+                     ("feedback", ("retry_feedback", "context_pack")))},
 }
 for _m, (_kill, _names) in _V21_NEW.items():
     V21_TARGETS.update({f"{_m}::{n}": list(_kill) for n in _names})
@@ -694,6 +699,17 @@ _V21_KILLS = {**{f"aisef2/app/adapters.py::{n}": "tests/v2/test_v21_kills_adapte
               **{f"aisef2/app/bundle.py::{n}": "tests/v2/test_v21_kills_bundle.py" for n in ("_strings", "read")},
               **{f"aisef2/app/bundle_cli.py::{n}": "tests/v2/test_v21_kills_bundle_cli.py" for n in ("coverage", "init")}}
 for _t, _f in _V21_KILLS.items():
+    V21_TARGETS[_t] = [*V21_TARGETS[_t], _f]
+# the 2.1 product tracks merged for campaign 2 (owner decision B-03b: the new 2.1 modules are targets): each track's own
+# test file, appended last, for the names it added to a module that already had targets and for the V2.1 targets whose
+# body it changed and whose new behaviour that file tests. D4 (v21p/context 01e8aef): not targets, PACK_HEAD (no
+# mutant) and PACK_MAX, PACK_LIST, PACK_ATTEMPTS (one tuple assignment). v21p/trace changes nothing under aisef2/.
+_V21_TRACKS = {**{f"aisef2/app/{t}": "tests/v2/test_v21_confine.py"
+                  for t in ("cli.py::run", "client.py::session", "run.py::execute", "run.py::client_on_path",
+                            "settings.py::OPTIONAL", "settings.py::load")},
+               **{f"aisef2/app/{t}": "tests/v2/test_v21_context_pack.py"
+                  for t in ("adapters.py::Developer.implement", "feedback.py::context_pack")}}
+for _t, _f in _V21_TRACKS.items():
     V21_TARGETS[_t] = [*V21_TARGETS[_t], _f]
 SUPERSEDED.update({t: "V2.1" for t in V21_TARGETS})
 for _phase in (P2_TARGETS, P6_TARGETS, C2_P1_TARGETS):
