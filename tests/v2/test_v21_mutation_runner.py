@@ -950,10 +950,43 @@ class Outcome(unittest.TestCase):
                     first = r["results"][0]["files"]
                     self.assertEqual([(x["file"][9:], x.get("role"), x["outcome"]) for x in first],
                                      [("test_fault.py", None, "INFRA"), ("test_fault.py", "control", "PASS"),
-                                      ("test_fault.py", "rerun", "PASS"), ("test_strong.py", None, "FAIL"),
+                                      ("test_fault.py", "control", "PASS"), ("test_fault.py", "rerun", "PASS"),
+                                      ("test_strong.py", None, "FAIL"), ("test_strong.py", "control", "PASS"),
                                       ("test_strong.py", "control", "PASS"), ("test_strong.py", "rerun", "FAIL")])
                     self.assertIn("kill not confirmed", first[0]["why"])
             flag.write_text("")
+
+    @unittest.skipUnless(POSIX, "the runner's process ranges and cleanup authority are measured on POSIX")
+    def test_a_fault_a_passing_run_leaves_for_the_next_is_never_a_kill(self):
+        """PL-2, process-env prover: a fixed port bound without SO_REUSEADDR fails a run started within TIME_WAIT of a
+        passing one, and a passing run recreates it. Aligned, the mutant's first run failed (T0's TIME_WAIT), the
+        control passed (it had expired) and left a new one, and the re-run failed with the same signature: a survivor
+        recorded as a confirmed kill, with a clean record. Here a flag outside the tree stands for that kernel state:
+        every PASS leaves it, the next run fails on it and clears it. The second control is the run it now fails."""
+        d = self.enterContext(tempfile.TemporaryDirectory())
+        busy = pathlib.Path(d) / "port"
+        root = toy(pathlib.Path(d), POSITIVE, {"test_port.py": f"""
+            import pathlib, unittest
+            from aisef2.toy import positive
+            BUSY = pathlib.Path({str(busy)!r})
+            class P(unittest.TestCase):
+                def test_binds_the_fixed_port(self):
+                    positive(5)
+                    if BUSY.exists() and BUSY.read_text() == "busy":
+                        BUSY.write_text("")
+                        self.fail("EADDRINUSE: the port is still in TIME_WAIT")
+                    BUSY.write_text("busy")
+            """})
+        r = m.run_target(root, "aisef2/toy.py::positive", ["tests/v2/test_port.py"])
+        self.assertNotIn("KILLED", classes(r))
+        why = rows_of(r)[0][1]["why"]
+        self.assertTrue(why.startswith("kill not confirmed: the unmutated module PASS, then FAIL"), why)
+        self.assertIn(" is INFRA (", "".join(m.target_problems(r, root)))
+        # the old failure, with one control: the first mutant is a confirmed kill, and nothing in the record says why not
+        busy.write_text("")
+        with mock.patch.object(m, "BRACKET", (m.BRACKET[0], m.BRACKET[2])):
+            r = m.run_target(root, "aisef2/toy.py::positive", ["tests/v2/test_port.py"])
+        self.assertEqual(classes(r)[0], "KILLED")
 
     @unittest.skipUnless(POSIX, "the runner's process ranges and cleanup authority are measured on POSIX")
     def test_a_lost_report_channel_is_not_a_timeout(self):
@@ -1418,7 +1451,7 @@ class Order(unittest.TestCase):
                 self.assertNotIn("stopped", r)
                 self.assertEqual(r["error"], self.runs[0]["error"])   # UNCLASSIFIED: the TIMEOUT and the INFRA mutant
                 kills = sum(c == "KILLED" for c in classes(r))
-                self.assertEqual(len(rows_of(r, "control")), kills)    # every kill bracketed exactly once
+                self.assertEqual(len(rows_of(r, "control")), 2 * kills)    # every kill bracketed exactly once
                 self.assertEqual(len(rows_of(r, "rerun")), kills)
         for key in ("classes", "killed", "survivors"):
             self.assertEqual(len({json.dumps(r[key]) for r in self.runs}), 1, key)

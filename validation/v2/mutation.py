@@ -1312,28 +1312,45 @@ def mutant_class(outcomes: list[str]) -> str:
     return "INFRA"
 
 
+#: the bracket's runs after a FAIL, in order: the unmutated module twice, then the mutant (role, which version, wanted)
+BRACKET = (("control", "null", "PASS"), ("control", "null", "PASS"), ("rerun", "mutant", "FAIL"))
+
+
+def _confirm(tg: _Target, rel: str, rows: list, row: dict, src: str) -> str:
+    """'' when `row`'s FAIL is confirmed, else why not: right away and each in a clean environment, the unmutated module
+    PASSES what failed (`_select`) twice in a row, then the mutant FAILS it again with the same signature. Twice: a
+    fault that a passing run leaves for the next one (a fixed port's TIME_WAIT) failed the mutant's re-run after the
+    control had passed, and a single control confirmed it (PL-2, process-env prover); the second control's run is the
+    one that fault now fails. The mutant's version is in the tree afterwards."""
+    sel = _select(row["first"], tg.ref[rel]["first_test"])
+    why = ""
+    for i, (role, version, want) in enumerate(BRACKET):
+        _write(tg, tg.null if version == "null" else src)
+        x = _run_file(tg, rel, rows, select=sel, role=role)
+        if x["outcome"] != want or (role == "rerun" and x.get("first") != row["first"]):
+            why = (f"the unmutated module {'PASS, then ' if i else ''}{x['outcome']}" if role == "control" else
+                   f"the mutant again {x['outcome']} {x.get('first') or x.get('why') or ''}".rstrip())
+            break
+    _write(tg, src)
+    return why
+
+
 def _mutant(tg: _Target, entry: dict, src: str) -> None:
-    """Every kill file in kill-set order, each run clean. A FAIL is a kill only when the bracket confirms it, right away
-    and each in a fresh environment: the unmutated module PASSES what failed (`_select`), and the mutant FAILS it again
-    with the same signature. Then — and only then — the remaining files are skipped. Anything else makes that file's
-    row INFRA and the chain goes on: a timeout or an infrastructure fault never decides a kill and never hides a later
-    valid one (VS-1, VS-2, VS-5, PL-2, ORD-2)."""
+    """Every kill file in kill-set order, each run clean. A FAIL is a kill only when the bracket confirms it (`_confirm`).
+    Then — and only then — the remaining files are skipped. Anything else makes that file's row INFRA and the chain goes
+    on: a timeout or an infrastructure fault never decides a kill and never hides a later valid one (VS-1, VS-2, VS-5,
+    PL-2, ORD-2)."""
     rows = entry["files"] = []
     _write(tg, src)
     for rel in tg.tests:
         row = _run_file(tg, rel, rows)
         if row["outcome"] != "FAIL":
             continue
-        sel = _select(row["first"], tg.ref[rel]["first_test"])
-        _write(tg, tg.null)
-        control = _run_file(tg, rel, rows, select=sel, role="control")
-        _write(tg, src)
-        again = _run_file(tg, rel, rows, select=sel, role="rerun")
-        if control["outcome"] == "PASS" and again["outcome"] == "FAIL" and again["first"] == row["first"]:
+        why = _confirm(tg, rel, rows, row, src)
+        if not why:
             entry["killed_by"] = {"file": rel, "first": row["first"], "seconds": row.get("seconds")}
             return
-        row.update(outcome="INFRA", why=f"kill not confirmed: the unmutated module {control['outcome']}, the mutant again "
-                                        f"{again['outcome']} {again.get('first') or again.get('why') or ''}".rstrip())
+        row.update(outcome="INFRA", why=f"kill not confirmed: {why}")
 
 
 def _classify(entry: dict, stopped: str | None = None) -> dict:
@@ -1465,14 +1482,14 @@ def _summarise(out: dict) -> dict:
 
 
 def _confirmed(r: dict) -> bool:
-    """A KILLED entry carries its bracket: the killing row FAIL, then the control PASS and the re-run FAIL with the same
-    signature, on the same file."""
+    """A KILLED entry carries its bracket (`BRACKET`): the killing row FAIL, then two control PASSes and the re-run FAIL
+    with the same signature, on the same file."""
     kb, rows = r.get("killed_by") or {}, r.get("files", [])
-    for i, x in enumerate(rows[:-2]):
+    for i, x in enumerate(rows):
         if "role" not in x and x["file"] == kb.get("file") and x["outcome"] == "FAIL" and x.get("first") == kb.get("first"):
-            c, a = rows[i + 1], rows[i + 2]
-            return (c.get("role"), c["file"], c["outcome"]) == ("control", x["file"], "PASS") and \
-                (a.get("role"), a["file"], a["outcome"], a.get("first")) == ("rerun", x["file"], "FAIL", x["first"])
+            got = [(y.get("role"), y["file"], y["outcome"], y.get("first") if y.get("role") == "rerun" else None)
+                   for y in rows[i + 1:i + 1 + len(BRACKET)]]
+            return got == [(role, x["file"], want, x["first"] if role == "rerun" else None) for role, _, want in BRACKET]
     return False
 
 
