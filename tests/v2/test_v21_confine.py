@@ -19,6 +19,7 @@ import subprocess
 import sys
 import tempfile
 import time
+import types
 import unittest
 from unittest import mock
 
@@ -284,6 +285,21 @@ class FailClosed(unittest.TestCase):
             self.assertEqual(confine._survivors("sleep 30.000001"), [9])
             self.assertGreaterEqual(time.monotonic() - t, 0.3)      # not before the grace has passed
         self.assertGreater(alive.call_count, 1)
+
+    def test_the_grace_used_is_survivor_grace_so_a_sleeper_ending_just_after_it_is_still_a_survivor(self):
+        """A survivor is dropped only by being gone, and the sleeper's lifetime is set against SURVIVOR_GRACE: a longer
+        grace than that lets a real survivor reach its own end inside it and go unreported (fail-open). On a clock of
+        the test's own, a sleeper alive until just after SURVIVOR_GRACE is a survivor, judged once the grace passed."""
+        from aisef2.runtime import process_range
+        mine, other = (process_range.Proc(9, 1, None, None, "sleep 30.000001"), process_range.Proc(8, 1, None, None, "sleep 30.000002"))
+        clock, ends = [0.0], confine.SURVIVOR_GRACE + 0.5
+        fake = types.SimpleNamespace(monotonic=lambda: clock[0], sleep=lambda s: clock.__setitem__(0, clock[0] + s))
+
+        def table():
+            return {9: mine, 8: other} if clock[0] < ends else {8: other}
+        with mock.patch.object(process_range, "process_table", table), mock.patch.object(confine, "time", fake):
+            self.assertEqual(confine._survivors("sleep 30.000001"), [9])
+        self.assertGreaterEqual(clock[0], confine.SURVIVOR_GRACE)
 
     @unittest.skipUnless(os.name == "posix", "a real process table")
     def test_a_killed_sleeper_is_no_survivor_a_live_one_is(self):
