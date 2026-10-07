@@ -31,6 +31,7 @@ MUTANTS = {
     "the developer result keeps its line breaks": ('        text = " ".join(text.split())', "        text = text"),
     "the run's secrets matched as given, not in the result's one-line form": (
         '{" ".join(str(x).split()) for x in secrets if x}', "{str(x) for x in secrets if x}"),
+    "a secret that is only whitespace kept as the secret \"\" (no `- {\"\"}`)": ('for x in secrets if x} - {""}', "for x in secrets if x}"),
     "attempts oldest first": ("reversed(list(enumerate(ended, 1))[-PACK_ATTEMPTS:])", "list(enumerate(ended, 1))[-PACK_ATTEMPTS:]"),
     "attempt cap 5": ("PACK_ATTEMPTS = 4000, 12, 4", "PACK_ATTEMPTS = 4000, 12, 5"),
     "no-proof list is every admitted criterion": ('sorted(set(a["criteria"]) - set(a["proofs"]))', 'sorted(set(a["criteria"]))'),

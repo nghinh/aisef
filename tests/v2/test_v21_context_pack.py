@@ -328,6 +328,17 @@ class Pack(Fixture):
         self.assertIn("x" * 290 + "[REDACTED] (journal seq 13)", cut)
         self.assertNotIn(secret[:6], cut)
 
+    def test_a_secret_that_is_only_whitespace_redacts_nothing(self):
+        """A secret is matched in its one-line form, and one that is only whitespace has "" for that form: "" is no
+        secret — str.replace("", "[REDACTED]") would put the mark between every two characters of the result."""
+        secret = "sk-test-0123456789abcdef"
+        ev = attempt(10, refuted=("C-ADD",), detail=f"developer outage: auth {secret} rejected")
+        want = self.pack(ev, secrets=(secret,))
+        self.assertIn("developer result: developer outage: auth [REDACTED] rejected (journal seq 13)", want)
+        for blank in (" ", "\n", " \t\r\n "):
+            with self.subTest(blank=repr(blank)):
+                self.assertEqual(self.pack(ev, secrets=(secret, blank)), want)
+
     def test_a_review_result_is_never_taken_for_the_developer_s(self):
         review = (("provider/request", {"budget_owner": "REVIEW"}), ("provider/result", {"detail": "3 findings"}))
         with_developer, without = self.pack(attempt(10, extra=review)), self.pack(attempt(10, extra=review, developer=False))
