@@ -18,19 +18,21 @@ at the head, at `at`, or — `at` = "with-table" — in the checkout that holds 
 after the head); the M-level of each REPORT item equals REPORT.md §2 at the head; each upstream source is a claim of
 UPSTREAM-RESEARCH.json with the same label (or, when the verifier reclassified it, the verifier's label and the original
 in `research_label`), the verifier's status, the commit read (7 hex digits or more), and every `file:line` of `where` a
-number that the research's or the verifier's evidence gives (for a corrected or refuted claim, only the verifier's
-evidence and correction) after a mention of a file of the same stem and before the next file mention — the rule cannot
-tell a line number from another number there, such as a percentage or a token count, nor a file from another of the same
-stem (`compute.rs` matches `compute.py`); a 360° item is verbatim in the assessment at the head; every row but a
-declined one names its gap (a word, not a dash: what is missing, or that nothing is); the acceptance cell is a criterion
-its source states (the proposal's §10 "Nghiệm thu cụ thể", §4.3 "Nghiệm thu bước đầu" or §12 gates; the 360's §6 "Thước
-đo xong" or §7 "Mục tiêu 2.1"; a trailing "(§n)", "(360 §n)" or "(đề xuất §n)" names the section), or says the source
-states none (NO_CRITERION), or is "—" on a declined row; a row whose `ref` names a §10 item ("§10 V2-03") quotes that
-item's own §10 criterion, never another item's and never NO_CRITERION. Outside §10 the rule cannot tell which stated
-criterion belongs to the item, nor whether the source states one for an item that says it states none. Open items and
-rows whose decision is `open` or `blocked` are the same set. The table block of TRACEABILITY.md is exactly --render's. A
-key the format does not know — at the top, in `sources`, in an open item, a row, a commit, a ref or an upstream entry —
-is a problem, never ignored; every revision is a hex commit id (`--at` and `--with-ref` are resolved by git first).
+number that one evidence text gives after a mention of a file of the same stem in that text and before its next file
+mention — the texts are, for a confirmed claim, the research's evidence and the verifier's evidence (not the verifier's
+correction), and for any other status (corrected, refuted, unverifiable) the verifier's evidence and correction (not the
+research's evidence); the rule cannot tell a line number from another number there, such as a percentage or a token
+count, nor a file from another of the same stem (`compute.rs` matches `compute.py`); a 360° item is verbatim in the
+assessment at the head; every row but a declined one names its gap (a word, not a dash: what is missing, or that nothing
+is); the acceptance cell is a criterion its source states (the proposal's §10 "Nghiệm thu cụ thể", §4.3 "Nghiệm thu bước
+đầu" or §12 gates; the 360's §6 "Thước đo xong" or §7 "Mục tiêu 2.1"; a trailing "(§n)", "(360 §n)" or "(đề xuất §n)"
+names the section), or says the source states none (NO_CRITERION), or is "—" on a declined row; a row whose `ref` names
+a §10 item ("§10 V2-03") quotes that item's own §10 criterion, never another item's and never NO_CRITERION. Outside §10
+the rule cannot tell which stated criterion belongs to the item, nor whether the source states one for an item that says
+it states none. Open items and rows whose decision is `open` or `blocked` are the same set. The table block of
+TRACEABILITY.md is exactly --render's. A key the format does not know — at the top, in `sources`, in an open item, a
+row, a commit, a ref or an upstream entry — is a problem, never ignored; every revision is a hex commit id (`--at` and
+`--with-ref` are resolved by git first).
 Proposal items and proposal acceptance cells are checked against the proposal only under --proposal.
 By default only objects reachable from the head are read: a cell on a branch of `other_refs` (a commit whose `ref`,
 or a reproducer whose `sha`, is that branch's commit) is checked only under `--with-ref`, and the OK line counts the
@@ -151,7 +153,7 @@ def _lines(text: str) -> set[tuple[str, str]]:
 
 
 def _cited(text: str) -> set[tuple[str, str]]:
-    """(file stem, number) of research or verifier evidence: each number goes with the file last mentioned before it."""
+    """(file stem, number) of one evidence text: each number goes with the file last mentioned before it there."""
     out, file = set(), None
     for m in CITES.finditer(text):
         if m.group(1):
@@ -328,7 +330,6 @@ def row_problems(row: dict, root: pathlib.Path, head: str, ctx: dict) -> list[st
         if claim is None or check is None:
             out.append(f"{rid}: upstream {u['key']}/{u['claim']} is not a verified claim")
             continue
-        said = check["evidence"] + " " + check.get("correction", "")
         new = RECLASSIFIED.search(check.get("correction", "")) if check["status"] != "confirmed" else None
         if u["label"] not in LABELS:
             out.append(f"{rid}: upstream {u['key']}/{u['claim']}: label {u['label']} is not one of {LABELS}")
@@ -341,14 +342,16 @@ def row_problems(row: dict, root: pathlib.Path, head: str, ctx: dict) -> list[st
         elif not new and (u["label"] != claim["status"] or "research_label" in u):
             out.append(f"{rid}: upstream {u['key']}/{u['claim']} is {claim['status']}, the row says {u['label']}"
                        + (" (research_label without a reclassification)" if "research_label" in u else ""))
+        # the texts a `where` number may come from, each read on its own (module docstring)
         if check["status"] == "confirmed":
-            said = claim["evidence"] + " " + said
-        lines, cited = _lines(u["where"]), _cited(said)
+            texts, whose = (claim["evidence"], check["evidence"]), "the research's or the verifier's evidence"
+        else:
+            texts, whose = (check["evidence"], check.get("correction", "")), "the verifier's evidence or correction"
+        lines, cited = _lines(u["where"]), set().union(*map(_cited, texts))
         if cited and not lines:
             out.append(f"{rid}: upstream {u['key']}/{u['claim']}: where names no file:line, the evidence does")
-        whose = "research or the verifier" if check["status"] == "confirmed" else "verifier"
-        out += [f"{rid}: upstream {u['key']}/{u['claim']}: where line {n} of {f} is not one the {whose}'s evidence "
-                f"cites for {f}" for f, n in sorted(lines - cited)]
+        out += [f"{rid}: upstream {u['key']}/{u['claim']}: where line {n} of {f} is not one {whose} cites for {f}"
+                for f, n in sorted(lines - cited)]
         if u["verify"] != check["status"]:
             out.append(f"{rid}: upstream {u['key']}/{u['claim']} was {check['status']}, the row says {u['verify']}")
         if u["repo"] != res["research"]["repo"]:

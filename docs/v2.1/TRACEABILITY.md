@@ -25,8 +25,9 @@ mục nguồn vào commit, test và mức đã có, và ghi rõ chỗ không xá
   (lý do) · `blocked` chặn trên một quyết định hay ngân sách có tên · `open` chưa làm và chưa có quyết định nào được ghi.
 - **Upstream**: `repo@commit` `tệp:dòng` — nhãn của tuyên bố trong nghiên cứu (**CODE** đọc trong mã · **README** chỉ
   tài liệu nói · **INFERENCE** suy luận chưa đo · **EXPERIMENT** số đo do upstream công bố · **NOT_FOUND** đề xuất nói
-  mà mã không xác nhận) và kết quả của người kiểm chứng thứ hai (confirmed / corrected / refuted). Khi "confirmed",
-  `tệp:dòng` là của nghiên cứu hoặc của người kiểm chứng; khi "corrected" hay "refuted", chỉ của người kiểm chứng; khi
+  mà mã không xác nhận) và kết quả của người kiểm chứng thứ hai (confirmed / corrected / refuted / unverifiable). Khi
+  "confirmed", số của `tệp:dòng` lấy từ bằng chứng của nghiên cứu hoặc bằng chứng của người kiểm chứng (không từ phần
+  sửa của người kiểm chứng); với mọi kết quả khác, chỉ từ bằng chứng hoặc phần sửa của người kiểm chứng; khi
   người kiểm chứng phân lại tuyên bố (N19 của open-code-review, N-18 của MiMo), nhãn là của người kiểm chứng và nhãn gốc
   của nghiên cứu ghi kèm.
 - **Mức (REPORT §2)**: mức của hạng mục REPORT tương ứng, chép nguyên và kiểm bằng máy; hàng không có hạng mục riêng
@@ -57,10 +58,12 @@ commit [`evidence/traceability-reproducers-c9c736f.out`](evidence/traceability-r
 chạy test, nên reproducer trích thêm sau lượt chạy bị nêu tên cho tới khi chạy lại; mỗi "kiểm cơ học" đúng và có đúng
 một khẳng định (chuỗi `contains`/`lacks` từ 4 ký tự, `exists` là true/false); mức khớp REPORT §2; mỗi nguồn upstream là
 một tuyên bố của nghiên cứu với đúng nhãn (của người kiểm chứng khi họ phân lại), đúng kết quả kiểm chứng, đúng commit
-đã đọc (≥ 7 chữ số hex), và mỗi `tệp:dòng` là một số mà bằng chứng của nghiên cứu hoặc của người kiểm chứng ghi (khi
-corrected/refuted: chỉ bằng chứng và phần sửa của người kiểm chứng) sau một lần nhắc một tệp **cùng tên gốc** (tên bỏ
-đuôi) và trước lần nhắc tệp kế tiếp — bộ kiểm không phân biệt số dòng với số khác ở đó (phần trăm, số token), cũng không
-phân biệt hai tệp cùng tên gốc (`compute.rs` khớp `compute.py`); mục 360° đúng nguyên văn; mọi hàng trừ `declined` ghi
+đã đọc (≥ 7 chữ số hex), và mỗi `tệp:dòng` là một số mà **một** văn bản bằng chứng ghi sau một lần nhắc một tệp **cùng
+tên gốc** (tên bỏ đuôi) trong chính văn bản đó và trước lần nhắc tệp kế tiếp — với tuyên bố confirmed, các văn bản là
+bằng chứng của nghiên cứu và bằng chứng của người kiểm chứng (không tính phần sửa của người kiểm chứng); với mọi kết quả
+khác (corrected, refuted, unverifiable), là bằng chứng và phần sửa của người kiểm chứng (không tính bằng chứng của
+nghiên cứu); bộ kiểm không phân biệt số dòng với số khác ở đó (phần trăm, số token), cũng không phân biệt hai tệp cùng
+tên gốc (`compute.rs` khớp `compute.py`); mục 360° đúng nguyên văn; mọi hàng trừ `declined` ghi
 phần còn thiếu (có chữ,
 không phải `—`); tiêu chí nghiệm thu nằm trong một đoạn nêu tiêu chí của nguồn, đúng mục khi có "(§n)", hoặc ghi rõ nguồn
 không nêu (tiêu chí của đề xuất chỉ kiểm khi có `--proposal`), và hàng mà `ref` là một mục §10 ("§10 V2-03") chép đúng

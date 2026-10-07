@@ -109,7 +109,7 @@ class Traceability(unittest.TestCase):
                     "P-7c": "where line 9999-10000 of", "P-V2-05": "where names no file:line",
                     "P-5.3a": "of no-such-file is not one the", "P-6.2c": "where line 9 of README is not one",
                     "P-6.2a": "is not one the research read", "P-11.3": "contains 'def' is not a string of 4 characters",
-                    "P-6.2b": "where line 875-924 of compute is not one the verifier's evidence cites",
+                    "P-6.2b": "where line 875-924 of compute is not one the verifier's evidence or correction cites",
                     "P-12-2": "test_facts_as_a_list is not listed ok in docs/v2.1/evidence/traceability-reproducers-c9c736f.out",
                     "P-12-4": "is not true or false", "P-5.2c": "paths names no path",
                     "P-4.2a": "decision is adopted names its gap", "R-M1": "decision is blocked names its gap",
@@ -135,6 +135,32 @@ class Traceability(unittest.TestCase):
                 run = f"{d}/{name}".format(self.table["head"][:7])
                 self.assertEqual(sorted(problems),
                                  sorted(f"{rid}: reproducer {spec} is not listed ok in {run}" for rid, spec in at_head))
+
+    def test_a_where_number_comes_only_from_the_texts_its_claims_status_allows(self):
+        """Confirmed: the research's or the verifier's evidence, never the verifier's correction. Any other status: the
+        verifier's evidence or correction, never the research's evidence. Each text is read on its own: a number before
+        its first file mention belongs to no file. Files match by stem: r.go matches the evidence's r.py."""
+        statuses = ("confirmed", "corrected", "refuted", "unverifiable")
+        upstream = self.table["sources"]["upstream"]
+        research = json.loads(TC.show(ROOT, self.table["head"], upstream))
+        research["results"].append({
+            "key": "fixture", "research": {"repo": "o/r", "head_commit": "a" * 40, "claims": [
+                {"id": s, "status": "CODE", "evidence": "r.py:10"} for s in statuses]},
+            "verify": {"checks": [{"id": s, "status": s, "evidence": "2 v.py:20", "correction": "3 c.py:30"}
+                                  for s in statuses]}})
+        t = copy.deepcopy(self.table)
+        row = t["rows"][0]
+        row["upstream"] = [{"key": "fixture", "repo": "o/r", "claim": s, "label": "CODE", "verify": s,
+                            "commit": "a" * 7, "where": "r.go:10, 2; v.py:20, 3; c.py:30"} for s in statuses]
+        real = TC.show
+        with mock.patch.object(TC, "show", lambda root, rev, path:
+                               json.dumps(research) if path == upstream else real(root, rev, path)):
+            problems = TC.check(t, ROOT)
+        named = {s: ("the verifier's evidence or correction", [("r", "10"), ("r", "2"), ("v", "3")]) for s in statuses}
+        named["confirmed"] = ("the research's or the verifier's evidence", [("c", "30"), ("r", "2"), ("v", "3")])
+        self.assertEqual(sorted(problems), sorted(
+            f"{row['id']}: upstream fixture/{s}: where line {n} of {f} is not one {whose} cites for {f}"
+            for s, (whose, lines) in named.items() for f, n in lines))
 
     def test_a_key_the_format_does_not_know_is_named_anywhere_in_the_table(self):
         cases = [({**self.table, "opne_items": []}, "the table: unknown key opne_items"),
