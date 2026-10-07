@@ -143,7 +143,10 @@ def build(root: pathlib.Path = ROOT, head: str = "HEAD") -> tuple[dict, dict]:
         "measured_at_final_head": len(a["measured_at_final_head"]),
         "reused_after_mechanical_proof": len(a["reused_after_mechanical_proof"]),
         "MUTANTS": sum(t["mutants"] for t in targets),
-        "KILLED": sum(t["killed"] for t in targets) - timeouts,
+        # a runner-2 result marks killed only the KILLED class and timed_out only the TIMEOUT class; on an old record
+        # (a timed-out result is always killed there) this is the old `sum(killed) - timeouts`
+        "KILLED": sum(1 for t in targets for r in t["results"] if r["killed"] and not r.get("timed_out")),
+        "CLASSES": {c: sum(t.get("classes", {}).get(c, 0) for t in targets) for c in m.CLASSES},
         "KILLED_BY_TIMEOUT": timeouts,
         "AUDITED_SURVIVORS": audited,
         "UNAUDITED_SURVIVORS": unaudited,

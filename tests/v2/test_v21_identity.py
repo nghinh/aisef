@@ -41,7 +41,7 @@ from aisef2.probe import cli_invocation as ci  # noqa: E402
 from aisef2.probe import process_effect as pe  # noqa: E402
 from aisef2.probe import python_callable as pc1  # noqa: E402
 from aisef2.probe import python_callable_v2 as pc2  # noqa: E402
-from aisef2.probe.calibration import calibration_env, executing, fixture_spec  # noqa: E402
+from aisef2.probe.calibration import executing, fixture_spec  # noqa: E402
 from aisef2.probe.protocol import ExecutionEnv, RevisionRef, run_probe  # noqa: E402
 from aisef2.product.contract import plain  # noqa: E402
 
@@ -65,19 +65,25 @@ class ThreeIdentities(unittest.TestCase):
         self.assertEqual(pc1.DIGEST, "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf")
         self.assertEqual(executing(pc1.PythonCallableProbe), pc1.DIGEST)
 
-    def test_the_shipped_calibrations_name_every_class_at_the_bytes_that_run_now(self):
-        have = {(r["probe_id"], r["probe_digest"], r["observation_class"]) for r in CALIBRATIONS}
-        for e in catalog.CATALOG:
-            if e.active:
-                for cls in e.classes:
-                    self.assertIn((e.probe_id, executing(e.factory), cls), have,
-                                  "a probe's bytes changed: run validation/qualification/release_calibration.py --write")
+    def test_every_active_probe_launch_starts_minus_I_minus_S_minus_B(self):
+        """The semantic half of test_v21_identity_bytes.PthChannel.test_every_active_probe_launch_carries_minus_S
+        (ORD-1 verifier (c)): its `_harness_argv` assertion, unchanged; the source-text counts stay there."""
+        for mod in (ci, pc2, pe):
+            with self.subTest(mod.PROBE_ID):
+                self.assertEqual(mod._harness_argv("/py", "/a", "/c")[1:4], ["-I", "-S", "-B"])
 
-    def test_calibrations_of_other_bytes_admit_nothing(self):
-        stale = tuple(dict(r, probe_digest="0" * 64) for r in CALIBRATIONS)
+    def test_calibrations_bound_to_the_bytes_that_run_admit_and_other_bytes_admit_nothing(self):
+        """The semantic half of test_v21_identity_bytes.ThreeIdentities.test_calibrations_of_other_bytes_admit_nothing
+        (ORD-1 verifier (c)): each shipped row re-bound, at run time, to the bytes its probe runs now — so the test holds
+        for any version of the probe modules, the null mutant included — admits the migrated 2.0.0 bundle; the same rows
+        at other bytes admit nothing, refused by check 9 for the executing digest; and calibrations() with no rows is the
+        shipped table."""
+        now = {e.probe_id: executing(e.factory) for e in catalog.CATALOG if e.active}
+        rows = tuple(dict(r, probe_digest=now.get(r["probe_id"], r["probe_digest"])) for r in CALIBRATIONS)
+        self.assertEqual(R.calibrations(), R.calibrations(CALIBRATIONS))
         project = bundle.load(bundle_cli.migrate(json.loads(LEDGERLOCK_2_0_0.read_text(encoding="utf-8")))[0])
-        self.assertTrue(R.admit(project, R.calibrations())["admitted"])
-        a = R.admit(project, R.calibrations(stale))
+        self.assertTrue(R.admit(project, R.calibrations(rows))["admitted"])
+        a = R.admit(project, R.calibrations(tuple(dict(r, probe_digest="0" * 64) for r in rows)))
         self.assertFalse(a["admitted"])
         self.assertEqual([f["check"] for f in a["failed"]], ["9. probe_calibration"])
         self.assertIn("executing", a["failed"][0]["problems"][0])
@@ -120,14 +126,6 @@ class PthChannel(unittest.TestCase):
         subprocess.run([self.python, "-I", "-B", "-c", "pass"], check=True)
         self.assertTrue(self.marker.exists(), "2.0.0's controller flags (-I -B) run the .pth")
 
-    def test_every_active_probe_launch_carries_minus_S(self):
-        for mod in (ci, pc2, pe):
-            with self.subTest(mod.PROBE_ID):
-                src = pathlib.Path(mod.__file__).read_text(encoding="utf-8")
-                self.assertNotIn('"-I", "-B"', src)                    # no launch without -S: controller, agent, subject
-                self.assertGreaterEqual(src.count('"-I", "-S", "-B"'), 2)
-                self.assertEqual(mod._harness_argv("/py", "/a", "/c")[1:4], ["-I", "-S", "-B"])
-
     def test_a_probe_on_an_interpreter_holding_a_pth_never_runs_it(self):
         probe = pc2.PythonCallableV2Probe()
         spec = fixture_spec(probe, FIXTURE)
@@ -135,13 +133,6 @@ class PthChannel(unittest.TestCase):
         rec = run_probe(probe, spec, at, ExecutionEnv(self.python, 30.0, Enforcement.PARTIAL))
         self.assertFalse(self.marker.exists(), "the probe's controller, agent or subject ran the injected .pth")
         self.assertEqual(rec.result.behavior_verdict.value, "SATISFIED", rec)
-
-    def test_the_run_gives_the_probes_this_interpreter_and_the_tests_their_own(self):
-        self.assertEqual(calibration_env(sys.executable).interpreter, sys.executable)
-        src = (ROOT / "aisef2/app/run.py").read_text(encoding="utf-8")
-        self.assertIn('env = ExecutionEnv(sys.executable, settings.timeouts_s["probe"]', src)
-        self.assertIn("test_interpreter=python)", src)
-        self.assertIn('python = probe_interpreter(out / "test-python")', src)
 
 
 class Migrate(unittest.TestCase):

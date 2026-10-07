@@ -27,14 +27,19 @@ made in the parsed script and written back into the constant, so the kill tests 
 from __future__ import annotations
 
 import ast
+import contextlib
 import copy
+import filecmp
 import hashlib
 import json
 import os
 import pathlib
+import re
 import shutil
+import stat
 import sys
 import tempfile
+import time
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
@@ -595,6 +600,8 @@ RECORDS["V2.0-S2"] = "closure-evidence/v2/release/S2-MUTATION.json"
 # and aisef2/app/calibrations.py::CALIBRATIONS — generated data (validation/qualification/release_calibration.py
 # rewrites it), proven by its calibration record and check 9, not by mutating its rows. S2_TARGETS stays whole (its
 # record's reuse proof and criteria read it); the V2.0-S2 phase keeps only what V2.1 does not take over.
+#: the semantic identity tests; tests/v2/test_v21_identity_bytes.py holds the byte/text-identity tests and is never a kill
+#: file (ORD-1: they fail the null mutant of the modules they read — docs/v2.1/MUTATION-RUNNER-V2.md §6)
 _V21_ID = "tests/v2/test_v21_identity.py"
 _V21_REG = {
     "aisef2/plan/static_admission.py": [_V21_ID], "aisef2/probe/calibration.py": [_V21_ID],
@@ -866,126 +873,693 @@ def mutants(module_src: str, func: str, enums: dict[str, list[str]]) -> list[tup
     return out
 
 
-def _run_tests(root: pathlib.Path, tests: list[str], boundary: ca.Boundary) -> tuple[bool, int]:
-    """(every kill test passed, processes the runner had to signal). Each run is a process range (WP-4.2): a timeout
-    takes down the whole tree it started, not only the direct child (P2-RESIDUAL-ORPHAN-SUBJECT: leaked harness
-    processes had skewed every later measurement). A mutant of the range code can break that containment — its tests
-    run the mutated code — so a range that will not empty, or that something escaped, fails the run and is cleaned up
-    here. P4-FINDING-011: what the range REPORTS (members, escapees, its group) is never permission; only
-    `cleanup_authority` decides what is signalled, from its own reading of the host, and a candidate it cannot prove
-    the runner's is RESIDUAL_OWNERSHIP_UNKNOWN — left alone, and the target fails."""
-    from aisef2.runtime.process_range import ProcessRange
-    from aisef2.runtime.story_scope import Residual
-    env = {k: v for k, v in os.environ.items() if k != "PYTHONPATH"}
-    leaked = 0
-    for rel in tests:
-        path = pathlib.PurePosixPath(rel)
-        # failfast: a mutant is killed by its first failing test; the rest of the file cannot change that verdict
-        cmd = [sys.executable, "-m", "unittest", "discover", "-f", "-s", str(path.parent), "-t", "tests", "-p", path.name]
-        log = root.parent / "kill-test.log"   # beside the work tree: its tail explains a failing run (OBS-S2-3)
-        with open(log, "wb") as out:
-            r = ProcessRange(f"kill tests {rel}", cmd, cwd=root, env=env, output=out).start()
-        code = r.wait(TIMEOUT)
-        escaped = [p.pid for p in r.escaped()]  # reported while their parents are alive — checked, never trusted
-        try:
-            r.release()
-        except Residual:
-            reported = [p.pid for p in r.members()] + escaped
-            anchor = getattr(getattr(r, "_anchor", None), "pid", None)
-            report = ca.signal_owned(boundary, pids=reported, groups=[anchor] if anchor else ())
-            _CLEANUP.extend(report.signalled)
-            if report.residual_ownership_unknown:
-                raise ca.Unproven(f"{rel}: {report.unproven}") from None
-            return False, leaked + len(report.signalled)
-        if code is None:
-            _TIMED_OUT.append(rel)  # a kill by timeout is a kill, and the record says so (load can cause one)
-            return False, leaked
-        if code != 0:
-            _FAILED.append(f"{rel} exit {code}: " + log.read_text(encoding="utf-8", errors="replace")[-2000:])
-            return False, leaked
-    return True, leaked
+def _write_version(path: pathlib.Path, src: str, last: int) -> int:
+    """Write one version of the mutated file with a whole-second mtime strictly above every earlier version's (BC-1).
+    A timestamp .pyc is accepted when (int mtime, size) match its header, so two versions of one size written in one
+    second share a .pyc, and the second runs the first one's code: whichever process wrote it (`-I` children ignore
+    PYTHONDONTWRITEBYTECODE and PYTHONPYCACHEPREFIX) and wherever it lives (BC-2, BC-4). With a stamp no earlier version
+    had, no cached .pyc of another version can be accepted. Stamps may run ahead of the clock by about a second per
+    fast mutant; no aisef2 code and no kill test reads the mutated module's mtime (BC-1 verifier)."""
+    path.write_text(src, encoding="utf-8")
+    stamp = max(last + 1, int(time.time()))
+    os.utime(path, (stamp, stamp))
+    return stamp
 
 
-#: kill-test runs the current mutant ended by timeout (drained per mutant into its result)
-_TIMED_OUT: list[str] = []
-#: every signal the runner sent for the current mutant, each with the authority's proof (drained into its result)
-_CLEANUP: list[dict] = []
-#: the failing kill-test run's file, exit status and output tail (read when the unmutated tree fails)
-_FAILED: list[str] = []
+#: The kill-test environment is an allowlist (§2.2): the worker env's keys and, on Windows, what Python needs to start
+#: there; an operator shell's PYTHON* variables never reach a kill test, so a run from a shell and one from a worker
+#: are the same. HOME, TMPDIR and XDG_* are fresh directories of each run, removed after it (FS-1, FS-3, ORD-5, PL-8).
+ENV_KEEP = ("PATH", "LANG", "USER", "LOGNAME", "SYSTEMROOT", "SystemRoot", "WINDIR")
+_FRESH = {"HOME": "home", "TMPDIR": "tmp", "XDG_CONFIG_HOME": "config", "XDG_DATA_HOME": "data", "XDG_STATE_HOME": "state",
+          "XDG_CACHE_HOME": "cache", **({"USERPROFILE": "home", "TEMP": "tmp", "TMP": "tmp"} if os.name == "nt" else {})}
+#: every kill-file run carries `AISEF_MUTATION_RUN=<worker>:<run>`: how a detached leftover that names no tree is found
+#: (PL-1) — a candidate, never proof (a child given its own environment does not carry it)
+TOKEN = "AISEF_MUTATION_RUN"
+#: an unproven leftover is watched this long for its own exit, never signalled (PL-7); still alive after it, the target
+#: and the worker stop. Long enough for a short-lived helper to end by itself — the 8 s detached sleep of
+#: test_v21_continue_integrity.py, or ORD-7's 30 s escapee — since in an order that never reaches its file the same
+#: target is classified, so a stop here is an order-dependent fate (ORD-7); paid only while something is left running
+SETTLE_S = 60.0
 
 
-def _reap_strays(work: pathlib.Path, boundary: ca.Boundary) -> int:
-    """Signal, by group, every process still running from the mutated tree after its kill tests, and count them (the
-    count also carries what a broken range left behind, see `_run_tests`). A mutant of the range code can break the
-    very containment its tests rely on (a mutated anchor that leaves its group and ignores EOF outlived a P4 run and
-    spun for 40 minutes, skewing every later timeout). Candidates come from the authority's own host table, and each is
-    signalled only with its proof (P4-FINDING-011); one it cannot prove is RESIDUAL_OWNERSHIP_UNKNOWN. POSIX: on
-    Windows the kill tests' own ranges are jobs with no breakaway."""
+class _Stop(ca.Unproven):
+    """The target and the worker stop: a leftover the authority cannot prove (RESIDUAL_OWNERSHIP_UNKNOWN), or a host
+    table that cannot be read. `leaked` names what was found."""
+
+    def __init__(self, why: str, leaked: list | None = None):
+        super().__init__(why)
+        self.code, _, self.detail = why.partition(": ")
+        self.leaked = leaked or []
+
+
+class _Target:
+    """One target's working state: its scratch directory (trees, run directories — never inside a tree), the ownership
+    boundary, the tree and its base manifest, the version of the mutated file in it and its stamp, the run counter, the
+    kill set, the unmutated module the bracket's control runs on, and T0's reference per file. A plain class, not a
+    dataclass: callers load this module by path without a sys.modules entry (p2, p4 tests)."""
+
+    def __init__(self, rel, scratch, boundary, worker, tree=None, pristine=None, tests=(), last=0):
+        self.rel, self.scratch, self.boundary, self.worker, self.tree = rel, scratch, boundary, worker, tree
+        self.pristine, self.tests, self.last = pristine, list(tests), last   # pristine None: the caller's own tree
+        self.holder = self.base = self.version = self.null = None
+        self.seq, self.ref = 0, {}   # ref: file -> T0's {"ref": [counts, skipped tests], "first_test"}
+
+
+def _worker(root: pathlib.Path) -> str:
+    """A stable name of the worker that runs from `root`: a restarted worker finds what an earlier run of it left (PL-3)."""
+    return hashlib.sha256(str(pathlib.Path(root).resolve()).encode()).hexdigest()[:12]
+
+
+def _pristine(root: pathlib.Path, dst: pathlib.Path) -> tuple[pathlib.Path, str]:
+    """The COPY parts of `root`, taken once (per `main()`, before any record is written) with `__pycache__` and the
+    runner's own record files left out — by exact path, never a name pattern — so a live record never enters a tree
+    (FS-4); and the tree's digest: sha256 over the sorted (path, sha256 of bytes) pairs, no mtimes."""
+    records = {os.path.normpath(root / r) for r in RECORDS.values()}
+
+    def skip(d, names):
+        return [n for n in names if n == "__pycache__" or os.path.normpath(os.path.join(d, n)) in records]
+    for part in COPY:
+        src = root / part
+        if src.is_dir():
+            shutil.copytree(src, dst / part, ignore=skip)
+        elif src.exists() and os.path.normpath(src) not in records:
+            (dst / part).parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(src, dst / part)
+    h = hashlib.sha256()
+    for p in sorted(x for x in dst.rglob("*") if x.is_file()):
+        h.update(p.relative_to(dst).as_posix().encode() + b"\0" + hashlib.sha256(p.read_bytes()).digest())
+    return dst, h.hexdigest()
+
+
+def _manifest(tree: pathlib.Path, skip: str | None) -> dict[str, tuple]:
+    """relpath -> ("d", mode) for a directory, (kind, size, mtime_ns, mode) for anything else (lstat). `__pycache__`
+    subtrees are left out (bytecode is `_write_version`'s); so is the mutated file, checked by its bytes. Directory
+    mtimes are never compared: creating `__pycache__` changes them (FS-1 verifier (c))."""
+    out = {}
+    for d, dirs, files in os.walk(tree):
+        dirs[:] = [x for x in dirs if x != "__pycache__"]
+        for x in dirs + files:
+            rel = pathlib.Path(os.path.relpath(os.path.join(d, x), tree)).as_posix()
+            st = os.lstat(os.path.join(d, x))
+            if stat.S_ISDIR(st.st_mode):
+                out[rel] = ("d", st.st_mode)
+            elif rel != skip:
+                out[rel] = ("l" if stat.S_ISLNK(st.st_mode) else "f", st.st_size, st.st_mtime_ns, st.st_mode)
+    return out
+
+
+def _write(tg: _Target, src: str) -> None:
+    tg.version, tg.last = src, _write_version(tg.tree / tg.rel, src, tg.last)
+
+
+def _new_tree(tg: _Target) -> None:
+    """A fresh tree from the pristine copy, the version under test written into it (stamped), its base manifest taken;
+    the old tree is removed (its own TemporaryDirectory). The boundary names the scratch directory, which holds every
+    tree, so it does not move."""
+    holder = tempfile.TemporaryDirectory(dir=tg.scratch, prefix="tree-", ignore_cleanup_errors=True)
+    tree = pathlib.Path(holder.name) / "tree"
+    shutil.copytree(tg.pristine, tree)
+    old, tg.holder, tg.tree = tg.holder, holder, tree
+    if tg.version is not None:
+        _write(tg, tg.version)
+    tg.base = _manifest(tree, tg.rel)
+    if old is not None:
+        old.cleanup()
+
+
+def _residue(tg: _Target) -> dict:
+    """What a run left in the tree: paths added or removed, and paths whose type, mode or content changed (a file only
+    touched, or rewritten with its own bytes, is not residue — except a `.py` source, whose mtime is half of what its
+    cached bytecode is checked against); the mutated file must still hold the version under test, with its stamp.
+    Empty when the tree is the pristine copy plus that version."""
+    now = _manifest(tg.tree, tg.rel)
+    base = tg.base
+
+    def same(k):
+        a, b = now[k], base[k]
+        if a[0] != b[0] or a[-1] != b[-1] or a[0] == "d":
+            return a == b
+        if a[0] == "l":
+            return os.readlink(tg.tree / k) == os.readlink(tg.pristine / k)
+        if k.endswith(".py") and a[2] != b[2]:   # a source touched in place: a .pyc of other bytes can match it again
+            return False
+        return filecmp.cmp(tg.tree / k, tg.pristine / k, shallow=False)
+    added, removed = sorted(set(now) - set(base)), sorted(set(base) - set(now))
+    changed = sorted(k for k in set(now) & set(base) if now[k] != base[k] and not same(k))
+    try:   # stamps are whole seconds, so any touch or rewrite of the mutated file shows in its mtime (BC-1 lens)
+        held = (tg.tree / tg.rel).read_text(encoding="utf-8") == tg.version and \
+            (tg.tree / tg.rel).stat().st_mtime_ns == tg.last * 10**9
+    except (OSError, UnicodeDecodeError):
+        held = False
+    changed += [] if held else [tg.rel]
+    # the cwd is the tree, so '../x' and '../../x' are reachable too: the tree's holder must hold only the tree, and the
+    # target's scratch only that holder and its own pristine copy (filesystem-state lens: residue beside the tree)
+    beside = sorted(set(os.listdir(tg.tree.parent)) - {"tree"})
+    scratch = sorted(set(os.listdir(tg.scratch)) - {tg.tree.parent.name, *(
+        [tg.pristine.name] if tg.pristine.parent == tg.scratch else [])})
+    return {k: v[:50] for k, v in (("added", added), ("removed", removed), ("changed", changed), ("beside", beside),
+                                   ("scratch", scratch)) if v}
+
+
+def _env(run: pathlib.Path, token: str) -> dict[str, str]:
+    env = {k: os.environ[k] for k in ENV_KEEP if k in os.environ}
+    for k, d in _FRESH.items():
+        (run / d).mkdir(exist_ok=True)
+        env[k] = str(run / d)
+    return {**env, TOKEN: token}
+
+
+def _watch(pids) -> list[int]:
+    """The pids still in the authority's host table after at most SETTLE_S, polled — nothing is signalled (PL-7)."""
+    deadline = time.monotonic() + SETTLE_S
+    while True:
+        table = ca.host_table()
+        left = [p for p in pids if p in table]
+        if not left or time.monotonic() >= deadline:
+            return left
+        time.sleep(0.25)
+
+
+def _clean(boundary: ca.Boundary, pids, groups, table=None) -> ca.Report:
+    """Signal what the authority proves the runner's (the only signal path: INV-MUTATION-AUTHORITY), then watch every
+    pid named, signalled or not, until it is gone; one still alive after SETTLE_S stops the target and the worker."""
+    try:
+        report = ca.signal_owned(boundary, pids=pids, groups=groups, table=table)
+        left = _watch(pids)
+    except OSError as e:
+        raise _Stop(f"HOST_TABLE_UNREADABLE: {e}") from None
+    if left:
+        raise _Stop(f"{ca.RESIDUAL_OWNERSHIP_UNKNOWN}: alive after {SETTLE_S}s: {left}; unproven {report.unproven}")
+    return report
+
+
+def _leftovers(tg: _Target, table: dict) -> dict[int, ca.Host]:
+    """What this worker left running: processes carrying its token (PL-1), naming the target's scratch directory, which
+    holds its trees and run directories (`ca.strays`; the union keeps command-line matching, since code under mutation
+    builds scrubbed environments — PL-6 verifier), or working inside it (`ca.cwd_under`: a helper given its own
+    environment and no scratch path still has the cwd it inherited — PL-1 (3), process-env prover). Candidates only."""
+    found = {p.pid: p for p in ca.strays(tg.boundary, table)}
+    found.update((p.pid, p) for p in ca.carriers(f"{TOKEN}={tg.worker}:", table))
+    found.update((p.pid, p) for p in ca.cwd_under(tg.boundary.root + os.sep, table, tg.boundary.since))
+    return found
+
+
+def _settle(tg: _Target) -> tuple[list[dict], list[dict]]:
+    """(leaked, cleanup) after a run: every leftover, signalled only with the authority's proof, the rest watched for
+    their own exit; `_Stop` when one outlives SETTLE_S. POSIX: on Windows a kill test's range is a job with no breakaway."""
     if os.name != "posix":
-        return 0
-    found = ca.strays(boundary)
-    report = ca.signal_owned(boundary, pids=[p.pid for p in found], groups=sorted({p.pgid for p in found}))
-    _CLEANUP.extend(report.signalled)
-    if report.residual_ownership_unknown:
-        raise ca.Unproven(f"strays of {work}: {report.unproven}")
-    return len(report.signalled)
+        return [], []
+    try:
+        table = ca.host_table()
+        found = _leftovers(tg, table)
+    except OSError as e:
+        raise _Stop(f"HOST_TABLE_UNREADABLE: {e}") from None
+    if not found:
+        return [], []
+    leaked = [{"pid": p.pid, "command": p.command[:120]} for p in found.values()]
+    try:
+        report = _clean(tg.boundary, sorted(found), sorted({p.pgid for p in found.values()}), table)
+    except _Stop as e:
+        raise _Stop(str(e), [dict(x, proved=False) for x in leaked]) from None
+    proved = {s["id"] for s in report.signalled}
+    return [dict(x, proved=x["pid"] in proved) for x in leaked], report.signalled
 
 
-def run_target(root: pathlib.Path, target: str, tests: list[str]) -> dict:
-    rel, func = target.split("::")
-    with tempfile.TemporaryDirectory() as t:
-        work = pathlib.Path(t) / "tree"
-        for part in COPY:
-            src = root / part
-            if src.is_dir():
-                shutil.copytree(src, work / part, ignore=shutil.ignore_patterns("__pycache__"))
-            elif src.exists():
-                (work / part).parent.mkdir(parents=True, exist_ok=True)
-                shutil.copy(src, work / part)
-        path = work / rel
-        original = path.read_text(encoding="utf-8")
-        boundary = ca.establish(work)  # P4-FINDING-011: the runner's own ownership boundary, before any worker
-        _FAILED.clear()
-        _TIMED_OUT.clear()
+def _earlier(worker: str) -> list[int]:
+    """Processes an earlier run of this worker left (its token, or one of its scratch directories in the command line),
+    still alive after SETTLE_S: a restarted worker never runs beside them (PL-3 verifier (e)). Nothing is signalled:
+    they were born before this run's boundary, so nothing about them can be proven."""
+    if os.name != "posix":
+        return []
+    table = ca.host_table()
+    mark = ca.Boundary(os.getpid(), 0.0, os.path.join(tempfile.gettempdir(), f"aisef-mut-{worker}-"))
+    found = {p.pid for p in ca.strays(mark, table)} | {p.pid for p in ca.carriers(f"{TOKEN}={worker}:", table)} | \
+        {p.pid for p in ca.cwd_under(mark.root, table)}
+    return _watch(sorted(found)) if found else []
+
+
+#: The release ladder's last stage is bounded at this call site (VS-7/PL-5); ProcessRange's own default (no limit) stays,
+#: as tests/v2/p4 asserts it. A range still not empty after it is a residual: INFRA, never a kill. One budget per run:
+#: the second release() after a RangeNotEmpty gets only what the first left of it, so a run holds its worker at most
+#: TIMEOUT + RELEASE_WAIT_S + both ladders' graces (2 x 4 s) + the settle (process-env prover: it was about 2x)
+RELEASE_WAIT_S = 60.0
+#: the normalised output tail a non-PASS row keeps (every row keeps its sha256)
+TAIL = 1500
+#: the per-mutant classes (§4.1); only KILLED and SURVIVED are verdicts
+CLASSES = ("KILLED", "SURVIVED", "TIMEOUT", "INFRA", "NOT_RUN")
+#: test files that are part of the suite and never kill evidence: each holds only tests that fail the null mutant of
+#: every target they could be a kill file for (byte and text identity, ORD-1) — the module docstring's rule, the same as
+#: the compiler_digest tests'. A kill set naming one is refused.
+NOT_KILL_FILES = ("tests/v2/test_v21_identity_bytes.py",)
+
+_RAN = re.compile(r"^Ran (\d+) tests? in [\d.]+s$", re.M)
+_END = re.compile(r"^(OK|FAILED)(?: \((.*)\))?$", re.M)
+_HEAD = re.compile(r"^(FAIL|ERROR|UNEXPECTED SUCCESS): (.+)$", re.M)
+_TEST = re.compile(r"^(\w+) \(([\w.]+)\)", re.M)
+_SKIP = re.compile(r"^ *(\S+ \([\w.]+\)(?: \[[^\n]*\]| \([^\n]*\))?)(?:\n[^\n]*)? \.\.\. skipped", re.M)
+
+
+def _summary(text: str) -> dict | None:
+    """unittest's own summary of a run (`-v`), read only after the LAST `Ran N tests in` line, so text a test prints
+    cannot forge it: ran, status, counts, the skipped tests, the first test the run listed, and `first` — the first
+    failure's signature: its whole header line (a subtest's [msg] or (params) included) and the class of the exception
+    its traceback ended in. None when there is none (a crash, a signal, exit 5, os._exit)."""
+    runs = list(_RAN.finditer(text))
+    end = _END.search(text, runs[-1].end()) if runs else None
+    if not end:
+        return None
+    body = text[:runs[-1].start()]
+    counts = {k.strip().replace(" ", "_"): int(v) for k, v in (p.split("=", 1) for p in (end[2] or "").split(", ") if "=" in p)}
+    first, head = None, _HEAD.search(body)
+    if head:
+        block = body[head.end():].split("\n" + "=" * 70 + "\n", 1)[0].split("Traceback (most recent call last):\n")
+        exc = next((ln.split(":", 1)[0] for ln in block[-1].splitlines() if ln and not ln[0].isspace()), "") \
+            if len(block) > 1 else ""
+        first = f"{head[1]}: {head[2]}" + (f" | {exc}" if exc else "")
+    test = next((t[2] for t in _TEST.finditer(body) if t[2].endswith("." + t[1]) and not t[2].startswith("unittest.")), None)
+    return {"ran": int(runs[-1][1]), "status": end[1], **counts, "first": first,
+            "skipped_tests": sorted(x[1] for x in _SKIP.finditer(body)), "first_test": test}
+
+
+def _counts(s: dict) -> list[int]:
+    return [s.get("ran", 0), s.get("skipped", 0), s.get("expected_failures", 0), s.get("unexpected_successes", 0)]
+
+
+def _outcome(code: int | None, elapsed: float, s: dict | None, ref: list | None) -> tuple[str, str | None]:
+    """PASS / FAIL / TIMEOUT / INFRA for one run, from the exit status and the elapsed time taken before release()
+    (VS-3) and the summary. `ref`: T0's [counts, skipped tests] for this file; None for T0 itself and for one test."""
+    if code is None:   # WaitContract (tests/v2/test_v2_006.py): a real timeout never returns before its deadline
+        return ("TIMEOUT", None) if elapsed >= TIMEOUT else ("INFRA", f"report channel lost after {elapsed:.2f}s")
+    if s is None:
+        return "INFRA", f"exit {code}, no unittest summary"            # a signal, exit 5, a crash, os._exit
+    bad = s.get("failures", 0) + s.get("errors", 0) + s.get("unexpected_successes", 0)
+    if code == 0 and s["status"] == "OK" and not bad:
+        if ref is None:
+            return ("PASS", None) if s["ran"] > s.get("skipped", 0) else ("INFRA", "every test skipped")   # VS-6
+        if [_counts(s), s["skipped_tests"]] != ref:
+            return "INFRA", f"counts {_counts(s)} or skipped tests differ from T0's {ref[0]}"           # VS-6
+        return "PASS", None
+    if code == 1 and s["status"] == "FAILED" and bad:
+        return ("FAIL", None) if s["first"] else ("INFRA", "no failing test named")
+    return "INFRA", f"exit {code} with {s['status']} {_counts(s)}"
+
+
+def _select(first: str, first_test: str | None) -> str | None:
+    """The `-k` pattern that runs only what failed: the failing test (a subtest's whole test), or the class whose
+    setUpClass/tearDownClass failed; for a module-level failure (an import, setUpModule) the file's first test, which
+    imports the module and sets it up. None: the whole file."""
+    m = re.match(r"(\w+) \(([\w.]+)\)", first.split(": ", 1)[1])
+    if m and m[2].endswith("." + m[1]) and not m[2].startswith("unittest."):
+        return f"*{m[2]}"
+    if m and m[1] in ("setUpClass", "tearDownClass"):
+        return f"*{m[2]}.*"
+    return f"*{first_test}" if first_test else None
+
+
+def _tail(text: str, tg: _Target, run: pathlib.Path) -> str:
+    """The output, normalised so two identical outcomes hash identically across runs and orders (ORD-6 verifier)."""
+    for path, name in ((run, "<run>"), (tg.tree, "<tree>"), (tg.scratch, "<scratch>")):
+        text = text.replace(os.path.realpath(path), name).replace(str(path), name)
+    text = re.sub(r"^(Ran \d+ tests?) in [\d.]+s$", r"\1", text, flags=re.M)
+    return re.sub(r"0x[0-9a-fA-F]+", "0x?", text)[-TAIL:]
+
+
+def _named(r, residual: Exception, not_empty: bool) -> list[int]:
+    """The pids release() named: the `[(pid, command), ...]` its message ends with, read structurally after the exact
+    prefix release() writes, rebuilt from the range's own name and ledger — so no text in a command line (which the
+    code under test controls: '(1, ' in an escapee's source) can add a pid (process-env prover). A message of another
+    shape stops the target: what it names is unknown."""
+    head = (f"{r.name}: not empty after {[s['stage'] for s in r.ledger]}: " if not_empty
+            else f"{r.name}: processes left the range and are alive: ")
+    text = str(residual)
+    try:
+        if not text.startswith(head):
+            raise ValueError(text[:120])
+        return [int(pid) for pid, _ in ast.literal_eval(text[len(head):])]
+    except (ValueError, TypeError, SyntaxError) as e:
+        raise _Stop(f"{ca.RESIDUAL_OWNERSHIP_UNKNOWN}: release() named processes in a form not read: {e}") from None
+
+
+def _run_file(tg: _Target, rel: str, rows: list, *, select: str | None = None, failfast: bool = True,
+              role: str | None = None, fresh: bool = False) -> dict:
+    """One run of kill file `rel` — or of what `select` names in it — on the version in the tree, in a clean environment
+    (§2), judged from the exit status and the elapsed time taken before release() (VS-3). After it, in this order: its
+    leftovers are settled (`_settle`; a process the authority cannot prove stops the target), the run directory is
+    removed, and the tree is checked and rebuilt when it differs. All of it goes on this run's own row (PL-4), which is
+    in `rows` before anything can stop the target. Only `cleanup_authority` signals anything (P4-FINDING-011)."""
+    from aisef2.runtime.process_range import ProcessRange, RangeError, RangeNotEmpty
+    from aisef2.runtime.story_scope import Residual
+    tg.seq += 1
+    begun, elapsed = time.monotonic(), 0.0
+    row: dict = {"file": rel, **({"role": role} if role else {}), **({"select": select} if select else {}),
+                 **({"fresh": True} if fresh else {})}
+    rows.append(row)
+    holder = None
+    path = pathlib.PurePosixPath(rel)
+    # failfast: a mutant is killed by its first failing test; -v names every test and every skip
+    cmd = [sys.executable, "-m", "unittest", "discover", "-v", *(["-f"] if failfast else []), "-s", str(path.parent),
+           "-t", "tests", "-p", path.name, *(["-k", select] if select else [])]
+    try:
+        holder = tempfile.TemporaryDirectory(dir=tg.scratch, prefix="run-")
+        run = pathlib.Path(holder.name)
+        log = run / "kill-test.log"   # beside the run's own directories, never in the tree (OBS-S2-3)
         try:
-            clean, leaked = _run_tests(work, tests, boundary)
-        except ca.Unproven as e:
-            return {"target": target, "error": f"{ca.RESIDUAL_OWNERSHIP_UNKNOWN}: {e}", "mutants": []}
-        if not clean or leaked:
-            return {"target": target, "error": f"kill tests fail on the unmutated tree (leaked {leaked})",
-                    "mutants": [], "baseline": {"timed_out": list(_TIMED_OUT), "failed": list(_FAILED)}}
-        results = []
-        for desc, src in mutants(original, func, _enum_members(original, work)):
-            path.write_text(src, encoding="utf-8")
-            _TIMED_OUT.clear()
-            _CLEANUP.clear()
+            with open(log, "wb") as out:
+                r = ProcessRange(f"kill tests {rel}", cmd, cwd=tg.tree, env=_env(run, f"{tg.worker}:{tg.seq}"),
+                                 output=out, wait_s=RELEASE_WAIT_S).start()
+        except (OSError, RangeError) as e:   # VS-4 (b): fork EAGAIN, EMFILE, SPAWN_FAILED — the chain goes on
+            r = None
+            row.update(outcome="INFRA", why=f"start failed: {type(e).__name__}: {e}")
+        if r is not None:
+            t = time.monotonic()
+            code = r.wait(TIMEOUT)
+            elapsed = time.monotonic() - t
+            row.update(exit=code, seconds=round(elapsed, 2))
+            escaped = [p.pid for p in r.escaped()]   # reported while their parents are alive — checked, never trusted
+            residual, released = None, time.monotonic()
             try:
-                passes, leaked = _run_tests(work, tests, boundary)
-                strays = _reap_strays(work, boundary) + leaked
-            except ca.Unproven as e:
-                path.write_text(original, encoding="utf-8")
-                return {"target": target, "error": f"{ca.RESIDUAL_OWNERSHIP_UNKNOWN} at mutant {desc!r}: {e}",
-                        "mutants": [], "cleanup": list(_CLEANUP)}
-            killed = not passes
-            result = {"mutant": desc, "killed": killed}
-            if _TIMED_OUT:
-                result["timed_out"] = list(_TIMED_OUT)  # killed by the clock, not by an assertion: named, so a
-                #                                          loaded machine cannot pass off a timeout as evidence
-            if strays:
-                result["strays_reaped"] = strays
-            if _CLEANUP:
-                result["cleanup"] = list(_CLEANUP)  # each signal with the authority's proof of ownership
-            results.append(result)
-        path.write_text(original, encoding="utf-8")
-    survivors = [r["mutant"] for r in results if not r["killed"]]
-    return {"target": target, "kill_tests": tests, "source_sha256": source_digest(original),
-            "mutants": len(results), "killed": len(results) - len(survivors),
-            "survivors": survivors, "strays_reaped": sum(r.get("strays_reaped", 0) for r in results),
-            "killed_by_timeout": sum(1 for r in results if r.get("timed_out")), "results": results}
+                r.release()
+            except Residual as e:
+                residual = e
+            text = log.read_bytes().decode("utf-8", "replace").replace("\r\n", "\n")
+            s = _summary(text)
+            outcome, why = _outcome(code, elapsed, s, tg.ref.get(rel, {}).get("ref") if select is None else None)
+            row.update(outcome=outcome, why=why)
+            if s is not None:
+                row.update({k: v for k, v in s.items() if k not in ("status", "skipped_tests", "first_test") and v} |
+                           ({"skipped_tests": s["skipped_tests"]} if s["skipped_tests"] else {}) |
+                           ({"first_test": s["first_test"]} if role == "t0" and s["first_test"] else {}))
+            tail = _tail(text, tg, run)
+            row["tail_sha256"] = hashlib.sha256(tail.encode()).hexdigest()
+            if outcome != "PASS":
+                row["tail"] = tail
+            if residual is not None:
+                row["residual"] = f"{type(residual).__name__}: {str(residual)[:300]}"
+                pids = sorted({p.pid for p in r.members()} | set(escaped) |
+                              set(_named(r, residual, isinstance(residual, RangeNotEmpty))))
+                anchor = None if r._reaped else r._anchor.pid   # a reaped anchor's group no longer exists (PL-5 (b))
+                row.setdefault("leaked", []).extend({"pid": p, "at": "release"} for p in pids)
+                report = _clean(tg.boundary, pids, [anchor] if anchor else [])
+                row.setdefault("cleanup", []).extend(report.signalled)
+                if isinstance(residual, RangeNotEmpty):   # the range would not empty under its own ladder: no verdict
+                    row.update(judged_before_release=outcome, outcome="INFRA", why=f"residual: {row['residual']}")
+                    r._wait = max(0.0, RELEASE_WAIT_S - (time.monotonic() - released))   # what the budget has left
+                    try:
+                        r.release()   # its group is gone now: reap the anchor
+                    except Residual as e:
+                        raise _Stop(f"{ca.RESIDUAL_OWNERSHIP_UNKNOWN}: the range would not empty: {e}") from None
+                # RangeEscaped whose escapees are gone (signalled with proof, or gone by themselves within SETTLE_S):
+                # the run started clean and keeps its outcome; what it left is named on its row (PL-1, PL-7 verifiers)
+        leaked, signalled = _settle(tg)
+        if leaked:
+            row.setdefault("leaked", []).extend(leaked)
+            row.setdefault("cleanup", []).extend(signalled)
+        try:
+            holder.cleanup()
+        except OSError as e:
+            row.update(outcome="INFRA", why=f"run directory not removed: {e}")
+        if tg.pristine is not None:
+            residue = _residue(tg)
+            if residue:
+                row["residue"] = residue
+                if "scratch" in residue:   # nothing the runner may remove holds it (no destructive site): stop
+                    raise _Stop(f"RESIDUE_UNREMOVABLE: {residue['scratch']} left in the target's scratch directory")
+                _new_tree(tg)   # a new holder too, so what was left beside the tree goes with the old one
+    except _Stop as e:
+        row.setdefault("outcome", "INFRA")
+        row["stopped"] = str(e)
+        row.setdefault("leaked", []).extend(e.leaked)
+        raise
+    except Exception as e:   # the runner's own failure (EMFILE making the run directory, ...): unknown state (VS-4)
+        row.setdefault("outcome", "INFRA")
+        row["stopped"] = f"RUNNER_EXCEPTION: {e!r}"
+        raise _Stop(row["stopped"]) from e
+    finally:
+        if holder is not None:
+            with contextlib.suppress(OSError):
+                holder.cleanup()
+        row["overhead_s"] = round(time.monotonic() - begun - elapsed, 2)
+    return row
+
+
+def mutant_class(outcomes: list[str]) -> str:
+    """A function of the multiset of per-file outcomes (a FAIL here is a confirmed one): order cannot change it (§7)."""
+    if "FAIL" in outcomes:
+        return "KILLED"
+    if all(o == "PASS" for o in outcomes):
+        return "SURVIVED"
+    if all(o in ("PASS", "TIMEOUT") for o in outcomes):
+        return "TIMEOUT"
+    return "INFRA"
+
+
+#: the bracket's runs after a FAIL, in order: the unmutated module twice, then the mutant (role, which version, wanted)
+BRACKET = (("control", "null", "PASS"), ("control", "null", "PASS"), ("rerun", "mutant", "FAIL"))
+
+
+def _confirm(tg: _Target, rel: str, rows: list, row: dict, src: str, fresh: bool = False) -> str:
+    """'' when `row`'s FAIL is confirmed, else why not: right away and each in a clean environment, the unmutated module
+    PASSES what failed (`_select`) twice in a row, then the mutant FAILS it again with the same signature. Twice: a
+    fault that a passing run leaves for the next one (a fixed port's TIME_WAIT) failed the mutant's re-run after the
+    control had passed, and a single control confirmed it (PL-2, process-env prover); the second control's run is the
+    one that fault now fails. `fresh`: the whole file each time, each in a tree rebuilt from the pristine copy
+    (`_remeasure`). The mutant's version is in the tree afterwards."""
+    sel = None if fresh else _select(row["first"], tg.ref[rel]["first_test"])
+    why = ""
+    for i, (role, version, want) in enumerate(BRACKET):
+        if fresh:
+            tg.version = tg.null if version == "null" else src
+            _new_tree(tg)
+        else:
+            _write(tg, tg.null if version == "null" else src)
+        x = _run_file(tg, rel, rows, select=sel, role=role, fresh=fresh)
+        if x["outcome"] != want or (role == "rerun" and x.get("first") != row["first"]):
+            why = (f"the unmutated module {'PASS, then ' if i else ''}{x['outcome']}" if role == "control" else
+                   f"the mutant again {x['outcome']} {x.get('first') or x.get('why') or ''}".rstrip())
+            break
+    _write(tg, src)
+    return why
+
+
+def _mutant(tg: _Target, entry: dict, src: str) -> None:
+    """Every kill file in kill-set order, each run clean. A FAIL is a kill only when the bracket confirms it (`_confirm`),
+    in place or, failing that, once more on a fresh tree (`_remeasure`). Then — and only then — the remaining files are
+    skipped. Anything else leaves that file's row PASS, TIMEOUT or INFRA and the chain goes on: a timeout or an
+    infrastructure fault never decides a kill and never hides a later valid one (VS-1, VS-2, VS-5, PL-2, ORD-2)."""
+    rows = entry["files"] = []
+    _write(tg, src)
+    for rel in tg.tests:
+        row = _run_file(tg, rel, rows)
+        if row["outcome"] == "FAIL" and (why := _confirm(tg, rel, rows, row, src)):
+            row = _remeasure(tg, rel, rows, row, src, why)
+        if row["outcome"] == "FAIL":   # confirmed: the only early stop
+            entry["killed_by"] = {"file": rel, "first": row["first"], "seconds": row.get("seconds")}
+            return
+
+
+def _remeasure(tg: _Target, rel: str, rows: list, row: dict, src: str, why: str) -> dict:
+    """A FAIL the bracket did not confirm in place: the file is measured once more from scratch — the whole file, in a
+    tree rebuilt from the pristine copy — and that run is the file's (`row` keeps its place in the record as
+    `unconfirmed`). So a fault that is gone by the bracket no longer hides a valid kill later in the same file (VS-5, the
+    failfast case), a test that cannot run alone under -k is bracketed whole (VS-6 (b)), and state the tree checks do
+    not see (a __pycache__ a run wrote — FS-2's mechanism, order-equivalence prover) cannot decide it. A FAIL there is
+    bracketed the same way, whole file, each run in a new tree; not confirmed again, the file is INFRA."""
+    row.update(role="unconfirmed", why=f"kill not confirmed: {why}; re-measured on a fresh tree")
+    tg.version = src
+    _new_tree(tg)
+    again = _run_file(tg, rel, rows, fresh=True)
+    if again["outcome"] == "FAIL" and (why := _confirm(tg, rel, rows, again, src, fresh=True)):
+        again.update(outcome="INFRA", why=f"kill not confirmed: {why}")
+    return again
+
+
+def _classify(entry: dict, stopped: str | None = None) -> dict:
+    primary = [r["outcome"] for r in entry.get("files", []) if "role" not in r]
+    cls = "INFRA" if stopped else mutant_class(primary)
+    entry.update({"class": cls, "killed": cls == "KILLED"} | ({"why": stopped} if stopped else {}))
+    if cls == "TIMEOUT":   # the legacy key, only for the TIMEOUT class: S2.account refuses it, and it cannot depend on order
+        entry["timed_out"] = sorted({r["file"] for r in entry["files"] if "role" not in r and r["outcome"] == "TIMEOUT"})
+    signals = [s for r in entry.get("files", []) for s in r.get("cleanup", [])]
+    if signals:
+        entry.update(strays_reaped=len(signals), cleanup=signals)   # each signal with the authority's proof
+    return entry
+
+
+def _baseline(tg: _Target, rows: list) -> list[str]:
+    """T0 (§5): the null mutant — the module as `mutants()` rewrites it, nothing mutated — against each kill file on its
+    own, the whole file, in a clean environment. Each must PASS, leave nothing behind and run at least one test; its
+    counts and skipped tests are the reference every later PASS of the file must match (VS-6). A file that fails the
+    null fails every mutant whatever it does (ORD-1: byte- and text-identity assertions), so it is refused, never used.
+    Returns why each file that did not pass is refused."""
+    _write(tg, tg.null)
+    refused = []
+    for rel in tg.tests:
+        row = _run_file(tg, rel, rows, failfast=False, role="t0")
+        if row["outcome"] == "PASS" and not row.get("residue") and not row.get("leaked"):
+            tg.ref[rel] = {"ref": [_counts(row), row.get("skipped_tests", [])], "first_test": row.get("first_test")}
+        else:
+            refused.append(f"{rel}: {row['outcome']} {row.get('first') or row.get('why') or ''}".rstrip()
+                           + (" (left residue)" if row.get("residue") else "") + (" (left processes)" if row.get("leaked") else ""))
+    return refused
+
+
+def _run_tests(root: pathlib.Path, tests: list[str], boundary: ca.Boundary) -> tuple[bool, int]:
+    """(every kill file PASSes, processes the runner signalled): each file in order, judged as a T0 run is, stopping at
+    the first that does not pass, in the caller's own tree (never checked). For callers outside the runner
+    (tests/v2/p4/test_process_range.py PROC-OWN-1); `ca.Unproven` when a leftover cannot be proven."""
+    with tempfile.TemporaryDirectory() as t:
+        tg = _Target(None, pathlib.Path(t), boundary, _worker(root), root)
+        rows: list[dict] = []
+        for rel in tests:
+            if _run_file(tg, rel, rows, failfast=False)["outcome"] != "PASS":
+                break
+        signalled = sum(len(r.get("cleanup", [])) for r in rows)
+        return all(r["outcome"] == "PASS" for r in rows) and len(rows) == len(tests), signalled
+
+
+def null_mutant(module_src: str, func: str) -> str:
+    """The module exactly as `mutants()` writes every mutant of `func`, with nothing mutated: `ast.unparse` of the
+    module and, for a `SCRIPT/fn` target, the child script itself re-unparsed inside its constant first (ORD-1
+    verifier (b): the script is reformatted too, so a module-level null is not the same rewrite)."""
+    tree = ast.parse(module_src)
+    script, _, inner = func.partition("/")
+    if inner:
+        const = _script(tree, script)
+        if const is None:
+            raise SystemExit(f"child script {script} not found")
+        const.value = ast.unparse(ast.parse(const.value))
+    return ast.unparse(tree)
+
+
+def run_target(root: pathlib.Path, target: str, tests: list[str], pristine: tuple[pathlib.Path, str] | None = None,
+               on_mutant=None, t0_only: bool = False) -> dict:
+    """Measure one target (§2–§4). `pristine`: the copy `main()` took once ((path, tree digest)); a direct caller passes
+    none and gets one of its own. Everything this target writes lives in one scratch directory, removed at the end.
+    `on_mutant(entry)` is called as each mutant completes (main's checkpoint line). An ownership failure stops the
+    target: the finished mutants are kept as measured, the current one is INFRA, the rest NOT_RUN (VS-4)."""
+    rel, func = target.split("::")
+    worker = _worker(root)
+    out: dict = {"target": target, "runner": 2, "kill_tests": list(tests)}
+    with tempfile.TemporaryDirectory(prefix=f"aisef-mut-{worker}-", ignore_cleanup_errors=True) as t:
+        scratch = pathlib.Path(t)
+        src_root, tree_sha = pristine or _pristine(root, scratch / "pristine")
+        original = (src_root / rel).read_text(encoding="utf-8")
+        found = mutants(original, func, _enum_members(original, src_root))
+        out.update(source_sha256=source_digest(original), tree_sha256=tree_sha, mutants=len(found))
+        results = out["results"] = [{"mutant": d, "class": "NOT_RUN", "killed": False} for d, _ in found]
+        if [k for k in tests if k in NOT_KILL_FILES]:
+            out["error"] = f"not a kill file: {[k for k in tests if k in NOT_KILL_FILES]} (NOT_KILL_FILES)"
+            return _summarise(out)
+        tg, where = None, "before the target"
+        try:   # establish, the first tree and T0 are inside too: an exception there keeps the rows and stops (VS-4)
+            tg = _Target(rel, scratch, ca.establish(scratch), worker, pristine=src_root, tests=list(tests),
+                         last=int((src_root / rel).stat().st_mtime))   # the checkout's own (copy2): stamps are above it
+            tg.null, tg.version = null_mutant(original, func), original
+            _new_tree(tg)
+            _settle(tg)   # what an earlier target of this worker left
+            where = "before mutant 1 (T0 {file})"
+            refused = _baseline(tg, out.setdefault("t0", []))
+            if refused:   # each refused file once more on the original bytes: a broken snapshot, or a rewrite-sensitive file
+                out["error"] = "kill tests fail on the unmutated tree (T0 null mutant): " + "; ".join(refused)
+                _write(tg, original)
+                for rel_ in [r["file"] for r in out["t0"] if r["outcome"] != "PASS" or r.get("residue") or r.get("leaked")]:
+                    _run_file(tg, rel_, out.setdefault("original", []), failfast=False, role="original")
+            for i, (desc, src) in enumerate([] if refused or t0_only else found):
+                where = f"at mutant {desc!r} ({{file}})"
+                entry = results[i] = {"mutant": desc}
+                try:
+                    _mutant(tg, entry, src)
+                except _Stop as e:
+                    _classify(entry, f"{e}")
+                    raise
+                except Exception as e:   # unknown state: this mutant has no verdict, and nothing more runs
+                    _classify(entry, f"RUNNER_EXCEPTION: {e!r}")
+                    raise _Stop(f"RUNNER_EXCEPTION: {e!r}") from e
+                _classify(entry)
+                if on_mutant:
+                    on_mutant(entry)
+        except Exception as e:   # a stop, or the runner's own failure outside a mutant's chain: nothing more runs
+            stop = e if isinstance(e, _Stop) else _Stop(f"RUNNER_EXCEPTION: {e!r}")
+            rows = [*out.get("t0", []), *out.get("original", []), *(x for r in results for x in r.get("files", []))]
+            file = next((r["file"] for r in reversed(rows) if r.get("stopped")), "?")
+            out.update(error=f"{stop.code} {where.format(file=file)}: {stop.detail}", stopped=True,
+                       **({"leaked": stop.leaked} if stop.leaked else {}))
+        finally:
+            if tg is not None and tg.holder is not None:
+                tg.holder.cleanup()
+    return _summarise(out)
+
+
+def _summarise(out: dict) -> dict:
+    res = out["results"]
+    classes = {c: sum(1 for r in res if r["class"] == c) for c in CLASSES}
+    out.update(killed=classes["KILLED"], survivors=[r["mutant"] for r in res if not r["killed"]], classes=classes,
+               killed_by_timeout=classes["TIMEOUT"], strays_reaped=sum(r.get("strays_reaped", 0) for r in res))
+    open_ = {c: n for c, n in classes.items() if c not in ("KILLED", "SURVIVED") and n}
+    if open_ and not out.get("error"):   # the frozen merge tools refuse an errored result: no audit can excuse these
+        # a run that ends with no unittest summary (a signal, os._exit) is never confirmed, so re-running such a mutant
+        # gives INFRA again: it needs a kill test or a ruling (lead decision Q1; classification prover, VS-6 (a))
+        silent = sum(1 for r in res if r["class"] == "INFRA" and any(
+            "no unittest summary" in (x.get("why") or "") for x in r.get("files", []) if "role" not in x))
+        out["error"] = (f"UNCLASSIFIED: {sum(open_.values())} mutant(s) neither killed nor survived {open_} — "
+                        + ("re-run them" if not silent else f"{silent} end a kill test with no unittest summary (a signal, "
+                           f"os._exit), which a re-run cannot confirm: each needs a kill test or a ruling; re-run the rest"))
+    return out
+
+
+def _confirmed(r: dict) -> bool:
+    """A KILLED entry carries its bracket (`BRACKET`): the killing row FAIL, then two control PASSes and the re-run FAIL
+    with the same signature, on the same file."""
+    kb, rows = r.get("killed_by") or {}, r.get("files", [])
+    for i, x in enumerate(rows):
+        if "role" not in x and x["file"] == kb.get("file") and x["outcome"] == "FAIL" and x.get("first") == kb.get("first"):
+            got = [(y.get("role"), y["file"], y["outcome"], y.get("first") if y.get("role") == "rerun" else None)
+                   for y in rows[i + 1:i + 1 + len(BRACKET)]]
+            return got == [(role, x["file"], want, x["first"] if role == "rerun" else None) for role, _, want in BRACKET]
+    return False
+
+
+def _problems_v2(t: dict, root: pathlib.Path) -> list[str]:
+    """The verdict on a runner-2 result (§4.3): the legacy rules, and every mutant is KILLED (a confirmed kill) or
+    SURVIVED (every kill file PASSed); any other class is refused and no audit excuses it (VS-2, VS-4)."""
+    name, res = t["target"], t.get("results", [])
+    out = [f"{name}: {t['error']}"] if t.get("error") else []
+    if source_digest((root / name.split("::")[0]).read_text(encoding="utf-8")) != t.get("source_sha256"):
+        out.append(f"{name}: target changed since the mutation run — re-run it")
+    if not t.get("mutants"):
+        out.append(f"{name}: no mutants generated — a run that cannot say NO proves nothing")
+    for r in res:
+        d, cls = r["mutant"], r.get("class")
+        if cls == "SURVIVED":
+            if name in NO_AUDIT:
+                out.append(f"{name}: survivor {d!r} (must be fully killed; audits not accepted)")
+            elif (name, d) not in AUDITED:
+                out.append(f"{name}: unaudited survivor {d!r}")
+        elif cls != "KILLED":
+            out.append(f"{name}: mutant {d!r} is {cls} ({r.get('why') or 'see its rows'}): neither killed nor survived — re-run it")
+    bad = [] if len(res) == t.get("mutants") else ["the results do not list every mutant"]
+    bad += [] if t.get("survivors") == [r["mutant"] for r in res if r.get("class") != "KILLED"] else \
+        ["survivors are not the mutants that were not killed"]
+    bad += [] if t.get("killed") == sum(r.get("class") == "KILLED" for r in res) else ["killed is not the KILLED count"]
+    for r in res:
+        d, rows = r["mutant"], r.get("files", [])
+        if r.get("killed") != (r.get("class") == "KILLED"):
+            bad.append(f"mutant {d!r}: killed is not its class")
+        if r.get("class") == "KILLED" and not _confirmed(r):
+            bad.append(f"mutant {d!r}: KILLED without a confirmed kill")
+        if r.get("class") == "SURVIVED" and [x["file"] for x in rows if "role" not in x and x["outcome"] == "PASS"] != t["kill_tests"]:
+            bad.append(f"mutant {d!r}: SURVIVED without one PASS per kill file")
+    if not t.get("error") and any(x.get("outcome") != "PASS" for x in t.get("t0", [])):
+        bad.append("a T0 row did not pass")
+    return out + [f"{name}: inconsistent record: {b}" for b in bad]
 
 
 def target_problems(t: dict, root: pathlib.Path = ROOT) -> list[str]:
-    """The verdict on one target's result: unchanged since the run, mutants generated, every survivor accounted for."""
+    """The verdict on one target's result: unchanged since the run, mutants generated, every survivor accounted for.
+    A runner-2 result (`"runner": 2`) is read by `_problems_v2`; every other record — every historical one — by the
+    rules below, unchanged."""
+    if t.get("runner") == 2:
+        return _problems_v2(t, root)
     if t.get("error"):
         return [f"{t['target']}: {t['error']}"]
     out = []
@@ -1017,6 +1591,9 @@ def problems_of(record: dict, root: pathlib.Path = ROOT, phase: str = "P1") -> l
     seen = {t["target"] for t in targets}
     out = [f"{t} has no mutation result" for t in PHASE_TARGETS[phase] if t not in seen]
     out += [f"{t} belongs to {phase_of(t)}, not {phase}" for t in seen if t in TARGETS and phase_of(t) != phase]
+    if phase == "V2.1":   # no result of a runner that did not classify enters V2.1 (VS-1, BC-3, ORD-1)
+        out += [f"{t['target']}: measured by a runner that does not classify — re-measure" for t in targets
+                if t.get("runner") != 2]
     return out + [p for t in targets for p in target_problems(t, root)]
 
 
@@ -1031,26 +1608,72 @@ def check(root: pathlib.Path = ROOT) -> list[str]:
     return out
 
 
+def _checkpoint(entry: dict) -> None:
+    """One line per finished mutant (PL-6): the worker log keeps it byte for byte, so a worker killed mid-target loses
+    nothing it measured."""
+    print("MUTANT " + json.dumps(entry, ensure_ascii=False), flush=True)
+
+
 def main(argv: list[str] | None = None) -> int:
     argv = sys.argv[1:] if argv is None else argv
+    if argv[:1] == ["t0"]:   # T0 only, nothing written: `t0 TARGET... [--tests FILE...]` (--tests: a diagnostic kill set)
+        targets, _, files = [x for x in argv[1:]], None, None
+        if "--tests" in targets:
+            i = targets.index("--tests")
+            targets, files = targets[:i], targets[i + 1:]
+        unknown = [t for t in targets if t not in TARGETS]
+        if unknown or not targets:
+            raise SystemExit(f"not a mutation target: {unknown or 'none named'}")
+        failed = 0
+        for target in targets:
+            r = run_target(ROOT, target, files or TARGETS[target], t0_only=True)
+            for row in [*r.get("t0", []), *r.get("original", [])]:
+                print(json.dumps({"target": target, **{k: v for k, v in row.items() if k != "tail"}}, ensure_ascii=False))
+            bad = r.get("stopped") or not r.get("t0") or any(   # no T0 row: the kill set was refused before T0
+                x["outcome"] != "PASS" or x.get("residue") or x.get("leaked") for x in r.get("t0", []))
+            failed += bool(bad)
+            print(f"T0 {target}: " + (r["error"] if bad else "PASS"), flush=True)
+        return 1 if failed else 0
     if argv[:1] == ["run"]:
         chosen = argv[1:] or list(TARGETS)
-        for phase, rel in RECORDS.items():
-            mine = [t for t in chosen if t in PHASE_TARGETS[phase]]
-            if not mine:
-                continue
-            out = ROOT / rel
-            record = json.loads(out.read_text(encoding="utf-8")) if out.exists() else {
-                "record": f"AISEF V2 — {phase} MUTATION", "tool": "validation/v2/mutation.py", "targets": []}
-            kept = [t for t in record["targets"] if t["target"] not in mine and t["target"] in PHASE_TARGETS[phase]]
-            fresh = []
-            for target in mine:  # the record is written after every target: a run that dies keeps what it measured
-                t = run_target(ROOT, target, TARGETS[target])
-                fresh.append(t)
-                record["targets"] = sorted(kept + fresh, key=lambda x: x["target"])
-                out.write_text(json.dumps(record, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
-                print(f"{t['target']}: {t.get('killed')}/{t.get('mutants')} killed; survivors {t.get('survivors')}"
-                      + (f" ERROR {t['error']}" if t.get("error") else ""), flush=True)
+        worker = _worker(ROOT)
+        try:
+            left = _earlier(worker)
+        except OSError as e:
+            print(f"STOPPED before the first target: HOST_TABLE_UNREADABLE: {e}", flush=True)
+            return 3
+        if left:  # a restarted worker never runs beside what an earlier run of it left (PL-3 verifier (e))
+            print(f"STOPPED before the first target: an earlier run of this worker left {left} alive", flush=True)
+            return 3
+        with tempfile.TemporaryDirectory(prefix=f"aisef-pristine-{worker}-") as p:
+            pristine = _pristine(ROOT, pathlib.Path(p) / "tree")   # once, before any record is written (FS-4)
+            done: set[str] = set()
+            for phase, rel in RECORDS.items():
+                mine = [t for t in chosen if t in PHASE_TARGETS[phase]]
+                if not mine:
+                    continue
+                out = ROOT / rel
+                record = json.loads(out.read_text(encoding="utf-8")) if out.exists() else {
+                    "record": f"AISEF V2 — {phase} MUTATION", "tool": "validation/v2/mutation.py", "targets": []}
+                kept = [t for t in record["targets"] if t["target"] not in mine and t["target"] in PHASE_TARGETS[phase]]
+                fresh = []
+                for target in mine:  # the record is written after every target: a run that dies keeps what it measured
+                    try:
+                        t = run_target(ROOT, target, TARGETS[target], pristine, on_mutant=_checkpoint)
+                    except Exception as e:   # outside run_target's own guard (its copy, mutants()): named, never lost
+                        t = _summarise({"target": target, "runner": 2, "kill_tests": list(TARGETS[target]), "mutants": 0,
+                                        "results": [], "error": f"RUNNER_EXCEPTION before the target: {e!r}",
+                                        "stopped": True})
+                    done.add(target)
+                    fresh.append(t)
+                    record["targets"] = sorted(kept + fresh, key=lambda x: x["target"])
+                    out.write_text(json.dumps(record, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
+                    print(f"{t['target']}: {t.get('killed')}/{t.get('mutants')} killed; classes {t.get('classes')}; "
+                          f"survivors {t.get('survivors')}" + (f" ERROR {t['error']}" if t.get("error") else ""), flush=True)
+                    if t.get("stopped"):   # the worker never runs beside a process it cannot prove its own
+                        rest = [x for x in chosen if x in TARGETS and x not in done]   # targets run phase by phase
+                        print(f"STOPPED {target}: {t['error']}\nNOT RUN {rest}", flush=True)
+                        return 3
         unknown = [t for t in chosen if t not in TARGETS]
         if unknown:
             raise SystemExit(f"not a mutation target: {unknown}")

@@ -28,8 +28,10 @@ from __future__ import annotations
 
 import dataclasses
 import os
+import pathlib
 import signal
 import subprocess
+import sys
 import time
 
 POSIX = os.name == "posix"
@@ -81,7 +83,8 @@ def establish(root) -> Boundary:
 def host_table() -> dict[int, Host]:
     """This module's own reading of the host: pid, ppid, pgid, start time, command. POSIX: `ps`, zombies included (a
     zombie leader still pins its group id). Windows: Win32_Process through PowerShell — pid, parent, creation time,
-    command; there is no process group, so a group is never provable there (pgid -1)."""
+    command; there is no process group, so a group is never provable there (pgid -1). POSIX: OSError when `ps` fails
+    or does not list itself — an empty reading never stands for "everything is gone"."""
     return _read()[0]
 
 
@@ -102,6 +105,9 @@ def _read() -> tuple[dict[int, Host], int]:
         except ValueError:
             continue
         out[int(f[0])] = Host(int(f[0]), int(f[1]), int(f[2]), born, f[8] if len(f) > 8 else "")
+    if proc.returncode != 0 or proc.pid not in out:   # a failed or partial reading would read as "every process gone"
+        raise OSError(f"ps -A exited {proc.returncode} and {'listed' if proc.pid in out else 'did not list'} itself: "
+                      "the host table cannot be read")
     return out, proc.pid
 
 
@@ -150,6 +156,76 @@ def strays(boundary: Boundary, table: dict[int, Host] | None = None) -> list[Hos
     marks = {boundary.root, os.path.realpath(boundary.root)}
     return sorted((p for p in table.values() if p.pid != os.getpid() and any(m in p.command for m in marks)),
                   key=lambda p: p.pid)
+
+
+def carriers(prefix: str, table: dict[int, Host] | None = None) -> list[Host]:
+    """Processes whose environment holds `prefix` (the mutation runner's `AISEF_MUTATION_RUN=<worker>:`) — candidates
+    only, like `strays`; `signal_owned` still proves each. A child given its own environment does not carry it, and
+    macOS hides a platform binary's environment (measured 2026-10-07: an inherited token is visible in `ps -E` for a
+    Homebrew python3, invisible for /bin/sleep). Read-only: Linux /proc/<pid>/environ, macOS `ps -E`; Windows: none (a
+    job has no breakaway)."""
+    table = host_table() if table is None else table
+    if not POSIX:
+        return []
+    hits: set[int] = set()
+    if sys.platform.startswith("linux"):
+        for pid in table:
+            try:
+                env = pathlib.Path(f"/proc/{pid}/environ").read_bytes()
+            except OSError:
+                continue
+            if any(v.startswith(prefix.encode()) for v in env.split(b"\0")):
+                hits.add(pid)
+    else:
+        proc = subprocess.Popen(["ps", "-E", "-ww", "-A", "-o", "pid=,command="], stdout=subprocess.PIPE,
+                                encoding="utf-8", errors="replace")
+        out, _ = proc.communicate()
+        listed = set()
+        for line in out.splitlines():
+            f = line.split(None, 1)
+            if f and f[0].isdigit():
+                listed.add(int(f[0]))
+                if len(f) == 2 and prefix in f[1]:
+                    hits.add(int(f[0]))
+        if proc.returncode != 0 or proc.pid not in listed:   # fail closed, as host_table does
+            raise OSError(f"ps -E exited {proc.returncode} and {'listed' if proc.pid in listed else 'did not list'} "
+                          "itself: the environments cannot be read")
+    return sorted((table[p] for p in hits if p in table and p != os.getpid()), key=lambda p: p.pid)
+
+
+def cwd_under(prefix: str, table: dict[int, Host] | None = None, since: float | None = None) -> list[Host]:
+    """Processes whose working directory starts with `prefix` (a directory given with its trailing separator, or a
+    name prefix) — candidates only, like `strays` and `carriers`; `signal_owned` still proves each. They need neither a
+    token nor a path in their command line: a helper given its own environment, or an Apple platform binary whose
+    environment `ps -E` hides, still has the cwd it inherited. `since`: only processes born no earlier than this are
+    asked (a leftover of a boundary was born after it), which keeps the read cheap. Read-only: Linux /proc/<pid>/cwd,
+    macOS `lsof -d cwd` (OSError when it does not list this process, which it is always asked about); Windows: none."""
+    table = host_table() if table is None else table
+    if not POSIX:
+        return []
+    head, tail = os.path.split(prefix)
+    marks = {prefix, os.path.join(os.path.realpath(head), tail)}
+    pids = sorted(p.pid for p in table.values() if p.pid != os.getpid() and (since is None or p.born >= since - _SLACK_S))
+    cwd: dict[int, str] = {}
+    if sys.platform.startswith("linux"):
+        for pid in pids:
+            try:
+                cwd[pid] = os.readlink(f"/proc/{pid}/cwd")
+            except OSError:
+                continue
+    else:
+        out = subprocess.run(["lsof", "-nP", "-w", "-a", "-d", "cwd", "-Fpn", "-p", ",".join(map(str, [os.getpid(), *pids]))],
+                             capture_output=True, encoding="utf-8", errors="replace").stdout
+        pid = None
+        for line in out.splitlines():
+            if line[:1] == "p" and line[1:].isdigit():
+                pid = int(line[1:])
+            elif line[:1] == "n" and pid is not None:
+                cwd[pid] = line[1:]
+        if os.getpid() not in cwd:   # lsof exits 1 when an asked pid is gone; an empty answer would read as "none"
+            raise OSError("lsof did not list this process's cwd: the working directories cannot be read")
+    hits = [p for p, d in cwd.items() if p != os.getpid() and any((d + os.sep).startswith(m) for m in marks)]
+    return sorted((table[p] for p in hits if p in table), key=lambda p: p.pid)
 
 
 def prove_member(boundary: Boundary, pid: int, group: int, table: dict[int, Host] | None = None) -> Host | None:
