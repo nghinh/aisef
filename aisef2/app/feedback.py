@@ -7,6 +7,11 @@
   decided it — criterion, role, requirement and clause, contract, spec, probe, subject, candidate, probe status and
   verdict against the expectation, the verifier's agreement, the typed failure and owner, the journal seqs. A pure
   function of the journal: prompt text, never journaled, never read by the kernel.
+* `context_pack` (V2.1 D4, docs/v2.1/CONTEXT-PACK.md): on a retry, what the journal also records about the story's
+  earlier attempts — each one's parent, its developer result, its candidate or that the parent itself was proved (it
+  changed nothing), the criteria that held there and those never proved there — each line citing its journal seqs. Read
+  from the controller's own records only, bounded, the run's secrets replaced; context, never authority:
+  no verdict, approval or budget reads it.
 """
 
 from __future__ import annotations
@@ -91,3 +96,88 @@ def retry_feedback(events, story_id: str, project: Project) -> str:
             line += "\n  " + REFUTED.format(verdict=p["verdict"])
         rows.append(line)
     return "\n".join(rows)
+
+
+#: the context pack's bounds: the prompt is one argv element (a Windows command line holds 32 767 characters)
+PACK_MAX, PACK_LIST, PACK_ATTEMPTS = 4000, 12, 4
+PACK_HEAD = ("What the run's journal records about the earlier attempts of this story (the controller's own record; "
+             "context only — no verdict, approval or budget reads it):")
+
+
+def context_pack(events, story_id: str, project: Project, secrets=()) -> str:
+    """The earlier attempts of `story_id` from journal events `(seq, type, data)` (module docstring); "" when none ended.
+    It reads only the controller's own records of an attempt — story/begin, story/admitted, the DEVELOPER
+    provider/request and its provider/result, proof/verified (candidate, criterion, verdict, agreement), story/end —
+    never a probe, tool, gate or test record nor a session stream: no stimulus, oracle internal or agent text."""
+    expect = {o.criterion_id: project.specs[o.product_proof_spec_id].candidate_expectation.value
+              for o in project.plan.obligations if o.story_id == story_id}
+
+    def redact(text: str) -> str:     # the one free text it carries: the run's secrets out, longest first (app/client.redact)
+        for s in sorted({str(x) for x in secrets if x}, key=len, reverse=True):
+            text = text.replace(s, "[REDACTED]")
+        return text
+    ended, cur = [], None
+    for seq, kind, d in sorted(((int(q), str(t), d) for q, t, d in events), key=lambda e: e[0]):
+        if d.get("story_id") != story_id:
+            continue
+        if kind == "story/begin":
+            cur = {"seq": seq, "parent": str(d.get("parent")), "criteria": [], "proofs": {}}
+        elif cur is None:
+            continue
+        elif kind == "story/admitted":
+            cur["criteria"] = sorted(map(str, d.get("dispositions") or {}))
+        elif kind == "provider/request" and d.get("budget_owner") == "DEVELOPER":
+            cur["request"] = seq
+        elif kind == "provider/result" and "request" in cur and "result" not in cur:
+            cur["result"] = (seq, redact(str(d.get("detail", "")))[:300])    # redacted before it is cut
+        elif kind == "proof/verified":
+            cur.setdefault("candidate", (seq, str(d.get("candidate"))))
+            c = str(d.get("criterion_id"))
+            if d.get("candidate") == cur["candidate"][1] and c not in cur["proofs"]:
+                cur["proofs"][c] = (seq, d.get("agreement") is True and d.get("verdict") == expect.get(c, "SATISFIED"))
+        elif kind == "story/end":
+            ended.append({**cur, "end": seq})
+            cur = None
+    if not ended:
+        return ""
+
+    def named(rows):    # (criterion, seq), sorted: the first PACK_LIST by name, with their seqs
+        shown = [(c, f"{c} ({project.facts[c]['clause']})" if c in project.facts else c, s) for c, s in sorted(rows)]
+        more = f" and {len(shown) - PACK_LIST} more" if len(shown) > PACK_LIST else ""
+        return ", ".join(x[1] for x in shown[:PACK_LIST]) + more, ", ".join(str(x[2]) for x in shown[:PACK_LIST])
+
+    lines = [PACK_HEAD]
+    if cur is not None:
+        lines.append(f"- this attempt starts again at the parent {cur['parent'][:12]} (journal seq {cur['seq']}); an "
+                     "earlier candidate named below is a commit of this repository")
+    if len(ended) > PACK_ATTEMPTS:
+        lines.append(f"- {len(ended) - PACK_ATTEMPTS} earlier attempt(s) not shown (journal seq {ended[0]['seq']}–"
+                     f"{ended[-PACK_ATTEMPTS - 1]['end']})")
+    for n, a in list(enumerate(ended, 1))[-PACK_ATTEMPTS:]:
+        r, c = a.get("result"), a.get("candidate")
+        line = f"- attempt {n}: parent {a['parent'][:12]} (journal seq {a['seq']}); " + (
+            f"developer result: {r[1]} (journal seq {r[0]})" if r else f"no developer result (journal seq {a['seq']}–{a['end']})")
+        if c and c[1] == a["parent"]:
+            line += f"; the revision proved was the parent itself — that attempt changed nothing (journal seq {c[0]})"
+        elif c:
+            line += f"; candidate {c[1][:12]} (journal seq {c[0]})"
+        lines.append(line)
+        held = [(k, v[0]) for k, v in a["proofs"].items() if v[1]]
+        if held:
+            what, seqs = named(held)
+            lines.append(f"  held at that revision, the verifier agreeing: {what} (journal seq {seqs})")
+        unproved = sorted(set(a["criteria"]) - set(a["proofs"]))
+        if unproved:
+            what, _ = named((k, 0) for k in unproved)
+            lines.append(f"  never proved at that revision (the attempt ended before their proof): {what} "
+                         f"(journal seq {a['seq']}–{a['end']})")
+    text = "\n".join(lines)
+    if len(text) > PACK_MAX:
+        kept, size = [], 0
+        for ln in text.split("\n"):
+            if size + len(ln) + 1 > PACK_MAX - 120:
+                break
+            kept.append(ln)
+            size += len(ln) + 1
+        text = "\n".join(kept) + f"\n[the context pack stops here: bounded at {PACK_MAX} characters]"
+    return text
