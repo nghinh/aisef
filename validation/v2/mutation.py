@@ -27,12 +27,15 @@ made in the parsed script and written back into the constant, so the kill tests 
 from __future__ import annotations
 
 import ast
+import contextlib
 import copy
+import filecmp
 import hashlib
 import json
 import os
 import pathlib
 import shutil
+import stat
 import sys
 import tempfile
 import time
@@ -880,44 +883,259 @@ def _write_version(path: pathlib.Path, src: str, last: int) -> int:
     return stamp
 
 
-def _run_tests(root: pathlib.Path, tests: list[str], boundary: ca.Boundary) -> tuple[bool, int]:
-    """(every kill test passed, processes the runner had to signal). Each run is a process range (WP-4.2): a timeout
-    takes down the whole tree it started, not only the direct child (P2-RESIDUAL-ORPHAN-SUBJECT: leaked harness
-    processes had skewed every later measurement). A mutant of the range code can break that containment — its tests
-    run the mutated code — so a range that will not empty, or that something escaped, fails the run and is cleaned up
-    here. P4-FINDING-011: what the range REPORTS (members, escapees, its group) is never permission; only
-    `cleanup_authority` decides what is signalled, from its own reading of the host, and a candidate it cannot prove
-    the runner's is RESIDUAL_OWNERSHIP_UNKNOWN — left alone, and the target fails."""
+#: The kill-test environment is an allowlist (§2.2): the worker env's keys and, on Windows, what Python needs to start
+#: there; an operator shell's PYTHON* variables never reach a kill test, so a run from a shell and one from a worker
+#: are the same. HOME, TMPDIR and XDG_* are fresh directories of each run, removed after it (FS-1, FS-3, ORD-5, PL-8).
+ENV_KEEP = ("PATH", "LANG", "USER", "LOGNAME", "SYSTEMROOT", "SystemRoot", "WINDIR")
+_FRESH = {"HOME": "home", "TMPDIR": "tmp", "XDG_CONFIG_HOME": "config", "XDG_DATA_HOME": "data", "XDG_STATE_HOME": "state",
+          "XDG_CACHE_HOME": "cache", **({"USERPROFILE": "home", "TEMP": "tmp", "TMP": "tmp"} if os.name == "nt" else {})}
+#: every kill-file run carries `AISEF_MUTATION_RUN=<worker>:<run>`: how a detached leftover that names no tree is found
+#: (PL-1) — a candidate, never proof (a child given its own environment does not carry it)
+TOKEN = "AISEF_MUTATION_RUN"
+#: an unproven leftover is watched this long for its own exit, never signalled (PL-7); still alive after it, the target
+#: and the worker stop
+SETTLE_S = 5.0
+
+
+class _Stop(ca.Unproven):
+    """The target and the worker stop: a leftover the authority cannot prove (RESIDUAL_OWNERSHIP_UNKNOWN), or a host
+    table that cannot be read. `leaked` names what was found."""
+
+    def __init__(self, why: str, leaked: list | None = None):
+        super().__init__(why)
+        self.leaked = leaked or []
+
+
+class _Target:
+    """One target's working state: its scratch directory (trees, run directories — never inside a tree), the ownership
+    boundary, the tree and its base manifest, the version of the mutated file in it and its stamp, the run counter.
+    A plain class, not a dataclass: callers load this module by path without a sys.modules entry (p2, p4 tests)."""
+
+    def __init__(self, rel, scratch, boundary, worker, tree=None, pristine=None, last=0):
+        self.rel, self.scratch, self.boundary, self.worker, self.tree = rel, scratch, boundary, worker, tree
+        self.pristine, self.last = pristine, last   # pristine None: the caller's own tree (`_run_tests`), never checked
+        self.holder = self.base = self.version = None
+        self.seq = 0
+
+
+def _worker(root: pathlib.Path) -> str:
+    """A stable name of the worker that runs from `root`: a restarted worker finds what an earlier run of it left (PL-3)."""
+    return hashlib.sha256(str(pathlib.Path(root).resolve()).encode()).hexdigest()[:12]
+
+
+def _pristine(root: pathlib.Path, dst: pathlib.Path) -> tuple[pathlib.Path, str]:
+    """The COPY parts of `root`, taken once (per `main()`, before any record is written) with `__pycache__` and the
+    runner's own record files left out — by exact path, never a name pattern — so a live record never enters a tree
+    (FS-4); and the tree's digest: sha256 over the sorted (path, sha256 of bytes) pairs, no mtimes."""
+    records = {os.path.normpath(root / r) for r in RECORDS.values()}
+
+    def skip(d, names):
+        return [n for n in names if n == "__pycache__" or os.path.normpath(os.path.join(d, n)) in records]
+    for part in COPY:
+        src = root / part
+        if src.is_dir():
+            shutil.copytree(src, dst / part, ignore=skip)
+        elif src.exists() and os.path.normpath(src) not in records:
+            (dst / part).parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(src, dst / part)
+    h = hashlib.sha256()
+    for p in sorted(x for x in dst.rglob("*") if x.is_file()):
+        h.update(p.relative_to(dst).as_posix().encode() + b"\0" + hashlib.sha256(p.read_bytes()).digest())
+    return dst, h.hexdigest()
+
+
+def _manifest(tree: pathlib.Path, skip: str | None) -> dict[str, tuple]:
+    """relpath -> ("d", mode) for a directory, (kind, size, mtime_ns, mode) for anything else (lstat). `__pycache__`
+    subtrees are left out (bytecode is `_write_version`'s); so is the mutated file, checked by its bytes. Directory
+    mtimes are never compared: creating `__pycache__` changes them (FS-1 verifier (c))."""
+    out = {}
+    for d, dirs, files in os.walk(tree):
+        dirs[:] = [x for x in dirs if x != "__pycache__"]
+        for x in dirs + files:
+            rel = pathlib.Path(os.path.relpath(os.path.join(d, x), tree)).as_posix()
+            st = os.lstat(os.path.join(d, x))
+            if stat.S_ISDIR(st.st_mode):
+                out[rel] = ("d", st.st_mode)
+            elif rel != skip:
+                out[rel] = ("l" if stat.S_ISLNK(st.st_mode) else "f", st.st_size, st.st_mtime_ns, st.st_mode)
+    return out
+
+
+def _write(tg: _Target, src: str) -> None:
+    tg.version, tg.last = src, _write_version(tg.tree / tg.rel, src, tg.last)
+
+
+def _new_tree(tg: _Target) -> None:
+    """A fresh tree from the pristine copy, the version under test written into it (stamped), its base manifest taken;
+    the old tree is removed (its own TemporaryDirectory). The boundary names the scratch directory, which holds every
+    tree, so it does not move."""
+    holder = tempfile.TemporaryDirectory(dir=tg.scratch, prefix="tree-", ignore_cleanup_errors=True)
+    tree = pathlib.Path(holder.name) / "tree"
+    shutil.copytree(tg.pristine, tree)
+    old, tg.holder, tg.tree = tg.holder, holder, tree
+    if tg.version is not None:
+        _write(tg, tg.version)
+    tg.base = _manifest(tree, tg.rel)
+    if old is not None:
+        old.cleanup()
+
+
+def _residue(tg: _Target) -> dict:
+    """What a run left in the tree: paths added or removed, and paths whose type, mode or content changed (a file only
+    touched, or rewritten with its own bytes, is not residue); the mutated file must still hold the version under test.
+    Empty when the tree is the pristine copy plus that version."""
+    now = _manifest(tg.tree, tg.rel)
+    base = tg.base
+
+    def same(k):
+        a, b = now[k], base[k]
+        if a[0] != b[0] or a[-1] != b[-1] or a[0] == "d":
+            return a == b
+        if a[0] == "l":
+            return os.readlink(tg.tree / k) == os.readlink(tg.pristine / k)
+        return filecmp.cmp(tg.tree / k, tg.pristine / k, shallow=False)
+    added, removed = sorted(set(now) - set(base)), sorted(set(base) - set(now))
+    changed = sorted(k for k in set(now) & set(base) if now[k] != base[k] and not same(k))
+    try:
+        held = (tg.tree / tg.rel).read_text(encoding="utf-8") == tg.version
+    except (OSError, UnicodeDecodeError):
+        held = False
+    changed += [] if held else [tg.rel]
+    return {k: v[:50] for k, v in (("added", added), ("removed", removed), ("changed", changed)) if v}
+
+
+def _env(run: pathlib.Path, token: str) -> dict[str, str]:
+    env = {k: os.environ[k] for k in ENV_KEEP if k in os.environ}
+    for k, d in _FRESH.items():
+        (run / d).mkdir(exist_ok=True)
+        env[k] = str(run / d)
+    return {**env, TOKEN: token}
+
+
+def _watch(pids) -> list[int]:
+    """The pids still in the authority's host table after at most SETTLE_S, polled — nothing is signalled (PL-7)."""
+    deadline = time.monotonic() + SETTLE_S
+    while True:
+        table = ca.host_table()
+        left = [p for p in pids if p in table]
+        if not left or time.monotonic() >= deadline:
+            return left
+        time.sleep(0.25)
+
+
+def _clean(boundary: ca.Boundary, pids, groups, table=None) -> ca.Report:
+    """Signal what the authority proves the runner's (the only signal path: INV-MUTATION-AUTHORITY), then watch every
+    pid named, signalled or not, until it is gone; one still alive after SETTLE_S stops the target and the worker."""
+    try:
+        report = ca.signal_owned(boundary, pids=pids, groups=groups, table=table)
+        left = _watch(pids)
+    except OSError as e:
+        raise _Stop(f"HOST_TABLE_UNREADABLE: {e}") from None
+    if left:
+        raise _Stop(f"{ca.RESIDUAL_OWNERSHIP_UNKNOWN}: alive after {SETTLE_S}s: {left}; unproven {report.unproven}")
+    return report
+
+
+def _leftovers(tg: _Target, table: dict) -> dict[int, ca.Host]:
+    """What this worker left running: processes carrying its token (PL-1) or naming the target's scratch directory, which
+    holds its trees and run directories (`ca.strays`; the union keeps command-line matching, since code under mutation
+    builds scrubbed environments — PL-6 verifier)."""
+    found = {p.pid: p for p in ca.strays(tg.boundary, table)}
+    found.update((p.pid, p) for p in ca.carriers(f"{TOKEN}={tg.worker}:", table))
+    return found
+
+
+def _settle(tg: _Target) -> tuple[list[dict], list[dict]]:
+    """(leaked, cleanup) after a run: every leftover, signalled only with the authority's proof, the rest watched for
+    their own exit; `_Stop` when one outlives SETTLE_S. POSIX: on Windows a kill test's range is a job with no breakaway."""
+    if os.name != "posix":
+        return [], []
+    try:
+        table = ca.host_table()
+        found = _leftovers(tg, table)
+    except OSError as e:
+        raise _Stop(f"HOST_TABLE_UNREADABLE: {e}") from None
+    if not found:
+        return [], []
+    leaked = [{"pid": p.pid, "command": p.command[:120]} for p in found.values()]
+    try:
+        report = _clean(tg.boundary, sorted(found), sorted({p.pgid for p in found.values()}), table)
+    except _Stop as e:
+        raise _Stop(str(e), [dict(x, proved=False) for x in leaked]) from None
+    proved = {s["id"] for s in report.signalled}
+    return [dict(x, proved=x["pid"] in proved) for x in leaked], report.signalled
+
+
+def _earlier(worker: str) -> list[int]:
+    """Processes an earlier run of this worker left (its token, or one of its scratch directories in the command line),
+    still alive after SETTLE_S: a restarted worker never runs beside them (PL-3 verifier (e)). Nothing is signalled:
+    they were born before this run's boundary, so nothing about them can be proven."""
+    if os.name != "posix":
+        return []
+    table = ca.host_table()
+    mark = ca.Boundary(os.getpid(), 0.0, os.path.join(tempfile.gettempdir(), f"aisef-mut-{worker}-"))
+    found = {p.pid for p in ca.strays(mark, table)} | {p.pid for p in ca.carriers(f"{TOKEN}={worker}:", table)}
+    return _watch(sorted(found)) if found else []
+
+
+def _run_tests(root: pathlib.Path, tests: list[str], boundary: ca.Boundary, tg: _Target | None = None) -> tuple[bool, int]:
+    """(every kill test passed, processes the runner had to signal). Each kill file runs in a clean environment (§2): a
+    fresh HOME/TMPDIR/XDG and the run token; after it, its leftovers are settled (`_settle`) and the tree is checked
+    against its base manifest and rebuilt from the pristine copy when it differs, the residue named. Each run is a
+    process range (WP-4.2): a timeout takes down the whole tree it started, not only the direct child
+    (P2-RESIDUAL-ORPHAN-SUBJECT). P4-FINDING-011: what the range REPORTS (members, escapees, its group) is never
+    permission; only `cleanup_authority` decides what is signalled, and a candidate it cannot prove the runner's is
+    RESIDUAL_OWNERSHIP_UNKNOWN — left alone, and the target fails. Called directly (`tg` None), the caller's tree is
+    used as it is and never checked."""
     from aisef2.runtime.process_range import ProcessRange
     from aisef2.runtime.story_scope import Residual
-    env = {k: v for k, v in os.environ.items() if k != "PYTHONPATH"}
-    leaked = 0
-    for rel in tests:
-        path = pathlib.PurePosixPath(rel)
-        # failfast: a mutant is killed by its first failing test; the rest of the file cannot change that verdict
-        cmd = [sys.executable, "-m", "unittest", "discover", "-f", "-s", str(path.parent), "-t", "tests", "-p", path.name]
-        log = root.parent / "kill-test.log"   # beside the work tree: its tail explains a failing run (OBS-S2-3)
-        with open(log, "wb") as out:
-            r = ProcessRange(f"kill tests {rel}", cmd, cwd=root, env=env, output=out).start()
-        code = r.wait(TIMEOUT)
-        escaped = [p.pid for p in r.escaped()]  # reported while their parents are alive — checked, never trusted
-        try:
-            r.release()
-        except Residual:
-            reported = [p.pid for p in r.members()] + escaped
-            anchor = getattr(getattr(r, "_anchor", None), "pid", None)
-            report = ca.signal_owned(boundary, pids=reported, groups=[anchor] if anchor else ())
-            _CLEANUP.extend(report.signalled)
-            if report.residual_ownership_unknown:
-                raise ca.Unproven(f"{rel}: {report.unproven}") from None
-            return False, leaked + len(report.signalled)
-        if code is None:
-            _TIMED_OUT.append(rel)  # a kill by timeout is a kill, and the record says so (load can cause one)
-            return False, leaked
-        if code != 0:
-            _FAILED.append(f"{rel} exit {code}: " + log.read_text(encoding="utf-8", errors="replace")[-2000:])
-            return False, leaked
-    return True, leaked
+    with contextlib.ExitStack() as stack:
+        if tg is None:
+            tg = _Target(None, pathlib.Path(stack.enter_context(tempfile.TemporaryDirectory())), boundary, _worker(root), root)
+        leaked = 0
+        for rel in tests:
+            tg.seq += 1
+            holder = tempfile.TemporaryDirectory(dir=tg.scratch, prefix="run-", ignore_cleanup_errors=True)
+            try:
+                run = pathlib.Path(holder.name)
+                path = pathlib.PurePosixPath(rel)
+                # failfast: a mutant is killed by its first failing test; the rest of the file cannot change that verdict
+                cmd = [sys.executable, "-m", "unittest", "discover", "-f", "-s", str(path.parent), "-t", "tests", "-p", path.name]
+                log = run / "kill-test.log"   # beside the run's own directories, never in the tree (OBS-S2-3)
+                with open(log, "wb") as out:
+                    r = ProcessRange(f"kill tests {rel}", cmd, cwd=tg.tree, env=_env(run, f"{tg.worker}:{tg.seq}"),
+                                     output=out).start()
+                code = r.wait(TIMEOUT)
+                escaped = [p.pid for p in r.escaped()]  # reported while their parents are alive — checked, never trusted
+                try:
+                    r.release()
+                except Residual:
+                    reported = [p.pid for p in r.members()] + escaped
+                    anchor = getattr(getattr(r, "_anchor", None), "pid", None)
+                    report = ca.signal_owned(tg.boundary, pids=reported, groups=[anchor] if anchor else ())
+                    _CLEANUP.extend(report.signalled)
+                    if report.residual_ownership_unknown:
+                        raise ca.Unproven(f"{rel}: {report.unproven}") from None
+                    return False, leaked + len(report.signalled)
+                tail = log.read_text(encoding="utf-8", errors="replace")[-2000:]
+                left, signalled = _settle(tg)
+                _CLEANUP.extend(signalled)
+                _LEFT.extend(dict(x, file=rel) for x in left)
+                leaked += len(signalled)
+                if tg.pristine is not None:
+                    residue = _residue(tg)
+                    if residue:
+                        _RESIDUE.append({"file": rel, **residue})
+                        _new_tree(tg)
+                if code is None:
+                    _TIMED_OUT.append(rel)  # a kill by timeout is a kill, and the record says so (load can cause one)
+                    return False, leaked
+                if code != 0:
+                    _FAILED.append(f"{rel} exit {code}: " + tail)
+                    return False, leaked
+            finally:
+                holder.cleanup()   # after the run's leftovers are settled
+        return True, leaked
 
 
 #: kill-test runs the current mutant ended by timeout (drained per mutant into its result)
@@ -926,77 +1144,81 @@ _TIMED_OUT: list[str] = []
 _CLEANUP: list[dict] = []
 #: the failing kill-test run's file, exit status and output tail (read when the unmutated tree fails)
 _FAILED: list[str] = []
+#: what the current mutant's runs left: processes (`leaked`) and tree residue, each with its file (drained per mutant)
+_LEFT: list[dict] = []
+_RESIDUE: list[dict] = []
 
 
-def _reap_strays(work: pathlib.Path, boundary: ca.Boundary) -> int:
-    """Signal, by group, every process still running from the mutated tree after its kill tests, and count them (the
-    count also carries what a broken range left behind, see `_run_tests`). A mutant of the range code can break the
-    very containment its tests rely on (a mutated anchor that leaves its group and ignores EOF outlived a P4 run and
-    spun for 40 minutes, skewing every later timeout). Candidates come from the authority's own host table, and each is
-    signalled only with its proof (P4-FINDING-011); one it cannot prove is RESIDUAL_OWNERSHIP_UNKNOWN. POSIX: on
-    Windows the kill tests' own ranges are jobs with no breakaway."""
-    if os.name != "posix":
-        return 0
-    found = ca.strays(boundary)
-    report = ca.signal_owned(boundary, pids=[p.pid for p in found], groups=sorted({p.pgid for p in found}))
-    _CLEANUP.extend(report.signalled)
-    if report.residual_ownership_unknown:
-        raise ca.Unproven(f"strays of {work}: {report.unproven}")
-    return len(report.signalled)
-
-
-def run_target(root: pathlib.Path, target: str, tests: list[str]) -> dict:
+def run_target(root: pathlib.Path, target: str, tests: list[str], pristine: tuple[pathlib.Path, str] | None = None) -> dict:
+    """Measure one target. `pristine`: the copy `main()` took once ((path, tree digest)); a direct caller passes none and
+    gets one of its own. Everything this target writes lives in one scratch directory, removed at the end."""
     rel, func = target.split("::")
-    with tempfile.TemporaryDirectory() as t:
-        work = pathlib.Path(t) / "tree"
-        for part in COPY:
-            src = root / part
-            if src.is_dir():
-                shutil.copytree(src, work / part, ignore=shutil.ignore_patterns("__pycache__"))
-            elif src.exists():
-                (work / part).parent.mkdir(parents=True, exist_ok=True)
-                shutil.copy(src, work / part)
-        path = work / rel
-        original = path.read_text(encoding="utf-8")
-        boundary = ca.establish(work)  # P4-FINDING-011: the runner's own ownership boundary, before any worker
-        _FAILED.clear()
-        _TIMED_OUT.clear()
+    worker = _worker(root)
+    with tempfile.TemporaryDirectory(prefix=f"aisef-mut-{worker}-", ignore_cleanup_errors=True) as t:
+        scratch = pathlib.Path(t)
+        src_root, tree_sha = pristine or _pristine(root, scratch / "pristine")
+        original = (src_root / rel).read_text(encoding="utf-8")
+        boundary = ca.establish(scratch)  # P4-FINDING-011: the runner's own ownership boundary, before any worker
+        tg = _Target(rel, scratch, boundary, worker, pristine=src_root, last=int((src_root / rel).stat().st_mtime))
+        _new_tree(tg)
+        tg.version = original
         try:
-            clean, leaked = _run_tests(work, tests, boundary)
-        except ca.Unproven as e:
-            return {"target": target, "error": f"{ca.RESIDUAL_OWNERSHIP_UNKNOWN}: {e}", "mutants": []}
-        if not clean or leaked:
-            return {"target": target, "error": f"kill tests fail on the unmutated tree (leaked {leaked})",
-                    "mutants": [], "baseline": {"timed_out": list(_TIMED_OUT), "failed": list(_FAILED)}}
-        results = []
-        last = int(path.stat().st_mtime)  # the checkout's own (copy2): every stamp is above it (BC-5)
-        for desc, src in mutants(original, func, _enum_members(original, work)):
-            last = _write_version(path, src, last)
-            _TIMED_OUT.clear()
-            _CLEANUP.clear()
-            try:
-                passes, leaked = _run_tests(work, tests, boundary)
-                strays = _reap_strays(work, boundary) + leaked
-            except ca.Unproven as e:
-                _write_version(path, original, last)
-                return {"target": target, "error": f"{ca.RESIDUAL_OWNERSHIP_UNKNOWN} at mutant {desc!r}: {e}",
-                        "mutants": [], "cleanup": list(_CLEANUP)}
-            killed = not passes
-            result = {"mutant": desc, "killed": killed}
-            if _TIMED_OUT:
-                result["timed_out"] = list(_TIMED_OUT)  # killed by the clock, not by an assertion: named, so a
-                #                                          loaded machine cannot pass off a timeout as evidence
-            if strays:
-                result["strays_reaped"] = strays
-            if _CLEANUP:
-                result["cleanup"] = list(_CLEANUP)  # each signal with the authority's proof of ownership
-            results.append(result)
-        _write_version(path, original, last)
+            results = _measure(tg, tests, mutants(original, func, _enum_members(original, src_root)))
+        finally:
+            tg.holder.cleanup()
+    if isinstance(results, str):
+        return {"target": target, "error": results, "mutants": [], "stopped": True, **_drained()}
+    if isinstance(results, dict):
+        return {"target": target, **results}
     survivors = [r["mutant"] for r in results if not r["killed"]]
-    return {"target": target, "kill_tests": tests, "source_sha256": source_digest(original),
+    return {"target": target, "kill_tests": tests, "source_sha256": source_digest(original), "tree_sha256": tree_sha,
             "mutants": len(results), "killed": len(results) - len(survivors),
             "survivors": survivors, "strays_reaped": sum(r.get("strays_reaped", 0) for r in results),
             "killed_by_timeout": sum(1 for r in results if r.get("timed_out")), "results": results}
+
+
+def _drained() -> dict:
+    return {k: list(v) for k, v in (("cleanup", _CLEANUP), ("leaked", _LEFT)) if v}
+
+
+def _measure(tg: _Target, tests: list[str], found: list[tuple[str, str]]) -> list[dict] | dict | str:
+    """The baseline, then every mutant: their results, a refusal of the baseline (a dict), or why the target stopped."""
+    for g in (_FAILED, _TIMED_OUT, _CLEANUP, _LEFT, _RESIDUE):
+        g.clear()
+    try:
+        _settle(tg)   # before the target: what an earlier target of this worker left
+        clean, leaked = _run_tests(tg.tree, tests, tg.boundary, tg)
+    except ca.Unproven as e:
+        _LEFT.extend(getattr(e, "leaked", []))
+        return f"{ca.RESIDUAL_OWNERSHIP_UNKNOWN} before mutant 1 (baseline): {e}"
+    if not clean or leaked or _LEFT or _RESIDUE:
+        return {"error": f"kill tests fail on the unmutated tree (leaked {leaked})", "mutants": [],
+                "baseline": {"timed_out": list(_TIMED_OUT), "failed": list(_FAILED), "leaked": list(_LEFT),
+                             "residue": list(_RESIDUE)}}
+    results = []
+    for desc, src in found:
+        _write(tg, src)
+        for g in (_TIMED_OUT, _CLEANUP, _LEFT, _RESIDUE):
+            g.clear()
+        try:
+            passes, strays = _run_tests(tg.tree, tests, tg.boundary, tg)
+        except ca.Unproven as e:
+            _LEFT.extend(getattr(e, "leaked", []))
+            return f"{ca.RESIDUAL_OWNERSHIP_UNKNOWN} at mutant {desc!r}: {e}"
+        result = {"mutant": desc, "killed": not passes}
+        if _TIMED_OUT:
+            result["timed_out"] = list(_TIMED_OUT)  # killed by the clock, not by an assertion: named, so a
+            #                                          loaded machine cannot pass off a timeout as evidence
+        if strays:
+            result["strays_reaped"] = strays
+        if _CLEANUP:
+            result["cleanup"] = list(_CLEANUP)  # each signal with the authority's proof of ownership
+        if _LEFT:
+            result["leaked"] = list(_LEFT)
+        if _RESIDUE:
+            result["residue"] = list(_RESIDUE)
+        results.append(result)
+    return results
 
 
 def target_problems(t: dict, root: pathlib.Path = ROOT) -> list[str]:
@@ -1050,22 +1272,32 @@ def main(argv: list[str] | None = None) -> int:
     argv = sys.argv[1:] if argv is None else argv
     if argv[:1] == ["run"]:
         chosen = argv[1:] or list(TARGETS)
-        for phase, rel in RECORDS.items():
-            mine = [t for t in chosen if t in PHASE_TARGETS[phase]]
-            if not mine:
-                continue
-            out = ROOT / rel
-            record = json.loads(out.read_text(encoding="utf-8")) if out.exists() else {
-                "record": f"AISEF V2 — {phase} MUTATION", "tool": "validation/v2/mutation.py", "targets": []}
-            kept = [t for t in record["targets"] if t["target"] not in mine and t["target"] in PHASE_TARGETS[phase]]
-            fresh = []
-            for target in mine:  # the record is written after every target: a run that dies keeps what it measured
-                t = run_target(ROOT, target, TARGETS[target])
-                fresh.append(t)
-                record["targets"] = sorted(kept + fresh, key=lambda x: x["target"])
-                out.write_text(json.dumps(record, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
-                print(f"{t['target']}: {t.get('killed')}/{t.get('mutants')} killed; survivors {t.get('survivors')}"
-                      + (f" ERROR {t['error']}" if t.get("error") else ""), flush=True)
+        worker = _worker(ROOT)
+        left = _earlier(worker)
+        if left:  # a restarted worker never runs beside what an earlier run of it left (PL-3 verifier (e))
+            print(f"STOPPED before the first target: an earlier run of this worker left {left} alive", flush=True)
+            return 3
+        with tempfile.TemporaryDirectory(prefix=f"aisef-pristine-{worker}-") as p:
+            pristine = _pristine(ROOT, pathlib.Path(p) / "tree")   # once, before any record is written (FS-4)
+            for phase, rel in RECORDS.items():
+                mine = [t for t in chosen if t in PHASE_TARGETS[phase]]
+                if not mine:
+                    continue
+                out = ROOT / rel
+                record = json.loads(out.read_text(encoding="utf-8")) if out.exists() else {
+                    "record": f"AISEF V2 — {phase} MUTATION", "tool": "validation/v2/mutation.py", "targets": []}
+                kept = [t for t in record["targets"] if t["target"] not in mine and t["target"] in PHASE_TARGETS[phase]]
+                fresh = []
+                for target in mine:  # the record is written after every target: a run that dies keeps what it measured
+                    t = run_target(ROOT, target, TARGETS[target], pristine)
+                    fresh.append(t)
+                    record["targets"] = sorted(kept + fresh, key=lambda x: x["target"])
+                    out.write_text(json.dumps(record, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
+                    print(f"{t['target']}: {t.get('killed')}/{t.get('mutants')} killed; survivors {t.get('survivors')}"
+                          + (f" ERROR {t['error']}" if t.get("error") else ""), flush=True)
+                    if t.get("stopped"):   # the worker never runs beside a process it cannot prove its own
+                        print(f"STOPPED {target}: {t['error']}", flush=True)
+                        return 3
         unknown = [t for t in chosen if t not in TARGETS]
         if unknown:
             raise SystemExit(f"not a mutation target: {unknown}")

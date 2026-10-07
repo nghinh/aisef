@@ -28,8 +28,10 @@ from __future__ import annotations
 
 import dataclasses
 import os
+import pathlib
 import signal
 import subprocess
+import sys
 import time
 
 POSIX = os.name == "posix"
@@ -150,6 +152,34 @@ def strays(boundary: Boundary, table: dict[int, Host] | None = None) -> list[Hos
     marks = {boundary.root, os.path.realpath(boundary.root)}
     return sorted((p for p in table.values() if p.pid != os.getpid() and any(m in p.command for m in marks)),
                   key=lambda p: p.pid)
+
+
+def carriers(prefix: str, table: dict[int, Host] | None = None) -> list[Host]:
+    """Processes whose environment holds `prefix` (the mutation runner's `AISEF_MUTATION_RUN=<worker>:`) — candidates
+    only, like `strays`; `signal_owned` still proves each. A child given its own environment does not carry it, and
+    macOS hides a platform binary's environment (measured 2026-10-07: an inherited token is visible in `ps -E` for a
+    Homebrew python3, invisible for /bin/sleep). Read-only: Linux /proc/<pid>/environ, macOS `ps -E`; Windows: none (a
+    job has no breakaway)."""
+    table = host_table() if table is None else table
+    if not POSIX:
+        return []
+    hits: set[int] = set()
+    if sys.platform.startswith("linux"):
+        for pid in table:
+            try:
+                env = pathlib.Path(f"/proc/{pid}/environ").read_bytes()
+            except OSError:
+                continue
+            if any(v.startswith(prefix.encode()) for v in env.split(b"\0")):
+                hits.add(pid)
+    else:
+        out = subprocess.run(["ps", "-E", "-ww", "-A", "-o", "pid=,command="], capture_output=True, encoding="utf-8",
+                             errors="replace").stdout
+        for line in out.splitlines():
+            f = line.split(None, 1)
+            if len(f) == 2 and f[0].isdigit() and prefix in f[1]:
+                hits.add(int(f[0]))
+    return sorted((table[p] for p in hits if p in table and p != os.getpid()), key=lambda p: p.pid)
 
 
 def prove_member(boundary: Boundary, pid: int, group: int, table: dict[int, Host] | None = None) -> Host | None:
