@@ -1,0 +1,3747 @@
+{
+ "format": "aisef.v21-traceability/1",
+ "head": "c9c736fd638511b5cfd23d4d75ceb311c47b0759",
+ "built": "2026-10-07",
+ "sources": {
+  "proposal": {
+   "title": "AISEF v2 — Đề xuất cải tiến từ nghiên cứu mã nguồn (06/10/2026)",
+   "sha256": "ad2a79443bb20f5333b89dc6aa34500527d345490174767aed5905b071929832",
+   "in_repository": false
+  },
+  "assessment": "docs/DANH-GIA-360-V2.0-2026-10-06.md",
+  "report": "docs/v2.1/REPORT.md",
+  "upstream": "docs/v2.1/research/UPSTREAM-RESEARCH.json"
+ },
+ "other_refs": {
+  "release/v2.0.1-prep": "f006d3d1b23ef9d318078642d16c7bdfa7687a98"
+ },
+ "open_items": [
+  {
+   "name": "Linux sandbox (F / B-07)",
+   "rows": [
+    "P-V2-05",
+    "P-ADJ-4",
+    "P-7c",
+    "P-12-1",
+    "R-P1-12",
+    "R-M5"
+   ]
+  },
+  {
+   "name": "Gói ngữ cảnh / checkpoint theo MiMo (D4)",
+   "rows": [
+    "P-5.3a"
+   ]
+  },
+  {
+   "name": "Lượt chạy live (provider thật)",
+   "rows": [
+    "P-ADJ-5",
+    "P-11.2",
+    "R-P1-11",
+    "R-M1",
+    "R-M2",
+    "R-M3"
+   ]
+  },
+  {
+   "name": "So sánh hiệu quả có đối chứng (E2)",
+   "rows": [
+    "P-V2-13",
+    "P-11.1",
+    "R-M6"
+   ]
+  },
+  {
+   "name": "Khác — chưa làm, chưa có quyết định (open)",
+   "rows": [
+    "P-V2-12",
+    "P-4.3a",
+    "P-9.3",
+    "P-GATE-2.1",
+    "R-P0-4",
+    "R-P1-9",
+    "R-P1-10",
+    "R-P2-20",
+    "R-3.1",
+    "R-M4",
+    "R-M8",
+    "R-M9"
+   ]
+  },
+  {
+   "name": "Khác — bị chặn (blocked)",
+   "rows": [
+    "P-GATE-2.0.1",
+    "R-P2-17",
+    "R-M7"
+   ]
+  }
+ ],
+ "rows": [
+  {
+   "id": "P-V2-01",
+   "source": "proposal",
+   "ref": "§10 V2-01; §3 bảng điều chỉnh, hàng `.pth`",
+   "item": "Đóng startup injection và tách trusted runtime",
+   "upstream": [],
+   "evidence": "Mọi lần khởi chạy probe đang hoạt động mang `-I -S` (cli_invocation, python_callable_v2, process_effect); probe chạy trên `sys.executable` ngoài thư mục lượt chạy, test của developer trên `<out>/test-python` (ADR-1). Trên 610a593 `.pth` chạy trong probe (STATUS A1: đo). Nhánh 2.0.1 (`c0ec1a5`, chưa phát hành): hai venv, không có `-S`.",
+   "refs": [
+    {
+     "path": "aisef2/probe/process_effect.py",
+     "contains": "\"-I\", \"-S\", \"-B\""
+    },
+    {
+     "path": "docs/v2.1/STATUS.md",
+     "contains": "`.pth` do mã test ghi chạy trong probe"
+    }
+   ],
+   "reproducers": [
+    "tests/v2/test_v21_identity.py::PthChannel::test_the_mechanism_minus_I_runs_it_minus_S_does_not",
+    "tests/v2/test_v21_identity.py::PthChannel::test_every_active_probe_launch_carries_minus_S",
+    "tests/v2/test_v21_identity.py::PthChannel::test_a_probe_on_an_interpreter_holding_a_pth_never_runs_it",
+    "tests/v2/test_v21_identity.py::PthChannel::test_the_run_gives_the_probes_this_interpreter_and_the_tests_their_own",
+    "f006d3d1b23ef9d318078642d16c7bdfa7687a98:tests/v2/test_v201_venvs.py::TwoVenvs::test_a_pth_written_from_the_tests_interpreter_never_runs_in_a_probe"
+   ],
+   "reproducer_note": "",
+   "impact": "cao: kênh để mã ứng viên chạy bên trong controller giữ khoá HMAC (360 §3.4)",
+   "decision": "adapted",
+   "why": "Nhận `-S` + interpreter của kernel; loại băm cây venv (TOCTOU) đúng như §3 của đề xuất. Nửa sau (tách trusted runtime khỏi nơi developer ghi được) KHÔNG đạt: developer và test chạy cùng user (REPORT §3).",
+   "commits": [
+    {
+     "sha": "919a271",
+     "paths": [
+      "aisef2/probe/cli_invocation.py",
+      "aisef2/probe/python_callable_v2.py",
+      "aisef2/probe/process_effect.py",
+      "aisef2/app/run.py",
+      "tests/v2/test_v21_identity.py"
+     ]
+    },
+    {
+     "sha": "c0ec1a5",
+     "paths": [
+      "aisef2/app/run.py",
+      "tests/v2/test_v201_venvs.py"
+     ],
+     "ref": "f006d3d1b23ef9d318078642d16c7bdfa7687a98"
+    }
+   ],
+   "report_items": {
+    "A1": "M3"
+   },
+   "m_note": "Khớp REPORT. Reproducer tại HEAD chạy lại xanh tại c9c736f (vòng 2, `docs/v2.1/evidence/traceability-reproducers-c9c736f.out`); reproducer ở `f006d3d` không chạy lại.",
+   "acceptance": "`.pth` không chạy trong controller; developer không ghi được interpreter/import tree của verifier; chạy canary qua đường app thật",
+   "gap": "Không có ranh giới hệ điều hành (F/B-07). Canary qua đường app thật với provider thật: chưa chạy.",
+   "unconfirmed": ""
+  },
+  {
+   "id": "P-V2-02",
+   "source": "proposal",
+   "ref": "§10 V2-02",
+   "item": "`RUN.json` thành projection kiểm được",
+   "upstream": [],
+   "evidence": "`--verify` dựng lại outcome từ journal, settings qua `runspec_hash`, chi tiêu từ luồng phiên + ledger preflight; trường chỉ có trong record chỉ được hạ verdict; `EVIDENCE.json` + anchor, `--expect-anchor` (ADR-3). Lượt CLI thật trên b72e51e (cây sạch): hai lần `--verify --expect-anchor` VERIFIED.",
+   "refs": [
+    {
+     "path": "docs/v2.1/evidence/cli-integration-b72e51e.out",
+     "contains": "commit: b72e51eadd87bee56b916c70c4ac24649f49071e dirty: 0"
+    },
+    {
+     "path": "docs/v2.1/evidence/cli-integration-b72e51e.out",
+     "contains": "\"verdict\": \"VERIFIED\""
+    },
+    {
+     "path": "docs/v2.1/evidence/cli-integration-c9c736f.out",
+     "contains": "commit: c9c736fd638511b5cfd23d4d75ceb311c47b0759 dirty: 0",
+     "at": "with-table"
+    },
+    {
+     "path": "docs/v2.1/evidence/cli-integration-c9c736f.out",
+     "contains": "\"verdict\": \"VERIFIED\"",
+     "at": "with-table"
+    }
+   ],
+   "reproducers": [
+    "tests/v2/test_v21_verify.py::RecordAlone::test_a_budget_stop_removed_from_the_record_is_refuted",
+    "tests/v2/test_v21_verify.py::RecordAlone::test_raising_the_ceiling_in_the_record_is_refuted",
+    "tests/v2/test_v21_verify.py::RecordAlone::test_story_outcomes_that_are_not_the_journal_s_are_refuted",
+    "tests/v2/test_v21_verify.py::RecordAlone::test_a_rewritten_manifest_is_refuted_only_against_the_anchor_the_operator_kept",
+    "tests/v2/test_v21_continue_integrity.py::AnchorThreatModel::test_the_limit_an_attacker_who_can_write_the_store_too_is_not_detected"
+   ],
+   "reproducer_note": "",
+   "impact": "cao: trên 2.0 sửa riêng `RUN.json` vẫn VERIFIED (STATUS A2: đo)",
+   "decision": "adopted",
+   "why": "Đúng phạm vi đề xuất; không đổi format journal.",
+   "commits": [
+    {
+     "sha": "ad78ce7",
+     "paths": [
+      "aisef2/app/verify.py",
+      "aisef2/app/run.py",
+      "aisef2/app/cli.py",
+      "tests/v2/test_v21_verify.py"
+     ]
+    },
+    {
+     "sha": "d622e71",
+     "paths": [
+      "aisef2/app/verify.py",
+      "aisef2/app/usage.py"
+     ]
+    },
+    {
+     "sha": "872e83c",
+     "paths": [
+      "aisef2/app/lineage.py",
+      "aisef2/app/verify.py"
+     ]
+    }
+   ],
+   "report_items": {
+    "A2": "M4"
+   },
+   "m_note": "Khớp REPORT: output CLI đã commit có hai VERIFIED với `--expect-anchor`.",
+   "acceptance": "Sửa riêng trường outcome/budget/error trong RUN bị phát hiện; tái dựng từ nguồn chuẩn đầy đủ",
+   "gap": "Không có anchor thì chỉ chứng minh nhất quán, không xác thực; nơi giữ anchor tin cậy chưa có (REPORT §4.3, §7).",
+   "unconfirmed": ""
+  },
+  {
+   "id": "P-V2-03",
+   "source": "proposal",
+   "ref": "§10 V2-03",
+   "item": "Làn release 2.0.x, metadata và quyền publish",
+   "upstream": [],
+   "evidence": "`release_rc`/`v2_release_gate` theo phiên bản trong pyproject (aa3c18a); metadata mô tả 2.x, `license = \"MIT\"`, tệp LICENSE, bỏ link tới repo private (b819a57). Action trong workflow vẫn ghim theo tag (`actions/checkout@v4`, `pypa/gh-action-pypi-publish@release/v1`), không theo SHA; không commit 2.1 nào sửa `.github/`.",
+   "refs": [
+    {
+     "path": ".github/workflows/release.yml",
+     "contains": "pypa/gh-action-pypi-publish@release/v1"
+    },
+    {
+     "path": ".github/workflows/release.yml",
+     "same_as": "610a593"
+    },
+    {
+     "path": "pyproject.toml",
+     "contains": "license = \"MIT\""
+    }
+   ],
+   "reproducers": [
+    "tests/v2/test_v21_release_lane.py::Subject::test_a_patch_version_has_its_own_candidates_never_2_0_0_s",
+    "tests/v2/test_v21_release_lane.py::Freeze::test_freeze_writes_the_version_s_next_candidate_and_never_rewrites_one",
+    "tests/v2/test_v21_release_lane.py::Gate::test_a_patch_passes_on_its_own_status_and_candidate"
+   ],
+   "reproducer_note": "",
+   "impact": "trung bình: không phát hành nổi 2.0.1 nếu không sửa công cụ (360 §3.7)",
+   "decision": "adapted",
+   "why": "Nhận phần công cụ + metadata. 'CI action ghim' chưa làm; 'quyền phát hành có kiểm soát' (người duyệt môi trường `pypi`, bảo vệ tag) là thiết lập GitHub của chủ dự án.",
+   "commits": [
+    {
+     "sha": "aa3c18a",
+     "paths": [
+      "validation/qualification/release_rc.py",
+      "validation/v2_release_gate.py",
+      "tests/v2/test_v21_release_lane.py"
+     ]
+    },
+    {
+     "sha": "b819a57",
+     "paths": [
+      "pyproject.toml",
+      "LICENSE",
+      "validation/v2/packaging_check.py"
+     ]
+    }
+   ],
+   "report_items": {
+    "A9": "M4",
+    "A10": "M4"
+   },
+   "m_note": "Khớp REPORT (M4 = build + `packaging_check` tại máy; CI/RC là M6).",
+   "acceptance": "Dựng bản vá không sửa hardcode phiên bản; metadata đúng; CI action ghim; quyền phát hành có kiểm soát",
+   "gap": "CI, staging, RC: M6 (chủ dự án). Action chưa ghim SHA. Trang PyPI của 2.0.0 chỉ đổi khi có bản phát hành mới.",
+   "unconfirmed": ""
+  },
+  {
+   "id": "P-V2-04",
+   "source": "proposal",
+   "ref": "§10 V2-04",
+   "item": "Sửa loader, preflight, redaction, phân loại lỗi môi trường",
+   "upstream": [],
+   "evidence": "Đầu vào sai ⇒ mã thoát 2 + đường dẫn JSON; endpoint loopback phân tích thật; `--check` clone như lượt chạy (106f72d). Preflight không theo redirect; luồng phiên được che dù ngắt (b029236). `git diff` lỗi ⇒ RESOURCE_ACQUISITION_FAILED, owner ENVIRONMENT, retry được (51c5241, 4ea4276).",
+   "refs": [
+    {
+     "path": "validation/v21/cli_integration/run.sh",
+     "contains": "git init -q -b main"
+    }
+   ],
+   "reproducers": [
+    "tests/v2/test_v21_inputs.py::BundleShape::test_product_roots_as_a_string_is_not_split_into_letters",
+    "tests/v2/test_v21_inputs.py::InputFiles::test_cli_exit_2_for_unreadable_inputs",
+    "tests/v2/test_v21_inputs.py::Endpoint::test_lookalike_hosts_are_refused",
+    "tests/v2/test_v21_inputs.py::RepositoryRefusal::test_an_editor_key_does_not_make_check_claim_the_baseline_is_missing",
+    "tests/v2/test_v21_transport.py::Redirect::test_a_redirect_is_refused_and_the_key_never_reaches_its_target",
+    "tests/v2/test_v21_transport.py::Redaction::test_an_interrupted_session_still_leaves_no_secret",
+    "tests/v2/test_v21_orchestration.py::DiffFailure::test_a_diff_git_cannot_produce_is_RESOURCE_ACQUISITION_FAILED"
+   ],
+   "reproducer_note": "",
+   "impact": "cao (khoá API tới đích redirect; bí mật còn trong bằng chứng sau ngắt) đến thấp (`--check` báo sai lý do) — STATUS §1",
+   "decision": "adopted",
+   "why": "Đúng đề xuất và 360 #13.",
+   "commits": [
+    {
+     "sha": "106f72d",
+     "paths": [
+      "aisef2/app/bundle.py",
+      "aisef2/app/settings.py",
+      "aisef2/app/run.py",
+      "tests/v2/test_v21_inputs.py"
+     ]
+    },
+    {
+     "sha": "b029236",
+     "paths": [
+      "aisef2/app/preflight.py",
+      "aisef2/app/client.py",
+      "tests/v2/test_v21_transport.py"
+     ]
+    },
+    {
+     "sha": "51c5241",
+     "paths": [
+      "aisef2/orchestrate/story_runner.py",
+      "aisef2/orchestrate/workspace.py",
+      "tests/v2/test_v21_orchestration.py"
+     ]
+    },
+    {
+     "sha": "4ea4276",
+     "paths": [
+      "aisef2/orchestrate/story_runner.py"
+     ]
+    }
+   ],
+   "report_items": {
+    "A3": "M3",
+    "A4": "M3",
+    "A5": "M4",
+    "A6": "M3",
+    "A7": "M3",
+    "A8": "M3"
+   },
+   "m_note": "Khớp REPORT. Lưu ý khi kiểm lại: M4 của A5 dựa vào `--check` ready qua CLI thật, nhưng repo của lượt đó được dựng bằng `git init` sạch, HOME riêng (validation/v21/cli_integration/run.sh) — không có khoá git của editor; M4 cho thấy đường clone chạy qua CLI thật, điều kiện của A5 chỉ được tái hiện ở test (M3).",
+   "acceptance": "Dữ liệu sai có lỗi vị trí; redirect không làm lộ auth; log đã redact kể cả lỗi/ngắt có xử lý; git lỗi không giả thành product defect",
+   "gap": "Preflight thật mới chỉ tới loopback, chưa gặp redirect thật (REPORT §2 A6–A7). Điều kiện của A5 (khoá git của editor) chỉ tái hiện ở test (M3): repo của lượt CLI thật (`git init` sạch) không có khoá đó.",
+   "unconfirmed": ""
+  },
+  {
+   "id": "P-V2-05",
+   "source": "proposal",
+   "ref": "§10 V2-05",
+   "item": "Linux sandbox developer và candidate",
+   "upstream": [
+    {
+     "key": "opensandbox",
+     "repo": "opensandbox-group/OpenSandbox",
+     "claim": "P10",
+     "label": "INFERENCE",
+     "verify": "confirmed",
+     "commit": "c7dc78a4090e",
+     "where": "manager.go:253-296; config.py:1005; example.config.toml:98"
+    }
+   ],
+   "evidence": "Không có mã cách ly nào tại HEAD (REPORT §2 F, §6). REPORT §6 ghi một phép đo môi trường (bwrap trong container chỉ chạy khi nới seccomp/apparmor/systempaths) — không có bản ghi đã commit cho phép đo đó.",
+   "refs": [
+    {
+     "path": "docs/v2.1/REPORT.md",
+     "contains": "chưa có mã cách ly nào trên nhánh"
+    }
+   ],
+   "reproducers": [],
+   "reproducer_note": "Không có (chưa triển khai).",
+   "impact": "cao: developer đọc được stimulus ẩn, bundle, journal (DEVELOPER-CONFINEMENT-GAP-001; 360 §3.4: 69 lời gọi / 4 phiên ở smoke #2)",
+   "decision": "blocked",
+   "why": "Chưa có mã; phương án ranh giới (a container là ranh giới / b bwrap trong container đã nới / c máy-VM riêng) chờ chủ dự án (REPORT §7 hàng F; khuyến nghị (a) chưa đo).",
+   "commits": [],
+   "report_items": {
+    "F": "M6"
+   },
+   "m_note": "Khớp REPORT.",
+   "acceptance": "Bài kiểm truy cập hidden bundle/runtime/key bị từ chối; không chạm host process; egress theo policy",
+   "gap": "Toàn bộ. MỞ.",
+   "unconfirmed": ""
+  },
+  {
+   "id": "P-V2-06",
+   "source": "proposal",
+   "ref": "§10 V2-06",
+   "item": "PRESERVE trước merge + sửa spec import",
+   "upstream": [],
+   "evidence": "PRESERVE của story đã commit được chứng minh ở candidate ⇒ CONTRACT_UNSATISFIED, owner DEVELOPER, retry, tiêu chí vào prompt retry (ADR-4, 91a8968); vẫn chứng minh lại sau merge cho thay đổi do merge (INTEGRATION). Lớp `python_imports` đếm import bằng `ast` (06d4e62); contract S-10-a sửa chỉ là bản nháp chưa duyệt.",
+   "refs": [
+    {
+     "path": "aisef2/probe/file_artifact.py",
+     "contains": "CLASSES = (\"exists\", \"content\", \"grep_count\", \"python_imports\")"
+    },
+    {
+     "path": "docs/v2.1/drafts/LEDGERLOCK-BC-V22-S-10-a-r2.DRAFT.json",
+     "exists": true
+    }
+   ],
+   "reproducers": [
+    "tests/v2/test_v21_orchestration.py::PreserveAtCandidate::test_a_regression_the_developer_made_is_the_developer_s_and_never_merged",
+    "tests/v2/test_v21_orchestration.py::PreserveAtCandidate::test_a_retry_that_repairs_it_commits",
+    "tests/v2/test_v21_python_imports.py::Controls::test_the_approved_regex_reproduces_the_false_rollback",
+    "tests/v2/test_v21_python_imports.py::Controls::test_each_draft_holds_on_the_smoke2_shape_and_refutes_a_real_import",
+    "tests/v2/test_p6_orchestration.py::Orchestration::test_ORCH_9_and_10_a_post_merge_regression_of_a_prior_PRESERVE_obligation_is_INTEGRATION_and_rolled_back"
+   ],
+   "reproducer_note": "",
+   "impact": "cao: smoke #2 rollback sai một story đúng (V21-37); lỗi hồi quy của developer thành INTEGRATION, không chạy lại (V21-38)",
+   "decision": "adopted",
+   "why": "Đúng đề xuất; contract LedgerLock không tự sửa — chủ dự án chọn A/B (B-04).",
+   "commits": [
+    {
+     "sha": "91a8968",
+     "paths": [
+      "aisef2/orchestrate/story_runner.py",
+      "tests/v2/test_v21_orchestration.py"
+     ]
+    },
+    {
+     "sha": "06d4e62",
+     "paths": [
+      "aisef2/probe/file_artifact.py",
+      "tests/v2/test_v21_python_imports.py",
+      "docs/v2.1/drafts/LEDGERLOCK-BC-V22-S-10-a-r2.DRAFT.json"
+     ]
+    }
+   ],
+   "report_items": {
+    "B1": "M3",
+    "B3": "M3"
+   },
+   "m_note": "Khớp REPORT. Reproducer tại HEAD chạy lại xanh tại c9c736f (vòng 2, `docs/v2.1/evidence/traceability-reproducers-c9c736f.out`).",
+   "acceptance": "Candidate làm hỏng story trước nhận phản hồi đúng; biến thể hợp lệ/docstring không bị bác nhầm; vẫn kiểm cây tích hợp khi base đổi",
+   "gap": "Contract S-10-a sửa: M6 (B-04 chưa duyệt). 'Biến thể hợp lệ không bị bác nhầm' chỉ kiểm cho hai bản nháp S-10-a trên dạng smoke #2, không tổng quát (xem P-9.3).",
+   "unconfirmed": ""
+  },
+  {
+   "id": "P-V2-07",
+   "source": "proposal",
+   "ref": "§10 V2-07",
+   "item": "Bundle API/schema/example/coverage",
+   "upstream": [],
+   "evidence": "`aisef bundle init/seal/approve/lint/explain`, JSON Schema `aisef-v2-authoring/1`, hai ví dụ ship trong wheel (1 story, 3 story) (620bde7). Lượt CLI thật b72e51e: seal → approve ×3 → lint READY → `--check` ready; bundle thứ hai seal → approve ×4.",
+   "refs": [
+    {
+     "path": "docs/v2.1/evidence/cli-integration-b72e51e.out",
+     "contains": "\"verdict\": \"READY\""
+    },
+    {
+     "path": "pyproject.toml",
+     "contains": "\"aisef2\" = [\"app/examples/*.json\"]"
+    },
+    {
+     "path": "docs/v2.1/evidence/cli-integration-b72e51e.out",
+     "contains": "AISEF does not parse the requirements document"
+    },
+    {
+     "path": "aisef2/app/bundle_cli.py",
+     "at": "b72e51e",
+     "lacks": "def _create("
+    },
+    {
+     "path": "aisef2/app/bundle_cli.py",
+     "contains": "def _create("
+    },
+    {
+     "path": "docs/v2.1/evidence/cli-integration-c9c736f.out",
+     "contains": "\"verdict\": \"READY\"",
+     "at": "with-table"
+    },
+    {
+     "path": "docs/v2.1/evidence/cli-integration-c9c736f.out",
+     "contains": "AISEF does not parse the requirements document",
+     "at": "with-table"
+    }
+   ],
+   "reproducers": [
+    "tests/v2/test_v21_bundle_tools.py::Outsider::test_each_example_from_init_to_a_ready_check",
+    "tests/v2/test_v21_bundle_tools.py::Schema::test_the_schema_and_the_tool_agree_on_every_closed_key_set",
+    "tests/v2/test_v21_bundle_tools.py::Refusals::test_an_uncovered_requirement_is_named_where_admission_refuses_it",
+    "tests/v2/test_v21_bundle_tools.py::Refusals::test_an_edited_contract_loses_its_approval_on_reseal"
+   ],
+   "reproducer_note": "",
+   "impact": "cao: không có đường soạn bundle được hỗ trợ (360 §3.6)",
+   "decision": "adopted",
+   "why": "Đúng đề xuất.",
+   "commits": [
+    {
+     "sha": "620bde7",
+     "paths": [
+      "aisef2/app/bundle_cli.py",
+      "aisef2/app/examples/calc-1-story.json",
+      "aisef2/app/examples/calc-3-stories.json",
+      "docs/v2.1/bundle-authoring.schema.json",
+      "tests/v2/test_v21_bundle_tools.py"
+     ]
+    }
+   ],
+   "report_items": {
+    "B4": "M4",
+    "B5": "M4"
+   },
+   "m_note": "Khớp REPORT: output đã commit có seal, approve, lint READY, `--check` ready. M4 là của lượt CLI thật tại `b72e51e` (docs/v2.1/evidence/cli-integration-b72e51e.out); `aisef2/app/bundle_cli.py` đổi sau lượt đó ở a912be6 và 3061ec0 (đường ghi của init/seal/approve/migrate chuyển sang tạo độc quyền `_create`), lượt lặp lại tại c9c736f (`docs/v2.1/evidence/cli-integration-c9c736f.out`, vòng 2 của bảng này: cùng `run.sh`, cùng nhị phân OCR, clone sạch tại c9c736f) cho cùng output — khác nhau chỉ ở giá trị băm (commit của repo `git init` mới, plan_hash, anchor, sha256), pid, mốc thời gian và dòng cuối bị cắt ở 3000 ký tự: M4 tại c9c736f.",
+   "acceptance": "Người ngoài tạo bundle 3 story không import private constructor; mọi mệnh đề có trạng thái coverage rõ",
+   "gap": "Chưa người ngoài nào thử (chưa đo). Độ phủ chỉ trên mệnh đề do tiêu chí khai — lint tự ghi 'AISEF does not parse the requirements document'.",
+   "unconfirmed": "Tài liệu ngữ pháp contract cho 18 lớp quan sát: không kiểm trong phiên này."
+  },
+  {
+   "id": "P-V2-08",
+   "source": "proposal",
+   "ref": "§10 V2-08; §3 bảng điều chỉnh, hàng identity; §9.2",
+   "item": "Tách compatibility và execution identity",
+   "upstream": [],
+   "evidence": "Ba danh tính: `contract_hash` (approval), DIGEST = năng lực probe (spec, plan), EXECUTION_DIGEST = byte nguồn probe (hàng hiệu chuẩn, RunSpec) (ADR-2, 919a271); `aisef bundle migrate`. Chủ dự án duyệt V2-007 (RELEASE-DECISIONS seq 4, dc9774f — kỹ thuật chép, chủ dự án không ký). Tại HEAD, PROBE_SOURCES của process_effect là 4 tệp probe: `aisef2/runtime/process_range.py` (process_effect import) và `range_anchor.py` (process_range chạy) không nằm trong EXECUTION_DIGEST.",
+   "refs": [
+    {
+     "path": "aisef2/probe/process_effect.py",
+     "contains": "PROBE_SOURCES = (\"probe/protocol.py\", \"probe/python_callable.py\", \"probe/cli_invocation.py\", \"probe/process_effect.py\")"
+    },
+    {
+     "path": "aisef2/probe/process_effect.py",
+     "contains": "from aisef2.runtime.process_range import ProcessRange"
+    },
+    {
+     "path": "aisef2/runtime/process_range.py",
+     "contains": "ANCHOR = pathlib.Path(__file__).with_name(\"range_anchor.py\")"
+    },
+    {
+     "path": "closure-evidence/v2/cycle2/RELEASE-DECISIONS.json",
+     "contains": "AISEF_V2_1_B01_ARCHITECTURE_EXCEPTION_V2_007"
+    }
+   ],
+   "reproducers": [
+    "tests/v2/test_v21_identity.py::ThreeIdentities::test_a_spec_binds_the_capability_and_the_bytes_are_their_own_digest",
+    "tests/v2/test_v21_identity.py::ThreeIdentities::test_calibrations_of_other_bytes_admit_nothing",
+    "tests/v2/test_v21_identity.py::ThreeIdentities::test_the_runspec_binds_each_probe_s_bytes",
+    "tests/v2/test_v21_identity.py::Migrate::test_migration_rebinds_the_plan_and_nothing_else",
+    "tests/test_v21_bundle_dispatch.py::BundleIsV2::test_migrate_through_the_aisef_command"
+   ],
+   "reproducer_note": "",
+   "impact": "cao: trên 2.0 sửa một byte probe (kể cả docstring) làm gãy mọi bundle (360 §3.1, §3.10)",
+   "decision": "adapted",
+   "why": "Nhận tách ba danh tính; năng lực probe là CAPABILITY_VERSION tăng bằng tay, không băm AST (ADR-2: băm AST không chứng minh tương đương). Execution digest chỉ phủ byte nguồn probe, chưa phủ runtime/dependency như §9.2 mục 3.",
+   "commits": [
+    {
+     "sha": "919a271",
+     "paths": [
+      "aisef2/probe/calibration.py",
+      "aisef2/app/calibrations.py",
+      "aisef2/app/bundle_cli.py",
+      "validation/qualification/release_calibration.py"
+     ]
+    },
+    {
+     "sha": "06d4e62",
+     "paths": [
+      "aisef2/app/calibrations.py"
+     ]
+    },
+    {
+     "sha": "4d4c53a",
+     "paths": [
+      "tests/v2/test_v21_identity.py"
+     ]
+    },
+    {
+     "sha": "16d85e7",
+     "paths": [
+      "closure-evidence/v2/v2.1/ARCHITECTURE-EXCEPTION-V2-007.json",
+      "closure-evidence/v2/v2.1/AISEF-V2-RFC-AMENDMENT-V2-007.json"
+     ]
+    },
+    {
+     "sha": "dc9774f",
+     "paths": [
+      "closure-evidence/v2/cycle2/RELEASE-DECISIONS.json"
+     ]
+    }
+   ],
+   "report_items": {
+    "B6": "M3"
+   },
+   "m_note": "Khớp REPORT. Reproducer tại HEAD chạy lại xanh tại c9c736f (vòng 2, `docs/v2.1/evidence/traceability-reproducers-c9c736f.out`).",
+   "acceptance": "Patch không đổi capability dùng được bundle cũ; đổi semantics bị chặn hoặc migrate có duyệt; run cũ kiểm được",
+   "gap": "EXECUTION_DIGEST bỏ sót `runtime/process_range.py` và `range_anchor.py` — phát hiện 360 §3.1 vẫn đúng tại HEAD (xem R-3.1). Kỷ luật tăng CAPABILITY_VERSION không máy nào kiểm (ADR-2). Tuyên bố 'một `-S` làm đỏ 37 test' chưa đo (STATUS B6).",
+   "unconfirmed": ""
+  },
+  {
+   "id": "P-V2-09",
+   "source": "proposal",
+   "ref": "§10 V2-09; §4.1–4.3",
+   "item": "OCR adapter + confirmed finding feedback",
+   "upstream": [
+    {
+     "key": "open-code-review",
+     "repo": "alibaba/open-code-review",
+     "claim": "P7",
+     "label": "CODE",
+     "verify": "confirmed",
+     "commit": "182898cf522d",
+     "where": "internal/session/manifest.go:231-237, 854-858"
+    },
+    {
+     "key": "open-code-review",
+     "repo": "alibaba/open-code-review",
+     "claim": "P8",
+     "label": "CODE",
+     "verify": "confirmed",
+     "commit": "182898cf522d",
+     "where": "internal/session/manifest.go:165-170, 941-958"
+    },
+    {
+     "key": "open-code-review",
+     "repo": "alibaba/open-code-review",
+     "claim": "P11",
+     "label": "CODE",
+     "verify": "corrected",
+     "commit": "182898cf522d",
+     "where": "cmd/opencodereview/review_cmd.go:326-352; internal/agent/agent.go:705-716"
+    },
+    {
+     "key": "open-code-review",
+     "repo": "alibaba/open-code-review",
+     "claim": "N3",
+     "label": "CODE",
+     "verify": "confirmed",
+     "commit": "182898cf522d",
+     "where": "cmd/opencodereview/sarif.go:195-211, 288-297"
+    },
+    {
+     "key": "open-code-review",
+     "repo": "alibaba/open-code-review",
+     "claim": "N6",
+     "label": "CODE",
+     "verify": "confirmed",
+     "commit": "182898cf522d",
+     "where": "internal/agent/agent.go:479-482, 919-927"
+    },
+    {
+     "key": "open-code-review",
+     "repo": "alibaba/open-code-review",
+     "claim": "N19",
+     "label": "EXPERIMENT",
+     "research_label": "NOT_FOUND",
+     "verify": "refuted",
+     "commit": "182898cf522d",
+     "where": "người kiểm: EXPERIMENT pages/src/components/BenchmarkSection.tsx:43-56 (recall 11,7–20 %, precision 25,2–37,8 %)"
+    }
+   ],
+   "evidence": "OCR v1.12.12 (182898c) chạy như tiến trình ngoài, ghim sha256, môi trường đã xoá biến OCR_/ANTHROPIC_/OTEL_; coverage do AISEF tính từ manifest, exit 0 không bao giờ là 'đã review đủ'; `finding_id` theo fingerprint SARIF; finding chỉ chặn khi CONFIRMED ∧ ANCHORED ∧ ≥ `min_severity` (ADR-7). Lượt CLI thật b72e51e: nhị phân OCR thật, settings `fix-loop` + `finder: ocr`, S1: RETRY → COMMIT, verify VERIFIED. `RealBinary` 3/3 OK với nhị phân OCR đã ghim, chạy lại tại c9c736f (vòng 2; `docs/v2.1/evidence/traceability-reproducers-c9c736f.out`).",
+   "refs": [
+    {
+     "path": "docs/v2.1/evidence/cli-integration-b72e51e.out",
+     "contains": "ocr: open-code-review v1.12.12 (182898c) darwin/arm64 sha256 bf38abf320ead4e106b71c15824463640207118f38e1c10c28a73b6839104af7"
+    },
+    {
+     "path": "validation/v21/cli_integration/make_inputs.py",
+     "contains": "\"review\": {\"policy\": \"fix-loop\", \"min_severity\": \"high\", \"finder\": \"ocr\","
+    },
+    {
+     "path": "tests/v2/test_v21_review.py",
+     "contains": "{\"repair-utf8-crash\": V.UNANCHORED}"
+    },
+    {
+     "path": "docs/v2.1/evidence/cli-integration-c9c736f.out",
+     "contains": "ocr: open-code-review v1.12.12 (182898c) darwin/arm64 sha256 bf38abf320ead4e106b71c15824463640207118f38e1c10c28a73b6839104af7",
+     "at": "with-table"
+    },
+    {
+     "path": "docs/v2.1/evidence/traceability-reproducers-c9c736f.out",
+     "contains": "# run 2 summary: Ran 3 tests in",
+     "at": "with-table"
+    },
+    {
+     "path": "docs/v2.1/evidence/traceability-reproducers-c9c736f.out",
+     "contains": "tests.v2.test_v21_review_chain.RealBinary.test_a_full_review_against_a_scripted_model: ok",
+     "at": "with-table"
+    }
+   ],
+   "reproducers": [
+    "tests/v2/test_v21_review.py::HistoricalDefects::test_each_shipped_defect_is_confirmed_on_its_shape_and_not_on_the_reference",
+    "tests/v2/test_v21_review_chain.py::IncompleteReview::test_partial",
+    "tests/v2/test_v21_review_chain.py::NotABlocker::test_a_finding_that_does_not_reproduce_does_not_block",
+    "tests/v2/test_v21_review_ocr.py::Coverage::test_exit_0_is_not_a_full_review",
+    "tests/v2/test_v21_review_ocr.py::Findings::test_ids_are_ocr_s_sarif_fingerprint_stable_under_order_and_numbered_when_repeated",
+    "tests/v2/test_v21_review_chain.py::RealBinary::test_a_full_review_against_a_scripted_model"
+   ],
+   "reproducer_note": "`RealBinary` cần `AISEF_TEST_OCR_EXE`: bỏ qua trong suite hermetic (REPORT §4.1).",
+   "impact": "cao: 5 lỗi review tìm thấy, tái hiện được, vẫn vào `main` (360 §3.5)",
+   "decision": "adapted",
+   "why": "Điều chỉnh: finding chỉ chặn khi CONFIRMED ∧ ANCHORED ∧ mức ≥ `min_severity` — điều kiện neo theo chỉ thị chủ dự án (xem P-ADJ-3, P-4.3b). Vì điều kiện đó, lỗi lịch sử thứ năm (UNANCHORED) vẫn lọt gate: tiêu chí '5 lỗi lịch sử không lọt gate' cố ý chỉ đạt 4/5.",
+   "commits": [
+    {
+     "sha": "e897437",
+     "paths": [
+      "aisef2/app/review_ocr.py",
+      "aisef2/app/review_verify.py",
+      "aisef2/app/feedback.py",
+      "aisef2/orchestrate/review.py",
+      "tests/v2/test_v21_review.py",
+      "tests/v2/test_v21_review_ocr.py"
+     ]
+    },
+    {
+     "sha": "390f07c",
+     "paths": [
+      "aisef2/app/review_verify.py",
+      "aisef2/app/review_ocr.py"
+     ]
+    },
+    {
+     "sha": "929598f",
+     "paths": [
+      "tests/v2/test_v21_review_chain.py"
+     ]
+    },
+    {
+     "sha": "181d68e",
+     "paths": [
+      "aisef2/app/adapters.py"
+     ]
+    },
+    {
+     "sha": "51f2eb5",
+     "paths": [
+      "aisef2/app/review_ocr.py"
+     ]
+    }
+   ],
+   "report_items": {
+    "C1": "M4",
+    "C2": "M4",
+    "C3": "M4"
+   },
+   "m_note": "Khớp REPORT về mức. Output đã commit xác nhận nhị phân OCR thật, settings fix-loop và S1 RETRY → COMMIT.",
+   "acceptance": "5 lỗi lịch sử không lọt gate; partial review không PASS; false finding không tự thành blocker",
+   "gap": "Chỉ 4/5 lỗi lịch sử neo được nên bị chặn; lỗi thứ năm (trích R-7/1, contract quan sát tệp) là UNANCHORED và theo luật neo vẫn lọt gate (ADR-7; test_v21_review.py dòng 8–9, 117). Chất lượng finding của mô hình thật: M6 (B-05, B-06).",
+   "unconfirmed": "Chuỗi 'finding ⇒ CONFIRMED ⇒ ANCHORED ⇒ REVIEW_FINDING' của REPORT §4.1 không có trong output đã commit (journal của lượt không được commit) — không xác nhận được từ repo."
+  },
+  {
+   "id": "P-V2-10",
+   "source": "proposal",
+   "ref": "§10 V2-10",
+   "item": "Resume từ journal/checkpoint",
+   "upstream": [
+    {
+     "key": "mimo-code",
+     "repo": "XiaomiMiMo/MiMo-Code",
+     "claim": "P-11",
+     "label": "CODE",
+     "verify": "confirmed",
+     "commit": "6babeb0b98f9",
+     "where": "packages/cli/src/workflow/runtime.ts:1562-1563, :588; persistence.ts:292-297"
+    },
+    {
+     "key": "mimo-code",
+     "repo": "XiaomiMiMo/MiMo-Code",
+     "claim": "N-16",
+     "label": "CODE",
+     "verify": "confirmed",
+     "commit": "6babeb0b98f9",
+     "where": "packages/cli/src/workflow/runtime.ts:1539-1545; workflow.sql.ts:6-31"
+    },
+    {
+     "key": "open-code-review",
+     "repo": "alibaba/open-code-review",
+     "claim": "P9",
+     "label": "CODE",
+     "verify": "confirmed",
+     "commit": "182898cf522d",
+     "where": "internal/session/resume_identity.go:79-128; cmd/opencodereview/review_cmd.go:182-188"
+    }
+   ],
+   "evidence": "Thay resume tại chỗ bằng nối tiếp: `aisef bundle continue` + `aisef run --parent`; claim theo thế hệ (`O_EXCL`); tác dụng ngoài được đối soát với git; chi phí chưa đối soát chặn phiên trả tiền (ADR-8). Lượt CLI thật b72e51e: SIGKILL thật (exit 137) ⇒ continue ⇒ `--parent` bị từ chối (exit 2) ⇒ `--accept-unaccounted` ⇒ COMMIT ⇒ continue lần nữa bị từ chối ⇒ verify VERIFIED.",
+   "refs": [
+    {
+     "path": "docs/v2.1/evidence/cli-integration-b72e51e.out",
+     "contains": "exit 137 (137 = SIGKILL)"
+    },
+    {
+     "path": "docs/v2.1/evidence/cli-integration-b72e51e.out",
+     "contains": "is already continued by"
+    },
+    {
+     "path": "docs/v2.1/evidence/cli-integration-c9c736f.out",
+     "contains": "exit 137 (137 = SIGKILL)",
+     "at": "with-table"
+    },
+    {
+     "path": "docs/v2.1/evidence/cli-integration-c9c736f.out",
+     "contains": "is already continued by",
+     "at": "with-table"
+    }
+   ],
+   "reproducers": [
+    "tests/v2/test_v21_continue_integrity.py::CommitWindows::test_the_merge_moved_main_the_journal_never_committed_it",
+    "tests/v2/test_v21_continue_integrity.py::JournalAppendWindows::test_a_short_write_is_a_torn_tail_whose_effect_is_still_reconciled",
+    "tests/v2/test_v21_continue_integrity.py::ClaimLifecycle::test_two_runs_at_once_one_claims_and_the_other_spends_nothing",
+    "tests/v2/test_v21_continue_integrity.py::ProviderRequestWindows::test_its_usage_reported_its_result_never_journaled",
+    "tests/v2/test_v21_continue_integrity.py::ProcessesOfAKilledRun::test_the_probe_processes_are_identified_and_die_with_the_run",
+    "tests/v2/test_v21_continue_usage.py::Continue::test_a_continuation_verifies_given_its_directory_relative_or_absolute"
+   ],
+   "reproducer_note": "",
+   "impact": "cao: 2.0 không có đường resume (`--out` phải mới), một lượt dài hỏng là mất (360 §3.1, §3.7)",
+   "decision": "adapted",
+   "why": "Resume tại chỗ cần format journal mới (schema đóng) ⇒ chọn nối tiếp + dòng dõi (ADR-8). 'Đổi policy tạo lineage mới' đạt bằng run con.",
+   "commits": [
+    {
+     "sha": "d622e71",
+     "paths": [
+      "aisef2/app/bundle_cli.py",
+      "aisef2/app/cli.py"
+     ]
+    },
+    {
+     "sha": "7e0aac0",
+     "paths": [
+      "aisef2/app/bundle_cli.py",
+      "tests/v2/test_v21_continue_integrity.py"
+     ]
+    },
+    {
+     "sha": "872e83c",
+     "paths": [
+      "aisef2/app/lineage.py",
+      "aisef2/app/bundle_cli.py"
+     ]
+    },
+    {
+     "sha": "b72e51e",
+     "paths": [
+      "aisef2/app/lineage.py",
+      "validation/v21/cli_integration/run.sh"
+     ]
+    }
+   ],
+   "report_items": {
+    "D1": "M4"
+   },
+   "m_note": "Khớp REPORT: output đã commit có exit 137, lần từ chối, VERIFIED.",
+   "acceptance": "Ngắt trước/sau commit và giữa probe; không commit/charge hai lần; chống hai process resume; đổi policy tạo lineage mới",
+   "gap": "Resume tại chỗ: M6. Mất điện / OS sập không mô phỏng; trên macOS `fsync` không ép cache ổ. Tiến trình con đã `setsid` sống sau lượt bị giết (REPORT §4.2, §6).",
+   "unconfirmed": ""
+  },
+  {
+   "id": "P-V2-11",
+   "source": "proposal",
+   "ref": "§10 V2-11",
+   "item": "Cost ledger + no-progress limits",
+   "upstream": [
+    {
+     "key": "mini-swe-agent",
+     "repo": "SWE-agent/mini-swe-agent",
+     "claim": "P7",
+     "label": "CODE",
+     "verify": "confirmed",
+     "commit": "04d809ceab9d",
+     "where": "src/minisweagent/agents/default.py:132, 148-150"
+    },
+    {
+     "key": "mini-swe-agent",
+     "repo": "SWE-agent/mini-swe-agent",
+     "claim": "N2",
+     "label": "CODE",
+     "verify": "corrected",
+     "commit": "04d809ceab9d",
+     "where": "src/minisweagent/models/litellm_model.py:110-125"
+    },
+    {
+     "key": "mini-swe-agent",
+     "repo": "SWE-agent/mini-swe-agent",
+     "claim": "N3",
+     "label": "CODE",
+     "verify": "confirmed",
+     "commit": "04d809ceab9d",
+     "where": "src/minisweagent/models/utils/retry.py:19-25"
+    },
+    {
+     "key": "open-code-review",
+     "repo": "alibaba/open-code-review",
+     "claim": "N14",
+     "label": "CODE",
+     "verify": "corrected",
+     "commit": "182898cf522d",
+     "where": "cmd/opencodereview/output.go:270-280; internal/agent/estimate.go:92-93"
+    }
+   ],
+   "evidence": "`aisef2/app/usage.py`: token theo lớp (input, cache_read, cache_write, output, reasoning), request, retry, wall time; tiền chỉ khi bảng giá đủ khoá (có nguồn + ngày hiệu lực), không biết ⇒ `null`; phiên có step thiếu token ⇒ partial. `no_progress` chỉ báo cáo; retry do taxonomy quyết định.",
+   "refs": [
+    {
+     "path": "aisef2/app/usage.py",
+     "contains": "an unknown price is `null` with its reason, never 0"
+    },
+    {
+     "path": "aisef2/app/usage.py",
+     "contains": "NO_SIDE_RETRY_COUNTER"
+    },
+    {
+     "path": "docs/v2.1/evidence/cli-integration-b72e51e.out",
+     "contains": "\"status\": \"unknown: some run's cost is not known (not 0)\""
+    },
+    {
+     "path": "docs/v2.1/evidence/cli-integration-c9c736f.out",
+     "contains": "\"status\": \"unknown: some run's cost is not known (not 0)\"",
+     "at": "with-table"
+    }
+   ],
+   "reproducers": [
+    "tests/v2/test_v21_continue_usage.py::Usage::test_without_prices_cost_is_unknown_never_zero",
+    "tests/v2/test_v21_continue_usage.py::Usage::test_with_prices_known_and_a_blind_step_makes_it_partial",
+    "tests/v2/test_v21_continue_usage.py::Usage::test_a_price_table_is_complete_or_refused",
+    "tests/v2/test_v21_continue_usage.py::Usage::test_retries_that_change_nothing_are_reported"
+   ],
+   "reproducer_note": "",
+   "impact": "cao với mọi quyết định ngân sách: trên 2.0 mọi bước giá 0 (360 §2, §3.5)",
+   "decision": "adapted",
+   "why": "Ledger nhận đủ. No-progress chỉ báo cáo, không phải 'limit' dừng lượt — dừng vẫn do trần ngân sách và taxonomy.",
+   "commits": [
+    {
+     "sha": "d622e71",
+     "paths": [
+      "aisef2/app/usage.py",
+      "tests/v2/test_v21_continue_usage.py"
+     ]
+    },
+    {
+     "sha": "6634d6d",
+     "paths": [
+      "aisef2/app/usage.py"
+     ]
+    }
+   ],
+   "report_items": {
+    "D2": "M4",
+    "D3": "M3"
+   },
+   "m_note": "Khớp REPORT. D2 M4: output đã commit có `lineage_usage.cost` unknown, không bao giờ là tổng từng phần.",
+   "acceptance": "USD known/estimated/unknown rõ ràng; stop có lý do; giữ cả request lỗi và retry; không mặc định unknown = 0",
+   "gap": "Giá thật: M6. Không có trạng thái 'estimated' (chỉ known / partial / unknown). Request HTTP không kết thúc step (retry của client, request lỗi) không có trong telemetry (`client.LIMITATION`) ⇒ 'giữ cả request lỗi' chưa đạt đầy đủ.",
+   "unconfirmed": ""
+  },
+  {
+   "id": "P-V2-12",
+   "source": "proposal",
+   "ref": "§10 V2-12",
+   "item": "Replay corpus qua app và adapter contract",
+   "upstream": [],
+   "evidence": "Không có corpus ghi thật phát lại qua `app.run.execute` tại HEAD: trong `git diff --name-only 610a593 c9c736f` không tệp nào mang tên replay/corpus/transcript. B-03d (`v21_q5_changes.py`) chỉ truy vết các mục corpus Q5 của 2.0 mà 2.1 đổi kỳ vọng.",
+   "refs": [
+    {
+     "path": "validation/qualification/v21_q5_changes.py",
+     "contains": "every q5.CORPUS item whose expectation 2.1 changed or"
+    }
+   ],
+   "reproducers": [],
+   "reproducer_note": "Không có (chưa triển khai).",
+   "impact": "cao: xanh offline hai lần không đoán được hành vi live (RC1 chết ở preflight; 360 §3.3)",
+   "decision": "open",
+   "why": "Chưa làm; không có quyết định nào được ghi lại.",
+   "commits": [],
+   "report_items": {},
+   "m_note": "REPORT §2 không có hạng mục riêng cho mục này.",
+   "acceptance": "Transcript thật tái hiện parser/preflight/cancellation lỗi; fixture schema mới bị từ chối rõ ràng",
+   "gap": "Toàn bộ.",
+   "unconfirmed": ""
+  },
+  {
+   "id": "P-V2-13",
+   "source": "proposal",
+   "ref": "§10 V2-13; §6",
+   "item": "Paired experiment và holdout",
+   "upstream": [
+    {
+     "key": "openresearch",
+     "repo": "alphaXiv/OpenResearch",
+     "claim": "P4",
+     "label": "CODE",
+     "verify": "confirmed",
+     "commit": "d52a05365622",
+     "where": "src/compute.rs:168-182, 41-49"
+    },
+    {
+     "key": "openresearch",
+     "repo": "alphaXiv/OpenResearch",
+     "claim": "P5",
+     "label": "CODE",
+     "verify": "confirmed",
+     "commit": "d52a05365622",
+     "where": "src/compute.rs:77-123"
+    },
+    {
+     "key": "openresearch",
+     "repo": "alphaXiv/OpenResearch",
+     "claim": "P7",
+     "label": "CODE",
+     "verify": "confirmed",
+     "commit": "d52a05365622",
+     "where": "src/local/experiments.rs:178-237"
+    },
+    {
+     "key": "openresearch",
+     "repo": "alphaXiv/OpenResearch",
+     "claim": "N1",
+     "label": "INFERENCE",
+     "verify": "confirmed",
+     "commit": "d52a05365622",
+     "where": "src/compute.rs:46-47, 134; git.rs:162-171"
+    },
+    {
+     "key": "openresearch",
+     "repo": "alphaXiv/OpenResearch",
+     "claim": "N18",
+     "label": "INFERENCE",
+     "verify": "confirmed",
+     "commit": "d52a05365622",
+     "where": "src/model.rs:66-86; store.rs:229-250"
+    },
+    {
+     "key": "mini-swe-agent",
+     "repo": "SWE-agent/mini-swe-agent",
+     "claim": "N10",
+     "label": "CODE",
+     "verify": "corrected",
+     "commit": "04d809ceab9d",
+     "where": "src/minisweagent/run/benchmarks/programbench.py:46-60, 107-115"
+    }
+   ],
+   "evidence": "`validation/experiments/harness.py`: manifest niêm phong (`aisef.experiment/1`), cặp chỉ khác biến đang thử (`pair_problems`), cánh direct do harness commit, evaluator ẩn + `leaks`, replay offline; nguồn là commit sạch. Không có lượt trả tiền nào (EXPERIMENT-PLAN: KẾ HOẠCH).",
+   "refs": [
+    {
+     "path": "docs/v2.1/EXPERIMENT-PLAN.md",
+     "contains": "**Trạng thái: KẾ HOẠCH.**"
+    }
+   ],
+   "reproducers": [
+    "tests/v2/test_v21_experiment.py::Experiment::test_a_pair_differs_in_the_variable_under_test_only",
+    "tests/v2/test_v21_experiment.py::Experiment::test_the_source_is_a_clean_commit",
+    "tests/v2/test_v21_experiment.py::Experiment::test_the_direct_arm_from_task_to_evaluated_result_and_its_replay",
+    "tests/v2/test_v21_experiment.py::Experiment::test_a_session_that_saw_the_hidden_stimulus_invalidates_the_result"
+   ],
+   "reproducer_note": "",
+   "impact": "quyết định: chưa có đối chứng nào cho V2 (360 §3.5)",
+   "decision": "blocked",
+   "why": "Harness nhận (E1). Chiến dịch chặn trên ngân sách của chủ dự án (B-09: canary bậc 1–2 trần 5 USD trước, 140 USD sau) và trên sandbox để evaluator ẩn thật sự ẩn (V2-05).",
+   "commits": [
+    {
+     "sha": "a29e82b",
+     "paths": [
+      "validation/experiments/harness.py",
+      "tests/v2/test_v21_experiment.py"
+     ]
+    }
+   ],
+   "report_items": {
+    "E1": "M3",
+    "E2": "M6"
+   },
+   "m_note": "Khớp REPORT.",
+   "acceptance": "So cùng client/model/budget; công bố cả run fail; held-out không được developer đọc",
+   "gap": "E2: MỞ. 'Held-out không được developer đọc' hiện chỉ phát hiện sau sự việc (`leaks` quét chuỗi đặc trưng), không ngăn được.",
+   "unconfirmed": ""
+  },
+  {
+   "id": "P-V2-14",
+   "source": "proposal",
+   "ref": "§10 V2-14",
+   "item": "Client thứ hai và `assess` độc lập",
+   "upstream": [],
+   "evidence": "Không có lệnh `aisef assess`; client duy nhất là OpenCode. Không commit 2.1 nào cho mục này.",
+   "refs": [
+    {
+     "path": "aisef2/app/cli.py",
+     "lacks": "assess"
+    }
+   ],
+   "reproducers": [],
+   "reproducer_note": "Không có (không triển khai).",
+   "impact": "trung bình cho 2.1; cao cho thị trường (360 §3.9)",
+   "decision": "declined",
+   "why": "Hoãn sang 2.2 theo chính đề xuất (§10 ưu tiên P2; §12 gate 2.2) và 360 §6.",
+   "commits": [],
+   "report_items": {},
+   "m_note": "REPORT §2 không có hạng mục riêng cho mục này.",
+   "acceptance": "OpenCode + một client khác tạo candidate được kiểm bằng cùng policy/evaluator; checker không cần điều phối toàn bộ SDLC",
+   "gap": "Toàn bộ (2.2).",
+   "unconfirmed": ""
+  },
+  {
+   "id": "P-ADJ-3",
+   "source": "proposal",
+   "ref": "§3 bảng điều chỉnh, hàng review",
+   "item": "LLM finding chưa xác minh chỉ phản hồi; lỗi đã xác minh, thuộc phạm vi, mức nghiêm trọng đủ cao phải chặn theo chính sách duyệt trước",
+   "upstream": [],
+   "evidence": "`review.policy: fix-loop` + `min_severity`: chặn ⇔ CONFIRMED (probe của AISEF tái hiện) ∧ ANCHORED (contract đã duyệt neo kỳ vọng) ∧ mức ≥ ngưỡng; settings không có `review` ⇒ luật 2.0.0 (advisory), ghi trong record (ADR-7).",
+   "refs": [
+    {
+     "path": "aisef2/app/review_verify.py",
+     "contains": "def blocks("
+    }
+   ],
+   "reproducers": [
+    "tests/v2/test_v21_review.py::Triage::test_severity_floor_and_policy",
+    "tests/v2/test_v21_review.py::Triage::test_a_misread_requirement_is_confirmed_and_never_blocks",
+    "tests/v2/test_v21_review.py::ProductPath::test_without_a_review_policy_the_same_review_is_advisory_as_in_2_0_0",
+    "tests/v2/test_v21_review_chain.py::FixLoop::test_a_correct_anchored_finding_is_fixed_before_the_merge"
+   ],
+   "reproducer_note": "",
+   "impact": "cao (360 §3.5)",
+   "decision": "adapted",
+   "why": "Theo đề xuất, không theo 360 #8 ('không chặn'); điều chỉnh: thêm điều kiện neo (ANCHORED) theo chỉ thị chủ dự án (ADR-7), như R-P1-8.",
+   "commits": [
+    {
+     "sha": "e897437",
+     "paths": [
+      "aisef2/app/review_verify.py"
+     ]
+    },
+    {
+     "sha": "390f07c",
+     "paths": [
+      "aisef2/app/review_verify.py"
+     ]
+    }
+   ],
+   "report_items": {
+    "C1": "M4"
+   },
+   "m_note": "Khớp REPORT (xem P-V2-09 về phần không xác nhận được từ output đã commit).",
+   "acceptance": "có các finding sai để chứng minh gate không chặn chỉ vì LLM nói có lỗi (§4.3)",
+   "gap": "Mặc định (không khai `review`) vẫn advisory. Neo sai khi một stimulus mới bị xếp sai mệnh đề (ADR-7).",
+   "unconfirmed": ""
+  },
+  {
+   "id": "P-ADJ-4",
+   "source": "proposal",
+   "ref": "§3 bảng điều chỉnh, hàng sandbox",
+   "item": "Đưa Linux sandbox tối thiểu trước thí nghiệm dùng hidden tests; macOS native làm sau",
+   "upstream": [],
+   "evidence": "Chưa có sandbox (F) và chưa chạy thí nghiệm hidden-test nào (E2): thứ tự chưa bị vi phạm vì cả hai chưa chạy.",
+   "refs": [
+    {
+     "path": "docs/v2.1/REPORT.md",
+     "contains": "chưa có mã cách ly nào trên nhánh"
+    }
+   ],
+   "reproducers": [],
+   "reproducer_note": "Không có.",
+   "impact": "cao: không thể gọi evaluator là độc lập khi developer đọc được đề",
+   "decision": "blocked",
+   "why": "Như P-V2-05 (phương án F chờ chủ dự án) và P-V2-13 (ngân sách).",
+   "commits": [],
+   "report_items": {
+    "F": "M6",
+    "E2": "M6"
+   },
+   "m_note": "Khớp REPORT.",
+   "acceptance": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với cột 'Lý do' của cùng hàng §3: Không thể gọi một bộ đánh giá là độc lập khi developer đọc được đề và runtime của verifier",
+   "gap": "Sandbox: MỞ.",
+   "unconfirmed": ""
+  },
+  {
+   "id": "P-ADJ-5",
+   "source": "proposal",
+   "ref": "§3 bảng điều chỉnh, hàng lượt trả tiền",
+   "item": "Dùng 1–3 lượt để canary; phép so sánh hiệu quả phải có thêm lượt lặp có ngân sách",
+   "upstream": [],
+   "evidence": "B-09 đề xuất các bậc: bậc 0 offline đã đạt (0 USD); bậc 1–2 (preflight thật + 1 story, trần 5 USD) chờ duyệt; pilot 18 lượt (2 workload × 3 cánh × 3 lặp) dự toán từ hồ sơ token smoke #2. Không lượt trả tiền nào đã chạy.",
+   "refs": [
+    {
+     "path": "docs/v2.1/decisions/B-09-CANARY-THEN-CAMPAIGN.md",
+     "contains": "**Trạng thái: ĐỀ XUẤT, CHƯA DUYỆT.**"
+    }
+   ],
+   "reproducers": [],
+   "reproducer_note": "Không có.",
+   "impact": "quyết định: canary chứng minh đường chạy, không đủ để kết luận hơn baseline",
+   "decision": "blocked",
+   "why": "Chặn trên ngân sách của chủ dự án (B-09 chưa duyệt).",
+   "commits": [],
+   "report_items": {
+    "E2": "M6"
+   },
+   "m_note": "Khớp REPORT.",
+   "acceptance": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với cột 'Lý do' của cùng hàng §3: Canary chứng minh đường chạy; không đủ để kết luận hơn baseline",
+   "gap": "Live: MỞ.",
+   "unconfirmed": ""
+  },
+  {
+   "id": "P-ADJ-6",
+   "source": "proposal",
+   "ref": "§3 bảng điều chỉnh, hàng mutation",
+   "item": "Làm sau; nếu tái sử dụng evidence phải tính cả phụ thuộc và công cụ kiểm",
+   "upstream": [],
+   "evidence": "B-03b (chủ dự án cho phép, RELEASE-DECISIONS seq 5): phase mutation V2.1 = 443 target / 11 365 mutant (55a6b74); một kết quả cũ chỉ được dùng lại khi tệp target, kill set, mọi tệp trong closure của kill test và generator đều giữ nguyên (`v21_mutation_record.proof`); tiêu chí đóng băng trước mọi kết quả (c9c736f). Không dùng ràng buộc AST từng hàm. Tại HEAD chưa có `closure-evidence/v2/v2.1/MUTATION-SUMMARY.json`.",
+   "refs": [
+    {
+     "path": "validation/qualification/v21_mutation_record.py",
+     "contains": "FROZEN_CRITERIA_SHA256 = \"9e6f9d39bee3b76549071a326bd32dd85d50d705ed18c396c8764a4c10b3dbdf\""
+    },
+    {
+     "path": "validation/qualification/v21_mutation_record.py",
+     "contains": "every file of the kill tests' closure is byte-identical"
+    },
+    {
+     "path": "closure-evidence/v2/v2.1/MUTATION-SUMMARY.json",
+     "exists": false
+    }
+   ],
+   "reproducers": [
+    "tests/v2/test_v21_mutation_record.py::Proof::test_a_different_kill_set_a_different_mutant_list_an_error_or_another_phase_is_not",
+    "tests/v2/test_v21_mutation_record.py::Phase::test_the_criteria_and_the_snapshot_are_frozen_before_any_result",
+    "tests/v2/test_v21_mutation_record.py::Account::test_every_v21_target_is_accounted_for_exactly_once_and_a_survivor_never_passes"
+   ],
+   "reproducer_note": "",
+   "impact": "trung bình: mutation 2.0 ràng buộc sha256 cả tệp (360 §3.2)",
+   "decision": "adopted",
+   "why": "Tái sử dụng tính cả phụ thuộc (closure) và công cụ (generator); không theo 360 #19 (AST từng hàm).",
+   "commits": [
+    {
+     "sha": "55a6b74",
+     "paths": [
+      "validation/qualification/v21_mutation_record.py",
+      "validation/v2/mutation.py"
+     ]
+    },
+    {
+     "sha": "c9c736f",
+     "paths": [
+      "validation/qualification/v21_mutation_record.py",
+      "tests/v2/test_v21_mutation_record.py"
+     ]
+    },
+    {
+     "sha": "16d4899",
+     "paths": [
+      "closure-evidence/v2/v2.1/REQUALIFICATION-MANIFEST.json"
+     ]
+    }
+   ],
+   "report_items": {},
+   "m_note": "REPORT §2 không có hạng mục cho B-03b.",
+   "acceptance": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với STATUS §3 B-03: suite đầy đủ xanh trên ứng viên 2.1",
+   "gap": "Chiến dịch chưa xong: tại HEAD không có kết quả mutation 2.1 nào để tuyên bố.",
+   "unconfirmed": ""
+  },
+  {
+   "id": "P-4.2a",
+   "source": "proposal",
+   "ref": "§4.2",
+   "item": "Reviewer trả thiếu manifest hoặc schema lạ → `INDETERMINATE`, không coi là review sạch.",
+   "upstream": [
+    {
+     "key": "open-code-review",
+     "repo": "alibaba/open-code-review",
+     "claim": "P15",
+     "label": "CODE",
+     "verify": "confirmed",
+     "commit": "182898cf522d",
+     "where": "internal/session/manifest.go:20-23; cmd/opencodereview/review_cmd.go:296; output.go:669-695"
+    }
+   ],
+   "evidence": "`review_ocr.coverage`: manifest thiếu, schema khác `ocr.run-manifest/v1`, partial, hết token, timeout ⇒ INDETERMINATE; dưới fix-loop là lỗi năng lực hoặc ProviderOutage; dưới advisory ghi lại, không chặn (REPORT §4.1).",
+   "refs": [
+    {
+     "path": "aisef2/app/review_ocr.py",
+     "contains": "NOT_REVIEWABLE = (\"unsupported_ext\", \"binary\")"
+    }
+   ],
+   "reproducers": [
+    "tests/v2/test_v21_review_chain.py::IncompleteReview::test_an_unsupported_manifest_schema",
+    "tests/v2/test_v21_review_chain.py::IncompleteReview::test_its_token_budget_spent",
+    "tests/v2/test_v21_review_chain.py::IncompleteReview::test_timed_out_and_its_spend_unknown",
+    "tests/v2/test_v21_review_ocr.py::Coverage::test_a_manifest_that_does_not_hold_together_is_indeterminate",
+    "tests/v2/test_v21_review_chain.py::IncompleteReview::test_under_advisory_the_incomplete_review_is_recorded_and_does_not_block"
+   ],
+   "reproducer_note": "",
+   "impact": "cao: exit 0 của OCR gồm cả `partial` (OCR P11)",
+   "decision": "adopted",
+   "why": "Đúng đề xuất.",
+   "commits": [
+    {
+     "sha": "e897437",
+     "paths": [
+      "aisef2/app/review_ocr.py",
+      "tests/v2/fixtures/ocr/partial.json"
+     ]
+    },
+    {
+     "sha": "390f07c",
+     "paths": [
+      "aisef2/app/review_ocr.py"
+     ]
+    }
+   ],
+   "report_items": {
+    "C2": "M4"
+   },
+   "m_note": "M4 là mức của hạng mục C2; riêng các nhánh INDETERMINATE chỉ có test offline (REPORT §4.1).",
+   "acceptance": "review thiếu một file bắt buộc không được thành PASS (§4.3)",
+   "gap": "Tiêu chí chỉ đạt dưới `fix-loop`: dưới `advisory` — cũng là luật khi settings không khai `review` (ADR-V2.1) — review thiếu được ghi INDETERMINATE mà story vẫn COMMIT (`IncompleteReview::test_under_advisory_the_incomplete_review_is_recorded_and_does_not_block`). Tệp bắt buộc mà preview loại vì `unsupported_ext` hay `binary` không tính là thiếu (xem P-4.2b).",
+   "unconfirmed": ""
+  },
+  {
+   "id": "P-4.2b",
+   "source": "proposal",
+   "ref": "§4.2",
+   "item": "Không lấy tập `selected` của OCR làm toàn bộ phạm vi bắt buộc một cách mặc nhiên",
+   "upstream": [
+    {
+     "key": "open-code-review",
+     "repo": "alibaba/open-code-review",
+     "claim": "P14",
+     "label": "CODE",
+     "verify": "confirmed",
+     "commit": "182898cf522d",
+     "where": "internal/agent/selection.go:52-58, 92-95; agent.go:2042-2052; compression.go:29-31 (lý do loại theo kích thước/extension/đường dẫn; default_exclude_patterns.json)"
+    },
+    {
+     "key": "open-code-review",
+     "repo": "alibaba/open-code-review",
+     "claim": "N9",
+     "label": "CODE",
+     "verify": "confirmed",
+     "commit": "182898cf522d",
+     "where": "internal/diff/git.go:28-41, 80-82; config/rules/system_rules.go:288-369"
+    }
+   ],
+   "evidence": "Phạm vi bắt buộc do AISEF tính từ journal (khoảng base..candidate đã đóng băng); đường dẫn bắt buộc vắng trong preview (bị `.gitignore`/thư mục provider loại) ⇒ INDETERMINATE (UPSTREAM-RESEARCH.md).",
+   "refs": [
+    {
+     "path": "aisef2/app/review_ocr.py",
+     "contains": "NOT_REVIEWABLE = (\"unsupported_ext\", \"binary\")"
+    },
+    {
+     "path": "aisef2/app/review_ocr.py",
+     "contains": "cannot read (named in the coverage, not counted against it)"
+    }
+   ],
+   "reproducers": [
+    "tests/v2/test_v21_review_ocr.py::Coverage::test_the_preview_s_exclusions_and_omissions_are_named",
+    "tests/v2/test_v21_review_ocr.py::Coverage::test_a_complete_run_of_the_frozen_range_covering_every_required_path",
+    "tests/v2/test_v21_review_ocr.py::Process::test_the_command_reviews_exactly_the_frozen_range_into_a_fresh_file"
+   ],
+   "reproducer_note": "",
+   "impact": "cao: tệp bị OCR lọc vẫn có thể quan trọng với AISEF",
+   "decision": "adapted",
+   "why": "Phạm vi bắt buộc do AISEF tính từ git (khoảng base..candidate đã đóng băng), không lấy tập `selected` của OCR. Điều chỉnh: tệp bắt buộc mà preview loại vì `unsupported_ext` hay `binary` được ghi tên trong coverage nhưng không tính là thiếu (docstring và `NOT_REVIEWABLE` của `review_ocr`); đề xuất nêu cả tệp bị lọc vì extension.",
+   "commits": [
+    {
+     "sha": "e897437",
+     "paths": [
+      "aisef2/app/review_ocr.py",
+      "tests/v2/fixtures/ocr/preview.json"
+     ]
+    }
+   ],
+   "report_items": {
+    "C2": "M4"
+   },
+   "m_note": "M4 là mức của C2; hành vi riêng này có test offline.",
+   "acceptance": "review thiếu một file bắt buộc không được thành PASS (§4.3)",
+   "gap": "Tiêu chí chưa đạt cho tệp bắt buộc mà preview của OCR loại vì `unsupported_ext` hay `binary`: tệp đó được ghi tên trong coverage nhưng không tính là thiếu (`review_ocr.NOT_REVIEWABLE`), nên review không đọc nó vẫn có thể COMPLETE. Không test nào đặt một tệp bắt buộc như thế rồi khẳng định kết quả (không test nào đi tới nhánh `NOT_REVIEWABLE` của `review_ocr.coverage`: fixture `tests/v2/fixtures/ocr/preview.json` có `docs/limits.md` = `unsupported_ext` nhưng không test nào đặt nó là bắt buộc, và `tests/v2/test_v21_review_chain.py` thấy `notes.txt` = `unsupported_ext` trong preview thật nhưng chỉ đặt `app/cli.py` là bắt buộc).",
+   "unconfirmed": ""
+  },
+  {
+   "id": "P-4.2c",
+   "source": "proposal",
+   "ref": "§4.2",
+   "item": "Không cho reviewer quyền commit, merge, thay contract hay cập nhật verdict.",
+   "upstream": [],
+   "evidence": "Reviewer chụp HEAD + mọi tệp của checkout trước finder, so lại sau finder và sau probe kiểm chứng; đổi ⇒ bỏ mọi finding (ADR-7). `review_verify.verify` nằm trong inventory PRODUCT_TRUTH với giới hạn (không commit/merge, không journal, một đường quyết định), do checker theo module, fail-closed cưỡng chế (B-03c).",
+   "refs": [
+    {
+     "path": "closure-evidence/v2/v2.1/AUTHORITY-INVENTORY.json",
+     "contains": "review_verify"
+    },
+    {
+     "path": "closure-evidence/v2/cycle2/RELEASE-DECISIONS.json",
+     "contains": "* Cả hai không trực tiếp commit/merge sản phẩm hoặc tạo đường quyết định cuối thứ hai."
+    }
+   ],
+   "reproducers": [
+    "tests/v2/test_v21_review_chain.py::CandidateChangedDuringReview::test_a_file_edited_by_the_finder_discards_the_review_and_never_reaches_main",
+    "tests/v2/test_v21_review_chain.py::CandidateChangedDuringReview::test_a_commit_made_by_the_finder_discards_the_review",
+    "tests/v2/test_v21_authority_limits.py::NoCommitOrMerge::test_verify_committing_or_journaling_is_caught",
+    "tests/v2/test_v21_authority_limits.py::OneDecisionPath::test_a_second_caller_of_verify_blocks_or_migrate_is_caught"
+   ],
+   "reproducer_note": "",
+   "impact": "cao: reviewer là mô hình, không có thẩm quyền sự thật sản phẩm",
+   "decision": "adopted",
+   "why": "Đúng đề xuất; owner B-03c (RELEASE-DECISIONS seq 5).",
+   "commits": [
+    {
+     "sha": "390f07c",
+     "paths": [
+      "aisef2/app/review_verify.py"
+     ]
+    },
+    {
+     "sha": "a912be6",
+     "paths": [
+      "validation/qualification/authority_limits.py",
+      "closure-evidence/v2/v2.1/AUTHORITY-INVENTORY.json",
+      "tests/v2/test_v21_authority_limits.py",
+      "aisef2/app/review_verify.py"
+     ]
+    },
+    {
+     "sha": "1711c07",
+     "paths": [
+      "validation/qualification/authority_limits.py"
+     ]
+    },
+    {
+     "sha": "0b4e740",
+     "paths": [
+      "validation/qualification/authority_limits.py"
+     ]
+    }
+   ],
+   "report_items": {},
+   "m_note": "REPORT §2 không có hạng mục riêng (B-03c thuộc §7). Reproducer tại HEAD chạy lại xanh tại c9c736f (vòng 2, `docs/v2.1/evidence/traceability-reproducers-c9c736f.out`).",
+   "acceptance": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với chỉ thị B-03c của chủ dự án (RELEASE-DECISIONS seq 5): Cả hai không trực tiếp commit/merge sản phẩm hoặc tạo đường quyết định cuối thứ hai.",
+   "gap": "Không có ranh giới OS: finder chạy dưới cùng user; thay đổi bị phát hiện và loại, không bị ngăn (REPORT §3).",
+   "unconfirmed": ""
+  },
+  {
+   "id": "P-4.3a",
+   "source": "proposal",
+   "ref": "§4.3",
+   "item": "Nếu finding phát hiện một yêu cầu chưa có trong contract, tạo **đề xuất sửa contract có phiên bản**.",
+   "upstream": [],
+   "evidence": "Finding CONFIRMED mà UNANCHORED được ghi lại (triage) kèm lý do, không chặn. Không có mã nào tạo đề xuất sửa contract có phiên bản từ một finding.",
+   "refs": [
+    {
+     "path": "aisef2/app/review_verify.py",
+     "lacks": "amend"
+    }
+   ],
+   "reproducers": [
+    "tests/v2/test_v21_review_chain.py::NotABlocker::test_a_reproduced_finding_whose_clause_shows_no_constant_outcome_does_not_block"
+   ],
+   "reproducer_note": "Test chỉ cho thấy finding được ghi và không chặn; phần tạo đề xuất không có test vì chưa có.",
+   "impact": "trung bình: yêu cầu thiếu trong contract chỉ nằm trong triage",
+   "decision": "open",
+   "why": "Chưa làm. Phần 'không để cùng agent nới tiêu chí' được giữ bằng `approve` chỉ nhận `human:<tên>` (ADR-6, xem P-13-2).",
+   "commits": [],
+   "report_items": {},
+   "m_note": "REPORT §2 không có hạng mục riêng cho mục này.",
+   "acceptance": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với một câu khác của cùng đoạn §4.3: Cập nhật đã duyệt áp dụng cho run mới; giữ nguyên lịch sử run cũ.",
+   "gap": "Toàn bộ phần tạo đề xuất.",
+   "unconfirmed": ""
+  },
+  {
+   "id": "P-4.3b",
+   "source": "proposal",
+   "ref": "§4.3 bước 4",
+   "item": "Reproducer chạy thành công **chưa đủ**: còn phải xác nhận kỳ vọng của nó đúng theo requirement/chính sách đã duyệt.",
+   "upstream": [],
+   "evidence": "`review_verify.anchor`: ANCHORED / CONTRADICTS_APPROVED / UNANCHORED quyết định chỉ từ contract đã duyệt và mệnh đề đã niêm phong của bundle, không từ chữ của reviewer (ADR-7).",
+   "refs": [
+    {
+     "path": "aisef2/app/review_verify.py",
+     "contains": "def anchor("
+    }
+   ],
+   "reproducers": [
+    "tests/v2/test_v21_review.py::Triage::test_a_stimulus_an_approved_contract_decides_otherwise_is_a_false_finding",
+    "tests/v2/test_v21_review_chain.py::NotABlocker::test_a_reproduced_finding_an_approved_contract_contradicts_does_not_block",
+    "tests/v2/test_v21_review.py::Triage::test_known_limit_a_new_stimulus_under_the_wrong_clause_anchors"
+   ],
+   "reproducer_note": "",
+   "impact": "cao: finding tái hiện được nhưng hiểu sai yêu cầu không được thành blocker",
+   "decision": "adopted",
+   "why": "Đúng đề xuất và chỉ thị chủ dự án.",
+   "commits": [
+    {
+     "sha": "390f07c",
+     "paths": [
+      "aisef2/app/review_verify.py",
+      "tests/v2/test_v21_review.py"
+     ]
+    }
+   ],
+   "report_items": {
+    "C1": "M4"
+   },
+   "m_note": "Khớp REPORT.",
+   "acceptance": "có các finding sai để chứng minh gate không chặn chỉ vì LLM nói có lỗi",
+   "gap": "Giới hạn đã đo: stimulus mới xếp sai mệnh đề vẫn neo được (test_known_limit_…).",
+   "unconfirmed": ""
+  },
+  {
+   "id": "P-4.3c",
+   "source": "proposal",
+   "ref": "§4.3 bước 7",
+   "item": "Branch đích đổi thì dựng cây tích hợp mới và kiểm lại.",
+   "upstream": [],
+   "evidence": "Có từ 2.0: chứng minh lại sau merge (`merge.affected_preserve`), thất bại ⇒ INTEGRATION (STATUS B2: 'ĐÃ KIỂM, không cần sửa', đọc mã). 2.1 giữ nó cạnh PRESERVE ở candidate (ADR-4).",
+   "refs": [
+    {
+     "path": "aisef2/orchestrate/merge.py",
+     "contains": "def affected_preserve("
+    },
+    {
+     "path": "docs/v2.1/STATUS.md",
+     "contains": "**ĐÃ KIỂM**, không cần sửa"
+    },
+    {
+     "path": "aisef2/orchestrate/merge.py",
+     "contains": "point=MeasurementPoint.POST_MERGE"
+    },
+    {
+     "path": "docs/v2.1/evidence/traceability-reproducers-c9c736f.out",
+     "contains": "tests.v2.test_p6_orchestration.Orchestration.test_ORCH_9_and_10_a_post_merge_regression_of_a_prior_PRESERVE_obligation_is_INTEGRATION_and_rolled_back: ok",
+     "at": "with-table"
+    }
+   ],
+   "reproducers": [
+    "tests/v2/test_p6_orchestration.py::Orchestration::test_ORCH_9_and_10_a_post_merge_regression_of_a_prior_PRESERVE_obligation_is_INTEGRATION_and_rolled_back"
+   ],
+   "reproducer_note": "",
+   "impact": "trung bình",
+   "decision": "adopted",
+   "why": "Đã có trong 2.0, không triển khai lại.",
+   "commits": [],
+   "report_items": {},
+   "m_note": "REPORT §2 không có hạng mục riêng cho mục này. Reproducer tại HEAD chạy lại xanh tại c9c736f (vòng 2, `docs/v2.1/evidence/traceability-reproducers-c9c736f.out`).",
+   "acceptance": "vẫn kiểm cây tích hợp khi base đổi (§10 V2-06)",
+   "gap": "Không còn so với tiêu chí trên: sau merge, mọi obligation của story và PRESERVE của các story đã commit được chứng minh lại ở revision đã merge (`merge.reprove`, POST_MERGE). Dựa vào đọc mã và test ORCH_9/10 (chạy lại xanh tại c9c736f, vòng 2).",
+   "unconfirmed": ""
+  },
+  {
+   "id": "P-5.2a",
+   "source": "proposal",
+   "ref": "§5.2 (metric do agent tự báo)",
+   "item": "AISEF phải tự chạy lệnh đánh giá được cố định, đọc kết quả có schema và ràng buộc digest.",
+   "upstream": [
+    {
+     "key": "mimo-code",
+     "repo": "XiaomiMiMo/MiMo-Code",
+     "claim": "P-09",
+     "label": "CODE",
+     "verify": "confirmed",
+     "commit": "6babeb0b98f9",
+     "where": "packages/cli/src/workflow/builtin/research-experiment.js:39-48, 102-123"
+    }
+   ],
+   "evidence": "Thí nghiệm: `harness.evaluate` chạy evaluator ẩn bằng probe của AISEF trên candidate đã đóng băng; 'xong' của agent chỉ được ghi. Review: reproducer do AISEF chạy bằng probe đã hiệu chuẩn.",
+   "refs": [],
+   "reproducers": [
+    "tests/v2/test_v21_experiment.py::Experiment::test_the_direct_arm_from_task_to_evaluated_result_and_its_replay",
+    "tests/v2/test_v21_review.py::HistoricalDefects::test_each_shipped_defect_is_confirmed_on_its_shape_and_not_on_the_reference"
+   ],
+   "reproducer_note": "",
+   "impact": "cao: metric tự báo không phải phép đo độc lập",
+   "decision": "adopted",
+   "why": "Đúng đề xuất.",
+   "commits": [
+    {
+     "sha": "a29e82b",
+     "paths": [
+      "validation/experiments/harness.py"
+     ]
+    },
+    {
+     "sha": "e897437",
+     "paths": [
+      "aisef2/app/review_verify.py"
+     ]
+    }
+   ],
+   "report_items": {
+    "E1": "M3"
+   },
+   "m_note": "Khớp REPORT.",
+   "acceptance": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với một câu khác của cùng đoạn §5.2: Agent chỉ đề xuất giả thuyết/candidate.",
+   "gap": "Chưa chạy trên workload thật (E2).",
+   "unconfirmed": ""
+  },
+  {
+   "id": "P-5.2b",
+   "source": "proposal",
+   "ref": "§5.2 (LLM judge)",
+   "item": "Có thể dùng để nhắc agent còn việc; không dùng thay acceptance hoặc để cấp `delivery_verdict PASS`.",
+   "upstream": [
+    {
+     "key": "mimo-code",
+     "repo": "XiaomiMiMo/MiMo-Code",
+     "claim": "P-10",
+     "label": "CODE",
+     "verify": "confirmed",
+     "commit": "6babeb0b98f9",
+     "where": "packages/cli/src/session/goal.ts:64-79, 159-215"
+    },
+    {
+     "key": "mimo-code",
+     "repo": "XiaomiMiMo/MiMo-Code",
+     "claim": "N-18",
+     "label": "INFERENCE",
+     "research_label": "CODE",
+     "verify": "corrected",
+     "commit": "6babeb0b98f9",
+     "where": "packages/cli/src/session/prompt.ts:4140, 4142-4150, 4175-4188"
+    }
+   ],
+   "evidence": "Không có LLM judge nào trong 2.1; review của mô hình không bao giờ tự chặn.",
+   "refs": [
+    {
+     "path": "aisef2/app/review_verify.py",
+     "contains": "a model review alone never blocks"
+    }
+   ],
+   "reproducers": [],
+   "reproducer_note": "Không có (không xây gì).",
+   "impact": "cao nếu sao chép: judge của MiMo dùng cùng model với phiên (CODE, prompt.ts:4140). Lỗi judge (mạng, schema) có được tính là đạt hay không: INFERENCE theo người kiểm chứng (N-18) — ý định fail-open có ghi trong chú thích, nhưng lỗi provider có thể lan ra thay vì fail-open; chưa kiểm.",
+   "decision": "declined",
+   "why": "Không sao chép; verdict chỉ từ obligation do probe chứng minh.",
+   "commits": [],
+   "report_items": {},
+   "m_note": "REPORT §2 không có hạng mục riêng cho mục này.",
+   "acceptance": "—",
+   "gap": "",
+   "unconfirmed": ""
+  },
+  {
+   "id": "P-5.2c",
+   "source": "proposal",
+   "ref": "§5.2 (resume làm mất lịch sử)",
+   "item": "AISEF cần tạo run con, giữ parent và bằng chứng cũ.",
+   "upstream": [
+    {
+     "key": "mimo-code",
+     "repo": "XiaomiMiMo/MiMo-Code",
+     "claim": "P-11",
+     "label": "CODE",
+     "verify": "confirmed",
+     "commit": "6babeb0b98f9",
+     "where": "packages/cli/src/workflow/runtime.ts:1562-1563; persistence.ts:292-297"
+    },
+    {
+     "key": "mimo-code",
+     "repo": "XiaomiMiMo/MiMo-Code",
+     "claim": "P-12",
+     "label": "CODE",
+     "verify": "confirmed",
+     "commit": "6babeb0b98f9",
+     "where": "packages/cli/src/workflow/runtime.ts:1515-1537; util/lock.ts:1-21"
+    }
+   ],
+   "evidence": "Run con qua `--parent`; bằng chứng run cũ giữ nguyên byte (chỉ thêm tệp claim); claim `O_EXCL` theo thế hệ: hai tiến trình cùng yêu cầu ⇒ đúng một lấy được (ADR-8).",
+   "refs": [],
+   "reproducers": [
+    "tests/v2/test_v21_continue_integrity.py::ClaimLifecycle::test_the_predecessors_evidence_stays_byte_identical_but_the_claim",
+    "tests/v2/test_v21_continue_integrity.py::ClaimLifecycle::test_two_runs_at_once_one_claims_and_the_other_spends_nothing",
+    "tests/v2/test_v21_continue_integrity.py::ClaimLifecycle::test_a_child_that_began_is_never_superseded_the_lineage_continues_from_it"
+   ],
+   "reproducer_note": "",
+   "impact": "cao",
+   "decision": "adopted",
+   "why": "Đúng đề xuất (khoá liên tiến trình, không chỉ trong tiến trình).",
+   "commits": [
+    {
+     "sha": "7e0aac0",
+     "paths": [
+      "tests/v2/test_v21_continue_integrity.py"
+     ]
+    },
+    {
+     "sha": "872e83c",
+     "paths": [
+      "aisef2/app/lineage.py"
+     ]
+    },
+    {
+     "sha": "7fe1062",
+     "paths": [
+      "tests/v2/test_v21_continue_integrity.py"
+     ]
+    }
+   ],
+   "report_items": {
+    "D1": "M4"
+   },
+   "m_note": "Khớp REPORT.",
+   "acceptance": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với một câu khác của cùng đoạn §5.2: AISEF cần chống hai controller ở hai tiến trình cùng resume.",
+   "gap": "Claimant ở máy khác: chỉ thay khi người vận hành nêu sha256 của claim (REPORT §4.2).",
+   "unconfirmed": ""
+  },
+  {
+   "id": "P-5.3a",
+   "source": "proposal",
+   "ref": "§5.3",
+   "item": "Checkpoint tối thiểu nên chứa các tham chiếu: `run_id`, `attempt_id`, `journal_sequence`, `candidate_digest`, `contract_digest`, `phase`, `open_findings`, `next_action`, `context_refs`.",
+   "upstream": [
+    {
+     "key": "mimo-code",
+     "repo": "XiaomiMiMo/MiMo-Code",
+     "claim": "P-03",
+     "label": "CODE",
+     "verify": "corrected",
+     "commit": "6babeb0b98f9",
+     "where": "packages/cli/src/session/checkpoint-templates.ts:4-57, 88-100"
+    },
+    {
+     "key": "mimo-code",
+     "repo": "XiaomiMiMo/MiMo-Code",
+     "claim": "P-04",
+     "label": "README",
+     "verify": "confirmed",
+     "commit": "6babeb0b98f9",
+     "where": "README.md:156-160 (không có số đo nào trong repo)"
+    },
+    {
+     "key": "mimo-code",
+     "repo": "XiaomiMiMo/MiMo-Code",
+     "claim": "P-14",
+     "label": "INFERENCE",
+     "verify": "confirmed",
+     "commit": "6babeb0b98f9",
+     "where": "thiết kế của AISEF; người kiểm: checkpoint.ts:1424-1451, 1453-1489"
+    },
+    {
+     "key": "mimo-code",
+     "repo": "XiaomiMiMo/MiMo-Code",
+     "claim": "N-04",
+     "label": "CODE",
+     "verify": "confirmed",
+     "commit": "6babeb0b98f9",
+     "where": "packages/cli/src/memory/memory-path-guard.ts:126-139"
+    },
+    {
+     "key": "mimo-code",
+     "repo": "XiaomiMiMo/MiMo-Code",
+     "claim": "N-06",
+     "label": "CODE",
+     "verify": "confirmed",
+     "commit": "6babeb0b98f9",
+     "where": "packages/cli/src/agent/prompt/checkpoint-writer.txt:54-57"
+    }
+   ],
+   "evidence": "Không có gói ngữ cảnh / checkpoint hỗ trợ nào tại HEAD (REPORT D4: M6). Phần 'trạng thái chuẩn do controller sở hữu' có qua `bundle continue`: sự thật là journal, không phải tóm tắt của agent (UPSTREAM-RESEARCH.md).",
+   "refs": [
+    {
+     "path": "docs/v2.1/REPORT.md",
+     "contains": "| D4 | gói ngữ cảnh kiểu MiMo | **M6** |"
+    },
+    {
+     "path": "closure-evidence/v2/cycle2/RELEASE-DECISIONS.json",
+     "contains": "context/checkpoint theo MiMo"
+    }
+   ],
+   "reproducers": [],
+   "reproducer_note": "Không có (chưa triển khai).",
+   "impact": "trung bình: smoke #2 một phiên đốt 7,0 M input không sửa gì (360 §3.5) — chưa chứng minh gói ngữ cảnh sẽ giảm điều đó",
+   "decision": "open",
+   "why": "REPORT/STATUS ghi 'chưa có bằng chứng cần'; chủ dự án yêu cầu báo riêng trạng thái context/checkpoint theo MiMo (RELEASE-DECISIONS seq 5). Chưa có quyết định đóng mục.",
+   "commits": [],
+   "report_items": {
+    "D4": "M6"
+   },
+   "m_note": "Khớp REPORT.",
+   "acceptance": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với một câu khác của cùng đoạn §5.3: Controller tự điền các trường định danh; phần văn xuôi không được ghi đè chúng.",
+   "gap": "Toàn bộ. MỞ. Nếu làm, tránh hai lỗi đã thấy ở upstream: agent chính ghi được checkpoint (N-04), writer chép nguyên văn khoá API (N-06).",
+   "unconfirmed": ""
+  },
+  {
+   "id": "P-5.3b",
+   "source": "proposal",
+   "ref": "§5.3",
+   "item": "Hành động merge/commit phải có operation ID để không lặp tác dụng khi crash xảy ra giữa thực thi và ghi nhận.",
+   "upstream": [],
+   "evidence": "Đối soát: candidate trong worktree `wt-<story>` của kernel và merge của kernel (cha thứ hai + 'merge <sha12>') được nhận diện với git; không nhận diện được ⇒ từ chối trừ khi người vận hành nêu `--leave-out-unidentified` (ADR-8).",
+   "refs": [
+    {
+     "path": "aisef2/app/bundle_cli.py",
+     "contains": "--leave-out-unidentified"
+    }
+   ],
+   "reproducers": [
+    "tests/v2/test_v21_continue_integrity.py::CommitWindows::test_the_developers_candidate_committed_nothing_journaled",
+    "tests/v2/test_v21_continue_integrity.py::CommitWindows::test_the_merge_moved_main_the_journal_never_committed_it",
+    "tests/v2/test_v21_continue_integrity.py::CommitWindows::test_a_commit_on_main_nothing_identifies_is_refused_unless_left_out_by_name"
+   ],
+   "reproducer_note": "",
+   "impact": "cao: commit/merge lặp sau crash",
+   "decision": "adapted",
+   "why": "Không thêm trường operation ID vào journal (schema đóng); dùng danh tính thao tác sẵn có của kernel (worktree, thông điệp merge).",
+   "commits": [
+    {
+     "sha": "872e83c",
+     "paths": [
+      "aisef2/app/lineage.py",
+      "tests/v2/test_v21_continue_integrity.py"
+     ]
+    }
+   ],
+   "report_items": {
+    "D1": "M4"
+   },
+   "m_note": "Khớp REPORT.",
+   "acceptance": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với một câu khác của cùng đoạn §5.3: Không tự chạy lại tác dụng ngoài hệ thống nếu chưa biết lần trước đã xảy ra hay chưa.",
+   "gap": "Nhận diện dựa vào quy ước của kernel (tên worktree, thông điệp merge); một commit tay giống quy ước chưa được xét.",
+   "unconfirmed": "Khả năng một commit do người/agent tạo trùng quy ước nhận diện: không kiểm trong phiên này."
+  },
+  {
+   "id": "P-5.3c",
+   "source": "proposal",
+   "ref": "§5.3 (no-progress detector)",
+   "item": "nếu một số bước liên tiếp không tạo thay đổi mã, bằng chứng mới hoặc giả thuyết mới có căn cứ, giảm ngữ cảnh và đổi chiến thuật một lần; vẫn lặp thì dừng với lý do.",
+   "upstream": [
+    {
+     "key": "mimo-code",
+     "repo": "XiaomiMiMo/MiMo-Code",
+     "claim": "P-07",
+     "label": "CODE",
+     "verify": "corrected",
+     "commit": "6babeb0b98f9",
+     "where": "packages/cli/src/workflow/builtin/research-experiment.js:81-90"
+    }
+   ],
+   "evidence": "`usage.no_progress` báo các attempt liên tiếp có cùng tập lỗi, ghi vào RUN.json; không giảm ngữ cảnh, không đổi chiến thuật, không dừng.",
+   "refs": [
+    {
+     "path": "aisef2/app/run.py",
+     "contains": "rec[\"usage\"], rec[\"no_progress\"] = usage.usage("
+    }
+   ],
+   "reproducers": [
+    "tests/v2/test_v21_continue_usage.py::Usage::test_retries_that_change_nothing_are_reported"
+   ],
+   "reproducer_note": "",
+   "impact": "trung bình: một phiên chạm trần 80 lượt không sửa gì (360 §3.5)",
+   "decision": "adapted",
+   "why": "Chỉ báo cáo: retry thuộc taxonomy — khớp câu 'không đặt thêm cơ chế retry độc lập trong adapter' của đề xuất; phần giảm ngữ cảnh / đổi chiến thuật / dừng không làm.",
+   "commits": [
+    {
+     "sha": "d622e71",
+     "paths": [
+      "aisef2/app/usage.py"
+     ]
+    }
+   ],
+   "report_items": {
+    "D3": "M3"
+   },
+   "m_note": "Khớp REPORT.",
+   "acceptance": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với một câu khác của cùng đoạn §5.3: Mọi retry tiếp tục đi qua taxonomy hiện có; không đặt thêm cơ chế retry độc lập trong adapter.",
+   "gap": "Đơn vị đo là attempt (cùng lỗi), không phải bước/lượt trong một phiên; ngưỡng chưa hiệu chỉnh.",
+   "unconfirmed": ""
+  },
+  {
+   "id": "P-6.2a",
+   "source": "proposal",
+   "ref": "§6.2",
+   "item": "Mỗi thử nghiệm cần khóa các trường sau trước khi chạy:",
+   "upstream": [
+    {
+     "key": "openresearch",
+     "repo": "alphaXiv/OpenResearch",
+     "claim": "P4",
+     "label": "CODE",
+     "verify": "confirmed",
+     "commit": "d52a05365622",
+     "where": "src/compute.rs:168-182, 41-49"
+    },
+    {
+     "key": "openresearch",
+     "repo": "alphaXiv/OpenResearch",
+     "claim": "N18",
+     "label": "INFERENCE",
+     "verify": "confirmed",
+     "commit": "d52a05365622",
+     "where": "src/model.rs:66-86; store.rs:229-250"
+    }
+   ],
+   "evidence": "Manifest `aisef.experiment/1` có khoá đóng (format, experiment_id, parent_experiment_id, pair, workload, source, evaluator, bundle, policy, command, client, model, environment, variable_under_test, limits, stop_rule, created_at), niêm phong bằng sha256 JSON chuẩn hoá; sửa ⇒ seal hỏng.",
+   "refs": [
+    {
+     "path": "validation/experiments/harness.py",
+     "contains": "FORMAT = \"aisef.experiment/1\""
+    },
+    {
+     "path": "validation/experiments/harness.py",
+     "contains": "\"command\", \"client\", \"model\", \"environment\", \"variable_under_test\", \"limits\", \"stop_rule\", \"created_at\")"
+    },
+    {
+     "path": "validation/experiments/harness.py",
+     "lacks": "adapter_version"
+    }
+   ],
+   "reproducers": [
+    "tests/v2/test_v21_experiment.py::Experiment::test_a_manifest_is_sealed_and_an_edit_breaks_the_seal"
+   ],
+   "reproducer_note": "",
+   "impact": "cao cho tính đối chiếu",
+   "decision": "adapted",
+   "why": "Nhận khung: khoá đóng ở cấp trên cùng, niêm phong sha256, `model.identity_confidence` kèm lý do, `evaluator.exposed_to_developer` = false (`harness.check`). Nội dung bên trong các khoá khác không được đòi; không có quyết định nào ghi lại cho phần đó.",
+   "commits": [
+    {
+     "sha": "a29e82b",
+     "paths": [
+      "validation/experiments/harness.py"
+     ]
+    }
+   ],
+   "report_items": {
+    "E1": "M3"
+   },
+   "m_note": "Khớp REPORT.",
+   "acceptance": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với chính mục: mọi trường §6.2 liệt kê được khoá trước khi chạy (gạch đầu dòng cuối của danh sách đó, 'Kết quả từng obligation, finding, chi phí, thời gian và sự cố môi trường', là một trường phải khoá, không phải tiêu chí).",
+   "gap": "`harness.check` không đòi nội dung các trường §6.2 liệt kê: Workload ID, baseline commit, candidate snapshot digest, digest requirements/bundle/evaluator/policy, nguồn gốc bộ test, client + phiên bản, adapter version, thông tin provider thực trả, environment image digest, dependency lock, mạng, quyền ghi, giới hạn thời gian/token/tiền. Chưa dùng cho lượt thật nào.",
+   "unconfirmed": ""
+  },
+  {
+   "id": "P-6.2b",
+   "source": "proposal",
+   "ref": "§6.2",
+   "item": "Không suy ra danh tính model thực chỉ từ chuỗi tên provider trả về.",
+   "upstream": [
+    {
+     "key": "openresearch",
+     "repo": "alphaXiv/OpenResearch",
+     "claim": "N13",
+     "label": "CODE",
+     "verify": "corrected",
+     "commit": "d52a05365622",
+     "where": "src/compute.rs:877-924"
+    },
+    {
+     "key": "openresearch",
+     "repo": "alphaXiv/OpenResearch",
+     "claim": "N12",
+     "label": "CODE",
+     "verify": "confirmed",
+     "commit": "d52a05365622",
+     "where": "src/chat/mod.rs:7642-7653; store/telemetry.rs:12-47, 50-57"
+    }
+   ],
+   "evidence": "`model.identity_confidence` ∈ verified / provider_reported / unverified, bắt buộc kèm lý do (`harness.check`).",
+   "refs": [
+    {
+     "path": "validation/experiments/harness.py",
+     "contains": "IDENTITY = (\"verified\", \"provider_reported\", \"unverified\")"
+    }
+   ],
+   "reproducers": [
+    "tests/v2/test_v21_experiment.py::Experiment::test_a_manifest_is_sealed_and_an_edit_breaks_the_seal"
+   ],
+   "reproducer_note": "Test chỉ chạy manifest hợp lệ (`unverified`); không có test âm riêng cho trường thiếu.",
+   "impact": "trung bình",
+   "decision": "adopted",
+   "why": "Đúng đề xuất.",
+   "commits": [
+    {
+     "sha": "a29e82b",
+     "paths": [
+      "validation/experiments/harness.py"
+     ]
+    }
+   ],
+   "report_items": {
+    "E1": "M3"
+   },
+   "m_note": "Khớp REPORT.",
+   "acceptance": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với một câu khác của cùng đoạn §6.2: ghi `provider-reported`/`unverified` đúng phạm vi, không gọi là xác thực model đầy đủ",
+   "gap": "Chỉ trong harness thí nghiệm; preflight của `aisef run` không đổi trong 2.1 về điểm này.",
+   "unconfirmed": "'preflight không đổi về điểm này': suy từ danh sách commit 2.1 (b029236 chỉ sửa redirect), chưa đọc lại preflight."
+  },
+  {
+   "id": "P-6.2c",
+   "source": "proposal",
+   "ref": "§6.2",
+   "item": "Tránh đưa dashboard, multi-cloud scheduler hoặc hàng loạt compute backend vào đường găng 2.1.",
+   "upstream": [
+    {
+     "key": "openresearch",
+     "repo": "alphaXiv/OpenResearch",
+     "claim": "P11",
+     "label": "INFERENCE",
+     "verify": "corrected",
+     "commit": "d52a05365622",
+     "where": "người kiểm: README.md:105-107@d52a053; up.rs:57-62, 790-830; remote_host.rs:749"
+    }
+   ],
+   "evidence": "Không có dashboard, scheduler hay compute backend nào được thêm (danh sách tệp đổi 610a593..c9c736f).",
+   "refs": [],
+   "reproducers": [],
+   "reproducer_note": "Không có (không xây gì).",
+   "impact": "—",
+   "decision": "declined",
+   "why": "Giữ đúng đề xuất.",
+   "commits": [],
+   "report_items": {},
+   "m_note": "REPORT §2 không có hạng mục riêng cho mục này.",
+   "acceptance": "—",
+   "gap": "",
+   "unconfirmed": ""
+  },
+  {
+   "id": "P-7a",
+   "source": "proposal",
+   "ref": "§7 mini-SWE-agent",
+   "item": "Giới hạn tiền kiểm trước lượt kế tiếp nên có thể vượt trần bởi một request đang thực hiện; AISEF cần ghi rõ sai số hoặc đặt trước ngân sách request.",
+   "upstream": [
+    {
+     "key": "mini-swe-agent",
+     "repo": "SWE-agent/mini-swe-agent",
+     "claim": "P7",
+     "label": "CODE",
+     "verify": "confirmed",
+     "commit": "04d809ceab9d",
+     "where": "src/minisweagent/agents/default.py:132, 148-150; tests/agents/test_default.py:530-544"
+    }
+   ],
+   "evidence": "Có từ 2.0: `client.LIMITATION` ghi rằng tổng có thể vượt trần bởi các step kết thúc kể từ lần đọc trước, và request không kết thúc step không có trong telemetry; ghi kèm mỗi bản kế toán ngân sách.",
+   "refs": [
+    {
+     "path": "aisef2/app/client.py",
+     "contains": "so totals can pass a ceiling by the steps",
+     "at": "610a593"
+    },
+    {
+     "path": "aisef2/app/client.py",
+     "contains": "so totals can pass a ceiling by the steps"
+    }
+   ],
+   "reproducers": [],
+   "reproducer_note": "Không có test riêng; bằng chứng là mã (giới hạn được ghi, không được đo).",
+   "impact": "trung bình",
+   "decision": "adopted",
+   "why": "Đã có trong 2.0 (ghi sai số), không triển khai lại.",
+   "commits": [],
+   "report_items": {},
+   "m_note": "REPORT §2 không có hạng mục riêng cho mục này.",
+   "acceptance": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với chính mục: AISEF cần ghi rõ sai số hoặc đặt trước ngân sách request",
+   "gap": "Không đặt trước ngân sách request; sai số không được định lượng.",
+   "unconfirmed": ""
+  },
+  {
+   "id": "P-7b",
+   "source": "proposal",
+   "ref": "§7 mini-SWE-agent",
+   "item": "Đối chứng chính phải là cùng model, client, nhiệm vụ và tài nguyên chạy trực tiếp. mini là đối chứng phụ",
+   "upstream": [
+    {
+     "key": "mini-swe-agent",
+     "repo": "SWE-agent/mini-swe-agent",
+     "claim": "P2",
+     "label": "INFERENCE",
+     "verify": "confirmed",
+     "commit": "04d809ceab9d",
+     "where": "src/minisweagent/models/litellm_model.py:66-71"
+    },
+    {
+     "key": "mini-swe-agent",
+     "repo": "SWE-agent/mini-swe-agent",
+     "claim": "P10",
+     "label": "INFERENCE",
+     "verify": "confirmed",
+     "commit": "04d809ceab9d",
+     "where": "— (INFERENCE: nghiên cứu không dẫn tệp:dòng nào cho tuyên bố này)"
+    }
+   ],
+   "evidence": "Cánh `direct` của harness: cùng client, cùng settings/route, task công khai; harness commit những gì client để lại. Không có cánh mini-SWE-agent trong `ARMS`.",
+   "refs": [
+    {
+     "path": "validation/experiments/harness.py",
+     "contains": "ARMS = (\"direct\", \"aisef\", \"aisef+\")"
+    }
+   ],
+   "reproducers": [
+    "tests/v2/test_v21_experiment.py::Experiment::test_the_direct_arm_from_task_to_evaluated_result_and_its_replay"
+   ],
+   "reproducer_note": "",
+   "impact": "cao cho kết luận hiệu quả",
+   "decision": "adapted",
+   "why": "Đối chứng chính nhận; mini là tuỳ chọn, chưa làm (UPSTREAM-RESEARCH.md: 'cánh A' tuỳ chọn').",
+   "commits": [
+    {
+     "sha": "a29e82b",
+     "paths": [
+      "validation/experiments/harness.py"
+     ]
+    }
+   ],
+   "report_items": {
+    "E1": "M3"
+   },
+   "m_note": "Khớp REPORT.",
+   "acceptance": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với chính mục (diễn đạt lại): Đối chứng chính là cùng model, client, nhiệm vụ và tài nguyên chạy trực tiếp",
+   "gap": "Cánh mini: chưa làm.",
+   "unconfirmed": ""
+  },
+  {
+   "id": "P-7c",
+   "source": "proposal",
+   "ref": "§7 OpenSandbox",
+   "item": "MVP nên là Linux executor, có thể điều khiển từ máy macOS.",
+   "upstream": [
+    {
+     "key": "opensandbox",
+     "repo": "opensandbox-group/OpenSandbox",
+     "claim": "P1",
+     "label": "CODE",
+     "verify": "confirmed",
+     "commit": "c7dc78a4090e",
+     "where": "server/opensandbox_server/services/docker/docker_service.py:783-850; container_ops.py:362-400, 402-496"
+    },
+    {
+     "key": "opensandbox",
+     "repo": "opensandbox-group/OpenSandbox",
+     "claim": "P8",
+     "label": "CODE",
+     "verify": "confirmed",
+     "commit": "c7dc78a4090e",
+     "where": "container_ops.py:362-400, 429-443; config.py:1216-1231, 1232-1247"
+    },
+    {
+     "key": "opensandbox",
+     "repo": "opensandbox-group/OpenSandbox",
+     "claim": "N1",
+     "label": "CODE",
+     "verify": "confirmed",
+     "commit": "c7dc78a4090e",
+     "where": "config.py:1200-1204 (mặc định network host)"
+    },
+    {
+     "key": "opensandbox",
+     "repo": "opensandbox-group/OpenSandbox",
+     "claim": "N4",
+     "label": "CODE",
+     "verify": "confirmed",
+     "commit": "c7dc78a4090e",
+     "where": "components/execd/pkg/flag/parser.go:42,62-71; router.go:218-221"
+    },
+    {
+     "key": "opensandbox",
+     "repo": "opensandbox-group/OpenSandbox",
+     "claim": "N13",
+     "label": "CODE",
+     "verify": "confirmed",
+     "commit": "c7dc78a4090e",
+     "where": "docker_service.py:899-922; container_ops.py:422-424"
+    },
+    {
+     "key": "opensandbox",
+     "repo": "opensandbox-group/OpenSandbox",
+     "claim": "N25",
+     "label": "INFERENCE",
+     "verify": "confirmed",
+     "commit": "c7dc78a4090e",
+     "where": "config.py:1118-1145, 995-1000, 1386-1396"
+    }
+   ],
+   "evidence": "Không có executor Linux tại HEAD. Mã OpenSandbox (c7dc78a) được đọc làm danh mục kiểm, không làm backend: mặc định network host, execd không xác thực trên Docker, chế độ bwrap nới container (UPSTREAM-RESEARCH.md).",
+   "refs": [
+    {
+     "path": "docs/v2.1/UPSTREAM-RESEARCH.md",
+     "contains": "danh mục kiểm cho V2-05"
+    }
+   ],
+   "reproducers": [],
+   "reproducer_note": "Không có (chưa triển khai).",
+   "impact": "cao (như P-V2-05)",
+   "decision": "blocked",
+   "why": "Như P-V2-05.",
+   "commits": [],
+   "report_items": {
+    "F": "M6"
+   },
+   "m_note": "Khớp REPORT.",
+   "acceptance": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với một câu khác của cùng đoạn §7: Developer không nhận host HOME, socket Docker, credential, verifier runtime hoặc hidden bundle.",
+   "gap": "Toàn bộ. MỞ.",
+   "unconfirmed": ""
+  },
+  {
+   "id": "P-8",
+   "source": "proposal",
+   "ref": "§8",
+   "item": "Mũi tên phản hồi về kernel không cho phép plugin trực tiếp ghi verdict.",
+   "upstream": [],
+   "evidence": "B-03c: `bundle_cli.migrate`, `review_verify.verify` trong AUTHORITY-INVENTORY.json; checker theo module, fail-closed bắt mọi đường commit/merge/journal/approve và đường quyết định thứ hai. Module mới nằm trong `aisef2/app`, không tách package (§8: 'chưa phải yêu cầu tạo ngay sáu package').",
+   "refs": [
+    {
+     "path": "closure-evidence/v2/v2.1/AUTHORITY-INVENTORY.json",
+     "contains": "bundle_cli"
+    },
+    {
+     "path": "closure-evidence/v2/cycle2/RELEASE-DECISIONS.json",
+     "contains": "Cập nhật inventory và kiểm tra kiến trúc để cưỡng chế các giới hạn này."
+    }
+   ],
+   "reproducers": [
+    "tests/v2/test_v21_authority_limits.py::RealTree::test_the_tree_is_inside_the_limits_and_the_closure_crosses_modules",
+    "tests/v2/test_v21_authority_limits.py::OneDecisionPath::test_a_second_caller_of_verify_blocks_or_migrate_is_caught",
+    "tests/v2/test_v21_authority_limits.py::MigrateNeverApproves::test_calling_approve_is_caught_with_everything_approve_then_reaches",
+    "tests/v2/test_v21_authority_limits.py::Calibration::test_the_q0_checker_rejects_its_known_bad_fixture_and_an_always_pass_mutant_fails_calibration"
+   ],
+   "reproducer_note": "",
+   "impact": "cao: một đường quyết định là tài sản chính của 2.0 (360 §3.1)",
+   "decision": "adopted",
+   "why": "Đúng đề xuất và owner B-03c.",
+   "commits": [
+    {
+     "sha": "a912be6",
+     "paths": [
+      "validation/qualification/authority_limits.py",
+      "closure-evidence/v2/v2.1/AUTHORITY-INVENTORY.json",
+      "aisef2/app/bundle_cli.py"
+     ]
+    },
+    {
+     "sha": "1711c07",
+     "paths": [
+      "validation/qualification/authority_limits.py",
+      "tests/v2/test_v21_authority_limits.py"
+     ]
+    },
+    {
+     "sha": "0b4e740",
+     "paths": [
+      "validation/qualification/authority_limits.py",
+      "tests/v2/test_v21_authority_limits.py"
+     ]
+    }
+   ],
+   "report_items": {},
+   "m_note": "REPORT §2 không có hạng mục (B-03c chấp nhận ở RELEASE-DECISIONS seq 5). Reproducer tại HEAD chạy lại xanh tại c9c736f (vòng 2, `docs/v2.1/evidence/traceability-reproducers-c9c736f.out`).",
+   "acceptance": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với chỉ thị B-03c của chủ dự án (RELEASE-DECISIONS seq 5): Cập nhật inventory và kiểm tra kiến trúc để cưỡng chế các giới hạn này.",
+   "gap": "Checker là phân tích tĩnh trên mã Python; tiến trình ngoài (OCR) không bị ràng buộc ở mức OS.",
+   "unconfirmed": ""
+  },
+  {
+   "id": "P-9.1",
+   "source": "proposal",
+   "ref": "§9.1",
+   "item": "CLI dự kiến, **chưa tồn tại trong v2.0 theo báo cáo**:",
+   "upstream": [],
+   "evidence": "`aisef bundle` có init, seal, approve, lint, explain, continue, migrate; `aisef run` có `--parent`, `--accept-unaccounted`, `--anchor-out`, `--expect-anchor`. Không có `run --resume`, không có `assess --candidate`.",
+   "refs": [
+    {
+     "path": "aisef2/app/bundle_cli.py",
+     "contains": "sub.add_parser(\"continue\""
+    },
+    {
+     "path": "aisef2/app/bundle_cli.py",
+     "contains": "sub.add_parser(\"migrate\""
+    },
+    {
+     "path": "aisef2/app/cli.py",
+     "contains": "\"--parent\""
+    }
+   ],
+   "reproducers": [
+    "tests/v2/test_v21_bundle_tools.py::Outsider::test_each_example_from_init_to_a_ready_check",
+    "tests/test_v21_bundle_dispatch.py::BundleIsV2::test_migrate_through_the_aisef_command",
+    "tests/v2/test_v21_continue_usage.py::Continue::test_the_continuation_inherits_what_the_journal_committed_and_proves_it_again_for_free"
+   ],
+   "reproducer_note": "",
+   "impact": "cao (360 §3.6)",
+   "decision": "adapted",
+   "why": "`run --resume` thay bằng `bundle continue` + `run --parent` (ADR-8); `assess` hoãn sang 2.2 (P-V2-14); thêm `approve` (duyệt từng contract, `human:<tên>`, ADR-6).",
+   "commits": [
+    {
+     "sha": "620bde7",
+     "paths": [
+      "aisef2/app/bundle_cli.py"
+     ]
+    },
+    {
+     "sha": "d622e71",
+     "paths": [
+      "aisef2/app/bundle_cli.py",
+      "aisef2/app/cli.py"
+     ]
+    },
+    {
+     "sha": "919a271",
+     "paths": [
+      "aisef/cli/parser.py",
+      "aisef2/app/bundle_cli.py"
+     ]
+    }
+   ],
+   "report_items": {
+    "B4": "M4",
+    "B5": "M4",
+    "D1": "M4"
+   },
+   "m_note": "Khớp REPORT. B4/B5: M4 là của lượt CLI thật tại `b72e51e` (docs/v2.1/evidence/cli-integration-b72e51e.out); `aisef2/app/bundle_cli.py` đổi sau lượt đó ở a912be6 và 3061ec0 (đường ghi của init/seal/approve/migrate chuyển sang tạo độc quyền `_create`), lượt lặp lại tại c9c736f (`docs/v2.1/evidence/cli-integration-c9c736f.out`, vòng 2 của bảng này: cùng `run.sh`, cùng nhị phân OCR, clone sạch tại c9c736f) cho cùng output — khác nhau chỉ ở giá trị băm (commit của repo `git init` mới, plan_hash, anchor, sha256), pid, mốc thời gian và dòng cuối bị cắt ở 3000 ký tự: M4 tại c9c736f. (kiểm cơ học ở P-V2-07)",
+   "acceptance": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với câu cuối của §9.1: `seal` chỉ niêm phong phiên bản đã duyệt, không thay thế duyệt.",
+   "gap": "`assess --candidate`: chưa có.",
+   "unconfirmed": ""
+  },
+  {
+   "id": "P-9.3",
+   "source": "proposal",
+   "ref": "§9.3",
+   "item": "Positive controls: nhiều triển khai đúng khác cấu trúc vẫn pass.",
+   "upstream": [],
+   "evidence": "Chưa có bậc kiểm contract theo ≥ 2 triển khai đúng, metamorphic hay false-rejection tổng quát. Hiệu chuẩn hiện có là theo lớp probe (fixture dương/âm cho mỗi lớp, ví dụ `python_imports`). Riêng S-10-a: hai bản nháp giữ trên dạng smoke #2 và bác một import thật.",
+   "refs": [
+    {
+     "path": "tests/v2/fixtures/calibration/file_artifact/python_imports/positive/request.json",
+     "exists": true
+    }
+   ],
+   "reproducers": [
+    "tests/v2/test_v21_python_imports.py::Controls::test_each_draft_holds_on_the_smoke2_shape_and_refutes_a_real_import"
+   ],
+   "reproducer_note": "",
+   "impact": "cao: S-10-a QUALIFIED trên một bản tham chiếu + một mutant rồi bác nhầm một story đúng (360 §3.3)",
+   "decision": "open",
+   "why": "Chưa làm; không có quyết định nào được ghi lại.",
+   "commits": [],
+   "report_items": {},
+   "m_note": "REPORT §2 không có hạng mục riêng cho mục này.",
+   "acceptance": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với một gạch đầu dòng khác của §9.3: Kiểm false rejection bên cạnh false acceptance.",
+   "gap": "Toàn bộ, trừ S-10-a.",
+   "unconfirmed": ""
+  },
+  {
+   "id": "P-11.1",
+   "source": "proposal",
+   "ref": "§11.1 (nhánh A)",
+   "item": "Cùng coding client/model chạy trực tiếp, cùng task và sandbox",
+   "upstream": [],
+   "evidence": "Harness có ba cánh `direct`, `aisef`, `aisef+`; EXPERIMENT-PLAN: A direct, B aisef, C aisef+ fix-loop. Không có sandbox chung cho các cánh.",
+   "refs": [
+    {
+     "path": "validation/experiments/harness.py",
+     "contains": "ARMS = (\"direct\", \"aisef\", \"aisef+\")"
+    }
+   ],
+   "reproducers": [
+    "tests/v2/test_v21_experiment.py::Experiment::test_a_pair_differs_in_the_variable_under_test_only"
+   ],
+   "reproducer_note": "",
+   "impact": "quyết định",
+   "decision": "blocked",
+   "why": "Chặn trên ngân sách (B-09) và sandbox (F).",
+   "commits": [
+    {
+     "sha": "a29e82b",
+     "paths": [
+      "validation/experiments/harness.py"
+     ]
+    }
+   ],
+   "report_items": {
+    "E1": "M3",
+    "E2": "M6"
+   },
+   "m_note": "Khớp REPORT.",
+   "acceptance": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với đoạn dưới bảng §11.1: Ghi patch set của B; không gắn nhãn B là v2.0.0 nguyên bản.",
+   "gap": "E2: MỞ; sandbox chung: MỞ.",
+   "unconfirmed": ""
+  },
+  {
+   "id": "P-11.2",
+   "source": "proposal",
+   "ref": "§11.2",
+   "item": "Canary trước: một story, ngân sách nhỏ, đi qua cài package → CLI → client → probe → review → kết quả cuối.",
+   "upstream": [],
+   "evidence": "Bậc 0 offline đã chạy trên b72e51e: CLI thật + OCR thật + preflight HTTP tới provider giả trên loopback + developer giả; chạy bằng `python -m aisef` với PYTHONPATH của cây, không cài từ package. Bậc 1–2 (provider thật) chờ duyệt (B-09).",
+   "refs": [
+    {
+     "path": "validation/v21/cli_integration/run.sh",
+     "contains": "PYTHONPATH=$W"
+    }
+   ],
+   "reproducers": [],
+   "reproducer_note": "Không có test (là lượt chạy; output đã commit).",
+   "impact": "cao: RC1 qua mọi kiểm offline rồi chết ở preflight live (360 §3.3)",
+   "decision": "blocked",
+   "why": "Chặn trên ngân sách của chủ dự án (B-09).",
+   "commits": [],
+   "report_items": {},
+   "m_note": "REPORT §2 không có hạng mục riêng cho mục này.",
+   "acceptance": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với một câu khác của cùng đoạn §11.2: Canary xanh mới mở thí nghiệm paired nhỏ trên một route.",
+   "gap": "Canary live: MỞ. Bước 'cài package' chưa có trong lượt offline.",
+   "unconfirmed": ""
+  },
+  {
+   "id": "P-11.3",
+   "source": "proposal",
+   "ref": "§11.3",
+   "item": "Cost ledger phải phân biệt input không cache, cache-read, cache-write và output; reasoning không đếm hai lần nếu provider đã gộp.",
+   "upstream": [],
+   "evidence": "`usage.CLASSES` = input, cache_read, cache_write, output, reasoning; tiền = (output + reasoning) × giá output (`usage._usd`). Đo trong phiên lập bảng (lệnh ở cột reproducer) trên 270 step của luồng phiên smoke #2 (closure-evidence/v2/release/smoke-2/run-1/sessions): `total` = input + output + reasoning + cache.read + cache.write ở 270/270 step; 200 step có reasoning > 0 và ở cả 200 `total` ≠ input + output + cache; output 68 853 + reasoning 244 483 = 313 336 (con số output của EXPERIMENT-PLAN). Suy luận (INFERENCE): nếu `total` là số provider trả về thì `output` của client không gồm `reasoning` và `_usd` không đếm hai lần; nếu OpenCode tự cộng `total` từ chính các trường của nó thì đẳng thức đúng bất kể `output` chứa gì, và phép đo này không phân định được.",
+   "refs": [
+    {
+     "path": "aisef2/app/usage.py",
+     "contains": "CLASSES = (\"input\", \"cache_read\", \"cache_write\", \"output\", \"reasoning\")"
+    },
+    {
+     "path": "docs/v2.1/EXPERIMENT-PLAN.md",
+     "contains": "313 336 output (gồm 244 483 reasoning)"
+    },
+    {
+     "path": "tests/v2/test_v21_continue_integrity.py",
+     "contains": "self.settings_doc = {**SETTINGS, \"prices\": PRICES}"
+    },
+    {
+     "path": "tests/v2/test_v21_continue_integrity.py",
+     "contains": "\"output\": 7, \"reasoning\": 3,"
+    }
+   ],
+   "reproducers": [
+    "tests/v2/test_v21_continue_usage.py::Usage::test_without_prices_cost_is_unknown_never_zero"
+   ],
+   "reproducer_note": "Test trên chỉ cho thấy tách 5 lớp token. Không test nào khẳng định số USD của một step có reasoning ≠ 0: số USD duy nhất được khẳng định (1.0, trong `Usage::test_with_prices_known_and_a_blind_step_makes_it_partial`) là của step o=0, r=0, cr=0. `tests/v2/test_v21_continue_integrity.py` (LineageBase) chạy `aisef run` với bảng giá (`\"prices\": PRICES`) và client giả báo reasoning 3 mỗi step, nhưng chỉ khẳng định token, và `cost.value` None khi chi tiêu không rõ. Phép đo token (không phải test), chạy ở gốc repo: `python3 -P -c \"import glob,json;e=[json.loads(x) for f in sorted(glob.glob('closure-evidence/v2/release/smoke-2/run-1/sessions/*.jsonl')) for x in open(f,encoding='utf-8')];k=[x['part']['tokens'] for x in e if x.get('type')=='step_finish'];s=lambda t:t['input']+t['output']+t['cache']['read']+t['cache']['write'];r=[t for t in k if t['reasoning']];print(len(k),sum(t['total']==s(t)+t['reasoning'] for t in k),sum(t['output'] for t in k),sum(t['reasoning'] for t in k),len(r),sum(t['total']!=s(t) for t in r))\"` in ra `270 270 68853 244483 200 200`.",
+   "impact": "cao cho USD/story",
+   "decision": "adopted",
+   "why": "Đúng đề xuất.",
+   "commits": [
+    {
+     "sha": "d622e71",
+     "paths": [
+      "aisef2/app/usage.py"
+     ]
+    }
+   ],
+   "report_items": {
+    "D2": "M4"
+   },
+   "m_note": "Khớp REPORT (mức của D2, không của phép đo token); phép đo token là đo lại trong phiên này, không phải test.",
+   "acceptance": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với một câu khác của cùng đoạn §11.3: Lưu nguồn giá và ngày hiệu lực; với 9router/combo không có rate card, để unknown và báo token.",
+   "gap": "Phép đo chỉ cho một phiên bản client (OpenCode 1.18.31 theo 360 §3.5); client/provider khác phải đo lại. Chưa test nào khẳng định số USD của một step có reasoning ≠ 0; 'không đếm hai lần' chưa được xác nhận trong mã OpenCode.",
+   "unconfirmed": "Cách OpenCode 1.18.31 điền `tokens.total` (số provider trả hay tự cộng từ các trường của nó): repo không chứa mã nguồn OpenCode — vì vậy kết luận 'không đếm hai lần' là INFERENCE."
+  },
+  {
+   "id": "P-12-1",
+   "source": "proposal",
+   "ref": "§12 phải làm ngay",
+   "item": "Controller/runtime/evidence/key ở miền developer không ghi được; workload không cùng quyền kiểm soát với verifier.",
+   "upstream": [],
+   "evidence": "Không đạt: developer và mã test chạy dưới user của người vận hành, sửa được mọi tệp user đó ghi được (REPORT §3).",
+   "refs": [
+    {
+     "path": "docs/v2.1/REPORT.md",
+     "contains": "Điều **không** có: ranh giới hệ điều hành."
+    }
+   ],
+   "reproducers": [],
+   "reproducer_note": "Không có.",
+   "impact": "cao",
+   "decision": "blocked",
+   "why": "Như P-V2-05.",
+   "commits": [],
+   "report_items": {
+    "F": "M6"
+   },
+   "m_note": "Khớp REPORT.",
+   "acceptance": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này (§12 'Phần phải làm ngay' nêu yêu cầu, không kèm tiêu chí); bảng đối chiếu với chính mục.",
+   "gap": "Toàn bộ. MỞ.",
+   "unconfirmed": ""
+  },
+  {
+   "id": "P-12-2",
+   "source": "proposal",
+   "ref": "§12 phải làm ngay",
+   "item": "`-S` có kiểm thử đường app thật và cách nạp dependency rõ ràng.",
+   "upstream": [],
+   "evidence": "Test đi qua `run` (probe nhận interpreter của kernel, test nhận venv riêng); probe chỉ stdlib (360 §3.6). Không có lượt live.",
+   "refs": [],
+   "reproducers": [
+    "tests/v2/test_v21_identity.py::PthChannel::test_the_run_gives_the_probes_this_interpreter_and_the_tests_their_own"
+   ],
+   "reproducer_note": "",
+   "impact": "cao",
+   "decision": "adopted",
+   "why": "Đúng đề xuất ở mức offline.",
+   "commits": [
+    {
+     "sha": "919a271",
+     "paths": [
+      "aisef2/app/run.py",
+      "tests/v2/test_v21_identity.py"
+     ]
+    }
+   ],
+   "report_items": {
+    "A1": "M3"
+   },
+   "m_note": "Khớp REPORT.",
+   "acceptance": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với một câu khác của cùng đoạn §12: Không khẳng định chỉ thêm flag là giải quyết confinement.",
+   "gap": "Không có lượt live qua đường app thật.",
+   "unconfirmed": ""
+  },
+  {
+   "id": "P-12-3",
+   "source": "proposal",
+   "ref": "§12 phải làm ngay",
+   "item": "Candidate code chạy trong tiến trình/môi trường riêng, không được nạp vào process giữ khóa.",
+   "upstream": [],
+   "evidence": "Có từ 2.0: subject chạy trong tiến trình riêng do controller sinh, kênh phán quyết HMAC (360 §3.4 'Mạnh'). 2.1 thêm `-S` cho mọi lần khởi chạy đó.",
+   "refs": [
+    {
+     "path": "aisef2/probe/process_effect.py",
+     "contains": "agent = subprocess.Popen([req[\"interpreter\"], \"-I\", \"-S\", \"-B\""
+    }
+   ],
+   "reproducers": [
+    "tests/v2/test_v21_identity.py::PthChannel::test_every_active_probe_launch_carries_minus_S"
+   ],
+   "reproducer_note": "",
+   "impact": "cao",
+   "decision": "adopted",
+   "why": "Đã có trong 2.0; không triển khai lại.",
+   "commits": [],
+   "report_items": {},
+   "m_note": "REPORT §2 không có hạng mục riêng cho mục này.",
+   "acceptance": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này (§12 'Phần phải làm ngay' nêu yêu cầu, không kèm tiêu chí); bảng đối chiếu với chính mục.",
+   "gap": "Cùng user: không phải môi trường riêng ở mức OS.",
+   "unconfirmed": "Các test tấn công của 2.0 ('20 test tấn công', 360 §3.4) không được định danh lại trong phiên này."
+  },
+  {
+   "id": "P-12-4",
+   "source": "proposal",
+   "ref": "§12 phải làm ngay",
+   "item": "Journal hash chain phát hiện một số sửa đổi khi có checkpoint đáng tin; không tự chống kẻ cùng quyền viết lại cả chuỗi.",
+   "upstream": [],
+   "evidence": "Anchor = sha256 của `EVIDENCE.json` in ra cuối lượt; `--verify --expect-anchor` bác việc viết lại nhất quán cả thư mục; tệp anchor `O_CREAT|O_EXCL|O_NOFOLLOW`, 0444 (ADR-3, ANCHOR-THREAT-MODEL.md).",
+   "refs": [
+    {
+     "path": "docs/v2.1/ANCHOR-THREAT-MODEL.md",
+     "exists": true
+    }
+   ],
+   "reproducers": [
+    "tests/v2/test_v21_continue_integrity.py::AnchorThreatModel::test_an_attacker_who_cannot_write_the_store_is_refuted",
+    "tests/v2/test_v21_continue_integrity.py::AnchorThreatModel::test_the_limit_an_attacker_who_can_write_the_store_too_is_not_detected",
+    "tests/v2/test_v21_continue_integrity.py::AnchorThreatModel::test_the_anchor_file_is_new_exact_and_never_through_a_link"
+   ],
+   "reproducer_note": "",
+   "impact": "cao",
+   "decision": "adopted",
+   "why": "Đúng đề xuất: tuyên bố giới hạn ở 'toàn vẹn so với một giá trị'.",
+   "commits": [
+    {
+     "sha": "ad78ce7",
+     "paths": [
+      "aisef2/app/verify.py"
+     ]
+    },
+    {
+     "sha": "872e83c",
+     "paths": [
+      "aisef2/app/lineage.py"
+     ]
+    }
+   ],
+   "report_items": {
+    "A2": "M4",
+    "D5": "M4"
+   },
+   "m_note": "Khớp REPORT về mức.",
+   "acceptance": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với một câu khác của cùng đoạn §12: Nếu tuyên bố tính xác thực, cần trust anchor/checkpoint ký hoặc dịch vụ append được bảo vệ bên ngoài miền workload.",
+   "gap": "Nơi giữ anchor tin cậy chưa có (REPORT §7).",
+   "unconfirmed": "D5 'CLI thật: tệp 0444' (REPORT §2): output đã commit chỉ có `anchor_written_to`, không có mode của tệp."
+  },
+  {
+   "id": "P-12-5",
+   "source": "proposal",
+   "ref": "§12 phải làm ngay",
+   "item": "Git tree, image và artifact digest kiểm ngay tại ranh giới sử dụng, không chỉ khi người viết báo xong.",
+   "upstream": [],
+   "evidence": "Nhị phân OCR chạy chỉ khi đúng sha256 đã ghim, theo đường dẫn tuyệt đối; checkout được chụp trước và so lại sau finder; nguồn thí nghiệm phải là commit sạch.",
+   "refs": [
+    {
+     "path": "aisef2/app/review_ocr.py",
+     "contains": "def pinned("
+    }
+   ],
+   "reproducers": [
+    "tests/v2/test_v21_review_ocr.py::Process::test_the_binary_runs_only_as_the_pinned_bytes_by_absolute_path",
+    "tests/v2/test_v21_review_chain.py::CandidateChangedDuringReview::test_a_finder_binary_that_is_not_the_pinned_one_does_not_run",
+    "tests/v2/test_v21_experiment.py::Experiment::test_the_source_is_a_clean_commit"
+   ],
+   "reproducer_note": "",
+   "impact": "cao",
+   "decision": "adapted",
+   "why": "Làm cho các ranh giới mới của 2.1 (OCR, review, thí nghiệm); không có image nào để kiểm.",
+   "commits": [
+    {
+     "sha": "e897437",
+     "paths": [
+      "aisef2/app/review_ocr.py"
+     ]
+    },
+    {
+     "sha": "390f07c",
+     "paths": [
+      "aisef2/app/review_ocr.py"
+     ]
+    },
+    {
+     "sha": "a29e82b",
+     "paths": [
+      "validation/experiments/harness.py"
+     ]
+    }
+   ],
+   "report_items": {},
+   "m_note": "REPORT §2 không có hạng mục riêng cho mục này.",
+   "acceptance": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này (§12 'Phần phải làm ngay' nêu yêu cầu, không kèm tiêu chí); bảng đối chiếu với chính mục.",
+   "gap": "Cùng user: giữa lúc kiểm và lúc dùng vẫn có thể bị thay (TOCTOU) — chỉ ranh giới OS đóng được.",
+   "unconfirmed": ""
+  },
+  {
+   "id": "P-GATE-2.0.1",
+   "source": "proposal",
+   "ref": "§12 gate",
+   "item": "**2.0.1:** reproducer lỗi đã biết được xử lý; release lane và metadata đúng; loader/preflight không làm mất phân loại; canary từ package thật chạy được.",
+   "upstream": [],
+   "evidence": "`release/v2.0.1-prep` = f006d3d (local, chưa push): suite đầy đủ Ran 5497, 4 F (so bản ghi niêm phong), 80 skip (REPORT §5); chưa CI/RC/Q0–Q5/tag; chưa canary từ package thật.",
+   "refs": [
+    {
+     "path": "docs/v2.1/REPORT.md",
+     "contains": "Ran 5497, **4 F**, 80 skip"
+    }
+   ],
+   "reproducers": [
+    "f006d3d1b23ef9d318078642d16c7bdfa7687a98:tests/v2/test_v201_venvs.py::TwoVenvs::test_a_pth_written_from_the_tests_interpreter_never_runs_in_a_probe"
+   ],
+   "reproducer_note": "",
+   "impact": "cao",
+   "decision": "blocked",
+   "why": "B-02: phát hành 2.0.1 là quyết định của chủ dự án (chưa duyệt).",
+   "commits": [
+    {
+     "sha": "c0ec1a5",
+     "paths": [
+      "aisef2/app/run.py",
+      "aisef2/orchestrate/story_runner.py",
+      "CHANGELOG.md"
+     ],
+     "ref": "f006d3d1b23ef9d318078642d16c7bdfa7687a98"
+    },
+    {
+     "sha": "f006d3d",
+     "paths": [
+      "aisef2/app/run.py",
+      "tests/v2/test_v201_relative_paths.py"
+     ],
+     "ref": "f006d3d1b23ef9d318078642d16c7bdfa7687a98"
+    }
+   ],
+   "report_items": {
+    "A11": "M3"
+   },
+   "m_note": "Khớp REPORT.",
+   "acceptance": "reproducer lỗi đã biết được xử lý; release lane và metadata đúng; loader/preflight không làm mất phân loại; canary từ package thật chạy được (§12; STATUS B-02 thêm: gate `v2_release_gate 2.0.1` PASS, byte PyPI = byte RC)",
+   "gap": "Gate chưa đạt.",
+   "unconfirmed": ""
+  },
+  {
+   "id": "P-GATE-2.1",
+   "source": "proposal",
+   "ref": "§12 gate",
+   "item": "**2.1 pilot:** người ngoài tạo và chạy bundle nhỏ; một workload chưa thấy hoàn tất không miễn trừ; LedgerLock repo thật được kiểm; lỗi review confirmed không bị bỏ qua; chi phí minh bạch; Linux isolation đủ cho holdout; resume qua các điểm crash định trước.",
+   "upstream": [],
+   "evidence": "Người ngoài: chưa đo. Workload chưa thấy: không có lượt live. LedgerLock repo thật: chưa. Review confirmed: M4 offline, 4/5 lỗi lịch sử. Chi phí: M4 offline, chưa có giá thật. Linux isolation: M6. Resume qua điểm crash: M4 (nối tiếp, không tại chỗ).",
+   "refs": [
+    {
+     "path": "docs/v2.1/REPORT.md",
+     "contains": "**Chưa đủ điều kiện phát hành.**"
+    }
+   ],
+   "reproducers": [],
+   "reproducer_note": "Xem các hàng tương ứng.",
+   "impact": "quyết định phát hành",
+   "decision": "open",
+   "why": "Gate chưa đạt; không có quyết định phát hành nào.",
+   "commits": [],
+   "report_items": {
+    "F": "M6",
+    "E2": "M6",
+    "D1": "M4",
+    "C1": "M4",
+    "D2": "M4"
+   },
+   "m_note": "Khớp REPORT.",
+   "acceptance": "người ngoài tạo và chạy bundle nhỏ; một workload chưa thấy hoàn tất không miễn trừ; LedgerLock repo thật được kiểm; lỗi review confirmed không bị bỏ qua; chi phí minh bạch; Linux isolation đủ cho holdout; resume qua các điểm crash định trước (§12)",
+   "gap": "Sáu trên bảy điều kiện chưa đạt hoặc chưa đo.",
+   "unconfirmed": ""
+  },
+  {
+   "id": "P-GATE-2.2",
+   "source": "proposal",
+   "ref": "§12 gate",
+   "item": "**2.2 mở rộng:** thêm client và chế độ kiểm PR/candidate độc lập sau khi có bằng chứng pilot;",
+   "upstream": [],
+   "evidence": "Không có commit 2.1 nào cho client thứ hai hay chế độ kiểm độc lập.",
+   "refs": [],
+   "reproducers": [],
+   "reproducer_note": "Không có.",
+   "impact": "—",
+   "decision": "declined",
+   "why": "Ngoài phạm vi 2.1 theo chính đề xuất.",
+   "commits": [],
+   "report_items": {},
+   "m_note": "REPORT §2 không có hạng mục riêng cho mục này.",
+   "acceptance": "—",
+   "gap": "Toàn bộ (2.2).",
+   "unconfirmed": ""
+  },
+  {
+   "id": "P-13-1",
+   "source": "proposal",
+   "ref": "§13 việc nên hoãn",
+   "item": "Viết lại toàn bộ kernel bằng framework khác hoặc kết hợp ba orchestrator vào một runtime.",
+   "upstream": [],
+   "evidence": "Không có: ADR-V2.1 giữ một đường quyết định, 'Không viết lại khung, không nhập orchestrator ngoài'; OCR chạy như tiến trình ngoài.",
+   "refs": [
+    {
+     "path": "docs/v2.1/ADR-V2.1.md",
+     "contains": "Không viết lại khung, không nhập orchestrator ngoài."
+    }
+   ],
+   "reproducers": [],
+   "reproducer_note": "Không có (không xây gì).",
+   "impact": "—",
+   "decision": "declined",
+   "why": "Hoãn theo đề xuất; tại HEAD được giữ.",
+   "commits": [],
+   "report_items": {},
+   "m_note": "REPORT §2 không có hạng mục riêng cho mục này.",
+   "acceptance": "—",
+   "gap": "",
+   "unconfirmed": ""
+  },
+  {
+   "id": "P-13-2",
+   "source": "proposal",
+   "ref": "§13 việc nên hoãn",
+   "item": "Cho LLM tự sửa acceptance, tự cấp approval hoặc tự kết luận metric đạt.",
+   "upstream": [],
+   "evidence": "`aisef bundle approve` chỉ nhận `human:<tên>`; `seal` không bao giờ duyệt; checker B-03c bắt mọi đường `migrate` tạo/sửa approval.",
+   "refs": [],
+   "reproducers": [
+    "tests/v2/test_v21_bundle_tools.py::Refusals::test_an_approver_that_is_not_a_human_identity_is_refused",
+    "tests/v2/test_v21_authority_limits.py::MigrateNeverApproves::test_an_approval_created_rather_than_re_loaded_is_caught"
+   ],
+   "reproducer_note": "",
+   "impact": "—",
+   "decision": "declined",
+   "why": "Hoãn theo đề xuất; tại HEAD được giữ.",
+   "commits": [],
+   "report_items": {},
+   "m_note": "REPORT §2 không có hạng mục riêng cho mục này.",
+   "acceptance": "—",
+   "gap": "",
+   "unconfirmed": "Công cụ không biết ai gõ lệnh: phải giữ bundle và lệnh ngoài tầm developer agent (ADR-6) — chưa có ranh giới OS."
+  },
+  {
+   "id": "P-13-3",
+   "source": "proposal",
+   "ref": "§13 việc nên hoãn",
+   "item": "Chạy nhiều developer song song trước khi sửa PRESERVE, resume và ranh giới ghi.",
+   "upstream": [],
+   "evidence": "Không commit 2.1 nào thêm developer song song (danh sách commit 610a593..c9c736f).",
+   "refs": [],
+   "reproducers": [],
+   "reproducer_note": "Không có (không xây gì).",
+   "impact": "—",
+   "decision": "declined",
+   "why": "Hoãn theo đề xuất; tại HEAD được giữ.",
+   "commits": [],
+   "report_items": {},
+   "m_note": "REPORT §2 không có hạng mục riêng cho mục này.",
+   "acceptance": "—",
+   "gap": "",
+   "unconfirmed": "Suy từ tiêu đề commit; không đọc lại mã của runner."
+  },
+  {
+   "id": "P-13-4",
+   "source": "proposal",
+   "ref": "§13 việc nên hoãn",
+   "item": "Mở thêm Q/mutation để tăng con số thay vì tái hiện lỗi sử dụng.",
+   "upstream": [],
+   "evidence": "Không thêm bậc Q mới. Có mở phase mutation V2.1 (443 target / 11 365 mutant, 55a6b74) như phần tái thẩm định B-03b do chủ dự án cho phép (RELEASE-DECISIONS seq 5) — vì 2.1 sửa kernel mà bằng chứng 2.0 ràng buộc theo byte.",
+   "refs": [
+    {
+     "path": "closure-evidence/v2/cycle2/RELEASE-DECISIONS.json",
+     "contains": "AISEF_V2_1_B03_REQUALIFICATION_ROUND"
+    }
+   ],
+   "reproducers": [],
+   "reproducer_note": "Không có (không xây gì).",
+   "impact": "—",
+   "decision": "declined",
+   "why": "Hoãn theo đề xuất; tại HEAD được giữ.",
+   "commits": [],
+   "report_items": {},
+   "m_note": "REPORT §2 không có hạng mục riêng cho mục này.",
+   "acceptance": "—",
+   "gap": "",
+   "unconfirmed": "Có phải 'tăng con số' hay không là đánh giá của chủ dự án; bảng chỉ ghi sự việc."
+  },
+  {
+   "id": "P-13-5",
+   "source": "proposal",
+   "ref": "§13 việc nên hoãn",
+   "item": "Dùng AST hash như chứng minh đủ của tương đương chương trình.",
+   "upstream": [],
+   "evidence": "ADR-2 'Không tuyên bố': digest khớp không chứng minh tương đương; băm AST cũng không. STATUS B7.",
+   "refs": [
+    {
+     "path": "docs/v2.1/ADR-V2.1.md",
+     "contains": "băm AST cũng không"
+    }
+   ],
+   "reproducers": [],
+   "reproducer_note": "Không có (không xây gì).",
+   "impact": "—",
+   "decision": "declined",
+   "why": "Hoãn theo đề xuất; tại HEAD được giữ.",
+   "commits": [],
+   "report_items": {},
+   "m_note": "REPORT §2 không có hạng mục riêng cho mục này.",
+   "acceptance": "—",
+   "gap": "",
+   "unconfirmed": ""
+  },
+  {
+   "id": "P-13-6",
+   "source": "proposal",
+   "ref": "§13 việc nên hoãn",
+   "item": "Xây memory tự học xuyên dự án trước khi có nguồn gốc, phạm vi và kiểm soát rò hidden test.",
+   "upstream": [],
+   "evidence": "Không có memory xuyên dự án nào (danh sách tệp đổi 610a593..c9c736f).",
+   "refs": [],
+   "reproducers": [],
+   "reproducer_note": "Không có (không xây gì).",
+   "impact": "—",
+   "decision": "declined",
+   "why": "Hoãn theo đề xuất; tại HEAD được giữ.",
+   "commits": [],
+   "report_items": {},
+   "m_note": "REPORT §2 không có hạng mục riêng cho mục này.",
+   "acceptance": "—",
+   "gap": "",
+   "unconfirmed": ""
+  },
+  {
+   "id": "P-13-7",
+   "source": "proposal",
+   "ref": "§13 việc nên hoãn",
+   "item": "Dashboard lớn, nhiều compute backend và sandbox Windows trước bằng chứng hiệu quả trên Linux.",
+   "upstream": [],
+   "evidence": "Không có (danh sách tệp đổi 610a593..c9c736f).",
+   "refs": [],
+   "reproducers": [],
+   "reproducer_note": "Không có (không xây gì).",
+   "impact": "—",
+   "decision": "declined",
+   "why": "Hoãn theo đề xuất; tại HEAD được giữ.",
+   "commits": [],
+   "report_items": {},
+   "m_note": "REPORT §2 không có hạng mục riêng cho mục này.",
+   "acceptance": "—",
+   "gap": "",
+   "unconfirmed": ""
+  },
+  {
+   "id": "R-P0-1",
+   "source": "360",
+   "ref": "§5 P0 #1",
+   "item": "Chạy controller và test runner với `-S`",
+   "upstream": [],
+   "evidence": "Như P-V2-01: `-S` + interpreter của kernel trên 2.1; hai venv trên 2.0.1 (c0ec1a5, chưa phát hành).",
+   "refs": [],
+   "reproducers": [
+    "tests/v2/test_v21_identity.py::PthChannel::test_a_probe_on_an_interpreter_holding_a_pth_never_runs_it",
+    "f006d3d1b23ef9d318078642d16c7bdfa7687a98:tests/v2/test_v201_venvs.py::TwoVenvs::test_a_pth_written_from_the_tests_interpreter_never_runs_in_a_probe"
+   ],
+   "reproducer_note": "",
+   "impact": "cao (360 §3.4; mức 'low' của V21-28 được nâng)",
+   "decision": "adopted",
+   "why": "Xem P-V2-01.",
+   "commits": [
+    {
+     "sha": "919a271",
+     "paths": [
+      "aisef2/probe/process_effect.py"
+     ]
+    },
+    {
+     "sha": "c0ec1a5",
+     "paths": [
+      "tests/v2/test_v201_venvs.py"
+     ],
+     "ref": "f006d3d1b23ef9d318078642d16c7bdfa7687a98"
+    }
+   ],
+   "report_items": {
+    "A1": "M3"
+   },
+   "m_note": "Khớp REPORT.",
+   "acceptance": "360 không ghi tiêu chí nghiệm thu cho mục này; theo chính mục: controller và test runner chạy với `-S` (hoặc băm cây venv trước mỗi probe; venv riêng cho test của developer)",
+   "gap": "Chưa đo một vụ giả mạo end-to-end qua `.pth` trong `aisef run` thật (360 §9) — giờ đã đóng ở mức cơ chế, OS chưa.",
+   "unconfirmed": ""
+  },
+  {
+   "id": "R-P0-2",
+   "source": "360",
+   "ref": "§5 P0 #2",
+   "item": "Trang PyPI đúng 2.0: README V2 làm long description, liên kết tuyệt đối, summary/classifier, thêm `LICENSE`",
+   "upstream": [],
+   "evidence": "Metadata 2.x + classifiers + LICENSE (b819a57); README tự chứa cho PyPI được chuẩn bị bằng `validation/v21/public_readme.py` (2cad415), chưa dùng cho bản phát hành nào.",
+   "refs": [
+    {
+     "path": "pyproject.toml",
+     "contains": "Development Status :: 4 - Beta"
+    }
+   ],
+   "reproducers": [
+    "tests/test_v21_public_readme.py::PublicReadme::test_the_self_contained_readme_has_no_relative_link"
+   ],
+   "reproducer_note": "",
+   "impact": "trung bình (trang công khai duy nhất nói sai sản phẩm)",
+   "decision": "adapted",
+   "why": "Metadata/LICENSE xong; README trên PyPI chờ chủ dự án chọn nơi đăng tài liệu (B-10).",
+   "commits": [
+    {
+     "sha": "b819a57",
+     "paths": [
+      "pyproject.toml",
+      "LICENSE"
+     ]
+    },
+    {
+     "sha": "2cad415",
+     "paths": [
+      "validation/v21/public_readme.py",
+      "tests/test_v21_public_readme.py"
+     ]
+    }
+   ],
+   "report_items": {
+    "A10": "M4"
+   },
+   "m_note": "Khớp REPORT.",
+   "acceptance": "360 không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với STATUS B-10: không link 404",
+   "gap": "Trang PyPI của 2.0.0 không đổi được nếu không phát hành (B-02); B-10 chưa quyết.",
+   "unconfirmed": ""
+  },
+  {
+   "id": "R-P0-3",
+   "source": "360",
+   "ref": "§5 P0 #3",
+   "item": "Làn vá 2.0.x: tham số hoá `release_rc.py`/`v2_release_gate.py` theo phiên bản; runbook vá (3 tầng: tài liệu / mã ngoài kernel / kernel) và runbook yank",
+   "upstream": [],
+   "evidence": "Công cụ theo phiên bản (aa3c18a). Không có runbook vá/yank mới: danh sách tệp `docs/` đổi trong 610a593..c9c736f không có.",
+   "refs": [],
+   "reproducers": [
+    "tests/v2/test_v21_release_lane.py::Gate::test_each_release_has_its_own_status_file"
+   ],
+   "reproducer_note": "",
+   "impact": "trung bình",
+   "decision": "adapted",
+   "why": "Công cụ xong; runbook chưa viết, không có quyết định ghi lại.",
+   "commits": [
+    {
+     "sha": "aa3c18a",
+     "paths": [
+      "validation/qualification/release_rc.py",
+      "validation/v2_release_gate.py"
+     ]
+    }
+   ],
+   "report_items": {
+    "A9": "M4"
+   },
+   "m_note": "Khớp REPORT.",
+   "acceptance": "360 không ghi tiêu chí nghiệm thu cho mục này; theo chính mục: `release_rc.py`/`v2_release_gate.py` nhận phiên bản làm tham số; có runbook vá 3 tầng và runbook yank",
+   "gap": "Runbook vá (3 tầng) và runbook yank: chưa có.",
+   "unconfirmed": ""
+  },
+  {
+   "id": "R-P0-4",
+   "source": "360",
+   "ref": "§5 P0 #4",
+   "item": "Người duyệt bắt buộc cho môi trường `pypi`, bảo vệ tag `v*`, ghim SHA mọi action",
+   "upstream": [],
+   "evidence": "Workflow vẫn dùng tag (`actions/checkout@v4`, `pypa/gh-action-pypi-publish@release/v1`); sổ RELEASE-DECISIONS có seq 4–5 (B-01, B-03), không có mục cho phán quyết 'FINAL RELEASE EXECUTION'. Cài đặt môi trường/tag trên GitHub: không kiểm được từ repo.",
+   "refs": [
+    {
+     "path": ".github/workflows/release.yml",
+     "contains": "actions/checkout@v4"
+    },
+    {
+     "path": "closure-evidence/v2/cycle2/RELEASE-DECISIONS.json",
+     "lacks": "FINAL RELEASE EXECUTION"
+    }
+   ],
+   "reproducers": [],
+   "reproducer_note": "Không có.",
+   "impact": "cao: cổng con người khi phát hành là mềm (360 §3.4, §3.8)",
+   "decision": "open",
+   "why": "Không có commit 2.1; phần GitHub settings là của chủ dự án; ghim SHA chưa làm.",
+   "commits": [],
+   "report_items": {},
+   "m_note": "REPORT §2 không có hạng mục riêng cho mục này.",
+   "acceptance": "360 không ghi tiêu chí nghiệm thu cho mục này; theo chính mục: môi trường `pypi` có người duyệt bắt buộc, tag `v*` được bảo vệ, mọi action ghim SHA, phán quyết 'FINAL RELEASE EXECUTION' có trong RELEASE-DECISIONS",
+   "gap": "Toàn bộ.",
+   "unconfirmed": ""
+  },
+  {
+   "id": "R-P0-5",
+   "source": "360",
+   "ref": "§5 P0 #5",
+   "item": "gỡ hoặc thay mọi liên kết GitHub trên aisef.io, salekit và `project.urls` của PyPI",
+   "upstream": [],
+   "evidence": "`project.urls` chỉ còn Homepage aisef.io (b819a57). Còn link `github.com/nghinh/aisef` trong README.vi.md, docs/SALEKIT.html, landingpage/index.html tại HEAD.",
+   "refs": [
+    {
+     "path": "pyproject.toml",
+     "contains": "Homepage = \"https://aisef.io/\""
+    },
+    {
+     "path": "landingpage/index.html",
+     "contains": "github.com/nghinh/aisef"
+    },
+    {
+     "path": "docs/SALEKIT.html",
+     "contains": "github.com/nghinh/aisef"
+    }
+   ],
+   "reproducers": [],
+   "reproducer_note": "Không có.",
+   "impact": "cao về uy tín (360 §3.9)",
+   "decision": "adapted",
+   "why": "Metadata gói xong; trang công khai chờ B-10 (chủ dự án).",
+   "commits": [
+    {
+     "sha": "b819a57",
+     "paths": [
+      "pyproject.toml"
+     ]
+    }
+   ],
+   "report_items": {},
+   "m_note": "REPORT §2 không có hạng mục riêng cho mục này.",
+   "acceptance": "360 không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với STATUS B-10: không link 404",
+   "gap": "Link trên landing, salekit, README.vi: còn.",
+   "unconfirmed": ""
+  },
+  {
+   "id": "R-P1-6",
+   "source": "360",
+   "ref": "§5 P1 #6",
+   "item": "V21-37 + V21-38 cùng lúc: tiêu chí import theo AST; chứng minh PRESERVE của story trước **ở bước ứng viên**",
+   "upstream": [],
+   "evidence": "Như P-V2-06.",
+   "refs": [],
+   "reproducers": [
+    "tests/v2/test_v21_orchestration.py::PreserveAtCandidate::test_a_regression_the_developer_made_is_the_developer_s_and_never_merged",
+    "tests/v2/test_v21_python_imports.py::Controls::test_the_approved_regex_reproduces_the_false_rollback"
+   ],
+   "reproducer_note": "",
+   "impact": "cao",
+   "decision": "adopted",
+   "why": "Xem P-V2-06.",
+   "commits": [
+    {
+     "sha": "91a8968",
+     "paths": [
+      "aisef2/orchestrate/story_runner.py"
+     ]
+    },
+    {
+     "sha": "06d4e62",
+     "paths": [
+      "aisef2/probe/file_artifact.py"
+     ]
+    }
+   ],
+   "report_items": {
+    "B1": "M3",
+    "B3": "M3"
+   },
+   "m_note": "Khớp REPORT.",
+   "acceptance": "360 không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với chính mục: lỗi DEVELOPER, có phản hồi",
+   "gap": "Contract S-10-a: B-04 chưa duyệt.",
+   "unconfirmed": ""
+  },
+  {
+   "id": "R-P1-7",
+   "source": "360",
+   "ref": "§5 P1 #7",
+   "item": "Công cụ bundle: API công khai + `aisef bundle init/seal/lint/rebind`, ví dụ ship kèm, tài liệu ngữ pháp contract cho 18 lớp quan sát; danh tính probe = phiên bản + băm AST không docstring",
+   "upstream": [],
+   "evidence": "Như P-V2-07 và P-V2-08. `rebind` có dưới tên `migrate`. Danh tính probe = CAPABILITY_VERSION (không băm AST).",
+   "refs": [],
+   "reproducers": [
+    "tests/v2/test_v21_bundle_tools.py::Outsider::test_each_example_from_init_to_a_ready_check",
+    "tests/v2/test_v21_identity.py::ThreeIdentities::test_a_spec_binds_the_capability_and_the_bytes_are_their_own_digest"
+   ],
+   "reproducer_note": "",
+   "impact": "cao",
+   "decision": "adapted",
+   "why": "Băm AST bị loại theo đề xuất §3 và ADR-2 (không chứng minh tương đương).",
+   "commits": [
+    {
+     "sha": "620bde7",
+     "paths": [
+      "aisef2/app/bundle_cli.py"
+     ]
+    },
+    {
+     "sha": "919a271",
+     "paths": [
+      "aisef2/probe/calibration.py"
+     ]
+    }
+   ],
+   "report_items": {
+    "B4": "M4",
+    "B5": "M4",
+    "B6": "M3"
+   },
+   "m_note": "Khớp REPORT. B4/B5: M4 là của lượt CLI thật tại `b72e51e` (docs/v2.1/evidence/cli-integration-b72e51e.out); `aisef2/app/bundle_cli.py` đổi sau lượt đó ở a912be6 và 3061ec0 (đường ghi của init/seal/approve/migrate chuyển sang tạo độc quyền `_create`), lượt lặp lại tại c9c736f (`docs/v2.1/evidence/cli-integration-c9c736f.out`, vòng 2 của bảng này: cùng `run.sh`, cùng nhị phân OCR, clone sạch tại c9c736f) cho cùng output — khác nhau chỉ ở giá trị băm (commit của repo `git init` mới, plan_hash, anchor, sha256), pid, mốc thời gian và dòng cuối bị cắt ở 3000 ký tự: M4 tại c9c736f. (kiểm cơ học ở P-V2-07)",
+   "acceptance": "một người ngoài dựng bundle cho một dự án 3 story không cần đọc mã nguồn (360 §6)",
+   "gap": "Người ngoài: chưa đo.",
+   "unconfirmed": "Tài liệu ngữ pháp cho 18 lớp quan sát: không kiểm trong phiên này."
+  },
+  {
+   "id": "R-P1-8",
+   "source": "360",
+   "ref": "§5 P1 #8",
+   "item": "Chính sách review: không chặn, nhưng **đưa phát hiện thành phản hồi cho developer**, ghi vào journal, đo precision",
+   "upstream": [],
+   "evidence": "Như P-ADJ-3: chặn khi CONFIRMED ∧ ANCHORED (fix-loop); phát hiện vào prompt retry. 5 phát hiện lịch sử của smoke #2 tái hiện trên dạng lỗi của chúng (CONFIRMED) và không tái hiện trên bản tham chiếu (NOT_REPRODUCED) — regression offline của bộ kiểm chứng; precision của reviewer chưa đo trong 2.1.",
+   "refs": [],
+   "reproducers": [
+    "tests/v2/test_v21_review.py::HistoricalDefects::test_each_shipped_defect_is_confirmed_on_its_shape_and_not_on_the_reference"
+   ],
+   "reproducer_note": "",
+   "impact": "cao",
+   "decision": "adapted",
+   "why": "Đề xuất (§3) thay 'không chặn' bằng chặn có điều kiện; chủ dự án thêm điều kiện neo.",
+   "commits": [
+    {
+     "sha": "e897437",
+     "paths": [
+      "aisef2/app/feedback.py"
+     ]
+    },
+    {
+     "sha": "390f07c",
+     "paths": [
+      "aisef2/app/review_verify.py"
+     ]
+    }
+   ],
+   "report_items": {
+    "C1": "M4"
+   },
+   "m_note": "Khớp REPORT.",
+   "acceptance": "360 không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với chính mục: đo precision (smoke #2: 5/5)",
+   "gap": "Precision của reviewer: chưa đo. Precision/recall với mô hình thật: M6 (B-06, ngân sách).",
+   "unconfirmed": ""
+  },
+  {
+   "id": "R-P1-9",
+   "source": "360",
+   "ref": "§5 P1 #9",
+   "item": "Bậc \"độ đặc hiệu\" cho spec: mỗi spec phải SATISFIED trên ≥2 cài đặt đúng độc lập + đối chứng âm cú pháp",
+   "upstream": [],
+   "evidence": "Như P-9.3: chưa có.",
+   "refs": [],
+   "reproducers": [
+    "tests/v2/test_v21_python_imports.py::Controls::test_each_draft_holds_on_the_smoke2_shape_and_refutes_a_real_import"
+   ],
+   "reproducer_note": "",
+   "impact": "cao",
+   "decision": "open",
+   "why": "Chưa làm; không có quyết định nào được ghi lại.",
+   "commits": [],
+   "report_items": {},
+   "m_note": "REPORT §2 không có hạng mục riêng cho mục này.",
+   "acceptance": "360 không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với chính mục: mỗi spec SATISFIED trên ≥ 2 cài đặt đúng độc lập, kèm đối chứng âm cú pháp (spec không bác nhầm)",
+   "gap": "Toàn bộ, trừ S-10-a.",
+   "unconfirmed": ""
+  },
+  {
+   "id": "R-P1-10",
+   "source": "360",
+   "ref": "§5 P1 #10",
+   "item": "Corpus \"ghi thật\" phát lại qua đường sản phẩm (`app.run.execute`, parser client thật, preflight) từ các luồng đã có trong smoke",
+   "upstream": [],
+   "evidence": "Như P-V2-12: chưa có.",
+   "refs": [],
+   "reproducers": [],
+   "reproducer_note": "Không có.",
+   "impact": "cao",
+   "decision": "open",
+   "why": "Chưa làm; không có quyết định nào được ghi lại.",
+   "commits": [],
+   "report_items": {},
+   "m_note": "REPORT §2 không có hạng mục riêng cho mục này.",
+   "acceptance": "360 không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với chính mục.",
+   "gap": "Toàn bộ.",
+   "unconfirmed": ""
+  },
+  {
+   "id": "R-P1-11",
+   "source": "360",
+   "ref": "§5 P1 #11",
+   "item": "Điểm dữ liệu thứ hai **có giá tiền**: cùng bundle, model khác (0 dòng mã) + lặp lại DeepSeek để đọc phương sai; ghi bảng giá, báo USD/story",
+   "upstream": [],
+   "evidence": "Không có lượt live nào trong 2.1 (REPORT: 'Không mục nào đạt M5'). Bảng giá DeepSeek đọc ngày 2026-10-06 có trong EXPERIMENT-PLAN; ledger tiền (D2) sẵn sàng.",
+   "refs": [
+    {
+     "path": "docs/v2.1/REPORT.md",
+     "contains": "Không mục nào đạt M5"
+    }
+   ],
+   "reproducers": [],
+   "reproducer_note": "Không có.",
+   "impact": "quyết định",
+   "decision": "blocked",
+   "why": "Ngân sách của chủ dự án (B-09).",
+   "commits": [],
+   "report_items": {
+    "E2": "M6"
+   },
+   "m_note": "Khớp REPORT.",
+   "acceptance": "USD/story được báo (360 §6)",
+   "gap": "Live: MỞ.",
+   "unconfirmed": ""
+  },
+  {
+   "id": "R-P1-12",
+   "source": "360",
+   "ref": "§5 P1 #12",
+   "item": "Giới hạn developer: ít nhất kiểm toán \"tầm với\" vào `RUN.json` và đưa bundle ra khỏi thư mục cha của workspace; sau đó sandbox thật cho cả macOS và Linux (V21-02/06)",
+   "upstream": [],
+   "evidence": "Sửa `RUN.json` giờ bị `--verify` bác (A2). Sandbox: không có (F M6). Thí nghiệm có `leaks` (phát hiện, không ngăn).",
+   "refs": [],
+   "reproducers": [
+    "tests/v2/test_v21_verify.py::RecordAlone::test_story_outcomes_that_are_not_the_journal_s_are_refuted"
+   ],
+   "reproducer_note": "",
+   "impact": "cao (69 lời gọi ra ngoài workspace ở smoke #2)",
+   "decision": "blocked",
+   "why": "Như P-V2-05.",
+   "commits": [],
+   "report_items": {
+    "A2": "M4",
+    "F": "M6"
+   },
+   "m_note": "Khớp REPORT.",
+   "acceptance": "Mục tiêu 2.1: 0 (hoặc được báo) (360 §7, chỉ số 'Đọc ra ngoài workspace của developer')",
+   "gap": "Sandbox: MỞ.",
+   "unconfirmed": "'Đưa bundle ra khỏi thư mục cha của workspace': không kiểm trong phiên này bundle nằm ở đâu so với workspace của developer."
+  },
+  {
+   "id": "R-P1-13",
+   "source": "360",
+   "ref": "§5 P1 #13",
+   "item": "Bộ nạp an toàn: mọi lỗi đầu vào → mã 2 kèm đường dẫn JSON; `--check` trả đúng lý do B4; endpoint qua `urlparse`; `redact` trong `finally`; lỗi git → ENVIRONMENT",
+   "upstream": [],
+   "evidence": "Như P-V2-04.",
+   "refs": [],
+   "reproducers": [
+    "tests/v2/test_v21_inputs.py::InputFiles::test_cli_exit_2_for_unreadable_inputs",
+    "tests/v2/test_v21_inputs.py::RepositoryRefusal::test_check_mode_on_such_a_repository_is_ready",
+    "tests/v2/test_v21_inputs.py::Endpoint::test_loopback_and_https_are_accepted",
+    "tests/v2/test_v21_transport.py::Redaction::test_an_interrupted_session_still_leaves_no_secret",
+    "tests/v2/test_v21_orchestration.py::DiffFailure::test_a_retry_budget_takes_the_story_to_its_next_attempt"
+   ],
+   "reproducer_note": "",
+   "impact": "trung bình–cao",
+   "decision": "adopted",
+   "why": "Xem P-V2-04.",
+   "commits": [
+    {
+     "sha": "106f72d",
+     "paths": [
+      "aisef2/app/bundle.py"
+     ]
+    },
+    {
+     "sha": "b029236",
+     "paths": [
+      "aisef2/app/client.py"
+     ]
+    },
+    {
+     "sha": "51c5241",
+     "paths": [
+      "aisef2/orchestrate/workspace.py"
+     ]
+    }
+   ],
+   "report_items": {
+    "A3": "M3",
+    "A4": "M3",
+    "A5": "M4",
+    "A6": "M3",
+    "A7": "M3",
+    "A8": "M3"
+   },
+   "m_note": "Khớp REPORT; xem ghi chú về A5 ở P-V2-04.",
+   "acceptance": "360 không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với chính mục: mọi lỗi đầu vào → mã 2 kèm đường dẫn JSON",
+   "gap": "Như P-V2-04: Preflight thật mới chỉ tới loopback, chưa gặp redirect thật (REPORT §2 A6–A7). Điều kiện của A5 (khoá git của editor) chỉ tái hiện ở test (M3): repo của lượt CLI thật (`git init` sạch) không có khoá đó.",
+   "unconfirmed": ""
+  },
+  {
+   "id": "R-P2-14",
+   "source": "360",
+   "ref": "§5 P2 #14",
+   "item": "Tách 1.x thành `aisef-legacy` (hoặc chỉ giữ `aisef legacy …`); `doctor` biết V2",
+   "upstream": [],
+   "evidence": "Không tách. 2.1 chỉ thêm `aisef bundle` đi vào V2 (919a271 sửa aisef/cli/parser.py).",
+   "refs": [],
+   "reproducers": [
+    "tests/test_v21_bundle_dispatch.py::BundleIsV2::test_a_refusal_is_exit_2"
+   ],
+   "reproducer_note": "",
+   "impact": "trung bình",
+   "decision": "declined",
+   "why": "Kế hoạch 2.2 (360 §6).",
+   "commits": [
+    {
+     "sha": "919a271",
+     "paths": [
+      "aisef/cli/parser.py"
+     ]
+    }
+   ],
+   "report_items": {},
+   "m_note": "REPORT §2 không có hạng mục riêng cho mục này.",
+   "acceptance": "—",
+   "gap": "Toàn bộ (2.2).",
+   "unconfirmed": ""
+  },
+  {
+   "id": "R-P2-15",
+   "source": "360",
+   "ref": "§5 P2 #15",
+   "item": "Client thứ hai (Claude Code hoặc Codex CLI); probe chạy với phụ thuộc đã khoá của dự án",
+   "upstream": [],
+   "evidence": "Như P-V2-14: không có.",
+   "refs": [],
+   "reproducers": [],
+   "reproducer_note": "Không có.",
+   "impact": "cao cho thị trường",
+   "decision": "declined",
+   "why": "Kế hoạch 2.2 (360 §6).",
+   "commits": [],
+   "report_items": {},
+   "m_note": "REPORT §2 không có hạng mục riêng cho mục này.",
+   "acceptance": "—",
+   "gap": "Toàn bộ (2.2).",
+   "unconfirmed": ""
+  },
+  {
+   "id": "R-P2-16",
+   "source": "360",
+   "ref": "§5 P2 #16",
+   "item": "Định vị lại thành **nhân kiểm chứng / cổng chấp nhận** dùng được cho PR của bất kỳ agent nào (CI check)",
+   "upstream": [],
+   "evidence": "Không có chế độ kiểm candidate độc lập.",
+   "refs": [],
+   "reproducers": [],
+   "reproducer_note": "Không có.",
+   "impact": "cao cho thị trường",
+   "decision": "declined",
+   "why": "Kế hoạch 2.2 (360 §6; đề xuất V2-14).",
+   "commits": [],
+   "report_items": {},
+   "m_note": "REPORT §2 không có hạng mục riêng cho mục này.",
+   "acceptance": "—",
+   "gap": "Toàn bộ (2.2).",
+   "unconfirmed": ""
+  },
+  {
+   "id": "R-P2-17",
+   "source": "360",
+   "ref": "§5 P2 #17",
+   "item": "Chính sách phát hành cân xứng: tầng vá, một canary live rẻ ở **đầu** mỗi RC, ngân sách trả tiền cộng dồn có điểm dừng",
+   "upstream": [],
+   "evidence": "Công cụ theo phiên bản (aa3c18a); B-09 đề xuất canary trước, quy tắc dừng theo chi phí `known` cộng dồn — chưa duyệt.",
+   "refs": [
+    {
+     "path": "docs/v2.1/decisions/B-09-CANARY-THEN-CAMPAIGN.md",
+     "contains": "dừng khi chi phí `known` cộng dồn chạm trần"
+    }
+   ],
+   "reproducers": [],
+   "reproducer_note": "Không có.",
+   "impact": "trung bình",
+   "decision": "blocked",
+   "why": "Chủ dự án (B-02, B-09).",
+   "commits": [
+    {
+     "sha": "aa3c18a",
+     "paths": [
+      "validation/qualification/release_rc.py"
+     ]
+    }
+   ],
+   "report_items": {},
+   "m_note": "REPORT §2 không có hạng mục riêng cho mục này.",
+   "acceptance": "360 không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với chính mục.",
+   "gap": "Chính sách chưa được duyệt.",
+   "unconfirmed": ""
+  },
+  {
+   "id": "R-P2-18",
+   "source": "360",
+   "ref": "§5 P2 #18",
+   "item": "Ăn kiêng bằng chứng: digest + tóm tắt trong git, luồng phiên thô và chunk Q4 sang release asset/LFS; tách test đọc bằng chứng khỏi bộ unit",
+   "upstream": [],
+   "evidence": "Không làm. Bộ evidence ứng viên của 2.1 được ghi ra ngoài repo (88fc7fb) — để không làm nhiễu checker, không phải để giảm kích thước.",
+   "refs": [
+    {
+     "path": "validation/v21/candidate_evidence.py",
+     "exists": true
+    }
+   ],
+   "reproducers": [],
+   "reproducer_note": "Không có.",
+   "impact": "trung bình",
+   "decision": "declined",
+   "why": "Kế hoạch 2.2 (360 §5 P2).",
+   "commits": [],
+   "report_items": {},
+   "m_note": "REPORT §2 không có hạng mục riêng cho mục này.",
+   "acceptance": "—",
+   "gap": "Toàn bộ.",
+   "unconfirmed": ""
+  },
+  {
+   "id": "R-P2-19",
+   "source": "360",
+   "ref": "§5 P2 #19",
+   "item": "Mutation: ràng buộc theo AST của từng hàm thay vì sha256 nguyên file; thêm toán tử xoá câu lệnh, biên số, handler",
+   "upstream": [],
+   "evidence": "Như P-ADJ-6: tái sử dụng theo byte của tệp target + closure của kill test + generator; không AST từng hàm.",
+   "refs": [],
+   "reproducers": [
+    "tests/v2/test_v21_mutation_record.py::Proof::test_a_result_measured_at_head_is_usable"
+   ],
+   "reproducer_note": "",
+   "impact": "trung bình",
+   "decision": "declined",
+   "why": "Đề xuất §3: AST từng hàm bỏ sót global/import/fixture/dependency. Toán tử mutation mới: không có trong 2.1.",
+   "commits": [
+    {
+     "sha": "55a6b74",
+     "paths": [
+      "validation/qualification/v21_mutation_record.py"
+     ]
+    }
+   ],
+   "report_items": {},
+   "m_note": "REPORT §2 không có hạng mục riêng cho mục này.",
+   "acceptance": "—",
+   "gap": "Toán tử xoá câu lệnh / biên số / handler: chưa có.",
+   "unconfirmed": "'Không có toán tử mới': suy từ commit 55a6b74 chỉ thêm target, chưa đọc diff của mutation.py."
+  },
+  {
+   "id": "R-P2-20",
+   "source": "360",
+   "ref": "§5 P2 #20",
+   "item": "Giảm bus factor: runbook người bảo trì trong repo; một người review kernel không phải chủ dự án mỗi bản minor",
+   "upstream": [],
+   "evidence": "Không làm.",
+   "refs": [],
+   "reproducers": [],
+   "reproducer_note": "Không có.",
+   "impact": "cao (360 §8)",
+   "decision": "open",
+   "why": "Việc của chủ dự án; không có quyết định nào được ghi lại.",
+   "commits": [],
+   "report_items": {},
+   "m_note": "REPORT §2 không có hạng mục riêng cho mục này.",
+   "acceptance": "360 không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với chính mục.",
+   "gap": "Toàn bộ.",
+   "unconfirmed": ""
+  },
+  {
+   "id": "R-NOW",
+   "source": "360",
+   "ref": "§5 'Không làm bây giờ'",
+   "item": "**Không làm bây giờ (nói ra để khỏi bị hút vào)**: thêm bậc Q, chạy lại Q4 với cùng seed, mở rộng mutation trước khi có điểm dữ liệu live thứ hai; sandbox Windows; \"cohort\" niêm phong",
+   "upstream": [],
+   "evidence": "Không thêm bậc Q, không sandbox Windows, không cohort. Phase mutation V2.1 (443 target) chạy trước khi có điểm dữ liệu live thứ hai, như phần tái thẩm định B-03b do chủ dự án cho phép (RELEASE-DECISIONS seq 5).",
+   "refs": [
+    {
+     "path": "closure-evidence/v2/cycle2/RELEASE-DECISIONS.json",
+     "contains": "AISEF_V2_1_B03_REQUALIFICATION_ROUND"
+    }
+   ],
+   "reproducers": [],
+   "reproducer_note": "Không có.",
+   "impact": "—",
+   "decision": "adapted",
+   "why": "Giữ, trừ mutation: chủ dự án quyết định mở B-03b (tái thẩm định bắt buộc vì bằng chứng 2.0 ràng buộc byte kernel).",
+   "commits": [
+    {
+     "sha": "dc9774f",
+     "paths": [
+      "closure-evidence/v2/cycle2/RELEASE-DECISIONS.json"
+     ]
+    }
+   ],
+   "report_items": {},
+   "m_note": "REPORT §2 không có hạng mục riêng cho mục này.",
+   "acceptance": "360 không ghi tiêu chí nghiệm thu cho mục này (danh sách 'không làm bây giờ').",
+   "gap": "Không còn việc với mục này (danh sách 'không làm'); điều chỉnh duy nhất là mutation, theo RELEASE-DECISIONS seq 5.",
+   "unconfirmed": "'Không chạy lại Q4 cùng seed': không kiểm riêng trong phiên này."
+  },
+  {
+   "id": "R-3.1",
+   "source": "360",
+   "ref": "§3.1 Yếu",
+   "item": "Băm lại bỏ sót `runtime/process_range.py`, `range_anchor.py` — mã quyết định quan sát có thể đổi mà danh tính không đổi.",
+   "upstream": [],
+   "evidence": "Vẫn đúng tại HEAD: PROBE_SOURCES (→ EXECUTION_DIGEST) của process_effect = protocol, python_callable, cli_invocation, process_effect; process_effect import `aisef2.runtime.process_range`, process_range chạy `range_anchor.py`.",
+   "refs": [
+    {
+     "path": "aisef2/probe/process_effect.py",
+     "contains": "PROBE_SOURCES = (\"probe/protocol.py\", \"probe/python_callable.py\", \"probe/cli_invocation.py\", \"probe/process_effect.py\")"
+    },
+    {
+     "path": "aisef2/probe/process_effect.py",
+     "contains": "from aisef2.runtime.process_range import ProcessRange"
+    },
+    {
+     "path": "aisef2/runtime/process_range.py",
+     "contains": "ANCHOR = pathlib.Path(__file__).with_name(\"range_anchor.py\")"
+    }
+   ],
+   "reproducers": [],
+   "reproducer_note": "Không có test nào ràng buộc hai tệp runtime vào EXECUTION_DIGEST (phát hiện chưa sửa).",
+   "impact": "trung bình: byte quyết định quan sát của process_effect đổi được mà hàng hiệu chuẩn/RunSpec không đổi",
+   "decision": "open",
+   "why": "Không có commit 2.1 và không có quyết định nào được ghi lại.",
+   "commits": [],
+   "report_items": {},
+   "m_note": "REPORT §2 không có hạng mục riêng cho mục này.",
+   "acceptance": "360 không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với định nghĩa ở đề xuất §9.2 mục 3 (định nghĩa, không phải tiêu chí nghiệm thu): Execution digest: đúng byte của probe/runtime/dependency đã dùng tạo bằng chứng",
+   "gap": "Toàn bộ. Sửa sẽ chạm `aisef2/probe` (kernel): cần mutation + hiệu chuẩn lại, ngoài snapshot đang đo.",
+   "unconfirmed": ""
+  },
+  {
+   "id": "R-M1",
+   "source": "360",
+   "ref": "§7 bảng chỉ số",
+   "item": "Lượt live đạt `delivery_verdict PASS` (không miễn trừ)",
+   "upstream": [],
+   "evidence": "0 lượt live trong 2.1 (REPORT: không mục nào đạt M5).",
+   "refs": [
+    {
+     "path": "docs/v2.1/REPORT.md",
+     "contains": "Không mục nào đạt M5"
+    }
+   ],
+   "reproducers": [],
+   "reproducer_note": "Chỉ số, không phải hành vi: không có reproducer.",
+   "impact": "theo dõi",
+   "decision": "blocked",
+   "why": "Ngân sách (B-09).",
+   "commits": [],
+   "report_items": {},
+   "m_note": "Chỉ số: REPORT §2 không chấm mức cho chỉ số. Hạng mục liên quan: E2 — mức của hạng mục đó không phải mức của chỉ số này.",
+   "acceptance": "Mục tiêu 2.1: ≥ 1 trên workload chưa từng thấy",
+   "gap": "Chưa đạt: 0 lượt live trong 2.1 (mục tiêu ≥ 1 trên workload chưa từng thấy).",
+   "unconfirmed": ""
+  },
+  {
+   "id": "R-M2",
+   "source": "360",
+   "ref": "§7 bảng chỉ số",
+   "item": "Workload × route × hệ điều hành đã chạy live",
+   "upstream": [],
+   "evidence": "Không đổi so với 2.0 (1 × 1 × macOS): không có lượt live trong 2.1.",
+   "refs": [],
+   "reproducers": [],
+   "reproducer_note": "Chỉ số, không phải hành vi: không có reproducer.",
+   "impact": "theo dõi",
+   "decision": "blocked",
+   "why": "Ngân sách (B-09); Linux: F.",
+   "commits": [],
+   "report_items": {},
+   "m_note": "Chỉ số: REPORT §2 không chấm mức cho chỉ số. Hạng mục liên quan: E2, F — mức của hạng mục đó không phải mức của chỉ số này.",
+   "acceptance": "Mục tiêu 2.1: ≥ 2 × 2, có Linux",
+   "gap": "Chưa đạt: vẫn 1 × 1 × macOS, không có Linux (mục tiêu ≥ 2 × 2, có Linux).",
+   "unconfirmed": ""
+  },
+  {
+   "id": "R-M3",
+   "source": "360",
+   "ref": "§7 bảng chỉ số",
+   "item": "Lỗi do review tìm thấy mà vẫn vào `main`",
+   "upstream": [],
+   "evidence": "Đo offline trên dạng 5 lỗi smoke #2: 4 neo được ⇒ chặn, 1 UNANCHORED (P-V2-09). Chưa đo live.",
+   "refs": [],
+   "reproducers": [],
+   "reproducer_note": "Chỉ số, không phải hành vi: không có reproducer.",
+   "impact": "theo dõi",
+   "decision": "blocked",
+   "why": "Số đo live cần ngân sách (B-05, B-06, B-09). Fix-loop (C1) có; phép thử offline trên 5 dạng lỗi smoke #2 là regression, không phải số đo live của chỉ số.",
+   "commits": [],
+   "report_items": {},
+   "m_note": "Chỉ số: REPORT §2 không chấm mức cho chỉ số. Hạng mục liên quan: C1 — mức của hạng mục đó không phải mức của chỉ số này.",
+   "acceptance": "Mục tiêu 2.1: đo và báo cạnh 59/59",
+   "gap": "Chưa đo live, chưa báo cạnh 59/59. Offline: 1/5 dạng lỗi lịch sử (R-7/1) UNANCHORED nên vẫn lọt gate (P-V2-09).",
+   "unconfirmed": ""
+  },
+  {
+   "id": "R-M4",
+   "source": "360",
+   "ref": "§7 bảng chỉ số",
+   "item": "Mệnh đề requirement được contract phủ",
+   "upstream": [],
+   "evidence": "`aisef bundle lint` báo độ phủ theo mệnh đề do tiêu chí khai; RUN.json không mang độ phủ (run.py ghi usage, no_progress).",
+   "refs": [
+    {
+     "path": "docs/v2.1/evidence/cli-integration-b72e51e.out",
+     "contains": "\"limit\": \"clauses are the ones the criteria's facts declare; AISEF does not parse the requirements document\""
+    },
+    {
+     "path": "docs/v2.1/evidence/cli-integration-c9c736f.out",
+     "contains": "\"limit\": \"clauses are the ones the criteria's facts declare; AISEF does not parse the requirements document\"",
+     "at": "with-table"
+    }
+   ],
+   "reproducers": [],
+   "reproducer_note": "Chỉ số, không phải hành vi: không có reproducer.",
+   "impact": "theo dõi",
+   "decision": "open",
+   "why": "Độ phủ được báo ở `aisef bundle lint` (B5); báo trong RUN.json chưa làm và không có quyết định nào được ghi lại (STATUS, ADR-V2.1, REPORT không nhắc).",
+   "commits": [],
+   "report_items": {},
+   "m_note": "Chỉ số: REPORT §2 không chấm mức cho chỉ số. Hạng mục liên quan: B5 — mức của hạng mục đó không phải mức của chỉ số này.",
+   "acceptance": "Mục tiêu 2.1: báo bằng máy trong `RUN.json`",
+   "gap": "RUN.json chưa mang độ phủ: mục tiêu 2.1 chưa đạt (chỉ `aisef bundle lint` báo, trên mệnh đề do tiêu chí khai).",
+   "unconfirmed": ""
+  },
+  {
+   "id": "R-M5",
+   "source": "360",
+   "ref": "§7 bảng chỉ số",
+   "item": "Đọc ra ngoài workspace của developer",
+   "upstream": [],
+   "evidence": "Không có ranh giới; `leaks` của harness chỉ quét chuỗi stimulus trong luồng phiên của thí nghiệm. Chưa đo.",
+   "refs": [],
+   "reproducers": [],
+   "reproducer_note": "Chỉ số, không phải hành vi: không có reproducer.",
+   "impact": "theo dõi",
+   "decision": "blocked",
+   "why": "Như P-V2-05.",
+   "commits": [],
+   "report_items": {},
+   "m_note": "Chỉ số: REPORT §2 không chấm mức cho chỉ số. Hạng mục liên quan: F — mức của hạng mục đó không phải mức của chỉ số này.",
+   "acceptance": "Mục tiêu 2.1: 0 (hoặc được báo)",
+   "gap": "Chưa đo; không có ranh giới hệ điều hành (F/B-07).",
+   "unconfirmed": ""
+  },
+  {
+   "id": "R-M6",
+   "source": "360",
+   "ref": "§7 bảng chỉ số",
+   "item": "USD / story giao được",
+   "upstream": [],
+   "evidence": "Ledger tiền có (D2); chưa có lượt live để báo số.",
+   "refs": [],
+   "reproducers": [],
+   "reproducer_note": "Chỉ số, không phải hành vi: không có reproducer.",
+   "impact": "theo dõi",
+   "decision": "blocked",
+   "why": "Ngân sách (B-09).",
+   "commits": [],
+   "report_items": {},
+   "m_note": "Chỉ số: REPORT §2 không chấm mức cho chỉ số. Hạng mục liên quan: D2, E2 — mức của hạng mục đó không phải mức của chỉ số này.",
+   "acceptance": "Mục tiêu 2.1: có",
+   "gap": "Chưa có số: 0 lượt live để chia USD cho story giao được.",
+   "unconfirmed": ""
+  },
+  {
+   "id": "R-M7",
+   "source": "360",
+   "ref": "§7 bảng chỉ số",
+   "item": "Thời gian từ bản vá đến PyPI",
+   "upstream": [],
+   "evidence": "Công cụ theo phiên bản (A9); chưa phát hành bản nào nên chưa đo.",
+   "refs": [],
+   "reproducers": [],
+   "reproducer_note": "Chỉ số, không phải hành vi: không có reproducer.",
+   "impact": "theo dõi",
+   "decision": "blocked",
+   "why": "B-02 (chủ dự án).",
+   "commits": [],
+   "report_items": {},
+   "m_note": "Chỉ số: REPORT §2 không chấm mức cho chỉ số. Hạng mục liên quan: A9 — mức của hạng mục đó không phải mức của chỉ số này.",
+   "acceptance": "Mục tiêu 2.1: < 1 ngày, không sửa công cụ phát hành",
+   "gap": "Chưa đo: chưa phát hành bản nào trong 2.1 (B-02).",
+   "unconfirmed": ""
+  },
+  {
+   "id": "R-M8",
+   "source": "360",
+   "ref": "§7 bảng chỉ số",
+   "item": "Người dùng ngoài",
+   "upstream": [],
+   "evidence": "0 (không thay đổi, theo những gì repo cho biết).",
+   "refs": [],
+   "reproducers": [],
+   "reproducer_note": "Chỉ số, không phải hành vi: không có reproducer.",
+   "impact": "theo dõi",
+   "decision": "open",
+   "why": "Ngoài phạm vi mã.",
+   "commits": [],
+   "report_items": {},
+   "m_note": "REPORT §2 không có hạng mục riêng cho mục này.",
+   "acceptance": "Mục tiêu 2.1: ≥ 1 đối tác thiết kế",
+   "gap": "Chưa đạt: 0 người dùng ngoài theo những gì repo cho biết (mục tiêu ≥ 1 đối tác thiết kế).",
+   "unconfirmed": ""
+  },
+  {
+   "id": "R-M9",
+   "source": "360",
+   "ref": "§7 bảng chỉ số",
+   "item": "Mục backlog có reproducer",
+   "upstream": [],
+   "evidence": "STATUS §1–2 có cột reproducer (D4, E2: '—'); `docs/v2/V2.1-BACKLOG.md` (38 mục) không đổi trong 2.1.",
+   "refs": [
+    {
+     "path": "docs/v2/V2.1-BACKLOG.md",
+     "same_as": "610a593"
+    }
+   ],
+   "reproducers": [],
+   "reproducer_note": "Chỉ số, không phải hành vi: không có reproducer.",
+   "impact": "theo dõi",
+   "decision": "open",
+   "why": "Chưa đo lại trên backlog 38 mục.",
+   "commits": [],
+   "report_items": {},
+   "m_note": "REPORT §2 không có hạng mục riêng cho mục này.",
+   "acceptance": "Mục tiêu 2.1: tất cả mục ≥ medium",
+   "gap": "Chưa đo lại: 38 mục của `docs/v2/V2.1-BACKLOG.md` chưa được đối chiếu với tiêu chí 'có reproducer'.",
+   "unconfirmed": ""
+  }
+ ]
+}

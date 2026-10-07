@@ -1,0 +1,525 @@
+"""The 2.1 traceability table, re-checked mechanically (stdlib only; reads git, never writes the repository).
+
+    python3 -P validation/v21/traceability_check.py                      check every row at the table's head
+    python3 -P validation/v21/traceability_check.py --at HEAD            the same claims at another commit
+    python3 -P validation/v21/traceability_check.py --proposal FILE      also: each proposal item is verbatim in FILE,
+                                                                         whose sha256 is the one the table records
+    python3 -P validation/v21/traceability_check.py --with-ref NAME      also: the cells read on another branch NAME
+                                                                         (`other_refs`), which must still be at the
+                                                                         commit the table records
+    python3 -P validation/v21/traceability_check.py --render             print the generated block of the .md
+
+Per row (docs/v2.1/research/TRACEABILITY.json): every commit exists, is an ancestor of the head (or of its `ref`) and
+touches every path named; every reproducer `[sha:]path::Class[::method]` exists (AST, at the head or at `sha`), and each
+one at the head is listed `ok`, by method, in RUN, the committed run of the reproducers at the table's head (the checker
+runs no test: a reproducer cited after that run is named until the run is redone); every `refs` entry holds (exactly one
+of `contains` / `lacks` a string of 4 characters or more, `exists` true or false, `same_as` its bytes at another commit;
+at the head, at `at`, or — `at` = "with-table" — in the checkout that holds the table, for evidence committed with it
+after the head); the M-level of each REPORT item equals REPORT.md §2 at the head; each upstream source is a claim of
+UPSTREAM-RESEARCH.json with the same label (or, when the verifier reclassified it, the verifier's label and the original
+in `research_label`), the verifier's status, the commit read (7 hex digits or more), and every `file:line` of `where` a
+number that one evidence text gives after a mention of a file of the same stem in that text and before its next file
+mention — the texts are, for a confirmed claim, the research's evidence and the verifier's evidence (not the verifier's
+correction), and for any other status (corrected, refuted, unverifiable) the verifier's evidence and correction (not the
+research's evidence); the rule cannot tell a line number from another number there, such as a percentage or a token
+count, nor a file from another of the same stem (`compute.rs` matches `compute.py`); a 360° item is verbatim in the
+assessment at the head; every row but a declined one names its gap (a word, not a dash: what is missing, or that nothing
+is); the acceptance cell is a criterion its source states (the proposal's §10 "Nghiệm thu cụ thể", §4.3 "Nghiệm thu bước
+đầu" or §12 gates; the 360's §6 "Thước đo xong" or §7 "Mục tiêu 2.1"; a trailing "(§n)", "(360 §n)" or "(đề xuất §n)"
+names the section), or says the source states none (NO_CRITERION), or is "—" on a declined row; a row whose `ref` names
+a §10 item ("§10 V2-03") quotes that item's own §10 criterion, never another item's and never NO_CRITERION. Outside §10
+the rule cannot tell which stated criterion belongs to the item, nor whether the source states one for an item that says
+it states none. Open items and rows whose decision is `open` or `blocked` are the same set. The table block of
+TRACEABILITY.md is exactly --render's. A key the format does not know — at the top, in `sources`, in an open item, a
+row, a commit, a ref or an upstream entry — is a problem, never ignored; every revision is a hex commit id (`--at` and
+`--with-ref` are resolved by git first).
+Proposal items and proposal acceptance cells are checked against the proposal only under --proposal.
+By default only objects reachable from the head are read: a cell on a branch of `other_refs` (a commit whose `ref`,
+or a reproducer whose `sha`, is that branch's commit) is checked only under `--with-ref`, and the OK line counts the
+cells left unchecked. Exit 0 with no problem, 1 with problems (one per line), 2 on bad usage."""
+
+from __future__ import annotations
+
+import argparse
+import ast
+import collections
+import functools
+import hashlib
+import json
+import pathlib
+import re
+import subprocess
+import sys
+
+ROOT = pathlib.Path(__file__).resolve().parents[2]
+TABLE = "docs/v2.1/research/TRACEABILITY.json"
+DOC = "docs/v2.1/TRACEABILITY.md"
+DECISIONS = ("adopted", "adapted", "declined", "blocked", "open")
+LABELS = ("CODE", "README", "INFERENCE", "EXPERIMENT", "NOT_FOUND")
+SOURCES = ("proposal", "360")
+FORMAT = "aisef.v21-traceability/1"
+TOP_KEYS = ({"format", "head", "built", "sources", "open_items", "rows"}, {"other_refs"})      # (required, optional)
+SOURCE_KEYS, PROPOSAL_KEYS = ({"proposal", "assessment", "report", "upstream"}, set()), ({"title", "sha256", "in_repository"}, set())
+OPEN_KEYS = ({"name", "rows"}, set())
+KEYS = ("id", "source", "ref", "item", "upstream", "evidence", "refs", "reproducers", "reproducer_note", "impact",
+        "decision", "why", "commits", "report_items", "m_note", "acceptance", "gap", "unconfirmed")
+COMMIT_KEYS, REF_KEYS = ({"sha", "paths"}, {"ref"}), ({"path"}, {"at"})
+ASSERTIONS = ("contains", "lacks", "exists", "same_as")
+UPSTREAM_KEYS = ({"key", "repo", "claim", "label", "verify", "commit", "where"}, {"research_label"})
+NEEDS_GAP = ("adopted", "adapted", "blocked", "open")         # every decision but declined
+SAID = re.compile(r"\w\w")                                       # a cell that says something: one word, not a dash
+MIN_STRING = 4                                                    # a `contains` / `lacks` shorter than this says nothing
+WITH_TABLE = "with-table"            # a ref's `at`: the file as committed with the table (evidence made after the head)
+NO_CRITERION = {"proposal": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này",
+                "360": "360 không ghi tiêu chí nghiệm thu cho mục này"}
+CITED = re.compile(r"\s*\((360 |đề xuất )?§(\d+(?:\.\d+)?)[^()]*\)$")  # "… (§4.3)", "… (360 §7, …)": the section named
+HEX = re.compile(r"[0-9a-f]{7,40}")
+LINES = re.compile(r"([\w-]+)\.[A-Za-z]\w*:(\d+(?:-\d+)?(?:,\s*\d+(?:-\d+)?)*)")  # dir/f.go:12-20, 31 -> (f, "12-20, 31")
+#: in the evidence, a file mention ("f.go:", "README at d52a053:") or a line number; a number belongs to the last file
+CITES = re.compile(r"([\w-]+)(?:\.[A-Za-z]\w*| at [0-9a-f]{7,40}):|(?<![\w.])(\d+(?:-\d+)?)(?!\w)")
+RUN = "docs/v2.1/evidence/traceability-reproducers-{}.out"    # the run of every reproducer at the head, by its 7 digits
+RAN = re.compile(r"^([\w.]+): ok$", re.M)                         # a line of that run: "tests.v2.mod.Class.method: ok"
+RECLASSIFIED = re.compile(r"(?:status should be|Classify it as) ([A-Z_]+)")
+BEGIN = "<!-- rows:begin — generated by validation/v21/traceability_check.py --render; do not edit by hand -->"
+END = "<!-- rows:end -->"
+TEST_ID = re.compile(r"(?:([0-9a-f]{7,40}):)?([\w./-]+\.py)::(\w+)(?:::(\w+))?")
+REPORT_ID = re.compile(r"([A-F])(\d*)(?:–([A-F])(\d+))?")
+
+
+@functools.lru_cache(maxsize=None)
+def _git(root: str, *args: str) -> str | None:
+    """stdout of `git args` in root, or None when git fails."""
+    p = subprocess.run(["git", "-C", root, *args], capture_output=True, text=True, encoding="utf-8", errors="replace")
+    return p.stdout if p.returncode == 0 else None
+
+
+def show(root: pathlib.Path, rev: str, path: str) -> str | None:
+    return _git(str(root), "show", f"{rev}:{path}")
+
+
+def collapse(text: str) -> str:
+    return " ".join(text.split())
+
+
+def report_levels(text: str) -> dict[str, str]:
+    """REPORT.md §2: item id -> M-level ('A3–A5' rows expand; 'M4 (A5), M3 (A3, A4)' assigns per named item)."""
+    section = text.split("\n## 2.", 1)[1].split("\n## ", 1)[0]
+    out: dict[str, str] = {}
+    for line in section.splitlines():
+        cells = [c.strip() for c in line.strip().strip("|").split("|")]
+        m = REPORT_ID.fullmatch(cells[0]) if len(cells) > 2 else None
+        if not m:
+            continue
+        letter, lo, _, hi = m.groups()
+        ids = [f"{letter}{n}" for n in range(int(lo), int(hi or lo) + 1)] if lo else [letter]
+        for lv in re.finditer(r"(M[1-6])\**\s*(?:\(([^)]*)\))?", cells[2]):
+            named = re.findall(r"\b[A-F]\d+\b", lv.group(2) or "")
+            for i in named or ids:
+                out.setdefault(i, lv.group(1))
+    return out
+
+
+def test_problem(root: pathlib.Path, rev: str, spec: str) -> str | None:
+    m = TEST_ID.fullmatch(spec)
+    if not m:
+        return f"reproducer {spec!r} is not [sha:]path::Class[::method]"
+    sha, path, cls, meth = m.groups()
+    src = show(root, sha or rev, path)
+    if src is None:
+        return f"reproducer {spec}: no {path} at {sha or rev}"
+    found = [n for n in ast.parse(src).body if isinstance(n, ast.ClassDef) and n.name == cls]
+    if not found:
+        return f"reproducer {spec}: no class {cls}"
+    if meth and not any(isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)) and n.name == meth
+                        for n in found[0].body):
+        return f"reproducer {spec}: no method {meth} in {cls}"
+    return None
+
+
+def _keys(where: str, entry: dict, keys: tuple[set, set]) -> list[str]:
+    need, may = keys
+    return ([f"{where}: missing key {k}" for k in sorted(need - set(entry))]
+            + [f"{where}: unknown key {k}" for k in sorted(set(entry) - need - may)])
+
+
+def _dotted(m: re.Match) -> str:
+    """tests/v2/t.py::C::m -> tests.v2.t.C.m, as unittest names it in a run."""
+    return ".".join([m.group(2)[:-3].replace("/", "."), *filter(None, m.groups()[2:])])
+
+
+def _lines(text: str) -> set[tuple[str, str]]:
+    """(file stem, line or range) of every `file.ext:12-20, 31` in a `where` cell."""
+    return {(m.group(1), n) for m in LINES.finditer(text) for n in re.split(r",\s*", m.group(2))}
+
+
+def _cited(text: str) -> set[tuple[str, str]]:
+    """(file stem, number) of one evidence text: each number goes with the file last mentioned before it there."""
+    out, file = set(), None
+    for m in CITES.finditer(text):
+        if m.group(1):
+            file = m.group(1)
+        elif file:
+            out.add((file, m.group(2)))
+    return out
+
+
+def criteria(text: str, source: str) -> dict[str, list[str]]:
+    """The passages of a source document that state an acceptance criterion, by section (module docstring)."""
+    out: dict[str, list[str]] = collections.defaultdict(list)
+    top = sub = ""
+    lines: list[str] = []
+    for line in text.splitlines():                       # a wrapped bullet or paragraph is one line
+        if lines and line.startswith("  ") and lines[-1].strip():
+            lines[-1] += " " + line.strip()
+        else:
+            lines.append(line)
+    for line in lines:
+        if h := re.match(r"(#{2,3}) (?:(\d+(?:\.\d+)?)\.? )?(.*)", line):
+            top, sub = (h.group(2) or "", h.group(3)) if h.group(1) == "##" else (top, h.group(3))
+            continue
+        cells = [c.strip() for c in line.strip().strip("|").split("|")] if line.startswith("|") else []
+        if source == "proposal":
+            if top == "10" and len(cells) == 6 and re.fullmatch(r"V2-\d+", cells[0]):
+                out["§10"].append(cells[3])
+                out[f"§10 {cells[0]}"].append(cells[3])
+            elif top == "4" and line.startswith("**Nghiệm thu bước đầu:**"):
+                out["§4.3"].append(line.split(":**", 1)[1])
+            elif top == "12" and sub == "Gate đề xuất" and (m := re.match(r"\*\*[^*]+:\*\*(.*)", line)):
+                out["§12"].append(m.group(1))
+        elif top == "6" and "Thước đo xong:" in line:
+            out["§6"].append(line.split("Thước đo xong:", 1)[1])
+        elif top == "7" and len(cells) == 3 and cells[2] != "Mục tiêu 2.1" and not cells[2].startswith("-"):
+            out["§7"].append("Mục tiêu 2.1: " + cells[2])
+    return {k: [collapse(p) for p in v] for k, v in out.items()}
+
+
+def acceptance_problem(row: dict, ctx: dict) -> str | None:
+    acc, src, rid = collapse(row["acceptance"]), row["source"], row["id"]
+    own = re.match(r"§10 (V2-\d+)\b", row["ref"]) if src == "proposal" else None   # a §10 item states its own
+    if not own and (acc.startswith(NO_CRITERION[src]) or (acc == "—" and row["decision"] == "declined")):
+        return None
+    m = None if own else CITED.search(acc)
+    doc = ("360" if m.group(1) == "360 " else "proposal") if m and m.group(1) else src
+    if ctx["criteria"][doc] is None:                     # the proposal, without --proposal
+        return None
+    text = acc[: m.start()] if m else acc
+    key = f"§10 {own.group(1)}" if own else f"§{m.group(2)}" if m else None
+    passages = ctx["criteria"][doc].get(key, []) if key else sum(ctx["criteria"][doc].values(), [])
+    if SAID.search(text) and any(text in p for p in passages):
+        return None
+    return (f"{rid}: the acceptance is not a criterion the {doc} document states" + (f" in {key}" if key else "")
+            + ("" if own else f" (when it states none, say so: {NO_CRITERION[src]!r})"))
+
+
+def resolve(root: pathlib.Path, name: str) -> str | None:
+    """The commit `name` (a branch, a tag, HEAD, an id) names, never read as an option."""
+    out = _git(str(root), "rev-parse", "--verify", "--end-of-options", f"{name}^{{commit}}")
+    return out.strip() if out else None
+
+
+def off_head(table: dict) -> list[tuple[str, str, str]]:
+    """(row id, cell, branch name) of every cell read on a branch of `other_refs` rather than under the head."""
+    names = {sha: name for name, sha in table.get("other_refs", {}).items()}
+    out = []
+    for r in table["rows"]:
+        out += [(r["id"], c["sha"], names[c["ref"]]) for c in r["commits"] if c.get("ref") in names]
+        out += [(r["id"], spec, names[m.group(1)]) for spec in r["reproducers"]
+                if (m := TEST_ID.fullmatch(spec)) and m.group(1) in names]
+    return out
+
+
+def _hex(text: str) -> str:
+    m = re.match(r"[0-9a-f]{40}", text or "")
+    return m.group(0) if m else ""
+
+
+def row_problems(row: dict, root: pathlib.Path, head: str, ctx: dict) -> list[str]:
+    rid = row.get("id", "?")
+    out = _keys(rid, row, (set(KEYS), set()))
+    if out:
+        return out
+    s, skip = str(root), ctx["skip"]
+    reach = functools.partial(_reachable, s, head)
+    if row["decision"] not in DECISIONS:
+        out.append(f"{rid}: decision {row['decision']!r} is not one of {DECISIONS}")
+    if row["source"] not in SOURCES:
+        out.append(f"{rid}: source {row['source']!r} is not one of {SOURCES}")
+    text = ctx["assessment"] if row["source"] == "360" else ctx["proposal"]
+    if text is not None and collapse(row["item"]) not in text:
+        out.append(f"{rid}: the item is not verbatim in the {row['source']} document")
+    if row["decision"] in NEEDS_GAP and not SAID.search(row["gap"]):
+        out.append(f"{rid}: a row whose decision is {row['decision']} names its gap, or says nothing is missing "
+                   f"(the gap is {row['gap']!r})")
+    if row["source"] in SOURCES and (p := acceptance_problem(row, ctx)):
+        out.append(p)
+    for c in row["commits"]:
+        bad = _keys(f"{rid}: commit {c.get('sha')}", c, COMMIT_KEYS)
+        bad += [f"{rid}: commit {v!r} is not a hex commit id" for v in (c.get("sha"), c.get("ref", head))
+                if not HEX.fullmatch(str(v))]
+        if not (isinstance(c.get("paths"), list) and c["paths"] and all(isinstance(p, str) and p for p in c["paths"])):
+            bad.append(f"{rid}: commit {c.get('sha')}: paths names no path (a list of the paths it touches)")
+        if "ref" in c and c["ref"] not in ctx["other"]:
+            bad.append(f"{rid}: commit {c['sha']}: ref {c['ref']} is not the commit of a branch in other_refs")
+        if bad:
+            out += bad
+            continue
+        sha, ref = c["sha"], c.get("ref", head)
+        if ref in skip:
+            continue
+        if _git(s, "cat-file", "-e", f"{sha}^{{commit}}") is None:
+            out.append(f"{rid}: commit {sha} is not in this clone")
+            continue
+        if _git(s, "merge-base", "--is-ancestor", sha, ref) is None:
+            out.append(f"{rid}: commit {sha} is not an ancestor of {ref}")
+        touched = set((_git(s, "show", "--name-only", "--format=", sha) or "").splitlines())
+        out += [f"{rid}: commit {sha} does not touch {p}" for p in c["paths"] if p not in touched]
+    for spec in row["reproducers"]:
+        m = TEST_ID.fullmatch(spec)
+        if m and m.group(1) in skip:
+            continue
+        if m and m.group(1) and m.group(1) not in ctx["other"] and not reach(m.group(1)):
+            out.append(f"{rid}: reproducer {spec}: {m.group(1)} is not reachable from {head} (nor in other_refs)")
+        elif p := test_problem(root, head, spec):
+            out.append(f"{rid}: {p}")
+        elif not m.group(1) and _dotted(m) not in ctx["ran"]:
+            out.append(f"{rid}: reproducer {spec} is not listed ok in {ctx['run']}")
+    for r in row["refs"]:
+        bad = _keys(f"{rid}: ref {r.get('path')}", r, (REF_KEYS[0], REF_KEYS[1] | set(ASSERTIONS)))
+        if sum(k in r for k in ASSERTIONS) != 1:
+            bad.append(f"{rid}: ref {r.get('path')}: exactly one of {ASSERTIONS}, not {sorted(set(r) & set(ASSERTIONS))}")
+        bad += [f"{rid}: ref {r.get('path')}: {k} {r[k]!r} is not a string of {MIN_STRING} characters or more"
+                for k in ("contains", "lacks") if k in r and not (isinstance(r[k], str) and len(r[k].strip()) >= MIN_STRING)]
+        if "exists" in r and not isinstance(r["exists"], bool):
+            bad.append(f"{rid}: ref {r.get('path')}: exists {r['exists']!r} is not true or false")
+        if r.get("at") == WITH_TABLE and not (root / str(r.get("path"))).resolve().is_relative_to(root.resolve()):
+            bad.append(f"{rid}: ref {r.get('path')}: a path outside the checkout")
+        for k in ("at", "same_as"):
+            if k in r and not (HEX.fullmatch(str(r[k])) and reach(r[k])) and not (k == "at" and r[k] == WITH_TABLE):
+                bad.append(f"{rid}: ref {r.get('path')}: {k} {r[k]!r} is not a hex commit id reachable from {head}")
+        if bad:
+            out += bad
+            continue
+        at = r.get("at", head)
+        if at == WITH_TABLE:
+            f = root / r["path"]
+            body = f.read_text(encoding="utf-8", errors="replace") if f.is_file() else None
+        else:
+            body = show(root, at, r["path"])
+        if "exists" in r and (body is not None) != r["exists"]:
+            out.append(f"{rid}: {r['path']} at {at} {'is missing' if r['exists'] else 'exists'}")
+        if "contains" in r and (body is None or r["contains"] not in body):
+            out.append(f"{rid}: {r['path']} at {at} does not contain {r['contains']!r}")
+        if "lacks" in r and (body is None or r["lacks"] in body):
+            out.append(f"{rid}: {r['path']} at {at} {'is missing' if body is None else 'contains'} {r['lacks']!r}")
+        if "same_as" in r and (body is None or body != show(root, r["same_as"], r["path"])):
+            out.append(f"{rid}: {r['path']} at {at} is not the same as at {r['same_as']}")
+    for item, level in row["report_items"].items():
+        if ctx["report"].get(item) != level:
+            out.append(f"{rid}: REPORT §2 gives {item} {ctx['report'].get(item)}, the row says {level}")
+    for u in row["upstream"]:
+        bad = _keys(f"{rid}: upstream {u.get('key')}/{u.get('claim')}", u, UPSTREAM_KEYS)
+        if bad:
+            out += bad
+            continue
+        res = ctx["research"].get(u["key"])
+        if res is None:
+            out.append(f"{rid}: upstream {u['key']} is not in the research record")
+            continue
+        claim = {c["id"]: c for c in res["research"]["claims"]}.get(u["claim"])
+        check = {c["id"]: c for c in res["verify"]["checks"]}.get(u["claim"])
+        if claim is None or check is None:
+            out.append(f"{rid}: upstream {u['key']}/{u['claim']} is not a verified claim")
+            continue
+        new = RECLASSIFIED.search(check.get("correction", "")) if check["status"] != "confirmed" else None
+        if u["label"] not in LABELS:
+            out.append(f"{rid}: upstream {u['key']}/{u['claim']}: label {u['label']} is not one of {LABELS}")
+        elif new and u["label"] != new.group(1):
+            out.append(f"{rid}: upstream {u['key']}/{u['claim']}: the verifier reclassified it as {new.group(1)}, "
+                       f"the row says {u['label']}")
+        elif new and u.get("research_label") != claim["status"]:
+            out.append(f"{rid}: upstream {u['key']}/{u['claim']}: research_label is {u.get('research_label')}, "
+                       f"the research says {claim['status']}")
+        elif not new and (u["label"] != claim["status"] or "research_label" in u):
+            out.append(f"{rid}: upstream {u['key']}/{u['claim']} is {claim['status']}, the row says {u['label']}"
+                       + (" (research_label without a reclassification)" if "research_label" in u else ""))
+        # the texts a `where` number may come from, each read on its own (module docstring)
+        if check["status"] == "confirmed":
+            texts, whose = (claim["evidence"], check["evidence"]), "the research's or the verifier's evidence"
+        else:
+            texts, whose = (check["evidence"], check.get("correction", "")), "the verifier's evidence or correction"
+        lines, cited = _lines(u["where"]), set().union(*map(_cited, texts))
+        if cited and not lines:
+            out.append(f"{rid}: upstream {u['key']}/{u['claim']}: where names no file:line, the evidence does")
+        out += [f"{rid}: upstream {u['key']}/{u['claim']}: where line {n} of {f} is not one {whose} cites for {f}"
+                for f, n in sorted(lines - cited)]
+        if u["verify"] != check["status"]:
+            out.append(f"{rid}: upstream {u['key']}/{u['claim']} was {check['status']}, the row says {u['verify']}")
+        if u["repo"] != res["research"]["repo"]:
+            out.append(f"{rid}: upstream {u['key']} is {res['research']['repo']}, the row says {u['repo']}")
+        read = {_hex(res["research"]["head_commit"]), _hex(res["research"].get("proposal_commit", ""))} - {""}
+        if not HEX.fullmatch(str(u["commit"])) or not any(full.startswith(u["commit"]) for full in read):
+            out.append(f"{rid}: upstream {u['key']} commit {u['commit']} is not one the research read")
+    return out
+
+
+def _reachable(root: str, head: str, rev: str) -> bool:
+    return _git(root, "merge-base", "--is-ancestor", rev, head) is not None
+
+
+def check(table: dict, root: pathlib.Path = ROOT, at: str | None = None, proposal: pathlib.Path | None = None,
+          doc: str | None = None, with_refs: tuple[str, ...] = ()) -> list[str]:
+    shape = _keys("the table", table, TOP_KEYS)
+    if not shape:
+        if table["format"] != FORMAT:
+            shape.append(f"the table: format {table['format']!r} is not {FORMAT!r}")
+        shape += _keys("sources", table["sources"], SOURCE_KEYS)
+        shape += _keys("sources.proposal", table["sources"].get("proposal", {}), PROPOSAL_KEYS)
+        for i, item in enumerate(table["open_items"]):
+            shape += _keys(f"open item {i} ({item.get('name')!r})", item, OPEN_KEYS)
+            if not item.get("rows"):
+                shape.append(f"open item {i} ({item.get('name')!r}) lists no row")
+    if shape:
+        return shape
+    if at is not None:
+        head = resolve(root, at)
+        if head is None:
+            return [f"--at {at}: not a commit in this clone"]
+    else:
+        head = table["head"]
+        if not HEX.fullmatch(str(head)) or _git(str(root), "cat-file", "-e", f"{head}^{{commit}}") is None:
+            return [f"head {head} is not a commit in this clone"]
+    other, problems = table.get("other_refs", {}), []
+    problems += [f"other_refs {n}: {v!r} is not a full hex commit id" for n, v in other.items()
+                 if not re.fullmatch(r"[0-9a-f]{40}", str(v))]
+    for name in with_refs:
+        if name not in other:
+            problems.append(f"--with-ref {name}: not one of the table's other_refs {sorted(other)}")
+        elif (got := resolve(root, name)) != other[name]:
+            problems.append(f"--with-ref {name}: {'not in this clone' if got is None else f'is at {got}'}, "
+                            f"the table records {other[name]}")
+    src = table["sources"]
+    run = RUN.format(table["head"][:7]) if HEX.fullmatch(str(table["head"])) else RUN.format("?")
+    ran = set(RAN.findall((root / run).read_text(encoding="utf-8"))) if (root / run).is_file() else set()
+    assessment = show(root, head, src["assessment"]) or ""
+    ctx = {"report": report_levels(show(root, head, src["report"]) or ""),
+           "assessment": collapse(assessment), "criteria": {"360": criteria(assessment, "360"), "proposal": None},
+           "research": {r["key"]: r for r in json.loads(show(root, head, src["upstream"]) or '{"results": []}')["results"]},
+           "proposal": None, "other": set(other.values()), "run": run, "ran": ran,
+           "skip": {sha for name, sha in other.items() if name not in with_refs}}
+    if proposal is not None:
+        data = proposal.read_bytes()
+        if hashlib.sha256(data).hexdigest() != src["proposal"]["sha256"]:
+            problems.append(f"{proposal} is not the proposal the table was built from (sha256)")
+        else:
+            ctx["proposal"] = collapse(data.decode("utf-8"))
+            ctx["criteria"]["proposal"] = criteria(data.decode("utf-8"), "proposal")
+    ids = [r.get("id") for r in table["rows"]]
+    problems += [f"{i}: duplicate id" for i in sorted({i for i in ids if ids.count(i) > 1})]
+    for row in table["rows"]:
+        problems += row_problems(row, root, head, ctx)
+    by_id = {r.get("id"): r for r in table["rows"]}
+    listed = {rid for item in table["open_items"] for rid in item["rows"]}
+    problems += [f"{r['id']}: its decision is {r['decision']}, and no open item lists it" for r in table["rows"]
+                 if r.get("decision") in ("open", "blocked") and r.get("id") not in listed]
+    for item in table["open_items"]:
+        for rid in item["rows"]:
+            if rid not in by_id:
+                problems.append(f"open item {item['name']!r}: no row {rid}")
+            elif by_id[rid]["decision"] not in ("open", "blocked"):
+                problems.append(f"open item {item['name']!r}: {rid} is {by_id[rid]['decision']}, not open or blocked")
+    if doc is not None:
+        block = doc.split(BEGIN, 1)[1].split(END, 1)[0] if BEGIN in doc and END in doc else None
+        if block != "\n" + render(table) + "\n":
+            problems.append(f"{DOC}: the generated block is not what --render prints from {TABLE}")
+    return problems
+
+
+def _code(text: str) -> str:
+    return f"`` {text} ``" if "`" in text else f"`{text}`"
+
+
+def _cell(text: str, limit: int | None = None) -> str:
+    text = collapse(text).replace("|", "\\|")
+    return text if limit is None or len(text) <= limit else text[: limit - 1] + "…"
+
+
+def render(table: dict) -> str:
+    """The .md block: open items, a summary table, then every row in full."""
+    rows, out = table["rows"], []
+    count = {d: sum(r["decision"] == d for r in rows) for d in DECISIONS}
+    out += [f"Tổng: {len(rows)} hàng (đề xuất {sum(r['source'] == 'proposal' for r in rows)}, báo cáo 360° "
+            f"{sum(r['source'] == '360' for r in rows)}); " + ", ".join(f"{d} {n}" for d, n in count.items()) + ".", ""]
+    out += ["## Mục còn mở", ""]
+    out += [f"- **{o['name']}**: " + ", ".join(f"[{r}](#{r.lower().replace('.', '')})" for r in o["rows"])
+            for o in table["open_items"]]
+    out += ["", "## Bảng tóm tắt", "", "| ID | Mục | Quyết định | Mức (REPORT §2) | Còn thiếu |", "|---|---|---|---|---|"]
+    for r in rows:
+        level = ", ".join(f"{k} {v}" for k, v in r["report_items"].items()) or "—"
+        out.append(f"| [{r['id']}](#{r['id'].lower().replace('.', '')}) | {_cell(r['item'], 90)} | {r['decision']} | "
+                   f"{level} | {_cell(r['gap'], 110) or '—'} |")
+    out += ["", "## Từng hàng", ""]
+    for r in rows:
+        src = "đề xuất" if r["source"] == "proposal" else "báo cáo 360°"
+        out += [f"### {r['id']}", "", f"> {collapse(r['item'])}", "", f"- **Nguồn:** {src} {r['ref']}"]
+        if r["upstream"]:
+            out.append("- **Upstream:** " + "; ".join(
+                f"{u['repo']}@{u['commit']} `{u['where']}` — {u['label']} (kiểm chứng: {u['verify']}"
+                + (f", người kiểm chứng phân lại; nghiên cứu ghi {u['research_label']}" if "research_label" in u else "")
+                + f"; claim {u['claim']})"
+                for u in r["upstream"]))
+        out.append(f"- **Bằng chứng tại HEAD:** {collapse(r['evidence'])}")
+        if r["refs"]:
+            def one(x):
+                where = f"`{x['path']}`" + (" (đi cùng bảng)" if x.get("at") == WITH_TABLE
+                                            else f" @ {x['at']}" if "at" in x else "")
+                if "contains" in x:
+                    return f"{where} chứa {_code(_cell(x['contains'], 100))}"
+                if "lacks" in x:
+                    return f"{where} không chứa {_code(x['lacks'])}"
+                if "same_as" in x:
+                    return f"{where} không đổi so với `{x['same_as']}`"
+                return f"{where} {'tồn tại' if x['exists'] else 'không tồn tại'}"
+            out.append("- **Kiểm cơ học:** " + "; ".join(one(x) for x in r["refs"]))
+        reps = ", ".join(f"`{t}`" for t in r["reproducers"])
+        out.append("- **Reproducer:** " + " ".join(x for x in (reps, collapse(r["reproducer_note"])) if x))
+        out.append(f"- **Ảnh hưởng:** {collapse(r['impact'])}")
+        out.append(f"- **Quyết định:** {r['decision']} — {collapse(r['why'])}")
+        if r["commits"]:
+            out.append("- **Commit:** " + "; ".join(
+                f"`{c['sha']}`" + (f" (trên `{c['ref'][:7]}`)" if "ref" in c else "") + ": " + ", ".join(c["paths"])
+                for c in r["commits"]))
+        level = ", ".join(f"{k} = {v}" for k, v in r["report_items"].items())
+        out.append("- **Mức (REPORT §2):** " + " — ".join(x for x in (level, collapse(r["m_note"])) if x))
+        out.append(f"- **Tiêu chí nghiệm thu:** {collapse(r['acceptance'])}")
+        out.append(f"- **Còn thiếu:** {collapse(r['gap']) or '—'}")
+        if r["unconfirmed"]:
+            out.append(f"- **Chưa xác nhận được:** {collapse(r['unconfirmed'])}")
+        out.append("")
+    return "\n".join(out).rstrip("\n")
+
+
+def main(argv: list[str] | None = None) -> int:
+    p = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
+    p.add_argument("--at", help="check the claims at this commit instead of the table's head")
+    p.add_argument("--proposal", type=pathlib.Path, help="the proposal file: its items are checked verbatim")
+    p.add_argument("--with-ref", action="append", default=[], metavar="NAME",
+                   help="also check the cells read on this branch of other_refs (repeatable)")
+    p.add_argument("--render", action="store_true", help="print the generated block of the .md and exit")
+    a = p.parse_args(argv)
+    table = json.loads((ROOT / TABLE).read_text(encoding="utf-8"))
+    if a.render:
+        print(render(table))
+        return 0
+    problems = check(table, ROOT, a.at, a.proposal, (ROOT / DOC).read_text(encoding="utf-8"), tuple(a.with_ref))
+    for line in problems:
+        print(line)
+    if not problems:
+        left = collections.Counter(name for *_, name in off_head(table) if name not in a.with_ref)
+        print(f"OK: {len(table['rows'])} rows at {a.at or table['head'][:12]}"
+              + ("" if a.proposal else " (proposal items and proposal acceptance cells not checked: pass --proposal)")
+              + "".join(f" ({n} cells on {name} not checked: pass --with-ref {name})" for name, n in left.items()))
+    return 1 if problems else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
