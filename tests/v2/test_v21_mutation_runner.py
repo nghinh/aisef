@@ -128,6 +128,30 @@ class Bytecode(unittest.TestCase):
         with mock.patch.object(m, "_write_version", same_second):
             self.assertNotEqual(killed(m.run_target(root, "aisef2/toy.py::v", ["tests/v2/test_k.py"])), BC_TRUTH)
 
+    @unittest.skipUnless(POSIX, "the runner's process ranges and cleanup authority are measured on POSIX")
+    def test_a_touched_source_is_residue_so_the_stamp_cannot_be_lost(self):
+        """Bytecode lens: a kill file that rewrites the mutated module with its own bytes puts the wall clock back into
+        its mtime, and BC-1's same-second collision returns (3 of 5 false SURVIVED in the prover's toy, with no error).
+        A source only touched counts as residue, so T0 refuses such a file; one that touches another source too."""
+        touch = {"test_t.py": """
+            import os, pathlib, unittest
+            ROOT = pathlib.Path(__file__).resolve().parents[2]
+            class T(unittest.TestCase):
+                def test_rewrites_a_source_with_its_own_bytes(self):
+                    p = ROOT / os.environ.get("TOY_TOUCH", "aisef2/toy.py")
+                    p.write_bytes(p.read_bytes())
+            """}
+        root = toy(self.dir, BC_MODULE, {**BC_KILL, **touch})
+        for rel in ("aisef2/toy.py", "aisef2/__init__.py"):
+            with self.subTest(rel), mock.patch.dict(os.environ, {"TOY_TOUCH": rel}), \
+                    mock.patch.object(m, "ENV_KEEP", (*m.ENV_KEEP, "TOY_TOUCH")):
+                r = m.run_target(root, "aisef2/toy.py::v", ["tests/v2/test_k.py", "tests/v2/test_t.py"])
+                self.assertEqual(r["error"], "kill tests fail on the unmutated tree (T0 null mutant): "
+                                             "tests/v2/test_t.py: PASS (left residue)")
+                self.assertEqual(r["t0"][1]["residue"], {"changed": [rel]})
+                self.assertFalse(r["t0"][0].get("residue"))       # a file that only reads the tree is not touched by it
+        self.assertEqual(killed(m.run_target(root, "aisef2/toy.py::v", ["tests/v2/test_k.py"])), BC_TRUTH)
+
 
 # --------------------------------------------------------------------------------------------- §2 clean environment
 

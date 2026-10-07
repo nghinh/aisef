@@ -987,7 +987,8 @@ def _new_tree(tg: _Target) -> None:
 
 def _residue(tg: _Target) -> dict:
     """What a run left in the tree: paths added or removed, and paths whose type, mode or content changed (a file only
-    touched, or rewritten with its own bytes, is not residue); the mutated file must still hold the version under test.
+    touched, or rewritten with its own bytes, is not residue — except a `.py` source, whose mtime is half of what its
+    cached bytecode is checked against); the mutated file must still hold the version under test, with its stamp.
     Empty when the tree is the pristine copy plus that version."""
     now = _manifest(tg.tree, tg.rel)
     base = tg.base
@@ -998,11 +999,14 @@ def _residue(tg: _Target) -> dict:
             return a == b
         if a[0] == "l":
             return os.readlink(tg.tree / k) == os.readlink(tg.pristine / k)
+        if k.endswith(".py") and a[2] != b[2]:   # a source touched in place: a .pyc of other bytes can match it again
+            return False
         return filecmp.cmp(tg.tree / k, tg.pristine / k, shallow=False)
     added, removed = sorted(set(now) - set(base)), sorted(set(base) - set(now))
     changed = sorted(k for k in set(now) & set(base) if now[k] != base[k] and not same(k))
-    try:
-        held = (tg.tree / tg.rel).read_text(encoding="utf-8") == tg.version
+    try:   # stamps are whole seconds, so any touch or rewrite of the mutated file shows in its mtime (BC-1 lens)
+        held = (tg.tree / tg.rel).read_text(encoding="utf-8") == tg.version and \
+            (tg.tree / tg.rel).stat().st_mtime_ns == tg.last * 10**9
     except (OSError, UnicodeDecodeError):
         held = False
     changed += [] if held else [tg.rel]
