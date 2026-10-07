@@ -1095,6 +1095,55 @@ class Classify(unittest.TestCase):
         self.assertEqual(classes(got["aisef2/toy.py::other"]), ["SURVIVED", "SURVIVED"])
 
     @unittest.skipUnless(POSIX, "the runner's process ranges and cleanup authority are measured on POSIX")
+    def test_a_runner_failure_outside_a_mutant_keeps_what_was_measured_and_names_what_did_not_run(self):
+        """VS-4, classification prover: ca.establish failing for the 2nd target escaped main() with a traceback (no
+        entry, no STOPPED or NOT RUN line), and an OSError(24) making T0's 2nd run directory escaped run_target and
+        main (no record at all). A run directory failing inside a mutant's chain crashed _classify on a row with no
+        outcome. Now each is a RUNNER_EXCEPTION stop that keeps every row measured, and main() names what did not run."""
+        d = self.enterContext(tempfile.TemporaryDirectory())
+        root = toy(pathlib.Path(d), POSITIVE + "\n\ndef other(x):\n    return x < 0\n", faulty(pathlib.Path(d) / "no"))
+        targets = {"aisef2/toy.py::positive": ["tests/v2/test_strong.py"], "aisef2/toy.py::other": ["tests/v2/test_weak.py"]}
+        rec = "closure-evidence/v2/toy/MUTATION.json"
+        (root / rec).parent.mkdir(parents=True)
+        real_establish, calls = m.ca.establish, []
+
+        def establish(scratch):
+            calls.append(scratch)
+            if len(calls) == 2:
+                raise BlockingIOError(35, "Resource temporarily unavailable")
+            return real_establish(scratch)
+        with mock.patch.object(m.ca, "establish", establish), mock.patch.object(m, "ROOT", root), \
+                mock.patch.object(m, "RECORDS", {"TOY": rec}), mock.patch.object(m, "PHASE_TARGETS", {"TOY": targets}), \
+                mock.patch.object(m, "TARGETS", targets), mock.patch("builtins.print") as out:
+            self.assertEqual(m.main(["run", *targets]), 3)
+        got = {t["target"]: t for t in json.loads((root / rec).read_text(encoding="utf-8"))["targets"]}
+        self.assertEqual(classes(got["aisef2/toy.py::positive"]), ["KILLED", "KILLED"])
+        self.assertTrue(got["aisef2/toy.py::other"]["error"].startswith("RUNNER_EXCEPTION before the target: BlockingIOError"))
+        self.assertTrue(got["aisef2/toy.py::other"]["stopped"])
+        lines = [c.args[0] for c in out.call_args_list]
+        self.assertTrue([x for x in lines if x.startswith("STOPPED aisef2/toy.py::other: RUNNER_EXCEPTION")])
+        self.assertIn("NOT RUN []", lines[-1])
+        real_tmp, made = tempfile.TemporaryDirectory, []
+
+        def tmp(*a, **kw):   # the run directories only; every other directory is made as usual
+            if kw.get("prefix") == "run-":
+                made.append(1)
+                if len(made) == fail_at:
+                    raise OSError(24, "Too many open files")
+            return real_tmp(*a, **kw)
+        kill = ["tests/v2/test_weak.py", "tests/v2/test_strong.py"]
+        for fail_at, where in ((2, "before mutant 1 (T0 tests/v2/test_strong.py)"), (3, "at mutant 'L2 returns None' "
+                                                                                      "(tests/v2/test_weak.py)")):
+            made.clear()
+            with self.subTest(fail_at=fail_at), mock.patch.object(m.tempfile, "TemporaryDirectory", tmp):
+                r = m.run_target(root, "aisef2/toy.py::positive", kill)
+                self.assertEqual(r["error"], f"RUNNER_EXCEPTION {where}: OSError(24, 'Too many open files')")
+                self.assertTrue(r["stopped"])
+                rows = [*r["t0"], *(x for res in r["results"] for x in res.get("files", []))]
+                self.assertEqual([x["outcome"] for x in rows], ["PASS", "PASS", "INFRA"][3 - fail_at:])   # all kept, well formed
+                self.assertEqual(classes(r), ["NOT_RUN", "NOT_RUN"] if fail_at == 2 else ["INFRA", "NOT_RUN"])
+
+    @unittest.skipUnless(POSIX, "the runner's process ranges and cleanup authority are measured on POSIX")
     def test_the_record_says_which_file_killed_and_why(self):
         """ORD-6: an assertion kill, a file that vanishes (exit 5) and an environment ImportError gave byte-identical
         records ({mutant, killed: true}). Now: KILLED with the failing test named, INFRA exit 5, INFRA not confirmed."""

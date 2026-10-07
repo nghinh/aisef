@@ -1213,14 +1213,15 @@ def _run_file(tg: _Target, rel: str, rows: list, *, select: str | None = None, f
     begun, elapsed = time.monotonic(), 0.0
     row: dict = {"file": rel, **({"role": role} if role else {}), **({"select": select} if select else {})}
     rows.append(row)
-    holder = tempfile.TemporaryDirectory(dir=tg.scratch, prefix="run-")
-    run = pathlib.Path(holder.name)
+    holder = None
     path = pathlib.PurePosixPath(rel)
     # failfast: a mutant is killed by its first failing test; -v names every test and every skip
     cmd = [sys.executable, "-m", "unittest", "discover", "-v", *(["-f"] if failfast else []), "-s", str(path.parent),
            "-t", "tests", "-p", path.name, *(["-k", select] if select else [])]
-    log = run / "kill-test.log"   # beside the run's own directories, never in the tree (OBS-S2-3)
     try:
+        holder = tempfile.TemporaryDirectory(dir=tg.scratch, prefix="run-")
+        run = pathlib.Path(holder.name)
+        log = run / "kill-test.log"   # beside the run's own directories, never in the tree (OBS-S2-3)
         try:
             with open(log, "wb") as out:
                 r = ProcessRange(f"kill tests {rel}", cmd, cwd=tg.tree, env=_env(run, f"{tg.worker}:{tg.seq}"),
@@ -1288,9 +1289,14 @@ def _run_file(tg: _Target, rel: str, rows: list, *, select: str | None = None, f
         row["stopped"] = str(e)
         row.setdefault("leaked", []).extend(e.leaked)
         raise
+    except Exception as e:   # the runner's own failure (EMFILE making the run directory, ...): unknown state (VS-4)
+        row.setdefault("outcome", "INFRA")
+        row["stopped"] = f"RUNNER_EXCEPTION: {e!r}"
+        raise _Stop(row["stopped"]) from e
     finally:
-        with contextlib.suppress(OSError):
-            holder.cleanup()
+        if holder is not None:
+            with contextlib.suppress(OSError):
+                holder.cleanup()
         row["overhead_s"] = round(time.monotonic() - begun - elapsed, 2)
     return row
 
@@ -1407,12 +1413,12 @@ def run_target(root: pathlib.Path, target: str, tests: list[str], pristine: tupl
         if [k for k in tests if k in NOT_KILL_FILES]:
             out["error"] = f"not a kill file: {[k for k in tests if k in NOT_KILL_FILES]} (NOT_KILL_FILES)"
             return _summarise(out)
-        tg = _Target(rel, scratch, ca.establish(scratch), worker, pristine=src_root, tests=list(tests),
-                     last=int((src_root / rel).stat().st_mtime))   # the checkout's own (copy2): stamps are above it
-        _new_tree(tg)
-        tg.version, tg.null = original, null_mutant(original, func)
-        where = "before the target"
-        try:
+        tg, where = None, "before the target"
+        try:   # establish, the first tree and T0 are inside too: an exception there keeps the rows and stops (VS-4)
+            tg = _Target(rel, scratch, ca.establish(scratch), worker, pristine=src_root, tests=list(tests),
+                         last=int((src_root / rel).stat().st_mtime))   # the checkout's own (copy2): stamps are above it
+            tg.null, tg.version = null_mutant(original, func), original
+            _new_tree(tg)
             _settle(tg)   # what an earlier target of this worker left
             where = "before mutant 1 (T0 {file})"
             refused = _baseline(tg, out.setdefault("t0", []))
@@ -1435,13 +1441,15 @@ def run_target(root: pathlib.Path, target: str, tests: list[str], pristine: tupl
                 _classify(entry)
                 if on_mutant:
                     on_mutant(entry)
-        except _Stop as e:
-            rows = [*out.get("t0", []), *(x for r in results for x in r.get("files", []))]
+        except Exception as e:   # a stop, or the runner's own failure outside a mutant's chain: nothing more runs
+            stop = e if isinstance(e, _Stop) else _Stop(f"RUNNER_EXCEPTION: {e!r}")
+            rows = [*out.get("t0", []), *out.get("original", []), *(x for r in results for x in r.get("files", []))]
             file = next((r["file"] for r in reversed(rows) if r.get("stopped")), "?")
-            out.update(error=f"{e.code} {where.format(file=file)}: {e.detail}", stopped=True,
-                       **({"leaked": e.leaked} if e.leaked else {}))
+            out.update(error=f"{stop.code} {where.format(file=file)}: {stop.detail}", stopped=True,
+                       **({"leaked": stop.leaked} if stop.leaked else {}))
         finally:
-            tg.holder.cleanup()
+            if tg is not None and tg.holder is not None:
+                tg.holder.cleanup()
     return _summarise(out)
 
 
@@ -1585,12 +1593,17 @@ def main(argv: list[str] | None = None) -> int:
     if argv[:1] == ["run"]:
         chosen = argv[1:] or list(TARGETS)
         worker = _worker(ROOT)
-        left = _earlier(worker)
+        try:
+            left = _earlier(worker)
+        except OSError as e:
+            print(f"STOPPED before the first target: HOST_TABLE_UNREADABLE: {e}", flush=True)
+            return 3
         if left:  # a restarted worker never runs beside what an earlier run of it left (PL-3 verifier (e))
             print(f"STOPPED before the first target: an earlier run of this worker left {left} alive", flush=True)
             return 3
         with tempfile.TemporaryDirectory(prefix=f"aisef-pristine-{worker}-") as p:
             pristine = _pristine(ROOT, pathlib.Path(p) / "tree")   # once, before any record is written (FS-4)
+            done: set[str] = set()
             for phase, rel in RECORDS.items():
                 mine = [t for t in chosen if t in PHASE_TARGETS[phase]]
                 if not mine:
@@ -1601,14 +1614,20 @@ def main(argv: list[str] | None = None) -> int:
                 kept = [t for t in record["targets"] if t["target"] not in mine and t["target"] in PHASE_TARGETS[phase]]
                 fresh = []
                 for target in mine:  # the record is written after every target: a run that dies keeps what it measured
-                    t = run_target(ROOT, target, TARGETS[target], pristine, on_mutant=_checkpoint)
+                    try:
+                        t = run_target(ROOT, target, TARGETS[target], pristine, on_mutant=_checkpoint)
+                    except Exception as e:   # outside run_target's own guard (its copy, mutants()): named, never lost
+                        t = _summarise({"target": target, "runner": 2, "kill_tests": list(TARGETS[target]), "mutants": 0,
+                                        "results": [], "error": f"RUNNER_EXCEPTION before the target: {e!r}",
+                                        "stopped": True})
+                    done.add(target)
                     fresh.append(t)
                     record["targets"] = sorted(kept + fresh, key=lambda x: x["target"])
                     out.write_text(json.dumps(record, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
                     print(f"{t['target']}: {t.get('killed')}/{t.get('mutants')} killed; classes {t.get('classes')}; "
                           f"survivors {t.get('survivors')}" + (f" ERROR {t['error']}" if t.get("error") else ""), flush=True)
                     if t.get("stopped"):   # the worker never runs beside a process it cannot prove its own
-                        rest = [x for x in chosen if x in TARGETS][chosen.index(target) + 1:]
+                        rest = [x for x in chosen if x in TARGETS and x not in done]   # targets run phase by phase
                         print(f"STOPPED {target}: {t['error']}\nNOT RUN {rest}", flush=True)
                         return 3
         unknown = [t for t in chosen if t not in TARGETS]
