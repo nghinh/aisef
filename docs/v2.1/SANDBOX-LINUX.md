@@ -235,7 +235,9 @@ read-only mounted directory prints its JSON.
   returns counts as a survivor only if still alive after up to 1 s, and the sleeper outlives the probe's 60 s limit
   plus that second (§5; `test_a_sleeper_still_dying_when_bubblewrap_returned_is_no_survivor`,
   `test_a_killed_sleeper_is_no_survivor_a_live_one_is`, which does not single out the zombie filter: a killed sleeper's
-  command line is gone too; `test_the_sleeper_outlives_a_probe_that_used_all_its_time_and_the_grace`).
+  command line is gone too; `test_the_sleeper_outlives_a_probe_that_used_all_its_time_and_the_grace`; and the grace
+  `_survivors` actually uses is `SURVIVOR_GRACE`, on a clock of the test's own:
+  `test_the_grace_used_is_survivor_grace_so_a_sleeper_ending_just_after_it_is_still_a_survivor`).
 
 **Kernel change.** This touches `aisef2/` (settings, client, run, cli, and the new `confine.py`): it needs mutation
 coverage and re-qualification outside the current measured snapshot. `confine.py` is **not** a mutation target today:
@@ -268,6 +270,29 @@ failed `test_what_is_measured_decides_not_the_name_of_the_tool` in every later r
 as killed for that reason alone), so the mutants after it were run again on a clean copy, removing such a file after
 each run; the counts above are from the clean runs.
 
+Round 5 (`2cd02e9`) adds one test and changes no code.
+`test_the_grace_used_is_survivor_grace_so_a_sleeper_ending_just_after_it_is_still_a_survivor` runs `_survivors` on a
+clock of its own (`confine.time` replaced: `monotonic` reads it, `sleep` advances it) against a sleeper alive until
+`SURVIVOR_GRACE` + 0.5 s, and requires it reported, only once the grace has passed: the look that decides comes
+after `SURVIVOR_GRACE` and before `SURVIVOR_GRACE` + 0.5 s, whatever grace and settling between looks `_survivors`
+uses. The relation that makes the grace safe is pinned, since `764dfa2`, by
+`test_the_sleeper_outlives_a_probe_that_used_all_its_time_and_the_grace`, from the probe's own call (the sleep and
+the timeout passed to it) and the constant: sleep > timeout + `SURVIVOR_GRACE` + 1 s
+for the last look — the grace stays below the window in which a real survivor of a probe that exited 0 just inside
+its limit is still alive, `SLEEPER`.x − `PROBE_TIMEOUT` − 1 = 120.x − 60 − 1 = 59.x s. The two together pin it on
+the grace used, not only on the constant; no third test is added for it. Mutants, one at a time on scratch copies of
+`0e2582a` and `2cd02e9`, each after a green baseline (Ran 29 OK; Ran 30 OK), judged by
+`env PATH=<a PATH without opencode> PYTHONPATH=<copy> python3 -P -m unittest tests.v2.test_v21_confine` in the copy:
+the effective grace ×100 with the constant unchanged (`deadline = time.monotonic() + SURVIVOR_GRACE * 100`) survives
+the 29 tests at `0e2582a` (the relation test reads the constant; no other grace test has an upper bound) and is
+killed by the 30 at `2cd02e9`, by the clock test alone; at `2cd02e9`, a grace just above the window
+(`SURVIVOR_GRACE = 60.0`: 60 + 60 + 1 = 121 > 120.x) and one of the sleeper's whole lifetime (`120.0`) are each killed
+by the relation test alone. A grace of 40 s (`SURVIVOR_GRACE = 40.0`) survives at both commits and is no
+violation: it satisfies the relation, 60 + 40 + 1 = 101 s < 120.x s, so a survivor is still alive at the last look;
+only a measurement with a survivor is slower (the module takes 134 s instead of 17 s). Pinning the constant's value
+would kill it, but would test a number, not the behaviour, so it is not pinned. The unmutated module at `2cd02e9`, in
+the worktree: Ran 30 OK.
+
 ## 7. Limits (not confined / not claimed)
 
 - **Not confined** by this track: the kernel's own execution of the developer's tests and the probes' execution of
@@ -296,7 +321,7 @@ each run; the counts above are from the clean runs.
 
 | Deliverable | Level | Why |
 |---|---|---|
-| the setting, the argv builder, fail-closed refusal of run / `--check` / session, each check of the measurement | **M3** | `test_v21_confine` (29 tests, all its own) on macOS with fake clients and providers; no OS boundary exercised on macOS. |
+| the setting, the argv builder, fail-closed refusal of run / `--check` / session, each check of the measurement | **M3** | `test_v21_confine` (30 tests, all its own) on macOS with fake clients and providers; no OS boundary exercised on macOS. |
 | the success path of a confined run (every session started through the bwrap argv, the reviewer's workspace read-only, the records saying so) | **M3** | `test_v21_confine.RunFailClosed.test_a_confined_run_starts_every_session_through_bubblewrap_and_says_so`: the **measurement stubbed** and the argv built for Linux, a recording fake bubblewrap that confines nothing — the wiring, not a boundary. |
 | the confinement boundary itself inside a Linux container | **M4** | `validation/v21/sandbox/run.sh` under real `docker`: real bwrap 0.12.0, real namespaces, a real host port, the container's real processes and sockets; the kernel's own `confine.measure` and the session's `confine.wrap` run in the container; each claim an operation tried (§5). A standalone harness, not `aisef run`; the client is a script, no provider — so not M5. |
 | a confined real `aisef run` on Linux end to end | **M6** | not done: the macOS host has no Linux backend to run `aisef run` itself under bwrap. |
