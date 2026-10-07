@@ -17,7 +17,7 @@ mục nguồn vào commit, test và mức đã có, và ghi rõ chỗ không xá
 | Báo cáo 360° | `docs/DANH-GIA-360-V2.0-2026-10-06.md` tại `c9c736f` |
 | Mức đạt | `docs/v2.1/REPORT.md` §2 tại `c9c736f` |
 | Nghiên cứu upstream (165 xác nhận / 46 phải sửa / 1 bị bác / 1 không kiểm được) | `docs/v2.1/research/UPSTREAM-RESEARCH.json` tại `c9c736f` |
-| Commit 2.1 | `git log 610a593..c9c736f` (66 commit); nhánh 2.0.1 `release/v2.0.1-prep` = `f006d3d` (local) |
+| Commit 2.1 | `git log 610a593..c9c736f` (66 commit); nhánh 2.0.1 `release/v2.0.1-prep` = `f006d3d` (local, chưa push; ghi ở `other_refs` của JSON, chỉ kiểm khi có `--with-ref`) |
 
 ## Cách đọc
 
@@ -26,9 +26,11 @@ mục nguồn vào commit, test và mức đã có, và ghi rõ chỗ không xá
 - **Upstream**: `repo@commit` `tệp:dòng` — nhãn của tuyên bố trong nghiên cứu (**CODE** đọc trong mã · **README** chỉ
   tài liệu nói · **INFERENCE** suy luận chưa đo · **EXPERIMENT** số đo do upstream công bố · **NOT_FOUND** đề xuất nói
   mà mã không xác nhận) và kết quả của người kiểm chứng thứ hai (confirmed / corrected / refuted). Khi "corrected" hay
-  "refuted", `tệp:dòng` là của người kiểm chứng.
+  "refuted", `tệp:dòng` là của người kiểm chứng; khi người kiểm chứng phân lại tuyên bố (N19 của open-code-review,
+  N-18 của MiMo), nhãn là của người kiểm chứng và nhãn gốc của nghiên cứu ghi kèm.
 - **Mức (REPORT §2)**: mức của hạng mục REPORT tương ứng, chép nguyên và kiểm bằng máy; hàng không có hạng mục riêng
-  trong REPORT để trống (không tự gán mức). M5 (live): không mục nào.
+  trong REPORT để trống (không tự gán mức). Hàng chỉ số của 360 §7 (R-M1…R-M9) không mang mức: mức của hạng mục liên
+  quan không phải mức của chỉ số. M5 (live): không mục nào. M4 là của lượt CLI thật tại `b72e51e` (xem "Giới hạn").
 - **Kiểm cơ học**: chuỗi phải có / không được có trong một tệp tại HEAD (hoặc commit ghi kèm) — bằng chứng cho các câu
   về mã hiện tại.
 - **Chưa xác nhận được**: phần của hàng dựa vào lời của tài liệu khác mà repo không cho kiểm lại.
@@ -39,14 +41,23 @@ mục nguồn vào commit, test và mức đã có, và ghi rõ chỗ không xá
 python3 -P validation/v21/traceability_check.py                       # mọi hàng tại c9c736f + khối sinh của tệp này
 python3 -P validation/v21/traceability_check.py --proposal <tệp đề xuất>  # thêm: mục của đề xuất đúng nguyên văn, đúng sha256
 python3 -P validation/v21/traceability_check.py --at HEAD             # cùng các khẳng định ở một commit mới hơn
+python3 -P validation/v21/traceability_check.py --with-ref release/v2.0.1-prep  # thêm: 7 ô đọc trên nhánh 2.0.1 (local)
 ```
 
 Bộ kiểm: commit tồn tại, là tổ tiên của HEAD (hoặc của `f006d3d` với nhánh 2.0.1) và chạm đúng các đường dẫn ghi; mỗi
-reproducer tồn tại (AST); mỗi "kiểm cơ học" đúng; mức khớp REPORT §2; mỗi nguồn upstream là một tuyên bố của nghiên cứu với
-đúng nhãn, đúng kết quả kiểm chứng, đúng commit đã đọc; mục 360° đúng nguyên văn; mỗi mục còn mở có quyết định `open` hoặc
-`blocked`. Test: `tests/test_v21_traceability.py`. **Giới hạn:** reproducer được kiểm là *tồn tại*, không được chạy lại khi
+reproducer tồn tại (AST); mỗi "kiểm cơ học" đúng và có đúng một khẳng định; mức khớp REPORT §2; mỗi nguồn upstream là một
+tuyên bố của nghiên cứu với đúng nhãn (của người kiểm chứng khi họ phân lại), đúng kết quả kiểm chứng, đúng commit đã đọc,
+và mọi số dòng ở `tệp:dòng` có trong bằng chứng của nghiên cứu (của người kiểm chứng khi corrected/refuted); mục 360° đúng
+nguyên văn; hàng `open`, `blocked`, `adapted` ghi phần còn thiếu; "Mục còn mở" và tập hàng `open`/`blocked` trùng nhau.
+Khoá lạ trong JSON là lỗi, không bị bỏ qua; mọi revision phải là mã commit hex (`--at`, `--with-ref` do git phân giải
+trước). Mặc định bộ kiểm chỉ đọc object tới được từ HEAD, nên chạy được trên mọi clone của nhánh; 7 ô đọc trên nhánh
+2.0.1 local (commit `c0ec1a5`, `f006d3d` và reproducer ở `f006d3d`, hàng P-V2-01, P-GATE-2.0.1, R-P0-1) chỉ được kiểm khi
+có `--with-ref release/v2.0.1-prep`, và dòng OK nói rõ chúng chưa được kiểm. Test: `tests/test_v21_traceability.py`. **Giới hạn:** reproducer được kiểm là *tồn tại*, không được chạy lại khi
 lập bảng; mức M3/M4 là của REPORT, đối chiếu với output CLI đã commit (`docs/v2.1/evidence/cli-integration-b72e51e.out`)
-chứ không đo lại.
+chứ không đo lại. Output đó là của mã tại `b72e51e`: giữa `b72e51e` và `c9c736f` chỉ hai commit chạm `aisef2/` hoặc
+`aisef/` — `a912be6` và `3061ec0` — đổi đường ghi của `aisef2/app/bundle_cli.py` (init/seal/approve/migrate ghi qua
+`_create`, tạo độc quyền O_EXCL) và một chú thích trong `review_verify.py`. Mức M4 vì vậy đọc là "M4 tại `b72e51e`"; byte
+của `bundle_cli.py` tại `c9c736f` chưa chạy qua CLI thật (kiểm cơ học ở [P-V2-07](#p-v2-07)).
 
 ## Điều đối chiếu tìm thấy (so với tài liệu hiện có)
 
@@ -61,25 +72,34 @@ chứ không đo lại.
    REPORT §4.1 (output chỉ có S1 RETRY → COMMIT) và tệp anchor 0444 của D5 — ghi ở cột "Chưa xác nhận được".
 5. **Thứ tự §10 của đề xuất** ("05/06/08/11/12 → 07/09 → 10 → 13"): 06, 08, 11 rồi 07, 09, 10 đã làm (13: chỉ
    harness); **05 (sandbox) và 12 (corpus ghi thật) — hai mục đứng đầu — chưa làm.**
-6. **Kế toán reasoning không đếm hai lần** ([P-11.3](#p-113)): đo trên 270 step của smoke #2 — `total` = input + output +
-   reasoning + cache ở 270/270 step, nên `output` của client không gồm `reasoning` và cách tính của `usage._usd` đúng cho
-   phiên bản client đó.
+6. **Kế toán reasoning: số đo có, kết luận là suy luận** ([P-11.3](#p-113)): trên 270 step của smoke #2, `total` =
+   input + output + reasoning + cache ở 270/270 step (lệnh đo ghi ở hàng). *Nếu* `total` là số provider trả về thì
+   `output` của client không gồm `reasoning` và `usage._usd` không đếm hai lần; nếu OpenCode 1.18.31 tự cộng `total` từ
+   các trường của nó thì đẳng thức đúng bất kể `output` chứa gì. Repo không có mã OpenCode để phân định: INFERENCE.
+   Không test nào định giá một step có reasoning ≠ 0.
 7. Các mục khác không có trong STATUS: action chưa ghim SHA và không có mục sổ cho phán quyết "FINAL RELEASE EXECUTION"
    ([R-P0-4](#r-p0-4)); link GitHub còn trên landing, salekit, README.vi ([R-P0-5](#r-p0-5)); `estimated` không có trạng
    thái riêng và request HTTP lỗi không có trong telemetry ([P-V2-11](#p-v2-11)); không có đề xuất sửa contract sinh từ
    finding ([P-4.3a](#p-43a)); không có bậc kiểm độ đặc hiệu của contract ([P-9.3](#p-93)).
+8. **REPORT §1 ghi "mã cuối `b72e51e`"**, không còn đúng tại `c9c736f` (a912be6, 3061ec0 đổi `aisef2/`); mức M4 là "M4 tại
+   `b72e51e`" (xem "Giới hạn").
+9. **Harness thí nghiệm chỉ khoá khung** ([P-6.2a](#p-62a)): `harness.check` đòi đúng tập khoá cấp trên cùng, seal, mức
+   danh tính model kèm lý do và evaluator ẩn; nội dung các trường §6.2 (snapshot digest, adapter version, image digest…)
+   không được đòi.
 
 Không mục nào ở đây được sửa hay triển khai lại trong lúc lập bảng.
 
 <!-- rows:begin — generated by validation/v21/traceability_check.py --render; do not edit by hand -->
-Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 25, adapted 18, declined 16, blocked 17, open 12.
+Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 24, adapted 17, declined 16, blocked 18, open 13.
 
 ## Mục còn mở
 
 - **Linux sandbox (F / B-07)**: [P-V2-05](#p-v2-05), [P-ADJ-4](#p-adj-4), [P-7c](#p-7c), [P-12-1](#p-12-1), [R-P1-12](#r-p1-12), [R-M5](#r-m5)
 - **Gói ngữ cảnh / checkpoint theo MiMo (D4)**: [P-5.3a](#p-53a)
-- **Lượt chạy live (provider thật)**: [P-ADJ-5](#p-adj-5), [P-11.2](#p-112), [R-P1-11](#r-p1-11), [R-M1](#r-m1), [R-M2](#r-m2)
+- **Lượt chạy live (provider thật)**: [P-ADJ-5](#p-adj-5), [P-11.2](#p-112), [R-P1-11](#r-p1-11), [R-M1](#r-m1), [R-M2](#r-m2), [R-M3](#r-m3)
 - **So sánh hiệu quả có đối chứng (E2)**: [P-V2-13](#p-v2-13), [P-11.1](#p-111), [R-M6](#r-m6)
+- **Khác — chưa làm, chưa có quyết định (open)**: [P-V2-12](#p-v2-12), [P-4.3a](#p-43a), [P-9.3](#p-93), [P-GATE-2.1](#p-gate-21), [R-P0-4](#r-p0-4), [R-P1-9](#r-p1-9), [R-P1-10](#r-p1-10), [R-P2-20](#r-p2-20), [R-3.1](#r-31), [R-M4](#r-m4), [R-M8](#r-m8), [R-M9](#r-m9)
+- **Khác — bị chặn (blocked)**: [P-GATE-2.0.1](#p-gate-201), [R-P2-17](#r-p2-17), [R-M7](#r-m7)
 
 ## Bảng tóm tắt
 
@@ -88,7 +108,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 25, adapted 18, 
 | [P-V2-01](#p-v2-01) | Đóng startup injection và tách trusted runtime | adapted | A1 M3 | Không có ranh giới hệ điều hành (F/B-07). Canary qua đường app thật với provider thật: chưa chạy. |
 | [P-V2-02](#p-v2-02) | `RUN.json` thành projection kiểm được | adopted | A2 M4 | Không có anchor thì chỉ chứng minh nhất quán, không xác thực; nơi giữ anchor tin cậy chưa có (REPORT §4.3, §7… |
 | [P-V2-03](#p-v2-03) | Làn release 2.0.x, metadata và quyền publish | adapted | A9 M4, A10 M4 | CI, staging, RC: M6 (chủ dự án). Action chưa ghim SHA. Trang PyPI của 2.0.0 chỉ đổi khi có bản phát hành mới. |
-| [P-V2-04](#p-v2-04) | Sửa loader, preflight, redaction, phân loại lỗi môi trường | adopted | A3 M3, A4 M3, A5 M4, A6 M3, A7 M3, A8 M3 | Preflight thật mới chỉ tới loopback, chưa gặp redirect thật (REPORT §2 A6–A7). |
+| [P-V2-04](#p-v2-04) | Sửa loader, preflight, redaction, phân loại lỗi môi trường | adopted | A3 M3, A4 M3, A5 M4, A6 M3, A7 M3, A8 M3 | Preflight thật mới chỉ tới loopback, chưa gặp redirect thật (REPORT §2 A6–A7). Điều kiện của A5 (khoá git của… |
 | [P-V2-05](#p-v2-05) | Linux sandbox developer và candidate | blocked | F M6 | Toàn bộ. MỞ. |
 | [P-V2-06](#p-v2-06) | PRESERVE trước merge + sửa spec import | adopted | B1 M3, B3 M3 | Contract S-10-a sửa: M6 (B-04 chưa duyệt). 'Biến thể hợp lệ không bị bác nhầm' chỉ kiểm cho hai bản nháp S-10… |
 | [P-V2-07](#p-v2-07) | Bundle API/schema/example/coverage | adopted | B4 M4, B5 M4 | Chưa người ngoài nào thử (chưa đo). Độ phủ chỉ trên mệnh đề do tiêu chí khai — lint tự ghi 'AISEF does not pa… |
@@ -115,7 +135,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 25, adapted 18, 
 | [P-5.3a](#p-53a) | Checkpoint tối thiểu nên chứa các tham chiếu: `run_id`, `attempt_id`, `journal_sequence`,… | open | D4 M6 | Toàn bộ. MỞ. Nếu làm, tránh hai lỗi đã thấy ở upstream: agent chính ghi được checkpoint (N-04), writer chép n… |
 | [P-5.3b](#p-53b) | Hành động merge/commit phải có operation ID để không lặp tác dụng khi crash xảy ra giữa t… | adapted | D1 M4 | Nhận diện dựa vào quy ước của kernel (tên worktree, thông điệp merge); một commit tay giống quy ước chưa được… |
 | [P-5.3c](#p-53c) | nếu một số bước liên tiếp không tạo thay đổi mã, bằng chứng mới hoặc giả thuyết mới có că… | adapted | D3 M3 | Đơn vị đo là attempt (cùng lỗi), không phải bước/lượt trong một phiên; ngưỡng chưa hiệu chỉnh. |
-| [P-6.2a](#p-62a) | Mỗi thử nghiệm cần khóa các trường sau trước khi chạy: | adopted | E1 M3 | Chưa dùng cho lượt thật nào. |
+| [P-6.2a](#p-62a) | Mỗi thử nghiệm cần khóa các trường sau trước khi chạy: | adapted | E1 M3 | `harness.check` không đòi nội dung các trường §6.2 liệt kê: Workload ID, baseline commit, candidate snapshot … |
 | [P-6.2b](#p-62b) | Không suy ra danh tính model thực chỉ từ chuỗi tên provider trả về. | adopted | E1 M3 | Chỉ trong harness thí nghiệm; preflight của `aisef run` không đổi trong 2.1 về điểm này. |
 | [P-6.2c](#p-62c) | Tránh đưa dashboard, multi-cloud scheduler hoặc hàng loạt compute backend vào đường găng … | declined | — | — |
 | [P-7a](#p-7a) | Giới hạn tiền kiểm trước lượt kế tiếp nên có thể vượt trần bởi một request đang thực hiện… | adopted | — | Không đặt trước ngân sách request; sai số không được định lượng. |
@@ -126,7 +146,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 25, adapted 18, 
 | [P-9.3](#p-93) | Positive controls: nhiều triển khai đúng khác cấu trúc vẫn pass. | open | — | Toàn bộ, trừ S-10-a. |
 | [P-11.1](#p-111) | Cùng coding client/model chạy trực tiếp, cùng task và sandbox | blocked | E1 M3, E2 M6 | E2: MỞ; sandbox chung: MỞ. |
 | [P-11.2](#p-112) | Canary trước: một story, ngân sách nhỏ, đi qua cài package → CLI → client → probe → revie… | blocked | — | Canary live: MỞ. Bước 'cài package' chưa có trong lượt offline. |
-| [P-11.3](#p-113) | Cost ledger phải phân biệt input không cache, cache-read, cache-write và output; reasonin… | adopted | D2 M4 | Phép đo chỉ cho một phiên bản client (OpenCode 1.18.31 theo 360 §3.5); client/provider khác phải đo lại. |
+| [P-11.3](#p-113) | Cost ledger phải phân biệt input không cache, cache-read, cache-write và output; reasonin… | adopted | D2 M4 | Phép đo chỉ cho một phiên bản client (OpenCode 1.18.31 theo 360 §3.5); client/provider khác phải đo lại. Chưa… |
 | [P-12-1](#p-12-1) | Controller/runtime/evidence/key ở miền developer không ghi được; workload không cùng quyề… | blocked | F M6 | Toàn bộ. MỞ. |
 | [P-12-2](#p-12-2) | `-S` có kiểm thử đường app thật và cách nạp dependency rõ ràng. | adopted | A1 M3 | Không có lượt live qua đường app thật. |
 | [P-12-3](#p-12-3) | Candidate code chạy trong tiến trình/môi trường riêng, không được nạp vào process giữ khó… | adopted | — | Cùng user: không phải môi trường riêng ở mức OS. |
@@ -149,12 +169,12 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 25, adapted 18, 
 | [R-P0-5](#r-p0-5) | gỡ hoặc thay mọi liên kết GitHub trên aisef.io, salekit và `project.urls` của PyPI | adapted | — | Link trên landing, salekit, README.vi: còn. |
 | [R-P1-6](#r-p1-6) | V21-37 + V21-38 cùng lúc: tiêu chí import theo AST; chứng minh PRESERVE của story trước *… | adopted | B1 M3, B3 M3 | Contract S-10-a: B-04 chưa duyệt. |
 | [R-P1-7](#r-p1-7) | Công cụ bundle: API công khai + `aisef bundle init/seal/lint/rebind`, ví dụ ship kèm, tài… | adapted | B4 M4, B5 M4, B6 M3 | Người ngoài: chưa đo. |
-| [R-P1-8](#r-p1-8) | Chính sách review: không chặn, nhưng **đưa phát hiện thành phản hồi cho developer**, ghi … | adapted | C1 M4 | Precision/recall với mô hình thật: M6 (B-06, ngân sách). |
+| [R-P1-8](#r-p1-8) | Chính sách review: không chặn, nhưng **đưa phát hiện thành phản hồi cho developer**, ghi … | adapted | C1 M4 | Precision của reviewer: chưa đo. Precision/recall với mô hình thật: M6 (B-06, ngân sách). |
 | [R-P1-9](#r-p1-9) | Bậc "độ đặc hiệu" cho spec: mỗi spec phải SATISFIED trên ≥2 cài đặt đúng độc lập + đối ch… | open | — | Toàn bộ, trừ S-10-a. |
 | [R-P1-10](#r-p1-10) | Corpus "ghi thật" phát lại qua đường sản phẩm (`app.run.execute`, parser client thật, pre… | open | — | Toàn bộ. |
 | [R-P1-11](#r-p1-11) | Điểm dữ liệu thứ hai **có giá tiền**: cùng bundle, model khác (0 dòng mã) + lặp lại DeepS… | blocked | E2 M6 | Live: MỞ. |
 | [R-P1-12](#r-p1-12) | Giới hạn developer: ít nhất kiểm toán "tầm với" vào `RUN.json` và đưa bundle ra khỏi thư … | blocked | A2 M4, F M6 | Sandbox: MỞ. |
-| [R-P1-13](#r-p1-13) | Bộ nạp an toàn: mọi lỗi đầu vào → mã 2 kèm đường dẫn JSON; `--check` trả đúng lý do B4; e… | adopted | A3 M3, A4 M3, A5 M4, A6 M3, A7 M3, A8 M3 | — |
+| [R-P1-13](#r-p1-13) | Bộ nạp an toàn: mọi lỗi đầu vào → mã 2 kèm đường dẫn JSON; `--check` trả đúng lý do B4; e… | adopted | A3 M3, A4 M3, A5 M4, A6 M3, A7 M3, A8 M3 | Như P-V2-04: Preflight thật mới chỉ tới loopback, chưa gặp redirect thật (REPORT §2 A6–A7). Điều kiện của A5 … |
 | [R-P2-14](#r-p2-14) | Tách 1.x thành `aisef-legacy` (hoặc chỉ giữ `aisef legacy …`); `doctor` biết V2 | declined | — | Toàn bộ (2.2). |
 | [R-P2-15](#r-p2-15) | Client thứ hai (Claude Code hoặc Codex CLI); probe chạy với phụ thuộc đã khoá của dự án | declined | — | Toàn bộ (2.2). |
 | [R-P2-16](#r-p2-16) | Định vị lại thành **nhân kiểm chứng / cổng chấp nhận** dùng được cho PR của bất kỳ agent … | declined | — | Toàn bộ (2.2). |
@@ -162,17 +182,17 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 25, adapted 18, 
 | [R-P2-18](#r-p2-18) | Ăn kiêng bằng chứng: digest + tóm tắt trong git, luồng phiên thô và chunk Q4 sang release… | declined | — | Toàn bộ. |
 | [R-P2-19](#r-p2-19) | Mutation: ràng buộc theo AST của từng hàm thay vì sha256 nguyên file; thêm toán tử xoá câ… | declined | — | Toán tử xoá câu lệnh / biên số / handler: chưa có. |
 | [R-P2-20](#r-p2-20) | Giảm bus factor: runbook người bảo trì trong repo; một người review kernel không phải chủ… | open | — | Toàn bộ. |
-| [R-NOW](#r-now) | **Không làm bây giờ (nói ra để khỏi bị hút vào)**: thêm bậc Q, chạy lại Q4 với cùng seed,… | adapted | — | — |
+| [R-NOW](#r-now) | **Không làm bây giờ (nói ra để khỏi bị hút vào)**: thêm bậc Q, chạy lại Q4 với cùng seed,… | adapted | — | Không còn việc với mục này (danh sách 'không làm'); điều chỉnh duy nhất là mutation, theo RELEASE-DECISIONS s… |
 | [R-3.1](#r-31) | Băm lại bỏ sót `runtime/process_range.py`, `range_anchor.py` — mã quyết định quan sát có … | open | — | Toàn bộ. Sửa sẽ chạm `aisef2/probe` (kernel): cần mutation + hiệu chuẩn lại, ngoài snapshot đang đo. |
-| [R-M1](#r-m1) | Lượt live đạt `delivery_verdict PASS` (không miễn trừ) | blocked | E2 M6 | — |
-| [R-M2](#r-m2) | Workload × route × hệ điều hành đã chạy live | blocked | E2 M6, F M6 | — |
-| [R-M3](#r-m3) | Lỗi do review tìm thấy mà vẫn vào `main` | adapted | C1 M4 | — |
-| [R-M4](#r-m4) | Mệnh đề requirement được contract phủ | adapted | B5 M4 | — |
-| [R-M5](#r-m5) | Đọc ra ngoài workspace của developer | blocked | F M6 | — |
-| [R-M6](#r-m6) | USD / story giao được | blocked | D2 M4, E2 M6 | — |
-| [R-M7](#r-m7) | Thời gian từ bản vá đến PyPI | blocked | A9 M4 | — |
-| [R-M8](#r-m8) | Người dùng ngoài | open | — | — |
-| [R-M9](#r-m9) | Mục backlog có reproducer | open | — | — |
+| [R-M1](#r-m1) | Lượt live đạt `delivery_verdict PASS` (không miễn trừ) | blocked | — | Chưa đạt: 0 lượt live trong 2.1 (mục tiêu ≥ 1 trên workload chưa từng thấy). |
+| [R-M2](#r-m2) | Workload × route × hệ điều hành đã chạy live | blocked | — | Chưa đạt: vẫn 1 × 1 × macOS, không có Linux (mục tiêu ≥ 2 × 2, có Linux). |
+| [R-M3](#r-m3) | Lỗi do review tìm thấy mà vẫn vào `main` | blocked | — | Chưa đo live, chưa báo cạnh 59/59. Offline: 1/5 dạng lỗi lịch sử (R-7/1) UNANCHORED nên vẫn lọt gate (P-V2-09… |
+| [R-M4](#r-m4) | Mệnh đề requirement được contract phủ | open | — | RUN.json chưa mang độ phủ: mục tiêu 2.1 chưa đạt (chỉ `aisef bundle lint` báo, trên mệnh đề do tiêu chí khai). |
+| [R-M5](#r-m5) | Đọc ra ngoài workspace của developer | blocked | — | Chưa đo; không có ranh giới hệ điều hành (F/B-07). |
+| [R-M6](#r-m6) | USD / story giao được | blocked | — | Chưa có số: 0 lượt live để chia USD cho story giao được. |
+| [R-M7](#r-m7) | Thời gian từ bản vá đến PyPI | blocked | — | Chưa đo: chưa phát hành bản nào trong 2.1 (B-02). |
+| [R-M8](#r-m8) | Người dùng ngoài | open | — | Chưa đạt: 0 người dùng ngoài theo những gì repo cho biết (mục tiêu ≥ 1 đối tác thiết kế). |
+| [R-M9](#r-m9) | Mục backlog có reproducer | open | — | Chưa đo lại: 38 mục của `docs/v2/V2.1-BACKLOG.md` chưa được đối chiếu với tiêu chí 'có reproducer'. |
 
 ## Từng hàng
 
@@ -234,14 +254,14 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 25, adapted 18, 
 - **Commit:** `106f72d`: aisef2/app/bundle.py, aisef2/app/settings.py, aisef2/app/run.py, tests/v2/test_v21_inputs.py; `b029236`: aisef2/app/preflight.py, aisef2/app/client.py, tests/v2/test_v21_transport.py; `51c5241`: aisef2/orchestrate/story_runner.py, aisef2/orchestrate/workspace.py, tests/v2/test_v21_orchestration.py; `4ea4276`: aisef2/orchestrate/story_runner.py
 - **Mức (REPORT §2):** A3 = M3, A4 = M3, A5 = M4, A6 = M3, A7 = M3, A8 = M3 — Khớp REPORT. Lưu ý khi kiểm lại: M4 của A5 dựa vào `--check` ready qua CLI thật, nhưng repo của lượt đó được dựng bằng `git init` sạch, HOME riêng (validation/v21/cli_integration/run.sh) — không có khoá git của editor; M4 cho thấy đường clone chạy qua CLI thật, điều kiện của A5 chỉ được tái hiện ở test (M3).
 - **Tiêu chí nghiệm thu:** Dữ liệu sai có lỗi vị trí; redirect không làm lộ auth; log đã redact kể cả lỗi/ngắt có xử lý; git lỗi không giả thành product defect
-- **Còn thiếu:** Preflight thật mới chỉ tới loopback, chưa gặp redirect thật (REPORT §2 A6–A7).
+- **Còn thiếu:** Preflight thật mới chỉ tới loopback, chưa gặp redirect thật (REPORT §2 A6–A7). Điều kiện của A5 (khoá git của editor) chỉ tái hiện ở test (M3): repo của lượt CLI thật (`git init` sạch) không có khoá đó.
 
 ### P-V2-05
 
 > Linux sandbox developer và candidate
 
 - **Nguồn:** đề xuất §10 V2-05
-- **Upstream:** opensandbox-group/OpenSandbox@c7dc78a4090e `đề xuất §10 V2-05 (nghiệm thu)` — INFERENCE (kiểm chứng: confirmed; claim P10)
+- **Upstream:** opensandbox-group/OpenSandbox@c7dc78a4090e `manager.go:253-296; config.py:1005; example.config.toml:98` — INFERENCE (kiểm chứng: confirmed; claim P10)
 - **Bằng chứng tại HEAD:** Không có mã cách ly nào tại HEAD (REPORT §2 F, §6). REPORT §6 ghi một phép đo môi trường (bwrap trong container chỉ chạy khi nới seccomp/apparmor/systempaths) — không có bản ghi đã commit cho phép đo đó.
 - **Kiểm cơ học:** `docs/v2.1/REPORT.md` chứa `chưa có mã cách ly nào trên nhánh`
 - **Reproducer:** Không có (chưa triển khai).
@@ -272,12 +292,12 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 25, adapted 18, 
 
 - **Nguồn:** đề xuất §10 V2-07
 - **Bằng chứng tại HEAD:** `aisef bundle init/seal/approve/lint/explain`, JSON Schema `aisef-v2-authoring/1`, hai ví dụ ship trong wheel (1 story, 3 story) (620bde7). Lượt CLI thật b72e51e: seal → approve ×3 → lint READY → `--check` ready; bundle thứ hai seal → approve ×4.
-- **Kiểm cơ học:** `docs/v2.1/evidence/cli-integration-b72e51e.out` chứa `"verdict": "READY"`; `pyproject.toml` chứa `"aisef2" = ["app/examples/*.json"]`; `docs/v2.1/evidence/cli-integration-b72e51e.out` chứa `AISEF does not parse the requirements document`
+- **Kiểm cơ học:** `docs/v2.1/evidence/cli-integration-b72e51e.out` chứa `"verdict": "READY"`; `pyproject.toml` chứa `"aisef2" = ["app/examples/*.json"]`; `docs/v2.1/evidence/cli-integration-b72e51e.out` chứa `AISEF does not parse the requirements document`; `aisef2/app/bundle_cli.py` @ b72e51e không chứa `def _create(`; `aisef2/app/bundle_cli.py` chứa `def _create(`
 - **Reproducer:** `tests/v2/test_v21_bundle_tools.py::Outsider::test_each_example_from_init_to_a_ready_check`, `tests/v2/test_v21_bundle_tools.py::Schema::test_the_schema_and_the_tool_agree_on_every_closed_key_set`, `tests/v2/test_v21_bundle_tools.py::Refusals::test_an_uncovered_requirement_is_named_where_admission_refuses_it`, `tests/v2/test_v21_bundle_tools.py::Refusals::test_an_edited_contract_loses_its_approval_on_reseal`
 - **Ảnh hưởng:** cao: không có đường soạn bundle được hỗ trợ (360 §3.6)
 - **Quyết định:** adopted — Đúng đề xuất.
 - **Commit:** `620bde7`: aisef2/app/bundle_cli.py, aisef2/app/examples/calc-1-story.json, aisef2/app/examples/calc-3-stories.json, docs/v2.1/bundle-authoring.schema.json, tests/v2/test_v21_bundle_tools.py
-- **Mức (REPORT §2):** B4 = M4, B5 = M4 — Khớp REPORT: output đã commit có seal, approve, lint READY, `--check` ready.
+- **Mức (REPORT §2):** B4 = M4, B5 = M4 — Khớp REPORT: output đã commit có seal, approve, lint READY, `--check` ready. M4 là của lượt CLI thật tại `b72e51e` (docs/v2.1/evidence/cli-integration-b72e51e.out); `aisef2/app/bundle_cli.py` đổi sau lượt đó ở a912be6 và 3061ec0 (đường ghi của init/seal/approve/migrate chuyển sang tạo độc quyền `_create`), nên byte tại c9c736f chưa chạy qua CLI thật: đọc là 'M4 tại b72e51e'.
 - **Tiêu chí nghiệm thu:** Người ngoài tạo bundle 3 story không import private constructor; mọi mệnh đề có trạng thái coverage rõ
 - **Còn thiếu:** Chưa người ngoài nào thử (chưa đo). Độ phủ chỉ trên mệnh đề do tiêu chí khai — lint tự ghi 'AISEF does not parse the requirements document'.
 - **Chưa xác nhận được:** Tài liệu ngữ pháp contract cho 18 lớp quan sát: không kiểm trong phiên này.
@@ -302,7 +322,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 25, adapted 18, 
 > OCR adapter + confirmed finding feedback
 
 - **Nguồn:** đề xuất §10 V2-09; §4.1–4.3
-- **Upstream:** alibaba/open-code-review@182898cf522d `internal/session/manifest.go:231-237, 854-858` — CODE (kiểm chứng: confirmed; claim P7); alibaba/open-code-review@182898cf522d `internal/session/manifest.go:165-170, 941-958` — CODE (kiểm chứng: confirmed; claim P8); alibaba/open-code-review@182898cf522d `cmd/opencodereview/review_cmd.go:326-352; internal/agent/agent.go:705-716` — CODE (kiểm chứng: corrected; claim P11); alibaba/open-code-review@182898cf522d `cmd/opencodereview/sarif.go:195-211, 288-297` — CODE (kiểm chứng: confirmed; claim N3); alibaba/open-code-review@182898cf522d `internal/agent/agent.go:479-482, 919-927` — CODE (kiểm chứng: confirmed; claim N6); alibaba/open-code-review@182898cf522d `người kiểm: EXPERIMENT pages/src/components/BenchmarkSection.tsx:43-56 (recall 11,7–20 %, precision 25,2–37,8 %)` — NOT_FOUND (kiểm chứng: refuted; claim N19)
+- **Upstream:** alibaba/open-code-review@182898cf522d `internal/session/manifest.go:231-237, 854-858` — CODE (kiểm chứng: confirmed; claim P7); alibaba/open-code-review@182898cf522d `internal/session/manifest.go:165-170, 941-958` — CODE (kiểm chứng: confirmed; claim P8); alibaba/open-code-review@182898cf522d `cmd/opencodereview/review_cmd.go:326-352; internal/agent/agent.go:705-716` — CODE (kiểm chứng: corrected; claim P11); alibaba/open-code-review@182898cf522d `cmd/opencodereview/sarif.go:195-211, 288-297` — CODE (kiểm chứng: confirmed; claim N3); alibaba/open-code-review@182898cf522d `internal/agent/agent.go:479-482, 919-927` — CODE (kiểm chứng: confirmed; claim N6); alibaba/open-code-review@182898cf522d `người kiểm: EXPERIMENT pages/src/components/BenchmarkSection.tsx:43-56 (recall 11,7–20 %, precision 25,2–37,8 %)` — EXPERIMENT (kiểm chứng: refuted, người kiểm chứng phân lại; nghiên cứu ghi NOT_FOUND; claim N19)
 - **Bằng chứng tại HEAD:** OCR v1.12.12 (182898c) chạy như tiến trình ngoài, ghim sha256, môi trường đã xoá biến OCR_/ANTHROPIC_/OTEL_; coverage do AISEF tính từ manifest, exit 0 không bao giờ là 'đã review đủ'; `finding_id` theo fingerprint SARIF; finding chỉ chặn khi CONFIRMED ∧ ANCHORED ∧ ≥ `min_severity` (ADR-7). Lượt CLI thật b72e51e: nhị phân OCR thật, settings `fix-loop` + `finder: ocr`, S1: RETRY → COMMIT, verify VERIFIED.
 - **Kiểm cơ học:** `docs/v2.1/evidence/cli-integration-b72e51e.out` chứa `ocr: open-code-review v1.12.12 (182898c) darwin/arm64 sha256 bf38abf320ead4e106b71c1582446364020711…`; `validation/v21/cli_integration/make_inputs.py` chứa `"review": {"policy": "fix-loop", "min_severity": "high", "finder": "ocr",`; `tests/v2/test_v21_review.py` chứa `{"repair-utf8-crash": V.UNANCHORED}`
 - **Reproducer:** `tests/v2/test_v21_review.py::HistoricalDefects::test_each_shipped_defect_is_confirmed_on_its_shape_and_not_on_the_reference`, `tests/v2/test_v21_review_chain.py::IncompleteReview::test_partial`, `tests/v2/test_v21_review_chain.py::NotABlocker::test_a_finding_that_does_not_reproduce_does_not_block`, `tests/v2/test_v21_review_ocr.py::Coverage::test_exit_0_is_not_a_full_review`, `tests/v2/test_v21_review_ocr.py::Findings::test_ids_are_ocr_s_sarif_fingerprint_stable_under_order_and_numbered_when_repeated`, `tests/v2/test_v21_review_chain.py::RealBinary::test_a_full_review_against_a_scripted_model` `RealBinary` cần `AISEF_TEST_OCR_EXE`: bỏ qua trong suite hermetic (REPORT §4.1).
@@ -468,7 +488,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 25, adapted 18, 
 > Không lấy tập `selected` của OCR làm toàn bộ phạm vi bắt buộc một cách mặc nhiên
 
 - **Nguồn:** đề xuất §4.2
-- **Upstream:** alibaba/open-code-review@182898cf522d `internal/agent/selection.go (lý do loại theo kích thước/extension/đường dẫn)` — CODE (kiểm chứng: confirmed; claim P14); alibaba/open-code-review@182898cf522d `internal/diff/git.go:28-41, 80-82; config/rules/system_rules.go:288-369` — CODE (kiểm chứng: confirmed; claim N9)
+- **Upstream:** alibaba/open-code-review@182898cf522d `internal/agent/selection.go:52-58, 92-95; agent.go:2042-2052; compression.go:29-31 (lý do loại theo kích thước/extension/đường dẫn; default_exclude_patterns.json)` — CODE (kiểm chứng: confirmed; claim P14); alibaba/open-code-review@182898cf522d `internal/diff/git.go:28-41, 80-82; config/rules/system_rules.go:288-369` — CODE (kiểm chứng: confirmed; claim N9)
 - **Bằng chứng tại HEAD:** Phạm vi bắt buộc do AISEF tính từ journal (khoảng base..candidate đã đóng băng); đường dẫn bắt buộc vắng trong preview (bị `.gitignore`/thư mục provider loại) ⇒ INDETERMINATE (UPSTREAM-RESEARCH.md).
 - **Reproducer:** `tests/v2/test_v21_review_ocr.py::Coverage::test_the_preview_s_exclusions_and_omissions_are_named`, `tests/v2/test_v21_review_ocr.py::Coverage::test_a_complete_run_of_the_frozen_range_covering_every_required_path`, `tests/v2/test_v21_review_ocr.py::Process::test_the_command_reviews_exactly_the_frozen_range_into_a_fresh_file`
 - **Ảnh hưởng:** cao: tệp bị OCR lọc vẫn có thể quan trọng với AISEF
@@ -556,11 +576,11 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 25, adapted 18, 
 > Có thể dùng để nhắc agent còn việc; không dùng thay acceptance hoặc để cấp `delivery_verdict PASS`.
 
 - **Nguồn:** đề xuất §5.2 (LLM judge)
-- **Upstream:** XiaomiMiMo/MiMo-Code@6babeb0b98f9 `packages/cli/src/session/goal.ts:64-79, 159-215` — CODE (kiểm chứng: confirmed; claim P-10); XiaomiMiMo/MiMo-Code@6babeb0b98f9 `packages/cli/src/session/prompt.ts:4140, 4142-4150, 4175-4188` — CODE (kiểm chứng: corrected; claim N-18)
+- **Upstream:** XiaomiMiMo/MiMo-Code@6babeb0b98f9 `packages/cli/src/session/goal.ts:64-79, 159-215` — CODE (kiểm chứng: confirmed; claim P-10); XiaomiMiMo/MiMo-Code@6babeb0b98f9 `packages/cli/src/session/prompt.ts:4140, 4142-4150, 4175-4188` — INFERENCE (kiểm chứng: corrected, người kiểm chứng phân lại; nghiên cứu ghi CODE; claim N-18)
 - **Bằng chứng tại HEAD:** Không có LLM judge nào trong 2.1; review của mô hình không bao giờ tự chặn.
 - **Kiểm cơ học:** `aisef2/app/review_verify.py` chứa `a model review alone never blocks`
 - **Reproducer:** Không có (không xây gì).
-- **Ảnh hưởng:** cao nếu sao chép: judge của MiMo dùng cùng model và lỗi judge tính là đạt (N-18)
+- **Ảnh hưởng:** cao nếu sao chép: judge của MiMo dùng cùng model với phiên (CODE, prompt.ts:4140). Lỗi judge (mạng, schema) có được tính là đạt hay không: INFERENCE theo người kiểm chứng (N-18) — ý định fail-open có ghi trong chú thích, nhưng lỗi provider có thể lan ra thay vì fail-open; chưa kiểm.
 - **Quyết định:** declined — Không sao chép; verdict chỉ từ obligation do probe chứng minh.
 - **Mức (REPORT §2):** REPORT §2 không có hạng mục riêng cho mục này.
 - **Tiêu chí nghiệm thu:** —
@@ -586,7 +606,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 25, adapted 18, 
 > Checkpoint tối thiểu nên chứa các tham chiếu: `run_id`, `attempt_id`, `journal_sequence`, `candidate_digest`, `contract_digest`, `phase`, `open_findings`, `next_action`, `context_refs`.
 
 - **Nguồn:** đề xuất §5.3
-- **Upstream:** XiaomiMiMo/MiMo-Code@6babeb0b98f9 `packages/cli/src/session/checkpoint-templates.ts:4-57, 88-100` — CODE (kiểm chứng: corrected; claim P-03); XiaomiMiMo/MiMo-Code@6babeb0b98f9 `README.md:156-160 (không có số đo nào trong repo)` — README (kiểm chứng: confirmed; claim P-04); XiaomiMiMo/MiMo-Code@6babeb0b98f9 `thiết kế của AISEF; checkpoint.ts:1424-1489` — INFERENCE (kiểm chứng: confirmed; claim P-14); XiaomiMiMo/MiMo-Code@6babeb0b98f9 `packages/cli/src/memory/memory-path-guard.ts:126-139` — CODE (kiểm chứng: confirmed; claim N-04); XiaomiMiMo/MiMo-Code@6babeb0b98f9 `packages/cli/src/agent/prompt/checkpoint-writer.txt:54-57` — CODE (kiểm chứng: confirmed; claim N-06)
+- **Upstream:** XiaomiMiMo/MiMo-Code@6babeb0b98f9 `packages/cli/src/session/checkpoint-templates.ts:4-57, 88-100` — CODE (kiểm chứng: corrected; claim P-03); XiaomiMiMo/MiMo-Code@6babeb0b98f9 `README.md:156-160 (không có số đo nào trong repo)` — README (kiểm chứng: confirmed; claim P-04); XiaomiMiMo/MiMo-Code@6babeb0b98f9 `thiết kế của AISEF; người kiểm: checkpoint.ts:1424-1451, 1453-1489` — INFERENCE (kiểm chứng: confirmed; claim P-14); XiaomiMiMo/MiMo-Code@6babeb0b98f9 `packages/cli/src/memory/memory-path-guard.ts:126-139` — CODE (kiểm chứng: confirmed; claim N-04); XiaomiMiMo/MiMo-Code@6babeb0b98f9 `packages/cli/src/agent/prompt/checkpoint-writer.txt:54-57` — CODE (kiểm chứng: confirmed; claim N-06)
 - **Bằng chứng tại HEAD:** Không có gói ngữ cảnh / checkpoint hỗ trợ nào tại HEAD (REPORT D4: M6). Phần 'trạng thái chuẩn do controller sở hữu' có qua `bundle continue`: sự thật là journal, không phải tóm tắt của agent (UPSTREAM-RESEARCH.md).
 - **Kiểm cơ học:** `docs/v2.1/REPORT.md` chứa `\| D4 \| gói ngữ cảnh kiểu MiMo \| **M6** \|`; `closure-evidence/v2/cycle2/RELEASE-DECISIONS.json` chứa `context/checkpoint theo MiMo`
 - **Reproducer:** Không có (chưa triển khai).
@@ -635,22 +655,21 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 25, adapted 18, 
 - **Nguồn:** đề xuất §6.2
 - **Upstream:** alphaXiv/OpenResearch@d52a05365622 `src/compute.rs:168-182, 41-49` — CODE (kiểm chứng: confirmed; claim P4); alphaXiv/OpenResearch@d52a05365622 `src/model.rs:66-86; store.rs:229-250` — INFERENCE (kiểm chứng: confirmed; claim N18)
 - **Bằng chứng tại HEAD:** Manifest `aisef.experiment/1` có khoá đóng (format, experiment_id, parent_experiment_id, pair, workload, source, evaluator, bundle, policy, command, client, model, environment, variable_under_test, limits, stop_rule, created_at), niêm phong bằng sha256 JSON chuẩn hoá; sửa ⇒ seal hỏng.
-- **Kiểm cơ học:** `validation/experiments/harness.py` chứa `FORMAT = "aisef.experiment/1"`; `validation/experiments/harness.py` chứa `"command", "client", "model", "environment", "variable_under_test", "limits", "stop_rule", "created…`
+- **Kiểm cơ học:** `validation/experiments/harness.py` chứa `FORMAT = "aisef.experiment/1"`; `validation/experiments/harness.py` chứa `"command", "client", "model", "environment", "variable_under_test", "limits", "stop_rule", "created…`; `validation/experiments/harness.py` không chứa `adapter_version`
 - **Reproducer:** `tests/v2/test_v21_experiment.py::Experiment::test_a_manifest_is_sealed_and_an_edit_breaks_the_seal`
 - **Ảnh hưởng:** cao cho tính đối chiếu
-- **Quyết định:** adopted — Đúng đề xuất.
+- **Quyết định:** adapted — Nhận khung: khoá đóng ở cấp trên cùng, niêm phong sha256, `model.identity_confidence` kèm lý do, `evaluator.exposed_to_developer` = false (`harness.check`). Nội dung bên trong các khoá khác không được đòi; không có quyết định nào ghi lại cho phần đó.
 - **Commit:** `a29e82b`: validation/experiments/harness.py
 - **Mức (REPORT §2):** E1 = M3 — Khớp REPORT.
 - **Tiêu chí nghiệm thu:** Kết quả từng obligation, finding, chi phí, thời gian và sự cố môi trường.
-- **Còn thiếu:** Chưa dùng cho lượt thật nào.
-- **Chưa xác nhận được:** Nội dung bắt buộc bên trong `environment` (image digest, dependency lock, mạng, quyền ghi): không kiểm trong phiên này.
+- **Còn thiếu:** `harness.check` không đòi nội dung các trường §6.2 liệt kê: Workload ID, baseline commit, candidate snapshot digest, digest requirements/bundle/evaluator/policy, nguồn gốc bộ test, client + phiên bản, adapter version, thông tin provider thực trả, environment image digest, dependency lock, mạng, quyền ghi, giới hạn thời gian/token/tiền. Chưa dùng cho lượt thật nào.
 
 ### P-6.2b
 
 > Không suy ra danh tính model thực chỉ từ chuỗi tên provider trả về.
 
 - **Nguồn:** đề xuất §6.2
-- **Upstream:** alphaXiv/OpenResearch@d52a05365622 `src/compute.rs:877-924` — CODE (kiểm chứng: corrected; claim N13); alphaXiv/OpenResearch@d52a05365622 `src/chat/mod.rs:7642-7653; store/telemetry.rs:12-57` — CODE (kiểm chứng: confirmed; claim N12)
+- **Upstream:** alphaXiv/OpenResearch@d52a05365622 `src/compute.rs:877-924` — CODE (kiểm chứng: corrected; claim N13); alphaXiv/OpenResearch@d52a05365622 `src/chat/mod.rs:7642-7653; store/telemetry.rs:12-47, 50-57` — CODE (kiểm chứng: confirmed; claim N12)
 - **Bằng chứng tại HEAD:** `model.identity_confidence` ∈ verified / provider_reported / unverified, bắt buộc kèm lý do (`harness.check`).
 - **Kiểm cơ học:** `validation/experiments/harness.py` chứa `IDENTITY = ("verified", "provider_reported", "unverified")`
 - **Reproducer:** `tests/v2/test_v21_experiment.py::Experiment::test_a_manifest_is_sealed_and_an_edit_breaks_the_seal` Test chỉ chạy manifest hợp lệ (`unverified`); không có test âm riêng cho trường thiếu.
@@ -667,7 +686,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 25, adapted 18, 
 > Tránh đưa dashboard, multi-cloud scheduler hoặc hàng loạt compute backend vào đường găng 2.1.
 
 - **Nguồn:** đề xuất §6.2
-- **Upstream:** alphaXiv/OpenResearch@d52a05365622 `đề xuất §6.2` — INFERENCE (kiểm chứng: corrected; claim P11)
+- **Upstream:** alphaXiv/OpenResearch@d52a05365622 `người kiểm: README.md:105-107@d52a053; up.rs:57-62, 790-830; remote_host.rs:749` — INFERENCE (kiểm chứng: corrected; claim P11)
 - **Bằng chứng tại HEAD:** Không có dashboard, scheduler hay compute backend nào được thêm (danh sách tệp đổi 610a593..c9c736f).
 - **Reproducer:** Không có (không xây gì).
 - **Ảnh hưởng:** —
@@ -696,7 +715,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 25, adapted 18, 
 > Đối chứng chính phải là cùng model, client, nhiệm vụ và tài nguyên chạy trực tiếp. mini là đối chứng phụ
 
 - **Nguồn:** đề xuất §7 mini-SWE-agent
-- **Upstream:** SWE-agent/mini-swe-agent@04d809ceab9d `src/minisweagent/models/litellm_model.py:66-71` — INFERENCE (kiểm chứng: confirmed; claim P2); SWE-agent/mini-swe-agent@04d809ceab9d `đề xuất §7` — INFERENCE (kiểm chứng: confirmed; claim P10)
+- **Upstream:** SWE-agent/mini-swe-agent@04d809ceab9d `src/minisweagent/models/litellm_model.py:66-71` — INFERENCE (kiểm chứng: confirmed; claim P2); SWE-agent/mini-swe-agent@04d809ceab9d `— (INFERENCE: nghiên cứu không dẫn tệp:dòng nào cho tuyên bố này)` — INFERENCE (kiểm chứng: confirmed; claim P10)
 - **Bằng chứng tại HEAD:** Cánh `direct` của harness: cùng client, cùng settings/route, task công khai; harness commit những gì client để lại. Không có cánh mini-SWE-agent trong `ARMS`.
 - **Kiểm cơ học:** `validation/experiments/harness.py` chứa `ARMS = ("direct", "aisef", "aisef+")`
 - **Reproducer:** `tests/v2/test_v21_experiment.py::Experiment::test_the_direct_arm_from_task_to_evaluated_result_and_its_replay`
@@ -712,7 +731,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 25, adapted 18, 
 > MVP nên là Linux executor, có thể điều khiển từ máy macOS.
 
 - **Nguồn:** đề xuất §7 OpenSandbox
-- **Upstream:** opensandbox-group/OpenSandbox@c7dc78a4090e `server/opensandbox_server/services/docker/docker_service.py:783-850; container_ops.py:362-496` — CODE (kiểm chứng: confirmed; claim P1); opensandbox-group/OpenSandbox@c7dc78a4090e `container_ops.py:362-400, 429-443; config.py:1216-1247` — CODE (kiểm chứng: confirmed; claim P8); opensandbox-group/OpenSandbox@c7dc78a4090e `config.py:1200-1204 (mặc định network host)` — CODE (kiểm chứng: confirmed; claim N1); opensandbox-group/OpenSandbox@c7dc78a4090e `components/execd/pkg/flag/parser.go:42,62-71; router.go:218-221` — CODE (kiểm chứng: confirmed; claim N4); opensandbox-group/OpenSandbox@c7dc78a4090e `docker_service.py:899-922; container_ops.py:422-424` — CODE (kiểm chứng: confirmed; claim N13); opensandbox-group/OpenSandbox@c7dc78a4090e `config.py:1118-1145, 995-1000, 1386-1396` — INFERENCE (kiểm chứng: confirmed; claim N25)
+- **Upstream:** opensandbox-group/OpenSandbox@c7dc78a4090e `server/opensandbox_server/services/docker/docker_service.py:783-850; container_ops.py:362-400, 402-496` — CODE (kiểm chứng: confirmed; claim P1); opensandbox-group/OpenSandbox@c7dc78a4090e `container_ops.py:362-400, 429-443; config.py:1216-1231, 1232-1247` — CODE (kiểm chứng: confirmed; claim P8); opensandbox-group/OpenSandbox@c7dc78a4090e `config.py:1200-1204 (mặc định network host)` — CODE (kiểm chứng: confirmed; claim N1); opensandbox-group/OpenSandbox@c7dc78a4090e `components/execd/pkg/flag/parser.go:42,62-71; router.go:218-221` — CODE (kiểm chứng: confirmed; claim N4); opensandbox-group/OpenSandbox@c7dc78a4090e `docker_service.py:899-922; container_ops.py:422-424` — CODE (kiểm chứng: confirmed; claim N13); opensandbox-group/OpenSandbox@c7dc78a4090e `config.py:1118-1145, 995-1000, 1386-1396` — INFERENCE (kiểm chứng: confirmed; claim N25)
 - **Bằng chứng tại HEAD:** Không có executor Linux tại HEAD. Mã OpenSandbox (c7dc78a) được đọc làm danh mục kiểm, không làm backend: mặc định network host, execd không xác thực trên Docker, chế độ bwrap nới container (UPSTREAM-RESEARCH.md).
 - **Kiểm cơ học:** `docs/v2.1/UPSTREAM-RESEARCH.md` chứa `danh mục kiểm cho V2-05`
 - **Reproducer:** Không có (chưa triển khai).
@@ -748,7 +767,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 25, adapted 18, 
 - **Ảnh hưởng:** cao (360 §3.6)
 - **Quyết định:** adapted — `run --resume` thay bằng `bundle continue` + `run --parent` (ADR-8); `assess` hoãn sang 2.2 (P-V2-14); thêm `approve` (duyệt từng contract, `human:<tên>`, ADR-6).
 - **Commit:** `620bde7`: aisef2/app/bundle_cli.py; `d622e71`: aisef2/app/bundle_cli.py, aisef2/app/cli.py; `919a271`: aisef/cli/parser.py, aisef2/app/bundle_cli.py
-- **Mức (REPORT §2):** B4 = M4, B5 = M4, D1 = M4 — Khớp REPORT.
+- **Mức (REPORT §2):** B4 = M4, B5 = M4, D1 = M4 — Khớp REPORT. B4/B5: M4 là của lượt CLI thật tại `b72e51e` (docs/v2.1/evidence/cli-integration-b72e51e.out); `aisef2/app/bundle_cli.py` đổi sau lượt đó ở a912be6 và 3061ec0 (đường ghi của init/seal/approve/migrate chuyển sang tạo độc quyền `_create`), nên byte tại c9c736f chưa chạy qua CLI thật: đọc là 'M4 tại b72e51e'. (kiểm cơ học ở P-V2-07)
 - **Tiêu chí nghiệm thu:** `seal` chỉ niêm phong phiên bản đã duyệt, không thay thế duyệt.
 - **Còn thiếu:** `assess --candidate`: chưa có.
 
@@ -800,15 +819,16 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 25, adapted 18, 
 > Cost ledger phải phân biệt input không cache, cache-read, cache-write và output; reasoning không đếm hai lần nếu provider đã gộp.
 
 - **Nguồn:** đề xuất §11.3
-- **Bằng chứng tại HEAD:** `usage.CLASSES` = input, cache_read, cache_write, output, reasoning; tiền = (output + reasoning) × giá output. Đo trong phiên lập bảng trên 270 step của luồng phiên smoke #2 (closure-evidence/v2/release/smoke-2/run-1/sessions): `total` = input + output + reasoning + cache.read + cache.write ở 270/270 step, và output 68 853 + reasoning 244 483 = 313 336 (con số output của EXPERIMENT-PLAN) ⇒ `output` của client không gồm `reasoning`, nên không đếm hai lần.
+- **Bằng chứng tại HEAD:** `usage.CLASSES` = input, cache_read, cache_write, output, reasoning; tiền = (output + reasoning) × giá output (`usage._usd`). Đo trong phiên lập bảng (lệnh ở cột reproducer) trên 270 step của luồng phiên smoke #2 (closure-evidence/v2/release/smoke-2/run-1/sessions): `total` = input + output + reasoning + cache.read + cache.write ở 270/270 step; 200 step có reasoning > 0 và ở cả 200 `total` ≠ input + output + cache; output 68 853 + reasoning 244 483 = 313 336 (con số output của EXPERIMENT-PLAN). Suy luận (INFERENCE): nếu `total` là số provider trả về thì `output` của client không gồm `reasoning` và `_usd` không đếm hai lần; nếu OpenCode tự cộng `total` từ chính các trường của nó thì đẳng thức đúng bất kể `output` chứa gì, và phép đo này không phân định được.
 - **Kiểm cơ học:** `aisef2/app/usage.py` chứa `CLASSES = ("input", "cache_read", "cache_write", "output", "reasoning")`; `docs/v2.1/EXPERIMENT-PLAN.md` chứa `313 336 output (gồm 244 483 reasoning)`
-- **Reproducer:** `tests/v2/test_v21_continue_usage.py::Usage::test_with_prices_known_and_a_blind_step_makes_it_partial`
+- **Reproducer:** `tests/v2/test_v21_continue_usage.py::Usage::test_without_prices_cost_is_unknown_never_zero` Test trên chỉ cho thấy tách 5 lớp token. Không test nào định giá một step có reasoning ≠ 0: test có giá duy nhất (`Usage::test_with_prices_known_and_a_blind_step_makes_it_partial`) định giá step o=0, r=0, cr=0; mọi lời gọi `usage.usage` khác trong tests/ không có bảng giá. Phép đo token (không phải test), chạy ở gốc repo: `python3 -P -c "import glob,json;e=[json.loads(x) for f in sorted(glob.glob('closure-evidence/v2/release/smoke-2/run-1/sessions/*.jsonl')) for x in open(f,encoding='utf-8')];k=[x['part']['tokens'] for x in e if x.get('type')=='step_finish'];s=lambda t:t['input']+t['output']+t['cache']['read']+t['cache']['write'];r=[t for t in k if t['reasoning']];print(len(k),sum(t['total']==s(t)+t['reasoning'] for t in k),sum(t['output'] for t in k),sum(t['reasoning'] for t in k),len(r),sum(t['total']!=s(t) for t in r))"` in ra `270 270 68853 244483 200 200`.
 - **Ảnh hưởng:** cao cho USD/story
 - **Quyết định:** adopted — Đúng đề xuất.
 - **Commit:** `d622e71`: aisef2/app/usage.py
-- **Mức (REPORT §2):** D2 = M4 — Khớp REPORT; phép đo token là đo lại trong phiên này (không phải test).
+- **Mức (REPORT §2):** D2 = M4 — Khớp REPORT (mức của D2, không của phép đo token); phép đo token là đo lại trong phiên này, không phải test.
 - **Tiêu chí nghiệm thu:** Lưu nguồn giá và ngày hiệu lực; với 9router/combo không có rate card, để unknown và báo token.
-- **Còn thiếu:** Phép đo chỉ cho một phiên bản client (OpenCode 1.18.31 theo 360 §3.5); client/provider khác phải đo lại.
+- **Còn thiếu:** Phép đo chỉ cho một phiên bản client (OpenCode 1.18.31 theo 360 §3.5); client/provider khác phải đo lại. Chưa có test định giá reasoning ≠ 0; 'không đếm hai lần' chưa được xác nhận trong mã OpenCode.
+- **Chưa xác nhận được:** Cách OpenCode 1.18.31 điền `tokens.total` (số provider trả hay tự cộng từ các trường của nó): repo không chứa mã nguồn OpenCode — vì vậy kết luận 'không đếm hai lần' là INFERENCE.
 
 ### P-12-1
 
@@ -1034,7 +1054,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 25, adapted 18, 
 - **Quyết định:** adopted — Xem P-V2-01.
 - **Commit:** `919a271`: aisef2/probe/process_effect.py; `c0ec1a5` (trên `f006d3d`): tests/v2/test_v201_venvs.py
 - **Mức (REPORT §2):** A1 = M3 — Khớp REPORT.
-- **Tiêu chí nghiệm thu:** đóng cơ chế duy nhất đã đo để mã ứng viên chạm kênh phán quyết
+- **Tiêu chí nghiệm thu:** 360 không ghi tiêu chí nghiệm thu cho mục này; theo chính mục: controller và test runner chạy với `-S` (hoặc băm cây venv trước mỗi probe; venv riêng cho test của developer)
 - **Còn thiếu:** Chưa đo một vụ giả mạo end-to-end qua `.pth` trong `aisef run` thật (360 §9) — giờ đã đóng ở mức cơ chế, OS chưa.
 
 ### R-P0-2
@@ -1063,7 +1083,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 25, adapted 18, 
 - **Quyết định:** adapted — Công cụ xong; runbook chưa viết, không có quyết định ghi lại.
 - **Commit:** `aa3c18a`: validation/qualification/release_rc.py, validation/v2_release_gate.py
 - **Mức (REPORT §2):** A9 = M4 — Khớp REPORT.
-- **Tiêu chí nghiệm thu:** hiện không phát hành nổi 2.0.1 nếu không sửa công cụ
+- **Tiêu chí nghiệm thu:** 360 không ghi tiêu chí nghiệm thu cho mục này; theo chính mục: `release_rc.py`/`v2_release_gate.py` nhận phiên bản làm tham số; có runbook vá 3 tầng và runbook yank
 - **Còn thiếu:** Runbook vá (3 tầng) và runbook yank: chưa có.
 
 ### R-P0-4
@@ -1077,7 +1097,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 25, adapted 18, 
 - **Ảnh hưởng:** cao: cổng con người khi phát hành là mềm (360 §3.4, §3.8)
 - **Quyết định:** open — Không có commit 2.1; phần GitHub settings là của chủ dự án; ghim SHA chưa làm.
 - **Mức (REPORT §2):** REPORT §2 không có hạng mục riêng cho mục này.
-- **Tiêu chí nghiệm thu:** cổng con người hiện là chuỗi JSON (360 §3.7, §3.8)
+- **Tiêu chí nghiệm thu:** 360 không ghi tiêu chí nghiệm thu cho mục này; theo chính mục: môi trường `pypi` có người duyệt bắt buộc, tag `v*` được bảo vệ, mọi action ghim SHA, phán quyết 'FINAL RELEASE EXECUTION' có trong RELEASE-DECISIONS
 - **Còn thiếu:** Toàn bộ.
 
 ### R-P0-5
@@ -1119,7 +1139,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 25, adapted 18, 
 - **Ảnh hưởng:** cao
 - **Quyết định:** adapted — Băm AST bị loại theo đề xuất §3 và ADR-2 (không chứng minh tương đương).
 - **Commit:** `620bde7`: aisef2/app/bundle_cli.py; `919a271`: aisef2/probe/calibration.py
-- **Mức (REPORT §2):** B4 = M4, B5 = M4, B6 = M3 — Khớp REPORT.
+- **Mức (REPORT §2):** B4 = M4, B5 = M4, B6 = M3 — Khớp REPORT. B4/B5: M4 là của lượt CLI thật tại `b72e51e` (docs/v2.1/evidence/cli-integration-b72e51e.out); `aisef2/app/bundle_cli.py` đổi sau lượt đó ở a912be6 và 3061ec0 (đường ghi của init/seal/approve/migrate chuyển sang tạo độc quyền `_create`), nên byte tại c9c736f chưa chạy qua CLI thật: đọc là 'M4 tại b72e51e'. (kiểm cơ học ở P-V2-07)
 - **Tiêu chí nghiệm thu:** một người ngoài dựng bundle cho một dự án 3 story không cần đọc mã nguồn (360 §6)
 - **Còn thiếu:** Người ngoài: chưa đo.
 - **Chưa xác nhận được:** Tài liệu ngữ pháp cho 18 lớp quan sát: không kiểm trong phiên này.
@@ -1129,14 +1149,14 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 25, adapted 18, 
 > Chính sách review: không chặn, nhưng **đưa phát hiện thành phản hồi cho developer**, ghi vào journal, đo precision
 
 - **Nguồn:** báo cáo 360° §5 P1 #8
-- **Bằng chứng tại HEAD:** Như P-ADJ-3: chặn khi CONFIRMED ∧ ANCHORED (fix-loop); phát hiện vào prompt retry; precision trên 5 lỗi smoke #2 đo offline (5 CONFIRMED trên dạng lỗi, NOT_REPRODUCED trên bản tham chiếu).
+- **Bằng chứng tại HEAD:** Như P-ADJ-3: chặn khi CONFIRMED ∧ ANCHORED (fix-loop); phát hiện vào prompt retry. 5 phát hiện lịch sử của smoke #2 tái hiện trên dạng lỗi của chúng (CONFIRMED) và không tái hiện trên bản tham chiếu (NOT_REPRODUCED) — regression offline của bộ kiểm chứng; precision của reviewer chưa đo trong 2.1.
 - **Reproducer:** `tests/v2/test_v21_review.py::HistoricalDefects::test_each_shipped_defect_is_confirmed_on_its_shape_and_not_on_the_reference`
 - **Ảnh hưởng:** cao
 - **Quyết định:** adapted — Đề xuất (§3) thay 'không chặn' bằng chặn có điều kiện; chủ dự án thêm điều kiện neo.
 - **Commit:** `e897437`: aisef2/app/feedback.py; `390f07c`: aisef2/app/review_verify.py
 - **Mức (REPORT §2):** C1 = M4 — Khớp REPORT.
 - **Tiêu chí nghiệm thu:** đo precision (smoke #2: 5/5)
-- **Còn thiếu:** Precision/recall với mô hình thật: M6 (B-06, ngân sách).
+- **Còn thiếu:** Precision của reviewer: chưa đo. Precision/recall với mô hình thật: M6 (B-06, ngân sách).
 
 ### R-P1-9
 
@@ -1204,7 +1224,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 25, adapted 18, 
 - **Commit:** `106f72d`: aisef2/app/bundle.py; `b029236`: aisef2/app/client.py; `51c5241`: aisef2/orchestrate/workspace.py
 - **Mức (REPORT §2):** A3 = M3, A4 = M3, A5 = M4, A6 = M3, A7 = M3, A8 = M3 — Khớp REPORT; xem ghi chú về A5 ở P-V2-04.
 - **Tiêu chí nghiệm thu:** mã 2 kèm đường dẫn JSON
-- **Còn thiếu:** —
+- **Còn thiếu:** Như P-V2-04: Preflight thật mới chỉ tới loopback, chưa gặp redirect thật (REPORT §2 A6–A7). Điều kiện của A5 (khoá git của editor) chỉ tái hiện ở test (M3): repo của lượt CLI thật (`git init` sạch) không có khoá đó.
 
 ### R-P2-14
 
@@ -1316,7 +1336,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 25, adapted 18, 
 - **Commit:** `dc9774f`: closure-evidence/v2/cycle2/RELEASE-DECISIONS.json
 - **Mức (REPORT §2):** REPORT §2 không có hạng mục riêng cho mục này.
 - **Tiêu chí nghiệm thu:** —
-- **Còn thiếu:** —
+- **Còn thiếu:** Không còn việc với mục này (danh sách 'không làm'); điều chỉnh duy nhất là mutation, theo RELEASE-DECISIONS seq 5.
 - **Chưa xác nhận được:** 'Không chạy lại Q4 cùng seed': không kiểm riêng trong phiên này.
 
 ### R-3.1
@@ -1343,9 +1363,9 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 25, adapted 18, 
 - **Reproducer:** Chỉ số, không phải hành vi: không có reproducer.
 - **Ảnh hưởng:** theo dõi
 - **Quyết định:** blocked — Ngân sách (B-09).
-- **Mức (REPORT §2):** E2 = M6 — Khớp REPORT.
+- **Mức (REPORT §2):** Chỉ số: REPORT §2 không chấm mức cho chỉ số. Hạng mục liên quan: E2 — mức của hạng mục đó không phải mức của chỉ số này.
 - **Tiêu chí nghiệm thu:** Mục tiêu 2.1: ≥ 1 trên workload chưa từng thấy
-- **Còn thiếu:** —
+- **Còn thiếu:** Chưa đạt: 0 lượt live trong 2.1 (mục tiêu ≥ 1 trên workload chưa từng thấy).
 
 ### R-M2
 
@@ -1356,9 +1376,9 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 25, adapted 18, 
 - **Reproducer:** Chỉ số, không phải hành vi: không có reproducer.
 - **Ảnh hưởng:** theo dõi
 - **Quyết định:** blocked — Ngân sách (B-09); Linux: F.
-- **Mức (REPORT §2):** E2 = M6, F = M6 — Khớp REPORT.
+- **Mức (REPORT §2):** Chỉ số: REPORT §2 không chấm mức cho chỉ số. Hạng mục liên quan: E2, F — mức của hạng mục đó không phải mức của chỉ số này.
 - **Tiêu chí nghiệm thu:** Mục tiêu 2.1: ≥ 2 × 2, có Linux
-- **Còn thiếu:** —
+- **Còn thiếu:** Chưa đạt: vẫn 1 × 1 × macOS, không có Linux (mục tiêu ≥ 2 × 2, có Linux).
 
 ### R-M3
 
@@ -1368,10 +1388,10 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 25, adapted 18, 
 - **Bằng chứng tại HEAD:** Đo offline trên dạng 5 lỗi smoke #2: 4 neo được ⇒ chặn, 1 UNANCHORED (P-V2-09). Chưa đo live.
 - **Reproducer:** Chỉ số, không phải hành vi: không có reproducer.
 - **Ảnh hưởng:** theo dõi
-- **Quyết định:** adapted — Fix-loop có; số đo live cần ngân sách.
-- **Mức (REPORT §2):** C1 = M4 — Khớp REPORT.
+- **Quyết định:** blocked — Số đo live cần ngân sách (B-05, B-06, B-09). Fix-loop (C1) có; phép thử offline trên 5 dạng lỗi smoke #2 là regression, không phải số đo live của chỉ số.
+- **Mức (REPORT §2):** Chỉ số: REPORT §2 không chấm mức cho chỉ số. Hạng mục liên quan: C1 — mức của hạng mục đó không phải mức của chỉ số này.
 - **Tiêu chí nghiệm thu:** Mục tiêu 2.1: đo và báo cạnh 59/59
-- **Còn thiếu:** —
+- **Còn thiếu:** Chưa đo live, chưa báo cạnh 59/59. Offline: 1/5 dạng lỗi lịch sử (R-7/1) UNANCHORED nên vẫn lọt gate (P-V2-09).
 
 ### R-M4
 
@@ -1382,10 +1402,10 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 25, adapted 18, 
 - **Kiểm cơ học:** `docs/v2.1/evidence/cli-integration-b72e51e.out` chứa `"limit": "clauses are the ones the criteria's facts declare; AISEF does not parse the requirements …`
 - **Reproducer:** Chỉ số, không phải hành vi: không có reproducer.
 - **Ảnh hưởng:** theo dõi
-- **Quyết định:** adapted — Báo ở lint, không ở RUN.json.
-- **Mức (REPORT §2):** B5 = M4 — Khớp REPORT.
+- **Quyết định:** open — Độ phủ được báo ở `aisef bundle lint` (B5); báo trong RUN.json chưa làm và không có quyết định nào được ghi lại (STATUS, ADR-V2.1, REPORT không nhắc).
+- **Mức (REPORT §2):** Chỉ số: REPORT §2 không chấm mức cho chỉ số. Hạng mục liên quan: B5 — mức của hạng mục đó không phải mức của chỉ số này.
 - **Tiêu chí nghiệm thu:** Mục tiêu 2.1: báo bằng máy trong `RUN.json`
-- **Còn thiếu:** —
+- **Còn thiếu:** RUN.json chưa mang độ phủ: mục tiêu 2.1 chưa đạt (chỉ `aisef bundle lint` báo, trên mệnh đề do tiêu chí khai).
 
 ### R-M5
 
@@ -1396,9 +1416,9 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 25, adapted 18, 
 - **Reproducer:** Chỉ số, không phải hành vi: không có reproducer.
 - **Ảnh hưởng:** theo dõi
 - **Quyết định:** blocked — Như P-V2-05.
-- **Mức (REPORT §2):** F = M6 — Khớp REPORT.
+- **Mức (REPORT §2):** Chỉ số: REPORT §2 không chấm mức cho chỉ số. Hạng mục liên quan: F — mức của hạng mục đó không phải mức của chỉ số này.
 - **Tiêu chí nghiệm thu:** Mục tiêu 2.1: 0 (hoặc được báo)
-- **Còn thiếu:** —
+- **Còn thiếu:** Chưa đo; không có ranh giới hệ điều hành (F/B-07).
 
 ### R-M6
 
@@ -1409,9 +1429,9 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 25, adapted 18, 
 - **Reproducer:** Chỉ số, không phải hành vi: không có reproducer.
 - **Ảnh hưởng:** theo dõi
 - **Quyết định:** blocked — Ngân sách (B-09).
-- **Mức (REPORT §2):** D2 = M4, E2 = M6 — Khớp REPORT.
+- **Mức (REPORT §2):** Chỉ số: REPORT §2 không chấm mức cho chỉ số. Hạng mục liên quan: D2, E2 — mức của hạng mục đó không phải mức của chỉ số này.
 - **Tiêu chí nghiệm thu:** Mục tiêu 2.1: có
-- **Còn thiếu:** —
+- **Còn thiếu:** Chưa có số: 0 lượt live để chia USD cho story giao được.
 
 ### R-M7
 
@@ -1422,9 +1442,9 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 25, adapted 18, 
 - **Reproducer:** Chỉ số, không phải hành vi: không có reproducer.
 - **Ảnh hưởng:** theo dõi
 - **Quyết định:** blocked — B-02 (chủ dự án).
-- **Mức (REPORT §2):** A9 = M4 — Khớp REPORT.
+- **Mức (REPORT §2):** Chỉ số: REPORT §2 không chấm mức cho chỉ số. Hạng mục liên quan: A9 — mức của hạng mục đó không phải mức của chỉ số này.
 - **Tiêu chí nghiệm thu:** Mục tiêu 2.1: < 1 ngày, không sửa công cụ phát hành
-- **Còn thiếu:** —
+- **Còn thiếu:** Chưa đo: chưa phát hành bản nào trong 2.1 (B-02).
 
 ### R-M8
 
@@ -1437,7 +1457,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 25, adapted 18, 
 - **Quyết định:** open — Ngoài phạm vi mã.
 - **Mức (REPORT §2):** REPORT §2 không có hạng mục riêng cho mục này.
 - **Tiêu chí nghiệm thu:** Mục tiêu 2.1: ≥ 1 đối tác thiết kế
-- **Còn thiếu:** —
+- **Còn thiếu:** Chưa đạt: 0 người dùng ngoài theo những gì repo cho biết (mục tiêu ≥ 1 đối tác thiết kế).
 
 ### R-M9
 
@@ -1451,5 +1471,5 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 25, adapted 18, 
 - **Quyết định:** open — Chưa đo lại trên backlog 38 mục.
 - **Mức (REPORT §2):** REPORT §2 không có hạng mục riêng cho mục này.
 - **Tiêu chí nghiệm thu:** Mục tiêu 2.1: tất cả mục ≥ medium
-- **Còn thiếu:** —
+- **Còn thiếu:** Chưa đo lại: 38 mục của `docs/v2/V2.1-BACKLOG.md` chưa được đối chiếu với tiêu chí 'có reproducer'.
 <!-- rows:end -->
