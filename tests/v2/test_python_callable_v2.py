@@ -11,6 +11,7 @@ on its own channel; PCV2_Q0 the probe source rules. Subprocess-backed on real ch
 mutation targets of aisef2/probe/python_callable_v2.py.
 """
 
+import ast
 import hashlib
 import importlib.util
 import json
@@ -806,9 +807,15 @@ class Q0(unittest.TestCase):
         e = catalog.entry_for(self.REL)
         self.assertEqual((e.subject_process, e.protocol_channel, e.stimulus_shape, e.cycle),
                          ("child_of_harness", "marker_file", "call", 2))
-        # the channel rule is what rejects a controller that puts its protocol on the subject's stdout
-        self.assertEqual(src.count('    proto.write((req["mark"]'), 1)
-        forged = src.replace('    proto.write((req["mark"]', '    sys.stdout.write((req["mark"]')
+        # the channel rule is what rejects a controller that puts its protocol on the subject's stdout: the defect is
+        # written into the parsed HARNESS (its ast.unparse text), so the site does not depend on its formatting (ORD-1)
+        tree = ast.parse(src)
+        harness = next(n.value for n in tree.body if isinstance(n, ast.Assign)
+                       and [getattr(t, "id", None) for t in n.targets] == ["HARNESS"])
+        script = ast.unparse(ast.parse(harness.value))
+        self.assertEqual(script.count("    proto.write((req['mark']"), 1)
+        harness.value = script.replace("    proto.write((req['mark']", "    sys.stdout.write((req['mark']")
+        forged = ast.unparse(tree)
         self.assertTrue(any("PROTOCOL_CHANNEL_DISCIPLINE" in v for v in ps.violations(self.REL, forged, ps.SOURCE_RULES, FACTS)))
 
 
