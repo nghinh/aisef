@@ -808,6 +808,96 @@ class Classify(unittest.TestCase):
         problems = m.problems_of({"targets": [legacy]}, ROOT, "V2.1")
         self.assertIn(f"{t}: measured by a runner that does not classify — re-measure", problems)
 
+# --------------------------------------------------------------------------------------------- §5 T0
+
+#: real V2.1 targets the null-mutant identities are checked on (pure: no kill file runs), SCRIPT targets included
+NULL_SAMPLE = ("aisef2/app/run.py::admit", "aisef2/probe/process_effect.py::HARNESS/ask",
+               "aisef2/probe/cli_invocation.py::AGENT/send", "aisef2/probe/cli_invocation.py::_harness_argv",
+               "aisef2/probe/python_callable_v2.py::HARNESS/emit", "aisef2/probe/file_artifact.py::DIGEST",
+               "aisef2/app/adapters.py::_bounded", "aisef2/plan/static_admission.py::check_contradictions")
+#: probe() reads x["probe"]; test_text pins that text, which ast.unparse writes as x['probe'] (ORD-1)
+ORD1_MODULE = 'def probe(x):\n    return x["probe"] if x else None\n'
+ORD1_FILES = {
+    "test_sem.py": """
+        import unittest
+        from aisef2.toy import probe
+        class Sem(unittest.TestCase):
+            def test_an_empty_request_has_no_probe(self):
+                self.assertIsNone(probe({}))
+        """,
+    "test_text.py": """
+        import pathlib, unittest
+        from aisef2 import toy
+        class Text(unittest.TestCase):
+            def test_the_module_says_it_this_way(self):
+                self.assertIn('x["probe"]', pathlib.Path(toy.__file__).read_text(encoding="utf-8"))
+        """}
+#: generator order: L2 returns None, L2 conditional negated, L2 string 'probe' emptied — only the second changes probe({})
+ORD1_TRUTH = ["SURVIVED", "KILLED", "SURVIVED"]
+
+
+class T0(unittest.TestCase):
+    """ORD-1, PL-4, VS-6: the baseline is the null mutant made by mutants()' own rewrite, each kill file on its own; a
+    file that fails it is refused for the target, never used as kill evidence."""
+
+    def test_the_null_mutant_is_the_rewrite_every_mutant_gets(self):
+        import ast
+        for target in NULL_SAMPLE:
+            rel, func = target.split("::")
+            src = (ROOT / rel).read_text(encoding="utf-8")
+            null = m.null_mutant(src, func)
+            script, _, inner = func.partition("/")
+            with self.subTest(target):
+                if inner:   # the module with the script left out is the same; the script parses to the same tree
+                    a, b = ast.parse(null), ast.parse(src)
+                    ca_, cb = m._script(a, script), m._script(b, script)
+                    self.assertEqual(ca_.value, ast.unparse(ast.parse(cb.value)))
+                    self.assertEqual(ast.dump(ast.parse(ca_.value)), ast.dump(ast.parse(cb.value)))
+                    ca_.value = cb.value = ""
+                    self.assertEqual(ast.dump(a), ast.dump(b))
+                else:
+                    self.assertEqual(ast.dump(ast.parse(null)), ast.dump(ast.parse(src)))
+                found = m.mutants(src, func, m._enum_members(src, ROOT))
+                self.assertTrue(found)
+                for desc, mutated in found:
+                    self.assertEqual(m.null_mutant(mutated, func), mutated, desc)   # the rewrite of a mutant is itself
+
+    @unittest.skipUnless(POSIX, "the runner's process ranges and cleanup authority are measured on POSIX")
+    def test_a_kill_file_that_pins_the_text_is_refused_not_used(self):
+        """ORD-1 on a toy: test_text pins source text that every mutant's rewrite changes. The old baseline (the
+        original bytes) let it 'kill' all 3 mutants, 0 survivors against a truth of 2. T0 refuses it, names it, and runs
+        it once on the original (which passes): a rewrite-sensitive file, not a broken snapshot."""
+        d = self.enterContext(tempfile.TemporaryDirectory())
+        root = toy(pathlib.Path(d), ORD1_MODULE, ORD1_FILES)
+        both = ["tests/v2/test_sem.py", "tests/v2/test_text.py"]
+        r = m.run_target(root, "aisef2/toy.py::probe", both)
+        self.assertRegex(r["error"], r"^kill tests fail on the unmutated tree \(T0 null mutant\): tests/v2/test_text\.py: "
+                                     r"FAIL FAIL: test_the_module_says_it_this_way .* \| AssertionError$")
+        self.assertEqual([x["outcome"] for x in r["t0"]], ["PASS", "FAIL"])
+        self.assertEqual([(x["file"], x["outcome"]) for x in r["original"]], [("tests/v2/test_text.py", "PASS")])
+        self.assertEqual(classes(r), ["NOT_RUN"] * 3)
+        self.assertEqual(classes(m.run_target(root, "aisef2/toy.py::probe", both[:1])), ORD1_TRUTH)
+        # the old failure, with the original bytes as the baseline: every mutant "killed" by the text pin
+        with mock.patch.object(m, "null_mutant", lambda src, func: src):
+            self.assertEqual(classes(m.run_target(root, "aisef2/toy.py::probe", both)), ["KILLED"] * 3)
+
+    @unittest.skipUnless(POSIX, "the runner's process ranges and cleanup authority are measured on POSIX")
+    def test_the_t0_command_runs_t0_alone_and_writes_nothing(self):
+        d = self.enterContext(tempfile.TemporaryDirectory())
+        root = toy(pathlib.Path(d), ORD1_MODULE, ORD1_FILES)
+        targets = {"aisef2/toy.py::probe": ["tests/v2/test_sem.py", "tests/v2/test_text.py"]}
+        rec = "closure-evidence/v2/toy/MUTATION.json"
+        with mock.patch.object(m, "ROOT", root), mock.patch.object(m, "RECORDS", {"TOY": rec}), \
+                mock.patch.object(m, "PHASE_TARGETS", {"TOY": targets}), mock.patch.object(m, "TARGETS", targets), \
+                mock.patch("builtins.print") as out:
+            self.assertEqual(m.main(["t0", *targets]), 1)
+            self.assertEqual(m.main(["t0", *targets, "--tests", "tests/v2/test_sem.py"]), 0)
+        lines = [c.args[0] for c in out.call_args_list]
+        self.assertEqual([json.loads(x)["outcome"] for x in lines if x.startswith("{")],
+                         ["PASS", "FAIL", "PASS", "PASS"])   # T0 sem, T0 text, the original text, then sem alone
+        self.assertEqual([x for x in lines if x.startswith("T0 ")][-1], "T0 aisef2/toy.py::probe: PASS")
+        self.assertFalse((root / rec).exists())
+
 
 if __name__ == "__main__":
     unittest.main()

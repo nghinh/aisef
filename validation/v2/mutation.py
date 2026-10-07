@@ -1300,9 +1300,11 @@ def _classify(entry: dict, stopped: str | None = None) -> dict:
 
 
 def _baseline(tg: _Target, rows: list) -> list[str]:
-    """Each kill file on its own, the whole file, on the unmutated module, in a clean environment: it must PASS, leave
-    nothing behind and run at least one test; its counts and skipped tests are the reference every later PASS of the
-    file must match (VS-6). Returns why each file that did not is refused."""
+    """T0 (§5): the null mutant — the module as `mutants()` rewrites it, nothing mutated — against each kill file on its
+    own, the whole file, in a clean environment. Each must PASS, leave nothing behind and run at least one test; its
+    counts and skipped tests are the reference every later PASS of the file must match (VS-6). A file that fails the
+    null fails every mutant whatever it does (ORD-1: byte- and text-identity assertions), so it is refused, never used.
+    Returns why each file that did not pass is refused."""
     _write(tg, tg.null)
     refused = []
     for rel in tg.tests:
@@ -1329,8 +1331,22 @@ def _run_tests(root: pathlib.Path, tests: list[str], boundary: ca.Boundary) -> t
         return all(r["outcome"] == "PASS" for r in rows) and len(rows) == len(tests), signalled
 
 
+def null_mutant(module_src: str, func: str) -> str:
+    """The module exactly as `mutants()` writes every mutant of `func`, with nothing mutated: `ast.unparse` of the
+    module and, for a `SCRIPT/fn` target, the child script itself re-unparsed inside its constant first (ORD-1
+    verifier (b): the script is reformatted too, so a module-level null is not the same rewrite)."""
+    tree = ast.parse(module_src)
+    script, _, inner = func.partition("/")
+    if inner:
+        const = _script(tree, script)
+        if const is None:
+            raise SystemExit(f"child script {script} not found")
+        const.value = ast.unparse(ast.parse(const.value))
+    return ast.unparse(tree)
+
+
 def run_target(root: pathlib.Path, target: str, tests: list[str], pristine: tuple[pathlib.Path, str] | None = None,
-               on_mutant=None) -> dict:
+               on_mutant=None, t0_only: bool = False) -> dict:
     """Measure one target (§2–§4). `pristine`: the copy `main()` took once ((path, tree digest)); a direct caller passes
     none and gets one of its own. Everything this target writes lives in one scratch directory, removed at the end.
     `on_mutant(entry)` is called as each mutant completes (main's checkpoint line). An ownership failure stops the
@@ -1348,15 +1364,18 @@ def run_target(root: pathlib.Path, target: str, tests: list[str], pristine: tupl
         tg = _Target(rel, scratch, ca.establish(scratch), worker, pristine=src_root, tests=list(tests),
                      last=int((src_root / rel).stat().st_mtime))   # the checkout's own (copy2): stamps are above it
         _new_tree(tg)
-        tg.version = tg.null = original
+        tg.version, tg.null = original, null_mutant(original, func)
         where = "before the target"
         try:
             _settle(tg)   # what an earlier target of this worker left
             where = "before mutant 1 (T0 {file})"
             refused = _baseline(tg, out.setdefault("t0", []))
-            if refused:
-                out["error"] = "kill tests fail on the unmutated tree: " + "; ".join(refused)
-            for i, (desc, src) in enumerate([] if refused else found):
+            if refused:   # each refused file once more on the original bytes: a broken snapshot, or a rewrite-sensitive file
+                out["error"] = "kill tests fail on the unmutated tree (T0 null mutant): " + "; ".join(refused)
+                _write(tg, original)
+                for rel_ in [r["file"] for r in out["t0"] if r["outcome"] != "PASS" or r.get("residue") or r.get("leaked")]:
+                    _run_file(tg, rel_, out.setdefault("original", []), failfast=False, role="original")
+            for i, (desc, src) in enumerate([] if refused or t0_only else found):
                 where = f"at mutant {desc!r} ({{file}})"
                 entry = results[i] = {"mutant": desc}
                 try:
@@ -1500,6 +1519,23 @@ def _checkpoint(entry: dict) -> None:
 
 def main(argv: list[str] | None = None) -> int:
     argv = sys.argv[1:] if argv is None else argv
+    if argv[:1] == ["t0"]:   # T0 only, nothing written: `t0 TARGET... [--tests FILE...]` (--tests: a diagnostic kill set)
+        targets, _, files = [x for x in argv[1:]], None, None
+        if "--tests" in targets:
+            i = targets.index("--tests")
+            targets, files = targets[:i], targets[i + 1:]
+        unknown = [t for t in targets if t not in TARGETS]
+        if unknown or not targets:
+            raise SystemExit(f"not a mutation target: {unknown or 'none named'}")
+        failed = 0
+        for target in targets:
+            r = run_target(ROOT, target, files or TARGETS[target], t0_only=True)
+            for row in [*r.get("t0", []), *r.get("original", [])]:
+                print(json.dumps({"target": target, **{k: v for k, v in row.items() if k != "tail"}}, ensure_ascii=False))
+            bad = r.get("stopped") or any(x["outcome"] != "PASS" or x.get("residue") or x.get("leaked") for x in r.get("t0", []))
+            failed += bool(bad)
+            print(f"T0 {target}: " + (r["error"] if bad else "PASS"), flush=True)
+        return 1 if failed else 0
     if argv[:1] == ["run"]:
         chosen = argv[1:] or list(TARGETS)
         worker = _worker(ROOT)
