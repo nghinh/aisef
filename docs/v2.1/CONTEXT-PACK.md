@@ -113,16 +113,21 @@ từng byte** bản trước.
 | Tóm tắt do agent viết | **không có** | — |
 
 Đột biến tay (không phải chiến dịch mutation của kernel): `validation/v21/context_pack_mutants.py` chạy trên bản sao của
-HEAD, baseline xanh trước, 24 đột biến — 23 trên các dòng của `context_pack` (bỏ kỳ vọng, mặc định SATISFIED cho mệnh đề
+HEAD, baseline xanh trước, 25 đột biến — 24 trên các dòng của `context_pack` (bỏ kỳ vọng, mặc định SATISFIED cho mệnh đề
 lạ, kỳ vọng chỉ của story này, bỏ điều kiện verifier đồng ý, cắt 299/301/1000, redact sau khi cắt, kết quả giữ xuống
-dòng, bí mật so nguyên dạng thay vì dạng một dòng, thứ tự cũ trước, trần 5 lượt, mọi mệnh đề là "không có proof", proof
+dòng, bí mật so nguyên dạng thay vì dạng một dòng, bí mật chỉ có khoảng trắng giữ thành bí mật `""` (bỏ `- {""}`),
+thứ tự cũ trước, trần 5 lượt, mọi mệnh đề là "không có proof", proof
 sau thay proof đầu, lề cho dấu dừng `PACK_MAX - 120` thành `PACK_MAX`, `PACK_MAX - 56`, `PACK_MAX - 119` và
 `PACK_MAX - 121`, phép so của vòng cắt bỏ xuống dòng của dòng đang xét, `size += len(ln) + 1` thành `size += len(ln)`,
 `break` của vòng cắt thành `continue`, tiêu đề nói "candidate là commit" dù không nêu candidate, dòng candidate bỏ câu
 đó) và 1 trên lời gọi của nó trong `Developer.implement` (không đưa bí mật của run — trước vòng 2, đột biến này **sống
 sót** cả 17 test):
-**24/24 bị giết** tại `7797061` ([evidence/context-pack-mutants.out](evidence/context-pack-mutants.out)). Các lớp test
-chạy: `Pack`, `Expectation`, `Prompt`, `RecordedSmoke2` (không có `ThroughTheRun`). Lịch sử: đột biến lề `PACK_MAX`
+**25/25 bị giết** tại `89e3989` ([evidence/context-pack-mutants.out](evidence/context-pack-mutants.out);
+`python3 -P validation/v21/context_pack_mutants.py` trên cây sạch, 21 s). Các lớp test chạy: `Pack`, `Expectation`,
+`Prompt`, `RecordedSmoke2` (không có `ThroughTheRun`). Lịch sử: lượt trước, 24 đột biến, **24/24 bị giết** tại
+`7797061`; đột biến `- {""}` thêm tại `89e3989` **sống sót** mọi test của `tests.v2.test_v21_context_pack` trước
+commit đó (không có `- {""}`, `str.replace("", "[REDACTED]")` chèn dấu giữa mọi cặp ký tự của kết quả developer),
+`Pack.test_a_secret_that_is_only_whitespace_redacts_nothing` giết nó (3 subtest đỏ); đột biến lề `PACK_MAX`
 **sống sót** cả 19 test tại `9198d47` (gói vượt biên tới 57 ký tự); `break` → `continue` **sống sót** cả 20 test tại
 `4022f7e` (không fixture nào có, sau dòng đầu không vừa, một dòng ngắn vừa chỗ); `size += len(ln)` **sống sót** cả 21
 test tại `b7a85cd`, và tài liệu tại `b7a85cd` gọi nó "tương đương về biên" vì "gói có tối đa 15 dòng" — **sai**: kết quả
