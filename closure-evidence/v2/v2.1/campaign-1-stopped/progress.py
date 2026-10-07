@@ -1,6 +1,6 @@
 """progress.py: the V2.1 campaign so far, from the workers' logs — targets done of their shard, mutants, survivors,
 errors, timeouts (each line `TARGET: K/N killed; survivors [...]` [ERROR ...] as mutation.py prints it)."""
-import json, pathlib, re, sys, time
+import pathlib, re, time
 D = pathlib.Path(__file__).parent
 LINE = re.compile(r"^(?P<t>\S+::\S+): (?P<k>\S+)/(?P<n>\S+) killed; survivors (?P<s>.*?)(?: ERROR (?P<e>.*))?$")
 out, total = {}, {"done": 0, "of": 0, "mutants": 0, "killed": 0, "survivors": [], "errors": [], "timeouts": []}

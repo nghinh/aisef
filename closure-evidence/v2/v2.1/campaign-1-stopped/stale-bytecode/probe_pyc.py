@@ -4,7 +4,7 @@ import pathlib, subprocess, sys, time
 d = pathlib.Path(sys.argv[1])
 m = d / "mod_under_test.py"
 out = []
-for i in range(20):
+for _ in range(20):
     a = "def f():\n    return 1 < 2\n"
     b = "def f():\n    return 1 > 2\n"          # same size: an operator swap
     m.write_text(a)
