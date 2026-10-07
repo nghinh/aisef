@@ -162,6 +162,11 @@ class CommandLine(unittest.TestCase):
             exe.write_text("#!/bin/sh\n")
             with self.subTest(exe=exe), self.assertRaisesRegex(confine.Unavailable, f"holds {held}: bound read-only"):
                 confine.wrap(self.spec, [str(exe)], self.env, str(self.ws), str(exe), system="linux")
+        # HOME not in the env the client gets: the user's home (~) still counts
+        exe = self.home / "opencode"
+        with mock.patch.object(confine.os.path, "expanduser", lambda p: str(self.home) if p == "~" else p), \
+                self.assertRaisesRegex(confine.Unavailable, "holds HOME: bound read-only"):
+            confine.wrap(self.spec, [str(exe)], {"PATH": "/usr/bin:/bin"}, str(self.ws), str(exe), system="linux")
 
     def test_a_directory_is_not_bubblewrap(self):
         with self.assertRaisesRegex(confine.Unavailable, "not an executable file at"):
@@ -169,6 +174,12 @@ class CommandLine(unittest.TestCase):
         rep = confine.measure(dict(self.spec, bwrap=str(self.tmp)), self.tmp / "m", str(self.exe), system="linux",
                               environ=self.env)
         self.assertEqual(rep["problems"], [f"bubblewrap is not an executable file at {self.tmp}"])
+
+    def test_an_unreadable_bubblewrap_is_a_problem_not_a_crash(self):
+        with mock.patch.object(confine.pathlib.Path, "read_bytes", side_effect=PermissionError(13, "Permission denied")):
+            rep = confine.measure(self.spec, self.tmp / "m", str(self.exe), system="linux", environ=self.env)
+        self.assertEqual(rep["problems"], [f"bubblewrap at {self.bwrap} could not be read: PermissionError"])
+        self.assertFalse((self.tmp / "m" / "ws").exists())
 
     def test_the_measured_wrapper_is_the_sessions_own(self):
         """measure() binds what a session's wrapper binds: the client's directory, the run repository's git directory,
@@ -199,6 +210,7 @@ class FailClosed(unittest.TestCase):
             confine.wrap(SPEC, ["x"], {}, "/w", system="darwin")
         with tempfile.TemporaryDirectory() as t:
             rep = confine.measure(SPEC, pathlib.Path(t) / "c", system="darwin")
+            self.assertFalse((pathlib.Path(t) / "c").exists())      # nothing is made on the host
         self.assertEqual(rep["problems"], ["confinement is Linux-only (bubblewrap); this host is darwin: no backend"])
 
     def test_a_missing_bubblewrap_or_read_only_path_is_refused(self):
@@ -319,6 +331,12 @@ class FailClosed(unittest.TestCase):
             (dict(change=lambda rep, tries: (rep.update(network="none"), rep["inside"]["namespaces"].update(net="own"),
                                              rep["inside"].update(routed_interfaces=["eth0"]))),
              "network none has routes on ['eth0'] (a reachable network)"),
+            # a path that only shares a prefix with an allowed one is outside it (/w/ws2 beside /w/ws, /usrlocal-extra beside /usr)
+            (dict(change=inside(unix_sockets=["/w/ws2/control.sock"])),
+             "a unix socket outside the workspace is reachable (read-only does not stop a connect): ['/w/ws2/control.sock']"),
+            (dict(change=inside(mounts=[{"at": "/", "access": "rw", "fs": "tmpfs"}, {"at": str(ws), "access": "rw", "fs": "ext4"},
+                                        {"at": "/usrlocal-extra", "access": "ro", "fs": "ext4"}], mount_targets=[str(ws), "/usr"])),
+             "mounted beyond what the wrapper names: ['/usrlocal-extra']"),
         ]
         for k in ("CapInh", "CapPrm", "CapEff", "CapAmb"):
             for v in ("0000000000000001", None):
@@ -336,6 +354,9 @@ class FailClosed(unittest.TestCase):
         self.assertEqual(judged(inside(home_listing=[".config"], mounts=[{"at": "/", "access": "rw", "fs": "tmpfs"},
                                                                        {"at": "/h/.config/opencode", "access": "ro", "fs": "ext4"}],
                                        mount_targets=["/h/.config/opencode"]), home="/h"), [])
+        self.assertEqual(judged(inside(mounts=[{"at": "/", "access": "rw", "fs": "tmpfs"}, {"at": str(ws), "access": "rw", "fs": "ext4"},
+                                               {"at": "/usr/local", "access": "ro", "fs": "ext4"}], mount_targets=[str(ws), "/usr"],
+                                       unix_sockets=[str(ws / "s" / "own.sock")])), [])     # below a named path: within it
 
     def test_a_check_that_did_not_run_is_a_problem_never_a_pass(self):
         """The user-namespace denial counts only when the kernel's refusal is seen; unshare absent or no try at all
@@ -460,6 +481,21 @@ class Check(unittest.TestCase):
         doc = json.loads(out)
         self.assertEqual((code, doc["ready"], doc["admission"]["admitted"]), (2, False, True))
         self.assertTrue(doc["confinement"]["problems"])
+
+    def test_check_measures_with_the_client_on_the_runs_path(self):
+        (self.tmp / "settings.json").write_text(json.dumps({**SETTINGS, "confinement": SPEC}), encoding="utf-8")
+        exe = self.tmp / "bin" / "opencode"
+        exe.parent.mkdir()
+        exe.write_text("#!/bin/sh\n")
+        exe.chmod(0o755)
+        seen = []
+        from tests.v2.test_app_run import calibrations
+        with mock.patch.object(R, "calibrations", calibrations), \
+                mock.patch.object(confine, "measure", lambda spec, where, client: seen.append(client) or {"problems": []}), \
+                mock.patch.dict(os.environ, {"PATH": f"{exe.parent}{os.pathsep}/usr/bin{os.pathsep}/bin"}):
+            code, out, _ = self.cli("--check", "--project", str(self.tmp / "project.json"), "--settings",
+                                    str(self.tmp / "settings.json"), "--repo", str(self.tmp / "source"))
+        self.assertEqual((code, json.loads(out)["ready"], seen), (0, True, [str(exe)]))
 
 
 if __name__ == "__main__":

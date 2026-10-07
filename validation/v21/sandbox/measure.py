@@ -160,8 +160,9 @@ def main() -> None:
         "connect_unmounted_unix_socket": inside(connect_py("path", str(SOCKS / "ctl")), env),
         "new_user_namespace": inside(sh("unshare --user --map-root-user true"), env),
         # the model reviewer's session: the checkout it reviews is bound read-only — its write bits are kept here, so
-        # only the mount refuses; giving the write bits back (the runner's read-only scope only clears them) fails too
-        "reviewer_write_reviewed_checkout": inside(sh(": > ./x; echo x >> ./candidate.py"), env, reviewer=True),
+        # only the mount refuses; giving the write bits back (the runner's read-only scope only clears them) fails too.
+        # Each write in a subshell, as PROBE does: sh exits at a failed redirection of `:`, so the append would not run
+        "reviewer_write_reviewed_checkout": inside(sh("(: > ./x); (echo x >> ./candidate.py)"), env, reviewer=True),
         "reviewer_chmod_reviewed_checkout": inside(sh("chmod u+w ./candidate.py"), env, reviewer=True),
     }
     # reached or not by network: denied with network none, reached with host (a run's) — never called a denial there
