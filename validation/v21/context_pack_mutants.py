@@ -1,4 +1,5 @@
-"""D4: the hand mutations of aisef2/app/feedback.py context_pack and whether tests.v2.test_v21_context_pack kills each —
+"""D4: the hand mutations of aisef2/app/feedback.py context_pack, and of its one call in aisef2/app/adapters.py
+Developer.implement, and whether tests.v2.test_v21_context_pack kills each —
 run on a copy of HEAD (git archive; closure-evidence linked read only), a green baseline first, one mutant at a time.
 Not the kernel's mutation campaign (validation/v2/mutation.py): the D4 lines still need that, outside the current snapshot.
     python3 -P validation/v21/context_pack_mutants.py       (from the repository root, on a clean tree)
@@ -31,6 +32,11 @@ MUTANTS = {
     "attempt cap 5": ("PACK_ATTEMPTS = 4000, 12, 4", "PACK_ATTEMPTS = 4000, 12, 5"),
     "no-proof list is every admitted criterion": ('sorted(set(a["criteria"]) - set(a["proofs"]))', 'sorted(set(a["criteria"]))'),
     "a later proof of a criterion replaces the first": ('and c not in cur["proofs"]', ""),
+    "the header says an earlier candidate is a commit, whatever is named": (
+        "(journal seq {cur['seq']})\")", "(journal seq {cur['seq']}); an earlier candidate named below is a commit of this repository\")"),
+    "a named candidate is not said to be a commit of this repository": (', a commit of this repository"', '"'),
+    "Developer.implement gives the pack none of the run's secrets": (
+        'self.project, self.kw.get("secrets", ()))', "self.project, ())", "aisef2/app/adapters.py"),
 }
 
 
@@ -43,8 +49,6 @@ def main() -> None:
                               capture_output=True, check=True)
         tarfile.open(fileobj=io.BytesIO(arch.stdout)).extractall(tmp, filter="data")
         os.symlink(ROOT / "closure-evidence", pathlib.Path(tmp) / "closure-evidence")
-        f = pathlib.Path(tmp) / "aisef2/app/feedback.py"
-        orig = f.read_text(encoding="utf-8")
 
         def run() -> tuple[int, str]:
             r = subprocess.run([sys.executable, "-P", "-W", "ignore::ResourceWarning", "-m", "unittest", *CLASSES],
@@ -55,14 +59,16 @@ def main() -> None:
         if rc:
             raise SystemExit("the baseline is not green: no mutant result means anything")
         killed = 0
-        for name, (a, b) in MUTANTS.items():
+        for name, (a, b, *where) in MUTANTS.items():
+            f = pathlib.Path(tmp) / (where[0] if where else "aisef2/app/feedback.py")
+            orig = f.read_text(encoding="utf-8")
             if orig.count(a) != 1:
-                raise SystemExit(f"mutant {name!r}: its target occurs {orig.count(a)} times")
+                raise SystemExit(f"mutant {name!r}: its target occurs {orig.count(a)} times in {f.name}")
             f.write_text(orig.replace(a, b), encoding="utf-8")
             rc, last = run()
+            f.write_text(orig, encoding="utf-8")
             killed += bool(rc)
             print(f"{'KILLED  ' if rc else 'SURVIVED'} {name}: {last}")
-        f.write_text(orig, encoding="utf-8")
         print(f"killed {killed} of {len(MUTANTS)}; restored copy: {run()[1]}")
 
 

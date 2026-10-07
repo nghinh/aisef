@@ -176,7 +176,7 @@ class Pack(Fixture):
             "[the context pack stops here: bounded at 300 characters]"), cut)     # whole lines kept, then the mark
 
     def test_at_the_real_bound_the_latest_attempts_are_kept_and_the_oldest_cut(self):
-        many = tuple(f"C-CRITERION-{i:03d}" for i in range(40))
+        many = tuple(f"C-CRITERION-{i:03d}" for i in range(30))    # sized so the cut falls inside attempt 1's block
         ev = [e for n in range(4) for e in attempt(100 * n, detail=f"developer outage: attempt {n + 1} " + "y" * 400,
                                                     held=many[:20], criteria=many)]
         ev.append((900, "story/begin", {"story_id": "S1", "parent": P}))
@@ -189,6 +189,7 @@ class Pack(Fixture):
         latest = text.split("\n- attempt 4:", 1)[1].split("\n- attempt 3:", 1)[0]
         self.assertIn("\n  held at that revision", latest)
         self.assertIn("\n  no proof recorded for them in that attempt", latest)
+        self.assertIn("\n- attempt 1:", text)
         self.assertNotIn("no proof recorded", text.split("\n- attempt 1:", 1)[1])     # the cut falls on the oldest
 
     def test_no_proof_recorded_is_all_it_says_when_the_attempt_ended_at_a_criterion_s_probes(self):
@@ -201,6 +202,19 @@ class Pack(Fixture):
                 self.assertIn("no proof recorded for them in that attempt: C-ADD (1.1) (journal seq 10–", text)
                 self.assertNotIn("revision", text.split("\n- attempt 1:", 1)[1])   # no candidate: no revision named
                 self.assertNotIn("before their proof", text)
+
+    def test_only_a_named_candidate_is_said_to_be_a_commit_of_this_repository(self):
+        begin = [(90, "story/begin", {"story_id": "S1", "parent": P})]
+        named = self.pack(attempt(10) + begin)
+        self.assertIn(f"; candidate {C[:12]} (journal seq 15), a commit of this repository", named)
+        self.assertEqual(named.count("a commit of this repository"), 1)
+        self.assertEqual(named.splitlines()[1], f"- this attempt starts again at the parent {P[:12]} (journal seq 90)")
+        mismatch = (("probe/evaluated", {"criterion_id": "C-ADD", "record": {}}), ("failure/observed", {
+            "code": "PROBE_MISMATCH", "owner": "INFRASTRUCTURE", "detail": "proof of C-ADD: PROBE_MISMATCH"}))
+        for shape, ev in (("an outage", attempt(10, held=(), developer=False)), ("the parent proved", attempt(10, candidate=P)),
+                          ("ended at a probe", attempt(10, held=(), extra=mismatch))):
+            with self.subTest(shape=shape):     # no candidate named: nothing is said to be a commit of the repository
+                self.assertNotIn("a commit of this repository", self.pack(ev + begin))
 
     def test_it_never_holds_proof_material_another_story_or_the_run_s_secrets(self):
         secret = "sk-test-0123456789abcdef"
@@ -307,6 +321,14 @@ class Prompt(Fixture):
         self.assertTrue(prompt.endswith(f"observed:\n{told}\n{pack}\nFix the implementation."), prompt[-400:])
         self.assertIn("the revision proved was the parent itself — that attempt changed nothing", prompt)
 
+
+    def test_the_run_s_secrets_reach_the_pack_in_the_prompt(self):
+        secret = "sk-run-secret-0123456789"
+        ev = attempt(10, held=(), refuted=("C-ADD",), detail=f"developer outage: auth {secret} rejected") + [
+            (30, "story/begin", {"story_id": "S1", "parent": P})]
+        prompt = self.implement(ev, secrets=(secret,))
+        self.assertIn("developer result: developer outage: auth [REDACTED] rejected (journal seq 13)", prompt)
+        self.assertNotIn(secret, prompt)
 
 class RecordedSmoke2(unittest.TestCase):
     """Offline replay on recorded evidence: the 2.0.0 release smoke-2's journal (closure-evidence, read only). Its

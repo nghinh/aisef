@@ -150,8 +150,7 @@ def context_pack(events, story_id: str, project: Project, secrets=()) -> str:
 
     lines = [PACK_HEAD]
     if cur is not None:
-        lines.append(f"- this attempt starts again at the parent {cur['parent'][:12]} (journal seq {cur['seq']}); an "
-                     "earlier candidate named below is a commit of this repository")
+        lines.append(f"- this attempt starts again at the parent {cur['parent'][:12]} (journal seq {cur['seq']})")
     if len(ended) > PACK_ATTEMPTS:
         lines.append(f"- {len(ended) - PACK_ATTEMPTS} earlier attempt(s) not shown (journal seq {ended[0]['seq']}–"
                      f"{ended[-PACK_ATTEMPTS - 1]['end']})")
@@ -162,7 +161,7 @@ def context_pack(events, story_id: str, project: Project, secrets=()) -> str:
         if c and c[1] == a["parent"]:
             line += f"; the revision proved was the parent itself — that attempt changed nothing (journal seq {c[0]})"
         elif c:
-            line += f"; candidate {c[1][:12]} (journal seq {c[0]})"
+            line += f"; candidate {c[1][:12]} (journal seq {c[0]}), a commit of this repository"
         lines.append(line)
         held = [(k, v[0]) for k, v in a["proofs"].items() if v[1]]
         if held:
