@@ -111,11 +111,12 @@ class ReviewerReview(_Reviewer):
         self.assertEqual(str(c.exception), "the checkout to review has no revision")
 
     def test_a_change_to_the_checkout_names_the_stage_it_happened_in(self):
-        repo = self.tmp / "repo"
+        repo, fresh = self.tmp / "repo", self.tmp / "repo-2"     # each stage on its own checkout: nothing is deleted
+        e2e.make_repo(fresh)
 
-        def touch(name):
+        def touch(name, where=repo):
             def run(*a, **k):
-                (repo / name).write_text("changed\n")
+                (where / name).write_text("changed\n")
                 return ([{"id": "F1"}], {}, None) if name == "by-finder.txt" else self.RV.Verification(self.RV.UNVERIFIABLE, "x")
             return run
         rev = self.reviewer()
@@ -123,11 +124,10 @@ class ReviewerReview(_Reviewer):
             rev.review(self.scope(), ("C-ADD",))
         self.assertEqual(str(c.exception), "the reviewed checkout changed during the finder: ['by-finder.txt'] "
                                            "(every finding discarded)")
-        (repo / "by-finder.txt").unlink()
         rev = self.reviewer()
         with mock.patch.object(rev, "_model", return_value=([{"id": "F1"}], {}, None)), \
-                mock.patch.object(rev, "_verify", touch("by-verification.txt")), self.assertRaises(ad.CapabilityUnrunnable) as c:
-            rev.review(self.scope(), ("C-ADD",))
+                mock.patch.object(rev, "_verify", touch("by-verification.txt", fresh)), self.assertRaises(ad.CapabilityUnrunnable) as c:
+            rev.review(self.scope(fresh), ("C-ADD",))
         self.assertEqual(str(c.exception), "the reviewed checkout changed during the verification: ['by-verification.txt'] "
                                            "(every finding discarded)")
 
@@ -211,11 +211,17 @@ class TreeOf(_Reviewer):
         with self.assertRaises(ad.CapabilityUnrunnable) as c:
             ad._unchanged(str(repo), head, before, "the finder")
         self.assertIn("['empty']", str(c.exception))
-        (repo / "empty").rmdir()
-        (repo / "d").rmdir()
-        os.symlink("dir", repo / "d")          # a link whose target reads like a directory's record
+        # the same checkout where d is a link whose target reads like a directory's record (a second repository, built
+        # the same way, so nothing is deleted): the record must still tell the two apart
+        twin = self.tmp / "repo-twin"
+        e2e.make_repo(twin)
+        (twin / "d").mkdir()
+        self.assertEqual(ad.tree_of(str(twin)), before)            # the twin is the same checkout as `before`
+        linked = self.tmp / "repo-linked"
+        e2e.make_repo(linked)
+        os.symlink("dir", linked / "d")
         with self.assertRaises(ad.CapabilityUnrunnable) as c:
-            ad._unchanged(str(repo), head, before, "the finder")
+            ad._unchanged(str(linked), e2e.git(linked, "rev-parse", "HEAD"), before, "the finder")
         self.assertIn("['d']", str(c.exception))
 
 
