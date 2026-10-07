@@ -1,0 +1,8 @@
+{
+ "checker": "execution_order",
+ "package": "V2.1 (B-03b)",
+ "kind": "hand_edit",
+ "find": "\"rule\": \"ascending T0 seconds",
+ "replace": "\"rule\": \"descending T0 seconds",
+ "expect": "derives now — re-run --write"
+}

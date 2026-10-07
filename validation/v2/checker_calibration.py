@@ -376,6 +376,21 @@ def _authority_limits() -> Checker:
                    ("validation/qualification/authority_limits.py",))
 
 
+def _execution_order() -> Checker:
+    """V2.1 (owner 2026-10-07, step 4): the mutation execution-order table is what its committed T0 sweep record
+    derives, byte for byte (validation/v2/execution_order.py --check). Known bad: the committed table with its rule
+    edited — a table that no longer is the record's derivation."""
+    eo = _load("aisef_v21_execution_order", V2 / "execution_order.py")
+    table = ROOT / "closure-evidence/v2/v2.1/EXECUTION-ORDER.json"
+
+    def bad(fx):
+        with tempfile.TemporaryDirectory() as t:
+            edited = pathlib.Path(t) / "EXECUTION-ORDER.json"
+            edited.write_text(_edit(table.read_text(encoding="utf-8"), fx), encoding="utf-8")
+            return eo.check(edited)
+    return Checker("execution_order", "V2.1 (B-03b)", lambda: eo.check(table), bad, ("validation/v2/execution_order.py",))
+
+
 def _owned_run() -> Checker:
     ow = _load("aisef_v2_owned_run", V2 / "owned_run.py")
     return Checker("owned_run", "WP-4.2", lambda: ow.check(ROOT), lambda fx: ow.problems_of(fx["measurement"]),
@@ -528,7 +543,7 @@ REGISTRY: list[Callable[[], Checker]] = [
     _kernel_rule("no_developer_artefact_at_parent", "NO_DEVELOPER_ARTEFACT_AT_PARENT", "WP-5.5 (invariant IX)"),
     _except_boundaries, _invariants_doc,
     _mutation, _cleanup_authority, _destructive_authority, _p1_evidence, _p2_evidence, _p3_evidence, _p4_evidence, _p5_evidence, _owned_run, _refmodel_independence, _gen_specs, _plan_semantics, _plan_baseline,
-    _migration_table, _p6_evidence, _old_path_audit, _release_inventory, _authority_limits,
+    _migration_table, _p6_evidence, _old_path_audit, _release_inventory, _authority_limits, _execution_order,
     # Cycle 2 (WP-2.0.1): the baseline guard, the probe catalog closure and the probe source rules
     _cycle2_baseline, _probe_catalog_closure,
     _probe_rule("no_clock_in_probe_facts", "NO_CLOCK_IN_PROBE_FACTS"),
