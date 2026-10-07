@@ -1569,6 +1569,38 @@ class KillSets(unittest.TestCase):
                     m.main(["run", "--order", str(table), *targets])
                 self.assertEqual(calls, [])
 
+    def test_run_misuse_is_refused_before_anything_runs(self):
+        """Final verifier: `run A --order T` ran A in declared order and refused only after it; `run --order` raised
+        IndexError; `run --order T` ran every target of every phase. Each is refused, with a message and a non-zero
+        exit, before any target runs and before any record is written; so is a name that is not a target."""
+        a, b = "tests/v2/test_a.py", "tests/v2/test_b.py"
+        targets = {"aisef2/toy.py::positive": [a, b]}
+        calls = []
+
+        def fake(root, target, tests, pristine=None, on_mutant=None, t0_only=False, order=None):
+            calls.append(target)
+            return m._summarise({"target": target, "runner": 2, "kill_tests": list(tests), "mutants": 0, "results": []})
+        with tempfile.TemporaryDirectory() as d:
+            root = toy(pathlib.Path(d), POSITIVE, {})
+            table = pathlib.Path(d) / "order.json"
+            table.write_text(json.dumps({"aisef2/toy.py::positive": {"files": [b, a], "from": "x"}}), encoding="utf-8")
+            with mock.patch.object(m, "ROOT", root), mock.patch.object(m, "RECORDS", {"TOY": "rec.json"}), \
+                    mock.patch.object(m, "PHASE_TARGETS", {"TOY": targets}), mock.patch.object(m, "TARGETS", targets), \
+                    mock.patch.object(m, "run_target", fake), mock.patch("builtins.print"):
+                for argv in (["run", *targets, "--order", str(table)], ["run", "--order"], ["run", "--order", str(table)],
+                             ["run", "--order", str(table), *targets, "--order", str(table)],
+                             ["run", *targets, "aisef2/toy.py::gone"]):
+                    with self.subTest(argv=argv):
+                        with self.assertRaises(SystemExit) as stop:
+                            m.main(argv)
+                        # a message (str): the interpreter prints it and exits 1
+                        self.assertRegex(stop.exception.code, r"^usage: mutation\.py run --order TABLE\.json TARGET\.\.\. |"
+                                                              r"^not a mutation target: \['aisef2/toy\.py::gone'\]$")
+                self.assertEqual(calls, [])
+                self.assertFalse((root / "rec.json").exists())
+                m.main(["run", "--order", str(table), *targets])   # the same table, used as the usage says: it runs
+                self.assertEqual(calls, list(targets))
+
 
 # --------------------------------------------------------------------------------------------- §7 order independence
 

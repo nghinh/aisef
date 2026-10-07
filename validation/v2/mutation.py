@@ -1653,12 +1653,18 @@ def main(argv: list[str] | None = None) -> int:
         return 1 if failed else 0
     if argv[:1] == ["run"]:
         chosen, table, stamp = argv[1:], {}, {}
+        # misuse is refused before anything runs, never read another way (`run A --order T` ran A, then refused)
+        if "--order" in chosen[1:] or (chosen[:1] == ["--order"] and len(chosen) < 3):
+            raise SystemExit("usage: mutation.py run --order TABLE.json TARGET... (--order once, first, with a table "
+                             "and the targets it is for)")
         if chosen[:1] == ["--order"]:   # {target: {"files": [...], "from": "<measurement>"}}; absent: declared order
             raw = pathlib.Path(chosen[1]).read_bytes()
             table, chosen = json.loads(raw), chosen[2:]
             stamp = {"table": argv[2], "table_sha256": hashlib.sha256(raw).hexdigest()}
             if unknown := [x for x in table if x not in TARGETS]:
                 raise SystemExit(f"not a mutation target in the execution-order table: {unknown}")
+        if unknown := [t for t in chosen if t not in TARGETS]:
+            raise SystemExit(f"not a mutation target: {unknown}")
         chosen = chosen or list(TARGETS)
         worker = _worker(ROOT)
         try:
@@ -1699,9 +1705,6 @@ def main(argv: list[str] | None = None) -> int:
                         rest = [x for x in chosen if x in TARGETS and x not in done]   # targets run phase by phase
                         print(f"STOPPED {target}: {t['error']}\nNOT RUN {rest}", flush=True)
                         return 3
-        unknown = [t for t in chosen if t not in TARGETS]
-        if unknown:
-            raise SystemExit(f"not a mutation target: {unknown}")
     problems = check()
     for phase, rel in RECORDS.items():
         if (ROOT / rel).exists():
