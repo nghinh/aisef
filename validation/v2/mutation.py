@@ -1435,6 +1435,17 @@ def null_mutant(module_src: str, func: str) -> str:
     return ast.unparse(tree)
 
 
+def _order_problem(order, kill: list[str]) -> str | None:
+    """Why `order` is not an execution order of the kill set `kill` (§7.2), None when it is: an object whose `files` is
+    `kill` in some order (the same files, each as often) and whose `from` names the measurement the order came from.
+    One rule for main (every table entry, before anything runs), run_target and the record check."""
+    files = order.get("files") if isinstance(order, dict) else order
+    if not isinstance(order, dict) or not isinstance(files, list) or not all(isinstance(f, str) for f in files) \
+            or sorted(files) != sorted(kill) or not order.get("from"):
+        return f"execution order {files!r} is not the kill set in another order, or names no measurement"
+    return None
+
+
 def run_target(root: pathlib.Path, target: str, tests: list[str], pristine: tuple[pathlib.Path, str] | None = None,
                on_mutant=None, t0_only: bool = False, order: dict | None = None) -> dict:
     """Measure one target (§2–§4). `pristine`: the copy `main()` took once ((path, tree digest)); a direct caller passes
@@ -1448,7 +1459,7 @@ def run_target(root: pathlib.Path, target: str, tests: list[str], pristine: tupl
     rel, func = target.split("::")
     worker = _worker(root)
     out: dict = {"target": target, "runner": 2, "kill_tests": list(tests),
-                 **({"execution_order": order} if order else {})}
+                 **({"execution_order": order} if order is not None else {})}
     with tempfile.TemporaryDirectory(prefix=f"aisef-mut-{worker}-", ignore_cleanup_errors=True) as t:
         scratch = pathlib.Path(t)
         src_root, tree_sha = pristine or _pristine(root, scratch / "pristine")
@@ -1459,9 +1470,8 @@ def run_target(root: pathlib.Path, target: str, tests: list[str], pristine: tupl
         if [k for k in tests if k in NOT_KILL_FILES]:
             out["error"] = f"not a kill file: {[k for k in tests if k in NOT_KILL_FILES]} (NOT_KILL_FILES)"
             return _summarise(out)
-        if order and (sorted(order.get("files", [])) != sorted(tests) or not order.get("from")):
-            out["error"] = (f"execution order {order.get('files')} is not the kill set in another order, or names no "
-                            "measurement")
+        if order is not None and (why := _order_problem(order, tests)):
+            out["error"] = why
             return _summarise(out)
         tg, where = None, "before the target"
         try:   # establish, the first tree and T0 are inside too: an exception there keeps the rows and stops (VS-4)
@@ -1661,8 +1671,14 @@ def main(argv: list[str] | None = None) -> int:
             raw = pathlib.Path(chosen[1]).read_bytes()
             table, chosen = json.loads(raw), chosen[2:]
             stamp = {"table": argv[2], "table_sha256": hashlib.sha256(raw).hexdigest()}
+            if not isinstance(table, dict):
+                raise SystemExit(f"execution-order table refused, nothing ran: not a JSON object: {argv[2]}")
             if unknown := [x for x in table if x not in TARGETS]:
                 raise SystemExit(f"not a mutation target in the execution-order table: {unknown}")
+            # every entry, before the first target runs: a bad one refused at its turn came after hours of earlier
+            # targets, and its errored entry replaced that target's result in the record
+            if bad := {x: why for x, e in table.items() if (why := _order_problem(e, TARGETS[x]))}:
+                raise SystemExit(f"execution-order table refused, nothing ran: {bad}")
         if unknown := [t for t in chosen if t not in TARGETS]:
             raise SystemExit(f"not a mutation target: {unknown}")
         chosen = chosen or list(TARGETS)

@@ -1569,6 +1569,44 @@ class KillSets(unittest.TestCase):
                     m.main(["run", "--order", str(table), *targets])
                 self.assertEqual(calls, [])
 
+    def test_main_refuses_a_table_with_any_bad_entry_before_the_first_target_runs(self):
+        """Final verifier: a bad entry was refused only at its target's turn — after every earlier target had run —
+        and its NOT_RUN entry replaced that target's result in the record. main now checks every entry of the table
+        (the targets it runs and the ones it does not) with run_target's own rule before the first target runs."""
+        a, b = "tests/v2/test_a.py", "tests/v2/test_b.py"
+        first, second = "aisef2/toy.py::positive", "aisef2/toy.py::other"
+        targets = {first: [a, b], second: [a, b]}
+        calls = []
+
+        def fake(root, target, tests, pristine=None, on_mutant=None, t0_only=False, order=None):
+            calls.append(target)
+            return m._summarise({"target": target, "runner": 2, "kill_tests": list(tests), "mutants": 0, "results": []})
+        good = {"files": [b, a], "from": "T0 seconds (this test)"}
+        with tempfile.TemporaryDirectory() as d:
+            root = toy(pathlib.Path(d), POSITIVE + "\n\ndef other(x):\n    return x\n", {})
+            record = root / "rec.json"
+            kept = json.dumps({"record": "toy", "targets": [{"target": second, "kept": "the earlier result"}]}) + "\n"
+            record.write_text(kept, encoding="utf-8")
+            table = pathlib.Path(d) / "order.json"
+            with mock.patch.object(m, "ROOT", root), mock.patch.object(m, "RECORDS", {"TOY": "rec.json"}), \
+                    mock.patch.object(m, "PHASE_TARGETS", {"TOY": targets}), mock.patch.object(m, "TARGETS", targets), \
+                    mock.patch.object(m, "run_target", fake), mock.patch("builtins.print"):
+                for bad in ({"files": [a], "from": "x"}, {"files": [b, a, a], "from": "x"}, {"files": [a, a], "from": "x"},
+                            {"files": [b, a]}, {"files": [b, a], "from": ""}, {"from": "x"}, {}, [b, a], None):
+                    for argv in ([first, second], [first]):   # the bad entry's target runs second, or not at all
+                        with self.subTest(bad=bad, argv=argv):
+                            table.write_text(json.dumps({first: good, second: bad}), encoding="utf-8")
+                            with self.assertRaises(SystemExit) as stop:
+                                m.main(["run", "--order", str(table), *argv])
+                            why = (f"execution order {bad.get('files') if isinstance(bad, dict) else bad!r} is not the "
+                                   "kill set in another order, or names no measurement")
+                            self.assertEqual(stop.exception.code, f"execution-order table refused, nothing ran: "
+                                                                  f"{ {second: why} }")
+                            self.assertEqual((calls, record.read_text(encoding="utf-8")), ([], kept))
+                table.write_text(json.dumps({first: good, second: {**good, "files": [a, b]}}), encoding="utf-8")
+                m.main(["run", "--order", str(table), first])   # every entry valid: it runs
+                self.assertEqual(calls, [first])
+
     def test_run_misuse_is_refused_before_anything_runs(self):
         """Final verifier: `run A --order T` ran A in declared order and refused only after it; `run --order` raised
         IndexError; `run --order T` ran every target of every phase. Each is refused, with a message and a non-zero
