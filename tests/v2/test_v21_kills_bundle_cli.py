@@ -34,5 +34,25 @@ class Coverage(unittest.TestCase):
             "limit": "clauses are the ones the criteria's facts declare; AISEF does not parse the requirements document"})
 
 
+class Init(unittest.TestCase):
+    """init — "L360 True->False" (`out.mkdir(parents=False)`), "L362 string ' exists: init writes a new directory and never
+    into one' emptied": init makes the directory it is given, parents included, and refuses one that exists, saying so."""
+
+    def setUp(self) -> None:
+        import tempfile
+        t = tempfile.TemporaryDirectory()
+        self.addCleanup(t.cleanup)
+        self.tmp = pathlib.Path(t.name)
+
+    def test_init_makes_a_nested_new_directory_and_refuses_an_existing_one_saying_why(self):
+        out = self.tmp / "work" / "projects" / "calc"
+        bundle_cli.init("calc-1-story", out)
+        self.assertTrue((out / "authoring.json").is_file())
+        self.assertTrue(any((out / "repo").rglob("*.py")))
+        with self.assertRaises(bundle_cli.B.BundleError) as c:
+            bundle_cli.init("calc-1-story", out)
+        self.assertEqual(str(c.exception), f"{out} exists: init writes a new directory and never into one")
+
+
 if __name__ == "__main__":
     unittest.main()
