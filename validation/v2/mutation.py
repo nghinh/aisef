@@ -35,6 +35,7 @@ import pathlib
 import shutil
 import sys
 import tempfile
+import time
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
@@ -866,6 +867,19 @@ def mutants(module_src: str, func: str, enums: dict[str, list[str]]) -> list[tup
     return out
 
 
+def _write_version(path: pathlib.Path, src: str, last: int) -> int:
+    """Write one version of the mutated file with a whole-second mtime strictly above every earlier version's (BC-1).
+    A timestamp .pyc is accepted when (int mtime, size) match its header, so two versions of one size written in one
+    second share a .pyc, and the second runs the first one's code: whichever process wrote it (`-I` children ignore
+    PYTHONDONTWRITEBYTECODE and PYTHONPYCACHEPREFIX) and wherever it lives (BC-2, BC-4). With a stamp no earlier version
+    had, no cached .pyc of another version can be accepted. Stamps may run ahead of the clock by about a second per
+    fast mutant; no aisef2 code and no kill test reads the mutated module's mtime (BC-1 verifier)."""
+    path.write_text(src, encoding="utf-8")
+    stamp = max(last + 1, int(time.time()))
+    os.utime(path, (stamp, stamp))
+    return stamp
+
+
 def _run_tests(root: pathlib.Path, tests: list[str], boundary: ca.Boundary) -> tuple[bool, int]:
     """(every kill test passed, processes the runner had to signal). Each run is a process range (WP-4.2): a timeout
     takes down the whole tree it started, not only the direct child (P2-RESIDUAL-ORPHAN-SUBJECT: leaked harness
@@ -955,15 +969,16 @@ def run_target(root: pathlib.Path, target: str, tests: list[str]) -> dict:
             return {"target": target, "error": f"kill tests fail on the unmutated tree (leaked {leaked})",
                     "mutants": [], "baseline": {"timed_out": list(_TIMED_OUT), "failed": list(_FAILED)}}
         results = []
+        last = int(path.stat().st_mtime)  # the checkout's own (copy2): every stamp is above it (BC-5)
         for desc, src in mutants(original, func, _enum_members(original, work)):
-            path.write_text(src, encoding="utf-8")
+            last = _write_version(path, src, last)
             _TIMED_OUT.clear()
             _CLEANUP.clear()
             try:
                 passes, leaked = _run_tests(work, tests, boundary)
                 strays = _reap_strays(work, boundary) + leaked
             except ca.Unproven as e:
-                path.write_text(original, encoding="utf-8")
+                _write_version(path, original, last)
                 return {"target": target, "error": f"{ca.RESIDUAL_OWNERSHIP_UNKNOWN} at mutant {desc!r}: {e}",
                         "mutants": [], "cleanup": list(_CLEANUP)}
             killed = not passes
@@ -976,7 +991,7 @@ def run_target(root: pathlib.Path, target: str, tests: list[str]) -> dict:
             if _CLEANUP:
                 result["cleanup"] = list(_CLEANUP)  # each signal with the authority's proof of ownership
             results.append(result)
-        path.write_text(original, encoding="utf-8")
+        _write_version(path, original, last)
     survivors = [r["mutant"] for r in results if not r["killed"]]
     return {"target": target, "kill_tests": tests, "source_sha256": source_digest(original),
             "mutants": len(results), "killed": len(results) - len(survivors),
