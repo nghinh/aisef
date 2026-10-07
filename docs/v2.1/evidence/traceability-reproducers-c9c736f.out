@@ -1,10 +1,10 @@
 # Reproducers cited by docs/v2.1/research/TRACEABILITY.json, run at c9c736f (round 2 of the traceability track)
 # clone: git clone --no-local --no-checkout --single-branch --branch v21p/trace; checkout --detach c9c736fd638511b5cfd23d4d75ceb311c47b0759; dirty 0
 # env: PATH without any directory holding an `opencode` executable; HOME and XDG_* in scratch; PYTHONPATH=<clone>
-# run 1 (hermetic, as the suite runs): python3 -P -m unittest -v <the 97 ids below>
-# run 1 summary: Ran 97 tests in 346.923s / OK (skipped=1)
+# run 1 (hermetic, as the suite runs): python3 -P -m unittest -v <the 98 ids below>
+# run 1 summary: Ran 98 tests in 348.266s / OK (skipped=1)
 # run 2: AISEF_TEST_OCR_EXE=<ocr v1.12.12 darwin-arm64, sha256 bf38abf320ead4e106b71c15824463640207118f38e1c10c28a73b6839104af7> python3 -P -m unittest -v tests.v2.test_v21_review_chain.RealBinary
-# run 2 summary: Ran 3 tests in 1.657s / OK
+# run 2 summary: Ran 3 tests in 1.662s / OK
 
 tests.v2.test_v21_identity.PthChannel.test_the_mechanism_minus_I_runs_it_minus_S_does_not: ok
 tests.v2.test_v21_identity.PthChannel.test_every_active_probe_launch_carries_minus_S: ok
@@ -70,6 +70,7 @@ tests.v2.test_v21_review_chain.IncompleteReview.test_an_unsupported_manifest_sch
 tests.v2.test_v21_review_chain.IncompleteReview.test_its_token_budget_spent: ok
 tests.v2.test_v21_review_chain.IncompleteReview.test_timed_out_and_its_spend_unknown: ok
 tests.v2.test_v21_review_ocr.Coverage.test_a_manifest_that_does_not_hold_together_is_indeterminate: ok
+tests.v2.test_v21_review_chain.IncompleteReview.test_under_advisory_the_incomplete_review_is_recorded_and_does_not_block: ok
 tests.v2.test_v21_review_ocr.Coverage.test_the_preview_s_exclusions_and_omissions_are_named: ok
 tests.v2.test_v21_review_ocr.Coverage.test_a_complete_run_of_the_frozen_range_covering_every_required_path: ok
 tests.v2.test_v21_review_ocr.Process.test_the_command_reviews_exactly_the_frozen_range_into_a_fresh_file: ok

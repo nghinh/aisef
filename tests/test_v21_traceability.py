@@ -78,8 +78,12 @@ class Traceability(unittest.TestCase):
         p03 = rows["P-5.3a"]["upstream"][0]
         p03["where"] = p03["where"].replace("checkpoint-templates.ts", "no-such-file.ts")
         rows["P-6.2c"]["upstream"][0]["where"] = "README.md:9"
-        rows["P-6.2a"]["upstream"][0]["commit"] = "d"                     # one hex digit is a prefix of anything
-        rows["P-11.3"]["refs"].append({"path": "aisef2/app/usage.py", "contains": ""})       # holds in every file
+        rows["P-6.2a"]["upstream"][0]["commit"] = rows["P-6.2a"]["upstream"][0]["commit"][:6]   # a prefix, too short
+        rows["P-11.3"]["refs"].append({"path": "aisef2/app/usage.py", "contains": "def"})    # holds, and says nothing
+        # a corrected claim: the research's own range (875-924) is not the verifier's (877-924), so it is not cited
+        rows["P-6.2b"]["upstream"][0]["where"] = "src/compute.rs:875-924"
+        # a test that exists at the head and is cited after the committed run of the reproducers
+        rows["P-12-2"]["reproducers"].append("tests/v2/test_v21_inputs.py::BundleShape::test_facts_as_a_list")
         rows["P-12-4"]["refs"].append({"path": "aisef2/app/usage.py", "exists": "yes"})
         rows["P-5.2c"]["commits"][0]["paths"] = []                        # touches nothing it names
         rows["P-4.2a"]["gap"] = ""                                        # adopted: nothing missing must be said
@@ -103,13 +107,16 @@ class Traceability(unittest.TestCase):
                     "P-5.2b": "the verifier reclassified it as INFERENCE, the row says CODE",
                     "P-7c": "where line 9999-10000 of", "P-V2-05": "where names no file:line",
                     "P-5.3a": "of no-such-file is not one the", "P-6.2c": "where line 9 of README is not one",
-                    "P-6.2a": "commit d is not one the research read", "P-11.3": "is not a string of 4 characters",
+                    "P-6.2a": "is not one the research read", "P-11.3": "contains 'def' is not a string of 4 characters",
+                    "P-6.2b": "where line 875-924 of compute is not one the verifier's evidence cites",
+                    "P-12-2": "test_facts_as_a_list is not listed ok in docs/v2.1/evidence/traceability-reproducers-c9c736f.out",
                     "P-12-4": "is not true or false", "P-5.2c": "paths names no path",
                     "P-4.2a": "decision is adopted names its gap", "R-M1": "decision is blocked names its gap",
                     "R-P1-6": "not a criterion the 360 document states (", "R-P1-7": "states in §7",
                     "R-P2-17": "not a criterion the 360 document states (", "P-9.1": "a path outside the checkout",
                     "P-ADJ-6": "cli-integration-c9c736f.out at with-table does not contain 'commit: b72e51e'"}
         problems = TC.check(t, ROOT, None, None, self.doc)
+        self.assertEqual(TC.RAN.findall("a.B.c: ok\na.B.d: skipped 'x'\na.B.e: FAIL\na.B.f: ok, then\n"), ["a.B.c"])
         for rid, text in expected.items():
             self.assertTrue(any(p.startswith(rid) and text in p for p in problems), (rid, text, problems))
         self.assertTrue(any("generated block" in p for p in problems))
@@ -129,17 +136,27 @@ class Traceability(unittest.TestCase):
     def test_criteria_are_read_from_the_sections_that_state_them(self):
         proposal = ("## 4. X\n\n### 4.3. Y\n\nmột câu.\n\n**Nghiệm thu bước đầu:** a; b.\n\n## 10. Backlog\n\n"
                     "| ID | Ưu tiên | Thay đổi | Nghiệm thu cụ thể | Phụ thuộc | Cỡ |\n|---|---|---|---|---|---|\n"
-                    "| V2-01 | P0 | đổi | tiêu chí một | — | M |\n\n## 12. Gate\n\n### Phần phải làm ngay\n\n**x:** không phải cổng\n\n"
-                    "### Gate đề xuất\n\n**2.0.1:** cổng một.\n\n## 13. Hoãn\n\n**2.2:** không phải cổng\n\n"
-                    "| V2-99 | P0 | đổi | không phải tiêu chí | — | S |\n")
-        self.assertEqual(TC.criteria(proposal, "proposal"), {"§4.3": ["a; b."], "§10": ["tiêu chí một"], "§12": ["cổng một."]})
+                    "| V2-01 | P0 | đổi | tiêu chí một | — | M |\n| V2-02 | P1 | đổi | tiêu chí hai | — | S |\n\n## 12. Gate\n\n"
+                    "### Phần phải làm ngay\n\n**x:** không phải cổng\n\n### Gate đề xuất\n\n**2.0.1:** cổng một.\n\n"
+                    "## 13. Hoãn\n\n**2.2:** không phải cổng\n\n| V2-99 | P0 | đổi | không phải tiêu chí | — | S |\n\n"
+                    "**Nghiệm thu bước đầu:** không phải §4.3\n\n### Gate đề xuất\n\n**2.3:** không phải cổng §12\n")
+        self.assertEqual(TC.criteria(proposal, "proposal"),
+                         {"§4.3": ["a; b."], "§10": ["tiêu chí một", "tiêu chí hai"], "§10 V2-01": ["tiêu chí một"],
+                          "§10 V2-02": ["tiêu chí hai"], "§12": ["cổng một."]})
         assessment = ("## 6. Lộ trình\n\n- **2.1**: #6. Thước đo xong: một người\n  ngoài dựng bundle.\n\n## 7. Bảng\n\n"
-                      "| Chỉ số | 2.0.0 | Mục tiêu 2.1 |\n|---|---|---|\n| USD | chưa đo | có |\n\n## 8. Rủi ro\n| a | b | c |\n")
+                      "| Chỉ số | 2.0.0 | Mục tiêu 2.1 |\n|---|---|---|\n| USD | chưa đo | có |\n\n## 8. Rủi ro\n| a | b | c |\n"
+                      "Thước đo xong: không phải §6\n")
         self.assertEqual(TC.criteria(assessment, "360"), {"§6": ["một người ngoài dựng bundle."], "§7": ["Mục tiêu 2.1: có"]})
         rows = {r["id"]: r for r in self.table["rows"]}
         ctx = {"criteria": {"proposal": TC.criteria(proposal, "proposal"), "360": {}}}
         for acc, ok in (("tiêu chí một", True), ("cổng một (§12)", True), ("tiêu chí một (§12)", False), ("một câu.", False),
-                        (TC.NO_CRITERION["proposal"] + "; theo chính mục", True), ("—", False), ("(§10)", False)):
+                        (TC.NO_CRITERION["proposal"] + "; theo chính mục", True), ("—", False), ("(§10)", False),
+                        ("khác; " + TC.NO_CRITERION["proposal"], False)):
+            row = {**rows["P-4.2b"], "acceptance": acc}                  # ref §4.2: any criterion the proposal states
+            self.assertEqual(TC.acceptance_problem(row, ctx) is None, ok, acc)
+        # ref "§10 V2-01": its own §10 criterion only, never another item's, never "states none"
+        for acc, ok in (("tiêu chí một", True), ("tiêu chí hai", False), ("cổng một (§12)", False), ("tiêu chí một (§12)", False),
+                        (TC.NO_CRITERION["proposal"] + "; theo chính mục", False)):
             row = {**rows["P-V2-01"], "acceptance": acc}
             self.assertEqual(TC.acceptance_problem(row, ctx) is None, ok, acc)
         self.assertIsNone(TC.acceptance_problem({**rows["P-13-1"], "acceptance": "—"}, ctx))      # declined

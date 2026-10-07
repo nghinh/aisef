@@ -130,7 +130,7 @@
    "report_items": {
     "A1": "M3"
    },
-   "m_note": "Khớp REPORT. Test tồn tại tại HEAD (kiểm bằng AST); không chạy lại trong phiên lập bảng.",
+   "m_note": "Khớp REPORT. Reproducer tại HEAD chạy lại xanh tại c9c736f (vòng 2, `docs/v2.1/evidence/traceability-reproducers-c9c736f.out`); reproducer ở `f006d3d` không chạy lại.",
    "acceptance": "`.pth` không chạy trong controller; developer không ghi được interpreter/import tree của verifier; chạy canary qua đường app thật",
    "gap": "Không có ranh giới hệ điều hành (F/B-07). Canary qua đường app thật với provider thật: chưa chạy.",
    "unconfirmed": ""
@@ -421,7 +421,7 @@
     "B1": "M3",
     "B3": "M3"
    },
-   "m_note": "Khớp REPORT. Test tồn tại tại HEAD (kiểm bằng AST); không chạy lại trong phiên lập bảng.",
+   "m_note": "Khớp REPORT. Reproducer tại HEAD chạy lại xanh tại c9c736f (vòng 2, `docs/v2.1/evidence/traceability-reproducers-c9c736f.out`).",
    "acceptance": "Candidate làm hỏng story trước nhận phản hồi đúng; biến thể hợp lệ/docstring không bị bác nhầm; vẫn kiểm cây tích hợp khi base đổi",
    "gap": "Contract S-10-a sửa: M6 (B-04 chưa duyệt). 'Biến thể hợp lệ không bị bác nhầm' chỉ kiểm cho hai bản nháp S-10-a trên dạng smoke #2, không tổng quát (xem P-9.3).",
    "unconfirmed": ""
@@ -572,7 +572,7 @@
    "report_items": {
     "B6": "M3"
    },
-   "m_note": "Khớp REPORT. Test tồn tại tại HEAD (kiểm bằng AST); không chạy lại trong phiên lập bảng.",
+   "m_note": "Khớp REPORT. Reproducer tại HEAD chạy lại xanh tại c9c736f (vòng 2, `docs/v2.1/evidence/traceability-reproducers-c9c736f.out`).",
    "acceptance": "Patch không đổi capability dùng được bundle cũ; đổi semantics bị chặn hoặc migrate có duyệt; run cũ kiểm được",
    "gap": "EXECUTION_DIGEST bỏ sót `runtime/process_range.py` và `range_anchor.py` — phát hiện 360 §3.1 vẫn đúng tại HEAD (xem R-3.1). Kỷ luật tăng CAPABILITY_VERSION không máy nào kiểm (ADR-2). Tuyên bố 'một `-S` làm đỏ 37 test' chưa đo (STATUS B6).",
    "unconfirmed": ""
@@ -1350,8 +1350,8 @@
     "C2": "M4"
    },
    "m_note": "M4 là mức của C2; hành vi riêng này có test offline.",
-   "acceptance": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với câu liền trước của cùng đoạn §4.2: Định nghĩa mẫu số từ chính sách AISEF trước khi gọi OCR.",
-   "gap": "Tệp bắt buộc bị loại vì extension hay nhị phân không được review mà review vẫn có thể COMPLETE. Không test nào đặt một tệp bắt buộc như thế rồi khẳng định kết quả (`grep` tests/: không test nào đọc `unreadable` hay `NOT_REVIEWABLE`; fixture `tests/v2/fixtures/ocr/preview.json` có `docs/limits.md` = `unsupported_ext` nhưng không test nào đặt nó là bắt buộc).",
+   "acceptance": "review thiếu một file bắt buộc không được thành PASS (§4.3)",
+   "gap": "Tiêu chí chưa đạt cho tệp bắt buộc mà preview của OCR loại vì `unsupported_ext` hay `binary`: tệp đó được ghi tên trong coverage nhưng không tính là thiếu (`review_ocr.NOT_REVIEWABLE`), nên review không đọc nó vẫn có thể COMPLETE. Không test nào đặt một tệp bắt buộc như thế rồi khẳng định kết quả (`grep` tests/: không test nào đọc `unreadable` hay `NOT_REVIEWABLE`; fixture `tests/v2/fixtures/ocr/preview.json` có `docs/limits.md` = `unsupported_ext` nhưng không test nào đặt nó là bắt buộc).",
    "unconfirmed": ""
   },
   {
@@ -1411,7 +1411,7 @@
     }
    ],
    "report_items": {},
-   "m_note": "REPORT §2 không có hạng mục riêng (B-03c thuộc §7). Test tồn tại tại HEAD (kiểm bằng AST); không chạy lại trong phiên lập bảng.",
+   "m_note": "REPORT §2 không có hạng mục riêng (B-03c thuộc §7). Reproducer tại HEAD chạy lại xanh tại c9c736f (vòng 2, `docs/v2.1/evidence/traceability-reproducers-c9c736f.out`).",
    "acceptance": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với chỉ thị B-03c của chủ dự án (RELEASE-DECISIONS seq 5): Cả hai không trực tiếp commit/merge sản phẩm hoặc tạo đường quyết định cuối thứ hai.",
    "gap": "Không có ranh giới OS: finder chạy dưới cùng user; thay đổi bị phát hiện và loại, không bị ngăn (REPORT §3).",
    "unconfirmed": ""
@@ -1517,7 +1517,7 @@
    "why": "Đã có trong 2.0, không triển khai lại.",
    "commits": [],
    "report_items": {},
-   "m_note": "REPORT §2 không có hạng mục riêng cho mục này. Test tồn tại tại HEAD (kiểm bằng AST); không chạy lại trong phiên lập bảng.",
+   "m_note": "REPORT §2 không có hạng mục riêng cho mục này. Reproducer tại HEAD chạy lại xanh tại c9c736f (vòng 2, `docs/v2.1/evidence/traceability-reproducers-c9c736f.out`).",
    "acceptance": "vẫn kiểm cây tích hợp khi base đổi (§10 V2-06)",
    "gap": "Không còn so với tiêu chí trên: sau merge, mọi obligation của story và PRESERVE của các story đã commit được chứng minh lại ở revision đã merge (`merge.reprove`, POST_MERGE). Dựa vào đọc mã và test ORCH_9/10 (chạy lại xanh tại c9c736f, vòng 2).",
    "unconfirmed": ""
@@ -2218,7 +2218,7 @@
     }
    ],
    "report_items": {},
-   "m_note": "REPORT §2 không có hạng mục (B-03c chấp nhận ở RELEASE-DECISIONS seq 5). Test tồn tại tại HEAD (kiểm bằng AST); không chạy lại trong phiên lập bảng.",
+   "m_note": "REPORT §2 không có hạng mục (B-03c chấp nhận ở RELEASE-DECISIONS seq 5). Reproducer tại HEAD chạy lại xanh tại c9c736f (vòng 2, `docs/v2.1/evidence/traceability-reproducers-c9c736f.out`).",
    "acceptance": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với chỉ thị B-03c của chủ dự án (RELEASE-DECISIONS seq 5): Cập nhật inventory và kiểm tra kiến trúc để cưỡng chế các giới hạn này.",
    "gap": "Checker là phân tích tĩnh trên mã Python; tiến trình ngoài (OCR) không bị ràng buộc ở mức OS.",
    "unconfirmed": ""

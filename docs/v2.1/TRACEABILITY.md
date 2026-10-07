@@ -51,27 +51,33 @@ python3 -P validation/v21/traceability_check.py --with-ref release/v2.0.1-prep  
 ```
 
 Bộ kiểm: commit tồn tại, là tổ tiên của HEAD (hoặc của `f006d3d` với nhánh 2.0.1) và chạm đúng các đường dẫn ghi (danh
-sách không rỗng); mỗi reproducer tồn tại (AST); mỗi "kiểm cơ học" đúng và có đúng một khẳng định (chuỗi `contains`/`lacks`
-từ 4 ký tự, `exists` là true/false); mức khớp REPORT §2; mỗi nguồn upstream là một tuyên bố của nghiên cứu với đúng nhãn
-(của người kiểm chứng khi họ phân lại), đúng kết quả kiểm chứng, đúng commit đã đọc (≥ 7 chữ số hex), và mỗi `tệp:dòng`
-là một dòng mà bằng chứng của nghiên cứu (của người kiểm chứng khi corrected/refuted) nêu **cho chính tệp đó** (số dòng
-thuộc về tệp được nhắc gần nhất trước nó); mục 360° đúng nguyên văn; mọi hàng trừ `declined` ghi phần còn thiếu (có chữ,
+sách không rỗng); mỗi reproducer tồn tại (AST), và mỗi reproducer tại HEAD có dòng `ok` (theo method) trong lượt chạy đã
+commit [`evidence/traceability-reproducers-c9c736f.out`](evidence/traceability-reproducers-c9c736f.out) — bộ kiểm không
+chạy test, nên reproducer trích thêm sau lượt chạy bị nêu tên cho tới khi chạy lại; mỗi "kiểm cơ học" đúng và có đúng
+một khẳng định (chuỗi `contains`/`lacks` từ 4 ký tự, `exists` là true/false); mức khớp REPORT §2; mỗi nguồn upstream là
+một tuyên bố của nghiên cứu với đúng nhãn (của người kiểm chứng khi họ phân lại), đúng kết quả kiểm chứng, đúng commit
+đã đọc (≥ 7 chữ số hex), và mỗi `tệp:dòng` là một số mà bằng chứng của nghiên cứu (của người kiểm chứng khi
+corrected/refuted) ghi sau một lần nhắc **chính tệp đó** và trước lần nhắc tệp kế tiếp — bộ kiểm không phân biệt số dòng
+với số khác ở đó (phần trăm, số token); mục 360° đúng nguyên văn; mọi hàng trừ `declined` ghi phần còn thiếu (có chữ,
 không phải `—`); tiêu chí nghiệm thu nằm trong một đoạn nêu tiêu chí của nguồn, đúng mục khi có "(§n)", hoặc ghi rõ nguồn
-không nêu (tiêu chí của đề xuất chỉ kiểm khi có `--proposal`); "Mục còn mở" và tập hàng `open`/`blocked` trùng nhau. Khoá
-lạ — ở cấp trên cùng, trong `sources`, trong mục còn mở, hàng, commit, kiểm cơ học hay upstream — là lỗi, không bị bỏ qua;
-mọi revision phải là mã commit hex (`--at`, `--with-ref` do git phân giải trước). Bộ kiểm **không** phân định được một
-câu chép từ đoạn tiêu chí có phải toàn bộ tiêu chí, hay tiêu chí đã đạt chưa: đó là phán đoán, ghi ở "Còn thiếu".
+không nêu (tiêu chí của đề xuất chỉ kiểm khi có `--proposal`), và hàng mà `ref` là một mục §10 ("§10 V2-03") chép đúng
+tiêu chí §10 của chính mục đó — không của mục khác, không ghi "không ghi tiêu chí"; "Mục còn mở" và tập hàng
+`open`/`blocked` trùng nhau. Khoá lạ — ở cấp trên cùng, trong `sources`, trong mục còn mở, hàng, commit, kiểm cơ học hay
+upstream — là lỗi, không bị bỏ qua; mọi revision phải là mã commit hex (`--at`, `--with-ref` do git phân giải trước).
+Bộ kiểm **không** phân định được: một câu chép từ đoạn tiêu chí có phải toàn bộ tiêu chí; tiêu chí đã đạt chưa; và, ngoài
+§10, tiêu chí được chép có phải của chính mục, hay nguồn có nêu tiêu chí ở chỗ khác cho một hàng ghi "không ghi tiêu chí"
+(vì vậy P-4.2b chép tiêu chí §4.3 về tệp bắt buộc). Đó là phán đoán, ghi ở "Tiêu chí nghiệm thu" và "Còn thiếu".
 
 Mặc định bộ kiểm chỉ đọc object tới được từ HEAD, nên chạy được trên mọi clone của nhánh; 7 ô đọc trên nhánh 2.0.1 local
 (commit `c0ec1a5`, `f006d3d` và reproducer ở `f006d3d`, hàng P-V2-01, P-GATE-2.0.1, R-P0-1) chỉ được kiểm khi có
 `--with-ref release/v2.0.1-prep`, và dòng OK nói rõ chúng chưa được kiểm. Test: `tests/test_v21_traceability.py`.
 
 **Đã chạy lại (vòng 2, trên clone sạch tại `c9c736f`, không provider trả tiền, không `opencode` thật):**
-- 97 reproducer bảng trích tại HEAD: `Ran 97 tests … OK (skipped=1)`; test bị bỏ qua là
+- 98 reproducer bảng trích tại HEAD: `Ran 98 tests … OK (skipped=1)`; test bị bỏ qua là
   `RealBinary.test_a_full_review_against_a_scripted_model` (cần `AISEF_TEST_OCR_EXE`), và với nhị phân OCR đã ghim cả lớp
   `RealBinary` `Ran 3 tests … OK` — từng test ở
   [`evidence/traceability-reproducers-c9c736f.out`](evidence/traceability-reproducers-c9c736f.out). Reproducer ở `f006d3d`
-  (P-V2-01) không chạy lại. Bộ kiểm vẫn chỉ kiểm reproducer *tồn tại*; lượt chạy là của commit này, không tự lặp lại.
+  (P-V2-01) không chạy lại. Bộ kiểm không chạy test: nó đòi mỗi reproducer tại HEAD có dòng `ok` trong tệp đó.
 - `validation/v21/cli_integration/run.sh` (CLI thật, OCR thật, provider giả trên loopback, developer giả):
   [`evidence/cli-integration-c9c736f.out`](evidence/cli-integration-c9c736f.out). So với output tại `b72e51e`, chỉ khác giá
   trị băm (commit của repo `git init` mới, plan_hash, anchor, sha256), pid, mốc thời gian và dòng cuối bị cắt ở 3000 ký
@@ -155,7 +161,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 21, adapted 20, 
 | [P-ADJ-5](#p-adj-5) | Dùng 1–3 lượt để canary; phép so sánh hiệu quả phải có thêm lượt lặp có ngân sách | blocked | E2 M6 | Live: MỞ. |
 | [P-ADJ-6](#p-adj-6) | Làm sau; nếu tái sử dụng evidence phải tính cả phụ thuộc và công cụ kiểm | adopted | — | Chiến dịch chưa xong: tại HEAD không có kết quả mutation 2.1 nào để tuyên bố. |
 | [P-4.2a](#p-42a) | Reviewer trả thiếu manifest hoặc schema lạ → `INDETERMINATE`, không coi là review sạch. | adopted | C2 M4 | Tiêu chí chỉ đạt dưới `fix-loop`: dưới `advisory` — cũng là luật khi settings không khai `review` (ADR-V2.1) … |
-| [P-4.2b](#p-42b) | Không lấy tập `selected` của OCR làm toàn bộ phạm vi bắt buộc một cách mặc nhiên | adapted | C2 M4 | Tệp bắt buộc bị loại vì extension hay nhị phân không được review mà review vẫn có thể COMPLETE. Không test nà… |
+| [P-4.2b](#p-42b) | Không lấy tập `selected` của OCR làm toàn bộ phạm vi bắt buộc một cách mặc nhiên | adapted | C2 M4 | Tiêu chí chưa đạt cho tệp bắt buộc mà preview của OCR loại vì `unsupported_ext` hay `binary`: tệp đó được ghi… |
 | [P-4.2c](#p-42c) | Không cho reviewer quyền commit, merge, thay contract hay cập nhật verdict. | adopted | — | Không có ranh giới OS: finder chạy dưới cùng user; thay đổi bị phát hiện và loại, không bị ngăn (REPORT §3). |
 | [P-4.3a](#p-43a) | Nếu finding phát hiện một yêu cầu chưa có trong contract, tạo **đề xuất sửa contract có p… | open | — | Toàn bộ phần tạo đề xuất. |
 | [P-4.3b](#p-43b) | Reproducer chạy thành công **chưa đủ**: còn phải xác nhận kỳ vọng của nó đúng theo requir… | adopted | C1 M4 | Giới hạn đã đo: stimulus mới xếp sai mệnh đề vẫn neo được (test_known_limit_…). |
@@ -238,7 +244,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 21, adapted 20, 
 - **Ảnh hưởng:** cao: kênh để mã ứng viên chạy bên trong controller giữ khoá HMAC (360 §3.4)
 - **Quyết định:** adapted — Nhận `-S` + interpreter của kernel; loại băm cây venv (TOCTOU) đúng như §3 của đề xuất. Nửa sau (tách trusted runtime khỏi nơi developer ghi được) KHÔNG đạt: developer và test chạy cùng user (REPORT §3).
 - **Commit:** `919a271`: aisef2/probe/cli_invocation.py, aisef2/probe/python_callable_v2.py, aisef2/probe/process_effect.py, aisef2/app/run.py, tests/v2/test_v21_identity.py; `c0ec1a5` (trên `f006d3d`): aisef2/app/run.py, tests/v2/test_v201_venvs.py
-- **Mức (REPORT §2):** A1 = M3 — Khớp REPORT. Test tồn tại tại HEAD (kiểm bằng AST); không chạy lại trong phiên lập bảng.
+- **Mức (REPORT §2):** A1 = M3 — Khớp REPORT. Reproducer tại HEAD chạy lại xanh tại c9c736f (vòng 2, `docs/v2.1/evidence/traceability-reproducers-c9c736f.out`); reproducer ở `f006d3d` không chạy lại.
 - **Tiêu chí nghiệm thu:** `.pth` không chạy trong controller; developer không ghi được interpreter/import tree của verifier; chạy canary qua đường app thật
 - **Còn thiếu:** Không có ranh giới hệ điều hành (F/B-07). Canary qua đường app thật với provider thật: chưa chạy.
 
@@ -313,7 +319,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 21, adapted 20, 
 - **Ảnh hưởng:** cao: smoke #2 rollback sai một story đúng (V21-37); lỗi hồi quy của developer thành INTEGRATION, không chạy lại (V21-38)
 - **Quyết định:** adopted — Đúng đề xuất; contract LedgerLock không tự sửa — chủ dự án chọn A/B (B-04).
 - **Commit:** `91a8968`: aisef2/orchestrate/story_runner.py, tests/v2/test_v21_orchestration.py; `06d4e62`: aisef2/probe/file_artifact.py, tests/v2/test_v21_python_imports.py, docs/v2.1/drafts/LEDGERLOCK-BC-V22-S-10-a-r2.DRAFT.json
-- **Mức (REPORT §2):** B1 = M3, B3 = M3 — Khớp REPORT. Test tồn tại tại HEAD (kiểm bằng AST); không chạy lại trong phiên lập bảng.
+- **Mức (REPORT §2):** B1 = M3, B3 = M3 — Khớp REPORT. Reproducer tại HEAD chạy lại xanh tại c9c736f (vòng 2, `docs/v2.1/evidence/traceability-reproducers-c9c736f.out`).
 - **Tiêu chí nghiệm thu:** Candidate làm hỏng story trước nhận phản hồi đúng; biến thể hợp lệ/docstring không bị bác nhầm; vẫn kiểm cây tích hợp khi base đổi
 - **Còn thiếu:** Contract S-10-a sửa: M6 (B-04 chưa duyệt). 'Biến thể hợp lệ không bị bác nhầm' chỉ kiểm cho hai bản nháp S-10-a trên dạng smoke #2, không tổng quát (xem P-9.3).
 
@@ -344,7 +350,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 21, adapted 20, 
 - **Ảnh hưởng:** cao: trên 2.0 sửa một byte probe (kể cả docstring) làm gãy mọi bundle (360 §3.1, §3.10)
 - **Quyết định:** adapted — Nhận tách ba danh tính; năng lực probe là CAPABILITY_VERSION tăng bằng tay, không băm AST (ADR-2: băm AST không chứng minh tương đương). Execution digest chỉ phủ byte nguồn probe, chưa phủ runtime/dependency như §9.2 mục 3.
 - **Commit:** `919a271`: aisef2/probe/calibration.py, aisef2/app/calibrations.py, aisef2/app/bundle_cli.py, validation/qualification/release_calibration.py; `06d4e62`: aisef2/app/calibrations.py; `4d4c53a`: tests/v2/test_v21_identity.py; `16d85e7`: closure-evidence/v2/v2.1/ARCHITECTURE-EXCEPTION-V2-007.json, closure-evidence/v2/v2.1/AISEF-V2-RFC-AMENDMENT-V2-007.json; `dc9774f`: closure-evidence/v2/cycle2/RELEASE-DECISIONS.json
-- **Mức (REPORT §2):** B6 = M3 — Khớp REPORT. Test tồn tại tại HEAD (kiểm bằng AST); không chạy lại trong phiên lập bảng.
+- **Mức (REPORT §2):** B6 = M3 — Khớp REPORT. Reproducer tại HEAD chạy lại xanh tại c9c736f (vòng 2, `docs/v2.1/evidence/traceability-reproducers-c9c736f.out`).
 - **Tiêu chí nghiệm thu:** Patch không đổi capability dùng được bundle cũ; đổi semantics bị chặn hoặc migrate có duyệt; run cũ kiểm được
 - **Còn thiếu:** EXECUTION_DIGEST bỏ sót `runtime/process_range.py` và `range_anchor.py` — phát hiện 360 §3.1 vẫn đúng tại HEAD (xem R-3.1). Kỷ luật tăng CAPABILITY_VERSION không máy nào kiểm (ADR-2). Tuyên bố 'một `-S` làm đỏ 37 test' chưa đo (STATUS B6).
 
@@ -528,8 +534,8 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 21, adapted 20, 
 - **Quyết định:** adapted — Phạm vi bắt buộc do AISEF tính từ git (khoảng base..candidate đã đóng băng), không lấy tập `selected` của OCR. Điều chỉnh: tệp bắt buộc mà preview loại vì `unsupported_ext` hay `binary` được ghi tên trong coverage nhưng không tính là thiếu (docstring và `NOT_REVIEWABLE` của `review_ocr`); đề xuất nêu cả tệp bị lọc vì extension.
 - **Commit:** `e897437`: aisef2/app/review_ocr.py, tests/v2/fixtures/ocr/preview.json
 - **Mức (REPORT §2):** C2 = M4 — M4 là mức của C2; hành vi riêng này có test offline.
-- **Tiêu chí nghiệm thu:** Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với câu liền trước của cùng đoạn §4.2: Định nghĩa mẫu số từ chính sách AISEF trước khi gọi OCR.
-- **Còn thiếu:** Tệp bắt buộc bị loại vì extension hay nhị phân không được review mà review vẫn có thể COMPLETE. Không test nào đặt một tệp bắt buộc như thế rồi khẳng định kết quả (`grep` tests/: không test nào đọc `unreadable` hay `NOT_REVIEWABLE`; fixture `tests/v2/fixtures/ocr/preview.json` có `docs/limits.md` = `unsupported_ext` nhưng không test nào đặt nó là bắt buộc).
+- **Tiêu chí nghiệm thu:** review thiếu một file bắt buộc không được thành PASS (§4.3)
+- **Còn thiếu:** Tiêu chí chưa đạt cho tệp bắt buộc mà preview của OCR loại vì `unsupported_ext` hay `binary`: tệp đó được ghi tên trong coverage nhưng không tính là thiếu (`review_ocr.NOT_REVIEWABLE`), nên review không đọc nó vẫn có thể COMPLETE. Không test nào đặt một tệp bắt buộc như thế rồi khẳng định kết quả (`grep` tests/: không test nào đọc `unreadable` hay `NOT_REVIEWABLE`; fixture `tests/v2/fixtures/ocr/preview.json` có `docs/limits.md` = `unsupported_ext` nhưng không test nào đặt nó là bắt buộc).
 
 ### P-4.2c
 
@@ -542,7 +548,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 21, adapted 20, 
 - **Ảnh hưởng:** cao: reviewer là mô hình, không có thẩm quyền sự thật sản phẩm
 - **Quyết định:** adopted — Đúng đề xuất; owner B-03c (RELEASE-DECISIONS seq 5).
 - **Commit:** `390f07c`: aisef2/app/review_verify.py; `a912be6`: validation/qualification/authority_limits.py, closure-evidence/v2/v2.1/AUTHORITY-INVENTORY.json, tests/v2/test_v21_authority_limits.py, aisef2/app/review_verify.py; `1711c07`: validation/qualification/authority_limits.py; `0b4e740`: validation/qualification/authority_limits.py
-- **Mức (REPORT §2):** REPORT §2 không có hạng mục riêng (B-03c thuộc §7). Test tồn tại tại HEAD (kiểm bằng AST); không chạy lại trong phiên lập bảng.
+- **Mức (REPORT §2):** REPORT §2 không có hạng mục riêng (B-03c thuộc §7). Reproducer tại HEAD chạy lại xanh tại c9c736f (vòng 2, `docs/v2.1/evidence/traceability-reproducers-c9c736f.out`).
 - **Tiêu chí nghiệm thu:** Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với chỉ thị B-03c của chủ dự án (RELEASE-DECISIONS seq 5): Cả hai không trực tiếp commit/merge sản phẩm hoặc tạo đường quyết định cuối thứ hai.
 - **Còn thiếu:** Không có ranh giới OS: finder chạy dưới cùng user; thay đổi bị phát hiện và loại, không bị ngăn (REPORT §3).
 
@@ -585,7 +591,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 21, adapted 20, 
 - **Reproducer:** `tests/v2/test_p6_orchestration.py::Orchestration::test_ORCH_9_and_10_a_post_merge_regression_of_a_prior_PRESERVE_obligation_is_INTEGRATION_and_rolled_back`
 - **Ảnh hưởng:** trung bình
 - **Quyết định:** adopted — Đã có trong 2.0, không triển khai lại.
-- **Mức (REPORT §2):** REPORT §2 không có hạng mục riêng cho mục này. Test tồn tại tại HEAD (kiểm bằng AST); không chạy lại trong phiên lập bảng.
+- **Mức (REPORT §2):** REPORT §2 không có hạng mục riêng cho mục này. Reproducer tại HEAD chạy lại xanh tại c9c736f (vòng 2, `docs/v2.1/evidence/traceability-reproducers-c9c736f.out`).
 - **Tiêu chí nghiệm thu:** vẫn kiểm cây tích hợp khi base đổi (§10 V2-06)
 - **Còn thiếu:** Không còn so với tiêu chí trên: sau merge, mọi obligation của story và PRESERVE của các story đã commit được chứng minh lại ở revision đã merge (`merge.reprove`, POST_MERGE). Dựa vào đọc mã và test ORCH_9/10 (chạy lại xanh tại c9c736f, vòng 2).
 
@@ -785,7 +791,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 21, adapted 20, 
 - **Ảnh hưởng:** cao: một đường quyết định là tài sản chính của 2.0 (360 §3.1)
 - **Quyết định:** adopted — Đúng đề xuất và owner B-03c.
 - **Commit:** `a912be6`: validation/qualification/authority_limits.py, closure-evidence/v2/v2.1/AUTHORITY-INVENTORY.json, aisef2/app/bundle_cli.py; `1711c07`: validation/qualification/authority_limits.py, tests/v2/test_v21_authority_limits.py; `0b4e740`: validation/qualification/authority_limits.py, tests/v2/test_v21_authority_limits.py
-- **Mức (REPORT §2):** REPORT §2 không có hạng mục (B-03c chấp nhận ở RELEASE-DECISIONS seq 5). Test tồn tại tại HEAD (kiểm bằng AST); không chạy lại trong phiên lập bảng.
+- **Mức (REPORT §2):** REPORT §2 không có hạng mục (B-03c chấp nhận ở RELEASE-DECISIONS seq 5). Reproducer tại HEAD chạy lại xanh tại c9c736f (vòng 2, `docs/v2.1/evidence/traceability-reproducers-c9c736f.out`).
 - **Tiêu chí nghiệm thu:** Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với chỉ thị B-03c của chủ dự án (RELEASE-DECISIONS seq 5): Cập nhật inventory và kiểm tra kiến trúc để cưỡng chế các giới hạn này.
 - **Còn thiếu:** Checker là phân tích tĩnh trên mã Python; tiến trình ngoài (OCR) không bị ràng buộc ở mức OS.
 

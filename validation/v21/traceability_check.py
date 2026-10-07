@@ -10,22 +10,28 @@
     python3 -P validation/v21/traceability_check.py --render             print the generated block of the .md
 
 Per row (docs/v2.1/research/TRACEABILITY.json): every commit exists, is an ancestor of the head (or of its `ref`) and
-touches every path named; every reproducer `[sha:]path::Class[::method]` exists (AST, at the head or at `sha`);
-every `refs` entry holds (exactly one of `contains` / `lacks` a string of 4 characters or more, `exists` true or false,
-`same_as` its bytes at another commit; at the head, at `at`, or — `at` = "with-table" — in the checkout that holds the
-table, for evidence committed with it after the head); the M-level of each REPORT item equals REPORT.md §2 at
-the head; each upstream source is a claim of UPSTREAM-RESEARCH.json with the same label (or, when the verifier
-reclassified it, the verifier's label and the original in `research_label`), the verifier's status, the commit read (7
-hex digits or more), and every `file:line` of `where` a line the research or, for a corrected or refuted claim, its
-verifier cites for that same file; a 360° item is verbatim in the assessment at the head; every row but a declined one
-names its gap (a word, not a dash: what is missing, or that nothing is); the acceptance cell is a criterion its source
-states (the proposal's §10 "Nghiệm thu cụ thể", §4.3 "Nghiệm thu bước đầu" or §12 gates; the 360's §6 "Thước đo xong"
-or §7 "Mục tiêu 2.1"; a trailing "(§n)", "(360 §n)" or "(đề xuất §n)" names the section), or says the source states
-none (NO_CRITERION), or is "—" on a declined row. Open items and rows whose decision is `open` or `blocked` are the same
-set. The table block of TRACEABILITY.md is exactly --render's. A key the format does not know — at the top, in
-`sources`, in an open item, a row, a commit, a ref or an upstream entry — is a problem, never ignored; every revision is
-a hex commit id (`--at` and `--with-ref` are resolved by git first). Proposal items and proposal acceptance cells
-are checked against the proposal only under --proposal.
+touches every path named; every reproducer `[sha:]path::Class[::method]` exists (AST, at the head or at `sha`), and
+each one at the head is listed `ok`, by method, in RUN, the committed run of the reproducers at the table's head (the
+checker runs no test: a reproducer cited after that run is named until the run is redone); every `refs` entry holds
+(exactly one of `contains` / `lacks` a string of 4 characters or more, `exists` true or false, `same_as` its bytes at
+another commit; at the head, at `at`, or — `at` = "with-table" — in the checkout that holds the table, for evidence
+committed with it after the head); the M-level of each REPORT item equals REPORT.md §2 at the head; each upstream
+source is a claim of UPSTREAM-RESEARCH.json with the same label (or, when the verifier reclassified it, the verifier's
+label and the original in `research_label`), the verifier's status, the commit read (7 hex digits or more), and every
+`file:line` of `where` a number that the research's evidence (for a corrected or refuted claim, its verifier's) gives
+after a mention of that same file and before the next file mention — the rule cannot tell a line number from another
+number there, such as a percentage or a token count; a 360° item is verbatim in the assessment at the head; every row
+but a declined one names its gap (a word, not a dash: what is missing, or that nothing is); the acceptance cell is a
+criterion its source states (the proposal's §10 "Nghiệm thu cụ thể", §4.3 "Nghiệm thu bước đầu" or §12 gates; the
+360's §6 "Thước đo xong" or §7 "Mục tiêu 2.1"; a trailing "(§n)", "(360 §n)" or "(đề xuất §n)" names the section), or
+says the source states none (NO_CRITERION), or is "—" on a declined row; a row whose `ref` names a §10 item ("§10
+V2-03") quotes that item's own §10 criterion, never another item's and never NO_CRITERION. Outside §10 the rule cannot
+tell which stated criterion belongs to the item, nor whether the source states one for an item that says it states
+none. Open items and rows whose decision is `open` or `blocked` are the same set. The table block of TRACEABILITY.md is
+exactly --render's. A key the format does not know — at the top, in `sources`, in an open item, a row, a commit, a ref
+or an upstream entry — is a problem, never ignored; every revision is a hex commit id (`--at` and `--with-ref` are
+resolved by git first). Proposal items and proposal acceptance cells are checked against the proposal only under
+--proposal.
 By default only objects reachable from the head are read: a cell on a branch of `other_refs` (a commit whose `ref`,
 or a reproducer whose `sha`, is that branch's commit) is checked only under `--with-ref`, and the OK line counts the
 cells left unchecked. Exit 0 with no problem, 1 with problems (one per line), 2 on bad usage."""
@@ -69,6 +75,8 @@ HEX = re.compile(r"[0-9a-f]{7,40}")
 LINES = re.compile(r"([\w-]+)\.[A-Za-z]\w*:(\d+(?:-\d+)?(?:,\s*\d+(?:-\d+)?)*)")  # dir/f.go:12-20, 31 -> (f, "12-20, 31")
 #: in research evidence, a file mention ("f.go:", "README at d52a053:") or a line number; a number belongs to the last file
 CITES = re.compile(r"([\w-]+)(?:\.[A-Za-z]\w*| at [0-9a-f]{7,40}):|(?<![\w.])(\d+(?:-\d+)?)(?!\w)")
+RUN = "docs/v2.1/evidence/traceability-reproducers-{}.out"    # the run of every reproducer at the head, by its 7 digits
+RAN = re.compile(r"^([\w.]+): ok$", re.M)                         # a line of that run: "tests.v2.mod.Class.method: ok"
 RECLASSIFIED = re.compile(r"(?:status should be|Classify it as) ([A-Z_]+)")
 BEGIN = "<!-- rows:begin — generated by validation/v21/traceability_check.py --render; do not edit by hand -->"
 END = "<!-- rows:end -->"
@@ -132,6 +140,11 @@ def _keys(where: str, entry: dict, keys: tuple[set, set]) -> list[str]:
             + [f"{where}: unknown key {k}" for k in sorted(set(entry) - need - may)])
 
 
+def _dotted(m: re.Match) -> str:
+    """tests/v2/t.py::C::m -> tests.v2.t.C.m, as unittest names it in a run."""
+    return ".".join([m.group(2)[:-3].replace("/", "."), *filter(None, m.groups()[2:])])
+
+
 def _lines(text: str) -> set[tuple[str, str]]:
     """(file stem, line or range) of every `file.ext:12-20, 31` in a `where` cell."""
     return {(m.group(1), n) for m in LINES.finditer(text) for n in re.split(r",\s*", m.group(2))}
@@ -166,6 +179,7 @@ def criteria(text: str, source: str) -> dict[str, list[str]]:
         if source == "proposal":
             if top == "10" and len(cells) == 6 and re.fullmatch(r"V2-\d+", cells[0]):
                 out["§10"].append(cells[3])
+                out[f"§10 {cells[0]}"].append(cells[3])
             elif top == "4" and line.startswith("**Nghiệm thu bước đầu:**"):
                 out["§4.3"].append(line.split(":**", 1)[1])
             elif top == "12" and sub == "Gate đề xuất" and (m := re.match(r"\*\*[^*]+:\*\*(.*)", line)):
@@ -179,18 +193,20 @@ def criteria(text: str, source: str) -> dict[str, list[str]]:
 
 def acceptance_problem(row: dict, ctx: dict) -> str | None:
     acc, src, rid = collapse(row["acceptance"]), row["source"], row["id"]
-    if acc.startswith(NO_CRITERION[src]) or (acc == "—" and row["decision"] == "declined"):
+    own = re.match(r"§10 (V2-\d+)\b", row["ref"]) if src == "proposal" else None   # a §10 item states its own
+    if not own and (acc.startswith(NO_CRITERION[src]) or (acc == "—" and row["decision"] == "declined")):
         return None
-    m = CITED.search(acc)
+    m = None if own else CITED.search(acc)
     doc = ("360" if m.group(1) == "360 " else "proposal") if m and m.group(1) else src
     if ctx["criteria"][doc] is None:                     # the proposal, without --proposal
         return None
     text = acc[: m.start()] if m else acc
-    passages = ctx["criteria"][doc].get(f"§{m.group(2)}", []) if m else sum(ctx["criteria"][doc].values(), [])
+    key = f"§10 {own.group(1)}" if own else f"§{m.group(2)}" if m else None
+    passages = ctx["criteria"][doc].get(key, []) if key else sum(ctx["criteria"][doc].values(), [])
     if SAID.search(text) and any(text in p for p in passages):
         return None
-    return (f"{rid}: the acceptance is not a criterion the {doc} document states"
-            + (f" in §{m.group(2)}" if m else "") + f" (when it states none, say so: {NO_CRITERION[src]!r})")
+    return (f"{rid}: the acceptance is not a criterion the {doc} document states" + (f" in {key}" if key else "")
+            + ("" if own else f" (when it states none, say so: {NO_CRITERION[src]!r})"))
 
 
 def resolve(root: pathlib.Path, name: str) -> str | None:
@@ -263,6 +279,8 @@ def row_problems(row: dict, root: pathlib.Path, head: str, ctx: dict) -> list[st
             out.append(f"{rid}: reproducer {spec}: {m.group(1)} is not reachable from {head} (nor in other_refs)")
         elif p := test_problem(root, head, spec):
             out.append(f"{rid}: {p}")
+        elif not m.group(1) and _dotted(m) not in ctx["ran"]:
+            out.append(f"{rid}: reproducer {spec} is not listed ok in {ctx['run']}")
     for r in row["refs"]:
         bad = _keys(f"{rid}: ref {r.get('path')}", r, (REF_KEYS[0], REF_KEYS[1] | set(ASSERTIONS)))
         if sum(k in r for k in ASSERTIONS) != 1:
@@ -377,11 +395,13 @@ def check(table: dict, root: pathlib.Path = ROOT, at: str | None = None, proposa
             problems.append(f"--with-ref {name}: {'not in this clone' if got is None else f'is at {got}'}, "
                             f"the table records {other[name]}")
     src = table["sources"]
+    run = RUN.format(table["head"][:7]) if HEX.fullmatch(str(table["head"])) else RUN.format("?")
+    ran = set(RAN.findall((root / run).read_text(encoding="utf-8"))) if (root / run).is_file() else set()
     assessment = show(root, head, src["assessment"]) or ""
     ctx = {"report": report_levels(show(root, head, src["report"]) or ""),
            "assessment": collapse(assessment), "criteria": {"360": criteria(assessment, "360"), "proposal": None},
            "research": {r["key"]: r for r in json.loads(show(root, head, src["upstream"]) or '{"results": []}')["results"]},
-           "proposal": None, "other": set(other.values()),
+           "proposal": None, "other": set(other.values()), "run": run, "ran": ran,
            "skip": {sha for name, sha in other.items() if name not in with_refs}}
     if proposal is not None:
         data = proposal.read_bytes()
