@@ -8,6 +8,8 @@
                        test code writes into its own interpreter's tree (a `.pth`, the interpreter) reaches no proof
     <out>/preflight    the provider preflight's ledger and observation
     <out>/sessions     one event stream per model session
+    <out>/confinement  V2.1 (F), when the settings ask for it: the measurement's canary and workspace (its report is
+                       RUN.json's `confinement`)
     <out>/RUN.started.json  V2.1: the run's identities written once before anything runs (format, bundle and kernel
                        digests, plan hash, the settings' digest, the lineage) — so a run the operating system killed (no
                        `finally` runs on SIGKILL) still says what it was; never rewritten
@@ -41,7 +43,7 @@ import tempfile
 import time
 
 from aisef2.app import adapters as ad
-from aisef2.app import client, lineage, preflight, usage
+from aisef2.app import client, confine, lineage, preflight, usage
 from aisef2.app.bundle import Project
 from aisef2.app.settings import Settings
 from aisef2.arch.enums import Enforcement
@@ -384,6 +386,11 @@ def execute(project: Project, settings: Settings, source: pathlib.Path, out: pat
             raise RunRefused(f"the plan is not admitted (RFC §12): {rec['admission']['failed']}")
         rec["stage"] = "test interpreter"
         python = probe_interpreter(out / "test-python")
+        if settings.confinement is not None:    # V2.1 (F): measured before the first provider request, never assumed
+            rec["stage"] = "confinement"
+            rec["confinement"] = confine.measure(settings.confinement, out / "confinement")
+            if rec["confinement"]["problems"]:
+                raise RunRefused("confinement was asked for and is not provided: " + "; ".join(rec["confinement"]["problems"]))
         rec["stage"] = "preflight"
         # exactly the PATH the run gives the client: none given, nothing found (never the os.defpath fallback)
         exe = client_exe or shutil.which("opencode", path=client.environment(settings.client_env, {}).get("PATH", ""))
@@ -420,7 +427,8 @@ def execute(project: Project, settings: Settings, source: pathlib.Path, out: pat
               "env": client.environment(settings.client_env, client.overlay(settings.route, settings.model_limit)),
               "budget": budget, "turn_cap": settings.max_turns_per_session, "exe": exe,
               # the operator's values the client receives, and the provider key: never left in a session's evidence
-              "secrets": tuple(v for v in (*(os.environ.get(n, "") for n in settings.client_env), key) if len(v) >= 8)}
+              "secrets": tuple(v for v in (*(os.environ.get(n, "") for n in settings.client_env), key) if len(v) >= 8),
+              **({"confine": settings.confinement} if settings.confinement is not None else {})}
         developer = ad.Developer(run, project, logs, kw, settings.timeouts_s["developer"])
         reviewer = ad.Reviewer(run, project, logs, kw, settings.timeouts_s["reviewer"], review=settings.review,
                                probe_timeout_s=settings.timeouts_s["probe"], interpreter=sys.executable,

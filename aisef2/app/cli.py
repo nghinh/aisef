@@ -17,8 +17,9 @@ import os
 import pathlib
 import re
 import sys
+import tempfile
 
-from aisef2.app import bundle, lineage, preflight, settings
+from aisef2.app import bundle, confine, lineage, preflight, settings
 from aisef2.app import run as R
 from aisef2.app.client import SessionRefused
 from aisef2.app.verify import verify
@@ -78,9 +79,14 @@ def run(argv: list[str]) -> int:
             R.check_git()
             R.check_repository(project, a.repo)
             adm = R.admit(project, R.calibrations())
+            conf, spec = None, getattr(s, "confinement", None)    # a settings stand-in may not carry it (S2 kill test)
+            if spec is not None:   # V2.1 (F): measured here too, in a directory of its own
+                with tempfile.TemporaryDirectory(prefix="aisef-confine-") as tmp:
+                    conf = confine.measure(spec, pathlib.Path(tmp) / "confinement")
+            ready = adm["admitted"] and not (conf and conf["problems"])
             _print({"project": project.name, "plan_hash": project.plan.plan_hash, "route": s.route, "admission": adm,
-                    "ready": adm["admitted"]})
-            return 0 if adm["admitted"] else 2
+                    **({"confinement": conf} if conf is not None else {}), "ready": ready})
+            return 0 if ready else 2
         rec = R.execute(project, s, a.repo, a.out, **({"predecessor": a.parent, "accept_unaccounted": a.accept_unaccounted,
                                                          "supersede_claim": a.supersede_claim} if a.parent is not None else {}))
     except (bundle.BundleError, settings.SettingsError, R.RunRefused, preflight.IdentityStop, SessionRefused) as e:

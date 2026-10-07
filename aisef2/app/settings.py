@@ -16,6 +16,8 @@ model, an inherited environment, unlimited turns or tokens, or an unattested rou
      "limits": {"DEVELOPER": n, "PLAN": n, "ENVIRONMENT": n, "PROVIDER": n, "INTEGRATION": n, "REVIEW": n, "SECURITY": n},
      "timeouts_s": {"developer": s, "reviewer": s, "tool": s, "probe": s},
      "preflight": {"chat_probes": n}}
+
+Optional (V2.1): "review", "prices", "confinement" (app/confine: the model sessions under bubblewrap, Linux only).
 """
 
 from __future__ import annotations
@@ -40,7 +42,9 @@ KEYS = ("format", "client", "route", "provider", "client_env", "budget", "max_tu
 #:   and optionally "finder": "model" (the default, 2.0.0's model reviewer) | "ocr" with "ocr": {"exe": <absolute path>,
 #:   "sha256": <the binary's>, "timeout_min": n, "max_tokens": n} (app/review_ocr)
 #: prices — the price table money is computed with (app/usage); absent, every cost is unknown (null), never 0
-OPTIONAL = ("review", "prices")
+#: confinement — {"backend": "bwrap", "bwrap": <absolute path>, "network": "none" | "host", "read_only": [<absolute path>, ...]}
+#:   (app/confine): every model session confined; measured before the first provider request, the run refused otherwise
+OPTIONAL = ("review", "prices", "confinement")
 #: what an absent `review` means: 2.0.0's rule (no finding blocks), named, never a silent default
 REVIEW_ABSENT = {"policy": "advisory", "min_severity": "critical", "finder": "model", "ocr": None, "given": False}
 FINDERS = ("model", "ocr")
@@ -93,6 +97,7 @@ class Settings:
     chat_probes: int
     content: dict           # the settings as given, for the RunSpec and the record
     review: dict = None     # V2.1: the review policy; REVIEW_ABSENT when the settings name none
+    confinement: dict | None = None     # V2.1 (F): app/confine's setting; None: the sessions are not confined
 
     @property
     def prices(self) -> dict | None:
@@ -141,6 +146,11 @@ def load(data: Mapping) -> Settings:
     if "prices" in data:
         from aisef2.app.usage import price_problem
         why = price_problem(data["prices"])
+        if why:
+            raise SettingsError(why)
+    if "confinement" in data:
+        from aisef2.app.confine import problem
+        why = problem(data["confinement"])
         if why:
             raise SettingsError(why)
     if data["client"] not in CLIENTS:
@@ -192,7 +202,7 @@ def load(data: Mapping) -> Settings:
     return Settings(data["client"], route, p["name"], str(p["endpoint"]).rstrip("/"), p["api_key_env"], p["served_model"],
                     p["listed_owner"], model_limit, tuple(env),
                     budget, _count(data["max_turns_per_session"], "max_turns_per_session"), limits, timeouts, probes,
-                    dict(data), review)
+                    dict(data), review, dict(data["confinement"]) if "confinement" in data else None)
 
 
 def read(path: str | pathlib.Path) -> Settings:
