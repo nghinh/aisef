@@ -9,6 +9,7 @@ controller's fresh bytecode prefix and `-B`; the mutants are rebound to act on t
 `_harness_argv` and `PythonCallableV2Probe.__init__`.
 """
 
+import ast
 import pathlib
 import re
 import sys
@@ -23,22 +24,24 @@ from aisef2.probe import python_callable_v2 as pc2  # noqa: E402
 from tests.v2 import test_p7_finding_001 as p7  # noqa: E402
 
 CASE = re.compile(r"test_PYC_(\d+)(b?)_(.*)")
-#: the subject process's bytecode controls on its command line inside the controller script
-FLAGS = '"-I", "-S", "-B", "-X", "pycache_prefix=" + req["agent_pycache"], '
+#: the subject process's bytecode controls on its command line inside the controller script, as the parsed script
+#: (its ast.unparse text) spells them, so the site does not depend on its formatting (ORD-1)
+FLAGS = "'-I', '-S', '-B', '-X', 'pycache_prefix=' + req['agent_pycache'], "
 
 
 def _agent_line(flags: str):
     """A controlled mutant of the subject process's command line: its bytecode controls replaced by `flags`."""
-    assert pc2.HARNESS.count(FLAGS) == 1
-    return mock.patch.object(pc2, "HARNESS", pc2.HARNESS.replace(FLAGS, flags))
+    script = ast.unparse(ast.parse(pc2.HARNESS))
+    assert script.count(FLAGS) == 1
+    return mock.patch.object(pc2, "HARNESS", script.replace(FLAGS, flags))
 
 
 class BytecodeV2(p7.Bytecode):
     def setUp(self):
         rebind = mock.patch.multiple(
             p7, pc=pc2, PythonCallableProbe=pc2.PythonCallableV2Probe,
-            WithoutB=lambda: _agent_line('"-I", "-S", "-X", "pycache_prefix=" + req["agent_pycache"], '),
-            WithoutPrefix=lambda keep_b: _agent_line('"-I", "-S", ' + ('"-B", ' if keep_b else "")),
+            WithoutB=lambda: _agent_line("'-I', '-S', '-X', 'pycache_prefix=' + req['agent_pycache'], "),
+            WithoutPrefix=lambda keep_b: _agent_line("'-I', '-S', " + ("'-B', " if keep_b else "")),
             LAUNCH_FLAGS=["-I", "-S", "-B"])      # V2.1: the active probe launches with -S (.pth channel)
         rebind.start()
         self.addCleanup(rebind.stop)

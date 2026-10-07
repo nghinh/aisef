@@ -859,24 +859,31 @@ class Identity(_Product):
         self.assertEqual([name for name, _, _ in ps.child_scripts(ast.parse(src))], ["HARNESS", "SUBPROCESS"])
         e = catalog.entry_for("aisef2/probe/process_effect.py")
         self.assertEqual((e.subject_process, e.stimulus_shape), (facts["subject_process"], facts["stimulus_shape"]))
-        # each rule rejects the corresponding defect in this module's own source
+        # each rule rejects the corresponding defect in this module's own source: written into the parsed HARNESS
+        # (its ast.unparse text), so the sites do not depend on how the module or the script is formatted (ORD-1)
+        tree = ast.parse(src)
+        harness = next(n.value for n in tree.body if isinstance(n, ast.Assign)
+                       and [getattr(t, "id", None) for t in n.targets] == ["HARNESS"])
+        script = ast.unparse(ast.parse(harness.value))
         defects = {
-            "PROTOCOL_CHANNEL_DISCIPLINE": ('    proto.write((req["mark"]', '    sys.stdout.write((req["mark"]'),
-            "SINGLE_PLACEHOLDER_TOKEN": ('value = value.replace(form, "<ws>")', 'value = value.replace(form, "<root>")'),
+            "PROTOCOL_CHANNEL_DISCIPLINE": ("    proto.write((req['mark']", "    sys.stdout.write((req['mark']"),
+            "SINGLE_PLACEHOLDER_TOKEN": ("value = value.replace(form, '<ws>')", "value = value.replace(form, '<root>')"),
             "NO_CLOCK_IN_PROBE_FACTS": ("import builtins, hashlib,", "import time, builtins, hashlib,"),
-            "CLOSED_DISPATCH_IN_SCENARIO_PROBES": ('    if kind != step["exception"]:\n',
-                                                  '    if kind == "x":\n        pass\n    elif kind != step["exception"]:\n'),
+            "CLOSED_DISPATCH_IN_SCENARIO_PROBES": ("    if kind != step['exception']:\n",
+                                                  "    if kind == 'x':\n        pass\n    elif kind != step['exception']:\n"),
         }
         for rule, (before, after) in defects.items():
             with self.subTest(rule=rule):
-                self.assertEqual(src.count(before), 1, before)
-                broken = src.replace(before, after)
+                self.assertEqual(script.count(before), 1, before)
+                broken = script.replace(before, after)
                 if rule == "CLOSED_DISPATCH_IN_SCENARIO_PROBES":
-                    broken = broken.replace('return {"outcome": "refuted:raised " + kind + ", not " + step["exception"]}',
-                                            'return {"outcome": "refuted:raised " + kind + ", not " + step["exception"]}\n'
-                                            '    else:\n        pass', 1)
-                self.assertTrue(any(v.startswith(rule) for v in ps.violations("aisef2/probe/process_effect.py", broken,
-                                                                                ps.SOURCE_RULES, facts)), rule)
+                    broken = broken.replace("return {'outcome': 'refuted:raised ' + kind + ', not ' + step['exception']}",
+                                            "return {'outcome': 'refuted:raised ' + kind + ', not ' + step['exception']}\n"
+                                            "    else:\n        pass", 1)
+                harness.value = broken
+                self.assertTrue(any(v.startswith(rule) for v in ps.violations("aisef2/probe/process_effect.py",
+                                                                                ast.unparse(tree), ps.SOURCE_RULES,
+                                                                                facts)), rule)
 
     def test_the_catalog_entry_binds_this_probe_as_the_active_process_effect_probe(self):
         e = catalog.active()[SubjectKind.PROCESS_EFFECT]

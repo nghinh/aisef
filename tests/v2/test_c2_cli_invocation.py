@@ -8,6 +8,7 @@ tests/v2/test_c2_cli_verdicts.py. Lives at the tests/v2 root like the other Cycl
 closed enum of the frozen invariant registry, and a new package under tests/v2 would fail registration.
 """
 
+import ast
 import contextlib
 import hashlib
 import importlib.util
@@ -776,11 +777,13 @@ class Bytecode(unittest.TestCase):
         self.assertEqual(sorted(scratch.rglob("*.pyc")), [])   # -B: nothing written anywhere
 
     def test_FM2_PYC_CLI_4_without_the_external_cache_the_stale_bytecode_decides_the_reproducer_detects_the_defect(self):
-        # B1: the subject is imported in its own process (the agent): the controls are on the agent's command line
-        flags = '"-I", "-S", "-B", "-X", "pycache_prefix=" + req["agent_pycache"], '
-        self.assertEqual(ci.HARNESS.count(flags), 1)
+        # B1: the subject is imported in its own process (the agent): the controls are on the agent's command line,
+        # edited in the parsed script (its ast.unparse text), so the site does not depend on its formatting (ORD-1)
+        script = ast.unparse(ast.parse(ci.HARNESS))
+        flags = "'-I', '-S', '-B', '-X', 'pycache_prefix=' + req['agent_pycache'], "
+        self.assertEqual(script.count(flags), 1)
         for keep_b in (True, False):
-            harness = ci.HARNESS.replace(flags, '"-I", "-S", ' + ('"-B", ' if keep_b else ""))
+            harness = script.replace(flags, "'-I', '-S', " + ("'-B', " if keep_b else ""))
             with self.subTest(keep_b=keep_b), mock.patch.object(ci, "HARNESS", harness):
                 self.assertEqual(verdict(self.observe(EXITS_2)), R)   # the stale code's exit 1, not the source's 2
                 self.assertEqual(verdict(self.observe(EXITS_1, expectation=R)), S)
@@ -788,7 +791,7 @@ class Bytecode(unittest.TestCase):
         scratch = self.tmp / "scratch"
         scratch.mkdir()
         before = snapshot(self.root)
-        with mock.patch.object(ci, "HARNESS", ci.HARNESS.replace(flags, '"-I", "-S", "-X", "pycache_prefix=" + req["agent_pycache"], ')):
+        with mock.patch.object(ci, "HARNESS", script.replace(flags, "'-I', '-S', '-X', 'pycache_prefix=' + req['agent_pycache'], ")):
             self.assertEqual(verdict(self.observe(EXITS_2, probe=CliInvocationProbe(scratch=str(scratch)))), S)
         self.assertEqual(snapshot(self.root), before)
         self.assertTrue(any(p.name.startswith("mod.") for p in scratch.rglob("*.pyc")))

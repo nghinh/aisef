@@ -8,6 +8,7 @@ its own fresh prefix) observe the source, never the stale bytecode. FM2-PYC-2 (P
 of the same content with different dates) is in tests/v2/test_probe_process_effect.py and uses this construction.
 """
 
+import ast
 import importlib.util
 import os
 import pathlib
@@ -144,11 +145,13 @@ class Bytecode(unittest.TestCase):
         self.assertEqual(sorted(scratch.rglob("*.pyc")), [])
 
     def test_FM2_PYC_EFFECT_5_without_the_external_cache_the_stale_bytecode_decides_the_reproducer_detects_it(self):
-        # B1: the subject is imported in its own process (the shared agent): the controls are on its command line
-        flags = '"-I", "-S", "-B", "-X", "pycache_prefix=" + req["agent_pycache"], '
-        self.assertEqual(pe.HARNESS.count(flags), 1)
+        # B1: the subject is imported in its own process (the shared agent): the controls are on its command line,
+        # edited in the parsed script (its ast.unparse text), so the site does not depend on its formatting (ORD-1)
+        script = ast.unparse(ast.parse(pe.HARNESS))
+        flags = "'-I', '-S', '-B', '-X', 'pycache_prefix=' + req['agent_pycache'], "
+        self.assertEqual(script.count(flags), 1)
         for keep_b in (True, False):
-            harness = pe.HARNESS.replace(flags, '"-I", "-S", ' + ('"-B", ' if keep_b else ""))
+            harness = script.replace(flags, "'-I', '-S', " + ("'-B', " if keep_b else ""))
             with self.subTest(keep_b=keep_b), mock.patch.object(pe, "HARNESS", harness):
                 self.assertEqual(verdict(self.observe(RETURNS_2)), R)   # the stale code's 1, not the source's 2
                 self.assertEqual(verdict(self.observe(RETURNS_1, expectation=R)), S)
@@ -156,7 +159,7 @@ class Bytecode(unittest.TestCase):
         scratch = self.tmp / "scratch"
         scratch.mkdir()
         before = snapshot(self.root)
-        with mock.patch.object(pe, "HARNESS", pe.HARNESS.replace(flags, '"-I", "-S", "-X", "pycache_prefix=" + req["agent_pycache"], ')):
+        with mock.patch.object(pe, "HARNESS", script.replace(flags, "'-I', '-S', '-X', 'pycache_prefix=' + req['agent_pycache'], ")):
             self.assertEqual(verdict(self.observe(RETURNS_2, probe=ProcessEffectProbe(scratch=str(scratch)))), S)
         self.assertEqual(snapshot(self.root), before)
         self.assertTrue(any(p.name.startswith("mod.") for p in scratch.rglob("*.pyc")))
