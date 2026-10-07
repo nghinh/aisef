@@ -142,6 +142,15 @@ class CommandLine(unittest.TestCase):
         _, env = self.wrap()
         self.assertEqual(env["XDG_CONFIG_HOME"], f"{confine.HOME}/.config")
 
+    def test_the_reviewers_workspace_is_bound_read_only(self):
+        """writable=False (the model reviewer's session): the checkout it reviews is bound read-only, last; no
+        host path is writable."""
+        argv, _ = confine.wrap(self.spec, [str(self.exe)], self.env, str(self.ws), str(self.exe), system="linux", writable=False)
+        self.assertEqual(pairs(argv, "--bind"), [])
+        self.assertEqual(pairs(argv, "--ro-bind")[-1], (str(self.ws), str(self.ws)))
+        self.assertEqual(argv[argv.index("--chdir") + 1], str(self.ws))
+        self.assertEqual(ro_binds(argv)[:-1], ro_binds(self.wrap()[0]))     # otherwise the developer's wrapper
+
     def test_network_host_shares_the_network_and_says_so(self):
         argv, _ = self.wrap(network="host")
         self.assertIn("--share-net", argv)
@@ -217,6 +226,11 @@ class FailClosed(unittest.TestCase):
                          "a file was created in the client directory", "a file was created in the git directory"):
                 self.assertIn(want, rep["problems"])
             self.assertTrue(any(p.startswith("a process the session left outlived it") for p in rep["problems"]), rep["problems"])
+            # unconfined, no namespace is the probe's own: "shared" on Linux, "not measured" where /proc has none
+            for n in ("user", "pid", "ipc", "uts", "mnt"):
+                self.assertTrue(any(p.startswith(f"the {n} namespace is not the session's own (") for p in rep["problems"]),
+                                (n, rep["problems"]))
+            self.assertNotIn("own", rep["inside"]["namespaces"].values())
             self.assertTrue(rep["created_outside_workspace"]["run_directory"])
             # the probe's own files, wherever confinement failed to stop them, removed
             probe_dirs = (where, confine.pathlib.Path(confine.__file__).resolve().parents[1], exe.parent, where / "repo" / ".git")
@@ -224,6 +238,104 @@ class FailClosed(unittest.TestCase):
             self.assertEqual(rep["tried"]["workspace"]["exit"], 0)
             self.assertEqual(rep["tried"]["read_git_directory"]["exit"], 0)
             self.assertEqual(rep["argv"][-4:], ["/bin/sh", "-c", "<PROBE>", "probe"])
+
+    @unittest.skipUnless(os.name == "posix", "the probe is a POSIX shell script")
+    def test_a_probe_that_did_not_exit_0_is_refused_even_when_it_reached_its_end(self):
+        with tempfile.TemporaryDirectory() as t:
+            tmp = pathlib.Path(os.path.realpath(t))
+            fake = fake_bwrap(tmp)
+            fake.write_text(fake.read_text().replace('exec "$@"', '"$@"; exit 3'))
+            exe = tmp / "client" / "opencode"
+            exe.parent.mkdir()
+            exe.write_text("#!/bin/sh\n")
+            rep = confine.measure(dict(SPEC, bwrap=str(fake)), tmp / "run" / "confinement", str(exe), system="linux",
+                                  environ={"PATH": "/usr/bin:/bin", "HOME": str(tmp)})
+            for pid in rep["setsid_survivors"]:
+                with contextlib.suppress(ProcessLookupError):
+                    os.kill(pid, signal.SIGKILL)
+        self.assertTrue(rep["problems"][0].startswith("the sandbox did not run the probe (exit 3): "), rep["problems"])
+        self.assertIn("setsid", rep["tried"])     # the probe ran to its end: only its exit refuses it
+
+    def test_no_client_no_measurement(self):
+        """Without the client the session's wrapper cannot be built, so nothing is measured: a problem, and the
+        measurement's worktree is removed."""
+        with tempfile.TemporaryDirectory() as t:
+            tmp = pathlib.Path(os.path.realpath(t))
+            fake = fake_bwrap(tmp)
+            where = tmp / "run" / "confinement"
+            rep = confine.measure(dict(SPEC, bwrap=str(fake)), where, None, system="linux",
+                                  environ={"PATH": "/usr/bin:/bin", "HOME": str(tmp)})
+            self.assertEqual(rep["problems"], ["the client (opencode) is not on the PATH the run gives it: the session's "
+                                               "wrapper cannot be measured"])
+            self.assertFalse((where / "ws").exists())
+
+    def test_a_namespace_counts_as_own_only_when_both_links_were_read_and_differ(self):
+        self.assertEqual(confine.namespaces({"user": "user:[1]", "pid": "pid:[7]"}, {"user": "user:[2]", "pid": "pid:[7]"}),
+                         {"user": "own", "pid": "shared"})
+        for inside, outside in (("readlink: /proc/self/ns/user: No such file or directory", "user:[2]"), ("user:[1]", None),
+                                ("pid:[1]", "user:[2]"), ("", "user:[2]"), (None, "user:[2]")):
+            with self.subTest(inside=inside, outside=outside):
+                self.assertEqual(confine.namespaces({"user": inside}, {"user": outside}), {"user": "not measured"})
+
+    def test_each_check_refuses_on_its_own(self):
+        """One departure at a time from a clean measurement: each check names it (none of them may be dropped)."""
+        ws = pathlib.Path("/w/ws")
+
+        def judged(change=lambda rep, tries: None, out="", home="/nonexistent"):
+            rep = {"network": "host", "created_outside_workspace": {"kernel": False}, "setsid_survivors": [],
+                   "inside": {"capabilities": dict.fromkeys(("CapInh", "CapPrm", "CapEff", "CapBnd", "CapAmb"), "0000000000000000"),
+                              "no_new_privs": "1", "namespaces": dict.fromkeys(("user", "pid", "ipc", "uts", "mnt"), "own"),
+                              "routed_interfaces": [], "home_listing": [], "unix_sockets": [],
+                              "mounts": [{"at": "/", "access": "rw", "fs": "tmpfs"}, {"at": str(ws), "access": "rw", "fs": "ext4"}],
+                              "mount_targets": [str(ws)]}}
+            tries = {"read_canary": (1, "No such file or directory"), "workspace": (0, "ok"),
+                     "read_git_directory": (0, "ref: x"), "user_namespace": (1, "unshare failed: No space left on device")}
+            change(rep, tries)
+            return confine._judge(rep, "tok", out, tries, home, ws)
+        self.assertEqual(judged(), [])
+
+        def inside(**kv):
+            return lambda rep, tries: rep["inside"].update(kv)
+        cases = [
+            (dict(change=lambda rep, tries: tries.update(read_canary=(0, ""))), "a file of the run directory was readable"),
+            (dict(change=lambda rep, tries: tries.pop("read_canary")), "a file of the run directory was readable"),
+            (dict(out="tok"), "a file of the run directory was readable"),
+            (dict(change=lambda rep, tries: rep["created_outside_workspace"].update(kernel=True)), "a file was created in the kernel"),
+            (dict(change=lambda rep, tries: rep.update(setsid_survivors=[42])), "a process the session left outlived it: [42]"),
+            (dict(change=lambda rep, tries: tries.update(workspace=(1, "ok"))), "the workspace was not writable"),
+            (dict(change=lambda rep, tries: tries.update(workspace=(0, ""))), "the workspace was not writable"),
+            (dict(change=lambda rep, tries: tries.pop("workspace")), "the workspace was not writable"),
+            (dict(change=inside(no_new_privs="0")), "NoNewPrivs is 0, not 1"),
+            (dict(change=inside(no_new_privs=None)), "NoNewPrivs is None, not 1"),
+            (dict(change=inside(mounts=[])), "the mounts could not be read"),
+            (dict(change=inside(mounts=[{"at": "/", "access": "rw", "fs": "tmpfs"}, {"at": "/srv", "access": "rw", "fs": "ext4"}],
+                                mount_targets=[str(ws), "/srv"])), "writable outside the workspace: ['/srv']"),
+            (dict(change=inside(home_listing=[".config", ".ssh"],
+                                mounts=[{"at": "/", "access": "rw", "fs": "tmpfs"}, {"at": "/h/.config/opencode", "access": "ro", "fs": "ext4"}],
+                                mount_targets=["/h/.config/opencode"]), home="/h"),
+             "HOME shows more than the way to what is mounted: ['.ssh']"),
+            (dict(change=lambda rep, tries: (rep.update(network="none"), rep["inside"]["namespaces"].update(net="shared"))),
+             "the net namespace is not the session's own (shared)"),
+            (dict(change=lambda rep, tries: (rep.update(network="none"), rep["inside"]["namespaces"].update(net="own"),
+                                             rep["inside"].update(routed_interfaces=["eth0"]))),
+             "network none has routes on ['eth0'] (a reachable network)"),
+        ]
+        for k in ("CapInh", "CapPrm", "CapEff", "CapAmb"):
+            for v in ("0000000000000001", None):
+                cases.append((dict(change=lambda rep, tries, k=k, v=v: rep["inside"]["capabilities"].update({k: v})),
+                              f"{k} is {v}, not 0"))
+        for n in ("user", "pid", "ipc", "uts", "mnt"):
+            for v in ("shared", "not measured"):
+                cases.append((dict(change=lambda rep, tries, n=n, v=v: rep["inside"]["namespaces"].update({n: v})),
+                              f"the {n} namespace is not the session's own ({v})"))
+            cases.append((dict(change=lambda rep, tries, n=n: rep["inside"]["namespaces"].pop(n)),
+                          f"the {n} namespace is not the session's own (not measured)"))
+        for kw, want in cases:
+            with self.subTest(want=want):
+                self.assertIn(want, judged(**kw))
+        self.assertEqual(judged(inside(home_listing=[".config"], mounts=[{"at": "/", "access": "rw", "fs": "tmpfs"},
+                                                                       {"at": "/h/.config/opencode", "access": "ro", "fs": "ext4"}],
+                                       mount_targets=["/h/.config/opencode"]), home="/h"), [])
 
     def test_a_check_that_did_not_run_is_a_problem_never_a_pass(self):
         """The user-namespace denial counts only when the kernel's refusal is seen; unshare absent or no try at all
@@ -313,7 +425,8 @@ class RunFailClosed(ProductBase):
         self.assertEqual(calls, [(str(self.client), out / "repo", out / "confinement")])
         self.assertEqual(json.loads((out / "RUN.json").read_text(encoding="utf-8"))["confinement"]["stub"], "measurement stubbed")
         self.assertEqual(sorted(s["role"] for s in rec["sessions"]), ["developer", "reviewer"])
-        self.assertTrue(all(s["confinement"] == "bwrap network=host" for s in rec["sessions"]), rec["sessions"])
+        self.assertEqual({s["role"]: s["confinement"] for s in rec["sessions"]},
+                         {"developer": "bwrap network=host", "reviewer": "bwrap network=host workspace=read-only"})
         started = [json.loads(line) for line in log.read_text(encoding="utf-8").splitlines()]
         self.assertEqual(len(started), 2)
         for argv in started:
@@ -323,8 +436,14 @@ class RunFailClosed(ProductBase):
                 self.assertIn(flag, argv[:cut])
             self.assertIn(str(self.client.parent), ro_binds(argv))
             self.assertIn(str((out / "repo" / ".git").resolve()), ro_binds(argv))
-            self.assertEqual(len(pairs(argv, "--bind")), 1)
-            self.assertTrue(pairs(argv, "--bind")[0][0].startswith(str(out / "work" / "ws")))
+        role = {argv[argv.index("--title", argv.index("--")) + 1].split()[0]: argv for argv in started}
+        developer, reviewer = role["developer"], role["reviewer"]
+        self.assertEqual(len(pairs(developer, "--bind")), 1)      # the developer writes its workspace, nothing else
+        self.assertTrue(pairs(developer, "--bind")[0][0].startswith(str(out / "work" / "ws")))
+        self.assertEqual(pairs(reviewer, "--bind"), [])           # the reviewer writes nothing of the host
+        checkout = reviewer[reviewer.index("--chdir") + 1]
+        self.assertEqual(pairs(reviewer, "--ro-bind")[-1], (checkout, checkout))
+        self.assertTrue(checkout.startswith(str(out / "work" / "ws")))
 
 
 @unittest.skipUnless(os.name == "posix", "the fake client is a script started by its shebang")

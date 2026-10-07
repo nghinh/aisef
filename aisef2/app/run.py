@@ -434,7 +434,9 @@ def execute(project: Project, settings: Settings, source: pathlib.Path, out: pat
               "secrets": tuple(v for v in (*(os.environ.get(n, "") for n in settings.client_env), key) if len(v) >= 8),
               **({"confine": settings.confinement} if settings.confinement is not None else {})}
         developer = ad.Developer(run, project, logs, kw, settings.timeouts_s["developer"])
-        reviewer = ad.Reviewer(run, project, logs, kw, settings.timeouts_s["reviewer"], review=settings.review,
+        # V2.1 (F): confined, the model reviewer's checkout is bound read-only — it writes nothing of the host
+        rkw = {**kw, "workspace_writable": False} if settings.confinement is not None else kw
+        reviewer = ad.Reviewer(run, project, logs, rkw, settings.timeouts_s["reviewer"], review=settings.review,
                                probe_timeout_s=settings.timeouts_s["probe"], interpreter=sys.executable,
                                route={"url": settings.endpoint, "token": key, "model": settings.model,
                                       "env": {k: v for k, v in client.environment(settings.client_env, {}).items()

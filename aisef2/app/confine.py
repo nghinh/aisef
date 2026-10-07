@@ -9,8 +9,11 @@ namespace when the client exits. It WRITES its workspace and nothing else of the
 (/usr, /etc and the library links), the client's own directory, the workspace's common git directory — for a run's
 worktree that is <out>/repo/.git, inside the run directory: the run's clone, every object and ref of it — the client's
 configuration directory and the operator's `read_only` paths; nothing else of the machine: not the rest of the run
-directory, not HOME (an empty tmpfs), not the kernel unless a `read_only` path holds it. A client whose directory holds
-HOME or the workspace is refused (bound read-only, the directory would expose them).
+directory, not HOME (an empty tmpfs), not the kernel or an interpreter unless it lies under the system paths (an
+interpreter in /usr or /usr/local is readable) or a `read_only` path. A client whose directory holds HOME or the
+workspace is refused (bound read-only, the directory would expose them). The model reviewer's session gets the same
+wrapper with its workspace — the checkout it reviews — bound read-only too (`writable=False`): it writes nothing of
+the host.
 
 Network: a run uses "host": the session shares the host's network so that it reaches its provider, and egress is NOT
 confined (the record says so). "none" (a network namespace of its own: a fresh loopback, no route) leaves a session no
@@ -120,9 +123,9 @@ def config_dir(env: Mapping[str, str]) -> tuple[str | None, str | None]:
     return base, (d if d and os.path.isdir(d) else None)
 
 
-def argv(spec: Mapping, command: list[str], workspace: str, read_only: list[str]) -> list[str]:
+def argv(spec: Mapping, command: list[str], workspace: str, read_only: list[str], writable: bool = True) -> list[str]:
     """The bubblewrap command line: namespaces, privileges, the system read-only, `read_only`, the workspace last
-    (read-write, even below a read-only path), the command in the workspace."""
+    (read-write — even below a read-only path — unless not `writable`), the command in the workspace."""
     a = [spec["bwrap"], "--unshare-user", "--unshare-pid", "--unshare-ipc", "--unshare-uts", "--unshare-cgroup-try",
          *(["--unshare-net"] if spec["network"] == "none" else ["--share-net"]),
          "--disable-userns", "--die-with-parent", "--new-session", "--cap-drop", "ALL"]
@@ -134,12 +137,13 @@ def argv(spec: Mapping, command: list[str], workspace: str, read_only: list[str]
     a += ["--proc", "/proc", "--dev", "/dev", "--tmpfs", "/tmp", "--tmpfs", HOME]
     for p in dict.fromkeys(read_only):
         a += ["--ro-bind", p, p]
-    return [*a, "--bind", workspace, workspace, "--chdir", workspace, "--", *command]
+    return [*a, "--bind" if writable else "--ro-bind", workspace, workspace, "--chdir", workspace, "--", *command]
 
 
 def wrap(spec: Mapping, command: list[str], env: Mapping[str, str], workspace: str, exe: str | None = None,
-         system: str = sys.platform) -> tuple[list[str], dict]:
-    """(argv, env) of `command` confined to `workspace`; Unavailable when this host cannot confine (fail closed)."""
+         system: str = sys.platform, writable: bool = True) -> tuple[list[str], dict]:
+    """(argv, env) of `command` confined to `workspace` (bound read-only when not `writable`: the reviewer's);
+    Unavailable when this host cannot confine (fail closed)."""
     if not system.startswith("linux"):
         raise Unavailable(f"confinement is Linux-only (bubblewrap); this host is {system}: no backend")
     if not (os.path.isfile(spec["bwrap"]) and os.access(spec["bwrap"], os.X_OK)):
@@ -159,7 +163,7 @@ def wrap(spec: Mapping, command: list[str], env: Mapping[str, str], workspace: s
     inside = {k: v for k, v in env.items() if k not in ("USERPROFILE", "TEMP", "TMP")}
     inside.update(HOME=HOME, TMPDIR="/tmp", XDG_DATA_HOME=f"{HOME}/.local/share", XDG_STATE_HOME=f"{HOME}/.local/state",
                   XDG_CACHE_HOME=f"{HOME}/.cache", XDG_CONFIG_HOME=base if cfg else f"{HOME}/.config")
-    return argv(spec, command, workspace, ro), inside
+    return argv(spec, command, workspace, ro, writable), inside
 
 
 def _sections(out: str) -> tuple[dict, dict, dict]:
@@ -303,12 +307,10 @@ def _probe(spec: Mapping, where: pathlib.Path, ws: pathlib.Path, full: list[str]
     # /proc/net/route rows after the header: an interface with a route. A fresh netns (--unshare-net) has none, even
     # though this kernel pre-creates DOWN tunnel pseudo-devices, so routes — not interface names — show reachability.
     routes = [ln.split("\t")[0] for ln in sections.get("route", [])[1:] if "\t" in ln]
-    outside_ns = {n: (os.readlink(f"/proc/self/ns/{n}") if os.path.exists(f"/proc/self/ns/{n}") else None)
-                  for n in values.get("ns", {})}
     rep["inside"] = {"uid": values.get("uid"), "capabilities": caps, "no_new_privs": status.get("NoNewPrivs"),
                      "seccomp": status.get("Seccomp"), "network_interfaces": netdev, "routed_interfaces": sorted(set(routes)),
                      "mounts": mounts, "mount_targets": targets(full),
-                     "namespaces": {n: ("own" if v != outside_ns.get(n) else "shared") for n, v in values.get("ns", {}).items()},
+                     "namespaces": namespaces(values.get("ns", {})),
                      "home_listing": sections.get("home", []),
                      "unix_sockets": sections.get("sockets", []) if values.get("sockets") == "listed" else None}
     rep["tried"] = {k: {"exit": rc, "output": o} for k, (rc, o) in tries.items()}
@@ -319,6 +321,19 @@ def _probe(spec: Mapping, where: pathlib.Path, ws: pathlib.Path, full: list[str]
         problems += _judge(rep, token, out, tries, home, ws)
     rep["problems"] = problems
     return rep
+
+
+def namespaces(inside: Mapping[str, str], outside: Mapping[str, str | None] | None = None) -> dict:
+    """Each namespace the probe read: "own" when both links are read (`user:[4026531837]`) and differ, "shared" when
+    equal, "not measured" otherwise — an error text or a link that could not be read never passes as "own"."""
+    if outside is None:
+        outside = {n: (os.readlink(f"/proc/self/ns/{n}") if os.path.exists(f"/proc/self/ns/{n}") else None) for n in inside}
+    return {n: ("not measured" if not (_link(n, v) and _link(n, outside.get(n))) else "own" if v != outside[n] else "shared")
+            for n, v in inside.items()}
+
+
+def _link(n: str, v) -> bool:
+    return isinstance(v, str) and re.fullmatch(rf"{n}:\[\d+\]", v) is not None
 
 
 def _within(path: str, roots) -> bool:
@@ -349,7 +364,8 @@ def _judge(rep: dict, token: str, out: str, tries: dict, home: str, ws: pathlib.
     if inside["no_new_privs"] != "1":
         bad.append(f"NoNewPrivs is {inside['no_new_privs']}, not 1")
     need = ("user", "pid", "ipc", "uts", "mnt", *(("net",) if rep["network"] == "none" else ()))
-    bad += [f"the {n} namespace is not the session's own" for n in need if inside["namespaces"].get(n) != "own"]
+    bad += [f"the {n} namespace is not the session's own ({inside['namespaces'].get(n, 'not measured')})" for n in need
+            if inside["namespaces"].get(n) != "own"]
     if rep["network"] == "none" and inside["routed_interfaces"]:
         bad.append(f"network none has routes on {inside['routed_interfaces']} (a reachable network)")
     if not inside["mounts"]:

@@ -1,9 +1,10 @@
 """In-container measurement of the model-session confinement (V2.1 F; run by run.sh inside a Linux container).
 
 The layout is a run's: the kernel installed in a venv (the operator's `read_only`), the client in a directory of its
-own (`runtime/`), the run directory with its repository and a session worktree of it, the operator's HOME with a key
-and the client's auth data, a hidden verifier file. Every operation runs under the command line a session gets —
-`aisef2.app.confine.wrap` with the client and the worktree, as `client.session` calls it — and the kernel's own
+own (`runtime/`), the run directory with its repository and a session worktree of it (the developer's) plus the
+checkout a model reviewer reviews (another worktree of it), the operator's HOME with a key and the client's auth data, a
+hidden verifier file. Every operation runs under the command line a session gets — `aisef2.app.confine.wrap` with the
+client and the worktree, as `client.session` calls it (the reviewer's: `writable=False`) — and the kernel's own
 `confine.measure` runs as `run.execute` calls it. Each row records the operation and what happened:
 
   denials    the operation FAILED inside the sandbox (its error is recorded);
@@ -45,6 +46,7 @@ from aisef2.app import confine  # noqa: E402 — the copy in the venv's site-pac
 RUN = BASE / "run-dir"                   # the kernel's run directory; outside the workspace
 REPO = RUN / "repo"                      # the run's clone: its .git is read-only inside every session
 WS = RUN / "work" / "ws" / "wt-S1"       # a session's workspace: a worktree of REPO, the only writable host path
+REVIEWED = RUN / "work" / "ws" / "verifier-wt-S1"   # the checkout a model reviewer reviews: bound read-only
 RUNTIME = BASE / "runtime" / "opencode"  # the client, in a directory of its own (bound read-only)
 VERIFIER = BASE / "verifier" / "hidden.json"
 ANCHOR = RUN / "EVIDENCE.anchor"
@@ -61,10 +63,12 @@ def git(*args: str) -> str:
     return subprocess.run(["git", *args], check=True, capture_output=True, text=True, env=GIT).stdout.strip()
 
 
-def inside(cmd: list[str], env: dict, spec: dict = SPEC) -> dict:
-    """`cmd` under a session's wrapper; its exit and output, or why the sandbox did not start it."""
+def inside(cmd: list[str], env: dict, spec: dict = SPEC, reviewer: bool = False) -> dict:
+    """`cmd` under a session's wrapper (the developer's, or the model reviewer's on the checkout it reviews); its
+    exit and output, or why the sandbox did not start it."""
     try:
-        argv, e = confine.wrap(spec, cmd, env, str(WS), str(RUNTIME), system="linux")
+        argv, e = confine.wrap(spec, cmd, env, str(REVIEWED if reviewer else WS), str(RUNTIME), system="linux",
+                               writable=not reviewer)
     except confine.Unavailable as x:
         return {"started": False, "why": str(x)}
     p = subprocess.run(argv, capture_output=True, text=True, env=e, timeout=60)
@@ -106,6 +110,8 @@ def main() -> None:
     git("-C", str(REPO), "init", "-q", "-b", "main")
     git("-C", str(REPO), "-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q", "--allow-empty", "-m", "base")
     git("-C", str(REPO), "worktree", "add", "-q", "--detach", str(WS))
+    git("-C", str(REPO), "worktree", "add", "-q", "--detach", str(REVIEWED))
+    (REVIEWED / "candidate.py").write_text("print('the candidate')\n")     # write bits kept: only the mount stops a write
     RUNTIME.parent.mkdir(parents=True)
     RUNTIME.write_text(CLIENT)
     RUNTIME.chmod(0o755)
@@ -118,7 +124,8 @@ def main() -> None:
     SOCKS.mkdir()
     keep = [listen_unix(str(SOCKS / "ctl")), listen_unix("\0aisef-measure-" + str(os.getpid()))]
     sleeper = subprocess.Popen(["sleep", "987.654"])     # a process of the container, outside the sandbox
-    before = {p: p.read_bytes() for p in (RUNTIME, ANCHOR, VERIFIER, REPO / ".git" / "HEAD")}
+    before = {p: p.read_bytes() for p in (RUNTIME, ANCHOR, VERIFIER, REPO / ".git" / "HEAD", REVIEWED / "candidate.py")}
+    reviewed_before = sorted(os.listdir(REVIEWED))
 
     report: dict = {"network": NETWORK, "uid": os.getuid(), "spec": SPEC,
                     "container": {k: os.environ.get(k) for k in ("PROFILE", "SECCOMP", "APPARMOR", "SYSTEMPATHS")},
@@ -129,6 +136,8 @@ def main() -> None:
     report["measure"] = confine.measure(SPEC, RUN / "confinement", str(RUNTIME), REPO, system="linux", environ=env)
     report["session_argv"] = confine.wrap(SPEC, [str(RUNTIME), "run", "<prompt>"], env, str(WS), str(RUNTIME),
                                           system="linux")[0]
+    report["reviewer_session_argv"] = confine.wrap(SPEC, [str(RUNTIME), "run", "<prompt>"], env, str(REVIEWED),
+                                                   str(RUNTIME), system="linux", writable=False)[0]
 
     sh = lambda s: ["/bin/sh", "-c", s]  # noqa: E731
     port, gw = int(os.environ.get("HOST_PORT", "0")), os.environ.get("HOST_GATEWAY", "127.0.0.1")
@@ -150,6 +159,10 @@ def main() -> None:
                                            "| grep -c 'sleep 98[7][.]654'; ls /proc | grep -E '^[0-9]+$' | sort -n | tr '\\n' ' '"), env),
         "connect_unmounted_unix_socket": inside(connect_py("path", str(SOCKS / "ctl")), env),
         "new_user_namespace": inside(sh("unshare --user --map-root-user true"), env),
+        # the model reviewer's session: the checkout it reviews is bound read-only — its write bits are kept here, so
+        # only the mount refuses; giving the write bits back (the runner's read-only scope only clears them) fails too
+        "reviewer_write_reviewed_checkout": inside(sh(": > ./x; echo x >> ./candidate.py"), env, reviewer=True),
+        "reviewer_chmod_reviewed_checkout": inside(sh("chmod u+w ./candidate.py"), env, reviewer=True),
     }
     # reached or not by network: denied with network none, reached with host (a run's) — never called a denial there
     report["network"] = {
@@ -167,6 +180,8 @@ def main() -> None:
         "read_git_directory": inside(sh(f"cat {REPO / '.git' / 'HEAD'}"), env),
         "git_status_in_workspace": inside(sh("git status --porcelain --branch"), env),
         "read_client_configuration": inside(sh(f"ls -A {CLIENT_HOME / '.config' / 'opencode'}"), env),
+        "reviewer_reads_reviewed_checkout": inside(sh("cat ./candidate.py && git status --porcelain --branch"), env,
+                                                   reviewer=True),
         "home_listing": inside(sh(f"ls -A {CLIENT_HOME}"), env),
         # a read-only mount does not stop a connect: the same socket, bound in read-only, is reachable — and the
         # kernel's measurement refuses such a setting (its problems are recorded)
@@ -186,6 +201,7 @@ def main() -> None:
                        "written_in_run_directory": (RUN / "written").exists(),
                        "written_in_kernel": kernel_file.exists(),
                        "written_in_client_directory": (RUNTIME.parent / "x").exists(),
+                       "reviewed_checkout_listing_unchanged": sorted(os.listdir(REVIEWED)) == reviewed_before,
                        "container_sleeper_seen_outside": sleeper_outside,
                        "measure_pid_outside": os.getpid()}
     for s in keep:

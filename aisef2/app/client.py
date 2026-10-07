@@ -183,12 +183,13 @@ def redact(log: pathlib.Path, secrets) -> int:
 
 def session(name: str, prompt: str, cwd: str, log: pathlib.Path, timeout_s: float, *, model: str | None = None,
             env: dict | None = None, budget: Budget | None = None, turn_cap: int | None = None, exe: str | None = None,
-            secrets: tuple[str, ...] = (), confine: dict | None = None) -> dict:
+            secrets: tuple[str, ...] = (), confine: dict | None = None, workspace_writable: bool = True) -> dict:
     """One `opencode run --format json` session in a process range of its own; its event stream goes to `log`. Nothing
     starts when anything is unbound, when the evidence shows the budget reached or spend unaccounted, or when `log`
     exists (a session's evidence is never overwritten); the range is released when the budget or the turn cap is
-    reached while it runs. `confine` (V2.1, app/confine): the session runs under bubblewrap, confined to `cwd`; a
-    host that cannot confine refuses it before anything starts."""
+    reached while it runs. `confine` (V2.1, app/confine): the session runs under bubblewrap, confined to `cwd` (bound
+    read-only when not `workspace_writable`: the model reviewer's); a host that cannot confine refuses it before
+    anything starts."""
     unbound = [k for k, v in (("model", model), ("env", env), ("budget", budget), ("turn_cap", turn_cap)) if v is None]
     if unbound:
         raise SessionRefused(f"a model session needs a fixed route, a built environment, a budget and a turn cap; "
@@ -203,7 +204,7 @@ def session(name: str, prompt: str, cwd: str, log: pathlib.Path, timeout_s: floa
         argv = [exe, "run", "--format", "json", "--model", model, "--title", name, "--dir", cwd, prompt]
         if confine is not None:
             try:
-                argv, env = confinement.wrap(confine, argv, env, cwd, exe)
+                argv, env = confinement.wrap(confine, argv, env, cwd, exe, writable=workspace_writable)
             except confinement.Unavailable as e:
                 raise SessionRefused(str(e)) from None
         log.parent.mkdir(parents=True, exist_ok=True)
@@ -221,6 +222,7 @@ def session(name: str, prompt: str, cwd: str, log: pathlib.Path, timeout_s: floa
         return {"exit": code, "timed_out": code is None and not stopped, "stopped": stopped, "started": True,
                 "error": seen["error"], "text": seen["text"], "turns": seen["turns"], "tokens": seen["tokens"],
                 "seconds": round(time.monotonic() - started, 1), "log": log.name, "redacted": redacted,
-                **({"confinement": f"bwrap network={confine['network']}"} if confine is not None else {})}
+                **({"confinement": f"bwrap network={confine['network']}" + ("" if workspace_writable else " workspace=read-only")}
+                   if confine is not None else {})}
     return {"exit": None, "timed_out": False, "stopped": stopped, "started": False, "error": stopped, "text": "", "turns": 0,
             "tokens": {"input": 0, "output": 0}, "seconds": 0.0, "log": None}
