@@ -322,7 +322,8 @@ and `timed_out` — the legacy key — **only for the TIMEOUT class**, listing t
 counts results that carry it, so in runner-2 records it counts exactly the TIMEOUT class, independently of order, with
 `s2_mutation_record.py` untouched.
 
-Target entry: `target`, `runner: 2`, `kill_tests` (the canonical list; execution order is that order), `source_sha256`,
+Target entry: `target`, `runner: 2`, `kill_tests` (the declared list, which `proof()` pins; each chain runs it in that
+order unless an execution-order table gives another, recorded whole as `execution_order`: §7.2), `source_sha256`,
 `tree_sha256`, `mutants`, `killed`, `survivors` (every non-KILLED mutant, generator order), `classes`,
 `killed_by_timeout` (= the TIMEOUT class count), `strays_reaped`, `t0`, `original` (when T0 refused a file), `results`
 (every generated mutant in generator order, NOT_RUN included, so `proof()`'s mutant-list comparison stays meaningful),
@@ -560,6 +561,21 @@ normalised tail hash in every order — o(m, f) does not depend on what ran befo
 (§1), the tree restore off (§2) and the old stop-at-first-non-PASS rule (§3, §4), each in one order, the classes differ
 from the truth, so the toy cannot pass vacuously. Runtime: the whole runner test file (36 tests) takes 252 s on this host under `heavy.sh`, the matrix about 115 s of it (5 rotations, 3 controls in one order each); it is POSIX-only.
 
+**Execution order (ORD-4).** `mutation.py run --order TABLE.json [target ...]` runs each listed target's chains in
+the order its entry gives — `{"files": [...], "from": "<the measurement>"}`, e.g. ascending T0 seconds at the
+snapshot, ties by declared position. The record keeps the declared `kill_tests` and copies the entry, with the table's
+path and sha256, as `execution_order`; T0 still runs the declared order. An entry that is not the kill set in another
+order, or names no measurement, refuses the target before anything runs; `_problems_v2` reads a SURVIVED's PASS rows in
+the order the record names and refuses an `execution_order` that is not the kill set. Without a table nothing changes:
+the declared order, no `execution_order`. No table is committed: the lead's pilot runs both ways.
+`Order.test_an_execution_order_changes_no_class_and_the_record_only_where_it_must` runs the declared set in the four
+other rotations through such a table: every class, the target's fields, T0 and `target_problems` equal the declared
+order's; each (mutant, file) has the same rows (clock left out) in all nine runs of the matrix; a mutant not killed ran
+every file in the table's order; a kill is the first file in that order whose FAIL reproduces, and nothing ran after
+it; and at least one kill moved to another file. Controls: a chain that ignores the table fails that test; a record
+check that ignores `execution_order` fails `Classify.test_a_survivor_is_read_in_the_order_its_chain_ran`. The `Order`
+class now takes 191 s under `heavy.sh` (9 matrix runs, 3 controls).
+
 ### 7.3 Limits, stated
 
 - **A detached process with no token, no scratch path in its command line and a working directory outside the
@@ -591,9 +607,9 @@ from the truth, so the toy cannot pass vacuously. Runtime: the whole runner test
   `EXCLUDED`, `proof`, `_current`, `CRITERIA` and `FROZEN_CRITERIA_SHA256` are not edited; `criteria_sha256()` is
   unchanged (the Phase test asserts it).
 - **Kill sets and their order:** `V21_TARGETS` and every `*_TARGETS` list are byte-identical; the files keep their
-  names, so `REQUALIFICATION-MANIFEST.json`'s `--check` stays green. Reordering kill sets (cheapest first) is a separate,
-  later commit; it records `execution_order` beside the canonical `kill_tests` so `proof()` keeps comparing the
-  canonical list (ORD-4 verifier). This work only makes that reorder safe (§7).
+  names, so `REQUALIFICATION-MANIFEST.json`'s `--check` stays green. No kill set is reordered: an execution order
+  (cheapest first) is given by a table (`run --order`, §7.2) and recorded as `execution_order` beside the declared
+  `kill_tests`, so `proof()` keeps comparing the declared list (ORD-4 verifier). No table is committed.
 - **`closure-evidence/`:** no record is edited.
 - **The kernel** (`aisef2/`): untouched, ProcessRange's default `wait_s` included.
 - **TIMEOUT stays 900 s per file.**
@@ -614,7 +630,8 @@ from the truth, so the toy cannot pass vacuously. Runtime: the whole runner test
 | 7 | `671d78e` | the contract, with the reviews' resolutions and the measurements | — |
 | fix 1–13 | §14 | the provers' open items, one commit each, each with its test | §14 |
 
-No kill-set reorder is in this series: the owner asked for it as a separate, later commit (§8).
+No kill-set reorder is in this series: the owner asked for it as a separate, later commit (§8). The execution-order
+table (lane execorder, §7.2) runs a declared set in another order without reordering it.
 
 Commits 1–5 ran, under `env -i` with the guard PATH and `python3 -P`, the heavy parts under `heavy.sh`: `ruff check`
 on the changed files; `mutation.py --check` diffed against c9c736f's output (identical at every commit);
@@ -700,7 +717,7 @@ small V2.1 targets, each with a 2-file kill set:
 | ORD-1 | byte/text-identity tests "killed" every mutant of 5 modules | §5 T0 gate, §6 split (4, 5, 5b); 60 targets refused pending N1 | `T0` toy; §6.1 sweep (129 pairs) |
 | ORD-2 | stop on timeout or any non-zero exit | §4.1 (3) | `Order`, `Classify` 1 |
 | ORD-3 | fast first files widen stale-bytecode exposure | §1 (1) | `Order` (fast `test_k` first in a rotation) |
-| ORD-4 | the reuse proof pins kill-set order | not changed; `execution_order` for the later reorder (§8); owner decision (§14) | — |
+| ORD-4 | the reuse proof pins kill-set order | not changed: a table gives the execution order, recorded as `execution_order` beside the declared `kill_tests` (§7.2, §8); relaxing the proof is the owner's (§14) | `Order` execution-order rotations; `Classify` survivor order; `KillSets` refusal |
 | ORD-5 | cross-file and cross-mutant state | §2.2, §2.3 per run (2) | `Env` case S; `Order` |
 | ORD-6 | no killing file or cause recorded | §3.2, §4.2 (3) | `Classify` 4 |
 | ORD-7 | target fate depends on whether an escaping file is reached | a stop, never a class; settle narrows the window (2, 3); a 60 s grace (§14 fix 5); §7.3 | `Proc` stops; §14 fix 5 |
@@ -818,7 +835,8 @@ destructive site added: every removal is still a `TemporaryDirectory` cleanup), 
   passes only beside a cache an earlier run wrote. None is known.
 - **ORD-4 — the reuse proof pins kill-set order** (order-equivalence). Unchanged by instruction (the reorder is a later,
   separate commit, §8): `proof()`, the Phase test and the scope manifest fail loudly on any reorder, and no reorder exists
-  yet. Relaxing them changes frozen criteria — the owner's decision.
+  yet. Relaxing them changes frozen criteria — the owner's decision. Running a declared set in another order needs none
+  of that (§7.2): `kill_tests` stays the declared list.
 - **ORD-7's residue** — a leftover living longer than 60 s still stops the target in the orders that reach its file
   (§7.3). Removing it needs ownership taken before release() (ORD-7 (b)), an authority-model change for the owner.
 - **The prover's optional extras not built:** every `.py`'s mtime is in fix 1 (built); a widened signature with the
