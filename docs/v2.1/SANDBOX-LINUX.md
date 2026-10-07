@@ -242,11 +242,12 @@ read-only mounted directory prints its JSON.
   `test_the_grace_used_is_survivor_grace_so_a_sleeper_ending_just_after_it_is_still_a_survivor`).
 
 **Kernel change.** This touches `aisef2/` (settings, client, run, cli, and the new `confine.py`): it needs mutation
-coverage and re-qualification outside the current measured snapshot. `confine.py` is **not** a mutation target today:
-`validation/v2/mutation.py` has no `aisef2/app/confine.py` entry (in neither `TARGETS` nor `V21_TARGETS`), and
-`run.py::client_on_path` is not one either; `tests/v2/test_v21_mutation_record.py` does not name them. Its coverage
-therefore needs new target entries in `validation/v2/mutation.py` (frozen for the running campaign, so not changed
-here), not only a later measurement. Against `closure-evidence/v2/v2.1/REQUALIFICATION-MANIFEST.json` (snapshot
+coverage and re-qualification outside the current measured snapshot. On this track's branch `confine.py` was **not** a
+mutation target: `validation/v2/mutation.py` had no `aisef2/app/confine.py` entry (in neither `TARGETS` nor
+`V21_TARGETS`), and `run.py::client_on_path` was not one either; `tests/v2/test_v21_mutation_record.py` did not name
+them. **Since `34db934` on `v21/integ` they are V2.1 targets**: confine.py's 20 names (808 mutants there; `_probe`
+184 since the INV-MUTATION-AUTHORITY fix, 814 in all) with kill set `test_v21_confine.py`, `client_on_path` with that
+file last, which is also appended to the kill sets of the 5 changed targets below. Against `closure-evidence/v2/v2.1/REQUALIFICATION-MANIFEST.json` (snapshot
 `cc53596`), `v21_requalification.py --check` on this branch (`ac27348`) reports 5 changed V2.1 targets —
 `cli.py::run`, `client.py::session`, `run.py::execute`, `settings.py::OPTIONAL`, `settings.py::load`; counted as its
 `scope()` counts them (`mutation.mutants`), 116→133, 114→128, 315→337, 2→3 and 254→268 mutants (+68). Targeted mutants of this track were run on scratch copies only — not campaign evidence: 45/45 killed
@@ -254,7 +255,7 @@ at `ac27348` (the 11 that survived the previous tests at `0da842f` among them; s
 5 the round-2 verifier saw survive the 24 tests at `4e00a0d` (`_within` without its `/`, the user's home not checked
 when the env has no HOME, an unreadable bubblewrap raising, a non-Linux measurement making its worktree, `--check`
 measuring without the client) survive them again and are killed by the 26 at `affcefb` (tests only: `aisef2/` is
-unchanged since `ac27348`). Round 3 changes `aisef2/app/confine.py` only (`_survivors`, `SURVIVOR_GRACE`; not a
+unchanged since `ac27348`). Round 3 changes `aisef2/app/confine.py` only (`_survivors`, `SURVIVOR_GRACE`; not then a
 mutation target; the files of the 5 targets above are unchanged since `ac27348` by `git diff`, so their counts
 above stand — `--check` itself was not re-run): 6/6 targeted
 mutants of the grace killed by the 28 tests at `3e0409c`; two of them — no grace (the round-2 code) and a grace of

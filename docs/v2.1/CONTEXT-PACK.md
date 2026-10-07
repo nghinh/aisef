@@ -171,4 +171,8 @@ báo trùng giả). Lượt tích hợp CLI không có gì bị che trong gói (
   (`:545`, `:562`, `:605`) không có `test_v21_context_pack` trong tập giết. Chiến dịch sau phải thêm đích
   `aisef2/app/feedback.py::context_pack` (và `PACK_MAX`/`PACK_LIST`/`PACK_ATTEMPTS`, `PACK_HEAD`) với
   `test_v21_context_pack` trong tập giết, và thêm `test_v21_context_pack` vào tập giết của `Developer.implement` (đột
-  biến "không đưa bí mật" ở trên mới chỉ được chạy với `test_v21_context_pack`).
+  biến "không đưa bí mật" ở trên mới chỉ được chạy với `test_v21_context_pack`). **Đã làm trên `v21/integ` (`34db934`)**:
+  `feedback.py::context_pack` là đích V2.1 (205 đột biến; tập giết `test_app_units`, `test_v21_review_chain`,
+  `test_app_run`, `test_v21_context_pack`) và `test_v21_context_pack` được nối cuối tập giết của
+  `adapters.py::Developer.implement`; `PACK_HEAD` (không có đột biến), `PACK_MAX`/`PACK_LIST`/`PACK_ATTEMPTS` (một phép
+  gán tuple) không là đích.
