@@ -1,0 +1,14 @@
+..................................................../opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/subprocess.py:1139: ResourceWarning: subprocess 20634 is still running
+  _warn("subprocess %s is still running" % self.pid,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/_strptime.py:582: ResourceWarning: unclosed file <_io.FileIO name=5 mode='wb' closefd=True>
+  for group_key in found_dict.keys():
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/_strptime.py:582: ResourceWarning: unclosed file <_io.FileIO name=6 mode='rb' closefd=True>
+  for group_key in found_dict.keys():
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+.......
+----------------------------------------------------------------------
+Ran 59 tests in 484.574s
+
+OK

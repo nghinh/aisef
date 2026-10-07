@@ -1,0 +1,4892 @@
+{
+ "record": "AISEF V2.1 — T0 SWEEP: every distinct (null mutant, kill file) pair of the V2.1 targets, run through the runner's own T0",
+ "measured_on": "7577e16880b01ea83248456dfac14343c2df7201",
+ "rows": [
+  {
+   "key": "aisef2/app/adapters.py|78f55ba4584548fc|tests/v2/test_app_run.py",
+   "module": "aisef2/app/adapters.py",
+   "null": "78f55ba4584548fccf790efd0d2c9d669390922fd3ce884dd13bd4888c906bc3",
+   "file": "tests/v2/test_app_run.py",
+   "targets": [
+    "aisef2/app/adapters.py::Developer.implement",
+    "aisef2/app/adapters.py::Reviewer.__init__",
+    "aisef2/app/adapters.py::Reviewer._model",
+    "aisef2/app/adapters.py::Reviewer._ocr",
+    "aisef2/app/adapters.py::Reviewer._verify",
+    "aisef2/app/adapters.py::Reviewer.review",
+    "aisef2/app/adapters.py::_bounded",
+    "aisef2/app/adapters.py::_unchanged",
+    "aisef2/app/adapters.py::attempt_of",
+    "aisef2/app/adapters.py::tree_of"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_app_run.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 34.15,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 17,
+     "first_test": "v2.test_app_run.Command.test_a_live_run_without_the_provider_key_stops_before_any_request",
+     "tail_sha256": "34c9bfe7ef7d76c17f599b0a81180f32dc90d22822f05f5f66668053994bd703",
+     "overhead_s": 0.29
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 36.0
+  },
+  {
+   "key": "aisef2/app/adapters.py|78f55ba4584548fc|tests/v2/test_app_units.py",
+   "module": "aisef2/app/adapters.py",
+   "null": "78f55ba4584548fccf790efd0d2c9d669390922fd3ce884dd13bd4888c906bc3",
+   "file": "tests/v2/test_app_units.py",
+   "targets": [
+    "aisef2/app/adapters.py::Developer.implement",
+    "aisef2/app/adapters.py::Reviewer.__init__",
+    "aisef2/app/adapters.py::Reviewer._model",
+    "aisef2/app/adapters.py::Reviewer._ocr",
+    "aisef2/app/adapters.py::Reviewer._verify",
+    "aisef2/app/adapters.py::Reviewer.review",
+    "aisef2/app/adapters.py::_bounded",
+    "aisef2/app/adapters.py::_unchanged",
+    "aisef2/app/adapters.py::attempt_of",
+    "aisef2/app/adapters.py::tree_of"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_app_units.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 6.52,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 41,
+     "first_test": "v2.test_app_units.Adapters.test_attempt_of_reads_the_kernel_projection_and_prior_failures",
+     "tail_sha256": "3ef303c799614934b469520dc3ed73bad54df703d4213d103aaf0597d5afb57a",
+     "overhead_s": 0.29
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 8.5
+  },
+  {
+   "key": "aisef2/app/adapters.py|78f55ba4584548fc|tests/v2/test_s2_kills.py",
+   "module": "aisef2/app/adapters.py",
+   "null": "78f55ba4584548fccf790efd0d2c9d669390922fd3ce884dd13bd4888c906bc3",
+   "file": "tests/v2/test_s2_kills.py",
+   "targets": [
+    "aisef2/app/adapters.py::Developer.implement",
+    "aisef2/app/adapters.py::Reviewer.review"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_s2_kills.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 23.46,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 43,
+     "first_test": "v2.test_s2_kills.AgentGuarded.test_the_controlled_fault_names_itself_in_its_message",
+     "tail_sha256": "0bd664af1b79df8fc95d7e4ab7fee01458ca96cf64aa0c3ba780bc5a70d2e7c3",
+     "overhead_s": 0.3
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 25.4
+  },
+  {
+   "key": "aisef2/app/adapters.py|78f55ba4584548fc|tests/v2/test_v21_identity.py",
+   "module": "aisef2/app/adapters.py",
+   "null": "78f55ba4584548fccf790efd0d2c9d669390922fd3ce884dd13bd4888c906bc3",
+   "file": "tests/v2/test_v21_identity.py",
+   "targets": [
+    "aisef2/app/adapters.py::Developer.implement",
+    "aisef2/app/adapters.py::Reviewer.__init__",
+    "aisef2/app/adapters.py::Reviewer._model",
+    "aisef2/app/adapters.py::Reviewer._ocr",
+    "aisef2/app/adapters.py::Reviewer._verify",
+    "aisef2/app/adapters.py::Reviewer.review",
+    "aisef2/app/adapters.py::_bounded",
+    "aisef2/app/adapters.py::_unchanged",
+    "aisef2/app/adapters.py::attempt_of",
+    "aisef2/app/adapters.py::tree_of"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_identity.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 1.46,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 13,
+     "first_test": "v2.test_v21_identity.Migrate.test_a_spec_no_release_compiles_is_refused_not_guessed",
+     "tail_sha256": "55ff309bf7ddd8be199b014399f388efe1c20a5041ab190f563ffc170a57e475",
+     "overhead_s": 0.31
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 3.4
+  },
+  {
+   "key": "aisef2/app/adapters.py|78f55ba4584548fc|tests/v2/test_v21_kills_adapters.py",
+   "module": "aisef2/app/adapters.py",
+   "null": "78f55ba4584548fccf790efd0d2c9d669390922fd3ce884dd13bd4888c906bc3",
+   "file": "tests/v2/test_v21_kills_adapters.py",
+   "targets": [
+    "aisef2/app/adapters.py::Reviewer.__init__",
+    "aisef2/app/adapters.py::Reviewer._model",
+    "aisef2/app/adapters.py::Reviewer._verify",
+    "aisef2/app/adapters.py::Reviewer.review",
+    "aisef2/app/adapters.py::_unchanged",
+    "aisef2/app/adapters.py::tree_of"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_kills_adapters.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 1.43,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 10,
+     "first_test": "v2.test_v21_kills_adapters.ReviewerInit.test_the_verification_runs_the_probe_under_the_interpreter_the_run_gave",
+     "tail_sha256": "cb06f26e71e4fa3244553fc563acb605dbb05e800e75ddf812dcafad54a38b11",
+     "overhead_s": 0.3
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 2.8
+  },
+  {
+   "key": "aisef2/app/adapters.py|78f55ba4584548fc|tests/v2/test_v21_review_chain.py",
+   "module": "aisef2/app/adapters.py",
+   "null": "78f55ba4584548fccf790efd0d2c9d669390922fd3ce884dd13bd4888c906bc3",
+   "file": "tests/v2/test_v21_review_chain.py",
+   "targets": [
+    "aisef2/app/adapters.py::Developer.implement",
+    "aisef2/app/adapters.py::Reviewer.__init__",
+    "aisef2/app/adapters.py::Reviewer._model",
+    "aisef2/app/adapters.py::Reviewer._ocr",
+    "aisef2/app/adapters.py::Reviewer._verify",
+    "aisef2/app/adapters.py::Reviewer.review",
+    "aisef2/app/adapters.py::_bounded",
+    "aisef2/app/adapters.py::_unchanged",
+    "aisef2/app/adapters.py::attempt_of",
+    "aisef2/app/adapters.py::tree_of"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_review_chain.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 154.63,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 18,
+     "skipped": 3,
+     "skipped_tests": [
+      "test_a_full_review_against_a_scripted_model (v2.test_v21_review_chain.RealBinary.test_a_full_review_against_a_scripted_model)",
+      "test_an_empty_range_is_skipped_without_a_model_call (v2.test_v21_review_chain.RealBinary.test_an_empty_range_is_skipped_without_a_model_call)",
+      "test_the_preview_is_read_as_the_adapter_expects (v2.test_v21_review_chain.RealBinary.test_the_preview_is_read_as_the_adapter_expects)"
+     ],
+     "first_test": "v2.test_v21_review_chain.CandidateChangedDuringReview.test_a_commit_made_by_the_finder_discards_the_review",
+     "tail_sha256": "1e4b8d44125b0693122f7d3880014f095229c51996b171f66abfe7c5b76af006",
+     "overhead_s": 0.31
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 156.5
+  },
+  {
+   "key": "aisef2/app/bundle.py|3163fe29b795edeb|tests/v2/test_app_run.py",
+   "module": "aisef2/app/bundle.py",
+   "null": "3163fe29b795edeb4fcd2a4ecd7adf55919d7617a921bdad1cc012dd67c37028",
+   "file": "tests/v2/test_app_run.py",
+   "targets": [
+    "aisef2/app/bundle.py::Project.order",
+    "aisef2/app/bundle.py::_HEX64",
+    "aisef2/app/bundle.py::_strings",
+    "aisef2/app/bundle.py::load",
+    "aisef2/app/bundle.py::read",
+    "aisef2/app/bundle.py::shape_problems"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_app_run.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 34.3,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 17,
+     "first_test": "v2.test_app_run.Command.test_a_live_run_without_the_provider_key_stops_before_any_request",
+     "tail_sha256": "34c9bfe7ef7d76c17f599b0a81180f32dc90d22822f05f5f66668053994bd703",
+     "overhead_s": 0.31
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 35.8
+  },
+  {
+   "key": "aisef2/app/bundle.py|3163fe29b795edeb|tests/v2/test_app_units.py",
+   "module": "aisef2/app/bundle.py",
+   "null": "3163fe29b795edeb4fcd2a4ecd7adf55919d7617a921bdad1cc012dd67c37028",
+   "file": "tests/v2/test_app_units.py",
+   "targets": [
+    "aisef2/app/bundle.py::Project.order",
+    "aisef2/app/bundle.py::_HEX64",
+    "aisef2/app/bundle.py::_strings",
+    "aisef2/app/bundle.py::load",
+    "aisef2/app/bundle.py::read",
+    "aisef2/app/bundle.py::shape_problems"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_app_units.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 6.35,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 41,
+     "first_test": "v2.test_app_units.Adapters.test_attempt_of_reads_the_kernel_projection_and_prior_failures",
+     "tail_sha256": "3ef303c799614934b469520dc3ed73bad54df703d4213d103aaf0597d5afb57a",
+     "overhead_s": 0.3
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 7.6
+  },
+  {
+   "key": "aisef2/app/bundle.py|3163fe29b795edeb|tests/v2/test_s2_kills.py",
+   "module": "aisef2/app/bundle.py",
+   "null": "3163fe29b795edeb4fcd2a4ecd7adf55919d7617a921bdad1cc012dd67c37028",
+   "file": "tests/v2/test_s2_kills.py",
+   "targets": [
+    "aisef2/app/bundle.py::load"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_s2_kills.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 23.28,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 43,
+     "first_test": "v2.test_s2_kills.AgentGuarded.test_the_controlled_fault_names_itself_in_its_message",
+     "tail_sha256": "0bd664af1b79df8fc95d7e4ab7fee01458ca96cf64aa0c3ba780bc5a70d2e7c3",
+     "overhead_s": 0.31
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 25.0
+  },
+  {
+   "key": "aisef2/app/bundle.py|3163fe29b795edeb|tests/v2/test_s2_kills_k.py",
+   "module": "aisef2/app/bundle.py",
+   "null": "3163fe29b795edeb4fcd2a4ecd7adf55919d7617a921bdad1cc012dd67c37028",
+   "file": "tests/v2/test_s2_kills_k.py",
+   "targets": [
+    "aisef2/app/bundle.py::Project.order"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_s2_kills_k.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 0.51,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 3,
+     "first_test": "tests.v2.test_s2_kills.AgentSend.test_the_ready_answer_is_one_whole_line",
+     "tail_sha256": "64240f48648ad3072f00eb8ba3ed5b9900f50f5c7fd375816fbdb0e38fa08338",
+     "overhead_s": 0.31
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 1.8
+  },
+  {
+   "key": "aisef2/app/bundle.py|3163fe29b795edeb|tests/v2/test_v21_bundle_tools.py",
+   "module": "aisef2/app/bundle.py",
+   "null": "3163fe29b795edeb4fcd2a4ecd7adf55919d7617a921bdad1cc012dd67c37028",
+   "file": "tests/v2/test_v21_bundle_tools.py",
+   "targets": [
+    "aisef2/app/bundle.py::Project.order",
+    "aisef2/app/bundle.py::_HEX64",
+    "aisef2/app/bundle.py::_strings",
+    "aisef2/app/bundle.py::load",
+    "aisef2/app/bundle.py::read",
+    "aisef2/app/bundle.py::shape_problems"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_bundle_tools.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 1.57,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 9,
+     "first_test": "v2.test_v21_bundle_tools.Outsider.test_each_example_from_init_to_a_ready_check",
+     "tail_sha256": "4adb025f77f5642acface5cc74c3400565782d1ac9ef5d332b2f9e500a05dee7",
+     "overhead_s": 0.3
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 2.8
+  },
+  {
+   "key": "aisef2/app/bundle.py|3163fe29b795edeb|tests/v2/test_v21_continue_integrity.py",
+   "module": "aisef2/app/bundle.py",
+   "null": "3163fe29b795edeb4fcd2a4ecd7adf55919d7617a921bdad1cc012dd67c37028",
+   "file": "tests/v2/test_v21_continue_integrity.py",
+   "targets": [
+    "aisef2/app/bundle.py::Project.order",
+    "aisef2/app/bundle.py::_HEX64",
+    "aisef2/app/bundle.py::_strings",
+    "aisef2/app/bundle.py::load",
+    "aisef2/app/bundle.py::read",
+    "aisef2/app/bundle.py::shape_problems"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_continue_integrity.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 232.08,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 24,
+     "first_test": "v2.test_v21_continue_integrity.AnchorThreatModel.test_an_attacker_who_cannot_write_the_store_is_refuted",
+     "tail_sha256": "6ed16fadda0701c1628b18171b29ee246ad8a6394124bc873e012e30e68ad7e4",
+     "overhead_s": 0.33
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 233.4
+  },
+  {
+   "key": "aisef2/app/bundle.py|3163fe29b795edeb|tests/v2/test_v21_continue_usage.py",
+   "module": "aisef2/app/bundle.py",
+   "null": "3163fe29b795edeb4fcd2a4ecd7adf55919d7617a921bdad1cc012dd67c37028",
+   "file": "tests/v2/test_v21_continue_usage.py",
+   "targets": [
+    "aisef2/app/bundle.py::Project.order",
+    "aisef2/app/bundle.py::_HEX64",
+    "aisef2/app/bundle.py::_strings",
+    "aisef2/app/bundle.py::load",
+    "aisef2/app/bundle.py::read",
+    "aisef2/app/bundle.py::shape_problems"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_continue_usage.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 52.9,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 10,
+     "first_test": "v2.test_v21_continue_usage.Continue.test_a_continuation_verifies_given_its_directory_relative_or_absolute",
+     "tail_sha256": "25554e9cde9f11bfa4dd3a4579e3a9c44cacdb9866194adec6d1ca0574fd3b64",
+     "overhead_s": 0.33
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 54.6
+  },
+  {
+   "key": "aisef2/app/bundle.py|3163fe29b795edeb|tests/v2/test_v21_identity.py",
+   "module": "aisef2/app/bundle.py",
+   "null": "3163fe29b795edeb4fcd2a4ecd7adf55919d7617a921bdad1cc012dd67c37028",
+   "file": "tests/v2/test_v21_identity.py",
+   "targets": [
+    "aisef2/app/bundle.py::Project.order",
+    "aisef2/app/bundle.py::_HEX64",
+    "aisef2/app/bundle.py::_strings",
+    "aisef2/app/bundle.py::load",
+    "aisef2/app/bundle.py::read",
+    "aisef2/app/bundle.py::shape_problems"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_identity.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 1.4,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 13,
+     "first_test": "v2.test_v21_identity.Migrate.test_a_spec_no_release_compiles_is_refused_not_guessed",
+     "tail_sha256": "55ff309bf7ddd8be199b014399f388efe1c20a5041ab190f563ffc170a57e475",
+     "overhead_s": 0.29
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 3.1
+  },
+  {
+   "key": "aisef2/app/bundle.py|3163fe29b795edeb|tests/v2/test_v21_inputs.py",
+   "module": "aisef2/app/bundle.py",
+   "null": "3163fe29b795edeb4fcd2a4ecd7adf55919d7617a921bdad1cc012dd67c37028",
+   "file": "tests/v2/test_v21_inputs.py",
+   "targets": [
+    "aisef2/app/bundle.py::Project.order",
+    "aisef2/app/bundle.py::_HEX64",
+    "aisef2/app/bundle.py::_strings",
+    "aisef2/app/bundle.py::load",
+    "aisef2/app/bundle.py::read",
+    "aisef2/app/bundle.py::shape_problems"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_inputs.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 1.58,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 20,
+     "first_test": "v2.test_v21_inputs.BundleShape.test_a_valid_bundle_still_loads",
+     "tail_sha256": "d39f63e4c8436fb76e82de52f522bc2737bd8bc9e94af2d56412b84f482dcedb",
+     "overhead_s": 0.29
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 2.9
+  },
+  {
+   "key": "aisef2/app/bundle.py|3163fe29b795edeb|tests/v2/test_v21_kills_bundle.py",
+   "module": "aisef2/app/bundle.py",
+   "null": "3163fe29b795edeb4fcd2a4ecd7adf55919d7617a921bdad1cc012dd67c37028",
+   "file": "tests/v2/test_v21_kills_bundle.py",
+   "targets": [
+    "aisef2/app/bundle.py::_strings",
+    "aisef2/app/bundle.py::read"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_kills_bundle.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 0.33,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 2,
+     "first_test": "v2.test_v21_kills_bundle.Read.test_each_unreadable_bundle_is_refused_naming_the_file_and_the_cause",
+     "tail_sha256": "30575c9a7035294a215a01e308c3ce9ebeaceb7beeba669e1cbabf56f830d59a",
+     "overhead_s": 0.3
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 1.6
+  },
+  {
+   "key": "aisef2/app/bundle.py|3163fe29b795edeb|tests/v2/test_v21_review.py",
+   "module": "aisef2/app/bundle.py",
+   "null": "3163fe29b795edeb4fcd2a4ecd7adf55919d7617a921bdad1cc012dd67c37028",
+   "file": "tests/v2/test_v21_review.py",
+   "targets": [
+    "aisef2/app/bundle.py::Project.order",
+    "aisef2/app/bundle.py::_HEX64",
+    "aisef2/app/bundle.py::_strings",
+    "aisef2/app/bundle.py::load",
+    "aisef2/app/bundle.py::read",
+    "aisef2/app/bundle.py::shape_problems"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_review.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 16.88,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 8,
+     "first_test": "v2.test_v21_review.HistoricalDefects.test_each_shipped_defect_is_confirmed_on_its_shape_and_not_on_the_reference",
+     "tail_sha256": "472928fdd58c74eb466a3bd8815a333f24039cf54dbb7522a3ced1cf29101770",
+     "overhead_s": 0.3
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 18.1
+  },
+  {
+   "key": "aisef2/app/bundle.py|3163fe29b795edeb|tests/v2/test_v21_review_chain.py",
+   "module": "aisef2/app/bundle.py",
+   "null": "3163fe29b795edeb4fcd2a4ecd7adf55919d7617a921bdad1cc012dd67c37028",
+   "file": "tests/v2/test_v21_review_chain.py",
+   "targets": [
+    "aisef2/app/bundle.py::Project.order",
+    "aisef2/app/bundle.py::_HEX64",
+    "aisef2/app/bundle.py::_strings",
+    "aisef2/app/bundle.py::load",
+    "aisef2/app/bundle.py::read",
+    "aisef2/app/bundle.py::shape_problems"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_review_chain.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 158.13,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 18,
+     "skipped": 3,
+     "skipped_tests": [
+      "test_a_full_review_against_a_scripted_model (v2.test_v21_review_chain.RealBinary.test_a_full_review_against_a_scripted_model)",
+      "test_an_empty_range_is_skipped_without_a_model_call (v2.test_v21_review_chain.RealBinary.test_an_empty_range_is_skipped_without_a_model_call)",
+      "test_the_preview_is_read_as_the_adapter_expects (v2.test_v21_review_chain.RealBinary.test_the_preview_is_read_as_the_adapter_expects)"
+     ],
+     "first_test": "v2.test_v21_review_chain.CandidateChangedDuringReview.test_a_commit_made_by_the_finder_discards_the_review",
+     "tail_sha256": "1e4b8d44125b0693122f7d3880014f095229c51996b171f66abfe7c5b76af006",
+     "overhead_s": 0.35
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 159.6
+  },
+  {
+   "key": "aisef2/app/bundle_cli.py|8bc5ab3781e6587f|tests/v2/test_v21_bundle_tools.py",
+   "module": "aisef2/app/bundle_cli.py",
+   "null": "8bc5ab3781e6587f97025be2d6d56c454f992d76b2afdfd8a8be3217c7e66ff4",
+   "file": "tests/v2/test_v21_bundle_tools.py",
+   "targets": [
+    "aisef2/app/bundle_cli.py::AUTHORING_KEYS",
+    "aisef2/app/bundle_cli.py::CONTRACT_KEYS",
+    "aisef2/app/bundle_cli.py::CRITERION_KEYS",
+    "aisef2/app/bundle_cli.py::EXAMPLES",
+    "aisef2/app/bundle_cli.py::RELEASES",
+    "aisef2/app/bundle_cli.py::_closed",
+    "aisef2/app/bundle_cli.py::_create",
+    "aisef2/app/bundle_cli.py::_earlier",
+    "aisef2/app/bundle_cli.py::_mint",
+    "aisef2/app/bundle_cli.py::_read",
+    "aisef2/app/bundle_cli.py::_refs",
+    "aisef2/app/bundle_cli.py::_spec_rows",
+    "aisef2/app/bundle_cli.py::_write_new",
+    "aisef2/app/bundle_cli.py::approve",
+    "aisef2/app/bundle_cli.py::continue_from",
+    "aisef2/app/bundle_cli.py::coverage",
+    "aisef2/app/bundle_cli.py::explain",
+    "aisef2/app/bundle_cli.py::init",
+    "aisef2/app/bundle_cli.py::lint",
+    "aisef2/app/bundle_cli.py::main",
+    "aisef2/app/bundle_cli.py::migrate",
+    "aisef2/app/bundle_cli.py::seal",
+    "aisef2/app/bundle_cli.py::unapproved"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_bundle_tools.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 1.84,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 9,
+     "first_test": "v2.test_v21_bundle_tools.Outsider.test_each_example_from_init_to_a_ready_check",
+     "tail_sha256": "4adb025f77f5642acface5cc74c3400565782d1ac9ef5d332b2f9e500a05dee7",
+     "overhead_s": 0.33
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 3.7
+  },
+  {
+   "key": "aisef2/app/bundle_cli.py|8bc5ab3781e6587f|tests/v2/test_v21_continue_integrity.py",
+   "module": "aisef2/app/bundle_cli.py",
+   "null": "8bc5ab3781e6587f97025be2d6d56c454f992d76b2afdfd8a8be3217c7e66ff4",
+   "file": "tests/v2/test_v21_continue_integrity.py",
+   "targets": [
+    "aisef2/app/bundle_cli.py::AUTHORING_KEYS",
+    "aisef2/app/bundle_cli.py::CONTRACT_KEYS",
+    "aisef2/app/bundle_cli.py::CRITERION_KEYS",
+    "aisef2/app/bundle_cli.py::EXAMPLES",
+    "aisef2/app/bundle_cli.py::RELEASES",
+    "aisef2/app/bundle_cli.py::_closed",
+    "aisef2/app/bundle_cli.py::_create",
+    "aisef2/app/bundle_cli.py::_earlier",
+    "aisef2/app/bundle_cli.py::_mint",
+    "aisef2/app/bundle_cli.py::_read",
+    "aisef2/app/bundle_cli.py::_refs",
+    "aisef2/app/bundle_cli.py::_spec_rows",
+    "aisef2/app/bundle_cli.py::_write_new",
+    "aisef2/app/bundle_cli.py::approve",
+    "aisef2/app/bundle_cli.py::continue_from",
+    "aisef2/app/bundle_cli.py::coverage",
+    "aisef2/app/bundle_cli.py::explain",
+    "aisef2/app/bundle_cli.py::init",
+    "aisef2/app/bundle_cli.py::lint",
+    "aisef2/app/bundle_cli.py::main",
+    "aisef2/app/bundle_cli.py::migrate",
+    "aisef2/app/bundle_cli.py::seal",
+    "aisef2/app/bundle_cli.py::unapproved"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_continue_integrity.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 224.65,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 24,
+     "first_test": "v2.test_v21_continue_integrity.AnchorThreatModel.test_an_attacker_who_cannot_write_the_store_is_refuted",
+     "tail_sha256": "6ed16fadda0701c1628b18171b29ee246ad8a6394124bc873e012e30e68ad7e4",
+     "overhead_s": 0.31
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 226.6
+  },
+  {
+   "key": "aisef2/app/bundle_cli.py|8bc5ab3781e6587f|tests/v2/test_v21_continue_usage.py",
+   "module": "aisef2/app/bundle_cli.py",
+   "null": "8bc5ab3781e6587f97025be2d6d56c454f992d76b2afdfd8a8be3217c7e66ff4",
+   "file": "tests/v2/test_v21_continue_usage.py",
+   "targets": [
+    "aisef2/app/bundle_cli.py::AUTHORING_KEYS",
+    "aisef2/app/bundle_cli.py::CONTRACT_KEYS",
+    "aisef2/app/bundle_cli.py::CRITERION_KEYS",
+    "aisef2/app/bundle_cli.py::EXAMPLES",
+    "aisef2/app/bundle_cli.py::RELEASES",
+    "aisef2/app/bundle_cli.py::_closed",
+    "aisef2/app/bundle_cli.py::_create",
+    "aisef2/app/bundle_cli.py::_earlier",
+    "aisef2/app/bundle_cli.py::_mint",
+    "aisef2/app/bundle_cli.py::_read",
+    "aisef2/app/bundle_cli.py::_refs",
+    "aisef2/app/bundle_cli.py::_spec_rows",
+    "aisef2/app/bundle_cli.py::_write_new",
+    "aisef2/app/bundle_cli.py::approve",
+    "aisef2/app/bundle_cli.py::continue_from",
+    "aisef2/app/bundle_cli.py::coverage",
+    "aisef2/app/bundle_cli.py::explain",
+    "aisef2/app/bundle_cli.py::init",
+    "aisef2/app/bundle_cli.py::lint",
+    "aisef2/app/bundle_cli.py::main",
+    "aisef2/app/bundle_cli.py::migrate",
+    "aisef2/app/bundle_cli.py::seal",
+    "aisef2/app/bundle_cli.py::unapproved"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_continue_usage.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 51.07,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 10,
+     "first_test": "v2.test_v21_continue_usage.Continue.test_a_continuation_verifies_given_its_directory_relative_or_absolute",
+     "tail_sha256": "25554e9cde9f11bfa4dd3a4579e3a9c44cacdb9866194adec6d1ca0574fd3b64",
+     "overhead_s": 0.31
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 52.8
+  },
+  {
+   "key": "aisef2/app/bundle_cli.py|8bc5ab3781e6587f|tests/v2/test_v21_identity.py",
+   "module": "aisef2/app/bundle_cli.py",
+   "null": "8bc5ab3781e6587f97025be2d6d56c454f992d76b2afdfd8a8be3217c7e66ff4",
+   "file": "tests/v2/test_v21_identity.py",
+   "targets": [
+    "aisef2/app/bundle_cli.py::AUTHORING_KEYS",
+    "aisef2/app/bundle_cli.py::CONTRACT_KEYS",
+    "aisef2/app/bundle_cli.py::CRITERION_KEYS",
+    "aisef2/app/bundle_cli.py::EXAMPLES",
+    "aisef2/app/bundle_cli.py::RELEASES",
+    "aisef2/app/bundle_cli.py::_closed",
+    "aisef2/app/bundle_cli.py::_create",
+    "aisef2/app/bundle_cli.py::_earlier",
+    "aisef2/app/bundle_cli.py::_mint",
+    "aisef2/app/bundle_cli.py::_read",
+    "aisef2/app/bundle_cli.py::_refs",
+    "aisef2/app/bundle_cli.py::_spec_rows",
+    "aisef2/app/bundle_cli.py::_write_new",
+    "aisef2/app/bundle_cli.py::approve",
+    "aisef2/app/bundle_cli.py::continue_from",
+    "aisef2/app/bundle_cli.py::coverage",
+    "aisef2/app/bundle_cli.py::explain",
+    "aisef2/app/bundle_cli.py::init",
+    "aisef2/app/bundle_cli.py::lint",
+    "aisef2/app/bundle_cli.py::main",
+    "aisef2/app/bundle_cli.py::migrate",
+    "aisef2/app/bundle_cli.py::seal",
+    "aisef2/app/bundle_cli.py::unapproved"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_identity.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 1.45,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 13,
+     "first_test": "v2.test_v21_identity.Migrate.test_a_spec_no_release_compiles_is_refused_not_guessed",
+     "tail_sha256": "55ff309bf7ddd8be199b014399f388efe1c20a5041ab190f563ffc170a57e475",
+     "overhead_s": 0.3
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 3.2
+  },
+  {
+   "key": "aisef2/app/bundle_cli.py|8bc5ab3781e6587f|tests/v2/test_v21_kills_bundle_cli.py",
+   "module": "aisef2/app/bundle_cli.py",
+   "null": "8bc5ab3781e6587f97025be2d6d56c454f992d76b2afdfd8a8be3217c7e66ff4",
+   "file": "tests/v2/test_v21_kills_bundle_cli.py",
+   "targets": [
+    "aisef2/app/bundle_cli.py::coverage",
+    "aisef2/app/bundle_cli.py::init"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_kills_bundle_cli.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 0.35,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 2,
+     "first_test": "v2.test_v21_kills_bundle_cli.Coverage.test_the_report_is_by_requirement_and_clause_with_the_strays_and_its_limit",
+     "tail_sha256": "0a4b1956ac93bc9602eda5e5aee8a308e207bc692d0c709855606837532eb5e6",
+     "overhead_s": 0.31
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 2.3
+  },
+  {
+   "key": "aisef2/app/bundle_cli.py|8bc5ab3781e6587f|tests/v2/test_v21_review.py",
+   "module": "aisef2/app/bundle_cli.py",
+   "null": "8bc5ab3781e6587f97025be2d6d56c454f992d76b2afdfd8a8be3217c7e66ff4",
+   "file": "tests/v2/test_v21_review.py",
+   "targets": [
+    "aisef2/app/bundle_cli.py::AUTHORING_KEYS",
+    "aisef2/app/bundle_cli.py::CONTRACT_KEYS",
+    "aisef2/app/bundle_cli.py::CRITERION_KEYS",
+    "aisef2/app/bundle_cli.py::EXAMPLES",
+    "aisef2/app/bundle_cli.py::RELEASES",
+    "aisef2/app/bundle_cli.py::_closed",
+    "aisef2/app/bundle_cli.py::_create",
+    "aisef2/app/bundle_cli.py::_earlier",
+    "aisef2/app/bundle_cli.py::_mint",
+    "aisef2/app/bundle_cli.py::_read",
+    "aisef2/app/bundle_cli.py::_refs",
+    "aisef2/app/bundle_cli.py::_spec_rows",
+    "aisef2/app/bundle_cli.py::_write_new",
+    "aisef2/app/bundle_cli.py::approve",
+    "aisef2/app/bundle_cli.py::continue_from",
+    "aisef2/app/bundle_cli.py::coverage",
+    "aisef2/app/bundle_cli.py::explain",
+    "aisef2/app/bundle_cli.py::init",
+    "aisef2/app/bundle_cli.py::lint",
+    "aisef2/app/bundle_cli.py::main",
+    "aisef2/app/bundle_cli.py::migrate",
+    "aisef2/app/bundle_cli.py::seal",
+    "aisef2/app/bundle_cli.py::unapproved"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_review.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 16.36,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 8,
+     "first_test": "v2.test_v21_review.HistoricalDefects.test_each_shipped_defect_is_confirmed_on_its_shape_and_not_on_the_reference",
+     "tail_sha256": "472928fdd58c74eb466a3bd8815a333f24039cf54dbb7522a3ced1cf29101770",
+     "overhead_s": 0.31
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 17.8
+  },
+  {
+   "key": "aisef2/app/cli.py|63b9869510fdf207|tests/v2/test_app_run.py",
+   "module": "aisef2/app/cli.py",
+   "null": "63b9869510fdf207fbfbcf46a440dd2b251e57abe0be9a96fd01a29e7bb79794",
+   "file": "tests/v2/test_app_run.py",
+   "targets": [
+    "aisef2/app/cli.py::_parser",
+    "aisef2/app/cli.py::run"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_app_run.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 34.24,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 17,
+     "first_test": "v2.test_app_run.Command.test_a_live_run_without_the_provider_key_stops_before_any_request",
+     "tail_sha256": "34c9bfe7ef7d76c17f599b0a81180f32dc90d22822f05f5f66668053994bd703",
+     "overhead_s": 0.31
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 35.5
+  },
+  {
+   "key": "aisef2/app/cli.py|63b9869510fdf207|tests/v2/test_app_units.py",
+   "module": "aisef2/app/cli.py",
+   "null": "63b9869510fdf207fbfbcf46a440dd2b251e57abe0be9a96fd01a29e7bb79794",
+   "file": "tests/v2/test_app_units.py",
+   "targets": [
+    "aisef2/app/cli.py::_parser",
+    "aisef2/app/cli.py::run"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_app_units.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 6.8,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 41,
+     "first_test": "v2.test_app_units.Adapters.test_attempt_of_reads_the_kernel_projection_and_prior_failures",
+     "tail_sha256": "3ef303c799614934b469520dc3ed73bad54df703d4213d103aaf0597d5afb57a",
+     "overhead_s": 0.31
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 8.0
+  },
+  {
+   "key": "aisef2/app/cli.py|63b9869510fdf207|tests/v2/test_s2_kills.py",
+   "module": "aisef2/app/cli.py",
+   "null": "63b9869510fdf207fbfbcf46a440dd2b251e57abe0be9a96fd01a29e7bb79794",
+   "file": "tests/v2/test_s2_kills.py",
+   "targets": [
+    "aisef2/app/cli.py::run"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_s2_kills.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 23.39,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 43,
+     "first_test": "v2.test_s2_kills.AgentGuarded.test_the_controlled_fault_names_itself_in_its_message",
+     "tail_sha256": "0bd664af1b79df8fc95d7e4ab7fee01458ca96cf64aa0c3ba780bc5a70d2e7c3",
+     "overhead_s": 0.31
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 25.0
+  },
+  {
+   "key": "aisef2/app/cli.py|63b9869510fdf207|tests/v2/test_v21_bundle_tools.py",
+   "module": "aisef2/app/cli.py",
+   "null": "63b9869510fdf207fbfbcf46a440dd2b251e57abe0be9a96fd01a29e7bb79794",
+   "file": "tests/v2/test_v21_bundle_tools.py",
+   "targets": [
+    "aisef2/app/cli.py::_parser",
+    "aisef2/app/cli.py::run"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_bundle_tools.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 1.57,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 9,
+     "first_test": "v2.test_v21_bundle_tools.Outsider.test_each_example_from_init_to_a_ready_check",
+     "tail_sha256": "4adb025f77f5642acface5cc74c3400565782d1ac9ef5d332b2f9e500a05dee7",
+     "overhead_s": 0.31
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 2.8
+  },
+  {
+   "key": "aisef2/app/cli.py|63b9869510fdf207|tests/v2/test_v21_continue_integrity.py",
+   "module": "aisef2/app/cli.py",
+   "null": "63b9869510fdf207fbfbcf46a440dd2b251e57abe0be9a96fd01a29e7bb79794",
+   "file": "tests/v2/test_v21_continue_integrity.py",
+   "targets": [
+    "aisef2/app/cli.py::_parser",
+    "aisef2/app/cli.py::run"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_continue_integrity.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 228.23,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 24,
+     "first_test": "v2.test_v21_continue_integrity.AnchorThreatModel.test_an_attacker_who_cannot_write_the_store_is_refuted",
+     "tail_sha256": "6ed16fadda0701c1628b18171b29ee246ad8a6394124bc873e012e30e68ad7e4",
+     "overhead_s": 0.3
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 229.4
+  },
+  {
+   "key": "aisef2/app/cli.py|63b9869510fdf207|tests/v2/test_v21_inputs.py",
+   "module": "aisef2/app/cli.py",
+   "null": "63b9869510fdf207fbfbcf46a440dd2b251e57abe0be9a96fd01a29e7bb79794",
+   "file": "tests/v2/test_v21_inputs.py",
+   "targets": [
+    "aisef2/app/cli.py::_parser",
+    "aisef2/app/cli.py::run"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_inputs.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 1.62,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 20,
+     "first_test": "v2.test_v21_inputs.BundleShape.test_a_valid_bundle_still_loads",
+     "tail_sha256": "d39f63e4c8436fb76e82de52f522bc2737bd8bc9e94af2d56412b84f482dcedb",
+     "overhead_s": 0.3
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 3.1
+  },
+  {
+   "key": "aisef2/app/client.py|b4000252341718ed|tests/v2/test_app_run.py",
+   "module": "aisef2/app/client.py",
+   "null": "b4000252341718edec72b34d70568043ea63d756226c2005bfae9951fcdc09a5",
+   "file": "tests/v2/test_app_run.py",
+   "targets": [
+    "aisef2/app/client.py::Budget.__init__",
+    "aisef2/app/client.py::Budget.account",
+    "aisef2/app/client.py::Budget.reached",
+    "aisef2/app/client.py::Budget.spend",
+    "aisef2/app/client.py::environment",
+    "aisef2/app/client.py::read_session",
+    "aisef2/app/client.py::redact",
+    "aisef2/app/client.py::session",
+    "aisef2/app/client.py::wait_within"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_app_run.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 34.03,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 17,
+     "first_test": "v2.test_app_run.Command.test_a_live_run_without_the_provider_key_stops_before_any_request",
+     "tail_sha256": "34c9bfe7ef7d76c17f599b0a81180f32dc90d22822f05f5f66668053994bd703",
+     "overhead_s": 0.3
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 35.3
+  },
+  {
+   "key": "aisef2/app/client.py|b4000252341718ed|tests/v2/test_app_units.py",
+   "module": "aisef2/app/client.py",
+   "null": "b4000252341718edec72b34d70568043ea63d756226c2005bfae9951fcdc09a5",
+   "file": "tests/v2/test_app_units.py",
+   "targets": [
+    "aisef2/app/client.py::Budget.__init__",
+    "aisef2/app/client.py::Budget.account",
+    "aisef2/app/client.py::Budget.reached",
+    "aisef2/app/client.py::Budget.spend",
+    "aisef2/app/client.py::environment",
+    "aisef2/app/client.py::read_session",
+    "aisef2/app/client.py::redact",
+    "aisef2/app/client.py::session",
+    "aisef2/app/client.py::wait_within"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_app_units.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 6.47,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 41,
+     "first_test": "v2.test_app_units.Adapters.test_attempt_of_reads_the_kernel_projection_and_prior_failures",
+     "tail_sha256": "3ef303c799614934b469520dc3ed73bad54df703d4213d103aaf0597d5afb57a",
+     "overhead_s": 0.3
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 7.7
+  },
+  {
+   "key": "aisef2/app/client.py|b4000252341718ed|tests/v2/test_s2_kills.py",
+   "module": "aisef2/app/client.py",
+   "null": "b4000252341718edec72b34d70568043ea63d756226c2005bfae9951fcdc09a5",
+   "file": "tests/v2/test_s2_kills.py",
+   "targets": [
+    "aisef2/app/client.py::Budget.__init__",
+    "aisef2/app/client.py::Budget.reached",
+    "aisef2/app/client.py::Budget.spend",
+    "aisef2/app/client.py::environment",
+    "aisef2/app/client.py::read_session",
+    "aisef2/app/client.py::session",
+    "aisef2/app/client.py::wait_within"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_s2_kills.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 23.35,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 43,
+     "first_test": "v2.test_s2_kills.AgentGuarded.test_the_controlled_fault_names_itself_in_its_message",
+     "tail_sha256": "0bd664af1b79df8fc95d7e4ab7fee01458ca96cf64aa0c3ba780bc5a70d2e7c3",
+     "overhead_s": 0.3
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 24.7
+  },
+  {
+   "key": "aisef2/app/client.py|b4000252341718ed|tests/v2/test_s2_kills_deterministic.py",
+   "module": "aisef2/app/client.py",
+   "null": "b4000252341718edec72b34d70568043ea63d756226c2005bfae9951fcdc09a5",
+   "file": "tests/v2/test_s2_kills_deterministic.py",
+   "targets": [
+    "aisef2/app/client.py::Budget.spend"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_s2_kills_deterministic.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 0.34,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 4,
+     "first_test": "v2.test_s2_kills_deterministic.BudgetSpend.test_as_many_requests_as_sessions_and_a_live_session_without_a_step",
+     "tail_sha256": "14cd005228bfcdeb94cb71cc2c8630bcfb850d796facfbaec9a30bb0e1bb8c2a",
+     "overhead_s": 0.3
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 1.8
+  },
+  {
+   "key": "aisef2/app/client.py|b4000252341718ed|tests/v2/test_s2_kills_k.py",
+   "module": "aisef2/app/client.py",
+   "null": "b4000252341718edec72b34d70568043ea63d756226c2005bfae9951fcdc09a5",
+   "file": "tests/v2/test_s2_kills_k.py",
+   "targets": [
+    "aisef2/app/client.py::wait_within"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_s2_kills_k.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 0.49,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 3,
+     "first_test": "tests.v2.test_s2_kills.AgentSend.test_the_ready_answer_is_one_whole_line",
+     "tail_sha256": "64240f48648ad3072f00eb8ba3ed5b9900f50f5c7fd375816fbdb0e38fa08338",
+     "overhead_s": 0.29
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 1.8
+  },
+  {
+   "key": "aisef2/app/client.py|b4000252341718ed|tests/v2/test_v21_transport.py",
+   "module": "aisef2/app/client.py",
+   "null": "b4000252341718edec72b34d70568043ea63d756226c2005bfae9951fcdc09a5",
+   "file": "tests/v2/test_v21_transport.py",
+   "targets": [
+    "aisef2/app/client.py::Budget.__init__",
+    "aisef2/app/client.py::Budget.account",
+    "aisef2/app/client.py::Budget.reached",
+    "aisef2/app/client.py::Budget.spend",
+    "aisef2/app/client.py::environment",
+    "aisef2/app/client.py::read_session",
+    "aisef2/app/client.py::redact",
+    "aisef2/app/client.py::session",
+    "aisef2/app/client.py::wait_within"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_transport.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 3.06,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 3,
+     "first_test": "v2.test_v21_transport.Redaction.test_an_interrupted_session_still_leaves_no_secret",
+     "tail_sha256": "9063d8436b9eb0bc5e54bdf57bda6b3a47b2e4c31ec48bf0bd8559e8c6d80977",
+     "overhead_s": 0.31
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 4.4
+  },
+  {
+   "key": "aisef2/app/feedback.py|b9c83edb0fa313cb|tests/v2/test_app_run.py",
+   "module": "aisef2/app/feedback.py",
+   "null": "b9c83edb0fa313cbc7e1a3032329842ebef01c77a2aef320aaf954fb84d035ec",
+   "file": "tests/v2/test_app_run.py",
+   "targets": [
+    "aisef2/app/feedback.py::retry_feedback"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_app_run.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 33.54,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 17,
+     "first_test": "v2.test_app_run.Command.test_a_live_run_without_the_provider_key_stops_before_any_request",
+     "tail_sha256": "34c9bfe7ef7d76c17f599b0a81180f32dc90d22822f05f5f66668053994bd703",
+     "overhead_s": 0.3
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 35.5
+  },
+  {
+   "key": "aisef2/app/feedback.py|b9c83edb0fa313cb|tests/v2/test_app_units.py",
+   "module": "aisef2/app/feedback.py",
+   "null": "b9c83edb0fa313cbc7e1a3032329842ebef01c77a2aef320aaf954fb84d035ec",
+   "file": "tests/v2/test_app_units.py",
+   "targets": [
+    "aisef2/app/feedback.py::retry_feedback"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_app_units.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 6.25,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 41,
+     "first_test": "v2.test_app_units.Adapters.test_attempt_of_reads_the_kernel_projection_and_prior_failures",
+     "tail_sha256": "3ef303c799614934b469520dc3ed73bad54df703d4213d103aaf0597d5afb57a",
+     "overhead_s": 0.3
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 8.1
+  },
+  {
+   "key": "aisef2/app/feedback.py|b9c83edb0fa313cb|tests/v2/test_v21_review_chain.py",
+   "module": "aisef2/app/feedback.py",
+   "null": "b9c83edb0fa313cbc7e1a3032329842ebef01c77a2aef320aaf954fb84d035ec",
+   "file": "tests/v2/test_v21_review_chain.py",
+   "targets": [
+    "aisef2/app/feedback.py::retry_feedback"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_review_chain.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 153.11,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 18,
+     "skipped": 3,
+     "skipped_tests": [
+      "test_a_full_review_against_a_scripted_model (v2.test_v21_review_chain.RealBinary.test_a_full_review_against_a_scripted_model)",
+      "test_an_empty_range_is_skipped_without_a_model_call (v2.test_v21_review_chain.RealBinary.test_an_empty_range_is_skipped_without_a_model_call)",
+      "test_the_preview_is_read_as_the_adapter_expects (v2.test_v21_review_chain.RealBinary.test_the_preview_is_read_as_the_adapter_expects)"
+     ],
+     "first_test": "v2.test_v21_review_chain.CandidateChangedDuringReview.test_a_commit_made_by_the_finder_discards_the_review",
+     "tail_sha256": "1e4b8d44125b0693122f7d3880014f095229c51996b171f66abfe7c5b76af006",
+     "overhead_s": 0.3
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 155.0
+  },
+  {
+   "key": "aisef2/app/lineage.py|6b5580651f25597a|tests/v2/test_v21_continue_integrity.py",
+   "module": "aisef2/app/lineage.py",
+   "null": "6b5580651f25597ac89c080179ebefe38ce3df695d5d4c943c1b128987d009c7",
+   "file": "tests/v2/test_v21_continue_integrity.py",
+   "targets": [
+    "aisef2/app/lineage.py::ANCHOR_LINE",
+    "aisef2/app/lineage.py::JOURNAL",
+    "aisef2/app/lineage.py::SPEND",
+    "aisef2/app/lineage.py::_git",
+    "aisef2/app/lineage.py::_gone",
+    "aisef2/app/lineage.py::_sha",
+    "aisef2/app/lineage.py::account_of",
+    "aisef2/app/lineage.py::child_state",
+    "aisef2/app/lineage.py::claim",
+    "aisef2/app/lineage.py::claimant",
+    "aisef2/app/lineage.py::claims",
+    "aisef2/app/lineage.py::continued_by",
+    "aisef2/app/lineage.py::events_of",
+    "aisef2/app/lineage.py::lineage_account",
+    "aisef2/app/lineage.py::predecessor_of",
+    "aisef2/app/lineage.py::process_started",
+    "aisef2/app/lineage.py::read_anchor",
+    "aisef2/app/lineage.py::reconcile",
+    "aisef2/app/lineage.py::usage_lineage",
+    "aisef2/app/lineage.py::write_anchor"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_continue_integrity.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 223.14,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 24,
+     "first_test": "v2.test_v21_continue_integrity.AnchorThreatModel.test_an_attacker_who_cannot_write_the_store_is_refuted",
+     "tail_sha256": "6ed16fadda0701c1628b18171b29ee246ad8a6394124bc873e012e30e68ad7e4",
+     "overhead_s": 0.3
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 224.3
+  },
+  {
+   "key": "aisef2/app/lineage.py|6b5580651f25597a|tests/v2/test_v21_continue_usage.py",
+   "module": "aisef2/app/lineage.py",
+   "null": "6b5580651f25597ac89c080179ebefe38ce3df695d5d4c943c1b128987d009c7",
+   "file": "tests/v2/test_v21_continue_usage.py",
+   "targets": [
+    "aisef2/app/lineage.py::ANCHOR_LINE",
+    "aisef2/app/lineage.py::JOURNAL",
+    "aisef2/app/lineage.py::SPEND",
+    "aisef2/app/lineage.py::_git",
+    "aisef2/app/lineage.py::_gone",
+    "aisef2/app/lineage.py::_sha",
+    "aisef2/app/lineage.py::account_of",
+    "aisef2/app/lineage.py::child_state",
+    "aisef2/app/lineage.py::claim",
+    "aisef2/app/lineage.py::claimant",
+    "aisef2/app/lineage.py::claims",
+    "aisef2/app/lineage.py::continued_by",
+    "aisef2/app/lineage.py::events_of",
+    "aisef2/app/lineage.py::lineage_account",
+    "aisef2/app/lineage.py::predecessor_of",
+    "aisef2/app/lineage.py::process_started",
+    "aisef2/app/lineage.py::read_anchor",
+    "aisef2/app/lineage.py::reconcile",
+    "aisef2/app/lineage.py::usage_lineage",
+    "aisef2/app/lineage.py::write_anchor"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_continue_usage.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 51.21,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 10,
+     "first_test": "v2.test_v21_continue_usage.Continue.test_a_continuation_verifies_given_its_directory_relative_or_absolute",
+     "tail_sha256": "25554e9cde9f11bfa4dd3a4579e3a9c44cacdb9866194adec6d1ca0574fd3b64",
+     "overhead_s": 0.3
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 52.6
+  },
+  {
+   "key": "aisef2/app/preflight.py|b51ce4ab77e02136|tests/v2/test_app_run.py",
+   "module": "aisef2/app/preflight.py",
+   "null": "b51ce4ab77e02136ee5f046cc7cededebd38d004dc881ba234d63579466465a7",
+   "file": "tests/v2/test_app_run.py",
+   "targets": [
+    "aisef2/app/preflight.py::accounting",
+    "aisef2/app/preflight.py::deployment",
+    "aisef2/app/preflight.py::fingerprint_fields",
+    "aisef2/app/preflight.py::http_transport",
+    "aisef2/app/preflight.py::identity_problems",
+    "aisef2/app/preflight.py::run"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_app_run.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 33.29,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 17,
+     "first_test": "v2.test_app_run.Command.test_a_live_run_without_the_provider_key_stops_before_any_request",
+     "tail_sha256": "34c9bfe7ef7d76c17f599b0a81180f32dc90d22822f05f5f66668053994bd703",
+     "overhead_s": 0.3
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 34.8
+  },
+  {
+   "key": "aisef2/app/preflight.py|b51ce4ab77e02136|tests/v2/test_app_units.py",
+   "module": "aisef2/app/preflight.py",
+   "null": "b51ce4ab77e02136ee5f046cc7cededebd38d004dc881ba234d63579466465a7",
+   "file": "tests/v2/test_app_units.py",
+   "targets": [
+    "aisef2/app/preflight.py::accounting",
+    "aisef2/app/preflight.py::deployment",
+    "aisef2/app/preflight.py::fingerprint_fields",
+    "aisef2/app/preflight.py::http_transport",
+    "aisef2/app/preflight.py::identity_problems",
+    "aisef2/app/preflight.py::run"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_app_units.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 6.45,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 41,
+     "first_test": "v2.test_app_units.Adapters.test_attempt_of_reads_the_kernel_projection_and_prior_failures",
+     "tail_sha256": "3ef303c799614934b469520dc3ed73bad54df703d4213d103aaf0597d5afb57a",
+     "overhead_s": 0.3
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 7.9
+  },
+  {
+   "key": "aisef2/app/preflight.py|b51ce4ab77e02136|tests/v2/test_s2_kills.py",
+   "module": "aisef2/app/preflight.py",
+   "null": "b51ce4ab77e02136ee5f046cc7cededebd38d004dc881ba234d63579466465a7",
+   "file": "tests/v2/test_s2_kills.py",
+   "targets": [
+    "aisef2/app/preflight.py::accounting",
+    "aisef2/app/preflight.py::fingerprint_fields",
+    "aisef2/app/preflight.py::run"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_s2_kills.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 22.98,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 43,
+     "first_test": "v2.test_s2_kills.AgentGuarded.test_the_controlled_fault_names_itself_in_its_message",
+     "tail_sha256": "0bd664af1b79df8fc95d7e4ab7fee01458ca96cf64aa0c3ba780bc5a70d2e7c3",
+     "overhead_s": 0.29
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 24.2
+  },
+  {
+   "key": "aisef2/app/preflight.py|b51ce4ab77e02136|tests/v2/test_s2_kills_deterministic.py",
+   "module": "aisef2/app/preflight.py",
+   "null": "b51ce4ab77e02136ee5f046cc7cededebd38d004dc881ba234d63579466465a7",
+   "file": "tests/v2/test_s2_kills_deterministic.py",
+   "targets": [
+    "aisef2/app/preflight.py::fingerprint_fields"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_s2_kills_deterministic.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 0.56,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 4,
+     "first_test": "v2.test_s2_kills_deterministic.BudgetSpend.test_as_many_requests_as_sessions_and_a_live_session_without_a_step",
+     "tail_sha256": "14cd005228bfcdeb94cb71cc2c8630bcfb850d796facfbaec9a30bb0e1bb8c2a",
+     "overhead_s": 0.3
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 2.1
+  },
+  {
+   "key": "aisef2/app/preflight.py|b51ce4ab77e02136|tests/v2/test_s2_kills_rc2.py",
+   "module": "aisef2/app/preflight.py",
+   "null": "b51ce4ab77e02136ee5f046cc7cededebd38d004dc881ba234d63579466465a7",
+   "file": "tests/v2/test_s2_kills_rc2.py",
+   "targets": [
+    "aisef2/app/preflight.py::identity_problems",
+    "aisef2/app/preflight.py::run"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_s2_kills_rc2.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 0.92,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 10,
+     "first_test": "v2.test_s2_kills_rc2.IdentityProblems.test_each_failure_is_named_with_what_the_transport_said",
+     "tail_sha256": "df8e8d58bdfc2774584afe2d649468d3740c76301fb6c3771ed6c888db315544",
+     "overhead_s": 0.31
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 2.5
+  },
+  {
+   "key": "aisef2/app/preflight.py|b51ce4ab77e02136|tests/v2/test_v21_identity.py",
+   "module": "aisef2/app/preflight.py",
+   "null": "b51ce4ab77e02136ee5f046cc7cededebd38d004dc881ba234d63579466465a7",
+   "file": "tests/v2/test_v21_identity.py",
+   "targets": [
+    "aisef2/app/preflight.py::accounting",
+    "aisef2/app/preflight.py::deployment",
+    "aisef2/app/preflight.py::fingerprint_fields",
+    "aisef2/app/preflight.py::http_transport",
+    "aisef2/app/preflight.py::identity_problems",
+    "aisef2/app/preflight.py::run"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_identity.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 1.4,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 13,
+     "first_test": "v2.test_v21_identity.Migrate.test_a_spec_no_release_compiles_is_refused_not_guessed",
+     "tail_sha256": "55ff309bf7ddd8be199b014399f388efe1c20a5041ab190f563ffc170a57e475",
+     "overhead_s": 0.29
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 2.8
+  },
+  {
+   "key": "aisef2/app/preflight.py|b51ce4ab77e02136|tests/v2/test_v21_transport.py",
+   "module": "aisef2/app/preflight.py",
+   "null": "b51ce4ab77e02136ee5f046cc7cededebd38d004dc881ba234d63579466465a7",
+   "file": "tests/v2/test_v21_transport.py",
+   "targets": [
+    "aisef2/app/preflight.py::accounting",
+    "aisef2/app/preflight.py::deployment",
+    "aisef2/app/preflight.py::fingerprint_fields",
+    "aisef2/app/preflight.py::http_transport",
+    "aisef2/app/preflight.py::identity_problems",
+    "aisef2/app/preflight.py::run"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_transport.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 3.04,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 3,
+     "first_test": "v2.test_v21_transport.Redaction.test_an_interrupted_session_still_leaves_no_secret",
+     "tail_sha256": "db3e6c37ede5b905b1dfd583dfb3a377d39b214b23a28cf1bdc6bbaf8c94e7e8",
+     "overhead_s": 0.3
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 4.3
+  },
+  {
+   "key": "aisef2/app/review_ocr.py|026d0e2021eb8d93|tests/v2/test_v21_review_chain.py",
+   "module": "aisef2/app/review_ocr.py",
+   "null": "026d0e2021eb8d939030599e038ea82e8a3db6a96938e071732a36837bd8c202",
+   "file": "tests/v2/test_v21_review_chain.py",
+   "targets": [
+    "aisef2/app/review_ocr.py::NOT_FULL",
+    "aisef2/app/review_ocr.py::NOT_REVIEWABLE",
+    "aisef2/app/review_ocr.py::OCR",
+    "aisef2/app/review_ocr.py::REPRODUCER_FENCE",
+    "aisef2/app/review_ocr.py::SCRUB_PREFIXES",
+    "aisef2/app/review_ocr.py::TERMINAL",
+    "aisef2/app/review_ocr.py::argv",
+    "aisef2/app/review_ocr.py::coverage",
+    "aisef2/app/review_ocr.py::environment",
+    "aisef2/app/review_ocr.py::finding_id",
+    "aisef2/app/review_ocr.py::findings",
+    "aisef2/app/review_ocr.py::item_id",
+    "aisef2/app/review_ocr.py::pinned",
+    "aisef2/app/review_ocr.py::read_output",
+    "aisef2/app/review_ocr.py::reproducer_of",
+    "aisef2/app/review_ocr.py::scrubbed_names"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_review_chain.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 152.19,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 18,
+     "skipped": 3,
+     "skipped_tests": [
+      "test_a_full_review_against_a_scripted_model (v2.test_v21_review_chain.RealBinary.test_a_full_review_against_a_scripted_model)",
+      "test_an_empty_range_is_skipped_without_a_model_call (v2.test_v21_review_chain.RealBinary.test_an_empty_range_is_skipped_without_a_model_call)",
+      "test_the_preview_is_read_as_the_adapter_expects (v2.test_v21_review_chain.RealBinary.test_the_preview_is_read_as_the_adapter_expects)"
+     ],
+     "first_test": "v2.test_v21_review_chain.CandidateChangedDuringReview.test_a_commit_made_by_the_finder_discards_the_review",
+     "tail_sha256": "1e4b8d44125b0693122f7d3880014f095229c51996b171f66abfe7c5b76af006",
+     "overhead_s": 0.32
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 153.4
+  },
+  {
+   "key": "aisef2/app/review_ocr.py|026d0e2021eb8d93|tests/v2/test_v21_review_ocr.py",
+   "module": "aisef2/app/review_ocr.py",
+   "null": "026d0e2021eb8d939030599e038ea82e8a3db6a96938e071732a36837bd8c202",
+   "file": "tests/v2/test_v21_review_ocr.py",
+   "targets": [
+    "aisef2/app/review_ocr.py::NOT_FULL",
+    "aisef2/app/review_ocr.py::NOT_REVIEWABLE",
+    "aisef2/app/review_ocr.py::OCR",
+    "aisef2/app/review_ocr.py::REPRODUCER_FENCE",
+    "aisef2/app/review_ocr.py::SCRUB_PREFIXES",
+    "aisef2/app/review_ocr.py::TERMINAL",
+    "aisef2/app/review_ocr.py::argv",
+    "aisef2/app/review_ocr.py::coverage",
+    "aisef2/app/review_ocr.py::environment",
+    "aisef2/app/review_ocr.py::finding_id",
+    "aisef2/app/review_ocr.py::findings",
+    "aisef2/app/review_ocr.py::item_id",
+    "aisef2/app/review_ocr.py::pinned",
+    "aisef2/app/review_ocr.py::read_output",
+    "aisef2/app/review_ocr.py::reproducer_of",
+    "aisef2/app/review_ocr.py::scrubbed_names"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_review_ocr.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 0.35,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 10,
+     "first_test": "v2.test_v21_review_ocr.Coverage.test_a_complete_run_of_the_frozen_range_covering_every_required_path",
+     "tail_sha256": "725576887ba60ae87ce0d0b699fc31411d7da860db1b600a3adc35e7f3667899",
+     "overhead_s": 0.31
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 1.9
+  },
+  {
+   "key": "aisef2/app/review_verify.py|ada05fbe859aa214|tests/v2/test_v21_review.py",
+   "module": "aisef2/app/review_verify.py",
+   "null": "ada05fbe859aa21424ae64cfea89f6d47bb3677f878e3cf6dc092a775a6c0b14",
+   "file": "tests/v2/test_v21_review.py",
+   "targets": [
+    "aisef2/app/review_verify.py::POLICIES",
+    "aisef2/app/review_verify.py::REPRODUCER_KEYS",
+    "aisef2/app/review_verify.py::SEVERITIES",
+    "aisef2/app/review_verify.py::Verification.evidence",
+    "aisef2/app/review_verify.py::_NUMBER",
+    "aisef2/app/review_verify.py::_approved_by_clause",
+    "aisef2/app/review_verify.py::_canon",
+    "aisef2/app/review_verify.py::_scalars",
+    "aisef2/app/review_verify.py::_states",
+    "aisef2/app/review_verify.py::_stimulus",
+    "aisef2/app/review_verify.py::anchor",
+    "aisef2/app/review_verify.py::blocks",
+    "aisef2/app/review_verify.py::detail",
+    "aisef2/app/review_verify.py::reproducer_contract",
+    "aisef2/app/review_verify.py::severity_of",
+    "aisef2/app/review_verify.py::verify"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_review.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 16.15,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 8,
+     "first_test": "v2.test_v21_review.HistoricalDefects.test_each_shipped_defect_is_confirmed_on_its_shape_and_not_on_the_reference",
+     "tail_sha256": "472928fdd58c74eb466a3bd8815a333f24039cf54dbb7522a3ced1cf29101770",
+     "overhead_s": 0.3
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 17.4
+  },
+  {
+   "key": "aisef2/app/review_verify.py|ada05fbe859aa214|tests/v2/test_v21_review_chain.py",
+   "module": "aisef2/app/review_verify.py",
+   "null": "ada05fbe859aa21424ae64cfea89f6d47bb3677f878e3cf6dc092a775a6c0b14",
+   "file": "tests/v2/test_v21_review_chain.py",
+   "targets": [
+    "aisef2/app/review_verify.py::POLICIES",
+    "aisef2/app/review_verify.py::REPRODUCER_KEYS",
+    "aisef2/app/review_verify.py::SEVERITIES",
+    "aisef2/app/review_verify.py::Verification.evidence",
+    "aisef2/app/review_verify.py::_NUMBER",
+    "aisef2/app/review_verify.py::_approved_by_clause",
+    "aisef2/app/review_verify.py::_canon",
+    "aisef2/app/review_verify.py::_scalars",
+    "aisef2/app/review_verify.py::_states",
+    "aisef2/app/review_verify.py::_stimulus",
+    "aisef2/app/review_verify.py::anchor",
+    "aisef2/app/review_verify.py::blocks",
+    "aisef2/app/review_verify.py::detail",
+    "aisef2/app/review_verify.py::reproducer_contract",
+    "aisef2/app/review_verify.py::severity_of",
+    "aisef2/app/review_verify.py::verify"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_review_chain.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 151.68,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 18,
+     "skipped": 3,
+     "skipped_tests": [
+      "test_a_full_review_against_a_scripted_model (v2.test_v21_review_chain.RealBinary.test_a_full_review_against_a_scripted_model)",
+      "test_an_empty_range_is_skipped_without_a_model_call (v2.test_v21_review_chain.RealBinary.test_an_empty_range_is_skipped_without_a_model_call)",
+      "test_the_preview_is_read_as_the_adapter_expects (v2.test_v21_review_chain.RealBinary.test_the_preview_is_read_as_the_adapter_expects)"
+     ],
+     "first_test": "v2.test_v21_review_chain.CandidateChangedDuringReview.test_a_commit_made_by_the_finder_discards_the_review",
+     "tail_sha256": "1e4b8d44125b0693122f7d3880014f095229c51996b171f66abfe7c5b76af006",
+     "overhead_s": 0.32
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 153.1
+  },
+  {
+   "key": "aisef2/app/review_verify.py|ada05fbe859aa214|tests/v2/test_v21_review_ocr.py",
+   "module": "aisef2/app/review_verify.py",
+   "null": "ada05fbe859aa21424ae64cfea89f6d47bb3677f878e3cf6dc092a775a6c0b14",
+   "file": "tests/v2/test_v21_review_ocr.py",
+   "targets": [
+    "aisef2/app/review_verify.py::POLICIES",
+    "aisef2/app/review_verify.py::REPRODUCER_KEYS",
+    "aisef2/app/review_verify.py::SEVERITIES",
+    "aisef2/app/review_verify.py::Verification.evidence",
+    "aisef2/app/review_verify.py::_NUMBER",
+    "aisef2/app/review_verify.py::_approved_by_clause",
+    "aisef2/app/review_verify.py::_canon",
+    "aisef2/app/review_verify.py::_scalars",
+    "aisef2/app/review_verify.py::_states",
+    "aisef2/app/review_verify.py::_stimulus",
+    "aisef2/app/review_verify.py::anchor",
+    "aisef2/app/review_verify.py::blocks",
+    "aisef2/app/review_verify.py::detail",
+    "aisef2/app/review_verify.py::reproducer_contract",
+    "aisef2/app/review_verify.py::severity_of",
+    "aisef2/app/review_verify.py::verify"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_review_ocr.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 0.34,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 10,
+     "first_test": "v2.test_v21_review_ocr.Coverage.test_a_complete_run_of_the_frozen_range_covering_every_required_path",
+     "tail_sha256": "725576887ba60ae87ce0d0b699fc31411d7da860db1b600a3adc35e7f3667899",
+     "overhead_s": 0.3
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 1.8
+  },
+  {
+   "key": "aisef2/app/run.py|00a229d1546f3390|tests/v2/test_app_run.py",
+   "module": "aisef2/app/run.py",
+   "null": "00a229d1546f3390193b121cc10da1cb2dfbaa14d1b35f1788e0f2233478a81e",
+   "file": "tests/v2/test_app_run.py",
+   "targets": [
+    "aisef2/app/run.py::_close",
+    "aisef2/app/run.py::_content_sha",
+    "aisef2/app/run.py::admit",
+    "aisef2/app/run.py::anchor_in",
+    "aisef2/app/run.py::anchor_of",
+    "aisef2/app/run.py::calibrations",
+    "aisef2/app/run.py::check_git",
+    "aisef2/app/run.py::check_repository",
+    "aisef2/app/run.py::delivery",
+    "aisef2/app/run.py::evidence_manifest",
+    "aisef2/app/run.py::execute",
+    "aisef2/app/run.py::kernel_digest",
+    "aisef2/app/run.py::layers_of",
+    "aisef2/app/run.py::outcomes_from",
+    "aisef2/app/run.py::probe_interpreter",
+    "aisef2/app/run.py::productproof",
+    "aisef2/app/run.py::regression_tests",
+    "aisef2/app/run.py::runspec_of",
+    "aisef2/app/run.py::unfinished"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_app_run.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 34.13,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 17,
+     "first_test": "v2.test_app_run.Command.test_a_live_run_without_the_provider_key_stops_before_any_request",
+     "tail_sha256": "34c9bfe7ef7d76c17f599b0a81180f32dc90d22822f05f5f66668053994bd703",
+     "overhead_s": 0.3
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 35.4
+  },
+  {
+   "key": "aisef2/app/run.py|00a229d1546f3390|tests/v2/test_app_units.py",
+   "module": "aisef2/app/run.py",
+   "null": "00a229d1546f3390193b121cc10da1cb2dfbaa14d1b35f1788e0f2233478a81e",
+   "file": "tests/v2/test_app_units.py",
+   "targets": [
+    "aisef2/app/run.py::_close",
+    "aisef2/app/run.py::_content_sha",
+    "aisef2/app/run.py::admit",
+    "aisef2/app/run.py::anchor_in",
+    "aisef2/app/run.py::anchor_of",
+    "aisef2/app/run.py::calibrations",
+    "aisef2/app/run.py::check_git",
+    "aisef2/app/run.py::check_repository",
+    "aisef2/app/run.py::delivery",
+    "aisef2/app/run.py::evidence_manifest",
+    "aisef2/app/run.py::execute",
+    "aisef2/app/run.py::kernel_digest",
+    "aisef2/app/run.py::layers_of",
+    "aisef2/app/run.py::outcomes_from",
+    "aisef2/app/run.py::probe_interpreter",
+    "aisef2/app/run.py::productproof",
+    "aisef2/app/run.py::regression_tests",
+    "aisef2/app/run.py::runspec_of",
+    "aisef2/app/run.py::unfinished"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_app_units.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 6.46,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 41,
+     "first_test": "v2.test_app_units.Adapters.test_attempt_of_reads_the_kernel_projection_and_prior_failures",
+     "tail_sha256": "3ef303c799614934b469520dc3ed73bad54df703d4213d103aaf0597d5afb57a",
+     "overhead_s": 0.3
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 8.0
+  },
+  {
+   "key": "aisef2/app/run.py|00a229d1546f3390|tests/v2/test_s2_kills.py",
+   "module": "aisef2/app/run.py",
+   "null": "00a229d1546f3390193b121cc10da1cb2dfbaa14d1b35f1788e0f2233478a81e",
+   "file": "tests/v2/test_s2_kills.py",
+   "targets": [
+    "aisef2/app/run.py::admit",
+    "aisef2/app/run.py::check_git",
+    "aisef2/app/run.py::check_repository",
+    "aisef2/app/run.py::delivery",
+    "aisef2/app/run.py::execute",
+    "aisef2/app/run.py::probe_interpreter",
+    "aisef2/app/run.py::productproof",
+    "aisef2/app/run.py::runspec_of"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_s2_kills.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 22.84,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 43,
+     "first_test": "v2.test_s2_kills.AgentGuarded.test_the_controlled_fault_names_itself_in_its_message",
+     "tail_sha256": "0bd664af1b79df8fc95d7e4ab7fee01458ca96cf64aa0c3ba780bc5a70d2e7c3",
+     "overhead_s": 0.29
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 24.3
+  },
+  {
+   "key": "aisef2/app/run.py|00a229d1546f3390|tests/v2/test_v21_continue_integrity.py",
+   "module": "aisef2/app/run.py",
+   "null": "00a229d1546f3390193b121cc10da1cb2dfbaa14d1b35f1788e0f2233478a81e",
+   "file": "tests/v2/test_v21_continue_integrity.py",
+   "targets": [
+    "aisef2/app/run.py::_close",
+    "aisef2/app/run.py::_content_sha",
+    "aisef2/app/run.py::admit",
+    "aisef2/app/run.py::anchor_in",
+    "aisef2/app/run.py::anchor_of",
+    "aisef2/app/run.py::calibrations",
+    "aisef2/app/run.py::check_git",
+    "aisef2/app/run.py::check_repository",
+    "aisef2/app/run.py::delivery",
+    "aisef2/app/run.py::evidence_manifest",
+    "aisef2/app/run.py::execute",
+    "aisef2/app/run.py::kernel_digest",
+    "aisef2/app/run.py::layers_of",
+    "aisef2/app/run.py::outcomes_from",
+    "aisef2/app/run.py::probe_interpreter",
+    "aisef2/app/run.py::productproof",
+    "aisef2/app/run.py::regression_tests",
+    "aisef2/app/run.py::runspec_of",
+    "aisef2/app/run.py::unfinished"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_continue_integrity.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 222.16,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 24,
+     "first_test": "v2.test_v21_continue_integrity.AnchorThreatModel.test_an_attacker_who_cannot_write_the_store_is_refuted",
+     "tail_sha256": "6ed16fadda0701c1628b18171b29ee246ad8a6394124bc873e012e30e68ad7e4",
+     "overhead_s": 0.31
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 223.5
+  },
+  {
+   "key": "aisef2/app/run.py|00a229d1546f3390|tests/v2/test_v21_continue_usage.py",
+   "module": "aisef2/app/run.py",
+   "null": "00a229d1546f3390193b121cc10da1cb2dfbaa14d1b35f1788e0f2233478a81e",
+   "file": "tests/v2/test_v21_continue_usage.py",
+   "targets": [
+    "aisef2/app/run.py::_close",
+    "aisef2/app/run.py::_content_sha",
+    "aisef2/app/run.py::admit",
+    "aisef2/app/run.py::anchor_in",
+    "aisef2/app/run.py::anchor_of",
+    "aisef2/app/run.py::calibrations",
+    "aisef2/app/run.py::check_git",
+    "aisef2/app/run.py::check_repository",
+    "aisef2/app/run.py::delivery",
+    "aisef2/app/run.py::evidence_manifest",
+    "aisef2/app/run.py::execute",
+    "aisef2/app/run.py::kernel_digest",
+    "aisef2/app/run.py::layers_of",
+    "aisef2/app/run.py::outcomes_from",
+    "aisef2/app/run.py::probe_interpreter",
+    "aisef2/app/run.py::productproof",
+    "aisef2/app/run.py::regression_tests",
+    "aisef2/app/run.py::runspec_of",
+    "aisef2/app/run.py::unfinished"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_continue_usage.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 51.0,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 10,
+     "first_test": "v2.test_v21_continue_usage.Continue.test_a_continuation_verifies_given_its_directory_relative_or_absolute",
+     "tail_sha256": "25554e9cde9f11bfa4dd3a4579e3a9c44cacdb9866194adec6d1ca0574fd3b64",
+     "overhead_s": 0.34
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 52.7
+  },
+  {
+   "key": "aisef2/app/run.py|00a229d1546f3390|tests/v2/test_v21_identity.py",
+   "module": "aisef2/app/run.py",
+   "null": "00a229d1546f3390193b121cc10da1cb2dfbaa14d1b35f1788e0f2233478a81e",
+   "file": "tests/v2/test_v21_identity.py",
+   "targets": [
+    "aisef2/app/run.py::_close",
+    "aisef2/app/run.py::_content_sha",
+    "aisef2/app/run.py::admit",
+    "aisef2/app/run.py::anchor_in",
+    "aisef2/app/run.py::anchor_of",
+    "aisef2/app/run.py::calibrations",
+    "aisef2/app/run.py::check_git",
+    "aisef2/app/run.py::check_repository",
+    "aisef2/app/run.py::delivery",
+    "aisef2/app/run.py::evidence_manifest",
+    "aisef2/app/run.py::execute",
+    "aisef2/app/run.py::kernel_digest",
+    "aisef2/app/run.py::layers_of",
+    "aisef2/app/run.py::outcomes_from",
+    "aisef2/app/run.py::probe_interpreter",
+    "aisef2/app/run.py::productproof",
+    "aisef2/app/run.py::regression_tests",
+    "aisef2/app/run.py::runspec_of",
+    "aisef2/app/run.py::unfinished"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_identity.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 1.4,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 13,
+     "first_test": "v2.test_v21_identity.Migrate.test_a_spec_no_release_compiles_is_refused_not_guessed",
+     "tail_sha256": "55ff309bf7ddd8be199b014399f388efe1c20a5041ab190f563ffc170a57e475",
+     "overhead_s": 0.3
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 2.9
+  },
+  {
+   "key": "aisef2/app/run.py|00a229d1546f3390|tests/v2/test_v21_inputs.py",
+   "module": "aisef2/app/run.py",
+   "null": "00a229d1546f3390193b121cc10da1cb2dfbaa14d1b35f1788e0f2233478a81e",
+   "file": "tests/v2/test_v21_inputs.py",
+   "targets": [
+    "aisef2/app/run.py::_close",
+    "aisef2/app/run.py::_content_sha",
+    "aisef2/app/run.py::admit",
+    "aisef2/app/run.py::anchor_in",
+    "aisef2/app/run.py::anchor_of",
+    "aisef2/app/run.py::calibrations",
+    "aisef2/app/run.py::check_git",
+    "aisef2/app/run.py::check_repository",
+    "aisef2/app/run.py::delivery",
+    "aisef2/app/run.py::evidence_manifest",
+    "aisef2/app/run.py::execute",
+    "aisef2/app/run.py::kernel_digest",
+    "aisef2/app/run.py::layers_of",
+    "aisef2/app/run.py::outcomes_from",
+    "aisef2/app/run.py::probe_interpreter",
+    "aisef2/app/run.py::productproof",
+    "aisef2/app/run.py::regression_tests",
+    "aisef2/app/run.py::runspec_of",
+    "aisef2/app/run.py::unfinished"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_inputs.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 1.64,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 20,
+     "first_test": "v2.test_v21_inputs.BundleShape.test_a_valid_bundle_still_loads",
+     "tail_sha256": "d39f63e4c8436fb76e82de52f522bc2737bd8bc9e94af2d56412b84f482dcedb",
+     "overhead_s": 0.29
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 2.9
+  },
+  {
+   "key": "aisef2/app/run.py|00a229d1546f3390|tests/v2/test_v21_review_chain.py",
+   "module": "aisef2/app/run.py",
+   "null": "00a229d1546f3390193b121cc10da1cb2dfbaa14d1b35f1788e0f2233478a81e",
+   "file": "tests/v2/test_v21_review_chain.py",
+   "targets": [
+    "aisef2/app/run.py::_close",
+    "aisef2/app/run.py::_content_sha",
+    "aisef2/app/run.py::admit",
+    "aisef2/app/run.py::anchor_in",
+    "aisef2/app/run.py::anchor_of",
+    "aisef2/app/run.py::calibrations",
+    "aisef2/app/run.py::check_git",
+    "aisef2/app/run.py::check_repository",
+    "aisef2/app/run.py::delivery",
+    "aisef2/app/run.py::evidence_manifest",
+    "aisef2/app/run.py::execute",
+    "aisef2/app/run.py::kernel_digest",
+    "aisef2/app/run.py::layers_of",
+    "aisef2/app/run.py::outcomes_from",
+    "aisef2/app/run.py::probe_interpreter",
+    "aisef2/app/run.py::productproof",
+    "aisef2/app/run.py::regression_tests",
+    "aisef2/app/run.py::runspec_of",
+    "aisef2/app/run.py::unfinished"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_review_chain.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 151.97,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 18,
+     "skipped": 3,
+     "skipped_tests": [
+      "test_a_full_review_against_a_scripted_model (v2.test_v21_review_chain.RealBinary.test_a_full_review_against_a_scripted_model)",
+      "test_an_empty_range_is_skipped_without_a_model_call (v2.test_v21_review_chain.RealBinary.test_an_empty_range_is_skipped_without_a_model_call)",
+      "test_the_preview_is_read_as_the_adapter_expects (v2.test_v21_review_chain.RealBinary.test_the_preview_is_read_as_the_adapter_expects)"
+     ],
+     "first_test": "v2.test_v21_review_chain.CandidateChangedDuringReview.test_a_commit_made_by_the_finder_discards_the_review",
+     "tail_sha256": "1e4b8d44125b0693122f7d3880014f095229c51996b171f66abfe7c5b76af006",
+     "overhead_s": 0.32
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 153.2
+  },
+  {
+   "key": "aisef2/app/run.py|00a229d1546f3390|tests/v2/test_v21_verify.py",
+   "module": "aisef2/app/run.py",
+   "null": "00a229d1546f3390193b121cc10da1cb2dfbaa14d1b35f1788e0f2233478a81e",
+   "file": "tests/v2/test_v21_verify.py",
+   "targets": [
+    "aisef2/app/run.py::_close",
+    "aisef2/app/run.py::_content_sha",
+    "aisef2/app/run.py::admit",
+    "aisef2/app/run.py::anchor_in",
+    "aisef2/app/run.py::anchor_of",
+    "aisef2/app/run.py::calibrations",
+    "aisef2/app/run.py::check_git",
+    "aisef2/app/run.py::check_repository",
+    "aisef2/app/run.py::delivery",
+    "aisef2/app/run.py::evidence_manifest",
+    "aisef2/app/run.py::execute",
+    "aisef2/app/run.py::kernel_digest",
+    "aisef2/app/run.py::layers_of",
+    "aisef2/app/run.py::outcomes_from",
+    "aisef2/app/run.py::probe_interpreter",
+    "aisef2/app/run.py::productproof",
+    "aisef2/app/run.py::regression_tests",
+    "aisef2/app/run.py::runspec_of",
+    "aisef2/app/run.py::unfinished"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_verify.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 31.95,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 8,
+     "first_test": "v2.test_v21_verify.RecordAlone.test_a_budget_stop_removed_from_the_record_is_refuted",
+     "tail_sha256": "f79e6288a26ee37a4f6a7da435cf549f3749c03aca7bcb314651cef2fe72b054",
+     "overhead_s": 0.3
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 33.6
+  },
+  {
+   "key": "aisef2/app/settings.py|ee84e5c8d4e1a208|tests/v2/test_app_run.py",
+   "module": "aisef2/app/settings.py",
+   "null": "ee84e5c8d4e1a208afccd8268d278ec3e5c090245f798080ee9f3752950f4c61",
+   "file": "tests/v2/test_app_run.py",
+   "targets": [
+    "aisef2/app/settings.py::FINDERS",
+    "aisef2/app/settings.py::LOOPBACK",
+    "aisef2/app/settings.py::OCR_KEYS",
+    "aisef2/app/settings.py::OPTIONAL",
+    "aisef2/app/settings.py::REVIEW_ABSENT",
+    "aisef2/app/settings.py::Settings.prices",
+    "aisef2/app/settings.py::_count",
+    "aisef2/app/settings.py::endpoint_problem",
+    "aisef2/app/settings.py::load",
+    "aisef2/app/settings.py::read"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_app_run.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 33.14,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 17,
+     "first_test": "v2.test_app_run.Command.test_a_live_run_without_the_provider_key_stops_before_any_request",
+     "tail_sha256": "34c9bfe7ef7d76c17f599b0a81180f32dc90d22822f05f5f66668053994bd703",
+     "overhead_s": 0.3
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 34.5
+  },
+  {
+   "key": "aisef2/app/settings.py|ee84e5c8d4e1a208|tests/v2/test_app_units.py",
+   "module": "aisef2/app/settings.py",
+   "null": "ee84e5c8d4e1a208afccd8268d278ec3e5c090245f798080ee9f3752950f4c61",
+   "file": "tests/v2/test_app_units.py",
+   "targets": [
+    "aisef2/app/settings.py::FINDERS",
+    "aisef2/app/settings.py::LOOPBACK",
+    "aisef2/app/settings.py::OCR_KEYS",
+    "aisef2/app/settings.py::OPTIONAL",
+    "aisef2/app/settings.py::REVIEW_ABSENT",
+    "aisef2/app/settings.py::Settings.prices",
+    "aisef2/app/settings.py::_count",
+    "aisef2/app/settings.py::endpoint_problem",
+    "aisef2/app/settings.py::load",
+    "aisef2/app/settings.py::read"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_app_units.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 6.43,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 41,
+     "first_test": "v2.test_app_units.Adapters.test_attempt_of_reads_the_kernel_projection_and_prior_failures",
+     "tail_sha256": "3ef303c799614934b469520dc3ed73bad54df703d4213d103aaf0597d5afb57a",
+     "overhead_s": 0.29
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 7.8
+  },
+  {
+   "key": "aisef2/app/settings.py|ee84e5c8d4e1a208|tests/v2/test_s2_kills.py",
+   "module": "aisef2/app/settings.py",
+   "null": "ee84e5c8d4e1a208afccd8268d278ec3e5c090245f798080ee9f3752950f4c61",
+   "file": "tests/v2/test_s2_kills.py",
+   "targets": [
+    "aisef2/app/settings.py::_count",
+    "aisef2/app/settings.py::load"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_s2_kills.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 22.86,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 43,
+     "first_test": "v2.test_s2_kills.AgentGuarded.test_the_controlled_fault_names_itself_in_its_message",
+     "tail_sha256": "0bd664af1b79df8fc95d7e4ab7fee01458ca96cf64aa0c3ba780bc5a70d2e7c3",
+     "overhead_s": 0.29
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 24.0
+  },
+  {
+   "key": "aisef2/app/settings.py|ee84e5c8d4e1a208|tests/v2/test_v21_continue_integrity.py",
+   "module": "aisef2/app/settings.py",
+   "null": "ee84e5c8d4e1a208afccd8268d278ec3e5c090245f798080ee9f3752950f4c61",
+   "file": "tests/v2/test_v21_continue_integrity.py",
+   "targets": [
+    "aisef2/app/settings.py::FINDERS",
+    "aisef2/app/settings.py::LOOPBACK",
+    "aisef2/app/settings.py::OCR_KEYS",
+    "aisef2/app/settings.py::OPTIONAL",
+    "aisef2/app/settings.py::REVIEW_ABSENT",
+    "aisef2/app/settings.py::Settings.prices",
+    "aisef2/app/settings.py::_count",
+    "aisef2/app/settings.py::endpoint_problem",
+    "aisef2/app/settings.py::load",
+    "aisef2/app/settings.py::read"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_continue_integrity.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 222.06,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 24,
+     "first_test": "v2.test_v21_continue_integrity.AnchorThreatModel.test_an_attacker_who_cannot_write_the_store_is_refuted",
+     "tail_sha256": "6ed16fadda0701c1628b18171b29ee246ad8a6394124bc873e012e30e68ad7e4",
+     "overhead_s": 0.32
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 223.2
+  },
+  {
+   "key": "aisef2/app/settings.py|ee84e5c8d4e1a208|tests/v2/test_v21_continue_usage.py",
+   "module": "aisef2/app/settings.py",
+   "null": "ee84e5c8d4e1a208afccd8268d278ec3e5c090245f798080ee9f3752950f4c61",
+   "file": "tests/v2/test_v21_continue_usage.py",
+   "targets": [
+    "aisef2/app/settings.py::FINDERS",
+    "aisef2/app/settings.py::LOOPBACK",
+    "aisef2/app/settings.py::OCR_KEYS",
+    "aisef2/app/settings.py::OPTIONAL",
+    "aisef2/app/settings.py::REVIEW_ABSENT",
+    "aisef2/app/settings.py::Settings.prices",
+    "aisef2/app/settings.py::_count",
+    "aisef2/app/settings.py::endpoint_problem",
+    "aisef2/app/settings.py::load",
+    "aisef2/app/settings.py::read"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_continue_usage.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 50.37,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 10,
+     "first_test": "v2.test_v21_continue_usage.Continue.test_a_continuation_verifies_given_its_directory_relative_or_absolute",
+     "tail_sha256": "25554e9cde9f11bfa4dd3a4579e3a9c44cacdb9866194adec6d1ca0574fd3b64",
+     "overhead_s": 0.3
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 51.9
+  },
+  {
+   "key": "aisef2/app/settings.py|ee84e5c8d4e1a208|tests/v2/test_v21_identity.py",
+   "module": "aisef2/app/settings.py",
+   "null": "ee84e5c8d4e1a208afccd8268d278ec3e5c090245f798080ee9f3752950f4c61",
+   "file": "tests/v2/test_v21_identity.py",
+   "targets": [
+    "aisef2/app/settings.py::FINDERS",
+    "aisef2/app/settings.py::LOOPBACK",
+    "aisef2/app/settings.py::OCR_KEYS",
+    "aisef2/app/settings.py::OPTIONAL",
+    "aisef2/app/settings.py::REVIEW_ABSENT",
+    "aisef2/app/settings.py::Settings.prices",
+    "aisef2/app/settings.py::_count",
+    "aisef2/app/settings.py::endpoint_problem",
+    "aisef2/app/settings.py::load",
+    "aisef2/app/settings.py::read"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_identity.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 1.41,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 13,
+     "first_test": "v2.test_v21_identity.Migrate.test_a_spec_no_release_compiles_is_refused_not_guessed",
+     "tail_sha256": "55ff309bf7ddd8be199b014399f388efe1c20a5041ab190f563ffc170a57e475",
+     "overhead_s": 0.3
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 2.8
+  },
+  {
+   "key": "aisef2/app/settings.py|ee84e5c8d4e1a208|tests/v2/test_v21_inputs.py",
+   "module": "aisef2/app/settings.py",
+   "null": "ee84e5c8d4e1a208afccd8268d278ec3e5c090245f798080ee9f3752950f4c61",
+   "file": "tests/v2/test_v21_inputs.py",
+   "targets": [
+    "aisef2/app/settings.py::FINDERS",
+    "aisef2/app/settings.py::LOOPBACK",
+    "aisef2/app/settings.py::OCR_KEYS",
+    "aisef2/app/settings.py::OPTIONAL",
+    "aisef2/app/settings.py::REVIEW_ABSENT",
+    "aisef2/app/settings.py::Settings.prices",
+    "aisef2/app/settings.py::_count",
+    "aisef2/app/settings.py::endpoint_problem",
+    "aisef2/app/settings.py::load",
+    "aisef2/app/settings.py::read"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_inputs.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 1.61,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 20,
+     "first_test": "v2.test_v21_inputs.BundleShape.test_a_valid_bundle_still_loads",
+     "tail_sha256": "d39f63e4c8436fb76e82de52f522bc2737bd8bc9e94af2d56412b84f482dcedb",
+     "overhead_s": 0.29
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 2.8
+  },
+  {
+   "key": "aisef2/app/settings.py|ee84e5c8d4e1a208|tests/v2/test_v21_review.py",
+   "module": "aisef2/app/settings.py",
+   "null": "ee84e5c8d4e1a208afccd8268d278ec3e5c090245f798080ee9f3752950f4c61",
+   "file": "tests/v2/test_v21_review.py",
+   "targets": [
+    "aisef2/app/settings.py::FINDERS",
+    "aisef2/app/settings.py::LOOPBACK",
+    "aisef2/app/settings.py::OCR_KEYS",
+    "aisef2/app/settings.py::OPTIONAL",
+    "aisef2/app/settings.py::REVIEW_ABSENT",
+    "aisef2/app/settings.py::Settings.prices",
+    "aisef2/app/settings.py::_count",
+    "aisef2/app/settings.py::endpoint_problem",
+    "aisef2/app/settings.py::load",
+    "aisef2/app/settings.py::read"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_review.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 16.03,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 8,
+     "first_test": "v2.test_v21_review.HistoricalDefects.test_each_shipped_defect_is_confirmed_on_its_shape_and_not_on_the_reference",
+     "tail_sha256": "472928fdd58c74eb466a3bd8815a333f24039cf54dbb7522a3ced1cf29101770",
+     "overhead_s": 0.29
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 17.2
+  },
+  {
+   "key": "aisef2/app/settings.py|ee84e5c8d4e1a208|tests/v2/test_v21_review_chain.py",
+   "module": "aisef2/app/settings.py",
+   "null": "ee84e5c8d4e1a208afccd8268d278ec3e5c090245f798080ee9f3752950f4c61",
+   "file": "tests/v2/test_v21_review_chain.py",
+   "targets": [
+    "aisef2/app/settings.py::FINDERS",
+    "aisef2/app/settings.py::LOOPBACK",
+    "aisef2/app/settings.py::OCR_KEYS",
+    "aisef2/app/settings.py::OPTIONAL",
+    "aisef2/app/settings.py::REVIEW_ABSENT",
+    "aisef2/app/settings.py::Settings.prices",
+    "aisef2/app/settings.py::_count",
+    "aisef2/app/settings.py::endpoint_problem",
+    "aisef2/app/settings.py::load",
+    "aisef2/app/settings.py::read"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_review_chain.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 152.51,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 18,
+     "skipped": 3,
+     "skipped_tests": [
+      "test_a_full_review_against_a_scripted_model (v2.test_v21_review_chain.RealBinary.test_a_full_review_against_a_scripted_model)",
+      "test_an_empty_range_is_skipped_without_a_model_call (v2.test_v21_review_chain.RealBinary.test_an_empty_range_is_skipped_without_a_model_call)",
+      "test_the_preview_is_read_as_the_adapter_expects (v2.test_v21_review_chain.RealBinary.test_the_preview_is_read_as_the_adapter_expects)"
+     ],
+     "first_test": "v2.test_v21_review_chain.CandidateChangedDuringReview.test_a_commit_made_by_the_finder_discards_the_review",
+     "tail_sha256": "1e4b8d44125b0693122f7d3880014f095229c51996b171f66abfe7c5b76af006",
+     "overhead_s": 0.29
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 153.6
+  },
+  {
+   "key": "aisef2/app/settings.py|ee84e5c8d4e1a208|tests/v2/test_v21_verify.py",
+   "module": "aisef2/app/settings.py",
+   "null": "ee84e5c8d4e1a208afccd8268d278ec3e5c090245f798080ee9f3752950f4c61",
+   "file": "tests/v2/test_v21_verify.py",
+   "targets": [
+    "aisef2/app/settings.py::FINDERS",
+    "aisef2/app/settings.py::LOOPBACK",
+    "aisef2/app/settings.py::OCR_KEYS",
+    "aisef2/app/settings.py::OPTIONAL",
+    "aisef2/app/settings.py::REVIEW_ABSENT",
+    "aisef2/app/settings.py::Settings.prices",
+    "aisef2/app/settings.py::_count",
+    "aisef2/app/settings.py::endpoint_problem",
+    "aisef2/app/settings.py::load",
+    "aisef2/app/settings.py::read"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_verify.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 32.04,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 8,
+     "first_test": "v2.test_v21_verify.RecordAlone.test_a_budget_stop_removed_from_the_record_is_refuted",
+     "tail_sha256": "f79e6288a26ee37a4f6a7da435cf549f3749c03aca7bcb314651cef2fe72b054",
+     "overhead_s": 0.3
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 33.2
+  },
+  {
+   "key": "aisef2/app/usage.py|69eb100c192fc816|tests/v2/test_v21_continue_integrity.py",
+   "module": "aisef2/app/usage.py",
+   "null": "69eb100c192fc8163568e0ae2303b8048e1f820ac22e6329690d1767143a52a8",
+   "file": "tests/v2/test_v21_continue_integrity.py",
+   "targets": [
+    "aisef2/app/usage.py::CLASSES",
+    "aisef2/app/usage.py::PRICE_KEYS",
+    "aisef2/app/usage.py::_DATE",
+    "aisef2/app/usage.py::_usd",
+    "aisef2/app/usage.py::no_progress",
+    "aisef2/app/usage.py::price_problem",
+    "aisef2/app/usage.py::session_tokens",
+    "aisef2/app/usage.py::usage"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_continue_integrity.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 222.49,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 24,
+     "first_test": "v2.test_v21_continue_integrity.AnchorThreatModel.test_an_attacker_who_cannot_write_the_store_is_refuted",
+     "tail_sha256": "6ed16fadda0701c1628b18171b29ee246ad8a6394124bc873e012e30e68ad7e4",
+     "overhead_s": 0.29
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 223.6
+  },
+  {
+   "key": "aisef2/app/usage.py|69eb100c192fc816|tests/v2/test_v21_continue_usage.py",
+   "module": "aisef2/app/usage.py",
+   "null": "69eb100c192fc8163568e0ae2303b8048e1f820ac22e6329690d1767143a52a8",
+   "file": "tests/v2/test_v21_continue_usage.py",
+   "targets": [
+    "aisef2/app/usage.py::CLASSES",
+    "aisef2/app/usage.py::PRICE_KEYS",
+    "aisef2/app/usage.py::_DATE",
+    "aisef2/app/usage.py::_usd",
+    "aisef2/app/usage.py::no_progress",
+    "aisef2/app/usage.py::price_problem",
+    "aisef2/app/usage.py::session_tokens",
+    "aisef2/app/usage.py::usage"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_continue_usage.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 50.79,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 10,
+     "first_test": "v2.test_v21_continue_usage.Continue.test_a_continuation_verifies_given_its_directory_relative_or_absolute",
+     "tail_sha256": "25554e9cde9f11bfa4dd3a4579e3a9c44cacdb9866194adec6d1ca0574fd3b64",
+     "overhead_s": 0.3
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 52.3
+  },
+  {
+   "key": "aisef2/app/usage.py|69eb100c192fc816|tests/v2/test_v21_verify.py",
+   "module": "aisef2/app/usage.py",
+   "null": "69eb100c192fc8163568e0ae2303b8048e1f820ac22e6329690d1767143a52a8",
+   "file": "tests/v2/test_v21_verify.py",
+   "targets": [
+    "aisef2/app/usage.py::CLASSES",
+    "aisef2/app/usage.py::PRICE_KEYS",
+    "aisef2/app/usage.py::_DATE",
+    "aisef2/app/usage.py::_usd",
+    "aisef2/app/usage.py::no_progress",
+    "aisef2/app/usage.py::price_problem",
+    "aisef2/app/usage.py::session_tokens",
+    "aisef2/app/usage.py::usage"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_verify.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 31.69,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 8,
+     "first_test": "v2.test_v21_verify.RecordAlone.test_a_budget_stop_removed_from_the_record_is_refuted",
+     "tail_sha256": "f79e6288a26ee37a4f6a7da435cf549f3749c03aca7bcb314651cef2fe72b054",
+     "overhead_s": 0.29
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 32.9
+  },
+  {
+   "key": "aisef2/app/verify.py|f24f029e8aef90fd|tests/v2/test_app_run.py",
+   "module": "aisef2/app/verify.py",
+   "null": "f24f029e8aef90fd0c1d8b06e950173dd228bb447d3c7322147f514006cf220a",
+   "file": "tests/v2/test_app_run.py",
+   "targets": [
+    "aisef2/app/verify.py::_runspec_problems",
+    "aisef2/app/verify.py::_spend",
+    "aisef2/app/verify.py::verify"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_app_run.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 33.39,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 17,
+     "first_test": "v2.test_app_run.Command.test_a_live_run_without_the_provider_key_stops_before_any_request",
+     "tail_sha256": "34c9bfe7ef7d76c17f599b0a81180f32dc90d22822f05f5f66668053994bd703",
+     "overhead_s": 0.29
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 34.8
+  },
+  {
+   "key": "aisef2/app/verify.py|f24f029e8aef90fd|tests/v2/test_app_units.py",
+   "module": "aisef2/app/verify.py",
+   "null": "f24f029e8aef90fd0c1d8b06e950173dd228bb447d3c7322147f514006cf220a",
+   "file": "tests/v2/test_app_units.py",
+   "targets": [
+    "aisef2/app/verify.py::_runspec_problems",
+    "aisef2/app/verify.py::_spend",
+    "aisef2/app/verify.py::verify"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_app_units.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 6.41,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 41,
+     "first_test": "v2.test_app_units.Adapters.test_attempt_of_reads_the_kernel_projection_and_prior_failures",
+     "tail_sha256": "3ef303c799614934b469520dc3ed73bad54df703d4213d103aaf0597d5afb57a",
+     "overhead_s": 0.3
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 7.8
+  },
+  {
+   "key": "aisef2/app/verify.py|f24f029e8aef90fd|tests/v2/test_s2_kills.py",
+   "module": "aisef2/app/verify.py",
+   "null": "f24f029e8aef90fd0c1d8b06e950173dd228bb447d3c7322147f514006cf220a",
+   "file": "tests/v2/test_s2_kills.py",
+   "targets": [
+    "aisef2/app/verify.py::verify"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_s2_kills.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 23.15,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 43,
+     "first_test": "v2.test_s2_kills.AgentGuarded.test_the_controlled_fault_names_itself_in_its_message",
+     "tail_sha256": "0bd664af1b79df8fc95d7e4ab7fee01458ca96cf64aa0c3ba780bc5a70d2e7c3",
+     "overhead_s": 0.29
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 25.7
+  },
+  {
+   "key": "aisef2/app/verify.py|f24f029e8aef90fd|tests/v2/test_v21_continue_integrity.py",
+   "module": "aisef2/app/verify.py",
+   "null": "f24f029e8aef90fd0c1d8b06e950173dd228bb447d3c7322147f514006cf220a",
+   "file": "tests/v2/test_v21_continue_integrity.py",
+   "targets": [
+    "aisef2/app/verify.py::_runspec_problems",
+    "aisef2/app/verify.py::_spend",
+    "aisef2/app/verify.py::verify"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_continue_integrity.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 222.71,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 24,
+     "first_test": "v2.test_v21_continue_integrity.AnchorThreatModel.test_an_attacker_who_cannot_write_the_store_is_refuted",
+     "tail_sha256": "6ed16fadda0701c1628b18171b29ee246ad8a6394124bc873e012e30e68ad7e4",
+     "overhead_s": 0.31
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 224.2
+  },
+  {
+   "key": "aisef2/app/verify.py|f24f029e8aef90fd|tests/v2/test_v21_continue_usage.py",
+   "module": "aisef2/app/verify.py",
+   "null": "f24f029e8aef90fd0c1d8b06e950173dd228bb447d3c7322147f514006cf220a",
+   "file": "tests/v2/test_v21_continue_usage.py",
+   "targets": [
+    "aisef2/app/verify.py::_runspec_problems",
+    "aisef2/app/verify.py::_spend",
+    "aisef2/app/verify.py::verify"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_continue_usage.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 50.86,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 10,
+     "first_test": "v2.test_v21_continue_usage.Continue.test_a_continuation_verifies_given_its_directory_relative_or_absolute",
+     "tail_sha256": "25554e9cde9f11bfa4dd3a4579e3a9c44cacdb9866194adec6d1ca0574fd3b64",
+     "overhead_s": 0.3
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 52.6
+  },
+  {
+   "key": "aisef2/app/verify.py|f24f029e8aef90fd|tests/v2/test_v21_verify.py",
+   "module": "aisef2/app/verify.py",
+   "null": "f24f029e8aef90fd0c1d8b06e950173dd228bb447d3c7322147f514006cf220a",
+   "file": "tests/v2/test_v21_verify.py",
+   "targets": [
+    "aisef2/app/verify.py::_runspec_problems",
+    "aisef2/app/verify.py::_spend",
+    "aisef2/app/verify.py::verify"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_verify.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 32.02,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 8,
+     "first_test": "v2.test_v21_verify.RecordAlone.test_a_budget_stop_removed_from_the_record_is_refuted",
+     "tail_sha256": "f79e6288a26ee37a4f6a7da435cf549f3749c03aca7bcb314651cef2fe72b054",
+     "overhead_s": 0.3
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 33.6
+  },
+  {
+   "key": "aisef2/orchestrate/adapters.py|418c644414262f76|tests/v2/test_p6_stages.py",
+   "module": "aisef2/orchestrate/adapters.py",
+   "null": "418c644414262f766f7cb1fb7243478aaf19bb30d9f740229a815c4ee60206d6",
+   "file": "tests/v2/test_p6_stages.py",
+   "targets": [
+    "aisef2/orchestrate/adapters.py::Finding.blocks",
+    "aisef2/orchestrate/adapters.py::Implemented.__post_init__",
+    "aisef2/orchestrate/adapters.py::Merge.__post_init__",
+    "aisef2/orchestrate/adapters.py::ReadOnlyScope.files",
+    "aisef2/orchestrate/adapters.py::ReadOnlyScope.read",
+    "aisef2/orchestrate/adapters.py::confine",
+    "aisef2/orchestrate/adapters.py::unconfine"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_p6_stages.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 6.97,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 39,
+     "first_test": "v2.test_p6_stages.Adapters.test_a_developer_answer_is_COMPLETED_with_a_candidate_or_FAILED_without",
+     "tail_sha256": "eb97462c64dba00ea09f6f3b1f49a06e4c26de76f5c331ddc4d90f2608ceb490",
+     "overhead_s": 0.29
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 8.1
+  },
+  {
+   "key": "aisef2/orchestrate/adapters.py|418c644414262f76|tests/v2/test_release_s2_kernel.py",
+   "module": "aisef2/orchestrate/adapters.py",
+   "null": "418c644414262f766f7cb1fb7243478aaf19bb30d9f740229a815c4ee60206d6",
+   "file": "tests/v2/test_release_s2_kernel.py",
+   "targets": [
+    "aisef2/orchestrate/adapters.py::Finding.blocks",
+    "aisef2/orchestrate/adapters.py::Implemented.__post_init__",
+    "aisef2/orchestrate/adapters.py::Merge.__post_init__",
+    "aisef2/orchestrate/adapters.py::ReadOnlyScope.files",
+    "aisef2/orchestrate/adapters.py::ReadOnlyScope.read",
+    "aisef2/orchestrate/adapters.py::confine",
+    "aisef2/orchestrate/adapters.py::unconfine"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_release_s2_kernel.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 7.06,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 16,
+     "first_test": "v2.test_release_s2_kernel.CheckoutMove.test_a_clean_that_fails_is_a_typed_refusal_and_the_checkout_keeps_its_revision",
+     "tail_sha256": "a5fdb440b3f5c36c1b0fa87691579c198a3317e89e4b578906abb0aa789c7473",
+     "overhead_s": 0.29
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 8.1
+  },
+  {
+   "key": "aisef2/orchestrate/adapters.py|418c644414262f76|tests/v2/test_v21_orchestration.py",
+   "module": "aisef2/orchestrate/adapters.py",
+   "null": "418c644414262f766f7cb1fb7243478aaf19bb30d9f740229a815c4ee60206d6",
+   "file": "tests/v2/test_v21_orchestration.py",
+   "targets": [
+    "aisef2/orchestrate/adapters.py::Finding.blocks",
+    "aisef2/orchestrate/adapters.py::Implemented.__post_init__",
+    "aisef2/orchestrate/adapters.py::Merge.__post_init__",
+    "aisef2/orchestrate/adapters.py::ReadOnlyScope.files",
+    "aisef2/orchestrate/adapters.py::ReadOnlyScope.read",
+    "aisef2/orchestrate/adapters.py::confine",
+    "aisef2/orchestrate/adapters.py::unconfine"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_orchestration.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 19.94,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 5,
+     "first_test": "v2.test_v21_orchestration.DiffFailure.test_a_diff_git_cannot_produce_is_RESOURCE_ACQUISITION_FAILED",
+     "tail_sha256": "d98108615c826936f61b3f950e2497908312410746cf279162f8d7a35f24eac5",
+     "overhead_s": 0.29
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 21.0
+  },
+  {
+   "key": "aisef2/orchestrate/review.py|6b62d420a5f3cc96|tests/v2/test_p6_stages.py",
+   "module": "aisef2/orchestrate/review.py",
+   "null": "6b62d420a5f3cc9675e9a38bc091ca11a752bbc6705928d6dc263ffbd99a2b4f",
+   "file": "tests/v2/test_p6_stages.py",
+   "targets": [
+    "aisef2/orchestrate/review.py::_result",
+    "aisef2/orchestrate/review.py::review"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_p6_stages.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 6.97,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 39,
+     "first_test": "v2.test_p6_stages.Adapters.test_a_developer_answer_is_COMPLETED_with_a_candidate_or_FAILED_without",
+     "tail_sha256": "5caa439d30c3eabcfc4de88b01b35e40effa4d074dde850ab071e62d9d9c57e9",
+     "overhead_s": 0.29
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 8.1
+  },
+  {
+   "key": "aisef2/orchestrate/review.py|6b62d420a5f3cc96|tests/v2/test_v21_review.py",
+   "module": "aisef2/orchestrate/review.py",
+   "null": "6b62d420a5f3cc9675e9a38bc091ca11a752bbc6705928d6dc263ffbd99a2b4f",
+   "file": "tests/v2/test_v21_review.py",
+   "targets": [
+    "aisef2/orchestrate/review.py::_result",
+    "aisef2/orchestrate/review.py::review"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_review.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 16.17,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 8,
+     "first_test": "v2.test_v21_review.HistoricalDefects.test_each_shipped_defect_is_confirmed_on_its_shape_and_not_on_the_reference",
+     "tail_sha256": "472928fdd58c74eb466a3bd8815a333f24039cf54dbb7522a3ced1cf29101770",
+     "overhead_s": 0.4
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 17.4
+  },
+  {
+   "key": "aisef2/orchestrate/story_runner.py|30e0faf5663e6b8d|tests/v2/test_c2_k_nowork_001.py",
+   "module": "aisef2/orchestrate/story_runner.py",
+   "null": "30e0faf5663e6b8d2369f9ea82fedcbcb9e8cfdda9b960e426fa77eecc5e8d68",
+   "file": "tests/v2/test_c2_k_nowork_001.py",
+   "targets": [
+    "aisef2/orchestrate/story_runner.py::StoryResult.committed",
+    "aisef2/orchestrate/story_runner.py::StoryResult.revision",
+    "aisef2/orchestrate/story_runner.py::_Held.__call__",
+    "aisef2/orchestrate/story_runner.py::_Held.__init__",
+    "aisef2/orchestrate/story_runner.py::_Held.release",
+    "aisef2/orchestrate/story_runner.py::_attempt",
+    "aisef2/orchestrate/story_runner.py::_committed",
+    "aisef2/orchestrate/story_runner.py::_fail",
+    "aisef2/orchestrate/story_runner.py::_freeze_plan",
+    "aisef2/orchestrate/story_runner.py::_probe",
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_c2_k_nowork_001.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 39.42,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 17,
+     "skipped": 4,
+     "skipped_tests": [
+      "test_the_check_binds_the_kernel_digest_and_the_b03a_authority (v2.test_c2_k_nowork_001.Record.test_the_check_binds_the_kernel_digest_and_the_b03a_authority)",
+      "test_the_history_check_reports_a_2_0_blob_that_is_not_tag_v2_0_0_s (v2.test_c2_k_nowork_001.Record.test_the_history_check_reports_a_2_0_blob_that_is_not_tag_v2_0_0_s)",
+      "test_the_record_binds_this_tree_and_shows_the_cases_red_before_and_green_after (v2.test_c2_k_nowork_001.Record.test_the_record_binds_this_tree_and_shows_the_cases_red_before_and_green_after)",
+      "test_the_writer_refuses_the_2_0_record_and_an_existing_file_before_running_anything (v2.test_c2_k_nowork_001.Record.test_the_writer_refuses_the_2_0_record_and_an_existing_file_before_running_anything)"
+     ],
+     "first_test": "v2.test_c2_k_nowork_001.DeveloperWorkRemains.test_C_a_blocking_policy_still_blocks_that_story_on_failing_tests",
+     "tail_sha256": "d787c02ec76987251c7c16264bd08c477c8866d88f87ab87759470c33041967a",
+     "overhead_s": 0.3
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 40.5
+  },
+  {
+   "key": "aisef2/orchestrate/story_runner.py|30e0faf5663e6b8d|tests/v2/test_c2_k_presat_001.py",
+   "module": "aisef2/orchestrate/story_runner.py",
+   "null": "30e0faf5663e6b8d2369f9ea82fedcbcb9e8cfdda9b960e426fa77eecc5e8d68",
+   "file": "tests/v2/test_c2_k_presat_001.py",
+   "targets": [
+    "aisef2/orchestrate/story_runner.py::StoryResult.committed",
+    "aisef2/orchestrate/story_runner.py::StoryResult.revision",
+    "aisef2/orchestrate/story_runner.py::_Held.__call__",
+    "aisef2/orchestrate/story_runner.py::_Held.__init__",
+    "aisef2/orchestrate/story_runner.py::_Held.release",
+    "aisef2/orchestrate/story_runner.py::_attempt",
+    "aisef2/orchestrate/story_runner.py::_committed",
+    "aisef2/orchestrate/story_runner.py::_fail",
+    "aisef2/orchestrate/story_runner.py::_freeze_plan",
+    "aisef2/orchestrate/story_runner.py::_probe",
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_c2_k_presat_001.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 21.04,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 8,
+     "first_test": "v2.test_c2_k_presat_001.DeveloperWasCalled.test_D_executed_failing_tests_are_still_blocked_under_a_blocking_policy",
+     "tail_sha256": "ba775204dc261a0e9e0ec68f003652cef6d4759e57a66fec897ba66556b1cc2e",
+     "overhead_s": 0.29
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 22.2
+  },
+  {
+   "key": "aisef2/orchestrate/story_runner.py|30e0faf5663e6b8d|tests/v2/test_c2_orchestration_conformance.py",
+   "module": "aisef2/orchestrate/story_runner.py",
+   "null": "30e0faf5663e6b8d2369f9ea82fedcbcb9e8cfdda9b960e426fa77eecc5e8d68",
+   "file": "tests/v2/test_c2_orchestration_conformance.py",
+   "targets": [
+    "aisef2/orchestrate/story_runner.py::StoryResult.committed",
+    "aisef2/orchestrate/story_runner.py::StoryResult.revision",
+    "aisef2/orchestrate/story_runner.py::_Held.__call__",
+    "aisef2/orchestrate/story_runner.py::_Held.__init__",
+    "aisef2/orchestrate/story_runner.py::_Held.release",
+    "aisef2/orchestrate/story_runner.py::_attempt",
+    "aisef2/orchestrate/story_runner.py::_committed",
+    "aisef2/orchestrate/story_runner.py::_fail",
+    "aisef2/orchestrate/story_runner.py::_freeze_plan",
+    "aisef2/orchestrate/story_runner.py::_probe",
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_c2_orchestration_conformance.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 35.37,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 24,
+     "skipped": 4,
+     "skipped_tests": [
+      "test_14a_each_spec_s_own_probe_gives_its_pristine_expectation_on_the_reference_tree (v2.test_c2_orchestration_conformance.LedgerLockStories.test_14a_each_spec_s_own_probe_gives_its_pristine_expectation_on_the_reference_tree)",
+      "test_14b_admission_and_both_parties_accept_each_whole_story_through_the_path (v2.test_c2_orchestration_conformance.LedgerLockStories.test_14b_admission_and_both_parties_accept_each_whole_story_through_the_path)",
+      "test_15_the_record_binds_this_tree_and_old_and_new_agree_on_every_single_probe_story (v2.test_c2_orchestration_conformance.Record.test_15_the_record_binds_this_tree_and_old_and_new_agree_on_every_single_probe_story)",
+      "test_15b_only_the_release_s_named_changes_are_accepted_each_while_its_gate_holds (v2.test_c2_orchestration_conformance.Record.test_15b_only_the_release_s_named_changes_are_accepted_each_while_its_gate_holds)"
+     ],
+     "first_test": "v2.test_c2_orchestration_conformance.LedgerLockStories.test_14a_each_spec_s_own_probe_gives_its_pristine_expectation_on_the_reference_tree",
+     "tail_sha256": "4171bc8813cfd1f454f880dd60a833fdd0635812b09d089e999eb0d6629bfe84",
+     "overhead_s": 0.29
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 36.5
+  },
+  {
+   "key": "aisef2/orchestrate/story_runner.py|30e0faf5663e6b8d|tests/v2/test_p6_orchestration.py",
+   "module": "aisef2/orchestrate/story_runner.py",
+   "null": "30e0faf5663e6b8d2369f9ea82fedcbcb9e8cfdda9b960e426fa77eecc5e8d68",
+   "file": "tests/v2/test_p6_orchestration.py",
+   "targets": [
+    "aisef2/orchestrate/story_runner.py::_attempt",
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_p6_orchestration.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 69.96,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 32,
+     "first_test": "v2.test_p6_orchestration.Orchestration.test_DIAG_1_the_observation_writes_no_bytecode_and_the_merged_revision_of_S0_carries_none",
+     "tail_sha256": "9605d0861a7c25d8a8d76be3bbd89acffcdf078b55167d318b74d92513f7461e",
+     "overhead_s": 0.3
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 75.6
+  },
+  {
+   "key": "aisef2/orchestrate/story_runner.py|30e0faf5663e6b8d|tests/v2/test_p6_stages.py",
+   "module": "aisef2/orchestrate/story_runner.py",
+   "null": "30e0faf5663e6b8d2369f9ea82fedcbcb9e8cfdda9b960e426fa77eecc5e8d68",
+   "file": "tests/v2/test_p6_stages.py",
+   "targets": [
+    "aisef2/orchestrate/story_runner.py::StoryResult.committed",
+    "aisef2/orchestrate/story_runner.py::StoryResult.revision",
+    "aisef2/orchestrate/story_runner.py::_Held.__call__",
+    "aisef2/orchestrate/story_runner.py::_Held.__init__",
+    "aisef2/orchestrate/story_runner.py::_Held.release",
+    "aisef2/orchestrate/story_runner.py::_attempt",
+    "aisef2/orchestrate/story_runner.py::_committed",
+    "aisef2/orchestrate/story_runner.py::_fail",
+    "aisef2/orchestrate/story_runner.py::_freeze_plan",
+    "aisef2/orchestrate/story_runner.py::_probe",
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_p6_stages.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 7.04,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 39,
+     "first_test": "v2.test_p6_stages.Adapters.test_a_developer_answer_is_COMPLETED_with_a_candidate_or_FAILED_without",
+     "tail_sha256": "a7cd36eebf4ddf732e04e4d33f108023a799c0a046b54889fd88893f8200456b",
+     "overhead_s": 0.29
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 8.2
+  },
+  {
+   "key": "aisef2/orchestrate/story_runner.py|30e0faf5663e6b8d|tests/v2/test_release_s2_kernel.py",
+   "module": "aisef2/orchestrate/story_runner.py",
+   "null": "30e0faf5663e6b8d2369f9ea82fedcbcb9e8cfdda9b960e426fa77eecc5e8d68",
+   "file": "tests/v2/test_release_s2_kernel.py",
+   "targets": [
+    "aisef2/orchestrate/story_runner.py::StoryResult.committed",
+    "aisef2/orchestrate/story_runner.py::StoryResult.revision",
+    "aisef2/orchestrate/story_runner.py::_Held.__call__",
+    "aisef2/orchestrate/story_runner.py::_Held.__init__",
+    "aisef2/orchestrate/story_runner.py::_Held.release",
+    "aisef2/orchestrate/story_runner.py::_attempt",
+    "aisef2/orchestrate/story_runner.py::_committed",
+    "aisef2/orchestrate/story_runner.py::_fail",
+    "aisef2/orchestrate/story_runner.py::_freeze_plan",
+    "aisef2/orchestrate/story_runner.py::_probe",
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_release_s2_kernel.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 7.02,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 16,
+     "first_test": "v2.test_release_s2_kernel.CheckoutMove.test_a_clean_that_fails_is_a_typed_refusal_and_the_checkout_keeps_its_revision",
+     "tail_sha256": "aa0cd35788b404e9fe1b37ada2f756833a16d3d8bcdd3e85836a04acce6e3e29",
+     "overhead_s": 0.29
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 8.2
+  },
+  {
+   "key": "aisef2/orchestrate/story_runner.py|30e0faf5663e6b8d|tests/v2/test_v21_orchestration.py",
+   "module": "aisef2/orchestrate/story_runner.py",
+   "null": "30e0faf5663e6b8d2369f9ea82fedcbcb9e8cfdda9b960e426fa77eecc5e8d68",
+   "file": "tests/v2/test_v21_orchestration.py",
+   "targets": [
+    "aisef2/orchestrate/story_runner.py::StoryResult.committed",
+    "aisef2/orchestrate/story_runner.py::StoryResult.revision",
+    "aisef2/orchestrate/story_runner.py::_Held.__call__",
+    "aisef2/orchestrate/story_runner.py::_Held.__init__",
+    "aisef2/orchestrate/story_runner.py::_Held.release",
+    "aisef2/orchestrate/story_runner.py::_attempt",
+    "aisef2/orchestrate/story_runner.py::_committed",
+    "aisef2/orchestrate/story_runner.py::_fail",
+    "aisef2/orchestrate/story_runner.py::_freeze_plan",
+    "aisef2/orchestrate/story_runner.py::_probe",
+    "aisef2/orchestrate/story_runner.py::run_story"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_orchestration.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 20.04,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 5,
+     "first_test": "v2.test_v21_orchestration.DiffFailure.test_a_diff_git_cannot_produce_is_RESOURCE_ACQUISITION_FAILED",
+     "tail_sha256": "60010ee370ca224be5e9c291e8b4e38b677221b49029eb044eeb9a37254b48c2",
+     "overhead_s": 0.31
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 21.2
+  },
+  {
+   "key": "aisef2/orchestrate/workspace.py|91c0d067fd130017|tests/v2/test_p6_stages.py",
+   "module": "aisef2/orchestrate/workspace.py",
+   "null": "91c0d067fd130017f1ac2b15cea5e5909d8bd518f0c77a02289460f467c0b809",
+   "file": "tests/v2/test_p6_stages.py",
+   "targets": [
+    "aisef2/orchestrate/workspace.py::Checkout.__init__",
+    "aisef2/orchestrate/workspace.py::Checkout.release",
+    "aisef2/orchestrate/workspace.py::GitMerger.base",
+    "aisef2/orchestrate/workspace.py::GitMerger.merge",
+    "aisef2/orchestrate/workspace.py::GitMerger.revert",
+    "aisef2/orchestrate/workspace.py::GitWorkspace.checkout",
+    "aisef2/orchestrate/workspace.py::GitWorkspace.diff",
+    "aisef2/orchestrate/workspace.py::GitWorkspace.move",
+    "aisef2/orchestrate/workspace.py::GitWorkspace.scratch",
+    "aisef2/orchestrate/workspace.py::Scratch.__init__",
+    "aisef2/orchestrate/workspace.py::Scratch.release",
+    "aisef2/orchestrate/workspace.py::_NO_BACKGROUND_GIT",
+    "aisef2/orchestrate/workspace.py::_env",
+    "aisef2/orchestrate/workspace.py::_sha",
+    "aisef2/orchestrate/workspace.py::commit_all",
+    "aisef2/orchestrate/workspace.py::config_problems",
+    "aisef2/orchestrate/workspace.py::git"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_p6_stages.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 7.06,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 39,
+     "first_test": "v2.test_p6_stages.Adapters.test_a_developer_answer_is_COMPLETED_with_a_candidate_or_FAILED_without",
+     "tail_sha256": "83b1ad075b03b4c4f29643e24c4445ef859d18c5566153e0597007e956f29ce1",
+     "overhead_s": 0.29
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 8.2
+  },
+  {
+   "key": "aisef2/orchestrate/workspace.py|91c0d067fd130017|tests/v2/test_release_s2_kernel.py",
+   "module": "aisef2/orchestrate/workspace.py",
+   "null": "91c0d067fd130017f1ac2b15cea5e5909d8bd518f0c77a02289460f467c0b809",
+   "file": "tests/v2/test_release_s2_kernel.py",
+   "targets": [
+    "aisef2/orchestrate/workspace.py::Checkout.__init__",
+    "aisef2/orchestrate/workspace.py::Checkout.release",
+    "aisef2/orchestrate/workspace.py::GitMerger.base",
+    "aisef2/orchestrate/workspace.py::GitMerger.merge",
+    "aisef2/orchestrate/workspace.py::GitMerger.revert",
+    "aisef2/orchestrate/workspace.py::GitWorkspace.checkout",
+    "aisef2/orchestrate/workspace.py::GitWorkspace.diff",
+    "aisef2/orchestrate/workspace.py::GitWorkspace.move",
+    "aisef2/orchestrate/workspace.py::GitWorkspace.scratch",
+    "aisef2/orchestrate/workspace.py::Scratch.__init__",
+    "aisef2/orchestrate/workspace.py::Scratch.release",
+    "aisef2/orchestrate/workspace.py::_NO_BACKGROUND_GIT",
+    "aisef2/orchestrate/workspace.py::_env",
+    "aisef2/orchestrate/workspace.py::_sha",
+    "aisef2/orchestrate/workspace.py::commit_all",
+    "aisef2/orchestrate/workspace.py::config_problems",
+    "aisef2/orchestrate/workspace.py::git"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_release_s2_kernel.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 7.04,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 16,
+     "first_test": "v2.test_release_s2_kernel.CheckoutMove.test_a_clean_that_fails_is_a_typed_refusal_and_the_checkout_keeps_its_revision",
+     "tail_sha256": "a5fdb440b3f5c36c1b0fa87691579c198a3317e89e4b578906abb0aa789c7473",
+     "overhead_s": 0.3
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 8.2
+  },
+  {
+   "key": "aisef2/orchestrate/workspace.py|91c0d067fd130017|tests/v2/test_s2_kills.py",
+   "module": "aisef2/orchestrate/workspace.py",
+   "null": "91c0d067fd130017f1ac2b15cea5e5909d8bd518f0c77a02289460f467c0b809",
+   "file": "tests/v2/test_s2_kills.py",
+   "targets": [
+    "aisef2/orchestrate/workspace.py::config_problems"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_s2_kills.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 23.13,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 43,
+     "first_test": "v2.test_s2_kills.AgentGuarded.test_the_controlled_fault_names_itself_in_its_message",
+     "tail_sha256": "0bd664af1b79df8fc95d7e4ab7fee01458ca96cf64aa0c3ba780bc5a70d2e7c3",
+     "overhead_s": 0.3
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 24.5
+  },
+  {
+   "key": "aisef2/orchestrate/workspace.py|91c0d067fd130017|tests/v2/test_v21_orchestration.py",
+   "module": "aisef2/orchestrate/workspace.py",
+   "null": "91c0d067fd130017f1ac2b15cea5e5909d8bd518f0c77a02289460f467c0b809",
+   "file": "tests/v2/test_v21_orchestration.py",
+   "targets": [
+    "aisef2/orchestrate/workspace.py::Checkout.__init__",
+    "aisef2/orchestrate/workspace.py::Checkout.release",
+    "aisef2/orchestrate/workspace.py::GitMerger.base",
+    "aisef2/orchestrate/workspace.py::GitMerger.merge",
+    "aisef2/orchestrate/workspace.py::GitMerger.revert",
+    "aisef2/orchestrate/workspace.py::GitWorkspace.checkout",
+    "aisef2/orchestrate/workspace.py::GitWorkspace.diff",
+    "aisef2/orchestrate/workspace.py::GitWorkspace.move",
+    "aisef2/orchestrate/workspace.py::GitWorkspace.scratch",
+    "aisef2/orchestrate/workspace.py::Scratch.__init__",
+    "aisef2/orchestrate/workspace.py::Scratch.release",
+    "aisef2/orchestrate/workspace.py::_NO_BACKGROUND_GIT",
+    "aisef2/orchestrate/workspace.py::_env",
+    "aisef2/orchestrate/workspace.py::_sha",
+    "aisef2/orchestrate/workspace.py::commit_all",
+    "aisef2/orchestrate/workspace.py::config_problems",
+    "aisef2/orchestrate/workspace.py::git"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_orchestration.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 19.95,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 5,
+     "first_test": "v2.test_v21_orchestration.DiffFailure.test_a_diff_git_cannot_produce_is_RESOURCE_ACQUISITION_FAILED",
+     "tail_sha256": "d98108615c826936f61b3f950e2497908312410746cf279162f8d7a35f24eac5",
+     "overhead_s": 0.29
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 21.1
+  },
+  {
+   "key": "aisef2/plan/static_admission.py|f99b61097b194dae|tests/v2/p2/test_static_admission.py",
+   "module": "aisef2/plan/static_admission.py",
+   "null": "f99b61097b194daede3ab3a866ad1dc46f0c4fe2e76a869c490bc32d279b233d",
+   "file": "tests/v2/p2/test_static_admission.py",
+   "targets": [
+    "aisef2/plan/static_admission.py::_cycle",
+    "aisef2/plan/static_admission.py::admit",
+    "aisef2/plan/static_admission.py::check_contract_spec_integrity",
+    "aisef2/plan/static_admission.py::check_contradictions",
+    "aisef2/plan/static_admission.py::check_dependency_dag",
+    "aisef2/plan/static_admission.py::check_ownership",
+    "aisef2/plan/static_admission.py::check_plan_structure",
+    "aisef2/plan/static_admission.py::check_probe_calibration",
+    "aisef2/plan/static_admission.py::check_proof_capability",
+    "aisef2/plan/static_admission.py::check_requirement_coverage",
+    "aisef2/plan/static_admission.py::check_traceability",
+    "aisef2/plan/static_admission.py::depends_on_story",
+    "aisef2/plan/static_admission.py::story_graph"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/p2/test_static_admission.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 0.24,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 27,
+     "first_test": "v2.p2.test_static_admission.Admission.test_1_requirement_coverage",
+     "tail_sha256": "047123d4194e0d62a5e63451c65838b94c375f088885b46c7a32588c8deef227",
+     "overhead_s": 0.29
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 1.5
+  },
+  {
+   "key": "aisef2/plan/static_admission.py|f99b61097b194dae|tests/v2/test_v21_identity.py",
+   "module": "aisef2/plan/static_admission.py",
+   "null": "f99b61097b194daede3ab3a866ad1dc46f0c4fe2e76a869c490bc32d279b233d",
+   "file": "tests/v2/test_v21_identity.py",
+   "targets": [
+    "aisef2/plan/static_admission.py::_cycle",
+    "aisef2/plan/static_admission.py::admit",
+    "aisef2/plan/static_admission.py::check_contract_spec_integrity",
+    "aisef2/plan/static_admission.py::check_contradictions",
+    "aisef2/plan/static_admission.py::check_dependency_dag",
+    "aisef2/plan/static_admission.py::check_ownership",
+    "aisef2/plan/static_admission.py::check_plan_structure",
+    "aisef2/plan/static_admission.py::check_probe_calibration",
+    "aisef2/plan/static_admission.py::check_proof_capability",
+    "aisef2/plan/static_admission.py::check_requirement_coverage",
+    "aisef2/plan/static_admission.py::check_traceability",
+    "aisef2/plan/static_admission.py::depends_on_story",
+    "aisef2/plan/static_admission.py::story_graph"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_identity.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 1.4,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 13,
+     "first_test": "v2.test_v21_identity.Migrate.test_a_spec_no_release_compiles_is_refused_not_guessed",
+     "tail_sha256": "55ff309bf7ddd8be199b014399f388efe1c20a5041ab190f563ffc170a57e475",
+     "overhead_s": 0.29
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 2.7
+  },
+  {
+   "key": "aisef2/probe/calibration.py|0a38c6715ef9e2f1|tests/v2/p2/test_calibration.py",
+   "module": "aisef2/probe/calibration.py",
+   "null": "0a38c6715ef9e2f19ad441a92db4af2b1e7dfc134513209053b9f911dfc69da1",
+   "file": "tests/v2/p2/test_calibration.py",
+   "targets": [
+    "aisef2/probe/calibration.py::calibrate",
+    "aisef2/probe/calibration.py::calibration_for",
+    "aisef2/probe/calibration.py::demonstrates_contrast",
+    "aisef2/probe/calibration.py::executing"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/p2/test_calibration.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 0.2,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 17,
+     "first_test": "v2.p2.test_calibration.Calibrate.test_CAL_1_an_always_REFUTED_prohibition_probe_is_rejected",
+     "tail_sha256": "d520f073b3708630e6dd3809f0b3927a8952feb0bff5bdebe533ade2280f2919",
+     "overhead_s": 0.3
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 1.5
+  },
+  {
+   "key": "aisef2/probe/calibration.py|0a38c6715ef9e2f1|tests/v2/test_v21_identity.py",
+   "module": "aisef2/probe/calibration.py",
+   "null": "0a38c6715ef9e2f19ad441a92db4af2b1e7dfc134513209053b9f911dfc69da1",
+   "file": "tests/v2/test_v21_identity.py",
+   "targets": [
+    "aisef2/probe/calibration.py::calibrate",
+    "aisef2/probe/calibration.py::calibration_for",
+    "aisef2/probe/calibration.py::demonstrates_contrast",
+    "aisef2/probe/calibration.py::executing"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_identity.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 1.37,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 13,
+     "first_test": "v2.test_v21_identity.Migrate.test_a_spec_no_release_compiles_is_refused_not_guessed",
+     "tail_sha256": "55ff309bf7ddd8be199b014399f388efe1c20a5041ab190f563ffc170a57e475",
+     "overhead_s": 0.29
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 2.6
+  },
+  {
+   "key": "aisef2/probe/cli_invocation.py|57892986d2da12a2|tests/v2/test_c2_cli_invocation.py",
+   "module": "aisef2/probe/cli_invocation.py",
+   "null": "57892986d2da12a240a169f200df3a3be9cde0a6975cf295570082587c770d66",
+   "file": "tests/v2/test_c2_cli_invocation.py",
+   "targets": [
+    "aisef2/probe/cli_invocation.py::AGENT/flush",
+    "aisef2/probe/cli_invocation.py::AGENT/guarded",
+    "aisef2/probe/cli_invocation.py::AGENT/op_bye",
+    "aisef2/probe/cli_invocation.py::AGENT/op_call",
+    "aisef2/probe/cli_invocation.py::AGENT/op_construct",
+    "aisef2/probe/cli_invocation.py::AGENT/op_import",
+    "aisef2/probe/cli_invocation.py::AGENT/op_invoke",
+    "aisef2/probe/cli_invocation.py::AGENT/op_resolve",
+    "aisef2/probe/cli_invocation.py::AGENT/op_value",
+    "aisef2/probe/cli_invocation.py::AGENT/plain",
+    "aisef2/probe/cli_invocation.py::AGENT/redirect",
+    "aisef2/probe/cli_invocation.py::AGENT/send",
+    "aisef2/probe/cli_invocation.py::AGENT/tagged"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_c2_cli_invocation.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 66.54,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 32,
+     "first_test": "v2.test_c2_cli_invocation.Bytecode.test_FM2_PYC_CLI_1_in_tree_stale_bytecode_with_a_matching_header_is_never_the_subject",
+     "tail_sha256": "6a5f8057fb90fa19f86d52c28bd6c466f4f2701451211146babe1d8799ca3419",
+     "overhead_s": 0.3
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 67.7
+  },
+  {
+   "key": "aisef2/probe/cli_invocation.py|57892986d2da12a2|tests/v2/test_c2_cli_protocol.py",
+   "module": "aisef2/probe/cli_invocation.py",
+   "null": "57892986d2da12a240a169f200df3a3be9cde0a6975cf295570082587c770d66",
+   "file": "tests/v2/test_c2_cli_protocol.py",
+   "targets": [
+    "aisef2/probe/cli_invocation.py::AGENT/flush",
+    "aisef2/probe/cli_invocation.py::AGENT/guarded",
+    "aisef2/probe/cli_invocation.py::AGENT/op_bye",
+    "aisef2/probe/cli_invocation.py::AGENT/op_call",
+    "aisef2/probe/cli_invocation.py::AGENT/op_construct",
+    "aisef2/probe/cli_invocation.py::AGENT/op_import",
+    "aisef2/probe/cli_invocation.py::AGENT/op_invoke",
+    "aisef2/probe/cli_invocation.py::AGENT/op_resolve",
+    "aisef2/probe/cli_invocation.py::AGENT/op_value",
+    "aisef2/probe/cli_invocation.py::AGENT/plain",
+    "aisef2/probe/cli_invocation.py::AGENT/redirect",
+    "aisef2/probe/cli_invocation.py::AGENT/send",
+    "aisef2/probe/cli_invocation.py::AGENT/tagged"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_c2_cli_protocol.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 61.97,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 18,
+     "first_test": "v2.test_c2_cli_protocol.AgentOps.test_every_op_answers_exactly",
+     "tail_sha256": "19d87abb143386ee94fc60c539269387431b204a81bbd830f036de02be3f7848",
+     "overhead_s": 0.3
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 63.3
+  },
+  {
+   "key": "aisef2/probe/cli_invocation.py|57892986d2da12a2|tests/v2/test_s2_kills.py",
+   "module": "aisef2/probe/cli_invocation.py",
+   "null": "57892986d2da12a240a169f200df3a3be9cde0a6975cf295570082587c770d66",
+   "file": "tests/v2/test_s2_kills.py",
+   "targets": [
+    "aisef2/probe/cli_invocation.py::AGENT/guarded",
+    "aisef2/probe/cli_invocation.py::AGENT/op_invoke",
+    "aisef2/probe/cli_invocation.py::AGENT/plain",
+    "aisef2/probe/cli_invocation.py::AGENT/send"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_s2_kills.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 23.14,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 43,
+     "first_test": "v2.test_s2_kills.AgentGuarded.test_the_controlled_fault_names_itself_in_its_message",
+     "tail_sha256": "0bd664af1b79df8fc95d7e4ab7fee01458ca96cf64aa0c3ba780bc5a70d2e7c3",
+     "overhead_s": 0.29
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 24.5
+  },
+  {
+   "key": "aisef2/probe/cli_invocation.py|57892986d2da12a2|tests/v2/test_s2_kills_k.py",
+   "module": "aisef2/probe/cli_invocation.py",
+   "null": "57892986d2da12a240a169f200df3a3be9cde0a6975cf295570082587c770d66",
+   "file": "tests/v2/test_s2_kills_k.py",
+   "targets": [
+    "aisef2/probe/cli_invocation.py::AGENT/send"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_s2_kills_k.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 0.48,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 3,
+     "first_test": "tests.v2.test_s2_kills.AgentSend.test_the_ready_answer_is_one_whole_line",
+     "tail_sha256": "64240f48648ad3072f00eb8ba3ed5b9900f50f5c7fd375816fbdb0e38fa08338",
+     "overhead_s": 0.29
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 1.7
+  },
+  {
+   "key": "aisef2/probe/cli_invocation.py|57892986d2da12a2|tests/v2/test_v21_identity.py",
+   "module": "aisef2/probe/cli_invocation.py",
+   "null": "57892986d2da12a240a169f200df3a3be9cde0a6975cf295570082587c770d66",
+   "file": "tests/v2/test_v21_identity.py",
+   "targets": [
+    "aisef2/probe/cli_invocation.py::AGENT/flush",
+    "aisef2/probe/cli_invocation.py::AGENT/guarded",
+    "aisef2/probe/cli_invocation.py::AGENT/op_bye",
+    "aisef2/probe/cli_invocation.py::AGENT/op_call",
+    "aisef2/probe/cli_invocation.py::AGENT/op_construct",
+    "aisef2/probe/cli_invocation.py::AGENT/op_import",
+    "aisef2/probe/cli_invocation.py::AGENT/op_invoke",
+    "aisef2/probe/cli_invocation.py::AGENT/op_resolve",
+    "aisef2/probe/cli_invocation.py::AGENT/op_value",
+    "aisef2/probe/cli_invocation.py::AGENT/plain",
+    "aisef2/probe/cli_invocation.py::AGENT/redirect",
+    "aisef2/probe/cli_invocation.py::AGENT/send",
+    "aisef2/probe/cli_invocation.py::AGENT/tagged"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_identity.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 1.38,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 13,
+     "first_test": "v2.test_v21_identity.Migrate.test_a_spec_no_release_compiles_is_refused_not_guessed",
+     "tail_sha256": "55ff309bf7ddd8be199b014399f388efe1c20a5041ab190f563ffc170a57e475",
+     "overhead_s": 0.29
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 2.5
+  },
+  {
+   "key": "aisef2/probe/cli_invocation.py|7c746ff8760de6c8|tests/v2/test_c2_cli_invocation.py",
+   "module": "aisef2/probe/cli_invocation.py",
+   "null": "7c746ff8760de6c8920584b24f191eb8e9db6897de4aac8a4fab0b8f82c739a4",
+   "file": "tests/v2/test_c2_cli_invocation.py",
+   "targets": [
+    "aisef2/probe/cli_invocation.py::HARNESS/answer_to",
+    "aisef2/probe/cli_invocation.py::HARNESS/ask",
+    "aisef2/probe/cli_invocation.py::HARNESS/conclude",
+    "aisef2/probe/cli_invocation.py::HARNESS/deadline",
+    "aisef2/probe/cli_invocation.py::HARNESS/emit",
+    "aisef2/probe/cli_invocation.py::HARNESS/ended",
+    "aisef2/probe/cli_invocation.py::HARNESS/file_fact",
+    "aisef2/probe/cli_invocation.py::HARNESS/finish",
+    "aisef2/probe/cli_invocation.py::HARNESS/inside",
+    "aisef2/probe/cli_invocation.py::HARNESS/invoke",
+    "aisef2/probe/cli_invocation.py::HARNESS/main",
+    "aisef2/probe/cli_invocation.py::HARNESS/resolve",
+    "aisef2/probe/cli_invocation.py::HARNESS/sha",
+    "aisef2/probe/cli_invocation.py::HARNESS/stream_fact"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_c2_cli_invocation.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 66.25,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 32,
+     "first_test": "v2.test_c2_cli_invocation.Bytecode.test_FM2_PYC_CLI_1_in_tree_stale_bytecode_with_a_matching_header_is_never_the_subject",
+     "tail_sha256": "6a5f8057fb90fa19f86d52c28bd6c466f4f2701451211146babe1d8799ca3419",
+     "overhead_s": 0.3
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 67.5
+  },
+  {
+   "key": "aisef2/probe/cli_invocation.py|7c746ff8760de6c8|tests/v2/test_c2_cli_protocol.py",
+   "module": "aisef2/probe/cli_invocation.py",
+   "null": "7c746ff8760de6c8920584b24f191eb8e9db6897de4aac8a4fab0b8f82c739a4",
+   "file": "tests/v2/test_c2_cli_protocol.py",
+   "targets": [
+    "aisef2/probe/cli_invocation.py::HARNESS/answer_to",
+    "aisef2/probe/cli_invocation.py::HARNESS/ask",
+    "aisef2/probe/cli_invocation.py::HARNESS/conclude",
+    "aisef2/probe/cli_invocation.py::HARNESS/deadline",
+    "aisef2/probe/cli_invocation.py::HARNESS/emit",
+    "aisef2/probe/cli_invocation.py::HARNESS/ended",
+    "aisef2/probe/cli_invocation.py::HARNESS/file_fact",
+    "aisef2/probe/cli_invocation.py::HARNESS/finish",
+    "aisef2/probe/cli_invocation.py::HARNESS/inside",
+    "aisef2/probe/cli_invocation.py::HARNESS/invoke",
+    "aisef2/probe/cli_invocation.py::HARNESS/main",
+    "aisef2/probe/cli_invocation.py::HARNESS/resolve",
+    "aisef2/probe/cli_invocation.py::HARNESS/sha",
+    "aisef2/probe/cli_invocation.py::HARNESS/stream_fact"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_c2_cli_protocol.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 62.2,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 18,
+     "first_test": "v2.test_c2_cli_protocol.AgentOps.test_every_op_answers_exactly",
+     "tail_sha256": "19d87abb143386ee94fc60c539269387431b204a81bbd830f036de02be3f7848",
+     "overhead_s": 0.34
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 63.5
+  },
+  {
+   "key": "aisef2/probe/cli_invocation.py|7c746ff8760de6c8|tests/v2/test_v21_identity.py",
+   "module": "aisef2/probe/cli_invocation.py",
+   "null": "7c746ff8760de6c8920584b24f191eb8e9db6897de4aac8a4fab0b8f82c739a4",
+   "file": "tests/v2/test_v21_identity.py",
+   "targets": [
+    "aisef2/probe/cli_invocation.py::HARNESS/answer_to",
+    "aisef2/probe/cli_invocation.py::HARNESS/ask",
+    "aisef2/probe/cli_invocation.py::HARNESS/conclude",
+    "aisef2/probe/cli_invocation.py::HARNESS/deadline",
+    "aisef2/probe/cli_invocation.py::HARNESS/emit",
+    "aisef2/probe/cli_invocation.py::HARNESS/ended",
+    "aisef2/probe/cli_invocation.py::HARNESS/file_fact",
+    "aisef2/probe/cli_invocation.py::HARNESS/finish",
+    "aisef2/probe/cli_invocation.py::HARNESS/inside",
+    "aisef2/probe/cli_invocation.py::HARNESS/invoke",
+    "aisef2/probe/cli_invocation.py::HARNESS/main",
+    "aisef2/probe/cli_invocation.py::HARNESS/resolve",
+    "aisef2/probe/cli_invocation.py::HARNESS/sha",
+    "aisef2/probe/cli_invocation.py::HARNESS/stream_fact"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_identity.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 1.38,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 13,
+     "first_test": "v2.test_v21_identity.Migrate.test_a_spec_no_release_compiles_is_refused_not_guessed",
+     "tail_sha256": "55ff309bf7ddd8be199b014399f388efe1c20a5041ab190f563ffc170a57e475",
+     "overhead_s": 0.29
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 2.6
+  },
+  {
+   "key": "aisef2/probe/cli_invocation.py|f05962df81d80685|tests/v2/test_c2_cli_calibration.py",
+   "module": "aisef2/probe/cli_invocation.py",
+   "null": "f05962df81d80685ca09918443bf7691c93f0470e49fde8f71020eca617ec9e6",
+   "file": "tests/v2/test_c2_cli_calibration.py",
+   "targets": [
+    "aisef2/probe/cli_invocation.py::CliInvocationProbe._observe_equality",
+    "aisef2/probe/cli_invocation.py::DIGEST"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_c2_cli_calibration.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 38.23,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 3,
+     "first_test": "v2.test_c2_cli_calibration.Equality.test_CLICAL_3_two_invocations_the_comparator_the_normalisation_and_the_swap",
+     "tail_sha256": "8e0c16626c591dd09bb8baef121a6a367de8ab28c290c42d0b0f156e32ec793a",
+     "overhead_s": 0.3
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 41.1
+  },
+  {
+   "key": "aisef2/probe/cli_invocation.py|f05962df81d80685|tests/v2/test_c2_cli_invocation.py",
+   "module": "aisef2/probe/cli_invocation.py",
+   "null": "f05962df81d80685ca09918443bf7691c93f0470e49fde8f71020eca617ec9e6",
+   "file": "tests/v2/test_c2_cli_invocation.py",
+   "targets": [
+    "aisef2/probe/cli_invocation.py::CliInvocationProbe.__init__",
+    "aisef2/probe/cli_invocation.py::CliInvocationProbe._observe",
+    "aisef2/probe/cli_invocation.py::CliInvocationProbe._observe_in",
+    "aisef2/probe/cli_invocation.py::CliInvocationProbe.observe",
+    "aisef2/probe/cli_invocation.py::PROBE_SOURCES",
+    "aisef2/probe/cli_invocation.py::_await",
+    "aisef2/probe/cli_invocation.py::_concluded",
+    "aisef2/probe/cli_invocation.py::_deadline",
+    "aisef2/probe/cli_invocation.py::_disposed",
+    "aisef2/probe/cli_invocation.py::_harness_argv",
+    "aisef2/probe/cli_invocation.py::_harness_failure",
+    "aisef2/probe/cli_invocation.py::_mac",
+    "aisef2/probe/cli_invocation.py::_no_result",
+    "aisef2/probe/cli_invocation.py::_preflight",
+    "aisef2/probe/cli_invocation.py::_probe_digest",
+    "aisef2/probe/cli_invocation.py::_silent",
+    "aisef2/probe/cli_invocation.py::_watch"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_c2_cli_invocation.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 66.08,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 32,
+     "first_test": "v2.test_c2_cli_invocation.Bytecode.test_FM2_PYC_CLI_1_in_tree_stale_bytecode_with_a_matching_header_is_never_the_subject",
+     "tail_sha256": "6a5f8057fb90fa19f86d52c28bd6c466f4f2701451211146babe1d8799ca3419",
+     "overhead_s": 0.3
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 67.3
+  },
+  {
+   "key": "aisef2/probe/cli_invocation.py|f05962df81d80685|tests/v2/test_c2_cli_protocol.py",
+   "module": "aisef2/probe/cli_invocation.py",
+   "null": "f05962df81d80685ca09918443bf7691c93f0470e49fde8f71020eca617ec9e6",
+   "file": "tests/v2/test_c2_cli_protocol.py",
+   "targets": [
+    "aisef2/probe/cli_invocation.py::CliInvocationProbe.__init__",
+    "aisef2/probe/cli_invocation.py::CliInvocationProbe._observe",
+    "aisef2/probe/cli_invocation.py::CliInvocationProbe._observe_equality",
+    "aisef2/probe/cli_invocation.py::CliInvocationProbe._observe_in",
+    "aisef2/probe/cli_invocation.py::CliInvocationProbe.observe",
+    "aisef2/probe/cli_invocation.py::PROBE_SOURCES",
+    "aisef2/probe/cli_invocation.py::_await",
+    "aisef2/probe/cli_invocation.py::_concluded",
+    "aisef2/probe/cli_invocation.py::_deadline",
+    "aisef2/probe/cli_invocation.py::_disposed",
+    "aisef2/probe/cli_invocation.py::_harness_argv",
+    "aisef2/probe/cli_invocation.py::_harness_failure",
+    "aisef2/probe/cli_invocation.py::_mac",
+    "aisef2/probe/cli_invocation.py::_no_result",
+    "aisef2/probe/cli_invocation.py::_preflight",
+    "aisef2/probe/cli_invocation.py::_probe_digest",
+    "aisef2/probe/cli_invocation.py::_silent",
+    "aisef2/probe/cli_invocation.py::_watch"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_c2_cli_protocol.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 61.99,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 18,
+     "first_test": "v2.test_c2_cli_protocol.AgentOps.test_every_op_answers_exactly",
+     "tail_sha256": "19d87abb143386ee94fc60c539269387431b204a81bbd830f036de02be3f7848",
+     "overhead_s": 0.3
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 63.5
+  },
+  {
+   "key": "aisef2/probe/cli_invocation.py|f05962df81d80685|tests/v2/test_c2_cli_verdicts.py",
+   "module": "aisef2/probe/cli_invocation.py",
+   "null": "f05962df81d80685ca09918443bf7691c93f0470e49fde8f71020eca617ec9e6",
+   "file": "tests/v2/test_c2_cli_verdicts.py",
+   "targets": [
+    "aisef2/probe/cli_invocation.py::CLASSES",
+    "aisef2/probe/cli_invocation.py::CLASS_TABLE",
+    "aisef2/probe/cli_invocation.py::COMPARATORS",
+    "aisef2/probe/cli_invocation.py::CliInvocationProbe.enforcement",
+    "aisef2/probe/cli_invocation.py::CliInvocationProbe.harness_preconditions",
+    "aisef2/probe/cli_invocation.py::FILE_SHAPES",
+    "aisef2/probe/cli_invocation.py::ON_DEADLINE",
+    "aisef2/probe/cli_invocation.py::QUANTIFIERS",
+    "aisef2/probe/cli_invocation.py::STREAM_SHAPES",
+    "aisef2/probe/cli_invocation.py::_argv_ok",
+    "aisef2/probe/cli_invocation.py::_bytes_of",
+    "aisef2/probe/cli_invocation.py::_child_env",
+    "aisef2/probe/cli_invocation.py::_content_ok",
+    "aisef2/probe/cli_invocation.py::_equal",
+    "aisef2/probe/cli_invocation.py::_equality_ok",
+    "aisef2/probe/cli_invocation.py::_equality_verdict",
+    "aisef2/probe/cli_invocation.py::_file_fact",
+    "aisef2/probe/cli_invocation.py::_file_matches",
+    "aisef2/probe/cli_invocation.py::_file_shape_ok",
+    "aisef2/probe/cli_invocation.py::_half_ok",
+    "aisef2/probe/cli_invocation.py::_harness_argv",
+    "aisef2/probe/cli_invocation.py::_is_int",
+    "aisef2/probe/cli_invocation.py::_mac",
+    "aisef2/probe/cli_invocation.py::_name_ok",
+    "aisef2/probe/cli_invocation.py::_normalization_ok",
+    "aisef2/probe/cli_invocation.py::_normalize",
+    "aisef2/probe/cli_invocation.py::_prepare",
+    "aisef2/probe/cli_invocation.py::_protocol",
+    "aisef2/probe/cli_invocation.py::_public",
+    "aisef2/probe/cli_invocation.py::_sha_file",
+    "aisef2/probe/cli_invocation.py::_stimulus_ok",
+    "aisef2/probe/cli_invocation.py::_stream_bytes",
+    "aisef2/probe/cli_invocation.py::_stream_fact",
+    "aisef2/probe/cli_invocation.py::_stream_matches",
+    "aisef2/probe/cli_invocation.py::_stream_shape_ok",
+    "aisef2/probe/cli_invocation.py::_streams_ok",
+    "aisef2/probe/cli_invocation.py::_substitute",
+    "aisef2/probe/cli_invocation.py::_ws_key_ok",
+    "aisef2/probe/cli_invocation.py::_ws_name",
+    "aisef2/probe/cli_invocation.py::observation_class",
+    "aisef2/probe/cli_invocation.py::spec_class",
+    "aisef2/probe/cli_invocation.py::verdict_of"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_c2_cli_verdicts.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 0.36,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 19,
+     "first_test": "v2.test_c2_cli_verdicts.Classes.test_contents_are_byte_exact",
+     "tail_sha256": "76bcb148af5469f5f16f08a5484311969de749ea3c8b5f9d2a0c5a1d8226f5d9",
+     "overhead_s": 0.3
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 1.8
+  },
+  {
+   "key": "aisef2/probe/cli_invocation.py|f05962df81d80685|tests/v2/test_v21_identity.py",
+   "module": "aisef2/probe/cli_invocation.py",
+   "null": "f05962df81d80685ca09918443bf7691c93f0470e49fde8f71020eca617ec9e6",
+   "file": "tests/v2/test_v21_identity.py",
+   "targets": [
+    "aisef2/probe/cli_invocation.py::CLASSES",
+    "aisef2/probe/cli_invocation.py::CLASS_TABLE",
+    "aisef2/probe/cli_invocation.py::COMPARATORS",
+    "aisef2/probe/cli_invocation.py::CliInvocationProbe.__init__",
+    "aisef2/probe/cli_invocation.py::CliInvocationProbe._observe",
+    "aisef2/probe/cli_invocation.py::CliInvocationProbe._observe_equality",
+    "aisef2/probe/cli_invocation.py::CliInvocationProbe._observe_in",
+    "aisef2/probe/cli_invocation.py::CliInvocationProbe.enforcement",
+    "aisef2/probe/cli_invocation.py::CliInvocationProbe.harness_preconditions",
+    "aisef2/probe/cli_invocation.py::CliInvocationProbe.observe",
+    "aisef2/probe/cli_invocation.py::DIGEST",
+    "aisef2/probe/cli_invocation.py::FILE_SHAPES",
+    "aisef2/probe/cli_invocation.py::ON_DEADLINE",
+    "aisef2/probe/cli_invocation.py::PROBE_SOURCES",
+    "aisef2/probe/cli_invocation.py::QUANTIFIERS",
+    "aisef2/probe/cli_invocation.py::STREAM_SHAPES",
+    "aisef2/probe/cli_invocation.py::_argv_ok",
+    "aisef2/probe/cli_invocation.py::_await",
+    "aisef2/probe/cli_invocation.py::_bytes_of",
+    "aisef2/probe/cli_invocation.py::_child_env",
+    "aisef2/probe/cli_invocation.py::_concluded",
+    "aisef2/probe/cli_invocation.py::_content_ok",
+    "aisef2/probe/cli_invocation.py::_deadline",
+    "aisef2/probe/cli_invocation.py::_disposed",
+    "aisef2/probe/cli_invocation.py::_equal",
+    "aisef2/probe/cli_invocation.py::_equality_ok",
+    "aisef2/probe/cli_invocation.py::_equality_verdict",
+    "aisef2/probe/cli_invocation.py::_file_fact",
+    "aisef2/probe/cli_invocation.py::_file_matches",
+    "aisef2/probe/cli_invocation.py::_file_shape_ok",
+    "aisef2/probe/cli_invocation.py::_half_ok",
+    "aisef2/probe/cli_invocation.py::_harness_argv",
+    "aisef2/probe/cli_invocation.py::_harness_failure",
+    "aisef2/probe/cli_invocation.py::_is_int",
+    "aisef2/probe/cli_invocation.py::_mac",
+    "aisef2/probe/cli_invocation.py::_name_ok",
+    "aisef2/probe/cli_invocation.py::_no_result",
+    "aisef2/probe/cli_invocation.py::_normalization_ok",
+    "aisef2/probe/cli_invocation.py::_normalize",
+    "aisef2/probe/cli_invocation.py::_preflight",
+    "aisef2/probe/cli_invocation.py::_prepare",
+    "aisef2/probe/cli_invocation.py::_probe_digest",
+    "aisef2/probe/cli_invocation.py::_protocol",
+    "aisef2/probe/cli_invocation.py::_public",
+    "aisef2/probe/cli_invocation.py::_sha_file",
+    "aisef2/probe/cli_invocation.py::_silent",
+    "aisef2/probe/cli_invocation.py::_stimulus_ok",
+    "aisef2/probe/cli_invocation.py::_stream_bytes",
+    "aisef2/probe/cli_invocation.py::_stream_fact",
+    "aisef2/probe/cli_invocation.py::_stream_matches",
+    "aisef2/probe/cli_invocation.py::_stream_shape_ok",
+    "aisef2/probe/cli_invocation.py::_streams_ok",
+    "aisef2/probe/cli_invocation.py::_substitute",
+    "aisef2/probe/cli_invocation.py::_watch",
+    "aisef2/probe/cli_invocation.py::_ws_key_ok",
+    "aisef2/probe/cli_invocation.py::_ws_name",
+    "aisef2/probe/cli_invocation.py::observation_class",
+    "aisef2/probe/cli_invocation.py::spec_class",
+    "aisef2/probe/cli_invocation.py::verdict_of"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_identity.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 1.37,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 13,
+     "first_test": "v2.test_v21_identity.Migrate.test_a_spec_no_release_compiles_is_refused_not_guessed",
+     "tail_sha256": "55ff309bf7ddd8be199b014399f388efe1c20a5041ab190f563ffc170a57e475",
+     "overhead_s": 0.29
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 2.6
+  },
+  {
+   "key": "aisef2/probe/file_artifact.py|2269be72bbf3cfd0|tests/v2/test_c2_file_artifact.py",
+   "module": "aisef2/probe/file_artifact.py",
+   "null": "2269be72bbf3cfd0f41c6189c696bad2fa7403b91596a152cfe54cc3edd7e5b5",
+   "file": "tests/v2/test_c2_file_artifact.py",
+   "targets": [
+    "aisef2/probe/file_artifact.py::CLASSES",
+    "aisef2/probe/file_artifact.py::DIGEST",
+    "aisef2/probe/file_artifact.py::FileArtifactProbe.__init__",
+    "aisef2/probe/file_artifact.py::FileArtifactProbe._reader",
+    "aisef2/probe/file_artifact.py::FileArtifactProbe.enforcement",
+    "aisef2/probe/file_artifact.py::FileArtifactProbe.harness_preconditions",
+    "aisef2/probe/file_artifact.py::FileArtifactProbe.observe",
+    "aisef2/probe/file_artifact.py::MODES",
+    "aisef2/probe/file_artifact.py::NEWLINES",
+    "aisef2/probe/file_artifact.py::ON_DEADLINE",
+    "aisef2/probe/file_artifact.py::ObjectStore.__init__",
+    "aisef2/probe/file_artifact.py::ObjectStore._parse",
+    "aisef2/probe/file_artifact.py::ObjectStore.blob",
+    "aisef2/probe/file_artifact.py::ObjectStore.entries",
+    "aisef2/probe/file_artifact.py::ObjectStore.holds_revision",
+    "aisef2/probe/file_artifact.py::ObjectStore.lookup",
+    "aisef2/probe/file_artifact.py::ObjectStore.run",
+    "aisef2/probe/file_artifact.py::ObjectStore.walk",
+    "aisef2/probe/file_artifact.py::PROBE_SOURCES",
+    "aisef2/probe/file_artifact.py::PlainTree._full",
+    "aisef2/probe/file_artifact.py::PlainTree._row",
+    "aisef2/probe/file_artifact.py::PlainTree.blob",
+    "aisef2/probe/file_artifact.py::PlainTree.entries",
+    "aisef2/probe/file_artifact.py::PlainTree.lookup",
+    "aisef2/probe/file_artifact.py::PlainTree.walk",
+    "aisef2/probe/file_artifact.py::_HEX64",
+    "aisef2/probe/file_artifact.py::_MODULE_NAME",
+    "aisef2/probe/file_artifact.py::_compiles",
+    "aisef2/probe/file_artifact.py::_probe_digest",
+    "aisef2/probe/file_artifact.py::content_facts",
+    "aisef2/probe/file_artifact.py::entry",
+    "aisef2/probe/file_artifact.py::expected_sha256",
+    "aisef2/probe/file_artifact.py::facts_of",
+    "aisef2/probe/file_artifact.py::git_env",
+    "aisef2/probe/file_artifact.py::grep_facts",
+    "aisef2/probe/file_artifact.py::import_facts",
+    "aisef2/probe/file_artifact.py::normalised",
+    "aisef2/probe/file_artifact.py::observation_class",
+    "aisef2/probe/file_artifact.py::read",
+    "aisef2/probe/file_artifact.py::refusal",
+    "aisef2/probe/file_artifact.py::run_git",
+    "aisef2/probe/file_artifact.py::selected",
+    "aisef2/probe/file_artifact.py::spec_class",
+    "aisef2/probe/file_artifact.py::verdict_of",
+    "aisef2/probe/file_artifact.py::window_of"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_c2_file_artifact.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 4.73,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 40,
+     "first_test": "v2.test_c2_file_artifact.Absence.test_FA_2_REQUIRES_SUBJECT_drops_the_offered_verdict",
+     "tail_sha256": "694592009b56ffae706b02efe29820306e7b4d80b48b0331c588634d8ba506bf",
+     "overhead_s": 0.29
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 5.9
+  },
+  {
+   "key": "aisef2/probe/file_artifact.py|2269be72bbf3cfd0|tests/v2/test_v21_identity.py",
+   "module": "aisef2/probe/file_artifact.py",
+   "null": "2269be72bbf3cfd0f41c6189c696bad2fa7403b91596a152cfe54cc3edd7e5b5",
+   "file": "tests/v2/test_v21_identity.py",
+   "targets": [
+    "aisef2/probe/file_artifact.py::CLASSES",
+    "aisef2/probe/file_artifact.py::DIGEST",
+    "aisef2/probe/file_artifact.py::FileArtifactProbe.__init__",
+    "aisef2/probe/file_artifact.py::FileArtifactProbe._reader",
+    "aisef2/probe/file_artifact.py::FileArtifactProbe.enforcement",
+    "aisef2/probe/file_artifact.py::FileArtifactProbe.harness_preconditions",
+    "aisef2/probe/file_artifact.py::FileArtifactProbe.observe",
+    "aisef2/probe/file_artifact.py::MODES",
+    "aisef2/probe/file_artifact.py::NEWLINES",
+    "aisef2/probe/file_artifact.py::ON_DEADLINE",
+    "aisef2/probe/file_artifact.py::ObjectStore.__init__",
+    "aisef2/probe/file_artifact.py::ObjectStore._parse",
+    "aisef2/probe/file_artifact.py::ObjectStore.blob",
+    "aisef2/probe/file_artifact.py::ObjectStore.entries",
+    "aisef2/probe/file_artifact.py::ObjectStore.holds_revision",
+    "aisef2/probe/file_artifact.py::ObjectStore.lookup",
+    "aisef2/probe/file_artifact.py::ObjectStore.run",
+    "aisef2/probe/file_artifact.py::ObjectStore.walk",
+    "aisef2/probe/file_artifact.py::PROBE_SOURCES",
+    "aisef2/probe/file_artifact.py::PlainTree._full",
+    "aisef2/probe/file_artifact.py::PlainTree._row",
+    "aisef2/probe/file_artifact.py::PlainTree.blob",
+    "aisef2/probe/file_artifact.py::PlainTree.entries",
+    "aisef2/probe/file_artifact.py::PlainTree.lookup",
+    "aisef2/probe/file_artifact.py::PlainTree.walk",
+    "aisef2/probe/file_artifact.py::_HEX64",
+    "aisef2/probe/file_artifact.py::_MODULE_NAME",
+    "aisef2/probe/file_artifact.py::_compiles",
+    "aisef2/probe/file_artifact.py::_probe_digest",
+    "aisef2/probe/file_artifact.py::content_facts",
+    "aisef2/probe/file_artifact.py::entry",
+    "aisef2/probe/file_artifact.py::expected_sha256",
+    "aisef2/probe/file_artifact.py::facts_of",
+    "aisef2/probe/file_artifact.py::git_env",
+    "aisef2/probe/file_artifact.py::grep_facts",
+    "aisef2/probe/file_artifact.py::import_facts",
+    "aisef2/probe/file_artifact.py::normalised",
+    "aisef2/probe/file_artifact.py::observation_class",
+    "aisef2/probe/file_artifact.py::read",
+    "aisef2/probe/file_artifact.py::refusal",
+    "aisef2/probe/file_artifact.py::run_git",
+    "aisef2/probe/file_artifact.py::selected",
+    "aisef2/probe/file_artifact.py::spec_class",
+    "aisef2/probe/file_artifact.py::verdict_of",
+    "aisef2/probe/file_artifact.py::window_of"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_identity.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 1.39,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 13,
+     "first_test": "v2.test_v21_identity.Migrate.test_a_spec_no_release_compiles_is_refused_not_guessed",
+     "tail_sha256": "55ff309bf7ddd8be199b014399f388efe1c20a5041ab190f563ffc170a57e475",
+     "overhead_s": 0.29
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 2.6
+  },
+  {
+   "key": "aisef2/probe/file_artifact.py|2269be72bbf3cfd0|tests/v2/test_v21_python_imports.py",
+   "module": "aisef2/probe/file_artifact.py",
+   "null": "2269be72bbf3cfd0f41c6189c696bad2fa7403b91596a152cfe54cc3edd7e5b5",
+   "file": "tests/v2/test_v21_python_imports.py",
+   "targets": [
+    "aisef2/probe/file_artifact.py::CLASSES",
+    "aisef2/probe/file_artifact.py::DIGEST",
+    "aisef2/probe/file_artifact.py::FileArtifactProbe.__init__",
+    "aisef2/probe/file_artifact.py::FileArtifactProbe._reader",
+    "aisef2/probe/file_artifact.py::FileArtifactProbe.enforcement",
+    "aisef2/probe/file_artifact.py::FileArtifactProbe.harness_preconditions",
+    "aisef2/probe/file_artifact.py::FileArtifactProbe.observe",
+    "aisef2/probe/file_artifact.py::MODES",
+    "aisef2/probe/file_artifact.py::NEWLINES",
+    "aisef2/probe/file_artifact.py::ON_DEADLINE",
+    "aisef2/probe/file_artifact.py::ObjectStore.__init__",
+    "aisef2/probe/file_artifact.py::ObjectStore._parse",
+    "aisef2/probe/file_artifact.py::ObjectStore.blob",
+    "aisef2/probe/file_artifact.py::ObjectStore.entries",
+    "aisef2/probe/file_artifact.py::ObjectStore.holds_revision",
+    "aisef2/probe/file_artifact.py::ObjectStore.lookup",
+    "aisef2/probe/file_artifact.py::ObjectStore.run",
+    "aisef2/probe/file_artifact.py::ObjectStore.walk",
+    "aisef2/probe/file_artifact.py::PROBE_SOURCES",
+    "aisef2/probe/file_artifact.py::PlainTree._full",
+    "aisef2/probe/file_artifact.py::PlainTree._row",
+    "aisef2/probe/file_artifact.py::PlainTree.blob",
+    "aisef2/probe/file_artifact.py::PlainTree.entries",
+    "aisef2/probe/file_artifact.py::PlainTree.lookup",
+    "aisef2/probe/file_artifact.py::PlainTree.walk",
+    "aisef2/probe/file_artifact.py::_HEX64",
+    "aisef2/probe/file_artifact.py::_MODULE_NAME",
+    "aisef2/probe/file_artifact.py::_compiles",
+    "aisef2/probe/file_artifact.py::_probe_digest",
+    "aisef2/probe/file_artifact.py::content_facts",
+    "aisef2/probe/file_artifact.py::entry",
+    "aisef2/probe/file_artifact.py::expected_sha256",
+    "aisef2/probe/file_artifact.py::facts_of",
+    "aisef2/probe/file_artifact.py::git_env",
+    "aisef2/probe/file_artifact.py::grep_facts",
+    "aisef2/probe/file_artifact.py::import_facts",
+    "aisef2/probe/file_artifact.py::normalised",
+    "aisef2/probe/file_artifact.py::observation_class",
+    "aisef2/probe/file_artifact.py::read",
+    "aisef2/probe/file_artifact.py::refusal",
+    "aisef2/probe/file_artifact.py::run_git",
+    "aisef2/probe/file_artifact.py::selected",
+    "aisef2/probe/file_artifact.py::spec_class",
+    "aisef2/probe/file_artifact.py::verdict_of",
+    "aisef2/probe/file_artifact.py::window_of"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_python_imports.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 0.52,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 5,
+     "first_test": "v2.test_v21_python_imports.Controls.test_a_file_that_does_not_parse_is_no_count",
+     "tail_sha256": "365d86a4e747d29452bf4b333a94d607fc4dab1405f9ee3ddefd619d0ab3185e",
+     "overhead_s": 0.3
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 1.7
+  },
+  {
+   "key": "aisef2/probe/process_effect.py|323c400d49681e4e|tests/v2/test_probe_process_effect.py",
+   "module": "aisef2/probe/process_effect.py",
+   "null": "323c400d49681e4ece58205e685cd3e779e7a96ab3638cc56d02905f7cd85069",
+   "file": "tests/v2/test_probe_process_effect.py",
+   "targets": [
+    "aisef2/probe/process_effect.py::HARNESS/answer_to",
+    "aisef2/probe/process_effect.py::HARNESS/answered",
+    "aisef2/probe/process_effect.py::HARNESS/ask",
+    "aisef2/probe/process_effect.py::HARNESS/count_lines",
+    "aisef2/probe/process_effect.py::HARNESS/do_call",
+    "aisef2/probe/process_effect.py::HARNESS/do_construct",
+    "aisef2/probe/process_effect.py::HARNESS/do_edit",
+    "aisef2/probe/process_effect.py::HARNESS/do_expect",
+    "aisef2/probe/process_effect.py::HARNESS/do_fault",
+    "aisef2/probe/process_effect.py::HARNESS/do_subprocess",
+    "aisef2/probe/process_effect.py::HARNESS/do_workspace",
+    "aisef2/probe/process_effect.py::HARNESS/do_write",
+    "aisef2/probe/process_effect.py::HARNESS/emit",
+    "aisef2/probe/process_effect.py::HARNESS/ended",
+    "aisef2/probe/process_effect.py::HARNESS/file_fact",
+    "aisef2/probe/process_effect.py::HARNESS/files_now",
+    "aisef2/probe/process_effect.py::HARNESS/finish",
+    "aisef2/probe/process_effect.py::HARNESS/guarded",
+    "aisef2/probe/process_effect.py::HARNESS/identity",
+    "aisef2/probe/process_effect.py::HARNESS/inside",
+    "aisef2/probe/process_effect.py::HARNESS/main",
+    "aisef2/probe/process_effect.py::HARNESS/reported",
+    "aisef2/probe/process_effect.py::HARNESS/resolve",
+    "aisef2/probe/process_effect.py::HARNESS/row_of",
+    "aisef2/probe/process_effect.py::HARNESS/run",
+    "aisef2/probe/process_effect.py::HARNESS/same",
+    "aisef2/probe/process_effect.py::HARNESS/subject_call",
+    "aisef2/probe/process_effect.py::HARNESS/unresolved",
+    "aisef2/probe/process_effect.py::HARNESS/unws"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_probe_process_effect.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 41.32,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 24,
+     "first_test": "v2.test_probe_process_effect.Adversarial.test_PE_ADV_1_an_unknown_or_malformed_step_is_INVALID_SPEC_through_run_probe_and_refused_at_admission",
+     "tail_sha256": "645e32ee4a6f9fe16853ed1848db74a049ef65ac7006ef11ba1f7b7e09fd8c56",
+     "overhead_s": 0.29
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 42.7
+  },
+  {
+   "key": "aisef2/probe/process_effect.py|323c400d49681e4e|tests/v2/test_probe_process_effect_bytecode.py",
+   "module": "aisef2/probe/process_effect.py",
+   "null": "323c400d49681e4ece58205e685cd3e779e7a96ab3638cc56d02905f7cd85069",
+   "file": "tests/v2/test_probe_process_effect_bytecode.py",
+   "targets": [
+    "aisef2/probe/process_effect.py::HARNESS/answer_to",
+    "aisef2/probe/process_effect.py::HARNESS/answered",
+    "aisef2/probe/process_effect.py::HARNESS/ask",
+    "aisef2/probe/process_effect.py::HARNESS/count_lines",
+    "aisef2/probe/process_effect.py::HARNESS/do_call",
+    "aisef2/probe/process_effect.py::HARNESS/do_construct",
+    "aisef2/probe/process_effect.py::HARNESS/do_edit",
+    "aisef2/probe/process_effect.py::HARNESS/do_expect",
+    "aisef2/probe/process_effect.py::HARNESS/do_fault",
+    "aisef2/probe/process_effect.py::HARNESS/do_subprocess",
+    "aisef2/probe/process_effect.py::HARNESS/do_workspace",
+    "aisef2/probe/process_effect.py::HARNESS/do_write",
+    "aisef2/probe/process_effect.py::HARNESS/emit",
+    "aisef2/probe/process_effect.py::HARNESS/ended",
+    "aisef2/probe/process_effect.py::HARNESS/file_fact",
+    "aisef2/probe/process_effect.py::HARNESS/files_now",
+    "aisef2/probe/process_effect.py::HARNESS/finish",
+    "aisef2/probe/process_effect.py::HARNESS/guarded",
+    "aisef2/probe/process_effect.py::HARNESS/identity",
+    "aisef2/probe/process_effect.py::HARNESS/inside",
+    "aisef2/probe/process_effect.py::HARNESS/main",
+    "aisef2/probe/process_effect.py::HARNESS/reported",
+    "aisef2/probe/process_effect.py::HARNESS/resolve",
+    "aisef2/probe/process_effect.py::HARNESS/row_of",
+    "aisef2/probe/process_effect.py::HARNESS/run",
+    "aisef2/probe/process_effect.py::HARNESS/same",
+    "aisef2/probe/process_effect.py::HARNESS/subject_call",
+    "aisef2/probe/process_effect.py::HARNESS/unresolved",
+    "aisef2/probe/process_effect.py::HARNESS/unws"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_probe_process_effect_bytecode.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 5.63,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 5,
+     "first_test": "v2.test_probe_process_effect_bytecode.Bytecode.test_FM2_PYC_EFFECT_1_in_tree_stale_bytecode_with_a_matching_header_is_never_the_subject",
+     "tail_sha256": "dee553bce3ec081ac4e9a64232a9052c525c6c6151af99c3bb27112c614e4257",
+     "overhead_s": 0.29
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 7.0
+  },
+  {
+   "key": "aisef2/probe/process_effect.py|323c400d49681e4e|tests/v2/test_s2_kills.py",
+   "module": "aisef2/probe/process_effect.py",
+   "null": "323c400d49681e4ece58205e685cd3e779e7a96ab3638cc56d02905f7cd85069",
+   "file": "tests/v2/test_s2_kills.py",
+   "targets": [
+    "aisef2/probe/process_effect.py::HARNESS/ask"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_s2_kills.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 23.02,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 43,
+     "first_test": "v2.test_s2_kills.AgentGuarded.test_the_controlled_fault_names_itself_in_its_message",
+     "tail_sha256": "0bd664af1b79df8fc95d7e4ab7fee01458ca96cf64aa0c3ba780bc5a70d2e7c3",
+     "overhead_s": 0.29
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 24.2
+  },
+  {
+   "key": "aisef2/probe/process_effect.py|323c400d49681e4e|tests/v2/test_v21_identity.py",
+   "module": "aisef2/probe/process_effect.py",
+   "null": "323c400d49681e4ece58205e685cd3e779e7a96ab3638cc56d02905f7cd85069",
+   "file": "tests/v2/test_v21_identity.py",
+   "targets": [
+    "aisef2/probe/process_effect.py::HARNESS/answer_to",
+    "aisef2/probe/process_effect.py::HARNESS/answered",
+    "aisef2/probe/process_effect.py::HARNESS/ask",
+    "aisef2/probe/process_effect.py::HARNESS/count_lines",
+    "aisef2/probe/process_effect.py::HARNESS/do_call",
+    "aisef2/probe/process_effect.py::HARNESS/do_construct",
+    "aisef2/probe/process_effect.py::HARNESS/do_edit",
+    "aisef2/probe/process_effect.py::HARNESS/do_expect",
+    "aisef2/probe/process_effect.py::HARNESS/do_fault",
+    "aisef2/probe/process_effect.py::HARNESS/do_subprocess",
+    "aisef2/probe/process_effect.py::HARNESS/do_workspace",
+    "aisef2/probe/process_effect.py::HARNESS/do_write",
+    "aisef2/probe/process_effect.py::HARNESS/emit",
+    "aisef2/probe/process_effect.py::HARNESS/ended",
+    "aisef2/probe/process_effect.py::HARNESS/file_fact",
+    "aisef2/probe/process_effect.py::HARNESS/files_now",
+    "aisef2/probe/process_effect.py::HARNESS/finish",
+    "aisef2/probe/process_effect.py::HARNESS/guarded",
+    "aisef2/probe/process_effect.py::HARNESS/identity",
+    "aisef2/probe/process_effect.py::HARNESS/inside",
+    "aisef2/probe/process_effect.py::HARNESS/main",
+    "aisef2/probe/process_effect.py::HARNESS/reported",
+    "aisef2/probe/process_effect.py::HARNESS/resolve",
+    "aisef2/probe/process_effect.py::HARNESS/row_of",
+    "aisef2/probe/process_effect.py::HARNESS/run",
+    "aisef2/probe/process_effect.py::HARNESS/same",
+    "aisef2/probe/process_effect.py::HARNESS/subject_call",
+    "aisef2/probe/process_effect.py::HARNESS/unresolved",
+    "aisef2/probe/process_effect.py::HARNESS/unws"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_identity.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 1.38,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 13,
+     "first_test": "v2.test_v21_identity.Migrate.test_a_spec_no_release_compiles_is_refused_not_guessed",
+     "tail_sha256": "55ff309bf7ddd8be199b014399f388efe1c20a5041ab190f563ffc170a57e475",
+     "overhead_s": 0.29
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 2.7
+  },
+  {
+   "key": "aisef2/probe/process_effect.py|f2941b69e75cf00a|tests/v2/test_probe_process_effect.py",
+   "module": "aisef2/probe/process_effect.py",
+   "null": "f2941b69e75cf00a1eefbeb058c67afa1d23035011bbb306ac98b92e596a0df6",
+   "file": "tests/v2/test_probe_process_effect.py",
+   "targets": [
+    "aisef2/probe/process_effect.py::ProcessEffectProbe.__init__",
+    "aisef2/probe/process_effect.py::ProcessEffectProbe._observe_in",
+    "aisef2/probe/process_effect.py::ProcessEffectProbe.observe",
+    "aisef2/probe/process_effect.py::_harness_argv",
+    "aisef2/probe/process_effect.py::_prepare",
+    "aisef2/probe/process_effect.py::_watch"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_probe_process_effect.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 41.65,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 24,
+     "first_test": "v2.test_probe_process_effect.Adversarial.test_PE_ADV_1_an_unknown_or_malformed_step_is_INVALID_SPEC_through_run_probe_and_refused_at_admission",
+     "tail_sha256": "645e32ee4a6f9fe16853ed1848db74a049ef65ac7006ef11ba1f7b7e09fd8c56",
+     "overhead_s": 0.29
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 42.9
+  },
+  {
+   "key": "aisef2/probe/process_effect.py|f2941b69e75cf00a|tests/v2/test_probe_process_effect_bytecode.py",
+   "module": "aisef2/probe/process_effect.py",
+   "null": "f2941b69e75cf00a1eefbeb058c67afa1d23035011bbb306ac98b92e596a0df6",
+   "file": "tests/v2/test_probe_process_effect_bytecode.py",
+   "targets": [
+    "aisef2/probe/process_effect.py::ProcessEffectProbe.__init__",
+    "aisef2/probe/process_effect.py::ProcessEffectProbe._observe_in",
+    "aisef2/probe/process_effect.py::ProcessEffectProbe.observe",
+    "aisef2/probe/process_effect.py::_harness_argv",
+    "aisef2/probe/process_effect.py::_prepare",
+    "aisef2/probe/process_effect.py::_watch"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_probe_process_effect_bytecode.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 5.66,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 5,
+     "first_test": "v2.test_probe_process_effect_bytecode.Bytecode.test_FM2_PYC_EFFECT_1_in_tree_stale_bytecode_with_a_matching_header_is_never_the_subject",
+     "tail_sha256": "dee553bce3ec081ac4e9a64232a9052c525c6c6151af99c3bb27112c614e4257",
+     "overhead_s": 0.29
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 6.8
+  },
+  {
+   "key": "aisef2/probe/process_effect.py|f2941b69e75cf00a|tests/v2/test_probe_process_effect_units.py",
+   "module": "aisef2/probe/process_effect.py",
+   "null": "f2941b69e75cf00a1eefbeb058c67afa1d23035011bbb306ac98b92e596a0df6",
+   "file": "tests/v2/test_probe_process_effect_units.py",
+   "targets": [
+    "aisef2/probe/process_effect.py::CLASSES",
+    "aisef2/probe/process_effect.py::CLASS_TABLE",
+    "aisef2/probe/process_effect.py::DIGEST",
+    "aisef2/probe/process_effect.py::FAULTED",
+    "aisef2/probe/process_effect.py::FAULTS",
+    "aisef2/probe/process_effect.py::FILE_SHAPES",
+    "aisef2/probe/process_effect.py::ON_DEADLINE",
+    "aisef2/probe/process_effect.py::PROBE_SOURCES",
+    "aisef2/probe/process_effect.py::ProcessEffectProbe.__init__",
+    "aisef2/probe/process_effect.py::ProcessEffectProbe._observe_in",
+    "aisef2/probe/process_effect.py::ProcessEffectProbe.enforcement",
+    "aisef2/probe/process_effect.py::ProcessEffectProbe.harness_preconditions",
+    "aisef2/probe/process_effect.py::ProcessEffectProbe.observe",
+    "aisef2/probe/process_effect.py::STEPS",
+    "aisef2/probe/process_effect.py::_CONTENT",
+    "aisef2/probe/process_effect.py::_FILE_HOLDS",
+    "aisef2/probe/process_effect.py::_FILE_SHAPE_OK",
+    "aisef2/probe/process_effect.py::_HOLDS",
+    "aisef2/probe/process_effect.py::_SHAPES",
+    "aisef2/probe/process_effect.py::_concluded",
+    "aisef2/probe/process_effect.py::_content_of",
+    "aisef2/probe/process_effect.py::_edit_ok",
+    "aisef2/probe/process_effect.py::_expect_ok",
+    "aisef2/probe/process_effect.py::_fault_ok",
+    "aisef2/probe/process_effect.py::_file_shape_ok",
+    "aisef2/probe/process_effect.py::_files_hold",
+    "aisef2/probe/process_effect.py::_flat_ok",
+    "aisef2/probe/process_effect.py::_harness_argv",
+    "aisef2/probe/process_effect.py::_ident_ok",
+    "aisef2/probe/process_effect.py::_identity",
+    "aisef2/probe/process_effect.py::_invocation_ok",
+    "aisef2/probe/process_effect.py::_jsonl_holds",
+    "aisef2/probe/process_effect.py::_observed_files",
+    "aisef2/probe/process_effect.py::_prepare",
+    "aisef2/probe/process_effect.py::_probe_digest",
+    "aisef2/probe/process_effect.py::_raises_hold",
+    "aisef2/probe/process_effect.py::_resolved",
+    "aisef2/probe/process_effect.py::_returns_hold",
+    "aisef2/probe/process_effect.py::_same",
+    "aisef2/probe/process_effect.py::_scenario_ok",
+    "aisef2/probe/process_effect.py::_step_ok",
+    "aisef2/probe/process_effect.py::_subprocess_ok",
+    "aisef2/probe/process_effect.py::_substitute",
+    "aisef2/probe/process_effect.py::_watch",
+    "aisef2/probe/process_effect.py::_workspace_ok",
+    "aisef2/probe/process_effect.py::_write_ok",
+    "aisef2/probe/process_effect.py::_ws_path_ok",
+    "aisef2/probe/process_effect.py::observation_class",
+    "aisef2/probe/process_effect.py::spec_class",
+    "aisef2/probe/process_effect.py::verdict_of"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_probe_process_effect_units.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 1.78,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 22,
+     "first_test": "v2.test_probe_process_effect_units.Decision.test_a_RESULT_is_the_observation",
+     "tail_sha256": "e423392b71a5ae52a178ba61ad445b2a7b96a3715008ba6ea9b74a900a244a32",
+     "overhead_s": 0.29
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 3.0
+  },
+  {
+   "key": "aisef2/probe/process_effect.py|f2941b69e75cf00a|tests/v2/test_v21_identity.py",
+   "module": "aisef2/probe/process_effect.py",
+   "null": "f2941b69e75cf00a1eefbeb058c67afa1d23035011bbb306ac98b92e596a0df6",
+   "file": "tests/v2/test_v21_identity.py",
+   "targets": [
+    "aisef2/probe/process_effect.py::CLASSES",
+    "aisef2/probe/process_effect.py::CLASS_TABLE",
+    "aisef2/probe/process_effect.py::DIGEST",
+    "aisef2/probe/process_effect.py::FAULTED",
+    "aisef2/probe/process_effect.py::FAULTS",
+    "aisef2/probe/process_effect.py::FILE_SHAPES",
+    "aisef2/probe/process_effect.py::ON_DEADLINE",
+    "aisef2/probe/process_effect.py::PROBE_SOURCES",
+    "aisef2/probe/process_effect.py::ProcessEffectProbe.__init__",
+    "aisef2/probe/process_effect.py::ProcessEffectProbe._observe_in",
+    "aisef2/probe/process_effect.py::ProcessEffectProbe.enforcement",
+    "aisef2/probe/process_effect.py::ProcessEffectProbe.harness_preconditions",
+    "aisef2/probe/process_effect.py::ProcessEffectProbe.observe",
+    "aisef2/probe/process_effect.py::STEPS",
+    "aisef2/probe/process_effect.py::_CONTENT",
+    "aisef2/probe/process_effect.py::_FILE_HOLDS",
+    "aisef2/probe/process_effect.py::_FILE_SHAPE_OK",
+    "aisef2/probe/process_effect.py::_HOLDS",
+    "aisef2/probe/process_effect.py::_SHAPES",
+    "aisef2/probe/process_effect.py::_concluded",
+    "aisef2/probe/process_effect.py::_content_of",
+    "aisef2/probe/process_effect.py::_edit_ok",
+    "aisef2/probe/process_effect.py::_expect_ok",
+    "aisef2/probe/process_effect.py::_fault_ok",
+    "aisef2/probe/process_effect.py::_file_shape_ok",
+    "aisef2/probe/process_effect.py::_files_hold",
+    "aisef2/probe/process_effect.py::_flat_ok",
+    "aisef2/probe/process_effect.py::_harness_argv",
+    "aisef2/probe/process_effect.py::_ident_ok",
+    "aisef2/probe/process_effect.py::_identity",
+    "aisef2/probe/process_effect.py::_invocation_ok",
+    "aisef2/probe/process_effect.py::_jsonl_holds",
+    "aisef2/probe/process_effect.py::_observed_files",
+    "aisef2/probe/process_effect.py::_prepare",
+    "aisef2/probe/process_effect.py::_probe_digest",
+    "aisef2/probe/process_effect.py::_raises_hold",
+    "aisef2/probe/process_effect.py::_resolved",
+    "aisef2/probe/process_effect.py::_returns_hold",
+    "aisef2/probe/process_effect.py::_same",
+    "aisef2/probe/process_effect.py::_scenario_ok",
+    "aisef2/probe/process_effect.py::_step_ok",
+    "aisef2/probe/process_effect.py::_subprocess_ok",
+    "aisef2/probe/process_effect.py::_substitute",
+    "aisef2/probe/process_effect.py::_watch",
+    "aisef2/probe/process_effect.py::_workspace_ok",
+    "aisef2/probe/process_effect.py::_write_ok",
+    "aisef2/probe/process_effect.py::_ws_path_ok",
+    "aisef2/probe/process_effect.py::observation_class",
+    "aisef2/probe/process_effect.py::spec_class",
+    "aisef2/probe/process_effect.py::verdict_of"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_identity.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 1.38,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 13,
+     "first_test": "v2.test_v21_identity.Migrate.test_a_spec_no_release_compiles_is_refused_not_guessed",
+     "tail_sha256": "55ff309bf7ddd8be199b014399f388efe1c20a5041ab190f563ffc170a57e475",
+     "overhead_s": 0.29
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 2.5
+  },
+  {
+   "key": "aisef2/probe/python_callable_v2.py|8bb09a74785a6ae5|tests/v2/test_python_callable_v2.py",
+   "module": "aisef2/probe/python_callable_v2.py",
+   "null": "8bb09a74785a6ae5095ef5486365ca1d71c5ed16bb546116627ef99d1346d15f",
+   "file": "tests/v2/test_python_callable_v2.py",
+   "targets": [
+    "aisef2/probe/python_callable_v2.py::HARNESS/answer_to",
+    "aisef2/probe/python_callable_v2.py::HARNESS/answered",
+    "aisef2/probe/python_callable_v2.py::HARNESS/ask",
+    "aisef2/probe/python_callable_v2.py::HARNESS/conclude",
+    "aisef2/probe/python_callable_v2.py::HARNESS/deadline",
+    "aisef2/probe/python_callable_v2.py::HARNESS/emit",
+    "aisef2/probe/python_callable_v2.py::HARNESS/ended",
+    "aisef2/probe/python_callable_v2.py::HARNESS/finish",
+    "aisef2/probe/python_callable_v2.py::HARNESS/inside",
+    "aisef2/probe/python_callable_v2.py::HARNESS/main",
+    "aisef2/probe/python_callable_v2.py::HARNESS/value_of"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_python_callable_v2.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 100.62,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 33,
+     "first_test": "v2.test_python_callable_v2.Calibration.test_PCV2_1_a_positive_fixture_uses_the_workspace_stimulus",
+     "tail_sha256": "d1482a175d18d34129f16e0d0a6f39d85371dbd6923db7a1c82a2b9a28074be9",
+     "overhead_s": 0.3
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 101.8
+  },
+  {
+   "key": "aisef2/probe/python_callable_v2.py|8bb09a74785a6ae5|tests/v2/test_python_callable_v2_bytecode.py",
+   "module": "aisef2/probe/python_callable_v2.py",
+   "null": "8bb09a74785a6ae5095ef5486365ca1d71c5ed16bb546116627ef99d1346d15f",
+   "file": "tests/v2/test_python_callable_v2_bytecode.py",
+   "targets": [
+    "aisef2/probe/python_callable_v2.py::HARNESS/answer_to",
+    "aisef2/probe/python_callable_v2.py::HARNESS/answered",
+    "aisef2/probe/python_callable_v2.py::HARNESS/ask",
+    "aisef2/probe/python_callable_v2.py::HARNESS/conclude",
+    "aisef2/probe/python_callable_v2.py::HARNESS/deadline",
+    "aisef2/probe/python_callable_v2.py::HARNESS/emit",
+    "aisef2/probe/python_callable_v2.py::HARNESS/ended",
+    "aisef2/probe/python_callable_v2.py::HARNESS/finish",
+    "aisef2/probe/python_callable_v2.py::HARNESS/inside",
+    "aisef2/probe/python_callable_v2.py::HARNESS/main",
+    "aisef2/probe/python_callable_v2.py::HARNESS/value_of"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_python_callable_v2_bytecode.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 6.27,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 10,
+     "first_test": "v2.test_python_callable_v2_bytecode.BytecodeV2.test_FM2_PYC_V2_1_in_tree_stale_bytecode_with_a_matching_header_is_not_the_subject_the_source_is",
+     "tail_sha256": "3f9e5f38c204a23fa2f1393de570197ddf90c70376312294ed5d360f8bee9c3d",
+     "overhead_s": 0.3
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 7.4
+  },
+  {
+   "key": "aisef2/probe/python_callable_v2.py|8bb09a74785a6ae5|tests/v2/test_v21_identity.py",
+   "module": "aisef2/probe/python_callable_v2.py",
+   "null": "8bb09a74785a6ae5095ef5486365ca1d71c5ed16bb546116627ef99d1346d15f",
+   "file": "tests/v2/test_v21_identity.py",
+   "targets": [
+    "aisef2/probe/python_callable_v2.py::HARNESS/answer_to",
+    "aisef2/probe/python_callable_v2.py::HARNESS/answered",
+    "aisef2/probe/python_callable_v2.py::HARNESS/ask",
+    "aisef2/probe/python_callable_v2.py::HARNESS/conclude",
+    "aisef2/probe/python_callable_v2.py::HARNESS/deadline",
+    "aisef2/probe/python_callable_v2.py::HARNESS/emit",
+    "aisef2/probe/python_callable_v2.py::HARNESS/ended",
+    "aisef2/probe/python_callable_v2.py::HARNESS/finish",
+    "aisef2/probe/python_callable_v2.py::HARNESS/inside",
+    "aisef2/probe/python_callable_v2.py::HARNESS/main",
+    "aisef2/probe/python_callable_v2.py::HARNESS/value_of"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_identity.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 1.41,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 13,
+     "first_test": "v2.test_v21_identity.Migrate.test_a_spec_no_release_compiles_is_refused_not_guessed",
+     "tail_sha256": "55ff309bf7ddd8be199b014399f388efe1c20a5041ab190f563ffc170a57e475",
+     "overhead_s": 0.3
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 2.6
+  },
+  {
+   "key": "aisef2/probe/python_callable_v2.py|920e42bd852dac46|tests/v2/test_python_callable_v2.py",
+   "module": "aisef2/probe/python_callable_v2.py",
+   "null": "920e42bd852dac46973e44acad649f50120a71af46736a848109f1f3640162d1",
+   "file": "tests/v2/test_python_callable_v2.py",
+   "targets": [
+    "aisef2/probe/python_callable_v2.py::CLASSES",
+    "aisef2/probe/python_callable_v2.py::DIGEST",
+    "aisef2/probe/python_callable_v2.py::ON_DEADLINE",
+    "aisef2/probe/python_callable_v2.py::PROBE_SOURCES",
+    "aisef2/probe/python_callable_v2.py::PythonCallableV2Probe.enforcement",
+    "aisef2/probe/python_callable_v2.py::PythonCallableV2Probe.observe",
+    "aisef2/probe/python_callable_v2.py::_concluded",
+    "aisef2/probe/python_callable_v2.py::_file_ok",
+    "aisef2/probe/python_callable_v2.py::_is_hex",
+    "aisef2/probe/python_callable_v2.py::_probe_digest",
+    "aisef2/probe/python_callable_v2.py::_substituted",
+    "aisef2/probe/python_callable_v2.py::_unsubstituted",
+    "aisef2/probe/python_callable_v2.py::_watch",
+    "aisef2/probe/python_callable_v2.py::_workspace_ok",
+    "aisef2/probe/python_callable_v2.py::_write_workspace",
+    "aisef2/probe/python_callable_v2.py::observation_class",
+    "aisef2/probe/python_callable_v2.py::spec_class",
+    "aisef2/probe/python_callable_v2.py::verdict_of"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_python_callable_v2.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 101.16,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 33,
+     "first_test": "v2.test_python_callable_v2.Calibration.test_PCV2_1_a_positive_fixture_uses_the_workspace_stimulus",
+     "tail_sha256": "d1482a175d18d34129f16e0d0a6f39d85371dbd6923db7a1c82a2b9a28074be9",
+     "overhead_s": 0.3
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 102.3
+  },
+  {
+   "key": "aisef2/probe/python_callable_v2.py|920e42bd852dac46|tests/v2/test_python_callable_v2_bytecode.py",
+   "module": "aisef2/probe/python_callable_v2.py",
+   "null": "920e42bd852dac46973e44acad649f50120a71af46736a848109f1f3640162d1",
+   "file": "tests/v2/test_python_callable_v2_bytecode.py",
+   "targets": [
+    "aisef2/probe/python_callable_v2.py::PythonCallableV2Probe.__init__",
+    "aisef2/probe/python_callable_v2.py::PythonCallableV2Probe.observe",
+    "aisef2/probe/python_callable_v2.py::_harness_argv"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_python_callable_v2_bytecode.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 6.3,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 10,
+     "first_test": "v2.test_python_callable_v2_bytecode.BytecodeV2.test_FM2_PYC_V2_1_in_tree_stale_bytecode_with_a_matching_header_is_not_the_subject_the_source_is",
+     "tail_sha256": "3f9e5f38c204a23fa2f1393de570197ddf90c70376312294ed5d360f8bee9c3d",
+     "overhead_s": 0.3
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 7.8
+  },
+  {
+   "key": "aisef2/probe/python_callable_v2.py|920e42bd852dac46|tests/v2/test_s2_kills.py",
+   "module": "aisef2/probe/python_callable_v2.py",
+   "null": "920e42bd852dac46973e44acad649f50120a71af46736a848109f1f3640162d1",
+   "file": "tests/v2/test_s2_kills.py",
+   "targets": [
+    "aisef2/probe/python_callable_v2.py::_concluded",
+    "aisef2/probe/python_callable_v2.py::_harness_argv",
+    "aisef2/probe/python_callable_v2.py::_watch"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_s2_kills.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 23.25,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 43,
+     "first_test": "v2.test_s2_kills.AgentGuarded.test_the_controlled_fault_names_itself_in_its_message",
+     "tail_sha256": "0bd664af1b79df8fc95d7e4ab7fee01458ca96cf64aa0c3ba780bc5a70d2e7c3",
+     "overhead_s": 0.3
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 25.1
+  },
+  {
+   "key": "aisef2/probe/python_callable_v2.py|920e42bd852dac46|tests/v2/test_v21_identity.py",
+   "module": "aisef2/probe/python_callable_v2.py",
+   "null": "920e42bd852dac46973e44acad649f50120a71af46736a848109f1f3640162d1",
+   "file": "tests/v2/test_v21_identity.py",
+   "targets": [
+    "aisef2/probe/python_callable_v2.py::CLASSES",
+    "aisef2/probe/python_callable_v2.py::DIGEST",
+    "aisef2/probe/python_callable_v2.py::ON_DEADLINE",
+    "aisef2/probe/python_callable_v2.py::PROBE_SOURCES",
+    "aisef2/probe/python_callable_v2.py::PythonCallableV2Probe.__init__",
+    "aisef2/probe/python_callable_v2.py::PythonCallableV2Probe.enforcement",
+    "aisef2/probe/python_callable_v2.py::PythonCallableV2Probe.observe",
+    "aisef2/probe/python_callable_v2.py::_concluded",
+    "aisef2/probe/python_callable_v2.py::_file_ok",
+    "aisef2/probe/python_callable_v2.py::_harness_argv",
+    "aisef2/probe/python_callable_v2.py::_is_hex",
+    "aisef2/probe/python_callable_v2.py::_probe_digest",
+    "aisef2/probe/python_callable_v2.py::_substituted",
+    "aisef2/probe/python_callable_v2.py::_unsubstituted",
+    "aisef2/probe/python_callable_v2.py::_watch",
+    "aisef2/probe/python_callable_v2.py::_workspace_ok",
+    "aisef2/probe/python_callable_v2.py::_write_workspace",
+    "aisef2/probe/python_callable_v2.py::observation_class",
+    "aisef2/probe/python_callable_v2.py::spec_class",
+    "aisef2/probe/python_callable_v2.py::verdict_of"
+   ],
+   "rows": [
+    {
+     "file": "tests/v2/test_v21_identity.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 1.41,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 13,
+     "first_test": "v2.test_v21_identity.Migrate.test_a_spec_no_release_compiles_is_refused_not_guessed",
+     "tail_sha256": "55ff309bf7ddd8be199b014399f388efe1c20a5041ab190f563ffc170a57e475",
+     "overhead_s": 0.3
+    }
+   ],
+   "original": [],
+   "error": null,
+   "seconds": 2.6
+  }
+ ]
+}
