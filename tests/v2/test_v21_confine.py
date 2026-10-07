@@ -3,14 +3,18 @@
 What runs everywhere (macOS too): the setting, the bubblewrap command line a session gets, and fail-closed — a run, a
 `--check` or a session that asks for confinement and cannot have it refuses before any provider request and before
 the client starts; and the measurement judges what it OBSERVES: a "bubblewrap" that runs the probe unconfined is
-refused for what it let through, not for its name. The boundary itself is measured on Linux by
+refused for what it let through, not for its name; and the path a confined run takes when the measurement holds —
+every session started through bubblewrap, the record saying so. The boundary itself is measured on Linux by
 validation/v21/sandbox (docker): this module never claims it."""
 
 from __future__ import annotations
 
+import contextlib
+import functools
 import json
 import os
 import pathlib
+import signal
 import subprocess
 import sys
 import tempfile
@@ -23,11 +27,28 @@ if str(ROOT) not in sys.path:
 
 from aisef2.app import client, confine, settings  # noqa: E402
 from aisef2.app import run as R  # noqa: E402
-from tests.v2.test_app_run import SETTINGS, Command, ProductBase, provider  # noqa: E402
+from tests.v2 import test_app_run as app_run  # noqa: E402 — the module, so its Command tests are not collected again
+from tests.v2.test_app_run import SETTINGS, ProductBase, provider  # noqa: E402
 
-SPEC = {"backend": "bwrap", "bwrap": "/usr/bin/bwrap", "network": "none", "read_only": []}
+#: what a run may ask for: the shared network (a session must reach its provider); "none" is measurement-only
+SPEC = {"backend": "bwrap", "bwrap": "/usr/bin/bwrap", "network": "host", "read_only": []}
+OCR = {"exe": "/opt/ocr", "sha256": "0" * 64, "timeout_min": 1, "max_tokens": 9}
 #: a "bubblewrap" that confines nothing: it drops every option and runs the command
 NOT_A_SANDBOX = '#!/bin/sh\nwhile [ $# -gt 0 ] && [ "$1" != "--" ]; do shift; done\n[ $# -gt 0 ] || exit 0\nshift\nexec "$@"\n'
+
+
+def ro_binds(argv: list[str]) -> list[str]:
+    return [src for src, _ in pairs(argv, "--ro-bind")]
+
+
+def fake_bwrap(where: pathlib.Path, log: pathlib.Path | None = None) -> pathlib.Path:
+    """NOT_A_SANDBOX, writing each command line it is given to `log` (one JSON array per line) first."""
+    fake = where / "bwrap"
+    record = (f'{sys.executable} -c "import json,sys; open(sys.argv[1], \'a\').write(json.dumps(sys.argv[2:]) + chr(10))" '
+              f'{log} "$@"\n') if log else ""
+    fake.write_text(NOT_A_SANDBOX.replace("\n", "\n" + record, 1))
+    fake.chmod(0o755)
+    return fake
 
 
 def pairs(argv: list[str], flag: str) -> list[tuple[str, str]]:
@@ -43,9 +64,19 @@ class Setting(unittest.TestCase):
         for bad, why in ((dict(SPEC, backend="docker"), "backend is bwrap"), (dict(SPEC, bwrap="bwrap"), "absolute path"),
                          (dict(SPEC, network="bridge"), "network is one of"), (dict(SPEC, read_only=["rel"]), "absolute paths"),
                          (dict(SPEC, read_only="/x"), "absolute paths"), ({**SPEC, "extra": 1}, "confinement is"),
+                         (dict(SPEC, network="none"), "no route to its provider: it is a measurement-only profile"),
                          ({k: v for k, v in SPEC.items() if k != "read_only"}, "confinement is")):
             with self.subTest(bad=bad), self.assertRaisesRegex(settings.SettingsError, why):
                 settings.load({**SETTINGS, "confinement": bad})
+
+    def test_not_with_open_code_review_which_calls_the_model_outside_the_sessions(self):
+        review = {"policy": "advisory", "min_severity": "high", "finder": "ocr", "ocr": OCR}
+        self.assertEqual(settings.load({**SETTINGS, "review": review}).review["finder"], "ocr")
+        with self.assertRaisesRegex(settings.SettingsError, "Open Code Review .* would call the model unconfined"):
+            settings.load({**SETTINGS, "review": review, "confinement": SPEC})
+        model = dict(review, finder="model")
+        del model["ocr"]
+        self.assertEqual(settings.load({**SETTINGS, "review": model, "confinement": SPEC}).confinement, SPEC)
 
 
 class CommandLine(unittest.TestCase):
@@ -78,7 +109,7 @@ class CommandLine(unittest.TestCase):
                             system="linux")
 
     def test_its_own_namespaces_no_privilege_and_the_client_command_unchanged(self):
-        argv, _ = self.wrap()
+        argv, _ = self.wrap(network="none")
         self.assertEqual(argv[0], str(self.bwrap))
         for flag in ("--unshare-user", "--unshare-pid", "--unshare-ipc", "--unshare-uts", "--unshare-net", "--disable-userns",
                      "--die-with-parent", "--new-session"):
@@ -116,6 +147,42 @@ class CommandLine(unittest.TestCase):
         self.assertIn("--share-net", argv)
         self.assertNotIn("--unshare-net", argv)
 
+    def test_a_client_directory_that_holds_home_or_the_workspace_is_refused(self):
+        for exe, held in ((self.home / "opencode", "HOME"), (self.run_dir / "opencode", "the workspace"),
+                          (self.tmp / "opencode", "HOME")):
+            exe.write_text("#!/bin/sh\n")
+            with self.subTest(exe=exe), self.assertRaisesRegex(confine.Unavailable, f"holds {held}: bound read-only"):
+                confine.wrap(self.spec, [str(exe)], self.env, str(self.ws), str(exe), system="linux")
+
+    def test_a_directory_is_not_bubblewrap(self):
+        with self.assertRaisesRegex(confine.Unavailable, "not an executable file at"):
+            self.wrap(bwrap=str(self.tmp))
+        rep = confine.measure(dict(self.spec, bwrap=str(self.tmp)), self.tmp / "m", str(self.exe), system="linux",
+                              environ=self.env)
+        self.assertEqual(rep["problems"], [f"bubblewrap is not an executable file at {self.tmp}"])
+
+    def test_the_measured_wrapper_is_the_sessions_own(self):
+        """measure() binds what a session's wrapper binds: the client's directory, the run repository's git directory,
+        the configuration — only the workspace differs; and it leaves no worktree in the run's repository."""
+        session, _ = self.wrap(read_only=[str(self.home / ".config")])
+        seen = []
+        real = confine.wrap
+
+        def spy(*a, **k):
+            r = real(*a, **k)
+            seen.append(r[0])
+            raise confine.Unavailable("captured, not run")
+        with mock.patch.object(confine, "wrap", spy):
+            rep = confine.measure(dict(self.spec, read_only=[str(self.home / ".config")]), self.run_dir / "confinement",
+                                  str(self.exe), self.run_dir / "repo", system="linux", environ=self.env)
+        self.assertEqual(rep["problems"], ["captured, not run"])
+        self.assertEqual(ro_binds(seen[-1]), ro_binds(session))
+        self.assertIn(str((self.run_dir / "repo" / ".git").resolve()), ro_binds(seen[-1]))
+        self.assertEqual(pairs(seen[-1], "--bind"), [(str(self.run_dir / "confinement" / "ws"),) * 2])
+        listed = subprocess.run(["git", "-C", str(self.run_dir / "repo"), "worktree", "list", "--porcelain"],
+                                capture_output=True, text=True, check=True).stdout
+        self.assertNotIn("confinement", listed)
+
 
 class FailClosed(unittest.TestCase):
     def test_a_host_that_is_not_linux_has_no_backend(self):
@@ -126,7 +193,7 @@ class FailClosed(unittest.TestCase):
         self.assertEqual(rep["problems"], ["confinement is Linux-only (bubblewrap); this host is darwin: no backend"])
 
     def test_a_missing_bubblewrap_or_read_only_path_is_refused(self):
-        with self.assertRaisesRegex(confine.Unavailable, "not an executable at /nonexistent/bwrap"):
+        with self.assertRaisesRegex(confine.Unavailable, "not an executable file at /nonexistent/bwrap"):
             confine.wrap(dict(SPEC, bwrap="/nonexistent/bwrap"), ["x"], {}, "/w", system="linux")
         with self.assertRaisesRegex(confine.Unavailable, "do not exist: \\['/nonexistent/ro'\\]"):
             confine.wrap(dict(SPEC, bwrap=sys.executable, read_only=["/nonexistent/ro"]), ["x"], {}, "/w", system="linux")
@@ -136,19 +203,58 @@ class FailClosed(unittest.TestCase):
         """A 'bubblewrap' that runs the probe unconfined: refused for what the probe could do."""
         with tempfile.TemporaryDirectory() as t:
             tmp = pathlib.Path(os.path.realpath(t))
-            fake = tmp / "bwrap"
-            fake.write_text(NOT_A_SANDBOX)
-            fake.chmod(0o755)
+            fake = fake_bwrap(tmp)
+            exe = tmp / "client" / "opencode"
+            exe.parent.mkdir()
+            exe.write_text("#!/bin/sh\n")
             where = tmp / "run" / "confinement"
-            rep = confine.measure(dict(SPEC, bwrap=str(fake)), where, system="linux",
+            rep = confine.measure(dict(SPEC, bwrap=str(fake)), where, str(exe), system="linux",
                                   environ={"PATH": "/usr/bin:/bin", "HOME": str(tmp)})
-            self.assertIn("a file of the run directory was readable", rep["problems"])
-            self.assertIn("a file was created in the run directory", rep["problems"])
+            for pid in rep["setsid_survivors"]:     # the unconfined probe's sleeper: not left running after the test
+                with contextlib.suppress(ProcessLookupError):
+                    os.kill(pid, signal.SIGKILL)
+            for want in ("a file of the run directory was readable", "a file was created in the run directory",
+                         "a file was created in the client directory", "a file was created in the git directory"):
+                self.assertIn(want, rep["problems"])
             self.assertTrue(any(p.startswith("a process the session left outlived it") for p in rep["problems"]), rep["problems"])
             self.assertTrue(rep["created_outside_workspace"]["run_directory"])
-            self.assertFalse((where / "written-from-inside").exists())     # the probe's own file, removed
+            # the probe's own files, wherever confinement failed to stop them, removed
+            probe_dirs = (where, confine.pathlib.Path(confine.__file__).resolve().parents[1], exe.parent, where / "repo" / ".git")
+            self.assertEqual([p for d in probe_dirs for p in d.glob("*") if p.name.startswith(("written-", ".aisef-confine-probe-"))], [])
             self.assertEqual(rep["tried"]["workspace"]["exit"], 0)
+            self.assertEqual(rep["tried"]["read_git_directory"]["exit"], 0)
             self.assertEqual(rep["argv"][-4:], ["/bin/sh", "-c", "<PROBE>", "probe"])
+
+    def test_a_check_that_did_not_run_is_a_problem_never_a_pass(self):
+        """The user-namespace denial counts only when the kernel's refusal is seen; unshare absent or no try at all
+        is 'not measured'; and the mounts must be what the wrapper names."""
+        ws = pathlib.Path("/w/ws")
+        rep = {"network": "host", "created_outside_workspace": {}, "setsid_survivors": [],
+               "inside": {"capabilities": dict.fromkeys(("CapInh", "CapPrm", "CapEff", "CapBnd", "CapAmb"), "0"),
+                          "no_new_privs": "1", "namespaces": dict.fromkeys(("user", "pid", "ipc", "uts", "mnt"), "own"),
+                          "routed_interfaces": [], "home_listing": [], "unix_sockets": [],
+                          "mounts": [{"at": "/", "access": "rw", "fs": "tmpfs"}, {"at": str(ws), "access": "rw", "fs": "ext4"}],
+                          "mount_targets": [str(ws)]}}
+        tries = {"read_canary": (1, ""), "workspace": (0, "ok"), "read_git_directory": (0, "ref: x"),
+                 "user_namespace": (1, "unshare: unshare failed: No space left on device")}
+        self.assertEqual(confine._judge(rep, "tok", "", tries, "/nonexistent", ws), [])
+        for userns in ((127, "unshare: absent"), (1, "unshare: unknown option"), None):
+            t = {**tries, "user_namespace": userns} if userns else {k: v for k, v in tries.items() if k != "user_namespace"}
+            with self.subTest(userns=userns):
+                self.assertTrue(any(p.startswith("no refusal of a further user namespace was measured")
+                                    for p in confine._judge(rep, "tok", "", t, "/nonexistent", ws)))
+        self.assertIn("a user namespace could be created", confine._judge(rep, "tok", "", {**tries, "user_namespace": (0, "")},
+                                                                          "/nonexistent", ws))
+        self.assertIn("the workspace's git directory was not readable (git would not work in the session)",
+                      confine._judge(rep, "tok", "", {**tries, "read_git_directory": (1, "No such file")}, "/nonexistent", ws))
+        extra = {**rep, "inside": {**rep["inside"], "mounts": [*rep["inside"]["mounts"], {"at": "/srv", "access": "ro", "fs": "ext4"}],
+                                   "unix_sockets": ["/run/x.sock", str(ws / "own.sock")]}}
+        said = confine._judge(extra, "tok", "", tries, "/nonexistent", ws)
+        self.assertIn("mounted beyond what the wrapper names: ['/srv']", said)
+        self.assertTrue(any("unix socket outside the workspace is reachable" in p and "/run/x.sock" in p and "own.sock" not in p
+                            for p in said), said)
+        self.assertIn("the reachable unix sockets could not be listed (no find in the sandbox)",
+                      confine._judge({**rep, "inside": {**rep["inside"], "unix_sockets": None}}, "tok", "", tries, "/nonexistent", ws))
 
     @unittest.skipUnless(os.name == "posix", "the fake client is a script started by its shebang")
     def test_a_session_that_cannot_be_confined_never_starts_the_client(self):
@@ -159,7 +265,7 @@ class FailClosed(unittest.TestCase):
             exe.chmod(0o755)
             limits = {"provider_requests": 9, "turns": 9, "input_tokens": 9, "output_tokens": 9}
             budget = client.Budget(limits, dict.fromkeys(limits, 0), tmp / "logs", lambda: 0)
-            with self.assertRaisesRegex(client.SessionRefused, "bubblewrap is not an executable|confinement is Linux-only"):
+            with self.assertRaisesRegex(client.SessionRefused, "bubblewrap is not an executable file|confinement is Linux-only"):
                 client.session("n", "p", str(tmp), tmp / "logs" / "s.jsonl", 5, model="fakeprov/m", env={"PATH": "/usr/bin:/bin"},
                                budget=budget, turn_cap=3, exe=str(exe), confine=dict(SPEC, bwrap="/nonexistent/bwrap"))
             self.assertFalse((tmp / "ran").exists())
@@ -172,7 +278,7 @@ class RunFailClosed(ProductBase):
         self.settings = settings.load({**SETTINGS, "confinement": dict(SPEC, bwrap="/nonexistent/bwrap")})
         transport = provider()
         with self.assertRaisesRegex(R.RunRefused, "confinement was asked for and is not provided: (bubblewrap is not an "
-                                                  "executable|confinement is Linux-only)"):
+                                                  "executable file|confinement is Linux-only)"):
             self.execute(transport=transport)
         self.assertEqual(transport.calls, [])
         rec = json.loads((self.tmp / "out" / "RUN.json").read_text(encoding="utf-8"))
@@ -186,10 +292,44 @@ class RunFailClosed(ProductBase):
         self.assertNotIn("confinement", rec)
         self.assertFalse(any("confinement" in s for s in rec["sessions"]))
 
+    def test_a_confined_run_starts_every_session_through_bubblewrap_and_says_so(self):
+        """The path a run takes when the measurement holds (stubbed here: macOS has no backend; the boundary is
+        measured by validation/v21/sandbox): measured with the sessions' client and the run's repository, every
+        developer and reviewer session started through the bubblewrap command line, each record and RUN.json saying so."""
+        log = self.tmp / "bwrap.log"
+        fake = fake_bwrap(self.tmp, log)
+        spec = dict(SPEC, bwrap=str(fake))
+        self.settings = settings.load({**SETTINGS, "confinement": spec})
+        calls = []
+
+        def measured(spec, where, exe, repo, **kw):
+            calls.append((exe, repo, where))
+            return {"network": spec["network"], "problems": [], "stub": "measurement stubbed"}
+        with mock.patch.object(confine, "measure", measured), \
+                mock.patch.object(confine, "wrap", functools.partial(confine.wrap, system="linux")):
+            rec = self.execute()
+        self.assertEqual(rec["delivery_verdict"], "PASS", rec)
+        out = self.tmp / "out"
+        self.assertEqual(calls, [(str(self.client), out / "repo", out / "confinement")])
+        self.assertEqual(json.loads((out / "RUN.json").read_text(encoding="utf-8"))["confinement"]["stub"], "measurement stubbed")
+        self.assertEqual(sorted(s["role"] for s in rec["sessions"]), ["developer", "reviewer"])
+        self.assertTrue(all(s["confinement"] == "bwrap network=host" for s in rec["sessions"]), rec["sessions"])
+        started = [json.loads(line) for line in log.read_text(encoding="utf-8").splitlines()]
+        self.assertEqual(len(started), 2)
+        for argv in started:
+            cut = argv.index("--")
+            self.assertEqual(argv[cut + 1], str(self.client))
+            for flag in ("--unshare-user", "--unshare-pid", "--share-net", "--disable-userns", "--die-with-parent"):
+                self.assertIn(flag, argv[:cut])
+            self.assertIn(str(self.client.parent), ro_binds(argv))
+            self.assertIn(str((out / "repo" / ".git").resolve()), ro_binds(argv))
+            self.assertEqual(len(pairs(argv, "--bind")), 1)
+            self.assertTrue(pairs(argv, "--bind")[0][0].startswith(str(out / "work" / "ws")))
+
 
 @unittest.skipUnless(os.name == "posix", "the fake client is a script started by its shebang")
 class Check(unittest.TestCase):
-    setUp, cli = Command.setUp, Command.cli
+    setUp, cli = app_run.Command.setUp, app_run.Command.cli
 
     def test_check_is_not_ready_when_confinement_is_not_provided(self):
         (self.tmp / "settings.json").write_text(json.dumps({**SETTINGS, "confinement": dict(SPEC, bwrap="/nonexistent/bwrap")}),

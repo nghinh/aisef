@@ -80,9 +80,9 @@ def run(argv: list[str]) -> int:
             R.check_repository(project, a.repo)
             adm = R.admit(project, R.calibrations())
             conf, spec = None, getattr(s, "confinement", None)    # a settings stand-in may not carry it (S2 kill test)
-            if spec is not None:   # V2.1 (F): measured here too, in a directory of its own
+            if spec is not None:   # V2.1 (F): measured here too — the sessions' client, in a directory of its own
                 with tempfile.TemporaryDirectory(prefix="aisef-confine-") as tmp:
-                    conf = confine.measure(spec, pathlib.Path(tmp) / "confinement")
+                    conf = confine.measure(spec, pathlib.Path(tmp) / "confinement", R.client_on_path(s))
             ready = adm["admitted"] and not (conf and conf["problems"])
             _print({"project": project.name, "plan_hash": project.plan.plan_hash, "route": s.route, "admission": adm,
                     **({"confinement": conf} if conf is not None else {}), "ready": ready})
