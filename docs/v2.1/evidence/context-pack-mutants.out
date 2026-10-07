@@ -1,4 +1,4 @@
-commit: 80f4437a035b55dabf467f02fd4cdc8c5c7403cf dirty: 0; tests: tests.v2.test_v21_context_pack.Pack tests.v2.test_v21_context_pack.Expectation tests.v2.test_v21_context_pack.Prompt tests.v2.test_v21_context_pack.RecordedSmoke2
+commit: 1899bb0ec1fc3fd9123a1e2f5579b07df17be42d dirty: 0; tests: tests.v2.test_v21_context_pack.Pack tests.v2.test_v21_context_pack.Expectation tests.v2.test_v21_context_pack.Prompt tests.v2.test_v21_context_pack.RecordedSmoke2
 baseline: OK
 KILLED   held ignores the expectation (verdict == SATISFIED): FAILED (failures=3)
 KILLED   an unknown criterion defaults to SATISFIED: FAILED (failures=1)
@@ -6,10 +6,13 @@ KILLED   expectations of this story's obligations only: FAILED (failures=1)
 KILLED   agreement not required: FAILED (failures=1)
 KILLED   developer result cut at 299: FAILED (failures=2)
 KILLED   developer result cut at 301: FAILED (failures=1)
-KILLED   developer result cut at 1000: FAILED (failures=1, errors=1)
+KILLED   developer result cut at 1000: FAILED (failures=2)
 KILLED   redacted after the cut: FAILED (failures=1)
 KILLED   attempts oldest first: FAILED (failures=1)
 KILLED   attempt cap 5: FAILED (failures=1)
-KILLED   no-proof list is every admitted criterion: FAILED (failures=3)
+KILLED   no-proof list is every admitted criterion: FAILED (failures=4)
 KILLED   a later proof of a criterion replaces the first: FAILED (failures=1)
-killed 12 of 12; restored copy: OK
+KILLED   the header says an earlier candidate is a commit, whatever is named: FAILED (failures=1)
+KILLED   a named candidate is not said to be a commit of this repository: FAILED (failures=1)
+KILLED   Developer.implement gives the pack none of the run's secrets: FAILED (failures=1)
+killed 15 of 15; restored copy: OK

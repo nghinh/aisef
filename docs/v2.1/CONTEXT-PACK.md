@@ -1,10 +1,10 @@
 # D4 — Gói ngữ cảnh do controller dựng cho lượt thử lại của developer
 
-Trạng thái: **M4** — gói tới developer qua CLI `aisef` thật (`validation/v21/cli_integration/run.sh` tại `80f4437`, cây
+Trạng thái: **M4** — gói tới developer qua CLI `aisef` thật (`validation/v21/cli_integration/run.sh` tại `1899bb0`, cây
 sạch: nhị phân Open Code Review thật, git thật; developer và mô hình của OCR là kịch bản). Bước cuối của `run.sh`
 (`readback.py`) tính lại hai prompt developer của run1 từ journal của nó: sha256 **trùng** `prompt_sha256` trong
 `RUN.json` và trùng tệp prompt client giả nhận; lượt 2 mang gói; mọi seq gói trích được đọc lại đúng story, đúng loại;
-journal không chứa gói ([evidence/cli-integration-80f4437.out](evidence/cli-integration-80f4437.out), cùng các bước và mã
+journal không chứa gói ([evidence/cli-integration-1899bb0.out](evidence/cli-integration-1899bb0.out), cùng các bước và mã
 thoát như `b72e51e`). Offline (M3): `tests/v2/test_v21_context_pack.py`, gồm `run.execute` với client giả và phát lại
 journal smoke-2. Hiệu quả trên mô hình thật: **M6** — cần lượt chạy live trả tiền, chưa có ngân sách. Thay đổi nằm trong
 `aisef2/app/` (`feedback.py`, `adapters.py`): cần mutation và tái thẩm định ngoài snapshot đang đo.
@@ -21,7 +21,8 @@ ghi), **INFERENCE** (suy luận, chưa đo).
 - **CODE** `session/checkpoint.ts:1252-1597` `renderRebuildContext` ghép, mỗi phần có trần riêng (`checkpoint.push_caps`,
   `:1322`, `:1340`, `:1346`, `:1351`, `:1365-1366`):
   - do controller giữ: actor đang chạy (`:1360`, `:1458-1470`), tin nhắn người dùng nguyên văn (`:1362-1397`),
-    "Recent activity" của đuôi phiên — chỉ tên công cụ và đối số, bỏ kết quả, ≤ 200 dòng, đối số ≤ 80 ký tự
+    "Recent activity" của đuôi phiên — tên công cụ và đối số, bỏ kết quả trừ lỗi: lời gọi lỗi kèm `→ error:` và thông
+    báo lỗi cắt ≤ 80 ký tự (`:42`), lời gọi dở kèm `→ interrupted` (`:43`); ≤ 200 dòng, đối số ≤ 80 ký tự
     (`session/tail-digest.ts:3-15`, `:39-45`);
   - lẫn: sổ task (`:1337`, `:1424-1451`) — controller lưu trong DB (`TaskRegistry`, `:630`), nhưng nội dung do agent ghi
     qua công cụ task (`tool/task.ts:109`, `:199-200` — agent tự đánh dấu task xong);
@@ -57,7 +58,7 @@ cho biết gì.
 
 ### 1.3 Đo trên bằng chứng đã ghi (chỉ đọc)
 
-Công cụ: `validation/v21/context_gap.py`; đầu ra: [evidence/context-gap.out](evidence/context-gap.out) (tại `80f4437`).
+Công cụ: `validation/v21/context_gap.py`; đầu ra: [evidence/context-gap.out](evidence/context-gap.out) (tại `1899bb0`).
 Điều journal biết là **EXPERIMENT** (đọc từ journal). Điều developer **được kể**: smoke-2 là **EXPERIMENT** (mục 1); cycle-2
 P10 là **CODE**, chưa tính lại — prompt do harness `validation/qualification/c2_p9.py` dựng, ở commit thực thi của từng
 attempt (sha256 trùng bản ghi `LEDGERLOCK-REGRESSION.json`): attempt 2 (`1f992ba`, `:230-247`) và 3 (`06ceb23`,
@@ -103,22 +104,27 @@ từng byte** bản trước.
 | Thuộc tính | Cách giữ | Test (`tests/v2/test_v21_context_pack.py`) |
 |---|---|---|
 | Do controller dựng, từ journal | đọc `story/begin`, `story/admitted`, `provider/request` (DEVELOPER) và `provider/result` của nó, `proof/verified` (chỉ candidate, criterion, verdict, agreement), `story/end` | `RecordedSmoke2`, `ThroughTheRun` |
-| Nói gì | mỗi lượt trước, mới nhất trước: cha; kết quả developer (văn bản adapter); candidate, hoặc "chính cha — lượt đó không đổi gì"; mệnh đề **đạt** (verdict = kỳ vọng của plan cho mệnh đề đó, verifier đồng ý — mệnh đề của bất kỳ story nào, vì PRESERVE của story đã commit cũng được chứng minh ở candidate; mệnh đề plan không biết thì không bao giờ đạt); mệnh đề **không có proof ghi lại** trong lượt đó (không nói nguyên nhân: lượt có thể dừng trước proof, hoặc ngay ở probe của nó — PROBE_MISMATCH, PROBE_INVALID_SPEC). Lượt hiện tại bắt đầu lại ở cha; candidate trước là commit của repo | `test_what_an_earlier_attempt_left…`, `test_only_the_attempt_s_candidate_counts…`, `Expectation`, `test_no_proof_recorded_is_all_it_says…` |
+| Nói gì | mỗi lượt trước, mới nhất trước: cha; kết quả developer (văn bản adapter); candidate, hoặc "chính cha — lượt đó không đổi gì"; mệnh đề **đạt** (verdict = kỳ vọng của plan cho mệnh đề đó, verifier đồng ý — mệnh đề của bất kỳ story nào, vì PRESERVE của story đã commit cũng được chứng minh ở candidate; mệnh đề plan không biết thì không bao giờ đạt); mệnh đề **không có proof ghi lại** trong lượt đó (không nói nguyên nhân: lượt có thể dừng trước proof, hoặc ngay ở probe của nó — PROBE_MISMATCH, PROBE_INVALID_SPEC). Lượt hiện tại bắt đầu lại ở cha; chỉ dòng nêu một candidate nói nó là commit của repo (không nêu candidate nào — lượt sự cố, lượt chứng minh chính cha, lượt dừng ở probe — thì không có câu đó) | `test_what_an_earlier_attempt_left…`, `test_only_the_attempt_s_candidate_counts…`, `Expectation`, `test_no_proof_recorded_is_all_it_says…`, `test_only_a_named_candidate_is_said…` |
 | Trích nguồn | mỗi dòng kèm `(journal seq …)`; điều vắng mặt trích khoảng seq của lượt | `test_every_item_cites…` (seq có thật, đúng story, đúng loại) |
 | Tất định | sắp theo seq, mệnh đề theo tên; không thời gian, môi trường, ngẫu nhiên | `test_an_identical_journal_gives_identical_bytes…` |
 | Có biên | `PACK_MAX` 4000 ký tự (prompt là một phần tử argv; dòng lệnh Windows ≤ 32 767), `PACK_LIST` 12 tên/dòng, `PACK_ATTEMPTS` 4 lượt gần nhất, kết quả developer cắt đúng 300 ký tự; cắt theo dòng nguyên, có dấu; lượt mới nhất đứng trước nên biên cắt lượt cũ nhất | `test_it_is_bounded`, `test_at_the_real_bound_the_latest_attempts_are_kept…` |
-| Không chứa vật liệu ẩn, bí mật | không đọc `probe/evaluated`, `tool/*`, `gate/check`, `tests/*`, stream phiên; không spec id, semantic hash; story khác bị loại; bí mật của run → `[REDACTED]` | `test_it_never_holds_proof_material…`, `test_a_review_result_is_never_taken…` |
+| Không chứa vật liệu ẩn, bí mật | không đọc `probe/evaluated`, `tool/*`, `gate/check`, `tests/*`, stream phiên; không spec id, semantic hash; story khác bị loại; bí mật của run → `[REDACTED]` (`Developer.implement` đưa bí mật của phiên vào gói) | `test_it_never_holds_proof_material…`, `test_a_review_result_is_never_taken…`, `Prompt.test_the_run_s_secrets_reach_the_pack_in_the_prompt` |
 | Không phải quyền uy | tiêu đề "context only — no verdict, approval or budget reads it"; không ghi vào journal; trong `aisef2/` chỉ `feedback.py` và `adapters.py` nhắc tới nó | `test_it_is_labelled…`, `ThroughTheRun` (journal không chứa nó) |
 | Tóm tắt do agent viết | **không có** | — |
 
 Đột biến tay (không phải chiến dịch mutation của kernel): `validation/v21/context_pack_mutants.py` chạy trên bản sao của
-HEAD, baseline xanh trước, 12 đột biến các dòng của `context_pack` (bỏ kỳ vọng, mặc định SATISFIED cho mệnh đề lạ, kỳ vọng
-chỉ của story này, bỏ điều kiện verifier đồng ý, cắt 299/301/1000, redact sau khi cắt, thứ tự cũ trước, trần 5 lượt, mọi
-mệnh đề là "không có proof", proof sau thay proof đầu): **12/12 bị giết** tại `80f4437`
-([evidence/context-pack-mutants.out](evidence/context-pack-mutants.out)).
+HEAD, baseline xanh trước, 15 đột biến — 14 trên các dòng của `context_pack` (bỏ kỳ vọng, mặc định SATISFIED cho mệnh đề
+lạ, kỳ vọng chỉ của story này, bỏ điều kiện verifier đồng ý, cắt 299/301/1000, redact sau khi cắt, thứ tự cũ trước, trần 5
+lượt, mọi mệnh đề là "không có proof", proof sau thay proof đầu, tiêu đề nói "candidate là commit" dù không nêu candidate,
+dòng candidate bỏ câu đó) và 1 trên lời gọi của nó trong `Developer.implement` (không đưa bí mật của run — trước vòng 2,
+đột biến này **sống sót** cả 17 test): **15/15 bị giết** tại `1899bb0`
+([evidence/context-pack-mutants.out](evidence/context-pack-mutants.out)). Các lớp test chạy: `Pack`, `Expectation`,
+`Prompt`, `RecordedSmoke2` (không có `ThroughTheRun`).
 
-Gói nằm trong prompt, nên đã được ràng buộc bằng `prompt_sha256` của phiên (`adapters.py`) và dựng lại được từ journal —
-không cần trường bản ghi mới.
+Gói nằm trong prompt, nên đã được ràng buộc bằng `prompt_sha256` của phiên (`adapters.py`) — không cần trường bản ghi
+mới. Dựng lại nó cần journal, bundle đã duyệt và, khi một bí mật đã bị che trong kết quả developer, chính bí mật đó:
+`readback.py` không có bí mật của run, nên trên một run có che nó báo `DIFFERENT` và thoát khác 0 (đóng an toàn, không
+báo trùng giả). Lượt tích hợp CLI không có gì bị che trong gói (hai prompt trùng).
 
 Đầu ra trên smoke-2 (phát lại offline, không phải bằng chứng của lượt chạy): phần 3 của
 [evidence/context-gap.out](evidence/context-gap.out).
@@ -130,8 +136,12 @@ không cần trường bản ghi mới.
 - không đóng khoảng hở cách ly. **OD-3** (`docs/implementation/v2/cycle2/H-CONTEXT-AUTHORITY-001-DESIGN.md`): seq và sha
   trong văn bản developer thấy là khoá tìm kiếm khi không có cách ly (một phiên đã in bản ghi `probe/evaluated` theo seq
   được trích). Gói chỉ trích seq của `story/begin`, `provider/result`, `proof/verified` và khoảng seq của lượt, không trích
-  bản ghi probe nào, không thêm loại định danh mới ngoài những gì `retry_feedback` đã đưa. OD-3 vẫn là quyết định của chủ
-  dự án; nếu bỏ khoá tìm kiếm khỏi văn bản developer thì trích dẫn của gói đi theo.
+  bản ghi probe nào, không thêm loại định danh mới ngoài những gì `retry_feedback` đã đưa (nó trích thẳng seq của hai bản
+  ghi probe của proof thất bại). Nhưng gói **thêm khoá tìm kiếm**: mỗi mệnh đề đạt có seq một `proof/verified`, và mọi
+  `proof/verified` nêu hai bản ghi `probe/evaluated` của nó trong `source_seqs` (định dạng journal 3; smoke-2: 176/176,
+  vd. seq 1371 → 1367, 1370) — cách bản ghi probe một bước, ở những mệnh đề `retry_feedback` không trỏ tới; khoảng seq
+  của lượt cũng bao các bản ghi probe. OD-3 vẫn là quyết định của chủ dự án; nếu bỏ khoá tìm kiếm khỏi văn bản developer
+  thì trích dẫn của gói đi theo.
 
 ## 4. Chưa làm
 
@@ -140,4 +150,10 @@ không cần trường bản ghi mới.
 - **Lý do dừng phiên trong journal**: chi tiết "changed nothing" bỏ `stopped` (`adapters.py`, `Implemented(O.FAILED…)`),
   nên gói không nói được "hết lượt". Sửa một dòng nhưng đổi văn bản journal — để riêng.
 - **Hiệu quả trên mô hình thật**: M6.
-- **Mutation** cho các dòng mới của `aisef2/app/feedback.py` và `adapters.py`: ngoài snapshot đang đo.
+- **Mutation** cho các dòng mới của `aisef2/app/feedback.py` và `adapters.py`: ngoài snapshot đang đo. Trong
+  `validation/v2/mutation.py` (đóng băng, không sửa ở đây), đích của `feedback.py` chỉ có `retry_feedback`, tập giết
+  `test_app_units` + `test_v21_review_chain` + `test_app_run` (`:621`, `:654-665`); đích `adapters.py::Developer.implement`
+  (`:545`, `:562`, `:605`) không có `test_v21_context_pack` trong tập giết. Chiến dịch sau phải thêm đích
+  `aisef2/app/feedback.py::context_pack` (và `PACK_MAX`/`PACK_LIST`/`PACK_ATTEMPTS`, `PACK_HEAD`) với
+  `test_v21_context_pack` trong tập giết, và thêm `test_v21_context_pack` vào tập giết của `Developer.implement` (đột
+  biến "không đưa bí mật" ở trên mới chỉ được chạy với `test_v21_context_pack`).
