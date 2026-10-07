@@ -31,6 +31,8 @@ through the real `run_target`, `_run_tests`, `mutants`, `main`, the real Process
 - INV-MUTATION-AUTHORITY → §2.4. Only `ca.signal_owned` signals, and only with its own ownership proof. An environment
   token, a command line or a range report is never proof. A process that only names the work tree, such as an
   operator's `tail -f`, is never signalled. The new tests signal nothing: their helpers end themselves on a sentinel.
+  Toy kill tests signal only themselves, except one that SIGKILLs its parent once it has proven it the range anchor the
+  test's own run started (§3.3).
 
 The cost of these rules: (a) a kill costs three short extra runs, the bracket (§4.1, §14 fix 9); (b) a mutant that hangs in k files
 costs k × TIMEOUT; (c) any process the runner cannot prove is its own stops the target, and the worker with it. §10
@@ -253,7 +255,10 @@ across runs and orders. The module globals `_FAILED`, `_TIMED_OUT`, `_CLEANUP` a
 - A one-shot EMFILE in the first run after T0, before a file that validly kills (VS-5 E1/E2): that row is INFRA (`kill
   not confirmed`), the chain goes on, the next file's kill is confirmed — KILLED in both kill-set orders.
 - The test SIGKILLs its own range anchor: INFRA `report channel lost after 0.0Xs` in under 1.5 s; a real expiry
-  (TIMEOUT patched to 2 s) is TIMEOUT.
+  (TIMEOUT patched to 2 s) is TIMEOUT. It signals only a parent `anchor_guard` proves the anchor of the test's own
+  run: a child of the test process running `range_anchor.py`, leader of the toy's group and session (that pid stays
+  the anchor or its zombie until the test process reaps it); unproven, the toy FAILs and signals nothing — measured:
+  with the guard told another controller pid, the mutant is KILLED by that FAIL and the test fails.
 - A file whose every test is skipped is refused at T0; a mutant that skips one more test, or `os._exit(0)`s before the
   summary, is INFRA.
 
@@ -322,7 +327,9 @@ and `timed_out` — the legacy key — **only for the TIMEOUT class**, listing t
 counts results that carry it, so in runner-2 records it counts exactly the TIMEOUT class, independently of order, with
 `s2_mutation_record.py` untouched.
 
-Target entry: `target`, `runner: 2`, `kill_tests` (the canonical list; execution order is that order), `source_sha256`,
+Target entry: `target`, `runner: 2`, `kill_tests` (the declared list, which `proof()` pins; each chain runs it in that
+order unless an execution-order table gives another, recorded as `execution_order`: the table's entry — `files`,
+`seconds`, `from` — with main's stamp `table`, `table_sha256`, `table_commit`: §7.2), `source_sha256`,
 `tree_sha256`, `mutants`, `killed`, `survivors` (every non-KILLED mutant, generator order), `classes`,
 `killed_by_timeout` (= the TIMEOUT class count), `strays_reaped`, `t0`, `original` (when T0 refused a file), `results`
 (every generated mutant in generator order, NOT_RUN included, so `proof()`'s mutant-list comparison stays meaningful),
@@ -346,7 +353,10 @@ unchanged.
   other non-KILLED class `mutant {m!r} is {class} ({why}): neither killed nor survived — re-run it`, which no audit
   excuses; and consistency: results list every mutant, `survivors` is the non-KILLED list, `killed` the KILLED count and
   each entry's `killed` its class, every KILLED carries its confirmed bracket (FAIL, control PASS, re-run FAIL with the
-  same signature, same file), every SURVIVED has one PASS per kill file, and an un-errored target has only PASS T0 rows.
+  same signature, same file), every SURVIVED has one PASS per kill file — in the order its chain ran them — and an
+  un-errored target has only PASS T0 rows. An `execution_order`, when the record has the key, is read by the runner's
+  own rule (`_order_problem`, §7.2): malformed, it is an inconsistent record and never the declared order; without its
+  table's path and sha256 it is inconsistent; with a table that was not committed at the run's HEAD it is refused.
 - `mutation.problems_of`: for phase `V2.1` only, a target result without `"runner": 2` is refused ("measured by a runner
   that does not classify — re-measure"). Historical phases keep today's behaviour.
 
@@ -558,7 +568,59 @@ identical across orders; the error is the same `UNCLASSIFIED` in every order and
 exactly once; and every (mutant, file) run has the same outcome, signature, exit status and (for PASS and FAIL) the same
 normalised tail hash in every order — o(m, f) does not depend on what ran before. **Controls:** with the stamp off
 (§1), the tree restore off (§2) and the old stop-at-first-non-PASS rule (§3, §4), each in one order, the classes differ
-from the truth, so the toy cannot pass vacuously. Runtime: the whole runner test file (36 tests) takes 252 s on this host under `heavy.sh`, the matrix about 115 s of it (5 rotations, 3 controls in one order each); it is POSIX-only.
+from the truth, so the toy cannot pass vacuously. Runtime, measured 2026-10-08 at 76e0eca under `heavy.sh` with the
+workers' `env -i`: the `Order` class takes 193 s (9 matrix runs — the 5 rotations and the 4 rotations of one declared
+set through a table — and 3 controls in one order each); the whole runner test file, 56 tests, 484 s. It is
+POSIX-only. (At commit 6 the file had 36 tests and took 252 s, the matrix about 115 s of it.)
+
+**Execution order (ORD-4).** `mutation.py run --order TABLE.json TARGET...` runs the chains of each target the table
+orders in its entry's order; every other target, and every T0, runs the declared order. Without a table nothing
+changes: the declared order, no `execution_order`.
+
+- *Provenance rule.* A table is derived, never written by hand, and only from a committed measurement:
+  `validation/v2/execution_order.py --write SWEEP.json TABLE.json` refuses a T0 sweep record that is not committed at
+  HEAD (HEAD's blob must be the bytes it reads) and applies one rule — a V2.1 target whose null mutant (`null_mutant()`
+  of the target's module at the tree the table is derived on, hashed as the sweep keys it) has a PASS T0 row for every
+  kill file runs its kill set in **ascending T0 seconds of each kill file on that null mutant, ties by declared
+  position**; any other target (a file never measured on that null, a T0 that did not pass, a module changed since) is
+  listed under `declared_order`, with why, and runs in declared order. The table is `{"table", "tool", "rule", "from":
+  {"path", "sha256", "measured_on"}, "orders": {target: {"files", "seconds", "from": {"path", "sha256"}}},
+  "declared_order": {target: why}}`. `--check TABLE.json` re-derives it from the record its `from` names and fails
+  unless that record is committed at HEAD and the table is byte for byte what it derives now. The order decides only
+  which reproduced FAIL comes first (§7.1 steps 4–5), so a stale table costs time, never a class.
+- *The sweep record.* `execution_order.py --record SWEEP.jsonl MEASURED_ON OUT.json` writes the committed format —
+  `{"record", "measured_on": the full commit the sweep ran at, "rows": [every JSONL line, unchanged]}` — and never
+  replaces a file. A row is one (null mutant, kill file) pair run through the runner's own T0 (§6.1): `module`, `null`
+  (sha256 of the null mutant's text), `file`, `targets`, `rows` (its T0 row: `role: "t0"`, `outcome`, `seconds`, …),
+  `original`, `error`. The sweep to commit under `closure-evidence/v2/v2.1/` is lane c2tests' `sweep-final.jsonl`,
+  measured at 33f4012: 129 pairs, 28 distinct null mutants, 36 kill files, 5,302 s of T0 runs (5,491 s wall). Derived
+  from an uncommitted copy of it at this branch (a dry run: `--write` itself refuses an uncommitted record), all 444
+  V2.1 targets get an order, 340 of them other than the declared one.
+- *main* refuses misuse before anything runs — `--order` once, first, with a table and the targets it is for; a name
+  that is not a target; an unreadable table, bad JSON, or no `orders` object — and checks **every** entry, for the
+  targets it runs and the ones it does not, with run_target's own rule (`_order_problem`: `files` is the declared kill
+  set as a multiset, `from` names the record by path and sha256): one bad entry stops main before the first target, so
+  no earlier target runs for hours first and no refused entry replaces a result in the record. It stamps each entry
+  with `table` (its path in the repository), `table_sha256` and `table_commit` — HEAD's commit when HEAD holds exactly
+  those bytes, else null and a `WARNING` line: an uncommitted table is recorded, not refused, so a pilot can still run
+  one, and `--check` refuses every result it ordered.
+- *The record* keeps the declared `kill_tests` and the stamped entry as `execution_order`; T0 runs the declared order.
+  `_problems_v2` reads the key, when present, by `_order_problem` too: a malformed one (`{}`, null, a list, no
+  `files`, `files: null`, no `from`) is an inconsistent record, never read as the declared order and never a crash; a
+  SURVIVED needs one PASS per kill file in that order; an entry without its table's path and sha256 is inconsistent;
+  and one whose `table_commit` is null is refused ("commit it and re-run") — `v21_mutation_record.py` reports it
+  through `problems_of`.
+
+`Order.test_an_execution_order_changes_no_class_and_the_record_only_where_it_must` runs the declared set in the four
+other rotations through such a table: every class, the target's fields, T0 and `target_problems` equal the declared
+order's; each (mutant, file) has the same rows (clock left out) in all nine runs of the matrix; a mutant not killed ran
+every file in the table's order; a kill is the first file in that order whose FAIL reproduces, and nothing ran after
+it; and at least one kill moved to another file. Controls: a chain that ignores the table fails that test; a record
+check that ignores `execution_order` fails `Classify.test_a_survivor_is_read_in_the_order_its_chain_ran`. The
+refusals, the record check's agreement with the runner and the provenance are tested in `KillSets` (`run` misuse, every
+entry before the first target, the stamp), `Classify` (malformed `execution_order`, an uncommitted table) and
+`tests/v2/test_v21_execution_order.py` (the rule, `--record`, `--write`, `--check`, `committed`; fixture
+`tests/v2/fixtures/execution_order/`), each with a control that fails it (§14, final verifier 1–4).
 
 ### 7.3 Limits, stated
 
@@ -591,9 +653,10 @@ from the truth, so the toy cannot pass vacuously. Runtime: the whole runner test
   `EXCLUDED`, `proof`, `_current`, `CRITERIA` and `FROZEN_CRITERIA_SHA256` are not edited; `criteria_sha256()` is
   unchanged (the Phase test asserts it).
 - **Kill sets and their order:** `V21_TARGETS` and every `*_TARGETS` list are byte-identical; the files keep their
-  names, so `REQUALIFICATION-MANIFEST.json`'s `--check` stays green. Reordering kill sets (cheapest first) is a separate,
-  later commit; it records `execution_order` beside the canonical `kill_tests` so `proof()` keeps comparing the
-  canonical list (ORD-4 verifier). This work only makes that reorder safe (§7).
+  names, so `REQUALIFICATION-MANIFEST.json`'s `--check` stays green. No kill set is reordered: an execution order
+  (cheapest first) is given by a table (`run --order`, §7.2) and recorded as `execution_order` beside the declared
+  `kill_tests`, so `proof()` keeps comparing the declared list (ORD-4 verifier). This work commits no table and no
+  sweep record: the generator derives a table only from a sweep record committed at HEAD, which the lead commits.
 - **`closure-evidence/`:** no record is edited.
 - **The kernel** (`aisef2/`): untouched, ProcessRange's default `wait_s` included.
 - **TIMEOUT stays 900 s per file.**
@@ -613,8 +676,12 @@ from the truth, so the toy cannot pass vacuously. Runtime: the whole runner test
 | 6 | `9cba6e0` | the order-independence matrix and the bounded release (§7, §2.4) | `::Order`, `::Proc` (VS-7/PL-5) |
 | 7 | `671d78e` | the contract, with the reviews' resolutions and the measurements | — |
 | fix 1–13 | §14 | the provers' open items, one commit each, each with its test | §14 |
+| ORD-4 | `f6151aa` | the execution-order table: `run --order`, `execution_order`, the record check (§7.2) | `::Order` table rotations, `::Classify`, `::KillSets` |
+| guard | `f2e0777` | the toy that kills its range anchor proves it is that anchor (§3.3) | `::Outcome` |
+| ord 1–4 | `eec1bcf`, `4a3b31b`, `8fc1350`, `76e0eca` | the final verifier's items on the execution order (§14) | `::KillSets`, `::Classify`, `test_v21_execution_order` |
 
-No kill-set reorder is in this series: the owner asked for it as a separate, later commit (§8).
+No kill-set reorder is in this series: the owner asked for it as a separate, later commit (§8). The execution-order
+table (lane execorder, §7.2) runs a declared set in another order without reordering it.
 
 Commits 1–5 ran, under `env -i` with the guard PATH and `python3 -P`, the heavy parts under `heavy.sh`: `ruff check`
 on the changed files; `mutation.py --check` diffed against c9c736f's output (identical at every commit);
@@ -700,7 +767,7 @@ small V2.1 targets, each with a 2-file kill set:
 | ORD-1 | byte/text-identity tests "killed" every mutant of 5 modules | §5 T0 gate, §6 split (4, 5, 5b); 60 targets refused pending N1 | `T0` toy; §6.1 sweep (129 pairs) |
 | ORD-2 | stop on timeout or any non-zero exit | §4.1 (3) | `Order`, `Classify` 1 |
 | ORD-3 | fast first files widen stale-bytecode exposure | §1 (1) | `Order` (fast `test_k` first in a rotation) |
-| ORD-4 | the reuse proof pins kill-set order | not changed; `execution_order` for the later reorder (§8); owner decision (§14) | — |
+| ORD-4 | the reuse proof pins kill-set order | not changed: a table derived from a committed T0 sweep record gives the execution order, recorded as `execution_order` beside the declared `kill_tests` with the committed table it came from (§7.2, §8); relaxing the proof is the owner's (§14) | `Order` execution-order rotations; `Classify` survivor order, malformed order, uncommitted table; `KillSets` refusals and stamp; `test_v21_execution_order` |
 | ORD-5 | cross-file and cross-mutant state | §2.2, §2.3 per run (2) | `Env` case S; `Order` |
 | ORD-6 | no killing file or cause recorded | §3.2, §4.2 (3) | `Classify` 4 |
 | ORD-7 | target fate depends on whether an escaping file is reached | a stop, never a class; settle narrows the window (2, 3); a 60 s grace (§14 fix 5); §7.3 | `Proc` stops; §14 fix 5 |
@@ -801,6 +868,11 @@ destructive site added: every removal is still a `TemporaryDirectory` cleanup), 
 | 11 | `2f8ec29` | `mutation.py t0` prints PASS for a refused kill set (order-equivalence) | Yes | no T0 row is a failure | `T0.test_the_t0_command_runs_t0_alone_and_writes_nothing` |
 | 12 | `7e8e26e` | `timed_out` in execution order (order-equivalence) | Yes | sorted | `Classify.test_timed_out_does_not_depend_on_the_order` |
 | 13 | `f72fb5b` | VS-6 (a): "re-run them" for mutants a re-run cannot confirm (classification) | Yes | the error says how many end with no summary and need a kill test or a ruling | `Classify.test_the_error_says_which_unclassified_mutants_a_re_run_cannot_resolve` |
+| guard | `f2e0777` | a toy kill test SIGKILLs its parent without proving it is its range anchor (final verifier, minor) | Yes | `anchor_guard`: the parent is signalled only when it is a child of the test process running `range_anchor.py` and leads the toy's group and session | `Outcome.test_a_lost_report_channel_is_not_a_timeout` (and the guard's negative: a plain child gets 0) |
+| ord 1 | `eec1bcf` | `run A --order T` ran A then refused; `run --order` raised IndexError; `run --order T` ran every target (final verifier, minor) | Yes | misuse and any name that is not a target are refused, with the usage, before anything runs | `KillSets.test_run_misuse_is_refused_before_anything_runs` |
+| ord 2 | `4a3b31b` | a bad table entry was refused only at its target's turn, after earlier targets ran, and its NOT_RUN entry replaced the record's result (final verifier, minor) | Yes | `_order_problem`, one rule; main checks every entry before the first target | `KillSets.test_main_refuses_a_table_with_any_bad_entry_before_the_first_target_runs` |
+| ord 3 | `8fc1350` | `_problems_v2` read `{}`/null as the declared order and crashed on a list or `files: null` (final verifier, minor) | Yes | the record check reads the key by `_order_problem` | `Classify.test_the_record_check_and_the_runner_agree_on_what_an_execution_order_is` |
+| ord 4 | `76e0eca` | a table's provenance: nothing tied it to a measurement or to a committed file (final verifier, minor) | Yes | `validation/v2/execution_order.py` (rule, `--record`, `--write`, `--check`); `from` = record path and sha256; main's stamp with `table_commit`; `_problems_v2` refuses an uncommitted table | `test_v21_execution_order` (3); `KillSets` stamp; `Classify.test_a_result_ordered_by_a_table_that_was_not_committed_is_refused` |
 | doc | this commit | the report's "16/16 failing pairs now pass" (order-equivalence) | Yes | §6.2: 16/16 identity-file pairs; the 7 C2-era pairs still fail (N1) | — |
 | doc | this commit | §7.1's claim that a nondeterministic file "shows as an unconfirmed FAIL" (classification) | Yes | the residual rate stated (§7.1 step 1) | fix 10's parity case |
 
@@ -818,7 +890,8 @@ destructive site added: every removal is still a `TemporaryDirectory` cleanup), 
   passes only beside a cache an earlier run wrote. None is known.
 - **ORD-4 — the reuse proof pins kill-set order** (order-equivalence). Unchanged by instruction (the reorder is a later,
   separate commit, §8): `proof()`, the Phase test and the scope manifest fail loudly on any reorder, and no reorder exists
-  yet. Relaxing them changes frozen criteria — the owner's decision.
+  yet. Relaxing them changes frozen criteria — the owner's decision. Running a declared set in another order needs none
+  of that (§7.2): `kill_tests` stays the declared list.
 - **ORD-7's residue** — a leftover living longer than 60 s still stops the target in the orders that reach its file
   (§7.3). Removing it needs ownership taken before release() (ORD-7 (b)), an authority-model change for the owner.
 - **The prover's optional extras not built:** every `.py`'s mtime is in fix 1 (built); a widened signature with the
@@ -836,4 +909,5 @@ destructive site added: every removal is still a `TemporaryDirectory` cleanup), 
 Every mutant has the same class under both (all KILLED). The difference is the second control (fix 9): one run per
 kill, about 0.6 s each here, so about +1.8 CPU-hours over ~10,900 kills; the cwd read (fix 4) adds about 0.02 s per
 run; the fresh re-measure (fix 10) and the 60 s grace (fix 5) cost nothing on these targets. The runner's own test
-file: 48 tests, 417 s under `heavy.sh` (it was 36 tests, 252 s).
+file: 56 tests, 484 s under `heavy.sh` at 76e0eca; the `Order` class alone, 193 s (48 tests and 417 s after the fix
+series; 36 tests and 252 s at commit 6).

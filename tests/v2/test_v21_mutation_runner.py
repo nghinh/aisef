@@ -7,6 +7,7 @@ off, so a toy that no longer exercises the channel fails instead of passing vacu
 from __future__ import annotations
 
 import contextlib
+import hashlib
 import json
 import os
 import pathlib
@@ -37,6 +38,19 @@ def toy(base: pathlib.Path, module: str, files: dict[str, str], name: str = "toy
         (root / rel).parent.mkdir(parents=True, exist_ok=True)
         (root / rel).write_text(text, encoding="utf-8")
     return root
+
+
+#: an execution-order entry's `from` (validation/v2/execution_order.py) and main's stamp of a table committed at HEAD
+FROM = {"path": "closure-evidence/v2/v2.1/T0-SWEEP.json (this test)", "sha256": "0" * 64}
+STAMP = {"table": "order.json", "table_sha256": "1" * 64, "table_commit": "2" * 40}
+
+
+def git(cwd: pathlib.Path, *args: str) -> str:
+    env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")} | {
+        "GIT_CONFIG_NOSYSTEM": "1", "GIT_CONFIG_GLOBAL": os.devnull, "GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@t",
+        "GIT_COMMITTER_NAME": "t", "GIT_COMMITTER_EMAIL": "t@t"}
+    return subprocess.run(["git", "-C", str(cwd), *args], capture_output=True, text=True, encoding="utf-8", env=env,
+                          check=True).stdout.strip()
 
 
 def killed(result: dict) -> list[bool]:
@@ -880,6 +894,25 @@ SUMMARIES = {
 }
 
 
+def anchor_guard() -> str:
+    """Source of `our_anchor()` for a toy kill test that signals its parent (INV-MUTATION-AUTHORITY): the parent's pid
+    when it is the range anchor this test process's run started — a child of this process running range_anchor.py,
+    leader of the toy's own group and session — else 0, and nothing is signalled. That pid stays the anchor, or its
+    zombie, until this process reaps it after wait() returns, so a signal to it cannot reach another process."""
+    from aisef2.runtime.process_range import ANCHOR
+    return textwrap.dedent(f"""
+        import os, subprocess
+
+        def our_anchor():
+            pp = os.getppid()
+            ps = subprocess.run(["ps", "-o", "ppid=,command=", "-p", str(pp)], capture_output=True, text=True)
+            ppid, _, command = ps.stdout.strip().partition(" ")
+            proven = pp > 1 and os.getpgrp() == os.getsid(0) == pp and ppid == "{os.getpid()}" and \\
+                command.endswith(" -P " + {str(ANCHOR)!r})
+            return pp if proven else 0
+        """)
+
+
 class Outcome(unittest.TestCase):
     """VS-1, VS-3, VS-5, VS-6, ORD-6: each run is PASS, FAIL, TIMEOUT or INFRA, judged from unittest's own summary,
     the exit status and the clock; only a FAIL the bracket confirms is a kill."""
@@ -1098,20 +1131,29 @@ class Outcome(unittest.TestCase):
     @unittest.skipUnless(POSIX, "the runner's process ranges and cleanup authority are measured on POSIX")
     def test_a_lost_report_channel_is_not_a_timeout(self):
         """VS-3: the test kills its own range anchor; wait() returns at once. That is INFRA, judged by the clock before
-        release(), and no TIMEOUT. A real expiry (TIMEOUT patched to 2 s) is TIMEOUT."""
+        release(), and no TIMEOUT. A real expiry (TIMEOUT patched to 2 s) is TIMEOUT. The toy signals its parent only
+        once `anchor_guard` has proven it the range anchor this test's run started; unproven, the toy FAILs and signals
+        nothing (INV-MUTATION-AUTHORITY)."""
         d = self.enterContext(tempfile.TemporaryDirectory())
-        root = toy(pathlib.Path(d), POSITIVE, {"test_x.py": """
-            import os, signal, time, unittest
+        root = toy(pathlib.Path(d), POSITIVE, {"test_x.py": anchor_guard() + textwrap.dedent("""
+            import signal, time, unittest
             from aisef2.toy import positive
+
             class X(unittest.TestCase):
                 def test_x(self):
                     if positive(5) is None:
-                        os.kill(os.getppid(), signal.SIGKILL)
+                        anchor = our_anchor()
+                        self.assertTrue(anchor, "the parent is not the range anchor this test started")
+                        os.kill(anchor, signal.SIGKILL)
                         time.sleep(30)
                     if positive(5) is False:
                         while True:
                             pass
-            """})
+            """)})
+        # the guard's own negative: a parent that is not the anchor (this process, for a plain child) proves nothing
+        plain = subprocess.run([sys.executable, "-c", anchor_guard() + "print(our_anchor())"], capture_output=True,
+                               text=True, check=True)
+        self.assertEqual(plain.stdout.strip(), "0")
         with mock.patch.object(m, "TIMEOUT", 2):
             r = m.run_target(root, "aisef2/toy.py::positive", ["tests/v2/test_x.py"])
         lost, real = (rows_of(r)[0][1], rows_of(r)[1][1])
@@ -1189,6 +1231,90 @@ class Classify(unittest.TestCase):
         rows = [("tests/v2/test_small.py", "TIMEOUT"), ("tests/v2/test_big.py", "TIMEOUT"), ("tests/v2/test_ok.py", "PASS")]
         self.assertEqual(entry(rows), entry(rows[::-1]))
         self.assertEqual(entry(rows), ["tests/v2/test_big.py", "tests/v2/test_small.py"])
+
+    def test_a_survivor_is_read_in_the_order_its_chain_ran(self):
+        """ORD-4: a SURVIVED needs one PASS per kill file in the order its chain ran them — the declared order, or the
+        `execution_order` the record names, which must be the kill set itself, in another order."""
+        d = self.enterContext(tempfile.TemporaryDirectory())
+        root = toy(pathlib.Path(d), POSITIVE, {})
+        src, target = (root / "aisef2/toy.py").read_text(encoding="utf-8"), "aisef2/toy.py::positive"
+        descs = [x for x, _ in m.mutants(src, "positive", {})]
+        a, b = "tests/v2/test_a.py", "tests/v2/test_b.py"
+
+        def problems(ran, files=None):
+            return m.target_problems({
+                "target": target, "runner": 2, "kill_tests": [a, b], "source_sha256": m.source_digest(src),
+                "mutants": len(descs), "killed": 0, "survivors": descs, "t0": [],
+                **({"execution_order": {"files": files, "from": FROM, **STAMP}} if files else {}),
+                "results": [{"mutant": x, "class": "SURVIVED", "killed": False,
+                             "files": [{"file": f, "outcome": "PASS"} for f in ran]} for x in descs]}, root)
+        not_ran = [f"{target}: inconsistent record: mutant {x!r}: SURVIVED without one PASS per kill file" for x in descs]
+        with mock.patch.dict(m.AUDITED, {(target, x): "audited for this test" for x in descs}):
+            self.assertEqual(problems([a, b]), [])
+            self.assertEqual(problems([b, a], [b, a]), [])
+            self.assertEqual(problems([b, a]), not_ran)
+            self.assertEqual(problems([a, b], [b, a]), not_ran)
+            self.assertEqual(problems([a], [a]), [f"{target}: inconsistent record: execution order {[a]!r} is not the "
+                                                  "kill set in another order, or names no measurement"])
+
+    def test_a_result_ordered_by_a_table_that_was_not_committed_is_refused(self):
+        """Provenance: a result whose chains ran in a table's order is tied to that table by path, sha256 and the commit
+        main found it at; a result without that stamp is inconsistent, and one whose table was not committed at the
+        run's HEAD is refused (v21_mutation_record.py reads these problems through problems_of)."""
+        d = self.enterContext(tempfile.TemporaryDirectory())
+        root = toy(pathlib.Path(d), POSITIVE, {})
+        src, target = (root / "aisef2/toy.py").read_text(encoding="utf-8"), "aisef2/toy.py::positive"
+        descs = [x for x, _ in m.mutants(src, "positive", {})]
+        a, b = "tests/v2/test_a.py", "tests/v2/test_b.py"
+
+        def problems(**stamp):
+            return m.target_problems({
+                "target": target, "runner": 2, "kill_tests": [a, b], "source_sha256": m.source_digest(src),
+                "mutants": len(descs), "killed": 0, "survivors": descs, "t0": [],
+                "execution_order": {"files": [b, a], "from": FROM, **stamp},
+                "results": [{"mutant": x, "class": "SURVIVED", "killed": False,
+                             "files": [{"file": f, "outcome": "PASS"} for f in (b, a)]} for x in descs]}, root)
+        no_stamp = [f"{target}: inconsistent record: execution_order names no table and its sha256"]
+        with mock.patch.dict(m.AUDITED, {(target, x): "audited for this test" for x in descs}):
+            self.assertEqual(problems(**STAMP), [])
+            self.assertEqual(problems(), no_stamp)
+            self.assertEqual(problems(**{**STAMP, "table_sha256": "abc"}), no_stamp)
+            self.assertEqual(problems(**{**STAMP, "table": None}), no_stamp)
+            for commit in (None, ""):
+                self.assertEqual(problems(**{**STAMP, "table_commit": commit}),
+                                 [f"{target}: execution-order table order.json was not a file committed at the run's HEAD "
+                                  "— commit it and re-run"])
+
+    def test_the_record_check_and_the_runner_agree_on_what_an_execution_order_is(self):
+        """Final verifier: `_problems_v2` read `(execution_order or {}).get("files", kill_tests)`: `{}` and `None` were
+        the declared order with no problem, a list crashed --check (AttributeError), `files: null` crashed it
+        (TypeError), and an entry with no `from` passed. Now each malformed value is an inconsistent record — the same
+        rule run_target refuses it with (a null one aside: run_target's None is no table, and it never writes one) —
+        and is never read as the declared order."""
+        d = self.enterContext(tempfile.TemporaryDirectory())
+        root = toy(pathlib.Path(d), POSITIVE, {})
+        src, target = (root / "aisef2/toy.py").read_text(encoding="utf-8"), "aisef2/toy.py::positive"
+        descs = [x for x, _ in m.mutants(src, "positive", {})]
+        a, b = "tests/v2/test_a.py", "tests/v2/test_b.py"
+        for order in ({}, None, [a, b], {"files": None, "from": "x"}, {"from": "x"}, {"files": [a, b]},
+                      {"files": [a, b], "from": None}, {"files": [a, 1], "from": "x"}, {"files": "ab", "from": "x"},
+                      {"files": [a, b], "from": "T0 seconds"}, {"files": [a, b], "from": {"path": "x.json"}},
+                      {"files": [a, b], "from": {**FROM, "sha256": "abc"}}, {"files": [a, b], "from": {**FROM, "path": ""}}):
+            with self.subTest(order=order):
+                if order is not None:   # run_target's None is "no table"; the runner never writes the key as null
+                    refused = m.run_target(root, target, [a, b], order=order)
+                    self.assertEqual((refused["error"], classes(refused), refused["execution_order"]),
+                                     (m._order_problem(order, [a, b]), ["NOT_RUN"] * 2, order))
+                record = {"target": target, "runner": 2, "kill_tests": [a, b], "source_sha256": m.source_digest(src),
+                          "mutants": len(descs), "killed": 0, "survivors": descs, "t0": [], "execution_order": order,
+                          "results": [{"mutant": x, "class": "SURVIVED", "killed": False,
+                                       "files": [{"file": f, "outcome": "PASS"} for f in (a, b)]} for x in descs]}
+                with mock.patch.dict(m.AUDITED, {(target, x): "audited for this test" for x in descs}), \
+                        mock.patch.object(m, "PHASE_TARGETS", {"TOY": {target: [a, b]}}), \
+                        mock.patch.object(m, "TARGETS", {target: [a, b]}):
+                    self.assertEqual(m.target_problems(record, root),
+                                     [f"{target}: inconsistent record: {m._order_problem(order, [a, b])}"])
+                    self.assertEqual(m.problems_of({"targets": [record]}, root, "TOY"), m.target_problems(record, root))
 
     @unittest.skipUnless(POSIX, "the runner's process ranges and cleanup authority are measured on POSIX")
     def test_a_timeout_is_never_a_kill_and_never_stops_the_chain(self):
@@ -1473,6 +1599,140 @@ class KillSets(unittest.TestCase):
         self.assertEqual(classes(r), ["NOT_RUN", "NOT_RUN"])
         self.assertNotIn("t0", r)
 
+    def test_an_execution_order_that_is_not_the_kill_set_is_refused_before_anything_runs(self):
+        """ORD-4: an execution order runs the declared kill set, every file once, and names the measurement it came
+        from; anything else refuses the target, with the declared `kill_tests` and the order given both kept."""
+        a, b = "tests/v2/test_a.py", "tests/v2/test_b.py"
+        with tempfile.TemporaryDirectory() as d:
+            root = toy(pathlib.Path(d), POSITIVE, {})
+            for order in ({"files": [a], "from": "x"}, {"files": [b, a, a], "from": "x"}, {"files": [b, a]}):
+                with self.subTest(order=order):
+                    r = m.run_target(root, "aisef2/toy.py::positive", [a, b], order=order)
+                    self.assertIn("is not the kill set in another order, or names no measurement", r["error"])
+                    self.assertEqual((r["kill_tests"], r["execution_order"]), ([a, b], order))
+                    self.assertEqual(classes(r), ["NOT_RUN", "NOT_RUN"])
+                    self.assertNotIn("t0", r)
+
+    def test_main_takes_each_targets_order_from_the_table_and_the_rest_in_declared_order(self):
+        """`run --order TABLE`: a target the table lists gets its entry, stamped with the table's path in the
+        repository, its sha256 and HEAD's commit when HEAD holds those bytes (else null, with a warning); any other
+        target the declared order; a table naming a target that does not exist stops main before anything runs."""
+        a, b = "tests/v2/test_a.py", "tests/v2/test_b.py"
+        targets = {"aisef2/toy.py::positive": [a, b], "aisef2/toy.py::other": [a, b]}
+        calls = []
+
+        def fake(root, target, tests, pristine=None, on_mutant=None, t0_only=False, order=None):
+            calls.append((target, tests, order))
+            return m._summarise({"target": target, "runner": 2, "kill_tests": list(tests), "mutants": 0, "results": []})
+        with tempfile.TemporaryDirectory() as d:
+            root = toy(pathlib.Path(d).resolve(), POSITIVE + "\n\ndef other(x):\n    return x\n", {})
+            git(root, "init", "-q", "-b", "main")
+            table, outside = root / "order.json", pathlib.Path(d) / "order.json"
+            raw = json.dumps({"orders": {"aisef2/toy.py::positive": {"files": [b, a], "from": FROM}}}).encode()
+            entry = {"files": [b, a], "from": FROM, "table_sha256": hashlib.sha256(raw).hexdigest()}
+            table.write_bytes(raw)
+            outside.write_bytes(raw)
+            with mock.patch.object(m, "ROOT", root), mock.patch.object(m, "RECORDS", {"TOY": "rec.json"}), \
+                    mock.patch.object(m, "PHASE_TARGETS", {"TOY": targets}), mock.patch.object(m, "TARGETS", targets), \
+                    mock.patch.object(m, "run_target", fake), mock.patch("builtins.print") as out:
+                for path, rel, commit in ((table, "order.json", None), (outside, str(outside), None), (table, "order.json", "HEAD")):
+                    if commit:
+                        git(root, "add", "order.json")
+                        git(root, "commit", "-q", "-m", "the table")
+                        commit = git(root, "rev-parse", "HEAD")
+                    calls.clear()
+                    out.reset_mock()
+                    m.main(["run", "--order", str(path), *targets])
+                    self.assertEqual(calls, [("aisef2/toy.py::positive", [a, b], {**entry, "table": rel, "table_commit": commit}),
+                                             ("aisef2/toy.py::other", [a, b], None)])
+                    warned = [c.args[0] for c in out.call_args_list if c.args[0].startswith("WARNING")]
+                    self.assertEqual(warned, [] if commit else [f"WARNING execution-order table {rel} is not a file committed "
+                                                                 "at HEAD: --check refuses every result it orders"])
+                table.write_text(json.dumps({"orders": {"aisef2/toy.py::gone": {"files": [a, b], "from": FROM}}}),
+                                 encoding="utf-8")
+                calls.clear()
+                with self.assertRaisesRegex(SystemExit, "not a mutation target in the execution-order table"):
+                    m.main(["run", "--order", str(table), *targets])
+                self.assertEqual(calls, [])
+
+    def test_main_refuses_a_table_with_any_bad_entry_before_the_first_target_runs(self):
+        """Final verifier: a bad entry was refused only at its target's turn — after every earlier target had run —
+        and its NOT_RUN entry replaced that target's result in the record. main now checks every entry of the table
+        (the targets it runs and the ones it does not) with run_target's own rule before the first target runs."""
+        a, b = "tests/v2/test_a.py", "tests/v2/test_b.py"
+        first, second = "aisef2/toy.py::positive", "aisef2/toy.py::other"
+        targets = {first: [a, b], second: [a, b]}
+        calls = []
+
+        def fake(root, target, tests, pristine=None, on_mutant=None, t0_only=False, order=None):
+            calls.append(target)
+            return m._summarise({"target": target, "runner": 2, "kill_tests": list(tests), "mutants": 0, "results": []})
+        good = {"files": [b, a], "from": FROM}
+        with tempfile.TemporaryDirectory() as d:
+            root = toy(pathlib.Path(d), POSITIVE + "\n\ndef other(x):\n    return x\n", {})
+            record = root / "rec.json"
+            kept = json.dumps({"record": "toy", "targets": [{"target": second, "kept": "the earlier result"}]}) + "\n"
+            record.write_text(kept, encoding="utf-8")
+            table = pathlib.Path(d) / "order.json"
+            with mock.patch.object(m, "ROOT", root), mock.patch.object(m, "RECORDS", {"TOY": "rec.json"}), \
+                    mock.patch.object(m, "PHASE_TARGETS", {"TOY": targets}), mock.patch.object(m, "TARGETS", targets), \
+                    mock.patch.object(m, "run_target", fake), mock.patch("builtins.print"):
+                for bad in ({"files": [a], "from": "x"}, {"files": [b, a, a], "from": "x"}, {"files": [a, a], "from": "x"},
+                            {"files": [b, a]}, {"files": [b, a], "from": ""}, {"from": "x"}, {}, [b, a], None):
+                    for argv in ([first, second], [first]):   # the bad entry's target runs second, or not at all
+                        with self.subTest(bad=bad, argv=argv):
+                            table.write_text(json.dumps({"orders": {first: good, second: bad}}), encoding="utf-8")
+                            with self.assertRaises(SystemExit) as stop:
+                                m.main(["run", "--order", str(table), *argv])
+                            why = (f"execution order {bad.get('files') if isinstance(bad, dict) else bad!r} is not the "
+                                   "kill set in another order, or names no measurement")
+                            self.assertEqual(stop.exception.code, f"execution-order table refused, nothing ran: "
+                                                                  f"{ {second: why} }")
+                            self.assertEqual((calls, record.read_text(encoding="utf-8")), ([], kept))
+                for text in (json.dumps({first: good}), "[]", "{", json.dumps({"orders": [good]})):   # no `orders` object
+                    with self.subTest(table=text), self.assertRaisesRegex(SystemExit, "^execution-order table refused, nothing ran: "):
+                        table.write_text(text, encoding="utf-8")
+                        m.main(["run", "--order", str(table), first])
+                with self.assertRaisesRegex(SystemExit, "^execution-order table refused, nothing ran: .*gone.json"):
+                    m.main(["run", "--order", str(table.with_name("gone.json")), first])   # no such file
+                self.assertEqual((calls, record.read_text(encoding="utf-8")), ([], kept))
+                table.write_text(json.dumps({"orders": {first: good, second: {**good, "files": [a, b]}}}), encoding="utf-8")
+                m.main(["run", "--order", str(table), first])   # every entry valid: it runs
+                self.assertEqual(calls, [first])
+
+    def test_run_misuse_is_refused_before_anything_runs(self):
+        """Final verifier: `run A --order T` ran A in declared order and refused only after it; `run --order` raised
+        IndexError; `run --order T` ran every target of every phase. Each is refused, with a message and a non-zero
+        exit, before any target runs and before any record is written; so is a name that is not a target."""
+        a, b = "tests/v2/test_a.py", "tests/v2/test_b.py"
+        targets = {"aisef2/toy.py::positive": [a, b]}
+        calls = []
+
+        def fake(root, target, tests, pristine=None, on_mutant=None, t0_only=False, order=None):
+            calls.append(target)
+            return m._summarise({"target": target, "runner": 2, "kill_tests": list(tests), "mutants": 0, "results": []})
+        with tempfile.TemporaryDirectory() as d:
+            root = toy(pathlib.Path(d), POSITIVE, {})
+            table = pathlib.Path(d) / "order.json"
+            table.write_text(json.dumps({"orders": {"aisef2/toy.py::positive": {"files": [b, a], "from": FROM}}}),
+                             encoding="utf-8")
+            with mock.patch.object(m, "ROOT", root), mock.patch.object(m, "RECORDS", {"TOY": "rec.json"}), \
+                    mock.patch.object(m, "PHASE_TARGETS", {"TOY": targets}), mock.patch.object(m, "TARGETS", targets), \
+                    mock.patch.object(m, "run_target", fake), mock.patch("builtins.print"):
+                for argv in (["run", *targets, "--order", str(table)], ["run", "--order"], ["run", "--order", str(table)],
+                             ["run", "--order", str(table), *targets, "--order", str(table)],
+                             ["run", *targets, "aisef2/toy.py::gone"]):
+                    with self.subTest(argv=argv):
+                        with self.assertRaises(SystemExit) as stop:
+                            m.main(argv)
+                        # a message (str): the interpreter prints it and exits 1
+                        self.assertRegex(stop.exception.code, r"^usage: mutation\.py run --order TABLE\.json TARGET\.\.\. |"
+                                                              r"^not a mutation target: \['aisef2/toy\.py::gone'\]$")
+                self.assertEqual(calls, [])
+                self.assertFalse((root / "rec.json").exists())
+                m.main(["run", "--order", str(table), *targets])   # the same table, used as the usage says: it runs
+                self.assertEqual(calls, list(targets))
+
 
 # --------------------------------------------------------------------------------------------- §7 order independence
 
@@ -1543,7 +1803,8 @@ def old_stop_rule(tg, entry, src):
 @unittest.skipUnless(POSIX, "the runner's process ranges and cleanup authority are measured on POSIX")
 class Order(unittest.TestCase):
     """The owner's rule: a reorder never changes a class, on a sample with killed, survivor, timeout and infrastructure
-    cases (§7). Five kill files in every rotation (each file in each position, each pair in both relative orders); each
+    cases (§7). Five kill files in every rotation (each file in each position, each pair in both relative orders) — as
+    the declared kill set, and as the execution order of one declared set (ORD-4: an execution-order table); each
     protection switched off in turn must change a class, so the toy cannot pass vacuously."""
 
     KILL = ["tests/v2/test_a.py", "tests/v2/test_h.py", "tests/v2/test_i.py", "tests/v2/test_c.py", "tests/v2/test_k.py"]
@@ -1553,8 +1814,10 @@ class Order(unittest.TestCase):
         cls._tmp = tempfile.TemporaryDirectory()
         cls.root = toy(pathlib.Path(cls._tmp.name), ORDER_MODULE, ORDER_FILES)
         cls.orders = [cls.KILL[i:] + cls.KILL[:i] for i in range(len(cls.KILL))]
+        cls.table = [{"files": o, "from": FROM, **STAMP} for o in cls.orders[1:]]   # each rotation, as main records it
         with mock.patch.object(m, "TIMEOUT", 2):
             cls.runs = [m.run_target(cls.root, "aisef2/toy.py::f", order) for order in cls.orders]
+            cls.reordered = [m.run_target(cls.root, "aisef2/toy.py::f", cls.KILL, order=o) for o in cls.table]
 
     @classmethod
     def tearDownClass(cls) -> None:
@@ -1599,6 +1862,47 @@ class Order(unittest.TestCase):
                 got = (x["outcome"], x.get("first"), x.get("exit"), x["tail_sha256"] if x["outcome"] in ("PASS", "FAIL") else "")
                 self.assertEqual(seen.setdefault(key, got), got, key)
         self.assertGreater(len(seen), 20)
+
+    def test_an_execution_order_changes_no_class_and_the_record_only_where_it_must(self):
+        """ORD-4: the declared kill set run in each other rotation an execution-order table gives. The record keeps the
+        declared `kill_tests` and names the order and its measurement (`execution_order`); every class, the target's
+        fields, T0 and the verdict are the declared order's; and the record differs from it only there and in which
+        reproduced FAIL came first: each (mutant, file) has the same rows in every order, a mutant not killed ran every
+        file in the table's order, and a kill is the first file in that order whose FAIL reproduces, nothing after it."""
+        def said(x):   # a run without its clock, and its tail hash only where it is stable (PASS, FAIL)
+            return {k: v for k, v in x.items() if k not in ("seconds", "overhead_s", "tail", "tail_sha256")} | (
+                {"tail_sha256": x["tail_sha256"]} if x["outcome"] in ("PASS", "FAIL") else {})
+
+        def rest(r):
+            return {**{k: v for k, v in r.items() if k not in ("execution_order", "t0", "results")},
+                    "t0": [said(x) for x in r["t0"]],
+                    "results": [{k: v for k, v in x.items() if k not in ("files", "killed_by")} for x in r["results"]]}
+        groups: dict = {}
+        for r in [*self.runs, *self.reordered]:
+            for x in r["results"]:
+                for f in dict.fromkeys(y["file"] for y in x["files"]):
+                    got = [said(y) for y in x["files"] if y["file"] == f]
+                    self.assertEqual(groups.setdefault((x["mutant"], f), got), got, (x["mutant"], f))
+        reproduces = {k for k, g in groups.items() if any("role" not in y and y["outcome"] == "FAIL" for y in g)}
+        ref, moved = self.runs[0], 0
+        self.assertNotIn("execution_order", ref)   # no table: the declared order, as before
+        for o, r in zip(self.table, self.reordered, strict=True):
+            with self.subTest(first=o["files"][0]):
+                self.assertEqual((r["kill_tests"], r["execution_order"]), (self.KILL, o))
+                self.assertEqual(dict(zip([x["mutant"] for x in r["results"]], classes(r), strict=True)), ORDER_TRUTH)
+                self.assertTrue(any(z.get("residue") for _, z in rows_of(r)))   # the residue case, in this order too
+                self.assertEqual(rest(r), rest(ref))
+                self.assertEqual(m.target_problems(r, self.root), m.target_problems(ref, self.root))
+                for x, y in zip(r["results"], ref["results"], strict=True):
+                    ran = list(dict.fromkeys(z["file"] for z in x["files"]))
+                    if x["class"] != "KILLED":
+                        self.assertEqual(ran, o["files"])
+                        continue
+                    first = next(f for f in o["files"] if (x["mutant"], f) in reproduces)
+                    self.assertEqual((x["killed_by"]["file"], ran), (first, o["files"][:o["files"].index(first) + 1]))
+                    self.assertTrue(m._confirmed(x))
+                    moved += x["killed_by"]["file"] != y["killed_by"]["file"]
+        self.assertGreater(moved, 0)   # the order decided which reproduced FAIL came first, and nothing else
 
     def test_each_protection_switched_off_changes_a_class(self):
         fixed = int((self.root / "aisef2/toy.py").stat().st_mtime) + 1

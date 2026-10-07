@@ -21,6 +21,8 @@ A probe's child script (a module-level string constant that the probe runs in th
 made in the parsed script and written back into the constant, so the kill tests run the mutated script (C2-P3).
 
     python -P validation/v2/mutation.py run [target ...]   # run; writes closure-evidence/v2/P<n>-MUTATION.json
+    python -P validation/v2/mutation.py run --order TABLE.json target ...     # each chain in the table's order (§7.2;
+                                                                              # TABLE from validation/v2/execution_order.py)
     python -P validation/v2/mutation.py --check            # every phase record current, every target killed or audited
 """
 
@@ -37,6 +39,7 @@ import pathlib
 import re
 import shutil
 import stat
+import subprocess
 import sys
 import tempfile
 import time
@@ -923,12 +926,14 @@ class _Stop(ca.Unproven):
 class _Target:
     """One target's working state: its scratch directory (trees, run directories — never inside a tree), the ownership
     boundary, the tree and its base manifest, the version of the mutated file in it and its stamp, the run counter, the
-    kill set, the unmutated module the bracket's control runs on, and T0's reference per file. A plain class, not a
-    dataclass: callers load this module by path without a sys.modules entry (p2, p4 tests)."""
+    kill set (declared order: T0's) and the order a mutant's chain runs it in, the unmutated module the bracket's
+    control runs on, and T0's reference per file. A plain class, not a dataclass: callers load this module by path
+    without a sys.modules entry (p2, p4 tests)."""
 
-    def __init__(self, rel, scratch, boundary, worker, tree=None, pristine=None, tests=(), last=0):
+    def __init__(self, rel, scratch, boundary, worker, tree=None, pristine=None, tests=(), last=0, order=None):
         self.rel, self.scratch, self.boundary, self.worker, self.tree = rel, scratch, boundary, worker, tree
         self.pristine, self.tests, self.last = pristine, list(tests), last   # pristine None: the caller's own tree
+        self.order = list(order or tests)   # a permutation of `tests` (run_target checks it); default: declared order
         self.holder = self.base = self.version = self.null = None
         self.seq, self.ref = 0, {}   # ref: file -> T0's {"ref": [counts, skipped tests], "first_test"}
 
@@ -1350,13 +1355,14 @@ def _confirm(tg: _Target, rel: str, rows: list, row: dict, src: str, fresh: bool
 
 
 def _mutant(tg: _Target, entry: dict, src: str) -> None:
-    """Every kill file in kill-set order, each run clean. A FAIL is a kill only when the bracket confirms it (`_confirm`),
-    in place or, failing that, once more on a fresh tree (`_remeasure`). Then — and only then — the remaining files are
-    skipped. Anything else leaves that file's row PASS, TIMEOUT or INFRA and the chain goes on: a timeout or an
-    infrastructure fault never decides a kill and never hides a later valid one (VS-1, VS-2, VS-5, PL-2, ORD-2)."""
+    """Every kill file in execution order (the declared one, unless a table gives another: §7), each run clean. A FAIL
+    is a kill only when the bracket confirms it (`_confirm`), in place or, failing that, once more on a fresh tree
+    (`_remeasure`). Then — and only then — the remaining files are skipped. Anything else leaves that file's row PASS,
+    TIMEOUT or INFRA and the chain goes on: a timeout or an infrastructure fault never decides a kill and never hides
+    a later valid one (VS-1, VS-2, VS-5, PL-2, ORD-2)."""
     rows = entry["files"] = []
     _write(tg, src)
-    for rel in tg.tests:
+    for rel in tg.order:
         row = _run_file(tg, rel, rows)
         if row["outcome"] == "FAIL" and (why := _confirm(tg, rel, rows, row, src)):
             row = _remeasure(tg, rel, rows, row, src, why)
@@ -1439,15 +1445,57 @@ def null_mutant(module_src: str, func: str) -> str:
     return ast.unparse(tree)
 
 
+_SHA256 = re.compile(r"[0-9a-f]{64}")
+
+
+def _order_problem(order, kill: list[str]) -> str | None:
+    """Why `order` is not an execution order of the kill set `kill` (§7.2), None when it is: an object whose `files` is
+    `kill` in some order (the same files, each as often) and whose `from` names the measurement the order came from —
+    the record's path and sha256 ({"path", "sha256"}: validation/v2/execution_order.py writes it). One rule for main
+    (every table entry, before anything runs), run_target and the record check."""
+    files = order.get("files") if isinstance(order, dict) else order
+    src = order.get("from") if isinstance(order, dict) else None
+    if not isinstance(order, dict) or not isinstance(files, list) or not all(isinstance(f, str) for f in files) \
+            or sorted(files) != sorted(kill) or not isinstance(src, dict) or not isinstance(src.get("path"), str) \
+            or not src["path"] or not _SHA256.fullmatch(str(src.get("sha256"))):
+        return f"execution order {files!r} is not the kill set in another order, or names no measurement"
+    return None
+
+
+def committed(root: pathlib.Path, path: pathlib.Path, raw: bytes) -> tuple[str, str | None]:
+    """(`path` relative to `root` when it is inside it, else as given; HEAD's commit when `raw` is that file's bytes at
+    HEAD of the repository whose top `root` is, else None). Read-only git; no git, no repository: None."""
+    try:
+        rel = path.resolve().relative_to(root.resolve()).as_posix()
+    except ValueError:
+        return str(path), None
+
+    def git(*args):
+        return subprocess.run(["git", "-C", str(root), *args], capture_output=True)
+    try:
+        top, head, blob = git("rev-parse", "--show-toplevel"), git("rev-parse", "--verify", "HEAD"), git("cat-file", "blob", f"HEAD:{rel}")
+    except OSError:
+        return rel, None
+    ok = (top.returncode == head.returncode == blob.returncode == 0 and blob.stdout == raw
+          and pathlib.Path(top.stdout.decode().strip()).resolve() == root.resolve())
+    return rel, head.stdout.decode().strip() if ok else None
+
+
 def run_target(root: pathlib.Path, target: str, tests: list[str], pristine: tuple[pathlib.Path, str] | None = None,
-               on_mutant=None, t0_only: bool = False) -> dict:
+               on_mutant=None, t0_only: bool = False, order: dict | None = None) -> dict:
     """Measure one target (§2–§4). `pristine`: the copy `main()` took once ((path, tree digest)); a direct caller passes
-    none and gets one of its own. Everything this target writes lives in one scratch directory, removed at the end.
+    none and gets one of its own. `order`: an execution-order table's entry, {"files": the kill set in the order each
+    mutant's chain runs it, "from": {"path", "sha256"} of the measurement that order came from, ...} (main adds the
+    table's path, sha256 and commit), kept whole as `execution_order`; the
+    record's `kill_tests` stays the declared list (proof() and the frozen criteria pin it: ORD-4), and T0 still runs
+    the files in declared order. None: the declared order, and no `execution_order`. Everything this target writes
+    lives in one scratch directory, removed at the end.
     `on_mutant(entry)` is called as each mutant completes (main's checkpoint line). An ownership failure stops the
     target: the finished mutants are kept as measured, the current one is INFRA, the rest NOT_RUN (VS-4)."""
     rel, func = target.split("::")
     worker = _worker(root)
-    out: dict = {"target": target, "runner": 2, "kill_tests": list(tests)}
+    out: dict = {"target": target, "runner": 2, "kill_tests": list(tests),
+                 **({"execution_order": order} if order is not None else {})}
     with tempfile.TemporaryDirectory(prefix=f"aisef-mut-{worker}-", ignore_cleanup_errors=True) as t:
         scratch = pathlib.Path(t)
         src_root, tree_sha = pristine or _pristine(root, scratch / "pristine")
@@ -1458,10 +1506,14 @@ def run_target(root: pathlib.Path, target: str, tests: list[str], pristine: tupl
         if [k for k in tests if k in NOT_KILL_FILES]:
             out["error"] = f"not a kill file: {[k for k in tests if k in NOT_KILL_FILES]} (NOT_KILL_FILES)"
             return _summarise(out)
+        if order is not None and (why := _order_problem(order, tests)):
+            out["error"] = why
+            return _summarise(out)
         tg, where = None, "before the target"
         try:   # establish, the first tree and T0 are inside too: an exception there keeps the rows and stops (VS-4)
             tg = _Target(rel, scratch, ca.establish(scratch), worker, pristine=src_root, tests=list(tests),
-                         last=int((src_root / rel).stat().st_mtime))   # the checkout's own (copy2): stamps are above it
+                         last=int((src_root / rel).stat().st_mtime),   # the checkout's own (copy2): stamps are above it
+                         order=order and order["files"])
             tg.null, tg.version = null_mutant(original, func), original
             _new_tree(tg)
             _settle(tg)   # what an earlier target of this worker left
@@ -1546,6 +1598,18 @@ def _problems_v2(t: dict, root: pathlib.Path) -> list[str]:
         elif cls != "KILLED":
             out.append(f"{name}: mutant {d!r} is {cls} ({r.get('why') or 'see its rows'}): neither killed nor survived — re-run it")
     bad = [] if len(res) == t.get("mutants") else ["the results do not list every mutant"]
+    # the order each chain ran the kill set in: the declared one, or `execution_order` when the record has the key —
+    # read by the runner's own rule; a malformed one is refused and never read as the declared order (ran: None)
+    why = _order_problem(t["execution_order"], t["kill_tests"]) if "execution_order" in t else None
+    ran = None if why else t["execution_order"]["files"] if "execution_order" in t else t["kill_tests"]
+    bad += [why] if why else []
+    if "execution_order" in t and not why:   # and its table: the path and sha256 main stamps, committed at the run's HEAD
+        eo = t["execution_order"]
+        if not isinstance(eo.get("table"), str) or not _SHA256.fullmatch(str(eo.get("table_sha256"))):
+            bad.append("execution_order names no table and its sha256")
+        elif not eo.get("table_commit"):
+            out.append(f"{name}: execution-order table {eo['table']} was not a file committed at the run's HEAD — "
+                       "commit it and re-run")
     bad += [] if t.get("survivors") == [r["mutant"] for r in res if r.get("class") != "KILLED"] else \
         ["survivors are not the mutants that were not killed"]
     bad += [] if t.get("killed") == sum(r.get("class") == "KILLED" for r in res) else ["killed is not the KILLED count"]
@@ -1555,7 +1619,8 @@ def _problems_v2(t: dict, root: pathlib.Path) -> list[str]:
             bad.append(f"mutant {d!r}: killed is not its class")
         if r.get("class") == "KILLED" and not _confirmed(r):
             bad.append(f"mutant {d!r}: KILLED without a confirmed kill")
-        if r.get("class") == "SURVIVED" and [x["file"] for x in rows if "role" not in x and x["outcome"] == "PASS"] != t["kill_tests"]:
+        passed = [x["file"] for x in rows if "role" not in x and x["outcome"] == "PASS"]
+        if r.get("class") == "SURVIVED" and ran is not None and passed != ran:
             bad.append(f"mutant {d!r}: SURVIVED without one PASS per kill file")
     if not t.get("error") and any(x.get("outcome") != "PASS" for x in t.get("t0", [])):
         bad.append("a T0 row did not pass")
@@ -1643,7 +1708,34 @@ def main(argv: list[str] | None = None) -> int:
             print(f"T0 {target}: " + (r["error"] if bad else "PASS"), flush=True)
         return 1 if failed else 0
     if argv[:1] == ["run"]:
-        chosen = argv[1:] or list(TARGETS)
+        chosen, table, stamp = argv[1:], {}, {}
+        # misuse is refused before anything runs, never read another way (`run A --order T` ran A, then refused)
+        if "--order" in chosen[1:] or (chosen[:1] == ["--order"] and len(chosen) < 3):
+            raise SystemExit("usage: mutation.py run --order TABLE.json TARGET... (--order once, first, with a table "
+                             "and the targets it is for)")
+        if chosen[:1] == ["--order"]:   # validation/v2/execution_order.py's table: {"orders": {target: entry}, ...}
+            path, chosen = pathlib.Path(chosen[1]), chosen[2:]
+            try:
+                raw = path.read_bytes()
+                table = json.loads(raw).get("orders")
+            except (OSError, ValueError, AttributeError) as e:
+                raise SystemExit(f"execution-order table refused, nothing ran: {path}: {e}") from None
+            if not isinstance(table, dict):
+                raise SystemExit(f"execution-order table refused, nothing ran: {path} has no `orders` object")
+            rel, commit = committed(ROOT, path, raw)   # the record ties each result to the committed table
+            stamp = {"table": rel, "table_sha256": hashlib.sha256(raw).hexdigest(), "table_commit": commit}
+            if not commit:
+                print(f"WARNING execution-order table {rel} is not a file committed at HEAD: --check refuses every "
+                      "result it orders", flush=True)
+            if unknown := [x for x in table if x not in TARGETS]:
+                raise SystemExit(f"not a mutation target in the execution-order table: {unknown}")
+            # every entry, before the first target runs: a bad one refused at its turn came after hours of earlier
+            # targets, and its errored entry replaced that target's result in the record
+            if bad := {x: why for x, e in table.items() if (why := _order_problem(e, TARGETS[x]))}:
+                raise SystemExit(f"execution-order table refused, nothing ran: {bad}")
+        if unknown := [t for t in chosen if t not in TARGETS]:
+            raise SystemExit(f"not a mutation target: {unknown}")
+        chosen = chosen or list(TARGETS)
         worker = _worker(ROOT)
         try:
             left = _earlier(worker)
@@ -1667,7 +1759,8 @@ def main(argv: list[str] | None = None) -> int:
                 fresh = []
                 for target in mine:  # the record is written after every target: a run that dies keeps what it measured
                     try:
-                        t = run_target(ROOT, target, TARGETS[target], pristine, on_mutant=_checkpoint)
+                        t = run_target(ROOT, target, TARGETS[target], pristine, on_mutant=_checkpoint,
+                                       order={**table[target], **stamp} if target in table else None)
                     except Exception as e:   # outside run_target's own guard (its copy, mutants()): named, never lost
                         t = _summarise({"target": target, "runner": 2, "kill_tests": list(TARGETS[target]), "mutants": 0,
                                         "results": [], "error": f"RUNNER_EXCEPTION before the target: {e!r}",
@@ -1682,9 +1775,6 @@ def main(argv: list[str] | None = None) -> int:
                         rest = [x for x in chosen if x in TARGETS and x not in done]   # targets run phase by phase
                         print(f"STOPPED {target}: {t['error']}\nNOT RUN {rest}", flush=True)
                         return 3
-        unknown = [t for t in chosen if t not in TARGETS]
-        if unknown:
-            raise SystemExit(f"not a mutation target: {unknown}")
     problems = check()
     for phase, rel in RECORDS.items():
         if (ROOT / rel).exists():
