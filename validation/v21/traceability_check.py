@@ -11,14 +11,21 @@
 
 Per row (docs/v2.1/research/TRACEABILITY.json): every commit exists, is an ancestor of the head (or of its `ref`) and
 touches every path named; every reproducer `[sha:]path::Class[::method]` exists (AST, at the head or at `sha`);
-every `refs` entry holds (exactly one of `contains` / `lacks` a string, `exists` true or false, `same_as` its bytes at
-another commit; at the head or at `at`); the M-level of each REPORT item equals REPORT.md §2 at the head; each upstream
-source is a claim of UPSTREAM-RESEARCH.json with the same label (or, when the verifier reclassified it, the verifier's
-label and the original in `research_label`), the verifier's status, the commit read, and `where` lines the research or,
-for a corrected or refuted claim, its verifier cites; a 360° item is verbatim in the assessment at the head; a row
-whose decision is `open`, `blocked` or `adapted` names its gap. Open items and rows whose decision is `open` or
-`blocked` are the same set. The table block of TRACEABILITY.md is exactly --render's. A key the format does not know
-is a problem, never ignored; every revision is a hex commit id (`--at` and `--with-ref` are resolved by git first).
+every `refs` entry holds (exactly one of `contains` / `lacks` a string of 4 characters or more, `exists` true or false,
+`same_as` its bytes at another commit; at the head, at `at`, or — `at` = "with-table" — in the checkout that holds the
+table, for evidence committed with it after the head); the M-level of each REPORT item equals REPORT.md §2 at
+the head; each upstream source is a claim of UPSTREAM-RESEARCH.json with the same label (or, when the verifier
+reclassified it, the verifier's label and the original in `research_label`), the verifier's status, the commit read (7
+hex digits or more), and every `file:line` of `where` a line the research or, for a corrected or refuted claim, its
+verifier cites for that same file; a 360° item is verbatim in the assessment at the head; every row but a declined one
+names its gap (a word, not a dash: what is missing, or that nothing is); the acceptance cell is a criterion its source
+states (the proposal's §10 "Nghiệm thu cụ thể", §4.3 "Nghiệm thu bước đầu" or §12 gates; the 360's §6 "Thước đo xong"
+or §7 "Mục tiêu 2.1"; a trailing "(§n)", "(360 §n)" or "(đề xuất §n)" names the section), or says the source states
+none (NO_CRITERION), or is "—" on a declined row. Open items and rows whose decision is `open` or `blocked` are the same
+set. The table block of TRACEABILITY.md is exactly --render's. A key the format does not know — at the top, in
+`sources`, in an open item, a row, a commit, a ref or an upstream entry — is a problem, never ignored; every revision is
+a hex commit id (`--at` and `--with-ref` are resolved by git first). Proposal items and proposal acceptance cells
+are checked against the proposal only under --proposal.
 By default only objects reachable from the head are read: a cell on a branch of `other_refs` (a commit whose `ref`,
 or a reproducer whose `sha`, is that branch's commit) is checked only under `--with-ref`, and the OK line counts the
 cells left unchecked. Exit 0 with no problem, 1 with problems (one per line), 2 on bad usage."""
@@ -42,14 +49,26 @@ DOC = "docs/v2.1/TRACEABILITY.md"
 DECISIONS = ("adopted", "adapted", "declined", "blocked", "open")
 LABELS = ("CODE", "README", "INFERENCE", "EXPERIMENT", "NOT_FOUND")
 SOURCES = ("proposal", "360")
+FORMAT = "aisef.v21-traceability/1"
+TOP_KEYS = ({"format", "head", "built", "sources", "open_items", "rows"}, {"other_refs"})      # (required, optional)
+SOURCE_KEYS, PROPOSAL_KEYS = ({"proposal", "assessment", "report", "upstream"}, set()), ({"title", "sha256", "in_repository"}, set())
+OPEN_KEYS = ({"name", "rows"}, set())
 KEYS = ("id", "source", "ref", "item", "upstream", "evidence", "refs", "reproducers", "reproducer_note", "impact",
         "decision", "why", "commits", "report_items", "m_note", "acceptance", "gap", "unconfirmed")
-COMMIT_KEYS, REF_KEYS = ({"sha", "paths"}, {"ref"}), ({"path"}, {"at"})       # (required, optional)
+COMMIT_KEYS, REF_KEYS = ({"sha", "paths"}, {"ref"}), ({"path"}, {"at"})
 ASSERTIONS = ("contains", "lacks", "exists", "same_as")
 UPSTREAM_KEYS = ({"key", "repo", "claim", "label", "verify", "commit", "where"}, {"research_label"})
-NEEDS_GAP = ("open", "blocked", "adapted")
+NEEDS_GAP = ("adopted", "adapted", "blocked", "open")         # every decision but declined
+SAID = re.compile(r"\w\w")                                       # a cell that says something: one word, not a dash
+MIN_STRING = 4                                                    # a `contains` / `lacks` shorter than this says nothing
+WITH_TABLE = "with-table"            # a ref's `at`: the file as committed with the table (evidence made after the head)
+NO_CRITERION = {"proposal": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này",
+                "360": "360 không ghi tiêu chí nghiệm thu cho mục này"}
+CITED = re.compile(r"\s*\((360 |đề xuất )?§(\d+(?:\.\d+)?)[^()]*\)$")  # "… (§4.3)", "… (360 §7, …)": the section named
 HEX = re.compile(r"[0-9a-f]{7,40}")
-LINES = re.compile(r"\.\w+:(\d+(?:-\d+)?(?:,\s*\d+(?:-\d+)?)*)")      # file.ext:12-20, 31 -> "12-20, 31"
+LINES = re.compile(r"([\w-]+)\.[A-Za-z]\w*:(\d+(?:-\d+)?(?:,\s*\d+(?:-\d+)?)*)")  # dir/f.go:12-20, 31 -> (f, "12-20, 31")
+#: in research evidence, a file mention ("f.go:", "README at d52a053:") or a line number; a number belongs to the last file
+CITES = re.compile(r"([\w-]+)(?:\.[A-Za-z]\w*| at [0-9a-f]{7,40}):|(?<![\w.])(\d+(?:-\d+)?)(?!\w)")
 RECLASSIFIED = re.compile(r"(?:status should be|Classify it as) ([A-Z_]+)")
 BEGIN = "<!-- rows:begin — generated by validation/v21/traceability_check.py --render; do not edit by hand -->"
 END = "<!-- rows:end -->"
@@ -113,8 +132,65 @@ def _keys(where: str, entry: dict, keys: tuple[set, set]) -> list[str]:
             + [f"{where}: unknown key {k}" for k in sorted(set(entry) - need - may)])
 
 
-def _lines(text: str) -> set[str]:
-    return {n for m in LINES.finditer(text) for n in re.split(r",\s*", m.group(1))}
+def _lines(text: str) -> set[tuple[str, str]]:
+    """(file stem, line or range) of every `file.ext:12-20, 31` in a `where` cell."""
+    return {(m.group(1), n) for m in LINES.finditer(text) for n in re.split(r",\s*", m.group(2))}
+
+
+def _cited(text: str) -> set[tuple[str, str]]:
+    """(file stem, number) of research evidence: each number goes with the file last mentioned before it."""
+    out, file = set(), None
+    for m in CITES.finditer(text):
+        if m.group(1):
+            file = m.group(1)
+        elif file:
+            out.add((file, m.group(2)))
+    return out
+
+
+def criteria(text: str, source: str) -> dict[str, list[str]]:
+    """The passages of a source document that state an acceptance criterion, by section (module docstring)."""
+    out: dict[str, list[str]] = collections.defaultdict(list)
+    top = sub = ""
+    lines: list[str] = []
+    for line in text.splitlines():                       # a wrapped bullet or paragraph is one line
+        if lines and line.startswith("  ") and lines[-1].strip():
+            lines[-1] += " " + line.strip()
+        else:
+            lines.append(line)
+    for line in lines:
+        if h := re.match(r"(#{2,3}) (?:(\d+(?:\.\d+)?)\.? )?(.*)", line):
+            top, sub = (h.group(2) or "", h.group(3)) if h.group(1) == "##" else (top, h.group(3))
+            continue
+        cells = [c.strip() for c in line.strip().strip("|").split("|")] if line.startswith("|") else []
+        if source == "proposal":
+            if top == "10" and len(cells) == 6 and re.fullmatch(r"V2-\d+", cells[0]):
+                out["§10"].append(cells[3])
+            elif top == "4" and line.startswith("**Nghiệm thu bước đầu:**"):
+                out["§4.3"].append(line.split(":**", 1)[1])
+            elif top == "12" and sub == "Gate đề xuất" and (m := re.match(r"\*\*[^*]+:\*\*(.*)", line)):
+                out["§12"].append(m.group(1))
+        elif top == "6" and "Thước đo xong:" in line:
+            out["§6"].append(line.split("Thước đo xong:", 1)[1])
+        elif top == "7" and len(cells) == 3 and cells[2] != "Mục tiêu 2.1" and not cells[2].startswith("-"):
+            out["§7"].append("Mục tiêu 2.1: " + cells[2])
+    return {k: [collapse(p) for p in v] for k, v in out.items()}
+
+
+def acceptance_problem(row: dict, ctx: dict) -> str | None:
+    acc, src, rid = collapse(row["acceptance"]), row["source"], row["id"]
+    if acc.startswith(NO_CRITERION[src]) or (acc == "—" and row["decision"] == "declined"):
+        return None
+    m = CITED.search(acc)
+    doc = ("360" if m.group(1) == "360 " else "proposal") if m and m.group(1) else src
+    if ctx["criteria"][doc] is None:                     # the proposal, without --proposal
+        return None
+    text = acc[: m.start()] if m else acc
+    passages = ctx["criteria"][doc].get(f"§{m.group(2)}", []) if m else sum(ctx["criteria"][doc].values(), [])
+    if SAID.search(text) and any(text in p for p in passages):
+        return None
+    return (f"{rid}: the acceptance is not a criterion the {doc} document states"
+            + (f" in §{m.group(2)}" if m else "") + f" (when it states none, say so: {NO_CRITERION[src]!r})")
 
 
 def resolve(root: pathlib.Path, name: str) -> str | None:
@@ -153,12 +229,17 @@ def row_problems(row: dict, root: pathlib.Path, head: str, ctx: dict) -> list[st
     text = ctx["assessment"] if row["source"] == "360" else ctx["proposal"]
     if text is not None and collapse(row["item"]) not in text:
         out.append(f"{rid}: the item is not verbatim in the {row['source']} document")
-    if row["decision"] in NEEDS_GAP and not row["gap"].strip():
-        out.append(f"{rid}: a row whose decision is {row['decision']} names its gap (the gap is empty)")
+    if row["decision"] in NEEDS_GAP and not SAID.search(row["gap"]):
+        out.append(f"{rid}: a row whose decision is {row['decision']} names its gap, or says nothing is missing "
+                   f"(the gap is {row['gap']!r})")
+    if row["source"] in SOURCES and (p := acceptance_problem(row, ctx)):
+        out.append(p)
     for c in row["commits"]:
         bad = _keys(f"{rid}: commit {c.get('sha')}", c, COMMIT_KEYS)
         bad += [f"{rid}: commit {v!r} is not a hex commit id" for v in (c.get("sha"), c.get("ref", head))
                 if not HEX.fullmatch(str(v))]
+        if not (isinstance(c.get("paths"), list) and c["paths"] and all(isinstance(p, str) and p for p in c["paths"])):
+            bad.append(f"{rid}: commit {c.get('sha')}: paths names no path (a list of the paths it touches)")
         if "ref" in c and c["ref"] not in ctx["other"]:
             bad.append(f"{rid}: commit {c['sha']}: ref {c['ref']} is not the commit of a branch in other_refs")
         if bad:
@@ -186,14 +267,24 @@ def row_problems(row: dict, root: pathlib.Path, head: str, ctx: dict) -> list[st
         bad = _keys(f"{rid}: ref {r.get('path')}", r, (REF_KEYS[0], REF_KEYS[1] | set(ASSERTIONS)))
         if sum(k in r for k in ASSERTIONS) != 1:
             bad.append(f"{rid}: ref {r.get('path')}: exactly one of {ASSERTIONS}, not {sorted(set(r) & set(ASSERTIONS))}")
+        bad += [f"{rid}: ref {r.get('path')}: {k} {r[k]!r} is not a string of {MIN_STRING} characters or more"
+                for k in ("contains", "lacks") if k in r and not (isinstance(r[k], str) and len(r[k].strip()) >= MIN_STRING)]
+        if "exists" in r and not isinstance(r["exists"], bool):
+            bad.append(f"{rid}: ref {r.get('path')}: exists {r['exists']!r} is not true or false")
+        if r.get("at") == WITH_TABLE and not (root / str(r.get("path"))).resolve().is_relative_to(root.resolve()):
+            bad.append(f"{rid}: ref {r.get('path')}: a path outside the checkout")
         for k in ("at", "same_as"):
-            if k in r and not (HEX.fullmatch(str(r[k])) and reach(r[k])):
+            if k in r and not (HEX.fullmatch(str(r[k])) and reach(r[k])) and not (k == "at" and r[k] == WITH_TABLE):
                 bad.append(f"{rid}: ref {r.get('path')}: {k} {r[k]!r} is not a hex commit id reachable from {head}")
         if bad:
             out += bad
             continue
         at = r.get("at", head)
-        body = show(root, at, r["path"])
+        if at == WITH_TABLE:
+            f = root / r["path"]
+            body = f.read_text(encoding="utf-8", errors="replace") if f.is_file() else None
+        else:
+            body = show(root, at, r["path"])
         if "exists" in r and (body is not None) != r["exists"]:
             out.append(f"{rid}: {r['path']} at {at} {'is missing' if r['exists'] else 'exists'}")
         if "contains" in r and (body is None or r["contains"] not in body):
@@ -234,18 +325,18 @@ def row_problems(row: dict, root: pathlib.Path, head: str, ctx: dict) -> list[st
                        + (" (research_label without a reclassification)" if "research_label" in u else ""))
         if check["status"] == "confirmed":
             said = claim["evidence"] + " " + said
-        lines = _lines(u["where"])
-        if _lines(said) and not lines:
+        lines, cited = _lines(u["where"]), _cited(said)
+        if cited and not lines:
             out.append(f"{rid}: upstream {u['key']}/{u['claim']}: where names no file:line, the research does")
-        out += [f"{rid}: upstream {u['key']}/{u['claim']}: where line {n} is not in the "
-                f"{'research' if check['status'] == 'confirmed' else 'verifier'}'s evidence"
-                for n in sorted(lines) if not re.search(rf"(?<!\d){re.escape(n)}(?!\d)", said)]
+        out += [f"{rid}: upstream {u['key']}/{u['claim']}: where line {n} of {f} is not one the "
+                f"{'research' if check['status'] == 'confirmed' else 'verifier'}'s evidence cites for {f}"
+                for f, n in sorted(lines - cited)]
         if u["verify"] != check["status"]:
             out.append(f"{rid}: upstream {u['key']}/{u['claim']} was {check['status']}, the row says {u['verify']}")
         if u["repo"] != res["research"]["repo"]:
             out.append(f"{rid}: upstream {u['key']} is {res['research']['repo']}, the row says {u['repo']}")
         read = {_hex(res["research"]["head_commit"]), _hex(res["research"].get("proposal_commit", ""))} - {""}
-        if not u["commit"] or not any(full.startswith(u["commit"]) for full in read):
+        if not HEX.fullmatch(str(u["commit"])) or not any(full.startswith(u["commit"]) for full in read):
             out.append(f"{rid}: upstream {u['key']} commit {u['commit']} is not one the research read")
     return out
 
@@ -256,6 +347,18 @@ def _reachable(root: str, head: str, rev: str) -> bool:
 
 def check(table: dict, root: pathlib.Path = ROOT, at: str | None = None, proposal: pathlib.Path | None = None,
           doc: str | None = None, with_refs: tuple[str, ...] = ()) -> list[str]:
+    shape = _keys("the table", table, TOP_KEYS)
+    if not shape:
+        if table["format"] != FORMAT:
+            shape.append(f"the table: format {table['format']!r} is not {FORMAT!r}")
+        shape += _keys("sources", table["sources"], SOURCE_KEYS)
+        shape += _keys("sources.proposal", table["sources"].get("proposal", {}), PROPOSAL_KEYS)
+        for i, item in enumerate(table["open_items"]):
+            shape += _keys(f"open item {i} ({item.get('name')!r})", item, OPEN_KEYS)
+            if not item.get("rows"):
+                shape.append(f"open item {i} ({item.get('name')!r}) lists no row")
+    if shape:
+        return shape
     if at is not None:
         head = resolve(root, at)
         if head is None:
@@ -274,8 +377,9 @@ def check(table: dict, root: pathlib.Path = ROOT, at: str | None = None, proposa
             problems.append(f"--with-ref {name}: {'not in this clone' if got is None else f'is at {got}'}, "
                             f"the table records {other[name]}")
     src = table["sources"]
+    assessment = show(root, head, src["assessment"]) or ""
     ctx = {"report": report_levels(show(root, head, src["report"]) or ""),
-           "assessment": collapse(show(root, head, src["assessment"]) or ""),
+           "assessment": collapse(assessment), "criteria": {"360": criteria(assessment, "360"), "proposal": None},
            "research": {r["key"]: r for r in json.loads(show(root, head, src["upstream"]) or '{"results": []}')["results"]},
            "proposal": None, "other": set(other.values()),
            "skip": {sha for name, sha in other.items() if name not in with_refs}}
@@ -285,6 +389,7 @@ def check(table: dict, root: pathlib.Path = ROOT, at: str | None = None, proposa
             problems.append(f"{proposal} is not the proposal the table was built from (sha256)")
         else:
             ctx["proposal"] = collapse(data.decode("utf-8"))
+            ctx["criteria"]["proposal"] = criteria(data.decode("utf-8"), "proposal")
     ids = [r.get("id") for r in table["rows"]]
     problems += [f"{i}: duplicate id" for i in sorted({i for i in ids if ids.count(i) > 1})]
     for row in table["rows"]:
@@ -342,7 +447,8 @@ def render(table: dict) -> str:
         out.append(f"- **Bằng chứng tại HEAD:** {collapse(r['evidence'])}")
         if r["refs"]:
             def one(x):
-                where = f"`{x['path']}`" + (f" @ {x['at']}" if "at" in x else "")
+                where = f"`{x['path']}`" + (" (đi cùng bảng)" if x.get("at") == WITH_TABLE
+                                            else f" @ {x['at']}" if "at" in x else "")
                 if "contains" in x:
                     return f"{where} chứa {_code(_cell(x['contains'], 100))}"
                 if "lacks" in x:
@@ -387,7 +493,7 @@ def main(argv: list[str] | None = None) -> int:
     if not problems:
         left = collections.Counter(name for *_, name in off_head(table) if name not in a.with_ref)
         print(f"OK: {len(table['rows'])} rows at {a.at or table['head'][:12]}"
-              + ("" if a.proposal else " (proposal items not checked verbatim: pass --proposal)")
+              + ("" if a.proposal else " (proposal items and proposal acceptance cells not checked: pass --proposal)")
               + "".join(f" ({n} cells on {name} not checked: pass --with-ref {name})" for name, n in left.items()))
     return 1 if problems else 0
 

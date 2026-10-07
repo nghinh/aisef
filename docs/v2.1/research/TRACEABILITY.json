@@ -150,6 +150,16 @@
     {
      "path": "docs/v2.1/evidence/cli-integration-b72e51e.out",
      "contains": "\"verdict\": \"VERIFIED\""
+    },
+    {
+     "path": "docs/v2.1/evidence/cli-integration-c9c736f.out",
+     "contains": "commit: c9c736fd638511b5cfd23d4d75ceb311c47b0759 dirty: 0",
+     "at": "with-table"
+    },
+    {
+     "path": "docs/v2.1/evidence/cli-integration-c9c736f.out",
+     "contains": "\"verdict\": \"VERIFIED\"",
+     "at": "with-table"
     }
    ],
    "reproducers": [
@@ -444,6 +454,16 @@
     {
      "path": "aisef2/app/bundle_cli.py",
      "contains": "def _create("
+    },
+    {
+     "path": "docs/v2.1/evidence/cli-integration-c9c736f.out",
+     "contains": "\"verdict\": \"READY\"",
+     "at": "with-table"
+    },
+    {
+     "path": "docs/v2.1/evidence/cli-integration-c9c736f.out",
+     "contains": "AISEF does not parse the requirements document",
+     "at": "with-table"
     }
    ],
    "reproducers": [
@@ -472,7 +492,7 @@
     "B4": "M4",
     "B5": "M4"
    },
-   "m_note": "Khớp REPORT: output đã commit có seal, approve, lint READY, `--check` ready. M4 là của lượt CLI thật tại `b72e51e` (docs/v2.1/evidence/cli-integration-b72e51e.out); `aisef2/app/bundle_cli.py` đổi sau lượt đó ở a912be6 và 3061ec0 (đường ghi của init/seal/approve/migrate chuyển sang tạo độc quyền `_create`), nên byte tại c9c736f chưa chạy qua CLI thật: đọc là 'M4 tại b72e51e'.",
+   "m_note": "Khớp REPORT: output đã commit có seal, approve, lint READY, `--check` ready. M4 là của lượt CLI thật tại `b72e51e` (docs/v2.1/evidence/cli-integration-b72e51e.out); `aisef2/app/bundle_cli.py` đổi sau lượt đó ở a912be6 và 3061ec0 (đường ghi của init/seal/approve/migrate chuyển sang tạo độc quyền `_create`), lượt lặp lại tại c9c736f (`docs/v2.1/evidence/cli-integration-c9c736f.out`, vòng 2 của bảng này: cùng `run.sh`, cùng nhị phân OCR, clone sạch tại c9c736f) cho cùng output — khác nhau chỉ ở giá trị băm (commit của repo `git init` mới, plan_hash, anchor, sha256), pid, mốc thời gian và dòng cuối bị cắt ở 3000 ký tự: M4 tại c9c736f.",
    "acceptance": "Người ngoài tạo bundle 3 story không import private constructor; mọi mệnh đề có trạng thái coverage rõ",
    "gap": "Chưa người ngoài nào thử (chưa đo). Độ phủ chỉ trên mệnh đề do tiêu chí khai — lint tự ghi 'AISEF does not parse the requirements document'.",
    "unconfirmed": "Tài liệu ngữ pháp contract cho 18 lớp quan sát: không kiểm trong phiên này."
@@ -619,7 +639,7 @@
      "where": "người kiểm: EXPERIMENT pages/src/components/BenchmarkSection.tsx:43-56 (recall 11,7–20 %, precision 25,2–37,8 %)"
     }
    ],
-   "evidence": "OCR v1.12.12 (182898c) chạy như tiến trình ngoài, ghim sha256, môi trường đã xoá biến OCR_/ANTHROPIC_/OTEL_; coverage do AISEF tính từ manifest, exit 0 không bao giờ là 'đã review đủ'; `finding_id` theo fingerprint SARIF; finding chỉ chặn khi CONFIRMED ∧ ANCHORED ∧ ≥ `min_severity` (ADR-7). Lượt CLI thật b72e51e: nhị phân OCR thật, settings `fix-loop` + `finder: ocr`, S1: RETRY → COMMIT, verify VERIFIED.",
+   "evidence": "OCR v1.12.12 (182898c) chạy như tiến trình ngoài, ghim sha256, môi trường đã xoá biến OCR_/ANTHROPIC_/OTEL_; coverage do AISEF tính từ manifest, exit 0 không bao giờ là 'đã review đủ'; `finding_id` theo fingerprint SARIF; finding chỉ chặn khi CONFIRMED ∧ ANCHORED ∧ ≥ `min_severity` (ADR-7). Lượt CLI thật b72e51e: nhị phân OCR thật, settings `fix-loop` + `finder: ocr`, S1: RETRY → COMMIT, verify VERIFIED. `RealBinary` 3/3 OK với nhị phân OCR đã ghim, chạy lại tại c9c736f (vòng 2; `docs/v2.1/evidence/traceability-reproducers-c9c736f.out`).",
    "refs": [
     {
      "path": "docs/v2.1/evidence/cli-integration-b72e51e.out",
@@ -632,6 +652,21 @@
     {
      "path": "tests/v2/test_v21_review.py",
      "contains": "{\"repair-utf8-crash\": V.UNANCHORED}"
+    },
+    {
+     "path": "docs/v2.1/evidence/cli-integration-c9c736f.out",
+     "contains": "ocr: open-code-review v1.12.12 (182898c) darwin/arm64 sha256 bf38abf320ead4e106b71c15824463640207118f38e1c10c28a73b6839104af7",
+     "at": "with-table"
+    },
+    {
+     "path": "docs/v2.1/evidence/traceability-reproducers-c9c736f.out",
+     "contains": "# run 2 summary: Ran 3 tests in",
+     "at": "with-table"
+    },
+    {
+     "path": "docs/v2.1/evidence/traceability-reproducers-c9c736f.out",
+     "contains": "tests.v2.test_v21_review_chain.RealBinary.test_a_full_review_against_a_scripted_model: ok",
+     "at": "with-table"
     }
    ],
    "reproducers": [
@@ -644,8 +679,8 @@
    ],
    "reproducer_note": "`RealBinary` cần `AISEF_TEST_OCR_EXE`: bỏ qua trong suite hermetic (REPORT §4.1).",
    "impact": "cao: 5 lỗi review tìm thấy, tái hiện được, vẫn vào `main` (360 §3.5)",
-   "decision": "adopted",
-   "why": "Đúng đề xuất; thêm điều kiện neo theo chỉ thị chủ dự án (xem P-ADJ-3, P-4.3b).",
+   "decision": "adapted",
+   "why": "Điều chỉnh: finding chỉ chặn khi CONFIRMED ∧ ANCHORED ∧ mức ≥ `min_severity` — điều kiện neo theo chỉ thị chủ dự án (xem P-ADJ-3, P-4.3b). Vì điều kiện đó, lỗi lịch sử thứ năm (UNANCHORED) vẫn lọt gate: tiêu chí '5 lỗi lịch sử không lọt gate' cố ý chỉ đạt 4/5.",
    "commits": [
     {
      "sha": "e897437",
@@ -692,7 +727,7 @@
    "m_note": "Khớp REPORT về mức. Output đã commit xác nhận nhị phân OCR thật, settings fix-loop và S1 RETRY → COMMIT.",
    "acceptance": "5 lỗi lịch sử không lọt gate; partial review không PASS; false finding không tự thành blocker",
    "gap": "Chỉ 4/5 lỗi lịch sử neo được nên bị chặn; lỗi thứ năm (trích R-7/1, contract quan sát tệp) là UNANCHORED và theo luật neo vẫn lọt gate (ADR-7; test_v21_review.py dòng 8–9, 117). Chất lượng finding của mô hình thật: M6 (B-05, B-06).",
-   "unconfirmed": "Chuỗi 'finding ⇒ CONFIRMED ⇒ ANCHORED ⇒ REVIEW_FINDING' của REPORT §4.1 không có trong output đã commit (journal của lượt không được commit) — không xác nhận được từ repo. Lượt `RealBinary` 3/3 OK chỉ có trong REPORT §4.1, không có bản ghi đã commit."
+   "unconfirmed": "Chuỗi 'finding ⇒ CONFIRMED ⇒ ANCHORED ⇒ REVIEW_FINDING' của REPORT §4.1 không có trong output đã commit (journal của lượt không được commit) — không xác nhận được từ repo."
   },
   {
    "id": "P-V2-10",
@@ -737,6 +772,16 @@
     {
      "path": "docs/v2.1/evidence/cli-integration-b72e51e.out",
      "contains": "is already continued by"
+    },
+    {
+     "path": "docs/v2.1/evidence/cli-integration-c9c736f.out",
+     "contains": "exit 137 (137 = SIGKILL)",
+     "at": "with-table"
+    },
+    {
+     "path": "docs/v2.1/evidence/cli-integration-c9c736f.out",
+     "contains": "is already continued by",
+     "at": "with-table"
     }
    ],
    "reproducers": [
@@ -845,6 +890,11 @@
     {
      "path": "docs/v2.1/evidence/cli-integration-b72e51e.out",
      "contains": "\"status\": \"unknown: some run's cost is not known (not 0)\""
+    },
+    {
+     "path": "docs/v2.1/evidence/cli-integration-c9c736f.out",
+     "contains": "\"status\": \"unknown: some run's cost is not known (not 0)\"",
+     "at": "with-table"
     }
    ],
    "reproducers": [
@@ -1048,8 +1098,8 @@
    ],
    "reproducer_note": "",
    "impact": "cao (360 §3.5)",
-   "decision": "adopted",
-   "why": "Theo đề xuất, không theo 360 #8 ('không chặn'); thêm điều kiện neo theo chỉ thị chủ dự án (ADR-7).",
+   "decision": "adapted",
+   "why": "Theo đề xuất, không theo 360 #8 ('không chặn'); điều chỉnh: thêm điều kiện neo (ANCHORED) theo chỉ thị chủ dự án (ADR-7), như R-P1-8.",
    "commits": [
     {
      "sha": "e897437",
@@ -1096,7 +1146,7 @@
     "E2": "M6"
    },
    "m_note": "Khớp REPORT.",
-   "acceptance": "Không thể gọi một bộ đánh giá là độc lập khi developer đọc được đề và runtime của verifier",
+   "acceptance": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với cột 'Lý do' của cùng hàng §3: Không thể gọi một bộ đánh giá là độc lập khi developer đọc được đề và runtime của verifier",
    "gap": "Sandbox: MỞ.",
    "unconfirmed": ""
   },
@@ -1123,7 +1173,7 @@
     "E2": "M6"
    },
    "m_note": "Khớp REPORT.",
-   "acceptance": "Canary chứng minh đường chạy; không đủ để kết luận hơn baseline",
+   "acceptance": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với cột 'Lý do' của cùng hàng §3: Canary chứng minh đường chạy; không đủ để kết luận hơn baseline",
    "gap": "Live: MỞ.",
    "unconfirmed": ""
   },
@@ -1181,7 +1231,7 @@
    ],
    "report_items": {},
    "m_note": "REPORT §2 không có hạng mục cho B-03b.",
-   "acceptance": "suite đầy đủ xanh trên ứng viên 2.1 (STATUS §3 B-03)",
+   "acceptance": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với STATUS §3 B-03: suite đầy đủ xanh trên ứng viên 2.1",
    "gap": "Chiến dịch chưa xong: tại HEAD không có kết quả mutation 2.1 nào để tuyên bố.",
    "unconfirmed": ""
   },
@@ -1202,12 +1252,18 @@
     }
    ],
    "evidence": "`review_ocr.coverage`: manifest thiếu, schema khác `ocr.run-manifest/v1`, partial, hết token, timeout ⇒ INDETERMINATE; dưới fix-loop là lỗi năng lực hoặc ProviderOutage; dưới advisory ghi lại, không chặn (REPORT §4.1).",
-   "refs": [],
+   "refs": [
+    {
+     "path": "aisef2/app/review_ocr.py",
+     "contains": "NOT_REVIEWABLE = (\"unsupported_ext\", \"binary\")"
+    }
+   ],
    "reproducers": [
     "tests/v2/test_v21_review_chain.py::IncompleteReview::test_an_unsupported_manifest_schema",
     "tests/v2/test_v21_review_chain.py::IncompleteReview::test_its_token_budget_spent",
     "tests/v2/test_v21_review_chain.py::IncompleteReview::test_timed_out_and_its_spend_unknown",
-    "tests/v2/test_v21_review_ocr.py::Coverage::test_a_manifest_that_does_not_hold_together_is_indeterminate"
+    "tests/v2/test_v21_review_ocr.py::Coverage::test_a_manifest_that_does_not_hold_together_is_indeterminate",
+    "tests/v2/test_v21_review_chain.py::IncompleteReview::test_under_advisory_the_incomplete_review_is_recorded_and_does_not_block"
    ],
    "reproducer_note": "",
    "impact": "cao: exit 0 của OCR gồm cả `partial` (OCR P11)",
@@ -1233,7 +1289,7 @@
    },
    "m_note": "M4 là mức của hạng mục C2; riêng các nhánh INDETERMINATE chỉ có test offline (REPORT §4.1).",
    "acceptance": "review thiếu một file bắt buộc không được thành PASS (§4.3)",
-   "gap": "",
+   "gap": "Tiêu chí chỉ đạt dưới `fix-loop`: dưới `advisory` — cũng là luật khi settings không khai `review` (ADR-V2.1) — review thiếu được ghi INDETERMINATE mà story vẫn COMMIT (`IncompleteReview::test_under_advisory_the_incomplete_review_is_recorded_and_does_not_block`). Tệp bắt buộc mà preview loại vì `unsupported_ext` hay `binary` không tính là thiếu (xem P-4.2b).",
    "unconfirmed": ""
   },
   {
@@ -1262,7 +1318,16 @@
     }
    ],
    "evidence": "Phạm vi bắt buộc do AISEF tính từ journal (khoảng base..candidate đã đóng băng); đường dẫn bắt buộc vắng trong preview (bị `.gitignore`/thư mục provider loại) ⇒ INDETERMINATE (UPSTREAM-RESEARCH.md).",
-   "refs": [],
+   "refs": [
+    {
+     "path": "aisef2/app/review_ocr.py",
+     "contains": "NOT_REVIEWABLE = (\"unsupported_ext\", \"binary\")"
+    },
+    {
+     "path": "aisef2/app/review_ocr.py",
+     "contains": "cannot read (named in the coverage, not counted against it)"
+    }
+   ],
    "reproducers": [
     "tests/v2/test_v21_review_ocr.py::Coverage::test_the_preview_s_exclusions_and_omissions_are_named",
     "tests/v2/test_v21_review_ocr.py::Coverage::test_a_complete_run_of_the_frozen_range_covering_every_required_path",
@@ -1270,8 +1335,8 @@
    ],
    "reproducer_note": "",
    "impact": "cao: tệp bị OCR lọc vẫn có thể quan trọng với AISEF",
-   "decision": "adopted",
-   "why": "Đúng đề xuất.",
+   "decision": "adapted",
+   "why": "Phạm vi bắt buộc do AISEF tính từ git (khoảng base..candidate đã đóng băng), không lấy tập `selected` của OCR. Điều chỉnh: tệp bắt buộc mà preview loại vì `unsupported_ext` hay `binary` được ghi tên trong coverage nhưng không tính là thiếu (docstring và `NOT_REVIEWABLE` của `review_ocr`); đề xuất nêu cả tệp bị lọc vì extension.",
    "commits": [
     {
      "sha": "e897437",
@@ -1285,8 +1350,8 @@
     "C2": "M4"
    },
    "m_note": "M4 là mức của C2; hành vi riêng này có test offline.",
-   "acceptance": "Định nghĩa mẫu số từ chính sách AISEF trước khi gọi OCR.",
-   "gap": "",
+   "acceptance": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với câu liền trước của cùng đoạn §4.2: Định nghĩa mẫu số từ chính sách AISEF trước khi gọi OCR.",
+   "gap": "Tệp bắt buộc bị loại vì extension hay nhị phân không được review mà review vẫn có thể COMPLETE. Không test nào đặt một tệp bắt buộc như thế rồi khẳng định kết quả (`grep` tests/: không test nào đọc `unreadable` hay `NOT_REVIEWABLE`; fixture `tests/v2/fixtures/ocr/preview.json` có `docs/limits.md` = `unsupported_ext` nhưng không test nào đặt nó là bắt buộc).",
    "unconfirmed": ""
   },
   {
@@ -1300,6 +1365,10 @@
     {
      "path": "closure-evidence/v2/v2.1/AUTHORITY-INVENTORY.json",
      "contains": "review_verify"
+    },
+    {
+     "path": "closure-evidence/v2/cycle2/RELEASE-DECISIONS.json",
+     "contains": "* Cả hai không trực tiếp commit/merge sản phẩm hoặc tạo đường quyết định cuối thứ hai."
     }
    ],
    "reproducers": [
@@ -1343,7 +1412,7 @@
    ],
    "report_items": {},
    "m_note": "REPORT §2 không có hạng mục riêng (B-03c thuộc §7). Test tồn tại tại HEAD (kiểm bằng AST); không chạy lại trong phiên lập bảng.",
-   "acceptance": "Cả hai không trực tiếp commit/merge sản phẩm hoặc tạo đường quyết định cuối thứ hai (owner B-03c)",
+   "acceptance": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với chỉ thị B-03c của chủ dự án (RELEASE-DECISIONS seq 5): Cả hai không trực tiếp commit/merge sản phẩm hoặc tạo đường quyết định cuối thứ hai.",
    "gap": "Không có ranh giới OS: finder chạy dưới cùng user; thay đổi bị phát hiện và loại, không bị ngăn (REPORT §3).",
    "unconfirmed": ""
   },
@@ -1370,7 +1439,7 @@
    "commits": [],
    "report_items": {},
    "m_note": "REPORT §2 không có hạng mục riêng cho mục này.",
-   "acceptance": "Cập nhật đã duyệt áp dụng cho run mới; giữ nguyên lịch sử run cũ.",
+   "acceptance": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với một câu khác của cùng đoạn §4.3: Cập nhật đã duyệt áp dụng cho run mới; giữ nguyên lịch sử run cũ.",
    "gap": "Toàn bộ phần tạo đề xuất.",
    "unconfirmed": ""
   },
@@ -1428,6 +1497,15 @@
     {
      "path": "docs/v2.1/STATUS.md",
      "contains": "**ĐÃ KIỂM**, không cần sửa"
+    },
+    {
+     "path": "aisef2/orchestrate/merge.py",
+     "contains": "point=MeasurementPoint.POST_MERGE"
+    },
+    {
+     "path": "docs/v2.1/evidence/traceability-reproducers-c9c736f.out",
+     "contains": "tests.v2.test_p6_orchestration.Orchestration.test_ORCH_9_and_10_a_post_merge_regression_of_a_prior_PRESERVE_obligation_is_INTEGRATION_and_rolled_back: ok",
+     "at": "with-table"
     }
    ],
    "reproducers": [
@@ -1441,7 +1519,7 @@
    "report_items": {},
    "m_note": "REPORT §2 không có hạng mục riêng cho mục này. Test tồn tại tại HEAD (kiểm bằng AST); không chạy lại trong phiên lập bảng.",
    "acceptance": "vẫn kiểm cây tích hợp khi base đổi (§10 V2-06)",
-   "gap": "",
+   "gap": "Không còn so với tiêu chí trên: sau merge, mọi obligation của story và PRESERVE của các story đã commit được chứng minh lại ở revision đã merge (`merge.reprove`, POST_MERGE). Dựa vào đọc mã và test ORCH_9/10 (chạy lại xanh tại c9c736f, vòng 2).",
    "unconfirmed": ""
   },
   {
@@ -1488,7 +1566,7 @@
     "E1": "M3"
    },
    "m_note": "Khớp REPORT.",
-   "acceptance": "Agent chỉ đề xuất giả thuyết/candidate.",
+   "acceptance": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với một câu khác của cùng đoạn §5.2: Agent chỉ đề xuất giả thuyết/candidate.",
    "gap": "Chưa chạy trên workload thật (E2).",
    "unconfirmed": ""
   },
@@ -1597,7 +1675,7 @@
     "D1": "M4"
    },
    "m_note": "Khớp REPORT.",
-   "acceptance": "AISEF cần chống hai controller ở hai tiến trình cùng resume.",
+   "acceptance": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với một câu khác của cùng đoạn §5.2: AISEF cần chống hai controller ở hai tiến trình cùng resume.",
    "gap": "Claimant ở máy khác: chỉ thay khi người vận hành nêu sha256 của claim (REPORT §4.2).",
    "unconfirmed": ""
   },
@@ -1674,7 +1752,7 @@
     "D4": "M6"
    },
    "m_note": "Khớp REPORT.",
-   "acceptance": "Controller tự điền các trường định danh; phần văn xuôi không được ghi đè chúng.",
+   "acceptance": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với một câu khác của cùng đoạn §5.3: Controller tự điền các trường định danh; phần văn xuôi không được ghi đè chúng.",
    "gap": "Toàn bộ. MỞ. Nếu làm, tránh hai lỗi đã thấy ở upstream: agent chính ghi được checkpoint (N-04), writer chép nguyên văn khoá API (N-06).",
    "unconfirmed": ""
   },
@@ -1713,7 +1791,7 @@
     "D1": "M4"
    },
    "m_note": "Khớp REPORT.",
-   "acceptance": "Không tự chạy lại tác dụng ngoài hệ thống nếu chưa biết lần trước đã xảy ra hay chưa.",
+   "acceptance": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với một câu khác của cùng đoạn §5.3: Không tự chạy lại tác dụng ngoài hệ thống nếu chưa biết lần trước đã xảy ra hay chưa.",
    "gap": "Nhận diện dựa vào quy ước của kernel (tên worktree, thông điệp merge); một commit tay giống quy ước chưa được xét.",
    "unconfirmed": "Khả năng một commit do người/agent tạo trùng quy ước nhận diện: không kiểm trong phiên này."
   },
@@ -1759,7 +1837,7 @@
     "D3": "M3"
    },
    "m_note": "Khớp REPORT.",
-   "acceptance": "Mọi retry tiếp tục đi qua taxonomy hiện có; không đặt thêm cơ chế retry độc lập trong adapter.",
+   "acceptance": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với một câu khác của cùng đoạn §5.3: Mọi retry tiếp tục đi qua taxonomy hiện có; không đặt thêm cơ chế retry độc lập trong adapter.",
    "gap": "Đơn vị đo là attempt (cùng lỗi), không phải bước/lượt trong một phiên; ngưỡng chưa hiệu chỉnh.",
    "unconfirmed": ""
   },
@@ -1822,7 +1900,7 @@
     "E1": "M3"
    },
    "m_note": "Khớp REPORT.",
-   "acceptance": "Kết quả từng obligation, finding, chi phí, thời gian và sự cố môi trường.",
+   "acceptance": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với chính mục: mọi trường §6.2 liệt kê được khoá trước khi chạy (gạch đầu dòng cuối của danh sách đó, 'Kết quả từng obligation, finding, chi phí, thời gian và sự cố môi trường', là một trường phải khoá, không phải tiêu chí).",
    "gap": "`harness.check` không đòi nội dung các trường §6.2 liệt kê: Workload ID, baseline commit, candidate snapshot digest, digest requirements/bundle/evaluator/policy, nguồn gốc bộ test, client + phiên bản, adapter version, thông tin provider thực trả, environment image digest, dependency lock, mạng, quyền ghi, giới hạn thời gian/token/tiền. Chưa dùng cho lượt thật nào.",
    "unconfirmed": ""
   },
@@ -1877,7 +1955,7 @@
     "E1": "M3"
    },
    "m_note": "Khớp REPORT.",
-   "acceptance": "ghi `provider-reported`/`unverified` đúng phạm vi, không gọi là xác thực model đầy đủ",
+   "acceptance": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với một câu khác của cùng đoạn §6.2: ghi `provider-reported`/`unverified` đúng phạm vi, không gọi là xác thực model đầy đủ",
    "gap": "Chỉ trong harness thí nghiệm; preflight của `aisef run` không đổi trong 2.1 về điểm này.",
    "unconfirmed": "'preflight không đổi về điểm này': suy từ danh sách commit 2.1 (b029236 chỉ sửa redirect), chưa đọc lại preflight."
   },
@@ -1947,7 +2025,7 @@
    "commits": [],
    "report_items": {},
    "m_note": "REPORT §2 không có hạng mục riêng cho mục này.",
-   "acceptance": "AISEF cần ghi rõ sai số hoặc đặt trước ngân sách request",
+   "acceptance": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với chính mục: AISEF cần ghi rõ sai số hoặc đặt trước ngân sách request",
    "gap": "Không đặt trước ngân sách request; sai số không được định lượng.",
    "unconfirmed": ""
   },
@@ -2002,7 +2080,7 @@
     "E1": "M3"
    },
    "m_note": "Khớp REPORT.",
-   "acceptance": "Đối chứng chính là cùng model, client, nhiệm vụ và tài nguyên chạy trực tiếp",
+   "acceptance": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với chính mục (diễn đạt lại): Đối chứng chính là cùng model, client, nhiệm vụ và tài nguyên chạy trực tiếp",
    "gap": "Cánh mini: chưa làm.",
    "unconfirmed": ""
   },
@@ -2084,7 +2162,7 @@
     "F": "M6"
    },
    "m_note": "Khớp REPORT.",
-   "acceptance": "Developer không nhận host HOME, socket Docker, credential, verifier runtime hoặc hidden bundle.",
+   "acceptance": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với một câu khác của cùng đoạn §7: Developer không nhận host HOME, socket Docker, credential, verifier runtime hoặc hidden bundle.",
    "gap": "Toàn bộ. MỞ.",
    "unconfirmed": ""
   },
@@ -2099,6 +2177,10 @@
     {
      "path": "closure-evidence/v2/v2.1/AUTHORITY-INVENTORY.json",
      "contains": "bundle_cli"
+    },
+    {
+     "path": "closure-evidence/v2/cycle2/RELEASE-DECISIONS.json",
+     "contains": "Cập nhật inventory và kiểm tra kiến trúc để cưỡng chế các giới hạn này."
     }
    ],
    "reproducers": [
@@ -2137,7 +2219,7 @@
    ],
    "report_items": {},
    "m_note": "REPORT §2 không có hạng mục (B-03c chấp nhận ở RELEASE-DECISIONS seq 5). Test tồn tại tại HEAD (kiểm bằng AST); không chạy lại trong phiên lập bảng.",
-   "acceptance": "Cập nhật inventory và kiểm tra kiến trúc để cưỡng chế các giới hạn này. (owner B-03c)",
+   "acceptance": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với chỉ thị B-03c của chủ dự án (RELEASE-DECISIONS seq 5): Cập nhật inventory và kiểm tra kiến trúc để cưỡng chế các giới hạn này.",
    "gap": "Checker là phân tích tĩnh trên mã Python; tiến trình ngoài (OCR) không bị ràng buộc ở mức OS.",
    "unconfirmed": ""
   },
@@ -2198,8 +2280,8 @@
     "B5": "M4",
     "D1": "M4"
    },
-   "m_note": "Khớp REPORT. B4/B5: M4 là của lượt CLI thật tại `b72e51e` (docs/v2.1/evidence/cli-integration-b72e51e.out); `aisef2/app/bundle_cli.py` đổi sau lượt đó ở a912be6 và 3061ec0 (đường ghi của init/seal/approve/migrate chuyển sang tạo độc quyền `_create`), nên byte tại c9c736f chưa chạy qua CLI thật: đọc là 'M4 tại b72e51e'. (kiểm cơ học ở P-V2-07)",
-   "acceptance": "`seal` chỉ niêm phong phiên bản đã duyệt, không thay thế duyệt.",
+   "m_note": "Khớp REPORT. B4/B5: M4 là của lượt CLI thật tại `b72e51e` (docs/v2.1/evidence/cli-integration-b72e51e.out); `aisef2/app/bundle_cli.py` đổi sau lượt đó ở a912be6 và 3061ec0 (đường ghi của init/seal/approve/migrate chuyển sang tạo độc quyền `_create`), lượt lặp lại tại c9c736f (`docs/v2.1/evidence/cli-integration-c9c736f.out`, vòng 2 của bảng này: cùng `run.sh`, cùng nhị phân OCR, clone sạch tại c9c736f) cho cùng output — khác nhau chỉ ở giá trị băm (commit của repo `git init` mới, plan_hash, anchor, sha256), pid, mốc thời gian và dòng cuối bị cắt ở 3000 ký tự: M4 tại c9c736f. (kiểm cơ học ở P-V2-07)",
+   "acceptance": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với câu cuối của §9.1: `seal` chỉ niêm phong phiên bản đã duyệt, không thay thế duyệt.",
    "gap": "`assess --candidate`: chưa có.",
    "unconfirmed": ""
   },
@@ -2226,7 +2308,7 @@
    "commits": [],
    "report_items": {},
    "m_note": "REPORT §2 không có hạng mục riêng cho mục này.",
-   "acceptance": "Kiểm false rejection bên cạnh false acceptance.",
+   "acceptance": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với một gạch đầu dòng khác của §9.3: Kiểm false rejection bên cạnh false acceptance.",
    "gap": "Toàn bộ, trừ S-10-a.",
    "unconfirmed": ""
   },
@@ -2263,7 +2345,7 @@
     "E2": "M6"
    },
    "m_note": "Khớp REPORT.",
-   "acceptance": "Ghi patch set của B; không gắn nhãn B là v2.0.0 nguyên bản.",
+   "acceptance": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với đoạn dưới bảng §11.1: Ghi patch set của B; không gắn nhãn B là v2.0.0 nguyên bản.",
    "gap": "E2: MỞ; sandbox chung: MỞ.",
    "unconfirmed": ""
   },
@@ -2288,7 +2370,7 @@
    "commits": [],
    "report_items": {},
    "m_note": "REPORT §2 không có hạng mục riêng cho mục này.",
-   "acceptance": "Canary xanh mới mở thí nghiệm paired nhỏ trên một route.",
+   "acceptance": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với một câu khác của cùng đoạn §11.2: Canary xanh mới mở thí nghiệm paired nhỏ trên một route.",
    "gap": "Canary live: MỞ. Bước 'cài package' chưa có trong lượt offline.",
    "unconfirmed": ""
   },
@@ -2307,12 +2389,20 @@
     {
      "path": "docs/v2.1/EXPERIMENT-PLAN.md",
      "contains": "313 336 output (gồm 244 483 reasoning)"
+    },
+    {
+     "path": "tests/v2/test_v21_continue_integrity.py",
+     "contains": "self.settings_doc = {**SETTINGS, \"prices\": PRICES}"
+    },
+    {
+     "path": "tests/v2/test_v21_continue_integrity.py",
+     "contains": "\"output\": 7, \"reasoning\": 3,"
     }
    ],
    "reproducers": [
     "tests/v2/test_v21_continue_usage.py::Usage::test_without_prices_cost_is_unknown_never_zero"
    ],
-   "reproducer_note": "Test trên chỉ cho thấy tách 5 lớp token. Không test nào định giá một step có reasoning ≠ 0: test có giá duy nhất (`Usage::test_with_prices_known_and_a_blind_step_makes_it_partial`) định giá step o=0, r=0, cr=0; mọi lời gọi `usage.usage` khác trong tests/ không có bảng giá. Phép đo token (không phải test), chạy ở gốc repo: `python3 -P -c \"import glob,json;e=[json.loads(x) for f in sorted(glob.glob('closure-evidence/v2/release/smoke-2/run-1/sessions/*.jsonl')) for x in open(f,encoding='utf-8')];k=[x['part']['tokens'] for x in e if x.get('type')=='step_finish'];s=lambda t:t['input']+t['output']+t['cache']['read']+t['cache']['write'];r=[t for t in k if t['reasoning']];print(len(k),sum(t['total']==s(t)+t['reasoning'] for t in k),sum(t['output'] for t in k),sum(t['reasoning'] for t in k),len(r),sum(t['total']!=s(t) for t in r))\"` in ra `270 270 68853 244483 200 200`.",
+   "reproducer_note": "Test trên chỉ cho thấy tách 5 lớp token. Không test nào khẳng định số USD của một step có reasoning ≠ 0: số USD duy nhất được khẳng định (1.0, trong `Usage::test_with_prices_known_and_a_blind_step_makes_it_partial`) là của step o=0, r=0, cr=0. `tests/v2/test_v21_continue_integrity.py` (LineageBase) chạy `aisef run` với bảng giá (`\"prices\": PRICES`) và client giả báo reasoning 3 mỗi step, nhưng chỉ khẳng định token, và `cost.value` None khi chi tiêu không rõ. Phép đo token (không phải test), chạy ở gốc repo: `python3 -P -c \"import glob,json;e=[json.loads(x) for f in sorted(glob.glob('closure-evidence/v2/release/smoke-2/run-1/sessions/*.jsonl')) for x in open(f,encoding='utf-8')];k=[x['part']['tokens'] for x in e if x.get('type')=='step_finish'];s=lambda t:t['input']+t['output']+t['cache']['read']+t['cache']['write'];r=[t for t in k if t['reasoning']];print(len(k),sum(t['total']==s(t)+t['reasoning'] for t in k),sum(t['output'] for t in k),sum(t['reasoning'] for t in k),len(r),sum(t['total']!=s(t) for t in r))\"` in ra `270 270 68853 244483 200 200`.",
    "impact": "cao cho USD/story",
    "decision": "adopted",
    "why": "Đúng đề xuất.",
@@ -2328,8 +2418,8 @@
     "D2": "M4"
    },
    "m_note": "Khớp REPORT (mức của D2, không của phép đo token); phép đo token là đo lại trong phiên này, không phải test.",
-   "acceptance": "Lưu nguồn giá và ngày hiệu lực; với 9router/combo không có rate card, để unknown và báo token.",
-   "gap": "Phép đo chỉ cho một phiên bản client (OpenCode 1.18.31 theo 360 §3.5); client/provider khác phải đo lại. Chưa có test định giá reasoning ≠ 0; 'không đếm hai lần' chưa được xác nhận trong mã OpenCode.",
+   "acceptance": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với một câu khác của cùng đoạn §11.3: Lưu nguồn giá và ngày hiệu lực; với 9router/combo không có rate card, để unknown và báo token.",
+   "gap": "Phép đo chỉ cho một phiên bản client (OpenCode 1.18.31 theo 360 §3.5); client/provider khác phải đo lại. Chưa test nào khẳng định số USD của một step có reasoning ≠ 0; 'không đếm hai lần' chưa được xác nhận trong mã OpenCode.",
    "unconfirmed": "Cách OpenCode 1.18.31 điền `tokens.total` (số provider trả hay tự cộng từ các trường của nó): repo không chứa mã nguồn OpenCode — vì vậy kết luận 'không đếm hai lần' là INFERENCE."
   },
   {
@@ -2355,7 +2445,7 @@
     "F": "M6"
    },
    "m_note": "Khớp REPORT.",
-   "acceptance": "—",
+   "acceptance": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này (§12 'Phần phải làm ngay' nêu yêu cầu, không kèm tiêu chí); bảng đối chiếu với chính mục.",
    "gap": "Toàn bộ. MỞ.",
    "unconfirmed": ""
   },
@@ -2387,7 +2477,7 @@
     "A1": "M3"
    },
    "m_note": "Khớp REPORT.",
-   "acceptance": "Không khẳng định chỉ thêm flag là giải quyết confinement.",
+   "acceptance": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với một câu khác của cùng đoạn §12: Không khẳng định chỉ thêm flag là giải quyết confinement.",
    "gap": "Không có lượt live qua đường app thật.",
    "unconfirmed": ""
   },
@@ -2414,7 +2504,7 @@
    "commits": [],
    "report_items": {},
    "m_note": "REPORT §2 không có hạng mục riêng cho mục này.",
-   "acceptance": "—",
+   "acceptance": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này (§12 'Phần phải làm ngay' nêu yêu cầu, không kèm tiêu chí); bảng đối chiếu với chính mục.",
    "gap": "Cùng user: không phải môi trường riêng ở mức OS.",
    "unconfirmed": "Các test tấn công của 2.0 ('20 test tấn công', 360 §3.4) không được định danh lại trong phiên này."
   },
@@ -2459,7 +2549,7 @@
     "D5": "M4"
    },
    "m_note": "Khớp REPORT về mức.",
-   "acceptance": "Nếu tuyên bố tính xác thực, cần trust anchor/checkpoint ký hoặc dịch vụ append được bảo vệ bên ngoài miền workload.",
+   "acceptance": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với một câu khác của cùng đoạn §12: Nếu tuyên bố tính xác thực, cần trust anchor/checkpoint ký hoặc dịch vụ append được bảo vệ bên ngoài miền workload.",
    "gap": "Nơi giữ anchor tin cậy chưa có (REPORT §7).",
    "unconfirmed": "D5 'CLI thật: tệp 0444' (REPORT §2): output đã commit chỉ có `anchor_written_to`, không có mode của tệp."
   },
@@ -2507,7 +2597,7 @@
    ],
    "report_items": {},
    "m_note": "REPORT §2 không có hạng mục riêng cho mục này.",
-   "acceptance": "—",
+   "acceptance": "Đề xuất không ghi tiêu chí nghiệm thu cho mục này (§12 'Phần phải làm ngay' nêu yêu cầu, không kèm tiêu chí); bảng đối chiếu với chính mục.",
    "gap": "Cùng user: giữa lúc kiểm và lúc dùng vẫn có thể bị thay (TOCTOU) — chỉ ranh giới OS đóng được.",
    "unconfirmed": ""
   },
@@ -2554,7 +2644,7 @@
     "A11": "M3"
    },
    "m_note": "Khớp REPORT.",
-   "acceptance": "gate `v2_release_gate 2.0.1` PASS; byte PyPI = byte RC (STATUS B-02)",
+   "acceptance": "reproducer lỗi đã biết được xử lý; release lane và metadata đúng; loader/preflight không làm mất phân loại; canary từ package thật chạy được (§12; STATUS B-02 thêm: gate `v2_release_gate 2.0.1` PASS, byte PyPI = byte RC)",
    "gap": "Gate chưa đạt.",
    "unconfirmed": ""
   },
@@ -2585,7 +2675,7 @@
     "D2": "M4"
    },
    "m_note": "Khớp REPORT.",
-   "acceptance": "“Một PASS” là mốc sử dụng được, không đủ để tuyên bố đáng tin ở mọi dự án.",
+   "acceptance": "người ngoài tạo và chạy bundle nhỏ; một workload chưa thấy hoàn tất không miễn trừ; LedgerLock repo thật được kiểm; lỗi review confirmed không bị bỏ qua; chi phí minh bạch; Linux isolation đủ cho holdout; resume qua các điểm crash định trước (§12)",
    "gap": "Sáu trên bảy điều kiện chưa đạt hoặc chưa đo.",
    "unconfirmed": ""
   },
@@ -2846,7 +2936,7 @@
     "A10": "M4"
    },
    "m_note": "Khớp REPORT.",
-   "acceptance": "không link 404 (STATUS B-10)",
+   "acceptance": "360 không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với STATUS B-10: không link 404",
    "gap": "Trang PyPI của 2.0.0 không đổi được nếu không phát hành (B-02); B-10 chưa quyết.",
    "unconfirmed": ""
   },
@@ -2947,7 +3037,7 @@
    ],
    "report_items": {},
    "m_note": "REPORT §2 không có hạng mục riêng cho mục này.",
-   "acceptance": "không link 404 (STATUS B-10)",
+   "acceptance": "360 không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với STATUS B-10: không link 404",
    "gap": "Link trên landing, salekit, README.vi: còn.",
    "unconfirmed": ""
   },
@@ -2986,7 +3076,7 @@
     "B3": "M3"
    },
    "m_note": "Khớp REPORT.",
-   "acceptance": "lỗi DEVELOPER, có phản hồi",
+   "acceptance": "360 không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với chính mục: lỗi DEVELOPER, có phản hồi",
    "gap": "Contract S-10-a: B-04 chưa duyệt.",
    "unconfirmed": ""
   },
@@ -3025,7 +3115,7 @@
     "B5": "M4",
     "B6": "M3"
    },
-   "m_note": "Khớp REPORT. B4/B5: M4 là của lượt CLI thật tại `b72e51e` (docs/v2.1/evidence/cli-integration-b72e51e.out); `aisef2/app/bundle_cli.py` đổi sau lượt đó ở a912be6 và 3061ec0 (đường ghi của init/seal/approve/migrate chuyển sang tạo độc quyền `_create`), nên byte tại c9c736f chưa chạy qua CLI thật: đọc là 'M4 tại b72e51e'. (kiểm cơ học ở P-V2-07)",
+   "m_note": "Khớp REPORT. B4/B5: M4 là của lượt CLI thật tại `b72e51e` (docs/v2.1/evidence/cli-integration-b72e51e.out); `aisef2/app/bundle_cli.py` đổi sau lượt đó ở a912be6 và 3061ec0 (đường ghi của init/seal/approve/migrate chuyển sang tạo độc quyền `_create`), lượt lặp lại tại c9c736f (`docs/v2.1/evidence/cli-integration-c9c736f.out`, vòng 2 của bảng này: cùng `run.sh`, cùng nhị phân OCR, clone sạch tại c9c736f) cho cùng output — khác nhau chỉ ở giá trị băm (commit của repo `git init` mới, plan_hash, anchor, sha256), pid, mốc thời gian và dòng cuối bị cắt ở 3000 ký tự: M4 tại c9c736f. (kiểm cơ học ở P-V2-07)",
    "acceptance": "một người ngoài dựng bundle cho một dự án 3 story không cần đọc mã nguồn (360 §6)",
    "gap": "Người ngoài: chưa đo.",
    "unconfirmed": "Tài liệu ngữ pháp cho 18 lớp quan sát: không kiểm trong phiên này."
@@ -3063,7 +3153,7 @@
     "C1": "M4"
    },
    "m_note": "Khớp REPORT.",
-   "acceptance": "đo precision (smoke #2: 5/5)",
+   "acceptance": "360 không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với chính mục: đo precision (smoke #2: 5/5)",
    "gap": "Precision của reviewer: chưa đo. Precision/recall với mô hình thật: M6 (B-06, ngân sách).",
    "unconfirmed": ""
   },
@@ -3085,7 +3175,7 @@
    "commits": [],
    "report_items": {},
    "m_note": "REPORT §2 không có hạng mục riêng cho mục này.",
-   "acceptance": "spec không bác nhầm",
+   "acceptance": "360 không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với chính mục: mỗi spec SATISFIED trên ≥ 2 cài đặt đúng độc lập, kèm đối chứng âm cú pháp (spec không bác nhầm)",
    "gap": "Toàn bộ, trừ S-10-a.",
    "unconfirmed": ""
   },
@@ -3105,7 +3195,7 @@
    "commits": [],
    "report_items": {},
    "m_note": "REPORT §2 không có hạng mục riêng cho mục này.",
-   "acceptance": "—",
+   "acceptance": "360 không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với chính mục.",
    "gap": "Toàn bộ.",
    "unconfirmed": ""
   },
@@ -3157,7 +3247,7 @@
     "F": "M6"
    },
    "m_note": "Khớp REPORT.",
-   "acceptance": "0 (hoặc được báo) đọc ra ngoài workspace (360 §7)",
+   "acceptance": "Mục tiêu 2.1: 0 (hoặc được báo) (360 §7, chỉ số 'Đọc ra ngoài workspace của developer')",
    "gap": "Sandbox: MỞ.",
    "unconfirmed": "'Đưa bundle ra khỏi thư mục cha của workspace': không kiểm trong phiên này bundle nằm ở đâu so với workspace của developer."
   },
@@ -3209,7 +3299,7 @@
     "A8": "M3"
    },
    "m_note": "Khớp REPORT; xem ghi chú về A5 ở P-V2-04.",
-   "acceptance": "mã 2 kèm đường dẫn JSON",
+   "acceptance": "360 không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với chính mục: mọi lỗi đầu vào → mã 2 kèm đường dẫn JSON",
    "gap": "Như P-V2-04: Preflight thật mới chỉ tới loopback, chưa gặp redirect thật (REPORT §2 A6–A7). Điều kiện của A5 (khoá git của editor) chỉ tái hiện ở test (M3): repo của lượt CLI thật (`git init` sạch) không có khoá đó.",
    "unconfirmed": ""
   },
@@ -3310,7 +3400,7 @@
    ],
    "report_items": {},
    "m_note": "REPORT §2 không có hạng mục riêng cho mục này.",
-   "acceptance": "—",
+   "acceptance": "360 không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với chính mục.",
    "gap": "Chính sách chưa được duyệt.",
    "unconfirmed": ""
   },
@@ -3384,7 +3474,7 @@
    "commits": [],
    "report_items": {},
    "m_note": "REPORT §2 không có hạng mục riêng cho mục này.",
-   "acceptance": "—",
+   "acceptance": "360 không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với chính mục.",
    "gap": "Toàn bộ.",
    "unconfirmed": ""
   },
@@ -3416,7 +3506,7 @@
    ],
    "report_items": {},
    "m_note": "REPORT §2 không có hạng mục riêng cho mục này.",
-   "acceptance": "—",
+   "acceptance": "360 không ghi tiêu chí nghiệm thu cho mục này (danh sách 'không làm bây giờ').",
    "gap": "Không còn việc với mục này (danh sách 'không làm'); điều chỉnh duy nhất là mutation, theo RELEASE-DECISIONS seq 5.",
    "unconfirmed": "'Không chạy lại Q4 cùng seed': không kiểm riêng trong phiên này."
   },
@@ -3449,7 +3539,7 @@
    "commits": [],
    "report_items": {},
    "m_note": "REPORT §2 không có hạng mục riêng cho mục này.",
-   "acceptance": "Execution digest: đúng byte của probe/runtime/dependency đã dùng tạo bằng chứng (đề xuất §9.2)",
+   "acceptance": "360 không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với định nghĩa ở đề xuất §9.2 mục 3 (định nghĩa, không phải tiêu chí nghiệm thu): Execution digest: đúng byte của probe/runtime/dependency đã dùng tạo bằng chứng",
    "gap": "Toàn bộ. Sửa sẽ chạm `aisef2/probe` (kernel): cần mutation + hiệu chuẩn lại, ngoài snapshot đang đo.",
    "unconfirmed": ""
   },
@@ -3529,6 +3619,11 @@
     {
      "path": "docs/v2.1/evidence/cli-integration-b72e51e.out",
      "contains": "\"limit\": \"clauses are the ones the criteria's facts declare; AISEF does not parse the requirements document\""
+    },
+    {
+     "path": "docs/v2.1/evidence/cli-integration-c9c736f.out",
+     "contains": "\"limit\": \"clauses are the ones the criteria's facts declare; AISEF does not parse the requirements document\"",
+     "at": "with-table"
     }
    ],
    "reproducers": [],

@@ -30,34 +30,57 @@ mục nguồn vào commit, test và mức đã có, và ghi rõ chỗ không xá
   N-18 của MiMo), nhãn là của người kiểm chứng và nhãn gốc của nghiên cứu ghi kèm.
 - **Mức (REPORT §2)**: mức của hạng mục REPORT tương ứng, chép nguyên và kiểm bằng máy; hàng không có hạng mục riêng
   trong REPORT để trống (không tự gán mức). Hàng chỉ số của 360 §7 (R-M1…R-M9) không mang mức: mức của hạng mục liên
-  quan không phải mức của chỉ số. M5 (live): không mục nào. M4 là của lượt CLI thật tại `b72e51e` (xem "Giới hạn").
-- **Kiểm cơ học**: chuỗi phải có / không được có trong một tệp tại HEAD (hoặc commit ghi kèm) — bằng chứng cho các câu
-  về mã hiện tại.
+  quan không phải mức của chỉ số. M5 (live): không mục nào. M4 của B4/B5 là lượt CLI thật, lặp lại tại `c9c736f` (xem
+  "Đã chạy lại").
+- **Tiêu chí nghiệm thu**: chép từ chỗ nguồn *nêu* tiêu chí — đề xuất §10 (cột "Nghiệm thu cụ thể"), §4.3 ("Nghiệm thu
+  bước đầu"), §12 (gate); 360 §6 ("Thước đo xong"), §7 ("Mục tiêu 2.1"); "(§n)" ở cuối ghi mục lấy. Mục mà nguồn không
+  nêu tiêu chí ghi rõ "Đề xuất không ghi tiêu chí nghiệm thu cho mục này" (hay "360 không ghi…") rồi nói bảng đối chiếu
+  với câu nào; `—` chỉ ở hàng `declined`.
+- **Còn thiếu**: mọi hàng trừ `declined` ghi phần còn thiếu so với tiêu chí, hoặc ghi rõ "Không còn…" và dựa vào đâu.
+- **Kiểm cơ học**: chuỗi phải có / không được có trong một tệp tại HEAD (hoặc commit ghi kèm, hoặc — "đi cùng bảng" —
+  tệp bằng chứng commit cùng bảng này sau HEAD) — bằng chứng cho các câu về mã hiện tại.
 - **Chưa xác nhận được**: phần của hàng dựa vào lời của tài liệu khác mà repo không cho kiểm lại.
 
 ## Kiểm lại
 
 ```sh
 python3 -P validation/v21/traceability_check.py                       # mọi hàng tại c9c736f + khối sinh của tệp này
-python3 -P validation/v21/traceability_check.py --proposal <tệp đề xuất>  # thêm: mục của đề xuất đúng nguyên văn, đúng sha256
+python3 -P validation/v21/traceability_check.py --proposal <tệp đề xuất>  # thêm: mục và tiêu chí của đề xuất, đúng sha256
 python3 -P validation/v21/traceability_check.py --at HEAD             # cùng các khẳng định ở một commit mới hơn
 python3 -P validation/v21/traceability_check.py --with-ref release/v2.0.1-prep  # thêm: 7 ô đọc trên nhánh 2.0.1 (local)
 ```
 
-Bộ kiểm: commit tồn tại, là tổ tiên của HEAD (hoặc của `f006d3d` với nhánh 2.0.1) và chạm đúng các đường dẫn ghi; mỗi
-reproducer tồn tại (AST); mỗi "kiểm cơ học" đúng và có đúng một khẳng định; mức khớp REPORT §2; mỗi nguồn upstream là một
-tuyên bố của nghiên cứu với đúng nhãn (của người kiểm chứng khi họ phân lại), đúng kết quả kiểm chứng, đúng commit đã đọc,
-và mọi số dòng ở `tệp:dòng` có trong bằng chứng của nghiên cứu (của người kiểm chứng khi corrected/refuted); mục 360° đúng
-nguyên văn; hàng `open`, `blocked`, `adapted` ghi phần còn thiếu; "Mục còn mở" và tập hàng `open`/`blocked` trùng nhau.
-Khoá lạ trong JSON là lỗi, không bị bỏ qua; mọi revision phải là mã commit hex (`--at`, `--with-ref` do git phân giải
-trước). Mặc định bộ kiểm chỉ đọc object tới được từ HEAD, nên chạy được trên mọi clone của nhánh; 7 ô đọc trên nhánh
-2.0.1 local (commit `c0ec1a5`, `f006d3d` và reproducer ở `f006d3d`, hàng P-V2-01, P-GATE-2.0.1, R-P0-1) chỉ được kiểm khi
-có `--with-ref release/v2.0.1-prep`, và dòng OK nói rõ chúng chưa được kiểm. Test: `tests/test_v21_traceability.py`. **Giới hạn:** reproducer được kiểm là *tồn tại*, không được chạy lại khi
-lập bảng; mức M3/M4 là của REPORT, đối chiếu với output CLI đã commit (`docs/v2.1/evidence/cli-integration-b72e51e.out`)
-chứ không đo lại. Output đó là của mã tại `b72e51e`: giữa `b72e51e` và `c9c736f` chỉ hai commit chạm `aisef2/` hoặc
-`aisef/` — `a912be6` và `3061ec0` — đổi đường ghi của `aisef2/app/bundle_cli.py` (init/seal/approve/migrate ghi qua
-`_create`, tạo độc quyền O_EXCL) và một chú thích trong `review_verify.py`. Mức M4 vì vậy đọc là "M4 tại `b72e51e`"; byte
-của `bundle_cli.py` tại `c9c736f` chưa chạy qua CLI thật (kiểm cơ học ở [P-V2-07](#p-v2-07)).
+Bộ kiểm: commit tồn tại, là tổ tiên của HEAD (hoặc của `f006d3d` với nhánh 2.0.1) và chạm đúng các đường dẫn ghi (danh
+sách không rỗng); mỗi reproducer tồn tại (AST); mỗi "kiểm cơ học" đúng và có đúng một khẳng định (chuỗi `contains`/`lacks`
+từ 4 ký tự, `exists` là true/false); mức khớp REPORT §2; mỗi nguồn upstream là một tuyên bố của nghiên cứu với đúng nhãn
+(của người kiểm chứng khi họ phân lại), đúng kết quả kiểm chứng, đúng commit đã đọc (≥ 7 chữ số hex), và mỗi `tệp:dòng`
+là một dòng mà bằng chứng của nghiên cứu (của người kiểm chứng khi corrected/refuted) nêu **cho chính tệp đó** (số dòng
+thuộc về tệp được nhắc gần nhất trước nó); mục 360° đúng nguyên văn; mọi hàng trừ `declined` ghi phần còn thiếu (có chữ,
+không phải `—`); tiêu chí nghiệm thu nằm trong một đoạn nêu tiêu chí của nguồn, đúng mục khi có "(§n)", hoặc ghi rõ nguồn
+không nêu (tiêu chí của đề xuất chỉ kiểm khi có `--proposal`); "Mục còn mở" và tập hàng `open`/`blocked` trùng nhau. Khoá
+lạ — ở cấp trên cùng, trong `sources`, trong mục còn mở, hàng, commit, kiểm cơ học hay upstream — là lỗi, không bị bỏ qua;
+mọi revision phải là mã commit hex (`--at`, `--with-ref` do git phân giải trước). Bộ kiểm **không** phân định được một
+câu chép từ đoạn tiêu chí có phải toàn bộ tiêu chí, hay tiêu chí đã đạt chưa: đó là phán đoán, ghi ở "Còn thiếu".
+
+Mặc định bộ kiểm chỉ đọc object tới được từ HEAD, nên chạy được trên mọi clone của nhánh; 7 ô đọc trên nhánh 2.0.1 local
+(commit `c0ec1a5`, `f006d3d` và reproducer ở `f006d3d`, hàng P-V2-01, P-GATE-2.0.1, R-P0-1) chỉ được kiểm khi có
+`--with-ref release/v2.0.1-prep`, và dòng OK nói rõ chúng chưa được kiểm. Test: `tests/test_v21_traceability.py`.
+
+**Đã chạy lại (vòng 2, trên clone sạch tại `c9c736f`, không provider trả tiền, không `opencode` thật):**
+- 97 reproducer bảng trích tại HEAD: `Ran 97 tests … OK (skipped=1)`; test bị bỏ qua là
+  `RealBinary.test_a_full_review_against_a_scripted_model` (cần `AISEF_TEST_OCR_EXE`), và với nhị phân OCR đã ghim cả lớp
+  `RealBinary` `Ran 3 tests … OK` — từng test ở
+  [`evidence/traceability-reproducers-c9c736f.out`](evidence/traceability-reproducers-c9c736f.out). Reproducer ở `f006d3d`
+  (P-V2-01) không chạy lại. Bộ kiểm vẫn chỉ kiểm reproducer *tồn tại*; lượt chạy là của commit này, không tự lặp lại.
+- `validation/v21/cli_integration/run.sh` (CLI thật, OCR thật, provider giả trên loopback, developer giả):
+  [`evidence/cli-integration-c9c736f.out`](evidence/cli-integration-c9c736f.out). So với output tại `b72e51e`, chỉ khác giá
+  trị băm (commit của repo `git init` mới, plan_hash, anchor, sha256), pid, mốc thời gian và dòng cuối bị cắt ở 3000 ký
+  tự. Giữa `b72e51e` và `c9c736f` chỉ hai commit chạm `aisef2/` hoặc `aisef/` — `a912be6` và `3061ec0`, đổi đường ghi của
+  `aisef2/app/bundle_cli.py` (init/seal/approve/migrate ghi qua `_create`, tạo độc quyền O_EXCL) và một chú thích trong
+  `review_verify.py` — nên M4 của B4/B5 nay là của chính byte tại `c9c736f`.
+
+**Giới hạn:** các mức khác là của REPORT, không đo lại ngoài hai lượt trên; lượt CLI vẫn không có khoá git của editor
+(A5) và không ghi journal ra output (C1, D5: xem "Chưa xác nhận được" ở từng hàng).
 
 ## Điều đối chiếu tìm thấy (so với tài liệu hiện có)
 
@@ -65,32 +88,40 @@ của `bundle_cli.py` tại `c9c736f` chưa chạy qua CLI thật (kiểm cơ h�
    `aisef2/runtime/process_range.py` (được import) và `range_anchor.py` (được chạy) nằm ngoài. Vì vậy V2-08 chưa đạt
    mục 3 của §9.2 đề xuất ("đúng byte của probe/runtime/dependency"). Sửa sẽ chạm kernel.
 2. **Nghiệm thu của V2-09 chỉ đạt 4/5** ([P-V2-09](#p-v2-09)): lỗi lịch sử thứ năm (trích R-7/1) là UNANCHORED nên theo luật
-   neo vẫn lọt gate; ADR-7 có ghi điều này nhưng STATUS ghi C1 "XONG".
+   neo vẫn lọt gate; ADR-7 có ghi điều này nhưng STATUS ghi C1 "XONG". Vì điều kiện neo là điều chỉnh của chủ dự án, hàng
+   ghi `adapted` (như P-ADJ-3, R-P1-8).
 3. **M4 của A5 không tái hiện điều kiện của A5** ([P-V2-04](#p-v2-04)): repo trong lượt CLI thật không có khoá git của
    editor; điều kiện đó chỉ có ở test (M3).
 4. **Hai khẳng định M4 không thấy được trong output đã commit**: chuỗi finding ⇒ CONFIRMED ⇒ ANCHORED ⇒ REVIEW_FINDING của
-   REPORT §4.1 (output chỉ có S1 RETRY → COMMIT) và tệp anchor 0444 của D5 — ghi ở cột "Chưa xác nhận được".
+   REPORT §4.1 (output chỉ có S1 RETRY → COMMIT) và tệp anchor 0444 của D5 — ghi ở cột "Chưa xác nhận được". (Lượt
+   `RealBinary` 3/3 mà REPORT §4.1 chỉ nêu thì nay đã chạy lại: xem "Đã chạy lại".)
 5. **Thứ tự §10 của đề xuất** ("05/06/08/11/12 → 07/09 → 10 → 13"): 06, 08, 11 rồi 07, 09, 10 đã làm (13: chỉ
    harness); **05 (sandbox) và 12 (corpus ghi thật) — hai mục đứng đầu — chưa làm.**
 6. **Kế toán reasoning: số đo có, kết luận là suy luận** ([P-11.3](#p-113)): trên 270 step của smoke #2, `total` =
    input + output + reasoning + cache ở 270/270 step (lệnh đo ghi ở hàng). *Nếu* `total` là số provider trả về thì
    `output` của client không gồm `reasoning` và `usage._usd` không đếm hai lần; nếu OpenCode 1.18.31 tự cộng `total` từ
    các trường của nó thì đẳng thức đúng bất kể `output` chứa gì. Repo không có mã OpenCode để phân định: INFERENCE.
-   Không test nào định giá một step có reasoning ≠ 0.
+   Có test chạy `aisef run` với bảng giá trên step có reasoning ≠ 0 (`test_v21_continue_integrity`), nhưng không test nào
+   khẳng định số USD của một step như thế.
 7. Các mục khác không có trong STATUS: action chưa ghim SHA và không có mục sổ cho phán quyết "FINAL RELEASE EXECUTION"
    ([R-P0-4](#r-p0-4)); link GitHub còn trên landing, salekit, README.vi ([R-P0-5](#r-p0-5)); `estimated` không có trạng
    thái riêng và request HTTP lỗi không có trong telemetry ([P-V2-11](#p-v2-11)); không có đề xuất sửa contract sinh từ
    finding ([P-4.3a](#p-43a)); không có bậc kiểm độ đặc hiệu của contract ([P-9.3](#p-93)).
-8. **REPORT §1 ghi "mã cuối `b72e51e`"**, không còn đúng tại `c9c736f` (a912be6, 3061ec0 đổi `aisef2/`); mức M4 là "M4 tại
-   `b72e51e`" (xem "Giới hạn").
+8. **REPORT §1 ghi "mã cuối `b72e51e`"**, không còn đúng tại `c9c736f` (a912be6, 3061ec0 đổi `aisef2/`); lượt CLI đã được
+   chạy lại tại `c9c736f` với cùng kết quả (xem "Đã chạy lại").
 9. **Harness thí nghiệm chỉ khoá khung** ([P-6.2a](#p-62a)): `harness.check` đòi đúng tập khoá cấp trên cùng, seal, mức
    danh tính model kèm lý do và evaluator ẩn; nội dung các trường §6.2 (snapshot digest, adapter version, image digest…)
    không được đòi.
 
+10. **Review thiếu tệp bắt buộc chỉ bị chặn dưới `fix-loop`** ([P-4.2a](#p-42a), [P-4.2b](#p-42b)): dưới `advisory` — cũng
+    là luật khi settings không khai `review` — review INDETERMINATE được ghi mà story vẫn COMMIT; và tệp bắt buộc mà preview
+    của OCR loại vì `unsupported_ext` hay `binary` không tính là thiếu (`review_ocr.NOT_REVIEWABLE`), không test nào phủ
+    nhánh đó. Đề xuất §4.2 nêu cả tệp bị lọc vì extension: P-4.2b ghi `adapted`.
+
 Không mục nào ở đây được sửa hay triển khai lại trong lúc lập bảng.
 
 <!-- rows:begin — generated by validation/v21/traceability_check.py --render; do not edit by hand -->
-Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 24, adapted 17, declined 16, blocked 18, open 13.
+Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 21, adapted 20, declined 16, blocked 18, open 13.
 
 ## Mục còn mở
 
@@ -113,22 +144,22 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 24, adapted 17, 
 | [P-V2-06](#p-v2-06) | PRESERVE trước merge + sửa spec import | adopted | B1 M3, B3 M3 | Contract S-10-a sửa: M6 (B-04 chưa duyệt). 'Biến thể hợp lệ không bị bác nhầm' chỉ kiểm cho hai bản nháp S-10… |
 | [P-V2-07](#p-v2-07) | Bundle API/schema/example/coverage | adopted | B4 M4, B5 M4 | Chưa người ngoài nào thử (chưa đo). Độ phủ chỉ trên mệnh đề do tiêu chí khai — lint tự ghi 'AISEF does not pa… |
 | [P-V2-08](#p-v2-08) | Tách compatibility và execution identity | adapted | B6 M3 | EXECUTION_DIGEST bỏ sót `runtime/process_range.py` và `range_anchor.py` — phát hiện 360 §3.1 vẫn đúng tại HEA… |
-| [P-V2-09](#p-v2-09) | OCR adapter + confirmed finding feedback | adopted | C1 M4, C2 M4, C3 M4 | Chỉ 4/5 lỗi lịch sử neo được nên bị chặn; lỗi thứ năm (trích R-7/1, contract quan sát tệp) là UNANCHORED và t… |
+| [P-V2-09](#p-v2-09) | OCR adapter + confirmed finding feedback | adapted | C1 M4, C2 M4, C3 M4 | Chỉ 4/5 lỗi lịch sử neo được nên bị chặn; lỗi thứ năm (trích R-7/1, contract quan sát tệp) là UNANCHORED và t… |
 | [P-V2-10](#p-v2-10) | Resume từ journal/checkpoint | adapted | D1 M4 | Resume tại chỗ: M6. Mất điện / OS sập không mô phỏng; trên macOS `fsync` không ép cache ổ. Tiến trình con đã … |
 | [P-V2-11](#p-v2-11) | Cost ledger + no-progress limits | adapted | D2 M4, D3 M3 | Giá thật: M6. Không có trạng thái 'estimated' (chỉ known / partial / unknown). Request HTTP không kết thúc st… |
 | [P-V2-12](#p-v2-12) | Replay corpus qua app và adapter contract | open | — | Toàn bộ. |
 | [P-V2-13](#p-v2-13) | Paired experiment và holdout | blocked | E1 M3, E2 M6 | E2: MỞ. 'Held-out không được developer đọc' hiện chỉ phát hiện sau sự việc (`leaks` quét chuỗi đặc trưng), kh… |
 | [P-V2-14](#p-v2-14) | Client thứ hai và `assess` độc lập | declined | — | Toàn bộ (2.2). |
-| [P-ADJ-3](#p-adj-3) | LLM finding chưa xác minh chỉ phản hồi; lỗi đã xác minh, thuộc phạm vi, mức nghiêm trọng … | adopted | C1 M4 | Mặc định (không khai `review`) vẫn advisory. Neo sai khi một stimulus mới bị xếp sai mệnh đề (ADR-7). |
+| [P-ADJ-3](#p-adj-3) | LLM finding chưa xác minh chỉ phản hồi; lỗi đã xác minh, thuộc phạm vi, mức nghiêm trọng … | adapted | C1 M4 | Mặc định (không khai `review`) vẫn advisory. Neo sai khi một stimulus mới bị xếp sai mệnh đề (ADR-7). |
 | [P-ADJ-4](#p-adj-4) | Đưa Linux sandbox tối thiểu trước thí nghiệm dùng hidden tests; macOS native làm sau | blocked | F M6, E2 M6 | Sandbox: MỞ. |
 | [P-ADJ-5](#p-adj-5) | Dùng 1–3 lượt để canary; phép so sánh hiệu quả phải có thêm lượt lặp có ngân sách | blocked | E2 M6 | Live: MỞ. |
 | [P-ADJ-6](#p-adj-6) | Làm sau; nếu tái sử dụng evidence phải tính cả phụ thuộc và công cụ kiểm | adopted | — | Chiến dịch chưa xong: tại HEAD không có kết quả mutation 2.1 nào để tuyên bố. |
-| [P-4.2a](#p-42a) | Reviewer trả thiếu manifest hoặc schema lạ → `INDETERMINATE`, không coi là review sạch. | adopted | C2 M4 | — |
-| [P-4.2b](#p-42b) | Không lấy tập `selected` của OCR làm toàn bộ phạm vi bắt buộc một cách mặc nhiên | adopted | C2 M4 | — |
+| [P-4.2a](#p-42a) | Reviewer trả thiếu manifest hoặc schema lạ → `INDETERMINATE`, không coi là review sạch. | adopted | C2 M4 | Tiêu chí chỉ đạt dưới `fix-loop`: dưới `advisory` — cũng là luật khi settings không khai `review` (ADR-V2.1) … |
+| [P-4.2b](#p-42b) | Không lấy tập `selected` của OCR làm toàn bộ phạm vi bắt buộc một cách mặc nhiên | adapted | C2 M4 | Tệp bắt buộc bị loại vì extension hay nhị phân không được review mà review vẫn có thể COMPLETE. Không test nà… |
 | [P-4.2c](#p-42c) | Không cho reviewer quyền commit, merge, thay contract hay cập nhật verdict. | adopted | — | Không có ranh giới OS: finder chạy dưới cùng user; thay đổi bị phát hiện và loại, không bị ngăn (REPORT §3). |
 | [P-4.3a](#p-43a) | Nếu finding phát hiện một yêu cầu chưa có trong contract, tạo **đề xuất sửa contract có p… | open | — | Toàn bộ phần tạo đề xuất. |
 | [P-4.3b](#p-43b) | Reproducer chạy thành công **chưa đủ**: còn phải xác nhận kỳ vọng của nó đúng theo requir… | adopted | C1 M4 | Giới hạn đã đo: stimulus mới xếp sai mệnh đề vẫn neo được (test_known_limit_…). |
-| [P-4.3c](#p-43c) | Branch đích đổi thì dựng cây tích hợp mới và kiểm lại. | adopted | — | — |
+| [P-4.3c](#p-43c) | Branch đích đổi thì dựng cây tích hợp mới và kiểm lại. | adopted | — | Không còn so với tiêu chí trên: sau merge, mọi obligation của story và PRESERVE của các story đã commit được … |
 | [P-5.2a](#p-52a) | AISEF phải tự chạy lệnh đánh giá được cố định, đọc kết quả có schema và ràng buộc digest. | adopted | E1 M3 | Chưa chạy trên workload thật (E2). |
 | [P-5.2b](#p-52b) | Có thể dùng để nhắc agent còn việc; không dùng thay acceptance hoặc để cấp `delivery_verd… | declined | — | — |
 | [P-5.2c](#p-52c) | AISEF cần tạo run con, giữ parent và bằng chứng cũ. | adopted | D1 M4 | Claimant ở máy khác: chỉ thay khi người vận hành nêu sha256 của claim (REPORT §4.2). |
@@ -217,7 +248,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 24, adapted 17, 
 
 - **Nguồn:** đề xuất §10 V2-02
 - **Bằng chứng tại HEAD:** `--verify` dựng lại outcome từ journal, settings qua `runspec_hash`, chi tiêu từ luồng phiên + ledger preflight; trường chỉ có trong record chỉ được hạ verdict; `EVIDENCE.json` + anchor, `--expect-anchor` (ADR-3). Lượt CLI thật trên b72e51e (cây sạch): hai lần `--verify --expect-anchor` VERIFIED.
-- **Kiểm cơ học:** `docs/v2.1/evidence/cli-integration-b72e51e.out` chứa `commit: b72e51eadd87bee56b916c70c4ac24649f49071e dirty: 0`; `docs/v2.1/evidence/cli-integration-b72e51e.out` chứa `"verdict": "VERIFIED"`
+- **Kiểm cơ học:** `docs/v2.1/evidence/cli-integration-b72e51e.out` chứa `commit: b72e51eadd87bee56b916c70c4ac24649f49071e dirty: 0`; `docs/v2.1/evidence/cli-integration-b72e51e.out` chứa `"verdict": "VERIFIED"`; `docs/v2.1/evidence/cli-integration-c9c736f.out` (đi cùng bảng) chứa `commit: c9c736fd638511b5cfd23d4d75ceb311c47b0759 dirty: 0`; `docs/v2.1/evidence/cli-integration-c9c736f.out` (đi cùng bảng) chứa `"verdict": "VERIFIED"`
 - **Reproducer:** `tests/v2/test_v21_verify.py::RecordAlone::test_a_budget_stop_removed_from_the_record_is_refuted`, `tests/v2/test_v21_verify.py::RecordAlone::test_raising_the_ceiling_in_the_record_is_refuted`, `tests/v2/test_v21_verify.py::RecordAlone::test_story_outcomes_that_are_not_the_journal_s_are_refuted`, `tests/v2/test_v21_verify.py::RecordAlone::test_a_rewritten_manifest_is_refuted_only_against_the_anchor_the_operator_kept`, `tests/v2/test_v21_continue_integrity.py::AnchorThreatModel::test_the_limit_an_attacker_who_can_write_the_store_too_is_not_detected`
 - **Ảnh hưởng:** cao: trên 2.0 sửa riêng `RUN.json` vẫn VERIFIED (STATUS A2: đo)
 - **Quyết định:** adopted — Đúng phạm vi đề xuất; không đổi format journal.
@@ -292,12 +323,12 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 24, adapted 17, 
 
 - **Nguồn:** đề xuất §10 V2-07
 - **Bằng chứng tại HEAD:** `aisef bundle init/seal/approve/lint/explain`, JSON Schema `aisef-v2-authoring/1`, hai ví dụ ship trong wheel (1 story, 3 story) (620bde7). Lượt CLI thật b72e51e: seal → approve ×3 → lint READY → `--check` ready; bundle thứ hai seal → approve ×4.
-- **Kiểm cơ học:** `docs/v2.1/evidence/cli-integration-b72e51e.out` chứa `"verdict": "READY"`; `pyproject.toml` chứa `"aisef2" = ["app/examples/*.json"]`; `docs/v2.1/evidence/cli-integration-b72e51e.out` chứa `AISEF does not parse the requirements document`; `aisef2/app/bundle_cli.py` @ b72e51e không chứa `def _create(`; `aisef2/app/bundle_cli.py` chứa `def _create(`
+- **Kiểm cơ học:** `docs/v2.1/evidence/cli-integration-b72e51e.out` chứa `"verdict": "READY"`; `pyproject.toml` chứa `"aisef2" = ["app/examples/*.json"]`; `docs/v2.1/evidence/cli-integration-b72e51e.out` chứa `AISEF does not parse the requirements document`; `aisef2/app/bundle_cli.py` @ b72e51e không chứa `def _create(`; `aisef2/app/bundle_cli.py` chứa `def _create(`; `docs/v2.1/evidence/cli-integration-c9c736f.out` (đi cùng bảng) chứa `"verdict": "READY"`; `docs/v2.1/evidence/cli-integration-c9c736f.out` (đi cùng bảng) chứa `AISEF does not parse the requirements document`
 - **Reproducer:** `tests/v2/test_v21_bundle_tools.py::Outsider::test_each_example_from_init_to_a_ready_check`, `tests/v2/test_v21_bundle_tools.py::Schema::test_the_schema_and_the_tool_agree_on_every_closed_key_set`, `tests/v2/test_v21_bundle_tools.py::Refusals::test_an_uncovered_requirement_is_named_where_admission_refuses_it`, `tests/v2/test_v21_bundle_tools.py::Refusals::test_an_edited_contract_loses_its_approval_on_reseal`
 - **Ảnh hưởng:** cao: không có đường soạn bundle được hỗ trợ (360 §3.6)
 - **Quyết định:** adopted — Đúng đề xuất.
 - **Commit:** `620bde7`: aisef2/app/bundle_cli.py, aisef2/app/examples/calc-1-story.json, aisef2/app/examples/calc-3-stories.json, docs/v2.1/bundle-authoring.schema.json, tests/v2/test_v21_bundle_tools.py
-- **Mức (REPORT §2):** B4 = M4, B5 = M4 — Khớp REPORT: output đã commit có seal, approve, lint READY, `--check` ready. M4 là của lượt CLI thật tại `b72e51e` (docs/v2.1/evidence/cli-integration-b72e51e.out); `aisef2/app/bundle_cli.py` đổi sau lượt đó ở a912be6 và 3061ec0 (đường ghi của init/seal/approve/migrate chuyển sang tạo độc quyền `_create`), nên byte tại c9c736f chưa chạy qua CLI thật: đọc là 'M4 tại b72e51e'.
+- **Mức (REPORT §2):** B4 = M4, B5 = M4 — Khớp REPORT: output đã commit có seal, approve, lint READY, `--check` ready. M4 là của lượt CLI thật tại `b72e51e` (docs/v2.1/evidence/cli-integration-b72e51e.out); `aisef2/app/bundle_cli.py` đổi sau lượt đó ở a912be6 và 3061ec0 (đường ghi của init/seal/approve/migrate chuyển sang tạo độc quyền `_create`), lượt lặp lại tại c9c736f (`docs/v2.1/evidence/cli-integration-c9c736f.out`, vòng 2 của bảng này: cùng `run.sh`, cùng nhị phân OCR, clone sạch tại c9c736f) cho cùng output — khác nhau chỉ ở giá trị băm (commit của repo `git init` mới, plan_hash, anchor, sha256), pid, mốc thời gian và dòng cuối bị cắt ở 3000 ký tự: M4 tại c9c736f.
 - **Tiêu chí nghiệm thu:** Người ngoài tạo bundle 3 story không import private constructor; mọi mệnh đề có trạng thái coverage rõ
 - **Còn thiếu:** Chưa người ngoài nào thử (chưa đo). Độ phủ chỉ trên mệnh đề do tiêu chí khai — lint tự ghi 'AISEF does not parse the requirements document'.
 - **Chưa xác nhận được:** Tài liệu ngữ pháp contract cho 18 lớp quan sát: không kiểm trong phiên này.
@@ -323,16 +354,16 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 24, adapted 17, 
 
 - **Nguồn:** đề xuất §10 V2-09; §4.1–4.3
 - **Upstream:** alibaba/open-code-review@182898cf522d `internal/session/manifest.go:231-237, 854-858` — CODE (kiểm chứng: confirmed; claim P7); alibaba/open-code-review@182898cf522d `internal/session/manifest.go:165-170, 941-958` — CODE (kiểm chứng: confirmed; claim P8); alibaba/open-code-review@182898cf522d `cmd/opencodereview/review_cmd.go:326-352; internal/agent/agent.go:705-716` — CODE (kiểm chứng: corrected; claim P11); alibaba/open-code-review@182898cf522d `cmd/opencodereview/sarif.go:195-211, 288-297` — CODE (kiểm chứng: confirmed; claim N3); alibaba/open-code-review@182898cf522d `internal/agent/agent.go:479-482, 919-927` — CODE (kiểm chứng: confirmed; claim N6); alibaba/open-code-review@182898cf522d `người kiểm: EXPERIMENT pages/src/components/BenchmarkSection.tsx:43-56 (recall 11,7–20 %, precision 25,2–37,8 %)` — EXPERIMENT (kiểm chứng: refuted, người kiểm chứng phân lại; nghiên cứu ghi NOT_FOUND; claim N19)
-- **Bằng chứng tại HEAD:** OCR v1.12.12 (182898c) chạy như tiến trình ngoài, ghim sha256, môi trường đã xoá biến OCR_/ANTHROPIC_/OTEL_; coverage do AISEF tính từ manifest, exit 0 không bao giờ là 'đã review đủ'; `finding_id` theo fingerprint SARIF; finding chỉ chặn khi CONFIRMED ∧ ANCHORED ∧ ≥ `min_severity` (ADR-7). Lượt CLI thật b72e51e: nhị phân OCR thật, settings `fix-loop` + `finder: ocr`, S1: RETRY → COMMIT, verify VERIFIED.
-- **Kiểm cơ học:** `docs/v2.1/evidence/cli-integration-b72e51e.out` chứa `ocr: open-code-review v1.12.12 (182898c) darwin/arm64 sha256 bf38abf320ead4e106b71c1582446364020711…`; `validation/v21/cli_integration/make_inputs.py` chứa `"review": {"policy": "fix-loop", "min_severity": "high", "finder": "ocr",`; `tests/v2/test_v21_review.py` chứa `{"repair-utf8-crash": V.UNANCHORED}`
+- **Bằng chứng tại HEAD:** OCR v1.12.12 (182898c) chạy như tiến trình ngoài, ghim sha256, môi trường đã xoá biến OCR_/ANTHROPIC_/OTEL_; coverage do AISEF tính từ manifest, exit 0 không bao giờ là 'đã review đủ'; `finding_id` theo fingerprint SARIF; finding chỉ chặn khi CONFIRMED ∧ ANCHORED ∧ ≥ `min_severity` (ADR-7). Lượt CLI thật b72e51e: nhị phân OCR thật, settings `fix-loop` + `finder: ocr`, S1: RETRY → COMMIT, verify VERIFIED. `RealBinary` 3/3 OK với nhị phân OCR đã ghim, chạy lại tại c9c736f (vòng 2; `docs/v2.1/evidence/traceability-reproducers-c9c736f.out`).
+- **Kiểm cơ học:** `docs/v2.1/evidence/cli-integration-b72e51e.out` chứa `ocr: open-code-review v1.12.12 (182898c) darwin/arm64 sha256 bf38abf320ead4e106b71c1582446364020711…`; `validation/v21/cli_integration/make_inputs.py` chứa `"review": {"policy": "fix-loop", "min_severity": "high", "finder": "ocr",`; `tests/v2/test_v21_review.py` chứa `{"repair-utf8-crash": V.UNANCHORED}`; `docs/v2.1/evidence/cli-integration-c9c736f.out` (đi cùng bảng) chứa `ocr: open-code-review v1.12.12 (182898c) darwin/arm64 sha256 bf38abf320ead4e106b71c1582446364020711…`; `docs/v2.1/evidence/traceability-reproducers-c9c736f.out` (đi cùng bảng) chứa `# run 2 summary: Ran 3 tests in`; `docs/v2.1/evidence/traceability-reproducers-c9c736f.out` (đi cùng bảng) chứa `tests.v2.test_v21_review_chain.RealBinary.test_a_full_review_against_a_scripted_model: ok`
 - **Reproducer:** `tests/v2/test_v21_review.py::HistoricalDefects::test_each_shipped_defect_is_confirmed_on_its_shape_and_not_on_the_reference`, `tests/v2/test_v21_review_chain.py::IncompleteReview::test_partial`, `tests/v2/test_v21_review_chain.py::NotABlocker::test_a_finding_that_does_not_reproduce_does_not_block`, `tests/v2/test_v21_review_ocr.py::Coverage::test_exit_0_is_not_a_full_review`, `tests/v2/test_v21_review_ocr.py::Findings::test_ids_are_ocr_s_sarif_fingerprint_stable_under_order_and_numbered_when_repeated`, `tests/v2/test_v21_review_chain.py::RealBinary::test_a_full_review_against_a_scripted_model` `RealBinary` cần `AISEF_TEST_OCR_EXE`: bỏ qua trong suite hermetic (REPORT §4.1).
 - **Ảnh hưởng:** cao: 5 lỗi review tìm thấy, tái hiện được, vẫn vào `main` (360 §3.5)
-- **Quyết định:** adopted — Đúng đề xuất; thêm điều kiện neo theo chỉ thị chủ dự án (xem P-ADJ-3, P-4.3b).
+- **Quyết định:** adapted — Điều chỉnh: finding chỉ chặn khi CONFIRMED ∧ ANCHORED ∧ mức ≥ `min_severity` — điều kiện neo theo chỉ thị chủ dự án (xem P-ADJ-3, P-4.3b). Vì điều kiện đó, lỗi lịch sử thứ năm (UNANCHORED) vẫn lọt gate: tiêu chí '5 lỗi lịch sử không lọt gate' cố ý chỉ đạt 4/5.
 - **Commit:** `e897437`: aisef2/app/review_ocr.py, aisef2/app/review_verify.py, aisef2/app/feedback.py, aisef2/orchestrate/review.py, tests/v2/test_v21_review.py, tests/v2/test_v21_review_ocr.py; `390f07c`: aisef2/app/review_verify.py, aisef2/app/review_ocr.py; `929598f`: tests/v2/test_v21_review_chain.py; `181d68e`: aisef2/app/adapters.py; `51f2eb5`: aisef2/app/review_ocr.py
 - **Mức (REPORT §2):** C1 = M4, C2 = M4, C3 = M4 — Khớp REPORT về mức. Output đã commit xác nhận nhị phân OCR thật, settings fix-loop và S1 RETRY → COMMIT.
 - **Tiêu chí nghiệm thu:** 5 lỗi lịch sử không lọt gate; partial review không PASS; false finding không tự thành blocker
 - **Còn thiếu:** Chỉ 4/5 lỗi lịch sử neo được nên bị chặn; lỗi thứ năm (trích R-7/1, contract quan sát tệp) là UNANCHORED và theo luật neo vẫn lọt gate (ADR-7; test_v21_review.py dòng 8–9, 117). Chất lượng finding của mô hình thật: M6 (B-05, B-06).
-- **Chưa xác nhận được:** Chuỗi 'finding ⇒ CONFIRMED ⇒ ANCHORED ⇒ REVIEW_FINDING' của REPORT §4.1 không có trong output đã commit (journal của lượt không được commit) — không xác nhận được từ repo. Lượt `RealBinary` 3/3 OK chỉ có trong REPORT §4.1, không có bản ghi đã commit.
+- **Chưa xác nhận được:** Chuỗi 'finding ⇒ CONFIRMED ⇒ ANCHORED ⇒ REVIEW_FINDING' của REPORT §4.1 không có trong output đã commit (journal của lượt không được commit) — không xác nhận được từ repo.
 
 ### P-V2-10
 
@@ -341,7 +372,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 24, adapted 17, 
 - **Nguồn:** đề xuất §10 V2-10
 - **Upstream:** XiaomiMiMo/MiMo-Code@6babeb0b98f9 `packages/cli/src/workflow/runtime.ts:1562-1563, :588; persistence.ts:292-297` — CODE (kiểm chứng: confirmed; claim P-11); XiaomiMiMo/MiMo-Code@6babeb0b98f9 `packages/cli/src/workflow/runtime.ts:1539-1545; workflow.sql.ts:6-31` — CODE (kiểm chứng: confirmed; claim N-16); alibaba/open-code-review@182898cf522d `internal/session/resume_identity.go:79-128; cmd/opencodereview/review_cmd.go:182-188` — CODE (kiểm chứng: confirmed; claim P9)
 - **Bằng chứng tại HEAD:** Thay resume tại chỗ bằng nối tiếp: `aisef bundle continue` + `aisef run --parent`; claim theo thế hệ (`O_EXCL`); tác dụng ngoài được đối soát với git; chi phí chưa đối soát chặn phiên trả tiền (ADR-8). Lượt CLI thật b72e51e: SIGKILL thật (exit 137) ⇒ continue ⇒ `--parent` bị từ chối (exit 2) ⇒ `--accept-unaccounted` ⇒ COMMIT ⇒ continue lần nữa bị từ chối ⇒ verify VERIFIED.
-- **Kiểm cơ học:** `docs/v2.1/evidence/cli-integration-b72e51e.out` chứa `exit 137 (137 = SIGKILL)`; `docs/v2.1/evidence/cli-integration-b72e51e.out` chứa `is already continued by`
+- **Kiểm cơ học:** `docs/v2.1/evidence/cli-integration-b72e51e.out` chứa `exit 137 (137 = SIGKILL)`; `docs/v2.1/evidence/cli-integration-b72e51e.out` chứa `is already continued by`; `docs/v2.1/evidence/cli-integration-c9c736f.out` (đi cùng bảng) chứa `exit 137 (137 = SIGKILL)`; `docs/v2.1/evidence/cli-integration-c9c736f.out` (đi cùng bảng) chứa `is already continued by`
 - **Reproducer:** `tests/v2/test_v21_continue_integrity.py::CommitWindows::test_the_merge_moved_main_the_journal_never_committed_it`, `tests/v2/test_v21_continue_integrity.py::JournalAppendWindows::test_a_short_write_is_a_torn_tail_whose_effect_is_still_reconciled`, `tests/v2/test_v21_continue_integrity.py::ClaimLifecycle::test_two_runs_at_once_one_claims_and_the_other_spends_nothing`, `tests/v2/test_v21_continue_integrity.py::ProviderRequestWindows::test_its_usage_reported_its_result_never_journaled`, `tests/v2/test_v21_continue_integrity.py::ProcessesOfAKilledRun::test_the_probe_processes_are_identified_and_die_with_the_run`, `tests/v2/test_v21_continue_usage.py::Continue::test_a_continuation_verifies_given_its_directory_relative_or_absolute`
 - **Ảnh hưởng:** cao: 2.0 không có đường resume (`--out` phải mới), một lượt dài hỏng là mất (360 §3.1, §3.7)
 - **Quyết định:** adapted — Resume tại chỗ cần format journal mới (schema đóng) ⇒ chọn nối tiếp + dòng dõi (ADR-8). 'Đổi policy tạo lineage mới' đạt bằng run con.
@@ -357,7 +388,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 24, adapted 17, 
 - **Nguồn:** đề xuất §10 V2-11
 - **Upstream:** SWE-agent/mini-swe-agent@04d809ceab9d `src/minisweagent/agents/default.py:132, 148-150` — CODE (kiểm chứng: confirmed; claim P7); SWE-agent/mini-swe-agent@04d809ceab9d `src/minisweagent/models/litellm_model.py:110-125` — CODE (kiểm chứng: corrected; claim N2); SWE-agent/mini-swe-agent@04d809ceab9d `src/minisweagent/models/utils/retry.py:19-25` — CODE (kiểm chứng: confirmed; claim N3); alibaba/open-code-review@182898cf522d `cmd/opencodereview/output.go:270-280; internal/agent/estimate.go:92-93` — CODE (kiểm chứng: corrected; claim N14)
 - **Bằng chứng tại HEAD:** `aisef2/app/usage.py`: token theo lớp (input, cache_read, cache_write, output, reasoning), request, retry, wall time; tiền chỉ khi bảng giá đủ khoá (có nguồn + ngày hiệu lực), không biết ⇒ `null`; phiên có step thiếu token ⇒ partial. `no_progress` chỉ báo cáo; retry do taxonomy quyết định.
-- **Kiểm cơ học:** `aisef2/app/usage.py` chứa `` an unknown price is `null` with its reason, never 0 ``; `aisef2/app/usage.py` chứa `NO_SIDE_RETRY_COUNTER`; `docs/v2.1/evidence/cli-integration-b72e51e.out` chứa `"status": "unknown: some run's cost is not known (not 0)"`
+- **Kiểm cơ học:** `aisef2/app/usage.py` chứa `` an unknown price is `null` with its reason, never 0 ``; `aisef2/app/usage.py` chứa `NO_SIDE_RETRY_COUNTER`; `docs/v2.1/evidence/cli-integration-b72e51e.out` chứa `"status": "unknown: some run's cost is not known (not 0)"`; `docs/v2.1/evidence/cli-integration-c9c736f.out` (đi cùng bảng) chứa `"status": "unknown: some run's cost is not known (not 0)"`
 - **Reproducer:** `tests/v2/test_v21_continue_usage.py::Usage::test_without_prices_cost_is_unknown_never_zero`, `tests/v2/test_v21_continue_usage.py::Usage::test_with_prices_known_and_a_blind_step_makes_it_partial`, `tests/v2/test_v21_continue_usage.py::Usage::test_a_price_table_is_complete_or_refused`, `tests/v2/test_v21_continue_usage.py::Usage::test_retries_that_change_nothing_are_reported`
 - **Ảnh hưởng:** cao với mọi quyết định ngân sách: trên 2.0 mọi bước giá 0 (360 §2, §3.5)
 - **Quyết định:** adapted — Ledger nhận đủ. No-progress chỉ báo cáo, không phải 'limit' dừng lượt — dừng vẫn do trần ngân sách và taxonomy.
@@ -419,7 +450,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 24, adapted 17, 
 - **Kiểm cơ học:** `aisef2/app/review_verify.py` chứa `def blocks(`
 - **Reproducer:** `tests/v2/test_v21_review.py::Triage::test_severity_floor_and_policy`, `tests/v2/test_v21_review.py::Triage::test_a_misread_requirement_is_confirmed_and_never_blocks`, `tests/v2/test_v21_review.py::ProductPath::test_without_a_review_policy_the_same_review_is_advisory_as_in_2_0_0`, `tests/v2/test_v21_review_chain.py::FixLoop::test_a_correct_anchored_finding_is_fixed_before_the_merge`
 - **Ảnh hưởng:** cao (360 §3.5)
-- **Quyết định:** adopted — Theo đề xuất, không theo 360 #8 ('không chặn'); thêm điều kiện neo theo chỉ thị chủ dự án (ADR-7).
+- **Quyết định:** adapted — Theo đề xuất, không theo 360 #8 ('không chặn'); điều chỉnh: thêm điều kiện neo (ANCHORED) theo chỉ thị chủ dự án (ADR-7), như R-P1-8.
 - **Commit:** `e897437`: aisef2/app/review_verify.py; `390f07c`: aisef2/app/review_verify.py
 - **Mức (REPORT §2):** C1 = M4 — Khớp REPORT (xem P-V2-09 về phần không xác nhận được từ output đã commit).
 - **Tiêu chí nghiệm thu:** có các finding sai để chứng minh gate không chặn chỉ vì LLM nói có lỗi (§4.3)
@@ -436,7 +467,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 24, adapted 17, 
 - **Ảnh hưởng:** cao: không thể gọi evaluator là độc lập khi developer đọc được đề
 - **Quyết định:** blocked — Như P-V2-05 (phương án F chờ chủ dự án) và P-V2-13 (ngân sách).
 - **Mức (REPORT §2):** F = M6, E2 = M6 — Khớp REPORT.
-- **Tiêu chí nghiệm thu:** Không thể gọi một bộ đánh giá là độc lập khi developer đọc được đề và runtime của verifier
+- **Tiêu chí nghiệm thu:** Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với cột 'Lý do' của cùng hàng §3: Không thể gọi một bộ đánh giá là độc lập khi developer đọc được đề và runtime của verifier
 - **Còn thiếu:** Sandbox: MỞ.
 
 ### P-ADJ-5
@@ -450,7 +481,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 24, adapted 17, 
 - **Ảnh hưởng:** quyết định: canary chứng minh đường chạy, không đủ để kết luận hơn baseline
 - **Quyết định:** blocked — Chặn trên ngân sách của chủ dự án (B-09 chưa duyệt).
 - **Mức (REPORT §2):** E2 = M6 — Khớp REPORT.
-- **Tiêu chí nghiệm thu:** Canary chứng minh đường chạy; không đủ để kết luận hơn baseline
+- **Tiêu chí nghiệm thu:** Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với cột 'Lý do' của cùng hàng §3: Canary chứng minh đường chạy; không đủ để kết luận hơn baseline
 - **Còn thiếu:** Live: MỞ.
 
 ### P-ADJ-6
@@ -465,7 +496,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 24, adapted 17, 
 - **Quyết định:** adopted — Tái sử dụng tính cả phụ thuộc (closure) và công cụ (generator); không theo 360 #19 (AST từng hàm).
 - **Commit:** `55a6b74`: validation/qualification/v21_mutation_record.py, validation/v2/mutation.py; `c9c736f`: validation/qualification/v21_mutation_record.py, tests/v2/test_v21_mutation_record.py; `16d4899`: closure-evidence/v2/v2.1/REQUALIFICATION-MANIFEST.json
 - **Mức (REPORT §2):** REPORT §2 không có hạng mục cho B-03b.
-- **Tiêu chí nghiệm thu:** suite đầy đủ xanh trên ứng viên 2.1 (STATUS §3 B-03)
+- **Tiêu chí nghiệm thu:** Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với STATUS §3 B-03: suite đầy đủ xanh trên ứng viên 2.1
 - **Còn thiếu:** Chiến dịch chưa xong: tại HEAD không có kết quả mutation 2.1 nào để tuyên bố.
 
 ### P-4.2a
@@ -475,13 +506,14 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 24, adapted 17, 
 - **Nguồn:** đề xuất §4.2
 - **Upstream:** alibaba/open-code-review@182898cf522d `internal/session/manifest.go:20-23; cmd/opencodereview/review_cmd.go:296; output.go:669-695` — CODE (kiểm chứng: confirmed; claim P15)
 - **Bằng chứng tại HEAD:** `review_ocr.coverage`: manifest thiếu, schema khác `ocr.run-manifest/v1`, partial, hết token, timeout ⇒ INDETERMINATE; dưới fix-loop là lỗi năng lực hoặc ProviderOutage; dưới advisory ghi lại, không chặn (REPORT §4.1).
-- **Reproducer:** `tests/v2/test_v21_review_chain.py::IncompleteReview::test_an_unsupported_manifest_schema`, `tests/v2/test_v21_review_chain.py::IncompleteReview::test_its_token_budget_spent`, `tests/v2/test_v21_review_chain.py::IncompleteReview::test_timed_out_and_its_spend_unknown`, `tests/v2/test_v21_review_ocr.py::Coverage::test_a_manifest_that_does_not_hold_together_is_indeterminate`
+- **Kiểm cơ học:** `aisef2/app/review_ocr.py` chứa `NOT_REVIEWABLE = ("unsupported_ext", "binary")`
+- **Reproducer:** `tests/v2/test_v21_review_chain.py::IncompleteReview::test_an_unsupported_manifest_schema`, `tests/v2/test_v21_review_chain.py::IncompleteReview::test_its_token_budget_spent`, `tests/v2/test_v21_review_chain.py::IncompleteReview::test_timed_out_and_its_spend_unknown`, `tests/v2/test_v21_review_ocr.py::Coverage::test_a_manifest_that_does_not_hold_together_is_indeterminate`, `tests/v2/test_v21_review_chain.py::IncompleteReview::test_under_advisory_the_incomplete_review_is_recorded_and_does_not_block`
 - **Ảnh hưởng:** cao: exit 0 của OCR gồm cả `partial` (OCR P11)
 - **Quyết định:** adopted — Đúng đề xuất.
 - **Commit:** `e897437`: aisef2/app/review_ocr.py, tests/v2/fixtures/ocr/partial.json; `390f07c`: aisef2/app/review_ocr.py
 - **Mức (REPORT §2):** C2 = M4 — M4 là mức của hạng mục C2; riêng các nhánh INDETERMINATE chỉ có test offline (REPORT §4.1).
 - **Tiêu chí nghiệm thu:** review thiếu một file bắt buộc không được thành PASS (§4.3)
-- **Còn thiếu:** —
+- **Còn thiếu:** Tiêu chí chỉ đạt dưới `fix-loop`: dưới `advisory` — cũng là luật khi settings không khai `review` (ADR-V2.1) — review thiếu được ghi INDETERMINATE mà story vẫn COMMIT (`IncompleteReview::test_under_advisory_the_incomplete_review_is_recorded_and_does_not_block`). Tệp bắt buộc mà preview loại vì `unsupported_ext` hay `binary` không tính là thiếu (xem P-4.2b).
 
 ### P-4.2b
 
@@ -490,13 +522,14 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 24, adapted 17, 
 - **Nguồn:** đề xuất §4.2
 - **Upstream:** alibaba/open-code-review@182898cf522d `internal/agent/selection.go:52-58, 92-95; agent.go:2042-2052; compression.go:29-31 (lý do loại theo kích thước/extension/đường dẫn; default_exclude_patterns.json)` — CODE (kiểm chứng: confirmed; claim P14); alibaba/open-code-review@182898cf522d `internal/diff/git.go:28-41, 80-82; config/rules/system_rules.go:288-369` — CODE (kiểm chứng: confirmed; claim N9)
 - **Bằng chứng tại HEAD:** Phạm vi bắt buộc do AISEF tính từ journal (khoảng base..candidate đã đóng băng); đường dẫn bắt buộc vắng trong preview (bị `.gitignore`/thư mục provider loại) ⇒ INDETERMINATE (UPSTREAM-RESEARCH.md).
+- **Kiểm cơ học:** `aisef2/app/review_ocr.py` chứa `NOT_REVIEWABLE = ("unsupported_ext", "binary")`; `aisef2/app/review_ocr.py` chứa `cannot read (named in the coverage, not counted against it)`
 - **Reproducer:** `tests/v2/test_v21_review_ocr.py::Coverage::test_the_preview_s_exclusions_and_omissions_are_named`, `tests/v2/test_v21_review_ocr.py::Coverage::test_a_complete_run_of_the_frozen_range_covering_every_required_path`, `tests/v2/test_v21_review_ocr.py::Process::test_the_command_reviews_exactly_the_frozen_range_into_a_fresh_file`
 - **Ảnh hưởng:** cao: tệp bị OCR lọc vẫn có thể quan trọng với AISEF
-- **Quyết định:** adopted — Đúng đề xuất.
+- **Quyết định:** adapted — Phạm vi bắt buộc do AISEF tính từ git (khoảng base..candidate đã đóng băng), không lấy tập `selected` của OCR. Điều chỉnh: tệp bắt buộc mà preview loại vì `unsupported_ext` hay `binary` được ghi tên trong coverage nhưng không tính là thiếu (docstring và `NOT_REVIEWABLE` của `review_ocr`); đề xuất nêu cả tệp bị lọc vì extension.
 - **Commit:** `e897437`: aisef2/app/review_ocr.py, tests/v2/fixtures/ocr/preview.json
 - **Mức (REPORT §2):** C2 = M4 — M4 là mức của C2; hành vi riêng này có test offline.
-- **Tiêu chí nghiệm thu:** Định nghĩa mẫu số từ chính sách AISEF trước khi gọi OCR.
-- **Còn thiếu:** —
+- **Tiêu chí nghiệm thu:** Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với câu liền trước của cùng đoạn §4.2: Định nghĩa mẫu số từ chính sách AISEF trước khi gọi OCR.
+- **Còn thiếu:** Tệp bắt buộc bị loại vì extension hay nhị phân không được review mà review vẫn có thể COMPLETE. Không test nào đặt một tệp bắt buộc như thế rồi khẳng định kết quả (`grep` tests/: không test nào đọc `unreadable` hay `NOT_REVIEWABLE`; fixture `tests/v2/fixtures/ocr/preview.json` có `docs/limits.md` = `unsupported_ext` nhưng không test nào đặt nó là bắt buộc).
 
 ### P-4.2c
 
@@ -504,13 +537,13 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 24, adapted 17, 
 
 - **Nguồn:** đề xuất §4.2
 - **Bằng chứng tại HEAD:** Reviewer chụp HEAD + mọi tệp của checkout trước finder, so lại sau finder và sau probe kiểm chứng; đổi ⇒ bỏ mọi finding (ADR-7). `review_verify.verify` nằm trong inventory PRODUCT_TRUTH với giới hạn (không commit/merge, không journal, một đường quyết định), do checker theo module, fail-closed cưỡng chế (B-03c).
-- **Kiểm cơ học:** `closure-evidence/v2/v2.1/AUTHORITY-INVENTORY.json` chứa `review_verify`
+- **Kiểm cơ học:** `closure-evidence/v2/v2.1/AUTHORITY-INVENTORY.json` chứa `review_verify`; `closure-evidence/v2/cycle2/RELEASE-DECISIONS.json` chứa `* Cả hai không trực tiếp commit/merge sản phẩm hoặc tạo đường quyết định cuối thứ hai.`
 - **Reproducer:** `tests/v2/test_v21_review_chain.py::CandidateChangedDuringReview::test_a_file_edited_by_the_finder_discards_the_review_and_never_reaches_main`, `tests/v2/test_v21_review_chain.py::CandidateChangedDuringReview::test_a_commit_made_by_the_finder_discards_the_review`, `tests/v2/test_v21_authority_limits.py::NoCommitOrMerge::test_verify_committing_or_journaling_is_caught`, `tests/v2/test_v21_authority_limits.py::OneDecisionPath::test_a_second_caller_of_verify_blocks_or_migrate_is_caught`
 - **Ảnh hưởng:** cao: reviewer là mô hình, không có thẩm quyền sự thật sản phẩm
 - **Quyết định:** adopted — Đúng đề xuất; owner B-03c (RELEASE-DECISIONS seq 5).
 - **Commit:** `390f07c`: aisef2/app/review_verify.py; `a912be6`: validation/qualification/authority_limits.py, closure-evidence/v2/v2.1/AUTHORITY-INVENTORY.json, tests/v2/test_v21_authority_limits.py, aisef2/app/review_verify.py; `1711c07`: validation/qualification/authority_limits.py; `0b4e740`: validation/qualification/authority_limits.py
 - **Mức (REPORT §2):** REPORT §2 không có hạng mục riêng (B-03c thuộc §7). Test tồn tại tại HEAD (kiểm bằng AST); không chạy lại trong phiên lập bảng.
-- **Tiêu chí nghiệm thu:** Cả hai không trực tiếp commit/merge sản phẩm hoặc tạo đường quyết định cuối thứ hai (owner B-03c)
+- **Tiêu chí nghiệm thu:** Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với chỉ thị B-03c của chủ dự án (RELEASE-DECISIONS seq 5): Cả hai không trực tiếp commit/merge sản phẩm hoặc tạo đường quyết định cuối thứ hai.
 - **Còn thiếu:** Không có ranh giới OS: finder chạy dưới cùng user; thay đổi bị phát hiện và loại, không bị ngăn (REPORT §3).
 
 ### P-4.3a
@@ -524,7 +557,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 24, adapted 17, 
 - **Ảnh hưởng:** trung bình: yêu cầu thiếu trong contract chỉ nằm trong triage
 - **Quyết định:** open — Chưa làm. Phần 'không để cùng agent nới tiêu chí' được giữ bằng `approve` chỉ nhận `human:<tên>` (ADR-6, xem P-13-2).
 - **Mức (REPORT §2):** REPORT §2 không có hạng mục riêng cho mục này.
-- **Tiêu chí nghiệm thu:** Cập nhật đã duyệt áp dụng cho run mới; giữ nguyên lịch sử run cũ.
+- **Tiêu chí nghiệm thu:** Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với một câu khác của cùng đoạn §4.3: Cập nhật đã duyệt áp dụng cho run mới; giữ nguyên lịch sử run cũ.
 - **Còn thiếu:** Toàn bộ phần tạo đề xuất.
 
 ### P-4.3b
@@ -548,13 +581,13 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 24, adapted 17, 
 
 - **Nguồn:** đề xuất §4.3 bước 7
 - **Bằng chứng tại HEAD:** Có từ 2.0: chứng minh lại sau merge (`merge.affected_preserve`), thất bại ⇒ INTEGRATION (STATUS B2: 'ĐÃ KIỂM, không cần sửa', đọc mã). 2.1 giữ nó cạnh PRESERVE ở candidate (ADR-4).
-- **Kiểm cơ học:** `aisef2/orchestrate/merge.py` chứa `def affected_preserve(`; `docs/v2.1/STATUS.md` chứa `**ĐÃ KIỂM**, không cần sửa`
+- **Kiểm cơ học:** `aisef2/orchestrate/merge.py` chứa `def affected_preserve(`; `docs/v2.1/STATUS.md` chứa `**ĐÃ KIỂM**, không cần sửa`; `aisef2/orchestrate/merge.py` chứa `point=MeasurementPoint.POST_MERGE`; `docs/v2.1/evidence/traceability-reproducers-c9c736f.out` (đi cùng bảng) chứa `tests.v2.test_p6_orchestration.Orchestration.test_ORCH_9_and_10_a_post_merge_regression_of_a_prior_…`
 - **Reproducer:** `tests/v2/test_p6_orchestration.py::Orchestration::test_ORCH_9_and_10_a_post_merge_regression_of_a_prior_PRESERVE_obligation_is_INTEGRATION_and_rolled_back`
 - **Ảnh hưởng:** trung bình
 - **Quyết định:** adopted — Đã có trong 2.0, không triển khai lại.
 - **Mức (REPORT §2):** REPORT §2 không có hạng mục riêng cho mục này. Test tồn tại tại HEAD (kiểm bằng AST); không chạy lại trong phiên lập bảng.
 - **Tiêu chí nghiệm thu:** vẫn kiểm cây tích hợp khi base đổi (§10 V2-06)
-- **Còn thiếu:** —
+- **Còn thiếu:** Không còn so với tiêu chí trên: sau merge, mọi obligation của story và PRESERVE của các story đã commit được chứng minh lại ở revision đã merge (`merge.reprove`, POST_MERGE). Dựa vào đọc mã và test ORCH_9/10 (chạy lại xanh tại c9c736f, vòng 2).
 
 ### P-5.2a
 
@@ -568,7 +601,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 24, adapted 17, 
 - **Quyết định:** adopted — Đúng đề xuất.
 - **Commit:** `a29e82b`: validation/experiments/harness.py; `e897437`: aisef2/app/review_verify.py
 - **Mức (REPORT §2):** E1 = M3 — Khớp REPORT.
-- **Tiêu chí nghiệm thu:** Agent chỉ đề xuất giả thuyết/candidate.
+- **Tiêu chí nghiệm thu:** Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với một câu khác của cùng đoạn §5.2: Agent chỉ đề xuất giả thuyết/candidate.
 - **Còn thiếu:** Chưa chạy trên workload thật (E2).
 
 ### P-5.2b
@@ -598,7 +631,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 24, adapted 17, 
 - **Quyết định:** adopted — Đúng đề xuất (khoá liên tiến trình, không chỉ trong tiến trình).
 - **Commit:** `7e0aac0`: tests/v2/test_v21_continue_integrity.py; `872e83c`: aisef2/app/lineage.py; `7fe1062`: tests/v2/test_v21_continue_integrity.py
 - **Mức (REPORT §2):** D1 = M4 — Khớp REPORT.
-- **Tiêu chí nghiệm thu:** AISEF cần chống hai controller ở hai tiến trình cùng resume.
+- **Tiêu chí nghiệm thu:** Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với một câu khác của cùng đoạn §5.2: AISEF cần chống hai controller ở hai tiến trình cùng resume.
 - **Còn thiếu:** Claimant ở máy khác: chỉ thay khi người vận hành nêu sha256 của claim (REPORT §4.2).
 
 ### P-5.3a
@@ -613,7 +646,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 24, adapted 17, 
 - **Ảnh hưởng:** trung bình: smoke #2 một phiên đốt 7,0 M input không sửa gì (360 §3.5) — chưa chứng minh gói ngữ cảnh sẽ giảm điều đó
 - **Quyết định:** open — REPORT/STATUS ghi 'chưa có bằng chứng cần'; chủ dự án yêu cầu báo riêng trạng thái context/checkpoint theo MiMo (RELEASE-DECISIONS seq 5). Chưa có quyết định đóng mục.
 - **Mức (REPORT §2):** D4 = M6 — Khớp REPORT.
-- **Tiêu chí nghiệm thu:** Controller tự điền các trường định danh; phần văn xuôi không được ghi đè chúng.
+- **Tiêu chí nghiệm thu:** Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với một câu khác của cùng đoạn §5.3: Controller tự điền các trường định danh; phần văn xuôi không được ghi đè chúng.
 - **Còn thiếu:** Toàn bộ. MỞ. Nếu làm, tránh hai lỗi đã thấy ở upstream: agent chính ghi được checkpoint (N-04), writer chép nguyên văn khoá API (N-06).
 
 ### P-5.3b
@@ -628,7 +661,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 24, adapted 17, 
 - **Quyết định:** adapted — Không thêm trường operation ID vào journal (schema đóng); dùng danh tính thao tác sẵn có của kernel (worktree, thông điệp merge).
 - **Commit:** `872e83c`: aisef2/app/lineage.py, tests/v2/test_v21_continue_integrity.py
 - **Mức (REPORT §2):** D1 = M4 — Khớp REPORT.
-- **Tiêu chí nghiệm thu:** Không tự chạy lại tác dụng ngoài hệ thống nếu chưa biết lần trước đã xảy ra hay chưa.
+- **Tiêu chí nghiệm thu:** Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với một câu khác của cùng đoạn §5.3: Không tự chạy lại tác dụng ngoài hệ thống nếu chưa biết lần trước đã xảy ra hay chưa.
 - **Còn thiếu:** Nhận diện dựa vào quy ước của kernel (tên worktree, thông điệp merge); một commit tay giống quy ước chưa được xét.
 - **Chưa xác nhận được:** Khả năng một commit do người/agent tạo trùng quy ước nhận diện: không kiểm trong phiên này.
 
@@ -645,7 +678,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 24, adapted 17, 
 - **Quyết định:** adapted — Chỉ báo cáo: retry thuộc taxonomy — khớp câu 'không đặt thêm cơ chế retry độc lập trong adapter' của đề xuất; phần giảm ngữ cảnh / đổi chiến thuật / dừng không làm.
 - **Commit:** `d622e71`: aisef2/app/usage.py
 - **Mức (REPORT §2):** D3 = M3 — Khớp REPORT.
-- **Tiêu chí nghiệm thu:** Mọi retry tiếp tục đi qua taxonomy hiện có; không đặt thêm cơ chế retry độc lập trong adapter.
+- **Tiêu chí nghiệm thu:** Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với một câu khác của cùng đoạn §5.3: Mọi retry tiếp tục đi qua taxonomy hiện có; không đặt thêm cơ chế retry độc lập trong adapter.
 - **Còn thiếu:** Đơn vị đo là attempt (cùng lỗi), không phải bước/lượt trong một phiên; ngưỡng chưa hiệu chỉnh.
 
 ### P-6.2a
@@ -661,7 +694,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 24, adapted 17, 
 - **Quyết định:** adapted — Nhận khung: khoá đóng ở cấp trên cùng, niêm phong sha256, `model.identity_confidence` kèm lý do, `evaluator.exposed_to_developer` = false (`harness.check`). Nội dung bên trong các khoá khác không được đòi; không có quyết định nào ghi lại cho phần đó.
 - **Commit:** `a29e82b`: validation/experiments/harness.py
 - **Mức (REPORT §2):** E1 = M3 — Khớp REPORT.
-- **Tiêu chí nghiệm thu:** Kết quả từng obligation, finding, chi phí, thời gian và sự cố môi trường.
+- **Tiêu chí nghiệm thu:** Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với chính mục: mọi trường §6.2 liệt kê được khoá trước khi chạy (gạch đầu dòng cuối của danh sách đó, 'Kết quả từng obligation, finding, chi phí, thời gian và sự cố môi trường', là một trường phải khoá, không phải tiêu chí).
 - **Còn thiếu:** `harness.check` không đòi nội dung các trường §6.2 liệt kê: Workload ID, baseline commit, candidate snapshot digest, digest requirements/bundle/evaluator/policy, nguồn gốc bộ test, client + phiên bản, adapter version, thông tin provider thực trả, environment image digest, dependency lock, mạng, quyền ghi, giới hạn thời gian/token/tiền. Chưa dùng cho lượt thật nào.
 
 ### P-6.2b
@@ -677,7 +710,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 24, adapted 17, 
 - **Quyết định:** adopted — Đúng đề xuất.
 - **Commit:** `a29e82b`: validation/experiments/harness.py
 - **Mức (REPORT §2):** E1 = M3 — Khớp REPORT.
-- **Tiêu chí nghiệm thu:** ghi `provider-reported`/`unverified` đúng phạm vi, không gọi là xác thực model đầy đủ
+- **Tiêu chí nghiệm thu:** Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với một câu khác của cùng đoạn §6.2: ghi `provider-reported`/`unverified` đúng phạm vi, không gọi là xác thực model đầy đủ
 - **Còn thiếu:** Chỉ trong harness thí nghiệm; preflight của `aisef run` không đổi trong 2.1 về điểm này.
 - **Chưa xác nhận được:** 'preflight không đổi về điểm này': suy từ danh sách commit 2.1 (b029236 chỉ sửa redirect), chưa đọc lại preflight.
 
@@ -707,7 +740,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 24, adapted 17, 
 - **Ảnh hưởng:** trung bình
 - **Quyết định:** adopted — Đã có trong 2.0 (ghi sai số), không triển khai lại.
 - **Mức (REPORT §2):** REPORT §2 không có hạng mục riêng cho mục này.
-- **Tiêu chí nghiệm thu:** AISEF cần ghi rõ sai số hoặc đặt trước ngân sách request
+- **Tiêu chí nghiệm thu:** Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với chính mục: AISEF cần ghi rõ sai số hoặc đặt trước ngân sách request
 - **Còn thiếu:** Không đặt trước ngân sách request; sai số không được định lượng.
 
 ### P-7b
@@ -723,7 +756,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 24, adapted 17, 
 - **Quyết định:** adapted — Đối chứng chính nhận; mini là tuỳ chọn, chưa làm (UPSTREAM-RESEARCH.md: 'cánh A' tuỳ chọn').
 - **Commit:** `a29e82b`: validation/experiments/harness.py
 - **Mức (REPORT §2):** E1 = M3 — Khớp REPORT.
-- **Tiêu chí nghiệm thu:** Đối chứng chính là cùng model, client, nhiệm vụ và tài nguyên chạy trực tiếp
+- **Tiêu chí nghiệm thu:** Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với chính mục (diễn đạt lại): Đối chứng chính là cùng model, client, nhiệm vụ và tài nguyên chạy trực tiếp
 - **Còn thiếu:** Cánh mini: chưa làm.
 
 ### P-7c
@@ -738,7 +771,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 24, adapted 17, 
 - **Ảnh hưởng:** cao (như P-V2-05)
 - **Quyết định:** blocked — Như P-V2-05.
 - **Mức (REPORT §2):** F = M6 — Khớp REPORT.
-- **Tiêu chí nghiệm thu:** Developer không nhận host HOME, socket Docker, credential, verifier runtime hoặc hidden bundle.
+- **Tiêu chí nghiệm thu:** Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với một câu khác của cùng đoạn §7: Developer không nhận host HOME, socket Docker, credential, verifier runtime hoặc hidden bundle.
 - **Còn thiếu:** Toàn bộ. MỞ.
 
 ### P-8
@@ -747,13 +780,13 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 24, adapted 17, 
 
 - **Nguồn:** đề xuất §8
 - **Bằng chứng tại HEAD:** B-03c: `bundle_cli.migrate`, `review_verify.verify` trong AUTHORITY-INVENTORY.json; checker theo module, fail-closed bắt mọi đường commit/merge/journal/approve và đường quyết định thứ hai. Module mới nằm trong `aisef2/app`, không tách package (§8: 'chưa phải yêu cầu tạo ngay sáu package').
-- **Kiểm cơ học:** `closure-evidence/v2/v2.1/AUTHORITY-INVENTORY.json` chứa `bundle_cli`
+- **Kiểm cơ học:** `closure-evidence/v2/v2.1/AUTHORITY-INVENTORY.json` chứa `bundle_cli`; `closure-evidence/v2/cycle2/RELEASE-DECISIONS.json` chứa `Cập nhật inventory và kiểm tra kiến trúc để cưỡng chế các giới hạn này.`
 - **Reproducer:** `tests/v2/test_v21_authority_limits.py::RealTree::test_the_tree_is_inside_the_limits_and_the_closure_crosses_modules`, `tests/v2/test_v21_authority_limits.py::OneDecisionPath::test_a_second_caller_of_verify_blocks_or_migrate_is_caught`, `tests/v2/test_v21_authority_limits.py::MigrateNeverApproves::test_calling_approve_is_caught_with_everything_approve_then_reaches`, `tests/v2/test_v21_authority_limits.py::Calibration::test_the_q0_checker_rejects_its_known_bad_fixture_and_an_always_pass_mutant_fails_calibration`
 - **Ảnh hưởng:** cao: một đường quyết định là tài sản chính của 2.0 (360 §3.1)
 - **Quyết định:** adopted — Đúng đề xuất và owner B-03c.
 - **Commit:** `a912be6`: validation/qualification/authority_limits.py, closure-evidence/v2/v2.1/AUTHORITY-INVENTORY.json, aisef2/app/bundle_cli.py; `1711c07`: validation/qualification/authority_limits.py, tests/v2/test_v21_authority_limits.py; `0b4e740`: validation/qualification/authority_limits.py, tests/v2/test_v21_authority_limits.py
 - **Mức (REPORT §2):** REPORT §2 không có hạng mục (B-03c chấp nhận ở RELEASE-DECISIONS seq 5). Test tồn tại tại HEAD (kiểm bằng AST); không chạy lại trong phiên lập bảng.
-- **Tiêu chí nghiệm thu:** Cập nhật inventory và kiểm tra kiến trúc để cưỡng chế các giới hạn này. (owner B-03c)
+- **Tiêu chí nghiệm thu:** Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với chỉ thị B-03c của chủ dự án (RELEASE-DECISIONS seq 5): Cập nhật inventory và kiểm tra kiến trúc để cưỡng chế các giới hạn này.
 - **Còn thiếu:** Checker là phân tích tĩnh trên mã Python; tiến trình ngoài (OCR) không bị ràng buộc ở mức OS.
 
 ### P-9.1
@@ -767,8 +800,8 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 24, adapted 17, 
 - **Ảnh hưởng:** cao (360 §3.6)
 - **Quyết định:** adapted — `run --resume` thay bằng `bundle continue` + `run --parent` (ADR-8); `assess` hoãn sang 2.2 (P-V2-14); thêm `approve` (duyệt từng contract, `human:<tên>`, ADR-6).
 - **Commit:** `620bde7`: aisef2/app/bundle_cli.py; `d622e71`: aisef2/app/bundle_cli.py, aisef2/app/cli.py; `919a271`: aisef/cli/parser.py, aisef2/app/bundle_cli.py
-- **Mức (REPORT §2):** B4 = M4, B5 = M4, D1 = M4 — Khớp REPORT. B4/B5: M4 là của lượt CLI thật tại `b72e51e` (docs/v2.1/evidence/cli-integration-b72e51e.out); `aisef2/app/bundle_cli.py` đổi sau lượt đó ở a912be6 và 3061ec0 (đường ghi của init/seal/approve/migrate chuyển sang tạo độc quyền `_create`), nên byte tại c9c736f chưa chạy qua CLI thật: đọc là 'M4 tại b72e51e'. (kiểm cơ học ở P-V2-07)
-- **Tiêu chí nghiệm thu:** `seal` chỉ niêm phong phiên bản đã duyệt, không thay thế duyệt.
+- **Mức (REPORT §2):** B4 = M4, B5 = M4, D1 = M4 — Khớp REPORT. B4/B5: M4 là của lượt CLI thật tại `b72e51e` (docs/v2.1/evidence/cli-integration-b72e51e.out); `aisef2/app/bundle_cli.py` đổi sau lượt đó ở a912be6 và 3061ec0 (đường ghi của init/seal/approve/migrate chuyển sang tạo độc quyền `_create`), lượt lặp lại tại c9c736f (`docs/v2.1/evidence/cli-integration-c9c736f.out`, vòng 2 của bảng này: cùng `run.sh`, cùng nhị phân OCR, clone sạch tại c9c736f) cho cùng output — khác nhau chỉ ở giá trị băm (commit của repo `git init` mới, plan_hash, anchor, sha256), pid, mốc thời gian và dòng cuối bị cắt ở 3000 ký tự: M4 tại c9c736f. (kiểm cơ học ở P-V2-07)
+- **Tiêu chí nghiệm thu:** Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với câu cuối của §9.1: `seal` chỉ niêm phong phiên bản đã duyệt, không thay thế duyệt.
 - **Còn thiếu:** `assess --candidate`: chưa có.
 
 ### P-9.3
@@ -782,7 +815,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 24, adapted 17, 
 - **Ảnh hưởng:** cao: S-10-a QUALIFIED trên một bản tham chiếu + một mutant rồi bác nhầm một story đúng (360 §3.3)
 - **Quyết định:** open — Chưa làm; không có quyết định nào được ghi lại.
 - **Mức (REPORT §2):** REPORT §2 không có hạng mục riêng cho mục này.
-- **Tiêu chí nghiệm thu:** Kiểm false rejection bên cạnh false acceptance.
+- **Tiêu chí nghiệm thu:** Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với một gạch đầu dòng khác của §9.3: Kiểm false rejection bên cạnh false acceptance.
 - **Còn thiếu:** Toàn bộ, trừ S-10-a.
 
 ### P-11.1
@@ -797,7 +830,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 24, adapted 17, 
 - **Quyết định:** blocked — Chặn trên ngân sách (B-09) và sandbox (F).
 - **Commit:** `a29e82b`: validation/experiments/harness.py
 - **Mức (REPORT §2):** E1 = M3, E2 = M6 — Khớp REPORT.
-- **Tiêu chí nghiệm thu:** Ghi patch set của B; không gắn nhãn B là v2.0.0 nguyên bản.
+- **Tiêu chí nghiệm thu:** Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với đoạn dưới bảng §11.1: Ghi patch set của B; không gắn nhãn B là v2.0.0 nguyên bản.
 - **Còn thiếu:** E2: MỞ; sandbox chung: MỞ.
 
 ### P-11.2
@@ -811,7 +844,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 24, adapted 17, 
 - **Ảnh hưởng:** cao: RC1 qua mọi kiểm offline rồi chết ở preflight live (360 §3.3)
 - **Quyết định:** blocked — Chặn trên ngân sách của chủ dự án (B-09).
 - **Mức (REPORT §2):** REPORT §2 không có hạng mục riêng cho mục này.
-- **Tiêu chí nghiệm thu:** Canary xanh mới mở thí nghiệm paired nhỏ trên một route.
+- **Tiêu chí nghiệm thu:** Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với một câu khác của cùng đoạn §11.2: Canary xanh mới mở thí nghiệm paired nhỏ trên một route.
 - **Còn thiếu:** Canary live: MỞ. Bước 'cài package' chưa có trong lượt offline.
 
 ### P-11.3
@@ -820,14 +853,14 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 24, adapted 17, 
 
 - **Nguồn:** đề xuất §11.3
 - **Bằng chứng tại HEAD:** `usage.CLASSES` = input, cache_read, cache_write, output, reasoning; tiền = (output + reasoning) × giá output (`usage._usd`). Đo trong phiên lập bảng (lệnh ở cột reproducer) trên 270 step của luồng phiên smoke #2 (closure-evidence/v2/release/smoke-2/run-1/sessions): `total` = input + output + reasoning + cache.read + cache.write ở 270/270 step; 200 step có reasoning > 0 và ở cả 200 `total` ≠ input + output + cache; output 68 853 + reasoning 244 483 = 313 336 (con số output của EXPERIMENT-PLAN). Suy luận (INFERENCE): nếu `total` là số provider trả về thì `output` của client không gồm `reasoning` và `_usd` không đếm hai lần; nếu OpenCode tự cộng `total` từ chính các trường của nó thì đẳng thức đúng bất kể `output` chứa gì, và phép đo này không phân định được.
-- **Kiểm cơ học:** `aisef2/app/usage.py` chứa `CLASSES = ("input", "cache_read", "cache_write", "output", "reasoning")`; `docs/v2.1/EXPERIMENT-PLAN.md` chứa `313 336 output (gồm 244 483 reasoning)`
-- **Reproducer:** `tests/v2/test_v21_continue_usage.py::Usage::test_without_prices_cost_is_unknown_never_zero` Test trên chỉ cho thấy tách 5 lớp token. Không test nào định giá một step có reasoning ≠ 0: test có giá duy nhất (`Usage::test_with_prices_known_and_a_blind_step_makes_it_partial`) định giá step o=0, r=0, cr=0; mọi lời gọi `usage.usage` khác trong tests/ không có bảng giá. Phép đo token (không phải test), chạy ở gốc repo: `python3 -P -c "import glob,json;e=[json.loads(x) for f in sorted(glob.glob('closure-evidence/v2/release/smoke-2/run-1/sessions/*.jsonl')) for x in open(f,encoding='utf-8')];k=[x['part']['tokens'] for x in e if x.get('type')=='step_finish'];s=lambda t:t['input']+t['output']+t['cache']['read']+t['cache']['write'];r=[t for t in k if t['reasoning']];print(len(k),sum(t['total']==s(t)+t['reasoning'] for t in k),sum(t['output'] for t in k),sum(t['reasoning'] for t in k),len(r),sum(t['total']!=s(t) for t in r))"` in ra `270 270 68853 244483 200 200`.
+- **Kiểm cơ học:** `aisef2/app/usage.py` chứa `CLASSES = ("input", "cache_read", "cache_write", "output", "reasoning")`; `docs/v2.1/EXPERIMENT-PLAN.md` chứa `313 336 output (gồm 244 483 reasoning)`; `tests/v2/test_v21_continue_integrity.py` chứa `self.settings_doc = {**SETTINGS, "prices": PRICES}`; `tests/v2/test_v21_continue_integrity.py` chứa `"output": 7, "reasoning": 3,`
+- **Reproducer:** `tests/v2/test_v21_continue_usage.py::Usage::test_without_prices_cost_is_unknown_never_zero` Test trên chỉ cho thấy tách 5 lớp token. Không test nào khẳng định số USD của một step có reasoning ≠ 0: số USD duy nhất được khẳng định (1.0, trong `Usage::test_with_prices_known_and_a_blind_step_makes_it_partial`) là của step o=0, r=0, cr=0. `tests/v2/test_v21_continue_integrity.py` (LineageBase) chạy `aisef run` với bảng giá (`"prices": PRICES`) và client giả báo reasoning 3 mỗi step, nhưng chỉ khẳng định token, và `cost.value` None khi chi tiêu không rõ. Phép đo token (không phải test), chạy ở gốc repo: `python3 -P -c "import glob,json;e=[json.loads(x) for f in sorted(glob.glob('closure-evidence/v2/release/smoke-2/run-1/sessions/*.jsonl')) for x in open(f,encoding='utf-8')];k=[x['part']['tokens'] for x in e if x.get('type')=='step_finish'];s=lambda t:t['input']+t['output']+t['cache']['read']+t['cache']['write'];r=[t for t in k if t['reasoning']];print(len(k),sum(t['total']==s(t)+t['reasoning'] for t in k),sum(t['output'] for t in k),sum(t['reasoning'] for t in k),len(r),sum(t['total']!=s(t) for t in r))"` in ra `270 270 68853 244483 200 200`.
 - **Ảnh hưởng:** cao cho USD/story
 - **Quyết định:** adopted — Đúng đề xuất.
 - **Commit:** `d622e71`: aisef2/app/usage.py
 - **Mức (REPORT §2):** D2 = M4 — Khớp REPORT (mức của D2, không của phép đo token); phép đo token là đo lại trong phiên này, không phải test.
-- **Tiêu chí nghiệm thu:** Lưu nguồn giá và ngày hiệu lực; với 9router/combo không có rate card, để unknown và báo token.
-- **Còn thiếu:** Phép đo chỉ cho một phiên bản client (OpenCode 1.18.31 theo 360 §3.5); client/provider khác phải đo lại. Chưa có test định giá reasoning ≠ 0; 'không đếm hai lần' chưa được xác nhận trong mã OpenCode.
+- **Tiêu chí nghiệm thu:** Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với một câu khác của cùng đoạn §11.3: Lưu nguồn giá và ngày hiệu lực; với 9router/combo không có rate card, để unknown và báo token.
+- **Còn thiếu:** Phép đo chỉ cho một phiên bản client (OpenCode 1.18.31 theo 360 §3.5); client/provider khác phải đo lại. Chưa test nào khẳng định số USD của một step có reasoning ≠ 0; 'không đếm hai lần' chưa được xác nhận trong mã OpenCode.
 - **Chưa xác nhận được:** Cách OpenCode 1.18.31 điền `tokens.total` (số provider trả hay tự cộng từ các trường của nó): repo không chứa mã nguồn OpenCode — vì vậy kết luận 'không đếm hai lần' là INFERENCE.
 
 ### P-12-1
@@ -841,7 +874,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 24, adapted 17, 
 - **Ảnh hưởng:** cao
 - **Quyết định:** blocked — Như P-V2-05.
 - **Mức (REPORT §2):** F = M6 — Khớp REPORT.
-- **Tiêu chí nghiệm thu:** —
+- **Tiêu chí nghiệm thu:** Đề xuất không ghi tiêu chí nghiệm thu cho mục này (§12 'Phần phải làm ngay' nêu yêu cầu, không kèm tiêu chí); bảng đối chiếu với chính mục.
 - **Còn thiếu:** Toàn bộ. MỞ.
 
 ### P-12-2
@@ -855,7 +888,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 24, adapted 17, 
 - **Quyết định:** adopted — Đúng đề xuất ở mức offline.
 - **Commit:** `919a271`: aisef2/app/run.py, tests/v2/test_v21_identity.py
 - **Mức (REPORT §2):** A1 = M3 — Khớp REPORT.
-- **Tiêu chí nghiệm thu:** Không khẳng định chỉ thêm flag là giải quyết confinement.
+- **Tiêu chí nghiệm thu:** Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với một câu khác của cùng đoạn §12: Không khẳng định chỉ thêm flag là giải quyết confinement.
 - **Còn thiếu:** Không có lượt live qua đường app thật.
 
 ### P-12-3
@@ -869,7 +902,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 24, adapted 17, 
 - **Ảnh hưởng:** cao
 - **Quyết định:** adopted — Đã có trong 2.0; không triển khai lại.
 - **Mức (REPORT §2):** REPORT §2 không có hạng mục riêng cho mục này.
-- **Tiêu chí nghiệm thu:** —
+- **Tiêu chí nghiệm thu:** Đề xuất không ghi tiêu chí nghiệm thu cho mục này (§12 'Phần phải làm ngay' nêu yêu cầu, không kèm tiêu chí); bảng đối chiếu với chính mục.
 - **Còn thiếu:** Cùng user: không phải môi trường riêng ở mức OS.
 - **Chưa xác nhận được:** Các test tấn công của 2.0 ('20 test tấn công', 360 §3.4) không được định danh lại trong phiên này.
 
@@ -885,7 +918,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 24, adapted 17, 
 - **Quyết định:** adopted — Đúng đề xuất: tuyên bố giới hạn ở 'toàn vẹn so với một giá trị'.
 - **Commit:** `ad78ce7`: aisef2/app/verify.py; `872e83c`: aisef2/app/lineage.py
 - **Mức (REPORT §2):** A2 = M4, D5 = M4 — Khớp REPORT về mức.
-- **Tiêu chí nghiệm thu:** Nếu tuyên bố tính xác thực, cần trust anchor/checkpoint ký hoặc dịch vụ append được bảo vệ bên ngoài miền workload.
+- **Tiêu chí nghiệm thu:** Đề xuất không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với một câu khác của cùng đoạn §12: Nếu tuyên bố tính xác thực, cần trust anchor/checkpoint ký hoặc dịch vụ append được bảo vệ bên ngoài miền workload.
 - **Còn thiếu:** Nơi giữ anchor tin cậy chưa có (REPORT §7).
 - **Chưa xác nhận được:** D5 'CLI thật: tệp 0444' (REPORT §2): output đã commit chỉ có `anchor_written_to`, không có mode của tệp.
 
@@ -901,7 +934,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 24, adapted 17, 
 - **Quyết định:** adapted — Làm cho các ranh giới mới của 2.1 (OCR, review, thí nghiệm); không có image nào để kiểm.
 - **Commit:** `e897437`: aisef2/app/review_ocr.py; `390f07c`: aisef2/app/review_ocr.py; `a29e82b`: validation/experiments/harness.py
 - **Mức (REPORT §2):** REPORT §2 không có hạng mục riêng cho mục này.
-- **Tiêu chí nghiệm thu:** —
+- **Tiêu chí nghiệm thu:** Đề xuất không ghi tiêu chí nghiệm thu cho mục này (§12 'Phần phải làm ngay' nêu yêu cầu, không kèm tiêu chí); bảng đối chiếu với chính mục.
 - **Còn thiếu:** Cùng user: giữa lúc kiểm và lúc dùng vẫn có thể bị thay (TOCTOU) — chỉ ranh giới OS đóng được.
 
 ### P-GATE-2.0.1
@@ -916,7 +949,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 24, adapted 17, 
 - **Quyết định:** blocked — B-02: phát hành 2.0.1 là quyết định của chủ dự án (chưa duyệt).
 - **Commit:** `c0ec1a5` (trên `f006d3d`): aisef2/app/run.py, aisef2/orchestrate/story_runner.py, CHANGELOG.md; `f006d3d` (trên `f006d3d`): aisef2/app/run.py, tests/v2/test_v201_relative_paths.py
 - **Mức (REPORT §2):** A11 = M3 — Khớp REPORT.
-- **Tiêu chí nghiệm thu:** gate `v2_release_gate 2.0.1` PASS; byte PyPI = byte RC (STATUS B-02)
+- **Tiêu chí nghiệm thu:** reproducer lỗi đã biết được xử lý; release lane và metadata đúng; loader/preflight không làm mất phân loại; canary từ package thật chạy được (§12; STATUS B-02 thêm: gate `v2_release_gate 2.0.1` PASS, byte PyPI = byte RC)
 - **Còn thiếu:** Gate chưa đạt.
 
 ### P-GATE-2.1
@@ -930,7 +963,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 24, adapted 17, 
 - **Ảnh hưởng:** quyết định phát hành
 - **Quyết định:** open — Gate chưa đạt; không có quyết định phát hành nào.
 - **Mức (REPORT §2):** F = M6, E2 = M6, D1 = M4, C1 = M4, D2 = M4 — Khớp REPORT.
-- **Tiêu chí nghiệm thu:** “Một PASS” là mốc sử dụng được, không đủ để tuyên bố đáng tin ở mọi dự án.
+- **Tiêu chí nghiệm thu:** người ngoài tạo và chạy bundle nhỏ; một workload chưa thấy hoàn tất không miễn trừ; LedgerLock repo thật được kiểm; lỗi review confirmed không bị bỏ qua; chi phí minh bạch; Linux isolation đủ cho holdout; resume qua các điểm crash định trước (§12)
 - **Còn thiếu:** Sáu trên bảy điều kiện chưa đạt hoặc chưa đo.
 
 ### P-GATE-2.2
@@ -1069,7 +1102,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 24, adapted 17, 
 - **Quyết định:** adapted — Metadata/LICENSE xong; README trên PyPI chờ chủ dự án chọn nơi đăng tài liệu (B-10).
 - **Commit:** `b819a57`: pyproject.toml, LICENSE; `2cad415`: validation/v21/public_readme.py, tests/test_v21_public_readme.py
 - **Mức (REPORT §2):** A10 = M4 — Khớp REPORT.
-- **Tiêu chí nghiệm thu:** không link 404 (STATUS B-10)
+- **Tiêu chí nghiệm thu:** 360 không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với STATUS B-10: không link 404
 - **Còn thiếu:** Trang PyPI của 2.0.0 không đổi được nếu không phát hành (B-02); B-10 chưa quyết.
 
 ### R-P0-3
@@ -1112,7 +1145,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 24, adapted 17, 
 - **Quyết định:** adapted — Metadata gói xong; trang công khai chờ B-10 (chủ dự án).
 - **Commit:** `b819a57`: pyproject.toml
 - **Mức (REPORT §2):** REPORT §2 không có hạng mục riêng cho mục này.
-- **Tiêu chí nghiệm thu:** không link 404 (STATUS B-10)
+- **Tiêu chí nghiệm thu:** 360 không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với STATUS B-10: không link 404
 - **Còn thiếu:** Link trên landing, salekit, README.vi: còn.
 
 ### R-P1-6
@@ -1126,7 +1159,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 24, adapted 17, 
 - **Quyết định:** adopted — Xem P-V2-06.
 - **Commit:** `91a8968`: aisef2/orchestrate/story_runner.py; `06d4e62`: aisef2/probe/file_artifact.py
 - **Mức (REPORT §2):** B1 = M3, B3 = M3 — Khớp REPORT.
-- **Tiêu chí nghiệm thu:** lỗi DEVELOPER, có phản hồi
+- **Tiêu chí nghiệm thu:** 360 không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với chính mục: lỗi DEVELOPER, có phản hồi
 - **Còn thiếu:** Contract S-10-a: B-04 chưa duyệt.
 
 ### R-P1-7
@@ -1139,7 +1172,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 24, adapted 17, 
 - **Ảnh hưởng:** cao
 - **Quyết định:** adapted — Băm AST bị loại theo đề xuất §3 và ADR-2 (không chứng minh tương đương).
 - **Commit:** `620bde7`: aisef2/app/bundle_cli.py; `919a271`: aisef2/probe/calibration.py
-- **Mức (REPORT §2):** B4 = M4, B5 = M4, B6 = M3 — Khớp REPORT. B4/B5: M4 là của lượt CLI thật tại `b72e51e` (docs/v2.1/evidence/cli-integration-b72e51e.out); `aisef2/app/bundle_cli.py` đổi sau lượt đó ở a912be6 và 3061ec0 (đường ghi của init/seal/approve/migrate chuyển sang tạo độc quyền `_create`), nên byte tại c9c736f chưa chạy qua CLI thật: đọc là 'M4 tại b72e51e'. (kiểm cơ học ở P-V2-07)
+- **Mức (REPORT §2):** B4 = M4, B5 = M4, B6 = M3 — Khớp REPORT. B4/B5: M4 là của lượt CLI thật tại `b72e51e` (docs/v2.1/evidence/cli-integration-b72e51e.out); `aisef2/app/bundle_cli.py` đổi sau lượt đó ở a912be6 và 3061ec0 (đường ghi của init/seal/approve/migrate chuyển sang tạo độc quyền `_create`), lượt lặp lại tại c9c736f (`docs/v2.1/evidence/cli-integration-c9c736f.out`, vòng 2 của bảng này: cùng `run.sh`, cùng nhị phân OCR, clone sạch tại c9c736f) cho cùng output — khác nhau chỉ ở giá trị băm (commit của repo `git init` mới, plan_hash, anchor, sha256), pid, mốc thời gian và dòng cuối bị cắt ở 3000 ký tự: M4 tại c9c736f. (kiểm cơ học ở P-V2-07)
 - **Tiêu chí nghiệm thu:** một người ngoài dựng bundle cho một dự án 3 story không cần đọc mã nguồn (360 §6)
 - **Còn thiếu:** Người ngoài: chưa đo.
 - **Chưa xác nhận được:** Tài liệu ngữ pháp cho 18 lớp quan sát: không kiểm trong phiên này.
@@ -1155,7 +1188,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 24, adapted 17, 
 - **Quyết định:** adapted — Đề xuất (§3) thay 'không chặn' bằng chặn có điều kiện; chủ dự án thêm điều kiện neo.
 - **Commit:** `e897437`: aisef2/app/feedback.py; `390f07c`: aisef2/app/review_verify.py
 - **Mức (REPORT §2):** C1 = M4 — Khớp REPORT.
-- **Tiêu chí nghiệm thu:** đo precision (smoke #2: 5/5)
+- **Tiêu chí nghiệm thu:** 360 không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với chính mục: đo precision (smoke #2: 5/5)
 - **Còn thiếu:** Precision của reviewer: chưa đo. Precision/recall với mô hình thật: M6 (B-06, ngân sách).
 
 ### R-P1-9
@@ -1168,7 +1201,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 24, adapted 17, 
 - **Ảnh hưởng:** cao
 - **Quyết định:** open — Chưa làm; không có quyết định nào được ghi lại.
 - **Mức (REPORT §2):** REPORT §2 không có hạng mục riêng cho mục này.
-- **Tiêu chí nghiệm thu:** spec không bác nhầm
+- **Tiêu chí nghiệm thu:** 360 không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với chính mục: mỗi spec SATISFIED trên ≥ 2 cài đặt đúng độc lập, kèm đối chứng âm cú pháp (spec không bác nhầm)
 - **Còn thiếu:** Toàn bộ, trừ S-10-a.
 
 ### R-P1-10
@@ -1181,7 +1214,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 24, adapted 17, 
 - **Ảnh hưởng:** cao
 - **Quyết định:** open — Chưa làm; không có quyết định nào được ghi lại.
 - **Mức (REPORT §2):** REPORT §2 không có hạng mục riêng cho mục này.
-- **Tiêu chí nghiệm thu:** —
+- **Tiêu chí nghiệm thu:** 360 không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với chính mục.
 - **Còn thiếu:** Toàn bộ.
 
 ### R-P1-11
@@ -1208,7 +1241,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 24, adapted 17, 
 - **Ảnh hưởng:** cao (69 lời gọi ra ngoài workspace ở smoke #2)
 - **Quyết định:** blocked — Như P-V2-05.
 - **Mức (REPORT §2):** A2 = M4, F = M6 — Khớp REPORT.
-- **Tiêu chí nghiệm thu:** 0 (hoặc được báo) đọc ra ngoài workspace (360 §7)
+- **Tiêu chí nghiệm thu:** Mục tiêu 2.1: 0 (hoặc được báo) (360 §7, chỉ số 'Đọc ra ngoài workspace của developer')
 - **Còn thiếu:** Sandbox: MỞ.
 - **Chưa xác nhận được:** 'Đưa bundle ra khỏi thư mục cha của workspace': không kiểm trong phiên này bundle nằm ở đâu so với workspace của developer.
 
@@ -1223,7 +1256,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 24, adapted 17, 
 - **Quyết định:** adopted — Xem P-V2-04.
 - **Commit:** `106f72d`: aisef2/app/bundle.py; `b029236`: aisef2/app/client.py; `51c5241`: aisef2/orchestrate/workspace.py
 - **Mức (REPORT §2):** A3 = M3, A4 = M3, A5 = M4, A6 = M3, A7 = M3, A8 = M3 — Khớp REPORT; xem ghi chú về A5 ở P-V2-04.
-- **Tiêu chí nghiệm thu:** mã 2 kèm đường dẫn JSON
+- **Tiêu chí nghiệm thu:** 360 không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với chính mục: mọi lỗi đầu vào → mã 2 kèm đường dẫn JSON
 - **Còn thiếu:** Như P-V2-04: Preflight thật mới chỉ tới loopback, chưa gặp redirect thật (REPORT §2 A6–A7). Điều kiện của A5 (khoá git của editor) chỉ tái hiện ở test (M3): repo của lượt CLI thật (`git init` sạch) không có khoá đó.
 
 ### R-P2-14
@@ -1278,7 +1311,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 24, adapted 17, 
 - **Quyết định:** blocked — Chủ dự án (B-02, B-09).
 - **Commit:** `aa3c18a`: validation/qualification/release_rc.py
 - **Mức (REPORT §2):** REPORT §2 không có hạng mục riêng cho mục này.
-- **Tiêu chí nghiệm thu:** —
+- **Tiêu chí nghiệm thu:** 360 không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với chính mục.
 - **Còn thiếu:** Chính sách chưa được duyệt.
 
 ### R-P2-18
@@ -1320,7 +1353,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 24, adapted 17, 
 - **Ảnh hưởng:** cao (360 §8)
 - **Quyết định:** open — Việc của chủ dự án; không có quyết định nào được ghi lại.
 - **Mức (REPORT §2):** REPORT §2 không có hạng mục riêng cho mục này.
-- **Tiêu chí nghiệm thu:** —
+- **Tiêu chí nghiệm thu:** 360 không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với chính mục.
 - **Còn thiếu:** Toàn bộ.
 
 ### R-NOW
@@ -1335,7 +1368,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 24, adapted 17, 
 - **Quyết định:** adapted — Giữ, trừ mutation: chủ dự án quyết định mở B-03b (tái thẩm định bắt buộc vì bằng chứng 2.0 ràng buộc byte kernel).
 - **Commit:** `dc9774f`: closure-evidence/v2/cycle2/RELEASE-DECISIONS.json
 - **Mức (REPORT §2):** REPORT §2 không có hạng mục riêng cho mục này.
-- **Tiêu chí nghiệm thu:** —
+- **Tiêu chí nghiệm thu:** 360 không ghi tiêu chí nghiệm thu cho mục này (danh sách 'không làm bây giờ').
 - **Còn thiếu:** Không còn việc với mục này (danh sách 'không làm'); điều chỉnh duy nhất là mutation, theo RELEASE-DECISIONS seq 5.
 - **Chưa xác nhận được:** 'Không chạy lại Q4 cùng seed': không kiểm riêng trong phiên này.
 
@@ -1350,7 +1383,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 24, adapted 17, 
 - **Ảnh hưởng:** trung bình: byte quyết định quan sát của process_effect đổi được mà hàng hiệu chuẩn/RunSpec không đổi
 - **Quyết định:** open — Không có commit 2.1 và không có quyết định nào được ghi lại.
 - **Mức (REPORT §2):** REPORT §2 không có hạng mục riêng cho mục này.
-- **Tiêu chí nghiệm thu:** Execution digest: đúng byte của probe/runtime/dependency đã dùng tạo bằng chứng (đề xuất §9.2)
+- **Tiêu chí nghiệm thu:** 360 không ghi tiêu chí nghiệm thu cho mục này; bảng đối chiếu với định nghĩa ở đề xuất §9.2 mục 3 (định nghĩa, không phải tiêu chí nghiệm thu): Execution digest: đúng byte của probe/runtime/dependency đã dùng tạo bằng chứng
 - **Còn thiếu:** Toàn bộ. Sửa sẽ chạm `aisef2/probe` (kernel): cần mutation + hiệu chuẩn lại, ngoài snapshot đang đo.
 
 ### R-M1
@@ -1399,7 +1432,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 24, adapted 17, 
 
 - **Nguồn:** báo cáo 360° §7 bảng chỉ số
 - **Bằng chứng tại HEAD:** `aisef bundle lint` báo độ phủ theo mệnh đề do tiêu chí khai; RUN.json không mang độ phủ (run.py ghi usage, no_progress).
-- **Kiểm cơ học:** `docs/v2.1/evidence/cli-integration-b72e51e.out` chứa `"limit": "clauses are the ones the criteria's facts declare; AISEF does not parse the requirements …`
+- **Kiểm cơ học:** `docs/v2.1/evidence/cli-integration-b72e51e.out` chứa `"limit": "clauses are the ones the criteria's facts declare; AISEF does not parse the requirements …`; `docs/v2.1/evidence/cli-integration-c9c736f.out` (đi cùng bảng) chứa `"limit": "clauses are the ones the criteria's facts declare; AISEF does not parse the requirements …`
 - **Reproducer:** Chỉ số, không phải hành vi: không có reproducer.
 - **Ảnh hưởng:** theo dõi
 - **Quyết định:** open — Độ phủ được báo ở `aisef bundle lint` (B5); báo trong RUN.json chưa làm và không có quyết định nào được ghi lại (STATUS, ADR-V2.1, REPORT không nhắc).
