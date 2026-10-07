@@ -21,7 +21,7 @@ spec.loader.exec_module(TC)
 
 
 def git(*args: str) -> subprocess.CompletedProcess:
-    return subprocess.run(["git", "-C", str(ROOT), *args], capture_output=True, text=True)
+    return subprocess.run(["git", "-C", str(ROOT), *args], capture_output=True, text=True, encoding="utf-8")
 
 
 class Traceability(unittest.TestCase):

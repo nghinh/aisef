@@ -85,8 +85,8 @@ class Bytecode(unittest.TestCase):
 
     def child(self, *flags: str, env: dict | None = None) -> str:
         code = f"import sys; sys.path.insert(0, {str(self.dir)!r}); import bcmod; print(bcmod.V)"
-        return subprocess.run([sys.executable, *flags, "-c", code], capture_output=True, text=True, check=True,
-                              env=env).stdout.strip()
+        return subprocess.run([sys.executable, *flags, "-c", code], capture_output=True, text=True, encoding="utf-8",
+                              check=True, env=env).stdout.strip()
 
     def test_a_same_size_same_second_version_reuses_the_cache_without_the_stamp(self):
         """The trap is live on this host: an -I child writes the .pyc, a -B child with PYTHONDONTWRITEBYTECODE reads
@@ -1152,7 +1152,7 @@ class Outcome(unittest.TestCase):
             """)})
         # the guard's own negative: a parent that is not the anchor (this process, for a plain child) proves nothing
         plain = subprocess.run([sys.executable, "-c", anchor_guard() + "print(our_anchor())"], capture_output=True,
-                               text=True, check=True)
+                               text=True, encoding="utf-8", check=True)
         self.assertEqual(plain.stdout.strip(), "0")
         with mock.patch.object(m, "TIMEOUT", 2):
             r = m.run_target(root, "aisef2/toy.py::positive", ["tests/v2/test_x.py"])

@@ -257,7 +257,7 @@ class CommandLine(unittest.TestCase):
         self.assertIn(str((self.run_dir / "repo" / ".git").resolve()), ro_binds(seen[-1]))
         self.assertEqual(pairs(seen[-1], "--bind"), [(str(self.run_dir / "confinement" / "ws"),) * 2])
         listed = subprocess.run(["git", "-C", str(self.run_dir / "repo"), "worktree", "list", "--porcelain"],
-                                capture_output=True, text=True, check=True).stdout
+                                capture_output=True, text=True, encoding="utf-8", check=True).stdout
         self.assertNotIn("confinement", listed)
 
 
