@@ -1623,7 +1623,8 @@ def main(argv: list[str] | None = None) -> int:
             r = run_target(ROOT, target, files or TARGETS[target], t0_only=True)
             for row in [*r.get("t0", []), *r.get("original", [])]:
                 print(json.dumps({"target": target, **{k: v for k, v in row.items() if k != "tail"}}, ensure_ascii=False))
-            bad = r.get("stopped") or any(x["outcome"] != "PASS" or x.get("residue") or x.get("leaked") for x in r.get("t0", []))
+            bad = r.get("stopped") or not r.get("t0") or any(   # no T0 row: the kill set was refused before T0
+                x["outcome"] != "PASS" or x.get("residue") or x.get("leaked") for x in r.get("t0", []))
             failed += bool(bad)
             print(f"T0 {target}: " + (r["error"] if bad else "PASS"), flush=True)
         return 1 if failed else 0

@@ -1420,7 +1420,10 @@ class T0(unittest.TestCase):
                 mock.patch("builtins.print") as out:
             self.assertEqual(m.main(["t0", *targets]), 1)
             self.assertEqual(m.main(["t0", *targets, "--tests", "tests/v2/test_sem.py"]), 0)
+            # order-equivalence prover: a refused kill set printed "T0 ...: PASS" and exited 0 (no T0 row ran at all)
+            self.assertEqual(m.main(["t0", *targets, "--tests", m.NOT_KILL_FILES[0]]), 1)
         lines = [c.args[0] for c in out.call_args_list]
+        self.assertEqual(lines.pop(), f"T0 aisef2/toy.py::probe: not a kill file: {list(m.NOT_KILL_FILES[:1])} (NOT_KILL_FILES)")
         self.assertEqual([json.loads(x)["outcome"] for x in lines if x.startswith("{")],
                          ["PASS", "FAIL", "PASS", "PASS"])   # T0 sem, T0 text, the original text, then sem alone
         self.assertEqual([x for x in lines if x.startswith("T0 ")][-1], "T0 aisef2/toy.py::probe: PASS")
