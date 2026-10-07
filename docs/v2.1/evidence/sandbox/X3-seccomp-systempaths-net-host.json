@@ -2,9 +2,11 @@
  "after": {
   "container_sleeper_seen_outside": true,
   "measure_pid_outside": 1,
+  "reviewed_checkout_listing_unchanged": true,
   "unchanged": {
    "/tmp/aisef/run-dir/EVIDENCE.anchor": true,
    "/tmp/aisef/run-dir/repo/.git/HEAD": true,
+   "/tmp/aisef/run-dir/work/ws/verifier-wt-S1/candidate.py": true,
    "/tmp/aisef/runtime/opencode": true,
    "/tmp/aisef/verifier/hidden.json": true
   },
@@ -39,6 +41,11 @@
   "read_git_directory": {
    "exit": 0,
    "out": "ref: refs/heads/main",
+   "started": true
+  },
+  "reviewer_reads_reviewed_checkout": {
+   "exit": 0,
+   "out": "print('the candidate')\n## HEAD (no branch)\n?? candidate.py",
    "started": true
   }
  },
@@ -89,6 +96,16 @@
   "read_verifier": {
    "exit": 1,
    "out": "cat: /tmp/aisef/verifier/hidden.json: No such file or directory",
+   "started": true
+  },
+  "reviewer_chmod_reviewed_checkout": {
+   "exit": 1,
+   "out": "chmod: changing permissions of './candidate.py': Read-only file system",
+   "started": true
+  },
+  "reviewer_write_reviewed_checkout": {
+   "exit": 2,
+   "out": "/bin/sh: 1: cannot create ./x: Read-only file system",
    "started": true
   },
   "see_container_process": {
@@ -402,19 +419,19 @@
    },
    "write_client_directory": {
     "exit": 2,
-    "output": "probe: 13: cannot create /tmp/aisef/runtime/.aisef-confine-probe-0d611c1a8ded4f73: Read-only file system"
+    "output": "probe: 13: cannot create /tmp/aisef/runtime/.aisef-confine-probe-78d7d09aedcb0188: Read-only file system"
    },
    "write_git_directory": {
     "exit": 2,
-    "output": "probe: 14: cannot create /tmp/aisef/run-dir/repo/.git/.aisef-confine-probe-0d611c1a8ded4f73: Read-only file system"
+    "output": "probe: 14: cannot create /tmp/aisef/run-dir/repo/.git/.aisef-confine-probe-78d7d09aedcb0188: Read-only file system"
    },
    "write_interpreter_site": {
     "exit": 2,
-    "output": "probe: 12: cannot create /tmp/aisef/venv/lib/python3.14/site-packages/.aisef-confine-probe-0d611c1a8ded4f73: Read-only file system"
+    "output": "probe: 12: cannot create /tmp/aisef/venv/lib/python3.14/site-packages/.aisef-confine-probe-78d7d09aedcb0188: Read-only file system"
    },
    "write_kernel": {
     "exit": 2,
-    "output": "probe: 11: cannot create /tmp/aisef/venv/lib/python3.14/site-packages/aisef2/.aisef-confine-probe-0d611c1a8ded4f73: Read-only file system"
+    "output": "probe: 11: cannot create /tmp/aisef/venv/lib/python3.14/site-packages/aisef2/.aisef-confine-probe-78d7d09aedcb0188: Read-only file system"
    },
    "write_run_directory": {
     "exit": 0,
@@ -441,6 +458,64 @@
    "started": true
   }
  },
+ "reviewer_session_argv": [
+  "/usr/bin/bwrap",
+  "--unshare-user",
+  "--unshare-pid",
+  "--unshare-ipc",
+  "--unshare-uts",
+  "--unshare-cgroup-try",
+  "--share-net",
+  "--disable-userns",
+  "--die-with-parent",
+  "--new-session",
+  "--cap-drop",
+  "ALL",
+  "--ro-bind",
+  "/usr",
+  "/usr",
+  "--ro-bind",
+  "/etc",
+  "/etc",
+  "--symlink",
+  "usr/bin",
+  "/bin",
+  "--symlink",
+  "usr/sbin",
+  "/sbin",
+  "--symlink",
+  "usr/lib",
+  "/lib",
+  "--proc",
+  "/proc",
+  "--dev",
+  "/dev",
+  "--tmpfs",
+  "/tmp",
+  "--tmpfs",
+  "/aisef-home",
+  "--ro-bind",
+  "/tmp/aisef/runtime",
+  "/tmp/aisef/runtime",
+  "--ro-bind",
+  "/tmp/aisef/run-dir/repo/.git",
+  "/tmp/aisef/run-dir/repo/.git",
+  "--ro-bind",
+  "/tmp/aisef/op-home/.config/opencode",
+  "/tmp/aisef/op-home/.config/opencode",
+  "--ro-bind",
+  "/tmp/aisef/venv",
+  "/tmp/aisef/venv",
+  "--ro-bind",
+  "/tmp/aisef/run-dir/work/ws/verifier-wt-S1",
+  "/tmp/aisef/run-dir/work/ws/verifier-wt-S1",
+  "--chdir",
+  "/tmp/aisef/run-dir/work/ws/verifier-wt-S1",
+  "--",
+  "/tmp/aisef/runtime/opencode",
+  "run",
+  "<prompt>"
+ ],
  "session_argv": [
   "/usr/bin/bwrap",
   "--unshare-user",
