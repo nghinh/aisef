@@ -25,6 +25,7 @@ if str(ROOT) not in sys.path:
 from validation.v2 import mutation as m  # noqa: E402
 
 POSIX = os.name == "posix"
+DEFAULT_SETTLE_S = m.SETTLE_S   # before any test patches it
 
 
 def toy(base: pathlib.Path, module: str, files: dict[str, str], name: str = "toy") -> pathlib.Path:
@@ -597,6 +598,47 @@ class Proc(unittest.TestCase):
                     self.assertEqual(classes(r), ["TIMEOUT", "SURVIVED"], r.get("error"))
                     self.assertNotIn("stopped", r)
                     self.assertTrue(r["results"][0]["timed_out"])
+
+    def test_an_escapee_that_ends_within_the_grace_does_not_make_the_order_decide(self):
+        """ORD-7: `test_e` hangs beside a detached helper that lives about 6 s. In [plain, test_e] plain kills both
+        mutants first; in [test_e, plain] the helper is reached, and with a grace shorter than its life the target
+        stopped at mutant 1 (INFRA, then NOT_RUN): the order decided the target's fate. With a grace longer than the
+        helper's life it settles by itself (never signalled), the TIMEOUT row keeps its outcome, and both orders give
+        the same classes. The default grace covers the real helpers measured (8 s, and ORD-7's 30 s escapee)."""
+        self.assertGreaterEqual(DEFAULT_SETTLE_S, 30)
+        root = toy(self.dir, POSITIVE, {
+            "test_e.py": """
+                import subprocess, sys, unittest
+                from aisef2.toy import positive
+                class E(unittest.TestCase):
+                    def test_hangs_beside_a_short_lived_helper(self):
+                        if positive(5) is not True:
+                            subprocess.Popen([sys.executable, "-c", "import time; time.sleep(6)"], start_new_session=True,
+                                             stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                            while True:
+                                pass
+                """,
+            "test_plain.py": """
+                import unittest
+                from aisef2.toy import positive
+                class P(unittest.TestCase):
+                    def test_positive(self):
+                        self.assertIs(positive(5), True)
+                        self.assertIs(positive(-1), False)
+                """})
+        e, plain = "tests/v2/test_e.py", "tests/v2/test_plain.py"
+        with mock.patch.object(m, "TIMEOUT", 2):
+            with mock.patch.object(m, "SETTLE_S", 15.0):
+                runs = [m.run_target(root, "aisef2/toy.py::positive", k) for k in ([plain, e], [e, plain])]
+            self.assertEqual([classes(r) for r in runs], [["KILLED", "KILLED"]] * 2)
+            self.assertFalse([r for r in runs if r.get("stopped")])
+            self.assertEqual([x["outcome"] for _, x in rows_of(runs[1]) if x["file"] == e], ["TIMEOUT", "TIMEOUT"])
+            self.assertFalse([s for r in runs for x in r["results"] for s in x.get("cleanup", [])])   # nothing signalled
+            # the old failure: a grace shorter than the helper's life, and the order decides
+            r = m.run_target(root, "aisef2/toy.py::positive", [e, plain])   # setUp's 1 s grace
+        self.assertTrue(r["stopped"])
+        self.assertEqual(classes(r), ["INFRA", "NOT_RUN"])
+        time.sleep(7)   # the helper ends itself
 
     @unittest.skipUnless(sys.platform == "darwin", "the group-rejoin mechanism was measured on macOS (VS-7 verifier)")
     def test_a_range_that_never_empties_is_bounded_and_never_a_kill(self):

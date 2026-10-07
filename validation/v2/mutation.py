@@ -896,8 +896,10 @@ _FRESH = {"HOME": "home", "TMPDIR": "tmp", "XDG_CONFIG_HOME": "config", "XDG_DAT
 #: (PL-1) — a candidate, never proof (a child given its own environment does not carry it)
 TOKEN = "AISEF_MUTATION_RUN"
 #: an unproven leftover is watched this long for its own exit, never signalled (PL-7); still alive after it, the target
-#: and the worker stop
-SETTLE_S = 5.0
+#: and the worker stop. Long enough for a short-lived helper to end by itself — the 8 s detached sleep of
+#: test_v21_continue_integrity.py, or ORD-7's 30 s escapee — since in an order that never reaches its file the same
+#: target is classified, so a stop here is an order-dependent fate (ORD-7); paid only while something is left running
+SETTLE_S = 60.0
 
 
 class _Stop(ca.Unproven):
