@@ -130,7 +130,8 @@ class Traceability(unittest.TestCase):
         proposal = ("## 4. X\n\n### 4.3. Y\n\nmột câu.\n\n**Nghiệm thu bước đầu:** a; b.\n\n## 10. Backlog\n\n"
                     "| ID | Ưu tiên | Thay đổi | Nghiệm thu cụ thể | Phụ thuộc | Cỡ |\n|---|---|---|---|---|---|\n"
                     "| V2-01 | P0 | đổi | tiêu chí một | — | M |\n\n## 12. Gate\n\n### Phần phải làm ngay\n\n**x:** không phải cổng\n\n"
-                    "### Gate đề xuất\n\n**2.0.1:** cổng một.\n\n## 13. Hoãn\n\n**2.2:** không phải cổng\n")
+                    "### Gate đề xuất\n\n**2.0.1:** cổng một.\n\n## 13. Hoãn\n\n**2.2:** không phải cổng\n\n"
+                    "| V2-99 | P0 | đổi | không phải tiêu chí | — | S |\n")
         self.assertEqual(TC.criteria(proposal, "proposal"), {"§4.3": ["a; b."], "§10": ["tiêu chí một"], "§12": ["cổng một."]})
         assessment = ("## 6. Lộ trình\n\n- **2.1**: #6. Thước đo xong: một người\n  ngoài dựng bundle.\n\n## 7. Bảng\n\n"
                       "| Chỉ số | 2.0.0 | Mục tiêu 2.1 |\n|---|---|---|\n| USD | chưa đo | có |\n\n## 8. Rủi ro\n| a | b | c |\n")
