@@ -18,6 +18,7 @@ import signal
 import subprocess
 import sys
 import tempfile
+import time
 import unittest
 from unittest import mock
 
@@ -267,6 +268,36 @@ class FailClosed(unittest.TestCase):
                     os.kill(pid, signal.SIGKILL)
         self.assertTrue(rep["problems"][0].startswith("the sandbox did not run the probe (exit 3): "), rep["problems"])
         self.assertIn("setsid", rep["tried"])     # the probe ran to its end: only its exit refuses it
+
+    def test_a_sleeper_still_dying_when_bubblewrap_returned_is_no_survivor(self):
+        """The PID namespace's teardown can still be killing the probe's sleeper when bubblewrap returns (measured: 1 in
+        400 measurements): one gone within SURVIVOR_GRACE is no survivor; one alive throughout it is, once it has passed."""
+        from aisef2.runtime import process_range
+        mine, other = (process_range.Proc(9, 1, None, None, "sleep 30.000001"), process_range.Proc(8, 1, None, None, "sleep 30.000002"))
+        dying = mock.Mock(side_effect=[{9: mine, 8: other}, {9: mine, 8: other}, {8: other}])
+        with mock.patch.object(process_range, "process_table", dying):
+            self.assertEqual(confine._survivors("sleep 30.000001"), [])
+        self.assertEqual(dying.call_count, 3)       # it looked again until the sleeper was gone
+        alive = mock.Mock(return_value={9: mine, 8: other})
+        with mock.patch.object(process_range, "process_table", alive), mock.patch.object(confine, "SURVIVOR_GRACE", 0.3):
+            t = time.monotonic()
+            self.assertEqual(confine._survivors("sleep 30.000001"), [9])
+            self.assertGreaterEqual(time.monotonic() - t, 0.3)      # not before the grace has passed
+        self.assertGreater(alive.call_count, 1)
+
+    @unittest.skipUnless(os.name == "posix", "a real process table")
+    def test_a_killed_sleeper_is_no_survivor_a_live_one_is(self):
+        """Real processes: a sleeper killed (left unreaped: a zombie) is no survivor; one alive is."""
+        value = f"31.{os.getpid() % 10**6:06d}"      # no other process has it
+        with mock.patch.object(confine, "SURVIVOR_GRACE", 0.3):
+            live = subprocess.Popen(["sleep", value])
+            try:
+                self.assertEqual(confine._survivors(f"sleep {value}"), [live.pid])
+                live.kill()
+                self.assertEqual(confine._survivors(f"sleep {value}"), [])
+            finally:
+                live.kill()
+                live.wait()
 
     def test_no_client_no_measurement(self):
         """Without the client the session's wrapper cannot be built, so nothing is measured: a problem, and the

@@ -35,6 +35,7 @@ import secrets
 import subprocess
 import sys
 import sysconfig
+import time
 from typing import Mapping
 
 KEYS = ("backend", "bwrap", "network", "read_only")
@@ -75,6 +76,9 @@ m section sockets
 if command -v find >/dev/null 2>&1; then find "$@" -type s -print 2>/dev/null | head -n 50; m sockets listed; fi
 m end
 '''
+#: how long a probe's sleeper found once bubblewrap returned may take to die before it counts as a survivor: the PID
+#: namespace's teardown can still be killing it then (measured: 1 in 400 measurements, the pid gone at once after)
+SURVIVOR_GRACE = 1.0
 #: what a kernel that refuses a further user namespace says (--disable-userns: ENOSPC; a seccomp or LSM refusal: EPERM)
 USERNS_REFUSED = re.compile(r"No space left on device|Operation not permitted")
 
@@ -289,8 +293,7 @@ def _probe(spec: Mapping, where: pathlib.Path, ws: pathlib.Path, full: list[str]
         code, out = p.returncode, p.stdout + p.stderr
     except (OSError, subprocess.SubprocessError) as e:
         code, out = None, f"{type(e).__name__}: {e}"
-    from aisef2.runtime.process_range import process_table
-    survivors = [pr.pid for pr in process_table().values() if f"sleep {sleep}" in pr.command]
+    survivors = _survivors(f"sleep {sleep}")
     created = {k: v.exists() for k, v in files.items()}
     for v in files.values():     # the probe's own empty files, if confinement failed to stop them
         if v.exists():
@@ -321,6 +324,19 @@ def _probe(spec: Mapping, where: pathlib.Path, ws: pathlib.Path, full: list[str]
         problems += _judge(rep, token, out, tries, home, ws)
     rep["problems"] = problems
     return rep
+
+
+def _survivors(command: str) -> list[int]:
+    """The live processes (zombies excluded: the process table drops them) whose command line holds `command`, once
+    each has had SURVIVOR_GRACE seconds to die: one the PID namespace's teardown is still killing did not outlive the
+    session; one still alive after it did."""
+    from aisef2.runtime.process_range import process_table
+    deadline = time.monotonic() + SURVIVOR_GRACE
+    while True:
+        found = sorted(pr.pid for pr in process_table().values() if command in pr.command)
+        if not found or time.monotonic() >= deadline:
+            return found
+        time.sleep(0.05)
 
 
 def namespaces(inside: Mapping[str, str], outside: Mapping[str, str | None] | None = None) -> dict:
