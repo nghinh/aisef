@@ -1,16 +1,16 @@
 == host
 docker 29.8.0 server linux/arm64
 host: Darwin 25.5.0 arm64  (this host runs no Linux backend itself; the guest below is a Docker Desktop VM container)
-measured tree: ac27348aeb60adf83309502ef4f213fadfcbd5b3; uncommitted paths: 0
+measured tree: affcefb763048e2aa6a6db0e76cf4d2979f90f27; uncommitted paths: 0
 == build aisef-sandbox-measure (pinned python:3.14-slim-trixie@sha256:3353bb7e9ae99c7cce6cad2b2f2b174e8f22813ac43e3b13e7a742627d2b01d8)
-sha256:fbbd7929afaa8539e9db9822b671ef83f23a04e7ca474af6b4d2c5bdfefdd066
+sha256:e63413ff76967f0794a5a1ed09729ad1be4e3af39e36a7eb20ef111b08fd1f44
 == guest (the image's own view of the Docker Desktop VM kernel)
 kernel: Linux 7.0.12-linuxkit aarch64
 apparmor: not in this kernel (/sys/module/apparmor absent)
 max_user_namespaces: 31880
 bubblewrap package: 0.12.0-1~deb13u1
 bubblewrap 0.12.0
-host listener on 127.0.0.1:64354; host-gateway seen from the container as host.docker.internal
+host listener on 127.0.0.1:65147; host-gateway seen from the container as host.docker.internal
 
 == profile P1-default (network=none) flags: 
   bwrap ran: NO; measure problems: 1
@@ -120,7 +120,7 @@ host listener on 127.0.0.1:64354; host-gateway seen from the container as host.d
   denials read_run_directory_file: exit 1: cat: /tmp/aisef/run-dir/canary: No such file or directory
   denials read_verifier: exit 1: cat: /tmp/aisef/verifier/hidden.json: No such file or directory
   denials reviewer_chmod_reviewed_checkout: exit 1: chmod: changing permissions of './candidate.py': Read-only file system
-  denials reviewer_write_reviewed_checkout: exit 2: /bin/sh: 1: cannot create ./x: Read-only file system
+  denials reviewer_write_reviewed_checkout: exit 2: /bin/sh: 1: cannot create ./x: Read-only file system | /bin/sh: 1: cannot create ./candidate.py: Read-only fil
   denials see_container_process: exit 0: 0 | 1 2 9 10 11 12
   denials write_client_directory: exit 2: /bin/sh: 1: cannot create /tmp/aisef/runtime/x: Read-only file system
   denials write_git_directory: exit 2: /bin/sh: 1: cannot create /tmp/aisef/run-dir/repo/.git/HEAD: Read-only file system
@@ -185,7 +185,7 @@ host listener on 127.0.0.1:64354; host-gateway seen from the container as host.d
   denials read_run_directory_file: exit 1: cat: /tmp/aisef/run-dir/canary: No such file or directory
   denials read_verifier: exit 1: cat: /tmp/aisef/verifier/hidden.json: No such file or directory
   denials reviewer_chmod_reviewed_checkout: exit 1: chmod: changing permissions of './candidate.py': Read-only file system
-  denials reviewer_write_reviewed_checkout: exit 2: /bin/sh: 1: cannot create ./x: Read-only file system
+  denials reviewer_write_reviewed_checkout: exit 2: /bin/sh: 1: cannot create ./x: Read-only file system | /bin/sh: 1: cannot create ./candidate.py: Read-only fil
   denials see_container_process: exit 0: 0 | 1 2 9 10 11 12
   denials write_client_directory: exit 2: /bin/sh: 1: cannot create /tmp/aisef/runtime/x: Read-only file system
   denials write_git_directory: exit 2: /bin/sh: 1: cannot create /tmp/aisef/run-dir/repo/.git/HEAD: Read-only file system
@@ -217,7 +217,7 @@ host listener on 127.0.0.1:64354; host-gateway seen from the container as host.d
   denials read_run_directory_file: exit 1: cat: /tmp/aisef/run-dir/canary: No such file or directory
   denials read_verifier: exit 1: cat: /tmp/aisef/verifier/hidden.json: No such file or directory
   denials reviewer_chmod_reviewed_checkout: exit 1: chmod: changing permissions of './candidate.py': Read-only file system
-  denials reviewer_write_reviewed_checkout: exit 2: /bin/sh: 1: cannot create ./x: Read-only file system
+  denials reviewer_write_reviewed_checkout: exit 2: /bin/sh: 1: cannot create ./x: Read-only file system | /bin/sh: 1: cannot create ./candidate.py: Read-only fil
   denials see_container_process: exit 0: 0 | 1 2 9 10 11 12
   denials write_client_directory: exit 2: /bin/sh: 1: cannot create /tmp/aisef/runtime/x: Read-only file system
   denials write_git_directory: exit 2: /bin/sh: 1: cannot create /tmp/aisef/run-dir/repo/.git/HEAD: Read-only file system
@@ -249,7 +249,7 @@ host listener on 127.0.0.1:64354; host-gateway seen from the container as host.d
   denials read_run_directory_file: exit 1: cat: /tmp/aisef/run-dir/canary: No such file or directory
   denials read_verifier: exit 1: cat: /tmp/aisef/verifier/hidden.json: No such file or directory
   denials reviewer_chmod_reviewed_checkout: exit 1: chmod: changing permissions of './candidate.py': Read-only file system
-  denials reviewer_write_reviewed_checkout: exit 2: /bin/sh: 1: cannot create ./x: Read-only file system
+  denials reviewer_write_reviewed_checkout: exit 2: /bin/sh: 1: cannot create ./x: Read-only file system | /bin/sh: 1: cannot create ./candidate.py: Read-only fil
   denials see_container_process: exit 0: 0 | 1 2 9 10 11 12
   denials write_client_directory: exit 2: /bin/sh: 1: cannot create /tmp/aisef/runtime/x: Read-only file system
   denials write_git_directory: exit 2: /bin/sh: 1: cannot create /tmp/aisef/run-dir/repo/.git/HEAD: Read-only file system
@@ -272,4 +272,4 @@ host listener on 127.0.0.1:64354; host-gateway seen from the container as host.d
   controls workspace_writable: exit 0: ok
   after (outside the sandbox): {"container_sleeper_seen_outside": true, "measure_pid_outside": 1, "reviewed_checkout_listing_unchanged": true, "unchanged": {"/tmp/aisef/run-dir/EVIDENCE.anchor": true, "/tmp/aisef/run-dir/repo/.git/HEAD": true, "/tmp/aisef/run-dir/work/ws/verifier-wt-S1/candidate.py": true, "/tmp/aisef/runtime/opencode": true, "/tmp/aisef/verifier/hidden.json": true}, "written_in_client_directory": false, "written_in_kernel": false, "written_in_run_directory": false}
 
-== done; per-profile JSON in /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/prod/round2-sandbox-fix/harness/*.json
+== done; per-profile JSON in /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/prod/round3-sandbox-fix/harness/*.json

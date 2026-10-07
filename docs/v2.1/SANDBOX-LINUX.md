@@ -8,7 +8,7 @@ nhánh"). It is **opt-in** and **Linux-only**; it changes nothing when the setti
 Module: [`aisef2/app/confine.py`](../../aisef2/app/confine.py). Harness:
 [`validation/v21/sandbox/`](../../validation/v21/sandbox/). Measured evidence:
 [`evidence/sandbox/`](evidence/sandbox/) (`measure.log`, one JSON per profile, `Dockerfile.measure`), recorded at the
-committed tree `ac27348` (`measured tree: … uncommitted paths: 0` in `measure.log`).
+committed tree `affcefb` (`measured tree: … uncommitted paths: 0` in `measure.log`).
 
 Every claim below names the operation that was tried and what happened (owner's 2026-10-06 requirement: a denied
 operation, not config alone). Where an operation **succeeded** — into a throwaway tmpfs, or because a session is
@@ -90,16 +90,18 @@ claim to replace the container profile.
 
 ### Fail-closed
 
-When the settings ask for confinement and it cannot be provided — not Linux, no bubblewrap (or a path that is not an
-executable file), a read-only path missing, a client whose directory holds HOME or the workspace, no client to
-measure with, or (P1–P3, X2) the sandbox cannot set up its namespaces — the run **refuses before the first provider
-request** and records why (`RUN.json.confinement.problems`, stage `confinement`); a single session refuses with
+When the settings ask for confinement and it cannot be provided — not Linux, no bubblewrap (a path that is not an
+executable file, or one that cannot be read), a read-only path missing, a client whose directory holds HOME (the
+env's, or the user's home when the env has none) or the workspace, no client to measure with, or (P1–P3, X2) the
+sandbox cannot set up its namespaces — the run **refuses before the first provider request** and records why (`RUN.json.confinement.problems`, stage `confinement`); a single session refuses with
 `SessionRefused` before the client starts or its log is created; `aisef run --check` is `ready: false`. A check the
 measurement could not make (no `unshare`, no `find`, an exit that is not the kernel's refusal, a `/proc/self/ns` link
 that could not be read on either side — `not measured`, never `own`) is a problem, never a pass; so is a probe that
 exits non-zero even after reaching its end. Proven by `test_v21_confine` (macOS: one `_judge` case per check,
 `test_a_namespace_counts_as_own_only_when_both_links_were_read_and_differ`, `test_no_client_no_measurement`,
-`test_a_probe_that_did_not_exit_0_is_refused_even_when_it_reached_its_end`) and by P1–P3/X2 above (the kernel's
+`test_a_probe_that_did_not_exit_0_is_refused_even_when_it_reached_its_end`,
+`test_an_unreadable_bubblewrap_is_a_problem_not_a_crash`,
+`test_a_client_directory_that_holds_home_or_the_workspace_is_refused`) and by P1–P3/X2 above (the kernel's
 measurement: "the sandbox did not run the probe").
 
 ## 4. The network: what a run can use
@@ -136,7 +138,7 @@ both sides: user, pid, ipc, uts, mnt `own`; net `own` with `none`, `shared` with
 | the runtime cannot be rewritten | `: > <runtime>/opencode`; `: > <runtime>/x` | `Read-only file system`; after: runtime unchanged, nothing created |
 | the kernel / interpreter cannot be written | `: > <venv site-packages>/aisef2/…` (a path the operator **can** write: `operator_can` true) | `Read-only file system` (the venv is a `read_only` path); after: nothing created |
 | the git directory cannot be written | `: > <out>/repo/.git/HEAD` | `Read-only file system`; after: HEAD unchanged |
-| the reviewer cannot write the checkout it reviews (its write bits kept here: only the mount refuses) | reviewer's wrapper: `: > ./x; echo x >> ./candidate.py`; `chmod u+w ./candidate.py` | `cannot create ./x: Read-only file system`; `chmod: … Read-only file system`; after: the checkout's listing and `candidate.py` unchanged |
+| the reviewer cannot write the checkout it reviews (its write bits kept here: only the mount refuses) | reviewer's wrapper: `(: > ./x); (echo x >> ./candidate.py)` (each in a subshell, so both are tried: sh exits at a failed redirection of `:`); `chmod u+w ./candidate.py` | `cannot create ./x: Read-only file system`, `cannot create ./candidate.py: Read-only file system`; `chmod: … Read-only file system`; after: the checkout's listing and `candidate.py` unchanged |
 | a unix socket outside every mount is unreachable | connect `<base>/sock/ctl` | `FileNotFoundError` |
 | no further user namespace (the route back to capabilities) | `unshare --user --map-root-user true` | `unshare failed: No space left on device` (`--disable-userns`) |
 | the container's processes are not visible | look for a container-side `sleep 987.654` (seen outside: `after.container_sleeper_seen_outside` true) by its command line in `/proc/*/cmdline` | found **0** times; `/proc` lists only `1 2 9 10 11 12` — the session's own PID namespace (the measurement: `namespaces.pid` "own", a different `/proc/self/ns/pid` from the container's) |
@@ -186,11 +188,13 @@ read-only mounted directory prints its JSON.
   `confinement`. The model reviewer's sessions get `workspace_writable=False` (`run.execute`), so the checkout they
   review is bound read-only and their record says `bwrap network=host workspace=read-only`
   (`RunFailClosed.test_a_confined_run_starts_every_session_through_bubblewrap_and_says_so`). `aisef run --check`
-  measures with the client on the run's PATH and a worktree of a new repository.
+  measures with the client on the run's PATH and a worktree of a new repository
+  (`Check.test_check_measures_with_the_client_on_the_runs_path`).
 - **Measurement** (`confine.measure`): a probe shell under that wrapper; judged on what it observes, never on config —
   a "bubblewrap" that runs the probe unconfined is refused for what the probe could do. Besides §5's checks it
   requires the mounts seen inside to lie within what the command line names, and no unix socket outside the workspace
-  under any bound directory; a namespace is `own` only when its `/proc/self/ns` link was read inside and outside
+  under any bound directory (within: the path itself or below it — `/w/ws2` is not within `/w/ws`, nor
+  `/usrlocal-extra` within `/usr`); a namespace is `own` only when its `/proc/self/ns` link was read inside and outside
   (`<name>:[<inode>]`) and they differ; a check that did not run is a problem.
 
 **Kernel change.** This touches `aisef2/` (settings, client, run, cli, and the new `confine.py`): it needs mutation
@@ -202,7 +206,11 @@ here), not only a later measurement. Against `closure-evidence/v2/v2.1/REQUALIFI
 `cc53596`), `v21_requalification.py --check` on this branch (`ac27348`) reports 5 changed V2.1 targets —
 `cli.py::run`, `client.py::session`, `run.py::execute`, `settings.py::OPTIONAL`, `settings.py::load`; counted as its
 `scope()` counts them (`mutation.mutants`), 116→133, 114→128, 315→337, 2→3 and 254→268 mutants (+68). Targeted mutants of this track were run on scratch copies only — not campaign evidence: 45/45 killed
-at `ac27348` (the 11 that survived the previous tests at `0da842f` among them; same script, same copy method).
+at `ac27348` (the 11 that survived the previous tests at `0da842f` among them; same script, same copy method); and the
+5 the round-2 verifier saw survive the 24 tests at `4e00a0d` (`_within` without its `/`, the user's home not checked
+when the env has no HOME, an unreadable bubblewrap raising, a non-Linux measurement making its worktree, `--check`
+measuring without the client) survive them again and are killed by the 26 at `affcefb` (tests only: `aisef2/` is
+unchanged since `ac27348`).
 
 ## 7. Limits (not confined / not claimed)
 
@@ -232,7 +240,7 @@ at `ac27348` (the 11 that survived the previous tests at `0da842f` among them; s
 
 | Deliverable | Level | Why |
 |---|---|---|
-| the setting, the argv builder, fail-closed refusal of run / `--check` / session, each check of the measurement | **M3** | `test_v21_confine` (24 tests, all its own) on macOS with fake clients and providers; no OS boundary exercised on macOS. |
+| the setting, the argv builder, fail-closed refusal of run / `--check` / session, each check of the measurement | **M3** | `test_v21_confine` (26 tests, all its own) on macOS with fake clients and providers; no OS boundary exercised on macOS. |
 | the success path of a confined run (every session started through the bwrap argv, the reviewer's workspace read-only, the records saying so) | **M3** | `test_v21_confine.RunFailClosed.test_a_confined_run_starts_every_session_through_bubblewrap_and_says_so`: the **measurement stubbed** and the argv built for Linux, a recording fake bubblewrap that confines nothing — the wiring, not a boundary. |
 | the confinement boundary itself inside a Linux container | **M4** | `validation/v21/sandbox/run.sh` under real `docker`: real bwrap 0.12.0, real namespaces, a real host port, the container's real processes and sockets; the kernel's own `confine.measure` and the session's `confine.wrap` run in the container; each claim an operation tried (§5). A standalone harness, not `aisef run`; the client is a script, no provider — so not M5. |
 | a confined real `aisef run` on Linux end to end | **M6** | not done: the macOS host has no Linux backend to run `aisef run` itself under bwrap. |
