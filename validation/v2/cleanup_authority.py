@@ -83,7 +83,8 @@ def establish(root) -> Boundary:
 def host_table() -> dict[int, Host]:
     """This module's own reading of the host: pid, ppid, pgid, start time, command. POSIX: `ps`, zombies included (a
     zombie leader still pins its group id). Windows: Win32_Process through PowerShell — pid, parent, creation time,
-    command; there is no process group, so a group is never provable there (pgid -1)."""
+    command; there is no process group, so a group is never provable there (pgid -1). POSIX: OSError when `ps` fails
+    or does not list itself — an empty reading never stands for "everything is gone"."""
     return _read()[0]
 
 
@@ -104,6 +105,9 @@ def _read() -> tuple[dict[int, Host], int]:
         except ValueError:
             continue
         out[int(f[0])] = Host(int(f[0]), int(f[1]), int(f[2]), born, f[8] if len(f) > 8 else "")
+    if proc.returncode != 0 or proc.pid not in out:   # a failed or partial reading would read as "every process gone"
+        raise OSError(f"ps -A exited {proc.returncode} and {'listed' if proc.pid in out else 'did not list'} itself: "
+                      "the host table cannot be read")
     return out, proc.pid
 
 
@@ -173,12 +177,19 @@ def carriers(prefix: str, table: dict[int, Host] | None = None) -> list[Host]:
             if any(v.startswith(prefix.encode()) for v in env.split(b"\0")):
                 hits.add(pid)
     else:
-        out = subprocess.run(["ps", "-E", "-ww", "-A", "-o", "pid=,command="], capture_output=True, encoding="utf-8",
-                             errors="replace").stdout
+        proc = subprocess.Popen(["ps", "-E", "-ww", "-A", "-o", "pid=,command="], stdout=subprocess.PIPE,
+                                encoding="utf-8", errors="replace")
+        out, _ = proc.communicate()
+        listed = set()
         for line in out.splitlines():
             f = line.split(None, 1)
-            if len(f) == 2 and f[0].isdigit() and prefix in f[1]:
-                hits.add(int(f[0]))
+            if f and f[0].isdigit():
+                listed.add(int(f[0]))
+                if len(f) == 2 and prefix in f[1]:
+                    hits.add(int(f[0]))
+        if proc.returncode != 0 or proc.pid not in listed:   # fail closed, as host_table does
+            raise OSError(f"ps -E exited {proc.returncode} and {'listed' if proc.pid in listed else 'did not list'} "
+                          "itself: the environments cannot be read")
     return sorted((table[p] for p in hits if p in table and p != os.getpid()), key=lambda p: p.pid)
 
 

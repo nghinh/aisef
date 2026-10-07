@@ -506,6 +506,44 @@ class Proc(unittest.TestCase):
         self.assertTrue(alive(pid), "a process the runner cannot prove is never signalled")
         self.end_helper(pid)
 
+    def test_a_host_table_that_cannot_be_read_stops_instead_of_reading_as_empty(self):
+        """Process-env lens: one `ps` read that exits non-zero with no output made `_settle` report nothing and `_watch`
+        report every pid gone while a token-carrying helper was alive — fail-open. Now the authority's readers raise
+        when `ps` fails or does not list itself, and the runner stops (HOST_TABLE_UNREADABLE); nothing is signalled."""
+        root = toy(self.dir, POSITIVE, leaky(self.sentinel, self.pidfile, when="True"))
+        real = subprocess.Popen
+        fakes = {"exit 1, no output": "raise SystemExit(1)",
+                 "exit 0, without itself": "print('    1     0     1 Mon Jan  1 00:00:00 2024 /sbin/launchd')"}
+        for name, script in fakes.items():
+            def popen(argv, *a, script=script, **kw):
+                return real([sys.executable, "-c", script], *a, **kw) if argv[0] == "ps" else real(argv, *a, **kw)
+            with self.subTest(name), mock.patch.object(m.ca.subprocess, "Popen", popen):
+                self.assertRaises(OSError, m.ca.host_table)
+                if sys.platform == "darwin":   # Linux reads /proc for environments, not ps
+                    self.assertRaises(OSError, m.ca.carriers, "X=", {})
+        tg = m._Target("aisef2/toy.py", self.dir, m.ca.establish(self.dir), m._worker(root))
+        # detached by a double fork, so not the runner's descendant: unprovable, never signalled; it carries the token
+        subprocess.run([sys.executable, "-c", "import subprocess, sys\nsubprocess.Popen(sys.argv[1:], start_new_session="
+                        "True, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)",
+                        sys.executable, "-c", HELPER, str(self.sentinel), str(self.pidfile)],
+                       env={**os.environ, m.TOKEN: f"{tg.worker}:1"}, check=True)
+        pid = self.helper_pid()
+        with self.assertRaises(m._Stop) as cm:
+            m._settle(tg)   # the helper is found, unproven (not a descendant now), and outlives the grace
+        self.assertEqual(cm.exception.code, m.ca.RESIDUAL_OWNERSHIP_UNKNOWN)
+
+        def broken(argv, *a, **kw):
+            return real([sys.executable, "-c", fakes["exit 1, no output"]], *a, **kw) if argv[0] == "ps" \
+                else real(argv, *a, **kw)
+        with mock.patch.object(m.ca.subprocess, "Popen", broken):
+            with self.assertRaises(m._Stop) as cm:
+                m._settle(tg)
+            self.assertEqual(cm.exception.code, "HOST_TABLE_UNREADABLE")
+            with self.assertRaises(OSError):
+                m._watch([pid])
+        self.assertTrue(alive(pid))
+        self.end_helper(pid)
+
     def test_a_short_lived_escapee_settles_instead_of_aborting(self):
         """PL-7: a timed-out test's watchdog leaves the range and exits within a poll of its parent's death. Whether
         release() still saw it alive is scheduling; the class is TIMEOUT every time, never a target error."""
