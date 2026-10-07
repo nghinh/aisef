@@ -287,7 +287,9 @@ class FailClosed(unittest.TestCase):
 
     @unittest.skipUnless(os.name == "posix", "a real process table")
     def test_a_killed_sleeper_is_no_survivor_a_live_one_is(self):
-        """Real processes: a sleeper killed (left unreaped: a zombie) is no survivor; one alive is."""
+        """Real processes: a sleeper killed (left unreaped: a zombie) is no survivor; one alive is. Two things each drop
+        the killed one — the table leaves zombies out, and its command line no longer shows the sleeper (macOS `ps`:
+        `<defunct>`; Linux: an empty /proc/<pid>/cmdline) — so this does not single out the zombie filter."""
         value = f"31.{os.getpid() % 10**6:06d}"      # no other process has it
         with mock.patch.object(confine, "SURVIVOR_GRACE", 0.3):
             live = subprocess.Popen(["sleep", value])
@@ -298,6 +300,32 @@ class FailClosed(unittest.TestCase):
             finally:
                 live.kill()
                 live.wait()
+
+    @unittest.skipUnless(os.name == "posix", "the probe is a POSIX shell script")
+    def test_the_sleeper_outlives_a_probe_that_used_all_its_time_and_the_grace(self):
+        """A survivor is dropped only by being gone, so the probe's sleeper must not reach its own end before the last
+        look: it lives longer than the probe's time limit plus SURVIVOR_GRACE plus 1 s for that look, so a probe that
+        exits 0 just inside its limit still leaves a survivor alive to be seen."""
+        real, probes = subprocess.run, []
+
+        def spy(argv, *a, **k):
+            if confine.PROBE in argv:       # the probe's $7 is its sleep: after PROBE, "probe" and $1..$6
+                probes.append((argv[argv.index(confine.PROBE) + 8], k["timeout"]))
+            return real(argv, *a, **k)
+        with tempfile.TemporaryDirectory() as t:
+            tmp = pathlib.Path(os.path.realpath(t))
+            exe = tmp / "client" / "opencode"
+            exe.parent.mkdir()
+            exe.write_text("#!/bin/sh\n")
+            with mock.patch.object(confine.subprocess, "run", spy):
+                rep = confine.measure(dict(SPEC, bwrap=str(fake_bwrap(tmp))), tmp / "run" / "confinement", str(exe),
+                                      system="linux", environ={"PATH": "/usr/bin:/bin", "HOME": str(tmp)})
+            for pid in rep["setsid_survivors"]:
+                with contextlib.suppress(ProcessLookupError):
+                    os.kill(pid, signal.SIGKILL)
+        [(sleep, timeout)] = probes
+        self.assertGreater(float(sleep), timeout + confine.SURVIVOR_GRACE + 1)
+        self.assertTrue(rep["setsid_survivors"])     # the sleeper it looks for is this one: unconfined, it survived
 
     def test_no_client_no_measurement(self):
         """Without the client the session's wrapper cannot be built, so nothing is measured: a problem, and the

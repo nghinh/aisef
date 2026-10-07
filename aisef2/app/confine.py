@@ -79,6 +79,11 @@ m end
 #: how long a probe's sleeper found once bubblewrap returned may take to die before it counts as a survivor: the PID
 #: namespace's teardown can still be killing it then (measured: 1 in 400 measurements, the pid gone at once after)
 SURVIVOR_GRACE = 1.0
+#: the probe's time limit (s) and how long its setsid sleeper lives: longer than the limit plus SURVIVOR_GRACE plus a
+#: look, so a sleeper that outlived the session is still alive at the last look even after a probe that exited just
+#: inside its limit (one that reached it is refused anyway) — a survivor is dropped only by being killed, never by
+#: reaching its own end
+PROBE_TIMEOUT, SLEEPER = 60, 120
 #: what a kernel that refuses a further user namespace says (--disable-userns: ENOSPC; a seccomp or LSM refusal: EPERM)
 USERNS_REFUSED = re.compile(r"No space left on device|Operation not permitted")
 
@@ -283,13 +288,13 @@ def _probe(spec: Mapping, where: pathlib.Path, ws: pathlib.Path, full: list[str]
              "client_directory": pathlib.Path(os.path.dirname(os.path.realpath(rep["client"]))) / probe_file,
              "git_directory": pathlib.Path(git_dir(str(ws)) or ws / ".git") / probe_file}
     home = env.get("HOME") or "/nonexistent"
-    sleep = f"30.{int(nonce, 16) % 10**6:06d}"
+    sleep = f"{SLEEPER}.{int(nonce, 16) % 10**6:06d}"
     f = {k: str(v) for k, v in files.items()}
     args = [str(canary), f["run_directory"], f["kernel"], f["interpreter_site"], home, str(ws / probe_file), sleep,
             f["client_directory"], f["git_directory"], *[t for t in targets(full) if t not in ("/proc", "/dev", "/tmp", HOME)]]
     rep["argv"] = full[:-len(cmd)] + ["/bin/sh", "-c", "<PROBE>", "probe"]
     try:
-        p = subprocess.run(full + args, capture_output=True, text=True, env=inside_env, timeout=60)
+        p = subprocess.run(full + args, capture_output=True, text=True, env=inside_env, timeout=PROBE_TIMEOUT)
         code, out = p.returncode, p.stdout + p.stderr
     except (OSError, subprocess.SubprocessError) as e:
         code, out = None, f"{type(e).__name__}: {e}"
@@ -327,9 +332,10 @@ def _probe(spec: Mapping, where: pathlib.Path, ws: pathlib.Path, full: list[str]
 
 
 def _survivors(command: str) -> list[int]:
-    """The live processes (zombies excluded: the process table drops them) whose command line holds `command`, once
-    each has had SURVIVOR_GRACE seconds to die: one the PID namespace's teardown is still killing did not outlive the
-    session; one still alive after it did."""
+    """The live processes whose command line holds `command`, once each has had SURVIVOR_GRACE seconds to die: one the
+    PID namespace's teardown is still killing did not outlive the session; one still alive after it did. A killed one
+    no longer matches: the table drops it, and its command line is gone anyway (macOS `ps`: `<defunct>`; Linux:
+    an empty /proc/<pid>/cmdline)."""
     from aisef2.runtime.process_range import process_table
     deadline = time.monotonic() + SURVIVOR_GRACE
     while True:

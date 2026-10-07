@@ -46,7 +46,7 @@ raced, reported, problem_counts = [], [], {}
 for i in range(N):
     looks.clear()
     rep = confine.measure(spec, B / f"m{i}", str(exe), repo, system="linux", environ=env)
-    first = [p for p, pr in looks[0].items() if "sleep 30." in pr.command] if looks else []
+    first = [p for p, pr in looks[0].items() if f"sleep {confine.SLEEPER}." in pr.command] if looks else []
     if first:
         raced.append({"i": i, "first_look": first, "looks": len(looks), "reported": rep["setsid_survivors"]})
     if rep["setsid_survivors"]:
