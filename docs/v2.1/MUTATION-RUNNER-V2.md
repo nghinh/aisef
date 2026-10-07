@@ -1,7 +1,8 @@
 # Mutation runner v2: the runner contract
 
 **Status:** implemented on branch `v21r/runner` (worktree `.claude/worktrees/v21r-runner`, based on `c9c736f`), commits
-listed in §9. Not pushed. The V2.1 campaign has not been restarted.
+listed in §9; the provers' open items after it are fixed by the series of §14, which corrects every claim below that it
+changes. Not pushed. The V2.1 campaign has not been restarted.
 **Closes:** every confirmed finding of the V2.1 runner audit (`scratchpad/audit/AUDIT-FINDINGS.json`). Where an
 auditor and a verifier disagree, the verifier wins. ORD-8 was refuted and is not a basis for any rule here.
 **Reviewed:** the two design reviews of 2026-10-07 (evidence validity; feasibility and cost). §13 lists each issue they
@@ -31,7 +32,7 @@ through the real `run_target`, `_run_tests`, `mutants`, `main`, the real Process
   token, a command line or a range report is never proof. A process that only names the work tree, such as an
   operator's `tail -f`, is never signalled. The new tests signal nothing: their helpers end themselves on a sentinel.
 
-The cost of these rules: (a) a kill costs two short extra runs, the bracket (§4.1); (b) a mutant that hangs in k files
+The cost of these rules: (a) a kill costs three short extra runs, the bracket (§4.1, §14 fix 9); (b) a mutant that hangs in k files
 costs k × TIMEOUT; (c) any process the runner cannot prove is its own stops the target, and the worker with it. §10
 gives the measured numbers.
 
@@ -64,7 +65,9 @@ def _write_version(path: pathlib.Path, src: str, last: int) -> int:
   `__pycache__` purge — none of them closes the mechanism (BC-2, BC-4, ORD-3). The kill-test environment is an
   allowlist (§2.2), so an operator shell's `PYTHONDONTWRITEBYTECODE=1` never reaches a kill test either.
 - The tree check (§2.3) ignores `__pycache__` on purpose: the stamp, not a bytecode-free tree, makes bytecode safe.
-  FS-2's fixture `.pyc` always matches its never-mutated source; no kill file is edited for FS-2.
+  FS-2's fixture `.pyc` always matches its never-mutated source; no kill file is edited for FS-2. The stamp itself is
+  checked after every run, and any `.py` whose mtime changed is residue (§14 fix 1); what a `__pycache__` can still
+  decide is bounded by the fresh re-measure (§14 fix 10, FS-2).
 
 ### 1.3 Tests (`::Bytecode`)
 
@@ -128,6 +131,10 @@ site is added, and `destructive_sites.json` is unchanged (the tests signal and d
   test. Residue `{"added", "removed", "changed"}` (each list ≤ 50) goes on the run's own row, and the tree is rebuilt:
   a new tree from the pristine copy, the version under test written with `_write_version`, a new base manifest, the old
   tree removed.
+- The cwd is the tree, so `../x` (the tree's holder) and `../../x` (the target's scratch) are reachable too: the
+  holder must hold only `tree` (anything else is residue `beside`, and the rebuild replaces the holder), and the scratch
+  only that holder and the target's own pristine copy (anything else, `scratch`, cannot be removed by the runner: the
+  target stops, RESIDUE_UNREMOVABLE) — §14 fix 2.
 - The ownership boundary names the target's scratch directory, which holds every tree and run directory, so a rebuild
   does not move it.
 - Measured cost: a stat walk of the 1,995-file COPY tree takes 0.03–0.04 s (ORD-5 verifier); a rebuild 0.5–1.6 s, paid
@@ -142,10 +149,12 @@ New read-only `ca.carriers(prefix, table)`: the processes whose environment hold
 
 After every run, in this order (evidence review: order fixed, findings on the run's own row):
 
-1. **Settle:** `found = ca.strays(boundary) ∪ ca.carriers("AISEF_MUTATION_RUN=<worker>:")` — command-line matching is
-   kept in the union because code under mutation builds scrubbed environments (PL-6 verifier). `ca.signal_owned`
+1. **Settle:** `found = ca.strays(boundary) ∪ ca.carriers("AISEF_MUTATION_RUN=<worker>:") ∪ ca.cwd_under(<scratch>/)`
+   — command-line matching is kept in the union because code under mutation builds scrubbed environments (PL-6
+   verifier); the cwd scan finds a helper that has neither the token nor a scratch path (§14 fix 4). `ca.signal_owned`
    signals what it proves the runner's (ancestry, birth, group leadership); every pid found, signalled or not, is then
-   watched in the authority's own host table for `SETTLE_S` = 5 s; nothing is signalled while watching (PL-7). Found
+   watched in the authority's own host table for `SETTLE_S` = 60 s (§14 fix 5; it was 5 s); nothing is signalled while
+   watching (PL-7). Found
    processes go on the row as `leaked` (`pid`, `command`, `proved`), the signals with their proofs as `cleanup`. A pid
    still alive after the grace raises a stop: RESIDUAL_OWNERSHIP_UNKNOWN. A host table that cannot be read (`ps` fork
    failure) is a stop too: HOST_TABLE_UNREADABLE.
@@ -175,7 +184,7 @@ signalled only while the anchor is unreaped (PL-5 (b)). Then:
   its group is gone; a range that still will not empty stops the target.
 - Anything unproven and still alive stops the target, as in step 1.
 
-**Not added:** a cwd-in-tree scan with `lsof`; a "born during the run, now ppid 1" quarantine (false hits from launchd
+**Not added:** (a cwd-in-tree scan was not added here; §14 fix 4 adds it) a "born during the run, now ppid 1" quarantine (false hits from launchd
 jobs); Linux `PR_SET_CHILD_SUBREAPER`; taking the ownership proof before release() (ORD-7 (b); lead decision Q4: no
 change to the authority model).
 
@@ -273,6 +282,8 @@ def _mutant(tg, entry, src):
 
 - **The bracket** (evidence review, critical; it resolves Q6): a FAIL is a kill only when, right away and each in a
   fresh environment, the unmutated module PASSES what failed and the mutant FAILS it again with the same signature.
+  Since §14 fix 9 the unmutated module must PASS twice in a row (`BRACKET`), and since fix 10 a FAIL not confirmed in
+  place is measured once more on a fresh tree, the whole file (`_remeasure`); the code above is the first version.
   `_select` runs only what failed: the failing test (a subtest's whole test), the class for a setUpClass failure, and
   for a module-level failure (an import, setUpModule) the file's first test from T0, which imports the module and sets
   it up — measured: a failed import still reports under any `-k`. A fault present at the first run and gone by the
@@ -447,8 +458,9 @@ methods with byte-identical bodies, to `tests/v2/test_v21_identity_bytes.py` (in
 `PthChannel`'s decorator, docstring and `setUp` copied verbatim because the moved methods run under that fixture). The
 semantic file keeps its name, so `_V21_ID` and every kill-set list are unchanged and the scope manifest's `--check`
 stays green; only imports the moved methods alone used are dropped. `mutation.NOT_KILL_FILES` names the bytes file;
-`run_target` refuses a kill set naming one; `::KillSets` asserts no kill set does. Re-swept after the split: 16/16 nulls
-PASS.
+`run_target` refuses a kill set naming one; `::KillSets` asserts no kill set does. Re-swept after the split: the 16
+(null, `test_v21_identity.py`) pairs PASS, 16/16. The 7 C2-era pairs of §6.1 were not re-swept and still fail (the 60
+targets of §6.3, N1); "16/16 failing pairs now pass" would overstate it (order-equivalence prover).
 
 Two moved methods also carried valid kill evidence, restated beside them in commit 5b (ORD-1 verifier (c); reviews E9,
 F8; Q5):
@@ -461,7 +473,7 @@ F8; Q5):
   `calibrations()` with no rows is the shipped table (run.py `admit` and `calibrations`, bundle `load`, bundle_cli
   `migrate`).
 
-Re-swept after 5b: 16/16 nulls PASS. The other two moved methods carry nothing valid for any target that held them
+Re-swept after 5b: the 16 (null, `test_v21_identity.py`) pairs PASS, 16/16. The other two moved methods carry nothing valid for any target that held them
 (text of run.py; shipped rows whose only killable reader, `calibration.py::executing`, keeps `test_the_cycle1_probe_
 keeps_its_one_frozen_digest` and the rebound restatement).
 
@@ -505,8 +517,13 @@ m's bytes with a stamp no earlier version had; HOME, XDG and TMPDIR are fresh; n
 nothing naming its scratch is alive.
 
 1. **Every run starts clean** (§1, §2), and a run that could not start clean does not start: the target stops. So
-   o(m, f) depends on m and f only. Kill files are assumed deterministic; one that is not shows as an unconfirmed FAIL
-   (INFRA) or as rows that differ between orders (§7.3).
+   o(m, f) depends on m and f only. Kill files are assumed deterministic. One that is not is caught often, not always
+   (classification prover: the earlier claim "it shows as an unconfirmed FAIL" was wrong): a file that fails a run
+   with probability p, whatever the mutant, gives a confirmed false KILLED only if its first run fails, both controls
+   pass and the re-run fails with the same signature — about p²(1−p)²(1+p) per survivor-file with the two controls of
+   §14 fix 9 and the fresh re-measure of fix 10 (the p³ term: unconfirmed in place, then the same again on a fresh tree;
+   it was about p²(1−p) with one control), and a file that fails every other run of itself is caught every time.
+   It can also differ between orders (§7.3).
 2. **The bracket is a function of (m, f)** too: it runs only what f's FAIL named, on the null and on m, each clean. So
    whether f's FAIL is confirmed depends on m and f only, and the confirmed outcomes O(m) = {o(m, f)} are a function of
    m and the kill *set*.
@@ -545,12 +562,23 @@ from the truth, so the toy cannot pass vacuously. Runtime: the whole runner test
 
 ### 7.3 Limits, stated
 
-- **A detached process with no token and no scratch path in its command line** is invisible: a constructed
-  environment, or an Apple platform binary whose environment `ps -E` hides. The PL-1 grep found one detached spawn in
-  the 36 V2.1 kill files (`test_v21_continue_integrity.py` MUL_SLOW, which the test waits for).
+- **A detached process with no token, no scratch path in its command line and a working directory outside the
+  scratch** is invisible (a helper that `chdir`s away, or one started with its own `cwd`). Since §14 fix 4 a constructed
+  environment or a platform binary that kept the cwd it inherited is found by the cwd scan. The PL-1 grep found one
+  detached spawn in the 36 V2.1 kill files (`test_v21_continue_integrity.py` MUL_SLOW, which the test waits for).
 - **A kill file whose outcome is nondeterministic** (load-dependent timeouts, `PYTHONHASHSEED` — unpinned, as in the
   workers, OBS-S2-12) can differ between orders through nondeterminism; the rows show it.
-- **Stops are order-dependent** (§7.1 step 6) and never produce a class.
+- **Stops are order-dependent** (§7.1 step 6) and never produce a class. Concretely (ORD-7): a leftover that outlives
+  the grace (`SETTLE_S`, 60 s since §14 fix 5) stops the target in an order that reaches its file and not in one where
+  an earlier file kills first; the re-run is deterministic, so in that order the target is never classified. Such a
+  stop belongs in the campaign manifest as an order-dependent target fate; removing it needs ownership taken before
+  release() (ORD-7 (b)), an authority-model change for the owner.
+- **A `__pycache__` written during a run persists in the tree** (FS-2: the ledgerlock fixture's, and every package's):
+  the residue manifest leaves `__pycache__` out, and removing it after every run needs either a destructive site
+  outside the closed authority-source set, an environment change every bytecode reproducer would see, or a rebuild per
+  run (§14, FS-2). Import semantics are unaffected (the caches are of unchanged sources); a FAIL it could cause is
+  re-measured on a fresh tree (§14 fix 10); a PASS it could cause (a test that passes only beside a cache) is not.
+- **Nondeterministic kill files**: the residual false-kill rate of §7.1 step 1.
 
 ## 8. What this does NOT change
 
@@ -581,9 +609,10 @@ from the truth, so the toy cannot pass vacuously. Runtime: the whole runner test
 | 3 | `ce5f4ef` | classification and record: per-run outcomes, the bracket, `mutant_class`, the runner-2 record, the stop, `target_problems`/`problems_of`, v21 `build` (§3, §4) | `::Outcome`, `::Classify`, `::Proc` (PL-7, mid-target stop) |
 | 4 | `6ab3c09` | T0: `null_mutant`, T0 per file, the original diagnostic, `mutation.py t0` (§5) | `::T0` |
 | 5 | `ba853fd` | the identity split, `NOT_KILL_FILES`, the conformance ruling's ids re-pointed (§6.2) | `::KillSets`; the T0 sweep table in the message |
-| 5b | `c08760b` | the two semantic restatements (§6.2) | re-swept 16/16 |
+| 5b | `c08760b` | the two semantic restatements (§6.2) | re-swept: 16/16 identity-file pairs |
 | 6 | `9cba6e0` | the order-independence matrix and the bounded release (§7, §2.4) | `::Order`, `::Proc` (VS-7/PL-5) |
-| 7 | this file | the contract, with the reviews' resolutions and the measurements | — |
+| 7 | `671d78e` | the contract, with the reviews' resolutions and the measurements | — |
+| fix 1–13 | §14 | the provers' open items, one commit each, each with its test | §14 |
 
 No kill-set reorder is in this series: the owner asked for it as a separate, later commit (§8).
 
@@ -616,7 +645,7 @@ small V2.1 targets, each with a 2-file kill set:
 - **Per run, the runners cost the same:** on `check_contradictions` a run costs 0.43 s new (0.16 s of kill test, 0.27 s
   of range start and release, settle — two `ps` reads — run directory and tree check) against 0.47 s old (16.0 s over
   34 runs, its range, interpreter start and one `ps` read per mutant included).
-- **The whole difference is the bracket** (§4.1): two more runs per KILLED mutant, here about 0.43 s each (only the
+- **The whole difference is the bracket** (§4.1): two more runs per KILLED mutant (three since §14 fix 9), here about 0.43 s each (only the
   failing test runs, but the interpreter, the range and the module import are paid), so about **+0.9 s per kill**.
   A survivor pays no bracket: its cost is today's (one run per kill file) plus the settle per file (≈ 0.1 s).
 - On these kill-dominated, sub-second targets the overhead is far above the earlier draft's 25 % acceptance bar. The
@@ -630,7 +659,8 @@ small V2.1 targets, each with a 2-file kill set:
 
 - **Kills:** about +0.9 s per kill on fast files, more where a file's import or `setUpClass` is heavy (unmeasured). The
   V2.0-S2 campaign had 12,248 kills in 12,727 mutants; at that ratio, V2.1's 11,363 mutants give about 10,900 kills,
-  about +2.7 CPU-hours — under an hour of wall time on 4 workers.
+  about +2.7 CPU-hours — under an hour of wall time on 4 workers. §14 fix 9 adds one control run per kill (about
+  +0.45 s each, +1.4 CPU-hours), fix 4 a 0.02 s `lsof` read per run; fix 10 costs only on an unconfirmed FAIL.
 - **T0** is the old baseline's cost (one pass of each kill file per target); the sweep measured 129 distinct pairs in
   5,656 s; the campaign's per-target T0 is about 15 CPU-hours (feasibility review), as the old baseline was.
 - **The large changes are not overhead but evidence:** the 200 targets the split unmasks (§6) now run their kill sets
@@ -649,20 +679,20 @@ small V2.1 targets, each with a 2-file kill set:
 | VS-1 | any non-zero exit was a kill; no cause recorded | §3.1, §3.2, §4.1 bracket (3) | `Outcome` faults after T0 → INFRA rows, 0 KILLED, refused |
 | VS-2 | a timeout was a kill and stopped the chain; `timed_out` order-dependent | §3.1 TIMEOUT, §4.1 no stop, §4.2 `timed_out` only on the TIMEOUT class (3) | `Classify` 2 |
 | VS-3 | a lost report channel was a timeout | §3.1, judged by the clock before release (3) | `Outcome` anchor loss / real expiry |
-| VS-4 | an infra event discarded mutants 1..N-1 or killed the worker | §4.4 (3) | `Proc` mid-target stop, `Classify` 3 |
-| VS-5 | failfast hid a valid kill behind an infra ERROR, in a file and across files | §4.1 the bracket; an unconfirmed FAIL continues the chain (3) | `Outcome` transient EMFILE, both orders |
-| VS-6 | exit 0 accepted with any count; vacuous baseline | §3.1 counts and skipped ids against T0; T0 refuses all-skipped (3, 4) | `Outcome` vacuous pass |
+| VS-4 | an infra event discarded mutants 1..N-1 or killed the worker | §4.4 (3); outside a mutant: §14 fix 8 | `Proc` mid-target stop, `Classify` 3, §14 fix 8 |
+| VS-5 | failfast hid a valid kill behind an infra ERROR, in a file and across files | §4.1 the bracket; an unconfirmed FAIL continues the chain (3); in a file: §14 fix 10 | `Outcome` transient EMFILE, both orders; §14 fix 10 |
+| VS-6 | exit 0 accepted with any count; vacuous baseline | §3.1 counts and skipped ids against T0; T0 refuses all-skipped (3, 4); §14 fixes 10, 13 | `Outcome` vacuous pass; §14 |
 | VS-7 / PL-5 | Residual → kill; unbounded release | §2.4 release (3) | `Proc` bounded release (macOS) |
 | FS-1 | shared tree/HOME/TMPDIR | §2.2, §2.3 (2) | `Env` case S, HOME; `Order` restore-off control |
-| FS-2 | fixture .pyc in the tree | harmless under §1 (1) | `Order` bytecode channel |
+| FS-2 | fixture .pyc in the tree | harmless under §1 (1); not removed — §7.3, §14 | `Order` bytecode channel; §14 fix 10 (presence toy) |
 | FS-3 | mkdtemp leaks into the worker TMPDIR | §2.2 (2) | `Env` HOME/XDG/TMPDIR |
 | FS-4 | the live record copied into later trees | §2.1 (2) | `Env` live record |
 | BC-1 | same-second same-size versions shared a .pyc | §1.2 (1) | `Bytecode` 1–4, `Order` stamp-off control |
 | BC-2 | `-I` children write, `-B` parents read | §1.2 (1) | `Bytecode` 1–2 |
 | BC-3 | 24 exposed old V2.1 kills | no reuse; `problems_of("V2.1")` (3) | `Classify` 6 |
 | BC-4 | a purge misses a pycache prefix | §1.2 (1) | `Bytecode` 2 under PYTHONPYCACHEPREFIX |
-| PL-1 | detached helpers unseen | §2.4 token ∪ command line, settle after every run (2) | `Proc` token helper |
-| PL-2 | infra fault after the baseline became kills | §4.1 bracket per kill (3) | `Outcome` persistent and transient faults |
+| PL-1 | detached helpers unseen | §2.4 token ∪ command line ∪ cwd (§14 fix 4), settle after every run (2) | `Proc` token helper, cwd helper |
+| PL-2 | infra fault after the baseline became kills | §4.1 bracket per kill (3), two controls (§14 fix 9) | `Outcome` persistent and transient faults, TIME_WAIT stand-in |
 | PL-3 | `strays_reaped` 0 by construction; strays persisted | §2.4 (signals counted only with proof; stop; restart sweep) (2) | `Proc` cases, restarted worker |
 | PL-4 | baseline unchecked; leak blamed on mutant 1 | §2.4 settle after every run including T0 (2, 4) | `Proc` baseline stray |
 | PL-6 | an outside process naming the tree aborted the target and lost its results | §2.4, §4.4 (2, 3) | `Proc` outside process, mid-target stop |
@@ -670,10 +700,10 @@ small V2.1 targets, each with a 2-file kill set:
 | ORD-1 | byte/text-identity tests "killed" every mutant of 5 modules | §5 T0 gate, §6 split (4, 5, 5b); 60 targets refused pending N1 | `T0` toy; §6.1 sweep (129 pairs) |
 | ORD-2 | stop on timeout or any non-zero exit | §4.1 (3) | `Order`, `Classify` 1 |
 | ORD-3 | fast first files widen stale-bytecode exposure | §1 (1) | `Order` (fast `test_k` first in a rotation) |
-| ORD-4 | the reuse proof pins kill-set order | not changed; `execution_order` for the later reorder (§8) | — |
+| ORD-4 | the reuse proof pins kill-set order | not changed; `execution_order` for the later reorder (§8); owner decision (§14) | — |
 | ORD-5 | cross-file and cross-mutant state | §2.2, §2.3 per run (2) | `Env` case S; `Order` |
 | ORD-6 | no killing file or cause recorded | §3.2, §4.2 (3) | `Classify` 4 |
-| ORD-7 | target fate depends on whether an escaping file is reached | a stop, never a class; settle narrows the window (2, 3); §7.3 | `Proc` stops |
+| ORD-7 | target fate depends on whether an escaping file is reached | a stop, never a class; settle narrows the window (2, 3); a 60 s grace (§14 fix 5); §7.3 | `Proc` stops; §14 fix 5 |
 | VS-8, FS-5, FS-6, BC-5..7, PL-8, ORD-9, ORD-10 (info) | — | VS-8 → §8; FS-5 → `MUTANT` lines and runbook; PL-8 → §2.2 | — |
 
 ## 12. Open questions for the owner
@@ -702,7 +732,10 @@ New, for the owner:
 - **N2.** The conformance ruling's re-pointed and added behaviour-test ids (§6.4) are B-03d evidence; review them
   before `v21_conformance_ruling.py --write`.
 - **N3.** The bounded-release test runs on macOS only (§2.5): the rejoin mechanism was measured there; on Linux the
-  anchor is a subreaper and the same toy may take another path. The rule is the same on both.
+  anchor is a subreaper and the same toy may take another path. The rule is the same on both. So does §14's release-budget
+  test.
+- **N4 (§14).** FS-2: whether a `__pycache__` a run writes must be removed after every run, and by which of the three
+  routes §14 lists (each needs an owner decision or a full T0 sweep first).
 
 ## 13. Review resolutions (2026-10-07)
 
@@ -744,3 +777,63 @@ Every issue of both reviews was checked against the code and, where it made a me
 | F14 | minor | Record files would grow to tens of MB | Yes | Only non-PASS rows keep `tail`; every row keeps `tail_sha256` and its counts (§3.2) |
 | F15 | minor | §5.4's AST equality is false for SCRIPT targets | Yes (measured) | The test compares the module with the script left out plus the parsed script (§5) |
 | F16 | minor | The order test's runtime was guessed | Yes | Measured (§7.2): rotations only, and each control in one order |
+
+## 14. The provers' open items (fix series, 2026-10-07)
+
+Five provers re-checked commits 1–7 by lens and left the items below open or new. Each was reproduced or read against
+the code before any change; each fix is its own commit with its own test in `tests/v2/test_v21_mutation_runner.py`, and
+each test was also run with the old code swapped in (or the protection switched off) to show it fails there. Every
+commit kept `mutation.py --check` identical to c9c736f's output (§8), `destructive_authority --check` PASS (no
+destructive site added: every removal is still a `TemporaryDirectory` cleanup), and ruff clean.
+
+| Fix | Commit | Item (lens) | Holds? | Change | Test |
+|---|---|---|---|---|---|
+| 1 | `ae975d4` | the stamp is not checked after a run: a kill file that rewrites the mutated module with its own bytes brings BC-1's collision back (bytecode) | Yes (prover: 3/5 false SURVIVED, no error) | the mutated file must keep `st_mtime_ns == stamp * 10**9`; any `.py` whose mtime changed is residue | `Bytecode.test_a_touched_source_is_residue_so_the_stamp_cannot_be_lost` |
+| 2 | `870b132` | `../x` and `../../x` from the tree are not checked (filesystem-state) | Yes (prover: 2 false SURVIVED in both orders) | holder must hold only `tree` (else rebuild); scratch only the holder and its pristine copy (else stop) | `Env.test_what_a_run_leaves_beside_the_tree_is_residue_too` |
+| 3 | `0089945` | one empty `ps` read reads as "every process gone" (process-env) | Yes | `ca._read` and `ca.carriers` raise when `ps` fails or does not list itself; the runner stops HOST_TABLE_UNREADABLE | `Proc.test_a_host_table_that_cannot_be_read_stops_instead_of_reading_as_empty` |
+| 4 | `aca1280` | PL-1 (3): a helper with its own environment and no scratch path is invisible (process-env) | Yes (prover: order flipped 5/8 mutants, clean record) | new read-only `ca.cwd_under`: processes born after the boundary whose cwd is in the scratch (macOS `lsof`, Linux `/proc`); candidates only, unprovable ones stop the target | `Proc.test_a_helper_with_its_own_environment_is_found_by_its_cwd` |
+| 5 | `cd4b336` | ORD-7: an escapee outliving 5 s stops the target in one order only (order-equivalence) | Yes; narrowed, not removed | `SETTLE_S` 5 s → 60 s (covers the measured 8 s and 30 s helpers; paid only while one is alive) | `Proc.test_an_escapee_that_ends_within_the_grace_does_not_make_the_order_decide` |
+| 6 | `457ca93` | Residual pids taken by a regex over text the code under test controls (process-env) | Yes (prover: `max(1, 2)` → watch launchd → stop) | the list release() ends its message with, read after the exact prefix rebuilt from the range's name and ledger; another shape stops | `Proc.test_the_pids_release_names_are_read_from_its_list_not_from_command_text` |
+| 7 | `012ff83` | the second release() after RangeNotEmpty gets a fresh RELEASE_WAIT_S (process-env) | Yes (prover: 129 s at the default) | the second call gets what is left of one budget | `Proc.test_one_release_budget_per_run` (macOS) |
+| 8 | `269baf5` | VS-4: establish, the first tree and T0 outside the guard; main has no per-target guard (classification) | Yes; and a latent `KeyError` (a run-directory failure in a mutant's chain left a row with no outcome) | any exception in `_run_file` is a RUNNER_EXCEPTION stop with a well-formed row; run_target guards establish/tree/T0; main writes an errored entry, prints STOPPED and NOT RUN (now the targets not yet run), exits 3 | `Classify.test_a_runner_failure_outside_a_mutant_keeps_what_was_measured_and_names_what_did_not_run` |
+| 9 | `8a51b33` | PL-2: a fault the control's PASS leaves for the re-run (TIME_WAIT) confirms a false kill (process-env, major) | Yes (prover: 2/2 aligned runs, clean record) | `BRACKET`: two control PASSes, then the re-run; `_confirmed` reads the same | `Outcome.test_a_fault_a_passing_run_leaves_for_the_next_is_never_a_kill` |
+| 10 | `95748ea` | VS-5 in a file; VS-6 (b) a test that cannot run alone; FS-2's presence mechanism (classification, order-equivalence) | Yes, all three | `_remeasure`: an unconfirmed FAIL keeps its row as `unconfirmed`, the file runs once more, whole, on a rebuilt tree; a FAIL there is bracketed whole, each run in a new tree | `Outcome.test_an_unconfirmed_fail_is_measured_again_on_a_fresh_tree` |
+| 11 | `2f8ec29` | `mutation.py t0` prints PASS for a refused kill set (order-equivalence) | Yes | no T0 row is a failure | `T0.test_the_t0_command_runs_t0_alone_and_writes_nothing` |
+| 12 | `7e8e26e` | `timed_out` in execution order (order-equivalence) | Yes | sorted | `Classify.test_timed_out_does_not_depend_on_the_order` |
+| 13 | `f72fb5b` | VS-6 (a): "re-run them" for mutants a re-run cannot confirm (classification) | Yes | the error says how many end with no summary and need a kill test or a ruling | `Classify.test_the_error_says_which_unclassified_mutants_a_re_run_cannot_resolve` |
+| doc | this commit | the report's "16/16 failing pairs now pass" (order-equivalence) | Yes | §6.2: 16/16 identity-file pairs; the 7 C2-era pairs still fail (N1) | — |
+| doc | this commit | §7.1's claim that a nondeterministic file "shows as an unconfirmed FAIL" (classification) | Yes | the residual rate stated (§7.1 step 1) | fix 10's parity case |
+
+**Not fixed, and why:**
+
+- **FS-2 — a `__pycache__` written during a run persists in the tree** (filesystem-state; the order-equivalence prover's
+  toy8 is the same mechanism). Its classification effects in the FAIL direction are closed by fix 10 (toy8: SURVIVED x2
+  in both orders), and its import effects cannot occur (the caches are of sources fix 1 proves unchanged). The cache
+  itself is not removed: (a) removing it after every run needs a destructive call site whose target the closed
+  authority-source set of `destructive_authority.py` cannot express (a path the runner found by walking its own tree) —
+  an INV-MUTATION-AUTHORITY change for the owner; (b) `PYTHONDONTWRITEBYTECODE`/`PYTHONPYCACHEPREFIX` for every kill test
+  would change what the bytecode reproducers measure (12 test files under tests/v2 read or set bytecode state) and needs a full T0 sweep before
+  adoption; (c) a rebuild after every run costs 0.5–1.6 s a run (2–3× the campaign); precompiling the pristine copy
+  would put `.pyc` files where kill tests assert none (`plain.rglob("*.pyc") == []`). What stays open: a test that
+  passes only beside a cache an earlier run wrote. None is known.
+- **ORD-4 — the reuse proof pins kill-set order** (order-equivalence). Unchanged by instruction (the reorder is a later,
+  separate commit, §8): `proof()`, the Phase test and the scope manifest fail loudly on any reorder, and no reorder exists
+  yet. Relaxing them changes frozen criteria — the owner's decision.
+- **ORD-7's residue** — a leftover living longer than 60 s still stops the target in the orders that reach its file
+  (§7.3). Removing it needs ownership taken before release() (ORD-7 (b)), an authority-model change for the owner.
+- **The prover's optional extras not built:** every `.py`'s mtime is in fix 1 (built); a widened signature with the
+  assertion message (PL-2, optional), pinning `PYTHONHASHSEED`, or T0 run twice to record reproducibility (VS-6
+  nondeterminism, optional: T0 twice would cost hours on the 257 s file) — owner's call.
+
+**Overhead of the fix series, measured** (2026-10-07, `heavy.sh`, the workers' `env -i`; `mutation.py run` on a
+`git archive` of 671d78e and of f72fb5b, the same two named targets; `scratchpad/runner-v2/fixer/measure.sh`):
+
+| Target | Mutants | 671d78e | f72fb5b | Runs (primary / control / re-run) | Runner s per run |
+|---|---|---|---|---|---|
+| `cli_invocation.py::_stream_bytes` | 7 | 16.1 s | 20.5 s | 7 / 7 → 14 / 7 | 0.27 → 0.29 |
+| `process_effect.py::_flat_ok` | 3 | 15.3 s | 17.3 s | 3 / 3 → 6 / 3 | 0.27 → 0.29 |
+
+Every mutant has the same class under both (all KILLED). The difference is the second control (fix 9): one run per
+kill, about 0.6 s each here, so about +1.8 CPU-hours over ~10,900 kills; the cwd read (fix 4) adds about 0.02 s per
+run; the fresh re-measure (fix 10) and the 60 s grace (fix 5) cost nothing on these targets. The runner's own test
+file: 48 tests, 417 s under `heavy.sh` (it was 36 tests, 252 s).
