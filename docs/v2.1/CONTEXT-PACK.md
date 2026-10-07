@@ -107,19 +107,21 @@ từng byte** bản trước.
 | Nói gì | mỗi lượt trước, mới nhất trước: cha; kết quả developer (văn bản adapter); candidate, hoặc "chính cha — lượt đó không đổi gì"; mệnh đề **đạt** (verdict = kỳ vọng của plan cho mệnh đề đó, verifier đồng ý — mệnh đề của bất kỳ story nào, vì PRESERVE của story đã commit cũng được chứng minh ở candidate; mệnh đề plan không biết thì không bao giờ đạt); mệnh đề **không có proof ghi lại** trong lượt đó (không nói nguyên nhân: lượt có thể dừng trước proof, hoặc ngay ở probe của nó — PROBE_MISMATCH, PROBE_INVALID_SPEC). Lượt hiện tại bắt đầu lại ở cha; chỉ dòng nêu một candidate nói nó là commit của repo (không nêu candidate nào — lượt sự cố, lượt chứng minh chính cha, lượt dừng ở probe — thì không có câu đó) | `test_what_an_earlier_attempt_left…`, `test_only_the_attempt_s_candidate_counts…`, `Expectation`, `test_no_proof_recorded_is_all_it_says…`, `test_only_a_named_candidate_is_said…` |
 | Trích nguồn | mỗi dòng kèm `(journal seq …)`; điều vắng mặt trích khoảng seq của lượt | `test_every_item_cites…` (seq có thật, đúng story, đúng loại) |
 | Tất định | sắp theo seq, mệnh đề theo tên; không thời gian, môi trường, ngẫu nhiên | `test_an_identical_journal_gives_identical_bytes…` |
-| Có biên | `PACK_MAX` 4000 ký tự (prompt là một phần tử argv; dòng lệnh Windows ≤ 32 767), `PACK_LIST` 12 tên/dòng, `PACK_ATTEMPTS` 4 lượt gần nhất, kết quả developer cắt đúng 300 ký tự; cắt theo dòng nguyên, có dấu; lượt mới nhất đứng trước nên biên cắt lượt cũ nhất | `test_it_is_bounded`, `test_at_the_real_bound_the_latest_attempts_are_kept…` |
+| Có biên | `PACK_MAX` 4000 ký tự (prompt là một phần tử argv; dòng lệnh Windows ≤ 32 767), `PACK_LIST` 12 tên/dòng, `PACK_ATTEMPTS` 4 lượt gần nhất, kết quả developer cắt đúng 300 ký tự; cắt theo dòng nguyên, có dấu; dừng khi còn `PACK_MAX - 120` để chừa chỗ cho dấu dừng (58 ký tự kể cả xuống dòng); lượt mới nhất đứng trước nên biên cắt lượt cũ nhất | `test_it_is_bounded`, `test_at_the_real_bound_the_latest_attempts_are_kept…`, `test_at_the_real_bound_the_stop_mark_fits…` (một dòng của gói chưa cắt kết thúc ở ký tự `PACK_MAX - 58 + 1`: giữ nó thì vượt biên) |
 | Không chứa vật liệu ẩn, bí mật | không đọc `probe/evaluated`, `tool/*`, `gate/check`, `tests/*`, stream phiên; không spec id, semantic hash; story khác bị loại; bí mật của run → `[REDACTED]` (`Developer.implement` đưa bí mật của phiên vào gói) | `test_it_never_holds_proof_material…`, `test_a_review_result_is_never_taken…`, `Prompt.test_the_run_s_secrets_reach_the_pack_in_the_prompt` |
 | Không phải quyền uy | tiêu đề "context only — no verdict, approval or budget reads it"; không ghi vào journal; trong `aisef2/` chỉ `feedback.py` và `adapters.py` nhắc tới nó | `test_it_is_labelled…`, `ThroughTheRun` (journal không chứa nó) |
 | Tóm tắt do agent viết | **không có** | — |
 
 Đột biến tay (không phải chiến dịch mutation của kernel): `validation/v21/context_pack_mutants.py` chạy trên bản sao của
-HEAD, baseline xanh trước, 15 đột biến — 14 trên các dòng của `context_pack` (bỏ kỳ vọng, mặc định SATISFIED cho mệnh đề
+HEAD, baseline xanh trước, 17 đột biến — 16 trên các dòng của `context_pack` (bỏ kỳ vọng, mặc định SATISFIED cho mệnh đề
 lạ, kỳ vọng chỉ của story này, bỏ điều kiện verifier đồng ý, cắt 299/301/1000, redact sau khi cắt, thứ tự cũ trước, trần 5
-lượt, mọi mệnh đề là "không có proof", proof sau thay proof đầu, tiêu đề nói "candidate là commit" dù không nêu candidate,
-dòng candidate bỏ câu đó) và 1 trên lời gọi của nó trong `Developer.implement` (không đưa bí mật của run — trước vòng 2,
-đột biến này **sống sót** cả 17 test): **15/15 bị giết** tại `1899bb0`
-([evidence/context-pack-mutants.out](evidence/context-pack-mutants.out)). Các lớp test chạy: `Pack`, `Expectation`,
-`Prompt`, `RecordedSmoke2` (không có `ThroughTheRun`).
+lượt, mọi mệnh đề là "không có proof", proof sau thay proof đầu, lề cho dấu dừng `PACK_MAX - 120` thành `PACK_MAX` và
+thành `PACK_MAX - 56`, tiêu đề nói "candidate là commit" dù không nêu candidate, dòng candidate bỏ câu đó) và 1 trên lời gọi
+của nó trong `Developer.implement` (không đưa bí mật của run — trước vòng 2, đột biến này **sống sót** cả 17 test):
+**17/17 bị giết** tại `9f6a2ae` ([evidence/context-pack-mutants.out](evidence/context-pack-mutants.out)). Các lớp test
+chạy: `Pack`, `Expectation`, `Prompt`, `RecordedSmoke2` (không có `ThroughTheRun`). Đột biến lề `PACK_MAX` **sống sót** cả
+19 test tại `9198d47` (gói vượt biên tới 57 ký tự). Lề từ 57 trở lên vẫn giữ biên (phần giữ lại ≤ `PACK_MAX` − 58, cộng
+dấu dừng 58 ký tự), nên test giữ biên chứ không giữ đúng hằng số 120.
 
 Gói nằm trong prompt, nên đã được ràng buộc bằng `prompt_sha256` của phiên (`adapters.py`) — không cần trường bản ghi
 mới. Dựng lại nó cần journal, bundle đã duyệt và, khi một bí mật đã bị che trong kết quả developer, chính bí mật đó:
