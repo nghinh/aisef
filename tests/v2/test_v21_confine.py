@@ -9,12 +9,10 @@ validation/v21/sandbox (docker): this module never claims it."""
 
 from __future__ import annotations
 
-import contextlib
 import functools
 import json
 import os
 import pathlib
-import signal
 import subprocess
 import sys
 import tempfile
@@ -29,8 +27,13 @@ if str(ROOT) not in sys.path:
 
 from aisef2.app import client, confine, settings  # noqa: E402
 from aisef2.app import run as R  # noqa: E402
+from aisef2.runtime.process_range import ProcessRange  # noqa: E402
 from tests.v2 import test_app_run as app_run  # noqa: E402 — the module, so its Command tests are not collected again
 from tests.v2.test_app_run import SETTINGS, ProductBase, provider  # noqa: E402
+
+if str(ROOT / "validation" / "v2") not in sys.path:
+    sys.path.insert(1, str(ROOT / "validation" / "v2"))
+import cleanup_authority as ca  # noqa: E402  — INV-MUTATION-AUTHORITY: what the measurement reports is never permission
 
 #: what a run may ask for: the shared network (a session must reach its provider); "none" is measurement-only
 SPEC = {"backend": "bwrap", "bwrap": "/usr/bin/bwrap", "network": "host", "read_only": []}
@@ -55,6 +58,50 @@ def fake_bwrap(where: pathlib.Path, log: pathlib.Path | None = None) -> pathlib.
 
 def pairs(argv: list[str], flag: str) -> list[tuple[str, str]]:
     return [(argv[i + 1], argv[i + 2]) for i, a in enumerate(argv[:argv.index("--")]) if a == flag]
+
+
+#: `measure_in_range`'s child: confine.measure as a run calls it, the probe's own call recorded (its sleep, its timeout)
+MEASURE = r'''import json, pathlib, sys
+from unittest import mock
+sys.path.insert(0, sys.argv[1])
+from aisef2.app import confine
+io = pathlib.Path(sys.argv[2])
+a = json.loads(io.read_text(encoding="utf-8"))
+real, probes = confine.subprocess.run, []
+def spy(argv, *x, **k):
+    if confine.PROBE in argv:       # the probe's $7 is its sleep: after PROBE, "probe" and $1..$6
+        probes.append((argv[argv.index(confine.PROBE) + 8], k["timeout"]))
+    return real(argv, *x, **k)
+with mock.patch.object(confine.subprocess, "run", spy):
+    rep = confine.measure(a["spec"], pathlib.Path(a["where"]), a["exe"], system="linux", environ=a["environ"])
+io.write_text(json.dumps({"rep": rep, "probes": probes}), encoding="utf-8")
+'''
+
+
+def measure_in_range(tmp: pathlib.Path, spec: dict, where: pathlib.Path, exe: pathlib.Path) -> tuple[dict, list]:
+    """(report, the probe's calls) of confine.measure run as the target of a process range this test starts, so the
+    sleeper an unconfined probe leaves is provably the test's — never a pid the measurement reports
+    (INV-MUTATION-AUTHORITY): on macOS (no setsid) it stays in the range's group, which release() signals; on Linux
+    setsid takes it out of the group and the range's anchor, a subreaper, adopts it, so cleanup_authority proves it
+    from its own reading of the host (the anchor the test's child, both born after the boundary) and only then signals
+    it. One it cannot prove is never signalled: release() raises RangeEscaped and the test fails."""
+    io = tmp / "measure.json"
+    io.write_text(json.dumps({"spec": spec, "where": str(where), "exe": str(exe),
+                              "environ": {"PATH": "/usr/bin:/bin", "HOME": str(tmp)}}), encoding="utf-8")
+    boundary = ca.establish(tmp)
+    with open(tmp / "measure.log", "wb") as log:
+        r = ProcessRange("confine.measure", [sys.executable, "-c", MEASURE, str(ROOT), str(io)], output=log,
+                         grace_s=(0.1, 2.0), wait_s=10.0).start()
+    try:
+        r.wait(confine.PROBE_TIMEOUT + 60)
+        adopted = [p.pid for p in ca.owned(boundary).values() if p.ppid == r.group]
+        ca.signal_owned(boundary, pids=adopted)
+    finally:
+        r.release()
+    out = json.loads(io.read_text(encoding="utf-8"))
+    if "rep" not in out:
+        raise AssertionError(f"the measurement did not answer: {(tmp / 'measure.log').read_text(errors='replace')[-2000:]}")
+    return out["rep"], out["probes"]
 
 
 class Setting(unittest.TestCase):
@@ -140,7 +187,9 @@ class CommandLine(unittest.TestCase):
         self.assertEqual(env["HOME"], confine.HOME)
         self.assertTrue(all(env[k].startswith(confine.HOME) for k in ("XDG_DATA_HOME", "XDG_STATE_HOME", "XDG_CACHE_HOME")))
         self.assertEqual(env["XDG_CONFIG_HOME"], str(self.home / ".config"))   # its opencode/ directory, read-only
-        (self.home / ".config" / "opencode").rmdir()
+        bare = self.tmp / "bare-home"       # a HOME whose .config has no opencode/ directory
+        (bare / ".config").mkdir(parents=True)
+        self.env["HOME"] = str(bare)
         _, env = self.wrap()
         self.assertEqual(env["XDG_CONFIG_HOME"], f"{confine.HOME}/.config")
 
@@ -231,11 +280,7 @@ class FailClosed(unittest.TestCase):
             exe.parent.mkdir()
             exe.write_text("#!/bin/sh\n")
             where = tmp / "run" / "confinement"
-            rep = confine.measure(dict(SPEC, bwrap=str(fake)), where, str(exe), system="linux",
-                                  environ={"PATH": "/usr/bin:/bin", "HOME": str(tmp)})
-            for pid in rep["setsid_survivors"]:     # the unconfined probe's sleeper: not left running after the test
-                with contextlib.suppress(ProcessLookupError):
-                    os.kill(pid, signal.SIGKILL)
+            rep, _ = measure_in_range(tmp, dict(SPEC, bwrap=str(fake)), where, exe)   # its sleeper not left running
             for want in ("a file of the run directory was readable", "a file was created in the run directory",
                          "a file was created in the client directory", "a file was created in the git directory"):
                 self.assertIn(want, rep["problems"])
@@ -262,11 +307,7 @@ class FailClosed(unittest.TestCase):
             exe = tmp / "client" / "opencode"
             exe.parent.mkdir()
             exe.write_text("#!/bin/sh\n")
-            rep = confine.measure(dict(SPEC, bwrap=str(fake)), tmp / "run" / "confinement", str(exe), system="linux",
-                                  environ={"PATH": "/usr/bin:/bin", "HOME": str(tmp)})
-            for pid in rep["setsid_survivors"]:
-                with contextlib.suppress(ProcessLookupError):
-                    os.kill(pid, signal.SIGKILL)
+            rep, _ = measure_in_range(tmp, dict(SPEC, bwrap=str(fake)), tmp / "run" / "confinement", exe)
         self.assertTrue(rep["problems"][0].startswith("the sandbox did not run the probe (exit 3): "), rep["problems"])
         self.assertIn("setsid", rep["tried"])     # the probe ran to its end: only its exit refuses it
 
@@ -321,24 +362,13 @@ class FailClosed(unittest.TestCase):
     def test_the_sleeper_outlives_a_probe_that_used_all_its_time_and_the_grace(self):
         """A survivor is dropped only by being gone, so the probe's sleeper must not reach its own end before the last
         look: it lives longer than the probe's time limit plus SURVIVOR_GRACE plus 1 s for that look, so a probe that
-        exits 0 just inside its limit still leaves a survivor alive to be seen."""
-        real, probes = subprocess.run, []
-
-        def spy(argv, *a, **k):
-            if confine.PROBE in argv:       # the probe's $7 is its sleep: after PROBE, "probe" and $1..$6
-                probes.append((argv[argv.index(confine.PROBE) + 8], k["timeout"]))
-            return real(argv, *a, **k)
+        exits 0 just inside its limit still leaves a survivor alive to be seen (the probe's call: MEASURE's spy)."""
         with tempfile.TemporaryDirectory() as t:
             tmp = pathlib.Path(os.path.realpath(t))
             exe = tmp / "client" / "opencode"
             exe.parent.mkdir()
             exe.write_text("#!/bin/sh\n")
-            with mock.patch.object(confine.subprocess, "run", spy):
-                rep = confine.measure(dict(SPEC, bwrap=str(fake_bwrap(tmp))), tmp / "run" / "confinement", str(exe),
-                                      system="linux", environ={"PATH": "/usr/bin:/bin", "HOME": str(tmp)})
-            for pid in rep["setsid_survivors"]:
-                with contextlib.suppress(ProcessLookupError):
-                    os.kill(pid, signal.SIGKILL)
+            rep, probes = measure_in_range(tmp, dict(SPEC, bwrap=str(fake_bwrap(tmp))), tmp / "run" / "confinement", exe)
         [(sleep, timeout)] = probes
         self.assertGreater(float(sleep), timeout + confine.SURVIVOR_GRACE + 1)
         self.assertTrue(rep["setsid_survivors"])     # the sleeper it looks for is this one: unconfined, it survived

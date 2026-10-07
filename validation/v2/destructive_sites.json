@@ -282,6 +282,17 @@
    "occurrences": 2
   },
   {
+   "path": "tests/v2/test_v21_confine.py",
+   "scope": "FailClosed.test_a_killed_sleeper_is_no_survivor_a_live_one_is",
+   "callable": "live.kill",
+   "target": "live",
+   "target_kind": "process",
+   "authority_source": "TEST_CREATED_HANDLE",
+   "justification": "the sleep subprocess the test started: killed to show a killed sleeper is no survivor, then in finally",
+   "enforcement": "static: live bound to subprocess.Popen( in the function",
+   "occurrences": 2
+  },
+  {
    "path": "tests/v2/test_v1_evidence_guard.py",
    "scope": "Preventive.test_remove_is_refused_before_it_reaches_the_filesystem",
    "callable": "os.remove",
