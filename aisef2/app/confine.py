@@ -243,7 +243,8 @@ def measure(spec: Mapping, where: pathlib.Path, exe: str | None = None, repo: pa
     """Run the probe under the wrapper a session gets — the client `exe`'s directory, a worktree of `repo` (the run's
     repository; a new one when None) as the workspace, so the same read-only mounts — with `where` (a new directory in
     the run directory) as the run directory: what it saw, what it was denied, and the problems — any one refuses the
-    run. The measurement's worktree is removed from `repo` afterwards."""
+    run. The measurement's worktree is removed from `repo` afterwards; a file the probe made outside the workspace is
+    not removed: it is named (`left_on_host`) and refuses the run."""
     environ = dict(os.environ if environ is None else environ)
     rep: dict = {"backend": spec["backend"], "bwrap": spec["bwrap"], "network": spec["network"],
                  "read_only": list(spec["read_only"]), "client": exe, "system": system,
@@ -300,9 +301,6 @@ def _probe(spec: Mapping, where: pathlib.Path, ws: pathlib.Path, full: list[str]
         code, out = None, f"{type(e).__name__}: {e}"
     survivors = _survivors(f"sleep {sleep}")
     created = {k: v.exists() for k, v in files.items()}
-    for v in files.values():     # the probe's own empty files, if confinement failed to stop them
-        if v.exists():
-            v.unlink()
     values, sections, tries = _sections(out)
     problems = []
     if code != 0 or "end" not in values:
@@ -325,8 +323,14 @@ def _probe(spec: Mapping, where: pathlib.Path, ws: pathlib.Path, full: list[str]
     rep["created_outside_workspace"] = created
     rep["setsid_survivors"] = survivors
     rep["operator_can"] = {f"write_{k}": os.access(v.parent, os.W_OK) for k, v in files.items()}
+    # INV-MUTATION-AUTHORITY: a file the probe made where confinement did not stop it exists because of the subject;
+    # nothing here removes it — the measurement refuses the run and names each one for the operator to remove
+    rep["left_on_host"] = [f[k] for k, v in created.items() if v]
     if not problems:
         problems += _judge(rep, token, out, tries, home, ws)
+    if rep["left_on_host"]:
+        problems.append(f"the probe's files are left where confinement did not stop them; nothing was removed, the "
+                        f"operator removes them: {rep['left_on_host']}")
     rep["problems"] = problems
     return rep
 

@@ -60,7 +60,9 @@ def pairs(argv: list[str], flag: str) -> list[tuple[str, str]]:
     return [(argv[i + 1], argv[i + 2]) for i, a in enumerate(argv[:argv.index("--")]) if a == flag]
 
 
-#: `measure_in_range`'s child: confine.measure as a run calls it, the probe's own call recorded (its sleep, its timeout)
+#: `measure_in_range`'s child: confine.measure as a run calls it, the probe's own call recorded (its sleep, its timeout), and
+#: the kernel and the interpreter's site the probe tries to write put in the test's directory: an unconfined probe's
+#: files are left where it made them (INV-MUTATION-AUTHORITY), so it must make none in the real tree or site-packages
 MEASURE = r'''import json, pathlib, sys
 from unittest import mock
 sys.path.insert(0, sys.argv[1])
@@ -72,7 +74,8 @@ def spy(argv, *x, **k):
     if confine.PROBE in argv:       # the probe's $7 is its sleep: after PROBE, "probe" and $1..$6
         probes.append((argv[argv.index(confine.PROBE) + 8], k["timeout"]))
     return real(argv, *x, **k)
-with mock.patch.object(confine.subprocess, "run", spy):
+with mock.patch.object(confine.subprocess, "run", spy), mock.patch.object(confine, "__file__", a["module"]), \
+        mock.patch.object(confine.sysconfig, "get_paths", lambda: {"purelib": a["site"]}):
     rep = confine.measure(a["spec"], pathlib.Path(a["where"]), a["exe"], system="linux", environ=a["environ"])
 io.write_text(json.dumps({"rep": rep, "probes": probes}), encoding="utf-8")
 '''
@@ -86,7 +89,10 @@ def measure_in_range(tmp: pathlib.Path, spec: dict, where: pathlib.Path, exe: pa
     from its own reading of the host (the anchor the test's child, both born after the boundary) and only then signals
     it. One it cannot prove is never signalled: release() raises RangeEscaped and the test fails."""
     io = tmp / "measure.json"
-    io.write_text(json.dumps({"spec": spec, "where": str(where), "exe": str(exe),
+    (tmp / "kernel" / "aisef2").mkdir(parents=True)
+    (tmp / "site").mkdir()
+    io.write_text(json.dumps({"spec": spec, "where": str(where), "exe": str(exe), "site": str(tmp / "site"),
+                              "module": str(tmp / "kernel" / "aisef2" / "app" / "confine.py"),
                               "environ": {"PATH": "/usr/bin:/bin", "HOME": str(tmp)}}), encoding="utf-8")
     boundary = ca.establish(tmp)
     with open(tmp / "measure.log", "wb") as log:
@@ -282,7 +288,8 @@ class FailClosed(unittest.TestCase):
             where = tmp / "run" / "confinement"
             rep, _ = measure_in_range(tmp, dict(SPEC, bwrap=str(fake)), where, exe)   # its sleeper not left running
             for want in ("a file of the run directory was readable", "a file was created in the run directory",
-                         "a file was created in the client directory", "a file was created in the git directory"):
+                         "a file was created in the client directory", "a file was created in the git directory",
+                         "a file was created in the kernel", "a file was created in the interpreter site"):
                 self.assertIn(want, rep["problems"])
             self.assertTrue(any(p.startswith("a process the session left outlived it") for p in rep["problems"]), rep["problems"])
             # unconfined, no namespace is the probe's own: "shared" on Linux, "not measured" where /proc has none
@@ -291,9 +298,16 @@ class FailClosed(unittest.TestCase):
                                 (n, rep["problems"]))
             self.assertNotIn("own", rep["inside"]["namespaces"].values())
             self.assertTrue(rep["created_outside_workspace"]["run_directory"])
-            # the probe's own files, wherever confinement failed to stop them, removed
-            probe_dirs = (where, confine.pathlib.Path(confine.__file__).resolve().parents[1], exe.parent, where / "repo" / ".git")
-            self.assertEqual([p for d in probe_dirs for p in d.glob("*") if p.name.startswith(("written-", ".aisef-confine-probe-"))], [])
+            # the probe's own files, wherever confinement did not stop them: left where it made them and named in the
+            # refusal, nothing removed — they are the subject's (INV-MUTATION-AUTHORITY; the measurement used to delete
+            # them). MEASURE puts the kernel and the interpreter's site in the test's directory: the real tree gets none
+            probe_dirs = (where, tmp / "kernel" / "aisef2", tmp / "site", exe.parent, where / "repo" / ".git")
+            left = [str(p) for d in probe_dirs for p in d.glob("*") if p.name.startswith(("written-", ".aisef-confine-probe-"))]
+            self.assertEqual(len(left), 5, left)
+            self.assertEqual(sorted(rep["left_on_host"]), sorted(left))
+            self.assertIn(f"the probe's files are left where confinement did not stop them; nothing was removed, the "
+                          f"operator removes them: {rep['left_on_host']}", rep["problems"])
+            self.assertEqual(list(pathlib.Path(confine.__file__).resolve().parents[1].glob(".aisef-confine-probe-*")), [])
             self.assertEqual(rep["tried"]["workspace"]["exit"], 0)
             self.assertEqual(rep["tried"]["read_git_directory"]["exit"], 0)
             self.assertEqual(rep["argv"][-4:], ["/bin/sh", "-c", "<PROBE>", "probe"])
@@ -310,6 +324,9 @@ class FailClosed(unittest.TestCase):
             rep, _ = measure_in_range(tmp, dict(SPEC, bwrap=str(fake)), tmp / "run" / "confinement", exe)
         self.assertTrue(rep["problems"][0].startswith("the sandbox did not run the probe (exit 3): "), rep["problems"])
         self.assertIn("setsid", rep["tried"])     # the probe ran to its end: only its exit refuses it
+        self.assertTrue(rep["left_on_host"])      # its files are named even though nothing else was judged
+        self.assertEqual(rep["problems"][1:], [f"the probe's files are left where confinement did not stop them; nothing "
+                                               f"was removed, the operator removes them: {rep['left_on_host']}"])
 
     def test_a_sleeper_still_dying_when_bubblewrap_returned_is_no_survivor(self):
         """The PID namespace's teardown can still be killing the probe's sleeper when bubblewrap returns (measured: 1 in

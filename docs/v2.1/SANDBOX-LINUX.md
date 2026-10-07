@@ -231,7 +231,9 @@ read-only mounted directory prints its JSON.
   requires the mounts seen inside to lie within what the command line names, and no unix socket outside the workspace
   under any bound directory (within: the path itself or below it — `/w/ws2` is not within `/w/ws`, nor
   `/usrlocal-extra` within `/usr`); a namespace is `own` only when its `/proc/self/ns` link was read inside and outside
-  (`<name>:[<inode>]`) and they differ; a check that did not run is a problem; a probe sleeper found when bubblewrap
+  (`<name>:[<inode>]`) and they differ; a check that did not run is a problem; a file the probe made outside the
+  workspace (confinement did not stop it) is never removed — the subject made it (INV-MUTATION-AUTHORITY) — but left
+  where it was made, listed in `left_on_host` and named in a problem for the operator to remove; a probe sleeper found when bubblewrap
   returns counts as a survivor only if still alive after up to 1 s, and the sleeper outlives the probe's 60 s limit
   plus that second (§5; `test_a_sleeper_still_dying_when_bubblewrap_returned_is_no_survivor`,
   `test_a_killed_sleeper_is_no_survivor_a_live_one_is`, which does not single out the zombie filter: a killed sleeper's
