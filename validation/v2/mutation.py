@@ -1378,7 +1378,7 @@ def _classify(entry: dict, stopped: str | None = None) -> dict:
     cls = "INFRA" if stopped else mutant_class(primary)
     entry.update({"class": cls, "killed": cls == "KILLED"} | ({"why": stopped} if stopped else {}))
     if cls == "TIMEOUT":   # the legacy key, only for the TIMEOUT class: S2.account refuses it, and it cannot depend on order
-        entry["timed_out"] = [r["file"] for r in entry["files"] if "role" not in r and r["outcome"] == "TIMEOUT"]
+        entry["timed_out"] = sorted({r["file"] for r in entry["files"] if "role" not in r and r["outcome"] == "TIMEOUT"})
     signals = [s for r in entry.get("files", []) for s in r.get("cleanup", [])]
     if signals:
         entry.update(strays_reaped=len(signals), cleanup=signals)   # each signal with the authority's proof

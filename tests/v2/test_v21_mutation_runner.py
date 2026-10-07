@@ -1166,6 +1166,15 @@ class Classify(unittest.TestCase):
         self.assertEqual([m.mutant_class(x) for x in (["PASS", "FAIL"], ["PASS"], ["TIMEOUT", "PASS"], ["TIMEOUT", "INFRA"])],
                          ["KILLED", "SURVIVED", "TIMEOUT", "INFRA"])
 
+    def test_timed_out_does_not_depend_on_the_order(self):
+        """Order-equivalence prover: `timed_out` was written in execution order, so two orders of one kill set gave
+        different record bytes for a TIMEOUT-class mutant, against section 7.1 (5). It is now sorted."""
+        def entry(order):
+            return m._classify({"mutant": "x", "files": [{"file": f, "outcome": o} for f, o in order]})["timed_out"]
+        rows = [("tests/v2/test_small.py", "TIMEOUT"), ("tests/v2/test_big.py", "TIMEOUT"), ("tests/v2/test_ok.py", "PASS")]
+        self.assertEqual(entry(rows), entry(rows[::-1]))
+        self.assertEqual(entry(rows), ["tests/v2/test_big.py", "tests/v2/test_small.py"])
+
     @unittest.skipUnless(POSIX, "the runner's process ranges and cleanup authority are measured on POSIX")
     def test_a_timeout_is_never_a_kill_and_never_stops_the_chain(self):
         """VS-2, ORD-2: test_hang hangs on both mutants. Old runner: hang first, both 'killed' with timed_out (a
