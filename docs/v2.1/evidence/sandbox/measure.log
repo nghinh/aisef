@@ -1,90 +1,251 @@
 == host
 docker 29.8.0 server linux/arm64
 host: Darwin 25.5.0 arm64  (this host runs no Linux backend itself; the guest below is a Docker Desktop VM container)
+measured tree: 8d1e7480b71b00a2308f4e7f3fa3ff11aba56bb4; uncommitted paths: 0
 == build aisef-sandbox-measure (pinned python:3.14-slim-trixie@sha256:3353bb7e9ae99c7cce6cad2b2f2b174e8f22813ac43e3b13e7a742627d2b01d8)
-sha256:a7416c247033f1554c78ef7860a409f6dec8ccc67b794733546923a22c065711
-host listener on 127.0.0.1:63414; host-gateway seen from the container as host.docker.internal
+sha256:84f96769162724c521196fce2bbde125175be0661b7a744546f1bc682299fcc4
+== guest (the image's own view of the Docker Desktop VM kernel)
+kernel: Linux 7.0.12-linuxkit aarch64
+apparmor: not in this kernel (/sys/module/apparmor absent)
+max_user_namespaces: 31880
+bubblewrap package: 0.12.0-1~deb13u1
+bubblewrap 0.12.0
+host listener on 127.0.0.1:63781; host-gateway seen from the container as host.docker.internal
 
 == profile P1-default (network=none) flags: 
   bwrap ran: NO; measure problems: 1
     - the sandbox did not run the probe (exit 1): bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user namespaces. See <https://deb.li/bubblewrap> or <file:///usr/share/doc/bubblewrap/README.Debian.gz>.
-  deny connect_host_port: exit 1: bwrap: No permissions to create a new namespace, likely because the ke
-  deny raise_capability: exit 1: bwrap: No permissions to create a new namespace, likely because the ke
-  deny read_file_outside_workspace: exit 1: bwrap: No permissions to create a new namespace, likely because the ke
-  deny read_home_secret_absolute: exit 1: bwrap: No permissions to create a new namespace, likely because the ke
-  deny read_verifier: exit 1: bwrap: No permissions to create a new namespace, likely because the ke
-  deny see_host_processes: exit 1: bwrap: No permissions to create a new namespace, likely because the ke
-  deny write_anchor: exit 1: bwrap: No permissions to create a new namespace, likely because the ke
-  deny write_run_directory: exit 1: bwrap: No permissions to create a new namespace, likely because the ke
-  deny write_runtime: exit 1: bwrap: No permissions to create a new namespace, likely because the ke
-  control workspace_writable: {'exit': 1, 'out': 'bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user namespaces. See <https://deb.li/bubblewrap> or <file:///usr/share/doc/bubblewrap/README.Debian.gz>.', 'started': True}
-  control fake_client_runs: {'exit': 1, 'out': 'bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user namespaces. See <https://deb.li/bubblewrap> or <file:///usr/share/doc/bubblewrap/README.Debian.gz>.', 'started': True}
-  host after run: runtime_unchanged=True anchor_unchanged=True written_in_run_dir=False
+  denials connect_unmounted_unix_socket: exit 1: bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user 
+  denials new_user_namespace: exit 1: bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user 
+  denials read_client_auth_data: exit 1: bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user 
+  denials read_home_ssh_key: exit 1: bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user 
+  denials read_run_directory_file: exit 1: bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user 
+  denials read_verifier: exit 1: bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user 
+  denials see_container_process: exit 1: bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user 
+  denials write_client_directory: exit 1: bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user 
+  denials write_git_directory: exit 1: bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user 
+  denials write_kernel: exit 1: bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user 
+  denials write_runtime: exit 1: bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user 
+  denials write_verifier: exit 1: bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user 
+  network connect_abstract_unix_socket: exit 1: bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user 
+  network connect_host_port: exit 1: bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user 
+  observed capabilities: exit 1: bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user 
+  tmpfs_only append_anchor: exit 1: bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user 
+  tmpfs_only create_in_run_directory: exit 1: bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user 
+  by_design connect_read_only_mounted_unix_socket: exit 1: bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user 
+  by_design git_status_in_workspace: exit 1: bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user 
+  by_design home_listing: exit 1: bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user 
+  by_design measure_with_a_read_only_mounted_socket: ['the sandbox did not run the probe (exit 1): bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user namespaces. See <https://deb.li/bubblewrap> or <file:///usr/share/doc/bubblewrap/README.Debian.gz>.']
+  by_design read_client_configuration: exit 1: bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user 
+  by_design read_git_directory: exit 1: bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user 
+  controls client_runs_from_its_mounted_directory: exit 1: bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user 
+  controls workspace_writable: exit 1: bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user 
+  after (outside the sandbox): {"container_sleeper_seen_outside": true, "measure_pid_outside": 1, "unchanged": {"/tmp/aisef/run-dir/EVIDENCE.anchor": true, "/tmp/aisef/run-dir/repo/.git/HEAD": true, "/tmp/aisef/runtime/opencode": true, "/tmp/aisef/verifier/hidden.json": true}, "written_in_client_directory": false, "written_in_kernel": false, "written_in_run_directory": false}
 
 == profile P2-seccomp (network=none) flags: --security-opt seccomp=unconfined
   bwrap ran: NO; measure problems: 1
     - the sandbox did not run the probe (exit 1): bwrap: Can't mount proc on /proc: Operation not permitted
-  deny connect_host_port: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
-  deny raise_capability: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
-  deny read_file_outside_workspace: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
-  deny read_home_secret_absolute: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
-  deny read_verifier: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
-  deny see_host_processes: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
-  deny write_anchor: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
-  deny write_run_directory: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
-  deny write_runtime: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
-  control workspace_writable: {'exit': 1, 'out': "bwrap: Can't mount proc on /proc: Operation not permitted", 'started': True}
-  control fake_client_runs: {'exit': 1, 'out': "bwrap: Can't mount proc on /proc: Operation not permitted", 'started': True}
-  host after run: runtime_unchanged=True anchor_unchanged=True written_in_run_dir=False
+  denials connect_unmounted_unix_socket: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  denials new_user_namespace: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  denials read_client_auth_data: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  denials read_home_ssh_key: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  denials read_run_directory_file: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  denials read_verifier: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  denials see_container_process: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  denials write_client_directory: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  denials write_git_directory: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  denials write_kernel: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  denials write_runtime: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  denials write_verifier: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  network connect_abstract_unix_socket: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  network connect_host_port: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  observed capabilities: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  tmpfs_only append_anchor: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  tmpfs_only create_in_run_directory: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  by_design connect_read_only_mounted_unix_socket: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  by_design git_status_in_workspace: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  by_design home_listing: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  by_design measure_with_a_read_only_mounted_socket: ["the sandbox did not run the probe (exit 1): bwrap: Can't mount proc on /proc: Operation not permitted"]
+  by_design read_client_configuration: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  by_design read_git_directory: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  controls client_runs_from_its_mounted_directory: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  controls workspace_writable: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  after (outside the sandbox): {"container_sleeper_seen_outside": true, "measure_pid_outside": 1, "unchanged": {"/tmp/aisef/run-dir/EVIDENCE.anchor": true, "/tmp/aisef/run-dir/repo/.git/HEAD": true, "/tmp/aisef/runtime/opencode": true, "/tmp/aisef/verifier/hidden.json": true}, "written_in_client_directory": false, "written_in_kernel": false, "written_in_run_directory": false}
 
 == profile P3-seccomp-apparmor (network=none) flags: --security-opt seccomp=unconfined --security-opt apparmor=unconfined
   bwrap ran: NO; measure problems: 1
     - the sandbox did not run the probe (exit 1): bwrap: Can't mount proc on /proc: Operation not permitted
-  deny connect_host_port: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
-  deny raise_capability: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
-  deny read_file_outside_workspace: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
-  deny read_home_secret_absolute: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
-  deny read_verifier: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
-  deny see_host_processes: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
-  deny write_anchor: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
-  deny write_run_directory: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
-  deny write_runtime: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
-  control workspace_writable: {'exit': 1, 'out': "bwrap: Can't mount proc on /proc: Operation not permitted", 'started': True}
-  control fake_client_runs: {'exit': 1, 'out': "bwrap: Can't mount proc on /proc: Operation not permitted", 'started': True}
-  host after run: runtime_unchanged=True anchor_unchanged=True written_in_run_dir=False
+  denials connect_unmounted_unix_socket: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  denials new_user_namespace: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  denials read_client_auth_data: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  denials read_home_ssh_key: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  denials read_run_directory_file: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  denials read_verifier: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  denials see_container_process: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  denials write_client_directory: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  denials write_git_directory: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  denials write_kernel: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  denials write_runtime: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  denials write_verifier: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  network connect_abstract_unix_socket: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  network connect_host_port: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  observed capabilities: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  tmpfs_only append_anchor: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  tmpfs_only create_in_run_directory: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  by_design connect_read_only_mounted_unix_socket: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  by_design git_status_in_workspace: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  by_design home_listing: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  by_design measure_with_a_read_only_mounted_socket: ["the sandbox did not run the probe (exit 1): bwrap: Can't mount proc on /proc: Operation not permitted"]
+  by_design read_client_configuration: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  by_design read_git_directory: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  controls client_runs_from_its_mounted_directory: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  controls workspace_writable: exit 1: bwrap: Can't mount proc on /proc: Operation not permitted
+  after (outside the sandbox): {"container_sleeper_seen_outside": true, "measure_pid_outside": 1, "unchanged": {"/tmp/aisef/run-dir/EVIDENCE.anchor": true, "/tmp/aisef/run-dir/repo/.git/HEAD": true, "/tmp/aisef/runtime/opencode": true, "/tmp/aisef/verifier/hidden.json": true}, "written_in_client_directory": false, "written_in_kernel": false, "written_in_run_directory": false}
 
 == profile P4-all (network=none) flags: --security-opt seccomp=unconfined --security-opt apparmor=unconfined --security-opt systempaths=unconfined
   bwrap ran: yes; measure problems: 0
-  deny connect_host_port: exit 0: DOWN: OSError: [Errno 101] Network is unreachable
-  deny raise_capability: exit 0: CapPrm:	0000000000000000
-CapEff:	0000000000000000
-CapBnd:	000000000000
-  deny read_file_outside_workspace: exit 1: cat: /tmp/aisef/run-dir/canary: No such file or directory
-  deny read_home_secret_absolute: exit 1: cat: /tmp/aisef/op-home/.ssh/id: No such file or directory
-  deny read_verifier: exit 1: cat: /tmp/aisef/verifier/hidden.json: No such file or directory
-  deny see_host_processes: exit 0: 1 2 3 4 5 6
-  deny write_anchor: exit 0: 
-  deny write_run_directory: exit 0: 
-  deny write_runtime: exit 2: /bin/sh: 1: cannot create /tmp/aisef/runtime/opencode: Directory nonex
-  control workspace_writable: {'exit': 0, 'out': 'ok', 'started': True}
-  control fake_client_runs: {'exit': 0, 'out': '{"type": "text", "part": {"text": "done"}}', 'started': True}
-  host after run: runtime_unchanged=True anchor_unchanged=True written_in_run_dir=False
+  denials connect_unmounted_unix_socket: exit 0: REFUSED: FileNotFoundError: [Errno 2] No such file or directory
+  denials new_user_namespace: exit 1: unshare: unshare failed: No space left on device
+  denials read_client_auth_data: exit 1: cat: /tmp/aisef/op-home/.local/share/opencode/auth.json: No such file or directory
+  denials read_home_ssh_key: exit 1: cat: /tmp/aisef/op-home/.ssh/id: No such file or directory
+  denials read_run_directory_file: exit 1: cat: /tmp/aisef/run-dir/canary: No such file or directory
+  denials read_verifier: exit 1: cat: /tmp/aisef/verifier/hidden.json: No such file or directory
+  denials see_container_process: exit 0: 0 | 1 2 9 10 11 12
+  denials write_client_directory: exit 2: /bin/sh: 1: cannot create /tmp/aisef/runtime/x: Read-only file system
+  denials write_git_directory: exit 2: /bin/sh: 1: cannot create /tmp/aisef/run-dir/repo/.git/HEAD: Read-only file system
+  denials write_kernel: exit 2: /bin/sh: 1: cannot create /tmp/aisef/venv/lib/python3.14/site-packages/aisef2/written-by-session: Read-only fi
+  denials write_runtime: exit 2: /bin/sh: 1: cannot create /tmp/aisef/runtime/opencode: Read-only file system
+  denials write_verifier: exit 2: /bin/sh: 1: cannot create /tmp/aisef/verifier/hidden.json: Directory nonexistent
+  network connect_abstract_unix_socket: exit 0: REFUSED: ConnectionRefusedError: [Errno 111] Connection refused
+  network connect_host_port: exit 0: DOWN: OSError: [Errno 101] Network is unreachable
+  observed capabilities: exit 0: CapInh:	0000000000000000 | CapPrm:	0000000000000000 | CapEff:	0000000000000000 | CapBnd:	0000000000000000 | Ca
+  tmpfs_only append_anchor: exit 0: x
+  tmpfs_only create_in_run_directory: exit 0: repo | work | written
+  by_design connect_read_only_mounted_unix_socket: exit 0: CONNECTED
+  by_design git_status_in_workspace: exit 0: ## HEAD (no branch)
+  by_design home_listing: exit 0: .config
+  by_design measure_with_a_read_only_mounted_socket: ["a unix socket outside the workspace is reachable (read-only does not stop a connect): ['/tmp/aisef/sock/ctl']"]
+  by_design read_client_configuration: exit 0: opencode.json
+  by_design read_git_directory: exit 0: ref: refs/heads/main
+  controls client_runs_from_its_mounted_directory: exit 0: {"type": "text", "part": {"text": "done"}}
+  controls workspace_writable: exit 0: ok
+  after (outside the sandbox): {"container_sleeper_seen_outside": true, "measure_pid_outside": 1, "unchanged": {"/tmp/aisef/run-dir/EVIDENCE.anchor": true, "/tmp/aisef/run-dir/repo/.git/HEAD": true, "/tmp/aisef/runtime/opencode": true, "/tmp/aisef/verifier/hidden.json": true}, "written_in_client_directory": false, "written_in_kernel": false, "written_in_run_directory": false}
+
+== profile X2-systempaths (network=none) flags: --security-opt systempaths=unconfined
+  bwrap ran: NO; measure problems: 1
+    - the sandbox did not run the probe (exit 1): bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user namespaces. See <https://deb.li/bubblewrap> or <file:///usr/share/doc/bubblewrap/README.Debian.gz>.
+  denials connect_unmounted_unix_socket: exit 1: bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user 
+  denials new_user_namespace: exit 1: bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user 
+  denials read_client_auth_data: exit 1: bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user 
+  denials read_home_ssh_key: exit 1: bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user 
+  denials read_run_directory_file: exit 1: bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user 
+  denials read_verifier: exit 1: bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user 
+  denials see_container_process: exit 1: bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user 
+  denials write_client_directory: exit 1: bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user 
+  denials write_git_directory: exit 1: bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user 
+  denials write_kernel: exit 1: bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user 
+  denials write_runtime: exit 1: bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user 
+  denials write_verifier: exit 1: bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user 
+  network connect_abstract_unix_socket: exit 1: bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user 
+  network connect_host_port: exit 1: bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user 
+  observed capabilities: exit 1: bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user 
+  tmpfs_only append_anchor: exit 1: bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user 
+  tmpfs_only create_in_run_directory: exit 1: bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user 
+  by_design connect_read_only_mounted_unix_socket: exit 1: bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user 
+  by_design git_status_in_workspace: exit 1: bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user 
+  by_design home_listing: exit 1: bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user 
+  by_design measure_with_a_read_only_mounted_socket: ['the sandbox did not run the probe (exit 1): bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user namespaces. See <https://deb.li/bubblewrap> or <file:///usr/share/doc/bubblewrap/README.Debian.gz>.']
+  by_design read_client_configuration: exit 1: bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user 
+  by_design read_git_directory: exit 1: bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user 
+  controls client_runs_from_its_mounted_directory: exit 1: bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user 
+  controls workspace_writable: exit 1: bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user 
+  after (outside the sandbox): {"container_sleeper_seen_outside": true, "measure_pid_outside": 1, "unchanged": {"/tmp/aisef/run-dir/EVIDENCE.anchor": true, "/tmp/aisef/run-dir/repo/.git/HEAD": true, "/tmp/aisef/runtime/opencode": true, "/tmp/aisef/verifier/hidden.json": true}, "written_in_client_directory": false, "written_in_kernel": false, "written_in_run_directory": false}
+
+== profile X1-seccomp-systempaths (network=none) flags: --security-opt seccomp=unconfined --security-opt systempaths=unconfined
+  bwrap ran: yes; measure problems: 0
+  denials connect_unmounted_unix_socket: exit 0: REFUSED: FileNotFoundError: [Errno 2] No such file or directory
+  denials new_user_namespace: exit 1: unshare: unshare failed: No space left on device
+  denials read_client_auth_data: exit 1: cat: /tmp/aisef/op-home/.local/share/opencode/auth.json: No such file or directory
+  denials read_home_ssh_key: exit 1: cat: /tmp/aisef/op-home/.ssh/id: No such file or directory
+  denials read_run_directory_file: exit 1: cat: /tmp/aisef/run-dir/canary: No such file or directory
+  denials read_verifier: exit 1: cat: /tmp/aisef/verifier/hidden.json: No such file or directory
+  denials see_container_process: exit 0: 0 | 1 2 9 10 11 12
+  denials write_client_directory: exit 2: /bin/sh: 1: cannot create /tmp/aisef/runtime/x: Read-only file system
+  denials write_git_directory: exit 2: /bin/sh: 1: cannot create /tmp/aisef/run-dir/repo/.git/HEAD: Read-only file system
+  denials write_kernel: exit 2: /bin/sh: 1: cannot create /tmp/aisef/venv/lib/python3.14/site-packages/aisef2/written-by-session: Read-only fi
+  denials write_runtime: exit 2: /bin/sh: 1: cannot create /tmp/aisef/runtime/opencode: Read-only file system
+  denials write_verifier: exit 2: /bin/sh: 1: cannot create /tmp/aisef/verifier/hidden.json: Directory nonexistent
+  network connect_abstract_unix_socket: exit 0: REFUSED: ConnectionRefusedError: [Errno 111] Connection refused
+  network connect_host_port: exit 0: DOWN: OSError: [Errno 101] Network is unreachable
+  observed capabilities: exit 0: CapInh:	0000000000000000 | CapPrm:	0000000000000000 | CapEff:	0000000000000000 | CapBnd:	0000000000000000 | Ca
+  tmpfs_only append_anchor: exit 0: x
+  tmpfs_only create_in_run_directory: exit 0: repo | work | written
+  by_design connect_read_only_mounted_unix_socket: exit 0: CONNECTED
+  by_design git_status_in_workspace: exit 0: ## HEAD (no branch)
+  by_design home_listing: exit 0: .config
+  by_design measure_with_a_read_only_mounted_socket: ["a unix socket outside the workspace is reachable (read-only does not stop a connect): ['/tmp/aisef/sock/ctl']"]
+  by_design read_client_configuration: exit 0: opencode.json
+  by_design read_git_directory: exit 0: ref: refs/heads/main
+  controls client_runs_from_its_mounted_directory: exit 0: {"type": "text", "part": {"text": "done"}}
+  controls workspace_writable: exit 0: ok
+  after (outside the sandbox): {"container_sleeper_seen_outside": true, "measure_pid_outside": 1, "unchanged": {"/tmp/aisef/run-dir/EVIDENCE.anchor": true, "/tmp/aisef/run-dir/repo/.git/HEAD": true, "/tmp/aisef/runtime/opencode": true, "/tmp/aisef/verifier/hidden.json": true}, "written_in_client_directory": false, "written_in_kernel": false, "written_in_run_directory": false}
 
 == profile P5-all-net-host (network=host) flags: --security-opt seccomp=unconfined --security-opt apparmor=unconfined --security-opt systempaths=unconfined
   bwrap ran: yes; measure problems: 0
-  deny connect_host_port: exit 0: UP: reached host host.docker.internal
-  deny raise_capability: exit 0: CapPrm:	0000000000000000
-CapEff:	0000000000000000
-CapBnd:	000000000000
-  deny read_file_outside_workspace: exit 1: cat: /tmp/aisef/run-dir/canary: No such file or directory
-  deny read_home_secret_absolute: exit 1: cat: /tmp/aisef/op-home/.ssh/id: No such file or directory
-  deny read_verifier: exit 1: cat: /tmp/aisef/verifier/hidden.json: No such file or directory
-  deny see_host_processes: exit 0: 1 2 3 4 5 6
-  deny write_anchor: exit 0: 
-  deny write_run_directory: exit 0: 
-  deny write_runtime: exit 2: /bin/sh: 1: cannot create /tmp/aisef/runtime/opencode: Directory nonex
-  control workspace_writable: {'exit': 0, 'out': 'ok', 'started': True}
-  control fake_client_runs: {'exit': 0, 'out': '{"type": "text", "part": {"text": "done"}}', 'started': True}
-  host after run: runtime_unchanged=True anchor_unchanged=True written_in_run_dir=False
+  denials connect_unmounted_unix_socket: exit 0: REFUSED: FileNotFoundError: [Errno 2] No such file or directory
+  denials new_user_namespace: exit 1: unshare: unshare failed: No space left on device
+  denials read_client_auth_data: exit 1: cat: /tmp/aisef/op-home/.local/share/opencode/auth.json: No such file or directory
+  denials read_home_ssh_key: exit 1: cat: /tmp/aisef/op-home/.ssh/id: No such file or directory
+  denials read_run_directory_file: exit 1: cat: /tmp/aisef/run-dir/canary: No such file or directory
+  denials read_verifier: exit 1: cat: /tmp/aisef/verifier/hidden.json: No such file or directory
+  denials see_container_process: exit 0: 0 | 1 2 9 10 11 12
+  denials write_client_directory: exit 2: /bin/sh: 1: cannot create /tmp/aisef/runtime/x: Read-only file system
+  denials write_git_directory: exit 2: /bin/sh: 1: cannot create /tmp/aisef/run-dir/repo/.git/HEAD: Read-only file system
+  denials write_kernel: exit 2: /bin/sh: 1: cannot create /tmp/aisef/venv/lib/python3.14/site-packages/aisef2/written-by-session: Read-only fi
+  denials write_runtime: exit 2: /bin/sh: 1: cannot create /tmp/aisef/runtime/opencode: Read-only file system
+  denials write_verifier: exit 2: /bin/sh: 1: cannot create /tmp/aisef/verifier/hidden.json: Directory nonexistent
+  network connect_abstract_unix_socket: exit 0: CONNECTED
+  network connect_host_port: exit 0: UP: reached host host.docker.internal
+  observed capabilities: exit 0: CapInh:	0000000000000000 | CapPrm:	0000000000000000 | CapEff:	0000000000000000 | CapBnd:	0000000000000000 | Ca
+  tmpfs_only append_anchor: exit 0: x
+  tmpfs_only create_in_run_directory: exit 0: repo | work | written
+  by_design connect_read_only_mounted_unix_socket: exit 0: CONNECTED
+  by_design git_status_in_workspace: exit 0: ## HEAD (no branch)
+  by_design home_listing: exit 0: .config
+  by_design measure_with_a_read_only_mounted_socket: ["a unix socket outside the workspace is reachable (read-only does not stop a connect): ['/tmp/aisef/sock/ctl']"]
+  by_design read_client_configuration: exit 0: opencode.json
+  by_design read_git_directory: exit 0: ref: refs/heads/main
+  controls client_runs_from_its_mounted_directory: exit 0: {"type": "text", "part": {"text": "done"}}
+  controls workspace_writable: exit 0: ok
+  after (outside the sandbox): {"container_sleeper_seen_outside": true, "measure_pid_outside": 1, "unchanged": {"/tmp/aisef/run-dir/EVIDENCE.anchor": true, "/tmp/aisef/run-dir/repo/.git/HEAD": true, "/tmp/aisef/runtime/opencode": true, "/tmp/aisef/verifier/hidden.json": true}, "written_in_client_directory": false, "written_in_kernel": false, "written_in_run_directory": false}
 
-== done; per-profile JSON in /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/prod/sandbox/measure-out/*.json
+== profile X3-seccomp-systempaths-net-host (network=host) flags: --security-opt seccomp=unconfined --security-opt systempaths=unconfined
+  bwrap ran: yes; measure problems: 0
+  denials connect_unmounted_unix_socket: exit 0: REFUSED: FileNotFoundError: [Errno 2] No such file or directory
+  denials new_user_namespace: exit 1: unshare: unshare failed: No space left on device
+  denials read_client_auth_data: exit 1: cat: /tmp/aisef/op-home/.local/share/opencode/auth.json: No such file or directory
+  denials read_home_ssh_key: exit 1: cat: /tmp/aisef/op-home/.ssh/id: No such file or directory
+  denials read_run_directory_file: exit 1: cat: /tmp/aisef/run-dir/canary: No such file or directory
+  denials read_verifier: exit 1: cat: /tmp/aisef/verifier/hidden.json: No such file or directory
+  denials see_container_process: exit 0: 0 | 1 2 9 10 11 12
+  denials write_client_directory: exit 2: /bin/sh: 1: cannot create /tmp/aisef/runtime/x: Read-only file system
+  denials write_git_directory: exit 2: /bin/sh: 1: cannot create /tmp/aisef/run-dir/repo/.git/HEAD: Read-only file system
+  denials write_kernel: exit 2: /bin/sh: 1: cannot create /tmp/aisef/venv/lib/python3.14/site-packages/aisef2/written-by-session: Read-only fi
+  denials write_runtime: exit 2: /bin/sh: 1: cannot create /tmp/aisef/runtime/opencode: Read-only file system
+  denials write_verifier: exit 2: /bin/sh: 1: cannot create /tmp/aisef/verifier/hidden.json: Directory nonexistent
+  network connect_abstract_unix_socket: exit 0: CONNECTED
+  network connect_host_port: exit 0: UP: reached host host.docker.internal
+  observed capabilities: exit 0: CapInh:	0000000000000000 | CapPrm:	0000000000000000 | CapEff:	0000000000000000 | CapBnd:	0000000000000000 | Ca
+  tmpfs_only append_anchor: exit 0: x
+  tmpfs_only create_in_run_directory: exit 0: repo | work | written
+  by_design connect_read_only_mounted_unix_socket: exit 0: CONNECTED
+  by_design git_status_in_workspace: exit 0: ## HEAD (no branch)
+  by_design home_listing: exit 0: .config
+  by_design measure_with_a_read_only_mounted_socket: ["a unix socket outside the workspace is reachable (read-only does not stop a connect): ['/tmp/aisef/sock/ctl']"]
+  by_design read_client_configuration: exit 0: opencode.json
+  by_design read_git_directory: exit 0: ref: refs/heads/main
+  controls client_runs_from_its_mounted_directory: exit 0: {"type": "text", "part": {"text": "done"}}
+  controls workspace_writable: exit 0: ok
+  after (outside the sandbox): {"container_sleeper_seen_outside": true, "measure_pid_outside": 1, "unchanged": {"/tmp/aisef/run-dir/EVIDENCE.anchor": true, "/tmp/aisef/run-dir/repo/.git/HEAD": true, "/tmp/aisef/runtime/opencode": true, "/tmp/aisef/verifier/hidden.json": true}, "written_in_client_directory": false, "written_in_kernel": false, "written_in_run_directory": false}
+
+== done; per-profile JSON in /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/prod/sandbox-fix/measured2/*.json

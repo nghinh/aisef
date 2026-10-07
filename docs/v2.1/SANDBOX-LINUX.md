@@ -1,16 +1,18 @@
-# AISEF 2.1 — Minimal Linux confinement of the developer session (track F / B-07)
+# AISEF 2.1 — Minimal Linux confinement of the model sessions (track F / B-07)
 
 Scope: confine the **model sessions** the kernel's client starts — the developer and the model reviewer — so the
-untrusted code they run cannot read or write anything of the machine beyond the one workspace it is given. This is the
-first isolation code on the branch (REPORT F was M6: "chưa có mã cách ly nào trên nhánh"). It is **opt-in** and
-**Linux-only**; it changes nothing when the settings do not ask for it.
+untrusted code they run cannot write anything of the machine beyond the one workspace it is given, and reads only
+what is listed in §2. This is the first isolation code on the branch (REPORT F was M6: "chưa có mã cách ly nào trên
+nhánh"). It is **opt-in** and **Linux-only**; it changes nothing when the settings do not ask for it.
 
 Module: [`aisef2/app/confine.py`](../../aisef2/app/confine.py). Harness:
 [`validation/v21/sandbox/`](../../validation/v21/sandbox/). Measured evidence:
-[`evidence/sandbox/`](evidence/sandbox/) (`measure.log`, `P1`–`P5` JSON, `Dockerfile.measure`).
+[`evidence/sandbox/`](evidence/sandbox/) (`measure.log`, one JSON per profile, `Dockerfile.measure`), recorded at the
+committed tree `8d1e748` (`measured tree: … uncommitted paths: 0` in `measure.log`).
 
-Everything below that says a boundary holds is backed by a **denied operation** in `evidence/sandbox/`, not by config
-alone (owner's 2026-10-06 requirement). What is not confined is stated as plainly as what is.
+Every claim below names the operation that was tried and what happened (owner's 2026-10-06 requirement: a denied
+operation, not config alone). Where an operation **succeeded** — into a throwaway tmpfs, or because a session is
+meant to reach it — it is listed as such, never as a denial. What is not confined is stated as plainly as what is.
 
 ---
 
@@ -18,135 +20,197 @@ alone (owner's 2026-10-06 requirement). What is not confined is stated as plainl
 
 The owner's requirement: do not write "macOS always has no isolation"; name the real configuration at each layer.
 
-| Layer | What it is here | Boundary it gives the developer code |
+| Layer | What it is here (measured, `measure.log`) | Boundary it gives the session's code |
 |---|---|---|
-| **macOS host** | Darwin 25.5.0 arm64, the operator's user | none of its own: there is no Linux container runtime that runs the developer *on the host*. bubblewrap, user namespaces and `/proc`-based process ranges are Linux kernel features; the kernel's existing session runs the client as the operator's user with **no OS boundary** (REPORT §3, DEVELOPER-CONFINEMENT-GAP-001). |
-| **Docker Desktop VM** | `docker` 29.8.0, server `linux/arm64` (a LinuxKit VM Docker Desktop runs) | the VM is a boundary between macOS and the Linux guest, but it is Docker's, not AISEF's; AISEF does not manage it. |
-| **Linux container (the guest)** | a `docker run` of the pinned `python:3.14-slim-trixie` image, `--user 1000 --cap-drop ALL --pids-limit --memory`, repo mounted read-only | the container is the first boundary AISEF can shape. Its own seccomp/apparmor/masked-paths profile is what decides whether a **nested** sandbox can start (§3). |
-| **bwrap inside the guest** | `aisef2.app.confine` builds the argv; one unprivileged user+mount+pid+ipc+uts(+net) namespace per session | the per-session boundary this track adds: the developer code sees only its workspace, no capability, its own PID namespace. **Measured in §4.** |
+| **macOS host** | Darwin 25.5.0 arm64, the operator's user | none of its own: bubblewrap, user namespaces and the `/proc`-based process ranges are Linux features; on macOS the kernel's session runs the client as the operator's user with **no OS boundary** (REPORT §3, DEVELOPER-CONFINEMENT-GAP-001), and a run that asks for confinement there is refused (§3). |
+| **Docker Desktop VM** | `docker` 29.8.0, server `linux/arm64`; guest kernel `Linux 7.0.12-linuxkit aarch64` (Docker Desktop's LinuxKit VM) | the VM separates macOS from the Linux guest, but it is Docker's boundary, not AISEF's; AISEF does not manage it. |
+| **Linux container (the guest)** | a `docker run` of the pinned `python:3.14-slim-trixie@sha256:3353bb7e…` image, `--user 1000:1000 --cap-drop ALL --pids-limit 512 --memory 1g`, the tree mounted read-only | the first boundary AISEF could shape. Its seccomp profile and masked system paths decide whether a **nested** sandbox can start at all (§3). |
+| **bwrap inside the guest** | `aisef2.app.confine` builds the argv; one unprivileged user + mount + pid + ipc + uts (+ net for `none`) namespace per session | the per-session boundary this track adds. **Measured in §5.** |
 
 A `-S` interpreter flag, a git worktree, or a hash check before running is **not** a sandbox and this document never
-calls one that (owner's instruction). The boundary here is kernel namespaces proven by denied operations.
+calls one that (owner's instruction). The boundary here is kernel namespaces, measured by operations tried inside.
 
-## 2. Threat model
+## 2. Threat model, and exactly what a confined session reaches
 
 The developer (and the model reviewer) run model-written, untrusted code in a checkout. Without an OS boundary that
-code runs as the operator's user and can (measured, REPORT §3):
-
-- read every file the operator can read — including a hidden experiment stimulus (DEVELOPER-CONFINEMENT-GAP-001);
-- write the client binary (the *runtime*), the run directory while the run is in progress, and the evidence anchor if
-  it is reachable;
-- leave a `setsid` child that outlives the run (REPORT §4.2).
+code runs as the operator's user and can (measured, REPORT §3): read every file the operator can read — including a
+hidden experiment stimulus (DEVELOPER-CONFINEMENT-GAP-001); write the client binary (the *runtime*), the run
+directory while the run is in progress, and the evidence anchor if it is reachable; leave a `setsid` child that
+outlives the run (REPORT §4.2).
 
 Trusted, and deliberately **outside** this sandbox: the kernel itself, which drives git, runs the probes and the
-developer's tests, computes the evidence and the anchor. Putting the control daemon inside the workload's area is the
-anti-pattern OpenSandbox's `execd` demonstrates (UPSTREAM-RESEARCH; design-only reference
-`opensandbox-group/OpenSandbox @ c7dc78a4090e`, never vendored). So the confinement wraps **only the client's
-session**, never the kernel.
+developer's tests, computes the evidence and the anchor. The design rule "never put the control daemon inside the
+workload's area" comes from OpenSandbox — **INFERENCE on CODE** (`opensandbox-group/OpenSandbox @ c7dc78a4090e`,
+design-only, never vendored; research record [`research/UPSTREAM-RESEARCH.json`](research/UPSTREAM-RESEARCH.json)
+item N7: its `execd` listens on tcp4 `:44772` inside the sandbox, execd `main.go:232-235`, and the egress nft output
+chain accepts `oifname lo`, `manager.go:261`, so the workload reaches its own controller). So the
+confinement wraps **only the client's session**, never the kernel.
 
-Goal: the session can read/write its workspace and run a program, and nothing else — not the run directory, not the
-runtime, not the verifier/anchor, not HOME secrets, not host processes, not the network (unless explicitly shared).
+What a confined session reaches (the command line, `confine.wrap`; the reads and writes measured in §5):
 
-## 3. What each boundary gives — and the honest loosening bwrap needs
+| | What |
+|---|---|
+| **writes** (host-backed) | its workspace — nothing else. Everything else it writes lands in its own tmpfs (`/`, `/tmp`, an empty HOME) and is gone when it exits. |
+| **reads, read-only** | the system (`/usr`, `/etc`, the merged-`/usr` links); **the client's own directory**; **the workspace's common git directory — for a run's worktree that is `<out>/repo/.git`, inside the run directory: the run's clone, every object and ref of it**; the client's configuration directory (`$XDG_CONFIG_HOME/opencode` or `~/.config/opencode`); the operator's `read_only` paths. |
+| **does not see** | the rest of the run directory (its canary, the anchor, the sessions' logs, other worktrees), the rest of HOME (`.ssh`, the client's auth data under `~/.local/share/opencode`), the verifier/hidden material, the kernel and the interpreter unless a `read_only` path holds them, the container's other processes. |
 
-Bubblewrap needs to create an **unprivileged user namespace** and mount a fresh `/proc`. A hardened container forbids
-both. Measured on this host, going from the hardened container and loosening one axis at a time (full log:
-[`evidence/sandbox/measure.log`](evidence/sandbox/measure.log)):
+Two consequences, stated because they are behaviour: the git directory is read-only, so a confined developer cannot
+commit — it leaves its changes in the worktree and the kernel commits them (`adapters.Developer`: `commit_all`); and a
+client installed **in HOME or above the workspace** (a single-file download in `~`, or a scratch directory that also
+holds the runs) is **refused** — its directory, bound read-only, would expose HOME or the runs
+(`confine.wrap`: "the client's directory … holds HOME").
 
-| Profile | Container flags added | Result |
+## 3. What each container boundary gives — and the loosening bwrap needs
+
+Bubblewrap needs to create an **unprivileged user namespace** and mount a fresh `/proc`. Measured on this host
+(`measure.log`, one JSON per profile; P2–P4 loosen cumulatively, X1/X2 single out the axes):
+
+| Profile | Container flags added to `--user 1000:1000 --cap-drop ALL --pids-limit 512 --memory 1g` | Result |
 |---|---|---|
-| **P1** hardened | *(none)* `--user 1000 --cap-drop ALL --pids-limit 512 --memory 1g` | bwrap **cannot start**: "No permissions to create a new namespace … kernel does not allow non-privileged user namespaces". Every session refused. |
-| **P2** | `--security-opt seccomp=unconfined` | bwrap starts the userns but **"Can't mount proc on /proc: Operation not permitted"**. Still refused. |
-| **P3** | `+ --security-opt apparmor=unconfined` | **identical** to P2 — apparmor is not the gate on this kernel. Still can't mount `/proc`. |
-| **P4** | `+ --security-opt systempaths=unconfined` | bwrap **runs**; measurement clean (0 problems). `systempaths=unconfined` is the axis that unmasks `/proc/*` so bwrap can mount a fresh `/proc`. |
-| **P5** | P4 but `--network` shared (not `none`) | bwrap runs; **egress is NOT confined** — the session reaches a host port (§4). |
+| **P1** hardened | *(none)* | bwrap **cannot start**: "No permissions to create a new namespace". Refused. |
+| **P2** | `--security-opt seccomp=unconfined` | the user namespace starts, then **"Can't mount proc on /proc: Operation not permitted"**. Refused. |
+| **P3** | P2 `+ apparmor=unconfined` | identical to P2. |
+| **X2** | `systempaths=unconfined` only | "No permissions to create a new namespace" (as P1): seccomp is a gate on its own. |
+| **X1** | `seccomp=unconfined` + `systempaths=unconfined` (AppArmor left default) | bwrap **runs**; the kernel's measurement: 0 problems. **The minimal loosening.** |
+| **P4** | P3 `+ systempaths=unconfined` | as X1. |
+| **X3** | X1, the session sharing the network (what a run uses, §4) | bwrap runs; 0 problems; the network is reachable (§4). |
+| **P5** | P4, the session sharing the network | as X3. |
 
-**This is loosening the container's own boundary.** The nested bwrap sandbox is strong *once it runs* (§4), but to
-let it run at all this host's container must drop seccomp and unmask system paths. So nested bwrap buys a second,
+So on this kernel the gates are Docker's **seccomp** profile (the user namespace) and its **masked system paths**
+(the fresh `/proc`). **AppArmor is not in this guest kernel** (`/sys/module/apparmor` absent, `measure.log`), so
+`apparmor=unconfined` changes nothing here; on a kernel with AppArmor it may be a third gate — not measured.
+
+**This is loosening the container's own boundary.** The nested sandbox is strong once it runs (§5), but on this host
+the container must drop its seccomp filter and unmask system paths to let it run. So nested bwrap buys a second,
 per-session boundary **only at the cost of weakening the first**. The recommendation (decision F) therefore remains:
-on a real deployment prefer the **container itself as the boundary** (`--network none`/egress sidecar, `--cap-drop
-ALL`, `--read-only`, non-root, `--pids-limit`, seccomp kept on) and use nested bwrap only where the container must
-stay hardened and the kernel allows unprivileged userns without unmasking. This module gives the bwrap layer; it does
-not claim to replace the container profile.
+on a real deployment prefer the **container itself as the boundary** (`--cap-drop ALL`, `--read-only`, non-root,
+`--pids-limit`, seccomp kept on, the network limited to the provider — §4), and use nested bwrap only where the
+kernel allows unprivileged user namespaces without that loosening. This module gives the bwrap layer; it does not
+claim to replace the container profile.
 
 ### Fail-closed
 
-When the settings ask for confinement and it cannot be provided — not Linux, no bwrap, a read-only path missing, or
-(P1–P3) the sandbox cannot set up its namespaces — the run **refuses before the first provider request** and records
-why (`RUN.json.confinement.problems`, stage `confinement`); a single session refuses with `SessionRefused` before the
-client starts or its log is created. Nothing is sent to a provider. Proven by `test_v21_confine` (macOS) and by P1–P3
-above (the measurement reports the sandbox did not run; a real run would raise `RunRefused`).
+When the settings ask for confinement and it cannot be provided — not Linux, no bubblewrap (or a path that is not an
+executable file), a read-only path missing, a client whose directory holds HOME or the workspace, no client to
+measure with, or (P1–P3, X2) the sandbox cannot set up its namespaces — the run **refuses before the first provider
+request** and records why (`RUN.json.confinement.problems`, stage `confinement`); a single session refuses with
+`SessionRefused` before the client starts or its log is created; `aisef run --check` is `ready: false`. A check the
+measurement could not make (no `unshare`, no `find`, an exit that is not the kernel's refusal) is a problem, never a
+pass. Proven by `test_v21_confine` (macOS) and by P1–P3/X2 above (the kernel's measurement: "the sandbox did not run
+the probe").
 
-## 4. What is confined once bwrap runs (P4, `--network none`)
+## 4. The network: what a run can use
 
-Every row is a denied operation from [`evidence/sandbox/P4-all.json`](evidence/sandbox/P4-all.json) /
-[`measure.log`](evidence/sandbox/measure.log); the positive controls show the workspace still works.
+| `network` | Namespace | What it gives (measured) | Usable for a run? |
+|---|---|---|---|
+| `none` | its own (`--unshare-net`): a fresh loopback, no route | host port: `Network is unreachable`; the container's abstract unix socket: `Connection refused` (X1, P4) | **No.** The session cannot reach its provider endpoint either, so no model call can work. **Measurement-only**: `settings.load` refuses it ("leaves a model session no route to its provider"). |
+| `host` | the container's (`--share-net`) | host port: `UP: reached host`; the container's abstract unix socket: `CONNECTED` (X3, P5) | **Yes — and egress is NOT confined.** The session reaches whatever the container's network reaches, and every abstract unix socket of that network namespace (on a bare Linux host that can mean the session bus, X11 or a container shim). The session record says `confinement: "bwrap network=host"`. |
 
-| Claim | Operation attempted in the sandbox | Observed |
+So **no configuration shown here confines a working model session's network.** That needs an egress allowlist (only
+the provider endpoint) — e.g. a default-deny sidecar such as OpenSandbox's (**CODE**, `c7dc78a4090e`: the sidecar is
+created and the workload joins its network namespace, `docker_service.py:783-850`; nft rules
+`manager.go:228-296`; an empty policy denies by default, `policy.go:39-45`; note packets are
+enforced only in its `dns+nft` mode, the default `dns` mode redirects port 53 only — research record N8, N9, N10).
+Not built here. Since `none` is refused for a run, a run never has sessions that could not reach the network, so no
+such session is ever counted as unaccounted provider spend.
+
+## 5. What is confined once bwrap runs
+
+Rows from [`evidence/sandbox/X3-seccomp-systempaths-net-host.json`](evidence/sandbox/X3-seccomp-systempaths-net-host.json)
+(the run profile: minimal loosening, shared network); X1/P4/P5 are identical except the network rows (§4). Every
+operation runs under the command line a session gets (`confine.wrap` with the client and a worktree of the run's
+repository); the kernel's own `confine.measure`, run as `run.execute` runs it, reports 0 problems in X1, X3, P4, P5.
+
+**Denied** (the operation failed inside; `after` = checked from outside the sandbox when the run ended):
+
+| Claim | Operation tried inside | Observed |
 |---|---|---|
-| read nothing outside the workspace | `cat <run-dir>/canary` | `No such file or directory` (exit 1) |
-| the verifier/hidden material is unreachable | `cat <verifier>/hidden.json` | `No such file or directory` |
-| HOME secrets unreachable | `cat <op-home>/.ssh/id` | `No such file or directory` (HOME is an empty tmpfs inside) |
-| cannot write the runtime (client binary) | `: > <runtime>/opencode` | denied; host check: **runtime unchanged** |
-| cannot write the anchor / run directory | append `<run-dir>/EVIDENCE.anchor`; create `<run-dir>/written` | lands only in the sandbox's throwaway tmpfs; host check: **anchor unchanged, no file in the real run directory** |
-| cannot see host processes | `ls /proc` numeric entries | only `1 2 3 4 5 6` — its own PID namespace, not the guest's/host's hundreds |
-| no network | `socket.create_connection(host-gateway)` | `Network is unreachable` (own empty net namespace; `routed_interfaces: []`) |
-| no capability | `/proc/self/status` Cap* | `CapPrm/CapEff/CapBnd/CapInh/CapAmb = 0` |
-| no new privileges | `/proc/self/status` NoNewPrivs | `1` |
-| its own namespaces | `readlink /proc/self/ns/*` vs the guest's | user, pid, net, ipc, uts, mnt all **own** |
-| a setsid child dies with the session | `setsid sleep <unique>` then look for it after | `setsid_survivors: []` — the session's own PID namespace kills every descendant when its init exits |
-| **control**: the workspace works | `echo ok > ./w && cat ./w` | `ok` |
-| **control**: a client can run | run a fake client in the workspace | prints its JSON |
+| the run directory is unreadable | `cat <run-dir>/canary` | `No such file or directory` |
+| the verifier/hidden material is unreachable | `cat <verifier>/hidden.json`; `: > <verifier>/hidden.json` | `No such file or directory`; `Directory nonexistent` (not mounted) |
+| HOME secrets unreachable | `cat ~/.ssh/id`; `cat ~/.local/share/opencode/auth.json` | `No such file or directory` (HOME shows only `.config`, the way to the client's configuration) |
+| the runtime cannot be rewritten | `: > <runtime>/opencode`; `: > <runtime>/x` | `Read-only file system`; after: runtime unchanged, nothing created |
+| the kernel / interpreter cannot be written | `: > <venv site-packages>/aisef2/…` (a path the operator **can** write: `operator_can` true) | `Read-only file system` (the venv is a `read_only` path); after: nothing created |
+| the git directory cannot be written | `: > <out>/repo/.git/HEAD` | `Read-only file system`; after: HEAD unchanged |
+| a unix socket outside every mount is unreachable | connect `<base>/sock/ctl` | `FileNotFoundError` |
+| no further user namespace (the route back to capabilities) | `unshare --user --map-root-user true` | `unshare failed: No space left on device` (`--disable-userns`) |
+| the container's processes are not visible | look for a container-side `sleep 987.654` (seen outside: `after.container_sleeper_seen_outside` true) by its command line in `/proc/*/cmdline` | found **0** times; `/proc` lists only `1 2 9 10 11 12` — the session's own PID namespace (the measurement: `namespaces.pid` "own", a different `/proc/self/ns/pid` from the container's) |
+| a setsid child dies with the session | the measurement's `setsid sleep <unique>`, then a look for it after | `setsid_survivors: []` |
 
-What `--network none` denies is reachability: `routed_interfaces: []` and the connect is unreachable. (This kernel
-pre-creates DOWN tunnel pseudo-devices in a fresh netns, so the proof is "no routes", not "only `lo` exists".)
+**Succeeds only into the sandbox's throwaway tmpfs** (not a denial; the real file is unchanged):
 
-**P5 (`--network` shared)** is identical except the connect **succeeds** (`UP: reached host`). So when the session is
-given the guest's network, egress is not confined and the record must say so — the module reports
-`confinement: "bwrap network=host"` on the session and `network` in the measurement.
+| Operation | Inside | After (outside) |
+|---|---|---|
+| append to `<run-dir>/EVIDENCE.anchor` | exit 0, the file reads `x` | anchor unchanged |
+| create `<run-dir>/written` | exit 0, `<run-dir>` lists `repo work written` | nothing in the real run directory |
 
-## 5. The implementation
+**Observed** (a reading of `/proc/self/status`, not an operation): `CapInh/CapPrm/CapEff/CapBnd/CapAmb = 0`,
+`NoNewPrivs: 1`, `Seccomp: 0` (§7); namespaces user, pid, ipc, uts, mnt **own** (net own with `none`, shared with
+`host`).
+
+**Reached by design** (read-only): `<out>/repo/.git/HEAD` reads `ref: refs/heads/main`; `git status` works in the
+workspace; the client's configuration directory lists `opencode.json`.
+
+**Sockets.** Filesystem sockets: none is listed under any host directory bound in (the measurement's
+`inside.unix_sockets: []`). A read-only mount does **not** stop a connect: the same `<base>/sock/ctl`, bound in
+read-only, is `CONNECTED` — and the kernel's measurement refuses that setting ("a unix socket outside the workspace
+is reachable"), recorded as `by_design.measure_with_a_read_only_mounted_socket`. Abstract sockets: §4.
+
+**Controls** (must work): the workspace (`echo ok > ./w && cat ./w` → `ok`); the client started from its own
+read-only mounted directory prints its JSON.
+
+## 6. The implementation
 
 - **Setting** (`aisef2/app/settings.py`, optional, fail-closed validation):
-  `"confinement": {"backend": "bwrap", "bwrap": "<absolute path>", "network": "none" | "host", "read_only": ["<abs>", ...]}`.
-  Absent ⇒ a 2.0.0 run, no record key, no wrapping.
+  `"confinement": {"backend": "bwrap", "bwrap": "<absolute path>", "network": "host", "read_only": ["<abs>", ...]}`.
+  `network: "none"` is refused for a run (§4); confinement together with `review.finder: "ocr"` is refused — Open
+  Code Review calls the model outside the client's sessions, unconfined. Absent ⇒ a 2.0.0 run, no record key, no
+  wrapping.
 - **argv builder** (`confine.wrap`): `--unshare-user --unshare-pid --unshare-ipc --unshare-uts` (and `--unshare-net`
-  for `network: none`, else `--share-net`), `--disable-userns`, `--die-with-parent`, `--new-session`, `--cap-drop
-  ALL`; the system (`/usr`, `/etc`, …) read-only (a merged-`/usr` symlink stays a symlink); the client's directory,
-  the worktree's **common git directory**, the client's config directory and the operator's `read_only` paths
-  read-only; the workspace bound **last** read-write (so it wins even below a read-only path); HOME an empty tmpfs with
-  `XDG_*` redirected under it, but `XDG_CONFIG_HOME` still pointing at the read-only `opencode` config so the client
-  finds its route.
-- **Wiring**: `client.session(..., confine=...)` wraps the client and refuses before the log exists when the host
-  cannot confine; `run.execute` measures confinement at a new stage before the preflight and refuses the whole run on
-  any problem, recording the report as `RUN.json.confinement`; `aisef run --check` measures it too (`ready: false`
-  when it is not provided).
-- **Measurement** (`confine.measure`): runs a probe shell under the very same wrapper and judges what it observes (the
-  table in §4). It never trusts config; a "bwrap" that runs the probe unconfined is refused for *what the probe could
-  do*, proven by `test_v21_confine.FailClosed.test_what_is_measured_decides_not_the_name_of_the_tool`.
+  for `none`, else `--share-net`), `--disable-userns`, `--die-with-parent`, `--new-session`, `--cap-drop ALL`; the
+  system read-only (a merged-`/usr` symlink stays a symlink); the client's directory, the worktree's common git
+  directory, the client's configuration directory and the operator's `read_only` paths read-only; the workspace bound
+  **last** read-write (so it wins even below a read-only path); HOME an empty tmpfs with `XDG_*` redirected under it,
+  `XDG_CONFIG_HOME` still pointing at the read-only configuration so the client finds its route.
+- **Wiring**: `run.execute` resolves the client first and measures confinement at a stage of its own before the
+  preflight, **with the sessions' client and a worktree of `<out>/repo`** (removed afterwards), so the measured
+  command line binds exactly what a session's binds (`test_v21_confine.CommandLine.test_the_measured_wrapper_is_the_sessions_own`);
+  any problem refuses the run, the report kept as `RUN.json.confinement`. `client.session(..., confine=...)` wraps
+  the client and refuses before the log exists when the host cannot confine; each confined session's record carries
+  `confinement`. `aisef run --check` measures with the client on the run's PATH and a worktree of a new repository.
+- **Measurement** (`confine.measure`): a probe shell under that wrapper; judged on what it observes, never on config —
+  a "bubblewrap" that runs the probe unconfined is refused for what the probe could do. Besides §5's checks it
+  requires the mounts seen inside to lie within what the command line names, and no unix socket outside the workspace
+  under any bound directory; a check that did not run is a problem.
 
 **Kernel change.** This touches `aisef2/` (settings, client, run, cli, and the new `confine.py`): it needs mutation
-coverage and re-qualification outside the current measured snapshot (the new module is already named in
-`tests/v2/test_v21_mutation_record.py`'s V2.1 targets list for the campaign, but was not measured here).
+coverage and re-qualification outside the current measured snapshot (the module is named in
+`tests/v2/test_v21_mutation_record.py`'s V2.1 targets, but was not measured in the current snapshot). Targeted
+mutants of this fix were run on a scratch copy only (15/15 killed) — not campaign evidence.
 
-## 6. Limits (not confined / not claimed)
+## 7. Limits (not confined / not claimed)
 
-- **Not confined** by this track: the kernel's own test execution and probe execution of the candidate, and Open Code
-  Review — they still run as the operator's user. This track confines the *client's model sessions* only.
-- **No syscall filter.** The confined process shows `Seccomp: 0` inside (the container's seccomp was unconfined to let
-  bwrap start, and bwrap is not run with `--seccomp`). The boundary is namespaces + caps + no-new-privs + mounts, not
-  syscall filtering. A real deployment should keep the container's seccomp on and not rely on nested bwrap (§3).
-- **The loosening is real** (§3): nested bwrap on this host needs the container's seccomp dropped and system paths
-  unmasked. Measured as a VM container on macOS Docker Desktop; a native Linux host or a Linux host with unprivileged
-  userns enabled would not need the same loosening — not measured here.
-- **Network `host`** does not confine egress (§4, P5); only `network: none` was proven to cut the network. A domain
-  allowlist egress sidecar (the reusable OpenSandbox piece, UPSTREAM-RESEARCH) is not built here.
-- Measured only on this one host/kernel; `--network none`'s pre-created tunnel devices are kernel-specific.
+- **Not confined** by this track: the kernel's own execution of the developer's tests and the probes' execution of
+  the candidate — they still run as the operator's user. Open Code Review is not confined either; it is refused
+  together with confinement.
+- **The network of a working session is not confined** (§4): `host` is the only usable mode and its egress is open;
+  `none` is measurement-only. No egress allowlist is built.
+- **No syscall filter.** The confined process shows `Seccomp: 0` (the container's seccomp was unconfined to let bwrap
+  start, and bwrap is not run with `--seccomp`). The boundary is namespaces + capabilities + no-new-privs + mounts.
+- **The loosening is real** (§3): on this host nested bwrap needs the container's seccomp dropped and system paths
+  unmasked. A Linux host that allows unprivileged user namespaces under its container profile might not — not
+  measured here.
+- **The session reads the run's clone** (`<out>/repo/.git`, every object and ref) and the client's configuration
+  directory: whatever the operator keeps there is readable by the model's code.
+- Measured on one host and kernel (Docker Desktop's LinuxKit 7.0.12, arm64). The image's apt packages are not pinned:
+  each build gets a new image ID (`measure.log`); the bubblewrap package (`0.12.0-1~deb13u1`) and the binary's
+  sha256 (`b3b829e1…`, every profile's JSON) are recorded and equal to the earlier run at `58f3b4e`. A fresh netns on
+  this kernel pre-creates DOWN tunnel pseudo-devices, so "no network" is judged by "no route", not by interface names.
 
-## 7. M-levels
+## 8. M-levels
 
 | Deliverable | Level | Why |
 |---|---|---|
-| argv builder + fail-closed refusal, settings, wiring into `client`/`run`/`--check` | **M3** | `test_v21_confine` (16 tests) on macOS: the setting, the command line, and every fail-closed path, with fake clients/providers; no OS boundary exercised on macOS. |
-| the confinement boundary itself (denials + controls) inside a Linux container | **M4** | `validation/v21/sandbox/run.sh` under real `docker` (real bwrap 0.12.0, real namespaces, a real host port and host process table), each claim a denied real operation; `evidence/sandbox/`. The model is still never called (fake client); no paid provider — so not M5. |
-| wired into a real `aisef run` on Linux end to end | **M6** | not done here: the macOS host has no Linux backend to run `aisef run` itself under bwrap; measured only via the standalone harness inside the container. |
+| the setting, the argv builder, fail-closed refusal of run / `--check` / session | **M3** | `test_v21_confine` (19 tests, all its own) on macOS with fake clients and providers; no OS boundary exercised on macOS. |
+| the success path of a confined run (every session started through the bwrap argv, the records saying so) | **M3** | `test_v21_confine.RunFailClosed.test_a_confined_run_starts_every_session_through_bubblewrap_and_says_so`: the **measurement stubbed** and the argv built for Linux, a recording fake bubblewrap that confines nothing — the wiring, not a boundary. |
+| the confinement boundary itself inside a Linux container | **M4** | `validation/v21/sandbox/run.sh` under real `docker`: real bwrap 0.12.0, real namespaces, a real host port, the container's real processes and sockets; the kernel's own `confine.measure` and the session's `confine.wrap` run in the container; each claim an operation tried (§5). A standalone harness, not `aisef run`; the client is a script, no provider — so not M5. |
+| a confined real `aisef run` on Linux end to end | **M6** | not done: the macOS host has no Linux backend to run `aisef run` itself under bwrap. |
