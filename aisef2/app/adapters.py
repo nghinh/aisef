@@ -240,7 +240,7 @@ def tree_of(root: str) -> dict[str, str]:
     """Every entry of a checkout but its .git, by relative path: a file's sha256, a link's target, a directory."""
     out = {}
     for d, dirs, files in os.walk(root):
-        dirs[:] = sorted(x for x in dirs if x != ".git")
+        dirs[:] = [x for x in dirs if x != ".git"]     # the walk order reaches no reader: compared as a mapping
         for name in [*dirs, *files]:
             p = pathlib.Path(d, name)
             rel = p.relative_to(root).as_posix()
