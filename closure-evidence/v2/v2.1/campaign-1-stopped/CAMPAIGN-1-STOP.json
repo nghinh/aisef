@@ -1,0 +1,278 @@
+{
+ "record": "AISEF V2.1 — B-03b CAMPAIGN 1 (snapshot cc53596): STOPPED, with what is kept and what may be reused",
+ "authority": {
+  "ledger": "closure-evidence/v2/cycle2/RELEASE-DECISIONS.json",
+  "seq": 5,
+  "owner_instruction_2026_10_07": "Nếu số đo chứng minh có lợi, dừng worker có kiểm soát tại checkpoint phù hợp; giữ manifest, log và mọi kết quả đã hoàn tất. Ghi rõ phần đang dở, không biến kết quả chưa hoàn tất thành bằng chứng. ... Không mặc định bỏ toàn bộ kết quả cũ hoặc chạy lại mọi thứ. Lập bảng kết quả có thể tái sử dụng theo quy tắc evidence hiện có và phần bắt buộc đo lại. Không tái sử dụng nếu chưa chứng minh đủ điều kiện."
+ },
+ "started": "2026-10-06T20:55:52Z",
+ "stopped": "2026-10-07T08:58:12+0700",
+ "why_stopped": [
+  "measured stale bytecode: in the workers' environment (env -i, no PYTHONDONTWRITEBYTECODE) a mutant written in the same whole second and with the same size as the previous one imported the previous one's .pyc in 17 of 20 pairs (stale-bytecode/probe_pyc.py); the runner rewrites every mutant into one tree and runs kill files without -B",
+  "the runner audit (AUDIT-FINDINGS.json): 29 confirmed findings (5 critical, 11 major, 13 minor), 1 refuted, each reproduced by an auditor and independently by a verifier — non-zero exits and timeouts counted as kills, order-dependent classification, shared tree/HOME/TMPDIR state and detached helpers between mutants, 5,709 of 11,363 mutants 'killed' by byte/text-identity assertions, no per-file kill cause recorded",
+  "cost: 7 mutants in 10 minutes over 4 workers on the app targets (rate.py), survivors running every kill file (~700 s each under load)"
+ ],
+ "how_stopped": "SIGTERM to the four `mutation.py run` processes after checking each one's cwd is its m21-w* worktree (STOP.log); in-flight kill-test processes left to end; owned_run measured: exit -15, owned_after 0, escaped [], harness orphans 0 -> 0 on all four (workers/*.owned.json); the heavy lock released",
+ "in_progress_not_evidence": {
+  "m21-w1": "aisef2/app/bundle_cli.py::main",
+  "m21-w2": "aisef2/app/adapters.py::Reviewer._ocr",
+  "m21-w3": "aisef2/app/bundle_cli.py::EXAMPLES",
+  "m21-w4": "aisef2/app/bundle.py::shape_problems"
+ },
+ "operator_store": "only .local/share/opencode/log changed (newest entry 03:10:19 -> 08:01:12; 12 entries before and after; db, auth and config unchanged); opencode.log is held open for writing by pid 9958 alone, the OpenCode desktop app's NodeService (child of pid 9792, started 2026-10-06 05:58 by launchd), outside every worker; the app listens on 127.0.0.1:60068 and :59976 and no test or kernel file names either port",
+ "reuse_table": [
+  {
+   "worker": "m21-w1",
+   "target": "aisef2/app/adapters.py::Developer.implement",
+   "mutants": 48,
+   "killed": 48,
+   "survivors": 0,
+   "timeouts": 0,
+   "reusable": false,
+   "conditions_not_met": [
+    "the old runner recorded no kill cause or per-file outcome (audit VS-1, ORD-6): no kill can be shown to be a valid, reproduced assertion kill rather than an exit code, a timeout or an infrastructure fault",
+    "stale-bytecode exposure: 2 mutant(s) the same size as the source written before them (audit BC-1/BC-3)",
+    "the target file changes in 927f5dc (tree_of's dead sort removed)"
+   ]
+  },
+  {
+   "worker": "m21-w1",
+   "target": "aisef2/app/adapters.py::Reviewer.__init__",
+   "mutants": 13,
+   "killed": 12,
+   "survivors": 1,
+   "timeouts": 0,
+   "reusable": false,
+   "conditions_not_met": [
+    "the old runner recorded no kill cause or per-file outcome (audit VS-1, ORD-6): no kill can be shown to be a valid, reproduced assertion kill rather than an exit code, a timeout or an infrastructure fault",
+    "stale-bytecode exposure: 2 mutant(s) the same size as the source written before them (audit BC-1/BC-3)",
+    "1 survivor(s): the kill set gains a dedicated kill file, so the kill set changes",
+    "the target file changes in 927f5dc (tree_of's dead sort removed)"
+   ]
+  },
+  {
+   "worker": "m21-w1",
+   "target": "aisef2/app/bundle.py::Project.order",
+   "mutants": 10,
+   "killed": 10,
+   "survivors": 0,
+   "timeouts": 0,
+   "reusable": false,
+   "conditions_not_met": [
+    "the old runner recorded no kill cause or per-file outcome (audit VS-1, ORD-6): no kill can be shown to be a valid, reproduced assertion kill rather than an exit code, a timeout or an infrastructure fault",
+    "stale-bytecode exposure: 1 mutant(s) the same size as the source written before them (audit BC-1/BC-3)",
+    "the target file changes in 0b59991 (unreachable re-check removed)"
+   ]
+  },
+  {
+   "worker": "m21-w1",
+   "target": "aisef2/app/bundle.py::_strings",
+   "mutants": 14,
+   "killed": 10,
+   "survivors": 4,
+   "timeouts": 0,
+   "reusable": false,
+   "conditions_not_met": [
+    "the old runner recorded no kill cause or per-file outcome (audit VS-1, ORD-6): no kill can be shown to be a valid, reproduced assertion kill rather than an exit code, a timeout or an infrastructure fault",
+    "stale-bytecode exposure: 3 mutant(s) the same size as the source written before them (audit BC-1/BC-3)",
+    "4 survivor(s): the kill set gains a dedicated kill file, so the kill set changes",
+    "the target file changes in 0b59991 (unreachable re-check removed)"
+   ]
+  },
+  {
+   "worker": "m21-w1",
+   "target": "aisef2/app/bundle.py::read",
+   "mutants": 9,
+   "killed": 5,
+   "survivors": 4,
+   "timeouts": 0,
+   "reusable": false,
+   "conditions_not_met": [
+    "the old runner recorded no kill cause or per-file outcome (audit VS-1, ORD-6): no kill can be shown to be a valid, reproduced assertion kill rather than an exit code, a timeout or an infrastructure fault",
+    "4 survivor(s): the kill set gains a dedicated kill file, so the kill set changes",
+    "the target file changes in 0b59991 (unreachable re-check removed)"
+   ]
+  },
+  {
+   "worker": "m21-w1",
+   "target": "aisef2/app/bundle_cli.py::AUTHORING_KEYS",
+   "mutants": 9,
+   "killed": 9,
+   "survivors": 0,
+   "timeouts": 0,
+   "reusable": false,
+   "conditions_not_met": [
+    "the old runner recorded no kill cause or per-file outcome (audit VS-1, ORD-6): no kill can be shown to be a valid, reproduced assertion kill rather than an exit code, a timeout or an infrastructure fault"
+   ]
+  },
+  {
+   "worker": "m21-w1",
+   "target": "aisef2/app/bundle_cli.py::CRITERION_KEYS",
+   "mutants": 6,
+   "killed": 6,
+   "survivors": 0,
+   "timeouts": 0,
+   "reusable": false,
+   "conditions_not_met": [
+    "the old runner recorded no kill cause or per-file outcome (audit VS-1, ORD-6): no kill can be shown to be a valid, reproduced assertion kill rather than an exit code, a timeout or an infrastructure fault"
+   ]
+  },
+  {
+   "worker": "m21-w1",
+   "target": "aisef2/app/bundle_cli.py::_create",
+   "mutants": 3,
+   "killed": 3,
+   "survivors": 0,
+   "timeouts": 0,
+   "reusable": false,
+   "conditions_not_met": [
+    "the old runner recorded no kill cause or per-file outcome (audit VS-1, ORD-6): no kill can be shown to be a valid, reproduced assertion kill rather than an exit code, a timeout or an infrastructure fault"
+   ]
+  },
+  {
+   "worker": "m21-w1",
+   "target": "aisef2/app/bundle_cli.py::coverage",
+   "mutants": 32,
+   "killed": 27,
+   "survivors": 5,
+   "timeouts": 0,
+   "reusable": false,
+   "conditions_not_met": [
+    "the old runner recorded no kill cause or per-file outcome (audit VS-1, ORD-6): no kill can be shown to be a valid, reproduced assertion kill rather than an exit code, a timeout or an infrastructure fault",
+    "5 survivor(s): the kill set gains a dedicated kill file, so the kill set changes"
+   ]
+  },
+  {
+   "worker": "m21-w1",
+   "target": "aisef2/app/bundle_cli.py::init",
+   "mutants": 12,
+   "killed": 10,
+   "survivors": 2,
+   "timeouts": 0,
+   "reusable": false,
+   "conditions_not_met": [
+    "the old runner recorded no kill cause or per-file outcome (audit VS-1, ORD-6): no kill can be shown to be a valid, reproduced assertion kill rather than an exit code, a timeout or an infrastructure fault",
+    "stale-bytecode exposure: 2 mutant(s) the same size as the source written before them (audit BC-1/BC-3)",
+    "2 survivor(s): the kill set gains a dedicated kill file, so the kill set changes"
+   ]
+  },
+  {
+   "worker": "m21-w3",
+   "target": "aisef2/app/adapters.py::Reviewer._model",
+   "mutants": 24,
+   "killed": 21,
+   "survivors": 3,
+   "timeouts": 0,
+   "reusable": false,
+   "conditions_not_met": [
+    "the old runner recorded no kill cause or per-file outcome (audit VS-1, ORD-6): no kill can be shown to be a valid, reproduced assertion kill rather than an exit code, a timeout or an infrastructure fault",
+    "3 survivor(s): the kill set gains a dedicated kill file, so the kill set changes",
+    "the target file changes in 927f5dc (tree_of's dead sort removed)"
+   ]
+  },
+  {
+   "worker": "m21-w3",
+   "target": "aisef2/app/adapters.py::Reviewer._verify",
+   "mutants": 6,
+   "killed": 5,
+   "survivors": 1,
+   "timeouts": 0,
+   "reusable": false,
+   "conditions_not_met": [
+    "the old runner recorded no kill cause or per-file outcome (audit VS-1, ORD-6): no kill can be shown to be a valid, reproduced assertion kill rather than an exit code, a timeout or an infrastructure fault",
+    "1 survivor(s): the kill set gains a dedicated kill file, so the kill set changes",
+    "the target file changes in 927f5dc (tree_of's dead sort removed)"
+   ]
+  },
+  {
+   "worker": "m21-w3",
+   "target": "aisef2/app/adapters.py::Reviewer.review",
+   "mutants": 54,
+   "killed": 42,
+   "survivors": 12,
+   "timeouts": 0,
+   "reusable": false,
+   "conditions_not_met": [
+    "the old runner recorded no kill cause or per-file outcome (audit VS-1, ORD-6): no kill can be shown to be a valid, reproduced assertion kill rather than an exit code, a timeout or an infrastructure fault",
+    "stale-bytecode exposure: 5 mutant(s) the same size as the source written before them (audit BC-1/BC-3)",
+    "12 survivor(s): the kill set gains a dedicated kill file, so the kill set changes",
+    "the target file changes in 927f5dc (tree_of's dead sort removed)"
+   ]
+  },
+  {
+   "worker": "m21-w3",
+   "target": "aisef2/app/adapters.py::_unchanged",
+   "mutants": 16,
+   "killed": 12,
+   "survivors": 4,
+   "timeouts": 0,
+   "reusable": false,
+   "conditions_not_met": [
+    "the old runner recorded no kill cause or per-file outcome (audit VS-1, ORD-6): no kill can be shown to be a valid, reproduced assertion kill rather than an exit code, a timeout or an infrastructure fault",
+    "stale-bytecode exposure: 1 mutant(s) the same size as the source written before them (audit BC-1/BC-3)",
+    "4 survivor(s): the kill set gains a dedicated kill file, so the kill set changes",
+    "the target file changes in 927f5dc (tree_of's dead sort removed)"
+   ]
+  },
+  {
+   "worker": "m21-w3",
+   "target": "aisef2/app/adapters.py::attempt_of",
+   "mutants": 15,
+   "killed": 15,
+   "survivors": 0,
+   "timeouts": 0,
+   "reusable": false,
+   "conditions_not_met": [
+    "the old runner recorded no kill cause or per-file outcome (audit VS-1, ORD-6): no kill can be shown to be a valid, reproduced assertion kill rather than an exit code, a timeout or an infrastructure fault",
+    "stale-bytecode exposure: 1 mutant(s) the same size as the source written before them (audit BC-1/BC-3)",
+    "the target file changes in 927f5dc (tree_of's dead sort removed)"
+   ]
+  },
+  {
+   "worker": "m21-w3",
+   "target": "aisef2/app/adapters.py::tree_of",
+   "mutants": 14,
+   "killed": 8,
+   "survivors": 6,
+   "timeouts": 0,
+   "reusable": false,
+   "conditions_not_met": [
+    "the old runner recorded no kill cause or per-file outcome (audit VS-1, ORD-6): no kill can be shown to be a valid, reproduced assertion kill rather than an exit code, a timeout or an infrastructure fault",
+    "stale-bytecode exposure: 1 mutant(s) the same size as the source written before them (audit BC-1/BC-3)",
+    "6 survivor(s): the kill set gains a dedicated kill file, so the kill set changes",
+    "the target file changes in 927f5dc (tree_of's dead sort removed)"
+   ]
+  },
+  {
+   "worker": "m21-w3",
+   "target": "aisef2/app/bundle.py::load",
+   "mutants": 74,
+   "killed": 71,
+   "survivors": 3,
+   "timeouts": 0,
+   "reusable": false,
+   "conditions_not_met": [
+    "the old runner recorded no kill cause or per-file outcome (audit VS-1, ORD-6): no kill can be shown to be a valid, reproduced assertion kill rather than an exit code, a timeout or an infrastructure fault",
+    "stale-bytecode exposure: 9 mutant(s) the same size as the source written before them (audit BC-1/BC-3)",
+    "3 survivor(s): the kill set gains a dedicated kill file, so the kill set changes",
+    "the target file changes in 0b59991 (unreachable re-check removed)"
+   ]
+  },
+  {
+   "worker": "m21-w4",
+   "target": "aisef2/app/adapters.py::_bounded",
+   "mutants": 10,
+   "killed": 10,
+   "survivors": 0,
+   "timeouts": 1,
+   "reusable": false,
+   "conditions_not_met": [
+    "the old runner recorded no kill cause or per-file outcome (audit VS-1, ORD-6): no kill can be shown to be a valid, reproduced assertion kill rather than an exit code, a timeout or an infrastructure fault",
+    "1 kill(s) by the clock: a timeout is never a kill",
+    "the target file changes in 927f5dc (tree_of's dead sort removed)"
+   ]
+  }
+ ],
+ "reuse_verdict": "0 of 18 completed results may be reused: every one fails at least the runner-validity condition; each is re-measured by the hardened runner (docs/v2.1/MUTATION-RUNNER-V2.md). The results stay here as history and are never imported as V2.1 worker histories.",
+ "historical_exposure": "exposure-v2.0.0.json: at v2.0.0, 768 of V2.0-S2's 6,463 recorded kills (11.9 %) and 1,661 of the other phases' (where the mutant list still regenerates) were exposed to stale bytecode (same size as the source written before them; a necessary, not a sufficient, condition: the records kept no timings); 39 kills by timeout in P2/P4/C2-P2/C2-P4. The 2.0 records are kept unchanged."
+}

@@ -1,0 +1,317 @@
+{
+ "target": "aisef2/app/bundle.py::shape_problems",
+ "kill_tests": [
+  "tests/v2/test_app_units.py",
+  "tests/v2/test_v21_inputs.py",
+  "tests/v2/test_v21_identity.py",
+  "tests/v2/test_v21_review.py",
+  "tests/v2/test_v21_bundle_tools.py",
+  "tests/v2/test_v21_continue_usage.py",
+  "tests/v2/test_v21_review_chain.py",
+  "tests/v2/test_v21_continue_integrity.py",
+  "tests/v2/test_app_run.py"
+ ],
+ "mutants_total": 115,
+ "rows": [
+  {
+   "mutant": "L66 condition negated",
+   "files": {
+    "tests/v2/test_app_units.py": {
+     "killed": true,
+     "seconds": 1.1,
+     "timed_out": false
+    },
+    "tests/v2/test_v21_inputs.py": {
+     "killed": true,
+     "seconds": 0.8,
+     "timed_out": false
+    },
+    "tests/v2/test_v21_identity.py": {
+     "killed": true,
+     "seconds": 0.8,
+     "timed_out": false
+    },
+    "tests/v2/test_v21_review.py": {
+     "killed": true,
+     "seconds": 0.7,
+     "timed_out": false
+    },
+    "tests/v2/test_v21_bundle_tools.py": {
+     "killed": true,
+     "seconds": 0.8,
+     "timed_out": false
+    },
+    "tests/v2/test_v21_continue_usage.py": {
+     "killed": true,
+     "seconds": 0.8,
+     "timed_out": false
+    },
+    "tests/v2/test_v21_review_chain.py": {
+     "killed": true,
+     "seconds": 0.8,
+     "timed_out": false
+    },
+    "tests/v2/test_v21_continue_integrity.py": {
+     "killed": true,
+     "seconds": 0.8,
+     "timed_out": false
+    },
+    "tests/v2/test_app_run.py": {
+     "killed": true,
+     "seconds": 0.8,
+     "timed_out": false
+    }
+   }
+  },
+  {
+   "mutant": "L87 condition negated",
+   "files": {
+    "tests/v2/test_app_units.py": {
+     "killed": true,
+     "seconds": 0.8,
+     "timed_out": false
+    },
+    "tests/v2/test_v21_inputs.py": {
+     "killed": true,
+     "seconds": 1.0,
+     "timed_out": false
+    },
+    "tests/v2/test_v21_identity.py": {
+     "killed": true,
+     "seconds": 0.9,
+     "timed_out": false
+    },
+    "tests/v2/test_v21_review.py": {
+     "killed": true,
+     "seconds": 0.7,
+     "timed_out": false
+    },
+    "tests/v2/test_v21_bundle_tools.py": {
+     "killed": true,
+     "seconds": 0.8,
+     "timed_out": false
+    },
+    "tests/v2/test_v21_continue_usage.py": {
+     "killed": true,
+     "seconds": 0.8,
+     "timed_out": false
+    },
+    "tests/v2/test_v21_review_chain.py": {
+     "killed": true,
+     "seconds": 0.7,
+     "timed_out": false
+    },
+    "tests/v2/test_v21_continue_integrity.py": {
+     "killed": true,
+     "seconds": 0.8,
+     "timed_out": false
+    },
+    "tests/v2/test_app_run.py": {
+     "killed": true,
+     "seconds": 0.7,
+     "timed_out": false
+    }
+   }
+  },
+  {
+   "mutant": "L94 condition negated",
+   "files": {
+    "tests/v2/test_app_units.py": {
+     "killed": true,
+     "seconds": 0.7,
+     "timed_out": false
+    },
+    "tests/v2/test_v21_inputs.py": {
+     "killed": true,
+     "seconds": 0.8,
+     "timed_out": false
+    },
+    "tests/v2/test_v21_identity.py": {
+     "killed": true,
+     "seconds": 0.7,
+     "timed_out": false
+    },
+    "tests/v2/test_v21_review.py": {
+     "killed": true,
+     "seconds": 0.6,
+     "timed_out": false
+    },
+    "tests/v2/test_v21_bundle_tools.py": {
+     "killed": true,
+     "seconds": 0.8,
+     "timed_out": false
+    },
+    "tests/v2/test_v21_continue_usage.py": {
+     "killed": true,
+     "seconds": 0.8,
+     "timed_out": false
+    },
+    "tests/v2/test_v21_review_chain.py": {
+     "killed": true,
+     "seconds": 0.8,
+     "timed_out": false
+    },
+    "tests/v2/test_v21_continue_integrity.py": {
+     "killed": true,
+     "seconds": 0.8,
+     "timed_out": false
+    },
+    "tests/v2/test_app_run.py": {
+     "killed": true,
+     "seconds": 0.7,
+     "timed_out": false
+    }
+   }
+  },
+  {
+   "mutant": "L76 In->NotIn",
+   "files": {
+    "tests/v2/test_app_units.py": {
+     "killed": true,
+     "seconds": 0.8,
+     "timed_out": false
+    },
+    "tests/v2/test_v21_inputs.py": {
+     "killed": true,
+     "seconds": 0.8,
+     "timed_out": false
+    },
+    "tests/v2/test_v21_identity.py": {
+     "killed": true,
+     "seconds": 0.6,
+     "timed_out": false
+    },
+    "tests/v2/test_v21_review.py": {
+     "killed": true,
+     "seconds": 0.7,
+     "timed_out": false
+    },
+    "tests/v2/test_v21_bundle_tools.py": {
+     "killed": true,
+     "seconds": 0.8,
+     "timed_out": false
+    },
+    "tests/v2/test_v21_continue_usage.py": {
+     "killed": true,
+     "seconds": 0.8,
+     "timed_out": false
+    },
+    "tests/v2/test_v21_review_chain.py": {
+     "killed": true,
+     "seconds": 0.8,
+     "timed_out": false
+    },
+    "tests/v2/test_v21_continue_integrity.py": {
+     "killed": true,
+     "seconds": 0.8,
+     "timed_out": false
+    },
+    "tests/v2/test_app_run.py": {
+     "killed": true,
+     "seconds": 0.7,
+     "timed_out": false
+    }
+   }
+  },
+  {
+   "mutant": "L92 string '$.stories.' emptied",
+   "files": {
+    "tests/v2/test_app_units.py": {
+     "killed": false,
+     "seconds": 8.8,
+     "timed_out": false
+    },
+    "tests/v2/test_v21_inputs.py": {
+     "killed": true,
+     "seconds": 0.8,
+     "timed_out": false
+    },
+    "tests/v2/test_v21_identity.py": {
+     "killed": false,
+     "seconds": 2.1,
+     "timed_out": false
+    },
+    "tests/v2/test_v21_review.py": {
+     "killed": false,
+     "seconds": 21.9,
+     "timed_out": false
+    },
+    "tests/v2/test_v21_bundle_tools.py": {
+     "killed": false,
+     "seconds": 2.3,
+     "timed_out": false
+    },
+    "tests/v2/test_v21_continue_usage.py": {
+     "killed": false,
+     "seconds": 69.4,
+     "timed_out": false
+    },
+    "tests/v2/test_v21_review_chain.py": {
+     "killed": false,
+     "seconds": 202.2,
+     "timed_out": false
+    },
+    "tests/v2/test_v21_continue_integrity.py": {
+     "killed": false,
+     "seconds": 306.1,
+     "timed_out": false
+    },
+    "tests/v2/test_app_run.py": {
+     "killed": false,
+     "seconds": 45.8,
+     "timed_out": false
+    }
+   }
+  },
+  {
+   "mutant": "L89 sorted() -> list()",
+   "files": {
+    "tests/v2/test_app_units.py": {
+     "killed": false,
+     "seconds": 8.5,
+     "timed_out": false
+    },
+    "tests/v2/test_v21_inputs.py": {
+     "killed": false,
+     "seconds": 2.4,
+     "timed_out": false
+    },
+    "tests/v2/test_v21_identity.py": {
+     "killed": false,
+     "seconds": 2.1,
+     "timed_out": false
+    },
+    "tests/v2/test_v21_review.py": {
+     "killed": false,
+     "seconds": 22.1,
+     "timed_out": false
+    },
+    "tests/v2/test_v21_bundle_tools.py": {
+     "killed": false,
+     "seconds": 2.2,
+     "timed_out": false
+    },
+    "tests/v2/test_v21_continue_usage.py": {
+     "killed": false,
+     "seconds": 68.8,
+     "timed_out": false
+    },
+    "tests/v2/test_v21_review_chain.py": {
+     "killed": false,
+     "seconds": 201.9,
+     "timed_out": false
+    },
+    "tests/v2/test_v21_continue_integrity.py": {
+     "killed": false,
+     "seconds": 328.9,
+     "timed_out": false
+    },
+    "tests/v2/test_app_run.py": {
+     "killed": false,
+     "seconds": 49.2,
+     "timed_out": false
+    }
+   }
+  }
+ ]
+}

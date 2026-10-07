@@ -1,0 +1,441 @@
+[
+ {
+  "worker": "m21-w1",
+  "target": "aisef2/app/adapters.py::Developer.implement",
+  "mutants": 48,
+  "killed": 48,
+  "survivors": 0,
+  "timeouts": 0,
+  "error": null,
+  "kill_tests": [
+   "tests/v2/test_app_units.py",
+   "tests/v2/test_v21_identity.py",
+   "tests/v2/test_v21_review_chain.py",
+   "tests/v2/test_app_run.py",
+   "tests/v2/test_s2_kills.py"
+  ],
+  "mutant_list_matches": true,
+  "consecutive_same_size_pairs": 2,
+  "examples": [
+   [
+    "L79 And swapped",
+    "L81 not removed"
+   ],
+   [
+    "L69 element 1 dropped",
+    "L69 element 2 dropped"
+   ]
+  ]
+ },
+ {
+  "worker": "m21-w1",
+  "target": "aisef2/app/adapters.py::Reviewer.__init__",
+  "mutants": 13,
+  "killed": 12,
+  "survivors": 1,
+  "timeouts": 0,
+  "error": null,
+  "kill_tests": [
+   "tests/v2/test_app_units.py",
+   "tests/v2/test_v21_identity.py",
+   "tests/v2/test_v21_review_chain.py",
+   "tests/v2/test_app_run.py"
+  ],
+  "mutant_list_matches": true,
+  "consecutive_same_size_pairs": 2,
+  "examples": [
+   [
+    "L102 Or swapped",
+    "L104 Or swapped"
+   ],
+   [
+    "L104 Or swapped",
+    "L105 Or swapped"
+   ]
+  ]
+ },
+ {
+  "worker": "m21-w1",
+  "target": "aisef2/app/bundle.py::Project.order",
+  "mutants": 10,
+  "killed": 10,
+  "survivors": 0,
+  "timeouts": 0,
+  "error": null,
+  "kill_tests": [
+   "tests/v2/test_app_units.py",
+   "tests/v2/test_v21_inputs.py",
+   "tests/v2/test_v21_identity.py",
+   "tests/v2/test_v21_review.py",
+   "tests/v2/test_v21_bundle_tools.py",
+   "tests/v2/test_v21_continue_usage.py",
+   "tests/v2/test_v21_review_chain.py",
+   "tests/v2/test_v21_continue_integrity.py",
+   "tests/v2/test_app_run.py",
+   "tests/v2/test_s2_kills_k.py"
+  ],
+  "mutant_list_matches": true,
+  "consecutive_same_size_pairs": 1,
+  "examples": [
+   [
+    "L122 not removed",
+    "L120 And swapped"
+   ]
+  ]
+ },
+ {
+  "worker": "m21-w1",
+  "target": "aisef2/app/bundle.py::_strings",
+  "mutants": 14,
+  "killed": 10,
+  "survivors": 4,
+  "timeouts": 0,
+  "error": null,
+  "kill_tests": [
+   "tests/v2/test_app_units.py",
+   "tests/v2/test_v21_inputs.py",
+   "tests/v2/test_v21_identity.py",
+   "tests/v2/test_v21_review.py",
+   "tests/v2/test_v21_bundle_tools.py",
+   "tests/v2/test_v21_continue_usage.py",
+   "tests/v2/test_v21_review_chain.py",
+   "tests/v2/test_v21_continue_integrity.py",
+   "tests/v2/test_app_run.py"
+  ],
+  "mutant_list_matches": true,
+  "consecutive_same_size_pairs": 3,
+  "examples": [
+   [
+    "L52 not removed",
+    "L52 not removed"
+   ],
+   [
+    "L52 not removed",
+    "L52 And swapped"
+   ],
+   [
+    "L52 And swapped",
+    "L52 not removed"
+   ]
+  ]
+ },
+ {
+  "worker": "m21-w1",
+  "target": "aisef2/app/bundle.py::read",
+  "mutants": 9,
+  "killed": 5,
+  "survivors": 4,
+  "timeouts": 0,
+  "error": null,
+  "kill_tests": [
+   "tests/v2/test_app_units.py",
+   "tests/v2/test_v21_inputs.py",
+   "tests/v2/test_v21_identity.py",
+   "tests/v2/test_v21_review.py",
+   "tests/v2/test_v21_bundle_tools.py",
+   "tests/v2/test_v21_continue_usage.py",
+   "tests/v2/test_v21_review_chain.py",
+   "tests/v2/test_v21_continue_integrity.py",
+   "tests/v2/test_app_run.py"
+  ],
+  "mutant_list_matches": true,
+  "consecutive_same_size_pairs": 0,
+  "examples": []
+ },
+ {
+  "worker": "m21-w1",
+  "target": "aisef2/app/bundle_cli.py::AUTHORING_KEYS",
+  "mutants": 9,
+  "killed": 9,
+  "survivors": 0,
+  "timeouts": 0,
+  "error": null,
+  "kill_tests": [
+   "tests/v2/test_v21_bundle_tools.py",
+   "tests/v2/test_v21_identity.py",
+   "tests/v2/test_v21_review.py",
+   "tests/v2/test_v21_continue_usage.py",
+   "tests/v2/test_v21_continue_integrity.py"
+  ],
+  "mutant_list_matches": true,
+  "consecutive_same_size_pairs": 0,
+  "examples": []
+ },
+ {
+  "worker": "m21-w1",
+  "target": "aisef2/app/bundle_cli.py::CRITERION_KEYS",
+  "mutants": 6,
+  "killed": 6,
+  "survivors": 0,
+  "timeouts": 0,
+  "error": null,
+  "kill_tests": [
+   "tests/v2/test_v21_bundle_tools.py",
+   "tests/v2/test_v21_identity.py",
+   "tests/v2/test_v21_review.py",
+   "tests/v2/test_v21_continue_usage.py",
+   "tests/v2/test_v21_continue_integrity.py"
+  ],
+  "mutant_list_matches": true,
+  "consecutive_same_size_pairs": 0,
+  "examples": []
+ },
+ {
+  "worker": "m21-w1",
+  "target": "aisef2/app/bundle_cli.py::_create",
+  "mutants": 3,
+  "killed": 3,
+  "survivors": 0,
+  "timeouts": 0,
+  "error": null,
+  "kill_tests": [
+   "tests/v2/test_v21_bundle_tools.py",
+   "tests/v2/test_v21_identity.py",
+   "tests/v2/test_v21_review.py",
+   "tests/v2/test_v21_continue_usage.py",
+   "tests/v2/test_v21_continue_integrity.py"
+  ],
+  "mutant_list_matches": true,
+  "consecutive_same_size_pairs": 0,
+  "examples": []
+ },
+ {
+  "worker": "m21-w1",
+  "target": "aisef2/app/bundle_cli.py::coverage",
+  "mutants": 32,
+  "killed": 27,
+  "survivors": 5,
+  "timeouts": 0,
+  "error": null,
+  "kill_tests": [
+   "tests/v2/test_v21_bundle_tools.py",
+   "tests/v2/test_v21_identity.py",
+   "tests/v2/test_v21_review.py",
+   "tests/v2/test_v21_continue_usage.py",
+   "tests/v2/test_v21_continue_integrity.py"
+  ],
+  "mutant_list_matches": true,
+  "consecutive_same_size_pairs": 0,
+  "examples": []
+ },
+ {
+  "worker": "m21-w1",
+  "target": "aisef2/app/bundle_cli.py::init",
+  "mutants": 12,
+  "killed": 10,
+  "survivors": 2,
+  "timeouts": 0,
+  "error": null,
+  "kill_tests": [
+   "tests/v2/test_v21_bundle_tools.py",
+   "tests/v2/test_v21_identity.py",
+   "tests/v2/test_v21_review.py",
+   "tests/v2/test_v21_continue_usage.py",
+   "tests/v2/test_v21_continue_integrity.py"
+  ],
+  "mutant_list_matches": true,
+  "consecutive_same_size_pairs": 2,
+  "examples": [
+   [
+    "L364 True->False",
+    "L364 True->False"
+   ],
+   [
+    "L365 string 'repo' emptied",
+    "L364 string 'repo' emptied"
+   ]
+  ]
+ },
+ {
+  "worker": "m21-w3",
+  "target": "aisef2/app/adapters.py::Reviewer._model",
+  "mutants": 24,
+  "killed": 21,
+  "survivors": 3,
+  "timeouts": 0,
+  "error": null,
+  "kill_tests": [
+   "tests/v2/test_app_units.py",
+   "tests/v2/test_v21_identity.py",
+   "tests/v2/test_v21_review_chain.py",
+   "tests/v2/test_app_run.py"
+  ],
+  "mutant_list_matches": true,
+  "consecutive_same_size_pairs": 0,
+  "examples": []
+ },
+ {
+  "worker": "m21-w3",
+  "target": "aisef2/app/adapters.py::Reviewer._verify",
+  "mutants": 6,
+  "killed": 5,
+  "survivors": 1,
+  "timeouts": 0,
+  "error": null,
+  "kill_tests": [
+   "tests/v2/test_app_units.py",
+   "tests/v2/test_v21_identity.py",
+   "tests/v2/test_v21_review_chain.py",
+   "tests/v2/test_app_run.py"
+  ],
+  "mutant_list_matches": true,
+  "consecutive_same_size_pairs": 0,
+  "examples": []
+ },
+ {
+  "worker": "m21-w3",
+  "target": "aisef2/app/adapters.py::Reviewer.review",
+  "mutants": 54,
+  "killed": 42,
+  "survivors": 12,
+  "timeouts": 0,
+  "error": null,
+  "kill_tests": [
+   "tests/v2/test_app_units.py",
+   "tests/v2/test_v21_identity.py",
+   "tests/v2/test_v21_review_chain.py",
+   "tests/v2/test_app_run.py",
+   "tests/v2/test_s2_kills.py"
+  ],
+  "mutant_list_matches": true,
+  "consecutive_same_size_pairs": 5,
+  "examples": [
+   [
+    "L110 NotEq->Eq",
+    "L114 Eq->NotEq"
+   ],
+   [
+    "L115 conditional negated",
+    "L122 condition negated"
+   ],
+   [
+    "L123 string 'anchor' emptied",
+    "L123 string 'status' emptied"
+   ]
+  ]
+ },
+ {
+  "worker": "m21-w3",
+  "target": "aisef2/app/adapters.py::_unchanged",
+  "mutants": 16,
+  "killed": 12,
+  "survivors": 4,
+  "timeouts": 0,
+  "error": null,
+  "kill_tests": [
+   "tests/v2/test_app_units.py",
+   "tests/v2/test_v21_identity.py",
+   "tests/v2/test_v21_review_chain.py",
+   "tests/v2/test_app_run.py"
+  ],
+  "mutant_list_matches": true,
+  "consecutive_same_size_pairs": 1,
+  "examples": [
+   [
+    "L261 NotEq->Eq",
+    "L261 NotEq->Eq"
+   ]
+  ]
+ },
+ {
+  "worker": "m21-w3",
+  "target": "aisef2/app/adapters.py::attempt_of",
+  "mutants": 15,
+  "killed": 15,
+  "survivors": 0,
+  "timeouts": 0,
+  "error": null,
+  "kill_tests": [
+   "tests/v2/test_app_units.py",
+   "tests/v2/test_v21_identity.py",
+   "tests/v2/test_v21_review_chain.py",
+   "tests/v2/test_app_run.py"
+  ],
+  "mutant_list_matches": true,
+  "consecutive_same_size_pairs": 1,
+  "examples": [
+   [
+    "L56 Eq->NotEq",
+    "L56 Eq->NotEq"
+   ]
+  ]
+ },
+ {
+  "worker": "m21-w3",
+  "target": "aisef2/app/adapters.py::tree_of",
+  "mutants": 14,
+  "killed": 8,
+  "survivors": 6,
+  "timeouts": 0,
+  "error": null,
+  "kill_tests": [
+   "tests/v2/test_app_units.py",
+   "tests/v2/test_v21_identity.py",
+   "tests/v2/test_v21_review_chain.py",
+   "tests/v2/test_app_run.py"
+  ],
+  "mutant_list_matches": true,
+  "consecutive_same_size_pairs": 1,
+  "examples": [
+   [
+    "L247 condition negated",
+    "L249 condition negated"
+   ]
+  ]
+ },
+ {
+  "worker": "m21-w3",
+  "target": "aisef2/app/bundle.py::load",
+  "mutants": 74,
+  "killed": 71,
+  "survivors": 3,
+  "timeouts": 0,
+  "error": null,
+  "kill_tests": [
+   "tests/v2/test_app_units.py",
+   "tests/v2/test_v21_inputs.py",
+   "tests/v2/test_v21_identity.py",
+   "tests/v2/test_v21_review.py",
+   "tests/v2/test_v21_bundle_tools.py",
+   "tests/v2/test_v21_continue_usage.py",
+   "tests/v2/test_v21_review_chain.py",
+   "tests/v2/test_v21_continue_integrity.py",
+   "tests/v2/test_app_run.py",
+   "tests/v2/test_s2_kills.py"
+  ],
+  "mutant_list_matches": true,
+  "consecutive_same_size_pairs": 9,
+  "examples": [
+   [
+    "L156 condition negated",
+    "L175 condition negated"
+   ],
+   [
+    "L156 sorted() -> list()",
+    "L156 sorted() -> list()"
+   ],
+   [
+    "L188 not removed",
+    "L188 not removed"
+   ]
+  ]
+ },
+ {
+  "worker": "m21-w4",
+  "target": "aisef2/app/adapters.py::_bounded",
+  "mutants": 10,
+  "killed": 10,
+  "survivors": 0,
+  "timeouts": 1,
+  "error": null,
+  "kill_tests": [
+   "tests/v2/test_app_units.py",
+   "tests/v2/test_v21_identity.py",
+   "tests/v2/test_v21_review_chain.py",
+   "tests/v2/test_app_run.py"
+  ],
+  "mutant_list_matches": true,
+  "consecutive_same_size_pairs": 0,
+  "examples": []
+ }
+]

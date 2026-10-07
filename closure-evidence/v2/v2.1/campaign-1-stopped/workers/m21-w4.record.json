@@ -1,0 +1,66 @@
+{
+ "record": "AISEF V2 — V2.1 MUTATION",
+ "tool": "validation/v2/mutation.py",
+ "targets": [
+  {
+   "target": "aisef2/app/adapters.py::_bounded",
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "source_sha256": "28817c90f4107fafc757e7ea66dd443d983fda912168fab6b191a50695274477",
+   "mutants": 10,
+   "killed": 10,
+   "survivors": [],
+   "strays_reaped": 0,
+   "killed_by_timeout": 1,
+   "results": [
+    {
+     "mutant": "L280 returns None",
+     "killed": true
+    },
+    {
+     "mutant": "L273 string 'x' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L277 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L277 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L277 element 0 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L277 element 1 dropped",
+     "killed": true
+    },
+    {
+     "mutant": "L278 And swapped",
+     "killed": true,
+     "timed_out": [
+      "tests/v2/test_v21_review_chain.py"
+     ]
+    },
+    {
+     "mutant": "L273 string 'utf-8' emptied",
+     "killed": true
+    },
+    {
+     "mutant": "L278 Is->IsNot",
+     "killed": true
+    },
+    {
+     "mutant": "L278 Lt->GtE",
+     "killed": true
+    }
+   ]
+  }
+ ]
+}

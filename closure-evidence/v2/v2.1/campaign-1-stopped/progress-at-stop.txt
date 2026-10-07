@@ -1,0 +1,17 @@
+started 2026-10-06T20:55:52Z; now 2026-10-07T08:58:12+0700
+m21-w1: 10/110 targets; survivors 5; errors 0
+m21-w2: 0/110 targets; survivors 0; errors 0
+m21-w3: 7/112 targets; survivors 6; errors 0
+m21-w4: 1/112 targets; survivors 0; errors 0
+total: 18/444 targets, 324/369 mutants killed
+  SURVIVOR aisef2/app/adapters.py::Reviewer.__init__: ['L104 Or swapped']
+  SURVIVOR aisef2/app/bundle.py::_strings: ["L53 string ': a' emptied", "L53 string ' list of non-empty strings, not ' emptied", 'L53 conditional negated', "L53 string ' non-empty' emptied"]
+  SURVIVOR aisef2/app/bundle.py::read: ['L202 element 1 dropped', "L203 string ': ' emptied", "L203 string ')' emptied", "L207 string ')' emptied"]
+  SURVIVOR aisef2/app/bundle_cli.py::coverage: ['L313 dict entry 2 dropped', "L315 string 'limit' emptied", 'L315 string "clauses are the ones the criteria\'s facts declare; AISEF does not parse the requirements document" emptied', 'L313 dict entry 1 dropped', "L312 string 'clause' emptied"]
+  SURVIVOR aisef2/app/bundle_cli.py::init: ['L360 True->False', "L362 string ' exists: init writes a new directory and never into one' emptied"]
+  SURVIVOR aisef2/app/adapters.py::Reviewer._model: ["L137 string 'reviewer ' emptied", "L139 string 'reviewer' emptied", "L138 string '.reviewer.' emptied"]
+  SURVIVOR aisef2/app/adapters.py::Reviewer._verify: ["L233 string 'no reproducer: the finding states no observable behaviour' emptied"]
+  SURVIVOR aisef2/app/adapters.py::Reviewer.review: ["L116 string 'the finder' emptied", "L127 string 'the verification' emptied", "L111 string 'the checkout to review has no revision' emptied", 'L123 dict entry 0 dropped', 'L123 dict entry 1 dropped', 'L123 dict entry 2 dropped', "L123 string 'anchor' emptied", "L123 string 'status' emptied", "L123 string 'why' emptied", "L123 string 'contracts' emptied", "L132 string ', confirmed=' emptied", "L130 string ', ' emptied"]
+  SURVIVOR aisef2/app/adapters.py::_unchanged: ['L266 sorted() -> list()', "L262 string ' (every finding discarded)' emptied", "L267 string ': ' emptied", "L267 string ' (every finding discarded)' emptied"]
+  SURVIVOR aisef2/app/adapters.py::tree_of: ['L243 sorted() -> list()', 'L244 element 0 dropped', "L248 string 'link:' emptied", "L250 string 'dir' emptied", "L243 string '.git' emptied", "L255 string 'unreadable:' emptied"]
+  SURVIVOR aisef2/app/bundle.py::load: ['L188 Or swapped', 'L189 string "product_roots are top-level names of the project\'s own source tree" emptied', 'L188 And swapped']

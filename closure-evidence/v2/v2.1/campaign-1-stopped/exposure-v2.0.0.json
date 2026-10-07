@@ -1,0 +1,128 @@
+{
+ "P1": {
+  "targets": 19,
+  "mutants": 1151,
+  "killed": 1151,
+  "timeout_kills": 0,
+  "exposed": 133,
+  "exposed_killed": 133
+ },
+ "P2": {
+  "targets": 47,
+  "mutants": 1305,
+  "killed": 1305,
+  "timeout_kills": 9,
+  "exposed": 138,
+  "exposed_killed": 138
+ },
+ "P3": {
+  "targets": 52,
+  "mutants": 1842,
+  "killed": 1832,
+  "timeout_kills": 0,
+  "exposed": 296,
+  "exposed_killed": 290,
+  "exposed_survived": 6
+ },
+ "P4": {
+  "targets": 98,
+  "mutants": 1594,
+  "killed": 1594,
+  "timeout_kills": 26,
+  "exposed": 219,
+  "exposed_killed": 219
+ },
+ "P5": {
+  "targets": 58,
+  "mutants": 1577,
+  "killed": 1577,
+  "timeout_kills": 0,
+  "exposed": 281,
+  "exposed_killed": 281
+ },
+ "P6": {
+  "targets": 118,
+  "mutants": 3570,
+  "killed": 3570,
+  "timeout_kills": 0,
+  "exposed": 383,
+  "exposed_killed": 383,
+  "mutant_not_regenerated": 614
+ },
+ "C2-P1": {
+  "targets": 42,
+  "mutants": 654,
+  "killed": 654,
+  "timeout_kills": 0,
+  "exposed": 77,
+  "exposed_killed": 77
+ },
+ "C2-P2": {
+  "targets": 54,
+  "mutants": 1258,
+  "killed": 1258,
+  "timeout_kills": 2,
+  "mutant_not_regenerated": 1165,
+  "source_unavailable": 1
+ },
+ "C2-P3": {
+  "targets": 75,
+  "mutants": 1465,
+  "killed": 1465,
+  "timeout_kills": 0,
+  "mutant_not_regenerated": 1308,
+  "exposed": 10,
+  "exposed_killed": 10,
+  "source_unavailable": 4
+ },
+ "C2-P4": {
+  "targets": 18,
+  "mutants": 423,
+  "killed": 423,
+  "timeout_kills": 2,
+  "mutant_not_regenerated": 423
+ },
+ "C2-ORCH": {
+  "targets": 16,
+  "mutants": 493,
+  "killed": 493,
+  "timeout_kills": 0,
+  "exposed": 25,
+  "exposed_killed": 25,
+  "mutant_not_regenerated": 346
+ },
+ "C2-P10": {
+  "targets": 39,
+  "mutants": 695,
+  "killed": 695,
+  "timeout_kills": 0,
+  "exposed": 60,
+  "exposed_killed": 60
+ },
+ "K-PRESAT-001": {
+  "targets": 11,
+  "mutants": 361,
+  "killed": 361,
+  "timeout_kills": 0,
+  "mutant_not_regenerated": 351,
+  "exposed": 1,
+  "exposed_killed": 1
+ },
+ "K-NOWORK-001": {
+  "targets": 11,
+  "mutants": 365,
+  "killed": 365,
+  "timeout_kills": 0,
+  "exposed": 38,
+  "exposed_killed": 38,
+  "mutant_not_regenerated": 36
+ },
+ "V2.0-S2": {
+  "targets": 261,
+  "mutants": 6463,
+  "killed": 6463,
+  "timeout_kills": 0,
+  "exposed": 768,
+  "exposed_killed": 768
+ }
+}

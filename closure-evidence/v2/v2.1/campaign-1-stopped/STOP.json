@@ -1,0 +1,71 @@
+{
+ "stopped_at": "2026-10-07T08:58:12+0700",
+ "workers": {
+  "m21-w1": {
+   "completed_in_record": [
+    "aisef2/app/adapters.py::Developer.implement",
+    "aisef2/app/adapters.py::Reviewer.__init__",
+    "aisef2/app/bundle.py::Project.order",
+    "aisef2/app/bundle.py::_strings",
+    "aisef2/app/bundle.py::read",
+    "aisef2/app/bundle_cli.py::AUTHORING_KEYS",
+    "aisef2/app/bundle_cli.py::CRITERION_KEYS",
+    "aisef2/app/bundle_cli.py::_create",
+    "aisef2/app/bundle_cli.py::coverage",
+    "aisef2/app/bundle_cli.py::init"
+   ],
+   "completed_in_log": [
+    "aisef2/app/adapters.py::Developer.implement",
+    "aisef2/app/adapters.py::Reviewer.__init__",
+    "aisef2/app/bundle.py::Project.order",
+    "aisef2/app/bundle.py::_strings",
+    "aisef2/app/bundle.py::read",
+    "aisef2/app/bundle_cli.py::AUTHORING_KEYS",
+    "aisef2/app/bundle_cli.py::CRITERION_KEYS",
+    "aisef2/app/bundle_cli.py::_create",
+    "aisef2/app/bundle_cli.py::coverage",
+    "aisef2/app/bundle_cli.py::init"
+   ],
+   "in_progress_not_evidence": "aisef2/app/bundle_cli.py::main",
+   "not_started": 99
+  },
+  "m21-w2": {
+   "completed_in_record": [],
+   "completed_in_log": [],
+   "in_progress_not_evidence": "aisef2/app/adapters.py::Reviewer._ocr",
+   "not_started": 109
+  },
+  "m21-w3": {
+   "completed_in_record": [
+    "aisef2/app/adapters.py::Reviewer._model",
+    "aisef2/app/adapters.py::Reviewer._verify",
+    "aisef2/app/adapters.py::Reviewer.review",
+    "aisef2/app/adapters.py::_unchanged",
+    "aisef2/app/adapters.py::attempt_of",
+    "aisef2/app/adapters.py::tree_of",
+    "aisef2/app/bundle.py::load"
+   ],
+   "completed_in_log": [
+    "aisef2/app/adapters.py::Reviewer._model",
+    "aisef2/app/adapters.py::Reviewer._verify",
+    "aisef2/app/adapters.py::Reviewer.review",
+    "aisef2/app/adapters.py::_unchanged",
+    "aisef2/app/adapters.py::attempt_of",
+    "aisef2/app/adapters.py::tree_of",
+    "aisef2/app/bundle.py::load"
+   ],
+   "in_progress_not_evidence": "aisef2/app/bundle_cli.py::EXAMPLES",
+   "not_started": 104
+  },
+  "m21-w4": {
+   "completed_in_record": [
+    "aisef2/app/adapters.py::_bounded"
+   ],
+   "completed_in_log": [
+    "aisef2/app/adapters.py::_bounded"
+   ],
+   "in_progress_not_evidence": "aisef2/app/bundle.py::shape_problems",
+   "not_started": 110
+  }
+ }
+}

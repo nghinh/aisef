@@ -1,0 +1,7 @@
+aisef2/app/adapters.py::Reviewer._model: 21/24 killed; survivors ["L137 string 'reviewer ' emptied", "L139 string 'reviewer' emptied", "L138 string '.reviewer.' emptied"]
+aisef2/app/adapters.py::Reviewer._verify: 5/6 killed; survivors ["L233 string 'no reproducer: the finding states no observable behaviour' emptied"]
+aisef2/app/adapters.py::Reviewer.review: 42/54 killed; survivors ["L116 string 'the finder' emptied", "L127 string 'the verification' emptied", "L111 string 'the checkout to review has no revision' emptied", 'L123 dict entry 0 dropped', 'L123 dict entry 1 dropped', 'L123 dict entry 2 dropped', "L123 string 'anchor' emptied", "L123 string 'status' emptied", "L123 string 'why' emptied", "L123 string 'contracts' emptied", "L132 string ', confirmed=' emptied", "L130 string ', ' emptied"]
+aisef2/app/adapters.py::_unchanged: 12/16 killed; survivors ['L266 sorted() -> list()', "L262 string ' (every finding discarded)' emptied", "L267 string ': ' emptied", "L267 string ' (every finding discarded)' emptied"]
+aisef2/app/adapters.py::attempt_of: 15/15 killed; survivors []
+aisef2/app/adapters.py::tree_of: 8/14 killed; survivors ['L243 sorted() -> list()', 'L244 element 0 dropped', "L248 string 'link:' emptied", "L250 string 'dir' emptied", "L243 string '.git' emptied", "L255 string 'unreadable:' emptied"]
+aisef2/app/bundle.py::load: 71/74 killed; survivors ['L188 Or swapped', 'L189 string "product_roots are top-level names of the project\'s own source tree" emptied', 'L188 And swapped']
