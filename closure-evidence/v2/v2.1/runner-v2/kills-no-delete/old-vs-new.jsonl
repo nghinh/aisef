@@ -1,0 +1,84 @@
+{"target": "Reviewer.review", "mutant": "L110 condition negated", "test": "ReviewerReview.test_a_change_to_the_checkout_names_the_stage_it_happened_in", "old": "FAIL", "new": "FAIL"}
+{"target": "Reviewer.review", "mutant": "L130 returns None", "test": "ReviewerReview.test_a_change_to_the_checkout_names_the_stage_it_happened_in", "old": "PASS", "new": "PASS"}
+{"target": "Reviewer.review", "mutant": "L108 element 0 dropped", "test": "ReviewerReview.test_a_change_to_the_checkout_names_the_stage_it_happened_in", "old": "FAIL", "new": "FAIL"}
+{"target": "Reviewer.review", "mutant": "L108 element 1 dropped", "test": "ReviewerReview.test_a_change_to_the_checkout_names_the_stage_it_happened_in", "old": "FAIL", "new": "FAIL"}
+{"target": "Reviewer.review", "mutant": "L110 NotEq->Eq", "test": "ReviewerReview.test_a_change_to_the_checkout_names_the_stage_it_happened_in", "old": "FAIL", "new": "FAIL"}
+{"target": "Reviewer.review", "mutant": "L114 Eq->NotEq", "test": "ReviewerReview.test_a_change_to_the_checkout_names_the_stage_it_happened_in", "old": "FAIL", "new": "FAIL"}
+{"target": "Reviewer.review", "mutant": "L115 element 0 dropped", "test": "ReviewerReview.test_a_change_to_the_checkout_names_the_stage_it_happened_in", "old": "FAIL", "new": "FAIL"}
+{"target": "Reviewer.review", "mutant": "L115 element 1 dropped", "test": "ReviewerReview.test_a_change_to_the_checkout_names_the_stage_it_happened_in", "old": "FAIL", "new": "FAIL"}
+{"target": "Reviewer.review", "mutant": "L115 element 2 dropped", "test": "ReviewerReview.test_a_change_to_the_checkout_names_the_stage_it_happened_in", "old": "FAIL", "new": "FAIL"}
+{"target": "Reviewer.review", "mutant": "L115 conditional negated", "test": "ReviewerReview.test_a_change_to_the_checkout_names_the_stage_it_happened_in", "old": "FAIL", "new": "FAIL"}
+{"target": "Reviewer.review", "mutant": "L122 condition negated", "test": "ReviewerReview.test_a_change_to_the_checkout_names_the_stage_it_happened_in", "old": "FAIL", "new": "FAIL"}
+{"target": "Reviewer.review", "mutant": "L109 string 'rev-parse' emptied", "test": "ReviewerReview.test_a_change_to_the_checkout_names_the_stage_it_happened_in", "old": "FAIL", "new": "FAIL"}
+{"target": "Reviewer.review", "mutant": "L109 string 'HEAD' emptied", "test": "ReviewerReview.test_a_change_to_the_checkout_names_the_stage_it_happened_in", "old": "FAIL", "new": "FAIL"}
+{"target": "Reviewer.review", "mutant": "L114 string 'ocr' emptied", "test": "ReviewerReview.test_a_change_to_the_checkout_names_the_stage_it_happened_in", "old": "PASS", "new": "PASS"}
+{"target": "Reviewer.review", "mutant": "L116 string 'the finder' emptied", "test": "ReviewerReview.test_a_change_to_the_checkout_names_the_stage_it_happened_in", "old": "FAIL", "new": "FAIL"}
+{"target": "Reviewer.review", "mutant": "L120 conditional negated", "test": "ReviewerReview.test_a_change_to_the_checkout_names_the_stage_it_happened_in", "old": "PASS", "new": "PASS"}
+{"target": "Reviewer.review", "mutant": "L121 dict entry 0 dropped", "test": "ReviewerReview.test_a_change_to_the_checkout_names_the_stage_it_happened_in", "old": "PASS", "new": "PASS"}
+{"target": "Reviewer.review", "mutant": "L121 dict entry 1 dropped", "test": "ReviewerReview.test_a_change_to_the_checkout_names_the_stage_it_happened_in", "old": "PASS", "new": "PASS"}
+{"target": "Reviewer.review", "mutant": "L121 dict entry 2 dropped", "test": "ReviewerReview.test_a_change_to_the_checkout_names_the_stage_it_happened_in", "old": "PASS", "new": "PASS"}
+{"target": "Reviewer.review", "mutant": "L121 dict entry 3 dropped", "test": "ReviewerReview.test_a_change_to_the_checkout_names_the_stage_it_happened_in", "old": "PASS", "new": "PASS"}
+{"target": "Reviewer.review", "mutant": "L122 IsNot->Is", "test": "ReviewerReview.test_a_change_to_the_checkout_names_the_stage_it_happened_in", "old": "FAIL", "new": "FAIL"}
+{"target": "Reviewer.review", "mutant": "L127 string 'the verification' emptied", "test": "ReviewerReview.test_a_change_to_the_checkout_names_the_stage_it_happened_in", "old": "FAIL", "new": "FAIL"}
+{"target": "Reviewer.review", "mutant": "L128 string 'findings' emptied", "test": "ReviewerReview.test_a_change_to_the_checkout_names_the_stage_it_happened_in", "old": "PASS", "new": "PASS"}
+{"target": "Reviewer.review", "mutant": "L130 tuple() -> list()", "test": "ReviewerReview.test_a_change_to_the_checkout_names_the_stage_it_happened_in", "old": "PASS", "new": "PASS"}
+{"target": "Reviewer.review", "mutant": "L111 string 'the checkout to review has no revision' emptied", "test": "ReviewerReview.test_a_change_to_the_checkout_names_the_stage_it_happened_in", "old": "PASS", "new": "PASS"}
+{"target": "Reviewer.review", "mutant": "L114 string 'finder' emptied", "test": "ReviewerReview.test_a_change_to_the_checkout_names_the_stage_it_happened_in", "old": "PASS", "new": "PASS"}
+{"target": "Reviewer.review", "mutant": "L121 string 'verification' emptied", "test": "ReviewerReview.test_a_change_to_the_checkout_names_the_stage_it_happened_in", "old": "PASS", "new": "PASS"}
+{"target": "Reviewer.review", "mutant": "L121 string 'status' emptied", "test": "ReviewerReview.test_a_change_to_the_checkout_names_the_stage_it_happened_in", "old": "PASS", "new": "PASS"}
+{"target": "Reviewer.review", "mutant": "L121 string 'why' emptied", "test": "ReviewerReview.test_a_change_to_the_checkout_names_the_stage_it_happened_in", "old": "PASS", "new": "PASS"}
+{"target": "Reviewer.review", "mutant": "L121 string 'probe' emptied", "test": "ReviewerReview.test_a_change_to_the_checkout_names_the_stage_it_happened_in", "old": "PASS", "new": "PASS"}
+{"target": "Reviewer.review", "mutant": "L121 string 'observed' emptied", "test": "ReviewerReview.test_a_change_to_the_checkout_names_the_stage_it_happened_in", "old": "PASS", "new": "PASS"}
+{"target": "Reviewer.review", "mutant": "L123 dict entry 0 dropped", "test": "ReviewerReview.test_a_change_to_the_checkout_names_the_stage_it_happened_in", "old": "PASS", "new": "PASS"}
+{"target": "Reviewer.review", "mutant": "L123 dict entry 1 dropped", "test": "ReviewerReview.test_a_change_to_the_checkout_names_the_stage_it_happened_in", "old": "PASS", "new": "PASS"}
+{"target": "Reviewer.review", "mutant": "L123 dict entry 2 dropped", "test": "ReviewerReview.test_a_change_to_the_checkout_names_the_stage_it_happened_in", "old": "PASS", "new": "PASS"}
+{"target": "Reviewer.review", "mutant": "L132 conditional negated", "test": "ReviewerReview.test_a_change_to_the_checkout_names_the_stage_it_happened_in", "old": "PASS", "new": "PASS"}
+{"target": "Reviewer.review", "mutant": "L123 string 'anchor' emptied", "test": "ReviewerReview.test_a_change_to_the_checkout_names_the_stage_it_happened_in", "old": "PASS", "new": "PASS"}
+{"target": "Reviewer.review", "mutant": "L123 string 'status' emptied", "test": "ReviewerReview.test_a_change_to_the_checkout_names_the_stage_it_happened_in", "old": "PASS", "new": "PASS"}
+{"target": "Reviewer.review", "mutant": "L123 string 'why' emptied", "test": "ReviewerReview.test_a_change_to_the_checkout_names_the_stage_it_happened_in", "old": "PASS", "new": "PASS"}
+{"target": "Reviewer.review", "mutant": "L123 string 'contracts' emptied", "test": "ReviewerReview.test_a_change_to_the_checkout_names_the_stage_it_happened_in", "old": "PASS", "new": "PASS"}
+{"target": "Reviewer.review", "mutant": "L124 string 'policy' emptied", "test": "ReviewerReview.test_a_change_to_the_checkout_names_the_stage_it_happened_in", "old": "FAIL", "new": "FAIL"}
+{"target": "Reviewer.review", "mutant": "L124 string 'min_severity' emptied", "test": "ReviewerReview.test_a_change_to_the_checkout_names_the_stage_it_happened_in", "old": "FAIL", "new": "FAIL"}
+{"target": "Reviewer.review", "mutant": "L125 Or swapped", "test": "ReviewerReview.test_a_change_to_the_checkout_names_the_stage_it_happened_in", "old": "PASS", "new": "PASS"}
+{"target": "Reviewer.review", "mutant": "L126 conditional negated", "test": "ReviewerReview.test_a_change_to_the_checkout_names_the_stage_it_happened_in", "old": "PASS", "new": "PASS"}
+{"target": "Reviewer.review", "mutant": "L131 conditional negated", "test": "ReviewerReview.test_a_change_to_the_checkout_names_the_stage_it_happened_in", "old": "PASS", "new": "PASS"}
+{"target": "Reviewer.review", "mutant": "L120 string 'reproducer' emptied", "test": "ReviewerReview.test_a_change_to_the_checkout_names_the_stage_it_happened_in", "old": "PASS", "new": "PASS"}
+{"target": "Reviewer.review", "mutant": "L130 conditional negated", "test": "ReviewerReview.test_a_change_to_the_checkout_names_the_stage_it_happened_in", "old": "PASS", "new": "PASS"}
+{"target": "Reviewer.review", "mutant": "L131 not removed", "test": "ReviewerReview.test_a_change_to_the_checkout_names_the_stage_it_happened_in", "old": "PASS", "new": "PASS"}
+{"target": "Reviewer.review", "mutant": "L132 string ', confirmed=' emptied", "test": "ReviewerReview.test_a_change_to_the_checkout_names_the_stage_it_happened_in", "old": "PASS", "new": "PASS"}
+{"target": "Reviewer.review", "mutant": "L125 string 'id' emptied", "test": "ReviewerReview.test_a_change_to_the_checkout_names_the_stage_it_happened_in", "old": "PASS", "new": "PASS"}
+{"target": "Reviewer.review", "mutant": "L130 string ' findings' emptied", "test": "ReviewerReview.test_a_change_to_the_checkout_names_the_stage_it_happened_in", "old": "PASS", "new": "PASS"}
+{"target": "Reviewer.review", "mutant": "L131 string ', parsed=' emptied", "test": "ReviewerReview.test_a_change_to_the_checkout_names_the_stage_it_happened_in", "old": "PASS", "new": "PASS"}
+{"target": "Reviewer.review", "mutant": "L125 string 'blocking' emptied", "test": "ReviewerReview.test_a_change_to_the_checkout_names_the_stage_it_happened_in", "old": "PASS", "new": "PASS"}
+{"target": "Reviewer.review", "mutant": "L130 string ', ' emptied", "test": "ReviewerReview.test_a_change_to_the_checkout_names_the_stage_it_happened_in", "old": "PASS", "new": "PASS"}
+{"target": "Reviewer.review", "mutant": "L131 string 'parsed' emptied", "test": "ReviewerReview.test_a_change_to_the_checkout_names_the_stage_it_happened_in", "old": "PASS", "new": "PASS"}
+{"target": "tree_of", "mutant": "L256 returns None", "test": "TreeOf.test_an_empty_directory_or_a_directory_turned_into_a_link_named_dir_is_a_change", "old": "FAIL", "new": "FAIL"}
+{"target": "tree_of", "mutant": "L242 element 0 dropped", "test": "TreeOf.test_an_empty_directory_or_a_directory_turned_into_a_link_named_dir_is_a_change", "old": "FAIL", "new": "FAIL"}
+{"target": "tree_of", "mutant": "L242 element 1 dropped", "test": "TreeOf.test_an_empty_directory_or_a_directory_turned_into_a_link_named_dir_is_a_change", "old": "FAIL", "new": "FAIL"}
+{"target": "tree_of", "mutant": "L242 element 2 dropped", "test": "TreeOf.test_an_empty_directory_or_a_directory_turned_into_a_link_named_dir_is_a_change", "old": "FAIL", "new": "FAIL"}
+{"target": "tree_of", "mutant": "L244 element 0 dropped", "test": "TreeOf.test_an_empty_directory_or_a_directory_turned_into_a_link_named_dir_is_a_change", "old": "FAIL", "new": "FAIL"}
+{"target": "tree_of", "mutant": "L244 element 1 dropped", "test": "TreeOf.test_an_empty_directory_or_a_directory_turned_into_a_link_named_dir_is_a_change", "old": "PASS", "new": "PASS"}
+{"target": "tree_of", "mutant": "L247 condition negated", "test": "TreeOf.test_an_empty_directory_or_a_directory_turned_into_a_link_named_dir_is_a_change", "old": "FAIL", "new": "FAIL"}
+{"target": "tree_of", "mutant": "L249 condition negated", "test": "TreeOf.test_an_empty_directory_or_a_directory_turned_into_a_link_named_dir_is_a_change", "old": "PASS", "new": "PASS"}
+{"target": "tree_of", "mutant": "L243 NotEq->Eq", "test": "TreeOf.test_an_empty_directory_or_a_directory_turned_into_a_link_named_dir_is_a_change", "old": "FAIL", "new": "FAIL"}
+{"target": "tree_of", "mutant": "L243 string '.git' emptied", "test": "TreeOf.test_an_empty_directory_or_a_directory_turned_into_a_link_named_dir_is_a_change", "old": "PASS", "new": "FAIL"}
+{"target": "tree_of", "mutant": "L248 string 'link:' emptied", "test": "TreeOf.test_an_empty_directory_or_a_directory_turned_into_a_link_named_dir_is_a_change", "old": "FAIL", "new": "FAIL"}
+{"target": "tree_of", "mutant": "L250 string 'dir' emptied", "test": "TreeOf.test_an_empty_directory_or_a_directory_turned_into_a_link_named_dir_is_a_change", "old": "PASS", "new": "PASS"}
+{"target": "tree_of", "mutant": "L255 string 'unreadable:' emptied", "test": "TreeOf.test_an_empty_directory_or_a_directory_turned_into_a_link_named_dir_is_a_change", "old": "PASS", "new": "PASS"}
+{"target": "_unchanged", "mutant": "L261 condition negated", "test": "TreeOf.test_an_empty_directory_or_a_directory_turned_into_a_link_named_dir_is_a_change", "old": "FAIL", "new": "FAIL"}
+{"target": "_unchanged", "mutant": "L265 condition negated", "test": "TreeOf.test_an_empty_directory_or_a_directory_turned_into_a_link_named_dir_is_a_change", "old": "FAIL", "new": "FAIL"}
+{"target": "_unchanged", "mutant": "L261 Or swapped", "test": "TreeOf.test_an_empty_directory_or_a_directory_turned_into_a_link_named_dir_is_a_change", "old": "PASS", "new": "PASS"}
+{"target": "_unchanged", "mutant": "L265 NotEq->Eq", "test": "TreeOf.test_an_empty_directory_or_a_directory_turned_into_a_link_named_dir_is_a_change", "old": "FAIL", "new": "FAIL"}
+{"target": "_unchanged", "mutant": "L260 string 'rev-parse' emptied", "test": "TreeOf.test_an_empty_directory_or_a_directory_turned_into_a_link_named_dir_is_a_change", "old": "FAIL", "new": "FAIL"}
+{"target": "_unchanged", "mutant": "L260 string 'HEAD' emptied", "test": "TreeOf.test_an_empty_directory_or_a_directory_turned_into_a_link_named_dir_is_a_change", "old": "FAIL", "new": "FAIL"}
+{"target": "_unchanged", "mutant": "L261 NotEq->Eq", "test": "TreeOf.test_an_empty_directory_or_a_directory_turned_into_a_link_named_dir_is_a_change", "old": "FAIL", "new": "FAIL"}
+{"target": "_unchanged", "mutant": "L261 NotEq->Eq", "test": "TreeOf.test_an_empty_directory_or_a_directory_turned_into_a_link_named_dir_is_a_change", "old": "FAIL", "new": "FAIL"}
+{"target": "_unchanged", "mutant": "L266 sorted() -> list()", "test": "TreeOf.test_an_empty_directory_or_a_directory_turned_into_a_link_named_dir_is_a_change", "old": "PASS", "new": "PASS"}
+{"target": "_unchanged", "mutant": "L262 string 'the reviewed checkout changed during ' emptied", "test": "TreeOf.test_an_empty_directory_or_a_directory_turned_into_a_link_named_dir_is_a_change", "old": "PASS", "new": "PASS"}
+{"target": "_unchanged", "mutant": "L262 string ': HEAD is no longer ' emptied", "test": "TreeOf.test_an_empty_directory_or_a_directory_turned_into_a_link_named_dir_is_a_change", "old": "PASS", "new": "PASS"}
+{"target": "_unchanged", "mutant": "L262 string ' (every finding discarded)' emptied", "test": "TreeOf.test_an_empty_directory_or_a_directory_turned_into_a_link_named_dir_is_a_change", "old": "PASS", "new": "PASS"}
+{"target": "_unchanged", "mutant": "L267 string 'the reviewed checkout changed during ' emptied", "test": "TreeOf.test_an_empty_directory_or_a_directory_turned_into_a_link_named_dir_is_a_change", "old": "PASS", "new": "PASS"}
+{"target": "_unchanged", "mutant": "L267 string ': ' emptied", "test": "TreeOf.test_an_empty_directory_or_a_directory_turned_into_a_link_named_dir_is_a_change", "old": "PASS", "new": "PASS"}
+{"target": "_unchanged", "mutant": "L267 string ' (every finding discarded)' emptied", "test": "TreeOf.test_an_empty_directory_or_a_directory_turned_into_a_link_named_dir_is_a_change", "old": "PASS", "new": "PASS"}
+{"target": "_unchanged", "mutant": "L266 NotEq->Eq", "test": "TreeOf.test_an_empty_directory_or_a_directory_turned_into_a_link_named_dir_is_a_change", "old": "FAIL", "new": "FAIL"}
+{"mutants": 83, "same": false, "killed_old": 33, "killed_new": 34, "differ": [{"target": "tree_of", "mutant": "L243 string '.git' emptied", "test": "TreeOf.test_an_empty_directory_or_a_directory_turned_into_a_link_named_dir_is_a_change", "old": "PASS", "new": "FAIL"}]}

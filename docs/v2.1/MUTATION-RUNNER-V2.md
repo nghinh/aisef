@@ -508,6 +508,26 @@ the owner rules among:
 3. let the runner exclude, per target, only the methods that fail that target's T0, recorded on the target — a new
    runner rule that weakens kill sets automatically, which this contract does not adopt without the owner.
 
+**Lead decision (2026-10-07): option 2**, under the owner's B-03b authorization and the 2026-10-07 delegation of the
+campaign's optimization within B-03, recorded here for the owner to overturn. Grounds:
+
+- Options 1 and 3 weaken a kill set (1 drops a method from it; 3 lets the runner drop one per target); option 2 keeps
+  every method, its name, its file and its assertions. Only how the method observes or injects into the child script
+  changes — from the script's text to its parsed form (`ast.unparse` of the parsed script, used on both sides) — which
+  is exactly what the null mutant's own rewrite does, so the method's meaning is the same and it no longer depends on
+  the formatting the rewrite changes. No expectation is edited, so the B-03d rule ("không sửa kỳ vọng chỉ để test xanh")
+  is not engaged.
+- Measured (`closure-evidence/v2/v2.1/runner-v2/N1-OPTION-2-EVIDENCE.json`, each method run through the runner's own
+  `_run_file`, old bytes against new): every method passes the unmodified tree, old and new; on the module-level mutants
+  sampled for each method (40 or 57), and for the three Q0 methods on every module-level mutant of the targets holding
+  their file (PE_Q0 215, CLI_Q0 616 with the AGENT/* ones, PCV2_Q0 481), old and new kill exactly the same mutants
+  (`killed_by_old_not_new` and `killed_by_new_not_old` empty for all eight; kills 0–48 per method); each injected
+  defect still trips its rule on the original module. The six files pass whole at 33f4012 (122 tests).
+- T0 sweep at 33f4012: 129 of 129 pairs PASS, 0 of 444 targets refused (was 16 failing pairs and 260 refused targets at
+  6ab3c09, before the split and option 2).
+- Commits 3ffef74, 44c9c56, b0351a1, a83ebed, a12e0c7, 33f4012 (one per file), merged at a333d93. The 2.0 records,
+  corpus and ruling are untouched; those files are 2.0 tests, kept in force, not 2.0 evidence.
+
 ### 6.4 What changes and does not
 
 - Every V2.1 target holding `_V21_ID` changes its kill-test closure (the file's bytes changed), so no old result for
@@ -792,10 +812,10 @@ survivors, and Q6 by the bracket per kill instead of a closing control per targe
 
 New, for the owner:
 
-- **N1 (§6.3).** Eight methods in six C2-era kill files fail the null mutant of 60 V2.1 targets (14 cli_invocation
-  HARNESS/*, 29 process_effect HARNESS/*, 6 process_effect module-level, 11 python_callable_v2 HARNESS/*), measured by
-  the T0 sweep; T0 refuses those targets until the owner chooses among the three options of §6.3. Most of the methods
-  are valid evidence for the same modules' module-level targets, which is why this work does not move them.
+- **N1 (§6.3).** Eight methods in six C2-era kill files failed the null mutant of 60 V2.1 targets (14 cli_invocation
+  HARNESS/*, 29 process_effect HARNESS/*, 6 process_effect module-level, 11 python_callable_v2 HARNESS/*). **Decided by
+  the lead, 2026-10-07: option 2** (§6.3, grounds and measurements there); T0 now refuses none. The owner may overturn
+  it: option 1 or 3 would re-open those 60 targets' kill sets.
 - **N2.** The conformance ruling's re-pointed and added behaviour-test ids (§6.4) are B-03d evidence; review them
   before `v21_conformance_ruling.py --write`.
 - **N3.** The bounded-release test runs on macOS only (§2.5): the rejoin mechanism was measured there; on Linux the
