@@ -1052,11 +1052,13 @@ def _clean(boundary: ca.Boundary, pids, groups, table=None) -> ca.Report:
 
 
 def _leftovers(tg: _Target, table: dict) -> dict[int, ca.Host]:
-    """What this worker left running: processes carrying its token (PL-1) or naming the target's scratch directory, which
+    """What this worker left running: processes carrying its token (PL-1), naming the target's scratch directory, which
     holds its trees and run directories (`ca.strays`; the union keeps command-line matching, since code under mutation
-    builds scrubbed environments — PL-6 verifier)."""
+    builds scrubbed environments — PL-6 verifier), or working inside it (`ca.cwd_under`: a helper given its own
+    environment and no scratch path still has the cwd it inherited — PL-1 (3), process-env prover). Candidates only."""
     found = {p.pid: p for p in ca.strays(tg.boundary, table)}
     found.update((p.pid, p) for p in ca.carriers(f"{TOKEN}={tg.worker}:", table))
+    found.update((p.pid, p) for p in ca.cwd_under(tg.boundary.root + os.sep, table, tg.boundary.since))
     return found
 
 
@@ -1089,7 +1091,8 @@ def _earlier(worker: str) -> list[int]:
         return []
     table = ca.host_table()
     mark = ca.Boundary(os.getpid(), 0.0, os.path.join(tempfile.gettempdir(), f"aisef-mut-{worker}-"))
-    found = {p.pid for p in ca.strays(mark, table)} | {p.pid for p in ca.carriers(f"{TOKEN}={worker}:", table)}
+    found = {p.pid for p in ca.strays(mark, table)} | {p.pid for p in ca.carriers(f"{TOKEN}={worker}:", table)} | \
+        {p.pid for p in ca.cwd_under(mark.root, table)}
     return _watch(sorted(found)) if found else []
 
 

@@ -401,11 +401,43 @@ class Proc(unittest.TestCase):
         self.assertEqual([(x["pid"], x["proved"]) for x in r["leaked"]], [(pid, False)])
         self.assertTrue(alive(pid), "an unproven helper is never signalled")
         self.end_helper(pid)
-        # the old failure (PL-1): without the token scan the helper is invisible, and the target "completes" beside it
+        # the old failure (PL-1): without the token scan (and the cwd scan, which the old runner did not have either)
+        # the helper is invisible, and the target "completes" beside it
         sentinel, pidfile = self.dir / "stop-2", self.dir / "helper-2.pid"
         self.addCleanup(sentinel.touch)
         root = toy(self.dir / "2", POSITIVE, leaky(sentinel, pidfile))
-        with mock.patch.object(m.ca, "carriers", lambda prefix, table=None: []):
+        with mock.patch.object(m.ca, "carriers", lambda prefix, table=None: []), \
+                mock.patch.object(m.ca, "cwd_under", lambda prefix, table=None, since=None: []):
+            r = m.run_target(root, "aisef2/toy.py::positive", ["tests/v2/test_l.py"])
+        pid = self.helper_pid(pidfile)
+        self.assertNotIn("error", r)
+        self.assertTrue(alive(pid))
+        self.end_helper(pid, sentinel)
+
+    def test_a_helper_with_its_own_environment_is_found_by_its_cwd(self):
+        """PL-1 (3), process-env prover: a helper spawned with `env={'PATH': ...}` carries no token and names no scratch
+        path; only its cwd — the tree it inherited — shows it. The old scan missed it, so later runs started beside it
+        (order alone flipped 5 of 8 mutants in the prover's toy, with a clean record). Now the cwd scan finds it: it is
+        unprovable (re-parented), never signalled, and the target stops at the mutant that left it."""
+        files = leaky(self.sentinel, self.pidfile)
+        files["test_l.py"] = files["test_l.py"].replace("start_new_session=True,",
+                                                        "start_new_session=True, env={'PATH': os.environ['PATH']},")
+        files["test_l.py"] = files["test_l.py"].replace("import subprocess, sys", "import os, subprocess, sys")
+        root = toy(self.dir, POSITIVE, files)
+        r = m.run_target(root, "aisef2/toy.py::positive", ["tests/v2/test_l.py"])
+        pid = self.helper_pid()
+        self.assertIn(f"{m.ca.RESIDUAL_OWNERSHIP_UNKNOWN} at mutant 'L2 returns None' (tests/v2/test_l.py)", r["error"])
+        self.assertEqual(classes(r), ["INFRA", "NOT_RUN"])
+        self.assertEqual([(x["pid"], x["proved"]) for x in r["leaked"]], [(pid, False)])
+        self.assertTrue(alive(pid), "an unproven helper is never signalled")
+        self.end_helper(pid)
+        # the old failure: without the cwd scan the helper is invisible, and the target "completes" beside it
+        sentinel, pidfile = self.dir / "stop-2", self.dir / "helper-2.pid"
+        self.addCleanup(sentinel.touch)
+        files = {k: v.replace(str(self.sentinel), str(sentinel)).replace(str(self.pidfile), str(pidfile))
+                 for k, v in files.items()}
+        root = toy(self.dir / "2", POSITIVE, files)
+        with mock.patch.object(m.ca, "cwd_under", lambda prefix, table=None, since=None: []):
             r = m.run_target(root, "aisef2/toy.py::positive", ["tests/v2/test_l.py"])
         pid = self.helper_pid(pidfile)
         self.assertNotIn("error", r)

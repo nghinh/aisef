@@ -193,6 +193,41 @@ def carriers(prefix: str, table: dict[int, Host] | None = None) -> list[Host]:
     return sorted((table[p] for p in hits if p in table and p != os.getpid()), key=lambda p: p.pid)
 
 
+def cwd_under(prefix: str, table: dict[int, Host] | None = None, since: float | None = None) -> list[Host]:
+    """Processes whose working directory starts with `prefix` (a directory given with its trailing separator, or a
+    name prefix) — candidates only, like `strays` and `carriers`; `signal_owned` still proves each. They need neither a
+    token nor a path in their command line: a helper given its own environment, or an Apple platform binary whose
+    environment `ps -E` hides, still has the cwd it inherited. `since`: only processes born no earlier than this are
+    asked (a leftover of a boundary was born after it), which keeps the read cheap. Read-only: Linux /proc/<pid>/cwd,
+    macOS `lsof -d cwd` (OSError when it does not list this process, which it is always asked about); Windows: none."""
+    table = host_table() if table is None else table
+    if not POSIX:
+        return []
+    head, tail = os.path.split(prefix)
+    marks = {prefix, os.path.join(os.path.realpath(head), tail)}
+    pids = sorted(p.pid for p in table.values() if p.pid != os.getpid() and (since is None or p.born >= since - _SLACK_S))
+    cwd: dict[int, str] = {}
+    if sys.platform.startswith("linux"):
+        for pid in pids:
+            try:
+                cwd[pid] = os.readlink(f"/proc/{pid}/cwd")
+            except OSError:
+                continue
+    else:
+        out = subprocess.run(["lsof", "-nP", "-w", "-a", "-d", "cwd", "-Fpn", "-p", ",".join(map(str, [os.getpid(), *pids]))],
+                             capture_output=True, encoding="utf-8", errors="replace").stdout
+        pid = None
+        for line in out.splitlines():
+            if line[:1] == "p" and line[1:].isdigit():
+                pid = int(line[1:])
+            elif line[:1] == "n" and pid is not None:
+                cwd[pid] = line[1:]
+        if os.getpid() not in cwd:   # lsof exits 1 when an asked pid is gone; an empty answer would read as "none"
+            raise OSError("lsof did not list this process's cwd: the working directories cannot be read")
+    hits = [p for p, d in cwd.items() if p != os.getpid() and any((d + os.sep).startswith(m) for m in marks)]
+    return sorted((table[p] for p in hits if p in table), key=lambda p: p.pid)
+
+
 def prove_member(boundary: Boundary, pid: int, group: int, table: dict[int, Host] | None = None) -> Host | None:
     """A pid CLAIMED by a subject or a fixture (a pid file, a report) is a lookup key, never permission. It is the
     runner's only when, in this module's own table, it sits in `group` — a group the controller created, whose
