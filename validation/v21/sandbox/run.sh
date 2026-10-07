@@ -66,7 +66,7 @@ except Exception as e: print(f"  no JSON report: {e}"); sys.exit()
 m=r["measure"]
 print(f"  bwrap ran: {'yes' if not any('did not run' in p for p in m['problems']) else 'NO'}; measure problems: {len(m['problems'])}")
 for p in m["problems"][:12]: print(f"    - {p}")
-for group in ("denials", "tmpfs_only", "by_design", "controls"):
+for group in ("denials", "network", "observed", "tmpfs_only", "by_design", "controls"):
     for k,v in r.get(group,{}).items():
         if isinstance(v, list): print(f"  {group} {k}: {v[:2]}"); continue
         s = "not-started(bwrap unavailable)" if not v.get("started") else f"exit {v['exit']}: {' | '.join(v.get('out','').splitlines())[:110]}"

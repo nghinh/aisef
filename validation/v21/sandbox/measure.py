@@ -7,6 +7,9 @@ and the client's auth data, a hidden verifier file. Every operation runs under t
 `confine.measure` runs as `run.execute` calls it. Each row records the operation and what happened:
 
   denials    the operation FAILED inside the sandbox (its error is recorded);
+  network    a host port and an abstract unix socket of the container's network namespace: failed under network
+             "none", reached under "host" (what a run uses) — recorded, never called a denial;
+  observed   what /proc/self/status shows (capabilities, NoNewPrivs, Seccomp) — a reading, not an operation;
   tmpfs_only the operation succeeded, but only into the sandbox's throwaway tmpfs: the real file, checked from
              outside after the run (`after`), is unchanged — not a denial;
   by_design  what a session is meant to reach (read-only), recorded so its extent is visible;
@@ -145,11 +148,16 @@ def main() -> None:
         # the container's sleeper by its command line (the pattern never matches the probe's own: 98[7]), then the PIDs
         "see_container_process": inside(sh("for f in /proc/[0-9]*/cmdline; do tr '\\0' ' ' < $f; echo; done "
                                            "| grep -c 'sleep 98[7][.]654'; ls /proc | grep -E '^[0-9]+$' | sort -n | tr '\\n' ' '"), env),
-        "connect_host_port": inside(["python3", "-c", connect], env),
         "connect_unmounted_unix_socket": inside(connect_py("path", str(SOCKS / "ctl")), env),
-        "connect_abstract_unix_socket": inside(connect_py("abstract", f"aisef-measure-{os.getpid()}"), env),
-        "capabilities": inside(sh("grep -E '^(Cap(Inh|Prm|Eff|Bnd|Amb)|NoNewPrivs|Seccomp):' /proc/self/status"), env),
         "new_user_namespace": inside(sh("unshare --user --map-root-user true"), env),
+    }
+    # reached or not by network: denied with network none, reached with host (a run's) — never called a denial there
+    report["network"] = {
+        "connect_host_port": inside(["python3", "-c", connect], env),
+        "connect_abstract_unix_socket": inside(connect_py("abstract", f"aisef-measure-{os.getpid()}"), env),
+    }
+    report["observed"] = {
+        "capabilities": inside(sh("grep -E '^(Cap(Inh|Prm|Eff|Bnd|Amb)|NoNewPrivs|Seccomp):' /proc/self/status"), env),
     }
     report["tmpfs_only"] = {
         "append_anchor": inside(sh(f"echo x >> {ANCHOR} && cat {ANCHOR}"), env),
