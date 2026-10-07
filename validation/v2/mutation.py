@@ -1182,6 +1182,22 @@ def _tail(text: str, tg: _Target, run: pathlib.Path) -> str:
     return re.sub(r"0x[0-9a-fA-F]+", "0x?", text)[-TAIL:]
 
 
+def _named(r, residual: Exception, not_empty: bool) -> list[int]:
+    """The pids release() named: the `[(pid, command), ...]` its message ends with, read structurally after the exact
+    prefix release() writes, rebuilt from the range's own name and ledger — so no text in a command line (which the
+    code under test controls: '(1, ' in an escapee's source) can add a pid (process-env prover). A message of another
+    shape stops the target: what it names is unknown."""
+    head = (f"{r.name}: not empty after {[s['stage'] for s in r.ledger]}: " if not_empty
+            else f"{r.name}: processes left the range and are alive: ")
+    text = str(residual)
+    try:
+        if not text.startswith(head):
+            raise ValueError(text[:120])
+        return [int(pid) for pid, _ in ast.literal_eval(text[len(head):])]
+    except (ValueError, TypeError, SyntaxError) as e:
+        raise _Stop(f"{ca.RESIDUAL_OWNERSHIP_UNKNOWN}: release() named processes in a form not read: {e}") from None
+
+
 def _run_file(tg: _Target, rel: str, rows: list, *, select: str | None = None, failfast: bool = True,
               role: str | None = None) -> dict:
     """One run of kill file `rel` — or of what `select` names in it — on the version in the tree, in a clean environment
@@ -1235,7 +1251,8 @@ def _run_file(tg: _Target, rel: str, rows: list, *, select: str | None = None, f
                 row["tail"] = tail
             if residual is not None:
                 row["residual"] = f"{type(residual).__name__}: {str(residual)[:300]}"
-                pids = sorted({p.pid for p in r.members()} | set(escaped) | {int(x) for x in re.findall(r"\((\d+), ", str(residual))})
+                pids = sorted({p.pid for p in r.members()} | set(escaped) |
+                              set(_named(r, residual, isinstance(residual, RangeNotEmpty))))
                 anchor = None if r._reaped else r._anchor.pid   # a reaped anchor's group no longer exists (PL-5 (b))
                 row.setdefault("leaked", []).extend({"pid": p, "at": "release"} for p in pids)
                 report = _clean(tg.boundary, pids, [anchor] if anchor else [])

@@ -10,6 +10,7 @@ import contextlib
 import json
 import os
 import pathlib
+import re
 import subprocess
 import sys
 import tempfile
@@ -598,6 +599,46 @@ class Proc(unittest.TestCase):
                     self.assertEqual(classes(r), ["TIMEOUT", "SURVIVED"], r.get("error"))
                     self.assertNotIn("stopped", r)
                     self.assertTrue(r["results"][0]["timed_out"])
+
+    def test_the_pids_release_names_are_read_from_its_list_not_from_command_text(self):
+        """Process-env prover: the pids of a Residual were taken with re.findall(r'\\((\\d+), ') over its message, which
+        holds command lines the code under test controls: an escapee whose source says `max(1, 2)` made the runner
+        watch launchd and stop ('alive after ...: [1]'). They are now read from the list release() ends its message
+        with, after the exact prefix rebuilt from the range's own name and ledger; another shape stops the target."""
+        class R:
+            name, ledger = "kill tests tests/v2/test_x.py", [{"stage": "cooperative"}, {"stage": "kill"}]
+        from aisef2.runtime.process_range import RangeEscaped, RangeNotEmpty
+        esc = RangeEscaped(f"{R.name}: processes left the range and are alive: [(4242, 'python -c x = max(1, 2)')]")
+        full = RangeNotEmpty(f"{R.name}: not empty after ['cooperative', 'kill']: [(7, 'os.setpgid(0, G)'), (8, 'b')]")
+        self.assertEqual(m._named(R, esc, False), [4242])
+        self.assertEqual(m._named(R, full, True), [7, 8])
+        self.assertEqual(sorted({int(x) for x in re.findall(r"\((\d+), ", str(esc))}), [1, 4242])  # old
+        for bad in (RangeEscaped("something else: [(1, 'x')]"), RangeNotEmpty(f"{R.name}: not empty after []: [(1, 'x')]")):
+            with self.subTest(bad=str(bad)), self.assertRaises(m._Stop):
+                m._named(R, bad, isinstance(bad, RangeNotEmpty))
+        # on a real range: an in-group child leaves a 2 s escapee whose source holds '(1, '
+        root = toy(self.dir, POSITIVE, {"test_p.py": """
+            import subprocess, sys, time, unittest
+            from aisef2.toy import positive
+            E = "import time; time.sleep(2); x = max(1, 2)"
+            B = "import subprocess, sys, time\\nsubprocess.Popen([sys.executable, '-c', sys.argv[1]], start_new_session=True)\\ntime.sleep(30)\\n"
+            class P(unittest.TestCase):
+                def test_leaves_an_escapee_through_a_member(self):
+                    if positive(5) is None:
+                        subprocess.Popen([sys.executable, "-c", B, E])
+                        time.sleep(0.7)
+            """})
+        with mock.patch.object(m, "SETTLE_S", 5.0):
+            r = m.run_target(root, "aisef2/toy.py::positive", ["tests/v2/test_p.py"])
+            self.assertEqual(classes(r), ["SURVIVED", "SURVIVED"], r.get("error"))
+            self.assertTrue(rows_of(r)[0][1]["residual"].startswith("RangeEscaped"), rows_of(r)[0][1])
+            self.assertNotIn(1, [x["pid"] for x in rows_of(r)[0][1]["leaked"]])
+            # the old failure, with the substring regex: pid 1 is watched, and the target stops
+            with mock.patch.object(m, "_named", lambda r_, e, ne: [int(x) for x in re.findall(r"\((\d+), ", str(e))]):
+                r = m.run_target(root, "aisef2/toy.py::positive", ["tests/v2/test_p.py"])
+        self.assertTrue(r["stopped"])
+        self.assertIn("alive after 5.0s: [1]", r["error"])
+        time.sleep(2.5)   # the escapee ends itself
 
     def test_an_escapee_that_ends_within_the_grace_does_not_make_the_order_decide(self):
         """ORD-7: `test_e` hangs beside a detached helper that lives about 6 s. In [plain, test_e] plain kills both
