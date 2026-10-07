@@ -419,19 +419,19 @@
    },
    "write_client_directory": {
     "exit": 2,
-    "output": "probe: 13: cannot create /tmp/aisef/runtime/.aisef-confine-probe-31285611c4f9e87c: Read-only file system"
+    "output": "probe: 13: cannot create /tmp/aisef/runtime/.aisef-confine-probe-f8b87ebfe6f50c4f: Read-only file system"
    },
    "write_git_directory": {
     "exit": 2,
-    "output": "probe: 14: cannot create /tmp/aisef/run-dir/repo/.git/.aisef-confine-probe-31285611c4f9e87c: Read-only file system"
+    "output": "probe: 14: cannot create /tmp/aisef/run-dir/repo/.git/.aisef-confine-probe-f8b87ebfe6f50c4f: Read-only file system"
    },
    "write_interpreter_site": {
     "exit": 2,
-    "output": "probe: 12: cannot create /tmp/aisef/venv/lib/python3.14/site-packages/.aisef-confine-probe-31285611c4f9e87c: Read-only file system"
+    "output": "probe: 12: cannot create /tmp/aisef/venv/lib/python3.14/site-packages/.aisef-confine-probe-f8b87ebfe6f50c4f: Read-only file system"
    },
    "write_kernel": {
     "exit": 2,
-    "output": "probe: 11: cannot create /tmp/aisef/venv/lib/python3.14/site-packages/aisef2/.aisef-confine-probe-31285611c4f9e87c: Read-only file system"
+    "output": "probe: 11: cannot create /tmp/aisef/venv/lib/python3.14/site-packages/aisef2/.aisef-confine-probe-f8b87ebfe6f50c4f: Read-only file system"
    },
    "write_run_directory": {
     "exit": 0,

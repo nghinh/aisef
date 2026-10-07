@@ -8,7 +8,8 @@ nhánh"). It is **opt-in** and **Linux-only**; it changes nothing when the setti
 Module: [`aisef2/app/confine.py`](../../aisef2/app/confine.py). Harness:
 [`validation/v21/sandbox/`](../../validation/v21/sandbox/). Measured evidence:
 [`evidence/sandbox/`](evidence/sandbox/) (`measure.log`, one JSON per profile, `Dockerfile.measure`), recorded at the
-committed tree `affcefb` (`measured tree: … uncommitted paths: 0` in `measure.log`).
+committed tree `3e0409c` (`measured tree: … uncommitted paths: 0` in `measure.log`); the setsid-survivor check
+against the PID namespace's teardown: `teardown-race-plain.json`, `teardown-race-sock.json` (§5).
 
 Every claim below names the operation that was tried and what happened (owner's 2026-10-06 requirement: a denied
 operation, not config alone). Where an operation **succeeded** — into a throwaway tmpfs, or because a session is
@@ -142,7 +143,7 @@ both sides: user, pid, ipc, uts, mnt `own`; net `own` with `none`, `shared` with
 | a unix socket outside every mount is unreachable | connect `<base>/sock/ctl` | `FileNotFoundError` |
 | no further user namespace (the route back to capabilities) | `unshare --user --map-root-user true` | `unshare failed: No space left on device` (`--disable-userns`) |
 | the container's processes are not visible | look for a container-side `sleep 987.654` (seen outside: `after.container_sleeper_seen_outside` true) by its command line in `/proc/*/cmdline` | found **0** times; `/proc` lists only `1 2 9 10 11 12` — the session's own PID namespace (the measurement: `namespaces.pid` "own", a different `/proc/self/ns/pid` from the container's) |
-| a setsid child dies with the session | the measurement's `setsid sleep <unique>`, then a look for it after | `setsid_survivors: []` |
+| a setsid child dies with the session | the measurement's `setsid sleep <unique>`, then a look for it once bubblewrap returned (one found is looked at again until gone, for up to 1 s) | `setsid_survivors: []` |
 
 **Succeeds only into the sandbox's throwaway tmpfs** (not a denial; the real file is unchanged):
 
@@ -163,6 +164,18 @@ workspace; the client's configuration directory lists `opencode.json`; the revie
 `inside.unix_sockets: []`). A read-only mount does **not** stop a connect: the same `<base>/sock/ctl`, bound in
 read-only, is `CONNECTED` — and the kernel's measurement refuses that setting ("a unix socket outside the workspace
 is reachable"), recorded as `by_design.measure_with_a_read_only_mounted_socket`. Abstract sockets: §4.
+
+**Survivors and the teardown.** When bubblewrap returns, the kernel may still be killing the PID namespace's
+processes, so a single look can find the probe's sleeper alive: the round-2 verifier saw it once in 400
+measurements on `affcefb`'s code (pid gone at the first re-check), and the kernel's measurement then refused for
+"a process the session left outlived it". Since `3e0409c` a sleeper found is looked at again every 0.05 s for up
+to `SURVIVOR_GRACE` (1 s); only one still alive then (the process table drops zombies) is a survivor. Measured with X1's container flags and
+the run's `network: host` (`validation/v21/sandbox/teardown_race.py`, 500 measurements each): without a socket, the first look never found
+the sleeper; with the read-only socket directory, it found it in 2 of 500 (measurements 20 and 34), the second look
+found it gone, and none reported a survivor — 0 of 1000. The positive control on Linux's `/proc` table: a
+"bubblewrap" that confines nothing leaves its sleeper alive, and the measurement reports it after the grace (14
+looks; the whole measurement 1.1 s; the pid still alive when it returned). The direction stays fail-closed: a survivor is only ever
+dropped by being gone.
 
 **Controls** (must work): the workspace (`echo ok > ./w && cat ./w` → `ok`); the client started from its own
 read-only mounted directory prints its JSON.
@@ -195,7 +208,9 @@ read-only mounted directory prints its JSON.
   requires the mounts seen inside to lie within what the command line names, and no unix socket outside the workspace
   under any bound directory (within: the path itself or below it — `/w/ws2` is not within `/w/ws`, nor
   `/usrlocal-extra` within `/usr`); a namespace is `own` only when its `/proc/self/ns` link was read inside and outside
-  (`<name>:[<inode>]`) and they differ; a check that did not run is a problem.
+  (`<name>:[<inode>]`) and they differ; a check that did not run is a problem; a probe sleeper found when bubblewrap
+  returns counts as a survivor only if still alive after up to 1 s (§5;
+  `test_a_sleeper_still_dying_when_bubblewrap_returned_is_no_survivor`, `test_a_killed_sleeper_is_no_survivor_a_live_one_is`).
 
 **Kernel change.** This touches `aisef2/` (settings, client, run, cli, and the new `confine.py`): it needs mutation
 coverage and re-qualification outside the current measured snapshot. `confine.py` is **not** a mutation target today:
@@ -210,7 +225,11 @@ at `ac27348` (the 11 that survived the previous tests at `0da842f` among them; s
 5 the round-2 verifier saw survive the 24 tests at `4e00a0d` (`_within` without its `/`, the user's home not checked
 when the env has no HOME, an unreadable bubblewrap raising, a non-Linux measurement making its worktree, `--check`
 measuring without the client) survive them again and are killed by the 26 at `affcefb` (tests only: `aisef2/` is
-unchanged since `ac27348`).
+unchanged since `ac27348`). Round 3 changes `aisef2/app/confine.py` only (`_survivors`, `SURVIVOR_GRACE`; not a
+mutation target; the files of the 5 targets above are unchanged since `ac27348` by `git diff`, so their counts
+above stand — `--check` itself was not re-run): 6/6 targeted
+mutants of the grace killed by the 28 tests at `3e0409c`; two of them — no grace (the round-2 code) and a grace of
+0 — survive the 26 round-2 tests.
 
 ## 7. Limits (not confined / not claimed)
 
@@ -240,7 +259,7 @@ unchanged since `ac27348`).
 
 | Deliverable | Level | Why |
 |---|---|---|
-| the setting, the argv builder, fail-closed refusal of run / `--check` / session, each check of the measurement | **M3** | `test_v21_confine` (26 tests, all its own) on macOS with fake clients and providers; no OS boundary exercised on macOS. |
+| the setting, the argv builder, fail-closed refusal of run / `--check` / session, each check of the measurement | **M3** | `test_v21_confine` (28 tests, all its own) on macOS with fake clients and providers; no OS boundary exercised on macOS. |
 | the success path of a confined run (every session started through the bwrap argv, the reviewer's workspace read-only, the records saying so) | **M3** | `test_v21_confine.RunFailClosed.test_a_confined_run_starts_every_session_through_bubblewrap_and_says_so`: the **measurement stubbed** and the argv built for Linux, a recording fake bubblewrap that confines nothing — the wiring, not a boundary. |
 | the confinement boundary itself inside a Linux container | **M4** | `validation/v21/sandbox/run.sh` under real `docker`: real bwrap 0.12.0, real namespaces, a real host port, the container's real processes and sockets; the kernel's own `confine.measure` and the session's `confine.wrap` run in the container; each claim an operation tried (§5). A standalone harness, not `aisef run`; the client is a script, no provider — so not M5. |
 | a confined real `aisef run` on Linux end to end | **M6** | not done: the macOS host has no Linux backend to run `aisef run` itself under bwrap. |
