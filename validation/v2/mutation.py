@@ -1497,7 +1497,13 @@ def _summarise(out: dict) -> dict:
                killed_by_timeout=classes["TIMEOUT"], strays_reaped=sum(r.get("strays_reaped", 0) for r in res))
     open_ = {c: n for c, n in classes.items() if c not in ("KILLED", "SURVIVED") and n}
     if open_ and not out.get("error"):   # the frozen merge tools refuse an errored result: no audit can excuse these
-        out["error"] = f"UNCLASSIFIED: {sum(open_.values())} mutant(s) neither killed nor survived {open_} — re-run them"
+        # a run that ends with no unittest summary (a signal, os._exit) is never confirmed, so re-running such a mutant
+        # gives INFRA again: it needs a kill test or a ruling (lead decision Q1; classification prover, VS-6 (a))
+        silent = sum(1 for r in res if r["class"] == "INFRA" and any(
+            "no unittest summary" in (x.get("why") or "") for x in r.get("files", []) if "role" not in x))
+        out["error"] = (f"UNCLASSIFIED: {sum(open_.values())} mutant(s) neither killed nor survived {open_} — "
+                        + ("re-run them" if not silent else f"{silent} end a kill test with no unittest summary (a signal, "
+                           f"os._exit), which a re-run cannot confirm: each needs a kill test or a ruling; re-run the rest"))
     return out
 
 

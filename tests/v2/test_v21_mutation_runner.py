@@ -1166,6 +1166,21 @@ class Classify(unittest.TestCase):
         self.assertEqual([m.mutant_class(x) for x in (["PASS", "FAIL"], ["PASS"], ["TIMEOUT", "PASS"], ["TIMEOUT", "INFRA"])],
                          ["KILLED", "SURVIVED", "TIMEOUT", "INFRA"])
 
+    def test_the_error_says_which_unclassified_mutants_a_re_run_cannot_resolve(self):
+        """Classification prover, VS-6 (a): a mutant whose kill test dies with no summary is INFRA for good, and the
+        error still said 're-run them'. It now says how many a re-run cannot confirm, and that they need a kill test or
+        a ruling; the prefix the merge tools and the tests read is unchanged."""
+        def out(*whys):
+            return m._summarise({"results": [{"mutant": f"m{i}", "class": "INFRA", "killed": False,
+                                              "files": [{"file": "f", "outcome": "INFRA", "why": w}]}
+                                             for i, w in enumerate(whys)]})["error"]
+        self.assertEqual(out("kill not confirmed: the unmutated module FAIL"),
+                         "UNCLASSIFIED: 1 mutant(s) neither killed nor survived {'INFRA': 1} — re-run them")
+        self.assertEqual(out("exit -9, no unittest summary", "kill not confirmed: the unmutated module FAIL"),
+                         "UNCLASSIFIED: 2 mutant(s) neither killed nor survived {'INFRA': 2} — 1 end a kill test with no "
+                         "unittest summary (a signal, os._exit), which a re-run cannot confirm: each needs a kill test or "
+                         "a ruling; re-run the rest")
+
     def test_timed_out_does_not_depend_on_the_order(self):
         """Order-equivalence prover: `timed_out` was written in execution order, so two orders of one kill set gave
         different record bytes for a TIMEOUT-class mutant, against section 7.1 (5). It is now sorted."""
