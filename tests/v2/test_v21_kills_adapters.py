@@ -176,5 +176,48 @@ class Unchanged(_Reviewer):
                                            f"{head[:12]} (every finding discarded)")
 
 
+class TreeOf(_Reviewer):
+    """tree_of — "L244 element 0 dropped" (directories not recorded), "L248 string 'link:' emptied", "L250 string 'dir'
+    emptied", "L243 string '.git' emptied", "L255 string 'unreadable:' emptied": the checkout's record holds every entry
+    but .git — a file by its sha256, a link by its target, a directory as one — so that a review which adds an empty
+    directory or turns a directory into a link is caught by _unchanged, and git's own bookkeeping is not a change."""
+
+    def test_the_record_distinguishes_each_kind_of_entry_and_leaves_out_git(self):
+        import hashlib
+        import os
+        repo = self.tmp / "repo"
+        (repo / "sub").mkdir()
+        (repo / "sub" / "f.txt").write_text("x\n")
+        os.symlink("sub/f.txt", repo / "link")
+        locked = repo / "locked.txt"
+        locked.write_text("secret\n")
+        locked.chmod(0)
+        self.addCleanup(locked.chmod, 0o600)
+        t = ad.tree_of(str(repo))
+        self.assertEqual(t["sub"], "dir")
+        self.assertEqual(t["sub/f.txt"], hashlib.sha256(b"x\n").hexdigest())
+        self.assertEqual(t["link"], "link:sub/f.txt")
+        if os.geteuid() != 0:     # root reads a 000 file
+            self.assertEqual(t["locked.txt"], "unreadable:PermissionError")
+        self.assertEqual([k for k in t if k == ".git" or k.startswith(".git/")], [])
+
+    def test_an_empty_directory_or_a_directory_turned_into_a_link_named_dir_is_a_change(self):
+        import os
+        repo = self.tmp / "repo"
+        head = e2e.git(repo, "rev-parse", "HEAD")
+        (repo / "d").mkdir()
+        before = ad.tree_of(str(repo))
+        (repo / "empty").mkdir()
+        with self.assertRaises(ad.CapabilityUnrunnable) as c:
+            ad._unchanged(str(repo), head, before, "the finder")
+        self.assertIn("['empty']", str(c.exception))
+        (repo / "empty").rmdir()
+        (repo / "d").rmdir()
+        os.symlink("dir", repo / "d")          # a link whose target reads like a directory's record
+        with self.assertRaises(ad.CapabilityUnrunnable) as c:
+            ad._unchanged(str(repo), head, before, "the finder")
+        self.assertIn("['d']", str(c.exception))
+
+
 if __name__ == "__main__":
     unittest.main()
