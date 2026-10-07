@@ -1,5 +1,5 @@
 D4 context gap on recorded retries (validation/v21/context_gap.py; read-only over closure-evidence/v2)
-commit: 1899bb0ec1fc3fd9123a1e2f5579b07df17be42d dirty: 0
+commit: 7797061e39a472b50314878a02450b16d56d357f dirty: 0
 
 1. What the 2.0.0 release smoke-2 developers were told: each prompt recomputed by the 2.0.0 code (git archive v2.0.0) from the journal before its request, against the prompt_sha256 the run recorded
    STORY-01-01 attempt 1 (request seq 40): EQUAL

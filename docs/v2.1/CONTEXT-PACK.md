@@ -1,11 +1,11 @@
 # D4 — Gói ngữ cảnh do controller dựng cho lượt thử lại của developer
 
-Trạng thái: **M4** — gói tới developer qua CLI `aisef` thật (`validation/v21/cli_integration/run.sh` tại `1899bb0`, cây
+Trạng thái: **M4** — gói tới developer qua CLI `aisef` thật (`validation/v21/cli_integration/run.sh` tại `7797061`, cây
 sạch: nhị phân Open Code Review thật, git thật; developer và mô hình của OCR là kịch bản). Bước cuối của `run.sh`
 (`readback.py`) tính lại hai prompt developer của run1 từ journal của nó: sha256 **trùng** `prompt_sha256` trong
 `RUN.json` và trùng tệp prompt client giả nhận; lượt 2 mang gói; mọi seq gói trích được đọc lại đúng story, đúng loại;
-journal không chứa gói ([evidence/cli-integration-1899bb0.out](evidence/cli-integration-1899bb0.out), cùng các bước và mã
-thoát như `b72e51e`). Offline (M3): `tests/v2/test_v21_context_pack.py`, gồm `run.execute` với client giả và phát lại
+journal không chứa gói ([evidence/cli-integration-7797061.out](evidence/cli-integration-7797061.out), cùng các bước và mã
+thoát như `b72e51e` và `1899bb0`). Offline (M3): `tests/v2/test_v21_context_pack.py`, gồm `run.execute` với client giả và phát lại
 journal smoke-2. Hiệu quả trên mô hình thật: **M6** — cần lượt chạy live trả tiền, chưa có ngân sách. Thay đổi nằm trong
 `aisef2/app/` (`feedback.py`, `adapters.py`): cần mutation và tái thẩm định ngoài snapshot đang đo.
 
@@ -58,7 +58,7 @@ cho biết gì.
 
 ### 1.3 Đo trên bằng chứng đã ghi (chỉ đọc)
 
-Công cụ: `validation/v21/context_gap.py`; đầu ra: [evidence/context-gap.out](evidence/context-gap.out) (tại `1899bb0`).
+Công cụ: `validation/v21/context_gap.py`; đầu ra: [evidence/context-gap.out](evidence/context-gap.out) (tại `7797061`).
 Điều journal biết là **EXPERIMENT** (đọc từ journal). Điều developer **được kể**: smoke-2 là **EXPERIMENT** (mục 1); cycle-2
 P10 là **CODE**, chưa tính lại — prompt do harness `validation/qualification/c2_p9.py` dựng, ở commit thực thi của từng
 attempt (sha256 trùng bản ghi `LEDGERLOCK-REGRESSION.json`): attempt 2 (`1f992ba`, `:230-247`) và 3 (`06ceb23`,
@@ -105,29 +105,31 @@ từng byte** bản trước.
 |---|---|---|
 | Do controller dựng, từ journal | đọc `story/begin`, `story/admitted`, `provider/request` (DEVELOPER) và `provider/result` của nó, `proof/verified` (chỉ candidate, criterion, verdict, agreement), `story/end` | `RecordedSmoke2`, `ThroughTheRun` |
 | Nói gì | mỗi lượt trước, mới nhất trước: cha; kết quả developer (văn bản adapter); candidate, hoặc "chính cha — lượt đó không đổi gì"; mệnh đề **đạt** (verdict = kỳ vọng của plan cho mệnh đề đó, verifier đồng ý — mệnh đề của bất kỳ story nào, vì PRESERVE của story đã commit cũng được chứng minh ở candidate; mệnh đề plan không biết thì không bao giờ đạt); mệnh đề **không có proof ghi lại** trong lượt đó (không nói nguyên nhân: lượt có thể dừng trước proof, hoặc ngay ở probe của nó — PROBE_MISMATCH, PROBE_INVALID_SPEC). Lượt hiện tại bắt đầu lại ở cha; chỉ dòng nêu một candidate nói nó là commit của repo (không nêu candidate nào — lượt sự cố, lượt chứng minh chính cha, lượt dừng ở probe — thì không có câu đó) | `test_what_an_earlier_attempt_left…`, `test_only_the_attempt_s_candidate_counts…`, `Expectation`, `test_no_proof_recorded_is_all_it_says…`, `test_only_a_named_candidate_is_said…` |
-| Trích nguồn | mỗi dòng kèm `(journal seq …)`; điều vắng mặt trích khoảng seq của lượt | `test_every_item_cites…` (seq có thật, đúng story, đúng loại) |
-| Tất định | sắp theo seq, mệnh đề theo tên; không thời gian, môi trường, ngẫu nhiên | `test_an_identical_journal_gives_identical_bytes…` |
-| Có biên | `PACK_MAX` 4000 ký tự (prompt là một phần tử argv; dòng lệnh Windows ≤ 32 767), `PACK_LIST` 12 tên/dòng, `PACK_ATTEMPTS` 4 lượt gần nhất, kết quả developer cắt đúng 300 ký tự; cắt theo dòng nguyên, có dấu; dừng khi còn `PACK_MAX - 120` để chừa chỗ cho dấu dừng (58 ký tự kể cả xuống dòng); lượt mới nhất đứng trước nên biên cắt lượt cũ nhất | `test_it_is_bounded`, `test_at_the_real_bound_the_latest_attempts_are_kept…`, `test_at_the_real_bound_the_stop_mark_fits…` (một dòng của gói chưa cắt kết thúc ở ký tự `PACK_MAX - 58 + 1`: giữ nó thì vượt biên), `test_at_the_real_bound_no_line_is_kept_after_the_first_that_does_not_fit` (sau dòng đầu không vừa là một dòng ngắn vừa chỗ: gói cắt vẫn là tiền tố gồm các dòng nguyên) |
-| Không chứa vật liệu ẩn, bí mật | không đọc `probe/evaluated`, `tool/*`, `gate/check`, `tests/*`, stream phiên; không spec id, semantic hash; story khác bị loại; bí mật của run → `[REDACTED]` (`Developer.implement` đưa bí mật của phiên vào gói) | `test_it_never_holds_proof_material…`, `test_a_review_result_is_never_taken…`, `Prompt.test_the_run_s_secrets_reach_the_pack_in_the_prompt` |
+| Trích nguồn | mỗi dòng kèm `(journal seq …)`; điều vắng mặt trích khoảng seq của lượt; kết quả developer là **một dòng** (mọi chuỗi khoảng trắng, kể cả xuống dòng, thành một dấu cách): văn bản provider viết — vd. trang 524 trong chi tiết sự cố, qua `client.read_session` — không thành dòng của gói | `test_every_item_cites…` (seq có thật, đúng story, đúng loại), `test_a_developer_result_is_one_line…` (trang 524 có dòng giả "held at that revision": gói 4 dòng, dòng nào cũng trích; trước `7797061`: 56 dòng, 50 không trích, dòng giả đứng thành dòng) |
+| Tất định | sắp theo seq, mệnh đề theo tên; không thời gian, môi trường, ngẫu nhiên; kết quả mang LF hay CRLF cho cùng byte | `test_an_identical_journal_gives_identical_bytes…`, `test_a_developer_result_is_one_line…` |
+| Có biên | `PACK_MAX` 4000 ký tự (prompt là một phần tử argv; dòng lệnh Windows ≤ 32 767), `PACK_LIST` 12 tên/dòng, `PACK_ATTEMPTS` 4 lượt gần nhất, kết quả developer về một dòng rồi cắt đúng 300 ký tự; cắt theo dòng nguyên, có dấu; giữ một dòng khi phần giữ lại cộng dòng đó và xuống dòng của nó ≤ `PACK_MAX - 120`, để chừa chỗ cho dấu dừng (58 ký tự kể cả xuống dòng); lượt mới nhất đứng trước nên biên cắt lượt cũ nhất | `test_it_is_bounded`, `test_at_the_real_bound_the_latest_attempts_are_kept…`, `test_at_the_real_bound_the_stop_mark_fits…` (một dòng của gói chưa cắt kết thúc ở ký tự `PACK_MAX - 58 + 1`: giữ nó thì vượt biên), `test_at_the_real_bound_no_line_is_kept_after_the_first_that_does_not_fit` (sau dòng đầu không vừa là một dòng ngắn vừa chỗ: gói cắt vẫn là tiền tố gồm các dòng nguyên), `test_at_the_real_bound_a_line_is_kept_only_when_it_ends_before_pack_max_minus_120` (dòng thứ 12 kết thúc, kể cả xuống dòng, đúng ở `PACK_MAX - 120`: giữ; quá một ký tự: cắt) |
+| Không chứa vật liệu ẩn, bí mật | không đọc `probe/evaluated`, `tool/*`, `gate/check`, `tests/*`, stream phiên; không spec id, semantic hash; story khác bị loại; bí mật của run → `[REDACTED]`, so ở dạng một dòng của cả bí mật lẫn kết quả (bí mật hai dòng gửi bằng CRLF vẫn bị che) (`Developer.implement` đưa bí mật của phiên vào gói) | `test_it_never_holds_proof_material…`, `test_a_review_result_is_never_taken…`, `test_a_developer_result_is_one_line…`, `Prompt.test_the_run_s_secrets_reach_the_pack_in_the_prompt` |
 | Không phải quyền uy | tiêu đề "context only — no verdict, approval or budget reads it"; không ghi vào journal; trong `aisef2/` chỉ `feedback.py` và `adapters.py` nhắc tới nó | `test_it_is_labelled…`, `ThroughTheRun` (journal không chứa nó) |
 | Tóm tắt do agent viết | **không có** | — |
 
 Đột biến tay (không phải chiến dịch mutation của kernel): `validation/v21/context_pack_mutants.py` chạy trên bản sao của
-HEAD, baseline xanh trước, 18 đột biến — 17 trên các dòng của `context_pack` (bỏ kỳ vọng, mặc định SATISFIED cho mệnh đề
-lạ, kỳ vọng chỉ của story này, bỏ điều kiện verifier đồng ý, cắt 299/301/1000, redact sau khi cắt, thứ tự cũ trước, trần 5
-lượt, mọi mệnh đề là "không có proof", proof sau thay proof đầu, lề cho dấu dừng `PACK_MAX - 120` thành `PACK_MAX` và
-thành `PACK_MAX - 56`, `break` của vòng cắt thành `continue`, tiêu đề nói "candidate là commit" dù không nêu candidate,
-dòng candidate bỏ câu đó) và 1 trên lời gọi của nó trong `Developer.implement` (không đưa bí mật của run — trước vòng 2,
-đột biến này **sống sót** cả 17 test):
-**18/18 bị giết** tại `4da9f33` ([evidence/context-pack-mutants.out](evidence/context-pack-mutants.out)). Các lớp test
-chạy: `Pack`, `Expectation`, `Prompt`, `RecordedSmoke2` (không có `ThroughTheRun`). Đột biến lề `PACK_MAX` **sống sót** cả
-19 test tại `9198d47` (gói vượt biên tới 57 ký tự). Lề từ 57 trở lên vẫn giữ biên (phần giữ lại ≤ `PACK_MAX` − 58, cộng
-dấu dừng 58 ký tự), nên test giữ biên chứ không giữ đúng hằng số 120. Đột biến `break` → `continue` **sống sót** cả 20 test
-tại `4022f7e` (không fixture nào có, sau dòng đầu không vừa, một dòng ngắn vừa chỗ; trên journal như thế nó bỏ dòng
-"- attempt N:" của lượt cũ nhất nhưng giữ dòng "held at that revision" của lượt đó, nằm dưới khối của lượt mới hơn liền
-trước và đọc như của lượt đó). Đột biến `size += len(ln) + 1` → `size += len(ln)` sống sót cả 21 test (bản sao cây làm
-việc có test mới, baseline xanh) và tương đương về biên: gói có tối đa 15 dòng (tiêu đề, lượt hiện tại, dòng "not
-shown", 4 × 3), nên đếm thiếu ≤ 14 ký tự và lề thực còn ≥ 106, trên mức 57 cần.
+HEAD, baseline xanh trước, 24 đột biến — 23 trên các dòng của `context_pack` (bỏ kỳ vọng, mặc định SATISFIED cho mệnh đề
+lạ, kỳ vọng chỉ của story này, bỏ điều kiện verifier đồng ý, cắt 299/301/1000, redact sau khi cắt, kết quả giữ xuống
+dòng, bí mật so nguyên dạng thay vì dạng một dòng, thứ tự cũ trước, trần 5 lượt, mọi mệnh đề là "không có proof", proof
+sau thay proof đầu, lề cho dấu dừng `PACK_MAX - 120` thành `PACK_MAX`, `PACK_MAX - 56`, `PACK_MAX - 119` và
+`PACK_MAX - 121`, phép so của vòng cắt bỏ xuống dòng của dòng đang xét, `size += len(ln) + 1` thành `size += len(ln)`,
+`break` của vòng cắt thành `continue`, tiêu đề nói "candidate là commit" dù không nêu candidate, dòng candidate bỏ câu
+đó) và 1 trên lời gọi của nó trong `Developer.implement` (không đưa bí mật của run — trước vòng 2, đột biến này **sống
+sót** cả 17 test):
+**24/24 bị giết** tại `7797061` ([evidence/context-pack-mutants.out](evidence/context-pack-mutants.out)). Các lớp test
+chạy: `Pack`, `Expectation`, `Prompt`, `RecordedSmoke2` (không có `ThroughTheRun`). Lịch sử: đột biến lề `PACK_MAX`
+**sống sót** cả 19 test tại `9198d47` (gói vượt biên tới 57 ký tự); `break` → `continue` **sống sót** cả 20 test tại
+`4022f7e` (không fixture nào có, sau dòng đầu không vừa, một dòng ngắn vừa chỗ); `size += len(ln)` **sống sót** cả 21
+test tại `b7a85cd`, và tài liệu tại `b7a85cd` gọi nó "tương đương về biên" vì "gói có tối đa 15 dòng" — **sai**: kết quả
+developer khi đó giữ xuống dòng, và trên một journal có lượt sự cố mang trang 524 (qua `client.read_session`) đột biến
+đưa gói tới 4064 ký tự, 133 dòng, vượt biên (probe của verifier vòng 3: 9 journal như thế). Câu đó đã bỏ; tại `7797061`
+kết quả là một dòng và test `…_ends_before_pack_max_minus_120` giữ đúng hằng số 120 ở cả hai phía, nên giết đột biến
+này cùng `PACK_MAX - 119`, `PACK_MAX - 121` và phép so bỏ xuống dòng.
 
 Gói nằm trong prompt, nên đã được ràng buộc bằng `prompt_sha256` của phiên (`adapters.py`) — không cần trường bản ghi
 mới. Dựng lại nó cần journal, bundle đã duyệt và, khi một bí mật đã bị che trong kết quả developer, chính bí mật đó:
