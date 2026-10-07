@@ -6,6 +6,7 @@ off, so a toy that no longer exercises the channel fails instead of passing vacu
 
 from __future__ import annotations
 
+import contextlib
 import json
 import os
 import pathlib
@@ -448,6 +449,48 @@ class Proc(unittest.TestCase):
                     self.assertEqual(classes(r), ["TIMEOUT", "SURVIVED"], r.get("error"))
                     self.assertNotIn("stopped", r)
                     self.assertTrue(r["results"][0]["timed_out"])
+
+    @unittest.skipUnless(sys.platform == "darwin", "the group-rejoin mechanism was measured on macOS (VS-7 verifier)")
+    def test_a_range_that_never_empties_is_bounded_and_never_a_kill(self):
+        """VS-7/PL-5: the test ignores SIGINT and SIGTERM, so the ladder reaches SIGKILL; its child leaves the group
+        first and rejoins it once the group SIGKILL has killed its parent (the unreaped anchor keeps the group alive).
+        The old runner waited without limit (wait_s None). Now release() gives up after RELEASE_WAIT_S, the row is
+        INFRA (`residual: RangeNotEmpty`), the group is signalled by the authority with its proof (the anchor is the
+        runner's own, unreaped child), and nothing is left running."""
+        root = toy(self.dir, POSITIVE, {"test_g.py": f"""
+            import os, signal, sys, time, unittest
+            from aisef2.toy import positive
+            class G(unittest.TestCase):
+                def test_hangs_and_leaves_a_rejoining_child(self):
+                    if positive(5) is not None:
+                        return
+                    group, parent = os.getpgrp(), os.getpid()
+                    for s in (signal.SIGINT, signal.SIGTERM):
+                        signal.signal(s, signal.SIG_IGN)
+                    if os.fork() == 0:
+                        try:
+                            os.setpgid(0, 0)
+                            while os.getppid() == parent:
+                                time.sleep(0.002)
+                            os.setpgid(0, group)
+                            end = time.time() + 60
+                            while time.time() < end and not os.path.exists({str(self.sentinel)!r}):
+                                time.sleep(0.05)
+                        finally:
+                            os._exit(0)
+                    time.sleep(1000)
+            """})
+        begun = time.monotonic()
+        with mock.patch.object(m, "TIMEOUT", 2), mock.patch.object(m, "RELEASE_WAIT_S", 3):
+            r = m.run_target(root, "aisef2/toy.py::positive", ["tests/v2/test_g.py"])
+        self.assertLess(time.monotonic() - begun, 60)
+        self.assertEqual(classes(r), ["INFRA", "SURVIVED"])
+        row = rows_of(r)[0][1]
+        self.assertTrue(row["residual"].startswith("RangeNotEmpty"), row)
+        self.assertEqual((row["outcome"], row["judged_before_release"]), ("INFRA", "TIMEOUT"))
+        self.assertEqual([s["kind"] for s in row["cleanup"]], ["group"])   # the authority's proof, the group it created
+        self.assertEqual(row["cleanup"][0]["proof"]["runner"], os.getpid())
+        self.assertNotIn("stopped", r)
 
 
 #: kill files whose fault the test switches on after T0 (a flag file outside the tree names the fault)
@@ -917,6 +960,150 @@ class KillSets(unittest.TestCase):
         self.assertIn("not a kill file: ['tests/v2/test_v21_identity_bytes.py']", r["error"])
         self.assertEqual(classes(r), ["NOT_RUN", "NOT_RUN"])
         self.assertNotIn("t0", r)
+
+
+# --------------------------------------------------------------------------------------------- §7 order independence
+
+#: f's mutants, generator order, and the class each must get in every order: every kind of evidence at least once
+ORDER_MODULE = "def f(x, verbose=False):\n    if x > 0:\n        return 'pos'\n    return 'neg'\n"
+ORDER_TRUTH = {"L2 condition negated": "KILLED",      # a/k FAIL; h hangs on it first in some orders (TIMEOUT, then a kill)
+               "L4 returns None": "INFRA",            # i dies by SIGKILL on it, reproducibly; nothing else sees it
+               "L1 False->True": "SURVIVED",          # nothing tests verbose; c leaves .scratch in the tree for it
+               "L2 Gt->LtE": "KILLED",
+               "L3 returns None": "KILLED",           # i is INFRA on it too: a kill after an infrastructure row
+               "L4 string 'neg' emptied": "TIMEOUT",  # only h sees it, and hangs
+               "L3 string 'pos' emptied": "KILLED"}   # same size as its predecessor (a TIMEOUT): the bytecode channel
+ORDER_FILES = {
+    "test_a.py": """
+        import pathlib, unittest
+        from aisef2.toy import f
+        class A(unittest.TestCase):
+            def test_positive(self):
+                self.assertFalse(pathlib.Path(".scratch").exists())
+                self.assertEqual(f(1), "pos")
+        """,
+    "test_h.py": """
+        import unittest
+        from aisef2.toy import f
+        class H(unittest.TestCase):
+            def test_negative_or_hang(self):
+                while f(-1) in ("pos", ""):
+                    pass
+        """,
+    "test_i.py": """
+        import os, signal, unittest
+        from aisef2.toy import f
+        class I(unittest.TestCase):
+            def test_dies_on_none(self):
+                if f(-1) is None or f(1) is None:
+                    os.kill(os.getpid(), signal.SIGKILL)
+        """,
+    "test_c.py": """
+        import pathlib, unittest
+        from aisef2.toy import f
+        class C(unittest.TestCase):
+            def test_leaves_scratch_for_verbose(self):
+                if f.__defaults__ == (True,):
+                    pathlib.Path(".scratch").write_text("x")
+        """,
+    "test_k.py": """
+        import pathlib, subprocess, sys, unittest
+        TREE = str(pathlib.Path(__file__).resolve().parents[2])
+        class K(unittest.TestCase):
+            def test_positive_through_an_isolated_child(self):
+                code = f"import sys; sys.path.insert(0, {TREE!r}); from aisef2.toy import f; print(f(1))"
+                out = subprocess.run([sys.executable, "-I", "-c", code], capture_output=True, text=True).stdout
+                self.assertEqual(out.strip(), "pos")
+        """}
+
+
+def old_stop_rule(tg, entry, src):
+    """The old runner's loop, for the control: stop at the first run that does not PASS and call it a kill."""
+    rows = entry["files"] = []
+    m._write(tg, src)
+    for rel in tg.tests:
+        if m._run_file(tg, rel, rows)["outcome"] != "PASS":
+            rows[-1]["outcome"] = "FAIL"
+            entry["killed_by"] = {"file": rel}
+            return
+
+
+@unittest.skipUnless(POSIX, "the runner's process ranges and cleanup authority are measured on POSIX")
+class Order(unittest.TestCase):
+    """The owner's rule: a reorder never changes a class, on a sample with killed, survivor, timeout and infrastructure
+    cases (§7). Five kill files in every rotation (each file in each position, each pair in both relative orders); each
+    protection switched off in turn must change a class, so the toy cannot pass vacuously."""
+
+    KILL = ["tests/v2/test_a.py", "tests/v2/test_h.py", "tests/v2/test_i.py", "tests/v2/test_c.py", "tests/v2/test_k.py"]
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls._tmp = tempfile.TemporaryDirectory()
+        cls.root = toy(pathlib.Path(cls._tmp.name), ORDER_MODULE, ORDER_FILES)
+        cls.orders = [cls.KILL[i:] + cls.KILL[:i] for i in range(len(cls.KILL))]
+        with mock.patch.object(m, "TIMEOUT", 2):
+            cls.runs = [m.run_target(cls.root, "aisef2/toy.py::f", order) for order in cls.orders]
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        cls._tmp.cleanup()
+
+    def run_with(self, order, **patches):
+        with mock.patch.object(m, "TIMEOUT", 2), contextlib.ExitStack() as stack:
+            for name, value in patches.items():
+                stack.enter_context(mock.patch.object(m, name, value))
+            return m.run_target(self.root, "aisef2/toy.py::f", order)
+
+    def test_the_sample_covers_every_kind_of_evidence(self):
+        src = (self.root / "aisef2/toy.py").read_text(encoding="utf-8")
+        found = m.mutants(src, "f", {})
+        self.assertEqual([d for d, _ in found], list(ORDER_TRUTH))
+        self.assertTrue({"KILLED", "SURVIVED", "TIMEOUT", "INFRA"} <= set(ORDER_TRUTH.values()))
+        sizes, truth = [len(s) for _, s in found], list(ORDER_TRUTH.values())
+        self.assertTrue(any(sizes[i] == sizes[i + 1] and truth[i] != truth[i + 1] for i in range(len(sizes) - 1)))
+        rows = {(o[0], d, x["file"]): x["outcome"] for o, r in zip(self.orders, self.runs, strict=True) for d, x in rows_of(r)}
+        self.assertIn("TIMEOUT", {v for (first, d, f), v in rows.items() if d == "L2 condition negated" and f.endswith("_h.py")})
+        self.assertIn("INFRA", {v for (first, d, f), v in rows.items() if d == "L3 returns None" and f.endswith("_i.py")})
+        self.assertTrue(any(x.get("residue") for r in self.runs for _, x in rows_of(r)))
+
+    def test_every_order_gives_every_mutant_its_designed_class(self):
+        for order, r in zip(self.orders, self.runs, strict=True):
+            with self.subTest(first=order[0]):
+                self.assertEqual(dict(zip([x["mutant"] for x in r["results"]], classes(r), strict=True)), ORDER_TRUTH)
+                self.assertNotIn("stopped", r)
+                self.assertEqual(r["error"], self.runs[0]["error"])   # UNCLASSIFIED: the TIMEOUT and the INFRA mutant
+                kills = sum(c == "KILLED" for c in classes(r))
+                self.assertEqual(len(rows_of(r, "control")), kills)    # every kill bracketed exactly once
+                self.assertEqual(len(rows_of(r, "rerun")), kills)
+        for key in ("classes", "killed", "survivors"):
+            self.assertEqual(len({json.dumps(r[key]) for r in self.runs}), 1, key)
+        self.assertEqual(len({json.dumps([x["mutant"] for x in r["results"] if "timed_out" in x]) for r in self.runs}), 1)
+
+    def test_a_run_s_outcome_does_not_depend_on_what_ran_before_it(self):
+        seen: dict = {}
+        for r in self.runs:
+            for d, x in rows_of(r):
+                key = (d, x["file"])
+                got = (x["outcome"], x.get("first"), x.get("exit"), x["tail_sha256"] if x["outcome"] in ("PASS", "FAIL") else "")
+                self.assertEqual(seen.setdefault(key, got), got, key)
+        self.assertGreater(len(seen), 20)
+
+    def test_each_protection_switched_off_changes_a_class(self):
+        fixed = int((self.root / "aisef2/toy.py").stat().st_mtime) + 1
+
+        def same_second(path, text, last):
+            path.write_text(text, encoding="utf-8")
+            os.utime(path, (fixed, fixed))
+            return fixed
+        controls = {"the stamp (§1)": ({"_write_version": same_second}, self.KILL[::-1]),
+                    "the tree restore (§2)": ({"_residue": lambda tg: {}}, ["tests/v2/test_c.py", "tests/v2/test_a.py",
+                                                                           *self.KILL[1:3], self.KILL[4]]),
+                    "the per-run classification (§3, §4)": ({"_mutant": old_stop_rule}, self.KILL)}
+        for name, (patches, order) in controls.items():
+            with self.subTest(name):
+                r = self.run_with(order, **patches)
+                got = dict(zip([x["mutant"] for x in r["results"]], [x["class"] for x in r["results"]], strict=True))
+                self.assertNotEqual(got, ORDER_TRUTH)
 
 
 if __name__ == "__main__":
