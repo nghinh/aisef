@@ -83,6 +83,7 @@ _PROBE = {"backlog": "docs/v2.1/STATUS.md §2 B6 and §1 A1 (919a271)",
           "behaviour_tests": ("tests.v2.test_v21_identity.ThreeIdentities.test_a_spec_binds_the_capability_and_the_bytes_are_their_own_digest",
                               "tests.v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes",
                               "tests.v2.test_v21_identity_bytes.PthChannel.test_every_active_probe_launch_carries_minus_S",
+                              "tests.v2.test_v21_identity.ThreeIdentities.test_every_active_probe_launch_starts_minus_I_minus_S_minus_B",
                               "tests.v2.test_v21_identity.PthChannel.test_a_probe_on_an_interpreter_holding_a_pth_never_runs_it")}
 _TEST_15B = "tests.v2.test_c2_orchestration_conformance.Record.test_15b_only_the_release_s_named_changes_are_accepted_each_while_its_gate_holds"
 #: why each file 2.1 changed changed — the part of a row a person states; everything else in a row is derived
@@ -137,6 +138,7 @@ ROWS = {
         "backlog": "docs/v2.1/STATUS.md §2 B6 (919a271)", "owner_approval": V2_007,
         "requirement": "RFC §9.1.1 (amended V2-007): ProbeCapabilityCalibration.probe_digest is the bytes that ran; §12 check 9",
         "behaviour_tests": ("tests.v2.test_v21_identity_bytes.ThreeIdentities.test_calibrations_of_other_bytes_admit_nothing",
+                            "tests.v2.test_v21_identity.ThreeIdentities.test_calibrations_bound_to_the_bytes_that_run_admit_and_other_bytes_admit_nothing",
                             "tests.v2.test_v21_identity_bytes.ThreeIdentities.test_the_shipped_calibrations_name_every_class_at_the_bytes_that_run_now",
                             "tests.v2.test_v21_identity.ThreeIdentities.test_the_cycle1_probe_keeps_its_one_frozen_digest")},
     "aisef2/probe/cli_invocation.py": _PROBE,

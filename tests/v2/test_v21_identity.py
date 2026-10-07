@@ -33,9 +33,12 @@ if str(ROOT) not in sys.path:
 
 from aisef2.app import bundle, bundle_cli  # noqa: E402
 from aisef2.app import run as R  # noqa: E402
+from aisef2.app.calibrations import CALIBRATIONS  # noqa: E402
 from aisef2.arch.enums import Enforcement  # noqa: E402
 from aisef2.plan.obligation import Plan  # noqa: E402
 from aisef2.probe import catalog  # noqa: E402
+from aisef2.probe import cli_invocation as ci  # noqa: E402
+from aisef2.probe import process_effect as pe  # noqa: E402
 from aisef2.probe import python_callable as pc1  # noqa: E402
 from aisef2.probe import python_callable_v2 as pc2  # noqa: E402
 from aisef2.probe.calibration import executing, fixture_spec  # noqa: E402
@@ -61,6 +64,29 @@ class ThreeIdentities(unittest.TestCase):
     def test_the_cycle1_probe_keeps_its_one_frozen_digest(self):
         self.assertEqual(pc1.DIGEST, "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf")
         self.assertEqual(executing(pc1.PythonCallableProbe), pc1.DIGEST)
+
+    def test_every_active_probe_launch_starts_minus_I_minus_S_minus_B(self):
+        """The semantic half of test_v21_identity_bytes.PthChannel.test_every_active_probe_launch_carries_minus_S
+        (ORD-1 verifier (c)): its `_harness_argv` assertion, unchanged; the source-text counts stay there."""
+        for mod in (ci, pc2, pe):
+            with self.subTest(mod.PROBE_ID):
+                self.assertEqual(mod._harness_argv("/py", "/a", "/c")[1:4], ["-I", "-S", "-B"])
+
+    def test_calibrations_bound_to_the_bytes_that_run_admit_and_other_bytes_admit_nothing(self):
+        """The semantic half of test_v21_identity_bytes.ThreeIdentities.test_calibrations_of_other_bytes_admit_nothing
+        (ORD-1 verifier (c)): each shipped row re-bound, at run time, to the bytes its probe runs now — so the test holds
+        for any version of the probe modules, the null mutant included — admits the migrated 2.0.0 bundle; the same rows
+        at other bytes admit nothing, refused by check 9 for the executing digest; and calibrations() with no rows is the
+        shipped table."""
+        now = {e.probe_id: executing(e.factory) for e in catalog.CATALOG if e.active}
+        rows = tuple(dict(r, probe_digest=now.get(r["probe_id"], r["probe_digest"])) for r in CALIBRATIONS)
+        self.assertEqual(R.calibrations(), R.calibrations(CALIBRATIONS))
+        project = bundle.load(bundle_cli.migrate(json.loads(LEDGERLOCK_2_0_0.read_text(encoding="utf-8")))[0])
+        self.assertTrue(R.admit(project, R.calibrations(rows))["admitted"])
+        a = R.admit(project, R.calibrations(tuple(dict(r, probe_digest="0" * 64) for r in rows)))
+        self.assertFalse(a["admitted"])
+        self.assertEqual([f["check"] for f in a["failed"]], ["9. probe_calibration"])
+        self.assertIn("executing", a["failed"][0]["problems"][0])
 
     def test_the_runspec_binds_each_probe_s_bytes(self):
         from aisef2.app import adapters as ad
