@@ -34,6 +34,8 @@ MUTANTS = {
     "a later proof of a criterion replaces the first": ('and c not in cur["proofs"]', ""),
     "no room left for the stop mark (PACK_MAX - 120 -> PACK_MAX)": ("> PACK_MAX - 120:", "> PACK_MAX:"),
     "room for the stop mark one character short (PACK_MAX - 120 -> PACK_MAX - 56)": ("> PACK_MAX - 120:", "> PACK_MAX - 56:"),
+    "the cut skips a line that does not fit and keeps later ones (break -> continue)": (
+        "                break\n            kept.append(ln)", "                continue\n            kept.append(ln)"),
     "the header says an earlier candidate is a commit, whatever is named": (
         "(journal seq {cur['seq']})\")", "(journal seq {cur['seq']}); an earlier candidate named below is a commit of this repository\")"),
     "a named candidate is not said to be a commit of this repository": (', a commit of this repository"', '"'),

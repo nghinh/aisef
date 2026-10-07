@@ -205,6 +205,27 @@ class Pack(Fixture):
         self.assertTrue(text.endswith(mark), text[-200:])
         self.assertTrue(whole.startswith(text[:-len(mark)] + "\n"))     # whole lines of the uncut pack, then the mark
 
+    def test_at_the_real_bound_no_line_is_kept_after_the_first_that_does_not_fit(self):
+        mark = f"\n[the context pack stops here: bounded at {feedback.PACK_MAX} characters]"
+        many = tuple(f"C-CRITERION-{i:03d}" for i in range(26))
+        ev = attempt(0, held=(), criteria=many[:1]) + attempt(5000, detail="z" * 300, held=many[:1], criteria=many[:1])
+        ev += [e for n in range(1, 4) for e in attempt(10000 * n, detail="y" * 300, held=many[:12], criteria=many)]
+        ev.append((90000, "story/begin", {"story_id": "S1", "parent": P}))
+        with mock.patch.object(feedback, "PACK_MAX", 10 ** 6):
+            whole = self.pack(ev).split("\n")
+        # sized so the oldest attempt shown (2) has a line that cannot fit, followed by its short held line that could:
+        # kept after the cut, that line would sit under attempt 3's block and read as attempt 3's
+        i = next(n for n, ln in enumerate(whole) if ln.startswith("- attempt 2:"))
+        self.assertGreater(len("\n".join(whole[:i + 1])), feedback.PACK_MAX)
+        self.assertTrue(whole[i + 1].startswith("  held at that revision"), whole[i + 1])
+        self.assertLessEqual(len("\n".join([*whole[:i], whole[i + 1]])) + len(mark), feedback.PACK_MAX)
+        text = self.pack(ev)
+        self.assertLessEqual(len(text), feedback.PACK_MAX)
+        self.assertTrue(text.endswith(mark), text[-200:])
+        kept = text[:-len(mark)].split("\n")
+        self.assertEqual(kept, whole[:len(kept)])     # a prefix of whole lines: nothing after the first line cut
+        self.assertEqual(len(kept), i)                # attempts 4 and 3 whole, nothing of attempt 2
+
     def test_no_proof_recorded_is_all_it_says_when_the_attempt_ended_at_a_criterion_s_probes(self):
         records = (("probe/evaluated", {"criterion_id": "C-ADD", "record": {}}),) * 2
         for code in ("PROBE_MISMATCH", "PROBE_INVALID_SPEC"):
