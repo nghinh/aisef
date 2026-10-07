@@ -14,6 +14,7 @@ B-08, B-09, B-10), [STATUS.md](STATUS.md) (phát hiện → sửa, theo từng d
 | Nhánh | HEAD | Trạng thái |
 |---|---|---|
 | `v2.1/foundation` | xem `git log -1` (commit chứa báo cáo này; mã cuối `b72e51e`) | local, chưa push. Gồm hai nhánh chủ đề đã merge: `v21/review` (`181d68e`), `v21/continue` (`872e83c`) |
+| `v21p/context` | xem `git log -1` | local, chưa push, chưa merge: D4 ([CONTEXT-PACK.md](CONTEXT-PACK.md)). Mang thay đổi mã `f15026b`, `80f4437` trong `aisef2/app/` (`feedback.py`, `adapters.py`) — sau `b72e51e`; cần mutation và tái thẩm định ngoài snapshot đang đo |
 | `release/v2.0.1-prep` | `f006d3d` | local, chưa push; bản vá 2.0.1 chuẩn bị, **chưa đủ điều kiện phát hành** (§5) |
 | `master`, `docs/v2` | `610a593` | không đổi trong phiên này (2.0.0 + tài liệu) |
 | `v21/confine`, `v21/decisions`, `v21/evidence` | `633b6a7` | trống (không commit nào), có thể xoá |
@@ -48,7 +49,7 @@ cao nhất có bằng chứng; mục ở M3/M4 đã qua M1–M2, trừ E1 và A9
 | D1 | nối tiếp lượt chạy (`bundle continue`, `run --parent`), claim theo thế hệ, đối soát với git | **M4** | `test_v21_continue_integrity` (SIGKILL ở 13 điểm đồng bộ + hai run cùng lúc); CLI thật: §4.2 — bắt được một lỗi (`b72e51e`) | resume tại chỗ: **M6** (không làm: cần format journal mới) |
 | D2 | usage/chi phí: không biết ≠ 0; chi phí chưa đối soát chặn phiên trả tiền | **M4** | `test_v21_continue_usage`; CLI thật: `--parent` bị từ chối, `--accept-unaccounted` ghi lại | giá thật: **M6** |
 | D3 | `no_progress` (chỉ báo cáo) | M3 | `test_v21_continue_usage.Usage` | — |
-| D4 | gói ngữ cảnh do controller dựng cho lượt thử lại ([CONTEXT-PACK.md](CONTEXT-PACK.md)) | **M4** | cần: đo trên 16 lượt thử lại đã ghi (`validation/v21/context_gap.py`); `test_v21_context_pack`; CLI thật: lượt 2 của run1 nhận gói, seq trích đúng (`evidence/context-pack-cli-f15026b.out`) | hiệu quả với mô hình thật: **M6** (lượt chạy trả tiền); nối tiếp: chưa làm (chưa có bằng chứng cần) |
+| D4 | gói ngữ cảnh do controller dựng cho lượt thử lại ([CONTEXT-PACK.md](CONTEXT-PACK.md)) | **M4** | cần: đo trên 16 lượt thử lại đã ghi (`validation/v21/context_gap.py`); `test_v21_context_pack`; CLI thật tại `80f4437`: prompt developer của run1 tính lại từ journal trùng `prompt_sha256`, lượt 2 nhận gói, seq trích đọc lại đúng, journal không chứa gói (bước read-back của `run.sh`, `evidence/cli-integration-80f4437.out`) | hiệu quả với mô hình thật: **M6** (lượt chạy trả tiền); nối tiếp: chưa làm (chưa có bằng chứng cần) |
 | D5 | tệp anchor an toàn (`--anchor-out`) | M4 | `AnchorThreatModel`; CLI thật: tệp 0444 | nơi giữ tin cậy (§4.3) |
 | E1 | harness thí nghiệm | M3 | `test_v21_experiment` (replay offline) | công cụ riêng, không thuộc đường sản phẩm |
 | E2 | chiến dịch đối chứng | **M6** | — | ngân sách chưa duyệt (B-09) |

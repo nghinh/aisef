@@ -1,11 +1,11 @@
-commit: f15026bb4fd73ea3977869f0607f674c250901ae dirty: 2
-opencode on PATH: /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/prod/context/work/cli-f15026b/fakebin/opencode
+commit: 80f4437a035b55dabf467f02fd4cdc8c5c7403cf dirty: 0
+opencode on PATH: /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/prod/context-fix/cli-80f4437/fakebin/opencode
 ocr: open-code-review v1.12.12 (182898c) darwin/arm64 sha256 bf38abf320ead4e106b71c15824463640207118f38e1c10c28a73b6839104af7
 == seal
 {
  "approvals_dropped": [],
  "approvals_kept": 0,
- "plan_hash": "df6cde98561d009394c1f2042fc07491996094da40f7223b03d8c3e53fd167e8",
+ "plan_hash": "fd9c1cb9e81550bfb1f460d853b3c2323ef7f5d1c35ae6b20c43032f0ea75e7a",
  "specs": 3,
  "to_approve": [
   {
@@ -117,7 +117,7 @@ exit 0
   "failed": [],
   "result_digest": "2b01083f0887d014bc82c80f31dec6c0e5f4f1ae5845ea943bbab29da535a8ae"
  },
- "plan_hash": "df6cde98561d009394c1f2042fc07491996094da40f7223b03d8c3e53fd167e8",
+ "plan_hash": "fd9c1cb9e81550bfb1f460d853b3c2323ef7f5d1c35ae6b20c43032f0ea75e7a",
  "project": "calc-cli",
  "ready": true,
  "route": "fakeprov/model-1"
@@ -128,13 +128,13 @@ exit 0
  "anchor_written_to": "anchors/run1.anchor",
  "delivery_blocked_by": [],
  "delivery_verdict": "PASS",
- "evidence_anchor": "9bf9bc513ee25911200d630fc64983019efe00bdedcb7bc3bb303896fd5e73b8",
- "final_main": "cfca585680e94c4c6466eb51aa0807be93cbfda1",
+ "evidence_anchor": "cb70e021446a7cd9e86b3f310937cd963f48f63309330353109b40d68b59f7ac",
+ "final_main": "f4d130788a652bc93028786655e7c2fe75411d80",
  "journal": {
   "closed": "SHUTDOWN",
   "lines": 167,
   "path": "run/journals/aisef-run.jsonl",
-  "sha256": "be030c42df4b3af6338536f886bdeb03f9a7f9bcbaa80558197f7fa2bb1cb0ac"
+  "sha256": "0d6a5ce3351a387099736c8330ed63b3b02d9d8a6c208c9e5fa3dd04d6349745"
  },
  "plan_quality_verdict": "NOT_CLAIMED",
  "project": "calc-cli",
@@ -150,7 +150,7 @@ exit 0
 == verify
 {
  "delivery_verdict": "PASS",
- "evidence_anchor": "9bf9bc513ee25911200d630fc64983019efe00bdedcb7bc3bb303896fd5e73b8",
+ "evidence_anchor": "cb70e021446a7cd9e86b3f310937cd963f48f63309330353109b40d68b59f7ac",
  "journal_events": 167,
  "notes": [
   "the anchor matches the expected value: authentic only as far as that value came from a store the developer cannot write (docs/v2.1/ANCHOR-THREAT-MODEL.md); it does not prove the run happened as its journal says"
@@ -163,7 +163,7 @@ exit 0
 {
  "approvals_dropped": [],
  "approvals_kept": 0,
- "plan_hash": "b671f4e0f307aafa31058b83232494474f63bfb109976669cc9f5e7fe80fa144",
+ "plan_hash": "11f8f918284ee1b5d0409ad5b8fe4644d0dc8fc3442d3fc100d97dd254f73331",
  "specs": 4,
  "to_approve": [
   {
@@ -267,7 +267,7 @@ run2: RUN.json absent; RUN.started.json present; kill: SIGKILL after the usage o
 == continue
 {
  "already_continued_by": null,
- "baseline": "623df3196ad2e929e73bea22a929031ed32749e1",
+ "baseline": "375af564ce84bfcd2e0860e6c8e8925876b9974b",
  "carried": [
   "S1"
  ],
@@ -291,20 +291,20 @@ run2: RUN.json absent; RUN.started.json present; kill: SIGKILL after the usage o
 }
 exit 0
 == run3 --parent, unknown spend not accepted
-aisef run: refused: the lineage of /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/prod/context/work/cli-f15026b/run2 has spend no evidence accounts for — no paid work starts until it is reconciled or accepted (--accept-unaccounted): run2: provider request seq 113 (S2, DEVELOPER) has no result — in flight when the run ended: what it spent is unknown
+aisef run: refused: the lineage of /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/prod/context-fix/cli-80f4437/run2 has spend no evidence accounts for — no paid work starts until it is reconciled or accepted (--accept-unaccounted): run2: provider request seq 113 (S2, DEVELOPER) has no result — in flight when the run ended: what it spent is unknown
 exit 2
 == run3 --parent --accept-unaccounted
 {
  "anchor_written_to": "anchors/run3.anchor",
  "delivery_blocked_by": [],
  "delivery_verdict": "PASS",
- "evidence_anchor": "50a9f4e5631d78552fd032de3f4e61a64644c57a719e3df2ef8badba88f96f41",
- "final_main": "68cd4b750adedd8ca7f66ed18d8019efc13cc194",
+ "evidence_anchor": "6ce2013e338c0b184080ab677c61e3dc4108cf33642a006f0540cf8e224d3784",
+ "final_main": "a12495d07fc0bccafccc03db85b72fd6e8cfb51d",
  "journal": {
   "closed": "SHUTDOWN",
   "lines": 147,
   "path": "run/journals/aisef-run.jsonl",
-  "sha256": "6156da9606695b5c5f9db484fe76b5a3ff03e9bebd6a4b074626bdd4d09f3249"
+  "sha256": "2282a191c8a61465cf8b26e7a3f9127648375eaccc9617fdaaf69f474d1cfdff"
  },
  "plan_quality_verdict": "NOT_CLAIMED",
  "project": "calc-cli-2",
@@ -320,12 +320,12 @@ exit 2
 }
 exit 0
 == continue run2 again
-refused: run2 is already continued by /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/prod/context/work/cli-f15026b/run3, which began: continue the lineage from it
+refused: run2 is already continued by /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/prod/context-fix/cli-80f4437/run3, which began: continue the lineage from it
 exit 2
 == verify run3
 {
  "delivery_verdict": "PASS",
- "evidence_anchor": "50a9f4e5631d78552fd032de3f4e61a64644c57a719e3df2ef8badba88f96f41",
+ "evidence_anchor": "6ce2013e338c0b184080ab677c61e3dc4108cf33642a006f0540cf8e224d3784",
  "journal_events": 147,
  "notes": [
   "the anchor matches the expected value: authentic only as far as that value came from a store the developer cannot write (docs/v2.1/ANCHOR-THREAT-MODEL.md); it does not prove the run happened as its journal says"
@@ -361,22 +361,22 @@ exit 0
   "claim": {
    "claimant": {
     "host": "MacBookPro",
-    "pid": 65162,
-    "started": "Wed Oct  7 09:48:33 2026"
+    "pid": 33235,
+    "started": "Wed Oct  7 10:14:01 2026"
    },
-   "claimed": 1791341314.205618,
-   "run": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/prod/context/work/cli-f15026b/run3",
+   "claimed": 1791342841.519944,
+   "run": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/prod/context-fix/cli-80f4437/run3",
    "supersedes": {
-    "child": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/prod/context/work/cli-f15026b/run3-refused",
+    "child": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/prod/context-fix/cli-80f4437/run3-refused",
     "child_state": "ENDED_UNBEGUN",
     "claim": "CONTINUED-BY.json",
     "claimant_gone": true,
     "operator_asserted": false,
-    "sha256": "05942f8e244f10db06a0ca8e88c22771013b74a69c82b23ad41cb06eb1b1c98a"
+    "sha256": "a832fb6ed2b0836d12765072d065f9b50f5fbad7aba41f9ab5f8cc4052827ce0"
    }
   },
   "evidence_anchor": null,
-  "path": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/prod/context/work/cli-f15026b/run2",
+  "path": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/prod/context-fix/cli-80f4437/run2",
   "recorded": false
  },
  "lineage_usage": {
@@ -396,7 +396,7 @@ exit 0
      "value": null
     },
     "recorded": false,
-    "run": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/prod/context/work/cli-f15026b/run2",
+    "run": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/prod/context-fix/cli-80f4437/run2",
     "superseded": false,
     "tokens": {
      "cache_read": 20,
@@ -417,7 +417,7 @@ exit 0
      "value": 0.0
     },
     "recorded": true,
-    "run": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/prod/context/work/cli-f15026b/run3-refused",
+    "run": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/prod/context-fix/cli-80f4437/run3-refused",
     "superseded": true,
     "tokens": {
      "cache_read": 0,
@@ -431,4 +431,26 @@ exit 0
     "cost": {
      "currency": "USD",
      "effective_date": "2026-10-06",
-     "know
+     "known": 0
+== run1 context pack read-back (D4)
+run1: 2 developer sessions in RUN.json, 2 DEVELOPER provider/request in the journal
+S1 attempt 1 (request seq 29): recomputed prompt EQUAL to RUN.json prompt_sha256; prompt-00.txt EQUAL
+S1 attempt 2 (request seq 90): recomputed prompt EQUAL to RUN.json prompt_sha256; prompt-01.txt EQUAL
+
+S1 attempt 2: the context pack in its prompt
+  | What the run's journal records about the earlier attempts of this story (the controller's own record; context only — no verdict, approval or budget reads it):
+  | - this attempt starts again at the parent 615df0711f36 (journal seq 75); an earlier candidate named below is a commit of this repository
+  | - attempt 1: parent 615df0711f36 (journal seq 14); developer result: opencode exit 0, 1 turns (journal seq 30); candidate 98b001498747 (journal seq 38)
+  |   held at that revision, the verifier agreeing: C-SUM (1.1), C-USAGE-0 (1.2), C-USAGE-1 (1.2) (journal seq 38, 46, 54)
+  the seqs it cites, read back from run1/run/journals/aisef-run.jsonl:
+   14 story/begin {"story_id": "S1", "parent": "615df0711f36f0c37552edd90f3af294a6e9a929"}
+   30 provider/result {"story_id": "S1", "detail": "opencode exit 0, 1 turns"}
+   38 proof/verified {"story_id": "S1", "candidate": "98b001498747365ff820485cf44f6f991e4bb667", "criterion_id": "C-SUM", "verdict": "SATISFIED", "agreement": true}
+   46 proof/verified {"story_id": "S1", "candidate": "98b001498747365ff820485cf44f6f991e4bb667", "criterion_id": "C-USAGE-0", "verdict": "SATISFIED", "agreement": true}
+   54 proof/verified {"story_id": "S1", "candidate": "98b001498747365ff820485cf44f6f991e4bb667", "criterion_id": "C-USAGE-1", "verdict": "SATISFIED", "agreement": true}
+   75 story/begin {"story_id": "S1", "parent": "615df0711f36f0c37552edd90f3af294a6e9a929"}
+  kinds of the seqs cited one by one: ['proof/verified', 'provider/result', 'story/begin'] (allowed: story/begin, provider/result, proof/verified); of the ends of a cited range: []
+
+the pack's head in the journal: False; 'context only' in the journal: False
+read-back: OK
+exit 0
