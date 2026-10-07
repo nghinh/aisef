@@ -1,16 +1,16 @@
 == host
 docker 29.8.0 server linux/arm64
 host: Darwin 25.5.0 arm64  (this host runs no Linux backend itself; the guest below is a Docker Desktop VM container)
-measured tree: 3e0409c324325ca54663f8ecb4ab83490e91ac73; uncommitted paths: 0
+measured tree: 764dfa21199403a41999ef2e5ac71e79cbeaf0b3; uncommitted paths: 0
 == build aisef-sandbox-measure (pinned python:3.14-slim-trixie@sha256:3353bb7e9ae99c7cce6cad2b2f2b174e8f22813ac43e3b13e7a742627d2b01d8)
-sha256:c23f9614f9330d28ccddfb3469d28889ec4b7c23c3a36551710eb1cd6726a7ca
+sha256:120795d13ada11aef63eb5a8ad1de4a5c14cd774fdb1f84587163cb016c42d9f
 == guest (the image's own view of the Docker Desktop VM kernel)
 kernel: Linux 7.0.12-linuxkit aarch64
 apparmor: not in this kernel (/sys/module/apparmor absent)
 max_user_namespaces: 31880
 bubblewrap package: 0.12.0-1~deb13u1
 bubblewrap 0.12.0
-host listener on 127.0.0.1:49775; host-gateway seen from the container as host.docker.internal
+host listener on 127.0.0.1:51325; host-gateway seen from the container as host.docker.internal
 
 == profile P1-default (network=none) flags: 
   bwrap ran: NO; measure problems: 1
@@ -272,4 +272,4 @@ host listener on 127.0.0.1:49775; host-gateway seen from the container as host.d
   controls workspace_writable: exit 0: ok
   after (outside the sandbox): {"container_sleeper_seen_outside": true, "measure_pid_outside": 1, "reviewed_checkout_listing_unchanged": true, "unchanged": {"/tmp/aisef/run-dir/EVIDENCE.anchor": true, "/tmp/aisef/run-dir/repo/.git/HEAD": true, "/tmp/aisef/run-dir/work/ws/verifier-wt-S1/candidate.py": true, "/tmp/aisef/runtime/opencode": true, "/tmp/aisef/verifier/hidden.json": true}, "written_in_client_directory": false, "written_in_kernel": false, "written_in_run_directory": false}
 
-== done; per-profile JSON in /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/prod/round3-sandbox/harness/*.json
+== done; per-profile JSON in /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/prod/round4-sandbox-fix/harness/*.json

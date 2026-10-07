@@ -1,21 +1,13 @@
 {
  "measurements": 500,
  "read_only_socket": true,
- "elapsed": 14.83,
- "first_look_found_a_sleeper": 2,
+ "elapsed": 14.67,
+ "first_look_found_a_sleeper": 1,
  "raced": [
   {
-   "i": 20,
+   "i": 18,
    "first_look": [
-    742
-   ],
-   "looks": 2,
-   "reported": []
-  },
-  {
-   "i": 34,
-   "first_look": [
-    1232
+    672
    ],
    "looks": 2,
    "reported": []
@@ -33,7 +25,7 @@
    "17540": true
   },
   "looks": 14,
-  "seconds": 1.06,
+  "seconds": 1.03,
   "survivor_problem": [
    "a process the session left outlived it: [17540]"
   ]

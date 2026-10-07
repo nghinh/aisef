@@ -1,7 +1,7 @@
 {
  "measurements": 500,
  "read_only_socket": false,
- "elapsed": 14.68,
+ "elapsed": 14.69,
  "first_look_found_a_sleeper": 0,
  "raced": [],
  "reported_survivors": [],
@@ -14,7 +14,7 @@
    "17540": true
   },
   "looks": 14,
-  "seconds": 1.09,
+  "seconds": 1.07,
   "survivor_problem": [
    "a process the session left outlived it: [17540]"
   ]

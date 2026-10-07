@@ -1,0 +1,49 @@
+{
+ "measurements": 500,
+ "read_only_socket": true,
+ "elapsed": 14.73,
+ "first_look_found_a_sleeper": 3,
+ "raced": [
+  {
+   "i": 25,
+   "first_look": [
+    918
+   ],
+   "looks": 2,
+   "reported": []
+  },
+  {
+   "i": 31,
+   "first_look": [
+    1128
+   ],
+   "looks": 2,
+   "reported": []
+  },
+  {
+   "i": 101,
+   "first_look": [
+    3578
+   ],
+   "looks": 2,
+   "reported": []
+  }
+ ],
+ "reported_survivors": [],
+ "problem_counts": {
+  "a unix socket outside the workspace is reachable (read-only does not stop a connect): ['/tmp/r/sock/ctl']": 500
+ },
+ "unconfined_control": {
+  "survivors": [
+   17541
+  ],
+  "alive_after_measure": {
+   "17541": true
+  },
+  "looks": 14,
+  "seconds": 1.08,
+  "survivor_problem": [
+   "a process the session left outlived it: [17541]"
+  ]
+ }
+}

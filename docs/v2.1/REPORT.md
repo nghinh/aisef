@@ -52,7 +52,7 @@ cao nhất có bằng chứng; mục ở M3/M4 đã qua M1–M2, trừ E1 và A9
 | D5 | tệp anchor an toàn (`--anchor-out`) | M4 | `AnchorThreatModel`; CLI thật: tệp 0444 | nơi giữ tin cậy (§4.3) |
 | E1 | harness thí nghiệm | M3 | `test_v21_experiment` (replay offline) | công cụ riêng, không thuộc đường sản phẩm |
 | E2 | chiến dịch đối chứng | **M6** | — | ngân sách chưa duyệt (B-09) |
-| F | cách ly Linux tối thiểu (bwrap, opt-in) | **M4** ranh giới (harness độc lập) / M3 nối dây / **M6** lượt chạy có cách ly | M3: `test_v21_confine` (28 test: setting, argv, từ chối fail-closed của run/`--check`/phiên, từng phép kiểm của phép đo; đường thành công với phép đo **giả lập** và bwrap giả); M4: `validation/v21/sandbox` + [evidence/sandbox](evidence/sandbox/) trong container Linux thật qua docker, mỗi claim là một thao tác đã thử ([SANDBOX-LINUX.md](SANDBOX-LINUX.md)) | lượt `aisef run` thật có cách ly trên Linux: **M6**; mạng của phiên làm việc **không** được cách ly (lượt chạy chỉ dùng `network: host`; `none` chỉ để đo); nested bwrap chỉ chạy khi nới seccomp + systempaths của container (§6) |
+| F | cách ly Linux tối thiểu (bwrap, opt-in) | **M4** ranh giới (harness độc lập) / M3 nối dây / **M6** lượt chạy có cách ly | M3: `test_v21_confine` (29 test: setting, argv, từ chối fail-closed của run/`--check`/phiên, từng phép kiểm của phép đo; đường thành công với phép đo **giả lập** và bwrap giả); M4: `validation/v21/sandbox` + [evidence/sandbox](evidence/sandbox/) trong container Linux thật qua docker, mỗi claim là một thao tác đã thử ([SANDBOX-LINUX.md](SANDBOX-LINUX.md)) | lượt `aisef run` thật có cách ly trên Linux: **M6**; mạng của phiên làm việc **không** được cách ly (lượt chạy chỉ dùng `network: host`; `none` chỉ để đo); nested bwrap chỉ chạy khi nới seccomp + systempaths của container (§6) |
 
 ## 3. Phạm vi chính xác của bảo đảm (thay câu "developer không còn sửa được kết quả kiểm tra")
 
@@ -182,7 +182,7 @@ sát — bị loại; công cụ giờ từ chối mọi đường ra trong repo
 ## 6. Giới hạn còn tồn tại
 
 - **Cách ly OS cho phiên model: có mã opt-in, đo bằng thao tác đã thử** ([SANDBOX-LINUX.md](SANDBOX-LINUX.md),
-  `aisef2/app/confine.py`, `validation/v21/sandbox`, đo ở `3e0409c`). Trong container `python:3.14-slim-trixie@sha256:3353bb7e…`
+  `aisef2/app/confine.py`, `validation/v21/sandbox`, đo ở `764dfa2`). Trong container `python:3.14-slim-trixie@sha256:3353bb7e…`
   trên Docker Desktop (kernel guest `7.0.12-linuxkit`, không có AppArmor), bwrap 0.12.0 (uid 1000) **chỉ chạy khi**
   container nới `seccomp=unconfined` **và** `systempaths=unconfined` (đo từng trục: X1 chạy; X2, P2, P3 không) — tức
   nới chính ranh giới của container. Khi chạy, phép đo của kernel dùng đúng dòng lệnh của phiên (client + worktree của
@@ -193,7 +193,9 @@ sát — bị loại; công cụ giờ từ chối mọi đường ra trong repo
   run directory, verifier, `~/.ssh`, dữ liệu auth của client; ghi runtime, kernel, git dir (`Read-only file system`);
   tạo user namespace mới; thấy tiến trình của container (PID namespace riêng); tiến trình `setsid` sống sau phiên
   (tiến trình thấy lúc bwrap vừa trả về được nhìn lại tới 1 s, vì namespace PID có thể còn đang bị kernel dọn:
-  0/1000 lần đo báo nhầm, `teardown-race-*.json`).
+  ở `764dfa2` 0/2000 lần đo báo nhầm, `teardown-race-*.json`; lần nhìn đầu thấy nó ở cả hai cấu hình — gộp bốn lượt
+  ở `3e0409c` và `764dfa2`: không socket 2/2000, có socket 8/2000, không kết luận khác biệt; tiến trình ngủ của probe
+  sống 120 s, quá giới hạn 60 s của probe cộng 1 s đó, nên một survivor thật không thể tự hết giờ trước lần nhìn cuối).
   Capability = 0, NoNewPrivs = 1 (đọc từ `/proc`). Ghi anchor/run-dir **thành công vào tmpfs riêng** của sandbox, file
   thật không đổi — không phải "bị từ chối". **Mạng**: `network: none` cắt mạng nhưng phiên cũng không tới được provider
   — chỉ để đo, settings từ chối cho lượt chạy; `host` (lượt chạy dùng) thì egress **không** bị cách ly và abstract unix

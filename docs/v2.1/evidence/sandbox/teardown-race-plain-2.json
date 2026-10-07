@@ -1,0 +1,22 @@
+{
+ "measurements": 500,
+ "read_only_socket": false,
+ "elapsed": 14.68,
+ "first_look_found_a_sleeper": 0,
+ "raced": [],
+ "reported_survivors": [],
+ "problem_counts": {},
+ "unconfined_control": {
+  "survivors": [
+   17540
+  ],
+  "alive_after_measure": {
+   "17540": true
+  },
+  "looks": 14,
+  "seconds": 1.09,
+  "survivor_problem": [
+   "a process the session left outlived it: [17540]"
+  ]
+ }
+}

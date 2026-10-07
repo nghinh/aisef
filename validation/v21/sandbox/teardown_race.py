@@ -1,10 +1,11 @@
-"""The setsid-survivor check against the PID namespace's teardown (V2.1 F, round 3): with X1's container flags
+"""The setsid-survivor check against the PID namespace's teardown (V2.1 F, rounds 3-4): with X1's container flags
 (seccomp and system paths loosened, uid 1000) and the run's network "host", call the kernel's confine.measure N times
 and count the measurements whose FIRST look at the process table, as soon as bubblewrap returned, found the probe's
 sleeper (the teardown race: one the kernel is still killing), and what the grace (confine.SURVIVOR_GRACE) then
 reported. Then one measurement with a "bubblewrap" that confines nothing: its sleeper really outlives the session and
 must still be reported on Linux's /proc table.
-Run under the heavy lock, with the tree at /repo read-only (the round-3 run: a git archive of 3e0409c):
+Run under the heavy lock, with the tree at /repo read-only (the round-4 runs: a git archive of 764dfa2,
+twice per configuration):
 
   docker run --rm --user 1000:1000 --cap-drop ALL --pids-limit 512 --memory 1g --security-opt seccomp=unconfined \
     --security-opt systempaths=unconfined -v <tree>:/repo:ro -v <this file>:/race.py:ro aisef-sandbox-measure \
