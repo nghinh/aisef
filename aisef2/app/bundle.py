@@ -184,9 +184,7 @@ def load(data: Mapping) -> Project:
     if set(stories) != {o.story_id for o in plan.obligations}:
         raise BundleError("stories are exactly the plan's stories")
     doc = data["requirements_document"]
-    roots = tuple(data["product_roots"])
-    if not roots or not all(isinstance(r, str) and r and "/" not in r for r in roots):
-        raise BundleError("product_roots are top-level names of the project's own source tree")
+    roots = tuple(data["product_roots"])     # shape_problems checked them: a non-empty list of top-level names
     project = Project(str(data["name"]), str(data["description"]), str(doc["path"]), str(doc["sha256"]), roots,
                       requirements, contracts, approvals, specs, plan, facts, stories,
                       hashlib.sha256(_canonical(dict(data))).hexdigest())
