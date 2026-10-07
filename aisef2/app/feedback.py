@@ -10,8 +10,8 @@
 * `context_pack` (V2.1 D4, docs/v2.1/CONTEXT-PACK.md): on a retry, what the journal also records about the story's
   earlier attempts, the latest first — each one's parent, its developer result, its candidate or that the parent itself
   was proved (it changed nothing), the criteria that held there and those with no proof recorded there — each line
-  citing its journal seqs. Read from the controller's own records only, bounded, the run's secrets replaced; context,
-  never authority: no verdict, approval or budget reads it.
+  citing its journal seqs. Read from the controller's own records only, bounded, the developer result on one line, the
+  run's secrets replaced; context, never authority: no verdict, approval or budget reads it.
 """
 
 from __future__ import annotations
@@ -114,9 +114,10 @@ def context_pack(events, story_id: str, project: Project, secrets=()) -> str:
     expect = {o.criterion_id: project.specs[o.product_proof_spec_id].candidate_expectation.value
               for o in project.plan.obligations}
 
-    def redact(text: str) -> str:     # the one free text it carries: the run's secrets out, longest first (app/client.redact)
-        for s in sorted({str(x) for x in secrets if x}, key=len, reverse=True):
-            text = text.replace(s, "[REDACTED]")
+    def redact(text: str) -> str:     # the one free text it carries: on one line, the run's secrets out, longest first
+        text = " ".join(text.split())    # every whitespace run, newlines included, one space: each line is the pack's own
+        for s in sorted({" ".join(str(x).split()) for x in secrets if x} - {""}, key=len, reverse=True):
+            text = text.replace(s, "[REDACTED]")    # a secret matched in the same one-line form (app/client.redact)
         return text
     ended, cur = [], None
     for seq, kind, d in sorted(((int(q), str(t), d) for q, t, d in events), key=lambda e: e[0]):

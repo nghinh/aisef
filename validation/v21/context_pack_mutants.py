@@ -28,12 +28,20 @@ MUTANTS = {
     "developer result cut at 301": ("[:300]", "[:301]"),
     "developer result cut at 1000": ("[:300]", "[:1000]"),
     "redacted after the cut": ('redact(str(d.get("detail", "")))[:300]', 'redact(str(d.get("detail", ""))[:300])'),
+    "the developer result keeps its line breaks": ('        text = " ".join(text.split())', "        text = text"),
+    "the run's secrets matched as given, not in the result's one-line form": (
+        '{" ".join(str(x).split()) for x in secrets if x}', "{str(x) for x in secrets if x}"),
     "attempts oldest first": ("reversed(list(enumerate(ended, 1))[-PACK_ATTEMPTS:])", "list(enumerate(ended, 1))[-PACK_ATTEMPTS:]"),
     "attempt cap 5": ("PACK_ATTEMPTS = 4000, 12, 4", "PACK_ATTEMPTS = 4000, 12, 5"),
     "no-proof list is every admitted criterion": ('sorted(set(a["criteria"]) - set(a["proofs"]))', 'sorted(set(a["criteria"]))'),
     "a later proof of a criterion replaces the first": ('and c not in cur["proofs"]', ""),
     "no room left for the stop mark (PACK_MAX - 120 -> PACK_MAX)": ("> PACK_MAX - 120:", "> PACK_MAX:"),
     "room for the stop mark one character short (PACK_MAX - 120 -> PACK_MAX - 56)": ("> PACK_MAX - 120:", "> PACK_MAX - 56:"),
+    "the cut one character late (PACK_MAX - 120 -> PACK_MAX - 119)": ("> PACK_MAX - 120:", "> PACK_MAX - 119:"),
+    "the cut one character early (PACK_MAX - 120 -> PACK_MAX - 121)": ("> PACK_MAX - 120:", "> PACK_MAX - 121:"),
+    "the cut's check leaves out the line's newline": ("if size + len(ln) + 1 > PACK_MAX", "if size + len(ln) > PACK_MAX"),
+    "the cut counts the kept lines without their newlines (size += len(ln))": (
+        "            size += len(ln) + 1\n", "            size += len(ln)\n"),
     "the cut skips a line that does not fit and keeps later ones (break -> continue)": (
         "                break\n            kept.append(ln)", "                continue\n            kept.append(ln)"),
     "the header says an earlier candidate is a commit, whatever is named": (
