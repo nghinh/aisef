@@ -605,9 +605,15 @@ class Identity(_Product):
         self.assertEqual(ps.check(ROOT), [])   # catalog closure: registered, digest live, fixtures for every class
         scripts = ps.child_scripts(ast.parse(src))
         self.assertEqual([name for name, _, _ in scripts], ["AGENT", "HARNESS"])   # B1: the subject's process, the controller
-        # the channel rule is what rejects a harness that puts its protocol on the subject's stdout
-        self.assertEqual(src.count('    proto.write((req["mark"]'), 1)
-        forged = src.replace('    proto.write((req["mark"]', '    sys.stdout.write((req["mark"]')
+        # the channel rule is what rejects a harness that puts its protocol on the subject's stdout: the defect is
+        # written into the parsed HARNESS (its ast.unparse text), so the site does not depend on its formatting (ORD-1)
+        tree = ast.parse(src)
+        harness = next(n.value for n in tree.body if isinstance(n, ast.Assign)
+                       and [getattr(t, "id", None) for t in n.targets] == ["HARNESS"])
+        script = ast.unparse(ast.parse(harness.value))
+        self.assertEqual(script.count("    proto.write((req['mark']"), 1)
+        harness.value = script.replace("    proto.write((req['mark']", "    sys.stdout.write((req['mark']")
+        forged = ast.unparse(tree)
         self.assertTrue(any("PROTOCOL_CHANNEL_DISCIPLINE" in v
                             for v in ps.violations("aisef2/probe/cli_invocation.py", forged, ps.SOURCE_RULES, facts)))
 
