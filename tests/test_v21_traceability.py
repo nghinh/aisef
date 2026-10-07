@@ -12,6 +12,7 @@ import pathlib
 import subprocess
 import tempfile
 import unittest
+from unittest import mock
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location("traceability_check", ROOT / "validation" / "v21" / "traceability_check.py")
@@ -120,6 +121,20 @@ class Traceability(unittest.TestCase):
         for rid, text in expected.items():
             self.assertTrue(any(p.startswith(rid) and text in p for p in problems), (rid, text, problems))
         self.assertTrue(any("generated block" in p for p in problems))
+
+    def test_without_a_run_at_the_head_every_reproducer_there_is_named(self):
+        """The table's head moved without a new committed run, or a run that wrote nothing: never a silent pass."""
+        at_head = [(r["id"], spec) for r in self.table["rows"] for spec in r["reproducers"]
+                   if not TC.TEST_ID.fullmatch(spec).group(1)]
+        self.assertGreater(len(at_head), 90)
+        with tempfile.TemporaryDirectory() as d:
+            (pathlib.Path(d) / f"empty-{self.table['head'][:7]}.out").write_text("", encoding="utf-8")
+            for name in ("absent-{}.out", "empty-{}.out"):
+                with mock.patch.object(TC, "RUN", f"{d}/{name}"):
+                    problems = TC.check(self.table, ROOT, None, None, self.doc)
+                run = f"{d}/{name}".format(self.table["head"][:7])
+                self.assertEqual(sorted(problems),
+                                 sorted(f"{rid}: reproducer {spec} is not listed ok in {run}" for rid, spec in at_head))
 
     def test_a_key_the_format_does_not_know_is_named_anywhere_in_the_table(self):
         cases = [({**self.table, "opne_items": []}, "the table: unknown key opne_items"),

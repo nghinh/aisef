@@ -1351,7 +1351,7 @@
    },
    "m_note": "M4 là mức của C2; hành vi riêng này có test offline.",
    "acceptance": "review thiếu một file bắt buộc không được thành PASS (§4.3)",
-   "gap": "Tiêu chí chưa đạt cho tệp bắt buộc mà preview của OCR loại vì `unsupported_ext` hay `binary`: tệp đó được ghi tên trong coverage nhưng không tính là thiếu (`review_ocr.NOT_REVIEWABLE`), nên review không đọc nó vẫn có thể COMPLETE. Không test nào đặt một tệp bắt buộc như thế rồi khẳng định kết quả (`grep` tests/: không test nào đọc `unreadable` hay `NOT_REVIEWABLE`; fixture `tests/v2/fixtures/ocr/preview.json` có `docs/limits.md` = `unsupported_ext` nhưng không test nào đặt nó là bắt buộc).",
+   "gap": "Tiêu chí chưa đạt cho tệp bắt buộc mà preview của OCR loại vì `unsupported_ext` hay `binary`: tệp đó được ghi tên trong coverage nhưng không tính là thiếu (`review_ocr.NOT_REVIEWABLE`), nên review không đọc nó vẫn có thể COMPLETE. Không test nào đặt một tệp bắt buộc như thế rồi khẳng định kết quả (không test nào đi tới nhánh `NOT_REVIEWABLE` của `review_ocr.coverage`: fixture `tests/v2/fixtures/ocr/preview.json` có `docs/limits.md` = `unsupported_ext` nhưng không test nào đặt nó là bắt buộc, và `tests/v2/test_v21_review_chain.py` thấy `notes.txt` = `unsupported_ext` trong preview thật nhưng chỉ đặt `app/cli.py` là bắt buộc).",
    "unconfirmed": ""
   },
   {

@@ -25,9 +25,10 @@ mục nguồn vào commit, test và mức đã có, và ghi rõ chỗ không xá
   (lý do) · `blocked` chặn trên một quyết định hay ngân sách có tên · `open` chưa làm và chưa có quyết định nào được ghi.
 - **Upstream**: `repo@commit` `tệp:dòng` — nhãn của tuyên bố trong nghiên cứu (**CODE** đọc trong mã · **README** chỉ
   tài liệu nói · **INFERENCE** suy luận chưa đo · **EXPERIMENT** số đo do upstream công bố · **NOT_FOUND** đề xuất nói
-  mà mã không xác nhận) và kết quả của người kiểm chứng thứ hai (confirmed / corrected / refuted). Khi "corrected" hay
-  "refuted", `tệp:dòng` là của người kiểm chứng; khi người kiểm chứng phân lại tuyên bố (N19 của open-code-review,
-  N-18 của MiMo), nhãn là của người kiểm chứng và nhãn gốc của nghiên cứu ghi kèm.
+  mà mã không xác nhận) và kết quả của người kiểm chứng thứ hai (confirmed / corrected / refuted). Khi "confirmed",
+  `tệp:dòng` là của nghiên cứu hoặc của người kiểm chứng; khi "corrected" hay "refuted", chỉ của người kiểm chứng; khi
+  người kiểm chứng phân lại tuyên bố (N19 của open-code-review, N-18 của MiMo), nhãn là của người kiểm chứng và nhãn gốc
+  của nghiên cứu ghi kèm.
 - **Mức (REPORT §2)**: mức của hạng mục REPORT tương ứng, chép nguyên và kiểm bằng máy; hàng không có hạng mục riêng
   trong REPORT để trống (không tự gán mức). Hàng chỉ số của 360 §7 (R-M1…R-M9) không mang mức: mức của hạng mục liên
   quan không phải mức của chỉ số. M5 (live): không mục nào. M4 của B4/B5 là lượt CLI thật, lặp lại tại `c9c736f` (xem
@@ -56,9 +57,11 @@ commit [`evidence/traceability-reproducers-c9c736f.out`](evidence/traceability-r
 chạy test, nên reproducer trích thêm sau lượt chạy bị nêu tên cho tới khi chạy lại; mỗi "kiểm cơ học" đúng và có đúng
 một khẳng định (chuỗi `contains`/`lacks` từ 4 ký tự, `exists` là true/false); mức khớp REPORT §2; mỗi nguồn upstream là
 một tuyên bố của nghiên cứu với đúng nhãn (của người kiểm chứng khi họ phân lại), đúng kết quả kiểm chứng, đúng commit
-đã đọc (≥ 7 chữ số hex), và mỗi `tệp:dòng` là một số mà bằng chứng của nghiên cứu (của người kiểm chứng khi
-corrected/refuted) ghi sau một lần nhắc **chính tệp đó** và trước lần nhắc tệp kế tiếp — bộ kiểm không phân biệt số dòng
-với số khác ở đó (phần trăm, số token); mục 360° đúng nguyên văn; mọi hàng trừ `declined` ghi phần còn thiếu (có chữ,
+đã đọc (≥ 7 chữ số hex), và mỗi `tệp:dòng` là một số mà bằng chứng của nghiên cứu hoặc của người kiểm chứng ghi (khi
+corrected/refuted: chỉ bằng chứng và phần sửa của người kiểm chứng) sau một lần nhắc một tệp **cùng tên gốc** (tên bỏ
+đuôi) và trước lần nhắc tệp kế tiếp — bộ kiểm không phân biệt số dòng với số khác ở đó (phần trăm, số token), cũng không
+phân biệt hai tệp cùng tên gốc (`compute.rs` khớp `compute.py`); mục 360° đúng nguyên văn; mọi hàng trừ `declined` ghi
+phần còn thiếu (có chữ,
 không phải `—`); tiêu chí nghiệm thu nằm trong một đoạn nêu tiêu chí của nguồn, đúng mục khi có "(§n)", hoặc ghi rõ nguồn
 không nêu (tiêu chí của đề xuất chỉ kiểm khi có `--proposal`), và hàng mà `ref` là một mục §10 ("§10 V2-03") chép đúng
 tiêu chí §10 của chính mục đó — không của mục khác, không ghi "không ghi tiêu chí"; "Mục còn mở" và tập hàng
@@ -535,7 +538,7 @@ Tổng: 88 hàng (đề xuất 57, báo cáo 360° 31); adopted 21, adapted 20, 
 - **Commit:** `e897437`: aisef2/app/review_ocr.py, tests/v2/fixtures/ocr/preview.json
 - **Mức (REPORT §2):** C2 = M4 — M4 là mức của C2; hành vi riêng này có test offline.
 - **Tiêu chí nghiệm thu:** review thiếu một file bắt buộc không được thành PASS (§4.3)
-- **Còn thiếu:** Tiêu chí chưa đạt cho tệp bắt buộc mà preview của OCR loại vì `unsupported_ext` hay `binary`: tệp đó được ghi tên trong coverage nhưng không tính là thiếu (`review_ocr.NOT_REVIEWABLE`), nên review không đọc nó vẫn có thể COMPLETE. Không test nào đặt một tệp bắt buộc như thế rồi khẳng định kết quả (`grep` tests/: không test nào đọc `unreadable` hay `NOT_REVIEWABLE`; fixture `tests/v2/fixtures/ocr/preview.json` có `docs/limits.md` = `unsupported_ext` nhưng không test nào đặt nó là bắt buộc).
+- **Còn thiếu:** Tiêu chí chưa đạt cho tệp bắt buộc mà preview của OCR loại vì `unsupported_ext` hay `binary`: tệp đó được ghi tên trong coverage nhưng không tính là thiếu (`review_ocr.NOT_REVIEWABLE`), nên review không đọc nó vẫn có thể COMPLETE. Không test nào đặt một tệp bắt buộc như thế rồi khẳng định kết quả (không test nào đi tới nhánh `NOT_REVIEWABLE` của `review_ocr.coverage`: fixture `tests/v2/fixtures/ocr/preview.json` có `docs/limits.md` = `unsupported_ext` nhưng không test nào đặt nó là bắt buộc, và `tests/v2/test_v21_review_chain.py` thấy `notes.txt` = `unsupported_ext` trong preview thật nhưng chỉ đặt `app/cli.py` là bắt buộc).
 
 ### P-4.2c
 
