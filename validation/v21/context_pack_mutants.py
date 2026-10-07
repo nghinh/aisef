@@ -32,6 +32,8 @@ MUTANTS = {
     "attempt cap 5": ("PACK_ATTEMPTS = 4000, 12, 4", "PACK_ATTEMPTS = 4000, 12, 5"),
     "no-proof list is every admitted criterion": ('sorted(set(a["criteria"]) - set(a["proofs"]))', 'sorted(set(a["criteria"]))'),
     "a later proof of a criterion replaces the first": ('and c not in cur["proofs"]', ""),
+    "no room left for the stop mark (PACK_MAX - 120 -> PACK_MAX)": ("> PACK_MAX - 120:", "> PACK_MAX:"),
+    "room for the stop mark one character short (PACK_MAX - 120 -> PACK_MAX - 56)": ("> PACK_MAX - 120:", "> PACK_MAX - 56:"),
     "the header says an earlier candidate is a commit, whatever is named": (
         "(journal seq {cur['seq']})\")", "(journal seq {cur['seq']}); an earlier candidate named below is a commit of this repository\")"),
     "a named candidate is not said to be a commit of this repository": (', a commit of this repository"', '"'),

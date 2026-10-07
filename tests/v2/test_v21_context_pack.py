@@ -192,6 +192,19 @@ class Pack(Fixture):
         self.assertIn("\n- attempt 1:", text)
         self.assertNotIn("no proof recorded", text.split("\n- attempt 1:", 1)[1])     # the cut falls on the oldest
 
+    def test_at_the_real_bound_the_stop_mark_fits_when_a_line_ends_just_short_of_room_for_it(self):
+        mark = f"\n[the context pack stops here: bounded at {feedback.PACK_MAX} characters]"
+        many = tuple(f"C-CRITERION-{i:03d}" for i in range(26))
+        ev = [e for n in range(4) for e in attempt(100 * n, detail="y" * 256, held=many[:12], criteria=many)]
+        with mock.patch.object(feedback, "PACK_MAX", 10 ** 6):
+            whole = self.pack(ev)
+        # sized so a line of the uncut pack ends one character too late to leave room for the mark: kept, it overflows
+        self.assertEqual(whole[feedback.PACK_MAX - len(mark) + 1], "\n")
+        text = self.pack(ev)
+        self.assertLessEqual(len(text), feedback.PACK_MAX)
+        self.assertTrue(text.endswith(mark), text[-200:])
+        self.assertTrue(whole.startswith(text[:-len(mark)] + "\n"))     # whole lines of the uncut pack, then the mark
+
     def test_no_proof_recorded_is_all_it_says_when_the_attempt_ended_at_a_criterion_s_probes(self):
         records = (("probe/evaluated", {"criterion_id": "C-ADD", "record": {}}),) * 2
         for code in ("PROBE_MISMATCH", "PROBE_INVALID_SPEC"):
