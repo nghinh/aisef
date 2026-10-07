@@ -1241,7 +1241,37 @@ class Classify(unittest.TestCase):
             self.assertEqual(problems([b, a], [b, a]), [])
             self.assertEqual(problems([b, a]), not_ran)
             self.assertEqual(problems([a, b], [b, a]), not_ran)
-            self.assertEqual(problems([a], [a]), [f"{target}: inconsistent record: execution_order is not the kill set"])
+            self.assertEqual(problems([a], [a]), [f"{target}: inconsistent record: execution order {[a]!r} is not the "
+                                                  "kill set in another order, or names no measurement"])
+
+    def test_the_record_check_and_the_runner_agree_on_what_an_execution_order_is(self):
+        """Final verifier: `_problems_v2` read `(execution_order or {}).get("files", kill_tests)`: `{}` and `None` were
+        the declared order with no problem, a list crashed --check (AttributeError), `files: null` crashed it
+        (TypeError), and an entry with no `from` passed. Now each malformed value is an inconsistent record — the same
+        rule run_target refuses it with (a null one aside: run_target's None is no table, and it never writes one) —
+        and is never read as the declared order."""
+        d = self.enterContext(tempfile.TemporaryDirectory())
+        root = toy(pathlib.Path(d), POSITIVE, {})
+        src, target = (root / "aisef2/toy.py").read_text(encoding="utf-8"), "aisef2/toy.py::positive"
+        descs = [x for x, _ in m.mutants(src, "positive", {})]
+        a, b = "tests/v2/test_a.py", "tests/v2/test_b.py"
+        for order in ({}, None, [a, b], {"files": None, "from": "x"}, {"from": "x"}, {"files": [a, b]},
+                      {"files": [a, b], "from": None}, {"files": [a, 1], "from": "x"}, {"files": "ab", "from": "x"}):
+            with self.subTest(order=order):
+                if order is not None:   # run_target's None is "no table"; the runner never writes the key as null
+                    refused = m.run_target(root, target, [a, b], order=order)
+                    self.assertEqual((refused["error"], classes(refused), refused["execution_order"]),
+                                     (m._order_problem(order, [a, b]), ["NOT_RUN"] * 2, order))
+                record = {"target": target, "runner": 2, "kill_tests": [a, b], "source_sha256": m.source_digest(src),
+                          "mutants": len(descs), "killed": 0, "survivors": descs, "t0": [], "execution_order": order,
+                          "results": [{"mutant": x, "class": "SURVIVED", "killed": False,
+                                       "files": [{"file": f, "outcome": "PASS"} for f in (a, b)]} for x in descs]}
+                with mock.patch.dict(m.AUDITED, {(target, x): "audited for this test" for x in descs}), \
+                        mock.patch.object(m, "PHASE_TARGETS", {"TOY": {target: [a, b]}}), \
+                        mock.patch.object(m, "TARGETS", {target: [a, b]}):
+                    self.assertEqual(m.target_problems(record, root),
+                                     [f"{target}: inconsistent record: {m._order_problem(order, [a, b])}"])
+                    self.assertEqual(m.problems_of({"targets": [record]}, root, "TOY"), m.target_problems(record, root))
 
     @unittest.skipUnless(POSIX, "the runner's process ranges and cleanup authority are measured on POSIX")
     def test_a_timeout_is_never_a_kill_and_never_stops_the_chain(self):

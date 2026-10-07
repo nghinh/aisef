@@ -1561,9 +1561,12 @@ def _problems_v2(t: dict, root: pathlib.Path) -> list[str]:
                 out.append(f"{name}: unaudited survivor {d!r}")
         elif cls != "KILLED":
             out.append(f"{name}: mutant {d!r} is {cls} ({r.get('why') or 'see its rows'}): neither killed nor survived — re-run it")
-    ran = (t.get("execution_order") or {}).get("files", t["kill_tests"])   # the order each chain ran the kill set in
     bad = [] if len(res) == t.get("mutants") else ["the results do not list every mutant"]
-    bad += [] if sorted(ran) == sorted(t["kill_tests"]) else ["execution_order is not the kill set"]
+    # the order each chain ran the kill set in: the declared one, or `execution_order` when the record has the key —
+    # read by the runner's own rule; a malformed one is refused and never read as the declared order (ran: None)
+    why = _order_problem(t["execution_order"], t["kill_tests"]) if "execution_order" in t else None
+    ran = None if why else t["execution_order"]["files"] if "execution_order" in t else t["kill_tests"]
+    bad += [why] if why else []
     bad += [] if t.get("survivors") == [r["mutant"] for r in res if r.get("class") != "KILLED"] else \
         ["survivors are not the mutants that were not killed"]
     bad += [] if t.get("killed") == sum(r.get("class") == "KILLED" for r in res) else ["killed is not the KILLED count"]
@@ -1574,7 +1577,7 @@ def _problems_v2(t: dict, root: pathlib.Path) -> list[str]:
         if r.get("class") == "KILLED" and not _confirmed(r):
             bad.append(f"mutant {d!r}: KILLED without a confirmed kill")
         passed = [x["file"] for x in rows if "role" not in x and x["outcome"] == "PASS"]
-        if r.get("class") == "SURVIVED" and passed != ran:
+        if r.get("class") == "SURVIVED" and ran is not None and passed != ran:
             bad.append(f"mutant {d!r}: SURVIVED without one PASS per kill file")
     if not t.get("error") and any(x.get("outcome") != "PASS" for x in t.get("t0", [])):
         bad.append("a T0 row did not pass")
