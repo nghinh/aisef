@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import copy
 import json
+import os
 import pathlib
 import random
 import re
@@ -264,7 +265,7 @@ print(json.dumps({"type": "step_finish", "part": {"tokens": {"input": 120, "outp
 '''
 
 
-@unittest.skipUnless(sys.platform != "win32", "the fake client is a script started by its shebang")
+@unittest.skipUnless(os.name == "posix", "the fake client is a script started by its shebang")
 class ThroughTheRun(e2e.ProductBase):
     """M3: `aisef run` (run.execute) with a fake client whose first developer session changes nothing."""
 

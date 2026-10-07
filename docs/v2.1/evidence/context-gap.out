@@ -1,0 +1,67 @@
+D4 context gap on recorded retries (validation/v21/context_gap.py; read-only over closure-evidence/v2)
+commit: f15026bb4fd73ea3977869f0607f674c250901ae dirty: 0
+
+1. What the 2.0.0 release smoke-2 developers were told: each prompt recomputed by the 2.0.0 code (git archive v2.0.0) from the journal before its request, against the prompt_sha256 the run recorded
+   STORY-01-01 attempt 1 (request seq 40): EQUAL
+   STORY-01-05 attempt 1 (request seq 228): EQUAL
+   STORY-02-01 attempt 1 (request seq 339): EQUAL
+   STORY-02-02 attempt 1 (request seq 408): EQUAL
+   STORY-03-01 attempt 1 (request seq 591): EQUAL
+   STORY-04-02 attempt 1 (request seq 1362): EQUAL
+   STORY-04-02 attempt 2 (request seq 1473): EQUAL
+   STORY-04-02 attempt 3 (request seq 1584): EQUAL
+   the retry text of STORY-04-02 attempt 3, as told:
+   | A previous attempt of this story was not accepted; the kernel observed:
+   | - CONTRACT_UNSATISFIED (owner DEVELOPER) — STORY-04-02, criterion S-9-d [INTRODUCE]: R-9 (docs/requirements.md §9 CLI Exit Codes (exact contract)), clause R-9/3: exit 3 on an I/O error
+   |   contract BC-V22-S-9-d, ProductProofSpec PPS-d0e057a7ff4b495cca2a81d9f4db48fe2e556eeed99bd25f27a266f27b63ea4e, probe probe.cli_invocation, subject python -m ledgerlock; candidate 9872144728a39e6131d102685aed01d74df228bb: probe status EXECUTED, verdict REFUTED (expected SATISFIED), the independent verifier agrees. Evidence: journal seq 1415, 1418 (the probe records), 1419 (the proof), 1422 (this failure).
+   |   The candidate remains REFUTED for this approved contract and the independent verifier agrees. Inspect the implementation against that requirement clause. The proof's stimulus is not part of this message.
+   | - CONTRACT_UNSATISFIED (owner DEVELOPER) — STORY-04-02, criterion S-9-d [INTRODUCE]: R-9 (docs/requirements.md §9 CLI Exit Codes (exact contract)), clause R-9/3: exit 3 on an I/O error
+   |   contract BC-V22-S-9-d, ProductProofSpec PPS-d0e057a7ff4b495cca2a81d9f4db48fe2e556eeed99bd25f27a266f27b63ea4e, probe probe.cli_invocation, subject python -m ledgerlock; candidate d8bab70eaa47696e3415f71781710fcadd1378ab: probe status EXECUTED, verdict REFUTED (expected SATISFIED), the independent verifier agrees. Evidence: journal seq 1526, 1529 (the probe records), 1530 (the proof), 1533 (this failure).
+   |   The candidate remains REFUTED for this approved contract and the independent verifier agrees. Inspect the implementation against that requirement clause. The proof's stimulus is not part of this message.
+   | Fix the implementation.
+
+2. Every recorded V2 retry with a journal
+
+run                      story        s#   req  nothing parent held unproved | calls prior journal hidden fw | outcome
+2.0.0 release smoke-2    STORY-04-02   2  1473        0      0    6        3 |    88     6      10     12 24 | the developer changed nothing (exit None, timed out False)
+2.0.0 release smoke-2    STORY-04-02   3  1584        1      1   12        6 |    39     0       0      6  4 | opencode exit 0, 33 turns
+cycle-2 P10 attempt 2    STORY-01-01   2   102        0      0    3        9 |    80     0       0      0  0 | opencode exit 0, 81 turns
+cycle-2 P10 attempt 2    STORY-01-05   2   170        0      0    0        0 |    66     0       0      0  0 | opencode exit 0, 67 turns
+cycle-2 P10 attempt 2    STORY-04-02   2  4266        0      0    9        0 |   159     0       0      0  0 | opencode exit 0, 161 turns
+cycle-2 P10 attempt 2    STORY-05-01   2  6095        0      0    2        0 |   191     0       0      0  0 | opencode exit 0, 193 turns
+cycle-2 P10 attempt 3    STORY-01-05   2  1849        0      0    0        6 |    26     0       0      0  0 | opencode exit 0, 16 turns
+cycle-2 P10 attempt 3    STORY-03-01   2  7169        0      0   14        9 |    53     0       0      0  0 | opencode exit 0, 41 turns
+cycle-2 P10 attempt 3    STORY-03-01   3  7391        0      0   28       18 |    51     0       0      0  0 | opencode exit 0, 43 turns
+cycle-2 P10 attempt 3    STORY-04-02   2  7739        0      0    9        0 |    61     0       0      0  0 | opencode exit 0, 51 turns
+cycle-2 P10 attempt 3    STORY-04-02   3  7866        0      0   18        0 |    50     0       0      0  0 | opencode exit 0, 28 turns
+cycle-2 P10 attempt 4    STORY-01-05   2  1849        0      0    0        6 |    37     0       0      0  0 | opencode exit 0, 33 turns
+cycle-2 P10 attempt 4    STORY-03-01   2  7202        0      0   14        9 |    41     0       0      0  0 | opencode exit 0, 42 turns
+cycle-2 P10 attempt 4    STORY-03-01   3  7441        0      0   28       18 |    88     7       0      0 14 | the developer changed nothing (exit None, timed out False)
+cycle-2 P10 attempt 4    STORY-04-02   2  7807        0      0    9        0 |    95     5       0      2 25 | the developer changed nothing (exit None, timed out False)
+cycle-2 P10 attempt 4    STORY-04-02   3  7943        1      1   18        0 |    89     9       5      5 10 | the developer changed nothing (exit 0, timed out False)
+
+retries: 16; with an earlier attempt that changed nothing / a parent shown as a candidate: 2; with an earlier 'held' fact untold: 13; with an unproved criterion untold: 9
+sessions that sought prior_work: 4 of 16 (27 calls)
+sessions that sought journal: 2 of 16 (15 calls)
+sessions that sought hidden: 4 of 16 (25 calls)
+sessions that sought framework: 5 of 16 (77 calls)
+retry sessions that changed nothing: 4
+
+3. The context pack this tree builds at smoke-2 STORY-04-02's retries (offline replay; not run evidence)
+
+   at request seq 1473 (807 characters):
+   | What the run's journal records about the earlier attempts of this story (the controller's own record; context only — no verdict, approval or budget reads it):
+   | - this attempt starts again at the parent d8bab70eaa47 (journal seq 1429); an earlier candidate named below is a commit of this repository
+   | - attempt 1: parent d8bab70eaa47 (journal seq 1318); developer result: opencode exit 0, 12 turns (journal seq 1363); candidate 9872144728a3 (journal seq 1371)
+   |   held at that revision, the verifier agreeing: S-3.3-a (R-3.3/1), S-3.3-b (R-3.3/1), S-3.3-c (R-3.3/1), S-3.3-d (R-3.3/2), S-7-e (R-7/4), S-7-f (R-7/4) (journal seq 1371, 1379, 1387, 1395, 1403, 1411)
+   |   never proved at that revision (the attempt ended before their proof): S-9-e (R-9/3), S-9-f (R-9/5), S-D3-05-01-1 (R-3.3/2) (journal seq 1318–1428)
+
+   at request seq 1584 (1400 characters):
+   | What the run's journal records about the earlier attempts of this story (the controller's own record; context only — no verdict, approval or budget reads it):
+   | - this attempt starts again at the parent d8bab70eaa47 (journal seq 1540); an earlier candidate named below is a commit of this repository
+   | - attempt 1: parent d8bab70eaa47 (journal seq 1318); developer result: opencode exit 0, 12 turns (journal seq 1363); candidate 9872144728a3 (journal seq 1371)
+   |   held at that revision, the verifier agreeing: S-3.3-a (R-3.3/1), S-3.3-b (R-3.3/1), S-3.3-c (R-3.3/1), S-3.3-d (R-3.3/2), S-7-e (R-7/4), S-7-f (R-7/4) (journal seq 1371, 1379, 1387, 1395, 1403, 1411)
+   |   never proved at that revision (the attempt ended before their proof): S-9-e (R-9/3), S-9-f (R-9/5), S-D3-05-01-1 (R-3.3/2) (journal seq 1318–1428)
+   | - attempt 2: parent d8bab70eaa47 (journal seq 1429); developer result: the developer changed nothing (exit None, timed out False) (journal seq 1474); the revision proved was the parent itself — that attempt changed nothing (journal seq 1482)
+   |   held at that revision, the verifier agreeing: S-3.3-a (R-3.3/1), S-3.3-b (R-3.3/1), S-3.3-c (R-3.3/1), S-3.3-d (R-3.3/2), S-7-e (R-7/4), S-7-f (R-7/4) (journal seq 1482, 1490, 1498, 1506, 1514, 1522)
+   |   never proved at that revision (the attempt ended before their proof): S-9-e (R-9/3), S-9-f (R-9/5), S-D3-05-01-1 (R-3.3/2) (journal seq 1429–1539)

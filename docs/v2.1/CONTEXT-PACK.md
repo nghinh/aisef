@@ -1,8 +1,11 @@
 # D4 — Gói ngữ cảnh do controller dựng cho lượt thử lại của developer
 
-Trạng thái: **M3** (module, tích hợp vào `aisef run`, kiểm offline gồm một lượt `run.execute` với client giả và một lần
-phát lại trên journal đã ghi của smoke-2). Hiệu quả trên mô hình thật: **M6** — cần lượt chạy live trả tiền, chưa có
-ngân sách. Thay đổi nằm trong `aisef2/app/` (`feedback.py`, `adapters.py`): cần mutation và tái thẩm định ngoài snapshot
+Trạng thái: **M4** — gói tới developer qua CLI `aisef` thật (`validation/v21/cli_integration/run.sh` tại `f15026b`:
+nhị phân Open Code Review thật, git thật; developer và mô hình của OCR là kịch bản): lượt 2 của run1 nhận gói, mọi seq nó
+trích được đọc lại đúng trong journal, journal không chứa gói ([evidence/context-pack-cli-f15026b.out](evidence/context-pack-cli-f15026b.out),
+toàn bộ lượt chạy: [evidence/cli-integration-f15026b.out](evidence/cli-integration-f15026b.out), cùng các bước và mã thoát
+như `b72e51e`). Offline (M3): `tests/v2/test_v21_context_pack.py`, gồm `run.execute` với client giả và phát lại journal
+smoke-2. Hiệu quả trên mô hình thật: **M6** — cần lượt chạy live trả tiền, chưa có ngân sách. Thay đổi nằm trong `aisef2/app/` (`feedback.py`, `adapters.py`): cần mutation và tái thẩm định ngoài snapshot
 đang đo.
 
 Nhãn nguồn: **CODE** (đọc mã, có file:dòng), **README** (tài liệu của repo), **EXPERIMENT** (đo trên bằng chứng đã
@@ -69,8 +72,9 @@ Công cụ: `validation/v21/context_gap.py`; đầu ra: [evidence/context-gap.ou
 
 ### 1.4 Kết luận về nhu cầu
 
-- **Có bằng chứng (EXPERIMENT + CODE):** ở mỗi lượt thử lại đã ghi, journal giữ sự thật mà developer không được kể, và
-  developer đã tiêu lời gọi công cụ để tự khôi phục đúng những sự thật đó.
+- **Có bằng chứng (EXPERIMENT + CODE):** ở 15/16 lượt thử lại đã ghi, journal giữ sự thật về lượt trước mà developer
+  không được kể; ở 4/16, developer tiêu 27 lời gọi công cụ để tự khôi phục việc của lượt trước, 2/16 đọc thẳng journal
+  đang chạy.
 - **Chỉ là INFERENCE:** rằng kể ra sẽ đổi kết quả (tỉ lệ đạt, số lượt, việc săn tìm). Đo cần lượt chạy live trả tiền → M6.
 - **Gói này không giải được:** bước nào của probe thất bại — journal chỉ giữ verdict và reason
   (`closure-evidence/v2/cycle2/PROBE-DIAGNOSTIC-GAP-001.json`). Việc săn vật liệu ẩn
