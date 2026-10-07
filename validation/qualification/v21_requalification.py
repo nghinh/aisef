@@ -2,14 +2,24 @@
 commit, in which environment — written once, before the mutation campaign starts.
 
     python -P validation/qualification/v21_requalification.py --write --base SHA --campaign NOTE   # -> v2.1/REQUALIFICATION-MANIFEST.json
-    python -P validation/qualification/v21_requalification.py --check   # the scope it names is still this tree's
+    python -P validation/qualification/v21_requalification.py --write --revision N --supersedes-reason TEXT \
+        --campaign NOTE [--execution-order REL] [--t0 REL] [--preflight REL]                        # -> ...-MANIFEST-N.json
+    python -P validation/qualification/v21_requalification.py --check   # the newest revision's scope is still this tree's
 
 The manifest names: the owner's decisions (RELEASE-DECISIONS seq 4 and 5), the base commit and the snapshot (HEAD at
 writing), every V2.1 mutation target with its kill set and mutant count (and how the reported 320 were checked against
 the tree), what is deliberately not a target and why, every Q0 checker, the 2.1 Q5 corpus, the v2.1 records to be
 produced (in order, with their tools), and the campaign's environment. --check reports where the tree no longer
 matches it (a target or kill set changed, a checker added or removed, the corpus changed): the manifest is a scope
-statement, so a later change of scope must be visible, not silently absorbed."""
+statement, so a later change of scope must be visible, not silently absorbed.
+
+A campaign that is stopped and restarted on another commit gets a REVISION (REQUALIFICATION-MANIFEST-N.json, N >= 2):
+written once like the first, it names the revision it supersedes (path and sha256), why, and the stop record; the
+commit it was written at; the versions it measures with — the runner and its contract, every kill file and the
+process/cleanup harness, each by sha256; the execution order of the kill files (or the declared order) and the T0 and
+preflight records, each by sha256. The first manifest's snapshot stays the phase's frozen SNAPSHOT
+(v21_mutation_record.py): a revision's snapshot descends from it. --check reads the newest revision; for a revision it
+also reports every version that moved since it was written."""
 
 from __future__ import annotations
 
@@ -103,12 +113,77 @@ def build(base: str, campaign: str) -> dict:
     }
 
 
+STOP_REL = "closure-evidence/v2/v2.1/campaign-1-stopped/CAMPAIGN-1-STOP.json"
+#: what a campaign measures with, besides the kill files: the runner, its contract and the process/cleanup harness
+HARNESS = ("validation/v2/mutation.py", "docs/v2.1/MUTATION-RUNNER-V2.md", "validation/v2/owned_run.py",
+           "validation/v2/cleanup_authority.py", "aisef2/runtime/process_range.py")
+
+
+def revision_rel(n: int) -> str:
+    return OUT_REL if n == 1 else OUT_REL.replace(".json", f"-{n}.json")
+
+
+def newest(root: pathlib.Path | None = None) -> int:
+    """The highest revision written (0 when none)."""
+    root = ROOT if root is None else root     # read at call time: ROOT is the tree checked
+    n = 0
+    while (root / revision_rel(n + 1)).is_file():
+        n += 1
+    return n
+
+
+def _pinned(rel: str | None) -> dict | None:
+    return None if rel is None else {"path": rel, "sha256": _sha(rel)}
+
+
+def versions() -> dict:
+    """Every file the campaign measures with, by sha256 (LF): the harness and each distinct kill file."""
+    from validation.v2 import mutation as m
+    kill = sorted({f for k in m.V21_TARGETS.values() for f in k})
+    return {"harness": {rel: _sha(rel) for rel in HARNESS if (ROOT / rel).is_file()},
+            "kill_files": {rel: _sha(rel) for rel in kill}}
+
+
+def build_revision(n: int, reason: str, campaign: str, execution_order: str | None, t0: str | None,
+                   preflight: str | None) -> dict:
+    from validation.qualification import v21_mutation_record as R
+    prev_rel = revision_rel(n - 1)
+    if n < 2 or not (ROOT / prev_rel).is_file() or (ROOT / revision_rel(n)).exists():
+        raise SystemExit(f"revision {n} needs revision {n - 1} ({prev_rel}) and no revision {n} yet")
+    if not reason.strip():
+        raise SystemExit("a revision says why it supersedes the previous one")
+    prev = json.loads((ROOT / prev_rel).read_text(encoding="utf-8"))
+    doc = build(prev["base"], campaign)
+    if subprocess.run(["git", "-C", str(ROOT), "merge-base", "--is-ancestor", R.SNAPSHOT, doc["snapshot"]]).returncode != 0:
+        raise SystemExit(f"the snapshot {doc['snapshot']} does not descend from the phase's SNAPSHOT {R.SNAPSHOT}")
+    return {**doc, "revision": n,
+            "supersedes": {"path": prev_rel, "sha256": _sha(prev_rel), "reason": reason,
+                           "stop_record": _pinned(STOP_REL) if (ROOT / STOP_REL).is_file() else None},
+            "phase_snapshot": R.SNAPSHOT, "versions": versions(),
+            "execution_order": _pinned(execution_order) or "the declared order of each kill set",
+            "t0": _pinned(t0), "preflight": _pinned(preflight)}
+
+
 def check() -> list[str]:
-    path = ROOT / OUT_REL
-    if not path.is_file():
+    n = newest()
+    if not n:
         return [f"{OUT_REL} is missing"]
-    rec, now = json.loads(path.read_text(encoding="utf-8")), scope()
+    rel = revision_rel(n)
+    rec, now = json.loads((ROOT / rel).read_text(encoding="utf-8")), scope()
     out = []
+    if n > 1:
+        sup = rec.get("supersedes") or {}
+        if sup.get("path") != revision_rel(n - 1) or sup.get("sha256") != _sha(revision_rel(n - 1)):
+            out.append(f"{rel} does not name revision {n - 1} by its bytes")
+        then, cur = rec.get("versions") or {}, versions()
+        for kind in ("harness", "kill_files"):
+            moved = sorted(f for f in set(then.get(kind, {})) | set(cur[kind]) if then.get(kind, {}).get(f) != cur[kind].get(f))
+            if moved:
+                out.append(f"{len(moved)} {kind.replace('_', ' ')} changed since {rel}: {moved[:10]}")
+        for key in ("execution_order", "t0", "preflight"):
+            pin = rec.get(key)
+            if isinstance(pin, dict) and (not (ROOT / pin["path"]).is_file() or _sha(pin["path"]) != pin["sha256"]):
+                out.append(f"the {key} record {pin['path']} is not the one {rel} names")
     for k in ("checkers", "q5_corpus"):
         if rec.get(k) != now[k]:
             out.append(f"the {k} changed since the manifest: {sorted(set(map(str, now[k])) ^ set(map(str, rec.get(k) or [])))[:10]}")
@@ -126,7 +201,20 @@ def main(argv: list[str] | None = None) -> int:
     mode.add_argument("--check", action="store_true")
     ap.add_argument("--base")
     ap.add_argument("--campaign", default="")
+    ap.add_argument("--revision", type=int)
+    ap.add_argument("--supersedes-reason", default="")
+    ap.add_argument("--execution-order")
+    ap.add_argument("--t0")
+    ap.add_argument("--preflight")
     a = ap.parse_args(argv)
+    if a.write and a.revision:
+        doc = build_revision(a.revision, a.supersedes_reason, a.campaign, a.execution_order, a.t0, a.preflight)
+        rel = revision_rel(a.revision)
+        with (ROOT / rel).open("x", encoding="utf-8") as f:
+            f.write(json.dumps(doc, indent=1, ensure_ascii=False) + "\n")
+        print(f"wrote {rel}: revision {a.revision}, supersedes {doc['supersedes']['path']}; {doc['mutation']['target_count']} "
+              f"targets, {doc['mutation']['mutant_count']} mutants, {len(doc['versions']['kill_files'])} kill files")
+        return 0
     if a.write:
         if not a.base:
             ap.error("--write needs --base")
