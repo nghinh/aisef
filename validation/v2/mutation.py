@@ -21,7 +21,8 @@ A probe's child script (a module-level string constant that the probe runs in th
 made in the parsed script and written back into the constant, so the kill tests run the mutated script (C2-P3).
 
     python -P validation/v2/mutation.py run [target ...]   # run; writes closure-evidence/v2/P<n>-MUTATION.json
-    python -P validation/v2/mutation.py run --order TABLE.json [target ...]   # each chain in the table's order (§7)
+    python -P validation/v2/mutation.py run --order TABLE.json target ...     # each chain in the table's order (§7.2;
+                                                                              # TABLE from validation/v2/execution_order.py)
     python -P validation/v2/mutation.py --check            # every phase record current, every target killed or audited
 """
 
@@ -38,6 +39,7 @@ import pathlib
 import re
 import shutil
 import stat
+import subprocess
 import sys
 import tempfile
 import time
@@ -1435,22 +1437,48 @@ def null_mutant(module_src: str, func: str) -> str:
     return ast.unparse(tree)
 
 
+_SHA256 = re.compile(r"[0-9a-f]{64}")
+
+
 def _order_problem(order, kill: list[str]) -> str | None:
     """Why `order` is not an execution order of the kill set `kill` (§7.2), None when it is: an object whose `files` is
-    `kill` in some order (the same files, each as often) and whose `from` names the measurement the order came from.
-    One rule for main (every table entry, before anything runs), run_target and the record check."""
+    `kill` in some order (the same files, each as often) and whose `from` names the measurement the order came from —
+    the record's path and sha256 ({"path", "sha256"}: validation/v2/execution_order.py writes it). One rule for main
+    (every table entry, before anything runs), run_target and the record check."""
     files = order.get("files") if isinstance(order, dict) else order
+    src = order.get("from") if isinstance(order, dict) else None
     if not isinstance(order, dict) or not isinstance(files, list) or not all(isinstance(f, str) for f in files) \
-            or sorted(files) != sorted(kill) or not order.get("from"):
+            or sorted(files) != sorted(kill) or not isinstance(src, dict) or not isinstance(src.get("path"), str) \
+            or not src["path"] or not _SHA256.fullmatch(str(src.get("sha256"))):
         return f"execution order {files!r} is not the kill set in another order, or names no measurement"
     return None
+
+
+def committed(root: pathlib.Path, path: pathlib.Path, raw: bytes) -> tuple[str, str | None]:
+    """(`path` relative to `root` when it is inside it, else as given; HEAD's commit when `raw` is that file's bytes at
+    HEAD of the repository whose top `root` is, else None). Read-only git; no git, no repository: None."""
+    try:
+        rel = path.resolve().relative_to(root.resolve()).as_posix()
+    except ValueError:
+        return str(path), None
+
+    def git(*args):
+        return subprocess.run(["git", "-C", str(root), *args], capture_output=True)
+    try:
+        top, head, blob = git("rev-parse", "--show-toplevel"), git("rev-parse", "--verify", "HEAD"), git("cat-file", "blob", f"HEAD:{rel}")
+    except OSError:
+        return rel, None
+    ok = (top.returncode == head.returncode == blob.returncode == 0 and blob.stdout == raw
+          and pathlib.Path(top.stdout.decode().strip()).resolve() == root.resolve())
+    return rel, head.stdout.decode().strip() if ok else None
 
 
 def run_target(root: pathlib.Path, target: str, tests: list[str], pristine: tuple[pathlib.Path, str] | None = None,
                on_mutant=None, t0_only: bool = False, order: dict | None = None) -> dict:
     """Measure one target (§2–§4). `pristine`: the copy `main()` took once ((path, tree digest)); a direct caller passes
     none and gets one of its own. `order`: an execution-order table's entry, {"files": the kill set in the order each
-    mutant's chain runs it, "from": the measurement that order came from, ...}, kept whole as `execution_order`; the
+    mutant's chain runs it, "from": {"path", "sha256"} of the measurement that order came from, ...} (main adds the
+    table's path, sha256 and commit), kept whole as `execution_order`; the
     record's `kill_tests` stays the declared list (proof() and the frozen criteria pin it: ORD-4), and T0 still runs
     the files in declared order. None: the declared order, and no `execution_order`. Everything this target writes
     lives in one scratch directory, removed at the end.
@@ -1567,6 +1595,13 @@ def _problems_v2(t: dict, root: pathlib.Path) -> list[str]:
     why = _order_problem(t["execution_order"], t["kill_tests"]) if "execution_order" in t else None
     ran = None if why else t["execution_order"]["files"] if "execution_order" in t else t["kill_tests"]
     bad += [why] if why else []
+    if "execution_order" in t and not why:   # and its table: the path and sha256 main stamps, committed at the run's HEAD
+        eo = t["execution_order"]
+        if not isinstance(eo.get("table"), str) or not _SHA256.fullmatch(str(eo.get("table_sha256"))):
+            bad.append("execution_order names no table and its sha256")
+        elif not eo.get("table_commit"):
+            out.append(f"{name}: execution-order table {eo['table']} was not a file committed at the run's HEAD — "
+                       "commit it and re-run")
     bad += [] if t.get("survivors") == [r["mutant"] for r in res if r.get("class") != "KILLED"] else \
         ["survivors are not the mutants that were not killed"]
     bad += [] if t.get("killed") == sum(r.get("class") == "KILLED" for r in res) else ["killed is not the KILLED count"]
@@ -1670,12 +1705,20 @@ def main(argv: list[str] | None = None) -> int:
         if "--order" in chosen[1:] or (chosen[:1] == ["--order"] and len(chosen) < 3):
             raise SystemExit("usage: mutation.py run --order TABLE.json TARGET... (--order once, first, with a table "
                              "and the targets it is for)")
-        if chosen[:1] == ["--order"]:   # {target: {"files": [...], "from": "<measurement>"}}; absent: declared order
-            raw = pathlib.Path(chosen[1]).read_bytes()
-            table, chosen = json.loads(raw), chosen[2:]
-            stamp = {"table": argv[2], "table_sha256": hashlib.sha256(raw).hexdigest()}
+        if chosen[:1] == ["--order"]:   # validation/v2/execution_order.py's table: {"orders": {target: entry}, ...}
+            path, chosen = pathlib.Path(chosen[1]), chosen[2:]
+            try:
+                raw = path.read_bytes()
+                table = json.loads(raw).get("orders")
+            except (OSError, ValueError, AttributeError) as e:
+                raise SystemExit(f"execution-order table refused, nothing ran: {path}: {e}") from None
             if not isinstance(table, dict):
-                raise SystemExit(f"execution-order table refused, nothing ran: not a JSON object: {argv[2]}")
+                raise SystemExit(f"execution-order table refused, nothing ran: {path} has no `orders` object")
+            rel, commit = committed(ROOT, path, raw)   # the record ties each result to the committed table
+            stamp = {"table": rel, "table_sha256": hashlib.sha256(raw).hexdigest(), "table_commit": commit}
+            if not commit:
+                print(f"WARNING execution-order table {rel} is not a file committed at HEAD: --check refuses every "
+                      "result it orders", flush=True)
             if unknown := [x for x in table if x not in TARGETS]:
                 raise SystemExit(f"not a mutation target in the execution-order table: {unknown}")
             # every entry, before the first target runs: a bad one refused at its turn came after hours of earlier

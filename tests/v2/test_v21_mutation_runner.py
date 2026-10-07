@@ -40,6 +40,19 @@ def toy(base: pathlib.Path, module: str, files: dict[str, str], name: str = "toy
     return root
 
 
+#: an execution-order entry's `from` (validation/v2/execution_order.py) and main's stamp of a table committed at HEAD
+FROM = {"path": "closure-evidence/v2/v2.1/T0-SWEEP.json (this test)", "sha256": "0" * 64}
+STAMP = {"table": "order.json", "table_sha256": "1" * 64, "table_commit": "2" * 40}
+
+
+def git(cwd: pathlib.Path, *args: str) -> str:
+    env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")} | {
+        "GIT_CONFIG_NOSYSTEM": "1", "GIT_CONFIG_GLOBAL": os.devnull, "GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@t",
+        "GIT_COMMITTER_NAME": "t", "GIT_COMMITTER_EMAIL": "t@t"}
+    return subprocess.run(["git", "-C", str(cwd), *args], capture_output=True, text=True, encoding="utf-8", env=env,
+                          check=True).stdout.strip()
+
+
 def killed(result: dict) -> list[bool]:
     return [r["killed"] for r in result["results"]]
 
@@ -1232,7 +1245,7 @@ class Classify(unittest.TestCase):
             return m.target_problems({
                 "target": target, "runner": 2, "kill_tests": [a, b], "source_sha256": m.source_digest(src),
                 "mutants": len(descs), "killed": 0, "survivors": descs, "t0": [],
-                **({"execution_order": {"files": files, "from": "this test"}} if files else {}),
+                **({"execution_order": {"files": files, "from": FROM, **STAMP}} if files else {}),
                 "results": [{"mutant": x, "class": "SURVIVED", "killed": False,
                              "files": [{"file": f, "outcome": "PASS"} for f in ran]} for x in descs]}, root)
         not_ran = [f"{target}: inconsistent record: mutant {x!r}: SURVIVED without one PASS per kill file" for x in descs]
@@ -1243,6 +1256,34 @@ class Classify(unittest.TestCase):
             self.assertEqual(problems([a, b], [b, a]), not_ran)
             self.assertEqual(problems([a], [a]), [f"{target}: inconsistent record: execution order {[a]!r} is not the "
                                                   "kill set in another order, or names no measurement"])
+
+    def test_a_result_ordered_by_a_table_that_was_not_committed_is_refused(self):
+        """Provenance: a result whose chains ran in a table's order is tied to that table by path, sha256 and the commit
+        main found it at; a result without that stamp is inconsistent, and one whose table was not committed at the
+        run's HEAD is refused (v21_mutation_record.py reads these problems through problems_of)."""
+        d = self.enterContext(tempfile.TemporaryDirectory())
+        root = toy(pathlib.Path(d), POSITIVE, {})
+        src, target = (root / "aisef2/toy.py").read_text(encoding="utf-8"), "aisef2/toy.py::positive"
+        descs = [x for x, _ in m.mutants(src, "positive", {})]
+        a, b = "tests/v2/test_a.py", "tests/v2/test_b.py"
+
+        def problems(**stamp):
+            return m.target_problems({
+                "target": target, "runner": 2, "kill_tests": [a, b], "source_sha256": m.source_digest(src),
+                "mutants": len(descs), "killed": 0, "survivors": descs, "t0": [],
+                "execution_order": {"files": [b, a], "from": FROM, **stamp},
+                "results": [{"mutant": x, "class": "SURVIVED", "killed": False,
+                             "files": [{"file": f, "outcome": "PASS"} for f in (b, a)]} for x in descs]}, root)
+        no_stamp = [f"{target}: inconsistent record: execution_order names no table and its sha256"]
+        with mock.patch.dict(m.AUDITED, {(target, x): "audited for this test" for x in descs}):
+            self.assertEqual(problems(**STAMP), [])
+            self.assertEqual(problems(), no_stamp)
+            self.assertEqual(problems(**{**STAMP, "table_sha256": "abc"}), no_stamp)
+            self.assertEqual(problems(**{**STAMP, "table": None}), no_stamp)
+            for commit in (None, ""):
+                self.assertEqual(problems(**{**STAMP, "table_commit": commit}),
+                                 [f"{target}: execution-order table order.json was not a file committed at the run's HEAD "
+                                  "— commit it and re-run"])
 
     def test_the_record_check_and_the_runner_agree_on_what_an_execution_order_is(self):
         """Final verifier: `_problems_v2` read `(execution_order or {}).get("files", kill_tests)`: `{}` and `None` were
@@ -1256,7 +1297,9 @@ class Classify(unittest.TestCase):
         descs = [x for x, _ in m.mutants(src, "positive", {})]
         a, b = "tests/v2/test_a.py", "tests/v2/test_b.py"
         for order in ({}, None, [a, b], {"files": None, "from": "x"}, {"from": "x"}, {"files": [a, b]},
-                      {"files": [a, b], "from": None}, {"files": [a, 1], "from": "x"}, {"files": "ab", "from": "x"}):
+                      {"files": [a, b], "from": None}, {"files": [a, 1], "from": "x"}, {"files": "ab", "from": "x"},
+                      {"files": [a, b], "from": "T0 seconds"}, {"files": [a, b], "from": {"path": "x.json"}},
+                      {"files": [a, b], "from": {**FROM, "sha256": "abc"}}, {"files": [a, b], "from": {**FROM, "path": ""}}):
             with self.subTest(order=order):
                 if order is not None:   # run_target's None is "no table"; the runner never writes the key as null
                     refused = m.run_target(root, target, [a, b], order=order)
@@ -1571,7 +1614,8 @@ class KillSets(unittest.TestCase):
                     self.assertNotIn("t0", r)
 
     def test_main_takes_each_targets_order_from_the_table_and_the_rest_in_declared_order(self):
-        """`run --order TABLE`: a target the table lists gets its entry, with the table's path and sha256; any other
+        """`run --order TABLE`: a target the table lists gets its entry, stamped with the table's path in the
+        repository, its sha256 and HEAD's commit when HEAD holds those bytes (else null, with a warning); any other
         target the declared order; a table naming a target that does not exist stops main before anything runs."""
         a, b = "tests/v2/test_a.py", "tests/v2/test_b.py"
         targets = {"aisef2/toy.py::positive": [a, b], "aisef2/toy.py::other": [a, b]}
@@ -1581,19 +1625,31 @@ class KillSets(unittest.TestCase):
             calls.append((target, tests, order))
             return m._summarise({"target": target, "runner": 2, "kill_tests": list(tests), "mutants": 0, "results": []})
         with tempfile.TemporaryDirectory() as d:
-            root = toy(pathlib.Path(d), POSITIVE + "\n\ndef other(x):\n    return x\n", {})
-            table = pathlib.Path(d) / "order.json"
-            raw = json.dumps({"aisef2/toy.py::positive": {"files": [b, a], "from": "T0 seconds (this test)"}}).encode()
+            root = toy(pathlib.Path(d).resolve(), POSITIVE + "\n\ndef other(x):\n    return x\n", {})
+            git(root, "init", "-q", "-b", "main")
+            table, outside = root / "order.json", pathlib.Path(d) / "order.json"
+            raw = json.dumps({"orders": {"aisef2/toy.py::positive": {"files": [b, a], "from": FROM}}}).encode()
+            entry = {"files": [b, a], "from": FROM, "table_sha256": hashlib.sha256(raw).hexdigest()}
             table.write_bytes(raw)
+            outside.write_bytes(raw)
             with mock.patch.object(m, "ROOT", root), mock.patch.object(m, "RECORDS", {"TOY": "rec.json"}), \
                     mock.patch.object(m, "PHASE_TARGETS", {"TOY": targets}), mock.patch.object(m, "TARGETS", targets), \
-                    mock.patch.object(m, "run_target", fake), mock.patch("builtins.print"):
-                m.main(["run", "--order", str(table), *targets])
-                self.assertEqual(calls, [
-                    ("aisef2/toy.py::positive", [a, b], {"files": [b, a], "from": "T0 seconds (this test)",
-                                                         "table": str(table), "table_sha256": hashlib.sha256(raw).hexdigest()}),
-                    ("aisef2/toy.py::other", [a, b], None)])
-                table.write_text(json.dumps({"aisef2/toy.py::gone": {"files": [a, b], "from": "x"}}), encoding="utf-8")
+                    mock.patch.object(m, "run_target", fake), mock.patch("builtins.print") as out:
+                for path, rel, commit in ((table, "order.json", None), (outside, str(outside), None), (table, "order.json", "HEAD")):
+                    if commit:
+                        git(root, "add", "order.json")
+                        git(root, "commit", "-q", "-m", "the table")
+                        commit = git(root, "rev-parse", "HEAD")
+                    calls.clear()
+                    out.reset_mock()
+                    m.main(["run", "--order", str(path), *targets])
+                    self.assertEqual(calls, [("aisef2/toy.py::positive", [a, b], {**entry, "table": rel, "table_commit": commit}),
+                                             ("aisef2/toy.py::other", [a, b], None)])
+                    warned = [c.args[0] for c in out.call_args_list if c.args[0].startswith("WARNING")]
+                    self.assertEqual(warned, [] if commit else [f"WARNING execution-order table {rel} is not a file committed "
+                                                                 "at HEAD: --check refuses every result it orders"])
+                table.write_text(json.dumps({"orders": {"aisef2/toy.py::gone": {"files": [a, b], "from": FROM}}}),
+                                 encoding="utf-8")
                 calls.clear()
                 with self.assertRaisesRegex(SystemExit, "not a mutation target in the execution-order table"):
                     m.main(["run", "--order", str(table), *targets])
@@ -1611,7 +1667,7 @@ class KillSets(unittest.TestCase):
         def fake(root, target, tests, pristine=None, on_mutant=None, t0_only=False, order=None):
             calls.append(target)
             return m._summarise({"target": target, "runner": 2, "kill_tests": list(tests), "mutants": 0, "results": []})
-        good = {"files": [b, a], "from": "T0 seconds (this test)"}
+        good = {"files": [b, a], "from": FROM}
         with tempfile.TemporaryDirectory() as d:
             root = toy(pathlib.Path(d), POSITIVE + "\n\ndef other(x):\n    return x\n", {})
             record = root / "rec.json"
@@ -1625,7 +1681,7 @@ class KillSets(unittest.TestCase):
                             {"files": [b, a]}, {"files": [b, a], "from": ""}, {"from": "x"}, {}, [b, a], None):
                     for argv in ([first, second], [first]):   # the bad entry's target runs second, or not at all
                         with self.subTest(bad=bad, argv=argv):
-                            table.write_text(json.dumps({first: good, second: bad}), encoding="utf-8")
+                            table.write_text(json.dumps({"orders": {first: good, second: bad}}), encoding="utf-8")
                             with self.assertRaises(SystemExit) as stop:
                                 m.main(["run", "--order", str(table), *argv])
                             why = (f"execution order {bad.get('files') if isinstance(bad, dict) else bad!r} is not the "
@@ -1633,7 +1689,14 @@ class KillSets(unittest.TestCase):
                             self.assertEqual(stop.exception.code, f"execution-order table refused, nothing ran: "
                                                                   f"{ {second: why} }")
                             self.assertEqual((calls, record.read_text(encoding="utf-8")), ([], kept))
-                table.write_text(json.dumps({first: good, second: {**good, "files": [a, b]}}), encoding="utf-8")
+                for text in (json.dumps({first: good}), "[]", "{", json.dumps({"orders": [good]})):   # no `orders` object
+                    with self.subTest(table=text), self.assertRaisesRegex(SystemExit, "^execution-order table refused, nothing ran: "):
+                        table.write_text(text, encoding="utf-8")
+                        m.main(["run", "--order", str(table), first])
+                with self.assertRaisesRegex(SystemExit, "^execution-order table refused, nothing ran: .*gone.json"):
+                    m.main(["run", "--order", str(table.with_name("gone.json")), first])   # no such file
+                self.assertEqual((calls, record.read_text(encoding="utf-8")), ([], kept))
+                table.write_text(json.dumps({"orders": {first: good, second: {**good, "files": [a, b]}}}), encoding="utf-8")
                 m.main(["run", "--order", str(table), first])   # every entry valid: it runs
                 self.assertEqual(calls, [first])
 
@@ -1651,7 +1714,8 @@ class KillSets(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             root = toy(pathlib.Path(d), POSITIVE, {})
             table = pathlib.Path(d) / "order.json"
-            table.write_text(json.dumps({"aisef2/toy.py::positive": {"files": [b, a], "from": "x"}}), encoding="utf-8")
+            table.write_text(json.dumps({"orders": {"aisef2/toy.py::positive": {"files": [b, a], "from": FROM}}}),
+                             encoding="utf-8")
             with mock.patch.object(m, "ROOT", root), mock.patch.object(m, "RECORDS", {"TOY": "rec.json"}), \
                     mock.patch.object(m, "PHASE_TARGETS", {"TOY": targets}), mock.patch.object(m, "TARGETS", targets), \
                     mock.patch.object(m, "run_target", fake), mock.patch("builtins.print"):
@@ -1750,7 +1814,7 @@ class Order(unittest.TestCase):
         cls._tmp = tempfile.TemporaryDirectory()
         cls.root = toy(pathlib.Path(cls._tmp.name), ORDER_MODULE, ORDER_FILES)
         cls.orders = [cls.KILL[i:] + cls.KILL[:i] for i in range(len(cls.KILL))]
-        cls.table = [{"files": o, "from": f"the declared set, rotated to {o[0]} (this test)"} for o in cls.orders[1:]]
+        cls.table = [{"files": o, "from": FROM, **STAMP} for o in cls.orders[1:]]   # each rotation, as main records it
         with mock.patch.object(m, "TIMEOUT", 2):
             cls.runs = [m.run_target(cls.root, "aisef2/toy.py::f", order) for order in cls.orders]
             cls.reordered = [m.run_target(cls.root, "aisef2/toy.py::f", cls.KILL, order=o) for o in cls.table]
