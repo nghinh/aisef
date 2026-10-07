@@ -1,7 +1,15 @@
 """D4 evidence of need: on every recorded retry of a developer, what the journal knew at the retry's request that the
-retry feedback (aisef2/app/feedback.py retry_feedback: failure/observed events and the proof records before them, by
-construction) does not say — and what the retrying session went looking for on its own. Read-only over committed
+retry feedback did not say — and what the retrying session went looking for on its own. Read-only over committed
 evidence; no provider, no kernel run.
+
+Who built the retry text, and how it is known (each line of the table below carries the label):
+  smoke-2 (2.0.0)   aisef2/app/feedback.py retry_feedback of v2.0.0; EXPERIMENT: part 1 recomputes every developer
+                    prompt with that code and compares it with the prompt_sha256 the run recorded.
+  cycle-2 P10       the qualification harness, validation/qualification/c2_p9.py at each attempt's
+                    repository_execution_commit (its sha256 equals the one LEDGERLOCK-REGRESSION.json records); CODE, not
+                    recomputed: attempt 2 (1f992ba, :230-247) and attempt 3 (06ceb23, :422-439) tell each failure's code
+                    and clause only; attempt 4 (e49226b, :222-259, :480-490) the H-RETRY-001 retry_feedback — failures and
+                    the proof records before them. None of the three reads a proof that held or an admitted criterion.
 
     python3 -P validation/v21/context_gap.py            (from the repository root; prints the report)
 
@@ -14,11 +22,14 @@ Not told (journal facts before the retry's provider/request):
   changed_nothing   an earlier attempt's developer result "the developer changed nothing" (provider/result)
   parent_as_cand    an earlier attempt whose evaluated candidate IS its parent (story/begin.parent): the feedback calls it
                     "candidate <sha> ... REFUTED" without saying no change was made
-  held              criteria proved SATISFIED with the verifier agreeing at an earlier candidate (only failures are told)
+  held              criteria proved at an earlier candidate with the verdict the plan expects for them (the 2.0.0
+                    bundle, migrated: REFUTED for a MUST_NOT_HOLD contract) and the verifier agreeing — as
+                    feedback.context_pack counts it (only failures are told)
   never_proved      criteria of the story (story/admitted) with no proof in the earlier attempt (proving stops at a failure)
 
 Sought by the retrying session (tool calls whose input matches; a regex classifier, so counts are of matching calls):
-  prior_work  git naming an earlier candidate's sha, reflog/fsck, or a read of the story's earlier developer stream
+  prior_work  git naming an earlier candidate's sha (never a parent: a candidate that is its parent changed nothing),
+              reflog/fsck, or a read of the story's earlier developer stream
   journal     the run's journal (journals/ or JOURNAL)
   hidden      the kernel's probe scratch, the verifier's worktree, a probe request.json — proof material
   framework   AISEF's own sources or the bundle (site-packages/aisef, /aisef2/, inputs/project.json, the ai-sdlc checkout)
@@ -114,7 +125,16 @@ def calls(stream: pathlib.Path):
             yield json.dumps(((e.get("part") or {}).get("state") or {}).get("input") or {}, ensure_ascii=False)
 
 
-def retries(name: str, journal: pathlib.Path, sessions: pathlib.Path) -> list[dict]:
+def expectations() -> dict[str, str]:
+    """criterion -> the candidate expectation of its spec in the 2.0.0 bundle (migrated, V2-007; the same plan's criteria
+    as P10's journals)."""
+    sys.path.insert(0, str(ROOT))
+    from aisef2.app import bundle, bundle_cli
+    project = bundle.load(bundle_cli.migrate(json.loads(BUNDLE.read_text(encoding="utf-8")))[0])
+    return {o.criterion_id: project.specs[o.product_proof_spec_id].candidate_expectation.value for o in project.plan.obligations}
+
+
+def retries(name: str, journal: pathlib.Path, sessions: pathlib.Path, expect: dict[str, str]) -> list[dict]:
     evs = events(journal)
     rows, seen = [], {}
     for e in evs:
@@ -128,11 +148,13 @@ def retries(name: str, journal: pathlib.Path, sessions: pathlib.Path) -> list[di
         prior = attempts(evs, story, e["seq"])
         result = next((x["data"].get("detail") for x in evs if x["type"] == "provider/result" and x["seq"] > e["seq"]
                        and x["data"].get("story_id") == story), None)
-        cands = {a.get("candidate") for a in prior} - {None}
+        parents = {x["data"]["parent"] for x in evs if x["type"] == "story/begin" and x["seq"] < e["seq"]
+                   and x["data"].get("story_id") == story}
+        cands = {a.get("candidate") for a in prior} - {None} - parents
         row = {"run": name, "story": story, "developer_session": seen[story], "request_seq": e["seq"],
                "changed_nothing": [a["result"][0] for a in prior if a["result"] and a["result"][1].startswith(NOTHING)],
                "parent_as_cand": [a["begin"] for a in prior if a.get("candidate") == a["parent"]],
-               "held": sum(1 for a in prior for v in a["proofs"].values() if v[1] == "SATISFIED" and v[2]),
+               "held": sum(1 for a in prior for c, v in a["proofs"].items() if c in expect and v[1] == expect[c] and v[2]),
                "never_proved": sum(len(set(a["criteria"]) - set(a["proofs"])) for a in prior),
                "outcome": result}
         stream = sessions / f"{story}.developer.{seen[story]}.jsonl"
@@ -184,8 +206,11 @@ def main() -> None:
         print(f"   {story} attempt {n} (request seq {seq}): {'EQUAL' if equal else 'DIFFERENT'}")
     print("   the retry text of STORY-04-02 attempt 3, as told:")
     print("\n".join("   | " + ln for ln in told[-1][4].strip().splitlines()))
-    print("\n2. Every recorded V2 retry with a journal\n")
-    rows = [r for run in RUNS for r in retries(*run)]
+    print("\n2. Every recorded V2 retry with a journal (who built the retry text: smoke-2 the v2.0.0 retry_feedback, "
+          "EXPERIMENT, part 1; cycle-2 P10 validation/qualification/c2_p9.py at each attempt's execution commit, CODE, "
+          "not recomputed: the module docstring)\n")
+    expect = expectations()
+    rows = [r for run in RUNS for r in retries(*run, expect)]
     print(f"{'run':24} {'story':12} s# {'req':>5}  nothing parent held unproved | calls prior journal hidden fw | outcome")
     for r in rows:
         s = r.get("sought") or {}

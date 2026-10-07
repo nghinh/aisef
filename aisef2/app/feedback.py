@@ -8,10 +8,10 @@
   verdict against the expectation, the verifier's agreement, the typed failure and owner, the journal seqs. A pure
   function of the journal: prompt text, never journaled, never read by the kernel.
 * `context_pack` (V2.1 D4, docs/v2.1/CONTEXT-PACK.md): on a retry, what the journal also records about the story's
-  earlier attempts — each one's parent, its developer result, its candidate or that the parent itself was proved (it
-  changed nothing), the criteria that held there and those never proved there — each line citing its journal seqs. Read
-  from the controller's own records only, bounded, the run's secrets replaced; context, never authority:
-  no verdict, approval or budget reads it.
+  earlier attempts, the latest first — each one's parent, its developer result, its candidate or that the parent itself
+  was proved (it changed nothing), the criteria that held there and those with no proof recorded there — each line
+  citing its journal seqs. Read from the controller's own records only, bounded, the run's secrets replaced; context,
+  never authority: no verdict, approval or budget reads it.
 """
 
 from __future__ import annotations
@@ -108,9 +108,11 @@ def context_pack(events, story_id: str, project: Project, secrets=()) -> str:
     """The earlier attempts of `story_id` from journal events `(seq, type, data)` (module docstring); "" when none ended.
     It reads only the controller's own records of an attempt — story/begin, story/admitted, the DEVELOPER
     provider/request and its provider/result, proof/verified (candidate, criterion, verdict, agreement), story/end —
-    never a probe, tool, gate or test record nor a session stream: no stimulus, oracle internal or agent text."""
+    never a probe, tool, gate or test record nor a session stream: no stimulus, oracle internal or agent text.
+    Held = the verdict is the plan's expectation for that criterion (any story's: a committed story's PRESERVE is proved
+    here too) and the verifier agrees; a criterion the plan does not know is never held."""
     expect = {o.criterion_id: project.specs[o.product_proof_spec_id].candidate_expectation.value
-              for o in project.plan.obligations if o.story_id == story_id}
+              for o in project.plan.obligations}
 
     def redact(text: str) -> str:     # the one free text it carries: the run's secrets out, longest first (app/client.redact)
         for s in sorted({str(x) for x in secrets if x}, key=len, reverse=True):
@@ -134,7 +136,7 @@ def context_pack(events, story_id: str, project: Project, secrets=()) -> str:
             cur.setdefault("candidate", (seq, str(d.get("candidate"))))
             c = str(d.get("criterion_id"))
             if d.get("candidate") == cur["candidate"][1] and c not in cur["proofs"]:
-                cur["proofs"][c] = (seq, d.get("agreement") is True and d.get("verdict") == expect.get(c, "SATISFIED"))
+                cur["proofs"][c] = (seq, d.get("agreement") is True and c in expect and d.get("verdict") == expect[c])
         elif kind == "story/end":
             ended.append({**cur, "end": seq})
             cur = None
@@ -153,7 +155,7 @@ def context_pack(events, story_id: str, project: Project, secrets=()) -> str:
     if len(ended) > PACK_ATTEMPTS:
         lines.append(f"- {len(ended) - PACK_ATTEMPTS} earlier attempt(s) not shown (journal seq {ended[0]['seq']}–"
                      f"{ended[-PACK_ATTEMPTS - 1]['end']})")
-    for n, a in list(enumerate(ended, 1))[-PACK_ATTEMPTS:]:
+    for n, a in reversed(list(enumerate(ended, 1))[-PACK_ATTEMPTS:]):    # the latest first: the bound cuts the oldest
         r, c = a.get("result"), a.get("candidate")
         line = f"- attempt {n}: parent {a['parent'][:12]} (journal seq {a['seq']}); " + (
             f"developer result: {r[1]} (journal seq {r[0]})" if r else f"no developer result (journal seq {a['seq']}–{a['end']})")
@@ -169,8 +171,7 @@ def context_pack(events, story_id: str, project: Project, secrets=()) -> str:
         unproved = sorted(set(a["criteria"]) - set(a["proofs"]))
         if unproved:
             what, _ = named((k, 0) for k in unproved)
-            lines.append(f"  never proved at that revision (the attempt ended before their proof): {what} "
-                         f"(journal seq {a['seq']}–{a['end']})")
+            lines.append(f"  no proof recorded for them in that attempt: {what} (journal seq {a['seq']}–{a['end']})")
     text = "\n".join(lines)
     if len(text) > PACK_MAX:
         kept, size = [], 0

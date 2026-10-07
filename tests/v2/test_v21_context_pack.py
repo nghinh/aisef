@@ -6,6 +6,7 @@ the recorded 2.0.0 smoke-2 journal and carried through `aisef run` end to end. O
 from __future__ import annotations
 
 import copy
+import functools
 import json
 import os
 import pathlib
@@ -58,6 +59,23 @@ def attempt(begin: int, *, parent=P, candidate=C, detail="opencode exit 0, 3 tur
     return out
 
 
+def widened(project, criteria):
+    """`project` whose plan also knows `criteria` as S1's, each on C-ADD's spec (expectation SATISFIED): a criterion the
+    plan does not know is never held, so the shape tests name criteria the plan has."""
+    spec = next(o.product_proof_spec_id for o in project.plan.obligations if o.criterion_id == "C-ADD")
+    extra = tuple(types.SimpleNamespace(criterion_id=c, story_id="S1", product_proof_spec_id=spec) for c in criteria)
+    return types.SimpleNamespace(plan=types.SimpleNamespace(obligations=(*project.plan.obligations, *extra)),
+                                 specs=project.specs, facts=project.facts)
+
+
+@functools.lru_cache(maxsize=1)
+def ledgerlock():
+    """The 2.0.0 release's LedgerLock bundle (closure-evidence, read only), migrated in memory (V2-007): its plan holds a
+    MUST_NOT_HOLD criterion, S-3.4-a of STORY-03-01, whose candidate expectation is REFUTED."""
+    raw = json.loads((ROOT / "closure-evidence/v2/release/LEDGERLOCK-PROJECT.json").read_text(encoding="utf-8"))
+    return bundle.load(bundle_cli.migrate(raw)[0])
+
+
 class Fixture(unittest.TestCase):
     def setUp(self) -> None:
         self.project = bundle.load(e2e.project_bundle("a" * 40))
@@ -67,6 +85,12 @@ class Fixture(unittest.TestCase):
 
 
 class Pack(Fixture):
+    def setUp(self) -> None:
+        super().setUp()
+        self.project = widened(self.project, ("C-OTHER", "C-X", "C-Y", "C-Z", "C-B", "C-POST",
+                                              *(f"C-{i:03d}" for i in range(200)),
+                                              *(f"C-CRITERION-{i:03d}" for i in range(40))))
+
     def test_nothing_ended_means_no_pack(self):
         self.assertEqual(self.pack([]), "")
         self.assertEqual(self.pack([(1, "story/begin", {"story_id": "S1", "parent": P})]), "")
@@ -81,7 +105,7 @@ class Pack(Fixture):
         self.assertIn(f"- this attempt starts again at the parent {P[:12]} (journal seq 50)", text)
         self.assertIn(f"- attempt 1: parent {P[:12]} (journal seq 10); developer result: opencode exit 0, 3 turns "
                       f"(journal seq 13); candidate {C[:12]} (journal seq 14)", text)
-        self.assertIn("never proved at that revision (the attempt ended before their proof): C-OTHER (journal seq 10–", text)
+        self.assertIn("no proof recorded for them in that attempt: C-OTHER (journal seq 10–", text)
         self.assertIn("developer result: the developer changed nothing (exit None, timed out False) (journal seq 33); the "
                       "revision proved was the parent itself — that attempt changed nothing (journal seq 35)", text)
         self.assertIn("held at that revision, the verifier agreeing: C-ADD (1.1) (journal seq 35)", text)
@@ -90,7 +114,11 @@ class Pack(Fixture):
         ev = attempt(10, refuted=("C-ADD",), held=("C-X",), criteria=("C-ADD", "C-X", "C-Y")) + attempt(40, candidate=P)
         ev.append((70, "story/begin", {"story_id": "S1", "parent": P}))
         by_seq = {s: (k, d) for s, k, d in ev}
-        for line in self.pack(ev).splitlines()[1:]:
+        expect = {o.criterion_id: self.project.specs[o.product_proof_spec_id].candidate_expectation.value
+                  for o in self.project.plan.obligations}
+        lines = self.pack(ev).splitlines()[1:]
+        self.assertTrue(any("held at that revision" in ln for ln in lines))
+        for line in lines:
             with self.subTest(line=line):
                 cites = CITED.findall(line)
                 self.assertTrue(cites, line)
@@ -101,15 +129,17 @@ class Pack(Fixture):
                         self.assertIn(s, by_seq)
                         self.assertEqual(by_seq[s][1].get("story_id"), "S1")
                 if "held" in line:
-                    self.assertTrue(all(by_seq[int(s)][0] == "proof/verified" and by_seq[int(s)][1]["verdict"] == "SATISFIED"
-                                        for s in CITED.findall(line)[0].split(", ")))
+                    for s in CITED.findall(line)[0].split(", "):
+                        kind, d = by_seq[int(s)]
+                        self.assertEqual((kind, d["agreement"], d["verdict"]),
+                                         ("proof/verified", True, expect[d["criterion_id"]]))
 
     def test_only_the_attempt_s_candidate_counts_and_its_first_proof_of_a_criterion(self):
         merged = (("proof/verified", {"candidate": "m" * 40, "criterion_id": "C-POST", "verdict": "SATISFIED", "agreement": True}),
                   ("proof/verified", {"candidate": C, "criterion_id": "C-ADD", "verdict": "REFUTED", "agreement": True}))
         text = self.pack(attempt(10, criteria=("C-ADD", "C-POST"), extra=merged))
         self.assertIn("held at that revision, the verifier agreeing: C-ADD (1.1) (journal seq 15)", text)
-        self.assertIn("never proved at that revision (the attempt ended before their proof): C-POST (journal seq", text)
+        self.assertIn("no proof recorded for them in that attempt: C-POST (journal seq", text)
         self.assertNotIn("m" * 12, text)
         disagreed = attempt(10, held=(), extra=(("proof/verified", {"candidate": C, "criterion_id": "C-ADD",
                                                                     "verdict": "SATISFIED", "agreement": False}),))
@@ -135,7 +165,8 @@ class Pack(Fixture):
         self.assertNotIn("C-012", text)
         long = self.pack(attempt(1, detail="x" * 5000, held=many, criteria=many))
         self.assertLessEqual(len(long), feedback.PACK_MAX)
-        self.assertIn("x" * 300 + " (journal seq 4)", long)     # one long result cannot crowd out the rest
+        self.assertIn("developer result: " + "x" * 300 + " (journal seq 4)", long)     # cut at exactly 300
+        self.assertNotIn("x" * 301, long)
         self.assertIn("held at that revision", long)
         narrow = mock.patch.multiple(feedback, PACK_MAX=300)
         with narrow:
@@ -143,6 +174,33 @@ class Pack(Fixture):
         self.assertLessEqual(len(cut), 300)
         self.assertTrue(cut.startswith(feedback.PACK_HEAD + "\n") and cut.endswith(
             "[the context pack stops here: bounded at 300 characters]"), cut)     # whole lines kept, then the mark
+
+    def test_at_the_real_bound_the_latest_attempts_are_kept_and_the_oldest_cut(self):
+        many = tuple(f"C-CRITERION-{i:03d}" for i in range(40))
+        ev = [e for n in range(4) for e in attempt(100 * n, detail=f"developer outage: attempt {n + 1} " + "y" * 400,
+                                                    held=many[:20], criteria=many)]
+        ev.append((900, "story/begin", {"story_id": "S1", "parent": P}))
+        text = self.pack(ev)
+        self.assertLessEqual(len(text), feedback.PACK_MAX)
+        self.assertTrue(text.endswith(f"[the context pack stops here: bounded at {feedback.PACK_MAX} characters]"), text)
+        shown = [int(n) for n in re.findall(r"^- attempt (\d+):", text, re.M)]
+        self.assertEqual(shown, sorted(shown, reverse=True))
+        self.assertEqual(shown[0], 4)                 # the attempt right before this one survives the bound, whole
+        latest = text.split("\n- attempt 4:", 1)[1].split("\n- attempt 3:", 1)[0]
+        self.assertIn("\n  held at that revision", latest)
+        self.assertIn("\n  no proof recorded for them in that attempt", latest)
+        self.assertNotIn("no proof recorded", text.split("\n- attempt 1:", 1)[1])     # the cut falls on the oldest
+
+    def test_no_proof_recorded_is_all_it_says_when_the_attempt_ended_at_a_criterion_s_probes(self):
+        records = (("probe/evaluated", {"criterion_id": "C-ADD", "record": {}}),) * 2
+        for code in ("PROBE_MISMATCH", "PROBE_INVALID_SPEC"):
+            with self.subTest(code=code):
+                ev = attempt(10, held=(), extra=(*records, ("failure/observed", {
+                    "code": code, "owner": "INFRASTRUCTURE", "detail": f"proof of C-ADD: {code}"})))
+                text = self.pack(ev)
+                self.assertIn("no proof recorded for them in that attempt: C-ADD (1.1) (journal seq 10–", text)
+                self.assertNotIn("revision", text.split("\n- attempt 1:", 1)[1])   # no candidate: no revision named
+                self.assertNotIn("before their proof", text)
 
     def test_it_never_holds_proof_material_another_story_or_the_run_s_secrets(self):
         secret = "sk-test-0123456789abcdef"
@@ -175,6 +233,35 @@ class Pack(Fixture):
         src = (ROOT / "aisef2/app/adapters.py").read_text(encoding="utf-8")
         self.assertEqual(src.count("context_pack("), 1)
         self.assertIn("feedback.context_pack(events, story_id, self.project", src.split("def implement", 1)[1].split("def ", 1)[0])
+
+
+class Expectation(unittest.TestCase):
+    """'Held' is the verdict the plan expects for that criterion with the verifier agreeing — REFUTED for a MUST_NOT_HOLD
+    contract — whichever story the criterion belongs to (a committed story's PRESERVE is proved at this candidate under
+    this story's id, story_runner V21-38); a criterion the plan does not know is never held."""
+
+    def pack_of(self, story, criterion, verdict, project=None):
+        ev = attempt(10, story=story, held=(), criteria=(criterion,), extra=(("proof/verified", {
+            "candidate": C, "criterion_id": criterion, "verdict": verdict, "agreement": True}),))
+        return feedback.context_pack(ev, story, project or ledgerlock())
+
+    def test_a_refuted_expectation_is_held_by_refuted_and_never_by_satisfied(self):
+        project = ledgerlock()
+        owner = next(o.story_id for o in project.plan.obligations if o.criterion_id == "S-3.4-a")
+        other = next(s for s in project.stories if s != owner)
+        self.assertEqual(project.specs[next(o.product_proof_spec_id for o in project.plan.obligations
+                                            if o.criterion_id == "S-3.4-a")].candidate_expectation.value, "REFUTED")
+        for story in (owner, other):
+            with self.subTest(story=story):
+                self.assertIn("held at that revision, the verifier agreeing: S-3.4-a (",
+                              self.pack_of(story, "S-3.4-a", "REFUTED"))
+                self.assertNotIn("held at that revision", self.pack_of(story, "S-3.4-a", "SATISFIED"))
+
+    def test_a_criterion_the_plan_does_not_know_is_never_held(self):
+        project = bundle.load(e2e.project_bundle("a" * 40))
+        self.assertIn("held at that revision", self.pack_of("S1", "C-ADD", "SATISFIED", project))
+        for verdict in ("SATISFIED", "REFUTED", None):
+            self.assertNotIn("held at that revision", self.pack_of("S1", "C-UNKNOWN", verdict, project))
 
 
 class Prompt(Fixture):
@@ -228,7 +315,7 @@ class RecordedSmoke2(unittest.TestCase):
 
     def test_the_pack_states_what_the_journal_knew_at_the_third_request(self):
         root = ROOT / "closure-evidence/v2/release"
-        project = bundle.load(bundle_cli.migrate(json.loads((root / "LEDGERLOCK-PROJECT.json").read_text(encoding="utf-8")))[0])
+        project = ledgerlock()
         lines = (root / "smoke-2/run-1/aisef-run.jsonl").read_text(encoding="utf-8").splitlines()
         ev = [(e["seq"], e["type"], e["data"]) for e in (json.loads(x)["event"] for x in lines if x.strip()) if e["seq"] < 1584]
         text = feedback.context_pack(ev, "STORY-04-02", project)
@@ -237,7 +324,7 @@ class RecordedSmoke2(unittest.TestCase):
                       "(journal seq 1363); candidate 9872144728a3 (journal seq 1371)", text)
         self.assertIn("developer result: the developer changed nothing (exit None, timed out False) (journal seq 1474); "
                       "the revision proved was the parent itself — that attempt changed nothing (journal seq 1482)", text)
-        self.assertIn("never proved at that revision (the attempt ended before their proof): S-9-e (R-9/3), S-9-f (R-9/5), "
+        self.assertIn("no proof recorded for them in that attempt: S-9-e (R-9/3), S-9-f (R-9/5), "
                       "S-D3-05-01-1 (R-3.3/2) (journal seq 1318–1428)", text)
         self.assertEqual(text.count("held at that revision"), 2)
         self.assertNotIn("PPS-", text)

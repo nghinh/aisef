@@ -49,4 +49,5 @@ A run --project cont.json --settings settings.json --repo run2/repo --parent run
 print "== continue run2 again"; A bundle continue approved2.json --from-run run2 --out cont-again.json
 print "== verify run3"; A run --verify --project cont.json --out run3 --expect-anchor "$(head -c 64 anchors/run3.anchor)"
 print "== run3 record"; $PY -c 'import json,sys; r=json.load(open(sys.argv[1])); print(json.dumps({k: r.get(k) for k in ("delivery_verdict","story_outcomes","continues","lineage_usage")}, indent=1)[:3000])' $I/run3/RUN.json
+print "== run1 context pack read-back (D4)"; $PY -P $HERE/readback.py $I; print "exit $?"
 pkill -f "$HERE/fakeprov.py port provider.log"
