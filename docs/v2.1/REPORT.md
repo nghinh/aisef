@@ -52,7 +52,7 @@ cao nhất có bằng chứng; mục ở M3/M4 đã qua M1–M2, trừ E1 và A9
 | D5 | tệp anchor an toàn (`--anchor-out`) | M4 | `AnchorThreatModel`; CLI thật: tệp 0444 | nơi giữ tin cậy (§4.3) |
 | E1 | harness thí nghiệm | M3 | `test_v21_experiment` (replay offline) | công cụ riêng, không thuộc đường sản phẩm |
 | E2 | chiến dịch đối chứng | **M6** | — | ngân sách chưa duyệt (B-09) |
-| F | cách ly Linux tối thiểu | **M6** | §6 | chưa có mã cách ly nào trên nhánh |
+| F | cách ly Linux tối thiểu (bwrap, opt-in) | **M4** ranh giới (harness độc lập) / M3 nối dây / **M6** lượt chạy có cách ly | M3: `test_v21_confine` (30 test: setting, argv, từ chối fail-closed của run/`--check`/phiên, từng phép kiểm của phép đo; đường thành công với phép đo **giả lập** và bwrap giả); M4: `validation/v21/sandbox` + [evidence/sandbox](evidence/sandbox/) trong container Linux thật qua docker, mỗi claim là một thao tác đã thử ([SANDBOX-LINUX.md](SANDBOX-LINUX.md)) | lượt `aisef run` thật có cách ly trên Linux: **M6**; mạng của phiên làm việc **không** được cách ly (lượt chạy chỉ dùng `network: host`; `none` chỉ để đo); nested bwrap chỉ chạy khi nới seccomp + systempaths của container (§6) |
 
 ## 3. Phạm vi chính xác của bảo đảm (thay câu "developer không còn sửa được kết quả kiểm tra")
 
@@ -181,12 +181,30 @@ sát — bị loại; công cụ giờ từ chối mọi đường ra trong repo
 
 ## 6. Giới hạn còn tồn tại
 
-- **Không có cách ly hệ điều hành** (§3). Cách ly Linux tối thiểu chưa làm; phản hồi của tôi bị hệ thống dừng hai lần khi
-  soạn phần này, nên không có mã nào trên nhánh. Đã đo môi trường (chưa phải bằng chứng cách ly): host macOS không có backend
-  nào; Docker Desktop (server linux/arm64) có Linux guest; trong container `python:3.14-slim-trixie@sha256:3353bb7e…`,
-  bwrap 0.12.0 chạy được với uid 1000 (user namespace, network namespace, `--tmp-overlay`) **chỉ khi** container được nới
-  `seccomp=unconfined`, `apparmor=unconfined`, `systempaths=unconfined` — tức nới chính ranh giới của container. Chưa có:
-  báo cáo user/mount/network/capability/socket và thao tác bị từ chối chứng minh ranh giới.
+- **Cách ly OS cho phiên model: có mã opt-in, đo bằng thao tác đã thử** ([SANDBOX-LINUX.md](SANDBOX-LINUX.md),
+  `aisef2/app/confine.py`, `validation/v21/sandbox`, đo ở `764dfa2`). Trong container `python:3.14-slim-trixie@sha256:3353bb7e…`
+  trên Docker Desktop (kernel guest `7.0.12-linuxkit`, không có AppArmor), bwrap 0.12.0 (uid 1000) **chỉ chạy khi**
+  container nới `seccomp=unconfined` **và** `systempaths=unconfined` (đo từng trục: X1 chạy; X2, P2, P3 không) — tức
+  nới chính ranh giới của container. Khi chạy, phép đo của kernel dùng đúng dòng lệnh của phiên (client + worktree của
+  `<out>/repo`): phiên chỉ **ghi** được workspace; **đọc** (chỉ đọc) hệ thống, thư mục của client, `<out>/repo/.git` (nằm
+  trong run directory: bản clone của lượt chạy), thư mục cấu hình client và `read_only` (hệ thống gồm cả `/usr`: interpreter
+  hay kernel cài dưới `/usr`, `/usr/local` đọc được); phiên reviewer **không ghi được gì** của host — checkout nó review
+  cũng bind chỉ đọc (ghi, `chmod` đều `Read-only file system`). Bị từ chối: đọc file khác của
+  run directory, verifier, `~/.ssh`, dữ liệu auth của client; ghi runtime, kernel, git dir (`Read-only file system`);
+  tạo user namespace mới; thấy tiến trình của container (PID namespace riêng); tiến trình `setsid` sống sau phiên
+  (tiến trình thấy lúc bwrap vừa trả về được nhìn lại tới 1 s, vì namespace PID có thể còn đang bị kernel dọn:
+  ở `764dfa2` 0/2000 lần đo báo nhầm, `teardown-race-*.json`; lần nhìn đầu thấy nó ở cả hai cấu hình — gộp bốn lượt
+  ở `3e0409c` và `764dfa2`: không socket 2/2000, có socket 8/2000, không kết luận khác biệt; tiến trình ngủ của probe
+  sống 120 s, quá giới hạn 60 s của probe cộng 1 s đó, nên một survivor thật không thể tự hết giờ trước lần nhìn cuối).
+  Capability = 0, NoNewPrivs = 1 (đọc từ `/proc`). Ghi anchor/run-dir **thành công vào tmpfs riêng** của sandbox, file
+  thật không đổi — không phải "bị từ chối". **Mạng**: `network: none` cắt mạng nhưng phiên cũng không tới được provider
+  — chỉ để đo, settings từ chối cho lượt chạy; `host` (lượt chạy dùng) thì egress **không** bị cách ly và abstract unix
+  socket của netns dùng chung; chưa có egress allowlist. Khi xin cách ly mà không cấp được thì run/`--check`/phiên
+  **từ chối trước request provider** (fail-closed); không dùng chung với `review.finder: ocr` (OCR gọi mô hình ngoài
+  phiên của client). **Chưa**: lượt `aisef run` thật có cách ly trên Linux; không coi nested-bwrap thay cho profile
+  container (khuyến nghị F giữ nguyên). Kernel đổi (`aisef2/`): cần mutation + tái thẩm định ngoài snapshot hiện tại —
+  `confine.py` **chưa** là mutation target (cần thêm mục vào `validation/v2/mutation.py`); so với
+  REQUALIFICATION-MANIFEST, 5 target V2.1 dịch (+68 mutant).
 - Không có lượt live nào: hiệu quả, chất lượng finding, chi phí thật — không biết.
 - Anchor chỉ có nghĩa khi bản tin cậy nằm ngoài tầm ghi của developer; hiện chưa có nơi đó.
 - Tiến trình con tách session thoát việc dọn dẹp.
@@ -209,5 +227,5 @@ sát — bị loại; công cụ giờ từ chối mọi đường ra trong repo
 | B-08 | K-NOWORK-001: story không đổi gì vẫn một lượt review | giữ / bỏ | giữ (OCR khoảng rỗng tốn 0 token) — [hồ sơ](decisions/B-08-K-NOWORK-001-REVIEW.md) |
 | B-09 | ngân sách E2 (đề nghị 140 USD) | duyệt / giảm / không | canary nhỏ trước chiến dịch — [hồ sơ](decisions/B-09-CANARY-THEN-CAMPAIGN.md) |
 | B-10 | nơi đăng tài liệu công khai | A README tự chứa / B repo docs công khai / C host khác / D public repo | A — [hồ sơ](decisions/B-10-PUBLIC-DOCS.md) |
-| F | ranh giới cách ly Linux | (a) container là ranh giới (`--network none`, cap-drop, mount chỉ đọc, user không root), không bwrap lồng; (b) bwrap trong container đã nới seccomp/apparmor; (c) máy/VM Linux riêng | (a), **chưa đo**: không phải nới ranh giới của container; (c) khi cần chạy song song |
+| F | ranh giới cách ly Linux | (a) container là ranh giới (cap-drop, mount chỉ đọc, user không root, giữ seccomp; mạng chỉ tới provider qua egress allowlist — `--network none` thì phiên không tới được provider), không bwrap lồng; (b) bwrap trong container đã nới seccomp + systempaths (đo: X1, [SANDBOX-LINUX §3](SANDBOX-LINUX.md)); (c) máy/VM Linux riêng | (a), **chưa đo**: không phải nới ranh giới của container; (c) khi cần chạy song song |
 | — | nơi giữ anchor tin cậy | commit đã ký / kho append-only / máy khác | commit đã ký trong repo riêng của người vận hành |

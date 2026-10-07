@@ -8,6 +8,8 @@
                        test code writes into its own interpreter's tree (a `.pth`, the interpreter) reaches no proof
     <out>/preflight    the provider preflight's ledger and observation
     <out>/sessions     one event stream per model session
+    <out>/confinement  V2.1 (F), when the settings ask for it: the measurement's canary (its report is RUN.json's
+                       `confinement`; its workspace, a worktree of <out>/repo, is removed after it)
     <out>/RUN.started.json  V2.1: the run's identities written once before anything runs (format, bundle and kernel
                        digests, plan hash, the settings' digest, the lineage) — so a run the operating system killed (no
                        `finally` runs on SIGKILL) still says what it was; never rewritten
@@ -41,7 +43,7 @@ import tempfile
 import time
 
 from aisef2.app import adapters as ad
-from aisef2.app import client, lineage, preflight, usage
+from aisef2.app import client, confine, lineage, preflight, usage
 from aisef2.app.bundle import Project
 from aisef2.app.settings import Settings
 from aisef2.arch.enums import Enforcement
@@ -106,6 +108,11 @@ def admit(project: Project, cals: tuple) -> dict:
 #: B4 holds only on a git that takes command-scope settings (GIT_CONFIG_COUNT, 2.31) and lists scopes (2.26): an older one
 #: would run with the repository's own configuration in force
 MIN_GIT = (2, 31)
+
+
+def client_on_path(settings: Settings) -> str | None:
+    """The client on exactly the PATH the run gives it: none given, nothing found (never the os.defpath fallback)."""
+    return shutil.which("opencode", path=client.environment(settings.client_env, {}).get("PATH", ""))
 
 
 def check_git() -> None:
@@ -384,9 +391,13 @@ def execute(project: Project, settings: Settings, source: pathlib.Path, out: pat
             raise RunRefused(f"the plan is not admitted (RFC §12): {rec['admission']['failed']}")
         rec["stage"] = "test interpreter"
         python = probe_interpreter(out / "test-python")
+        exe = client_exe or client_on_path(settings)
+        if settings.confinement is not None:    # V2.1 (F): measured before the first provider request, never assumed —
+            rec["stage"] = "confinement"        # with the sessions' client and a worktree of the run's repository
+            rec["confinement"] = confine.measure(settings.confinement, out / "confinement", exe, repo)
+            if rec["confinement"]["problems"]:
+                raise RunRefused("confinement was asked for and is not provided: " + "; ".join(rec["confinement"]["problems"]))
         rec["stage"] = "preflight"
-        # exactly the PATH the run gives the client: none given, nothing found (never the os.defpath fallback)
-        exe = client_exe or shutil.which("opencode", path=client.environment(settings.client_env, {}).get("PATH", ""))
         if not exe:
             raise RunRefused("the client (opencode) is not on the PATH the run gives it")
         # the client's own configuration decides where its sessions go: it must be the endpoint the preflight attests
@@ -420,9 +431,12 @@ def execute(project: Project, settings: Settings, source: pathlib.Path, out: pat
               "env": client.environment(settings.client_env, client.overlay(settings.route, settings.model_limit)),
               "budget": budget, "turn_cap": settings.max_turns_per_session, "exe": exe,
               # the operator's values the client receives, and the provider key: never left in a session's evidence
-              "secrets": tuple(v for v in (*(os.environ.get(n, "") for n in settings.client_env), key) if len(v) >= 8)}
+              "secrets": tuple(v for v in (*(os.environ.get(n, "") for n in settings.client_env), key) if len(v) >= 8),
+              **({"confine": settings.confinement} if settings.confinement is not None else {})}
         developer = ad.Developer(run, project, logs, kw, settings.timeouts_s["developer"])
-        reviewer = ad.Reviewer(run, project, logs, kw, settings.timeouts_s["reviewer"], review=settings.review,
+        # V2.1 (F): confined, the model reviewer's checkout is bound read-only — it writes nothing of the host
+        rkw = {**kw, "workspace_writable": False} if settings.confinement is not None else kw
+        reviewer = ad.Reviewer(run, project, logs, rkw, settings.timeouts_s["reviewer"], review=settings.review,
                                probe_timeout_s=settings.timeouts_s["probe"], interpreter=sys.executable,
                                route={"url": settings.endpoint, "token": key, "model": settings.model,
                                       "env": {k: v for k, v in client.environment(settings.client_env, {}).items()

@@ -1,0 +1,3 @@
+FROM python:3.14-slim-trixie@sha256:3353bb7e9ae99c7cce6cad2b2f2b174e8f22813ac43e3b13e7a742627d2b01d8
+RUN apt-get update && apt-get install -y --no-install-recommends bubblewrap git libcap2-bin util-linux \
+ && rm -rf /var/lib/apt/lists/* && useradd -m -u 1000 op

@@ -1,0 +1,425 @@
+{
+ "after": {
+  "container_sleeper_seen_outside": true,
+  "measure_pid_outside": 1,
+  "reviewed_checkout_listing_unchanged": true,
+  "unchanged": {
+   "/tmp/aisef/run-dir/EVIDENCE.anchor": true,
+   "/tmp/aisef/run-dir/repo/.git/HEAD": true,
+   "/tmp/aisef/run-dir/work/ws/verifier-wt-S1/candidate.py": true,
+   "/tmp/aisef/runtime/opencode": true,
+   "/tmp/aisef/verifier/hidden.json": true
+  },
+  "written_in_client_directory": false,
+  "written_in_kernel": false,
+  "written_in_run_directory": false
+ },
+ "by_design": {
+  "connect_read_only_mounted_unix_socket": {
+   "exit": 1,
+   "out": "bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user namespaces. See <https://deb.li/bubblewrap> or <file:///usr/share/doc/bubblewrap/README.Debian.gz>.",
+   "started": true
+  },
+  "git_status_in_workspace": {
+   "exit": 1,
+   "out": "bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user namespaces. See <https://deb.li/bubblewrap> or <file:///usr/share/doc/bubblewrap/README.Debian.gz>.",
+   "started": true
+  },
+  "home_listing": {
+   "exit": 1,
+   "out": "bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user namespaces. See <https://deb.li/bubblewrap> or <file:///usr/share/doc/bubblewrap/README.Debian.gz>.",
+   "started": true
+  },
+  "measure_with_a_read_only_mounted_socket": [
+   "the sandbox did not run the probe (exit 1): bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user namespaces. See <https://deb.li/bubblewrap> or <file:///usr/share/doc/bubblewrap/README.Debian.gz>."
+  ],
+  "read_client_configuration": {
+   "exit": 1,
+   "out": "bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user namespaces. See <https://deb.li/bubblewrap> or <file:///usr/share/doc/bubblewrap/README.Debian.gz>.",
+   "started": true
+  },
+  "read_git_directory": {
+   "exit": 1,
+   "out": "bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user namespaces. See <https://deb.li/bubblewrap> or <file:///usr/share/doc/bubblewrap/README.Debian.gz>.",
+   "started": true
+  },
+  "reviewer_reads_reviewed_checkout": {
+   "exit": 1,
+   "out": "bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user namespaces. See <https://deb.li/bubblewrap> or <file:///usr/share/doc/bubblewrap/README.Debian.gz>.",
+   "started": true
+  }
+ },
+ "container": {
+  "APPARMOR": "default",
+  "PROFILE": "X2-systempaths",
+  "SECCOMP": "default",
+  "SYSTEMPATHS": "unconfined"
+ },
+ "controls": {
+  "client_runs_from_its_mounted_directory": {
+   "exit": 1,
+   "out": "bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user namespaces. See <https://deb.li/bubblewrap> or <file:///usr/share/doc/bubblewrap/README.Debian.gz>.",
+   "started": true
+  },
+  "workspace_writable": {
+   "exit": 1,
+   "out": "bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user namespaces. See <https://deb.li/bubblewrap> or <file:///usr/share/doc/bubblewrap/README.Debian.gz>.",
+   "started": true
+  }
+ },
+ "denials": {
+  "connect_unmounted_unix_socket": {
+   "exit": 1,
+   "out": "bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user namespaces. See <https://deb.li/bubblewrap> or <file:///usr/share/doc/bubblewrap/README.Debian.gz>.",
+   "started": true
+  },
+  "new_user_namespace": {
+   "exit": 1,
+   "out": "bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user namespaces. See <https://deb.li/bubblewrap> or <file:///usr/share/doc/bubblewrap/README.Debian.gz>.",
+   "started": true
+  },
+  "read_client_auth_data": {
+   "exit": 1,
+   "out": "bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user namespaces. See <https://deb.li/bubblewrap> or <file:///usr/share/doc/bubblewrap/README.Debian.gz>.",
+   "started": true
+  },
+  "read_home_ssh_key": {
+   "exit": 1,
+   "out": "bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user namespaces. See <https://deb.li/bubblewrap> or <file:///usr/share/doc/bubblewrap/README.Debian.gz>.",
+   "started": true
+  },
+  "read_run_directory_file": {
+   "exit": 1,
+   "out": "bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user namespaces. See <https://deb.li/bubblewrap> or <file:///usr/share/doc/bubblewrap/README.Debian.gz>.",
+   "started": true
+  },
+  "read_verifier": {
+   "exit": 1,
+   "out": "bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user namespaces. See <https://deb.li/bubblewrap> or <file:///usr/share/doc/bubblewrap/README.Debian.gz>.",
+   "started": true
+  },
+  "reviewer_chmod_reviewed_checkout": {
+   "exit": 1,
+   "out": "bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user namespaces. See <https://deb.li/bubblewrap> or <file:///usr/share/doc/bubblewrap/README.Debian.gz>.",
+   "started": true
+  },
+  "reviewer_write_reviewed_checkout": {
+   "exit": 1,
+   "out": "bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user namespaces. See <https://deb.li/bubblewrap> or <file:///usr/share/doc/bubblewrap/README.Debian.gz>.",
+   "started": true
+  },
+  "see_container_process": {
+   "exit": 1,
+   "out": "bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user namespaces. See <https://deb.li/bubblewrap> or <file:///usr/share/doc/bubblewrap/README.Debian.gz>.",
+   "started": true
+  },
+  "write_client_directory": {
+   "exit": 1,
+   "out": "bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user namespaces. See <https://deb.li/bubblewrap> or <file:///usr/share/doc/bubblewrap/README.Debian.gz>.",
+   "started": true
+  },
+  "write_git_directory": {
+   "exit": 1,
+   "out": "bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user namespaces. See <https://deb.li/bubblewrap> or <file:///usr/share/doc/bubblewrap/README.Debian.gz>.",
+   "started": true
+  },
+  "write_kernel": {
+   "exit": 1,
+   "out": "bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user namespaces. See <https://deb.li/bubblewrap> or <file:///usr/share/doc/bubblewrap/README.Debian.gz>.",
+   "started": true
+  },
+  "write_runtime": {
+   "exit": 1,
+   "out": "bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user namespaces. See <https://deb.li/bubblewrap> or <file:///usr/share/doc/bubblewrap/README.Debian.gz>.",
+   "started": true
+  },
+  "write_verifier": {
+   "exit": 1,
+   "out": "bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user namespaces. See <https://deb.li/bubblewrap> or <file:///usr/share/doc/bubblewrap/README.Debian.gz>.",
+   "started": true
+  }
+ },
+ "guest": {
+  "apparmor_in_kernel": false,
+  "max_user_namespaces": "31880",
+  "uname": "Linux 7.0.12-linuxkit aarch64"
+ },
+ "measure": {
+  "argv": [
+   "/usr/bin/bwrap",
+   "--unshare-user",
+   "--unshare-pid",
+   "--unshare-ipc",
+   "--unshare-uts",
+   "--unshare-cgroup-try",
+   "--unshare-net",
+   "--disable-userns",
+   "--die-with-parent",
+   "--new-session",
+   "--cap-drop",
+   "ALL",
+   "--ro-bind",
+   "/usr",
+   "/usr",
+   "--ro-bind",
+   "/etc",
+   "/etc",
+   "--symlink",
+   "usr/bin",
+   "/bin",
+   "--symlink",
+   "usr/sbin",
+   "/sbin",
+   "--symlink",
+   "usr/lib",
+   "/lib",
+   "--proc",
+   "/proc",
+   "--dev",
+   "/dev",
+   "--tmpfs",
+   "/tmp",
+   "--tmpfs",
+   "/aisef-home",
+   "--ro-bind",
+   "/tmp/aisef/runtime",
+   "/tmp/aisef/runtime",
+   "--ro-bind",
+   "/tmp/aisef/run-dir/repo/.git",
+   "/tmp/aisef/run-dir/repo/.git",
+   "--ro-bind",
+   "/tmp/aisef/op-home/.config/opencode",
+   "/tmp/aisef/op-home/.config/opencode",
+   "--ro-bind",
+   "/tmp/aisef/venv",
+   "/tmp/aisef/venv",
+   "--bind",
+   "/tmp/aisef/run-dir/confinement/ws",
+   "/tmp/aisef/run-dir/confinement/ws",
+   "--chdir",
+   "/tmp/aisef/run-dir/confinement/ws",
+   "--",
+   "/bin/sh",
+   "-c",
+   "<PROBE>",
+   "probe"
+  ],
+  "backend": "bwrap",
+  "bwrap": "/usr/bin/bwrap",
+  "bwrap_sha256": "b3b829e18a7d43ee589dc37e351cb9480ff7301b493d8227b8c754294638b976",
+  "bwrap_version": "bubblewrap 0.12.0",
+  "client": "/tmp/aisef/runtime/opencode",
+  "created_outside_workspace": {
+   "client_directory": false,
+   "git_directory": false,
+   "interpreter_site": false,
+   "kernel": false,
+   "run_directory": false
+  },
+  "inside": {
+   "capabilities": {
+    "CapAmb": null,
+    "CapBnd": null,
+    "CapEff": null,
+    "CapInh": null,
+    "CapPrm": null
+   },
+   "home_listing": [],
+   "mount_targets": [
+    "/usr",
+    "/etc",
+    "/proc",
+    "/dev",
+    "/tmp",
+    "/aisef-home",
+    "/tmp/aisef/runtime",
+    "/tmp/aisef/run-dir/repo/.git",
+    "/tmp/aisef/op-home/.config/opencode",
+    "/tmp/aisef/venv",
+    "/tmp/aisef/run-dir/confinement/ws"
+   ],
+   "mounts": [],
+   "namespaces": {},
+   "network_interfaces": [],
+   "no_new_privs": null,
+   "routed_interfaces": [],
+   "seccomp": null,
+   "uid": null,
+   "unix_sockets": null
+  },
+  "network": "none",
+  "operator_can": {
+   "write_client_directory": true,
+   "write_git_directory": true,
+   "write_interpreter_site": true,
+   "write_kernel": true,
+   "write_run_directory": true
+  },
+  "operator_uid": 1000,
+  "problems": [
+   "the sandbox did not run the probe (exit 1): bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user namespaces. See <https://deb.li/bubblewrap> or <file:///usr/share/doc/bubblewrap/README.Debian.gz>."
+  ],
+  "read_only": [
+   "/tmp/aisef/venv"
+  ],
+  "setsid_survivors": [],
+  "system": "linux",
+  "tried": {}
+ },
+ "network": {
+  "connect_abstract_unix_socket": {
+   "exit": 1,
+   "out": "bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user namespaces. See <https://deb.li/bubblewrap> or <file:///usr/share/doc/bubblewrap/README.Debian.gz>.",
+   "started": true
+  },
+  "connect_host_port": {
+   "exit": 1,
+   "out": "bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user namespaces. See <https://deb.li/bubblewrap> or <file:///usr/share/doc/bubblewrap/README.Debian.gz>.",
+   "started": true
+  }
+ },
+ "observed": {
+  "capabilities": {
+   "exit": 1,
+   "out": "bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user namespaces. See <https://deb.li/bubblewrap> or <file:///usr/share/doc/bubblewrap/README.Debian.gz>.",
+   "started": true
+  }
+ },
+ "reviewer_session_argv": [
+  "/usr/bin/bwrap",
+  "--unshare-user",
+  "--unshare-pid",
+  "--unshare-ipc",
+  "--unshare-uts",
+  "--unshare-cgroup-try",
+  "--unshare-net",
+  "--disable-userns",
+  "--die-with-parent",
+  "--new-session",
+  "--cap-drop",
+  "ALL",
+  "--ro-bind",
+  "/usr",
+  "/usr",
+  "--ro-bind",
+  "/etc",
+  "/etc",
+  "--symlink",
+  "usr/bin",
+  "/bin",
+  "--symlink",
+  "usr/sbin",
+  "/sbin",
+  "--symlink",
+  "usr/lib",
+  "/lib",
+  "--proc",
+  "/proc",
+  "--dev",
+  "/dev",
+  "--tmpfs",
+  "/tmp",
+  "--tmpfs",
+  "/aisef-home",
+  "--ro-bind",
+  "/tmp/aisef/runtime",
+  "/tmp/aisef/runtime",
+  "--ro-bind",
+  "/tmp/aisef/run-dir/repo/.git",
+  "/tmp/aisef/run-dir/repo/.git",
+  "--ro-bind",
+  "/tmp/aisef/op-home/.config/opencode",
+  "/tmp/aisef/op-home/.config/opencode",
+  "--ro-bind",
+  "/tmp/aisef/venv",
+  "/tmp/aisef/venv",
+  "--ro-bind",
+  "/tmp/aisef/run-dir/work/ws/verifier-wt-S1",
+  "/tmp/aisef/run-dir/work/ws/verifier-wt-S1",
+  "--chdir",
+  "/tmp/aisef/run-dir/work/ws/verifier-wt-S1",
+  "--",
+  "/tmp/aisef/runtime/opencode",
+  "run",
+  "<prompt>"
+ ],
+ "session_argv": [
+  "/usr/bin/bwrap",
+  "--unshare-user",
+  "--unshare-pid",
+  "--unshare-ipc",
+  "--unshare-uts",
+  "--unshare-cgroup-try",
+  "--unshare-net",
+  "--disable-userns",
+  "--die-with-parent",
+  "--new-session",
+  "--cap-drop",
+  "ALL",
+  "--ro-bind",
+  "/usr",
+  "/usr",
+  "--ro-bind",
+  "/etc",
+  "/etc",
+  "--symlink",
+  "usr/bin",
+  "/bin",
+  "--symlink",
+  "usr/sbin",
+  "/sbin",
+  "--symlink",
+  "usr/lib",
+  "/lib",
+  "--proc",
+  "/proc",
+  "--dev",
+  "/dev",
+  "--tmpfs",
+  "/tmp",
+  "--tmpfs",
+  "/aisef-home",
+  "--ro-bind",
+  "/tmp/aisef/runtime",
+  "/tmp/aisef/runtime",
+  "--ro-bind",
+  "/tmp/aisef/run-dir/repo/.git",
+  "/tmp/aisef/run-dir/repo/.git",
+  "--ro-bind",
+  "/tmp/aisef/op-home/.config/opencode",
+  "/tmp/aisef/op-home/.config/opencode",
+  "--ro-bind",
+  "/tmp/aisef/venv",
+  "/tmp/aisef/venv",
+  "--bind",
+  "/tmp/aisef/run-dir/work/ws/wt-S1",
+  "/tmp/aisef/run-dir/work/ws/wt-S1",
+  "--chdir",
+  "/tmp/aisef/run-dir/work/ws/wt-S1",
+  "--",
+  "/tmp/aisef/runtime/opencode",
+  "run",
+  "<prompt>"
+ ],
+ "spec": {
+  "backend": "bwrap",
+  "bwrap": "/usr/bin/bwrap",
+  "network": "none",
+  "read_only": [
+   "/tmp/aisef/venv"
+  ]
+ },
+ "tmpfs_only": {
+  "append_anchor": {
+   "exit": 1,
+   "out": "bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user namespaces. See <https://deb.li/bubblewrap> or <file:///usr/share/doc/bubblewrap/README.Debian.gz>.",
+   "started": true
+  },
+  "create_in_run_directory": {
+   "exit": 1,
+   "out": "bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user namespaces. See <https://deb.li/bubblewrap> or <file:///usr/share/doc/bubblewrap/README.Debian.gz>.",
+   "started": true
+  }
+ },
+ "uid": 1000
+}

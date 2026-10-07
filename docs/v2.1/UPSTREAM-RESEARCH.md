@@ -51,7 +51,9 @@ AISEF coi **mọi** phát hiện của OCR là tuyên bố chưa xác minh.
 - **Cơ chế MiMo cho agent ghi `checkpoint.md`/sửa trạng thái task** (**CODE** `tool/task.ts:199`): trái với "trạng thái
   do controller sở hữu".
 - **Grant "always" vào ruleset cả phiên của MiMo** (**CODE** `runtime.ts:716-764`): trái INV-MUTATION-AUTHORITY.
-- **execd trong sandbox của OpenSandbox**: bài học ngược — controller không đặt daemon điều khiển trong vùng của workload.
+- **execd trong sandbox của OpenSandbox** (**INFERENCE** trên **CODE** `main.go:232-235`, `manager.go:261` @ `c7dc78a4090e`;
+  [research/UPSTREAM-RESEARCH.json](research/UPSTREAM-RESEARCH.json) N7): bài học ngược — controller không đặt daemon
+  điều khiển trong vùng của workload.
 
 ## Rủi ro mở (chưa đo, ghi để không tuyên bố quá)
 
