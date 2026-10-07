@@ -881,6 +881,25 @@ SUMMARIES = {
 }
 
 
+def anchor_guard() -> str:
+    """Source of `our_anchor()` for a toy kill test that signals its parent (INV-MUTATION-AUTHORITY): the parent's pid
+    when it is the range anchor this test process's run started — a child of this process running range_anchor.py,
+    leader of the toy's own group and session — else 0, and nothing is signalled. That pid stays the anchor, or its
+    zombie, until this process reaps it after wait() returns, so a signal to it cannot reach another process."""
+    from aisef2.runtime.process_range import ANCHOR
+    return textwrap.dedent(f"""
+        import os, subprocess
+
+        def our_anchor():
+            pp = os.getppid()
+            ps = subprocess.run(["ps", "-o", "ppid=,command=", "-p", str(pp)], capture_output=True, text=True)
+            ppid, _, command = ps.stdout.strip().partition(" ")
+            proven = pp > 1 and os.getpgrp() == os.getsid(0) == pp and ppid == "{os.getpid()}" and \\
+                command.endswith(" -P " + {str(ANCHOR)!r})
+            return pp if proven else 0
+        """)
+
+
 class Outcome(unittest.TestCase):
     """VS-1, VS-3, VS-5, VS-6, ORD-6: each run is PASS, FAIL, TIMEOUT or INFRA, judged from unittest's own summary,
     the exit status and the clock; only a FAIL the bracket confirms is a kill."""
@@ -1099,20 +1118,29 @@ class Outcome(unittest.TestCase):
     @unittest.skipUnless(POSIX, "the runner's process ranges and cleanup authority are measured on POSIX")
     def test_a_lost_report_channel_is_not_a_timeout(self):
         """VS-3: the test kills its own range anchor; wait() returns at once. That is INFRA, judged by the clock before
-        release(), and no TIMEOUT. A real expiry (TIMEOUT patched to 2 s) is TIMEOUT."""
+        release(), and no TIMEOUT. A real expiry (TIMEOUT patched to 2 s) is TIMEOUT. The toy signals its parent only
+        once `anchor_guard` has proven it the range anchor this test's run started; unproven, the toy FAILs and signals
+        nothing (INV-MUTATION-AUTHORITY)."""
         d = self.enterContext(tempfile.TemporaryDirectory())
-        root = toy(pathlib.Path(d), POSITIVE, {"test_x.py": """
-            import os, signal, time, unittest
+        root = toy(pathlib.Path(d), POSITIVE, {"test_x.py": anchor_guard() + textwrap.dedent("""
+            import signal, time, unittest
             from aisef2.toy import positive
+
             class X(unittest.TestCase):
                 def test_x(self):
                     if positive(5) is None:
-                        os.kill(os.getppid(), signal.SIGKILL)
+                        anchor = our_anchor()
+                        self.assertTrue(anchor, "the parent is not the range anchor this test started")
+                        os.kill(anchor, signal.SIGKILL)
                         time.sleep(30)
                     if positive(5) is False:
                         while True:
                             pass
-            """})
+            """)})
+        # the guard's own negative: a parent that is not the anchor (this process, for a plain child) proves nothing
+        plain = subprocess.run([sys.executable, "-c", anchor_guard() + "print(our_anchor())"], capture_output=True,
+                               text=True, check=True)
+        self.assertEqual(plain.stdout.strip(), "0")
         with mock.patch.object(m, "TIMEOUT", 2):
             r = m.run_target(root, "aisef2/toy.py::positive", ["tests/v2/test_x.py"])
         lost, real = (rows_of(r)[0][1], rows_of(r)[1][1])

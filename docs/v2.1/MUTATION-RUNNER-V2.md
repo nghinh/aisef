@@ -31,6 +31,8 @@ through the real `run_target`, `_run_tests`, `mutants`, `main`, the real Process
 - INV-MUTATION-AUTHORITY → §2.4. Only `ca.signal_owned` signals, and only with its own ownership proof. An environment
   token, a command line or a range report is never proof. A process that only names the work tree, such as an
   operator's `tail -f`, is never signalled. The new tests signal nothing: their helpers end themselves on a sentinel.
+  Toy kill tests signal only themselves, except one that SIGKILLs its parent once it has proven it the range anchor the
+  test's own run started (§3.3).
 
 The cost of these rules: (a) a kill costs three short extra runs, the bracket (§4.1, §14 fix 9); (b) a mutant that hangs in k files
 costs k × TIMEOUT; (c) any process the runner cannot prove is its own stops the target, and the worker with it. §10
@@ -253,7 +255,10 @@ across runs and orders. The module globals `_FAILED`, `_TIMED_OUT`, `_CLEANUP` a
 - A one-shot EMFILE in the first run after T0, before a file that validly kills (VS-5 E1/E2): that row is INFRA (`kill
   not confirmed`), the chain goes on, the next file's kill is confirmed — KILLED in both kill-set orders.
 - The test SIGKILLs its own range anchor: INFRA `report channel lost after 0.0Xs` in under 1.5 s; a real expiry
-  (TIMEOUT patched to 2 s) is TIMEOUT.
+  (TIMEOUT patched to 2 s) is TIMEOUT. It signals only a parent `anchor_guard` proves the anchor of the test's own
+  run: a child of the test process running `range_anchor.py`, leader of the toy's group and session (that pid stays
+  the anchor or its zombie until the test process reaps it); unproven, the toy FAILs and signals nothing — measured:
+  with the guard told another controller pid, the mutant is KILLED by that FAIL and the test fails.
 - A file whose every test is skipped is refused at T0; a mutant that skips one more test, or `os._exit(0)`s before the
   summary, is INFRA.
 
@@ -818,6 +823,7 @@ destructive site added: every removal is still a `TemporaryDirectory` cleanup), 
 | 11 | `2f8ec29` | `mutation.py t0` prints PASS for a refused kill set (order-equivalence) | Yes | no T0 row is a failure | `T0.test_the_t0_command_runs_t0_alone_and_writes_nothing` |
 | 12 | `7e8e26e` | `timed_out` in execution order (order-equivalence) | Yes | sorted | `Classify.test_timed_out_does_not_depend_on_the_order` |
 | 13 | `f72fb5b` | VS-6 (a): "re-run them" for mutants a re-run cannot confirm (classification) | Yes | the error says how many end with no summary and need a kill test or a ruling | `Classify.test_the_error_says_which_unclassified_mutants_a_re_run_cannot_resolve` |
+| guard | lane execorder | a toy kill test SIGKILLs its parent without proving it is its range anchor (final verifier, minor) | Yes | `anchor_guard`: the parent is signalled only when it is a child of the test process running `range_anchor.py` and leads the toy's group and session | `Outcome.test_a_lost_report_channel_is_not_a_timeout` (and the guard's negative: a plain child gets 0) |
 | doc | this commit | the report's "16/16 failing pairs now pass" (order-equivalence) | Yes | §6.2: 16/16 identity-file pairs; the 7 C2-era pairs still fail (N1) | — |
 | doc | this commit | §7.1's claim that a nondeterministic file "shows as an unconfirmed FAIL" (classification) | Yes | the residual rate stated (§7.1 step 1) | fix 10's parity case |
 
