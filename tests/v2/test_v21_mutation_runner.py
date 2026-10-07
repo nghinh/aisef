@@ -185,6 +185,12 @@ def classes(result: dict) -> list[str]:
     return [r["class"] for r in result["results"]]
 
 
+def no_remeasure(tg, rel, rows, row, src, why):
+    """The runner before `_remeasure` (fix 10): an unconfirmed FAIL is INFRA, never measured again — for controls."""
+    row.update(outcome="INFRA", why=f"kill not confirmed: {why}")
+    return row
+
+
 @unittest.skipUnless(POSIX, "the runner's process ranges and cleanup authority are measured on POSIX")
 class Env(unittest.TestCase):
     """FS-1, FS-3, FS-4, ORD-5, PL-8: every kill-file run starts in a clean tree, HOME, XDG and TMPDIR."""
@@ -204,8 +210,9 @@ class Env(unittest.TestCase):
                 self.assertEqual(left, [(d, "tests/v2/test_s.py", {"added": [".scratch"]})
                                         for d in ("L5 condition negated", "L4 True->False")])   # on the run that left it
         # the old failure (ORD-5 case S), with the restore switched off: the residue decides every later run of test_c
-        # (the old runner counted each as a kill: 8/8; here the bracket's control fails on the dirty tree too)
-        with mock.patch.object(m, "_residue", lambda tg: {}):
+        # (the old runner counted each as a kill: 8/8; here the bracket's control fails on the dirty tree too, and the
+        # fresh re-measure, which would rebuild the tree, is off as well)
+        with mock.patch.object(m, "_residue", lambda tg: {}), mock.patch.object(m, "_remeasure", no_remeasure):
             r = m.run_target(root, "aisef2/toy.py::tidy", ["tests/v2/test_s.py", "tests/v2/test_c.py"])
         self.assertEqual([x["outcome"] for _, x in rows_of(r) if x["file"] == "tests/v2/test_c.py"], ["INFRA"] * 8)
         self.assertEqual(classes(r), ["INFRA"] * 8)
@@ -949,12 +956,110 @@ class Outcome(unittest.TestCase):
                 if kill[0].endswith("test_fault.py"):
                     first = r["results"][0]["files"]
                     self.assertEqual([(x["file"][9:], x.get("role"), x["outcome"]) for x in first],
-                                     [("test_fault.py", None, "INFRA"), ("test_fault.py", "control", "PASS"),
+                                     [("test_fault.py", "unconfirmed", "FAIL"), ("test_fault.py", "control", "PASS"),
                                       ("test_fault.py", "control", "PASS"), ("test_fault.py", "rerun", "PASS"),
+                                      ("test_fault.py", None, "PASS"),   # re-measured on a fresh tree: the fault is gone
                                       ("test_strong.py", None, "FAIL"), ("test_strong.py", "control", "PASS"),
                                       ("test_strong.py", "control", "PASS"), ("test_strong.py", "rerun", "FAIL")])
+                    self.assertTrue(first[4]["fresh"])
                     self.assertIn("kill not confirmed", first[0]["why"])
             flag.write_text("")
+
+    @unittest.skipUnless(POSIX, "the runner's process ranges and cleanup authority are measured on POSIX")
+    def test_an_unconfirmed_fail_is_measured_again_on_a_fresh_tree(self):
+        """Fix 10 (`_remeasure`), one toy per open finding; each also with the fresh re-measure off (the old INFRA):
+        - VS-5 in a file: a one-shot infrastructure error in test_a stopped the file (-f) before test_b's valid kill;
+          the fault was gone by the bracket, so the mutant was INFRA. Now the whole file runs again: KILLED by test_b.
+        - VS-6 (b): test_b reads state test_a sets, so `-k test_b` fails on the unmutated module too and the valid kill
+          was never confirmed. Bracketed whole: KILLED.
+        - VS-6, nondeterminism: a file that fails every other run of itself, whatever the mutant. The second control
+          catches it; re-measured, it passes: SURVIVED, the truth (it never reads the mutant's answer).
+        - FS-2's mechanism, order-equivalence prover: test_p writes a fixture's __pycache__ (on a wrong answer only),
+          which the tree checks do not see; test_q asserts there is none. Both orders: every mutant SURVIVED."""
+        d = pathlib.Path(self.enterContext(tempfile.TemporaryDirectory()))
+        flag, count = d / "fault", d / "count"
+        files = {
+            "test_mix.py": f"""
+                import pathlib, unittest
+                from aisef2.toy import positive
+                FLAG = pathlib.Path({str(flag)!r})
+                class T(unittest.TestCase):
+                    def test_a_infra(self):
+                        if FLAG.exists() and FLAG.read_text() == "once":
+                            FLAG.write_text("")
+                            raise OSError(28, "No space left on device")
+                    def test_b_assert(self):
+                        self.assertIs(positive(5), True)
+                        self.assertIs(positive(-1), False)
+                """,
+            "test_ord.py": """
+                import unittest
+                from aisef2.toy import positive
+                STATE = {}
+                class T(unittest.TestCase):
+                    def test_a_compute(self):
+                        STATE["v"] = (positive(5), positive(-1))
+                    def test_b_check(self):
+                        self.assertEqual(STATE["v"], (True, False))
+                """,
+            "test_flaky.py": f"""
+                import pathlib, unittest
+                from aisef2.toy import positive
+                C = pathlib.Path({str(count)!r})
+                class T(unittest.TestCase):
+                    def test_flaky(self):
+                        n = int(C.read_text()) if C.exists() else 0
+                        C.write_text(str(n + 1))
+                        positive(5)
+                        self.assertEqual(n % 2, 0, "a flake")
+                """,
+            "test_p_pyc.py": """
+                import pathlib, sys, unittest
+                from aisef2.toy import positive
+                FX = pathlib.Path(__file__).resolve().parent / "fixtures"
+                class P(unittest.TestCase):
+                    def test_p(self):
+                        if positive(-1) is not False:   # only a wrong answer loads the fixture, whose bytecode lands beside it
+                            sys.path.insert(0, str(FX))
+                            import fxmod  # noqa: F401
+                """,
+            "test_q_nopyc.py": """
+                import pathlib, unittest
+                FX = pathlib.Path(__file__).resolve().parent / "fixtures"
+                class Q(unittest.TestCase):
+                    def test_the_fixture_holds_no_bytecode(self):
+                        self.assertFalse((FX / "__pycache__").exists())
+                """,
+            "fixtures/fxmod.py": "X = 1\n"}
+        root = toy(d, POSITIVE, files)
+        cases = {"VS-5": (["tests/v2/test_mix.py"], ["KILLED", "KILLED"], ["INFRA", "KILLED"]),
+                 "VS-6 (b)": (["tests/v2/test_ord.py"], ["KILLED", "KILLED"], ["INFRA", "INFRA"]),
+                 "parity": (["tests/v2/test_flaky.py"], ["SURVIVED", "SURVIVED"], ["INFRA", "SURVIVED"]),
+                 "pycache pq": (["tests/v2/test_p_pyc.py", "tests/v2/test_q_nopyc.py"], ["SURVIVED", "SURVIVED"], None),
+                 "pycache qp": (["tests/v2/test_q_nopyc.py", "tests/v2/test_p_pyc.py"], ["SURVIVED", "SURVIVED"], None)}
+        for name, (kill, truth, old) in cases.items():
+            for remeasure in (True, False):
+                if not remeasure and old is None:
+                    continue
+                flag.write_text("")
+                count.write_text("0")
+                with self.subTest(name, remeasure=remeasure), contextlib.ExitStack() as stack:
+                    if name == "VS-5":
+                        stack.enter_context(after_t0(flag, "once"))
+                    if not remeasure:
+                        stack.enter_context(mock.patch.object(m, "_remeasure", no_remeasure))
+                    r = m.run_target(root, "aisef2/toy.py::positive", kill)
+                    self.assertEqual(classes(r), truth if remeasure else old, r.get("error"))
+                    if remeasure:
+                        self.assertEqual(m.target_problems(r, root),
+                                         [] if truth[0] == "KILLED" else [f"aisef2/toy.py::positive: unaudited survivor {x!r}"
+                                                                          for x in r["survivors"]])
+                        self.assertTrue(rows_of(r, "unconfirmed"))   # the path was taken, so the toy is not vacuous
+        # pycache, [q, p] without the fresh re-measure: the cache mutant 1 left decides mutant 2 (the prover's 1 SURVIVED,
+        # 5 INFRA in that order)
+        with mock.patch.object(m, "_remeasure", no_remeasure):
+            r = m.run_target(root, "aisef2/toy.py::positive", ["tests/v2/test_q_nopyc.py", "tests/v2/test_p_pyc.py"])
+        self.assertEqual(classes(r), ["SURVIVED", "INFRA"])
 
     @unittest.skipUnless(POSIX, "the runner's process ranges and cleanup authority are measured on POSIX")
     def test_a_fault_a_passing_run_leaves_for_the_next_is_never_a_kill(self):
@@ -978,10 +1083,12 @@ class Outcome(unittest.TestCase):
                     BUSY.write_text("busy")
             """})
         r = m.run_target(root, "aisef2/toy.py::positive", ["tests/v2/test_port.py"])
-        self.assertNotIn("KILLED", classes(r))
-        why = rows_of(r)[0][1]["why"]
+        self.assertEqual(classes(r), ["SURVIVED", "SURVIVED"])   # the truth: the test never reads the mutant's answer
+        why = rows_of(r, "unconfirmed")[0][1]["why"]
         self.assertTrue(why.startswith("kill not confirmed: the unmutated module PASS, then FAIL"), why)
-        self.assertIn(" is INFRA (", "".join(m.target_problems(r, root)))
+        with mock.patch.object(m, "_remeasure", no_remeasure):   # without the fresh re-measure (fix 10): INFRA, not a kill
+            busy.write_text("")
+            self.assertEqual(classes(m.run_target(root, "aisef2/toy.py::positive", ["tests/v2/test_port.py"]))[0], "INFRA")
         # the old failure, with one control: the first mutant is a confirmed kill, and nothing in the record says why not
         busy.write_text("")
         with mock.patch.object(m, "BRACKET", (m.BRACKET[0], m.BRACKET[2])):
@@ -1474,7 +1581,8 @@ class Order(unittest.TestCase):
             os.utime(path, (fixed, fixed))
             return fixed
         controls = {"the stamp (§1)": ({"_write_version": same_second}, self.KILL[::-1]),
-                    "the tree restore (§2)": ({"_residue": lambda tg: {}}, ["tests/v2/test_c.py", "tests/v2/test_a.py",
+                    "the tree restore (§2)": ({"_residue": lambda tg: {}, "_remeasure": no_remeasure},
+                                              ["tests/v2/test_c.py", "tests/v2/test_a.py",
                                                                            *self.KILL[1:3], self.KILL[4]]),
                     "the per-run classification (§3, §4)": ({"_mutant": old_stop_rule}, self.KILL)}
         for name, (patches, order) in controls.items():

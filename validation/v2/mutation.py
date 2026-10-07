@@ -1201,7 +1201,7 @@ def _named(r, residual: Exception, not_empty: bool) -> list[int]:
 
 
 def _run_file(tg: _Target, rel: str, rows: list, *, select: str | None = None, failfast: bool = True,
-              role: str | None = None) -> dict:
+              role: str | None = None, fresh: bool = False) -> dict:
     """One run of kill file `rel` — or of what `select` names in it — on the version in the tree, in a clean environment
     (§2), judged from the exit status and the elapsed time taken before release() (VS-3). After it, in this order: its
     leftovers are settled (`_settle`; a process the authority cannot prove stops the target), the run directory is
@@ -1211,7 +1211,8 @@ def _run_file(tg: _Target, rel: str, rows: list, *, select: str | None = None, f
     from aisef2.runtime.story_scope import Residual
     tg.seq += 1
     begun, elapsed = time.monotonic(), 0.0
-    row: dict = {"file": rel, **({"role": role} if role else {}), **({"select": select} if select else {})}
+    row: dict = {"file": rel, **({"role": role} if role else {}), **({"select": select} if select else {}),
+                 **({"fresh": True} if fresh else {})}
     rows.append(row)
     holder = None
     path = pathlib.PurePosixPath(rel)
@@ -1316,17 +1317,22 @@ def mutant_class(outcomes: list[str]) -> str:
 BRACKET = (("control", "null", "PASS"), ("control", "null", "PASS"), ("rerun", "mutant", "FAIL"))
 
 
-def _confirm(tg: _Target, rel: str, rows: list, row: dict, src: str) -> str:
+def _confirm(tg: _Target, rel: str, rows: list, row: dict, src: str, fresh: bool = False) -> str:
     """'' when `row`'s FAIL is confirmed, else why not: right away and each in a clean environment, the unmutated module
     PASSES what failed (`_select`) twice in a row, then the mutant FAILS it again with the same signature. Twice: a
     fault that a passing run leaves for the next one (a fixed port's TIME_WAIT) failed the mutant's re-run after the
     control had passed, and a single control confirmed it (PL-2, process-env prover); the second control's run is the
-    one that fault now fails. The mutant's version is in the tree afterwards."""
-    sel = _select(row["first"], tg.ref[rel]["first_test"])
+    one that fault now fails. `fresh`: the whole file each time, each in a tree rebuilt from the pristine copy
+    (`_remeasure`). The mutant's version is in the tree afterwards."""
+    sel = None if fresh else _select(row["first"], tg.ref[rel]["first_test"])
     why = ""
     for i, (role, version, want) in enumerate(BRACKET):
-        _write(tg, tg.null if version == "null" else src)
-        x = _run_file(tg, rel, rows, select=sel, role=role)
+        if fresh:
+            tg.version = tg.null if version == "null" else src
+            _new_tree(tg)
+        else:
+            _write(tg, tg.null if version == "null" else src)
+        x = _run_file(tg, rel, rows, select=sel, role=role, fresh=fresh)
         if x["outcome"] != want or (role == "rerun" and x.get("first") != row["first"]):
             why = (f"the unmutated module {'PASS, then ' if i else ''}{x['outcome']}" if role == "control" else
                    f"the mutant again {x['outcome']} {x.get('first') or x.get('why') or ''}".rstrip())
@@ -1336,21 +1342,35 @@ def _confirm(tg: _Target, rel: str, rows: list, row: dict, src: str) -> str:
 
 
 def _mutant(tg: _Target, entry: dict, src: str) -> None:
-    """Every kill file in kill-set order, each run clean. A FAIL is a kill only when the bracket confirms it (`_confirm`).
-    Then — and only then — the remaining files are skipped. Anything else makes that file's row INFRA and the chain goes
-    on: a timeout or an infrastructure fault never decides a kill and never hides a later valid one (VS-1, VS-2, VS-5,
-    PL-2, ORD-2)."""
+    """Every kill file in kill-set order, each run clean. A FAIL is a kill only when the bracket confirms it (`_confirm`),
+    in place or, failing that, once more on a fresh tree (`_remeasure`). Then — and only then — the remaining files are
+    skipped. Anything else leaves that file's row PASS, TIMEOUT or INFRA and the chain goes on: a timeout or an
+    infrastructure fault never decides a kill and never hides a later valid one (VS-1, VS-2, VS-5, PL-2, ORD-2)."""
     rows = entry["files"] = []
     _write(tg, src)
     for rel in tg.tests:
         row = _run_file(tg, rel, rows)
-        if row["outcome"] != "FAIL":
-            continue
-        why = _confirm(tg, rel, rows, row, src)
-        if not why:
+        if row["outcome"] == "FAIL" and (why := _confirm(tg, rel, rows, row, src)):
+            row = _remeasure(tg, rel, rows, row, src, why)
+        if row["outcome"] == "FAIL":   # confirmed: the only early stop
             entry["killed_by"] = {"file": rel, "first": row["first"], "seconds": row.get("seconds")}
             return
-        row.update(outcome="INFRA", why=f"kill not confirmed: {why}")
+
+
+def _remeasure(tg: _Target, rel: str, rows: list, row: dict, src: str, why: str) -> dict:
+    """A FAIL the bracket did not confirm in place: the file is measured once more from scratch — the whole file, in a
+    tree rebuilt from the pristine copy — and that run is the file's (`row` keeps its place in the record as
+    `unconfirmed`). So a fault that is gone by the bracket no longer hides a valid kill later in the same file (VS-5, the
+    failfast case), a test that cannot run alone under -k is bracketed whole (VS-6 (b)), and state the tree checks do
+    not see (a __pycache__ a run wrote — FS-2's mechanism, order-equivalence prover) cannot decide it. A FAIL there is
+    bracketed the same way, whole file, each run in a new tree; not confirmed again, the file is INFRA."""
+    row.update(role="unconfirmed", why=f"kill not confirmed: {why}; re-measured on a fresh tree")
+    tg.version = src
+    _new_tree(tg)
+    again = _run_file(tg, rel, rows, fresh=True)
+    if again["outcome"] == "FAIL" and (why := _confirm(tg, rel, rows, again, src, fresh=True)):
+        again.update(outcome="INFRA", why=f"kill not confirmed: {why}")
+    return again
 
 
 def _classify(entry: dict, stopped: str | None = None) -> dict:
