@@ -1,0 +1,2 @@
+2026-10-08T03:29:37+0700 SIGTERM 12658 12661 (pilot.sh lane subshells of lanes 1 and 3, parent 12656 = pilot.sh under heavy.sh 96040): the second order of those lanes is not started
+2026-10-08T03:29:39+0700 SIGTERM 12761 12763 (mutation.py run, cwd l3-decl and l1-decl, checked by lsof): pilot attempt 1 stopped after ENOSPC (disk 2.0 GiB free)

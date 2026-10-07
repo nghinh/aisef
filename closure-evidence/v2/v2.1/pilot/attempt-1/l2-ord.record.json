@@ -1,0 +1,1621 @@
+{
+ "record": "AISEF V2 — V2.1 MUTATION",
+ "tool": "validation/v2/mutation.py",
+ "targets": [
+  {
+   "target": "aisef2/app/settings.py::endpoint_problem",
+   "runner": 2,
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "execution_order": {
+    "files": [
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_inputs.py",
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_verify.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_continue_integrity.py"
+    ],
+    "seconds": [
+     1.41,
+     1.61,
+     6.43,
+     16.03,
+     32.04,
+     33.14,
+     50.37,
+     152.51,
+     222.06
+    ],
+    "from": {
+     "path": "closure-evidence/v2/v2.1/T0-SWEEP.json",
+     "sha256": "53f092d5755fa5a838bc0a45acbb7fdccafa4a4cbd5f6780d7f4163203413442"
+    },
+    "table": "closure-evidence/v2/v2.1/EXECUTION-ORDER.json",
+    "table_sha256": "e33d382c3be2883c245cd32133056613a3be7568237610099a9913c3a63c5ba7",
+    "table_commit": "ff115be2d97679606a065ff877994d0af8bde329"
+   },
+   "source_sha256": "1ef489a7d6e45ab82a0748aa21df392d86db295d025b9aed1f0ceff881e1f494",
+   "tree_sha256": "9dea25575b780fb48367b1b27f22c896ee010c9ec794af63e5331f6503adc03a",
+   "mutants": 36,
+   "results": [
+    {
+     "mutant": "L62 condition negated",
+     "files": [
+      {
+       "file": "tests/v2/test_v21_identity.py",
+       "exit": 1,
+       "seconds": 1.5,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 13,
+       "errors": 1,
+       "first": "ERROR: test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes) | aisef2.app.settings.SettingsError",
+       "tail_sha256": "7ed90fc57591cd804245c6a433faa97bd0c17cc14405c8b68c3ebe134d417df4",
+       "tail": "ic half of test_v21_identity_bytes.ThreeIdentities.test_calibrations_of_other_bytes_admit_nothing ... ok\ntest_every_active_probe_launch_starts_minus_I_minus_S_minus_B (v2.test_v21_identity.ThreeIdentities.test_every_active_probe_launch_starts_minus_I_minus_S_minus_B)\nThe semantic half of test_v21_identity_bytes.PthChannel.test_every_active_probe_launch_carries_minus_S ... ok\ntest_the_cycle1_probe_keeps_its_one_frozen_digest (v2.test_v21_identity.ThreeIdentities.test_the_cycle1_probe_keeps_its_one_frozen_digest) ... ok\ntest_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes) ... ERROR\n\n======================================================================\nERROR: test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_v21_identity.py\", line 97, in test_the_runspec_binds_each_probe_s_bytes\n    p, st = bundle.load(e2e.project_bundle(\"a\" * 40)), settings.load(e2e.SETTINGS)\n                                                       ~~~~~~~~~~~~~^^^^^^^^^^^^^^\n  File \"<tree>/aisef2/app/settings.py\", line 130, in load\n    raise SettingsError(problem)\naisef2.app.settings.SettingsError: the provider endpoint is a URL string\n\n----------------------------------------------------------------------\nRan 13 tests\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_v21_identity.py",
+       "role": "control",
+       "select": "*v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes",
+       "exit": 0,
+       "seconds": 0.39,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "033636acb99268f769f5b74be0b08bd1e6bbbcefdbfa4c957bac84a26572472f",
+       "overhead_s": 0.36
+      },
+      {
+       "file": "tests/v2/test_v21_identity.py",
+       "role": "control",
+       "select": "*v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes",
+       "exit": 0,
+       "seconds": 0.4,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "033636acb99268f769f5b74be0b08bd1e6bbbcefdbfa4c957bac84a26572472f",
+       "overhead_s": 0.36
+      },
+      {
+       "file": "tests/v2/test_v21_identity.py",
+       "role": "rerun",
+       "select": "*v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes",
+       "exit": 1,
+       "seconds": 0.45,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes) | aisef2.app.settings.SettingsError",
+       "tail_sha256": "36a2a5a1982ef83be0cae30ce7dc339733fbde9f42c38570e65dd1e254aec808",
+       "tail": "test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes) ... ERROR\n\n======================================================================\nERROR: test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_v21_identity.py\", line 97, in test_the_runspec_binds_each_probe_s_bytes\n    p, st = bundle.load(e2e.project_bundle(\"a\" * 40)), settings.load(e2e.SETTINGS)\n                                                       ~~~~~~~~~~~~~^^^^^^^^^^^^^^\n  File \"<tree>/aisef2/app/settings.py\", line 130, in load\n    raise SettingsError(problem)\naisef2.app.settings.SettingsError: the provider endpoint is a URL string\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.52
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_v21_identity.py",
+      "first": "ERROR: test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes) | aisef2.app.settings.SettingsError",
+      "seconds": 1.5
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L69 condition negated",
+     "files": [
+      {
+       "file": "tests/v2/test_v21_identity.py",
+       "exit": 1,
+       "seconds": 1.48,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 13,
+       "errors": 1,
+       "first": "ERROR: test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes) | aisef2.app.settings.SettingsError",
+       "tail_sha256": "9ca6353177a1c8ea1510e48b81369d2f431cc88add3505b51cc557ecb9918908",
+       "tail": "tities.test_calibrations_of_other_bytes_admit_nothing ... ok\ntest_every_active_probe_launch_starts_minus_I_minus_S_minus_B (v2.test_v21_identity.ThreeIdentities.test_every_active_probe_launch_starts_minus_I_minus_S_minus_B)\nThe semantic half of test_v21_identity_bytes.PthChannel.test_every_active_probe_launch_carries_minus_S ... ok\ntest_the_cycle1_probe_keeps_its_one_frozen_digest (v2.test_v21_identity.ThreeIdentities.test_the_cycle1_probe_keeps_its_one_frozen_digest) ... ok\ntest_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes) ... ERROR\n\n======================================================================\nERROR: test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_v21_identity.py\", line 97, in test_the_runspec_binds_each_probe_s_bytes\n    p, st = bundle.load(e2e.project_bundle(\"a\" * 40)), settings.load(e2e.SETTINGS)\n                                                       ~~~~~~~~~~~~~^^^^^^^^^^^^^^\n  File \"<tree>/aisef2/app/settings.py\", line 130, in load\n    raise SettingsError(problem)\naisef2.app.settings.SettingsError: the provider endpoint is an https URL (or http to a loopback address) with a host\n\n----------------------------------------------------------------------\nRan 13 tests\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_v21_identity.py",
+       "role": "control",
+       "select": "*v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes",
+       "exit": 0,
+       "seconds": 0.4,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "033636acb99268f769f5b74be0b08bd1e6bbbcefdbfa4c957bac84a26572472f",
+       "overhead_s": 0.36
+      },
+      {
+       "file": "tests/v2/test_v21_identity.py",
+       "role": "control",
+       "select": "*v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes",
+       "exit": 0,
+       "seconds": 0.42,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "033636acb99268f769f5b74be0b08bd1e6bbbcefdbfa4c957bac84a26572472f",
+       "overhead_s": 0.37
+      },
+      {
+       "file": "tests/v2/test_v21_identity.py",
+       "role": "rerun",
+       "select": "*v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes",
+       "exit": 1,
+       "seconds": 0.43,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes) | aisef2.app.settings.SettingsError",
+       "tail_sha256": "b1bf7f9a1dcf0c629121a85a623cffc0a62f1873789164f1ef4a6cd5c68fdfbc",
+       "tail": "test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes) ... ERROR\n\n======================================================================\nERROR: test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_v21_identity.py\", line 97, in test_the_runspec_binds_each_probe_s_bytes\n    p, st = bundle.load(e2e.project_bundle(\"a\" * 40)), settings.load(e2e.SETTINGS)\n                                                       ~~~~~~~~~~~~~^^^^^^^^^^^^^^\n  File \"<tree>/aisef2/app/settings.py\", line 130, in load\n    raise SettingsError(problem)\naisef2.app.settings.SettingsError: the provider endpoint is an https URL (or http to a loopback address) with a host\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.37
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_v21_identity.py",
+      "first": "ERROR: test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes) | aisef2.app.settings.SettingsError",
+      "seconds": 1.48
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L71 condition negated",
+     "files": [
+      {
+       "file": "tests/v2/test_v21_identity.py",
+       "exit": 1,
+       "seconds": 1.46,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 13,
+       "errors": 1,
+       "first": "ERROR: test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes) | aisef2.app.settings.SettingsError",
+       "tail_sha256": "29ea2cd8e7da7e1c84364bdb27df30efc865d7263e4de9891a68cdba4b33adb3",
+       "tail": "calibrations_of_other_bytes_admit_nothing ... ok\ntest_every_active_probe_launch_starts_minus_I_minus_S_minus_B (v2.test_v21_identity.ThreeIdentities.test_every_active_probe_launch_starts_minus_I_minus_S_minus_B)\nThe semantic half of test_v21_identity_bytes.PthChannel.test_every_active_probe_launch_carries_minus_S ... ok\ntest_the_cycle1_probe_keeps_its_one_frozen_digest (v2.test_v21_identity.ThreeIdentities.test_the_cycle1_probe_keeps_its_one_frozen_digest) ... ok\ntest_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes) ... ERROR\n\n======================================================================\nERROR: test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_v21_identity.py\", line 97, in test_the_runspec_binds_each_probe_s_bytes\n    p, st = bundle.load(e2e.project_bundle(\"a\" * 40)), settings.load(e2e.SETTINGS)\n                                                       ~~~~~~~~~~~~~^^^^^^^^^^^^^^\n  File \"<tree>/aisef2/app/settings.py\", line 130, in load\n    raise SettingsError(problem)\naisef2.app.settings.SettingsError: the provider endpoint carries no credentials, query or fragment (the key is sent as a header)\n\n----------------------------------------------------------------------\nRan 13 tests\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.36
+      },
+      {
+       "file": "tests/v2/test_v21_identity.py",
+       "role": "control",
+       "select": "*v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes",
+       "exit": 0,
+       "seconds": 0.4,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "033636acb99268f769f5b74be0b08bd1e6bbbcefdbfa4c957bac84a26572472f",
+       "overhead_s": 0.36
+      },
+      {
+       "file": "tests/v2/test_v21_identity.py",
+       "role": "control",
+       "select": "*v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes",
+       "exit": 0,
+       "seconds": 0.4,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "033636acb99268f769f5b74be0b08bd1e6bbbcefdbfa4c957bac84a26572472f",
+       "overhead_s": 0.36
+      },
+      {
+       "file": "tests/v2/test_v21_identity.py",
+       "role": "rerun",
+       "select": "*v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes",
+       "exit": 1,
+       "seconds": 0.36,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes) | aisef2.app.settings.SettingsError",
+       "tail_sha256": "5f7ac2bd75b9786d9d90a63750d26092a49bb1694b03b429bc83c5703a009f4e",
+       "tail": "test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes) ... ERROR\n\n======================================================================\nERROR: test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_v21_identity.py\", line 97, in test_the_runspec_binds_each_probe_s_bytes\n    p, st = bundle.load(e2e.project_bundle(\"a\" * 40)), settings.load(e2e.SETTINGS)\n                                                       ~~~~~~~~~~~~~^^^^^^^^^^^^^^\n  File \"<tree>/aisef2/app/settings.py\", line 130, in load\n    raise SettingsError(problem)\naisef2.app.settings.SettingsError: the provider endpoint carries no credentials, query or fragment (the key is sent as a header)\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.33
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_v21_identity.py",
+      "first": "ERROR: test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes) | aisef2.app.settings.SettingsError",
+      "seconds": 1.46
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L73 condition negated",
+     "files": [
+      {
+       "file": "tests/v2/test_v21_identity.py",
+       "exit": 1,
+       "seconds": 1.38,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 13,
+       "errors": 1,
+       "first": "ERROR: test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes) | aisef2.app.settings.SettingsError",
+       "tail_sha256": "e440150e96ca8495d0388c59db214d8bd470abd9475bfeec99605347cf5f3051",
+       "tail": "ns_of_other_bytes_admit_nothing ... ok\ntest_every_active_probe_launch_starts_minus_I_minus_S_minus_B (v2.test_v21_identity.ThreeIdentities.test_every_active_probe_launch_starts_minus_I_minus_S_minus_B)\nThe semantic half of test_v21_identity_bytes.PthChannel.test_every_active_probe_launch_carries_minus_S ... ok\ntest_the_cycle1_probe_keeps_its_one_frozen_digest (v2.test_v21_identity.ThreeIdentities.test_the_cycle1_probe_keeps_its_one_frozen_digest) ... ok\ntest_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes) ... ERROR\n\n======================================================================\nERROR: test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_v21_identity.py\", line 97, in test_the_runspec_binds_each_probe_s_bytes\n    p, st = bundle.load(e2e.project_bundle(\"a\" * 40)), settings.load(e2e.SETTINGS)\n                                                       ~~~~~~~~~~~~~^^^^^^^^^^^^^^\n  File \"<tree>/aisef2/app/settings.py\", line 130, in load\n    raise SettingsError(problem)\naisef2.app.settings.SettingsError: the provider endpoint is https (or http to 127.0.0.1, localhost, ::1): provider.invalid is not loopback\n\n----------------------------------------------------------------------\nRan 13 tests\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_v21_identity.py",
+       "role": "control",
+       "select": "*v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes",
+       "exit": 0,
+       "seconds": 0.46,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "033636acb99268f769f5b74be0b08bd1e6bbbcefdbfa4c957bac84a26572472f",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_v21_identity.py",
+       "role": "control",
+       "select": "*v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes",
+       "exit": 0,
+       "seconds": 0.37,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "033636acb99268f769f5b74be0b08bd1e6bbbcefdbfa4c957bac84a26572472f",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_v21_identity.py",
+       "role": "rerun",
+       "select": "*v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes",
+       "exit": 1,
+       "seconds": 0.37,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes) | aisef2.app.settings.SettingsError",
+       "tail_sha256": "aaad9ad9166b6bb00e814fad3ab649288837dfa7ad1e7338e0579654b040106f",
+       "tail": "test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes) ... ERROR\n\n======================================================================\nERROR: test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_v21_identity.py\", line 97, in test_the_runspec_binds_each_probe_s_bytes\n    p, st = bundle.load(e2e.project_bundle(\"a\" * 40)), settings.load(e2e.SETTINGS)\n                                                       ~~~~~~~~~~~~~^^^^^^^^^^^^^^\n  File \"<tree>/aisef2/app/settings.py\", line 130, in load\n    raise SettingsError(problem)\naisef2.app.settings.SettingsError: the provider endpoint is https (or http to 127.0.0.1, localhost, ::1): provider.invalid is not loopback\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.34
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_v21_identity.py",
+      "first": "ERROR: test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes) | aisef2.app.settings.SettingsError",
+      "seconds": 1.38
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L62 not removed",
+     "files": [
+      {
+       "file": "tests/v2/test_v21_identity.py",
+       "exit": 1,
+       "seconds": 1.39,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 13,
+       "errors": 1,
+       "first": "ERROR: test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes) | aisef2.app.settings.SettingsError",
+       "tail_sha256": "7ed90fc57591cd804245c6a433faa97bd0c17cc14405c8b68c3ebe134d417df4",
+       "tail": "ic half of test_v21_identity_bytes.ThreeIdentities.test_calibrations_of_other_bytes_admit_nothing ... ok\ntest_every_active_probe_launch_starts_minus_I_minus_S_minus_B (v2.test_v21_identity.ThreeIdentities.test_every_active_probe_launch_starts_minus_I_minus_S_minus_B)\nThe semantic half of test_v21_identity_bytes.PthChannel.test_every_active_probe_launch_carries_minus_S ... ok\ntest_the_cycle1_probe_keeps_its_one_frozen_digest (v2.test_v21_identity.ThreeIdentities.test_the_cycle1_probe_keeps_its_one_frozen_digest) ... ok\ntest_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes) ... ERROR\n\n======================================================================\nERROR: test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_v21_identity.py\", line 97, in test_the_runspec_binds_each_probe_s_bytes\n    p, st = bundle.load(e2e.project_bundle(\"a\" * 40)), settings.load(e2e.SETTINGS)\n                                                       ~~~~~~~~~~~~~^^^^^^^^^^^^^^\n  File \"<tree>/aisef2/app/settings.py\", line 130, in load\n    raise SettingsError(problem)\naisef2.app.settings.SettingsError: the provider endpoint is a URL string\n\n----------------------------------------------------------------------\nRan 13 tests\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.32
+      },
+      {
+       "file": "tests/v2/test_v21_identity.py",
+       "role": "control",
+       "select": "*v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes",
+       "exit": 0,
+       "seconds": 0.37,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "033636acb99268f769f5b74be0b08bd1e6bbbcefdbfa4c957bac84a26572472f",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_v21_identity.py",
+       "role": "control",
+       "select": "*v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes",
+       "exit": 0,
+       "seconds": 0.38,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "033636acb99268f769f5b74be0b08bd1e6bbbcefdbfa4c957bac84a26572472f",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_v21_identity.py",
+       "role": "rerun",
+       "select": "*v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes",
+       "exit": 1,
+       "seconds": 0.39,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes) | aisef2.app.settings.SettingsError",
+       "tail_sha256": "36a2a5a1982ef83be0cae30ce7dc339733fbde9f42c38570e65dd1e254aec808",
+       "tail": "test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes) ... ERROR\n\n======================================================================\nERROR: test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_v21_identity.py\", line 97, in test_the_runspec_binds_each_probe_s_bytes\n    p, st = bundle.load(e2e.project_bundle(\"a\" * 40)), settings.load(e2e.SETTINGS)\n                                                       ~~~~~~~~~~~~~^^^^^^^^^^^^^^\n  File \"<tree>/aisef2/app/settings.py\", line 130, in load\n    raise SettingsError(problem)\naisef2.app.settings.SettingsError: the provider endpoint is a URL string\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.36
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_v21_identity.py",
+      "first": "ERROR: test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes) | aisef2.app.settings.SettingsError",
+      "seconds": 1.39
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L63 returns None",
+     "files": [
+      {
+       "file": "tests/v2/test_v21_identity.py",
+       "exit": 0,
+       "seconds": 1.48,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 13,
+       "tail_sha256": "55ff309bf7ddd8be199b014399f388efe1c20a5041ab190f563ffc170a57e475",
+       "overhead_s": 0.36
+      },
+      {
+       "file": "tests/v2/test_v21_inputs.py",
+       "exit": 0,
+       "seconds": 1.76,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 20,
+       "tail_sha256": "d39f63e4c8436fb76e82de52f522bc2737bd8bc9e94af2d56412b84f482dcedb",
+       "overhead_s": 0.36
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "exit": 0,
+       "seconds": 7.19,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 41,
+       "tail_sha256": "3ef303c799614934b469520dc3ed73bad54df703d4213d103aaf0597d5afb57a",
+       "overhead_s": 0.36
+      },
+      {
+       "file": "tests/v2/test_v21_review.py",
+       "exit": 0,
+       "seconds": 18.58,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 8,
+       "tail_sha256": "472928fdd58c74eb466a3bd8815a333f24039cf54dbb7522a3ced1cf29101770",
+       "overhead_s": 0.36
+      },
+      {
+       "file": "tests/v2/test_v21_verify.py",
+       "exit": 0,
+       "seconds": 36.22,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 8,
+       "tail_sha256": "f79e6288a26ee37a4f6a7da435cf549f3749c03aca7bcb314651cef2fe72b054",
+       "overhead_s": 0.36
+      },
+      {
+       "file": "tests/v2/test_app_run.py",
+       "exit": 0,
+       "seconds": 39.53,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 17,
+       "tail_sha256": "34c9bfe7ef7d76c17f599b0a81180f32dc90d22822f05f5f66668053994bd703",
+       "overhead_s": 0.36
+      },
+      {
+       "file": "tests/v2/test_v21_continue_usage.py",
+       "exit": 0,
+       "seconds": 58.88,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 10,
+       "tail_sha256": "25554e9cde9f11bfa4dd3a4579e3a9c44cacdb9866194adec6d1ca0574fd3b64",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_v21_review_chain.py",
+       "exit": 0,
+       "seconds": 175.08,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 18,
+       "skipped": 3,
+       "skipped_tests": [
+        "test_a_full_review_against_a_scripted_model (v2.test_v21_review_chain.RealBinary.test_a_full_review_against_a_scripted_model)",
+        "test_an_empty_range_is_skipped_without_a_model_call (v2.test_v21_review_chain.RealBinary.test_an_empty_range_is_skipped_without_a_model_call)",
+        "test_the_preview_is_read_as_the_adapter_expects (v2.test_v21_review_chain.RealBinary.test_the_preview_is_read_as_the_adapter_expects)"
+       ],
+       "tail_sha256": "1e4b8d44125b0693122f7d3880014f095229c51996b171f66abfe7c5b76af006",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_v21_continue_integrity.py",
+       "exit": 0,
+       "seconds": 260.66,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 24,
+       "tail_sha256": "6ed16fadda0701c1628b18171b29ee246ad8a6394124bc873e012e30e68ad7e4",
+       "overhead_s": 0.38
+      }
+     ],
+     "class": "SURVIVED",
+     "killed": false
+    },
+    {
+     "mutant": "L69 Or swapped",
+     "files": [
+      {
+       "file": "tests/v2/test_v21_identity.py",
+       "exit": 0,
+       "seconds": 1.48,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 13,
+       "tail_sha256": "55ff309bf7ddd8be199b014399f388efe1c20a5041ab190f563ffc170a57e475",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_v21_inputs.py",
+       "exit": 1,
+       "seconds": 0.99,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 11,
+       "failures": 1,
+       "first": "FAIL: test_lookalike_hosts_are_refused (v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused) [ftp://127.0.0.1/v1] | AssertionError",
+       "tail_sha256": "24767b92fb414f9f25a69871ae6228fb43f72c40b6f813857feef72b336399bd",
+       "tail": "ments_as_an_object) ... ok\ntest_requirements_document_as_a_string (v2.test_v21_inputs.BundleShape.test_requirements_document_as_a_string) ... ok\ntest_requirements_document_without_sha256 (v2.test_v21_inputs.BundleShape.test_requirements_document_without_sha256) ... ok\ntest_stories_as_a_list (v2.test_v21_inputs.BundleShape.test_stories_as_a_list) ... ok\ntest_story_tests_as_a_string_is_not_split_into_letters (v2.test_v21_inputs.BundleShape.test_story_tests_as_a_string_is_not_split_into_letters) ... ok\ntest_story_without_tests (v2.test_v21_inputs.BundleShape.test_story_without_tests) ... ok\ntest_lookalike_hosts_are_refused (v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused) ... \n  test_lookalike_hosts_are_refused (v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused) [ftp://127.0.0.1/v1] ... FAIL\n\n======================================================================\nFAIL: test_lookalike_hosts_are_refused (v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused) [ftp://127.0.0.1/v1]\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_v21_inputs.py\", line 133, in test_lookalike_hosts_are_refused\n    with self.subTest(e), self.assertRaises(settings.SettingsError):\n                          ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: SettingsError not raised\n\n----------------------------------------------------------------------\nRan 11 tests\n\nFAILED (failures=1)\n",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_v21_inputs.py",
+       "role": "control",
+       "select": "*v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused",
+       "exit": 0,
+       "seconds": 0.39,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "8ec46b2b020dea6c26540ee34ad79414e2594b97d6042eef53b15caa6d773804",
+       "overhead_s": 0.36
+      },
+      {
+       "file": "tests/v2/test_v21_inputs.py",
+       "role": "control",
+       "select": "*v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused",
+       "exit": 0,
+       "seconds": 0.39,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "8ec46b2b020dea6c26540ee34ad79414e2594b97d6042eef53b15caa6d773804",
+       "overhead_s": 0.36
+      },
+      {
+       "file": "tests/v2/test_v21_inputs.py",
+       "role": "rerun",
+       "select": "*v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused",
+       "exit": 1,
+       "seconds": 0.4,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "failures": 1,
+       "first": "FAIL: test_lookalike_hosts_are_refused (v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused) [ftp://127.0.0.1/v1] | AssertionError",
+       "tail_sha256": "ab3257f25769572e8d7a4d23a45199a70f8f131542b316c1a2c946ce97c403d2",
+       "tail": "test_lookalike_hosts_are_refused (v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused) ... \n  test_lookalike_hosts_are_refused (v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused) [ftp://127.0.0.1/v1] ... FAIL\n\n======================================================================\nFAIL: test_lookalike_hosts_are_refused (v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused) [ftp://127.0.0.1/v1]\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_v21_inputs.py\", line 133, in test_lookalike_hosts_are_refused\n    with self.subTest(e), self.assertRaises(settings.SettingsError):\n                          ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: SettingsError not raised\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (failures=1)\n",
+       "overhead_s": 0.36
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_v21_inputs.py",
+      "first": "FAIL: test_lookalike_hosts_are_refused (v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused) [ftp://127.0.0.1/v1] | AssertionError",
+      "seconds": 0.99
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L70 returns None",
+     "files": [
+      {
+       "file": "tests/v2/test_v21_identity.py",
+       "exit": 0,
+       "seconds": 1.48,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 13,
+       "tail_sha256": "55ff309bf7ddd8be199b014399f388efe1c20a5041ab190f563ffc170a57e475",
+       "overhead_s": 0.4
+      },
+      {
+       "file": "tests/v2/test_v21_inputs.py",
+       "exit": 1,
+       "seconds": 1.0,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 11,
+       "failures": 1,
+       "first": "FAIL: test_lookalike_hosts_are_refused (v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused) [ftp://127.0.0.1/v1] | AssertionError",
+       "tail_sha256": "24767b92fb414f9f25a69871ae6228fb43f72c40b6f813857feef72b336399bd",
+       "tail": "ments_as_an_object) ... ok\ntest_requirements_document_as_a_string (v2.test_v21_inputs.BundleShape.test_requirements_document_as_a_string) ... ok\ntest_requirements_document_without_sha256 (v2.test_v21_inputs.BundleShape.test_requirements_document_without_sha256) ... ok\ntest_stories_as_a_list (v2.test_v21_inputs.BundleShape.test_stories_as_a_list) ... ok\ntest_story_tests_as_a_string_is_not_split_into_letters (v2.test_v21_inputs.BundleShape.test_story_tests_as_a_string_is_not_split_into_letters) ... ok\ntest_story_without_tests (v2.test_v21_inputs.BundleShape.test_story_without_tests) ... ok\ntest_lookalike_hosts_are_refused (v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused) ... \n  test_lookalike_hosts_are_refused (v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused) [ftp://127.0.0.1/v1] ... FAIL\n\n======================================================================\nFAIL: test_lookalike_hosts_are_refused (v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused) [ftp://127.0.0.1/v1]\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_v21_inputs.py\", line 133, in test_lookalike_hosts_are_refused\n    with self.subTest(e), self.assertRaises(settings.SettingsError):\n                          ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: SettingsError not raised\n\n----------------------------------------------------------------------\nRan 11 tests\n\nFAILED (failures=1)\n",
+       "overhead_s": 0.38
+      },
+      {
+       "file": "tests/v2/test_v21_inputs.py",
+       "role": "control",
+       "select": "*v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused",
+       "exit": 0,
+       "seconds": 0.39,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "8ec46b2b020dea6c26540ee34ad79414e2594b97d6042eef53b15caa6d773804",
+       "overhead_s": 0.36
+      },
+      {
+       "file": "tests/v2/test_v21_inputs.py",
+       "role": "control",
+       "select": "*v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused",
+       "exit": 0,
+       "seconds": 0.39,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "8ec46b2b020dea6c26540ee34ad79414e2594b97d6042eef53b15caa6d773804",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_v21_inputs.py",
+       "role": "rerun",
+       "select": "*v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused",
+       "exit": 1,
+       "seconds": 0.39,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "failures": 1,
+       "first": "FAIL: test_lookalike_hosts_are_refused (v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused) [ftp://127.0.0.1/v1] | AssertionError",
+       "tail_sha256": "ab3257f25769572e8d7a4d23a45199a70f8f131542b316c1a2c946ce97c403d2",
+       "tail": "test_lookalike_hosts_are_refused (v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused) ... \n  test_lookalike_hosts_are_refused (v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused) [ftp://127.0.0.1/v1] ... FAIL\n\n======================================================================\nFAIL: test_lookalike_hosts_are_refused (v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused) [ftp://127.0.0.1/v1]\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_v21_inputs.py\", line 133, in test_lookalike_hosts_are_refused\n    with self.subTest(e), self.assertRaises(settings.SettingsError):\n                          ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: SettingsError not raised\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (failures=1)\n",
+       "overhead_s": 0.35
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_v21_inputs.py",
+      "first": "FAIL: test_lookalike_hosts_are_refused (v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused) [ftp://127.0.0.1/v1] | AssertionError",
+      "seconds": 1.0
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L71 Or swapped",
+     "files": [
+      {
+       "file": "tests/v2/test_v21_identity.py",
+       "exit": 0,
+       "seconds": 1.49,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 13,
+       "tail_sha256": "55ff309bf7ddd8be199b014399f388efe1c20a5041ab190f563ffc170a57e475",
+       "overhead_s": 0.36
+      },
+      {
+       "file": "tests/v2/test_v21_inputs.py",
+       "exit": 1,
+       "seconds": 1.01,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 11,
+       "failures": 1,
+       "first": "FAIL: test_lookalike_hosts_are_refused (v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused) [http://user:pw@127.0.0.1/v1] | AssertionError",
+       "tail_sha256": "0efc0c59798e85e3a3ab4bdb170674227ddc3b48269d83179cb45bb0e85130c2",
+       "tail": ") ... ok\ntest_requirements_document_as_a_string (v2.test_v21_inputs.BundleShape.test_requirements_document_as_a_string) ... ok\ntest_requirements_document_without_sha256 (v2.test_v21_inputs.BundleShape.test_requirements_document_without_sha256) ... ok\ntest_stories_as_a_list (v2.test_v21_inputs.BundleShape.test_stories_as_a_list) ... ok\ntest_story_tests_as_a_string_is_not_split_into_letters (v2.test_v21_inputs.BundleShape.test_story_tests_as_a_string_is_not_split_into_letters) ... ok\ntest_story_without_tests (v2.test_v21_inputs.BundleShape.test_story_without_tests) ... ok\ntest_lookalike_hosts_are_refused (v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused) ... \n  test_lookalike_hosts_are_refused (v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused) [http://user:pw@127.0.0.1/v1] ... FAIL\n\n======================================================================\nFAIL: test_lookalike_hosts_are_refused (v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused) [http://user:pw@127.0.0.1/v1]\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_v21_inputs.py\", line 133, in test_lookalike_hosts_are_refused\n    with self.subTest(e), self.assertRaises(settings.SettingsError):\n                          ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: SettingsError not raised\n\n----------------------------------------------------------------------\nRan 11 tests\n\nFAILED (failures=1)\n",
+       "overhead_s": 0.36
+      },
+      {
+       "file": "tests/v2/test_v21_inputs.py",
+       "role": "control",
+       "select": "*v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused",
+       "exit": 0,
+       "seconds": 0.4,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "8ec46b2b020dea6c26540ee34ad79414e2594b97d6042eef53b15caa6d773804",
+       "overhead_s": 0.36
+      },
+      {
+       "file": "tests/v2/test_v21_inputs.py",
+       "role": "control",
+       "select": "*v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused",
+       "exit": 0,
+       "seconds": 0.39,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "8ec46b2b020dea6c26540ee34ad79414e2594b97d6042eef53b15caa6d773804",
+       "overhead_s": 0.36
+      },
+      {
+       "file": "tests/v2/test_v21_inputs.py",
+       "role": "rerun",
+       "select": "*v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused",
+       "exit": 1,
+       "seconds": 0.39,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "failures": 1,
+       "first": "FAIL: test_lookalike_hosts_are_refused (v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused) [http://user:pw@127.0.0.1/v1] | AssertionError",
+       "tail_sha256": "c0862f88c2693f1f9af913f45124db45778847ada365d2ff5cc0a2d61db423a7",
+       "tail": "test_lookalike_hosts_are_refused (v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused) ... \n  test_lookalike_hosts_are_refused (v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused) [http://user:pw@127.0.0.1/v1] ... FAIL\n\n======================================================================\nFAIL: test_lookalike_hosts_are_refused (v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused) [http://user:pw@127.0.0.1/v1]\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_v21_inputs.py\", line 133, in test_lookalike_hosts_are_refused\n    with self.subTest(e), self.assertRaises(settings.SettingsError):\n                          ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: SettingsError not raised\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (failures=1)\n",
+       "overhead_s": 0.36
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_v21_inputs.py",
+      "first": "FAIL: test_lookalike_hosts_are_refused (v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused) [http://user:pw@127.0.0.1/v1] | AssertionError",
+      "seconds": 1.01
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L72 returns None",
+     "files": [
+      {
+       "file": "tests/v2/test_v21_identity.py",
+       "exit": 0,
+       "seconds": 1.49,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 13,
+       "tail_sha256": "55ff309bf7ddd8be199b014399f388efe1c20a5041ab190f563ffc170a57e475",
+       "overhead_s": 0.39
+      },
+      {
+       "file": "tests/v2/test_v21_inputs.py",
+       "exit": 1,
+       "seconds": 0.98,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 11,
+       "failures": 1,
+       "first": "FAIL: test_lookalike_hosts_are_refused (v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused) [http://user:pw@127.0.0.1/v1] | AssertionError",
+       "tail_sha256": "0efc0c59798e85e3a3ab4bdb170674227ddc3b48269d83179cb45bb0e85130c2",
+       "tail": ") ... ok\ntest_requirements_document_as_a_string (v2.test_v21_inputs.BundleShape.test_requirements_document_as_a_string) ... ok\ntest_requirements_document_without_sha256 (v2.test_v21_inputs.BundleShape.test_requirements_document_without_sha256) ... ok\ntest_stories_as_a_list (v2.test_v21_inputs.BundleShape.test_stories_as_a_list) ... ok\ntest_story_tests_as_a_string_is_not_split_into_letters (v2.test_v21_inputs.BundleShape.test_story_tests_as_a_string_is_not_split_into_letters) ... ok\ntest_story_without_tests (v2.test_v21_inputs.BundleShape.test_story_without_tests) ... ok\ntest_lookalike_hosts_are_refused (v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused) ... \n  test_lookalike_hosts_are_refused (v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused) [http://user:pw@127.0.0.1/v1] ... FAIL\n\n======================================================================\nFAIL: test_lookalike_hosts_are_refused (v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused) [http://user:pw@127.0.0.1/v1]\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_v21_inputs.py\", line 133, in test_lookalike_hosts_are_refused\n    with self.subTest(e), self.assertRaises(settings.SettingsError):\n                          ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: SettingsError not raised\n\n----------------------------------------------------------------------\nRan 11 tests\n\nFAILED (failures=1)\n",
+       "overhead_s": 0.36
+      },
+      {
+       "file": "tests/v2/test_v21_inputs.py",
+       "role": "control",
+       "select": "*v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused",
+       "exit": 0,
+       "seconds": 0.4,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "8ec46b2b020dea6c26540ee34ad79414e2594b97d6042eef53b15caa6d773804",
+       "overhead_s": 0.36
+      },
+      {
+       "file": "tests/v2/test_v21_inputs.py",
+       "role": "control",
+       "select": "*v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused",
+       "exit": 0,
+       "seconds": 0.39,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "8ec46b2b020dea6c26540ee34ad79414e2594b97d6042eef53b15caa6d773804",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_v21_inputs.py",
+       "role": "rerun",
+       "select": "*v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused",
+       "exit": 1,
+       "seconds": 0.44,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "failures": 1,
+       "first": "FAIL: test_lookalike_hosts_are_refused (v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused) [http://user:pw@127.0.0.1/v1] | AssertionError",
+       "tail_sha256": "c0862f88c2693f1f9af913f45124db45778847ada365d2ff5cc0a2d61db423a7",
+       "tail": "test_lookalike_hosts_are_refused (v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused) ... \n  test_lookalike_hosts_are_refused (v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused) [http://user:pw@127.0.0.1/v1] ... FAIL\n\n======================================================================\nFAIL: test_lookalike_hosts_are_refused (v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused) [http://user:pw@127.0.0.1/v1]\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_v21_inputs.py\", line 133, in test_lookalike_hosts_are_refused\n    with self.subTest(e), self.assertRaises(settings.SettingsError):\n                          ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: SettingsError not raised\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (failures=1)\n",
+       "overhead_s": 0.36
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_v21_inputs.py",
+      "first": "FAIL: test_lookalike_hosts_are_refused (v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused) [http://user:pw@127.0.0.1/v1] | AssertionError",
+      "seconds": 0.98
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L73 And swapped",
+     "files": [
+      {
+       "file": "tests/v2/test_v21_identity.py",
+       "exit": 1,
+       "seconds": 1.48,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 13,
+       "errors": 1,
+       "first": "ERROR: test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes) | aisef2.app.settings.SettingsError",
+       "tail_sha256": "e440150e96ca8495d0388c59db214d8bd470abd9475bfeec99605347cf5f3051",
+       "tail": "ns_of_other_bytes_admit_nothing ... ok\ntest_every_active_probe_launch_starts_minus_I_minus_S_minus_B (v2.test_v21_identity.ThreeIdentities.test_every_active_probe_launch_starts_minus_I_minus_S_minus_B)\nThe semantic half of test_v21_identity_bytes.PthChannel.test_every_active_probe_launch_carries_minus_S ... ok\ntest_the_cycle1_probe_keeps_its_one_frozen_digest (v2.test_v21_identity.ThreeIdentities.test_the_cycle1_probe_keeps_its_one_frozen_digest) ... ok\ntest_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes) ... ERROR\n\n======================================================================\nERROR: test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_v21_identity.py\", line 97, in test_the_runspec_binds_each_probe_s_bytes\n    p, st = bundle.load(e2e.project_bundle(\"a\" * 40)), settings.load(e2e.SETTINGS)\n                                                       ~~~~~~~~~~~~~^^^^^^^^^^^^^^\n  File \"<tree>/aisef2/app/settings.py\", line 130, in load\n    raise SettingsError(problem)\naisef2.app.settings.SettingsError: the provider endpoint is https (or http to 127.0.0.1, localhost, ::1): provider.invalid is not loopback\n\n----------------------------------------------------------------------\nRan 13 tests\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_v21_identity.py",
+       "role": "control",
+       "select": "*v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes",
+       "exit": 0,
+       "seconds": 0.4,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "033636acb99268f769f5b74be0b08bd1e6bbbcefdbfa4c957bac84a26572472f",
+       "overhead_s": 0.36
+      },
+      {
+       "file": "tests/v2/test_v21_identity.py",
+       "role": "control",
+       "select": "*v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes",
+       "exit": 0,
+       "seconds": 0.41,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "033636acb99268f769f5b74be0b08bd1e6bbbcefdbfa4c957bac84a26572472f",
+       "overhead_s": 0.36
+      },
+      {
+       "file": "tests/v2/test_v21_identity.py",
+       "role": "rerun",
+       "select": "*v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes",
+       "exit": 1,
+       "seconds": 0.44,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes) | aisef2.app.settings.SettingsError",
+       "tail_sha256": "aaad9ad9166b6bb00e814fad3ab649288837dfa7ad1e7338e0579654b040106f",
+       "tail": "test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes) ... ERROR\n\n======================================================================\nERROR: test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_v21_identity.py\", line 97, in test_the_runspec_binds_each_probe_s_bytes\n    p, st = bundle.load(e2e.project_bundle(\"a\" * 40)), settings.load(e2e.SETTINGS)\n                                                       ~~~~~~~~~~~~~^^^^^^^^^^^^^^\n  File \"<tree>/aisef2/app/settings.py\", line 130, in load\n    raise SettingsError(problem)\naisef2.app.settings.SettingsError: the provider endpoint is https (or http to 127.0.0.1, localhost, ::1): provider.invalid is not loopback\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.4
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_v21_identity.py",
+      "first": "ERROR: test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes) | aisef2.app.settings.SettingsError",
+      "seconds": 1.48
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L74 returns None",
+     "files": [
+      {
+       "file": "tests/v2/test_v21_identity.py",
+       "exit": 0,
+       "seconds": 1.73,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 13,
+       "tail_sha256": "55ff309bf7ddd8be199b014399f388efe1c20a5041ab190f563ffc170a57e475",
+       "overhead_s": 0.38
+      },
+      {
+       "file": "tests/v2/test_v21_inputs.py",
+       "exit": 1,
+       "seconds": 1.2,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 11,
+       "failures": 1,
+       "first": "FAIL: test_lookalike_hosts_are_refused (v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused) [http://localhost.evil.example/v1] | AssertionError",
+       "tail_sha256": "1206623fc817d801ef35b72bfcff337e327d43e92b69f6f2a2bc2122870ccdd5",
+       "tail": "est_requirements_document_as_a_string (v2.test_v21_inputs.BundleShape.test_requirements_document_as_a_string) ... ok\ntest_requirements_document_without_sha256 (v2.test_v21_inputs.BundleShape.test_requirements_document_without_sha256) ... ok\ntest_stories_as_a_list (v2.test_v21_inputs.BundleShape.test_stories_as_a_list) ... ok\ntest_story_tests_as_a_string_is_not_split_into_letters (v2.test_v21_inputs.BundleShape.test_story_tests_as_a_string_is_not_split_into_letters) ... ok\ntest_story_without_tests (v2.test_v21_inputs.BundleShape.test_story_without_tests) ... ok\ntest_lookalike_hosts_are_refused (v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused) ... \n  test_lookalike_hosts_are_refused (v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused) [http://localhost.evil.example/v1] ... FAIL\n\n======================================================================\nFAIL: test_lookalike_hosts_are_refused (v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused) [http://localhost.evil.example/v1]\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_v21_inputs.py\", line 133, in test_lookalike_hosts_are_refused\n    with self.subTest(e), self.assertRaises(settings.SettingsError):\n                          ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: SettingsError not raised\n\n----------------------------------------------------------------------\nRan 11 tests\n\nFAILED (failures=1)\n",
+       "overhead_s": 0.42
+      },
+      {
+       "file": "tests/v2/test_v21_inputs.py",
+       "role": "control",
+       "select": "*v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused",
+       "exit": 0,
+       "seconds": 0.41,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "8ec46b2b020dea6c26540ee34ad79414e2594b97d6042eef53b15caa6d773804",
+       "overhead_s": 0.37
+      },
+      {
+       "file": "tests/v2/test_v21_inputs.py",
+       "role": "control",
+       "select": "*v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused",
+       "exit": 0,
+       "seconds": 0.38,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "8ec46b2b020dea6c26540ee34ad79414e2594b97d6042eef53b15caa6d773804",
+       "overhead_s": 0.39
+      },
+      {
+       "file": "tests/v2/test_v21_inputs.py",
+       "role": "rerun",
+       "select": "*v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused",
+       "exit": 1,
+       "seconds": 0.43,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "failures": 1,
+       "first": "FAIL: test_lookalike_hosts_are_refused (v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused) [http://localhost.evil.example/v1] | AssertionError",
+       "tail_sha256": "f3bbbc0cb3b9d29fcb6ae9faa71a7d7da6188744972ff597648aaae5ea30c308",
+       "tail": "test_lookalike_hosts_are_refused (v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused) ... \n  test_lookalike_hosts_are_refused (v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused) [http://localhost.evil.example/v1] ... FAIL\n\n======================================================================\nFAIL: test_lookalike_hosts_are_refused (v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused) [http://localhost.evil.example/v1]\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_v21_inputs.py\", line 133, in test_lookalike_hosts_are_refused\n    with self.subTest(e), self.assertRaises(settings.SettingsError):\n                          ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: SettingsError not raised\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (failures=1)\n",
+       "overhead_s": 0.37
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_v21_inputs.py",
+      "first": "FAIL: test_lookalike_hosts_are_refused (v2.test_v21_inputs.Endpoint.test_lookalike_hosts_are_refused) [http://localhost.evil.example/v1] | AssertionError",
+      "seconds": 1.2
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L63 string 'the provider endpoint is a URL string' emptied",
+     "files": [
+      {
+       "file": "tests/v2/test_v21_identity.py",
+       "exit": 0,
+       "seconds": 1.72,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 13,
+       "tail_sha256": "55ff309bf7ddd8be199b014399f388efe1c20a5041ab190f563ffc170a57e475",
+       "overhead_s": 0.37
+      },
+      {
+       "file": "tests/v2/test_v21_inputs.py",
+       "exit": 0,
+       "seconds": 2.04,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 20,
+       "tail_sha256": "d39f63e4c8436fb76e82de52f522bc2737bd8bc9e94af2d56412b84f482dcedb",
+       "overhead_s": 0.41
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "exit": 0,
+       "seconds": 8.22,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 41,
+       "tail_sha256": "3ef303c799614934b469520dc3ed73bad54df703d4213d103aaf0597d5afb57a",
+       "overhead_s": 0.42
+      },
+      {
+       "file": "tests/v2/test_v21_review.py",
+       "exit": 0,
+       "seconds": 19.09,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 8,
+       "tail_sha256": "472928fdd58c74eb466a3bd8815a333f24039cf54dbb7522a3ced1cf29101770",
+       "overhead_s": 0.37
+      },
+      {
+       "file": "tests/v2/test_v21_verify.py",
+       "exit": 0,
+       "seconds": 35.87,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 8,
+       "tail_sha256": "f79e6288a26ee37a4f6a7da435cf549f3749c03aca7bcb314651cef2fe72b054",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_app_run.py",
+       "exit": 0,
+       "seconds": 40.68,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 17,
+       "tail_sha256": "34c9bfe7ef7d76c17f599b0a81180f32dc90d22822f05f5f66668053994bd703",
+       "overhead_s": 0.33
+      },
+      {
+       "file": "tests/v2/test_v21_continue_usage.py",
+       "exit": 0,
+       "seconds": 59.22,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 10,
+       "tail_sha256": "25554e9cde9f11bfa4dd3a4579e3a9c44cacdb9866194adec6d1ca0574fd3b64",
+       "overhead_s": 0.36
+      },
+      {
+       "file": "tests/v2/test_v21_review_chain.py",
+       "exit": 0,
+       "seconds": 179.03,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 18,
+       "skipped": 3,
+       "skipped_tests": [
+        "test_a_full_review_against_a_scripted_model (v2.test_v21_review_chain.RealBinary.test_a_full_review_against_a_scripted_model)",
+        "test_an_empty_range_is_skipped_without_a_model_call (v2.test_v21_review_chain.RealBinary.test_an_empty_range_is_skipped_without_a_model_call)",
+        "test_the_preview_is_read_as_the_adapter_expects (v2.test_v21_review_chain.RealBinary.test_the_preview_is_read_as_the_adapter_expects)"
+       ],
+       "tail_sha256": "1e4b8d44125b0693122f7d3880014f095229c51996b171f66abfe7c5b76af006",
+       "overhead_s": 0.36
+      },
+      {
+       "file": "tests/v2/test_v21_continue_integrity.py",
+       "exit": 0,
+       "seconds": 291.73,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 24,
+       "tail_sha256": "6ed16fadda0701c1628b18171b29ee246ad8a6394124bc873e012e30e68ad7e4",
+       "overhead_s": 0.38
+      }
+     ],
+     "class": "SURVIVED",
+     "killed": false
+    },
+    {
+     "mutant": "L66 element 0 dropped",
+     "files": [
+      {
+       "file": "tests/v2/test_v21_identity.py",
+       "exit": 1,
+       "seconds": 1.45,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 13,
+       "errors": 1,
+       "first": "ERROR: test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes) | aisef2.app.settings.SettingsError",
+       "tail_sha256": "a6576e466d0fd8e2240c000d5df678fa6f65c0d5c8c40459f1d7f9069ce10398",
+       "tail": "tities.test_calibrations_of_other_bytes_admit_nothing ... ok\ntest_every_active_probe_launch_starts_minus_I_minus_S_minus_B (v2.test_v21_identity.ThreeIdentities.test_every_active_probe_launch_starts_minus_I_minus_S_minus_B)\nThe semantic half of test_v21_identity_bytes.PthChannel.test_every_active_probe_launch_carries_minus_S ... ok\ntest_the_cycle1_probe_keeps_its_one_frozen_digest (v2.test_v21_identity.ThreeIdentities.test_the_cycle1_probe_keeps_its_one_frozen_digest) ... ok\ntest_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes) ... ERROR\n\n======================================================================\nERROR: test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_v21_identity.py\", line 97, in test_the_runspec_binds_each_probe_s_bytes\n    p, st = bundle.load(e2e.project_bundle(\"a\" * 40)), settings.load(e2e.SETTINGS)\n                                                       ~~~~~~~~~~~~~^^^^^^^^^^^^^^\n  File \"<tree>/aisef2/app/settings.py\", line 130, in load\n    raise SettingsError(problem)\naisef2.app.settings.SettingsError: the provider endpoint is not a URL: too many values to unpack (expected 1, got 2)\n\n----------------------------------------------------------------------\nRan 13 tests\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_v21_identity.py",
+       "role": "control",
+       "select": "*v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes",
+       "exit": 0,
+       "seconds": 0.39,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "033636acb99268f769f5b74be0b08bd1e6bbbcefdbfa4c957bac84a26572472f",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_v21_identity.py",
+       "role": "control",
+       "select": "*v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes",
+       "exit": 0,
+       "seconds": 0.39,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "033636acb99268f769f5b74be0b08bd1e6bbbcefdbfa4c957bac84a26572472f",
+       "overhead_s": 0.36
+      },
+      {
+       "file": "tests/v2/test_v21_identity.py",
+       "role": "rerun",
+       "select": "*v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes",
+       "exit": 1,
+       "seconds": 0.4,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes) | aisef2.app.settings.SettingsError",
+       "tail_sha256": "1cb5082f059f4abf9a3b765c6208a6ac5ff571919cc969fd323f7616e8875769",
+       "tail": "test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes) ... ERROR\n\n======================================================================\nERROR: test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_v21_identity.py\", line 97, in test_the_runspec_binds_each_probe_s_bytes\n    p, st = bundle.load(e2e.project_bundle(\"a\" * 40)), settings.load(e2e.SETTINGS)\n                                                       ~~~~~~~~~~~~~^^^^^^^^^^^^^^\n  File \"<tree>/aisef2/app/settings.py\", line 130, in load\n    raise SettingsError(problem)\naisef2.app.settings.SettingsError: the provider endpoint is not a URL: too many values to unpack (expected 1, got 2)\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.35
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_v21_identity.py",
+      "first": "ERROR: test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes) | aisef2.app.settings.SettingsError",
+      "seconds": 1.45
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L66 element 1 dropped",
+     "files": [
+      {
+       "file": "tests/v2/test_v21_identity.py",
+       "exit": 1,
+       "seconds": 1.44,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 13,
+       "errors": 1,
+       "first": "ERROR: test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes) | aisef2.app.settings.SettingsError",
+       "tail_sha256": "a6576e466d0fd8e2240c000d5df678fa6f65c0d5c8c40459f1d7f9069ce10398",
+       "tail": "tities.test_calibrations_of_other_bytes_admit_nothing ... ok\ntest_every_active_probe_launch_starts_minus_I_minus_S_minus_B (v2.test_v21_identity.ThreeIdentities.test_every_active_probe_launch_starts_minus_I_minus_S_minus_B)\nThe semantic half of test_v21_identity_bytes.PthChannel.test_every_active_probe_launch_carries_minus_S ... ok\ntest_the_cycle1_probe_keeps_its_one_frozen_digest (v2.test_v21_identity.ThreeIdentities.test_the_cycle1_probe_keeps_its_one_frozen_digest) ... ok\ntest_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes) ... ERROR\n\n======================================================================\nERROR: test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_v21_identity.py\", line 97, in test_the_runspec_binds_each_probe_s_bytes\n    p, st = bundle.load(e2e.project_bundle(\"a\" * 40)), settings.load(e2e.SETTINGS)\n                                                       ~~~~~~~~~~~~~^^^^^^^^^^^^^^\n  File \"<tree>/aisef2/app/settings.py\", line 130, in load\n    raise SettingsError(problem)\naisef2.app.settings.SettingsError: the provider endpoint is not a URL: too many values to unpack (expected 1, got 2)\n\n----------------------------------------------------------------------\nRan 13 tests\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_v21_identity.py",
+       "role": "control",
+       "select": "*v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes",
+       "exit": 0,
+       "seconds": 0.39,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "033636acb99268f769f5b74be0b08bd1e6bbbcefdbfa4c957bac84a26572472f",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_v21_identity.py",
+       "role": "control",
+       "select": "*v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes",
+       "exit": 0,
+       "seconds": 0.39,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "033636acb99268f769f5b74be0b08bd1e6bbbcefdbfa4c957bac84a26572472f",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_v21_identity.py",
+       "role": "rerun",
+       "select": "*v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes",
+       "exit": 1,
+       "seconds": 0.39,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes) | aisef2.app.settings.SettingsError",
+       "tail_sha256": "1cb5082f059f4abf9a3b765c6208a6ac5ff571919cc969fd323f7616e8875769",
+       "tail": "test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes) ... ERROR\n\n======================================================================\nERROR: test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_v21_identity.py\", line 97, in test_the_runspec_binds_each_probe_s_bytes\n    p, st = bundle.load(e2e.project_bundle(\"a\" * 40)), settings.load(e2e.SETTINGS)\n                                                       ~~~~~~~~~~~~~^^^^^^^^^^^^^^\n  File \"<tree>/aisef2/app/settings.py\", line 130, in load\n    raise SettingsError(problem)\naisef2.app.settings.SettingsError: the provider endpoint is not a URL: too many values to unpack (expected 1, got 2)\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.35
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_v21_identity.py",
+      "first": "ERROR: test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes) | aisef2.app.settings.SettingsError",
+      "seconds": 1.44
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L66 element 0 dropped",
+     "files": [
+      {
+       "file": "tests/v2/test_v21_identity.py",
+       "exit": 1,
+       "seconds": 1.43,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 13,
+       "errors": 1,
+       "first": "ERROR: test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes) | aisef2.app.settings.SettingsError",
+       "tail_sha256": "abb57c652f01e878f5021099a207567c977a8fec101fee5ecf92fabd1fcb8174",
+       "tail": "ties.test_calibrations_of_other_bytes_admit_nothing ... ok\ntest_every_active_probe_launch_starts_minus_I_minus_S_minus_B (v2.test_v21_identity.ThreeIdentities.test_every_active_probe_launch_starts_minus_I_minus_S_minus_B)\nThe semantic half of test_v21_identity_bytes.PthChannel.test_every_active_probe_launch_carries_minus_S ... ok\ntest_the_cycle1_probe_keeps_its_one_frozen_digest (v2.test_v21_identity.ThreeIdentities.test_the_cycle1_probe_keeps_its_one_frozen_digest) ... ok\ntest_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes) ... ERROR\n\n======================================================================\nERROR: test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_v21_identity.py\", line 97, in test_the_runspec_binds_each_probe_s_bytes\n    p, st = bundle.load(e2e.project_bundle(\"a\" * 40)), settings.load(e2e.SETTINGS)\n                                                       ~~~~~~~~~~~~~^^^^^^^^^^^^^^\n  File \"<tree>/aisef2/app/settings.py\", line 130, in load\n    raise SettingsError(problem)\naisef2.app.settings.SettingsError: the provider endpoint is not a URL: not enough values to unpack (expected 2, got 1)\n\n----------------------------------------------------------------------\nRan 13 tests\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_v21_identity.py",
+       "role": "control",
+       "select": "*v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes",
+       "exit": 0,
+       "seconds": 0.39,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "033636acb99268f769f5b74be0b08bd1e6bbbcefdbfa4c957bac84a26572472f",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_v21_identity.py",
+       "role": "control",
+       "select": "*v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes",
+       "exit": 0,
+       "seconds": 0.39,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "033636acb99268f769f5b74be0b08bd1e6bbbcefdbfa4c957bac84a26572472f",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_v21_identity.py",
+       "role": "rerun",
+       "select": "*v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes",
+       "exit": 1,
+       "seconds": 0.37,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes) | aisef2.app.settings.SettingsError",
+       "tail_sha256": "7e5255cdb02ee10be0410c9b851163322c46c68e0670330fddced89e84a7194b",
+       "tail": "test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes) ... ERROR\n\n======================================================================\nERROR: test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_v21_identity.py\", line 97, in test_the_runspec_binds_each_probe_s_bytes\n    p, st = bundle.load(e2e.project_bundle(\"a\" * 40)), settings.load(e2e.SETTINGS)\n                                                       ~~~~~~~~~~~~~^^^^^^^^^^^^^^\n  File \"<tree>/aisef2/app/settings.py\", line 130, in load\n    raise SettingsError(problem)\naisef2.app.settings.SettingsError: the provider endpoint is not a URL: not enough values to unpack (expected 2, got 1)\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.35
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_v21_identity.py",
+      "first": "ERROR: test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes) | aisef2.app.settings.SettingsError",
+      "seconds": 1.43
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L66 element 1 dropped",
+     "files": [
+      {
+       "file": "tests/v2/test_v21_identity.py",
+       "exit": 1,
+       "seconds": 1.43,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 13,
+       "errors": 1,
+       "first": "ERROR: test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes) | aisef2.app.settings.SettingsError",
+       "tail_sha256": "abb57c652f01e878f5021099a207567c977a8fec101fee5ecf92fabd1fcb8174",
+       "tail": "ties.test_calibrations_of_other_bytes_admit_nothing ... ok\ntest_every_active_probe_launch_starts_minus_I_minus_S_minus_B (v2.test_v21_identity.ThreeIdentities.test_every_active_probe_launch_starts_minus_I_minus_S_minus_B)\nThe semantic half of test_v21_identity_bytes.PthChannel.test_every_active_probe_launch_carries_minus_S ... ok\ntest_the_cycle1_probe_keeps_its_one_frozen_digest (v2.test_v21_identity.ThreeIdentities.test_the_cycle1_probe_keeps_its_one_frozen_digest) ... ok\ntest_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes) ... ERROR\n\n======================================================================\nERROR: test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_v21_identity.py\", line 97, in test_the_runspec_binds_each_probe_s_bytes\n    p, st = bundle.load(e2e.project_bundle(\"a\" * 40)), settings.load(e2e.SETTINGS)\n                                                       ~~~~~~~~~~~~~^^^^^^^^^^^^^^\n  File \"<tree>/aisef2/app/settings.py\", line 130, in load\n    raise SettingsError(problem)\naisef2.app.settings.SettingsError: the provider endpoint is not a URL: not enough values to unpack (expected 2, got 1)\n\n----------------------------------------------------------------------\nRan 13 tests\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_v21_identity.py",
+       "role": "control",
+       "select": "*v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes",
+       "exit": 0,
+       "seconds": 0.4,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "033636acb99268f769f5b74be0b08bd1e6bbbcefdbfa4c957bac84a26572472f",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_v21_identity.py",
+       "role": "control",
+       "select": "*v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes",
+       "exit": 0,
+       "seconds": 0.39,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "033636acb99268f769f5b74be0b08bd1e6bbbcefdbfa4c957bac84a26572472f",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_v21_identity.py",
+       "role": "rerun",
+       "select": "*v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes",
+       "exit": 1,
+       "seconds": 0.37,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes) | aisef2.app.settings.SettingsError",
+       "tail_sha256": "7e5255cdb02ee10be0410c9b851163322c46c68e0670330fddced89e84a7194b",
+       "tail": "test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes) ... ERROR\n\n======================================================================\nERROR: test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_v21_identity.py\", line 97, in test_the_runspec_binds_each_probe_s_bytes\n    p, st = bundle.load(e2e.project_bundle(\"a\" * 40)), settings.load(e2e.SETTINGS)\n                                                       ~~~~~~~~~~~~~^^^^^^^^^^^^^^\n  File \"<tree>/aisef2/app/settings.py\", line 130, in load\n    raise SettingsError(problem)\naisef2.app.settings.SettingsError: the provider endpoint is not a URL: not enough values to unpack (expected 2, got 1)\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.35
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_v21_identity.py",
+      "first": "ERROR: test_the_runspec_binds_each_probe_s_bytes (v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes) | aisef2.app.settings.SettingsError",
+      "seconds": 1.43
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L68 returns None",
+     "files": [
+      {
+       "file": "tests/v2/test_v21_identity.py",
+       "exit": 0,
+       "seconds": 1.46,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 13,
+       "tail_sha256": "55ff309bf7ddd8be199b014399f388efe1c20a5041ab190f563ffc170a57e475",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_v21_inputs.py",
+       "exit": 0,
+       "seconds": 1.71,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 20,
+       "tail_sha256": "d39f63e4c8436fb76e82de52f522bc2737bd8bc9e94af2d56412b84f482dcedb",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "exit": 0,
+       "seconds": 6.98,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 41,
+       "tail_sha256": "3ef303c799614934b469520dc3ed73bad54df703d4213d103aaf0597d5afb57a",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_v21_review.py",
+       "exit": 0,
+       "seconds": 18.44,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 8,
+       "tail_sha256": "472928fdd58c74eb466a3bd8815a333f24039cf54dbb7522a3ced1cf29101770",
+       "overhead_s": 0.36
+      },
+      {
+       "file": "tests/v2/test_v21_verify.py",
+       "exit": 0,
+       "seconds": 36.82,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 8,
+       "tail_sha256": "f79e6288a26ee37a4f6a7da435cf549f3749c03aca7bcb314651cef2fe72b054",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_app_run.py",
+       "exit": 0,
+       "seconds": 46.2,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 17,
+       "tail_sha256": "34c9bfe7ef7d76c17f599b0a81180f32dc90d22822f05f5f66668053994bd703",
+       "overhead_s": 0.47
+      },
+      {
+       "file": "tests/v2/test_v21_continue_usage.py",
+       "exit": 0,
+       "seconds": 71.79,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 10,
+       "tail_sha256": "25554e9cde9f11bfa4dd3a4579e3a9c44cacdb9866194adec6d1ca0574fd3b64",
+       "overhead_s": 0.44
+      },
+      {
+       "file": "tests/v2/test_v21_review_chain.py",
+       "exit": 0,
+       "seconds": 198.0,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 18,
+       "skipped": 3,
+       "skipped_tests": [
+        "test_a_full_review_against_a_scripted_model (v2.test_v21_review_chain.RealBinary.test_a_full_review_against_a_scripted_model)",
+        "test_an_empty_range_is_skipped_without_a_model_call (v2.test_v21_review_chain.RealBinary.test_an_empty_range_is_skipped_without_a_model_call)",
+        "test_the_preview_is_read_as_the_adapter_expects (v2.test_v21_review_chain.RealBinary.test_the_preview_is_read_as_the_adapter_expects)"
+       ],
+       "tail_sha256": "1e4b8d44125b0693122f7d3880014f095229c51996b171f66abfe7c5b76af006",
+       "overhead_s": 0.44
+      },
+      {
+       "file": "tests/v2/test_v21_continue_integrity.py",
+       "exit": 1,
+       "seconds": 190.82,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 15,
+       "errors": 1,
+       "first": "ERROR: test_a_corrupt_line_before_the_end_is_refused (v2.test_v21_continue_integrity.JournalAppendWindows.test_a_corrupt_line_before_the_end_is_refused) | shutil.Error",
+       "tail_sha256": "5c59c73267304a17cb0ab0cc6f2c6c20330beba91df9f4aecad26197d22998d9",
+       "tail": " 389, in test_a_corrupt_line_before_the_end_is_refused\n    shutil.copytree(first, copy, symlinks=True)\n    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/shutil.py\", line 654, in copytree\n    return _copytree(entries=entries, src=src, dst=dst, symlinks=symlinks,\n                     ignore=ignore, copy_function=copy_function,\n                     ignore_dangling_symlinks=ignore_dangling_symlinks,\n                     dirs_exist_ok=dirs_exist_ok)\n  File \"/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/shutil.py\", line 608, in _copytree\n    raise Error(errors)\nshutil.Error: [('<run>/tmp/tmp1ngdg08v/first/repo/app/calc.py', '<run>/tmp/tmp1ngdg08v/copy/repo/app/calc.py', \"[Errno 28] No space left on device: '<run>/tmp/tmp1ngdg08v/copy/repo/app/calc.py'\"), ('<run>/tmp/tmp1ngdg08v/first/repo/docs', '<run>/tmp/tmp1ngdg08v/copy/repo/docs', \"[Errno 28] No space left on device: '<run>/tmp/tmp1ngdg08v/copy/repo/docs'\"), ('<run>/tmp/tmp1ngdg08v/first/repo/.git', '<run>/tmp/tmp1ngdg08v/copy/repo/.git', \"[Errno 28] No space left on device: '<run>/tmp/tmp1ngdg08v/copy/repo/.git'\"), ('<run>/tmp/tmp1ngdg08v/first/preflight', '<run>/tmp/tmp1ngdg08v/copy/preflight', \"[Errno 28] No space left on device: '<run>/tmp/tmp1ngdg08v/copy/preflight'\")]\n\n----------------------------------------------------------------------\nRan 15 tests\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.46
+      }
+     ],
+     "class": "INFRA",
+     "killed": false,
+     "why": "RUNNER_EXCEPTION: OSError(28, 'No space left on device')"
+    },
+    {
+     "mutant": "L69 NotIn->In",
+     "class": "NOT_RUN",
+     "killed": false
+    },
+    {
+     "mutant": "L69 not removed",
+     "class": "NOT_RUN",
+     "killed": false
+    },
+    {
+     "mutant": "L70 string 'the provider endpoint is an https URL (or http to a loopback address) with a host' emptied",
+     "class": "NOT_RUN",
+     "killed": false
+    },
+    {
+     "mutant": "L71 IsNot->Is",
+     "class": "NOT_RUN",
+     "killed": false
+    },
+    {
+     "mutant": "L71 IsNot->Is",
+     "class": "NOT_RUN",
+     "killed": false
+    },
+    {
+     "mutant": "L72 string 'the provider endpoint carries no credentials, query or fragment (the key is sent as a header)' emptied",
+     "class": "NOT_RUN",
+     "killed": false
+    },
+    {
+     "mutant": "L73 Eq->NotEq",
+     "class": "NOT_RUN",
+     "killed": false
+    },
+    {
+     "mutant": "L73 NotIn->In",
+     "class": "NOT_RUN",
+     "killed": false
+    },
+    {
+     "mutant": "L69 element 0 dropped",
+     "class": "NOT_RUN",
+     "killed": false
+    },
+    {
+     "mutant": "L69 element 1 dropped",
+     "class": "NOT_RUN",
+     "killed": false
+    },
+    {
+     "mutant": "L73 string 'http' emptied",
+     "class": "NOT_RUN",
+     "killed": false
+    },
+    {
+     "mutant": "L74 string 'the provider endpoint is https (or http to ' emptied",
+     "class": "NOT_RUN",
+     "killed": false
+    },
+    {
+     "mutant": "L74 string '): ' emptied",
+     "class": "NOT_RUN",
+     "killed": false
+    },
+    {
+     "mutant": "L74 string ' is not loopback' emptied",
+     "class": "NOT_RUN",
+     "killed": false
+    },
+    {
+     "mutant": "L68 string 'the provider endpoint is not a URL: ' emptied",
+     "class": "NOT_RUN",
+     "killed": false
+    },
+    {
+     "mutant": "L69 string 'https' emptied",
+     "class": "NOT_RUN",
+     "killed": false
+    },
+    {
+     "mutant": "L69 string 'http' emptied",
+     "class": "NOT_RUN",
+     "killed": false
+    },
+    {
+     "mutant": "L74 string ', ' emptied",
+     "class": "NOT_RUN",
+     "killed": false
+    }
+   ],
+   "t0": [
+    {
+     "file": "tests/v2/test_app_units.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 7.69,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 41,
+     "first_test": "v2.test_app_units.Adapters.test_attempt_of_reads_the_kernel_projection_and_prior_failures",
+     "tail_sha256": "3ef303c799614934b469520dc3ed73bad54df703d4213d103aaf0597d5afb57a",
+     "overhead_s": 0.39
+    },
+    {
+     "file": "tests/v2/test_v21_inputs.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 1.88,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 20,
+     "first_test": "v2.test_v21_inputs.BundleShape.test_a_valid_bundle_still_loads",
+     "tail_sha256": "d39f63e4c8436fb76e82de52f522bc2737bd8bc9e94af2d56412b84f482dcedb",
+     "overhead_s": 0.35
+    },
+    {
+     "file": "tests/v2/test_v21_identity.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 1.49,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 13,
+     "first_test": "v2.test_v21_identity.Migrate.test_a_spec_no_release_compiles_is_refused_not_guessed",
+     "tail_sha256": "55ff309bf7ddd8be199b014399f388efe1c20a5041ab190f563ffc170a57e475",
+     "overhead_s": 0.35
+    },
+    {
+     "file": "tests/v2/test_v21_review.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 18.15,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 8,
+     "first_test": "v2.test_v21_review.HistoricalDefects.test_each_shipped_defect_is_confirmed_on_its_shape_and_not_on_the_reference",
+     "tail_sha256": "472928fdd58c74eb466a3bd8815a333f24039cf54dbb7522a3ced1cf29101770",
+     "overhead_s": 0.35
+    },
+    {
+     "file": "tests/v2/test_v21_verify.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 35.6,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 8,
+     "first_test": "v2.test_v21_verify.RecordAlone.test_a_budget_stop_removed_from_the_record_is_refuted",
+     "tail_sha256": "f79e6288a26ee37a4f6a7da435cf549f3749c03aca7bcb314651cef2fe72b054",
+     "overhead_s": 0.37
+    },
+    {
+     "file": "tests/v2/test_v21_continue_usage.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 58.96,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 10,
+     "first_test": "v2.test_v21_continue_usage.Continue.test_a_continuation_verifies_given_its_directory_relative_or_absolute",
+     "tail_sha256": "25554e9cde9f11bfa4dd3a4579e3a9c44cacdb9866194adec6d1ca0574fd3b64",
+     "overhead_s": 0.36
+    },
+    {
+     "file": "tests/v2/test_v21_review_chain.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 174.61,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 18,
+     "skipped": 3,
+     "skipped_tests": [
+      "test_a_full_review_against_a_scripted_model (v2.test_v21_review_chain.RealBinary.test_a_full_review_against_a_scripted_model)",
+      "test_an_empty_range_is_skipped_without_a_model_call (v2.test_v21_review_chain.RealBinary.test_an_empty_range_is_skipped_without_a_model_call)",
+      "test_the_preview_is_read_as_the_adapter_expects (v2.test_v21_review_chain.RealBinary.test_the_preview_is_read_as_the_adapter_expects)"
+     ],
+     "first_test": "v2.test_v21_review_chain.CandidateChangedDuringReview.test_a_commit_made_by_the_finder_discards_the_review",
+     "tail_sha256": "1e4b8d44125b0693122f7d3880014f095229c51996b171f66abfe7c5b76af006",
+     "overhead_s": 0.34
+    },
+    {
+     "file": "tests/v2/test_v21_continue_integrity.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 259.16,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 24,
+     "first_test": "v2.test_v21_continue_integrity.AnchorThreatModel.test_an_attacker_who_cannot_write_the_store_is_refuted",
+     "tail_sha256": "6ed16fadda0701c1628b18171b29ee246ad8a6394124bc873e012e30e68ad7e4",
+     "overhead_s": 0.37
+    },
+    {
+     "file": "tests/v2/test_app_run.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 38.96,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 17,
+     "first_test": "v2.test_app_run.Command.test_a_live_run_without_the_provider_key_stops_before_any_request",
+     "tail_sha256": "34c9bfe7ef7d76c17f599b0a81180f32dc90d22822f05f5f66668053994bd703",
+     "overhead_s": 0.37
+    }
+   ],
+   "error": "RUNNER_EXCEPTION at mutant 'L68 returns None' (?): OSError(28, 'No space left on device')",
+   "stopped": true,
+   "killed": 15,
+   "survivors": [
+    "L63 returns None",
+    "L63 string 'the provider endpoint is a URL string' emptied",
+    "L68 returns None",
+    "L69 NotIn->In",
+    "L69 not removed",
+    "L70 string 'the provider endpoint is an https URL (or http to a loopback address) with a host' emptied",
+    "L71 IsNot->Is",
+    "L71 IsNot->Is",
+    "L72 string 'the provider endpoint carries no credentials, query or fragment (the key is sent as a header)' emptied",
+    "L73 Eq->NotEq",
+    "L73 NotIn->In",
+    "L69 element 0 dropped",
+    "L69 element 1 dropped",
+    "L73 string 'http' emptied",
+    "L74 string 'the provider endpoint is https (or http to ' emptied",
+    "L74 string '): ' emptied",
+    "L74 string ' is not loopback' emptied",
+    "L68 string 'the provider endpoint is not a URL: ' emptied",
+    "L69 string 'https' emptied",
+    "L69 string 'http' emptied",
+    "L74 string ', ' emptied"
+   ],
+   "classes": {
+    "KILLED": 15,
+    "SURVIVED": 2,
+    "TIMEOUT": 0,
+    "INFRA": 1,
+    "NOT_RUN": 18
+   },
+   "killed_by_timeout": 0,
+   "strays_reaped": 0
+  }
+ ]
+}

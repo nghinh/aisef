@@ -1,0 +1,256 @@
+{
+ "record": "AISEF V2 — V2.1 MUTATION",
+ "tool": "validation/v2/mutation.py",
+ "targets": [
+  {
+   "target": "aisef2/app/settings.py::endpoint_problem",
+   "runner": 2,
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_review.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "source_sha256": "1ef489a7d6e45ab82a0748aa21df392d86db295d025b9aed1f0ceff881e1f494",
+   "tree_sha256": "9dea25575b780fb48367b1b27f22c896ee010c9ec794af63e5331f6503adc03a",
+   "mutants": 36,
+   "results": [
+    {
+     "mutant": "L62 condition negated",
+     "class": "NOT_RUN",
+     "killed": false
+    },
+    {
+     "mutant": "L69 condition negated",
+     "class": "NOT_RUN",
+     "killed": false
+    },
+    {
+     "mutant": "L71 condition negated",
+     "class": "NOT_RUN",
+     "killed": false
+    },
+    {
+     "mutant": "L73 condition negated",
+     "class": "NOT_RUN",
+     "killed": false
+    },
+    {
+     "mutant": "L62 not removed",
+     "class": "NOT_RUN",
+     "killed": false
+    },
+    {
+     "mutant": "L63 returns None",
+     "class": "NOT_RUN",
+     "killed": false
+    },
+    {
+     "mutant": "L69 Or swapped",
+     "class": "NOT_RUN",
+     "killed": false
+    },
+    {
+     "mutant": "L70 returns None",
+     "class": "NOT_RUN",
+     "killed": false
+    },
+    {
+     "mutant": "L71 Or swapped",
+     "class": "NOT_RUN",
+     "killed": false
+    },
+    {
+     "mutant": "L72 returns None",
+     "class": "NOT_RUN",
+     "killed": false
+    },
+    {
+     "mutant": "L73 And swapped",
+     "class": "NOT_RUN",
+     "killed": false
+    },
+    {
+     "mutant": "L74 returns None",
+     "class": "NOT_RUN",
+     "killed": false
+    },
+    {
+     "mutant": "L63 string 'the provider endpoint is a URL string' emptied",
+     "class": "NOT_RUN",
+     "killed": false
+    },
+    {
+     "mutant": "L66 element 0 dropped",
+     "class": "NOT_RUN",
+     "killed": false
+    },
+    {
+     "mutant": "L66 element 1 dropped",
+     "class": "NOT_RUN",
+     "killed": false
+    },
+    {
+     "mutant": "L66 element 0 dropped",
+     "class": "NOT_RUN",
+     "killed": false
+    },
+    {
+     "mutant": "L66 element 1 dropped",
+     "class": "NOT_RUN",
+     "killed": false
+    },
+    {
+     "mutant": "L68 returns None",
+     "class": "NOT_RUN",
+     "killed": false
+    },
+    {
+     "mutant": "L69 NotIn->In",
+     "class": "NOT_RUN",
+     "killed": false
+    },
+    {
+     "mutant": "L69 not removed",
+     "class": "NOT_RUN",
+     "killed": false
+    },
+    {
+     "mutant": "L70 string 'the provider endpoint is an https URL (or http to a loopback address) with a host' emptied",
+     "class": "NOT_RUN",
+     "killed": false
+    },
+    {
+     "mutant": "L71 IsNot->Is",
+     "class": "NOT_RUN",
+     "killed": false
+    },
+    {
+     "mutant": "L71 IsNot->Is",
+     "class": "NOT_RUN",
+     "killed": false
+    },
+    {
+     "mutant": "L72 string 'the provider endpoint carries no credentials, query or fragment (the key is sent as a header)' emptied",
+     "class": "NOT_RUN",
+     "killed": false
+    },
+    {
+     "mutant": "L73 Eq->NotEq",
+     "class": "NOT_RUN",
+     "killed": false
+    },
+    {
+     "mutant": "L73 NotIn->In",
+     "class": "NOT_RUN",
+     "killed": false
+    },
+    {
+     "mutant": "L69 element 0 dropped",
+     "class": "NOT_RUN",
+     "killed": false
+    },
+    {
+     "mutant": "L69 element 1 dropped",
+     "class": "NOT_RUN",
+     "killed": false
+    },
+    {
+     "mutant": "L73 string 'http' emptied",
+     "class": "NOT_RUN",
+     "killed": false
+    },
+    {
+     "mutant": "L74 string 'the provider endpoint is https (or http to ' emptied",
+     "class": "NOT_RUN",
+     "killed": false
+    },
+    {
+     "mutant": "L74 string '): ' emptied",
+     "class": "NOT_RUN",
+     "killed": false
+    },
+    {
+     "mutant": "L74 string ' is not loopback' emptied",
+     "class": "NOT_RUN",
+     "killed": false
+    },
+    {
+     "mutant": "L68 string 'the provider endpoint is not a URL: ' emptied",
+     "class": "NOT_RUN",
+     "killed": false
+    },
+    {
+     "mutant": "L69 string 'https' emptied",
+     "class": "NOT_RUN",
+     "killed": false
+    },
+    {
+     "mutant": "L69 string 'http' emptied",
+     "class": "NOT_RUN",
+     "killed": false
+    },
+    {
+     "mutant": "L74 string ', ' emptied",
+     "class": "NOT_RUN",
+     "killed": false
+    }
+   ],
+   "error": "RUNNER_EXCEPTION before the target: Error([('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-pristine-53ac8e57dbe1-w4te3bkn/tree/closure-evidence/v2/P7-FINDING-001/corrected-e0d5af6/diag-orch9-linux-py3.11-shard3.json', '/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-mut-53ac8e57dbe1-va9cmkvj/tree-_u4m7fzo/tree/closure-evidence/v2/P7-FINDING-001/corrected-e0d5af6/diag-orch9-linux-py3.11-shard3.json', \"[Errno 28] No space left on device: '/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-pristine-53ac8e57dbe1-w4te3bkn/tree/closure-evidence/v2/P7-FINDING-001/corrected-e0d5af6/diag-orch9-linux-py3.11-shard3.json' -> '/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-mut-53ac8e57dbe1-va9cmkvj/tree-_u4m7fzo/tree/closure-evidence/v2/P7-FINDING-001/corrected-e0d5af6/diag-orch9-linux-py3.11-shard3.json'\"), ('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-pristine-53ac8e57dbe1-w4te3bkn/tree/closure-evidence/v2/P7-FINDING-001/corrected-e0d5af6/diag-orch9-linux-py3.13-shard1.json', '/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-mut-53ac8e57dbe1-va9cmkvj/tree-_u4m7fzo/tree/closure-evidence/v2/P7-FINDING-001/corrected-e0d5af6/diag-orch9-linux-py3.13-shard1.json', \"[Errno 28] No space left on device: '/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-pristine-53ac8e57dbe1-w4te3bkn/tree/closure-evidence/v2/P7-FINDING-001/corrected-e0d5af6/diag-orch9-linux-py3.13-shard1.json' -> '/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-mut-53ac8e57dbe1-va9cmkvj/tree-_u4m7fzo/tree/closure-evidence/v2/P7-FINDING-001/corrected-e0d5af6/diag-orch9-linux-py3.13-shard1.json'\"), ('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-pristine-53ac8e57dbe1-w4te3bkn/tree/closure-evidence/v2/P7-FINDING-001/corrected-e0d5af6/diag-orch9-linux-py3.14-shard1.json', '/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-mut-53ac8e57dbe1-va9cmkvj/tree-_u4m7fzo/tree/closure-evidence/v2/P7-FINDING-001/corrected-e0d5af6/diag-orch9-linux-py3.14-shard1.json', \"[Errno 28] No space left on device: '/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-pristine-53ac8e57dbe1-w4te3bkn/tree/closure-evidence/v2/P7-FINDING-001/corrected-e0d5af6/diag-orch9-linux-py3.14-shard1.json' -> '/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-mut-53ac8e57dbe1-va9cmkvj/tree-_u4m7fzo/tree/closure-evidence/v2/P7-FINDING-001/corrected-e0d5af6/diag-orch9-linux-py3.14-shard1.json'\"), ('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-pristine-53ac8e57dbe1-w4te3bkn/tree/closure-evidence/v2/P7-FINDING-001/corrected-e0d5af6/diag-orch9-linux-py3.11-shard1.json', '/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-mut-53ac8e57dbe1-va9cmkvj/tree-_u4m7fzo/tree/closure-evidence/v2/P7-FINDING-001/corrected-e0d5af6/diag-orch9-linux-py3.11-shard1.json', \"[Errno 28] No space left on device: '/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-pristine-53ac8e57dbe1-w4te3bkn/tree/closure-evidence/v2/P7-FINDING-001/corrected-e0d5af6/diag-orch9-linux-py3.11-shard1.json' -> '/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-mut-53ac8e57dbe1-va9cmkvj/tree-_u4m7fzo/tree/closure-evidence/v2/P7-FINDING-001/corrected-e0d5af6/diag-orch9-linux-py3.11-shard1.json'\"), ('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-pristine-53ac8e57dbe1-w4te3bkn/tree/closure-evidence/v2/P7-FINDING-001/corrected-e0d5af6/diag-orch9-windows-py3.11-shard1.json', '/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-mut-53ac8e57dbe1-va9cmkvj/tree-_u4m7fzo/tree/closure-evidence/v2/P7-FINDING-001/corrected-e0d5af6/diag-orch9-windows-py3.11-shard1.json', \"[Errno 28] No space left on device: '/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-pristine-53ac8e57dbe1-w4te3bkn/tree/closure-evidence/v2/P7-FINDING-001/corrected-e0d5af6/diag-orch9-windows-py3.11-shard1.json' -> '/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-mut-53ac8e57dbe1-va9cmkvj/tree-_u4m7fzo/tree/closure-evidence/v2/P7-FINDING-001/corrected-e0d5af6/diag-orch9-windows-py3.11-shard1.json'\"), ('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-pristine-53ac8e57dbe1-w4te3bkn/tree/closure-evidence/v2/P7-FINDING-001/corrected-e0d5af6/diag-orch9-linux-py3.12-shard1.json', '/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-mut-53ac8e57dbe1-va9cmkvj/tree-_u4m7fzo/tree/closure-evidence/v2/P7-FINDING-001/corrected-e0d5af6/diag-orch9-linux-py3.12-shard1.json', \"[Errno 28] No space left on device: '/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-pristine-53ac8e57dbe1-w4te3bkn/tree/closure-evidence/v2/P7-FINDING-001/corrected-e0d5af6/diag-orch9-linux-py3.12-shard1.json' -> '/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-mut-53ac8e57dbe1-va9cmkvj/tree-_u4m7fzo/tree/closure-evidence/v2/P7-FINDING-001/corrected-e0d5af6/diag-orch9-linux-py3.12-shard1.json'\"), ('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-pristine-53ac8e57dbe1-w4te3bkn/tree/closure-evidence/v2/P7-RUN-HISTORY.json', '/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-mut-53ac8e57dbe1-va9cmkvj/tree-_u4m7fzo/tree/closure-evidence/v2/P7-RUN-HISTORY.json', \"[Errno 28] No space left on device: '/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-mut-53ac8e57dbe1-va9cmkvj/tree-_u4m7fzo/tree/closure-evidence/v2/P7-RUN-HISTORY.json'\"), ('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-pristine-53ac8e57dbe1-w4te3bkn/tree/closure-evidence/v2/P0-PLAN-FINDING-001-RESOLUTION.json', '/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-mut-53ac8e57dbe1-va9cmkvj/tree-_u4m7fzo/tree/closure-evidence/v2/P0-PLAN-FINDING-001-RESOLUTION.json', \"[Errno 28] No space left on device: '/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-mut-53ac8e57dbe1-va9cmkvj/tree-_u4m7fzo/tree/closure-evidence/v2/P0-PLAN-FINDING-001-RESOLUTION.json'\"), ('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-pristine-53ac8e57dbe1-w4te3bkn/tree/closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-002.json', '/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-mut-53ac8e57dbe1-va9cmkvj/tree-_u4m7fzo/tree/closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-002.json', \"[Errno 28] No space left on device: '/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-mut-53ac8e57dbe1-va9cmkvj/tree-_u4m7fzo/tree/closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-002.json'\"), ('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-pristine-53ac8e57dbe1-w4te3bkn/tree/closure-evidence/v2/P3-FINAL-SEAL.json', '/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-mut-53ac8e57dbe1-va9cmkvj/tree-_u4m7fzo/tree/closure-evidence/v2/P3-FINAL-SEAL.json', \"[Errno 28] No space left on device: '/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-mut-53ac8e57dbe1-va9cmkvj/tree-_u4m7fzo/tree/closure-evidence/v2/P3-FINAL-SEAL.json'\"), ('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-pristine-53ac8e57dbe1-w4te3bkn/tree/closure-evidence/v2/P1-ROUTING-TABLE.json', '/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-mut-53ac8e57dbe1-va9cmkvj/tree-_u4m7fzo/tree/closure-evidence/v2/P1-ROUTING-TABLE.json', \"[Errno 28] No space left on device: '/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-mut-53ac8e57dbe1-va9cmkvj/tree-_u4m7fzo/tree/closure-evidence/v2/P1-ROUTING-TABLE.json'\"), ('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-pristine-53ac8e57dbe1-w4te3bkn/tree/closure-evidence/v2/P5-INVARIANTS.json', '/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-mut-53ac8e57dbe1-va9cmkvj/tree-_u4m7fzo/tree/closure-evidence/v2/P5-INVARIANTS.json', \"[Errno 28] No space left on device: '/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-mut-53ac8e57dbe1-va9cmkvj/tree-_u4m7fzo/tree/closure-evidence/v2/P5-INVARIANTS.json'\"), ('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-pristine-53ac8e57dbe1-w4te3bkn/tree/closure-evidence/v2/P5-ADEQUACY.json', '/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-mut-53ac8e57dbe1-va9cmkvj/tree-_u4m7fzo/tree/closure-evidence/v2/P5-ADEQUACY.json', \"[Errno 28] No space left on device: '/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-mut-53ac8e57dbe1-va9cmkvj/tree-_u4m7fzo/tree/closure-evidence/v2/P5-ADEQUACY.json'\"), ('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-pristine-53ac8e57dbe1-w4te3bkn/tree/closure-evidence/v2/P8-RUN-HISTORY.json', '/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-mut-53ac8e57dbe1-va9cmkvj/tree-_u4m7fzo/tree/closure-evidence/v2/P8-RUN-HISTORY.json', \"[Errno 28] No space left on device: '/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-mut-53ac8e57dbe1-va9cmkvj/tree-_u4m7fzo/tree/closure-evidence/v2/P8-RUN-HISTORY.json'\"), ('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-pristine-53ac8e57dbe1-w4te3bkn/tree/closure-evidence/v2/P4-FINAL-SEAL.json', '/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-mut-53ac8e57dbe1-va9cmkvj/tree-_u4m7fzo/tree/closure-evidence/v2/P4-FINAL-SEAL.json', \"[Errno 28] No space left on device: '/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-mut-53ac8e57dbe1-va9cmkvj/tree-_u4m7fzo/tree/closure-evidence/v2/P4-FINAL-SEAL.json'\"), ('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-pristine-53ac8e57dbe1-w4te3bkn/tree/closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-003.json', '/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-mut-53ac8e57dbe1-va9cmkvj/tree-_u4m7fzo/tree/closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-003.json', \"[Errno 28] No space left on device: '/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-mut-53ac8e57dbe1-va9cmkvj/tree-_u4m7fzo/tree/closure-evidence/v2/AISEF-V2-RFC-AMENDMENT-V2-003.json'\"), ('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-pristine-53ac8e57dbe1-w4te3bkn/tree/closure-evidence/v2/Q5', '/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-mut-53ac8e57dbe1-va9cmkvj/tree-_u4m7fzo/tree/closure-evidence/v2/Q5', \"[Errno 28] No space left on device: '/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-mut-53ac8e57dbe1-va9cmkvj/tree-_u4m7fzo/tree/closure-evidence/v2/Q5'\"), ('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-pristine-53ac8e57dbe1-w4te3bkn/tree/closure-evidence/v2/P3-CONTROL-PROJECTIONS.json', '/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-mut-53ac8e57dbe1-va9cmkvj/tree-_u4m7fzo/tree/closure-evidence/v2/P3-CONTROL-PROJECTIONS.json', \"[Errno 28] No space left on device: '/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-mut-53ac8e57dbe1-va9cmkvj/tree-_u4m7fzo/tree/closure-evidence/v2/P3-CONTROL-PROJECTIONS.json'\"), ('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-pristine-53ac8e57dbe1-w4te3bkn/tree/closure-evidence/v2/P4-COMPLETION-CORRECTION-V2-003.json', '/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-mut-53ac8e57dbe1-va9cmkvj/tree-_u4m7fzo/tree/closure-evidence/v2/P4-COMPLETION-CORRECTION-V2-003.json', \"[Errno 28] No space left on device: '/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-mut-53ac8e57dbe1-va9cmkvj/tree-_u4m7fzo/tree/closure-evidence/v2/P4-COMPLETION-CORRECTION-V2-003.json'\"), ('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-pristine-53ac8e57dbe1-w4te3bkn/tree/closure-evidence/v2/P4-RANGE-EMPTINESS.json', '/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-mut-53ac8e57dbe1-va9cmkvj/tree-_u4m7fzo/tree/closure-evidence/v2/P4-RANGE-EMPTINESS.json', \"[Errno 28] No space left on device: '/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-mut-53ac8e57dbe1-va9cmkvj/tree-_u4m7fzo/tree/closure-evidence/v2/P4-RANGE-EMPTINESS.json'\"), ('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-pristine-53ac8e57dbe1-w4te3bkn/tree/closure-evidence/v2/P3-RUN-HISTORY.json', '/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-mut-53ac8e57dbe1-va9cmkvj/tree-_u4m7fzo/tree/closure-evidence/v2/P3-RUN-HISTORY.json', \"[Errno 28] No space left on device: '/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-mut-53ac8e57dbe1-va9cmkvj/tree-_u4m7fzo/tree/closure-evidence/v2/P3-RUN-HISTORY.json'\"), ('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-pristine-53ac8e57dbe1-w4te3bkn/tree/closure-evidence/v2/Q4', '/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-mut-53ac8e57dbe1-va9cmkvj/tree-_u4m7fzo/tree/closure-evidence/v2/Q4', \"[Errno 28] No space left on device: '/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-mut-53ac8e57dbe1-va9cmkvj/tree-_u4m7fzo/tree/closure-evidence/v2/Q4'\"), ('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-pristine-53ac8e57dbe1-w4te3bkn/tree/closure-evidence/v2/P4-FINDING-011-SAFETY.json', '/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-mut-53ac8e57dbe1-va9cmkvj/tree-_u4m7fzo/tree/closure-evidence/v2/P4-FINDING-011-SAFETY.json', \"[Errno 28] No space left on device: '/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-mut-53ac8e57dbe1-va9cmkvj/tree-_u4m7fzo/tree/closure-evidence/v2/P4-FINDING-011-SAFETY.json'\"), ('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-pristine-53ac8e57dbe1-w4te3bkn/tree/validation', '/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-mut-53ac8e57dbe1-va9cmkvj/tree-_u4m7fzo/tree/validation', \"[Errno 28] No space left on device: '/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/pilot/l2-decl.env/tmp/aisef-mut-53ac8e57dbe1-va9cmkvj/tree-_u4m7fzo/tree/validation'\")])",
+   "stopped": true,
+   "killed": 0,
+   "survivors": [
+    "L62 condition negated",
+    "L69 condition negated",
+    "L71 condition negated",
+    "L73 condition negated",
+    "L62 not removed",
+    "L63 returns None",
+    "L69 Or swapped",
+    "L70 returns None",
+    "L71 Or swapped",
+    "L72 returns None",
+    "L73 And swapped",
+    "L74 returns None",
+    "L63 string 'the provider endpoint is a URL string' emptied",
+    "L66 element 0 dropped",
+    "L66 element 1 dropped",
+    "L66 element 0 dropped",
+    "L66 element 1 dropped",
+    "L68 returns None",
+    "L69 NotIn->In",
+    "L69 not removed",
+    "L70 string 'the provider endpoint is an https URL (or http to a loopback address) with a host' emptied",
+    "L71 IsNot->Is",
+    "L71 IsNot->Is",
+    "L72 string 'the provider endpoint carries no credentials, query or fragment (the key is sent as a header)' emptied",
+    "L73 Eq->NotEq",
+    "L73 NotIn->In",
+    "L69 element 0 dropped",
+    "L69 element 1 dropped",
+    "L73 string 'http' emptied",
+    "L74 string 'the provider endpoint is https (or http to ' emptied",
+    "L74 string '): ' emptied",
+    "L74 string ' is not loopback' emptied",
+    "L68 string 'the provider endpoint is not a URL: ' emptied",
+    "L69 string 'https' emptied",
+    "L69 string 'http' emptied",
+    "L74 string ', ' emptied"
+   ],
+   "classes": {
+    "KILLED": 0,
+    "SURVIVED": 0,
+    "TIMEOUT": 0,
+    "INFRA": 0,
+    "NOT_RUN": 36
+   },
+   "killed_by_timeout": 0,
+   "strays_reaped": 0
+  }
+ ]
+}
