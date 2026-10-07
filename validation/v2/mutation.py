@@ -600,6 +600,8 @@ RECORDS["V2.0-S2"] = "closure-evidence/v2/release/S2-MUTATION.json"
 # and aisef2/app/calibrations.py::CALIBRATIONS — generated data (validation/qualification/release_calibration.py
 # rewrites it), proven by its calibration record and check 9, not by mutating its rows. S2_TARGETS stays whole (its
 # record's reuse proof and criteria read it); the V2.0-S2 phase keeps only what V2.1 does not take over.
+#: the semantic identity tests; tests/v2/test_v21_identity_bytes.py holds the byte/text-identity tests and is never a kill
+#: file (ORD-1: they fail the null mutant of the modules they read — docs/v2.1/MUTATION-RUNNER-V2.md §6)
 _V21_ID = "tests/v2/test_v21_identity.py"
 _V21_REG = {
     "aisef2/plan/static_admission.py": [_V21_ID], "aisef2/probe/calibration.py": [_V21_ID],
@@ -1088,6 +1090,10 @@ RELEASE_WAIT_S = 60.0
 TAIL = 1500
 #: the per-mutant classes (§4.1); only KILLED and SURVIVED are verdicts
 CLASSES = ("KILLED", "SURVIVED", "TIMEOUT", "INFRA", "NOT_RUN")
+#: test files that are part of the suite and never kill evidence: each holds only tests that fail the null mutant of
+#: every target they could be a kill file for (byte and text identity, ORD-1) — the module docstring's rule, the same as
+#: the compiler_digest tests'. A kill set naming one is refused.
+NOT_KILL_FILES = ("tests/v2/test_v21_identity_bytes.py",)
 
 _RAN = re.compile(r"^Ran (\d+) tests? in [\d.]+s$", re.M)
 _END = re.compile(r"^(OK|FAILED)(?: \((.*)\))?$", re.M)
@@ -1361,6 +1367,9 @@ def run_target(root: pathlib.Path, target: str, tests: list[str], pristine: tupl
         found = mutants(original, func, _enum_members(original, src_root))
         out.update(source_sha256=source_digest(original), tree_sha256=tree_sha, mutants=len(found))
         results = out["results"] = [{"mutant": d, "class": "NOT_RUN", "killed": False} for d, _ in found]
+        if [k for k in tests if k in NOT_KILL_FILES]:
+            out["error"] = f"not a kill file: {[k for k in tests if k in NOT_KILL_FILES]} (NOT_KILL_FILES)"
+            return _summarise(out)
         tg = _Target(rel, scratch, ca.establish(scratch), worker, pristine=src_root, tests=list(tests),
                      last=int((src_root / rel).stat().st_mtime))   # the checkout's own (copy2): stamps are above it
         _new_tree(tg)

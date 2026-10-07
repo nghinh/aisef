@@ -82,7 +82,7 @@ _PROBE = {"backlog": "docs/v2.1/STATUS.md §2 B6 and §1 A1 (919a271)",
                          "probe's executed bytes; -S: ADR-1 (no RFC clause)",
           "behaviour_tests": ("tests.v2.test_v21_identity.ThreeIdentities.test_a_spec_binds_the_capability_and_the_bytes_are_their_own_digest",
                               "tests.v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes",
-                              "tests.v2.test_v21_identity.PthChannel.test_every_active_probe_launch_carries_minus_S",
+                              "tests.v2.test_v21_identity_bytes.PthChannel.test_every_active_probe_launch_carries_minus_S",
                               "tests.v2.test_v21_identity.PthChannel.test_a_probe_on_an_interpreter_holding_a_pth_never_runs_it")}
 _TEST_15B = "tests.v2.test_c2_orchestration_conformance.Record.test_15b_only_the_release_s_named_changes_are_accepted_each_while_its_gate_holds"
 #: why each file 2.1 changed changed — the part of a row a person states; everything else in a row is derived
@@ -122,7 +122,7 @@ ROWS = {
             "test_ORCH_9_and_10_a_post_merge_regression_of_a_prior_PRESERVE_obligation_is_INTEGRATION_and_rolled_back",
             "tests.v2.test_v21_orchestration.DiffFailure.test_a_diff_git_cannot_produce_is_RESOURCE_ACQUISITION_FAILED",
             "tests.v2.test_v21_orchestration.DiffFailure.test_a_retry_budget_takes_the_story_to_its_next_attempt",
-            "tests.v2.test_v21_identity.PthChannel.test_the_run_gives_the_probes_this_interpreter_and_the_tests_their_own")},
+            "tests.v2.test_v21_identity_bytes.PthChannel.test_the_run_gives_the_probes_this_interpreter_and_the_tests_their_own")},
     "aisef2/orchestrate/workspace.py": {
         "change": "GitWorkspace.diff: git exiting non-zero raises ResourceUnavailable (2.0: InvariantError, which ended the run "
                   "as a kernel defect)",
@@ -136,8 +136,8 @@ ROWS = {
                   "calibration_for matches on it, so a byte change admits nothing until it is calibrated again",
         "backlog": "docs/v2.1/STATUS.md §2 B6 (919a271)", "owner_approval": V2_007,
         "requirement": "RFC §9.1.1 (amended V2-007): ProbeCapabilityCalibration.probe_digest is the bytes that ran; §12 check 9",
-        "behaviour_tests": ("tests.v2.test_v21_identity.ThreeIdentities.test_calibrations_of_other_bytes_admit_nothing",
-                            "tests.v2.test_v21_identity.ThreeIdentities.test_the_shipped_calibrations_name_every_class_at_the_bytes_that_run_now",
+        "behaviour_tests": ("tests.v2.test_v21_identity_bytes.ThreeIdentities.test_calibrations_of_other_bytes_admit_nothing",
+                            "tests.v2.test_v21_identity_bytes.ThreeIdentities.test_the_shipped_calibrations_name_every_class_at_the_bytes_that_run_now",
                             "tests.v2.test_v21_identity.ThreeIdentities.test_the_cycle1_probe_keeps_its_one_frozen_digest")},
     "aisef2/probe/cli_invocation.py": _PROBE,
     "aisef2/probe/file_artifact.py": {

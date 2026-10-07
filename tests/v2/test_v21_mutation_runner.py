@@ -898,6 +898,26 @@ class T0(unittest.TestCase):
         self.assertEqual([x for x in lines if x.startswith("T0 ")][-1], "T0 aisef2/toy.py::probe: PASS")
         self.assertFalse((root / rec).exists())
 
+# --------------------------------------------------------------------------------------------- §6 kill sets
+
+
+class KillSets(unittest.TestCase):
+    """ORD-1, §6: a file of byte- and text-identity tests is part of the suite and never kill evidence."""
+
+    def test_no_kill_set_names_a_byte_identity_file(self):
+        named = {f for kill in m.TARGETS.values() for f in kill}
+        self.assertEqual(sorted(named & set(m.NOT_KILL_FILES)), [])
+        self.assertTrue(all((ROOT / f).is_file() for f in m.NOT_KILL_FILES))
+        self.assertIn(m._V21_ID, named)   # the semantic half keeps its name, and every kill set that named it
+
+    def test_a_kill_set_naming_one_is_refused_before_anything_runs(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = toy(pathlib.Path(d), POSITIVE, {})
+            r = m.run_target(root, "aisef2/toy.py::positive", ["tests/v2/test_v21_identity_bytes.py"])
+        self.assertIn("not a kill file: ['tests/v2/test_v21_identity_bytes.py']", r["error"])
+        self.assertEqual(classes(r), ["NOT_RUN", "NOT_RUN"])
+        self.assertNotIn("t0", r)
+
 
 if __name__ == "__main__":
     unittest.main()
