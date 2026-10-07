@@ -684,6 +684,14 @@ V21_TARGETS.update({
     # test_c2_effect_calibration.py: it imports validation/qualification, which the mutation copy does not hold (preflight)
     "aisef2/probe/python_callable_v2.py::DIGEST": [_V21_ID, *_C2_P4_TESTS],
 })
+# campaign 1's survivors (closure-evidence/v2/v2.1/campaign-1-stopped): each target's own kill file, appended last
+_V21_KILLS = {**{f"aisef2/app/adapters.py::{n}": "tests/v2/test_v21_kills_adapters.py"
+                 for n in ("Reviewer._model", "Reviewer._verify", "Reviewer.__init__", "Reviewer.review", "_unchanged",
+                           "tree_of")},
+              **{f"aisef2/app/bundle.py::{n}": "tests/v2/test_v21_kills_bundle.py" for n in ("_strings", "read")},
+              **{f"aisef2/app/bundle_cli.py::{n}": "tests/v2/test_v21_kills_bundle_cli.py" for n in ("coverage", "init")}}
+for _t, _f in _V21_KILLS.items():
+    V21_TARGETS[_t] = [*V21_TARGETS[_t], _f]
 SUPERSEDED.update({t: "V2.1" for t in V21_TARGETS})
 for _phase in (P2_TARGETS, P6_TARGETS, C2_P1_TARGETS):
     for _t in [t for t in _phase if t in V21_TARGETS]:
