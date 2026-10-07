@@ -681,6 +681,71 @@ class Proc(unittest.TestCase):
         self.assertEqual(classes(r), ["INFRA", "NOT_RUN"])
         time.sleep(7)   # the helper ends itself
 
+    @unittest.skipUnless(sys.platform == "darwin", "the repopulating group was measured on macOS (process-env prover)")
+    def test_one_release_budget_per_run(self):
+        """Process-env prover (pl5r150): after a RangeNotEmpty the runner signals the group and calls release() again,
+        which ran the whole ladder with a fresh RELEASE_WAIT_S, so one run held its worker about twice the stated bound
+        (129 s at the default). P, in its own group inside the anchor's session (never reached by the group signals),
+        keeps the range's group repopulated; the target stops (the range would not empty), and the run's release takes
+        one budget plus both ladders' graces, not two budgets. P ends on its sentinel; nothing signals it."""
+        root = toy(self.dir, POSITIVE, {"test_r.py": f"""
+            import os, subprocess, sys, time, unittest
+            P = '''
+            import os, sys, time
+            G, end, stop = int(sys.argv[1]), time.time() + 60, sys.argv[2]
+            open(sys.argv[3], "w").write(str(os.getpid()))
+            def waiter():
+                r, w = os.pipe()
+                pid = os.fork()
+                if pid == 0:
+                    os.close(w)
+                    os.read(r, 1)
+                    try:
+                        os.setpgid(0, G)
+                    except OSError:
+                        os._exit(3)
+                    time.sleep(3)
+                    os._exit(0)
+                os.close(r)
+                return pid, w
+            spare = [waiter() for _ in range(4)]
+            def activate():
+                pid, w = spare.pop(0)
+                os.write(w, b"g")
+                os.close(w)
+                spare.append(waiter())
+                return pid
+            active = {{activate(), activate()}}
+            while time.time() < end and not os.path.exists(stop):
+                pid, _ = os.waitpid(-1, os.WNOHANG)
+                if pid == 0:
+                    time.sleep(0.001)
+                elif pid in active:
+                    active.discard(pid)
+                    active.add(activate())
+            '''
+            class R(unittest.TestCase):
+                def test_leaves_the_group_repopulated(self):
+                    import textwrap
+                    subprocess.Popen([sys.executable, "-c", textwrap.dedent(P), str(os.getpgrp()), {str(self.sentinel)!r},
+                                      {str(self.pidfile)!r}], process_group=0, stdin=subprocess.DEVNULL,
+                                     stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                    time.sleep(0.5)
+            """})
+        wait = 8.0
+        with mock.patch.object(m, "RELEASE_WAIT_S", wait):
+            r = m.run_target(root, "aisef2/toy.py::positive", ["tests/v2/test_r.py"])
+        pid = self.helper_pid()
+        row = r["t0"][0]
+        self.assertTrue(r["stopped"])
+        self.assertIn("the range would not empty", r["error"])
+        self.assertIn("not empty after ['cooperative', 'terminate', 'kill', 'cooperative', 'terminate', 'kill']", r["error"])
+        from aisef2.runtime.process_range import GRACE_S
+        grace = sum(GRACE_S)
+        self.assertLess(row["overhead_s"], wait + 2 * grace + 3, row)   # two budgets took 2 x (wait + grace)
+        self.assertGreater(row["overhead_s"], wait + grace)
+        self.end_helper(pid)
+
     @unittest.skipUnless(sys.platform == "darwin", "the group-rejoin mechanism was measured on macOS (VS-7 verifier)")
     def test_a_range_that_never_empties_is_bounded_and_never_a_kill(self):
         """VS-7/PL-5: the test ignores SIGINT and SIGTERM, so the ladder reaches SIGKILL; its child leaves the group

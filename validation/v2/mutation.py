@@ -1099,7 +1099,9 @@ def _earlier(worker: str) -> list[int]:
 
 
 #: The release ladder's last stage is bounded at this call site (VS-7/PL-5); ProcessRange's own default (no limit) stays,
-#: as tests/v2/p4 asserts it. A range still not empty after it is a residual: INFRA, never a kill.
+#: as tests/v2/p4 asserts it. A range still not empty after it is a residual: INFRA, never a kill. One budget per run:
+#: the second release() after a RangeNotEmpty gets only what the first left of it, so a run holds its worker at most
+#: TIMEOUT + RELEASE_WAIT_S + both ladders' graces (2 x 4 s) + the settle (process-env prover: it was about 2x)
 RELEASE_WAIT_S = 60.0
 #: the normalised output tail a non-PASS row keeps (every row keeps its sha256)
 TAIL = 1500
@@ -1232,7 +1234,7 @@ def _run_file(tg: _Target, rel: str, rows: list, *, select: str | None = None, f
             elapsed = time.monotonic() - t
             row.update(exit=code, seconds=round(elapsed, 2))
             escaped = [p.pid for p in r.escaped()]   # reported while their parents are alive — checked, never trusted
-            residual = None
+            residual, released = None, time.monotonic()
             try:
                 r.release()
             except Residual as e:
@@ -1259,6 +1261,7 @@ def _run_file(tg: _Target, rel: str, rows: list, *, select: str | None = None, f
                 row.setdefault("cleanup", []).extend(report.signalled)
                 if isinstance(residual, RangeNotEmpty):   # the range would not empty under its own ladder: no verdict
                     row.update(judged_before_release=outcome, outcome="INFRA", why=f"residual: {row['residual']}")
+                    r._wait = max(0.0, RELEASE_WAIT_S - (time.monotonic() - released))   # what the budget has left
                     try:
                         r.release()   # its group is gone now: reap the anchor
                     except Residual as e:
