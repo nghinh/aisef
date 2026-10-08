@@ -1,0 +1,386 @@
+"""Linux guest checks of the session confinement and of process ownership (V2.1 F; owner 2026-10-08, item 5).
+
+Runs INSIDE a Docker Desktop Linux container, started by linux_guest.sh (which states every docker flag) — never on
+the host. The tree is mounted read-only at /repo and the container is discarded (--rm). Roles (argv[1]):
+
+  canary NAME   a process the checks did not start (the entry shell starts it): records every catchable signal it gets
+  a             a setsid descendant of a confined session, started the way client.session starts one (confine.wrap,
+                then a ProcessRange whose target is bubblewrap): seen from outside, provable only through
+                cleanup_authority, gone with the session — when the client ends ("end"), when cleanup_authority
+                signals the pid it proved before the client ends ("proved"), and when the range's release ladder stops
+                a running one ("release"); plus one confine.measure with the real bubblewrap
+  b             the route test_v21_confine.measure_in_range takes for an unconfined probe's setsid sleeper — the
+                range's anchor, a subreaper, adopts it; cleanup_authority proves ancestry and birth; signal_owned
+                signals it — run through that very function, every signal_owned call recorded with its proof
+  c             the controller SIGKILLed while a confined session and its setsid descendant run: the kernel's session
+                owner (client.session) and the python that called confine.measure (in-process, as run.execute does)
+  ctl-session ARGS / ctl-measure ARGS   the controllers c starts and kills
+
+a, b and c also claim the processes the checks did not start (docker-init, the entry shell, the canaries) through a
+LIVE cleanup_authority.signal_owned: none may be signalled, and each canary must still be alive with no signal logged.
+Prints one JSON object. It signals only the controllers it started (its own Popen handles) and what cleanup_authority
+proves (INV-MUTATION-AUTHORITY); it removes nothing. Never runs opencode; the container has no network."""
+import dataclasses
+import json
+import os
+import pathlib
+import secrets
+import signal
+import subprocess
+import sys
+import tempfile
+import time
+
+REPO = pathlib.Path("/repo")
+sys.path[:0] = [str(REPO), str(REPO / "validation" / "v2")]
+from aisef2.app import client, confine  # noqa: E402
+from aisef2.runtime.process_range import ProcessRange, RangeEscaped, RangeNotEmpty  # noqa: E402
+import cleanup_authority as ca  # noqa: E402
+
+G = pathlib.Path("/tmp/g")  # shared with the entry shell: the canaries' pid files, the boundary mark
+GIT = {"HOME": "/tmp", "GIT_CONFIG_GLOBAL": "/dev/null", "GIT_CONFIG_NOSYSTEM": "1", "PATH": "/usr/bin:/bin"}
+SPEC = {"backend": "bwrap", "bwrap": "/usr/bin/bwrap", "network": "host", "read_only": []}
+CANARIES = ("early", "early-setsid", "late")
+#: the fake client: starts a setsid sleeper, writes what it sees inside to the workspace (its only writable host
+#: path), then runs until the observer creates ./go
+CLIENT = """#!/bin/sh
+setsid sleep {marker} </dev/null >/dev/null 2>&1 &
+s=$!
+sleep 0.2
+{{ echo "client $$"; echo "sleeper $s"; echo "pidns $(readlink /proc/self/ns/pid)"; echo "sleeper_sid $(cut -d' ' -f6 /proc/$s/stat)";
+   echo "visible $(cd /proc && echo [0-9]*)"; }} > ./inside.tmp
+mv ./inside.tmp ./inside.txt
+while [ ! -e ./go ]; do sleep 0.05; done
+"""
+
+
+def stat(pid: int) -> dict | None:
+    """This harness's own reading of /proc/<pid>: identity (pid, start in clock ticks since boot), state, parent,
+    group, session, command line; None when gone."""
+    try:
+        s = pathlib.Path(f"/proc/{pid}/stat").read_text(encoding="utf-8", errors="replace")
+        cmd = pathlib.Path(f"/proc/{pid}/cmdline").read_bytes().replace(b"\0", b" ").decode(errors="replace").strip()
+    except OSError:
+        return None
+    f = s[s.rindex(")") + 2:].split()
+    return {"pid": pid, "state": f[0], "ppid": int(f[1]), "pgid": int(f[2]), "sid": int(f[3]), "start": int(f[19]),
+            "cmd": cmd[:160]}
+
+
+def table() -> dict[int, dict]:
+    return {p["pid"]: p for p in (stat(int(n)) for n in os.listdir("/proc") if n.isdigit()) if p}
+
+
+def ident(p: dict) -> tuple[int, int]:
+    return p["pid"], p["start"]
+
+
+def alive(i) -> bool:
+    p = stat(i[0])
+    return p is not None and p["start"] == i[1] and p["state"] not in ("Z", "X")
+
+
+def below(t: dict, root: int) -> list[dict]:
+    """Every process whose parent chain in `t` reaches `root` (not `root` itself)."""
+    out, todo = [], [root]
+    while todo:
+        parent = todo.pop()
+        kids = [p for p in t.values() if p["ppid"] == parent and p not in out]
+        out += kids
+        todo += [p["pid"] for p in kids]
+    return out
+
+
+def chain(t: dict, pid: int) -> list[dict]:
+    out = []
+    while pid in t and len(out) < 64:
+        out.append(t[pid])
+        if pid == os.getpid() or t[pid]["ppid"] == pid:
+            break
+        pid = t[pid]["ppid"]
+    return out
+
+
+def ps() -> list[str]:
+    return subprocess.run(["ps", "-A", "-o", "pid,ppid,pgid,sid,stat,lstart,args"], capture_output=True, encoding="utf-8",
+                          errors="replace").stdout.splitlines()
+
+
+def report(r: ca.Report) -> dict:
+    return {"signalled": r.signalled, "unproven": r.unproven}
+
+
+def until(test, seconds: float, step: float = 0.02):
+    end = time.monotonic() + seconds
+    while time.monotonic() < end:
+        v = test()
+        if v:
+            return v
+        time.sleep(step)
+    return test()
+
+
+# ------------------------------------------------------------------------------------------- what the checks did not start
+
+def canary(name: str) -> None:
+    got = G / f"canary-{name}.signals"
+
+    def note(sig, _):
+        with open(got, "a", encoding="utf-8") as fh:
+            fh.write(signal.Signals(sig).name + "\n")
+    for s in signal.valid_signals():
+        if s not in (signal.SIGKILL, signal.SIGSTOP):
+            try:
+                signal.signal(s, note)
+            except (OSError, ValueError):
+                pass
+    me = stat(os.getpid())
+    (G / f"canary-{name}.tmp").write_text(json.dumps([me["pid"], me["start"]]), encoding="utf-8")
+    os.replace(G / f"canary-{name}.tmp", G / f"canary-{name}.pid")
+    while True:
+        signal.pause()
+
+
+def establish() -> tuple[ca.Boundary, dict]:
+    """The boundary, established after the early canaries and before the late one (the entry shell starts it once
+    /tmp/g/boundary exists): one is older than the boundary, the other younger — neither a descendant of this runner."""
+    if not until(lambda: all((G / f"canary-{n}.pid").exists() for n in CANARIES[:2]), 30):
+        raise SystemExit("the early canaries did not start")
+    b = ca.establish("/tmp")
+    (G / "boundary").write_text(json.dumps(dataclasses.asdict(b)), encoding="utf-8")
+    if not until(lambda: (G / "canary-late.pid").exists(), 30):
+        raise SystemExit("the late canary did not start")
+    return b, {n: tuple(json.loads((G / f"canary-{n}.pid").read_text(encoding="utf-8"))) for n in CANARIES}
+
+
+def foreign(b: ca.Boundary, can: dict) -> dict:
+    """Claim, LIVE, every process the checks did not start — docker-init, the entry shell, the canaries — and their
+    groups (the entry shell's is this harness's own): whatever cleanup_authority proved, it would signal now."""
+    t = ca.host_table()
+    pids = [1, os.getppid(), *[can[n][0] for n in CANARIES]]
+    groups = sorted({t[p].pgid for p in pids if p in t})
+    r = ca.signal_owned(b, pids=pids, groups=groups, table=t)
+    time.sleep(0.5)
+    return {"claimed_pids": pids, "claimed_groups": groups, "host_rows": {p: dataclasses.asdict(t[p]) for p in pids if p in t},
+            **report(r), "canaries_after": canaries(can)}
+
+
+def canaries(can: dict) -> dict:
+    out = {}
+    for n in CANARIES:
+        f = G / f"canary-{n}.signals"
+        out[n] = {"pid": can[n][0], "alive_same_start": alive(can[n]),
+                  "signals_received": f.read_text(encoding="utf-8").split() if f.exists() else []}
+    return out
+
+
+# ------------------------------------------------------------------------------------------- a confined session's world
+
+def world(base: pathlib.Path) -> dict:
+    base.mkdir(parents=True)
+    repo, ws, home = base / "repo", base / "work" / "ws", base / "home"
+    repo.mkdir()
+    for a in (["init", "-q", "-b", "main"], ["-c", "user.name=g", "-c", "user.email=g@l", "commit", "-q", "--allow-empty", "-m", "x"],
+              ["worktree", "add", "-q", "--detach", str(ws)]):
+        subprocess.run(["git", "-C", str(repo), *a], check=True, env=GIT)
+    (home / ".config" / "opencode").mkdir(parents=True)
+    marker = f"3600.{secrets.randbelow(10**6):06d}"
+    exe = base / "client" / "opencode"
+    exe.parent.mkdir()
+    exe.write_text(CLIENT.format(marker=marker), encoding="utf-8")
+    exe.chmod(0o755)
+    return {"base": str(base), "repo": str(repo), "ws": str(ws), "exe": str(exe), "marker": marker,
+            "env": {"PATH": "/usr/bin:/bin:/usr/local/bin", "HOME": str(home), "LANG": "C"}}
+
+
+def inside(w: dict) -> dict:
+    lines = pathlib.Path(w["ws"], "inside.txt").read_text(encoding="utf-8").splitlines()
+    return {k: v for k, _, v in (ln.partition(" ") for ln in lines)}
+
+
+def sleeper(w: dict) -> dict | None:
+    hits = [p for p in table().values() if p["cmd"] == f"sleep {w['marker']}"]
+    return hits[0] if len(hits) == 1 else None
+
+
+def gone_within(ids, seconds: float) -> dict:
+    """How long after now until none of `ids` is alive (zombie counts as gone), and what was still there at the end."""
+    t0 = time.monotonic()
+    until(lambda: not any(alive(i) for i in ids), seconds, 0.005)
+    return {"seconds": round(time.monotonic() - t0, 3), "still_alive": [i for i in ids if alive(i)],
+            "zombies": [i for i in ids if (p := stat(i[0])) and p["start"] == i[1] and p["state"] == "Z"]}
+
+
+# ------------------------------------------------------------------------------------------- the checks
+
+def check_a() -> dict:
+    b, can = establish()
+    out = {"boundary": dataclasses.asdict(b), "runner": stat(os.getpid())}
+    for mode in ("end", "proved", "release"):
+        out[mode] = session_a(b, mode)
+    w = world(pathlib.Path("/tmp/a-measure"))
+    rep = confine.measure(SPEC, pathlib.Path(w["base"]) / "m", w["exe"], pathlib.Path(w["repo"]), environ=w["env"])
+    out["measure"] = {k: rep.get(k) for k in ("problems", "setsid_survivors", "left_on_host", "bwrap_version", "bwrap_sha256")}
+    out["measure"]["namespaces"] = rep.get("inside", {}).get("namespaces")
+    out["measure"]["tried_setsid"] = rep.get("tried", {}).get("setsid")
+    out["foreign"] = foreign(b, can)
+    return out
+
+
+def session_a(b: ca.Boundary, mode: str) -> dict:
+    w = world(pathlib.Path(f"/tmp/a-{mode}"))
+    argv, env = confine.wrap(SPEC, [w["exe"], "run", "--format", "json", "the prompt"], w["env"], w["ws"], w["exe"])
+    rec: dict = {"argv": argv}
+    with open(pathlib.Path(w["base"]) / "session.log", "w", encoding="utf-8") as fh:
+        r = ProcessRange(f"a-{mode}", argv, cwd=w["ws"], env=env, output=fh, grace_s=(1.0, 1.0), wait_s=10.0).start()
+        try:
+            if not until(lambda: pathlib.Path(w["ws"], "inside.txt").exists(), 20):
+                rec["error"] = "the client did not report"
+                return rec
+            t, s = table(), sleeper(w)
+            rec["inside"] = inside(w)
+            rec["sleeper_outside"] = s
+            rec["chain_to_runner"] = chain(t, s["pid"]) if s else None
+            session = [ident(p) for p in below(t, r.group)]
+            rec["range"] = {"anchor_pid_and_group": r.group, "target_bwrap": r.target_pid,
+                            "members": [(p.pid, p.command[:80]) for p in r.members()],
+                            "escaped": [(p.pid, p.command[:80]) for p in r.escaped()], "session_processes": session}
+            rec["proof_of_the_outside_pid"] = report(ca.signal_owned(b, pids=[s["pid"]], dry_run=True)) if s else None
+            claimed = [int(rec["inside"]["client"]), int(rec["inside"]["sleeper"])]
+            rec["inside_pids_claimed"] = {"claimed": claimed, "what_they_name_outside": {p: t.get(p) for p in claimed},
+                                          "dry_run": report(ca.signal_owned(b, pids=claimed, dry_run=True))}
+            if mode == "proved":     # LIVE: what cleanup_authority proved, it signals; the session goes on
+                rec["proved_signal"] = report(ca.signal_owned(b, pids=[s["pid"]]))
+                rec["sleeper_after_proved_signal"] = gone_within([ident(s)], 2.0)
+                rec["client_alive_after_proved_signal"] = alive(ident(t[s["ppid"]]))
+            if mode in ("end", "proved"):
+                pathlib.Path(w["ws"], "go").touch()
+                rec["client_exit"] = r.wait(30)
+                rec["after_bwrap_returned"] = gone_within([ident(s)], 2.0)
+        finally:
+            try:
+                r.release()
+                rec["release"] = {"raised": None, "ledger": [x["stage"] for x in r.ledger]}
+            except (RangeEscaped, RangeNotEmpty) as e:
+                rec["release"] = {"raised": f"{type(e).__name__}: {e}", "ledger": [x["stage"] for x in r.ledger]}
+    rec["after_release"] = gone_within(session, 2.0)
+    rec["marker_in_table_after"] = [p for p in table().values() if w["marker"] in p["cmd"]]
+    return rec
+
+
+def check_b() -> dict:
+    b, can = establish()
+    import tests.v2.test_v21_confine as tc
+    assert tc.ca is ca and tc.ProcessRange is ProcessRange
+    calls, real = [], ca.signal_owned
+
+    def recording(boundary, pids=(), groups=(), **k):
+        t, mine = ca.host_table(), table()
+        mine = {p: chain(mine, p) for p in pids}   # this harness's own reading: the claimed pid up to the runner
+        r = real(boundary, pids=pids, groups=groups, table=t, **k)
+        calls.append({"boundary": dataclasses.asdict(boundary), "claimed": list(pids), "groups": list(groups),
+                      "host_rows": {p: dataclasses.asdict(t[p]) for p in pids if p in t}, "harness_view": mine, **report(r)})
+        return r
+    tmp = pathlib.Path(os.path.realpath(tempfile.mkdtemp(prefix="b-", dir="/tmp")))
+    exe = tmp / "client" / "opencode"
+    exe.parent.mkdir()
+    exe.write_text("#!/bin/sh\n", encoding="utf-8")
+    ca.signal_owned = recording
+    try:
+        rep, probes, site = tc.measure_in_range(tmp, dict(tc.SPEC, bwrap=str(tc.fake_bwrap(tmp))), tmp / "run" / "confinement", exe)
+    finally:
+        ca.signal_owned = real
+    signalled = [ident(c["harness_view"][x["id"]][0]) for c in calls for x in c["signalled"] if c["harness_view"].get(x["id"])]
+    return {"boundary": dataclasses.asdict(b), "runner": stat(os.getpid()), "signal_owned_calls": calls,
+            "measurement_reported_survivors": rep["setsid_survivors"], "probe_calls": probes, "left_on_host": rep["left_on_host"],
+            "venv_site": str(site), "signalled_alive_after": [i for i in signalled if alive(i)],
+            "reported_claimed_again_after": report(ca.signal_owned(b, pids=rep["setsid_survivors"], dry_run=True)),
+            "foreign": foreign(b, can)}
+
+
+def check_c() -> dict:
+    b, can = establish()
+    out = {"boundary": dataclasses.asdict(b), "runner": stat(os.getpid()), "session_owner": kill_session_owner()}
+    out["measure_caller"] = [kill_measure_caller(i) for i in range(3)]
+    out["ps_at_end"] = ps()
+    out["foreign"] = foreign(b, can)
+    return out
+
+
+def controller(role: str, w: dict, log: pathlib.Path) -> subprocess.Popen:
+    return subprocess.Popen([sys.executable, "-B", __file__, role, json.dumps(w)], stdout=log.open("w", encoding="utf-8"),
+                            stderr=subprocess.STDOUT)
+
+
+def kill_session_owner() -> dict:
+    w = world(pathlib.Path("/tmp/c-session"))
+    ctl = controller("ctl-session", w, pathlib.Path(w["base"]) / "ctl.log")
+    rec: dict = {"controller": ctl.pid}
+    if not until(lambda: pathlib.Path(w["ws"], "inside.txt").exists(), 30):
+        ctl.kill()
+        ctl.wait()
+        return {**rec, "error": "the client did not report", "log": (pathlib.Path(w["base"]) / "ctl.log").read_text(encoding="utf-8")}
+    t, s = table(), sleeper(w)
+    session = [ident(t[ctl.pid]), *[ident(p) for p in below(t, ctl.pid)]]
+    rec.update(inside=inside(w), sleeper_outside=s, chain_to_runner=chain(t, s["pid"]) if s else None,
+               before_kill=[t[i[0]] for i in session])
+    ctl.kill()                                   # SIGKILL, through this harness's own handle
+    rec["controller_exit"] = ctl.wait()
+    rec["after_kill"] = gone_within(session, 5.0)
+    rec["marker_in_table_after"] = [p for p in table().values() if w["marker"] in p["cmd"]]
+    return rec
+
+
+def kill_measure_caller(n: int) -> dict:
+    """SIGKILL the python running confine.measure once its probe's setsid sleeper is seen alive (the probe takes
+    tens of milliseconds: each try that finished first is recorded and retried, up to 30)."""
+    tries = []
+    for i in range(30):
+        w = world(pathlib.Path(f"/tmp/c-measure-{n}-{i}"))
+        ctl = controller("ctl-measure", w, pathlib.Path(w["base"]) / "ctl.log")
+        seen = None
+        while ctl.poll() is None and seen is None:
+            for d in os.listdir("/proc"):
+                if d.isdigit():
+                    try:
+                        c = pathlib.Path(f"/proc/{d}/cmdline").read_bytes()
+                    except OSError:
+                        continue
+                    if c.startswith(f"sleep\0{confine.SLEEPER}.".encode()):
+                        seen = int(d)
+                        break
+        if seen is None:
+            ctl.wait()
+            tries.append({"try": i, "caught": False, "controller_exit": ctl.returncode})
+            continue
+        t = table()
+        session = [ident(t[ctl.pid]), *[ident(p) for p in below(t, ctl.pid)]]
+        ctl.kill()                               # SIGKILL, through this harness's own handle
+        code = ctl.wait()
+        return {"tries_before": tries, "try": i, "caught": True, "sleeper_outside": t.get(seen),
+                "chain_to_runner": chain(t, seen), "before_kill": [t[x[0]] for x in session], "controller_exit": code,
+                "after_kill": gone_within(session, 5.0),
+                "sleeper_in_table_after": [p for p in table().values() if f"sleep {confine.SLEEPER}." in p["cmd"]]}
+    return {"tries_before": tries, "caught": False}
+
+
+def ctl_session(w: dict) -> None:
+    logs = pathlib.Path(w["base"]) / "logs"
+    budget = client.Budget({k: 100 for k in client.Budget.KEYS}, {k: 0 for k in client.Budget.KEYS}, logs, requests=lambda: 1)
+    print(json.dumps(client.session("S1", "the prompt", w["ws"], logs / "S1.jsonl", 600, model="fake/model", env=w["env"],
+                                    budget=budget, turn_cap=99, exe=w["exe"], confine=SPEC)))
+
+
+def ctl_measure(w: dict) -> None:
+    rep = confine.measure(SPEC, pathlib.Path(w["base"]) / "m", w["exe"], pathlib.Path(w["repo"]), environ=w["env"])
+    print(json.dumps(rep["problems"]))
+
+
+if __name__ == "__main__":
+    role = sys.argv[1]
+    if role == "canary":
+        canary(sys.argv[2])
+    elif role.startswith("ctl-"):
+        {"ctl-session": ctl_session, "ctl-measure": ctl_measure}[role](json.loads(sys.argv[2]))
+    else:
+        print(json.dumps({"a": check_a, "b": check_b, "c": check_c}[role](), indent=1, default=str))
