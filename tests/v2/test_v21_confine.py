@@ -5,16 +5,23 @@ What runs everywhere (macOS too): the setting, the bubblewrap command line a ses
 the client starts; and the measurement judges what it OBSERVES: a "bubblewrap" that runs the probe unconfined is
 refused for what it let through, not for its name; and the path a confined run takes when the measurement holds —
 every session started through bubblewrap, the record saying so. The boundary itself is measured on Linux by
-validation/v21/sandbox (docker): this module never claims it."""
+validation/v21/sandbox (docker): this module never claims it. Every probe here that runs unconfined runs in a
+disposable environment by construction (MEASURE), any other measurement gets a "bubblewrap" that runs nothing, and
+each measuring test compares the host before and after (host_view): even when confinement — the very thing under
+test — or the test's own set-up fails, nothing lands in the interpreter's site-packages, the tree or HOME."""
 
 from __future__ import annotations
 
+import copy
 import functools
 import json
 import os
 import pathlib
+import re
+import shutil
 import subprocess
 import sys
+import sysconfig
 import tempfile
 import time
 import types
@@ -40,6 +47,48 @@ SPEC = {"backend": "bwrap", "bwrap": "/usr/bin/bwrap", "network": "host", "read_
 OCR = {"exe": "/opt/ocr", "sha256": "0" * 64, "timeout_min": 1, "max_tokens": 9}
 #: a "bubblewrap" that confines nothing: it drops every option and runs the command
 NOT_A_SANDBOX = '#!/bin/sh\nwhile [ $# -gt 0 ] && [ "$1" != "--" ]; do shift; done\n[ $# -gt 0 ] || exit 0\nshift\nexec "$@"\n'
+#: a "bubblewrap" for the tests that must never run anything under it: it runs no command, so a measurement that
+#: reached its probe by a fault writes nothing anywhere
+RUNS_NOTHING = "#!/bin/sh\nexit 97\n"
+
+
+def _entries(d: str, deep: bool) -> dict:
+    """{relative path: (size, mtime_ns) | "dir"} below `d` (its top level only unless `deep`), bytecode left out."""
+    out = {}
+    for root, dirs, files in os.walk(d):
+        for x in files:
+            st = os.lstat(os.path.join(root, x))
+            out[os.path.relpath(os.path.join(root, x), d)] = (st.st_size, st.st_mtime_ns)
+        out.update((os.path.relpath(os.path.join(root, x), d), "dir") for x in dirs if x != "__pycache__")
+        dirs[:] = [x for x in dirs if deep and x != "__pycache__"]
+    return out
+
+
+def host_view() -> dict:
+    """What no test here may change on the host, whatever the code under test computes: the entries at the top of this
+    interpreter's site-packages and every file of the kernel tree (aisef2/) — names, sizes, mtimes — and the names at
+    the top of the repository and of the account's home (other programs keep files there up to date, so new names
+    only)."""
+    try:
+        import pwd
+        homes = {os.path.expanduser("~"), pwd.getpwuid(os.getuid()).pw_dir}
+    except (ImportError, KeyError):
+        homes = {os.path.expanduser("~")}
+    return {"exact": {**{f"site {p}": _entries(p, False) for p in {sysconfig.get_paths()[k] for k in ("purelib", "platlib")}},
+                      "kernel": _entries(str(ROOT / "aisef2"), True)},
+            "names": {f"names {p}": set(os.listdir(p)) for p in {*homes, str(ROOT)} if os.path.isdir(p)}}
+
+
+def host_unchanged(before: dict) -> None:
+    """Fails when anything appeared in, left or changed in the interpreter's site or the kernel tree, or a name
+    appeared at the top of the repository or of the home, since `before` (host_view)."""
+    after = host_view()
+    bad = {k: {"new": sorted(set(v) - set(before["exact"][k])), "gone": sorted(set(before["exact"][k]) - set(v)),
+               "changed": sorted(n for n in set(v) & set(before["exact"][k]) if v[n] != before["exact"][k][n])}
+           for k, v in after["exact"].items() if v != before["exact"][k]}
+    bad.update({k: {"new": sorted(v - before["names"][k])} for k, v in after["names"].items() if v - before["names"][k]})
+    if bad:
+        raise AssertionError(f"a test changed the host outside its own directories: {bad}")
 
 
 def ro_binds(argv: list[str]) -> list[str]:
@@ -60,44 +109,63 @@ def pairs(argv: list[str], flag: str) -> list[tuple[str, str]]:
     return [(argv[i + 1], argv[i + 2]) for i, a in enumerate(argv[:argv.index("--")]) if a == flag]
 
 
-#: `measure_in_range`'s child: confine.measure as a run calls it, the probe's own call recorded (its sleep, its timeout), and
-#: the kernel and the interpreter's site the probe tries to write put in the test's directory: an unconfined probe's
-#: files are left where it made them (INV-MUTATION-AUTHORITY), so it must make none in the real tree or site-packages
-MEASURE = r'''import json, pathlib, sys
+#: `measure_in_range`'s child: confine.measure as a run calls it, the probe's own call recorded (its sleep, its timeout).
+#: An unconfined probe's files are left where it made them (INV-MUTATION-AUTHORITY), so every place it can write is the
+#: test's BY CONSTRUCTION, not by a patch a fault could get around: the child's interpreter is a throwaway venv (its
+#: site-packages, however the code computes it, is the test's), the aisef2 it imports is a throwaway copy installed
+#: there (so is the kernel directory), and its cwd, HOME, TMPDIR and XDG directories are the test's. It checks that
+#: before it measures and refuses otherwise: a broken construction never reaches the probe.
+MEASURE = r'''import json, os, pathlib, sys, sysconfig
 from unittest import mock
-sys.path.insert(0, sys.argv[1])
 from aisef2.app import confine
-io = pathlib.Path(sys.argv[2])
+io = pathlib.Path(sys.argv[1])
 a = json.loads(io.read_text(encoding="utf-8"))
+tmp = os.path.realpath(a["tmp"])
+seen = {"interpreter": sys.prefix, "kernel": confine.__file__, "cwd": os.getcwd(), "where": a["where"], "client": a["exe"],
+        **{k: sysconfig.get_paths()[k] for k in ("purelib", "platlib")},
+        **{k: os.environ.get(k, "/") for k in ("HOME", "TMPDIR", "XDG_CONFIG_HOME", "XDG_DATA_HOME", "XDG_STATE_HOME",
+                                               "XDG_CACHE_HOME")}}
+outside = {k: v for k, v in seen.items() if os.path.commonpath([tmp, os.path.realpath(v)]) != tmp}
+if outside:
+    io.write_text(json.dumps({"refused": outside}), encoding="utf-8")
+    sys.exit(3)
 real, probes = confine.subprocess.run, []
 def spy(argv, *x, **k):
     if confine.PROBE in argv:       # the probe's $7 is its sleep: after PROBE, "probe" and $1..$6
         probes.append((argv[argv.index(confine.PROBE) + 8], k["timeout"]))
     return real(argv, *x, **k)
-with mock.patch.object(confine.subprocess, "run", spy), mock.patch.object(confine, "__file__", a["module"]), \
-        mock.patch.object(confine.sysconfig, "get_paths", lambda: {"purelib": a["site"]}):
+with mock.patch.object(confine.subprocess, "run", spy):
     rep = confine.measure(a["spec"], pathlib.Path(a["where"]), a["exe"], system="linux", environ=a["environ"])
 io.write_text(json.dumps({"rep": rep, "probes": probes}), encoding="utf-8")
 '''
 
 
-def measure_in_range(tmp: pathlib.Path, spec: dict, where: pathlib.Path, exe: pathlib.Path) -> tuple[dict, list]:
-    """(report, the probe's calls) of confine.measure run as the target of a process range this test starts, so the
-    sleeper an unconfined probe leaves is provably the test's — never a pid the measurement reports
+def measure_in_range(tmp: pathlib.Path, spec: dict, where: pathlib.Path, exe: pathlib.Path) -> tuple[dict, list, pathlib.Path]:
+    """(report, the probe's calls, the child's site-packages) of confine.measure run as the target of a process range
+    this test starts, in the disposable environment MEASURE checks (a venv in `tmp` holding a copy of this tree's
+    aisef2), so the sleeper an unconfined probe leaves is provably the test's — never a pid the measurement reports
     (INV-MUTATION-AUTHORITY): on macOS (no setsid) it stays in the range's group, which release() signals; on Linux
     setsid takes it out of the group and the range's anchor, a subreaper, adopts it, so cleanup_authority proves it
     from its own reading of the host (the anchor the test's child, both born after the boundary) and only then signals
     it. One it cannot prove is never signalled: release() raises RangeEscaped and the test fails."""
     io = tmp / "measure.json"
-    (tmp / "kernel" / "aisef2").mkdir(parents=True)
-    (tmp / "site").mkdir()
-    io.write_text(json.dumps({"spec": spec, "where": str(where), "exe": str(exe), "site": str(tmp / "site"),
-                              "module": str(tmp / "kernel" / "aisef2" / "app" / "confine.py"),
+    subprocess.run([sys.executable, "-m", "venv", "--without-pip", str(tmp / "venv")], check=True)
+    py = tmp / "venv" / "bin" / "python"
+    site = pathlib.Path(subprocess.run([str(py), "-I", "-c", "import sysconfig; print(sysconfig.get_paths()['purelib'])"],
+                                       capture_output=True, encoding="utf-8", check=True).stdout.strip())
+    shutil.copytree(ROOT / "aisef2", site / "aisef2", ignore=shutil.ignore_patterns("__pycache__"))
+    own = {k: tmp / "child" / k.lower() for k in ("cwd", "HOME", "TMPDIR", "XDG_CONFIG_HOME", "XDG_DATA_HOME",
+                                                  "XDG_STATE_HOME", "XDG_CACHE_HOME")}
+    for d in own.values():
+        d.mkdir(parents=True)
+    env = {"PATH": os.environ.get("PATH", "/usr/bin:/bin"), "LANG": os.environ.get("LANG", "C"),
+           **{k: str(d) for k, d in own.items() if k != "cwd"}}
+    io.write_text(json.dumps({"spec": spec, "where": str(where), "exe": str(exe), "tmp": str(tmp),
                               "environ": {"PATH": "/usr/bin:/bin", "HOME": str(tmp)}}), encoding="utf-8")
     boundary = ca.establish(tmp)
     with open(tmp / "measure.log", "wb") as log:
-        r = ProcessRange("confine.measure", [sys.executable, "-c", MEASURE, str(ROOT), str(io)], output=log,
-                         grace_s=(0.1, 2.0), wait_s=10.0).start()
+        r = ProcessRange("confine.measure", [str(py), "-I", "-B", "-c", MEASURE, str(io)], cwd=own["cwd"], env=env,
+                         output=log, grace_s=(0.1, 2.0), wait_s=10.0).start()
     try:
         r.wait(confine.PROBE_TIMEOUT + 60)
         adopted = [p.pid for p in ca.owned(boundary).values() if p.ppid == r.group]
@@ -105,9 +173,28 @@ def measure_in_range(tmp: pathlib.Path, spec: dict, where: pathlib.Path, exe: pa
     finally:
         r.release()
     out = json.loads(io.read_text(encoding="utf-8"))
+    if "refused" in out:
+        raise AssertionError(f"the measurement's child refused to measure outside a disposable environment: {out['refused']}")
     if "rep" not in out:
         raise AssertionError(f"the measurement did not answer: {(tmp / 'measure.log').read_text(errors='replace')[-2000:]}")
-    return out["rep"], out["probes"]
+    return out["rep"], out["probes"], site
+
+
+class HostGuard(unittest.TestCase):
+    def test_it_fails_on_what_appeared_changed_or_left_since_its_view(self):
+        """host_unchanged against a doctored view — never by writing the host."""
+        view = host_view()
+        host_unchanged(view)
+        f = next(n for n, v in view["exact"]["kernel"].items() if v != "dir")
+        top = sorted(view["names"][f"names {ROOT}"])[0]
+        for doctor, said in ((lambda b: b["exact"]["kernel"].pop(f), f"'new': [{f!r}]"),
+                             (lambda b: b["exact"]["kernel"].update({f: (-1, 0)}), f"'changed': [{f!r}]"),
+                             (lambda b: b["exact"]["kernel"].update({"gone.py": (0, 0)}), "'gone': ['gone.py']"),
+                             (lambda b: b["names"][f"names {ROOT}"].discard(top), f"'new': [{top!r}]")):
+            before = copy.deepcopy(view)
+            doctor(before)
+            with self.subTest(said=said), self.assertRaisesRegex(AssertionError, re.escape(said)):
+                host_unchanged(before)
 
 
 class Setting(unittest.TestCase):
@@ -141,8 +228,9 @@ class CommandLine(unittest.TestCase):
         t = tempfile.TemporaryDirectory()
         self.addCleanup(t.cleanup)
         self.tmp = pathlib.Path(os.path.realpath(t.name))
+        self.addCleanup(host_unchanged, host_view())
         self.bwrap = self.tmp / "bwrap"
-        self.bwrap.write_text(NOT_A_SANDBOX)
+        self.bwrap.write_text(RUNS_NOTHING)       # nothing here runs it: the command line is only built
         self.bwrap.chmod(0o755)
         self.home, self.run_dir = self.tmp / "home", self.tmp / "out"
         (self.home / ".config" / "opencode").mkdir(parents=True)
@@ -262,6 +350,9 @@ class CommandLine(unittest.TestCase):
 
 
 class FailClosed(unittest.TestCase):
+    def setUp(self) -> None:
+        self.addCleanup(host_unchanged, host_view())
+
     def test_a_host_that_is_not_linux_has_no_backend(self):
         with self.assertRaisesRegex(confine.Unavailable, "Linux-only .* this host is darwin: no backend"):
             confine.wrap(SPEC, ["x"], {}, "/w", system="darwin")
@@ -286,7 +377,7 @@ class FailClosed(unittest.TestCase):
             exe.parent.mkdir()
             exe.write_text("#!/bin/sh\n")
             where = tmp / "run" / "confinement"
-            rep, _ = measure_in_range(tmp, dict(SPEC, bwrap=str(fake)), where, exe)   # its sleeper not left running
+            rep, _, site = measure_in_range(tmp, dict(SPEC, bwrap=str(fake)), where, exe)   # its sleeper not left running
             for want in ("a file of the run directory was readable", "a file was created in the run directory",
                          "a file was created in the client directory", "a file was created in the git directory",
                          "a file was created in the kernel", "a file was created in the interpreter site"):
@@ -300,8 +391,8 @@ class FailClosed(unittest.TestCase):
             self.assertTrue(rep["created_outside_workspace"]["run_directory"])
             # the probe's own files, wherever confinement did not stop them: left where it made them and named in the
             # refusal, nothing removed — they are the subject's (INV-MUTATION-AUTHORITY; the measurement used to delete
-            # them). MEASURE puts the kernel and the interpreter's site in the test's directory: the real tree gets none
-            probe_dirs = (where, tmp / "kernel" / "aisef2", tmp / "site", exe.parent, where / "repo" / ".git")
+            # them). MEASURE's kernel and interpreter site are the test's venv and its copy: the real ones get none
+            probe_dirs = (where, site / "aisef2", site, exe.parent, where / "repo" / ".git")
             left = [str(p) for d in probe_dirs for p in d.glob("*") if p.name.startswith(("written-", ".aisef-confine-probe-"))]
             self.assertEqual(len(left), 5, left)
             self.assertEqual(sorted(rep["left_on_host"]), sorted(left))
@@ -321,7 +412,7 @@ class FailClosed(unittest.TestCase):
             exe = tmp / "client" / "opencode"
             exe.parent.mkdir()
             exe.write_text("#!/bin/sh\n")
-            rep, _ = measure_in_range(tmp, dict(SPEC, bwrap=str(fake)), tmp / "run" / "confinement", exe)
+            rep, _, _ = measure_in_range(tmp, dict(SPEC, bwrap=str(fake)), tmp / "run" / "confinement", exe)
         self.assertTrue(rep["problems"][0].startswith("the sandbox did not run the probe (exit 3): "), rep["problems"])
         self.assertIn("setsid", rep["tried"])     # the probe ran to its end: only its exit refuses it
         self.assertTrue(rep["left_on_host"])      # its files are named even though nothing else was judged
@@ -385,7 +476,7 @@ class FailClosed(unittest.TestCase):
             exe = tmp / "client" / "opencode"
             exe.parent.mkdir()
             exe.write_text("#!/bin/sh\n")
-            rep, probes = measure_in_range(tmp, dict(SPEC, bwrap=str(fake_bwrap(tmp))), tmp / "run" / "confinement", exe)
+            rep, probes, _ = measure_in_range(tmp, dict(SPEC, bwrap=str(fake_bwrap(tmp))), tmp / "run" / "confinement", exe)
         [(sleep, timeout)] = probes
         self.assertGreater(float(sleep), timeout + confine.SURVIVOR_GRACE + 1)
         self.assertTrue(rep["setsid_survivors"])     # the sleeper it looks for is this one: unconfined, it survived
@@ -395,7 +486,9 @@ class FailClosed(unittest.TestCase):
         measurement's worktree is removed."""
         with tempfile.TemporaryDirectory() as t:
             tmp = pathlib.Path(os.path.realpath(t))
-            fake = fake_bwrap(tmp)
+            fake = tmp / "bwrap"
+            fake.write_text(RUNS_NOTHING)
+            fake.chmod(0o755)
             where = tmp / "run" / "confinement"
             rep = confine.measure(dict(SPEC, bwrap=str(fake)), where, None, system="linux",
                                   environ={"PATH": "/usr/bin:/bin", "HOME": str(tmp)})
