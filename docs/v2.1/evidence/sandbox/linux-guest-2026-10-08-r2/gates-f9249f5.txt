@@ -1,0 +1,11 @@
+== ruff
+All checks passed!
+rc 0
+== destructive_authority
+destructive authority: PASS
+rc 0
+== tests.test_meta
+Ran 34 tests in 5.482s
+
+OK
+rc 0

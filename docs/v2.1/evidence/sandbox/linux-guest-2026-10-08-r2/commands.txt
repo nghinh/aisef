@@ -1,0 +1,30 @@
+== a: docker run --rm --init --network none --user 1000:1000 --cap-drop ALL --pids-limit 512 --memory 1g --cpus 2 -w /repo -v /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/wf-followups/round2/ev/tree:/repo:ro -v /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/wf-followups/round2/procps/ps:/usr/local/bin/ps:ro -v /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/wf-followups/round2/procps/libproc2.so.0:/usr/lib/aarch64-linux-gnu/libproc2.so.0:ro --security-opt seccomp=unconfined --security-opt systempaths=unconfined aisef-sandbox-measure sh -c mkdir -p /tmp/g; H=/repo/validation/v21/sandbox/linux_guest.py
+python3 -B $H canary early &
+setsid python3 -B $H canary early-setsid &
+(until [ -e /tmp/g/boundary ]; do sleep 0.1; done; sleep 1.5; python3 -B $H canary late & wait) &
+python3 -B $H "$0" a
+   host load average { 8.07 7.67 7.29 } at 2026-10-08T16:10:39+0700
+   exit 0 in 13 s; host load average { 8.21 7.71 7.31 } at 2026-10-08T16:10:52+0700
+== b: docker run --rm --init --network none --user 1000:1000 --cap-drop ALL --pids-limit 512 --memory 1g --cpus 2 -w /repo -v /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/wf-followups/round2/ev/tree:/repo:ro -v /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/wf-followups/round2/procps/ps:/usr/local/bin/ps:ro -v /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/wf-followups/round2/procps/libproc2.so.0:/usr/lib/aarch64-linux-gnu/libproc2.so.0:ro  aisef-sandbox-measure sh -c mkdir -p /tmp/g; H=/repo/validation/v21/sandbox/linux_guest.py
+python3 -B $H canary early &
+setsid python3 -B $H canary early-setsid &
+(until [ -e /tmp/g/boundary ]; do sleep 0.1; done; sleep 1.5; python3 -B $H canary late & wait) &
+python3 -B $H "$0" b
+   host load average { 8.21 7.71 7.31 } at 2026-10-08T16:10:52+0700
+   exit 0 in 7 s; host load average { 8.49 7.78 7.34 } at 2026-10-08T16:10:59+0700
+== c: docker run --rm --init --network none --user 1000:1000 --cap-drop ALL --pids-limit 512 --memory 1g --cpus 2 -w /repo -v /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/wf-followups/round2/ev/tree:/repo:ro -v /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/wf-followups/round2/procps/ps:/usr/local/bin/ps:ro -v /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/wf-followups/round2/procps/libproc2.so.0:/usr/lib/aarch64-linux-gnu/libproc2.so.0:ro --security-opt seccomp=unconfined --security-opt systempaths=unconfined aisef-sandbox-measure sh -c mkdir -p /tmp/g; H=/repo/validation/v21/sandbox/linux_guest.py
+python3 -B $H canary early &
+setsid python3 -B $H canary early-setsid &
+(until [ -e /tmp/g/boundary ]; do sleep 0.1; done; sleep 1.5; python3 -B $H canary late & wait) &
+python3 -B $H "$0" c
+   host load average { 8.49 7.78 7.34 } at 2026-10-08T16:10:59+0700
+   exit 0 in 7 s; host load average { 8.37 7.77 7.34 } at 2026-10-08T16:11:06+0700
+== d1: docker run --rm --init --network none --user 1000:1000 --cap-drop ALL --pids-limit 512 --memory 1g --cpus 2 -w /repo -v /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/wf-followups/round2/ev/tree:/repo:ro -v /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/wf-followups/round2/procps/ps:/usr/local/bin/ps:ro -v /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/wf-followups/round2/procps/libproc2.so.0:/usr/lib/aarch64-linux-gnu/libproc2.so.0:ro  aisef-sandbox-measure python3 -B /repo/validation/v21/sandbox/linux_guest.py d1
+   host load average { 8.37 7.77 7.34 } at 2026-10-08T16:11:06+0700
+   exit 0 in 24 s; host load average { 8.16 7.76 7.35 } at 2026-10-08T16:11:30+0700
+== d-test_v21_confine: docker run --rm --init --network none --user 1000:1000 --cap-drop ALL --pids-limit 512 --memory 1g --cpus 2 -w /repo -v /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/wf-followups/round2/ev/tree:/repo:ro -v /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/wf-followups/round2/procps/ps:/usr/local/bin/ps:ro -v /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/wf-followups/round2/procps/libproc2.so.0:/usr/lib/aarch64-linux-gnu/libproc2.so.0:ro  aisef-sandbox-measure python3 -B -m unittest -v tests.v2.test_v21_confine
+   host load average { 8.16 7.76 7.35 } at 2026-10-08T16:11:30+0700
+   exit 0 in 25 s; host load average { 10.23 8.28 7.54 } at 2026-10-08T16:11:55+0700
+== d-test_process_range: docker run --rm --init --network none --user 1000:1000 --cap-drop ALL --pids-limit 512 --memory 1g --cpus 2 -w /repo -v /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/wf-followups/round2/ev/tree:/repo:ro -v /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/wf-followups/round2/procps/ps:/usr/local/bin/ps:ro -v /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/wf-followups/round2/procps/libproc2.so.0:/usr/lib/aarch64-linux-gnu/libproc2.so.0:ro  aisef-sandbox-measure python3 -B -m unittest -v tests.v2.p4.test_process_range
+   host load average { 10.23 8.28 7.54 } at 2026-10-08T16:11:55+0700
+   exit 0 in 23 s; host load average { 10.58 8.47 7.63 } at 2026-10-08T16:12:18+0700

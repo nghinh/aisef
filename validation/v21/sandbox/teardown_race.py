@@ -13,7 +13,7 @@ twice per configuration):
 
 "sock" adds a unix socket directory to read_only (every measurement then refuses for it; the round-2 race was seen
 there). It prints one JSON object; never runs the real opencode, never calls a provider."""
-import json, os, pathlib, signal, socket, subprocess, sys, threading, time
+import json, pathlib, socket, subprocess, sys, threading, time
 sys.path.insert(0, "/repo")
 from aisef2.app import confine
 from aisef2.runtime import process_range
@@ -66,11 +66,9 @@ looks.clear()
 t1 = time.time()
 rep = confine.measure(dict(spec, bwrap=str(fake), read_only=[]), B / "unconfined", str(exe), repo, system="linux", environ=env)
 alive = {p: pathlib.Path(f"/proc/{p}/stat").exists() for p in rep["setsid_survivors"]}
-for p in rep["setsid_survivors"]:
-    try:
-        os.kill(p, signal.SIGKILL)
-    except ProcessLookupError:
-        pass
+# INV-MUTATION-AUTHORITY: the pids the measurement reports are a claim, never a target. Nothing is signalled here: the
+# sleeper (sleep 120.x) ends by itself, or with the container's PID namespace when this script — PID 1 of the
+# `docker run` above — exits
 out["unconfined_control"] = {"survivors": rep["setsid_survivors"], "alive_after_measure": alive, "looks": len(looks),
                              "seconds": round(time.time() - t1, 2),
                              "survivor_problem": [p for p in rep["problems"] if p.startswith("a process the session left")]}

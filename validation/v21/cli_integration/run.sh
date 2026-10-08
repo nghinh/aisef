@@ -13,7 +13,9 @@ export PATH=$I/fakebin:$GUARD HOME=$I/home XDG_CONFIG_HOME=$I/xdg FAKE_PROVIDER_
 print "commit: $(git -C $W rev-parse HEAD) dirty: $(git -C $W status --porcelain | wc -l | tr -d ' ')"
 print "opencode on PATH: $(command -v opencode)"; print "ocr: $($OCR version | head -1) sha256 $(shasum -a 256 $OCR | cut -c1-64)"
 A() { (cd $I && $PY -m aisef "$@"); print "exit $?"; }
-(cd $I && $PY -I $HERE/fakeprov.py port provider.log &); while [[ ! -s $I/port ]]; do sleep 0.1; done
+# the provider is this shell's own job: its stop at the end signals $PROV, never a pattern matched across the host
+(cd $I && exec $PY -I $HERE/fakeprov.py port provider.log) & PROV=$!
+while [[ ! -s $I/port ]] && kill -0 $PROV 2>/dev/null; do sleep 0.1; done
 $PY $HERE/make_inputs.py $I $OCR
 mkdir -p $I/repo/app $I/repo/docs && cd $I/repo && git init -q -b main && : > app/__init__.py
 printf '# Calc CLI\n\n## 1. Command line\n\n1.1 python -m app A B exits with the sum of the integers A and B.\n\n1.2 Exit 2 on a usage error (any other number of arguments).\n' > docs/requirements.md
@@ -38,7 +40,12 @@ A bundle approve b2.json --contract BC-USAGE-1 --approver human:integration --ou
 A bundle approve b3.json --contract BC-NAN --approver human:integration --out approved2.json
 print "== run2 (SIGKILLed in S2)"
 (cd $I && exec $PY -m aisef run --project approved2.json --settings settings.json --repo repo2 --out run2 \
-   --anchor-out anchors/run2.anchor) & print $! > $I/kill-run2.pid; wait $!; print "exit $? (137 = SIGKILL)"
+   --anchor-out anchors/run2.anchor) & RUN2=$!
+# INV-MUTATION-AUTHORITY: the kill's target is this shell's own job ($!, started just above, not yet waited for);
+# the fake developer only says when (kill-run2.ready, written once its S2 usage is reported, then it waits)
+until [[ -e $I/kill-run2.ready ]] || ! kill -0 $RUN2 2>/dev/null; do sleep 0.05; done
+[[ -e $I/kill-run2.ready ]] && kill -KILL $RUN2 && print "SIGKILL after the usage of 'developer S2' was reported" > $I/kill-run2.done
+wait $RUN2; print "exit $? (137 = SIGKILL)"
 print "run2: RUN.json $([[ -e $I/run2/RUN.json ]] && print present || print absent); RUN.started.json $([[ -e $I/run2/RUN.started.json ]] && print present || print absent); kill: $(cat $I/kill-run2.done)"
 print "== continue"; A bundle continue approved2.json --from-run run2 --out cont.json
 print "== run3 --parent, unknown spend not accepted"
@@ -50,4 +57,4 @@ print "== continue run2 again"; A bundle continue approved2.json --from-run run2
 print "== verify run3"; A run --verify --project cont.json --out run3 --expect-anchor "$(head -c 64 anchors/run3.anchor)"
 print "== run3 record"; $PY -c 'import json,sys; r=json.load(open(sys.argv[1])); print(json.dumps({k: r.get(k) for k in ("delivery_verdict","story_outcomes","continues","lineage_usage")}, indent=1)[:3000])' $I/run3/RUN.json
 print "== run1 context pack read-back (D4)"; $PY -P $HERE/readback.py $I; print "exit $?"
-pkill -f "$HERE/fakeprov.py port provider.log"
+kill $PROV; wait $PROV; print "provider (job $PROV) stopped: exit $? (143 = SIGTERM)"

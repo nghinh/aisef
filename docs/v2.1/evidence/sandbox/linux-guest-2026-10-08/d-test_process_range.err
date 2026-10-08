@@ -1,0 +1,38 @@
+test_an_anchor_whose_report_nobody_reads_ends_itself_and_its_group (tests.v2.p4.test_process_range.Anchor.test_an_anchor_whose_report_nobody_reads_ends_itself_and_its_group)
+An exception out of the anchor's main — here STARTED written to a controller already gone — ends the anchor ... /usr/local/lib/python3.14/unittest/case.py:615: ResourceWarning: unclosed file <_io.TextIOWrapper name=4 encoding='utf-8'>
+  result = method()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_no_GO_no_target (tests.v2.p4.test_process_range.Anchor.test_no_GO_no_target)
+The anchor starts the target only after GO (the controller has made it a member of its job). ... ok
+test_the_reaper_reaps_every_child_but_the_target_and_keeps_doing_it (tests.v2.p4.test_process_range.Anchor.test_the_reaper_reaps_every_child_but_the_target_and_keeps_doing_it) ... ok
+test_the_subreaper_is_asked_for_on_linux_only_and_its_absence_is_tolerated (tests.v2.p4.test_process_range.Anchor.test_the_subreaper_is_asked_for_on_linux_only_and_its_absence_is_tolerated) ... ok
+test_without_os_waitid_the_reaper_returns_at_once (tests.v2.p4.test_process_range.Anchor.test_without_os_waitid_the_reaper_returns_at_once)
+Where Python exposes no os.waitid (Windows; also python.org's and Homebrew's 3.12 builds on macOS, which has ... ok
+test_a_job_stop_is_recognised_only_with_its_stop_in_the_ledger (tests.v2.p4.test_process_range.Backends.test_a_job_stop_is_recognised_only_with_its_stop_in_the_ledger)
+Windows: TerminateJobObject gives every member JOB_EXIT_CODE; the adapter's reading of it is pure. ... ok
+test_D_024_green_after_the_range_is_proved_empty_before_the_worktree_is_removed (tests.v2.p4.test_process_range.Range.test_D_024_green_after_the_range_is_proved_empty_before_the_worktree_is_removed) ... ok
+test_D_024_red_before_a_writing_grandchild_outlives_a_cleanup_that_trusts_the_direct_child (tests.v2.p4.test_process_range.Range.test_D_024_red_before_a_writing_grandchild_outlives_a_cleanup_that_trusts_the_direct_child) ... ok
+test_PROC_OWN_1_a_controller_that_dies_leaves_no_owned_process_alive (tests.v2.p4.test_process_range.Range.test_PROC_OWN_1_a_controller_that_dies_leaves_no_owned_process_alive) ... ok
+test_PROC_OWN_1_the_mutation_runner_timeout_takes_the_whole_tree_down (tests.v2.p4.test_process_range.Range.test_PROC_OWN_1_the_mutation_runner_timeout_takes_the_whole_tree_down) ... ok
+test_PROC_OWN_2_after_disposal_the_range_never_signals_again (tests.v2.p4.test_process_range.Range.test_PROC_OWN_2_after_disposal_the_range_never_signals_again) ... ok
+test_a_controller_that_returns_without_disposing_exits_and_its_range_goes_with_it (tests.v2.p4.test_process_range.Range.test_a_controller_that_returns_without_disposing_exits_and_its_range_goes_with_it) ... ok
+test_a_group_the_kernel_says_has_nobody_left_to_signal_is_measured_not_assumed (tests.v2.p4.test_process_range.Range.test_a_group_the_kernel_says_has_nobody_left_to_signal_is_measured_not_assumed)
+macOS answers EPERM (not ESRCH) to killpg when every member is already exiting or a zombie (XNU killpg1 ... ok
+test_a_normal_tree_is_reaped_and_measured_empty (tests.v2.p4.test_process_range.Range.test_a_normal_tree_is_reaped_and_measured_empty) ... ok
+test_a_range_that_will_not_empty_is_residual_never_a_silent_success_and_blocks_by_default (tests.v2.p4.test_process_range.Range.test_a_range_that_will_not_empty_is_residual_never_a_silent_success_and_blocks_by_default) ... ok
+test_a_running_target_is_stopped_graceful_first (tests.v2.p4.test_process_range.Range.test_a_running_target_is_stopped_graceful_first) ... ok
+test_a_tree_that_exits_by_itself_is_released_without_a_signal (tests.v2.p4.test_process_range.Range.test_a_tree_that_exits_by_itself_is_released_without_a_signal) ... ok
+test_an_escaped_child_is_detected_reported_and_never_signalled (tests.v2.p4.test_process_range.Range.test_an_escaped_child_is_detected_reported_and_never_signalled) ... ok
+test_an_interrupt_ignoring_target_climbs_the_ladder (tests.v2.p4.test_process_range.Range.test_an_interrupt_ignoring_target_climbs_the_ladder) ... ok
+test_an_orphan_the_range_adopts_is_reaped_when_it_dies (tests.v2.p4.test_process_range.Range.test_an_orphan_the_range_adopts_is_reaped_when_it_dies)
+Linux: the anchor is a subreaper, so the grandchild re-parents to it when the target exits; killed, it ... ok
+test_escapees_are_reported_in_pid_order (tests.v2.p4.test_process_range.Range.test_escapees_are_reported_in_pid_order) ... ok
+test_start_failures_are_refused_and_leave_nothing_running (tests.v2.p4.test_process_range.Range.test_start_failures_are_refused_and_leave_nothing_running) ... ok
+test_the_anchor_runs_isolated_and_the_target_gets_exactly_the_given_environment (tests.v2.p4.test_process_range.Range.test_the_anchor_runs_isolated_and_the_target_gets_exactly_the_given_environment) ... ok
+test_wait_says_none_at_once_when_the_anchor_is_gone_and_keeps_saying_it (tests.v2.p4.test_process_range.Range.test_wait_says_none_at_once_when_the_anchor_is_gone_and_keeps_saying_it) ... ok
+
+----------------------------------------------------------------------
+Ran 24 tests in 19.106s
+
+OK

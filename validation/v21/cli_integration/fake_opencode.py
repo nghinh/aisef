@@ -1,8 +1,11 @@
 """The integration run's developer: attempt 1 sums three arguments as two, attempt 2 refuses them (exit 2); S2 (the
-continuation segment) exits 3 on a non-integer argument — and the first time, once its usage is reported, SIGKILLs the
-`aisef run` whose pid run.sh wrote to kill-run2.pid (no `finally` runs: the request's result is never journaled).
-Never the real client: run.sh puts it on PATH as `opencode` and removes every directory holding a real one."""
-import json, os, pathlib, signal, sys
+continuation segment) exits 3 on a non-integer argument — and the first time, once its usage is reported, it writes
+kill-run2.ready and waits: run.sh, which started that `aisef run` itself, SIGKILLs it through its own job (`$!`), so
+no `finally` runs and the request's result is never journaled; this client then ends with the run's process range
+(or after 60 s, exit 4: the kill did not come). It signals nothing (INV-MUTATION-AUTHORITY: a pid read from a file
+the run's own processes can write is no controller's view). Never the real client: run.sh puts it on PATH as
+`opencode` and removes every directory holding a real one."""
+import json, pathlib, sys, time
 argv = sys.argv[1:]
 if argv == ["--version"]:
     print("0.0.0-integration-fake"); raise SystemExit(0)
@@ -26,8 +29,9 @@ elif title.startswith("developer"):
         "    def test_sum(self):\n        self.assertEqual(main(['2', '3']), 5)\n\n    def test_usage(self):\n        self.assertEqual(main([]), 2)\n")
 print(json.dumps({"type": "text", "part": {"text": "done"}}))
 print(json.dumps({"type": "step_finish", "part": {"tokens": {"input": 120, "output": 7, "reasoning": 3, "cache": {"read": 10, "write": 0}}}}))
-pid, killed = here / "kill-run2.pid", here / "kill-run2.done"
-if title == "developer S2" and pid.exists() and not killed.exists():
+ready = here / "kill-run2.ready"
+if title == "developer S2" and not ready.exists():
     sys.stdout.flush()
-    killed.write_text("SIGKILL after the usage of 'developer S2' was reported\n")
-    os.kill(int(pid.read_text()), signal.SIGKILL)
+    ready.write_text("the usage of 'developer S2' is reported\n")
+    time.sleep(60)
+    raise SystemExit(4)

@@ -3,10 +3,12 @@ V2.0-S2 standard applied to mutation.V21_TARGETS, and a kept worker history neve
 
 from __future__ import annotations
 
+import os
 import pathlib
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
@@ -14,6 +16,7 @@ sys.path.insert(0, str(ROOT))
 from validation.qualification import v21_mutation_record as R  # noqa: E402
 from validation.v2 import mutation as m  # noqa: E402
 from tests.v2.test_s2_mutation_record import _row  # noqa: E402
+from tests.v2 import isolated_git  # noqa: E402
 
 
 class Phase(unittest.TestCase):
@@ -73,13 +76,11 @@ class Account(unittest.TestCase):
 
 class ImportWorker(unittest.TestCase):
     def test_a_kept_history_is_never_replaced(self):
-        import subprocess
         with tempfile.TemporaryDirectory() as t:
             root, wt = pathlib.Path(t) / "root", pathlib.Path(t) / "wt"
             wt.mkdir()
-            subprocess.run(["git", "-C", str(wt), "init", "-q"], check=True)
-            subprocess.run(["git", "-C", str(wt), "-c", "user.name=t", "-c", "user.email=t@x", "commit", "-q",
-                            "--allow-empty", "-m", "s"], check=True)
+            isolated_git.git(wt, "init", "-q")       # no GIT_* variable or git configuration of the caller reaches it
+            isolated_git.git(wt, "commit", "-q", "--allow-empty", "-m", "s")
             log = pathlib.Path(t) / "w.log"
             log.write_text("ran\n", encoding="utf-8")
             kept = R.import_worker("A", wt, "finished", log, root)
@@ -87,6 +88,28 @@ class ImportWorker(unittest.TestCase):
             with self.assertRaises(FileExistsError):
                 R.import_worker("A", wt, "again", log, root)
             self.assertEqual([h["worker"] for h in R.histories(root)], ["A"])
+
+    def test_its_git_never_reaches_the_callers_repository(self):
+        """Run from a pre-commit hook of a linked worktree, a test inherits GIT_DIR and GIT_INDEX_FILE (absolute paths):
+        the kept-history test's git runs in its own temporary repository all the same, and the caller's — with a file
+        staged — is left as it was, byte for byte."""
+        with tempfile.TemporaryDirectory() as t:
+            bait = pathlib.Path(os.path.realpath(t)) / "bait"
+            bait.mkdir()
+            isolated_git.git(bait, "init", "-q", "-b", "main")
+            isolated_git.git(bait, "commit", "-q", "--allow-empty", "-m", "bait")
+            (bait / "dev.txt").write_text("staged by the developer\n", encoding="utf-8")
+            isolated_git.git(bait, "add", "dev.txt")
+            git_dir = bait / ".git"
+
+            def files() -> dict:
+                return {p.relative_to(git_dir).as_posix(): p.read_bytes() for p in git_dir.rglob("*") if p.is_file()}
+            before, result = files(), unittest.TestResult()
+            with mock.patch.dict(os.environ, {"GIT_DIR": str(git_dir), "GIT_INDEX_FILE": str(git_dir / "index"),
+                                              "GIT_WORK_TREE": str(bait)}):
+                ImportWorker("test_a_kept_history_is_never_replaced").run(result)
+            self.assertEqual((result.testsRun, result.errors, result.failures), (1, [], []))
+            self.assertEqual(files(), before)
 
 
 if __name__ == "__main__":
