@@ -4,10 +4,13 @@ declared authority source does not match the derivation, E. fails on an ambiguou
 destructive API outside its taxonomy, G. (MUT-AUTH-NEG-3) discovers a destructive callable handed over by reference —
 addCleanup, an alias registered or called, partial, ExitStack.callback — and fails it without a row, H. (MUT-AUTH-NEG-4)
 fails the same registered callable once its target is no longer test-created, I. fails closed on a registration the
-taxonomy does not model or a callable passed by keyword — and passes on this tree."""
+taxonomy does not model or a callable passed by keyword — and passes on this tree. K. holds the shell scripts under
+validation/, which the checker (Python only) does not read, to the same rule: a signal's target is a job the
+script started."""
 
 import json
 import pathlib
+import re
 import sys
 import tempfile
 import unittest
@@ -200,6 +203,41 @@ class Checker(unittest.TestCase):
         problems = da.check(tree({"tests/v2/t.py": unknown}, [row]))
         self.assertEqual(problems[0], "tests/v2/t.py:11: a destructive callable handed by reference to a registration the "
                                       "taxonomy does not model (schedule->shutil.rmtree) — its target cannot be derived; fail closed")
+
+
+class ShellScripts(unittest.TestCase):
+    """K. The checker reads the *.py of its scopes only. A shell script under validation/ is held to the same rule here,
+    lexically (each line that is not a comment): no signal picks its target by pattern (pkill, killall — a match across
+    the whole host table, e.g. another run's process with the same command line), and every `kill` either asks signal 0
+    (a liveness question, nothing is delivered) or names a job the script itself started (a variable assigned `$!`)."""
+    SIGNAL = re.compile(r"(?<![\w$./-])(pkill|killall|kill)(?=\s)((?:\s+-\w+)*)\s+(\S*)")
+
+    def problems(self, rel: str, text: str) -> tuple[list[str], int]:
+        own, out, seen = set(re.findall(r"(?<![\w$])(\w+)=\$!", text)), [], 0
+        for n, line in enumerate(text.splitlines(), 1):
+            for tool, flags, arg in ([] if line.lstrip().startswith("#") else self.SIGNAL.findall(line)):
+                seen += 1
+                var = re.match(r"\$\{?(\w+)\}?", arg)
+                if tool != "kill":
+                    out.append(f"{rel}:{n}: {tool} picks its target by pattern")
+                elif flags.split() != ["-0"] and not (var and var.group(1) in own):
+                    out.append(f"{rel}:{n}: kill{flags} {arg}: not a job this script started ($!)")
+        return out, seen
+
+    def test_K_a_shell_script_signals_only_a_job_it_started(self):
+        seen = {}
+        for p in sorted((ROOT / "validation").rglob("*.sh")):
+            rel = p.relative_to(ROOT).as_posix()
+            problems, seen[rel] = self.problems(rel, p.read_text(encoding="utf-8"))
+            self.assertEqual(problems, [], rel)
+        self.assertGreaterEqual(seen["validation/v21/cli_integration/run.sh"], 4)   # a scan that sees nothing proves nothing
+        self.assertGreaterEqual(seen["validation/v21/sandbox/run.sh"], 1)
+        bad = ('pkill -f "$HERE/fakeprov.py port provider.log"\n(sleep 9) & J=$!\nkill $(cat run.pid)\nkill -9 $OTHER\n'
+               'killall python3\n# kill $X: a comment\nkill -0 $ANY; kill -KILL $J\n')
+        self.assertEqual(self.problems("t.sh", bad), (["t.sh:1: pkill picks its target by pattern",
+                                                        "t.sh:3: kill $(cat: not a job this script started ($!)",
+                                                        "t.sh:4: kill -9 $OTHER: not a job this script started ($!)",
+                                                        "t.sh:5: killall picks its target by pattern"], 6))
 
 
 if __name__ == "__main__":

@@ -13,7 +13,9 @@ export PATH=$I/fakebin:$GUARD HOME=$I/home XDG_CONFIG_HOME=$I/xdg FAKE_PROVIDER_
 print "commit: $(git -C $W rev-parse HEAD) dirty: $(git -C $W status --porcelain | wc -l | tr -d ' ')"
 print "opencode on PATH: $(command -v opencode)"; print "ocr: $($OCR version | head -1) sha256 $(shasum -a 256 $OCR | cut -c1-64)"
 A() { (cd $I && $PY -m aisef "$@"); print "exit $?"; }
-(cd $I && $PY -I $HERE/fakeprov.py port provider.log &); while [[ ! -s $I/port ]]; do sleep 0.1; done
+# the provider is this shell's own job: its stop at the end signals $PROV, never a pattern matched across the host
+(cd $I && exec $PY -I $HERE/fakeprov.py port provider.log) & PROV=$!
+while [[ ! -s $I/port ]] && kill -0 $PROV 2>/dev/null; do sleep 0.1; done
 $PY $HERE/make_inputs.py $I $OCR
 mkdir -p $I/repo/app $I/repo/docs && cd $I/repo && git init -q -b main && : > app/__init__.py
 printf '# Calc CLI\n\n## 1. Command line\n\n1.1 python -m app A B exits with the sum of the integers A and B.\n\n1.2 Exit 2 on a usage error (any other number of arguments).\n' > docs/requirements.md
@@ -55,4 +57,4 @@ print "== continue run2 again"; A bundle continue approved2.json --from-run run2
 print "== verify run3"; A run --verify --project cont.json --out run3 --expect-anchor "$(head -c 64 anchors/run3.anchor)"
 print "== run3 record"; $PY -c 'import json,sys; r=json.load(open(sys.argv[1])); print(json.dumps({k: r.get(k) for k in ("delivery_verdict","story_outcomes","continues","lineage_usage")}, indent=1)[:3000])' $I/run3/RUN.json
 print "== run1 context pack read-back (D4)"; $PY -P $HERE/readback.py $I; print "exit $?"
-pkill -f "$HERE/fakeprov.py port provider.log"
+kill $PROV; wait $PROV; print "provider (job $PROV) stopped: exit $? (143 = SIGTERM)"
