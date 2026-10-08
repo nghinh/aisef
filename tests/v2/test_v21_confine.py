@@ -6,7 +6,8 @@ the client starts; and the measurement judges what it OBSERVES: a "bubblewrap" t
 refused for what it let through, not for its name; and the path a confined run takes when the measurement holds —
 every session started through bubblewrap, the record saying so. The boundary itself is measured on Linux by
 validation/v21/sandbox (docker): this module never claims it. Every probe here that runs unconfined runs in a
-disposable environment by construction (MEASURE), any other measurement gets a "bubblewrap" that runs nothing, and
+disposable environment by construction (MEASURE), any other measurement gets a "bubblewrap" that runs nothing (one
+that exits 97 at once, a directory or an absent path; the environment it would give the probe is the test's), and
 each measuring test compares the host before and after (host_view): even when confinement — the very thing under
 test — or the test's own set-up fails, nothing lands in the interpreter's site-packages, what a venv shares with
 the interpreter (its standard library, its prefix), the tree or HOME."""
@@ -454,7 +455,11 @@ class FailClosed(unittest.TestCase):
         with self.assertRaisesRegex(confine.Unavailable, "Linux-only .* this host is darwin: no backend"):
             confine.wrap(SPEC, ["x"], {}, "/w", system="darwin")
         with tempfile.TemporaryDirectory() as t:
-            rep = confine.measure(SPEC, pathlib.Path(t) / "c", system="darwin")
+            fake = pathlib.Path(t) / "bwrap"        # a fault past the host check still reaches no probe
+            fake.write_text(RUNS_NOTHING)
+            fake.chmod(0o755)
+            rep = confine.measure(dict(SPEC, bwrap=str(fake)), pathlib.Path(t) / "c", system="darwin",
+                                  environ={"PATH": "/usr/bin:/bin", "HOME": t})
             self.assertFalse((pathlib.Path(t) / "c").exists())      # nothing is made on the host
         self.assertEqual(rep["problems"], ["confinement is Linux-only (bubblewrap); this host is darwin: no backend"])
 
