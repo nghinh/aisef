@@ -1,0 +1,138 @@
+{
+ "aisef2/app/cli.py::_parser": [
+  [
+   12,
+   "L29 string 'aisef run' emptied"
+  ],
+  [
+   13,
+   "L29 string \"Run a project's admitted plan under the AISEF V2 kernel.\" emptied"
+  ],
+  [
+   15,
+   "L31 string \"check the inputs and the plan's admission; no provider request\" emptied"
+  ],
+  [
+   17,
+   "L32 string 'verify a finished run directory against its journal' emptied"
+  ],
+  [
+   18,
+   "L33 True->False"
+  ],
+  [
+   19,
+   "L33 string 'the project bundle (aisef-v2-project/1)' emptied"
+  ],
+  [
+   20,
+   "L34 string 'the run settings (aisef-v2-run/1)' emptied"
+  ],
+  [
+   21,
+   "L35 string \"the project's git repository (cloned; never written)\" emptied"
+  ],
+  [
+   22,
+   "L36 string 'the run directory (a new one to run; an existing one to verify)' emptied"
+  ],
+  [
+   23,
+   "L37 string 'SHA256' emptied"
+  ],
+  [
+   24,
+   "L38 string 'verify only: the evidence anchor the run printed, kept outside the run directory' emptied"
+  ],
+  [
+   25,
+   "L40 string 'run only: the run this one continues (`aisef bundle continue`), recorded with its anchor' emptied"
+  ],
+  [
+   26,
+   "L42 string 'run only: a new file (never overwritten) the evidence anchor is written to \u2014 keep it where the developer cannot write (docs/v2.1/ANCHOR-THREAT-MODEL.md)' emptied"
+  ],
+  [
+   28,
+   "L45 string 'run --parent only: start although the lineage has spend no evidence accounts for (recorded)' emptied"
+  ],
+  [
+   29,
+   "L46 string 'SHA256' emptied"
+  ],
+  [
+   30,
+   "L47 string \"run --parent only: supersede the predecessor's claim with this sha256 whose child never began and whose claimant cannot be shown gone (the operator's assertion, recorded)\" emptied"
+  ]
+ ],
+ "aisef2/app/settings.py::endpoint_problem": [
+  [
+   5,
+   "L69 returns None"
+  ],
+  [
+   12,
+   "L69 string 'the provider endpoint is a URL string' emptied"
+  ],
+  [
+   17,
+   "L74 returns None"
+  ],
+  [
+   30,
+   "L80 string '): ' emptied"
+  ],
+  [
+   31,
+   "L80 string ' is not loopback' emptied"
+  ],
+  [
+   32,
+   "L74 string 'the provider endpoint is not a URL: ' emptied"
+  ],
+  [
+   35,
+   "L80 string ', ' emptied"
+  ]
+ ],
+ "aisef2/app/usage.py::no_progress": [
+  [
+   13,
+   "L122 element 2 dropped"
+  ],
+  [
+   14,
+   "L126 And swapped"
+  ],
+  [
+   23,
+   "L122 string 'story/commit' emptied"
+  ],
+  [
+   24,
+   "L123 sorted() -> list()"
+  ]
+ ],
+ "aisef2/app/lineage.py::claims": [
+  [
+   2,
+   "L70 condition negated"
+  ],
+  [
+   3,
+   "L72 sorted() -> list()"
+  ],
+  [
+   5,
+   "L70 And swapped"
+  ],
+  [
+   8,
+   "L69 string 'CONTINUED-BY\\\\.(\\\\d+)\\\\.json' emptied"
+  ],
+  [
+   9,
+   "L70 GtE->Lt"
+  ]
+ ]
+}

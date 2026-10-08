@@ -1,0 +1,739 @@
+{
+ "lanes": {
+  "l1": {
+   "decl": {
+    "wall_s": 5881.0,
+    "log_tail": [
+     "mutation: FAIL",
+     "owned processes: before=0 at_exit=0 after=0 escaped=0 released_empty=True ladder=[] harness_orphans=0->0 (posix-session-and-group, 5881s)",
+     "exit 1"
+    ]
+   },
+   "ord": {
+    "wall_s": 5592.0,
+    "log_tail": [
+     "mutation: FAIL",
+     "owned processes: before=0 at_exit=0 after=0 escaped=0 released_empty=True ladder=[] harness_orphans=0->0 (posix-session-and-group, 5592s)",
+     "exit 1"
+    ]
+   }
+  },
+  "l2": {
+   "decl": {
+    "wall_s": 7587.0,
+    "log_tail": [
+     "mutation: FAIL",
+     "owned processes: before=0 at_exit=0 after=0 escaped=0 released_empty=True ladder=[] harness_orphans=0->0 (posix-session-and-group, 7587s)",
+     "exit 1"
+    ]
+   },
+   "ord": {
+    "wall_s": 8802.0,
+    "log_tail": [
+     "mutation: FAIL",
+     "owned processes: before=0 at_exit=0 after=0 escaped=0 released_empty=True ladder=[] harness_orphans=0->0 (posix-session-and-group, 8802s)",
+     "exit 1"
+    ]
+   }
+  },
+  "l3": {
+   "decl": {
+    "wall_s": 3824.0,
+    "log_tail": [
+     "mutation: FAIL",
+     "owned processes: before=0 at_exit=0 after=0 escaped=0 released_empty=True ladder=[] harness_orphans=0->0 (posix-session-and-group, 3824s)",
+     "exit 1"
+    ]
+   },
+   "ord": {
+    "wall_s": 3791.0,
+    "log_tail": [
+     "mutation: FAIL",
+     "owned processes: before=0 at_exit=0 after=0 escaped=0 released_empty=True ladder=[] harness_orphans=0->0 (posix-session-and-group, 3790s)",
+     "exit 1"
+    ]
+   }
+  },
+  "l4": {
+   "decl": {
+    "wall_s": 2977.0,
+    "log_tail": [
+     "mutation: FAIL",
+     "owned processes: before=0 at_exit=0 after=0 escaped=0 released_empty=True ladder=[] harness_orphans=0->0 (posix-session-and-group, 2977s)",
+     "exit 1"
+    ]
+   },
+   "ord": {
+    "wall_s": 1417.0,
+    "log_tail": [
+     "mutation: FAIL",
+     "owned processes: before=0 at_exit=0 after=0 escaped=0 released_empty=True ladder=[] harness_orphans=0->0 (posix-session-and-group, 1417s)",
+     "exit 1"
+    ]
+   }
+  }
+ },
+ "targets": {
+  "aisef2/app/cli.py::_parser": {
+   "lane": "l1",
+   "decl": {
+    "order": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_inputs.py",
+     "tests/v2/test_v21_bundle_tools.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_app_run.py"
+    ],
+    "mutants": 31,
+    "classes": {
+     "KILLED": 15,
+     "SURVIVED": 16
+    },
+    "kill_position": {
+     "1": 15
+    },
+    "own_runs": 95,
+    "full_chains": 16,
+    "runner_seconds": 5202.8,
+    "t0_seconds": 332.3,
+    "error": null,
+    "stopped": null,
+    "survivors": [
+     "L29 string 'aisef run' emptied",
+     "L29 string \"Run a project's admitted plan under the AISEF V2 kernel.\" emptied",
+     "L31 string \"check the inputs and the plan's admission; no provider request\" emptied",
+     "L32 string 'verify a finished run directory against its journal' emptied",
+     "L33 True->False",
+     "L33 string 'the project bundle (aisef-v2-project/1)' emptied",
+     "L34 string 'the run settings (aisef-v2-run/1)' emptied",
+     "L35 string \"the project's git repository (cloned; never written)\" emptied",
+     "L36 string 'the run directory (a new one to run; an existing one to verify)' emptied",
+     "L37 string 'SHA256' emptied",
+     "L38 string 'verify only: the evidence anchor the run printed, kept outside the run directory' emptied",
+     "L40 string 'run only: the run this one continues (`aisef bundle continue`), recorded with its anchor' emptied",
+     "L42 string 'run only: a new file (never overwritten) the evidence anchor is written to \u2014 keep it where the developer cannot write (docs/v2.1/ANCHOR-THREAT-MODEL.md)' emptied",
+     "L45 string 'run --parent only: start although the lineage has spend no evidence accounts for (recorded)' emptied",
+     "L46 string 'SHA256' emptied",
+     "L47 string \"run --parent only: supersede the predecessor's claim with this sha256 whose child never began and whose claimant cannot be shown gone (the operator's assertion, recorded)\" emptied"
+    ],
+    "timeout_infra_notrun": {}
+   },
+   "ord": {
+    "order": [
+     "tests/v2/test_v21_bundle_tools.py",
+     "tests/v2/test_v21_inputs.py",
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_v21_continue_integrity.py"
+    ],
+    "mutants": 31,
+    "classes": {
+     "KILLED": 15,
+     "SURVIVED": 16
+    },
+    "kill_position": {
+     "1": 15
+    },
+    "own_runs": 95,
+    "full_chains": 16,
+    "runner_seconds": 4942.9,
+    "t0_seconds": 299.5,
+    "error": null,
+    "stopped": null,
+    "survivors": [
+     "L29 string 'aisef run' emptied",
+     "L29 string \"Run a project's admitted plan under the AISEF V2 kernel.\" emptied",
+     "L31 string \"check the inputs and the plan's admission; no provider request\" emptied",
+     "L32 string 'verify a finished run directory against its journal' emptied",
+     "L33 True->False",
+     "L33 string 'the project bundle (aisef-v2-project/1)' emptied",
+     "L34 string 'the run settings (aisef-v2-run/1)' emptied",
+     "L35 string \"the project's git repository (cloned; never written)\" emptied",
+     "L36 string 'the run directory (a new one to run; an existing one to verify)' emptied",
+     "L37 string 'SHA256' emptied",
+     "L38 string 'verify only: the evidence anchor the run printed, kept outside the run directory' emptied",
+     "L40 string 'run only: the run this one continues (`aisef bundle continue`), recorded with its anchor' emptied",
+     "L42 string 'run only: a new file (never overwritten) the evidence anchor is written to \u2014 keep it where the developer cannot write (docs/v2.1/ANCHOR-THREAT-MODEL.md)' emptied",
+     "L45 string 'run --parent only: start although the lineage has spend no evidence accounts for (recorded)' emptied",
+     "L46 string 'SHA256' emptied",
+     "L47 string \"run --parent only: supersede the predecessor's claim with this sha256 whose child never began and whose claimant cannot be shown gone (the operator's assertion, recorded)\" emptied"
+    ],
+    "timeout_infra_notrun": {}
+   },
+   "compare": {
+    "mutants": 31,
+    "same_class": 31,
+    "differ": 0,
+    "same_killing_file": 16,
+    "runner_seconds_ratio_ord_over_decl": 0.95,
+    "own_runs_decl_ord": [
+     95,
+     95
+    ]
+   }
+  },
+  "aisef2/app/run.py::admit": {
+   "lane": "l1",
+   "decl": {
+    "order": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_inputs.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_verify.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_s2_kills.py"
+    ],
+    "mutants": 15,
+    "classes": {
+     "KILLED": 15
+    },
+    "kill_position": {
+     "1": 13,
+     "3": 2
+    },
+    "own_runs": 19,
+    "full_chains": 0,
+    "runner_seconds": 671.9,
+    "t0_seconds": 590.3,
+    "error": null,
+    "stopped": null,
+    "survivors": [],
+    "timeout_infra_notrun": {}
+   },
+   "ord": {
+    "order": [
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_inputs.py",
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_s2_kills.py",
+     "tests/v2/test_v21_verify.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_continue_integrity.py"
+    ],
+    "mutants": 15,
+    "classes": {
+     "KILLED": 15
+    },
+    "kill_position": {
+     "1": 11,
+     "3": 4
+    },
+    "own_runs": 23,
+    "full_chains": 0,
+    "runner_seconds": 644.1,
+    "t0_seconds": 565.3,
+    "error": null,
+    "stopped": null,
+    "survivors": [],
+    "timeout_infra_notrun": {}
+   },
+   "compare": {
+    "mutants": 15,
+    "same_class": 15,
+    "differ": 0,
+    "same_killing_file": 6,
+    "runner_seconds_ratio_ord_over_decl": 0.959,
+    "own_runs_decl_ord": [
+     19,
+     23
+    ]
+   }
+  },
+  "aisef2/app/settings.py::endpoint_problem": {
+   "lane": "l2",
+   "decl": {
+    "order": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_inputs.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_verify.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_app_run.py"
+    ],
+    "mutants": 36,
+    "classes": {
+     "KILLED": 29,
+     "SURVIVED": 7
+    },
+    "kill_position": {
+     "1": 26,
+     "2": 3
+    },
+    "own_runs": 95,
+    "full_chains": 7,
+    "runner_seconds": 4473.5,
+    "t0_seconds": 546.4,
+    "error": null,
+    "stopped": null,
+    "survivors": [
+     "L69 returns None",
+     "L69 string 'the provider endpoint is a URL string' emptied",
+     "L74 returns None",
+     "L80 string '): ' emptied",
+     "L80 string ' is not loopback' emptied",
+     "L74 string 'the provider endpoint is not a URL: ' emptied",
+     "L80 string ', ' emptied"
+    ],
+    "timeout_infra_notrun": {}
+   },
+   "ord": {
+    "order": [
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_inputs.py",
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_verify.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_continue_integrity.py"
+    ],
+    "mutants": 36,
+    "classes": {
+     "KILLED": 29,
+     "SURVIVED": 7
+    },
+    "kill_position": {
+     "1": 17,
+     "2": 11,
+     "3": 1
+    },
+    "own_runs": 105,
+    "full_chains": 7,
+    "runner_seconds": 4819.3,
+    "t0_seconds": 614.2,
+    "error": null,
+    "stopped": null,
+    "survivors": [
+     "L69 returns None",
+     "L69 string 'the provider endpoint is a URL string' emptied",
+     "L74 returns None",
+     "L80 string '): ' emptied",
+     "L80 string ' is not loopback' emptied",
+     "L74 string 'the provider endpoint is not a URL: ' emptied",
+     "L80 string ', ' emptied"
+    ],
+    "timeout_infra_notrun": {}
+   },
+   "compare": {
+    "mutants": 36,
+    "same_class": 36,
+    "differ": 0,
+    "same_killing_file": 11,
+    "runner_seconds_ratio_ord_over_decl": 1.077,
+    "own_runs_decl_ord": [
+     95,
+     105
+    ]
+   }
+  },
+  "aisef2/app/usage.py::no_progress": {
+   "lane": "l2",
+   "decl": {
+    "order": [
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_verify.py",
+     "tests/v2/test_v21_continue_integrity.py"
+    ],
+    "mutants": 33,
+    "classes": {
+     "KILLED": 29,
+     "SURVIVED": 4
+    },
+    "kill_position": {
+     "1": 29
+    },
+    "own_runs": 41,
+    "full_chains": 4,
+    "runner_seconds": 3109.1,
+    "t0_seconds": 310.0,
+    "error": null,
+    "stopped": null,
+    "survivors": [
+     "L122 element 2 dropped",
+     "L126 And swapped",
+     "L122 string 'story/commit' emptied",
+     "L123 sorted() -> list()"
+    ],
+    "timeout_infra_notrun": {}
+   },
+   "ord": {
+    "order": [
+     "tests/v2/test_v21_verify.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_continue_integrity.py"
+    ],
+    "mutants": 33,
+    "classes": {
+     "KILLED": 29,
+     "SURVIVED": 4
+    },
+    "kill_position": {
+     "1": 6,
+     "2": 23
+    },
+    "own_runs": 64,
+    "full_chains": 4,
+    "runner_seconds": 3976.1,
+    "t0_seconds": 346.5,
+    "error": null,
+    "stopped": null,
+    "survivors": [
+     "L122 element 2 dropped",
+     "L126 And swapped",
+     "L122 string 'story/commit' emptied",
+     "L123 sorted() -> list()"
+    ],
+    "timeout_infra_notrun": {}
+   },
+   "compare": {
+    "mutants": 33,
+    "same_class": 33,
+    "differ": 0,
+    "same_killing_file": 27,
+    "runner_seconds_ratio_ord_over_decl": 1.279,
+    "own_runs_decl_ord": [
+     41,
+     64
+    ]
+   }
+  },
+  "aisef2/app/lineage.py::claims": {
+   "lane": "l3",
+   "decl": {
+    "order": [
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_continue_integrity.py"
+    ],
+    "mutants": 12,
+    "classes": {
+     "KILLED": 7,
+     "SURVIVED": 5
+    },
+    "kill_position": {
+     "1": 5,
+     "2": 2
+    },
+    "own_runs": 19,
+    "full_chains": 5,
+    "runner_seconds": 2415.6,
+    "t0_seconds": 311.3,
+    "error": null,
+    "stopped": null,
+    "survivors": [
+     "L70 condition negated",
+     "L72 sorted() -> list()",
+     "L70 And swapped",
+     "L69 string 'CONTINUED-BY\\\\.(\\\\d+)\\\\.json' emptied",
+     "L70 GtE->Lt"
+    ],
+    "timeout_infra_notrun": {}
+   },
+   "ord": {
+    "order": [
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_continue_integrity.py"
+    ],
+    "mutants": 12,
+    "classes": {
+     "KILLED": 7,
+     "SURVIVED": 5
+    },
+    "kill_position": {
+     "1": 5,
+     "2": 2
+    },
+    "own_runs": 19,
+    "full_chains": 5,
+    "runner_seconds": 2376.4,
+    "t0_seconds": 307.1,
+    "error": null,
+    "stopped": null,
+    "survivors": [
+     "L70 condition negated",
+     "L72 sorted() -> list()",
+     "L70 And swapped",
+     "L69 string 'CONTINUED-BY\\\\.(\\\\d+)\\\\.json' emptied",
+     "L70 GtE->Lt"
+    ],
+    "timeout_infra_notrun": {}
+   },
+   "compare": {
+    "mutants": 12,
+    "same_class": 12,
+    "differ": 0,
+    "same_killing_file": 12,
+    "runner_seconds_ratio_ord_over_decl": 0.984,
+    "own_runs_decl_ord": [
+     19,
+     19
+    ]
+   }
+  },
+  "aisef2/orchestrate/story_runner.py::_fail": {
+   "lane": "l3",
+   "decl": {
+    "order": [
+     "tests/v2/test_p6_stages.py",
+     "tests/v2/test_v21_orchestration.py",
+     "tests/v2/test_release_s2_kernel.py",
+     "tests/v2/test_c2_k_nowork_001.py",
+     "tests/v2/test_c2_k_presat_001.py",
+     "tests/v2/test_c2_orchestration_conformance.py"
+    ],
+    "mutants": 34,
+    "classes": {
+     "KILLED": 34
+    },
+    "kill_position": {
+     "1": 34
+    },
+    "own_runs": 34,
+    "full_chains": 0,
+    "runner_seconds": 363.3,
+    "t0_seconds": 161.1,
+    "error": null,
+    "stopped": null,
+    "survivors": [],
+    "timeout_infra_notrun": {}
+   },
+   "ord": {
+    "order": [
+     "tests/v2/test_p6_stages.py",
+     "tests/v2/test_release_s2_kernel.py",
+     "tests/v2/test_v21_orchestration.py",
+     "tests/v2/test_c2_k_presat_001.py",
+     "tests/v2/test_c2_orchestration_conformance.py",
+     "tests/v2/test_c2_k_nowork_001.py"
+    ],
+    "mutants": 34,
+    "classes": {
+     "KILLED": 34
+    },
+    "kill_position": {
+     "1": 34
+    },
+    "own_runs": 34,
+    "full_chains": 0,
+    "runner_seconds": 331.5,
+    "t0_seconds": 147.5,
+    "error": null,
+    "stopped": null,
+    "survivors": [],
+    "timeout_infra_notrun": {}
+   },
+   "compare": {
+    "mutants": 34,
+    "same_class": 34,
+    "differ": 0,
+    "same_killing_file": 34,
+    "runner_seconds_ratio_ord_over_decl": 0.912,
+    "own_runs_decl_ord": [
+     34,
+     34
+    ]
+   }
+  },
+  "aisef2/probe/cli_invocation.py::_harness_failure": {
+   "lane": "l3",
+   "decl": {
+    "order": [
+     "tests/v2/test_c2_cli_protocol.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_c2_cli_invocation.py"
+    ],
+    "mutants": 27,
+    "classes": {
+     "KILLED": 27
+    },
+    "kill_position": {
+     "1": 22,
+     "3": 5
+    },
+    "own_runs": 37,
+    "full_chains": 0,
+    "runner_seconds": 1036.6,
+    "t0_seconds": 135.2,
+    "error": null,
+    "stopped": null,
+    "survivors": [],
+    "timeout_infra_notrun": {}
+   },
+   "ord": {
+    "order": [
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_c2_cli_protocol.py",
+     "tests/v2/test_c2_cli_invocation.py"
+    ],
+    "mutants": 27,
+    "classes": {
+     "KILLED": 27
+    },
+    "kill_position": {
+     "2": 22,
+     "3": 5
+    },
+    "own_runs": 59,
+    "full_chains": 0,
+    "runner_seconds": 1075.5,
+    "t0_seconds": 135.8,
+    "error": null,
+    "stopped": null,
+    "survivors": [],
+    "timeout_infra_notrun": {}
+   },
+   "compare": {
+    "mutants": 27,
+    "same_class": 27,
+    "differ": 0,
+    "same_killing_file": 27,
+    "runner_seconds_ratio_ord_over_decl": 1.038,
+    "own_runs_decl_ord": [
+     37,
+     59
+    ]
+   }
+  },
+  "aisef2/probe/cli_invocation.py::AGENT/guarded": {
+   "lane": "l4",
+   "decl": {
+    "order": [
+     "tests/v2/test_c2_cli_protocol.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_c2_cli_invocation.py",
+     "tests/v2/test_s2_kills.py"
+    ],
+    "mutants": 19,
+    "classes": {
+     "KILLED": 19
+    },
+    "kill_position": {
+     "1": 18,
+     "4": 1
+    },
+    "own_runs": 22,
+    "full_chains": 0,
+    "runner_seconds": 359.8,
+    "t0_seconds": 162.3,
+    "error": null,
+    "stopped": null,
+    "survivors": [],
+    "timeout_infra_notrun": {}
+   },
+   "ord": {
+    "order": [
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_s2_kills.py",
+     "tests/v2/test_c2_cli_protocol.py",
+     "tests/v2/test_c2_cli_invocation.py"
+    ],
+    "mutants": 19,
+    "classes": {
+     "KILLED": 19
+    },
+    "kill_position": {
+     "1": 3,
+     "2": 13,
+     "3": 3
+    },
+    "own_runs": 38,
+    "full_chains": 0,
+    "runner_seconds": 355.5,
+    "t0_seconds": 170.2,
+    "error": null,
+    "stopped": null,
+    "survivors": [],
+    "timeout_infra_notrun": {}
+   },
+   "compare": {
+    "mutants": 19,
+    "same_class": 19,
+    "differ": 0,
+    "same_killing_file": 4,
+    "runner_seconds_ratio_ord_over_decl": 0.988,
+    "own_runs_decl_ord": [
+     22,
+     38
+    ]
+   }
+  },
+  "aisef2/probe/python_callable_v2.py::_watch": {
+   "lane": "l4",
+   "decl": {
+    "order": [
+     "tests/v2/test_python_callable_v2.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_s2_kills.py"
+    ],
+    "mutants": 33,
+    "classes": {
+     "KILLED": 33
+    },
+    "kill_position": {
+     "1": 32,
+     "3": 1
+    },
+    "own_runs": 35,
+    "full_chains": 0,
+    "runner_seconds": 2604.7,
+    "t0_seconds": 137.6,
+    "error": null,
+    "stopped": null,
+    "survivors": [],
+    "timeout_infra_notrun": {}
+   },
+   "ord": {
+    "order": [
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_s2_kills.py",
+     "tests/v2/test_python_callable_v2.py"
+    ],
+    "mutants": 33,
+    "classes": {
+     "KILLED": 33
+    },
+    "kill_position": {
+     "1": 14,
+     "2": 13,
+     "3": 6
+    },
+    "own_runs": 58,
+    "full_chains": 0,
+    "runner_seconds": 1054.6,
+    "t0_seconds": 137.2,
+    "error": null,
+    "stopped": null,
+    "survivors": [],
+    "timeout_infra_notrun": {}
+   },
+   "compare": {
+    "mutants": 33,
+    "same_class": 33,
+    "differ": 0,
+    "same_killing_file": 7,
+    "runner_seconds_ratio_ord_over_decl": 0.405,
+    "own_runs_decl_ord": [
+     35,
+     58
+    ]
+   }
+  }
+ },
+ "differ": [],
+ "totals": {
+  "decl_runner_seconds": 20237.3,
+  "decl_own_runs": 397,
+  "ord_runner_seconds": 19575.899999999998,
+  "ord_own_runs": 495,
+  "mutants": 240,
+  "same_class": 240
+ }
+}

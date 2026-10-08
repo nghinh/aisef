@@ -1,0 +1,3131 @@
+{
+ "record": "AISEF V2 — V2.1 MUTATION",
+ "tool": "validation/v2/mutation.py",
+ "targets": [
+  {
+   "target": "aisef2/app/cli.py::_parser",
+   "runner": 2,
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py"
+   ],
+   "source_sha256": "555806041859c41be1cc47e6d95aecfbcb5cc5910cb0dd0835108e2be3ffd04e",
+   "tree_sha256": "34003dc8d1639785a0d157934ee4a1d759c2604f2a20b0da565b5cb43fa7ee86",
+   "mutants": 31,
+   "results": [
+    {
+     "mutant": "L49 returns None",
+     "files": [
+      {
+       "file": "tests/v2/test_app_units.py",
+       "exit": 1,
+       "seconds": 1.24,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 7,
+       "errors": 1,
+       "first": "ERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict) | AttributeError",
+       "tail_sha256": "3e5865ee70b261ffffa79a4eb782bef7b00db16e395ab2fa72a3cd6bf88473a9",
+       "tail": "units.Bundle.test_a_bundle_loads_with_every_spec_compiled_and_its_digest) ... ok\ntest_stories_run_in_dependency_order_ties_by_name_and_a_cycle_is_refused (v2.test_app_units.Bundle.test_stories_run_in_dependency_order_ties_by_name_and_a_cycle_is_refused) ... ok\ntest_what_a_bundle_must_hold (v2.test_app_units.Bundle.test_what_a_bundle_must_hold) ... ok\ntest_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict) ... ERROR\n\n======================================================================\nERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_app_units.py\", line 754, in test_a_missing_bundle_file_is_an_error_not_a_verdict\n    code, _, err = self.cli(\"--verify\", \"--project\", str(self.tmp / \"absent.json\"), \"--out\", str(self.tmp))\n                   ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<tree>/tests/v2/test_app_units.py\", line 738, in cli\n    code = cli.run(list(argv))\n  File \"<tree>/aisef2/app/cli.py\", line 45, in run\n    a = p.parse_args(argv)\n        ^^^^^^^^^^^^\nAttributeError: 'NoneType' object has no attribute 'parse_args'\n\n----------------------------------------------------------------------\nRan 7 tests\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "control",
+       "select": "*v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict",
+       "exit": 0,
+       "seconds": 0.4,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "510ed0ec9a3b6bda3ea347d4b651dd9b41458c05ef9a726bb9dd233517de922e",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "control",
+       "select": "*v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict",
+       "exit": 0,
+       "seconds": 0.4,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "510ed0ec9a3b6bda3ea347d4b651dd9b41458c05ef9a726bb9dd233517de922e",
+       "overhead_s": 0.36
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "rerun",
+       "select": "*v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict",
+       "exit": 1,
+       "seconds": 0.38,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict) | AttributeError",
+       "tail_sha256": "8c35529f129a66d957270c5a1b374029300073a9c83ea03842c84cdb541156ca",
+       "tail": "test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict) ... ERROR\n\n======================================================================\nERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_app_units.py\", line 754, in test_a_missing_bundle_file_is_an_error_not_a_verdict\n    code, _, err = self.cli(\"--verify\", \"--project\", str(self.tmp / \"absent.json\"), \"--out\", str(self.tmp))\n                   ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<tree>/tests/v2/test_app_units.py\", line 738, in cli\n    code = cli.run(list(argv))\n  File \"<tree>/aisef2/app/cli.py\", line 45, in run\n    a = p.parse_args(argv)\n        ^^^^^^^^^^^^\nAttributeError: 'NoneType' object has no attribute 'parse_args'\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.36
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_app_units.py",
+      "first": "ERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict) | AttributeError",
+      "seconds": 1.24
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L31 string '--check' emptied",
+     "files": [
+      {
+       "file": "tests/v2/test_app_units.py",
+       "exit": 1,
+       "seconds": 1.26,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 7,
+       "errors": 1,
+       "first": "ERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict) | IndexError",
+       "tail_sha256": "3142f9312dc6f9657ce2ed366521d9f2d03cbd5ab5e96e23335c1caa7159c715",
+       "tail": "ROR\n\n======================================================================\nERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_app_units.py\", line 754, in test_a_missing_bundle_file_is_an_error_not_a_verdict\n    code, _, err = self.cli(\"--verify\", \"--project\", str(self.tmp / \"absent.json\"), \"--out\", str(self.tmp))\n                   ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<tree>/tests/v2/test_app_units.py\", line 738, in cli\n    code = cli.run(list(argv))\n  File \"<tree>/aisef2/app/cli.py\", line 44, in run\n    p = _parser()\n  File \"<tree>/aisef2/app/cli.py\", line 27, in _parser\n    mode.add_argument('', action='store_true', help=\"check the inputs and the plan's admission; no provider request\")\n    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/argparse.py\", line 1516, in add_argument\n    if not args or len(args) == 1 and args[0][0] not in chars:\n                                      ~~~~~~~^^^\nIndexError: string index out of range\n\n----------------------------------------------------------------------\nRan 7 tests\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.37
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "control",
+       "select": "*v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict",
+       "exit": 0,
+       "seconds": 0.49,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "510ed0ec9a3b6bda3ea347d4b651dd9b41458c05ef9a726bb9dd233517de922e",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "control",
+       "select": "*v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict",
+       "exit": 0,
+       "seconds": 0.41,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "510ed0ec9a3b6bda3ea347d4b651dd9b41458c05ef9a726bb9dd233517de922e",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "rerun",
+       "select": "*v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict",
+       "exit": 1,
+       "seconds": 0.39,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict) | IndexError",
+       "tail_sha256": "2f7eb4f8f235389111d5bd403074d783d4bc7a7022254c245e4053ec7db47fe1",
+       "tail": "RROR\n\n======================================================================\nERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_app_units.py\", line 754, in test_a_missing_bundle_file_is_an_error_not_a_verdict\n    code, _, err = self.cli(\"--verify\", \"--project\", str(self.tmp / \"absent.json\"), \"--out\", str(self.tmp))\n                   ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<tree>/tests/v2/test_app_units.py\", line 738, in cli\n    code = cli.run(list(argv))\n  File \"<tree>/aisef2/app/cli.py\", line 44, in run\n    p = _parser()\n  File \"<tree>/aisef2/app/cli.py\", line 27, in _parser\n    mode.add_argument('', action='store_true', help=\"check the inputs and the plan's admission; no provider request\")\n    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/argparse.py\", line 1516, in add_argument\n    if not args or len(args) == 1 and args[0][0] not in chars:\n                                      ~~~~~~~^^^\nIndexError: string index out of range\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.35
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_app_units.py",
+      "first": "ERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict) | IndexError",
+      "seconds": 1.26
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L32 string '--verify' emptied",
+     "files": [
+      {
+       "file": "tests/v2/test_app_units.py",
+       "exit": 1,
+       "seconds": 1.23,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 7,
+       "errors": 1,
+       "first": "ERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict) | IndexError",
+       "tail_sha256": "624ddb7f85108d66f355a17b22d4d4d71863569e47b0947e52e9858e34388eac",
+       "tail": "_not_a_verdict) ... ERROR\n\n======================================================================\nERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_app_units.py\", line 754, in test_a_missing_bundle_file_is_an_error_not_a_verdict\n    code, _, err = self.cli(\"--verify\", \"--project\", str(self.tmp / \"absent.json\"), \"--out\", str(self.tmp))\n                   ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<tree>/tests/v2/test_app_units.py\", line 738, in cli\n    code = cli.run(list(argv))\n  File \"<tree>/aisef2/app/cli.py\", line 44, in run\n    p = _parser()\n  File \"<tree>/aisef2/app/cli.py\", line 28, in _parser\n    mode.add_argument('', action='store_true', help='verify a finished run directory against its journal')\n    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/argparse.py\", line 1516, in add_argument\n    if not args or len(args) == 1 and args[0][0] not in chars:\n                                      ~~~~~~~^^^\nIndexError: string index out of range\n\n----------------------------------------------------------------------\nRan 7 tests\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "control",
+       "select": "*v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict",
+       "exit": 0,
+       "seconds": 0.39,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "510ed0ec9a3b6bda3ea347d4b651dd9b41458c05ef9a726bb9dd233517de922e",
+       "overhead_s": 0.36
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "control",
+       "select": "*v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict",
+       "exit": 0,
+       "seconds": 0.39,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "510ed0ec9a3b6bda3ea347d4b651dd9b41458c05ef9a726bb9dd233517de922e",
+       "overhead_s": 0.36
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "rerun",
+       "select": "*v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict",
+       "exit": 1,
+       "seconds": 0.38,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict) | IndexError",
+       "tail_sha256": "e0cba8c6b1c7ccfa1931da08c8cf4b20648de6201ff494bc191bd10d1b73b80a",
+       "tail": "r_not_a_verdict) ... ERROR\n\n======================================================================\nERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_app_units.py\", line 754, in test_a_missing_bundle_file_is_an_error_not_a_verdict\n    code, _, err = self.cli(\"--verify\", \"--project\", str(self.tmp / \"absent.json\"), \"--out\", str(self.tmp))\n                   ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<tree>/tests/v2/test_app_units.py\", line 738, in cli\n    code = cli.run(list(argv))\n  File \"<tree>/aisef2/app/cli.py\", line 44, in run\n    p = _parser()\n  File \"<tree>/aisef2/app/cli.py\", line 28, in _parser\n    mode.add_argument('', action='store_true', help='verify a finished run directory against its journal')\n    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/argparse.py\", line 1516, in add_argument\n    if not args or len(args) == 1 and args[0][0] not in chars:\n                                      ~~~~~~~^^^\nIndexError: string index out of range\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.34
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_app_units.py",
+      "first": "ERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict) | IndexError",
+      "seconds": 1.23
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L33 string '--project' emptied",
+     "files": [
+      {
+       "file": "tests/v2/test_app_units.py",
+       "exit": 1,
+       "seconds": 1.18,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 7,
+       "errors": 1,
+       "first": "ERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict) | IndexError",
+       "tail_sha256": "a2936465f6f99cd7d344beb0b182a968ed630ac62f8087c04306a1c632b2fb74",
+       "tail": "rror_not_a_verdict) ... ERROR\n\n======================================================================\nERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_app_units.py\", line 754, in test_a_missing_bundle_file_is_an_error_not_a_verdict\n    code, _, err = self.cli(\"--verify\", \"--project\", str(self.tmp / \"absent.json\"), \"--out\", str(self.tmp))\n                   ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<tree>/tests/v2/test_app_units.py\", line 738, in cli\n    code = cli.run(list(argv))\n  File \"<tree>/aisef2/app/cli.py\", line 44, in run\n    p = _parser()\n  File \"<tree>/aisef2/app/cli.py\", line 29, in _parser\n    p.add_argument('', required=True, type=pathlib.Path, help='the project bundle (aisef-v2-project/1)')\n    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/argparse.py\", line 1516, in add_argument\n    if not args or len(args) == 1 and args[0][0] not in chars:\n                                      ~~~~~~~^^^\nIndexError: string index out of range\n\n----------------------------------------------------------------------\nRan 7 tests\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.33
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "control",
+       "select": "*v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict",
+       "exit": 0,
+       "seconds": 0.37,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "510ed0ec9a3b6bda3ea347d4b651dd9b41458c05ef9a726bb9dd233517de922e",
+       "overhead_s": 0.33
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "control",
+       "select": "*v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict",
+       "exit": 0,
+       "seconds": 0.37,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "510ed0ec9a3b6bda3ea347d4b651dd9b41458c05ef9a726bb9dd233517de922e",
+       "overhead_s": 0.33
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "rerun",
+       "select": "*v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict",
+       "exit": 1,
+       "seconds": 0.38,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict) | IndexError",
+       "tail_sha256": "6190c70f4302de98a5847d65c3efdd555101c5d0cd6c88501fe9a9324e3a5b89",
+       "tail": "error_not_a_verdict) ... ERROR\n\n======================================================================\nERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_app_units.py\", line 754, in test_a_missing_bundle_file_is_an_error_not_a_verdict\n    code, _, err = self.cli(\"--verify\", \"--project\", str(self.tmp / \"absent.json\"), \"--out\", str(self.tmp))\n                   ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<tree>/tests/v2/test_app_units.py\", line 738, in cli\n    code = cli.run(list(argv))\n  File \"<tree>/aisef2/app/cli.py\", line 44, in run\n    p = _parser()\n  File \"<tree>/aisef2/app/cli.py\", line 29, in _parser\n    p.add_argument('', required=True, type=pathlib.Path, help='the project bundle (aisef-v2-project/1)')\n    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/argparse.py\", line 1516, in add_argument\n    if not args or len(args) == 1 and args[0][0] not in chars:\n                                      ~~~~~~~^^^\nIndexError: string index out of range\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.33
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_app_units.py",
+      "first": "ERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict) | IndexError",
+      "seconds": 1.18
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L34 string '--settings' emptied",
+     "files": [
+      {
+       "file": "tests/v2/test_app_units.py",
+       "exit": 1,
+       "seconds": 1.17,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 7,
+       "errors": 1,
+       "first": "ERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict) | IndexError",
+       "tail_sha256": "40f2ea1b89443d0304a733bd8201093d163ece7347a87076e5b30f190b531085",
+       "tail": "Command.test_a_missing_bundle_file_is_an_error_not_a_verdict) ... ERROR\n\n======================================================================\nERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_app_units.py\", line 754, in test_a_missing_bundle_file_is_an_error_not_a_verdict\n    code, _, err = self.cli(\"--verify\", \"--project\", str(self.tmp / \"absent.json\"), \"--out\", str(self.tmp))\n                   ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<tree>/tests/v2/test_app_units.py\", line 738, in cli\n    code = cli.run(list(argv))\n  File \"<tree>/aisef2/app/cli.py\", line 44, in run\n    p = _parser()\n  File \"<tree>/aisef2/app/cli.py\", line 30, in _parser\n    p.add_argument('', type=pathlib.Path, help='the run settings (aisef-v2-run/1)')\n    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/argparse.py\", line 1516, in add_argument\n    if not args or len(args) == 1 and args[0][0] not in chars:\n                                      ~~~~~~~^^^\nIndexError: string index out of range\n\n----------------------------------------------------------------------\nRan 7 tests\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.33
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "control",
+       "select": "*v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict",
+       "exit": 0,
+       "seconds": 0.37,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "510ed0ec9a3b6bda3ea347d4b651dd9b41458c05ef9a726bb9dd233517de922e",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "control",
+       "select": "*v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict",
+       "exit": 0,
+       "seconds": 0.39,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "510ed0ec9a3b6bda3ea347d4b651dd9b41458c05ef9a726bb9dd233517de922e",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "rerun",
+       "select": "*v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict",
+       "exit": 1,
+       "seconds": 0.39,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict) | IndexError",
+       "tail_sha256": "c084c019488343cc9a6c399affc086836756e16fab9fe315e9d8900a21bdac0d",
+       "tail": ".Command.test_a_missing_bundle_file_is_an_error_not_a_verdict) ... ERROR\n\n======================================================================\nERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_app_units.py\", line 754, in test_a_missing_bundle_file_is_an_error_not_a_verdict\n    code, _, err = self.cli(\"--verify\", \"--project\", str(self.tmp / \"absent.json\"), \"--out\", str(self.tmp))\n                   ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<tree>/tests/v2/test_app_units.py\", line 738, in cli\n    code = cli.run(list(argv))\n  File \"<tree>/aisef2/app/cli.py\", line 44, in run\n    p = _parser()\n  File \"<tree>/aisef2/app/cli.py\", line 30, in _parser\n    p.add_argument('', type=pathlib.Path, help='the run settings (aisef-v2-run/1)')\n    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/argparse.py\", line 1516, in add_argument\n    if not args or len(args) == 1 and args[0][0] not in chars:\n                                      ~~~~~~~^^^\nIndexError: string index out of range\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.34
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_app_units.py",
+      "first": "ERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict) | IndexError",
+      "seconds": 1.17
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L35 string '--repo' emptied",
+     "files": [
+      {
+       "file": "tests/v2/test_app_units.py",
+       "exit": 1,
+       "seconds": 1.24,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 7,
+       "errors": 1,
+       "first": "ERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict) | IndexError",
+       "tail_sha256": "30c5c99fced3d675090fc61d8406863667cfacdb374b0fd08752f45b7c2c52ab",
+       "tail": "an_error_not_a_verdict) ... ERROR\n\n======================================================================\nERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_app_units.py\", line 754, in test_a_missing_bundle_file_is_an_error_not_a_verdict\n    code, _, err = self.cli(\"--verify\", \"--project\", str(self.tmp / \"absent.json\"), \"--out\", str(self.tmp))\n                   ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<tree>/tests/v2/test_app_units.py\", line 738, in cli\n    code = cli.run(list(argv))\n  File \"<tree>/aisef2/app/cli.py\", line 44, in run\n    p = _parser()\n  File \"<tree>/aisef2/app/cli.py\", line 31, in _parser\n    p.add_argument('', type=pathlib.Path, help=\"the project's git repository (cloned; never written)\")\n    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/argparse.py\", line 1516, in add_argument\n    if not args or len(args) == 1 and args[0][0] not in chars:\n                                      ~~~~~~~^^^\nIndexError: string index out of range\n\n----------------------------------------------------------------------\nRan 7 tests\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "control",
+       "select": "*v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict",
+       "exit": 0,
+       "seconds": 0.39,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "510ed0ec9a3b6bda3ea347d4b651dd9b41458c05ef9a726bb9dd233517de922e",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "control",
+       "select": "*v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict",
+       "exit": 0,
+       "seconds": 0.4,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "510ed0ec9a3b6bda3ea347d4b651dd9b41458c05ef9a726bb9dd233517de922e",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "rerun",
+       "select": "*v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict",
+       "exit": 1,
+       "seconds": 0.39,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict) | IndexError",
+       "tail_sha256": "272c925737df239b2b40d0f136656dae21c05c311e2087363f5300223842b629",
+       "tail": "_an_error_not_a_verdict) ... ERROR\n\n======================================================================\nERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_app_units.py\", line 754, in test_a_missing_bundle_file_is_an_error_not_a_verdict\n    code, _, err = self.cli(\"--verify\", \"--project\", str(self.tmp / \"absent.json\"), \"--out\", str(self.tmp))\n                   ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<tree>/tests/v2/test_app_units.py\", line 738, in cli\n    code = cli.run(list(argv))\n  File \"<tree>/aisef2/app/cli.py\", line 44, in run\n    p = _parser()\n  File \"<tree>/aisef2/app/cli.py\", line 31, in _parser\n    p.add_argument('', type=pathlib.Path, help=\"the project's git repository (cloned; never written)\")\n    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/argparse.py\", line 1516, in add_argument\n    if not args or len(args) == 1 and args[0][0] not in chars:\n                                      ~~~~~~~^^^\nIndexError: string index out of range\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.35
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_app_units.py",
+      "first": "ERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict) | IndexError",
+      "seconds": 1.24
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L36 string '--out' emptied",
+     "files": [
+      {
+       "file": "tests/v2/test_app_units.py",
+       "exit": 1,
+       "seconds": 1.27,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 7,
+       "errors": 1,
+       "first": "ERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict) | IndexError",
+       "tail_sha256": "972b1fef4a491d4a34c133de3289d05e9ff712495c3bf48fffe80b0738e89378",
+       "tail": ") ... ERROR\n\n======================================================================\nERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_app_units.py\", line 754, in test_a_missing_bundle_file_is_an_error_not_a_verdict\n    code, _, err = self.cli(\"--verify\", \"--project\", str(self.tmp / \"absent.json\"), \"--out\", str(self.tmp))\n                   ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<tree>/tests/v2/test_app_units.py\", line 738, in cli\n    code = cli.run(list(argv))\n  File \"<tree>/aisef2/app/cli.py\", line 44, in run\n    p = _parser()\n  File \"<tree>/aisef2/app/cli.py\", line 32, in _parser\n    p.add_argument('', type=pathlib.Path, help='the run directory (a new one to run; an existing one to verify)')\n    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/argparse.py\", line 1516, in add_argument\n    if not args or len(args) == 1 and args[0][0] not in chars:\n                                      ~~~~~~~^^^\nIndexError: string index out of range\n\n----------------------------------------------------------------------\nRan 7 tests\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.36
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "control",
+       "select": "*v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict",
+       "exit": 0,
+       "seconds": 0.4,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "510ed0ec9a3b6bda3ea347d4b651dd9b41458c05ef9a726bb9dd233517de922e",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "control",
+       "select": "*v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict",
+       "exit": 0,
+       "seconds": 0.39,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "510ed0ec9a3b6bda3ea347d4b651dd9b41458c05ef9a726bb9dd233517de922e",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "rerun",
+       "select": "*v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict",
+       "exit": 1,
+       "seconds": 0.39,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict) | IndexError",
+       "tail_sha256": "658d1d31d4b7895affde052cd24c190e71dc961de2ea15c6e7f6f55a5643d026",
+       "tail": "t) ... ERROR\n\n======================================================================\nERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_app_units.py\", line 754, in test_a_missing_bundle_file_is_an_error_not_a_verdict\n    code, _, err = self.cli(\"--verify\", \"--project\", str(self.tmp / \"absent.json\"), \"--out\", str(self.tmp))\n                   ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<tree>/tests/v2/test_app_units.py\", line 738, in cli\n    code = cli.run(list(argv))\n  File \"<tree>/aisef2/app/cli.py\", line 44, in run\n    p = _parser()\n  File \"<tree>/aisef2/app/cli.py\", line 32, in _parser\n    p.add_argument('', type=pathlib.Path, help='the run directory (a new one to run; an existing one to verify)')\n    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/argparse.py\", line 1516, in add_argument\n    if not args or len(args) == 1 and args[0][0] not in chars:\n                                      ~~~~~~~^^^\nIndexError: string index out of range\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.36
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_app_units.py",
+      "first": "ERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict) | IndexError",
+      "seconds": 1.27
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L37 string '--expect-anchor' emptied",
+     "files": [
+      {
+       "file": "tests/v2/test_app_units.py",
+       "exit": 1,
+       "seconds": 1.21,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 7,
+       "errors": 1,
+       "first": "ERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict) | IndexError",
+       "tail_sha256": "4513caa9e74a13fea9cac98f5526b2a4cd1fdf67b8e3352e1674ea9896badb77",
+       "tail": "===================================================\nERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_app_units.py\", line 754, in test_a_missing_bundle_file_is_an_error_not_a_verdict\n    code, _, err = self.cli(\"--verify\", \"--project\", str(self.tmp / \"absent.json\"), \"--out\", str(self.tmp))\n                   ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<tree>/tests/v2/test_app_units.py\", line 738, in cli\n    code = cli.run(list(argv))\n  File \"<tree>/aisef2/app/cli.py\", line 44, in run\n    p = _parser()\n  File \"<tree>/aisef2/app/cli.py\", line 33, in _parser\n    p.add_argument('', metavar='SHA256', help='verify only: the evidence anchor the run printed, kept outside the run directory')\n    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/argparse.py\", line 1516, in add_argument\n    if not args or len(args) == 1 and args[0][0] not in chars:\n                                      ~~~~~~~^^^\nIndexError: string index out of range\n\n----------------------------------------------------------------------\nRan 7 tests\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "control",
+       "select": "*v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict",
+       "exit": 0,
+       "seconds": 0.4,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "510ed0ec9a3b6bda3ea347d4b651dd9b41458c05ef9a726bb9dd233517de922e",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "control",
+       "select": "*v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict",
+       "exit": 0,
+       "seconds": 0.39,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "510ed0ec9a3b6bda3ea347d4b651dd9b41458c05ef9a726bb9dd233517de922e",
+       "overhead_s": 0.37
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "rerun",
+       "select": "*v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict",
+       "exit": 1,
+       "seconds": 0.42,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict) | IndexError",
+       "tail_sha256": "c0559a4f9df607e154ddfe3f2a8f4b4f2fad7a090a02a3c09868f85699c51bd1",
+       "tail": "====================================================\nERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_app_units.py\", line 754, in test_a_missing_bundle_file_is_an_error_not_a_verdict\n    code, _, err = self.cli(\"--verify\", \"--project\", str(self.tmp / \"absent.json\"), \"--out\", str(self.tmp))\n                   ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<tree>/tests/v2/test_app_units.py\", line 738, in cli\n    code = cli.run(list(argv))\n  File \"<tree>/aisef2/app/cli.py\", line 44, in run\n    p = _parser()\n  File \"<tree>/aisef2/app/cli.py\", line 33, in _parser\n    p.add_argument('', metavar='SHA256', help='verify only: the evidence anchor the run printed, kept outside the run directory')\n    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/argparse.py\", line 1516, in add_argument\n    if not args or len(args) == 1 and args[0][0] not in chars:\n                                      ~~~~~~~^^^\nIndexError: string index out of range\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.35
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_app_units.py",
+      "first": "ERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict) | IndexError",
+      "seconds": 1.21
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L39 string '--parent' emptied",
+     "files": [
+      {
+       "file": "tests/v2/test_app_units.py",
+       "exit": 1,
+       "seconds": 1.26,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 7,
+       "errors": 1,
+       "first": "ERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict) | IndexError",
+       "tail_sha256": "fec6eb828c5bd16caee0bb6fb1c93de81733f1749ac7b56b7597f7560beaf77f",
+       "tail": "=================================\nERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_app_units.py\", line 754, in test_a_missing_bundle_file_is_an_error_not_a_verdict\n    code, _, err = self.cli(\"--verify\", \"--project\", str(self.tmp / \"absent.json\"), \"--out\", str(self.tmp))\n                   ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<tree>/tests/v2/test_app_units.py\", line 738, in cli\n    code = cli.run(list(argv))\n  File \"<tree>/aisef2/app/cli.py\", line 44, in run\n    p = _parser()\n  File \"<tree>/aisef2/app/cli.py\", line 34, in _parser\n    p.add_argument('', type=pathlib.Path, help='run only: the run this one continues (`aisef bundle continue`), recorded with its anchor')\n    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/argparse.py\", line 1516, in add_argument\n    if not args or len(args) == 1 and args[0][0] not in chars:\n                                      ~~~~~~~^^^\nIndexError: string index out of range\n\n----------------------------------------------------------------------\nRan 7 tests\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "control",
+       "select": "*v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict",
+       "exit": 0,
+       "seconds": 0.39,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "510ed0ec9a3b6bda3ea347d4b651dd9b41458c05ef9a726bb9dd233517de922e",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "control",
+       "select": "*v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict",
+       "exit": 0,
+       "seconds": 0.38,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "510ed0ec9a3b6bda3ea347d4b651dd9b41458c05ef9a726bb9dd233517de922e",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "rerun",
+       "select": "*v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict",
+       "exit": 1,
+       "seconds": 0.39,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict) | IndexError",
+       "tail_sha256": "640a5bbf0736ddaabafe79aeafbcfac840baa1da8d58738c3ac40f4e820b4d1f",
+       "tail": "==================================\nERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_app_units.py\", line 754, in test_a_missing_bundle_file_is_an_error_not_a_verdict\n    code, _, err = self.cli(\"--verify\", \"--project\", str(self.tmp / \"absent.json\"), \"--out\", str(self.tmp))\n                   ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<tree>/tests/v2/test_app_units.py\", line 738, in cli\n    code = cli.run(list(argv))\n  File \"<tree>/aisef2/app/cli.py\", line 44, in run\n    p = _parser()\n  File \"<tree>/aisef2/app/cli.py\", line 34, in _parser\n    p.add_argument('', type=pathlib.Path, help='run only: the run this one continues (`aisef bundle continue`), recorded with its anchor')\n    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/argparse.py\", line 1516, in add_argument\n    if not args or len(args) == 1 and args[0][0] not in chars:\n                                      ~~~~~~~^^^\nIndexError: string index out of range\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.36
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_app_units.py",
+      "first": "ERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict) | IndexError",
+      "seconds": 1.26
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L41 string '--anchor-out' emptied",
+     "files": [
+      {
+       "file": "tests/v2/test_app_units.py",
+       "exit": 1,
+       "seconds": 1.23,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 7,
+       "errors": 1,
+       "first": "ERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict) | IndexError",
+       "tail_sha256": "c349dbc3e744fe24d4e9deee6de1fcc7afd39bdb9050d67c9b6efb0a1eed48e2",
+       "tail": "missing_bundle_file_is_an_error_not_a_verdict)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_app_units.py\", line 754, in test_a_missing_bundle_file_is_an_error_not_a_verdict\n    code, _, err = self.cli(\"--verify\", \"--project\", str(self.tmp / \"absent.json\"), \"--out\", str(self.tmp))\n                   ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<tree>/tests/v2/test_app_units.py\", line 738, in cli\n    code = cli.run(list(argv))\n  File \"<tree>/aisef2/app/cli.py\", line 44, in run\n    p = _parser()\n  File \"<tree>/aisef2/app/cli.py\", line 35, in _parser\n    p.add_argument('', type=pathlib.Path, help='run only: a new file (never overwritten) the evidence anchor is written to — keep it where the developer cannot write (docs/v2.1/ANCHOR-THREAT-MODEL.md)')\n    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/argparse.py\", line 1516, in add_argument\n    if not args or len(args) == 1 and args[0][0] not in chars:\n                                      ~~~~~~~^^^\nIndexError: string index out of range\n\n----------------------------------------------------------------------\nRan 7 tests\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.36
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "control",
+       "select": "*v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict",
+       "exit": 0,
+       "seconds": 0.39,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "510ed0ec9a3b6bda3ea347d4b651dd9b41458c05ef9a726bb9dd233517de922e",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "control",
+       "select": "*v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict",
+       "exit": 0,
+       "seconds": 0.37,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "510ed0ec9a3b6bda3ea347d4b651dd9b41458c05ef9a726bb9dd233517de922e",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "rerun",
+       "select": "*v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict",
+       "exit": 1,
+       "seconds": 0.39,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict) | IndexError",
+       "tail_sha256": "60884bf7b6a2ea56b6c3069a17213ae61146c08db91cc7c5e7f153e6cf06426e",
+       "tail": "_missing_bundle_file_is_an_error_not_a_verdict)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_app_units.py\", line 754, in test_a_missing_bundle_file_is_an_error_not_a_verdict\n    code, _, err = self.cli(\"--verify\", \"--project\", str(self.tmp / \"absent.json\"), \"--out\", str(self.tmp))\n                   ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<tree>/tests/v2/test_app_units.py\", line 738, in cli\n    code = cli.run(list(argv))\n  File \"<tree>/aisef2/app/cli.py\", line 44, in run\n    p = _parser()\n  File \"<tree>/aisef2/app/cli.py\", line 35, in _parser\n    p.add_argument('', type=pathlib.Path, help='run only: a new file (never overwritten) the evidence anchor is written to — keep it where the developer cannot write (docs/v2.1/ANCHOR-THREAT-MODEL.md)')\n    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/argparse.py\", line 1516, in add_argument\n    if not args or len(args) == 1 and args[0][0] not in chars:\n                                      ~~~~~~~^^^\nIndexError: string index out of range\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.34
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_app_units.py",
+      "first": "ERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict) | IndexError",
+      "seconds": 1.23
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L44 string '--accept-unaccounted' emptied",
+     "files": [
+      {
+       "file": "tests/v2/test_app_units.py",
+       "exit": 1,
+       "seconds": 1.23,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 7,
+       "errors": 1,
+       "first": "ERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict) | IndexError",
+       "tail_sha256": "89ca37d1452e511b952e6d3807f28902ecc3a09be43660bee4cafbf544e1ac88",
+       "tail": "=======================\nERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_app_units.py\", line 754, in test_a_missing_bundle_file_is_an_error_not_a_verdict\n    code, _, err = self.cli(\"--verify\", \"--project\", str(self.tmp / \"absent.json\"), \"--out\", str(self.tmp))\n                   ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<tree>/tests/v2/test_app_units.py\", line 738, in cli\n    code = cli.run(list(argv))\n  File \"<tree>/aisef2/app/cli.py\", line 44, in run\n    p = _parser()\n  File \"<tree>/aisef2/app/cli.py\", line 36, in _parser\n    p.add_argument('', action='store_true', help='run --parent only: start although the lineage has spend no evidence accounts for (recorded)')\n    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/argparse.py\", line 1516, in add_argument\n    if not args or len(args) == 1 and args[0][0] not in chars:\n                                      ~~~~~~~^^^\nIndexError: string index out of range\n\n----------------------------------------------------------------------\nRan 7 tests\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "control",
+       "select": "*v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict",
+       "exit": 0,
+       "seconds": 0.41,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "510ed0ec9a3b6bda3ea347d4b651dd9b41458c05ef9a726bb9dd233517de922e",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "control",
+       "select": "*v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict",
+       "exit": 0,
+       "seconds": 0.38,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "510ed0ec9a3b6bda3ea347d4b651dd9b41458c05ef9a726bb9dd233517de922e",
+       "overhead_s": 0.36
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "rerun",
+       "select": "*v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict",
+       "exit": 1,
+       "seconds": 0.39,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict) | IndexError",
+       "tail_sha256": "df897b2d43a65daa96d2aec18b612eec9d3dedec6bb0534309f01d23145d22e5",
+       "tail": "========================\nERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_app_units.py\", line 754, in test_a_missing_bundle_file_is_an_error_not_a_verdict\n    code, _, err = self.cli(\"--verify\", \"--project\", str(self.tmp / \"absent.json\"), \"--out\", str(self.tmp))\n                   ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<tree>/tests/v2/test_app_units.py\", line 738, in cli\n    code = cli.run(list(argv))\n  File \"<tree>/aisef2/app/cli.py\", line 44, in run\n    p = _parser()\n  File \"<tree>/aisef2/app/cli.py\", line 36, in _parser\n    p.add_argument('', action='store_true', help='run --parent only: start although the lineage has spend no evidence accounts for (recorded)')\n    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/argparse.py\", line 1516, in add_argument\n    if not args or len(args) == 1 and args[0][0] not in chars:\n                                      ~~~~~~~^^^\nIndexError: string index out of range\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.35
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_app_units.py",
+      "first": "ERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict) | IndexError",
+      "seconds": 1.23
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L46 string '--supersede-claim' emptied",
+     "files": [
+      {
+       "file": "tests/v2/test_app_units.py",
+       "exit": 1,
+       "seconds": 1.24,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 7,
+       "errors": 1,
+       "first": "ERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict) | IndexError",
+       "tail_sha256": "d0189ea376e9c26885f186a3f0c5a4f1b836f84ee412de03e7b48d60015bf877",
+       "tail": "t_a_verdict)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_app_units.py\", line 754, in test_a_missing_bundle_file_is_an_error_not_a_verdict\n    code, _, err = self.cli(\"--verify\", \"--project\", str(self.tmp / \"absent.json\"), \"--out\", str(self.tmp))\n                   ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<tree>/tests/v2/test_app_units.py\", line 738, in cli\n    code = cli.run(list(argv))\n  File \"<tree>/aisef2/app/cli.py\", line 44, in run\n    p = _parser()\n  File \"<tree>/aisef2/app/cli.py\", line 37, in _parser\n    p.add_argument('', metavar='SHA256', help=\"run --parent only: supersede the predecessor's claim with this sha256 whose child never began and whose claimant cannot be shown gone (the operator's assertion, recorded)\")\n    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/argparse.py\", line 1516, in add_argument\n    if not args or len(args) == 1 and args[0][0] not in chars:\n                                      ~~~~~~~^^^\nIndexError: string index out of range\n\n----------------------------------------------------------------------\nRan 7 tests\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "control",
+       "select": "*v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict",
+       "exit": 0,
+       "seconds": 0.39,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "510ed0ec9a3b6bda3ea347d4b651dd9b41458c05ef9a726bb9dd233517de922e",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "control",
+       "select": "*v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict",
+       "exit": 0,
+       "seconds": 0.4,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "510ed0ec9a3b6bda3ea347d4b651dd9b41458c05ef9a726bb9dd233517de922e",
+       "overhead_s": 0.36
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "rerun",
+       "select": "*v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict",
+       "exit": 1,
+       "seconds": 0.39,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict) | IndexError",
+       "tail_sha256": "1a64ccb10be098a583ee982643a023e04b14ca938c2c891c3c6e3a851aef991a",
+       "tail": "ot_a_verdict)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_app_units.py\", line 754, in test_a_missing_bundle_file_is_an_error_not_a_verdict\n    code, _, err = self.cli(\"--verify\", \"--project\", str(self.tmp / \"absent.json\"), \"--out\", str(self.tmp))\n                   ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<tree>/tests/v2/test_app_units.py\", line 738, in cli\n    code = cli.run(list(argv))\n  File \"<tree>/aisef2/app/cli.py\", line 44, in run\n    p = _parser()\n  File \"<tree>/aisef2/app/cli.py\", line 37, in _parser\n    p.add_argument('', metavar='SHA256', help=\"run --parent only: supersede the predecessor's claim with this sha256 whose child never began and whose claimant cannot be shown gone (the operator's assertion, recorded)\")\n    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/argparse.py\", line 1516, in add_argument\n    if not args or len(args) == 1 and args[0][0] not in chars:\n                                      ~~~~~~~^^^\nIndexError: string index out of range\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.38
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_app_units.py",
+      "first": "ERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict) | IndexError",
+      "seconds": 1.24
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L29 string 'aisef run' emptied",
+     "files": [
+      {
+       "file": "tests/v2/test_app_units.py",
+       "exit": 0,
+       "seconds": 7.17,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 41,
+       "tail_sha256": "3ef303c799614934b469520dc3ed73bad54df703d4213d103aaf0597d5afb57a",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_v21_inputs.py",
+       "exit": 0,
+       "seconds": 1.72,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 20,
+       "tail_sha256": "d39f63e4c8436fb76e82de52f522bc2737bd8bc9e94af2d56412b84f482dcedb",
+       "overhead_s": 0.33
+      },
+      {
+       "file": "tests/v2/test_v21_bundle_tools.py",
+       "exit": 0,
+       "seconds": 1.61,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 9,
+       "tail_sha256": "4adb025f77f5642acface5cc74c3400565782d1ac9ef5d332b2f9e500a05dee7",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_v21_continue_integrity.py",
+       "exit": 0,
+       "seconds": 253.39,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 24,
+       "tail_sha256": "6ed16fadda0701c1628b18171b29ee246ad8a6394124bc873e012e30e68ad7e4",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_app_run.py",
+       "exit": 0,
+       "seconds": 36.5,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 17,
+       "tail_sha256": "34c9bfe7ef7d76c17f599b0a81180f32dc90d22822f05f5f66668053994bd703",
+       "overhead_s": 0.35
+      }
+     ],
+     "class": "SURVIVED",
+     "killed": false
+    },
+    {
+     "mutant": "L29 string \"Run a project's admitted plan under the AISEF V2 kernel.\" emptied",
+     "files": [
+      {
+       "file": "tests/v2/test_app_units.py",
+       "exit": 0,
+       "seconds": 7.15,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 41,
+       "tail_sha256": "3ef303c799614934b469520dc3ed73bad54df703d4213d103aaf0597d5afb57a",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_v21_inputs.py",
+       "exit": 0,
+       "seconds": 1.78,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 20,
+       "tail_sha256": "d39f63e4c8436fb76e82de52f522bc2737bd8bc9e94af2d56412b84f482dcedb",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_v21_bundle_tools.py",
+       "exit": 0,
+       "seconds": 1.64,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 9,
+       "tail_sha256": "4adb025f77f5642acface5cc74c3400565782d1ac9ef5d332b2f9e500a05dee7",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_v21_continue_integrity.py",
+       "exit": 0,
+       "seconds": 256.79,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 24,
+       "tail_sha256": "6ed16fadda0701c1628b18171b29ee246ad8a6394124bc873e012e30e68ad7e4",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_app_run.py",
+       "exit": 0,
+       "seconds": 37.91,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 17,
+       "tail_sha256": "34c9bfe7ef7d76c17f599b0a81180f32dc90d22822f05f5f66668053994bd703",
+       "overhead_s": 0.36
+      }
+     ],
+     "class": "SURVIVED",
+     "killed": false
+    },
+    {
+     "mutant": "L31 string 'store_true' emptied",
+     "files": [
+      {
+       "file": "tests/v2/test_app_units.py",
+       "exit": 1,
+       "seconds": 1.25,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 7,
+       "errors": 1,
+       "first": "ERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict) | ValueError",
+       "tail_sha256": "7deecf1f48c062a6853ef392e018e197f6972c9217a4eb46d0017e6f8e9711cd",
+       "tail": ".Command.test_a_missing_bundle_file_is_an_error_not_a_verdict) ... ERROR\n\n======================================================================\nERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_app_units.py\", line 754, in test_a_missing_bundle_file_is_an_error_not_a_verdict\n    code, _, err = self.cli(\"--verify\", \"--project\", str(self.tmp / \"absent.json\"), \"--out\", str(self.tmp))\n                   ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<tree>/tests/v2/test_app_units.py\", line 738, in cli\n    code = cli.run(list(argv))\n  File \"<tree>/aisef2/app/cli.py\", line 44, in run\n    p = _parser()\n  File \"<tree>/aisef2/app/cli.py\", line 27, in _parser\n    mode.add_argument('--check', action='', help=\"check the inputs and the plan's admission; no provider request\")\n    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/argparse.py\", line 1538, in add_argument\n    raise ValueError(f'unknown action {action_class!r}')\nValueError: unknown action ''\n\n----------------------------------------------------------------------\nRan 7 tests\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "control",
+       "select": "*v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict",
+       "exit": 0,
+       "seconds": 0.42,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "510ed0ec9a3b6bda3ea347d4b651dd9b41458c05ef9a726bb9dd233517de922e",
+       "overhead_s": 0.37
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "control",
+       "select": "*v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict",
+       "exit": 0,
+       "seconds": 0.43,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "510ed0ec9a3b6bda3ea347d4b651dd9b41458c05ef9a726bb9dd233517de922e",
+       "overhead_s": 0.36
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "rerun",
+       "select": "*v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict",
+       "exit": 1,
+       "seconds": 0.41,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict) | ValueError",
+       "tail_sha256": "334ee01a9f9251f8e110fa9e7fc98922a2ab4fac9728c80e9f836640a051f5f7",
+       "tail": "s.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict) ... ERROR\n\n======================================================================\nERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_app_units.py\", line 754, in test_a_missing_bundle_file_is_an_error_not_a_verdict\n    code, _, err = self.cli(\"--verify\", \"--project\", str(self.tmp / \"absent.json\"), \"--out\", str(self.tmp))\n                   ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<tree>/tests/v2/test_app_units.py\", line 738, in cli\n    code = cli.run(list(argv))\n  File \"<tree>/aisef2/app/cli.py\", line 44, in run\n    p = _parser()\n  File \"<tree>/aisef2/app/cli.py\", line 27, in _parser\n    mode.add_argument('--check', action='', help=\"check the inputs and the plan's admission; no provider request\")\n    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/argparse.py\", line 1538, in add_argument\n    raise ValueError(f'unknown action {action_class!r}')\nValueError: unknown action ''\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.35
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_app_units.py",
+      "first": "ERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict) | ValueError",
+      "seconds": 1.25
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L31 string \"check the inputs and the plan's admission; no provider request\" emptied",
+     "files": [
+      {
+       "file": "tests/v2/test_app_units.py",
+       "exit": 0,
+       "seconds": 7.2,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 41,
+       "tail_sha256": "3ef303c799614934b469520dc3ed73bad54df703d4213d103aaf0597d5afb57a",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_v21_inputs.py",
+       "exit": 0,
+       "seconds": 1.77,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 20,
+       "tail_sha256": "d39f63e4c8436fb76e82de52f522bc2737bd8bc9e94af2d56412b84f482dcedb",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_v21_bundle_tools.py",
+       "exit": 0,
+       "seconds": 1.64,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 9,
+       "tail_sha256": "4adb025f77f5642acface5cc74c3400565782d1ac9ef5d332b2f9e500a05dee7",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_v21_continue_integrity.py",
+       "exit": 0,
+       "seconds": 255.31,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 24,
+       "tail_sha256": "6ed16fadda0701c1628b18171b29ee246ad8a6394124bc873e012e30e68ad7e4",
+       "overhead_s": 0.36
+      },
+      {
+       "file": "tests/v2/test_app_run.py",
+       "exit": 0,
+       "seconds": 38.88,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 17,
+       "tail_sha256": "34c9bfe7ef7d76c17f599b0a81180f32dc90d22822f05f5f66668053994bd703",
+       "overhead_s": 0.39
+      }
+     ],
+     "class": "SURVIVED",
+     "killed": false
+    },
+    {
+     "mutant": "L32 string 'store_true' emptied",
+     "files": [
+      {
+       "file": "tests/v2/test_app_units.py",
+       "exit": 1,
+       "seconds": 1.32,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 7,
+       "errors": 1,
+       "first": "ERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict) | ValueError",
+       "tail_sha256": "cf0bdac47eff36083d7fdfad1a140234b5863dbba1a6b9aa225819898d100d8f",
+       "tail": "t (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict) ... ERROR\n\n======================================================================\nERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_app_units.py\", line 754, in test_a_missing_bundle_file_is_an_error_not_a_verdict\n    code, _, err = self.cli(\"--verify\", \"--project\", str(self.tmp / \"absent.json\"), \"--out\", str(self.tmp))\n                   ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<tree>/tests/v2/test_app_units.py\", line 738, in cli\n    code = cli.run(list(argv))\n  File \"<tree>/aisef2/app/cli.py\", line 44, in run\n    p = _parser()\n  File \"<tree>/aisef2/app/cli.py\", line 28, in _parser\n    mode.add_argument('--verify', action='', help='verify a finished run directory against its journal')\n    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/argparse.py\", line 1538, in add_argument\n    raise ValueError(f'unknown action {action_class!r}')\nValueError: unknown action ''\n\n----------------------------------------------------------------------\nRan 7 tests\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.37
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "control",
+       "select": "*v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict",
+       "exit": 0,
+       "seconds": 0.39,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "510ed0ec9a3b6bda3ea347d4b651dd9b41458c05ef9a726bb9dd233517de922e",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "control",
+       "select": "*v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict",
+       "exit": 0,
+       "seconds": 0.4,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "510ed0ec9a3b6bda3ea347d4b651dd9b41458c05ef9a726bb9dd233517de922e",
+       "overhead_s": 0.36
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "rerun",
+       "select": "*v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict",
+       "exit": 1,
+       "seconds": 0.39,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict) | ValueError",
+       "tail_sha256": "be93928145a8a02b8a4b2a268c11ba6e9fd5a6e73d9952113ebe36edb53c108f",
+       "tail": "ct (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict) ... ERROR\n\n======================================================================\nERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_app_units.py\", line 754, in test_a_missing_bundle_file_is_an_error_not_a_verdict\n    code, _, err = self.cli(\"--verify\", \"--project\", str(self.tmp / \"absent.json\"), \"--out\", str(self.tmp))\n                   ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<tree>/tests/v2/test_app_units.py\", line 738, in cli\n    code = cli.run(list(argv))\n  File \"<tree>/aisef2/app/cli.py\", line 44, in run\n    p = _parser()\n  File \"<tree>/aisef2/app/cli.py\", line 28, in _parser\n    mode.add_argument('--verify', action='', help='verify a finished run directory against its journal')\n    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/argparse.py\", line 1538, in add_argument\n    raise ValueError(f'unknown action {action_class!r}')\nValueError: unknown action ''\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.35
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_app_units.py",
+      "first": "ERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict) | ValueError",
+      "seconds": 1.32
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L32 string 'verify a finished run directory against its journal' emptied",
+     "files": [
+      {
+       "file": "tests/v2/test_app_units.py",
+       "exit": 0,
+       "seconds": 7.19,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 41,
+       "tail_sha256": "3ef303c799614934b469520dc3ed73bad54df703d4213d103aaf0597d5afb57a",
+       "overhead_s": 0.36
+      },
+      {
+       "file": "tests/v2/test_v21_inputs.py",
+       "exit": 0,
+       "seconds": 1.75,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 20,
+       "tail_sha256": "d39f63e4c8436fb76e82de52f522bc2737bd8bc9e94af2d56412b84f482dcedb",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_v21_bundle_tools.py",
+       "exit": 0,
+       "seconds": 1.67,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 9,
+       "tail_sha256": "4adb025f77f5642acface5cc74c3400565782d1ac9ef5d332b2f9e500a05dee7",
+       "overhead_s": 0.36
+      },
+      {
+       "file": "tests/v2/test_v21_continue_integrity.py",
+       "exit": 0,
+       "seconds": 256.21,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 24,
+       "tail_sha256": "6ed16fadda0701c1628b18171b29ee246ad8a6394124bc873e012e30e68ad7e4",
+       "overhead_s": 0.36
+      },
+      {
+       "file": "tests/v2/test_app_run.py",
+       "exit": 0,
+       "seconds": 37.92,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 17,
+       "tail_sha256": "34c9bfe7ef7d76c17f599b0a81180f32dc90d22822f05f5f66668053994bd703",
+       "overhead_s": 0.35
+      }
+     ],
+     "class": "SURVIVED",
+     "killed": false
+    },
+    {
+     "mutant": "L33 True->False",
+     "files": [
+      {
+       "file": "tests/v2/test_app_units.py",
+       "exit": 0,
+       "seconds": 7.26,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 41,
+       "tail_sha256": "3ef303c799614934b469520dc3ed73bad54df703d4213d103aaf0597d5afb57a",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_v21_inputs.py",
+       "exit": 0,
+       "seconds": 1.75,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 20,
+       "tail_sha256": "d39f63e4c8436fb76e82de52f522bc2737bd8bc9e94af2d56412b84f482dcedb",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_v21_bundle_tools.py",
+       "exit": 0,
+       "seconds": 1.62,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 9,
+       "tail_sha256": "4adb025f77f5642acface5cc74c3400565782d1ac9ef5d332b2f9e500a05dee7",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_v21_continue_integrity.py",
+       "exit": 0,
+       "seconds": 254.89,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 24,
+       "tail_sha256": "6ed16fadda0701c1628b18171b29ee246ad8a6394124bc873e012e30e68ad7e4",
+       "overhead_s": 0.39
+      },
+      {
+       "file": "tests/v2/test_app_run.py",
+       "exit": 0,
+       "seconds": 38.37,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 17,
+       "tail_sha256": "34c9bfe7ef7d76c17f599b0a81180f32dc90d22822f05f5f66668053994bd703",
+       "overhead_s": 0.33
+      }
+     ],
+     "class": "SURVIVED",
+     "killed": false
+    },
+    {
+     "mutant": "L33 string 'the project bundle (aisef-v2-project/1)' emptied",
+     "files": [
+      {
+       "file": "tests/v2/test_app_units.py",
+       "exit": 0,
+       "seconds": 7.19,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 41,
+       "tail_sha256": "3ef303c799614934b469520dc3ed73bad54df703d4213d103aaf0597d5afb57a",
+       "overhead_s": 0.36
+      },
+      {
+       "file": "tests/v2/test_v21_inputs.py",
+       "exit": 0,
+       "seconds": 1.76,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 20,
+       "tail_sha256": "d39f63e4c8436fb76e82de52f522bc2737bd8bc9e94af2d56412b84f482dcedb",
+       "overhead_s": 0.36
+      },
+      {
+       "file": "tests/v2/test_v21_bundle_tools.py",
+       "exit": 0,
+       "seconds": 1.64,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 9,
+       "tail_sha256": "4adb025f77f5642acface5cc74c3400565782d1ac9ef5d332b2f9e500a05dee7",
+       "overhead_s": 0.36
+      },
+      {
+       "file": "tests/v2/test_v21_continue_integrity.py",
+       "exit": 0,
+       "seconds": 256.43,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 24,
+       "tail_sha256": "6ed16fadda0701c1628b18171b29ee246ad8a6394124bc873e012e30e68ad7e4",
+       "overhead_s": 0.36
+      },
+      {
+       "file": "tests/v2/test_app_run.py",
+       "exit": 0,
+       "seconds": 38.56,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 17,
+       "tail_sha256": "34c9bfe7ef7d76c17f599b0a81180f32dc90d22822f05f5f66668053994bd703",
+       "overhead_s": 0.35
+      }
+     ],
+     "class": "SURVIVED",
+     "killed": false
+    },
+    {
+     "mutant": "L34 string 'the run settings (aisef-v2-run/1)' emptied",
+     "files": [
+      {
+       "file": "tests/v2/test_app_units.py",
+       "exit": 0,
+       "seconds": 7.14,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 41,
+       "tail_sha256": "3ef303c799614934b469520dc3ed73bad54df703d4213d103aaf0597d5afb57a",
+       "overhead_s": 0.36
+      },
+      {
+       "file": "tests/v2/test_v21_inputs.py",
+       "exit": 0,
+       "seconds": 1.78,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 20,
+       "tail_sha256": "d39f63e4c8436fb76e82de52f522bc2737bd8bc9e94af2d56412b84f482dcedb",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_v21_bundle_tools.py",
+       "exit": 0,
+       "seconds": 1.63,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 9,
+       "tail_sha256": "4adb025f77f5642acface5cc74c3400565782d1ac9ef5d332b2f9e500a05dee7",
+       "overhead_s": 0.36
+      },
+      {
+       "file": "tests/v2/test_v21_continue_integrity.py",
+       "exit": 0,
+       "seconds": 255.34,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 24,
+       "tail_sha256": "6ed16fadda0701c1628b18171b29ee246ad8a6394124bc873e012e30e68ad7e4",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_app_run.py",
+       "exit": 0,
+       "seconds": 37.63,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 17,
+       "tail_sha256": "34c9bfe7ef7d76c17f599b0a81180f32dc90d22822f05f5f66668053994bd703",
+       "overhead_s": 0.34
+      }
+     ],
+     "class": "SURVIVED",
+     "killed": false
+    },
+    {
+     "mutant": "L35 string \"the project's git repository (cloned; never written)\" emptied",
+     "files": [
+      {
+       "file": "tests/v2/test_app_units.py",
+       "exit": 0,
+       "seconds": 6.86,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 41,
+       "tail_sha256": "3ef303c799614934b469520dc3ed73bad54df703d4213d103aaf0597d5afb57a",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_v21_inputs.py",
+       "exit": 0,
+       "seconds": 1.69,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 20,
+       "tail_sha256": "d39f63e4c8436fb76e82de52f522bc2737bd8bc9e94af2d56412b84f482dcedb",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_v21_bundle_tools.py",
+       "exit": 0,
+       "seconds": 1.62,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 9,
+       "tail_sha256": "4adb025f77f5642acface5cc74c3400565782d1ac9ef5d332b2f9e500a05dee7",
+       "overhead_s": 0.36
+      },
+      {
+       "file": "tests/v2/test_v21_continue_integrity.py",
+       "exit": 0,
+       "seconds": 257.14,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 24,
+       "tail_sha256": "6ed16fadda0701c1628b18171b29ee246ad8a6394124bc873e012e30e68ad7e4",
+       "overhead_s": 0.32
+      },
+      {
+       "file": "tests/v2/test_app_run.py",
+       "exit": 0,
+       "seconds": 34.53,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 17,
+       "tail_sha256": "34c9bfe7ef7d76c17f599b0a81180f32dc90d22822f05f5f66668053994bd703",
+       "overhead_s": 0.34
+      }
+     ],
+     "class": "SURVIVED",
+     "killed": false
+    },
+    {
+     "mutant": "L36 string 'the run directory (a new one to run; an existing one to verify)' emptied",
+     "files": [
+      {
+       "file": "tests/v2/test_app_units.py",
+       "exit": 0,
+       "seconds": 6.86,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 41,
+       "tail_sha256": "3ef303c799614934b469520dc3ed73bad54df703d4213d103aaf0597d5afb57a",
+       "overhead_s": 0.32
+      },
+      {
+       "file": "tests/v2/test_v21_inputs.py",
+       "exit": 0,
+       "seconds": 1.68,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 20,
+       "tail_sha256": "d39f63e4c8436fb76e82de52f522bc2737bd8bc9e94af2d56412b84f482dcedb",
+       "overhead_s": 0.33
+      },
+      {
+       "file": "tests/v2/test_v21_bundle_tools.py",
+       "exit": 0,
+       "seconds": 1.53,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 9,
+       "tail_sha256": "4adb025f77f5642acface5cc74c3400565782d1ac9ef5d332b2f9e500a05dee7",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_v21_continue_integrity.py",
+       "exit": 0,
+       "seconds": 246.2,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 24,
+       "tail_sha256": "6ed16fadda0701c1628b18171b29ee246ad8a6394124bc873e012e30e68ad7e4",
+       "overhead_s": 0.32
+      },
+      {
+       "file": "tests/v2/test_app_run.py",
+       "exit": 0,
+       "seconds": 35.39,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 17,
+       "tail_sha256": "34c9bfe7ef7d76c17f599b0a81180f32dc90d22822f05f5f66668053994bd703",
+       "overhead_s": 0.33
+      }
+     ],
+     "class": "SURVIVED",
+     "killed": false
+    },
+    {
+     "mutant": "L37 string 'SHA256' emptied",
+     "files": [
+      {
+       "file": "tests/v2/test_app_units.py",
+       "exit": 0,
+       "seconds": 6.67,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 41,
+       "tail_sha256": "3ef303c799614934b469520dc3ed73bad54df703d4213d103aaf0597d5afb57a",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_v21_inputs.py",
+       "exit": 0,
+       "seconds": 1.64,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 20,
+       "tail_sha256": "d39f63e4c8436fb76e82de52f522bc2737bd8bc9e94af2d56412b84f482dcedb",
+       "overhead_s": 0.33
+      },
+      {
+       "file": "tests/v2/test_v21_bundle_tools.py",
+       "exit": 0,
+       "seconds": 1.52,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 9,
+       "tail_sha256": "4adb025f77f5642acface5cc74c3400565782d1ac9ef5d332b2f9e500a05dee7",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_v21_continue_integrity.py",
+       "exit": 0,
+       "seconds": 239.71,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 24,
+       "tail_sha256": "6ed16fadda0701c1628b18171b29ee246ad8a6394124bc873e012e30e68ad7e4",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_app_run.py",
+       "exit": 0,
+       "seconds": 34.88,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 17,
+       "tail_sha256": "34c9bfe7ef7d76c17f599b0a81180f32dc90d22822f05f5f66668053994bd703",
+       "overhead_s": 0.33
+      }
+     ],
+     "class": "SURVIVED",
+     "killed": false
+    },
+    {
+     "mutant": "L38 string 'verify only: the evidence anchor the run printed, kept outside the run directory' emptied",
+     "files": [
+      {
+       "file": "tests/v2/test_app_units.py",
+       "exit": 0,
+       "seconds": 6.73,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 41,
+       "tail_sha256": "3ef303c799614934b469520dc3ed73bad54df703d4213d103aaf0597d5afb57a",
+       "overhead_s": 0.32
+      },
+      {
+       "file": "tests/v2/test_v21_inputs.py",
+       "exit": 0,
+       "seconds": 1.67,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 20,
+       "tail_sha256": "d39f63e4c8436fb76e82de52f522bc2737bd8bc9e94af2d56412b84f482dcedb",
+       "overhead_s": 0.31
+      },
+      {
+       "file": "tests/v2/test_v21_bundle_tools.py",
+       "exit": 0,
+       "seconds": 1.51,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 9,
+       "tail_sha256": "4adb025f77f5642acface5cc74c3400565782d1ac9ef5d332b2f9e500a05dee7",
+       "overhead_s": 0.31
+      },
+      {
+       "file": "tests/v2/test_v21_continue_integrity.py",
+       "exit": 0,
+       "seconds": 239.71,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 24,
+       "tail_sha256": "6ed16fadda0701c1628b18171b29ee246ad8a6394124bc873e012e30e68ad7e4",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_app_run.py",
+       "exit": 0,
+       "seconds": 35.39,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 17,
+       "tail_sha256": "34c9bfe7ef7d76c17f599b0a81180f32dc90d22822f05f5f66668053994bd703",
+       "overhead_s": 0.32
+      }
+     ],
+     "class": "SURVIVED",
+     "killed": false
+    },
+    {
+     "mutant": "L40 string 'run only: the run this one continues (`aisef bundle continue`), recorded with its anchor' emptied",
+     "files": [
+      {
+       "file": "tests/v2/test_app_units.py",
+       "exit": 0,
+       "seconds": 6.55,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 41,
+       "tail_sha256": "3ef303c799614934b469520dc3ed73bad54df703d4213d103aaf0597d5afb57a",
+       "overhead_s": 0.32
+      },
+      {
+       "file": "tests/v2/test_v21_inputs.py",
+       "exit": 0,
+       "seconds": 1.56,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 20,
+       "tail_sha256": "d39f63e4c8436fb76e82de52f522bc2737bd8bc9e94af2d56412b84f482dcedb",
+       "overhead_s": 0.33
+      },
+      {
+       "file": "tests/v2/test_v21_bundle_tools.py",
+       "exit": 0,
+       "seconds": 1.48,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 9,
+       "tail_sha256": "4adb025f77f5642acface5cc74c3400565782d1ac9ef5d332b2f9e500a05dee7",
+       "overhead_s": 0.32
+      },
+      {
+       "file": "tests/v2/test_v21_continue_integrity.py",
+       "exit": 0,
+       "seconds": 249.5,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 24,
+       "tail_sha256": "6ed16fadda0701c1628b18171b29ee246ad8a6394124bc873e012e30e68ad7e4",
+       "overhead_s": 0.36
+      },
+      {
+       "file": "tests/v2/test_app_run.py",
+       "exit": 0,
+       "seconds": 37.44,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 17,
+       "tail_sha256": "34c9bfe7ef7d76c17f599b0a81180f32dc90d22822f05f5f66668053994bd703",
+       "overhead_s": 0.33
+      }
+     ],
+     "class": "SURVIVED",
+     "killed": false
+    },
+    {
+     "mutant": "L42 string 'run only: a new file (never overwritten) the evidence anchor is written to — keep it where the developer cannot write (docs/v2.1/ANCHOR-THREAT-MODEL.md)' emptied",
+     "files": [
+      {
+       "file": "tests/v2/test_app_units.py",
+       "exit": 0,
+       "seconds": 6.92,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 41,
+       "tail_sha256": "3ef303c799614934b469520dc3ed73bad54df703d4213d103aaf0597d5afb57a",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_v21_inputs.py",
+       "exit": 0,
+       "seconds": 1.67,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 20,
+       "tail_sha256": "d39f63e4c8436fb76e82de52f522bc2737bd8bc9e94af2d56412b84f482dcedb",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_v21_bundle_tools.py",
+       "exit": 0,
+       "seconds": 1.53,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 9,
+       "tail_sha256": "4adb025f77f5642acface5cc74c3400565782d1ac9ef5d332b2f9e500a05dee7",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_v21_continue_integrity.py",
+       "exit": 0,
+       "seconds": 251.33,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 24,
+       "tail_sha256": "6ed16fadda0701c1628b18171b29ee246ad8a6394124bc873e012e30e68ad7e4",
+       "overhead_s": 0.36
+      },
+      {
+       "file": "tests/v2/test_app_run.py",
+       "exit": 0,
+       "seconds": 38.73,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 17,
+       "tail_sha256": "34c9bfe7ef7d76c17f599b0a81180f32dc90d22822f05f5f66668053994bd703",
+       "overhead_s": 0.34
+      }
+     ],
+     "class": "SURVIVED",
+     "killed": false
+    },
+    {
+     "mutant": "L44 string 'store_true' emptied",
+     "files": [
+      {
+       "file": "tests/v2/test_app_units.py",
+       "exit": 1,
+       "seconds": 1.19,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 7,
+       "errors": 1,
+       "first": "ERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict) | ValueError",
+       "tail_sha256": "6735eb312568203632a12fc577ae14d41ea0eb883bf07b32e18ea7adac990715",
+       "tail": "==================================================================\nERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_app_units.py\", line 754, in test_a_missing_bundle_file_is_an_error_not_a_verdict\n    code, _, err = self.cli(\"--verify\", \"--project\", str(self.tmp / \"absent.json\"), \"--out\", str(self.tmp))\n                   ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<tree>/tests/v2/test_app_units.py\", line 738, in cli\n    code = cli.run(list(argv))\n  File \"<tree>/aisef2/app/cli.py\", line 44, in run\n    p = _parser()\n  File \"<tree>/aisef2/app/cli.py\", line 36, in _parser\n    p.add_argument('--accept-unaccounted', action='', help='run --parent only: start although the lineage has spend no evidence accounts for (recorded)')\n    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/argparse.py\", line 1538, in add_argument\n    raise ValueError(f'unknown action {action_class!r}')\nValueError: unknown action ''\n\n----------------------------------------------------------------------\nRan 7 tests\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "control",
+       "select": "*v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict",
+       "exit": 0,
+       "seconds": 0.38,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "510ed0ec9a3b6bda3ea347d4b651dd9b41458c05ef9a726bb9dd233517de922e",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "control",
+       "select": "*v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict",
+       "exit": 0,
+       "seconds": 0.38,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "510ed0ec9a3b6bda3ea347d4b651dd9b41458c05ef9a726bb9dd233517de922e",
+       "overhead_s": 0.43
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "rerun",
+       "select": "*v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict",
+       "exit": 1,
+       "seconds": 0.38,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict) | ValueError",
+       "tail_sha256": "5c4e5164fd3d6d6d8fcca355f09daad7e3553a45c39ec9992adec0b154322422",
+       "tail": "===================================================================\nERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_app_units.py\", line 754, in test_a_missing_bundle_file_is_an_error_not_a_verdict\n    code, _, err = self.cli(\"--verify\", \"--project\", str(self.tmp / \"absent.json\"), \"--out\", str(self.tmp))\n                   ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<tree>/tests/v2/test_app_units.py\", line 738, in cli\n    code = cli.run(list(argv))\n  File \"<tree>/aisef2/app/cli.py\", line 44, in run\n    p = _parser()\n  File \"<tree>/aisef2/app/cli.py\", line 36, in _parser\n    p.add_argument('--accept-unaccounted', action='', help='run --parent only: start although the lineage has spend no evidence accounts for (recorded)')\n    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/argparse.py\", line 1538, in add_argument\n    raise ValueError(f'unknown action {action_class!r}')\nValueError: unknown action ''\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.34
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_app_units.py",
+      "first": "ERROR: test_a_missing_bundle_file_is_an_error_not_a_verdict (v2.test_app_units.Command.test_a_missing_bundle_file_is_an_error_not_a_verdict) | ValueError",
+      "seconds": 1.19
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L45 string 'run --parent only: start although the lineage has spend no evidence accounts for (recorded)' emptied",
+     "files": [
+      {
+       "file": "tests/v2/test_app_units.py",
+       "exit": 0,
+       "seconds": 7.16,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 41,
+       "tail_sha256": "3ef303c799614934b469520dc3ed73bad54df703d4213d103aaf0597d5afb57a",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_v21_inputs.py",
+       "exit": 0,
+       "seconds": 1.67,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 20,
+       "tail_sha256": "d39f63e4c8436fb76e82de52f522bc2737bd8bc9e94af2d56412b84f482dcedb",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_v21_bundle_tools.py",
+       "exit": 0,
+       "seconds": 1.52,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 9,
+       "tail_sha256": "4adb025f77f5642acface5cc74c3400565782d1ac9ef5d332b2f9e500a05dee7",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_v21_continue_integrity.py",
+       "exit": 0,
+       "seconds": 248.36,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 24,
+       "tail_sha256": "6ed16fadda0701c1628b18171b29ee246ad8a6394124bc873e012e30e68ad7e4",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_app_run.py",
+       "exit": 0,
+       "seconds": 37.41,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 17,
+       "tail_sha256": "34c9bfe7ef7d76c17f599b0a81180f32dc90d22822f05f5f66668053994bd703",
+       "overhead_s": 0.35
+      }
+     ],
+     "class": "SURVIVED",
+     "killed": false
+    },
+    {
+     "mutant": "L46 string 'SHA256' emptied",
+     "files": [
+      {
+       "file": "tests/v2/test_app_units.py",
+       "exit": 0,
+       "seconds": 6.79,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 41,
+       "tail_sha256": "3ef303c799614934b469520dc3ed73bad54df703d4213d103aaf0597d5afb57a",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_v21_inputs.py",
+       "exit": 0,
+       "seconds": 1.7,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 20,
+       "tail_sha256": "d39f63e4c8436fb76e82de52f522bc2737bd8bc9e94af2d56412b84f482dcedb",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_v21_bundle_tools.py",
+       "exit": 0,
+       "seconds": 1.55,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 9,
+       "tail_sha256": "4adb025f77f5642acface5cc74c3400565782d1ac9ef5d332b2f9e500a05dee7",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_v21_continue_integrity.py",
+       "exit": 0,
+       "seconds": 251.92,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 24,
+       "tail_sha256": "6ed16fadda0701c1628b18171b29ee246ad8a6394124bc873e012e30e68ad7e4",
+       "overhead_s": 0.37
+      },
+      {
+       "file": "tests/v2/test_app_run.py",
+       "exit": 0,
+       "seconds": 37.73,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 17,
+       "tail_sha256": "34c9bfe7ef7d76c17f599b0a81180f32dc90d22822f05f5f66668053994bd703",
+       "overhead_s": 0.38
+      }
+     ],
+     "class": "SURVIVED",
+     "killed": false
+    },
+    {
+     "mutant": "L47 string \"run --parent only: supersede the predecessor's claim with this sha256 whose child never began and whose claimant cannot be shown gone (the operator's assertion, recorded)\" emptied",
+     "files": [
+      {
+       "file": "tests/v2/test_app_units.py",
+       "exit": 0,
+       "seconds": 7.03,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 41,
+       "tail_sha256": "3ef303c799614934b469520dc3ed73bad54df703d4213d103aaf0597d5afb57a",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_v21_inputs.py",
+       "exit": 0,
+       "seconds": 1.7,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 20,
+       "tail_sha256": "d39f63e4c8436fb76e82de52f522bc2737bd8bc9e94af2d56412b84f482dcedb",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_v21_bundle_tools.py",
+       "exit": 0,
+       "seconds": 1.55,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 9,
+       "tail_sha256": "4adb025f77f5642acface5cc74c3400565782d1ac9ef5d332b2f9e500a05dee7",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_v21_continue_integrity.py",
+       "exit": 0,
+       "seconds": 252.27,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 24,
+       "tail_sha256": "6ed16fadda0701c1628b18171b29ee246ad8a6394124bc873e012e30e68ad7e4",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_app_run.py",
+       "exit": 0,
+       "seconds": 37.6,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 17,
+       "tail_sha256": "34c9bfe7ef7d76c17f599b0a81180f32dc90d22822f05f5f66668053994bd703",
+       "overhead_s": 0.34
+      }
+     ],
+     "class": "SURVIVED",
+     "killed": false
+    }
+   ],
+   "t0": [
+    {
+     "file": "tests/v2/test_app_units.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 7.5,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 41,
+     "first_test": "v2.test_app_units.Adapters.test_attempt_of_reads_the_kernel_projection_and_prior_failures",
+     "tail_sha256": "3ef303c799614934b469520dc3ed73bad54df703d4213d103aaf0597d5afb57a",
+     "overhead_s": 0.36
+    },
+    {
+     "file": "tests/v2/test_v21_inputs.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 1.68,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 20,
+     "first_test": "v2.test_v21_inputs.BundleShape.test_a_valid_bundle_still_loads",
+     "tail_sha256": "d39f63e4c8436fb76e82de52f522bc2737bd8bc9e94af2d56412b84f482dcedb",
+     "overhead_s": 0.34
+    },
+    {
+     "file": "tests/v2/test_v21_bundle_tools.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 1.54,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 9,
+     "first_test": "v2.test_v21_bundle_tools.Outsider.test_each_example_from_init_to_a_ready_check",
+     "tail_sha256": "4adb025f77f5642acface5cc74c3400565782d1ac9ef5d332b2f9e500a05dee7",
+     "overhead_s": 0.34
+    },
+    {
+     "file": "tests/v2/test_v21_continue_integrity.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 282.98,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 24,
+     "first_test": "v2.test_v21_continue_integrity.AnchorThreatModel.test_an_attacker_who_cannot_write_the_store_is_refuted",
+     "tail_sha256": "6ed16fadda0701c1628b18171b29ee246ad8a6394124bc873e012e30e68ad7e4",
+     "overhead_s": 0.36
+    },
+    {
+     "file": "tests/v2/test_app_run.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 38.61,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 17,
+     "first_test": "v2.test_app_run.Command.test_a_live_run_without_the_provider_key_stops_before_any_request",
+     "tail_sha256": "34c9bfe7ef7d76c17f599b0a81180f32dc90d22822f05f5f66668053994bd703",
+     "overhead_s": 0.36
+    }
+   ],
+   "killed": 15,
+   "survivors": [
+    "L29 string 'aisef run' emptied",
+    "L29 string \"Run a project's admitted plan under the AISEF V2 kernel.\" emptied",
+    "L31 string \"check the inputs and the plan's admission; no provider request\" emptied",
+    "L32 string 'verify a finished run directory against its journal' emptied",
+    "L33 True->False",
+    "L33 string 'the project bundle (aisef-v2-project/1)' emptied",
+    "L34 string 'the run settings (aisef-v2-run/1)' emptied",
+    "L35 string \"the project's git repository (cloned; never written)\" emptied",
+    "L36 string 'the run directory (a new one to run; an existing one to verify)' emptied",
+    "L37 string 'SHA256' emptied",
+    "L38 string 'verify only: the evidence anchor the run printed, kept outside the run directory' emptied",
+    "L40 string 'run only: the run this one continues (`aisef bundle continue`), recorded with its anchor' emptied",
+    "L42 string 'run only: a new file (never overwritten) the evidence anchor is written to — keep it where the developer cannot write (docs/v2.1/ANCHOR-THREAT-MODEL.md)' emptied",
+    "L45 string 'run --parent only: start although the lineage has spend no evidence accounts for (recorded)' emptied",
+    "L46 string 'SHA256' emptied",
+    "L47 string \"run --parent only: supersede the predecessor's claim with this sha256 whose child never began and whose claimant cannot be shown gone (the operator's assertion, recorded)\" emptied"
+   ],
+   "classes": {
+    "KILLED": 15,
+    "SURVIVED": 16,
+    "TIMEOUT": 0,
+    "INFRA": 0,
+    "NOT_RUN": 0
+   },
+   "killed_by_timeout": 0,
+   "strays_reaped": 0
+  },
+  {
+   "target": "aisef2/app/run.py::admit",
+   "runner": 2,
+   "kill_tests": [
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_v21_inputs.py",
+    "tests/v2/test_v21_identity.py",
+    "tests/v2/test_v21_verify.py",
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_review_chain.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_s2_kills.py"
+   ],
+   "source_sha256": "7b2e24030a6b19a59f12a864348f89c69204681b007209d58db2057f3fb91a5a",
+   "tree_sha256": "34003dc8d1639785a0d157934ee4a1d759c2604f2a20b0da565b5cb43fa7ee86",
+   "mutants": 15,
+   "results": [
+    {
+     "mutant": "L105 returns None",
+     "files": [
+      {
+       "file": "tests/v2/test_app_units.py",
+       "exit": 1,
+       "seconds": 1.67,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 17,
+       "errors": 1,
+       "first": "ERROR: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) | TypeError",
+       "tail_sha256": "b2ea30444fea2c62189b325f244fcba9227c6d035a988ed9aeef8e3f25bb8386",
+       "tail": "d) ... ok\ntest_probe_requests_carry_enough_tokens_for_a_reasoning_model (v2.test_app_units.Preflight.test_probe_requests_carry_enough_tokens_for_a_reasoning_model) ... ok\ntest_the_ledger_accounts_for_every_request_sent (v2.test_app_units.Preflight.test_the_ledger_accounts_for_every_request_sent) ... ok\ntest_a_git_older_than_b4_needs_is_refused_with_what_was_found (v2.test_app_units.RunParts.test_a_git_older_than_b4_needs_is_refused_with_what_was_found) ... ok\ntest_a_run_and_a_check_on_an_old_git_are_refused_before_any_git_command (v2.test_app_units.RunParts.test_a_run_and_a_check_on_an_old_git_are_refused_before_any_git_command) ... ok\ntest_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) ... ERROR\n\n======================================================================\nERROR: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_app_units.py\", line 503, in test_admission_is_re_derived_and_names_every_failed_check\n    self.assertEqual((ok[\"admitted\"], ok[\"failed\"]), (True, []))\n                      ~~^^^^^^^^^^^^\nTypeError: 'NoneType' object is not subscriptable\n\n----------------------------------------------------------------------\nRan 17 tests\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "control",
+       "select": "*v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check",
+       "exit": 0,
+       "seconds": 0.4,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "2d79b4a5e44e928d04da177166d420132c4f01ff6146a3e8e389f4f6cb24df3b",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "control",
+       "select": "*v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check",
+       "exit": 0,
+       "seconds": 0.38,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "2d79b4a5e44e928d04da177166d420132c4f01ff6146a3e8e389f4f6cb24df3b",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "rerun",
+       "select": "*v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check",
+       "exit": 1,
+       "seconds": 0.38,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) | TypeError",
+       "tail_sha256": "7a6de88a377a816181d3f84274e5ddfd0513c26a8414bc7f05253801e701480b",
+       "tail": "test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) ... ERROR\n\n======================================================================\nERROR: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_app_units.py\", line 503, in test_admission_is_re_derived_and_names_every_failed_check\n    self.assertEqual((ok[\"admitted\"], ok[\"failed\"]), (True, []))\n                      ~~^^^^^^^^^^^^\nTypeError: 'NoneType' object is not subscriptable\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.34
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_app_units.py",
+      "first": "ERROR: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) | TypeError",
+      "seconds": 1.67
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L103 dict entry 0 dropped",
+     "files": [
+      {
+       "file": "tests/v2/test_app_units.py",
+       "exit": 1,
+       "seconds": 1.47,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 17,
+       "errors": 1,
+       "first": "ERROR: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) | KeyError",
+       "tail_sha256": "c8013f2773214769357447366adad2a3b3082317d19319cf3d184b43316ff211",
+       "tail": "very_identity_problem_is_named) ... ok\ntest_probe_requests_carry_enough_tokens_for_a_reasoning_model (v2.test_app_units.Preflight.test_probe_requests_carry_enough_tokens_for_a_reasoning_model) ... ok\ntest_the_ledger_accounts_for_every_request_sent (v2.test_app_units.Preflight.test_the_ledger_accounts_for_every_request_sent) ... ok\ntest_a_git_older_than_b4_needs_is_refused_with_what_was_found (v2.test_app_units.RunParts.test_a_git_older_than_b4_needs_is_refused_with_what_was_found) ... ok\ntest_a_run_and_a_check_on_an_old_git_are_refused_before_any_git_command (v2.test_app_units.RunParts.test_a_run_and_a_check_on_an_old_git_are_refused_before_any_git_command) ... ok\ntest_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) ... ERROR\n\n======================================================================\nERROR: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_app_units.py\", line 503, in test_admission_is_re_derived_and_names_every_failed_check\n    self.assertEqual((ok[\"admitted\"], ok[\"failed\"]), (True, []))\n                      ~~^^^^^^^^^^^^\nKeyError: 'admitted'\n\n----------------------------------------------------------------------\nRan 17 tests\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "control",
+       "select": "*v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check",
+       "exit": 0,
+       "seconds": 0.38,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "2d79b4a5e44e928d04da177166d420132c4f01ff6146a3e8e389f4f6cb24df3b",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "control",
+       "select": "*v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check",
+       "exit": 0,
+       "seconds": 0.39,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "2d79b4a5e44e928d04da177166d420132c4f01ff6146a3e8e389f4f6cb24df3b",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "rerun",
+       "select": "*v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check",
+       "exit": 1,
+       "seconds": 0.4,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) | KeyError",
+       "tail_sha256": "38ff7d8bf3a36549a4fde0c4017be6eb2cb7dbf5537fc644601add2fbbb87e6c",
+       "tail": "test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) ... ERROR\n\n======================================================================\nERROR: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_app_units.py\", line 503, in test_admission_is_re_derived_and_names_every_failed_check\n    self.assertEqual((ok[\"admitted\"], ok[\"failed\"]), (True, []))\n                      ~~^^^^^^^^^^^^\nKeyError: 'admitted'\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.33
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_app_units.py",
+      "first": "ERROR: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) | KeyError",
+      "seconds": 1.47
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L103 dict entry 1 dropped",
+     "files": [
+      {
+       "file": "tests/v2/test_app_units.py",
+       "exit": 1,
+       "seconds": 1.46,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 17,
+       "errors": 1,
+       "first": "ERROR: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) | KeyError",
+       "tail_sha256": "5809bf03803521d4341c3a364aa6649450079ad8c081e4d83c063ece4ca11133",
+       "tail": "every_identity_problem_is_named) ... ok\ntest_probe_requests_carry_enough_tokens_for_a_reasoning_model (v2.test_app_units.Preflight.test_probe_requests_carry_enough_tokens_for_a_reasoning_model) ... ok\ntest_the_ledger_accounts_for_every_request_sent (v2.test_app_units.Preflight.test_the_ledger_accounts_for_every_request_sent) ... ok\ntest_a_git_older_than_b4_needs_is_refused_with_what_was_found (v2.test_app_units.RunParts.test_a_git_older_than_b4_needs_is_refused_with_what_was_found) ... ok\ntest_a_run_and_a_check_on_an_old_git_are_refused_before_any_git_command (v2.test_app_units.RunParts.test_a_run_and_a_check_on_an_old_git_are_refused_before_any_git_command) ... ok\ntest_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) ... ERROR\n\n======================================================================\nERROR: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_app_units.py\", line 504, in test_admission_is_re_derived_and_names_every_failed_check\n    self.assertEqual(len(ok[\"engine_digest\"]), 64)\n                         ~~^^^^^^^^^^^^^^^^^\nKeyError: 'engine_digest'\n\n----------------------------------------------------------------------\nRan 17 tests\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "control",
+       "select": "*v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check",
+       "exit": 0,
+       "seconds": 0.41,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "2d79b4a5e44e928d04da177166d420132c4f01ff6146a3e8e389f4f6cb24df3b",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "control",
+       "select": "*v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check",
+       "exit": 0,
+       "seconds": 0.39,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "2d79b4a5e44e928d04da177166d420132c4f01ff6146a3e8e389f4f6cb24df3b",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "rerun",
+       "select": "*v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check",
+       "exit": 1,
+       "seconds": 0.38,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) | KeyError",
+       "tail_sha256": "d19ded522e1cb09f0596deb4ee766069cf5caab704683b692b50734468318b92",
+       "tail": "test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) ... ERROR\n\n======================================================================\nERROR: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_app_units.py\", line 504, in test_admission_is_re_derived_and_names_every_failed_check\n    self.assertEqual(len(ok[\"engine_digest\"]), 64)\n                         ~~^^^^^^^^^^^^^^^^^\nKeyError: 'engine_digest'\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.34
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_app_units.py",
+      "first": "ERROR: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) | KeyError",
+      "seconds": 1.46
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L103 dict entry 2 dropped",
+     "files": [
+      {
+       "file": "tests/v2/test_app_units.py",
+       "exit": 1,
+       "seconds": 1.46,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 17,
+       "errors": 1,
+       "first": "ERROR: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) | KeyError",
+       "tail_sha256": "b9930d4e4bb5995aeb9455f13440e7b557d8dfef37f22a8468479d92f05b5db0",
+       "tail": "roblem_is_named) ... ok\ntest_probe_requests_carry_enough_tokens_for_a_reasoning_model (v2.test_app_units.Preflight.test_probe_requests_carry_enough_tokens_for_a_reasoning_model) ... ok\ntest_the_ledger_accounts_for_every_request_sent (v2.test_app_units.Preflight.test_the_ledger_accounts_for_every_request_sent) ... ok\ntest_a_git_older_than_b4_needs_is_refused_with_what_was_found (v2.test_app_units.RunParts.test_a_git_older_than_b4_needs_is_refused_with_what_was_found) ... ok\ntest_a_run_and_a_check_on_an_old_git_are_refused_before_any_git_command (v2.test_app_units.RunParts.test_a_run_and_a_check_on_an_old_git_are_refused_before_any_git_command) ... ok\ntest_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) ... ERROR\n\n======================================================================\nERROR: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_app_units.py\", line 507, in test_admission_is_re_derived_and_names_every_failed_check\n    self.assertNotEqual(bad[\"result_digest\"], ok[\"result_digest\"])\n                        ~~~^^^^^^^^^^^^^^^^^\nKeyError: 'result_digest'\n\n----------------------------------------------------------------------\nRan 17 tests\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "control",
+       "select": "*v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check",
+       "exit": 0,
+       "seconds": 0.38,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "2d79b4a5e44e928d04da177166d420132c4f01ff6146a3e8e389f4f6cb24df3b",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "control",
+       "select": "*v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check",
+       "exit": 0,
+       "seconds": 0.38,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "2d79b4a5e44e928d04da177166d420132c4f01ff6146a3e8e389f4f6cb24df3b",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "rerun",
+       "select": "*v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check",
+       "exit": 1,
+       "seconds": 0.38,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) | KeyError",
+       "tail_sha256": "2635c16bfd4c23e038bfdf0478bea77649753254613f6475e5ad082b2cd0252d",
+       "tail": "test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) ... ERROR\n\n======================================================================\nERROR: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_app_units.py\", line 507, in test_admission_is_re_derived_and_names_every_failed_check\n    self.assertNotEqual(bad[\"result_digest\"], ok[\"result_digest\"])\n                        ~~~^^^^^^^^^^^^^^^^^\nKeyError: 'result_digest'\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.34
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_app_units.py",
+      "first": "ERROR: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) | KeyError",
+      "seconds": 1.46
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L103 dict entry 3 dropped",
+     "files": [
+      {
+       "file": "tests/v2/test_app_units.py",
+       "exit": 1,
+       "seconds": 1.46,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 17,
+       "errors": 1,
+       "first": "ERROR: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) | KeyError",
+       "tail_sha256": "d42423b37bdecbf070d18947a001a450bdc56d9f497dbbf8f47fd42c6059811d",
+       "tail": "y_problem_is_named) ... ok\ntest_probe_requests_carry_enough_tokens_for_a_reasoning_model (v2.test_app_units.Preflight.test_probe_requests_carry_enough_tokens_for_a_reasoning_model) ... ok\ntest_the_ledger_accounts_for_every_request_sent (v2.test_app_units.Preflight.test_the_ledger_accounts_for_every_request_sent) ... ok\ntest_a_git_older_than_b4_needs_is_refused_with_what_was_found (v2.test_app_units.RunParts.test_a_git_older_than_b4_needs_is_refused_with_what_was_found) ... ok\ntest_a_run_and_a_check_on_an_old_git_are_refused_before_any_git_command (v2.test_app_units.RunParts.test_a_run_and_a_check_on_an_old_git_are_refused_before_any_git_command) ... ok\ntest_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) ... ERROR\n\n======================================================================\nERROR: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_app_units.py\", line 503, in test_admission_is_re_derived_and_names_every_failed_check\n    self.assertEqual((ok[\"admitted\"], ok[\"failed\"]), (True, []))\n                                      ~~^^^^^^^^^^\nKeyError: 'failed'\n\n----------------------------------------------------------------------\nRan 17 tests\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "control",
+       "select": "*v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check",
+       "exit": 0,
+       "seconds": 0.38,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "2d79b4a5e44e928d04da177166d420132c4f01ff6146a3e8e389f4f6cb24df3b",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "control",
+       "select": "*v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check",
+       "exit": 0,
+       "seconds": 0.39,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "2d79b4a5e44e928d04da177166d420132c4f01ff6146a3e8e389f4f6cb24df3b",
+       "overhead_s": 0.36
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "rerun",
+       "select": "*v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check",
+       "exit": 1,
+       "seconds": 0.38,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) | KeyError",
+       "tail_sha256": "dc1197d98fe6dcf75fe94e4345b34e1e41b78cdb8138df97ce13812f7d351b81",
+       "tail": "test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) ... ERROR\n\n======================================================================\nERROR: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_app_units.py\", line 503, in test_admission_is_re_derived_and_names_every_failed_check\n    self.assertEqual((ok[\"admitted\"], ok[\"failed\"]), (True, []))\n                                      ~~^^^^^^^^^^\nKeyError: 'failed'\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.34
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_app_units.py",
+      "first": "ERROR: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) | KeyError",
+      "seconds": 1.46
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L103 string 'admitted' emptied",
+     "files": [
+      {
+       "file": "tests/v2/test_app_units.py",
+       "exit": 1,
+       "seconds": 1.49,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 17,
+       "errors": 1,
+       "first": "ERROR: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) | KeyError",
+       "tail_sha256": "c8013f2773214769357447366adad2a3b3082317d19319cf3d184b43316ff211",
+       "tail": "very_identity_problem_is_named) ... ok\ntest_probe_requests_carry_enough_tokens_for_a_reasoning_model (v2.test_app_units.Preflight.test_probe_requests_carry_enough_tokens_for_a_reasoning_model) ... ok\ntest_the_ledger_accounts_for_every_request_sent (v2.test_app_units.Preflight.test_the_ledger_accounts_for_every_request_sent) ... ok\ntest_a_git_older_than_b4_needs_is_refused_with_what_was_found (v2.test_app_units.RunParts.test_a_git_older_than_b4_needs_is_refused_with_what_was_found) ... ok\ntest_a_run_and_a_check_on_an_old_git_are_refused_before_any_git_command (v2.test_app_units.RunParts.test_a_run_and_a_check_on_an_old_git_are_refused_before_any_git_command) ... ok\ntest_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) ... ERROR\n\n======================================================================\nERROR: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_app_units.py\", line 503, in test_admission_is_re_derived_and_names_every_failed_check\n    self.assertEqual((ok[\"admitted\"], ok[\"failed\"]), (True, []))\n                      ~~^^^^^^^^^^^^\nKeyError: 'admitted'\n\n----------------------------------------------------------------------\nRan 17 tests\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "control",
+       "select": "*v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check",
+       "exit": 0,
+       "seconds": 0.39,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "2d79b4a5e44e928d04da177166d420132c4f01ff6146a3e8e389f4f6cb24df3b",
+       "overhead_s": 0.33
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "control",
+       "select": "*v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check",
+       "exit": 0,
+       "seconds": 0.37,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "2d79b4a5e44e928d04da177166d420132c4f01ff6146a3e8e389f4f6cb24df3b",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "rerun",
+       "select": "*v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check",
+       "exit": 1,
+       "seconds": 0.38,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) | KeyError",
+       "tail_sha256": "38ff7d8bf3a36549a4fde0c4017be6eb2cb7dbf5537fc644601add2fbbb87e6c",
+       "tail": "test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) ... ERROR\n\n======================================================================\nERROR: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_app_units.py\", line 503, in test_admission_is_re_derived_and_names_every_failed_check\n    self.assertEqual((ok[\"admitted\"], ok[\"failed\"]), (True, []))\n                      ~~^^^^^^^^^^^^\nKeyError: 'admitted'\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.34
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_app_units.py",
+      "first": "ERROR: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) | KeyError",
+      "seconds": 1.49
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L103 string 'engine_digest' emptied",
+     "files": [
+      {
+       "file": "tests/v2/test_app_units.py",
+       "exit": 1,
+       "seconds": 1.46,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 17,
+       "errors": 1,
+       "first": "ERROR: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) | KeyError",
+       "tail_sha256": "5809bf03803521d4341c3a364aa6649450079ad8c081e4d83c063ece4ca11133",
+       "tail": "every_identity_problem_is_named) ... ok\ntest_probe_requests_carry_enough_tokens_for_a_reasoning_model (v2.test_app_units.Preflight.test_probe_requests_carry_enough_tokens_for_a_reasoning_model) ... ok\ntest_the_ledger_accounts_for_every_request_sent (v2.test_app_units.Preflight.test_the_ledger_accounts_for_every_request_sent) ... ok\ntest_a_git_older_than_b4_needs_is_refused_with_what_was_found (v2.test_app_units.RunParts.test_a_git_older_than_b4_needs_is_refused_with_what_was_found) ... ok\ntest_a_run_and_a_check_on_an_old_git_are_refused_before_any_git_command (v2.test_app_units.RunParts.test_a_run_and_a_check_on_an_old_git_are_refused_before_any_git_command) ... ok\ntest_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) ... ERROR\n\n======================================================================\nERROR: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_app_units.py\", line 504, in test_admission_is_re_derived_and_names_every_failed_check\n    self.assertEqual(len(ok[\"engine_digest\"]), 64)\n                         ~~^^^^^^^^^^^^^^^^^\nKeyError: 'engine_digest'\n\n----------------------------------------------------------------------\nRan 17 tests\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "control",
+       "select": "*v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check",
+       "exit": 0,
+       "seconds": 0.38,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "2d79b4a5e44e928d04da177166d420132c4f01ff6146a3e8e389f4f6cb24df3b",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "control",
+       "select": "*v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check",
+       "exit": 0,
+       "seconds": 0.38,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "2d79b4a5e44e928d04da177166d420132c4f01ff6146a3e8e389f4f6cb24df3b",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "rerun",
+       "select": "*v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check",
+       "exit": 1,
+       "seconds": 0.38,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) | KeyError",
+       "tail_sha256": "d19ded522e1cb09f0596deb4ee766069cf5caab704683b692b50734468318b92",
+       "tail": "test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) ... ERROR\n\n======================================================================\nERROR: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_app_units.py\", line 504, in test_admission_is_re_derived_and_names_every_failed_check\n    self.assertEqual(len(ok[\"engine_digest\"]), 64)\n                         ~~^^^^^^^^^^^^^^^^^\nKeyError: 'engine_digest'\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.34
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_app_units.py",
+      "first": "ERROR: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) | KeyError",
+      "seconds": 1.46
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L103 string 'result_digest' emptied",
+     "files": [
+      {
+       "file": "tests/v2/test_app_units.py",
+       "exit": 1,
+       "seconds": 1.46,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 17,
+       "errors": 1,
+       "first": "ERROR: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) | KeyError",
+       "tail_sha256": "b9930d4e4bb5995aeb9455f13440e7b557d8dfef37f22a8468479d92f05b5db0",
+       "tail": "roblem_is_named) ... ok\ntest_probe_requests_carry_enough_tokens_for_a_reasoning_model (v2.test_app_units.Preflight.test_probe_requests_carry_enough_tokens_for_a_reasoning_model) ... ok\ntest_the_ledger_accounts_for_every_request_sent (v2.test_app_units.Preflight.test_the_ledger_accounts_for_every_request_sent) ... ok\ntest_a_git_older_than_b4_needs_is_refused_with_what_was_found (v2.test_app_units.RunParts.test_a_git_older_than_b4_needs_is_refused_with_what_was_found) ... ok\ntest_a_run_and_a_check_on_an_old_git_are_refused_before_any_git_command (v2.test_app_units.RunParts.test_a_run_and_a_check_on_an_old_git_are_refused_before_any_git_command) ... ok\ntest_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) ... ERROR\n\n======================================================================\nERROR: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_app_units.py\", line 507, in test_admission_is_re_derived_and_names_every_failed_check\n    self.assertNotEqual(bad[\"result_digest\"], ok[\"result_digest\"])\n                        ~~~^^^^^^^^^^^^^^^^^\nKeyError: 'result_digest'\n\n----------------------------------------------------------------------\nRan 17 tests\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "control",
+       "select": "*v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check",
+       "exit": 0,
+       "seconds": 0.38,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "2d79b4a5e44e928d04da177166d420132c4f01ff6146a3e8e389f4f6cb24df3b",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "control",
+       "select": "*v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check",
+       "exit": 0,
+       "seconds": 0.38,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "2d79b4a5e44e928d04da177166d420132c4f01ff6146a3e8e389f4f6cb24df3b",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "rerun",
+       "select": "*v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check",
+       "exit": 1,
+       "seconds": 0.38,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) | KeyError",
+       "tail_sha256": "2635c16bfd4c23e038bfdf0478bea77649753254613f6475e5ad082b2cd0252d",
+       "tail": "test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) ... ERROR\n\n======================================================================\nERROR: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_app_units.py\", line 507, in test_admission_is_re_derived_and_names_every_failed_check\n    self.assertNotEqual(bad[\"result_digest\"], ok[\"result_digest\"])\n                        ~~~^^^^^^^^^^^^^^^^^\nKeyError: 'result_digest'\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.33
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_app_units.py",
+      "first": "ERROR: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) | KeyError",
+      "seconds": 1.46
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L104 string 'failed' emptied",
+     "files": [
+      {
+       "file": "tests/v2/test_app_units.py",
+       "exit": 1,
+       "seconds": 1.47,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 17,
+       "errors": 1,
+       "first": "ERROR: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) | KeyError",
+       "tail_sha256": "d42423b37bdecbf070d18947a001a450bdc56d9f497dbbf8f47fd42c6059811d",
+       "tail": "y_problem_is_named) ... ok\ntest_probe_requests_carry_enough_tokens_for_a_reasoning_model (v2.test_app_units.Preflight.test_probe_requests_carry_enough_tokens_for_a_reasoning_model) ... ok\ntest_the_ledger_accounts_for_every_request_sent (v2.test_app_units.Preflight.test_the_ledger_accounts_for_every_request_sent) ... ok\ntest_a_git_older_than_b4_needs_is_refused_with_what_was_found (v2.test_app_units.RunParts.test_a_git_older_than_b4_needs_is_refused_with_what_was_found) ... ok\ntest_a_run_and_a_check_on_an_old_git_are_refused_before_any_git_command (v2.test_app_units.RunParts.test_a_run_and_a_check_on_an_old_git_are_refused_before_any_git_command) ... ok\ntest_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) ... ERROR\n\n======================================================================\nERROR: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_app_units.py\", line 503, in test_admission_is_re_derived_and_names_every_failed_check\n    self.assertEqual((ok[\"admitted\"], ok[\"failed\"]), (True, []))\n                                      ~~^^^^^^^^^^\nKeyError: 'failed'\n\n----------------------------------------------------------------------\nRan 17 tests\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "control",
+       "select": "*v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check",
+       "exit": 0,
+       "seconds": 0.38,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "2d79b4a5e44e928d04da177166d420132c4f01ff6146a3e8e389f4f6cb24df3b",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "control",
+       "select": "*v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check",
+       "exit": 0,
+       "seconds": 0.39,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "2d79b4a5e44e928d04da177166d420132c4f01ff6146a3e8e389f4f6cb24df3b",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "rerun",
+       "select": "*v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check",
+       "exit": 1,
+       "seconds": 0.38,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) | KeyError",
+       "tail_sha256": "dc1197d98fe6dcf75fe94e4345b34e1e41b78cdb8138df97ce13812f7d351b81",
+       "tail": "test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) ... ERROR\n\n======================================================================\nERROR: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_app_units.py\", line 503, in test_admission_is_re_derived_and_names_every_failed_check\n    self.assertEqual((ok[\"admitted\"], ok[\"failed\"]), (True, []))\n                                      ~~^^^^^^^^^^\nKeyError: 'failed'\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.34
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_app_units.py",
+      "first": "ERROR: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) | KeyError",
+      "seconds": 1.47
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L104 dict entry 0 dropped",
+     "files": [
+      {
+       "file": "tests/v2/test_app_units.py",
+       "exit": 1,
+       "seconds": 1.46,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 17,
+       "errors": 1,
+       "first": "ERROR: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) | KeyError",
+       "tail_sha256": "97b2ca5a737f095de5e044c8b1be1b10a65bd795a2c2dcc14f6cfb1ed4edb9ee",
+       "tail": "_carry_enough_tokens_for_a_reasoning_model (v2.test_app_units.Preflight.test_probe_requests_carry_enough_tokens_for_a_reasoning_model) ... ok\ntest_the_ledger_accounts_for_every_request_sent (v2.test_app_units.Preflight.test_the_ledger_accounts_for_every_request_sent) ... ok\ntest_a_git_older_than_b4_needs_is_refused_with_what_was_found (v2.test_app_units.RunParts.test_a_git_older_than_b4_needs_is_refused_with_what_was_found) ... ok\ntest_a_run_and_a_check_on_an_old_git_are_refused_before_any_git_command (v2.test_app_units.RunParts.test_a_run_and_a_check_on_an_old_git_are_refused_before_any_git_command) ... ok\ntest_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) ... ERROR\n\n======================================================================\nERROR: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_app_units.py\", line 506, in test_admission_is_re_derived_and_names_every_failed_check\n    self.assertEqual((bad[\"admitted\"], [f[\"check\"] for f in bad[\"failed\"]]), (False, [\"9. probe_calibration\"]))\n                                        ~^^^^^^^^^\nKeyError: 'check'\n\n----------------------------------------------------------------------\nRan 17 tests\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "control",
+       "select": "*v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check",
+       "exit": 0,
+       "seconds": 0.38,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "2d79b4a5e44e928d04da177166d420132c4f01ff6146a3e8e389f4f6cb24df3b",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "control",
+       "select": "*v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check",
+       "exit": 0,
+       "seconds": 0.38,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "2d79b4a5e44e928d04da177166d420132c4f01ff6146a3e8e389f4f6cb24df3b",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "rerun",
+       "select": "*v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check",
+       "exit": 1,
+       "seconds": 0.38,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) | KeyError",
+       "tail_sha256": "3c1acc3bf3c5427be28a3e88c0d1c15ce927d07f29a2e25446d154c165d5c5f7",
+       "tail": "test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) ... ERROR\n\n======================================================================\nERROR: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_app_units.py\", line 506, in test_admission_is_re_derived_and_names_every_failed_check\n    self.assertEqual((bad[\"admitted\"], [f[\"check\"] for f in bad[\"failed\"]]), (False, [\"9. probe_calibration\"]))\n                                        ~^^^^^^^^^\nKeyError: 'check'\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.34
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_app_units.py",
+      "first": "ERROR: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) | KeyError",
+      "seconds": 1.46
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L104 dict entry 1 dropped",
+     "files": [
+      {
+       "file": "tests/v2/test_app_units.py",
+       "exit": 0,
+       "seconds": 6.73,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 41,
+       "tail_sha256": "3ef303c799614934b469520dc3ed73bad54df703d4213d103aaf0597d5afb57a",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_v21_inputs.py",
+       "exit": 0,
+       "seconds": 1.69,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 20,
+       "tail_sha256": "d39f63e4c8436fb76e82de52f522bc2737bd8bc9e94af2d56412b84f482dcedb",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_v21_identity.py",
+       "exit": 1,
+       "seconds": 1.39,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 10,
+       "errors": 1,
+       "first": "ERROR: test_calibrations_bound_to_the_bytes_that_run_admit_and_other_bytes_admit_nothing (v2.test_v21_identity.ThreeIdentities.test_calibrations_bound_to_the_bytes_that_run_admit_and_other_bytes_admit_nothing) | KeyError",
+       "tail_sha256": "6e401762f612c0b9f39d9fb5d3ddd4999518c501e75282cec5945d431d5183e4",
+       "tail": "s_it_minus_S_does_not (v2.test_v21_identity.PthChannel.test_the_mechanism_minus_I_runs_it_minus_S_does_not) ... ok\ntest_a_spec_binds_the_capability_and_the_bytes_are_their_own_digest (v2.test_v21_identity.ThreeIdentities.test_a_spec_binds_the_capability_and_the_bytes_are_their_own_digest) ... ok\ntest_calibrations_bound_to_the_bytes_that_run_admit_and_other_bytes_admit_nothing (v2.test_v21_identity.ThreeIdentities.test_calibrations_bound_to_the_bytes_that_run_admit_and_other_bytes_admit_nothing)\nThe semantic half of test_v21_identity_bytes.ThreeIdentities.test_calibrations_of_other_bytes_admit_nothing ... ERROR\n\n======================================================================\nERROR: test_calibrations_bound_to_the_bytes_that_run_admit_and_other_bytes_admit_nothing (v2.test_v21_identity.ThreeIdentities.test_calibrations_bound_to_the_bytes_that_run_admit_and_other_bytes_admit_nothing)\nThe semantic half of test_v21_identity_bytes.ThreeIdentities.test_calibrations_of_other_bytes_admit_nothing\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_v21_identity.py\", line 89, in test_calibrations_bound_to_the_bytes_that_run_admit_and_other_bytes_admit_nothing\n    self.assertIn(\"executing\", a[\"failed\"][0][\"problems\"][0])\n                               ~~~~~~~~~~~~~~^^^^^^^^^^^^\nKeyError: 'problems'\n\n----------------------------------------------------------------------\nRan 10 tests\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_v21_identity.py",
+       "role": "control",
+       "select": "*v2.test_v21_identity.ThreeIdentities.test_calibrations_bound_to_the_bytes_that_run_admit_and_other_bytes_admit_nothing",
+       "exit": 0,
+       "seconds": 0.43,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "8fe0d563501527dc9fe3551265a0cc895e92c625bef92c37efeda7bb976f1636",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_v21_identity.py",
+       "role": "control",
+       "select": "*v2.test_v21_identity.ThreeIdentities.test_calibrations_bound_to_the_bytes_that_run_admit_and_other_bytes_admit_nothing",
+       "exit": 0,
+       "seconds": 0.44,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "8fe0d563501527dc9fe3551265a0cc895e92c625bef92c37efeda7bb976f1636",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_v21_identity.py",
+       "role": "rerun",
+       "select": "*v2.test_v21_identity.ThreeIdentities.test_calibrations_bound_to_the_bytes_that_run_admit_and_other_bytes_admit_nothing",
+       "exit": 1,
+       "seconds": 0.43,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_calibrations_bound_to_the_bytes_that_run_admit_and_other_bytes_admit_nothing (v2.test_v21_identity.ThreeIdentities.test_calibrations_bound_to_the_bytes_that_run_admit_and_other_bytes_admit_nothing) | KeyError",
+       "tail_sha256": "003401cd7e65072b521f2750c0971bf6b576def29719e2dbbc2d8c112a93e331",
+       "tail": "test_calibrations_bound_to_the_bytes_that_run_admit_and_other_bytes_admit_nothing (v2.test_v21_identity.ThreeIdentities.test_calibrations_bound_to_the_bytes_that_run_admit_and_other_bytes_admit_nothing)\nThe semantic half of test_v21_identity_bytes.ThreeIdentities.test_calibrations_of_other_bytes_admit_nothing ... ERROR\n\n======================================================================\nERROR: test_calibrations_bound_to_the_bytes_that_run_admit_and_other_bytes_admit_nothing (v2.test_v21_identity.ThreeIdentities.test_calibrations_bound_to_the_bytes_that_run_admit_and_other_bytes_admit_nothing)\nThe semantic half of test_v21_identity_bytes.ThreeIdentities.test_calibrations_of_other_bytes_admit_nothing\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_v21_identity.py\", line 89, in test_calibrations_bound_to_the_bytes_that_run_admit_and_other_bytes_admit_nothing\n    self.assertIn(\"executing\", a[\"failed\"][0][\"problems\"][0])\n                               ~~~~~~~~~~~~~~^^^^^^^^^^^^\nKeyError: 'problems'\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.35
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_v21_identity.py",
+      "first": "ERROR: test_calibrations_bound_to_the_bytes_that_run_admit_and_other_bytes_admit_nothing (v2.test_v21_identity.ThreeIdentities.test_calibrations_bound_to_the_bytes_that_run_admit_and_other_bytes_admit_nothing) | KeyError",
+      "seconds": 1.39
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L104 string 'check' emptied",
+     "files": [
+      {
+       "file": "tests/v2/test_app_units.py",
+       "exit": 1,
+       "seconds": 1.5,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 17,
+       "errors": 1,
+       "first": "ERROR: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) | KeyError",
+       "tail_sha256": "97b2ca5a737f095de5e044c8b1be1b10a65bd795a2c2dcc14f6cfb1ed4edb9ee",
+       "tail": "_carry_enough_tokens_for_a_reasoning_model (v2.test_app_units.Preflight.test_probe_requests_carry_enough_tokens_for_a_reasoning_model) ... ok\ntest_the_ledger_accounts_for_every_request_sent (v2.test_app_units.Preflight.test_the_ledger_accounts_for_every_request_sent) ... ok\ntest_a_git_older_than_b4_needs_is_refused_with_what_was_found (v2.test_app_units.RunParts.test_a_git_older_than_b4_needs_is_refused_with_what_was_found) ... ok\ntest_a_run_and_a_check_on_an_old_git_are_refused_before_any_git_command (v2.test_app_units.RunParts.test_a_run_and_a_check_on_an_old_git_are_refused_before_any_git_command) ... ok\ntest_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) ... ERROR\n\n======================================================================\nERROR: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_app_units.py\", line 506, in test_admission_is_re_derived_and_names_every_failed_check\n    self.assertEqual((bad[\"admitted\"], [f[\"check\"] for f in bad[\"failed\"]]), (False, [\"9. probe_calibration\"]))\n                                        ~^^^^^^^^^\nKeyError: 'check'\n\n----------------------------------------------------------------------\nRan 17 tests\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "control",
+       "select": "*v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check",
+       "exit": 0,
+       "seconds": 0.39,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "2d79b4a5e44e928d04da177166d420132c4f01ff6146a3e8e389f4f6cb24df3b",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "control",
+       "select": "*v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check",
+       "exit": 0,
+       "seconds": 0.38,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "2d79b4a5e44e928d04da177166d420132c4f01ff6146a3e8e389f4f6cb24df3b",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "rerun",
+       "select": "*v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check",
+       "exit": 1,
+       "seconds": 0.38,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) | KeyError",
+       "tail_sha256": "3c1acc3bf3c5427be28a3e88c0d1c15ce927d07f29a2e25446d154c165d5c5f7",
+       "tail": "test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) ... ERROR\n\n======================================================================\nERROR: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_app_units.py\", line 506, in test_admission_is_re_derived_and_names_every_failed_check\n    self.assertEqual((bad[\"admitted\"], [f[\"check\"] for f in bad[\"failed\"]]), (False, [\"9. probe_calibration\"]))\n                                        ~^^^^^^^^^\nKeyError: 'check'\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.34
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_app_units.py",
+      "first": "ERROR: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) | KeyError",
+      "seconds": 1.5
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L104 string 'problems' emptied",
+     "files": [
+      {
+       "file": "tests/v2/test_app_units.py",
+       "exit": 0,
+       "seconds": 6.78,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 41,
+       "tail_sha256": "3ef303c799614934b469520dc3ed73bad54df703d4213d103aaf0597d5afb57a",
+       "overhead_s": 0.33
+      },
+      {
+       "file": "tests/v2/test_v21_inputs.py",
+       "exit": 0,
+       "seconds": 1.73,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 20,
+       "tail_sha256": "d39f63e4c8436fb76e82de52f522bc2737bd8bc9e94af2d56412b84f482dcedb",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_v21_identity.py",
+       "exit": 1,
+       "seconds": 1.4,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 10,
+       "errors": 1,
+       "first": "ERROR: test_calibrations_bound_to_the_bytes_that_run_admit_and_other_bytes_admit_nothing (v2.test_v21_identity.ThreeIdentities.test_calibrations_bound_to_the_bytes_that_run_admit_and_other_bytes_admit_nothing) | KeyError",
+       "tail_sha256": "6e401762f612c0b9f39d9fb5d3ddd4999518c501e75282cec5945d431d5183e4",
+       "tail": "s_it_minus_S_does_not (v2.test_v21_identity.PthChannel.test_the_mechanism_minus_I_runs_it_minus_S_does_not) ... ok\ntest_a_spec_binds_the_capability_and_the_bytes_are_their_own_digest (v2.test_v21_identity.ThreeIdentities.test_a_spec_binds_the_capability_and_the_bytes_are_their_own_digest) ... ok\ntest_calibrations_bound_to_the_bytes_that_run_admit_and_other_bytes_admit_nothing (v2.test_v21_identity.ThreeIdentities.test_calibrations_bound_to_the_bytes_that_run_admit_and_other_bytes_admit_nothing)\nThe semantic half of test_v21_identity_bytes.ThreeIdentities.test_calibrations_of_other_bytes_admit_nothing ... ERROR\n\n======================================================================\nERROR: test_calibrations_bound_to_the_bytes_that_run_admit_and_other_bytes_admit_nothing (v2.test_v21_identity.ThreeIdentities.test_calibrations_bound_to_the_bytes_that_run_admit_and_other_bytes_admit_nothing)\nThe semantic half of test_v21_identity_bytes.ThreeIdentities.test_calibrations_of_other_bytes_admit_nothing\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_v21_identity.py\", line 89, in test_calibrations_bound_to_the_bytes_that_run_admit_and_other_bytes_admit_nothing\n    self.assertIn(\"executing\", a[\"failed\"][0][\"problems\"][0])\n                               ~~~~~~~~~~~~~~^^^^^^^^^^^^\nKeyError: 'problems'\n\n----------------------------------------------------------------------\nRan 10 tests\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_v21_identity.py",
+       "role": "control",
+       "select": "*v2.test_v21_identity.ThreeIdentities.test_calibrations_bound_to_the_bytes_that_run_admit_and_other_bytes_admit_nothing",
+       "exit": 0,
+       "seconds": 0.43,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "8fe0d563501527dc9fe3551265a0cc895e92c625bef92c37efeda7bb976f1636",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_v21_identity.py",
+       "role": "control",
+       "select": "*v2.test_v21_identity.ThreeIdentities.test_calibrations_bound_to_the_bytes_that_run_admit_and_other_bytes_admit_nothing",
+       "exit": 0,
+       "seconds": 0.43,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "8fe0d563501527dc9fe3551265a0cc895e92c625bef92c37efeda7bb976f1636",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_v21_identity.py",
+       "role": "rerun",
+       "select": "*v2.test_v21_identity.ThreeIdentities.test_calibrations_bound_to_the_bytes_that_run_admit_and_other_bytes_admit_nothing",
+       "exit": 1,
+       "seconds": 0.43,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "errors": 1,
+       "first": "ERROR: test_calibrations_bound_to_the_bytes_that_run_admit_and_other_bytes_admit_nothing (v2.test_v21_identity.ThreeIdentities.test_calibrations_bound_to_the_bytes_that_run_admit_and_other_bytes_admit_nothing) | KeyError",
+       "tail_sha256": "003401cd7e65072b521f2750c0971bf6b576def29719e2dbbc2d8c112a93e331",
+       "tail": "test_calibrations_bound_to_the_bytes_that_run_admit_and_other_bytes_admit_nothing (v2.test_v21_identity.ThreeIdentities.test_calibrations_bound_to_the_bytes_that_run_admit_and_other_bytes_admit_nothing)\nThe semantic half of test_v21_identity_bytes.ThreeIdentities.test_calibrations_of_other_bytes_admit_nothing ... ERROR\n\n======================================================================\nERROR: test_calibrations_bound_to_the_bytes_that_run_admit_and_other_bytes_admit_nothing (v2.test_v21_identity.ThreeIdentities.test_calibrations_bound_to_the_bytes_that_run_admit_and_other_bytes_admit_nothing)\nThe semantic half of test_v21_identity_bytes.ThreeIdentities.test_calibrations_of_other_bytes_admit_nothing\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_v21_identity.py\", line 89, in test_calibrations_bound_to_the_bytes_that_run_admit_and_other_bytes_admit_nothing\n    self.assertIn(\"executing\", a[\"failed\"][0][\"problems\"][0])\n                               ~~~~~~~~~~~~~~^^^^^^^^^^^^\nKeyError: 'problems'\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (errors=1)\n",
+       "overhead_s": 0.37
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_v21_identity.py",
+      "first": "ERROR: test_calibrations_bound_to_the_bytes_that_run_admit_and_other_bytes_admit_nothing (v2.test_v21_identity.ThreeIdentities.test_calibrations_bound_to_the_bytes_that_run_admit_and_other_bytes_admit_nothing) | KeyError",
+      "seconds": 1.4
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L104 not removed",
+     "files": [
+      {
+       "file": "tests/v2/test_app_units.py",
+       "exit": 1,
+       "seconds": 1.47,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 17,
+       "failures": 1,
+       "first": "FAIL: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) | AssertionError",
+       "tail_sha256": "c21ec7a788cc231a904981ed829d5263c82969cc96f926d09533886bda63f0f4",
+       "tail": "eck (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) ... FAIL\n\n======================================================================\nFAIL: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_app_units.py\", line 503, in test_admission_is_re_derived_and_names_every_failed_check\n    self.assertEqual((ok[\"admitted\"], ok[\"failed\"]), (True, []))\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: Tuples differ: (True, [{'check': '1. requirement_coverage', 'pro[399 chars][]}]) != (True, [])\n\nFirst differing element 1:\n[{'check': '1. requirement_coverage', 'pro[398 chars] []}]\n[]\n\n- (True,\n+ (True, [])\n?       ++++\n\n-  [{'check': '1. requirement_coverage', 'problems': []},\n-   {'check': '2. contract_spec_integrity', 'problems': []},\n-   {'check': '3. ownership', 'problems': []},\n-   {'check': '4. dependency_dag', 'problems': []},\n-   {'check': '5. contradictions', 'problems': []},\n-   {'check': '6. proof_capability', 'problems': []},\n-   {'check': '7. traceability', 'problems': []},\n-   {'check': '8. plan_structure', 'problems': []},\n-   {'check': '9. probe_calibration', 'problems': []}])\n\n----------------------------------------------------------------------\nRan 17 tests\n\nFAILED (failures=1)\n",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "control",
+       "select": "*v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check",
+       "exit": 0,
+       "seconds": 0.37,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "2d79b4a5e44e928d04da177166d420132c4f01ff6146a3e8e389f4f6cb24df3b",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "control",
+       "select": "*v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check",
+       "exit": 0,
+       "seconds": 0.38,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "2d79b4a5e44e928d04da177166d420132c4f01ff6146a3e8e389f4f6cb24df3b",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "rerun",
+       "select": "*v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check",
+       "exit": 1,
+       "seconds": 0.38,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "failures": 1,
+       "first": "FAIL: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) | AssertionError",
+       "tail_sha256": "33c06112b51164621593c43956c5dff9720d702f0ffbad0e2a7153065c83505d",
+       "tail": "check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) ... FAIL\n\n======================================================================\nFAIL: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_app_units.py\", line 503, in test_admission_is_re_derived_and_names_every_failed_check\n    self.assertEqual((ok[\"admitted\"], ok[\"failed\"]), (True, []))\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: Tuples differ: (True, [{'check': '1. requirement_coverage', 'pro[399 chars][]}]) != (True, [])\n\nFirst differing element 1:\n[{'check': '1. requirement_coverage', 'pro[398 chars] []}]\n[]\n\n- (True,\n+ (True, [])\n?       ++++\n\n-  [{'check': '1. requirement_coverage', 'problems': []},\n-   {'check': '2. contract_spec_integrity', 'problems': []},\n-   {'check': '3. ownership', 'problems': []},\n-   {'check': '4. dependency_dag', 'problems': []},\n-   {'check': '5. contradictions', 'problems': []},\n-   {'check': '6. proof_capability', 'problems': []},\n-   {'check': '7. traceability', 'problems': []},\n-   {'check': '8. plan_structure', 'problems': []},\n-   {'check': '9. probe_calibration', 'problems': []}])\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (failures=1)\n",
+       "overhead_s": 0.34
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_app_units.py",
+      "first": "FAIL: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) | AssertionError",
+      "seconds": 1.47
+     },
+     "class": "KILLED",
+     "killed": true
+    },
+    {
+     "mutant": "L104 string '. ' emptied",
+     "files": [
+      {
+       "file": "tests/v2/test_app_units.py",
+       "exit": 1,
+       "seconds": 1.49,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 17,
+       "failures": 1,
+       "first": "FAIL: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) | AssertionError",
+       "tail_sha256": "b5d527f58d558470d8e3fe29616df00f798050e0bb6729df96a87d56b43bb374",
+       "tail": "s_refused_with_what_was_found (v2.test_app_units.RunParts.test_a_git_older_than_b4_needs_is_refused_with_what_was_found) ... ok\ntest_a_run_and_a_check_on_an_old_git_are_refused_before_any_git_command (v2.test_app_units.RunParts.test_a_run_and_a_check_on_an_old_git_are_refused_before_any_git_command) ... ok\ntest_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) ... FAIL\n\n======================================================================\nFAIL: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_app_units.py\", line 506, in test_admission_is_re_derived_and_names_every_failed_check\n    self.assertEqual((bad[\"admitted\"], [f[\"check\"] for f in bad[\"failed\"]]), (False, [\"9. probe_calibration\"]))\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: Tuples differ: (False, ['9probe_calibration']) != (False, ['9. probe_calibration'])\n\nFirst differing element 1:\n['9probe_calibration']\n['9. probe_calibration']\n\n- (False, ['9probe_calibration'])\n+ (False, ['9. probe_calibration'])\n?            ++\n\n\n----------------------------------------------------------------------\nRan 17 tests\n\nFAILED (failures=1)\n",
+       "overhead_s": 0.35
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "control",
+       "select": "*v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check",
+       "exit": 0,
+       "seconds": 0.38,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "2d79b4a5e44e928d04da177166d420132c4f01ff6146a3e8e389f4f6cb24df3b",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "control",
+       "select": "*v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check",
+       "exit": 0,
+       "seconds": 0.39,
+       "outcome": "PASS",
+       "why": null,
+       "ran": 1,
+       "tail_sha256": "2d79b4a5e44e928d04da177166d420132c4f01ff6146a3e8e389f4f6cb24df3b",
+       "overhead_s": 0.34
+      },
+      {
+       "file": "tests/v2/test_app_units.py",
+       "role": "rerun",
+       "select": "*v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check",
+       "exit": 1,
+       "seconds": 0.38,
+       "outcome": "FAIL",
+       "why": null,
+       "ran": 1,
+       "failures": 1,
+       "first": "FAIL: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) | AssertionError",
+       "tail_sha256": "afd1776643ac38277e2aa36fdcda79b5e10244dd314228b3e0e8608fe86833d8",
+       "tail": "test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) ... FAIL\n\n======================================================================\nFAIL: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<tree>/tests/v2/test_app_units.py\", line 506, in test_admission_is_re_derived_and_names_every_failed_check\n    self.assertEqual((bad[\"admitted\"], [f[\"check\"] for f in bad[\"failed\"]]), (False, [\"9. probe_calibration\"]))\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: Tuples differ: (False, ['9probe_calibration']) != (False, ['9. probe_calibration'])\n\nFirst differing element 1:\n['9probe_calibration']\n['9. probe_calibration']\n\n- (False, ['9probe_calibration'])\n+ (False, ['9. probe_calibration'])\n?            ++\n\n\n----------------------------------------------------------------------\nRan 1 test\n\nFAILED (failures=1)\n",
+       "overhead_s": 0.34
+      }
+     ],
+     "killed_by": {
+      "file": "tests/v2/test_app_units.py",
+      "first": "FAIL: test_admission_is_re_derived_and_names_every_failed_check (v2.test_app_units.RunParts.test_admission_is_re_derived_and_names_every_failed_check) | AssertionError",
+      "seconds": 1.49
+     },
+     "class": "KILLED",
+     "killed": true
+    }
+   ],
+   "t0": [
+    {
+     "file": "tests/v2/test_app_units.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 7.26,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 41,
+     "first_test": "v2.test_app_units.Adapters.test_attempt_of_reads_the_kernel_projection_and_prior_failures",
+     "tail_sha256": "3ef303c799614934b469520dc3ed73bad54df703d4213d103aaf0597d5afb57a",
+     "overhead_s": 0.34
+    },
+    {
+     "file": "tests/v2/test_v21_inputs.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 1.71,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 20,
+     "first_test": "v2.test_v21_inputs.BundleShape.test_a_valid_bundle_still_loads",
+     "tail_sha256": "d39f63e4c8436fb76e82de52f522bc2737bd8bc9e94af2d56412b84f482dcedb",
+     "overhead_s": 0.35
+    },
+    {
+     "file": "tests/v2/test_v21_identity.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 1.44,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 13,
+     "first_test": "v2.test_v21_identity.Migrate.test_a_spec_no_release_compiles_is_refused_not_guessed",
+     "tail_sha256": "55ff309bf7ddd8be199b014399f388efe1c20a5041ab190f563ffc170a57e475",
+     "overhead_s": 0.35
+    },
+    {
+     "file": "tests/v2/test_v21_verify.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 35.7,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 8,
+     "first_test": "v2.test_v21_verify.RecordAlone.test_a_budget_stop_removed_from_the_record_is_refuted",
+     "tail_sha256": "f79e6288a26ee37a4f6a7da435cf549f3749c03aca7bcb314651cef2fe72b054",
+     "overhead_s": 0.34
+    },
+    {
+     "file": "tests/v2/test_v21_continue_usage.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 57.65,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 10,
+     "first_test": "v2.test_v21_continue_usage.Continue.test_a_continuation_verifies_given_its_directory_relative_or_absolute",
+     "tail_sha256": "25554e9cde9f11bfa4dd3a4579e3a9c44cacdb9866194adec6d1ca0574fd3b64",
+     "overhead_s": 0.34
+    },
+    {
+     "file": "tests/v2/test_v21_review_chain.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 171.78,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 18,
+     "skipped": 3,
+     "skipped_tests": [
+      "test_a_full_review_against_a_scripted_model (v2.test_v21_review_chain.RealBinary.test_a_full_review_against_a_scripted_model)",
+      "test_an_empty_range_is_skipped_without_a_model_call (v2.test_v21_review_chain.RealBinary.test_an_empty_range_is_skipped_without_a_model_call)",
+      "test_the_preview_is_read_as_the_adapter_expects (v2.test_v21_review_chain.RealBinary.test_the_preview_is_read_as_the_adapter_expects)"
+     ],
+     "first_test": "v2.test_v21_review_chain.CandidateChangedDuringReview.test_a_commit_made_by_the_finder_discards_the_review",
+     "tail_sha256": "1e4b8d44125b0693122f7d3880014f095229c51996b171f66abfe7c5b76af006",
+     "overhead_s": 0.37
+    },
+    {
+     "file": "tests/v2/test_v21_continue_integrity.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 252.75,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 24,
+     "first_test": "v2.test_v21_continue_integrity.AnchorThreatModel.test_an_attacker_who_cannot_write_the_store_is_refuted",
+     "tail_sha256": "6ed16fadda0701c1628b18171b29ee246ad8a6394124bc873e012e30e68ad7e4",
+     "overhead_s": 0.34
+    },
+    {
+     "file": "tests/v2/test_app_run.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 37.39,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 17,
+     "first_test": "v2.test_app_run.Command.test_a_live_run_without_the_provider_key_stops_before_any_request",
+     "tail_sha256": "34c9bfe7ef7d76c17f599b0a81180f32dc90d22822f05f5f66668053994bd703",
+     "overhead_s": 0.35
+    },
+    {
+     "file": "tests/v2/test_s2_kills.py",
+     "role": "t0",
+     "exit": 0,
+     "seconds": 24.65,
+     "outcome": "PASS",
+     "why": null,
+     "ran": 43,
+     "first_test": "v2.test_s2_kills.AgentGuarded.test_the_controlled_fault_names_itself_in_its_message",
+     "tail_sha256": "0bd664af1b79df8fc95d7e4ab7fee01458ca96cf64aa0c3ba780bc5a70d2e7c3",
+     "overhead_s": 0.34
+    }
+   ],
+   "killed": 15,
+   "survivors": [],
+   "classes": {
+    "KILLED": 15,
+    "SURVIVED": 0,
+    "TIMEOUT": 0,
+    "INFRA": 0,
+    "NOT_RUN": 0
+   },
+   "killed_by_timeout": 0,
+   "strays_reaped": 0
+  }
+ ]
+}

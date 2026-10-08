@@ -1,0 +1,228 @@
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=11 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=10 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:277: ResourceWarning: unclosed file <_io.TextIOWrapper name=9 encoding='utf-8'>
+  tests_held.release()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=11 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=10 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:277: ResourceWarning: unclosed file <_io.TextIOWrapper name=9 encoding='utf-8'>
+  tests_held.release()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+./Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=11 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=10 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:277: ResourceWarning: unclosed file <_io.TextIOWrapper name=9 encoding='utf-8'>
+  tests_held.release()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=11 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=10 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:277: ResourceWarning: unclosed file <_io.TextIOWrapper name=9 encoding='utf-8'>
+  tests_held.release()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+./Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=11 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=10 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:277: ResourceWarning: unclosed file <_io.TextIOWrapper name=9 encoding='utf-8'>
+  tests_held.release()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=11 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=10 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:277: ResourceWarning: unclosed file <_io.TextIOWrapper name=9 encoding='utf-8'>
+  tests_held.release()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+./Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=11 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=10 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:277: ResourceWarning: unclosed file <_io.TextIOWrapper name=9 encoding='utf-8'>
+  tests_held.release()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=11 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=10 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:277: ResourceWarning: unclosed file <_io.TextIOWrapper name=9 encoding='utf-8'>
+  tests_held.release()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+./Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=11 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=10 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:277: ResourceWarning: unclosed file <_io.TextIOWrapper name=9 encoding='utf-8'>
+  tests_held.release()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=11 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=10 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:277: ResourceWarning: unclosed file <_io.TextIOWrapper name=9 encoding='utf-8'>
+  tests_held.release()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+fatal: path 'app/cli.py' does not exist in 'main'
+./Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=11 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=10 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:277: ResourceWarning: unclosed file <_io.TextIOWrapper name=9 encoding='utf-8'>
+  tests_held.release()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=11 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=10 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:277: ResourceWarning: unclosed file <_io.TextIOWrapper name=9 encoding='utf-8'>
+  tests_held.release()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+./Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=11 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=10 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:277: ResourceWarning: unclosed file <_io.TextIOWrapper name=9 encoding='utf-8'>
+  tests_held.release()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=11 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=10 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:277: ResourceWarning: unclosed file <_io.TextIOWrapper name=9 encoding='utf-8'>
+  tests_held.release()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+./Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=11 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=10 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:277: ResourceWarning: unclosed file <_io.TextIOWrapper name=9 encoding='utf-8'>
+  tests_held.release()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=11 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=10 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:277: ResourceWarning: unclosed file <_io.TextIOWrapper name=9 encoding='utf-8'>
+  tests_held.release()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+./Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=11 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=10 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:277: ResourceWarning: unclosed file <_io.TextIOWrapper name=9 encoding='utf-8'>
+  tests_held.release()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=11 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=10 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:277: ResourceWarning: unclosed file <_io.TextIOWrapper name=9 encoding='utf-8'>
+  tests_held.release()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+./Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=11 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=10 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:277: ResourceWarning: unclosed file <_io.TextIOWrapper name=9 encoding='utf-8'>
+  tests_held.release()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+./Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=11 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=10 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:277: ResourceWarning: unclosed file <_io.TextIOWrapper name=9 encoding='utf-8'>
+  tests_held.release()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+./Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=11 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=10 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:277: ResourceWarning: unclosed file <_io.TextIOWrapper name=9 encoding='utf-8'>
+  tests_held.release()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+./Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=11 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=10 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:277: ResourceWarning: unclosed file <_io.TextIOWrapper name=9 encoding='utf-8'>
+  tests_held.release()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+./Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=11 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=10 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21/aisef2/orchestrate/story_runner.py:277: ResourceWarning: unclosed file <_io.TextIOWrapper name=9 encoding='utf-8'>
+  tests_held.release()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+..sss
+Slowest test durations
+----------------------------------------------------------------------
+14.740s    test_a_commit_made_by_the_finder_discards_the_review (tests.v2.test_v21_review_chain.CandidateChangedDuringReview.test_a_commit_made_by_the_finder_discards_the_review)
+14.739s    test_a_correct_anchored_finding_is_fixed_before_the_merge (tests.v2.test_v21_review_chain.FixLoop.test_a_correct_anchored_finding_is_fixed_before_the_merge)
+14.438s    test_a_file_edited_by_the_finder_discards_the_review_and_never_reaches_main (tests.v2.test_v21_review_chain.CandidateChangedDuringReview.test_a_file_edited_by_the_finder_discards_the_review_and_never_reaches_main)
+12.233s    test_the_fix_rounds_spent_with_the_defect_left_roll_back (tests.v2.test_v21_review_chain.FixLoop.test_the_fix_rounds_spent_with_the_defect_left_roll_back)
+11.908s    test_timed_out_and_its_spend_unknown (tests.v2.test_v21_review_chain.IncompleteReview.test_timed_out_and_its_spend_unknown)
+11.403s    test_a_provider_failure_is_the_providers (tests.v2.test_v21_review_chain.IncompleteReview.test_a_provider_failure_is_the_providers)
+11.268s    test_its_token_budget_spent (tests.v2.test_v21_review_chain.IncompleteReview.test_its_token_budget_spent)
+11.251s    test_an_unsupported_manifest_schema (tests.v2.test_v21_review_chain.IncompleteReview.test_an_unsupported_manifest_schema)
+10.723s    test_partial (tests.v2.test_v21_review_chain.IncompleteReview.test_partial)
+10.268s    test_a_finder_binary_that_is_not_the_pinned_one_does_not_run (tests.v2.test_v21_review_chain.CandidateChangedDuringReview.test_a_finder_binary_that_is_not_the_pinned_one_does_not_run)
+9.526s     test_a_reproduced_finding_an_approved_contract_contradicts_does_not_block (tests.v2.test_v21_review_chain.NotABlocker.test_a_reproduced_finding_an_approved_contract_contradicts_does_not_block)
+9.390s     test_a_reproduced_finding_whose_clause_shows_no_constant_outcome_does_not_block (tests.v2.test_v21_review_chain.NotABlocker.test_a_reproduced_finding_whose_clause_shows_no_constant_outcome_does_not_block)
+
+----------------------------------------------------------------------
+Ran 18 tests in 168.323s
+
+OK (skipped=3)
