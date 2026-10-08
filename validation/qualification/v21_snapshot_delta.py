@@ -8,21 +8,28 @@ without sufficient grounds).
 
 --write: OUT_DIR/DELTA.json (machine) and OUT_DIR/DELTA.md (the table). --check: the table's head is HEAD or an
 ancestor of it; both files are byte for byte what base..head derives now (with the read-set the table records, its
-sha256 unchanged); and no file changed after the table's head (outside OUT_DIR) is anything but evidence/doc or code
-outside mutation.COPY that reaches no target, with no record binding it — otherwise the table is stale (a read-set
-measured at the table's head says nothing of a later file).
+sha256 unchanged); the reuse criteria of v21_mutation_record (criteria_sha256: proof, which verdict() re-implements per
+commit) are the ones the table was derived beside; and no file changed after the table's head (outside OUT_DIR) is
+anything but evidence/doc or code outside mutation.COPY that reaches no target, with no record binding it — otherwise
+the table is stale (a read-set measured at the table's head says nothing of a later file).
 
 Data the kill tests read cannot be found completely by reading their source (a path joined at run time, held by a
 module, picked by a glob). Every changed file inside mutation.COPY that the other rules leave open for a target is
-therefore one of: read by its kill files (in a measured read-set), or maybe read (found statically); not read (a
-measured read-set of every such kill file omits it); or "inside COPY, read-set not measured" — and then that target's
-base result stands only PROVISIONALLY, until a measured read-set clears it. --read-set R.json is that measurement, recorded elsewhere (not
-by this tool): {"commit": "<the head's full sha>", "kill_files": {"<kill file>": {"opened": [paths], "listed": [dirs]}}},
-paths relative to the tree root. The recording run (after the campaign: it runs every kill file) runs each kill file
-alone at head in the runner's tree with an audit hook taking `open`, `os.listdir` and `os.scandir` events, and os.stat /
-os.lstat wrapped (they raise no audit event), in its own process and every child Python process. A kill file opened or
-looked up p, or listed a directory above p: it reads p. A kill file missing from the record stays not measured; a file
-that does not exist at head (deleted, a rename's source) is never cleared by a run at head.
+therefore, per kill file: read (a measured read-set says so) — the target's base result is then no ground at head:
+re-measure it; not read (a measured read-set of that kill file omits it); or not measured — "inside COPY, read-set not
+measured", and the target's base result stands only PROVISIONALLY until a measured read-set clears it. A kill file not
+measured whose closure names the file (found statically) is reported as one that may read it, and is provisional all the
+same; a measured kill file is decided by the measurement alone. --read-set R.json is that measurement, recorded
+elsewhere (not by this tool): {"commit": "<the head's full sha>", "kill_files": {"<kill file>": {"opened": [paths],
+"listed": [dirs]}}}, every path relative to the root of the tree the run used ("." is the root; what lies outside the
+tree is left out). The recording run (after the campaign: it runs every kill file) runs each kill file alone at head
+with -B in the runner's tree (no __pycache__) with an audit hook taking `open`, `os.listdir` and `os.scandir` events,
+and os.stat / os.lstat wrapped (they raise no audit event), in its own process and every child Python process; each
+path is made relative to the tree's resolved root. A kill file opened or looked up p, or listed a directory above p: it
+reads p. A record is refused when a path is absolute, written with a backslash or holds an empty, "." or ".." part, or
+when a kill file's own path is not among the files it opened (its import opens it: a record without it measured
+nothing). A kill file missing from the record stays not measured; a file that does not exist at head (deleted, a
+rename's source) is never cleared by a run at head.
 
 Each commit's harness is read from that commit (its validation/v2/mutation.py: V21_TARGETS, COPY, the generator), never
 from the working tree. Every file of `git diff -M --name-status base head` (both sides of a rename) gets its kinds and
@@ -55,8 +62,12 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from validation.qualification import s2_mutation_record as S2  # noqa: E402
+from validation.qualification import v21_mutation_record as MR  # noqa: E402
 
 TOOL_REL = "validation/qualification/v21_snapshot_delta.py"
+PROOF_REL = "validation/qualification/v21_mutation_record.py"
+#: the reuse criteria verdict() re-implements (v21_mutation_record.criteria_sha256 of this file)
+PROOF = ROOT / PROOF_REL
 HARNESS = ("validation/v2/mutation.py", "validation/v2/execution_order.py", "validation/v2/owned_run.py",
            "validation/v2/cleanup_authority.py")
 #: the definitions mutation.mutants() runs (with ast and copy of the same interpreter)
@@ -87,7 +98,9 @@ RULES = {
                "every V2.1 target, stated as such in the file's row and in every target's row; the proof's rules do "
                "not bind the runner's code",
     "data": "a file inside mutation.COPY outside the harness is data to every target it is not the module of; per "
-            "kill file of such a target whose closure does not hold it: read when found statically in a file of "
+            "kill file of such a target whose closure does not hold it, measured: read when the measured read-set "
+            "says so (opened or looked up, or a directory above it listed), not read when it omits it and the file "
+            "exists at head, else not measured; not measured: may read when found statically in a file of "
             "that closure inside COPY (no other file is in the runner's tree), tests/ or not, at base or head — the "
             "whole path in its text; its path split into consecutive parts, each a whole string constant, from the "
             "repository root or a directory above that file; a parent directory of two components or more and the "
@@ -95,19 +108,19 @@ RULES = {
             "scandir, walk or fwalk whose receiver and arguments name it: their string constants joined in source "
             "order up to the first part with *, ? or [, from the root or a directory above that file) that is the "
             "parent directory, or any directory above when it lists recursively (rglob, walk, fwalk, a ** pattern) "
-            "— or read when the measured read-set "
-            "says so (opened or looked up, or a directory above it listed); not read when the measured read-set holds "
-            "the kill file and the file exists at head; else not measured",
-    DATA: "inside COPY, read by <kill files> (read_set.read_by: measured, or found statically — then they may read "
-          "it): their targets; outside the proof's rules",
-    UNMEASURED: "inside COPY, read-set not measured: for every target with such a kill file, its base result stands "
-                "only PROVISIONALLY until a measured read-set clears the file; read_set.provisional counts them "
-                "(provisional_except: the targets of the build it does not hold)",
+            "— and not measured all the same",
+    DATA: "inside COPY, read by <kill files> (read_set.read_by: measured — their targets' base results are no ground "
+          "at head: re-measure them (counts.data_read) —, or found statically: they may read it, and are not "
+          "measured): their targets; outside the proof's rules",
+    UNMEASURED: "inside COPY, read-set not measured (found statically or not): for every target with such a kill file, "
+                "its base result stands only PROVISIONALLY until a measured read-set clears the file; "
+                "read_set.provisional counts them (provisional_except: the targets of the build it does not hold)",
     UNREAD: "inside COPY and not read by any kill file the other rules leave open (measured read-set): no target",
     CODE: "a .py or .sh file or a #! script that no rule above ties to a target by code (not under aisef2/, no kill "
           "file, in no kill closure, not the harness); inside COPY it is data as well",
     EVIDENCE: "none of the above (outside COPY, not code): no target",
-    "verdict": "v21_mutation_record.proof for a result measured at base, at head",
+    "verdict": "v21_mutation_record.proof for a result measured at base, at head (re-implemented per commit; "
+               "proof.criteria_sha256 is the one it was derived beside)",
     "records": "manifest: a new revision when a target, a kill set or a target module changed, or a file it binds by "
                "sha256 differs at head; T0: every (module, null mutant, kill file) pair a head target needs with no "
                "PASS row in the manifest's T0 record, or whose kill file changed since the sweep, and that base did "
@@ -393,35 +406,47 @@ def _read_set(path: pathlib.Path, head: str) -> dict[str, tuple[frozenset[str], 
                          f"\"listed\": [directory]}}}}}}")
     if doc.get("commit") != head:
         raise SystemExit(f"{path}: measured at {str(doc.get('commit'))[:12]}, not at the head {head[:12]}")
-    return {k: (frozenset(map(_norm, v["opened"])), frozenset(map(_norm, v["listed"]))) for k, v in kf.items()}
+    out = {}
+    for k, v in kf.items():
+        bad = [s for x in ("opened", "listed") for s in v[x] if s.strip().startswith("/") or "\\" in s
+               or (n := _norm(s)) and {"", ".", ".."} & set(n.split("/"))]
+        if bad:
+            raise SystemExit(f"{path}: {k}: {bad[0]!r} is not a path relative to the tree root (the recorder makes every "
+                             f"path relative to the root of the tree it ran in and leaves out what lies outside it)")
+        out[k] = (frozenset(map(_norm, v["opened"])), frozenset(map(_norm, v["listed"])))
+        if k not in out[k][0]:
+            raise SystemExit(f"{path}: {k}: its own path is not among the files it opened (its import opens it): the "
+                             f"record measured nothing of it")
+    return out
 
 
 def _data(B: Rev, H: Rev, p: str, kc: dict[str, frozenset[str]], measured: dict | None,
           copy: tuple[str, ...]) -> tuple[dict, set, set]:
     """For the changed file `p` inside COPY: (kill file -> how it reads p, the kill files not measured, the kill files
-    a measured read-set clears), over the kill files whose closure does not hold p. Only the closure's files inside
-    COPY are looked into: no other file is in the runner's tree."""
+    a measured read-set clears), over the kill files whose closure does not hold p. A measured kill file is decided by
+    the measurement; one not measured (or measured at head while p is not there) is not measured, and may read p when
+    found statically. Only the closure's files inside COPY are looked into: no other file is in the runner's tree."""
     root, read, unmeasured, cleared = B.root, {}, set(), set()
     names: dict[str, str | None] = {}
+    parts = p.split("/")
     for k, files in kc.items():
         if p in files:
             continue
+        if measured is not None and k in measured:
+            opened, listed = measured[k]
+            if p in opened or any("/".join(parts[:i]) in listed for i in range(len(parts))):
+                read[k] = "measured"
+                continue
+            if p in S2._files(root, H.sha):
+                cleared.add(k)
+                continue
+        unmeasured.add(k)
         for f in sorted(x for x in files if any(x == c or x.startswith(c + "/") for c in copy)):
             if f not in names:
                 names[f] = next((h for R in (B, H) if (h := _names(_info(root, R.sha, f), f, p))), None)
             if names[f]:
                 read[k] = f"found statically: {f} names {names[f]}"
                 break
-        if measured is None or k not in measured:
-            if k not in read:
-                unmeasured.add(k)
-            continue
-        opened, listed = measured[k]
-        parts = p.split("/")
-        if p in opened or any("/".join(parts[:i]) in listed for i in range(len(parts))):
-            read[k] = "measured"
-        elif k not in read:
-            (cleared if p in S2._files(root, H.sha) else unmeasured).add(k)
     return read, unmeasured, cleared
 
 
@@ -446,8 +471,8 @@ def _records(B: Rev, H: Rev, rows: list[dict]) -> list[dict]:
         except ValueError:
             continue
         if doc.get("snapshot") == B.sha:
-            manifests.append((doc.get("revision", 0), p, doc))
-    man_rel, man = (manifests[-1][1], manifests[-1][2]) if manifests else (None, {})
+            manifests.append((doc.get("revision") or 0, p, doc))
+    man_rel, man = max(manifests, key=lambda x: x[:2])[1:] if manifests else (None, {})
     reasons = list(target_reasons)
     if module_changed:
         reasons.append({"why": f"{len(module_changed)} target module(s) changed: mutant counts and nulls re-derived",
@@ -634,6 +659,7 @@ def _build(B: Rev, H: Rev, rs: dict | None = None) -> tuple[dict, str]:
     for t in targets:
         v, out = verdicts[t], []
         v["read_set_not_measured"] = n = unmeasured_n[t]
+        v["data_read"] = sum(1 for r in rows if READ["measured"] in r["targets"].get(t, []))
         if t not in H.targets:
             continue
         if hpaths:
@@ -642,7 +668,9 @@ def _build(B: Rev, H: Rev, rs: dict | None = None) -> tuple[dict, str]:
         for how in READ:
             notes = [r["path"] for r in rows if READ[how] in r["targets"].get(t, [])]
             if notes:
-                out.append(f"{NOTE[how]}: {', '.join(notes)}")
+                out.append(f"{NOTE[how]}: {', '.join(notes)}" + (
+                    f" — the {b7} result is no ground at head (the proof's rules do not cover data): re-measure it"
+                    if how == "measured" and not v["reasons"] else ""))
         if n:
             out.append(f"inside mutation.COPY, read-set not measured: {n} changed file(s) — " + (
                 "a re-measure at head reads them as they are" if v["reasons"] else
@@ -654,12 +682,14 @@ def _build(B: Rev, H: Rev, rs: dict | None = None) -> tuple[dict, str]:
     doc = {
         "record": "AISEF V2.1 — SNAPSHOT DELTA (owner rule 2026-10-08)",
         "tool": {"path": TOOL_REL, "sha256": hashlib.sha256((HERE / "v21_snapshot_delta.py").read_bytes()).hexdigest()},
+        "proof": {"path": PROOF_REL, "criteria_sha256": MR.criteria_sha256(PROOF)},
         "base": B.sha, "head": H.sha, "rules": RULES,
         "read_set": {**{k: rs[k] for k in ("path", "sha256", "commit")}, "kill_files": len(measured)} if rs else None,
         "counts": {"files": len(rows), "targets_at_base": len(B.targets), "targets_at_head": len(H.targets),
                    "affected_targets": len(affected),
                    "remeasure": sum(1 for v in verdicts.values() if v["verdict"].startswith("re-measure")),
                    "stand": len(stand), "provisional": sum(1 for t in stand if unmeasured_n[t]),
+                   "data_read": sum(1 for t in stand if verdicts[t]["data_read"]),
                    "not_at_head": sum(1 for t in targets if t not in H.targets),
                    "remeasure_not_reached_by_any_file": sorted(t for t in targets if verdicts[t]["reasons"] and t not in affected)},
         "harness_changed": [{"path": r["path"], "names_changed": r.get("names_changed", [])}
@@ -695,6 +725,10 @@ def markdown(doc: dict) -> str:
                      f"files inside `mutation.COPY` may be read by their kill tests and that reading is not measured; a "
                      f"measured read-set (an audit-hook run of the kill files at head, after the campaign: `--read-set`) "
                      f"clears them or names the targets they reach.")
+    if c["data_read"]:
+        lines.append(f"**{c['data_read']} of the {c['stand']} that can stand by the proof's rules have kill tests that read "
+                     f"changed data inside `mutation.COPY` (measured)**: the proof's rules do not cover data, so a {b7} "
+                     f"result is no ground for them at head; re-measure them.")
     for h in doc["harness_changed"]:
         lines.append(f"Harness changed: `{h['path']}` (top-level names changed: "
                      f"{', '.join(h['names_changed']) or 'none'}). The proof's rules do not bind the runner's code; "
@@ -714,6 +748,9 @@ def markdown(doc: dict) -> str:
              [f"re-derive `{x}`" for x in r["records"] if x]
         if ts and not r["remeasure"]:
             ev.insert(0, "no target re-measured by the proof's rules")
+        rd = [t for t in ts if READ["measured"] in r["targets"][t] and t not in r["remeasure"]]
+        if rd:
+            ev.append(f"read by their kill tests (measured; outside the proof's rules): re-measure {len(rd)}: {_short(rd)}")
         d = r.get("read_set")
         if d and d["provisional"]:
             who = "every target" if d["provisional"] == every else \
@@ -752,6 +789,10 @@ def check(root: pathlib.Path, out_dir: pathlib.Path) -> list[str]:
         return [f"{out_dir}/DELTA.json cannot be read: {e!r}"]
     if S2._git(root, "merge-base", "--is-ancestor", head, "HEAD").returncode != 0:
         return [f"the table's head {head[:12]} is not HEAD or an ancestor of it"]
+    proof = MR.criteria_sha256(PROOF)
+    if (doc.get("proof") or {}).get("criteria_sha256") != proof:
+        return [f"{PROOF_REL}: its reuse criteria (criteria_sha256 {proof[:16]}) are not the ones the table was derived "
+                f"beside: verdict() re-implements proof() — compare the two before re-deriving the table"]
     rs = doc.get("read_set")
     if rs:
         path = root / rs["path"]
