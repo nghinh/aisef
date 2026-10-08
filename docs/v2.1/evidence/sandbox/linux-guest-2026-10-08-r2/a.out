@@ -1,0 +1,1140 @@
+{
+ "boundary": {
+  "runner": 12,
+  "since": 1791450640.0,
+  "root": "/tmp"
+ },
+ "runner": {
+  "pid": 12,
+  "state": "R",
+  "ppid": 7,
+  "pgid": 7,
+  "sid": 1,
+  "start": 114375851,
+  "cmd": "python3 -B /repo/validation/v21/sandbox/linux_guest.py a"
+ },
+ "end": {
+  "argv": [
+   "/usr/bin/bwrap",
+   "--unshare-user",
+   "--unshare-pid",
+   "--unshare-ipc",
+   "--unshare-uts",
+   "--unshare-cgroup-try",
+   "--share-net",
+   "--disable-userns",
+   "--die-with-parent",
+   "--new-session",
+   "--cap-drop",
+   "ALL",
+   "--ro-bind",
+   "/usr",
+   "/usr",
+   "--ro-bind",
+   "/etc",
+   "/etc",
+   "--symlink",
+   "usr/bin",
+   "/bin",
+   "--symlink",
+   "usr/sbin",
+   "/sbin",
+   "--symlink",
+   "usr/lib",
+   "/lib",
+   "--proc",
+   "/proc",
+   "--dev",
+   "/dev",
+   "--tmpfs",
+   "/tmp",
+   "--tmpfs",
+   "/aisef-home",
+   "--ro-bind",
+   "/tmp/a-end/client",
+   "/tmp/a-end/client",
+   "--ro-bind",
+   "/tmp/a-end/repo/.git",
+   "/tmp/a-end/repo/.git",
+   "--ro-bind",
+   "/tmp/a-end/home/.config/opencode",
+   "/tmp/a-end/home/.config/opencode",
+   "--bind",
+   "/tmp/a-end/work/ws",
+   "/tmp/a-end/work/ws",
+   "--chdir",
+   "/tmp/a-end/work/ws",
+   "--",
+   "/tmp/a-end/client/opencode",
+   "run",
+   "--format",
+   "json",
+   "--model",
+   "fake/model",
+   "--title",
+   "a-end",
+   "--dir",
+   "/tmp/a-end/work/ws",
+   "the prompt"
+  ],
+  "process_range": {
+   "name": "a-end",
+   "cwd": "/tmp/a-end/work/ws",
+   "grace_s": [
+    2.0,
+    2.0
+   ],
+   "wait_s": null,
+   "waited_with": "r.wait(30), not client.wait_within"
+  },
+  "inside": {
+   "client": "2",
+   "sleeper": "3",
+   "pidns": "pid:[4026532970]",
+   "sleeper_sid": "3",
+   "visible": "1 2 3 7"
+  },
+  "sleeper_outside": {
+   "pid": 39,
+   "state": "S",
+   "ppid": 38,
+   "pgid": 39,
+   "sid": 39,
+   "start": 114376172,
+   "cmd": "sleep 3600.986815"
+  },
+  "chain_to_runner": [
+   {
+    "pid": 39,
+    "state": "S",
+    "ppid": 38,
+    "pgid": 39,
+    "sid": 39,
+    "start": 114376172,
+    "cmd": "sleep 3600.986815"
+   },
+   {
+    "pid": 38,
+    "state": "S",
+    "ppid": 36,
+    "pgid": 36,
+    "sid": 36,
+    "start": 114376172,
+    "cmd": "/bin/sh /tmp/a-end/client/opencode run --format json --model fake/model --title a-end --dir /tmp/a-end/work/ws the prompt"
+   },
+   {
+    "pid": 36,
+    "state": "S",
+    "ppid": 34,
+    "pgid": 36,
+    "sid": 36,
+    "start": 114376172,
+    "cmd": "/usr/bin/bwrap --unshare-user --unshare-pid --unshare-ipc --unshare-uts --unshare-cgroup-try --share-net --disable-userns --die-with-parent --new-session --cap-"
+   },
+   {
+    "pid": 34,
+    "state": "S",
+    "ppid": 32,
+    "pgid": 32,
+    "sid": 32,
+    "start": 114376172,
+    "cmd": "/usr/bin/bwrap --unshare-user --unshare-pid --unshare-ipc --unshare-uts --unshare-cgroup-try --share-net --disable-userns --die-with-parent --new-session --cap-"
+   },
+   {
+    "pid": 32,
+    "state": "S",
+    "ppid": 12,
+    "pgid": 32,
+    "sid": 32,
+    "start": 114376156,
+    "cmd": "/usr/local/bin/python3 -P /repo/aisef2/runtime/range_anchor.py"
+   },
+   {
+    "pid": 12,
+    "state": "R",
+    "ppid": 7,
+    "pgid": 7,
+    "sid": 1,
+    "start": 114375851,
+    "cmd": "python3 -B /repo/validation/v21/sandbox/linux_guest.py a"
+   }
+  ],
+  "range": {
+   "anchor_pid_and_group": 32,
+   "target_bwrap": 34,
+   "members": [
+    [
+     34,
+     "/usr/bin/bwrap --unshare-user --unshare-pid --unshare-ipc --unshare-uts --unshar"
+    ]
+   ],
+   "escaped": [
+    [
+     36,
+     "/usr/bin/bwrap --unshare-user --unshare-pid --unshare-ipc --unshare-uts --unshar"
+    ]
+   ],
+   "session_processes": [
+    [
+     34,
+     114376172
+    ],
+    [
+     36,
+     114376172
+    ],
+    [
+     38,
+     114376172
+    ],
+    [
+     39,
+     114376172
+    ],
+    [
+     45,
+     114376193
+    ]
+   ]
+  },
+  "proof_of_the_outside_pid": {
+   "signalled": [
+    {
+     "kind": "pid",
+     "id": 39,
+     "proof": {
+      "pid": 39,
+      "ppid": 38,
+      "pgid": 39,
+      "born": 1791450642.0,
+      "runner": 12,
+      "since": 1791450640.0,
+      "command": "sleep 3600.986815"
+     }
+    }
+   ],
+   "unproven": []
+  },
+  "inside_pids_claimed": {
+   "claimed": [
+    2,
+    3
+   ],
+   "what_they_name_outside": {
+    "2": null,
+    "3": null
+   },
+   "dry_run": {
+    "signalled": [],
+    "unproven": [
+     {
+      "kind": "pid",
+      "id": 2,
+      "why": "not in the host table"
+     },
+     {
+      "kind": "pid",
+      "id": 3,
+      "why": "not in the host table"
+     }
+    ]
+   }
+  },
+  "inside_pid_collision": {
+   "sibling": {
+    "pid": 48,
+    "ppid": 12,
+    "pgid": 7,
+    "born": 1791450642.0,
+    "command": "sleep 1.5"
+   },
+   "claimed": {
+    "sibling": 48,
+    "early": 9,
+    "early-setsid": 10,
+    "late": 25
+   },
+   "dry_run": {
+    "signalled": [
+     {
+      "kind": "pid",
+      "id": 48,
+      "proof": {
+       "pid": 48,
+       "ppid": 12,
+       "pgid": 7,
+       "born": 1791450642.0,
+       "runner": 12,
+       "since": 1791450640.0,
+       "command": "sleep 1.5"
+      }
+     }
+    ],
+    "unproven": [
+     {
+      "kind": "pid",
+      "id": 9,
+      "why": "born before the boundary or not a descendant of the runner"
+     },
+     {
+      "kind": "pid",
+      "id": 10,
+      "why": "born before the boundary or not a descendant of the runner"
+     },
+     {
+      "kind": "pid",
+      "id": 25,
+      "why": "born before the boundary or not a descendant of the runner"
+     }
+    ]
+   }
+  },
+  "client_exit": 0,
+  "after_bwrap_returned": {
+   "seconds": 0.006,
+   "still_alive": [],
+   "zombies": []
+  },
+  "release": {
+   "raised": null,
+   "ledger": []
+  },
+  "after_release": {
+   "seconds": 0.0,
+   "still_alive": [],
+   "zombies": []
+  },
+  "marker_in_table_after": []
+ },
+ "proved": {
+  "argv": [
+   "/usr/bin/bwrap",
+   "--unshare-user",
+   "--unshare-pid",
+   "--unshare-ipc",
+   "--unshare-uts",
+   "--unshare-cgroup-try",
+   "--share-net",
+   "--disable-userns",
+   "--die-with-parent",
+   "--new-session",
+   "--cap-drop",
+   "ALL",
+   "--ro-bind",
+   "/usr",
+   "/usr",
+   "--ro-bind",
+   "/etc",
+   "/etc",
+   "--symlink",
+   "usr/bin",
+   "/bin",
+   "--symlink",
+   "usr/sbin",
+   "/sbin",
+   "--symlink",
+   "usr/lib",
+   "/lib",
+   "--proc",
+   "/proc",
+   "--dev",
+   "/dev",
+   "--tmpfs",
+   "/tmp",
+   "--tmpfs",
+   "/aisef-home",
+   "--ro-bind",
+   "/tmp/a-proved/client",
+   "/tmp/a-proved/client",
+   "--ro-bind",
+   "/tmp/a-proved/repo/.git",
+   "/tmp/a-proved/repo/.git",
+   "--ro-bind",
+   "/tmp/a-proved/home/.config/opencode",
+   "/tmp/a-proved/home/.config/opencode",
+   "--bind",
+   "/tmp/a-proved/work/ws",
+   "/tmp/a-proved/work/ws",
+   "--chdir",
+   "/tmp/a-proved/work/ws",
+   "--",
+   "/tmp/a-proved/client/opencode",
+   "run",
+   "--format",
+   "json",
+   "--model",
+   "fake/model",
+   "--title",
+   "a-proved",
+   "--dir",
+   "/tmp/a-proved/work/ws",
+   "the prompt"
+  ],
+  "process_range": {
+   "name": "a-proved",
+   "cwd": "/tmp/a-proved/work/ws",
+   "grace_s": [
+    2.0,
+    2.0
+   ],
+   "wait_s": null,
+   "waited_with": "r.wait(30), not client.wait_within"
+  },
+  "inside": {
+   "client": "2",
+   "sleeper": "3",
+   "pidns": "pid:[4026532971]",
+   "sleeper_sid": "3",
+   "visible": "1 2 3 7"
+  },
+  "sleeper_outside": {
+   "pid": 90,
+   "state": "S",
+   "ppid": 89,
+   "pgid": 90,
+   "sid": 90,
+   "start": 114376371,
+   "cmd": "sleep 3600.663524"
+  },
+  "chain_to_runner": [
+   {
+    "pid": 90,
+    "state": "S",
+    "ppid": 89,
+    "pgid": 90,
+    "sid": 90,
+    "start": 114376371,
+    "cmd": "sleep 3600.663524"
+   },
+   {
+    "pid": 89,
+    "state": "S",
+    "ppid": 88,
+    "pgid": 88,
+    "sid": 88,
+    "start": 114376371,
+    "cmd": "/bin/sh /tmp/a-proved/client/opencode run --format json --model fake/model --title a-proved --dir /tmp/a-proved/work/ws the prompt"
+   },
+   {
+    "pid": 88,
+    "state": "S",
+    "ppid": 85,
+    "pgid": 88,
+    "sid": 88,
+    "start": 114376370,
+    "cmd": "/usr/bin/bwrap --unshare-user --unshare-pid --unshare-ipc --unshare-uts --unshare-cgroup-try --share-net --disable-userns --die-with-parent --new-session --cap-"
+   },
+   {
+    "pid": 85,
+    "state": "S",
+    "ppid": 83,
+    "pgid": 83,
+    "sid": 83,
+    "start": 114376370,
+    "cmd": "/usr/bin/bwrap --unshare-user --unshare-pid --unshare-ipc --unshare-uts --unshare-cgroup-try --share-net --disable-userns --die-with-parent --new-session --cap-"
+   },
+   {
+    "pid": 83,
+    "state": "S",
+    "ppid": 12,
+    "pgid": 83,
+    "sid": 83,
+    "start": 114376356,
+    "cmd": "/usr/local/bin/python3 -P /repo/aisef2/runtime/range_anchor.py"
+   },
+   {
+    "pid": 12,
+    "state": "R",
+    "ppid": 7,
+    "pgid": 7,
+    "sid": 1,
+    "start": 114375851,
+    "cmd": "python3 -B /repo/validation/v21/sandbox/linux_guest.py a"
+   }
+  ],
+  "range": {
+   "anchor_pid_and_group": 83,
+   "target_bwrap": 85,
+   "members": [
+    [
+     85,
+     "/usr/bin/bwrap --unshare-user --unshare-pid --unshare-ipc --unshare-uts --unshar"
+    ]
+   ],
+   "escaped": [
+    [
+     88,
+     "/usr/bin/bwrap --unshare-user --unshare-pid --unshare-ipc --unshare-uts --unshar"
+    ]
+   ],
+   "session_processes": [
+    [
+     85,
+     114376370
+    ],
+    [
+     88,
+     114376370
+    ],
+    [
+     89,
+     114376371
+    ],
+    [
+     90,
+     114376371
+    ],
+    [
+     96,
+     114376392
+    ]
+   ]
+  },
+  "proof_of_the_outside_pid": {
+   "signalled": [
+    {
+     "kind": "pid",
+     "id": 90,
+     "proof": {
+      "pid": 90,
+      "ppid": 89,
+      "pgid": 90,
+      "born": 1791450644.0,
+      "runner": 12,
+      "since": 1791450640.0,
+      "command": "sleep 3600.663524"
+     }
+    }
+   ],
+   "unproven": []
+  },
+  "inside_pids_claimed": {
+   "claimed": [
+    2,
+    3
+   ],
+   "what_they_name_outside": {
+    "2": null,
+    "3": null
+   },
+   "dry_run": {
+    "signalled": [],
+    "unproven": [
+     {
+      "kind": "pid",
+      "id": 2,
+      "why": "not in the host table"
+     },
+     {
+      "kind": "pid",
+      "id": 3,
+      "why": "not in the host table"
+     }
+    ]
+   }
+  },
+  "proved_signal": {
+   "signalled": [
+    {
+     "kind": "pid",
+     "id": 90,
+     "proof": {
+      "pid": 90,
+      "ppid": 89,
+      "pgid": 90,
+      "born": 1791450644.0,
+      "runner": 12,
+      "since": 1791450640.0,
+      "command": "sleep 3600.663524"
+     }
+    }
+   ],
+   "unproven": []
+  },
+  "sleeper_after_proved_signal": {
+   "seconds": 0.006,
+   "still_alive": [],
+   "zombies": []
+  },
+  "client_alive_after_proved_signal": true,
+  "client_exit": 0,
+  "after_bwrap_returned": {
+   "seconds": 0.0,
+   "still_alive": [],
+   "zombies": []
+  },
+  "release": {
+   "raised": null,
+   "ledger": []
+  },
+  "after_release": {
+   "seconds": 0.0,
+   "still_alive": [],
+   "zombies": []
+  },
+  "marker_in_table_after": []
+ },
+ "release": {
+  "argv": [
+   "/usr/bin/bwrap",
+   "--unshare-user",
+   "--unshare-pid",
+   "--unshare-ipc",
+   "--unshare-uts",
+   "--unshare-cgroup-try",
+   "--share-net",
+   "--disable-userns",
+   "--die-with-parent",
+   "--new-session",
+   "--cap-drop",
+   "ALL",
+   "--ro-bind",
+   "/usr",
+   "/usr",
+   "--ro-bind",
+   "/etc",
+   "/etc",
+   "--symlink",
+   "usr/bin",
+   "/bin",
+   "--symlink",
+   "usr/sbin",
+   "/sbin",
+   "--symlink",
+   "usr/lib",
+   "/lib",
+   "--proc",
+   "/proc",
+   "--dev",
+   "/dev",
+   "--tmpfs",
+   "/tmp",
+   "--tmpfs",
+   "/aisef-home",
+   "--ro-bind",
+   "/tmp/a-release/client",
+   "/tmp/a-release/client",
+   "--ro-bind",
+   "/tmp/a-release/repo/.git",
+   "/tmp/a-release/repo/.git",
+   "--ro-bind",
+   "/tmp/a-release/home/.config/opencode",
+   "/tmp/a-release/home/.config/opencode",
+   "--bind",
+   "/tmp/a-release/work/ws",
+   "/tmp/a-release/work/ws",
+   "--chdir",
+   "/tmp/a-release/work/ws",
+   "--",
+   "/tmp/a-release/client/opencode",
+   "run",
+   "--format",
+   "json",
+   "--model",
+   "fake/model",
+   "--title",
+   "a-release",
+   "--dir",
+   "/tmp/a-release/work/ws",
+   "the prompt"
+  ],
+  "process_range": {
+   "name": "a-release",
+   "cwd": "/tmp/a-release/work/ws",
+   "grace_s": [
+    2.0,
+    2.0
+   ],
+   "wait_s": null,
+   "waited_with": "r.wait(30), not client.wait_within"
+  },
+  "inside": {
+   "client": "2",
+   "sleeper": "3",
+   "pidns": "pid:[4026532970]",
+   "sleeper_sid": "3",
+   "visible": "1 2 3 7"
+  },
+  "sleeper_outside": {
+   "pid": 113,
+   "state": "S",
+   "ppid": 112,
+   "pgid": 113,
+   "sid": 113,
+   "start": 114376416,
+   "cmd": "sleep 3600.435209"
+  },
+  "chain_to_runner": [
+   {
+    "pid": 113,
+    "state": "S",
+    "ppid": 112,
+    "pgid": 113,
+    "sid": 113,
+    "start": 114376416,
+    "cmd": "sleep 3600.435209"
+   },
+   {
+    "pid": 112,
+    "state": "S",
+    "ppid": 110,
+    "pgid": 110,
+    "sid": 110,
+    "start": 114376416,
+    "cmd": "/bin/sh /tmp/a-release/client/opencode run --format json --model fake/model --title a-release --dir /tmp/a-release/work/ws the prompt"
+   },
+   {
+    "pid": 110,
+    "state": "S",
+    "ppid": 108,
+    "pgid": 110,
+    "sid": 110,
+    "start": 114376416,
+    "cmd": "/usr/bin/bwrap --unshare-user --unshare-pid --unshare-ipc --unshare-uts --unshare-cgroup-try --share-net --disable-userns --die-with-parent --new-session --cap-"
+   },
+   {
+    "pid": 108,
+    "state": "S",
+    "ppid": 106,
+    "pgid": 106,
+    "sid": 106,
+    "start": 114376415,
+    "cmd": "/usr/bin/bwrap --unshare-user --unshare-pid --unshare-ipc --unshare-uts --unshare-cgroup-try --share-net --disable-userns --die-with-parent --new-session --cap-"
+   },
+   {
+    "pid": 106,
+    "state": "S",
+    "ppid": 12,
+    "pgid": 106,
+    "sid": 106,
+    "start": 114376400,
+    "cmd": "/usr/local/bin/python3 -P /repo/aisef2/runtime/range_anchor.py"
+   },
+   {
+    "pid": 12,
+    "state": "R",
+    "ppid": 7,
+    "pgid": 7,
+    "sid": 1,
+    "start": 114375851,
+    "cmd": "python3 -B /repo/validation/v21/sandbox/linux_guest.py a"
+   }
+  ],
+  "range": {
+   "anchor_pid_and_group": 106,
+   "target_bwrap": 108,
+   "members": [
+    [
+     108,
+     "/usr/bin/bwrap --unshare-user --unshare-pid --unshare-ipc --unshare-uts --unshar"
+    ]
+   ],
+   "escaped": [
+    [
+     110,
+     "/usr/bin/bwrap --unshare-user --unshare-pid --unshare-ipc --unshare-uts --unshar"
+    ]
+   ],
+   "session_processes": [
+    [
+     108,
+     114376415
+    ],
+    [
+     110,
+     114376416
+    ],
+    [
+     112,
+     114376416
+    ],
+    [
+     113,
+     114376416
+    ],
+    [
+     119,
+     114376437
+    ]
+   ]
+  },
+  "proof_of_the_outside_pid": {
+   "signalled": [
+    {
+     "kind": "pid",
+     "id": 113,
+     "proof": {
+      "pid": 113,
+      "ppid": 112,
+      "pgid": 113,
+      "born": 1791450645.0,
+      "runner": 12,
+      "since": 1791450640.0,
+      "command": "sleep 3600.435209"
+     }
+    }
+   ],
+   "unproven": []
+  },
+  "inside_pids_claimed": {
+   "claimed": [
+    2,
+    3
+   ],
+   "what_they_name_outside": {
+    "2": null,
+    "3": null
+   },
+   "dry_run": {
+    "signalled": [],
+    "unproven": [
+     {
+      "kind": "pid",
+      "id": 2,
+      "why": "not in the host table"
+     },
+     {
+      "kind": "pid",
+      "id": 3,
+      "why": "not in the host table"
+     }
+    ]
+   }
+  },
+  "release": {
+   "raised": null,
+   "ledger": [
+    "cooperative"
+   ]
+  },
+  "after_release": {
+   "seconds": 0.0,
+   "still_alive": [],
+   "zombies": []
+  },
+  "marker_in_table_after": []
+ },
+ "measure": {
+  "problems": [],
+  "setsid_survivors": [],
+  "left_on_host": [],
+  "bwrap_version": "bubblewrap 0.12.0",
+  "bwrap_sha256": "b3b829e18a7d43ee589dc37e351cb9480ff7301b493d8227b8c754294638b976",
+  "operator_can": {
+   "write_run_directory": true,
+   "write_kernel": false,
+   "write_interpreter_site": false,
+   "write_client_directory": true,
+   "write_git_directory": true
+  },
+  "created_outside_workspace": {
+   "run_directory": false,
+   "kernel": false,
+   "interpreter_site": false,
+   "client_directory": false,
+   "git_directory": false
+  },
+  "tried_writes": {
+   "write_run_directory": {
+    "exit": 0,
+    "output": ""
+   },
+   "write_kernel": {
+    "exit": 2,
+    "output": "probe: 11: cannot create /repo/aisef2/.aisef-confine-probe-37db7145fedb22db: Directory nonexistent"
+   },
+   "write_interpreter_site": {
+    "exit": 2,
+    "output": "probe: 12: cannot create /usr/local/lib/python3.14/site-packages/.aisef-confine-probe-37db7145fedb22db: Read-only file system"
+   },
+   "write_client_directory": {
+    "exit": 2,
+    "output": "probe: 13: cannot create /tmp/a-measure/client/.aisef-confine-probe-37db7145fedb22db: Read-only file system"
+   },
+   "write_git_directory": {
+    "exit": 2,
+    "output": "probe: 14: cannot create /tmp/a-measure/repo/.git/.aisef-confine-probe-37db7145fedb22db: Read-only file system"
+   }
+  },
+  "namespaces": {
+   "user": "own",
+   "pid": "own",
+   "net": "shared",
+   "ipc": "own",
+   "uts": "own",
+   "mnt": "own"
+  },
+  "tried_setsid": {
+   "exit": 0,
+   "output": ""
+  }
+ },
+ "measure_venv": {
+  "control_without_bubblewrap": {
+   "bwrap": "test_v21_confine.NOT_A_SANDBOX (runs the probe unconfined)",
+   "tmp": "/tmp/a-control_without_bubblewrap-w6vfpl53",
+   "venv_site": "/tmp/a-control_without_bubblewrap-w6vfpl53/venv/lib/python3.14/site-packages",
+   "probe_calls": [
+    [
+     "120.068312",
+     60
+    ]
+   ],
+   "problems": [
+    "a file of the run directory was readable",
+    "a file was created in the run directory",
+    "a file was created in the kernel",
+    "a file was created in the interpreter site",
+    "a file was created in the client directory",
+    "a file was created in the git directory",
+    "a user namespace could be created",
+    "a process the session left outlived it: [203]",
+    "NoNewPrivs is 0, not 1",
+    "the user namespace is not the session's own (shared)",
+    "the pid namespace is not the session's own (shared)",
+    "the ipc namespace is not the session's own (shared)",
+    "the uts namespace is not the session's own (shared)",
+    "the mnt namespace is not the session's own (shared)",
+    "mounted beyond what the wrapper names: ['/sys', '/sys/fs/cgroup', '/repo']",
+    "writable outside the workspace: ['/', '/etc/hostname', '/etc/hosts', '/etc/resolv.conf']",
+    "HOME shows more than the way to what is mounted: ['bwrap', 'child', 'client', 'measure.json', 'measure.log', 'run', 'venv']",
+    "the probe's files are left where confinement did not stop them; nothing was removed, the operator removes them: ['/tmp/a-control_without_bubblewrap-w6vfpl53/run/confinement/written-8a3b80939b5c9798', '/tmp/a-control_without_bubblewrap-w6vfpl53/venv/lib/python3.14/site-packages/aisef2/.aisef-confine-probe-8a3b80939b5c9798', '/tmp/a-control_without_bubblewrap-w6vfpl53/venv/lib/python3.14/site-packages/.aisef-confine-probe-8a3b80939b5c9798', '/tmp/a-control_without_bubblewrap-w6vfpl53/client/.aisef-confine-probe-8a3b80939b5c9798', '/tmp/a-control_without_bubblewrap-w6vfpl53/run/confinement/repo/.git/.aisef-confine-probe-8a3b80939b5c9798']"
+   ],
+   "setsid_survivors": [
+    203
+   ],
+   "left_on_host": [
+    "/tmp/a-control_without_bubblewrap-w6vfpl53/run/confinement/written-8a3b80939b5c9798",
+    "/tmp/a-control_without_bubblewrap-w6vfpl53/venv/lib/python3.14/site-packages/aisef2/.aisef-confine-probe-8a3b80939b5c9798",
+    "/tmp/a-control_without_bubblewrap-w6vfpl53/venv/lib/python3.14/site-packages/.aisef-confine-probe-8a3b80939b5c9798",
+    "/tmp/a-control_without_bubblewrap-w6vfpl53/client/.aisef-confine-probe-8a3b80939b5c9798",
+    "/tmp/a-control_without_bubblewrap-w6vfpl53/run/confinement/repo/.git/.aisef-confine-probe-8a3b80939b5c9798"
+   ],
+   "bwrap_version": "",
+   "bwrap_sha256": "d611b68d44f9836c0d0725e54311d3d6b9a40502297d4899a62774f80e047112",
+   "operator_can": {
+    "write_run_directory": true,
+    "write_kernel": true,
+    "write_interpreter_site": true,
+    "write_client_directory": true,
+    "write_git_directory": true
+   },
+   "created_outside_workspace": {
+    "run_directory": true,
+    "kernel": true,
+    "interpreter_site": true,
+    "client_directory": true,
+    "git_directory": true
+   },
+   "tried_writes": {
+    "write_run_directory": {
+     "exit": 0,
+     "output": ""
+    },
+    "write_kernel": {
+     "exit": 0,
+     "output": ""
+    },
+    "write_interpreter_site": {
+     "exit": 0,
+     "output": ""
+    },
+    "write_client_directory": {
+     "exit": 0,
+     "output": ""
+    },
+    "write_git_directory": {
+     "exit": 0,
+     "output": ""
+    }
+   },
+   "namespaces": {
+    "user": "shared",
+    "pid": "shared",
+    "net": "shared",
+    "ipc": "shared",
+    "uts": "shared",
+    "mnt": "shared"
+   },
+   "tried_setsid": {
+    "exit": 0,
+    "output": ""
+   }
+  },
+  "bubblewrap": {
+   "bwrap": "/usr/bin/bwrap",
+   "tmp": "/tmp/a-bubblewrap-oi8qer8r",
+   "venv_site": "/tmp/a-bubblewrap-oi8qer8r/venv/lib/python3.14/site-packages",
+   "probe_calls": [
+    [
+     "120.036309",
+     60
+    ]
+   ],
+   "problems": [],
+   "setsid_survivors": [],
+   "left_on_host": [],
+   "bwrap_version": "bubblewrap 0.12.0",
+   "bwrap_sha256": "b3b829e18a7d43ee589dc37e351cb9480ff7301b493d8227b8c754294638b976",
+   "operator_can": {
+    "write_run_directory": true,
+    "write_kernel": true,
+    "write_interpreter_site": true,
+    "write_client_directory": true,
+    "write_git_directory": true
+   },
+   "created_outside_workspace": {
+    "run_directory": false,
+    "kernel": false,
+    "interpreter_site": false,
+    "client_directory": false,
+    "git_directory": false
+   },
+   "tried_writes": {
+    "write_run_directory": {
+     "exit": 0,
+     "output": ""
+    },
+    "write_kernel": {
+     "exit": 2,
+     "output": "probe: 11: cannot create /tmp/a-bubblewrap-oi8qer8r/venv/lib/python3.14/site-packages/aisef2/.aisef-confine-probe-55820035597f3895: Directory nonexistent"
+    },
+    "write_interpreter_site": {
+     "exit": 2,
+     "output": "probe: 12: cannot create /tmp/a-bubblewrap-oi8qer8r/venv/lib/python3.14/site-packages/.aisef-confine-probe-55820035597f3895: Directory nonexistent"
+    },
+    "write_client_directory": {
+     "exit": 2,
+     "output": "probe: 13: cannot create /tmp/a-bubblewrap-oi8qer8r/client/.aisef-confine-probe-55820035597f3895: Read-only file system"
+    },
+    "write_git_directory": {
+     "exit": 2,
+     "output": "probe: 14: cannot create /tmp/a-bubblewrap-oi8qer8r/run/confinement/repo/.git/.aisef-confine-probe-55820035597f3895: Read-only file system"
+    }
+   },
+   "namespaces": {
+    "user": "own",
+    "pid": "own",
+    "net": "shared",
+    "ipc": "own",
+    "uts": "own",
+    "mnt": "own"
+   },
+   "tried_setsid": {
+    "exit": 0,
+    "output": ""
+   }
+  }
+ },
+ "foreign": {
+  "claimed_pids": [
+   1,
+   7,
+   9,
+   10,
+   25
+  ],
+  "claimed_groups": [
+   1,
+   7,
+   10
+  ],
+  "host_rows": {
+   "1": {
+    "pid": 1,
+    "ppid": 0,
+    "pgid": 1,
+    "born": 1791450639.0,
+    "command": "/sbin/docker-init -- sh -c mkdir -p /tmp/g; H=/repo/validation/v21/sandbox/linux_guest.py python3 -B $H canary early & setsid python3 -B $H canary early-setsid & (until [ -e /tmp/g/boundary ]; do sleep 0.1; done; sleep 1.5; python3 -B $H canary late & wait) & python3 -B $H \"$0\" a"
+   },
+   "7": {
+    "pid": 7,
+    "ppid": 1,
+    "pgid": 7,
+    "born": 1791450639.0,
+    "command": "sh -c mkdir -p /tmp/g; H=/repo/validation/v21/sandbox/linux_guest.py python3 -B $H canary early & setsid python3 -B $H canary early-setsid & (until [ -e /tmp/g/boundary ]; do sleep 0.1; done; sleep 1.5; python3 -B $H canary late & wait) & python3 -B $H \"$0\" a"
+   },
+   "9": {
+    "pid": 9,
+    "ppid": 7,
+    "pgid": 7,
+    "born": 1791450639.0,
+    "command": "python3 -B /repo/validation/v21/sandbox/linux_guest.py canary early"
+   },
+   "10": {
+    "pid": 10,
+    "ppid": 7,
+    "pgid": 10,
+    "born": 1791450639.0,
+    "command": "python3 -B /repo/validation/v21/sandbox/linux_guest.py canary early-setsid"
+   },
+   "25": {
+    "pid": 25,
+    "ppid": 11,
+    "pgid": 7,
+    "born": 1791450642.0,
+    "command": "python3 -B /repo/validation/v21/sandbox/linux_guest.py canary late"
+   }
+  },
+  "signalled": [],
+  "unproven": [
+   {
+    "kind": "group",
+    "id": 1,
+    "why": "born before the boundary or not a descendant of the runner"
+   },
+   {
+    "kind": "group",
+    "id": 7,
+    "why": "born before the boundary or not a descendant of the runner"
+   },
+   {
+    "kind": "group",
+    "id": 10,
+    "why": "born before the boundary or not a descendant of the runner"
+   },
+   {
+    "kind": "pid",
+    "id": 1,
+    "why": "born before the boundary or not a descendant of the runner"
+   },
+   {
+    "kind": "pid",
+    "id": 7,
+    "why": "born before the boundary or not a descendant of the runner"
+   },
+   {
+    "kind": "pid",
+    "id": 9,
+    "why": "born before the boundary or not a descendant of the runner"
+   },
+   {
+    "kind": "pid",
+    "id": 10,
+    "why": "born before the boundary or not a descendant of the runner"
+   },
+   {
+    "kind": "pid",
+    "id": 25,
+    "why": "born before the boundary or not a descendant of the runner"
+   }
+  ],
+  "canaries_after": {
+   "early": {
+    "pid": 9,
+    "alive_same_start": true,
+    "signals_received": []
+   },
+   "early-setsid": {
+    "pid": 10,
+    "alive_same_start": true,
+    "signals_received": []
+   },
+   "late": {
+    "pid": 25,
+    "alive_same_start": true,
+    "signals_received": []
+   }
+  }
+ }
+}

@@ -1,5 +1,16 @@
 # Linux guest checks, 2026-10-08 (V2.1 F; owner item 5)
 
+> **Superseded** by round 2, [`../linux-guest-2026-10-08-r2/`](../linux-guest-2026-10-08-r2/README.md) (tree
+> `f9249f5`, every check re-run in the same container configuration). The files here are kept unchanged as the
+> round-1 record. Read with the round-1 verifier's findings: check a4's kernel and interpreter-site denials did not
+> discriminate (uid 1000 cannot write `/repo` or the image's site-packages even without bubblewrap); the inside pids
+> 2 and 3 were refused only because nothing in the container has those numbers; "only through a proof" overstates
+> what was shown (no other route was tried); the session's `ProcessRange` used `grace_s=(1.0, 1.0)`, `wait_s=10.0`
+> and an argv without `--model`/`--title`/`--dir`, not `client.session`'s; in (c) the outer bwrap's parent is the
+> anchor, so the anchor's watchdog and `--die-with-parent` act in series, and in c2 the pipes are a second possible
+> route; `environment.txt` lacks the component versions and the procps source's Debian 13.6; d's evidence is only
+> its transcripts. And since `58683e8`, `teardown_race.py` signals nothing (the last bullet below).
+
 What these files are: the output of `validation/v21/sandbox/linux_guest.sh` (harness `linux_guest.py`), run once,
 on 2026-10-08 about 15:10 +07, against the tree at commit `860c02a`. They cover the sandbox checks that had never run
 on Linux: (a) a setsid descendant of a confined session, (b) how the tests identify a process they own, (c) cleanup

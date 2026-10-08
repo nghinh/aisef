@@ -1,0 +1,224 @@
+{
+ "boundary": {
+  "runner": 13,
+  "since": 1791450652.0,
+  "root": "/tmp"
+ },
+ "runner": {
+  "pid": 13,
+  "state": "R",
+  "ppid": 8,
+  "pgid": 8,
+  "sid": 1,
+  "start": 114377076,
+  "cmd": "python3 -B /repo/validation/v21/sandbox/linux_guest.py b"
+ },
+ "signal_owned_calls": [
+  {
+   "boundary": {
+    "runner": 13,
+    "since": 1791450656.0,
+    "root": "/tmp/b-hav_24o3"
+   },
+   "claimed": [
+    67
+   ],
+   "groups": [],
+   "host_rows": {
+    "67": {
+     "pid": 67,
+     "ppid": 30,
+     "pgid": 67,
+     "born": 1791450657.0,
+     "command": "sleep 120.365992"
+    }
+   },
+   "harness_view": {
+    "67": [
+     {
+      "pid": 67,
+      "state": "S",
+      "ppid": 30,
+      "pgid": 67,
+      "sid": 67,
+      "start": 114377622,
+      "cmd": "sleep 120.365992"
+     },
+     {
+      "pid": 30,
+      "state": "S",
+      "ppid": 13,
+      "pgid": 30,
+      "sid": 30,
+      "start": 114377529,
+      "cmd": "/usr/local/bin/python3 -P /repo/aisef2/runtime/range_anchor.py"
+     },
+     {
+      "pid": 13,
+      "state": "R",
+      "ppid": 8,
+      "pgid": 8,
+      "sid": 1,
+      "start": 114377076,
+      "cmd": "python3 -B /repo/validation/v21/sandbox/linux_guest.py b"
+     }
+    ]
+   },
+   "signalled": [
+    {
+     "kind": "pid",
+     "id": 67,
+     "proof": {
+      "pid": 67,
+      "ppid": 30,
+      "pgid": 67,
+      "born": 1791450657.0,
+      "runner": 13,
+      "since": 1791450656.0,
+      "command": "sleep 120.365992"
+     }
+    }
+   ],
+   "unproven": []
+  }
+ ],
+ "measurement_reported_survivors": [
+  67
+ ],
+ "probe_calls": [
+  [
+   "120.365992",
+   60
+  ]
+ ],
+ "left_on_host": [
+  "/tmp/b-hav_24o3/run/confinement/written-88547cf88e9e48a8",
+  "/tmp/b-hav_24o3/venv/lib/python3.14/site-packages/aisef2/.aisef-confine-probe-88547cf88e9e48a8",
+  "/tmp/b-hav_24o3/venv/lib/python3.14/site-packages/.aisef-confine-probe-88547cf88e9e48a8",
+  "/tmp/b-hav_24o3/client/.aisef-confine-probe-88547cf88e9e48a8",
+  "/tmp/b-hav_24o3/run/confinement/repo/.git/.aisef-confine-probe-88547cf88e9e48a8"
+ ],
+ "venv_site": "/tmp/b-hav_24o3/venv/lib/python3.14/site-packages",
+ "signalled_alive_after": [],
+ "reported_claimed_again_after": {
+  "signalled": [],
+  "unproven": [
+   {
+    "kind": "pid",
+    "id": 67,
+    "why": "not in the host table"
+   }
+  ]
+ },
+ "foreign": {
+  "claimed_pids": [
+   1,
+   8,
+   10,
+   11,
+   26
+  ],
+  "claimed_groups": [
+   1,
+   8,
+   11
+  ],
+  "host_rows": {
+   "1": {
+    "pid": 1,
+    "ppid": 0,
+    "pgid": 1,
+    "born": 1791450651.0,
+    "command": "/sbin/docker-init -- sh -c mkdir -p /tmp/g; H=/repo/validation/v21/sandbox/linux_guest.py python3 -B $H canary early & setsid python3 -B $H canary early-setsid & (until [ -e /tmp/g/boundary ]; do sleep 0.1; done; sleep 1.5; python3 -B $H canary late & wait) & python3 -B $H \"$0\" b"
+   },
+   "8": {
+    "pid": 8,
+    "ppid": 1,
+    "pgid": 8,
+    "born": 1791450651.0,
+    "command": "sh -c mkdir -p /tmp/g; H=/repo/validation/v21/sandbox/linux_guest.py python3 -B $H canary early & setsid python3 -B $H canary early-setsid & (until [ -e /tmp/g/boundary ]; do sleep 0.1; done; sleep 1.5; python3 -B $H canary late & wait) & python3 -B $H \"$0\" b"
+   },
+   "10": {
+    "pid": 10,
+    "ppid": 8,
+    "pgid": 8,
+    "born": 1791450651.0,
+    "command": "python3 -B /repo/validation/v21/sandbox/linux_guest.py canary early"
+   },
+   "11": {
+    "pid": 11,
+    "ppid": 8,
+    "pgid": 11,
+    "born": 1791450651.0,
+    "command": "python3 -B /repo/validation/v21/sandbox/linux_guest.py canary early-setsid"
+   },
+   "26": {
+    "pid": 26,
+    "ppid": 12,
+    "pgid": 8,
+    "born": 1791450654.0,
+    "command": "python3 -B /repo/validation/v21/sandbox/linux_guest.py canary late"
+   }
+  },
+  "signalled": [],
+  "unproven": [
+   {
+    "kind": "group",
+    "id": 1,
+    "why": "born before the boundary or not a descendant of the runner"
+   },
+   {
+    "kind": "group",
+    "id": 8,
+    "why": "born before the boundary or not a descendant of the runner"
+   },
+   {
+    "kind": "group",
+    "id": 11,
+    "why": "born before the boundary or not a descendant of the runner"
+   },
+   {
+    "kind": "pid",
+    "id": 1,
+    "why": "born before the boundary or not a descendant of the runner"
+   },
+   {
+    "kind": "pid",
+    "id": 8,
+    "why": "born before the boundary or not a descendant of the runner"
+   },
+   {
+    "kind": "pid",
+    "id": 10,
+    "why": "born before the boundary or not a descendant of the runner"
+   },
+   {
+    "kind": "pid",
+    "id": 11,
+    "why": "born before the boundary or not a descendant of the runner"
+   },
+   {
+    "kind": "pid",
+    "id": 26,
+    "why": "born before the boundary or not a descendant of the runner"
+   }
+  ],
+  "canaries_after": {
+   "early": {
+    "pid": 10,
+    "alive_same_start": true,
+    "signals_received": []
+   },
+   "early-setsid": {
+    "pid": 11,
+    "alive_same_start": true,
+    "signals_received": []
+   },
+   "late": {
+    "pid": 26,
+    "alive_same_start": true,
+    "signals_received": []
+   }
+  }
+ }
+}
