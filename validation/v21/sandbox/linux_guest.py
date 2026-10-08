@@ -4,27 +4,38 @@ Runs INSIDE a Docker Desktop Linux container, started by linux_guest.sh (which s
 the host. The tree is mounted read-only at /repo and the container is discarded (--rm). Roles (argv[1]):
 
   canary NAME   a process the checks did not start (the entry shell starts it): records every catchable signal it gets
-  a             a setsid descendant of a confined session, started the way client.session starts one (confine.wrap,
-                then a ProcessRange whose target is bubblewrap): seen from outside, provable only through
-                cleanup_authority, gone with the session — when the client ends ("end"), when cleanup_authority
-                signals the pid it proved before the client ends ("proved"), and when the range's release ladder stops
-                a running one ("release"); plus one confine.measure with the real bubblewrap
+  a             a setsid descendant of a confined session, started with client.session's own calls (the argv it
+                builds, confine.wrap, then ProcessRange(name, argv, cwd=, env=, output=) with the defaults — grace
+                GRACE_S, no final-wait bound — and start(); the harness then waits with r.wait, not wait_within):
+                seen from outside, proved by cleanup_authority (no other route to signal it is tried), gone with the
+                session — when the client ends ("end"), when cleanup_authority signals the pid it proved before the
+                client ends ("proved"), and when the range's release ladder stops a running one ("release"); the pids
+                the session sees inside claimed, and pids that DO exist outside but are not the session's claimed as
+                if reported from inside (a sibling the harness started, the canaries); then confine.measure with the
+                real bubblewrap twice: the kernel at /repo as a run imports it, and a venv in the container's own
+                layer whose kernel copy and site the container user can write — measured once without bubblewrap
+                (the control: every probe write lands) and once with it
   b             the route test_v21_confine.measure_in_range takes for an unconfined probe's setsid sleeper — the
                 range's anchor, a subreaper, adopts it; cleanup_authority proves ancestry and birth; signal_owned
                 signals it — run through that very function, every signal_owned call recorded with its proof
   c             the controller SIGKILLed while a confined session and its setsid descendant run: the kernel's session
                 owner (client.session) and the python that called confine.measure (in-process, as run.execute does)
+  d1            tests.v2.test_v21_confine whole, with recorders around measure_in_range, cleanup_authority.signal_owned
+                and host_view/host_unchanged (each calls the real one): per test its outcome, what each measurement
+                built and proved, and which of the roots host_unchanged compares this user could have written
   ctl-session ARGS / ctl-measure ARGS   the controllers c starts and kills
 
 a, b and c also claim the processes the checks did not start (docker-init, the entry shell, the canaries) through a
 LIVE cleanup_authority.signal_owned: none may be signalled, and each canary must still be alive with no signal logged.
 Prints one JSON object. It signals only the controllers it started (its own Popen handles) and what cleanup_authority
 proves (INV-MUTATION-AUTHORITY); it removes nothing. Never runs opencode; the container has no network."""
+import contextlib
 import dataclasses
 import json
 import os
 import pathlib
 import secrets
+import shutil
 import signal
 import subprocess
 import sys
@@ -34,7 +45,7 @@ import time
 REPO = pathlib.Path("/repo")
 sys.path[:0] = [str(REPO), str(REPO / "validation" / "v2")]
 from aisef2.app import client, confine  # noqa: E402
-from aisef2.runtime.process_range import ProcessRange, RangeEscaped, RangeNotEmpty  # noqa: E402
+from aisef2.runtime.process_range import GRACE_S, ProcessRange, RangeEscaped, RangeNotEmpty  # noqa: E402
 import cleanup_authority as ca  # noqa: E402
 
 G = pathlib.Path("/tmp/g")  # shared with the entry shell: the canaries' pid files, the boundary mark
@@ -217,22 +228,50 @@ def check_a() -> dict:
     b, can = establish()
     out = {"boundary": dataclasses.asdict(b), "runner": stat(os.getpid())}
     for mode in ("end", "proved", "release"):
-        out[mode] = session_a(b, mode)
+        out[mode] = session_a(b, can, mode)
     w = world(pathlib.Path("/tmp/a-measure"))
-    rep = confine.measure(SPEC, pathlib.Path(w["base"]) / "m", w["exe"], pathlib.Path(w["repo"]), environ=w["env"])
-    out["measure"] = {k: rep.get(k) for k in ("problems", "setsid_survivors", "left_on_host", "bwrap_version", "bwrap_sha256")}
-    out["measure"]["namespaces"] = rep.get("inside", {}).get("namespaces")
-    out["measure"]["tried_setsid"] = rep.get("tried", {}).get("setsid")
+    # the kernel as a run imports it (/repo, read-only here) and this interpreter's site (root's): the container user
+    # cannot write either even without bubblewrap (operator_can), so those two denials are not bubblewrap's
+    out["measure"] = summary(confine.measure(SPEC, pathlib.Path(w["base"]) / "m", w["exe"], pathlib.Path(w["repo"]),
+                                             environ=w["env"]))
+    # discriminating: the tests' own construction (a venv in the container's writable layer, a copy of aisef2 in its
+    # site), so the kernel copy, the site, the run, client and git directories are all the container user's
+    import tests.v2.test_v21_confine as tc
+    out["measure_venv"] = {}
+    for name, bwrap in (("control_without_bubblewrap", None), ("bubblewrap", SPEC["bwrap"])):
+        tmp = pathlib.Path(os.path.realpath(tempfile.mkdtemp(prefix=f"a-{name}-", dir="/tmp")))
+        exe = tmp / "client" / "opencode"
+        exe.parent.mkdir()
+        exe.write_text("#!/bin/sh\n", encoding="utf-8")
+        rep, probes, site = tc.measure_in_range(tmp, dict(SPEC, bwrap=bwrap or str(tc.fake_bwrap(tmp))),
+                                                tmp / "run" / "confinement", exe)
+        out["measure_venv"][name] = {"bwrap": bwrap or "test_v21_confine.NOT_A_SANDBOX (runs the probe unconfined)",
+                                     "tmp": str(tmp), "venv_site": str(site), "probe_calls": probes, **summary(rep)}
     out["foreign"] = foreign(b, can)
     return out
 
 
-def session_a(b: ca.Boundary, mode: str) -> dict:
+def summary(rep: dict) -> dict:
+    """What a measurement says about each write it tried: could the container user write there without bubblewrap
+    (the product's own operator_can), did the probe's file appear (created_outside_workspace), and the probe's exit
+    and message for it."""
+    tried = rep.get("tried", {})
+    return {**{k: rep.get(k) for k in ("problems", "setsid_survivors", "left_on_host", "bwrap_version", "bwrap_sha256",
+                                       "operator_can", "created_outside_workspace")},
+            "tried_writes": {k: tried.get(k) for k in tried if k.startswith("write_")},
+            "namespaces": rep.get("inside", {}).get("namespaces"), "tried_setsid": tried.get("setsid")}
+
+
+def session_a(b: ca.Boundary, can: dict, mode: str) -> dict:
     w = world(pathlib.Path(f"/tmp/a-{mode}"))
-    argv, env = confine.wrap(SPEC, [w["exe"], "run", "--format", "json", "the prompt"], w["env"], w["ws"], w["exe"])
-    rec: dict = {"argv": argv}
+    name = f"a-{mode}"      # client.session's argv, then its wrap and its ProcessRange call (client.py, session())
+    command = [w["exe"], "run", "--format", "json", "--model", "fake/model", "--title", name, "--dir", w["ws"], "the prompt"]
+    argv, env = confine.wrap(SPEC, command, w["env"], w["ws"], w["exe"])
+    rec: dict = {"argv": argv, "process_range": {"name": name, "cwd": w["ws"], "grace_s": list(GRACE_S), "wait_s": None,
+                                                 "waited_with": "r.wait(30), not client.wait_within"}}
     with open(pathlib.Path(w["base"]) / "session.log", "w", encoding="utf-8") as fh:
-        r = ProcessRange(f"a-{mode}", argv, cwd=w["ws"], env=env, output=fh, grace_s=(1.0, 1.0), wait_s=10.0).start()
+        r = ProcessRange(name, argv, cwd=w["ws"], env=env, output=fh)
+        r.start()
         try:
             if not until(lambda: pathlib.Path(w["ws"], "inside.txt").exists(), 20):
                 rec["error"] = "the client did not report"
@@ -249,6 +288,8 @@ def session_a(b: ca.Boundary, mode: str) -> dict:
             claimed = [int(rec["inside"]["client"]), int(rec["inside"]["sleeper"])]
             rec["inside_pids_claimed"] = {"claimed": claimed, "what_they_name_outside": {p: t.get(p) for p in claimed},
                                           "dry_run": report(ca.signal_owned(b, pids=claimed, dry_run=True))}
+            if mode == "end":
+                rec["inside_pid_collision"] = collision(b, can)
             if mode == "proved":     # LIVE: what cleanup_authority proved, it signals; the session goes on
                 rec["proved_signal"] = report(ca.signal_owned(b, pids=[s["pid"]]))
                 rec["sleeper_after_proved_signal"] = gone_within([ident(s)], 2.0)
@@ -266,6 +307,23 @@ def session_a(b: ca.Boundary, mode: str) -> dict:
     rec["after_release"] = gone_within(session, 2.0)
     rec["marker_in_table_after"] = [p for p in table().values() if w["marker"] in p["cmd"]]
     return rec
+
+
+def collision(b: ca.Boundary, can: dict) -> dict:
+    """The inside pids above name nothing in this container's table, so their refusal says only that. Here pids that
+    DO exist outside and are not the session's are claimed as a report from inside would claim them, in a dry run:
+    the canaries (not the runner's: refused on birth and descent) and a sibling this harness starts now (the runner's
+    own child, born after the boundary: cleanup_authority proves it — it proves ownership by the runner, not
+    membership of the session). The sibling is waited for, never signalled."""
+    sib = subprocess.Popen(["sleep", "1.5"])
+    try:
+        t = ca.host_table()
+        pids = [sib.pid, *[can[n][0] for n in CANARIES]]
+        return {"sibling": dataclasses.asdict(t[sib.pid]) if sib.pid in t else None,
+                "claimed": {"sibling": sib.pid, **{n: can[n][0] for n in CANARIES}},
+                "dry_run": report(ca.signal_owned(b, pids=pids, dry_run=True, table=t))}
+    finally:
+        sib.wait()
 
 
 def check_b() -> dict:
@@ -296,6 +354,78 @@ def check_b() -> dict:
             "venv_site": str(site), "signalled_alive_after": [i for i in signalled if alive(i)],
             "reported_claimed_again_after": report(ca.signal_owned(b, pids=rep["setsid_survivors"], dry_run=True)),
             "foreign": foreign(b, can)}
+
+
+def check_d1() -> dict:
+    """tests.v2.test_v21_confine whole (the tests `python -m unittest tests.v2.test_v21_confine` loads), with
+    recorders that call the real functions: what each measure_in_range built (its venv site, the probe's call, what
+    it reported), every cleanup_authority.signal_owned call with its proof and this harness's own reading of the
+    claimed pid's parent chain, what host_view watched — with whether this user could write each root at all — and
+    every host_unchanged comparison. Nothing is signalled here but by the tests' own route."""
+    import unittest
+    import tests.v2.test_v21_confine as tc
+    assert tc.ca is ca
+    now, out = [None], {"measure_in_range": [], "signal_owned": [], "host_view": None, "host_view_calls": 0,
+                        "host_unchanged": []}
+    real = {"mir": tc.measure_in_range, "so": ca.signal_owned, "view": tc.host_view, "same": tc.host_unchanged}
+
+    def mir(tmp, spec, where, exe):
+        rec = {"test": now[0], "tmp": str(tmp), "bwrap": spec["bwrap"]}
+        with contextlib.suppress(OSError):
+            rec["bwrap_is"] = {tc.RUNS_NOTHING: "RUNS_NOTHING", tc.NOT_A_SANDBOX: "NOT_A_SANDBOX"}.get(
+                pathlib.Path(spec["bwrap"]).read_text(encoding="utf-8"), "another script")
+        out["measure_in_range"].append(rec)
+        try:
+            rep, probes, site = real["mir"](tmp, spec, where, exe)
+        except BaseException as e:
+            rec["raised"] = f"{type(e).__name__}: {str(e)[:300]}"
+            raise
+        rec.update(venv_site=str(site), probe_calls=probes, setsid_survivors=rep["setsid_survivors"],
+                   left_on_host=rep["left_on_host"], created_outside_workspace=rep.get("created_outside_workspace"))
+        return rep, probes, site
+
+    def so(boundary, pids=(), groups=(), **k):
+        mine = table()
+        r = real["so"](boundary, pids=pids, groups=groups, **k)
+        out["signal_owned"].append({"test": now[0], "claimed": list(pids), "groups": list(groups), **report(r),
+                                    "harness_view": {p: chain(mine, p)[:3] for p in pids}})
+        return r
+
+    def view():
+        v = real["view"]()
+        out["host_view_calls"] += 1
+        if out["host_view"] is None:
+            roots = {k: (str(REPO / "aisef2") if k == "kernel" else k.split(" ", 1)[1]) for k in v["exact"]}
+            roots.update({k: k.split(" ", 1)[1] for k in v["names"]})
+            out["host_view"] = {k: {"entries": len((v["exact"] | v["names"])[k]), "this_user_can_write": os.access(p, os.W_OK)}
+                                for k, p in roots.items()}
+        return v
+
+    def same(before):
+        try:
+            real["same"](before)
+            out["host_unchanged"].append({"test": now[0], "unchanged": True})
+        except AssertionError as e:
+            out["host_unchanged"].append({"test": now[0], "unchanged": False, "said": str(e)[:300]})
+            raise
+
+    class Result(unittest.TestResult):
+        def startTest(self, test):
+            now[0] = test.id().split(".", 3)[-1]
+            super().startTest(test)
+    tc.measure_in_range, ca.signal_owned, tc.host_view, tc.host_unchanged = mir, so, view, same
+    try:
+        result = Result()
+        with contextlib.redirect_stdout(sys.stderr):
+            unittest.defaultTestLoader.loadTestsFromModule(tc).run(result)
+    finally:
+        tc.measure_in_range, ca.signal_owned, tc.host_view, tc.host_unchanged = real["mir"], real["so"], real["view"], real["same"]
+    out["result"] = {"ran": result.testsRun, "failures": [t.id() for t, _ in result.failures],
+                     "errors": [t.id() for t, _ in result.errors], "skipped": [t.id() for t, _ in result.skipped],
+                     "details": [s[-600:] for _, s in result.failures + result.errors]}
+    out["platform"] = {"sys.platform": sys.platform, "setsid": shutil.which("setsid"), "ps": shutil.which("ps"),
+                       "uid": os.getuid(), "HOME": os.environ.get("HOME")}
+    return out
 
 
 def check_c() -> dict:
@@ -383,4 +513,4 @@ if __name__ == "__main__":
     elif role.startswith("ctl-"):
         {"ctl-session": ctl_session, "ctl-measure": ctl_measure}[role](json.loads(sys.argv[2]))
     else:
-        print(json.dumps({"a": check_a, "b": check_b, "c": check_c}[role](), indent=1, default=str))
+        print(json.dumps({"a": check_a, "b": check_b, "c": check_c, "d1": check_d1}[role](), indent=1, default=str))
