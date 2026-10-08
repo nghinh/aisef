@@ -295,6 +295,21 @@ class OwnGit(unittest.TestCase):
             self.assertEqual((result.testsRun, result.errors, result.failures), (1, [], []))
             self.assertEqual(_entries(str(bait / ".git"), True), before)
 
+    def test_a_hook_in_the_tests_repository_never_runs(self):
+        """A git whose compiled-in template directory carries an executable hook copies it into every repository a test
+        initialises (GIT_TEMPLATE_DIR and the configuration are not read; that directory is): app_run.git runs git with
+        the hook path the null device, as the runner's own git does, so no hook in a test's repository runs."""
+        with tempfile.TemporaryDirectory() as t:
+            repo = pathlib.Path(t) / "r"
+            repo.mkdir()
+            app_run.git(repo, "init", "-q", "-b", "main")
+            hook = repo / ".git" / "hooks" / "pre-commit"
+            hook.parent.mkdir(exist_ok=True)
+            hook.write_text("#!/bin/sh\necho ran > hook-ran\n", encoding="utf-8")
+            hook.chmod(0o755)
+            app_run.git(repo, "commit", "-q", "--allow-empty", "-m", "base")
+            self.assertFalse((repo / "hook-ran").exists())
+
 
 class Setting(unittest.TestCase):
     def test_absent_is_none_and_given_is_kept(self):
