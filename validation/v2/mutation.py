@@ -692,12 +692,17 @@ V21_TARGETS.update({
     # test_c2_effect_calibration.py: it imports validation/qualification, which the mutation copy does not hold (preflight)
     "aisef2/probe/python_callable_v2.py::DIGEST": [_V21_ID, *_C2_P4_TESTS],
 })
-# campaign 1's survivors (closure-evidence/v2/v2.1/campaign-1-stopped): each target's own kill file, appended last
+# campaign 1's survivors (closure-evidence/v2/v2.1/campaign-1-stopped), then campaign 2's (runner v2 at 5719f1f):
+# each target's own kill file, appended last
 _V21_KILLS = {**{f"aisef2/app/adapters.py::{n}": "tests/v2/test_v21_kills_adapters.py"
                  for n in ("Reviewer._model", "Reviewer._verify", "Reviewer.__init__", "Reviewer.review", "_unchanged",
                            "tree_of")},
               **{f"aisef2/app/bundle.py::{n}": "tests/v2/test_v21_kills_bundle.py" for n in ("_strings", "read")},
-              **{f"aisef2/app/bundle_cli.py::{n}": "tests/v2/test_v21_kills_bundle_cli.py" for n in ("coverage", "init")}}
+              **{f"aisef2/app/bundle_cli.py::{n}": "tests/v2/test_v21_kills_bundle_cli.py" for n in ("coverage", "init")},
+              "aisef2/app/cli.py::_parser": "tests/v2/test_v21_kills_cli.py",
+              "aisef2/app/settings.py::endpoint_problem": "tests/v2/test_v21_kills_settings.py",
+              "aisef2/app/usage.py::no_progress": "tests/v2/test_v21_kills_usage.py",
+              "aisef2/app/lineage.py::claims": "tests/v2/test_v21_kills_lineage.py"}
 for _t, _f in _V21_KILLS.items():
     V21_TARGETS[_t] = [*V21_TARGETS[_t], _f]
 # the 2.1 product tracks merged for campaign 2 (owner decision B-03b: the new 2.1 modules are targets): each track's own
