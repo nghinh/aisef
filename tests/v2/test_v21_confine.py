@@ -197,6 +197,23 @@ class HostGuard(unittest.TestCase):
                 host_unchanged(before)
 
 
+class OwnGit(unittest.TestCase):
+    def test_the_set_up_git_never_reaches_the_callers_repository(self):
+        """Run from a pre-commit hook of a linked worktree, a test inherits GIT_DIR and GIT_INDEX_FILE (absolute paths):
+        CommandLine's git runs in its own temporary repository all the same, and the caller's is left as it was."""
+        with tempfile.TemporaryDirectory() as t:
+            bait = pathlib.Path(os.path.realpath(t)) / "bait"
+            bait.mkdir()
+            app_run.git(bait, "init", "-q", "-b", "main")
+            app_run.git(bait, "commit", "-q", "--allow-empty", "-m", "bait")
+            before, result = _entries(str(bait / ".git"), True), unittest.TestResult()
+            with mock.patch.dict(os.environ, {"GIT_DIR": str(bait / ".git"), "GIT_INDEX_FILE": str(bait / ".git" / "index"),
+                                              "GIT_WORK_TREE": str(bait)}):
+                CommandLine("test_the_measured_wrapper_is_the_sessions_own").run(result)
+            self.assertEqual((result.testsRun, result.errors, result.failures), (1, [], []))
+            self.assertEqual(_entries(str(bait / ".git"), True), before)
+
+
 class Setting(unittest.TestCase):
     def test_absent_is_none_and_given_is_kept(self):
         self.assertIsNone(settings.load(SETTINGS).confinement)
@@ -236,11 +253,12 @@ class CommandLine(unittest.TestCase):
         (self.home / ".config" / "opencode").mkdir(parents=True)
         repo = self.run_dir / "repo"
         repo.mkdir(parents=True)
-        subprocess.run(["git", "init", "-q", "-b", "main", str(repo)], check=True)
-        subprocess.run(["git", "-C", str(repo), "-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q", "--allow-empty",
-                        "-m", "base"], check=True)
+        # app_run.git: no GIT_* variable of the caller (a hook's GIT_DIR / GIT_INDEX_FILE would take these to the
+        # developer's repository), no system or global configuration
+        app_run.git(repo, "init", "-q", "-b", "main")
+        app_run.git(repo, "commit", "-q", "--allow-empty", "-m", "base")
         self.ws = self.run_dir / "work" / "ws" / "wt-S1"
-        subprocess.run(["git", "-C", str(repo), "worktree", "add", "-q", "--detach", str(self.ws)], check=True)
+        app_run.git(repo, "worktree", "add", "-q", "--detach", str(self.ws))
         self.exe = self.tmp / "client" / "opencode"
         self.exe.parent.mkdir()
         self.exe.write_text("#!/bin/sh\n")
@@ -344,9 +362,7 @@ class CommandLine(unittest.TestCase):
         self.assertEqual(ro_binds(seen[-1]), ro_binds(session))
         self.assertIn(str((self.run_dir / "repo" / ".git").resolve()), ro_binds(seen[-1]))
         self.assertEqual(pairs(seen[-1], "--bind"), [(str(self.run_dir / "confinement" / "ws"),) * 2])
-        listed = subprocess.run(["git", "-C", str(self.run_dir / "repo"), "worktree", "list", "--porcelain"],
-                                capture_output=True, text=True, encoding="utf-8", check=True).stdout
-        self.assertNotIn("confinement", listed)
+        self.assertNotIn("confinement", app_run.git(self.run_dir / "repo", "worktree", "list", "--porcelain"))
 
 
 class FailClosed(unittest.TestCase):
