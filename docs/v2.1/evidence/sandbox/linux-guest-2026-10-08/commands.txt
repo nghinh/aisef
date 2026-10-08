@@ -1,0 +1,22 @@
+== a: docker run --rm --init --network none --user 1000:1000 --cap-drop ALL --pids-limit 512 --memory 1g --cpus 2 -w /repo -v /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/wf-followups/linux-guest/tree:/repo:ro -v /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/wf-followups/linux-guest/procps/ps:/usr/local/bin/ps:ro -v /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/wf-followups/linux-guest/procps/libproc2.so.0:/usr/lib/aarch64-linux-gnu/libproc2.so.0:ro --security-opt seccomp=unconfined --security-opt systempaths=unconfined aisef-sandbox-measure sh -c mkdir -p /tmp/g; H=/repo/validation/v21/sandbox/linux_guest.py
+python3 -B $H canary early &
+setsid python3 -B $H canary early-setsid &
+(until [ -e /tmp/g/boundary ]; do sleep 0.1; done; sleep 1.5; python3 -B $H canary late & wait) &
+python3 -B $H "$0" a
+   exit 0 in 5 s
+== b: docker run --rm --init --network none --user 1000:1000 --cap-drop ALL --pids-limit 512 --memory 1g --cpus 2 -w /repo -v /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/wf-followups/linux-guest/tree:/repo:ro -v /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/wf-followups/linux-guest/procps/ps:/usr/local/bin/ps:ro -v /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/wf-followups/linux-guest/procps/libproc2.so.0:/usr/lib/aarch64-linux-gnu/libproc2.so.0:ro  aisef-sandbox-measure sh -c mkdir -p /tmp/g; H=/repo/validation/v21/sandbox/linux_guest.py
+python3 -B $H canary early &
+setsid python3 -B $H canary early-setsid &
+(until [ -e /tmp/g/boundary ]; do sleep 0.1; done; sleep 1.5; python3 -B $H canary late & wait) &
+python3 -B $H "$0" b
+   exit 0 in 7 s
+== c: docker run --rm --init --network none --user 1000:1000 --cap-drop ALL --pids-limit 512 --memory 1g --cpus 2 -w /repo -v /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/wf-followups/linux-guest/tree:/repo:ro -v /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/wf-followups/linux-guest/procps/ps:/usr/local/bin/ps:ro -v /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/wf-followups/linux-guest/procps/libproc2.so.0:/usr/lib/aarch64-linux-gnu/libproc2.so.0:ro --security-opt seccomp=unconfined --security-opt systempaths=unconfined aisef-sandbox-measure sh -c mkdir -p /tmp/g; H=/repo/validation/v21/sandbox/linux_guest.py
+python3 -B $H canary early &
+setsid python3 -B $H canary early-setsid &
+(until [ -e /tmp/g/boundary ]; do sleep 0.1; done; sleep 1.5; python3 -B $H canary late & wait) &
+python3 -B $H "$0" c
+   exit 0 in 6 s
+== d-test_v21_confine: docker run --rm --init --network none --user 1000:1000 --cap-drop ALL --pids-limit 512 --memory 1g --cpus 2 -w /repo -v /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/wf-followups/linux-guest/tree:/repo:ro -v /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/wf-followups/linux-guest/procps/ps:/usr/local/bin/ps:ro -v /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/wf-followups/linux-guest/procps/libproc2.so.0:/usr/lib/aarch64-linux-gnu/libproc2.so.0:ro  aisef-sandbox-measure python3 -B -m unittest -v tests.v2.test_v21_confine
+   exit 0 in 21 s
+== d-test_process_range: docker run --rm --init --network none --user 1000:1000 --cap-drop ALL --pids-limit 512 --memory 1g --cpus 2 -w /repo -v /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/wf-followups/linux-guest/tree:/repo:ro -v /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/wf-followups/linux-guest/procps/ps:/usr/local/bin/ps:ro -v /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/wf-followups/linux-guest/procps/libproc2.so.0:/usr/lib/aarch64-linux-gnu/libproc2.so.0:ro  aisef-sandbox-measure python3 -B -m unittest -v tests.v2.p4.test_process_range
+   exit 0 in 20 s

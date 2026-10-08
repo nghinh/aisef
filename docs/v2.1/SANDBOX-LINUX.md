@@ -203,6 +203,26 @@ end.
 **Controls** (must work): the workspace (`echo ok > ./w && cat ./w` → `ok`); the client started from its own
 read-only mounted directory prints its JSON.
 
+**Linux guest checks (2026-10-08).** The checks below ran on tree `860c02a`, in containers of the measure image on
+Docker Desktop's LinuxKit 7.0.12 arm64 guest. The containers ran as uid 1000 with no capabilities and no network, the
+tree read-only. The details, including the docker flags and the execution path of each check, are in
+[`evidence/sandbox/linux-guest-2026-10-08/README.md`](evidence/sandbox/linux-guest-2026-10-08/README.md); the harness
+is `validation/v21/sandbox/linux_guest.py`.
+
+- **A setsid descendant of a session started as `client.session` starts one.** It shows in the container's process
+  table under its outside pid, with a parent chain to the controller. The range sees only bwrap: the outer bwrap is
+  its member, and bwrap's init is listed as escaped. `cleanup_authority` can prove the descendant. The pids the
+  session sees inside are not in the host table, so they are refused. The descendant is gone as soon as the session
+  ends: when the client exits, after a proved signal, and under the release ladder.
+- **The tests' route** (the anchor, a subreaper, adopts the sleeper; `cleanup_authority` proves it; `signal_owned`
+  signals it) ran through `measure_in_range` itself, with its proof record.
+- **The controller SIGKILLed** (`client.session`'s owner, and the python inside `confine.measure`). Nothing of the
+  session was left 6–7 ms later.
+- In every one of these checks, a live claim of the processes the checks did not start signalled nothing.
+- `test_v21_confine` (31 tests) and `p4/test_process_range` (24 tests) passed whole there, with none skipped.
+
+This is a container in Docker Desktop's VM. It is not a bare-metal Linux host and it is not CI.
+
 ## 6. The implementation
 
 - **Setting** (`aisef2/app/settings.py`, optional, fail-closed validation):
@@ -324,7 +344,7 @@ the worktree: Ran 30 OK.
 
 | Deliverable | Level | Why |
 |---|---|---|
-| the setting, the argv builder, fail-closed refusal of run / `--check` / session, each check of the measurement | **M3** | `test_v21_confine` (30 tests, all its own) on macOS with fake clients and providers; no OS boundary exercised on macOS. |
+| the setting, the argv builder, fail-closed refusal of run / `--check` / session, each check of the measurement | **M3** | `test_v21_confine` (30 tests, all its own; 31 since `c624c54`) on macOS with fake clients and providers; no OS boundary exercised on macOS. Since 2026-10-08 the module has also run whole in the Linux guest (§5), still with fake clients. |
 | the success path of a confined run (every session started through the bwrap argv, the reviewer's workspace read-only, the records saying so) | **M3** | `test_v21_confine.RunFailClosed.test_a_confined_run_starts_every_session_through_bubblewrap_and_says_so`: the **measurement stubbed** and the argv built for Linux, a recording fake bubblewrap that confines nothing — the wiring, not a boundary. |
 | the confinement boundary itself inside a Linux container | **M4** | `validation/v21/sandbox/run.sh` under real `docker`: real bwrap 0.12.0, real namespaces, a real host port, the container's real processes and sockets; the kernel's own `confine.measure` and the session's `confine.wrap` run in the container; each claim an operation tried (§5). A standalone harness, not `aisef run`; the client is a script, no provider — so not M5. |
 | a confined real `aisef run` on Linux end to end | **M6** | not done: the macOS host has no Linux backend to run `aisef run` itself under bwrap. |

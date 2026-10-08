@@ -1,0 +1,66 @@
+test_check_is_not_ready_when_confinement_is_not_provided (tests.v2.test_v21_confine.Check.test_check_is_not_ready_when_confinement_is_not_provided) ... ok
+test_check_measures_with_the_client_on_the_runs_path (tests.v2.test_v21_confine.Check.test_check_measures_with_the_client_on_the_runs_path) ... ok
+test_a_client_directory_that_holds_home_or_the_workspace_is_refused (tests.v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) ... ok
+test_a_directory_is_not_bubblewrap (tests.v2.test_v21_confine.CommandLine.test_a_directory_is_not_bubblewrap) ... ok
+test_an_unreadable_bubblewrap_is_a_problem_not_a_crash (tests.v2.test_v21_confine.CommandLine.test_an_unreadable_bubblewrap_is_a_problem_not_a_crash) ... ok
+test_home_is_an_empty_tmpfs_and_the_client_still_finds_its_configuration (tests.v2.test_v21_confine.CommandLine.test_home_is_an_empty_tmpfs_and_the_client_still_finds_its_configuration) ... ok
+test_its_own_namespaces_no_privilege_and_the_client_command_unchanged (tests.v2.test_v21_confine.CommandLine.test_its_own_namespaces_no_privilege_and_the_client_command_unchanged) ... ok
+test_network_host_shares_the_network_and_says_so (tests.v2.test_v21_confine.CommandLine.test_network_host_shares_the_network_and_says_so) ... ok
+test_the_measured_wrapper_is_the_sessions_own (tests.v2.test_v21_confine.CommandLine.test_the_measured_wrapper_is_the_sessions_own)
+measure() binds what a session's wrapper binds: the client's directory, the run repository's git directory, ... ok
+test_the_reviewers_workspace_is_bound_read_only (tests.v2.test_v21_confine.CommandLine.test_the_reviewers_workspace_is_bound_read_only)
+writable=False (the model reviewer's session): the checkout it reviews is bound read-only, last; no ... ok
+test_the_workspace_is_the_only_writable_host_path_and_it_is_bound_last (tests.v2.test_v21_confine.CommandLine.test_the_workspace_is_the_only_writable_host_path_and_it_is_bound_last) ... ok
+test_a_check_that_did_not_run_is_a_problem_never_a_pass (tests.v2.test_v21_confine.FailClosed.test_a_check_that_did_not_run_is_a_problem_never_a_pass)
+The user-namespace denial counts only when the kernel's refusal is seen; unshare absent or no try at all ... ok
+test_a_host_that_is_not_linux_has_no_backend (tests.v2.test_v21_confine.FailClosed.test_a_host_that_is_not_linux_has_no_backend) ... ok
+test_a_killed_sleeper_is_no_survivor_a_live_one_is (tests.v2.test_v21_confine.FailClosed.test_a_killed_sleeper_is_no_survivor_a_live_one_is)
+Real processes: a sleeper killed (left unreaped: a zombie) is no survivor; one alive is. Two things each drop ... ok
+test_a_missing_bubblewrap_or_read_only_path_is_refused (tests.v2.test_v21_confine.FailClosed.test_a_missing_bubblewrap_or_read_only_path_is_refused) ... ok
+test_a_namespace_counts_as_own_only_when_both_links_were_read_and_differ (tests.v2.test_v21_confine.FailClosed.test_a_namespace_counts_as_own_only_when_both_links_were_read_and_differ) ... ok
+test_a_probe_that_did_not_exit_0_is_refused_even_when_it_reached_its_end (tests.v2.test_v21_confine.FailClosed.test_a_probe_that_did_not_exit_0_is_refused_even_when_it_reached_its_end) ... ok
+test_a_session_that_cannot_be_confined_never_starts_the_client (tests.v2.test_v21_confine.FailClosed.test_a_session_that_cannot_be_confined_never_starts_the_client) ... ok
+test_a_sleeper_still_dying_when_bubblewrap_returned_is_no_survivor (tests.v2.test_v21_confine.FailClosed.test_a_sleeper_still_dying_when_bubblewrap_returned_is_no_survivor)
+The PID namespace's teardown can still be killing the probe's sleeper when bubblewrap returns (measured: 1 in ... ok
+test_each_check_refuses_on_its_own (tests.v2.test_v21_confine.FailClosed.test_each_check_refuses_on_its_own)
+One departure at a time from a clean measurement: each check names it (none of them may be dropped). ... ok
+test_no_client_no_measurement (tests.v2.test_v21_confine.FailClosed.test_no_client_no_measurement)
+Without the client the session's wrapper cannot be built, so nothing is measured: a problem, and the ... ok
+test_the_grace_used_is_survivor_grace_so_a_sleeper_ending_just_after_it_is_still_a_survivor (tests.v2.test_v21_confine.FailClosed.test_the_grace_used_is_survivor_grace_so_a_sleeper_ending_just_after_it_is_still_a_survivor)
+A survivor is dropped only by being gone, and the sleeper's lifetime is set against SURVIVOR_GRACE: a longer ... ok
+test_the_sleeper_outlives_a_probe_that_used_all_its_time_and_the_grace (tests.v2.test_v21_confine.FailClosed.test_the_sleeper_outlives_a_probe_that_used_all_its_time_and_the_grace)
+A survivor is dropped only by being gone, so the probe's sleeper must not reach its own end before the last ... ok
+test_what_is_measured_decides_not_the_name_of_the_tool (tests.v2.test_v21_confine.FailClosed.test_what_is_measured_decides_not_the_name_of_the_tool)
+A 'bubblewrap' that runs the probe unconfined: refused for what the probe could do. ... ok
+test_it_fails_on_what_appeared_changed_or_left_since_its_view (tests.v2.test_v21_confine.HostGuard.test_it_fails_on_what_appeared_changed_or_left_since_its_view)
+host_unchanged against a doctored view — never by writing the host. ... ok
+test_a_confined_run_starts_every_session_through_bubblewrap_and_says_so (tests.v2.test_v21_confine.RunFailClosed.test_a_confined_run_starts_every_session_through_bubblewrap_and_says_so)
+The path a run takes when the measurement holds (stubbed here: macOS has no backend; the boundary is ... /repo/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=11 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/repo/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=10 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/repo/aisef2/orchestrate/story_runner.py:277: ResourceWarning: unclosed file <_io.TextIOWrapper name=9 encoding='utf-8'>
+  tests_held.release()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_a_run_that_asks_for_confinement_it_cannot_have_sends_nothing_and_records_why (tests.v2.test_v21_confine.RunFailClosed.test_a_run_that_asks_for_confinement_it_cannot_have_sends_nothing_and_records_why) ... ok
+test_without_the_setting_the_record_has_no_confinement_and_the_sessions_are_not_wrapped (tests.v2.test_v21_confine.RunFailClosed.test_without_the_setting_the_record_has_no_confinement_and_the_sessions_are_not_wrapped) ... /repo/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=11 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/repo/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=10 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/repo/aisef2/orchestrate/story_runner.py:277: ResourceWarning: unclosed file <_io.TextIOWrapper name=9 encoding='utf-8'>
+  tests_held.release()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_absent_is_none_and_given_is_kept (tests.v2.test_v21_confine.Setting.test_absent_is_none_and_given_is_kept) ... ok
+test_anything_else_is_refused (tests.v2.test_v21_confine.Setting.test_anything_else_is_refused) ... ok
+test_not_with_open_code_review_which_calls_the_model_outside_the_sessions (tests.v2.test_v21_confine.Setting.test_not_with_open_code_review_which_calls_the_model_outside_the_sessions) ... ok
+
+----------------------------------------------------------------------
+Ran 31 tests in 18.786s
+
+OK
