@@ -1,0 +1,74 @@
+{
+ "record": "AISEF V2.1 — MUTATION AUDIT EXCEPTION REQUEST",
+ "id": "MUTATION-AUDIT-REQUEST-V2.1-no_progress-13-23",
+ "status": "PROPOSED — NOT APPLIED",
+ "prepared": "2026-10-08",
+ "owner_decision": null,
+ "owner_approval": null,
+ "base": {
+  "commit": "3e6ebf1",
+  "snapshot": "5719f1f87ebbb2d3f19a3f0629ee656c93597c23",
+  "kernel_identical_to_snapshot": "git diff --quiet 5719f1f 3e6ebf1 -- aisef2/ passes"
+ },
+ "dossier": "closure-evidence/v2/v2.1/mutation/no_progress-13-23.md",
+ "target": "aisef2/app/usage.py::no_progress",
+ "source_sha256": "f7812cbd90a2e96f3736dfab2554af79a0bc25ecc6052fbbb8f0fe3507b50223",
+ "measured_in": {
+  "record": "closure-evidence/v2/v2.1/pilot/attempt-2/l2-ord.record.json",
+  "runner": 2,
+  "at": "5719f1f",
+  "kill_tests": ["tests/v2/test_v21_verify.py", "tests/v2/test_v21_continue_usage.py", "tests/v2/test_v21_continue_integrity.py"],
+  "mutants": 33,
+  "killed": 29,
+  "survivors": ["L122 element 2 dropped", "L126 And swapped", "L122 string 'story/commit' emptied", "L123 sorted() -> list()"],
+  "reused_by": "closure-evidence/v2/v2.1/campaign-2/CAMPAIGN-2-START.json reuse_table (pilot attempt 2, table-order lanes)",
+  "since": "144b028 appended tests/v2/test_v21_kills_usage.py to the kill set; a hand check (not a mutation run) showed that it kills 14 and 24 and that 13 and 23 pass it. no_progress is re-measured under manifest revision 3, after campaign 2 (CAMPAIGN-2-START.json after_the_campaign); that run has not happened"
+ },
+ "mutants": [
+  {"index": 13, "description": "L122 element 2 dropped",
+   "line_122": "elif e['type'] in ('story/retry', 'story/rollback'):"},
+  {"index": 23, "description": "L122 string 'story/commit' emptied",
+   "line_122": "elif e['type'] in ('story/retry', 'story/rollback', ''):"}
+ ],
+ "classification_requested": "AUDITED: equivalent in the supported domain (journals the kernel writes). Never KILLED: the record keeps both as SURVIVED (validation/v2/mutation.py:1614-1618); an AUDITED entry only stops --check from reporting them as unaudited",
+ "domain_decision_required": "The owner chooses the domain: (A) journals the kernel writes, under which 13 and 23 are equivalent, or (B) journals the writer and projections admit, under which they are not, and the consistent resolution is the separate product change in the dossier (section 8), not this exception. The kill of mutant 24 already rests on a domain-B input (dossier section 7)",
+ "proposed_entries": [
+  {"key": ["aisef2/app/usage.py::no_progress", "L122 element 2 dropped"],
+   "reason": "a story/commit no longer closes an attempt, so the committed attempt adds no row. On the journals the kernel writes, that row is always [] and always the story's last: the projections refuse any closer or begin of a story after its commit (story_state.py:10-11, :37-38), and story_runner journals failure/observed only on the branch that does not commit (story_runner.py:328-338). A [] row is never in `same`. It differs only on failure/observed then commit in one attempt, which no producer writes (closure-evidence/v2/v2.1/mutation/no_progress-13-23.md)"},
+  {"key": ["aisef2/app/usage.py::no_progress", "L122 string 'story/commit' emptied"],
+   "reason": "the same as 'L122 element 2 dropped': '' is no event's type (the writer takes a typed EventType, format3.py:384; '' is not in the reader's VOCABULARY), so this mutant is that one"}
+ ],
+ "proposed_change_to_validation_v2_mutation_py": {
+  "where": "the AUDITED block (validation/v2/mutation.py:732-753 at 3e6ebf1): the comment at :732-733 and two entries appended after the qualification_counters entries",
+  "comment_line_733_today": "#: models have entries: their code is not edited to remove a dead field, because its author is not this session.",
+  "comment_addition": "#: One kernel target is excepted by the owner (MUTATION-AUDIT-REQUEST-V2.1-no_progress-13-23): usage.no_progress's two\n#: commit-row mutants, equivalent on the journals the kernel writes (closure-evidence/v2/v2.1/mutation/no_progress-13-23.md).",
+  "python": "_COMMIT_ROW = (\"a story/commit no longer closes an attempt, so the committed attempt adds no row. On the journals the \"\n               \"kernel writes, that row is always [] and always the story's last: the projections refuse any closer or \"\n               \"begin of a story after its commit (story_state.py:10-11, :37-38), and story_runner journals \"\n               \"failure/observed only on the branch that does not commit (story_runner.py:328-338). A [] row is never \"\n               \"in `same`. It differs only on failure/observed then commit in one attempt, which no producer writes \"\n               \"(closure-evidence/v2/v2.1/mutation/no_progress-13-23.md)\")\n    (\"aisef2/app/usage.py::no_progress\", \"L122 element 2 dropped\"): _COMMIT_ROW,\n    (\"aisef2/app/usage.py::no_progress\", \"L122 string 'story/commit' emptied\"): (\n        \"the same as 'L122 element 2 dropped': '' is no event's type (the writer takes a typed EventType, \"\n        \"format3.py:384; '' is not in the reader's VOCABULARY), so this mutant is that one\"),",
+  "note": "_COMMIT_ROW is a module-level constant defined beside _DEAD_FLAG (before `AUDITED: dict[...] = {`); the two key lines go inside the dict"
+ },
+ "other_checks_that_would_refuse_it": [
+  {"file": "tests/v2/p2/test_mutation_targets.py:30",
+   "today": "self.assertTrue(all(k[0].startswith(\"tests/v2/refmodel/\") and v for k, v in mu.AUDITED.items()))",
+   "effect": "fails with the two entries; this test is in the unit suite. Changing it is a change to a policy assertion: only on the owner's explicit order, never to get PASS"},
+  {"file": "validation/qualification/q2.py:90, :331",
+   "today": "audited_equivalents_outside_the_reference_models must be empty, or q2 adds the problem 'an unaudited survivor, or an audit outside the reference models'",
+   "effect": "the Q2 qualification tool would report usage.no_progress there. No CI workflow or v2.1 doc runs q2 (git grep); whether it still binds V2.1 is the owner's call"}
+ ],
+ "effect_if_applied": [
+  "`python -P validation/v2/mutation.py --check` stops reporting the two as unaudited survivors once the V2.1 record shows them SURVIVED; they stay SURVIVED in the record and count as AUDITED_SURVIVORS, not KILLED (validation/qualification/v21_mutation_record.py:129-130)",
+  "no target module changes: usage.py's source_sha256 stays f7812cbd…, so no mutation result goes stale; no kill set changes",
+  "validation/v2/mutation.py is in every mutation COPY tree, so a later run's tree_sha256 differs; --check does not compare tree_sha256 (mutation.py:1525 records it only)"
+ ],
+ "conditions_proposed": [
+  "apply only after campaign 2 ends and no_progress has been re-measured under manifest revision 3, and only if that run shows exactly these two mutants SURVIVED",
+  "a domain guard (proposed, not written): a test that fails if story_runner ever journals failure/observed in an attempt that then commits, e.g. asserting INV-A on the journals the existing run tests produce, so that a future story_runner change breaking the domain fails a test instead of silently voiding the audit (dossier section 4, weakest link (1))",
+  "the record keeps its weakest link visible: INV-A is enforced by story_runner's control flow only; the projections and the verify reader do not check it"
+ ],
+ "alternatives": [
+  {"name": "leave open", "effect": "13 and 23 stay unaudited survivors; the V2.1 final mutation record cannot pass (`passing` requires no unaudited survivors, v21_mutation_record.py:134)"},
+  {"name": "product change: drop \"story/commit\" from usage.py:122 (NOT applied)",
+   "effect": "removes both mutants. No behaviour change on kernel-written journals (the lemma); on failure-then-commit-in-one-attempt it returns [] instead of reporting the committed attempt, which is the docstring's reading. Its 31 new mutants all differ from it on the two direct unit tests' inputs (in-memory lower bound, not a mutation run)",
+   "cost": "usage.py's 8 V2.1 targets stale (re-measure); 424 of 466 V2.1 targets' kill closures import usage.py (reported other_code_changed; per owner directive 1 they need a stated basis to be bound to the new HEAD); run.kernel_digest changes, so `aisef bundle continue` refuses runs of the 5719f1f kernel (bundle_cli.py:391-393)"},
+  {"name": "enforce INV-A in the journal",
+   "effect": "a projection refusing story/commit while a failure/observed of the same attempt is open; changes journal semantics (projection version, frozen items); listed for completeness only"}
+ ]
+}
