@@ -37,6 +37,7 @@ if str(ROOT) not in sys.path:
 from aisef2.app import client, confine, settings  # noqa: E402
 from aisef2.app import run as R  # noqa: E402
 from aisef2.runtime.process_range import ProcessRange  # noqa: E402
+from tests.v2 import isolated_git  # noqa: E402
 from tests.v2 import test_app_run as app_run  # noqa: E402 — the module, so its Command tests are not collected again
 from tests.v2.test_app_run import SETTINGS, ProductBase, provider  # noqa: E402
 
@@ -286,8 +287,8 @@ class OwnGit(unittest.TestCase):
         with tempfile.TemporaryDirectory() as t:
             bait = pathlib.Path(os.path.realpath(t)) / "bait"
             bait.mkdir()
-            app_run.git(bait, "init", "-q", "-b", "main")
-            app_run.git(bait, "commit", "-q", "--allow-empty", "-m", "bait")
+            isolated_git.git(bait, "init", "-q", "-b", "main")
+            isolated_git.git(bait, "commit", "-q", "--allow-empty", "-m", "bait")
             before, result = _entries(str(bait / ".git"), True), unittest.TestResult()
             with mock.patch.dict(os.environ, {"GIT_DIR": str(bait / ".git"), "GIT_INDEX_FILE": str(bait / ".git" / "index"),
                                               "GIT_WORK_TREE": str(bait)}):
@@ -297,17 +298,17 @@ class OwnGit(unittest.TestCase):
 
     def test_a_hook_in_the_tests_repository_never_runs(self):
         """A git whose compiled-in template directory carries an executable hook copies it into every repository a test
-        initialises (GIT_TEMPLATE_DIR and the configuration are not read; that directory is): app_run.git runs git with
-        the hook path the null device, as the runner's own git does, so no hook in a test's repository runs."""
+        initialises (GIT_TEMPLATE_DIR and the configuration are not read; that directory is): isolated_git.git runs git
+        with the hook path the null device, as the runner's own git does, so no hook in a test's repository runs."""
         with tempfile.TemporaryDirectory() as t:
             repo = pathlib.Path(t) / "r"
             repo.mkdir()
-            app_run.git(repo, "init", "-q", "-b", "main")
+            isolated_git.git(repo, "init", "-q", "-b", "main")
             hook = repo / ".git" / "hooks" / "pre-commit"
             hook.parent.mkdir(exist_ok=True)
             hook.write_text("#!/bin/sh\necho ran > hook-ran\n", encoding="utf-8")
             hook.chmod(0o755)
-            app_run.git(repo, "commit", "-q", "--allow-empty", "-m", "base")
+            isolated_git.git(repo, "commit", "-q", "--allow-empty", "-m", "base")
             self.assertFalse((repo / "hook-ran").exists())
 
 
@@ -350,12 +351,12 @@ class CommandLine(unittest.TestCase):
         (self.home / ".config" / "opencode").mkdir(parents=True)
         repo = self.run_dir / "repo"
         repo.mkdir(parents=True)
-        # app_run.git: no GIT_* variable of the caller (a hook's GIT_DIR / GIT_INDEX_FILE would take these to the
+        # isolated_git.git: no GIT_* variable of the caller (a hook's GIT_DIR / GIT_INDEX_FILE would take these to the
         # developer's repository), no system or global configuration
-        app_run.git(repo, "init", "-q", "-b", "main")
-        app_run.git(repo, "commit", "-q", "--allow-empty", "-m", "base")
+        isolated_git.git(repo, "init", "-q", "-b", "main")
+        isolated_git.git(repo, "commit", "-q", "--allow-empty", "-m", "base")
         self.ws = self.run_dir / "work" / "ws" / "wt-S1"
-        app_run.git(repo, "worktree", "add", "-q", "--detach", str(self.ws))
+        isolated_git.git(repo, "worktree", "add", "-q", "--detach", str(self.ws))
         self.exe = self.tmp / "client" / "opencode"
         self.exe.parent.mkdir()
         self.exe.write_text("#!/bin/sh\n")
@@ -459,7 +460,7 @@ class CommandLine(unittest.TestCase):
         self.assertEqual(ro_binds(seen[-1]), ro_binds(session))
         self.assertIn(str((self.run_dir / "repo" / ".git").resolve()), ro_binds(seen[-1]))
         self.assertEqual(pairs(seen[-1], "--bind"), [(str(self.run_dir / "confinement" / "ws"),) * 2])
-        self.assertNotIn("confinement", app_run.git(self.run_dir / "repo", "worktree", "list", "--porcelain"))
+        self.assertNotIn("confinement", isolated_git.git(self.run_dir / "repo", "worktree", "list", "--porcelain"))
 
 
 class FailClosed(unittest.TestCase):

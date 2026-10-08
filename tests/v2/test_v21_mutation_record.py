@@ -16,7 +16,7 @@ sys.path.insert(0, str(ROOT))
 from validation.qualification import v21_mutation_record as R  # noqa: E402
 from validation.v2 import mutation as m  # noqa: E402
 from tests.v2.test_s2_mutation_record import _row  # noqa: E402
-from tests.v2 import test_app_run as app_run  # noqa: E402 — the module, so its tests are not collected again
+from tests.v2 import isolated_git  # noqa: E402
 
 
 class Phase(unittest.TestCase):
@@ -79,8 +79,8 @@ class ImportWorker(unittest.TestCase):
         with tempfile.TemporaryDirectory() as t:
             root, wt = pathlib.Path(t) / "root", pathlib.Path(t) / "wt"
             wt.mkdir()
-            app_run.git(wt, "init", "-q")       # no GIT_* variable or git configuration of the caller reaches it
-            app_run.git(wt, "commit", "-q", "--allow-empty", "-m", "s")
+            isolated_git.git(wt, "init", "-q")       # no GIT_* variable or git configuration of the caller reaches it
+            isolated_git.git(wt, "commit", "-q", "--allow-empty", "-m", "s")
             log = pathlib.Path(t) / "w.log"
             log.write_text("ran\n", encoding="utf-8")
             kept = R.import_worker("A", wt, "finished", log, root)
@@ -96,10 +96,10 @@ class ImportWorker(unittest.TestCase):
         with tempfile.TemporaryDirectory() as t:
             bait = pathlib.Path(os.path.realpath(t)) / "bait"
             bait.mkdir()
-            app_run.git(bait, "init", "-q", "-b", "main")
-            app_run.git(bait, "commit", "-q", "--allow-empty", "-m", "bait")
+            isolated_git.git(bait, "init", "-q", "-b", "main")
+            isolated_git.git(bait, "commit", "-q", "--allow-empty", "-m", "bait")
             (bait / "dev.txt").write_text("staged by the developer\n", encoding="utf-8")
-            app_run.git(bait, "add", "dev.txt")
+            isolated_git.git(bait, "add", "dev.txt")
             git_dir = bait / ".git"
 
             def files() -> dict:

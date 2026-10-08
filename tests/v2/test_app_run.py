@@ -26,7 +26,6 @@ from aisef2.app import run as R  # noqa: E402
 from aisef2.app.verify import verify  # noqa: E402
 from aisef2.arch.enums import ObligationRole, Owner, Polarity, SubjectAbsence, SubjectKind  # noqa: E402
 from aisef2.journal import format3  # noqa: E402
-from aisef2.orchestrate import workspace  # noqa: E402
 from aisef2.plan.obligation import EXPECTED_AT_PARENT, NOT_PREREGISTERED, Plan, PlanObligation  # noqa: E402
 from aisef2.probe import catalog  # noqa: E402
 from aisef2.probe.calibration import ProbeCapabilityCalibration, executing  # noqa: E402
@@ -67,11 +66,9 @@ print(json.dumps({"type": "step_finish", "part": {"tokens": {"input": 120, "outp
 
 
 def git(cwd, *args: str) -> str:
-    """git as the runner starts it (workspace._ISOLATED_GIT: no system or global configuration; no hook, fsmonitor or
-    signing program, whatever the repository holds), with no GIT_* variable of the caller: a hook's GIT_DIR or
-    GIT_INDEX_FILE would take it to the caller's repository."""
-    env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")} | workspace._ISOLATED_GIT | {
-        "GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@t", "GIT_COMMITTER_NAME": "t", "GIT_COMMITTER_EMAIL": "t@t"}
+    env = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")} | {
+        "GIT_CONFIG_NOSYSTEM": "1", "GIT_CONFIG_GLOBAL": os.devnull, "GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@t",
+        "GIT_COMMITTER_NAME": "t", "GIT_COMMITTER_EMAIL": "t@t"}
     return subprocess.run(["git", "-C", str(cwd), *args], capture_output=True, text=True, encoding="utf-8", env=env,
                           check=True).stdout.strip()
 
