@@ -1,6 +1,8 @@
 """validation/qualification/v21_snapshot_delta.py on a toy repository: each kind of change after the snapshot gets its
 targets and the reuse proof's verdict, data inside mutation.COPY is read, not read or not measured, and --check refuses
-a table that is stale. Every rule of the tool has a case here that fails when the rule is taken out."""
+a table that is stale. Every rule of the tool has a case here that fails when the rule is taken out (the COVERED kinds
+of --check hold no copy_data or copy_unread: --check builds without a read-set, where neither occurs without
+copy_unmeasured, so adding them changes nothing --check can see)."""
 
 from __future__ import annotations
 
@@ -20,14 +22,17 @@ sys.path.insert(0, str(ROOT))
 from validation.qualification import v21_snapshot_delta as D  # noqa: E402
 
 
-def _toy_mutation(targets: dict[str, list[str]]) -> str:
+COPY = ('aisef2', 'tests/v2', 'validation/v2', 'docs', 'pyproject.toml')
+
+
+def _toy_mutation(targets: dict[str, list[str]], copy: tuple[str, ...] = COPY) -> str:
     """A toy validation/v2/mutation.py: the real generator, null mutant and enum lookup, with its own targets."""
     src = (ROOT / "validation/v2/mutation.py").read_text(encoding="utf-8")
     keep = {"_SWAP", "_inert", "_script", "_root", "mutants", "_enum_members", "null_mutant"}
     segs = [ast.get_source_segment(src, n) for n in ast.parse(src).body
             if getattr(n, "name", None) in keep or (isinstance(n, ast.Assign) and getattr(n.targets[0], "id", None) in keep)]
     return ("from __future__ import annotations\n\nimport ast\nimport copy\nimport pathlib\n\n" + "\n\n\n".join(segs)
-            + f"\n\n\nCOPY = ('aisef2', 'tests/v2', 'validation/v2', 'docs', 'pyproject.toml')\nV21_TARGETS = {targets!r}\n")
+            + f"\n\n\nCOPY = {copy!r}\nV21_TARGETS = {targets!r}\n")
 
 
 TARGETS = {"aisef2/m.py::f": ["tests/v2/test_m.py"], "aisef2/m.py::g": ["tests/v2/test_m.py"],
@@ -45,6 +50,11 @@ FILES = {
 }
 SAME = "same inputs (generator source, module source, enum members)"
 MAY_READ = "data its kill tests may read (found statically; outside the proof's rules)"
+
+
+def ran(kill_file: str, opened: tuple[str, ...] | list[str] = (), listed: tuple[str, ...] | list[str] = ()) -> dict:
+    """A kill file's entry in a measured read-set: its own import opens it."""
+    return {"opened": [kill_file, *opened], "listed": [*listed]}
 
 
 def _git(repo: pathlib.Path, *args: str) -> str:
@@ -114,6 +124,8 @@ class Toy(unittest.TestCase):
         self.assertEqual(doc["records"][0]["reasons"], [
             {"why": "1 target module(s) changed: mutant counts and nulls re-derived", "targets": ["aisef2/n.py::h"],
              "files": ["aisef2/n.py"]}])
+        self.assertEqual((doc["records"][0]["record"], doc["records"][0]["note"]),
+                         (None, f"no closure-evidence/v2/v2.1/REQUALIFICATION-MANIFEST*.json at head has snapshot {self.base[:12]}"))
 
     def test_a_kill_set_change_in_mutation_py_re_measures_that_target(self):
         doc = self.delta({"validation/v2/mutation.py": _toy_mutation({**TARGETS, "aisef2/m.py::f": [M, N]})})
@@ -121,6 +133,14 @@ class Toy(unittest.TestCase):
         self.assertEqual(self.verdicts(doc), {"aisef2/m.py::f": "re-measure: its kill set is not the current one",
                                               "aisef2/m.py::g": self.stand(), "aisef2/n.py::h": self.stand()})
         self.assertEqual(doc["files"][0]["names_changed"], ["V21_TARGETS"])
+        self.init({})                                     # h's kill file at base only: its closure is still looked into
+        self.edit({"validation/v2/mutation.py": _toy_mutation({**TARGETS, "aisef2/n.py::h": [M]}), N: "X = 2\n"})
+        doc, _ = D.build(self.repo, self.base, self.commit("kill set"))
+        rows = {r["path"]: r for r in doc["files"]}
+        self.assertEqual((rows[N]["kinds"], rows[N]["targets"]),     # at head N is data inside COPY to M
+                         (["kill_file", D.UNMEASURED], {"aisef2/n.py::h": ["removed from its kill set"]}))
+        self.assertEqual(doc["targets"]["aisef2/n.py::h"]["verdict"],
+                         "re-measure: its kill set is not the current one; kill tests changed: tests/v2/test_n.py")
 
     def test_targets_added_or_removed_in_mutation_py(self):
         doc = self.delta({"validation/v2/mutation.py": _toy_mutation(
@@ -169,6 +189,19 @@ class Toy(unittest.TestCase):
                                               "aisef2/m.py::g": self.stand(), "aisef2/n.py::h": self.stand()})
         self.assertEqual(doc["targets"]["aisef2/m.py::g"]["generator"], "run at both: 2 and 2 mutants")
         self.assertEqual(doc["targets"]["aisef2/n.py::h"]["generator"], SAME)
+
+    def test_a_module_importing_the_file_at_either_commit_is_reached(self):
+        enum = "from enum import Enum\n\n\nclass Color(Enum):\n    RED = 1\n"
+        uses = "from aisef2.e import Color\n\n\ndef f(x):\n    return x is Color.RED\n\n\ndef g(x):\n    return x > 2\n"
+        imports = "its module imports this file (enum members: generator input)"
+        for name, at_base, at_head in (("imported at base only", uses, FILES["aisef2/m.py"]),
+                                       ("imported at head only", FILES["aisef2/m.py"], uses)):
+            with self.subTest(name):
+                self.init({"aisef2/e.py": enum, "aisef2/m.py": at_base})
+                self.edit({"aisef2/e.py": enum + "    BLUE = 2\n", "aisef2/m.py": at_head})
+                doc, _ = D.build(self.repo, self.base, self.commit("both"))
+                row = {r["path"]: r for r in doc["files"]}["aisef2/e.py"]
+                self.assertEqual(row["targets"], {"aisef2/m.py::f": [imports], "aisef2/m.py::g": [imports]})
 
     def test_a_kill_file_change_re_measures_the_targets_whose_kill_set_holds_it(self):
         doc = self.delta({N: "X = 2\n"})
@@ -239,6 +272,18 @@ class Toy(unittest.TestCase):
         self.assertEqual((doc["counts"]["affected_targets"], doc["counts"]["remeasure"], doc["counts"]["provisional"]),
                          (0, 0, 0))
 
+    def test_copy_is_taken_at_both_commits(self):
+        less = tuple(c for c in COPY if c != "docs")
+        for name, at_base, at_head, path in (("an entry at base only", COPY, less, "docs/notes.md"),
+                                             ("an entry at head only", COPY, (*COPY, "evidence"), "evidence/notes.md")):
+            with self.subTest(name):
+                self.init({"validation/v2/mutation.py": _toy_mutation(TARGETS, at_base)})
+                self.edit({"validation/v2/mutation.py": _toy_mutation(TARGETS, at_head), path: "changed\n"})
+                doc, _ = D.build(self.repo, self.base, self.commit("copy"))
+                row = {r["path"]: r for r in doc["files"]}[path]
+                self.assertEqual((row["kinds"], row["read_set"]["not_measured"]), ([D.UNMEASURED], [M, N]))
+                self.assertEqual(doc["counts"]["provisional"], 3)
+
     def test_code_that_reaches_no_target_has_its_own_kind(self):
         for path, text, kinds in (("tools/run.py", "X = 1\n", [D.CODE]), ("docs/run.sh", "echo\n", [D.CODE, D.UNMEASURED]),
                                   ("docs/runner", "#!/bin/sh\necho\n", [D.CODE, D.UNMEASURED]),
@@ -272,18 +317,24 @@ class Toy(unittest.TestCase):
                                                   "re-measure at head reads them as they are"])
         self.assertEqual(doc["counts"]["provisional"], 2)
 
-    def test_data_a_kill_test_names_is_reported_beside_a_verdict_the_proof_does_not_change(self):
+    def test_data_a_kill_test_names_is_reported_and_its_result_stands_only_provisionally(self):
         doc = self.delta({"docs/data.json": "{\"x\": 1}\n"})
         row = doc["files"][0]
         self.assertEqual((row["kinds"], row["tests_or_harness"]), ([D.DATA, D.UNMEASURED], [M]))
-        self.assertEqual(row["read_set"]["read_by"], {M: f"found statically: {M} names its path"})
+        self.assertEqual(row["read_set"], {"read_by": {M: f"found statically: {M} names its path"}, "not_measured": [M, N],
+                                           "cleared": [], "provisional": 3, "provisional_except": []})
         f = doc["targets"]["aisef2/m.py::f"]
         self.assertTrue(f["verdict"].endswith("can stand at head"))
-        self.assertEqual(f["outside_the_proof"], ["data its kill tests may read changed (found statically): docs/data.json"])
+        self.assertEqual(f["outside_the_proof"], ["data its kill tests may read changed (found statically): docs/data.json",
+                                                  self.provisional()])
         self.assertEqual(doc["targets"]["aisef2/n.py::h"]["outside_the_proof"], [self.provisional()])
+        self.assertEqual((doc["counts"]["provisional"], doc["counts"]["data_read"]), (3, 0))
+        _, md = D.build(self.repo, self.base, "HEAD")
+        self.assertIn("**3 of the 3 that can stand do so only PROVISIONALLY**", md)
 
     def test_data_found_statically_however_the_path_is_written(self):
-        base = "import glob\nimport pathlib\nfrom tests.v2 import helper\nROOT = pathlib.Path(__file__).parents[2]\n"
+        base = ("import glob\nimport os\nimport pathlib\nfrom tests.v2 import helper\n"
+                "ROOT = pathlib.Path(__file__).parents[2]\n")
         cases = {
             "path parts, each quoted": ({M: base + "D = ROOT / 'docs' / 'sub' / 'data.json'\n"}, "docs/sub/data.json",
                                         "M", f"{M} names its path parts"),
@@ -306,6 +357,16 @@ class Toy(unittest.TestCase):
                 "validation/v2/data/new.json", "A", "validation/v2/reader.py names a directory it lists"),
             "a glob pattern's literal part": ({M: base + "A = glob.glob(str(ROOT / 'docs/sub/*.json'))\n"},
                                               "docs/sub/new.json", "A", f"{M} names a directory it lists"),
+            "an iglob of its directory": ({M: base + "A = list(glob.iglob(os.path.join(ROOT, 'docs', 'sub', '*.json')))\n"},
+                                          "docs/sub/new.json", "A", f"{M} names a directory it lists"),
+            "a listdir of its directory": ({M: base + "A = os.listdir(ROOT / 'docs' / 'sub')\n"},
+                                           "docs/sub/new.json", "A", f"{M} names a directory it lists"),
+            "a scandir of its directory": ({M: base + "A = list(os.scandir(os.path.join(ROOT, 'docs', 'sub')))\n"},
+                                           "docs/sub/new.json", "A", f"{M} names a directory it lists"),
+            "an os.walk above it": ({M: base + "A = list(os.walk(os.path.join(ROOT, 'docs')))\n"},
+                                    "docs/sub/deep/new.json", "A", f"{M} names a directory it lists"),
+            "an os.fwalk above it": ({M: base + "A = list(os.fwalk(os.path.join(ROOT, 'docs')))\n"},
+                                     "docs/sub/deep/new.json", "A", f"{M} names a directory it lists"),
             "a recursive glob above it": ({M: base + "A = sorted((ROOT / 'docs').rglob('*.json'))\n"},
                                           "docs/sub/deep/new.json", "A", f"{M} names a directory it lists"),
             "a ** pattern above it": ({M: base + "A = sorted((ROOT / 'docs').glob('**/*.json'))\n"},
@@ -319,8 +380,8 @@ class Toy(unittest.TestCase):
             with self.subTest(name):
                 self.init({**files, **({changed: "{}\n"} if status == "M" else {})})
                 row = self.delta({changed: "{\"x\": 2}\n"})["files"][0]
-                self.assertEqual((row["status"], row["kinds"], row["read_set"]["read_by"]),
-                                 (status, [D.DATA, D.UNMEASURED], {M: f"found statically: {how}"}))
+                self.assertEqual((row["status"], row["kinds"], row["read_set"]["read_by"], row["read_set"]["not_measured"]),
+                                 (status, [D.DATA, D.UNMEASURED], {M: f"found statically: {how}"}, [M, N]))
                 self.assertEqual(sorted(t for t, w in row["targets"].items() if MAY_READ in w), ["aisef2/m.py::f", "aisef2/m.py::g"])
 
     def test_data_is_looked_for_at_both_commits(self):
@@ -334,10 +395,24 @@ class Toy(unittest.TestCase):
                 row = {r["path"]: r for r in doc["files"]}["docs/sub/data.json"]
                 self.assertEqual(row["read_set"]["read_by"], {M: f"found statically: {reader} names its path"})
 
+    def test_data_is_looked_for_in_the_kill_files_closure_at_both_commits(self):
+        reader = "validation/v2/reader.py"
+        imports = FILES[M] + "from validation.v2 import reader\n"
+        for name, at_base, at_head in (("imported at base only", imports, FILES[M] + "Y = 1\n"),
+                                       ("imported at head only", FILES[M], imports)):
+            with self.subTest(name):
+                self.init({M: at_base, reader: "D = 'docs/sub/data.json'\n", "docs/sub/data.json": "{}\n"})
+                self.edit({M: at_head, "docs/sub/data.json": "{\"x\": 2}\n"})
+                doc, _ = D.build(self.repo, self.base, self.commit("both"))
+                row = {r["path"]: r for r in doc["files"]}["docs/sub/data.json"]
+                self.assertEqual(row["read_set"]["read_by"], {M: f"found statically: {reader} names its path"})
+
     def test_a_name_alone_or_a_directory_never_listed_is_not_found(self):
         base = "import pathlib\nfrom tests.v2 import helper\nROOT = pathlib.Path(__file__).parents[2]\n"
         for name, files, changed in (
                 ("the basename only", {M: base + "N = 'data.json'\n"}, "docs/sub/data.json"),
+                ("a parent of one component and the basename", {M: base + "P = ('docs', 'data.json')\n"},
+                 "docs/sub/data.json"),
                 ("its directory, never listed", {M: base + "D = ROOT / 'docs' / 'sub'\n"}, "docs/sub/new.json"),
                 ("a sibling's directory listed", {M: base + "A = list((ROOT / 'docs' / 'other').iterdir())\n"},
                  "docs/sub/new.json"),
@@ -360,37 +435,62 @@ class Toy(unittest.TestCase):
     # -- the measured read-set --------------------------------------------------------------------------------------
 
     def test_a_measured_read_set_names_the_readers_and_clears_the_rest(self):
-        doc = self.delta({"docs/notes.md": "x\n"}, {"kill_files": {M: {"opened": ["./docs/notes.md"], "listed": []},
-                                                                   N: {"opened": ["docs/data.json"], "listed": ["docs/sub"]}}})
+        doc = self.delta({"docs/notes.md": "x\n"}, {"kill_files": {M: ran(M, ["./docs/notes.md"]),
+                                                                   N: ran(N, ["docs/data.json"], ["docs/sub"])}})
         row = doc["files"][0]
         self.assertEqual((row["kinds"], row["read_set"]), ([D.DATA], {
             "read_by": {M: "measured"}, "not_measured": [], "cleared": [N], "provisional": 0,
             "provisional_except": sorted(TARGETS)}))
+        note = (f"data its kill tests read changed (measured): docs/notes.md — the {self.base[:7]} result is no ground "
+                f"at head (the proof's rules do not cover data): re-measure it")
         self.assertEqual({t: v.get("outside_the_proof") for t, v in doc["targets"].items()},
-                         {"aisef2/m.py::f": ["data its kill tests read changed (measured): docs/notes.md"],
-                          "aisef2/m.py::g": ["data its kill tests read changed (measured): docs/notes.md"],
-                          "aisef2/n.py::h": None})
+                         {"aisef2/m.py::f": [note], "aisef2/m.py::g": [note], "aisef2/n.py::h": None})
+        self.assertEqual({t: v["data_read"] for t, v in doc["targets"].items()},
+                         {"aisef2/m.py::f": 1, "aisef2/m.py::g": 1, "aisef2/n.py::h": 0})
         self.assertEqual(row["targets"], dict.fromkeys(["aisef2/m.py::f", "aisef2/m.py::g"],
                                                        ["data its kill tests read (measured; outside the proof's rules)"]))
-        self.assertEqual((doc["read_set"]["path"], doc["read_set"]["kill_files"], doc["counts"]["provisional"]),
-                         ("readset.json", 2, 0))
+        self.assertEqual((doc["read_set"]["path"], doc["read_set"]["kill_files"], doc["counts"]["provisional"],
+                          doc["counts"]["data_read"], doc["counts"]["stand"]), ("readset.json", 2, 0, 2, 3))
+        _, md = D.build(self.repo, self.base, "HEAD", self.repo / "readset.json")
+        self.assertIn("**2 of the 3 that can stand by the proof's rules have kill tests that read changed data inside "
+                      f"`mutation.COPY` (measured)**: the proof's rules do not cover data, so a {self.base[:7]} result is no "
+                      "ground for them at head; re-measure them.", md)
+        self.assertIn("no target re-measured by the proof's rules; read by their kill tests (measured; outside the proof's "
+                      "rules): re-measure 2: `aisef2/m.py::f`, `aisef2/m.py::g` |", md)
+        self.assertNotIn("PROVISIONALLY", md)
+
+    def test_a_re_measured_target_whose_kill_tests_read_changed_data_is_not_counted_again(self):
+        self.edit({"docs/notes.md": "x\n", "aisef2/n.py": "def h(x):\n    return x\n"})
+        head = self.commit("two")
+        rs = self.repo / "readset.json"
+        rs.write_text(json.dumps({"commit": head, "kill_files": {M: ran(M), N: ran(N, ["docs/notes.md"])}}), encoding="utf-8")
+        doc, md = D.build(self.repo, self.base, head, rs)
+        self.assertEqual(doc["targets"]["aisef2/n.py::h"]["outside_the_proof"],
+                         ["data its kill tests read changed (measured): docs/notes.md"])
+        self.assertEqual((doc["counts"]["data_read"], doc["counts"]["remeasure"]), (0, 1))
+        self.assertNotIn("have kill tests that read changed data", md)
+        self.assertNotIn("read by their kill tests (measured", md)
+
+    def test_a_measurement_decides_over_a_static_finding(self):
+        row = self.delta({"docs/data.json": "{\"x\": 1}\n"}, {"kill_files": {M: ran(M), N: ran(N)}})["files"][0]
+        self.assertEqual((row["kinds"], row["targets"], row["read_set"]["read_by"], row["read_set"]["cleared"]),
+                         ([D.UNREAD], {}, {}, [M, N]))
 
     def test_a_listed_directory_above_the_file_reads_it(self):
         for listed in ("docs", "docs/", "./docs/a", "."):      # "." is the tree's root
             with self.subTest(listed):
                 self.init({})
-                row = self.delta({"docs/a/b.md": "x\n"}, {"kill_files": {M: {"opened": [], "listed": ["docs/b"]},
-                                                                         N: {"opened": [], "listed": [listed]}}})["files"][0]
+                row = self.delta({"docs/a/b.md": "x\n"}, {"kill_files": {M: ran(M, listed=["docs/b"]),
+                                                                         N: ran(N, listed=[listed])}})["files"][0]
                 self.assertEqual((row["kinds"], row["read_set"]["read_by"], row["read_set"]["cleared"]),
                                  ([D.DATA], {N: "measured"}, [M]))
 
     def test_a_read_set_that_clears_every_kill_file_leaves_no_target(self):
-        row = self.delta({"docs/notes.md": "x\n"}, {"kill_files": {M: {"opened": [], "listed": []},
-                                                                   N: {"opened": [], "listed": []}}})["files"][0]
+        row = self.delta({"docs/notes.md": "x\n"}, {"kill_files": {M: ran(M), N: ran(N)}})["files"][0]
         self.assertEqual((row["kinds"], row["targets"], row["read_set"]["cleared"]), ([D.UNREAD], {}, [M, N]))
 
     def test_a_kill_file_missing_from_the_read_set_stays_not_measured(self):
-        doc = self.delta({"docs/notes.md": "x\n"}, {"kill_files": {M: {"opened": [], "listed": []}}})
+        doc = self.delta({"docs/notes.md": "x\n"}, {"kill_files": {M: ran(M)}})
         row = doc["files"][0]
         self.assertEqual((row["kinds"], row["read_set"]["not_measured"], row["read_set"]["cleared"],
                           row["read_set"]["provisional_except"]), ([D.UNMEASURED], [N], [M], ["aisef2/m.py::f", "aisef2/m.py::g"]))
@@ -398,17 +498,41 @@ class Toy(unittest.TestCase):
 
     def test_a_file_missing_at_head_is_never_cleared_by_a_run_at_head(self):
         (self.repo / "docs/notes.md").rename(self.repo / "docs/notes2.md")   # the source is not at head
-        row = self.delta({}, {"kill_files": {M: {"opened": [], "listed": []}, N: {"opened": [], "listed": []}}})["files"][0]
+        row = self.delta({}, {"kill_files": {M: ran(M), N: ran(N)}})["files"][0]
         self.assertEqual((row["status"], row["kinds"], row["read_set"]["not_measured"], row["read_set"]["cleared"]),
                          ("R100", [D.UNMEASURED], [M, N], []))
+        self.init({})
+        (self.repo / "docs/data.json").rename(self.repo.parent / "data.json")   # out of the repository; M names it: found statically
+        row = self.delta({}, {"kill_files": {M: ran(M), N: ran(N)}})["files"][0]
+        self.assertEqual((row["status"], row["kinds"], row["read_set"]["read_by"], row["read_set"]["not_measured"]),
+                         ("D", [D.DATA, D.UNMEASURED], {M: f"found statically: {M} names its path"}, [M, N]))
+        self.init({})
+        (self.repo / "docs/data.json").rename(self.repo.parent / "data.json")   # out of the repository; M looked it up at head: it reads it
+        row = self.delta({}, {"kill_files": {M: ran(M, ["docs/data.json"]), N: ran(N)}})["files"][0]
+        self.assertEqual((row["kinds"], row["read_set"]["read_by"], row["read_set"]["not_measured"]),
+                         ([D.DATA, D.UNMEASURED], {M: "measured"}, [N]))
 
     def test_a_read_set_of_another_commit_or_shape_is_refused(self):
         self.edit({"docs/notes.md": "x\n"})
         head = self.commit("change")
         rs = self.repo / "readset.json"
+        rel = "is not a path relative to the tree root"
         for doc, why in (({"commit": self.base, "kill_files": {}}, "not at the head"),
                          ({"commit": head, "kill_files": {M: {"opened": "docs/notes.md", "listed": []}}}, "not a read-set"),
-                         ({"commit": head}, "not a read-set")):
+                         ({"commit": head}, "not a read-set"),
+                         ({"commit": head, "kill_files": {M: ran(M, [f"/private/tmp/runner/{M}"])}},
+                          f"{M}: '/private/tmp/runner/{M}' {rel}"),
+                         ({"commit": head, "kill_files": {M: ran(M, ["tests/v2/../../docs/notes.md"])}},
+                          f"{M}: 'tests/v2/../../docs/notes.md' {rel}"),
+                         ({"commit": head, "kill_files": {M: ran(M, ["docs\\notes.md"])}}, f"{M}: 'docs\\\\notes.md' {rel}"),
+                         ({"commit": head, "kill_files": {M: ran(M, ["docs//notes.md"])}}, f"{M}: 'docs//notes.md' {rel}"),
+                         ({"commit": head, "kill_files": {M: ran(M, ["docs/./notes.md"])}}, f"{M}: 'docs/./notes.md' {rel}"),
+                         ({"commit": head, "kill_files": {M: ran(M), N: ran(N, listed=["/private/tmp/runner/docs"])}},
+                          f"{N}: '/private/tmp/runner/docs' {rel}"),
+                         ({"commit": head, "kill_files": {M: {"opened": [f"/private/tmp/runner/{M}", "docs/notes.md"],
+                                                              "listed": []}}}, f"{M}: '/private/tmp/runner/{M}' {rel}"),
+                         ({"commit": head, "kill_files": {M: {"opened": ["docs/notes.md"], "listed": []}}},
+                          f"{M}: its own path is not among the files it opened")):
             with self.subTest(why):
                 rs.write_text(json.dumps(doc), encoding="utf-8")
                 with self.assertRaises(SystemExit) as e:
@@ -455,6 +579,7 @@ class Toy(unittest.TestCase):
         self.assertEqual(rows["validation/v2/mutation.py"], [man_rel, "closure-evidence/EO.json", "closure-evidence/Q0.json"])
         self.assertEqual(rows[M], [man_rel, "closure-evidence/T0.json", "closure-evidence/EO.json"])
         self.assertIn("| `closure-evidence/Q0.json` | yes: re-derive the Q0 checker calibration |", md)
+        self.assertEqual(rec["closure-evidence/Q0.json"]["note"], "not written at head")
 
     def test_a_kill_file_the_manifest_does_not_bind_is_a_reason(self):
         man_rel = "closure-evidence/v2/v2.1/REQUALIFICATION-MANIFEST-2.json"
@@ -464,6 +589,15 @@ class Toy(unittest.TestCase):
         doc, _ = D.build(self.repo, self.base, self.commit("manifest"))
         self.assertEqual((doc["records"][0]["record"], doc["records"][0]["reasons"]),
                          (man_rel, [{"why": f"kill files the manifest does not bind: {N}", "files": [N]}]))
+
+    def test_the_manifest_is_the_latest_revision_of_this_snapshot(self):
+        prefix = "closure-evidence/v2/v2.1/REQUALIFICATION-MANIFEST"
+        self.edit({f"{prefix}-3.json": json.dumps({"snapshot": self.base, "revision": 3}),   # sorts before the next
+                   f"{prefix}.json": json.dumps({"snapshot": self.base, "revision": 2}),
+                   f"{prefix}-1.json": json.dumps({"snapshot": self.base, "revision": None}),
+                   f"{prefix}-4.json": json.dumps({"snapshot": "0" * 40, "revision": 4})})
+        doc, _ = D.build(self.repo, self.base, self.commit("manifests"))
+        self.assertEqual(doc["records"][0]["record"], f"{prefix}-3.json")
 
     def test_a_null_mutant_change_re_derives_the_execution_order(self):
         man_rel = "closure-evidence/v2/v2.1/REQUALIFICATION-MANIFEST-2.json"
@@ -526,6 +660,19 @@ class Toy(unittest.TestCase):
         (out / "DELTA.json").write_text(json.dumps(doc), encoding="utf-8")
         self.assertIn(f"{out}/DELTA.json is not what {self.base[:12]}..{now[:12]} derives now", D.check(self.repo, out))
 
+    def test_check_calls_a_later_change_every_kill_test_may_read_stale(self):
+        self.init({N: "X = 1\nD = 'docs/data.json'\n"})       # M and N both name it: found statically for each
+        self.edit({"evidence/notes.md": "x\n"})
+        head = self.commit("evidence")
+        out = self.write_table(head)
+        self.commit("the table")
+        self.edit({"docs/data.json": "{\"x\": 3}\n"})
+        now = self.commit("data")
+        doc, _ = D.build(self.repo, head, now)
+        self.assertEqual((doc["files"][0]["kinds"], doc["files"][0]["read_set"]["not_measured"]), ([D.DATA, D.UNMEASURED], [M, N]))
+        self.assertEqual(D.check(self.repo, out), [f"stale: HEAD {now[:12]} has changes after the table's head "
+                                                   f"{head[:12]} that it does not cover: docs/data.json"])
+
     def test_check_calls_a_later_change_a_record_binds_stale(self):
         man_rel = "closure-evidence/v2/v2.1/REQUALIFICATION-MANIFEST-2.json"
         self.edit({man_rel: json.dumps({"snapshot": self.base, "bound": {"path": "evidence/notes.md",
@@ -538,6 +685,26 @@ class Toy(unittest.TestCase):
         now = self.commit("bound evidence")
         self.assertEqual(D.check(self.repo, out), [f"stale: HEAD {now[:12]} has changes after the table's head "
                                                    f"{head[:12]} that it does not cover: evidence/notes.md"])
+
+    def test_check_refuses_a_table_derived_beside_other_reuse_criteria(self):
+        self.edit({"evidence/notes.md": "x\n"})
+        out = self.write_table(self.commit("evidence"))
+        self.commit("the table")
+        src = D.PROOF.read_text(encoding="utf-8")
+        old = 'out.append("its kill set is not the current one")'
+        self.assertEqual(src.count(old), 1)
+        self.addCleanup(setattr, D, "PROOF", D.PROOF)
+        for name, text, problems in (("a change outside the criteria", src + "\n# a comment\n", 0),
+                                     ("a change of proof()", src.replace(old, "pass"), 1)):
+            with self.subTest(name):
+                D.PROOF = pathlib.Path(self._tmp.name) / f"proof-{problems}.py"
+                D.PROOF.write_text(text, encoding="utf-8")
+                sha = D.MR.criteria_sha256(D.PROOF)
+                self.assertEqual(D.check(self.repo, out), [] if not problems else [
+                    f"{D.PROOF_REL}: its reuse criteria (criteria_sha256 {sha[:16]}) are not the ones the table was derived "
+                    f"beside: verdict() re-implements proof() — compare the two before re-deriving the table"])
+        doc = json.loads((out / "DELTA.json").read_text(encoding="utf-8"))
+        self.assertEqual(doc["proof"], {"path": D.PROOF_REL, "criteria_sha256": D.MR.criteria_sha256(ROOT / D.PROOF_REL)})
 
     def test_check_refuses_a_table_whose_head_is_not_an_ancestor_of_head(self):
         _git(self.repo, "checkout", "-q", "-b", "side")
@@ -558,8 +725,7 @@ class Toy(unittest.TestCase):
         self.edit({"docs/notes.md": "x\n"})
         head = self.commit("data")
         rs = self.repo / "readset.json"
-        rs.write_text(json.dumps({"commit": head, "kill_files": {M: {"opened": [], "listed": []},
-                                                                  N: {"opened": [], "listed": []}}}), encoding="utf-8")
+        rs.write_text(json.dumps({"commit": head, "kill_files": {M: ran(M), N: ran(N)}}), encoding="utf-8")
         out = self.write_table(head, rs)
         self.assertEqual(json.loads((out / "DELTA.json").read_text(encoding="utf-8"))["files"][0]["kinds"], [D.UNREAD])
         self.assertEqual(D.check(self.repo, out), [])
