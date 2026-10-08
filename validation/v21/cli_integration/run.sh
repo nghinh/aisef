@@ -38,7 +38,12 @@ A bundle approve b2.json --contract BC-USAGE-1 --approver human:integration --ou
 A bundle approve b3.json --contract BC-NAN --approver human:integration --out approved2.json
 print "== run2 (SIGKILLed in S2)"
 (cd $I && exec $PY -m aisef run --project approved2.json --settings settings.json --repo repo2 --out run2 \
-   --anchor-out anchors/run2.anchor) & print $! > $I/kill-run2.pid; wait $!; print "exit $? (137 = SIGKILL)"
+   --anchor-out anchors/run2.anchor) & RUN2=$!
+# INV-MUTATION-AUTHORITY: the kill's target is this shell's own job ($!, started just above, not yet waited for);
+# the fake developer only says when (kill-run2.ready, written once its S2 usage is reported, then it waits)
+until [[ -e $I/kill-run2.ready ]] || ! kill -0 $RUN2 2>/dev/null; do sleep 0.05; done
+[[ -e $I/kill-run2.ready ]] && kill -KILL $RUN2 && print "SIGKILL after the usage of 'developer S2' was reported" > $I/kill-run2.done
+wait $RUN2; print "exit $? (137 = SIGKILL)"
 print "run2: RUN.json $([[ -e $I/run2/RUN.json ]] && print present || print absent); RUN.started.json $([[ -e $I/run2/RUN.started.json ]] && print present || print absent); kill: $(cat $I/kill-run2.done)"
 print "== continue"; A bundle continue approved2.json --from-run run2 --out cont.json
 print "== run3 --parent, unknown spend not accepted"
