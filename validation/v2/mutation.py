@@ -1148,7 +1148,7 @@ NOT_KILL_FILES = ("tests/v2/test_v21_identity_bytes.py",)
 
 _RAN = re.compile(r"^Ran (\d+) tests? in [\d.]+s$", re.M)
 _END = re.compile(r"^(OK|FAILED)(?: \((.*)\))?$", re.M)
-_HEAD = re.compile(r"^(FAIL|ERROR|UNEXPECTED SUCCESS): (.+)$", re.M)
+_HEAD = re.compile(r"^={70}\n(FAIL|ERROR|UNEXPECTED SUCCESS): (.+)$", re.M)   # a line a test prints is not the report
 _TEST = re.compile(r"^(\w+) \(([\w.]+)\)", re.M)
 _SKIP = re.compile(r"^ *(\S+ \([\w.]+\)(?: \[[^\n]*\]| \([^\n]*\))?)(?:\n[^\n]*)? \.\.\. skipped", re.M)
 
@@ -1175,22 +1175,33 @@ def _summary(text: str) -> dict | None:
             "skipped_tests": sorted(x[1] for x in _SKIP.finditer(body)), "first_test": test}
 
 
-#: the runner's own temp names (§3.2): a scratch directory is `aisef-mut-<worker>-<8>`, a run directory `run-<8>` and a tree
-#: `tree-<8>` in it, a run's TMPDIR `<run>/tmp`, and a test's default mkdtemp `tmp<8>` in that (8 = tempfile's random
-#: characters). A subTest label or parameter that names a path there is new on every run.
-_RUNNER_DIR = re.compile(r"(?:[A-Za-z]:)?[\\/][^\s'\"()\[\]]{0,500}?aisef-mut-[0-9a-f]{12}-[a-z0-9_]{8}[\\/]+(run|tree)-[a-z0-9_]{8}")
-_MKDTEMP = re.compile(r"(<run>[\\/]+tmp[\\/]+)tmp[a-z0-9_]{8}(?![a-z0-9_])")
+#: the runner's own temp names (§15): a scratch directory is `aisef-mut-<worker>-<8>` (worker: 12 hex), a run directory
+#: `run-<8>` or a tree `tree-<8>` in it, a run's TMPDIR `<run>/tmp`, and a test's default mkdtemp name `tmp<8>` in that
+#: (8 = tempfile's random characters). Only the run, tree and mkdtemp names are replaced, never the text around them and
+#: not the scratch name (one per target: a directory of another target or worker stays a different name).
+_RUNNER_DIR = re.compile(r"(?<![\w.-])(aisef-mut-[0-9a-f]{12}-[a-z0-9_]{8}[\\/]+)(run|tree)-[a-z0-9_]{8}(?![a-z0-9_])")
+_MKDTEMP = re.compile(r"(<run#\d+>[\\/]+tmp[\\/]+)(tmp[a-z0-9_]{8})(?![a-z0-9_])")
 
 
 def signature(first: str | None) -> str | None:
-    """What the bracket compares (§3.2): the failure's `first` — header line and exception class — with the runner's
-    own temp names replaced (`<run>`, `<tree>`, `<mkdtemp>`) and nothing else, so a path under the run's TMPDIR in a
-    subTest label is the same failure on every run, while another test, subtest, parameter or exception class is not.
-    A pure function of the recorded `first`: the record check applies it to the row as written. The record keeps the
-    header as the run printed it."""
-    if first is None or "aisef-mut-" not in first:   # no runner name: nothing to replace, and no scan of a long header
+    """What the bracket compares (§15): the failure's `first` — header line and exception class — with the runner's own
+    run, tree and mkdtemp names replaced by `<run#n>`, `<tree#n>`, `<mkdtemp#n>` (n: order of first appearance in this
+    header, so which names coincide is kept) and nothing else: a path under the run's TMPDIR in a subTest label is the
+    same failure on every run, while another test, subtest, parameter, exception class or directory is not. A `<` already
+    in the header is doubled first, so a literal `<run#1>` is not a replaced name. A pure function of the recorded
+    `first`: the record check applies it to the row as written, and the record keeps the header as the run printed it."""
+    if not isinstance(first, str):
         return first
-    return _MKDTEMP.sub(r"\1<mkdtemp>", _RUNNER_DIR.sub(lambda m_: f"<{m_[1]}>", first))
+    text = first.replace("<", "<<")
+    if "aisef-mut-" not in text:   # no runner name: nothing to replace, and no scan of a long header
+        return text
+    seen: dict[tuple[str, str], int] = {}
+
+    def number(kind: str, name: str) -> int:
+        return seen.setdefault((kind, name), 1 + sum(k[0] == kind for k in seen))
+
+    text = _RUNNER_DIR.sub(lambda m_: f"{m_[1]}<{m_[2]}#{number(m_[2], m_[0])}>", text)
+    return _MKDTEMP.sub(lambda m_: f"{m_[1]}<mkdtemp#{number('mkdtemp', m_[2])}>", text)
 
 
 def _counts(s: dict) -> list[int]:
@@ -1232,6 +1243,7 @@ def _tail(text: str, tg: _Target, run: pathlib.Path) -> str:
     """The output, normalised so two identical outcomes hash identically across runs and orders (ORD-6 verifier)."""
     for path, name in ((run, "<run>"), (tg.tree, "<tree>"), (tg.scratch, "<scratch>")):
         text = text.replace(os.path.realpath(path), name).replace(str(path), name)
+    text = re.sub(r"(<run>[\\/]+tmp[\\/]+)tmp[a-z0-9_]{8}(?![a-z0-9_])", r"\1<mkdtemp>", text)   # a test's own mkdtemp
     text = re.sub(r"^(Ran \d+ tests?) in [\d.]+s$", r"\1", text, flags=re.M)
     return re.sub(r"0x[0-9a-fA-F]+", "0x?", text)[-TAIL:]
 

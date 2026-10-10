@@ -938,41 +938,66 @@ series; 36 tests and 252 s at commit 6).
 
 **What campaign 2 showed.** 31 of 12,448 mutants ended INFRA although each failed its kill test on every run and the
 unmutated module passed every control: 30 in `confine.py::wrap`, 1 in `cli.py::run`. Both kill tests name a path in a
-subTest label — `subTest(exe=exe)` (`test_v21_confine.py:220`) and `subTest(argv[-1])`
-(`test_v21_continue_integrity.py:620`) — and the path is under the run's own TMPDIR
+subTest label — `subTest(exe=exe)` (`test_v21_confine.py:220` at 5719f1f; line 424 at this head) and
+`subTest(argv[-1])` (`test_v21_continue_integrity.py:620`) — and the path is under the run's own TMPDIR
 (`<scratch>/run-<8>/tmp/tmp<8>/…`), which is new on every run. The failure signature (§3.1) is the whole header line, so
 the bracket's re-run (and the fresh-tree re-run) never had the signature of the first failure and the runner, correctly
-by its rules, did not call it a kill. Three further mutants were TIMEOUT (a mutant that never terminates or waits out
-its budget); they are a different matter and are left to their own re-run.
+by its rules, did not call it a kill. Three further mutants were TIMEOUT (a mutant that never terminates or waits out its
+budget); they are a different matter and are left to their own re-run.
 
-**The change** (`signature`, `_RUNNER_DIR`, `_MKDTEMP`; used by `_confirm` and `_confirmed` and nowhere else): the
-signature the bracket compares is `first` with three kinds of name replaced — the run directory and the tree directory
-of this runner (`…/aisef-mut-<worker>-<8>/run-<8>` → `<run>`, `…/tree-<8>` → `<tree>`) and a test's default mkdtemp name
-directly under the run's TMPDIR (`<run>/tmp/tmp<8>` → `<run>/tmp/<mkdtemp>`). Everything else stays: the test and subtest,
-every other part of a label (the stable remainder of the path, a counter, a parameter), the exception class. A function of
-the recorded `first` alone, so the record check applies the same rule to the row as written; the record is unchanged in
-shape and keeps the raw header. The outcome of a run (`_outcome`: PASS, FAIL, TIMEOUT, INFRA), the controls, the second
-control, the fresh re-measure and the classification are untouched: the rule only widens "same signature" from "same
-string" to "same string but for the runner's own random names".
+**The change** (`signature`, `_RUNNER_DIR`, `_MKDTEMP`; used by `_confirm` and `_confirmed` and nowhere else; `_tail` maps
+the same mkdtemp name; `_HEAD` is anchored to the report). The signature the bracket compares is `first` with three
+kinds of NAME replaced and nothing around them touched: a run directory `run-<8>` or a tree `tree-<8>` directly under a
+runner scratch directory (`aisef-mut-<worker 12 hex>-<8>/run-<8>` → `aisef-mut-…/<run#n>`), and a test's default
+mkdtemp name directly under the run's TMPDIR (`<run#n>/tmp/tmp<8>` → `<run#n>/tmp/<mkdtemp#m>`). `n`, `m` count the
+distinct names of a kind in order of first appearance in that header, so which names coincide survives (`src is dst`
+is not `src is not dst`); the scratch name stays, so another target's or worker's directory is another name; a `<`
+already in the header is doubled first, so a literal `<run#1>` is not a replaced name; text before, between and after
+the names (the rest of a path, a drive letter, a parameter, a counter) and the exception class are never touched. A
+function of the recorded `first` alone, so the record check applies the same rule to the row as written; the record
+keeps the header as the run printed it. `_outcome` (PASS, FAIL, TIMEOUT, INFRA), the controls, the second control, the
+fresh re-measure and the classification are untouched: the rule only widens "same signature" from "same string" to
+"same string but for the runner's own random names". Two unrelated changes ride with it, both from the review:
+`_HEAD` takes the header after the report's own `=`×70 line, so a line a test prints (or a docstring under `-v`) is no
+longer taken for the first failure; and `_tail` maps the test's mkdtemp name too, so a row's `tail_sha256` of such a
+failure is the same on every run (ORD-6 holds on `signature(first)` and `tail_sha256`; `first` itself is raw by design).
 
-**What it cannot do.** It cannot turn a failure that is not the same into a kill (a failure of another test, subtest,
-parameter or exception class keeps another signature; a label that carries a per-run counter is still INFRA —
-`Signature.test_a_failure_that_differs_in_more_than_temp_names_is_still_not_a_kill`), and it cannot create a FAIL: a
-PASS, a TIMEOUT, an INFRA row or a lost summary decides as before, before the signature is read. A kill file whose label
-carries something else that changes on every run (a pid, a clock, a port) is not helped; it stays INFRA and is named.
+**What it cannot do, and its limits.**
+- It cannot turn a failure that is not the same into a kill: another test, subtest, parameter, directory or exception
+  class keeps another signature (`Signature.test_the_signature_replaces_only_the_runners_own_temp_names`), a label that
+  carries a per-run counter is still INFRA (`…test_a_failure_that_differs_in_more_than_temp_names_is_still_not_a_kill`),
+  and it cannot create a FAIL: a PASS, a TIMEOUT, an INFRA row or a lost summary decides as before, before the
+  signature is read. A kill file whose label carries something else that changes on every run (a pid, a clock, a port)
+  is not helped; it stays INFRA and is named.
+- By shape alone, a fixed name under the run's TMPDIR that looks like mkdtemp's (`tmp` + 8 of `[a-z0-9_]`, e.g.
+  `tmpbackup_a`) is replaced like one, and a run directory of the same scratch from an earlier run is `<run#n>` like
+  this one; both only matter for a re-run that fails in a sibling subtest that differs in exactly that and nothing
+  else. Not covered, and fail-closed: a second mkdtemp level, a mkdtemp name with a suffix of name characters or another
+  prefix, a relative spelling, upper-cased or 8.3 Windows names — they stay INFRA.
+- A record written by this runner is read by this runner's `--check`. The earlier runner (and
+  `campaign-2/tools/check_at_snapshot.sh` at 5719f1f) reads a KILLED entry whose re-run differs only in temp names as
+  "KILLED without a confirmed kill": fail-closed, and the reason for running the re-measure's check with this runner.
 
-**Which campaign-2 results stand** (the runner is a harness the reuse proof does not cover, so the argument is made here
-and checked on the record):
+**Which campaign-2 results stand.** The runner is a harness the reuse proof does not cover, so the argument is made here
+and checked on the record (`campaign-2/tools/replay_signature.py`, run over the 12,448 results as written;
+`campaign-2/results/SIGNATURE-REPLAY.json`):
 
-| Class | Why the runner change cannot move it | Check on the record (`replay_signature.py`) |
+| Class | Why the runner change cannot move it | Check on the record |
 |---|---|---|
-| KILLED (10,738) | its bracket was confirmed by string equality; equal strings have equal signatures | all 10,738 are confirmed under the new rule |
-| SURVIVED (1,676) | no FAIL row, so no bracket and no signature is read | n/a (`mutant_class`: every file PASS) |
-| TIMEOUT (3), NOT_RUN (0) | decided before any signature is read | n/a |
-| INFRA (31) | the only class the rule can change, and only toward KILLED | the in-place bracket of all 31 (controls PASS ×2, re-run FAIL) is confirmed under the new rule; the class is not rewritten: only a re-run decides |
+| KILLED (10,738) | its bracket was confirmed by string equality; equal strings have equal signatures | all 10,738 are confirmed under the rule (`killed_not_confirmed: []`) |
+| SURVIVED (1,676) | all but 2 have no FAIL row: no bracket, no signature read. The 2 carry an unconfirmed FAIL row whose re-run PASSed — the rule does not change a PASS | 0 whose in-place bracket is confirmed under the rule: none can move |
+| TIMEOUT (3), NOT_RUN (0) | decided by the outcomes before any signature is read; a TIMEOUT mutant with an unconfirmed FAIL row would be the exception | none carries a FAIL row |
+| INFRA (31) | the only class the rule can change, and only toward KILLED | the in-place bracket of all 31 (controls PASS ×2, re-run FAIL) is confirmed under the rule, by signature only |
 
-So no campaign-2 result is invalidated by this change and none is promoted by it; the 31 are re-measured by the runner
-as changed (they are in `confine.py::wrap` and `cli.py::run`, both already in the re-measure set of
-`campaign-2/delta/DELTA.md` because `test_v21_confine.py` changed). Tests: `::Signature` (4): the toy reproduces the
-campaign's INFRA with the rule switched off and is KILLED with it on, a label with a counter stays not-a-kill, the
-function's cases (POSIX and Windows spellings, what it must leave alone), the record check.
+A SURVIVED or TIMEOUT mutant that carries an unconfirmed FAIL row whose in-place bracket differs only in temp names would
+be KILLED when measured again; the replay shows none in campaign 2, and the claim "the rule cannot move SURVIVED" is
+therefore a measurement on this record, not a property of the code. No campaign-2 result is invalidated by the change and
+none is promoted by it; the class of the 31 is not rewritten — only a re-run decides — and the re-run is part of the
+rev-3 measurement: both targets (`confine.py::wrap`, `cli.py::run`) are already in the re-measure set of
+`campaign-2/delta/DELTA.md` because `test_v21_confine.py` changed. The delta and manifest revision 3 are re-derived at
+the head that carries this change before that run.
+
+**Tests** (`::Signature`, 6): the toy reproduces the campaign's INFRA with the rule switched off and is KILLED with it
+on; a label with a per-run counter stays not-a-kill; the function's cases (what it replaces, what it keeps — text before
+a path, aliasing, another directory, a lookalike, a literal placeholder, Windows spellings, non-strings, a 200 kB header
+under 5 s); the record check; a printed `FAIL:` line is not the header.
