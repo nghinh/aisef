@@ -1,0 +1,443 @@
+{
+ "measure_in_range": [
+  {
+   "test": "FailClosed.test_a_probe_that_did_not_exit_0_is_refused_even_when_it_reached_its_end",
+   "tmp": "/tmp/tmpl7hwa18h",
+   "bwrap": "/tmp/tmpl7hwa18h/bwrap",
+   "bwrap_is": "another script",
+   "venv_site": "/tmp/tmpl7hwa18h/venv/lib/python3.14/site-packages",
+   "probe_calls": [
+    [
+     "120.221715",
+     60
+    ]
+   ],
+   "setsid_survivors": [
+    149
+   ],
+   "left_on_host": [
+    "/tmp/tmpl7hwa18h/run/confinement/written-e90c1060fcefe413",
+    "/tmp/tmpl7hwa18h/venv/lib/python3.14/site-packages/aisef2/.aisef-confine-probe-e90c1060fcefe413",
+    "/tmp/tmpl7hwa18h/venv/lib/python3.14/site-packages/.aisef-confine-probe-e90c1060fcefe413",
+    "/tmp/tmpl7hwa18h/client/.aisef-confine-probe-e90c1060fcefe413",
+    "/tmp/tmpl7hwa18h/run/confinement/repo/.git/.aisef-confine-probe-e90c1060fcefe413"
+   ],
+   "created_outside_workspace": {
+    "run_directory": true,
+    "kernel": true,
+    "interpreter_site": true,
+    "client_directory": true,
+    "git_directory": true
+   }
+  },
+  {
+   "test": "FailClosed.test_the_sleeper_outlives_a_probe_that_used_all_its_time_and_the_grace",
+   "tmp": "/tmp/tmptith75pr",
+   "bwrap": "/tmp/tmptith75pr/bwrap",
+   "bwrap_is": "NOT_A_SANDBOX",
+   "venv_site": "/tmp/tmptith75pr/venv/lib/python3.14/site-packages",
+   "probe_calls": [
+    [
+     "120.479390",
+     60
+    ]
+   ],
+   "setsid_survivors": [
+    205
+   ],
+   "left_on_host": [
+    "/tmp/tmptith75pr/run/confinement/written-666af81542219b5e",
+    "/tmp/tmptith75pr/venv/lib/python3.14/site-packages/aisef2/.aisef-confine-probe-666af81542219b5e",
+    "/tmp/tmptith75pr/venv/lib/python3.14/site-packages/.aisef-confine-probe-666af81542219b5e",
+    "/tmp/tmptith75pr/client/.aisef-confine-probe-666af81542219b5e",
+    "/tmp/tmptith75pr/run/confinement/repo/.git/.aisef-confine-probe-666af81542219b5e"
+   ],
+   "created_outside_workspace": {
+    "run_directory": true,
+    "kernel": true,
+    "interpreter_site": true,
+    "client_directory": true,
+    "git_directory": true
+   }
+  },
+  {
+   "test": "FailClosed.test_what_is_measured_decides_not_the_name_of_the_tool",
+   "tmp": "/tmp/tmpowvtfyew",
+   "bwrap": "/tmp/tmpowvtfyew/bwrap",
+   "bwrap_is": "NOT_A_SANDBOX",
+   "venv_site": "/tmp/tmpowvtfyew/venv/lib/python3.14/site-packages",
+   "probe_calls": [
+    [
+     "120.753184",
+     60
+    ]
+   ],
+   "setsid_survivors": [
+    252
+   ],
+   "left_on_host": [
+    "/tmp/tmpowvtfyew/run/confinement/written-a563bfc41df80560",
+    "/tmp/tmpowvtfyew/venv/lib/python3.14/site-packages/aisef2/.aisef-confine-probe-a563bfc41df80560",
+    "/tmp/tmpowvtfyew/venv/lib/python3.14/site-packages/.aisef-confine-probe-a563bfc41df80560",
+    "/tmp/tmpowvtfyew/client/.aisef-confine-probe-a563bfc41df80560",
+    "/tmp/tmpowvtfyew/run/confinement/repo/.git/.aisef-confine-probe-a563bfc41df80560"
+   ],
+   "created_outside_workspace": {
+    "run_directory": true,
+    "kernel": true,
+    "interpreter_site": true,
+    "client_directory": true,
+    "git_directory": true
+   }
+  },
+  {
+   "test": "HostGuard.test_nothing_is_copied_or_probed_outside_the_tests_directory",
+   "tmp": "/tmp/tmp4ks03qhh/m",
+   "bwrap": "/tmp/tmp4ks03qhh/m/bwrap",
+   "bwrap_is": "RUNS_NOTHING",
+   "raised": "AssertionError: the venv is not the test's (outside /tmp/tmp4ks03qhh/m: {'prefix': '/tmp/tmp4ks03qhh/bait', 'purelib': '/tmp/tmp4ks03qhh/bait', 'platlib': '/tmp/tmp4ks03qhh/bait'}; /tmp/tmp4ks03qhh/m in the base interpreter's []): nothing was copied into it"
+  },
+  {
+   "test": "HostGuard.test_nothing_is_copied_or_probed_outside_the_tests_directory",
+   "tmp": "/tmp/tmp4ks03qhh/m2",
+   "bwrap": "/tmp/tmp4ks03qhh/m2/bwrap",
+   "bwrap_is": "RUNS_NOTHING",
+   "raised": "AssertionError: the measurement's child refused to measure outside a disposable environment: {'the probe would write': ['/usr/local/lib/python3.14/.aisef-confine-probe-ab1eeac7b89b5882']}"
+  }
+ ],
+ "signal_owned": [
+  {
+   "test": "FailClosed.test_a_probe_that_did_not_exit_0_is_refused_even_when_it_reached_its_end",
+   "claimed": [
+    149
+   ],
+   "groups": [],
+   "signalled": [
+    {
+     "kind": "pid",
+     "id": 149,
+     "proof": {
+      "pid": 149,
+      "ppid": 111,
+      "pgid": 149,
+      "born": 1791675744.0,
+      "runner": 7,
+      "since": 1791675743.0,
+      "command": "sleep 120.221715"
+     }
+    }
+   ],
+   "unproven": [],
+   "harness_view": {
+    "149": [
+     {
+      "pid": 149,
+      "state": "S",
+      "ppid": 111,
+      "pgid": 149,
+      "sid": 149,
+      "start": 4931,
+      "cmd": "sleep 120.221715"
+     },
+     {
+      "pid": 111,
+      "state": "S",
+      "ppid": 7,
+      "pgid": 111,
+      "sid": 111,
+      "start": 4879,
+      "cmd": "/usr/local/bin/python3 -P /repo/aisef2/runtime/range_anchor.py"
+     },
+     {
+      "pid": 7,
+      "state": "R",
+      "ppid": 1,
+      "pgid": 7,
+      "sid": 1,
+      "start": 4680,
+      "cmd": "python3 -B /repo/validation/v21/sandbox/linux_guest.py d1"
+     }
+    ]
+   }
+  },
+  {
+   "test": "FailClosed.test_the_sleeper_outlives_a_probe_that_used_all_its_time_and_the_grace",
+   "claimed": [
+    205
+   ],
+   "groups": [],
+   "signalled": [
+    {
+     "kind": "pid",
+     "id": 205,
+     "proof": {
+      "pid": 205,
+      "ppid": 168,
+      "pgid": 205,
+      "born": 1791675746.0,
+      "runner": 7,
+      "since": 1791675746.0,
+      "command": "sleep 120.479390"
+     }
+    }
+   ],
+   "unproven": [],
+   "harness_view": {
+    "205": [
+     {
+      "pid": 205,
+      "state": "S",
+      "ppid": 168,
+      "pgid": 205,
+      "sid": 205,
+      "start": 5168,
+      "cmd": "sleep 120.479390"
+     },
+     {
+      "pid": 168,
+      "state": "S",
+      "ppid": 7,
+      "pgid": 168,
+      "sid": 168,
+      "start": 5120,
+      "cmd": "/usr/local/bin/python3 -P /repo/aisef2/runtime/range_anchor.py"
+     },
+     {
+      "pid": 7,
+      "state": "R",
+      "ppid": 1,
+      "pgid": 7,
+      "sid": 1,
+      "start": 4680,
+      "cmd": "python3 -B /repo/validation/v21/sandbox/linux_guest.py d1"
+     }
+    ]
+   }
+  },
+  {
+   "test": "FailClosed.test_what_is_measured_decides_not_the_name_of_the_tool",
+   "claimed": [
+    252
+   ],
+   "groups": [],
+   "signalled": [
+    {
+     "kind": "pid",
+     "id": 252,
+     "proof": {
+      "pid": 252,
+      "ppid": 215,
+      "pgid": 252,
+      "born": 1791675748.0,
+      "runner": 7,
+      "since": 1791675748.0,
+      "command": "sleep 120.753184"
+     }
+    }
+   ],
+   "unproven": [],
+   "harness_view": {
+    "252": [
+     {
+      "pid": 252,
+      "state": "S",
+      "ppid": 215,
+      "pgid": 252,
+      "sid": 252,
+      "start": 5353,
+      "cmd": "sleep 120.753184"
+     },
+     {
+      "pid": 215,
+      "state": "S",
+      "ppid": 7,
+      "pgid": 215,
+      "sid": 215,
+      "start": 5307,
+      "cmd": "/usr/local/bin/python3 -P /repo/aisef2/runtime/range_anchor.py"
+     },
+     {
+      "pid": 7,
+      "state": "R",
+      "ppid": 1,
+      "pgid": 7,
+      "sid": 1,
+      "start": 4680,
+      "cmd": "python3 -B /repo/validation/v21/sandbox/linux_guest.py d1"
+     }
+    ]
+   }
+  },
+  {
+   "test": "HostGuard.test_nothing_is_copied_or_probed_outside_the_tests_directory",
+   "claimed": [],
+   "groups": [],
+   "signalled": [],
+   "unproven": [],
+   "harness_view": {}
+  }
+ ],
+ "host_view": {
+  "site /usr/local/lib/python3.14/site-packages": {
+   "entries": 3,
+   "this_user_can_write": false
+  },
+  "base /usr/local": {
+   "entries": 10,
+   "this_user_can_write": false
+  },
+  "base /usr/local/bin": {
+   "entries": 16,
+   "this_user_can_write": false
+  },
+  "base /usr/local/lib/python3.14": {
+   "entries": 196,
+   "this_user_can_write": false
+  },
+  "kernel": {
+   "entries": 107,
+   "this_user_can_write": false
+  },
+  "names /home/op": {
+   "entries": 3,
+   "this_user_can_write": true
+  },
+  "names /repo": {
+   "entries": 21,
+   "this_user_can_write": false
+  }
+ },
+ "host_view_calls": 52,
+ "host_unchanged": [
+  {
+   "test": "CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused",
+   "unchanged": true
+  },
+  {
+   "test": "CommandLine.test_a_directory_is_not_bubblewrap",
+   "unchanged": true
+  },
+  {
+   "test": "CommandLine.test_an_unreadable_bubblewrap_is_a_problem_not_a_crash",
+   "unchanged": true
+  },
+  {
+   "test": "CommandLine.test_home_is_an_empty_tmpfs_and_the_client_still_finds_its_configuration",
+   "unchanged": true
+  },
+  {
+   "test": "CommandLine.test_its_own_namespaces_no_privilege_and_the_client_command_unchanged",
+   "unchanged": true
+  },
+  {
+   "test": "CommandLine.test_network_host_shares_the_network_and_says_so",
+   "unchanged": true
+  },
+  {
+   "test": "CommandLine.test_the_measured_wrapper_is_the_sessions_own",
+   "unchanged": true
+  },
+  {
+   "test": "CommandLine.test_the_reviewers_workspace_is_bound_read_only",
+   "unchanged": true
+  },
+  {
+   "test": "CommandLine.test_the_workspace_is_the_only_writable_host_path_and_it_is_bound_last",
+   "unchanged": true
+  },
+  {
+   "test": "FailClosed.test_a_check_that_did_not_run_is_a_problem_never_a_pass",
+   "unchanged": true
+  },
+  {
+   "test": "FailClosed.test_a_host_that_is_not_linux_has_no_backend",
+   "unchanged": true
+  },
+  {
+   "test": "FailClosed.test_a_killed_sleeper_is_no_survivor_a_live_one_is",
+   "unchanged": true
+  },
+  {
+   "test": "FailClosed.test_a_missing_bubblewrap_or_read_only_path_is_refused",
+   "unchanged": true
+  },
+  {
+   "test": "FailClosed.test_a_namespace_counts_as_own_only_when_both_links_were_read_and_differ",
+   "unchanged": true
+  },
+  {
+   "test": "FailClosed.test_a_probe_that_did_not_exit_0_is_refused_even_when_it_reached_its_end",
+   "unchanged": true
+  },
+  {
+   "test": "FailClosed.test_a_session_that_cannot_be_confined_never_starts_the_client",
+   "unchanged": true
+  },
+  {
+   "test": "FailClosed.test_a_sleeper_still_dying_when_bubblewrap_returned_is_no_survivor",
+   "unchanged": true
+  },
+  {
+   "test": "FailClosed.test_each_check_refuses_on_its_own",
+   "unchanged": true
+  },
+  {
+   "test": "FailClosed.test_no_client_no_measurement",
+   "unchanged": true
+  },
+  {
+   "test": "FailClosed.test_the_grace_used_is_survivor_grace_so_a_sleeper_ending_just_after_it_is_still_a_survivor",
+   "unchanged": true
+  },
+  {
+   "test": "FailClosed.test_the_sleeper_outlives_a_probe_that_used_all_its_time_and_the_grace",
+   "unchanged": true
+  },
+  {
+   "test": "FailClosed.test_what_is_measured_decides_not_the_name_of_the_tool",
+   "unchanged": true
+  },
+  {
+   "test": "HostGuard.test_it_fails_on_what_appeared_changed_or_left_since_its_view",
+   "unchanged": true
+  },
+  {
+   "test": "HostGuard.test_it_fails_on_what_appeared_changed_or_left_since_its_view",
+   "unchanged": false,
+   "said": "a test changed the host outside its own directories: {'kernel': {'new': ['__init__.py'], 'gone': [], 'changed': []}}"
+  },
+  {
+   "test": "HostGuard.test_it_fails_on_what_appeared_changed_or_left_since_its_view",
+   "unchanged": false,
+   "said": "a test changed the host outside its own directories: {'kernel': {'new': [], 'gone': [], 'changed': ['__init__.py']}}"
+  },
+  {
+   "test": "HostGuard.test_it_fails_on_what_appeared_changed_or_left_since_its_view",
+   "unchanged": false,
+   "said": "a test changed the host outside its own directories: {'kernel': {'new': [], 'gone': ['gone.py'], 'changed': []}}"
+  },
+  {
+   "test": "HostGuard.test_it_fails_on_what_appeared_changed_or_left_since_its_view",
+   "unchanged": false,
+   "said": "a test changed the host outside its own directories: {'names /repo': {'new': ['.gitattributes']}}"
+  },
+  {
+   "test": "OwnGit.test_the_set_up_git_never_reaches_the_callers_repository",
+   "unchanged": true
+  }
+ ],
+ "result": {
+  "ran": 34,
+  "failures": [],
+  "errors": [],
+  "skipped": [],
+  "details": []
+ },
+ "platform": {
+  "sys.platform": "linux",
+  "setsid": "/usr/bin/setsid",
+  "ps": "/usr/local/bin/ps",
+  "uid": 1000,
+  "HOME": "/home/op"
+ }
+}
