@@ -1,0 +1,416 @@
+{
+ "record": "AISEF V2.1 — CAMPAIGN 2 END (B-03b)",
+ "snapshot": "5719f1f87ebbb2d3f19a3f0629ee656c93597c23",
+ "started": "2026-10-08T03:49:41Z",
+ "ended": "2026-10-10T14:42:02Z",
+ "wall_hours": 58.87,
+ "targets": 466,
+ "manifest_targets": 466,
+ "mutants": 12448,
+ "manifest_mutants": 12448,
+ "classes": {
+  "KILLED": 10738,
+  "SURVIVED": 1676,
+  "TIMEOUT": 3,
+  "INFRA": 31
+ },
+ "from": {
+  "c2-w1.record.json": 108,
+  "c2-w2.record.json": 115,
+  "c2-w3.record.json": 114,
+  "c2-w4.record.json": 120,
+  "l1-ord.record.json": 2,
+  "l2-ord.record.json": 2,
+  "l3-ord.record.json": 3,
+  "l4-ord.record.json": 2
+ },
+ "merge_problems": [],
+ "unclassified": [
+  {
+   "target": "aisef2/app/adapters.py::_bounded",
+   "mutant": "L281 And swapped",
+   "class": "TIMEOUT",
+   "files": [
+    "tests/v2/test_v21_review_chain.py"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::continue_from",
+   "mutant": "L416 In->NotIn",
+   "class": "TIMEOUT",
+   "files": [
+    "tests/v2/test_v21_continue_usage.py",
+    "tests/v2/test_v21_continue_integrity.py"
+   ]
+  },
+  {
+   "target": "aisef2/app/cli.py::run",
+   "mutant": "L65 Or swapped",
+   "class": "INFRA",
+   "files": [
+    "tests/v2/test_v21_continue_integrity.py"
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::_survivors",
+   "mutant": "L347 condition negated",
+   "class": "TIMEOUT",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L156 condition negated",
+   "class": "INFRA",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L158 condition negated",
+   "class": "INFRA",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L161 condition negated",
+   "class": "INFRA",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L164 condition negated",
+   "class": "INFRA",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L156 not removed",
+   "class": "INFRA",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L158 not removed",
+   "class": "INFRA",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L163 conditional negated",
+   "class": "INFRA",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L167 condition negated",
+   "class": "INFRA",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L160 string 'read_only' emptied",
+   "class": "INFRA",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L165 element 0 dropped",
+   "class": "INFRA",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L165 element 1 dropped",
+   "class": "INFRA",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L165 element 0 dropped",
+   "class": "INFRA",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L165 element 2 dropped",
+   "class": "INFRA",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L166 And swapped",
+   "class": "INFRA",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L158 string 'bwrap' emptied",
+   "class": "INFRA",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L158 string 'bwrap' emptied",
+   "class": "INFRA",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L165 element 0 dropped",
+   "class": "INFRA",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L165 element 1 dropped",
+   "class": "INFRA",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L165 element 0 dropped",
+   "class": "INFRA",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L165 element 1 dropped",
+   "class": "INFRA",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L165 element 0 dropped",
+   "class": "INFRA",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L165 element 1 dropped",
+   "class": "INFRA",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L166 Eq->NotEq",
+   "class": "INFRA",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L168 string ' holds ' emptied",
+   "class": "INFRA",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L168 string ': bound read-only it would expose it; give the client a directory of its own' emptied",
+   "class": "INFRA",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L165 string 'HOME' emptied",
+   "class": "INFRA",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L165 string 'the workspace' emptied",
+   "class": "INFRA",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L165 string 'HOME' emptied",
+   "class": "INFRA",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L166 element 0 dropped",
+   "class": "INFRA",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L166 element 1 dropped",
+   "class": "INFRA",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ]
+  }
+ ],
+ "check_at_snapshot": {
+  "how": "campaign-2/tools/check_at_snapshot.sh: the merged record copied into a fresh detached worktree at the snapshot, `mutation.py --check` under env -i (PATH without opencode)",
+  "exit": 1,
+  "unaudited_survivors": 1676,
+  "unclassified_lines": 39,
+  "other_failures": []
+ },
+ "ownership": {
+  "runs": 457,
+  "escaped": 0,
+  "released_empty": 457,
+  "harness_orphans_after": 0
+ },
+ "operator_store": {
+  "changed": [
+   ".local/share/opencode/log",
+   ".local/share/opencode/tool-output"
+  ],
+  "why": "store_stat.py (os.stat only) — the after snapshot was taken at store-after.at with the committed isolation/tools/store_stat.py (same sha256 as release/s5-rc2's) because the scratch copy the driver called had been removed by the host's /tmp cleanup; the two changes are the operator's OpenCode desktop app (pid 9792, running throughout): its log (run a7141900, projects harness/devsecops) and its tool-output pruning at 2026-10-10 09:00:01 +07; opencode.db, -wal, -shm, auth.json and opencode.json unchanged"
+ },
+ "files": {
+  "MUTATION.json.xz": {
+   "sha256": "6103a4394ed75857713d316ca3376e83d2a115ad11c21a6ff9bc7f09dcf07610",
+   "bytes": 1602268,
+   "uncompressed_sha256": "30921d0e197e9d19b7b4f36b6ad49e3bde3529132d7e35564423ef43028164e2",
+   "uncompressed_bytes": 64704977
+  },
+  "c2-w1.record.json.xz": {
+   "sha256": "1453e60f9a3dbe57759eb8ac7de7a918f1de6c585894eadb972e9eb888cf9ea7",
+   "bytes": 425216,
+   "uncompressed_sha256": "933a8ef1e1888023b3fab6a0a8edba75d59f3c6e3e4f3a27c8c50e3c3e3a8a17",
+   "uncompressed_bytes": 16394868
+  },
+  "c2-w1.log.xz": {
+   "sha256": "ef63a82145113e55b49f57969cafa06bc53b31286ea509ad13d2e043e96dcc56",
+   "bytes": 423508,
+   "uncompressed_sha256": "352b24b2002ec0116a55149bc34ea2c0a46b876a708eb05f4db08ebc8f1e1266",
+   "uncompressed_bytes": 27339060
+  },
+  "c2-w2.record.json.xz": {
+   "sha256": "b841481c89aac26544e0715aeddcd224c70bdb4896116e25275841147384e944",
+   "bytes": 402760,
+   "uncompressed_sha256": "a24051914dbfbffd13d069350e27810eb0b5f72d1cbb1b9010bebfac599d8257",
+   "uncompressed_bytes": 15207035
+  },
+  "c2-w2.log.xz": {
+   "sha256": "cd8cdf24f554a497b67d5426cbba1985ad60c0df8e85db3168edfe7768438e04",
+   "bytes": 397964,
+   "uncompressed_sha256": "f155af44c4303ac07da4a970c9efe36620fa302e7eea34ccff8a87ad020a9206",
+   "uncompressed_bytes": 26496585
+  },
+  "c2-w3.record.json.xz": {
+   "sha256": "2a274294e1ee606f1038e68d6bb63a82dde1b3ff0fa0f63d90fae4f8e824bd41",
+   "bytes": 490852,
+   "uncompressed_sha256": "0ab48665f9643e5b296f372f79fb5fccede657c6ae5a239284eb3aa14178c3eb",
+   "uncompressed_bytes": 17474767
+  },
+  "c2-w3.log.xz": {
+   "sha256": "1b931ed30543a6cdd08e81317ce5c317ea8f27b8ba71fa5c8d6aef873e2694a8",
+   "bytes": 483032,
+   "uncompressed_sha256": "36750ed28ebaaa0ea924fdfb7e7fff1e7a9014499257f645831ecb71a9015a99",
+   "uncompressed_bytes": 28375637
+  },
+  "c2-w4.record.json.xz": {
+   "sha256": "278c4416f02a265040dbc0ed29fac53808aef47c8fa7309a23cdfe9ad8ed6fb4",
+   "bytes": 382292,
+   "uncompressed_sha256": "26e178071044b3fa76075b0d8fb640d45d410110659fae24ce74e970db3fdefe",
+   "uncompressed_bytes": 14392247
+  },
+  "c2-w4.log.xz": {
+   "sha256": "0c49fbececf74ec5b1aa5e9aa7fec9b15f6ddcb51bfb43bd09b5bdf2454e6240",
+   "bytes": 379520,
+   "uncompressed_sha256": "be43b21f0505169d6f2a16a7b50022b0e968e14669afd5a5458971f52c09e588",
+   "uncompressed_bytes": 27581819
+  },
+  "progress.log.xz": {
+   "sha256": "8867e2d70bc90bdf64336696f55644bb0c5329f02b8e919dfa0a2dcaba0a69b2",
+   "bytes": 19408,
+   "uncompressed_sha256": "4860915dc871b28a238db0269b763f4c0ce32238e85f8d1206b6e7b5ad49cc9e",
+   "uncompressed_bytes": 718788
+  },
+  "disk.log.xz": {
+   "sha256": "97c396e6f3a2704ad8da200df54308bc187023b16f66473123ef51fe3e15bc35",
+   "bytes": 2152,
+   "uncompressed_sha256": "18f365a169e411c50bf3fc5141b8da2bc2947e38e07349c56f34077dd752f2ff",
+   "uncompressed_bytes": 112992
+  },
+  "store-before.json": {
+   "sha256": "80860789fb3f55f3952cc33fcebe42978b01371c265651f1ff41e6668ad722ba",
+   "bytes": 1169
+  },
+  "store-after.json": {
+   "sha256": "554971691219d1bf552260c0f4af30ca14c104700b06d1a4abce8fe827d457fc",
+   "bytes": 1168
+  },
+  "store-after.at": {
+   "sha256": "d8280ea7037a586e98c7b2d203215376cee9e6ef690af73fe39f63aeedc3b7fe",
+   "bytes": 21
+  },
+  "check.out": {
+   "sha256": "ad93cb8d6e3427b66508ee84d199ab9bc7c4023f438609229cbbb85351dc81f9",
+   "bytes": 216342
+  },
+  "ACCOUNT.json": {
+   "sha256": "699d51a1733c263796d378351e5835cdfba4140fd55483a237c88a0885797d6a",
+   "bytes": 6731
+  },
+  "owned.tar.xz": {
+   "sha256": "ec2bcdf1d47c40c7bf909886a4233093e3cd7cf8bd4badf928d23d36ec0322bc",
+   "bytes": 14524
+  }
+ },
+ "notes": "results/NOTES.md (what happened during the run: monitor defect, TIMEOUTs, the temp-path INFRA, disk/swap)"
+}
