@@ -1178,7 +1178,7 @@ def _summary(text: str) -> dict | None:
 #: the runner's own temp names (§3.2): a scratch directory is `aisef-mut-<worker>-<8>`, a run directory `run-<8>` and a tree
 #: `tree-<8>` in it, a run's TMPDIR `<run>/tmp`, and a test's default mkdtemp `tmp<8>` in that (8 = tempfile's random
 #: characters). A subTest label or parameter that names a path there is new on every run.
-_RUNNER_DIR = re.compile(r"(?:[A-Za-z]:)?[\\/][^\s'\"()\[\]]*?aisef-mut-[0-9a-f]{12}-[a-z0-9_]{8}[\\/]+(run|tree)-[a-z0-9_]{8}")
+_RUNNER_DIR = re.compile(r"(?:[A-Za-z]:)?[\\/][^\s'\"()\[\]]{0,500}?aisef-mut-[0-9a-f]{12}-[a-z0-9_]{8}[\\/]+(run|tree)-[a-z0-9_]{8}")
 _MKDTEMP = re.compile(r"(<run>[\\/]+tmp[\\/]+)tmp[a-z0-9_]{8}(?![a-z0-9_])")
 
 
@@ -1188,8 +1188,8 @@ def signature(first: str | None) -> str | None:
     subTest label is the same failure on every run, while another test, subtest, parameter or exception class is not.
     A pure function of the recorded `first`: the record check applies it to the row as written. The record keeps the
     header as the run printed it."""
-    if first is None:
-        return None
+    if first is None or "aisef-mut-" not in first:   # no runner name: nothing to replace, and no scan of a long header
+        return first
     return _MKDTEMP.sub(r"\1<mkdtemp>", _RUNNER_DIR.sub(lambda m_: f"<{m_[1]}>", first))
 
 

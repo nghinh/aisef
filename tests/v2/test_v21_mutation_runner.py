@@ -1231,6 +1231,12 @@ class Signature(unittest.TestCase):
         win = "FAIL: t (v2.t.A.t) (p=WindowsPath('C:\\\\Users\\\\u\\\\Temp\\\\aisef-mut-0123456789ab-abcd1234\\\\run-wxyz5678\\\\tmp\\\\tmpq1w2e3r4\\\\a')) | AssertionError"
         self.assertEqual(sig(win), "FAIL: t (v2.t.A.t) (p=WindowsPath('<run>\\\\tmp\\\\<mkdtemp>\\\\a')) | AssertionError")
         self.assertIsNone(sig(None))
+        # a long header is not scanned quadratically: with no runner name, and with one among many slashes
+        for long in ("FAIL: t (v2.t.A.t) (p=" + "/a" * 100_000 + ") | AssertionError",
+                     "FAIL: t (v2.t.A.t) (p=" + "/a" * 100_000 + "/aisef-mut-0123456789ab-abcd1234/run-wxyz5678/tmp/tmpq1w2e3r4') | AssertionError"):
+            began = time.monotonic()
+            sig(long)
+            self.assertLess(time.monotonic() - began, 5, "the signature scans a long header too slowly")
         self.assertEqual(sig("FAIL: t (v2.t.A.t) | AssertionError"), "FAIL: t (v2.t.A.t) | AssertionError")
 
     def test_the_record_check_reads_a_bracket_by_signature(self):

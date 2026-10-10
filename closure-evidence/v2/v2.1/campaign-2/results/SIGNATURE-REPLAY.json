@@ -2,7 +2,7 @@
  "record": "MUTATION.json.xz",
  "record_sha256": "6103a4394ed75857713d316ca3376e83d2a115ad11c21a6ff9bc7f09dcf07610",
  "runner": "validation/v2/mutation.py",
- "runner_sha256": "02cb38d7eba67811d9f2dbea818d51982c694b39492d6780bbd718979d4bb9c3",
+ "runner_sha256": "bbca3e97713b925f369a136baff232f9aa4c796f589f6411db9a9de6d02777ea",
  "classes": {
   "KILLED": 10738,
   "SURVIVED": 1676,
