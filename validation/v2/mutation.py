@@ -1175,6 +1175,24 @@ def _summary(text: str) -> dict | None:
             "skipped_tests": sorted(x[1] for x in _SKIP.finditer(body)), "first_test": test}
 
 
+#: the runner's own temp names (§3.2): a scratch directory is `aisef-mut-<worker>-<8>`, a run directory `run-<8>` and a tree
+#: `tree-<8>` in it, a run's TMPDIR `<run>/tmp`, and a test's default mkdtemp `tmp<8>` in that (8 = tempfile's random
+#: characters). A subTest label or parameter that names a path there is new on every run.
+_RUNNER_DIR = re.compile(r"(?:[A-Za-z]:)?[\\/][^\s'\"()\[\]]*?aisef-mut-[0-9a-f]{12}-[a-z0-9_]{8}[\\/]+(run|tree)-[a-z0-9_]{8}")
+_MKDTEMP = re.compile(r"(<run>[\\/]+tmp[\\/]+)tmp[a-z0-9_]{8}(?![a-z0-9_])")
+
+
+def signature(first: str | None) -> str | None:
+    """What the bracket compares (§3.2): the failure's `first` — header line and exception class — with the runner's
+    own temp names replaced (`<run>`, `<tree>`, `<mkdtemp>`) and nothing else, so a path under the run's TMPDIR in a
+    subTest label is the same failure on every run, while another test, subtest, parameter or exception class is not.
+    A pure function of the recorded `first`: the record check applies it to the row as written. The record keeps the
+    header as the run printed it."""
+    if first is None:
+        return None
+    return _MKDTEMP.sub(r"\1<mkdtemp>", _RUNNER_DIR.sub(lambda m_: f"<{m_[1]}>", first))
+
+
 def _counts(s: dict) -> list[int]:
     return [s.get("ran", 0), s.get("skipped", 0), s.get("expected_failures", 0), s.get("unexpected_successes", 0)]
 
@@ -1367,7 +1385,7 @@ def _confirm(tg: _Target, rel: str, rows: list, row: dict, src: str, fresh: bool
         else:
             _write(tg, tg.null if version == "null" else src)
         x = _run_file(tg, rel, rows, select=sel, role=role, fresh=fresh)
-        if x["outcome"] != want or (role == "rerun" and x.get("first") != row["first"]):
+        if x["outcome"] != want or (role == "rerun" and signature(x.get("first")) != signature(row["first"])):
             why = (f"the unmutated module {'PASS, then ' if i else ''}{x['outcome']}" if role == "control" else
                    f"the mutant again {x['outcome']} {x.get('first') or x.get('why') or ''}".rstrip())
             break
@@ -1593,10 +1611,12 @@ def _confirmed(r: dict) -> bool:
     with the same signature, on the same file."""
     kb, rows = r.get("killed_by") or {}, r.get("files", [])
     for i, x in enumerate(rows):
-        if "role" not in x and x["file"] == kb.get("file") and x["outcome"] == "FAIL" and x.get("first") == kb.get("first"):
-            got = [(y.get("role"), y["file"], y["outcome"], y.get("first") if y.get("role") == "rerun" else None)
+        if "role" not in x and x["file"] == kb.get("file") and x["outcome"] == "FAIL" and \
+                signature(x.get("first")) == signature(kb.get("first")):
+            got = [(y.get("role"), y["file"], y["outcome"], signature(y.get("first")) if y.get("role") == "rerun" else None)
                    for y in rows[i + 1:i + 1 + len(BRACKET)]]
-            return got == [(role, x["file"], want, x["first"] if role == "rerun" else None) for role, _, want in BRACKET]
+            return got == [(role, x["file"], want, signature(x["first"]) if role == "rerun" else None)
+                           for role, _, want in BRACKET]
     return False
 
 

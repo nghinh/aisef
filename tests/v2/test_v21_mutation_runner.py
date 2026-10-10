@@ -1195,6 +1195,121 @@ class Outcome(unittest.TestCase):
                          ["counts [2, 1, 0, 0] or skipped tests differ from T0's [2, 0, 0, 0]", "exit 0, no unittest summary"])
 
 
+class Signature(unittest.TestCase):
+    """Campaign 2 (2026-10-10): 31 mutants were INFRA although each failed its kill test on every run and the unmutated
+    module passed every control. Two kill tests name a temp path in a subTest label (`subTest(argv[-1])`,
+    `subTest(exe=exe)`), and a path under the run's own TMPDIR is new on every run, so the bracket's re-run never had
+    the signature of the first failure. The signature is the header with the runner's own temp names replaced — the
+    run directory, the tree, a test's default mkdtemp name under the run's TMPDIR — and nothing else."""
+
+    RUN = "/private/var/tmp/aisef-mut-0123456789ab-abcd1234/run-wxyz5678"
+
+    def test_the_signature_replaces_only_the_runners_own_temp_names(self):
+        sig = m.signature
+        a = f"FAIL: test_x (v2.t.A.test_x) (exe=PosixPath('{self.RUN}/tmp/tmpq1w2e3r4/home/opencode')) | AssertionError"
+        b = a.replace("wxyz5678", "mnop1234").replace("tmpq1w2e3r4", "tmpz9y8x7w6")
+        self.assertNotEqual(a, b)
+        self.assertEqual(sig(a), sig(b))
+        self.assertEqual(sig(a), "FAIL: test_x (v2.t.A.test_x) (exe=PosixPath('<run>/tmp/<mkdtemp>/home/opencode')) | AssertionError")
+        # the stable remainder, the test, the exception class and the other temp names still tell failures apart
+        for other in (a.replace("/home/opencode", "/workspace/opencode"), a.replace("test_x (v2.t.A.test_x)", "test_y (v2.t.A.test_y)"),
+                      a.replace("AssertionError", "ValueError"), a.replace(f"{self.RUN}/tmp", f"{self.RUN}/home")):
+            with self.subTest(other[:90]):
+                self.assertNotEqual(sig(a), sig(other))
+        tree = "FAIL: t (v2.t.A.t) [/tmp/aisef-mut-0123456789ab-abcd1234/tree-abcd1234/aisef2/x.py] | AssertionError"
+        self.assertEqual(sig(tree), "FAIL: t (v2.t.A.t) [<tree>/aisef2/x.py] | AssertionError")
+        # a path that is not the runner's, or a name that only looks like mkdtemp's, is left as it is
+        for plain in ("FAIL: t (v2.t.A.t) (path='/home/u/tmpabcd1234/x') | AssertionError",
+                      "FAIL: t (v2.t.A.t) (path='/tmp/run-abcd1234/tmp/tmpabcd1234') | AssertionError",
+                      "FAIL: t (v2.t.A.t) (path='/x/aisef-mut-short/run-wxyz5678/tmp/tmpq1w2e3r4') | AssertionError"):
+            with self.subTest(plain):
+                self.assertEqual(sig(plain), plain)
+        # the run directory goes, a name under its TMPDIR that is not mkdtemp's default stays
+        self.assertEqual(sig(f"FAIL: t (v2.t.A.t) (path='{self.RUN}/tmp/tmp-keep') | AssertionError"),
+                         "FAIL: t (v2.t.A.t) (path='<run>/tmp/tmp-keep') | AssertionError")
+        # Windows separators, a repr that doubles them, and a missing signature
+        win = "FAIL: t (v2.t.A.t) (p=WindowsPath('C:\\\\Users\\\\u\\\\Temp\\\\aisef-mut-0123456789ab-abcd1234\\\\run-wxyz5678\\\\tmp\\\\tmpq1w2e3r4\\\\a')) | AssertionError"
+        self.assertEqual(sig(win), "FAIL: t (v2.t.A.t) (p=WindowsPath('<run>\\\\tmp\\\\<mkdtemp>\\\\a')) | AssertionError")
+        self.assertIsNone(sig(None))
+        self.assertEqual(sig("FAIL: t (v2.t.A.t) | AssertionError"), "FAIL: t (v2.t.A.t) | AssertionError")
+
+    def test_the_record_check_reads_a_bracket_by_signature(self):
+        """§4.3: a recorded kill whose re-run differs from the first failure only in the runner's temp names is a
+        confirmed bracket (as the runner now judges it); one that differs in anything else, or a record with none of
+        either, is read as before."""
+        f = "tests/v2/test_x.py"
+        a = f"FAIL: t (v2.t.A.t) (p='{self.RUN}/tmp/tmpq1w2e3r4/x') | AssertionError"
+        same = a.replace("wxyz5678", "mnop1234").replace("tmpq1w2e3r4", "tmpz9y8x7w6")
+        other = same.replace("/x')", "/y')")
+
+        def entry(rerun):
+            return {"mutant": "m", "class": "KILLED", "killed": True, "killed_by": {"file": f, "first": a},
+                    "files": [{"file": f, "outcome": "FAIL", "first": a}, {"file": f, "role": "control", "outcome": "PASS"},
+                              {"file": f, "role": "control", "outcome": "PASS"},
+                              {"file": f, "role": "rerun", "outcome": "FAIL", "first": rerun}]}
+        self.assertTrue(m._confirmed(entry(a)))
+        self.assertTrue(m._confirmed(entry(same)))
+        self.assertFalse(m._confirmed(entry(other)))
+
+    @unittest.skipUnless(POSIX, "the runner's process ranges and cleanup authority are measured on POSIX")
+    def test_a_failure_that_names_a_temp_path_is_the_same_failure_on_every_run(self):
+        """The campaign's INFRA, as a toy: the failing subTest's label carries a path under the run's TMPDIR. Both
+        mutants fail it on every run and the unmutated module passes every control: KILLED, bracket confirmed, the
+        raw headers of the first failure and of the re-run differ and their signatures do not. With the signature
+        switched off (the runner of campaign 2): INFRA — so the toy exercises the channel."""
+        d = pathlib.Path(self.enterContext(tempfile.TemporaryDirectory()))
+        root = toy(d, POSITIVE, {"test_sig.py": """
+            import os, shutil, tempfile, unittest
+            from aisef2.toy import positive
+
+            class S(unittest.TestCase):
+                def test_a_path_in_the_label(self):
+                    tmp = tempfile.mkdtemp()   # <scratch>/run-xxxxxxxx/tmp/tmpxxxxxxxx: new on every run
+                    self.addCleanup(shutil.rmtree, tmp)
+                    with self.subTest(path=os.path.join(tmp, "operator-only", "out.anchor")):
+                        self.assertIs(positive(5), True)
+            """})
+        kill = ["tests/v2/test_sig.py"]
+        r = m.run_target(root, "aisef2/toy.py::positive", kill)
+        self.assertEqual(classes(r), ["KILLED", "KILLED"], r.get("error"))
+        self.assertEqual(m.target_problems(r, root), [])
+        for res in r["results"]:
+            rows = res["files"]
+            self.assertEqual([x.get("role") for x in rows], [None, "control", "control", "rerun"])
+            self.assertNotEqual(rows[0]["first"], rows[3]["first"])
+            self.assertEqual(m.signature(rows[0]["first"]), m.signature(rows[3]["first"]))
+            self.assertIn("<run>", m.signature(rows[0]["first"]))
+            self.assertTrue(m._confirmed(res))
+        with mock.patch.object(m, "signature", lambda s: s):
+            old = m.run_target(root, "aisef2/toy.py::positive", kill)
+        self.assertEqual(classes(old), ["INFRA", "INFRA"])
+        self.assertRegex(old["error"], r"^UNCLASSIFIED: 2 mutant")
+
+    @unittest.skipUnless(POSIX, "the runner's process ranges and cleanup authority are measured on POSIX")
+    def test_a_failure_that_differs_in_more_than_temp_names_is_still_not_a_kill(self):
+        """The same label plus a parameter that changes on every run (a counter outside the tree): the failures are
+        not provably the same, so the bracket is not confirmed and no mutant is KILLED (fail closed: INFRA)."""
+        d = pathlib.Path(self.enterContext(tempfile.TemporaryDirectory()))
+        count = d / "count"
+        root = toy(d, POSITIVE, {"test_sig.py": f"""
+            import os, pathlib, shutil, tempfile, unittest
+            from aisef2.toy import positive
+            C = pathlib.Path({str(count)!r})
+
+            class S(unittest.TestCase):
+                def test_a_path_and_a_counter_in_the_label(self):
+                    n = int(C.read_text()) if C.exists() else 0
+                    C.write_text(str(n + 1))
+                    tmp = tempfile.mkdtemp()
+                    self.addCleanup(shutil.rmtree, tmp)
+                    with self.subTest(path=os.path.join(tmp, "x"), attempt=n):
+                        self.assertIs(positive(5), True)
+            """})
+        r = m.run_target(root, "aisef2/toy.py::positive", ["tests/v2/test_sig.py"])
+        self.assertEqual(classes(r), ["INFRA", "INFRA"])
+        self.assertTrue(rows_of(r, "unconfirmed"))
+
+
 class Classify(unittest.TestCase):
     """VS-2, VS-4, ORD-2, ORD-6 and the record: the class is a function of the outcomes, a timeout or an
     infrastructure event never stops the chain, and the record says which file killed and why."""

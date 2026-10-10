@@ -1,0 +1,648 @@
+{
+ "record": "MUTATION.json.xz",
+ "record_sha256": "6103a4394ed75857713d316ca3376e83d2a115ad11c21a6ff9bc7f09dcf07610",
+ "runner": "validation/v2/mutation.py",
+ "runner_sha256": "02cb38d7eba67811d9f2dbea818d51982c694b39492d6780bbd718979d4bb9c3",
+ "classes": {
+  "KILLED": 10738,
+  "SURVIVED": 1676,
+  "TIMEOUT": 3,
+  "INFRA": 31
+ },
+ "killed_not_confirmed": [],
+ "infra": 31,
+ "infra_would_be_confirmed": 31,
+ "infra_not_confirmed": [],
+ "infra_by_target": {
+  "aisef2/app/cli.py::run": 1,
+  "aisef2/app/confine.py::wrap": 30
+ },
+ "infra_rows": [
+  {
+   "target": "aisef2/app/cli.py::run",
+   "mutant": "L65 Or swapped",
+   "files": [
+    "tests/v2/test_app_run.py",
+    "tests/v2/test_app_units.py",
+    "tests/v2/test_s2_kills.py",
+    "tests/v2/test_v21_bundle_tools.py",
+    "tests/v2/test_v21_confine.py",
+    "tests/v2/test_v21_continue_integrity.py",
+    "tests/v2/test_v21_inputs.py"
+   ],
+   "would_be_confirmed": true,
+   "brackets": [
+    {
+     "row": 6,
+     "fresh": false,
+     "role": "unconfirmed",
+     "bracket": "confirmed"
+    }
+   ],
+   "first_difference": {
+    "a": "FAIL: test_the_cli_refuses_anchor_paths_it_would_not_write_and_a_malformed_expected_anchor (v2.test_v21_continue_integrity.AnchorThreatModel.test_the_cli_refuses_anchor_paths_it_would_not_write_and_a_",
+    "b": "FAIL: test_the_cli_refuses_anchor_paths_it_would_not_write_and_a_malformed_expected_anchor (v2.test_v21_continue_integrity.AnchorThreatModel.test_the_cli_refuses_anchor_paths_it_would_not_write_and_a_"
+   }
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L156 condition negated",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ],
+   "would_be_confirmed": true,
+   "brackets": [
+    {
+     "row": 0,
+     "fresh": false,
+     "role": "unconfirmed",
+     "bracket": "confirmed"
+    }
+   ],
+   "first_difference": {
+    "a": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private",
+    "b": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private"
+   }
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L158 condition negated",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ],
+   "would_be_confirmed": true,
+   "brackets": [
+    {
+     "row": 0,
+     "fresh": false,
+     "role": "unconfirmed",
+     "bracket": "confirmed"
+    }
+   ],
+   "first_difference": {
+    "a": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private",
+    "b": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private"
+   }
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L161 condition negated",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ],
+   "would_be_confirmed": true,
+   "brackets": [
+    {
+     "row": 0,
+     "fresh": false,
+     "role": "unconfirmed",
+     "bracket": "confirmed"
+    }
+   ],
+   "first_difference": {
+    "a": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private",
+    "b": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private"
+   }
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L164 condition negated",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ],
+   "would_be_confirmed": true,
+   "brackets": [
+    {
+     "row": 0,
+     "fresh": false,
+     "role": "unconfirmed",
+     "bracket": "confirmed"
+    }
+   ],
+   "first_difference": {
+    "a": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private",
+    "b": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private"
+   }
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L156 not removed",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ],
+   "would_be_confirmed": true,
+   "brackets": [
+    {
+     "row": 0,
+     "fresh": false,
+     "role": "unconfirmed",
+     "bracket": "confirmed"
+    }
+   ],
+   "first_difference": {
+    "a": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private",
+    "b": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private"
+   }
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L158 not removed",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ],
+   "would_be_confirmed": true,
+   "brackets": [
+    {
+     "row": 0,
+     "fresh": false,
+     "role": "unconfirmed",
+     "bracket": "confirmed"
+    }
+   ],
+   "first_difference": {
+    "a": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private",
+    "b": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private"
+   }
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L163 conditional negated",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ],
+   "would_be_confirmed": true,
+   "brackets": [
+    {
+     "row": 0,
+     "fresh": false,
+     "role": "unconfirmed",
+     "bracket": "confirmed"
+    }
+   ],
+   "first_difference": {
+    "a": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private",
+    "b": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private"
+   }
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L167 condition negated",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ],
+   "would_be_confirmed": true,
+   "brackets": [
+    {
+     "row": 0,
+     "fresh": false,
+     "role": "unconfirmed",
+     "bracket": "confirmed"
+    }
+   ],
+   "first_difference": {
+    "a": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private",
+    "b": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private"
+   }
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L160 string 'read_only' emptied",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ],
+   "would_be_confirmed": true,
+   "brackets": [
+    {
+     "row": 0,
+     "fresh": false,
+     "role": "unconfirmed",
+     "bracket": "confirmed"
+    }
+   ],
+   "first_difference": {
+    "a": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/privat",
+    "b": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/privat"
+   }
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L165 element 0 dropped",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ],
+   "would_be_confirmed": true,
+   "brackets": [
+    {
+     "row": 0,
+     "fresh": false,
+     "role": "unconfirmed",
+     "bracket": "confirmed"
+    }
+   ],
+   "first_difference": {
+    "a": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/privat",
+    "b": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/privat"
+   }
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L165 element 1 dropped",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ],
+   "would_be_confirmed": true,
+   "brackets": [
+    {
+     "row": 0,
+     "fresh": false,
+     "role": "unconfirmed",
+     "bracket": "confirmed"
+    }
+   ],
+   "first_difference": {
+    "a": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/privat",
+    "b": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/privat"
+   }
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L165 element 0 dropped",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ],
+   "would_be_confirmed": true,
+   "brackets": [
+    {
+     "row": 0,
+     "fresh": false,
+     "role": "unconfirmed",
+     "bracket": "confirmed"
+    }
+   ],
+   "first_difference": {
+    "a": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private",
+    "b": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private"
+   }
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L165 element 2 dropped",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ],
+   "would_be_confirmed": true,
+   "brackets": [
+    {
+     "row": 0,
+     "fresh": false,
+     "role": "unconfirmed",
+     "bracket": "confirmed"
+    }
+   ],
+   "first_difference": {
+    "a": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private",
+    "b": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private"
+   }
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L166 And swapped",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ],
+   "would_be_confirmed": true,
+   "brackets": [
+    {
+     "row": 0,
+     "fresh": false,
+     "role": "unconfirmed",
+     "bracket": "confirmed"
+    }
+   ],
+   "first_difference": {
+    "a": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private",
+    "b": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private"
+   }
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L158 string 'bwrap' emptied",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ],
+   "would_be_confirmed": true,
+   "brackets": [
+    {
+     "row": 0,
+     "fresh": false,
+     "role": "unconfirmed",
+     "bracket": "confirmed"
+    }
+   ],
+   "first_difference": {
+    "a": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/privat",
+    "b": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/privat"
+   }
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L158 string 'bwrap' emptied",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ],
+   "would_be_confirmed": true,
+   "brackets": [
+    {
+     "row": 0,
+     "fresh": false,
+     "role": "unconfirmed",
+     "bracket": "confirmed"
+    }
+   ],
+   "first_difference": {
+    "a": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/privat",
+    "b": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/privat"
+   }
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L165 element 0 dropped",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ],
+   "would_be_confirmed": true,
+   "brackets": [
+    {
+     "row": 0,
+     "fresh": false,
+     "role": "unconfirmed",
+     "bracket": "confirmed"
+    }
+   ],
+   "first_difference": {
+    "a": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/privat",
+    "b": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/privat"
+   }
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L165 element 1 dropped",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ],
+   "would_be_confirmed": true,
+   "brackets": [
+    {
+     "row": 0,
+     "fresh": false,
+     "role": "unconfirmed",
+     "bracket": "confirmed"
+    }
+   ],
+   "first_difference": {
+    "a": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/privat",
+    "b": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/privat"
+   }
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L165 element 0 dropped",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ],
+   "would_be_confirmed": true,
+   "brackets": [
+    {
+     "row": 0,
+     "fresh": false,
+     "role": "unconfirmed",
+     "bracket": "confirmed"
+    }
+   ],
+   "first_difference": {
+    "a": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/privat",
+    "b": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/privat"
+   }
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L165 element 1 dropped",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ],
+   "would_be_confirmed": true,
+   "brackets": [
+    {
+     "row": 0,
+     "fresh": false,
+     "role": "unconfirmed",
+     "bracket": "confirmed"
+    }
+   ],
+   "first_difference": {
+    "a": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/privat",
+    "b": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/privat"
+   }
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L165 element 0 dropped",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ],
+   "would_be_confirmed": true,
+   "brackets": [
+    {
+     "row": 0,
+     "fresh": false,
+     "role": "unconfirmed",
+     "bracket": "confirmed"
+    }
+   ],
+   "first_difference": {
+    "a": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/privat",
+    "b": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/privat"
+   }
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L165 element 1 dropped",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ],
+   "would_be_confirmed": true,
+   "brackets": [
+    {
+     "row": 0,
+     "fresh": false,
+     "role": "unconfirmed",
+     "bracket": "confirmed"
+    }
+   ],
+   "first_difference": {
+    "a": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/privat",
+    "b": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/privat"
+   }
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L166 Eq->NotEq",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ],
+   "would_be_confirmed": true,
+   "brackets": [
+    {
+     "row": 0,
+     "fresh": false,
+     "role": "unconfirmed",
+     "bracket": "confirmed"
+    }
+   ],
+   "first_difference": {
+    "a": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private",
+    "b": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private"
+   }
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L168 string ' holds ' emptied",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ],
+   "would_be_confirmed": true,
+   "brackets": [
+    {
+     "row": 0,
+     "fresh": false,
+     "role": "unconfirmed",
+     "bracket": "confirmed"
+    }
+   ],
+   "first_difference": {
+    "a": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private",
+    "b": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private"
+   }
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L168 string ': bound read-only it would expose it; give the client a directory of its own' emptied",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ],
+   "would_be_confirmed": true,
+   "brackets": [
+    {
+     "row": 0,
+     "fresh": false,
+     "role": "unconfirmed",
+     "bracket": "confirmed"
+    }
+   ],
+   "first_difference": {
+    "a": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private",
+    "b": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private"
+   }
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L165 string 'HOME' emptied",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ],
+   "would_be_confirmed": true,
+   "brackets": [
+    {
+     "row": 0,
+     "fresh": false,
+     "role": "unconfirmed",
+     "bracket": "confirmed"
+    }
+   ],
+   "first_difference": {
+    "a": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private",
+    "b": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private"
+   }
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L165 string 'the workspace' emptied",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ],
+   "would_be_confirmed": true,
+   "brackets": [
+    {
+     "row": 0,
+     "fresh": false,
+     "role": "unconfirmed",
+     "bracket": "confirmed"
+    }
+   ],
+   "first_difference": {
+    "a": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private",
+    "b": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private"
+   }
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L165 string 'HOME' emptied",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ],
+   "would_be_confirmed": true,
+   "brackets": [
+    {
+     "row": 0,
+     "fresh": false,
+     "role": "unconfirmed",
+     "bracket": "confirmed"
+    }
+   ],
+   "first_difference": {
+    "a": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private",
+    "b": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private"
+   }
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L166 element 0 dropped",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ],
+   "would_be_confirmed": true,
+   "brackets": [
+    {
+     "row": 0,
+     "fresh": false,
+     "role": "unconfirmed",
+     "bracket": "confirmed"
+    }
+   ],
+   "first_difference": {
+    "a": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private",
+    "b": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private"
+   }
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "mutant": "L166 element 1 dropped",
+   "files": [
+    "tests/v2/test_v21_confine.py"
+   ],
+   "would_be_confirmed": true,
+   "brackets": [
+    {
+     "row": 0,
+     "fresh": false,
+     "role": "unconfirmed",
+     "bracket": "confirmed"
+    }
+   ],
+   "first_difference": {
+    "a": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private",
+    "b": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private"
+   }
+  }
+ ]
+}
