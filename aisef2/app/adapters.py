@@ -167,7 +167,8 @@ class Reviewer:
         changed = git(scope.root, "diff", "--name-status", "--no-renames", f"{base}..{head}")
         if changed.returncode != 0:
             raise CapabilityUnrunnable(f"git diff {base[:12]}..{head[:12]} exited {changed.returncode}")
-        rows = [ln.split("\t", 1) for ln in changed.stdout.splitlines() if "\t" in ln]
+        # a row ends at "\n" only: splitlines also breaks at U+0085/U+2028/U+2029, which core.quotepath=false prints raw
+        rows = [ln.split("\t", 1) for ln in changed.stdout.split("\n") if "\t" in ln]
         mine = [(k, p) for k, p in rows if p.split("/")[0] in self.project.product_roots]
         required = sorted(p for k, p in mine if k != "D")
         log = self.logs / f"{story}.reviewer.{attempt}.jsonl"
