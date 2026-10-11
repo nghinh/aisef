@@ -4,7 +4,9 @@ money only when the operator gave a price table — an unknown price is `null` w
 Sources: each session's event stream (the client's per-step token report: uncached input, cache read, cache write,
 output, reasoning), the preflight's ledger, and the journal (provider requests, retries, story outcomes). A step that
 reports no tokens makes the session's tokens a lower bound and its cost unknown (`steps_without_tokens`); a session
-that started and finished no step is unaccounted. Settings `prices` (optional):
+that started and finished no step is unaccounted. The preflight's spend is unknown, and so the cost `partial`, when its
+ledger is there and does not read, or holds a request sent and never answered (what `lineage.account_of` lists as
+unaccounted) — never counted as 0; no ledger at all is no preflight spend. Settings `prices` (optional):
 {"currency": "USD", "input_per_mtok": x, "cache_read_per_mtok": x, "cache_write_per_mtok": x, "output_per_mtok": x,
  "source": "...", "effective_date": "YYYY-MM-DD"} — reasoning tokens priced as output.
 
@@ -87,10 +89,16 @@ def usage(out: pathlib.Path, events: list[dict], prices: Mapping | None, rec: Ma
             row["cost"] = None if partial else _usd(s["tokens"], prices)
         sessions.append(row)
     from aisef2.app import preflight
+    gaps = ["these sessions' cost is unknown (not 0)"] if unknown else []      # why the run's cost is not a figure
     try:
-        pre = preflight.accounting(out / "preflight" / "LEDGER.jsonl")
-    except Exception:  # noqa: BLE001 — a ledger the reader refuses, whatever its damage, is a preflight not known
+        pre = preflight.accounting(out / "preflight" / "LEDGER.jsonl")     # an absent ledger is no preflight spend: 0
+    except Exception:  # noqa: BLE001 — a ledger that is there and the reader refuses is a preflight not known
         pre = None
+        gaps.append("the preflight's ledger does not read: its cost is unknown (not 0)")
+    else:
+        if pre.get("unaccounted"):      # what lineage.account_of lists: spend that is unknown, not 0
+            gaps.append(f"preflight requests {pre['unaccounted']} were sent and never answered: their cost is unknown "
+                        "(not 0)")
     requests = sum(1 for e in events if e["type"] == "provider/request")
     retried = [e["data"].get("story_id") for e in events if e["type"] == "story/retry"]    # the journal's decisions,
     retries = {s: retried.count(s) for s in sorted(set(retried))}                           # read — never a side counter
@@ -103,8 +111,8 @@ def usage(out: pathlib.Path, events: list[dict], prices: Mapping | None, rec: Ma
                            "output": pre["output_tokens"], "reasoning": 0}, prices)
         money = {"currency": prices["currency"], "source": prices["source"], "effective_date": prices["effective_date"],
                  "known": round(known, 6), "sessions_unknown": unknown,
-                 "value": round(known, 6) if not unknown else None,
-                 "status": "known" if not unknown else "partial: these sessions' cost is unknown (not 0)"}
+                 "value": None if gaps else round(known, 6),
+                 "status": "partial: " + "; ".join(gaps) if gaps else "known"}
     return {"provider_requests_journaled": requests, "sessions": sessions, "tokens": totals, "preflight": pre,
             "retries": retries, "wall_s": round(finished - started, 3) if isinstance(started, (int, float))
             and isinstance(finished, (int, float)) else None, "cost": money}
