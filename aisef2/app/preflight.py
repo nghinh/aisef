@@ -6,6 +6,7 @@ run's budget (requests, tokens). The fingerprint is a drift detector, never a cl
 
 from __future__ import annotations
 
+import http.client
 import json
 import os
 import pathlib
@@ -37,7 +38,8 @@ def http_transport(endpoint: str, key: str, timeout_s: float = 60.0):
     """(path, body | None) -> (status, json): GET when `body` is None, else POST with "stream": false (one JSON answer
     is read: without it the router answers as an event stream, S6-SMOKE-1-PREFLIGHT-OPAQUE); `key` sent as a bearer
     token, never recorded. A failed request keeps its HTTP status (0 only when no HTTP answer came) and says why in
-    `transport_error` (the error or parse class) and `content_type`. A redirect is refused, never followed with the key:
+    `transport_error` (the error or parse class) and `content_type`; JSON that is not one object is a failure of its kind
+    ("not a JSON object"). A redirect is refused, never followed with the key:
 it comes back as its 3xx status with `transport_error` "redirect refused"."""
     if not key:
         raise IdentityStop("no provider key: the key variable is not set, or the client's configuration holds none")
@@ -50,12 +52,17 @@ it comes back as its 3xx status with `transport_error` "redirect refused"."""
         try:
             with _OPENER.open(req, timeout=timeout_s) as r:
                 status, ctype = r.status, r.headers.get("Content-Type")
-                return status, json.loads(r.read().decode("utf-8") or "{}")
+                doc = json.loads(r.read().decode("utf-8") or "{}")
         except urllib.error.HTTPError as e:
             why = "redirect refused" if 300 <= e.code < 400 else "HTTPError"
             return e.code, {"transport_error": why, "content_type": e.headers.get("Content-Type") if e.headers else None}
-        except (urllib.error.URLError, OSError, ValueError) as e:
+        # http.client's own errors (IncompleteRead, BadStatusLine, InvalidURL, ...) are not OSErrors; a body nested past
+        # the parser's depth is a RecursionError (3.11-3.13): each is an answer with its class, like the rest
+        except (urllib.error.URLError, OSError, ValueError, http.client.HTTPException, RecursionError) as e:
             return status, {"transport_error": type(e).__name__, "content_type": ctype}
+        if not isinstance(doc, dict):     # JSON that is not an object is no answer the consumers can read: a failure of its kind
+            return status, {"transport_error": "not a JSON object", "content_type": ctype}
+        return status, doc
     return call
 
 
