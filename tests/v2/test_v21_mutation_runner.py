@@ -1691,6 +1691,104 @@ ORD1_FILES = {
 ORD1_TRUTH = ["SURVIVED", "KILLED", "SURVIVED"]
 
 
+class PositionalAudits(unittest.TestCase):
+    """B-03 (2026-10-11): a survivor is audited by its position in the target's mutant list, at the module digest the
+    audit was written for. A description is not an identity — the same line is mutated at each of its occurrences, so
+    125 survivors of campaign 2 share a description with a sibling — and an audit by description would excuse a
+    sibling nobody looked at. The V2.0 entries of `AUDITED` (reference models) are read by description as before."""
+
+    def setUp(self):
+        self.root = toy(pathlib.Path(self.enterContext(tempfile.TemporaryDirectory())), POSITIVE, {})
+        self.src = (self.root / "aisef2/toy.py").read_text(encoding="utf-8")
+        self.target = "aisef2/toy.py::positive"
+        self.digest = m.source_digest(self.src)
+        self.same = "L2 string 'x' emptied"   # the same description at two positions
+
+    def entry(self, index, **over):
+        base = {"target": self.target, "index": index, "mutant": self.same, "class": "AUDITED", "group": "g",
+                "source_sha256": self.digest, "grounds": "nobody reads it", "consumers_checked": ["aisef2/toy.py"],
+                "exceptions_checked": ["a caller that parses it: none"]}
+        return {**base, **over}
+
+    def write(self, entries):
+        path = self.root / m.AUDITS_REL
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps({"entries": entries}), encoding="utf-8")
+        m._AUDITS_CACHE.clear()
+
+    def result(self, classes_=("SURVIVED", "SURVIVED"), descs=None):
+        descs = descs or [self.same] * len(classes_)
+        files = [{"file": "tests/v2/test_a.py", "outcome": "PASS"}]
+        return {"target": self.target, "runner": 2, "kill_tests": ["tests/v2/test_a.py"], "source_sha256": self.digest,
+                "mutants": len(descs), "killed": classes_.count("KILLED"), "t0": [],
+                "survivors": [d for d, c in zip(descs, classes_, strict=True) if c != "KILLED"],
+                "results": [{"mutant": d, "class": c, "killed": c == "KILLED",
+                             "files": files if c == "SURVIVED" else [], **({"killed_by": {}} if c == "KILLED" else {})}
+                            for d, c in zip(descs, classes_, strict=True)]}
+
+    def unaudited(self, result):
+        return [p for p in m.target_problems(result, self.root) if "unaudited survivor" in p]
+
+    def test_an_audit_covers_its_own_position_and_not_a_sibling_with_the_same_description(self):
+        self.write([self.entry(0)])
+        self.assertEqual(self.unaudited(self.result()), [f"{self.target}: unaudited survivor {self.same!r}"])
+        self.write([self.entry(0), self.entry(1, **{"class": "EQUIVALENT"})])
+        self.assertEqual(self.unaudited(self.result()), [])
+        # description alone is no audit: no entry, the same two descriptions
+        self.write([])
+        self.assertEqual(len(self.unaudited(self.result())), 2)
+
+    def test_an_audit_counts_only_at_the_digest_it_was_written_for_and_for_the_mutant_it_names(self):
+        self.write([self.entry(0, source_sha256="f" * 64), self.entry(1, mutant="L2 returns None")])
+        self.assertEqual(len(self.unaudited(self.result())), 2)
+
+    def test_a_malformed_entry_counts_for_nothing_and_is_reported(self):
+        bad = [self.entry(0, consumers_checked=[]), self.entry(0, exceptions_checked=["  "]), self.entry(0, grounds=""),
+               self.entry(0, **{"class": "KILLED"}), self.entry(0, source_sha256="abc"), self.entry(-1), "x",
+               self.entry(1), self.entry(1)]
+        self.write(bad)
+        found, problems = m.audits_at(self.root)
+        self.assertEqual(list(found), [(self.target, 1, self.same)])
+        self.assertEqual(len(problems), len(bad) - 1)   # every entry but the first good one is a problem (the repeat too)
+        self.assertEqual(len(self.unaudited(self.result())), 1)   # position 0 has no valid audit
+        # a file that is not an object with `entries`, and unreadable JSON, are problems and no audit
+        for text in ("[]", "{", '{"entries": 3}'):
+            (self.root / m.AUDITS_REL).write_text(text, encoding="utf-8")
+            m._AUDITS_CACHE.clear()
+            found, problems = m.audits_at(self.root)
+            self.assertEqual((found, len(problems)), ({}, 1), text)
+
+    def test_only_a_survivor_is_audited_a_timeout_or_an_infra_never(self):
+        self.write([self.entry(0), self.entry(1)])
+        got = m.target_problems(self.result(("TIMEOUT", "INFRA")), self.root)
+        self.assertEqual(len([p for p in got if "neither killed nor survived" in p]), 2, got)
+        self.assertEqual(self.unaudited(self.result(("KILLED", "SURVIVED"))), [])   # position 1 audited; 0 was killed
+        self.assertEqual(len(self.unaudited(self.result(("SURVIVED", "KILLED")))), 0)
+
+    def test_a_no_audit_target_refuses_an_audit_and_the_reference_model_entries_stay_by_description(self):
+        self.write([self.entry(0), self.entry(1)])
+        with mock.patch.object(m, "NO_AUDIT", {self.target}):
+            got = m.target_problems(self.result(), self.root)
+            self.assertEqual(len([p for p in got if "audits not accepted" in p]), 2, got)
+        with mock.patch.dict(m.AUDITED, {(self.target, self.same): "reference model"}):
+            self.write([])
+            self.assertEqual(self.unaudited(self.result()), [])
+
+    def test_the_record_view_hides_exactly_what_a_position_audits(self):
+        from validation.qualification import v21_mutation_record as R
+        self.write([self.entry(1, **{"class": "EQUIVALENT"})])
+        r = self.result(("SURVIVED", "SURVIVED", "KILLED"), [self.same, self.same, "L2 returns None"])
+        self.assertEqual(R._view(self.root, r, m)["survivors"], [self.same])   # position 0 is still open
+        self.assertEqual(r["survivors"], [self.same, self.same])                # the result itself is not rewritten
+        self.assertEqual(R.survivor_accounts(self.root, r, m),
+                         {"open": 1, "legacy": 0, "EQUIVALENT": 1, "AUDITED": 0})
+        # an older record has no positions: by description, as before
+        old = {"target": self.target, "survivors": [self.same, "x"]}
+        with mock.patch.dict(m.AUDITED, {(self.target, self.same): "reference model"}):
+            self.assertEqual(R.survivor_accounts(self.root, old, m), {"open": 1, "legacy": 1, "EQUIVALENT": 0, "AUDITED": 0})
+            self.assertEqual(R._view(self.root, old, m), old)
+
+
 class T0(unittest.TestCase):
     """ORD-1, PL-4, VS-6: the baseline is the null mutant made by mutants()' own rewrite, each kill file on its own; a
     file that fails it is refused for the target, never used as kill evidence."""

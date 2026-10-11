@@ -100,6 +100,39 @@ def histories(root: pathlib.Path = ROOT) -> list[dict]:
     return out
 
 
+def _view(root: pathlib.Path, result: dict, m) -> dict:
+    """`result` as the accounting reads it: the mutants a positional audit (mutation.AUDITS_REL) covers are not listed
+    among the survivors, so S2.account (frozen, by description) sees only what is still open. The record keeps the
+    result as it was measured."""
+    if result.get("runner") != 2:
+        return result
+    rows = result.get("results", [])
+    open_ = [r["mutant"] for i, r in enumerate(rows) if r.get("class") != "KILLED"
+             and not (r.get("class") == "SURVIVED" and m.audit_of(root, result["target"], i, r["mutant"], result.get("source_sha256")))]
+    return {**result, "survivors": open_}
+
+
+def survivor_accounts(root: pathlib.Path, t: dict, m) -> dict[str, int]:
+    """How the SURVIVED mutants of one result stand: by position (runner 2) or, for an older record, by description.
+    `open` = no audit; `legacy` = an entry of mutation.AUDITED; `EQUIVALENT`, `AUDITED` = a positional audit's class."""
+    out = {"open": 0, "legacy": 0, **{c: 0 for c in m.AUDIT_CLASSES}}
+    if t.get("runner") != 2:
+        for d in t.get("survivors", []):
+            out["legacy" if (t["target"], d) in m.AUDITED else "open"] += 1
+        return out
+    for i, r in enumerate(t.get("results", [])):
+        if r.get("class") != "SURVIVED":
+            continue
+        e = m.audit_of(root, t["target"], i, r["mutant"], t.get("source_sha256"))
+        if (t["target"], r["mutant"]) in m.AUDITED:
+            out["legacy"] += 1
+        elif e is not None:
+            out[e["class"]] += 1
+        else:
+            out["open"] += 1
+    return out
+
+
 def build(root: pathlib.Path = ROOT, head: str = "HEAD") -> tuple[dict, dict]:
     from validation.v2 import mutation as m
     final = S2._git(root, "rev-parse", head).stdout.decode().strip()
@@ -120,14 +153,20 @@ def build(root: pathlib.Path = ROOT, head: str = "HEAD") -> tuple[dict, dict]:
                 seen_before.add(t["target"])
             rows.append({**row, "why": why, "current": current, "other_code_changed": other,
                          "at_final_head": not why and S2.at_final_head(root, h["snapshot"], final)})
-    a = S2.account(rows, m.V21_TARGETS, frozenset(m.AUDITED))
-    chosen = a["chosen"]
+    seen_rows = [{**r, "result": _view(root, r["result"], m)} for r in rows]
+    a = S2.account(seen_rows, m.V21_TARGETS, frozenset(m.AUDITED))
+    by_view = {id(v): r for v, r in zip(seen_rows, rows, strict=True)}   # the record keeps each result as it was measured
+    chosen = a["chosen"] = {t: by_view[id(v)] for t, v in a["chosen"].items()}
     targets = sorted((c["result"] for c in chosen.values()), key=lambda x: x["target"])
     record = {"record": "AISEF V2.1 — MUTATION (requalification round B-03b)", "tool": "validation/v2/mutation.py",
               "merged_by": "validation/qualification/v21_mutation_record.py", "targets": targets}
     problems = m.problems_of(record, root, PHASE)
-    audited = sum(1 for t in targets for s in t["survivors"] if (t["target"], s) in m.AUDITED)
-    unaudited = sum(1 for t in targets for s in t["survivors"] if (t["target"], s) not in m.AUDITED)
+    stands = [survivor_accounts(root, t, m) for t in targets]
+    by_class = {k: sum(x[k] for x in stands) for k in ("EQUIVALENT", "AUDITED", "legacy")}
+    audited = sum(by_class.values())
+    # not KILLED and not SURVIVED (TIMEOUT, INFRA, NOT_RUN) is never audited away: it is open
+    unaudited = sum(x["open"] for x in stands) + sum(
+        1 for t in targets for r in t.get("results", []) if r.get("class") not in ("KILLED", "SURVIVED"))
     timeouts = sum(S2._timeouts(t) for t in targets)
     crit, s2crit = criteria_sha256(), S2.criteria_sha256()
     frozen = FROZEN_CRITERIA_SHA256 is not None and crit == FROZEN_CRITERIA_SHA256 and s2crit == S2.FROZEN_CRITERIA_SHA256
@@ -149,6 +188,8 @@ def build(root: pathlib.Path = ROOT, head: str = "HEAD") -> tuple[dict, dict]:
         "CLASSES": {c: sum(t.get("classes", {}).get(c, 0) for t in targets) for c in m.CLASSES},
         "KILLED_BY_TIMEOUT": timeouts,
         "AUDITED_SURVIVORS": audited,
+        "AUDITED_BY_CLASS": {"EQUIVALENT": by_class["EQUIVALENT"], "AUDITED": by_class["AUDITED"],
+                             "V2.0_REFERENCE_MODEL": by_class["legacy"]},
         "UNAUDITED_SURVIVORS": unaudited,
         "STALE_RESULTS_EXCLUDED": len(stale),
         "RERUN_TARGETS": len([t for t, c in chosen.items() if c["current"] and t in seen_before]),

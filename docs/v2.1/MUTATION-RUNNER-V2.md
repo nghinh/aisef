@@ -1023,3 +1023,26 @@ the head that carries this change before that run.
 on; a label with a per-run counter stays not-a-kill; the function's cases (what it replaces, what it keeps — text before
 a path, aliasing, another directory, a lookalike, a literal placeholder, Windows spellings, non-strings, a 200 kB header
 under 5 s); the record check; a printed `FAIL:` line is not the header.
+
+## 16. Audits by position (B-03, 2026-10-11)
+
+`AUDITED` is keyed by (target, description). A description is not an identity: the generator mutates every occurrence
+of a line's literal or operator, and 125 of campaign 2's 1,676 survivors share their description with a sibling mutant
+of the same target (55 of them with a sibling that was killed, the rest with another survivor). An audit by
+description would excuse a sibling nobody looked at.
+
+The V2.1 audits are therefore **positional**, in `closure-evidence/v2/v2.1/mutation/SURVIVOR-AUDITS.json`
+(`mutation.AUDITS_REL`): `{"entries": [{target, index, mutant, class, source_sha256, group, grounds,
+consumers_checked, exceptions_checked}]}`. An entry covers mutant `index` of `target`'s list when its description
+is `mutant`, the result was measured on a module whose digest is `source_sha256`, and the mutant SURVIVED. A TIMEOUT,
+an INFRA or a NOT_RUN mutant is never audited away. `class` is `EQUIVALENT` (no observable difference, proved from
+the code) or `AUDITED` (it differs, and no consumer or contract the entry names depends on it); neither is a kill
+and the summary keeps them apart from KILLED (`AUDITED_BY_CLASS`). Each entry names, for itself, the consumers it
+checked and the exceptions it looked for; `group` shares one reasoning between mutants but never replaces those two
+lists. A malformed entry, an entry audited twice, or a file that is not an object with `entries` counts for nothing
+and is a problem of the V2.1 phase (`problems_of`). `NO_AUDIT` targets accept none. The V2.0 reference-model entries
+of `AUDITED` are read by description as before.
+
+The record builder (`v21_mutation_record.py`) reads the audits through a view that removes exactly the audited
+positions from `survivors` before the frozen S2 accounting sees them; the record keeps every result as it was
+measured. Tests: `test_v21_mutation_runner.PositionalAudits` (6).

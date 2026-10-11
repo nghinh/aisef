@@ -751,6 +751,83 @@ AUDITED: dict[tuple[str, str], str] = {
     ("tests/v2/refmodel/qualification_counters.py::model", "L44 sorted() -> list()"): (
         "`misplaced` is read only for truthiness and inside the refusal message"),
 }
+#: Audits that name the mutant by its position (B-03, survivors of campaign 2). A description is not an identity: the
+#: same line is mutated at each of its occurrences, so one description can be two mutants, one of them killable. An entry
+#: is `{target, index, mutant, class, source_sha256, group, grounds, consumers_checked, exceptions_checked}` and counts
+#: only for that position of that target's mutant list, at the module's digest it was written for, and only for a
+#: SURVIVED mutant. `EQUIVALENT`: no observable difference, proved from the code. `AUDITED`: it differs, and no consumer
+#: or contract the entry names depends on it. Neither is a kill, and the record keeps them apart from KILLED.
+AUDITS_REL = "closure-evidence/v2/v2.1/mutation/SURVIVOR-AUDITS.json"
+AUDIT_CLASSES = ("EQUIVALENT", "AUDITED")
+
+
+def _audit_entry_problem(e) -> str | None:
+    if not isinstance(e, dict):
+        return "not an object"
+    for k, kind in (("target", str), ("mutant", str), ("class", str), ("group", str), ("grounds", str)):
+        if not isinstance(e.get(k), kind) or not e[k].strip():
+            return f"{k} is missing or empty"
+    if not isinstance(e.get("index"), int) or isinstance(e.get("index"), bool) or e["index"] < 0:
+        return "index is not a position"
+    if e["class"] not in AUDIT_CLASSES:
+        return f"class {e['class']!r} is neither of {AUDIT_CLASSES}"
+    if not _SHA256.fullmatch(str(e.get("source_sha256"))):
+        return "source_sha256 is not a digest"
+    for k in ("consumers_checked", "exceptions_checked"):
+        v = e.get(k)
+        if not isinstance(v, list) or not v or not all(isinstance(x, str) and x.strip() for x in v):
+            return f"{k} is missing, empty or not a list of text"
+    return None
+
+
+_AUDITS_CACHE: dict[tuple[str, int, int], tuple[dict, list[str]]] = {}
+
+
+def audits_at(root: pathlib.Path = ROOT) -> tuple[dict[tuple[str, int, str], dict], list[str]]:
+    """The positional audits of the tree at `root` (AUDITS_REL): ({(target, index, mutant): entry}, problems). A
+    malformed entry, a repeated position or a file that is not an object with `entries` is a problem and counts for
+    nothing; no file is no audits and no problem."""
+    path = root / AUDITS_REL
+    try:
+        st = path.stat()
+    except OSError:
+        return {}, []
+    key = (str(path), st.st_mtime_ns, st.st_size)
+    if key in _AUDITS_CACHE:
+        return _AUDITS_CACHE[key]
+    found: dict[tuple[str, int, str], dict] = {}
+    problems: list[str] = []
+    try:
+        doc = json.loads(path.read_text(encoding="utf-8"))
+        entries = doc["entries"] if isinstance(doc, dict) else None
+        if not isinstance(entries, list):
+            raise ValueError("no `entries` list")
+    except (OSError, ValueError, KeyError) as exc:
+        out = ({}, [f"{AUDITS_REL}: unreadable: {exc}"])
+        _AUDITS_CACHE[key] = out
+        return out
+    for n, e in enumerate(entries):
+        why = _audit_entry_problem(e)
+        if why:
+            problems.append(f"{AUDITS_REL}: entry {n}: {why}")
+            continue
+        k = (e["target"], e["index"], e["mutant"])
+        if k in found:
+            problems.append(f"{AUDITS_REL}: entry {n}: {k[0]} [{k[1]}] is audited twice")
+            continue
+        found[k] = e
+    _AUDITS_CACHE.clear()
+    _AUDITS_CACHE[key] = (found, problems)
+    return found, problems
+
+
+def audit_of(root: pathlib.Path, target: str, index: int, mutant: str, source_sha256: str | None) -> dict | None:
+    """The positional audit that covers mutant `index` of `target` (description `mutant`) in a result measured on a
+    module with digest `source_sha256`, or None. The V2.0 entries of AUDITED are by description, and read as before."""
+    e = audits_at(root)[0].get((target, index, mutant))
+    return e if e is not None and e["source_sha256"] == source_sha256 and target not in NO_AUDIT else None
+
+
 #: What a run copies into its scratch tree.
 COPY = ("aisef2", "tests/v2", "validation/v2", "docs/architecture", "docs/implementation/v2", "closure-evidence/v2",
         "docs/v2.1",   # the bundle-authoring schema and the S-10-a drafts two V2.1 kill files read
@@ -1645,12 +1722,12 @@ def _problems_v2(t: dict, root: pathlib.Path) -> list[str]:
         out.append(f"{name}: target changed since the mutation run — re-run it")
     if not t.get("mutants"):
         out.append(f"{name}: no mutants generated — a run that cannot say NO proves nothing")
-    for r in res:
+    for i, r in enumerate(res):
         d, cls = r["mutant"], r.get("class")
         if cls == "SURVIVED":
             if name in NO_AUDIT:
                 out.append(f"{name}: survivor {d!r} (must be fully killed; audits not accepted)")
-            elif (name, d) not in AUDITED:
+            elif (name, d) not in AUDITED and audit_of(root, name, i, d, t.get("source_sha256")) is None:
                 out.append(f"{name}: unaudited survivor {d!r}")
         elif cls != "KILLED":
             out.append(f"{name}: mutant {d!r} is {cls} ({r.get('why') or 'see its rows'}): neither killed nor survived — re-run it")
@@ -1724,6 +1801,8 @@ def problems_of(record: dict, root: pathlib.Path = ROOT, phase: str = "P1") -> l
     if phase == "V2.1":   # no result of a runner that did not classify enters V2.1 (VS-1, BC-3, ORD-1)
         out += [f"{t['target']}: measured by a runner that does not classify — re-measure" for t in targets
                 if t.get("runner") != 2]
+    if phase == "V2.1":   # a malformed positional audit counts for nothing, and is said so
+        out += audits_at(root)[1]
     return out + [p for t in targets for p in target_problems(t, root)]
 
 
