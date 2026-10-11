@@ -1,0 +1,4559 @@
+{
+ "record": "AISEF V2.1 — REQUALIFICATION ROUND SCOPE MANIFEST (B-03)",
+ "authority": [
+  {
+   "ledger": "closure-evidence/v2/cycle2/RELEASE-DECISIONS.json",
+   "seq": 4,
+   "id": "AISEF_V2_1_B01_ARCHITECTURE_EXCEPTION_V2_007",
+   "approver": "human:owner"
+  },
+  {
+   "ledger": "closure-evidence/v2/cycle2/RELEASE-DECISIONS.json",
+   "seq": 5,
+   "id": "AISEF_V2_1_B03_REQUALIFICATION_ROUND",
+   "approver": "human:owner"
+  }
+ ],
+ "base": "dc9774f81abb6d3421beda5fb71e08abe69fbb4d",
+ "snapshot": "f860e57fdcd457887d8766de8c8d4d01f1af778c",
+ "snapshot_aisef2_tree": "267507dd661d97690485d362571b8235fcd40ea0",
+ "the_reported_320": "checked against the tree at the base: every target whose module digest differs from its record's source_sha256 — P2 15, P6 2, C2-P1 42, V2.0-S2 261 = 320 (7,482 recorded mutants; the current generator yields 7,912 for them, line shifts)",
+ "not_targets": {
+  "names with no mutant": "a run that cannot say NO proves nothing (mutation.py)",
+  "aisef2/app/calibrations.py::CALIBRATIONS": "generated data (release_calibration.py rewrites it), proven by its calibration record and admission check 9, not by mutating its rows"
+ },
+ "mutation": {
+  "phase": "V2.1",
+  "record": "closure-evidence/v2/v2.1/MUTATION.json",
+  "timeout_s_per_kill_file": 900,
+  "targets": {
+   "aisef2/app/adapters.py::Developer.implement": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_s2_kills.py",
+     "tests/v2/test_v21_context_pack.py"
+    ],
+    "mutants": 52
+   },
+   "aisef2/app/adapters.py::Reviewer.__init__": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_v21_kills_adapters.py"
+    ],
+    "mutants": 13
+   },
+   "aisef2/app/adapters.py::Reviewer._model": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_v21_kills_adapters.py"
+    ],
+    "mutants": 24
+   },
+   "aisef2/app/adapters.py::Reviewer._ocr": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_v21_defects_ocr.py",
+     "tests/v2/test_v21_defects_ocrz.py",
+     "tests/v2/test_v21_kills3_A10.py",
+     "tests/v2/test_v21_kills3_T10a.py",
+     "tests/v2/test_v21_kills3_T10b.py",
+     "tests/v2/test_v21_kills3_T10c.py",
+     "tests/v2/test_v21_kills3_T10d.py"
+    ],
+    "mutants": 281
+   },
+   "aisef2/app/adapters.py::Reviewer._verify": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_v21_kills_adapters.py"
+    ],
+    "mutants": 6
+   },
+   "aisef2/app/adapters.py::Reviewer.review": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_s2_kills.py",
+     "tests/v2/test_v21_kills_adapters.py"
+    ],
+    "mutants": 54
+   },
+   "aisef2/app/adapters.py::_bounded": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_v21_kills3_TO3.py"
+    ],
+    "mutants": 10
+   },
+   "aisef2/app/adapters.py::_unchanged": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_v21_kills_adapters.py"
+    ],
+    "mutants": 16
+   },
+   "aisef2/app/adapters.py::attempt_of": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_app_run.py"
+    ],
+    "mutants": 15
+   },
+   "aisef2/app/adapters.py::tree_of": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_v21_kills_adapters.py"
+    ],
+    "mutants": 13
+   },
+   "aisef2/app/bundle.py::Project.order": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_inputs.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_bundle_tools.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_s2_kills_k.py"
+    ],
+    "mutants": 10
+   },
+   "aisef2/app/bundle.py::_HEX64": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_inputs.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_bundle_tools.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_app_run.py"
+    ],
+    "mutants": 1
+   },
+   "aisef2/app/bundle.py::_strings": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_inputs.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_bundle_tools.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_v21_kills_bundle.py"
+    ],
+    "mutants": 14
+   },
+   "aisef2/app/bundle.py::load": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_inputs.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_bundle_tools.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_s2_kills.py"
+    ],
+    "mutants": 66
+   },
+   "aisef2/app/bundle.py::read": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_inputs.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_bundle_tools.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_v21_kills_bundle.py"
+    ],
+    "mutants": 9
+   },
+   "aisef2/app/bundle.py::shape_problems": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_inputs.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_bundle_tools.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_v21_defects_bundleshape.py",
+     "tests/v2/test_v21_kills3_A24.py",
+     "tests/v2/test_v21_kills3_T24a.py"
+    ],
+    "mutants": 114
+   },
+   "aisef2/app/bundle_cli.py::AUTHORING_KEYS": {
+    "kill_tests": [
+     "tests/v2/test_v21_bundle_tools.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_continue_integrity.py"
+    ],
+    "mutants": 9
+   },
+   "aisef2/app/bundle_cli.py::CONTRACT_KEYS": {
+    "kill_tests": [
+     "tests/v2/test_v21_bundle_tools.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_continue_integrity.py"
+    ],
+    "mutants": 8
+   },
+   "aisef2/app/bundle_cli.py::CRITERION_KEYS": {
+    "kill_tests": [
+     "tests/v2/test_v21_bundle_tools.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_continue_integrity.py"
+    ],
+    "mutants": 6
+   },
+   "aisef2/app/bundle_cli.py::EXAMPLES": {
+    "kill_tests": [
+     "tests/v2/test_v21_bundle_tools.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_continue_integrity.py"
+    ],
+    "mutants": 1
+   },
+   "aisef2/app/bundle_cli.py::RELEASES": {
+    "kill_tests": [
+     "tests/v2/test_v21_bundle_tools.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_continue_integrity.py"
+    ],
+    "mutants": 42
+   },
+   "aisef2/app/bundle_cli.py::_closed": {
+    "kill_tests": [
+     "tests/v2/test_v21_bundle_tools.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_v21_kills3_A04.py",
+     "tests/v2/test_v21_kills3_T04a.py"
+    ],
+    "mutants": 11
+   },
+   "aisef2/app/bundle_cli.py::_create": {
+    "kill_tests": [
+     "tests/v2/test_v21_bundle_tools.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_continue_integrity.py"
+    ],
+    "mutants": 3
+   },
+   "aisef2/app/bundle_cli.py::_earlier": {
+    "kill_tests": [
+     "tests/v2/test_v21_bundle_tools.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_continue_integrity.py"
+    ],
+    "mutants": 7
+   },
+   "aisef2/app/bundle_cli.py::_mint": {
+    "kill_tests": [
+     "tests/v2/test_v21_bundle_tools.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_continue_integrity.py"
+    ],
+    "mutants": 13
+   },
+   "aisef2/app/bundle_cli.py::_read": {
+    "kill_tests": [
+     "tests/v2/test_v21_bundle_tools.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_v21_kills3_T04a.py"
+    ],
+    "mutants": 7
+   },
+   "aisef2/app/bundle_cli.py::_refs": {
+    "kill_tests": [
+     "tests/v2/test_v21_bundle_tools.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_continue_integrity.py"
+    ],
+    "mutants": 3
+   },
+   "aisef2/app/bundle_cli.py::_shell_word": {
+    "kill_tests": [
+     "tests/v2/test_v21_bundle_tools.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_v21_defects_bundlecli.py"
+    ],
+    "mutants": 12
+   },
+   "aisef2/app/bundle_cli.py::_spec_rows": {
+    "kill_tests": [
+     "tests/v2/test_v21_bundle_tools.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_v21_kills3_T04a.py"
+    ],
+    "mutants": 38
+   },
+   "aisef2/app/bundle_cli.py::_write_new": {
+    "kill_tests": [
+     "tests/v2/test_v21_bundle_tools.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_v21_kills3_T04a.py"
+    ],
+    "mutants": 3
+   },
+   "aisef2/app/bundle_cli.py::approve": {
+    "kill_tests": [
+     "tests/v2/test_v21_bundle_tools.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_v21_kills3_A04.py",
+     "tests/v2/test_v21_kills3_T04a.py"
+    ],
+    "mutants": 24
+   },
+   "aisef2/app/bundle_cli.py::continue_from": {
+    "kill_tests": [
+     "tests/v2/test_v21_bundle_tools.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_v21_defects_bundlecli.py",
+     "tests/v2/test_v21_kills3_T01a.py",
+     "tests/v2/test_v21_kills3_T01b.py",
+     "tests/v2/test_v21_kills3_TO1.py"
+    ],
+    "mutants": 180
+   },
+   "aisef2/app/bundle_cli.py::coverage": {
+    "kill_tests": [
+     "tests/v2/test_v21_bundle_tools.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_v21_kills_bundle_cli.py",
+     "tests/v2/test_v21_defects_bundlecli.py",
+     "tests/v2/test_v21_defects_lint.py"
+    ],
+    "mutants": 48
+   },
+   "aisef2/app/bundle_cli.py::explain": {
+    "kill_tests": [
+     "tests/v2/test_v21_bundle_tools.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_v21_defects_bundlecli.py",
+     "tests/v2/test_v21_kills3_T04a.py"
+    ],
+    "mutants": 34
+   },
+   "aisef2/app/bundle_cli.py::init": {
+    "kill_tests": [
+     "tests/v2/test_v21_bundle_tools.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_v21_kills_bundle_cli.py"
+    ],
+    "mutants": 12
+   },
+   "aisef2/app/bundle_cli.py::lint": {
+    "kill_tests": [
+     "tests/v2/test_v21_bundle_tools.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_v21_kills3_T03a.py"
+    ],
+    "mutants": 57
+   },
+   "aisef2/app/bundle_cli.py::main": {
+    "kill_tests": [
+     "tests/v2/test_v21_bundle_tools.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_v21_defects_lint.py",
+     "tests/v2/test_v21_kills3_A00.py",
+     "tests/v2/test_v21_kills3_T00a.py",
+     "tests/v2/test_v21_kills3_T00b.py"
+    ],
+    "mutants": 152
+   },
+   "aisef2/app/bundle_cli.py::migrate": {
+    "kill_tests": [
+     "tests/v2/test_v21_bundle_tools.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_v21_kills3_A03.py",
+     "tests/v2/test_v21_kills3_T03a.py",
+     "tests/v2/test_v21_kills3_T03b.py"
+    ],
+    "mutants": 83
+   },
+   "aisef2/app/bundle_cli.py::seal": {
+    "kill_tests": [
+     "tests/v2/test_v21_bundle_tools.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_v21_kills3_A02.py",
+     "tests/v2/test_v21_kills3_T02a.py"
+    ],
+    "mutants": 160
+   },
+   "aisef2/app/bundle_cli.py::unapproved": {
+    "kill_tests": [
+     "tests/v2/test_v21_bundle_tools.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_v21_kills3_T04a.py"
+    ],
+    "mutants": 19
+   },
+   "aisef2/app/cli.py::_parser": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_inputs.py",
+     "tests/v2/test_v21_bundle_tools.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_v21_kills_cli.py",
+     "tests/v2/test_v21_kills3_A23.py",
+     "tests/v2/test_v21_kills3_T23a.py"
+    ],
+    "mutants": 31
+   },
+   "aisef2/app/cli.py::run": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_inputs.py",
+     "tests/v2/test_v21_bundle_tools.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_s2_kills.py",
+     "tests/v2/test_v21_confine.py",
+     "tests/v2/test_v21_kills3_T23a.py"
+    ],
+    "mutants": 133
+   },
+   "aisef2/app/client.py::Budget.__init__": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_transport.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_s2_kills.py"
+    ],
+    "mutants": 19
+   },
+   "aisef2/app/client.py::Budget.account": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_transport.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_v21_kills3_T28a.py"
+    ],
+    "mutants": 15
+   },
+   "aisef2/app/client.py::Budget.reached": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_transport.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_s2_kills.py"
+    ],
+    "mutants": 20
+   },
+   "aisef2/app/client.py::Budget.spend": {
+    "kill_tests": [
+     "tests/v2/test_s2_kills_deterministic.py",
+     "tests/v2/test_v21_transport.py",
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_s2_kills.py"
+    ],
+    "mutants": 48
+   },
+   "aisef2/app/client.py::environment": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_transport.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_s2_kills.py"
+    ],
+    "mutants": 37
+   },
+   "aisef2/app/client.py::read_session": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_transport.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_s2_kills.py"
+    ],
+    "mutants": 82
+   },
+   "aisef2/app/client.py::redact": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_transport.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_v21_kills3_T28a.py"
+    ],
+    "mutants": 8
+   },
+   "aisef2/app/client.py::session": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_transport.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_s2_kills.py",
+     "tests/v2/test_v21_confine.py"
+    ],
+    "mutants": 128
+   },
+   "aisef2/app/client.py::wait_within": {
+    "kill_tests": [
+     "tests/v2/test_s2_kills_k.py",
+     "tests/v2/test_v21_transport.py",
+     "tests/v2/test_s2_kills.py",
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_app_run.py"
+    ],
+    "mutants": 23
+   },
+   "aisef2/app/confine.py::KEYS": {
+    "kill_tests": [
+     "tests/v2/test_v21_confine.py"
+    ],
+    "mutants": 4
+   },
+   "aisef2/app/confine.py::NETWORKS": {
+    "kill_tests": [
+     "tests/v2/test_v21_confine.py"
+    ],
+    "mutants": 2
+   },
+   "aisef2/app/confine.py::SYSTEM": {
+    "kill_tests": [
+     "tests/v2/test_v21_confine.py",
+     "tests/v2/test_v21_kills3_T07a.py"
+    ],
+    "mutants": 8
+   },
+   "aisef2/app/confine.py::USERNS_REFUSED": {
+    "kill_tests": [
+     "tests/v2/test_v21_confine.py"
+    ],
+    "mutants": 1
+   },
+   "aisef2/app/confine.py::_judge": {
+    "kill_tests": [
+     "tests/v2/test_v21_confine.py",
+     "tests/v2/test_v21_kills3_A06.py",
+     "tests/v2/test_v21_kills3_T06a.py"
+    ],
+    "mutants": 173
+   },
+   "aisef2/app/confine.py::_link": {
+    "kill_tests": [
+     "tests/v2/test_v21_confine.py"
+    ],
+    "mutants": 4
+   },
+   "aisef2/app/confine.py::_mounts": {
+    "kill_tests": [
+     "tests/v2/test_v21_confine.py",
+     "tests/v2/test_v21_kills3_T07a.py"
+    ],
+    "mutants": 25
+   },
+   "aisef2/app/confine.py::_probe": {
+    "kill_tests": [
+     "tests/v2/test_v21_confine.py",
+     "tests/v2/test_v21_defects_confine.py",
+     "tests/v2/test_v21_kills3_A05.py",
+     "tests/v2/test_v21_kills3_T05a.py",
+     "tests/v2/test_v21_kills3_T05b.py",
+     "tests/v2/test_v21_kills3_T05c.py"
+    ],
+    "mutants": 183
+   },
+   "aisef2/app/confine.py::_sections": {
+    "kill_tests": [
+     "tests/v2/test_v21_confine.py",
+     "tests/v2/test_v21_kills3_T07a.py"
+    ],
+    "mutants": 44
+   },
+   "aisef2/app/confine.py::_survivors": {
+    "kill_tests": [
+     "tests/v2/test_v21_confine.py",
+     "tests/v2/test_v21_kills3_TO2.py"
+    ],
+    "mutants": 8
+   },
+   "aisef2/app/confine.py::_within": {
+    "kill_tests": [
+     "tests/v2/test_v21_confine.py",
+     "tests/v2/test_v21_defects_confine.py",
+     "tests/v2/test_v21_kills3_T07a.py"
+    ],
+    "mutants": 5
+   },
+   "aisef2/app/confine.py::_worktree": {
+    "kill_tests": [
+     "tests/v2/test_v21_confine.py",
+     "tests/v2/test_v21_kills3_A07.py",
+     "tests/v2/test_v21_kills3_T07a.py"
+    ],
+    "mutants": 44
+   },
+   "aisef2/app/confine.py::argv": {
+    "kill_tests": [
+     "tests/v2/test_v21_confine.py",
+     "tests/v2/test_v21_kills3_A06.py",
+     "tests/v2/test_v21_kills3_T06a.py"
+    ],
+    "mutants": 73
+   },
+   "aisef2/app/confine.py::config_dir": {
+    "kill_tests": [
+     "tests/v2/test_v21_confine.py",
+     "tests/v2/test_v21_kills3_T07a.py"
+    ],
+    "mutants": 13
+   },
+   "aisef2/app/confine.py::git_dir": {
+    "kill_tests": [
+     "tests/v2/test_v21_confine.py",
+     "tests/v2/test_v21_kills3_T07a.py"
+    ],
+    "mutants": 13
+   },
+   "aisef2/app/confine.py::measure": {
+    "kill_tests": [
+     "tests/v2/test_v21_confine.py",
+     "tests/v2/test_v21_kills3_A06.py",
+     "tests/v2/test_v21_kills3_T06b.py"
+    ],
+    "mutants": 62
+   },
+   "aisef2/app/confine.py::namespaces": {
+    "kill_tests": [
+     "tests/v2/test_v21_confine.py",
+     "tests/v2/test_v21_kills3_T07b.py"
+    ],
+    "mutants": 16
+   },
+   "aisef2/app/confine.py::problem": {
+    "kill_tests": [
+     "tests/v2/test_v21_confine.py",
+     "tests/v2/test_v21_kills3_T07b.py"
+    ],
+    "mutants": 45
+   },
+   "aisef2/app/confine.py::targets": {
+    "kill_tests": [
+     "tests/v2/test_v21_confine.py",
+     "tests/v2/test_v21_defects_confine.py",
+     "tests/v2/test_v21_kills3_T07b.py"
+    ],
+    "mutants": 26
+   },
+   "aisef2/app/confine.py::wrap": {
+    "kill_tests": [
+     "tests/v2/test_v21_confine.py",
+     "tests/v2/test_v21_kills3_A07.py",
+     "tests/v2/test_v21_kills3_T07b.py"
+    ],
+    "mutants": 69
+   },
+   "aisef2/app/feedback.py::context_pack": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_v21_context_pack.py",
+     "tests/v2/test_v21_kills3_T17a.py"
+    ],
+    "mutants": 205
+   },
+   "aisef2/app/feedback.py::retry_feedback": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_v21_kills3_A17.py",
+     "tests/v2/test_v21_kills3_T17a.py",
+     "tests/v2/test_v21_kills3_T17b.py",
+     "tests/v2/test_v21_kills3_T17c.py"
+    ],
+    "mutants": 141
+   },
+   "aisef2/app/lineage.py::ANCHOR_LINE": {
+    "kill_tests": [
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_continue_integrity.py"
+    ],
+    "mutants": 1
+   },
+   "aisef2/app/lineage.py::JOURNAL": {
+    "kill_tests": [
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_continue_integrity.py"
+    ],
+    "mutants": 3
+   },
+   "aisef2/app/lineage.py::SPEND": {
+    "kill_tests": [
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_continue_integrity.py"
+    ],
+    "mutants": 4
+   },
+   "aisef2/app/lineage.py::_claimed_run": {
+    "kill_tests": [
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_v21_defects_verify.py"
+    ],
+    "mutants": 8
+   },
+   "aisef2/app/lineage.py::_git": {
+    "kill_tests": [
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_continue_integrity.py"
+    ],
+    "mutants": 1
+   },
+   "aisef2/app/lineage.py::_gone": {
+    "kill_tests": [
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_v21_defects_verify.py",
+     "tests/v2/test_v21_kills3_T09a.py"
+    ],
+    "mutants": 23
+   },
+   "aisef2/app/lineage.py::_sha": {
+    "kill_tests": [
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_continue_integrity.py"
+    ],
+    "mutants": 1
+   },
+   "aisef2/app/lineage.py::account_of": {
+    "kill_tests": [
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_v21_defects_verify.py",
+     "tests/v2/test_v21_kills3_A09.py",
+     "tests/v2/test_v21_kills3_T09a.py"
+    ],
+    "mutants": 64
+   },
+   "aisef2/app/lineage.py::child_state": {
+    "kill_tests": [
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_continue_integrity.py"
+    ],
+    "mutants": 8
+   },
+   "aisef2/app/lineage.py::claim": {
+    "kill_tests": [
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_v21_defects_verify.py",
+     "tests/v2/test_v21_kills3_T09a.py",
+     "tests/v2/test_v21_kills3_T09b.py"
+    ],
+    "mutants": 73
+   },
+   "aisef2/app/lineage.py::claimant": {
+    "kill_tests": [
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_continue_integrity.py"
+    ],
+    "mutants": 7
+   },
+   "aisef2/app/lineage.py::claims": {
+    "kill_tests": [
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_v21_kills_lineage.py",
+     "tests/v2/test_v21_kills3_T09b.py"
+    ],
+    "mutants": 12
+   },
+   "aisef2/app/lineage.py::continued_by": {
+    "kill_tests": [
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_v21_defects_verify.py",
+     "tests/v2/test_v21_kills3_T09b.py"
+    ],
+    "mutants": 16
+   },
+   "aisef2/app/lineage.py::events_of": {
+    "kill_tests": [
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_v21_kills3_A09.py"
+    ],
+    "mutants": 4
+   },
+   "aisef2/app/lineage.py::lineage_account": {
+    "kill_tests": [
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_v21_defects_verify.py",
+     "tests/v2/test_v21_kills3_T09b.py",
+     "tests/v2/test_v21_kills3_T09c.py"
+    ],
+    "mutants": 43
+   },
+   "aisef2/app/lineage.py::predecessor_of": {
+    "kill_tests": [
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_v21_defects_verify.py",
+     "tests/v2/test_v21_kills3_T09c.py"
+    ],
+    "mutants": 14
+   },
+   "aisef2/app/lineage.py::process_started": {
+    "kill_tests": [
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_v21_kills3_T09c.py"
+    ],
+    "mutants": 18
+   },
+   "aisef2/app/lineage.py::read_anchor": {
+    "kill_tests": [
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_v21_kills3_T09c.py"
+    ],
+    "mutants": 6
+   },
+   "aisef2/app/lineage.py::reconcile": {
+    "kill_tests": [
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_v21_kills3_A08.py",
+     "tests/v2/test_v21_kills3_T08a.py"
+    ],
+    "mutants": 147
+   },
+   "aisef2/app/lineage.py::usage_lineage": {
+    "kill_tests": [
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_v21_kills3_A08.py",
+     "tests/v2/test_v21_kills3_T08a.py",
+     "tests/v2/test_v21_kills3_T08b.py"
+    ],
+    "mutants": 80
+   },
+   "aisef2/app/lineage.py::write_anchor": {
+    "kill_tests": [
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_continue_integrity.py"
+    ],
+    "mutants": 9
+   },
+   "aisef2/app/preflight.py::accounting": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_transport.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_s2_kills.py"
+    ],
+    "mutants": 26
+   },
+   "aisef2/app/preflight.py::deployment": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_transport.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_app_run.py"
+    ],
+    "mutants": 7
+   },
+   "aisef2/app/preflight.py::fingerprint_fields": {
+    "kill_tests": [
+     "tests/v2/test_s2_kills_deterministic.py",
+     "tests/v2/test_v21_transport.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_s2_kills.py"
+    ],
+    "mutants": 22
+   },
+   "aisef2/app/preflight.py::http_transport": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_transport.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_v21_defects_preflight.py",
+     "tests/v2/test_v21_kills3_T25a.py"
+    ],
+    "mutants": 74
+   },
+   "aisef2/app/preflight.py::identity_problems": {
+    "kill_tests": [
+     "tests/v2/test_s2_kills_rc2.py",
+     "tests/v2/test_v21_transport.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_app_run.py"
+    ],
+    "mutants": 60
+   },
+   "aisef2/app/preflight.py::run": {
+    "kill_tests": [
+     "tests/v2/test_s2_kills_rc2.py",
+     "tests/v2/test_v21_transport.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_s2_kills.py"
+    ],
+    "mutants": 134
+   },
+   "aisef2/app/review_ocr.py::NOT_FULL": {
+    "kill_tests": [
+     "tests/v2/test_v21_review_ocr.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_kills3_T12a.py"
+    ],
+    "mutants": 3
+   },
+   "aisef2/app/review_ocr.py::NOT_REVIEWABLE": {
+    "kill_tests": [
+     "tests/v2/test_v21_review_ocr.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_kills3_T12a.py"
+    ],
+    "mutants": 2
+   },
+   "aisef2/app/review_ocr.py::OCR": {
+    "kill_tests": [
+     "tests/v2/test_v21_review_ocr.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_kills3_T12a.py"
+    ],
+    "mutants": 8
+   },
+   "aisef2/app/review_ocr.py::REPRODUCER_FENCE": {
+    "kill_tests": [
+     "tests/v2/test_v21_review_ocr.py",
+     "tests/v2/test_v21_review_chain.py"
+    ],
+    "mutants": 1
+   },
+   "aisef2/app/review_ocr.py::SCRUB_PREFIXES": {
+    "kill_tests": [
+     "tests/v2/test_v21_review_ocr.py",
+     "tests/v2/test_v21_review_chain.py"
+    ],
+    "mutants": 4
+   },
+   "aisef2/app/review_ocr.py::TERMINAL": {
+    "kill_tests": [
+     "tests/v2/test_v21_review_ocr.py",
+     "tests/v2/test_v21_review_chain.py"
+    ],
+    "mutants": 4
+   },
+   "aisef2/app/review_ocr.py::argv": {
+    "kill_tests": [
+     "tests/v2/test_v21_review_ocr.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_kills3_T12b.py"
+    ],
+    "mutants": 56
+   },
+   "aisef2/app/review_ocr.py::coverage": {
+    "kill_tests": [
+     "tests/v2/test_v21_review_ocr.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_kills3_A11.py",
+     "tests/v2/test_v21_kills3_T11a.py"
+    ],
+    "mutants": 137
+   },
+   "aisef2/app/review_ocr.py::environment": {
+    "kill_tests": [
+     "tests/v2/test_v21_review_ocr.py",
+     "tests/v2/test_v21_review_chain.py"
+    ],
+    "mutants": 24
+   },
+   "aisef2/app/review_ocr.py::finding_id": {
+    "kill_tests": [
+     "tests/v2/test_v21_review_ocr.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_kills3_T12b.py"
+    ],
+    "mutants": 13
+   },
+   "aisef2/app/review_ocr.py::findings": {
+    "kill_tests": [
+     "tests/v2/test_v21_review_ocr.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_kills3_T11a.py",
+     "tests/v2/test_v21_kills3_T11b.py"
+    ],
+    "mutants": 69
+   },
+   "aisef2/app/review_ocr.py::item_id": {
+    "kill_tests": [
+     "tests/v2/test_v21_review_ocr.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_kills3_T12b.py"
+    ],
+    "mutants": 12
+   },
+   "aisef2/app/review_ocr.py::pinned": {
+    "kill_tests": [
+     "tests/v2/test_v21_review_ocr.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_kills3_T12b.py"
+    ],
+    "mutants": 12
+   },
+   "aisef2/app/review_ocr.py::read_output": {
+    "kill_tests": [
+     "tests/v2/test_v21_review_ocr.py",
+     "tests/v2/test_v21_review_chain.py"
+    ],
+    "mutants": 5
+   },
+   "aisef2/app/review_ocr.py::reproducer_of": {
+    "kill_tests": [
+     "tests/v2/test_v21_review_ocr.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_kills3_T12b.py"
+    ],
+    "mutants": 11
+   },
+   "aisef2/app/review_ocr.py::scrubbed_names": {
+    "kill_tests": [
+     "tests/v2/test_v21_review_ocr.py",
+     "tests/v2/test_v21_review_chain.py"
+    ],
+    "mutants": 2
+   },
+   "aisef2/app/review_verify.py::POLICIES": {
+    "kill_tests": [
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_review_ocr.py",
+     "tests/v2/test_v21_review_chain.py"
+    ],
+    "mutants": 2
+   },
+   "aisef2/app/review_verify.py::REPRODUCER_KEYS": {
+    "kill_tests": [
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_review_ocr.py",
+     "tests/v2/test_v21_review_chain.py"
+    ],
+    "mutants": 4
+   },
+   "aisef2/app/review_verify.py::SEVERITIES": {
+    "kill_tests": [
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_review_ocr.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_kills3_T16a.py"
+    ],
+    "mutants": 4
+   },
+   "aisef2/app/review_verify.py::Verification.evidence": {
+    "kill_tests": [
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_review_ocr.py",
+     "tests/v2/test_v21_review_chain.py"
+    ],
+    "mutants": 5
+   },
+   "aisef2/app/review_verify.py::_NUMBER": {
+    "kill_tests": [
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_review_ocr.py",
+     "tests/v2/test_v21_review_chain.py"
+    ],
+    "mutants": 1
+   },
+   "aisef2/app/review_verify.py::_approved_by_clause": {
+    "kill_tests": [
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_review_ocr.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_kills3_T16a.py"
+    ],
+    "mutants": 22
+   },
+   "aisef2/app/review_verify.py::_canon": {
+    "kill_tests": [
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_review_ocr.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_kills3_T16a.py"
+    ],
+    "mutants": 7
+   },
+   "aisef2/app/review_verify.py::_scalars": {
+    "kill_tests": [
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_review_ocr.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_kills3_T16a.py"
+    ],
+    "mutants": 7
+   },
+   "aisef2/app/review_verify.py::_states": {
+    "kill_tests": [
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_review_ocr.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_kills3_T16a.py"
+    ],
+    "mutants": 13
+   },
+   "aisef2/app/review_verify.py::_stimulus": {
+    "kill_tests": [
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_review_ocr.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_kills3_T16a.py"
+    ],
+    "mutants": 8
+   },
+   "aisef2/app/review_verify.py::anchor": {
+    "kill_tests": [
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_review_ocr.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_kills3_A15.py",
+     "tests/v2/test_v21_kills3_T15a.py"
+    ],
+    "mutants": 82
+   },
+   "aisef2/app/review_verify.py::blocks": {
+    "kill_tests": [
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_review_ocr.py",
+     "tests/v2/test_v21_review_chain.py"
+    ],
+    "mutants": 8
+   },
+   "aisef2/app/review_verify.py::detail": {
+    "kill_tests": [
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_review_ocr.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_kills3_T15a.py"
+    ],
+    "mutants": 36
+   },
+   "aisef2/app/review_verify.py::reproducer_contract": {
+    "kill_tests": [
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_review_ocr.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_defects_reproducer.py",
+     "tests/v2/test_v21_kills3_A15.py",
+     "tests/v2/test_v21_kills3_T15a.py"
+    ],
+    "mutants": 65
+   },
+   "aisef2/app/review_verify.py::severity_of": {
+    "kill_tests": [
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_review_ocr.py",
+     "tests/v2/test_v21_review_chain.py"
+    ],
+    "mutants": 5
+   },
+   "aisef2/app/review_verify.py::verify": {
+    "kill_tests": [
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_review_ocr.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_kills3_A16.py",
+     "tests/v2/test_v21_kills3_T16a.py"
+    ],
+    "mutants": 30
+   },
+   "aisef2/app/run.py::_close": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_inputs.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_verify.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_app_run.py"
+    ],
+    "mutants": 3
+   },
+   "aisef2/app/run.py::_content_sha": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_inputs.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_verify.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_v21_kills3_T14a.py"
+    ],
+    "mutants": 10
+   },
+   "aisef2/app/run.py::admit": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_inputs.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_verify.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_s2_kills.py"
+    ],
+    "mutants": 15
+   },
+   "aisef2/app/run.py::anchor_in": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_inputs.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_verify.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_v21_kills3_T14a.py"
+    ],
+    "mutants": 4
+   },
+   "aisef2/app/run.py::anchor_of": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_inputs.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_verify.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_v21_kills3_T14a.py"
+    ],
+    "mutants": 7
+   },
+   "aisef2/app/run.py::calibrations": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_inputs.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_verify.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_app_run.py"
+    ],
+    "mutants": 11
+   },
+   "aisef2/app/run.py::check_git": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_inputs.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_verify.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_s2_kills.py"
+    ],
+    "mutants": 22
+   },
+   "aisef2/app/run.py::check_repository": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_inputs.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_verify.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_s2_kills.py",
+     "tests/v2/test_v21_kills3_T14a.py"
+    ],
+    "mutants": 38
+   },
+   "aisef2/app/run.py::client_on_path": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_inputs.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_verify.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_v21_confine.py"
+    ],
+    "mutants": 3
+   },
+   "aisef2/app/run.py::delivery": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_inputs.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_verify.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_s2_kills.py"
+    ],
+    "mutants": 46
+   },
+   "aisef2/app/run.py::evidence_manifest": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_inputs.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_verify.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_v21_kills3_T14a.py"
+    ],
+    "mutants": 21
+   },
+   "aisef2/app/run.py::execute": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_inputs.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_verify.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_s2_kills.py",
+     "tests/v2/test_v21_confine.py",
+     "tests/v2/test_v21_kills3_A13.py",
+     "tests/v2/test_v21_kills3_T13a.py"
+    ],
+    "mutants": 337
+   },
+   "aisef2/app/run.py::kernel_digest": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_inputs.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_verify.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_app_run.py"
+    ],
+    "mutants": 3
+   },
+   "aisef2/app/run.py::layers_of": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_inputs.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_verify.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_v21_kills3_T14b.py"
+    ],
+    "mutants": 79
+   },
+   "aisef2/app/run.py::outcomes_from": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_inputs.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_verify.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_app_run.py"
+    ],
+    "mutants": 16
+   },
+   "aisef2/app/run.py::probe_interpreter": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_inputs.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_verify.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_s2_kills.py"
+    ],
+    "mutants": 21
+   },
+   "aisef2/app/run.py::productproof": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_inputs.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_verify.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_s2_kills.py"
+    ],
+    "mutants": 62
+   },
+   "aisef2/app/run.py::regression_tests": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_inputs.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_verify.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_app_run.py"
+    ],
+    "mutants": 14
+   },
+   "aisef2/app/run.py::runspec_of": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_inputs.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_verify.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_s2_kills.py"
+    ],
+    "mutants": 51
+   },
+   "aisef2/app/run.py::unfinished": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_inputs.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_verify.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_v21_kills3_T14b.py"
+    ],
+    "mutants": 18
+   },
+   "aisef2/app/settings.py::FINDERS": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_inputs.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_verify.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_app_run.py"
+    ],
+    "mutants": 2
+   },
+   "aisef2/app/settings.py::LOOPBACK": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_inputs.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_verify.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_app_run.py"
+    ],
+    "mutants": 3
+   },
+   "aisef2/app/settings.py::OCR_KEYS": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_inputs.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_verify.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_app_run.py"
+    ],
+    "mutants": 4
+   },
+   "aisef2/app/settings.py::OPTIONAL": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_inputs.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_verify.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_v21_confine.py"
+    ],
+    "mutants": 3
+   },
+   "aisef2/app/settings.py::REVIEW_ABSENT": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_inputs.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_verify.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_v21_kills3_A26.py",
+     "tests/v2/test_v21_kills3_T26a.py"
+    ],
+    "mutants": 9
+   },
+   "aisef2/app/settings.py::Settings.prices": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_inputs.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_verify.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_app_run.py"
+    ],
+    "mutants": 2
+   },
+   "aisef2/app/settings.py::_count": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_inputs.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_verify.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_s2_kills.py"
+    ],
+    "mutants": 7
+   },
+   "aisef2/app/settings.py::endpoint_problem": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_inputs.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_verify.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_v21_kills_settings.py",
+     "tests/v2/test_v21_kills3_A26.py",
+     "tests/v2/test_v21_kills3_T26a.py"
+    ],
+    "mutants": 36
+   },
+   "aisef2/app/settings.py::load": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_inputs.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_verify.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_s2_kills.py",
+     "tests/v2/test_v21_confine.py",
+     "tests/v2/test_v21_kills3_T26a.py"
+    ],
+    "mutants": 268
+   },
+   "aisef2/app/settings.py::read": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_inputs.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_review.py",
+     "tests/v2/test_v21_verify.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_review_chain.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_v21_kills3_T26a.py"
+    ],
+    "mutants": 9
+   },
+   "aisef2/app/usage.py::CLASSES": {
+    "kill_tests": [
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_verify.py",
+     "tests/v2/test_v21_continue_integrity.py"
+    ],
+    "mutants": 5
+   },
+   "aisef2/app/usage.py::PRICE_KEYS": {
+    "kill_tests": [
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_verify.py",
+     "tests/v2/test_v21_continue_integrity.py"
+    ],
+    "mutants": 7
+   },
+   "aisef2/app/usage.py::_DATE": {
+    "kill_tests": [
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_verify.py",
+     "tests/v2/test_v21_continue_integrity.py"
+    ],
+    "mutants": 1
+   },
+   "aisef2/app/usage.py::_usd": {
+    "kill_tests": [
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_verify.py",
+     "tests/v2/test_v21_continue_integrity.py"
+    ],
+    "mutants": 10
+   },
+   "aisef2/app/usage.py::no_progress": {
+    "kill_tests": [
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_verify.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_v21_kills_usage.py",
+     "tests/v2/test_v21_kills3_A20.py",
+     "tests/v2/test_v21_kills3_T20a.py"
+    ],
+    "mutants": 33
+   },
+   "aisef2/app/usage.py::price_problem": {
+    "kill_tests": [
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_verify.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_v21_kills3_T20a.py"
+    ],
+    "mutants": 45
+   },
+   "aisef2/app/usage.py::session_tokens": {
+    "kill_tests": [
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_verify.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_v21_kills3_T20a.py"
+    ],
+    "mutants": 42
+   },
+   "aisef2/app/usage.py::usage": {
+    "kill_tests": [
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_verify.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_v21_defects_lineageusage.py",
+     "tests/v2/test_v21_defects_verify.py",
+     "tests/v2/test_v21_kills3_T20a.py",
+     "tests/v2/test_v21_kills3_T20b.py"
+    ],
+    "mutants": 119
+   },
+   "aisef2/app/verify.py::_runspec_problems": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_verify.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_v21_kills3_A22.py",
+     "tests/v2/test_v21_kills3_T22a.py"
+    ],
+    "mutants": 45
+   },
+   "aisef2/app/verify.py::_spend": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_verify.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_app_run.py"
+    ],
+    "mutants": 14
+   },
+   "aisef2/app/verify.py::verify": {
+    "kill_tests": [
+     "tests/v2/test_app_units.py",
+     "tests/v2/test_v21_verify.py",
+     "tests/v2/test_v21_continue_usage.py",
+     "tests/v2/test_v21_continue_integrity.py",
+     "tests/v2/test_app_run.py",
+     "tests/v2/test_s2_kills.py",
+     "tests/v2/test_v21_defects_verify.py",
+     "tests/v2/test_v21_kills3_A22.py",
+     "tests/v2/test_v21_kills3_T22a.py",
+     "tests/v2/test_v21_kills3_T22b.py"
+    ],
+    "mutants": 189
+   },
+   "aisef2/orchestrate/adapters.py::Finding.blocks": {
+    "kill_tests": [
+     "tests/v2/test_p6_stages.py",
+     "tests/v2/test_v21_orchestration.py",
+     "tests/v2/test_release_s2_kernel.py"
+    ],
+    "mutants": 2
+   },
+   "aisef2/orchestrate/adapters.py::Implemented.__post_init__": {
+    "kill_tests": [
+     "tests/v2/test_p6_stages.py",
+     "tests/v2/test_v21_orchestration.py",
+     "tests/v2/test_release_s2_kernel.py"
+    ],
+    "mutants": 27
+   },
+   "aisef2/orchestrate/adapters.py::Merge.__post_init__": {
+    "kill_tests": [
+     "tests/v2/test_p6_stages.py",
+     "tests/v2/test_v21_orchestration.py",
+     "tests/v2/test_release_s2_kernel.py"
+    ],
+    "mutants": 6
+   },
+   "aisef2/orchestrate/adapters.py::ReadOnlyScope.files": {
+    "kill_tests": [
+     "tests/v2/test_p6_stages.py",
+     "tests/v2/test_v21_orchestration.py",
+     "tests/v2/test_release_s2_kernel.py"
+    ],
+    "mutants": 8
+   },
+   "aisef2/orchestrate/adapters.py::ReadOnlyScope.read": {
+    "kill_tests": [
+     "tests/v2/test_p6_stages.py",
+     "tests/v2/test_v21_orchestration.py",
+     "tests/v2/test_release_s2_kernel.py"
+    ],
+    "mutants": 1
+   },
+   "aisef2/orchestrate/adapters.py::confine": {
+    "kill_tests": [
+     "tests/v2/test_p6_stages.py",
+     "tests/v2/test_v21_orchestration.py",
+     "tests/v2/test_release_s2_kernel.py"
+    ],
+    "mutants": 9
+   },
+   "aisef2/orchestrate/adapters.py::unconfine": {
+    "kill_tests": [
+     "tests/v2/test_p6_stages.py",
+     "tests/v2/test_v21_orchestration.py",
+     "tests/v2/test_release_s2_kernel.py"
+    ],
+    "mutants": 5
+   },
+   "aisef2/orchestrate/review.py::_result": {
+    "kill_tests": [
+     "tests/v2/test_p6_stages.py",
+     "tests/v2/test_v21_review.py"
+    ],
+    "mutants": 10
+   },
+   "aisef2/orchestrate/review.py::review": {
+    "kill_tests": [
+     "tests/v2/test_p6_stages.py",
+     "tests/v2/test_v21_review.py"
+    ],
+    "mutants": 121
+   },
+   "aisef2/orchestrate/story_runner.py::StoryResult.committed": {
+    "kill_tests": [
+     "tests/v2/test_p6_stages.py",
+     "tests/v2/test_v21_orchestration.py",
+     "tests/v2/test_release_s2_kernel.py",
+     "tests/v2/test_c2_k_nowork_001.py",
+     "tests/v2/test_c2_k_presat_001.py",
+     "tests/v2/test_c2_orchestration_conformance.py"
+    ],
+    "mutants": 3
+   },
+   "aisef2/orchestrate/story_runner.py::StoryResult.revision": {
+    "kill_tests": [
+     "tests/v2/test_p6_stages.py",
+     "tests/v2/test_v21_orchestration.py",
+     "tests/v2/test_release_s2_kernel.py",
+     "tests/v2/test_c2_k_nowork_001.py",
+     "tests/v2/test_c2_k_presat_001.py",
+     "tests/v2/test_c2_orchestration_conformance.py"
+    ],
+    "mutants": 1
+   },
+   "aisef2/orchestrate/story_runner.py::_Held.__call__": {
+    "kill_tests": [
+     "tests/v2/test_p6_stages.py",
+     "tests/v2/test_v21_orchestration.py",
+     "tests/v2/test_release_s2_kernel.py",
+     "tests/v2/test_c2_k_nowork_001.py",
+     "tests/v2/test_c2_k_presat_001.py",
+     "tests/v2/test_c2_orchestration_conformance.py"
+    ],
+    "mutants": 3
+   },
+   "aisef2/orchestrate/story_runner.py::_Held.__init__": {
+    "kill_tests": [
+     "tests/v2/test_p6_stages.py",
+     "tests/v2/test_v21_orchestration.py",
+     "tests/v2/test_release_s2_kernel.py",
+     "tests/v2/test_c2_k_nowork_001.py",
+     "tests/v2/test_c2_k_presat_001.py",
+     "tests/v2/test_c2_orchestration_conformance.py"
+    ],
+    "mutants": 6
+   },
+   "aisef2/orchestrate/story_runner.py::_Held.release": {
+    "kill_tests": [
+     "tests/v2/test_p6_stages.py",
+     "tests/v2/test_v21_orchestration.py",
+     "tests/v2/test_release_s2_kernel.py",
+     "tests/v2/test_c2_k_nowork_001.py",
+     "tests/v2/test_c2_k_presat_001.py",
+     "tests/v2/test_c2_orchestration_conformance.py"
+    ],
+    "mutants": 3
+   },
+   "aisef2/orchestrate/story_runner.py::_attempt": {
+    "kill_tests": [
+     "tests/v2/test_p6_stages.py",
+     "tests/v2/test_v21_orchestration.py",
+     "tests/v2/test_release_s2_kernel.py",
+     "tests/v2/test_c2_k_nowork_001.py",
+     "tests/v2/test_c2_k_presat_001.py",
+     "tests/v2/test_c2_orchestration_conformance.py",
+     "tests/v2/test_p6_orchestration.py"
+    ],
+    "mutants": 324
+   },
+   "aisef2/orchestrate/story_runner.py::_committed": {
+    "kill_tests": [
+     "tests/v2/test_p6_stages.py",
+     "tests/v2/test_v21_orchestration.py",
+     "tests/v2/test_release_s2_kernel.py",
+     "tests/v2/test_c2_k_nowork_001.py",
+     "tests/v2/test_c2_k_presat_001.py",
+     "tests/v2/test_c2_orchestration_conformance.py"
+    ],
+    "mutants": 6
+   },
+   "aisef2/orchestrate/story_runner.py::_fail": {
+    "kill_tests": [
+     "tests/v2/test_p6_stages.py",
+     "tests/v2/test_v21_orchestration.py",
+     "tests/v2/test_release_s2_kernel.py",
+     "tests/v2/test_c2_k_nowork_001.py",
+     "tests/v2/test_c2_k_presat_001.py",
+     "tests/v2/test_c2_orchestration_conformance.py"
+    ],
+    "mutants": 34
+   },
+   "aisef2/orchestrate/story_runner.py::_freeze_plan": {
+    "kill_tests": [
+     "tests/v2/test_p6_stages.py",
+     "tests/v2/test_v21_orchestration.py",
+     "tests/v2/test_release_s2_kernel.py",
+     "tests/v2/test_c2_k_nowork_001.py",
+     "tests/v2/test_c2_k_presat_001.py",
+     "tests/v2/test_c2_orchestration_conformance.py"
+    ],
+    "mutants": 9
+   },
+   "aisef2/orchestrate/story_runner.py::_probe": {
+    "kill_tests": [
+     "tests/v2/test_p6_stages.py",
+     "tests/v2/test_v21_orchestration.py",
+     "tests/v2/test_release_s2_kernel.py",
+     "tests/v2/test_c2_k_nowork_001.py",
+     "tests/v2/test_c2_k_presat_001.py",
+     "tests/v2/test_c2_orchestration_conformance.py"
+    ],
+    "mutants": 9
+   },
+   "aisef2/orchestrate/story_runner.py::run_story": {
+    "kill_tests": [
+     "tests/v2/test_p6_stages.py",
+     "tests/v2/test_v21_orchestration.py",
+     "tests/v2/test_release_s2_kernel.py",
+     "tests/v2/test_c2_k_nowork_001.py",
+     "tests/v2/test_c2_k_presat_001.py",
+     "tests/v2/test_c2_orchestration_conformance.py",
+     "tests/v2/test_p6_orchestration.py"
+    ],
+    "mutants": 11
+   },
+   "aisef2/orchestrate/workspace.py::Checkout.__init__": {
+    "kill_tests": [
+     "tests/v2/test_p6_stages.py",
+     "tests/v2/test_v21_orchestration.py",
+     "tests/v2/test_release_s2_kernel.py"
+    ],
+    "mutants": 10
+   },
+   "aisef2/orchestrate/workspace.py::Checkout.release": {
+    "kill_tests": [
+     "tests/v2/test_p6_stages.py",
+     "tests/v2/test_v21_orchestration.py",
+     "tests/v2/test_release_s2_kernel.py"
+    ],
+    "mutants": 8
+   },
+   "aisef2/orchestrate/workspace.py::GitMerger.base": {
+    "kill_tests": [
+     "tests/v2/test_p6_stages.py",
+     "tests/v2/test_v21_orchestration.py",
+     "tests/v2/test_release_s2_kernel.py"
+    ],
+    "mutants": 1
+   },
+   "aisef2/orchestrate/workspace.py::GitMerger.merge": {
+    "kill_tests": [
+     "tests/v2/test_p6_stages.py",
+     "tests/v2/test_v21_orchestration.py",
+     "tests/v2/test_release_s2_kernel.py"
+    ],
+    "mutants": 46
+   },
+   "aisef2/orchestrate/workspace.py::GitMerger.revert": {
+    "kill_tests": [
+     "tests/v2/test_p6_stages.py",
+     "tests/v2/test_v21_orchestration.py",
+     "tests/v2/test_release_s2_kernel.py"
+    ],
+    "mutants": 15
+   },
+   "aisef2/orchestrate/workspace.py::GitWorkspace.checkout": {
+    "kill_tests": [
+     "tests/v2/test_p6_stages.py",
+     "tests/v2/test_v21_orchestration.py",
+     "tests/v2/test_release_s2_kernel.py"
+    ],
+    "mutants": 16
+   },
+   "aisef2/orchestrate/workspace.py::GitWorkspace.diff": {
+    "kill_tests": [
+     "tests/v2/test_p6_stages.py",
+     "tests/v2/test_v21_orchestration.py",
+     "tests/v2/test_release_s2_kernel.py"
+    ],
+    "mutants": 9
+   },
+   "aisef2/orchestrate/workspace.py::GitWorkspace.move": {
+    "kill_tests": [
+     "tests/v2/test_p6_stages.py",
+     "tests/v2/test_v21_orchestration.py",
+     "tests/v2/test_release_s2_kernel.py"
+    ],
+    "mutants": 26
+   },
+   "aisef2/orchestrate/workspace.py::GitWorkspace.scratch": {
+    "kill_tests": [
+     "tests/v2/test_p6_stages.py",
+     "tests/v2/test_v21_orchestration.py",
+     "tests/v2/test_release_s2_kernel.py"
+    ],
+    "mutants": 4
+   },
+   "aisef2/orchestrate/workspace.py::Scratch.__init__": {
+    "kill_tests": [
+     "tests/v2/test_p6_stages.py",
+     "tests/v2/test_v21_orchestration.py",
+     "tests/v2/test_release_s2_kernel.py"
+    ],
+    "mutants": 6
+   },
+   "aisef2/orchestrate/workspace.py::Scratch.release": {
+    "kill_tests": [
+     "tests/v2/test_p6_stages.py",
+     "tests/v2/test_v21_orchestration.py",
+     "tests/v2/test_release_s2_kernel.py"
+    ],
+    "mutants": 3
+   },
+   "aisef2/orchestrate/workspace.py::_NO_BACKGROUND_GIT": {
+    "kill_tests": [
+     "tests/v2/test_p6_stages.py",
+     "tests/v2/test_v21_orchestration.py",
+     "tests/v2/test_release_s2_kernel.py"
+    ],
+    "mutants": 11
+   },
+   "aisef2/orchestrate/workspace.py::_env": {
+    "kill_tests": [
+     "tests/v2/test_p6_stages.py",
+     "tests/v2/test_v21_orchestration.py",
+     "tests/v2/test_release_s2_kernel.py"
+    ],
+    "mutants": 6
+   },
+   "aisef2/orchestrate/workspace.py::_sha": {
+    "kill_tests": [
+     "tests/v2/test_p6_stages.py",
+     "tests/v2/test_v21_orchestration.py",
+     "tests/v2/test_release_s2_kernel.py"
+    ],
+    "mutants": 13
+   },
+   "aisef2/orchestrate/workspace.py::commit_all": {
+    "kill_tests": [
+     "tests/v2/test_p6_stages.py",
+     "tests/v2/test_v21_orchestration.py",
+     "tests/v2/test_release_s2_kernel.py"
+    ],
+    "mutants": 19
+   },
+   "aisef2/orchestrate/workspace.py::config_problems": {
+    "kill_tests": [
+     "tests/v2/test_p6_stages.py",
+     "tests/v2/test_v21_orchestration.py",
+     "tests/v2/test_release_s2_kernel.py",
+     "tests/v2/test_s2_kills.py"
+    ],
+    "mutants": 34
+   },
+   "aisef2/orchestrate/workspace.py::git": {
+    "kill_tests": [
+     "tests/v2/test_p6_stages.py",
+     "tests/v2/test_v21_orchestration.py",
+     "tests/v2/test_release_s2_kernel.py"
+    ],
+    "mutants": 22
+   },
+   "aisef2/plan/static_admission.py::_cycle": {
+    "kill_tests": [
+     "tests/v2/p2/test_static_admission.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 21
+   },
+   "aisef2/plan/static_admission.py::admit": {
+    "kill_tests": [
+     "tests/v2/p2/test_static_admission.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 21
+   },
+   "aisef2/plan/static_admission.py::check_contract_spec_integrity": {
+    "kill_tests": [
+     "tests/v2/p2/test_static_admission.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 13
+   },
+   "aisef2/plan/static_admission.py::check_contradictions": {
+    "kill_tests": [
+     "tests/v2/p2/test_static_admission.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 32
+   },
+   "aisef2/plan/static_admission.py::check_dependency_dag": {
+    "kill_tests": [
+     "tests/v2/p2/test_static_admission.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 9
+   },
+   "aisef2/plan/static_admission.py::check_ownership": {
+    "kill_tests": [
+     "tests/v2/p2/test_static_admission.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_kills3_T28a.py"
+    ],
+    "mutants": 20
+   },
+   "aisef2/plan/static_admission.py::check_plan_structure": {
+    "kill_tests": [
+     "tests/v2/p2/test_static_admission.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 8
+   },
+   "aisef2/plan/static_admission.py::check_probe_calibration": {
+    "kill_tests": [
+     "tests/v2/p2/test_static_admission.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 19
+   },
+   "aisef2/plan/static_admission.py::check_proof_capability": {
+    "kill_tests": [
+     "tests/v2/p2/test_static_admission.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 16
+   },
+   "aisef2/plan/static_admission.py::check_requirement_coverage": {
+    "kill_tests": [
+     "tests/v2/p2/test_static_admission.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 6
+   },
+   "aisef2/plan/static_admission.py::check_traceability": {
+    "kill_tests": [
+     "tests/v2/p2/test_static_admission.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 11
+   },
+   "aisef2/plan/static_admission.py::depends_on_story": {
+    "kill_tests": [
+     "tests/v2/p2/test_static_admission.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 12
+   },
+   "aisef2/plan/static_admission.py::story_graph": {
+    "kill_tests": [
+     "tests/v2/p2/test_static_admission.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 4
+   },
+   "aisef2/probe/calibration.py::calibrate": {
+    "kill_tests": [
+     "tests/v2/p2/test_calibration.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 40
+   },
+   "aisef2/probe/calibration.py::calibration_for": {
+    "kill_tests": [
+     "tests/v2/p2/test_calibration.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 9
+   },
+   "aisef2/probe/calibration.py::demonstrates_contrast": {
+    "kill_tests": [
+     "tests/v2/p2/test_calibration.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 5
+   },
+   "aisef2/probe/calibration.py::executing": {
+    "kill_tests": [
+     "tests/v2/p2/test_calibration.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 3
+   },
+   "aisef2/probe/cli_invocation.py::AGENT/flush": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_protocol.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_c2_cli_invocation.py"
+    ],
+    "mutants": 4
+   },
+   "aisef2/probe/cli_invocation.py::AGENT/guarded": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_protocol.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_c2_cli_invocation.py",
+     "tests/v2/test_s2_kills.py"
+    ],
+    "mutants": 19
+   },
+   "aisef2/probe/cli_invocation.py::AGENT/op_bye": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_protocol.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_c2_cli_invocation.py"
+    ],
+    "mutants": 1
+   },
+   "aisef2/probe/cli_invocation.py::AGENT/op_call": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_protocol.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_c2_cli_invocation.py"
+    ],
+    "mutants": 38
+   },
+   "aisef2/probe/cli_invocation.py::AGENT/op_construct": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_protocol.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_c2_cli_invocation.py"
+    ],
+    "mutants": 13
+   },
+   "aisef2/probe/cli_invocation.py::AGENT/op_import": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_protocol.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_c2_cli_invocation.py"
+    ],
+    "mutants": 22
+   },
+   "aisef2/probe/cli_invocation.py::AGENT/op_invoke": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_protocol.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_c2_cli_invocation.py",
+     "tests/v2/test_s2_kills.py"
+    ],
+    "mutants": 36
+   },
+   "aisef2/probe/cli_invocation.py::AGENT/op_resolve": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_protocol.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_c2_cli_invocation.py"
+    ],
+    "mutants": 16
+   },
+   "aisef2/probe/cli_invocation.py::AGENT/op_value": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_protocol.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_c2_cli_invocation.py"
+    ],
+    "mutants": 2
+   },
+   "aisef2/probe/cli_invocation.py::AGENT/plain": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_protocol.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_c2_cli_invocation.py",
+     "tests/v2/test_s2_kills.py"
+    ],
+    "mutants": 4
+   },
+   "aisef2/probe/cli_invocation.py::AGENT/redirect": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_protocol.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_c2_cli_invocation.py"
+    ],
+    "mutants": 15
+   },
+   "aisef2/probe/cli_invocation.py::AGENT/send": {
+    "kill_tests": [
+     "tests/v2/test_s2_kills_k.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_s2_kills.py",
+     "tests/v2/test_c2_cli_protocol.py",
+     "tests/v2/test_c2_cli_invocation.py"
+    ],
+    "mutants": 2
+   },
+   "aisef2/probe/cli_invocation.py::AGENT/tagged": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_protocol.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_c2_cli_invocation.py"
+    ],
+    "mutants": 16
+   },
+   "aisef2/probe/cli_invocation.py::CLASSES": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 5
+   },
+   "aisef2/probe/cli_invocation.py::CLASS_TABLE": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 212
+   },
+   "aisef2/probe/cli_invocation.py::COMPARATORS": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 2
+   },
+   "aisef2/probe/cli_invocation.py::CliInvocationProbe.__init__": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_protocol.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_c2_cli_invocation.py"
+    ],
+    "mutants": 4
+   },
+   "aisef2/probe/cli_invocation.py::CliInvocationProbe._observe": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_protocol.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_c2_cli_invocation.py"
+    ],
+    "mutants": 15
+   },
+   "aisef2/probe/cli_invocation.py::CliInvocationProbe._observe_equality": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_protocol.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_c2_cli_calibration.py"
+    ],
+    "mutants": 73
+   },
+   "aisef2/probe/cli_invocation.py::CliInvocationProbe._observe_in": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_protocol.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_c2_cli_invocation.py"
+    ],
+    "mutants": 45
+   },
+   "aisef2/probe/cli_invocation.py::CliInvocationProbe.enforcement": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 3
+   },
+   "aisef2/probe/cli_invocation.py::CliInvocationProbe.harness_preconditions": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 9
+   },
+   "aisef2/probe/cli_invocation.py::CliInvocationProbe.observe": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_protocol.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_c2_cli_invocation.py"
+    ],
+    "mutants": 48
+   },
+   "aisef2/probe/cli_invocation.py::DIGEST": {
+    "kill_tests": [
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_c2_cli_calibration.py"
+    ],
+    "mutants": 4
+   },
+   "aisef2/probe/cli_invocation.py::FILE_SHAPES": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 4
+   },
+   "aisef2/probe/cli_invocation.py::HARNESS/answer_to": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_protocol.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_c2_cli_invocation.py",
+     "tests/v2/test_v21_kills3_T21a.py"
+    ],
+    "mutants": 12
+   },
+   "aisef2/probe/cli_invocation.py::HARNESS/ask": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_protocol.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_c2_cli_invocation.py"
+    ],
+    "mutants": 4
+   },
+   "aisef2/probe/cli_invocation.py::HARNESS/conclude": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_protocol.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_c2_cli_invocation.py",
+     "tests/v2/test_v21_kills3_A21.py"
+    ],
+    "mutants": 4
+   },
+   "aisef2/probe/cli_invocation.py::HARNESS/deadline": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_protocol.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_c2_cli_invocation.py",
+     "tests/v2/test_v21_kills3_T21a.py"
+    ],
+    "mutants": 5
+   },
+   "aisef2/probe/cli_invocation.py::HARNESS/emit": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_protocol.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_c2_cli_invocation.py"
+    ],
+    "mutants": 10
+   },
+   "aisef2/probe/cli_invocation.py::HARNESS/ended": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_protocol.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_c2_cli_invocation.py"
+    ],
+    "mutants": 13
+   },
+   "aisef2/probe/cli_invocation.py::HARNESS/file_fact": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_protocol.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_c2_cli_invocation.py"
+    ],
+    "mutants": 8
+   },
+   "aisef2/probe/cli_invocation.py::HARNESS/finish": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_protocol.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_c2_cli_invocation.py",
+     "tests/v2/test_v21_kills3_T21a.py"
+    ],
+    "mutants": 12
+   },
+   "aisef2/probe/cli_invocation.py::HARNESS/inside": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_protocol.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_c2_cli_invocation.py",
+     "tests/v2/test_v21_kills3_T21a.py"
+    ],
+    "mutants": 4
+   },
+   "aisef2/probe/cli_invocation.py::HARNESS/invoke": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_protocol.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_c2_cli_invocation.py",
+     "tests/v2/test_v21_kills3_T21a.py"
+    ],
+    "mutants": 41
+   },
+   "aisef2/probe/cli_invocation.py::HARNESS/main": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_protocol.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_c2_cli_invocation.py",
+     "tests/v2/test_v21_kills3_A21.py",
+     "tests/v2/test_v21_kills3_T21a.py",
+     "tests/v2/test_v21_kills3_T21b.py"
+    ],
+    "mutants": 127
+   },
+   "aisef2/probe/cli_invocation.py::HARNESS/resolve": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_protocol.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_c2_cli_invocation.py"
+    ],
+    "mutants": 15
+   },
+   "aisef2/probe/cli_invocation.py::HARNESS/sha": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_protocol.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_c2_cli_invocation.py"
+    ],
+    "mutants": 3
+   },
+   "aisef2/probe/cli_invocation.py::HARNESS/stream_fact": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_protocol.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_c2_cli_invocation.py"
+    ],
+    "mutants": 13
+   },
+   "aisef2/probe/cli_invocation.py::ON_DEADLINE": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 15
+   },
+   "aisef2/probe/cli_invocation.py::PROBE_SOURCES": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_protocol.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_c2_cli_invocation.py"
+    ],
+    "mutants": 3
+   },
+   "aisef2/probe/cli_invocation.py::QUANTIFIERS": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 3
+   },
+   "aisef2/probe/cli_invocation.py::STREAM_SHAPES": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 5
+   },
+   "aisef2/probe/cli_invocation.py::_argv_ok": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 2
+   },
+   "aisef2/probe/cli_invocation.py::_await": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_protocol.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_c2_cli_invocation.py"
+    ],
+    "mutants": 22
+   },
+   "aisef2/probe/cli_invocation.py::_bytes_of": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 11
+   },
+   "aisef2/probe/cli_invocation.py::_child_env": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 26
+   },
+   "aisef2/probe/cli_invocation.py::_concluded": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_protocol.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_c2_cli_invocation.py"
+    ],
+    "mutants": 62
+   },
+   "aisef2/probe/cli_invocation.py::_content_ok": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 28
+   },
+   "aisef2/probe/cli_invocation.py::_deadline": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_protocol.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_c2_cli_invocation.py"
+    ],
+    "mutants": 10
+   },
+   "aisef2/probe/cli_invocation.py::_disposed": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_protocol.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_c2_cli_invocation.py"
+    ],
+    "mutants": 3
+   },
+   "aisef2/probe/cli_invocation.py::_equal": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 11
+   },
+   "aisef2/probe/cli_invocation.py::_equality_ok": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 24
+   },
+   "aisef2/probe/cli_invocation.py::_equality_verdict": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 28
+   },
+   "aisef2/probe/cli_invocation.py::_file_fact": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 7
+   },
+   "aisef2/probe/cli_invocation.py::_file_matches": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 31
+   },
+   "aisef2/probe/cli_invocation.py::_file_shape_ok": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 35
+   },
+   "aisef2/probe/cli_invocation.py::_half_ok": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 6
+   },
+   "aisef2/probe/cli_invocation.py::_harness_argv": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_c2_cli_protocol.py",
+     "tests/v2/test_c2_cli_invocation.py"
+    ],
+    "mutants": 20
+   },
+   "aisef2/probe/cli_invocation.py::_harness_failure": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_protocol.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_c2_cli_invocation.py"
+    ],
+    "mutants": 27
+   },
+   "aisef2/probe/cli_invocation.py::_is_int": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 3
+   },
+   "aisef2/probe/cli_invocation.py::_mac": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_c2_cli_protocol.py",
+     "tests/v2/test_c2_cli_invocation.py"
+    ],
+    "mutants": 3
+   },
+   "aisef2/probe/cli_invocation.py::_name_ok": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 3
+   },
+   "aisef2/probe/cli_invocation.py::_no_result": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_protocol.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_c2_cli_invocation.py"
+    ],
+    "mutants": 20
+   },
+   "aisef2/probe/cli_invocation.py::_normalization_ok": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 15
+   },
+   "aisef2/probe/cli_invocation.py::_normalize": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 7
+   },
+   "aisef2/probe/cli_invocation.py::_preflight": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_protocol.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_c2_cli_invocation.py"
+    ],
+    "mutants": 18
+   },
+   "aisef2/probe/cli_invocation.py::_prepare": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 77
+   },
+   "aisef2/probe/cli_invocation.py::_probe_digest": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_protocol.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_c2_cli_invocation.py"
+    ],
+    "mutants": 1
+   },
+   "aisef2/probe/cli_invocation.py::_protocol": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 14
+   },
+   "aisef2/probe/cli_invocation.py::_public": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 16
+   },
+   "aisef2/probe/cli_invocation.py::_sha_file": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 12
+   },
+   "aisef2/probe/cli_invocation.py::_silent": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_protocol.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_c2_cli_invocation.py"
+    ],
+    "mutants": 11
+   },
+   "aisef2/probe/cli_invocation.py::_stimulus_ok": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 37
+   },
+   "aisef2/probe/cli_invocation.py::_stream_bytes": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 7
+   },
+   "aisef2/probe/cli_invocation.py::_stream_fact": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 11
+   },
+   "aisef2/probe/cli_invocation.py::_stream_matches": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 38
+   },
+   "aisef2/probe/cli_invocation.py::_stream_shape_ok": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 41
+   },
+   "aisef2/probe/cli_invocation.py::_streams_ok": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 6
+   },
+   "aisef2/probe/cli_invocation.py::_substitute": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 8
+   },
+   "aisef2/probe/cli_invocation.py::_watch": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_protocol.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_c2_cli_invocation.py"
+    ],
+    "mutants": 43
+   },
+   "aisef2/probe/cli_invocation.py::_ws_key_ok": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 3
+   },
+   "aisef2/probe/cli_invocation.py::_ws_name": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 1
+   },
+   "aisef2/probe/cli_invocation.py::observation_class": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 55
+   },
+   "aisef2/probe/cli_invocation.py::spec_class": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 13
+   },
+   "aisef2/probe/cli_invocation.py::verdict_of": {
+    "kill_tests": [
+     "tests/v2/test_c2_cli_verdicts.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 44
+   },
+   "aisef2/probe/file_artifact.py::CLASSES": {
+    "kill_tests": [
+     "tests/v2/test_c2_file_artifact.py",
+     "tests/v2/test_v21_python_imports.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 4
+   },
+   "aisef2/probe/file_artifact.py::DIGEST": {
+    "kill_tests": [
+     "tests/v2/test_v21_python_imports.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_c2_file_artifact.py"
+    ],
+    "mutants": 4
+   },
+   "aisef2/probe/file_artifact.py::FileArtifactProbe.__init__": {
+    "kill_tests": [
+     "tests/v2/test_c2_file_artifact.py",
+     "tests/v2/test_v21_python_imports.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 5
+   },
+   "aisef2/probe/file_artifact.py::FileArtifactProbe._reader": {
+    "kill_tests": [
+     "tests/v2/test_c2_file_artifact.py",
+     "tests/v2/test_v21_python_imports.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 15
+   },
+   "aisef2/probe/file_artifact.py::FileArtifactProbe.enforcement": {
+    "kill_tests": [
+     "tests/v2/test_c2_file_artifact.py",
+     "tests/v2/test_v21_python_imports.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 3
+   },
+   "aisef2/probe/file_artifact.py::FileArtifactProbe.harness_preconditions": {
+    "kill_tests": [
+     "tests/v2/test_c2_file_artifact.py",
+     "tests/v2/test_v21_python_imports.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 7
+   },
+   "aisef2/probe/file_artifact.py::FileArtifactProbe.observe": {
+    "kill_tests": [
+     "tests/v2/test_c2_file_artifact.py",
+     "tests/v2/test_v21_python_imports.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_kills3_T27a.py"
+    ],
+    "mutants": 137
+   },
+   "aisef2/probe/file_artifact.py::MODES": {
+    "kill_tests": [
+     "tests/v2/test_c2_file_artifact.py",
+     "tests/v2/test_v21_python_imports.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 4
+   },
+   "aisef2/probe/file_artifact.py::NEWLINES": {
+    "kill_tests": [
+     "tests/v2/test_c2_file_artifact.py",
+     "tests/v2/test_v21_python_imports.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 2
+   },
+   "aisef2/probe/file_artifact.py::ON_DEADLINE": {
+    "kill_tests": [
+     "tests/v2/test_c2_file_artifact.py",
+     "tests/v2/test_v21_python_imports.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 12
+   },
+   "aisef2/probe/file_artifact.py::ObjectStore.__init__": {
+    "kill_tests": [
+     "tests/v2/test_c2_file_artifact.py",
+     "tests/v2/test_v21_python_imports.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 10
+   },
+   "aisef2/probe/file_artifact.py::ObjectStore._parse": {
+    "kill_tests": [
+     "tests/v2/test_c2_file_artifact.py",
+     "tests/v2/test_v21_python_imports.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 18
+   },
+   "aisef2/probe/file_artifact.py::ObjectStore.blob": {
+    "kill_tests": [
+     "tests/v2/test_c2_file_artifact.py",
+     "tests/v2/test_v21_python_imports.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 3
+   },
+   "aisef2/probe/file_artifact.py::ObjectStore.entries": {
+    "kill_tests": [
+     "tests/v2/test_c2_file_artifact.py",
+     "tests/v2/test_v21_python_imports.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 5
+   },
+   "aisef2/probe/file_artifact.py::ObjectStore.holds_revision": {
+    "kill_tests": [
+     "tests/v2/test_c2_file_artifact.py",
+     "tests/v2/test_v21_python_imports.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 8
+   },
+   "aisef2/probe/file_artifact.py::ObjectStore.lookup": {
+    "kill_tests": [
+     "tests/v2/test_c2_file_artifact.py",
+     "tests/v2/test_v21_python_imports.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 6
+   },
+   "aisef2/probe/file_artifact.py::ObjectStore.run": {
+    "kill_tests": [
+     "tests/v2/test_c2_file_artifact.py",
+     "tests/v2/test_v21_python_imports.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 3
+   },
+   "aisef2/probe/file_artifact.py::ObjectStore.walk": {
+    "kill_tests": [
+     "tests/v2/test_c2_file_artifact.py",
+     "tests/v2/test_v21_python_imports.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 6
+   },
+   "aisef2/probe/file_artifact.py::PROBE_SOURCES": {
+    "kill_tests": [
+     "tests/v2/test_c2_file_artifact.py",
+     "tests/v2/test_v21_python_imports.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 2
+   },
+   "aisef2/probe/file_artifact.py::PlainTree._full": {
+    "kill_tests": [
+     "tests/v2/test_c2_file_artifact.py",
+     "tests/v2/test_v21_python_imports.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 2
+   },
+   "aisef2/probe/file_artifact.py::PlainTree._row": {
+    "kill_tests": [
+     "tests/v2/test_c2_file_artifact.py",
+     "tests/v2/test_v21_python_imports.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 15
+   },
+   "aisef2/probe/file_artifact.py::PlainTree.blob": {
+    "kill_tests": [
+     "tests/v2/test_c2_file_artifact.py",
+     "tests/v2/test_v21_python_imports.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 1
+   },
+   "aisef2/probe/file_artifact.py::PlainTree.entries": {
+    "kill_tests": [
+     "tests/v2/test_c2_file_artifact.py",
+     "tests/v2/test_v21_python_imports.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 3
+   },
+   "aisef2/probe/file_artifact.py::PlainTree.lookup": {
+    "kill_tests": [
+     "tests/v2/test_c2_file_artifact.py",
+     "tests/v2/test_v21_python_imports.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 10
+   },
+   "aisef2/probe/file_artifact.py::PlainTree.walk": {
+    "kill_tests": [
+     "tests/v2/test_c2_file_artifact.py",
+     "tests/v2/test_v21_python_imports.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 7
+   },
+   "aisef2/probe/file_artifact.py::_HEX64": {
+    "kill_tests": [
+     "tests/v2/test_c2_file_artifact.py",
+     "tests/v2/test_v21_python_imports.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 1
+   },
+   "aisef2/probe/file_artifact.py::_MODULE_NAME": {
+    "kill_tests": [
+     "tests/v2/test_v21_python_imports.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_c2_file_artifact.py"
+    ],
+    "mutants": 1
+   },
+   "aisef2/probe/file_artifact.py::_compiles": {
+    "kill_tests": [
+     "tests/v2/test_c2_file_artifact.py",
+     "tests/v2/test_v21_python_imports.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 10
+   },
+   "aisef2/probe/file_artifact.py::_probe_digest": {
+    "kill_tests": [
+     "tests/v2/test_c2_file_artifact.py",
+     "tests/v2/test_v21_python_imports.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 1
+   },
+   "aisef2/probe/file_artifact.py::content_facts": {
+    "kill_tests": [
+     "tests/v2/test_c2_file_artifact.py",
+     "tests/v2/test_v21_python_imports.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 12
+   },
+   "aisef2/probe/file_artifact.py::entry": {
+    "kill_tests": [
+     "tests/v2/test_c2_file_artifact.py",
+     "tests/v2/test_v21_python_imports.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 27
+   },
+   "aisef2/probe/file_artifact.py::expected_sha256": {
+    "kill_tests": [
+     "tests/v2/test_c2_file_artifact.py",
+     "tests/v2/test_v21_python_imports.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 10
+   },
+   "aisef2/probe/file_artifact.py::facts_of": {
+    "kill_tests": [
+     "tests/v2/test_c2_file_artifact.py",
+     "tests/v2/test_v21_python_imports.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_v21_kills3_T27a.py"
+    ],
+    "mutants": 88
+   },
+   "aisef2/probe/file_artifact.py::git_env": {
+    "kill_tests": [
+     "tests/v2/test_c2_file_artifact.py",
+     "tests/v2/test_v21_python_imports.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 49
+   },
+   "aisef2/probe/file_artifact.py::grep_facts": {
+    "kill_tests": [
+     "tests/v2/test_c2_file_artifact.py",
+     "tests/v2/test_v21_python_imports.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 38
+   },
+   "aisef2/probe/file_artifact.py::import_facts": {
+    "kill_tests": [
+     "tests/v2/test_v21_python_imports.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_c2_file_artifact.py",
+     "tests/v2/test_v21_kills3_T27a.py"
+    ],
+    "mutants": 52
+   },
+   "aisef2/probe/file_artifact.py::normalised": {
+    "kill_tests": [
+     "tests/v2/test_c2_file_artifact.py",
+     "tests/v2/test_v21_python_imports.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 5
+   },
+   "aisef2/probe/file_artifact.py::observation_class": {
+    "kill_tests": [
+     "tests/v2/test_c2_file_artifact.py",
+     "tests/v2/test_v21_python_imports.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 94
+   },
+   "aisef2/probe/file_artifact.py::read": {
+    "kill_tests": [
+     "tests/v2/test_c2_file_artifact.py",
+     "tests/v2/test_v21_python_imports.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 3
+   },
+   "aisef2/probe/file_artifact.py::refusal": {
+    "kill_tests": [
+     "tests/v2/test_c2_file_artifact.py",
+     "tests/v2/test_v21_python_imports.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 29
+   },
+   "aisef2/probe/file_artifact.py::run_git": {
+    "kill_tests": [
+     "tests/v2/test_c2_file_artifact.py",
+     "tests/v2/test_v21_python_imports.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 8
+   },
+   "aisef2/probe/file_artifact.py::selected": {
+    "kill_tests": [
+     "tests/v2/test_c2_file_artifact.py",
+     "tests/v2/test_v21_python_imports.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 3
+   },
+   "aisef2/probe/file_artifact.py::spec_class": {
+    "kill_tests": [
+     "tests/v2/test_c2_file_artifact.py",
+     "tests/v2/test_v21_python_imports.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 12
+   },
+   "aisef2/probe/file_artifact.py::verdict_of": {
+    "kill_tests": [
+     "tests/v2/test_c2_file_artifact.py",
+     "tests/v2/test_v21_python_imports.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 20
+   },
+   "aisef2/probe/file_artifact.py::window_of": {
+    "kill_tests": [
+     "tests/v2/test_c2_file_artifact.py",
+     "tests/v2/test_v21_python_imports.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 8
+   },
+   "aisef2/probe/process_effect.py::CLASSES": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 3
+   },
+   "aisef2/probe/process_effect.py::CLASS_TABLE": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 118
+   },
+   "aisef2/probe/process_effect.py::DIGEST": {
+    "kill_tests": [
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_probe_process_effect_units.py"
+    ],
+    "mutants": 4
+   },
+   "aisef2/probe/process_effect.py::FAULTED": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 3
+   },
+   "aisef2/probe/process_effect.py::FAULTS": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 28
+   },
+   "aisef2/probe/process_effect.py::FILE_SHAPES": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 6
+   },
+   "aisef2/probe/process_effect.py::HARNESS/answer_to": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_probe_process_effect_bytecode.py",
+     "tests/v2/test_v21_kills3_T19a.py"
+    ],
+    "mutants": 12
+   },
+   "aisef2/probe/process_effect.py::HARNESS/answered": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_probe_process_effect_bytecode.py",
+     "tests/v2/test_v21_kills3_T19a.py"
+    ],
+    "mutants": 6
+   },
+   "aisef2/probe/process_effect.py::HARNESS/ask": {
+    "kill_tests": [
+     "tests/v2/test_s2_kills.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ],
+    "mutants": 4
+   },
+   "aisef2/probe/process_effect.py::HARNESS/count_lines": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_probe_process_effect_bytecode.py",
+     "tests/v2/test_v21_kills3_T19a.py"
+    ],
+    "mutants": 4
+   },
+   "aisef2/probe/process_effect.py::HARNESS/do_call": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ],
+    "mutants": 23
+   },
+   "aisef2/probe/process_effect.py::HARNESS/do_construct": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ],
+    "mutants": 21
+   },
+   "aisef2/probe/process_effect.py::HARNESS/do_edit": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_probe_process_effect_bytecode.py",
+     "tests/v2/test_v21_kills3_T19a.py"
+    ],
+    "mutants": 52
+   },
+   "aisef2/probe/process_effect.py::HARNESS/do_expect": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ],
+    "mutants": 62
+   },
+   "aisef2/probe/process_effect.py::HARNESS/do_fault": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ],
+    "mutants": 4
+   },
+   "aisef2/probe/process_effect.py::HARNESS/do_subprocess": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_probe_process_effect_bytecode.py",
+     "tests/v2/test_v21_kills3_T19a.py"
+    ],
+    "mutants": 41
+   },
+   "aisef2/probe/process_effect.py::HARNESS/do_workspace": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ],
+    "mutants": 8
+   },
+   "aisef2/probe/process_effect.py::HARNESS/do_write": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_probe_process_effect_bytecode.py",
+     "tests/v2/test_v21_kills3_T19a.py"
+    ],
+    "mutants": 16
+   },
+   "aisef2/probe/process_effect.py::HARNESS/emit": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ],
+    "mutants": 10
+   },
+   "aisef2/probe/process_effect.py::HARNESS/ended": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_probe_process_effect_bytecode.py",
+     "tests/v2/test_v21_kills3_T19a.py"
+    ],
+    "mutants": 37
+   },
+   "aisef2/probe/process_effect.py::HARNESS/file_fact": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ],
+    "mutants": 27
+   },
+   "aisef2/probe/process_effect.py::HARNESS/files_now": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ],
+    "mutants": 4
+   },
+   "aisef2/probe/process_effect.py::HARNESS/finish": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_probe_process_effect_bytecode.py",
+     "tests/v2/test_v21_kills3_T19a.py"
+    ],
+    "mutants": 12
+   },
+   "aisef2/probe/process_effect.py::HARNESS/guarded": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_probe_process_effect_bytecode.py",
+     "tests/v2/test_v21_kills3_T19b.py"
+    ],
+    "mutants": 27
+   },
+   "aisef2/probe/process_effect.py::HARNESS/identity": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ],
+    "mutants": 9
+   },
+   "aisef2/probe/process_effect.py::HARNESS/inside": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_probe_process_effect_bytecode.py",
+     "tests/v2/test_v21_kills3_T19b.py"
+    ],
+    "mutants": 4
+   },
+   "aisef2/probe/process_effect.py::HARNESS/main": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_probe_process_effect_bytecode.py",
+     "tests/v2/test_v21_kills3_A19.py",
+     "tests/v2/test_v21_kills3_T19b.py"
+    ],
+    "mutants": 160
+   },
+   "aisef2/probe/process_effect.py::HARNESS/reported": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_probe_process_effect_bytecode.py",
+     "tests/v2/test_v21_kills3_T19b.py"
+    ],
+    "mutants": 26
+   },
+   "aisef2/probe/process_effect.py::HARNESS/resolve": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ],
+    "mutants": 15
+   },
+   "aisef2/probe/process_effect.py::HARNESS/row_of": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ],
+    "mutants": 9
+   },
+   "aisef2/probe/process_effect.py::HARNESS/run": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_probe_process_effect_bytecode.py",
+     "tests/v2/test_v21_kills3_T19b.py"
+    ],
+    "mutants": 59
+   },
+   "aisef2/probe/process_effect.py::HARNESS/same": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ],
+    "mutants": 7
+   },
+   "aisef2/probe/process_effect.py::HARNESS/subject_call": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ],
+    "mutants": 38
+   },
+   "aisef2/probe/process_effect.py::HARNESS/unresolved": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ],
+    "mutants": 16
+   },
+   "aisef2/probe/process_effect.py::HARNESS/unws": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ],
+    "mutants": 10
+   },
+   "aisef2/probe/process_effect.py::ON_DEADLINE": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 9
+   },
+   "aisef2/probe/process_effect.py::PROBE_SOURCES": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 4
+   },
+   "aisef2/probe/process_effect.py::ProcessEffectProbe.__init__": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ],
+    "mutants": 4
+   },
+   "aisef2/probe/process_effect.py::ProcessEffectProbe._observe_in": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ],
+    "mutants": 38
+   },
+   "aisef2/probe/process_effect.py::ProcessEffectProbe.enforcement": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 3
+   },
+   "aisef2/probe/process_effect.py::ProcessEffectProbe.harness_preconditions": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 11
+   },
+   "aisef2/probe/process_effect.py::ProcessEffectProbe.observe": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ],
+    "mutants": 54
+   },
+   "aisef2/probe/process_effect.py::STEPS": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 67
+   },
+   "aisef2/probe/process_effect.py::_CONTENT": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 3
+   },
+   "aisef2/probe/process_effect.py::_FILE_HOLDS": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 19
+   },
+   "aisef2/probe/process_effect.py::_FILE_SHAPE_OK": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 27
+   },
+   "aisef2/probe/process_effect.py::_HOLDS": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 3
+   },
+   "aisef2/probe/process_effect.py::_SHAPES": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 8
+   },
+   "aisef2/probe/process_effect.py::_concluded": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 53
+   },
+   "aisef2/probe/process_effect.py::_content_of": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 2
+   },
+   "aisef2/probe/process_effect.py::_edit_ok": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 8
+   },
+   "aisef2/probe/process_effect.py::_expect_ok": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 4
+   },
+   "aisef2/probe/process_effect.py::_fault_ok": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 5
+   },
+   "aisef2/probe/process_effect.py::_file_shape_ok": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 11
+   },
+   "aisef2/probe/process_effect.py::_files_hold": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 15
+   },
+   "aisef2/probe/process_effect.py::_flat_ok": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 3
+   },
+   "aisef2/probe/process_effect.py::_harness_argv": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py"
+    ],
+    "mutants": 20
+   },
+   "aisef2/probe/process_effect.py::_ident_ok": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 3
+   },
+   "aisef2/probe/process_effect.py::_identity": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 11
+   },
+   "aisef2/probe/process_effect.py::_invocation_ok": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 10
+   },
+   "aisef2/probe/process_effect.py::_jsonl_holds": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 8
+   },
+   "aisef2/probe/process_effect.py::_observed_files": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 11
+   },
+   "aisef2/probe/process_effect.py::_prepare": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py",
+     "tests/v2/test_v21_kills3_T19b.py"
+    ],
+    "mutants": 55
+   },
+   "aisef2/probe/process_effect.py::_probe_digest": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 1
+   },
+   "aisef2/probe/process_effect.py::_raises_hold": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 8
+   },
+   "aisef2/probe/process_effect.py::_resolved": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 31
+   },
+   "aisef2/probe/process_effect.py::_returns_hold": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 28
+   },
+   "aisef2/probe/process_effect.py::_same": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 7
+   },
+   "aisef2/probe/process_effect.py::_scenario_ok": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 28
+   },
+   "aisef2/probe/process_effect.py::_step_ok": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 18
+   },
+   "aisef2/probe/process_effect.py::_subprocess_ok": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 8
+   },
+   "aisef2/probe/process_effect.py::_substitute": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 14
+   },
+   "aisef2/probe/process_effect.py::_watch": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_probe_process_effect.py",
+     "tests/v2/test_probe_process_effect_bytecode.py",
+     "tests/v2/test_v21_kills3_T19b.py"
+    ],
+    "mutants": 44
+   },
+   "aisef2/probe/process_effect.py::_workspace_ok": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 6
+   },
+   "aisef2/probe/process_effect.py::_write_ok": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 7
+   },
+   "aisef2/probe/process_effect.py::_ws_path_ok": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 3
+   },
+   "aisef2/probe/process_effect.py::observation_class": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 74
+   },
+   "aisef2/probe/process_effect.py::spec_class": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 13
+   },
+   "aisef2/probe/process_effect.py::verdict_of": {
+    "kill_tests": [
+     "tests/v2/test_probe_process_effect_units.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 9
+   },
+   "aisef2/probe/python_callable_v2.py::CLASSES": {
+    "kill_tests": [
+     "tests/v2/test_python_callable_v2.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 7
+   },
+   "aisef2/probe/python_callable_v2.py::DIGEST": {
+    "kill_tests": [
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_python_callable_v2.py"
+    ],
+    "mutants": 4
+   },
+   "aisef2/probe/python_callable_v2.py::HARNESS/answer_to": {
+    "kill_tests": [
+     "tests/v2/test_python_callable_v2.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_python_callable_v2_bytecode.py",
+     "tests/v2/test_v21_kills3_T18a.py"
+    ],
+    "mutants": 12
+   },
+   "aisef2/probe/python_callable_v2.py::HARNESS/answered": {
+    "kill_tests": [
+     "tests/v2/test_python_callable_v2.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_python_callable_v2_bytecode.py",
+     "tests/v2/test_v21_kills3_T18a.py"
+    ],
+    "mutants": 8
+   },
+   "aisef2/probe/python_callable_v2.py::HARNESS/ask": {
+    "kill_tests": [
+     "tests/v2/test_python_callable_v2.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_python_callable_v2_bytecode.py"
+    ],
+    "mutants": 4
+   },
+   "aisef2/probe/python_callable_v2.py::HARNESS/conclude": {
+    "kill_tests": [
+     "tests/v2/test_python_callable_v2.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_python_callable_v2_bytecode.py",
+     "tests/v2/test_v21_kills3_T18a.py"
+    ],
+    "mutants": 4
+   },
+   "aisef2/probe/python_callable_v2.py::HARNESS/deadline": {
+    "kill_tests": [
+     "tests/v2/test_python_callable_v2.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_python_callable_v2_bytecode.py",
+     "tests/v2/test_v21_kills3_T18a.py"
+    ],
+    "mutants": 5
+   },
+   "aisef2/probe/python_callable_v2.py::HARNESS/emit": {
+    "kill_tests": [
+     "tests/v2/test_python_callable_v2.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_python_callable_v2_bytecode.py"
+    ],
+    "mutants": 10
+   },
+   "aisef2/probe/python_callable_v2.py::HARNESS/ended": {
+    "kill_tests": [
+     "tests/v2/test_python_callable_v2.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_python_callable_v2_bytecode.py",
+     "tests/v2/test_v21_kills3_A18.py",
+     "tests/v2/test_v21_kills3_T18a.py"
+    ],
+    "mutants": 31
+   },
+   "aisef2/probe/python_callable_v2.py::HARNESS/finish": {
+    "kill_tests": [
+     "tests/v2/test_python_callable_v2.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_python_callable_v2_bytecode.py",
+     "tests/v2/test_v21_kills3_T18a.py"
+    ],
+    "mutants": 12
+   },
+   "aisef2/probe/python_callable_v2.py::HARNESS/inside": {
+    "kill_tests": [
+     "tests/v2/test_python_callable_v2.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_python_callable_v2_bytecode.py",
+     "tests/v2/test_v21_kills3_T18a.py"
+    ],
+    "mutants": 5
+   },
+   "aisef2/probe/python_callable_v2.py::HARNESS/main": {
+    "kill_tests": [
+     "tests/v2/test_python_callable_v2.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_python_callable_v2_bytecode.py",
+     "tests/v2/test_v21_kills3_T18b.py"
+    ],
+    "mutants": 157
+   },
+   "aisef2/probe/python_callable_v2.py::HARNESS/value_of": {
+    "kill_tests": [
+     "tests/v2/test_python_callable_v2.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_python_callable_v2_bytecode.py"
+    ],
+    "mutants": 19
+   },
+   "aisef2/probe/python_callable_v2.py::ON_DEADLINE": {
+    "kill_tests": [
+     "tests/v2/test_python_callable_v2.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 21
+   },
+   "aisef2/probe/python_callable_v2.py::PROBE_SOURCES": {
+    "kill_tests": [
+     "tests/v2/test_python_callable_v2.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 4
+   },
+   "aisef2/probe/python_callable_v2.py::PythonCallableV2Probe.__init__": {
+    "kill_tests": [
+     "tests/v2/test_python_callable_v2_bytecode.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 4
+   },
+   "aisef2/probe/python_callable_v2.py::PythonCallableV2Probe.enforcement": {
+    "kill_tests": [
+     "tests/v2/test_python_callable_v2.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 3
+   },
+   "aisef2/probe/python_callable_v2.py::PythonCallableV2Probe.observe": {
+    "kill_tests": [
+     "tests/v2/test_python_callable_v2.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_python_callable_v2_bytecode.py"
+    ],
+    "mutants": 148
+   },
+   "aisef2/probe/python_callable_v2.py::_concluded": {
+    "kill_tests": [
+     "tests/v2/test_python_callable_v2.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_s2_kills.py"
+    ],
+    "mutants": 75
+   },
+   "aisef2/probe/python_callable_v2.py::_file_ok": {
+    "kill_tests": [
+     "tests/v2/test_python_callable_v2.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 15
+   },
+   "aisef2/probe/python_callable_v2.py::_harness_argv": {
+    "kill_tests": [
+     "tests/v2/test_python_callable_v2_bytecode.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_s2_kills.py"
+    ],
+    "mutants": 16
+   },
+   "aisef2/probe/python_callable_v2.py::_is_hex": {
+    "kill_tests": [
+     "tests/v2/test_python_callable_v2.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 3
+   },
+   "aisef2/probe/python_callable_v2.py::_probe_digest": {
+    "kill_tests": [
+     "tests/v2/test_python_callable_v2.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 1
+   },
+   "aisef2/probe/python_callable_v2.py::_substituted": {
+    "kill_tests": [
+     "tests/v2/test_python_callable_v2.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 9
+   },
+   "aisef2/probe/python_callable_v2.py::_unsubstituted": {
+    "kill_tests": [
+     "tests/v2/test_python_callable_v2.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 9
+   },
+   "aisef2/probe/python_callable_v2.py::_watch": {
+    "kill_tests": [
+     "tests/v2/test_python_callable_v2.py",
+     "tests/v2/test_v21_identity.py",
+     "tests/v2/test_s2_kills.py"
+    ],
+    "mutants": 33
+   },
+   "aisef2/probe/python_callable_v2.py::_workspace_ok": {
+    "kill_tests": [
+     "tests/v2/test_python_callable_v2.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 4
+   },
+   "aisef2/probe/python_callable_v2.py::_write_workspace": {
+    "kill_tests": [
+     "tests/v2/test_python_callable_v2.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 10
+   },
+   "aisef2/probe/python_callable_v2.py::observation_class": {
+    "kill_tests": [
+     "tests/v2/test_python_callable_v2.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 75
+   },
+   "aisef2/probe/python_callable_v2.py::spec_class": {
+    "kill_tests": [
+     "tests/v2/test_python_callable_v2.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 13
+   },
+   "aisef2/probe/python_callable_v2.py::verdict_of": {
+    "kill_tests": [
+     "tests/v2/test_python_callable_v2.py",
+     "tests/v2/test_v21_identity.py"
+    ],
+    "mutants": 47
+   }
+  },
+  "target_count": 468,
+  "mutant_count": 12548,
+  "by_module": {
+   "aisef2/app/adapters.py": {
+    "targets": 10,
+    "mutants": 484
+   },
+   "aisef2/app/bundle.py": {
+    "targets": 6,
+    "mutants": 214
+   },
+   "aisef2/app/bundle_cli.py": {
+    "targets": 24,
+    "mutants": 932
+   },
+   "aisef2/app/cli.py": {
+    "targets": 2,
+    "mutants": 164
+   },
+   "aisef2/app/client.py": {
+    "targets": 9,
+    "mutants": 380
+   },
+   "aisef2/app/confine.py": {
+    "targets": 20,
+    "mutants": 818
+   },
+   "aisef2/app/feedback.py": {
+    "targets": 2,
+    "mutants": 346
+   },
+   "aisef2/app/lineage.py": {
+    "targets": 21,
+    "mutants": 542
+   },
+   "aisef2/app/preflight.py": {
+    "targets": 6,
+    "mutants": 323
+   },
+   "aisef2/app/review_ocr.py": {
+    "targets": 16,
+    "mutants": 363
+   },
+   "aisef2/app/review_verify.py": {
+    "targets": 16,
+    "mutants": 299
+   },
+   "aisef2/app/run.py": {
+    "targets": 20,
+    "mutants": 781
+   },
+   "aisef2/app/settings.py": {
+    "targets": 10,
+    "mutants": 343
+   },
+   "aisef2/app/usage.py": {
+    "targets": 8,
+    "mutants": 262
+   },
+   "aisef2/app/verify.py": {
+    "targets": 3,
+    "mutants": 248
+   },
+   "aisef2/orchestrate/adapters.py": {
+    "targets": 7,
+    "mutants": 58
+   },
+   "aisef2/orchestrate/review.py": {
+    "targets": 2,
+    "mutants": 131
+   },
+   "aisef2/orchestrate/story_runner.py": {
+    "targets": 11,
+    "mutants": 409
+   },
+   "aisef2/orchestrate/workspace.py": {
+    "targets": 17,
+    "mutants": 249
+   },
+   "aisef2/plan/static_admission.py": {
+    "targets": 13,
+    "mutants": 192
+   },
+   "aisef2/probe/calibration.py": {
+    "targets": 4,
+    "mutants": 57
+   },
+   "aisef2/probe/cli_invocation.py": {
+    "targets": 86,
+    "mutants": 1769
+   },
+   "aisef2/probe/file_artifact.py": {
+    "targets": 45,
+    "mutants": 763
+   },
+   "aisef2/probe/process_effect.py": {
+    "targets": 79,
+    "mutants": 1653
+   },
+   "aisef2/probe/python_callable_v2.py": {
+    "targets": 31,
+    "mutants": 768
+   }
+  }
+ },
+ "checkers": [
+  "arch_catalog",
+  "authority_limits",
+  "candidate_only_execution",
+  "cleanup_authority",
+  "closed_dispatch_in_scenario_probes",
+  "cohort_boundary",
+  "cohort_confined",
+  "cycle2_baseline",
+  "destructive_authority",
+  "development_regression_bound",
+  "except_boundaries",
+  "execution_order",
+  "f_conformance",
+  "freeze_manifest",
+  "gen_specs",
+  "invariants_doc",
+  "migration_table",
+  "mutation",
+  "no_clock_in_probe_facts",
+  "no_cohort_record",
+  "no_developer_artefact_at_parent",
+  "no_prose_control",
+  "no_raw_verdict_routing",
+  "no_side_retry_counter",
+  "no_test_artefact_in_probes",
+  "no_time_in_projections",
+  "no_verdict_from_absence_declaration",
+  "old_path_audit",
+  "one_signal_authority",
+  "owned_run",
+  "p1_evidence",
+  "p2_evidence",
+  "p3_evidence",
+  "p4_evidence",
+  "p5_evidence",
+  "p6_evidence",
+  "packaging_check",
+  "plan_baseline",
+  "plan_docs_check",
+  "plan_semantics",
+  "plan_validate",
+  "probe_catalog_closure",
+  "profile_freeze",
+  "protocol_channel_discipline",
+  "refmodel_independence",
+  "release_inventory",
+  "result_only_through_binding",
+  "retryable_only_in_taxonomy",
+  "run_history",
+  "sentinel_is_not_evidence",
+  "single_placeholder_token",
+  "state_model_prover",
+  "v1_evidence_guard",
+  "v2_encoding_scanner"
+ ],
+ "q5_corpus": [
+  "normal-completion",
+  "retry-then-commit",
+  "review-finding-rollback",
+  "pre-satisfied",
+  "security-finding-rollback",
+  "developer-outage-rollback",
+  "developer-regression-at-candidate",
+  "post-merge-integration-regression",
+  "cli-proved-story",
+  "cli-refuted-then-commit",
+  "file-artifact-prohibition",
+  "scenario-proved-story",
+  "bytes-returning-python-callable"
+ ],
+ "records": [
+  {
+   "path": "closure-evidence/v2/v2.1/ARCHITECTURE-EXCEPTION-V2-007.json",
+   "tool": "B-01 (lane b01; bound by the V2-007 amendment)"
+  },
+  {
+   "path": "closure-evidence/v2/v2.1/AISEF-V2-RFC-AMENDMENT-V2-007.json",
+   "tool": "B-01"
+  },
+  {
+   "path": "closure-evidence/v2/v2.1/AISEF-V2-FREEZE-MANIFEST.json",
+   "tool": "validation/v2/freeze_manifest.py"
+  },
+  {
+   "path": "closure-evidence/v2/v2.1/MUTATION.json",
+   "tool": "validation/qualification/v21_mutation_record.py --write (workers: mutation.py run)"
+  },
+  {
+   "path": "closure-evidence/v2/v2.1/MUTATION-SUMMARY.json",
+   "tool": "validation/qualification/v21_mutation_record.py --write"
+  },
+  {
+   "path": "closure-evidence/v2/v2.1/AUTHORITY-INVENTORY.json",
+   "tool": "validation/qualification/release_inventory.py --write"
+  },
+  {
+   "path": "closure-evidence/v2/v2.1/P2-STATIC-ADMISSION.json",
+   "tool": "validation/v2/p2_evidence.py"
+  },
+  {
+   "path": "closure-evidence/v2/v2.1/Q0-CHECKER-CALIBRATION.json",
+   "tool": "validation/v2/checker_calibration.py"
+  },
+  {
+   "path": "closure-evidence/v2/v2.1/P5-PLAN-V2.2-PROPOSAL.json",
+   "tool": "validation/qualification/p5_acceptance.py --write-v21-proposal"
+  },
+  {
+   "path": "closure-evidence/v2/v2.1/P5-FALSIFIABILITY.json",
+   "tool": "validation/qualification/p5_falsifiability.py --run-v21"
+  },
+  {
+   "path": "closure-evidence/v2/v2.1/C2-P5-ACCEPTANCE-REVERIFICATION.json",
+   "tool": "validation/qualification/p5_acceptance.py --write-v21"
+  },
+  {
+   "path": "closure-evidence/v2/v2.1/PLAN-V2.2-CORRECTION-1.json",
+   "tool": "validation/qualification/c2_plan_correction.py --write"
+  },
+  {
+   "path": "closure-evidence/v2/v2.1/K-NOWORK-001-REHEARSAL.json",
+   "tool": "validation/qualification/c2_k_nowork_001.py --write"
+  },
+  {
+   "path": "closure-evidence/v2/v2.1/Q5-KERNEL-COMPARISON.json",
+   "tool": "validation/qualification/v21_q5_compare.py --write"
+  },
+  {
+   "path": "closure-evidence/v2/v2.1/CONFORMANCE-RULING.json",
+   "tool": "validation/qualification/v21_conformance_ruling.py --write"
+  }
+ ],
+ "environment": {
+  "system": "macOS-26.5.2-arm64-arm-64bit-Mach-O",
+  "python": "3.14.7",
+  "executable": "/opt/homebrew/opt/python@3.14/bin/python3.14",
+  "worker": "env -i; PATH with every directory holding an executable `opencode` removed; HOME, XDG_CONFIG/DATA/STATE/CACHE and TMPDIR in the worker's own scratch directory; validation/v2/owned_run.py around each worker (processes before / at exit / after); a detached git worktree per worker at the snapshot; no real client, provider, credential or operator data reachable",
+  "campaign": "campaign 3 at f860e57: runner v2 with the signature fix and positional audits, the survivor kill files, the product fixes the audit found; 199 of 468 targets measured (179 by the delta, 20 as the runner-impact check), 269 stand on campaign 2"
+ },
+ "rule": "written once (mode 'x'); a later change of scope is a new record, never an edit",
+ "revision": 3,
+ "supersedes": {
+  "path": "closure-evidence/v2/v2.1/REQUALIFICATION-MANIFEST-2.json",
+  "sha256": "b844877d804f96026fbdd600f5161b586f7a2c0cbe5cdfa01c6a54cb87582494",
+  "reason": "campaign 2 (5719f1f, manifest rev 2) finished 2026-10-10 21:42 with 10,738 KILLED / 1,676 SURVIVED / 3 TIMEOUT / 31 INFRA; the owner chose (b) on 2026-10-10: fix the runner (the 31 INFRA were real kills whose failure signatures differed only by a runner temp name), resolve the 34, and treat the survivors by behavioural risk. Campaign 3 runs on a snapshot that carries the runner fix (c4c1720), positional survivor audits (875c85e), 78 survivor kill-test files and 11 defect-test files, the product defects the audit found (lint, confine, ocr, preflight, reproducer, verify, lineage, usage, bundle, bundle_cli) and two helper targets (468 targets). Scope: the 179 targets the snapshot delta against 5719f1f (read-set measured at 8d2bf01) says to re-measure, plus 20 standing targets measured again as the check that the runner's changes moved no class; the other 269 stand on campaign 2's results. Campaign 2's record stays as history.",
+  "stop_record": {
+   "path": "closure-evidence/v2/v2.1/campaign-1-stopped/CAMPAIGN-1-STOP.json",
+   "sha256": "1b93f4c6eb0541cee4aefb8cd978bc30c47bf06ecb6f0858c789034f1dee1e77"
+  }
+ },
+ "phase_snapshot": "cc5359699c057f666f1693b90f1beb4762676478",
+ "versions": {
+  "harness": {
+   "validation/v2/mutation.py": "415a8e084c7cfc40a5c9182cb4e9f483d525207a6b9fcfaedf9182d94391927f",
+   "docs/v2.1/MUTATION-RUNNER-V2.md": "ec656ab7f345e7baae5dbae45cf596febe37e82091fee2afc6b8e3c46742f235",
+   "validation/v2/owned_run.py": "b36f28742039d85b2e2af37942a84a18d0d12bfc8e0372e32aa7114beabc5e55",
+   "validation/v2/cleanup_authority.py": "4f3de7a056e4d9c14a92b453465422f7b581038282cacfa9b500ffe5edea6518",
+   "aisef2/runtime/process_range.py": "877f6cba3e28dc792d5f962ac0217b0738a5651d8940d79b3a6d0bba4b30dd93"
+  },
+  "kill_files": {
+   "tests/v2/p2/test_calibration.py": "a39b78402465eca122582ada33a04faefd99e75867c3ac42cdafde733f5d2f65",
+   "tests/v2/p2/test_static_admission.py": "d5cb06f54708c6b53dce5a1acb2d28b64609ea2c07d00641c62893296b504104",
+   "tests/v2/test_app_run.py": "410b5df37c978c7d6620a4a461b8add750168d90804b0fe89f9aebb1a00ba8aa",
+   "tests/v2/test_app_units.py": "6e0ad11194fdf39083aa39d4148d8d98b0f338664a37dfbe89fd3ff7d3b6ef1a",
+   "tests/v2/test_c2_cli_calibration.py": "3b20686eaba438cb5921519aa80f2af4b8a73a069194e889686507586c218a3c",
+   "tests/v2/test_c2_cli_invocation.py": "678a83d513e727e0adfa0e101bab11c4a342ff451b464b3abd5f01e715ba53ac",
+   "tests/v2/test_c2_cli_protocol.py": "4e7b8263bd9bb2f6d0f54f654dbaab2551bbc339cbd2f197d996caee6991633c",
+   "tests/v2/test_c2_cli_verdicts.py": "0673a700984e78703dd3619fe056ace203d6807b135b851080737e8ffce62667",
+   "tests/v2/test_c2_file_artifact.py": "adaf284a4a01739c1533a88c1562896d78f60103c7d14c1ebfbb28db81ad1ea7",
+   "tests/v2/test_c2_k_nowork_001.py": "f618589b03367669f85f16e19efd891fa5e96745c89a2d98aed804d2ef337fff",
+   "tests/v2/test_c2_k_presat_001.py": "47c082fb94dc610b086c11168b579146924050eb649e8465f7ce318581fd8a3c",
+   "tests/v2/test_c2_orchestration_conformance.py": "864774cb7a9b6b3bf677a95c04a95394414f6b88c62a0db463940450b029bb5a",
+   "tests/v2/test_p6_orchestration.py": "204098c6970751696fe700b6d31c4e16e5c0f84d795fca70069cd51d3d66028b",
+   "tests/v2/test_p6_stages.py": "fd6ccdbe72a3c731a0dfac6b957fc2baf94dfc3cf3becd9bd40b050cd396df6d",
+   "tests/v2/test_probe_process_effect.py": "1b93839728ccbb0fe087618217dc517bc10317ab26531713029ea6773ec3cc45",
+   "tests/v2/test_probe_process_effect_bytecode.py": "012a5446f9a578694ecc838e4c74a00b5cf605ede08fec94702276c6e8cf2b3c",
+   "tests/v2/test_probe_process_effect_units.py": "58ef6d70a41101f42ccb6707c9367a05f6618bb7073f51307c5ef594f052f143",
+   "tests/v2/test_python_callable_v2.py": "3b46a7868d24eaca02f31a52050832632957dfe6566c147814c7b05c993fdfa0",
+   "tests/v2/test_python_callable_v2_bytecode.py": "bee6e0068cc6a8f7297f5fc6fce553e9320ab61507040f3897072c1162b80ddc",
+   "tests/v2/test_release_s2_kernel.py": "20d3ae401236167fe5628db0e4f4233e8f26cb37f6f8a617525d377c6df9fe2f",
+   "tests/v2/test_s2_kills.py": "6f4b2260ea57edcf08765b18908d8b22133a7f401008882dd231ac98b09722af",
+   "tests/v2/test_s2_kills_deterministic.py": "3501a46004d7cdde7e748ef78d6e6cad556b4be2924410459d65abf9d43df2aa",
+   "tests/v2/test_s2_kills_k.py": "2d9a708457308ddb6d2cf3905ce50a47c3a3f9e9e16cfda0bc92802df957b410",
+   "tests/v2/test_s2_kills_rc2.py": "77fe462b0393e43bd5710400a1fe3444324a31167e77105ab4f6dc344881b4a1",
+   "tests/v2/test_v21_bundle_tools.py": "37156a2da34fb97f87481865ef00374db770540ad4fbdb316a475b91a3ac9f8f",
+   "tests/v2/test_v21_confine.py": "b5343dc85f524d5e835ae69b2468c6359358413b3918bc71e8d331556b7741db",
+   "tests/v2/test_v21_context_pack.py": "8ecb00eff5858a8f20fd0e75b272f13de64694372f5f456c7bb55eb07a9f62eb",
+   "tests/v2/test_v21_continue_integrity.py": "a158be140209e375214b7f219e28906f878b3bbb0ffb7b2d9f6bb5dc97acf6d2",
+   "tests/v2/test_v21_continue_usage.py": "1653c13cc5c76a2d50b3c4d6ca4a7b0da4bb352b8e970dad6d244728ea89ab69",
+   "tests/v2/test_v21_defects_bundlecli.py": "e1847f35bbeb5afa525840b1f82cd47fb6fe6ebd404b01d09a7aa63a0325c88e",
+   "tests/v2/test_v21_defects_bundleshape.py": "8f89d41c6cd71706c1d66d078401e0a1c561a4dca595660b82cfc320010534ce",
+   "tests/v2/test_v21_defects_confine.py": "26695ad9d1bccc311e021002200774f5d55e82e251ff6a8a3b4867b357ad9578",
+   "tests/v2/test_v21_defects_lineageusage.py": "59127a1165e20ad166200cc5ed3c58b2222518560608036efbabd885eb4240e0",
+   "tests/v2/test_v21_defects_lint.py": "6826ff9524e0fe95f0ec24f121d9c0327a31a9c1060056e5fff18a55b046d9a2",
+   "tests/v2/test_v21_defects_ocr.py": "f0f46541bfea1fb60d3707f4381916f71a6c0cef5d751cbea12ea1ed51190e43",
+   "tests/v2/test_v21_defects_ocrz.py": "e990b7e89498ec7d85b29d46316521ae078d219e8d4a6239f387817bb592be86",
+   "tests/v2/test_v21_defects_preflight.py": "5c52c79c614daa761a5ee21127552c6503d21a1c2fa308e5775cfb4961cc59e8",
+   "tests/v2/test_v21_defects_reproducer.py": "4a3928d90025183557e56ecd83779f0746d2dec553e2312f9ffad077c26ef953",
+   "tests/v2/test_v21_defects_verify.py": "4c1a8bd6f10847775db04e2da4d614c95b265cc276ed6c1f377cb3530c4929ea",
+   "tests/v2/test_v21_identity.py": "5ac0fcb1325732c81bd63ca5fbb5e45f160f7df01c69a0077ed7565fd13cb69c",
+   "tests/v2/test_v21_inputs.py": "f25694614f16c5b09bb912a1b353f500a8c50c272bcfbb9ded09138f272b5887",
+   "tests/v2/test_v21_kills3_A00.py": "70c24f67345b6afd25fbe1ee4627d4fd45ff5b100b537d546f6aa9f52aba2fe3",
+   "tests/v2/test_v21_kills3_A02.py": "449af02dc2ba344874cd628676b71f9327fd979b63ec5c29b4fefcbddca28bd7",
+   "tests/v2/test_v21_kills3_A03.py": "972adbc0d2686b436e6e966964fe8e1007e1d8bfa52f4b576f50ab98dd00f0bd",
+   "tests/v2/test_v21_kills3_A04.py": "330083f726dfba83315e3d7661b37a89d3cdb8827f96e1298d0f6d39e8890a61",
+   "tests/v2/test_v21_kills3_A05.py": "95f02ce08641a007a696c956003f29575fda01a5b1340ccaf4e7fe3bd68ebd4d",
+   "tests/v2/test_v21_kills3_A06.py": "c6a8a606c8738dc40ea2582cd7be5d9ad5f9c8ed88786d68fabbebe137a0e7bb",
+   "tests/v2/test_v21_kills3_A07.py": "414c62d18e1d0f71ff01d4dcdbc6b83fef0b7007baa1e56cb7166bdf592d4ce9",
+   "tests/v2/test_v21_kills3_A08.py": "51a44882ad6ebf1884946e3e554ddd644de7ff08a152621c2fe63cafad1bd03c",
+   "tests/v2/test_v21_kills3_A09.py": "4e0f06b86cb4cfecd4dd29f5b4551b25f43f67f7fd775b630facea60cc038597",
+   "tests/v2/test_v21_kills3_A10.py": "7273edfb92ce82f92755ecf809769293eef1ddc7384ed93c7395082d0414e977",
+   "tests/v2/test_v21_kills3_A11.py": "1296c1c84d5a22e7549fe5751caaf07b178abd632b812c1c038210d7e25c087b",
+   "tests/v2/test_v21_kills3_A13.py": "d4910cd2a969cc9168dcd04c4a49bc70a581d0125539b09e6e0f4919680a496d",
+   "tests/v2/test_v21_kills3_A15.py": "1b5fb16edff341aeafc90749f2baa4a151fb0a603275eb58cea7425aa0804c91",
+   "tests/v2/test_v21_kills3_A16.py": "e6d8da4b91eeb7bfcf3d0e5bfd4c0add4c0ef7c807489b61661cd39f3759f399",
+   "tests/v2/test_v21_kills3_A17.py": "37d82c1e199330c711dbcbb81ad770982cc40f9bc3c3da095fa4d3681632730a",
+   "tests/v2/test_v21_kills3_A18.py": "0efb5fc53d7a0afb14d655717b0fe0129e8dd9fcbb44ba2611f6f980ba16e8fc",
+   "tests/v2/test_v21_kills3_A19.py": "e501c5351af58e367f72d8f7417b9c8e4572b60fa2a25356f870c11e8c77a7f1",
+   "tests/v2/test_v21_kills3_A20.py": "ebaf07e31481fa259923b15a98594913ca1d34085ca0d0aa85e3bcba92437877",
+   "tests/v2/test_v21_kills3_A21.py": "0739b77069da95b9b3f3c35dd5de6a9bc0d057271050eec6be20548896780e28",
+   "tests/v2/test_v21_kills3_A22.py": "abc98bb7d3da37f46104987494e9de86633bbf9d91d7e868ff518984790441d3",
+   "tests/v2/test_v21_kills3_A23.py": "bcc444782b21bb863ddea6c446eb3ff63c2287c910adba8b8db5e995cbe6c176",
+   "tests/v2/test_v21_kills3_A24.py": "e035116eedb385f95f9874be79e49c2d509d6ff46c08fc29950b36a711162ddd",
+   "tests/v2/test_v21_kills3_A26.py": "11dabf266fb28c52cf7c646d7f308533e2819278095f6218c4e3cf2c5ed783be",
+   "tests/v2/test_v21_kills3_T00a.py": "1acdf968d2f7ae8b881a9dbce156a81bd3be3e56c9c7e6e782ba98a9786e9bcb",
+   "tests/v2/test_v21_kills3_T00b.py": "81f31f337376a91069848dc10bdf8070a26934ddbdee2a1195a108e1009f35b1",
+   "tests/v2/test_v21_kills3_T01a.py": "6b245837c9a4f0dd5503387f0006aebf1a216d04e10071c7a6b00da30d87a061",
+   "tests/v2/test_v21_kills3_T01b.py": "758d82e7742b5f278b16178ed4b5c5dc8ea9a930c6ffc3164ce39df6c55278ef",
+   "tests/v2/test_v21_kills3_T02a.py": "dc3b2f759f259cb1da528628dfdb4f694ce2af98cdadc633b8bfc744c807b9e2",
+   "tests/v2/test_v21_kills3_T03a.py": "48ce0401bec3f73bc7106cab06329b4ec30d9cadeff4a3608f116ff723dbc3dc",
+   "tests/v2/test_v21_kills3_T03b.py": "65f04212ab4cd97cdaf68d8433772172b57e08cf9282875e71899e61fb1468be",
+   "tests/v2/test_v21_kills3_T04a.py": "14f881eee0328d21a5fa2c0d7e76c8d7136bbd7c6b16b3acedcaf51497715f48",
+   "tests/v2/test_v21_kills3_T05a.py": "4643c0a39b62adc8087ace90ee1c067cc070c86b8dd570951369d5efa5e78651",
+   "tests/v2/test_v21_kills3_T05b.py": "3d393f6a95f2d349af97e746fbaa801c4b2ec3a22e1fa2385779a2c177e3bd99",
+   "tests/v2/test_v21_kills3_T05c.py": "f28d7328694ed9e9131cb865b5483b3dd6915023a459a57f1864266a34368255",
+   "tests/v2/test_v21_kills3_T06a.py": "e8bd77f263236171299869d2e163e9fce6b17800b829e64455c078ef8500bd20",
+   "tests/v2/test_v21_kills3_T06b.py": "e73df8fc8e4bc600572626ff435351934eafe640c30c06014f152b16bb4121b1",
+   "tests/v2/test_v21_kills3_T07a.py": "9a083446df2bd20b2f1348dfdc5a3e5467e9dcb69dba32851484953133a0ef21",
+   "tests/v2/test_v21_kills3_T07b.py": "fe4442f89acaaaa7d6694e5a5b05739b63d4a1b184ae25a686e904ca796b75fa",
+   "tests/v2/test_v21_kills3_T08a.py": "6e02db762e3d1b9bd774328b8ef29b2e07a082fc3c8d2c5c3cfcdd45ae56a72e",
+   "tests/v2/test_v21_kills3_T08b.py": "201a9e77491ee25618edad4ee4b72c06b2518d16b3102ee1bfca5e516cdc9625",
+   "tests/v2/test_v21_kills3_T09a.py": "d21db57331e9fb96717eed500a3f2ba28d324bcfe77bbbfe55489bf025ce18f8",
+   "tests/v2/test_v21_kills3_T09b.py": "ebc6bf68c4e377837f914000742f76db5a87a2f30006f7ae02a5373d43e93e8a",
+   "tests/v2/test_v21_kills3_T09c.py": "cf8e1210be95db4b90b4e1907ec5e6c79837d27a6cef2ac90e15f175ffef85e2",
+   "tests/v2/test_v21_kills3_T10a.py": "1ac4f82a6a103ca987bc78db8b473169a306cf16ec6892d7226c915bd7a7047d",
+   "tests/v2/test_v21_kills3_T10b.py": "a9b7f0535800da20c8a349776a82ca541b60aa0be1908dce353da3464e69d767",
+   "tests/v2/test_v21_kills3_T10c.py": "39470979a13f145c914343b69898bd4ea9b68a61e0a13da23a4aaaa39422ff02",
+   "tests/v2/test_v21_kills3_T10d.py": "40e58aca4de8b1f1f3ce8be995a7fa16a12f3332021bf14c89500dd1d28e3002",
+   "tests/v2/test_v21_kills3_T11a.py": "29aac0bdecd17176362508b59c992a3e94e29ea1d166ba2503fca5ee762bf31d",
+   "tests/v2/test_v21_kills3_T11b.py": "b3a284f20ce5ac5f5329d6125464a1bda29a2002d1807d15ce05b4ec9d93a899",
+   "tests/v2/test_v21_kills3_T12a.py": "5c2268c62a93d935be3349e191b6972e7d25a02bc66f77d93480513eb3bbb660",
+   "tests/v2/test_v21_kills3_T12b.py": "710c75f13888ad5012f851e2d5f41c46db421cd28dd1cef93f8ccd1669ab9de4",
+   "tests/v2/test_v21_kills3_T13a.py": "36fc6ad7fbb3b309b43d592979a68498b548f92251a21848d377274213d2c2b2",
+   "tests/v2/test_v21_kills3_T14a.py": "8525c03baf6ea891e59781cf49fbec287d60aa875d3641bdb7a4b8673c3baab9",
+   "tests/v2/test_v21_kills3_T14b.py": "e305ee02689cd6b2467e439956de216c4bfad39c6e256ca14cb97ef9318ee2a2",
+   "tests/v2/test_v21_kills3_T15a.py": "ad1c60477b73c5bf929505f93be5206291b7349b99ab14cf08a25179b55cb484",
+   "tests/v2/test_v21_kills3_T16a.py": "38df91ec894a9d566d6349278ac31849e6ae322cf6ee82532ad37771d7734ae4",
+   "tests/v2/test_v21_kills3_T17a.py": "91cae81e0c5f316fefe0887d539d1b5ef30abe18d8f118af564a0d1ae8b8c70f",
+   "tests/v2/test_v21_kills3_T17b.py": "10625e661cd4c0ebc54c453613f59f2139579482b50dfdd328d409839ff8cecd",
+   "tests/v2/test_v21_kills3_T17c.py": "5984b119c919e4c6fb410b40fea4be2d0e4aa7f3c7162b7aea970874114aac67",
+   "tests/v2/test_v21_kills3_T18a.py": "66857ca788b481be122f084b42be4bd5cba823e440d36720d173317470e5409d",
+   "tests/v2/test_v21_kills3_T18b.py": "1871393763e3fe257701fe50574159e50f49008a9d8d829b3f028241e69ee4a7",
+   "tests/v2/test_v21_kills3_T19a.py": "afe0df8e0e8e2b42e38956da6c1fea5d573479134491f0249d2ed87ddc321d24",
+   "tests/v2/test_v21_kills3_T19b.py": "7e0172dd446fe6128af5e9c5e9edfc6de4b624ff21f38c6237d2bf633666c3d8",
+   "tests/v2/test_v21_kills3_T20a.py": "7ae5dde578f2a8f0a19bbfec3604ff2fc41629225b81a35bad11c392e34df40b",
+   "tests/v2/test_v21_kills3_T20b.py": "da54dc8388605016ccb467e44c689ae41d110dccef52aa4fee8479f031ce1278",
+   "tests/v2/test_v21_kills3_T21a.py": "ecf4d1fa504b6efee97401e2f66ccde243914193484356ae5d4eab93147474c1",
+   "tests/v2/test_v21_kills3_T21b.py": "1210fa2ae079c0553b09b464bd7f144fdf0a56147a3e96959580d0700864a226",
+   "tests/v2/test_v21_kills3_T22a.py": "162dbd5938663d364ca856378f6d291f4e88588bfd8736b02b48243ff5c7c648",
+   "tests/v2/test_v21_kills3_T22b.py": "047df019793fcb33195bde77de18f86c73afaed6fc2d79658e53bef084ad4225",
+   "tests/v2/test_v21_kills3_T23a.py": "f487b95b3000664de2d73fa5c700e169cab6e12926073d86d35586b4fcf3b3d4",
+   "tests/v2/test_v21_kills3_T24a.py": "3c0b7986919497e0ce5c1aeae45df95e32d346dc3532d81f5fb929917e2ee968",
+   "tests/v2/test_v21_kills3_T25a.py": "06e87d96dabc86243c92da6e5b695b2098c5f22da0e0346963657ef6f25dca06",
+   "tests/v2/test_v21_kills3_T26a.py": "9d96c0b20a352d5e6a25e69906178a03807f6082a7004e3af4c282df9376e88d",
+   "tests/v2/test_v21_kills3_T27a.py": "80d9b1df580ef8c58d405aaf51ed5dba703d28a3a2eebb0c44e1933d8331a4c3",
+   "tests/v2/test_v21_kills3_T28a.py": "84f76de7d89e5e09a340324cd296bde5c3724161d21708ade150aeae76a94698",
+   "tests/v2/test_v21_kills3_TO1.py": "efb2f63c1c8770cfd1ff65b0d8c379a9e60c07e4e6a57e3e755bfe24efeac137",
+   "tests/v2/test_v21_kills3_TO2.py": "53dfb8de85bab4c4c7960a820228b7a23e0aec281ba363bac40b534dbf05b87a",
+   "tests/v2/test_v21_kills3_TO3.py": "b10c09e3e0c504d1cde329588f2be7b76fbcae0f1b98430d2e7671d08384cbd8",
+   "tests/v2/test_v21_kills_adapters.py": "396774d3c7aff4adf22c61636e8bf584aa8e35958f3cc03010e958da30034314",
+   "tests/v2/test_v21_kills_bundle.py": "76f3804eb4f0c5f57543d87711e8198529e9b4dfcc73d906f2be908a5cbf6559",
+   "tests/v2/test_v21_kills_bundle_cli.py": "b99f6ab9ace6ba3c702c9ee8e423c325a6793d5490d01cfb584daa46e7644d6e",
+   "tests/v2/test_v21_kills_cli.py": "9195b63f17a8e3d761f8170976ff89fdca0bad7f1ce407474757b5ff0b4c2aec",
+   "tests/v2/test_v21_kills_lineage.py": "68e66c9cbcf63274f34cf2977b18429e957cdd7752fb30c8059a058be2ab3ed0",
+   "tests/v2/test_v21_kills_settings.py": "824091699ba943b8c21c297e1dc6ccee01a6b342d2b099cfc3e0d9728e069103",
+   "tests/v2/test_v21_kills_usage.py": "156c97784e3261facbc207829295acbccc81e303288208180696b71bd489243c",
+   "tests/v2/test_v21_orchestration.py": "e677afc277215ace52e75b2c5b4ca62d6990916dcc0ee88a495258ed1e6a446b",
+   "tests/v2/test_v21_python_imports.py": "c0c5388678d8d3203124729d6f8a9081ee27a0ace55f1eacb0a11056539cfa5d",
+   "tests/v2/test_v21_review.py": "f4d41071d11d7b7dd9cfbd8fb86daa006834991392176fd4e5406fdc1806704a",
+   "tests/v2/test_v21_review_chain.py": "dea1a843fd2d75e85ffbfb9b4ea62d4df5798d9560560fc7a1a0668172650e12",
+   "tests/v2/test_v21_review_ocr.py": "af814e29d61c0ed0b89453fb00b0ff4f76bc1487026f6ebdf042f2836277ae13",
+   "tests/v2/test_v21_transport.py": "6af6cd8430ca52e139597d7993bfa0ff76a8247b717a06904761deb3919d5447",
+   "tests/v2/test_v21_verify.py": "7c9d21a15d0ba0c42e06e1c2fee1b6052c955e91f6aa450a27ffff6c93435fb9"
+  }
+ },
+ "execution_order": {
+  "path": "closure-evidence/v2/v2.1/EXECUTION-ORDER-3.json",
+  "sha256": "d5fc9483fc1677c582f53e68900459ead3ebb9450148a4312586339ecc516eb2"
+ },
+ "t0": {
+  "path": "closure-evidence/v2/v2.1/T0-SWEEP-3.json",
+  "sha256": "151043ab6740cf5e94c2023c57729dc6ac83d7cb23ef6a1d318291e05e80cede"
+ },
+ "preflight": {
+  "path": "closure-evidence/v2/v2.1/campaign-3/t0-sweep/README.md",
+  "sha256": "37a4761283e436e21e8412bbd5285cead2214810af4173eeef254e74afb9d31d"
+ }
+}
