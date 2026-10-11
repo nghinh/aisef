@@ -55,7 +55,17 @@ def _strings(v, where: str, *, empty: bool = True) -> list[str]:
 
 
 def shape_problems(data: Mapping) -> None:
-    """The bundle's JSON types, checked before any kernel constructor sees them; the first problem names its path."""
+    """The bundle's JSON types, checked before any kernel constructor sees them; the first problem names its path.
+
+    A bundle is sealed on one machine and run on another, and the project supports Windows: a path is confined to the
+    repository on every platform's reading. `/` and `\\` both separate; a leading separator, a drive (`C:/x`, `C:x`)
+    or a UNC share makes a path absolute, and a `..` component climbs out of the root. A product root is one name:
+    none of those, and no separator at all."""
+
+    def outside(p: str) -> bool:
+        w = pathlib.PureWindowsPath(p)      # its reading of `/` and `..` is the POSIX one, plus `\` and drives
+        return bool(w.drive or w.root or ".." in w.parts)
+
     for k in ("name", "description"):
         if not isinstance(data[k], str):
             raise BundleError(f"$.{k}: a string")
@@ -68,12 +78,12 @@ def shape_problems(data: Mapping) -> None:
     for k in sorted({"path", "sha256"} ^ set(doc)):
         raise BundleError(f"$.requirements_document.{k}: {'missing' if k in ('path', 'sha256') else 'not a field of it'}")
     path = doc["path"]
-    if not isinstance(path, str) or not path or path.startswith("/") or ".." in pathlib.PurePosixPath(path).parts:
+    if not isinstance(path, str) or not path or outside(path):
         raise BundleError("$.requirements_document.path: a path relative to the repository root")
     if not isinstance(doc["sha256"], str) or not _HEX64.fullmatch(doc["sha256"]):
         raise BundleError("$.requirements_document.sha256: 64 lowercase hex characters")
     roots = _strings(data["product_roots"], "$.product_roots", empty=False)
-    if any("/" in r or r in (".", "..") for r in roots):
+    if any("/" in r or "\\" in r or r in (".", "..") or pathlib.PureWindowsPath(r).drive for r in roots):
         raise BundleError("$.product_roots: top-level names of the project's own source tree")
     if not isinstance(data["plan"], Mapping):
         raise BundleError("$.plan: an object")
@@ -91,7 +101,7 @@ def shape_problems(data: Mapping) -> None:
         if unknown:
             raise BundleError(f"$.stories.{sid}.depends_on: names stories the bundle does not hold: {unknown}")
         for t in _strings(s["tests"], f"$.stories.{sid}.tests"):
-            if t.startswith("/") or ".." in pathlib.PurePosixPath(t).parts:
+            if outside(t):
                 raise BundleError(f"$.stories.{sid}.tests: {t!r} is not a path relative to the repository root")
 
 
