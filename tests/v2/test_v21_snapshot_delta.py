@@ -52,9 +52,35 @@ SAME = "same inputs (generator source, module source, enum members)"
 MAY_READ = "data its kill tests may read (found statically; outside the proof's rules)"
 
 
-def ran(kill_file: str, opened: tuple[str, ...] | list[str] = (), listed: tuple[str, ...] | list[str] = ()) -> dict:
-    """A kill file's entry in a measured read-set: its own import opens it."""
-    return {"opened": [kill_file, *opened], "listed": [*listed]}
+def ran(kill_file: str, opened: tuple[str, ...] | list[str] = (), listed: tuple[str, ...] | list[str] = (),
+        by: dict[str, list[str]] | None = None) -> dict:
+    """A kill file's entry in a measured read-set: its own import opens it. `by`: listed_by (absent in an old record)."""
+    return {"opened": [kill_file, *opened], "listed": [*listed], **({"listed_by": by} if by is not None else {})}
+
+
+REG = "aisef2/invariants/registry.py"
+SUB, NEW, FX = "tests/v2/sub", "tests/v2/new", "tests/v2/fx"
+#: what registry.py has of the real one that matters: test_directories lists tests/v2 and keeps the set of parents of
+#: the test modules; _arms walks a syntax tree (not a listing)
+REG_SRC = """import ast
+import pathlib
+
+ROOT = pathlib.Path(__file__).resolve().parents[2]
+TESTS_V2 = "tests/v2"
+
+
+def test_directories(root=ROOT):
+    base = root / TESTS_V2
+    out = {TESTS_V2} if any(base.glob("test_*.py")) else set()
+    for path in base.rglob("test_*.py"):
+        out.add(path.parent.relative_to(root).as_posix())
+    return frozenset(out)
+
+
+def _arms(src):
+    return [n for n in ast.walk(ast.parse(src)) if isinstance(n, ast.Call)]
+"""
+DIRS = ("tests/v2", SUB, NEW, FX)
 
 
 def _git(repo: pathlib.Path, *args: str) -> str:
@@ -538,6 +564,200 @@ class Toy(unittest.TestCase):
                 with self.assertRaises(SystemExit) as e:
                     D.build(self.repo, self.base, head, rs)
                 self.assertIn(why, str(e.exception))
+
+    # -- directories listed by registry.py (test_directories: only the set of directories that hold a test module) -------
+
+    def listings(self, callers: dict[str, list[str]] | None = None, dirs=DIRS, **by) -> dict:
+        """A measured read-set of M and N that listed `dirs`, each by REG alone — or by `callers` (dir -> files) —,
+        with `by` (kill file -> the same for that kill file alone) over it."""
+        mk = lambda f: ran(f, listed=dirs, by={d: (callers or {}).get(d, [REG]) for d in dirs})  # noqa: E731
+        return {"kill_files": {f: by.get(f, mk(f)) for f in (M, N)}}
+
+    def regdelta(self, files: dict[str, str], read_set: dict | None, base: dict[str, str] | None = None):
+        """(doc, rows by path) of `files` changed over a snapshot that holds REG, a test module in tests/v2/sub and a
+        fixture and no test module in tests/v2/fx; any number of changed files."""
+        self.init({REG: REG_SRC, f"{SUB}/test_x.py": "X = 1\n", f"{FX}/data.json": "{}\n", **(base or {})})
+        self.edit(files)
+        head = self.commit("change")
+        rs = None
+        if read_set is not None:
+            rs = self.repo / "readset.json"
+            rs.write_text(json.dumps({"commit": head, **read_set}), encoding="utf-8")
+        doc, _ = D.build(self.repo, self.base, head, rs)
+        return doc, {r["path"]: r for r in doc["files"]}
+
+    def outcome(self, row: dict) -> str:
+        """`unread` (a measured read-set clears it for both kill files), `read` (both read it), or the split."""
+        d, kinds = row.get("read_set", {}), set(row["kinds"]) - {D.CODE}
+        if kinds == {D.UNREAD}:
+            return "unread"
+        if kinds == {D.DATA} and set(d["read_by"]) == {M, N}:
+            return "read"
+        return f"{sorted(d.get('read_by', {}))} read, {d.get('cleared')} cleared"
+
+    def test_a_directory_listed_only_by_the_registry_is_not_read_by_a_file_that_cannot_change_its_result(self):
+        for name, files in (("a test module beside another", {f"{SUB}/test_y.py": "X = 2\n"}),
+                            ("a test module beside others in tests/v2 itself", {"tests/v2/test_y.py": "X = 2\n"}),
+                            ("a test module changed, the only one of its directory", {f"{SUB}/test_x.py": "X = 3\n"}),
+                            ("a fixture beside a test module", {f"{SUB}/data.json": "{}\n"}),
+                            ("a fixture changed in a directory with no test module", {f"{FX}/data.json": "{\"x\": 1}\n"}),
+                            ("a fixture in a directory new at head", {f"{NEW}/data.json": "{}\n"}),
+                            ("a fixture in directories new at head", {f"{NEW}/deep/er/data.json": "{}\n"})):
+            with self.subTest(name):
+                (path,) = files
+                doc, rows = self.regdelta(files, self.listings())
+                self.assertEqual(self.outcome(rows[path]), "unread")
+                self.assertEqual((rows[path]["read_set"]["cleared"], rows[path]["read_set"]["read_by"]), ([M, N], {}))
+                self.assertTrue(doc["read_set"]["listing_discount"]["applies"])
+                # the same change by a record that does not say who listed: read, as before the attribution existed
+                _, rows = self.regdelta(files, {"kill_files": {f: ran(f, listed=DIRS) for f in (M, N)}})
+                self.assertEqual(self.outcome(rows[path]), "read")
+
+    def test_the_first_or_last_test_module_of_a_directory_is_read_through_the_registrys_listing(self):
+        for name, files, base in (
+                ("the first of a new directory", {f"{NEW}/test_z.py": "X = 1\n"}, None),
+                ("the first of a directory that held a fixture", {f"{FX}/test_z.py": "X = 1\n"}, None),
+                ("the last of a directory, removed", {f"{SUB}/test_x.py": None}, None),
+                ("a test module renamed to another directory", {f"{SUB}/test_x.py": None, f"{NEW}/test_x.py": "X = 1\n"}, None),
+                ("a directory named like a test module, new", {f"{NEW}/test_d.py/data.json": "{}\n"}, None)):
+            with self.subTest(name):
+                self.init({REG: REG_SRC, f"{SUB}/test_x.py": "X = 1\n", f"{FX}/data.json": "{}\n", **(base or {})})
+                for rel, text in files.items():
+                    if text is None:
+                        (self.repo / rel).unlink()
+                self.edit({r: t for r, t in files.items() if t is not None})
+                head = self.commit("change")
+                rs = self.repo / "readset.json"
+                rs.write_text(json.dumps({"commit": head, **self.listings()}), encoding="utf-8")
+                doc, _ = D.build(self.repo, self.base, head, rs)
+                rows = {p: r for r in doc["files"] for p in (r["path"], r.get("from")) if p}   # a rename has both
+                self.assertTrue(doc["read_set"]["listing_discount"]["applies"])
+                for path in files:
+                    self.assertEqual(self.outcome(rows[path]), "read", path)
+                    self.assertEqual(rows[path]["read_set"]["read_by"], {M: "measured", N: "measured"})
+
+    def test_a_directory_listed_by_the_registry_and_by_another_caller_is_read(self):
+        files = {f"{SUB}/test_y.py": "X = 2\n"}
+        for name, callers in (("another file of the tree", [REG, M]), ("code with no file of the tree", [REG, "<native>"]),
+                              ("another file alone", [M]), ("the registry named for nothing", []),
+                              ("a file that only looks like it", ["tests/aisef2/invariants/registry.py"])):
+            with self.subTest(name):
+                _, rows = self.regdelta(files, self.listings({SUB: callers}))
+                self.assertEqual(self.outcome(rows[f"{SUB}/test_y.py"]), "read")
+        # per kill file, and per directory above the file: only the directories above it count
+        _, rows = self.regdelta(files, self.listings(**{
+            M: ran(M, listed=DIRS, by={d: [REG] for d in DIRS}),
+            N: ran(N, listed=DIRS, by={**dict.fromkeys(DIRS, [REG]), SUB: [REG, N]})}))
+        row = rows[f"{SUB}/test_y.py"]
+        self.assertEqual((row["kinds"], row["read_set"]["read_by"], row["read_set"]["cleared"]), ([D.CODE, D.DATA], {N: "measured"}, [M]))
+        _, rows = self.regdelta({"tests/v2/test_y.py": "X = 2\n"}, self.listings({SUB: [REG, N], NEW: [N]}))
+        self.assertEqual(self.outcome(rows["tests/v2/test_y.py"]), "unread")   # tests/v2 alone is above it
+
+    def test_a_file_the_kill_file_opened_or_a_directory_listed_without_attribution_is_read(self):
+        files = {f"{SUB}/test_y.py": "X = 2\n"}
+        _, rows = self.regdelta(files, self.listings(**{M: ran(M, [f"{SUB}/test_y.py"], DIRS, {d: [REG] for d in DIRS})}))
+        row = rows[f"{SUB}/test_y.py"]   # opened: read whoever listed
+        self.assertEqual((row["read_set"]["read_by"], row["read_set"]["cleared"]), ({M: "measured"}, [N]))
+        for name, by in (("no listed_by", None), ("an empty listed_by", {}), ("only another directory", {NEW: [REG]}),
+                         ("a directory of no listing", {"tests/v2": [REG], SUB: []})):
+            with self.subTest(name):
+                doc, rows = self.regdelta(files, {"kill_files": {f: ran(f, listed=DIRS, by=by) for f in (M, N)}})
+                self.assertEqual(self.outcome(rows[f"{SUB}/test_y.py"]), "read")
+                self.assertEqual(rows[f"{SUB}/test_y.py"]["read_set"]["read_by"], {M: "measured", N: "measured"})
+                if not by:   # no listed_by in either: the table says so rather than that a rule was applied
+                    self.assertEqual(doc["read_set"]["listing_discount"]["attributed"], 0)
+                    _, md = D.build(self.repo, self.base, "HEAD", self.repo / "readset.json")
+                    self.assertIn("the record has no `listed_by` for any kill file", md)
+                    self.assertNotIn("only as the first or last test module", md)
+
+    def test_a_file_outside_tests_v2_or_a_listing_outside_it_is_never_discounted(self):
+        _, rows = self.regdelta({"docs/new.md": "x\n"}, self.listings(dirs=(*DIRS, "docs")))
+        self.assertEqual(self.outcome(rows["docs/new.md"]), "read")   # docs listed by the registry's name, p not under tests/v2
+        for d in ("tests", "."):
+            with self.subTest(d):
+                _, rows = self.regdelta({f"{SUB}/test_y.py": "X = 2\n"}, self.listings(dirs=(*DIRS, d)))
+                self.assertEqual(self.outcome(rows[f"{SUB}/test_y.py"]), "read")   # a directory above tests/v2 listed too
+
+    def test_test_directories_changed_between_base_and_head_turns_the_discount_off_and_the_table_says_why(self):
+        files = {f"{SUB}/test_y.py": "X = 2\n"}
+        doc, rows = self.regdelta(files, self.listings())
+        self.assertEqual((doc["read_set"]["listing_discount"]["applies"], self.outcome(rows[f"{SUB}/test_y.py"])),
+                         (True, "unread"))
+        for name, edit, why in (
+                ("its body changed", REG_SRC.replace('base.rglob("test_*.py")', 'base.rglob("*.py")'),
+                 f"test_directories in {REG} differs between "),
+                ("a decorator added", REG_SRC.replace("def test_directories", "@staticmethod\ndef test_directories"),
+                 f"test_directories in {REG} differs between "),
+                ("a listing added elsewhere in the file", REG_SRC + "\n\ndef names(d):\n    return sorted(__import__('os').listdir(d))\n",
+                 f"{REG} lists a directory outside test_directories at "),
+                ("the function removed", REG_SRC.replace("test_directories", "directories"),
+                 f"{REG} has no single test_directories at "),
+                ("not Python", "def (:\n", f"{REG} does not parse at ")):
+            with self.subTest(name):
+                doc, rows = self.regdelta({**files, REG: edit}, self.listings())
+                d = doc["read_set"]["listing_discount"]
+                self.assertEqual((d["applies"], self.outcome(rows[f"{SUB}/test_y.py"])), (False, "read"))
+                self.assertIn(why, d["why"])
+                _, md = D.build(self.repo, self.base, "HEAD", self.repo / "readset.json")
+                self.assertIn("**Listing discount off**", md)
+                self.assertIn(d["why"], md)
+        # a change of the file that leaves the function (and every listing) alone does not turn it off
+        doc, rows = self.regdelta({**files, REG: REG_SRC + "\n\nOTHER = 1\n"}, self.listings())
+        self.assertEqual((doc["read_set"]["listing_discount"]["applies"], self.outcome(rows[f"{SUB}/test_y.py"])),
+                         (True, "unread"))
+        # ... nor a function with other lines in other places (the line numbers are not its source)
+        doc, rows = self.regdelta({**files, REG: "\n\n" + REG_SRC}, self.listings())
+        self.assertTrue(doc["read_set"]["listing_discount"]["applies"])
+
+    def test_a_snapshot_without_the_registry_has_no_discount(self):
+        self.init({})
+        self.edit({f"{SUB}/test_y.py": "X = 2\n"})
+        head = self.commit("change")
+        rs = self.repo / "readset.json"
+        rs.write_text(json.dumps({"commit": head, **self.listings()}), encoding="utf-8")
+        doc, _ = D.build(self.repo, self.base, head, rs)
+        d = doc["read_set"]["listing_discount"]
+        self.assertEqual((d["applies"], d["why"], self.outcome(doc["files"][0])),
+                         (False, f"{REG} has no single test_directories at {self.base[:7]}", "read"))
+
+    def test_the_table_with_the_discount_is_re_derived_byte_for_byte(self):
+        _, rows = self.regdelta({f"{SUB}/test_y.py": "X = 2\n", f"{NEW}/test_z.py": "X = 1\n"}, self.listings())
+        head = _git(self.repo, "rev-parse", "HEAD")
+        rs = self.repo / "readset.json"
+        out = self.write_table(head, rs)
+        doc = json.loads((out / "DELTA.json").read_text(encoding="utf-8"))
+        self.assertEqual(doc["read_set"]["listing_discount"], {
+            "applies": True, "attributed": 2, "why": f"test_directories in {REG} is the same at {self.base[:7]} and "
+                                                      f"{head[:7]} and lists nowhere else there; tests/v2 directories "
+                                                      f"whose membership of its result changes: 1"})
+        md = (out / "DELTA.md").read_text(encoding="utf-8")
+        self.assertIn("Listings by `aisef2/invariants/registry.py` (`test_directories`: only the set of directories "
+                      "holding a `test_*.py`) read a changed file of `tests/v2` only as the first or last test module of a "
+                      "directory (`listed_by` in 2 of 2 kill files)", md)
+        self.assertEqual(D.check(self.repo, out), [])
+        self.assertEqual(self.outcome(rows[f"{SUB}/test_y.py"]), "unread")
+        self.assertEqual(self.outcome(rows[f"{NEW}/test_z.py"]), "read")
+
+    def test_a_malformed_listed_by_is_refused_and_a_record_without_it_is_accepted(self):
+        self.edit({f"{SUB}/test_y.py": "X = 2\n"})
+        head = self.commit("change")
+        rs = self.repo / "readset.json"
+        rel = "is not a path relative to the tree root"
+        for why, entry in (("not a read-set", {**ran(M), "listed_by": [REG]}),
+                           ("not a read-set", {**ran(M), "listed_by": {"tests/v2": REG}}),
+                           ("not a read-set", {**ran(M), "listed_by": {"tests/v2": [1]}}),
+                           (f"{M}: '/private/tmp/runner/x.py' {rel}", {**ran(M), "listed_by": {"tests/v2": ["/private/tmp/runner/x.py"]}}),
+                           (f"{M}: '/private/tmp/runner' {rel}", {**ran(M), "listed_by": {"/private/tmp/runner": [REG]}}),
+                           (f"{M}: 'tests/../x' {rel}", {**ran(M), "listed_by": {"tests/v2": ["tests/../x"]}})):
+            with self.subTest(why, entry=entry["listed_by"]):
+                rs.write_text(json.dumps({"commit": head, "kill_files": {M: entry}}), encoding="utf-8")
+                with self.assertRaises(SystemExit) as e:
+                    D.build(self.repo, self.base, head, rs)
+                self.assertIn(why, str(e.exception))
+        rs.write_text(json.dumps({"commit": head, "kill_files": {M: ran(M, listed=["tests/v2"]), N: ran(
+            N, listed=["tests/v2/"], by={"./tests/v2/": [REG, "<native>"]})}}), encoding="utf-8")
+        got = D._read_set(rs, head)
+        self.assertEqual((got[M][2], got[N][2]), ({}, {"tests/v2": frozenset({REG, "<native>"})}))
 
     # -- records ----------------------------------------------------------------------------------------------------
 

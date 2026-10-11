@@ -360,8 +360,9 @@ class ToyRecord(unittest.TestCase):
         path.write_text(json.dumps({"commit": head, **self.doc}), encoding="utf-8")
         got = D._read_set(path, head)   # the function --read-set is read by; it refuses a bad path or a missing own path
         self.assertEqual(sorted(got), PASSING)   # the failing one is not "measured": it stays not measured there
-        for f, (opened, listed) in got.items():
+        for f, (opened, listed, by) in got.items():
             self.assertEqual((sorted(opened), sorted(listed)), (self.kf[f]["opened"], self.kf[f]["listed"]))
+            self.assertEqual(by, {d: frozenset(c) for d, c in self.kf[f]["listed_by"].items()})
 
     def test_nothing_is_written_to_the_tree_and_no_scratch_directory_or_process_is_left(self):
         from validation.v2 import cleanup_authority as ca

@@ -26,10 +26,13 @@ tree is left out). The recording run (after the campaign: it runs every kill fil
 with -B in the runner's tree (no __pycache__) with an audit hook taking `open`, `os.listdir` and `os.scandir` events,
 and os.stat / os.lstat wrapped (they raise no audit event), in its own process and every child Python process; each
 path is made relative to the tree's resolved root. A kill file opened or looked up p, or listed a directory above p: it
-reads p. A record is refused when a path is absolute, written with a backslash or holds an empty, "." or ".." part, or
-when a kill file's own path is not among the files it opened (its import opens it: a record without it measured
-nothing). A kill file missing from the record stays not measured; a file that does not exist at head (deleted, a
-rename's source) is never cleared by a run at head.
+reads p — unless the entry also holds `"listed_by": {directory: [file]}` (the file of the tree that made the listings
+of each directory: its innermost frame on the stack; "<native>" when none is of the tree) and every file named for
+each such directory is aisef2/invariants/registry.py (the discount: _listing_rule, RULES["data"]). A record is refused when a path is
+absolute, written with a backslash or holds an empty, "." or ".." part, or when a kill file's own path is not among
+the files it opened (its import opens it: a record without it measured nothing); a record without `listed_by` is
+accepted and discounts nothing. A kill file missing from the record stays not measured; a file that does not exist at
+head (deleted, a rename's source) is never cleared by a run at head.
 
 Each commit's harness is read from that commit (its validation/v2/mutation.py: V21_TARGETS, COPY, the generator), never
 from the working tree. Every file of `git diff -M --name-status base head` (both sides of a rename) gets its kinds and
@@ -46,6 +49,7 @@ from __future__ import annotations
 
 import argparse
 import ast
+import fnmatch
 import functools
 import hashlib
 import importlib.util
@@ -87,6 +91,13 @@ READ = {"measured": "data its kill tests read (measured; outside the proof's rul
 NOTE = {"measured": "data its kill tests read changed (measured)",
         "found statically": "data its kill tests may read changed (found statically)"}
 LISTING = frozenset({"glob", "iglob", "rglob", "iterdir", "listdir", "scandir", "walk", "fwalk"})
+#: the one file whose listings of a directory a kill file's read-set may not count as a read of what lies in it:
+#: `test_directories` there lists TESTS_V2 with glob("test_*.py") and rglob("test_*.py") and keeps only the set of the
+#: directories that hold a test module (every kill file imports tests/v2/__init__.py, whose arm() calls it). A file
+#: under TESTS_V2 can change that set only when it is, or lies under, an entry named test_*.py that is the first or
+#: last of its directory; a new or changed file anywhere else cannot.
+REGISTRY, REGISTRY_FN = "aisef2/invariants/registry.py", "test_directories"
+TESTS_V2, TEST_MODULE = "tests/v2", "test_*.py"   # registry.TESTS_V2, and the pattern test_directories globs for
 RULES = {
     "product": "a file under aisef2/: every target of that module (the module digest is whole-file); every target of a "
                "module that imports it from aisef2 (its enum members are generator input); every target whose kill "
@@ -99,7 +110,13 @@ RULES = {
                "not bind the runner's code",
     "data": "a file inside mutation.COPY outside the harness is data to every target it is not the module of; per "
             "kill file of such a target whose closure does not hold it, measured: read when the measured read-set "
-            "says so (opened or looked up, or a directory above it listed), not read when it omits it and the file "
+            "says so (opened or looked up, or a directory above it listed — except under tests/v2 when every "
+            "listing of each such directory is attributed (listed_by) to aisef2/invariants/registry.py, whose "
+            "test_directories keeps only the set of directories holding a test_*.py: then the file is read through "
+            "the listing only when it is, or lies in a directory named, test_*.py and the directory holding that "
+            "entry is in that set at base and not at head or the reverse — a first or last test module; off, and "
+            "the table says why, when test_directories differs between base and head or registry.py lists "
+            "elsewhere), not read when it omits it and the file "
             "exists at head, else not measured; not measured: may read when found statically in a file of "
             "that closure inside COPY (no other file is in the runner's tree), tests/ or not, at base or head — the "
             "whole path in its text; its path split into consecutive parts, each a whole string constant, from the "
@@ -392,40 +409,103 @@ def _names(info: tuple, f: str, p: str) -> str | None:
     return None
 
 
-def _read_set(path: pathlib.Path, head: str) -> dict[str, tuple[frozenset[str], frozenset[str]]]:
-    """kill file -> (paths it opened or looked up, directories it listed), from a recorded read-set of `head`."""
+def _read_set(path: pathlib.Path, head: str) -> dict[str, tuple[frozenset[str], frozenset[str], dict]]:
+    """kill file -> (paths it opened or looked up, directories it listed, directory -> the files of the tree that made
+    its listings (`listed_by`; {} in a record without it)), from a recorded read-set of `head`."""
     try:
         doc = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, ValueError) as e:
         raise SystemExit(f"{path}: cannot be read: {e!r}") from None
     kf = doc.get("kill_files") if isinstance(doc, dict) else None
     if not isinstance(kf, dict) or not all(isinstance(v, dict) and all(
-            isinstance(v.get(x), list) and all(isinstance(s, str) for s in v[x]) for x in ("opened", "listed"))
+            isinstance(v.get(x), list) and all(isinstance(s, str) for s in v[x]) for x in ("opened", "listed")) and (
+            "listed_by" not in v or isinstance(v["listed_by"], dict) and all(
+                isinstance(c, list) and all(isinstance(s, str) for s in c) for c in v["listed_by"].values()))
             for v in kf.values()):
         raise SystemExit(f"{path}: not a read-set: {{\"commit\", \"kill_files\": {{kill file: {{\"opened\": [path], "
-                         f"\"listed\": [directory]}}}}}}")
+                         f"\"listed\": [directory], [\"listed_by\": {{directory: [file]}}]}}}}}}")
     if doc.get("commit") != head:
         raise SystemExit(f"{path}: measured at {str(doc.get('commit'))[:12]}, not at the head {head[:12]}")
     out = {}
     for k, v in kf.items():
-        bad = [s for x in ("opened", "listed") for s in v[x] if s.strip().startswith("/") or "\\" in s
-               or (n := _norm(s)) and {"", ".", ".."} & set(n.split("/"))]
+        by = v.get("listed_by", {})
+        bad = [s for s in (*v["opened"], *v["listed"], *by, *(c for cs in by.values() for c in cs))
+               if s.strip().startswith("/") or "\\" in s or (n := _norm(s)) and {"", ".", ".."} & set(n.split("/"))]
         if bad:
             raise SystemExit(f"{path}: {k}: {bad[0]!r} is not a path relative to the tree root (the recorder makes every "
                              f"path relative to the root of the tree it ran in and leaves out what lies outside it)")
-        out[k] = (frozenset(map(_norm, v["opened"])), frozenset(map(_norm, v["listed"])))
+        out[k] = (frozenset(map(_norm, v["opened"])), frozenset(map(_norm, v["listed"])), {})
+        for d, cs in by.items():
+            out[k][2][_norm(d)] = out[k][2].get(_norm(d), frozenset()) | frozenset(map(_norm, cs))
         if k not in out[k][0]:
             raise SystemExit(f"{path}: {k}: its own path is not among the files it opened (its import opens it): the "
                              f"record measured nothing of it")
     return out
 
 
+def _test_dirs(files) -> frozenset[str]:
+    """The directories registry.test_directories returns for a tree holding `files`: the parent of every entry under
+    TESTS_V2 named test_*.py — a file or a directory (glob matches both), a name in any case (a stricter match)."""
+    n = len(TESTS_V2.split("/"))
+    return frozenset("/".join(parts[:i]) for f in files if f.startswith(TESTS_V2 + "/")
+                     for parts in [f.split("/")] for i in range(n, len(parts))
+                     if fnmatch.fnmatchcase(parts[i].lower(), TEST_MODULE))
+
+
+def _lists(call: ast.Call) -> bool:
+    """A call of one of LISTING (`ast.walk`, the syntax tree's, is not one)."""
+    f = call.func
+    name = getattr(f, "attr", None) or getattr(f, "id", None)
+    return name in LISTING and not (name == "walk" and getattr(getattr(f, "value", None), "id", None) == "ast")
+
+
+def _listing_rule(B: Rev, H: Rev) -> tuple[frozenset[str] | None, str]:
+    """The discount of REGISTRY's listings (RULES["data"]): (the directories whose membership of test_directories()'s
+    result differs between base and head, why the rule holds) — or (None, why it is off for this run). Off when
+    REGISTRY has no single test_directories, when it lists a directory anywhere outside it (a file-level attribution
+    could not tell the two apart), or when that function's AST differs between base and head (what the rule was
+    written for is not what ran at base)."""
+    dumps = []
+    for R in (B, H):
+        try:
+            tree = ast.parse(R.text(REGISTRY) or "")
+        except SyntaxError:
+            return None, f"{REGISTRY} does not parse at {R.sha[:7]}"
+        fns = [n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == REGISTRY_FN]
+        if len(fns) != 1:
+            return None, f"{REGISTRY} has no single {REGISTRY_FN} at {R.sha[:7]}"
+        inside = {id(n) for n in ast.walk(fns[0])}
+        other = [n.lineno for n in ast.walk(tree) if id(n) not in inside and isinstance(n, ast.Call) and _lists(n)]
+        if other:
+            return None, f"{REGISTRY} lists a directory outside {REGISTRY_FN} at {R.sha[:7]} (line {other[0]})"
+        dumps.append(ast.dump(fns[0]))
+    if dumps[0] != dumps[1]:
+        return None, f"{REGISTRY_FN} in {REGISTRY} differs between {B.sha[:7]} and {H.sha[:7]}"
+    changed = _test_dirs(S2._files(B.root, B.sha)) ^ _test_dirs(S2._files(H.root, H.sha))
+    return changed, (f"{REGISTRY_FN} in {REGISTRY} is the same at {B.sha[:7]} and {H.sha[:7]} and lists nowhere else "
+                     f"there; {TESTS_V2} directories whose membership of its result changes: {len(changed)}")
+
+
+def _discounted(p: str, above: list[str], by: dict, changed: frozenset[str] | None) -> bool:
+    """True when `p` is not read through the listings of the directories `above` it: the rule holds for this run,
+    every file named for each of them is REGISTRY, they are TESTS_V2 or under it as `p` is, and p is no test module
+    (nor under a directory named like one) whose directory's membership of test_directories()'s result changes."""
+    under = TESTS_V2 + "/"
+    if changed is None or not p.startswith(under) or not all(d == TESTS_V2 or d.startswith(under) for d in above):
+        return False
+    parts = p.split("/")
+    return all(by.get(d) == {REGISTRY} for d in above) and not any(
+        fnmatch.fnmatchcase(parts[i].lower(), TEST_MODULE) and "/".join(parts[:i]) in changed
+        for i in range(len(TESTS_V2.split("/")), len(parts)))
+
+
 def _data(B: Rev, H: Rev, p: str, kc: dict[str, frozenset[str]], measured: dict | None,
-          copy: tuple[str, ...]) -> tuple[dict, set, set]:
+          copy: tuple[str, ...], changed: frozenset[str] | None = None) -> tuple[dict, set, set]:
     """For the changed file `p` inside COPY: (kill file -> how it reads p, the kill files not measured, the kill files
     a measured read-set clears), over the kill files whose closure does not hold p. A measured kill file is decided by
     the measurement; one not measured (or measured at head while p is not there) is not measured, and may read p when
-    found statically. Only the closure's files inside COPY are looked into: no other file is in the runner's tree."""
+    found statically. Only the closure's files inside COPY are looked into: no other file is in the runner's tree.
+    `changed`: _listing_rule's directories (None: the discount is off)."""
     root, read, unmeasured, cleared = B.root, {}, set(), set()
     names: dict[str, str | None] = {}
     parts = p.split("/")
@@ -433,8 +513,9 @@ def _data(B: Rev, H: Rev, p: str, kc: dict[str, frozenset[str]], measured: dict 
         if p in files:
             continue
         if measured is not None and k in measured:
-            opened, listed = measured[k]
-            if p in opened or any("/".join(parts[:i]) in listed for i in range(len(parts))):
+            opened, listed, by = measured[k]
+            above = [d for d in ("/".join(parts[:i]) for i in range(len(parts))) if d in listed]
+            if p in opened or above and not _discounted(p, above, by, changed):
                 read[k] = "measured"
                 continue
             if p in S2._files(root, H.sha):
@@ -574,6 +655,7 @@ def build(root: pathlib.Path, base: str, head: str, read_set: pathlib.Path | Non
 def _build(B: Rev, H: Rev, rs: dict | None = None) -> tuple[dict, str]:
     root = B.root
     measured = rs["measured"] if rs else None
+    changed, why = _listing_rule(B, H) if rs else (None, "")
     targets = sorted(set(B.targets) | set(H.targets))
     verdicts = {t: verdict(B, H, t) for t in targets}
     kc = _kill_closures(B, H)
@@ -615,7 +697,7 @@ def _build(B: Rev, H: Rev, rs: dict | None = None) -> tuple[dict, str]:
                 for t in targets:
                     affected.setdefault(t, []).append("harness change (every V2.1 target)")
             if p not in harness and any(p == c or p.startswith(c + "/") for c in copy):
-                read, unmeasured, cleared = _data(B, H, p, kc, measured, copy)
+                read, unmeasured, cleared = _data(B, H, p, kc, measured, copy, changed)
                 data = data or {"read_by": {}, "not_measured": set(), "cleared": set(), "provisional": set()}
                 data["read_by"] |= {k: w for k, w in read.items() if k not in data["read_by"]}
                 data["not_measured"] |= unmeasured
@@ -684,7 +766,9 @@ def _build(B: Rev, H: Rev, rs: dict | None = None) -> tuple[dict, str]:
         "tool": {"path": TOOL_REL, "sha256": hashlib.sha256((HERE / "v21_snapshot_delta.py").read_bytes()).hexdigest()},
         "proof": {"path": PROOF_REL, "criteria_sha256": MR.criteria_sha256(PROOF)},
         "base": B.sha, "head": H.sha, "rules": RULES,
-        "read_set": {**{k: rs[k] for k in ("path", "sha256", "commit")}, "kill_files": len(measured)} if rs else None,
+        "read_set": {**{k: rs[k] for k in ("path", "sha256", "commit")}, "kill_files": len(measured),
+                     "listing_discount": {"applies": changed is not None, "why": why,
+                                          "attributed": sum(1 for v in measured.values() if v[2])}} if rs else None,
         "counts": {"files": len(rows), "targets_at_base": len(B.targets), "targets_at_head": len(H.targets),
                    "affected_targets": len(affected),
                    "remeasure": sum(1 for v in verdicts.values() if v["verdict"].startswith("re-measure")),
@@ -719,6 +803,18 @@ def markdown(doc: dict) -> str:
     rs = doc["read_set"]
     lines.append(f"Read-set of the kill files: measured at `{rs['commit'][:12]}` (`{rs['path']}`, sha256 `{rs['sha256'][:16]}`, "
                  f"{rs['kill_files']} kill files)." if rs else "Read-set of the kill files: **not measured** (no `--read-set`).")
+    if rs:
+        ld = rs["listing_discount"]
+        if not ld["applies"]:
+            lines.append(f"**Listing discount off** (every changed file under a directory a kill file listed is read by "
+                         f"it): {ld['why']}.")
+        elif not ld["attributed"]:
+            lines.append("Listing discount: the record has no `listed_by` for any kill file, so every changed file under "
+                         "a directory a kill file listed is read by it.")
+        else:
+            lines.append(f"Listings by `{REGISTRY}` (`{REGISTRY_FN}`: only the set of directories holding a "
+                         f"`{TEST_MODULE}`) read a changed file of `{TESTS_V2}` only as the first or last test module of "
+                         f"a directory (`listed_by` in {ld['attributed']} of {rs['kill_files']} kill files): {ld['why']}.")
     n_un = sum(1 for r in doc["files"] if UNMEASURED in r["kinds"])
     if c["provisional"]:
         lines.append(f"**{c['provisional']} of the {c['stand']} that can stand do so only PROVISIONALLY**: {n_un} changed "
