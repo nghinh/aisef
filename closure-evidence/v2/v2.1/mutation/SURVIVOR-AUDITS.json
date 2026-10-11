@@ -2450,7 +2450,7 @@
    "class": "AUDITED",
    "source_sha256": "1227726975b15f485894c2ee4b831d44173dbbbaf2f92bdbe165bf79cdc09ffa",
    "group": "T09-AUDIT-CLAIM-BYTES: the claim file's bytes are only parsed as JSON or hashed as read; nothing re-derives or compares them",
-   "grounds": "",
+   "grounds": "Audit unrefuted after trying to refute it. The file ends without a newline; every reader is json.loads (claim L126-136, continued_by L164, lineage_account L286/L295) or hashes the bytes it read (_sha(data)), so the digest the operator names is always the one of the bytes on disk. The claim file is outside the evidence manifest (run.py:290-296 lists RUN.json, RUN.started.json, journals, sessions, preflight); the claim dict, not the file, is what goes into RUN.json['continues']['claim'] and that is canonicalised by _content_sha. verify.py does not read the file. Residual, accepted: a human `cat` runs on to the prompt.",
    "consumers_checked": [
     "aisef2/app/lineage.py:65-72 claims() (exists/glob, never reads)",
     "aisef2/app/lineage.py:126-136 claim() (read_bytes -> json.loads; _sha over those bytes)",
@@ -2481,7 +2481,7 @@
    "class": "AUDITED",
    "source_sha256": "1227726975b15f485894c2ee4b831d44173dbbbaf2f92bdbe165bf79cdc09ffa",
    "group": "T09-AUDIT-CLAIM-WORDING: connective punctuation of a refusal whose identifying elements (the flag, the 64-hex digest) are intact",
-   "grounds": "",
+   "grounds": "Audit unrefuted. Only the closing parenthesis of the parenthetical is lost; the flag and the digest remain and the digest is delimited by the preceding space. The sibling batch T09b asserts the recovery instruction by regex `--supersede-claim\\s+([0-9a-f]{64})(?![0-9a-f])` and then supersedes with the extracted value, so the contract that matters (flag + exact digest that works) is held there and does not depend on the `)`; under the mutant the digest is the last token, which an operator copies more safely than `<sha>)` (cli.py compares by equality, so a copied trailing `)` would not match).",
    "consumers_checked": [
     "aisef2/app/lineage.py:139-141 (only producer); aisef2/app/run.py:373-378 (RunRefused(str(e)), recorded as failure detail); aisef2/app/cli.py:93 (printed on stderr as `aisef run: refused: ...`)",
     "grep --supersede-claim / 'an operator may name' over aisef2, aisef, validation, tests, bin, docs: cli.py:46-48 help text, tests/v2/test_v21_kills_cli.py (help text), docs/v2.1/USAGE-2.1.md:129; nothing extracts the digest by pattern except the T09b regex, which ends at the hex",
@@ -2507,7 +2507,7 @@
    "class": "EQUIVALENT",
    "source_sha256": "1227726975b15f485894c2ee4b831d44173dbbbaf2f92bdbe165bf79cdc09ffa",
    "group": "T09-EQ-NOFOLLOW: O_NOFOLLOW beside O_CREAT|O_EXCL; O_EXCL already refuses a final-component symbolic link",
-   "grounds": "",
+   "grounds": "Equivalence holds. Proof: O_NOFOLLOW only governs the final path component and O_CREAT|O_EXCL already refuses a final component that exists, a symbolic link included, with EEXIST regardless of its target: POSIX open(), the macOS open(2) man page on this host (`If O_EXCL is set with O_CREAT and the last component of the pathname is a symbolic link, open() will fail even if the symbolic link points to a non-existent name`), Linux open(2), and (recalled, not readable here) Linux build_open_flags ORing O_NOFOLLOW in for O_CREAT|O_EXCL. Where os has no O_NOFOLLOW (Windows) getattr(os,'O_NOFOLLOW',0) is already 0, the mutant's value. The only handler is `except FileExistsError` at L148, and EEXIST is what every state gives. Separate observation, not this mutant (see issues): a dangling link as the NEWEST generation raises a raw FileNotFoundError at L126 (path.read_bytes()), not through os.open.",
    "consumers_checked": [
     "aisef2/app/lineage.py:146-150 (FileExistsError -> LineageRefused; no other OSError handled)",
     "tests/v2/test_v21_continue_integrity.py ClaimLifecycle.test_two_runs_at_once_one_claims_and_the_other_spends_nothing (the O_EXCL race; its `Os` shim delegates getattr, so the mutant's getattr(os,'',0) -> 0 reaches real open identically)",
@@ -2534,7 +2534,7 @@
    "class": "AUDITED",
    "source_sha256": "1227726975b15f485894c2ee4b831d44173dbbbaf2f92bdbe165bf79cdc09ffa",
    "group": "T09-AUDIT-CLAIM-BYTES: the claim file's bytes are only parsed as JSON or hashed as read; nothing re-derives or compares them",
-   "grounds": "",
+   "grounds": "Audit unrefuted. Only the order of keys in the file differs (insertion order fixed in claim(): run, claimed, claimant, supersedes; nested supersedes is not alphabetical either). Bytes are deterministic in both forms; json.loads and every dict comparison are order-insensitive; the digest is of the bytes on disk. The dict returned (and embedded in RUN.json, canonicalised by _content_sha with sort_keys) is the same object in both forms. No document states a canonical byte form of the claim file and nothing re-serialises a claim.",
    "consumers_checked": [
     "aisef2/app/lineage.py:126-136, 164, 286, 295 (json.loads / hash of the bytes read)",
     "aisef2/app/run.py:368 and :278-296 (returned dict, canonical JSON for RUN.json; claim file not in the manifest)",
@@ -2562,7 +2562,7 @@
    "class": "AUDITED",
    "source_sha256": "1227726975b15f485894c2ee4b831d44173dbbbaf2f92bdbe165bf79cdc09ffa",
    "group": "T09-AUDIT-ANCHOR-MSG: explanatory wording of a ValueError whose class and identifying element are kept",
-   "grounds": "",
+   "grounds": "Audit unrefuted. Tightened grounds: the only ValueError this function can raise is the one at L352 (read_bytes raises OSError, decode(errors='replace') cannot raise), so the class alone names the single cause 'not a complete anchor file' and the path, kept in the mutant, names the object. No product code calls read_anchor (cli.py takes the 64 hex on the command line; --expect-anchor is regex-checked at cli.py:69-70); tests call it and assert ValueError (test_v21_continue_integrity.py:609, T09c [4] for non-ASCII); the docs (ANCHOR-THREAT-MODEL.md:50, REPORT.md:150) promise the refusal, not its wording. Residual: an operator script printing str(e) sees the bare path.",
    "consumers_checked": [
     "grep read_anchor over aisef2, aisef, validation, tests, docs, bin: tests/v2/test_v21_continue_integrity.py:582,587,609,610 only, docs/v2.1/REPORT.md:150 and ANCHOR-THREAT-MODEL.md:50 (state that it refuses)",
     "aisef2/app/cli.py:69-70 (anchor given on the command line, no file read)",
@@ -2805,7 +2805,7 @@
    "class": "AUDITED",
    "source_sha256": "1227726975b15f485894c2ee4b831d44173dbbbaf2f92bdbe165bf79cdc09ffa",
    "group": "T09-AUDIT-ANCHOR-MSG: explanatory wording of a ValueError whose class and identifying element are kept",
-   "grounds": "",
+   "grounds": "Audit unrefuted. Validation precedes os.open (L339-341) so no file is made; the message keeps repr of the value. The only product caller (cli.py:99) passes R.anchor_in(a.out), which is anchor_of(...) = a sha256 hexdigest, or None which the `if anchor and ...` guard skips, so the branch is unreachable from the CLI; its handler (cli.py:101-103) would print `ValueError: <message>` to stderr and exit 2, with the printed anchor still usable, so even a future reachable case loses only the prefix wording.",
    "consumers_checked": [
     "aisef2/app/cli.py:97-107",
     "aisef2/app/run.py:299-309 (anchor_in / anchor_of: _sha hexdigest)",
@@ -2832,7 +2832,7 @@
    "class": "EQUIVALENT",
    "source_sha256": "1227726975b15f485894c2ee4b831d44173dbbbaf2f92bdbe165bf79cdc09ffa",
    "group": "T09-EQ-NOFOLLOW: O_NOFOLLOW beside O_CREAT|O_EXCL; O_EXCL already refuses a final-component symbolic link",
-   "grounds": "",
+   "grounds": "Equivalence holds on the same proof as claim [63]: O_CREAT|O_EXCL refuses an existing final component, a symlink included, with EEXIST (POSIX; macOS open(2) man page on this host; Linux open(2)), O_NOFOLLOW governs only that component, and the mutant's flag value equals what Windows already gets. The documented promise (ANCHOR-THREAT-MODEL.md:46-47: a symlink, even one pointing nowhere, is refused) is behavioural and is held by O_EXCL; the doc names O_NOFOLLOW as mechanism but nothing observable depends on it. cli.py:65 also refuses an existing or dangling path with lexists before the run.",
    "consumers_checked": [
     "tests/v2/test_v21_continue_integrity.py AnchorThreatModel.test_the_anchor_file_is_new_exact_and_never_through_a_link (asserts FileExistsError for a dangling link; passes on the mutant)",
     "docs/v2.1/ANCHOR-THREAT-MODEL.md:46-49 and REPORT.md:150",
@@ -5193,7 +5193,7 @@
    "class": "AUDITED",
    "source_sha256": "5237cfa7ba128c0403f3cbd9d8a842e1be3afa2ff2d7066d43a4a28633f77e0a",
    "group": "Wire-only entries of facts that _concluded (python_callable_v2.py:525-545) answers without reading the mutated entry: hard-exit facts return at :536-538 from facts['exit_code'] (the 'subject' read at :539 is after it), the equals-over-a-callable facts return at :543-544 from facts['unsupported']; HARNESS (:245-402) is the only writer of the RESULT body and _watch/_concluded (:500-545) the only reader (ci._protocol has three callers, each on its own marker file: cli_invocation, process_effect, this module). The only other reads of 'subject'/'resolved' in this module are :192 (verdict_of, class exists) and :539 (== 'absent'). AUDITED rather than EQUIVALENT because the RESULT body on the wire does differ (reproduced: exp/wire_exp.py, observation_equal=True, wire_equal=False for all nine, run by me). No document promises the facts' shape for this probe.",
-   "grounds": "",
+   "grounds": "Dropped 'subject' entry of the hard-exit facts {'subject','hard_exit','exit_code'}: required=no, decision=no (hard_exit and exit_code are the decision-bearing entries: gate :392 and _concluded :536-538, killed by the existing exit-3 case), integrity=no (not hashed/counted). Reproduced: Observation(OBSERVED, REFUTED, '... (exit 3)') identical, RESULT body differs.",
    "consumers_checked": [
     "python_callable_v2.py _concluded :536-538 returns on hard_exit before :539",
     "HARNESS gate :392 reads facts.get('hard_exit'), never 'subject'",
@@ -5215,7 +5215,7 @@
    "class": "AUDITED",
    "source_sha256": "5237cfa7ba128c0403f3cbd9d8a842e1be3afa2ff2d7066d43a4a28633f77e0a",
    "group": "Wire-only entries of facts that _concluded (python_callable_v2.py:525-545) answers without reading the mutated entry: hard-exit facts return at :536-538 from facts['exit_code'] (the 'subject' read at :539 is after it), the equals-over-a-callable facts return at :543-544 from facts['unsupported']; HARNESS (:245-402) is the only writer of the RESULT body and _watch/_concluded (:500-545) the only reader (ci._protocol has three callers, each on its own marker file: cli_invocation, process_effect, this module). The only other reads of 'subject'/'resolved' in this module are :192 (verdict_of, class exists) and :539 (== 'absent'). AUDITED rather than EQUIVALENT because the RESULT body on the wire does differ (reproduced: exp/wire_exp.py, observation_equal=True, wire_equal=False for all nine, run by me). No document promises the facts' shape for this probe.",
-   "grounds": "",
+   "grounds": "'subject' key emptied in the hard-exit facts: same path as [11]; the wire key '' is authenticated and parsed like any key (exp/wire_exp.py ran it end to end).",
    "consumers_checked": [
     "_watch :518 json.loads accepts any object; _unsubstituted :218-227 rewrites values only",
     "ci._protocol :879-896 authenticates the body bytes as written",
@@ -5236,7 +5236,7 @@
    "class": "AUDITED",
    "source_sha256": "5237cfa7ba128c0403f3cbd9d8a842e1be3afa2ff2d7066d43a4a28633f77e0a",
    "group": "Wire-only entries of facts that _concluded (python_callable_v2.py:525-545) answers without reading the mutated entry: hard-exit facts return at :536-538 from facts['exit_code'] (the 'subject' read at :539 is after it), the equals-over-a-callable facts return at :543-544 from facts['unsupported']; HARNESS (:245-402) is the only writer of the RESULT body and _watch/_concluded (:500-545) the only reader (ci._protocol has three callers, each on its own marker file: cli_invocation, process_effect, this module). The only other reads of 'subject'/'resolved' in this module are :192 (verdict_of, class exists) and :539 (== 'absent'). AUDITED rather than EQUIVALENT because the RESULT body on the wire does differ (reproduced: exp/wire_exp.py, observation_equal=True, wire_equal=False for all nine, run by me). No document promises the facts' shape for this probe.",
-   "grounds": "",
+   "grounds": "'present' value emptied in the hard-exit facts: same path as [11]. '' vs 'present' differ at :539 only (== 'absent', False for both), unreachable for a hard exit.",
    "consumers_checked": [
     ":539 facts.get('subject') == 'absent' is False for '' as for 'present' and is after the :536 return",
     "_unsubstituted :218-227: ''.replace(ws, '<ws>') is a no-op while ws is a non-empty realpath (observe() :463)",
@@ -5257,7 +5257,7 @@
    "class": "AUDITED",
    "source_sha256": "5237cfa7ba128c0403f3cbd9d8a842e1be3afa2ff2d7066d43a4a28633f77e0a",
    "group": "Wire-only entries of facts that _concluded (python_callable_v2.py:525-545) answers without reading the mutated entry: hard-exit facts return at :536-538 from facts['exit_code'] (the 'subject' read at :539 is after it), the equals-over-a-callable facts return at :543-544 from facts['unsupported']; HARNESS (:245-402) is the only writer of the RESULT body and _watch/_concluded (:500-545) the only reader (ci._protocol has three callers, each on its own marker file: cli_invocation, process_effect, this module). The only other reads of 'subject'/'resolved' in this module are :192 (verdict_of, class exists) and :539 (== 'absent'). AUDITED rather than EQUIVALENT because the RESULT body on the wire does differ (reproduced: exp/wire_exp.py, observation_equal=True, wire_equal=False for all nine, run by me). No document promises the facts' shape for this probe.",
-   "grounds": "",
+   "grounds": "Dropped 'subject' entry of the equals-over-a-callable facts: UNSUPPORTED with detail facts['unsupported'] is unchanged (pinned exactly by test_PCV2_3_equality_over_a_callable_is_UNSUPPORTED_hence_INVALID_SPEC, :342); only the RESULT body differs.",
    "consumers_checked": [
     "_concluded :530/:534/:536 (no), :539 .get('subject') == 'absent' False with the entry present, absent or emptied, :541 (no), :543-544 returns UNSUPPORTED from facts['unsupported']",
     "HARNESS gate :392 does not read it; finish() runs on these facts but never reads the dict",
@@ -5277,7 +5277,7 @@
    "class": "AUDITED",
    "source_sha256": "5237cfa7ba128c0403f3cbd9d8a842e1be3afa2ff2d7066d43a4a28633f77e0a",
    "group": "Wire-only entries of facts that _concluded (python_callable_v2.py:525-545) answers without reading the mutated entry: hard-exit facts return at :536-538 from facts['exit_code'] (the 'subject' read at :539 is after it), the equals-over-a-callable facts return at :543-544 from facts['unsupported']; HARNESS (:245-402) is the only writer of the RESULT body and _watch/_concluded (:500-545) the only reader (ci._protocol has three callers, each on its own marker file: cli_invocation, process_effect, this module). The only other reads of 'subject'/'resolved' in this module are :192 (verdict_of, class exists) and :539 (== 'absent'). AUDITED rather than EQUIVALENT because the RESULT body on the wire does differ (reproduced: exp/wire_exp.py, observation_equal=True, wire_equal=False for all nine, run by me). No document promises the facts' shape for this probe.",
-   "grounds": "",
+   "grounds": "Dropped 'resolved' entry of the same facts: 'resolved' is read only by verdict_of :192 for class exists, which _concluded reaches at :545, after the :543-544 return.",
    "consumers_checked": [
     "verdict_of :187-203 reads 'resolved' only for exists (:192); not reached from :543",
     "python_callable.py:146 reads 'resolved' of the Cycle-1 controller's own facts (another probe, another marker file)",
@@ -5297,7 +5297,7 @@
    "class": "AUDITED",
    "source_sha256": "5237cfa7ba128c0403f3cbd9d8a842e1be3afa2ff2d7066d43a4a28633f77e0a",
    "group": "Wire-only entries of facts that _concluded (python_callable_v2.py:525-545) answers without reading the mutated entry: hard-exit facts return at :536-538 from facts['exit_code'] (the 'subject' read at :539 is after it), the equals-over-a-callable facts return at :543-544 from facts['unsupported']; HARNESS (:245-402) is the only writer of the RESULT body and _watch/_concluded (:500-545) the only reader (ci._protocol has three callers, each on its own marker file: cli_invocation, process_effect, this module). The only other reads of 'subject'/'resolved' in this module are :192 (verdict_of, class exists) and :539 (== 'absent'). AUDITED rather than EQUIVALENT because the RESULT body on the wire does differ (reproduced: exp/wire_exp.py, observation_equal=True, wire_equal=False for all nine, run by me). No document promises the facts' shape for this probe.",
-   "grounds": "",
+   "grounds": "'subject' key emptied in the same facts: wire key '' only; dict keys are not rewritten by _unsubstituted, JSON and the MAC accept it (ran end to end).",
    "consumers_checked": [
     ":539 .get('subject') is None for the emptied key, != 'absent'; :543-544 returns first",
     "_unsubstituted :218-227 rewrites values only; ci._protocol authenticates the bytes as written",
@@ -5318,7 +5318,7 @@
    "class": "AUDITED",
    "source_sha256": "5237cfa7ba128c0403f3cbd9d8a842e1be3afa2ff2d7066d43a4a28633f77e0a",
    "group": "Wire-only entries of facts that _concluded (python_callable_v2.py:525-545) answers without reading the mutated entry: hard-exit facts return at :536-538 from facts['exit_code'] (the 'subject' read at :539 is after it), the equals-over-a-callable facts return at :543-544 from facts['unsupported']; HARNESS (:245-402) is the only writer of the RESULT body and _watch/_concluded (:500-545) the only reader (ci._protocol has three callers, each on its own marker file: cli_invocation, process_effect, this module). The only other reads of 'subject'/'resolved' in this module are :192 (verdict_of, class exists) and :539 (== 'absent'). AUDITED rather than EQUIVALENT because the RESULT body on the wire does differ (reproduced: exp/wire_exp.py, observation_equal=True, wire_equal=False for all nine, run by me). No document promises the facts' shape for this probe.",
-   "grounds": "",
+   "grounds": "'resolved' key emptied in the same facts: as [110] for the reader, as [134] for the wire.",
    "consumers_checked": [
     "verdict_of :192 (class exists only) not reached from the :543 return; no other read of 'resolved' in the module (grep)",
     "_watch :518-521 parses the body whole and hands it to _concluded; keys other than the tested ones are inert",
@@ -5338,7 +5338,7 @@
    "class": "AUDITED",
    "source_sha256": "5237cfa7ba128c0403f3cbd9d8a842e1be3afa2ff2d7066d43a4a28633f77e0a",
    "group": "Wire-only entries of facts that _concluded (python_callable_v2.py:525-545) answers without reading the mutated entry: hard-exit facts return at :536-538 from facts['exit_code'] (the 'subject' read at :539 is after it), the equals-over-a-callable facts return at :543-544 from facts['unsupported']; HARNESS (:245-402) is the only writer of the RESULT body and _watch/_concluded (:500-545) the only reader (ci._protocol has three callers, each on its own marker file: cli_invocation, process_effect, this module). The only other reads of 'subject'/'resolved' in this module are :192 (verdict_of, class exists) and :539 (== 'absent'). AUDITED rather than EQUIVALENT because the RESULT body on the wire does differ (reproduced: exp/wire_exp.py, observation_equal=True, wire_equal=False for all nine, run by me). No document promises the facts' shape for this probe.",
-   "grounds": "",
+   "grounds": "'present' value emptied in the same facts: '' == 'absent' is False exactly as 'present' == 'absent' is, on a path that returns UNSUPPORTED before anything else is read.",
    "consumers_checked": [
     ":539 == 'absent' evaluated and False for both",
     "_unsubstituted: ''.replace(ws, '<ws>') is a no-op (ws non-empty realpath)",
@@ -5358,7 +5358,7 @@
    "class": "AUDITED",
    "source_sha256": "5237cfa7ba128c0403f3cbd9d8a842e1be3afa2ff2d7066d43a4a28633f77e0a",
    "group": "Wire-only entries of facts that _concluded (python_callable_v2.py:525-545) answers without reading the mutated entry: hard-exit facts return at :536-538 from facts['exit_code'] (the 'subject' read at :539 is after it), the equals-over-a-callable facts return at :543-544 from facts['unsupported']; HARNESS (:245-402) is the only writer of the RESULT body and _watch/_concluded (:500-545) the only reader (ci._protocol has three callers, each on its own marker file: cli_invocation, process_effect, this module). The only other reads of 'subject'/'resolved' in this module are :192 (verdict_of, class exists) and :539 (== 'absent'). AUDITED rather than EQUIVALENT because the RESULT body on the wire does differ (reproduced: exp/wire_exp.py, observation_equal=True, wire_equal=False for all nine, run by me). No document promises the facts' shape for this probe.",
-   "grounds": "",
+   "grounds": "'resolved' True -> False in the same facts: same as [110] for the reader; nothing reads the value on this branch (verdict_of reads it only for exists, :192).",
    "consumers_checked": [
     "verdict_of :192 `facts.get('resolved') is True` (class exists), not reached from :543-544; for equals verdict_of reads 'returned' (:193-194), which this dict never carries",
     "grep 'resolved' in aisef2/: python_callable.py :146 (Cycle-1 facts) and python_callable_v2.py :192 and the producers only"
@@ -5373,7 +5373,7 @@
  ],
  "written_against": {
   "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa",
-  "note": "audits were written and reviewed against the module text at base; entries whose module the product fixes changed were carried to the fixed text by validation (remap: same description without line number, same occurrence, same changed line); `remapped_from` names the origin; 13 whose changed line the fixes rewrote are in `unmapped_after_fixes` and are re-derived by the re-measure"
+  "note": "audits were written and reviewed against the module text at base; entries whose module the product fixes changed were carried to the fixed text by validation (remap: the same description without its line number, the same occurrence, the same changed line); `remapped_from` names the origin; the entries in `unmapped_after_fixes` changed their line in the fixes and are re-derived by the re-measure"
  },
  "unmapped_after_fixes": [
   {
