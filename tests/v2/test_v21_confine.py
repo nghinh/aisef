@@ -261,9 +261,9 @@ class HostGuard(unittest.TestCase):
             def faulty(src, dst, *a, **k):
                 done = real_copy(src, dst, *a, **k)     # copytree's own recursion comes back through here
                 c = pathlib.Path(dst, "app", "confine.py")
-                if c.exists():
-                    c.write_text(c.read_text(encoding="utf-8").replace('get_paths()["purelib"]) / probe_file',
-                                                                       'get_paths()["stdlib"]) / probe_file'), encoding="utf-8")
+                if c.exists():   # the copy is the committed text, or the runner's null mutant of it (ast.unparse: 'purelib')
+                    c.write_text(re.sub(r"""get_paths\(\)\[(['"])purelib\1\]\) / probe_file""",
+                                        'get_paths()["stdlib"]) / probe_file', c.read_text(encoding="utf-8")), encoding="utf-8")
                 return done
             for patch, refused in ((mock.patch.object(subprocess, "run", lying), "the venv is not the test's .* nothing was "
                                     "copied into it"),

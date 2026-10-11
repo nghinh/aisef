@@ -1,11 +1,13 @@
 #!/bin/zsh
-# t0-sweep.sh SHA OUT: the T0 sweep (sweep.py) at a detached checkout of SHA, under the workers' environment (env -i, PATH
+# t0-sweep.sh SHA OUT [SEED.jsonl]: the T0 sweep (sweep.py) at a detached checkout of SHA, under the workers' environment (env -i, PATH
 # without opencode, scratch HOME/XDG/TMPDIR under OUT), under the machine-wide heavy lock. Results outside the tree.
+# SEED.jsonl (optional): rows already measured, copied to OUT/sweep.jsonl first — sweep.py skips a key it finds there.
 SP=/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad
 W=/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/v21
-SHA=$1; OUT=$2
+SHA=$1; OUT=$2; SEED=$3
 [[ -n $SHA && -n $OUT && ! -e $OUT ]] || { echo "usage: t0-sweep.sh SHA OUT (OUT absent)"; exit 2; }
 mkdir -p $OUT/home $OUT/xdg/{config,data,state,cache} $OUT/tmp
+[[ -z $SEED ]] || cp $SEED $OUT/sweep.jsonl || exit 3
 GP=$(print -rl -- ${(s.:.)PATH} | while read -r d; do [[ -x $d/opencode ]] || print -r -- $d; done | paste -sd: -)
 git -C $W worktree add -q --detach $OUT/rc $SHA || exit 1
 cd $OUT/rc || exit 9
