@@ -435,7 +435,7 @@ class Callers(unittest.TestCase):
             (hook / "sitecustomize.py").write_text(RS.hook_source(events, tree), encoding="utf-8")
             env = {"PATH": os.environ.get("PATH", ""), "PYTHONPATH": str(hook), **(env_extra or {})}
             r = subprocess.run([sys.executable, "-c", self.CHILD, str(tree), *names], cwd=tree, env=env,
-                               capture_output=True, text=True)
+                               capture_output=True, text=True, encoding="utf-8")
             self.assertEqual((r.returncode, r.stderr), (0, ""))
             return RS.merge(events, tree)
 
