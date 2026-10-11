@@ -9,7 +9,8 @@ preflight ledger with those settings' ceilings; a story the journal shows begun 
 What the record alone says can only LOWER the verdict (a run failure, a refused story, a budget stop) — and the
 record and every evidence file are bound by EVIDENCE.json, whose digest is the anchor the run printed: given that
 anchor (`expect_anchor`), a consistent rewrite of the whole directory is refuted too. Without it, verification proves
-consistency, not authenticity: the run directory is writable by its operator's user."""
+consistency, not authenticity: the run directory is writable by its operator's user. A file that is damaged, or is not
+what a run writes, is a finding — REFUTED with its cause — never a traceback in place of a verdict."""
 
 from __future__ import annotations
 
@@ -75,19 +76,30 @@ def verify(project: Project, out: pathlib.Path, expect_anchor: str | None = None
     anchor = None
     try:
         stored = json.loads((out / R.MANIFEST).read_text(encoding="utf-8"))
-    except OSError:
+    except FileNotFoundError:     # only an absent file is a run of an older release; one that is there is evidence
         stored = None
         notes.append(f"no {R.MANIFEST}: a run of a release before 2.1 — its record is bound by nothing but itself")
     except ValueError:
         stored = None
         problems.append(f"{R.MANIFEST} is not JSON")
+    except OSError as e:
+        stored = None
+        problems.append(f"{R.MANIFEST} cannot be read ({type(e).__name__})")
+    else:
+        if not isinstance(stored, dict) or not isinstance(stored.get("files", {}), dict):    # `null` is not "no manifest"
+            stored = None
+            problems.append(f"{R.MANIFEST} is not an evidence manifest (a JSON object holding its files)")
     if stored is not None:
         anchor = R.anchor_of(stored)
-        fresh = R.evidence_manifest(out)
-        if stored != fresh:
-            changed = sorted(k for k in set(stored.get("files", {})) | set(fresh["files"])
-                             if stored.get("files", {}).get(k) != fresh["files"].get(k))
-            problems.append(f"the evidence manifest does not match the run directory: {changed[:5]}")
+        try:
+            fresh = R.evidence_manifest(out)
+        except OSError as e:     # a file the manifest binds cannot be read: the finding, with the file
+            problems.append(f"an evidence file cannot be read ({type(e).__name__}): {e.filename}")
+        else:
+            if stored != fresh:
+                changed = sorted(k for k in set(stored.get("files", {})) | set(fresh["files"])
+                                 if stored.get("files", {}).get(k) != fresh["files"].get(k))
+                problems.append(f"the evidence manifest does not match the run directory: {changed[:5]}")
     if expect_anchor is not None and anchor != expect_anchor:
         problems.append(f"the evidence anchor is {anchor and anchor[:12]}, not the {expect_anchor[:12]} the run printed")
     elif expect_anchor is not None:     # the match proves integrity against the value given, nothing about its source
@@ -100,10 +112,12 @@ def verify(project: Project, out: pathlib.Path, expect_anchor: str | None = None
     events: list[dict] = []
     if not j:
         problems.append("the run has no journal (it ended before the run began)")
+    elif not isinstance(j, dict):
+        problems.append("RUN.json's journal reference is not an object")
     else:
         try:
             data = (out / j["path"]).read_bytes()
-        except (OSError, KeyError, TypeError) as e:
+        except (OSError, KeyError, TypeError, ValueError) as e:
             data = b""
             problems.append(f"the journal RUN.json names cannot be read ({type(e).__name__})")
         if hashlib.sha256(data).hexdigest() != j.get("sha256") or data.count(b"\n") != j.get("lines"):
@@ -115,40 +129,46 @@ def verify(project: Project, out: pathlib.Path, expect_anchor: str | None = None
                 problems.append("the journal ends in a torn line")
         except Exception as e:  # noqa: BLE001 — any refusal of the reader is the finding
             problems.append(f"the journal does not reconstruct: {type(e).__name__}: {e}"[:500])
-    outcomes = R.outcomes_from(events)
-    recorded = rec.get("story_outcomes") or {}
-    differ = sorted(s for s in outcomes if recorded.get(s) != outcomes[s])
-    if differ:
-        problems.append(f"the record's story outcomes are not the journal's for {differ}")
-    refused = R.unfinished(events)
-    bound, s = _runspec_problems(project, rec, events)
-    problems += bound
-    stop = None
-    if s is not None:
-        spent, stop = _spend(out, s, events, rec)
-        claimed = (rec.get("budget") or {}).get("spent") or {}
-        off = [k for k in client.Budget.KEYS if claimed.get(k) != spent[k]]
-        if off:
-            problems.append(f"the record's spend is not what the evidence re-derives for {off}")
-    # what can only lower the verdict is taken from the record too; nothing in it can raise one
-    errors = [{"story": x, "error": "begun and never ended in the journal"} for x in refused] + list(rec.get("story_errors") or [])
-    verdict, _, committed = R.delivery(project, events, outcomes, stop or rec.get("budget_stop"), errors)
-    if rec.get("failure") and verdict == "PASS":
-        verdict = "FAIL"
-    if rec.get("delivery_verdict") != verdict:
-        problems.append(f"the record says {rec.get('delivery_verdict')}; the journal re-derives {verdict}")
-    if events and rec.get("productproof") != R.productproof(project, events, committed):
-        problems.append("the record's ProductProof account is not the one the journal re-derives")
-    if isinstance(rec.get("usage"), dict) and "error" not in rec["usage"]:     # V2.1: the account is the evidence's
-        try:
-            prices = settings.load(rec.get("settings") or {}).prices
-        except settings.SettingsError:
-            prices = None
-        if rec["usage"] != json.loads(json.dumps(usage.usage(out, events, prices, rec), default=str)) \
-                or rec.get("no_progress") != usage.no_progress(events):
-            problems.append("the record's usage is not what the evidence re-derives")
-    if rec.get("final_main") and (out / "repo").exists():
-        if git(out / "repo", "rev-parse", "main").stdout.strip() != rec["final_main"]:
-            problems.append("the run's repository main is not the record's final main")
+    # what follows re-derives from the record's fields and the evidence's files: a field of another type than the run
+    # writes, a stream or a ledger that does not read, is a finding — never a traceback in place of a verdict
+    verdict = None
+    try:
+        outcomes = R.outcomes_from(events)
+        recorded = rec.get("story_outcomes") or {}
+        differ = sorted(s for s in outcomes if recorded.get(s) != outcomes[s])
+        if differ:
+            problems.append(f"the record's story outcomes are not the journal's for {differ}")
+        refused = R.unfinished(events)
+        bound, s = _runspec_problems(project, rec, events)
+        problems += bound
+        stop = None
+        if s is not None:
+            spent, stop = _spend(out, s, events, rec)
+            claimed = (rec.get("budget") or {}).get("spent") or {}
+            off = [k for k in client.Budget.KEYS if claimed.get(k) != spent[k]]
+            if off:
+                problems.append(f"the record's spend is not what the evidence re-derives for {off}")
+        # what can only lower the verdict is taken from the record too; nothing in it can raise one
+        errors = [{"story": x, "error": "begun and never ended in the journal"} for x in refused] + list(rec.get("story_errors") or [])
+        verdict, _, committed = R.delivery(project, events, outcomes, stop or rec.get("budget_stop"), errors)
+        if rec.get("failure") and verdict == "PASS":
+            verdict = "FAIL"
+        if rec.get("delivery_verdict") != verdict:
+            problems.append(f"the record says {rec.get('delivery_verdict')}; the journal re-derives {verdict}")
+        if events and rec.get("productproof") != R.productproof(project, events, committed):
+            problems.append("the record's ProductProof account is not the one the journal re-derives")
+        if isinstance(rec.get("usage"), dict) and "error" not in rec["usage"]:     # V2.1: the account is the evidence's
+            try:
+                prices = settings.load(rec.get("settings") or {}).prices
+            except settings.SettingsError:
+                prices = None
+            if rec["usage"] != json.loads(json.dumps(usage.usage(out, events, prices, rec), default=str)) \
+                    or rec.get("no_progress") != usage.no_progress(events):
+                problems.append("the record's usage is not what the evidence re-derives")
+        if rec.get("final_main") and (out / "repo").exists():
+            if git(out / "repo", "rev-parse", "main").stdout.strip() != rec["final_main"]:
+                problems.append("the run's repository main is not the record's final main")
+    except Exception as e:  # noqa: BLE001 — whatever the reader refuses is the finding
+        problems.append(f"the record cannot be re-derived from the evidence: {type(e).__name__}: {e}"[:500])
     return {"verdict": "REFUTED" if problems else "VERIFIED", "problems": problems, "delivery_verdict": verdict,
             "journal_events": len(events), "evidence_anchor": anchor, "notes": notes}
