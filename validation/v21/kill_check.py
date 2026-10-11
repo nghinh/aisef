@@ -54,11 +54,10 @@ def main(argv: list[str]) -> int:
     target, files = args[0], args[1:]
     if only is not None:
         full = m.mutants
+        src = (ROOT / target.split("::")[0]).read_text(encoding="utf-8")
+        # the descriptions of the listed positions, taken from the unfiltered list BEFORE the filter is installed
+        names = [d for i, (d, _) in enumerate(full(src, target.split("::")[1], m._enum_members(src, ROOT))) if i in only]
         m.mutants = only_positions(full, only)
-        names = [d for i, (d, _) in enumerate(full((ROOT / target.split("::")[0]).read_text(encoding="utf-8"),
-                                                    target.split("::")[1],
-                                                    m._enum_members((ROOT / target.split("::")[0]).read_text(encoding="utf-8"), ROOT)))
-                 if i in only]
         positions = sorted(only)
     r = m.run_target(ROOT, target, files)
     if r.get("error") and not r.get("results"):
