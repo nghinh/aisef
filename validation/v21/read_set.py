@@ -3,10 +3,26 @@
 The recorder of the read-set `validation/qualification/v21_snapshot_delta.py --read-set R.json` consumes: for every kill
 file, which files of the runner's tree it opened or looked up, and which directories it listed.
 
-    {"commit": "<HEAD's full sha>", "kill_files": {"<kill file>": {"opened": [path], "listed": [dir]}}}
+    {"commit": "<HEAD's full sha>", "kill_files": {"<kill file>": {"opened": [path], "listed": [dir],
+                                                                   "listed_by": {dir: [file]}, "listed_via": {dir: [file]}}}}
 
 Every path is relative to the root of the tree the run used ("." is the root; what lies outside it is left out),
 written with "/", sorted, unique; a kill file's own path is among its `opened` (its import opens it).
+
+Who listed it. Every listing event (os.listdir, os.scandir — which every glob, rglob and walk of the stdlib goes
+through) also records the files of the tree on the Python stack at the event: the stdlib, site-packages, frozen and
+string code are not files of the tree and take no slot, a file is counted once, at most four, innermost first.
+`listed_by` is, for each listed directory, the sorted union over the events of the INNERMOST of them: the repository
+code that made the listing (the stdlib frames of glob/pathlib between it and the OS are not a file of the tree).
+`listed_via` is the union over the events of all (up to four) files recorded: the lister and the code that called it,
+for reading only. They differ on purpose: at 2b90242 `tests/v2` is listed by `aisef2/invariants/registry.py` alone
+(`listed_by`, every kill file: `test_directories`, reached from every `tests/v2/**/__init__.py` through `arm`), while
+`listed_via` also names those `__init__.py` files, the callers of `arm`; a rule on the whole stack could never say
+"this listing is that function's". A listing with no file of the tree on its stack (the interpreter's own machinery
+under --control own-walk, C code, `-c` or frozen code, a thread whose own frames are the stdlib's) is attributed to
+["<native>"]: a name no consumer takes for a file. A child Python process that runs the hook is attributed by its own
+stack; a listing by a child that does not run it is not recorded at all (it is not in `listed` either: limits).
+`opened` and `listed` are unchanged by it; a consumer that does not know `listed_by` ignores it.
 
 What it does. For each kill file of `--files` (default: every distinct file of `mutation.V21_TARGETS`):
   * a fresh copy of the runner's tree: `mutation._pristine` (the COPY parts of this checkout, no __pycache__, no live
@@ -107,10 +123,11 @@ UNDER = ("no-stat", "no-children")
 HOOK = r'''import os, sys, _thread
 
 sys.dont_write_bytecode = True
-_EV, _STAT, _KIDS, _OWN = @EVENTS@, @STAT@, @CHILDREN@, @OWN@
+_EV, _STAT, _KIDS, _OWN, _ROOTS = @EVENTS@, @STAT@, @CHILDREN@, @OWN@, @ROOTS@
 _HOOK = os.path.dirname(os.path.abspath(__file__))
 _o, _w, _pid, _cwd = os.open, os.write, os.getpid, os.getcwd
 _join, _norm, _isabs, _fspath, _fsdecode = os.path.join, os.path.normpath, os.path.isabs, os.fspath, os.fsdecode
+_nc = os.path.normcase
 _st, _tl = {"pid": None, "fd": None}, _thread._local()
 
 
@@ -167,17 +184,40 @@ def _run(fn, *args):
         _tl.busy = False
 
 
+def _callers(f):
+    """The files of the tree on the stack from frame `f` outward, innermost first, distinct, at most 4: stdlib,
+    site-packages, frozen and string code are not under the tree. None of them: `<native>`."""
+    out = []
+    try:
+        while f is not None and len(out) < 4:
+            n, f = f.f_code.co_filename, f.f_back
+            w = None if n.startswith("<") else _where(n)
+            if w and w not in out and any(_nc(w).startswith(r + os.sep) for r in _ROOTS):
+                out.append(w)
+    except Exception:   # a relative name and a cwd that is gone: what is not known is not discounted
+        out.append("<native>")
+    return out or ["<native>"]
+
+
+def _esc(s):
+    return s.replace("\\", "\\\\").replace("\n", "\\n").replace("\t", "\\t")
+
+
 def _note(kind, p):
     w = _where(p)
     if w is None:
         return
-    if kind != "o" and not _OWN:
+    f = None
+    if kind != "o":
         f = sys._getframe(1)
-        while f.f_code.co_filename == _note.__code__.co_filename:   # the frame of the code that made the call
+        while f is not None and f.f_code.co_filename == _note.__code__.co_filename:   # the frame of the code that made the call
             f = f.f_back
-        if _own(f):
+        if f is not None and not _OWN and _own(f):
             return
-    _emit(kind + "\t" + w.replace("\\", "\\\\").replace("\n", "\\n") + "\n")
+    line = kind + "\t" + _esc(w)
+    if kind == "l":   # who listed it: the files of the tree on this thread's stack
+        line += "".join("\t" + _esc(c) for c in _callers(f))
+    _emit(line + "\n")
 
 
 def _isolated(argv):
@@ -253,9 +293,15 @@ except Exception:
 '''
 
 
-def hook_source(events: pathlib.Path, controls=()) -> str:
+def _roots(tree: pathlib.Path) -> tuple[str, ...]:
+    """The tree under both its spellings, normalised: what a path of the tree starts with (merge and the hook)."""
+    return tuple(dict.fromkeys(os.path.normcase(os.path.normpath(str(p))) for p in (tree, tree.resolve())))
+
+
+def hook_source(events: pathlib.Path, tree: pathlib.Path, controls=()) -> str:
     return (HOOK.replace("@EVENTS@", repr(str(events))).replace("@STAT@", repr("no-stat" not in controls))
-            .replace("@CHILDREN@", repr("no-children" not in controls)).replace("@OWN@", repr("own-walk" in controls)))
+            .replace("@CHILDREN@", repr("no-children" not in controls)).replace("@OWN@", repr("own-walk" in controls))
+            .replace("@ROOTS@", repr(_roots(tree))))
 
 
 def _rel(path: str, roots: tuple[str, ...]) -> str | None:
@@ -269,22 +315,33 @@ def _rel(path: str, roots: tuple[str, ...]) -> str | None:
     return None
 
 
-_ESC = re.compile(r"\\([\\n])")
+_ESC = re.compile(r"\\([\\nt])")
+_UNESC = {"\\": "\\", "n": "\n", "t": "\t"}
+NATIVE = "<native>"   # listed_by: a listing with no file of the tree on its stack
+
+
+def _unesc(s: str) -> str:
+    return _ESC.sub(lambda m: _UNESC[m[1]], s)
 
 
 def merge(events: pathlib.Path, tree: pathlib.Path) -> dict:
-    """What every process of one kill-file run wrote under `events`: opened, listed, children counts."""
-    roots = tuple(dict.fromkeys(os.path.normcase(os.path.normpath(str(p))) for p in (tree, tree.resolve())))
-    opened, listed = set(), set()
+    """What every process of one kill-file run wrote under `events`: opened, listed (and by which files of the tree:
+    the innermost one of each listing, `listed_by`, and up to four of its stack, `listed_via`), children counts."""
+    roots = _roots(tree)
+    opened, listed, chains = set(), set(), {}
     kids = {"started": 0, "python": 0, "python_unhooked": 0, "other": 0}
     files = sorted(events.glob("*.ev"))
     for f in files:
         for line in f.read_bytes().decode("utf-8", "surrogateescape").split("\n"):
             kind, _, rest = line.partition("\t")
             if kind in ("o", "s", "l"):
-                rel = _rel(_ESC.sub(lambda m: "\\" if m[1] == "\\" else "\n", rest), roots)
+                path, *callers = rest.split("\t") if kind == "l" else [rest]
+                rel = _rel(_unesc(path), roots)
                 if rel is not None and "__pycache__" not in rel.split("/"):   # a cache lookup, never a file of the tree
                     (listed if kind == "l" else opened).add(rel)
+                    if kind == "l":
+                        by = [r for c in callers if (r := _rel(_unesc(c), roots)) and "__pycache__" not in r.split("/")]
+                        chains.setdefault(rel, set()).add(tuple(by) or (NATIVE,))   # no caller recorded: not discounted
             elif kind == "C":
                 _, py, hooked = rest.split("\t")
                 kids["started"] += 1
@@ -294,7 +351,9 @@ def merge(events: pathlib.Path, tree: pathlib.Path) -> dict:
     # `hooked`: processes that ran the hook, less the kill file's own; `unobserved`: started and not seen
     kids["hooked"] = max(len(files) - 1, 0)
     kids["unobserved"] = kids["python_unhooked"] + kids["other"]
-    return {"opened": sorted(opened), "listed": sorted(listed), "children": kids}
+    return {"opened": sorted(opened), "listed": sorted(listed), "children": kids,
+            "listed_by": {d: sorted({c[0] for c in cs}) for d, cs in sorted(chains.items())},
+            "listed_via": {d: sorted({f for c in cs for f in c}) for d, cs in sorted(chains.items())}}
 
 
 def record(root, files, controls=(), progress=None) -> dict:
@@ -318,10 +377,11 @@ def record(root, files, controls=(), progress=None) -> dict:
                 events, hook = scratch / f"events-{i}", scratch / f"hook-{i}"
                 events.mkdir()
                 hook.mkdir()
-                (hook / "sitecustomize.py").write_text(hook_source(events, controls), encoding="utf-8")
                 tg.pristine = pristine   # a tree of its own per kill file, by the runner's helper; no residue check
                 M._new_tree(tg)
                 tg.pristine = None
+                tree = tg.tree   # the run's, even when the runner rebuilds it after the run: the hook names this one
+                (hook / "sitecustomize.py").write_text(hook_source(events, tree, controls), encoding="utf-8")
                 M._env = lambda run, token, h=hook: {**real_env(run, token), "PYTHONPATH": str(h)}
                 rows: list[dict] = []
                 try:
@@ -332,9 +392,10 @@ def record(root, files, controls=(), progress=None) -> dict:
                     row["why"] = str(e)
                 finally:
                     M._env = real_env
-                got = merge(events, tg.tree)
-                entry = {"opened": got["opened"], "listed": got["listed"], "outcome": row.get("outcome"),
-                         "seconds": row.get("seconds"), "children": got["children"]}
+                got = merge(events, tree)
+                entry = {"opened": got["opened"], "listed": got["listed"], "listed_by": got["listed_by"],
+                         "listed_via": got["listed_via"], "outcome": row.get("outcome"), "seconds": row.get("seconds"),
+                         "children": got["children"]}
                 for k in ("why", "leaked", "residual"):
                     if row.get(k):
                         entry[k] = row[k]
@@ -376,6 +437,9 @@ def record(root, files, controls=(), progress=None) -> dict:
                  "so does a child of one",
                  "not seen: reads with no event and no wrapped call (C libraries, os.access, os.readlink, os.fwalk, "
                  "dir_fd, DirEntry.stat, the import system's private stat), symlinks inside the tree",
+                 "listed_by names the innermost file of the tree on the stack of each listing (listed_via: up to four): "
+                 "what that file's function does with the listing is not recorded, and a listing with no file of the "
+                 "tree on its stack is '<native>'; a directory listed by a child that is not hooked is not in `listed`",
                  "the unmutated tree: a mutant may read what the original does not",
                  "the interpreter's own walk to find code is left out (--control own-walk records it)"]}
     return doc

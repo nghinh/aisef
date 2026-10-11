@@ -28,13 +28,25 @@ from validation.v2 import mutation as M  # noqa: E402
 from validation.v21 import read_set as RS  # noqa: E402
 
 POSIX = os.name == "posix"
-COPY = ("pkg", "data", "tests")
+COPY = ("pkg", "data", "data2", "tests")
 INIT = "tests/v2/__init__.py"
 T = "tests/v2/test_{}.py"
 
 TREE = {
     "pkg/__init__.py": "", "pkg/mod.py": "VALUE = 1\n",
-    "data/a.txt": "a", "data/c.txt": "c", "data/sub/b.txt": "b",
+    "pkg/registry.py": """
+        import os
+        import pathlib
+
+
+        def names(directory):
+            return sorted(os.listdir(directory))
+
+
+        def txt(directory):   # pathlib's walk: the stdlib's frames sit between this file and the scandir
+            return sorted(p.name for p in pathlib.Path(directory).rglob("*.txt"))
+        """,
+    "data/a.txt": "a", "data/c.txt": "c", "data/sub/b.txt": "b", "data2/we\tird/x.txt": "x",
     "tests/__init__.py": "", INIT: "",
     T.format("nothing"): """
         import unittest
@@ -54,6 +66,39 @@ TREE = {
                 self.assertEqual(os.listdir("data/sub"), ["b.txt"])
                 with os.scandir("data") as it:
                     self.assertEqual(sorted(e.name for e in it), ["a.txt", "c.txt", "sub"])
+        """,
+    T.format("registry"): """
+        import unittest
+        from pkg import registry
+        class K(unittest.TestCase):
+            def test(self):
+                self.assertEqual(registry.names("data/sub"), ["b.txt"])
+                self.assertEqual(registry.txt("data"), ["a.txt", "b.txt", "c.txt"])   # data and data/sub
+        """,
+    T.format("two_callers"): """
+        import os, unittest
+        from pkg import registry
+        class K(unittest.TestCase):
+            def test(self):
+                self.assertEqual(registry.names("data"), ["a.txt", "c.txt", "sub"])   # data: by the registry ...
+                with os.scandir("data") as it:   # ... and by this file
+                    self.assertEqual(sorted(e.name for e in it), ["a.txt", "c.txt", "sub"])
+        """,
+    T.format("child_lists"): """
+        import subprocess, sys, unittest
+        class K(unittest.TestCase):
+            def test(self):   # each child is hooked: its own stack tells who listed
+                a = subprocess.run([sys.executable, "-c", "from pkg import registry; print(registry.names('data/sub'))"],
+                                   capture_output=True, text=True)
+                b = subprocess.run([sys.executable, "-c", "import os; print(os.listdir('data/sub'))"],
+                                   capture_output=True, text=True)
+                self.assertEqual((a.stdout.strip(), b.stdout.strip()), ("['b.txt']", "['b.txt']"))
+        """,
+    T.format("odd_names"): """
+        import os, unittest
+        class K(unittest.TestCase):
+            def test(self):   # a tab and a backslash in a name: one field of an event line each
+                self.assertEqual(os.listdir("data2/we\\tird"), ["x.txt"])
         """,
     T.format("stats"): """
         import os, unittest
@@ -157,19 +202,45 @@ class ToyRecord(unittest.TestCase):
         nothing = T.format("nothing")
         base = set(self.kf[nothing]["opened"]) - {nothing}
         self.assertEqual(base, {INIT, "tests/v2"})   # the package its import opens, the directory discover looked up
+        reg = {"pkg/__init__.py", "pkg/registry.py"}
         extra = {"opens": {"data/a.txt", "pkg/__init__.py", "pkg/mod.py"}, "stats": {"data/c.txt"},
                  "lists": set(), "child": {"data/a.txt"}, "child_env": set(), "child_isolated": set(),
-                 "child_pythonpath": set(),
+                 "child_pythonpath": set(), "registry": reg, "two_callers": reg, "child_lists": reg,
                  "child_other": set(), "dirfd": {"data/sub"}}
         for name, more in extra.items():
             with self.subTest(name):
                 f = T.format(name)
                 self.assertEqual(self.kf[f]["opened"], sorted(base | {f} | more))
         self.assertEqual(self.kf[nothing]["listed"], [])
-        self.assertEqual(self.kf[T.format("lists")]["listed"], ["data", "data/sub"])   # listdir and scandir
+        listing = {"lists": ["data", "data/sub"], "registry": ["data", "data/sub"],   # listdir, scandir, rglob
+                   "two_callers": ["data"], "child_lists": ["data/sub"], "odd_names": ["data2/we\tird"]}
+        for name, listed in listing.items():
+            self.assertEqual(self.kf[T.format(name)]["listed"], listed, name)
         for f in PASSING:
-            if f != T.format("lists"):
+            if f not in {T.format(n) for n in listing}:
                 self.assertEqual(self.kf[f]["listed"], [], f)
+
+    def test_each_listed_directory_is_attributed_to_the_file_of_the_tree_that_made_the_listing(self):
+        """listed_by: the innermost file of the tree on the stack; listed_via: up to four of them, the callers too."""
+        k = {n: self.kf[T.format(n)] for n in ("lists", "registry", "two_callers", "child_lists", "nothing")}
+        reg, mine = "pkg/registry.py", {n: T.format(n) for n in ("lists", "registry", "two_callers", "child_lists")}
+        self.assertEqual(k["lists"]["listed_by"], {"data": [mine["lists"]], "data/sub": [mine["lists"]]})   # its own call
+        self.assertEqual(k["registry"]["listed_by"], {"data": [reg], "data/sub": [reg]})   # pathlib's frames are not files of the tree
+        self.assertEqual(k["registry"]["listed_via"], {d: [reg, mine["registry"]] for d in ("data", "data/sub")})
+        self.assertEqual(k["two_callers"]["listed_by"],   # the union over the events of a directory
+                         {"data": sorted([reg, mine["two_callers"]])})
+        self.assertEqual(k["child_lists"]["listed_by"], {"data/sub": sorted([reg, "<native>"])})   # a -c child, hooked
+        self.assertEqual(k["child_lists"]["listed_via"], {"data/sub": sorted([reg, "<native>"])})
+        self.assertEqual(k["nothing"]["listed_by"], {})
+        odd = self.kf[T.format("odd_names")]
+        self.assertEqual((odd["listed"], odd["listed_by"]), (["data2/we\tird"], {"data2/we\tird": [T.format("odd_names")]}))
+        for f, e in self.kf.items():   # one entry per listed directory, no other
+            self.assertEqual(sorted(e["listed_by"]), e["listed"], f)
+            self.assertEqual(sorted(e["listed_via"]), e["listed"], f)
+            for d, via in e["listed_via"].items():
+                self.assertTrue(set(e["listed_by"][d]) <= set(via), (f, d))
+        # the same directory by the registry-like file in one kill file and by the kill file itself in another
+        self.assertNotEqual(k["registry"]["listed_by"]["data/sub"], k["lists"]["listed_by"]["data/sub"])
 
     def test_a_kill_files_own_path_is_among_what_it_opened_and_every_row_has_its_outcome(self):
         self.assertEqual(sorted(self.kf), PASSING)
@@ -215,7 +286,7 @@ class ToyRecord(unittest.TestCase):
         m = self.doc["limits"]["measured_children"]
         self.assertEqual(m["kill_files_with_unobserved_children"],
                          [T.format(n) for n in ("child_env", "child_isolated", "child_other", "child_pythonpath")])
-        self.assertEqual((m["started"], m["python"], m["python_unhooked"], m["other"], m["hooked"]), (5, 4, 3, 1, 1))
+        self.assertEqual((m["started"], m["python"], m["python_unhooked"], m["other"], m["hooked"]), (7, 6, 3, 1, 3))
         self.assertTrue(self.doc["limits"]["text"])
 
     def test_control_with_the_child_hook_off_the_childs_read_is_missing(self):
@@ -316,15 +387,68 @@ class Merge(unittest.TestCase):
             ev.mkdir()
             r = str(real / "tree")
             (ev / "10.ev").write_text("\n".join([
-                "P\t10\t1", f"o\t{r}/a.txt", f"o\t{tree}/b.txt", f"l\t{r}", f"s\t{r}/d/e.txt",
+                "P\t10\t1", f"o\t{r}/a.txt", f"o\t{tree}/b.txt", f"l\t{r}\t{r}/reg.py\t{tree}/t/test_a.py", f"s\t{r}/d/e.txt",
                 f"o\t{r}/__pycache__/a.cpython-314.pyc", f"o\t{base}/outside.txt", f"o\t{r}x/near.txt",
-                f"o\t{r}/we\\\\ird\\nname", "C\tsubprocess.Popen\t1\t1", "C\tos.system\t0\t0", ""]), encoding="utf-8")
-            (ev / "11.ev").write_text("P\t11\t10\nC\tsubprocess.Popen\t1\t0\n", encoding="utf-8")
+                f"o\t{r}/we\\\\ird\\nname", "C\tsubprocess.Popen\t1\t1", "C\tos.system\t0\t0",
+                f"l\t{r}/d\t{r}/other.py",   # a second event of another file: the union is per directory
+                f"l\t{r}\t{r}/other.py\t{r}/reg.py",
+                f"l\t{r}/e\t{base}/outside.py\t{r}x/near.py",   # no caller of the tree: <native>
+                f"l\t{r}/f",   # an event with no caller field at all: <native> too
+                f"l\t{r}/g\t{r}/we\\\\ird\\tname.py", ""]), encoding="utf-8")
+            (ev / "11.ev").write_text(f"P\t11\t10\nC\tsubprocess.Popen\t1\t0\nl\t{r}/d\t{r}/child.py\n",
+                                      encoding="utf-8")
             got = RS.merge(ev, tree)
         self.assertEqual(got["opened"], ["a.txt", "b.txt", "d/e.txt", "we\\ird\nname"])
-        self.assertEqual(got["listed"], ["."])
+        self.assertEqual(got["listed"], [".", "d", "e", "f", "g"])
+        self.assertEqual(got["listed_by"], {".": ["other.py", "reg.py"], "d": ["child.py", "other.py"], "e": ["<native>"],
+                                            "f": ["<native>"], "g": ["we\\ird\tname.py"]})
+        self.assertEqual(got["listed_via"], {".": ["other.py", "reg.py", "t/test_a.py"], "d": ["child.py", "other.py"],
+                                             "e": ["<native>"], "f": ["<native>"], "g": ["we\\ird\tname.py"]})
         self.assertEqual(got["children"], {"started": 3, "python": 2, "python_unhooked": 1, "other": 1, "hooked": 1,
                                            "unobserved": 2})
+
+
+@unittest.skipUnless(POSIX, "exercised on POSIX only (a hooked child process)")
+class Callers(unittest.TestCase):
+    """The hook's stack walk on a stack built by hand (code objects of chosen file names, called through one another):
+    stdlib frames take no slot, the innermost file of the tree is `listed_by`, at most four distinct files in
+    `listed_via`, innermost first, a file twice counts once."""
+
+    CHILD = textwrap.dedent("""
+        import os, sys
+        tree, names = sys.argv[1], sys.argv[2:]
+        fn = lambda: os.listdir(os.path.join(tree, "data"))   # <string>: not a file of the tree
+        for name in reversed(names):   # outermost first; each frame is a code object of its own file name
+            ns = {"nxt": fn}
+            exec(compile("def f():\\n    return nxt()\\n", name.replace("@", tree), "exec"), ns)
+            fn = ns["f"]
+        fn()
+        """)
+
+    def run_child(self, names, env_extra=None):
+        with tempfile.TemporaryDirectory() as t:
+            base = pathlib.Path(t)
+            tree, events, hook = base / "tree", base / "ev", base / "hook"
+            for d in (tree / "data", events, hook):
+                d.mkdir(parents=True)
+            (hook / "sitecustomize.py").write_text(RS.hook_source(events, tree), encoding="utf-8")
+            env = {"PATH": os.environ.get("PATH", ""), "PYTHONPATH": str(hook), **(env_extra or {})}
+            r = subprocess.run([sys.executable, "-c", self.CHILD, str(tree), *names], cwd=tree, env=env,
+                               capture_output=True, text=True)
+            self.assertEqual((r.returncode, r.stderr), (0, ""))
+            return RS.merge(events, tree)
+
+    def test_a_stdlib_frame_takes_no_slot_and_the_innermost_file_of_the_tree_is_the_lister(self):
+        mine = [f"@/pkg/{c}.py" for c in "abcdeFe"]   # outermost first: e innermost, e twice, F, d, c, b, a
+        stdlib = [f"/fake/lib/python3/s{i}.py" for i in range(5)]   # inside it: five files, none of the tree
+        got = self.run_child([*mine, *stdlib])
+        self.assertEqual(got["listed"], ["data"])
+        self.assertEqual(got["listed_by"], {"data": ["pkg/e.py"]})
+        self.assertEqual(got["listed_via"], {"data": ["pkg/F.py", "pkg/c.py", "pkg/d.py", "pkg/e.py"]})   # not a, b: four
+
+    def test_a_stack_with_no_file_of_the_tree_is_native(self):
+        got = self.run_child(["/fake/lib/python3/s0.py", "/elsewhere/other.py"])
+        self.assertEqual((got["listed_by"], got["listed_via"]), ({"data": ["<native>"]}, {"data": ["<native>"]}))
 
 
 class Cli(unittest.TestCase):
