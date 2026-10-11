@@ -98,7 +98,7 @@ def _read() -> tuple[dict[int, Host], int]:
     out = {}
     for line in stdout.splitlines():
         f = line.split(None, 8)  # pid ppid pgid Www Mmm dd HH:MM:SS yyyy command
-        if len(f) < 8:
+        if len(f) < 8 or not all(x.isdigit() for x in f[:3]):   # a continuation line of a multi-line command is no row
             continue
         try:
             born = time.mktime(time.strptime(" ".join(f[3:8]), "%a %b %d %H:%M:%S %Y"))
