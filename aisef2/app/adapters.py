@@ -164,11 +164,16 @@ class Reviewer:
                      if e.type == "story/begin" and e.data.get("story_id") == story), None)
         if base is None:
             raise CapabilityUnrunnable(f"the journal names no parent of {story}")
-        changed = git(scope.root, "diff", "--name-status", "--no-renames", f"{base}..{head}")
+        # -z: NUL ends every field and no path is quoted, so a path is read whole whatever its characters and the
+        # repository's core.quotepath (git's default prints a non-ASCII path C-quoted); --no-renames: a row is a
+        # status letter and one path
+        changed = git(scope.root, "diff", "-z", "--name-status", "--no-renames", f"{base}..{head}")
         if changed.returncode != 0:
             raise CapabilityUnrunnable(f"git diff {base[:12]}..{head[:12]} exited {changed.returncode}")
-        # a row ends at "\n" only: splitlines also breaks at U+0085/U+2028/U+2029, which core.quotepath=false prints raw
-        rows = [ln.split("\t", 1) for ln in changed.stdout.split("\n") if "\t" in ln]
+        fields = changed.stdout.split("\0")[:-1]       # the last field is closed by its NUL too
+        rows = list(zip(fields[0::2], fields[1::2], strict=False))
+        if 2 * len(rows) != len(fields) or any(len(k) != 1 for k, _ in rows):   # a row of two paths, a dangling status
+            raise CapabilityUnrunnable(f"git diff {base[:12]}..{head[:12]} printed a row of another shape: {fields[:3]!r}")
         mine = [(k, p) for k, p in rows if p.split("/")[0] in self.project.product_roots]
         required = sorted(p for k, p in mine if k != "D")
         log = self.logs / f"{story}.reviewer.{attempt}.jsonl"
