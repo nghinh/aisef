@@ -78,7 +78,13 @@ def severity_of(finding: Mapping) -> str:
 
 
 def reproducer_contract(finding: Mapping, requirements: Mapping[str, object], product_roots) -> BehaviorContract | str:
-    """The finding's reproducer as an (unapproved, never compiled into the plan) MUST_HOLD contract, or why not."""
+    """The finding's reproducer as an (unapproved, never compiled into the plan) MUST_HOLD contract, or why not.
+
+    The finding's prose — its id and the first 500 characters of its summary — is the contract's id and rationale, which
+    no control path reads, so it never decides the verdict. The contract's hash is over UTF-8, which has no form for a
+    lone surrogate (`json.loads` yields one from a model's "\\ud800"): each is written as its own escape, `\\ud800`; text
+    that encodes is hashed as it is. A surrogate in the reproducer itself (stimulus, observable, locator) is not prose:
+    the reproducer is refused, naming why."""
     r = finding.get("reproducer")
     if not isinstance(r, Mapping):
         return "no reproducer: the finding states no observable behaviour"
@@ -96,11 +102,12 @@ def reproducer_contract(finding: Mapping, requirements: Mapping[str, object], pr
     if top not in product_roots:
         return f"the subject {locator!r} is not in the product ({sorted(product_roots)})"
     try:
-        return BehaviorContract.create(id=f"REVIEW-{finding.get('id', 'finding')}", requirement_ids=(rid,),
+        cid, why = (t.encode("utf-8", "backslashreplace").decode("utf-8")
+                    for t in (f"REVIEW-{finding.get('id', 'finding')}", str(finding.get("summary", ""))[:500]))
+        return BehaviorContract.create(id=cid, requirement_ids=(rid,),
                                        subject=Subject(SubjectKind(subject["kind"]), locator), stimulus=r["stimulus"],
                                        observable=r["observable"], polarity=Polarity.MUST_HOLD,
-                                       subject_absence=SubjectAbsence.REQUIRES_SUBJECT,
-                                       rationale=str(finding.get("summary", ""))[:500])
+                                       subject_absence=SubjectAbsence.REQUIRES_SUBJECT, rationale=why)
     except (ContractError, ValueError, TypeError) as e:
         return f"the reproducer is not a contract: {e}"
 
