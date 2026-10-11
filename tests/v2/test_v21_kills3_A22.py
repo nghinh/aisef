@@ -40,9 +40,11 @@ JOURNAL = "run/journals/aisef-run.jsonl"
 HEX12 = re.compile(r"\b[0-9a-f]{12}\b")     # a 12-hex prefix standing alone: not part of a longer run of hex
 
 
-def write_run(out: pathlib.Path, project, capabilities: list[dict], spec: dict, record_settings: dict) -> None:
+def write_run(out: pathlib.Path, project, capabilities: list[dict], spec: dict, record_settings: dict,
+              manifest: bool = True) -> None:
     """The run directory a run that resolved its RunSpec and went no further leaves: the journal, the record that
-    names it (spend zero, ProductProof as the journal re-derives it) and the manifest that binds both."""
+    names it (spend zero, ProductProof as the journal re-derives it) and the manifest that binds both — which a
+    run of a release before 2.1 did not write (`manifest=False`)."""
     (out / "run" / "journals").mkdir(parents=True)
     w = JournalWriter3(out / JOURNAL, clock=lambda: 1.0)     # no wall clock: the same bytes on every run
     try:
@@ -61,7 +63,8 @@ def write_run(out: pathlib.Path, project, capabilities: list[dict], spec: dict, 
            "budget": {"spent": {k: 0 for k in client.Budget.KEYS}},
            "productproof": R.productproof(project, events, set())}
     (out / "RUN.json").write_text(json.dumps(rec), encoding="utf-8")
-    (out / R.MANIFEST).write_text(json.dumps(R.evidence_manifest(out)), encoding="utf-8")
+    if manifest:
+        (out / R.MANIFEST).write_text(json.dumps(R.evidence_manifest(out)), encoding="utf-8")
 
 
 class WithProject(unittest.TestCase):
@@ -81,11 +84,12 @@ class MiniRun(WithProject):
         self.addCleanup(t.cleanup)
         self.out = pathlib.Path(t.name).resolve() / "out"
 
-    def make(self, *, capabilities=None, spec=None, record_settings=None) -> None:
+    def make(self, *, capabilities=None, spec=None, record_settings=None, manifest=True) -> None:
         cap = opaque("kernel", Enforcement.FULL, tool="x")
         bound = resolve([cap], R.layers_of(self.project, settings.load(e2e.SETTINGS)), REVISION)
         write_run(self.out, self.project, [cap.resolved()] if capabilities is None else capabilities,
-                  bound.resolved() if spec is None else spec, e2e.SETTINGS if record_settings is None else record_settings)
+                  bound.resolved() if spec is None else spec, e2e.SETTINGS if record_settings is None else record_settings,
+                  manifest)
         self.bound = bound
 
 
@@ -200,8 +204,7 @@ class ARunWithoutAManifestIsVerifiedWithANoteThatNamesTheFileAndTheReleaseBounda
     Pins aisef2/app/verify.py::verify [135]."""
 
     def test_the_note_names_the_file_and_the_release_boundary(self):
-        self.make()
-        (self.out / R.MANIFEST).unlink()
+        self.make(manifest=False)
         v = verify(self.project, self.out)
         self.assertEqual((v["verdict"], v["evidence_anchor"], v["problems"]), ("VERIFIED", None, []))
         (note,) = v["notes"]

@@ -70,9 +70,11 @@ class Checkout(unittest.TestCase):
         self.addCleanup(self._tmp.cleanup)
         self.tmp = pathlib.Path(self._tmp.name)
 
-    def checkout(self, name: str = "reference") -> pathlib.Path:
+    def checkout(self, name: str = "reference", *, without: tuple[str, ...] = ()) -> pathlib.Path:
+        """The reference copied under `name`, less the module files named by `without` (a candidate that lacks them)."""
         root = self.tmp / name
-        shutil.copytree(base.REFERENCE, root / "ledgerlock", ignore=shutil.ignore_patterns("__pycache__"))
+        shutil.copytree(base.REFERENCE, root / "ledgerlock",
+                        ignore=shutil.ignore_patterns("__pycache__", *without))
         return root
 
     def verify(self, f: dict, root: pathlib.Path) -> V.Verification:
@@ -367,8 +369,8 @@ class AFindingAboutAnAbsentSubject(Checkout):
     Pins aisef2/app/review_verify.py::reproducer_contract [46]"""
 
     def test_it_is_not_confirmed_and_does_not_block(self):
-        root = self.checkout()
-        (root / "ledgerlock" / "__main__.py").unlink()
+        root = self.checkout(without=("__main__.py",))
+        self.assertFalse((root / "ledgerlock" / "__main__.py").exists())
         f = finding()
         f["severity"] = "critical"
         v = self.verify(f, root)

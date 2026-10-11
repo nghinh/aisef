@@ -121,8 +121,9 @@ class ExpectedAnchor(ExecutedRun):
     def test_a_directory_without_its_manifest_is_refuted_not_a_crash(self):          # [138]
         anchor = R.anchor_in(self.out)
         self.assertRegex(anchor, r"^[0-9a-f]{64}$")
-        (self.out / R.MANIFEST).unlink()
-        v = verify(self.project, self.out, expect_anchor=anchor)
+        bare = self.out.parent / "bare"        # the same run, its manifest gone: a copy that never held it
+        shutil.copytree(self.out, bare, ignore=shutil.ignore_patterns(R.MANIFEST))
+        v = verify(self.project, bare, expect_anchor=anchor)
         self.assertEqual((v["verdict"], v["evidence_anchor"]), ("REFUTED", None), v)
         self.assertTrue(any("anchor" in p for p in v["problems"]), v["problems"])
 

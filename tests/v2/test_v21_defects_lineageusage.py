@@ -29,7 +29,6 @@ import io
 import json
 import os
 import pathlib
-import shutil
 import sys
 import tempfile
 import unittest
@@ -70,7 +69,12 @@ class Account(unittest.TestCase):
         t = tempfile.TemporaryDirectory()
         self.addCleanup(t.cleanup)
         self.tmp = pathlib.Path(t.name).resolve()
-        self.out = self.tmp / "run"
+        self.start("run")
+
+    def start(self, name: str) -> None:
+        """The run directory `name`, with its one session: a case that needs no ledger of the previous one's starts
+        another directory (nothing is removed)."""
+        self.out = self.tmp / name
         (self.out / "sessions").mkdir(parents=True)
         self.log("S1.developer.1.jsonl", STEP)
 
@@ -163,9 +167,9 @@ class UnknownPreflightSpend(Account):
     """T20b: the run's cost counts what the preflight spent only as far as it is known — never as 0 under `known`."""
 
     def test_a_ledger_that_exists_and_does_not_read_makes_the_cost_partial_with_the_cause(self):
-        for name, text in UNREADABLE.items():
+        for n, (name, text) in enumerate(UNREADABLE.items()):
             with self.subTest(name):
-                shutil.rmtree(self.out / "preflight", ignore_errors=True)
+                self.start(f"run-{n}")
                 self.ledger(text)
                 u = self.account()
                 cost = u["cost"]
@@ -217,9 +221,9 @@ class UnknownPreflightSpend(Account):
         self.assertEqual((absent["cost"]["value"], absent["cost"]["status"], absent["cost"]["known"]), (1.0, "known", 1.0))
         self.assertEqual(absent["preflight"], {"provider_requests": 0, "turns": 0, "input_tokens": 0, "output_tokens": 0,
                                                "unaccounted": []})
-        for text in ("", ANSWERED):
+        for n, text in enumerate(("", ANSWERED)):
             with self.subTest(ledger=text):
-                shutil.rmtree(self.out / "preflight", ignore_errors=True)
+                self.start(f"run-{n}")
                 self.ledger(text)
                 u = self.account()
                 self.assertEqual((u["cost"]["status"], u["cost"]["value"], u["cost"]["sessions_unknown"]),

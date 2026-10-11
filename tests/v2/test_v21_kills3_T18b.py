@@ -23,7 +23,6 @@ opencode, a network or a provider.
 
 import json
 import pathlib
-import shutil
 import sys
 import tempfile
 import unittest
@@ -80,9 +79,11 @@ def spec(locator, observable=None, stimulus=None, *, absence=DECIDABLE, window=1
 
 
 def checkout(files):
-    d = tempfile.mkdtemp(prefix="aisef2-rev-")
+    """`files` written under a temporary directory of its own; the caller cleans it up (`cleanup` of the returned
+    object), so nothing is removed by path."""
+    d = tempfile.TemporaryDirectory(prefix="aisef2-rev-", ignore_cleanup_errors=True)
     for rel, text in files.items():
-        p = pathlib.Path(d, rel)
+        p = pathlib.Path(d.name, rel)
         p.parent.mkdir(parents=True, exist_ok=True)
         p.write_text(text, encoding="utf-8")
     return d
@@ -102,13 +103,11 @@ ALL_CLASSES = {"exists": ({"condition": "exists"}, {}), **CALL_CLASSES}
 class _Revision(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.root = checkout(PRODUCT)
+        rev = checkout(PRODUCT)
+        cls.addClassCleanup(rev.cleanup)
+        cls.root = rev.name
         cls.at = RevisionRef(SHA, cls.root)
         cls.env = ExecutionEnv(sys.executable, 20, Enforcement.PARTIAL)
-
-    @classmethod
-    def tearDownClass(cls):
-        shutil.rmtree(cls.root, ignore_errors=True)
 
     def see(self, locator, observable, stimulus=None, absence=DECIDABLE):
         return P.observe(spec(locator, observable, stimulus, absence=absence), self.at, self.env)
@@ -225,8 +224,9 @@ class ExistsIsResolution(_Revision):
                 self.assertEqual(classify_failure(s, seen), Executed(S))
 
     def test_exists_never_executes_the_subject(self):
-        own = checkout({"app/__init__.py": "", "app/touch.py": PRODUCT["app/touch.py"]})   # its own: nothing else runs it
-        self.addCleanup(shutil.rmtree, own, ignore_errors=True)
+        rev = checkout({"app/__init__.py": "", "app/touch.py": PRODUCT["app/touch.py"]})   # its own: nothing else runs it
+        self.addCleanup(rev.cleanup)
+        own = rev.name
         at, flag = RevisionRef(SHA, own), pathlib.Path(own, "touched.flag")
 
         def run_(observable):

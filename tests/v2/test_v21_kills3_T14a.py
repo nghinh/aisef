@@ -21,6 +21,7 @@ import hashlib
 import json
 import os
 import pathlib
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -188,8 +189,6 @@ class OneFileChangedAlone(unittest.TestCase):
 
     Pins aisef2/app/run.py::evidence_manifest [1, 2, 3, 5, 6, 8, 10, 17, 20] at the reader, `verify`."""
 
-    FILES = ("RUN.json", "RUN.started.json", R.MANIFEST, "preflight/PREFLIGHT.json")
-
     @classmethod
     def setUpClass(cls) -> None:
         t = tempfile.TemporaryDirectory()
@@ -209,15 +208,13 @@ class OneFileChangedAlone(unittest.TestCase):
         R.execute(cls.project, settings.load(base.SETTINGS), cls.tmp / "source", cls.out, client_exe=str(client),
                   transport=base.provider(), cals=base.calibrations())
         cls.anchor = R.anchor_in(cls.out)
-        cls.original = {rel: (cls.out / pathlib.PurePosixPath(rel)).read_bytes() for rel in cls.FILES}
 
-    def setUp(self) -> None:     # one run for the class: each test puts the directory back as the run left it
-        self.addCleanup(self.restore)
-
-    def restore(self) -> None:
-        for rel, data in self.original.items():
-            (self.out / pathlib.PurePosixPath(rel)).write_bytes(data)
-        (self.out / "run" / "journals" / "stray.jsonl").unlink(missing_ok=True)
+    def setUp(self) -> None:     # one run for the class: each test changes a copy of the directory as the run left it
+        t = tempfile.TemporaryDirectory()
+        self.addCleanup(t.cleanup)
+        copy = pathlib.Path(t.name).resolve() / "out"
+        shutil.copytree(type(self).out, copy, symlinks=True)
+        self.out = copy
 
     def rewrite(self, rel: str, **fields) -> None:
         p = self.out / pathlib.PurePosixPath(rel)

@@ -129,7 +129,7 @@ class OcrBase(unittest.TestCase):
         for rel, text in files.items():
             target = self.repo / rel
             if text is None:
-                target.unlink()
+                git(self.repo, "rm", "-q", "--", rel)     # the candidate deletes it: git removes it from tree and index
                 continue
             target.parent.mkdir(parents=True, exist_ok=True)
             target.write_text(text, encoding="utf-8")

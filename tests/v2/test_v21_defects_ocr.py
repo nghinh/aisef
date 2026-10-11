@@ -154,7 +154,7 @@ class OneNameStatusRowIsOneRow(unittest.TestCase):
         `deleted`; a path outside the product roots is neither."""
         (self.repo / "app" / "util.py").write_text("# util\n", encoding="utf-8")
         (self.repo / "app" / "cli.py").write_text("# cli\n", encoding="utf-8")
-        (self.repo / "app" / "calc.py").unlink()
+        e2e.git(self.repo, "rm", "-q", "--", "app/calc.py")     # the story deletes it: git removes it from tree and index
         (self.repo / "docs" / "notes.md").write_text("# notes\n", encoding="utf-8")
         e2e.git(self.repo, "add", "-A")
         e2e.git(self.repo, "commit", "-q", "-m", "ordinary change")
