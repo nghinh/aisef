@@ -20,6 +20,22 @@ sys.path.insert(0, str(ROOT))
 from validation.v2 import mutation as m  # noqa: E402
 
 
+def only_positions(full, only: set[int]):
+    """`mutants` restricted to the listed positions of the OUTER list. `mutants` of a `SCRIPT/function` target calls
+    itself through the module global this replaces, so a filter applied at every level also filtered the inner list
+    (the child script's) by the same positions and dropped what the outer positions named."""
+    depth = [0]
+
+    def some(src, func, enums):
+        depth[0] += 1
+        try:
+            got = full(src, func, enums)
+        finally:
+            depth[0] -= 1
+        return got if depth[0] else [x for i, x in enumerate(got) if i in only]
+    return some
+
+
 def main(argv: list[str]) -> int:
     only = out = None
     args = list(argv)
@@ -38,10 +54,7 @@ def main(argv: list[str]) -> int:
     target, files = args[0], args[1:]
     if only is not None:
         full = m.mutants
-
-        def some(src, func, enums):
-            return [x for i, x in enumerate(full(src, func, enums)) if i in only]
-        m.mutants = some
+        m.mutants = only_positions(full, only)
         names = [d for i, (d, _) in enumerate(full((ROOT / target.split("::")[0]).read_text(encoding="utf-8"),
                                                     target.split("::")[1],
                                                     m._enum_members((ROOT / target.split("::")[0]).read_text(encoding="utf-8"), ROOT)))
