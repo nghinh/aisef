@@ -67,4 +67,7 @@ run c $X1 -- sh -c "$ENTRY" c
 run d1 -- python3 -B /repo/validation/v21/sandbox/linux_guest.py d1
 run d-test_v21_confine -- python3 -B -m unittest -v tests.v2.test_v21_confine
 run d-test_process_range -- python3 -B -m unittest -v tests.v2.p4.test_process_range
+# B-03: the product fixes and the survivor tests of confine.py, on the Linux guest as well (the host-bound probe roots
+# and the trailing-slash read_only entries are decided by what bubblewrap and /proc/self/mountinfo really print)
+run d-test_v21_confine_survivors -- python3 -B -m unittest -v tests.v2.test_v21_defects_confine tests.v2.test_v21_kills3_A05 tests.v2.test_v21_kills3_A06 tests.v2.test_v21_kills3_A07 tests.v2.test_v21_kills3_T05a tests.v2.test_v21_kills3_T05b tests.v2.test_v21_kills3_T05c tests.v2.test_v21_kills3_T06a tests.v2.test_v21_kills3_T06b tests.v2.test_v21_kills3_T07a tests.v2.test_v21_kills3_T07b tests.v2.test_v21_kills3_TO2
 print "done: $OUT"
