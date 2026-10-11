@@ -214,10 +214,13 @@ change to the authority model).
 
 The kill command is `python -m unittest discover -v -f -s <dir> -t tests -p <file>` (`-f` kept: VS-5 verifier; `-v`
 names every test and every skip). The summary is read only after the **last** `Ran N tests in` line, so text a test
-prints cannot forge it. Its `first` — the failure's **signature** — is the whole first header line (`FAIL: test_b
+prints cannot forge the counts. Its `first` — the failure's **header** — is the whole first header line (`FAIL: test_b
 (v2.t.A.test_b) [q]`, a subtest's `[msg]` or `(params)` kept) plus the class of the exception its traceback ended in
 (`| AssertionError`). Both reviews measured that a narrower pattern gave `None` for every subTest failure, and
-`None == None` matched any re-run.
+`None == None` matched any re-run. The bracket compares `signature(first)`: `first` with the runner's own temp names
+replaced (§15; "the signature" below is that, "the header" the raw line); the record keeps `first` as it was printed.
+The header is the line after the report's own `=`×70 separator (§15), so one line a test prints is not the first
+failure; a test that prints the separator and a `FAIL:` line itself still is.
 
 | Outcome | When |
 |---|---|
@@ -240,7 +243,8 @@ Every run — T0, a mutant's run, the bracket's control and re-run, the T0 diagn
 counts, `first`, `skipped_tests`, `first_test` (T0 only), `tail_sha256`, `tail` (non-PASS rows only: the record stays
 small; feasibility review), and when they occur `residue`, `leaked`, `cleanup`, `residual`, `judged_before_release`,
 `stopped`. The tail is normalised before it is hashed: the run, tree and scratch paths become `<run>`, `<tree>`,
-`<scratch>`, `Ran N tests in X.XXXs` becomes `Ran N tests`, addresses are masked, so identical outcomes hash identically
+`<scratch>`, a test's own default mkdtemp name directly under `<run>/tmp` becomes `<mkdtemp>` (§15), `Ran N tests in
+X.XXXs` becomes `Ran N tests`, addresses are masked, so identical outcomes hash identically
 across runs and orders. The module globals `_FAILED`, `_TIMED_OUT`, `_CLEANUP` are gone.
 
 ### 3.3 Tests (`::Outcome`)
@@ -286,7 +290,7 @@ def _mutant(tg, entry, src):
 ```
 
 - **The bracket** (evidence review, critical; it resolves Q6): a FAIL is a kill only when, right away and each in a
-  fresh environment, the unmutated module PASSES what failed and the mutant FAILS it again with the same signature.
+  fresh environment, the unmutated module PASSES what failed and the mutant FAILS it again with the same signature (§15).
   Since §14 fix 9 the unmutated module must PASS twice in a row (`BRACKET`), and since fix 10 a FAIL not confirmed in
   place is measured once more on a fresh tree, the whole file (`_remeasure`); the code above is the first version.
   `_select` runs only what failed: the failing test (a subtest's whole test), the class for a setUpClass failure, and
@@ -585,8 +589,9 @@ Designed truth: 4 KILLED (two of them after a TIMEOUT row in some orders, one af
 leaves residue, 1 TIMEOUT, 1 INFRA. Asserted: the sample covers each kind (and the same-size neighbours); every order
 gives every mutant its designed class; `classes`, `killed`, `survivors` and the set of mutants with `timed_out` are
 identical across orders; the error is the same `UNCLASSIFIED` in every order and nothing stops; every kill is bracketed
-exactly once; and every (mutant, file) run has the same outcome, signature, exit status and (for PASS and FAIL) the same
-normalised tail hash in every order — o(m, f) does not depend on what ran before. **Controls:** with the stamp off
+exactly once; and every (mutant, file) run has the same outcome, header, exit status and (for PASS and FAIL) the same
+normalised tail hash in every order (the toy's labels name no temp path; a failure that names one has another raw header on
+every run and in every order — its `signature` and its tail hash are the same, §15) — o(m, f) does not depend on what ran before. **Controls:** with the stamp off
 (§1), the tree restore off (§2) and the old stop-at-first-non-PASS rule (§3, §4), each in one order, the classes differ
 from the truth, so the toy cannot pass vacuously. Runtime, measured 2026-10-08 at 76e0eca under `heavy.sh` with the
 workers' `env -i`: the `Order` class takes 193 s (9 matrix runs — the 5 rotations and the 4 rotations of one declared
@@ -931,3 +936,90 @@ kill, about 0.6 s each here, so about +1.8 CPU-hours over ~10,900 kills; the cwd
 run; the fresh re-measure (fix 10) and the 60 s grace (fix 5) cost nothing on these targets. The runner's own test
 file: 56 tests, 484 s under `heavy.sh` at 76e0eca; the `Order` class alone, 193 s (48 tests and 417 s after the fix
 series; 36 tests and 252 s at commit 6).
+
+
+## 15. Campaign 2's finding: a temp path in a subTest label (2026-10-10)
+
+**What campaign 2 showed.** 31 of 12,448 mutants ended INFRA although each failed its kill test on every run and the
+unmutated module passed every control: 30 in `confine.py::wrap`, 1 in `cli.py::run`. Both kill tests name a path in a
+subTest label — `subTest(exe=exe)` (`test_v21_confine.py:220` at 5719f1f; line 424 at this head) and
+`subTest(argv[-1])` (`test_v21_continue_integrity.py:620`) — and the path is under the run's own TMPDIR
+(`<scratch>/run-<8>/tmp/tmp<8>/…`), which is new on every run. The failure header (§3.1) is the whole line, so
+the bracket's re-run (and the fresh-tree re-run) never had the header of the first failure and the runner, correctly
+by its rules, did not call it a kill. Three further mutants were TIMEOUT (a mutant that never terminates or waits out its
+budget): a different matter. `confine.py::_survivors` is in the re-measure set; `adapters.py::_bounded` and
+`bundle_cli.py::continue_from` are not (their kill files are unchanged), so they stay unresolved — and `--check` red for
+them — until a kill test that fails fast instead of hanging puts them in it (the survivor work's first items).
+
+**The change** (`signature`, `_RUNNER_DIR`, `_MKDTEMP`; used by `_confirm` and `_confirmed` and nowhere else; `_tail` maps
+the same mkdtemp name; `_HEAD` is anchored to the report). The signature the bracket compares is `first` with three
+kinds of NAME replaced and nothing around them touched: a run directory `run-<8>` or a tree `tree-<8>` directly under a
+runner scratch directory (`aisef-mut-<worker 12 hex>-<8>/run-<8>` → `aisef-mut-…/<run#n>`), and a test's default
+mkdtemp name directly under the run's TMPDIR (`<run#n>/tmp/tmp<8>` → `<run#n>/tmp/<mkdtemp#m>`). `n`, `m` count the
+distinct names of a kind in order of first appearance in that header, so which names coincide survives (`src is dst`
+is not `src is not dst`); the scratch name stays, so another target's or worker's directory is another name; a `<`
+already in the header is doubled first, so a literal `<run#1>` is not a replaced name; text before, between and after
+the names (the rest of a path, a drive letter, a parameter, a counter) and the exception class are never touched but for
+that doubling. A
+function of the recorded `first` alone, so the record check applies the same rule to the row as written; the record
+keeps the header as the run printed it. `_outcome` (PASS, FAIL, TIMEOUT, INFRA), the controls, the second control, the
+fresh re-measure and the classification are untouched: the rule only widens "same failure" from "same string" to
+"same string but for the runner's own random names". Two further changes ride with it, both from the review. `_HEAD`
+takes the header after the report's own `=`×70 line, so a line a test prints (or a docstring under `-v`) is no longer
+taken for the first failure; one that prints the separator and a `FAIL:` line is still, and that stays open. It feeds
+`_outcome` (a FAIL needs a header), so it is evidenced on the record: of the 21,613 rows that kept a header and a tail, 17,547
+have the header directly after a separator line, 760 have the tail cut before it, 3,306 do not hold it, and none has it
+after anything else (`header_position_in_kept_tails`); a failure whose header is not after a separator reads INFRA
+(fail-closed), never a kill. And `_tail` maps the test's mkdtemp name too, so a row's `tail_sha256` of such a
+failure is the same on every run (POSIX spelling; see the limits). ORD-6's byte-for-byte claim is NOT extended to `first` of such a row: it is raw by design and
+differs between runs and orders (as it did); what is the same is its `signature(first)` and its `tail_sha256`, and the
+class. The determinism tests compare raw `first` and pass because their toys name no temp path.
+
+**What it cannot do, and its limits.**
+- It cannot turn a failure that is not the same into a kill: another test, subtest, parameter, directory or exception
+  class keeps another signature (`Signature.test_the_signature_replaces_only_the_runners_own_temp_names`), a label that
+  carries a per-run counter is still INFRA (`…test_a_failure_that_differs_in_more_than_temp_names_is_still_not_a_kill`),
+  and it cannot create a FAIL: a PASS, a TIMEOUT, an INFRA row or a lost summary decides as before, before the
+  signature is read. A kill file whose label carries something else that changes on every run (a pid, a clock, a port)
+  is not helped; it stays INFRA and is named.
+- By shape alone, a fixed name under the run's TMPDIR that looks like mkdtemp's (`tmp` + 8 of `[a-z0-9_]`, e.g.
+  `tmpbackup_a`) is replaced like one, and a run directory of the same scratch from an earlier run is `<run#n>` like
+  this one; both only matter for a re-run that fails in a sibling subtest that differs in exactly that and nothing
+  else. Not covered, and fail-closed: a second mkdtemp level, a mkdtemp name with a suffix of name characters or another
+  prefix, a relative spelling, upper-cased or 8.3 Windows names — they stay INFRA.
+- A kill test that fails for a reason of its own, independent of the mutant, on some runs (a flaky test whose label
+  carries a temp path) could be confirmed by a bracket whose first failure and re-run are both that flake: before, the
+  differing paths made it INFRA. The unmutated controls (two PASSes, then the fresh re-measure) are what stops it, as for any
+  kill; the rule does not make a flake more likely to pass them. The separators of a path are not part of a name: `/`
+  and `//` are one directory (`Signature.…replaces_only_the_runners_own_temp_names`).
+- `tail_sha256` maps the mkdtemp name after `<run>` is substituted, which is `str(path)`: a Windows repr that spells the
+  path with forward slashes (`repr(WindowsPath)`) is left alone, so on Windows a row's `tail_sha256` of such a failure can
+  still differ between runs. Only the signature, which reads the header, is spelled both ways. The sentence above about
+  `tail_sha256` is POSIX.
+- A record written by this runner is read by this runner's `--check`. The earlier runner (and
+  `campaign-2/tools/check_at_snapshot.sh` at 5719f1f) reads a KILLED entry whose re-run differs only in temp names as
+  "KILLED without a confirmed kill": fail-closed, and the reason for running the re-measure's check with this runner.
+
+**Which campaign-2 results stand.** The runner is a harness the reuse proof does not cover, so the argument is made here
+and checked on the record (`campaign-2/tools/replay_signature.py`, run over the 12,448 results as written;
+`campaign-2/results/SIGNATURE-REPLAY.json`):
+
+| Class | Why the runner change cannot move it | Check on the record |
+|---|---|---|
+| KILLED (10,738) | its bracket was confirmed by string equality; equal strings have equal signatures | all 10,738 are confirmed under the rule (`killed_not_confirmed: []`) |
+| SURVIVED (1,676) | all but 2 have no FAIL row: no bracket, no signature read. The 2 carry an unconfirmed FAIL row whose re-run PASSed — the rule does not change a PASS | 0 whose in-place bracket is confirmed under the rule: none can move |
+| TIMEOUT (3), NOT_RUN (0) | decided by the outcomes before any signature is read; a TIMEOUT mutant with an unconfirmed FAIL row would be the exception | none carries a FAIL row |
+| INFRA (31) | the only class the rule can change, and only toward KILLED | the in-place bracket of all 31 (controls PASS ×2, re-run FAIL) is confirmed under the rule, by signature only |
+
+A SURVIVED or TIMEOUT mutant that carries an unconfirmed FAIL row whose in-place bracket differs only in temp names would
+be KILLED when measured again; the replay shows none in campaign 2, and the claim "the rule cannot move SURVIVED" is
+therefore a measurement on this record, not a property of the code. No campaign-2 result is invalidated by the change and
+none is promoted by it; the class of the 31 is not rewritten — only a re-run decides — and the re-run is part of the
+rev-3 measurement: both targets (`confine.py::wrap`, `cli.py::run`) are already in the re-measure set of
+`campaign-2/delta/DELTA.md` because `test_v21_confine.py` changed. The delta and manifest revision 3 are re-derived at
+the head that carries this change before that run.
+
+**Tests** (`::Signature`, 5): the toy reproduces the campaign's INFRA with the rule switched off and is KILLED with it
+on; a label with a per-run counter stays not-a-kill; the function's cases (what it replaces, what it keeps — text before
+a path, aliasing, another directory, a lookalike, a literal placeholder, Windows spellings, non-strings, a 200 kB header
+under 5 s); the record check; a printed `FAIL:` line is not the header.

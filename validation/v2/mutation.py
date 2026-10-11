@@ -1148,7 +1148,7 @@ NOT_KILL_FILES = ("tests/v2/test_v21_identity_bytes.py",)
 
 _RAN = re.compile(r"^Ran (\d+) tests? in [\d.]+s$", re.M)
 _END = re.compile(r"^(OK|FAILED)(?: \((.*)\))?$", re.M)
-_HEAD = re.compile(r"^(FAIL|ERROR|UNEXPECTED SUCCESS): (.+)$", re.M)
+_HEAD = re.compile(r"^={70}\n(FAIL|ERROR|UNEXPECTED SUCCESS): (.+)$", re.M)   # a line a test prints is not the report
 _TEST = re.compile(r"^(\w+) \(([\w.]+)\)", re.M)
 _SKIP = re.compile(r"^ *(\S+ \([\w.]+\)(?: \[[^\n]*\]| \([^\n]*\))?)(?:\n[^\n]*)? \.\.\. skipped", re.M)
 
@@ -1173,6 +1173,39 @@ def _summary(text: str) -> dict | None:
     test = next((t[2] for t in _TEST.finditer(body) if t[2].endswith("." + t[1]) and not t[2].startswith("unittest.")), None)
     return {"ran": int(runs[-1][1]), "status": end[1], **counts, "first": first,
             "skipped_tests": sorted(x[1] for x in _SKIP.finditer(body)), "first_test": test}
+
+
+#: the runner's own temp names (§15): a scratch directory is `aisef-mut-<worker>-<8>` (worker: 12 hex), a run directory
+#: `run-<8>` or a tree `tree-<8>` in it, a run's TMPDIR `<run>/tmp`, and a test's default mkdtemp name `tmp<8>` in that
+#: (8 = tempfile's random characters). Only the run, tree and mkdtemp names are replaced, never the text around them and
+#: not the scratch name (one per target: a directory of another target or worker stays a different name).
+_RUNNER_DIR = re.compile(r"(?<![\w.-])(?P<scratch>aisef-mut-[0-9a-f]{12}-[a-z0-9_]{8})(?P<sep>[\\/]+)(?P<kind>run|tree)-(?P<name>[a-z0-9_]{8})(?![a-z0-9_])")
+_MKDTEMP = re.compile(r"(?<!<)(?P<run><run#\d+>)(?P<sep>[\\/]+tmp[\\/]+)(?P<name>tmp[a-z0-9_]{8})(?![a-z0-9_])")   # (?<!<): not a doubled literal
+
+
+def signature(first: str | None) -> str | None:
+    """What the bracket compares (§15): the failure's `first` — header line and exception class — with the runner's own
+    run, tree and mkdtemp names replaced by `<run#n>`, `<tree#n>`, `<mkdtemp#n>` (n: order of first appearance in this
+    header, so which names coincide is kept) and nothing else: a path under the run's TMPDIR in a subTest label is the
+    same failure on every run, while another test, subtest, parameter, exception class or directory is not. A `<` already
+    in the header is doubled first, so a literal `<run#1>` is not a replaced name. A pure function of the recorded
+    `first`: the record check applies it to the row as written, and the record keeps the header as the run printed it."""
+    if not isinstance(first, str):
+        return first
+    text = first.replace("<", "<<")
+    if "aisef-mut-" not in text:   # no runner name: nothing to replace, and no scan of a long header
+        return text
+    seen: dict[tuple[str, ...], int] = {}
+    count: dict[str, int] = {}
+
+    def number(kind: str, *name: str) -> int:   # the name, never the separators: `/` and `//` are one directory
+        if (kind, *name) not in seen:
+            count[kind] = count.get(kind, 0) + 1
+            seen[kind, *name] = count[kind]
+        return seen[kind, *name]
+
+    text = _RUNNER_DIR.sub(lambda m_: f"{m_['scratch']}{m_['sep']}<{m_['kind']}#{number(m_['kind'], m_['scratch'], m_['name'])}>", text)
+    return _MKDTEMP.sub(lambda m_: f"{m_['run']}{m_['sep']}<mkdtemp#{number('mkdtemp', m_['run'], m_['name'])}>", text)
 
 
 def _counts(s: dict) -> list[int]:
@@ -1214,6 +1247,7 @@ def _tail(text: str, tg: _Target, run: pathlib.Path) -> str:
     """The output, normalised so two identical outcomes hash identically across runs and orders (ORD-6 verifier)."""
     for path, name in ((run, "<run>"), (tg.tree, "<tree>"), (tg.scratch, "<scratch>")):
         text = text.replace(os.path.realpath(path), name).replace(str(path), name)
+    text = re.sub(r"(<run>[\\/]+tmp[\\/]+)tmp[a-z0-9_]{8}(?![a-z0-9_])", r"\1<mkdtemp>", text)   # a test's own mkdtemp
     text = re.sub(r"^(Ran \d+ tests?) in [\d.]+s$", r"\1", text, flags=re.M)
     return re.sub(r"0x[0-9a-fA-F]+", "0x?", text)[-TAIL:]
 
@@ -1367,7 +1401,7 @@ def _confirm(tg: _Target, rel: str, rows: list, row: dict, src: str, fresh: bool
         else:
             _write(tg, tg.null if version == "null" else src)
         x = _run_file(tg, rel, rows, select=sel, role=role, fresh=fresh)
-        if x["outcome"] != want or (role == "rerun" and x.get("first") != row["first"]):
+        if x["outcome"] != want or (role == "rerun" and signature(x.get("first")) != signature(row["first"])):
             why = (f"the unmutated module {'PASS, then ' if i else ''}{x['outcome']}" if role == "control" else
                    f"the mutant again {x['outcome']} {x.get('first') or x.get('why') or ''}".rstrip())
             break
@@ -1593,10 +1627,12 @@ def _confirmed(r: dict) -> bool:
     with the same signature, on the same file."""
     kb, rows = r.get("killed_by") or {}, r.get("files", [])
     for i, x in enumerate(rows):
-        if "role" not in x and x["file"] == kb.get("file") and x["outcome"] == "FAIL" and x.get("first") == kb.get("first"):
-            got = [(y.get("role"), y["file"], y["outcome"], y.get("first") if y.get("role") == "rerun" else None)
+        sx = signature(x.get("first"))
+        if "role" not in x and x["file"] == kb.get("file") and x["outcome"] == "FAIL" and isinstance(sx, str) and \
+                sx == signature(kb.get("first")):
+            got = [(y.get("role"), y["file"], y["outcome"], signature(y.get("first")) if y.get("role") == "rerun" else None)
                    for y in rows[i + 1:i + 1 + len(BRACKET)]]
-            return got == [(role, x["file"], want, x["first"] if role == "rerun" else None) for role, _, want in BRACKET]
+            return got == [(role, x["file"], want, sx if role == "rerun" else None) for role, _, want in BRACKET]
     return False
 
 
