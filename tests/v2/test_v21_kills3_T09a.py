@@ -195,17 +195,18 @@ class ClaimDecisionOnTheClaimant(WithTable):
                  "no start time recorded": (claimant(started=None), STARTED),
                  "recorded unknown": (claimant(started="unknown"), STARTED),
                  "no start time recorded, no such process": (claimant(started=None), None)}
-        for name, (who, now) in cases.items():
+        for n, (name, (who, now)) in enumerate(cases.items()):
             with self.subTest(name):
                 if now is None:
                     self.table.rows.pop(4242, None)
                 else:
                     self.table.rows[4242] = now
-                p = self.held(who)
+                self.pred = self.tmp / f"pred-{n}"      # a predecessor of its own per case: no claim left by the last
+                self.pred.mkdir()
+                self.held(who)
                 msg = self.refusal()
                 self.assertIn("cannot be shown gone", msg)
                 self.assertNotIn("is alive", msg)
-                p.unlink()
 
     def test_a_claimant_gone_is_superseded_by_evidence_never_by_assertion(self):
         self.table.rows[4242] = LATER                  # recorded STARTED: the pid was reused
@@ -314,30 +315,30 @@ class Accounting(WithTable):
 
     def test_the_account_counts_the_preflight_the_journal_and_every_session(self):
         run = self.tmp / "first"
-        make_run(run, requests=self.STORIES, streams=self.STREAMS, record=True)
-        acct = lineage.account_of(run)
-        self.assertEqual(self.figures(acct), self.EXPECTED)
-        self.assertEqual((acct["unaccounted"], acct["recorded"], acct["run"]), ([], True, str(run)))
-        (run / "RUN.json").unlink()                      # a run killed before its record: the same spend, not recorded
+        make_run(run, requests=self.STORIES, streams=self.STREAMS)       # a run killed before its record: not recorded
         acct = lineage.account_of(run)
         self.assertEqual(self.figures(acct), self.EXPECTED)
         self.assertIs(acct["recorded"], False)
+        (run / "RUN.json").write_text("{}\n", encoding="utf-8")           # and the record written: the same spend
+        acct = lineage.account_of(run)
+        self.assertEqual(self.figures(acct), self.EXPECTED)
+        self.assertEqual((acct["unaccounted"], acct["recorded"], acct["run"]), ([], True, str(run)))
 
     def test_a_finished_predecessors_cost_is_known_and_a_killed_ones_is_not(self):
         run, child = self.tmp / "first", self.tmp / "second"
-        make_run(run, requests=self.STORIES, streams=self.STREAMS, record=True)
+        make_run(run, requests=self.STORIES, streams=self.STREAMS)       # killed before its record
         own = {"tokens": {}, "cost": {"value": 0.0}}
-        got = lineage.usage_lineage(run, child, own, PRICES)
-        # 4 sessions x (120 in + 10 cache-read x 0.1, 10 out x 4) + the preflight (18 in, 2 out), per million tokens
-        self.assertEqual(got["cost"]["status"], "known")
-        self.assertAlmostEqual(got["cost"]["value"], (4 * (120 + 1 + 40) + 18 + 8) / 1e6, places=9)
-        self.assertEqual((got["runs"][0]["recorded"], got["runs"][0]["cost"]["status"]), (True, "known"))
-        (run / "RUN.json").unlink()
         got = lineage.usage_lineage(run, child, own, PRICES)
         self.assertIs(got["runs"][0]["recorded"], False)
         self.assertTrue(got["runs"][0]["cost"]["status"].startswith("partial"), got["runs"][0]["cost"])
         self.assertIsNone(got["runs"][0]["cost"]["value"])
         self.assertIsNone(got["cost"]["value"])           # never a partial sum shown as the whole
+        (run / "RUN.json").write_text("{}\n", encoding="utf-8")           # finished: the record is written
+        got = lineage.usage_lineage(run, child, own, PRICES)
+        # 4 sessions x (120 in + 10 cache-read x 0.1, 10 out x 4) + the preflight (18 in, 2 out), per million tokens
+        self.assertEqual(got["cost"]["status"], "known")
+        self.assertAlmostEqual(got["cost"]["value"], (4 * (120 + 1 + 40) + 18 + 8) / 1e6, places=9)
+        self.assertEqual((got["runs"][0]["recorded"], got["runs"][0]["cost"]["status"]), (True, "known"))
 
 
 class PreflightLedger(WithTable):

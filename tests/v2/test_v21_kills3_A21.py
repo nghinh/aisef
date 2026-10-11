@@ -16,7 +16,6 @@ import json
 import os
 import pathlib
 import secrets
-import shutil
 import signal
 import subprocess
 import sys
@@ -42,6 +41,18 @@ MUTE_THEN_DIE = {
 }
 
 
+def checkout(test: unittest.TestCase, files: dict) -> str:
+    """`base.checkout(files)` — a directory holding `files`, written as it writes them — made inside a temporary
+    directory the test itself cleans up (nothing is removed by path)."""
+    d = tempfile.TemporaryDirectory(prefix="aisef2-rev-", ignore_cleanup_errors=True)
+    test.addCleanup(d.cleanup)
+    for rel, text in files.items():
+        p = pathlib.Path(d.name, rel)
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(text, encoding="utf-8", newline="\n")
+    return d.name
+
+
 class DeadlineClosesTheProtocol(unittest.TestCase):
     """The deadline path writes `RESULT {"deadline": true}` and then `END` — the same closing line as the normal path.
     The controller is run to its own end by itself (no stop from the parent can cut the file short), and the file is
@@ -55,8 +66,7 @@ class DeadlineClosesTheProtocol(unittest.TestCase):
     """
 
     def run_controller(self, files, window):
-        root = base.checkout(files)
-        self.addCleanup(shutil.rmtree, root, True)
+        root = checkout(self, files)
         scratch = tempfile.TemporaryDirectory(prefix="aisef2-a21-", ignore_cleanup_errors=True)
         self.addCleanup(scratch.cleanup)
         work = os.path.join(scratch.name, "evaluation")
@@ -90,8 +100,7 @@ class SignalEndedSubjectIsReportedWhateverItsCapturesHold(unittest.TestCase):
     """
 
     def test_a_signal_with_unreadable_captures_is_still_the_signal(self):
-        root = base.checkout(MUTE_THEN_DIE)
-        self.addCleanup(shutil.rmtree, root, True)
+        root = checkout(self, MUTE_THEN_DIE)
         at = RevisionRef(base.SHA, root)
         s = base.spec("app:__main__", base.EXIT0, {"argv": []})
         o = base.P.observe(s, at, base.env())

@@ -251,9 +251,10 @@ class WholeRun(unittest.TestCase):
         """A copy of the finished run's directory, less the files named: what a run killed before its record, or a
         directory of a release that wrote no RUN.started.json, holds."""
         dst = self.tmp / name
-        shutil.copytree(self.first, dst, symlinks=True)
         for r in remove:
-            (dst / r).unlink()
+            self.assertTrue((self.first / r).is_file(), f"{r}: the finished run does not hold the file to leave out")
+        shutil.copytree(self.first, dst, symlinks=True,
+                        ignore=lambda d, names: [n for n in names if pathlib.Path(d) == self.first and n in remove])
         return dst
 
     def child(self, parent: pathlib.Path, name: str | None = None, **kw) -> tuple[Exception, dict, dict]:

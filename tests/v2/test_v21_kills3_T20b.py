@@ -125,11 +125,12 @@ class UnreadablePreflightLedger(Account):
     Pins aisef2/app/usage.py::usage [29, 30, 31, 37]."""
 
     def account_with(self, write_ledger):
-        (self.out / "preflight").mkdir(exist_ok=True)
+        t = tempfile.TemporaryDirectory()      # a run directory of its own per case: no ledger left by the last one
+        self.addCleanup(t.cleanup)
+        self.out = pathlib.Path(t.name)
+        (self.out / "sessions").mkdir()
+        (self.out / "preflight").mkdir()
         ledger = self.out / "preflight" / "LEDGER.jsonl"
-        if ledger.is_dir():
-            ledger.rmdir()
-        ledger.unlink(missing_ok=True)
         write_ledger(ledger)
         self.log("S1.developer.1.jsonl", step(i=1_000_000, o=0, r=0, cr=0))
         return usage.usage(self.out, [], PRICES, {})

@@ -624,7 +624,7 @@ class Toy(unittest.TestCase):
                 self.init({REG: REG_SRC, f"{SUB}/test_x.py": "X = 1\n", f"{FX}/data.json": "{}\n", **(base or {})})
                 for rel, text in files.items():
                     if text is None:
-                        (self.repo / rel).unlink()
+                        _git(self.repo, "rm", "-q", "--", rel)    # the change removes it: git does, from tree and index
                 self.edit({r: t for r, t in files.items() if t is not None})
                 head = self.commit("change")
                 rs = self.repo / "readset.json"

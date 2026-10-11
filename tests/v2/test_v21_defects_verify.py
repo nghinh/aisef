@@ -22,6 +22,7 @@ import io
 import json
 import os
 import pathlib
+import shutil
 import sys
 import tempfile
 import unittest
@@ -55,10 +56,10 @@ class DamagedRunDirectory(ProductBase):
                                                   *sorted((self.out / "sessions").glob("*.jsonl"))]}
 
     def restore(self) -> None:
+        """Every file the run left, back as it was. A directory in a file's place is made in a copy (see the manifest
+        test), never here: nothing is removed."""
         for p, data in self.files.items():
-            if p.is_dir():
-                p.rmdir()
-            elif p.exists():
+            if p.exists():
                 p.chmod(0o644)
             p.write_bytes(data)
 
@@ -125,13 +126,14 @@ class DamagedRunDirectory(ProductBase):
         self.refuted(v)
         self.assertEqual(v["evidence_anchor"], R.anchor_of({}))
         self.assertTrue(any("does not match" in p for p in v["problems"]), v["problems"])
-        (self.out / R.MANIFEST).unlink()
-        v = verify(self.project, self.out)
+        older = self.tmp / "older"            # the same run, as a release before 2.1 left it: without its manifest
+        shutil.copytree(self.out, older, symlinks=True, ignore=shutil.ignore_patterns(R.MANIFEST))
+        v = verify(self.project, older)
         self.assertEqual((v["verdict"], v["problems"], v["evidence_anchor"]), ("VERIFIED", [], None), v)
         self.assertEqual(len(v["notes"]), 1, v["notes"])
         self.assertIn("2.1", v["notes"][0])
-        (self.out / R.MANIFEST).mkdir()
-        v = verify(self.project, self.out)
+        (older / R.MANIFEST).mkdir()
+        v = verify(self.project, older)
         self.refuted(v)
         self.assertTrue(any(R.MANIFEST in p for p in v["problems"]), v["problems"])
         self.assertEqual(v["notes"], [])

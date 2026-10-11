@@ -349,8 +349,10 @@ class ManifestProblemNamesTheFilesThatDiffer(_Dir):
             self.assertNotIn(agreeing, problem)
 
     def test_a_file_the_manifest_binds_and_the_directory_lacks_is_named(self):
-        gone = self.out / "sessions" / "S1.reviewer.1.jsonl"
-        gone.unlink()
+        bare = self.tmp / "bare"       # the directory as it is without that stream, the manifest as it was
+        shutil.copytree(self.out, bare, ignore=shutil.ignore_patterns("S1.reviewer.1.jsonl"))
+        self.assertFalse((bare / "sessions" / "S1.reviewer.1.jsonl").exists())
+        self.out = bare
 
         problem = self.manifest_problem()
 
