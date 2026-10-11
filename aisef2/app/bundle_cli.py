@@ -38,6 +38,7 @@ import argparse
 import dataclasses
 import json
 import pathlib
+import shlex
 import sys
 from typing import Mapping
 
@@ -148,6 +149,17 @@ def _mint(contract: BehaviorContract, ref: ProbeRef, compiler_digest: str = COMP
 
 def _refs() -> dict:
     return {kind: ProbeRef(e.probe_id, e.probe_digest) for kind, e in catalog.active().items()}
+
+
+def _shell_word(path: pathlib.Path | str, *, windows: bool = sys.platform == "win32") -> str:
+    """`path` as one word of the command line the operator pastes: as it is when their shell takes it so, else quoted —
+    single quotes on POSIX, double quotes on Windows around a path that holds whitespace (a Windows path holds no `"`)."""
+    text = str(path)
+    if windows:
+        return f'"{text}"' if any(c.isspace() for c in text) else text
+    # shlex.quote's safe set is ASCII-only, and a path of letters of any script needs no quoting: judge it as `a`s
+    masked = "".join("a" if c.isalnum() else c for c in text)
+    return text if shlex.quote(masked) == masked else shlex.quote(text)
 
 
 def _closed(obj, keys: tuple[str, ...], where: str) -> None:
@@ -304,7 +316,10 @@ def coverage(bundle: Mapping) -> dict:
     by_req: dict[str, dict] = {r["id"]: {"clauses": [], "criteria": []} for r in bundle["requirements"]}
     stray = []
     for cid, f in bundle["facts"].items():
-        rec = by_req.get(f.get("requirement"))
+        try:
+            rec = by_req.get(f.get("requirement"))
+        except TypeError:      # a list or an object: no requirement id, so a criterion citing none of the bundle's
+            rec = None
         if rec is None:
             stray.append(cid)
             continue
@@ -358,7 +373,9 @@ def lint(bundle: Mapping) -> dict:
 
 def explain(bundle: Mapping) -> dict:
     """Per story, in plan order: each criterion with its role, requirement clause, contract, probe, class, polarity,
-    whether its class is calibrated at the bytes that run and whether its contract is approved."""
+    whether its class is calibrated at the bytes that run and whether its contract is approved — `approved` is null
+    for a criterion with no contract (its obligation names a spec none of the bundle's contracts compiles to): there is
+    none to be approved, `lint` lists it in `criteria_without_contract`, and no `approve` could name it."""
     B.shape_problems(bundle)
     pending = {x["contract"] for x in unapproved(bundle)}
     rows = _spec_rows(bundle)
@@ -367,7 +384,8 @@ def explain(bundle: Mapping) -> dict:
         f = bundle["facts"].get(cid, {})
         out.setdefault(row["story"], []).append({"criterion": cid, **{k: v for k, v in row.items() if k != "story"},
                                                  "requirement": f.get("requirement"), "clause": f.get("clause"),
-                                                 "clause_text": f.get("clause_text"), "approved": row["contract"] not in pending})
+                                                 "clause_text": f.get("clause_text"),
+                                                 "approved": None if row["contract"] is None else row["contract"] not in pending})
     return {"project": bundle["name"], "stories": out}
 
 
@@ -442,7 +460,7 @@ def continue_from(data: Mapping, run_dir: pathlib.Path, *, leave_out_unidentifie
             obligations.append(PlanObligation(o.criterion_id, o.product_proof_spec_id, carried, ObligationRole.VERIFY,
                                               EXPECTED_AT_PARENT[ObligationRole.VERIFY], o.depends_on,
                                               f"carried: {o.story_id} committed it in the run anchored "
-                                              f"{(anchor or 'without a manifest')[:16]} ({o.criterion_id})"))
+                                              f"{anchor[:16] if anchor else 'without a manifest'} ({o.criterion_id})"))
         else:
             obligations.append(o)
     new_plan = Plan.create(id=f"{plan.id}-continued", baseline=baseline, obligations=tuple(obligations),
@@ -467,7 +485,8 @@ def continue_from(data: Mapping, run_dir: pathlib.Path, *, leave_out_unidentifie
               f"{len(reconciled['items'])} effect(s) the journal does not confirm are left out of the continuation's "
               f"baseline {baseline[:12]} (each identified in `unconfirmed`); their stories run again",
               "remaining": [s for s in project.stories if s not in done],
-              "next": f"aisef run --project <this bundle> --repo {repo} --parent {run_dir} --settings S --out NEW"}
+              "next": f"aisef run --project <this bundle> --repo {_shell_word(repo)} --parent {_shell_word(run_dir)} "
+                      "--settings S --out NEW"}
     return out, report
 
 
