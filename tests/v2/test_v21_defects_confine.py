@@ -242,6 +242,10 @@ class AReadOnlyPathWrittenWithATrailingSlash(Case):
     def test_a_mount_that_only_shares_its_prefix_is_still_beyond(self):
         """Fail closed: `<dir>-extra` is not below `<dir>/`, nor `<dir>` itself below a root that merely begins with it."""
         sibling = f"{self.ro}-extra"
+        self.assertFalse(confine._within(sibling, [f"{self.ro}/"]))      # the predicate, wherever the temp directory lies
+        self.assertTrue(confine._within(f"{self.ro}/inner", [f"{self.ro}/"]))
+        if below(str(self.ro), "/tmp"):   # a mount below the sandbox's own /tmp tmpfs is named by the wrapper (Linux CI)
+            self.skipTest("the temp directory lies below the sandbox's /tmp: the measurement below is not about it")
         rep, _ = self.measure(read_only=[f"{self.ro}/"], extra_mounts=[sibling])
         self.assertEqual(rep["problems"], [f"mounted beyond what the wrapper names: ['{sibling}']"])
 
