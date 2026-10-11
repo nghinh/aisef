@@ -213,11 +213,14 @@ def _mounts(lines: list[str]) -> list[dict]:
     return out
 
 
-def targets(full: list[str]) -> list[str]:
-    """Where a bubblewrap command line mounts something (what a session may see mounted, and nothing else)."""
+def targets(full: list[str], host: bool = False) -> list[str]:
+    """Where a bubblewrap command line mounts something (what a session may see mounted, and nothing else); `host`:
+    only where it binds a directory of the HOST (--bind, --ro-bind), not what the sandbox makes itself (--tmpfs,
+    --proc, --dev). Which is which is the option's, never the path's: the host's /tmp bound over `--tmpfs /tmp` is a
+    host directory."""
     a = full[:full.index("--")]
     return [a[i + (2 if f in ("--bind", "--ro-bind") else 1)] for i, f in enumerate(a)
-            if f in ("--bind", "--ro-bind", "--tmpfs", "--proc", "--dev")]
+            if f in ("--bind", "--ro-bind") or (not host and f in ("--tmpfs", "--proc", "--dev"))]
 
 
 def _worktree(where: pathlib.Path, repo: pathlib.Path | None) -> tuple[pathlib.Path, pathlib.Path]:
@@ -292,11 +295,13 @@ def _probe(spec: Mapping, where: pathlib.Path, ws: pathlib.Path, full: list[str]
     sleep = f"{SLEEPER}.{int(nonce, 16) % 10**6:06d}"
     f = {k: str(v) for k, v in files.items()}
     args = [str(canary), f["run_directory"], f["kernel"], f["interpreter_site"], home, str(ws / probe_file), sleep,
-            f["client_directory"], f["git_directory"], *[t for t in targets(full) if t not in ("/proc", "/dev", "/tmp", HOME)]]
+            f["client_directory"], f["git_directory"], *targets(full, host=True)]
     rep["argv"] = full[:-len(cmd)] + ["/bin/sh", "-c", "<PROBE>", "probe"]
     try:
         p = subprocess.run(full + args, capture_output=True, text=True, env=inside_env, timeout=PROBE_TIMEOUT)
         code, out = p.returncode, p.stdout + p.stderr
+    except subprocess.TimeoutExpired:      # its own text starts with the whole command line: cut, it never reaches the limit
+        code, out = None, f"TimeoutExpired: timed out after {PROBE_TIMEOUT} seconds"
     except (OSError, subprocess.SubprocessError) as e:
         code, out = None, f"{type(e).__name__}: {e}"
     survivors = _survivors(f"sleep {sleep}")
@@ -363,7 +368,9 @@ def _link(n: str, v) -> bool:
 
 
 def _within(path: str, roots) -> bool:
-    return any(path == r or path.startswith(r.rstrip("/") + "/") for r in roots)
+    """`path` is a root or lies below one; a root written with a trailing slash (`read_only` is bound as written, the
+    kernel prints its mount point without it) is the same directory."""
+    return any(path == r or path.startswith(r + "/") for r in (r.rstrip("/") for r in roots))
 
 
 def _judge(rep: dict, token: str, out: str, tries: dict, home: str, ws: pathlib.Path) -> list[str]:
