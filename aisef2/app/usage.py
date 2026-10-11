@@ -86,10 +86,10 @@ def usage(out: pathlib.Path, events: list[dict], prices: Mapping | None, rec: Ma
         if prices:
             row["cost"] = None if partial else _usd(s["tokens"], prices)
         sessions.append(row)
+    from aisef2.app import preflight
     try:
-        from aisef2.app import preflight
         pre = preflight.accounting(out / "preflight" / "LEDGER.jsonl")
-    except (OSError, ValueError, KeyError):
+    except Exception:  # noqa: BLE001 — a ledger the reader refuses, whatever its damage, is a preflight not known
         pre = None
     requests = sum(1 for e in events if e["type"] == "provider/request")
     retried = [e["data"].get("story_id") for e in events if e["type"] == "story/retry"]    # the journal's decisions,

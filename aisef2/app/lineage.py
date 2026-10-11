@@ -32,7 +32,12 @@ requests, the preflight's ledger) and adds what only the journal shows: a provid
 when the run ended — whose session stream exists is unknown spend. `lineage_account` sums the lineage (each run once,
 and every superseded child, whose preflight may have spent). A continuation of a lineage with unaccounted spend starts
 no paid work unless the operator accepts it by name (`--accept-unaccounted`), and the lineage's known spend counts
-against the run's ceilings (continuing never resets a budget)."""
+against the run's ceilings (continuing never resets a budget).
+
+**A file that is damaged, or is not what a run writes** — a ledger line or a claim that is valid JSON and no object, a
+session stream the reader refuses — is answered as the torn form of the same file is: unknown spend, listed; the
+unreadable-claim marker; a claim passed over, or not superseded without evidence (`LineageRefused`). `claim`,
+`continued_by`, `predecessor_of`, `account_of` and `lineage_account` raise nothing else for such a file."""
 
 from __future__ import annotations
 
@@ -58,6 +63,16 @@ class LineageRefused(Exception):
 def _sha(data: bytes) -> str:
     import hashlib
     return hashlib.sha256(data).hexdigest()
+
+
+def _claimed_run(text: str) -> str | None:
+    """The run a claim file names (None: it names none). A file that parses but is no claim — not a JSON object, or one
+    that names its run by anything but a string — is as unreadable as a torn one: ValueError, which every reader of a
+    claim already answers (a marker, or the claim passed over)."""
+    doc = json.loads(text)
+    if not isinstance(doc, dict) or not isinstance(doc.get("run", ""), str):
+        raise ValueError("not a claim")
+    return doc.get("run")
 
 
 # ------------------------------------------------------------------------------------------------ claims
@@ -108,7 +123,8 @@ def claimant() -> dict:
 def _gone(who: Mapping) -> bool | None:
     """Whether the claimant is provably gone: True (same host, its pid absent or now another process), False (alive),
     None (another host, or its identity cannot be read)."""
-    if who.get("host") != socket.gethostname() or not isinstance(who.get("pid"), int) or who.get("started") in (None, "unknown"):
+    if not isinstance(who, Mapping) or who.get("host") != socket.gethostname() or not isinstance(who.get("pid"), int) \
+            or who.get("started") in (None, "unknown"):
         return None
     now = process_started(who["pid"])
     if now is None:
@@ -123,10 +139,16 @@ def claim(predecessor: pathlib.Path, child: pathlib.Path, at: float, supersede: 
     target = predecessor / CLAIM
     if found:
         n, path = found[-1]
-        data = path.read_bytes()
+        try:
+            data = path.read_bytes()
+        except OSError as e:    # what it says cannot be reconciled, nor its digest named: only evidence could supersede it
+            raise LineageRefused(f"{predecessor} is claimed ({path.name}) and the claim cannot be read "
+                                 f"({type(e).__name__}): not superseded without evidence") from None
         try:
             doc = json.loads(data)
         except ValueError:
+            doc = {}
+        if not isinstance(doc, dict):     # JSON that is no claim is as torn as a torn one
             doc = {}
         held = pathlib.Path(str(doc.get("run", "")))
         state = child_state(held) if doc.get("run") else UNBEGUN
@@ -161,7 +183,7 @@ def continued_by(predecessor: pathlib.Path) -> tuple[str | None, str | None]:
     if not found:
         return None, None
     try:
-        run = json.loads(found[-1][1].read_text(encoding="utf-8")).get("run")
+        run = _claimed_run(found[-1][1].read_text(encoding="utf-8"))
     except (OSError, ValueError):
         return "(an unreadable claim)", None
     return run, child_state(pathlib.Path(run)) if run else None
@@ -239,10 +261,15 @@ def account_of(run_dir: pathlib.Path) -> dict:
     answered = {s for e in events if e.type == "provider/result" for s in e.source_seqs}
     try:
         pre = preflight.accounting(run_dir / "preflight" / "LEDGER.jsonl")
-    except (OSError, ValueError, KeyError):
+    except Exception:  # noqa: BLE001 — a ledger the reader refuses, whatever its damage, is spend that is unknown
         pre = {k: 0 for k in SPEND} | {"unaccounted": ["the preflight's ledger does not read"]}
     huge = {k: 10 ** 12 for k in SPEND}
-    spent = client.Budget(huge, pre, run_dir / "sessions", lambda: len(requests)).spend()
+    try:
+        spent = client.Budget(huge, pre, run_dir / "sessions", lambda: len(requests)).spend()
+    except Exception as e:  # noqa: BLE001 — a stream the reader refuses: what the sessions spent is unknown, not 0
+        spent = {**{k: pre[k] for k in SPEND}, "provider_requests": pre["provider_requests"] + len(requests),
+                 "unaccounted": [f"{run_dir.name}: a session's event stream does not read ({type(e).__name__}): what "
+                                 "the sessions spent is unknown"]}
     unaccounted = list(spent["unaccounted"]) + [f"preflight request {n} sent and never answered" for n in pre.get("unaccounted") or []]
     logs = [p.name for p in (run_dir / "sessions").glob("*.jsonl")] if (run_dir / "sessions").is_dir() else []
     for r in requests:
@@ -263,10 +290,11 @@ def account_of(run_dir: pathlib.Path) -> dict:
 def predecessor_of(run_dir: pathlib.Path) -> pathlib.Path | None:
     for name in (STARTED, "RUN.json"):
         try:
-            c = json.loads((run_dir / name).read_text(encoding="utf-8")).get("continues")
+            doc = json.loads((run_dir / name).read_text(encoding="utf-8"))
         except (OSError, ValueError):
             continue
-        if isinstance(c, Mapping) and c.get("path"):
+        c = doc.get("continues") if isinstance(doc, dict) else None     # a record that is no object names no predecessor
+        if isinstance(c, Mapping) and isinstance(c.get("path"), str) and c["path"]:
             return pathlib.Path(c["path"])
     return None
 
@@ -283,7 +311,7 @@ def lineage_account(predecessor: pathlib.Path, child: pathlib.Path | None = None
         nxt = predecessor_of(at)
         for _, path in claims(nxt) if nxt is not None else []:
             try:
-                sibling = json.loads(path.read_text(encoding="utf-8")).get("run")
+                sibling = _claimed_run(path.read_text(encoding="utf-8"))
             except (OSError, ValueError):
                 sibling = None
             if sibling and key(sibling) not in seen:
@@ -292,7 +320,7 @@ def lineage_account(predecessor: pathlib.Path, child: pathlib.Path | None = None
         at = nxt
     for _, path in claims(predecessor):     # siblings of `child`: superseded children of the predecessor itself
         try:
-            sibling = json.loads(path.read_text(encoding="utf-8")).get("run")
+            sibling = _claimed_run(path.read_text(encoding="utf-8"))
         except (OSError, ValueError):
             continue
         if sibling and key(sibling) not in seen:
