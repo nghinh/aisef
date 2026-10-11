@@ -299,6 +299,7 @@ class ToyRecord(unittest.TestCase):
         self.assertEqual([p.command for p in ca.host_table().values() if str(self.private) in p.command], [])
 
 
+@unittest.skipUnless(POSIX, "exercised on POSIX only (a symlinked tree)")
 class Merge(unittest.TestCase):
     """The merge of one run's event files, on hand-written events (no process): spellings, escapes, outside, caches."""
 

@@ -51,9 +51,13 @@ Limits — what a read-set recorded here is not (also in the output, `limits`, w
     launched by something that raises no such event (`_posixsubprocess` called directly) is not counted either way.
     Measured over the kill files of V21_TARGETS at 875c85e by grep of each file's own text (not its helpers):
     23 of 45 mention subprocess, Popen, ProcessRange, os.system/fork/exec/spawn or multiprocessing; 11 of those pass
-    `env=`; 3 name PYTHONPATH (test_s2_kills, test_v21_continue_integrity, test_c2_cli_verdicts). So a read of a
-    child that those files start through a constructed environment is NOT in their read-set, and a file only such a
-    child reads is reported "not read" for them: a measured read-set is a lower bound for those kill files.
+    `env=`; 3 name PYTHONPATH (test_s2_kills, test_v21_continue_integrity, test_c2_cli_verdicts). Measured by the
+    recorder at 180df1c on 5 of those 23 (continue_integrity, c2_cli_verdicts, bundle_tools, identity, s2_kills):
+    4791 child launches, 672 of them Python, of which 337 (50%) unhooked; 4119 not Python (git); 358 child processes
+    ran the hook. Four of the five start children it cannot see; only c2_cli_verdicts (0 started) has none. So a
+    read of a child that those files start through a constructed environment, and every read of a git child, is NOT
+    in their read-set, and a file only such a child reads is reported "not read" for them: a measured read-set is a
+    lower bound for those kill files. The other 18 that mention subprocess are not measured here.
   * Not seen even in a hooked process: reads that raise no event and go through no wrapped call (a C library opening
     a file itself, `os.access`, `os.readlink`, `os.fwalk`/`dir_fd`/fd-relative calls, `DirEntry.stat`, a stat made by
     the import system through its private `posix.stat`, `from os import stat` bound before the hook), a stat or an
@@ -239,9 +243,10 @@ sys.addaudithook(_audit)
 if not _KIDS:   # control: children do not inherit the hook
     os.environ.pop("PYTHONPATH", None)
 try:   # a sitecustomize this one shadows still runs
-    import importlib.machinery as _m, importlib.util as _u
-    _spec = _m.PathFinder.find_spec("sitecustomize", [p for p in sys.path if _norm(os.path.abspath(p or ".")) != _HOOK])
+    from importlib.machinery import PathFinder as _pf
+    _spec = _pf.find_spec("sitecustomize", [p for p in sys.path if _norm(os.path.abspath(p or ".")) != _HOOK])
     if _spec is not None and _spec.loader is not None:
+        import importlib.util as _u
         _spec.loader.exec_module(_u.module_from_spec(_spec))
 except Exception:
     pass
