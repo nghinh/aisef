@@ -1214,12 +1214,12 @@ class Signature(unittest.TestCase):
         self.assertEqual(sig(a), f"FAIL: test_x (v2.t.A.test_x) (exe=PosixPath('{self.SCRATCH}/<run#1>/tmp/<mkdtemp#1>/home/opencode')) "
                                  "| AssertionError")
         # the stable remainder, the test, the exception class, the other temp names and the text before a path tell failures apart
-        S2 = "/private/var/tmp/aisef-mut-ffffffffffff-abcd1234"
         for other in (a.replace("/home/opencode", "/workspace/opencode"), a.replace("test_x (v2.t.A.test_x)", "test_y (v2.t.A.test_y)"),
                       a.replace("AssertionError", "ValueError"), a.replace(f"{self.RUN}/tmp", f"{self.RUN}/home"),
-                      a.replace("/private/var/tmp/aisef-mut-0123456789ab", S2[:-9] + "aisef-mut-ffffffffffff")):
+                      a.replace("0123456789ab", "ffffffffffff")):
             with self.subTest(other[:90]):
                 self.assertNotEqual(sig(a), sig(other))
+        self.assertIn("<run#1>", sig(a.replace("0123456789ab", "ffffffffffff")))   # another worker's directory: still the run name
         # review 2026-10-11: what stands BEFORE the runner's path in a token is not erased, a drive-like key keeps its letter
         r1, r2 = self.RUN, self.SCRATCH + "/run-mnop1234"
         for x, y in ((f"[x=/p/one,y={r1}/tmp/f]", f"[x=/p/two,y={r2}/tmp/f]"),
@@ -1248,9 +1248,21 @@ class Signature(unittest.TestCase):
         # the run directory goes, a name under its TMPDIR that is not mkdtemp's default stays
         self.assertEqual(sig(f"FAIL: t (v2.t.A.t) (path='{self.RUN}/tmp/tmp-keep') | AssertionError"),
                          f"FAIL: t (v2.t.A.t) (path='{self.SCRATCH}/<run#1>/tmp/tmp-keep') | AssertionError")
-        # a literal placeholder in a header is not a replaced name
+        # a literal placeholder in a header is not a replaced name — alone, or beside a real runner name
         self.assertNotEqual(sig("FAIL: t (v2.t.A.t) (p='<run#1>/tmp/tmpq1w2e3r4') | E"),
                             sig(f"FAIL: t (v2.t.A.t) (p='{self.RUN}/tmp/tmpq1w2e3r4') | E"))
+        lit = f"FAIL: t (v2.t.A.t) (lit='<run#1>/tmp/%s', real='{self.RUN}/f') | E"
+        self.assertNotEqual(sig(lit % "tmpaaaaaaaa"), sig(lit % "tmpbbbbbbbb"))
+        # review 2026-10-11: the separators are not part of a name — one directory spelled two ways is one name, two are two
+        one = f"FAIL: t (v2.t.A.t) (src='{r1}/x', dst='{self.SCRATCH}//run-wxyz5678/x') | E"
+        two = f"FAIL: t (v2.t.A.t) (src='{r1}/x', dst='{self.SCRATCH}//run-mnop1234/x') | E"
+        self.assertNotEqual(sig(one), sig(two))
+        self.assertEqual(sig(one), f"FAIL: t (v2.t.A.t) (src='{self.SCRATCH}/<run#1>/x', dst='{self.SCRATCH}//<run#1>/x') | E")
+        # many distinct names are numbered in linear time
+        many = "FAIL: t (v2.t.A.t) (p=" + ",".join(f"{self.SCRATCH}/run-{i:08d}/tmp/tmp{i:08d}" for i in range(6000)) + ") | E"
+        began = time.monotonic()
+        sig(many)
+        self.assertLess(time.monotonic() - began, 5)
         # Windows separators, a repr that doubles them (a str repr), and a missing or malformed signature
         win = ("FAIL: t (v2.t.A.t) (p='C:\\\\Users\\\\u\\\\Temp\\\\aisef-mut-0123456789ab-abcd1234\\\\run-wxyz5678"
                "\\\\tmp\\\\tmpq1w2e3r4\\\\a') | AssertionError")
@@ -1290,6 +1302,15 @@ class Signature(unittest.TestCase):
         self.assertTrue(m._confirmed(entry(a)))
         self.assertTrue(m._confirmed(entry(same)))
         self.assertFalse(m._confirmed(entry(other)))
+        # a hand-edited record answers instead of raising, and a header that is not text is no confirmation
+        for odd in (None, 5, ["x"]):
+            e = entry(a)
+            for row in (e["killed_by"], e["files"][0], e["files"][3]):
+                row["first"] = odd
+            self.assertFalse(m._confirmed(e), odd)
+        e = entry(a)
+        del e["killed_by"]["first"], e["files"][0]["first"]
+        self.assertFalse(m._confirmed(e))
 
     @unittest.skipUnless(POSIX, "the runner's process ranges and cleanup authority are measured on POSIX")
     def test_a_failure_that_names_a_temp_path_is_the_same_failure_on_every_run(self):
@@ -1318,6 +1339,7 @@ class Signature(unittest.TestCase):
             self.assertEqual([x.get("role") for x in rows], [None, "control", "control", "rerun"])
             self.assertNotEqual(rows[0]["first"], rows[3]["first"])
             self.assertEqual(m.signature(rows[0]["first"]), m.signature(rows[3]["first"]))
+            self.assertEqual(rows[0]["tail_sha256"], rows[3]["tail_sha256"])   # `_tail` maps the mkdtemp name too (POSIX spelling)
             self.assertIn("<run#1>/tmp/<mkdtemp#1>", m.signature(rows[0]["first"]))
             self.assertTrue(m._confirmed(res))
         with mock.patch.object(m, "signature", lambda s: s):

@@ -2,7 +2,7 @@
  "record": "MUTATION.json.xz",
  "record_sha256": "6103a4394ed75857713d316ca3376e83d2a115ad11c21a6ff9bc7f09dcf07610",
  "runner": "validation/v2/mutation.py",
- "runner_sha256_lf": "8deeee68124f911a4ff66d53dc680a8f816353e2c74998d8f1a10c5af31bb020",
+ "runner_sha256_lf": "f46f508cfd2344039a94535cdcda93fc7841c5638f544bd10d2ee3ee0e6f7e63",
  "classes": {
   "KILLED": 10738,
   "SURVIVED": 1676,
@@ -24,6 +24,11 @@
    "rerun PASS": 2
   }
  },
+ "header_position_in_kept_tails": {
+  "after the separator line": 17547,
+  "header not in the kept tail": 3306,
+  "tail cut before the separator": 760
+ },
  "not_killed_mutants_the_rule_could_move_toward_killed": 31,
  "by_class": {
   "INFRA": 31
@@ -41,8 +46,11 @@
    "row": 6,
    "role": "unconfirmed",
    "fresh": false,
-   "first": "FAIL: test_the_cli_refuses_anchor_paths_it_would_not_write_and_a_malformed_expected_anchor (v2.test_v21_continue_integrity.AnchorThreatModel.test_the_cli_refuses_anchor_paths_it_would_not_write_and_a_malformed_expected_anchor) [/private/tmp",
-   "rerun": "FAIL: test_the_cli_refuses_anchor_paths_it_would_not_write_and_a_malformed_expected_anchor (v2.test_v21_continue_integrity.AnchorThreatModel.test_the_cli_refuses_anchor_paths_it_would_not_write_and_a_malformed_expected_anchor) [/private/tmp"
+   "string_equal": false,
+   "signature_equal": true,
+   "first": "FAIL: test_the_cli_refuses_anchor_paths_it_would_not_write_and_a_malformed_expected_anchor (v2.test_v21_continue_integrity.AnchorThreatModel.test_the_cli_refuses_anchor_paths_it_would_not_write_and_a_malformed_expected_anchor) [/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w2.env/tmp/aisef-mut-6393971b6273-8v24lo7o/run-ue3qfwgg/tmp/tmpaicwyzqv/operator-only/out.anchor] | AssertionError",
+   "rerun": "FAIL: test_the_cli_refuses_anchor_paths_it_would_not_write_and_a_malformed_expected_anchor (v2.test_v21_continue_integrity.AnchorThreatModel.test_the_cli_refuses_anchor_paths_it_would_not_write_and_a_malformed_expected_anchor) [/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w2.env/tmp/aisef-mut-6393971b6273-8v24lo7o/run-eb1vkcar/tmp/tmp8vr6v08k/operator-only/out.anchor] | AssertionError",
+   "signature": "FAIL: test_the_cli_refuses_anchor_paths_it_would_not_write_and_a_malformed_expected_anchor (v2.test_v21_continue_integrity.AnchorThreatModel.test_the_cli_refuses_anchor_paths_it_would_not_write_and_a_malformed_expected_anchor) [/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w2.env/tmp/aisef-mut-6393971b6273-8v24lo7o/<run#1>/tmp/<mkdtemp#1>/operator-only/out.anchor] | AssertionError"
   },
   {
    "target": "aisef2/app/confine.py::wrap",
@@ -52,8 +60,11 @@
    "row": 0,
    "role": "unconfirmed",
    "fresh": false,
-   "first": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-",
-   "rerun": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-"
+   "string_equal": false,
+   "signature_equal": true,
+   "first": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-nz2_584b/tmp/tmp1sm50z2u/home/opencode')) | AssertionError",
+   "rerun": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-8sup5a4l/tmp/tmpq157_jt_/home/opencode')) | AssertionError",
+   "signature": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/<run#1>/tmp/<mkdtemp#1>/home/opencode')) | AssertionError"
   },
   {
    "target": "aisef2/app/confine.py::wrap",
@@ -63,8 +74,11 @@
    "row": 0,
    "role": "unconfirmed",
    "fresh": false,
-   "first": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-",
-   "rerun": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-"
+   "string_equal": false,
+   "signature_equal": true,
+   "first": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-nn0saw16/tmp/tmp11qzg3pj/home/opencode')) | AssertionError",
+   "rerun": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-5gpsxuu8/tmp/tmprh2nfc0e/home/opencode')) | AssertionError",
+   "signature": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/<run#1>/tmp/<mkdtemp#1>/home/opencode')) | AssertionError"
   },
   {
    "target": "aisef2/app/confine.py::wrap",
@@ -74,8 +88,11 @@
    "row": 0,
    "role": "unconfirmed",
    "fresh": false,
-   "first": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-",
-   "rerun": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-"
+   "string_equal": false,
+   "signature_equal": true,
+   "first": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-awb5ueww/tmp/tmpqt25cbih/home/opencode')) | AssertionError",
+   "rerun": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-6nt9il6m/tmp/tmp3ztzu76e/home/opencode')) | AssertionError",
+   "signature": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/<run#1>/tmp/<mkdtemp#1>/home/opencode')) | AssertionError"
   },
   {
    "target": "aisef2/app/confine.py::wrap",
@@ -85,8 +102,11 @@
    "row": 0,
    "role": "unconfirmed",
    "fresh": false,
-   "first": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-",
-   "rerun": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-"
+   "string_equal": false,
+   "signature_equal": true,
+   "first": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-btepvrx6/tmp/tmp_jx76vxm/home/opencode')) | AssertionError",
+   "rerun": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-ul8utttz/tmp/tmpi06q1pvl/home/opencode')) | AssertionError",
+   "signature": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/<run#1>/tmp/<mkdtemp#1>/home/opencode')) | AssertionError"
   },
   {
    "target": "aisef2/app/confine.py::wrap",
@@ -96,8 +116,11 @@
    "row": 0,
    "role": "unconfirmed",
    "fresh": false,
-   "first": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-",
-   "rerun": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-"
+   "string_equal": false,
+   "signature_equal": true,
+   "first": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-fy8r8vpa/tmp/tmplnirqolb/home/opencode')) | AssertionError",
+   "rerun": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-a2djpq5v/tmp/tmpa1zta6td/home/opencode')) | AssertionError",
+   "signature": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/<run#1>/tmp/<mkdtemp#1>/home/opencode')) | AssertionError"
   },
   {
    "target": "aisef2/app/confine.py::wrap",
@@ -107,8 +130,11 @@
    "row": 0,
    "role": "unconfirmed",
    "fresh": false,
-   "first": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-",
-   "rerun": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-"
+   "string_equal": false,
+   "signature_equal": true,
+   "first": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-5_z7e1o6/tmp/tmpwjoam30_/home/opencode')) | AssertionError",
+   "rerun": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-gf_q99nz/tmp/tmp2170btvl/home/opencode')) | AssertionError",
+   "signature": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/<run#1>/tmp/<mkdtemp#1>/home/opencode')) | AssertionError"
   },
   {
    "target": "aisef2/app/confine.py::wrap",
@@ -118,8 +144,11 @@
    "row": 0,
    "role": "unconfirmed",
    "fresh": false,
-   "first": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-",
-   "rerun": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-"
+   "string_equal": false,
+   "signature_equal": true,
+   "first": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-rdgtomz3/tmp/tmpu6nsurq8/home/opencode')) | AssertionError",
+   "rerun": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-xctr6pxj/tmp/tmpft4c9dop/home/opencode')) | AssertionError",
+   "signature": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/<run#1>/tmp/<mkdtemp#1>/home/opencode')) | AssertionError"
   },
   {
    "target": "aisef2/app/confine.py::wrap",
@@ -129,8 +158,11 @@
    "row": 0,
    "role": "unconfirmed",
    "fresh": false,
-   "first": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-",
-   "rerun": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-"
+   "string_equal": false,
+   "signature_equal": true,
+   "first": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-2y0zktia/tmp/tmpk4ov_1pq/home/opencode')) | AssertionError",
+   "rerun": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-xfpze11d/tmp/tmpzory2gur/home/opencode')) | AssertionError",
+   "signature": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/<run#1>/tmp/<mkdtemp#1>/home/opencode')) | AssertionError"
   },
   {
    "target": "aisef2/app/confine.py::wrap",
@@ -140,8 +172,11 @@
    "row": 0,
    "role": "unconfirmed",
    "fresh": false,
-   "first": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads",
-   "rerun": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads"
+   "string_equal": false,
+   "signature_equal": true,
+   "first": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-k_h4sj54/tmp/tmpa8a8h0h6/home/opencode')) | KeyError",
+   "rerun": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-q8vokhcc/tmp/tmp5fa_cn5d/home/opencode')) | KeyError",
+   "signature": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/<run#1>/tmp/<mkdtemp#1>/home/opencode')) | KeyError"
   },
   {
    "target": "aisef2/app/confine.py::wrap",
@@ -151,8 +186,11 @@
    "row": 0,
    "role": "unconfirmed",
    "fresh": false,
-   "first": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads",
-   "rerun": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads"
+   "string_equal": false,
+   "signature_equal": true,
+   "first": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-l2mdecso/tmp/tmpwpe9d_28/home/opencode')) | ValueError",
+   "rerun": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-3_3l1bf7/tmp/tmp66vkqx2o/home/opencode')) | ValueError",
+   "signature": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/<run#1>/tmp/<mkdtemp#1>/home/opencode')) | ValueError"
   },
   {
    "target": "aisef2/app/confine.py::wrap",
@@ -162,8 +200,11 @@
    "row": 0,
    "role": "unconfirmed",
    "fresh": false,
-   "first": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads",
-   "rerun": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads"
+   "string_equal": false,
+   "signature_equal": true,
+   "first": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-qaprn2gm/tmp/tmpnavec5u5/home/opencode')) | ValueError",
+   "rerun": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-51jjbdix/tmp/tmp156tlevv/home/opencode')) | ValueError",
+   "signature": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/<run#1>/tmp/<mkdtemp#1>/home/opencode')) | ValueError"
   },
   {
    "target": "aisef2/app/confine.py::wrap",
@@ -173,8 +214,11 @@
    "row": 0,
    "role": "unconfirmed",
    "fresh": false,
-   "first": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-",
-   "rerun": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-"
+   "string_equal": false,
+   "signature_equal": true,
+   "first": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-9q4tewa9/tmp/tmpj5ln64rj/home/opencode')) | AssertionError",
+   "rerun": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-036brpc7/tmp/tmp7qcmr3av/home/opencode')) | AssertionError",
+   "signature": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/<run#1>/tmp/<mkdtemp#1>/home/opencode')) | AssertionError"
   },
   {
    "target": "aisef2/app/confine.py::wrap",
@@ -184,8 +228,11 @@
    "row": 0,
    "role": "unconfirmed",
    "fresh": false,
-   "first": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-",
-   "rerun": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-"
+   "string_equal": false,
+   "signature_equal": true,
+   "first": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-2f1_akdy/tmp/tmpcf61oxas/out/opencode')) | AssertionError",
+   "rerun": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-227zuag4/tmp/tmpqnipwn55/out/opencode')) | AssertionError",
+   "signature": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/<run#1>/tmp/<mkdtemp#1>/out/opencode')) | AssertionError"
   },
   {
    "target": "aisef2/app/confine.py::wrap",
@@ -195,8 +242,11 @@
    "row": 0,
    "role": "unconfirmed",
    "fresh": false,
-   "first": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-",
-   "rerun": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-"
+   "string_equal": false,
+   "signature_equal": true,
+   "first": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-04k54no_/tmp/tmptrpvb0l_/out/opencode')) | AssertionError",
+   "rerun": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-r_920etk/tmp/tmpsx1q5876/out/opencode')) | AssertionError",
+   "signature": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/<run#1>/tmp/<mkdtemp#1>/out/opencode')) | AssertionError"
   },
   {
    "target": "aisef2/app/confine.py::wrap",
@@ -206,8 +256,11 @@
    "row": 0,
    "role": "unconfirmed",
    "fresh": false,
-   "first": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads",
-   "rerun": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads"
+   "string_equal": false,
+   "signature_equal": true,
+   "first": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-c2j8qxp3/tmp/tmp6j0spm1a/home/opencode')) | KeyError",
+   "rerun": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-ltscfbfv/tmp/tmp497ro2yj/home/opencode')) | KeyError",
+   "signature": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/<run#1>/tmp/<mkdtemp#1>/home/opencode')) | KeyError"
   },
   {
    "target": "aisef2/app/confine.py::wrap",
@@ -217,8 +270,11 @@
    "row": 0,
    "role": "unconfirmed",
    "fresh": false,
-   "first": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads",
-   "rerun": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads"
+   "string_equal": false,
+   "signature_equal": true,
+   "first": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-kk55rrzw/tmp/tmpjktbo5uo/home/opencode')) | KeyError",
+   "rerun": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-3d9n3ftu/tmp/tmp2zz0hgqw/home/opencode')) | KeyError",
+   "signature": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/<run#1>/tmp/<mkdtemp#1>/home/opencode')) | KeyError"
   },
   {
    "target": "aisef2/app/confine.py::wrap",
@@ -228,8 +284,11 @@
    "row": 0,
    "role": "unconfirmed",
    "fresh": false,
-   "first": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads",
-   "rerun": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads"
+   "string_equal": false,
+   "signature_equal": true,
+   "first": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-6hv8_sgq/tmp/tmpnuu67sdn/home/opencode')) | ValueError",
+   "rerun": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-dd2ytpq2/tmp/tmpx2j94hk8/home/opencode')) | ValueError",
+   "signature": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/<run#1>/tmp/<mkdtemp#1>/home/opencode')) | ValueError"
   },
   {
    "target": "aisef2/app/confine.py::wrap",
@@ -239,8 +298,11 @@
    "row": 0,
    "role": "unconfirmed",
    "fresh": false,
-   "first": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads",
-   "rerun": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads"
+   "string_equal": false,
+   "signature_equal": true,
+   "first": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-n00gwq61/tmp/tmp6f3mnolh/home/opencode')) | ValueError",
+   "rerun": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-n4ua3e_2/tmp/tmpif7cb46d/home/opencode')) | ValueError",
+   "signature": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/<run#1>/tmp/<mkdtemp#1>/home/opencode')) | ValueError"
   },
   {
    "target": "aisef2/app/confine.py::wrap",
@@ -250,8 +312,11 @@
    "row": 0,
    "role": "unconfirmed",
    "fresh": false,
-   "first": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads",
-   "rerun": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads"
+   "string_equal": false,
+   "signature_equal": true,
+   "first": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-cu2i6aax/tmp/tmpb5tp5t6w/home/opencode')) | ValueError",
+   "rerun": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-746ckjuq/tmp/tmp405iw2rs/home/opencode')) | ValueError",
+   "signature": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/<run#1>/tmp/<mkdtemp#1>/home/opencode')) | ValueError"
   },
   {
    "target": "aisef2/app/confine.py::wrap",
@@ -261,8 +326,11 @@
    "row": 0,
    "role": "unconfirmed",
    "fresh": false,
-   "first": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads",
-   "rerun": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads"
+   "string_equal": false,
+   "signature_equal": true,
+   "first": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-6as9wv4b/tmp/tmposlx90pb/home/opencode')) | ValueError",
+   "rerun": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-vc0gxt6k/tmp/tmpai1_ooy8/home/opencode')) | ValueError",
+   "signature": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/<run#1>/tmp/<mkdtemp#1>/home/opencode')) | ValueError"
   },
   {
    "target": "aisef2/app/confine.py::wrap",
@@ -272,8 +340,11 @@
    "row": 0,
    "role": "unconfirmed",
    "fresh": false,
-   "first": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads",
-   "rerun": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads"
+   "string_equal": false,
+   "signature_equal": true,
+   "first": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-y6_4uzn0/tmp/tmpbe_p2vp0/home/opencode')) | ValueError",
+   "rerun": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-0b2q2kgh/tmp/tmp8zde2qoy/home/opencode')) | ValueError",
+   "signature": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/<run#1>/tmp/<mkdtemp#1>/home/opencode')) | ValueError"
   },
   {
    "target": "aisef2/app/confine.py::wrap",
@@ -283,8 +354,11 @@
    "row": 0,
    "role": "unconfirmed",
    "fresh": false,
-   "first": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads",
-   "rerun": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads"
+   "string_equal": false,
+   "signature_equal": true,
+   "first": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-hn6kl495/tmp/tmpe0vx4h0z/home/opencode')) | ValueError",
+   "rerun": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-9a7yw4b1/tmp/tmpkwymcw36/home/opencode')) | ValueError",
+   "signature": "ERROR: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/<run#1>/tmp/<mkdtemp#1>/home/opencode')) | ValueError"
   },
   {
    "target": "aisef2/app/confine.py::wrap",
@@ -294,8 +368,11 @@
    "row": 0,
    "role": "unconfirmed",
    "fresh": false,
-   "first": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-",
-   "rerun": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-"
+   "string_equal": false,
+   "signature_equal": true,
+   "first": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-fongio7h/tmp/tmpjd6gga_t/out/opencode')) | AssertionError",
+   "rerun": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-45zlnt4h/tmp/tmpeonwzeho/out/opencode')) | AssertionError",
+   "signature": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/<run#1>/tmp/<mkdtemp#1>/out/opencode')) | AssertionError"
   },
   {
    "target": "aisef2/app/confine.py::wrap",
@@ -305,8 +382,11 @@
    "row": 0,
    "role": "unconfirmed",
    "fresh": false,
-   "first": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-",
-   "rerun": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-"
+   "string_equal": false,
+   "signature_equal": true,
+   "first": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-700pgylq/tmp/tmp1hj5l6cq/home/opencode')) | AssertionError",
+   "rerun": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-wbodb619/tmp/tmpdfvjn5bj/home/opencode')) | AssertionError",
+   "signature": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/<run#1>/tmp/<mkdtemp#1>/home/opencode')) | AssertionError"
   },
   {
    "target": "aisef2/app/confine.py::wrap",
@@ -316,8 +396,11 @@
    "row": 0,
    "role": "unconfirmed",
    "fresh": false,
-   "first": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-",
-   "rerun": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-"
+   "string_equal": false,
+   "signature_equal": true,
+   "first": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-jy_l92ev/tmp/tmp3s0xsq28/home/opencode')) | AssertionError",
+   "rerun": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-0fht33n4/tmp/tmpzs610gm7/home/opencode')) | AssertionError",
+   "signature": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/<run#1>/tmp/<mkdtemp#1>/home/opencode')) | AssertionError"
   },
   {
    "target": "aisef2/app/confine.py::wrap",
@@ -327,8 +410,11 @@
    "row": 0,
    "role": "unconfirmed",
    "fresh": false,
-   "first": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-",
-   "rerun": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-"
+   "string_equal": false,
+   "signature_equal": true,
+   "first": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-k9ftse4g/tmp/tmp9e87u__g/home/opencode')) | AssertionError",
+   "rerun": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-rwg_dt4y/tmp/tmpvojlv_p5/home/opencode')) | AssertionError",
+   "signature": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/<run#1>/tmp/<mkdtemp#1>/home/opencode')) | AssertionError"
   },
   {
    "target": "aisef2/app/confine.py::wrap",
@@ -338,8 +424,11 @@
    "row": 0,
    "role": "unconfirmed",
    "fresh": false,
-   "first": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-",
-   "rerun": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-"
+   "string_equal": false,
+   "signature_equal": true,
+   "first": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-rarpuyn5/tmp/tmpypfw28ew/out/opencode')) | AssertionError",
+   "rerun": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-y5erb_5m/tmp/tmpz6v_t4hy/out/opencode')) | AssertionError",
+   "signature": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/<run#1>/tmp/<mkdtemp#1>/out/opencode')) | AssertionError"
   },
   {
    "target": "aisef2/app/confine.py::wrap",
@@ -349,8 +438,11 @@
    "row": 0,
    "role": "unconfirmed",
    "fresh": false,
-   "first": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-",
-   "rerun": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-"
+   "string_equal": false,
+   "signature_equal": true,
+   "first": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-25n5r06e/tmp/tmpbmczv6t1/home/opencode')) | AssertionError",
+   "rerun": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-grlq6tz6/tmp/tmp6dog1ilo/home/opencode')) | AssertionError",
+   "signature": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/<run#1>/tmp/<mkdtemp#1>/home/opencode')) | AssertionError"
   },
   {
    "target": "aisef2/app/confine.py::wrap",
@@ -360,8 +452,11 @@
    "row": 0,
    "role": "unconfirmed",
    "fresh": false,
-   "first": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-",
-   "rerun": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-"
+   "string_equal": false,
+   "signature_equal": true,
+   "first": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-qorboka7/tmp/tmp98hj3gt8/out/opencode')) | AssertionError",
+   "rerun": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-b9hx8vd_/tmp/tmpdiml5nrw/out/opencode')) | AssertionError",
+   "signature": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/<run#1>/tmp/<mkdtemp#1>/out/opencode')) | AssertionError"
   },
   {
    "target": "aisef2/app/confine.py::wrap",
@@ -371,8 +466,11 @@
    "row": 0,
    "role": "unconfirmed",
    "fresh": false,
-   "first": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-",
-   "rerun": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-"
+   "string_equal": false,
+   "signature_equal": true,
+   "first": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-ete0qgdi/tmp/tmpy0xfwv1k/out/opencode')) | AssertionError",
+   "rerun": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/run-ovqp4xso/tmp/tmpztyljp9k/out/opencode')) | AssertionError",
+   "signature": "FAIL: test_a_client_directory_that_holds_home_or_the_workspace_is_refused (v2.test_v21_confine.CommandLine.test_a_client_directory_that_holds_home_or_the_workspace_is_refused) (exe=PosixPath('/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c2/c2-w3.env/tmp/aisef-mut-8069a9de0d1b-d69t5x6z/<run#1>/tmp/<mkdtemp#1>/out/opencode')) | AssertionError"
   }
  ]
 }

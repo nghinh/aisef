@@ -1179,8 +1179,8 @@ def _summary(text: str) -> dict | None:
 #: `run-<8>` or a tree `tree-<8>` in it, a run's TMPDIR `<run>/tmp`, and a test's default mkdtemp name `tmp<8>` in that
 #: (8 = tempfile's random characters). Only the run, tree and mkdtemp names are replaced, never the text around them and
 #: not the scratch name (one per target: a directory of another target or worker stays a different name).
-_RUNNER_DIR = re.compile(r"(?<![\w.-])(aisef-mut-[0-9a-f]{12}-[a-z0-9_]{8}[\\/]+)(run|tree)-[a-z0-9_]{8}(?![a-z0-9_])")
-_MKDTEMP = re.compile(r"(<run#\d+>[\\/]+tmp[\\/]+)(tmp[a-z0-9_]{8})(?![a-z0-9_])")
+_RUNNER_DIR = re.compile(r"(?<![\w.-])(?P<scratch>aisef-mut-[0-9a-f]{12}-[a-z0-9_]{8})(?P<sep>[\\/]+)(?P<kind>run|tree)-(?P<name>[a-z0-9_]{8})(?![a-z0-9_])")
+_MKDTEMP = re.compile(r"(?<!<)(?P<run><run#\d+>)(?P<sep>[\\/]+tmp[\\/]+)(?P<name>tmp[a-z0-9_]{8})(?![a-z0-9_])")   # (?<!<): not a doubled literal
 
 
 def signature(first: str | None) -> str | None:
@@ -1195,13 +1195,17 @@ def signature(first: str | None) -> str | None:
     text = first.replace("<", "<<")
     if "aisef-mut-" not in text:   # no runner name: nothing to replace, and no scan of a long header
         return text
-    seen: dict[tuple[str, str], int] = {}
+    seen: dict[tuple[str, ...], int] = {}
+    count: dict[str, int] = {}
 
-    def number(kind: str, name: str) -> int:
-        return seen.setdefault((kind, name), 1 + sum(k[0] == kind for k in seen))
+    def number(kind: str, *name: str) -> int:   # the name, never the separators: `/` and `//` are one directory
+        if (kind, *name) not in seen:
+            count[kind] = count.get(kind, 0) + 1
+            seen[kind, *name] = count[kind]
+        return seen[kind, *name]
 
-    text = _RUNNER_DIR.sub(lambda m_: f"{m_[1]}<{m_[2]}#{number(m_[2], m_[0])}>", text)
-    return _MKDTEMP.sub(lambda m_: f"{m_[1]}<mkdtemp#{number('mkdtemp', m_[2])}>", text)
+    text = _RUNNER_DIR.sub(lambda m_: f"{m_['scratch']}{m_['sep']}<{m_['kind']}#{number(m_['kind'], m_['scratch'], m_['name'])}>", text)
+    return _MKDTEMP.sub(lambda m_: f"{m_['run']}{m_['sep']}<mkdtemp#{number('mkdtemp', m_['run'], m_['name'])}>", text)
 
 
 def _counts(s: dict) -> list[int]:
@@ -1623,12 +1627,12 @@ def _confirmed(r: dict) -> bool:
     with the same signature, on the same file."""
     kb, rows = r.get("killed_by") or {}, r.get("files", [])
     for i, x in enumerate(rows):
-        if "role" not in x and x["file"] == kb.get("file") and x["outcome"] == "FAIL" and \
-                signature(x.get("first")) == signature(kb.get("first")):
+        sx = signature(x.get("first"))
+        if "role" not in x and x["file"] == kb.get("file") and x["outcome"] == "FAIL" and isinstance(sx, str) and \
+                sx == signature(kb.get("first")):
             got = [(y.get("role"), y["file"], y["outcome"], signature(y.get("first")) if y.get("role") == "rerun" else None)
                    for y in rows[i + 1:i + 1 + len(BRACKET)]]
-            return got == [(role, x["file"], want, signature(x["first"]) if role == "rerun" else None)
-                           for role, _, want in BRACKET]
+            return got == [(role, x["file"], want, sx if role == "rerun" else None) for role, _, want in BRACKET]
     return False
 
 
