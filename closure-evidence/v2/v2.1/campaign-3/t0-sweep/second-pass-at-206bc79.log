@@ -1,0 +1,7 @@
+HEAD 206bc79fc06490ec2820f886fca1c4158490ea5f dirty: [] free 33 GiB
+=== sweep 2026-10-11 17:30:52
+235 pairs, 29 null mutants, 133 kill files
+PASS aisef2/app/confine.py|4dfe3672fd65da0c|tests/v2/test_v21_confine.py  (21.5s)
+sweep RC 0
+HEAD after 206bc79fc06490ec2820f886fca1c4158490ea5f dirty: []
+=== DONE 2026-10-11 17:31:17
