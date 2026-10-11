@@ -301,7 +301,7 @@ def coverage(bundle: Mapping) -> dict:
     """Per requirement: the clauses the plan's criteria declare (facts.clause) and the criteria; a requirement no
     criterion covers is UNCOVERED. Only the clauses an author declared are known here: a clause never written into a
     criterion's facts is not seen, and the report says so."""
-    by_req: dict[str, dict] = {r["id"]: {"clauses": {}, "criteria": []} for r in bundle["requirements"]}
+    by_req: dict[str, dict] = {r["id"]: {"clauses": [], "criteria": []} for r in bundle["requirements"]}
     stray = []
     for cid, f in bundle["facts"].items():
         rec = by_req.get(f.get("requirement"))
@@ -309,8 +309,27 @@ def coverage(bundle: Mapping) -> dict:
             stray.append(cid)
             continue
         rec["criteria"].append(cid)
-        rec["clauses"].setdefault(f.get("clause"), []).append(cid)
-    return {"requirements": {rid: {"status": "COVERED" if v["criteria"] else "UNCOVERED", **v} for rid, v in by_req.items()},
+        rec["clauses"].append((f.get("clause"), cid))
+
+    def by_clause(declared: list) -> dict:
+        """clause -> criteria. Every clause of a bundle that loads is a string; one that is not (a missing one beside
+        "1.1", a number, a list: `load` refuses it and lint says so) must not make this report unprintable, so it is
+        keyed as it is while the keys hash and order (json.dumps(sort_keys=True) orders them), else by its JSON text."""
+        out: dict = {}
+        try:
+            for clause, cid in declared:
+                out.setdefault(clause, []).append(cid)
+            sorted(out)
+        except TypeError:
+            out = {}
+            for clause, cid in declared:
+                out.setdefault(clause if isinstance(clause, str) else json.dumps(clause, sort_keys=True, default=str),
+                               []).append(cid)
+        return out
+
+    return {"requirements": {rid: {"status": "COVERED" if v["criteria"] else "UNCOVERED",
+                                   "clauses": by_clause(v["clauses"]), "criteria": v["criteria"]}
+                             for rid, v in by_req.items()},
             "criteria_citing_no_requirement_of_the_bundle": stray,
             "limit": "clauses are the ones the criteria's facts declare; AISEF does not parse the requirements document"}
 
