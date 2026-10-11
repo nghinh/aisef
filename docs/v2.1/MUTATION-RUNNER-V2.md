@@ -1046,3 +1046,20 @@ of `AUDITED` are read by description as before.
 The record builder (`v21_mutation_record.py`) reads the audits through a view that removes exactly the audited
 positions from `survivors` before the frozen S2 accounting sees them; the record keeps every result as it was
 measured. Tests: `test_v21_mutation_runner.PositionalAudits` (6).
+
+## 17. Campaign 3's T0 sweep (B-03, 2026-10-11)
+
+Before campaign 3 the §6.1 measurement was repeated on the tree that campaign measures: every distinct (null mutant,
+kill file) pair of the 468 V2.1 targets through the runner's own T0 — **235 pairs, 29 null mutants, 133 kill files**
+(`closure-evidence/v2/v2.1/campaign-3/tools/sweep.py`; record `T0-SWEEP-3.json`; table `EXECUTION-ORDER-3.json`;
+account in `campaign-3/t0-sweep/README.md`). First pass at 408e1c8: 234 PASS and one FAIL, and the original bytes passed
+that one: `test_v21_confine.HostGuard.test_nothing_is_copied_or_probed_outside_the_tests_directory` made its faulty
+kernel copy by replacing the literal text `get_paths()["purelib"]) / probe_file`, which the module the runner writes
+(`ast.unparse`: single quotes) does not contain, so the test failed on the null mutant — and, had T0 not stopped it,
+would have failed on every mutant of `confine.py`, a kill of every one of them by a fault of the test. Fixed at 206bc79
+(a pattern over either quote style); second pass PASS.
+
+The rule it adds for a kill file that edits product source: match the **tokens**, never the spelling — the runner
+writes every module through `ast.unparse` (quotes, line breaks, parentheses, comments and blank lines are not the
+committed text), and T0 is where a file that depends on the spelling is found. The same holds for a test that
+compares source text, counts lines or asserts on a line number.
