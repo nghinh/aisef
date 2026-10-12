@@ -274,7 +274,8 @@ What the reviewer re-ran and found, in short (the report is `out/conf/review/rep
 * **One fail-open, fixed** (`_owned`): a host table whose rows lacked a super block (`dev`) or peer groups (`optional`)
   matched nothing, so the host's own `mqueue` super block was accepted. Such a table is now "not established" like an
   unread one (`tests/v2/test_v21_r3_conf_rv_hostrows.py`; the rows `_host_mounts` builds always carry both fields, so
-  no measurement is refused by it).
+  no measurement is refused by it). `kill_check` of `_owned` after the change: 118 mutants, 118 killed (the first run
+  had one survivor, the new reason's text emptied; the test now pins the cause).
 * **Corrected wording**: class D is accepted by *identity under a `--dev` destination*, not "placed by `--dev`" — an extra
   `--dev-bind /dev/null /dev/null` gives the same row and is accepted (real run, `dev-bind-null-over-null`).
 * **Re-run, same result**: the twelve real-bubblewrap scenarios (`scenarios`), the locale record, the 2.1 boundary harness

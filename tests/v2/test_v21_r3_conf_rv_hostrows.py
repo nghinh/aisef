@@ -48,7 +48,7 @@ class IncompleteHostTable(unittest.TestCase):
                 self.assertEqual(len(said), 1, said)
                 self.assertTrue(said[0].startswith("cannot establish that a writable mount belongs to the sandbox"), said)
                 self.assertIn("isolation not established", said[0])
-                self.assertIn("/mq:", said[0])
+                self.assertIn("/mq: the host's mount table has a row", said[0])     # the mount, and the cause
                 self.assertNotIn("writable outside", said[0])
 
     def test_a_table_whose_every_row_lacks_the_super_block_does_not_pass_a_mount_it_holds(self):
