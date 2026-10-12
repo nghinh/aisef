@@ -1,0 +1,74 @@
+{
+ "environment": {
+  "bubblewrap": "bubblewrap 0.12.0",
+  "kernel": "Linux 7.0.12-linuxkit aarch64",
+  "locales": [
+   "C",
+   "C.utf8",
+   "POSIX"
+  ],
+  "os": "Debian GNU/Linux 13 (trixie)",
+  "python": "3.14.8",
+  "uid": 1000
+ },
+ "record": {
+  "bubblewrap_calls": [
+   {
+    "keys": [
+     "HOME",
+     "LANG",
+     "LC_ALL",
+     "PATH",
+     "PWD",
+     "TMPDIR",
+     "XDG_CACHE_HOME",
+     "XDG_CONFIG_HOME",
+     "XDG_DATA_HOME",
+     "XDG_STATE_HOME"
+    ],
+    "locale_family": {
+     "LANG": "C",
+     "LC_ALL": "C"
+    }
+   },
+   {
+    "keys": [
+     "HOME",
+     "LANG",
+     "LC_ALL",
+     "PATH",
+     "PWD",
+     "TMPDIR",
+     "XDG_CACHE_HOME",
+     "XDG_CONFIG_HOME",
+     "XDG_DATA_HOME",
+     "XDG_STATE_HOME"
+    ],
+    "locale_family": {
+     "LANG": "C",
+     "LC_ALL": "C"
+    }
+   }
+  ],
+  "caller": {
+   "LANG": "vi_VN.UTF-8",
+   "LANGUAGE": "ja",
+   "LC_ALL": "de_DE.UTF-8",
+   "LC_MESSAGES": "fr_FR.UTF-8"
+  },
+  "locales_in_the_guest": [
+   "C",
+   "C.utf8",
+   "POSIX"
+  ],
+  "os_environ_unchanged": true,
+  "report": {
+   "bwrap_version": "bubblewrap 0.12.0",
+   "locale": {
+    "LANG": "C",
+    "LC_ALL": "C"
+   },
+   "problems": []
+  }
+ }
+}

@@ -1,0 +1,856 @@
+{
+ "environment": {
+  "bubblewrap": "bubblewrap 0.12.0",
+  "kernel": "Linux 7.0.12-linuxkit aarch64",
+  "locales": [
+   "C",
+   "C.utf8",
+   "POSIX"
+  ],
+  "os": "Debian GNU/Linux 13 (trixie)",
+  "python": "3.14.8",
+  "uid": 1000
+ },
+ "record": {
+  "bind-null-at-dev-x": {
+   "accepted": false,
+   "devices": {
+    "/dev/full": "1:7",
+    "/dev/null": "1:3",
+    "/dev/random": "1:8",
+    "/dev/tty": "5:0",
+    "/dev/urandom": "1:9",
+    "/dev/zero": "1:5"
+   },
+   "extra": [
+    "--bind",
+    "/dev/null",
+    "/dev/x"
+   ],
+   "problems": [
+    "writable outside the workspace: ['/dev/x'] (/dev/x: its super block 0:69 is the host's (mounted there at /dev))"
+   ],
+   "read_only": [],
+   "table_unchanged": true,
+   "writable_mounts_besides_the_workspace": [
+    {
+     "at": "/",
+     "dev": "0:85",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/proc",
+     "dev": "0:86",
+     "fs": "proc",
+     "optional": [],
+     "source": "proc"
+    },
+    {
+     "at": "/dev",
+     "dev": "0:87",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/null",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/zero",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/full",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/random",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/urandom",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/tty",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/pts",
+     "dev": "0:88",
+     "fs": "devpts",
+     "optional": [],
+     "source": "devpts"
+    },
+    {
+     "at": "/tmp",
+     "dev": "0:89",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/aisef-home",
+     "dev": "0:90",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/x",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    }
+   ]
+  },
+  "dev-bind-null-over-null": {
+   "accepted": true,
+   "devices": {
+    "/dev/full": "1:7",
+    "/dev/null": "1:3",
+    "/dev/random": "1:8",
+    "/dev/tty": "5:0",
+    "/dev/urandom": "1:9",
+    "/dev/zero": "1:5"
+   },
+   "extra": [
+    "--dev-bind",
+    "/dev/null",
+    "/dev/null"
+   ],
+   "problems": [],
+   "read_only": [],
+   "table_unchanged": true,
+   "writable_mounts_besides_the_workspace": [
+    {
+     "at": "/",
+     "dev": "0:60",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/proc",
+     "dev": "0:61",
+     "fs": "proc",
+     "optional": [],
+     "source": "proc"
+    },
+    {
+     "at": "/dev",
+     "dev": "0:62",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/null",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/zero",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/full",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/random",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/urandom",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/tty",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/pts",
+     "dev": "0:63",
+     "fs": "devpts",
+     "optional": [],
+     "source": "devpts"
+    },
+    {
+     "at": "/tmp",
+     "dev": "0:65",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/aisef-home",
+     "dev": "0:85",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/null",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    }
+   ]
+  },
+  "read_only /dev": {
+   "accepted": false,
+   "devices": {},
+   "extra": [],
+   "problems": [
+    "no refusal of a further user namespace was measured (exit 127: unshare: absent)",
+    "cannot establish that a writable mount belongs to the sandbox (isolation not established, not a write that was seen): /dev/null: it is not shown to be the character device 1:3 (read: nothing); /dev/zero: it is not shown to be the character device 1:5 (read: nothing); /dev/full: it is not shown to be the character device 1:7 (read: nothing); /dev/random: it is not shown to be the character device 1:8 (read: nothing); /dev/urandom: it is not shown to be the character device 1:9 (read: nothing); /dev/tty: it is not shown to be the character device 5:0 (read: nothing)",
+    "the reachable unix sockets could not be listed (no find in the sandbox)"
+   ],
+   "read_only": [
+    "/dev"
+   ],
+   "table_unchanged": true,
+   "writable_mounts_besides_the_workspace": [
+    {
+     "at": "/",
+     "dev": "0:60",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/proc",
+     "dev": "0:61",
+     "fs": "proc",
+     "optional": [],
+     "source": "proc"
+    },
+    {
+     "at": "/dev",
+     "dev": "0:62",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/null",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/zero",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/full",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/random",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/urandom",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/tty",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/pts",
+     "dev": "0:63",
+     "fs": "devpts",
+     "optional": [],
+     "source": "devpts"
+    },
+    {
+     "at": "/tmp",
+     "dev": "0:65",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/aisef-home",
+     "dev": "0:85",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    }
+   ]
+  },
+  "read_only /dev/pts": {
+   "accepted": true,
+   "devices": {
+    "/dev/full": "1:7",
+    "/dev/null": "1:3",
+    "/dev/random": "1:8",
+    "/dev/tty": "5:0",
+    "/dev/urandom": "1:9",
+    "/dev/zero": "1:5"
+   },
+   "extra": [],
+   "problems": [],
+   "read_only": [
+    "/dev/pts"
+   ],
+   "table_unchanged": true,
+   "writable_mounts_besides_the_workspace": [
+    {
+     "at": "/",
+     "dev": "0:60",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/proc",
+     "dev": "0:61",
+     "fs": "proc",
+     "optional": [],
+     "source": "proc"
+    },
+    {
+     "at": "/dev",
+     "dev": "0:62",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/null",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/zero",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/full",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/random",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/urandom",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/tty",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/pts",
+     "dev": "0:63",
+     "fs": "devpts",
+     "optional": [],
+     "source": "devpts"
+    },
+    {
+     "at": "/tmp",
+     "dev": "0:65",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/aisef-home",
+     "dev": "0:85",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    }
+   ]
+  },
+  "read_only /dev/shm": {
+   "accepted": true,
+   "devices": {
+    "/dev/full": "1:7",
+    "/dev/null": "1:3",
+    "/dev/random": "1:8",
+    "/dev/tty": "5:0",
+    "/dev/urandom": "1:9",
+    "/dev/zero": "1:5"
+   },
+   "extra": [],
+   "problems": [],
+   "read_only": [
+    "/dev/shm"
+   ],
+   "table_unchanged": true,
+   "writable_mounts_besides_the_workspace": [
+    {
+     "at": "/",
+     "dev": "0:60",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/proc",
+     "dev": "0:61",
+     "fs": "proc",
+     "optional": [],
+     "source": "proc"
+    },
+    {
+     "at": "/dev",
+     "dev": "0:62",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/null",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/zero",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/full",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/random",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/urandom",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/tty",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/pts",
+     "dev": "0:63",
+     "fs": "devpts",
+     "optional": [],
+     "source": "devpts"
+    },
+    {
+     "at": "/tmp",
+     "dev": "0:65",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/aisef-home",
+     "dev": "0:85",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    }
+   ]
+  },
+  "read_only /run": {
+   "accepted": true,
+   "devices": {
+    "/dev/full": "1:7",
+    "/dev/null": "1:3",
+    "/dev/random": "1:8",
+    "/dev/tty": "5:0",
+    "/dev/urandom": "1:9",
+    "/dev/zero": "1:5"
+   },
+   "extra": [],
+   "problems": [],
+   "read_only": [
+    "/run"
+   ],
+   "table_unchanged": true,
+   "writable_mounts_besides_the_workspace": [
+    {
+     "at": "/",
+     "dev": "0:60",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/proc",
+     "dev": "0:61",
+     "fs": "proc",
+     "optional": [],
+     "source": "proc"
+    },
+    {
+     "at": "/dev",
+     "dev": "0:62",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/null",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/zero",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/full",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/random",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/urandom",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/tty",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/pts",
+     "dev": "0:63",
+     "fs": "devpts",
+     "optional": [],
+     "source": "devpts"
+    },
+    {
+     "at": "/tmp",
+     "dev": "0:65",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/aisef-home",
+     "dev": "0:85",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    }
+   ]
+  },
+  "read_only /tmp": {
+   "accepted": true,
+   "devices": {
+    "/dev/full": "1:7",
+    "/dev/null": "1:3",
+    "/dev/random": "1:8",
+    "/dev/tty": "5:0",
+    "/dev/urandom": "1:9",
+    "/dev/zero": "1:5"
+   },
+   "extra": [],
+   "problems": [],
+   "read_only": [
+    "/tmp"
+   ],
+   "table_unchanged": true,
+   "writable_mounts_besides_the_workspace": [
+    {
+     "at": "/",
+     "dev": "0:60",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/proc",
+     "dev": "0:61",
+     "fs": "proc",
+     "optional": [],
+     "source": "proc"
+    },
+    {
+     "at": "/dev",
+     "dev": "0:62",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/null",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/zero",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/full",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/random",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/urandom",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/tty",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/pts",
+     "dev": "0:63",
+     "fs": "devpts",
+     "optional": [],
+     "source": "devpts"
+    },
+    {
+     "at": "/tmp",
+     "dev": "0:65",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/aisef-home",
+     "dev": "0:85",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    }
+   ]
+  },
+  "stdin-is-a-terminal": {
+   "accepted": true,
+   "devices": {
+    "/dev/full": "1:7",
+    "/dev/null": "1:3",
+    "/dev/random": "1:8",
+    "/dev/tty": "5:0",
+    "/dev/urandom": "1:9",
+    "/dev/zero": "1:5"
+   },
+   "extra": [],
+   "problems": [],
+   "read_only": [],
+   "stdin": "/dev/pts/0",
+   "table_unchanged": true,
+   "writable_mounts_besides_the_workspace": [
+    {
+     "at": "/",
+     "dev": "0:60",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/proc",
+     "dev": "0:61",
+     "fs": "proc",
+     "optional": [],
+     "source": "proc"
+    },
+    {
+     "at": "/dev",
+     "dev": "0:62",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/null",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/zero",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/full",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/random",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/urandom",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/tty",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/dev/pts",
+     "dev": "0:63",
+     "fs": "devpts",
+     "optional": [],
+     "source": "devpts"
+    },
+    {
+     "at": "/tmp",
+     "dev": "0:65",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    },
+    {
+     "at": "/aisef-home",
+     "dev": "0:85",
+     "fs": "tmpfs",
+     "optional": [],
+     "source": "tmpfs"
+    }
+   ]
+  }
+ }
+}

@@ -31,6 +31,7 @@ if str(ROOT) not in sys.path:
 
 from aisef2.app import confine  # noqa: E402
 from tests.v2 import test_v21_confine as base  # noqa: E402 — the module: its tests are not collected again
+from tests.v2 import v21_r3_conf_rows as rows  # noqa: E402
 
 
 class ArgvDefault(unittest.TestCase):
@@ -51,10 +52,11 @@ class ArgvDefault(unittest.TestCase):
 def clean_report(ws: pathlib.PurePath) -> dict:
     """A measurement `_judge` finds nothing to say about (the workspace the only host-backed mount)."""
     return {"network": "host", "created_outside_workspace": {"kernel": False}, "setsid_survivors": [],
+            "host_mounts": rows.HOST,
             "inside": {"capabilities": dict.fromkeys(("CapInh", "CapPrm", "CapEff", "CapBnd", "CapAmb"), "0000000000000000"),
                        "no_new_privs": "1", "namespaces": dict.fromkeys(("user", "pid", "ipc", "uts", "mnt"), "own"),
                        "routed_interfaces": [], "home_listing": [], "unix_sockets": [],
-                       "mounts": [{"at": "/", "access": "rw", "fs": "tmpfs"}, {"at": str(ws), "access": "rw", "fs": "ext4"}],
+                       "mounts": [rows.mount("/"), {"at": str(ws), "access": "rw", "fs": "ext4"}],
                        "mount_targets": [str(ws)]}}
 
 

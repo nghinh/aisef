@@ -39,6 +39,7 @@ from aisef2.app import run as R  # noqa: E402
 from aisef2.runtime.process_range import ProcessRange  # noqa: E402
 from tests.v2 import isolated_git  # noqa: E402
 from tests.v2 import test_app_run as app_run  # noqa: E402 — the module, so its Command tests are not collected again
+from tests.v2 import v21_r3_conf_rows as rows  # noqa: E402
 from tests.v2.test_app_run import SETTINGS, ProductBase, provider  # noqa: E402
 
 if str(ROOT / "validation" / "v2") not in sys.path:
@@ -628,10 +629,11 @@ class FailClosed(unittest.TestCase):
 
         def judged(change=lambda rep, tries: None, out="", home="/nonexistent"):
             rep = {"network": "host", "created_outside_workspace": {"kernel": False}, "setsid_survivors": [],
+                   "host_mounts": rows.HOST,
                    "inside": {"capabilities": dict.fromkeys(("CapInh", "CapPrm", "CapEff", "CapBnd", "CapAmb"), "0000000000000000"),
                               "no_new_privs": "1", "namespaces": dict.fromkeys(("user", "pid", "ipc", "uts", "mnt"), "own"),
                               "routed_interfaces": [], "home_listing": [], "unix_sockets": [],
-                              "mounts": [{"at": "/", "access": "rw", "fs": "tmpfs"}, {"at": str(ws), "access": "rw", "fs": "ext4"}],
+                              "mounts": [rows.mount("/"), {"at": str(ws), "access": "rw", "fs": "ext4"}],
                               "mount_targets": [str(ws)]}}
             tries = {"read_canary": (1, "No such file or directory"), "workspace": (0, "ok"),
                      "read_git_directory": (0, "ref: x"), "user_namespace": (1, "unshare failed: No space left on device")}
@@ -653,10 +655,10 @@ class FailClosed(unittest.TestCase):
             (dict(change=inside(no_new_privs="0")), "NoNewPrivs is 0, not 1"),
             (dict(change=inside(no_new_privs=None)), "NoNewPrivs is None, not 1"),
             (dict(change=inside(mounts=[])), "the mounts could not be read"),
-            (dict(change=inside(mounts=[{"at": "/", "access": "rw", "fs": "tmpfs"}, {"at": "/srv", "access": "rw", "fs": "ext4"}],
+            (dict(change=inside(mounts=[rows.mount("/"), {"at": "/srv", "access": "rw", "fs": "ext4"}],
                                 mount_targets=[str(ws), "/srv"])), "writable outside the workspace: ['/srv']"),
             (dict(change=inside(home_listing=[".config", ".ssh"],
-                                mounts=[{"at": "/", "access": "rw", "fs": "tmpfs"}, {"at": "/h/.config/opencode", "access": "ro", "fs": "ext4"}],
+                                mounts=[rows.mount("/"), {"at": "/h/.config/opencode", "access": "ro", "fs": "ext4"}],
                                 mount_targets=["/h/.config/opencode"]), home="/h"),
              "HOME shows more than the way to what is mounted: ['.ssh']"),
             (dict(change=lambda rep, tries: (rep.update(network="none"), rep["inside"]["namespaces"].update(net="shared"))),
@@ -667,7 +669,7 @@ class FailClosed(unittest.TestCase):
             # a path that only shares a prefix with an allowed one is outside it (/w/ws2 beside /w/ws, /usrlocal-extra beside /usr)
             (dict(change=inside(unix_sockets=["/w/ws2/control.sock"])),
              "a unix socket outside the workspace is reachable (read-only does not stop a connect): ['/w/ws2/control.sock']"),
-            (dict(change=inside(mounts=[{"at": "/", "access": "rw", "fs": "tmpfs"}, {"at": str(ws), "access": "rw", "fs": "ext4"},
+            (dict(change=inside(mounts=[rows.mount("/"), {"at": str(ws), "access": "rw", "fs": "ext4"},
                                         {"at": "/usrlocal-extra", "access": "ro", "fs": "ext4"}], mount_targets=[str(ws), "/usr"])),
              "mounted beyond what the wrapper names: ['/usrlocal-extra']"),
         ]
@@ -684,10 +686,10 @@ class FailClosed(unittest.TestCase):
         for kw, want in cases:
             with self.subTest(want=want):
                 self.assertIn(want, judged(**kw))
-        self.assertEqual(judged(inside(home_listing=[".config"], mounts=[{"at": "/", "access": "rw", "fs": "tmpfs"},
+        self.assertEqual(judged(inside(home_listing=[".config"], mounts=[rows.mount("/"),
                                                                        {"at": "/h/.config/opencode", "access": "ro", "fs": "ext4"}],
                                        mount_targets=["/h/.config/opencode"]), home="/h"), [])
-        self.assertEqual(judged(inside(mounts=[{"at": "/", "access": "rw", "fs": "tmpfs"}, {"at": str(ws), "access": "rw", "fs": "ext4"},
+        self.assertEqual(judged(inside(mounts=[rows.mount("/"), {"at": str(ws), "access": "rw", "fs": "ext4"},
                                                {"at": "/usr/local", "access": "ro", "fs": "ext4"}], mount_targets=[str(ws), "/usr"],
                                        unix_sockets=[str(ws / "s" / "own.sock")])), [])     # below a named path: within it
 
@@ -695,11 +697,11 @@ class FailClosed(unittest.TestCase):
         """The user-namespace denial counts only when the kernel's refusal is seen; unshare absent or no try at all
         is 'not measured'; and the mounts must be what the wrapper names."""
         ws = pathlib.Path("/w/ws")
-        rep = {"network": "host", "created_outside_workspace": {}, "setsid_survivors": [],
+        rep = {"network": "host", "created_outside_workspace": {}, "setsid_survivors": [], "host_mounts": rows.HOST,
                "inside": {"capabilities": dict.fromkeys(("CapInh", "CapPrm", "CapEff", "CapBnd", "CapAmb"), "0"),
                           "no_new_privs": "1", "namespaces": dict.fromkeys(("user", "pid", "ipc", "uts", "mnt"), "own"),
                           "routed_interfaces": [], "home_listing": [], "unix_sockets": [],
-                          "mounts": [{"at": "/", "access": "rw", "fs": "tmpfs"}, {"at": str(ws), "access": "rw", "fs": "ext4"}],
+                          "mounts": [rows.mount("/"), {"at": str(ws), "access": "rw", "fs": "ext4"}],
                           "mount_targets": [str(ws)]}}
         tries = {"read_canary": (1, ""), "workspace": (0, "ok"), "read_git_directory": (0, "ref: x"),
                  "user_namespace": (1, "unshare: unshare failed: No space left on device")}

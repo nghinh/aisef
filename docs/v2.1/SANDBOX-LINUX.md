@@ -51,7 +51,7 @@ What a confined session reaches (the command line, `confine.wrap`; the reads and
 
 | | What |
 |---|---|
-| **writes** (host-backed) | the developer's session: its workspace — nothing else. The model reviewer's session: **nothing** — the checkout it reviews is bound read-only as well (`confine.wrap(…, writable=False)`, §5). Everything else a session writes lands in its own tmpfs (`/`, `/tmp`, an empty HOME) and is gone when it exits. |
+| **writes** (host-backed) | the developer's session: its workspace — nothing else. The model reviewer's session: **nothing** — the checkout it reviews is bound read-only as well (`confine.wrap(…, writable=False)`, §5). Everything else a session writes lands in its own tmpfs (`/`, `/tmp`, an empty HOME) and is gone when it exits. The measurement accepts a writable mount outside the workspace only when the report shows it is the sandbox's own, or one of the six device nodes `--dev` places (§6.1, the owner's 2026-10-12 policy). |
 | **reads, read-only** | the system (`/usr`, `/etc`, the merged-`/usr` links); **the client's own directory**; **the workspace's common git directory — for a run's worktree that is `<out>/repo/.git`, inside the run directory: the run's clone, every object and ref of it**; the client's configuration directory (`$XDG_CONFIG_HOME/opencode` or `~/.config/opencode`); the operator's `read_only` paths. |
 | **does not see** | the rest of the run directory (its canary, the anchor, the sessions' logs, other worktrees), the rest of HOME (`.ssh`, the client's auth data under `~/.local/share/opencode`), the verifier/hidden material, the kernel and the interpreter **unless they lie under the system paths or a `read_only` path** — `/usr` is bound read-only, so an interpreter or a kernel installed under `/usr` (`/usr/local` included) is readable: the harness itself runs `/usr/local/bin/python3` inside; the container's other processes. |
 
@@ -263,7 +263,7 @@ This is a container in Docker Desktop's VM. It is not a bare-metal Linux host an
   a "bubblewrap" that runs the probe unconfined is refused for what the probe could do. Besides §5's checks it
   requires the mounts seen inside to lie within what the command line names, and no unix socket outside the workspace
   under any bound directory (within: the path itself or below it — `/w/ws2` is not within `/w/ws`, nor
-  `/usrlocal-extra` within `/usr`); a namespace is `own` only when its `/proc/self/ns` link was read inside and outside
+  `/usrlocal-extra` within `/usr`); every writable mount outside the workspace must be shown to be the sandbox's own (§6.1); a namespace is `own` only when its `/proc/self/ns` link was read inside and outside
   (`<name>:[<inode>]`) and they differ; a check that did not run is a problem; a file the probe made outside the
   workspace (confinement did not stop it) is never removed — the subject made it (INV-MUTATION-AUTHORITY) — but left
   where it was made, listed in `left_on_host` and named in a problem for the operator to remove; a probe sleeper found when bubblewrap
@@ -329,6 +329,53 @@ only a measurement with a survivor is slower (the module takes 134 s instead of 
 would kill it, but would test a number, not the behaviour, so it is not pinned. The unmutated module at `2cd02e9`, in
 the worktree: Ran 30 OK.
 
+### 6.1 The write policy and the locale (B03-R3, owner 2026-10-12)
+
+Decision and evidence: [`decisions/B03-R3-conf.md`](decisions/B03-R3-conf.md); records of a real bubblewrap in the Linux
+guest: [`evidence/sandbox/r3-conf/`](evidence/sandbox/r3-conf/).
+
+**Writes.** The developer writes the workspace and the execution resources explicitly allowed; every other writable mount
+must be **shown** to belong to the sandbox. The judgement decides from the mount's file-system type, mount source, mount
+options and namespace — never from the file system's name alone or from a place under `/dev/` (the earlier clause
+exempted `tmpfs`, `proc`, `devpts` and `mqueue` by name and anything under `/dev/` by place, and so accepted the
+container's own `/dev/pts`, `/dev/mqueue`, `/dev/shm`, `/dev` and `/proc`: it accepted all twelve variants measured in
+the guest, nine of which are write paths). A writable mount outside the workspace is accepted when it is:
+
+| Class | Accepted when |
+|---|---|
+| the workspace | its mount point is the workspace (the one host-backed writable mount) |
+| an execution resource | the name is `null`, `zero`, `full`, `random`, `urandom` or `tty`, it lies under a `--dev` destination of the command line, and the probe read it inside as the character device of that kernel number (`1:3`, `1:5`, `1:7`, `1:8`, `1:9`, `5:0`). These are bubblewrap's binds of the host's own nodes: allowed for being an explicit list of what an execution needs, each by identity |
+| a mount the sandbox made | a `tmpfs`, `proc`, `devpts` or `mqueue` whose mount source is its own name, whose super block (major:minor) is not one the host's own mount table holds (read before the session and after it), and that no peer group of the host propagates into or out of |
+
+Anything else is refused: `writable outside the workspace: [...]` when the report shows it is the host's (a super block
+the host holds, a host path or device as source, a file system a wrapper cannot make, a peer group of the host, a node
+that is not the device it must be), and `cannot establish that a writable mount belongs to the sandbox (isolation not
+established …)` when a field could not be read or the host's table is unreadable or incomplete — never a pass. Why a super block that is not the
+host's is the sandbox's own: the kernel gives each `tmpfs` mount its own super block and each `devpts` mount a new
+instance, a `proc` super block is keyed by the PID namespace and an `mqueue` one by the IPC namespace, so one that shares
+the host's namespace is the host's (measured: no `--unshare-pid` gives `/proc` as the container's `0:66`); the judgement
+already requires those namespaces to be the session's own. Lifecycle: the host's table is the same after each session
+as before it in every recorded run, and `setsid_survivors` is empty; a super block goes with the mount namespace
+(proc's and mqueue's with the PID and IPC one) when the session's last process exits — kernel behaviour relied on, not
+measured here.
+
+The report records what decided: `host_mounts` (the host's table as `{at, fs, dev, optional}`), `inside.mounts` rows
+with `dev`, `root`, `source`, `options`, `super_options` and `optional`, `inside.devices` and `inside.device_roots`.
+
+**Locale.** The measurement's own subprocesses — the probe and `bwrap --version` — run with `LC_ALL=C` and `LANG=C`
+(`confine.LOCALE`), so the text the judgement parses (the probe's output, the user-namespace refusal `USERNS_REFUSED`
+matches) does not depend on the caller's locale; nothing else of `LANG`, `LANGUAGE` or `LC_*` reaches them. The report
+records it (`locale`). The caller's `os.environ` and the environment a session gets (`confine.wrap`) are untouched.
+
+**What was measured.** With the real bubblewrap 0.12.0 in the guest, the session's own command line and eleven variants
+(`scenarios-X1.json`; the same in a mount namespace with a shared tree, `scenarios-X1-shared-tree.json`):
+a second `--dev` (a devpts outside `/dev/`) and `--mqueue` are accepted; the container's devpts, mqueue, `/dev`,
+`/dev/shm` and `/proc` bound or shared in, a writable ext4 file at `/dev/x`, a regular file or another device over
+`/dev/null` and a node outside the list are each refused for what they are. The environment the real bubblewrap
+received, with a caller carrying `LANG=vi_VN.UTF-8`, `LC_ALL=de_DE.UTF-8`, `LC_MESSAGES=fr_FR.UTF-8`, `LANGUAGE=ja`, is
+`LC_ALL=C LANG=C` and nothing else of the family (`locale-X1.json`). **Not measured:** a translated message (the guest has
+only the locales `C`, `C.utf8` and `POSIX`).
+
 ## 7. Limits (not confined / not claimed)
 
 - **Not confined** by this track: the kernel's own execution of the developer's tests and the probes' execution of
@@ -348,6 +395,12 @@ the worktree: Ran 30 OK.
   measured here.
 - **The session reads the run's clone** (`<out>/repo/.git`, every object and ref) and the client's configuration
   directory: whatever the operator keeps there is readable by the model's code.
+- **The write policy decides from what the report shows.** A super block of another mount namespace than the
+  controller's (another session's tmpfs reached through `/proc/<pid>/root` in a bind) is not the host's and is not
+  excluded by observation; `confine.wrap` binds only the workspace read-write, so no command line it builds does that.
+  Two mounts at one path are judged by what the probe sees at the path. The host's table is the controller's own: in a
+  container, the container's.
+- **No translated message was measured** (§6.1): the measurement's locale is fixed to C so that none need be.
 - Measured on one host and kernel (Docker Desktop's LinuxKit 7.0.12, arm64). The image's apt packages are not pinned:
   each build gets a new image ID (`measure.log`); the bubblewrap package (`0.12.0-1~deb13u1`) and the binary's
   sha256 (`b3b829e1…`, every profile's JSON) are recorded and equal to the earlier run at `58f3b4e`. A fresh netns on

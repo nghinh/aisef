@@ -37,6 +37,7 @@ if str(ROOT) not in sys.path:
 
 from aisef2.app import confine  # noqa: E402
 from tests.v2 import isolated_git  # noqa: E402
+from tests.v2 import v21_r3_conf_rows as rows  # noqa: E402
 
 M = confine.MARK
 SPEC = {"backend": "bwrap", "bwrap": "/usr/bin/bwrap", "network": "host", "read_only": []}
@@ -147,7 +148,7 @@ class Case(unittest.TestCase):
             return real_namespaces(inside, {n: f"{n}:[1]" for n in inside})
         self.n += 1
         with mock.patch.object(subprocess, "run", run), mock.patch.object(confine, "namespaces", own), \
-                mock.patch.object(confine, "_survivors", lambda command: []):
+                mock.patch.object(confine, "_survivors", lambda command: []), rows.host_table():
             rep = confine.measure(spec, self.run_dir / f"confinement{self.n}", str(self.exe), self.run_dir / "repo",
                                   system="linux", environ=dict(self.environ))
         self.assertEqual(len(calls), 1, rep["problems"])

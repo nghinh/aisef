@@ -31,6 +31,7 @@ if str(ROOT) not in sys.path:
 
 from aisef2.app import confine  # noqa: E402
 from aisef2.orchestrate import workspace  # noqa: E402
+from tests.v2 import v21_r3_conf_rows as rows  # noqa: E402
 
 SPEC = {"backend": "bwrap", "bwrap": "/usr/bin/bwrap", "network": "host", "read_only": []}
 
@@ -89,10 +90,13 @@ class MountInfo(unittest.TestCase):
     """Requirement: each /proc/self/mountinfo line with a ' - ' separator, at least 6 fields before it and a
     filesystem type after it becomes {at: the mount point, octal escapes decoded (\\040 space, \\011 tab, \\012
     newline, \\134 backslash); access: 'ro' iff 'ro' is one of the comma-separated PER-MOUNT options (field 6, not the
-    super options after the separator), else 'rw'; fs: the filesystem type}; any other line is skipped. The judge
-    reads this list for 'mounted beyond what the wrapper names' (at), 'writable outside the workspace' (access, fs):
-    a writable host-backed mount read as 'ro' passes the very check that exists to find it, a read-only bind read as
-    'rw' refuses every run; the labels 'ro'/'rw' are the vocabulary of the record (RUN.json confinement.inside.mounts).
+    super options after the separator), else 'rw'; fs: the filesystem type; and, since B03-R3, what the write policy
+    decides from: dev (major:minor, the super block), root, source (mount source, escapes decoded), options (the
+    per-mount ones), super_options and optional (the propagation fields)}; any other line is skipped. The judge
+    reads this list for 'mounted beyond what the wrapper names' (at), 'writable outside the workspace' (access, fs,
+    and the rest): a writable host-backed mount read as 'ro' passes the very check that exists to find it, a
+    read-only bind read as 'rw' refuses every run; the labels 'ro'/'rw' are the vocabulary of the record (RUN.json
+    confinement.inside.mounts).
 
     Pins aisef2/app/confine.py::_mounts [11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]."""
 
@@ -112,15 +116,21 @@ class MountInfo(unittest.TestCase):
 
     def test_a_line_becomes_where_how_and_what_and_the_other_shapes_are_skipped(self):
         got = confine._mounts([self.ROOT_FS, self.USR, self.WS, *self.SKIPPED, self.TMP, self.ODD])
-        self.assertEqual(got, [{"at": "/", "access": "rw", "fs": "tmpfs"},
-                               {"at": "/usr", "access": "ro", "fs": "ext4"},
-                               {"at": "/w s/ws", "access": "rw", "fs": "ext4"},
-                               {"at": "/tmp", "access": "rw", "fs": "tmpfs"},
-                               {"at": "/a\\b\tc\nd 1", "access": "rw", "fs": "tmpfs"}])
+        self.assertEqual(got, [
+            {"at": "/", "access": "rw", "fs": "tmpfs", "dev": "0:30", "root": "/", "source": "tmpfs",
+             "options": ["rw", "nosuid", "nodev", "relatime"], "super_options": ["rw"], "optional": []},
+            {"at": "/usr", "access": "ro", "fs": "ext4", "dev": "8:1", "root": "/usr", "source": "/dev/sda1",
+             "options": ["ro", "relatime"], "super_options": ["rw", "errors=remount-ro"], "optional": ["master:2"]},
+            {"at": "/w s/ws", "access": "rw", "fs": "ext4", "dev": "8:1", "root": "/ws", "source": "/dev/sda1",
+             "options": ["rw", "relatime"], "super_options": ["ro"], "optional": []},
+            {"at": "/tmp", "access": "rw", "fs": "tmpfs", "dev": "0:31", "root": "/", "source": "tmpfs",
+             "options": ["rw", "nosuid", "nodev"], "super_options": ["rw", "size=1024k"], "optional": []},
+            {"at": "/a\\b\tc\nd 1", "access": "rw", "fs": "tmpfs", "dev": "0:32", "root": "/", "source": "tmpfs",
+             "options": ["rw", "proto"], "super_options": ["rw"], "optional": []}])
 
     def judged(self, lines, targets, ws="/w s/ws"):
         """_judge over a guest whose mount table is `lines`, everything else as a clean measurement shows it."""
-        rep = {"network": "host", "created_outside_workspace": {}, "setsid_survivors": [],
+        rep = {"network": "host", "created_outside_workspace": {}, "setsid_survivors": [], "host_mounts": rows.HOST,
                "inside": {"capabilities": dict.fromkeys(("CapInh", "CapPrm", "CapEff", "CapBnd", "CapAmb"), "0"),
                           "no_new_privs": "1", "namespaces": dict.fromkeys(("user", "pid", "ipc", "uts", "mnt"), "own"),
                           "routed_interfaces": [], "home_listing": [], "unix_sockets": [],
@@ -226,11 +236,11 @@ class TrailingSlash(unittest.TestCase):
 
     def test_a_mount_below_a_read_only_path_written_with_a_trailing_slash_is_not_beyond(self):
         ws = pathlib.PurePosixPath("/w/ws")
-        rep = {"network": "host", "created_outside_workspace": {}, "setsid_survivors": [],
+        rep = {"network": "host", "created_outside_workspace": {}, "setsid_survivors": [], "host_mounts": rows.HOST,
                "inside": {"capabilities": dict.fromkeys(("CapInh", "CapPrm", "CapEff", "CapBnd", "CapAmb"), "0"),
                           "no_new_privs": "1", "namespaces": dict.fromkeys(("user", "pid", "ipc", "uts", "mnt"), "own"),
                           "routed_interfaces": [], "home_listing": [], "unix_sockets": [],
-                          "mounts": [{"at": "/", "access": "rw", "fs": "tmpfs"}, {"at": str(ws), "access": "rw", "fs": "ext4"},
+                          "mounts": [rows.mount("/"), {"at": str(ws), "access": "rw", "fs": "ext4"},
                                      {"at": "/data/sub", "access": "ro", "fs": "ext4"},
                                      {"at": "/data2", "access": "ro", "fs": "ext4"}],
                           "mount_targets": [str(ws), "/data/"]}}

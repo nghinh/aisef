@@ -21,8 +21,12 @@ way to its provider: a measurement-only profile (validation/v21/sandbox), refuse
 
 A run that asks for confinement measures it before its first provider request (`measure`): the session's own wrapper —
 the same client, a worktree of the same repository — runs a shell that tries what it must not be able to do and
-reports what it sees; anything not as required refuses the run. Not confined here: the kernel's own execution of the
-developer's tests and the probes' execution of the candidate (they run as the operator's user); Open Code Review is
+reports what it sees; anything not as required refuses the run. The measurement's own subprocesses run in a fixed C
+locale (`LOCALE`, recorded in the report), whatever the caller's. The only writable mounts it accepts are the workspace,
+the explicitly allowed device nodes `--dev` places (`DEVICES`) and mounts shown to be the sandbox's own (`_owned`:
+a file system a wrapper makes, a super block the host's mount table does not hold, no propagation with the host);
+a writable mount it cannot establish either way refuses the run too. Not confined here: the kernel's own execution of
+the developer's tests and the probes' execution of the candidate (they run as the operator's user); Open Code Review is
 refused together with confinement (app/settings), since it calls the model outside the client's sessions."""
 
 from __future__ import annotations
@@ -55,6 +59,12 @@ m uid "$(id -u)"
 for n in user pid net ipc uts mnt; do m ns "$n" "$(readlink /proc/self/ns/$n 2>&1)"; done
 m section status; cat /proc/self/status 2>&1
 m section mountinfo; cat /proc/self/mountinfo 2>&1
+m section devices
+cat /proc/self/mountinfo 2>/dev/null | while read -r _ _ _ _ at _; do
+  case $at in */null|*/zero|*/full|*/random|*/urandom|*/tty)
+    if [ -c "$at" ]; then echo "char $(stat -L -c '%t:%T' -- "$at" 2>/dev/null) $at"; else echo "other - $at"; fi ;;
+  esac
+done
 m section route; cat /proc/net/route 2>&1
 m section netdev; cat /proc/net/dev 2>&1
 m section home; if [ -e "$5" ]; then ls -A -- "$5" 2>&1; fi
@@ -86,6 +96,20 @@ SURVIVOR_GRACE = 1.0
 PROBE_TIMEOUT, SLEEPER = 60, 120
 #: what a kernel that refuses a further user namespace says (--disable-userns: ENOSPC; a seccomp or LSM refusal: EPERM)
 USERNS_REFUSED = re.compile(r"No space left on device|Operation not permitted")
+#: the locale of the measurement's own subprocesses (the probe, `bwrap --version`): fixed, so the text they print — the
+#: probe's output, what USERNS_REFUSED matches — does not depend on the caller's, and recorded in the report
+#: (`locale`). Nothing of the caller's LANG, LANGUAGE or LC_* reaches them; the sessions' environment (`wrap`, shared
+#: with real sessions) and the caller's own are not touched.
+LOCALE = {"LC_ALL": "C", "LANG": "C"}
+#: the file systems a wrapper can make for itself (kernel pseudo file systems): the mount source of each is its own name,
+#: never a host path or device. A writable mount of one of these is the sandbox's only as `_owned` shows.
+PSEUDO = ("tmpfs", "proc", "devpts", "mqueue")
+#: the execution resources `--dev` places: bubblewrap binds the HOST's own nodes there, so they are host-backed and are
+#: accepted for being explicitly allowed — a closed list, each the character device of that kernel number (devices.txt)
+DEVICES = {"null": "1:3", "zero": "1:5", "full": "1:7", "random": "1:8", "urandom": "1:9", "tty": "5:0"}
+#: a super block number (major:minor) and a propagation tag of mountinfo's optional fields
+_DEV = re.compile(r"\d+:\d+")
+_PEER = re.compile(r"(shared|master|propagate_from):(\d+)")
 
 
 class Unavailable(Exception):
@@ -203,14 +227,44 @@ def _sections(out: str) -> tuple[dict, dict, dict]:
 
 
 def _mounts(lines: list[str]) -> list[dict]:
+    """The rows of a mountinfo table (proc(5): id, parent, major:minor, root, mount point, per-mount options, optional
+    fields, `-`, type, source, super options) as what a judgement needs: where (`at`), whether writable (`access`: `ro`
+    only when a PER-MOUNT option says so), the file system (`fs`), the super block (`dev`: shared by every mount of the
+    same file system, a bind included), what of it is mounted (`root`), its `source`, the per-mount `options`, the
+    `super_options` and the propagation `optional` fields. A line that is not of that shape is skipped."""
+    def text(s: str) -> str:      # mountinfo escapes a space, a tab, a newline and a backslash in octal
+        return re.sub(r"\\([0-7]{3})", lambda o: chr(int(o[1], 8)), s)
     out = []
     for line in lines:
         left, sep, right = line.partition(" - ")
         f, r = left.split(), right.split()
-        if sep and len(f) >= 6 and r:      # mountinfo escapes a space, a tab, a newline and a backslash in octal
-            at = re.sub(r"\\([0-7]{3})", lambda o: chr(int(o[1], 8)), f[4])
-            out.append({"at": at, "access": "ro" if "ro" in f[5].split(",") else "rw", "fs": r[0]})
+        if sep and len(f) >= 6 and r:
+            out.append({"at": text(f[4]), "access": "ro" if "ro" in f[5].split(",") else "rw", "fs": r[0], "dev": f[2],
+                        "root": text(f[3]), "source": text(r[1]) if len(r) > 1 else None, "options": f[5].split(","),
+                        "super_options": r[2].split(",") if len(r) > 2 else [], "optional": f[6:]})
     return out
+
+
+def _host_mounts() -> list[dict] | None:
+    """The host's mount table as the controller sees it — its own /proc/self/mountinfo, the table every host bind of a
+    session comes from — as the rows' `at`, `fs`, `dev` and `optional` (what a judgement of a sandbox's mounts against
+    it uses and a verifier needs), or None when it cannot be read whole (a line that does not parse is a mount it
+    cannot rule out)."""
+    try:
+        lines = pathlib.Path("/proc/self/mountinfo").read_text(encoding="utf-8", errors="replace").splitlines()
+    except OSError:
+        return None
+    rows = _mounts(lines)
+    if not rows or len(rows) != len(lines):
+        return None
+    return [{k: r[k] for k in ("at", "fs", "dev", "optional")} for r in rows]
+
+
+def _device_roots(full: list[str]) -> list[str]:
+    """Where a bubblewrap command line has `--dev` place its device nodes (which option made a mount is the option's,
+    never the path's)."""
+    a = full[:full.index("--")]
+    return [a[i + 1] for i, f in enumerate(a) if f == "--dev"]
 
 
 def targets(full: list[str], host: bool = False) -> list[str]:
@@ -246,13 +300,14 @@ def measure(spec: Mapping, where: pathlib.Path, exe: str | None = None, repo: pa
     """Run the probe under the wrapper a session gets — the client `exe`'s directory, a worktree of `repo` (the run's
     repository; a new one when None) as the workspace, so the same read-only mounts — with `where` (a new directory in
     the run directory) as the run directory: what it saw, what it was denied, and the problems — any one refuses the
-    run. The measurement's worktree is removed from `repo` afterwards; a file the probe made outside the workspace is
-    not removed: it is named (`left_on_host`) and refuses the run."""
+    run. The probe and the `--version` query run in the fixed C `LOCALE`, whatever `environ` holds (recorded as
+    `locale`). The measurement's worktree is removed from `repo` afterwards; a file the probe made outside the
+    workspace is not removed: it is named (`left_on_host`) and refuses the run."""
     environ = dict(os.environ if environ is None else environ)
     rep: dict = {"backend": spec["backend"], "bwrap": spec["bwrap"], "network": spec["network"],
                  "read_only": list(spec["read_only"]), "client": exe, "system": system,
                  "operator_uid": os.getuid() if hasattr(os, "getuid") else None}
-    env = {k: environ[k] for k in ("PATH", "HOME", "XDG_CONFIG_HOME", "LANG") if k in environ}
+    env = {k: environ[k] for k in ("PATH", "HOME", "XDG_CONFIG_HOME") if k in environ}
     cmd = ["/bin/sh", "-c", PROBE, "probe"]
     made = None
     try:
@@ -278,8 +333,12 @@ def measure(spec: Mapping, where: pathlib.Path, exe: str | None = None, repo: pa
 
 def _probe(spec: Mapping, where: pathlib.Path, ws: pathlib.Path, full: list[str], inside_env: dict, env: dict,
            cmd: list[str], rep: dict) -> dict:
+    # what the measurement's subprocesses get: the session's environment (`inside_env`) but for the locale, fixed
+    run_env = {**{k: v for k, v in inside_env.items() if not re.match(r"LC_|LANG", k)}, **LOCALE}
+    rep["locale"] = {k: v for k, v in run_env.items() if re.match(r"LC_|LANG", k)}
     try:
-        rep["bwrap_version"] = subprocess.run([spec["bwrap"], "--version"], capture_output=True, text=True, timeout=30).stdout.strip()
+        rep["bwrap_version"] = subprocess.run([spec["bwrap"], "--version"], capture_output=True, text=True, timeout=30,
+                                              env=run_env).stdout.strip()
     except (OSError, subprocess.SubprocessError) as e:
         rep["bwrap_version"] = f"unavailable: {type(e).__name__}"
     token, nonce = secrets.token_hex(16), secrets.token_hex(8)   # token: only the canary's content; nonce: the file paths
@@ -297,13 +356,15 @@ def _probe(spec: Mapping, where: pathlib.Path, ws: pathlib.Path, full: list[str]
     args = [str(canary), f["run_directory"], f["kernel"], f["interpreter_site"], home, str(ws / probe_file), sleep,
             f["client_directory"], f["git_directory"], *targets(full, host=True)]
     rep["argv"] = full[:-len(cmd)] + ["/bin/sh", "-c", "<PROBE>", "probe"]
+    before = _host_mounts()      # the host's table, read before the session starts and again after it ended
     try:
-        p = subprocess.run(full + args, capture_output=True, text=True, env=inside_env, timeout=PROBE_TIMEOUT)
+        p = subprocess.run(full + args, capture_output=True, text=True, env=run_env, timeout=PROBE_TIMEOUT)
         code, out = p.returncode, p.stdout + p.stderr
     except subprocess.TimeoutExpired:      # its own text starts with the whole command line: cut, it never reaches the limit
         code, out = None, f"TimeoutExpired: timed out after {PROBE_TIMEOUT} seconds"
     except (OSError, subprocess.SubprocessError) as e:
         code, out = None, f"{type(e).__name__}: {e}"
+    after = _host_mounts()
     survivors = _survivors(f"sleep {sleep}")
     created = {k: v.exists() for k, v in files.items()}
     values, sections, tries = _sections(out)
@@ -314,6 +375,11 @@ def _probe(spec: Mapping, where: pathlib.Path, ws: pathlib.Path, full: list[str]
     status = {k: v.strip() for k, v in status.items()}
     caps = {k: status.get(k) for k in ("CapInh", "CapPrm", "CapEff", "CapBnd", "CapAmb")}
     mounts = _mounts(sections.get("mountinfo", []))
+    devices = {}       # "<char|other> <major:minor|-> <path>": what the probe found at each device node's mount point
+    for ln in sections.get("devices", []):
+        kind, _, rest = ln.partition(" ")
+        number, _, path = rest.partition(" ")
+        devices[path] = number if kind == "char" else kind
     netdev = [ln.split(":", 1)[0].strip() for ln in sections.get("netdev", [])[2:] if ":" in ln]
     # /proc/net/route rows after the header: an interface with a route. A fresh netns (--unshare-net) has none, even
     # though this kernel pre-creates DOWN tunnel pseudo-devices, so routes — not interface names — show reachability.
@@ -321,9 +387,13 @@ def _probe(spec: Mapping, where: pathlib.Path, ws: pathlib.Path, full: list[str]
     rep["inside"] = {"uid": values.get("uid"), "capabilities": caps, "no_new_privs": status.get("NoNewPrivs"),
                      "seccomp": status.get("Seccomp"), "network_interfaces": netdev, "routed_interfaces": sorted(set(routes)),
                      "mounts": mounts, "mount_targets": targets(full),
+                     "device_roots": _device_roots(full), "devices": devices,
                      "namespaces": namespaces(values.get("ns", {})),
                      "home_listing": sections.get("home", []),
                      "unix_sockets": sections.get("sockets", []) if values.get("sockets") == "listed" else None}
+    # the host's mount table (the report is the record: a verifier sees which super blocks the host held): None when
+    # either reading failed, so that no mount is shown to be the sandbox's own
+    rep["host_mounts"] = None if before is None or after is None else before + [r for r in after if r not in before]
     rep["tried"] = {k: {"exit": rc, "output": o} for k, (rc, o) in tries.items()}
     rep["created_outside_workspace"] = created
     rep["setsid_survivors"] = survivors
@@ -373,6 +443,69 @@ def _within(path: str, roots) -> bool:
     return any(path == r or path.startswith(r + "/") for r in (r.rstrip("/") for r in roots))
 
 
+def _owned(m: dict, inside: dict, host: list[dict] | None) -> tuple[bool, str] | None:
+    """Whether the writable mount `m` (not the workspace) is shown to belong to the sandbox — the owner's write policy
+    (docs/v2.1/decisions/B03-R3-conf.md): None when it is, else (known, why): `known` when what was read shows it is
+    NOT (it can write beyond the sandbox), not known when the data to show either way is missing. The file system's
+    name and the mount's place under /dev decide nothing. A mount is the sandbox's when
+
+    * it is one of the explicitly allowed execution resources — the name of a device `--dev` places (a closed list),
+      under a `--dev` destination of the command line, and the probe read it inside as the character device of exactly
+      that kernel number (the host's own node: host-backed, allowed for being allowed); or
+    * its file system is one a wrapper makes for itself, its mount source is that file system's own name (not a host
+      path or device), its super block is not one the host's mount table holds (so it was made inside the sandbox: a
+      write cannot reach the host, and the super block goes with the mount namespace — proc's with the PID namespace,
+      mqueue's with the IPC one) and no peer group of the host propagates into it or out of it.
+
+    Everything else — an unread field, an unreadable or incomplete host table — is not established: not a pass."""
+    at, fs = m["at"], m["fs"]
+    parent, _, name = at.rpartition("/")
+    if name in DEVICES and parent in inside.get("device_roots", ()):
+        seen = inside.get("devices", {}).get(at)
+        if seen == DEVICES[name]:
+            return None
+        return bool(seen), f"it is not shown to be the character device {DEVICES[name]} (read: {seen or 'nothing'})"
+    if fs not in PSEUDO:
+        return True, ""
+    if m.get("source") is None:
+        return False, "its mount source was not read"
+    if m["source"] != fs:
+        return True, f"its mount source is {m['source']!r}, not {fs}'s own"
+    if not host:
+        return False, "the host's mount table could not be read"
+    if not all(isinstance(h, dict) and isinstance(h.get("dev"), str) and _DEV.fullmatch(h["dev"])
+               and isinstance(h.get("optional"), list) for h in host):
+        # a row that shows neither its super block nor its peer groups rules nothing out: not a table to judge against
+        return False, "the host's mount table has a row that does not show its super block or peer groups"
+    dev = m.get("dev")
+    if not (isinstance(dev, str) and _DEV.fullmatch(dev)):
+        return False, "its super block was not read"
+    shared = next((h for h in host if h.get("dev") == dev), None)
+    if shared:
+        return True, f"its super block {dev} is the host's (mounted there at {shared['at']})"
+    tags = m.get("optional")
+    if not isinstance(tags, list):
+        return False, "its propagation was not read"
+    groups = {t.partition(":")[2] for h in host for t in h.get("optional") or () if _PEER.fullmatch(t)}
+    leaks = [t for t in tags if t.partition(":")[2] in groups and _PEER.fullmatch(t)]
+    if leaks:
+        return True, f"it propagates with the host's peer group {leaks}"
+    if not all(re.fullmatch(r"shared:\d+", t) for t in tags):
+        return False, f"its propagation {tags} is not shown to be the sandbox's own"
+    return None
+
+
+def _writes(inside: dict, host: list[dict] | None, ws: pathlib.Path) -> list[tuple[str, bool, str]]:
+    """(mount point, known, why) of each writable mount outside the workspace that `_owned` does not show to be the
+    sandbox's."""
+    out = []
+    for m in inside["mounts"]:
+        if m["access"] == "rw" and m["at"] != str(ws) and (no := _owned(m, inside, host)) is not None:
+            if (m["at"], *no) not in out:     # a mount covered by another at the same path is judged as that path is
+                out.append((m["at"], *no))
+    return out
+
+
 def _judge(rep: dict, token: str, out: str, tries: dict, home: str, ws: pathlib.Path) -> list[str]:
     """What the measurement shows that confinement must not allow — or did not measure (a check that could not run
     is a problem, never a pass)."""
@@ -406,10 +539,14 @@ def _judge(rep: dict, token: str, out: str, tries: dict, home: str, ws: pathlib.
     beyond = [m["at"] for m in inside["mounts"] if m["at"] != "/" and not _within(m["at"], inside["mount_targets"])]
     if beyond:
         bad.append(f"mounted beyond what the wrapper names: {beyond[:10]}")
-    host_backed = [m for m in inside["mounts"] if m["access"] == "rw" and m["fs"] not in ("tmpfs", "proc", "devpts", "mqueue")
-                   and not m["at"].startswith("/dev/") and m["at"] != str(ws)]
-    if host_backed:
-        bad.append(f"writable outside the workspace: {[m['at'] for m in host_backed]}")
+    unowned = _writes(inside, rep.get("host_mounts"), ws)
+    if refused := [(at, why) for at, known, why in unowned if known]:
+        # a mount whose file system is not a pseudo one is writable host storage, whatever else: nothing more to say
+        said = [f"{at}: {why}" for at, why in refused if why]
+        bad.append(f"writable outside the workspace: {[at for at, _ in refused]}" + (f" ({'; '.join(said)})" if said else ""))
+    if unknown := [f"{at}: {why}" for at, known, why in unowned if not known]:
+        bad.append("cannot establish that a writable mount belongs to the sandbox (isolation not established, not a "
+                   f"write that was seen): {'; '.join(unknown)}")
     names = {pathlib.PurePosixPath(m["at"]).relative_to(home).parts[0] for m in inside["mounts"]
              if pathlib.PurePosixPath(m["at"]).is_relative_to(home) and m["at"] != home}
     shown = set(inside["home_listing"])

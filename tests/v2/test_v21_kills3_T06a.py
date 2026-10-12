@@ -31,6 +31,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from aisef2.app import confine  # noqa: E402
+from tests.v2 import v21_r3_conf_rows as rows  # noqa: E402
 
 #: str(WS) is "/run/confinement/ws" on every host: the judge compares mount points with it as POSIX strings
 WS = pathlib.PurePosixPath("/run/confinement/ws")
@@ -40,7 +41,9 @@ EVIDENCE = ROOT / "docs" / "v2.1" / "evidence" / "sandbox"
 
 
 def mount(at: str, fs: str, access: str = "ro") -> dict:
-    return {"at": at, "access": access, "fs": fs}
+    """A row as mountinfo gives it: a pseudo file system is the sandbox's own (its own name as source, a super block
+    the host's table lacks); what is read-only or host storage is not judged by that."""
+    return rows.mount(at, fs, access)
 
 
 def layout() -> list[dict]:
@@ -60,7 +63,7 @@ def measured(network: str = "host") -> tuple[dict, dict]:
     """(rep, tries) of a clean measurement: every check passes. With "host" the session shares the network, so the
     host's interface `eth0` has a route (every real record); with "none" it has a fresh namespace and no route."""
     zero = "0000000000000000"
-    rep = {"network": network,
+    rep = {"network": network, "host_mounts": rows.HOST,
            "created_outside_workspace": dict.fromkeys(("run_directory", "kernel", "interpreter_site", "client_directory",
                                                        "git_directory"), False),
            "setsid_survivors": [],
@@ -70,7 +73,7 @@ def measured(network: str = "host") -> tuple[dict, dict]:
                                      "net": "own" if network == "none" else "shared"},
                       "routed_interfaces": [] if network == "none" else ["eth0"],
                       "mounts": layout(), "mount_targets": list(TARGETS), "home_listing": [".config"],
-                      "unix_sockets": []}}
+                      "unix_sockets": [], "device_roots": ["/dev"], "devices": {"/dev/null": "1:3"}}}
     tries = {"read_canary": (1, "cat: canary: No such file or directory"), "read_git_directory": (0, "ref: refs/heads/main"),
              "setsid": (0, ""), "user_namespace": (1, "unshare: unshare failed: No space left on device"),
              "workspace": (0, "ok")}
@@ -144,14 +147,23 @@ class RecordedLinuxMeasurements(unittest.TestCase):
     strongest oracle there is for "a correctly confined session is not refused". Pins _judge [36, 141, 156]."""
 
     def test_a_measurement_that_was_accepted_is_accepted_again(self):
+        """Since B03-R3 (owner, 2026-10-12) a writable mount outside the workspace is accepted only when the report
+        shows it is the sandbox's own. These four records predate that: their rows carry no mount source and no super
+        block and they hold no host table, so they cannot show it. They are accepted again for everything else — the
+        judge's only words are the one problem that names each such mount as NOT ESTABLISHED (fail closed, never a
+        pass); the records that carry the data are replayed whole by test_v21_r3_conf_policy."""
         accepted = accepted_records()
         for name, rec in accepted:
             rep = rec["measure"]
             tries = {k: (v["exit"], v["output"]) for k, v in rep["tried"].items()}
             ws = pathlib.PurePosixPath(rep["inside"]["mount_targets"][-1])      # the workspace is bound last
             home = next(t[:-len("/.config/opencode")] for t in rep["inside"]["mount_targets"] if t.endswith("/.config/opencode"))
+            writable = list(dict.fromkeys(m["at"] for m in rep["inside"]["mounts"] if m["access"] == "rw" and m["at"] != str(ws)))
             with self.subTest(record=name, network=rep["network"]):
-                self.assertEqual(judged(rep, tries, home, ws), [])
+                self.assertTrue(writable)       # the premise: the record has sandbox-made writable mounts
+                self.assertEqual(judged(rep, tries, home, ws), [
+                    "cannot establish that a writable mount belongs to the sandbox (isolation not established, not a "
+                    "write that was seen): " + "; ".join(f"{at}: its mount source was not read" for at in writable)])
         if not accepted:
             self.skipTest(f"no accepted measurement under {EVIDENCE}")
 
