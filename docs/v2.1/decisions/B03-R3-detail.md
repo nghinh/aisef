@@ -183,8 +183,9 @@ Files: `tests/v2/test_v21_r3_detail_statement.py`, `..._artifact.py`, `..._produ
 | `::preserve` | 43 (38 + 5 of the review's name digest) | 43 | artifact |
 | `::artifact_problems` | 92 | 92 | artifact |
 | `run.py::evidence_manifest` | 24 | 24 | artifact (3 were survivors of the campaign: `sorted() -> list()`; killed only because this machine's file system lists a directory out of name order) |
-| `adapters.py::Reviewer.review` | 64 (54 + 10 new) | 64 | artifact (all 10 new), registered kill files (the rest) |
-| `verify.py::verify` | 191 (189 + 2 new) | the 2 new | product; the other 189 are lines this WP did not touch — see `report.json` for the subset measured |
+| `adapters.py::Reviewer.review` | 64 (54 + 10 new) | 64 | artifact (all 10 new; alone it leaves 27 of the old 54), plus the registered kill files, re-run in the review: 64/64 |
+| `adapters.py::Reviewer._ocr` | 12 mutants of the review's new lines | 12 | `test_v21_r3_detail_rv_finderfiles.py` (the rest of `_ocr`'s mutants are the registered set's) |
+| `verify.py::verify` | 191 (189 + 2 new: positions 43, 44) | the 2 new | product (re-run in the review); the other 189 are lines this WP did not touch — see `report.json` for the subset measured |
 
 Survivors of the exploratory runs on earlier revisions of the code and what became of them are listed per function in
 `report.json` (`mutants[].dispositions`): two equivalents (a `bool` next to `int`; `""` and `"."` among the components
@@ -196,7 +197,8 @@ by writing an `if`, the rest were killed by naming the cause class and the ident
 * **Real**: the statement and artifact code; the journal (`format3`), the manifest, `--verify`; the real
   `cli_invocation` and `python_callable` probes executed on real git checkouts; the file-system behaviour of
   `preserve` (a directory that is a file, a missing run directory, `os.replace`/`os.fsync` failing through a patched
-  `os` function only for the call); the measurement on the 10 older run directories found in the scratchpad.
+  `os` function only for the call); the measurement on the 10 older run directories found in the scratchpad (4 of
+  them still exist; §8).
 * **Simulated**: the developer (a script), the finder (a script that writes OCR's documents), the provider (a
   transport stub); "the write fails with ENOSPC" in the `aisef run` failclosed test is the keeping function
   replaced (the real failures are in the unit file).
