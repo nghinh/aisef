@@ -406,7 +406,9 @@ def preserve(out: pathlib.Path, finding: Mapping, *, story: str, attempt: int, i
              session: str | None = None, secrets=()) -> Artifact | str:
     """The finding as the finder wrote it — its whole reproducer, with the verification and anchor the kernel attached —
     kept in `<out>/review-findings/<story>.<attempt>.<index>.json` (`index`: its place in the finder's list, so two
-    findings with one id do not meet): the run's `secrets` replaced, `revision` the candidate the probe ran at,
+    findings with one id do not meet; `<story>` is the id as it is when it is a file name of at most 40 characters, and
+    otherwise its name-safe prefix and `-` and the first 8 hex digits of the id's sha256, so two ids that read alike
+    do not meet either): the run's `secrets` replaced, `revision` the candidate the probe ran at,
     `session` the finder's stream, `redacted` how many secrets were replaced (0: the file holds the reproducer that
     ran). Created, never overwritten; written whole to a sibling and renamed over, so a reader never sees half a file.
     The `Artifact` that names it — or why it could not be kept, as text: a failure to keep evidence never raises."""
@@ -415,7 +417,10 @@ def preserve(out: pathlib.Path, finding: Mapping, *, story: str, attempt: int, i
         data = (json.dumps({"format": ARTIFACT_FORMAT, "story_id": story, "attempt": attempt, "index": index,
                             "revision": revision, "session": session, "redacted": count, "finding": body},
                            indent=1, sort_keys=True) + "\n").encode("ascii")
-        name = f"{re.sub(r'[^A-Za-z0-9_-]', '_', story)[:40]}.{attempt}.{index}.json"
+        stem = re.sub(r'[^A-Za-z0-9_-]', '_', story)[:40]
+        if stem != story:     # changed or cut: another story id makes the same stem, so the id's digest tells them apart
+            stem += "-" + hashlib.sha256(story.encode("utf-8", "backslashreplace")).hexdigest()[:8]
+        name = f"{stem}.{attempt}.{index}.json"
         kept = Artifact(f"{ARTIFACT_DIR}/{name}", hashlib.sha256(data).hexdigest(), len(data))   # a name it refuses: no file
         folder = pathlib.Path(out) / ARTIFACT_DIR
         folder.mkdir(exist_ok=True)

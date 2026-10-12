@@ -139,9 +139,32 @@ class PreserveWritesTheWholeFinding(Scratch):
         self.assertEqual(first, second)         # path, sha256 and size
         self.assertEqual((self.out / first.path).read_bytes(), (elsewhere / second.path).read_bytes())
 
-    def test_an_unsafe_story_id_is_written_with_underscores_for_what_a_file_name_does_not_take(self):
-        self.assertEqual(self.keep(story="a b/c:d").path, "review-findings/a_b_c_d.2.0.json")
-        self.assertEqual(self.keep(story="x" * 90, index=1).path, "review-findings/" + "x" * 40 + ".2.1.json")
+    def test_an_unsafe_story_id_is_written_with_underscores_and_its_digest(self):
+        """An id that is not a file name as it stands is a name-safe prefix of at most 40 characters and the first 8 hex
+        digits of the id's sha256 (reviewer fix: without them `STORY.1` and `STORY_1`, or two ids that share their
+        first 40 characters, made one file name and the second story's review was refused every attempt)."""
+        def digest(s: str) -> str:
+            return hashlib.sha256(s.encode("utf-8")).hexdigest()[:8]
+        self.assertEqual(self.keep(story="a b/c:d").path, f"review-findings/a_b_c_d-{digest('a b/c:d')}.2.0.json")
+        self.assertEqual(self.keep(story="x" * 90, index=1).path,
+                         "review-findings/" + "x" * 40 + f"-{digest('x' * 90)}.2.1.json")
+        self.assertEqual(self.keep(story="a-b_c").path, "review-findings/a-b_c.2.0.json")     # a file name: as it is
+
+    def test_two_story_ids_that_read_alike_have_two_files_and_each_is_its_own(self):
+        longer = "ledgerlock-snapshot-command-handles-missing-file"     # shares its first 40 characters with the next
+        pairs = (("STORY.1", "STORY_1"), ("feature/login", "feature_login"), (longer + "-A", longer + "-B"))
+        for first, second in pairs:
+            with self.subTest(first=first, second=second):
+                a = self.keep(finding(summary="first"), story=first)
+                b = self.keep(finding(summary="second"), story=second)
+                self.assertIsInstance(a, V.Artifact, a)
+                self.assertIsInstance(b, V.Artifact, b)
+                self.assertNotEqual(a.path, b.path)
+                docs = [json.loads((self.out / x.path).read_bytes()) for x in (a, b)]
+                self.assertEqual([d["story_id"] for d in docs], [first, second])
+                self.assertEqual([d["finding"]["summary"] for d in docs], ["first", "second"])
+                for x in (a, b):
+                    self.assertRegex(x.path, r"^review-findings/[A-Za-z0-9_.-]{1,80}\.json$")
 
     def test_a_name_that_is_not_one_leaves_no_file(self):
         why = self.keep(attempt=10 ** 100)
