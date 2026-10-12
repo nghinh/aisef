@@ -293,7 +293,7 @@ class _Flight:
         self.thread = threading.get_ident()
         self.disposing = False   # True once the range is measured empty: the anchor may be reaped, nothing signals
         self.escaped: dict[int, Proc] = {}
-        self.done = threading.Event()
+        self.done = False        # set by the leader, last; read by the callers that wait
         self.outcome: Residual | None = None
 
 
@@ -315,7 +315,7 @@ class ProcessRange:
         self.target_pid: int | None = None
         self.returncode: int | None = None
         self._reaped = False
-        self._mx = threading.Lock()           # guards `_flight` only; never held while anything waits
+        self._mx = threading.RLock()          # guards `_flight` only; re-entrant, never held while anything waits
         self._flight: _Flight | None = None   # the release in progress (or the last one, done)
 
     # ---- start
@@ -438,13 +438,14 @@ class ProcessRange:
         write or pipe close of its own. A call after a release has ended is what it always was: a no-op once the anchor
         is reaped, a new ladder after RangeNotEmpty. A call from the thread that is already releasing (a signal
         handler) stops the range when the frame below is still in the ladder and returns at once past it: that frame
-        disposes. A caller waits exactly as long as the release it waits for."""
-        flight = None
+        disposes. A caller waits exactly as long as the release it waits for — by polling, as `wait_empty` does, so
+        that nothing a re-entering handler could meet is held while it waits."""
+        flight = outcome = None
         try:
             while flight is None:
                 with self._mx:
                     current = self._flight
-                    if current is None or current.done.is_set():
+                    if current is None or current.done:
                         if self._anchor is None or self._reaped:
                             return
                         flight = self._flight = _Flight()
@@ -453,17 +454,20 @@ class ProcessRange:
                         if not current.disposing:
                             self._ladder(current)
                         return
-                    # in slices: a main thread waiting here stays interruptible (Windows does not interrupt a bare wait)
-                    if current.done.wait(1.0) and current.outcome is not None:
+                    while not current.done:
+                        time.sleep(POLL_S)
+                    if current.outcome is not None:
                         raise type(current.outcome)(*current.outcome.args) from current.outcome
             self._release(flight)
         except Residual as e:
+            outcome = e   # RangeNotEmpty / RangeEscaped: raised below, once `done` is set
             if flight is not None:
                 flight.outcome = e
-            raise
         finally:
             if flight is not None:
-                flight.done.set()
+                flight.done = True
+        if outcome is not None:
+            raise outcome
 
     def _ladder(self, flight: _Flight) -> None:
         """Stop the range, graceful-first, until it is measured empty; RangeNotEmpty when it does not empty."""
@@ -479,6 +483,8 @@ class ProcessRange:
                                 f"{[(p.pid, p.command) for p in self.members()]}")
 
     def _release(self, flight: _Flight) -> None:
+        """The ladder, then the disposal: EXIT to the anchor, the reap, the pipes and the backend closed, and the check
+        that nothing which left the range is alive. RangeEscaped when something is."""
         self._ladder(flight)
         flight.disposing = True  # measured empty: from here the anchor may be reaped, and nothing is signalled
         flight.escaped.update({p.pid: p for p in self.escaped()})  # Linux: orphaned escapees re-parent to the anchor

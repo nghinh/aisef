@@ -11,11 +11,12 @@ The contract this file tests, from the real call paths (the decision doc's table
 4. NO DEADLOCK — a call from the thread that is already releasing (a signal handler) neither hangs nor corrupts the
    frame below; a waiter waits exactly as long as the release it waits for; a failed start() leaves nothing to wait on.
 
-Every test below is a controlled thread choreography over a fake anchor, backend and pipes (no process, no timing, no
-sleep): a thread is PARKED inside the operation the race needs, the second caller is brought to the point where it
-is either waiting for the first or — in an implementation that does not make it wait — already running, and only then
-is the first one let go. The one exception is `RealRange`, which runs a real target under a real anchor: an
-integration check, not the proof. The bound on every wait (`BOUND_S`) only ends a test that would otherwise hang.
+Every test below is a controlled thread choreography over a fake anchor, backend and pipes (no process, no sleep of
+the test's own): a thread is PARKED inside the operation the race needs, the second caller is brought to the point
+where it is either waiting for the first (a waiter polls: it is seen in the `time.sleep` the module calls) or — in an
+implementation that does not make it wait — already running, and only then is the first one let go. Two exceptions: `RealRange` runs a real target under a real anchor (an integration check, not the
+proof), and `AbandonedWorker` lets StoryScope's own 0.05 s bound run out on a release that is parked, so it cannot
+end any other way. The bound on every wait (`BOUND_S`) only ends a test that would otherwise hang.
 """
 
 import io
@@ -23,6 +24,7 @@ import os
 import pathlib
 import sys
 import threading
+import time
 import types
 import unittest
 from unittest import mock
@@ -37,7 +39,7 @@ from aisef2.runtime.story_scope import StoryScope  # noqa: E402
 from tests.v2.p4.world import Journal2, emitter, released  # noqa: E402
 
 BOUND_S = 10.0           # a gate's upper bound: reached only by a test that would otherwise hang
-HELD_FALLBACK_S = 2.0    # how long an implementation that blocks the second caller some other way is given to do so
+HELD_FALLBACK_S = 5.0    # how long an implementation that blocks the second caller some other way is given to do so
 PY = sys.executable
 POSIX = os.name == "posix"
 
@@ -45,8 +47,7 @@ POSIX = os.name == "posix"
 # --------------------------------------------------------------------------------------- the choreography
 
 class Park:
-    """Parks the first thread that reaches it until the test lets it go. When the range already has a release in
-    flight, the flight's event is replaced by a spy that says when another thread starts waiting on it."""
+    """Parks the first thread that reaches it until the test lets it go."""
 
     def __init__(self, rig: "Rig") -> None:
         self.rig, self.taken = rig, False
@@ -57,30 +58,29 @@ class Park:
             first, self.taken = not self.taken, True
         if not first:
             return
-        flight = getattr(self.rig.range, "_flight", None)
-        if flight is not None:
-            flight.done = _Spy(flight.done, self.rig)
         self.arrived.set()
         if not self.go.wait(BOUND_S):
             raise AssertionError("a parked thread was never let go")
 
 
-class _Spy:
-    """Stands in for a flight's `done` event; a thread that waits on it is a caller held behind the release."""
+class _Time:
+    """`time` as `process_range` sees it. A caller that waits for a release in flight polls with `time.sleep`; that
+    call says "a caller is held behind the release", and may run a hook (a signal handler arriving while it waits)."""
 
-    def __init__(self, event: threading.Event, rig: "Rig") -> None:
-        self._event, self._rig = event, rig
+    monotonic = staticmethod(time.monotonic)
 
-    def wait(self, timeout=None):
-        self._rig.waiting.set()
-        self._rig.second.set()
-        return self._event.wait(timeout)
+    def __init__(self, rig: "Rig") -> None:
+        self._rig = rig
 
-    def is_set(self) -> bool:
-        return self._event.is_set()
-
-    def set(self) -> None:
-        self._event.set()
+    def sleep(self, seconds: float) -> None:
+        rig = self._rig
+        rig.waits += 1
+        rig.waiting.set()
+        rig.second.set()
+        hook, rig.during_wait = rig.during_wait, None
+        if hook is not None:
+            hook()
+        time.sleep(seconds)
 
 
 class Caller(threading.Thread):
@@ -173,14 +173,15 @@ class Rig:
     """A ProcessRange with no process: the anchor, the backend and the pipes are fakes that journal every operation with
     the thread that did it, so a test can say what ran, how often, and whether two threads were inside at once."""
 
-    def __init__(self, members: int = 1, dies_on: str | None = "SIGINT", escapees: tuple = (),
-                 empties_before_signal: bool = False) -> None:
+    def __init__(self, test: unittest.TestCase, members: int = 1, dies_on: str | None = "SIGINT",
+                 escapees: tuple = (), empties_before_signal: bool = False) -> None:
         self._mx = threading.Lock()
         self.ops: list[tuple[str, str]] = []        # (thread name, operation), in the order they started
         self.depth: dict[int, int] = {}             # thread ident -> operations it is inside now
         self.max_threads = 0                        # the most threads inside operations at once
         self.hooks: dict[str, object] = {}
         self.second, self.waiting, self.overlap = threading.Event(), threading.Event(), threading.Event()
+        self.waits, self.during_wait = 0, None
         self.alive = [Proc(100 + i, 1, None, None, f"member-{i}") for i in range(members)]
         self.dies_on, self.empties_before_signal = dies_on, empties_before_signal
         self.escapees = [Proc(pid, 1, None, None, command) for pid, command in escapees]
@@ -191,6 +192,9 @@ class Rig:
         self.range._anchor, self.range._os = self.anchor, _Backend(self)
         self.range._pumper = types.SimpleNamespace(join=lambda timeout=None: None)
         self.range.returncode = 0                   # the target's exit status was reported
+        patch = mock.patch.object(pr, "time", _Time(self))
+        patch.start()
+        test.addCleanup(patch.stop)
 
     def op(self, name: str):
         return _Op(self, name)
@@ -203,9 +207,9 @@ class Rig:
         return sum(1 for _, o in self.ops if o == operation)
 
     def second_is_held(self) -> str:
-        """Returns once the second caller is out of the way of the parked first one: waiting for the release ("waiting"),
-        or — an implementation that does not make it wait — already running inside ("inside"); an implementation that
-        blocks it some other way is given `HELD_FALLBACK_S` ("elsewhere")."""
+        """Returns once the second caller is out of the way of the parked first one: polling for the release's end
+        ("waiting"), or — an implementation that does not make it wait — already running inside ("inside"); an
+        implementation that blocks it some other way is given `HELD_FALLBACK_S` ("elsewhere")."""
         if not self.second.wait(HELD_FALLBACK_S):
             return "elsewhere"
         return "waiting" if self.waiting.is_set() else "inside"
@@ -252,7 +256,7 @@ def two_callers(test: unittest.TestCase, rig: Rig, park: Park) -> tuple[Caller, 
 
 class MutualExclusion(unittest.TestCase):
     def test_two_threads_releasing_one_range_run_one_ladder_one_exit_write_and_one_close(self):
-        rig = Rig(dies_on="SIGINT")
+        rig = Rig(self, dies_on="SIGINT")
         park = rig.park_at("signal")        # A is inside its first signal, past the reaped guard
         a, b = two_callers(self, rig, park)
         park.go.set()
@@ -271,7 +275,7 @@ class MutualExclusion(unittest.TestCase):
     def test_the_second_caller_is_not_released_before_the_first_has_finished(self):
         """B waits behind A while A is stuck (the last stage of a ladder with no bound waits as long as it must): B is
         still waiting when A has not finished, and both return once A does — a wait on A, not a lock held across A."""
-        rig = Rig(dies_on="SIGINT")
+        rig = Rig(self, dies_on="SIGINT")
         park = rig.park_at("members")
         a, b = two_callers(self, rig, park)
         self.assertTrue(a.is_alive() and b.is_alive())     # B did not run a release of its own meanwhile
@@ -294,7 +298,7 @@ class MutualExclusion(unittest.TestCase):
             stdin.flush()
         except OSError:
             pass                                # EPIPE: the range ignores it too; the bytes stay
-        rig = Rig(members=0)
+        rig = Rig(self, members=0)
         rig.anchor.stdin, rig.anchor.reaped, rig.anchor.returncode = stdin, True, 0   # the anchor has exited
         park = rig.park_at("escaped")           # A is past the reaped guard, before any close
         a = Caller(rig.range, "A", before=lambda: setattr(raw, "x_ident", threading.get_ident()))
@@ -310,6 +314,28 @@ class MutualExclusion(unittest.TestCase):
         b.finish(self)
         self.assertEqual((repr(a.error), repr(b.error)), ("None", "None"))
         self.assertTrue(stdin.closed and rig.range._reaped)
+
+
+class WaitingCaller(unittest.TestCase):
+    def test_a_call_that_arrives_on_a_waiting_thread_waits_too_and_hangs_nothing(self):
+        """A handler runs on the thread that is waiting for A's release and calls release() itself: it is a waiter like
+        any other (A is the releasing thread, not this one), and both waits end with A's release."""
+        rig = Rig(self, dies_on="SIGINT")
+        park = rig.park_at("signal")
+        nested = []
+
+        def handler():
+            try:
+                nested.append(rig.range.release())
+            except BaseException as e:  # noqa: BLE001
+                nested.append(e)
+        rig.during_wait = handler
+        a, b = two_callers(self, rig, park)
+        park.go.set()
+        a.finish(self)
+        b.finish(self)
+        self.assertEqual((a.error, b.error, nested, rig.max_threads), (None, None, [None], 1))
+        self.assertEqual(([s for s, _ in rig.sent], rig.writes, rig.count("stdin.close")), (["SIGINT"], ["EXIT\n"], 1))
 
 
 class _StdinRaw(io.RawIOBase):
@@ -339,7 +365,8 @@ class _StdinRaw(io.RawIOBase):
     def close(self) -> None:
         if not io.RawIOBase.closed.__get__(self):
             self.in_close.set()
-            self.x_checked.wait(BOUND_S)
+            if threading.get_ident() != self.x_ident:    # the other closer waits for X; X never waits for itself
+                self.x_checked.wait(BOUND_S)
         super().close()
 
 
@@ -347,7 +374,7 @@ class _StdinRaw(io.RawIOBase):
 
 class Idempotence(unittest.TestCase):
     def test_a_call_after_the_release_ended_does_nothing_observable_and_returns(self):
-        rig = Rig(dies_on="SIGINT")
+        rig = Rig(self, dies_on="SIGINT")
         rig.range.release()
         ops, ledger, sent = list(rig.ops), list(rig.range.ledger), list(rig.sent)
         for _ in range(2):
@@ -359,14 +386,14 @@ class Idempotence(unittest.TestCase):
         self.assertIsNone(ProcessRange("never", [PY]).release())
 
     def test_a_range_that_exited_by_itself_is_released_without_a_signal(self):
-        rig = Rig(members=0)
+        rig = Rig(self, members=0)
         rig.range.release()
         self.assertEqual((rig.sent, rig.range.ledger, rig.writes), ([], [], ["EXIT\n"]))
 
     def test_an_empty_range_whose_target_never_reported_its_exit_is_still_stopped(self):
         """Nothing is alive in the range, but the target's exit was never reported: the controller does not know how it
         ended, so it runs the ladder (`and`, not `or`: emptiness AND a reported exit)."""
-        rig = Rig(members=0, dies_on="SIGINT")
+        rig = Rig(self, members=0, dies_on="SIGINT")
         rig.range.returncode = None
         real = rig.range._os.signal
 
@@ -379,7 +406,7 @@ class Idempotence(unittest.TestCase):
         self.assertEqual(rig.range.returncode, 0)
 
     def test_the_message_of_a_range_that_will_not_empty_names_the_stages_and_the_members(self):
-        rig = Rig(dies_on=None)
+        rig = Rig(self, dies_on=None)
         with self.assertRaises(RangeNotEmpty) as e:
             rig.range.release()
         self.assertEqual(str(e.exception), "r: not empty after ['cooperative', 'terminate', 'kill']: "
@@ -389,7 +416,7 @@ class Idempotence(unittest.TestCase):
         self.assertFalse(rig.range._reaped)
 
     def test_RangeNotEmpty_then_a_later_call_runs_the_ladder_again_as_it_always_did(self):
-        rig = Rig(dies_on=None)
+        rig = Rig(self, dies_on=None)
         for _ in range(2):
             with self.assertRaises(RangeNotEmpty):
                 rig.range.release()
@@ -402,7 +429,7 @@ class Idempotence(unittest.TestCase):
         self.assertEqual((rig.writes, rig.count("stdin.close"), rig.count("anchor.wait")), ([], 1, 1))
 
     def test_RangeEscaped_is_raised_to_the_caller_and_a_later_call_returns_as_it_always_did(self):
-        rig = Rig(members=0, escapees=((9002, "later"), (9001, "leaver")))
+        rig = Rig(self, members=0, escapees=((9002, "later"), (9001, "leaver")))
         alive = {9001: Proc(9001, 1, None, None, "leaver"), 9002: Proc(9002, 1, None, None, "later")}
         with mock.patch.object(pr, "process_table", return_value=alive):
             with self.assertRaises(RangeEscaped) as e:
@@ -415,7 +442,7 @@ class Idempotence(unittest.TestCase):
         self.assertTrue(rig.range._reaped)
 
     def test_a_range_with_no_escapee_does_not_read_the_process_table(self):
-        rig = Rig(members=0)
+        rig = Rig(self, members=0)
         with mock.patch.object(pr, "process_table", side_effect=AssertionError("read the table")):
             rig.range.release()
 
@@ -424,7 +451,7 @@ class Idempotence(unittest.TestCase):
 
 class SharedOutcome(unittest.TestCase):
     def test_a_caller_that_waited_is_given_RangeEscaped_a_leak_is_never_silent_for_it(self):
-        rig = Rig(dies_on="SIGINT", escapees=((9001, "leaver"),))
+        rig = Rig(self, dies_on="SIGINT", escapees=((9001, "leaver"),))
         alive = {9001: Proc(9001, 1, None, None, "leaver")}
         park = rig.park_at("signal")
         with mock.patch.object(pr, "process_table", return_value=alive):
@@ -442,7 +469,7 @@ class SharedOutcome(unittest.TestCase):
             self.assertIsNone(rig.range.release())          # a call after it ended: as it always was
 
     def test_a_caller_that_waited_is_given_RangeNotEmpty_and_no_second_ladder_runs(self):
-        rig = Rig(dies_on=None)
+        rig = Rig(self, dies_on=None)
         park = rig.park_at("signal")
         a, b = two_callers(self, rig, park)
         park.go.set()
@@ -461,7 +488,7 @@ class SharedOutcome(unittest.TestCase):
     def test_a_failure_that_is_not_an_outcome_is_not_handed_to_the_waiter_who_leads_instead(self):
         """A release that dies of something else (here a signal that fails) is no outcome of the range: the caller that
         waited for it runs the release itself, as a later call would."""
-        rig = Rig(dies_on="SIGINT")
+        rig = Rig(self, dies_on="SIGINT")
         park = rig.park_at("signal")
         real = rig.range._os.signal
         calls = []
@@ -488,7 +515,7 @@ class Ownership(unittest.TestCase):
     def test_no_signal_is_sent_after_the_anchor_was_reaped(self):
         """A is past the reaped guard, inside the signal; the members have left by themselves; B measures the range empty
         and reaps the anchor. A's signal is then sent to a group the anchor no longer pins — unless B waits for A."""
-        rig = Rig(empties_before_signal=True)
+        rig = Rig(self, empties_before_signal=True)
         park = rig.park_at("signal")
         a, b = two_callers(self, rig, park)
         park.go.set()
@@ -499,7 +526,7 @@ class Ownership(unittest.TestCase):
         self.assertEqual(rig.count("anchor.wait"), 1)
 
     def test_a_caller_that_waited_never_signals_a_range_the_other_thread_emptied(self):
-        rig = Rig(dies_on="SIGINT")
+        rig = Rig(self, dies_on="SIGINT")
         park = rig.park_at("signal")
         a, b = two_callers(self, rig, park)
         park.go.set()
@@ -510,7 +537,7 @@ class Ownership(unittest.TestCase):
         self.assertEqual([t for t, o in rig.ops if o == "signal"], ["A"])
 
     def test_the_signal_guard_refuses_after_the_reap(self):
-        rig = Rig(members=0)
+        rig = Rig(self, members=0)
         rig.range.release()
         with self.assertRaisesRegex(RangeError, "the anchor is reaped; the range is never signalled again"):
             rig.range._signal("kill", "SIGKILL")
@@ -530,7 +557,7 @@ class Reentry(unittest.TestCase):
         return below
 
     def test_a_call_inside_the_ladder_stops_the_range_and_the_frame_below_disposes(self):
-        rig = Rig(dies_on="SIGINT")
+        rig = Rig(self, dies_on="SIGINT")
         seen = {}
 
         def handler():
@@ -549,7 +576,7 @@ class Reentry(unittest.TestCase):
         self.assertTrue(rig.range._reaped)
 
     def test_a_call_past_the_ladder_returns_at_once_and_leaves_the_disposal_to_the_frame_below(self):
-        rig = Rig(members=0)
+        rig = Rig(self, members=0)
         seen = {}
 
         def handler():
@@ -567,7 +594,7 @@ class Reentry(unittest.TestCase):
         self.assertTrue(rig.range._reaped)
 
     def test_a_call_inside_the_ladder_that_cannot_empty_the_range_raises_to_its_caller_only(self):
-        rig = Rig(dies_on=None)
+        rig = Rig(self, dies_on=None)
         seen = {}
 
         def handler():
@@ -585,6 +612,33 @@ class Reentry(unittest.TestCase):
         self.assertFalse(rig.range._reaped)
         rig.alive = []
         self.assertIsNone(rig.range.release())                      # nothing is left half done: the next call completes
+        self.assertTrue(rig.range._reaped)
+
+    def test_a_call_that_arrives_while_a_release_is_being_claimed_hangs_nothing(self):
+        """The handler lands inside the few bytecodes in which the first call holds the range's own lock to claim the
+        release: the lock is the range's, so the re-entering call must be able to take it again (an `RLock`)."""
+        rig = Rig(self, dies_on="SIGINT")
+        inner, nested = rig.range._mx, []
+
+        class Hooked:
+            def __init__(self):
+                self.hook = lambda: nested.append(rig.range.release())
+
+            def __enter__(self):
+                inner.acquire()                     # the range's own lock, held ...
+                hook, self.hook = self.hook, None
+                if hook is not None:
+                    hook()                          # ... when the handler arrives
+                return self
+
+            def __exit__(self, *exc):
+                inner.release()
+                return False
+        rig.range._mx = Hooked()
+        below = self.run_below(rig)
+        self.assertEqual((below.error, nested), (None, [None]))
+        self.assertEqual(([s for s, _ in rig.sent], rig.writes, rig.count("stdin.close"), rig.count("anchor.wait")),
+                         (["SIGINT"], ["EXIT\n"], 1, 1))
         self.assertTrue(rig.range._reaped)
 
     @unittest.skipUnless(POSIX, "a failed adopt on Windows is not exercised here: _Job.abort does not signal an anchor "
@@ -613,12 +667,12 @@ class AbandonedWorker(Journal2, unittest.TestCase):
         w = self.writer()
         self.story(w)
         scope = StoryScope("S1", emitter(w), release_timeout_s=0.05)
-        rig = Rig(dies_on="SIGINT")
+        rig = Rig(self, dies_on="SIGINT")
         park = rig.park_at("members")
         self.addCleanup(park.go.set)
         scope.acquire(rig.range)
         report = scope.dispose()
-        self.assertTrue(park.arrived.is_set())
+        self.assertTrue(park.arrived.wait(BOUND_S))
         self.assertEqual(released(w), [("r", "RESIDUAL")])
         self.assertEqual(report.records[0].detail, "not released: the release was still running after 0.05s")
         late = Caller(rig.range, "late")
@@ -657,7 +711,9 @@ class RealRange(unittest.TestCase):
         self.assertEqual((stop.error, owner.error), (None, None))
         self.assertEqual(r.members(), [])
         self.assertTrue(r._reaped and r._anchor.stdin.closed and r._anchor.stdout.closed)
-        self.assertEqual([s["stage"] for s in r.ledger], ["cooperative"] if POSIX else ["terminate_job"])   # one ladder
+        ladder = ["cooperative", "terminate", "kill"] if POSIX else ["terminate_job"]
+        stages = [s["stage"] for s in r.ledger]
+        self.assertTrue(stages and stages == ladder[:len(stages)], stages)   # one ladder, not two climbing together
 
 
 if __name__ == "__main__":
