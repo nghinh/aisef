@@ -2285,9 +2285,9 @@
   {
    "target": "aisef2/app/lineage.py::claim",
    "index": 54,
-   "mutant": "L174 string '\\n' emptied",
+   "mutant": "L179 string '\\n' emptied",
    "class": "AUDITED",
-   "source_sha256": "1227726975b15f485894c2ee4b831d44173dbbbaf2f92bdbe165bf79cdc09ffa",
+   "source_sha256": "528dc0146694bd92697f317aaad5fee260535518bd7966efbfd2b644541c7761",
    "group": "T09-AUDIT-CLAIM-BYTES: the claim file's bytes are only parsed as JSON or hashed as read; nothing re-derives or compares them",
    "grounds": "Audit unrefuted after trying to refute it. The file ends without a newline; every reader is json.loads (claim L126-136, continued_by L164, lineage_account L286/L295) or hashes the bytes it read (_sha(data)), so the digest the operator names is always the one of the bytes on disk. The claim file is outside the evidence manifest (run.py:290-296 lists RUN.json, RUN.started.json, journals, sessions, preflight); the claim dict, not the file, is what goes into RUN.json['continues']['claim'] and that is canonicalised by _content_sha. verify.py does not read the file. Residual, accepted: a human `cat` runs on to the prompt.",
    "consumers_checked": [
@@ -2308,17 +2308,17 @@
    "batch": "A09",
    "reviewed": true,
    "remapped_from": {
-    "index": 52,
-    "mutant": "L152 string '\\n' emptied",
-    "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+    "index": 54,
+    "mutant": "L174 string '\\n' emptied",
+    "base": "f860e57fdcd457887d8766de8c8d4d01f1af778c"
    }
   },
   {
    "target": "aisef2/app/lineage.py::claim",
    "index": 63,
-   "mutant": "L163 string ')' emptied",
+   "mutant": "L168 string ')' emptied",
    "class": "AUDITED",
-   "source_sha256": "1227726975b15f485894c2ee4b831d44173dbbbaf2f92bdbe165bf79cdc09ffa",
+   "source_sha256": "528dc0146694bd92697f317aaad5fee260535518bd7966efbfd2b644541c7761",
    "group": "T09-AUDIT-CLAIM-WORDING: connective punctuation of a refusal whose identifying elements (the flag, the 64-hex digest) are intact",
    "grounds": "Audit unrefuted. Only the closing parenthesis of the parenthetical is lost; the flag and the digest remain and the digest is delimited by the preceding space. The sibling batch T09b asserts the recovery instruction by regex `--supersede-claim\\s+([0-9a-f]{64})(?![0-9a-f])` and then supersedes with the extracted value, so the contract that matters (flag + exact digest that works) is held there and does not depend on the `)`; under the mutant the digest is the last token, which an operator copies more safely than `<sha>)` (cli.py compares by equality, so a copied trailing `)` would not match).",
    "consumers_checked": [
@@ -2334,17 +2334,17 @@
    "batch": "A09",
    "reviewed": true,
    "remapped_from": {
-    "index": 61,
-    "mutant": "L141 string ')' emptied",
-    "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+    "index": 63,
+    "mutant": "L163 string ')' emptied",
+    "base": "f860e57fdcd457887d8766de8c8d4d01f1af778c"
    }
   },
   {
    "target": "aisef2/app/lineage.py::claim",
    "index": 65,
-   "mutant": "L169 string 'O_NOFOLLOW' emptied",
+   "mutant": "L174 string 'O_NOFOLLOW' emptied",
    "class": "EQUIVALENT",
-   "source_sha256": "1227726975b15f485894c2ee4b831d44173dbbbaf2f92bdbe165bf79cdc09ffa",
+   "source_sha256": "528dc0146694bd92697f317aaad5fee260535518bd7966efbfd2b644541c7761",
    "group": "T09-EQ-NOFOLLOW: O_NOFOLLOW beside O_CREAT|O_EXCL; O_EXCL already refuses a final-component symbolic link",
    "grounds": "Equivalence holds. Proof: O_NOFOLLOW only governs the final path component and O_CREAT|O_EXCL already refuses a final component that exists, a symbolic link included, with EEXIST regardless of its target: POSIX open(), the macOS open(2) man page on this host (`If O_EXCL is set with O_CREAT and the last component of the pathname is a symbolic link, open() will fail even if the symbolic link points to a non-existent name`), Linux open(2), and (recalled, not readable here) Linux build_open_flags ORing O_NOFOLLOW in for O_CREAT|O_EXCL. Where os has no O_NOFOLLOW (Windows) getattr(os,'O_NOFOLLOW',0) is already 0, the mutant's value. The only handler is `except FileExistsError` at L148, and EEXIST is what every state gives. Separate observation, not this mutant (see issues): a dangling link as the NEWEST generation raises a raw FileNotFoundError at L126 (path.read_bytes()), not through os.open.",
    "consumers_checked": [
@@ -2361,17 +2361,17 @@
    "batch": "A09",
    "reviewed": true,
    "remapped_from": {
-    "index": 63,
-    "mutant": "L147 string 'O_NOFOLLOW' emptied",
-    "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+    "index": 65,
+    "mutant": "L169 string 'O_NOFOLLOW' emptied",
+    "base": "f860e57fdcd457887d8766de8c8d4d01f1af778c"
    }
   },
   {
    "target": "aisef2/app/lineage.py::claim",
    "index": 72,
-   "mutant": "L174 True->False",
+   "mutant": "L179 True->False",
    "class": "AUDITED",
-   "source_sha256": "1227726975b15f485894c2ee4b831d44173dbbbaf2f92bdbe165bf79cdc09ffa",
+   "source_sha256": "528dc0146694bd92697f317aaad5fee260535518bd7966efbfd2b644541c7761",
    "group": "T09-AUDIT-CLAIM-BYTES: the claim file's bytes are only parsed as JSON or hashed as read; nothing re-derives or compares them",
    "grounds": "Audit unrefuted. Only the order of keys in the file differs (insertion order fixed in claim(): run, claimed, claimant, supersedes; nested supersedes is not alphabetical either). Bytes are deterministic in both forms; json.loads and every dict comparison are order-insensitive; the digest is of the bytes on disk. The dict returned (and embedded in RUN.json, canonicalised by _content_sha with sort_keys) is the same object in both forms. No document states a canonical byte form of the claim file and nothing re-serialises a claim.",
    "consumers_checked": [
@@ -2389,17 +2389,17 @@
    "batch": "A09",
    "reviewed": true,
    "remapped_from": {
-    "index": 67,
-    "mutant": "L152 True->False",
-    "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+    "index": 72,
+    "mutant": "L174 True->False",
+    "base": "f860e57fdcd457887d8766de8c8d4d01f1af778c"
    }
   },
   {
    "target": "aisef2/app/lineage.py::read_anchor",
    "index": 5,
-   "mutant": "L380 string ' is not a complete evidence anchor file' emptied",
+   "mutant": "L411 string ' is not a complete evidence anchor file' emptied",
    "class": "AUDITED",
-   "source_sha256": "1227726975b15f485894c2ee4b831d44173dbbbaf2f92bdbe165bf79cdc09ffa",
+   "source_sha256": "528dc0146694bd92697f317aaad5fee260535518bd7966efbfd2b644541c7761",
    "group": "T09-AUDIT-ANCHOR-MSG: explanatory wording of a ValueError whose class and identifying element are kept",
    "grounds": "Audit unrefuted. Tightened grounds: the only ValueError this function can raise is the one at L352 (read_bytes raises OSError, decode(errors='replace') cannot raise), so the class alone names the single cause 'not a complete anchor file' and the path, kept in the mutant, names the object. No product code calls read_anchor (cli.py takes the 64 hex on the command line; --expect-anchor is regex-checked at cli.py:69-70); tests call it and assert ValueError (test_v21_continue_integrity.py:609, T09c [4] for non-ASCII); the docs (ANCHOR-THREAT-MODEL.md:50, REPORT.md:150) promise the refusal, not its wording. Residual: an operator script printing str(e) sees the bare path.",
    "consumers_checked": [
@@ -2416,16 +2416,16 @@
    "reviewed": true,
    "remapped_from": {
     "index": 5,
-    "mutant": "L352 string ' is not a complete evidence anchor file' emptied",
-    "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+    "mutant": "L380 string ' is not a complete evidence anchor file' emptied",
+    "base": "f860e57fdcd457887d8766de8c8d4d01f1af778c"
    }
   },
   {
    "target": "aisef2/app/lineage.py::reconcile",
    "index": 137,
-   "mutant": "L240 string \"the developer's candidate of \" emptied",
+   "mutant": "L245 string \"the developer's candidate of \" emptied",
    "class": "AUDITED",
-   "source_sha256": "1227726975b15f485894c2ee4b831d44173dbbbaf2f92bdbe165bf79cdc09ffa",
+   "source_sha256": "528dc0146694bd92697f317aaad5fee260535518bd7966efbfd2b644541c7761",
    "group": "T08-WHY-IDENTIFIED: the free-narrative `why` of an identified (merge or candidate) item. The only code that reads an item's `why` is the refusal of UNIDENTIFIED items (bundle_cli.py:407-411); an identified item is only printed in the `continue` report (bundle_cli.py:445, main 524-526), which RUN.json and --verify never hold (run.py:337-378: `continues` = path, anchor, claim, account; verify.py re-derives usage and the account, never the report). No document quotes a sentence. Each mutant below was checked for what it removes; a requirement-shaped test of the identifying elements (kc-audit-refutation-attempt.json) leaves all six SURVIVED.",
    "grounds": "Removes the noun phrase that says what the commit is; the same fact is the item's `operation: 'candidate'` (the integrity test selects on it) and the report-level in_flight ('their stories run again'). Story, worktree name and head sha (`commit`) remain. A test could only assert the sentence. Revised by me only in a citation (constructors at lineage.py:198, 202, 205, 217; the implementer cited 203/206, which are `why` continuation lines).",
    "consumers_checked": [
@@ -2444,16 +2444,16 @@
    "reviewed": true,
    "remapped_from": {
     "index": 137,
-    "mutant": "L218 string \"the developer's candidate of \" emptied",
-    "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+    "mutant": "L240 string \"the developer's candidate of \" emptied",
+    "base": "f860e57fdcd457887d8766de8c8d4d01f1af778c"
    }
   },
   {
    "target": "aisef2/app/lineage.py::reconcile",
    "index": 138,
-   "mutant": "L240 string \" in the kernel's worktree \" emptied",
+   "mutant": "L245 string \" in the kernel's worktree \" emptied",
    "class": "AUDITED",
-   "source_sha256": "1227726975b15f485894c2ee4b831d44173dbbbaf2f92bdbe165bf79cdc09ffa",
+   "source_sha256": "528dc0146694bd92697f317aaad5fee260535518bd7966efbfd2b644541c7761",
    "group": "T08-WHY-IDENTIFIED: the free-narrative `why` of an identified (merge or candidate) item. The only code that reads an item's `why` is the refusal of UNIDENTIFIED items (bundle_cli.py:407-411); an identified item is only printed in the `continue` report (bundle_cli.py:445, main 524-526), which RUN.json and --verify never hold (run.py:337-378: `continues` = path, anchor, claim, account; verify.py re-derives usage and the account, never the report). No document quotes a sentence. Each mutant below was checked for what it removes; a requirement-shaped test of the identifying elements (kc-audit-refutation-attempt.json) leaves all six SURVIVED.",
    "grounds": "Only the separator between two identifying elements is removed ('...of S2wt-S2, never journaled...'); both elements remain in the sentence and the story is also the structured `story` field; the worktree name is determined by it (wt-<story>, lineage.py:211). A word-boundary assertion on the ids WOULD kill this mutant and 145; I judged it a rendering pin of an informational field (nothing parses it, no operator action depends on it) and did not add it: the owner's call.",
    "consumers_checked": [
@@ -2471,16 +2471,16 @@
    "reviewed": true,
    "remapped_from": {
     "index": 138,
-    "mutant": "L218 string \" in the kernel's worktree \" emptied",
-    "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+    "mutant": "L240 string \" in the kernel's worktree \" emptied",
+    "base": "f860e57fdcd457887d8766de8c8d4d01f1af778c"
    }
   },
   {
    "target": "aisef2/app/lineage.py::reconcile",
    "index": 139,
-   "mutant": "L240 string ', never journaled (no proof ran on it): developed again' emptied",
+   "mutant": "L245 string ', never journaled (no proof ran on it): developed again' emptied",
    "class": "AUDITED",
-   "source_sha256": "1227726975b15f485894c2ee4b831d44173dbbbaf2f92bdbe165bf79cdc09ffa",
+   "source_sha256": "528dc0146694bd92697f317aaad5fee260535518bd7966efbfd2b644541c7761",
    "group": "T08-WHY-IDENTIFIED: the free-narrative `why` of an identified (merge or candidate) item. The only code that reads an item's `why` is the refusal of UNIDENTIFIED items (bundle_cli.py:407-411); an identified item is only printed in the `continue` report (bundle_cli.py:445, main 524-526), which RUN.json and --verify never hold (run.py:337-378: `continues` = path, anchor, claim, account; verify.py re-derives usage and the account, never the report). No document quotes a sentence. Each mutant below was checked for what it removes; a requirement-shaped test of the identifying elements (kc-audit-refutation-attempt.json) leaves all six SURVIVED.",
    "grounds": "Consequence/explanation clause ('never journaled (no proof ran on it): developed again'): no id, path, limit or code is removed; 'developed again' is said by report['in_flight'] ('their stories run again') and by `remaining`. The clause is also inexact in a window, so a test of it would pin text that is not a contract: I re-derived from the code that prove() journals the implementer's probe/evaluated at the candidate (orchestrate/proof.py:89-91) before the verifier's probe and before proof/verified, with the kernel's worktree already moved to the candidate (story_runner.py:237), so a run stopped inside the first criterion's proof yields this item with 'no proof ran on it' overstated. Derived, not measured by me.",
    "consumers_checked": [
@@ -2499,16 +2499,16 @@
    "reviewed": true,
    "remapped_from": {
     "index": 139,
-    "mutant": "L218 string ', never journaled (no proof ran on it): developed again' emptied",
-    "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+    "mutant": "L240 string ', never journaled (no proof ran on it): developed again' emptied",
+    "base": "f860e57fdcd457887d8766de8c8d4d01f1af778c"
    }
   },
   {
    "target": "aisef2/app/lineage.py::reconcile",
    "index": 144,
-   "mutant": "L221 string \"the kernel's merge of \" emptied",
+   "mutant": "L226 string \"the kernel's merge of \" emptied",
    "class": "AUDITED",
-   "source_sha256": "1227726975b15f485894c2ee4b831d44173dbbbaf2f92bdbe165bf79cdc09ffa",
+   "source_sha256": "528dc0146694bd92697f317aaad5fee260535518bd7966efbfd2b644541c7761",
    "group": "T08-WHY-IDENTIFIED: the free-narrative `why` of an identified (merge or candidate) item. The only code that reads an item's `why` is the refusal of UNIDENTIFIED items (bundle_cli.py:407-411); an identified item is only printed in the `continue` report (bundle_cli.py:445, main 524-526), which RUN.json and --verify never hold (run.py:337-378: `continues` = path, anchor, claim, account; verify.py re-derives usage and the account, never the report). No document quotes a sentence. Each mutant below was checked for what it removes; a requirement-shaped test of the identifying elements (kc-audit-refutation-attempt.json) leaves all six SURVIVED.",
    "grounds": "Opening noun phrase of a sentence that restates structured fields: that the commit is the kernel's merge is the item's `operation: 'merge'` + `identified: True`, decided at lineage.py:197 (second parent a proof/verified candidate of an open story, subject 'merge <sha12>'), which the integrity test asserts and mutant 26's test pins. Story and sha12 remain in the sentence.",
    "consumers_checked": [
@@ -2527,16 +2527,16 @@
    "reviewed": true,
    "remapped_from": {
     "index": 144,
-    "mutant": "L199 string \"the kernel's merge of \" emptied",
-    "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+    "mutant": "L221 string \"the kernel's merge of \" emptied",
+    "base": "f860e57fdcd457887d8766de8c8d4d01f1af778c"
    }
   },
   {
    "target": "aisef2/app/lineage.py::reconcile",
    "index": 145,
-   "mutant": "L221 string \"'s proved candidate \" emptied",
+   "mutant": "L226 string \"'s proved candidate \" emptied",
    "class": "AUDITED",
-   "source_sha256": "1227726975b15f485894c2ee4b831d44173dbbbaf2f92bdbe165bf79cdc09ffa",
+   "source_sha256": "528dc0146694bd92697f317aaad5fee260535518bd7966efbfd2b644541c7761",
    "group": "T08-WHY-IDENTIFIED: the free-narrative `why` of an identified (merge or candidate) item. The only code that reads an item's `why` is the refusal of UNIDENTIFIED items (bundle_cli.py:407-411); an identified item is only printed in the `continue` report (bundle_cli.py:445, main 524-526), which RUN.json and --verify never hold (run.py:337-378: `continues` = path, anchor, claim, account; verify.py re-derives usage and the account, never the report). No document quotes a sentence. Each mutant below was checked for what it removes; a requirement-shaped test of the identifying elements (kc-audit-refutation-attempt.json) leaves all six SURVIVED.",
    "grounds": "Removes the possessive, the word 'proved' and the separator: 'the kernel's merge of S2<sha12>'. Both ids remain and are structured (`story`, full `candidate`; `commit`); 'proved' is explanation (`candidates` holds every proof/verified event's candidate whatever its agreement or verdict, lineage.py:181-182, so no field carries it). A word-boundary assertion on the ids would kill it (as 138); a containment assertion would not (kc-audit-refutation-attempt.json). Rendering pin of informational text, not added.",
    "consumers_checked": [
@@ -2554,16 +2554,16 @@
    "reviewed": true,
    "remapped_from": {
     "index": 145,
-    "mutant": "L199 string \"'s proved candidate \" emptied",
-    "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+    "mutant": "L221 string \"'s proved candidate \" emptied",
+    "base": "f860e57fdcd457887d8766de8c8d4d01f1af778c"
    }
   },
   {
    "target": "aisef2/app/lineage.py::reconcile",
    "index": 146,
-   "mutant": "L221 string ': its post-merge proof and commit were never journaled' emptied",
+   "mutant": "L226 string ': its post-merge proof and commit were never journaled' emptied",
    "class": "AUDITED",
-   "source_sha256": "1227726975b15f485894c2ee4b831d44173dbbbaf2f92bdbe165bf79cdc09ffa",
+   "source_sha256": "528dc0146694bd92697f317aaad5fee260535518bd7966efbfd2b644541c7761",
    "group": "T08-WHY-IDENTIFIED: the free-narrative `why` of an identified (merge or candidate) item. The only code that reads an item's `why` is the refusal of UNIDENTIFIED items (bundle_cli.py:407-411); an identified item is only printed in the `continue` report (bundle_cli.py:445, main 524-526), which RUN.json and --verify never hold (run.py:337-378: `continues` = path, anchor, claim, account; verify.py re-derives usage and the account, never the report). No document quotes a sentence. Each mutant below was checked for what it removes; a requirement-shaped test of the identifying elements (kc-audit-refutation-attempt.json) leaves all six SURVIVED.",
    "grounds": "A description of what the journal lacks, inexact in a window the suite drives: reprove() (story_runner.py:313) journals S2's post-merge probe/evaluated and proof/verified before gate.decision (:327) and story/commit (:329), so a kill at the story/commit append (journal-before-write, journal-short-write) leaves the merge item produced while 'post-merge proof ... never journaled' is false; only the commit is missing or cut (the implementer measured it with a scratch probe; I re-derived the ordering from the code and did not re-measure). Read by no code and promised by no document: a test would pin a false sentence. If the owner wants it to be a contract the text must first be made exact.",
    "consumers_checked": [
@@ -2581,16 +2581,16 @@
    "reviewed": true,
    "remapped_from": {
     "index": 146,
-    "mutant": "L199 string ': its post-merge proof and commit were never journaled' emptied",
-    "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+    "mutant": "L221 string ': its post-merge proof and commit were never journaled' emptied",
+    "base": "f860e57fdcd457887d8766de8c8d4d01f1af778c"
    }
   },
   {
    "target": "aisef2/app/lineage.py::usage_lineage",
    "index": 41,
-   "mutant": "L341 dict entry 0 dropped",
+   "mutant": "L372 dict entry 0 dropped",
    "class": "EQUIVALENT",
-   "source_sha256": "1227726975b15f485894c2ee4b831d44173dbbbaf2f92bdbe165bf79cdc09ffa",
+   "source_sha256": "528dc0146694bd92697f317aaad5fee260535518bd7966efbfd2b644541c7761",
    "group": "T08-UL-EQ-SEQ: indexes 41 and 60 change only the `seq` entry (its presence / its key) of the temporary event dicts built at lineage.py:313 and handed to usage.usage.",
    "grounds": "usage.usage (usage.py:75-110) reads the event dicts at exactly two places: e['type'] (usage.py:94, :95) and e['data'] (usage.py:95); it never enumerates a dict's keys, items or copies it, and its return dict (count, sessions, tokens, preflight, retries, wall_s, cost) holds no event. The dicts built at lineage.py:313 are used only as that argument and kept nowhere. So the result of usage_lineage is a function of type and data only; a dict display without 'seq' cannot raise differently. The same shape is built by run.py:495 and verify.py:147 and read by none of them for `seq`. kc: SURVIVED with this file (kc-usage_lineage-56.json), as it must.",
    "consumers_checked": [
@@ -2607,16 +2607,16 @@
    "reviewed": true,
    "remapped_from": {
     "index": 41,
-    "mutant": "L313 dict entry 0 dropped",
-    "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+    "mutant": "L341 dict entry 0 dropped",
+    "base": "f860e57fdcd457887d8766de8c8d4d01f1af778c"
    }
   },
   {
    "target": "aisef2/app/lineage.py::usage_lineage",
    "index": 60,
-   "mutant": "L341 string 'seq' emptied",
+   "mutant": "L372 string 'seq' emptied",
    "class": "EQUIVALENT",
-   "source_sha256": "1227726975b15f485894c2ee4b831d44173dbbbaf2f92bdbe165bf79cdc09ffa",
+   "source_sha256": "528dc0146694bd92697f317aaad5fee260535518bd7966efbfd2b644541c7761",
    "group": "T08-UL-EQ-SEQ: indexes 41 and 60 change only the `seq` entry (its presence / its key) of the temporary event dicts built at lineage.py:313 and handed to usage.usage.",
    "grounds": "Same chain as 41: the seq value under 'seq' or under '' is never read (usage.py:94-95 read only 'type' and 'data'; no key enumeration). The key '' does not collide with 'type' or 'data'; `u` holds no event. kc: SURVIVED with this file, as it must.",
    "consumers_checked": [
@@ -2633,16 +2633,16 @@
    "reviewed": true,
    "remapped_from": {
     "index": 60,
-    "mutant": "L313 string 'seq' emptied",
-    "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+    "mutant": "L341 string 'seq' emptied",
+    "base": "f860e57fdcd457887d8766de8c8d4d01f1af778c"
    }
   },
   {
    "target": "aisef2/app/lineage.py::write_anchor",
    "index": 5,
-   "mutant": "L368 string 'not an evidence anchor: ' emptied",
+   "mutant": "L399 string 'not an evidence anchor: ' emptied",
    "class": "AUDITED",
-   "source_sha256": "1227726975b15f485894c2ee4b831d44173dbbbaf2f92bdbe165bf79cdc09ffa",
+   "source_sha256": "528dc0146694bd92697f317aaad5fee260535518bd7966efbfd2b644541c7761",
    "group": "T09-AUDIT-ANCHOR-MSG: explanatory wording of a ValueError whose class and identifying element are kept",
    "grounds": "Audit unrefuted. Validation precedes os.open (L339-341) so no file is made; the message keeps repr of the value. The only product caller (cli.py:99) passes R.anchor_in(a.out), which is anchor_of(...) = a sha256 hexdigest, or None which the `if anchor and ...` guard skips, so the branch is unreachable from the CLI; its handler (cli.py:101-103) would print `ValueError: <message>` to stderr and exit 2, with the printed anchor still usable, so even a future reachable case loses only the prefix wording.",
    "consumers_checked": [
@@ -2660,16 +2660,16 @@
    "reviewed": true,
    "remapped_from": {
     "index": 5,
-    "mutant": "L340 string 'not an evidence anchor: ' emptied",
-    "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+    "mutant": "L368 string 'not an evidence anchor: ' emptied",
+    "base": "f860e57fdcd457887d8766de8c8d4d01f1af778c"
    }
   },
   {
    "target": "aisef2/app/lineage.py::write_anchor",
    "index": 6,
-   "mutant": "L369 string 'O_NOFOLLOW' emptied",
+   "mutant": "L400 string 'O_NOFOLLOW' emptied",
    "class": "EQUIVALENT",
-   "source_sha256": "1227726975b15f485894c2ee4b831d44173dbbbaf2f92bdbe165bf79cdc09ffa",
+   "source_sha256": "528dc0146694bd92697f317aaad5fee260535518bd7966efbfd2b644541c7761",
    "group": "T09-EQ-NOFOLLOW: O_NOFOLLOW beside O_CREAT|O_EXCL; O_EXCL already refuses a final-component symbolic link",
    "grounds": "Equivalence holds on the same proof as claim [63]: O_CREAT|O_EXCL refuses an existing final component, a symlink included, with EEXIST (POSIX; macOS open(2) man page on this host; Linux open(2)), O_NOFOLLOW governs only that component, and the mutant's flag value equals what Windows already gets. The documented promise (ANCHOR-THREAT-MODEL.md:46-47: a symlink, even one pointing nowhere, is refused) is behavioural and is held by O_EXCL; the doc names O_NOFOLLOW as mechanism but nothing observable depends on it. cli.py:65 also refuses an existing or dangling path with lexists before the run.",
    "consumers_checked": [
@@ -2686,8 +2686,8 @@
    "reviewed": true,
    "remapped_from": {
     "index": 6,
-    "mutant": "L341 string 'O_NOFOLLOW' emptied",
-    "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+    "mutant": "L369 string 'O_NOFOLLOW' emptied",
+    "base": "f860e57fdcd457887d8766de8c8d4d01f1af778c"
    }
   },
   {
@@ -4300,12 +4300,23 @@
    "mutant": "L87 string ')' emptied",
    "class": "AUDITED",
    "source_sha256": "1259fc39d5733bf55d409a23a15e412ebaaf4c9fb1d59e01fd34df8c96a8dffb",
-   "group": "R01",
-   "grounds": "",
-   "consumers_checked": [],
-   "exceptions_checked": [],
+   "group": "Closing ')' of a parenthesised tail whose only content is the exception class, which is the last datum of its item (L87, L73, L122). A test of it could only assert that the string ends with ')' - the string equal to the string. What a reader needs of these three items (the file or record, the kind of failure, the class) is pinned elsewhere for each and is intact under the mutant; each item is its own list element, so the unbalanced '(' reaches nothing that follows. Each is audited on its own consumers below.",
+   "grounds": "The mutant yields 'EVIDENCE.json cannot be read (IsADirectoryError'. File, kind and class are still there, in the same order, the class last; my test test_a_manifest_that_cannot_be_read_names_the_file_and_the_class_of_the_failure asserts exactly those three and SURVIVES this mutant by construction. The verdict is 'REFUTED' if the list is non-empty (L173), with either text. Nothing parses the text.",
+   "consumers_checked": [
+    "aisef2/app/verify.py L87 is the only producer (git grep 'cannot be read (' over aisef2: bundle.py:211, settings.py:218, review_ocr.py:207 are other producers of other texts)",
+    "aisef2/app/cli.py L73-L76: json.dumps of the verdict document, exit code from v['verdict'] only",
+    "validation/qualification/release_acceptance.py L128, L144, L152: reads v['verdict'] == 'VERIFIED' and embeds v in the record as 'verification'; release_rehearsal.py L133, L154: embeds v['problems'] as a list in an f-string; none parses a problem",
+    "tests: test_v21_defects_verify.py::test_only_an_absent_manifest_is_a_run_of_an_older_release asserts R.MANIFEST in a problem; test_v21_kills3_R01.py asserts the file, the class token and the kind (read); no test or document asserts the closing parenthesis",
+    "docs/ (grep 'cannot be read (' and REFUTED in docs/*.md, docs/v2.1/*.md): no document promises the text"
+   ],
+   "exceptions_checked": [
+    "a consumer reading '(<Class>)' as a code: git grep over aisef2, validation, tests, docs, scripts finds none",
+    "a consumer joining problems with '; ' where an unbalanced '(' would swallow the next item: the only joins of problems in aisef2 (run.py L399, L414) are of confinement/preflight problems; verify's list reaches cli as JSON and release_rehearsal as a list repr",
+    "the class name followed by more text in the item: the f-string at L87 ends after the class, nothing follows"
+   ],
    "batch": "R01",
-   "reviewed": true
+   "reviewed": true,
+   "fields_from": "the implementer's report: the reviewer's final entry (CONFIRMED, kc-rv-verify.json SURVIVED, grep of every reader of verify()['problems']) carries the verdict and the kill_check only"
   },
   {
    "target": "aisef2/app/verify.py::verify",
@@ -4389,12 +4400,23 @@
    "mutant": "L73 string ')' emptied",
    "class": "AUDITED",
    "source_sha256": "1259fc39d5733bf55d409a23a15e412ebaaf4c9fb1d59e01fd34df8c96a8dffb",
-   "group": "R01",
-   "grounds": "",
-   "consumers_checked": [],
-   "exceptions_checked": [],
+   "group": "Closing ')' of a parenthesised tail whose only content is the exception class, the last datum of its item; see [126].",
+   "grounds": "The mutant yields '<path>/RUN.json: no readable run record (FileNotFoundError'. The path precedes the text and is delimited by ': no readable run record (' which the mutant keeps; the class is the last datum. The document returned is {'verdict', 'problems'} in both. T22a's NoReadableRunRecord already pins the refusal as exactly that document with one problem naming the record's path and the class (absent, not JSON, not UTF-8, a directory).",
+   "consumers_checked": [
+    "aisef2/app/verify.py L73 is the only producer (git grep 'readable run record' over aisef2, validation, tests, docs, scripts: verify.py only)",
+    "aisef2/app/cli.py L73-L76: printed as JSON; exit 1 from v['verdict'] != 'VERIFIED'",
+    "validation/qualification/release_acceptance.py L127-L128: reads RUN.json itself before calling verify, then v['verdict']; release_rehearsal.py L133, L154: embeds the list",
+    "tests/v2/test_v21_kills3_T22a.py::NoReadableRunRecord (path, class, one problem) and test_v21_kills3_A22.py::AnUnreadableRecordIsNamedByItsFileAndItsCause (path ends where it ends, class a token)",
+    "docs: no document quotes the text"
+   ],
+   "exceptions_checked": [
+    "a consumer parsing the class out of '(<Class>)': none found by grep",
+    "a record path that itself contains '(' so that the cause's start is ambiguous: the path comes first and is delimited by ': no readable run record (', kept by the mutant",
+    "the verdict depending on the text: the early return is a literal 'REFUTED' with a one-element list in both"
+   ],
    "batch": "R01",
-   "reviewed": true
+   "reviewed": true,
+   "fields_from": "the implementer's report: the reviewer's final entry (CONFIRMED, kc-rv-verify.json SURVIVED, grep of every reader of verify()['problems']) carries the verdict and the kill_check only"
   },
   {
    "target": "aisef2/app/verify.py::verify",
@@ -4402,12 +4424,22 @@
    "mutant": "L122 string ')' emptied",
    "class": "AUDITED",
    "source_sha256": "1259fc39d5733bf55d409a23a15e412ebaaf4c9fb1d59e01fd34df8c96a8dffb",
-   "group": "R01",
-   "grounds": "",
-   "consumers_checked": [],
-   "exceptions_checked": [],
+   "group": "Closing ')' of a parenthesised tail whose only content is the exception class, the last datum of its item; see [126].",
+   "grounds": "The mutant yields 'the journal RUN.json names cannot be read (KeyError'. Subject (the journal the record names), kind and class are intact; the class is the last datum. The next problem ('the journal is not the one RUN.json names (digest or length)', L123-L124) is a separate list element, so the unbalanced '(' reaches no other text. T22b's JournalReferenceUnreadable pins, for FileNotFoundError, KeyError and TypeError, exactly one problem carrying the class and the word 'journal', and test_v21_defects_verify.py pins the ValueError arm the same way.",
+   "consumers_checked": [
+    "aisef2/app/verify.py L122 is the only producer (git grep 'names cannot be read' over aisef2, validation, tests, docs, scripts: verify.py only)",
+    "aisef2/app/cli.py L73-L76: JSON; exit code from the verdict",
+    "validation/qualification/release_rehearsal.py L133, L154 and release_acceptance.py L144: the verdict is read, the list embedded, no problem parsed",
+    "tests/v2/test_v21_kills3_T22b.py::JournalReferenceUnreadable, tests/v2/test_v21_defects_verify.py::test_a_journal_reference_that_is_no_object_or_no_path_is_refuted: assert the class once and 'journal'; none asserts the parenthesis"
+   ],
+   "exceptions_checked": [
+    "the earlier lead's TypeError arm (a journal reference that is not an object): in the current code L115-L116 refuses a non-dict journal reference with its own problem before this try, so L122 is reached only for a dict whose path is missing (KeyError), not a path (TypeError), has a NUL (ValueError) or cannot be opened (OSError); in every arm the class is the last datum",
+    "a consumer parsing '(<Class>)': none found by grep",
+    "the verdict depending on the text: L173 is 'REFUTED' if problems, with either text"
+   ],
    "batch": "R01",
-   "reviewed": true
+   "reviewed": true,
+   "fields_from": "the implementer's report: the reviewer's final entry (CONFIRMED, kc-rv-verify.json SURVIVED, grep of every reader of verify()['problems']) carries the verdict and the kill_check only"
   },
   {
    "target": "aisef2/orchestrate/story_runner.py::_attempt",
@@ -5511,5 +5543,12 @@
     "mutant": "L112 string 'the reproducer is not a contract: ' emptied"
    }
   ]
+ },
+ "campaign_4_remap": {
+  "base": "f860e57fdcd457887d8766de8c8d4d01f1af778c",
+  "head_code": "b5c24575600ffc7b28441802dcb168bc9829f920",
+  "note": "aisef2/app/lineage.py changed (the account_of fix, merge f06cd66) after campaign 3 measured it: every entry of that module was carried by validation (the same description without its line number, the same occurrence, the same changed line) to the module as campaign 4 measured it; the one entry the tool reported as unmapped had already been carried by round 2's own remap and is kept as it was (its digest is the measured module's)",
+  "entries_remapped": 212,
+  "entries_kept": 1
  }
 }

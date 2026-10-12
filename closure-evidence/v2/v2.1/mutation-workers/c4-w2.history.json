@@ -1,0 +1,13 @@
+{
+ "worker": "c4-w2",
+ "snapshot": "b5c24575600ffc7b28441802dcb168bc9829f920",
+ "status": "finished 2026-10-12; git status --porcelain after: clean (campaign 4, snapshot b5c2457; the worker directory is named c3-w2 by the campaign script)",
+ "log": {
+  "path": "closure-evidence/v2/v2.1/mutation-workers/c4-w2.log",
+  "sha256": "664bde1525772df01b2bcfd99d1a6a2b13b2ceb09ba2298bf01dfce71fcc93a5"
+ },
+ "record": {
+  "path": "closure-evidence/v2/v2.1/mutation-workers/c4-w2.record.json",
+  "sha256": "d30aa2573330b156db477e24d71ed7da98f2a05579532ed94453d5e5fb905fc3"
+ }
+}
