@@ -85,7 +85,9 @@ aisef run --verify --project bundle.json --out run1 --expect-anchor <anchor>
 ```
 - `RUN.json` có thêm `usage` (token theo lớp, request, retry, thời gian, tiền nếu có giá) và `no_progress` (retry lặp lại
   đúng các lỗi cũ — chỉ báo cáo).
-- Thư mục: `<out>/test-python` (venv cho test của developer; probe **không** chạy trên nó), `<out>/EVIDENCE.json`.
+- Thư mục: `<out>/test-python` (venv cho test của developer; probe **không** chạy trên nó), `<out>/EVIDENCE.json`,
+  `<out>/review-findings/` (mỗi finding của reviewer, đầy đủ và đã che bí mật của run; dòng journal chỉ giữ bản tóm tắt
+  ≤ 1.500 ký tự, nêu đường dẫn, sha256 và kích thước của tệp; `--verify` đối chiếu).
 
 ## 5. Lượt chạy dừng giữa chừng: nối tiếp, không chạy lại từ đầu
 

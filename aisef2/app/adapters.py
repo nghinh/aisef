@@ -46,6 +46,12 @@ OCR_BACKGROUND = ("You review a change to {name}. {requirements} in the reposito
                   "does not have. A comment without one is recorded for a person; it never blocks the change.")
 
 
+#: the review is refused, not the finding downgraded: a confirmed, anchored finding whose evidence cannot be kept would
+#: otherwise pass the story (a cut statement is never grounds to block, and none is dropped silently)
+NOT_PRESERVED = ("finding {id} is confirmed and anchored, but its full reproducer could not be preserved ({why}): the "
+                 "review did not complete with its evidence (every finding discarded)")
+
+
 def _sha(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
@@ -94,7 +100,12 @@ class Reviewer:
     the kernel's probe verifies each reproducer and the bundle's approved contracts anchor its expectation
     (app/review_verify); and the reviewed checkout must not change while the review runs: the candidate is captured
     before the finder starts and every file of the checkout is compared after the finder and after the verification —
-    a change discards every finding (CapabilityUnrunnable: the review did not run on the candidate)."""
+    a change discards every finding (CapabilityUnrunnable: the review did not run on the candidate).
+
+    Each finding is kept whole, secret-redacted, in an artifact of the run directory (`review_verify.preserve`) that
+    its journaled statement names; the statement is bounded and says so when it cut. A finding that would block and
+    whose artifact cannot be kept refuses the review the same way (`NOT_PRESERVED`): a cut statement is never what
+    blocks a story, and a confirmed finding is never passed silently. The run's secrets are the session streams'."""
 
     def __init__(self, run, project: Project, logs: pathlib.Path, session_kw: dict, timeout_s: float,
                  review: dict | None = None, probe_timeout_s: float = 60.0, interpreter: str | None = None,
@@ -117,18 +128,26 @@ class Reviewer:
         ocr = self.review_policy.get("finder") == "ocr"
         found, s, coverage = (self._ocr(scope, attempt, head) if ocr else self._model(scope, attempt))
         _unchanged(scope.root, head, before, "the finder")
+        secrets = (*self.kw.get("secrets", ()), self.route.get("token"))     # what the session streams are redacted with
         typed = []
-        for f in found:     # a finding is evidence only when the kernel's probe reproduces it and its clause anchors it
+        for index, f in enumerate(found):     # evidence only when the kernel's probe reproduces it and its clause anchors it
             v = self._verify(f, scope.root, head)
             a = review_verify.anchor(f, self.project) if isinstance(f.get("reproducer"), dict) else None
             f["verification"] = {"status": v.status, "why": v.reason, "probe": v.probe, "observed": v.observed}
             if a is not None:
                 f["anchor"] = {"status": a.status, "why": a.reason, "contracts": list(a.contracts)}
             confirmed = review_verify.blocks(v, f, self.review_policy["policy"], self.review_policy["min_severity"], a)
-            typed.append(Finding(str(f.get("id")), confirmed or bool(f.get("blocking")),
-                                 (v.evidence(),) if confirmed else (), review_verify.detail(f, v, a)))
+            # the statement is bounded; the finding is kept whole, redacted, in an artifact the row names and the
+            # manifest binds — and a block rests on that artifact, never on the statement's cut text
+            kept = review_verify.preserve(self.logs.parent, f, story=scope.story_id, attempt=attempt, index=index,
+                                          revision=head, session=s.get("log"), secrets=secrets)
+            fid = review_verify.redacted(str(f.get("id")), secrets)[0]      # it names the gate row: no secret there either
+            if confirmed and not isinstance(kept, review_verify.Artifact):
+                raise CapabilityUnrunnable(NOT_PRESERVED.format(id=fid, why=kept))
+            typed.append(Finding(fid, confirmed or bool(f.get("blocking")),
+                                 (v.evidence(),) if confirmed else (), review_verify.detail(f, v, a, kept, secrets)))
         _unchanged(scope.root, head, before, "the verification")
-        s["findings"] = found
+        s["findings"] = review_verify.redacted(found, secrets)[0]     # RUN.json: never a secret of the run
         confirmed = sum(1 for t in typed if t.blocks)
         return Reviewed(O.COMPLETED, tuple(typed), f"{len(found)} findings" + (f", {coverage}" if coverage else "")
                         + (f", parsed={s.get('parsed')}" if not ocr else "")
@@ -199,12 +218,17 @@ class Reviewer:
         code_p = _bounded(review_ocr.argv(pin["exe"], output=str(work / "preview.json"), preview=True, **common),
                           scope.root, env, work / "preview.log", self.timeout_s, f"ocr preview {story}")
         preview = review_ocr.read_output(work / "preview.json")
+        keys = (*self.kw.get("secrets", ()), self.route["token"])     # what the session stream is redacted with
+        for raw in ("preview.json", "preview.log"):     # the finder's own copies: read above, they keep no secret
+            client.redact(work / raw, keys)
         log.parent.mkdir(parents=True, exist_ok=True)
         with log.open("x", encoding="utf-8") as fh:     # before the review starts: a stream that exists may have spent
             fh.write(json.dumps({"type": "ocr_started", "finder": f"ocr {review_ocr.OCR['version']}"}) + "\n")
         code = _bounded(review_ocr.argv(pin["exe"], output=str(work / "output.json"), **common), scope.root, env,
                         work / "ocr.log", self.timeout_s, f"ocr review {story}")
         output = review_ocr.read_output(work / "output.json")
+        for raw in ("output.json", "ocr.log"):     # likewise: the comments' reproducers are in `output`, in memory
+            client.redact(work / raw, keys)
         summary = (output or {}).get("summary") or {}
         counts = [summary.get(k) for k in ("input_tokens", "output_tokens")]
         tokens = ({"input": counts[0], "output": counts[1], "reasoning": 0,
@@ -217,7 +241,7 @@ class Reviewer:
                  {"type": "step_finish", "part": {"tokens": tokens} if tokens else {}}]  # no tokens: unaccounted
         with log.open("a", encoding="utf-8") as fh:
             fh.write("".join(json.dumps(x, sort_keys=True) + "\n" for x in lines))
-        redacted = client.redact(log, (*self.kw.get("secrets", ()), self.route["token"]))
+        redacted = client.redact(log, keys)
         seen = client.read_session(log)
         s = {"exit": code, "timed_out": code is None, "stopped": None, "started": True, "error": seen["error"],
              "text": seen["text"], "turns": seen["turns"], "tokens": seen["tokens"],

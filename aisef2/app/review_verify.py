@@ -36,11 +36,22 @@ corrupt file is an I/O error). A stimulus an approved contract decides different
 Policy (settings `review`): under `fix-loop` a CONFIRMED and ANCHORED finding at or above `min_severity` blocks
 (REVIEW_FINDING, owner REVIEW, retryable through the taxonomy's REVIEW limit: the bounded fix loop), its statement and
 the probe's observation fed back to the developer on the retry; everything else is triage — journaled with its
-verification and anchor, never blocking. `advisory` keeps 2.0.0's behaviour: nothing blocks."""
+verification and anchor, never blocking. `advisory` keeps 2.0.0's behaviour: nothing blocks.
+
+**The statement and its artifact** (owner decision B-03 round 3, item 5). `detail` is the journaled statement of a
+finding — a gate row, and the developer's retry prompt — and is bounded (`SUMMARY_MAX`) by construction, field by
+field, never by slicing its text. The bound is on the statement only: the finding's *full* reproducer, verification and
+anchor are kept, secrets redacted, in an artifact of the run directory (`preserve`) that the journal row names by path,
+sha256 and size and the evidence manifest lists; `aisef run --verify` checks the row against the file
+(`artifact_problems`). A finding blocks only with that artifact (app/adapters: without it the review is refused)."""
 
 from __future__ import annotations
 
+import hashlib
 import json
+import math
+import os
+import pathlib
 import re
 from dataclasses import dataclass
 from typing import Mapping
@@ -246,12 +257,237 @@ def blocks(v: Verification, finding: Mapping, policy: str, min_severity: str, an
             and SEVERITIES.index(severity_of(finding)) >= SEVERITIES.index(min_severity))
 
 
-def detail(finding: Mapping, v: Verification, anchored: Anchor | None = None) -> str:
-    """The journaled statement of a finding (the gate row the developer's retry prompt is built from): bounded text."""
-    r = finding.get("reproducer") if isinstance(finding.get("reproducer"), Mapping) else {}
-    return json.dumps({"finding": str(finding.get("id"))[:80], "severity": severity_of(finding),
-                       "summary": str(finding.get("summary", ""))[:400], "clause": r.get("clause"),
-                       "verification": v.status, "why": v.reason[:300],
-                       **({"anchor": anchored.status, "anchor_why": anchored.reason[:300]} if anchored else {}),
-                       "reproducer": {k: r.get(k) for k in ("subject", "stimulus", "observable")} if r else None},
-                      ensure_ascii=False, sort_keys=True)[:1500]
+# --------------------------------------------------------------------------------- the statement and its artifact
+
+#: the journaled statement of a finding is bounded in total (it is a journal row and the developer's retry prompt)
+SUMMARY_MAX = 1500
+ARTIFACT_DIR = "review-findings"
+ARTIFACT_FORMAT = "aisef-v2-review-finding/1"
+REDACTED = "[REDACTED]"      # what app/client.redact writes into a session's stream
+DEPTH_MAX = 64               # containers nested deeper are not kept (no probe grammar nests that far)
+#: the decisive text fields' bounds, in characters of the encoded string body (each cut at its own bound only)
+FINDING_MAX, CLAUSE_MAX, STATUS_MAX, WHY_MAX, OBSERVED_MAX, NOT_KEPT_MAX = 60, 40, 20, 160, 24, 120
+#: what one more marker may add to the statement: `, "<field>": <count>` (an elastic field's name is at most 10
+#: characters and a count at most 10 digits: a field of less than 10**10 characters) is at most 26 characters
+_MARK = 26
+_ARTIFACT_PATH = re.compile(re.escape(ARTIFACT_DIR) + r"/[A-Za-z0-9_.-]{1,80}\.json")
+_SHA256 = re.compile(r"[0-9a-f]{64}")
+
+
+@dataclass(frozen=True, slots=True)
+class Artifact:
+    """Where a finding's full statement is kept: a path relative to the run directory, and the sha256 and the number of
+    the bytes of the file. The shape is checked: the statement's bound relies on it."""
+    path: str
+    sha256: str
+    size: int
+
+    def __post_init__(self) -> None:
+        if not (_ARTIFACT_PATH.fullmatch(self.path) and _SHA256.fullmatch(self.sha256) and type(self.size) is int
+                and 0 <= self.size < 10 ** 10):
+            raise ValueError(f"not a review artifact reference: {self.path!r}")
+
+
+def redacted(value, secrets=()):
+    """(`value` as plain JSON data, how many secrets were replaced). Every string — keys too — has each secret replaced
+    by `REDACTED`, the longest first; a number whose text holds one (a secret of digits) is that text with it replaced;
+    a string with no UTF-8 form (a lone surrogate, which `json.loads` yields from a model's "\\ud800") is written with
+    its escape; a key that is not a string is written `<type>repr`; a value that is
+    not JSON data (NaN, a set, bytes) as its repr; what is nested deeper than `DEPTH_MAX` (no probe grammar is) is
+    replaced by a marker, so the walk — and what is made of it — cannot meet the interpreter's recursion limit."""
+    wanted = sorted({str(s) for s in secrets if s}, key=len, reverse=True)
+    count = 0
+
+    def walk(x, depth=0):
+        nonlocal count
+        if isinstance(x, str):
+            for s in wanted:
+                count += x.count(s)
+                x = x.replace(s, REDACTED)
+            return x.encode("utf-8", "backslashreplace").decode("utf-8")
+        if isinstance(x, (Mapping, list, tuple)) and depth >= DEPTH_MAX:
+            return f"<nested deeper than {DEPTH_MAX} levels>"
+        if isinstance(x, Mapping):
+            out = {}
+            for k, item in x.items():
+                key = walk(k if isinstance(k, str) else f"<{type(k).__name__}>{k!r}")
+                if key in out:     # two keys that became one are both kept
+                    key = f"{key}#{len(out)}"
+                out[key] = walk(item, depth + 1)
+            return out
+        if isinstance(x, (list, tuple)):
+            return [walk(item, depth + 1) for item in x]
+        if isinstance(x, (int, float)) and not isinstance(x, bool) and any(s in repr(x) for s in wanted):
+            return walk(repr(x))     # a secret of digits, written as a JSON number: its text, the secret replaced
+        if x is None or isinstance(x, int) or (isinstance(x, float) and math.isfinite(x)):     # a bool is an int
+            return x
+        return walk(repr(x))
+    return walk(value), count
+
+
+def _dumps(value) -> str:
+    return json.dumps(value, ensure_ascii=False, sort_keys=True)
+
+
+def _fit(text: str, room: int) -> tuple[str, int]:
+    """The longest prefix of `text` whose JSON string body is at most `room` characters, and how many characters of
+    `text` it leaves out. Measured on the encoding (a quote is two characters, a control character six), never on the
+    text, and only as far as `room` reaches."""
+    used = 0
+    for i, ch in enumerate(text):
+        used += len(json.dumps(ch, ensure_ascii=False)) - 2
+        if used > room:
+            return text[:i], len(text) - i
+    return text, 0
+
+
+def detail(finding: Mapping, v: Verification, anchored: Anchor | None = None, artifact: Artifact | str | None = None,
+           secrets=()) -> str:
+    """The journaled statement of a finding (the gate row the developer's retry prompt is built from): one JSON object,
+    always valid and never longer than `SUMMARY_MAX` — by construction, not by cutting its text.
+
+    What decided the block comes first and no other field can evict it: the finding's id, severity and clause, the
+    verification (`verification`, `why`, and `observed`: the probe's verdict on the behaviour the reproducer states)
+    and the anchor, each cut only at its own bound. What is left is shared between the finder's one-line `summary` and
+    the reproducer's `subject`, `stimulus` (the conditions to reproduce) and `observable` (the expected result), the
+    smallest first. A value that fits its share is stated whole; one that does not is the prefix of its canonical JSON
+    text, a string. `elided` says how many characters of which field were left out: present only when something was,
+    and authoritative (a field it does not name is whole). `artifact` is where the full statement is kept (a path, a
+    sha256, a size), or — a str — why it is not (`artifact: null`, `artifact_why`); absent for None. `secrets` are
+    replaced in everything stated, before anything is cut.
+
+    Why the bound holds: the decisive text fields are at most 60+40+20+160+24+20+160 characters (an artifact
+    reference has a checked shape; `artifact_why` is at most 120), their keys and the punctuation are fixed, and the
+    elastic fields share `SUMMARY_MAX` less all of that and what their own markers may add."""
+    def red(x):
+        return redacted(x, secrets)[0]
+    r = red(finding["reproducer"]) if isinstance(finding.get("reproducer"), Mapping) else {}
+    cut: dict[str, int] = {}
+
+    def fit(name: str, text, room: int) -> str:
+        part, left = _fit(red(str(text)), room)
+        if left:
+            cut[name] = left
+        return part
+    clause = r.get("clause")
+    out = {"finding": fit("finding", finding.get("id"), FINDING_MAX), "severity": severity_of(finding),
+           "clause": None if clause is None else fit("clause", clause if isinstance(clause, str) else _dumps(clause),
+                                                     CLAUSE_MAX),
+           "verification": fit("verification", v.status, STATUS_MAX), "why": fit("why", v.reason, WHY_MAX)}
+    if v.observed is not None:
+        out["observed"] = fit("observed", v.observed, OBSERVED_MAX)
+    if anchored:
+        out["anchor"] = fit("anchor", anchored.status, STATUS_MAX)
+        out["anchor_why"] = fit("anchor_why", anchored.reason, WHY_MAX)
+    if isinstance(artifact, Artifact):
+        out["artifact"] = {"path": artifact.path, "sha256": artifact.sha256, "bytes": artifact.size}
+    elif artifact is not None:
+        out["artifact"], out["artifact_why"] = None, fit("artifact_why", artifact, NOT_KEPT_MAX)
+    elastic = {"summary": red(str(finding.get("summary", "")))}
+    if r:
+        elastic |= {k: r.get(k) for k in ("subject", "stimulus", "observable")}
+    out |= {"summary": "", "reproducer": {k: "" for k in elastic if k != "summary"} or None, "elided": cut}
+    room = SUMMARY_MAX - len(_dumps(out)) + 2 * len(elastic) - _MARK * len(elastic)    # `cut` is in `out`, empty or not
+    size = {k: len(_dumps(x)) for k, x in elastic.items()}
+    shown, n = {}, len(elastic)
+    for k in sorted(elastic, key=size.get):     # the smallest first: what it does not need goes to the others
+        share = min(size[k], room // n)
+        room, n = room - share, n - 1
+        if size[k] <= share:
+            shown[k] = elastic[k]
+        else:
+            shown[k], cut[k] = _fit(elastic[k] if isinstance(elastic[k], str) else _dumps(elastic[k]), share - 2)
+    out["summary"] = shown.pop("summary")
+    if shown:
+        out["reproducer"] = shown
+    if not cut:
+        out.pop("elided")
+    return _dumps(out)
+
+
+def preserve(out: pathlib.Path, finding: Mapping, *, story: str, attempt: int, index: int, revision: str,
+             session: str | None = None, secrets=()) -> Artifact | str:
+    """The finding as the finder wrote it — its whole reproducer, with the verification and anchor the kernel attached —
+    kept in `<out>/review-findings/<story>.<attempt>.<index>.json` (`index`: its place in the finder's list, so two
+    findings with one id do not meet; `<story>` is the id as it is when it is a file name of at most 40 characters, and
+    otherwise its name-safe prefix and `-` and the first 8 hex digits of the id's sha256, so two ids that read alike
+    do not meet either): the run's `secrets` replaced, `revision` the candidate the probe ran at,
+    `session` the finder's stream, `redacted` how many secrets were replaced (0: the file holds the reproducer that
+    ran). Created, never overwritten; written whole to a sibling and renamed over, so a reader never sees half a file.
+    The `Artifact` that names it — or why it could not be kept, as text: a failure to keep evidence never raises."""
+    try:
+        body, count = redacted(finding, secrets)
+        data = (json.dumps({"format": ARTIFACT_FORMAT, "story_id": story, "attempt": attempt, "index": index,
+                            "revision": revision, "session": session, "redacted": count, "finding": body},
+                           indent=1, sort_keys=True) + "\n").encode("ascii")
+        stem = re.sub(r'[^A-Za-z0-9_-]', '_', story)[:40]
+        if stem != story:     # changed or cut: another story id makes the same stem, so the id's digest tells them apart
+            stem += "-" + hashlib.sha256(story.encode("utf-8", "backslashreplace")).hexdigest()[:8]
+        name = f"{stem}.{attempt}.{index}.json"
+        kept = Artifact(f"{ARTIFACT_DIR}/{name}", hashlib.sha256(data).hexdigest(), len(data))   # a name it refuses: no file
+        folder = pathlib.Path(out) / ARTIFACT_DIR
+        folder.mkdir(exist_ok=True)
+        if (folder / name).exists():
+            raise FileExistsError(f"{name} exists: an artifact is never overwritten")
+        sibling = folder / f"{name}.tmp"
+        with sibling.open("xb") as fh:
+            fh.write(data)
+            fh.flush()
+            os.fsync(fh.fileno())
+        os.replace(sibling, folder / name)
+        return kept
+    except (OSError, ValueError, TypeError) as e:
+        return f"{type(e).__name__}: {e}"[:300]
+
+
+def artifact_problems(out: pathlib.Path, events: list[dict]) -> tuple[list[str], list[str]]:
+    """(problems, notes) of the review rows of a journal (`events`: `{seq, type, data}`) against the files of the run
+    directory `out` (`aisef run --verify`). A row whose statement names an artifact binds its bytes: a path inside
+    `review-findings/`, a file that exists with the size and sha256 the row states and that is this story's statement of
+    this finding. A row that blocked and names none is a problem when the statement says `artifact: null` (this
+    release never blocks without one) and a note when it has no `artifact` at all (a run of an earlier release)."""
+    problems, notes = [], []
+    for e in events:
+        d = e.get("data") or {}
+        story, at, _ = str(d.get("check", "")).partition(":review:")
+        _, dash, tail = str(d.get("detail", "")).partition(" — ")
+        if e.get("type") != "gate/check" or not at or not dash:
+            continue
+        try:
+            stated = json.loads(tail)
+        except ValueError:
+            continue
+        if not isinstance(stated, dict):
+            continue
+        row = f"review row {e.get('seq')} ({d.get('check')})"
+        ref = stated.get("artifact")
+        if not isinstance(ref, dict):
+            if ref is not None:
+                problems.append(f"{row}: its artifact reference {ref!r} is not a path, a size and a sha256")
+            elif d.get("passed") is False and "artifact" in stated:
+                problems.append(f"{row}: it blocked and names no artifact — the reproducer it rests on is not preserved")
+            elif d.get("passed") is False:
+                notes.append(f"{row}: blocked on a statement with no preserved reproducer (a run of a release before "
+                             "review artifacts)")
+            continue
+        parts = pathlib.PurePosixPath(str(ref.get("path"))).parts
+        if len(parts) != 2 or parts[0] != ARTIFACT_DIR or parts[1] == "..":     # a path never holds "" or "."
+            problems.append(f"{row}: names {ref.get('path')!r}, which is not a file of {ARTIFACT_DIR}/")
+            continue
+        try:
+            data = (pathlib.Path(out) / ARTIFACT_DIR / parts[1]).read_bytes()
+        except OSError as x:
+            problems.append(f"{row}: its artifact {ref['path']} cannot be read ({type(x).__name__})")
+            continue
+        if len(data) != ref.get("bytes") or hashlib.sha256(data).hexdigest() != ref.get("sha256"):
+            problems.append(f"{row}: its artifact {ref['path']} is not the file the row binds (size or sha256)")
+            continue
+        try:
+            doc = json.loads(data.decode("utf-8"))
+        except ValueError:
+            doc = None
+        found = doc.get("finding") if isinstance(doc, dict) else None
+        if not (isinstance(found, dict) and doc.get("format") == ARTIFACT_FORMAT and doc.get("story_id") == story
+                and str(found.get("id")).startswith(str(stated.get("finding")))):
+            problems.append(f"{row}: its artifact {ref['path']} is not this story's statement of this finding")
+    return problems, notes

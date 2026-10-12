@@ -222,7 +222,8 @@ class StatementOfAFinding(unittest.TestCase):
         rep = f["reproducer"]
         self.assertEqual(json.loads(text), {
             "finding": "FND-7", "severity": "high", "summary": self.SUMMARY, "clause": "R-9/3",
-            "verification": V.CONFIRMED, "why": v.reason, "anchor": V.ANCHORED, "anchor_why": a.reason,
+            "verification": V.CONFIRMED, "why": v.reason, "observed": v.observed, "anchor": V.ANCHORED,
+            "anchor_why": a.reason,
             "reproducer": {"subject": MAIN, "stimulus": rep["stimulus"], "observable": rep["observable"]}})
         self.assertIn("tệp", text)
         self.assertNotIn("\\u", text)
