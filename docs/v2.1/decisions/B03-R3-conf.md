@@ -90,9 +90,9 @@ the command line) and `locale`. The report is the record: a verifier re-derives 
 | Class | Accepted when (all) | Evidence it rests on |
 |---|---|---|
 | **W** the workspace | `at == str(ws)` (unchanged: the one host-backed writable mount) | the command line's last `--bind` |
-| **D** an execution resource | the name is one of `null zero full random urandom tty` and its parent directory is a `--dev` destination of the command line, **and** the probe read the node, inside, as a character device of exactly the number the kernel gives that name (`1:3 1:5 1:7 1:8 1:9 5:0`) | `inside.device_roots` (the option made it), `inside.devices` (`[ -c ]` and `stat -L -c %t:%T`, run inside) |
+| **D** an execution resource | the name is one of `null zero full random urandom tty` and its parent directory is a `--dev` destination of the command line, **and** the probe read the node, inside, as a character device of exactly the number the kernel gives that name (`1:3 1:5 1:7 1:8 1:9 5:0`) | `inside.device_roots` (a `--dev` option names the directory the node lies in; which option placed the node is not observable, so the identity read decides), `inside.devices` (`[ -c ]` and `stat -L -c %t:%T`, run inside) |
 | **P** a mount the sandbox made | the file system is one a wrapper can make (`tmpfs proc devpts mqueue`) **and** its mount source is that file system's own name **and** its super block is not one the host's table holds **and** no peer group of the host propagates into or out of it (each optional field is `shared:N` of a group the host does not hold, or none) | `inside.mounts[].fs/source/dev/optional`, `host_mounts` |
-| anything else | refused (known: it is the host's) or *not established* (an unread field, an unreadable table) | — |
+| anything else | refused (known: it is the host's) or *not established* (an unread field; a host table that is unreadable or incomplete — a row that shows neither its super block nor its peer groups rules nothing out) | — |
 
 How P answers each part of the owner's text:
 
@@ -266,3 +266,26 @@ a label by index) and those mutants — with the ones the changed classes had ki
 * **`rep.host_mounts` is in `RUN.json`**: trimmed to four fields per mount; for a host with hundreds of mounts that is
   tens of kilobytes. Decision for the lead if it should be elided from `RUN.json` and kept in the measurement's own
   evidence only.
+
+## 12. Independent review (branch `v21r3/conf-rv`, stacked on this one)
+
+What the reviewer re-ran and found, in short (the report is `out/conf/review/report.json` of the work package):
+
+* **One fail-open, fixed** (`_owned`): a host table whose rows lacked a super block (`dev`) or peer groups (`optional`)
+  matched nothing, so the host's own `mqueue` super block was accepted. Such a table is now "not established" like an
+  unread one (`tests/v2/test_v21_r3_conf_rv_hostrows.py`; the rows `_host_mounts` builds always carry both fields, so
+  no measurement is refused by it).
+* **Corrected wording**: class D is accepted by *identity under a `--dev` destination*, not "placed by `--dev`" — an extra
+  `--dev-bind /dev/null /dev/null` gives the same row and is accepted (real run, `dev-bind-null-over-null`).
+* **Re-run, same result**: the twelve real-bubblewrap scenarios (`scenarios`), the locale record, the 2.1 boundary harness
+  (`measure.py`, `NETWORK=host|none`: `problems: []`, 13 writable mounts), 167 tests in the `hardened` guest, the whole
+  `kill_check` of every new name, and the old judge against the recorded scenarios (accepts all twelve; the tree refuses nine).
+* **Also measured, no false refusal**: `read_only` of `/tmp`, `/run`, `/dev/shm`, `/dev/pts` (real bubblewrap, layout
+  outside `/tmp`); a controller whose stdin is a terminal (no `/dev/console` row appears with bubblewrap 0.12.0 and
+  `--new-session`). `read_only: ["/dev"]` is refused as before: a read-only `/dev/null` stops the probe's own redirects
+  (`unshare: absent`).
+* **Still not established**: a translated message (a hand-built German `libc.mo` was not loaded by the guest's glibc 2.41,
+  so no translated text was produced there either); another namespace's super block bound in by a wrapper that is not
+  `confine.wrap` (the `/proc/<pid>/root` route was refused with EACCES in the guest, so it was not demonstrated); the
+  host's table read *after* the session can hold a super-block number that an unrelated host mount reused within
+  milliseconds of the session's end — that would refuse a correct session as "the host's" (fails closed; not observed).

@@ -457,7 +457,7 @@ def _owned(m: dict, inside: dict, host: list[dict] | None) -> tuple[bool, str] |
       write cannot reach the host, and the super block goes with the mount namespace — proc's with the PID namespace,
       mqueue's with the IPC one) and no peer group of the host propagates into it or out of it.
 
-    Everything else — an unread field, an unreadable host table — is not established: not a pass."""
+    Everything else — an unread field, an unreadable or incomplete host table — is not established: not a pass."""
     at, fs = m["at"], m["fs"]
     parent, _, name = at.rpartition("/")
     if name in DEVICES and parent in inside.get("device_roots", ()):
@@ -473,6 +473,10 @@ def _owned(m: dict, inside: dict, host: list[dict] | None) -> tuple[bool, str] |
         return True, f"its mount source is {m['source']!r}, not {fs}'s own"
     if not host:
         return False, "the host's mount table could not be read"
+    if not all(isinstance(h, dict) and isinstance(h.get("dev"), str) and _DEV.fullmatch(h["dev"])
+               and isinstance(h.get("optional"), list) for h in host):
+        # a row that shows neither its super block nor its peer groups rules nothing out: not a table to judge against
+        return False, "the host's mount table has a row that does not show its super block or peer groups"
     dev = m.get("dev")
     if not (isinstance(dev, str) and _DEV.fullmatch(dev)):
         return False, "its super block was not read"

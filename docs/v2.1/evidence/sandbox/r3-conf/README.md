@@ -75,3 +75,23 @@ measurement's `problems` is empty (its refusal of a further user namespace read 
 * A confined `aisef run` end to end (no provider, no `opencode`).
 * That these hold at another tree: they hold at one where `aisef2/app/confine.py`, `PROBE` and the harness are
   byte-identical.
+
+## `review-X1.json` (the independent review's run, 2026-10-13)
+
+`guest.sh <tree> X1 python3 -B /repo/validation/v21/sandbox/r3_conf_review_guest.py > review-X1.json`: command lines and
+operator settings the scenarios above did not try, through `confine._probe` with the real bubblewrap 0.12.0, at the tree
+of the review's commit (the tree of `scenarios-X1.json` plus the one change recorded in `decisions/B03-R3-conf.md` §12,
+which no row of these records reaches). Each entry: `accepted`, the `problems`, the nodes read inside, every writable
+mount besides the workspace (accepted or not), and `table_unchanged`.
+
+| entry | what it shows |
+|---|---|
+| `dev-bind-null-over-null` | `--dev-bind /dev/null /dev/null` gives the same row as `--dev` placed: accepted (identity decides, not the option) |
+| `bind-null-at-dev-x` | the same device under a name outside the list: refused (the container's `/dev` super block) — the earlier clause accepted it by place |
+| `stdin-is-a-terminal` | the controller's stdin is a pseudo terminal: no `/dev/console` row, accepted |
+| `read_only /tmp`, `/run`, `/dev/shm`, `/dev/pts` | accepted: nothing writable is added |
+| `read_only /dev` | refused by the earlier checks as before (`unshare: absent`, no `find`): a read-only `/dev/null` stops the probe's own redirects |
+
+Not shown: that a translated message differs (a hand-built German `libc.mo` on a tmpfs over `/usr/share/locale` was not
+loaded by the guest's glibc 2.41, so no translated text was produced); another namespace's super block bound in
+(`/proc/<pid>/root` of a process in a user namespace of its own is refused with EACCES for an unprivileged caller).

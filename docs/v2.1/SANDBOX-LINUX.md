@@ -350,7 +350,7 @@ the guest, nine of which are write paths). A writable mount outside the workspac
 Anything else is refused: `writable outside the workspace: [...]` when the report shows it is the host's (a super block
 the host holds, a host path or device as source, a file system a wrapper cannot make, a peer group of the host, a node
 that is not the device it must be), and `cannot establish that a writable mount belongs to the sandbox (isolation not
-established …)` when a field or the host's table could not be read — never a pass. Why a super block that is not the
+established …)` when a field could not be read or the host's table is unreadable or incomplete — never a pass. Why a super block that is not the
 host's is the sandbox's own: the kernel gives each `tmpfs` mount its own super block and each `devpts` mount a new
 instance, a `proc` super block is keyed by the PID namespace and an `mqueue` one by the IPC namespace, so one that shares
 the host's namespace is the host's (measured: no `--unshare-pid` gives `/proc` as the container's `0:66`); the judgement
