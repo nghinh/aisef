@@ -1,0 +1,517 @@
+{
+ "environment": {
+  "bubblewrap": "bubblewrap 0.12.0",
+  "kernel": "Linux 7.0.12-linuxkit aarch64",
+  "locales": [
+   "C",
+   "C.utf8",
+   "POSIX"
+  ],
+  "os": "Debian GNU/Linux 13 (trixie)",
+  "python": "3.14.8",
+  "uid": 0
+ },
+ "environment_of_the_before_the_change_run_equal": true,
+ "locale": {
+  "locale": {
+   "LANG": "C",
+   "LC_ALL": "C"
+  },
+  "os_environ_unchanged": true,
+  "problems": []
+ },
+ "measure_py": {
+  "host": {
+   "host_mounts_appeared": [],
+   "host_mounts_rows": 15,
+   "locale": {
+    "LANG": "C",
+    "LC_ALL": "C"
+   },
+   "problems": []
+  },
+  "none": {
+   "host_mounts_appeared": [],
+   "host_mounts_rows": 15,
+   "locale": {
+    "LANG": "C",
+    "LC_ALL": "C"
+   },
+   "problems": []
+  }
+ },
+ "reuse": {
+  "after_the_change": {
+   "baseline-flood": {
+    "accepted": true,
+    "extra_options": [],
+    "host_mounts_appeared": 48,
+    "host_mounts_rows": 15,
+    "problems": [],
+    "sandbox_super_blocks_taken_by_those_mounts": [
+     {
+      "dev": "0:60",
+      "sandbox_mount": "/"
+     },
+     {
+      "dev": "0:61",
+      "sandbox_mount": "/proc"
+     },
+     {
+      "dev": "0:62",
+      "sandbox_mount": "/dev"
+     },
+     {
+      "dev": "0:63",
+      "sandbox_mount": "/dev/pts"
+     },
+     {
+      "dev": "0:65",
+      "sandbox_mount": "/tmp"
+     },
+     {
+      "dev": "0:85",
+      "sandbox_mount": "/aisef-home"
+     }
+    ],
+    "sandbox_super_blocks_the_table_before_held": [
+     "0:57",
+     "0:69"
+    ],
+    "unrelated_mounts_made_before_the_second_reading": 48
+   },
+   "baseline-no-flood": {
+    "accepted": true,
+    "extra_options": [],
+    "host_mounts_appeared": 0,
+    "host_mounts_rows": 15,
+    "problems": [],
+    "sandbox_super_blocks_taken_by_those_mounts": [],
+    "sandbox_super_blocks_the_table_before_held": [
+     "0:57",
+     "0:69"
+    ],
+    "unrelated_mounts_made_before_the_second_reading": 0
+   },
+   "host-mqueue-bound-flood": {
+    "accepted": false,
+    "extra_options": [
+     "--dev-bind",
+     "/dev/mqueue",
+     "/hostmq"
+    ],
+    "host_mounts_appeared": 48,
+    "host_mounts_rows": 15,
+    "problems": [
+     "mounted beyond what the wrapper names: ['/hostmq']",
+     "writable outside the workspace: ['/hostmq'] (/hostmq: its super block 0:64 is the host's (mounted there at /dev/mqueue))"
+    ],
+    "sandbox_super_blocks_taken_by_those_mounts": [
+     {
+      "dev": "0:60",
+      "sandbox_mount": "/"
+     },
+     {
+      "dev": "0:61",
+      "sandbox_mount": "/proc"
+     },
+     {
+      "dev": "0:62",
+      "sandbox_mount": "/dev"
+     },
+     {
+      "dev": "0:63",
+      "sandbox_mount": "/dev/pts"
+     },
+     {
+      "dev": "0:65",
+      "sandbox_mount": "/tmp"
+     },
+     {
+      "dev": "0:85",
+      "sandbox_mount": "/aisef-home"
+     }
+    ],
+    "sandbox_super_blocks_the_table_before_held": [
+     "0:57",
+     "0:64",
+     "0:69"
+    ],
+    "unrelated_mounts_made_before_the_second_reading": 48
+   },
+   "host-mqueue-bound-no-flood": {
+    "accepted": false,
+    "extra_options": [
+     "--dev-bind",
+     "/dev/mqueue",
+     "/hostmq"
+    ],
+    "host_mounts_appeared": 0,
+    "host_mounts_rows": 15,
+    "problems": [
+     "mounted beyond what the wrapper names: ['/hostmq']",
+     "writable outside the workspace: ['/hostmq'] (/hostmq: its super block 0:64 is the host's (mounted there at /dev/mqueue))"
+    ],
+    "sandbox_super_blocks_taken_by_those_mounts": [],
+    "sandbox_super_blocks_the_table_before_held": [
+     "0:57",
+     "0:64",
+     "0:69"
+    ],
+    "unrelated_mounts_made_before_the_second_reading": 0
+   }
+  },
+  "before_the_change": {
+   "baseline-flood": {
+    "accepted": false,
+    "extra_options": [],
+    "host_mounts_appeared": "absent (the tree predates FU-CONF)",
+    "host_mounts_rows": 63,
+    "problems": [
+     "writable outside the workspace: ['/', '/proc', '/dev', '/dev/pts', '/tmp', '/aisef-home'] (/: its super block 0:60 is the host's (mounted there at <unrelated-0>); /proc: its super block 0:61 is the host's (mounted there at <unrelated-1>); /dev: its super block 0:62 is the host's (mounted there at <unrelated-2>); /dev/pts: its super block 0:63 is the host's (mounted there at <unrelated-4>); /tmp: its super block 0:65 is the host's (mounted there at <unrelated-5>); /aisef-home: its super block 0:85 is the host's (mounted there at <unrelated-6>))"
+    ],
+    "sandbox_super_blocks_taken_by_those_mounts": [
+     {
+      "dev": "0:60",
+      "sandbox_mount": "/"
+     },
+     {
+      "dev": "0:61",
+      "sandbox_mount": "/proc"
+     },
+     {
+      "dev": "0:62",
+      "sandbox_mount": "/dev"
+     },
+     {
+      "dev": "0:63",
+      "sandbox_mount": "/dev/pts"
+     },
+     {
+      "dev": "0:65",
+      "sandbox_mount": "/tmp"
+     },
+     {
+      "dev": "0:85",
+      "sandbox_mount": "/aisef-home"
+     }
+    ],
+    "sandbox_super_blocks_the_table_before_held": [
+     "0:57",
+     "0:69"
+    ],
+    "unrelated_mounts_made_before_the_second_reading": 48
+   },
+   "baseline-no-flood": {
+    "accepted": true,
+    "extra_options": [],
+    "host_mounts_appeared": "absent (the tree predates FU-CONF)",
+    "host_mounts_rows": 15,
+    "problems": [],
+    "sandbox_super_blocks_taken_by_those_mounts": [],
+    "sandbox_super_blocks_the_table_before_held": [
+     "0:57",
+     "0:69"
+    ],
+    "unrelated_mounts_made_before_the_second_reading": 0
+   },
+   "host-mqueue-bound-flood": {
+    "accepted": false,
+    "extra_options": [
+     "--dev-bind",
+     "/dev/mqueue",
+     "/hostmq"
+    ],
+    "host_mounts_appeared": "absent (the tree predates FU-CONF)",
+    "host_mounts_rows": 63,
+    "problems": [
+     "mounted beyond what the wrapper names: ['/hostmq']",
+     "writable outside the workspace: ['/', '/proc', '/dev', '/dev/pts', '/tmp', '/aisef-home', '/hostmq'] (/: its super block 0:60 is the host's (mounted there at <unrelated-0>); /proc: its super block 0:61 is the host's (mounted there at <unrelated-1>); /dev: its super block 0:62 is the host's (mounted there at <unrelated-2>); /dev/pts: its super block 0:63 is the host's (mounted there at <unrelated-4>); /tmp: its super block 0:65 is the host's (mounted there at <unrelated-5>); /aisef-home: its super block 0:85 is the host's (mounted there at <unrelated-6>); /hostmq: its super block 0:64 is the host's (mounted there at /dev/mqueue))"
+    ],
+    "sandbox_super_blocks_taken_by_those_mounts": [
+     {
+      "dev": "0:60",
+      "sandbox_mount": "/"
+     },
+     {
+      "dev": "0:61",
+      "sandbox_mount": "/proc"
+     },
+     {
+      "dev": "0:62",
+      "sandbox_mount": "/dev"
+     },
+     {
+      "dev": "0:63",
+      "sandbox_mount": "/dev/pts"
+     },
+     {
+      "dev": "0:65",
+      "sandbox_mount": "/tmp"
+     },
+     {
+      "dev": "0:85",
+      "sandbox_mount": "/aisef-home"
+     }
+    ],
+    "sandbox_super_blocks_the_table_before_held": [
+     "0:57",
+     "0:64",
+     "0:69"
+    ],
+    "unrelated_mounts_made_before_the_second_reading": 48
+   },
+   "host-mqueue-bound-no-flood": {
+    "accepted": false,
+    "extra_options": [
+     "--dev-bind",
+     "/dev/mqueue",
+     "/hostmq"
+    ],
+    "host_mounts_appeared": "absent (the tree predates FU-CONF)",
+    "host_mounts_rows": 15,
+    "problems": [
+     "mounted beyond what the wrapper names: ['/hostmq']",
+     "writable outside the workspace: ['/hostmq'] (/hostmq: its super block 0:64 is the host's (mounted there at /dev/mqueue))"
+    ],
+    "sandbox_super_blocks_taken_by_those_mounts": [],
+    "sandbox_super_blocks_the_table_before_held": [
+     "0:57",
+     "0:64",
+     "0:69"
+    ],
+    "unrelated_mounts_made_before_the_second_reading": 0
+   }
+  },
+  "driver": "validation/v21/sandbox/r3_conf_fu_guest.py reuse",
+  "meaning": "48 unrelated tmpfs file systems are mounted in the controller's mount namespace (a user and mount namespace of the container) in place of the second reading of the host's table, i.e. after the session ended; real bubblewrap, real probe, real kernel device numbers; the unrelated host activity is the driver's (simulated)"
+ },
+ "review_scenarios_replayed_at_the_new_tree": {
+  "bind-null-at-dev-x": {
+   "accepted": false,
+   "same_verdict_and_problems_as_the_committed_record": true,
+   "table_unchanged": true
+  },
+  "dev-bind-null-over-null": {
+   "accepted": true,
+   "same_verdict_and_problems_as_the_committed_record": true,
+   "table_unchanged": true
+  },
+  "read_only /dev": {
+   "accepted": false,
+   "same_verdict_and_problems_as_the_committed_record": true,
+   "table_unchanged": true
+  },
+  "read_only /dev/pts": {
+   "accepted": true,
+   "same_verdict_and_problems_as_the_committed_record": true,
+   "table_unchanged": true
+  },
+  "read_only /dev/shm": {
+   "accepted": true,
+   "same_verdict_and_problems_as_the_committed_record": true,
+   "table_unchanged": true
+  },
+  "read_only /run": {
+   "accepted": true,
+   "same_verdict_and_problems_as_the_committed_record": true,
+   "table_unchanged": true
+  },
+  "read_only /tmp": {
+   "accepted": true,
+   "same_verdict_and_problems_as_the_committed_record": true,
+   "table_unchanged": true
+  },
+  "stdin-is-a-terminal": {
+   "accepted": true,
+   "same_verdict_and_problems_as_the_committed_record": true,
+   "table_unchanged": true
+  }
+ },
+ "scenarios_replayed_at_the_new_tree": {
+  "scenarios-X1": {
+   "alt-dev-sandbox-devpts": {
+    "accepted": true,
+    "host_mounts_appeared": [],
+    "host_mounts_rows": 15,
+    "problems_equal_to_the_committed_record_but_for_super_block_numbers_and_pids": true,
+    "table_unchanged": true
+   },
+   "baseline": {
+    "accepted": true,
+    "host_mounts_appeared": [],
+    "host_mounts_rows": 15,
+    "problems_equal_to_the_committed_record_but_for_super_block_numbers_and_pids": true,
+    "table_unchanged": true
+   },
+   "ext4-file-at-dev-x": {
+    "accepted": false,
+    "host_mounts_appeared": [],
+    "host_mounts_rows": 15,
+    "problems_equal_to_the_committed_record_but_for_super_block_numbers_and_pids": true,
+    "table_unchanged": true
+   },
+   "host-dev-bound": {
+    "accepted": false,
+    "host_mounts_appeared": [],
+    "host_mounts_rows": 15,
+    "problems_equal_to_the_committed_record_but_for_super_block_numbers_and_pids": true,
+    "table_unchanged": true
+   },
+   "host-devpts-at-other-path": {
+    "accepted": false,
+    "host_mounts_appeared": [],
+    "host_mounts_rows": 15,
+    "problems_equal_to_the_committed_record_but_for_super_block_numbers_and_pids": true,
+    "table_unchanged": true
+   },
+   "host-mqueue-bound": {
+    "accepted": false,
+    "host_mounts_appeared": [],
+    "host_mounts_rows": 15,
+    "problems_equal_to_the_committed_record_but_for_super_block_numbers_and_pids": true,
+    "table_unchanged": true
+   },
+   "host-shm-over-dev-shm": {
+    "accepted": false,
+    "host_mounts_appeared": [],
+    "host_mounts_rows": 15,
+    "problems_equal_to_the_committed_record_but_for_super_block_numbers_and_pids": true,
+    "table_unchanged": true
+   },
+   "mqueue-sandbox": {
+    "accepted": false,
+    "host_mounts_appeared": [],
+    "host_mounts_rows": 15,
+    "problems_equal_to_the_committed_record_but_for_super_block_numbers_and_pids": true,
+    "table_unchanged": true
+   },
+   "ptmx-at-dev-ptmx2": {
+    "accepted": false,
+    "host_mounts_appeared": [],
+    "host_mounts_rows": 15,
+    "problems_equal_to_the_committed_record_but_for_super_block_numbers_and_pids": true,
+    "table_unchanged": true
+   },
+   "regular-file-at-dev-null": {
+    "accepted": false,
+    "host_mounts_appeared": [],
+    "host_mounts_rows": 15,
+    "problems_equal_to_the_committed_record_but_for_super_block_numbers_and_pids": true,
+    "table_unchanged": true
+   },
+   "shared-pid-namespace": {
+    "accepted": false,
+    "host_mounts_appeared": [],
+    "host_mounts_rows": 15,
+    "problems_equal_to_the_committed_record_but_for_super_block_numbers_and_pids": true,
+    "table_unchanged": true
+   },
+   "zero-at-dev-null": {
+    "accepted": false,
+    "host_mounts_appeared": [],
+    "host_mounts_rows": 15,
+    "problems_equal_to_the_committed_record_but_for_super_block_numbers_and_pids": true,
+    "table_unchanged": true
+   }
+  },
+  "scenarios-X1-shared-tree": {
+   "alt-dev-sandbox-devpts": {
+    "accepted": true,
+    "host_mounts_appeared": [],
+    "host_mounts_rows": 15,
+    "problems_equal_to_the_committed_record_but_for_super_block_numbers_and_pids": true,
+    "table_unchanged": true
+   },
+   "baseline": {
+    "accepted": true,
+    "host_mounts_appeared": [],
+    "host_mounts_rows": 15,
+    "problems_equal_to_the_committed_record_but_for_super_block_numbers_and_pids": true,
+    "table_unchanged": true
+   },
+   "ext4-file-at-dev-x": {
+    "accepted": false,
+    "host_mounts_appeared": [],
+    "host_mounts_rows": 15,
+    "problems_equal_to_the_committed_record_but_for_super_block_numbers_and_pids": true,
+    "table_unchanged": true
+   },
+   "host-dev-bound": {
+    "accepted": false,
+    "host_mounts_appeared": [],
+    "host_mounts_rows": 15,
+    "problems_equal_to_the_committed_record_but_for_super_block_numbers_and_pids": true,
+    "table_unchanged": true
+   },
+   "host-devpts-at-other-path": {
+    "accepted": false,
+    "host_mounts_appeared": [],
+    "host_mounts_rows": 15,
+    "problems_equal_to_the_committed_record_but_for_super_block_numbers_and_pids": true,
+    "table_unchanged": true
+   },
+   "host-mqueue-bound": {
+    "accepted": false,
+    "host_mounts_appeared": [],
+    "host_mounts_rows": 15,
+    "problems_equal_to_the_committed_record_but_for_super_block_numbers_and_pids": true,
+    "table_unchanged": true
+   },
+   "host-shm-over-dev-shm": {
+    "accepted": false,
+    "host_mounts_appeared": [],
+    "host_mounts_rows": 15,
+    "problems_equal_to_the_committed_record_but_for_super_block_numbers_and_pids": true,
+    "table_unchanged": true
+   },
+   "mqueue-sandbox": {
+    "accepted": false,
+    "host_mounts_appeared": [],
+    "host_mounts_rows": 15,
+    "problems_equal_to_the_committed_record_but_for_super_block_numbers_and_pids": true,
+    "table_unchanged": true
+   },
+   "ptmx-at-dev-ptmx2": {
+    "accepted": false,
+    "host_mounts_appeared": [],
+    "host_mounts_rows": 15,
+    "problems_equal_to_the_committed_record_but_for_super_block_numbers_and_pids": true,
+    "table_unchanged": true
+   },
+   "regular-file-at-dev-null": {
+    "accepted": false,
+    "host_mounts_appeared": [],
+    "host_mounts_rows": 15,
+    "problems_equal_to_the_committed_record_but_for_super_block_numbers_and_pids": true,
+    "table_unchanged": true
+   },
+   "shared-pid-namespace": {
+    "accepted": false,
+    "host_mounts_appeared": [],
+    "host_mounts_rows": 15,
+    "problems_equal_to_the_committed_record_but_for_super_block_numbers_and_pids": true,
+    "table_unchanged": true
+   },
+   "zero-at-dev-null": {
+    "accepted": false,
+    "host_mounts_appeared": [],
+    "host_mounts_rows": 15,
+    "problems_equal_to_the_committed_record_but_for_super_block_numbers_and_pids": true,
+    "table_unchanged": true
+   }
+  }
+ },
+ "trees": {
+  "after_the_change": "5012420 (host_mounts = the reading before the session; host_mounts_appeared)",
+  "before_the_change": "c05d19c (aisef2/app/confine.py of the review head: host_mounts = the union of two readings)"
+ },
+ "unittest_hardened": {
+  "modules": "test_v21_r3_conf_fu_before test_v21_r3_conf_policy test_v21_r3_conf_rv_hostrows test_v21_r3_conf_locale T07a T06a A06 T05a T05b T05c defects_confine confine",
+  "result": [
+   "Ran 179 tests in 16.247s",
+   "OK (skipped=1)"
+  ]
+ },
+ "what": "B03-R3 conf follow-up (FU-CONF), real bubblewrap 0.12.0 in the Linux guest (profile X1; the unit tests under `hardened`), 2026-10-13"
+}
