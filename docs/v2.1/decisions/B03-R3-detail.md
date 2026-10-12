@@ -25,7 +25,7 @@ test, 6 real versus simulated, 7 residual risks and what is not established.
 Where my reading is not literal: "the decisive information after character 1,500" is tested at the statement level
 (no field of the statement can be evicted by another) and at the run level (a real run, a stimulus of 4,000+ characters).
 
-## 2. What the code did (measured on `3dc827b`; `scripts/before_unit.py`, `scripts/before_product.py`)
+## 2. What the code did (measured on `3dc827b` with two scripts kept in the hand-over directory, `scripts/before_unit.py` and `scripts/before_product.py`)
 
 * `detail` = `json.dumps({finding, severity, summary[:400], clause, verification, why[:300], anchor, anchor_why[:300],
   reproducer:{subject, stimulus, observable}}, sort_keys=True)[:1500]`: the slice is applied to the **encoded text**.
@@ -167,6 +167,24 @@ Files: `tests/v2/test_v21_r3_detail_statement.py`, `..._artifact.py`, `..._produ
   the two source anchors `whole` and `inner` are literal copies of the statement that builds a `Finding`; it now passes
   the artifact reference and the run's secrets to `detail` and names the id `fid` (redacted). No rule of the checker
   and no assertion changed: the checker passes on the real tree and still catches each edit.
+
+### Mutants (`validation/v21/kill_check.py`, every mutant of the function, this WP's files)
+
+| function | mutants | killed | by |
+|---|---|---|---|
+| `review_verify.py::detail` | 96 | 96 | statement |
+| `::redacted` | 39 | 39 | statement |
+| `::_fit` / `::_dumps` / `::Artifact.__post_init__` | 11 / 3 / 7 | all | statement |
+| `::preserve` | 38 | 38 | artifact |
+| `::artifact_problems` | 92 | 92 | artifact |
+| `run.py::evidence_manifest` | 24 | 24 | artifact (3 were survivors of the campaign: `sorted() -> list()`; killed only because this machine's file system lists a directory out of name order) |
+| `adapters.py::Reviewer.review` | 64 (54 + 10 new) | 64 | artifact (all 10 new), registered kill files (the rest) |
+| `verify.py::verify` | 191 (189 + 2 new) | the 2 new | product; the other 189 are lines this WP did not touch — see `report.json` for the subset measured |
+
+Survivors of the exploratory runs on earlier revisions of the code and what became of them are listed per function in
+`report.json` (`mutants[].dispositions`): two equivalents (a `bool` next to `int`; `""` and `"."` among the components
+of a `PurePosixPath`) were removed from the code, two infinite-loop mutants (a `while` for key collisions) were removed
+by writing an `if`, the rest were killed by naming the cause class and the identifying elements in assertions.
 
 ## 6. Real versus simulated
 
