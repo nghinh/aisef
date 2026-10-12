@@ -32,34 +32,6 @@
   },
   {
    "target": "aisef2/app/adapters.py::Reviewer._ocr",
-   "index": 36,
-   "mutant": "L222 dict entry 5 dropped",
-   "class": "AUDITED",
-   "source_sha256": "c709ff999e67d3d22a4b52581bc8b1fb64c2d1b620e5296df7722b3d2a2f8fba",
-   "group": "TEXT-KEY: an in-memory field the one reader strips",
-   "grounds": "Reclassified from EQUIVALENT: `_ocr` returns `s`, so a direct caller (a unit test) can see that `s['text']` is missing; EQUIVALENT ('no input can make the result differ') overclaims. Nothing depends on it: Reviewer.review (adapters.py:118-134) takes s['findings']= and, only on the model path (`if not ocr`), s.get('parsed'); run.py:482-491 is the only reader of Reviewer.sessions and rebuilds RUN.json with `{k: v for k, v in s.items() if k != 'text'}`, so RUN.json, the journal and the streams are byte-identical; budget_stops (run.py:312-318) reads role, story_id, stopped. The text itself is in the stream line {'type': 'text'} (adapters.py:210) which client.read_session re-reads.",
-   "consumers_checked": [
-    "aisef2/app/adapters.py:118-134 Reviewer.review",
-    "aisef2/app/run.py:439 (sole constructor of Reviewer), :482-491 (sole reader of .sessions; strips 'text'), :312-318 budget_stops",
-    "aisef2/app/verify.py (no read of rec['sessions'])",
-    "validation/qualification/c2_p9.py (own OpenCodeDeveloper/OpenCodeReviewer, own strip)",
-    "grep of .sessions over aisef2, validation, scripts: the lines above only"
-   ],
-   "exceptions_checked": [
-    "a reader indexing s['text'] of an OCR session: none (adapters.py:144,147 are the model finder's own dict; client.py writer; c2_p9 own classes)",
-    "a generic loop over sessions that would raise KeyError: run.py uses s.get('role'), s.get('story_id'), s['stopped'] (present) and the strip comprehension",
-    "[94] (the key emptied, '' not stripped) is a different mutant, not in this batch"
-   ],
-   "batch": "A10",
-   "reviewed": true,
-   "remapped_from": {
-    "index": 34,
-    "mutant": "L216 dict entry 5 dropped",
-    "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
-   }
-  },
-  {
-   "target": "aisef2/app/adapters.py::Reviewer._ocr",
    "index": 79,
    "mutant": "L210 dict entry 2 dropped",
    "class": "AUDITED",
@@ -714,6 +686,32 @@
   },
   {
    "target": "aisef2/app/bundle_cli.py::continue_from",
+   "index": 157,
+   "mutant": "L462 string 'carried: ' emptied",
+   "class": "AUDITED",
+   "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+   "group": "T01-LABEL-RATIONALE: the prose label of an ownership_rationale whose identifying elements (story, anchor, criterion) are retained and separately asserted",
+   "grounds": "Re-checked at f860e57, not copied. The mutant turns f\"carried: {o.story_id} committed it in the run anchored {anchor[:16]...} ({o.criterion_id})\" into the same sentence without its label. I re-ran the implementer's differential (diff.py continue) on the real fake-client run of T01b: out differs at exactly /plan/obligations[0]/ownership_rationale and /plan/plan_hash; the report is identical; control fields (criterion, spec, story_id, role, expected_parent, depends_on), stories, specs, contracts and approvals are equal; the mutant bundle loads. The field is prose for human review that no control path may read (aisef2/plan/obligation.py:7-8; kernel_static_checks.py:167-176 flags attribute and getattr reads of it), it is hash-bound, so plan_hash follows its text and is recomputed from the stored plan at every load. My own grep for any reader of ownership_rationale / 'rationale' / 'carried:' over aisef2, aisef, validation, tests, docs: only bundle.py:146 (constructs PlanObligation from the stored plan), obligation.py (definition), bundle_cli.py:462 (the writer), the static check, and tests that read the rationale for its identifying elements. feedback.py (_line, task, retry_feedback) and review_verify.py/run.py build prompts and rows from facts, roles and specs, never from the plan's rationale. The one fact the label stated, that the obligation is carried, is carried in data as story_id == report['carried_as'] (CARRIED) and role VERIFY.",
+   "consumers_checked": [
+    "aisef2/app/bundle.py:146 (load: o['ownership_rationale'] into PlanObligation; no use of the text) and :158 (plain(plan) back out)",
+    "aisef2/plan/obligation.py:7-10, 37, 99-110 (definition; hash binds every field; never read by control)",
+    "validation/v2/kernel_static_checks.py:55, 167-176 (NO_PROSE_CONTROL: no attribute or getattr('...') read of text/rationale/ownership_rationale; subscript reads do not exist per my grep)",
+    "aisef2/app/feedback.py:22-70 and :115 and aisef2/app/review_verify.py:176-200, aisef2/app/run.py:218-235 (what a developer or reviewer prompt and the delivery rows are built from: facts, roles, specs; none names the rationale)",
+    "tests/v2/test_v21_kills3_T01b.py:313-319 and tests/v2/test_v21_defects_bundlecli.py:167-183 (read the rationale for S1, the criterion, a >=12-hex prefix of the anchor, 'anchored <16 hex> (C-ADD)' / 'without a manifest'; they do not read the label and the mutant still passes them)",
+    "tests/v2/test_v21_continue_usage.py:137-150 (asserts {'C-ADD': ('CARRIED','VERIFY')}: the carried marking is asserted in data)",
+    "docs/v2.1/USAGE-2.1.md:95-98 and ADR-V2.1: describe the CARRIED story and VERIFY obligations, never the rationale's wording"
+   ],
+   "exceptions_checked": [
+    "a reader detecting carried obligations by the 'carried:' prefix: none anywhere in the repo or docs (grep 'carried:' finds bundle_cli.py:462 only); detection that exists is by story_id and role",
+    "a continuation of a continuation: obligations of CARRIED are in `done` of generation 2 and rebuilt at :459-463 with a fresh sentence (the previous text is replaced, never parsed)",
+    "a stored hash compared with an independent value: the continued plan's hash depends on the baseline commit sha of that run and is recomputed from the stored plan; the report carries no hash, so no literal is pinned",
+    "a prompt or report dumping the whole plan JSON to a model or an operator (where the label would be read): none of the prompt builders serialises plan obligations; the only operator-visible output of continue is the report"
+   ],
+   "batch": "R04",
+   "reviewed": true
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::continue_from",
    "index": 165,
    "mutant": "L425 string ')' emptied",
    "class": "AUDITED",
@@ -739,6 +737,28 @@
     "mutant": "L388 string ')' emptied",
     "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
    }
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::coverage",
+   "index": 11,
+   "mutant": "L330 string 'clause -> criteria. Every clause of a bundle that loads is a string; one that is not (a missing one beside\\n        \"1.1\", a number, a list: `load` refuses it and lint says so) must not make this report unprintable, so it is\\n        keyed as it is while the keys hash and order (json.dumps(sort_keys=True) orders them), else by its JSON text.' emptied",
+   "class": "EQUIVALENT",
+   "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+   "group": "R04",
+   "grounds": "The mutant (survivor_view: `\"\"\"clause -> criteria. ...\"\"\"` -> `\"\"\"\"\"\"`) changes only the docstring of the closure by_clause (bundle_cli.py:329-332). Proof from the code: by_clause is created per call of coverage, referenced once, by its call at :346, and never returned, stored, passed or inspected; coverage returns the report dict. The AST probe (re-run by me, review/rv-cov-ast-11.out) finds the single Load of the name at :346, no locals/vars/globals/dir/getattr/eval/exec/help or .__doc__/_getframe/f_locals inside coverage, and no inspect/pydoc/__doc__/frame use anywhere in bundle_cli.py. A function's docstring has no effect on its behaviour; the only observable is by_clause.__doc__, which no code can reach (it is a local of a running call).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:312-349 (coverage) and :352-371 (lint, the only caller, reads requirements and criteria_citing_no_requirement_of_the_bundle)",
+    "grep for __doc__, get_docstring, getdoc, pydoc, inspect, doctest, co_consts, __code__ over aisef2, aisef, validation, tests: module docstrings used as CLI help, validation/v2/gen_migration_table.py:136 (get_docstring of the v1 module aisef/control/obligation.py), aisef2/quality/relevance.py:151 (compiles a source file and collects line numbers from its code objects; reads no docstring); none reads a docstring of bundle_cli.py",
+    "the behaviour the docstring describes (a non-string clause keyed by its JSON text, no TypeError) is code in by_clause's body and pinned by test_v21_defects_lint.py and test_v21_kills_bundle_cli.py; the mutant leaves the body untouched",
+    "aisef2/app/run.py:77 kernel_digest hashes the source bytes, which every mutant changes; no kill-set test pins a literal digest, so it is not an observable of this mutant that distinguishes it from the other mutants"
+   ],
+   "exceptions_checked": [
+    "help() / pydoc / doc generator reaching a closure: a closure is not reachable from the module or from any object; none in the repo",
+    "a check that every function carries a docstring or a non-empty one: ruff select is F, B, E9 (pyproject.toml); validation/v2/kernel_static_checks.py has 11 rules (RULES, :68-71: NO_PROSE_CONTROL, NO_RAW_VERDICT_ROUTING, ...) and none is about docstrings",
+    "python -OO strips docstrings in production anyway, so no behaviour can depend on them"
+   ],
+   "batch": "R04",
+   "reviewed": true
   },
   {
    "target": "aisef2/app/bundle_cli.py::explain",
@@ -788,6 +808,29 @@
     "mutant": "L352 string 'project' emptied",
     "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
    }
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::explain",
+   "index": 31,
+   "mutant": "L385 string 'story' emptied",
+   "class": "AUDITED",
+   "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+   "group": "T04-EXPLAIN-REPORT: a report entry that gains a redundant key equal to its group key; no field lost, changed or misleading",
+   "grounds": "`{k: v for k, v in row.items() if k != 'story'}` becomes `k != ''`: no key is ever '', so each entry keeps its `story`, the key of the group it sits under (row['story'] = o.story_id at :300 and out.setdefault(row['story'], ...) at :385 are the same value by construction). I re-ran the implementer's differential (diff.py explain) on calc-3-stories, sealed and fully approved: the outputs differ only by an added `story` key in each of the 5 entries, mutant entry == {**original entry, 'story': group} for all 10 (sealed + approved); every other field, entry order, story order and `project` are identical. The key set before: approved, calibrated, class, clause, clause_text, contract, criterion, polarity, probe, requirement, role, spec, subject; after: the same plus story. No later literal key of the entry collides with `story`, so nothing is overwritten. Output only grows by data the reader already has one level up.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:565-571 (main): json.dumps(report, indent=1, sort_keys=True, default=str) printed for the approver; USAGE-2.1.md:28 (`aisef bundle explain` before approving): the reader is a person; exit code is 0 either way",
+    "tests that read explain's entries, by single key: test_v21_kills3_T04a.py::ExplainEntries (fields() picks keys with .get), test_v21_defects_bundlecli.py::CriterionWithoutAContract (e['criterion'], e['contract'], e['approved']), test_v21_bundle_tools.py:70-74 (r['calibrated'], r['approved']); none compares a whole entry or its key set",
+    "validation/v21/cli_integration/*.py|sh: no explain reader (readback.py reads journal events); docs/v2.1/evidence/cli-integration-*.out are snapshots compared by no test with live output (tests/test_v21_traceability.py cites a file for another record)",
+    "docs/v2.1/bundle-authoring.schema.json: the schema of the authoring document, not of explain's report; no document closes explain's entry key set (its docstring lists fields and does not list spec or subject either)"
+   ],
+   "exceptions_checked": [
+    "an exact key-set or whole-entry equality on an explain entry: none in tests, validation or docs",
+    "a flattening or table renderer printing every key of an entry, or `f(story=s, **entry)` / `dict(story=s, **entry)` which would raise TypeError on the duplicate: none (main only dumps JSON)",
+    "a consumer that wants `story` inside an entry: it is absent in the original, so none can exist; the mutant adds, never removes, data",
+    "a row without `story` (then `k != 'story'` would differ): every row is built with `story` at :300"
+   ],
+   "batch": "R04",
+   "reviewed": true
   },
   {
    "target": "aisef2/app/bundle_cli.py::lint",
@@ -1608,211 +1651,6 @@
    }
   },
   {
-   "target": "aisef2/app/cli.py::_parser",
-   "index": 13,
-   "mutant": "L29 string \"Run a project's admitted plan under the AISEF V2 kernel.\" emptied",
-   "class": "AUDITED",
-   "source_sha256": "555806041859c41be1cc47e6d95aecfbcb5cc5910cb0dd0835108e2be3ffd04e",
-   "group": "help text of `aisef run`, shown only by `aisef run --help` (the only caller of _parser is cli.run, cli.py:57; aisef/cli/parser.py:408-422 hands argv to cli.run and never reads the description or help); what each sentence describes is enforced and asserted elsewhere and the operator reference is README/USAGE",
-   "grounds": "argparse prints the description only in format_help (--help/-h); p.error prints usage, never the description, so no refusal carries it. It holds no identifying element (no format id, command, flag, path, limit or warning). The V2 default-ness it announces is behaviour (tests/test_cli.py::TestRunIsV2), the admission it names is behaviour (test_app_run.Product.test_an_unadmitted_plan_never_reaches_the_provider).",
-   "consumers_checked": [
-    "aisef2/app/cli.py:57 (only caller of _parser) and aisef/cli/parser.py:185-187,408-422 (lists `run` with its own sentence; forwards argv)",
-    "closure-evidence/v2/release/S7-RC2-CLEAN-INSTALL.json:22 and closure-evidence/v2/release/s7-rc2/s7.txt:81 (frozen quotations; no reader)",
-    "closure-evidence/v2/release/production/clean-install/aisef_run_help.txt (frozen 2.0.0 capture; hash listed, never compared with live output)",
-    "tests/test_cli.py::TestRunIsV2 (behavioural carrier of the V2 default); tests/v2/test_v21_kills_cli.py (owner B-03b, registered for _parser at validation/v2/mutation.py:702) is a whole-help verbatim pin that kills this mutant at BASE; informational, not counted as a kill and not relied on by the audit"
-   ],
-   "exceptions_checked": [
-    "a description that carries a limit, a warning or a command: it is one purpose sentence",
-    "a script or gate that matches the live help (git grep '--help', 'V2 kernel', 'admitted plan' over validation/, tests/, aisef*/): none outside the verbatim pin",
-    "layout damage when emptied: ran --help with it emptied, usage then options, exit 0"
-   ],
-   "batch": "A23",
-   "reviewed": true
-  },
-  {
-   "target": "aisef2/app/cli.py::_parser",
-   "index": 15,
-   "mutant": "L31 string \"check the inputs and the plan's admission; no provider request\" emptied",
-   "class": "AUDITED",
-   "source_sha256": "555806041859c41be1cc47e6d95aecfbcb5cc5910cb0dd0835108e2be3ffd04e",
-   "group": "help text of `aisef run`, shown only by `aisef run --help` (the only caller of _parser is cli.run, cli.py:57; aisef/cli/parser.py:408-422 hands argv to cli.run and never reads the description or help); what each sentence describes is enforced and asserted elsewhere and the operator reference is README/USAGE",
-   "grounds": "The assurance is behaviour and is asserted as behaviour; README.md:72 and docs/v2/USAGE.md:18,73 state it in their own words.",
-   "consumers_checked": [
-    "tests/v2/test_app_run.py:351-360 (test_check_admits_with_the_release_calibrations_and_sends_nothing)",
-    "tests/v2/test_v21_confine.py:804-834 (class Check, the confinement path of --check)",
-    "aisef2/app/confine.py:241-274 (measure: the client is a bind directory, never executed)",
-    "README.md:72, docs/v2/USAGE.md:18,73; tests/v2/test_v21_kills_cli.py (owner B-03b, registered for _parser at validation/v2/mutation.py:702) is a whole-help verbatim pin that kills this mutant at BASE; informational, not counted as a kill and not relied on by the audit"
-   ],
-   "exceptions_checked": [
-    "the sentence being false (a --check path that reaches the provider): none found, see notes",
-    "a reader that selects the mode from the help text: the mode is the argparse flag",
-    "mutant removing the only warning an operator reads before a paid run: --check is the documented dry run in README and USAGE, and the behaviour test pins that it sends nothing"
-   ],
-   "batch": "A23",
-   "reviewed": true
-  },
-  {
-   "target": "aisef2/app/cli.py::_parser",
-   "index": 17,
-   "mutant": "L32 string 'verify a finished run directory against its journal' emptied",
-   "class": "AUDITED",
-   "source_sha256": "555806041859c41be1cc47e6d95aecfbcb5cc5910cb0dd0835108e2be3ffd04e",
-   "group": "help text of `aisef run`, shown only by `aisef run --help` (the only caller of _parser is cli.run, cli.py:57; aisef/cli/parser.py:408-422 hands argv to cli.run and never reads the description or help); what each sentence describes is enforced and asserted elsewhere and the operator reference is README/USAGE",
-   "grounds": "Mode label; no limit, warning, id or command in it.",
-   "consumers_checked": [
-    "aisef2/app/verify.py:1-12,66-100 (the full statement)",
-    "tests/v2/test_app_units.py:631 and tests/v2/test_app_run.py (verify behaviour)",
-    "README.md:73 and docs/v2/USAGE.md:9,75 (the mode in their own words); tests/v2/test_v21_kills_cli.py (owner B-03b, registered for _parser at validation/v2/mutation.py:702) is a whole-help verbatim pin that kills this mutant at BASE; informational, not counted as a kill and not relied on by the audit"
-   ],
-   "exceptions_checked": [
-    "a false statement an operator would act on: the sentence is true",
-    "a parser of the help to pick the mode: none"
-   ],
-   "batch": "A23",
-   "reviewed": true
-  },
-  {
-   "target": "aisef2/app/cli.py::_parser",
-   "index": 21,
-   "mutant": "L35 string \"the project's git repository (cloned; never written)\" emptied",
-   "class": "AUDITED",
-   "source_sha256": "555806041859c41be1cc47e6d95aecfbcb5cc5910cb0dd0835108e2be3ffd04e",
-   "group": "help text of `aisef run`, shown only by `aisef run --help` (the only caller of _parser is cli.run, cli.py:57; aisef/cli/parser.py:408-422 hands argv to cli.run and never reads the description or help); what each sentence describes is enforced and asserted elsewhere and the operator reference is README/USAGE",
-   "grounds": "Property is behaviour; the help restates it and so do the two operator documents.",
-   "consumers_checked": [
-    "aisef2/app/run.py:129-148,322-385 (every use of the source)",
-    "tests/v2/test_app_run.py:189 ('the source is never written'); tests/v2/test_v21_inputs.py (--check runs on a clone)",
-    "docs/v2/USAGE.md:82 and README.md Get started",
-    "closure-evidence/v2/release/production/clean-install/aisef_run_help.txt (frozen capture, same sentence); tests/v2/test_v21_kills_cli.py (owner B-03b, registered for _parser at validation/v2/mutation.py:702) is a whole-help verbatim pin that kills this mutant at BASE; informational, not counted as a kill and not relied on by the audit"
-   ],
-   "exceptions_checked": [
-    "the assurance being false on some path: none (grep of every use of `source`/`repo` in run.py)",
-    "weak evidence in the behaviour test (ref/index/objects not compared): reported, belongs to that test"
-   ],
-   "batch": "A23",
-   "reviewed": true
-  },
-  {
-   "target": "aisef2/app/cli.py::_parser",
-   "index": 22,
-   "mutant": "L36 string 'the run directory (a new one to run; an existing one to verify)' emptied",
-   "class": "AUDITED",
-   "source_sha256": "555806041859c41be1cc47e6d95aecfbcb5cc5910cb0dd0835108e2be3ffd04e",
-   "group": "help text of `aisef run`, shown only by `aisef run --help` (the only caller of _parser is cli.run, cli.py:57; aisef/cli/parser.py:408-422 hands argv to cli.run and never reads the description or help); what each sentence describes is enforced and asserted elsewhere and the operator reference is README/USAGE",
-   "grounds": "Two-role label; each role has its own refusal naming the path.",
-   "consumers_checked": [
-    "aisef2/app/run.py:336; aisef2/app/verify.py:70-72; aisef2/app/cli.py:59-62",
-    "tests/v2/test_app_run.py:288 (test_a_run_directory_is_never_reused); tests/v2/test_app_units.py:743 (test_each_mode_names_what_it_needs)",
-    "docs/v2/USAGE.md:92; closure-evidence/.../aisef_run_help.txt ('(must not exist)', frozen); tests/v2/test_v21_kills_cli.py (owner B-03b, registered for _parser at validation/v2/mutation.py:702) is a whole-help verbatim pin that kills this mutant at BASE; informational, not counted as a kill and not relied on by the audit"
-   ],
-   "exceptions_checked": [
-    "an operator giving an existing directory to a run: refused naming the path",
-    "an operator giving a fresh directory to --verify: REFUTED (fails closed), not VERIFIED"
-   ],
-   "batch": "A23",
-   "reviewed": true
-  },
-  {
-   "target": "aisef2/app/cli.py::_parser",
-   "index": 23,
-   "mutant": "L37 string 'SHA256' emptied",
-   "class": "AUDITED",
-   "source_sha256": "555806041859c41be1cc47e6d95aecfbcb5cc5910cb0dd0835108e2be3ffd04e",
-   "group": "argparse metavars: display-only placeholders; the value kind each hints at is enforced by a refusal that fails closed",
-   "grounds": "metavar is read by argparse only to render usage/help.",
-   "consumers_checked": [
-    "aisef2/app/cli.py:63-70 (shape and mode refusals); aisef2/app/verify.py:91-96",
-    "docs/v2.1/ANCHOR-THREAT-MODEL.md:17, docs/v2.1/USAGE-2.1.md:81-84",
-    "tests/v2/test_v21_kills_cli.py::Parser (usage of a refusal, verbatim; informational)"
-   ],
-   "exceptions_checked": [
-    "an operator passing a path because the placeholder was blank: refused (not 64 hex)",
-    "emptied metavar breaking usage wrapping or help (argparse assertion): ran --help and a refusal with it emptied on 3.14, both fine"
-   ],
-   "batch": "A23",
-   "reviewed": true
-  },
-  {
-   "target": "aisef2/app/cli.py::_parser",
-   "index": 24,
-   "mutant": "L38 string 'verify only: the evidence anchor the run printed, kept outside the run directory' emptied",
-   "class": "AUDITED",
-   "source_sha256": "555806041859c41be1cc47e6d95aecfbcb5cc5910cb0dd0835108e2be3ffd04e",
-   "group": "help text of `aisef run`, shown only by `aisef run --help` (the only caller of _parser is cli.run, cli.py:57; aisef/cli/parser.py:408-422 hands argv to cli.run and never reads the description or help); what each sentence describes is enforced and asserted elsewhere and the operator reference is README/USAGE",
-   "grounds": "Every element has a stronger carrier; the residual words are the module docstring's sentence (run.py:23).",
-   "consumers_checked": [
-    "aisef2/app/cli.py:63-70; aisef2/app/verify.py:91-96; aisef2/app/run.py:23",
-    "docs/v2.1/ANCHOR-THREAT-MODEL.md:15-30,52-54; docs/v2.1/USAGE-2.1.md:81-84",
-    "tests/v2/test_v21_kills_cli.py (verbatim pin; the only reader of the help)"
-   ],
-   "exceptions_checked": [
-    "an operator reading 'kept outside the run directory' as sufficient: the match note at the moment of use says otherwise",
-    "'verify only' given to a run or check: refused at cli.py:63-64"
-   ],
-   "batch": "A23",
-   "reviewed": true
-  },
-  {
-   "target": "aisef2/app/cli.py::_parser",
-   "index": 28,
-   "mutant": "L45 string 'run --parent only: start although the lineage has spend no evidence accounts for (recorded)' emptied",
-   "class": "AUDITED",
-   "source_sha256": "555806041859c41be1cc47e6d95aecfbcb5cc5910cb0dd0835108e2be3ffd04e",
-   "group": "help text of `aisef run`, shown only by `aisef run --help` (the only caller of _parser is cli.run, cli.py:57; aisef/cli/parser.py:408-422 hands argv to cli.run and never reads the description or help); what each sentence describes is enforced and asserted elsewhere and the operator reference is README/USAGE",
-   "grounds": "The operator meets the flag in the refusal, with the cause and the list, before choosing it; the help restates it.",
-   "consumers_checked": [
-    "aisef2/app/run.py:373-378; tests/v2/test_v21_continue_integrity.py:287-306",
-    "docs/v2.1/USAGE-2.1.md:117-122; docs/v2.1/ADR-V2.1.md:141-142",
-    "aisef2/app/cli.py:67-68 (given without --parent: refused, T23a run [23,24,48]); tests/v2/test_v21_kills_cli.py (owner B-03b, registered for _parser at validation/v2/mutation.py:702) is a whole-help verbatim pin that kills this mutant at BASE; informational, not counted as a kill and not relied on by the audit"
-   ],
-   "exceptions_checked": [
-    "an operator who accepts without reading the list: the refusal prints the list; the help could not improve on it",
-    "scope words vs behaviour under --check/--verify: D1"
-   ],
-   "batch": "A23",
-   "reviewed": true
-  },
-  {
-   "target": "aisef2/app/cli.py::_parser",
-   "index": 29,
-   "mutant": "L46 string 'SHA256' emptied",
-   "class": "AUDITED",
-   "source_sha256": "555806041859c41be1cc47e6d95aecfbcb5cc5910cb0dd0835108e2be3ffd04e",
-   "group": "argparse metavars: display-only placeholders (see [23])",
-   "grounds": "Same as [23]; the right value is printed by the refusal at the moment it is needed.",
-   "consumers_checked": [
-    "aisef2/app/lineage.py:130-145; tests/v2/test_v21_continue_integrity.py:455-470",
-    "docs/v2.1/USAGE-2.1.md:123-130; tests/v2/test_v21_kills_cli.py::Parser (usage of a refusal, verbatim; informational)"
-   ],
-   "exceptions_checked": [
-    "an operator passing the claim file's path or a prefix: `asserted` is False, not superseded, the refusal prints the full sha",
-    "the flag/sha inside that refusal being unpinned (see issues): independent of the placeholder"
-   ],
-   "batch": "A23",
-   "reviewed": true
-  },
-  {
-   "target": "aisef2/app/cli.py::_parser",
-   "index": 30,
-   "mutant": "L47 string \"run --parent only: supersede the predecessor's claim with this sha256 whose child never began and whose claimant cannot be shown gone (the operator's assertion, recorded)\" emptied",
-   "class": "AUDITED",
-   "source_sha256": "555806041859c41be1cc47e6d95aecfbcb5cc5910cb0dd0835108e2be3ffd04e",
-   "group": "help text of `aisef run`, shown only by `aisef run --help` (the only caller of _parser is cli.run, cli.py:57; aisef/cli/parser.py:408-422 hands argv to cli.run and never reads the description or help); what each sentence describes is enforced and asserted elsewhere and the operator reference is README/USAGE",
-   "grounds": "The help restates three things each enforced or printed elsewhere; the one unpinned element lives in lineage.claim.",
-   "consumers_checked": [
-    "aisef2/app/lineage.py:130-145; tests/v2/test_v21_continue_integrity.py:455-470",
-    "docs/v2.1/USAGE-2.1.md:123-130; aisef2/app/cli.py:67-68",
-    "git grep -F -e --supersede-claim -- tests validation: keyword uses and the verbatim pin only"
-   ],
-   "exceptions_checked": [
-    "the help as the only place the conditions are learned: the refusal states them at the moment the flag is needed",
-    "scope words vs behaviour under --check/--verify: D1",
-    "a reader of this help to build the command: none, the sha is printed by the refusal"
-   ],
-   "batch": "A23",
-   "reviewed": true
-  },
-  {
    "target": "aisef2/app/cli.py::run",
    "index": 108,
    "mutant": "L102 string ': ' emptied",
@@ -2042,34 +1880,6 @@
    "remapped_from": {
     "index": 132,
     "mutant": "L384 string ')' emptied",
-    "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
-   }
-  },
-  {
-   "target": "aisef2/app/confine.py::_probe",
-   "index": 49,
-   "mutant": "L294 string '/nonexistent' emptied",
-   "class": "AUDITED",
-   "source_sha256": "048485811e26b409b589dfdb2b76378cf157d9eea1fb40879f71a29a096cd317",
-   "group": "A05",
-   "grounds": "`home = env.get('HOME') or ''` instead of '/nonexistent'. The probe's only use of $5 is `[ -e \"$5\" ]` then `ls -A -- \"$5\"` (confine.py L60): false for '' exactly as for an absent path, so the home section is empty in both. _judge then skips the HOME check on the sentinel (original, L409) or runs it on an empty listing (mutant): `shown <= names` holds for empty shown and PurePosixPath(abs).is_relative_to('') is False, so nothing raises and names stays empty. Verdict identical; the record differs only when an operator `read_only` names a host directory literally called /nonexistent (original lists its entries into home_listing, mutant []). No document names the sentinel; a test would pin a literal.",
-   "consumers_checked": [
-    "aisef2/app/confine.py L60 (the only use of $5), L291, L294-295, L406-410 (_judge: names/shown and `home != '/nonexistent'`)",
-    "tests/v2/test_v21_confine.py L629-715 (hand `home='/nonexistent'` to _judge; nothing drives an unset HOME through measure)",
-    "docs/v2.1/SANDBOX-LINUX.md (HOME is an empty tmpfs; nothing about an unset HOME); docs/v2.1/evidence/sandbox/*.json home_listing (data, no reader)",
-    "validation/v21/sandbox/measure.py L186 (its own `ls -A`, not this report field)"
-   ],
-   "exceptions_checked": [
-    "/nonexistent bound into the session: home_listing differs (record only), verdict equal",
-    "is_relative_to('') on an absolute path: False on 3.14.7 (run here); 3.12+ is `other in self.parents`, 3.11 catches ValueError: no raise either way",
-    "crafted probe output with home entries while HOME is unset: the mutant would refuse ('HOME shows more...'), the original not; not reachable from `[ -e '' ]`, and fail-closed",
-    "HOME set but empty: `or` takes the sentinel in the original, '' in the mutant: same analysis"
-   ],
-   "batch": "A05",
-   "reviewed": true,
-   "remapped_from": {
-    "index": 49,
-    "mutant": "L291 string '/nonexistent' emptied",
     "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
    }
   },
@@ -2442,6 +2252,35 @@
    ],
    "batch": "A17",
    "reviewed": true
+  },
+  {
+   "target": "aisef2/app/lineage.py::_claimed_run",
+   "index": 6,
+   "mutant": "L79 string 'not a claim' emptied",
+   "class": "AUDITED",
+   "source_sha256": "528dc0146694bd92697f317aaad5fee260535518bd7966efbfd2b644541c7761",
+   "group": "single mutant: the message of an exception every caller drops",
+   "grounds": "The mutant changes only the message of the ValueError at lineage.py:74. The contract is the exception CLASS (docstring lineage.py:69-71, every reader of a claim answers ValueError) and it is pinned by the killed class mutants and test_v21_defects_verify.py Claims.test_continued_by_gives_the_marker_and_no_state / test_the_lineage_account_passes_over_a_claim_that_names_no_run. All three callers catch (OSError, ValueError) without binding it. Re-run by me: kill_check leaves [6] SURVIVED under the file (kc-claimed_run.json), as it must for an audit.",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:186-187 continued_by: `except (OSError, ValueError): return \"(an unreadable claim)\", None` - no `as`, the message is dropped",
+    "aisef2/app/lineage.py:314-315 lineage_account (earlier runs' claims): `except (OSError, ValueError): sibling = None` - no `as`",
+    "aisef2/app/lineage.py:323-324 lineage_account (the predecessor's own claims): `except (OSError, ValueError): continue` - no `as`",
+    "aisef2/app/bundle_cli.py:414 the only caller of continued_by in aisef2/ and validation/: unpacks (child, state), never sees an exception",
+    "grep -rl _claimed_run over *.py/*.md/*.sh/*.txt outside closure-evidence: aisef2/app/lineage.py and validation/v2/mutation.py (names it as a mutation target) only; the text 'not a claim' occurs only at lineage.py:74"
+   ],
+   "exceptions_checked": [
+    "a caller that binds the exception (`as e`) and logs, wraps or re-raises str(e): none of the three clauses binds it; claim() does not call _claimed_run (it parses with its own json.loads)",
+    "the ValueError escaping uncaught to a traceback (where the text would be read): every call site catches ValueError",
+    "a test that matches the message (assertRaisesRegex / msg): none in tests/ (grep for 'not a claim')",
+    "an external or future caller of the private helper: none in the repository; its contract would still be the class"
+   ],
+   "batch": "R03",
+   "reviewed": true,
+   "remapped_from": {
+    "index": 6,
+    "mutant": "L74 string 'not a claim' emptied",
+    "base": "f860e57fdcd457887d8766de8c8d4d01f1af778c"
+   }
   },
   {
    "target": "aisef2/app/lineage.py::claim",
@@ -2853,6 +2692,72 @@
   },
   {
    "target": "aisef2/app/preflight.py::http_transport",
+   "index": 13,
+   "mutant": "L47 element 0 dropped",
+   "class": "AUDITED",
+   "source_sha256": "89a195632ef5045ec4bd9a73b4642b53dd87ebeef8dadbe26ea634d5c9c72c51",
+   "group": "T25-AUD-ANNOTATION: the return annotation of the nested def `call` (preflight.py:47), two elements of one unevaluated string",
+   "grounds": "The mutant changes only call.__annotations__['return'] ('tuple[dict,]' for 'tuple[int, dict]'); under `from __future__ import annotations` (preflight.py:7) it is one string nothing evaluates; call's result, exceptions and requests are identical (the runtime shape (status, document) is asserted by value in tests/v2/test_s2_kills_rc2.py::Transport.test_a_post_asks_for_one_json_answer_and_a_get_sends_no_body). Reproduced by me: kill_check of the implementer's scratch DeclaredReturnType test (typing.get_type_hints(call)['return'] == tuple[int, dict]) KILLS [13] and [14] and the behavioural URLError test kills neither; the six kill files of the target do not. Not EQUIVALENT in the strict sense (introspection separates it); not a requirement anyone relies on: a test of the annotation is the declaration equal to itself. REVISED by reviewer: grounds extended with the runner's own policy (validation/v2/mutation.py:1028 `_inert` calls every annotation inert and only fails to descend into nested defs: a generator gap, not a behaviour) and with the ruff result on the mutated source; the disposition is the implementer's. Round 1's reviewed A25 audit gave the same pair (then [7],[8]) EQUIVALENT; AUDITED is the stricter and stands.",
+   "consumers_checked": [
+    "aisef2/app/run.py:409 builds the transport and hands it to preflight.run; aisef2/app/preflight.py:101 and :110 `code, body = transport(...)` unpack the 2-tuple call returns (checked: line numbers match); preflight.run's `transport` parameter is unannotated, so no typed consumer of the closure's return type exists",
+    "grep over aisef2/ validation/ tests/ for __annotations__|get_type_hints|get_annotations|annotationlib|inspect.signature|eval_str|autospec|typeguard|beartype|pydantic|validate_call: no reader reaches `call` (a closure, never a module member); the only mock.patch of http_transport (tests/v2/test_app_run.py:355) uses side_effect, not autospec",
+    "pyproject.toml:68 select = [F, B, E9]; reviewer ran ruff on a sed copy of the mutated module: `All checks passed!`; no mypy/pyright/pytype/pyre in pyproject.toml or .github/workflows",
+    "validation/v2/mutation.py:1027-1038 `_inert`: the runner's own policy is that every annotation is inert (postponed, never evaluated); it exempts the target's own args/returns/AnnAssign but does not descend into nested defs, which is why `call`'s annotation was generated at all (reviewer addition)"
+   ],
+   "exceptions_checked": [
+    "a reader that unpacks the annotation to decide arity (autospec, dispatcher, serializer): none found (see above)",
+    "a static type checker reading `code, body = transport(...)` against a 1-tuple: none runs in this repository; this is the ceiling of the audit: if one is added, [13] and [14] become real findings and a declared-shape test would be warranted",
+    "evaluation of the annotation at import (PEP 649, Python 3.14): the module's `from __future__ import annotations` (preflight.py:7) keeps it a string; the mutant modules import and run under 3.14.7 (kc-scratch-http_transport.json: T0 PASS, [13]/[14] fail only in the get_type_hints test)"
+   ],
+   "batch": "R06",
+   "reviewed": true
+  },
+  {
+   "target": "aisef2/app/preflight.py::http_transport",
+   "index": 14,
+   "mutant": "L47 element 1 dropped",
+   "class": "AUDITED",
+   "source_sha256": "89a195632ef5045ec4bd9a73b4642b53dd87ebeef8dadbe26ea634d5c9c72c51",
+   "group": "T25-AUD-ANNOTATION: the return annotation of the nested def `call` (preflight.py:47), two elements of one unevaluated string",
+   "grounds": "Same mechanism as [13]: only call.__annotations__['return'] ('tuple[int,]') and inspect.signature(call).return_annotation differ; result, exception and request of `call` are identical. Separated only by the scratch get_type_hints test (reproduced: kc-scratch-http_transport.json [14] KILLED by it alone). REVISED by reviewer as [13]: runner policy (`_inert` does not descend into nested defs) and the ruff result added.",
+   "consumers_checked": [
+    "aisef2/app/run.py:409 builds the transport and hands it to preflight.run; aisef2/app/preflight.py:101 and :110 `code, body = transport(...)` unpack the 2-tuple call returns (checked: line numbers match); preflight.run's `transport` parameter is unannotated, so no typed consumer of the closure's return type exists",
+    "grep over aisef2/ validation/ tests/ for __annotations__|get_type_hints|get_annotations|annotationlib|inspect.signature|eval_str|autospec|typeguard|beartype|pydantic|validate_call: no reader reaches `call` (a closure, never a module member); the only mock.patch of http_transport (tests/v2/test_app_run.py:355) uses side_effect, not autospec",
+    "pyproject.toml:68 select = [F, B, E9]; reviewer ran ruff on a sed copy of the mutated module: `All checks passed!`; no mypy/pyright/pytype/pyre in pyproject.toml or .github/workflows",
+    "validation/v2/mutation.py:1027-1038 `_inert`: the runner's own policy is that every annotation is inert (postponed, never evaluated); it exempts the target's own args/returns/AnnAssign but does not descend into nested defs, which is why `call`'s annotation was generated at all (reviewer addition)"
+   ],
+   "exceptions_checked": [
+    "a reader that unpacks the annotation to decide arity (autospec, dispatcher, serializer): none found (see above)",
+    "a static type checker reading `code, body = transport(...)` against a 1-tuple: none runs in this repository; this is the ceiling of the audit: if one is added, [13] and [14] become real findings and a declared-shape test would be warranted",
+    "evaluation of the annotation at import (PEP 649, Python 3.14): the module's `from __future__ import annotations` (preflight.py:7) keeps it a string; the mutant modules import and run under 3.14.7 (kc-scratch-http_transport.json: T0 PASS, [13]/[14] fail only in the get_type_hints test)"
+   ],
+   "batch": "R06",
+   "reviewed": true
+  },
+  {
+   "target": "aisef2/app/preflight.py::http_transport",
+   "index": 17,
+   "mutant": "L61 element 0 dropped",
+   "class": "EQUIVALENT",
+   "source_sha256": "89a195632ef5045ec4bd9a73b4642b53dd87ebeef8dadbe26ea634d5c9c72c51",
+   "group": "T25-EQ-URLERROR-IS-OSERROR: a subclass listed next to its base class in one except tuple",
+   "grounds": "preflight.py:61 is ONE clause `except (urllib.error.URLError, OSError, ValueError, http.client.HTTPException, RecursionError) as e:`; except-tuple matching is isinstance matching and urllib/error.py:19 `class URLError(OSError)` (CPython 3.14.7; HTTPError :35 and ContentTooShortError :70 derive from URLError): every URLError the try block can raise is matched by element 1 (OSError) into the same handler with the same `e`, and the body reads type(e).__name__ (the instance's class, not the listed one). HTTPError is taken by the clause before (preflight.py:56) in both. Verified by me against the installed stdlib (class MROs printed: URLError, HTTPError, ContentTooShortError all have OSError in their MRO; HTTPException, IncompleteRead, RecursionError do not and are listed separately). kill_check of the behavioural scratch test (URLError and ContentTooShortError answered with their class name): [17] SURVIVED, as a proof by hierarchy requires.",
+   "consumers_checked": [
+    "aisef2/app/preflight.py:92 failure() and :124 identity_problems(): read transport_error/content_type of the returned body; the same strings for every URLError",
+    "tests/v2/test_s2_kills_rc2.py Transport/Run and tests/v2/test_v21_kills3_T25a.py FailureIsData: assert the class name answered for URLError-family failures; all pass on the mutant (campaign 3: every kill file PASSED)",
+    "grep over aisef2/ validation/ tests/ for assignments to or patches of urllib.error.URLError: none (tests patch only preflight._OPENER.open)"
+   ],
+   "exceptions_checked": [
+    "an exception that is a URLError but not an OSError: impossible by class definition (urllib/error.py:19); separable only by rebinding urllib.error.URLError, i.e. patching the stdlib, not an input of http_transport",
+    "the tuple's other elements (HTTPException, RecursionError, added by the product fixes) relate URLError to nothing; `except` matching is by PyType_IsSubtype for exception classes, so ABC registration is not a path",
+    "the attribute lookup urllib.error.URLError at match time in the original: urllib.error is imported at preflight.py:13; no AttributeError path",
+    "lint: ruff F/B/E9 on the mutated source passes (urllib.error is still used by the HTTPError clause)"
+   ],
+   "batch": "R06",
+   "reviewed": true
+  },
+  {
+   "target": "aisef2/app/preflight.py::http_transport",
    "index": 42,
    "mutant": "L49 string 'GET' emptied",
    "class": "EQUIVALENT",
@@ -3075,46 +2980,6 @@
     "a reader taking TERMINAL as the set of acceptable states: none exists, membership is tested nowhere"
    ],
    "batch": "A12",
-   "reviewed": true
-  },
-  {
-   "target": "aisef2/app/review_ocr.py::coverage",
-   "index": 25,
-   "mutant": "L107 tuple() -> list()",
-   "class": "AUDITED",
-   "source_sha256": "043f8adca928861b290d8723a9a7a256cbe04566c1e44985b7c424f3ddca1609",
-   "group": "T11-TYPE-FORM: container type of a frozen verdict's sequence field",
-   "grounds": "Container type of a frozen verdict's sequence field; the only reader copies it with list() and a membership test is type-blind.",
-   "consumers_checked": [
-    "aisef2/app/adapters.py:224 (list(cov.not_reviewable) into the record)",
-    "aisef2/app/review_ocr.py:109 (p not in unreadable)",
-    "grep Coverage( over aisef2, validation, tests: review_ocr.py:84, 86, 134 only"
-   ],
-   "exceptions_checked": [
-    "hash(Coverage) or a set/dict key: none (a frozen dataclass hashes its fields; no caller hashes)",
-    "equality of two Coverage values: none in product code; only T11a compares the field with a tuple",
-    "in-place mutation of the returned list: none, adapters copies it"
-   ],
-   "batch": "A11",
-   "reviewed": true
-  },
-  {
-   "target": "aisef2/app/review_ocr.py::coverage",
-   "index": 44,
-   "mutant": "L134 tuple() -> list()",
-   "class": "AUDITED",
-   "source_sha256": "043f8adca928861b290d8723a9a7a256cbe04566c1e44985b7c424f3ddca1609",
-   "group": "T11-TYPE-FORM: container type of a frozen verdict's sequence field",
-   "grounds": "Container type of a frozen verdict's sequence field; the only reader is truthiness plus iteration at adapters.py:227.",
-   "consumers_checked": [
-    "aisef2/app/adapters.py:227 (cov.failed and all(i.get('classification') == 'provider' ...))",
-    "aisef2/app/adapters.py:224 (the record does not carry failed)"
-   ],
-   "exceptions_checked": [
-    "a non-empty failed holds dicts, so the verdict is unhashable in the original too: no hash contract",
-    "the list holds the same dict objects in the same order: nothing reachable differs"
-   ],
-   "batch": "A11",
    "reviewed": true
   },
   {
@@ -3624,6 +3489,27 @@
   },
   {
    "target": "aisef2/app/review_verify.py::reproducer_contract",
+   "index": 28,
+   "mutant": "L111 element 0 dropped",
+   "class": "EQUIVALENT",
+   "source_sha256": "a9aa9f55306f4b85af837418d2625b63f44bdb7e66587394afa994399f597ae1",
+   "group": "A15 / T25-EQ: a subclass listed next to its base class in one except tuple",
+   "grounds": "review_verify.py:111 `except (ContractError, ValueError, TypeError) as e`; the mutant drops element 0. aisef2/product/contract.py:26 `class ContractError(ValueError)`: every ContractError instance is a ValueError and is matched by element 1 into the same handler, same `e`, same returned f-string. The name is bound once, by the import at review_verify.py:53 (it occurs only at :53 and :111; grep over aisef2/ and validation/ finds the single definition at contract.py:26 and three subclasses, PlanError plan/obligation.py:25, CompileError product/compiler.py:40, UnapprovedContract product/approval.py:22, all ValueError by inheritance). kill_check of the behavioural scratch test (a NaN observable makes BehaviorContract.create raise ContractError; the reason carries 'finite'): [28] SURVIVED, as a proof by hierarchy requires.",
+   "consumers_checked": [
+    "aisef2/app/review_verify.py:119-120 verify(): `if isinstance(c, str): return Verification(UNVERIFIABLE, c)`; :205-206 anchor(): same branch -> UNANCHORED with the reason; the reason text is identical in both forms",
+    "tests/v2/test_v21_kills3_T15a.py ReproducerThatIsNotAContractIsAReason and test_v21_kills3_A15.py: assert the refusal is a reason carrying the cause for ContractError cases; both pass on the mutant",
+    "aisef2/plan/obligation.py, aisef2/product/compiler.py, aisef2/product/approval.py: raise subclasses of ContractError from code that is not in this try block"
+   ],
+   "exceptions_checked": [
+    "a ContractError that is not a ValueError: impossible by class definition (contract.py:26); separable only by rebinding aisef2.product.contract.ContractError, not an input; a module reload re-creates the class but still as a ValueError subclass",
+    "a ContractError raised outside the try block: unaffected by the clause",
+    "lint (reviewer measured): on a sed copy of the mutated module ruff F401 reports `ContractError imported but unused` (the other mutants of this batch pass F/B/E9); CI's `ruff check .` (tests.yml) would therefore refuse this mutant, which is the lint gate, not a behaviour, and kill_check does not run it"
+   ],
+   "batch": "R06",
+   "reviewed": true
+  },
+  {
+   "target": "aisef2/app/review_verify.py::reproducer_contract",
    "index": 30,
    "mutant": "L111 element 2 dropped",
    "class": "AUDITED",
@@ -3739,30 +3625,6 @@
    "remapped_from": {
     "index": 44,
     "mutant": "L97 sorted() -> list()",
-    "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
-   }
-  },
-  {
-   "target": "aisef2/app/review_verify.py::reproducer_contract",
-   "index": 52,
-   "mutant": "L112 string 'the reproducer is not a contract: ' emptied",
-   "class": "AUDITED",
-   "source_sha256": "a9aa9f55306f4b85af837418d2625b63f44bdb7e66587394afa994399f597ae1",
-   "group": "stage label ahead of the construction failure's own message, which is kept and asserted",
-   "grounds": "Mutated reason is the bare ContractError/ValueError text (\"'cli' is not a valid SubjectKind\", \"stimulus must be a mapping\"): offending value and cause class kept; UnverifiableReproducers.test_a_subject_kind_nobody_declares_is_refused_naming_it asserts the offending kind as a token ([47] SURVIVED).",
-   "consumers_checked": [
-    "aisef2/app/adapters.py:234-239 (Reviewer._verify -> verify() -> Verification.reason -> f['verification']['why'] and detail()'s 'why'[:300]); UNVERIFIABLE never blocks (blocks() needs CONFIRMED), so feedback.py never prints it",
-    "git grep 'is not a contract': aisef2/app/bundle_cli.py:209 is another message (a bundle document); no reader of this one"
-   ],
-   "exceptions_checked": [
-    "an exception whose own text is opaque: the only one is the codec message of the [52]/[55] defect, where the label would be the sole 'contract' hint but the status and missing probe say it",
-    "confusion with 'no reproducer' / 'holds exactly': those keep their own predicates (pinned)"
-   ],
-   "batch": "A15",
-   "reviewed": true,
-   "remapped_from": {
-    "index": 47,
-    "mutant": "L105 string 'the reproducer is not a contract: ' emptied",
     "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
    }
   },
@@ -4326,6 +4188,34 @@
   },
   {
    "target": "aisef2/app/verify.py::verify",
+   "index": 98,
+   "mutant": "L104 string ' the run printed' emptied",
+   "class": "AUDITED",
+   "source_sha256": "1259fc39d5733bf55d409a23a15e412ebaaf4c9fb1d59e01fd34df8c96a8dffb",
+   "group": "A22",
+   "grounds": "The mutant reads 'the evidence anchor is <A12>, not the <E12>'. What is lost is that E is 'the one the run printed', a fact about a value the operator supplied themselves through --expect-anchor, whose help (cli.py L38) and format refusal (cli.py L70) state the same provenance, and which the threat model states in prose. The identifying elements and their roles (position plus 'not the') are asserted by the [108] test and survive.",
+   "consumers_checked": [
+    "aisef2/app/verify.py L91-L92 sole producer",
+    "aisef2/app/cli.py L37-L38 and L69-L70: the option's help and its refusal carry the phrase; tests/v2/test_v21_kills_cli.py L59-L61 pin the help text, which is where this phrase has a contract",
+    "docs/v2.1/ANCHOR-THREAT-MODEL.md and docs/v2.1/USAGE-2.1.md: describe where the expected value comes from, do not quote the problem",
+    "tests/v2/test_v21_verify.py::test_a_rewritten_manifest_is_refuted_only_against_the_anchor_the_operator_kept: asserts 'anchor' occurs in a problem",
+    "grep of 'the run printed': verify.py, cli.py, the help test, and an unrelated sense in docs/v2.1/MUTATION-RUNNER-V2.md"
+   ],
+   "exceptions_checked": [
+    "a caller of verify() whose expect_anchor did not come from a run: then the phrase would be inaccurate rather than needed; none in aisef2 or validation (callers: cli.py passes the operator's --expect-anchor, release_acceptance.py L128 and release_rehearsal.py L124 pass none)",
+    "the phrase being what tells which value is the expected one: that is carried by 'not the' and position, both kept",
+    "anchor being None (no manifest, or unreadable): the first element prints the word None and the sentence is otherwise unchanged by this mutant"
+   ],
+   "batch": "A22",
+   "reviewed": true,
+   "remapped_from": {
+    "index": 109,
+    "mutant": "L92 string ' the run printed' emptied",
+    "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+   }
+  },
+  {
+   "target": "aisef2/app/verify.py::verify",
    "index": 108,
    "mutant": "L152 dict entry 0 dropped",
    "class": "EQUIVALENT",
@@ -4378,31 +4268,44 @@
   },
   {
    "target": "aisef2/app/verify.py::verify",
-   "index": 98,
-   "mutant": "L104 string ' the run printed' emptied",
+   "index": 122,
+   "mutant": "L81 string 'no ' emptied",
    "class": "AUDITED",
    "source_sha256": "1259fc39d5733bf55d409a23a15e412ebaaf4c9fb1d59e01fd34df8c96a8dffb",
    "group": "A22",
-   "grounds": "The mutant reads 'the evidence anchor is <A12>, not the <E12>'. What is lost is that E is 'the one the run printed', a fact about a value the operator supplied themselves through --expect-anchor, whose help (cli.py L38) and format refusal (cli.py L70) state the same provenance, and which the threat model states in prose. The identifying elements and their roles (position plus 'not the') are asserted by the [108] test and survive.",
+   "grounds": "The mutant's note reads 'EVIDENCE.json: a run of a release before 2.1 — its record is bound by nothing but itself'. It is emitted only in the OSError branch (L78-L80), says the run predates the manifest, and the same document has evidence_anchor None; the file, the release boundary and the consequence are all there. A reader cannot take it for 'the manifest is present'. The loss is the negation word of a sentence whose other clauses carry the absence.",
    "consumers_checked": [
-    "aisef2/app/verify.py L91-L92 sole producer",
-    "aisef2/app/cli.py L37-L38 and L69-L70: the option's help and its refusal carry the phrase; tests/v2/test_v21_kills_cli.py L59-L61 pin the help text, which is where this phrase has a contract",
-    "docs/v2.1/ANCHOR-THREAT-MODEL.md and docs/v2.1/USAGE-2.1.md: describe where the expected value comes from, do not quote the problem",
-    "tests/v2/test_v21_verify.py::test_a_rewritten_manifest_is_refuted_only_against_the_anchor_the_operator_kept: asserts 'anchor' occurs in a problem",
-    "grep of 'the run printed': verify.py, cli.py, the help test, and an unrelated sense in docs/v2.1/MUTATION-RUNNER-V2.md"
+    "aisef2/app/verify.py L77-L80 sole producer, L153 the document (notes, evidence_anchor)",
+    "aisef2/app/cli.py L52-L53 prints it; exit 0 on VERIFIED",
+    "tests/v2/test_s2_kills.py L553-L568 asserts notes == [] for a run WITH a manifest only; grep of EVIDENCE.json/R.MANIFEST over tests/v2 finds only rewrites of the manifest (test_app_units L638, test_s2_kills L559, test_v21_verify L85/L105, test_v21_continue_integrity L575), none removes or omits it, so no pre-existing test reads this note",
+    "docs/v2/USAGE.md, docs/v2.1/USAGE-2.1.md section 7 and docs/v2.1/ANCHOR-THREAT-MODEL.md ('no anchor': consistency only): state the meaning, do not quote the note",
+    "grep of 'release before 2.1' and 'bound by nothing': verify.py and one campaign output quoting the mutant"
    ],
    "exceptions_checked": [
-    "a caller of verify() whose expect_anchor did not come from a run: then the phrase would be inaccurate rather than needed; none in aisef2 or validation (callers: cli.py passes the operator's --expect-anchor, release_acceptance.py L128 and release_rehearsal.py L124 pass none)",
-    "the phrase being what tells which value is the expected one: that is carried by 'not the' and position, both kept",
-    "anchor being None (no manifest, or unreadable): the first element prints the word None and the sentence is otherwise unchanged by this mutant"
+    "a reader taking the note to say EVIDENCE.json is present: contradicted by evidence_anchor None and by the branch it is emitted in",
+    "the consequence clause being the lost part: it is kept here; the case where it is lost is [135], which is killed",
+    "the same sentence in a 2.1+ run (manifest deleted): the release boundary stays, so the operator can still tell"
    ],
    "batch": "A22",
    "reviewed": true,
    "remapped_from": {
-    "index": 109,
-    "mutant": "L92 string ' the run printed' emptied",
+    "index": 134,
+    "mutant": "L80 string 'no ' emptied",
     "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
    }
+  },
+  {
+   "target": "aisef2/app/verify.py::verify",
+   "index": 126,
+   "mutant": "L87 string ')' emptied",
+   "class": "AUDITED",
+   "source_sha256": "1259fc39d5733bf55d409a23a15e412ebaaf4c9fb1d59e01fd34df8c96a8dffb",
+   "group": "R01",
+   "grounds": "",
+   "consumers_checked": [],
+   "exceptions_checked": [],
+   "batch": "R01",
+   "reviewed": true
   },
   {
    "target": "aisef2/app/verify.py::verify",
@@ -4482,31 +4385,29 @@
   },
   {
    "target": "aisef2/app/verify.py::verify",
-   "index": 122,
-   "mutant": "L81 string 'no ' emptied",
+   "index": 151,
+   "mutant": "L73 string ')' emptied",
    "class": "AUDITED",
    "source_sha256": "1259fc39d5733bf55d409a23a15e412ebaaf4c9fb1d59e01fd34df8c96a8dffb",
-   "group": "A22",
-   "grounds": "The mutant's note reads 'EVIDENCE.json: a run of a release before 2.1 — its record is bound by nothing but itself'. It is emitted only in the OSError branch (L78-L80), says the run predates the manifest, and the same document has evidence_anchor None; the file, the release boundary and the consequence are all there. A reader cannot take it for 'the manifest is present'. The loss is the negation word of a sentence whose other clauses carry the absence.",
-   "consumers_checked": [
-    "aisef2/app/verify.py L77-L80 sole producer, L153 the document (notes, evidence_anchor)",
-    "aisef2/app/cli.py L52-L53 prints it; exit 0 on VERIFIED",
-    "tests/v2/test_s2_kills.py L553-L568 asserts notes == [] for a run WITH a manifest only; grep of EVIDENCE.json/R.MANIFEST over tests/v2 finds only rewrites of the manifest (test_app_units L638, test_s2_kills L559, test_v21_verify L85/L105, test_v21_continue_integrity L575), none removes or omits it, so no pre-existing test reads this note",
-    "docs/v2/USAGE.md, docs/v2.1/USAGE-2.1.md section 7 and docs/v2.1/ANCHOR-THREAT-MODEL.md ('no anchor': consistency only): state the meaning, do not quote the note",
-    "grep of 'release before 2.1' and 'bound by nothing': verify.py and one campaign output quoting the mutant"
-   ],
-   "exceptions_checked": [
-    "a reader taking the note to say EVIDENCE.json is present: contradicted by evidence_anchor None and by the branch it is emitted in",
-    "the consequence clause being the lost part: it is kept here; the case where it is lost is [135], which is killed",
-    "the same sentence in a 2.1+ run (manifest deleted): the release boundary stays, so the operator can still tell"
-   ],
-   "batch": "A22",
-   "reviewed": true,
-   "remapped_from": {
-    "index": 134,
-    "mutant": "L80 string 'no ' emptied",
-    "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
-   }
+   "group": "R01",
+   "grounds": "",
+   "consumers_checked": [],
+   "exceptions_checked": [],
+   "batch": "R01",
+   "reviewed": true
+  },
+  {
+   "target": "aisef2/app/verify.py::verify",
+   "index": 174,
+   "mutant": "L122 string ')' emptied",
+   "class": "AUDITED",
+   "source_sha256": "1259fc39d5733bf55d409a23a15e412ebaaf4c9fb1d59e01fd34df8c96a8dffb",
+   "group": "R01",
+   "grounds": "",
+   "consumers_checked": [],
+   "exceptions_checked": [],
+   "batch": "R01",
+   "reviewed": true
   },
   {
    "target": "aisef2/orchestrate/story_runner.py::_attempt",
@@ -5519,5 +5420,96 @@
    "reviewed": true,
    "why": "the changed line differs at HEAD"
   }
- ]
+ ],
+ "round_2": {
+  "base": "f860e57fdcd457887d8766de8c8d4d01f1af778c",
+  "batches": [
+   "R01",
+   "R02",
+   "R03",
+   "R04",
+   "R05",
+   "R06",
+   "R07"
+  ],
+  "added": 11,
+  "unmapped": [],
+  "pruned_because_killed_now": [
+   {
+    "target": "aisef2/app/adapters.py::Reviewer._ocr",
+    "index": 36,
+    "mutant": "L222 dict entry 5 dropped"
+   },
+   {
+    "target": "aisef2/app/cli.py::_parser",
+    "index": 13,
+    "mutant": "L29 string \"Run a project's admitted plan under the AISEF V2 kernel.\" emptied"
+   },
+   {
+    "target": "aisef2/app/cli.py::_parser",
+    "index": 15,
+    "mutant": "L31 string \"check the inputs and the plan's admission; no provider request\" emptied"
+   },
+   {
+    "target": "aisef2/app/cli.py::_parser",
+    "index": 17,
+    "mutant": "L32 string 'verify a finished run directory against its journal' emptied"
+   },
+   {
+    "target": "aisef2/app/cli.py::_parser",
+    "index": 21,
+    "mutant": "L35 string \"the project's git repository (cloned; never written)\" emptied"
+   },
+   {
+    "target": "aisef2/app/cli.py::_parser",
+    "index": 22,
+    "mutant": "L36 string 'the run directory (a new one to run; an existing one to verify)' emptied"
+   },
+   {
+    "target": "aisef2/app/cli.py::_parser",
+    "index": 23,
+    "mutant": "L37 string 'SHA256' emptied"
+   },
+   {
+    "target": "aisef2/app/cli.py::_parser",
+    "index": 24,
+    "mutant": "L38 string 'verify only: the evidence anchor the run printed, kept outside the run directory' emptied"
+   },
+   {
+    "target": "aisef2/app/cli.py::_parser",
+    "index": 28,
+    "mutant": "L45 string 'run --parent only: start although the lineage has spend no evidence accounts for (recorded)' emptied"
+   },
+   {
+    "target": "aisef2/app/cli.py::_parser",
+    "index": 29,
+    "mutant": "L46 string 'SHA256' emptied"
+   },
+   {
+    "target": "aisef2/app/cli.py::_parser",
+    "index": 30,
+    "mutant": "L47 string \"run --parent only: supersede the predecessor's claim with this sha256 whose child never began and whose claimant cannot be shown gone (the operator's assertion, recorded)\" emptied"
+   },
+   {
+    "target": "aisef2/app/confine.py::_probe",
+    "index": 49,
+    "mutant": "L294 string '/nonexistent' emptied"
+   },
+   {
+    "target": "aisef2/app/review_ocr.py::coverage",
+    "index": 25,
+    "mutant": "L107 tuple() -> list()"
+   },
+   {
+    "target": "aisef2/app/review_ocr.py::coverage",
+    "index": 44,
+    "mutant": "L134 tuple() -> list()"
+   },
+   {
+    "target": "aisef2/app/review_verify.py::reproducer_contract",
+    "index": 52,
+    "mutant": "L112 string 'the reproducer is not a contract: ' emptied"
+   }
+  ]
+ }
 }
