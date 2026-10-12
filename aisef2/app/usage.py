@@ -11,7 +11,9 @@ unaccounted) — never counted as 0; no ledger at all is no preflight spend. Set
  "source": "...", "effective_date": "YYYY-MM-DD"} — reasoning tokens priced as output.
 
 `no_progress` reads the journal for retries that changed nothing: the same failures, attempt after attempt. It only
-reports — a retry is decided by the failure taxonomy and its limits, never here (NO_SIDE_RETRY_COUNTER)."""
+reports — a retry is decided by the failure taxonomy and its limits, never here (NO_SIDE_RETRY_COUNTER). It is a
+function of any journal the six control projections admit (`aisef run --verify` refuses the others before it is
+asked: aisef2/app/verify.py), not only of the journals the kernel's story runner happens to write."""
 
 from __future__ import annotations
 
@@ -120,14 +122,22 @@ def usage(out: pathlib.Path, events: list[dict], prices: Mapping | None, rec: Ma
 
 def no_progress(events: list[dict]) -> list[dict]:
     """Per story, consecutive failed attempts with the same failures (codes and details): retries that changed nothing
-    the kernel can see. A report; the taxonomy alone decides a retry."""
+    the kernel can see. A report; the taxonomy alone decides a retry.
+
+    An attempt is *failed* when it ended in `story/retry` or `story/rollback`; its failures are the `failure/observed`
+    its story journaled after the later of the attempt's `story/begin` and the story's previous outcome, up to that
+    outcome. A committed attempt is progress and is never reported, whatever failures it observed — a commit is not a
+    retry, and no attempt follows it. A failure observed after an attempt's outcome and before the story's next
+    `story/begin` is nobody's for this report: not the next attempt's, which had not begun."""
     attempts: dict[str, list[list[str]]] = {}
     current: dict[str, list[str]] = {}
     for e in events:
         sid = e["data"].get("story_id")
         if e["type"] == "failure/observed":
             current.setdefault(sid, []).append(f"{e['data'].get('code')}: {e['data'].get('detail')}")
-        elif e["type"] in ("story/retry", "story/rollback", "story/commit"):
+        elif e["type"] == "story/begin":
+            current.pop(sid, None)     # a new attempt: what the story observed since its last outcome is not its own
+        elif e["type"] in ("story/retry", "story/rollback"):
             attempts.setdefault(sid, []).append(sorted(current.pop(sid, [])))
     out = []
     for sid, rows in attempts.items():
@@ -135,4 +145,3 @@ def no_progress(events: list[dict]) -> list[dict]:
         if same:
             out.append({"story": sid, "attempts_repeating_the_one_before": [n + 1 for n in same], "failures": rows[same[0]]})
     return out
-
