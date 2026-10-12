@@ -1063,3 +1063,30 @@ The rule it adds for a kill file that edits product source: match the **tokens**
 writes every module through `ast.unparse` (quotes, line breaks, parentheses, comments and blank lines are not the
 committed text), and T0 is where a file that depends on the spelling is found. The same holds for a test that
 compares source text, counts lines or asserts on a line number.
+
+## 18. Campaign 3's result, round 2 and campaign 4 (B-03, 2026-10-12)
+
+**Campaign 3** (manifest rev 3, snapshot f860e57, 14.54 h on 4 workers, 199 of 468 targets, 7,867 mutants): 7,583 KILLED /
+242 SURVIVED / 1 INFRA / 41 NOT_RUN as run; the two targets that did not close were re-run alone at the same snapshot
+(`c3b-w1`, imported as a continuation of the history) and ended 41/41 and 26/26 KILLED, so 7,625 KILLED / 242 SURVIVED.
+Evidence: `closure-evidence/v2/v2.1/campaign-3/results/README.md`.
+
+* The runner-impact check §15/§16 needed: 20 standing targets (632 mutants) measured again — every mutant list and every
+  class identical to campaign 2. Campaign 2's 34 unresolved mutants (31 INFRA, 3 TIMEOUT) are all KILLED now.
+* One intermittent failure: a T0 baseline FAILED once with a `ValueError` out of `ProcessRange._close_pipes` — two threads
+  inside `release()` of one range (a test that stops the controller from a second thread), no mutual exclusion; 1-5% per
+  run of that one test, never a false kill (the bracket turns it into INFRA). Measured and explained in
+  `campaign-3/CAMPAIGN-3-NOTES.md`; the fix is one file pinned by the manifest, so it is the owner's decision.
+* A kill file that kills a mutant by waiting out a long window passes the runner's rule and is expensive: T21a's kill of
+  `HARNESS/invoke` `L107 returns None` FAILs after 640.9 s (twice, with its bracket), under the 900 s limit; it is
+  written down here so a future load-sensitive TIMEOUT is read for what it would be.
+
+**Round 2** (`closure-evidence/v2/v2.1/mutation/ROUND-2.md`): the 42 survivors no kill and no audit covered — 21 KILLED,
+8 AUDITED, 3 EQUIVALENT, 9 OPEN (owner decisions), 1 DEFECT (`lineage.account_of`: spend the evidence cannot show was
+raised, or on 3.14 shown as a known 0; fixed at one point). Because `lineage.py` changed, the module's targets are
+re-measured, and its new guard `_look` is registered as a helper target with `account_of`'s kill set (the
+`_V21_HELPERS` rule: a helper's kill set is its caller's as registered at the end).
+
+**Campaign 4** (manifest rev 4): the targets the delta (base f860e57, a read-set measured at the commit before the
+snapshot) says to re-measure; every other result stands — campaign 3's at f860e57 or, for a target campaign 3 did not
+run, campaign 2's at 5719f1f, which campaign 3's delta found unchanged.

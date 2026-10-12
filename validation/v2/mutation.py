@@ -881,6 +881,11 @@ _V21_KILLS3: dict[str, list[str]] = {
 for _t, _fs in _V21_KILLS3.items():
     V21_TARGETS[_t] = [*V21_TARGETS[_t], *[f for f in _fs if f not in V21_TARGETS[_t]]]
 # --- end kills3 ---
+# Helper targets whose kill set is their caller's AS REGISTERED ABOVE (after the generated lists): the account_of fix's guard
+# (B-03, round 2). `_look` decides "unknown, not 0" for the evidence the system will not let account_of look at; its two
+# constants have no mutants (a tuple of errno names and of integers).
+for _t, _src in {'aisef2/app/lineage.py::_look': 'aisef2/app/lineage.py::account_of'}.items():
+    V21_TARGETS[_t] = list(V21_TARGETS[_src])
 SUPERSEDED.update({t: "V2.1" for t in V21_TARGETS})
 for _phase in (P2_TARGETS, P6_TARGETS, C2_P1_TARGETS):
     for _t in [t for t in _phase if t in V21_TARGETS]:
