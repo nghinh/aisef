@@ -1,0 +1,165 @@
+test_another_failure_of_the_call_still_names_its_class_and_reason (tests.v2.test_v21_defects_confine.AProbeThatHangs.test_another_failure_of_the_call_still_names_its_class_and_reason) ... ok
+test_the_recorded_reason_names_the_limit (tests.v2.test_v21_defects_confine.AProbeThatHangs.test_the_recorded_reason_names_the_limit) ... ok
+test_a_mount_below_it_is_not_beyond (tests.v2.test_v21_defects_confine.AReadOnlyPathWrittenWithATrailingSlash.test_a_mount_below_it_is_not_beyond) ... ok
+test_a_mount_that_only_shares_its_prefix_is_still_beyond (tests.v2.test_v21_defects_confine.AReadOnlyPathWrittenWithATrailingSlash.test_a_mount_that_only_shares_its_prefix_is_still_beyond)
+Fail closed: `<dir>-extra` is not below `<dir>/`, nor `<dir>` itself below a root that merely begins with it. ... skipped "the temp directory lies below the sandbox's /tmp: the measurement below is not about it"
+test_a_socket_below_it_is_still_listed_and_refuses (tests.v2.test_v21_defects_confine.AReadOnlyPathWrittenWithATrailingSlash.test_a_socket_below_it_is_still_listed_and_refuses) ... ok
+test_its_mount_is_not_beyond_what_the_wrapper_names (tests.v2.test_v21_defects_confine.AReadOnlyPathWrittenWithATrailingSlash.test_its_mount_is_not_beyond_what_the_wrapper_names) ... ok
+test_several_slashes_are_the_same_directory (tests.v2.test_v21_defects_confine.AReadOnlyPathWrittenWithATrailingSlash.test_several_slashes_are_the_same_directory) ... ok
+test_a_host_directory_at_the_homes_own_path (tests.v2.test_v21_defects_confine.SocketsBelowAHostDirectoryBoundAtASyntheticMount.test_a_host_directory_at_the_homes_own_path) ... ok
+test_a_session_as_required_is_not_refused (tests.v2.test_v21_defects_confine.SocketsBelowAHostDirectoryBoundAtASyntheticMount.test_a_session_as_required_is_not_refused)
+The model's baseline: nothing bound in has a socket (one in the workspace is the session's own). ... ok
+test_control_a_plain_bound_directory_is_listed_and_refuses (tests.v2.test_v21_defects_confine.SocketsBelowAHostDirectoryBoundAtASyntheticMount.test_control_a_plain_bound_directory_is_listed_and_refuses) ... ok
+test_the_client_installed_in_a_directory_named_like_a_synthetic_mount (tests.v2.test_v21_defects_confine.SocketsBelowAHostDirectoryBoundAtASyntheticMount.test_the_client_installed_in_a_directory_named_like_a_synthetic_mount)
+The same by another way in: the client's own directory is bound read-only (not `read_only`); one that is ... ok
+test_the_directories_are_exactly_the_host_directories_the_wrapper_binds (tests.v2.test_v21_defects_confine.SocketsBelowAHostDirectoryBoundAtASyntheticMount.test_the_directories_are_exactly_the_host_directories_the_wrapper_binds)
+Every host directory bound in is searched, wherever the path leads; the sandbox's own mounts (--proc, --dev, ... ok
+test_the_hosts_dev_bound_over_the_synthetic_dev (tests.v2.test_v21_defects_confine.SocketsBelowAHostDirectoryBoundAtASyntheticMount.test_the_hosts_dev_bound_over_the_synthetic_dev) ... ok
+test_the_hosts_tmp_bound_over_the_synthetic_tmpfs (tests.v2.test_v21_defects_confine.SocketsBelowAHostDirectoryBoundAtASyntheticMount.test_the_hosts_tmp_bound_over_the_synthetic_tmpfs) ... ok
+test_a_root_with_or_without_a_trailing_slash_is_the_same_directory (tests.v2.test_v21_defects_confine.Within.test_a_root_with_or_without_a_trailing_slash_is_the_same_directory) ... ok
+test_the_root_directory_holds_every_path (tests.v2.test_v21_defects_confine.Within.test_the_root_directory_holds_every_path) ... ok
+test_a_probe_that_could_not_run_is_refused_naming_the_cause_and_what_it_said (tests.v2.test_v21_kills3_A05.NotRun.test_a_probe_that_could_not_run_is_refused_naming_the_cause_and_what_it_said)
+Nothing was measured, so the run is refused for that and only that: "exit None" (no exit status, the probe ... ok
+test_routed_interfaces_are_the_unique_names_in_a_stable_order (tests.v2.test_v21_kills3_A05.Order.test_routed_interfaces_are_the_unique_names_in_a_stable_order)
+The same observation gives the same list whatever the interpreter's hash seed: a set's order is a function ... ok
+test_a_netdev_line_that_is_not_an_interface_row_is_no_interface (tests.v2.test_v21_kills3_A05.Rows.test_a_netdev_line_that_is_not_an_interface_row_is_no_interface)
+/proc/net/dev's rows are `<name>: counters`; a line after the two header lines that is not one names no ... ok
+test_a_route_line_that_is_not_a_route_row_is_no_route_and_refuses_nothing (tests.v2.test_v21_kills3_A05.Rows.test_a_route_line_that_is_not_a_route_row_is_no_route_and_refuses_nothing)
+A line without the row's tabs is no route: with `network: none` it must not make the refusal that a ... ok
+test_a_status_line_that_is_not_a_key_value_row_is_skipped_not_a_crash (tests.v2.test_v21_kills3_A05.Rows.test_a_status_line_that_is_not_a_key_value_row_is_skipped_not_a_crash)
+A line without a colon among the status lines must not stop the measurement (a ValueError out of `measure` ... ok
+test_the_record_says_which_uid_the_session_ran_as (tests.v2.test_v21_kills3_A05.Uid.test_the_record_says_which_uid_the_session_ran_as)
+The first thing the probe reports is `id -u`; the record keeps it under `inside.uid`, the session's side of ... ok
+test_the_workspace_is_read_write_unless_asked_not_to_be (tests.v2.test_v21_kills3_A06.ArgvDefault.test_the_workspace_is_read_write_unless_asked_not_to_be) ... ok
+test_the_recorded_argv_is_the_command_line_that_ran (tests.v2.test_v21_kills3_A06.RecordedCommandLine.test_the_recorded_argv_is_the_command_line_that_ran) ... ok
+test_a_refusal_the_kernel_gave_is_one_by_either_of_its_wordings (tests.v2.test_v21_kills3_A06.UserNamespaceCheckThatCouldNotRun.test_a_refusal_the_kernel_gave_is_one_by_either_of_its_wordings) ... ok
+test_exit_127_is_never_a_measured_refusal_whatever_it_printed (tests.v2.test_v21_kills3_A06.UserNamespaceCheckThatCouldNotRun.test_exit_127_is_never_a_measured_refusal_whatever_it_printed) ... ok
+test_a_client_reached_through_a_link_is_refused_naming_its_resolved_directory (tests.v2.test_v21_kills3_A07.ClientDirectoryRefusal.test_a_client_reached_through_a_link_is_refused_naming_its_resolved_directory) ... ok
+test_the_directory_refused_is_named_as_the_clients (tests.v2.test_v21_kills3_A07.ClientDirectoryRefusal.test_the_directory_refused_is_named_as_the_clients) ... ok
+test_a_repository_git_refuses_to_run_in_is_told_the_same_way (tests.v2.test_v21_kills3_A07.WorktreeStageRefusal.test_a_repository_git_refuses_to_run_in_is_told_the_same_way)
+The likeliest real cause: the run's repository holds a configuration key that is not inert, so the runner's ... ok
+test_the_repository_path_is_a_token_of_its_own (tests.v2.test_v21_kills3_A07.WorktreeStageRefusal.test_the_repository_path_is_a_token_of_its_own)
+git's text opens with a word (`fatal:`, `error:`, `refused:`): the path must not run into it, or the ... ok
+test_the_stage_that_failed_is_the_workspace_as_a_worktree (tests.v2.test_v21_kills3_A07.WorktreeStageRefusal.test_the_stage_that_failed_is_the_workspace_as_a_worktree) ... ok
+test_a_sandbox_as_required_is_not_refused (tests.v2.test_v21_kills3_T05a.CleanSession.test_a_sandbox_as_required_is_not_refused)
+The model's baseline: HOME shows only `.config`, the way to the client's configuration directory (SANDBOX- ... ok
+test_a_home_that_shows_more_than_the_way_to_a_mount_is_refused_naming_the_entry (tests.v2.test_v21_kills3_T05a.HomeListing.test_a_home_that_shows_more_than_the_way_to_a_mount_is_refused_naming_the_entry) ... ok
+test_the_probe_is_given_the_operators_home (tests.v2.test_v21_kills3_T05a.HomeListing.test_the_probe_is_given_the_operators_home) ... ok
+test_without_a_home_the_probe_is_given_a_path_that_is_not_there_and_no_home_is_judged (tests.v2.test_v21_kills3_T05a.HomeListing.test_without_a_home_the_probe_is_given_a_path_that_is_not_there_and_no_home_is_judged)
+HOME absent from the environment: a report (not a crash), the probe's $5 the "/nonexistent" the judgement ... ok
+test_a_sandbox_without_find_is_a_problem_not_a_pass (tests.v2.test_v21_kills3_T05a.UnixSockets.test_a_sandbox_without_find_is_a_problem_not_a_pass)
+No `sockets listed` in the transcript: the sockets are unknown (None, not an empty list) and the run is ... ok
+test_a_socket_below_a_bound_read_only_directory_is_refused_naming_it (tests.v2.test_v21_kills3_T05a.UnixSockets.test_a_socket_below_a_bound_read_only_directory_is_refused_naming_it) ... ok
+test_find_that_listed_nothing_is_a_clean_listing (tests.v2.test_v21_kills3_T05a.UnixSockets.test_find_that_listed_nothing_is_a_clean_listing) ... ok
+test_the_probe_is_given_every_host_directory_the_wrapper_binds_and_none_of_its_own_mounts (tests.v2.test_v21_kills3_T05a.UnixSockets.test_the_probe_is_given_every_host_directory_the_wrapper_binds_and_none_of_its_own_mounts) ... ok
+test_interfaces_are_listed_and_none_is_routed (tests.v2.test_v21_kills3_T05b.AFreshNetworkNamespace.test_interfaces_are_listed_and_none_is_routed) ... ok
+test_it_is_not_refused (tests.v2.test_v21_kills3_T05b.AFreshNetworkNamespace.test_it_is_not_refused) ... ok
+test_the_record_holds_what_it_printed (tests.v2.test_v21_kills3_T05b.BubblewrapRelease.test_the_record_holds_what_it_printed) ... ok
+test_the_release_is_asked_of_bubblewrap_with_its_version_option (tests.v2.test_v21_kills3_T05b.BubblewrapRelease.test_the_release_is_asked_of_bubblewrap_with_its_version_option) ... ok
+test_a_listing_that_found_no_socket_is_an_empty_list_not_unknown (tests.v2.test_v21_kills3_T05b.CorrectlyConfinedSession.test_a_listing_that_found_no_socket_is_an_empty_list_not_unknown)
+`m sockets listed` after an empty section: the check ran and found nothing (None is 'could not list'). ... ok
+test_it_is_not_refused (tests.v2.test_v21_kills3_T05b.CorrectlyConfinedSession.test_it_is_not_refused)
+The verdict is made from the probe's sections: status (capabilities, NoNewPrivs), mountinfo, the namespace ... ok
+test_network_interfaces_are_the_names_in_proc_net_dev_in_order (tests.v2.test_v21_kills3_T05b.CorrectlyConfinedSession.test_network_interfaces_are_the_names_in_proc_net_dev_in_order)
+The rows after the two header lines, the name before the colon (SANDBOX-LINUX §4: the data behind 'a fresh ... ok
+test_no_new_privs_and_seccomp_are_the_status_values (tests.v2.test_v21_kills3_T05b.CorrectlyConfinedSession.test_no_new_privs_and_seccomp_are_the_status_values)
+Seccomp '0' is the honest limit of this boundary (no syscall filter): the record says what was read. ... ok
+test_the_capabilities_are_the_five_sets_the_status_reports (tests.v2.test_v21_kills3_T05b.CorrectlyConfinedSession.test_the_capabilities_are_the_five_sets_the_status_reports)
+CapBnd is recorded though not judged (SANDBOX-LINUX §5: CapInh/CapPrm/CapEff/CapBnd/CapAmb = 0). Each set is ... ok
+test_the_interfaces_with_a_route_are_recorded_once_each_sorted (tests.v2.test_v21_kills3_T05b.CorrectlyConfinedSession.test_the_interfaces_with_a_route_are_recorded_once_each_sorted)
+/proc/net/route has one row for wlan0, two for eth0 and one for docker0 (host network: not judged, but ... ok
+test_the_mounts_are_what_mountinfo_says_and_their_targets_what_the_wrapper_names (tests.v2.test_v21_kills3_T05b.CorrectlyConfinedSession.test_the_mounts_are_what_mountinfo_says_and_their_targets_what_the_wrapper_names)
+The judgement's 'mounted beyond what the wrapper names' compares the one with the other; the targets are ... ok
+test_the_namespaces_are_own_except_the_shared_network (tests.v2.test_v21_kills3_T05b.CorrectlyConfinedSession.test_the_namespaces_are_own_except_the_shared_network) ... ok
+test_the_record_has_each_reading_under_its_name (tests.v2.test_v21_kills3_T05b.CorrectlyConfinedSession.test_the_record_has_each_reading_under_its_name)
+What a reader of RUN.json.confinement.inside looks for by name (a field added later is not this test's). ... ok
+test_the_uid_is_what_id_printed (tests.v2.test_v21_kills3_T05b.CorrectlyConfinedSession.test_the_uid_is_what_id_printed)
+The uid the session ran as (P4: 1000, the operator's own, not root): the record's `uid` is `id -u` inside. ... ok
+test_a_route_refuses_the_measurement_naming_each_interface_once (tests.v2.test_v21_kills3_T05b.RoutesUnderNetworkNone.test_a_route_refuses_the_measurement_naming_each_interface_once) ... ok
+test_the_record_holds_the_interfaces_with_a_route (tests.v2.test_v21_kills3_T05b.RoutesUnderNetworkNone.test_the_record_holds_the_interfaces_with_a_route) ... ok
+test_each_try_has_its_exit_and_the_text_it_printed (tests.v2.test_v21_kills3_T05b.WhatWasTried.test_each_try_has_its_exit_and_the_text_it_printed) ... ok
+test_operator_can_is_one_per_write_try_under_the_same_name (tests.v2.test_v21_kills3_T05b.WhatWasTried.test_operator_can_is_one_per_write_try_under_the_same_name) ... ok
+test_a_probe_over_its_limit_is_a_problem_not_a_crash (tests.v2.test_v21_kills3_T05c.TheProbeCannotBeRunOrHangs.test_a_probe_over_its_limit_is_a_problem_not_a_crash)
+The sandbox hangs: subprocess raises TimeoutExpired (a SubprocessError, not an OSError), with the command line ... ok
+test_an_exec_failure_of_the_probe_is_a_problem_not_a_crash (tests.v2.test_v21_kills3_T05c.TheProbeCannotBeRunOrHangs.test_an_exec_failure_of_the_probe_is_a_problem_not_a_crash)
+The wrapper cannot be executed at all (a bubblewrap of another architecture, a text file made executable): ... ok
+test_one_measurements_value_is_never_inside_anothers (tests.v2.test_v21_kills3_T05c.TheSleeperHasAFixedWidthDuration.test_one_measurements_value_is_never_inside_anothers)
+`_survivors` finds a sleeper by `command in pr.command` ("sleep <value>"): measurements running together must ... ok
+test_the_value_is_the_sleeper_and_six_fraction_digits_whatever_the_nonce (tests.v2.test_v21_kills3_T05c.TheSleeperHasAFixedWidthDuration.test_the_value_is_the_sleeper_and_six_fraction_digits_whatever_the_nonce) ... ok
+test_a_hung_version_call_is_marked_unavailable_and_names_the_class (tests.v2.test_v21_kills3_T05c.TheVersionReadCannotFail.test_a_hung_version_call_is_marked_unavailable_and_names_the_class) ... ok
+test_a_version_that_was_read_is_the_tools_own_text (tests.v2.test_v21_kills3_T05c.TheVersionReadCannotFail.test_a_version_that_was_read_is_the_tools_own_text)
+The other shape of the field: the first read's stdout, stripped — never the marker. ... ok
+test_an_exec_failure_is_marked_unavailable_and_names_the_class (tests.v2.test_v21_kills3_T05c.TheVersionReadCannotFail.test_an_exec_failure_is_marked_unavailable_and_names_the_class) ... ok
+test_a_network_namespace_of_its_own_without_a_route_is_not_a_problem (tests.v2.test_v21_kills3_T06a.AcceptedMeasurement.test_a_network_namespace_of_its_own_without_a_route_is_not_a_problem)
+network "none" and no routed interface is the fresh namespace --unshare-net gives. Pins _judge [36]. ... ok
+test_a_route_inside_a_network_namespace_of_its_own_is_the_problem_and_names_the_interface (tests.v2.test_v21_kills3_T06a.AcceptedMeasurement.test_a_route_inside_a_network_namespace_of_its_own_is_the_problem_and_names_the_interface)
+The other side of the decision: "none" with a routed interface is a reachable network, named by interface. ... ok
+test_a_writable_host_filesystem_outside_the_workspace_is_named_and_the_procfs_is_not (tests.v2.test_v21_kills3_T06a.AcceptedMeasurement.test_a_writable_host_filesystem_outside_the_workspace_is_named_and_the_procfs_is_not)
+The rest of the layout stays: an ext4 mount outside the workspace is the problem, and it is the only name. ... ok
+test_the_procfs_bubblewrap_mounts_writable_is_not_host_storage (tests.v2.test_v21_kills3_T06a.AcceptedMeasurement.test_the_procfs_bubblewrap_mounts_writable_is_not_host_storage)
+A writable mount whose filesystem is not backed by host storage (the procfs at /proc, which every measured ... ok
+test_the_shared_network_with_its_route_is_not_a_problem (tests.v2.test_v21_kills3_T06a.AcceptedMeasurement.test_the_shared_network_with_its_route_is_not_a_problem)
+network "host": the session shares the host's network so it reaches its provider, and the record says so; ... ok
+test_a_measurement_that_was_accepted_is_accepted_again (tests.v2.test_v21_kills3_T06a.RecordedLinuxMeasurements.test_a_measurement_that_was_accepted_is_accepted_again) ... ok
+test_the_exit_code_of_the_user_namespace_try_can_be_read_back_from_the_problem (tests.v2.test_v21_kills3_T06a.RefusalReasons.test_the_exit_code_of_the_user_namespace_try_can_be_read_back_from_the_problem)
+"no refusal of a further user namespace was measured" carries the measured exit code and the probe's own ... ok
+test_the_names_home_shows_are_listed_in_name_order_and_cut_after_ten (tests.v2.test_v21_kills3_T06a.RefusalReasons.test_the_names_home_shows_are_listed_in_name_order_and_cut_after_ten)
+"HOME shows more than the way to what is mounted" lists the exposed names sorted, the first ten: the same ... ok
+test_a_directory_is_bound_a_link_stays_a_link_and_an_absent_name_is_left_out (tests.v2.test_v21_kills3_T06a.SessionLine.test_a_directory_is_bound_a_link_stays_a_link_and_an_absent_name_is_left_out)
+The same on a SYSTEM of the test's own, so that each branch is reached on every host (the real tuple is ... ok
+test_every_option_is_followed_by_exactly_its_arguments_and_none_is_empty (tests.v2.test_v21_kills3_T06a.SessionLine.test_every_option_is_followed_by_exactly_its_arguments_and_none_is_empty)
+A line bubblewrap would misparse starts no session (the measurement's probe then "did not run" and a run ... ok
+test_proc_dev_and_tmp_are_mounted_at_their_own_paths_and_home_is_an_empty_tmpfs (tests.v2.test_v21_kills3_T06a.SessionLine.test_proc_dev_and_tmp_are_mounted_at_their_own_paths_and_home_is_an_empty_tmpfs)
+The probe's own reads (/proc/self/status, /proc/self/ns/*, /proc/net/route), the client's /dev/null and ... ok
+test_the_line_still_carries_every_isolation_option_the_accepted_measurements_ran_under (tests.v2.test_v21_kills3_T06a.SessionLine.test_the_line_still_carries_every_isolation_option_the_accepted_measurements_ran_under)
+The records of a real Linux host (docs/v2.1/evidence/sandbox, the same four that `problems` is empty in) hold ... ok
+test_the_session_gets_a_cgroup_namespace_of_its_own_where_the_kernel_has_one (tests.v2.test_v21_kills3_T06a.SessionLine.test_the_session_gets_a_cgroup_namespace_of_its_own_where_the_kernel_has_one)
+`--unshare-cgroup-try` (best effort: the "-try" form never refuses) is on the line once, with the other ... ok
+test_the_system_is_bound_as_what_it_is_on_this_host (tests.v2.test_v21_kills3_T06a.SessionLine.test_the_system_is_bound_as_what_it_is_on_this_host)
+SANDBOX-LINUX.md section 6: the system read-only, "a merged-/usr symlink stays a symlink". For each name of ... ok
+test_it_is_the_digest_of_the_files_bytes (tests.v2.test_v21_kills3_T06b.BinaryIdentity.test_it_is_the_digest_of_the_files_bytes) ... ok
+test_the_measured_wrapper_binds_the_configuration_a_session_binds (tests.v2.test_v21_kills3_T06b.MeasureEnvironment.test_the_measured_wrapper_binds_the_configuration_a_session_binds) ... ok
+test_the_probe_gets_the_runs_path_and_configuration_and_nothing_else_of_the_operators (tests.v2.test_v21_kills3_T06b.MeasureEnvironment.test_the_probe_gets_the_runs_path_and_configuration_and_nothing_else_of_the_operators) ... ok
+test_a_host_without_getuid_is_refused_not_crashed (tests.v2.test_v21_kills3_T06b.OperatorUid.test_a_host_without_getuid_is_refused_not_crashed) ... ok
+test_it_is_the_operators_real_uid_on_posix (tests.v2.test_v21_kills3_T06b.OperatorUid.test_it_is_the_operators_real_uid_on_posix) ... ok
+test_it_is_what_the_platform_says (tests.v2.test_v21_kills3_T06b.OperatorUid.test_it_is_what_the_platform_says) ... ok
+test_a_measurement_that_reached_its_probe_says_it_too (tests.v2.test_v21_kills3_T06b.ReportHeader.test_a_measurement_that_reached_its_probe_says_it_too) ... ok
+test_a_refusal_still_says_what_was_asked_and_where (tests.v2.test_v21_kills3_T06b.ReportHeader.test_a_refusal_still_says_what_was_asked_and_where) ... ok
+test_xdg_config_home_alone_is_enough (tests.v2.test_v21_kills3_T07a.ConfigurationDirectory.test_xdg_config_home_alone_is_enough) ... ok
+test_xdg_config_home_is_read_first (tests.v2.test_v21_kills3_T07a.ConfigurationDirectory.test_xdg_config_home_is_read_first) ... ok
+test_a_gitfile_that_is_not_a_pointer_binds_nothing_and_never_raises (tests.v2.test_v21_kills3_T07a.GitFile.test_a_gitfile_that_is_not_a_pointer_binds_nothing_and_never_raises) ... ok
+test_a_pointer_is_followed (tests.v2.test_v21_kills3_T07a.GitFile.test_a_pointer_is_followed)
+The control of the test above: a real pointer names the directory that is bound. ... ok
+test_a_repository_that_cannot_be_made_is_named_with_its_path (tests.v2.test_v21_kills3_T07a.MeasurementStages.test_a_repository_that_cannot_be_made_is_named_with_its_path) ... ok
+test_a_worktree_that_cannot_be_made_is_told_from_the_repository_stage (tests.v2.test_v21_kills3_T07a.MeasurementStages.test_a_worktree_that_cannot_be_made_is_told_from_the_repository_stage) ... ok
+test_a_guest_with_a_read_only_system_and_its_workspace_is_clean (tests.v2.test_v21_kills3_T07a.MountInfo.test_a_guest_with_a_read_only_system_and_its_workspace_is_clean)
+Read-only host binds are not 'writable outside the workspace', and the workspace whose path holds a space ... ok
+test_a_line_becomes_where_how_and_what_and_the_other_shapes_are_skipped (tests.v2.test_v21_kills3_T07a.MountInfo.test_a_line_becomes_where_how_and_what_and_the_other_shapes_are_skipped) ... ok
+test_a_writable_host_backed_mount_outside_the_workspace_is_refused (tests.v2.test_v21_kills3_T07a.MountInfo.test_a_writable_host_backed_mount_outside_the_workspace_is_refused) ... ok
+test_values_sections_and_tries (tests.v2.test_v21_kills3_T07a.ProbeOutput.test_values_sections_and_tries) ... ok
+test_a_path_the_host_does_not_have_is_not_named (tests.v2.test_v21_kills3_T07a.SystemPaths.test_a_path_the_host_does_not_have_is_not_named) ... ok
+test_every_system_path_the_host_has_is_bound_read_only (tests.v2.test_v21_kills3_T07a.SystemPaths.test_every_system_path_the_host_has_is_bound_read_only) ... ok
+test_a_mount_below_a_read_only_path_written_with_a_trailing_slash_is_not_beyond (tests.v2.test_v21_kills3_T07a.TrailingSlash.test_a_mount_below_a_read_only_path_written_with_a_trailing_slash_is_not_beyond) ... ok
+test_a_path_below_a_root_with_a_trailing_slash_is_within_it (tests.v2.test_v21_kills3_T07a.TrailingSlash.test_a_path_below_a_root_with_a_trailing_slash_is_within_it) ... ok
+test_each_link_is_compared_with_this_processs_own_proc_link (tests.v2.test_v21_kills3_T07b.DefaultOutsideIsThisProcess.test_each_link_is_compared_with_this_processs_own_proc_link) ... ok
+test_every_namespace_whose_link_differs_inside_is_own (tests.v2.test_v21_kills3_T07b.DefaultOutsideIsThisProcess.test_every_namespace_whose_link_differs_inside_is_own) ... ok
+test_on_this_host_a_session_that_shares_every_link_is_shared (tests.v2.test_v21_kills3_T07b.DefaultOutsideIsThisProcess.test_on_this_host_a_session_that_shares_every_link_is_shared)
+The real /proc: what this process reads there, a probe that shared its namespaces would read too. ... ok
+test_no_host_profile_or_temp_location_arrives (tests.v2.test_v21_kills3_T07b.SessionEnvironment.test_no_host_profile_or_temp_location_arrives) ... ok
+test_the_callers_variables_arrive_with_their_values (tests.v2.test_v21_kills3_T07b.SessionEnvironment.test_the_callers_variables_arrive_with_their_values) ... ok
+test_tmpdir_names_a_tmpfs_the_wrapper_made (tests.v2.test_v21_kills3_T07b.SessionEnvironment.test_tmpdir_names_a_tmpfs_the_wrapper_made) ... ok
+test_a_setting_that_is_not_the_four_keys_names_each_key_as_a_word (tests.v2.test_v21_kills3_T07b.SettingIsAJsonObject.test_a_setting_that_is_not_the_four_keys_names_each_key_as_a_word) ... ok
+test_a_settings_file_that_writes_the_keys_in_another_order_is_read (tests.v2.test_v21_kills3_T07b.SettingIsAJsonObject.test_a_settings_file_that_writes_the_keys_in_another_order_is_read)
+The operator's own path: a JSON file, read back by settings.read. ... ok
+test_the_order_of_the_keys_does_not_matter (tests.v2.test_v21_kills3_T07b.SettingIsAJsonObject.test_the_order_of_the_keys_does_not_matter) ... ok
+test_a_literal_command_line_of_every_kind_of_option (tests.v2.test_v21_kills3_T07b.TargetsAreMountPoints.test_a_literal_command_line_of_every_kind_of_option) ... ok
+test_the_command_line_wrap_builds_names_its_own_mounts (tests.v2.test_v21_kills3_T07b.TargetsAreMountPoints.test_the_command_line_wrap_builds_names_its_own_mounts)
+Every option kind the wrapper really emits (read-only system and `read_only` paths, the client's and ... ok
+test_a_sleeper_alive_throughout_is_returned_after_the_grace_not_before (tests.v2.test_v21_kills3_TO2.ASurvivorIsReportedOnlyOnceTheGraceHasPassed.test_a_sleeper_alive_throughout_is_returned_after_the_grace_not_before) ... ok
+test_a_sleeper_that_is_gone_within_the_grace_ends_the_poll_when_it_is_gone (tests.v2.test_v21_kills3_TO2.ThePollEndsWhenNothingIsLeft.test_a_sleeper_that_is_gone_within_the_grace_ends_the_poll_when_it_is_gone) ... ok
+test_no_match_at_the_first_look_returns_empty_without_waiting (tests.v2.test_v21_kills3_TO2.ThePollEndsWhenNothingIsLeft.test_no_match_at_the_first_look_returns_empty_without_waiting) ... ok
+
+----------------------------------------------------------------------
+Ran 114 tests in 1.017s
+
+OK (skipped=1)

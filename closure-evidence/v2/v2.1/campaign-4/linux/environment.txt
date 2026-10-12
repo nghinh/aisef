@@ -1,0 +1,85 @@
+== host: Darwin 25.5.0 arm64; macOS 26.5.2
+host load average { 2.50 2.37 2.51 } at 2026-10-12T16:41:05+0700
+== docker version
+Client:
+ Version:           29.8.0
+ API version:       1.56
+ Go version:        go1.26.8
+ Git commit:        88096ef
+ Built:             Thu Sep  3 21:49:43 2026
+ OS/Arch:           darwin/arm64
+ Context:           desktop-linux
+
+Server: Docker Desktop 4.91.0 (239619)
+ Engine:
+  Version:          29.8.0
+  API version:      1.56 (minimum version 1.40)
+  Go version:       go1.26.8
+  Git commit:       3ce5872
+  Built:            Thu Sep  3 21:49:37 2026
+  OS/Arch:          linux/arm64
+  Experimental:     false
+ containerd:
+  Version:          v2.3.4
+  GitCommit:        db8809540e1a7a9da5d518876894933ff55692ab
+ runc:
+  Version:          1.4.3
+  GitCommit:        v1.4.3-0-gbb14dabe
+ docker-init:
+  Version:          0.19.0
+  GitCommit:        de40ad0
+guest: Docker Desktop; kernel 7.0.12-linuxkit; 8 CPUs; 8319770624 bytes; cgroup v2; security [name=seccomp,profile=builtin name=cgroupns]
+== other containers running in the same VM (not started by this script)
+b7057425c7c2 postgres:16.15 Up 12 seconds (healthy)
+f06b8b7c6ca3 valkey/valkey:9.1.1 Up 12 seconds (healthy)
+image: aisef-sandbox-measure sha256:568d868ab18d64f7da961ab103e604ff7e5d18fc05cfccaa1946890b0d8b15ed created 2026-10-07T02:35:50.325134004Z linux/arm64
+procps source image: postgres:16.15 sha256:c1b3783309b6499c795eed7c20135a1a4d25cae1b575c3d52c6f536129a1b109 linux/arm64
+procps source packages (a container of postgres:16.15, no network):
+debian 13.6
+libproc2-0:arm64	2:4.0.4-9
+procps	2:4.0.4-9
+tree: /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/linux3/tree
+archive: /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/linux3/tree.tar sha256 b799ea25d76d47f2a98a0bc73bbe61a6b6f5d8590ec4035c5a5cb62bc7c4210c; files 5761
+commit: 49d65988dab5d99bd8a2f56594fead5a7a9038b0 tree 884b1733cde433a1e3b1ec2cd74721a771c4b2f9
+procps: 388a50620b101a212cee94b180d867240a142a397c9270ff3d6c5244fd979023 edb1e9823b60ea9bc4dc244445b4802863c745ec804e4318a16a131699b5383d 
+base flags: --rm --init --network none --user 1000:1000 --cap-drop ALL --pids-limit 512 --memory 1g --cpus 2 -w /repo -v /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/linux3/tree:/repo:ro -v /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/linux/procps/ps:/usr/local/bin/ps:ro -v /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/linux/procps/libproc2.so.0:/usr/lib/aarch64-linux-gnu/libproc2.so.0:ro
+X1 flags: --security-opt seccomp=unconfined --security-opt systempaths=unconfined
+bwrap start test: bwrap --unshare-user --unshare-pid --die-with-parent --ro-bind / / --proc /proc true
+== guest view, hardened:
+kernel Linux 7.0.12-linuxkit #1 SMP PREEMPT Thu Aug 27 14:02:21 UTC 2026 aarch64
+debian 13.7
+uid 1000 gid 1000 HOME /home/op
+CapEff:	0000000000000000 CapBnd:	0000000000000000 NoNewPrivs:	0 Seccomp:	2 
+max_user_namespaces 31880
+bubblewrap 0.12.0
+b3b829e18a7d43ee589dc37e351cb9480ff7301b493d8227b8c754294638b976  /usr/bin/bwrap
+Python 3.14.8 (main, Oct  6 2026, 02:02:59) [GCC 14.2.0]
+ps from procps-ng 4.0.4
+not writable by uid 1000: /repo
+not writable by uid 1000: /usr/local/lib/python3.14/site-packages
+not writable by uid 1000: /usr/local/lib/python3.14
+not writable by uid 1000: /usr/local
+not writable by uid 1000: /usr/local/bin
+writable by uid 1000: /home/op
+writable by uid 1000: /tmp
+bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user namespaces. See <https://deb.li/bubblewrap> or <file:///usr/share/doc/bubblewrap/README.Debian.gz>.
+bwrap starts: no
+== guest view, X1:
+kernel Linux 7.0.12-linuxkit #1 SMP PREEMPT Thu Aug 27 14:02:21 UTC 2026 aarch64
+debian 13.7
+uid 1000 gid 1000 HOME /home/op
+CapEff:	0000000000000000 CapBnd:	0000000000000000 NoNewPrivs:	0 Seccomp:	0 
+max_user_namespaces 31880
+bubblewrap 0.12.0
+b3b829e18a7d43ee589dc37e351cb9480ff7301b493d8227b8c754294638b976  /usr/bin/bwrap
+Python 3.14.8 (main, Oct  6 2026, 02:02:59) [GCC 14.2.0]
+ps from procps-ng 4.0.4
+not writable by uid 1000: /repo
+not writable by uid 1000: /usr/local/lib/python3.14/site-packages
+not writable by uid 1000: /usr/local/lib/python3.14
+not writable by uid 1000: /usr/local
+not writable by uid 1000: /usr/local/bin
+writable by uid 1000: /home/op
+writable by uid 1000: /tmp
+bwrap starts: yes
+host load average { 5.10 2.91 2.70 } at 2026-10-12T16:41:10+0700

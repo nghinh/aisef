@@ -1,0 +1,722 @@
+{
+ "boundary": {
+  "runner": 13,
+  "since": 1791798085.0,
+  "root": "/tmp"
+ },
+ "runner": {
+  "pid": 13,
+  "state": "R",
+  "ppid": 7,
+  "pgid": 7,
+  "sid": 1,
+  "start": 3395,
+  "cmd": "python3 -B /repo/validation/v21/sandbox/linux_guest.py c"
+ },
+ "session_owner": {
+  "controller": 27,
+  "inside": {
+   "client": "2",
+   "sleeper": "3",
+   "pidns": "pid:[4026532970]",
+   "sleeper_sid": "3",
+   "visible": "1 2 3 7"
+  },
+  "sleeper_outside": {
+   "pid": 35,
+   "state": "S",
+   "ppid": 34,
+   "pgid": 35,
+   "sid": 35,
+   "start": 3660,
+   "cmd": "sleep 3600.981463"
+  },
+  "chain_to_runner": [
+   {
+    "pid": 35,
+    "state": "S",
+    "ppid": 34,
+    "pgid": 35,
+    "sid": 35,
+    "start": 3660,
+    "cmd": "sleep 3600.981463"
+   },
+   {
+    "pid": 34,
+    "state": "S",
+    "ppid": 33,
+    "pgid": 33,
+    "sid": 33,
+    "start": 3660,
+    "cmd": "/bin/sh /tmp/c-session/client/opencode run --format json --model fake/model --title S1 --dir /tmp/c-session/work/ws the prompt"
+   },
+   {
+    "pid": 33,
+    "state": "S",
+    "ppid": 30,
+    "pgid": 33,
+    "sid": 33,
+    "start": 3660,
+    "cmd": "/usr/bin/bwrap --unshare-user --unshare-pid --unshare-ipc --unshare-uts --unshare-cgroup-try --share-net --disable-userns --die-with-parent --new-session --cap-"
+   },
+   {
+    "pid": 30,
+    "state": "S",
+    "ppid": 28,
+    "pgid": 28,
+    "sid": 28,
+    "start": 3660,
+    "cmd": "/usr/bin/bwrap --unshare-user --unshare-pid --unshare-ipc --unshare-uts --unshare-cgroup-try --share-net --disable-userns --die-with-parent --new-session --cap-"
+   },
+   {
+    "pid": 28,
+    "state": "S",
+    "ppid": 27,
+    "pgid": 28,
+    "sid": 28,
+    "start": 3650,
+    "cmd": "/usr/local/bin/python3 -P /repo/aisef2/runtime/range_anchor.py"
+   },
+   {
+    "pid": 27,
+    "state": "S",
+    "ppid": 13,
+    "pgid": 7,
+    "sid": 1,
+    "start": 3625,
+    "cmd": "/usr/local/bin/python3 -B /repo/validation/v21/sandbox/linux_guest.py ctl-session {\"base\": \"/tmp/c-session\", \"repo\": \"/tmp/c-session/repo\", \"ws\": \"/tmp/c-sessio"
+   },
+   {
+    "pid": 13,
+    "state": "R",
+    "ppid": 7,
+    "pgid": 7,
+    "sid": 1,
+    "start": 3395,
+    "cmd": "python3 -B /repo/validation/v21/sandbox/linux_guest.py c"
+   }
+  ],
+  "before_kill": [
+   {
+    "pid": 27,
+    "state": "S",
+    "ppid": 13,
+    "pgid": 7,
+    "sid": 1,
+    "start": 3625,
+    "cmd": "/usr/local/bin/python3 -B /repo/validation/v21/sandbox/linux_guest.py ctl-session {\"base\": \"/tmp/c-session\", \"repo\": \"/tmp/c-session/repo\", \"ws\": \"/tmp/c-sessio"
+   },
+   {
+    "pid": 28,
+    "state": "S",
+    "ppid": 27,
+    "pgid": 28,
+    "sid": 28,
+    "start": 3650,
+    "cmd": "/usr/local/bin/python3 -P /repo/aisef2/runtime/range_anchor.py"
+   },
+   {
+    "pid": 30,
+    "state": "S",
+    "ppid": 28,
+    "pgid": 28,
+    "sid": 28,
+    "start": 3660,
+    "cmd": "/usr/bin/bwrap --unshare-user --unshare-pid --unshare-ipc --unshare-uts --unshare-cgroup-try --share-net --disable-userns --die-with-parent --new-session --cap-"
+   },
+   {
+    "pid": 33,
+    "state": "S",
+    "ppid": 30,
+    "pgid": 33,
+    "sid": 33,
+    "start": 3660,
+    "cmd": "/usr/bin/bwrap --unshare-user --unshare-pid --unshare-ipc --unshare-uts --unshare-cgroup-try --share-net --disable-userns --die-with-parent --new-session --cap-"
+   },
+   {
+    "pid": 34,
+    "state": "S",
+    "ppid": 33,
+    "pgid": 33,
+    "sid": 33,
+    "start": 3660,
+    "cmd": "/bin/sh /tmp/c-session/client/opencode run --format json --model fake/model --title S1 --dir /tmp/c-session/work/ws the prompt"
+   },
+   {
+    "pid": 35,
+    "state": "S",
+    "ppid": 34,
+    "pgid": 35,
+    "sid": 35,
+    "start": 3660,
+    "cmd": "sleep 3600.981463"
+   },
+   {
+    "pid": 41,
+    "state": "S",
+    "ppid": 34,
+    "pgid": 33,
+    "sid": 33,
+    "start": 3681,
+    "cmd": "sleep 0.05"
+   }
+  ],
+  "controller_exit": -9,
+  "after_kill": {
+   "seconds": 0.007,
+   "still_alive": [],
+   "zombies": []
+  },
+  "marker_in_table_after": []
+ },
+ "measure_caller": [
+  {
+   "tries_before": [],
+   "try": 0,
+   "caught": true,
+   "sleeper_outside": {
+    "pid": 79,
+    "state": "S",
+    "ppid": 55,
+    "pgid": 79,
+    "sid": 79,
+    "start": 3711,
+    "cmd": "sleep 120.772245"
+   },
+   "chain_to_runner": [
+    {
+     "pid": 79,
+     "state": "S",
+     "ppid": 55,
+     "pgid": 79,
+     "sid": 79,
+     "start": 3711,
+     "cmd": "sleep 120.772245"
+    },
+    {
+     "pid": 55,
+     "state": "S",
+     "ppid": 54,
+     "pgid": 54,
+     "sid": 54,
+     "start": 3710,
+     "cmd": "/bin/sh -c m() { printf '@@aisef-confine %s\\n' \"$*\"; }\nm uid \"$(id -u)\"\nfor n in user pid net ipc uts mnt; do m ns \"$n\" \"$(readlink /proc/self/ns/$n 2>&1)\"; don"
+    },
+    {
+     "pid": 54,
+     "state": "S",
+     "ppid": 53,
+     "pgid": 54,
+     "sid": 54,
+     "start": 3710,
+     "cmd": "/usr/bin/bwrap --unshare-user --unshare-pid --unshare-ipc --unshare-uts --unshare-cgroup-try --share-net --disable-userns --die-with-parent --new-session --cap-"
+    },
+    {
+     "pid": 53,
+     "state": "S",
+     "ppid": 48,
+     "pgid": 7,
+     "sid": 1,
+     "start": 3710,
+     "cmd": "/usr/bin/bwrap --unshare-user --unshare-pid --unshare-ipc --unshare-uts --unshare-cgroup-try --share-net --disable-userns --die-with-parent --new-session --cap-"
+    },
+    {
+     "pid": 48,
+     "state": "S",
+     "ppid": 13,
+     "pgid": 7,
+     "sid": 1,
+     "start": 3683,
+     "cmd": "/usr/local/bin/python3 -B /repo/validation/v21/sandbox/linux_guest.py ctl-measure {\"base\": \"/tmp/c-measure-0-0\", \"repo\": \"/tmp/c-measure-0-0/repo\", \"ws\": \"/tmp/"
+    },
+    {
+     "pid": 13,
+     "state": "R",
+     "ppid": 7,
+     "pgid": 7,
+     "sid": 1,
+     "start": 3395,
+     "cmd": "python3 -B /repo/validation/v21/sandbox/linux_guest.py c"
+    }
+   ],
+   "before_kill": [
+    {
+     "pid": 48,
+     "state": "S",
+     "ppid": 13,
+     "pgid": 7,
+     "sid": 1,
+     "start": 3683,
+     "cmd": "/usr/local/bin/python3 -B /repo/validation/v21/sandbox/linux_guest.py ctl-measure {\"base\": \"/tmp/c-measure-0-0\", \"repo\": \"/tmp/c-measure-0-0/repo\", \"ws\": \"/tmp/"
+    },
+    {
+     "pid": 53,
+     "state": "S",
+     "ppid": 48,
+     "pgid": 7,
+     "sid": 1,
+     "start": 3710,
+     "cmd": "/usr/bin/bwrap --unshare-user --unshare-pid --unshare-ipc --unshare-uts --unshare-cgroup-try --share-net --disable-userns --die-with-parent --new-session --cap-"
+    },
+    {
+     "pid": 54,
+     "state": "S",
+     "ppid": 53,
+     "pgid": 54,
+     "sid": 54,
+     "start": 3710,
+     "cmd": "/usr/bin/bwrap --unshare-user --unshare-pid --unshare-ipc --unshare-uts --unshare-cgroup-try --share-net --disable-userns --die-with-parent --new-session --cap-"
+    },
+    {
+     "pid": 55,
+     "state": "S",
+     "ppid": 54,
+     "pgid": 54,
+     "sid": 54,
+     "start": 3710,
+     "cmd": "/bin/sh -c m() { printf '@@aisef-confine %s\\n' \"$*\"; }\nm uid \"$(id -u)\"\nfor n in user pid net ipc uts mnt; do m ns \"$n\" \"$(readlink /proc/self/ns/$n 2>&1)\"; don"
+    },
+    {
+     "pid": 79,
+     "state": "S",
+     "ppid": 55,
+     "pgid": 79,
+     "sid": 79,
+     "start": 3711,
+     "cmd": "sleep 120.772245"
+    },
+    {
+     "pid": 80,
+     "state": "R",
+     "ppid": 55,
+     "pgid": 54,
+     "sid": 54,
+     "start": 3711,
+     "cmd": "find /usr /etc /tmp/c-measure-0-0/client /tmp/c-measure-0-0/repo/.git /tmp/c-measure-0-0/home/.config/opencode /tmp/c-measure-0-0/m/ws -type s -print"
+    },
+    {
+     "pid": 81,
+     "state": "S",
+     "ppid": 55,
+     "pgid": 54,
+     "sid": 54,
+     "start": 3711,
+     "cmd": "head -n 50"
+    }
+   ],
+   "controller_exit": -9,
+   "after_kill": {
+    "seconds": 0.006,
+    "still_alive": [],
+    "zombies": []
+   },
+   "sleeper_in_table_after": []
+  },
+  {
+   "tries_before": [],
+   "try": 0,
+   "caught": true,
+   "sleeper_outside": {
+    "pid": 119,
+    "state": "S",
+    "ppid": 95,
+    "pgid": 119,
+    "sid": 119,
+    "start": 3741,
+    "cmd": "sleep 120.149845"
+   },
+   "chain_to_runner": [
+    {
+     "pid": 119,
+     "state": "S",
+     "ppid": 95,
+     "pgid": 119,
+     "sid": 119,
+     "start": 3741,
+     "cmd": "sleep 120.149845"
+    },
+    {
+     "pid": 95,
+     "state": "S",
+     "ppid": 94,
+     "pgid": 94,
+     "sid": 94,
+     "start": 3741,
+     "cmd": "/bin/sh -c m() { printf '@@aisef-confine %s\\n' \"$*\"; }\nm uid \"$(id -u)\"\nfor n in user pid net ipc uts mnt; do m ns \"$n\" \"$(readlink /proc/self/ns/$n 2>&1)\"; don"
+    },
+    {
+     "pid": 94,
+     "state": "S",
+     "ppid": 93,
+     "pgid": 94,
+     "sid": 94,
+     "start": 3741,
+     "cmd": "/usr/bin/bwrap --unshare-user --unshare-pid --unshare-ipc --unshare-uts --unshare-cgroup-try --share-net --disable-userns --die-with-parent --new-session --cap-"
+    },
+    {
+     "pid": 93,
+     "state": "S",
+     "ppid": 88,
+     "pgid": 7,
+     "sid": 1,
+     "start": 3741,
+     "cmd": "/usr/bin/bwrap --unshare-user --unshare-pid --unshare-ipc --unshare-uts --unshare-cgroup-try --share-net --disable-userns --die-with-parent --new-session --cap-"
+    },
+    {
+     "pid": 88,
+     "state": "S",
+     "ppid": 13,
+     "pgid": 7,
+     "sid": 1,
+     "start": 3713,
+     "cmd": "/usr/local/bin/python3 -B /repo/validation/v21/sandbox/linux_guest.py ctl-measure {\"base\": \"/tmp/c-measure-1-0\", \"repo\": \"/tmp/c-measure-1-0/repo\", \"ws\": \"/tmp/"
+    },
+    {
+     "pid": 13,
+     "state": "R",
+     "ppid": 7,
+     "pgid": 7,
+     "sid": 1,
+     "start": 3395,
+     "cmd": "python3 -B /repo/validation/v21/sandbox/linux_guest.py c"
+    }
+   ],
+   "before_kill": [
+    {
+     "pid": 88,
+     "state": "S",
+     "ppid": 13,
+     "pgid": 7,
+     "sid": 1,
+     "start": 3713,
+     "cmd": "/usr/local/bin/python3 -B /repo/validation/v21/sandbox/linux_guest.py ctl-measure {\"base\": \"/tmp/c-measure-1-0\", \"repo\": \"/tmp/c-measure-1-0/repo\", \"ws\": \"/tmp/"
+    },
+    {
+     "pid": 93,
+     "state": "S",
+     "ppid": 88,
+     "pgid": 7,
+     "sid": 1,
+     "start": 3741,
+     "cmd": "/usr/bin/bwrap --unshare-user --unshare-pid --unshare-ipc --unshare-uts --unshare-cgroup-try --share-net --disable-userns --die-with-parent --new-session --cap-"
+    },
+    {
+     "pid": 94,
+     "state": "S",
+     "ppid": 93,
+     "pgid": 94,
+     "sid": 94,
+     "start": 3741,
+     "cmd": "/usr/bin/bwrap --unshare-user --unshare-pid --unshare-ipc --unshare-uts --unshare-cgroup-try --share-net --disable-userns --die-with-parent --new-session --cap-"
+    },
+    {
+     "pid": 95,
+     "state": "S",
+     "ppid": 94,
+     "pgid": 94,
+     "sid": 94,
+     "start": 3741,
+     "cmd": "/bin/sh -c m() { printf '@@aisef-confine %s\\n' \"$*\"; }\nm uid \"$(id -u)\"\nfor n in user pid net ipc uts mnt; do m ns \"$n\" \"$(readlink /proc/self/ns/$n 2>&1)\"; don"
+    },
+    {
+     "pid": 119,
+     "state": "S",
+     "ppid": 95,
+     "pgid": 119,
+     "sid": 119,
+     "start": 3741,
+     "cmd": "sleep 120.149845"
+    },
+    {
+     "pid": 120,
+     "state": "R",
+     "ppid": 95,
+     "pgid": 94,
+     "sid": 94,
+     "start": 3741,
+     "cmd": "find /usr /etc /tmp/c-measure-1-0/client /tmp/c-measure-1-0/repo/.git /tmp/c-measure-1-0/home/.config/opencode /tmp/c-measure-1-0/m/ws -type s -print"
+    },
+    {
+     "pid": 121,
+     "state": "S",
+     "ppid": 95,
+     "pgid": 94,
+     "sid": 94,
+     "start": 3741,
+     "cmd": "head -n 50"
+    }
+   ],
+   "controller_exit": -9,
+   "after_kill": {
+    "seconds": 0.006,
+    "still_alive": [],
+    "zombies": []
+   },
+   "sleeper_in_table_after": []
+  },
+  {
+   "tries_before": [],
+   "try": 0,
+   "caught": true,
+   "sleeper_outside": {
+    "pid": 159,
+    "state": "S",
+    "ppid": 135,
+    "pgid": 159,
+    "sid": 159,
+    "start": 3771,
+    "cmd": "sleep 120.256981"
+   },
+   "chain_to_runner": [
+    {
+     "pid": 159,
+     "state": "S",
+     "ppid": 135,
+     "pgid": 159,
+     "sid": 159,
+     "start": 3771,
+     "cmd": "sleep 120.256981"
+    },
+    {
+     "pid": 135,
+     "state": "S",
+     "ppid": 134,
+     "pgid": 134,
+     "sid": 134,
+     "start": 3771,
+     "cmd": "/bin/sh -c m() { printf '@@aisef-confine %s\\n' \"$*\"; }\nm uid \"$(id -u)\"\nfor n in user pid net ipc uts mnt; do m ns \"$n\" \"$(readlink /proc/self/ns/$n 2>&1)\"; don"
+    },
+    {
+     "pid": 134,
+     "state": "S",
+     "ppid": 133,
+     "pgid": 134,
+     "sid": 134,
+     "start": 3770,
+     "cmd": "/usr/bin/bwrap --unshare-user --unshare-pid --unshare-ipc --unshare-uts --unshare-cgroup-try --share-net --disable-userns --die-with-parent --new-session --cap-"
+    },
+    {
+     "pid": 133,
+     "state": "S",
+     "ppid": 128,
+     "pgid": 7,
+     "sid": 1,
+     "start": 3770,
+     "cmd": "/usr/bin/bwrap --unshare-user --unshare-pid --unshare-ipc --unshare-uts --unshare-cgroup-try --share-net --disable-userns --die-with-parent --new-session --cap-"
+    },
+    {
+     "pid": 128,
+     "state": "S",
+     "ppid": 13,
+     "pgid": 7,
+     "sid": 1,
+     "start": 3743,
+     "cmd": "/usr/local/bin/python3 -B /repo/validation/v21/sandbox/linux_guest.py ctl-measure {\"base\": \"/tmp/c-measure-2-0\", \"repo\": \"/tmp/c-measure-2-0/repo\", \"ws\": \"/tmp/"
+    },
+    {
+     "pid": 13,
+     "state": "R",
+     "ppid": 7,
+     "pgid": 7,
+     "sid": 1,
+     "start": 3395,
+     "cmd": "python3 -B /repo/validation/v21/sandbox/linux_guest.py c"
+    }
+   ],
+   "before_kill": [
+    {
+     "pid": 128,
+     "state": "S",
+     "ppid": 13,
+     "pgid": 7,
+     "sid": 1,
+     "start": 3743,
+     "cmd": "/usr/local/bin/python3 -B /repo/validation/v21/sandbox/linux_guest.py ctl-measure {\"base\": \"/tmp/c-measure-2-0\", \"repo\": \"/tmp/c-measure-2-0/repo\", \"ws\": \"/tmp/"
+    },
+    {
+     "pid": 133,
+     "state": "S",
+     "ppid": 128,
+     "pgid": 7,
+     "sid": 1,
+     "start": 3770,
+     "cmd": "/usr/bin/bwrap --unshare-user --unshare-pid --unshare-ipc --unshare-uts --unshare-cgroup-try --share-net --disable-userns --die-with-parent --new-session --cap-"
+    },
+    {
+     "pid": 134,
+     "state": "S",
+     "ppid": 133,
+     "pgid": 134,
+     "sid": 134,
+     "start": 3770,
+     "cmd": "/usr/bin/bwrap --unshare-user --unshare-pid --unshare-ipc --unshare-uts --unshare-cgroup-try --share-net --disable-userns --die-with-parent --new-session --cap-"
+    },
+    {
+     "pid": 135,
+     "state": "S",
+     "ppid": 134,
+     "pgid": 134,
+     "sid": 134,
+     "start": 3771,
+     "cmd": "/bin/sh -c m() { printf '@@aisef-confine %s\\n' \"$*\"; }\nm uid \"$(id -u)\"\nfor n in user pid net ipc uts mnt; do m ns \"$n\" \"$(readlink /proc/self/ns/$n 2>&1)\"; don"
+    },
+    {
+     "pid": 159,
+     "state": "S",
+     "ppid": 135,
+     "pgid": 159,
+     "sid": 159,
+     "start": 3771,
+     "cmd": "sleep 120.256981"
+    },
+    {
+     "pid": 160,
+     "state": "R",
+     "ppid": 135,
+     "pgid": 134,
+     "sid": 134,
+     "start": 3771,
+     "cmd": "find /usr /etc /tmp/c-measure-2-0/client /tmp/c-measure-2-0/repo/.git /tmp/c-measure-2-0/home/.config/opencode /tmp/c-measure-2-0/m/ws -type s -print"
+    },
+    {
+     "pid": 161,
+     "state": "S",
+     "ppid": 135,
+     "pgid": 134,
+     "sid": 134,
+     "start": 3771,
+     "cmd": "head -n 50"
+    }
+   ],
+   "controller_exit": -9,
+   "after_kill": {
+    "seconds": 0.006,
+    "still_alive": [],
+    "zombies": []
+   },
+   "sleeper_in_table_after": []
+  }
+ ],
+ "ps_at_end": [
+  "    PID    PPID    PGID     SID STAT                  STARTED COMMAND",
+  "      1       0       1       1 Ss   Mon Oct 12 09:41:24 2026 /sbin/docker-init -- sh -c mkdir -p /tmp/g; H=/repo/validation/v21/sandbox/linux_guest.py python3 -B $H canary early & setsid python3 -B $H canary early-setsid & (until [ -e /tmp/g/boundary ]; do sleep 0.1; done; sleep 1.5; python3 -B $H canary late & wait) & python3 -B $H \"$0\" c",
+  "      7       1       7       1 S    Mon Oct 12 09:41:24 2026 sh -c mkdir -p /tmp/g; H=/repo/validation/v21/sandbox/linux_guest.py python3 -B $H canary early & setsid python3 -B $H canary early-setsid & (until [ -e /tmp/g/boundary ]; do sleep 0.1; done; sleep 1.5; python3 -B $H canary late & wait) & python3 -B $H \"$0\" c",
+  "      9       7       7       1 S    Mon Oct 12 09:41:24 2026 python3 -B /repo/validation/v21/sandbox/linux_guest.py canary early",
+  "     10       7      10      10 Ss   Mon Oct 12 09:41:24 2026 python3 -B /repo/validation/v21/sandbox/linux_guest.py canary early-setsid",
+  "     11       7       7       1 S    Mon Oct 12 09:41:24 2026 sh -c mkdir -p /tmp/g; H=/repo/validation/v21/sandbox/linux_guest.py python3 -B $H canary early & setsid python3 -B $H canary early-setsid & (until [ -e /tmp/g/boundary ]; do sleep 0.1; done; sleep 1.5; python3 -B $H canary late & wait) & python3 -B $H \"$0\" c",
+  "     13       7       7       1 S    Mon Oct 12 09:41:24 2026 python3 -B /repo/validation/v21/sandbox/linux_guest.py c",
+  "     20      11       7       1 S    Mon Oct 12 09:41:26 2026 python3 -B /repo/validation/v21/sandbox/linux_guest.py canary late",
+  "    162      13       7       1 R    Mon Oct 12 09:41:28 2026 ps -A -o pid,ppid,pgid,sid,stat,lstart,args"
+ ],
+ "foreign": {
+  "claimed_pids": [
+   1,
+   7,
+   9,
+   10,
+   20
+  ],
+  "claimed_groups": [
+   1,
+   7,
+   10
+  ],
+  "host_rows": {
+   "1": {
+    "pid": 1,
+    "ppid": 0,
+    "pgid": 1,
+    "born": 1791798084.0,
+    "command": "/sbin/docker-init -- sh -c mkdir -p /tmp/g; H=/repo/validation/v21/sandbox/linux_guest.py python3 -B $H canary early & setsid python3 -B $H canary early-setsid & (until [ -e /tmp/g/boundary ]; do sleep 0.1; done; sleep 1.5; python3 -B $H canary late & wait) & python3 -B $H \"$0\" c"
+   },
+   "7": {
+    "pid": 7,
+    "ppid": 1,
+    "pgid": 7,
+    "born": 1791798084.0,
+    "command": "sh -c mkdir -p /tmp/g; H=/repo/validation/v21/sandbox/linux_guest.py python3 -B $H canary early & setsid python3 -B $H canary early-setsid & (until [ -e /tmp/g/boundary ]; do sleep 0.1; done; sleep 1.5; python3 -B $H canary late & wait) & python3 -B $H \"$0\" c"
+   },
+   "9": {
+    "pid": 9,
+    "ppid": 7,
+    "pgid": 7,
+    "born": 1791798084.0,
+    "command": "python3 -B /repo/validation/v21/sandbox/linux_guest.py canary early"
+   },
+   "10": {
+    "pid": 10,
+    "ppid": 7,
+    "pgid": 10,
+    "born": 1791798084.0,
+    "command": "python3 -B /repo/validation/v21/sandbox/linux_guest.py canary early-setsid"
+   },
+   "20": {
+    "pid": 20,
+    "ppid": 11,
+    "pgid": 7,
+    "born": 1791798086.0,
+    "command": "python3 -B /repo/validation/v21/sandbox/linux_guest.py canary late"
+   }
+  },
+  "signalled": [],
+  "unproven": [
+   {
+    "kind": "group",
+    "id": 1,
+    "why": "born before the boundary or not a descendant of the runner"
+   },
+   {
+    "kind": "group",
+    "id": 7,
+    "why": "born before the boundary or not a descendant of the runner"
+   },
+   {
+    "kind": "group",
+    "id": 10,
+    "why": "born before the boundary or not a descendant of the runner"
+   },
+   {
+    "kind": "pid",
+    "id": 1,
+    "why": "born before the boundary or not a descendant of the runner"
+   },
+   {
+    "kind": "pid",
+    "id": 7,
+    "why": "born before the boundary or not a descendant of the runner"
+   },
+   {
+    "kind": "pid",
+    "id": 9,
+    "why": "born before the boundary or not a descendant of the runner"
+   },
+   {
+    "kind": "pid",
+    "id": 10,
+    "why": "born before the boundary or not a descendant of the runner"
+   },
+   {
+    "kind": "pid",
+    "id": 20,
+    "why": "born before the boundary or not a descendant of the runner"
+   }
+  ],
+  "canaries_after": {
+   "early": {
+    "pid": 9,
+    "alive_same_start": true,
+    "signals_received": []
+   },
+   "early-setsid": {
+    "pid": 10,
+    "alive_same_start": true,
+    "signals_received": []
+   },
+   "late": {
+    "pid": 20,
+    "alive_same_start": true,
+    "signals_received": []
+   }
+  }
+ }
+}
