@@ -1,0 +1,24 @@
+HEAD 76e92e878746c12ef89f46ac01a95ba6da327609 dirty: [] free 36 GiB
+=== sweep 2026-10-12 11:13:24
+242 pairs, 29 null mutants, 140 kill files
+PASS aisef2/app/adapters.py|5d64908c140098e6|tests/v2/test_v21_kills3_R07.py  (6.6s)
+PASS aisef2/app/bundle_cli.py|2e36034056944ab8|tests/v2/test_v21_kills3_R04.py  (2.4s)
+PASS aisef2/app/confine.py|4dfe3672fd65da0c|tests/v2/test_v21_kills3_R02.py  (5.3s)
+PASS aisef2/app/lineage.py|db4567fff5087e65|tests/v2/test_v21_continue_integrity.py  (234.6s)
+PASS aisef2/app/lineage.py|db4567fff5087e65|tests/v2/test_v21_continue_usage.py  (85.2s)
+PASS aisef2/app/lineage.py|db4567fff5087e65|tests/v2/test_v21_defects_lineage2.py  (6.6s)
+PASS aisef2/app/lineage.py|db4567fff5087e65|tests/v2/test_v21_defects_verify.py  (51.6s)
+PASS aisef2/app/lineage.py|db4567fff5087e65|tests/v2/test_v21_kills3_A08.py  (8.7s)
+PASS aisef2/app/lineage.py|db4567fff5087e65|tests/v2/test_v21_kills3_A09.py  (4.4s)
+PASS aisef2/app/lineage.py|db4567fff5087e65|tests/v2/test_v21_kills3_R03.py  (4.3s)
+PASS aisef2/app/lineage.py|db4567fff5087e65|tests/v2/test_v21_kills3_T08a.py  (8.3s)
+PASS aisef2/app/lineage.py|db4567fff5087e65|tests/v2/test_v21_kills3_T08b.py  (4.6s)
+PASS aisef2/app/lineage.py|db4567fff5087e65|tests/v2/test_v21_kills3_T09a.py  (4.1s)
+PASS aisef2/app/lineage.py|db4567fff5087e65|tests/v2/test_v21_kills3_T09b.py  (4.7s)
+PASS aisef2/app/lineage.py|db4567fff5087e65|tests/v2/test_v21_kills3_T09c.py  (4.1s)
+PASS aisef2/app/lineage.py|db4567fff5087e65|tests/v2/test_v21_kills_lineage.py  (3.2s)
+PASS aisef2/app/usage.py|2e79cb9e686cff05|tests/v2/test_v21_kills3_R05.py  (3.9s)
+PASS aisef2/app/verify.py|9a7140dbdbd1a4b8|tests/v2/test_v21_kills3_R01.py  (3.5s)
+sweep RC 0
+HEAD after 76e92e878746c12ef89f46ac01a95ba6da327609 dirty: []
+=== DONE 2026-10-12 11:20:55
