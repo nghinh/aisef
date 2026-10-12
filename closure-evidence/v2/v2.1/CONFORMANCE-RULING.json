@@ -1,0 +1,821 @@
+{
+ "record": "AISEF V2.1 — CONFORMANCE RULING (B-03d): 2.1's behaviour changes against the historical C2-ORCHESTRATION-CONFORMANCE-REPAIR record",
+ "id": "AISEF-V2.1-CONFORMANCE-RULING",
+ "authority": {
+  "decision": {
+   "path": "closure-evidence/v2/cycle2/RELEASE-DECISIONS.json",
+   "seq": 5,
+   "id": "AISEF_V2_1_B03_REQUALIFICATION_ROUND",
+   "part": "B-03d",
+   "approver": "human:owner",
+   "decision": "a ruling naming 2.1's behaviour changes and a new Q5 corpus; 2.0's corpus, rulings and evidence kept"
+  },
+  "owner_text": [
+   "B-03d — Conformance và Q5\nCho phép tạo ruling nêu rõ thay đổi hành vi của 2.1 và corpus Q5 mới tương ứng. Giữ nguyên corpus, ruling và evidence của 2.0.\nMỗi thay đổi kỳ vọng phải truy được tới requirement/quyết định đã duyệt và bằng chứng hành vi; không sửa kỳ vọng chỉ để test xanh.",
+   "Không bỏ test, giảm assertion, thêm skip/xfail hoặc nới oracle để đạt PASS."
+  ],
+  "quoted_verbatim": true,
+  "not_authorized_by_the_decision": "B-02 (2.0.1 release), B-04, B-08, B-09, B-10; any push, tag, publish, deploy or paid provider call; a 2.1 release or RC freeze; any new owner acceptance of the C2-P5 boundary — each still the owner's own decision"
+ },
+ "recorded_by": "engineering: written by validation/qualification/v21_conformance_ruling.py --write from this tree and the per-file reasons stated in it; the owner authorized a ruling (B-03d) and did not write or sign this file",
+ "historical_record": "closure-evidence/v2/cycle2/C2-ORCHESTRATION-CONFORMANCE-REPAIR.json",
+ "conformance": {
+  "rule": "one row per file c2_orchestration_repair.check reports under (d) that 2.1 changed (its LF sha256 at v2.0.0 ca2631374602da45dae75b7f6907ff4729d0b2f7 is not its sha256 now). release_differences accepts such a (d) finding when the file is in its V2.0 list (by path, as in 2.0: v2_0_list) or this committed ruling names it AND the file's LF sha256 is the row's sha256_2_1; --check binds every row, V2.0-listed or not, to its bytes; no ruling, nothing new is accepted",
+  "since": "610a5935281fd01a707e035bef33499569fdbb15",
+  "v2_0_0": "ca2631374602da45dae75b7f6907ff4729d0b2f7",
+  "rows": [
+   {
+    "path": "aisef2/orchestrate/adapters.py",
+    "sha256_v2_0_0": "ad7e8dd66b5c3571f9da6dbc84931291b359afd128e0f04e5dd60571da7b865a",
+    "sha256_2_1": "dc69ebab3c64f1d2e37f8a5c7db5b652093f6b7fc3ea39c0200f3d23fd7ee1e1",
+    "commits_2_1": [
+     {
+      "commit": "e89743763a4c995961de4d767d65232e3bf93e56",
+      "subject": "v2.1(C): a review finding is acted on only when the kernel's own probe reproduces it — the bounded fix loop; Open Code Review pinned as a finder whose coverage AISEF checks"
+     }
+    ],
+    "v2_0_list": "B4",
+    "change": "Finding.detail (default ''): what a finding states, journaled on its gate row; it never decides (Finding.blocks is still blocking and corroborated)",
+    "backlog": "docs/v2.1/STATUS.md §2 C1, C3 (e897437)",
+    "owner_approval": "none of its own: an engineering change (docs/v2.1/ADR-V2.1.md ADR-7); B-03d authorizes this ruling to name it, not the change",
+    "requirement": "RFC §25: a blocking decision MUST NOT rest on a model reviewer alone (D-002); each finding is a gate/check row",
+    "behaviour_tests": [
+     "tests.v2.test_p6_stages.Adapters.test_a_finding_blocks_only_when_blocking_and_corroborated",
+     "tests.v2.test_v21_review.ProductPath.test_without_a_review_policy_the_same_review_is_advisory_as_in_2_0_0",
+     "tests.v2.test_v21_review_chain.FixLoop.test_a_correct_anchored_finding_is_fixed_before_the_merge"
+    ]
+   },
+   {
+    "path": "aisef2/orchestrate/review.py",
+    "sha256_v2_0_0": "e69618688509735fd241f507f44a58d8e7730ab7a940a2b810039cefcc073f20",
+    "sha256_2_1": "154f4a6bfa45b20868d7f080eede1d4a8d884dadbe5997487ebd506afa878c06",
+    "commits_2_1": [
+     {
+      "commit": "e89743763a4c995961de4d767d65232e3bf93e56",
+      "subject": "v2.1(C): a review finding is acted on only when the kernel's own probe reproduces it — the bounded fix loop; Open Code Review pinned as a finder whose coverage AISEF checks"
+     }
+    ],
+    "v2_0_list": null,
+    "change": "a finding's gate row detail is 2.0's text followed by ' — <the finding's detail>' when it has one; the row's pass/fail and the REVIEW_FINDING failure are 2.0's",
+    "backlog": "docs/v2.1/STATUS.md §2 C1, C3 (e897437)",
+    "owner_approval": "none of its own: an engineering change (docs/v2.1/ADR-V2.1.md ADR-7); B-03d authorizes this ruling to name it, not the change",
+    "requirement": "RFC §25: a blocking decision MUST NOT rest on a model reviewer alone (D-002); each finding is a gate/check row",
+    "behaviour_tests": [
+     "tests.v2.test_p6_stages.Review.test_no_finding_is_one_passing_row_and_an_advisory_finding_alone_never_blocks",
+     "tests.v2.test_v21_review.ProductPath.test_fix_loop_does_not_block_a_confirmed_finding_its_clause_does_not_anchor",
+     "tests.v2.test_v21_review_chain.FixLoop.test_a_correct_anchored_finding_is_fixed_before_the_merge",
+     "tests.v2.test_v21_review_chain.FixLoop.test_the_fix_rounds_spent_with_the_defect_left_roll_back"
+    ]
+   },
+   {
+    "path": "aisef2/orchestrate/story_runner.py",
+    "sha256_v2_0_0": "30c64e6b343e993171d2bdf8d3b0cd2b16514a62622c35f398260376493a24d5",
+    "sha256_2_1": "db394816ee96297205094282647c5896bf3a417c9ebd1ba04f15dd32fe70a4d0",
+    "commits_2_1": [
+     {
+      "commit": "91a89684e6c5a3ed7f2cf5fc52ef955d3a661cde",
+      "subject": "v2.1(B, V21-38): a committed story's PRESERVE obligation the candidate breaks is the developer's — proved at the candidate, fed back, retryable, never merged"
+     },
+     {
+      "commit": "919a271ecfca246381b1de036a874f3b6935c0be",
+      "subject": "v2.1(A+B, V2-007): probes run on the kernel's interpreter with -I -S, tests on their own venv; a spec binds the probe's capability, a calibration the bytes that run; `aisef bundle migrate`"
+     },
+     {
+      "commit": "4ea4276c3b16351e8260d9940d258d8b7253ae8c",
+      "subject": "v2.1(A): the diff failure's gate row is the candidate stage's — it follows the move it rests on (fixes 51c5241)"
+     },
+     {
+      "commit": "51c524106b923076dd00e7d28b5dda99871fd334",
+      "subject": "v2.1(A): a git diff the story runner cannot read is RESOURCE_ACQUISITION_FAILED (ENVIRONMENT), not an InvariantError that ends the run"
+     }
+    ],
+    "v2_0_list": "B7",
+    "change": "V21-38 (91a8968): every PRESERVE obligation of a committed story the change could affect (merge.affected_preserve) is proved at the CANDIDATE: CONTRACT_UNSATISFIED, DEVELOPER, retryable, never merged; the post-merge re-proof stays, for what the merge itself changes (INTEGRATION). A8 (51c5241, 4ea4276): a candidate diff git cannot produce is RESOURCE_ACQUISITION_FAILED (ENVIRONMENT) on the 'candidate' gate row. A1 (919a271): StoryInputs.test_interpreter — the developer's tests run on their own interpreter, never the probes'",
+    "backlog": "docs/v2.1/STATUS.md §2 B1 (V21-38, 91a8968); §1 A8 (51c5241, 4ea4276); §1 A1 (919a271)",
+    "owner_approval": "none of its own: an engineering change (docs/v2.1/ADR-V2.1.md ADR-4 for V21-38, ADR-1 for A1; STATUS §1 A8); B-03d authorizes this ruling to name it, not the change",
+    "requirement": "RFC §10.3: CANDIDATE x UNSATISFIED, any admitted role — owner DEVELOPER; §22.1: CONTRACT_UNSATISFIED DEVELOPER RETRYABLE; §26: the post-merge re-proof of prior PRESERVE obligations (INTEGRATION) kept; §17.1: RESOURCE_ACQUISITION_FAILED (ENVIRONMENT, retryable)",
+    "behaviour_tests": [
+     "tests.v2.test_v21_orchestration.PreserveAtCandidate.test_a_regression_the_developer_made_is_the_developer_s_and_never_merged",
+     "tests.v2.test_v21_orchestration.PreserveAtCandidate.test_a_retry_that_repairs_it_commits",
+     "tests.v2.test_v21_orchestration.PreserveAtCandidate.test_a_story_with_no_committed_predecessor_proves_only_its_own",
+     "tests.v2.test_c2_orchestration_conformance.ReproofOfAnotherKind.test_a_regression_of_the_prior_spec_of_another_kind_is_the_developer_s_at_the_candidate_and_never_merged",
+     "tests.v2.test_p6_orchestration.Orchestration.test_ORCH_9_and_10_a_post_merge_regression_of_a_prior_PRESERVE_obligation_is_INTEGRATION_and_rolled_back",
+     "tests.v2.test_v21_orchestration.DiffFailure.test_a_diff_git_cannot_produce_is_RESOURCE_ACQUISITION_FAILED",
+     "tests.v2.test_v21_orchestration.DiffFailure.test_a_retry_budget_takes_the_story_to_its_next_attempt",
+     "tests.v2.test_v21_identity_bytes.PthChannel.test_the_run_gives_the_probes_this_interpreter_and_the_tests_their_own"
+    ]
+   },
+   {
+    "path": "aisef2/orchestrate/workspace.py",
+    "sha256_v2_0_0": "a3bb637d401557b8f1578c1e49b6b8a495d47e5dcc678736b07eaf6cd5737d21",
+    "sha256_2_1": "aa5ff45302d77f6f76b6c15e4bc1b7d0758fec8c85c68c980e7ac6b17b1cdb20",
+    "commits_2_1": [
+     {
+      "commit": "51c524106b923076dd00e7d28b5dda99871fd334",
+      "subject": "v2.1(A): a git diff the story runner cannot read is RESOURCE_ACQUISITION_FAILED (ENVIRONMENT), not an InvariantError that ends the run"
+     }
+    ],
+    "v2_0_list": "B4, B6, B7",
+    "change": "GitWorkspace.diff: git exiting non-zero raises ResourceUnavailable (2.0: InvariantError, which ended the run as a kernel defect)",
+    "backlog": "docs/v2.1/STATUS.md §1 A8 (51c5241)",
+    "owner_approval": "none of its own: an engineering change (docs/v2.1/STATUS.md §1 A8); B-03d authorizes this ruling to name it, not the change",
+    "requirement": "RFC §17.1: a resource the scope could not acquire is RESOURCE_ACQUISITION_FAILED (ENVIRONMENT, retryable), from the typed outcome; §22.1",
+    "behaviour_tests": [
+     "tests.v2.test_p6_stages.Workspace.test_checkouts_are_detached_worktrees_at_a_full_sha_moved_and_released_through_git",
+     "tests.v2.test_v21_orchestration.DiffFailure.test_a_diff_git_cannot_produce_is_RESOURCE_ACQUISITION_FAILED"
+    ]
+   },
+   {
+    "path": "aisef2/probe/calibration.py",
+    "sha256_v2_0_0": "562ff1f1ac98884db7fd72b29f12be38678a751d673fcfc232b389e802c1d00c",
+    "sha256_2_1": "ab47bbdee89157970b66e60425a160a7313cab5bb9f4a15f1f25ff0683ca2ef4",
+    "commits_2_1": [
+     {
+      "commit": "919a271ecfca246381b1de036a874f3b6935c0be",
+      "subject": "v2.1(A+B, V2-007): probes run on the kernel's interpreter with -I -S, tests on their own venv; a spec binds the probe's capability, a calibration the bytes that run; `aisef bundle migrate`"
+     }
+    ],
+    "v2_0_list": null,
+    "change": "executing(probe): a ProbeCapabilityCalibration binds the digest of the bytes that ran (EXECUTION_DIGEST); calibration_for matches on it, so a byte change admits nothing until it is calibrated again",
+    "backlog": "docs/v2.1/STATUS.md §2 B6 (919a271)",
+    "owner_approval": "ARCHITECTURE-EXCEPTION-V2-007 APPROVED by the owner (B-01, RELEASE-DECISIONS seq 4); applied in 919a271 before that approval (closure-evidence/v2/v2.1/ARCHITECTURE-EXCEPTION-V2-007.json says so)",
+    "requirement": "RFC §9.1.1 (amended V2-007): ProbeCapabilityCalibration.probe_digest is the bytes that ran; §12 check 9",
+    "behaviour_tests": [
+     "tests.v2.test_v21_identity_bytes.ThreeIdentities.test_calibrations_of_other_bytes_admit_nothing",
+     "tests.v2.test_v21_identity.ThreeIdentities.test_calibrations_bound_to_the_bytes_that_run_admit_and_other_bytes_admit_nothing",
+     "tests.v2.test_v21_identity_bytes.ThreeIdentities.test_the_shipped_calibrations_name_every_class_at_the_bytes_that_run_now",
+     "tests.v2.test_v21_identity.ThreeIdentities.test_the_cycle1_probe_keeps_its_one_frozen_digest"
+    ]
+   },
+   {
+    "path": "aisef2/probe/cli_invocation.py",
+    "sha256_v2_0_0": "1a46991ffb84395f37aced671478cecab4ec58ad7ba1d0eb9892028ee57f61c4",
+    "sha256_2_1": "d13f62cd66bf88c6548de971941d00eedd2e1b0837d9fe4c3ad13dbd2ac4f0b0",
+    "commits_2_1": [
+     {
+      "commit": "919a271ecfca246381b1de036a874f3b6935c0be",
+      "subject": "v2.1(A+B, V2-007): probes run on the kernel's interpreter with -I -S, tests on their own venv; a spec binds the probe's capability, a calibration the bytes that run; `aisef bundle migrate`"
+     }
+    ],
+    "v2_0_list": "B1, B1-BLOCKS-STOP-001",
+    "change": "V2-007 (919a271): CAPABILITY_VERSION; EXECUTION_DIGEST = the 2.0 source digest (the bytes that run); DIGEST = sha256(json([PROBE_ID, CAPABILITY_VERSION, CLASSES])), what a spec binds. A1 (919a271): every launch carries -S (-I does not disable site: a .pth written by test code ran inside a probe)",
+    "backlog": "docs/v2.1/STATUS.md §2 B6 and §1 A1 (919a271)",
+    "owner_approval": "ARCHITECTURE-EXCEPTION-V2-007 APPROVED by the owner (B-01, RELEASE-DECISIONS seq 4); applied in 919a271 before that approval (closure-evidence/v2/v2.1/ARCHITECTURE-EXCEPTION-V2-007.json says so); A1 (-S): none of its own: an engineering change (docs/v2.1/ADR-V2.1.md ADR-1, a security fix); B-03d authorizes this ruling to name it, not the change",
+    "requirement": "RFC §5.1, §8, §35 (amended V2-007): a spec binds the probe's capability; §23: the RunSpec binds each probe's executed bytes; -S: ADR-1 (no RFC clause)",
+    "behaviour_tests": [
+     "tests.v2.test_v21_identity.ThreeIdentities.test_a_spec_binds_the_capability_and_the_bytes_are_their_own_digest",
+     "tests.v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes",
+     "tests.v2.test_v21_identity_bytes.PthChannel.test_every_active_probe_launch_carries_minus_S",
+     "tests.v2.test_v21_identity.ThreeIdentities.test_every_active_probe_launch_starts_minus_I_minus_S_minus_B",
+     "tests.v2.test_v21_identity.PthChannel.test_a_probe_on_an_interpreter_holding_a_pth_never_runs_it"
+    ]
+   },
+   {
+    "path": "aisef2/probe/file_artifact.py",
+    "sha256_v2_0_0": "02163b8f33074071c9915d41e01f90c8931e3f7ef563559bb3beea9c55b6dae0",
+    "sha256_2_1": "21ac55fd79ae6a5f814044394ea0033445d73378e2c8f17ef16c4d32edf0583b",
+    "commits_2_1": [
+     {
+      "commit": "06d4e62c0b0666506cd95d663dfa8d3300e060a4",
+      "subject": "v2.1(B, V21-37): file_artifact python_imports — imports counted by syntax, never by a line regex; the revised LedgerLock criterion as an unapproved draft"
+     },
+     {
+      "commit": "919a271ecfca246381b1de036a874f3b6935c0be",
+      "subject": "v2.1(A+B, V2-007): probes run on the kernel's interpreter with -I -S, tests on their own venv; a spec binds the probe's capability, a calibration the bytes that run; `aisef bundle migrate`"
+     }
+    ],
+    "v2_0_list": null,
+    "change": "V2-007 (919a271): DIGEST is the capability digest, EXECUTION_DIGEST the bytes. V21-37 (06d4e62): the class python_imports (imports counted by syntax, never by a line regex), CAPABILITY_VERSION 2",
+    "backlog": "docs/v2.1/STATUS.md §2 B6 (919a271); §2 B3, V21-37 (06d4e62)",
+    "owner_approval": "ARCHITECTURE-EXCEPTION-V2-007 APPROVED by the owner (B-01, RELEASE-DECISIONS seq 4); applied in 919a271 before that approval (closure-evidence/v2/v2.1/ARCHITECTURE-EXCEPTION-V2-007.json says so); V21-37: NOT owner-approved — none of its own: an engineering change (docs/v2.1/ADR-V2.1.md ADR-5); B-03d authorizes this ruling to name it, not the change; the revised LedgerLock contract that would use python_imports is an unapproved draft (STATUS §2 B3)",
+    "requirement": "RFC §8 and §35 (amended V2-007): a spec binds the probe's capability, a new observation class is a new capability version; §9.1.1",
+    "behaviour_tests": [
+     "tests.v2.test_v21_identity.ThreeIdentities.test_a_spec_binds_the_capability_and_the_bytes_are_their_own_digest",
+     "tests.v2.test_v21_python_imports.Controls.test_the_approved_regex_reproduces_the_false_rollback",
+     "tests.v2.test_v21_python_imports.Controls.test_each_draft_holds_on_the_smoke2_shape_and_refutes_a_real_import",
+     "tests.v2.test_v21_python_imports.Controls.test_a_file_that_does_not_parse_is_no_count",
+     "tests.v2.test_v21_python_imports.Controls.test_the_grammar_is_closed"
+    ]
+   },
+   {
+    "path": "aisef2/probe/process_effect.py",
+    "sha256_v2_0_0": "a47eed87bf5b908acb33e1d205e31580f68973ea5be33b151db095f4a75872fa",
+    "sha256_2_1": "7b5d60cef52e96dcb0a9f5dfd915f43802850a926592c41d7920610dc250aa3c",
+    "commits_2_1": [
+     {
+      "commit": "919a271ecfca246381b1de036a874f3b6935c0be",
+      "subject": "v2.1(A+B, V2-007): probes run on the kernel's interpreter with -I -S, tests on their own venv; a spec binds the probe's capability, a calibration the bytes that run; `aisef bundle migrate`"
+     }
+    ],
+    "v2_0_list": "B1, B1-BLOCKS-STOP-001",
+    "change": "V2-007 (919a271): CAPABILITY_VERSION; EXECUTION_DIGEST = the 2.0 source digest (the bytes that run); DIGEST = sha256(json([PROBE_ID, CAPABILITY_VERSION, CLASSES])), what a spec binds. A1 (919a271): every launch carries -S (-I does not disable site: a .pth written by test code ran inside a probe)",
+    "backlog": "docs/v2.1/STATUS.md §2 B6 and §1 A1 (919a271)",
+    "owner_approval": "ARCHITECTURE-EXCEPTION-V2-007 APPROVED by the owner (B-01, RELEASE-DECISIONS seq 4); applied in 919a271 before that approval (closure-evidence/v2/v2.1/ARCHITECTURE-EXCEPTION-V2-007.json says so); A1 (-S): none of its own: an engineering change (docs/v2.1/ADR-V2.1.md ADR-1, a security fix); B-03d authorizes this ruling to name it, not the change",
+    "requirement": "RFC §5.1, §8, §35 (amended V2-007): a spec binds the probe's capability; §23: the RunSpec binds each probe's executed bytes; -S: ADR-1 (no RFC clause)",
+    "behaviour_tests": [
+     "tests.v2.test_v21_identity.ThreeIdentities.test_a_spec_binds_the_capability_and_the_bytes_are_their_own_digest",
+     "tests.v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes",
+     "tests.v2.test_v21_identity_bytes.PthChannel.test_every_active_probe_launch_carries_minus_S",
+     "tests.v2.test_v21_identity.ThreeIdentities.test_every_active_probe_launch_starts_minus_I_minus_S_minus_B",
+     "tests.v2.test_v21_identity.PthChannel.test_a_probe_on_an_interpreter_holding_a_pth_never_runs_it"
+    ]
+   },
+   {
+    "path": "aisef2/probe/python_callable_v2.py",
+    "sha256_v2_0_0": "5e34d4bc02d87dc547e789488af321151fac8e69b5c39ca3e846b286c3bee241",
+    "sha256_2_1": "5237cfa7ba128c0403f3cbd9d8a842e1be3afa2ff2d7066d43a4a28633f77e0a",
+    "commits_2_1": [
+     {
+      "commit": "919a271ecfca246381b1de036a874f3b6935c0be",
+      "subject": "v2.1(A+B, V2-007): probes run on the kernel's interpreter with -I -S, tests on their own venv; a spec binds the probe's capability, a calibration the bytes that run; `aisef bundle migrate`"
+     }
+    ],
+    "v2_0_list": "B1, B1-BLOCKS-STOP-001",
+    "change": "V2-007 (919a271): CAPABILITY_VERSION; EXECUTION_DIGEST = the 2.0 source digest (the bytes that run); DIGEST = sha256(json([PROBE_ID, CAPABILITY_VERSION, CLASSES])), what a spec binds. A1 (919a271): every launch carries -S (-I does not disable site: a .pth written by test code ran inside a probe)",
+    "backlog": "docs/v2.1/STATUS.md §2 B6 and §1 A1 (919a271)",
+    "owner_approval": "ARCHITECTURE-EXCEPTION-V2-007 APPROVED by the owner (B-01, RELEASE-DECISIONS seq 4); applied in 919a271 before that approval (closure-evidence/v2/v2.1/ARCHITECTURE-EXCEPTION-V2-007.json says so); A1 (-S): none of its own: an engineering change (docs/v2.1/ADR-V2.1.md ADR-1, a security fix); B-03d authorizes this ruling to name it, not the change",
+    "requirement": "RFC §5.1, §8, §35 (amended V2-007): a spec binds the probe's capability; §23: the RunSpec binds each probe's executed bytes; -S: ADR-1 (no RFC clause)",
+    "behaviour_tests": [
+     "tests.v2.test_v21_identity.ThreeIdentities.test_a_spec_binds_the_capability_and_the_bytes_are_their_own_digest",
+     "tests.v2.test_v21_identity.ThreeIdentities.test_the_runspec_binds_each_probe_s_bytes",
+     "tests.v2.test_v21_identity_bytes.PthChannel.test_every_active_probe_launch_carries_minus_S",
+     "tests.v2.test_v21_identity.ThreeIdentities.test_every_active_probe_launch_starts_minus_I_minus_S_minus_B",
+     "tests.v2.test_v21_identity.PthChannel.test_a_probe_on_an_interpreter_holding_a_pth_never_runs_it"
+    ]
+   },
+   {
+    "path": "tests/v2/test_c2_orchestration_conformance.py",
+    "sha256_v2_0_0": "bf4ebfdf6dbbb3505d28eadcc942205d647d8c4a062a5da3d472bed49a2fd902",
+    "sha256_2_1": "864774cb7a9b6b3bf677a95c04a95394414f6b88c62a0db463940450b029bb5a",
+    "commits_2_1": [
+     {
+      "commit": "cd36de8cbb6674b8f68a814ff33661d41a291b33",
+      "subject": "v2.1(B-03d): a V2.0-named change is accepted by name only at its v2.0.0 bytes; one 2.1 changed again needs the ruling"
+     },
+     {
+      "commit": "2d89b8e21a24e4542cb9b24ff5ec3dd428ad585a",
+      "subject": "v2.1(B-03d, L3c): the 2.1 conformance ruling's generator; release_differences accepts a 2.1 change only as the committed ruling names it, by content, and gates (e) on B-03a's history and re-verification; the cycle-2 record is never re-written on 2.1"
+     },
+     {
+      "commit": "91a89684e6c5a3ed7f2cf5fc52ef955d3a661cde",
+      "subject": "v2.1(B, V21-38): a committed story's PRESERVE obligation the candidate breaks is the developer's — proved at the candidate, fed back, retryable, never merged"
+     }
+    ],
+    "v2_0_list": "probe-identity re-binding; this rule",
+    "change": "91a8968: ReproofOfAnotherKind's regression case re-aimed to V21-38 (the developer's at the candidate, never merged), each assertion kept. B-03d: test_15 names this ruling; test_15b accepts a 2.1 change only as this ruling names it, by content, and gates (e) on B-03a's history and re-verification",
+    "backlog": "docs/v2.1/STATUS.md §2 B1 (V21-38, 91a8968); owner B-03d",
+    "owner_approval": "V21-38: none of its own: an engineering change (docs/v2.1/ADR-V2.1.md ADR-4); B-03d authorizes this ruling to name it, not the change; test_15/test_15b: owner B-03d (RELEASE-DECISIONS seq 5), this ruling",
+    "requirement": "RFC §10.3 and §26 (as story_runner.py); the owner's B-03d text: every changed expectation traced to an approved requirement or decision and to behaviour evidence, none changed only to pass",
+    "behaviour_tests": [
+     "tests.v2.test_c2_orchestration_conformance.ReproofOfAnotherKind.test_a_regression_of_the_prior_spec_of_another_kind_is_the_developer_s_at_the_candidate_and_never_merged",
+     "tests.v2.test_c2_orchestration_conformance.Record.test_15b_only_the_release_s_named_changes_are_accepted_each_while_its_gate_holds"
+    ]
+   },
+   {
+    "path": "validation/qualification/c2_orchestration_repair.py",
+    "sha256_v2_0_0": "8bd56ae02d7ea0337c7944356334ea65658bc0dfeb48d5943542c7456c087995",
+    "sha256_2_1": "baf6e0cfe69d88d8dfc70e1aaabf8358290f61870bab2e20244bc2763d15af9b",
+    "commits_2_1": [
+     {
+      "commit": "cd36de8cbb6674b8f68a814ff33661d41a291b33",
+      "subject": "v2.1(B-03d): a V2.0-named change is accepted by name only at its v2.0.0 bytes; one 2.1 changed again needs the ruling"
+     },
+     {
+      "commit": "2d89b8e21a24e4542cb9b24ff5ec3dd428ad585a",
+      "subject": "v2.1(B-03d, L3c): the 2.1 conformance ruling's generator; release_differences accepts a 2.1 change only as the committed ruling names it, by content, and gates (e) on B-03a's history and re-verification; the cycle-2 record is never re-written on 2.1"
+     }
+    ],
+    "v2_0_list": null,
+    "change": "B-03d: release_differences accepts a 2.1 change only as this ruling names it, by content, and gates (e) on p5_acceptance.history_problems and reverification_problems (B-03a) instead of p5_acceptance.check; write() and the (b) job refuse before measuring once q5.CORPUS lacks a Cycle-1 item (cycle1_items_refusal): the record is cycle-2 history",
+    "backlog": "owner B-03d and B-03a (RELEASE-DECISIONS seq 5)",
+    "owner_approval": "owner B-03d (this ruling); B-03a (no engine-digest tolerance, no rebind mapping hiding unverified behaviour) sets the (e) gate",
+    "requirement": "the owner's B-03d text (2.0's corpus, rulings and evidence kept; every changed expectation traced) and B-03a's",
+    "behaviour_tests": [
+     "tests.v2.test_c2_orchestration_conformance.Record.test_15b_only_the_release_s_named_changes_are_accepted_each_while_its_gate_holds",
+     "tests.v2.test_v21_conformance_ruling.CycleTwoRecord.test_write_refuses_before_measuring_on_2_1",
+     "tests.v2.test_v21_conformance_ruling.CycleTwoRecord.test_the_b_job_refuses_before_executing_an_item"
+    ]
+   },
+   {
+    "path": "validation/v2/mutation.py",
+    "sha256_v2_0_0": "8449cbbc536896ca8af03efc5468eec962317aba665344c15f82d78d69a18077",
+    "sha256_2_1": "268a71830cc1237eb5676261f826fad8ccd800e4734104ce151533e842022f46",
+    "commits_2_1": [
+     {
+      "commit": "c621adda23d4487dba8feb0f2d9d45c161496ffe",
+      "subject": "v2.1: lineage._look registered as a helper target (the account_of fix's guard, 5 mutants); EXECUTION-ORDER-5 (469 targets); runner doc §18"
+     },
+     {
+      "commit": "76e92e878746c12ef89f46ac01a95ba6da327609",
+      "subject": "v2.1 survivor work, round 2 (B-03): 6 kill-test files for campaign 3's unaudited survivors, 11 positional audits, the lineage defect test registered"
+     },
+     {
+      "commit": "04e0b0f0a23fa9824add47311a23985f8b6eb94d",
+      "subject": "v2.1 survivor work (B-03): 78 test files, 217 positional audits, defect tests registered, two helper targets"
+     },
+     {
+      "commit": "875c85e8ecd514940263b4a341256f233b679521",
+      "subject": "v2.1 tool: survivor audits by position, at the module digest, with consumers and exceptions named"
+     },
+     {
+      "commit": "aa4df8912d077f62acd8d7def829a40231114a42",
+      "subject": "fix(mutation runner): signature numbering by name, linear; _confirmed guards; tests, replay and §15 limits"
+     },
+     {
+      "commit": "81a948e99d7d8bbfe1115da8e201dcf22e629293",
+      "subject": "runner: the signature replaces names, not the text around them — review of f84fac0/d14b4f3 (3 lenses, 2026-10-11)"
+     },
+     {
+      "commit": "d14b4f36ba655a7e59e085e57af0f9ad420e1d53",
+      "subject": "runner: bound the signature scan — a long header with many slashes took 128 s to normalise"
+     },
+     {
+      "commit": "f84fac032eede17f56509637c2fc04ea8d9a70ed",
+      "subject": "runner: the bracket compares a failure's signature, not its raw header — the runner's own temp names no longer make a kill look unconfirmed"
+     },
+     {
+      "commit": "efc27ccb7bbb8f8d2e2070ba83c8e978fc7c6110",
+      "subject": "v2.1 kill sets: campaign 2's survivor kill files appended to their 4 targets"
+     },
+     {
+      "commit": "34db9342a438fe2f2bd627bbab65c48a8513813a",
+      "subject": "mutation (V2.1): the merged 2.1 product tracks' names are targets — confine.py whole, context_pack, client_on_path"
+     },
+     {
+      "commit": "7577e16880b01ea83248456dfac14343c2df7201",
+      "subject": "Merge v21r/execorder (B-03b, owner step 4: execution order separate from the declared kill set; table derived only from a committed T0 sweep record; misuse and every bad table entry refused before anything runs; record check and runner share one rule; each result names the committed table it ran)"
+     },
+     {
+      "commit": "8ef108e06292bc9990b601169ca295ac254c8a73",
+      "subject": "v2.1 kill sets: campaign 1's survivor kill files appended to their 10 targets"
+     },
+     {
+      "commit": "76e0ecab9f5d36634bd18b93ba81afbdcfd30a30",
+      "subject": "v2.1 runner (execution order, final verifier 4): the table is derived from a committed T0 sweep record, and every result names the committed table it ran"
+     },
+     {
+      "commit": "8fc1350ef54c54a39eccf8c4b1e07df75365ac66",
+      "subject": "v2.1 runner (execution order, final verifier 3): the record check reads `execution_order` by the runner's own rule"
+     },
+     {
+      "commit": "4a3b31ba4561fac2361a06a49ae1554ac3e3b192",
+      "subject": "v2.1 runner (execution order, final verifier 2): main checks every table entry before the first target runs"
+     },
+     {
+      "commit": "eec1bcf98a29d23c3bffaec01f4330d24692baa6",
+      "subject": "v2.1 runner (execution order, final verifier 1): `run` misuse is refused before anything runs, never read another way"
+     },
+     {
+      "commit": "f6151aadf83c0c9d9a01680416d472e46476e1aa",
+      "subject": "v2.1 runner (execution order, ORD-4): a table runs a declared kill set in another order; kill_tests stays declared"
+     },
+     {
+      "commit": "f72fb5b53491358f0edbeca785e9844413230f84",
+      "subject": "v2.1 runner (fix 13, VS-6 (a)): the UNCLASSIFIED error says which mutants a re-run cannot resolve"
+     },
+     {
+      "commit": "7e8e26ea5a8cb1bb4a4fb12b4afcc9f9af90212c",
+      "subject": "v2.1 runner (fix 12): `timed_out` is sorted, so it does not depend on the kill-set order"
+     },
+     {
+      "commit": "2f8ec29930fcea352c58381694e0d3b8a075818a",
+      "subject": "v2.1 runner (fix 11): `mutation.py t0` fails a kill set it refused before any T0 row"
+     },
+     {
+      "commit": "95748ea0a13c798c81d6ff9aa6b1a7b1f70f1612",
+      "subject": "v2.1 runner (fix 10, VS-5 / VS-6 / FS-2): a FAIL the bracket does not confirm is measured again on a fresh tree"
+     },
+     {
+      "commit": "8a51b33092ac53023436710f49cb6fbef1effd55",
+      "subject": "v2.1 runner (fix 9, PL-2): the bracket's control runs twice; a fault a passing run leaves can no longer confirm a kill"
+     },
+     {
+      "commit": "269baf5270dfa527d80054308b713ce4c28f0647",
+      "subject": "v2.1 runner (fix 8, VS-4): a runner failure outside a mutant keeps the rows and stops; main names what did not run"
+     },
+     {
+      "commit": "012ff8376d01c23941570ed8f2bf6aa160ebe21b",
+      "subject": "v2.1 runner (fix 7, process-env): one release budget per run"
+     },
+     {
+      "commit": "457ca93d9c70cf502fa99e7b5c70d1192239fa3b",
+      "subject": "v2.1 runner (fix 6, process-env): the pids a Residual names are read from its list, not from its text"
+     },
+     {
+      "commit": "cd4b3368c841972e19832682e73339469dc1bab4",
+      "subject": "v2.1 runner (fix 5, ORD-7): an unproven leftover is watched for 60 s, not 5, before the target stops"
+     },
+     {
+      "commit": "aca12801727a09630a44535c0ba912f69c90cabe",
+      "subject": "v2.1 runner (fix 4, PL-1 (3)): a leftover working inside the scratch is found by its cwd"
+     },
+     {
+      "commit": "870b132cce1e3028219bebbd1611c00d5c4d07e2",
+      "subject": "v2.1 runner (fix 2, clean environment): what a run leaves beside the tree is residue too"
+     },
+     {
+      "commit": "ae975d43e38bf90cc4bf168f0baede07281e7f74",
+      "subject": "v2.1 runner (fix 1, bytecode): a touched source is residue, and the mutated file must keep its stamp"
+     },
+     {
+      "commit": "ba853fd16e402251192f59f794cb9dc4b19fe2dd",
+      "subject": "tests(v2.1): split test_v21_identity.py — its 4 byte/text-identity methods move, unchanged, to a file that is never a kill file"
+     },
+     {
+      "commit": "6ab3c0996108d9416426534e194809b355d5da29",
+      "subject": "v2.1 runner (4/7, T0): the baseline is the null mutant made by mutants()' own rewrite, each kill file on its own"
+     },
+     {
+      "commit": "ce5f4ef75b07d3299d12a8b9928a6df60650624f",
+      "subject": "v2.1 runner (3/7, classification): PASS/FAIL/TIMEOUT/INFRA per run; only a bracketed FAIL is a kill, and it alone stops the chain"
+     },
+     {
+      "commit": "e15cad67d856e2a87de280531b5a2add356b31d6",
+      "subject": "v2.1 runner (2/7, clean environment): every kill-file run starts clean, and a leftover the runner cannot prove stops it"
+     },
+     {
+      "commit": "4a267230f0eef347e52c3f8b4315a013f1f3a772",
+      "subject": "v2.1 runner (1/7, bytecode): every version of the mutated file gets a whole-second mtime no earlier version had"
+     },
+     {
+      "commit": "880881f9976df891b8db6a48887c85dc50f44702",
+      "subject": "Merge v21r/b03c (B-03c: migrate and verify in the 2.1 authority inventory, their limits enforced by a module-based, fail-closed checker; migrate --out's exclusive writer)"
+     },
+     {
+      "commit": "e97ea413de22977870856985a0add4a6a278d5cf",
+      "subject": "v2.1(B-03b): process_effect DIGEST's kill set without a file the mutation copy cannot import (the preflight found it)"
+     },
+     {
+      "commit": "55a6b74c46dcf644ac0d23f61c5b438d837e96e5",
+      "subject": "v2.1(B-03b): the V2.1 mutation phase — 443 targets / 11,365 mutants — and its merge tool under the V2.0-S2 standard"
+     }
+    ],
+    "v2_0_list": "S2 mutation phase",
+    "change": "the V2.1 phase (record closure-evidence/v2/v2.1/MUTATION.json, last in RECORDS): the 320 stale targets and the 2.1 modules' names, taken over through SUPERSEDED; the earlier phases' records stay history",
+    "backlog": "owner B-03b (55a6b74, e97ea41; the merge 880881f adds bundle_cli::_create)",
+    "owner_approval": "owner B-03b (RELEASE-DECISIONS seq 5): a new mutation phase through RECORDS/SUPERSEDED",
+    "requirement": "the owner's B-03b text; (f) is accepted only while validation/v2/mutation.py check() == []",
+    "behaviour_tests": [
+     "tests.v2.test_v21_mutation_record.Phase.test_the_phase_takes_over_every_stale_module_target_and_s2_stays_whole",
+     "tests.v2.test_v21_mutation_record.Account.test_every_v21_target_is_accounted_for_exactly_once_and_a_survivor_never_passes",
+     "tests.v2.test_c2_orchestration_conformance.Record.test_15b_only_the_release_s_named_changes_are_accepted_each_while_its_gate_holds"
+    ]
+   }
+  ]
+ },
+ "identity": {
+  "moved_from_the_record": {
+   "catalog": "the catalog's probe digests are the probes' capability digests (V2-007, 919a271); file_artifact's capability version is 2 (V21-37, 06d4e62)",
+   "catalog_matches_the_brief": "the cycle-2 brief names the 2.0 source digests (c2_orchestration_repair.BRIEFED_DIGEST_PREFIXES)",
+   "contract_spec_semantic_digest": "a spec's id and semantic hash bind its probe's digest (aisef2/product/spec.py), so each of the 59 moves with the catalog; contract ids and contract hashes do not",
+   "plan_hash": "the plan's hash is over the spec ids",
+   "plan_ok": "plan_ok requires the accepted plan hash (c2_orchestration_repair.PLAN_HASH)",
+   "probe_sources_identical_to_6311254": "as probe_sources_vs_6311254",
+   "probe_sources_vs_6311254": "the probe sources 2.1 changed (rows of this ruling) beside the V2.0 release's B1 changes"
+  },
+  "unmoved": [
+   "contracts",
+   "all_equal_to_accepted",
+   "semantic_change",
+   "cycle1_drift_ok",
+   "cycle1_frozen_probe_sources",
+   "cycle1_frozen_probe_sources_identical"
+  ],
+  "values": {
+   "catalog": {
+    "record": {
+     "probe.python_callable": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+     "probe.file_artifact": "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901",
+     "probe.python_callable_v2": "b71adecf433ea690f0ca03a1cd846778b36387ed48e621924fa58da9a94411fc",
+     "probe.cli_invocation": "5ec17bea4a6763339b5bfda9523ec71dc792b1ed01c6018b5562bff45c70f393",
+     "probe.process_effect": "dbbe4cd51feb988b7b1bfd95aebf243c275c217399d51063d3a85f09b2cfbb23"
+    },
+    "now": {
+     "probe.python_callable": "1961e84d913edc687bdb52f6c6cd0f034e86f2d1dadd9e89fa76757a51dc35bf",
+     "probe.file_artifact": "be1485d12a4dd02d32fe9ba9d44c37204346be42ae97856484dc67cae3be74fe",
+     "probe.python_callable_v2": "0821c14651a95494b2352ea0447e467595388fc713fd531ced6f75c7bcfa8aae",
+     "probe.cli_invocation": "330ae4a88cc8ca58e66b462b9dc6ad9b4023e4b1dfebc8373c584eaa95e8de31",
+     "probe.process_effect": "409c41aea16f8ab2c83406e429fdaed565eaa8dadd945a78bd93ad617b8814f7"
+    }
+   },
+   "plan_hash": {
+    "record": "27b679d9513f3dc2f9b5da68a694a3ef1baff50f87eae9903721415a4670a669",
+    "now": "c2431cdda73b0f210e49e1b5a940d4bcbeb312d9f3b1df6f4e0563e65134d2a1"
+   }
+  },
+  "probe_sources_moved_from_the_record": {
+   "aisef2/probe/calibration.py": "a row of this ruling",
+   "aisef2/probe/catalog.py": "the V2.0 list (B1)",
+   "aisef2/probe/cli_invocation.py": "a row of this ruling",
+   "aisef2/probe/file_artifact.py": "a row of this ruling",
+   "aisef2/probe/process_effect.py": "a row of this ruling",
+   "aisef2/probe/python_callable_v2.py": "a row of this ruling"
+  },
+  "authority": {
+   "V2-007": {
+    "path": "closure-evidence/v2/cycle2/RELEASE-DECISIONS.json",
+    "seq": 4,
+    "id": "AISEF_V2_1_B01_ARCHITECTURE_EXCEPTION_V2_007",
+    "decision": "ARCHITECTURE-EXCEPTION-V2-007 APPROVED"
+   },
+   "V21-37": "file_artifact CAPABILITY_VERSION 2 — an engineering change, NOT owner-approved"
+  },
+  "all_equal_to_accepted": "unmoved because p5_acceptance.verify compares the 59 specs through rebind.spec_subst (the V2.0 B1 probe-identity re-binding): an identity mapping, NOT behaviour evidence",
+  "behaviour_evidence": {
+   "p5_falsifiability": "closure-evidence/v2/v2.1/P5-FALSIFIABILITY.json",
+   "c2_p5_reverification": "closure-evidence/v2/v2.1/C2-P5-ACCEPTANCE-REVERIFICATION.json",
+   "probe_calibrations": "closure-evidence/v2/release/V2.1.0.dev0-PROBE-CALIBRATIONS-2.json",
+   "rule": "every retained spec re-executed under this tree's probes (pristine and witness), compared literally inside B-03a's re-verification; the shipped calibrations at the bytes that run (admission check 9)"
+  },
+  "engine_digest": "NOT tolerated here: no rule accepts the static admission engine digest (a33f2aee… -> this tree's); the (e) gate is p5_acceptance.history_problems() == [] and reverification_problems() == [] (B-03a: the 2.0 acceptance is its v2.0.0 blob, the boundary re-verified literally on 2.1), never p5_acceptance.check",
+  "rule": "(e) is accepted only while every moved identity is in release_differences' probe_moved, every moved probe source is in the V2.0 list or a row of this ruling at its sha256_2_1, and the (e) gate holds"
+ },
+ "q5": {
+  "data": "validation/qualification/v21_q5_changes.py",
+  "corpus_2_1": [
+   "normal-completion",
+   "retry-then-commit",
+   "review-finding-rollback",
+   "pre-satisfied",
+   "security-finding-rollback",
+   "developer-outage-rollback",
+   "developer-regression-at-candidate",
+   "post-merge-integration-regression",
+   "cli-proved-story",
+   "cli-refuted-then-commit",
+   "file-artifact-prohibition",
+   "scenario-proved-story",
+   "bytes-returning-python-callable"
+  ],
+  "comparison_record": "closure-evidence/v2/v2.1/Q5-KERNEL-COMPARISON.json",
+  "comparison_check": "validation/qualification/v21_q5_compare.py --check",
+  "changes": {
+   "developer-regression-at-candidate": {
+    "item": "developer-regression-at-candidate",
+    "replaces": "post-merge-regression",
+    "scenario": "two stories: S0 introduces C1 (add) and preserves C0 (sub), and commits; S2's developer answers C2 (mul) with a candidate that also breaks sub — 2.0's post-merge-regression stream, S2's answer given again on the retry",
+    "expectation_2_0": {
+     "source": "closure-evidence/v2/release/Q5-RC2/CORPUS.json",
+     "item": "post-merge-regression",
+     "outcomes": {
+      "S0": [
+       "COMMIT"
+      ],
+      "S2": [
+       "ROLLBACK"
+      ]
+     },
+     "model_calls": 4,
+     "tool_calls": 2,
+     "events": 143,
+     "ledger_digest": "a21b7af5013b0fabe882c762ef050a070fa1a0bd2c7a57d765ccac7f5eb68f7f",
+     "coverage": [
+      "merge path",
+      "post-merge path",
+      "PRESERVE re-proof",
+      "rollback path",
+      "two stories"
+     ],
+     "failure": {
+      "seq": 134,
+      "story_id": "S2",
+      "code": "POST_MERGE_REGRESSION",
+      "owner": "INTEGRATION",
+      "retryable": false,
+      "detail": "post-merge C0: POST_MERGE_REGRESSION"
+     }
+    },
+    "expectation_2_1": {
+     "outcomes": {
+      "S0": [
+       "COMMIT"
+      ],
+      "S2": [
+       "RETRY",
+       "ROLLBACK"
+      ]
+     },
+     "model_calls": [
+      "DEVELOPER_IMPLEMENT S0",
+      "REVIEWER_REVIEW S0",
+      "DEVELOPER_IMPLEMENT S2",
+      "DEVELOPER_IMPLEMENT S2"
+     ],
+     "failures": [
+      {
+       "story_id": "S2",
+       "code": "CONTRACT_UNSATISFIED",
+       "owner": "DEVELOPER",
+       "retryable": true,
+       "detail": "proof of C0: CONTRACT_UNSATISFIED"
+      },
+      {
+       "story_id": "S2",
+       "code": "CONTRACT_UNSATISFIED",
+       "owner": "DEVELOPER",
+       "retryable": true,
+       "detail": "proof of C0: CONTRACT_UNSATISFIED"
+      }
+     ],
+     "s2": "S2:proof:C0 fails at each candidate; the retry's request carries prior_failures [CONTRACT_UNSATISFIED]; S2 is never reviewed, merged or re-proved after a merge"
+    },
+    "cause_commit": "91a89684e6c5a3ed7f2cf5fc52ef955d3a661cde",
+    "requirement": [
+     "docs/architecture/AISEF-V2-ARCHITECTURE-RFC.md §10.3: CANDIDATE x UNSATISFIED, any admitted role — the implementation does not meet the contract — owner DEVELOPER",
+     "RFC §22.1: CONTRACT_UNSATISFIED, DEVELOPER, RETRYABLE",
+     "RFC §26: after merge every PRESERVE obligation of prior stories the merge could affect is re-proved; a regression there is INTEGRATION's — kept for what the merge itself changes (post-merge-integration-regression)"
+    ],
+    "decision": [
+     "docs/v2.1/STATUS.md §2 row B1: 'PRESERVE chỉ kiểm sau merge (V21-38)', fixed by 91a8968; docs/v2.1/ADR-V2.1.md ADR-4",
+     "owner B-03d approval, closure-evidence/v2/cycle2/RELEASE-DECISIONS.json seq 5 (AISEF_V2_1_B03_REQUALIFICATION_ROUND): 'a ruling naming 2.1's behaviour changes and a new Q5 corpus; 2.0's corpus, rulings and evidence kept'"
+    ],
+    "behaviour_tests": [
+     "tests.v2.test_p9_reproduction.MultiStory.test_Q5_13_a_regression_the_developer_made_is_found_at_the_candidate_retried_and_never_merged",
+     "tests.v2.test_v21_orchestration.PreserveAtCandidate.test_a_regression_the_developer_made_is_the_developer_s_and_never_merged",
+     "tests.v2.test_v21_orchestration.PreserveAtCandidate.test_a_retry_that_repairs_it_commits",
+     "tests.v2.test_c2_orchestration_conformance.ReproofOfAnotherKind.test_a_regression_of_the_prior_spec_of_another_kind_is_the_developer_s_at_the_candidate_and_never_merged"
+    ],
+    "measured": {
+     "evidence": "engineering measurement, record: closure-evidence/v2/v2.1/Q5-KERNEL-COMPARISON.json",
+     "attribution_evidence": "919a271 and 91a8968: the lane's scratch measurement only, in no record",
+     "2.0 item under aisef2 v2.0.0 and 919a271": "COMMIT / ROLLBACK, 4 calls (DEV, REV, DEV, REV), 143 events, POST_MERGE_REGRESSION INTEGRATION at seq 134; replay GREEN (as release/Q5-RC2)",
+     "2.0 item under aisef2 91a8968 and dc9774f": "S0 COMMIT, then EXTRA_MODEL_CALL: the script has no DEVELOPER_IMPLEMENT answer for request 4; CONTRACT_UNSATISFIED DEVELOPER retryable at seq 109 'proof of C0'",
+     "this item under dc9774f": "COMMIT / RETRY, ROLLBACK, 4 calls, 154 events, failures at seq 109 and 145; replay GREEN",
+     "this item under aisef2 v2.0.0": "S0 COMMIT, then EXTRA_MODEL_CALL: the script has no REVIEWER_REVIEW answer for request 4 (2.0 reviews and merges S2's candidate)"
+    }
+   },
+   "post-merge-integration-regression": {
+    "item": "post-merge-integration-regression",
+    "keeps_coverage_of": "post-merge-regression",
+    "scenario": "two stories as above; S2's candidate is clean (mul only) and, right after S2's developer answer, main moves under it: somebody else lands a sub that returns a + b (ORCH_9; q5._LandsAfter for the named story)",
+    "expectation_2_0": {
+     "source": "closure-evidence/v2/release/Q5-RC2/CORPUS.json",
+     "item": "post-merge-regression",
+     "outcomes": {
+      "S0": [
+       "COMMIT"
+      ],
+      "S2": [
+       "ROLLBACK"
+      ]
+     },
+     "model_calls": 4,
+     "tool_calls": 2,
+     "events": 143,
+     "ledger_digest": "a21b7af5013b0fabe882c762ef050a070fa1a0bd2c7a57d765ccac7f5eb68f7f",
+     "coverage": [
+      "merge path",
+      "post-merge path",
+      "PRESERVE re-proof",
+      "rollback path",
+      "two stories"
+     ],
+     "failure": {
+      "seq": 134,
+      "story_id": "S2",
+      "code": "POST_MERGE_REGRESSION",
+      "owner": "INTEGRATION",
+      "retryable": false,
+      "detail": "post-merge C0: POST_MERGE_REGRESSION"
+     }
+    },
+    "expectation_2_1": {
+     "outcomes": {
+      "S0": [
+       "COMMIT"
+      ],
+      "S2": [
+       "ROLLBACK"
+      ]
+     },
+     "model_calls": [
+      "DEVELOPER_IMPLEMENT S0",
+      "REVIEWER_REVIEW S0",
+      "DEVELOPER_IMPLEMENT S2",
+      "REVIEWER_REVIEW S2"
+     ],
+     "failures": [
+      {
+       "story_id": "S2",
+       "code": "POST_MERGE_REGRESSION",
+       "owner": "INTEGRATION",
+       "retryable": false,
+       "detail": "post-merge C0: POST_MERGE_REGRESSION"
+      }
+     ],
+     "s2": "S2:proof:C0 holds at the candidate (V21-38's row); S2:post-merge:C2 holds and S2:post-merge:C0 fails at the merged revision; the merge is rolled back"
+    },
+    "cause_commit": "91a89684e6c5a3ed7f2cf5fc52ef955d3a661cde",
+    "requirement": [
+     "RFC §26: after merge the story's obligations MUST be re-proved at the merged revision, together with every PRESERVE obligation of prior stories the merge could affect; a regression is owner INTEGRATION",
+     "RFC §10.3: POST_MERGE x UNSATISFIED, any role — a regression after merge — owner INTEGRATION",
+     "RFC §22.1: POST_MERGE_REGRESSION, INTEGRATION, NOT_RETRYABLE"
+    ],
+    "decision": [
+     "docs/v2.1/STATUS.md §2 row B1: 'PRESERVE chỉ kiểm sau merge (V21-38)', fixed by 91a8968; docs/v2.1/ADR-V2.1.md ADR-4",
+     "owner B-03d approval, closure-evidence/v2/cycle2/RELEASE-DECISIONS.json seq 5 (AISEF_V2_1_B03_REQUALIFICATION_ROUND): 'a ruling naming 2.1's behaviour changes and a new Q5 corpus; 2.0's corpus, rulings and evidence kept'",
+     "docs/v2.1/STATUS.md §2 row B2: the integrated tree re-checked when the target branch moves — ORCH_9"
+    ],
+    "behaviour_tests": [
+     "tests.v2.test_p9_reproduction.MultiStory.test_Q5_12_a_two_story_run_with_a_post_merge_regression_reproduces",
+     "tests.v2.test_p6_orchestration.Orchestration.test_ORCH_9_and_10_a_post_merge_regression_of_a_prior_PRESERVE_obligation_is_INTEGRATION_and_rolled_back"
+    ],
+    "measured": {
+     "evidence": "engineering measurement, record: closure-evidence/v2/v2.1/Q5-KERNEL-COMPARISON.json",
+     "this item under dc9774f": "COMMIT / ROLLBACK, 4 calls (DEV, REV, DEV, REV), 151 events, POST_MERGE_REGRESSION INTEGRATION at seq 142; replay GREEN",
+     "this item under aisef2 v2.0.0": "the same outcomes, calls and failure (seq 134), 143 events: without the candidate's C0 proof (8 events) that V21-38 adds; replay GREEN"
+    }
+   }
+  },
+  "unchanged": {
+   "evidence": "engineering measurement, record: closure-evidence/v2/v2.1/Q5-KERNEL-COMPARISON.json",
+   "identical_up_to_kernel_identity": [
+    "normal-completion",
+    "retry-then-commit",
+    "review-finding-rollback",
+    "pre-satisfied",
+    "security-finding-rollback",
+    "developer-outage-rollback"
+   ],
+   "identity_only": {
+    "items": [
+     "cli-proved-story",
+     "cli-refuted-then-commit",
+     "file-artifact-prohibition",
+     "scenario-proved-story",
+     "bytes-returning-python-callable"
+    ],
+    "differing": "every request hash; plan/frozen plan_hash; probe/evaluated probe_digest, spec_id, semantic_hash, record_digest; proof/verified spec_id, semantic_hash; the probe process-range names, which carry the spec id",
+    "probe_digests_by_kind": {
+     "cli_invocation": [
+      "d42449fd8e3a",
+      "330ae4a88cc8"
+     ],
+     "file_artifact": [
+      "31465b73cbe2",
+      "be1485d12a4d"
+     ],
+     "process_effect": [
+      "815e4c865274",
+      "409c41aea16f"
+     ],
+     "python_callable": [
+      "b1f25878d350",
+      "0821c14651a9"
+     ]
+    },
+    "probe_ids_by_kind": {
+     "cli_invocation": "probe.cli_invocation",
+     "file_artifact": "probe.file_artifact",
+     "process_effect": "probe.process_effect",
+     "python_callable": "probe.python_callable_v2"
+    },
+    "probe_digests_evidence": "engineering measurement, record: closure-evidence/v2/v2.1/Q5-KERNEL-COMPARISON.json (each side's probe digests; v21_q5_compare.check compares them with these)",
+    "cause_commits_evidence": "the lane's scratch measurement only, in no record (COMPARISON_REL measures v2.0.0 and this tree, never 919a271: the file_artifact step 46737ca1c479 is not in it)",
+    "cause_commits": {
+     "919a271ecfca246381b1de036a874f3b6935c0be": "V2-007: a probe's digest is its capability digest (all four; file_artifact 31465b73cbe2 -> 46737ca1c479)",
+     "06d4e62c0b0666506cd95d663dfa8d3300e060a4": "V21-37 (engineering change, not owner-approved): file_artifact python_imports, capability version 2 (46737ca1c479 -> be1485d12a4d)"
+    },
+    "decision": [
+     "ARCHITECTURE-EXCEPTION-V2-007 approved: RELEASE-DECISIONS seq 4 (AISEF_V2_1_B01_ARCHITECTURE_EXCEPTION_V2_007)",
+     "V21-37: engineering change (ADR-5, 06d4e62), not owner-approved; no Q5 expectation depends on it (identity only)"
+    ]
+   }
+  },
+  "rule": "each changed expectation names its cause commit, the requirement, the decision and its behaviour tests; 2.0's corpora (closure-evidence/v2/Q5, cycle2/Q5, cycle2/Q5-FINAL, release/Q5-RC1, release/Q5-RC2) stay as recorded"
+ },
+ "mutation": {
+  "authority": {
+   "path": "closure-evidence/v2/cycle2/RELEASE-DECISIONS.json",
+   "seq": 5,
+   "id": "AISEF_V2_1_B03_REQUALIFICATION_ROUND",
+   "part": "B-03b"
+  },
+  "phase": "V2.1",
+  "record": "closure-evidence/v2/v2.1/MUTATION.json",
+  "rule": "(f) the record's mutation summary is cycle 2's (C2-ORCH, K-PRESAT-001, K-NOWORK-001); release_differences accepts (f) only while validation/v2/mutation.py check() == [] — every phase's record holds on this tree, V2.1's included"
+ },
+ "history": {
+  "record": "closure-evidence/v2/cycle2/C2-ORCHESTRATION-CONFORMANCE-REPAIR.json",
+  "sha256": "a798b6ab0ed7cb0b31c004485c8ee3dfe5f2a35ac415ff79b0d85a84858bae24",
+  "is_its_v2_0_0_blob": true,
+  "statement": "(a) defect_reproducer, (b) single_probe_equivalence and (c) test_matrix are cycle-2 executions, kept as recorded and never re-measured on 2.1: (b) measured the seven Cycle-1 items, post-merge-regression among them, which 2.1 replaced (V21-38: q5 above); (c) names ReproofOfAnotherKind's 2.0 case, re-aimed by 91a8968",
+  "c2_orchestration_repair_write": "refused before measuring: q5.CORPUS has no ['post-merge-regression'], which (b) measures by name — closure-evidence/v2/cycle2/C2-ORCHESTRATION-CONFORMANCE-REPAIR.json is cycle-2 history and is never re-written on 2.1 (the 2.1 changes are named by closure-evidence/v2/v2.1/CONFORMANCE-RULING.json; release_differences checks this tree against both)"
+ },
+ "unchanged": [
+  "closure-evidence/v2/cycle2/C2-ORCHESTRATION-CONFORMANCE-REPAIR.json: byte-identical, its v2.0.0 blob",
+  "2.0's Q5 corpora and every 2.0 and cycle-2 record and ruling",
+  "release_differences' V2.0 list and the (f) gate (mutation.check() == [])",
+  "SEMANTIC_IDENTITIES and probe_moved: an identity outside probe_moved is never accepted"
+ ],
+ "not_done": [
+  "no 2.0 or cycle-2 record, corpus or ruling is rewritten",
+  "no engine-digest tolerance; no probe-identity re-binding in the (e) gate",
+  "c2_orchestration_repair.py --write never runs on 2.1: it refuses before measuring",
+  "no owner approval is claimed for a change beyond what its row states",
+  "no new owner acceptance of the C2-P5 boundary"
+ ],
+ "written_at": {
+  "head": "13513a1c7da403e4dfa9723e12e30a79b04777f6"
+ }
+}
