@@ -16,7 +16,10 @@ the test's own): a thread is PARKED inside the operation the race needs, the sec
 where it is either waiting for the first (a waiter polls: it is seen in the `time.sleep` the module calls) or — in an
 implementation that does not make it wait — already running, and only then is the first one let go. Two exceptions: `RealRange` runs a real target under a real anchor (an integration check, not the
 proof), and `AbandonedWorker` lets StoryScope's own 0.05 s bound run out on a release that is parked, so it cannot
-end any other way. The bound on every wait (`BOUND_S`) only ends a test that would otherwise hang.
+end any other way. The bound on every wait (`BOUND_S`) only ends a test that would otherwise hang. `ClaimAndWait`
+(reviewer's additions) parks a thread INSIDE the claim and gives a second caller `CLAIM_PROBE_S` to get past it: in a
+correct run nothing happens in that time, so it simply runs out; a claim that is not one critical section lets the
+second caller through at once and the test goes on without waiting.
 """
 
 import io
@@ -679,8 +682,10 @@ class AbandonedWorker(Journal2, unittest.TestCase):
         self.assertEqual(report.records[0].detail, "not released: the release was still running after 0.05s")
         late = Caller(rig.range, "late")
         late.start()
-        rig.second_is_held()
-        self.assertTrue(late.is_alive())                   # it waits for the abandoned worker ...
+        # design-bound, like the claim-lock test: the wait is a poll with the module's own `time.sleep` (the decision
+        # doc, section 4); a caller that spins on the claim instead is not seen sleeping
+        self.assertEqual(rig.second_is_held(), "waiting")
+        self.assertTrue(late.is_alive())                   # ... and waits for it ...
         park.go.set()
         late.finish(self)                                  # ... and is free when that ends
         self.assertIsNone(late.error)
@@ -716,6 +721,159 @@ class RealRange(unittest.TestCase):
         ladder = ["cooperative", "terminate", "kill"] if POSIX else ["terminate_job"]
         stages = [s["stage"] for s in r.ledger]
         self.assertTrue(stages and stages == ladder[:len(stages)], stages)   # one ladder, not two climbing together
+
+
+# --------------------------------------------------------------------------------------- reviewer additions (R3 review)
+
+CLAIM_PROBE_S = 1.0   # how long a second caller is given to get past a claim that should hold it: expires in a correct run
+
+
+def _gate_the_claim(rig: Rig) -> Park:
+    """Parks the first thread whose release() reads `_reaped` — the claim's own `if self._anchor is None or
+    self._reaped` — AFTER it has read the value (a stale `False` is what an unguarded claim would act on). Any other
+    thread that reads it meanwhile has got past the claim: that is what `rig.second` is set to say."""
+    park = Park(rig)
+    gate = {"ident": None}
+
+    def read(self):
+        value = self.__dict__["_reaped"]
+        me = threading.get_ident()
+        with rig._mx:
+            if gate["ident"] is None and not park.taken:
+                gate["ident"] = me
+            elif gate["ident"] not in (None, me) and not park.go.is_set():
+                rig.second.set()
+        if gate["ident"] == me:
+            park()
+        return value
+
+    def write(self, value):
+        self.__dict__["_reaped"] = value
+
+    rig.range.__class__ = type("Gated", (ProcessRange,), {"_reaped": property(read, write)})
+    return park
+
+
+class ClaimAndWait(unittest.TestCase):
+    def test_two_threads_that_arrive_together_are_not_both_leaders(self):
+        """A is inside the claim, having read that the range is not reaped; B arrives. A claim that is not one critical
+        section (no lock; a lock around the read and another around the write) lets B lead the whole release, and A —
+        with its stale read — a second one afterwards: two disposals, two closes."""
+        rig = Rig(self, dies_on="SIGINT")
+        park = _gate_the_claim(rig)
+        a = Caller(rig.range, "A")
+        a.start()
+        self.assertTrue(park.arrived.wait(BOUND_S), "the first caller never reached the claim")
+        b = Caller(rig.range, "B")
+        b.start()
+        rig.second.wait(CLAIM_PROBE_S)      # B got past the claim (it must not), or is held there / waiting (it must)
+        park.go.set()
+        a.finish(self)
+        b.finish(self)
+        self.assertEqual((a.error, b.error), (None, None))
+        self.assertEqual(rig.max_threads, 1)
+        self.assertEqual([s for s, _ in rig.sent], ["SIGINT"])
+        self.assertEqual(rig.writes, ["EXIT\n"])
+        self.assertEqual((rig.count("stdin.close"), rig.count("stdout.close")), (1, 1))
+        self.assertEqual((rig.count("anchor.wait"), rig.count("backend.close")), (1, 1))
+
+    def test_a_caller_is_held_until_the_release_has_ended_wherever_the_release_is(self):
+        """Past the ladder — the range is measured empty, the anchor is about to be, or is being, reaped and its pipes
+        closed — a second caller still waits: returning there would hand its caller a range whose anchor is unreaped
+        and whose escapees are not yet checked (a leak it would never see)."""
+        for point in ("anchor.poll", "anchor.wait", "stdin.close", "stdout.close", "backend.close"):
+            with self.subTest(parked_at=point):
+                rig = Rig(self, dies_on="SIGINT")
+                park = rig.park_at(point)
+                a = Caller(rig.range, "A")
+                a.start()
+                self.assertTrue(park.arrived.wait(BOUND_S), f"the release never reached {point}")
+                b = Caller(rig.range, "B")
+                b.start()
+                waited = 0
+                while not rig.second.is_set() and b.is_alive() and waited < 4000:    # B waits (polls) or has returned
+                    rig.second.wait(0.005)
+                    waited += 5
+                self.assertTrue(b.is_alive(), f"a caller returned while the release was parked at {point}")
+                park.go.set()
+                a.finish(self)
+                b.finish(self)
+                self.assertEqual((a.error, b.error), (None, None))
+                self.assertTrue(rig.range._reaped)
+                self.assertEqual((rig.count("stdin.close"), rig.count("anchor.wait")), (1, 1))
+
+    def test_a_caller_waits_for_the_escapee_check_and_is_given_its_outcome(self):
+        """The last thing a release does is look for what left the range: a caller that arrives before that is
+        given RangeEscaped like the first, not `None` — the leak that §17.1 says is never silent."""
+        rig = Rig(self, members=0, escapees=((9001, "leaver"),))
+        alive = {9001: Proc(9001, 1, None, None, "leaver")}
+        park = Park(rig)
+
+        def table():
+            park()
+            return alive
+        with mock.patch.object(pr, "process_table", side_effect=table):
+            a = Caller(rig.range, "A")
+            a.start()
+            self.assertTrue(park.arrived.wait(BOUND_S), "the release never reached the escapee check")
+            b = Caller(rig.range, "B")
+            b.start()
+            waited = 0
+            while not rig.second.is_set() and b.is_alive() and waited < 4000:
+                rig.second.wait(0.005)
+                waited += 5
+            self.assertTrue(b.is_alive(), "a caller returned before the escapee check had ended")
+            park.go.set()
+            a.finish(self)
+            b.finish(self)
+        self.assertEqual((type(a.error), type(b.error)), (RangeEscaped, RangeEscaped))
+
+
+class EscapeeLooks(unittest.TestCase):
+    """A release names what left the range as seen at either of its two looks: before the ladder (a member that left
+    while its parent is alive) and after it (Linux: an orphan re-parented to the anchor, its parent gone). `release`
+    was split in two and the looks now accumulate on the flight: each look is checked on its own, because with the
+    same escapee at both a fake can not tell the one from the other."""
+
+    def release_seeing(self, *looks):
+        rig = Rig(self, dies_on="SIGINT")
+        calls = []
+
+        def escaped(anchor):
+            calls.append(anchor)
+            i = len(calls) - 1
+            return [Proc(pid, 1, None, None, command) for pid, command in (looks[i] if i < len(looks) else ())]
+        rig.range._os.escaped = escaped
+        alive = {9001: Proc(9001, 1, None, None, "leaver")}
+        with mock.patch.object(pr, "process_table", return_value=alive):
+            try:
+                rig.range.release()
+            except RangeEscaped as e:
+                return e, rig
+        return None, rig
+
+    def test_an_escapee_seen_only_before_the_ladder_is_reported(self):
+        error, rig = self.release_seeing([(9001, "leaver")], [])
+        self.assertIsNotNone(error)
+        self.assertIn("(9001, 'leaver')", str(error))
+        self.assertTrue(rig.range._reaped)
+
+    def test_an_escapee_seen_only_after_the_ladder_is_reported(self):
+        error, rig = self.release_seeing([], [(9001, "leaver")])
+        self.assertIsNotNone(error)
+        self.assertIn("(9001, 'leaver')", str(error))
+        self.assertTrue(rig.range._reaped)
+
+    def test_an_escapee_seen_at_both_looks_is_named_once(self):
+        error, _ = self.release_seeing([(9001, "leaver")], [(9001, "leaver")])
+        self.assertIsNotNone(error)
+        self.assertEqual(str(error).count("(9001, 'leaver')"), 1)
+
+    def test_an_escapee_that_is_gone_when_the_release_ends_is_not_reported(self):
+        rig = Rig(self, dies_on="SIGINT", escapees=((9001, "leaver"),))
+        with mock.patch.object(pr, "process_table", return_value={}):
+            rig.range.release()            # it was seen, and it is not alive at the end: nothing is raised
+        self.assertTrue(rig.range._reaped)
 
 
 if __name__ == "__main__":

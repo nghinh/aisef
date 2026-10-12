@@ -120,7 +120,8 @@ flake; it is not a fix of the contract. (An `RLock` *is* what guards the claim: 
 
 ## 5. Requirement -> test
 
-All in `tests/v2/test_v21_r3_range_release_contract.py` (25 tests, ~0.6 s). Fake anchor, backend and pipes journal
+All in `tests/v2/test_v21_r3_range_release_contract.py` (32 tests, ~1.8 s: 25 written with the change, 7 added in
+the independent review, section 10). Fake anchor, backend and pipes journal
 every operation with the thread that did it; a thread is **parked** inside the operation the race needs, the second
 caller is brought to "polling for the first" (seen in the `time.sleep` the module calls) or — in an implementation
 that does not make it wait — "already running inside" (two threads in the backend), and only then is the first one
@@ -147,12 +148,17 @@ let go. No process and no sleep of the test's own, except `RealRange` and the PO
 | 4 a handler inside the claim hangs nothing (design-bound; skipped where there is no claim lock) | `Reentry.test_a_call_that_arrives_while_a_release_is_being_claimed_hangs_nothing` | skipped |
 | 4 a failed `start()` leaves a range whose release returns (POSIX) | `Reentry.test_a_failed_start_leaves_a_range_whose_release_returns_at_once` | pass |
 | 4 a handler on a waiting thread waits too (design-bound) | `WaitingCaller.test_a_call_that_arrives_on_a_waiting_thread_waits_too_and_hangs_nothing` | FAIL |
-| 4 the abandoned StoryScope worker does not end a later caller | `AbandonedWorker.test_a_release_the_scope_abandoned_...` | FAIL |
+| 4 the abandoned StoryScope worker does not end a later caller, and it waits by polling, not by spinning | `AbandonedWorker.test_a_release_the_scope_abandoned_...` | FAIL |
+| 1 the claim is ONE critical section: a thread parked inside it holds a second caller out (no lock, or a lock around the read and another around the write, lets both lead) | `ClaimAndWait.test_two_threads_that_arrive_together_are_not_both_leaders` (review) | FAIL |
+| 1/2 a caller is held until the release has ENDED, wherever past the ladder it is: parked at `anchor.poll`, `anchor.wait`, `stdin.close`, `stdout.close`, `backend.close` | `ClaimAndWait.test_a_caller_is_held_until_the_release_has_ended_wherever_the_release_is` (review, 5 subtests) | FAIL |
+| 2 a caller that arrives before the escapee check is given RangeEscaped (not `None`) | `ClaimAndWait.test_a_caller_waits_for_the_escapee_check_and_is_given_its_outcome` (review) | FAIL |
+| 2 an escapee seen at either look (before the ladder; after it: Linux orphan re-parented to the anchor) is named, once | `EscapeeLooks.*` (review, 4) | pass (unchanged behaviour: guards the split of `release`) |
 
 ## 6. What is real, what is simulated
 
 * **Real:** `RealRange` (a real target under a real anchor and pipes, two threads); the failed-start test (a real
-  anchor); the real `io.TextIOWrapper` over `io.BufferedWriter` in the ValueError test; the existing real-process
+  anchor); in the ValueError test the `io.TextIOWrapper` and `io.BufferedWriter` are CPython's own (the raw pipe
+  under them is a simulated EPIPE writer, and the interleaving is forced by a hook inside its `close()`); the existing real-process
   tests run on the host and in the Linux guest (section 8); the 200-run loops of the two by-design tests.
 * **Simulated:** every other test: a fake anchor, backend and pipes with thread parking. The "signal handler" is a
   call made from inside a backend operation (or the module's `time.sleep`, or the claim lock) on the same thread — a
@@ -168,10 +174,11 @@ let go. No process and no sleep of the test's own, except `RealRange` and the PO
   classes and their text, `ledger`, `_wait`, `_reaped`, `_anchor`, `_cwd` (read by `mutation.py:1575-1581` and tests).
 * **Importers (product):** `app/client.py`, `app/adapters.py`, `app/confine.py` (`process_table` only),
   `quality/test_execution.py`, `quality/vacuity.py`, `runtime/tool.py`, `orchestrate/security.py` (`RangeError`),
-  `probe/{cli_invocation,process_effect,python_callable,python_callable_v2}.py`. `validation/`: 16 files
-  (`grep -rl process_range`), among them `v2/mutation.py`, `v2/p4_evidence.py`, `v2/destructive_authority.py`.
+  `probe/{cli_invocation,process_effect,python_callable,python_callable_v2}.py`. `validation/`: 15 files
+  (`grep -rl process_range validation`, counted in the review; this document said 16), among them `v2/mutation.py`, `v2/p4_evidence.py`, `v2/destructive_authority.py`.
 * **Mutation targets to register** (`validation/v2/mutation.py`, the lead's): `ProcessRange.release` (changed),
-  `ProcessRange._ladder`, `ProcessRange._release`, `_Flight.__init__` (new), with kill files
+  `ProcessRange._ladder`, `ProcessRange._release`, `_Flight.__init__` (new) and `ProcessRange.__init__` (changed: two
+  lines; its 17 mutants are measured below), with kill files
   `tests/v2/p4/test_process_range.py` and `tests/v2/test_v21_r3_range_release_contract.py`. The sealed P4 record
   names 17 targets of this file (`_abort`, `_close_pipes`, `_signal`, `anchor_returncode`, `escaped`, `members`,
   `release`, `start`, `wait`, `wait_empty`, `_Job.controller_stopped`, `_Posix.abort/escaped/members`, `_ps_table`,
@@ -182,16 +189,19 @@ let go. No process and no sleep of the test's own, except `RealRange` and the PO
 Host: macOS arm64, CPython 3.14.7, the machine carrying other sessions' work throughout. Guest: Linux 7.0.12-linuxkit
 aarch64, CPython 3.14.8, bubblewrap 0.12.0 (`guest.sh`, one discarded container per command, no network).
 
-**8.1 The new tests.** 25 tests, ~0.5 s.
+**8.1 The new tests.** 25 tests at the implementer's head (~0.5 s); 32 after the review (~1.8 s). The table is the
+implementer's measurement of the 25; the review's own runs of the 32 are in section 10.
 
 | where | tree | result |
 |---|---|---|
 | host | this branch | 40/40 runs OK |
 | host | `BASE` file | 12 FAIL + 1 skipped (no claim lock), **40/40 runs each**; the real-`io` test fails with the exact `ValueError: PyMemoryView_FromBuffer(): info->buf must not be NULL` |
-| guest (**real run**) | this branch | 25 OK |
-| guest (**real run**) | `BASE` file | 12 FAIL + 1 skipped, the same exact ValueError: the reproduction is not macOS's |
+| guest (**real run** of the same fake-backend tests: Linux, not a simulation of Linux) | this branch | 25 OK |
+| guest (**real run**, as above) | `BASE` file | 12 FAIL + 1 skipped, the same exact ValueError: the reproduction is not macOS's |
 
-**8.2 Mutants** (`kill_check`, the new test file alone, T0 PASS 25 tests; source sha256 `489e7ec3638c...`):
+**8.2 Mutants** (`kill_check`, the new test file alone, T0 PASS 25 tests; source sha256 `489e7ec3638c...`). This is the
+implementer's table of the 25-test file; the review's re-run of it found `release` [17] unstable (INFRA) and its
+re-run with the 32-test file is in section 10:
 
 | function | mutants | KILLED | SURVIVED |
 |---|---|---|---|
@@ -268,8 +278,80 @@ So this change adds four failing tests to `BASE`'s four, all of them records bou
   would have. If a signal handler ever calls `scope.dispose()` while the main thread is inside `release()`, the
   worker it starts waits for the suspended frame and is cut at `RELEASE_TIMEOUT_S` (600 s) by the scope, where
   before it ran a ladder alongside. The product has no such handler (section 2).
-* **A flight stranded by an asynchronous exception.** `KeyboardInterrupt` delivered in the few bytecodes between the
-  claim and the `try`, or inside the `finally` before `done = True`, would leave waiters polling (the same window
-  exists around every `with lock:`); not measured, not closed.
+* **A flight stranded by an asynchronous exception.** `KeyboardInterrupt` delivered inside the `finally`, before
+  `done = True` (two bytecodes), would leave waiters polling; not measured, not closed. (The claim itself is inside
+  the `try`: an interrupt between the creation of the flight and its publication reaches the `finally`, which sets
+  `done`, so that window does not strand anyone.)
 * **Two `wait()` callers share one queue** (finding (d)); not part of this contract, left alone.
 * The sealed-record checkers listed in 8.5/8.6 are stale after this change by construction; the lead regenerates them.
+
+## 10. Independent review (branch `v21r3/range-rv`, stacked on `v21r3/range`)
+
+Re-run by a second engineer, on the host (macOS arm64, CPython 3.14.7, a second interpreter 3.12.14), in the Linux
+guest (3.14.8), and by mutating the implementation. Nothing in `process_range.py` was changed: the review found no
+defect in the product code. It found four gaps in the evidence, all closed by tests (7 added, 32 in the file now).
+
+**10.1 What the 25 tests did not notice (wrong implementations that passed all 25).** Each variant is the committed
+`process_range.py` with one thing made wrong; "25/25" is the implementer's file, "32/32" the final one.
+
+| wrong implementation | result on the 25 tests | on the 32 |
+|---|---|---|
+| the claim without a lock, and without the `_mx` attribute (the one test that looks for `_mx` skips) | 24 OK + 1 skipped | FAIL: `test_two_threads_that_arrive_together_are_not_both_leaders` |
+| the claim with a lock, but the check and the write in two critical sections (TOCTOU) | 25/25 OK | FAIL: the same |
+| a waiter that returns as soon as the leader is `disposing` (past the ladder, before the reap, the pipe close and the escapee check) | 25/25 OK (by luck of the 20 ms poll: the leader had finished) | FAIL: `test_a_caller_is_held_until_the_release_has_ended_...` (5 subtests) and `..._waits_for_the_escapee_check_...` |
+| `flight.done = True` set right after the ladder instead of at the end | 1 failure (a re-entry test, for another reason: no test pinned a waiter against this) | FAIL: the held-until-ended tests |
+| the second look at escapees (Linux orphan re-parented to the anchor) deleted | 25/25 OK, and `tests/v2/p4/test_process_range.py` passes too (host and guest) | FAIL: `EscapeeLooks` |
+
+The first two matter most: the claim is exactly where the original defect lives and its window is a few bytecodes.
+`RealRange` (two real threads aligned by a barrier) did not see the unlocked claim in 100 runs — the "repeat until it
+stops failing" the owner excluded. `ClaimAndWait.test_two_threads_that_arrive_together_are_not_both_leaders` parks one thread INSIDE the claim
+(after its read of `_reaped`, through a property on a subclass: nothing of the design's names is needed) and brings a
+second one to it. In a correct run the second caller is held and a bounded `Event.wait` (`CLAIM_PROBE_S`, 1 s) runs
+out; a claim that lets it through sets the event at once. It is the only test of the file that waits on time, and a
+correct implementation can not fail it on a slow machine (a slow machine can only hide a wrong one).
+
+**10.2 `kill_check`, re-run.** The implementer's 25-test file, run again: `ProcessRange.release` 22 KILLED + **1 INFRA**
+(mutant [17], `L457 not removed`: `while not current.done:` becomes `while current.done:`, a waiter that spins on the
+claim instead of sleeping; alone it was KILLED, KILLED, INFRA in three runs, by a different test each time, because
+only a rare hang window made the file fail). The bracket needs the same signature twice, so that mutant would have been
+a coin flip in the lead's re-measurement. `AbandonedWorker` now asserts that its late caller is seen *polling*
+(`second_is_held() == "waiting"`); [17] is KILLED, by that test, in 5 of 5 runs. With the 32-test file (T0 PASS, 32
+tests): `release` 23/23, `_ladder` 15/15, `_release` 12/12, `_Flight.__init__` 2/2, `ProcessRange.__init__` 17/17
+KILLED, 69/69. Kills that go only through an exception: `__init__` [0-13] (a dropped element of a tuple unpack:
+`ValueError` at construction, which any test that builds a range meets), `_ladder` [8], [9] (`self._grace[None]`:
+`TypeError` at the kill stage) and [14] (`s['']`: `KeyError`; the message text is asserted by another test). The
+statement-deletion probe below is not a measurement of record.
+
+**10.3 Statement deletions** (a probe of the review, not `kill_check`): each simple statement of `release`, `_ladder`,
+`_release`, `_Flight.__init__` and the two new lines of `ProcessRange.__init__` replaced by `pass`, 38 variants, the
+32-test file with its bounds shortened to 2 s. 33 FAIL, 3 hang (`flight.done = True`; the EXIT write; its flush: a real
+anchor never exits), 2 SURVIVED before the additions: the two escapee looks (the first is killed by
+`p4/test_process_range.py`, the second by nothing). After them none survives.
+
+**10.4 Reproduced, not read.** Host `BASE`: 12 FAIL + 1 skipped of the 25, three runs, the exact `ValueError:
+PyMemoryView_FromBuffer(): info->buf must not be NULL` from the real-`io` test; the same on 3.12.14 and in the guest
+(real run of the fake-backend tests); this branch: 25/25, and 32/32 forty times on the host, three times on 3.12.14
+and once in the guest. The alternatives of section 4 re-applied to `BASE` and run against the 32 tests: investigator's
+`RLock` 7 failures (86 s), plain `Lock` 8 (116 s: self-deadlocks end at the tests' 10 s bound), swallow 18. Each is the
+implementer's count plus the review's tests; one of the RLock/Lock failures is `AbandonedWorker`'s design-bound
+assertion that the late caller is seen polling, which a blocking lock does not do although it holds the caller too.
+Supplement (100 runs each, a fresh interpreter, `env -i`): `FM2_CLI_SUBJECT_3` on `BASE` 96 pass / 4 fail, the exact
+error in 7 outputs, all four failing runs through `run.release()` -> `_close_pipes()`; on this branch 100/100, 0.
+Importers re-run on this branch: `p4.test_process_range` 24, `test_c2_cli_invocation` 32, `test_probe_process_effect`
+24, `test_v21_confine` 34 (host; guest X1 and hardened), `p4.test_interruption` 20 (3/3 in the foreground),
+`test_python_callable_v2` 33, `p2.test_python_callable` 37, `test_c2_p9_harness` 31, `test_p6_orchestration` 32,
+`test_no_dual_authority` 17, `p5.test_vacuity` 19, `p5.test_invariants` 50, `p0.test_destructive_authority` 13,
+`p4.test_mutation_safety` 10, `hardening.test_process_owner` 7: all OK. The sealed records fail as section 8.6 says:
+`BASE` k_nowork OK, p5_acceptance 1, checker_calibration 2, orchestration_conformance 1; this branch 1, 2, 2, 1, and
+`PlanCorrection` and `Classify [P4]` for the digest of `process_range.py` / `aisef2/`.
+
+**10.5 What stays open (not changed).** (a) D1 above is worse than "later callers see `None`": the outcome a caller gets
+depends on a window of microseconds. Two threads call `release()` and the leader ends in RangeEscaped: a caller that
+arrived during the release is given RangeEscaped; one that arrives after it ends gets `None`. In the two by-design tests
+the stop thread's exception is read by nobody, so which of the two the probe's own `finally` is decides whether the
+leak is seen. The product has no such pair of callers (section 2). The owner's choice is between (i) leaving it, (ii) a
+range that remembers the Residual of its last completed release and re-raises it to every later caller until it is
+cleared (the sequential outcomes of RangeEscaped change; RangeNotEmpty still re-runs the ladder). (b) A leader that
+dies of something that is not a Residual after the reap (a failing `process_table()` in the escapee check) gives its
+waiters `None`: the escapee check did not complete for anyone. (c) The sealed records and `docs/v2.1/REPORT.md`
+(Q-RANGE row), `MUTATION-RUNNER-V2.md` (the intermittent-failure paragraph) still describe the question as open.
