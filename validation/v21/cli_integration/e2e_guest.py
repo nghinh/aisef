@@ -782,7 +782,7 @@ def proofs(ctx: Ctx, s1_: Scenario | None) -> list[dict]:
          "RUN.json sessions[].confinement; the client's own /proc/1/cmdline equals confine.argv (S1 check "
          "*_ran_inside_bwrap_as_pid_1_with_the_kernels_argv)",
          "value": [x.get("confinement") for x in rec.get("sessions") or []]},
-        {"segment": "story_runner -> merge (commit by the kernel, the git directory read-only to the session)", "field":
+        {"segment": "story_runner -> merge (the kernel commits the developer's files; the scripted developer never runs git, so developer_committed_itself is false by construction; the read-only git directory is shown by S2)", "field":
          "RUN.json story_outcomes, final_main, sessions[developer].developer_committed_itself",
          "value": {"story_outcomes": rec.get("story_outcomes"), "final_main": rec.get("final_main"),
                    "developer_committed_itself": [x.get("developer_committed_itself") for x in dev]}},
