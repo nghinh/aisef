@@ -32,7 +32,11 @@ requests, the preflight's ledger) and adds what only the journal shows: a provid
 when the run ended — whose session stream exists is unknown spend. `lineage_account` sums the lineage (each run once,
 and every superseded child, whose preflight may have spent). A continuation of a lineage with unaccounted spend starts
 no paid work unless the operator accepts it by name (`--accept-unaccounted`), and the lineage's known spend counts
-against the run's ceilings (continuing never resets a budget).
+against the run's ceilings (continuing never resets a budget). Evidence the system will not let `account_of` look at — a
+run directory with no search permission, a `sessions` that is a link into a directory that cannot be traversed or is a
+directory that cannot be listed — is unknown spend, listed: never raised out of it, never a 0 shown as known. What is
+genuinely not there (no sessions directory, no ledger, no run directory) is not unknown: it is what a run that spent
+nothing there looks like.
 
 **A file that is damaged, or is not what a run writes** — a ledger line or a claim that is valid JSON and no object, a
 session stream the reader refuses — is answered as the torn form of the same file is: unknown spend, listed; the
@@ -41,6 +45,7 @@ unreadable-claim marker; a claim passed over, or not superseded without evidence
 
 from __future__ import annotations
 
+import errno
 import json
 import os
 import pathlib
@@ -252,6 +257,29 @@ def reconcile(run_dir: pathlib.Path, events: list, baseline: str, torn: bool) ->
 
 # ------------------------------------------------------------------------------------------------ spend
 
+#: what the system answers when there is nothing at a path — the errors pathlib itself (3.11-3.13) takes for "not there":
+#: no such name, a component that is not a directory, a link that resolves to nothing or loops; on Windows an invalid
+#: name, a drive not ready, a reparse point that cannot be resolved
+_NOT_THERE = (errno.ENOENT, errno.ENOTDIR, errno.EBADF, errno.ELOOP)
+_NOT_THERE_WINERROR = (21, 123, 1921)
+
+
+def _look(path: pathlib.Path) -> None:
+    """Raise what keeps the system from listing `path` — or, `path` being a file, from finding it: no permission (a link
+    into a directory that cannot be traversed, a run directory with no search permission, a directory that cannot be
+    listed), a name too long, an I/O error. Nothing for what is there (a file answers "not a directory") and for what is
+    genuinely not there. `Path.is_dir` and `exists` raise on a refusal in 3.11-3.13 and answer False in 3.14, and `glob`
+    answers an empty listing in all of them: spend that could not be seen was raised out of `account_of` or shown as a
+    known 0."""
+    try:
+        os.listdir(path)
+    except OSError as e:
+        if e.errno not in _NOT_THERE and getattr(e, "winerror", None) not in _NOT_THERE_WINERROR:
+            raise
+    except ValueError:      # a name with a NUL byte names no file: pathlib has always answered "not there"
+        pass
+
+
 def account_of(run_dir: pathlib.Path) -> dict:
     """What `run_dir` spent, re-derived from its evidence (the run's Budget rules), and what is unknown."""
     from aisef2.app import client, preflight
@@ -259,19 +287,22 @@ def account_of(run_dir: pathlib.Path) -> dict:
     events = got[0] if got else []
     requests = [e for e in events if e.type == "provider/request"]
     answered = {s for e in events if e.type == "provider/result" for s in e.source_seqs}
+    ledger, sessions = run_dir / "preflight" / "LEDGER.jsonl", run_dir / "sessions"
     try:
-        pre = preflight.accounting(run_dir / "preflight" / "LEDGER.jsonl")
+        _look(ledger)
+        pre = preflight.accounting(ledger)
     except Exception:  # noqa: BLE001 — a ledger the reader refuses, whatever its damage, is spend that is unknown
         pre = {k: 0 for k in SPEND} | {"unaccounted": ["the preflight's ledger does not read"]}
     huge = {k: 10 ** 12 for k in SPEND}
     try:
-        spent = client.Budget(huge, pre, run_dir / "sessions", lambda: len(requests)).spend()
+        _look(sessions)
+        spent = client.Budget(huge, pre, sessions, lambda: len(requests)).spend()
     except Exception as e:  # noqa: BLE001 — a stream the reader refuses: what the sessions spent is unknown, not 0
         spent = {**{k: pre[k] for k in SPEND}, "provider_requests": pre["provider_requests"] + len(requests),
                  "unaccounted": [f"{run_dir.name}: a session's event stream does not read ({type(e).__name__}): what "
                                  "the sessions spent is unknown"]}
     unaccounted = list(spent["unaccounted"]) + [f"preflight request {n} sent and never answered" for n in pre.get("unaccounted") or []]
-    logs = [p.name for p in (run_dir / "sessions").glob("*.jsonl")] if (run_dir / "sessions").is_dir() else []
+    logs = [p.name for p in sessions.glob("*.jsonl")] if os.path.isdir(sessions) else []
     for r in requests:
         if r.seq in answered:
             continue
@@ -283,7 +314,7 @@ def account_of(run_dir: pathlib.Path) -> dict:
         if len(mine) > done:
             unaccounted.append(f"{run_dir.name}: provider request seq {r.seq} ({story}, {owner}) has no result — in "
                                "flight when the run ended: what it spent is unknown")
-    return {"run": str(run_dir), "recorded": (run_dir / "RUN.json").is_file(),
+    return {"run": str(run_dir), "recorded": os.path.isfile(run_dir / "RUN.json"),
             **{k: int(spent[k]) for k in SPEND}, "unaccounted": unaccounted}
 
 
