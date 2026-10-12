@@ -1,4 +1,4 @@
-# AISEF 2.1 — Báo cáo trạng thái (2026-10-06, bản sửa theo yêu cầu nghiệm thu)
+# AISEF 2.1 — Báo cáo trạng thái (2026-10-06, bản sửa theo yêu cầu nghiệm thu; §0 cập nhật 2026-10-12)
 
 **Chưa đủ điều kiện phát hành.** A–E **chưa hoàn thành**: không có cách ly hệ điều hành, không có lượt chạy live nào
 (OCR với mô hình thật, developer thật), không có số đo đối chứng, và suite đầy đủ còn đỏ ở các test so bản ghi niêm
@@ -8,6 +8,91 @@ chưa duyệt phát hành, chưa duyệt ngân sách 140 USD — báo cáo này 
 Tài liệu đi kèm: [RED-SUITE.md](RED-SUITE.md) (từng test đỏ), [ADR-V2.1.md](ADR-V2.1.md),
 [ANCHOR-THREAT-MODEL.md](ANCHOR-THREAT-MODEL.md), [USAGE-2.1.md](USAGE-2.1.md), [decisions/](decisions/) (hồ sơ B-01, B-04,
 B-08, B-09, B-10), [STATUS.md](STATUS.md) (phát hiện → sửa, theo từng dòng).
+
+## 0. Cập nhật 2026-10-12 — vòng mutation B-03 (B-01 và B-03 a–d đã được chủ dự án duyệt 2026-10-06; B-02, B-04, B-08, B-09, B-10 **chưa**)
+
+**Điều kiện vẫn chưa đạt.** Bản ghi mutation V2.1 là **FAIL**, vì đúng **9 mutant còn mở** ở 4 target — mỗi cái là một
+câu hỏi của chủ dự án, không phải một test thiếu (§0.4). Không có gì được push, gắn tag, publish; không chạy provider trả
+tiền. "KILLED" dưới đây là **mutation** (test thật bắt được thay đổi nhỏ của mã); nó không thay cho kiểm chứng tích hợp
+hay cho số đo với mô hình thật.
+
+### 0.1 Bản ghi cuối (`closure-evidence/v2/v2.1/MUTATION.json`, `MUTATION-SUMMARY.json`, đo ở runner v2)
+
+| | số lượng |
+|---|---|
+| target (mỗi cái được tính đúng một lần) | 469 (28 đo ở snapshot cuối `b5c2457`, 441 dùng lại sau chứng minh cơ học) |
+| mutant | 12,555 |
+| **KILLED** (một FAIL tái hiện, có kiểm chứng đối chứng) | **12,333** |
+| SURVIVED, có audit theo vị trí | 213 — **152 AUDITED** (khác biệt có thật, không người đọc nào dựa vào; nêu từng người đọc, từng ngoại lệ) + **61 EQUIVALENT** (chứng minh từ mã). **Không phải kill; báo riêng.** |
+| SURVIVED, **chưa quyết** | **9** — `confine._judge` ×4, `confine.measure` ×2, `usage.no_progress` ×2, `review_verify.detail` ×1 |
+| TIMEOUT / INFRA / NOT_RUN / diệt bằng đồng hồ | 0 / 0 / 0 / 0 |
+| kết luận bản ghi | **FAIL** (chỉ vì 9 mutant trên); tiêu chí tái dùng đóng băng, không đổi |
+
+Lịch sử các lượt đo (mỗi kết quả gắn commit/snapshot/runner/bộ kill/môi trường; bản ghi chiến dịch 2 giữ nguyên làm
+lịch sử): chiến dịch 2 (`5719f1f`, 466 target, 12,448 mutant, 58.9 giờ) 10,738 K / 1,676 S / 3 TIMEOUT / 31 INFRA →
+sửa runner (INFRA là kill thật mà chữ ký lỗi chỉ khác tên thư mục tạm của runner; `c4c1720`) → 84 tệp test kill + 12 tệp
+test lỗi (11 cụm lỗi sản phẩm, 1 lỗi của runner) → chiến dịch 3 (`f860e57`, 199 target, 7,867 mutant, 14.5 giờ) 7,625 K / 242 S → vòng 2 (42
+mutant: 21 K, 8 AUDITED, 3 EQUIVALENT, 9 mở, 1 lỗi sản phẩm) → chiến dịch 4 (`b5c2457`, 28 target, 1,378 mutant, 2.85
+giờ) 1,336 K / 42 S (cả 42 đã có audit). 34 mutant "chưa phân giải" của chiến dịch 2: **34/34 KILLED**. Kiểm tra tác
+động của việc sửa runner: 20 target đứng yên đo lại (632 mutant) — **0 khác biệt về lớp** (mẫu, không phải chứng minh
+cho phần còn lại). Chi tiết: `closure-evidence/v2/v2.1/campaign-3/results/README.md`, `campaign-4/results/`,
+`mutation/ROUND-2.md`.
+
+### 0.2 Bảng: đã làm / đã kiểm chứng / chưa kiểm chứng / bị chặn
+
+| Hạng mục | Đã làm | Đã kiểm chứng (bằng gì) | Chưa kiểm chứng | Bị chặn / chờ |
+|---|---|---|---|---|
+| Runner mutation v2 | chữ ký lỗi bỏ tên thư mục tạm của runner; audit theo vị trí; bộ phân tích `ps` | `test_v21_mutation_runner` (chữ ký, audit theo vị trí); 20/20 mẫu tác động; 34/34 | 441 target đứng yên (269 theo chiến dịch 2, 172 theo chiến dịch 3) không đo lại: chúng đứng theo delta và read-set của 140 tệp kill đo thật, không theo chứng minh tĩnh | — |
+| Mutation 469 target | xem §0.1 | bản ghi + `--check` ở HEAD | 9 mutant mở | **quyết định chủ dự án** (§0.4) |
+| Lỗi sản phẩm tìm bằng audit | 11 cụm lỗi sửa (lint, confine ×2, OCR, verify, lineage ×2, preflight, reproducer, usage, bundle, bundle_cli), mỗi cụm có test của yêu cầu thật đỏ trước/xanh sau | test + kill file của module chạy như cũ; Linux guest | các hàm cùng họ trong `lineage.py`/`Budget.spend` (§0.4) | quyết định chủ dự án |
+| Cách ly Linux (F) | harness + `confine` | Linux guest (Docker Desktop, kernel 7.0.12-linuxkit): a/b/c/d1 thoát 0, `test_v21_confine` 34, `p4/test_process_range` 24, bộ test sửa lỗi 114 OK — `campaign-4/linux/` | lượt `aisef run` thật có cách ly; `LANG` khác tiếng Anh (image đo chỉ có `C`/`POSIX`) | M6 |
+| K-NOWORK, Q5, conformance ruling | sinh trên cây mã cuối (§0.3) | tự kiểm của từng công cụ; REPRODUCED AND CORRECTED; ruling 12 hàng | — | — |
+| Q0 (54 checker), acceptance C2-P5 | công cụ có sẵn | — | chưa sinh | cần checker `mutation` sạch ⇒ 9 mutant (§0.4) |
+| Suite đầy đủ | chạy trên commit cuối (hermetic, `env -i`, không có `opencode` trong PATH) | kết quả và từng test đỏ + lý do: `closure-evidence/v2/v2.1/campaign-4/suite/README.md` (commit đó chỉ thêm bằng chứng sau tài liệu này) | — | test đỏ còn lại là các test so bản ghi niêm phong (§0.3) |
+
+### 0.3 Bản ghi dẫn xuất 2.1 (đúng thứ tự phụ thuộc)
+
+Cây mã cuối là cây của snapshot chiến dịch 4 (`b5c2457`); các commit sau đó chỉ đổi tài liệu và `closure-evidence/`.
+**Đã sinh và commit trên cây đó:** P5 proposal; P5 falsifiability (59/59 spec đạt); PLAN-V2.2 correction 1; P2 static
+admission; `T0-SWEEP-4` / `EXECUTION-ORDER-5`; **K-NOWORK-001** rehearsal (REPRODUCED AND CORRECTED, 724 s); **Q5**
+kernel comparison (6 giống hệt, 5 chỉ đổi danh tính, 3 khác — đúng ba thay đổi có tên: `developer-regression-at-candidate`,
+`post-merge-integration-regression`, `post-merge-regression`); **conformance ruling** (12 hàng).
+**Không sinh, và không được sinh như đạt:** `Q0-CHECKER-CALIBRATION.json` (Q0 đòi mọi checker hiệu chuẩn, trong đó
+checker `mutation` phải chạy sạch trên bản ghi thật — nó đỏ vì bản ghi V2.1 là FAIL) và
+`C2-P5-ACCEPTANCE-REVERIFICATION.json` (chạy lại guard Q0). Ruling nói rõ (f) chỉ được chấp nhận khi
+`mutation.check() == []`, nên các test so với bản ghi niêm phong còn đỏ cho tới khi 9 mutant được quyết; không bản ghi nào
+được viết để làm xanh một test.
+
+### 0.4 Quyết định thật sự cần ở chủ dự án
+
+| # | Câu hỏi | Ảnh hưởng nếu trả lời |
+|---|---|---|
+| Q-JUDGE | Mount `devpts`/`mqueue` **ghi được** ngoài `/dev/` có là "ghi được ngoài workspace" không? (không tài liệu nào định nghĩa "host-backed"; dòng devpts rw duy nhất từng đo là `/dev/pts`, đã được miễn) | 4 mutant `confine._judge`; có sẵn test nháp cho đáp án "giữ", chưa vào suite |
+| Q-LANG | Phép đo `confine.measure` phản chiếu locale của phiên hay chạy cố định `C`? (hiện truyền `LANG`, bỏ `LC_ALL`; mọi lần đo đều `LANG=C`) | 2 mutant; image đo của guest chỉ có `C`/`POSIX` nên chưa thể phát sinh từ chối sai ở đó |
+| Q-JOURNAL | `no_progress` lượng hoá trên những journal nào? (hồ sơ `mutation/no_progress-13-23.md`: tương đương chỉ trên journal do kernel viết — miền A) | 2 mutant; có test nháp A/B |
+| Q-DETAIL | `review_verify.detail()` cắt 1500 ký tự: phần nào của reproducer phải sống sót; cắt có phải giữ JSON hợp lệ? (hiện thứ tự khoá quyết định; không test nào khẳng định `len ≤ 1500`) | 1 mutant; tái hiện ở `mutation/round-2-drafts/open-1.py` |
+| Q-RANGE | `ProcessRange.release()` bị hai luồng gọi: một `RLock` (+9/−1, đã có test tất định) hay giữ nguyên và ghi nhận "flake đã biết" (1–5% mỗi lượt của MỘT test; không bao giờ là kill giả; không đường sản phẩm nào chạm tới) | tệp bị ghim bởi manifest: sửa = manifest mới + đo lại tới ~235 target nhập nó. Khuyến nghị: sửa cùng đợt kế tiếp đụng harness, không đo lại riêng — `campaign-3/CAMPAIGN-3-NOTES.md` |
+| Họ `lineage.py` | `claims()`, `child_state`, `events_of`, `Budget.spend`: cùng tra cứu phụ thuộc phiên bản Python cho thư mục chạy không tìm kiếm được; `claim` từ chối hay traceback là quyết định thiết kế | không đổi trong đợt này |
+| Việc cũ còn chờ | xoá 3 tệp probe trong `site-packages` (lệnh `rm` đúng đường dẫn chờ duyệt); probe module (namespace-package, lỗi trước subprocess, `file_artifact` RecursionError — đổi probe cần hiệu chuẩn lại); kiểm phiên bản OCR trước lượt chạy; B-02/B-04/B-08/B-09/B-10 | — |
+
+### 0.5 Bảng bàn giao (tách trạng thái: mutation ≠ tích hợp ≠ số đo với mô hình thật)
+
+Từng hàng nguồn → commit → test, kể cả hàng bị từ chối hay còn mở: [TRACEABILITY.md](TRACEABILITY.md) (sinh từ
+`research/TRACEABILITY.json`, 88 hàng, kiểm bằng `validation/v21/traceability_check.py`). Dưới đây là phần cô đọng, theo
+nguồn upstream; "mức" là M1–M6 của §2 bên dưới.
+
+| Nguồn | Cơ chế đã nhận (hàng đề xuất) | Mã | Commit | Kiểm chứng | Tích hợp vào `aisef run` | Lợi ích **chưa đo** |
+|---|---|---|---|---|---|---|
+| open-code-review (OCR) | adapter OCR + finding đã xác nhận mới chặn; manifest thiếu ⇒ INDETERMINATE (P-V2-09, P-4.2a/b) | `review_ocr.py`, `review_verify.py`, `adapters.Reviewer._ocr` | `e897437` `390f07c` `929598f` `51f2eb5` | mutation (3 module); `test_v21_review*`, `test_v21_review_chain`; CLI thật + nhị phân OCR v1.12.12 với mô hình **kịch bản** (M4) | có (`review.finder: "ocr"`), mặc định tắt | chất lượng/độ phủ finding với mô hình thật (M6); 4/5 lỗi lịch sử neo được, lỗi thứ năm UNANCHORED vẫn lọt gate theo luật neo |
+| open-code-review + MiMo-Code | nối tiếp từ journal, run con giữ run cha và bằng chứng cũ, claim theo thế hệ (P-V2-10, P-5.2c) | `lineage.py`, `bundle_cli.py`, `run.py` | `d622e71` `7e0aac0` `872e83c` `b72e51e` `7fe1062` | mutation (cả `lineage.py` sau khi sửa lỗi); SIGKILL thật ở 13 điểm; CLI thật (M4) | có (`bundle continue`, `run --parent`) | resume tại chỗ **không làm** (cần format journal mới) |
+| open-code-review + MiMo-Code | sổ chi phí, "không biết ≠ 0", giới hạn không tiến triển (P-V2-11, P-5.3c) | `usage.py`, `lineage.account_of` | `d622e71` `6634d6d` | mutation; `test_v21_continue_usage` (D2 M4, D3 M3) | có; `no_progress` chỉ báo cáo | giá thật (M6); quyết định miền journal (Q-JOURNAL) |
+| MiMo-Code | gói ngữ cảnh do controller dựng cho lượt thử lại — **không** phải checkpoint (P-5.3a vẫn **MỞ**) | `feedback.py::context_pack`, `Developer` | `f15026b` `80f4437` `1899bb0` `7797061` | mutation; `test_v21_context_pack`; đo trên 16 lượt thử lại đã ghi; CLI thật (M4) | có, trong một run | hiệu quả sửa lỗi với mô hình thật (M6, lượt chạy trả tiền) |
+| OpenSandbox | cách ly Linux tối thiểu, opt-in | `confine.py`, `validation/v21/sandbox` | xem REPORT §2 hàng F | mutation + Linux guest (§0.2) | opt-in; chưa có lượt `aisef run` thật có cách ly | ranh giới bảo đảm với phiên thật (M6); mạng phiên **không** cách ly |
+| OpenResearch | harness thí nghiệm đối chứng: manifest niêm phong, cặp một biến, evaluator ẩn (P-V2-13, P-6.2a/b) | `validation/experiments/harness.py` | `a29e82b` | `test_v21_experiment` (replay offline, M3) | **không** thuộc đường sản phẩm | chiến dịch đối chứng (E2) chưa chạy: ngân sách B-09 và sandbox cho evaluator ẩn |
+
+Quy tắc đọc: mutation **không** thay kiểm chứng tích hợp; kiểm chứng tích hợp bằng mô hình kịch bản **không** phải số đo
+với mô hình thật; chưa có mục nào đạt M5 (live). "Harness đối chứng" là công cụ riêng; "OCR", "gói ngữ cảnh", "cách ly
+Linux" có trạng thái riêng ở bảng trên và không gộp.
 
 ## 1. HEAD và trạng thái từng nhánh
 
