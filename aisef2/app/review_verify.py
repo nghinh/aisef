@@ -264,12 +264,12 @@ SUMMARY_MAX = 1500
 ARTIFACT_DIR = "review-findings"
 ARTIFACT_FORMAT = "aisef-v2-review-finding/1"
 REDACTED = "[REDACTED]"      # what app/client.redact writes into a session's stream
-DEPTH_MAX = 64
+DEPTH_MAX = 64               # containers nested deeper are not kept (no probe grammar nests that far)
 #: the decisive text fields' bounds, in characters of the encoded string body (each cut at its own bound only)
 FINDING_MAX, CLAUSE_MAX, STATUS_MAX, WHY_MAX, OBSERVED_MAX, NOT_KEPT_MAX = 60, 40, 20, 160, 24, 120
-#: what a marker may add to the statement: `"<field>": <count>, ` (an elastic field's name is at most 10 characters and
-#: a count at most 10 digits) for each elastic field, and `"elided": {}, ` itself
-_MARK, _ELIDED = 26, 14
+#: what one more marker may add to the statement: `, "<field>": <count>` (an elastic field's name is at most 10
+#: characters and a count at most 10 digits: a field of less than 10**10 characters) is at most 26 characters
+_MARK = 26
 _ARTIFACT_PATH = re.compile(re.escape(ARTIFACT_DIR) + r"/[A-Za-z0-9_.-]{1,80}\.json")
 _SHA256 = re.compile(r"[0-9a-f]{64}")
 
@@ -316,7 +316,7 @@ def redacted(value, secrets=()):
             return out
         if isinstance(x, (list, tuple)):
             return [walk(item, depth + 1) for item in x]
-        if x is None or isinstance(x, (bool, int)) or (isinstance(x, float) and math.isfinite(x)):
+        if x is None or isinstance(x, int) or (isinstance(x, float) and math.isfinite(x)):     # a bool is an int
             return x
         return walk(repr(x))
     return walk(value), count
@@ -353,7 +353,7 @@ def detail(finding: Mapping, v: Verification, anchored: Anchor | None = None, ar
     sha256, a size), or — a str — why it is not (`artifact: null`, `artifact_why`); absent for None. `secrets` are
     replaced in everything stated, before anything is cut.
 
-    Why the bound holds: the decisive text fields are at most 60+40+20+160+24+24+160 characters (an artifact
+    Why the bound holds: the decisive text fields are at most 60+40+20+160+24+20+160 characters (an artifact
     reference has a checked shape; `artifact_why` is at most 120), their keys and the punctuation are fixed, and the
     elastic fields share `SUMMARY_MAX` less all of that and what their own markers may add."""
     def red(x):
@@ -383,9 +383,8 @@ def detail(finding: Mapping, v: Verification, anchored: Anchor | None = None, ar
     elastic = {"summary": red(str(finding.get("summary", "")))}
     if r:
         elastic |= {k: r.get(k) for k in ("subject", "stimulus", "observable")}
-    out |= {"summary": "", "reproducer": {k: "" for k in elastic if k != "summary"} or None}
-    room = (SUMMARY_MAX - len(_dumps({**out, **({"elided": cut} if cut else {})})) + 2 * len(elastic)
-            - _MARK * len(elastic) - (0 if cut else _ELIDED))
+    out |= {"summary": "", "reproducer": {k: "" for k in elastic if k != "summary"} or None, "elided": cut}
+    room = SUMMARY_MAX - len(_dumps(out)) + 2 * len(elastic) - _MARK * len(elastic)    # `cut` is in `out`, empty or not
     size = {k: len(_dumps(x)) for k, x in elastic.items()}
     shown, n = {}, len(elastic)
     for k in sorted(elastic, key=size.get):     # the smallest first: what it does not need goes to the others
@@ -398,8 +397,8 @@ def detail(finding: Mapping, v: Verification, anchored: Anchor | None = None, ar
     out["summary"] = shown.pop("summary")
     if shown:
         out["reproducer"] = shown
-    if cut:
-        out["elided"] = cut
+    if not cut:
+        out.pop("elided")
     return _dumps(out)
 
 
@@ -416,19 +415,20 @@ def preserve(out: pathlib.Path, finding: Mapping, *, story: str, attempt: int, i
         data = (json.dumps({"format": ARTIFACT_FORMAT, "story_id": story, "attempt": attempt, "index": index,
                             "revision": revision, "session": session, "redacted": count, "finding": body},
                            indent=1, sort_keys=True) + "\n").encode("ascii")
+        name = f"{re.sub(r'[^A-Za-z0-9_-]', '_', story)[:40]}.{attempt}.{index}.json"
+        kept = Artifact(f"{ARTIFACT_DIR}/{name}", hashlib.sha256(data).hexdigest(), len(data))   # a name it refuses: no file
         folder = pathlib.Path(out) / ARTIFACT_DIR
-        final = folder / f"{re.sub(r'[^A-Za-z0-9_-]', '_', story)[:40]}.{attempt}.{index}.json"
         folder.mkdir(exist_ok=True)
-        if final.exists():
-            raise FileExistsError(f"{final.name} exists: an artifact is never overwritten")
-        sibling = final.with_name(final.name + ".tmp")
+        if (folder / name).exists():
+            raise FileExistsError(f"{name} exists: an artifact is never overwritten")
+        sibling = folder / f"{name}.tmp"
         with sibling.open("xb") as fh:
             fh.write(data)
             fh.flush()
             os.fsync(fh.fileno())
-        os.replace(sibling, final)
-        return Artifact(f"{ARTIFACT_DIR}/{final.name}", hashlib.sha256(data).hexdigest(), len(data))
-    except (OSError, ValueError, TypeError, RecursionError) as e:
+        os.replace(sibling, folder / name)
+        return kept
+    except (OSError, ValueError, TypeError) as e:
         return f"{type(e).__name__}: {e}"[:300]
 
 
@@ -454,14 +454,16 @@ def artifact_problems(out: pathlib.Path, events: list[dict]) -> tuple[list[str],
         row = f"review row {e.get('seq')} ({d.get('check')})"
         ref = stated.get("artifact")
         if not isinstance(ref, dict):
-            if d.get("passed") is False and "artifact" in stated:
+            if ref is not None:
+                problems.append(f"{row}: its artifact reference {ref!r} is not a path, a size and a sha256")
+            elif d.get("passed") is False and "artifact" in stated:
                 problems.append(f"{row}: it blocked and names no artifact — the reproducer it rests on is not preserved")
             elif d.get("passed") is False:
                 notes.append(f"{row}: blocked on a statement with no preserved reproducer (a run of a release before "
                              "review artifacts)")
             continue
         parts = pathlib.PurePosixPath(str(ref.get("path"))).parts
-        if len(parts) != 2 or parts[0] != ARTIFACT_DIR or parts[1] in ("", ".", ".."):
+        if len(parts) != 2 or parts[0] != ARTIFACT_DIR or parts[1] == "..":     # a path never holds "" or "."
             problems.append(f"{row}: names {ref.get('path')!r}, which is not a file of {ARTIFACT_DIR}/")
             continue
         try:

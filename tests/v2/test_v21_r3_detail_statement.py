@@ -501,8 +501,10 @@ class AnArtifactReferenceHasAShape(unittest.TestCase):
                ("review-findings/a.json", "0" * 64, -1), ("review-findings/a.json", "0" * 64, 10 ** 10),
                ("review-findings/a.json", "0" * 64, True), ("review-findings/a.json", "0" * 64, "5"))
         for args in bad:
-            with self.subTest(args=args), self.assertRaises(ValueError):
+            with self.subTest(args=args), self.assertRaises(ValueError) as c:
                 V.Artifact(*args)
+            self.assertIn("not a review artifact reference", str(c.exception))
+            self.assertIn(repr(args[0]), str(c.exception))      # which reference
 
 
 if __name__ == "__main__":

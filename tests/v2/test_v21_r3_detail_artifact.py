@@ -20,6 +20,7 @@ import hashlib
 import json
 import os
 import pathlib
+import re
 import sys
 import tempfile
 import types
@@ -106,7 +107,9 @@ class PreserveWritesTheWholeFinding(Scratch):
         before = (self.out / first.path).read_bytes()
         again = self.keep(finding(summary="changed"))
         self.assertIsInstance(again, str)
+        self.assertTrue(again.startswith("FileExistsError: "), again)
         self.assertIn("S1.2.0.json", again)
+        self.assertIn("never overwritten", again)
         self.assertEqual((self.out / first.path).read_bytes(), before)
 
     def test_the_file_is_whole_before_it_is_visible_and_a_failed_write_leaves_nothing_visible(self):
@@ -126,6 +129,25 @@ class PreserveWritesTheWholeFinding(Scratch):
                 self.assertIn("OSError", why)
                 self.assertEqual(sorted(p.name for p in self.folder.glob("*.json")), ["S1.2.0.json"])   # what a reader globs
 
+    def test_the_bytes_do_not_depend_on_the_order_of_the_finders_keys(self):
+        a = {"id": "F", "summary": "s", "reproducer": {"clause": "R-9/3", "stimulus": {"argv": ["a"], "stdin": None}}}
+        b = {"reproducer": {"stimulus": {"stdin": None, "argv": ["a"]}, "clause": "R-9/3"}, "summary": "s", "id": "F"}
+        elsewhere = self.tmp / "out-2"
+        elsewhere.mkdir()
+        first = self.keep(a)
+        second = V.preserve(elsewhere, b, story="S1", attempt=2, index=0, revision=HEAD, session="S1.reviewer.2.jsonl")
+        self.assertEqual(first, second)         # path, sha256 and size
+        self.assertEqual((self.out / first.path).read_bytes(), (elsewhere / second.path).read_bytes())
+
+    def test_an_unsafe_story_id_is_written_with_underscores_for_what_a_file_name_does_not_take(self):
+        self.assertEqual(self.keep(story="a b/c:d").path, "review-findings/a_b_c_d.2.0.json")
+        self.assertEqual(self.keep(story="x" * 90, index=1).path, "review-findings/" + "x" * 40 + ".2.1.json")
+
+    def test_a_name_that_is_not_one_leaves_no_file(self):
+        why = self.keep(attempt=10 ** 100)
+        self.assertTrue(why.startswith("ValueError: not a review artifact reference"), why)
+        self.assertFalse(self.folder.exists())
+
     def test_a_failure_to_keep_is_a_reason_and_never_an_exception(self):
         unwritable = self.tmp / "no-such-run-directory"
         self.assertIn("FileNotFoundError", V.preserve(unwritable, finding(), story="S1", attempt=1, index=0, revision=HEAD))
@@ -136,7 +158,7 @@ class PreserveWritesTheWholeFinding(Scratch):
         self.assertIsInstance(why, str)
         self.assertTrue(why.startswith(("FileExistsError", "NotADirectoryError")), why)
         why = self.keep(attempt=object())                # not serialisable
-        self.assertTrue(why.startswith("TypeError"), why)
+        self.assertTrue(why.startswith("TypeError: "), why)
 
     def test_a_story_id_that_is_not_a_file_name_still_names_a_file_inside_the_directory(self):
         art = self.keep(story="../../x/..\\S 1" + "z" * 100)
@@ -162,6 +184,10 @@ class ArtifactProblems(Scratch):
     def check(self, *rows):
         return V.artifact_problems(self.out, list(rows))
 
+    def assert_row(self, problem: str, tail: str, seq=9, check="S1:review:FND-7") -> None:
+        """A problem names the row (its seq and check) and then what is wrong with it."""
+        self.assertRegex(problem, rf"^review row {seq} \({check}\): {tail}")
+
     def test_a_row_whose_artifact_is_there_and_is_the_one_it_binds_has_no_problem(self):
         text = self.stated()
         self.assertEqual(self.check(row(9, "S1", "FND-7", f"blocking, corroborated by probe:p:REFUTED — {text}", False)),
@@ -174,9 +200,7 @@ class ArtifactProblems(Scratch):
         problems, notes = self.check(row(9, "S1", "FND-7", f"informational — {text}"))
         self.assertEqual(notes, [])
         self.assertEqual(len(problems), 1)
-        self.assertIn("review row 9 (S1:review:FND-7)", problems[0])
-        self.assertIn("review-findings/S1.2.0.json", problems[0])
-        self.assertIn("cannot be read", problems[0])
+        self.assert_row(problems[0], r"its artifact review-findings/S1\.2\.0\.json cannot be read \(FileNotFoundError\)$")
 
     def test_an_altered_artifact_is_a_problem_whatever_the_manifest_says(self):
         """The row binds the bytes through the hash-chained journal: rewriting the file and the manifest together does
@@ -188,9 +212,10 @@ class ArtifactProblems(Scratch):
         path.write_bytes(same_size)
         problems, _ = self.check(row(9, "S1", "FND-7", f"informational — {text}"))
         self.assertEqual(len(problems), 1)
-        self.assertIn("is not the file the row binds", problems[0])
+        self.assert_row(problems[0], r"its artifact review-findings/S1\.2\.0\.json is not the file the row binds")
         path.write_bytes(same_size + b" ")
-        self.assertIn("is not the file the row binds", self.check(row(9, "S1", "FND-7", f"x — {text}"))[0][0])
+        problems, _ = self.check(row(9, "S1", "FND-7", f"x — {text}"))
+        self.assert_row(problems[0], r"its artifact review-findings/S1\.2\.0\.json is not the file the row binds")
 
     def test_an_artifact_of_another_story_or_another_finding_is_not_this_rows(self):
         text = self.stated()
@@ -202,7 +227,8 @@ class ArtifactProblems(Scratch):
                 else:
                     problems, _ = self.check(row(9, story, fid, f"informational — {text}"))
                 self.assertEqual(len(problems), 1)
-                self.assertIn("is not this story's statement of this finding", problems[0])
+                self.assert_row(problems[0], r"its artifact review-findings/S1\.2\.0\.json is not this story's statement "
+                                             r"of this finding$", check=f"{story}:review:{fid}")
 
     def test_a_row_that_names_a_path_outside_the_directory_is_a_problem_and_nothing_is_read(self):
         text = self.stated()
@@ -213,20 +239,31 @@ class ArtifactProblems(Scratch):
                 forged = text.replace(real, path.replace("\\", "\\\\"))
                 problems, _ = self.check(row(9, "S1", "FND-7", f"informational — {forged}"))
                 self.assertEqual(len(problems), 1)
-                self.assertIn("not a file of review-findings/", problems[0])
+                self.assert_row(problems[0], rf"names {re.escape(repr(path))}, which is not a file of review-findings/$")
+
+    def test_a_reference_that_is_not_a_reference_is_a_problem(self):
+        text = self.stated()
+        real = json.dumps(json.loads(text)["artifact"], sort_keys=True)
+        for passed in (True, False):
+            for ref in ('"review-findings/S1.2.0.json"', "[1, 2]", "7", "true"):
+                with self.subTest(ref=ref, passed=passed):
+                    forged = text.replace(real, ref)
+                    self.assertNotEqual(forged, text)
+                    problems, notes = self.check(row(9, "S1", "FND-7", f"informational — {forged}", passed))
+                    self.assertEqual((len(problems), notes), (1, []))
+                    self.assert_row(problems[0], r"its artifact reference .* is not a path, a size and a sha256$")
 
     def test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one(self):
         old = V.detail(finding(), V.Verification(V.CONFIRMED, REASON, "probe.cli_invocation", "REFUTED"), None)    # no `artifact`
         problems, notes = self.check(row(4, "S1", "FND-7", f"blocking, corroborated by probe:p:REFUTED — {old}", False))
         self.assertEqual(problems, [])
         self.assertEqual(len(notes), 1)
-        self.assertIn("review row 4 (S1:review:FND-7)", notes[0])
+        self.assert_row(notes[0], r"blocked on a statement with no preserved reproducer", seq=4)
         none = V.detail(finding(), V.Verification(V.CONFIRMED, REASON, "p", "REFUTED"), None, "OSError: disk full")
         problems, notes = self.check(row(4, "S1", "FND-7", f"blocking, corroborated by probe:p:REFUTED — {none}", False))
         self.assertEqual(notes, [])
         self.assertEqual(len(problems), 1)
-        self.assertIn("review row 4 (S1:review:FND-7)", problems[0])
-        self.assertIn("names no artifact", problems[0])
+        self.assert_row(problems[0], r"it blocked and names no artifact", seq=4)
         # a row that did not block says artifact: null as a fact, and is neither
         self.assertEqual(self.check(row(4, "S1", "FND-7", f"informational — {none}")), ([], []))
 
@@ -277,6 +314,21 @@ class ManifestBindsTheArtifacts(Scratch):
             "preflight/PREFLIGHT.json": hashlib.sha256(b"p").hexdigest()})
         self.keep()
         self.assertEqual(len(R.evidence_manifest(self.out)["files"]), 6)       # only the kept finding's file is new
+
+    def test_every_group_is_listed_in_name_order(self):
+        """The manifest is a mapping and nothing reads its order; each group is listed in name order, so that the
+        same directory is always the same document, whatever order its files were created or the file system lists
+        them in."""
+        scrambled = (7, 2, 11, 5, 0, 9, 3, 10, 1, 8, 4, 6)      # twelve names: 1 in 479,001,600 to come out sorted by luck
+        self.lay({f"{group}/f{n:02d}.jsonl": b"x" for group in ("sessions", "run/journals", "preflight")
+                  for n in scrambled})
+        for index in scrambled:                    # created out of order
+            self.keep(finding(summary=str(index)), index=index)
+        listed = list(R.evidence_manifest(self.out)["files"])
+        for group in ("sessions/", "run/journals/", "preflight/", "review-findings/"):
+            members = [k for k in listed if k.startswith(group)]
+            self.assertEqual(len(members), 12, group)
+            self.assertEqual(members, sorted(members), group)
 
     def test_changing_a_kept_finding_changes_the_run_s_anchor(self):
         self.lay({"RUN.json": b"{}"})
