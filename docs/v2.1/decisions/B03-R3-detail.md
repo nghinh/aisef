@@ -78,7 +78,9 @@ Where my reading is not literal: "the decisive information after character 1,500
 ### 3.2 The artifact (`review_verify.preserve`)
 
 * Path `review-findings/<story>.<attempt>.<index>.json` (index = position in the finder's list: two findings with the same
-  id do not collide). One file per finding per attempt; **create-only** (an existing file is a refusal), written to
+  id do not collide; `<story>` is the story id when that is a file name of at most 40 characters, and otherwise its
+  name-safe prefix, `-` and the first 8 hex digits of its sha256 — reviewer's fix, see §8: without the digest `STORY.1`
+  and `STORY_1` made one name). One file per finding per attempt; **create-only** (an existing file is a refusal), written to
   `<name>.tmp`, `fsync`ed and renamed over (`os.replace`, as `runtime/sentinel.py`): a reader never sees half a file, and
   `*.json` never matches the temporary. A new directory, **not** `sessions/` (the budget and usage readers glob it
   for streams) and not `review/` (OCR's per-attempt work directories).
@@ -122,7 +124,10 @@ blocks; the story fails for an environment reason and is retried through the tax
 ### 3.5 Secrets everywhere the finding is persisted
 
 The statement, the artifact and `RUN.json`'s `sessions[].findings[]` are redacted from the same list. The probe still
-runs the in-memory, unredacted reproducer (a redacted one would reproduce something else).
+runs the in-memory, unredacted reproducer (a redacted one would reproduce something else). A number whose text holds a
+secret (a secret of digits) is redacted too, and the finder's own work files under `review/<story>.<attempt>/`
+(`preview.json`, `output.json`, `preview.log`, `ocr.log`) are redacted with the same list right after they are read
+(both reviewer's fixes, §8).
 
 ## 4. Alternatives rejected
 
@@ -202,10 +207,10 @@ by writing an `if`, the rest were killed by naming the cause class and the ident
 
 ## 7. Residual risks and what is not established
 
-* **`review/<story>.<attempt>/output.json` (the finder's own raw output, written by the OCR binary) keeps the secret
-  verbatim and is not in the manifest.** Measured (`secret_in_review_work_files`). It is outside the functions this WP
-  changes (`Reviewer._ocr`); redacting those files after the finder ran is three lines with `client.redact` — an
-  owner/lead call (listed in `decisions_needed`).
+* ~~`review/<story>.<attempt>/output.json` (the finder's own raw output) keeps the secret verbatim and is not in the
+  manifest.~~ Fixed in the independent review (§8): the four files are redacted after they are read. They are still
+  not in the manifest (scratch, not evidence), and the OCR binary's own `home/` directory (its cache) is not touched
+  and was not inspected with a real binary.
 * The session stream's redaction (`client.redact`) is on bytes: a secret with JSON-special characters, or split across
   two `text` events of the model finder, is not matched there. The statement, the artifact and `RUN.json` are redacted
   on decoded strings; the stream is not changed by this WP.
@@ -215,14 +220,20 @@ by writing an `if`, the rest were killed by naming the cause class and the ident
 * `redacted: 0` means the file holds what was handed to the probe; for the model finder that text has already passed
   the stream's byte redaction. A reproducer that held a secret and was redacted would reproduce differently — the
   artifact says how many replacements were made.
-* A structure nested deeper than 64 levels is kept as a marker (no probe grammar nests that deep; such a reproducer
-  is refused as a contract and never blocks).
+* A structure nested deeper than 64 levels is kept as a marker (no probe grammar nests that deep). Measured in the
+  review: such a reproducer (argv, stdin, env, workspace or an unknown key nested 100 deep) is built as a contract but
+  gets no observation class from the registry, so it is UNVERIFIABLE (refused, not degraded) and never blocks.
 * A key collision after redaction or type normalisation is resolved by `<key>#<position>`; a literal key of that form
   at the same position would still collide. Not reachable from `json.loads` output with one secret.
 * A temporary `*.json.tmp` left by a write that failed is not cleaned (no new delete site): the same
   (story, attempt, index) is never written twice within a run, and a leftover is not in the manifest.
 * Artifacts written for findings of a review that was then discarded (the checkout changed during the verification)
   are kept and are in the manifest; no journal row names them.
-* Docs that list the manifest's contents (`docs/v2.1/ANCHOR-THREAT-MODEL.md`, `USAGE-2.1.md`, `ADR-V2.1.md`) say "record,
-  journal, streams, preflight": not edited here (shared documents).
+* Docs that list the manifest's contents (`docs/v2.1/ANCHOR-THREAT-MODEL.md`, `USAGE-2.1.md`, `ADR-V2.1.md`) said
+  "record, journal, streams, preflight": named `review-findings/` in the independent review (§8).
+* A secret in another form than its exact value is not matched, by the statement, the artifact or the stream alike: split
+  across two strings of the reproducer, JSON-escaped inside a string that holds JSON text, another case, base64.
+* Two story ids that differ only by letter case (`S1` and `s1`) are one file name on a case-insensitive file system
+  (macOS, Windows): the second is refused as "exists" (create-only), never overwritten; a finding that would block then
+  refuses its review on every attempt. Not reachable with ids that differ by more than case.
 * Not measured: behaviour with a real Open Code Review binary or a real model finder; only scripted ones.
