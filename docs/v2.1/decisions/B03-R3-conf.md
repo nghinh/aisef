@@ -79,8 +79,9 @@ shared by every mount of a file system, a bind included), `root`, `source`, `opt
 `optional` (the propagation fields). `access` is still `ro` only when a *per-mount* option says so.
 
 `_probe` records, new: `host_mounts` (the controller's own `/proc/self/mountinfo` — "the host" — as `{at, fs, dev,
-optional}` per mount, read before the session starts and again after it ended; a super block held at either moment
-counts; `None` when either reading failed or a line did not parse), `inside.devices` (what the probe read of each
+optional}` per mount, read just before the session starts; a super block it holds counts; `None` when the reading failed
+or a line did not parse; **§13 (FU-CONF): this was first the union of that reading and a second one after the session,
+which is no longer read as a judge**), `host_mounts_appeared` (§13), `inside.devices` (what the probe read of each
 mount point named like a device node: `{path: "1:3" | "other"}`), `inside.device_roots` (the destinations of `--dev` in
 the command line) and `locale`. The report is the record: a verifier re-derives every acceptance from `inside.mounts`,
 `host_mounts`, `inside.devices` and `inside.device_roots` (`RecordedGuest` does).
@@ -163,6 +164,8 @@ modules' and not parsed for text; they are not changed.
    not what the session has at the mount point (a bound regular file). The in-sandbox `stat` proves the latter.
 7. **Read the host table once, before the session**: a super block the host mounts between the reading and the start of
    bubblewrap, or one it drops while a session holds it, is missed by one reading. Two readings, union.
+   **Reversed by §13 (FU-CONF, 2026-10-13):** the union refused correct sessions when a host mount took a number the
+   session had just freed; the reading before the session is what decides, and §13 names what that gives up.
 
 ## 6. The lifecycle claim, and what it rests on
 
@@ -187,7 +190,7 @@ session keeps the namespace (and its RAM-backed file systems) alive; nothing her
 | the host's devpts / mqueue / tmpfs / proc, a host path or device as source, a file system a wrapper cannot make, a peer group of the host: refused, with the reason; a place under `/dev/` exempts nothing | `…policy.HostBacked` |
 | what cannot be read is "isolation not established", never a pass, never "writable" | `…policy.NotEstablished`, `…policy.ReportedData` |
 | the execution resources are accepted by identity and refused when not | `…policy.DeviceNodes`, `…policy.DevicesSection` (real shell and `stat`) |
-| the host's table is read before and after, whole, or not at all; the report records it | `…policy.HostTable`, `…policy.ReportedData` |
+| the host's table is read before the session (it decides), whole, or not at all; the report records it; the reading after the session is recorded as `host_mounts_appeared` and decides nothing (§13) | `…policy.HostTable`, `…policy.ReportedData`, `test_v21_r3_conf_fu_before` |
 | the real guest's reports are judged again as they were (accepted and refused) | `…policy.RecordedGuest` |
 | the exact environment handed to the probe and to `bwrap --version`; the report's `locale`; `os.environ` and the session's environment untouched | `test_v21_r3_conf_locale.PassedDown`, `…AtTheExecBoundary`, `…RecordedGuest` |
 | rows carry what the policy decides from | `test_v21_kills3_T07a.MountInfo`, `test_v21_kills3_T05b` |
@@ -289,4 +292,5 @@ What the reviewer re-ran and found, in short (the report is `out/conf/review/rep
   so no translated text was produced there either); another namespace's super block bound in by a wrapper that is not
   `confine.wrap` (the `/proc/<pid>/root` route was refused with EACCES in the guest, so it was not demonstrated); the
   host's table read *after* the session can hold a super-block number that an unrelated host mount reused within
-  milliseconds of the session's end — that would refuse a correct session as "the host's" (fails closed; not observed).
+  milliseconds of the session's end — that would refuse a correct session as "the host's" (fails closed; not observed;
+  **removed by §13**: the reading after the session no longer decides).

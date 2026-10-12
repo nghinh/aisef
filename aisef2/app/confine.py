@@ -24,7 +24,8 @@ the same client, a worktree of the same repository — runs a shell that tries w
 reports what it sees; anything not as required refuses the run. The measurement's own subprocesses run in a fixed C
 locale (`LOCALE`, recorded in the report), whatever the caller's. The only writable mounts it accepts are the workspace,
 the explicitly allowed device nodes `--dev` places (`DEVICES`) and mounts shown to be the sandbox's own (`_owned`:
-a file system a wrapper makes, a super block the host's mount table does not hold, no propagation with the host);
+a file system a wrapper makes, a super block the host's mount table — read before the session starts — does not hold,
+no propagation with the host);
 a writable mount it cannot establish either way refuses the run too. Not confined here: the kernel's own execution of
 the developer's tests and the probes' execution of the candidate (they run as the operator's user); Open Code Review is
 refused together with confinement (app/settings), since it calls the model outside the client's sessions."""
@@ -356,7 +357,7 @@ def _probe(spec: Mapping, where: pathlib.Path, ws: pathlib.Path, full: list[str]
     args = [str(canary), f["run_directory"], f["kernel"], f["interpreter_site"], home, str(ws / probe_file), sleep,
             f["client_directory"], f["git_directory"], *targets(full, host=True)]
     rep["argv"] = full[:-len(cmd)] + ["/bin/sh", "-c", "<PROBE>", "probe"]
-    before = _host_mounts()      # the host's table, read before the session starts and again after it ended
+    before = _host_mounts()      # the host's table as it is when the session starts: what decides; read again after it ends
     try:
         p = subprocess.run(full + args, capture_output=True, text=True, env=run_env, timeout=PROBE_TIMEOUT)
         code, out = p.returncode, p.stdout + p.stderr
@@ -391,9 +392,14 @@ def _probe(spec: Mapping, where: pathlib.Path, ws: pathlib.Path, full: list[str]
                      "namespaces": namespaces(values.get("ns", {})),
                      "home_listing": sections.get("home", []),
                      "unix_sockets": sections.get("sockets", []) if values.get("sockets") == "listed" else None}
-    # the host's mount table (the report is the record: a verifier sees which super blocks the host held): None when
-    # either reading failed, so that no mount is shown to be the sandbox's own
-    rep["host_mounts"] = None if before is None or after is None else before + [r for r in after if r not in before]
+    # the host's mount table (the report is the record: a verifier sees which super blocks the host held) is the reading
+    # BEFORE the session: a super block the session creates is one no live host mount holds, so one the host already
+    # had is not the sandbox's. None when it failed, so that no mount is shown to be the sandbox's own. The reading
+    # after the session decides nothing — the numbers the session held are free again by then, and a host mount made
+    # in the milliseconds after its end can take one; a row that appeared cannot tell that from a leak — it is
+    # recorded: the rows the host gained meanwhile (None when either reading failed: nothing to tell it from)
+    rep["host_mounts"] = before
+    rep["host_mounts_appeared"] = None if before is None or after is None else [r for r in after if r not in before]
     rep["tried"] = {k: {"exit": rc, "output": o} for k, (rc, o) in tries.items()}
     rep["created_outside_workspace"] = created
     rep["setsid_survivors"] = survivors
