@@ -529,10 +529,10 @@ class OneDecisionPath(unittest.TestCase):
         typed = "            typed.append(Finding("
         asked = "            confirmed = review_verify.blocks("
         whole = ('            typed.append(Finding(str(f.get("id")), confirmed or bool(f.get("blocking")),\n'
-                 '                                 (v.evidence(),) if confirmed else (), review_verify.detail(f, v, a)))')
+                 '                                 (v.evidence(),) if confirmed else (), review_verify.detail(f, v, a, kept, secrets)))')
         inner = ('            for g in (f, f):\n'
                  '                typed.append(Finding(str(g.get("id")), confirmed or bool(g.get("blocking")),\n'
-                 '                                     (v.evidence(),) if confirmed else (), review_verify.detail(g, v, a)))\n'
+                 '                                     (v.evidence(),) if confirmed else (), review_verify.detail(g, v, a, kept, secrets)))\n'
                  '                confirmed = True')
         for edit in ((typed, "            confirmed |= True\n" + typed), (typed, "            confirmed = True\n" + typed),
                      (typed, "            confirmed, _ = True, 0\n" + typed), (asked, "            if a:\n    " + asked),

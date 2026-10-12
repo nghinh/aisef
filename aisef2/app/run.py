@@ -18,9 +18,13 @@
     <out>/CONTINUED-BY.json  V2.1: created (exclusively) in a run directory when another run continues it: one
                        continuation per run, the claimant named; a later generation (CONTINUED-BY.<n>.json) only
                        supersedes, with evidence, a claim whose child never began (app/lineage); nothing is deleted
-    <out>/EVIDENCE.json the evidence manifest (V2.1): the sha256 of the record, the journal, every session stream and
-                       the preflight's files, written after the record; its own digest is the run's evidence anchor,
-                       printed for the operator to keep outside the run directory (`aisef run --verify --expect-anchor`)
+    <out>/review-findings  V2.1: one file per review finding, whole and secret-redacted (app/review_verify.preserve);
+                       the journal row of the finding names it by sha256, so what a verifier needs to reproduce a
+                       finding is never only in the row's bounded statement
+    <out>/EVIDENCE.json the evidence manifest (V2.1): the sha256 of the record, the journal, every session stream, the
+                       preflight's files and the review findings' files, written after the record; its own digest is
+                       the run's evidence anchor, printed for the operator to keep outside the run directory
+                       (`aisef run --verify --expect-anchor`)
 
 Order: the bundle and the settings load (every seal re-checked); the repository is cloned and its requirements document
 checked against the bundle; the plan is admitted (RFC §12); the test interpreter is made; the route is attested by
@@ -43,7 +47,7 @@ import tempfile
 import time
 
 from aisef2.app import adapters as ad
-from aisef2.app import client, confine, lineage, preflight, usage
+from aisef2.app import client, confine, lineage, preflight, review_verify, usage
 from aisef2.app.bundle import Project
 from aisef2.app.settings import Settings
 from aisef2.arch.enums import Enforcement
@@ -289,9 +293,11 @@ def _content_sha(p: pathlib.Path) -> str:
 
 def evidence_manifest(out: pathlib.Path) -> dict:
     """The sha256 of every file a verification re-derives from (the repository aside: `final_main` is checked in it):
-    the record, the journal, each session stream, the preflight's ledger and observation."""
+    the record, the journal, each session stream, the preflight's ledger and observation, and the review findings'
+    artifacts (a run directory without any lists exactly what it always did)."""
     files = [out / "RUN.json", out / STARTED, *sorted((out / "run" / "journals").glob("*.jsonl")),
-             *sorted((out / "sessions").glob("*.jsonl")), *sorted((out / "preflight").glob("*"))]
+             *sorted((out / "sessions").glob("*.jsonl")), *sorted((out / "preflight").glob("*")),
+             *sorted((out / review_verify.ARTIFACT_DIR).glob("*.json"))]
     return {"format": MANIFEST_FORMAT,
             "files": {p.relative_to(out).as_posix(): _content_sha(p) for p in files if p.is_file()}}
 

@@ -46,6 +46,12 @@ OCR_BACKGROUND = ("You review a change to {name}. {requirements} in the reposito
                   "does not have. A comment without one is recorded for a person; it never blocks the change.")
 
 
+#: the review is refused, not the finding downgraded: a confirmed, anchored finding whose evidence cannot be kept would
+#: otherwise pass the story (a cut statement is never grounds to block, and none is dropped silently)
+NOT_PRESERVED = ("finding {id} is confirmed and anchored, but its full reproducer could not be preserved ({why}): the "
+                 "review did not complete with its evidence (every finding discarded)")
+
+
 def _sha(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
@@ -117,18 +123,26 @@ class Reviewer:
         ocr = self.review_policy.get("finder") == "ocr"
         found, s, coverage = (self._ocr(scope, attempt, head) if ocr else self._model(scope, attempt))
         _unchanged(scope.root, head, before, "the finder")
+        secrets = (*self.kw.get("secrets", ()), self.route.get("token"))     # what the session streams are redacted with
         typed = []
-        for f in found:     # a finding is evidence only when the kernel's probe reproduces it and its clause anchors it
+        for index, f in enumerate(found):     # evidence only when the kernel's probe reproduces it and its clause anchors it
             v = self._verify(f, scope.root, head)
             a = review_verify.anchor(f, self.project) if isinstance(f.get("reproducer"), dict) else None
             f["verification"] = {"status": v.status, "why": v.reason, "probe": v.probe, "observed": v.observed}
             if a is not None:
                 f["anchor"] = {"status": a.status, "why": a.reason, "contracts": list(a.contracts)}
             confirmed = review_verify.blocks(v, f, self.review_policy["policy"], self.review_policy["min_severity"], a)
+            # the statement is bounded; the finding is kept whole, redacted, in an artifact the row names and the
+            # manifest binds — and a block rests on that artifact, never on the statement's cut text
+            kept = review_verify.preserve(self.logs.parent, f, story=scope.story_id, attempt=attempt, index=index,
+                                          revision=head, session=s.get("log"), secrets=secrets)
+            if confirmed and not isinstance(kept, review_verify.Artifact):
+                raise CapabilityUnrunnable(NOT_PRESERVED.format(id=review_verify.redacted(str(f.get("id")), secrets)[0],
+                                                                why=kept))
             typed.append(Finding(str(f.get("id")), confirmed or bool(f.get("blocking")),
-                                 (v.evidence(),) if confirmed else (), review_verify.detail(f, v, a)))
+                                 (v.evidence(),) if confirmed else (), review_verify.detail(f, v, a, kept, secrets)))
         _unchanged(scope.root, head, before, "the verification")
-        s["findings"] = found
+        s["findings"] = review_verify.redacted(found, secrets)[0]     # RUN.json: never a secret of the run
         confirmed = sum(1 for t in typed if t.blocks)
         return Reviewed(O.COMPLETED, tuple(typed), f"{len(found)} findings" + (f", {coverage}" if coverage else "")
                         + (f", parsed={s.get('parsed')}" if not ocr else "")
