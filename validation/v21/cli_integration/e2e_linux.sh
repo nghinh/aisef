@@ -15,7 +15,7 @@ TREE=${1:?TREE}; PROCPS=${2:?PROCPS_DIR}; OUT=${3:?OUT_DIR}; ARCHIVE=${4:?ARCHIV
 [[ ! -e $OUT ]] || { print "OUT_DIR exists"; exit 2; }
 # the tree that runs is the commit named in the record: the same file count as the archive, and the driver and the
 # client byte for byte as COMMIT has them (a launcher that records one tree and runs another proves nothing)
-[[ $(tar -tf $ARCHIVE | grep -vc '/$') == $(find $TREE -type f | wc -l | tr -d ' ') ]] || { print "TREE is not ARCHIVE: file counts differ"; exit 2; }
+[[ $(tar -tf $ARCHIVE | grep -vc '/$') == $(find $TREE ! -type d | wc -l | tr -d ' ') ]] || { print "TREE is not ARCHIVE: file counts differ"; exit 2; }
 for f in e2e_guest.py e2e_client.py; do
   [[ $(git -C ${0:A:h} show "$COMMIT:validation/v21/cli_integration/$f" 2>/dev/null | shasum -a 256 | cut -c1-64) \
      == $(shasum -a 256 "$TREE/validation/v21/cli_integration/$f" 2>/dev/null | cut -c1-64) ]] || { print "TREE is not COMMIT: $f differs or is missing"; exit 2; }
@@ -35,7 +35,7 @@ load() { print -r -- "host load average $(sysctl -n vm.loadavg) at $(date '+%Y-%
   print "== other containers running in the same VM (not started by this script)"; docker ps --format '{{.ID}} {{.Image}} {{.Status}}'
   docker image inspect $IMG --format "image: $IMG {{.Id}} created {{.Created}} {{.Os}}/{{.Architecture}}"
   print "tree: $TREE"; print "archive: $ARCHIVE sha256 $(shasum -a 256 $ARCHIVE | cut -c1-64); files $(tar -tf $ARCHIVE | grep -vc '/$')"
-  print "tree files: $(find $TREE -type f | wc -l | tr -d ' ')"
+  print "tree files: $(find $TREE ! -type d | wc -l | tr -d ' ')"
   print "commit: $COMMIT tree $(git -C ${0:A:h} rev-parse "$COMMIT^{tree}")"
   print "procps: $(shasum -a 256 $PROCPS/ps $PROCPS/libproc2.so.0 | awk '{print $1}' | tr '\n' ' ')"
   print "base flags: ${BASE[*]}"; print "X1 flags: ${X1[*]}"
