@@ -326,13 +326,55 @@ class TextThatIsNotUtf8AndKeysThatAreNotStrings(unittest.TestCase):
             cur.append([])
             cur = cur[0]
         d = self.assert_statable(finding(stimulus={"argv": deep}))
-        self.assertIn("nested deeper than", json.dumps(d))
+        self.assertIn("<nested deeper than 64 levels>", json.dumps(d))
 
     def test_two_keys_that_become_one_are_both_kept(self):
         out, n = V.redacted({"a": 1, "<int>1": 2, 1: 3})
-        self.assertEqual((sorted(out.values()), n), ([1, 2, 3], 0))
+        self.assertEqual((out, n), ({"a": 1, "<int>1": 2, "<int>1#2": 3}, 0))
         out, n = V.redacted({SECRET: 1, V.REDACTED: 2}, (SECRET,))
-        self.assertEqual((sorted(out.values()), n, SECRET in json.dumps(out)), ([1, 2], 1, False))
+        self.assertEqual((out, n), ({V.REDACTED: 1, f"{V.REDACTED}#1": 2}, 1))
+
+
+def nest(kind: str, levels: int, leaf="x"):
+    value = leaf
+    for _ in range(levels):
+        value = {"k": value} if kind == "dict" else [value] if kind == "list" else (value,)
+    return value
+
+
+def descend(value, kind: str, levels: int):
+    for _ in range(levels):
+        value = value["k"] if kind == "dict" else value[0]
+    return value
+
+
+class DeepStructures(unittest.TestCase):
+    """No probe grammar nests anything deeper than a few levels; what is nested deeper than `DEPTH_MAX` is replaced by a
+    marker so that nothing made of the structure can meet the interpreter's recursion limit."""
+
+    MARKER = "<nested deeper than 64 levels>"
+
+    def test_the_marker_is_exact_and_replaces_the_first_container_past_the_limit(self):
+        self.assertEqual(V.DEPTH_MAX, 64)
+        for kind in ("dict", "list", "tuple"):
+            with self.subTest(kind=kind):
+                out, _ = V.redacted(nest(kind, 70))
+                self.assertEqual(descend(out, kind if kind == "dict" else "list", 64), self.MARKER)
+
+    def test_a_structure_exactly_at_the_limit_is_kept_whole(self):
+        for kind in ("dict", "list", "tuple"):
+            with self.subTest(kind=kind):
+                out, _ = V.redacted(nest(kind, 64, "leaf"))
+                self.assertEqual(descend(out, kind if kind == "dict" else "list", 64), "leaf")
+                out, _ = V.redacted(nest(kind, 65, "leaf"))
+                self.assertEqual(descend(out, kind if kind == "dict" else "list", 64), self.MARKER)
+
+    def test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker(self):
+        for kind in ("dict", "list", "tuple"):
+            with self.subTest(kind=kind):
+                text, d = stated(finding(stimulus={"argv": nest(kind, 100)}))
+                self.assertIn(self.MARKER, json.dumps(d))
+                self.assertLessEqual(len(text), V.SUMMARY_MAX)
 
 
 class SecretsAreOutBeforeAnythingIsCut(unittest.TestCase):

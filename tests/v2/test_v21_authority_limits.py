@@ -528,10 +528,10 @@ class OneDecisionPath(unittest.TestCase):
     def test_what_blocks_answered_rebound_or_not_asked_on_every_path_is_caught(self):
         typed = "            typed.append(Finding("
         asked = "            confirmed = review_verify.blocks("
-        whole = ('            typed.append(Finding(str(f.get("id")), confirmed or bool(f.get("blocking")),\n'
+        whole = ('            typed.append(Finding(fid, confirmed or bool(f.get("blocking")),\n'
                  '                                 (v.evidence(),) if confirmed else (), review_verify.detail(f, v, a, kept, secrets)))')
         inner = ('            for g in (f, f):\n'
-                 '                typed.append(Finding(str(g.get("id")), confirmed or bool(g.get("blocking")),\n'
+                 '                typed.append(Finding(fid, confirmed or bool(g.get("blocking")),\n'
                  '                                     (v.evidence(),) if confirmed else (), review_verify.detail(g, v, a, kept, secrets)))\n'
                  '                confirmed = True')
         for edit in ((typed, "            confirmed |= True\n" + typed), (typed, "            confirmed = True\n" + typed),

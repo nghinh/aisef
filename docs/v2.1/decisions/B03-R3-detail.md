@@ -136,4 +136,75 @@ runs the in-memory, unredacted reproducer (a redacted one would reproduce someth
 * **"Reported but non-blocking" when the artifact cannot be written.** Fail-open (3.4).
 * **One file per finding id.** Ids are model-chosen, unbounded, not unique within a review, not file-name safe.
 
-(Sections 5–7 below are completed with the measured results.)
+
+## 5. Requirement to test
+
+| requirement | test (file) |
+|---|---|
+| the statement is valid JSON of at most `SUMMARY_MAX` for any finding (100,000-character fields, unicode, control characters, nested, keys that are not strings) | `TheStatementIsBoundedByConstruction.test_the_bound_holds_for_a_seeded_sweep_of_adversarial_findings`, `...test_the_worst_encoding_of_every_decisive_field_still_leaves_the_elastic_fields_room` (statement) |
+| decisive information after character 1,500 is not lost: what decided the block survives a stimulus of any size | `...test_what_decided_the_block_is_there_whatever_the_size_of_the_stimulus`, `...test_one_huge_field_evicts_no_other`, `...test_several_huge_fields_share_what_is_left_and_all_are_marked`, `...test_each_decisive_field_is_cut_at_its_own_bound_and_marked_exactly` (statement); product: `test_the_blocked_row_is_valid_json_within_the_bound_and_says_what_decided_it` |
+| the statement states conditions, expected, observed, the cut and the artifact | `WhatIsStatedAndHowItIsMarked.*` (statement); product: `test_the_statement_names_the_artifact_and_it_is_the_file_with_that_digest` |
+| a cut is marked with the exact number of characters left out | the `elided` assertions of the same tests; `test_the_marker_counts_characters_of_the_text_not_of_its_encoding` |
+| a secret is not in the statement, and not half of it at the cut | `SecretsAreOutBeforeAnythingIsCut.*` (statement: 100 offsets around the stimulus's cut, 3 decisive fields around their bounds) |
+| text with no UTF-8 form, keys that are not strings, non-JSON values, absurd nesting never raise | `TextThatIsNotUtf8AndKeysThatAreNotStrings.*` (statement) |
+| the full finding is kept whole, redacted, identified, create-only, written whole before visible | `PreserveWritesTheWholeFinding.*` (artifact) |
+| a failure to keep is a reason, never an exception | `...test_a_failure_to_keep_is_a_reason_and_never_an_exception`, `...test_the_file_is_whole_before_it_is_visible_and_a_failed_write_leaves_nothing_visible` (artifact) |
+| the journal row binds the artifact; `--verify` refuses missing, altered, mis-pointed, outside the directory, a blocking row with none | `ArtifactProblems.*` (artifact); product: `test_an_altered_artifact_is_refuted_by_the_manifest_and_by_the_row`, `test_a_removed_artifact_is_refuted`, `test_an_artifact_rewritten_with_the_manifest_made_again_is_still_not_the_file_the_row_binds`, `test_without_a_manifest_the_row_still_binds_the_artifact` |
+| the manifest lists the artifacts; a directory with none lists what it always did | `ManifestBindsTheArtifacts.*` (artifact); product: `test_the_manifest_lists_the_artifact_and_the_run_verifies`; failclosed: `test_a_run_that_kept_no_artifact_has_the_manifest_it_always_had` |
+| a finding that would block and cannot be preserved refuses the review; a cut statement is never what blocks; a finding that would not block is reported with why it has no artifact; advisory refuses nothing | `ReviewerKeepsTheEvidence.*` (artifact); failclosed (`aisef run`): the four tests of `WithoutItsArtifactAFindingNeverBlocksAndTheStoryIsNeverCommittedOnIt` |
+| the run's secrets (client environment, provider key, OCR token) are out of the statement, the artifact, `RUN.json`, the journal and the retry prompt | `ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it`, `...test_the_finders_own_token_is_a_secret_of_the_run_too`, `...test_the_id_that_names_the_gate_row_carries_no_secret_either`; product: `test_the_secret_is_in_nothing_the_run_persisted_for_its_reviewers_findings`, `test_the_developer_is_told_the_finding_as_stated_on_its_retry`, `test_the_record_keeps_the_finding_the_finder_made_with_the_secret_out`; model: `test_the_secret_is_in_none_of_the_run_s_files_and_the_run_verifies` |
+| the developer's retry prompt still carries the finding, readable | product: `test_the_developer_is_told_the_finding_as_stated_on_its_retry`; the existing `test_v21_review_chain.FixLoop` |
+
+Files: `tests/v2/test_v21_r3_detail_statement.py`, `..._artifact.py`, `..._product.py`, `..._failclosed.py`,
+`..._model.py`. The product-path files run a real `aisef run` with a fake developer and a fake finder script.
+
+### Existing tests changed (rule 5)
+
+* `tests/v2/test_v21_kills3_T15a.py::StatementOfAFinding.test_a_confirmed_and_anchored_finding_is_stated_in_full` — the
+  expected dict gains `"observed": v.observed`. Owner sentence: the statement must state "kết quả mong đợi/thực tế";
+  every other key and value is asserted as before.
+* `tests/v2/test_v21_authority_limits.py::OneDecisionPath.test_what_blocks_answered_rebound_or_not_asked_on_every_path_is_caught` —
+  the two source anchors `whole` and `inner` are literal copies of the statement that builds a `Finding`; it now passes
+  the artifact reference and the run's secrets to `detail` and names the id `fid` (redacted). No rule of the checker
+  and no assertion changed: the checker passes on the real tree and still catches each edit.
+
+## 6. Real versus simulated
+
+* **Real**: the statement and artifact code; the journal (`format3`), the manifest, `--verify`; the real
+  `cli_invocation` and `python_callable` probes executed on real git checkouts; the file-system behaviour of
+  `preserve` (a directory that is a file, a missing run directory, `os.replace`/`os.fsync` failing through a patched
+  `os` function only for the call); the measurement on the 10 older run directories found in the scratchpad.
+* **Simulated**: the developer (a script), the finder (a script that writes OCR's documents), the provider (a
+  transport stub); "the write fails with ENOSPC" in the `aisef run` failclosed test is the keeping function
+  replaced (the real failures are in the unit file).
+* **Linux guest**: see the report (`test_runs`): the new test files and the checks around them run in the Docker guest
+  (real run, Python 3.14.8, no network).
+* **Neither**: Windows, Python 3.11–3.13 — written for them (pathlib, bytes, `skipUnless(posix)` only for the
+  shebang-script runs), not run here.
+
+## 7. Residual risks and what is not established
+
+* **`review/<story>.<attempt>/output.json` (the finder's own raw output, written by the OCR binary) keeps the secret
+  verbatim and is not in the manifest.** Measured (`secret_in_review_work_files`). It is outside the functions this WP
+  changes (`Reviewer._ocr`); redacting those files after the finder ran is three lines with `client.redact` — an
+  owner/lead call (listed in `decisions_needed`).
+* The session stream's redaction (`client.redact`) is on bytes: a secret with JSON-special characters, or split across
+  two `text` events of the model finder, is not matched there. The statement, the artifact and `RUN.json` are redacted
+  on decoded strings; the stream is not changed by this WP.
+* A secret split across two strings of the reproducer (two argv elements) is not one string and is not matched.
+* `observed` is the probe's verdict, not the observed values: the probe protocol (`Executed`) carries no more. A
+  verifier re-running the artifact's reproducer at `revision` gets the values.
+* `redacted: 0` means the file holds what was handed to the probe; for the model finder that text has already passed
+  the stream's byte redaction. A reproducer that held a secret and was redacted would reproduce differently — the
+  artifact says how many replacements were made.
+* A structure nested deeper than 64 levels is kept as a marker (no probe grammar nests that deep; such a reproducer
+  is refused as a contract and never blocks).
+* A key collision after redaction or type normalisation is resolved by `<key>#<position>`; a literal key of that form
+  at the same position would still collide. Not reachable from `json.loads` output with one secret.
+* A temporary `*.json.tmp` left by a write that failed is not cleaned (no new delete site): the same
+  (story, attempt, index) is never written twice within a run, and a leftover is not in the manifest.
+* Artifacts written for findings of a review that was then discarded (the checkout changed during the verification)
+  are kept and are in the manifest; no journal row names them.
+* Docs that list the manifest's contents (`docs/v2.1/ANCHOR-THREAT-MODEL.md`, `USAGE-2.1.md`, `ADR-V2.1.md`) say "record,
+  journal, streams, preflight": not edited here (shared documents).
+* Not measured: behaviour with a real Open Code Review binary or a real model finder; only scripted ones.

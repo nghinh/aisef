@@ -100,7 +100,12 @@ class Reviewer:
     the kernel's probe verifies each reproducer and the bundle's approved contracts anchor its expectation
     (app/review_verify); and the reviewed checkout must not change while the review runs: the candidate is captured
     before the finder starts and every file of the checkout is compared after the finder and after the verification —
-    a change discards every finding (CapabilityUnrunnable: the review did not run on the candidate)."""
+    a change discards every finding (CapabilityUnrunnable: the review did not run on the candidate).
+
+    Each finding is kept whole, secret-redacted, in an artifact of the run directory (`review_verify.preserve`) that
+    its journaled statement names; the statement is bounded and says so when it cut. A finding that would block and
+    whose artifact cannot be kept refuses the review the same way (`NOT_PRESERVED`): a cut statement is never what
+    blocks a story, and a confirmed finding is never passed silently. The run's secrets are the session streams'."""
 
     def __init__(self, run, project: Project, logs: pathlib.Path, session_kw: dict, timeout_s: float,
                  review: dict | None = None, probe_timeout_s: float = 60.0, interpreter: str | None = None,
@@ -136,10 +141,10 @@ class Reviewer:
             # manifest binds — and a block rests on that artifact, never on the statement's cut text
             kept = review_verify.preserve(self.logs.parent, f, story=scope.story_id, attempt=attempt, index=index,
                                           revision=head, session=s.get("log"), secrets=secrets)
+            fid = review_verify.redacted(str(f.get("id")), secrets)[0]      # it names the gate row: no secret there either
             if confirmed and not isinstance(kept, review_verify.Artifact):
-                raise CapabilityUnrunnable(NOT_PRESERVED.format(id=review_verify.redacted(str(f.get("id")), secrets)[0],
-                                                                why=kept))
-            typed.append(Finding(str(f.get("id")), confirmed or bool(f.get("blocking")),
+                raise CapabilityUnrunnable(NOT_PRESERVED.format(id=fid, why=kept))
+            typed.append(Finding(fid, confirmed or bool(f.get("blocking")),
                                  (v.evidence(),) if confirmed else (), review_verify.detail(f, v, a, kept, secrets)))
         _unchanged(scope.root, head, before, "the verification")
         s["findings"] = review_verify.redacted(found, secrets)[0]     # RUN.json: never a secret of the run

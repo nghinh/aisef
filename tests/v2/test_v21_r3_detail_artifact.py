@@ -363,6 +363,11 @@ class ReviewerKeepsTheEvidence(_Reviewer):
             self.assertNotIn(TOKEN, where)
         self.assertEqual(json.loads(data)["redacted"], 1)
 
+    def test_the_id_that_names_the_gate_row_carries_no_secret_either(self):
+        r, s, _ = self.review(self.reviewer(secrets=(SECRET,)), [finding(id=f"id-{SECRET}"), finding(id="plain")])
+        self.assertEqual([t.id for t in r.findings], [f"id-{V.REDACTED}", "plain"])
+        self.assertEqual([f["id"] for f in s["findings"]], [f"id-{V.REDACTED}", "plain"])
+
     def test_two_findings_of_one_review_have_two_files_in_the_order_the_finder_gave_them(self):
         found = [finding(id="same"), finding(id="same", summary="the second")]
         r, _, _ = self.review(self.reviewer(), found)

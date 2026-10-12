@@ -310,8 +310,8 @@ def redacted(value, secrets=()):
             out = {}
             for k, item in x.items():
                 key = walk(k if isinstance(k, str) else f"<{type(k).__name__}>{k!r}")
-                while key in out:     # two keys that became one are both kept
-                    key += "'"
+                if key in out:     # two keys that became one are both kept
+                    key = f"{key}#{len(out)}"
                 out[key] = walk(item, depth + 1)
             return out
         if isinstance(x, (list, tuple)):
