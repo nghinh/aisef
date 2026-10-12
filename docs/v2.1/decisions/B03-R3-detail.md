@@ -177,10 +177,10 @@ Files: `tests/v2/test_v21_r3_detail_statement.py`, `..._artifact.py`, `..._produ
 
 | function | mutants | killed | by |
 |---|---|---|---|
-| `review_verify.py::detail` | 96 | 96 | statement |
-| `::redacted` | 39 | 39 | statement |
+| `review_verify.py::detail` | 96 | 96 | statement + T15a |
+| `::redacted` | 46 (39 + 7 of the review's numeric branch) | 46 | statement |
 | `::_fit` / `::_dumps` / `::Artifact.__post_init__` | 11 / 3 / 7 | all | statement |
-| `::preserve` | 38 | 38 | artifact |
+| `::preserve` | 43 (38 + 5 of the review's name digest) | 43 | artifact |
 | `::artifact_problems` | 92 | 92 | artifact |
 | `run.py::evidence_manifest` | 24 | 24 | artifact (3 were survivors of the campaign: `sorted() -> list()`; killed only because this machine's file system lists a directory out of name order) |
 | `adapters.py::Reviewer.review` | 64 (54 + 10 new) | 64 | artifact (all 10 new), registered kill files (the rest) |
@@ -237,3 +237,36 @@ by writing an `if`, the rest were killed by naming the cause class and the ident
   (macOS, Windows): the second is refused as "exists" (create-only), never overwritten; a finding that would block then
   refuses its review on every attempt. Not reachable with ids that differ by more than case.
 * Not measured: behaviour with a real Open Code Review binary or a real model finder; only scripted ones.
+
+## 8. Independent review (`v21r3/detail-rv`, stacked on `ac25abf`)
+
+The implementer's work was re-run, not read: every test file of §5, the 66 importing modules, the 12,000-case sweep below,
+the mutants of every changed function, the base facts of §2 on `3dc827b`, and the Linux guest. The owner's five
+sentences are met, the third one in part (the kernel's probe states a verdict, not the observed values: §3.1). Three
+defects were found and fixed, each with a test that fails on `ac25abf`:
+
+| defect (measured on `ac25abf`) | fix | test |
+|---|---|---|
+| Two story ids that read alike (`STORY.1`/`STORY_1`, `feature/login`/`feature_login`, two ids that share their first 40 characters; `S1`/`s1` on macOS) made one artifact name: create-only refused the second, and a finding that would block refused its review on every attempt | `preserve`: an id that is not a file name as it stands carries 8 hex digits of its sha256 | `test_two_story_ids_that_read_alike_have_two_files_and_each_is_its_own`, `test_an_unsafe_story_id_is_written_with_underscores_and_its_digest` (artifact) |
+| `Reviewer._ocr`: the finder's own files `review/<story>.<attempt>/{preview,output}.json`, `{preview,ocr}.log` kept the secret verbatim in the run directory (the implementer's open decision) | `client.redact` of the four files right after each is read | `test_v21_r3_detail_rv_finderfiles.py` (2 tests; 12 mutants of the new lines, all killed) |
+| A secret of digits written by the finder as a JSON number was kept in the statement, the artifact and `RUN.json` | `redacted`: a number whose text holds a secret is that text, redacted | `test_a_secret_of_digits_*` (statement 2, artifact 1) |
+
+Re-measured and unchanged: the 1,500-character bound (3 seeds x 4,000 adversarial findings: 0 violations, longest 1,492);
+the old behaviour on `3dc827b` (an invalid 1,500-character fragment, the secret in `RUN.json`, the journal row and the
+developer's prompt); 160 real findings of 43 real journals found under the scratchpad are all stated within the bound
+and kept, and their 160 review rows give `artifact_problems` no problem and no note; 4 of the 10 older run directories
+the implementer measured still exist (their manifests are identical under both trees; the other 6 are gone).
+
+What is real in the evidence: the statement, the artifact, the journal, the manifest, `--verify`, the probes and the git
+checkouts; what is simulated: the developer, the finder (OCR and model), the provider, and the write failure of the
+`aisef run` fail-closed test. The Linux guest runs are real runs of the same simulated actors.
+
+Two corrections to §7 and §5 made by the review: the implementer's "refused as a contract" for a reproducer nested deeper
+than 64 levels is imprecise (it is built as a contract and gets no observation class, so UNVERIFIABLE; the conclusion
+holds), and "killed by statement/artifact" rested on runs that named both files; each function was re-run with exactly
+the files of the table.
+
+One finding outside this WP, not fixed here: `aisef2/runtime/process_range.py::_ps_table` (the non-Linux path) reads
+`ps -A -o pid=,ppid=,pgid=,stat=,command=` line by line with `int()`. A process anywhere on the host whose command line
+holds a newline makes every `ProcessRange` operation raise `ValueError`, so every `aisef run` there is REFUSED and every
+`kill_check` target is INFRA until that process exits. Measured during this review; it ended with the process.
