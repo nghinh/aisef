@@ -618,7 +618,9 @@ class Reentry(unittest.TestCase):
         """The handler lands inside the few bytecodes in which the first call holds the range's own lock to claim the
         release: the lock is the range's, so the re-entering call must be able to take it again (an `RLock`)."""
         rig = Rig(self, dies_on="SIGINT")
-        inner, nested = rig.range._mx, []
+        inner, nested = getattr(rig.range, "_mx", None), []
+        if inner is None:
+            self.skipTest("this range has no lock of its own to claim a release under: nothing for a handler to re-enter")
 
         class Hooked:
             def __init__(self):
