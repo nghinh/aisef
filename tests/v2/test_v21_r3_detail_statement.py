@@ -70,6 +70,9 @@ class TheStatementIsBoundedByConstruction(unittest.TestCase):
     it — the old statement sliced its encoded text at 1,500 and lost, in that order, subject, severity, summary,
     verification and why (measured: a 3,000-character stdin gave 1,500 characters of invalid JSON)."""
 
+    def test_the_bound_is_the_owners_fifteen_hundred_characters(self):
+        self.assertEqual(V.SUMMARY_MAX, 1500)
+
     def test_a_short_finding_is_stated_whole_and_nothing_is_marked(self):
         text, d = stated()
         self.assertEqual(d, {

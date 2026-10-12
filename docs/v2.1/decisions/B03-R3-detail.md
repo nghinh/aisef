@@ -56,12 +56,12 @@ Where my reading is not literal: "the decisive information after character 1,500
 `detail(finding, v, anchored=None, artifact=None, secrets=())` returns one JSON object, always valid, always
 `<= SUMMARY_MAX` (1,500) characters:
 
-| field | content | bound (encoded characters of the string body) | evictable |
+| field | content | bound (characters of the encoded string body) | evictable |
 |---|---|---|---|
-| `finding`, `severity`, `clause`, `verification`, `why`, `observed`, `anchor`, `anchor_why` | what decided the block | 60, enum, 40, 20, 160, 24, 24, 160 | never by another field; cut only at its own bound |
-| `artifact` | `{path, sha256, bytes}` of the full statement, or `null` + `artifact_why` (120) | fixed by the type | never |
-| `summary`, `reproducer.subject`, `.stimulus`, `.observable` | the conditions to reproduce, expected (`observable`), the finder's prose | what is left of 1,500 after everything above and a reserve for the markers, shared out smallest-first | cut at their share |
-| `elided` | `{field: characters left out}` — present only when something was cut | reserve of 4 entries + 14 | — |
+| `finding`, `severity`, `clause`, `verification`, `why`, `observed`, `anchor`, `anchor_why` | what decided the block | 60, enum, 40, 20, 160, 24, 20, 160 (`FINDING_MAX` ... `WHY_MAX`) | never by another field; cut only at its own bound |
+| `artifact` | `{path, sha256, bytes}` of the full statement, or `null` + `artifact_why` (120) | fixed by the type (`Artifact` checks its shape) | never |
+| `summary`, `reproducer.subject`, `.stimulus`, `.observable` | the conditions to reproduce, expected (`observable`), the finder's prose | what is left of 1,500 after everything above and 26 characters per marker they may add, shared out smallest-first | cut at their share |
+| `elided` | `{field: characters left out}` — present only when something was cut | measured as already present (`, "elided": {}` costs 14) | — |
 
 * A value that fits its share is stated whole (an object, as before). One that does not becomes the **prefix of its
   canonical JSON text** as a string, and `elided[field]` says how many characters were left out. `elided` is
@@ -146,12 +146,12 @@ runs the in-memory, unredacted reproducer (a redacted one would reproduce someth
 | the statement states conditions, expected, observed, the cut and the artifact | `WhatIsStatedAndHowItIsMarked.*` (statement); product: `test_the_statement_names_the_artifact_and_it_is_the_file_with_that_digest` |
 | a cut is marked with the exact number of characters left out | the `elided` assertions of the same tests; `test_the_marker_counts_characters_of_the_text_not_of_its_encoding` |
 | a secret is not in the statement, and not half of it at the cut | `SecretsAreOutBeforeAnythingIsCut.*` (statement: 100 offsets around the stimulus's cut, 3 decisive fields around their bounds) |
-| text with no UTF-8 form, keys that are not strings, non-JSON values, absurd nesting never raise | `TextThatIsNotUtf8AndKeysThatAreNotStrings.*` (statement) |
+| text with no UTF-8 form, keys that are not strings, non-JSON values, absurd nesting never raise | `TextThatIsNotUtf8AndKeysThatAreNotStrings.*`, `DeepStructures.*` (statement) |
 | the full finding is kept whole, redacted, identified, create-only, written whole before visible | `PreserveWritesTheWholeFinding.*` (artifact) |
 | a failure to keep is a reason, never an exception | `...test_a_failure_to_keep_is_a_reason_and_never_an_exception`, `...test_the_file_is_whole_before_it_is_visible_and_a_failed_write_leaves_nothing_visible` (artifact) |
 | the journal row binds the artifact; `--verify` refuses missing, altered, mis-pointed, outside the directory, a blocking row with none | `ArtifactProblems.*` (artifact); product: `test_an_altered_artifact_is_refuted_by_the_manifest_and_by_the_row`, `test_a_removed_artifact_is_refuted`, `test_an_artifact_rewritten_with_the_manifest_made_again_is_still_not_the_file_the_row_binds`, `test_without_a_manifest_the_row_still_binds_the_artifact` |
-| the manifest lists the artifacts; a directory with none lists what it always did | `ManifestBindsTheArtifacts.*` (artifact); product: `test_the_manifest_lists_the_artifact_and_the_run_verifies`; failclosed: `test_a_run_that_kept_no_artifact_has_the_manifest_it_always_had` |
-| a finding that would block and cannot be preserved refuses the review; a cut statement is never what blocks; a finding that would not block is reported with why it has no artifact; advisory refuses nothing | `ReviewerKeepsTheEvidence.*` (artifact); failclosed (`aisef run`): the four tests of `WithoutItsArtifactAFindingNeverBlocksAndTheStoryIsNeverCommittedOnIt` |
+| the manifest lists the artifacts, each group in name order; a directory with none lists what it always did | `ManifestBindsTheArtifacts.*` (artifact; `test_every_group_is_listed_in_name_order`); product: `test_the_manifest_lists_the_artifact_and_the_run_verifies`; failclosed: `test_a_run_that_kept_no_artifact_has_the_manifest_it_always_had` |
+| a finding that would block and cannot be preserved refuses the review; a cut statement is never what blocks; a finding that would not block is reported with why it has no artifact; advisory refuses nothing | `ReviewerKeepsTheEvidence.*` (artifact); failclosed (`aisef run`): the five tests of `WithoutItsArtifactAFindingNeverBlocksAndTheStoryIsNeverCommittedOnIt` |
 | the run's secrets (client environment, provider key, OCR token) are out of the statement, the artifact, `RUN.json`, the journal and the retry prompt | `ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it`, `...test_the_finders_own_token_is_a_secret_of_the_run_too`, `...test_the_id_that_names_the_gate_row_carries_no_secret_either`; product: `test_the_secret_is_in_nothing_the_run_persisted_for_its_reviewers_findings`, `test_the_developer_is_told_the_finding_as_stated_on_its_retry`, `test_the_record_keeps_the_finding_the_finder_made_with_the_secret_out`; model: `test_the_secret_is_in_none_of_the_run_s_files_and_the_run_verifies` |
 | the developer's retry prompt still carries the finding, readable | product: `test_the_developer_is_told_the_finding_as_stated_on_its_retry`; the existing `test_v21_review_chain.FixLoop` |
 
