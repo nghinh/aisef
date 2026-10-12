@@ -466,6 +466,23 @@ class Redacted(unittest.TestCase):
         out, n = V.redacted("x ABCDEFGH y", ("ABCD", "ABCDEFGH"))
         self.assertEqual((out, n), (f"x {V.REDACTED} y", 1))
 
+    def test_a_secret_of_digits_is_out_when_the_finder_wrote_it_as_a_number(self):
+        """Reviewer's finding: only strings were matched, so a client value of digits (a PIN, an account number) that the
+        finder wrote as a JSON number was kept — in the statement, the artifact and RUN.json."""
+        pin = "1234567890"
+        out, n = V.redacted({"argv": ["pin", int(pin), 12, 2.5, True, None], "stdin": {"text": f"pin={pin}"}}, (pin,))
+        self.assertEqual((out, n), ({"argv": ["pin", V.REDACTED, 12, 2.5, True, None],
+                                     "stdin": {"text": f"pin={V.REDACTED}"}}, 2))
+        out, n = V.redacted([3.14159265, 3.14, 31415926, 2 * int(pin)], ("3.14159265", pin))
+        self.assertEqual((out, n), ([V.REDACTED, 3.14, 31415926, 2 * int(pin)], 1))     # a number that has not its text
+        self.assertEqual(V.redacted([True, False], ("True",)), ([True, False], 0))      # a bool is not a number's text
+
+    def test_a_secret_of_digits_is_not_in_the_statement_either(self):
+        pin = "1234567890"
+        text, d = stated(finding(stimulus={"args": [int(pin), 7]}), secrets=(pin,))
+        self.assertNotIn(pin, text)
+        self.assertEqual(d["reproducer"]["stimulus"], {"args": [V.REDACTED, 7]})
+
 
 class FitMeasuresTheEncoding(unittest.TestCase):
     def test_widths_and_the_count_of_what_was_left_out(self):

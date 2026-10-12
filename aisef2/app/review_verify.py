@@ -290,8 +290,9 @@ class Artifact:
 
 def redacted(value, secrets=()):
     """(`value` as plain JSON data, how many secrets were replaced). Every string — keys too — has each secret replaced
-    by `REDACTED`, the longest first; a string with no UTF-8 form (a lone surrogate, which `json.loads` yields from a
-    model's "\\ud800") is written with its escape; a key that is not a string is written `<type>repr`; a value that is
+    by `REDACTED`, the longest first; a number whose text holds one (a secret of digits) is that text with it replaced;
+    a string with no UTF-8 form (a lone surrogate, which `json.loads` yields from a model's "\\ud800") is written with
+    its escape; a key that is not a string is written `<type>repr`; a value that is
     not JSON data (NaN, a set, bytes) as its repr; what is nested deeper than `DEPTH_MAX` (no probe grammar is) is
     replaced by a marker, so the walk — and what is made of it — cannot meet the interpreter's recursion limit."""
     wanted = sorted({str(s) for s in secrets if s}, key=len, reverse=True)
@@ -316,6 +317,8 @@ def redacted(value, secrets=()):
             return out
         if isinstance(x, (list, tuple)):
             return [walk(item, depth + 1) for item in x]
+        if isinstance(x, (int, float)) and not isinstance(x, bool) and any(s in repr(x) for s in wanted):
+            return walk(repr(x))     # a secret of digits, written as a JSON number: its text, the secret replaced
         if x is None or isinstance(x, int) or (isinstance(x, float) and math.isfinite(x)):     # a bool is an int
             return x
         return walk(repr(x))

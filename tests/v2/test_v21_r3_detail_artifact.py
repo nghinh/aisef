@@ -89,6 +89,16 @@ class PreserveWritesTheWholeFinding(Scratch):
         self.assertEqual(len(json.loads(data)["finding"]["reproducer"]["stimulus"]["stdin"]["text"]), 5000 + 10 + 4)
         self.assertEqual(sorted(p.name for p in self.folder.iterdir()), ["S1.2.0.json"])     # no temporary left
 
+    def test_a_secret_of_digits_written_as_a_number_is_replaced_in_the_file_too(self):
+        pin = "1234567890"
+        art = self.keep(finding({"args": [int(pin), 7], "stdin": {"text": f"pin={pin}"}}), secrets=(pin,))
+        data = (self.out / art.path).read_bytes()
+        self.assertNotIn(pin.encode(), data)
+        doc = json.loads(data)
+        self.assertEqual(doc["finding"]["reproducer"]["stimulus"],
+                         {"args": [V.REDACTED, 7], "stdin": {"text": f"pin={V.REDACTED}"}})
+        self.assertEqual(doc["redacted"], 2)
+
     def test_a_finding_with_nothing_to_replace_is_kept_exactly_and_says_so(self):
         f = finding({"argv": ["a"], "stdin": {"text": "é中\n"}})
         art = self.keep(f)
