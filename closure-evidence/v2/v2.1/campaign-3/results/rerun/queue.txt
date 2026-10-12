@@ -1,0 +1,2 @@
+aisef2/probe/cli_invocation.py::HARNESS/invoke
+aisef2/probe/process_effect.py::HARNESS/reported

@@ -1,0 +1,13 @@
+{
+ "worker": "c3b-w1",
+ "snapshot": "f860e57fdcd457887d8766de8c8d4d01f1af778c",
+ "status": "finished 2026-10-12; git status --porcelain after: clean (campaign 3 re-run of two targets that did not close in c3: HARNESS/invoke T0 flake, HARNESS/reported INFRA; snapshot f860e57)",
+ "log": {
+  "path": "closure-evidence/v2/v2.1/mutation-workers/c3b-w1.log",
+  "sha256": "8558aad94bd4d5edf180b82f2083c16cd8f208ab13df0f86759240fbd6ca309b"
+ },
+ "record": {
+  "path": "closure-evidence/v2/v2.1/mutation-workers/c3b-w1.record.json",
+  "sha256": "f17093eb40239ae8ce4c28c5ae4fe6d9a0c6cf9d338e9221db24ca43d7f0376a"
+ }
+}

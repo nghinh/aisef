@@ -1,0 +1,13 @@
+{
+ "worker": "c3-w2",
+ "snapshot": "f860e57fdcd457887d8766de8c8d4d01f1af778c",
+ "status": "finished 2026-10-12; git status --porcelain after: clean (campaign 3, snapshot f860e57)",
+ "log": {
+  "path": "closure-evidence/v2/v2.1/mutation-workers/c3-w2.log",
+  "sha256": "492a2f8eb321995c5276ce65e52892b1005e4820e1005fed70cdbf90a04574b7"
+ },
+ "record": {
+  "path": "closure-evidence/v2/v2.1/mutation-workers/c3-w2.record.json",
+  "sha256": "2095bf7146d917eea8192ed559883050c4f0f9c66ed2b40376e443f665884351"
+ }
+}

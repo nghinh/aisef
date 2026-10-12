@@ -1,0 +1,1642 @@
+{
+ "finished_targets": 199,
+ "duplicates": {},
+ "totals": {
+  "KILLED": 7583,
+  "SURVIVED": 242,
+  "INFRA": 1,
+  "NOT_RUN": 41
+ },
+ "impact": {
+  "aisef2/app/client.py::Budget.spend": {
+   "mutants": 48,
+   "same_mutant_list": true,
+   "classes_base": {
+    "KILLED": 48,
+    "SURVIVED": 0,
+    "TIMEOUT": 0,
+    "INFRA": 0,
+    "NOT_RUN": 0
+   },
+   "classes_new": {
+    "KILLED": 48,
+    "SURVIVED": 0,
+    "TIMEOUT": 0,
+    "INFRA": 0,
+    "NOT_RUN": 0
+   },
+   "differences": []
+  },
+  "aisef2/app/client.py::read_session": {
+   "mutants": 82,
+   "same_mutant_list": true,
+   "classes_base": {
+    "KILLED": 82,
+    "SURVIVED": 0,
+    "TIMEOUT": 0,
+    "INFRA": 0,
+    "NOT_RUN": 0
+   },
+   "classes_new": {
+    "KILLED": 82,
+    "SURVIVED": 0,
+    "TIMEOUT": 0,
+    "INFRA": 0,
+    "NOT_RUN": 0
+   },
+   "differences": []
+  },
+  "aisef2/app/review_ocr.py::TERMINAL": {
+   "mutants": 4,
+   "same_mutant_list": true,
+   "classes_base": {
+    "KILLED": 0,
+    "SURVIVED": 4,
+    "TIMEOUT": 0,
+    "INFRA": 0,
+    "NOT_RUN": 0
+   },
+   "classes_new": {
+    "KILLED": 0,
+    "SURVIVED": 4,
+    "TIMEOUT": 0,
+    "INFRA": 0,
+    "NOT_RUN": 0
+   },
+   "differences": []
+  },
+  "aisef2/app/review_ocr.py::environment": {
+   "mutants": 24,
+   "same_mutant_list": true,
+   "classes_base": {
+    "KILLED": 24,
+    "SURVIVED": 0,
+    "TIMEOUT": 0,
+    "INFRA": 0,
+    "NOT_RUN": 0
+   },
+   "classes_new": {
+    "KILLED": 24,
+    "SURVIVED": 0,
+    "TIMEOUT": 0,
+    "INFRA": 0,
+    "NOT_RUN": 0
+   },
+   "differences": []
+  },
+  "aisef2/app/run.py::delivery": {
+   "mutants": 46,
+   "same_mutant_list": true,
+   "classes_base": {
+    "KILLED": 46,
+    "SURVIVED": 0,
+    "TIMEOUT": 0,
+    "INFRA": 0,
+    "NOT_RUN": 0
+   },
+   "classes_new": {
+    "KILLED": 46,
+    "SURVIVED": 0,
+    "TIMEOUT": 0,
+    "INFRA": 0,
+    "NOT_RUN": 0
+   },
+   "differences": []
+  },
+  "aisef2/app/settings.py::Settings.prices": {
+   "mutants": 2,
+   "same_mutant_list": true,
+   "classes_base": {
+    "KILLED": 2,
+    "SURVIVED": 0,
+    "TIMEOUT": 0,
+    "INFRA": 0,
+    "NOT_RUN": 0
+   },
+   "classes_new": {
+    "KILLED": 2,
+    "SURVIVED": 0,
+    "TIMEOUT": 0,
+    "INFRA": 0,
+    "NOT_RUN": 0
+   },
+   "differences": []
+  },
+  "aisef2/orchestrate/adapters.py::Implemented.__post_init__": {
+   "mutants": 27,
+   "same_mutant_list": true,
+   "classes_base": {
+    "KILLED": 27,
+    "SURVIVED": 0,
+    "TIMEOUT": 0,
+    "INFRA": 0,
+    "NOT_RUN": 0
+   },
+   "classes_new": {
+    "KILLED": 27,
+    "SURVIVED": 0,
+    "TIMEOUT": 0,
+    "INFRA": 0,
+    "NOT_RUN": 0
+   },
+   "differences": []
+  },
+  "aisef2/orchestrate/review.py::review": {
+   "mutants": 121,
+   "same_mutant_list": true,
+   "classes_base": {
+    "KILLED": 121,
+    "SURVIVED": 0,
+    "TIMEOUT": 0,
+    "INFRA": 0,
+    "NOT_RUN": 0
+   },
+   "classes_new": {
+    "KILLED": 121,
+    "SURVIVED": 0,
+    "TIMEOUT": 0,
+    "INFRA": 0,
+    "NOT_RUN": 0
+   },
+   "differences": []
+  },
+  "aisef2/orchestrate/story_runner.py::run_story": {
+   "mutants": 11,
+   "same_mutant_list": true,
+   "classes_base": {
+    "KILLED": 11,
+    "SURVIVED": 0,
+    "TIMEOUT": 0,
+    "INFRA": 0,
+    "NOT_RUN": 0
+   },
+   "classes_new": {
+    "KILLED": 11,
+    "SURVIVED": 0,
+    "TIMEOUT": 0,
+    "INFRA": 0,
+    "NOT_RUN": 0
+   },
+   "differences": []
+  },
+  "aisef2/orchestrate/workspace.py::config_problems": {
+   "mutants": 34,
+   "same_mutant_list": true,
+   "classes_base": {
+    "KILLED": 34,
+    "SURVIVED": 0,
+    "TIMEOUT": 0,
+    "INFRA": 0,
+    "NOT_RUN": 0
+   },
+   "classes_new": {
+    "KILLED": 34,
+    "SURVIVED": 0,
+    "TIMEOUT": 0,
+    "INFRA": 0,
+    "NOT_RUN": 0
+   },
+   "differences": []
+  },
+  "aisef2/plan/static_admission.py::admit": {
+   "mutants": 21,
+   "same_mutant_list": true,
+   "classes_base": {
+    "KILLED": 21,
+    "SURVIVED": 0,
+    "TIMEOUT": 0,
+    "INFRA": 0,
+    "NOT_RUN": 0
+   },
+   "classes_new": {
+    "KILLED": 21,
+    "SURVIVED": 0,
+    "TIMEOUT": 0,
+    "INFRA": 0,
+    "NOT_RUN": 0
+   },
+   "differences": []
+  },
+  "aisef2/plan/static_admission.py::check_proof_capability": {
+   "mutants": 16,
+   "same_mutant_list": true,
+   "classes_base": {
+    "KILLED": 16,
+    "SURVIVED": 0,
+    "TIMEOUT": 0,
+    "INFRA": 0,
+    "NOT_RUN": 0
+   },
+   "classes_new": {
+    "KILLED": 16,
+    "SURVIVED": 0,
+    "TIMEOUT": 0,
+    "INFRA": 0,
+    "NOT_RUN": 0
+   },
+   "differences": []
+  },
+  "aisef2/probe/calibration.py::calibrate": {
+   "mutants": 40,
+   "same_mutant_list": true,
+   "classes_base": {
+    "KILLED": 40,
+    "SURVIVED": 0,
+    "TIMEOUT": 0,
+    "INFRA": 0,
+    "NOT_RUN": 0
+   },
+   "classes_new": {
+    "KILLED": 40,
+    "SURVIVED": 0,
+    "TIMEOUT": 0,
+    "INFRA": 0,
+    "NOT_RUN": 0
+   },
+   "differences": []
+  },
+  "aisef2/probe/cli_invocation.py::AGENT/redirect": {
+   "mutants": 15,
+   "same_mutant_list": true,
+   "classes_base": {
+    "KILLED": 15,
+    "SURVIVED": 0,
+    "TIMEOUT": 0,
+    "INFRA": 0,
+    "NOT_RUN": 0
+   },
+   "classes_new": {
+    "KILLED": 15,
+    "SURVIVED": 0,
+    "TIMEOUT": 0,
+    "INFRA": 0,
+    "NOT_RUN": 0
+   },
+   "differences": []
+  },
+  "aisef2/probe/cli_invocation.py::_harness_argv": {
+   "mutants": 20,
+   "same_mutant_list": true,
+   "classes_base": {
+    "KILLED": 20,
+    "SURVIVED": 0,
+    "TIMEOUT": 0,
+    "INFRA": 0,
+    "NOT_RUN": 0
+   },
+   "classes_new": {
+    "KILLED": 20,
+    "SURVIVED": 0,
+    "TIMEOUT": 0,
+    "INFRA": 0,
+    "NOT_RUN": 0
+   },
+   "differences": []
+  },
+  "aisef2/probe/cli_invocation.py::_normalization_ok": {
+   "mutants": 15,
+   "same_mutant_list": true,
+   "classes_base": {
+    "KILLED": 15,
+    "SURVIVED": 0,
+    "TIMEOUT": 0,
+    "INFRA": 0,
+    "NOT_RUN": 0
+   },
+   "classes_new": {
+    "KILLED": 15,
+    "SURVIVED": 0,
+    "TIMEOUT": 0,
+    "INFRA": 0,
+    "NOT_RUN": 0
+   },
+   "differences": []
+  },
+  "aisef2/probe/file_artifact.py::PlainTree._row": {
+   "mutants": 15,
+   "same_mutant_list": true,
+   "classes_base": {
+    "KILLED": 15,
+    "SURVIVED": 0,
+    "TIMEOUT": 0,
+    "INFRA": 0,
+    "NOT_RUN": 0
+   },
+   "classes_new": {
+    "KILLED": 15,
+    "SURVIVED": 0,
+    "TIMEOUT": 0,
+    "INFRA": 0,
+    "NOT_RUN": 0
+   },
+   "differences": []
+  },
+  "aisef2/probe/file_artifact.py::git_env": {
+   "mutants": 49,
+   "same_mutant_list": true,
+   "classes_base": {
+    "KILLED": 49,
+    "SURVIVED": 0,
+    "TIMEOUT": 0,
+    "INFRA": 0,
+    "NOT_RUN": 0
+   },
+   "classes_new": {
+    "KILLED": 49,
+    "SURVIVED": 0,
+    "TIMEOUT": 0,
+    "INFRA": 0,
+    "NOT_RUN": 0
+   },
+   "differences": []
+  },
+  "aisef2/probe/process_effect.py::HARNESS/do_call": {
+   "mutants": 23,
+   "same_mutant_list": true,
+   "classes_base": {
+    "KILLED": 23,
+    "SURVIVED": 0,
+    "TIMEOUT": 0,
+    "INFRA": 0,
+    "NOT_RUN": 0
+   },
+   "classes_new": {
+    "KILLED": 23,
+    "SURVIVED": 0,
+    "TIMEOUT": 0,
+    "INFRA": 0,
+    "NOT_RUN": 0
+   },
+   "differences": []
+  },
+  "aisef2/probe/python_callable_v2.py::_file_ok": {
+   "mutants": 15,
+   "same_mutant_list": true,
+   "classes_base": {
+    "KILLED": 15,
+    "SURVIVED": 0,
+    "TIMEOUT": 0,
+    "INFRA": 0,
+    "NOT_RUN": 0
+   },
+   "classes_new": {
+    "KILLED": 15,
+    "SURVIVED": 0,
+    "TIMEOUT": 0,
+    "INFRA": 0,
+    "NOT_RUN": 0
+   },
+   "differences": []
+  }
+ },
+ "unresolved": [
+  {
+   "target": "aisef2/app/adapters.py::_bounded",
+   "index": 6,
+   "mutant": "L281 And swapped",
+   "class_base": "TIMEOUT",
+   "now": [
+    [
+     6,
+     "L287 And swapped",
+     "KILLED"
+    ]
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::continue_from",
+   "index": 20,
+   "mutant": "L416 In->NotIn",
+   "class_base": "TIMEOUT",
+   "now": [
+    [
+     20,
+     "L453 In->NotIn",
+     "KILLED"
+    ],
+    [
+     58,
+     "L459 In->NotIn",
+     "KILLED"
+    ],
+    [
+     171,
+     "L471 In->NotIn",
+     "KILLED"
+    ]
+   ]
+  },
+  {
+   "target": "aisef2/app/cli.py::run",
+   "index": 22,
+   "mutant": "L65 Or swapped",
+   "class_base": "INFRA",
+   "now": [
+    [
+     22,
+     "L65 Or swapped",
+     "KILLED"
+    ],
+    [
+     23,
+     "L67 Or swapped",
+     "KILLED"
+    ]
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::_survivors",
+   "index": 1,
+   "mutant": "L347 condition negated",
+   "class_base": "TIMEOUT",
+   "now": [
+    [
+     1,
+     "L352 condition negated",
+     "KILLED"
+    ]
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "index": 0,
+   "mutant": "L156 condition negated",
+   "class_base": "INFRA",
+   "now": [
+    [
+     0,
+     "L156 condition negated",
+     "KILLED"
+    ],
+    [
+     1,
+     "L158 condition negated",
+     "KILLED"
+    ],
+    [
+     2,
+     "L161 condition negated",
+     "KILLED"
+    ],
+    [
+     3,
+     "L164 condition negated",
+     "KILLED"
+    ],
+    [
+     9,
+     "L167 condition negated",
+     "KILLED"
+    ]
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "index": 1,
+   "mutant": "L158 condition negated",
+   "class_base": "INFRA",
+   "now": [
+    [
+     0,
+     "L156 condition negated",
+     "KILLED"
+    ],
+    [
+     1,
+     "L158 condition negated",
+     "KILLED"
+    ],
+    [
+     2,
+     "L161 condition negated",
+     "KILLED"
+    ],
+    [
+     3,
+     "L164 condition negated",
+     "KILLED"
+    ],
+    [
+     9,
+     "L167 condition negated",
+     "KILLED"
+    ]
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "index": 2,
+   "mutant": "L161 condition negated",
+   "class_base": "INFRA",
+   "now": [
+    [
+     0,
+     "L156 condition negated",
+     "KILLED"
+    ],
+    [
+     1,
+     "L158 condition negated",
+     "KILLED"
+    ],
+    [
+     2,
+     "L161 condition negated",
+     "KILLED"
+    ],
+    [
+     3,
+     "L164 condition negated",
+     "KILLED"
+    ],
+    [
+     9,
+     "L167 condition negated",
+     "KILLED"
+    ]
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "index": 3,
+   "mutant": "L164 condition negated",
+   "class_base": "INFRA",
+   "now": [
+    [
+     0,
+     "L156 condition negated",
+     "KILLED"
+    ],
+    [
+     1,
+     "L158 condition negated",
+     "KILLED"
+    ],
+    [
+     2,
+     "L161 condition negated",
+     "KILLED"
+    ],
+    [
+     3,
+     "L164 condition negated",
+     "KILLED"
+    ],
+    [
+     9,
+     "L167 condition negated",
+     "KILLED"
+    ]
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "index": 6,
+   "mutant": "L156 not removed",
+   "class_base": "INFRA",
+   "now": [
+    [
+     6,
+     "L156 not removed",
+     "KILLED"
+    ],
+    [
+     7,
+     "L158 not removed",
+     "KILLED"
+    ],
+    [
+     18,
+     "L160 not removed",
+     "KILLED"
+    ]
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "index": 7,
+   "mutant": "L158 not removed",
+   "class_base": "INFRA",
+   "now": [
+    [
+     6,
+     "L156 not removed",
+     "KILLED"
+    ],
+    [
+     7,
+     "L158 not removed",
+     "KILLED"
+    ],
+    [
+     18,
+     "L160 not removed",
+     "KILLED"
+    ]
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "index": 8,
+   "mutant": "L163 conditional negated",
+   "class_base": "INFRA",
+   "now": [
+    [
+     8,
+     "L163 conditional negated",
+     "KILLED"
+    ],
+    [
+     23,
+     "L174 conditional negated",
+     "KILLED"
+    ]
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "index": 9,
+   "mutant": "L167 condition negated",
+   "class_base": "INFRA",
+   "now": [
+    [
+     0,
+     "L156 condition negated",
+     "KILLED"
+    ],
+    [
+     1,
+     "L158 condition negated",
+     "KILLED"
+    ],
+    [
+     2,
+     "L161 condition negated",
+     "KILLED"
+    ],
+    [
+     3,
+     "L164 condition negated",
+     "KILLED"
+    ],
+    [
+     9,
+     "L167 condition negated",
+     "KILLED"
+    ]
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "index": 27,
+   "mutant": "L160 string 'read_only' emptied",
+   "class_base": "INFRA",
+   "now": [
+    [
+     27,
+     "L160 string 'read_only' emptied",
+     "KILLED"
+    ],
+    [
+     38,
+     "L171 string 'read_only' emptied",
+     "KILLED"
+    ]
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "index": 29,
+   "mutant": "L165 element 0 dropped",
+   "class_base": "INFRA",
+   "now": [
+    [
+     10,
+     "L170 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     12,
+     "L171 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     14,
+     "L175 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     19,
+     "L172 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     29,
+     "L165 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     31,
+     "L165 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     35,
+     "L171 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     39,
+     "L172 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     47,
+     "L165 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     49,
+     "L165 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     51,
+     "L165 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     67,
+     "L166 element 0 dropped",
+     "KILLED"
+    ]
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "index": 30,
+   "mutant": "L165 element 1 dropped",
+   "class_base": "INFRA",
+   "now": [
+    [
+     11,
+     "L170 element 1 dropped",
+     "KILLED"
+    ],
+    [
+     13,
+     "L171 element 1 dropped",
+     "KILLED"
+    ],
+    [
+     15,
+     "L175 element 1 dropped",
+     "KILLED"
+    ],
+    [
+     20,
+     "L172 element 1 dropped",
+     "KILLED"
+    ],
+    [
+     30,
+     "L165 element 1 dropped",
+     "KILLED"
+    ],
+    [
+     32,
+     "L165 element 1 dropped",
+     "KILLED"
+    ],
+    [
+     36,
+     "L171 element 1 dropped",
+     "KILLED"
+    ],
+    [
+     40,
+     "L172 element 1 dropped",
+     "KILLED"
+    ],
+    [
+     48,
+     "L165 element 1 dropped",
+     "KILLED"
+    ],
+    [
+     50,
+     "L165 element 1 dropped",
+     "KILLED"
+    ],
+    [
+     52,
+     "L165 element 1 dropped",
+     "KILLED"
+    ],
+    [
+     68,
+     "L166 element 1 dropped",
+     "KILLED"
+    ]
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "index": 31,
+   "mutant": "L165 element 0 dropped",
+   "class_base": "INFRA",
+   "now": [
+    [
+     10,
+     "L170 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     12,
+     "L171 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     14,
+     "L175 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     19,
+     "L172 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     29,
+     "L165 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     31,
+     "L165 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     35,
+     "L171 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     39,
+     "L172 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     47,
+     "L165 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     49,
+     "L165 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     51,
+     "L165 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     67,
+     "L166 element 0 dropped",
+     "KILLED"
+    ]
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "index": 33,
+   "mutant": "L165 element 2 dropped",
+   "class_base": "INFRA",
+   "now": [
+    [
+     33,
+     "L165 element 2 dropped",
+     "KILLED"
+    ],
+    [
+     37,
+     "L171 element 2 dropped",
+     "KILLED"
+    ],
+    [
+     41,
+     "L172 element 2 dropped",
+     "KILLED"
+    ]
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "index": 34,
+   "mutant": "L166 And swapped",
+   "class_base": "INFRA",
+   "now": [
+    [
+     16,
+     "L158 And swapped",
+     "KILLED"
+    ],
+    [
+     34,
+     "L166 And swapped",
+     "KILLED"
+    ]
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "index": 45,
+   "mutant": "L158 string 'bwrap' emptied",
+   "class_base": "INFRA",
+   "now": [
+    [
+     45,
+     "L158 string 'bwrap' emptied",
+     "KILLED"
+    ],
+    [
+     46,
+     "L158 string 'bwrap' emptied",
+     "KILLED"
+    ],
+    [
+     61,
+     "L159 string 'bwrap' emptied",
+     "KILLED"
+    ]
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "index": 46,
+   "mutant": "L158 string 'bwrap' emptied",
+   "class_base": "INFRA",
+   "now": [
+    [
+     45,
+     "L158 string 'bwrap' emptied",
+     "KILLED"
+    ],
+    [
+     46,
+     "L158 string 'bwrap' emptied",
+     "KILLED"
+    ],
+    [
+     61,
+     "L159 string 'bwrap' emptied",
+     "KILLED"
+    ]
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "index": 47,
+   "mutant": "L165 element 0 dropped",
+   "class_base": "INFRA",
+   "now": [
+    [
+     10,
+     "L170 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     12,
+     "L171 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     14,
+     "L175 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     19,
+     "L172 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     29,
+     "L165 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     31,
+     "L165 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     35,
+     "L171 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     39,
+     "L172 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     47,
+     "L165 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     49,
+     "L165 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     51,
+     "L165 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     67,
+     "L166 element 0 dropped",
+     "KILLED"
+    ]
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "index": 48,
+   "mutant": "L165 element 1 dropped",
+   "class_base": "INFRA",
+   "now": [
+    [
+     11,
+     "L170 element 1 dropped",
+     "KILLED"
+    ],
+    [
+     13,
+     "L171 element 1 dropped",
+     "KILLED"
+    ],
+    [
+     15,
+     "L175 element 1 dropped",
+     "KILLED"
+    ],
+    [
+     20,
+     "L172 element 1 dropped",
+     "KILLED"
+    ],
+    [
+     30,
+     "L165 element 1 dropped",
+     "KILLED"
+    ],
+    [
+     32,
+     "L165 element 1 dropped",
+     "KILLED"
+    ],
+    [
+     36,
+     "L171 element 1 dropped",
+     "KILLED"
+    ],
+    [
+     40,
+     "L172 element 1 dropped",
+     "KILLED"
+    ],
+    [
+     48,
+     "L165 element 1 dropped",
+     "KILLED"
+    ],
+    [
+     50,
+     "L165 element 1 dropped",
+     "KILLED"
+    ],
+    [
+     52,
+     "L165 element 1 dropped",
+     "KILLED"
+    ],
+    [
+     68,
+     "L166 element 1 dropped",
+     "KILLED"
+    ]
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "index": 49,
+   "mutant": "L165 element 0 dropped",
+   "class_base": "INFRA",
+   "now": [
+    [
+     10,
+     "L170 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     12,
+     "L171 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     14,
+     "L175 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     19,
+     "L172 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     29,
+     "L165 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     31,
+     "L165 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     35,
+     "L171 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     39,
+     "L172 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     47,
+     "L165 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     49,
+     "L165 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     51,
+     "L165 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     67,
+     "L166 element 0 dropped",
+     "KILLED"
+    ]
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "index": 50,
+   "mutant": "L165 element 1 dropped",
+   "class_base": "INFRA",
+   "now": [
+    [
+     11,
+     "L170 element 1 dropped",
+     "KILLED"
+    ],
+    [
+     13,
+     "L171 element 1 dropped",
+     "KILLED"
+    ],
+    [
+     15,
+     "L175 element 1 dropped",
+     "KILLED"
+    ],
+    [
+     20,
+     "L172 element 1 dropped",
+     "KILLED"
+    ],
+    [
+     30,
+     "L165 element 1 dropped",
+     "KILLED"
+    ],
+    [
+     32,
+     "L165 element 1 dropped",
+     "KILLED"
+    ],
+    [
+     36,
+     "L171 element 1 dropped",
+     "KILLED"
+    ],
+    [
+     40,
+     "L172 element 1 dropped",
+     "KILLED"
+    ],
+    [
+     48,
+     "L165 element 1 dropped",
+     "KILLED"
+    ],
+    [
+     50,
+     "L165 element 1 dropped",
+     "KILLED"
+    ],
+    [
+     52,
+     "L165 element 1 dropped",
+     "KILLED"
+    ],
+    [
+     68,
+     "L166 element 1 dropped",
+     "KILLED"
+    ]
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "index": 51,
+   "mutant": "L165 element 0 dropped",
+   "class_base": "INFRA",
+   "now": [
+    [
+     10,
+     "L170 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     12,
+     "L171 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     14,
+     "L175 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     19,
+     "L172 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     29,
+     "L165 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     31,
+     "L165 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     35,
+     "L171 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     39,
+     "L172 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     47,
+     "L165 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     49,
+     "L165 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     51,
+     "L165 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     67,
+     "L166 element 0 dropped",
+     "KILLED"
+    ]
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "index": 52,
+   "mutant": "L165 element 1 dropped",
+   "class_base": "INFRA",
+   "now": [
+    [
+     11,
+     "L170 element 1 dropped",
+     "KILLED"
+    ],
+    [
+     13,
+     "L171 element 1 dropped",
+     "KILLED"
+    ],
+    [
+     15,
+     "L175 element 1 dropped",
+     "KILLED"
+    ],
+    [
+     20,
+     "L172 element 1 dropped",
+     "KILLED"
+    ],
+    [
+     30,
+     "L165 element 1 dropped",
+     "KILLED"
+    ],
+    [
+     32,
+     "L165 element 1 dropped",
+     "KILLED"
+    ],
+    [
+     36,
+     "L171 element 1 dropped",
+     "KILLED"
+    ],
+    [
+     40,
+     "L172 element 1 dropped",
+     "KILLED"
+    ],
+    [
+     48,
+     "L165 element 1 dropped",
+     "KILLED"
+    ],
+    [
+     50,
+     "L165 element 1 dropped",
+     "KILLED"
+    ],
+    [
+     52,
+     "L165 element 1 dropped",
+     "KILLED"
+    ],
+    [
+     68,
+     "L166 element 1 dropped",
+     "KILLED"
+    ]
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "index": 53,
+   "mutant": "L166 Eq->NotEq",
+   "class_base": "INFRA",
+   "now": [
+    [
+     53,
+     "L166 Eq->NotEq",
+     "KILLED"
+    ]
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "index": 55,
+   "mutant": "L168 string ' holds ' emptied",
+   "class_base": "INFRA",
+   "now": [
+    [
+     55,
+     "L168 string ' holds ' emptied",
+     "KILLED"
+    ]
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "index": 56,
+   "mutant": "L168 string ': bound read-only it would expose it; give the client a directory of its own' emptied",
+   "class_base": "INFRA",
+   "now": [
+    [
+     56,
+     "L168 string ': bound read-only it would expose it; give the client a directory of its own' emptied",
+     "KILLED"
+    ]
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "index": 62,
+   "mutant": "L165 string 'HOME' emptied",
+   "class_base": "INFRA",
+   "now": [
+    [
+     62,
+     "L165 string 'HOME' emptied",
+     "KILLED"
+    ],
+    [
+     63,
+     "L165 string 'HOME' emptied",
+     "KILLED"
+    ],
+    [
+     65,
+     "L165 string 'HOME' emptied",
+     "KILLED"
+    ]
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "index": 64,
+   "mutant": "L165 string 'the workspace' emptied",
+   "class_base": "INFRA",
+   "now": [
+    [
+     64,
+     "L165 string 'the workspace' emptied",
+     "KILLED"
+    ]
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "index": 65,
+   "mutant": "L165 string 'HOME' emptied",
+   "class_base": "INFRA",
+   "now": [
+    [
+     62,
+     "L165 string 'HOME' emptied",
+     "KILLED"
+    ],
+    [
+     63,
+     "L165 string 'HOME' emptied",
+     "KILLED"
+    ],
+    [
+     65,
+     "L165 string 'HOME' emptied",
+     "KILLED"
+    ]
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "index": 67,
+   "mutant": "L166 element 0 dropped",
+   "class_base": "INFRA",
+   "now": [
+    [
+     10,
+     "L170 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     12,
+     "L171 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     14,
+     "L175 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     19,
+     "L172 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     29,
+     "L165 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     31,
+     "L165 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     35,
+     "L171 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     39,
+     "L172 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     47,
+     "L165 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     49,
+     "L165 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     51,
+     "L165 element 0 dropped",
+     "KILLED"
+    ],
+    [
+     67,
+     "L166 element 0 dropped",
+     "KILLED"
+    ]
+   ]
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "index": 68,
+   "mutant": "L166 element 1 dropped",
+   "class_base": "INFRA",
+   "now": [
+    [
+     11,
+     "L170 element 1 dropped",
+     "KILLED"
+    ],
+    [
+     13,
+     "L171 element 1 dropped",
+     "KILLED"
+    ],
+    [
+     15,
+     "L175 element 1 dropped",
+     "KILLED"
+    ],
+    [
+     20,
+     "L172 element 1 dropped",
+     "KILLED"
+    ],
+    [
+     30,
+     "L165 element 1 dropped",
+     "KILLED"
+    ],
+    [
+     32,
+     "L165 element 1 dropped",
+     "KILLED"
+    ],
+    [
+     36,
+     "L171 element 1 dropped",
+     "KILLED"
+    ],
+    [
+     40,
+     "L172 element 1 dropped",
+     "KILLED"
+    ],
+    [
+     48,
+     "L165 element 1 dropped",
+     "KILLED"
+    ],
+    [
+     50,
+     "L165 element 1 dropped",
+     "KILLED"
+    ],
+    [
+     52,
+     "L165 element 1 dropped",
+     "KILLED"
+    ],
+    [
+     68,
+     "L166 element 1 dropped",
+     "KILLED"
+    ]
+   ]
+  }
+ ],
+ "unfinished_scope": []
+}

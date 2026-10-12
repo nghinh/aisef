@@ -1,0 +1,798 @@
+{
+"1": {
+"by": "c3-w1 aisef2/app/run.py::execute 2026-10-11T12:41:51Z",
+"done": "2026-10-11T17:46:51Z exit 1"
+},
+"2": {
+"by": "c3-w2 aisef2/app/settings.py::load 2026-10-11T12:41:56Z",
+"done": "2026-10-11T13:34:06Z exit 1"
+},
+"3": {
+"by": "c3-w3 aisef2/app/verify.py::verify 2026-10-11T12:42:01Z",
+"done": "2026-10-11T15:54:16Z exit 1"
+},
+"4": {
+"by": "c3-w4 aisef2/app/adapters.py::Reviewer._ocr 2026-10-11T12:42:06Z",
+"done": "2026-10-11T15:03:49Z exit 1"
+},
+"5": {
+"by": "c3-w2 aisef2/app/bundle.py::shape_problems 2026-10-11T13:34:06Z",
+"done": "2026-10-11T14:09:26Z exit 1"
+},
+"6": {
+"by": "c3-w2 aisef2/app/bundle_cli.py::continue_from 2026-10-11T14:09:26Z",
+"done": "2026-10-11T18:06:36Z exit 1"
+},
+"7": {
+"by": "c3-w4 aisef2/app/bundle_cli.py::seal 2026-10-11T15:03:49Z",
+"done": "2026-10-11T15:56:11Z exit 1"
+},
+"8": {
+"by": "c3-w3 aisef2/app/bundle_cli.py::main 2026-10-11T15:54:16Z",
+"done": "2026-10-11T18:10:05Z exit 1"
+},
+"9": {
+"by": "c3-w4 aisef2/app/cli.py::run 2026-10-11T15:56:11Z",
+"done": "2026-10-11T16:28:05Z exit 1"
+},
+"10": {
+"by": "c3-w4 aisef2/app/lineage.py::reconcile 2026-10-11T16:28:05Z",
+"done": "2026-10-11T17:25:50Z exit 1"
+},
+"11": {
+"by": "c3-w4 aisef2/app/feedback.py::context_pack 2026-10-11T17:25:50Z",
+"done": "2026-10-11T17:50:48Z exit 1"
+},
+"12": {
+"by": "c3-w1 aisef2/app/usage.py::usage 2026-10-11T17:46:51Z",
+"done": "2026-10-11T18:18:51Z exit 1"
+},
+"13": {
+"by": "c3-w4 aisef2/app/run.py::layers_of 2026-10-11T17:50:48Z",
+"done": "2026-10-11T18:07:56Z exit 1"
+},
+"14": {
+"by": "c3-w2 aisef2/app/bundle.py::load 2026-10-11T18:06:36Z",
+"done": "2026-10-11T18:26:51Z exit 1"
+},
+"15": {
+"by": "c3-w4 aisef2/app/feedback.py::retry_feedback 2026-10-11T18:07:57Z",
+"done": "2026-10-11T18:18:37Z exit 1"
+},
+"16": {
+"by": "c3-w3 aisef2/app/bundle_cli.py::migrate 2026-10-11T18:10:05Z",
+"done": "2026-10-11T18:43:32Z exit 1"
+},
+"17": {
+"by": "c3-w4 aisef2/app/run.py::delivery 2026-10-11T18:18:37Z",
+"done": "2026-10-11T18:35:55Z exit 1"
+},
+"18": {
+"by": "c3-w1 aisef2/app/lineage.py::usage_lineage 2026-10-11T18:18:52Z",
+"done": "2026-10-11T18:38:51Z exit 1"
+},
+"19": {
+"by": "c3-w2 aisef2/app/lineage.py::claim 2026-10-11T18:26:51Z",
+"done": "2026-10-11T19:16:48Z exit 1"
+},
+"20": {
+"by": "c3-w4 aisef2/app/review_ocr.py::coverage 2026-10-11T18:35:55Z",
+"done": "2026-10-11T19:02:49Z exit 1"
+},
+"21": {
+"by": "c3-w1 aisef2/app/run.py::check_repository 2026-10-11T18:38:51Z",
+"done": "2026-10-11T19:06:35Z exit 1"
+},
+"22": {
+"by": "c3-w3 aisef2/app/lineage.py::account_of 2026-10-11T18:43:32Z",
+"done": "2026-10-11T19:14:18Z exit 1"
+},
+"23": {
+"by": "c3-w4 aisef2/probe/cli_invocation.py::HARNESS/main 2026-10-11T19:02:49Z",
+"done": "2026-10-11T20:08:55Z exit 1"
+},
+"24": {
+"by": "c3-w1 aisef2/app/settings.py::endpoint_problem 2026-10-11T19:06:35Z",
+"done": "2026-10-11T19:18:48Z exit 1"
+},
+"25": {
+"by": "c3-w3 aisef2/probe/python_callable_v2.py::HARNESS/main 2026-10-11T19:14:18Z",
+"done": "2026-10-11T20:19:42Z exit 1"
+},
+"26": {
+"by": "c3-w2 aisef2/app/bundle_cli.py::lint 2026-10-11T19:16:48Z",
+"done": "2026-10-11T19:36:58Z exit 1"
+},
+"27": {
+"by": "c3-w1 aisef2/app/verify.py::_runspec_problems 2026-10-11T19:18:48Z",
+"done": "2026-10-11T19:56:57Z exit 1"
+},
+"28": {
+"by": "c3-w2 aisef2/app/bundle_cli.py::coverage 2026-10-11T19:36:58Z",
+"done": "2026-10-11T19:50:40Z exit 1"
+},
+"29": {
+"by": "c3-w2 aisef2/app/review_verify.py::anchor 2026-10-11T19:50:40Z",
+"done": "2026-10-11T20:25:49Z exit 1"
+},
+"30": {
+"by": "c3-w1 aisef2/app/usage.py::price_problem 2026-10-11T19:56:57Z",
+"done": "2026-10-11T20:06:32Z exit 1"
+},
+"31": {
+"by": "c3-w1 aisef2/app/adapters.py::Reviewer.review 2026-10-11T20:06:32Z",
+"done": "2026-10-11T20:15:57Z exit 1"
+},
+"32": {
+"by": "c3-w4 aisef2/app/adapters.py::Developer.implement 2026-10-11T20:08:55Z",
+"done": "2026-10-11T20:22:57Z exit 1"
+},
+"33": {
+"by": "c3-w1 aisef2/app/lineage.py::lineage_account 2026-10-11T20:15:57Z",
+"done": "2026-10-11T20:24:05Z exit 1"
+},
+"34": {
+"by": "c3-w3 aisef2/app/usage.py::session_tokens 2026-10-11T20:19:42Z",
+"done": "2026-10-11T20:27:55Z exit 1"
+},
+"35": {
+"by": "c3-w4 aisef2/app/bundle_cli.py::RELEASES 2026-10-11T20:22:57Z",
+"done": "2026-10-11T20:30:57Z exit 1"
+},
+"36": {
+"by": "c3-w1 aisef2/app/bundle_cli.py::_spec_rows 2026-10-11T20:24:05Z",
+"done": "2026-10-11T20:32:12Z exit 1"
+},
+"37": {
+"by": "c3-w2 aisef2/app/review_verify.py::reproducer_contract 2026-10-11T20:25:49Z",
+"done": "2026-10-11T20:52:57Z exit 1"
+},
+"38": {
+"by": "c3-w3 aisef2/app/client.py::session 2026-10-11T20:27:55Z",
+"done": "2026-10-11T21:37:05Z exit 1"
+},
+"39": {
+"by": "c3-w4 aisef2/app/review_ocr.py::findings 2026-10-11T20:30:57Z",
+"done": "2026-10-11T21:06:01Z exit 1"
+},
+"40": {
+"by": "c3-w1 aisef2/app/run.py::evidence_manifest 2026-10-11T20:32:12Z",
+"done": "2026-10-11T21:13:12Z exit 1"
+},
+"41": {
+"by": "c3-w2 aisef2/app/bundle_cli.py::explain 2026-10-11T20:52:57Z",
+"done": "2026-10-11T21:19:01Z exit 1"
+},
+"42": {
+"by": "c3-w4 aisef2/app/usage.py::no_progress 2026-10-11T21:06:01Z",
+"done": "2026-10-11T21:25:17Z exit 1"
+},
+"43": {
+"by": "c3-w1 aisef2/probe/process_effect.py::HARNESS/main 2026-10-11T21:13:12Z",
+"done": "2026-10-11T22:40:15Z exit 1"
+},
+"44": {
+"by": "c3-w2 aisef2/app/run.py::unfinished 2026-10-11T21:19:01Z",
+"done": "2026-10-11T21:40:12Z exit 1"
+},
+"45": {
+"by": "c3-w4 aisef2/app/preflight.py::run 2026-10-11T21:25:17Z",
+"done": "2026-10-11T21:43:43Z exit 1"
+},
+"46": {
+"by": "c3-w3 aisef2/app/review_ocr.py::argv 2026-10-11T21:37:05Z",
+"done": "2026-10-11T21:42:32Z exit 1"
+},
+"47": {
+"by": "c3-w2 aisef2/app/cli.py::_parser 2026-10-11T21:40:12Z",
+"done": "2026-10-11T21:46:56Z exit 1"
+},
+"48": {
+"by": "c3-w3 aisef2/app/bundle.py::_strings 2026-10-11T21:42:32Z",
+"done": "2026-10-11T21:52:36Z exit 1"
+},
+"49": {
+"by": "c3-w4 aisef2/app/bundle_cli.py::approve 2026-10-11T21:43:43Z",
+"done": "2026-10-11T21:56:35Z exit 1"
+},
+"50": {
+"by": "c3-w2 aisef2/app/lineage.py::_gone 2026-10-11T21:46:56Z",
+"done": "2026-10-11T21:54:03Z exit 1"
+},
+"51": {
+"by": "c3-w3 aisef2/app/review_verify.py::detail 2026-10-11T21:52:36Z",
+"done": "2026-10-11T22:02:09Z exit 1"
+},
+"52": {
+"by": "c3-w2 aisef2/app/bundle_cli.py::unapproved 2026-10-11T21:54:03Z",
+"done": "2026-10-11T22:00:59Z exit 1"
+},
+"53": {
+"by": "c3-w4 aisef2/probe/cli_invocation.py::HARNESS/invoke 2026-10-11T21:56:35Z",
+"done": "2026-10-11T22:00:22Z exit 1"
+},
+"54": {
+"by": "c3-w4 aisef2/app/bundle.py::Project.order 2026-10-11T22:00:22Z",
+"done": "2026-10-11T22:10:27Z exit 1"
+},
+"55": {
+"by": "c3-w2 aisef2/app/adapters.py::Reviewer._model 2026-10-11T22:00:59Z",
+"done": "2026-10-11T22:07:28Z exit 1"
+},
+"56": {
+"by": "c3-w3 aisef2/app/client.py::read_session 2026-10-11T22:02:09Z",
+"done": "2026-10-11T22:17:19Z exit 1"
+},
+"57": {
+"by": "c3-w2 aisef2/app/bundle.py::read 2026-10-11T22:07:28Z",
+"done": "2026-10-11T22:17:21Z exit 1"
+},
+"58": {
+"by": "c3-w4 aisef2/app/review_verify.py::verify 2026-10-11T22:10:27Z",
+"done": "2026-10-11T22:29:35Z exit 1"
+},
+"59": {
+"by": "c3-w3 aisef2/app/run.py::_content_sha 2026-10-11T22:17:19Z",
+"done": "2026-10-11T22:28:54Z exit 1"
+},
+"60": {
+"by": "c3-w2 aisef2/app/lineage.py::process_started 2026-10-11T22:17:21Z",
+"done": "2026-10-11T22:40:23Z exit 1"
+},
+"61": {
+"by": "c3-w3 aisef2/app/verify.py::_spend 2026-10-11T22:28:54Z",
+"done": "2026-10-11T22:47:20Z exit 1"
+},
+"62": {
+"by": "c3-w4 aisef2/app/lineage.py::continued_by 2026-10-11T22:29:35Z",
+"done": "2026-10-11T22:36:18Z exit 1"
+},
+"63": {
+"by": "c3-w4 aisef2/app/confine.py::_probe 2026-10-11T22:36:18Z",
+"done": "2026-10-11T22:57:52Z exit 1"
+},
+"64": {
+"by": "c3-w1 aisef2/app/settings.py::REVIEW_ABSENT 2026-10-11T22:40:15Z",
+"done": "2026-10-11T22:50:45Z exit 1"
+},
+"65": {
+"by": "c3-w2 aisef2/app/settings.py::read 2026-10-11T22:40:23Z",
+"done": "2026-10-11T23:20:22Z exit 1"
+},
+"66": {
+"by": "c3-w3 aisef2/app/lineage.py::predecessor_of 2026-10-11T22:47:20Z",
+"done": "2026-10-11T22:53:55Z exit 1"
+},
+"67": {
+"by": "c3-w1 aisef2/app/bundle_cli.py::_mint 2026-10-11T22:50:45Z",
+"done": "2026-10-11T22:57:42Z exit 1"
+},
+"68": {
+"by": "c3-w3 aisef2/probe/python_callable_v2.py::HARNESS/ended 2026-10-11T22:53:55Z",
+"done": "2026-10-11T23:21:42Z exit 1"
+},
+"69": {
+"by": "c3-w1 aisef2/app/confine.py::_judge 2026-10-11T22:57:42Z",
+"done": "2026-10-11T23:14:47Z exit 1"
+},
+"70": {
+"by": "c3-w4 aisef2/app/review_verify.py::_approved_by_clause 2026-10-11T22:57:52Z",
+"done": "2026-10-11T23:03:50Z exit 1"
+},
+"71": {
+"by": "c3-w4 aisef2/app/bundle_cli.py::_shell_word 2026-10-11T23:03:50Z",
+"done": "2026-10-11T23:25:21Z exit 1"
+},
+"72": {
+"by": "c3-w1 aisef2/app/review_ocr.py::environment 2026-10-11T23:14:47Z",
+"done": "2026-10-11T23:18:49Z exit 1"
+},
+"73": {
+"by": "c3-w1 aisef2/app/bundle_cli.py::init 2026-10-11T23:18:49Z",
+"done": "2026-10-11T23:25:07Z exit 1"
+},
+"74": {
+"by": "c3-w2 aisef2/app/adapters.py::_unchanged 2026-10-11T23:20:22Z",
+"done": "2026-10-11T23:25:51Z exit 1"
+},
+"75": {
+"by": "c3-w3 aisef2/app/run.py::anchor_of 2026-10-11T23:21:43Z",
+"done": "2026-10-11T23:32:27Z exit 1"
+},
+"76": {
+"by": "c3-w1 aisef2/app/bundle_cli.py::_closed 2026-10-11T23:25:07Z",
+"done": "2026-10-11T23:48:30Z exit 1"
+},
+"77": {
+"by": "c3-w4 aisef2/probe/process_effect.py::HARNESS/run 2026-10-11T23:25:21Z",
+"done": "2026-10-11T23:40:18Z exit 1"
+},
+"78": {
+"by": "c3-w2 aisef2/app/adapters.py::attempt_of 2026-10-11T23:25:51Z",
+"done": "2026-10-11T23:30:55Z exit 1"
+},
+"79": {
+"by": "c3-w2 aisef2/app/preflight.py::http_transport 2026-10-11T23:30:55Z",
+"done": "2026-10-11T23:39:49Z exit 1"
+},
+"80": {
+"by": "c3-w3 aisef2/app/lineage.py::claims 2026-10-11T23:32:27Z",
+"done": "2026-10-11T23:38:24Z exit 1"
+},
+"81": {
+"by": "c3-w3 aisef2/probe/process_effect.py::_prepare 2026-10-11T23:38:24Z",
+"done": "2026-10-11T23:45:08Z exit 1"
+},
+"82": {
+"by": "c3-w2 aisef2/app/client.py::Budget.spend 2026-10-11T23:39:49Z",
+"done": "2026-10-11T23:43:24Z exit 1"
+},
+"83": {
+"by": "c3-w4 aisef2/app/usage.py::_usd 2026-10-11T23:40:18Z",
+"done": "2026-10-12T00:02:44Z exit 1"
+},
+"84": {
+"by": "c3-w2 aisef2/app/adapters.py::Reviewer.__init__ 2026-10-11T23:43:24Z",
+"done": "2026-10-11T23:49:51Z exit 1"
+},
+"85": {
+"by": "c3-w3 aisef2/app/adapters.py::tree_of 2026-10-11T23:45:08Z",
+"done": "2026-10-11T23:50:17Z exit 1"
+},
+"86": {
+"by": "c3-w1 aisef2/probe/process_effect.py::HARNESS/do_edit 2026-10-11T23:48:30Z",
+"done": "2026-10-12T00:20:07Z exit 1"
+},
+"87": {
+"by": "c3-w2 aisef2/orchestrate/review.py::review 2026-10-11T23:49:51Z",
+"done": "2026-10-12T00:02:14Z exit 1"
+},
+"88": {
+"by": "c3-w3 aisef2/app/bundle_cli.py::AUTHORING_KEYS 2026-10-11T23:50:17Z",
+"done": "2026-10-11T23:56:55Z exit 1"
+},
+"89": {
+"by": "c3-w3 aisef2/app/preflight.py::identity_problems 2026-10-11T23:56:55Z",
+"done": "2026-10-12T00:02:27Z exit 1"
+},
+"90": {
+"by": "c3-w2 aisef2/probe/cli_invocation.py::_harness_argv 2026-10-12T00:02:14Z",
+"done": "2026-10-12T00:05:31Z exit 1"
+},
+"91": {
+"by": "c3-w3 aisef2/probe/process_effect.py::_watch 2026-10-12T00:02:27Z",
+"done": "2026-10-12T00:10:05Z exit 1"
+},
+"92": {
+"by": "c3-w4 aisef2/app/lineage.py::write_anchor 2026-10-12T00:02:44Z",
+"done": "2026-10-12T00:28:14Z exit 1"
+},
+"93": {
+"by": "c3-w2 aisef2/app/lineage.py::_claimed_run 2026-10-12T00:05:31Z",
+"done": "2026-10-12T00:17:39Z exit 1"
+},
+"94": {
+"by": "c3-w3 aisef2/app/bundle_cli.py::CONTRACT_KEYS 2026-10-12T00:10:05Z",
+"done": "2026-10-12T00:16:40Z exit 1"
+},
+"95": {
+"by": "c3-w3 aisef2/probe/process_effect.py::HARNESS/do_subprocess 2026-10-12T00:16:40Z",
+"done": "2026-10-12T00:29:36Z exit 1"
+},
+"96": {
+"by": "c3-w2 aisef2/app/adapters.py::_bounded 2026-10-12T00:17:39Z",
+"done": "2026-10-12T00:21:57Z exit 1"
+},
+"97": {
+"by": "c3-w1 aisef2/orchestrate/story_runner.py::run_story 2026-10-12T00:20:07Z",
+"done": "2026-10-12T00:31:20Z exit 1"
+},
+"98": {
+"by": "c3-w2 aisef2/app/lineage.py::child_state 2026-10-12T00:21:57Z",
+"done": "2026-10-12T00:48:20Z exit 1"
+},
+"99": {
+"by": "c3-w4 aisef2/app/review_verify.py::_states 2026-10-12T00:28:14Z",
+"done": "2026-10-12T00:35:39Z exit 1"
+},
+"100": {
+"by": "c3-w3 aisef2/app/usage.py::PRICE_KEYS 2026-10-12T00:29:36Z",
+"done": "2026-10-12T00:47:06Z exit 1"
+},
+"101": {
+"by": "c3-w1 aisef2/app/bundle_cli.py::_read 2026-10-12T00:31:20Z",
+"done": "2026-10-12T00:48:50Z exit 1"
+},
+"102": {
+"by": "c3-w4 aisef2/app/bundle_cli.py::_earlier 2026-10-12T00:35:39Z",
+"done": "2026-10-12T00:41:48Z exit 1"
+},
+"103": {
+"by": "c3-w4 aisef2/probe/process_effect.py::HARNESS/ended 2026-10-12T00:41:48Z",
+"done": "2026-10-12T01:00:49Z exit 1"
+},
+"104": {
+"by": "c3-w3 aisef2/app/run.py::anchor_in 2026-10-12T00:47:06Z",
+"done": "2026-10-12T01:03:25Z exit 1"
+},
+"105": {
+"by": "c3-w2 aisef2/app/review_ocr.py::finding_id 2026-10-12T00:48:20Z",
+"done": "2026-10-12T00:51:50Z exit 1"
+},
+"106": {
+"by": "c3-w1 aisef2/probe/cli_invocation.py::AGENT/redirect 2026-10-12T00:48:50Z",
+"done": "2026-10-12T00:56:54Z exit 1"
+},
+"107": {
+"by": "c3-w2 aisef2/orchestrate/workspace.py::config_problems 2026-10-12T00:51:50Z",
+"done": "2026-10-12T01:00:07Z exit 1"
+},
+"108": {
+"by": "c3-w1 aisef2/app/lineage.py::claimant 2026-10-12T00:56:54Z",
+"done": "2026-10-12T01:22:08Z exit 1"
+},
+"109": {
+"by": "c3-w2 aisef2/app/review_ocr.py::item_id 2026-10-12T01:00:07Z",
+"done": "2026-10-12T01:03:39Z exit 1"
+},
+"110": {
+"by": "c3-w4 aisef2/app/review_ocr.py::pinned 2026-10-12T01:00:49Z",
+"done": "2026-10-12T01:07:15Z exit 1"
+},
+"111": {
+"by": "c3-w3 aisef2/app/bundle_cli.py::CRITERION_KEYS 2026-10-12T01:03:25Z",
+"done": "2026-10-12T01:09:36Z exit 1"
+},
+"112": {
+"by": "c3-w2 aisef2/app/preflight.py::accounting 2026-10-12T01:03:39Z",
+"done": "2026-10-12T01:08:33Z exit 1"
+},
+"113": {
+"by": "c3-w4 aisef2/probe/cli_invocation.py::HARNESS/answer_to 2026-10-12T01:07:15Z",
+"done": "2026-10-12T01:13:40Z exit 1"
+},
+"114": {
+"by": "c3-w2 aisef2/probe/cli_invocation.py::HARNESS/finish 2026-10-12T01:08:33Z",
+"done": "2026-10-12T01:14:50Z exit 1"
+},
+"115": {
+"by": "c3-w3 aisef2/app/review_ocr.py::reproducer_of 2026-10-12T01:09:36Z",
+"done": "2026-10-12T01:12:59Z exit 1"
+},
+"116": {
+"by": "c3-w3 aisef2/app/lineage.py::read_anchor 2026-10-12T01:12:59Z",
+"done": "2026-10-12T01:23:58Z exit 1"
+},
+"117": {
+"by": "c3-w4 aisef2/app/settings.py::OPTIONAL 2026-10-12T01:13:40Z",
+"done": "2026-10-12T01:28:23Z exit 1"
+},
+"118": {
+"by": "c3-w2 aisef2/app/confine.py::argv 2026-10-12T01:14:50Z",
+"done": "2026-10-12T01:18:46Z exit 1"
+},
+"119": {
+"by": "c3-w2 aisef2/app/run.py::client_on_path 2026-10-12T01:18:46Z",
+"done": "2026-10-12T01:29:41Z exit 1"
+},
+"120": {
+"by": "c3-w1 aisef2/probe/python_callable_v2.py::_file_ok 2026-10-12T01:22:08Z",
+"done": "2026-10-12T01:31:32Z exit 1"
+},
+"121": {
+"by": "c3-w3 aisef2/app/usage.py::CLASSES 2026-10-12T01:23:58Z",
+"done": "2026-10-12T01:32:07Z exit 1"
+},
+"122": {
+"by": "c3-w4 aisef2/probe/process_effect.py::HARNESS/guarded 2026-10-12T01:28:23Z",
+"done": "2026-10-12T01:43:18Z exit 1"
+},
+"123": {
+"by": "c3-w2 aisef2/app/preflight.py::fingerprint_fields 2026-10-12T01:29:42Z",
+"done": "2026-10-12T01:32:06Z exit 1"
+},
+"124": {
+"by": "c3-w1 aisef2/probe/process_effect.py::HARNESS/reported 2026-10-12T01:31:32Z",
+"done": "2026-10-12T01:42:38Z exit 1"
+},
+"125": {
+"by": "c3-w2 aisef2/app/confine.py::wrap 2026-10-12T01:32:07Z",
+"done": "2026-10-12T01:38:02Z exit 1"
+},
+"126": {
+"by": "c3-w3 aisef2/probe/python_callable_v2.py::HARNESS/answer_to 2026-10-12T01:32:07Z",
+"done": "2026-10-12T01:36:55Z exit 1"
+},
+"127": {
+"by": "c3-w3 aisef2/probe/python_callable_v2.py::HARNESS/finish 2026-10-12T01:36:55Z",
+"done": "2026-10-12T01:41:08Z exit 1"
+},
+"128": {
+"by": "c3-w2 aisef2/app/confine.py::measure 2026-10-12T01:38:02Z",
+"done": "2026-10-12T01:45:20Z exit 1"
+},
+"129": {
+"by": "c3-w3 aisef2/app/review_verify.py::_stimulus 2026-10-12T01:41:08Z",
+"done": "2026-10-12T01:44:59Z exit 1"
+},
+"130": {
+"by": "c3-w1 aisef2/app/review_verify.py::blocks 2026-10-12T01:42:38Z",
+"done": "2026-10-12T01:47:56Z exit 1"
+},
+"131": {
+"by": "c3-w4 aisef2/app/adapters.py::Reviewer._verify 2026-10-12T01:43:18Z",
+"done": "2026-10-12T01:47:40Z exit 1"
+},
+"132": {
+"by": "c3-w3 aisef2/app/review_ocr.py::OCR 2026-10-12T01:44:59Z",
+"done": "2026-10-12T01:59:56Z exit 1"
+},
+"133": {
+"by": "c3-w2 aisef2/app/review_verify.py::_canon 2026-10-12T01:45:20Z",
+"done": "2026-10-12T01:55:32Z exit 1"
+},
+"134": {
+"by": "c3-w4 aisef2/app/review_verify.py::_scalars 2026-10-12T01:47:40Z",
+"done": "2026-10-12T01:54:39Z exit 1"
+},
+"135": {
+"by": "c3-w1 aisef2/probe/process_effect.py::HARNESS/do_call 2026-10-12T01:47:56Z",
+"done": "2026-10-12T01:56:05Z exit 1"
+},
+"136": {
+"by": "c3-w4 aisef2/probe/file_artifact.py::FileArtifactProbe.observe 2026-10-12T01:54:39Z",
+"done": "2026-10-12T02:15:00Z exit 1"
+},
+"137": {
+"by": "c3-w2 aisef2/app/lineage.py::events_of 2026-10-12T01:55:32Z",
+"done": "2026-10-12T02:01:07Z exit 1"
+},
+"138": {
+"by": "c3-w1 aisef2/app/lineage.py::SPEND 2026-10-12T01:56:05Z",
+"done": "2026-10-12T02:04:41Z exit 1"
+},
+"139": {
+"by": "c3-w3 aisef2/app/settings.py::Settings.prices 2026-10-12T01:59:57Z",
+"done": "2026-10-12T02:15:24Z exit 1"
+},
+"140": {
+"by": "c3-w2 aisef2/probe/python_callable_v2.py::HARNESS/answered 2026-10-12T02:01:07Z",
+"done": "2026-10-12T02:04:49Z exit 1"
+},
+"141": {
+"by": "c3-w1 aisef2/app/confine.py::problem 2026-10-12T02:04:41Z",
+"done": "2026-10-12T02:14:00Z exit 1"
+},
+"142": {
+"by": "c3-w2 aisef2/orchestrate/adapters.py::Implemented.__post_init__ 2026-10-12T02:04:49Z",
+"done": "2026-10-12T02:06:57Z exit 1"
+},
+"143": {
+"by": "c3-w2 aisef2/app/confine.py::_worktree 2026-10-12T02:06:57Z",
+"done": "2026-10-12T02:11:28Z exit 1"
+},
+"144": {
+"by": "c3-w2 aisef2/app/bundle_cli.py::_write_new 2026-10-12T02:11:28Z",
+"done": "2026-10-12T02:28:53Z exit 1"
+},
+"145": {
+"by": "c3-w1 aisef2/app/bundle_cli.py::_create 2026-10-12T02:14:00Z",
+"done": "2026-10-12T02:19:56Z exit 1"
+},
+"146": {
+"by": "c3-w4 aisef2/app/bundle_cli.py::_refs 2026-10-12T02:15:00Z",
+"done": "2026-10-12T02:21:04Z exit 1"
+},
+"147": {
+"by": "c3-w3 aisef2/app/confine.py::_sections 2026-10-12T02:15:24Z",
+"done": "2026-10-12T02:17:55Z exit 1"
+},
+"148": {
+"by": "c3-w3 aisef2/probe/process_effect.py::HARNESS/do_write 2026-10-12T02:17:55Z",
+"done": "2026-10-12T02:31:18Z exit 1"
+},
+"149": {
+"by": "c3-w1 aisef2/app/review_verify.py::Verification.evidence 2026-10-12T02:19:56Z",
+"done": "2026-10-12T02:24:34Z exit 1"
+},
+"150": {
+"by": "c3-w4 aisef2/app/review_verify.py::severity_of 2026-10-12T02:21:04Z",
+"done": "2026-10-12T02:26:01Z exit 1"
+},
+"151": {
+"by": "c3-w1 aisef2/app/lineage.py::JOURNAL 2026-10-12T02:24:34Z",
+"done": "2026-10-12T02:32:26Z exit 1"
+},
+"152": {
+"by": "c3-w4 aisef2/probe/file_artifact.py::facts_of 2026-10-12T02:26:02Z",
+"done": "2026-10-12T02:36:09Z exit 1"
+},
+"153": {
+"by": "c3-w2 aisef2/probe/cli_invocation.py::HARNESS/deadline 2026-10-12T02:28:53Z",
+"done": "2026-10-12T02:37:30Z exit 1"
+},
+"154": {
+"by": "c3-w3 aisef2/app/review_verify.py::SEVERITIES 2026-10-12T02:31:19Z",
+"done": "2026-10-12T02:34:50Z exit 1"
+},
+"155": {
+"by": "c3-w1 aisef2/app/review_verify.py::REPRODUCER_KEYS 2026-10-12T02:32:26Z",
+"done": "2026-10-12T02:36:33Z exit 1"
+},
+"156": {
+"by": "c3-w3 aisef2/probe/process_effect.py::HARNESS/answer_to 2026-10-12T02:34:50Z",
+"done": "2026-10-12T02:39:00Z exit 1"
+},
+"157": {
+"by": "c3-w4 aisef2/probe/process_effect.py::HARNESS/finish 2026-10-12T02:36:09Z",
+"done": "2026-10-12T02:40:05Z exit 1"
+},
+"158": {
+"by": "c3-w1 aisef2/app/client.py::Budget.account 2026-10-12T02:36:33Z",
+"done": "2026-10-12T02:38:11Z exit 1"
+},
+"159": {
+"by": "c3-w2 aisef2/app/review_ocr.py::TERMINAL 2026-10-12T02:37:30Z",
+"done": "2026-10-12T02:51:48Z exit 1"
+},
+"160": {
+"by": "c3-w1 aisef2/probe/python_callable_v2.py::HARNESS/deadline 2026-10-12T02:38:11Z",
+"done": "2026-10-12T02:42:33Z exit 1"
+},
+"161": {
+"by": "c3-w3 aisef2/probe/python_callable_v2.py::HARNESS/inside 2026-10-12T02:39:00Z",
+"done": "2026-10-12T02:41:54Z exit 1"
+},
+"162": {
+"by": "c3-w4 aisef2/app/confine.py::targets 2026-10-12T02:40:05Z",
+"done": "2026-10-12T02:41:52Z exit 1"
+},
+"163": {
+"by": "c3-w4 aisef2/app/bundle.py::_HEX64 2026-10-12T02:41:52Z",
+"done": "2026-10-12T02:51:05Z exit 1"
+},
+"164": {
+"by": "c3-w3 aisef2/probe/cli_invocation.py::HARNESS/inside 2026-10-12T02:41:54Z",
+"done": "2026-10-12T02:47:22Z exit 1"
+},
+"165": {
+"by": "c3-w1 aisef2/probe/cli_invocation.py::HARNESS/conclude 2026-10-12T02:42:33Z",
+"done": "2026-10-12T02:48:07Z exit 1"
+},
+"166": {
+"by": "c3-w3 aisef2/app/confine.py::_mounts 2026-10-12T02:47:22Z",
+"done": "2026-10-12T02:48:59Z exit 1"
+},
+"167": {
+"by": "c3-w1 aisef2/probe/python_callable_v2.py::HARNESS/conclude 2026-10-12T02:48:07Z",
+"done": "2026-10-12T02:54:55Z exit 1"
+},
+"168": {
+"by": "c3-w3 aisef2/app/review_ocr.py::NOT_FULL 2026-10-12T02:48:59Z",
+"done": "2026-10-12T02:52:03Z exit 1"
+},
+"169": {
+"by": "c3-w4 aisef2/probe/file_artifact.py::import_facts 2026-10-12T02:51:05Z",
+"done": "2026-10-12T02:55:23Z exit 1"
+},
+"170": {
+"by": "c3-w2 aisef2/app/client.py::redact 2026-10-12T02:51:48Z",
+"done": "2026-10-12T02:53:23Z exit 1"
+},
+"171": {
+"by": "c3-w3 aisef2/app/review_verify.py::POLICIES 2026-10-12T02:52:03Z",
+"done": "2026-10-12T02:58:25Z exit 1"
+},
+"172": {
+"by": "c3-w2 aisef2/probe/process_effect.py::HARNESS/answered 2026-10-12T02:53:23Z",
+"done": "2026-10-12T02:55:36Z exit 1"
+},
+"173": {
+"by": "c3-w1 aisef2/app/confine.py::namespaces 2026-10-12T02:54:55Z",
+"done": "2026-10-12T02:56:11Z exit 1"
+},
+"174": {
+"by": "c3-w4 aisef2/probe/file_artifact.py::git_env 2026-10-12T02:55:23Z",
+"done": "2026-10-12T03:03:19Z exit 1"
+},
+"175": {
+"by": "c3-w2 aisef2/app/preflight.py::deployment 2026-10-12T02:55:36Z",
+"done": "2026-10-12T02:57:23Z exit 1"
+},
+"176": {
+"by": "c3-w1 aisef2/app/usage.py::_DATE 2026-10-12T02:56:11Z",
+"done": "2026-10-12T03:03:48Z exit 1"
+},
+"177": {
+"by": "c3-w2 aisef2/app/review_ocr.py::NOT_REVIEWABLE 2026-10-12T02:57:23Z",
+"done": "2026-10-12T03:00:30Z exit 1"
+},
+"178": {
+"by": "c3-w3 aisef2/app/bundle_cli.py::EXAMPLES 2026-10-12T02:58:25Z",
+"done": "2026-10-12T03:04:15Z exit 1"
+},
+"179": {
+"by": "c3-w2 aisef2/app/lineage.py::ANCHOR_LINE 2026-10-12T03:00:30Z",
+"done": "2026-10-12T03:07:12Z exit 1"
+},
+"180": {
+"by": "c3-w4 aisef2/app/lineage.py::_git 2026-10-12T03:03:19Z",
+"done": "2026-10-12T03:09:31Z exit 1"
+},
+"181": {
+"by": "c3-w1 aisef2/app/lineage.py::_sha 2026-10-12T03:03:48Z",
+"done": "2026-10-12T03:11:33Z exit 1"
+},
+"182": {
+"by": "c3-w3 aisef2/app/confine.py::config_dir 2026-10-12T03:04:15Z",
+"done": "2026-10-12T03:05:26Z exit 1"
+},
+"183": {
+"by": "c3-w3 aisef2/app/confine.py::git_dir 2026-10-12T03:05:26Z",
+"done": "2026-10-12T03:06:33Z exit 1"
+},
+"184": {
+"by": "c3-w3 aisef2/probe/process_effect.py::HARNESS/inside 2026-10-12T03:06:33Z",
+"done": "2026-10-12T03:09:25Z exit 1"
+},
+"185": {
+"by": "c3-w2 aisef2/probe/process_effect.py::HARNESS/count_lines 2026-10-12T03:07:12Z",
+"done": "2026-10-12T03:09:32Z exit 1"
+},
+"186": {
+"by": "c3-w3 aisef2/app/review_verify.py::_NUMBER 2026-10-12T03:09:25Z",
+"done": "2026-10-12T03:13:06Z exit 1"
+},
+"187": {
+"by": "c3-w4 aisef2/app/confine.py::SYSTEM 2026-10-12T03:09:31Z",
+"done": "2026-10-12T03:10:20Z exit 1"
+},
+"188": {
+"by": "c3-w2 aisef2/app/confine.py::_survivors 2026-10-12T03:09:32Z",
+"done": "2026-10-12T03:10:39Z exit 1"
+},
+"189": {
+"by": "c3-w4 aisef2/app/confine.py::_within 2026-10-12T03:10:20Z",
+"done": "2026-10-12T03:11:02Z exit 1"
+},
+"190": {
+"by": "c3-w2 aisef2/probe/file_artifact.py::PlainTree._row 2026-10-12T03:10:39Z",
+"done": "2026-10-12T03:11:42Z exit 1"
+},
+"191": {
+"by": "c3-w4 aisef2/app/confine.py::KEYS 2026-10-12T03:11:02Z",
+"done": "2026-10-12T03:11:43Z exit 1"
+},
+"192": {
+"by": "c3-w1 aisef2/app/confine.py::_link 2026-10-12T03:11:33Z",
+"done": "2026-10-12T03:12:18Z exit 1"
+},
+"193": {
+"by": "c3-w2 aisef2/probe/calibration.py::calibrate 2026-10-12T03:11:43Z",
+"done": "2026-10-12T03:13:14Z exit 1"
+},
+"194": {
+"by": "c3-w4 aisef2/app/confine.py::NETWORKS 2026-10-12T03:11:43Z",
+"done": "2026-10-12T03:12:35Z exit 1"
+},
+"195": {
+"by": "c3-w1 aisef2/plan/static_admission.py::check_ownership 2026-10-12T03:12:18Z",
+"done": "2026-10-12T03:13:12Z exit 1"
+},
+"196": {
+"by": "c3-w4 aisef2/plan/static_admission.py::admit 2026-10-12T03:12:35Z",
+"done": "2026-10-12T03:13:29Z exit 1"
+},
+"197": {
+"by": "c3-w3 aisef2/probe/cli_invocation.py::_normalization_ok 2026-10-12T03:13:06Z",
+"done": "2026-10-12T03:13:51Z exit 1"
+},
+"198": {
+"by": "c3-w1 aisef2/plan/static_admission.py::check_proof_capability 2026-10-12T03:13:12Z",
+"done": "2026-10-12T03:13:52Z exit 1"
+},
+"199": {
+"by": "c3-w2 aisef2/app/confine.py::USERNS_REFUSED 2026-10-12T03:13:14Z",
+"done": "2026-10-12T03:13:43Z exit 1"
+}
+}

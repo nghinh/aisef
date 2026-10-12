@@ -1,0 +1,382 @@
+{
+ "survivors": 242,
+ "audited": {
+  "AUDITED": 144,
+  "EQUIVALENT": 56
+ },
+ "unaudited": [
+  {
+   "target": "aisef2/app/adapters.py::Reviewer._ocr",
+   "index": 198,
+   "mutant": "L176 string '..' emptied",
+   "audited": null,
+   "group": null
+  },
+  {
+   "target": "aisef2/app/adapters.py::Reviewer._ocr",
+   "index": 199,
+   "mutant": "L176 string ' printed a row of another shape: ' emptied",
+   "audited": null,
+   "group": null
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_shell_word",
+   "index": 5,
+   "mutant": "L154 string 'win32' emptied",
+   "audited": null,
+   "group": null
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_shell_word",
+   "index": 11,
+   "mutant": "L161 string 'a' emptied",
+   "audited": null,
+   "group": null
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::continue_from",
+   "index": 157,
+   "mutant": "L462 string 'carried: ' emptied",
+   "audited": null,
+   "group": null
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::coverage",
+   "index": 11,
+   "mutant": "L330 string 'clause -> criteria. Every clause of a bundle that loads is a string; one that is not (a missing one beside\\n        \"1.1\", a number, a list: `load` refuses it and lint says so) must not make this report unprintable, so it is\\n        keyed as it is while the keys hash and order (json.dumps(sort_keys=True) orders them), else by its JSON text.' emptied",
+   "audited": null,
+   "group": null
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::explain",
+   "index": 31,
+   "mutant": "L385 string 'story' emptied",
+   "audited": null,
+   "group": null
+  },
+  {
+   "target": "aisef2/app/confine.py::_judge",
+   "index": 142,
+   "mutant": "L409 element 2 dropped",
+   "audited": null,
+   "group": null
+  },
+  {
+   "target": "aisef2/app/confine.py::_judge",
+   "index": 143,
+   "mutant": "L409 element 3 dropped",
+   "audited": null,
+   "group": null
+  },
+  {
+   "target": "aisef2/app/confine.py::_judge",
+   "index": 157,
+   "mutant": "L409 string 'devpts' emptied",
+   "audited": null,
+   "group": null
+  },
+  {
+   "target": "aisef2/app/confine.py::_judge",
+   "index": 158,
+   "mutant": "L409 string 'mqueue' emptied",
+   "audited": null,
+   "group": null
+  },
+  {
+   "target": "aisef2/app/confine.py::_probe",
+   "index": 61,
+   "mutant": "L305 element 1 dropped",
+   "audited": null,
+   "group": null
+  },
+  {
+   "target": "aisef2/app/confine.py::_probe",
+   "index": 166,
+   "mutant": "L304 string ' seconds' emptied",
+   "audited": null,
+   "group": null
+  },
+  {
+   "target": "aisef2/app/confine.py::measure",
+   "index": 40,
+   "mutant": "L255 element 3 dropped",
+   "audited": null,
+   "group": null
+  },
+  {
+   "target": "aisef2/app/confine.py::measure",
+   "index": 49,
+   "mutant": "L255 string 'LANG' emptied",
+   "audited": null,
+   "group": null
+  },
+  {
+   "target": "aisef2/app/lineage.py::_claimed_run",
+   "index": 6,
+   "mutant": "L74 string 'not a claim' emptied",
+   "audited": null,
+   "group": null
+  },
+  {
+   "target": "aisef2/app/lineage.py::account_of",
+   "index": 42,
+   "mutant": "L274 string 'sessions' emptied",
+   "audited": null,
+   "group": null
+  },
+  {
+   "target": "aisef2/app/lineage.py::account_of",
+   "index": 54,
+   "mutant": "L271 string '): what the sessions spent is unknown' emptied",
+   "audited": null,
+   "group": null
+  },
+  {
+   "target": "aisef2/app/lineage.py::claim",
+   "index": 68,
+   "mutant": "L145 string ' is claimed (' emptied",
+   "audited": null,
+   "group": null
+  },
+  {
+   "target": "aisef2/app/lineage.py::claim",
+   "index": 69,
+   "mutant": "L145 string ') and the claim cannot be read (' emptied",
+   "audited": null,
+   "group": null
+  },
+  {
+   "target": "aisef2/app/lineage.py::claim",
+   "index": 70,
+   "mutant": "L146 string '): not superseded without evidence' emptied",
+   "audited": null,
+   "group": null
+  },
+  {
+   "target": "aisef2/app/preflight.py::http_transport",
+   "index": 13,
+   "mutant": "L47 element 0 dropped",
+   "audited": null,
+   "group": null
+  },
+  {
+   "target": "aisef2/app/preflight.py::http_transport",
+   "index": 14,
+   "mutant": "L47 element 1 dropped",
+   "audited": null,
+   "group": null
+  },
+  {
+   "target": "aisef2/app/preflight.py::http_transport",
+   "index": 17,
+   "mutant": "L61 element 0 dropped",
+   "audited": null,
+   "group": null
+  },
+  {
+   "target": "aisef2/app/review_verify.py::detail",
+   "index": 22,
+   "mutant": "L257 True->False",
+   "audited": null,
+   "group": null
+  },
+  {
+   "target": "aisef2/app/review_verify.py::reproducer_contract",
+   "index": 28,
+   "mutant": "L111 element 0 dropped",
+   "audited": null,
+   "group": null
+  },
+  {
+   "target": "aisef2/app/usage.py::no_progress",
+   "index": 13,
+   "mutant": "L130 element 2 dropped",
+   "audited": null,
+   "group": null
+  },
+  {
+   "target": "aisef2/app/usage.py::no_progress",
+   "index": 23,
+   "mutant": "L130 string 'story/commit' emptied",
+   "audited": null,
+   "group": null
+  },
+  {
+   "target": "aisef2/app/usage.py::usage",
+   "index": 94,
+   "mutant": "L100 string ' were sent and never answered: their cost is unknown (not 0)' emptied",
+   "audited": null,
+   "group": null
+  },
+  {
+   "target": "aisef2/app/usage.py::usage",
+   "index": 118,
+   "mutant": "L115 string '; ' emptied",
+   "audited": null,
+   "group": null
+  },
+  {
+   "target": "aisef2/app/verify.py::_runspec_problems",
+   "index": 4,
+   "mutant": "L37 returns None",
+   "audited": null,
+   "group": null
+  },
+  {
+   "target": "aisef2/app/verify.py::_runspec_problems",
+   "index": 9,
+   "mutant": "L37 element 0 dropped",
+   "audited": null,
+   "group": null
+  },
+  {
+   "target": "aisef2/app/verify.py::_runspec_problems",
+   "index": 10,
+   "mutant": "L37 element 1 dropped",
+   "audited": null,
+   "group": null
+  },
+  {
+   "target": "aisef2/app/verify.py::verify",
+   "index": 125,
+   "mutant": "L87 string ' cannot be read (' emptied",
+   "audited": null,
+   "group": null
+  },
+  {
+   "target": "aisef2/app/verify.py::verify",
+   "index": 126,
+   "mutant": "L87 string ')' emptied",
+   "audited": null,
+   "group": null
+  },
+  {
+   "target": "aisef2/app/verify.py::verify",
+   "index": 127,
+   "mutant": "L91 string ' is not an evidence manifest (a JSON object holding its files)' emptied",
+   "audited": null,
+   "group": null
+  },
+  {
+   "target": "aisef2/app/verify.py::verify",
+   "index": 151,
+   "mutant": "L73 string ')' emptied",
+   "audited": null,
+   "group": null
+  },
+  {
+   "target": "aisef2/app/verify.py::verify",
+   "index": 153,
+   "mutant": "L97 string 'an evidence file cannot be read (' emptied",
+   "audited": null,
+   "group": null
+  },
+  {
+   "target": "aisef2/app/verify.py::verify",
+   "index": 154,
+   "mutant": "L97 string '): ' emptied",
+   "audited": null,
+   "group": null
+  },
+  {
+   "target": "aisef2/app/verify.py::verify",
+   "index": 170,
+   "mutant": "L172 string 'the record cannot be re-derived from the evidence: ' emptied",
+   "audited": null,
+   "group": null
+  },
+  {
+   "target": "aisef2/app/verify.py::verify",
+   "index": 171,
+   "mutant": "L172 string ': ' emptied",
+   "audited": null,
+   "group": null
+  },
+  {
+   "target": "aisef2/app/verify.py::verify",
+   "index": 174,
+   "mutant": "L122 string ')' emptied",
+   "audited": null,
+   "group": null
+  }
+ ],
+ "audits_not_matching_a_survivor_of_a_measured_target": [
+  {
+   "target": "aisef2/app/adapters.py::Reviewer._ocr",
+   "index": 36,
+   "mutant": "L222 dict entry 5 dropped"
+  },
+  {
+   "target": "aisef2/app/cli.py::_parser",
+   "index": 13,
+   "mutant": "L29 string \"Run a project's admitted plan under the AISEF V2 kernel.\" emptied"
+  },
+  {
+   "target": "aisef2/app/cli.py::_parser",
+   "index": 15,
+   "mutant": "L31 string \"check the inputs and the plan's admission; no provider request\" emptied"
+  },
+  {
+   "target": "aisef2/app/cli.py::_parser",
+   "index": 17,
+   "mutant": "L32 string 'verify a finished run directory against its journal' emptied"
+  },
+  {
+   "target": "aisef2/app/cli.py::_parser",
+   "index": 21,
+   "mutant": "L35 string \"the project's git repository (cloned; never written)\" emptied"
+  },
+  {
+   "target": "aisef2/app/cli.py::_parser",
+   "index": 22,
+   "mutant": "L36 string 'the run directory (a new one to run; an existing one to verify)' emptied"
+  },
+  {
+   "target": "aisef2/app/cli.py::_parser",
+   "index": 23,
+   "mutant": "L37 string 'SHA256' emptied"
+  },
+  {
+   "target": "aisef2/app/cli.py::_parser",
+   "index": 24,
+   "mutant": "L38 string 'verify only: the evidence anchor the run printed, kept outside the run directory' emptied"
+  },
+  {
+   "target": "aisef2/app/cli.py::_parser",
+   "index": 28,
+   "mutant": "L45 string 'run --parent only: start although the lineage has spend no evidence accounts for (recorded)' emptied"
+  },
+  {
+   "target": "aisef2/app/cli.py::_parser",
+   "index": 29,
+   "mutant": "L46 string 'SHA256' emptied"
+  },
+  {
+   "target": "aisef2/app/cli.py::_parser",
+   "index": 30,
+   "mutant": "L47 string \"run --parent only: supersede the predecessor's claim with this sha256 whose child never began and whose claimant cannot be shown gone (the operator's assertion, recorded)\" emptied"
+  },
+  {
+   "target": "aisef2/app/confine.py::_probe",
+   "index": 49,
+   "mutant": "L294 string '/nonexistent' emptied"
+  },
+  {
+   "target": "aisef2/app/review_ocr.py::coverage",
+   "index": 25,
+   "mutant": "L107 tuple() -> list()"
+  },
+  {
+   "target": "aisef2/app/review_ocr.py::coverage",
+   "index": 44,
+   "mutant": "L134 tuple() -> list()"
+  },
+  {
+   "target": "aisef2/app/review_verify.py::reproducer_contract",
+   "index": 52,
+   "mutant": "L112 string 'the reproducer is not a contract: ' emptied"
+  }
+ ],
+ "audit_problems": [],
+ "measured_targets": 199
+}
