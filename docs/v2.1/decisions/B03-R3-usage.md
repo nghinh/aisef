@@ -129,7 +129,7 @@ construction; read back with `format3.reconstruct` as `--verify` reads):
 | changed `no_progress`, same files + `test_v21_r3_usage_no_progress.py` | **35 mutants, 35 KILLED, 0 survived** | `kill_check`, `kc-no_progress.json`; the new file alone kills `L138 string 'story/begin' emptied` |
 | `_projection_refusal` (new) | 9 mutants, 9 KILLED | `kc-_projection_refusal.json`, the boundary file |
 | `verify` (199 mutants), the boundary file alone | 107 KILLED, 92 SURVIVED. **All 16 mutants on the lines this change added or moved (149-155) are KILLED.** The 92 sit on unchanged lines: 57 are killed by the registered A22, R01, T22a, T22b, defects_verify and test_v21_verify; 24 more by the campaign's other five files (test_app_units, test_s2_kills, test_app_run, continue_usage, continue_integrity); **11 survive** those six files: the same 11 the campaign recorded for BASE's `verify` as surviving all of its eleven files (matched by mutated text: `sorted()`, ` the run printed`, the `errors` entries, `no `, `)` x3; not re-run here against the other five), each already AUDITED or EQUIVALENT in `SURVIVOR-AUDITS.json` against BASE's source hash, an entry now stale | `kc-verify.json`, `kc-verify-survivors-registered.json`, `kc-verify-24-with-the-campaigns-other-five.json` (clean roots) |
-| New tests against the BASE function | 8 of 14 `no_progress` tests FAIL on `git show 3dc827b:aisef2/app/usage.py`; the boundary tests that go through `verify` show `VERIFIED` + `PASS` at BASE for the two journals that would deliver | `wrong_impls.py`; BASE tree run |
+| New tests against the BASE function | 4 of the 14 `no_progress` test methods FAIL (8 failures, counting subtests; re-measured in review) on `git show 3dc827b:aisef2/app/usage.py`; the boundary tests that go through `verify` show `VERIFIED` + `PASS` at BASE for the two journals that would deliver | `wrong_impls.py`; BASE tree run |
 | Distinct journals found (1,218 files, 101 distinct by sha256): formats 1 / 2 / 3 | 4 / 1 / 89 admitted: 4 + 1 + 85; refused by a projection: 4 (all format 3); do not reconstruct: 7 (the reader's own refusal fixtures and a corrupted copy) | `measure_journals.py` |
 | The 4 refused | two `JournalWriter3` mini-journals of `test_v21_defects_verify.Dirs.run_dir` (a `provider/request` with no `story/begin`; used by lineage tests, never given to verify), one writer experiment (a retry after a commit), one named `forged`. None was written by a kernel run | provenance read from the generating scripts |
 | BASE vs changed `no_progress` on the 94 readable distinct journals | 87 identical (23 with a non-empty report); 7 differ: 5 admitted (writer/RunScope experiments that inject a failure before a commit or after an outcome), 2 refused | `compare_old_new.py` |
@@ -157,8 +157,8 @@ valid chain and a faithful encoder as control) and the writer takes only a typed
 is an argument about a function that is gone; it is not offered as a kill.
 
 What replaces them is a behaviour, verified: a commit does not close a failed attempt, and a failure outside an attempt
-is not the next attempt's. It is pinned by tests that fail on a function that does otherwise (8 of 14 on the BASE
-function). That reinsertion is a wrong implementation I ran by hand, not a runner mutant: the runner's catalogue drops
+is not the next attempt's. It is pinned by tests that fail on a function that does otherwise (4 of 14 test methods, 8 failures counting
+subtests, on the BASE function). That reinsertion is a wrong implementation I ran by hand, not a runner mutant: the runner's catalogue drops
 or empties elements and never adds one. The changed function's own mutants are the 35 above, all killed. The lead retires
 the two rows when the target is re-measured (its source hash changed).
 
@@ -176,8 +176,12 @@ the two rows when the target is re-measured (its source hash changed).
   `lineage.events_of` (`lineage.py:99`, the spend), `repair` (folds the projections, no product caller) and the
   sentinel read journals with `format3.reconstruct` and do not refuse a projection-violating one. None reaches
   `no_progress`; they are outside the owner's principle as worded and outside this WP's files (D-READERS).
-* **Cost.** The fold is linear in the events with a state copy per step (about a millisecond per event here; 1,834
-  events in about a second). Not measured at 100,000 events.
+* **Cost.** Quadratic, not linear: every step freezes the whole state (`Folder.advance`), and the states grow with the
+  number of stories. Measured in review (a synthetic journal of one-retry-then-commit stories, written through
+  Authority, then folded): 1,102 events 1.0 s, 4,402 events 19 s, 17,602 events 291 s; the writer's own pre-check
+  cost the same (326 s at 17,602). The 2.0.0 smoke journal (1,834 events) folds in 0.6 s. So `--verify` now costs about
+  what journaling the run cost; a run of tens of thousands of events would verify in minutes to hours. Not measured
+  at 100,000 events (extrapolated: hours).
 * **Formats 1 and 2.** No supported path ever wrote them as a run directory (the format-3 switch, `175ba3a`, precedes
   the product runtime, `6b0b90d`); `verify` reads them through the same reader and the boundary admits the 4 + 1
   fixtures and journals the real format-1/2 writers produce under `Authority` (simulation). No honest run directory of
@@ -203,3 +207,33 @@ the two rows when the target is re-measured (its source hash changed).
 * **D-INVA.** Whether "failure then commit in one attempt" should be impossible (a projection refusing `story/commit`
   while the attempt has an open failure). That changes journal semantics (projection version, frozen items). This WP
   answers the shape instead (D1) and does not touch the projections.
+
+## 10. Independent review (round 3)
+
+A second engineer re-ran the work from a separate checkout (`v21r3/usage-rv`, stacked on this branch). What it found:
+
+* **Confirmed by re-run.** `no_progress`: 35 mutants, 35 KILLED (same `source_sha256`); BASE: 33 mutants, 31 KILLED, 13 and
+  23 SURVIVED (`kill_check` from a `git archive` of `3dc827b`). `_projection_refusal`: 9 of 9 KILLED. `verify`: the 16
+  mutants on the lines this change added or moved: 16 of 16 KILLED by the boundary file alone. Every new
+  `no_progress` test method kills at least one mutant. Both new files pass T0 (`t0_check`). A fuzz of 1,358 variants of
+  honest journals (event dropped, duplicated, swapped, retargeted, or cut) written through the bare writer raised no
+  exception other than `ProjectionError` in the fold, and the helper and an independent from-scratch fold of the six
+  projections agreed on all of them. 673 readable distinct journals (2,200 files) found now: 671 admitted, 2 refused
+  (the same two `provider/request`-without-`story/begin` mini-journals of `test_v21_defects_verify`, which no kernel
+  wrote), BASE and changed `no_progress` agree on all 673; 38 RUN.json records with a `no_progress` field resolve their
+  journal and equal both functions. Under Python 3.12 and 3.14, the new files pass.
+* **Two gaps in the tests, closed** (`tests/v2/test_v21_r3_usage_review.py`, 3 tests):
+  `no_progress` compared with ANY earlier failed attempt instead of the one before passed every test of this WP and of
+  the registered kill files (and is not in the runner's catalogue); and every record the boundary tests build carries a
+  `usage` account, so a refusal placed inside the V2.1 usage branch would have passed them — the doc says the boundary
+  is at the reconstruction step because a 2.0.0 record has no `usage`, and now a test says so.
+* **Two statements corrected in this document:** "8 of 14 tests fail on BASE" (4 of 14 test methods, 8 failures counting
+  subtests) and the cost of the fold (quadratic in the number of stories, not linear; see §8).
+* **Not changed, and still the owner's:** D-LATE, D-READERS, D-INVA (§9). The review's reading of D-LATE: ignoring a
+  late failure matches what the projections keep (`failure_owner` leaves the deciding failure alone once cited), and no
+  kernel path journals the shape; both answers are defined on every admitted journal.
+
+| Requirement | Test (review) |
+|---|---|
+| consecutive means the attempt before: a failure set an older attempt had is not a repeat | `ConsecutiveMeansTheAttemptBefore` (2 tests) |
+| the boundary is at the reconstruction step: a record with no `usage` account is refused by the projection too, nothing re-derived | `TheBoundaryIsWhereTheJournalIsReconstructed.test_a_record_without_a_usage_account_is_refused_by_the_projection` |
