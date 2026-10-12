@@ -12,7 +12,8 @@
 * **`release`** is the graceful-first ladder: cooperative (SIGINT) -> grace -> SIGTERM -> grace -> SIGKILL -> wait
   (Windows: TerminateJobObject -> wait). Every signal is sent while the anchor is unreaped and is recorded in `ledger`.
   A range that does not empty raises `RangeNotEmpty` (the resource is RESIDUAL); after the anchor is reaped the range
-  never signals again.
+  never signals again. **One release at a time** (single flight): the ladder, the EXIT write, the reap and the pipe
+  close of one range are never run by two threads; a second caller waits for the first and is given its outcome.
 * `descendants` walks a process table for *reporting* only: a visited set, stale parent edges dropped (a parent
   created after its child), bounded by the table. Nothing it returns is ever signalled (WIN-PID-1, WIN-PID-2).
 """
@@ -282,6 +283,20 @@ BACKEND = _Posix if POSIX else _Job
 
 # --------------------------------------------------------------------------------------- the range
 
+class _Flight:
+    """One release in progress (single flight): the thread leading it, whether it is past the ladder, what it saw leave
+    the range, and — when it ends in a `Residual` — that outcome, which every caller that waited for it is given."""
+
+    __slots__ = ("thread", "disposing", "escaped", "done", "outcome")
+
+    def __init__(self) -> None:
+        self.thread = threading.get_ident()
+        self.disposing = False   # True once the range is measured empty: the anchor may be reaped, nothing signals
+        self.escaped: dict[int, Proc] = {}
+        self.done = False        # set by the leader, last; read by the callers that wait
+        self.outcome: Residual | None = None
+
+
 class ProcessRange:
     """A StoryScope resource (PROCESS_RANGE) running `argv` inside an OS-owned range."""
 
@@ -300,6 +315,8 @@ class ProcessRange:
         self.target_pid: int | None = None
         self.returncode: int | None = None
         self._reaped = False
+        self._mx = threading.RLock()          # guards `_flight` only; re-entrant, never held while anything waits
+        self._flight: _Flight | None = None   # the release in progress (or the last one, done)
 
     # ---- start
     def start(self) -> "ProcessRange":
@@ -414,10 +431,47 @@ class ProcessRange:
 
     def release(self) -> None:
         """The graceful-first ladder until the range is measured empty; then the anchor is reaped. Raises
-        RangeNotEmpty (RESIDUAL) when it does not empty, RangeEscaped when processes that left it are alive."""
-        if self._anchor is None or self._reaped:
-            return
-        escaped = {p.pid: p for p in self.escaped()}  # seen while their parents are alive
+        RangeNotEmpty (RESIDUAL) when it does not empty, RangeEscaped when processes that left it are alive.
+
+        One release at a time. A caller that arrives while another thread is releasing waits for it and is given its
+        outcome — the same RangeNotEmpty or RangeEscaped, so a leak is not silent for either — and runs no ladder, EXIT
+        write or pipe close of its own. A call after a release has ended is what it always was: a no-op once the anchor
+        is reaped, a new ladder after RangeNotEmpty. A call from the thread that is already releasing (a signal
+        handler) stops the range when the frame below is still in the ladder and returns at once past it: that frame
+        disposes. A caller waits exactly as long as the release it waits for — by polling, as `wait_empty` does, so
+        that nothing a re-entering handler could meet is held while it waits."""
+        flight = outcome = None
+        try:
+            while flight is None:
+                with self._mx:
+                    current = self._flight
+                    if current is None or current.done:
+                        if self._anchor is None or self._reaped:
+                            return
+                        flight = self._flight = _Flight()
+                if flight is None:   # a release is in flight
+                    if current.thread == threading.get_ident():
+                        if not current.disposing:
+                            self._ladder(current)
+                        return
+                    while not current.done:
+                        time.sleep(POLL_S)
+                    if current.outcome is not None:
+                        raise type(current.outcome)(*current.outcome.args) from current.outcome
+            self._release(flight)
+        except Residual as e:
+            outcome = e   # RangeNotEmpty / RangeEscaped: raised below, once `done` is set
+            if flight is not None:
+                flight.outcome = e
+        finally:
+            if flight is not None:
+                flight.done = True
+        if outcome is not None:
+            raise outcome
+
+    def _ladder(self, flight: _Flight) -> None:
+        """Stop the range, graceful-first, until it is measured empty; RangeNotEmpty when it does not empty."""
+        flight.escaped.update({p.pid: p for p in self.escaped()})  # seen while their parents are alive
         empty = self.wait_empty(0.0) and self.wait(0.0) is not None
         for stage, sig, grace in self._os.stages:
             if empty:
@@ -427,7 +481,13 @@ class ProcessRange:
         if not empty:
             raise RangeNotEmpty(f"{self.name}: not empty after {[s['stage'] for s in self.ledger]}: "
                                 f"{[(p.pid, p.command) for p in self.members()]}")
-        escaped.update({p.pid: p for p in self.escaped()})  # Linux: orphaned escapees re-parent to the anchor
+
+    def _release(self, flight: _Flight) -> None:
+        """The ladder, then the disposal: EXIT to the anchor, the reap, the pipes and the backend closed, and the check
+        that nothing which left the range is alive. RangeEscaped when something is."""
+        self._ladder(flight)
+        flight.disposing = True  # measured empty: from here the anchor may be reaped, and nothing is signalled
+        flight.escaped.update({p.pid: p for p in self.escaped()})  # Linux: orphaned escapees re-parent to the anchor
         if self._anchor.poll() is None:
             try:
                 self._anchor.stdin.write("EXIT\n")
@@ -439,8 +499,8 @@ class ProcessRange:
         self._close_pipes()
         self._os.close()
         self.wait(1.0)
-        live = process_table() if escaped else {}
-        still = sorted(pid for pid in escaped if pid in live)
+        live = process_table() if flight.escaped else {}
+        still = sorted(pid for pid in flight.escaped if pid in live)
         if still:
             raise RangeEscaped(f"{self.name}: processes left the range and are alive: "
                                f"{[(pid, live[pid].command) for pid in still]}")
