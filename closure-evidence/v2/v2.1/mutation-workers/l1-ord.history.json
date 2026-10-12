@@ -1,0 +1,13 @@
+{
+ "worker": "l1-ord",
+ "snapshot": "5719f1f87ebbb2d3f19a3f0629ee656c93597c23",
+ "status": "pilot attempt 2 lane 1 (order table), 2026-10-08, snapshot 5719f1f; git status --porcelain after: []",
+ "log": {
+  "path": "closure-evidence/v2/v2.1/mutation-workers/l1-ord.log",
+  "sha256": "f50d2f7fbedd258cf1883647bcbd68d79927d498c137662d0810714ee9620523"
+ },
+ "record": {
+  "path": "closure-evidence/v2/v2.1/mutation-workers/l1-ord.record.json",
+  "sha256": "826a5680090c3f2b6dc315b4f953ca317ef9e6b1cdcc268d273a36748a4e92c6"
+ }
+}
