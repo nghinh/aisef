@@ -65,7 +65,7 @@ kiến trúc không xác nhận implementation đã đúng — tương thích, m
 **Đã đo:** sửa riêng `RUN.json` (bỏ `budget_stop`, đặt PASS) vẫn VERIFIED trên 2.0.0. **Quyết định:** outcome lấy từ
 journal; settings buộc vào journal bằng cách dựng lại `runspec_hash`; chi tiêu dựng lại từ luồng phiên + ledger preflight;
 story bắt đầu mà không kết thúc = bị từ chối; trường chỉ có trong record **chỉ được hạ** verdict. `EVIDENCE.json` băm record
-(JSON chuẩn hoá), journal, mọi phiên, preflight; digest của nó là **anchor** in ra cho người vận hành giữ ngoài thư mục;
+(JSON chuẩn hoá), journal, mọi phiên, preflight và các tệp `review-findings/` (nếu có: B-03 vòng 3, mục 5); digest của nó là **anchor** in ra cho người vận hành giữ ngoài thư mục;
 `--verify --expect-anchor` bác bỏ cả việc viết lại nhất quán toàn thư mục. Không đổi format journal.
 **Không tuyên bố:** không có anchor thì verify chỉ chứng minh *nhất quán*, không chứng minh *xác thực*.
 

@@ -1,7 +1,8 @@
 # Evidence anchor — mô hình đe doạ (AISEF 2.1, nhánh chưa phát hành)
 
-`EVIDENCE.json` băm record (JSON chuẩn hoá), `RUN.started.json`, journal, mọi luồng phiên và tệp preflight; **anchor** là
-sha256 của manifest đó (ADR-3). `aisef run --verify --expect-anchor A` bác bỏ mọi thư mục mà manifest dựng lại không ra
+`EVIDENCE.json` băm record (JSON chuẩn hoá), `RUN.started.json`, journal, mọi luồng phiên, tệp preflight và — nếu run có —
+mọi tệp `review-findings/*.json` (mỗi finding của reviewer, nguyên văn đã che bí mật của run; dòng journal của finding nêu
+sha256 và kích thước của tệp, `--verify` đối chiếu); **anchor** là sha256 của manifest đó (ADR-3). `aisef run --verify --expect-anchor A` bác bỏ mọi thư mục mà manifest dựng lại không ra
 `A`.
 
 **Anchor kiểm tra toàn vẹn so với một giá trị neo đáng tin. Nó không chứng minh lịch sử thực thi là thật**: một thư mục
