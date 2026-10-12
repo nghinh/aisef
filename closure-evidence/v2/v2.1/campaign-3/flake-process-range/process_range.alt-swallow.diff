@@ -1,0 +1,22 @@
+--- a/aisef2/runtime/process_range.py	2026-10-12 11:19:46
++++ b/aisef2/runtime/process_range.py	2026-10-12 11:32:00
+@@ -350,7 +350,7 @@
+         for pipe in (self._anchor.stdin, self._anchor.stdout):
+             try:
+                 pipe.close()
+-            except OSError:
++            except (OSError, ValueError):   # ValueError: another releaser closed it under us
+                 pass
+ 
+     # ---- observe
+@@ -432,8 +432,8 @@
+             try:
+                 self._anchor.stdin.write("EXIT\n")
+                 self._anchor.stdin.flush()
+-            except OSError:
+-                pass  # it is already gone
++            except (OSError, ValueError):
++                pass  # it is already gone, or another releaser has closed the pipe
+         self._anchor.wait()
+         self._reaped = True
+         self._close_pipes()

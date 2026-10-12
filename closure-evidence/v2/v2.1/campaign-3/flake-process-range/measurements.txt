@@ -1,0 +1,35 @@
+FLAKE: ValueError PyMemoryView_FromBuffer(): info->buf must not be NULL  (aisef2/runtime/process_range.py::_close_pipes)
+tree f860e57 (process_range.py sha256 877f6cba3e28dc79..., identical at 4060e08); CPython 3.14.7 macOS arm64; every count below was measured here.
+
+NATURAL RATE of tests/v2/test_c2_cli_invocation.py -k test_FM2_CLI_SUBJECT_3 (single test, unittest discover, env -i, PATH without opencode)
+  idle sequential      : 100 runs  test FAILED 3 (3.0%, Wilson95 1.0-8.5)   exact error present 5 (5.0%, 2.2-11.2)  [main thread 3, after_dispatch thread 2]
+  4 copies + 6 burners : 240 runs  test FAILED 1 (0.4%, 0.07-2.3)          exact error present 3 (1.25%, 0.4-3.6)  [main 1, after_dispatch 2]
+      1-min load average during the batch: 12 at start, peak 35 (the machine also carried other sessions' work)
+  idle vs loaded exact error: Fisher p=0.051 (not a significant difference)
+  all 340 natural runs: 8 exact errors (2.35%), 4 test failures (1.2%)
+  fixed tree (RLock fix), 4 copies + 4 burners: 48 runs  0 exact errors, 0 failures   (P(0/48 | 2.35%) = 0.32: weak alone; the deterministic test is the evidence)
+  runs of the test in total: 1 trial + 3 trace + 100 + 240 + 48 + 8 tracer = 400
+  campaign 3 records: this file, unmutated tree: 10 full-file runs (9 T0 + 1 original), 1 FAIL; test_probe_process_effect.py: 16 T0 runs, 0 FAIL
+
+PRECONDITION TRACE (8 runs, spies on anchor.poll/stdin.write/flush/close, no failure captured):
+  2 of 8: both releasers saw poll()==None within ~1 ms, the second EXIT flush raised BrokenPipeError (bytes stay pending),
+          both threads entered _close_pipes within 0.1 ms (s2: 259.6/259.6 ms, s8: 273.4/273.5 ms)
+  6 of 8: the second releaser entered after the first had reaped the anchor (poll()!=None): no write, closes 30 ms apart or serial
+
+PLAIN-PIPE REPRODUCTION (repro_plain.py, no aisef2): Popen(stdin=PIPE, stdout=PIPE, encoding='utf-8'), child 'true'
+  two threads close stdin+stdout together, pending bytes after EPIPE : 97/3000 (3.2%) in the first run, 442/3000 (14.7%) in the
+                                                                       re-run saved in plain.out.txt (same script; load differs): exact ValueError  [3.12.14: 219/3000]
+  three threads                                                        : 491/3000 first run, 1361/3000 re-run (two losers)
+  one thread, pending bytes                                            : 0/3000 (only the OSError _close_pipes ignores), both runs
+  two threads, no pending bytes                                        : 0/3000, both runs
+  two_release (the release tail itself, head -n1 child, two threads)   : 0/3000 first run, 1/3000 re-run (exact error; the tail is not forced into EPIPE)
+  reader_close (pump iterating stdout, close from main)                : 300/300 ValueError('I/O operation on closed file') in the PUMP thread; main close() clean
+  reader_blocked (pump blocked in read(), close from main)             : 100/100 close() BLOCKS until the child dies, then returns normally; 0 exceptions
+DETERMINISTIC (repro_gated.py, stdlib io only): exact error from X.flush()/X.close() in every window tried; same text on 3.9.6, 3.12.14, 3.14.3, 3.14.4, 3.14.7
+PROPOSED TEST (proposed/test_release_concurrent_pipes.py): original 200/200 FAIL with the exact error (0.001 s each); lock fix 30/30 PASS (2.0 s: the gate bound)
+RANGE-LEVEL (repro_range.py, real range on 'sleep 60', STOP + OWNER threads): 0/400 (owner poll 20 ms), 0/400 (1 ms) on the original tree; 0/800 on the fixed tree
+DYNAMIC EXERCISE (exercise_driver.py, 132 kill files, test_c2_cli_invocation.py excluded: budget): 53 start >=1 ProcessRange; 3,023 starts, 4,955 releases;
+  exactly ONE other kill file had two threads inside release() of one range at once: tests/v2/test_probe_process_effect.py (test_FM2_EFFECT_10)
+  28 files release a range from >=2 distinct threads SEQUENTIALLY (StoryScope Ranged.release after the probe's own): max concurrent releasers 1
+  2 of the 132 fail in the scratch tree for record-binding reasons unrelated to ProcessRange (test_c2_k_nowork_001: K-NOWORK-001-REHEARSAL.json missing;
+  test_c2_orchestration_conformance: story_runner.py changed since the record)

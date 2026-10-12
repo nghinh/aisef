@@ -1,0 +1,9 @@
+## /opt/homebrew/bin/python3.12
+experiment=two_close_pending iterations=3000 seconds=10.4
+  3000  OSError (what _close_pipes ignores)
+   219  A.close(stdin): ValueError: PyMemoryView_FromBuffer(): info->buf must not be NULL
+## /usr/bin/python3
+Exception in thread Thread-13:
+Traceback (most recent call last):
+  File "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/flake/repro_plain.py", line 160, in go
+    pipe.close()

@@ -1,0 +1,131 @@
+"""Proposed test (tests/v2/p4/test_process_range.py, or a file of its own): two threads call ProcessRange.release()
+on one range and the pipes are closed once. Deterministic: a Python raw stands in for the anchor's stdin pipe, whose
+close() is held while the second releaser has passed its closed-check. No sleeps; the bounds below are only how long
+a gate may wait for a thread that, once the fix serialises the releasers, can never arrive.
+
+Before the fix: the second releaser raises ValueError('PyMemoryView_FromBuffer(): info->buf must not be NULL')
+out of release() (the very error of the 2026-10-12 T0 failure). After: neither thread raises.
+
+    PROCESS_RANGE_FILE=<path to a process_range.py> python3 -B -m unittest proposed/test_release_concurrent_pipes.py
+(the file named is loaded under its own module name; without the variable the repository's module is used)
+"""
+import importlib.util
+import io
+import os
+import sys
+import threading
+import types
+import unittest
+
+_FILE = os.environ.get("PROCESS_RANGE_FILE")
+if _FILE:
+    spec = importlib.util.spec_from_file_location("process_range_under_test", _FILE)
+    pr = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = pr   # a dataclass of the module looks itself up here
+    spec.loader.exec_module(pr)
+else:
+    from aisef2.runtime import process_range as pr
+
+BOUND_S = 2.0   # a gate's upper bound where the thread it waits for cannot arrive (the fixed code)
+
+
+class _StdinRaw(io.RawIOBase):
+    """The anchor's stdin pipe, its reader gone: every write is EPIPE, so the bytes written stay pending in the buffer
+    (an EXIT that met an anchor that had just left); close() is held until X has passed its closed-checks."""
+
+    def __init__(self):
+        super().__init__()
+        self.in_close, self.x_checked = threading.Event(), threading.Event()
+        self.x_ident, self.x_reads, self._seen = None, 3, 0
+
+    def writable(self):
+        return True
+
+    def write(self, b):
+        raise BrokenPipeError(32, "Broken pipe")
+
+    @property
+    def closed(self):
+        value = io.RawIOBase.closed.__get__(self)
+        if threading.get_ident() == self.x_ident:
+            self._seen += 1
+            if self._seen == self.x_reads:      # TextIOWrapper.close, TextIOWrapper.flush, BufferedWriter.flush
+                self.x_checked.set()
+        return value
+
+    def close(self):
+        if not io.RawIOBase.closed.__get__(self):
+            self.in_close.set()
+            self.x_checked.wait(BOUND_S)        # X arrives at once before the fix; after it, X is behind the lock
+        super().close()
+
+
+def _range(raw, first_arrived, let_first_go, poll=lambda: 0):
+    """A range with no process: the anchor (already exited: poll() is 0, so release() writes no EXIT) and its backend are
+    fakes; the pipes are the real io stack, TextIOWrapper over BufferedWriter, as Popen(..., encoding=) builds them."""
+    stdin = io.TextIOWrapper(io.BufferedWriter(raw), encoding="utf-8", write_through=True)
+    stdin.write("EXIT\n")                       # pending in the buffer
+    try:
+        stdin.flush()
+    except OSError:
+        pass                                    # EPIPE: release() ignores it too; the bytes stay
+    r = pr.ProcessRange("fake", ["unused"])
+    r._anchor = types.SimpleNamespace(pid=1, stdin=stdin, stdout=io.StringIO(), poll=poll, wait=lambda: 0)
+    gate = {"first": True}
+
+    def escaped(pid):
+        if gate["first"]:                       # the first releaser stands here, past `_reaped`, until told
+            gate["first"] = False
+            first_arrived.set()
+            let_first_go.wait(BOUND_S)
+        return []
+
+    r._os = types.SimpleNamespace(stages=(), members=lambda pid: [], escaped=escaped, close=lambda: None)
+    r._pumper = threading.Thread(target=lambda: None)
+    r._pumper.start()
+    r._pumper.join()
+    r.returncode = 0
+    return r
+
+
+class ConcurrentRelease(unittest.TestCase):
+    def _two_releasers(self, poll):
+        raw = _StdinRaw()
+        first_arrived, let_first_go = threading.Event(), threading.Event()
+        r = _range(raw, first_arrived, let_first_go, poll)
+        raised = {}
+
+        def releaser(tag):
+            if tag == "X":
+                raw.x_ident = threading.get_ident()
+            try:
+                r.release()
+            except BaseException as e:           # noqa: BLE001 - the point of the test is what escapes release()
+                raised[tag] = e
+
+        # X is the thread that stands inside release(), past its `_reaped` check, while Y runs the whole release
+        tx = threading.Thread(target=releaser, args=("X",))
+        tx.start()
+        self.assertTrue(first_arrived.wait(BOUND_S))
+        ty = threading.Thread(target=releaser, args=("Y",))
+        ty.start()
+        # before the fix Y runs to raw.close() (in_close) and holds it there; after it Y is behind X's lock
+        raw.in_close.wait(BOUND_S)
+        let_first_go.set()
+        tx.join(30)
+        ty.join(30)
+        self.assertFalse(tx.is_alive() or ty.is_alive())
+        self.assertTrue(r._reaped)
+        return {k: repr(v) for k, v in raised.items()}
+
+    def test_a_second_releaser_never_closes_the_pipes_the_first_is_closing(self):
+        """the anchor has exited (poll() is 0): X goes straight to _close_pipes() while Y is inside raw.close()"""
+        self.assertEqual({}, self._two_releasers(lambda: 0))
+
+    def test_a_second_releaser_never_writes_to_the_pipes_the_first_has_closed(self):
+        """X still sees the anchor alive (poll() is None): it writes EXIT after Y has closed stdin"""
+        self.assertEqual({}, self._two_releasers(lambda: None))
+
+
+if __name__ == "__main__":
+    unittest.main()

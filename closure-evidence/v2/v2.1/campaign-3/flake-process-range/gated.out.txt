@@ -1,0 +1,13 @@
+3.14.7
+level 1: Y.close -> BrokenPipeError(32, 'Broken pipe') | X.flush -> ValueError('PyMemoryView_FromBuffer(): info->buf must not be NULL')
+level 2 k=1 (X's closed-read #1 reached=True): Y.close -> BrokenPipeError(32, 'Broken pipe') | X.close -> ValueError('PyMemoryView_FromBuffer(): info->buf must not be NULL')
+level 2 k=2 (X's closed-read #2 reached=True): Y.close -> BrokenPipeError(32, 'Broken pipe') | X.close -> ValueError('PyMemoryView_FromBuffer(): info->buf must not be NULL')
+level 2 k=3 (X's closed-read #3 reached=True): Y.close -> BrokenPipeError(32, 'Broken pipe') | X.close -> ValueError('PyMemoryView_FromBuffer(): info->buf must not be NULL')
+level 2 k=4 (X's closed-read #4 reached=False): Y.close -> BrokenPipeError(32, 'Broken pipe') | X.close -> ValueError('PyMemoryView_FromBuffer(): info->buf must not be NULL')
+level 2 k=5 (X's closed-read #5 reached=False): Y.close -> BrokenPipeError(32, 'Broken pipe') | X.close -> ValueError('PyMemoryView_FromBuffer(): info->buf must not be NULL')
+level 2 k=6 (X's closed-read #6 reached=False): Y.close -> BrokenPipeError(32, 'Broken pipe') | X.close -> ValueError('PyMemoryView_FromBuffer(): info->buf must not be NULL')
+-- level 3 (H1: reader thread vs close on stdout)
+level 3 k=1 reached=True: main close -> None | pump next -> 'StopIteration'
+level 3 k=2 reached=True: main close -> None | pump next -> 'StopIteration'
+level 3 k=3 reached=False: main close -> None | pump next -> 'StopIteration'
+level 3 k=4 reached=False: main close -> None | pump next -> 'StopIteration'

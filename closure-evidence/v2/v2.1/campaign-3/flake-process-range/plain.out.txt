@@ -1,0 +1,26 @@
+3.14.7 (main, Aug  5 2026, 10:29:49) [Clang 21.0.0 (clang-2100.1.1.101)]
+experiment=one_release iterations=3000 seconds=8.8
+     0  (no exception of any kind in any thread)
+experiment=two_release iterations=3000 seconds=19.1
+     1  A.close(stdin): ValueError: PyMemoryView_FromBuffer(): info->buf must not be NULL
+experiment=two_close iterations=3000 seconds=10.4
+     0  (no exception of any kind in any thread)
+experiment=one_close_pending iterations=3000 seconds=10.9
+  3000  OSError (what _close_pipes ignores)
+experiment=two_close_no_pending iterations=3000 seconds=11.1
+     0  (no exception of any kind in any thread)
+experiment=two_close_pending iterations=3000 seconds=11.3
+  3000  OSError (what _close_pipes ignores)
+   442  A.close(stdin): ValueError: PyMemoryView_FromBuffer(): info->buf must not be NULL
+experiment=three_close_pending iterations=3000 seconds=11.8
+  3008  OSError (what _close_pipes ignores)
+   695  A.close(stdin): ValueError: PyMemoryView_FromBuffer(): info->buf must not be NULL
+   664  B.close(stdin): ValueError: PyMemoryView_FromBuffer(): info->buf must not be NULL
+     2  C.close(stdin): ValueError: PyMemoryView_FromBuffer(): info->buf must not be NULL
+experiment=reader_close iterations=300 seconds=5.6
+   300  pump-thread: ValueError: I/O operation on closed file
+experiment=reader_blocked iterations=100 seconds=103.6
+   100  main close(stdout) BLOCKED >1s while the pump is in read()
+   100  pump thread ended by plain EOF
+   100  main close(stdout) returned normally
+done

@@ -1,0 +1,25 @@
+--- a/aisef2/runtime/process_range.py	2026-10-12 11:19:46
++++ b/aisef2/runtime/process_range.py	2026-10-12 11:19:46
+@@ -300,6 +300,7 @@
+         self.target_pid: int | None = None
+         self.returncode: int | None = None
+         self._reaped = False
++        self._releasing = threading.RLock()   # one releaser at a time: a controller's stop and the owner's own release
+ 
+     # ---- start
+     def start(self) -> "ProcessRange":
+@@ -414,7 +415,13 @@
+ 
+     def release(self) -> None:
+         """The graceful-first ladder until the range is measured empty; then the anchor is reaped. Raises
+-        RangeNotEmpty (RESIDUAL) when it does not empty, RangeEscaped when processes that left it are alive."""
++        RangeNotEmpty (RESIDUAL) when it does not empty, RangeEscaped when processes that left it are alive. Two
++        threads may call it (a stop from another thread meets the owner's own): the second waits for the first, then
++        finds the anchor reaped — never a second write, flush and close of the same pipes."""
++        with self._releasing:
++            self._release()
++
++    def _release(self) -> None:
+         if self._anchor is None or self._reaped:
+             return
+         escaped = {p.pid: p for p in self.escaped()}  # seen while their parents are alive
