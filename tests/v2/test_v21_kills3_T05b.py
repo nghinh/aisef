@@ -26,6 +26,7 @@ if str(ROOT) not in sys.path:
 
 from aisef2.app import confine  # noqa: E402
 from aisef2.runtime import process_range  # noqa: E402
+from tests.v2 import v21_r3_conf_rows as rows  # noqa: E402
 
 #: what PROBE's m() puts in front of each line it means to be read (the rest is a command's own output)
 MARK = "@@aisef-confine "
@@ -99,6 +100,12 @@ def mountinfo(argv: list[str]) -> list[str]:
             for i, (at, access, fs) in enumerate(mounts(argv))]
 
 
+def devices(argv: list[str]) -> list[str]:
+    """The probe's `devices` section: each node `--dev` places, read inside as the character device it must be."""
+    return [f"char {number} {at}/{name}" for flag, at in destinations(argv) if flag == "--dev"
+            for name, number in confine.DEVICES.items()]
+
+
 def tries(args: list[str]) -> dict[str, tuple[int, str]]:
     """{try: (exit, what it printed)} of a session as the wrapper must give it, for the probe's arguments `args`."""
     canary, run_directory, kernel, site, _home, _file, _sleep, client, git = args[:9]
@@ -130,7 +137,8 @@ def transcript(argv: list[str], args: list[str], network: str, script: dict) -> 
     mountinfo, route, netdev, home (lists of lines), sockets (lines; "{ws}" is the workspace), listed (whether `find`
     ran), tries ({try: (exit, text)})."""
     ws = os.path.dirname(args[5])
-    parts = {"status": STATUS, "mountinfo": mountinfo(argv), "route": ROUTE, "netdev": NETDEV, "home": []}
+    parts = {"status": STATUS, "mountinfo": mountinfo(argv), "devices": devices(argv), "route": ROUTE, "netdev": NETDEV,
+             "home": []}
     parts.update({k: v for k, v in script.items() if k in parts})
     out = [f"{MARK}uid 1000"]
     out += [f"{MARK}ns {n} {link}" for n, link in inside_links(network).items()]
@@ -143,10 +151,11 @@ def transcript(argv: list[str], args: list[str], network: str, script: dict) -> 
     return "\n".join([*out, f"{MARK}end", ""])
 
 
-def measure(tmp: pathlib.Path, network: str = "host", **script) -> types.SimpleNamespace:
+def measure(tmp: pathlib.Path, network: str = "host", host=None, **script) -> types.SimpleNamespace:
     """confine.measure of the scripted session, in-process: `tmp` is a new directory of the test's. What it returns:
     rep (the measurement's report), calls (each call made to bubblewrap), argv (the command line the probe ran
-    under, up to its `--`) and args (the probe's $1 ...)."""
+    under, up to its `--`) and args (the probe's $1 ...). `host`: the host's mount table as the measurement reads it
+    (v21_r3_conf_rows.host_table; a minimal host by default)."""
     bwrap = tmp / "bwrap"
     bwrap.write_text("#!/bin/sh\nexit 97\n", encoding="utf-8")     # nothing here runs it: its calls are answered below
     bwrap.chmod(0o755)
@@ -181,7 +190,8 @@ def measure(tmp: pathlib.Path, network: str = "host", **script) -> types.SimpleN
         return real_namespaces(inside, OUTSIDE if outside is None else outside)
 
     with mock.patch.object(subprocess, "run", run), mock.patch.object(os, "access", access), \
-            mock.patch.object(confine, "namespaces", namespaces), mock.patch.object(process_range, "process_table", dict):
+            mock.patch.object(confine, "namespaces", namespaces), mock.patch.object(process_range, "process_table", dict), \
+            rows.host_table(host):
         seen.rep = confine.measure(spec, seen.where, str(client), system="linux", environ={"PATH": "/usr/bin:/bin"})
     return seen
 
@@ -242,8 +252,11 @@ class CorrectlyConfinedSession(Measured):
     def test_the_mounts_are_what_mountinfo_says_and_their_targets_what_the_wrapper_names(self):
         """The judgement's 'mounted beyond what the wrapper names' compares the one with the other; the targets are
         read off the command line the record carries, option by option."""
+        # a row is what mountinfo's line says of the mount, the fields the write policy decides from included (B03-R3)
         self.assertEqual(self.inside["mounts"],
-                         [{"at": at, "access": access, "fs": fs} for at, access, fs in mounts(self.seen.argv)])
+                         [{"at": at, "access": access, "fs": fs, "dev": f"0:{50 + i}", "root": "/", "source": fs,
+                           "options": [access, "relatime"], "super_options": [access], "optional": [f"shared:{i}"]}
+                          for i, (at, access, fs) in enumerate(mounts(self.seen.argv))])
         self.assertEqual(self.inside["mount_targets"], [at for _, at in destinations(self.rep["argv"])])
         for named in ("/proc", "/dev", "/tmp", str(self.seen.where / "ws"), str(self.seen.readable),
                       str(self.seen.client.parent)):

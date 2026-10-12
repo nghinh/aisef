@@ -27,6 +27,7 @@ if str(ROOT) not in sys.path:
 
 from aisef2.app import confine  # noqa: E402
 from tests.v2 import isolated_git  # noqa: E402
+from tests.v2 import v21_r3_conf_rows as rows  # noqa: E402
 
 SPEC = {"backend": "bwrap", "bwrap": "/usr/bin/bwrap", "network": "host", "read_only": []}
 #: a "bubblewrap" that runs no command: a call that got past the model below would write nothing anywhere
@@ -146,7 +147,7 @@ class Session(unittest.TestCase):
             return real_namespaces(inside, {n: f"{n}:[1]" for n in inside})
         env = environ if environ is not None else {"PATH": "/usr/bin:/bin", "HOME": str(self.home)}
         with mock.patch.object(subprocess, "run", run), mock.patch.object(confine, "namespaces", own), \
-                mock.patch.object(confine, "_survivors", lambda command: []):
+                mock.patch.object(confine, "_survivors", lambda command: []), rows.host_table():
             rep = confine.measure(spec, self.run_dir / "confinement", str(self.exe), self.run_dir / "repo",
                                   system="linux", environ=env)
         self.assertEqual(len(calls), 1, rep["problems"])
