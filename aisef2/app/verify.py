@@ -10,7 +10,12 @@ What the record alone says can only LOWER the verdict (a run failure, a refused 
 record and every evidence file are bound by EVIDENCE.json, whose digest is the anchor the run printed: given that
 anchor (`expect_anchor`), a consistent rewrite of the whole directory is refuted too. Without it, verification proves
 consistency, not authenticity: the run directory is writable by its operator's user. A file that is damaged, or is not
-what a run writes, is a finding — REFUTED with its cause — never a traceback in place of a verdict."""
+what a run writes, is a finding — REFUTED with its cause — never a traceback in place of a verdict.
+
+The journal's boundary (B-03 round 3): the reader checks each event and the hash chain, and not the lifecycle the
+control projections enforce when the kernel writes — a story that commits twice, an event of a story after its commit.
+A journal the six projections refuse is not one the kernel could have written: it is REFUTED naming the projection and
+the event, and nothing is re-derived from it (as for a journal that does not reconstruct)."""
 
 from __future__ import annotations
 
@@ -23,10 +28,27 @@ from aisef2.app import run as R
 from aisef2.app.bundle import Project
 from aisef2.arch.enums import Enforcement, IdentityGrade
 from aisef2.journal import format3
+from aisef2.journal.fold import Folder, ProjectionError
+from aisef2.journal.projections import PROJECTIONS
 from aisef2.orchestrate.workspace import git
 from aisef2.product.contract import plain
 from aisef2.runtime.capability import CapabilityIdentity
 from aisef2.runtime.runspec import resolve
+
+
+def _projection_refusal(events) -> tuple[str, str, int, str] | None:
+    """The first event of the reconstructed journal that one of the six control projections refuses, as (projection id,
+    event type, seq, why) — else None. The authority is the writer's own (`Authority.append`): each projection's
+    `Folder` is advanced over the events in seq order, so a journal is admitted here exactly when the kernel's writer
+    could have written it."""
+    folders = [(p.id, Folder(p)) for p in PROJECTIONS.values()]
+    for e in events:
+        for pid, folder in folders:
+            try:
+                folder.advance(e)
+            except ProjectionError as err:
+                return pid, e.type, e.seq, str(err)
+    return None
 
 
 def _runspec_problems(project: Project, rec: dict, events: list[dict]) -> tuple[list[str], settings.Settings | None]:
@@ -124,7 +146,13 @@ def verify(project: Project, out: pathlib.Path, expect_anchor: str | None = None
             problems.append("the journal is not the one RUN.json names (digest or length)")
         try:
             journal = format3.reconstruct(data.decode("utf-8"))
-            events = [{"seq": e.seq, "type": e.type, "data": plain(e.data)} for e in journal.events]
+            refused = _projection_refusal(journal.events)
+            if refused is None:
+                events = [{"seq": e.seq, "type": e.type, "data": plain(e.data)} for e in journal.events]
+            else:     # not a journal the kernel could have written: nothing is re-derived from it
+                pid, kind, seq, why = refused
+                problems.append(f"the journal violates the control projections the kernel's writer enforces: {pid} "
+                                f"refuses {kind} at seq {seq}: {why}"[:500])
             if journal.torn_tail:
                 problems.append("the journal ends in a torn line")
         except Exception as e:  # noqa: BLE001 — any refusal of the reader is the finding
