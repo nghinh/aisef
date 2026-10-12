@@ -159,6 +159,14 @@ class PreserveWritesTheWholeFinding(Scratch):
         self.assertEqual(self.keep(story="x" * 90, index=1).path,
                          "review-findings/" + "x" * 40 + f"-{digest('x' * 90)}.2.1.json")
         self.assertEqual(self.keep(story="a-b_c").path, "review-findings/a-b_c.2.0.json")     # a file name: as it is
+        # a lone surrogate (json.loads yields one from "\ud800") has no UTF-8 form: the digest is of its escape, and the
+        # file is still made (an id that cannot be hashed is not a reason to refuse a review)
+        lone = "a\ud800b"
+        art = self.keep(story=lone, index=3)
+        self.assertIsInstance(art, V.Artifact, art)
+        escaped = hashlib.sha256(lone.encode("utf-8", "backslashreplace")).hexdigest()[:8]
+        self.assertEqual(art.path, f"review-findings/a_b-{escaped}.2.3.json")
+        self.assertEqual(json.loads((self.out / art.path).read_bytes())["story_id"], lone)
 
     def test_two_story_ids_that_read_alike_have_two_files_and_each_is_its_own(self):
         longer = "ledgerlock-snapshot-command-handles-missing-file"     # shares its first 40 characters with the next
