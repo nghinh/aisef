@@ -531,17 +531,24 @@ def s2(ctx: Ctx, confined: bool) -> Scenario:
             ev = said.get(target) or {}
             mount = ev.get("mount") or [None, None, None]
             host_has = os.path.exists(ev["path"]) if ev.get("op") == "create" and target != "checkout_under_review" else None
+            # ENOENT is a sandbox's answer only where the host HAS the place (a create's parent directory, a read's
+            # file): a path whose parent is absent on the host fails under any kernel, sandbox or not (review fix:
+            # S2 on its own used to pass a mistyped path; S2c, the control, was the only thing that caught it)
+            place = os.path.dirname(ev["path"]) if ev.get("op") == "create" else ev.get("path")
+            place_on_host = os.path.exists(place) if place and target != "checkout_under_review" else None
+            not_there = ev.get("ok") is False and ev.get("errname") == "ENOENT"
             rows[f"{role}:{target}"] = {"op": ev.get("op"), "path": ev.get("path"), "client_saw": (
                 "created" if ev.get("ok") and op == "create" else "read" if ev.get("ok") else ev.get("errname")),
                 "errno": ev.get("errno"), "client_mount_of_the_path": mount, "host_has_the_file": host_has,
-                "sha256_read": ev.get("sha256"), "recorded": bool(ev)}
+                "host_has_the_place": place_on_host, "sha256_read": ev.get("sha256"), "recorded": bool(ev)}
             if confined:
                 if target == "git_directory_head":      # by design: the session reads the run clone's HEAD
                     good = ev.get("ok") is True
                 elif target == "run_directory_canary":
-                    good = ev.get("ok") is False
+                    good = ev.get("ok") is False and (not not_there or bool(place_on_host))
                 else:   # refused, or accepted only into the sandbox's own tmpfs — and the host never got the file
-                    good = bool(ev) and not host_has and (ev.get("ok") is False or mount[1] == "tmpfs")
+                    good = (bool(ev) and not host_has and (ev.get("ok") is False or mount[1] == "tmpfs")
+                            and (not not_there or bool(place_on_host)))
             elif target in CONTAINER_DENIES:
                 good = ev.get("ok") is False
             elif target == "run_directory_canary":     # the control reads the file itself, byte for byte
@@ -549,6 +556,11 @@ def s2(ctx: Ctx, confined: bool) -> Scenario:
             else:       # the control: the operator's uid reaches every one of them
                 good = ev.get("ok") is True and host_has is not False
             s.ok(f"{role}:{target}", good, rows[f"{role}:{target}"])
+    classes: dict[str, list[str]] = {}      # what the sessions were told, by kind: "refused" is not the only answer
+    for k, v in rows.items():
+        fs = v["client_mount_of_the_path"][1]
+        classes.setdefault(f"{v['client_saw']}" + (f" (a {fs} mount)" if fs else ""), []).append(k)
+    s.observed["what_the_session_was_told"] = classes
     top = sorted(os.listdir(s.out))
     from aisef2.app import run as R
     s.ok("kernel_that_ran_is_this_trees_kernel", rec.get("kernel_digest") == R.kernel_digest(),

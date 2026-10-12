@@ -13,6 +13,13 @@
 set -u
 TREE=${1:?TREE}; PROCPS=${2:?PROCPS_DIR}; OUT=${3:?OUT_DIR}; ARCHIVE=${4:?ARCHIVE}; COMMIT=${5:?COMMIT}
 [[ ! -e $OUT ]] || { print "OUT_DIR exists"; exit 2; }
+# the tree that runs is the commit named in the record: the same file count as the archive, and the driver and the
+# client byte for byte as COMMIT has them (a launcher that records one tree and runs another proves nothing)
+[[ $(tar -tf $ARCHIVE | grep -vc '/$') == $(find $TREE -type f | wc -l | tr -d ' ') ]] || { print "TREE is not ARCHIVE: file counts differ"; exit 2; }
+for f in e2e_guest.py e2e_client.py; do
+  [[ $(git -C ${0:A:h} show "$COMMIT:validation/v21/cli_integration/$f" 2>/dev/null | shasum -a 256 | cut -c1-64) \
+     == $(shasum -a 256 "$TREE/validation/v21/cli_integration/$f" 2>/dev/null | cut -c1-64) ]] || { print "TREE is not COMMIT: $f differs or is missing"; exit 2; }
+done
 mkdir -p $OUT
 IMG=aisef-sandbox-measure; PROCPS_IMG=postgres:16.15
 BASE=(--rm --init --network none --user 1000:1000 --cap-drop ALL --pids-limit 512 --memory 1g --cpus 2 -w /repo
@@ -44,6 +51,7 @@ load() { print -r -- "host load average $(sysctl -n vm.loadavg) at $(date '+%Y-%
   load
 } > $OUT/environment.txt 2>&1
 
+rc=0     # non-zero when a container failed, or left no result: the exit status carries the verdict
 for prof in X1 hardened; do
   [[ $prof == X1 ]] && F=($X1) || F=()
   print "== $prof: docker run $BASE $F $IMG python3 -B $DRIVER run --profile $prof" >> $OUT/commands.txt
@@ -56,5 +64,7 @@ for prof in X1 hardened; do
   mkdir -p $OUT/guest-$prof
   awk '/^@@E2E-TAR-BEGIN/{f=1;next} /^@@E2E-TAR-END/{f=0} f' $OUT/e2e-$prof.out | base64 -d | tar -xzf - -C $OUT/guest-$prof
   print "$prof: container exit $code; $(grep '^ "passed"' $OUT/e2e-$prof.json); $(grep -c '"passed": false' $OUT/e2e-$prof.json) failed entries"
+  [[ $code -eq 0 ]] && grep -q '^ "passed": true' $OUT/e2e-$prof.json || rc=1
 done
-print "done: $OUT"
+print "done: $OUT (exit $rc)"
+exit $rc
