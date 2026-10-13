@@ -301,7 +301,8 @@ constant, a return value), 30 of 44 for `_sections` (tuple elements dropped: the
 `reconcile` (every git argument among them). Read one by one, each is a shape a consumer reads (a key, a tuple, a
 return value, a decoding that must not be strict); the reviewer found none that stands for a behaviour no test looks
 at. The behaviours — which characters end a line, which end a field, which lines are events — were put to
-**wrong implementations of the reviewer's own**, 16 in all (`$R3/out/client/review/lab/`, one tree each):
+**wrong implementations of the reviewer's own**, 16 in all (each a copy of the tree with one exact replacement,
+`$R3/out/client/review/tools/rv_variant.py`; logs in `lab-logs/`; the trees themselves were removed):
 
 | wrong implementation | the 27 tests | the 32 tests |
 |---|---|---|
