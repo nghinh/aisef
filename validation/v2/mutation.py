@@ -898,7 +898,7 @@ _R3_CONF = (_R3 + "conf_policy.py", _R3 + "conf_rv_hostrows.py", _R3 + "conf_fu_
 _V21_R3_NEW: dict[str, list[str]] = {
     "aisef2/app/confine.py::_owned": [*_R3_CONF],
     "aisef2/app/confine.py::_writes": [_R3_CONF[0], _R3_CONF[2]],
-    "aisef2/app/confine.py::_host_mounts": [_R3_CONF[0], _R3_CONF[2]],
+    "aisef2/app/confine.py::_host_mounts": [_R3_CONF[0], _R3_CONF[2], _R3 + "client_readers.py"],
     "aisef2/app/confine.py::_device_roots": [_R3_CONF[0]],
     "aisef2/app/confine.py::PSEUDO": [_R3_CONF[0]],
     "aisef2/app/confine.py::DEVICES": [_R3_CONF[0]],
@@ -915,10 +915,18 @@ _V21_R3_NEW: dict[str, list[str]] = {
     "aisef2/runtime/process_range.py::_Flight.__init__": [_R3 + "range_release_contract.py"],
     "aisef2/runtime/process_range.py::_Flight.__slots__": [_R3 + "range_release_contract.py"],
     "aisef2/runtime/process_range.py::_linux_table": [_R3 + "range_fu_linux_table.py"],
+    # WP client: one reader of a session stream and one of a probe's output, both split at the line feed only
+    "aisef2/app/client.py::events": [_R3 + "client_stream.py", "tests/v2/test_app_units.py"],
+    "aisef2/app/confine.py::_lines": [_R3 + "client_readers.py"],
+    # WP auth: the mutation runner's own host-table readers (the root of every ownership proof; B03-R3-AUTH.md)
+    **{f"validation/v2/cleanup_authority.py::{n}": [_R3 + "auth_ps_table.py", _R3 + "auth_other_readers.py",
+                                                    _R3 + "auth_rv_digits.py"]
+       for n in ("_lines", "_not_a_row", "_twice", "_ps_env", "_ps_rows", "_read", "_win_rows", "_windows_table",
+                 "_env_rows", "_lsof_cwds", "carriers", "cwd_under", "host_table", "_PS_ROW", "_PS_ENV_ROW", "_WIN_ROW")},
 }
 _V21_R3_APPEND: dict[str, list[str]] = {
     "aisef2/app/confine.py::_judge": [*_R3_CONF],
-    "aisef2/app/confine.py::_mounts": [_R3_CONF[0]],
+    "aisef2/app/confine.py::_mounts": [_R3_CONF[0], _R3 + "client_readers.py"],
     "aisef2/app/confine.py::_probe": [_R3_CONF[0], _R3 + "conf_locale.py", _R3_CONF[2]],
     "aisef2/app/confine.py::measure": [_R3_CONF[0], _R3 + "conf_locale.py", _R3_CONF[2]],
     "aisef2/app/review_verify.py::detail": [_R3 + "detail_statement.py"],
@@ -927,6 +935,10 @@ _V21_R3_APPEND: dict[str, list[str]] = {
     "aisef2/app/adapters.py::Reviewer._ocr": [_R3 + "detail_rv_finderfiles.py"],
     "aisef2/app/usage.py::no_progress": [_R3 + "usage_no_progress.py", _R3 + "usage_review.py"],
     "aisef2/app/verify.py::verify": [_R3 + "usage_boundary.py", _R3 + "usage_review.py", _R3 + "detail_product.py"],
+    "aisef2/app/client.py::read_session": [_R3 + "client_stream.py"],
+    "aisef2/app/usage.py::session_tokens": [_R3 + "client_stream.py"],
+    "aisef2/app/confine.py::_sections": [_R3 + "client_readers.py"],
+    "aisef2/app/lineage.py::reconcile": [_R3 + "client_readers.py"],
 }
 _V21_R3_RANGE = {t: list(k) for t, k in P4_TARGETS.items() if t.startswith("aisef2/runtime/process_range.py::")}
 _V21_R3_RANGE_APPEND = {
