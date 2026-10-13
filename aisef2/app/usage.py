@@ -17,10 +17,11 @@ asked: aisef2/app/verify.py), not only of the journals the kernel's story runner
 
 from __future__ import annotations
 
-import json
 import pathlib
 import re
 from typing import Mapping
+
+from aisef2.app import client
 
 PRICE_KEYS = ("currency", "input_per_mtok", "cache_read_per_mtok", "cache_write_per_mtok", "output_per_mtok", "source",
               "effective_date")
@@ -47,13 +48,7 @@ def session_tokens(log: pathlib.Path) -> dict:
     """One session's tokens by class, its finished steps and those that reported no tokens."""
     t = dict.fromkeys(CLASSES, 0)
     steps = blind = 0
-    for line in log.read_text(encoding="utf-8", errors="replace").splitlines():
-        if not line.startswith("{"):
-            continue
-        try:
-            ev = json.loads(line)
-        except ValueError:
-            continue
+    for ev in client.events(log):      # the budget's own reading of the stream: the two accounts never read it differently
         if ev.get("type") != "step_finish":
             continue
         steps += 1
