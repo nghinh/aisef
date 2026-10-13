@@ -24,6 +24,7 @@ import json
 import os
 import pathlib
 import queue
+import re
 import signal
 import subprocess
 import sys
@@ -56,6 +57,13 @@ class RangeEscaped(Residual):
     range's — and, since they could still write, nothing that depends on the range may be released either."""
 
 
+class ProcessTableError(Exception):
+    """`ps` printed a line that is not a process row. The table is not returned: a row dropped is a process the table
+    cannot see (a member, a survivor) and a row made up is one that is not there. Not a `Residual` (it says nothing
+    about what is alive) and not a `RangeError` (callers read that as "the tool could not start" and go on): it
+    propagates, as a failed `ps` (`CalledProcessError`) always did. The message names the line, cut to 80 characters."""
+
+
 @dataclass(frozen=True)
 class Proc:
     pid: int
@@ -73,7 +81,9 @@ def _linux_table() -> dict[int, Proc]:
         if not entry.name.isdigit():
             continue
         try:
-            stat = pathlib.Path(entry.path, "stat").read_text()
+            # bytes, decoded with replacement: a process's name is its own (`prctl(PR_SET_NAME)`), and one that is not
+            # UTF-8 made `read_text()` raise UnicodeDecodeError — not the OSError skipped below — for the whole host
+            stat = pathlib.Path(entry.path, "stat").read_bytes().decode("utf-8", "replace")
             cmd = pathlib.Path(entry.path, "cmdline").read_bytes().replace(b"\0", b" ").decode("utf-8", "replace")
         except OSError:
             continue  # it exited while the table was read
@@ -86,14 +96,21 @@ def _linux_table() -> dict[int, Proc]:
 
 
 def _ps_table() -> dict[int, Proc]:
-    r = subprocess.run(["ps", "-A", "-o", "pid=,ppid=,pgid=,stat=,command="], capture_output=True, encoding="utf-8",
-                       errors="replace", check=True)
+    r = subprocess.run(["ps", "-A", "-o", "pid=,ppid=,pgid=,stat=,command="], capture_output=True, check=True)
     out = {}
-    for line in r.stdout.splitlines():
-        f = line.split(None, 4)
-        if len(f) < 4 or f[3].startswith("Z"):
+    # A row ends at "\n" and nowhere else. `ps` escapes a newline inside a command (`\012`) but prints U+2028, U+2029
+    # and the like raw (in a UTF-8 locale), so `str.splitlines()` — and text mode, which also turns "\r" into "\n" —
+    # cut a row inside its command: the tail was dropped (a survivor named after the cut was not found), or raised
+    # (`int('alpha')`), or, when it looked like a row, became one (a process that is not there).
+    for line in r.stdout.decode("utf-8", "replace").split("\n"):
+        if not line.strip(" "):
+            continue  # the end of the output (it ends with "\n"), or a blank line: no process
+        m = re.fullmatch(r" *([0-9]+) +([0-9]+) +([0-9]+) +([^ ]+)(?: +(.*))?", line)  # pid ppid pgid stat [command]
+        if m is None:
+            raise ProcessTableError(f"ps printed a line that is not a process row: {line[:80]!r}")
+        if m[4].startswith("Z"):
             continue
-        out[int(f[0])] = Proc(int(f[0]), int(f[1]), int(f[2]), None, f[4] if len(f) > 4 else "")
+        out[int(m[1])] = Proc(int(m[1]), int(m[2]), int(m[3]), None, m[5] or "")
     return out
 
 

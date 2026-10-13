@@ -87,8 +87,8 @@ class NoPidAncestry(unittest.TestCase):
         self.assertEqual(pr.descendants(table, 1), [2, 3, 5, 9])
         self.assertEqual(pr.targets(table, members=[9, 5, 3]), [3, 5, 9])
 
-    def test_the_ps_reader_skips_zombies_and_short_lines_and_a_failed_ps_is_not_an_empty_table(self):
-        out = b"   10     1    10 Ss   /bin/zsh -l\n   11    10    10 Z    (python)\n   12    10\n" \
+    def test_the_ps_reader_skips_zombies_while_a_line_that_is_not_a_row_and_a_failed_ps_are_errors(self):
+        out = b"   10     1    10 Ss   /bin/zsh -l\n   11    10    10 Z    (python)\n" \
               b"   13    10    10 R\n   14    10    14 S    bad\xff name\n"
         real = subprocess.run
 
@@ -101,6 +101,11 @@ class NoPidAncestry(unittest.TestCase):
         self.assertEqual(table[10], Proc(10, 1, 10, None, "/bin/zsh -l"))
         self.assertEqual(table[13].command, "")
         self.assertEqual(table[14], Proc(14, 10, 14, None, "bad\ufffd name"))  # not UTF-8: still measured
+        # B03 r3 (range-fu): a line with only pid and ppid used to be skipped here. It is no row, and a row skipped is a
+        # process the table cannot see: it is an error that names the line (the lead's brief, "never a silently skipped row")
+        with mock.patch.object(pr.subprocess, "run", answered(out + b"   12    10\n")), \
+                self.assertRaises(pr.ProcessTableError):
+            pr._ps_table()
         with mock.patch.object(pr.subprocess, "run", answered(b"", 1)), self.assertRaises(subprocess.CalledProcessError):
             pr._ps_table()  # a failed measurement is an error, never an empty range
 
