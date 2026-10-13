@@ -212,7 +212,7 @@ class TheAccounts(_Dir):
         log = write(self.tmp / "logs" / "s.jsonl", record(step(1, 1, reason=f"stop{sep}")), record(step(1, 1, reason=f"stop{sep}")))
         budget = client.Budget(LIMITS, ZERO, self.tmp / "logs", lambda: 1)
         running = types.SimpleNamespace(wait=lambda timeout: None)      # a session that is still running
-        code, stopped = client.wait_within(running, log, 60, budget, 2)
+        code, stopped = client.wait_within(running, log, 2, budget, 2)    # returns at the first look; 2 s only bounds a failure
         self.assertEqual((code, stopped), (None, "session turn cap: 2 turns"))
 
 
