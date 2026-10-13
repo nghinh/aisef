@@ -175,7 +175,6 @@ class NotARow(unittest.TestCase):
         "a day that does not exist": "   12     7    12 Sun Feb 31 09:30:00 2026     c",
         "a clock that is no time": "   12     7    12 Sun Oct 11 25:61:00 2026     c",
         "a year of five digits": "   12     7    12 Sun Oct 11 09:30:00 20266     c",
-        "a year the clock cannot hold": "   12     7    12 Mon Jan  1 00:00:00 0001     c",
         "text glued to the year": f"   12     7    12 {EARLY}x c",
         "a localised date": "   12     7    12 Di. 13 Okt. 08:03:59 2026     c",
         "only a separator": " ",
@@ -195,6 +194,15 @@ class NotARow(unittest.TestCase):
                     self.assertNotIsInstance(cm.exception, ValueError)
                     self.assertTrue(str(cm.exception).startswith("ps printed a line that is not a process row: "),
                                     str(cm.exception))   # what the operator reads under HOST_TABLE_UNREADABLE
+
+    def test_a_date_the_clock_cannot_hold_is_not_a_row_and_not_an_overflow(self):
+        """`time.mktime` raises OverflowError for a year it cannot represent (measured: macOS, year 0001; glibc holds
+        it, so the clock is made to refuse here to be the same on every host)."""
+        with mock.patch.object(ca.time, "mktime", side_effect=OverflowError("mktime argument out of range")):
+            with self.assertRaises(ca.TableUnreadable) as cm:
+                table_of(row(100, 1, 100) + reader_row())
+        self.assertNotIsInstance(cm.exception, ArithmeticError)
+        self.assertTrue(str(cm.exception).startswith("ps printed a line that is not a process row: "))
 
     def test_the_error_names_the_line_cut_to_eighty_characters(self):
         bad = "x" * 200
