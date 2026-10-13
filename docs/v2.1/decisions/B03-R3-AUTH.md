@@ -119,7 +119,8 @@ runner reports "no stray left"; refusing stops the target, which is the runner's
 | `cwd_under`: a path with a separator is one field; field-shaped path text makes no process; refusals; the argv; the Linux branch | `CwdUnder.*` (11), `CwdUnderOnLinux.*` (2), real: `TheRealHost.test_a_process_working_in_a_directory_with_a_separator_...` |
 
 **Wrong implementations tried** (`wrong_impls.py.txt`, one edit each of the fixed module; the file must fail, and does,
-`wrong-impls-ps-table.txt`): `str.splitlines()` of the decoded text (the old bug), `bytes.splitlines()` (cuts at CR),
+`wrong-impls-ps-table.txt`; taken on an earlier state of the module, one anchor of which is gone from the final one — the
+reviewer re-ran 25 one-edit variants of the final module, all caught: `review/wrong-impls-rv.txt`): `str.splitlines()` of the decoded text (the old bug), `bytes.splitlines()` (cuts at CR),
 skipping a non-row, skipping a bad date, the later row of a pid wins, `lstrip()` of the command, `ps` in the user's locale,
 reading a failed `ps`, a reader that need not list itself, `\d` for the digits. All ten fail.
 
@@ -164,6 +165,11 @@ added for it, none was dispositioned as equivalent or audited.
 so there is no registered kill set to add to; the files above are the kill files to register if the lead wants it.
 `TableUnreadable` has no logic; `establish`, `host_table` changed in docstrings only.
 
+Review (section 9): all 222 re-run by the reviewer (0 survived). After the digit bound, `_ps_rows` 25, `_env_rows` 8,
+`_win_rows` 15 and `_lsof_cwds` 27 were re-run with `tests/v2/test_v21_r3_auth_rv_digits.py` added as a third kill
+file: all KILLED, T0 PASS for the three files. (Two `kill_check` runs started at once from one tree see each other's
+test processes as leftovers of the same worker and stop with NOT_RUN: run them one after another.)
+
 ## 7. Existing test changed (one)
 
 `tests/v2/test_v21_defects_runner.py`: (a) `FakePs.communicate` returns the **bytes** `ps` printed (what a binary-mode
@@ -176,9 +182,14 @@ INV-MUTATION-AUTHORITY ("a skipped line is a process the table cannot see"). The
 ## 8. Not established / residual
 
 * **A `ps` that prints a raw LF inside a command** is the one way left to put a row-shaped line into the table: by
-  shape it cannot be told from a real row. None was measured (macOS: `\012`; procps: a space). What is closed for it is
-  the case where the forged pid is also listed (refused as a pid listed twice); a forged row for a pid that is not
-  listed (and might be reused) is not caught. Closing it needs a second source (sysctl/`/proc`), which I did not build.
+  shape it cannot be told from a real row. None was measured (macOS: `\012`; procps: a space; measured again in
+  review, section 9). What is closed for it is the case where the forged pid is also listed (refused as a pid listed
+  twice); a forged row for a pid that is not listed is not caught. **Its reach is wider than "a pid that might be
+  reused"** (review): a process group id outlives its leader, so a forged row `N <runner> N <later date>` for a group
+  whose leader has exited makes `signal_owned(groups=[N])` `killpg` the live, unrelated members of group N
+  (simulated: `review/residual_sim.py.txt`; `prove_member` still refuses a member born before the boundary, `killpg`
+  does not look at members). Closing it needs a second source or no free-text column in the ownership read (sysctl,
+  `/proc`, or `ps -o pid=,ppid=,pgid=,lstart=` without `command=`), which is not built: an owner decision (section 9).
 * **Windows is not run.** The script, the base64 decode and the strictness were tested against the format only. If the
   script is wrong the failure is an empty or refused table: no authority is expanded, but the Windows path may be
   unusable until it is run once on a real Windows (PowerShell 5.1 and 7).
@@ -190,3 +201,43 @@ INV-MUTATION-AUTHORITY ("a skipped line is a process the table cannot see"). The
 * Sealed records, K-NOWORK, Q0 and the calibration record are stale after any product change; in this tree
   `p0/test_checker_calibration` (4 failures) and `test_v21_mutation_runner.Classify.test_historical_records_read_as_before`
   (1) fail on `process_range.py` targets "changed since the mutation run", i.e. from WP range-fu, not from this file.
+* **Candidates under a prefix that holds a control character are not found by `cwd_under` on macOS**: `lsof -F` prints
+  TAB, LF, CR, FF as `\t \n \r \f`, VT/ESC as `^K ^[`, a backslash as `\\` and DEL/NEL as `\x7f \xc2\x85` (measured in
+  review, `review/probe_lsof_names.out.txt`), so the text of such a path is not the path. Unchanged by this WP; the
+  runner's prefix is its own scratch directory (`tg.boundary.root + os.sep`), and a control character *after* it still
+  matches. U+2028, U+2029, NBSP are printed raw and are found.
+* `time.strptime` reads the weekday and month names in the **process's** LC_TIME (C unless something calls
+  `locale.setlocale`; nothing in this repo does). Were it set to a non-English locale every honest row would be refused
+  (typed, fail-closed: HOST_TABLE_UNREADABLE) — as it was before this change ("did not list itself").
+
+## 9. Independent review (WP auth-rv)
+
+Re-run, not read. What it added, all under `$R3/out/auth/review/`:
+
+* **One defect fixed** (commit on `v21r3/auth-rv`): the row patterns accepted `[0-9]+`, and `int()` of more than 4300
+  digits raises `ValueError` (CPython 3.11+), which is not the typed `TableUnreadable` — in all four readers
+  (`ps`, `ps -E`, `lsof`, PowerShell). Reachable only through a line no measured tool prints (a raw-LF `ps`, a broken
+  `lsof`), so the severity is low, but it is the defect class of batch T23a (a `ValueError` out of the reader). Every
+  number is now bounded to what a host prints: pid, parent, group `[0-9]{1,10}` (pid_t is 32 bits; a Windows DWORD is
+  4294967295), seconds since 1970 `[0-9]{1,12}`. `tests/v2/test_v21_r3_auth_rv_digits.py` (4 tests; four wrong
+  bounds fail it: unbounded, 9 digits, one reader missed, only the pid).
+* **Raw LF measured again** (real children, nothing signalled): macOS `ps` escapes LF/CR/VT/FF/FS/NEL in argv **and in
+  an environment string** (`ps -E`) and prints U+2028/U+2029 raw (`probe_ps_env_lf.out.txt`); a process whose comm
+  holds a separator shows as `<defunct>` or the interpreter's name, not the symlink's (`probe_comm_lf.out.txt`); in the
+  Linux guest procps prints `?` for a separator in a comm, a zombie's `[comm]` and an empty argv
+  (`guest-probe-comm.out.txt`: 15 lines, all rows).
+* **An independent matrix**, real children, 274 variants per run (33 separators, each before/around a forged row,
+  parent = the runner and = a carrier, argv[0] itself a row / a lstart lookalike / led by NBSP or U+2028, invalid UTF-8,
+  empty arguments, a 100 000-character argument, environments and working directories holding the same): at the
+  integration head 68 variants put the victim in `owned`, 63 in `prove_member`, 131 entries `signalled`
+  (`adv-real-before.json`); on this branch none, no refusal, every row equal to an independent `ps -p`
+  (`adv-real-after-digits.json`; `adv-real-after.json` is the same run before the digits fix), the same in the Linux guest (`adv-guest-after.json`, procps prints a separator as `?`, so only the checks that do not expect it raw).
+* **No refusal of an honest table**: the real host table in 23 environments (11 LC_ALL values incl. th/ar/fa/he/zh,
+  LC_TIME/LANG/LANGUAGE alone, COLUMNS 0/1/20, four time zones incl. +5:30 and +12:45), 150 reads while processes were
+  started and ended, `carriers` and `cwd_under` over the whole table, 60 more of each (180 reads) under churn: 0 refusals
+  (`honest-real-out.json`, `stress-real-out.json`). 20 000 generated tables (commands with every separator,
+  forged-row text, invalid UTF-8): the reading equals the oracle and `owned` is the same (`fuzz_parser.py.txt`).
+* **A `ps` that printed a raw LF, simulated 20 000 times** (`fuzz-out.txt`): never an altered or lost row for a listed
+  pid; an extra row for an unlisted pid is accepted in 7 648 of 9 500 accepted readings — the residual of section 8.
+* **Windows**: the script is valid PowerShell by reading (balanced; one `$_.CommandLine`, inside
+  `ToBase64String(UTF8.GetBytes([string]...))`; `-f` over a comma list; no double quotes or backticks); it was not run.
