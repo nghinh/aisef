@@ -886,8 +886,59 @@ for _t, _fs in _V21_KILLS3.items():
 # constants have no mutants (a tuple of errno names and of integers).
 for _t, _src in {'aisef2/app/lineage.py::_look': 'aisef2/app/lineage.py::account_of'}.items():
     V21_TARGETS[_t] = list(V21_TARGETS[_src])
+# --- round 3 ---
+# B-03 round 3 (2026-10-13): the owner's decisions on the nine open mutants (docs/v2.1/decisions/B03-R3-*.md) changed
+# aisef2/app/{confine,usage,verify,review_verify,adapters,run}.py and aisef2/runtime/process_range.py. Each name they
+# added is a target of its own with the kill files its work package proved it with (validation/v21/kill_check.py over
+# every mutant of the name); each name they changed gets the work package's files appended last. process_range.py is a
+# V2.0 P4 module: the file changed, so every one of its targets is a V2.1 target now (the earlier record keeps its
+# historical entries: SUPERSEDED), with the P4 kill set first.
+_R3 = "tests/v2/test_v21_r3_"
+_R3_CONF = (_R3 + "conf_policy.py", _R3 + "conf_rv_hostrows.py", _R3 + "conf_fu_before.py")
+_V21_R3_NEW: dict[str, list[str]] = {
+    "aisef2/app/confine.py::_owned": [*_R3_CONF],
+    "aisef2/app/confine.py::_writes": [_R3_CONF[0], _R3_CONF[2]],
+    "aisef2/app/confine.py::_host_mounts": [_R3_CONF[0], _R3_CONF[2]],
+    "aisef2/app/confine.py::_device_roots": [_R3_CONF[0]],
+    "aisef2/app/confine.py::PSEUDO": [_R3_CONF[0]],
+    "aisef2/app/confine.py::DEVICES": [_R3_CONF[0]],
+    "aisef2/app/confine.py::_DEV": [_R3_CONF[0]],
+    "aisef2/app/confine.py::_PEER": [_R3_CONF[0]],
+    "aisef2/app/confine.py::LOCALE": [_R3 + "conf_locale.py"],
+    **{f"aisef2/app/review_verify.py::{n}": [_R3 + "detail_statement.py", _R3 + "detail_artifact.py"]
+       for n in ("redacted", "_fit", "_dumps", "Artifact.__post_init__", "preserve", "artifact_problems",
+                 "_ARTIFACT_PATH", "_SHA256")},
+    "aisef2/app/verify.py::_projection_refusal": [_R3 + "usage_boundary.py"],
+    "aisef2/runtime/process_range.py::ProcessRange.__init__": [_R3 + "range_release_contract.py"],
+    "aisef2/runtime/process_range.py::ProcessRange._ladder": ["tests/v2/p4/test_process_range.py", _R3 + "range_release_contract.py"],
+    "aisef2/runtime/process_range.py::ProcessRange._release": ["tests/v2/p4/test_process_range.py", _R3 + "range_release_contract.py"],
+    "aisef2/runtime/process_range.py::_Flight.__init__": [_R3 + "range_release_contract.py"],
+    "aisef2/runtime/process_range.py::_Flight.__slots__": [_R3 + "range_release_contract.py"],
+    "aisef2/runtime/process_range.py::_linux_table": [_R3 + "range_fu_linux_table.py"],
+}
+_V21_R3_APPEND: dict[str, list[str]] = {
+    "aisef2/app/confine.py::_judge": [*_R3_CONF],
+    "aisef2/app/confine.py::_mounts": [_R3_CONF[0]],
+    "aisef2/app/confine.py::_probe": [_R3_CONF[0], _R3 + "conf_locale.py", _R3_CONF[2]],
+    "aisef2/app/confine.py::measure": [_R3_CONF[0], _R3 + "conf_locale.py", _R3_CONF[2]],
+    "aisef2/app/review_verify.py::detail": [_R3 + "detail_statement.py"],
+    "aisef2/app/run.py::evidence_manifest": [_R3 + "detail_artifact.py"],
+    "aisef2/app/adapters.py::Reviewer.review": [_R3 + "detail_artifact.py"],
+    "aisef2/app/adapters.py::Reviewer._ocr": [_R3 + "detail_rv_finderfiles.py"],
+    "aisef2/app/usage.py::no_progress": [_R3 + "usage_no_progress.py", _R3 + "usage_review.py"],
+    "aisef2/app/verify.py::verify": [_R3 + "usage_boundary.py", _R3 + "usage_review.py", _R3 + "detail_product.py"],
+}
+_V21_R3_RANGE = {t: list(k) for t, k in P4_TARGETS.items() if t.startswith("aisef2/runtime/process_range.py::")}
+_V21_R3_RANGE_APPEND = {
+    "aisef2/runtime/process_range.py::_ps_table": [_R3 + "range_fu_ps_table.py"],
+    "aisef2/runtime/process_range.py::ProcessRange.release": [_R3 + "range_release_contract.py"],
+}
+for _t, _fs in {**_V21_R3_RANGE, **_V21_R3_NEW}.items():
+    V21_TARGETS[_t] = list(_fs)
+for _t, _fs in {**_V21_R3_RANGE_APPEND, **_V21_R3_APPEND}.items():
+    V21_TARGETS[_t] = [*V21_TARGETS[_t], *[f for f in _fs if f not in V21_TARGETS[_t]]]
 SUPERSEDED.update({t: "V2.1" for t in V21_TARGETS})
-for _phase in (P2_TARGETS, P6_TARGETS, C2_P1_TARGETS):
+for _phase in (P2_TARGETS, P4_TARGETS, P6_TARGETS, C2_P1_TARGETS):
     for _t in [t for t in _phase if t in V21_TARGETS]:
         del _phase[_t]
 RECORDS["V2.1"] = "closure-evidence/v2/v2.1/MUTATION.json"
