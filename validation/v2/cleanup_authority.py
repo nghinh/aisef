@@ -26,9 +26,12 @@ The static half is `destructive_authority.py`: every destructive call site is le
 
 from __future__ import annotations
 
+import base64
+import binascii
 import dataclasses
 import os
 import pathlib
+import re
 import signal
 import subprocess
 import sys
@@ -72,6 +75,14 @@ class Unproven(Exception):
     """RESIDUAL_OWNERSHIP_UNKNOWN: a cleanup candidate whose ownership this module could not prove."""
 
 
+class TableUnreadable(OSError):
+    """A reading of the host (the process table, the environments, the working directories) cannot be taken as the tool
+    printed it: the tool failed, did not list this process, or printed a line that is not a row. An OSError, so every
+    caller that already stops on "the table cannot be read" (mutation.py `_clean`, `_settle`: HOST_TABLE_UNREADABLE)
+    stops on this one too; no partial reading is returned. A line skipped is a process the reading cannot see, and a
+    line made up is one that is not there — a command line is implementation output, so neither may be silent."""
+
+
 def establish(root) -> Boundary:
     """Call before spawning the first worker of a target: the birth floor is the birth of this call's own table
     reader, in the table's clock (falls back to the wall clock only when the reader did not list itself)."""
@@ -83,51 +94,118 @@ def establish(root) -> Boundary:
 def host_table() -> dict[int, Host]:
     """This module's own reading of the host: pid, ppid, pgid, start time, command. POSIX: `ps`, zombies included (a
     zombie leader still pins its group id). Windows: Win32_Process through PowerShell — pid, parent, creation time,
-    command; there is no process group, so a group is never provable there (pgid -1). POSIX: OSError when `ps` fails
-    or does not list itself — an empty reading never stands for "everything is gone"."""
+    command; there is no process group, so a group is never provable there (pgid -1). POSIX: TableUnreadable (an
+    OSError) when `ps` fails, does not list itself, or prints a line that is no row — an empty or partial reading never
+    stands for "everything is gone", and a command line never makes or hides a row."""
     return _read()[0]
 
 
+#: one `ps -A -o pid=,ppid=,pgid=,lstart=,command=` row: ASCII digits, `lstart` as `Www Mmm dd HH:MM:SS yyyy` (the day
+#: padded with spaces below 10: `Oct  6`), then the command as printed. Only ASCII spaces separate the columns, so a
+#: command that starts with a no-break or ideographic space keeps it. macOS pads the `lstart` column to five spaces,
+#: procps to one; the padding cannot be told from leading spaces of the command, and is not part of it.
+_PS_ROW = re.compile(r" *([0-9]+) +([0-9]+) +([0-9]+) +([A-Za-z]{3}) ([A-Za-z]{3}) +([0-9]{1,2}) "
+                     r"([0-9]{2}:[0-9]{2}:[0-9]{2}) ([0-9]{4})(?: +(.*))?")
+#: one `ps -E -ww -A -o pid=,command=` row: the pid, then the command and its environment as printed
+_PS_ENV_ROW = re.compile(r" *([0-9]+)(?: +(.*))?")
+#: one Windows row, as the PowerShell script prints it: pid|ppid|seconds since 1970|base64 of the UTF-8 command line
+_WIN_ROW = re.compile(r"([0-9]+)\|([0-9]+)\|(-?[0-9]+)\|([A-Za-z0-9+/]*={0,2})")
+
+
+def _lines(raw: bytes) -> list[str]:
+    """The non-blank lines of a tool's output. A line ends at "\n" and nowhere else: `ps` and `lsof` escape LF in what
+    they print (macOS also CR, VT, FF) but print U+2028, U+2029 and the like raw, so `str.splitlines()` — and a text-mode
+    read, which also turns CR into LF — cut a command in two: the tail was dropped, or made a row of a process that is
+    not there. Bytes, each line decoded with replacement."""
+    return [line for line in (b.decode("utf-8", "replace") for b in raw.split(b"\n")) if line.strip(" ")]
+
+
+def _not_a_row(tool: str, line: str) -> TableUnreadable:
+    return TableUnreadable(f"{tool} printed a line that is not a process row: {line[:80]!r}")
+
+
+def _twice(tool: str, pid: str, line: str) -> TableUnreadable:
+    return TableUnreadable(f"{tool} listed pid {pid} twice: {line[:80]!r}")   # a process is listed once; a row made up
+
+
+def _ps_env() -> dict[str, str]:
+    """The environment `ps` runs in. Its `lstart` is printed in the locale's own words (measured on macOS under
+    de_DE.UTF-8: `Di. 13 Okt. 08:03:59 2026`), which the row pattern is not: LC_TIME is pinned to C. LC_ALL would
+    override it, so its value moves to LC_CTYPE — the category that decides how the bytes of a command are printed."""
+    env = dict(os.environ)
+    if "LC_ALL" in env:
+        env["LC_CTYPE"] = env.pop("LC_ALL")
+    env["LC_TIME"] = "C"
+    return env
+
+
+def _ps_rows(raw: bytes) -> dict[int, Host]:
+    """Every line of `ps -A -o pid=,ppid=,pgid=,lstart=,command=` is a row, or the reading is refused (TableUnreadable):
+    a pid listed twice, a date that is no date, a line of any other shape. Whole or not returned — never a table with a
+    process the reader skipped or one it made up."""
+    out: dict[int, Host] = {}
+    for line in _lines(raw):
+        m = _PS_ROW.fullmatch(line)
+        if m is None:
+            raise _not_a_row("ps", line)
+        pid, ppid, pgid, wday, month, day, clock, year, command = m.groups()
+        try:
+            born = time.mktime(time.strptime(f"{wday} {month} {day} {clock} {year}", "%a %b %d %H:%M:%S %Y"))
+        except (ValueError, OverflowError):
+            raise _not_a_row("ps", line) from None
+        if int(pid) in out:
+            raise _twice("ps", pid, line)
+        out[int(pid)] = Host(int(pid), int(ppid), int(pgid), born, command or "")
+    return out
+
+
 def _read() -> tuple[dict[int, Host], int]:
-    """(table, pid of the reader process that produced it — it lists itself, and its birth dates the reading)."""
+    """(table, pid of the reader process that produced it — it lists itself, and its birth dates the reading).
+    TableUnreadable (an OSError) when `ps` fails, does not list itself, or prints a line that is no row."""
     if not POSIX:
         return _windows_table()
     proc = subprocess.Popen(["ps", "-A", "-o", "pid=,ppid=,pgid=,lstart=,command="], stdout=subprocess.PIPE,
-                            encoding="utf-8", errors="replace")
-    stdout, _ = proc.communicate()
-    out = {}
-    for line in stdout.splitlines():
-        f = line.split(None, 8)  # pid ppid pgid Www Mmm dd HH:MM:SS yyyy command
-        if len(f) < 8 or not all(x.isdigit() for x in f[:3]):   # a continuation line of a multi-line command is no row
-            continue
-        try:
-            born = time.mktime(time.strptime(" ".join(f[3:8]), "%a %b %d %H:%M:%S %Y"))
-        except ValueError:
-            continue
-        out[int(f[0])] = Host(int(f[0]), int(f[1]), int(f[2]), born, f[8] if len(f) > 8 else "")
-    if proc.returncode != 0 or proc.pid not in out:   # a failed or partial reading would read as "every process gone"
-        raise OSError(f"ps -A exited {proc.returncode} and {'listed' if proc.pid in out else 'did not list'} itself: "
-                      "the host table cannot be read")
+                            env=_ps_env())
+    raw, _ = proc.communicate()
+    if proc.returncode != 0:   # what a failed ps printed is not read: a partial table reads as "every process gone"
+        raise TableUnreadable(f"ps -A exited {proc.returncode}: the host table cannot be read")
+    out = _ps_rows(raw)
+    if proc.pid not in out:
+        raise TableUnreadable("ps -A did not list itself: the host table cannot be read")
     return out, proc.pid
+
+
+def _win_rows(raw: bytes) -> dict[int, Host]:
+    """The PowerShell output: one `pid|ppid|seconds|base64` row per line, CR LF terminated — or TableUnreadable."""
+    out: dict[int, Host] = {}
+    for line in _lines(raw.replace(b"\r\n", b"\n")):
+        m = _WIN_ROW.fullmatch(line)
+        if m is None:
+            raise _not_a_row("powershell", line)
+        pid, ppid, born, command = m.groups()
+        try:
+            text = base64.b64decode(command, validate=True).decode("utf-8", "replace")
+        except binascii.Error:
+            raise _not_a_row("powershell", line) from None
+        if int(pid) in out:
+            raise _twice("powershell", pid, line)
+        out[int(pid)] = Host(int(pid), int(ppid), -1, float(born), text)
+    return out
 
 
 def _windows_table() -> tuple[dict[int, Host], int]:
+    # the command line travels as base64 of its UTF-8 bytes: it may hold any character, a raw CR or LF included, and
+    # what is printed is ASCII, one row per line — a command line cannot end a row or begin another
     script = ("Get-CimInstance Win32_Process | ForEach-Object { '{0}|{1}|{2}|{3}' -f $_.ProcessId, $_.ParentProcessId, "
-              "[int64]((Get-Date $_.CreationDate).ToUniversalTime() - (Get-Date '1970-01-01')).TotalSeconds, $_.CommandLine }")
+              "[int64]((Get-Date $_.CreationDate).ToUniversalTime() - (Get-Date '1970-01-01')).TotalSeconds, "
+              "[Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes([string]$_.CommandLine)) }")
     try:
         proc = subprocess.Popen(["powershell", "-NoProfile", "-NonInteractive", "-Command", script],
-                                stdout=subprocess.PIPE, encoding="utf-8", errors="replace")
-        stdout, _ = proc.communicate(timeout=60)
+                                stdout=subprocess.PIPE)
+        raw, _ = proc.communicate(timeout=60)
     except (OSError, subprocess.TimeoutExpired):
         return {}, -1  # nothing provable: every candidate is RESIDUAL_OWNERSHIP_UNKNOWN
-    out = {}
-    for line in stdout.splitlines():
-        f = line.split("|", 3)
-        try:
-            out[int(f[0])] = Host(int(f[0]), int(f[1]), -1, float(f[2]), f[3] if len(f) > 3 else "")
-        except (ValueError, IndexError):
-            continue
-    return out, proc.pid
+    return _win_rows(raw), proc.pid
 
 
 def owned(boundary: Boundary, table: dict[int, Host] | None = None) -> dict[int, Host]:
@@ -158,6 +236,42 @@ def strays(boundary: Boundary, table: dict[int, Host] | None = None) -> list[Hos
                   key=lambda p: p.pid)
 
 
+def _env_rows(raw: bytes) -> dict[int, str]:
+    """`ps -E -ww -A -o pid=,command=`: {pid: the command and its environment as printed}. macOS escapes LF in an
+    environment string as it does in a command, but prints U+2028 and the like raw; a line that is no row, or a pid
+    listed twice, is TableUnreadable — an environment string may hold any text, so it never ends a row."""
+    out: dict[int, str] = {}
+    for line in _lines(raw):
+        m = _PS_ENV_ROW.fullmatch(line)
+        if m is None:
+            raise _not_a_row("ps -E", line)
+        if int(m[1]) in out:
+            raise _twice("ps -E", m[1], line)
+        out[int(m[1])] = m[2] or ""
+    return out
+
+
+def _lsof_cwds(raw: bytes) -> dict[int, str]:
+    """`lsof ... -F0pn` -> {pid: working directory}. `-0` ends each field at NUL, which no path holds, and each set at
+    LF: a path with U+2028 (or, were one printed raw, an LF) is one field. A field that is not `p<digits>`, `f...` or
+    `n...`, or output that stops inside a field, is TableUnreadable."""
+    *fields, tail = raw.split(b"\0")
+    if tail not in (b"", b"\n"):
+        raise TableUnreadable(f"lsof output ends inside a field: {tail[:80]!r}")
+    out: dict[int, str] = {}
+    pid = None
+    for field in fields:
+        field = field[1:] if field[:1] == b"\n" else field
+        kind, value = field[:1], field[1:].decode("utf-8", "replace")
+        if kind == b"p" and re.fullmatch("[0-9]+", value):
+            pid = int(value)
+        elif kind == b"n" and pid is not None:
+            out[pid] = value
+        elif kind != b"f":
+            raise TableUnreadable(f"lsof printed a field that is not p, f or n of a process: {field[:80]!r}")
+    return out
+
+
 def carriers(prefix: str, table: dict[int, Host] | None = None) -> list[Host]:
     """Processes whose environment holds `prefix` (the mutation runner's `AISEF_MUTATION_RUN=<worker>:`) — candidates
     only, like `strays`; `signal_owned` still proves each. A child given its own environment does not carry it, and
@@ -177,19 +291,14 @@ def carriers(prefix: str, table: dict[int, Host] | None = None) -> list[Host]:
             if any(v.startswith(prefix.encode()) for v in env.split(b"\0")):
                 hits.add(pid)
     else:
-        proc = subprocess.Popen(["ps", "-E", "-ww", "-A", "-o", "pid=,command="], stdout=subprocess.PIPE,
-                                encoding="utf-8", errors="replace")
-        out, _ = proc.communicate()
-        listed = set()
-        for line in out.splitlines():
-            f = line.split(None, 1)
-            if f and f[0].isdigit():
-                listed.add(int(f[0]))
-                if len(f) == 2 and prefix in f[1]:
-                    hits.add(int(f[0]))
-        if proc.returncode != 0 or proc.pid not in listed:   # fail closed, as host_table does
-            raise OSError(f"ps -E exited {proc.returncode} and {'listed' if proc.pid in listed else 'did not list'} "
-                          "itself: the environments cannot be read")
+        proc = subprocess.Popen(["ps", "-E", "-ww", "-A", "-o", "pid=,command="], stdout=subprocess.PIPE)
+        raw, _ = proc.communicate()
+        if proc.returncode != 0:   # fail closed, as host_table does
+            raise TableUnreadable(f"ps -E exited {proc.returncode}: the environments cannot be read")
+        listed = _env_rows(raw)
+        if proc.pid not in listed:
+            raise TableUnreadable("ps -E did not list itself: the environments cannot be read")
+        hits.update(pid for pid, text in listed.items() if prefix in text)
     return sorted((table[p] for p in hits if p in table and p != os.getpid()), key=lambda p: p.pid)
 
 
@@ -214,16 +323,11 @@ def cwd_under(prefix: str, table: dict[int, Host] | None = None, since: float | 
             except OSError:
                 continue
     else:
-        out = subprocess.run(["lsof", "-nP", "-w", "-a", "-d", "cwd", "-Fpn", "-p", ",".join(map(str, [os.getpid(), *pids]))],
-                             capture_output=True, encoding="utf-8", errors="replace").stdout
-        pid = None
-        for line in out.splitlines():
-            if line[:1] == "p" and line[1:].isdigit():
-                pid = int(line[1:])
-            elif line[:1] == "n" and pid is not None:
-                cwd[pid] = line[1:]
+        asked = ",".join(map(str, [os.getpid(), *pids]))
+        raw = subprocess.run(["lsof", "-nP", "-w", "-a", "-d", "cwd", "-F0pn", "-p", asked], capture_output=True).stdout
+        cwd = _lsof_cwds(raw)
         if os.getpid() not in cwd:   # lsof exits 1 when an asked pid is gone; an empty answer would read as "none"
-            raise OSError("lsof did not list this process's cwd: the working directories cannot be read")
+            raise TableUnreadable("lsof did not list this process's cwd: the working directories cannot be read")
     hits = [p for p, d in cwd.items() if p != os.getpid() and any((d + os.sep).startswith(m) for m in marks)]
     return sorted((table[p] for p in hits if p in table), key=lambda p: p.pid)
 

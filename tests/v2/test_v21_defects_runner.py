@@ -1,10 +1,15 @@
 """V2.1 (B-03, survivor audit of campaign 2): the cleanup authority's reading of the host table.
 
-`ps -A -o pid=,ppid=,pgid=,lstart=,command=` prints a command that holds a newline over several lines. A continuation
-line whose fields 3..7 happen to read as a date (`foo bar baz Sun Oct 11 09:30:00 2026 ...`) reached `int(f[0])` and
-raised ValueError out of the reader — the runner stopped on a RUNNER_EXCEPTION/INFRA for any process of the host that
-had a multi-line command (two kill_check runs of batch T23a). A line that is no row is no row; the table is what the
-real rows say, and a table that does not list the reader itself is still refused."""
+`ps -A -o pid=,ppid=,pgid=,lstart=,command=` was reported to print a command that holds a newline over several lines
+(measured since, on macOS: LF is escaped as `\\012`; U+2028 and U+2029 are printed raw). A continuation line whose
+fields 3..7 happen to read as a date (`foo bar baz Sun Oct 11 09:30:00 2026 ...`) reached `int(f[0])` and raised
+ValueError out of the reader — the runner stopped on a RUNNER_EXCEPTION/INFRA for any process of the host that had a
+multi-line command (two kill_check runs of batch T23a). The ValueError was the defect; skipping the line (B-03 round 2)
+was a second one: a skipped line is a process the table cannot see, and (round 3, WP auth) a command line holding
+U+2028 and row-shaped text made a row of a process that is not there. A line that is no row now refuses the reading
+with a typed error (`TableUnreadable`, an OSError the runner stops on as HOST_TABLE_UNREADABLE); what really caused
+those lines — a separator `ps` prints raw — is one row (tests/v2/test_v21_r3_auth_ps_table.py); a table that does not
+list the reader itself is still refused."""
 
 from __future__ import annotations
 
@@ -29,7 +34,7 @@ class FakePs:
         self.text = text
 
     def communicate(self, *_a, **_k):
-        return self.text, None
+        return self.text.encode("utf-8"), None   # a binary-mode Popen: the bytes `ps` printed
 
 
 def table_of(text: str, returncode: int = 0):
@@ -53,13 +58,17 @@ class ContinuationLines(unittest.TestCase):
         self.assertEqual(reader, 31337)
         self.assertEqual((out[100].ppid, out[100].pgid), (1, 100))
 
-    def test_a_continuation_line_that_reads_as_a_date_is_no_row(self):
+    def test_a_continuation_line_that_reads_as_a_date_refuses_the_reading_with_a_typed_error(self):
         lines = ROWS.splitlines(keepends=True)
         text = lines[0] + 'y.py"])\\012\n' + "foo bar baz Sun Oct 11 09:30:00 2026 trailing text\n" + \
             "12 x 7 Sun Oct 11 09:30:00 2026 a pid that is not one\n" + lines[1]
-        out, _ = table_of(text)
-        self.assertEqual(sorted(out), [100, 31337])
-        self.assertEqual(out[100].command, "/usr/bin/sleep 60")
+        with self.assertRaises(ca.TableUnreadable) as cm:   # an OSError: the runner stops (HOST_TABLE_UNREADABLE)
+            table_of(text)
+        self.assertIsInstance(cm.exception, OSError)
+        self.assertNotIsInstance(cm.exception, ValueError)   # the defect: a RUNNER_EXCEPTION out of the reader
+        for part in text.splitlines(keepends=True)[1:4]:   # each of the three lines alone is as much a refusal
+            with self.subTest(line=part[:30]), self.assertRaises(ca.TableUnreadable):
+                table_of(lines[0] + part + lines[1])
 
     def test_a_table_that_does_not_list_the_reader_is_still_refused(self):
         with self.assertRaises(OSError):
