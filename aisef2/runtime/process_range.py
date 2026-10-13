@@ -81,7 +81,9 @@ def _linux_table() -> dict[int, Proc]:
         if not entry.name.isdigit():
             continue
         try:
-            stat = pathlib.Path(entry.path, "stat").read_text()
+            # bytes, decoded with replacement: a process's name is its own (`prctl(PR_SET_NAME)`), and one that is not
+            # UTF-8 made `read_text()` raise UnicodeDecodeError — not the OSError skipped below — for the whole host
+            stat = pathlib.Path(entry.path, "stat").read_bytes().decode("utf-8", "replace")
             cmd = pathlib.Path(entry.path, "cmdline").read_bytes().replace(b"\0", b" ").decode("utf-8", "replace")
         except OSError:
             continue  # it exited while the table was read
