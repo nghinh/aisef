@@ -429,7 +429,8 @@ error where it raises; "cases" counts subtests):
 
 **11.7 Real, simulated, neither.** *Real, on the host (macOS):* the 60-case reproduction before and after; `RealPs`.
 *Real, in the Linux guest (`guest.sh`, X1; Python 3.14.8):* the `_linux_table` reproduction and `RealLinux` (section
-11.8), before and after; the new test files and `p4.test_process_table`: 27 tests OK, 1 skipped (`RealPs`).
+11.8), before and after; at the final head the two new files, `p4.test_process_table`, `p4.test_process_range` and
+the release-contract file: 85 tests OK, 1 skipped (`RealPs`).
 *Simulated:* every other test — a real child process prints bytes I chose, so `subprocess.run`'s capture, `check` and
 decoding are the real ones, but the rows are mine; the `/proc` of `LinuxTable` is a directory the test writes.
 *Neither:* Windows (the tests are portable by construction: no signal, no path, the POSIX-only ones are skipped; not run
