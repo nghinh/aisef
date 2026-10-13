@@ -8,7 +8,10 @@ three that decided something from the pieces, and the one that is pinned because
 keeps it safe:
 
 * `WorktreeListing`   — `lineage.reconcile` reads `git worktree list --porcelain`: a kernel worktree whose path holds a
-  separator was not found, and with it the unjournaled candidate it holds (the item a continuation must name).
+  separator was not found, and with it the unjournaled candidate it holds (the item a continuation must name); and
+  what the item says to the operator.
+* `MergeStatement`   — the same function's other item, the merge in flight, and what it says (the listing of `main`'s
+  first parents is hex only: not exposed; asserted because `reconcile` was changed and its statements are read).
 * `ProbeOutput`       — `confine._sections` / `_mounts` / `_judge`: a mount point, a socket or a name the probe prints
   with a separator was two rows; a writable mount outside the workspace whose path holds one was not judged at all.
 * `HostTable`         — `confine._host_mounts`: a host mount point with one made the whole table "not read whole", so
@@ -104,6 +107,48 @@ class WorktreeListing(unittest.TestCase):
         items, head, _ = self.reconciled("ordinary", parent)
         self.assertEqual([(i["commit"], i["operation"], i["story"], i["identified"]) for i in items],
                          [(head, "candidate", "S1", True)])
+
+    def test_the_item_says_whose_candidate_where_and_what_the_continuation_does_with_it(self):
+        """What the operator reads (`aisef bundle continue` prints the items): the story, the kernel's worktree by name,
+        that no proof ran on it, and that the story is developed again."""
+        parent = self.tmp / "ordinary"
+        parent.mkdir()
+        items, _, _ = self.reconciled("ordinary", parent)
+        [why] = [i["why"] for i in items]
+        self.assertIn("the developer's candidate of S1", why)
+        self.assertIn("in the kernel's worktree wt-S1", why)
+        self.assertIn("never journaled (no proof ran on it): developed again", why)
+
+
+class MergeStatement(unittest.TestCase):
+    """Requirement: a merge the kernel started and did not journal is stated with its story, its proved candidate and
+    what is missing of it — the operator reads this to decide whether to leave the item out of the continuation
+    (`reconcile` identifies it through the same listing of `main`'s first parents the worktree scan follows)."""
+
+    def test_the_kernels_merge_in_flight_is_stated(self):
+        with tempfile.TemporaryDirectory() as t:
+            run_dir = pathlib.Path(os.path.realpath(t)) / "run-dir"
+            repo = run_dir / "repo"
+            repo.mkdir(parents=True)
+            git(repo, "init", "-q", "-b", "main")
+            (repo / "base.txt").write_text("base\n", encoding="utf-8")
+            git(repo, "add", "-A")
+            git(repo, "commit", "-q", "-m", "base")
+            base = git(repo, "rev-parse", "HEAD")
+            git(repo, "checkout", "-q", "-b", "s2", base)
+            (repo / "s2.txt").write_text("candidate\n", encoding="utf-8")
+            git(repo, "add", "-A")
+            git(repo, "commit", "-q", "-m", "candidate")
+            cand = git(repo, "rev-parse", "HEAD")
+            git(repo, "checkout", "-q", "main")
+            git(repo, "merge", "-q", "--no-ff", "-m", f"merge {cand[:12]}", "s2")
+            events = [ev.Event(0, "story/begin", {"story_id": "S2", "parent": base}, 0.0),
+                      ev.Event(1, "proof/verified", {"story_id": "S2", "criterion_id": "C1", "candidate": cand}, 0.0)]
+            [item] = lineage.reconcile(run_dir, events, base, False)["items"]
+        self.assertEqual((item["operation"], item["story"], item["candidate"], item["identified"]), ("merge", "S2", cand, True))
+        self.assertIn("the kernel's merge of S2", item["why"])
+        self.assertIn(f"'s proved candidate {cand[:12]}", item["why"])
+        self.assertIn("its post-merge proof and commit were never journaled", item["why"])
 
 
 class ProbeOutput(unittest.TestCase):
