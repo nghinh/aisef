@@ -283,8 +283,10 @@ and `test_v21_mutation_record` OK on this branch; `p0.test_destructive_authority
 OK; `ruff check .` OK; `tests.test_v21_traceability` and `traceability_check.py` (88 rows) OK; T0 (`t0_check`) of the
 review's versions of both files OK on `read_session`, `session_tokens`, `_mounts`, `reconcile`. On a simulated merge
 into the integration head (`56cd387`, which only adds registry entries to `validation/v2/mutation.py`) the merge is
-clean and `p2.test_mutation_targets`, `p0`, `p4` pass; `test_v21_mutation_record` is red there with or without this
-branch (it needs target functions that are not in the tree it is run from).
+clean; this branch's full tree with that head's registry passes `test_v21_mutation_record` and
+`p2.test_mutation_targets` (11 tests), and `p0`, `p4` pass on the merged lean tree. (A first run of
+`test_v21_mutation_record` on a lean tree without `closure-evidence/` errored, with or without this branch: a lean-tree
+artifact, not a finding.)
 
 **Mutants, re-run** (`kill_check`, the runner's bracket, the files named in section 7 minus the 27 s
 `test_s2_kills.py`): `events` 6/6, `_lines` 4/4, `_host_mounts` 16/16, `session_tokens` 37/37, `_sections` 44/44,
