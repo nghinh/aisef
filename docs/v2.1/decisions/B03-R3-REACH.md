@@ -30,7 +30,7 @@ reach.py --out R.json (--base SHA [--head SHA] | --watch W.json) [--files F...] 
   every function by (file, `co_qualname`-style name) that is new or whose *own* code (decorators, arguments, body; a
   nested def only by what the enclosing code evaluates at the def) differs. Each name carries its kind: `new`,
   `changed`, `docstring`. At HEAD `bcb2cfa`/`beed5a3` against `b5c2457` (campaign 4's snapshot; `3dc827be` gives the same
-  diff): **51 names in 10 files**.
+  diffstat): **51 names in 10 files**.
 * **Module-level statements** are not functions. Each watched file's `<module>` code is watched too and recorded as
   `loaded`; `modules[file]` says whether the statements that run at import are `new/changed/docstring/unchanged`, and
   `diff.files[file].module_statements` names them by kind and line. `module_statements_executed` = `loaded` without
