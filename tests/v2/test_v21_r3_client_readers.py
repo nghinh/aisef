@@ -38,7 +38,11 @@ from aisef2.app import confine, lineage, preflight  # noqa: E402
 from aisef2.journal import event as ev  # noqa: E402
 from tests.v2 import v21_r3_conf_rows as rows  # noqa: E402
 
-SEPARATORS = (("U+2028", " "), ("U+2029", " "), ("U+0085", "\u0085"))
+SEPARATORS = (("U+2028", "\u2028"), ("U+2029", "\u2029"), ("U+0085", "\u0085"))
+#: every character `str.split()` ends a field at that mountinfo does not escape (it escapes a space, a tab, a newline
+#: and a backslash and prints the rest as it is): U+000B, U+000C, U+000D, U+001C-U+001F, U+0085, U+00A0, U+1680,
+#: U+2000-U+200A, U+2028, U+2029, U+202F, U+205F, U+3000. Computed from `str.isspace()` (every one of them is below U+3001).
+OTHER_WHITE_SPACE = tuple(c for c in map(chr, range(0x3001)) if c.isspace() and c not in " \t\n")
 M = confine.MARK
 
 
@@ -172,6 +176,17 @@ class ProbeOutput(unittest.TestCase):
                 [row] = confine._mounts(sections["mountinfo"])
                 self.assertEqual((row["at"], row["access"], row["fs"]), (mount, "rw", "ext4"))
 
+    def test_a_field_ends_at_a_space_and_nowhere_else(self):
+        """(review) The mount point, the root and the source are each one field whatever white space they hold: the
+        three named separators are not the whole of what `str.split()` cut at (U+000B, U+000C, U+001C-U+001F, U+00A0,
+        U+2000-U+200A, U+202F, U+205F, U+3000 too)."""
+        for c in OTHER_WHITE_SPACE:
+            with self.subTest(character=f"U+{ord(c):04X}"):
+                [row] = confine._mounts([f"41 1 8:2 /r{c}t /m{c}p rw,relatime shared:3 - ext4 /dev/s{c}d rw,errors=remount-ro"])
+                self.assertEqual((row["at"], row["root"], row["source"]), (f"/m{c}p", f"/r{c}t", f"/dev/s{c}d"))
+                self.assertEqual((row["fs"], row["dev"], row["access"], row["options"], row["optional"], row["super_options"]),
+                                 ("ext4", "8:2", "rw", ["rw", "relatime"], ["shared:3"], ["rw", "errors=remount-ro"]))
+
     def judged(self, lines: list[str], targets: list[str]) -> list[str]:
         ws = pathlib.PurePosixPath("/w/ws")
         rep = {"network": "host", "created_outside_workspace": {}, "setsid_survivors": [], "host_mounts": rows.HOST,
@@ -215,6 +230,20 @@ class HostTable(unittest.TestCase):
                     {"at": "/", "fs": "ext4", "dev": "8:1", "optional": []},
                     {"at": f"/mnt/usb{sep}stick", "fs": "tmpfs", "dev": "0:46", "optional": ["shared:7"]}])
 
+    def test_a_host_mount_point_that_holds_any_other_white_space_is_one_row(self):
+        """(review) Real kernel, Linux guest: a bind mount at a path with U+00A0 or U+3000 was read as a row whose `at`
+        was a PREFIX of its path (16 rows, none at the mount's path) — wrong data, not a refusal. U+000D is left out:
+        `Path.read_text` makes a carriage return a line end before this reader sees the text (measured in the guest:
+        `_host_mounts()` is None for such a mount, before and after this change — an open residual, not a claim), and
+        the text this test hands over would hide that."""
+        for c in OTHER_WHITE_SPACE:
+            if c == "\r":
+                continue
+            with self.subTest(character=f"U+{ord(c):04X}"):
+                table = "\n".join(["1 0 8:1 / / rw,relatime - ext4 /dev/vda1 rw",
+                                   f"300 1 0:46 / /mnt/a{c}b rw,nosuid shared:7 - tmpfs tmpfs rw", ""])
+                self.assertEqual([r["at"] for r in self.read(table)], ["/", f"/mnt/a{c}b"])
+
     def test_a_table_with_a_line_that_is_no_row_is_still_not_read_whole(self):
         for table in ("1 0 8:1 / / rw - ext4 /dev/vda1 rw\n\n2 0 8:2 / /b rw - ext4 /dev/vda2 rw\n",
                       "1 0 8:1 / / rw - ext4 /dev/vda1 rw\nnot a row\n", "\n", ""):
@@ -229,7 +258,7 @@ class Lines(unittest.TestCase):
     def test_lines(self):
         for text, expected in (("a\nb\n", ["a", "b"]), ("a\nb", ["a", "b"]), ("", []), ("\n", [""]), ("a\n\nb\n", ["a", "", "b"]),
                                ("a\n\n", ["a", ""]),
-                               ("a b c\u0085d\x0be\x0cf\x1cg\x1dh\x1ei\n", ["a b c\u0085d\x0be\x0cf\x1cg\x1dh\x1ei"])):
+                               ("a\u2028b\u2029c\u0085d\x0be\x0cf\x1cg\x1dh\x1ei\n", ["a\u2028b\u2029c\u0085d\x0be\x0cf\x1cg\x1dh\x1ei"])):
             with self.subTest(text=text):
                 self.assertEqual(confine._lines(text), expected)
 
@@ -241,11 +270,11 @@ class PreflightLedger(unittest.TestCase):
 
     def test_a_failure_text_with_separators_is_written_escaped_and_read_back(self):
         answers = {"/models": (200, {"data": [{"id": "m", "owned_by": "o"}]}),
-                   "/chat/completions": (502, {"transport_error": "Bad Gateway", "content_type": "text/ html\u0085"})}
+                   "/chat/completions": (502, {"transport_error": "Bad\u2028Gateway", "content_type": "text/\u2029html\u0085"})}
         with tempfile.TemporaryDirectory() as t:
             rec = preflight.run("p/m", 1, lambda path, body=None: answers[path], pathlib.Path(t) / "pf")
             data = (pathlib.Path(t) / "pf" / "LEDGER.jsonl").read_bytes()
-        for raw in (" ", " ", "\u0085"):
+        for raw in ("\u2028", "\u2029", "\u0085"):
             self.assertNotIn(raw.encode("utf-8"), data)
         self.assertEqual(data.count(b"\n"), 4)                       # sent, done, sent, done
         self.assertEqual(rec["accounting"], {"provider_requests": 2, "turns": 0, "input_tokens": 0, "output_tokens": 0,

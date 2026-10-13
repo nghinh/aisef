@@ -42,7 +42,7 @@ from tests.v2 import test_app_run as e2e  # noqa: E402
 
 #: the characters `str.splitlines()` ends a line at that JSON allows raw inside a string (U+0000-U+001F may not be:
 #: `\x0b`, `\x0c` and `\x1c`-`\x1e` are escaped by every encoder, so a record never holds them raw)
-SEPARATORS = (("U+2028", " "), ("U+2029", " "), ("U+0085", "\u0085"))
+SEPARATORS = (("U+2028", "\u2028"), ("U+2029", "\u2029"), ("U+0085", "\u0085"))
 LIMITS = {"provider_requests": 99, "turns": 99, "input_tokens": 9999, "output_tokens": 9999}
 ZERO = dict.fromkeys(LIMITS, 0)
 
@@ -124,7 +124,7 @@ class ReadingAStream(_Dir):
                     "steps": 2, "steps_without_tokens": 0})
 
     def test_a_step_without_a_token_report_is_still_counted_blind_next_to_one_that_holds_a_separator(self):
-        sep = " "
+        sep = "\u2028"
         log = write(self.tmp / "s.jsonl", record({"type": "step_finish", "part": {"reason": f"a{sep}b"}}), record(step(3, 2)))
         got = client.read_session(log)
         self.assertEqual((got["turns"], got["steps_without_tokens"], got["tokens"]), (2, 1, {"input": 5, "output": 3}))
@@ -139,8 +139,8 @@ class ReadingAStream(_Dir):
     def test_a_record_ends_at_a_line_feed_and_a_carriage_return_is_whitespace(self):
         """CRLF-ended records are read; so is a record whose JSON holds a lone carriage return between two tokens (it is
         whitespace there: neither a line end nor a reason to cut the record, as text mode's newline translation did)."""
-        crlf = write(self.tmp / "crlf.jsonl", *stream_of(" "), end="\r\n")
-        self.assertEqual(client.read_session(crlf)["text"], "before aftertail")
+        crlf = write(self.tmp / "crlf.jsonl", *stream_of("\u2028"), end="\r\n")
+        self.assertEqual(client.read_session(crlf)["text"], "before\u2028aftertail")
         self.assertEqual(client.read_session(crlf)["turns"], 2)
         spaced = write(self.tmp / "cr.jsonl", record(text("kept")).replace('"part"', '\r"part"', 1), record(step(1, 1)))
         self.assertIn(b"\r", spaced.read_bytes())
@@ -151,7 +151,7 @@ class ReadingAStream(_Dir):
         """The torn last line of a stream stopped mid-write, a line of the client's own, raw bytes, a JSON line that is
         not an object, a record with a control character raw inside a string (not JSON): each skipped; the events
         around them are counted, and nothing is raised."""
-        torn = record(text("lost tail"))[:-6]            # cut inside the string, just after the separator
+        torn = record(text("lost\u2028tail"))[:-6]            # cut inside the string, just after the separator
         lines = [record(text("a")), "client log: starting", "[1, 2]", '{"type": "text", "part": {"text": "x\x0by"}}',
                  record(step(2, 1)), "", record(text("b"))]
         log = write(self.tmp / "s.jsonl", *lines)
@@ -159,6 +159,27 @@ class ReadingAStream(_Dir):
         got = client.read_session(log)
         self.assertEqual((got["text"], got["turns"], got["tokens"]), ("ab", 1, {"input": 4, "output": 2}))
         self.assertEqual([e["type"] for e in client.events(log)], ["text", "step_finish", "text"])
+
+    def test_a_last_record_without_its_line_feed_is_read(self):
+        """(review) A record whose line feed is not written yet — the stream is read while the client writes, or the
+        session was stopped between a record and its line feed — is a whole record: only a line that does not parse is
+        skipped, wherever it is. Dropping "the last line, as it may be torn" would lose a finished step's tokens."""
+        for label, sep in SEPARATORS:
+            with self.subTest(separator=label):
+                log = self.tmp / f"{label}.jsonl"
+                log.write_bytes("\n".join([record(text(f"a{sep}b")), record(step(7, 3))]).encode("utf-8"))
+                self.assertFalse(log.read_bytes().endswith(b"\n"))
+                got = client.read_session(log)
+                self.assertEqual((got["text"], got["turns"], got["tokens"]), (f"a{sep}b", 1, {"input": 9, "output": 4}))
+                self.assertEqual(usage.session_tokens(log)["steps"], 1)
+
+    def test_a_byte_that_is_no_utf8_inside_an_event_is_a_replacement_character_not_a_lost_event(self):
+        """(review) The decoding is as it was (`errors="replace"`): not strict (the whole stream lost, or an error) and
+        not `ignore` (the character silently gone from a text a reader parses)."""
+        log = self.tmp / "bad.jsonl"
+        log.write_bytes(record(text("a@b")).encode("utf-8").replace(b"@", b"\xff") + b"\n" + record(step(1, 1)).encode("utf-8") + b"\n")
+        got = client.read_session(log)
+        self.assertEqual((got["text"], got["turns"]), ("a�b", 1))
 
     def test_an_empty_stream_has_no_events(self):
         log = write(self.tmp / "empty.jsonl")
@@ -179,7 +200,7 @@ class TheAccounts(_Dir):
 
     def test_the_budgets_spend_is_the_same_with_and_without_a_separator(self):
         spent = {}
-        for name, sep in (("plain", " "), ("sep", " "), ("nel", "\u0085")):
+        for name, sep in (("plain", " "), ("sep", "\u2028"), ("nel", "\u0085")):
             spent[name] = client.Budget(LIMITS, ZERO, self.sessions(name, sep), lambda: 2).spend()
         self.assertEqual(spent["sep"], spent["plain"])
         self.assertEqual(spent["nel"], spent["plain"])
@@ -188,7 +209,7 @@ class TheAccounts(_Dir):
 
     def test_the_usage_account_is_the_same_with_and_without_a_separator(self):
         got = {}
-        for name, sep in (("plain", " "), ("sep", " ")):
+        for name, sep in (("plain", " "), ("sep", "\u2029")):
             out = self.sessions(name, sep).parent
             got[name] = usage.usage(out, [], None, {})
         self.assertEqual(got["sep"], got["plain"])
@@ -206,9 +227,19 @@ class TheAccounts(_Dir):
                 self.assertEqual(seen["tokens"], {"input": t["input"] + t["cache_read"] + t["cache_write"],
                                                   "output": t["output"] + t["reasoning"]})
 
+    def test_a_carriage_return_between_tokens_is_whitespace_for_both_accounts(self):
+        """(review) `usage.session_tokens` reads through `client.events` too: a record with a carriage return between two
+        tokens is one record there as in the budget (a loop of its own in text mode cut it and lost the step)."""
+        spaced = record(step(4, 2)).replace('"part"', '\r"part"', 1)
+        log = write(self.tmp / "cr.jsonl", record(text("x")), spaced, record(step(1, 1)))
+        self.assertIn(b"\r", log.read_bytes())
+        seen, tokens = client.read_session(log), usage.session_tokens(log)
+        self.assertEqual((seen["turns"], tokens["steps"]), (2, 2))
+        self.assertEqual(seen["tokens"], {"input": 4 + 2 + 1 + 2, "output": 2 + 1 + 1 + 1})
+
     def test_the_turn_cap_counts_a_finished_step_that_holds_a_separator(self):
         """`wait_within` stops a session at its turn cap: a step cut in two was a step that was never counted."""
-        sep = " "
+        sep = "\u2028"
         log = write(self.tmp / "logs" / "s.jsonl", record(step(1, 1, reason=f"stop{sep}")), record(step(1, 1, reason=f"stop{sep}")))
         budget = client.Budget(LIMITS, ZERO, self.tmp / "logs", lambda: 1)
         running = types.SimpleNamespace(wait=lambda timeout: None)      # a session that is still running
@@ -229,7 +260,7 @@ class _Reviewing(_Dir):
         self.scope = types.SimpleNamespace(story_id="S1", root=str(self.tmp / "repo"))
 
     FINDING = {"id": "F-sep", "blocking": True, "severity": "high",
-               "summary": "the parser cuts a record at U+2028: it reads   as the end of a line", "reproducer": None}
+               "summary": "the parser cuts a record at U+2028: it reads \u2028 as the end of a line", "reproducer": None}
 
     def findings_text(self, sep: str) -> str:
         return json.dumps({"findings": [dict(self.FINDING, summary=f"cut at{sep}here")]}, ensure_ascii=False)
@@ -265,7 +296,7 @@ class ModelReviewer(_Reviewing):
                 self.assertEqual((s["turns"], s["tokens"]), (1, {"input": 42, "output": 21}))
 
     def test_the_review_records_the_finding_with_its_statement_whole(self):
-        sep = " "
+        sep = "\u2028"
         events = [record(text(self.findings_text(sep))), record(step(40, 20))]
         rev = self.reviewer(review={"policy": "fix-loop", "min_severity": "low", "finder": "model", "ocr": None, "given": True})
         with mock.patch.object(client, "session", self.fake_session(events)):
@@ -277,7 +308,7 @@ class ModelReviewer(_Reviewing):
         self.assertIn("parsed=True", reviewed.detail)
 
     def test_an_error_that_holds_a_separator_is_a_provider_outage_not_no_findings(self):
-        sep = " "
+        sep = "\u2028"
         err = {"type": "error", "error": {"name": "APIError", "data": {"message": f"upstream{sep}down", "statusCode": 502}}}
         with mock.patch.object(client, "session", self.fake_session([record(err)])):
             with self.assertRaises(ad.ProviderOutage) as caught:
@@ -315,17 +346,17 @@ class RealSession(_Reviewing):
         (self.tmp / "bin" / "events.json").write_text(json.dumps(events), encoding="utf-8")
 
     def test_a_session_whose_text_and_tokens_hold_separators_is_recorded_whole(self):
-        sep = " "
-        self.says([text(f"one{sep}two"), step(30, 6, reason=f"stop{sep}"), text(" three"), step(4, 1)])
+        sep = "\u2028"
+        self.says([text(f"one{sep}two"), step(30, 6, reason=f"stop{sep}"), text("\u2029three"), step(4, 1)])
         s = client.session("developer S1", "do it", str(self.tmp / "repo"), self.tmp / "logs" / "S1.developer.1.jsonl", 60,
                            **self.kw())
         self.assertEqual((s["exit"], s["error"], s["stopped"]), (0, None, None))
-        self.assertEqual(s["text"], f"one{sep}two three")
+        self.assertEqual(s["text"], f"one{sep}two\u2029three")
         self.assertEqual((s["turns"], s["tokens"]), (2, {"input": 30 + 2 + 4 + 2, "output": 6 + 1 + 1 + 1}))
         self.assertIn(sep.encode("utf-8"), (self.tmp / "logs" / "S1.developer.1.jsonl").read_bytes())
 
     def test_the_reviewer_of_a_real_process_sees_a_findings_block_that_holds_a_separator(self):
-        sep = " "
+        sep = "\u2029"
         self.says([text(self.findings_text(sep)), step(40, 20)])
         found, s, _ = self.reviewer(self.kw())._model(self.scope, 1)
         self.assertEqual([f["id"] for f in found], ["F-sep"])
