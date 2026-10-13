@@ -28,9 +28,11 @@ ROOT = pathlib.Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from aisef2.journal.format2 import ResourceKind as K  # noqa: E402
 from aisef2.runtime import process_range as pr  # noqa: E402
-from aisef2.runtime.process_range import Proc  # noqa: E402
-from aisef2.runtime.story_scope import Residual  # noqa: E402
+from aisef2.runtime.process_range import Proc, ProcessRange  # noqa: E402
+from aisef2.runtime.story_scope import Residual, StoryScope  # noqa: E402
+from tests.v2.p4.world import Fake, Journal2, emitter, released  # noqa: E402
 
 PS_ARGV = ["ps", "-A", "-o", "pid=,ppid=,pgid=,stat=,command="]
 FAKE = 4_000_000  # above any pid a host hands out (macOS: 99999): a row that names it is a row that was made up
@@ -195,6 +197,41 @@ class NotARow(unittest.TestCase):
         # fail closed: the rows before the bad line are not handed out as if they were the whole table
         with self.assertRaises(pr.ProcessTableError):
             table_of(lines(row(10, 1, 10, "S", "/bin/a"), "garbage", row(11, 1, 11, "S", "/bin/b")))
+
+
+@unittest.skipUnless(os.name == "posix", "the POSIX backend measures the range from the process table")
+class FailsClosedWhereItIsRead(Journal2, unittest.TestCase):
+    """The error is not swallowed on the way: a table that cannot be read is never read as "no member", and the scope
+    that disposes the range names it (FAILED, the line) and releases nothing that depends on the range."""
+
+    BAD = b"   12    10\n"
+
+    def test_the_readers_of_the_table_raise_and_never_answer_that_nothing_is_there(self):
+        backend = pr._Posix()
+        backend.adopt(10)
+        with mock.patch.object(pr, "LINUX", False), mock.patch.object(pr.subprocess, "run", answered(self.BAD)):
+            for name, read in (("process_table", pr.process_table), ("members", lambda: backend.members(99)),
+                               ("escaped", lambda: backend.escaped(99))):
+                with self.subTest(name), self.assertRaises(pr.ProcessTableError):
+                    read()
+
+    def test_a_release_that_cannot_read_the_table_is_failed_names_the_line_and_blocks_what_follows(self):
+        w = self.writer()
+        scope = StoryScope(self.story(w), emitter(w))
+        scratch_log: list = []
+        scope.acquire(Fake("scratch", K.SCRATCH, scratch_log))
+        target = ProcessRange("rng", [sys.executable, "-S", "-c", "pass"]).start()
+        self.addCleanup(lambda: None if target._reaped else target.release())  # with the real table again
+        scope.acquire(target)
+        self.assertIsNotNone(target.wait(60.0))  # it ends by itself
+        with mock.patch.object(pr, "LINUX", False), mock.patch.object(pr.subprocess, "run", answered(self.BAD)):
+            scope.dispose()
+        self.assertEqual(released(w), [("rng", "FAILED"), ("scratch", "RESIDUAL")])
+        detail = next(e.data["detail"] for e in w.events if e.data.get("resource") == "rng"
+                      and e.data.get("status") == "FAILED")
+        self.assertTrue(detail.startswith("ProcessTableError:"), detail)
+        self.assertIn(repr(self.BAD.decode().rstrip("\n")), detail)
+        self.assertEqual(scratch_log, [])  # the directory the range could still write to was not removed
 
 
 @unittest.skipUnless(sys.platform == "darwin", "the `ps` of macOS: the table that is read from `ps`")
