@@ -3,8 +3,9 @@
 Branch `v21r3/client`, from the integration head `643a6e0`. Product files: `aisef2/app/client.py` (`events`, new;
 `read_session`), `aisef2/app/usage.py` (`session_tokens`), `aisef2/app/lineage.py` (`reconcile`, one expression),
 `aisef2/app/confine.py` (`_lines`, new; `_sections`, `_mounts`, `_host_mounts`). Tests:
-`tests/v2/test_v21_r3_client_stream.py` (17), `tests/v2/test_v21_r3_client_readers.py` (10). No existing test was
-changed. Evidence: `$R3/out/client/` (scripts, outputs and `kc-*.json`; each is named where it is used).
+`tests/v2/test_v21_r3_client_stream.py` (17, +3 by review = 20), `tests/v2/test_v21_r3_client_readers.py` (10, +2 by
+review = 12). No existing test was changed. Section 11 is the independent review's addendum (what it re-ran, what it
+found, what it added): where it contradicts a statement above, section 11 is the later and measured one. Evidence: `$R3/out/client/` (scripts, outputs and `kc-*.json`; each is named where it is used).
 
 ## 1. What was asked
 
@@ -85,6 +86,8 @@ Outside `aisef2/app/` (findings only; nothing changed there):
 | `aisef2/quality/test_execution.py:206` | the last line of stderr, in a message | text only |
 | `aisef2/journal/format3.py:315`, `format2.py:311`, `compat.py:55` | `text.split("\n")` | NOT EXPOSED |
 | `validation/qualification/release_smoke.py:284`, `validation/v21/context_gap.py:87,119` | session streams, evidence tooling | same pattern; not product; the 67 recorded streams hold none (P4) |
+| `validation/qualification/c2_p9.py:402` (`read_session`; found by review) | a verbatim copy of the loop this WP replaced, `splitlines()` included. `c2_p9.Budget.spend` (l.356, the C2 experiment's hard ceilings), its turn cap (l.438), its session record (l.471) and `c2_delivery_experiment.py:273` read through it | the same silent loss of a text or error event, and of a finished step whose own record holds a separator. Validation tooling, outside `aisef2/app/`: not changed; for the harness's owner |
+| `validation/v21/cli_integration/e2e_client.py:44` (found by review) | the guest's `/proc/self/mountinfo`, `read_text().splitlines()` | evidence tooling; not changed |
 
 ## 5. The decision
 
@@ -230,7 +233,8 @@ with the five-file set; `kc-reconcile.json`: the full run at `6c2cfac`, 148 of 1
 * A raw carriage return in a mount point or a worktree path is still cut: mountinfo does not escape it, and the readers
   go through text mode (`Path.read_text`, `subprocess.run(text=True)`, `workspace.git` in `orchestrate/`), which makes it
   a line end. `Path.read_text(newline=)` exists from Python 3.13 only (the floor is 3.11), and the conf tests patch
-  `Path.read_text`; not changed, not measured.
+  `Path.read_text`; not changed. (Measured afterwards by the review, section 11: before and after this change alike,
+  `_host_mounts()` is `None` for such a mount and the sandbox's table loses its row.)
 * A path that holds a line feed in `git worktree list --porcelain` needs `-z`; not handled.
 * The lone-CR-separated stream (a writer that ends records with CR only) was read as separate records through text
   mode and is now one line that does not parse. No writer is known to do it; the JSON-lines convention is LF (CRLF is
@@ -261,3 +265,96 @@ Host (macOS 25.5, Python 3.14.7, git 2.53.0), through `$SP/m21/kills3/py.sh`, pr
 The two sealed-record failures are the checkers the task names as expected-stale after a product change; both are also
 red on `643a6e0` (each re-run there in a detached worktree of that commit, same assertion), so this change did not
 turn them red. They are the lead's to regenerate; nothing was done about them.
+
+## 11. Independent review (branch `v21r3/client-rv`, reviewer's addendum)
+
+What the reviewer re-ran, what it measured, what it changed. Product code was not changed: it is correct for the
+defect it names. Evidence: `$R3/out/client/review/` (scripts under `tools/`, one log per run; `report.json`).
+
+**Re-run, not read.** Both new files, 32 tests (the 27 above + 5 of the review), OK on macOS (Python 3.14.7) and on
+3.12.14; in the Linux guest (X1, Python 3.14.8, git 2.47.3, bubblewrap 0.12.0; a `git archive` of the product code of
+this branch with the review's two test files) the two files plus 11 confinement / client / lineage / usage modules, 238 tests OK, 1 skipped (an existing confinement test:
+"the temp directory lies below the sandbox's /tmp"); the 125 test modules that import `client`, `usage`, `confine` or
+`lineage` directly or through `run`, `cli`, `verify`, `adapters`..., 1519 tests, 4 skipped, 124 modules OK and 1 red
+(`test_c2_delivery_experiment`, the committed `PLAN-V2.2-CORRECTION-1.json`, a sealed record the lead regenerates);
+`tests.v2.test_c2_k_nowork_001` red the same way ("the kernel changed since the record"); both fail identically on a
+fresh checkout of `643a6e0` (re-run by the review), `p2.test_mutation_targets`
+and `test_v21_mutation_record` OK on this branch; `p0.test_destructive_authority` 13 and `p4.test_mutation_safety` 10
+OK; `ruff check .` OK; `tests.test_v21_traceability` and `traceability_check.py` (88 rows) OK; T0 (`t0_check`) of the
+review's versions of both files OK on `read_session`, `session_tokens`, `_mounts`, `reconcile`. On a simulated merge
+into the integration head (`56cd387`, which only adds registry entries to `validation/v2/mutation.py`) the merge is
+clean and `p2.test_mutation_targets`, `p0`, `p4` pass; `test_v21_mutation_record` is red there with or without this
+branch (it needs target functions that are not in the tree it is run from).
+
+**Mutants, re-run** (`kill_check`, the runner's bracket, the files named in section 7 minus the 27 s
+`test_s2_kills.py`): `events` 6/6, `_lines` 4/4, `_host_mounts` 16/16, `session_tokens` 37/37, `_sections` 44/44,
+`_mounts` 46/46 and `reconcile` 148/148 KILLED (readers file 99, `T08a` 46, `continue_usage` 2, `A08` 1; the six
+statement mutants [138]-[140] and [145]-[147] by assertion). `read_session`: 76/77 with that reduced set; the one left,
+`L68 element 1 dropped`, is killed by the registered `test_s2_kills.py::ClientReadSession` (section 7: 2 of its 77
+kills are that file's).
+
+Kills that went through an exception (the runner reports ERROR, not FAIL): 5 of 6 for `events` (an emptied string
+constant, a return value), 30 of 44 for `_sections` (tuple elements dropped: the unpack raises), 23 of 46 for `_mounts`
+(a dict key emptied: `KeyError`), 33 of 77 for `read_session`, 11 of 37 for `session_tokens`, 95 of 148 for
+`reconcile` (every git argument among them). Read one by one, each is a shape a consumer reads (a key, a tuple, a
+return value, a decoding that must not be strict); the reviewer found none that stands for a behaviour no test looks
+at. The behaviours — which characters end a line, which end a field, which lines are events — were put to
+**wrong implementations of the reviewer's own**, 16 in all (`$R3/out/client/review/lab/`, one tree each):
+
+| wrong implementation | the 27 tests | the 32 tests |
+|---|---|---|
+| `events` over `bytes.splitlines()` (LF, CR, CRLF) | caught (1) | caught (2) |
+| `events` drops the last line "as it may be torn" | **passed** | caught (3) |
+| `events` stops at the first line that does not parse | caught | caught |
+| separators replaced by a space before the cut | caught (14) | caught (17) |
+| `events` over `read_text(...).split("\n")` | caught (1) | caught (2) |
+| `session_tokens` with a loop of its own, text mode | **passed** | caught (1) |
+| `session_tokens` with the old `splitlines()` loop | caught (7) | caught (8) |
+| `events` decoding with `errors="ignore"` | **passed** | caught (1) |
+| `_mounts` fields split at ASCII white space only | **passed** | caught (6) |
+| `_mounts` protecting only U+2028/U+2029/U+0085 | **passed** | caught (46) |
+| `_lines` keeps the empty element after a final LF | caught (9) | caught (35) |
+| `_lines` drops every empty line | caught (4) | caught (4) |
+| `_host_mounts` over `splitlines()` | caught (3) | caught (12) |
+| `reconcile` worktree block over `splitlines()` | caught (3) | caught (3) |
+| `reconcile` fields over `ln.split(None, 1)` | passed | passed: equivalent (only the `worktree` path's leaf and `HEAD` are read; the leaf `wt-<story>` does not begin with white space) |
+| the preflight ledger written with raw non-ASCII | caught (1, an error) | caught |
+
+**Added by the review** (commit `973d8a4`, tests only): a last record without its line feed is read; an undecodable
+byte inside an event is a replacement character; a carriage return between tokens is whitespace for the usage
+account too; every `str.isspace()` character but the three the kernel escapes is inside one mountinfo field
+(`_mounts`) and one host-table row (`_host_mounts`; U+000D left out, below). The raw U+2028/U+2029 characters of the
+two files' sources are `\u` escapes now (AST identical).
+
+**Measured, in the Linux guest, for the first time** (a real kernel table and a real bubblewrap session, the
+integration head `643a6e0` against this branch; `out/client/review/guest-real-output.txt`):
+
+| character in the mount point | head: host table | head: sandbox table | this branch |
+|---|---|---|---|
+| U+2028, U+2029, U+0085, U+000B, U+000C, U+001C | `None` (every confined run refused) | 14 of 15 rows, mount not found | 16 rows / 15 rows, found |
+| U+00A0, U+3000 | **16 rows, the mount's `at` is a prefix of its path** (wrong data, no refusal) | 15 rows, `at` wrong | found |
+| **U+000D** | `None` | 14 of 15 rows, mount not found | **`None` / 14 of 15 rows: unchanged** |
+
+So (a) the fix is wider than section 4 says: `str.split()` also cut at VT, FF, FS-US, NBSP and the Unicode spaces
+(measured here for U+000B, U+000C, U+001C, U+00A0, U+3000; the other spaces by the unit test), and for NBSP and
+the Unicode spaces the old reader did not refuse, it misread; (b) section 9's "a raw carriage return ... not
+measured" is now measured, and it is **not** only a refusal: the host table is `None` (fail closed) but the sandbox
+table loses the row and nothing judges that mount. The path is operator- or kernel-chosen (workspace, client
+directory, the common git directory, `read_only`), not the model's; the same on a real worktree under a directory
+named with CR: `lineage.reconcile` reports no candidate, before and after (`tools/rv_cr_worktree.py`). Closing it
+means reading bytes in `_host_mounts` and `measure` (`Path.read_text` and `subprocess.run(text=True)` translate a
+carriage return before any reader sees it) and `git worktree list -z`; that replaces `Path.read_text` as what the
+existing conf tests feed (`test_v21_r3_conf_policy.py:385`, `test_v21_r3_conf_fu_before.py:171`) and the `subprocess.run`
+fakes of the confinement tests — an owner decision, not made here.
+
+**Real streams.** 67 unique recorded streams (of 134 paths found on this machine), `read_session` and
+`session_tokens` before and after: identical. They hold 23,799 raw non-ASCII characters (`═ — § → é ✅`, ...): the real
+client's JSON writer does not ASCII-escape, the property that makes JavaScript's `JSON.stringify` write U+2028
+raw. None holds U+2028/U+2029/U+0085, CR, VT, FF, a line that is not a record, or an unterminated last line. Still
+**not established**: that the real client writes U+2028 raw (never observed, not run). A property check over 3000
+random streams (ASCII-escaped or raw non-ASCII, LF or CRLF, unterminated last record, every troublesome character in
+every field): `client.events` returned exactly the events written, 3000 of 3000 (`tools/rv_property.py`).
+
+**A reader the first pass did not list.** `validation/qualification/c2_p9.py:402` is a verbatim third copy of the loop
+(`splitlines()` included); its `Budget` is the C2 delivery experiment's hard-ceiling guard (section 4, outside-app
+table). Not changed: validation tooling, outside this WP's scope.
