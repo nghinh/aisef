@@ -364,6 +364,44 @@ class Recorder(unittest.TestCase):
         self.assertNotIn("aisef-reach", sys.modules)
         self.assertIn("'<module>'", text)
 
+    def test_main_end_to_end_on_a_toy_repository(self):
+        """git diff -> watch list -> the runner's own _run_file -> merge -> the document, through main()."""
+        v1 = "def f():\n    return 1\n\n\ndef g():\n    return 2\n"
+        files = {"aisef2/__init__.py": "", "aisef2/toy.py": v1, "tests/v2/__init__.py": "",
+                 "tests/v2/test_calls_f.py": "import unittest\nfrom aisef2 import toy\n\n\nclass K(unittest.TestCase):\n"
+                                             "    def test(self):\n        self.assertEqual(toy.f(), 11)\n",
+                 "tests/v2/test_calls_g.py": "import unittest\nfrom aisef2 import toy\n\n\nclass K(unittest.TestCase):\n"
+                                             "    def test(self):\n        self.assertEqual(toy.g(), 2)\n",
+                 "tests/v2/test_imports.py": "import unittest\nfrom aisef2 import toy\n\n\nclass K(unittest.TestCase):\n"
+                                             "    def test(self):\n        self.assertTrue(toy)\n"}
+        with tempfile.TemporaryDirectory() as t:
+            repo = pathlib.Path(t) / "repo"
+            for rel, text in files.items():
+                (repo / rel).parent.mkdir(parents=True, exist_ok=True)
+                (repo / rel).write_text(text, encoding="utf-8")
+            git(repo, "init", "-q")
+            git(repo, "add", "-A")
+            git(repo, "commit", "-q", "-m", "base")
+            base = git(repo, "rev-parse", "HEAD")
+            (repo / "aisef2/toy.py").write_text(v1.replace("return 1", "return 11"), encoding="utf-8")
+            git(repo, "commit", "-q", "-a", "-m", "head")
+            out = pathlib.Path(t) / "R.json"
+            with contextlib.redirect_stderr(io.StringIO()):
+                code = R.main(["--base", base, "--out", str(out), "--files", "tests/v2/test_calls_f.py",
+                               "tests/v2/test_calls_g.py", "tests/v2/test_imports.py"], root=repo)
+            doc = json.loads(out.read_text(encoding="utf-8"))
+        self.assertEqual(code, 0)
+        self.assertEqual((doc["watch"], doc["watch_size"], doc["modules"]), ({"aisef2/toy.py": ["f"]}, 1,
+                                                                            {"aisef2/toy.py": "unchanged"}))
+        self.assertEqual((doc["base"], doc["head"] == doc["commit"], doc["complete"]), (base, True, True))
+        kf = doc["kill_files"]
+        self.assertEqual(kf["tests/v2/test_calls_f.py"]["executed"], [["aisef2/toy.py", "f"]])
+        self.assertEqual(kf["tests/v2/test_calls_g.py"]["executed"], [])   # imports the changed file, runs another function
+        self.assertEqual(kf["tests/v2/test_imports.py"]["executed"], [])
+        for v in kf.values():
+            self.assertEqual((v["loaded"], v["module_statements_executed"], v["outcome"]), (["aisef2/toy.py"], [], "PASS"))
+        self.assertTrue(doc["limits"])
+
     def test_main_refuses_without_a_watch_source(self):
         with contextlib.redirect_stderr(io.StringIO()), self.assertRaises(SystemExit) as e:
             R.main(["--out", "/nonexistent/out.json"])
