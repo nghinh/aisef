@@ -32,17 +32,28 @@ class SessionRefused(Exception):
     """A session that is not fully bound never starts."""
 
 
+def events(log: pathlib.Path) -> list[dict]:
+    """The events a session's stream holds, in order — the one reading of it (the budget's and the usage account's).
+    A record of a JSON-lines stream ends at a line feed and nowhere else: U+2028, U+2029 and U+0085 are legal raw
+    inside a JSON string (JavaScript's JSON.stringify writes them so), and `str.splitlines()` — like text mode, which
+    also makes a carriage return a line end — cut such a record in two, neither half parsed, and the event was lost
+    without a word (a model's text, a finished step's tokens). A line that is not a JSON object — the torn last line
+    of a stream that was stopped mid-write, a line of the client's own — is no event and is skipped."""
+    out = []
+    for line in log.read_bytes().decode("utf-8", "replace").split("\n"):
+        if line.startswith("{"):
+            try:
+                out.append(json.loads(line))
+            except ValueError:
+                pass
+    return out
+
+
 def read_session(log: pathlib.Path) -> dict:
     """What a session's event stream says so far: its text, its error, its turns, its tokens, and how many finished
     steps carry no token report."""
     text, error, turns, tokens, blind = [], None, 0, {"input": 0, "output": 0}, 0
-    for line in log.read_text(encoding="utf-8", errors="replace").splitlines():
-        if not line.startswith("{"):
-            continue
-        try:
-            ev = json.loads(line)
-        except ValueError:
-            continue
+    for ev in events(log):
         part = ev.get("part") or {}
         if ev.get("type") == "text":
             text.append(str(part.get("text") or ""))

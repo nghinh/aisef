@@ -200,10 +200,19 @@ def wrap(spec: Mapping, command: list[str], env: Mapping[str, str], workspace: s
     return argv(spec, command, workspace, ro, writable), inside
 
 
+def _lines(text: str) -> list[str]:
+    """The lines of `text`, each ended by a line feed and by nothing else. `str.splitlines()` also ends one at U+2028,
+    U+2029, U+0085, U+000B, U+000C and U+001C to U+001E, and the kernel prints those raw in a path (mountinfo escapes
+    only a space, a tab, a newline and a backslash; `ls` and `find` print a name as it is): a mount point or a name that
+    holds one was two rows, each of which then fails to be a row of its table."""
+    lines = text.split("\n")
+    return lines[:-1] if lines[-1] == "" else lines      # a text that ends with a line feed has no empty line after it
+
+
 def _sections(out: str) -> tuple[dict, dict, dict]:
     """The probe's output: its single values, its sections, its tries {name: (rc, output)}."""
     values, sections, tries, cur, name = {}, {}, {}, None, None
-    for line in out.splitlines():
+    for line in _lines(out):
         if not line.startswith(MARK):
             if cur is not None:
                 cur.append(line)
@@ -232,13 +241,15 @@ def _mounts(lines: list[str]) -> list[dict]:
     fields, `-`, type, source, super options) as what a judgement needs: where (`at`), whether writable (`access`: `ro`
     only when a PER-MOUNT option says so), the file system (`fs`), the super block (`dev`: shared by every mount of the
     same file system, a bind included), what of it is mounted (`root`), its `source`, the per-mount `options`, the
-    `super_options` and the propagation `optional` fields. A line that is not of that shape is skipped."""
+    `super_options` and the propagation `optional` fields. A line that is not of that shape is skipped. A field ends at
+    a space and nowhere else: the kernel escapes a space, a tab, a newline and a backslash of a path in octal and prints
+    U+2028, U+2029, U+0085 raw, which `str.split()` also split a field at."""
     def text(s: str) -> str:      # mountinfo escapes a space, a tab, a newline and a backslash in octal
         return re.sub(r"\\([0-7]{3})", lambda o: chr(int(o[1], 8)), s)
     out = []
     for line in lines:
         left, sep, right = line.partition(" - ")
-        f, r = left.split(), right.split()
+        f, r = re.findall(r"[^ ]+", left), re.findall(r"[^ ]+", right)     # a space ends a field, as the kernel prints it
         if sep and len(f) >= 6 and r:
             out.append({"at": text(f[4]), "access": "ro" if "ro" in f[5].split(",") else "rw", "fs": r[0], "dev": f[2],
                         "root": text(f[3]), "source": text(r[1]) if len(r) > 1 else None, "options": f[5].split(","),
@@ -252,7 +263,7 @@ def _host_mounts() -> list[dict] | None:
     it uses and a verifier needs), or None when it cannot be read whole (a line that does not parse is a mount it
     cannot rule out)."""
     try:
-        lines = pathlib.Path("/proc/self/mountinfo").read_text(encoding="utf-8", errors="replace").splitlines()
+        lines = _lines(pathlib.Path("/proc/self/mountinfo").read_text(encoding="utf-8", errors="replace"))
     except OSError:
         return None
     rows = _mounts(lines)

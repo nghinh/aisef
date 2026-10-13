@@ -233,7 +233,8 @@ def reconcile(run_dir: pathlib.Path, events: list, baseline: str, torn: bool) ->
                           "why": f"main {main[:12]} does not descend from the journal's last commit {baseline[:12]}"})
     trees = _git(repo, "worktree", "list", "--porcelain").stdout.split("\n\n")
     for block in trees:
-        fields = dict(ln.split(" ", 1) for ln in block.splitlines() if " " in ln)
+        # a line ends at LF only: git prints a path raw, U+2028 and U+2029 in it too (`splitlines()` cut the line there)
+        fields = dict(ln.split(" ", 1) for ln in block.split("\n") if " " in ln)
         name = pathlib.Path(fields.get("worktree", "")).name
         m = re.fullmatch(r"wt-(.+)", name)
         head = fields.get("HEAD")
