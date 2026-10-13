@@ -16,8 +16,9 @@ What each class pins, as a requirement, through `confine._judge` / `confine.meas
 * NotEstablished   — what cannot be read is "isolation not established", worded so, never a pass and never "writable".
 * DeviceNodes      — the execution resources `--dev` places are accepted by identity (a closed list, the character
                      device of that number, under a `--dev` destination of the command line), refused when they are not.
-* ReportedData     — what the probe's call hands the judgement: the host's table read before and after the session, the
-                     device nodes read inside, the `--dev` destinations; one reading lost is not a pass.
+* ReportedData     — what the probe's call hands the judgement: the host's table read before the session (the one
+                     that decides; the reading after it is information, test_v21_r3_conf_fu_before), the device
+                     nodes read inside, the `--dev` destinations; the reading before lost is not a pass.
 * HostTable        — `confine._host_mounts`, the reading of the host's own table.
 * DevicesSection   — the probe's `devices` section, run by a real shell against a table of the test's.
 * RecordedGuest    — the judgement of the reports a REAL bubblewrap run in the Linux guest produced
@@ -298,9 +299,10 @@ def transcript_host(*readings):
 
 class ReportedData(unittest.TestCase):
     """Requirement: a measurement hands the judgement what it needs, and a reading it lost is not a pass — the host's
-    table read before the session and again after it (a super block the host held at either moment is the host's), the
-    device nodes read inside, the `--dev` destinations of the command line; the report records them. Through
-    `confine.measure`, the probe's one call answered with a transcript of a correctly confined session (T05b's)."""
+    table read before the session (a super block it holds is the host's; the reading after the session decides
+    nothing: tests/v2/test_v21_r3_conf_fu_before.py), the device nodes read inside, the `--dev` destinations of the
+    command line; the report records them. Through `confine.measure`, the probe's one call answered with a transcript
+    of a correctly confined session (T05b's)."""
 
     def measure(self, host=None, **script):
         t = tempfile.TemporaryDirectory()
@@ -315,27 +317,31 @@ class ReportedData(unittest.TestCase):
         self.assertEqual(inside["device_roots"], ["/dev"])
         self.assertEqual(inside["devices"], {f"/dev/{n}": number for n, number in confine.DEVICES.items()})
 
-    def test_the_host_is_read_before_the_session_and_after_it_and_both_count(self):
-        """A super block the host held at either moment is the host's: the sandbox's /tmp (whose number the transcript
-        fixes) is refused when the host's table holds it in the reading before the session only, or in the reading
-        after it only, and accepted when it holds it in neither; the report keeps both readings."""
+    def test_the_host_is_judged_by_the_reading_before_the_session_the_one_after_decides_nothing(self):
+        """A super block the host held when the session started is the host's: the sandbox's /tmp (whose number the
+        transcript fixes) is refused when the host's table holds it in the reading before the session, whatever the
+        reading after it holds, and accepted when only the reading after it does (the number the session's own mount
+        freed, taken by a host mount made since — B03-R3 FU-CONF); the report keeps the reading before as
+        `host_mounts` and the rows that appeared as `host_mounts_appeared`."""
         tmp = next(m for m in self.measure().rep["inside"]["mounts"] if m["at"] == "/tmp")
         held = {"at": "/mnt/other", "fs": "tmpfs", "dev": tmp["dev"], "optional": []}
-        for first, second in ((rows.HOST, rows.HOST), ([*rows.HOST, held], rows.HOST), (rows.HOST, [*rows.HOST, held])):
+        for first, second in ((rows.HOST, rows.HOST), ([*rows.HOST, held], rows.HOST), (rows.HOST, [*rows.HOST, held]),
+                              ([*rows.HOST, held], [*rows.HOST, held])):
             with self.subTest(before=len(first), after=len(second)):
                 seen = self.measure(transcript_host(first, second))
                 shown = [p for p in seen.rep["problems"] if p.startswith("writable outside")]
-                if held in (*first, *second):
+                self.assertEqual(seen.rep["host_mounts"], first)
+                self.assertEqual(seen.rep["host_mounts_appeared"], [r for r in second if r not in first])
+                if held in first:
                     self.assertEqual(len(shown), 1, seen.rep["problems"])
                     self.assertIn("['/tmp']", shown[0])
                     self.assertIn("/mnt/other", shown[0])
-                    self.assertEqual(seen.rep["host_mounts"], [*rows.HOST, held])
                 else:
                     self.assertEqual(seen.rep["problems"], [])
-                    self.assertEqual(seen.rep["host_mounts"], rows.HOST)
 
-    def test_a_reading_that_failed_leaves_no_mount_shown_to_be_the_sandboxs(self):
-        for reads in ((None, rows.HOST), (rows.HOST, None), (None, None)):
+    def test_a_reading_before_that_failed_leaves_no_mount_shown_to_be_the_sandboxs(self):
+        """(A reading AFTER that failed refuses nothing: test_v21_r3_conf_fu_before.ReadingLost.)"""
+        for reads in ((None, rows.HOST), (None, None)):
             with self.subTest(reads=reads):
                 seen = self.measure(transcript_host(*reads))
                 self.assertIsNone(seen.rep["host_mounts"])

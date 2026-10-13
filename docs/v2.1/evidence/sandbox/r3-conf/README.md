@@ -95,3 +95,20 @@ mount besides the workspace (accepted or not), and `table_unchanged`.
 Not shown: that a translated message differs (a hand-built German `libc.mo` on a tmpfs over `/usr/share/locale` was not
 loaded by the guest's glibc 2.41, so no translated text was produced); another namespace's super block bound in
 (`/proc/<pid>/root` of a process in a user namespace of its own is refused with EACCES for an unprivileged caller).
+
+## `fu-X1.json` (the follow-up FU-CONF's run, 2026-10-13)
+
+`guest.sh <tree> X1 python3 -B /repo/validation/v21/sandbox/r3_conf_fu_guest.py reuse` at the tree of `c05d19c` (the
+review head, with the driver copied in) and at the tree of `5012420` (the follow-up), plus the drivers above
+(`scenarios`, `shared-tree`, `locale`, `r3_conf_review_guest.py`), `validation/v21/sandbox/measure.py`
+(`NETWORK=host|none`) and the confinement tests under the `hardened` profile at `5012420`, condensed here (the raw
+outputs are not kept: they hold temporary directory names and the whole reports of the records above). What it shows:
+
+* `reuse`: 48 unrelated tmpfs file systems mounted by the driver, in the controller's own mount namespace, in place of the
+  second reading of the host's table (after the session ended). They took six of the session's own super block numbers.
+  Before the change the correct session is refused (six mounts "the host's"); after it, accepted. The container's mqueue
+  bound read-write is refused by its super block in both, with and without the mounts. Real bubblewrap and real kernel
+  numbers; the unrelated host activity is the driver's (simulated).
+* the twelve scenarios (both modes) and the eight review ones: the same verdicts and problems as the records above (but
+  for super block numbers and a pid), `host_mounts_appeared: []`, `table_unchanged: true`.
+* `measure.py`: `problems: []` for both networks, `host_mounts_appeared` a list; `hardened`: 179 tests OK (skipped=1).

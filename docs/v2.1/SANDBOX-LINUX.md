@@ -345,7 +345,7 @@ the guest, nine of which are write paths). A writable mount outside the workspac
 |---|---|
 | the workspace | its mount point is the workspace (the one host-backed writable mount) |
 | an execution resource | the name is `null`, `zero`, `full`, `random`, `urandom` or `tty`, it lies under a `--dev` destination of the command line, and the probe read it inside as the character device of that kernel number (`1:3`, `1:5`, `1:7`, `1:8`, `1:9`, `5:0`). These are bubblewrap's binds of the host's own nodes: allowed for being an explicit list of what an execution needs, each by identity |
-| a mount the sandbox made | a `tmpfs`, `proc`, `devpts` or `mqueue` whose mount source is its own name, whose super block (major:minor) is not one the host's own mount table holds (read before the session and after it), and that no peer group of the host propagates into or out of |
+| a mount the sandbox made | a `tmpfs`, `proc`, `devpts` or `mqueue` whose mount source is its own name, whose super block (major:minor) is not one the host's own mount table holds (read just before the session starts: a super block a session creates is one no live host mount holds; the reading after the session decides nothing), and that no peer group of the host propagates into or out of |
 
 Anything else is refused: `writable outside the workspace: [...]` when the report shows it is the host's (a super block
 the host holds, a host path or device as source, a file system a wrapper cannot make, a peer group of the host, a node
@@ -359,8 +359,10 @@ as before it in every recorded run, and `setsid_survivors` is empty; a super blo
 (proc's and mqueue's with the PID and IPC one) when the session's last process exits — kernel behaviour relied on, not
 measured here.
 
-The report records what decided: `host_mounts` (the host's table as `{at, fs, dev, optional}`), `inside.mounts` rows
-with `dev`, `root`, `source`, `options`, `super_options` and `optional`, `inside.devices` and `inside.device_roots`.
+The report records what decided: `host_mounts` (the host's table as `{at, fs, dev, optional}`, read before the session),
+`inside.mounts` rows with `dev`, `root`, `source`, `options`, `super_options` and `optional`, `inside.devices` and
+`inside.device_roots`; and, as information only, `host_mounts_appeared` (the rows the host's table gained while the
+measurement ran, read after it; `None` when either reading failed — it refuses nothing).
 
 **Locale.** The measurement's own subprocesses — the probe and `bwrap --version` — run with `LC_ALL=C` and `LANG=C`
 (`confine.LOCALE`), so the text the judgement parses (the probe's output, the user-namespace refusal `USERNS_REFUSED`
@@ -399,7 +401,9 @@ only the locales `C`, `C.utf8` and `POSIX`).
   controller's (another session's tmpfs reached through `/proc/<pid>/root` in a bind) is not the host's and is not
   excluded by observation; `confine.wrap` binds only the workspace read-write, so no command line it builds does that.
   Two mounts at one path are judged by what the probe sees at the path. The host's table is the controller's own: in a
-  container, the container's.
+  container, the container's. It is read once, just before the session starts: a host mount made after that reading and
+  before bubblewrap bound its parent in read-write (`confine.wrap` binds only the workspace so) is not told from the
+  sandbox's own; it lies inside the workspace tree (B03-R3-conf §13).
 - **No translated message was measured** (§6.1): the measurement's locale is fixed to C so that none need be.
 - Measured on one host and kernel (Docker Desktop's LinuxKit 7.0.12, arm64). The image's apt packages are not pinned:
   each build gets a new image ID (`measure.log`); the bubblewrap package (`0.12.0-1~deb13u1`) and the binary's

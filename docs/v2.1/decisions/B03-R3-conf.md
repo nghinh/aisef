@@ -79,8 +79,9 @@ shared by every mount of a file system, a bind included), `root`, `source`, `opt
 `optional` (the propagation fields). `access` is still `ro` only when a *per-mount* option says so.
 
 `_probe` records, new: `host_mounts` (the controller's own `/proc/self/mountinfo` — "the host" — as `{at, fs, dev,
-optional}` per mount, read before the session starts and again after it ended; a super block held at either moment
-counts; `None` when either reading failed or a line did not parse), `inside.devices` (what the probe read of each
+optional}` per mount, read just before the session starts; a super block it holds counts; `None` when the reading failed
+or a line did not parse; **§13 (FU-CONF): this was first the union of that reading and a second one after the session,
+which is no longer read as a judge**), `host_mounts_appeared` (§13), `inside.devices` (what the probe read of each
 mount point named like a device node: `{path: "1:3" | "other"}`), `inside.device_roots` (the destinations of `--dev` in
 the command line) and `locale`. The report is the record: a verifier re-derives every acceptance from `inside.mounts`,
 `host_mounts`, `inside.devices` and `inside.device_roots` (`RecordedGuest` does).
@@ -163,6 +164,8 @@ modules' and not parsed for text; they are not changed.
    not what the session has at the mount point (a bound regular file). The in-sandbox `stat` proves the latter.
 7. **Read the host table once, before the session**: a super block the host mounts between the reading and the start of
    bubblewrap, or one it drops while a session holds it, is missed by one reading. Two readings, union.
+   **Reversed by §13 (FU-CONF, 2026-10-13):** the union refused correct sessions when a host mount took a number the
+   session had just freed; the reading before the session is what decides, and §13 names what that gives up.
 
 ## 6. The lifecycle claim, and what it rests on
 
@@ -187,7 +190,7 @@ session keeps the namespace (and its RAM-backed file systems) alive; nothing her
 | the host's devpts / mqueue / tmpfs / proc, a host path or device as source, a file system a wrapper cannot make, a peer group of the host: refused, with the reason; a place under `/dev/` exempts nothing | `…policy.HostBacked` |
 | what cannot be read is "isolation not established", never a pass, never "writable" | `…policy.NotEstablished`, `…policy.ReportedData` |
 | the execution resources are accepted by identity and refused when not | `…policy.DeviceNodes`, `…policy.DevicesSection` (real shell and `stat`) |
-| the host's table is read before and after, whole, or not at all; the report records it | `…policy.HostTable`, `…policy.ReportedData` |
+| the host's table is read before the session (it decides), whole, or not at all; the report records it; the reading after the session is recorded as `host_mounts_appeared` and decides nothing (§13) | `…policy.HostTable`, `…policy.ReportedData`, `test_v21_r3_conf_fu_before` |
 | the real guest's reports are judged again as they were (accepted and refused) | `…policy.RecordedGuest` |
 | the exact environment handed to the probe and to `bwrap --version`; the report's `locale`; `os.environ` and the session's environment untouched | `test_v21_r3_conf_locale.PassedDown`, `…AtTheExecBoundary`, `…RecordedGuest` |
 | rows carry what the policy decides from | `test_v21_kills3_T07a.MountInfo`, `test_v21_kills3_T05b` |
@@ -289,4 +292,107 @@ What the reviewer re-ran and found, in short (the report is `out/conf/review/rep
   so no translated text was produced there either); another namespace's super block bound in by a wrapper that is not
   `confine.wrap` (the `/proc/<pid>/root` route was refused with EACCES in the guest, so it was not demonstrated); the
   host's table read *after* the session can hold a super-block number that an unrelated host mount reused within
-  milliseconds of the session's end — that would refuse a correct session as "the host's" (fails closed; not observed).
+  milliseconds of the session's end — that would refuse a correct session as "the host's" (fails closed; not observed;
+  **removed by §13**: the reading after the session no longer decides).
+
+## 13. Follow-up FU-CONF (2026-10-13, branch `v21r3/conf-fu`, stacked on §12): a super block is "the host's" by the reading before the session
+
+**Finding** (§12's last residual, from the review of this work package). `_probe` read the controller's
+`/proc/self/mountinfo` before the session and after it, `host_mounts` was the union, and `_owned` called a writable pseudo
+mount the sandbox's own only when its super block was in neither. Super blocks of these file systems are anonymous device
+numbers, allocated lowest-free: the numbers of the session's own tmpfs / devpts / proc / mqueue mounts are free again when
+it ends, and any host mount made between its end and the second reading — a container starting on a CI host — can take
+one. A correct session was then refused as "its super block … is the host's", depending on the host's activity (fail
+closed, spurious).
+
+**Requirement** (the owner's W3, §1: *chứng minh được mount/namespace thuộc sandbox, không mở đường ghi vào host*; the
+lead's reading for this follow-up): whether a super block is one the host already had is decided from the reading taken
+**before** the session — a super block a session creates is, by construction, one no live host mount holds. The reading
+after the session is information; a row that appeared there cannot tell a leak from a reused number.
+
+**Change** (`confine._probe`, two lines and their comment; `_owned`, `_writes`, `_judge` are untouched — they take the
+table as a parameter):
+
+| report field | was | is |
+|---|---|---|
+| `host_mounts` | the reading before + the rows of the reading after it lacked; `None` when either reading failed | the reading before the session; `None` when it failed (nothing is then shown to be the sandbox's own: "cannot establish", as before) |
+| `host_mounts_appeared` (new) | — | the rows of the reading after the session that the one before lacks, as `_host_mounts` shapes them (`{at, fs, dev, optional}`), in the order read; `[]` when none; `None` when either reading failed (there is nothing to tell it from). Decides nothing |
+
+An unreadable reading after the session no longer refuses a run by itself.
+
+**Reproduced.**
+
+* *Simulation* (`tests/v2/test_v21_r3_conf_fu_before.py`, through `confine.measure`, T05b's transcript of a correct
+  session, `_host_mounts` answered by the test): at `c05d19c` a host row holding the number of the session's `/tmp`, in the
+  reading after the session only, refused it — `writable outside the workspace: ['/tmp'] (/tmp: its super block 0:58 is the
+  host's (mounted there at /mnt/other))`; at this change the session is accepted and the row is in
+  `host_mounts_appeared`.
+* *Real bubblewrap, real device numbers* (`validation/v21/sandbox/r3_conf_fu_guest.py reuse`, record
+  `evidence/sandbox/r3-conf/fu-X1.json`): the session's own command line, the probe and bubblewrap 0.12.0 are real; 48
+  unrelated tmpfs file systems are mounted by the driver in place of the second reading (what a container start does).
+  They took six of the session's own numbers (`/`, `/proc`, `/dev`, `/dev/pts`, `/tmp`, `/aisef-home`). At `c05d19c` the
+  session was refused, all six "the host's"; at this change it is accepted (48 rows in `host_mounts_appeared`). With no
+  unrelated mounts both accept. The unrelated host activity is the driver's: simulated; the kernel's numbers are real.
+
+**Still refused** (control, same two runs): the container's own mqueue bound read-write at `/hostmq`
+(`--dev-bind /dev/mqueue /hostmq`) — super block `0:64`, held by the reading before the session — is refused as the host's
+with the 48 mounts after it and without them; in the simulation also with the reading after unreadable or lacking the row.
+The twelve scenarios (`scenarios-X1`, `scenarios-X1-shared-tree`) and the eight of `review-X1` give the committed records'
+verdicts and problems (but for super block numbers and a pid), `host_mounts_appeared == []`, `table_unchanged: true`;
+`measure.py` with `NETWORK=host` and `none`: `problems: []`, `host_mounts_appeared` a list.
+
+**Wrong implementations tried** (each fails at least one new test): the union again; the reading after only; every row of
+the reading after as "appeared"; the rows that went instead of the ones that appeared; the host table lost when the reading
+after failed; `appeared` computed when the reading before failed; the reading after used when the one before failed.
+
+**What this gives up, and what it does not** (not established; residual):
+
+1. The union could refuse one more thing: a host mount made after the reading before the session and before bubblewrap
+   bound the directory above it read-write, if it was still mounted at the second reading. It is no longer told from the
+   sandbox's own. `confine.wrap` binds read-write only the workspace, so such a mount lies inside the workspace tree
+   (`wrap`'s command line: `--bind <workspace> <workspace>` is its only read-write host bind); the read-only binds are
+   `ro` per mount whatever lies under them (bubblewrap's submount handling, not re-measured here); and a mount the host
+   makes while the session runs reaches the session only by propagation, which carries a peer-group tag of the host's
+   (`master:N`) that the policy already calls "not shown to be the sandbox's own" (the shared-tree record shows the tags).
+   Argued, not measured: no run mounts something on the host in that window.
+2. Unchanged: a super block the reading before holds and the host drops before bubblewrap makes the session's mounts frees
+   its number for them — a spurious refusal, fail closed, window = the reading before the session to the session's mount
+   setup. The change removes the other window (the session's end to the second reading), which is where the session's own
+   numbers are free.
+3. The lifecycle claim of §6 is as before (kernel behaviour relied on, proxies measured).
+
+**Existing tests changed** (rule 5; both in `test_v21_r3_conf_policy.ReportedData`, the owner's W3 and this follow-up's
+requirement): `test_the_host_is_read_before_the_session_and_after_it_and_both_count` pinned the union — its case with the
+row in the reading after the session only now expects acceptance; the cases for the reading before keep every refusal
+assertion, and `host_mounts` / `host_mounts_appeared` are asserted for all four (renamed
+`…_judged_by_the_reading_before_the_session_the_one_after_decides_nothing`).
+`test_a_reading_that_failed_leaves_no_mount_shown_to_be_the_sandboxs` lost its `(reading before ok, after None)` case: an
+unreadable reading after no longer refuses; the other two cases keep every assertion, and the lost one is pinned in
+`test_v21_r3_conf_fu_before.ReadingLost` (renamed `…_a_reading_before_that_failed_…`).
+
+**Requirement → test** (`tests/v2/test_v21_r3_conf_fu_before.py`, all through `confine.measure`; simulated transcript):
+
+| Requirement | Test |
+|---|---|
+| a super block only the reading after the session holds is not the host's (the hazard) | `ReadingBefore.test_a_super_block_only_the_reading_after_the_session_holds_is_not_the_hosts` |
+| one the reading before holds is, whatever the reading after holds | `ReadingBefore.test_a_super_block_the_reading_before_the_session_holds_is_the_hosts` |
+| a writable bind of a host super block stays refused whatever the reading after says (holds it, lacks it, unreadable) | `ReadingBefore.test_a_writable_bind_of_a_super_block_the_host_held_is_refused_…`, `…test_the_same_bind_is_not_refused_for_a_super_block_the_host_never_held_…` |
+| an unreadable reading before establishes nothing; one after refuses nothing | `ReadingLost` |
+| `host_mounts` is the reading before; `host_mounts_appeared` the rows that appeared, in order, `[]` or `None`, in `_host_mounts`'s shape (through the real `_host_mounts`) | `Appeared` |
+
+**Mutants** (`kill_check`, the confinement kill set, this file first; source `aisef2/app/confine.py` sha256 `093e276c…`):
+
+| Name | Mutants | Killed | Survived | Of which |
+|---|---|---|---|---|
+| `_probe` | 216 | 213 | 3 | the same three as §10, on lines this change did not touch: `'sleep '` AUDITED (old 110), `': '` AUDITED (old 167), `'.git'` EQUIVALENT (old 175). The 7 mutants of the two changed lines are all killed, by `test_v21_r3_conf_fu_before` |
+| `_owned` | 118 | 118 | 0 | |
+| `_writes`, `_host_mounts` | 18, 16 | all | 0 | |
+| `_judge` | 175 | 168 | 7 | the same seven as §10 (old 92, 97, 125, 126, 128, 129, 132) |
+| `measure` | 60 | 59 | 1 | `'/'` EQUIVALENT (old 51) |
+
+Only `_probe` changed in source; the others were run again because a kill file they use was edited.
+
+**Real, simulated, neither.** Real (guest, X1): the `reuse` driver at both trees, the twelve scenarios in both modes, the
+review scenarios, `measure.py`, the locale record; `hardened`: 179 tests OK (skipped=1; the existing skip).
+Simulated: the transcript-based tests, and the unrelated host activity of the `reuse` driver. Neither: a systemd or
+bare-metal host, CI Linux, a host that mounts on its own while a session runs.
