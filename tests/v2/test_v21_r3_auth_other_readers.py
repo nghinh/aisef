@@ -309,6 +309,7 @@ def lsof_prints(raw, returncode=1):
         yield calls
 
 
+@unittest.skipUnless(os.name == "posix", "the paths lsof prints are POSIX paths: the prefix test joins them with os.sep")
 class CwdUnder(unittest.TestCase):
     ME = os.getpid()
 
@@ -412,6 +413,7 @@ class CwdUnder(unittest.TestCase):
             self.assertEqual(ca.cwd_under("/w/", {}), [])
 
 
+@unittest.skipUnless(os.name == "posix", "the paths of /proc/<pid>/cwd are POSIX paths: the prefix test joins them with os.sep")
 class CwdUnderOnLinux(unittest.TestCase):
     """Linux: /proc/<pid>/cwd by readlink — a hermetic fake (the branch was not changed; its mutants are pinned here,
     and the real /proc is read by TheRealHost on a Linux host)."""
