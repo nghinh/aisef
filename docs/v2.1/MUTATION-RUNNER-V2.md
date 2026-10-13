@@ -1090,3 +1090,59 @@ re-measured, and its new guard `_look` is registered as a helper target with `ac
 **Campaign 4** (manifest rev 4): the targets the delta (base f860e57, a read-set measured at the commit before the
 snapshot) says to re-measure; every other result stands — campaign 3's at f860e57 or, for a target campaign 3 did not
 run, campaign 2's at 5719f1f, which campaign 3's delta found unchanged.
+
+## 19. Campaign 5: the measuring instrument changed, and what that does to every standing result (B-03 round 3, 2026-10-13)
+
+**What changed in what the runner measures with.** The owner's decisions of 2026-10-12 on the nine open mutants changed
+product code (`confine`, `usage`, `verify`, `review_verify`, `adapters`, `run`, `client`, `lineage`) and, because
+their reviews found defects in them, two files the manifest pins as harness: `aisef2/runtime/process_range.py` and
+`validation/v2/cleanup_authority.py`.
+
+* `ProcessRange.release()` is one release at a time (a second caller waits and is given the first's outcome; a
+  re-entry on the same thread cannot hang): the 1–5 % flake of `test_c2_cli_invocation` (two threads in `release()`)
+  is fixed at its cause (`docs/v2.1/decisions/B03-R3-range.md`).
+* `process_table()` splits `ps` rows at the line feed only and fails closed, typed (`ProcessTableError`), on a line
+  that is not a row; macOS `ps` prints U+2028/U+2029 raw in a UTF-8 locale and `str.splitlines()` cut a row inside its
+  command (a raise, a silently cut command, or a made-up process). The Linux reader decodes with replacement (a
+  process named with bytes that are not UTF-8 raised for the whole host).
+* `cleanup_authority._read` — the root of every ownership proof of this runner — had the same property and worse: a
+  command line holding U+2028 plus row-shaped text made a process born before the boundary "signalled" in a dry run.
+  It now reads bytes, splits at the line feed only, matches each row strictly and refuses the whole reading
+  (`TableUnreadable`, an `OSError`: every caller already stops on it) when a line is not a row
+  (`docs/v2.1/decisions/B03-R3-AUTH.md`). The runner's measurement semantics did not change: the class of a mutant,
+  the bracket, T0, the audits by position are as in §4–§18; only the code that decides *what is alive* is stricter.
+
+**The rule for a standing result under an instrument change.** The owner's words (item 6): a result may be reused only
+with a *specific dependency basis*; the rules are not relaxed to avoid the cost of measuring. The proof
+(`v21_mutation_record.proof`) does not bind the runner's code or code outside `tests/` in a kill closure, and the
+read-set says only that every kill file *opens* `process_range.py` (the package `__init__` of `tests/v2` loads it).
+What binds is whether the kill files EXECUTE changed code. `validation/v21/reach.py` records exactly that: for each
+kill file run alone by the runner's own `_run_file`, the changed functions (51 names of 10 files, by AST against
+`b5c2457`) that started executing, in the test process and every Python child that inherits the recorder
+(`sys.monitoring` `PY_START`, first hit written at once; eleven controls on a toy tree, each shown to bite;
+`docs/v2.1/decisions/B03-R3-REACH.md`). It is one-sided: a function seen executing is certain; one not seen is
+"not executed" only in the processes hooked — a child started with its own `env=` or `-I` is counted
+(`children.unhooked_python`), and a kill file with such a child cannot support "executes no changed code".
+
+**Measured** (`campaign-5/reach.json`, 161 kill files, 1,609 s, all PASS, controls a–k ok): 50 kill files execute no
+changed function; 111 execute at least one (`ProcessRange.release` and the other five names of the range code in 61,
+`_ps_table` in 65, `client.events` in 45, `usage.session_tokens` in 33, …). Of the 358 targets the delta
+(`campaign-5/delta`) lets stand by the proof's rules, **every one of the 162 outside the three probe modules has a
+kill file that executes a changed function or runs a Python child the recorder cannot see**, and the 196 targets of
+`cli_invocation.py`, `process_effect.py` and `python_callable_v2.py` import `ProcessRange` directly (their kill tests
+run the probes under it). There is therefore **no dependency basis for keeping any result**: campaign 5 measures
+**all 528 targets (13,566 mutants) at one snapshot, with one runner and one harness**; none is reused from campaigns
+2–4 (their records stay as history, §18). Roles in `campaign-5/SCOPE.json`: NEW 59 (871 mutants), REMEASURE 111
+(4,365: the target's file or its kill set changed), PROBE 196 (4,190), REACH 162 (4,140).
+
+**Not claimed.** That the changed functions' behaviour differs for any mutant (the re-measure may well show 0
+class differences for the 358); that a standing result *was* wrong. It is the absence of a basis, not the presence of a
+difference, that makes the measurement necessary. The import-time statements of `process_range.py` that changed
+(`import re`, two class definitions, a docstring) bind names; the recorder reports them as `module_statements`
+and they are not treated as executed behaviour (every kill file of `tests/v2` loads the file).
+
+**Order and workers.** The queue runs the delta's targets first (NEW and REMEASURE, 170: they carry the owner's
+decisions), then the probe modules', then the reach-driven ones; longest expected first within each group (T0 seconds
+of `T0-SWEEP-5`); 5 workers (campaign 3 and 4 used 4; the machine has 8 cores; the longest known kill, T21a's 640 s of
+waiting, is under the 900 s limit at 4 workers and its margin at 5 is not measured: an INFRA or TIMEOUT row is re-run
+alone at the same snapshot, as `c3b` was, and is never counted as a kill).
