@@ -216,6 +216,18 @@ class Walker(unittest.TestCase):
         mod = R.changed(eager + "class K:\n    def g(self, y: int): pass\n", eager + "class K:\n    def g(self, y: str): pass\n")
         self.assertEqual(mod["module"], "changed")
 
+    def test_the_module_statements_that_differ_are_named_by_kind_and_line(self):
+        c = R.changed(RICH, edit(RICH, "import functools", "import functools\nimport os"))
+        self.assertEqual([(m["kind"], m["text"]) for m in c["module_statements"]], [("Import", "import os")])
+        c = R.changed(RICH, edit(RICH, '"""doc"""', '"""other doc"""'))
+        self.assertEqual([m["kind"] for m in c["module_statements"]], ["docstring"])
+        c = R.changed(RICH, edit(RICH, "    x = 1\n", "    x = 2\n"))
+        self.assertEqual([(m["kind"], m["text"]) for m in c["module_statements"]], [("ClassDef", "class C:")])
+        c = R.changed(RICH, RICH + "\n\ndef added():\n    return 1\n")
+        self.assertEqual(c["module_statements"], [])   # a def with nothing to evaluate is no statement
+        c = R.changed(RICH, RICH + "\n\nclass Added(Exception):\n    pass\n\n\nLIMIT = 3\n")
+        self.assertEqual([m["text"] for m in c["module_statements"]], ["class Added(Exception):", "LIMIT = 3"])
+
     def test_a_new_file_is_all_new(self):
         c = R.changed(None, RICH)
         self.assertEqual(c["module"], "new")
@@ -284,7 +296,7 @@ class Merge(unittest.TestCase):
 
     def test_the_earliest_process_is_the_test_process_and_children_are_told_apart(self):
         got = self.merged({
-            "10-200.rch": "P\t10\t1\t200\tpython -m unittest discover\nH\ta.py\tf\nH\ta.py\t<module>\nC\tsubprocess.Popen\t1\t1\n",
+            "10-200.rch": "P\t10\t1\t200\tpython -m unittest discover\nH\ta.py\tf\nH\ta.py\t<module>\nL\tsubprocess.Popen\t1\t1\t\n",
             "11-300.rch": "P\t11\t10\t300\tpython -c <code>\nH\ta.py\tg\nH\ta.py\tf\n",
             "12-310.rch": "P\t12\t10\t310\tgit status\n",
         })
@@ -298,8 +310,18 @@ class Merge(unittest.TestCase):
         self.assertEqual((got["executed"], got["executed_in_children"]), ([["a.py", "f"]], []))
 
     def test_launches_are_counted_by_what_the_launch_says(self):
-        got = self.merged({"1-5.rch": "P\t1\t0\t5\tpython\nC\tsubprocess.Popen\t1\t0\nC\tos.system\t0\t0\nC\tsubprocess.Popen\t1\t1\n"})
-        self.assertEqual(got["children"], {"hooked": 0, "unhooked_python": 1, "other": 1})
+        got = self.merged({"1-5.rch": "P\t1\t0\t5\tpython\nL\tsubprocess.Popen\t1\t0\tpython -I -B -c <code>\n"
+                                      "L\tos.system\t0\t0\t\nL\tsubprocess.Popen\t1\t1\t\n"
+                                      "L\tsubprocess.Popen\t1\t0\tpython -I -B -c <code>\n"})
+        self.assertEqual(got["children"], {"hooked": 0, "unhooked_python": 2, "other": 1})
+        self.assertEqual(got["unhooked_python_argv"], {"python -I -B -c <code>": 2})
+
+    def test_a_copy_of_the_tree_is_executed_and_another_version_is_named_apart(self):
+        got = self.merged({"1-5.rch": "P\t1\t0\t5\tpython\nH\ta.py\tf\nC\ta.py\tg\nC\ta.py\tf\nX\ta.py\th\nX\ta.py\t<module>\n"})
+        self.assertEqual(got["executed"], [["a.py", "f"], ["a.py", "g"]])   # g: only through a copy of the same bytes
+        self.assertEqual(got["executed_from_copy_only"], [["a.py", "g"]])
+        self.assertEqual(got["other_version"], [["a.py", "h"]])   # not executed: it is not the code measured
+        self.assertEqual(got["loaded"], [])
 
     def test_a_line_that_is_not_one_is_counted_not_trusted(self):
         got = self.merged({"1-5.rch": "P\t1\t0\t5\tpython\nH\tonly-one-field\nnonsense\nH\ta.py\tf\n"})
@@ -348,6 +370,17 @@ class Recorder(unittest.TestCase):
         self.assertEqual(doc["kill_files"], {})
         self.assertEqual(doc["not_passed"][R._T.format("a")]["outcome"], "PASS")
         self.assertIn("nothing measured", doc["not_passed"][R._T.format("a")]["why"])
+
+    def test_an_unhooked_child_is_shown_by_what_it_was_started_as(self):
+        c = R.changed(R._TOY_BASE, R._TOY)
+        with tempfile.TemporaryDirectory() as t:
+            root = R._toy_tree(pathlib.Path(t))
+            doc = R.record(root, [R._T.format("d")], {R._TOY_FILE: sorted(c["names"])}, {R._TOY_FILE: c["module"]})
+        e = doc["kill_files"][R._T.format("d")]
+        self.assertEqual((e["executed"], e["children"]["unhooked_python"]), ([], 1))
+        (words, n), = e["unhooked_python_argv"].items()
+        self.assertEqual(n, 1)
+        self.assertTrue(words.endswith("-c <code>"), words)   # the payload of -c is not copied
 
     def test_the_plain_mode_runs_the_same_files_with_no_hook(self):
         c = R.changed(R._TOY_BASE, R._TOY)

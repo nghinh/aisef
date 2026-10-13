@@ -6,9 +6,10 @@ module is not executing a function of it. This tool records the execution.
 
     {"commit", "base", "head", "tool", "python", "platform", "watch": {file: [name]}, "watch_size", "modules": {file: status},
      "diff": {...},
-     "kill_files": {kf: {"executed": [[file, name]], "executed_in_children": [[file, name]], "loaded": [file],
+     "kill_files": {kf: {"executed": [[file, name]], "executed_in_children": [[file, name]],
+                         "executed_from_copy_only": [[file, name]], "other_version": [[file, name]], "loaded": [file],
                          "module_statements_executed": [file], "outcome", "seconds", "processes",
-                         "children": {"hooked", "unhooked_python", "other"}}},
+                         "children": {"hooked", "unhooked_python", "other"}, "unhooked_python_argv": {words: n}}},
      "not_passed": {...}, "not_measured": {...}, "complete", "limits": [...]}
 
 The watch list. `git diff --no-renames base head` over `aisef2/**.py` and `validation/v2/cleanup_authority.py`: every
@@ -37,8 +38,10 @@ The recorder. The runner's own `mutation._run_file` runs the kill file alone (it
 ProcessRange, judgement, leftovers settled only through validation/v2/cleanup_authority.py) on a fresh copy of its tree
 (`mutation._pristine`, `_new_tree`), with one addition to the environment: PYTHONPATH naming a directory of this run that
 holds a `sitecustomize.py`. Every Python process that loads it — the test process and each child that inherits
-PYTHONPATH — installs a `sys.monitoring` PY_START callback (Python 3.12+; refused earlier). For a code object that is
-not in the watch list the callback returns DISABLE, so it never fires again for that code object. For one that is, it
+PYTHONPATH — installs a `sys.monitoring` PY_START callback (Python 3.12+; refused earlier). A code object is in the
+watch list by its file — the tree's own, or a file outside the tree with the same name, path tail and bytes (product
+code run from a copy of the tree; a copy with other bytes is `other_version`) — and its `co_qualname`. For a code object
+that is not in the watch list the callback returns DISABLE, so it never fires again for that code object. For one that is, it
 appends one line to the process's own file with one `os.write`, at the FIRST hit — a process SIGKILLed right after the
 call has recorded it — and then also returns DISABLE. Per hit the file is opened and closed again: the recorder holds
 no file descriptor, so a test that counts or closes descriptors does not see it. A forked child registers itself and
@@ -59,7 +62,9 @@ without PYTHONPATH ⇒ NOT recorded, the child counted `unhooked_python` (the li
 recorded; f. a process SIGKILLed right after the call ⇒ recorded; g. the recorder changes no kill file's PASS/FAIL (a
 passing and a failing toy, hooked and plain); h. the qualified names of methods, nested defs, generators, coroutines and
 a property setter, taken from the AST by this tool, are the ones the interpreter reports; i. a forked child records its
-own first hit although its parent's first hit had disabled the event.
+own first hit although its parent's first hit had disabled the event; j. product code run from a copy of the tree
+(`executed_from_copy_only`) is recorded when the copy's bytes are the tree's, and another version of the file is
+named apart (`other_version`), not counted; k. descriptors closed by the code under test lose no later hit.
 
 Limits — what a result recorded here is not (also in the output, `limits`):
   * Python processes only: a child that is not Python (git, sh) runs code nobody sees (`children.other`).
@@ -89,6 +94,7 @@ from __future__ import annotations
 import argparse
 import ast
 import copy
+import hashlib
 import json
 import os
 import pathlib
@@ -158,11 +164,32 @@ def own(node: ast.AST, deferred: bool) -> tuple[str, str]:
 _SCOPES = (ast.stmt, ast.excepthandler, ast.match_case)   # where a def can stand: never inside an expression
 
 
+def _deferred(tree: ast.Module) -> bool:
+    return any(isinstance(n, ast.ImportFrom) and n.module == "__future__" and any(a.name == "annotations" for a in n.names)
+               for n in tree.body)
+
+
+def statements(src: str) -> list[tuple[str, dict]]:
+    """[(own text, {line, kind, text})] for each statement of the module that runs something at import: a def stands by
+    its decorators, defaults and annotations only (see _Elide), a class keeps its non-def statements."""
+    tree = ast.parse(src)
+    out = []
+    for i, s in enumerate(tree.body):
+        got = _Elide(_deferred(tree)).visit(copy.deepcopy(s))
+        nodes = got if isinstance(got, list) else [got]
+        if not nodes:
+            continue
+        head = ast.unparse(s).split("\n", 1)[0]
+        doc = i == 0 and isinstance(s, ast.Expr) and isinstance(s.value, ast.Constant) and isinstance(s.value.value, str)
+        out.append(("".join(ast.dump(n) for n in nodes),
+                    {"line": s.lineno, "kind": "docstring" if doc else type(s).__name__, "text": head[:100]}))
+    return out
+
+
 def functions(src: str) -> tuple[dict[str, list[tuple[str, str]]], tuple[str, str]]:
     """({qualified name: sorted own-code texts of every def of that name}, own-code texts of the module's statements)."""
     tree = ast.parse(src)
-    deferred = any(isinstance(n, ast.ImportFrom) and n.module == "__future__" and any(a.name == "annotations" for a in n.names)
-                   for n in tree.body)
+    deferred = _deferred(tree)
     out: dict[str, list[tuple[str, str]]] = {}
 
     def walk(node: ast.AST, prefix: str) -> None:
@@ -192,8 +219,15 @@ def changed(base_src: str | None, head_src: str) -> dict:
             names[q] = "new" if o is None else ("docstring" if [x[1] for x in o] == [x[1] for x in v] else "changed")
     module = ("new" if old_mod is None else "unchanged" if old_mod == new_mod else
               "docstring" if old_mod[1] == new_mod[1] else "changed")
+    kept = [t for t, _ in statements(base_src)] if base_src is not None and module != "unchanged" else []
+    stmts = []   # the statements at head that base had no copy of (a multiset: one removed line is not matched twice)
+    for t, info in statements(head_src) if module != "unchanged" else ():
+        if t in kept:
+            kept.remove(t)
+        else:
+            stmts.append(info)
     return {"names": names, "unchanged": sorted(set(new) - set(names)), "removed": sorted(set(old) - set(new)),
-            "module": module}
+            "module": module, "module_statements": stmts[:40]}
 
 
 def _py(p: str) -> bool:
@@ -215,7 +249,7 @@ def watch_from_diff(root: pathlib.Path, base: str, head: str) -> tuple[dict, dic
         old = None if code.startswith("A") else RS._git(root, "show", f"{base}:{path}")
         c = changed(old, RS._git(root, "show", f"{head}:{path}"))
         diff["files"][path] = {"status": code, "module": c["module"], "unchanged": len(c["unchanged"]),
-                               "names": c["names"]}
+                               "names": c["names"], "module_statements": c["module_statements"]}
         if c["removed"]:
             diff["removed_functions"][path] = c["removed"]
         if c["names"] or c["module"] != "unchanged":
@@ -242,10 +276,12 @@ def watch_from_file(path: pathlib.Path) -> dict:
 
 #: The sitecustomize every hooked process runs. Never raises into the process: an exception here would break the code
 #: under test. Per process one file `<pid>-<ns>.rch`: `P pid ppid start_ns words` (it ran the hook), `H file name` (a
-#: watched code object started, once per process), `C event python hooked` (it started a child).
+#: watched code object of the tree started, once per process), `C file name` (the same, in a file outside the tree of
+#: the same name and bytes: product code run from a copy of the tree), `X file name` (…of that name and other bytes: another
+#: version), `L event python hooked words` (it started a child).
 HOOK = r'''import os, sys, time
 
-_EV, _ROOTS, _WATCH = @EVENTS@, @ROOTS@, @WATCH@
+_EV, _ROOTS, _WATCH, _SHA = @EVENTS@, @ROOTS@, @WATCH@, @SHA@   # _SHA: file -> sha256 of the tree's bytes
 _HOOK = os.path.dirname(os.path.abspath(__file__))
 _o, _w, _c, _pid, _fsdecode, _fspath = os.open, os.write, os.close, os.getpid, os.fsdecode, os.fspath
 _norm, _join, _isabs, _nc = os.path.normpath, os.path.join, os.path.isabs, os.path.normcase
@@ -253,10 +289,14 @@ _mon = sys.monitoring
 _DISABLE = _mon.DISABLE
 _CWD0 = os.getcwd()
 _LAUNCH = ("subprocess.Popen", "os.posix_spawn", "os.spawn", "os.system")
+_NAMES = {_rel: frozenset(_n) for _rel, _n in _WATCH.items()}
 _W = {}   # absolute file, under every spelling of the tree -> (file relative to the tree, watched names)
 for _r in _ROOTS:
-    for _rel, _names in _WATCH.items():
-        _W[_nc(_norm(_join(_r, _rel)))] = (_rel, frozenset(_names))
+    for _rel, _n in _NAMES.items():
+        _W[_nc(_norm(_join(_r, _rel)))] = (_rel, _n)
+_BY_NAME = {}   # base name -> watched files of that name: where a copy outside the tree is looked for
+for _rel in _WATCH:
+    _BY_NAME.setdefault(os.path.basename(_rel), []).append(_rel)
 _st, _seen = {"path": None}, set()
 
 
@@ -268,8 +308,8 @@ def _append(line, create=False):
         _c(fd)
 
 
-def _words():
-    a = list(getattr(sys, "orig_argv", None) or sys.argv)[:4]
+def _words(a):
+    a = [_fsdecode(w) if isinstance(w, (bytes, os.PathLike)) else str(w) for w in list(a)[:4]]
     return " ".join("<code>" if i and a[i - 1] == "-c" else w for i, w in enumerate(a))[:200].replace("\t", " ").replace("\n", " ")
 
 
@@ -277,28 +317,46 @@ def _register():
     ns, pid = time.time_ns(), _pid()
     _st["path"] = _join(_EV, "%d-%d.rch" % (pid, ns))
     _seen.clear()
-    _append("P\t%d\t%d\t%d\t%s\n" % (pid, os.getppid(), ns, _words()), True)
+    _append("P\t%d\t%d\t%d\t%s\n" % (pid, os.getppid(), ns, _words(getattr(sys, "orig_argv", None) or sys.argv)), True)
+
+
+def _copy_of(fn):
+    """(file, kind) when `fn`, outside the tree, is a file of that name and path tail: `C` the same bytes as the tree's
+    (product code run from a copy of the tree), `X` other bytes (another version). None: not a watched file's name."""
+    if not _BY_NAME.get(os.path.basename(fn)):
+        return None
+    tail = fn.replace("\\", "/")
+    for rel in _BY_NAME[os.path.basename(fn)]:
+        if tail.endswith("/" + rel):
+            import hashlib
+            with open(fn, "rb") as f:
+                return rel, "C" if hashlib.sha256(f.read()).hexdigest() == _SHA.get(rel) else "X"
+    return None
 
 
 def _start(code, offset):
     try:
         fn = code.co_filename
-        hit = _W.get(_nc(_norm(fn if _isabs(fn) else _join(_CWD0, fn))))
+        key = _norm(fn if _isabs(fn) else _join(_CWD0, fn))
+        hit, kind = _W.get(_nc(key)), "H"   # H: the tree's own file
         if hit is None:
-            return _DISABLE
+            c = _copy_of(key)
+            if c is None:
+                return _DISABLE
+            hit, kind = (c[0], _NAMES[c[0]]), c[1]
         rel, names = hit
         q = code.co_qualname
         if q not in names:
             return _DISABLE
     except Exception:
         return _DISABLE
-    if (rel, q) in _seen:
+    if (kind, rel, q) in _seen:
         return _DISABLE
     try:
-        _append("H\t%s\t%s\n" % (rel, q))
+        _append("%s\t%s\t%s\n" % (kind, rel, q))
     except Exception:   # no free descriptor, no space: the event stays on, the next call tries again
         return None
-    _seen.add((rel, q))
+    _seen.add((kind, rel, q))
     return _DISABLE
 
 
@@ -321,6 +379,7 @@ def _has_hook(env):
 
 def _launch(event, a):
     py = hooked = 0
+    words = ""
     if event != "os.system":
         if event == "subprocess.Popen":
             exe, argv, env = a[0], a[1], a[3]
@@ -332,7 +391,9 @@ def _launch(event, a):
         e = _fsdecode(e) if isinstance(e, bytes) else e
         py = int(os.path.basename(e).lower().startswith("python") or e == sys.executable)
         hooked = int(bool(py and isinstance(argv, (list, tuple)) and _has_hook(env) and not _isolated(argv)))
-    _append("C\t%s\t%d\t%d\n" % (event, py, hooked))
+        if py and not hooked and isinstance(argv, (list, tuple)):
+            words = _words(argv)   # what the child that will not run this hook was started as
+    _append("L\t%s\t%d\t%d\t%s\n" % (event, py, hooked, words))
 
 
 def _audit(event, a):
@@ -383,17 +444,20 @@ except Exception:
 
 
 def hook_source(events: pathlib.Path, tree: pathlib.Path, watch: dict) -> str:
+    """`watch`: {file: [names]}. The digest of each file is the tree's own bytes: what a copy is compared with."""
     w = {f: sorted({*names, MODULE}) for f, names in watch.items()}
+    sha = {f: hashlib.sha256((tree / f).read_bytes()).hexdigest() for f in w if (tree / f).is_file()}
     return (HOOK.replace("@EVENTS@", repr(str(events))).replace("@ROOTS@", repr(RS._roots(tree)))
-            .replace("@WATCH@", repr(w)))
+            .replace("@WATCH@", repr(w)).replace("@SHA@", repr(sha)))
 
 
 def merge(events: pathlib.Path) -> dict:
     """What every process of one kill-file run wrote under `events`. The test process is the earliest hooked one: every
     other hooked process descends from it."""
     procs: dict[int, tuple[int, int, str]] = {}   # pid -> (start_ns, ppid, words)
-    hits: dict[int, set[tuple[str, str]]] = {}
+    hits: dict[int, set[tuple[str, str, str]]] = {}   # pid -> {(H | C | X, file, name)}
     kids = {"python": 0, "python_unhooked": 0, "other": 0}
+    argvs: dict[str, int] = {}
     bad = 0
     for f in sorted(events.glob("*.rch")):
         pid = None
@@ -406,27 +470,34 @@ def merge(events: pathlib.Path) -> dict:
                     if pid not in procs or int(ns) < procs[pid][0]:
                         procs[pid] = (int(ns), int(ppid), words)
                     hits.setdefault(pid, set())
-                elif kind == "H" and pid is not None:
+                elif kind in ("H", "C", "X") and pid is not None:
                     rel, q = rest.split("\t", 1)
-                    hits[pid].add((rel, q))
-                elif kind == "C":
-                    _, py, hooked = rest.split("\t")
+                    hits[pid].add((kind, rel, q))
+                elif kind == "L":
+                    _, py, hooked, words = rest.split("\t", 3)
                     kids["python"] += int(py)
                     kids["python_unhooked"] += int(py) - int(hooked)
                     kids["other"] += 1 - int(py)
+                    if words:
+                        argvs[words] = argvs.get(words, 0) + 1
                 elif line:
                     bad += 1
             except ValueError:
                 bad += 1
     test = min(procs, key=lambda p: (procs[p][0], p)) if procs else None
-    everywhere = {h for hs in hits.values() for h in hs}
-    in_children = {h for p, hs in hits.items() if p != test for h in hs}
-    return {"executed": sorted([r, q] for r, q in everywhere if q != MODULE),
+    ran = {(k, r, q) for hs in hits.values() for k, r, q in hs if k != "X"}   # the tree's bytes: its file or a copy
+    in_children = {(r, q) for p, hs in hits.items() if p != test for k, r, q in hs if k != "X"}
+    via_tree = {(r, q) for k, r, q in ran if k == "H"}
+    return {"executed": sorted([r, q] for r, q in {(r, q) for _, r, q in ran} if q != MODULE),
             "executed_in_children": sorted([r, q] for r, q in in_children if q != MODULE),
-            "loaded": sorted({r for r, q in everywhere if q == MODULE}),
+            "executed_from_copy_only": sorted([r, q] for r, q in {(r, q) for _, r, q in ran} - via_tree if q != MODULE),
+            "other_version": sorted([r, q] for r, q in {(r, q) for hs in hits.values() for k, r, q in hs if k == "X"}
+                                    if q != MODULE),
+            "loaded": sorted({r for _, r, q in ran if q == MODULE}),
             "processes": len(procs), "unparsed_lines": bad,
             "children": {"hooked": max(len(procs) - 1, 0), "unhooked_python": kids["python_unhooked"],
-                         "other": kids["other"]}}
+                         "other": kids["other"]},
+            "unhooked_python_argv": dict(sorted(argvs.items(), key=lambda kv: (-kv[1], kv[0]))[:10])}
 
 
 # ---- the recorder -----------------------------------------------------------------------------------------------
@@ -525,7 +596,9 @@ LIMITS = [
     "a child Python process is seen only when it inherits PYTHONPATH and runs without -I, -E, -S: a test that builds its "
     "own env= starts a child this recorder cannot see (children.unhooked_python), and so does a child of one; a child "
     "launched with no subprocess.Popen/os.posix_spawn/os.spawn/os.system audit event is not counted either way",
-    "not matched: C-level calls, code with no file of the tree (exec, compile, dataclass-generated methods)",
+    "not matched: C-level calls, code with no file (exec, compile, dataclass-generated methods), and product code run "
+    "from a copy of the tree whose file name or path tail differs; a copy with the tree's name, path tail and bytes "
+    "is counted (executed_from_copy_only), one with other bytes is another version (other_version), not counted",
     "a hit is lost when the process has no free file descriptor at that moment (retried at the next call)",
     "a function executed before the hook is installed (the interpreter start) is not seen: none of the watched ones can be",
     "'executed' says the function's code object started; not a line, a branch, or that its result was used",
@@ -675,6 +748,32 @@ _KILL = {
                 t.prop = 1
                 self.assertEqual((toy.outer(), list(toy.gen()), asyncio.run(toy.coro())), (9, [10], 11))
         """,
+    "k": """
+        import os, unittest
+        from aisef2 import toy
+        class K(unittest.TestCase):
+            def test(self):   # the code under test closes every descriptor above 2: the recorder holds none to lose
+                toy.watched()
+                os.closerange(3, 1024)
+                toy.watched_child()
+        """,
+    "j": """
+        import importlib.util, pathlib, shutil, tempfile, unittest
+        from aisef2 import toy
+        class K(unittest.TestCase):
+            def test(self):   # product code run from a copy of the tree: the same bytes, and another version
+                src = pathlib.Path(toy.__file__)
+                with tempfile.TemporaryDirectory() as t:
+                    for name, fn, text in (("site", "watched", src.read_text()),
+                                           ("old", "watched_thread", src.read_text() + "\\n# an older version\\n")):
+                        d = pathlib.Path(t, name, "aisef2")
+                        d.mkdir(parents=True)
+                        (d / "toy.py").write_text(text)
+                        spec = importlib.util.spec_from_file_location("toycopy_" + name, d / "toy.py")
+                        m = importlib.util.module_from_spec(spec)
+                        spec.loader.exec_module(m)
+                        getattr(m, fn)()
+        """,
     "i": """
         import os, unittest
         from aisef2 import toy
@@ -700,6 +799,8 @@ CONTROLS = {
     "g": "the recorder changes no kill file's PASS/FAIL (a passing and a failing toy, hooked and plain)",
     "h": "the qualified names this tool derives from the AST are the ones the interpreter reports",
     "i": "a forked child records its own first hit although its parent's first hit disabled the event",
+    "j": "product code run from a byte-identical copy of the tree is recorded (flagged); another version is not",
+    "k": "descriptors the code under test closes do not lose later hits (the recorder holds no descriptor)",
 }
 _G, _F = _T.format("g_pass"), _T.format("g_fail")
 
@@ -721,11 +822,11 @@ def run_controls(which=None) -> dict:
     began = time.monotonic()
     c = changed(_TOY_BASE, _TOY)   # everything but `unwatched`, by this tool's own diff
     watch, modules, toy = {_TOY_FILE: sorted(c["names"])}, {_TOY_FILE: c["module"]}, _TOY_FILE
-    names = {k: _T.format(k) for k in "abcdefhi"}
+    names = {k: _T.format(k) for k in "abcdefhijk"}
     out: dict[str, dict] = {}
     with tempfile.TemporaryDirectory(prefix="aisef-reach-controls-", ignore_cleanup_errors=True) as t:
         root = _toy_tree(pathlib.Path(t))
-        files = [names[k] for k in "abcdefhi" if k in which] + ([_G, _F] if "g" in which else [])
+        files = [names[k] for k in "abcdefhijk" if k in which] + ([_G, _F] if "g" in which else [])
         hooked = record(root, files, watch, modules)
         plain = record(root, [_G, _F], watch, modules, hooked=False) if "g" in which else {}
 
@@ -753,6 +854,10 @@ def run_controls(which=None) -> dict:
               lambda: row(hooked, names["h"])["executed"]),
         "i": (([[toy, "watched"]], [[toy, "watched"]]),
               lambda: (row(hooked, names["i"])["executed"], row(hooked, names["i"])["executed_in_children"])),
+        "k": ([[toy, "watched"], [toy, "watched_child"]], lambda: row(hooked, names["k"])["executed"]),
+        "j": (([[toy, "watched"]], [[toy, "watched"]], [[toy, "watched_thread"]]),
+              lambda: (row(hooked, names["j"])["executed"], row(hooked, names["j"])["executed_from_copy_only"],
+                       row(hooked, names["j"])["other_version"])),
     }
     for k in which:
         want, get = exp[k]
