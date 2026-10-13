@@ -355,3 +355,125 @@ cleared (the sequential outcomes of RangeEscaped change; RangeNotEmpty still re-
 dies of something that is not a Residual after the reap (a failing `process_table()` in the escapee check) gives its
 waiters `None`: the escapee check did not complete for anyone. (c) The sealed records and `docs/v2.1/REPORT.md`
 (Q-RANGE row), `MUTATION-RUNNER-V2.md` (the intermittent-failure paragraph) still describe the question as open.
+
+## 11. Follow-up, 2026-10-13 (`range-fu`): the process table's row ends at a line feed and nowhere else
+
+Branch `v21r3/range-fu`, stacked on `v21r3/range-rv`. It owns `_ps_table` (and, as section 11.8 says, `_linux_table`) in
+`aisef2/runtime/process_range.py`; `release`, `_release`, `_ladder` and `_Flight` are untouched.
+
+**11.1 The finding, and the correction of the record.** `_ps_table` (macOS, `LINUX` false) read `ps -A -o
+pid=,ppid=,pgid=,stat=,command=` in text mode and split it with `str.splitlines()`. The first report blamed "a newline in
+a command line": that is not the trigger — `ps` prints a line feed in a command as `\012`. The trigger is a character
+`ps` prints raw and `splitlines()` breaks at. Measured on this host (macOS 26.5.2, Darwin 25.5.0, CPython 3.14.7):
+
+| character in the command line | `ps` in a UTF-8 locale | `ps` in the C locale |
+|---|---|---|
+| U+2028, U+2029 | **raw** | `M-bM^@M-(` (escaped) |
+| U+0085 (NEL) | `M^E` (escaped) | `M-BM^E` |
+| VT, FF, FS, GS, RS, CR | `^K ^L ^\ ^] ^^ ^M` (escaped) | the same |
+| LF | `\012` | `\012` |
+
+So **on this `ps` only U+2028 and U+2029, and only when `ps` itself runs in a UTF-8 locale** (the mutation workers run with
+`LANG=en_US.UTF-8`), reach the parser; U+0085 does not reproduce here although the lead's report names it. Other `ps`
+versions may differ; the fix does not depend on which characters a `ps` leaves raw.
+
+**11.2 What it did, on `BASE`** (`repro-ps-table.py.txt`: one child of its own per case, `/bin/zsh -c 'echo ready; read
+x; : TEXT'`, ended by closing its stdin; 10 characters x 2 locales x 3 shapes = 60 real cases; nothing signalled). With
+U+2028 or U+2029 in a UTF-8 locale, three outcomes, by what follows the character:
+
+| text after the character | `process_table()` on `BASE` |
+|---|---|
+| four or more words (`alpha beta gamma delta`) | `ValueError: invalid literal for int() with base 10: 'alpha'` — every `ProcessRange` operation on the host raises |
+| fewer than four words | no error; **the child's `command` is silently cut** at the character (a survivor whose marker follows it is not found by `confine._survivors`) |
+| row-shaped text (`99998 1 99998 S x`) | no error; **a process that is not there is in the table** (and the real row of that pid, if there is one, is overwritten) |
+
+After the change: 60 of 60 cases return the whole table, the child's row present, `command` equal to what `ps -p PID -o
+command=` prints, and no made-up pid (`repro-after-fix.txt`; before: `repro-before-base.txt`). The second and third
+rows of the table are worse than the one the lead reported: they do not raise.
+
+**11.3 The fix.** `_ps_table` reads bytes (no text mode: it also turns CR into LF), decodes with replacement, splits at
+`"\n"` only and takes a non-blank line as a row with one pattern — `pid ppid pgid stat [command]`, ASCII digits, columns
+separated by spaces, the command the rest of the line as printed (a command that starts with U+2028 keeps it). Blank
+lines (the output's end) are no rows. A zombie (stat `Z...`) is skipped, as before.
+
+**11.4 The error, its class and why.** A non-blank line that is not a row raises `ProcessTableError(Exception)`, naming
+`line[:80]` as `repr` (a separator is shown, not printed). Not skipped: a row skipped is a process the table cannot see —
+a member the emptiness check would call gone, a survivor `_survivors` would miss. The class from how callers treat a
+table failure: nobody catches one specifically (`ProcessRange.release`/`members`, `confine._survivors`,
+`owned_run.harness_orphans` let it propagate, as the `CalledProcessError` of a failed `ps` always did), and
+`StoryScope._release` turns any `Exception` that is not a `Residual` into FAILED and blocks what depends on the range.
+So it is **not a `Residual`** (RESIDUAL says "named, not released"; this says nothing about what is alive) and **not a
+`RangeError`** (the callers that catch that read it as "the tool could not start" and go on; a table that cannot be
+read must not). Both are pinned by tests.
+
+**11.5 Alternatives, run against the 16-test file** (each a copy of `_ps_table` in a scratch tree, with the same typed
+error where it raises; "cases" counts subtests):
+
+| alternative | result |
+|---|---|
+| A. `split("\n")` + the old `split(None, 4)` + `int()`, short lines skipped as before (the literal fix) | 27 cases fail, 7 tests |
+| B. as A, but a short line raises too | 18 cases fail, 2 tests: 13 where a command begins with a Unicode-whitespace character (U+2028, U+0085, VT, FF, FS ... — `split(None, 4)` strips it: not "as `ps` printed it"); 5 where `int()` and `split()` accept `+5`, `1_0`, a non-ASCII digit, tab-separated columns, a separator before the pid |
+| C. `splitlines()`, lines that are not rows skipped | 24 cases fail, 11 tests (truncated commands, made-up rows, CR) |
+| D. text mode, then `split("\n")` | 2 errors: a CR in a command becomes a break |
+
+**11.6 Requirement -> test** (`tests/v2/test_v21_r3_range_fu_ps_table.py`, 16 tests, ~0.8 s; `..._linux_table.py`, 7):
+
+| requirement | test |
+|---|---|
+| a command holding any of 13 separator characters (U+0085, U+2028, U+2029, VT, FF, FS, GS, RS, CR, US, TAB, NBSP, U+3000) in 5 positions is one row, whole, and nothing after it is a row | `RowIsALine.test_a_command_holding_a_separator_is_one_row_with_the_whole_command` |
+| a raw CR / an escaped LF / non-UTF-8 bytes beside a separator / blank lines / no final newline | `RowIsALine.*` (4 tests) |
+| zombie skipped; a row without a command has `""`; `ps` is asked for exactly these columns once; a failed `ps` is `CalledProcessError`, never a table | `RowShape.*` |
+| 12 shapes of a line that is not a row are `ProcessTableError` naming `repr(line[:80])`, not a `ValueError`/`Residual`/`RangeError`; the 81st character is not named; a separator is shown; no partial table | `NotARow.*` |
+| the table readers (`process_table`, `_Posix.members`, `_Posix.escaped`) raise; a `StoryScope` records the release FAILED with the line and leaves the scratch directory | `FailsClosedWhereItIsRead.*` |
+| a real `/bin/sh` with U+2028, U+2029, U+0085 in its command line, `ps` in a UTF-8 locale: its row is whole and equals `ps -p`'s; no made-up pid | `RealPs` (macOS only, ~0.2 s: the child waits for its stdin, no sleep, no signal) |
+
+**11.7 Real, simulated, neither.** *Real, on the host (macOS):* the 60-case reproduction before and after; `RealPs`.
+*Real, in the Linux guest (`guest.sh`, X1; Python 3.14.8):* the `_linux_table` reproduction and `RealLinux` (section
+11.8), before and after; the new test files and `p4.test_process_table`: 27 tests OK, 1 skipped (`RealPs`).
+*Simulated:* every other test — a real child process prints bytes I chose, so `subprocess.run`'s capture, `check` and
+decoding are the real ones, but the rows are mine; the `/proc` of `LinuxTable` is a directory the test writes.
+*Neither:* Windows (the tests are portable by construction: no signal, no path, the POSIX-only ones are skipped; not run
+there); a `ps` other than this macOS's; the real OpenCode client.
+
+**11.8 `_linux_table`: the same hazard, another shape (second commit, droppable).** It read `/proc/<pid>/stat` with
+`read_text()`. A process named with bytes that are not UTF-8 (`prctl(PR_SET_NAME)`; an executable file with such a
+name) raises `UnicodeDecodeError` — not the `OSError` it skips — for the whole host. **Real run in the guest, before:**
+`process_table()` after `prctl(15, b"\xff\xfeab")` raised `UnicodeDecodeError: 'utf-8' codec can't decode byte 0xff`
+(`guest-linux-comm.sh.txt`); after the change it returns the table (`guest-comm-after.txt`). The file is read as bytes and
+decoded with replacement, as `cmdline` already was. Nothing else changed there; other failure shapes of that reader
+(`rindex`, `f[19]`) were not measured and are untouched.
+
+**11.9 Mutants** (`kill_check`, T0 PASS):
+
+| function | tests | mutants | killed | survived |
+|---|---|---|---|---|
+| `_ps_table` | the new file (16 tests) | 24 | 24 | 0 |
+| `_ps_table` | existing `p4/test_process_table.py` (as changed) alone | 24 | 22 | 2: `' '` emptied (the blank-line strip) and the message prefix emptied — the new file kills both; both files together 24/24 |
+| `_linux_table` | `test_v21_r3_range_fu_linux_table.py` | 17 | 17 | 0 |
+
+**11.10 The same property elsewhere** (`grep` over `aisef2/`, `validation/`; fixed only inside `process_range.py`):
+
+| site | verdict |
+|---|---|
+| `validation/v2/cleanup_authority.py:99` (`_read`, `ps -A ... lstart=,command=`) | **same hazard, and it is the runner's authority.** `splitlines()` + "a continuation line is no row" (skipped). Measured, read-only, `dry_run=True` (`finding-cleanup-authority.py.txt`): a process born before the boundary, not owned, becomes `signalled` once a carrier's command line holds U+2028 + a row naming its pid with the runner as parent. Command lines are implementation output: INV-MUTATION-AUTHORITY. **Not fixed (not mine); the lead's.** |
+| `cleanup_authority.py:124` (Windows, PowerShell `|`-joined), `:184` (`carriers`, `ps -E`), `:220` (`cwd_under`, `lsof -Fpn`) | same property; the last two yield candidates that `signal_owned` re-proves against `_read`'s table. Windows' `CommandLine` holds a raw LF, so `split("\n")` would not fix it there: structured output. Not measured. |
+| `aisef2/app/client.py:39` (`read_session`) | JSON allows U+2028/U+2029 raw in a string; the event is cut, both halves fail `json.loads`, `except ValueError: continue` drops it: **the model's `text` event is lost silently** (`finding-client-read-session.py.txt`, synthetic log). Not established that the real client writes them raw. `app/usage.py:48` reads only `step_finish` (no free text): not affected as far as the file shows. |
+| `aisef2/quality/relevance.py:101` (`story_diff`), `quality/vacuity.py:103` (`file_patches`) | a changed line holding FF, U+0085 or U+2028 is two "lines" to them, one to git: `story_diff` reports the later added lines one off (`[2, 5]` for `[2, 4]`), `file_patches` marks the patch opaque (fails safe) (`finding-diff-parsers.py.txt`, synthetic patch, the real parsers). Developer-controlled input. |
+| `aisef2/app/lineage.py:236` (`git worktree list --porcelain`), `app/confine.py:181` (`_sections`, the probe's own output) | a path with U+2028 is cut; low (kernel-named `wt-<story>`; operator-given mounts). `lineage.py:219` reads hex ids: not affected. |
+| `aisef2/probe/file_artifact.py:250` | a different question (what a "line" of an observed file is); `probe/cli_invocation.py:415` is `bytes.splitlines()`, which breaks at LF/CR only: not affected |
+| `validation/p12_watchdog.py:67`, `validation/v21/sandbox/linux_guest.py:116`, V1 `aisef/harness/process_owner.py:49,177` | the watchdog could match a made-up row (low); `ps()` is a display list; V1 reads `pid ppid` only, exactly two fields: not affected |
+| `validation/v2/mutation.py:1317-1378` | every process scan goes through `cleanup_authority` (`host_table`, `carriers`, `cwd_under`): inherits the first row |
+
+**11.11 Existing test changed.** `tests/v2/p4/test_process_table.py`, `NoPidAncestry`: the test that skipped "short
+lines" (`   12    10`, pid and ppid only) now expects `ProcessTableError` for it, and is renamed
+`test_the_ps_reader_skips_zombies_while_a_line_that_is_not_a_row_and_a_failed_ps_are_errors`; every other assertion is
+unchanged. The requirement that moved it is the brief's "never a silently skipped row: a skipped row is a process the
+table cannot see". The brief's list of rows to keep is unchanged (a four-field row has an empty command). If the lead
+reads "short lines as today" instead, the revert is the one `if` that raises for such a line; the other lines of
+this section stand.
+
+**11.12 Not established.** (a) Which `ps` versions print which characters raw; only this host's was measured. (b) That a
+real `ps` never prints a short line: the change makes it an error that names the line instead of a silent skip; if one
+ever does, every `ProcessRange` operation on that host raises until it is understood. (c) `_linux_table`'s other
+failure shapes. (d) Windows. (e) A waiter of a single flight whose leader died of `ProcessTableError` after the reap
+gets `None`, as section 10.5 (b) says of any non-`Residual` — this adds one more way to reach it, no new class of it.
