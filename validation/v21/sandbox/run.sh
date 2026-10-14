@@ -64,7 +64,7 @@ import json,sys
 try: r=json.load(open(sys.argv[1]))
 except Exception as e: print(f"  no JSON report: {e}"); sys.exit()
 m=r["measure"]
-print(f"  bwrap ran: {'yes' if not any('did not run' in p for p in m['problems']) else 'NO'}; measure problems: {len(m['problems'])}")
+print(f"  bwrap ran: {'yes' if not any('the sandbox did not run the probe' in p for p in m['problems']) else 'NO'}; measure problems: {len(m['problems'])}")
 for p in m["problems"][:12]: print(f"    - {p}")
 for group in ("denials", "network", "observed", "tmpfs_only", "by_design", "controls"):
     for k,v in r.get(group,{}).items():

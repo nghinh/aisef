@@ -925,7 +925,7 @@ _V21_R3_NEW: dict[str, list[str]] = {
                  "_env_rows", "_lsof_cwds", "carriers", "cwd_under", "host_table", "_PS_ROW", "_PS_ENV_ROW", "_WIN_ROW")},
 }
 _V21_R3_APPEND: dict[str, list[str]] = {
-    "aisef2/app/confine.py::_judge": [*_R3_CONF, _R3 + "judge_not_run.py"],
+    "aisef2/app/confine.py::_judge": [*_R3_CONF, _R3 + "judge_not_run.py", "tests/v2/test_v21_r4_probe_record.py"],
     # the environment `wrap` builds for the probe is asserted value for value by the locale test (the three XDG
     # mutants of campaign 5 were audited as "nothing reads the value back"; two independent re-verifications found
     # that test killing them, and that it was not in `wrap`'s kill set)
@@ -940,7 +940,8 @@ _V21_R3_APPEND: dict[str, list[str]] = {
     # whether it is a requirement; the test states what they agree on (the cause is named when the row is of other bytes)
     "aisef2/app/review_verify.py::verify": ["tests/v2/test_v21_r4_uncalibrated_qualifier.py"],
     "aisef2/app/confine.py::_mounts": [_R3_CONF[0], _R3 + "client_readers.py"],
-    "aisef2/app/confine.py::_probe": [_R3_CONF[0], _R3 + "conf_locale.py", _R3_CONF[2]],
+    # the report is the record (campaign 6's [109]: the canary's line feed; two skeptics refuted "refused either way")
+    "aisef2/app/confine.py::_probe": [_R3_CONF[0], _R3 + "conf_locale.py", _R3_CONF[2], "tests/v2/test_v21_r4_probe_record.py"],
     "aisef2/app/confine.py::measure": [_R3_CONF[0], _R3 + "conf_locale.py", _R3_CONF[2]],
     "aisef2/app/review_verify.py::detail": [_R3 + "detail_statement.py"],
     "aisef2/app/run.py::evidence_manifest": [_R3 + "detail_artifact.py"],
