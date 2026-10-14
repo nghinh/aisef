@@ -1,0 +1,3419 @@
+{
+ "record": "AISEF V2.1 — campaign 8 scope: which targets are measured, and why",
+ "head": "c186cb22330022991292a2481a5c69e61eaf93b8",
+ "read_set": "c186cb22330022991292a2481a5c69e61eaf93b8",
+ "delta_bases": {
+  "campaign 5 (289885e)": "289885e",
+  "campaign 6 (a770fbb)": "a770fbb",
+  "campaign 7 (853da4a)": "853da4a"
+ },
+ "code_moved_since_campaign_7_read_set": [
+  "tests/v2/test_v21_r3_conf_policy.py",
+  "tests/v2/test_v21_r4_probe_record.py",
+  "validation/v2/checker_calibration.py"
+ ],
+ "targets": {
+  "aisef2/app/adapters.py::Developer.implement": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/adapters.py::Reviewer.__init__": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/adapters.py::Reviewer._model": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/adapters.py::Reviewer._ocr": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/adapters.py::Reviewer._verify": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/adapters.py::Reviewer.review": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/adapters.py::_bounded": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/adapters.py::_unchanged": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/adapters.py::attempt_of": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/adapters.py::tree_of": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/bundle.py::Project.order": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/bundle.py::_HEX64": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/bundle.py::_strings": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/bundle.py::load": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/bundle.py::read": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/bundle.py::shape_problems": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/bundle_cli.py::AUTHORING_KEYS": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/bundle_cli.py::CONTRACT_KEYS": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/bundle_cli.py::CRITERION_KEYS": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/bundle_cli.py::EXAMPLES": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/bundle_cli.py::RELEASES": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/bundle_cli.py::_closed": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/bundle_cli.py::_create": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/bundle_cli.py::_earlier": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/bundle_cli.py::_mint": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/bundle_cli.py::_read": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/bundle_cli.py::_refs": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/bundle_cli.py::_shell_word": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/bundle_cli.py::_spec_rows": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/bundle_cli.py::_write_new": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/bundle_cli.py::approve": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/bundle_cli.py::continue_from": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/bundle_cli.py::coverage": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/bundle_cli.py::explain": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/bundle_cli.py::init": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/bundle_cli.py::lint": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/bundle_cli.py::main": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/bundle_cli.py::migrate": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/bundle_cli.py::seal": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/bundle_cli.py::unapproved": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/cli.py::_parser": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/cli.py::run": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "data_read_cleared": {
+    "by": "campaign-8/DATA-READ-ANALYSIS-from-289885e.json + campaign-6/CHANGED-FUNCTIONS.json",
+    "listings_that_changed": [],
+    "opened_and_changed": [
+     "aisef2/app/confine.py",
+     "aisef2/runtime/process_range.py"
+    ],
+    "import_time_statements": {
+     "aisef2/app/confine.py": "unchanged",
+     "aisef2/runtime/process_range.py": "unchanged"
+    }
+   },
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/client.py::Budget.__init__": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/client.py::Budget.account": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/client.py::Budget.reached": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/client.py::Budget.spend": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/client.py::environment": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/client.py::events": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/client.py::read_session": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/client.py::redact": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/client.py::session": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "data_read_cleared": {
+    "by": "campaign-8/DATA-READ-ANALYSIS-from-289885e.json + campaign-6/CHANGED-FUNCTIONS.json",
+    "listings_that_changed": [],
+    "opened_and_changed": [
+     "aisef2/app/confine.py",
+     "aisef2/runtime/process_range.py"
+    ],
+    "import_time_statements": {
+     "aisef2/app/confine.py": "unchanged",
+     "aisef2/runtime/process_range.py": "unchanged"
+    }
+   },
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/client.py::wait_within": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/confine.py::DEVICES": {
+   "role": "REMEASURE",
+   "reasons": [
+    "kill tests changed: tests/v2/test_v21_r3_conf_policy.py"
+   ],
+   "result_from_base": "campaign 6 (a770fbb)",
+   "result_from": "campaign 8 (this campaign)"
+  },
+  "aisef2/app/confine.py::KEYS": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 6 (a770fbb)",
+   "data_read_cleared": {
+    "by": "campaign-8/DATA-READ-ANALYSIS-from-a770fbb.json + campaign-6/CHANGED-FUNCTIONS.json",
+    "listings_that_changed": [],
+    "opened_and_changed": [],
+    "import_time_statements": {}
+   },
+   "result_from": "campaign 6 (a770fbb)"
+  },
+  "aisef2/app/confine.py::LOCALE": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 6 (a770fbb)",
+   "result_from": "campaign 6 (a770fbb)"
+  },
+  "aisef2/app/confine.py::NETWORKS": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 6 (a770fbb)",
+   "data_read_cleared": {
+    "by": "campaign-8/DATA-READ-ANALYSIS-from-a770fbb.json + campaign-6/CHANGED-FUNCTIONS.json",
+    "listings_that_changed": [],
+    "opened_and_changed": [],
+    "import_time_statements": {}
+   },
+   "result_from": "campaign 6 (a770fbb)"
+  },
+  "aisef2/app/confine.py::PSEUDO": {
+   "role": "REMEASURE",
+   "reasons": [
+    "kill tests changed: tests/v2/test_v21_r3_conf_policy.py"
+   ],
+   "result_from_base": "campaign 6 (a770fbb)",
+   "result_from": "campaign 8 (this campaign)"
+  },
+  "aisef2/app/confine.py::SYSTEM": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 6 (a770fbb)",
+   "data_read_cleared": {
+    "by": "campaign-8/DATA-READ-ANALYSIS-from-a770fbb.json + campaign-6/CHANGED-FUNCTIONS.json",
+    "listings_that_changed": [],
+    "opened_and_changed": [],
+    "import_time_statements": {}
+   },
+   "result_from": "campaign 6 (a770fbb)"
+  },
+  "aisef2/app/confine.py::USERNS_REFUSED": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 6 (a770fbb)",
+   "data_read_cleared": {
+    "by": "campaign-8/DATA-READ-ANALYSIS-from-a770fbb.json + campaign-6/CHANGED-FUNCTIONS.json",
+    "listings_that_changed": [],
+    "opened_and_changed": [],
+    "import_time_statements": {}
+   },
+   "result_from": "campaign 6 (a770fbb)"
+  },
+  "aisef2/app/confine.py::_DEV": {
+   "role": "REMEASURE",
+   "reasons": [
+    "kill tests changed: tests/v2/test_v21_r3_conf_policy.py"
+   ],
+   "result_from_base": "campaign 6 (a770fbb)",
+   "result_from": "campaign 8 (this campaign)"
+  },
+  "aisef2/app/confine.py::_PEER": {
+   "role": "REMEASURE",
+   "reasons": [
+    "kill tests changed: tests/v2/test_v21_r3_conf_policy.py"
+   ],
+   "result_from_base": "campaign 6 (a770fbb)",
+   "result_from": "campaign 8 (this campaign)"
+  },
+  "aisef2/app/confine.py::_device_roots": {
+   "role": "REMEASURE",
+   "reasons": [
+    "kill tests changed: tests/v2/test_v21_r3_conf_policy.py"
+   ],
+   "result_from_base": "campaign 6 (a770fbb)",
+   "result_from": "campaign 8 (this campaign)"
+  },
+  "aisef2/app/confine.py::_host_mounts": {
+   "role": "REMEASURE",
+   "reasons": [
+    "kill tests changed: tests/v2/test_v21_r3_conf_policy.py"
+   ],
+   "result_from_base": "campaign 6 (a770fbb)",
+   "result_from": "campaign 8 (this campaign)"
+  },
+  "aisef2/app/confine.py::_judge": {
+   "role": "REMEASURE",
+   "reasons": [
+    "kill tests changed: tests/v2/test_v21_r3_conf_policy.py, tests/v2/test_v21_r4_probe_record.py"
+   ],
+   "result_from_base": "campaign 7 (853da4a)",
+   "result_from": "campaign 8 (this campaign)"
+  },
+  "aisef2/app/confine.py::_lines": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 6 (a770fbb)",
+   "result_from": "campaign 6 (a770fbb)"
+  },
+  "aisef2/app/confine.py::_link": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 6 (a770fbb)",
+   "data_read_cleared": {
+    "by": "campaign-8/DATA-READ-ANALYSIS-from-a770fbb.json + campaign-6/CHANGED-FUNCTIONS.json",
+    "listings_that_changed": [],
+    "opened_and_changed": [],
+    "import_time_statements": {}
+   },
+   "result_from": "campaign 6 (a770fbb)"
+  },
+  "aisef2/app/confine.py::_mounts": {
+   "role": "REMEASURE",
+   "reasons": [
+    "kill tests changed: tests/v2/test_v21_r3_conf_policy.py"
+   ],
+   "result_from_base": "campaign 6 (a770fbb)",
+   "result_from": "campaign 8 (this campaign)"
+  },
+  "aisef2/app/confine.py::_owned": {
+   "role": "REMEASURE",
+   "reasons": [
+    "kill tests changed: tests/v2/test_v21_r3_conf_policy.py"
+   ],
+   "result_from_base": "campaign 6 (a770fbb)",
+   "result_from": "campaign 8 (this campaign)"
+  },
+  "aisef2/app/confine.py::_probe": {
+   "role": "REMEASURE",
+   "reasons": [
+    "kill tests changed: tests/v2/test_v21_r3_conf_policy.py, tests/v2/test_v21_r4_probe_record.py"
+   ],
+   "result_from_base": "campaign 7 (853da4a)",
+   "result_from": "campaign 8 (this campaign)"
+  },
+  "aisef2/app/confine.py::_sections": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 7 (853da4a)",
+   "data_read_cleared": {
+    "by": "campaign-8/DATA-READ-ANALYSIS-from-853da4a.json + campaign-6/CHANGED-FUNCTIONS.json",
+    "listings_that_changed": [],
+    "opened_and_changed": [],
+    "import_time_statements": {}
+   },
+   "result_from": "campaign 7 (853da4a)"
+  },
+  "aisef2/app/confine.py::_survivors": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 6 (a770fbb)",
+   "data_read_cleared": {
+    "by": "campaign-8/DATA-READ-ANALYSIS-from-a770fbb.json + campaign-6/CHANGED-FUNCTIONS.json",
+    "listings_that_changed": [],
+    "opened_and_changed": [],
+    "import_time_statements": {}
+   },
+   "result_from": "campaign 6 (a770fbb)"
+  },
+  "aisef2/app/confine.py::_within": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 6 (a770fbb)",
+   "data_read_cleared": {
+    "by": "campaign-8/DATA-READ-ANALYSIS-from-a770fbb.json + campaign-6/CHANGED-FUNCTIONS.json",
+    "listings_that_changed": [],
+    "opened_and_changed": [],
+    "import_time_statements": {}
+   },
+   "result_from": "campaign 6 (a770fbb)"
+  },
+  "aisef2/app/confine.py::_worktree": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 6 (a770fbb)",
+   "data_read_cleared": {
+    "by": "campaign-8/DATA-READ-ANALYSIS-from-a770fbb.json + campaign-6/CHANGED-FUNCTIONS.json",
+    "listings_that_changed": [],
+    "opened_and_changed": [],
+    "import_time_statements": {}
+   },
+   "result_from": "campaign 6 (a770fbb)"
+  },
+  "aisef2/app/confine.py::_writes": {
+   "role": "REMEASURE",
+   "reasons": [
+    "kill tests changed: tests/v2/test_v21_r3_conf_policy.py"
+   ],
+   "result_from_base": "campaign 6 (a770fbb)",
+   "result_from": "campaign 8 (this campaign)"
+  },
+  "aisef2/app/confine.py::argv": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 6 (a770fbb)",
+   "data_read_cleared": {
+    "by": "campaign-8/DATA-READ-ANALYSIS-from-a770fbb.json + campaign-6/CHANGED-FUNCTIONS.json",
+    "listings_that_changed": [],
+    "opened_and_changed": [],
+    "import_time_statements": {}
+   },
+   "result_from": "campaign 6 (a770fbb)"
+  },
+  "aisef2/app/confine.py::config_dir": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 6 (a770fbb)",
+   "data_read_cleared": {
+    "by": "campaign-8/DATA-READ-ANALYSIS-from-a770fbb.json + campaign-6/CHANGED-FUNCTIONS.json",
+    "listings_that_changed": [],
+    "opened_and_changed": [],
+    "import_time_statements": {}
+   },
+   "result_from": "campaign 6 (a770fbb)"
+  },
+  "aisef2/app/confine.py::git_dir": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 6 (a770fbb)",
+   "data_read_cleared": {
+    "by": "campaign-8/DATA-READ-ANALYSIS-from-a770fbb.json + campaign-6/CHANGED-FUNCTIONS.json",
+    "listings_that_changed": [],
+    "opened_and_changed": [],
+    "import_time_statements": {}
+   },
+   "result_from": "campaign 6 (a770fbb)"
+  },
+  "aisef2/app/confine.py::measure": {
+   "role": "REMEASURE",
+   "reasons": [
+    "kill tests changed: tests/v2/test_v21_r3_conf_policy.py"
+   ],
+   "result_from_base": "campaign 6 (a770fbb)",
+   "result_from": "campaign 8 (this campaign)"
+  },
+  "aisef2/app/confine.py::namespaces": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 6 (a770fbb)",
+   "data_read_cleared": {
+    "by": "campaign-8/DATA-READ-ANALYSIS-from-a770fbb.json + campaign-6/CHANGED-FUNCTIONS.json",
+    "listings_that_changed": [],
+    "opened_and_changed": [],
+    "import_time_statements": {}
+   },
+   "result_from": "campaign 6 (a770fbb)"
+  },
+  "aisef2/app/confine.py::problem": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 6 (a770fbb)",
+   "data_read_cleared": {
+    "by": "campaign-8/DATA-READ-ANALYSIS-from-a770fbb.json + campaign-6/CHANGED-FUNCTIONS.json",
+    "listings_that_changed": [],
+    "opened_and_changed": [],
+    "import_time_statements": {}
+   },
+   "result_from": "campaign 6 (a770fbb)"
+  },
+  "aisef2/app/confine.py::targets": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 6 (a770fbb)",
+   "data_read_cleared": {
+    "by": "campaign-8/DATA-READ-ANALYSIS-from-a770fbb.json + campaign-6/CHANGED-FUNCTIONS.json",
+    "listings_that_changed": [],
+    "opened_and_changed": [],
+    "import_time_statements": {}
+   },
+   "result_from": "campaign 6 (a770fbb)"
+  },
+  "aisef2/app/confine.py::wrap": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 6 (a770fbb)",
+   "data_read_cleared": {
+    "by": "campaign-8/DATA-READ-ANALYSIS-from-a770fbb.json + campaign-6/CHANGED-FUNCTIONS.json",
+    "listings_that_changed": [],
+    "opened_and_changed": [],
+    "import_time_statements": {}
+   },
+   "result_from": "campaign 6 (a770fbb)"
+  },
+  "aisef2/app/feedback.py::context_pack": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/feedback.py::retry_feedback": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/lineage.py::ANCHOR_LINE": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/lineage.py::JOURNAL": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/lineage.py::SPEND": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/lineage.py::_claimed_run": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/lineage.py::_git": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/lineage.py::_gone": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/lineage.py::_look": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/lineage.py::_sha": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/lineage.py::account_of": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/lineage.py::child_state": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/lineage.py::claim": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/lineage.py::claimant": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/lineage.py::claims": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/lineage.py::continued_by": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/lineage.py::events_of": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/lineage.py::lineage_account": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/lineage.py::predecessor_of": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/lineage.py::process_started": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/lineage.py::read_anchor": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/lineage.py::reconcile": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/lineage.py::usage_lineage": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/lineage.py::write_anchor": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/preflight.py::accounting": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/preflight.py::deployment": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/preflight.py::fingerprint_fields": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/preflight.py::http_transport": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/preflight.py::identity_problems": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/preflight.py::run": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/review_ocr.py::NOT_FULL": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/review_ocr.py::NOT_REVIEWABLE": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/review_ocr.py::OCR": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/review_ocr.py::REPRODUCER_FENCE": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/review_ocr.py::SCRUB_PREFIXES": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/review_ocr.py::TERMINAL": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/review_ocr.py::argv": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/review_ocr.py::coverage": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/review_ocr.py::environment": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/review_ocr.py::finding_id": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/review_ocr.py::findings": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 6 (a770fbb)",
+   "result_from": "campaign 6 (a770fbb)"
+  },
+  "aisef2/app/review_ocr.py::item_id": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/review_ocr.py::pinned": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/review_ocr.py::read_output": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/review_ocr.py::reproducer_of": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/review_ocr.py::scrubbed_names": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/review_verify.py::Artifact.__post_init__": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/review_verify.py::POLICIES": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/review_verify.py::REPRODUCER_KEYS": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/review_verify.py::SEVERITIES": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/review_verify.py::Verification.evidence": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/review_verify.py::_ARTIFACT_PATH": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/review_verify.py::_NUMBER": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/review_verify.py::_SHA256": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/review_verify.py::_approved_by_clause": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/review_verify.py::_canon": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 6 (a770fbb)",
+   "result_from": "campaign 6 (a770fbb)"
+  },
+  "aisef2/app/review_verify.py::_dumps": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/review_verify.py::_fit": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/review_verify.py::_scalars": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/review_verify.py::_states": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/review_verify.py::_stimulus": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/review_verify.py::anchor": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/review_verify.py::artifact_problems": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/review_verify.py::blocks": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/review_verify.py::detail": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/review_verify.py::preserve": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/review_verify.py::redacted": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/review_verify.py::reproducer_contract": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/review_verify.py::severity_of": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/review_verify.py::verify": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 6 (a770fbb)",
+   "result_from": "campaign 6 (a770fbb)"
+  },
+  "aisef2/app/run.py::_close": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/run.py::_content_sha": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/run.py::admit": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/run.py::anchor_in": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/run.py::anchor_of": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/run.py::calibrations": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/run.py::check_git": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/run.py::check_repository": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/run.py::client_on_path": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "data_read_cleared": {
+    "by": "campaign-8/DATA-READ-ANALYSIS-from-289885e.json + campaign-6/CHANGED-FUNCTIONS.json",
+    "listings_that_changed": [],
+    "opened_and_changed": [
+     "aisef2/app/confine.py",
+     "aisef2/runtime/process_range.py"
+    ],
+    "import_time_statements": {
+     "aisef2/app/confine.py": "unchanged",
+     "aisef2/runtime/process_range.py": "unchanged"
+    }
+   },
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/run.py::delivery": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/run.py::evidence_manifest": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/run.py::execute": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "data_read_cleared": {
+    "by": "campaign-8/DATA-READ-ANALYSIS-from-289885e.json + campaign-6/CHANGED-FUNCTIONS.json",
+    "listings_that_changed": [],
+    "opened_and_changed": [
+     "aisef2/app/confine.py",
+     "aisef2/runtime/process_range.py"
+    ],
+    "import_time_statements": {
+     "aisef2/app/confine.py": "unchanged",
+     "aisef2/runtime/process_range.py": "unchanged"
+    }
+   },
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/run.py::kernel_digest": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/run.py::layers_of": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/run.py::outcomes_from": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/run.py::probe_interpreter": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/run.py::productproof": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/run.py::regression_tests": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/run.py::runspec_of": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/run.py::unfinished": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/settings.py::FINDERS": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/settings.py::LOOPBACK": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/settings.py::OCR_KEYS": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/settings.py::OPTIONAL": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "data_read_cleared": {
+    "by": "campaign-8/DATA-READ-ANALYSIS-from-289885e.json + campaign-6/CHANGED-FUNCTIONS.json",
+    "listings_that_changed": [],
+    "opened_and_changed": [
+     "aisef2/app/confine.py",
+     "aisef2/runtime/process_range.py"
+    ],
+    "import_time_statements": {
+     "aisef2/app/confine.py": "unchanged",
+     "aisef2/runtime/process_range.py": "unchanged"
+    }
+   },
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/settings.py::REVIEW_ABSENT": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/settings.py::Settings.prices": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/settings.py::_count": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/settings.py::endpoint_problem": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/settings.py::load": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "data_read_cleared": {
+    "by": "campaign-8/DATA-READ-ANALYSIS-from-289885e.json + campaign-6/CHANGED-FUNCTIONS.json",
+    "listings_that_changed": [],
+    "opened_and_changed": [
+     "aisef2/app/confine.py",
+     "aisef2/runtime/process_range.py"
+    ],
+    "import_time_statements": {
+     "aisef2/app/confine.py": "unchanged",
+     "aisef2/runtime/process_range.py": "unchanged"
+    }
+   },
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/settings.py::read": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/usage.py::CLASSES": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/usage.py::PRICE_KEYS": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/usage.py::_DATE": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/usage.py::_usd": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/usage.py::no_progress": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/usage.py::price_problem": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/usage.py::session_tokens": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/usage.py::usage": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/verify.py::_projection_refusal": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/verify.py::_runspec_problems": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/verify.py::_spend": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/app/verify.py::verify": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/orchestrate/adapters.py::Finding.blocks": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/orchestrate/adapters.py::Implemented.__post_init__": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/orchestrate/adapters.py::Merge.__post_init__": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/orchestrate/adapters.py::ReadOnlyScope.files": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/orchestrate/adapters.py::ReadOnlyScope.read": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/orchestrate/adapters.py::confine": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/orchestrate/adapters.py::unconfine": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/orchestrate/review.py::_result": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/orchestrate/review.py::review": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/orchestrate/story_runner.py::StoryResult.committed": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/orchestrate/story_runner.py::StoryResult.revision": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/orchestrate/story_runner.py::_Held.__call__": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/orchestrate/story_runner.py::_Held.__init__": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/orchestrate/story_runner.py::_Held.release": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/orchestrate/story_runner.py::_attempt": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "data_read_cleared": {
+    "by": "campaign-8/DATA-READ-ANALYSIS-from-289885e.json + campaign-6/CHANGED-FUNCTIONS.json",
+    "listings_that_changed": [],
+    "opened_and_changed": [
+     "aisef2/app/confine.py",
+     "aisef2/runtime/process_range.py"
+    ],
+    "import_time_statements": {
+     "aisef2/app/confine.py": "unchanged",
+     "aisef2/runtime/process_range.py": "unchanged"
+    }
+   },
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/orchestrate/story_runner.py::_committed": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/orchestrate/story_runner.py::_fail": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/orchestrate/story_runner.py::_freeze_plan": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/orchestrate/story_runner.py::_probe": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/orchestrate/story_runner.py::run_story": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "data_read_cleared": {
+    "by": "campaign-8/DATA-READ-ANALYSIS-from-289885e.json + campaign-6/CHANGED-FUNCTIONS.json",
+    "listings_that_changed": [],
+    "opened_and_changed": [
+     "aisef2/app/confine.py",
+     "aisef2/runtime/process_range.py"
+    ],
+    "import_time_statements": {
+     "aisef2/app/confine.py": "unchanged",
+     "aisef2/runtime/process_range.py": "unchanged"
+    }
+   },
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/orchestrate/workspace.py::Checkout.__init__": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/orchestrate/workspace.py::Checkout.release": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/orchestrate/workspace.py::GitMerger.base": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/orchestrate/workspace.py::GitMerger.merge": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/orchestrate/workspace.py::GitMerger.revert": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/orchestrate/workspace.py::GitWorkspace.checkout": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/orchestrate/workspace.py::GitWorkspace.diff": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/orchestrate/workspace.py::GitWorkspace.move": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/orchestrate/workspace.py::GitWorkspace.scratch": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/orchestrate/workspace.py::Scratch.__init__": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/orchestrate/workspace.py::Scratch.release": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/orchestrate/workspace.py::_NO_BACKGROUND_GIT": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/orchestrate/workspace.py::_env": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/orchestrate/workspace.py::_sha": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/orchestrate/workspace.py::commit_all": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/orchestrate/workspace.py::config_problems": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/orchestrate/workspace.py::git": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/plan/static_admission.py::_cycle": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/plan/static_admission.py::admit": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/plan/static_admission.py::check_contract_spec_integrity": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/plan/static_admission.py::check_contradictions": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/plan/static_admission.py::check_dependency_dag": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/plan/static_admission.py::check_ownership": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/plan/static_admission.py::check_plan_structure": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/plan/static_admission.py::check_probe_calibration": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/plan/static_admission.py::check_proof_capability": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/plan/static_admission.py::check_requirement_coverage": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/plan/static_admission.py::check_traceability": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/plan/static_admission.py::depends_on_story": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/plan/static_admission.py::story_graph": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/calibration.py::calibrate": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/calibration.py::calibration_for": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/calibration.py::demonstrates_contrast": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/calibration.py::executing": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::AGENT/flush": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::AGENT/guarded": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::AGENT/op_bye": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::AGENT/op_call": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::AGENT/op_construct": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::AGENT/op_import": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::AGENT/op_invoke": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::AGENT/op_resolve": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::AGENT/op_value": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::AGENT/plain": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::AGENT/redirect": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::AGENT/send": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::AGENT/tagged": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::CLASSES": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::CLASS_TABLE": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::COMPARATORS": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::CliInvocationProbe.__init__": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::CliInvocationProbe._observe": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::CliInvocationProbe._observe_equality": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::CliInvocationProbe._observe_in": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::CliInvocationProbe.enforcement": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::CliInvocationProbe.harness_preconditions": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::CliInvocationProbe.observe": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::DIGEST": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::FILE_SHAPES": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::HARNESS/answer_to": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::HARNESS/ask": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::HARNESS/conclude": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::HARNESS/deadline": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::HARNESS/emit": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::HARNESS/ended": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::HARNESS/file_fact": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::HARNESS/finish": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::HARNESS/inside": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::HARNESS/invoke": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::HARNESS/main": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::HARNESS/resolve": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::HARNESS/sha": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::HARNESS/stream_fact": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::ON_DEADLINE": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::PROBE_SOURCES": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::QUANTIFIERS": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::STREAM_SHAPES": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::_argv_ok": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::_await": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::_bytes_of": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::_child_env": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::_concluded": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::_content_ok": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::_deadline": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::_disposed": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::_equal": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::_equality_ok": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::_equality_verdict": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::_file_fact": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::_file_matches": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::_file_shape_ok": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::_half_ok": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::_harness_argv": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::_harness_failure": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::_is_int": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::_mac": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::_name_ok": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::_no_result": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::_normalization_ok": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::_normalize": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::_preflight": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::_prepare": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::_probe_digest": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::_protocol": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::_public": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::_sha_file": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::_silent": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::_stimulus_ok": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::_stream_bytes": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::_stream_fact": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::_stream_matches": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::_stream_shape_ok": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::_streams_ok": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::_substitute": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::_watch": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::_ws_key_ok": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::_ws_name": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::observation_class": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::spec_class": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/cli_invocation.py::verdict_of": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/file_artifact.py::CLASSES": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/file_artifact.py::DIGEST": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/file_artifact.py::FileArtifactProbe.__init__": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/file_artifact.py::FileArtifactProbe._reader": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/file_artifact.py::FileArtifactProbe.enforcement": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/file_artifact.py::FileArtifactProbe.harness_preconditions": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/file_artifact.py::FileArtifactProbe.observe": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/file_artifact.py::MODES": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/file_artifact.py::NEWLINES": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/file_artifact.py::ON_DEADLINE": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/file_artifact.py::ObjectStore.__init__": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/file_artifact.py::ObjectStore._parse": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/file_artifact.py::ObjectStore.blob": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/file_artifact.py::ObjectStore.entries": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/file_artifact.py::ObjectStore.holds_revision": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/file_artifact.py::ObjectStore.lookup": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/file_artifact.py::ObjectStore.run": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/file_artifact.py::ObjectStore.walk": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/file_artifact.py::PROBE_SOURCES": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/file_artifact.py::PlainTree._full": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/file_artifact.py::PlainTree._row": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/file_artifact.py::PlainTree.blob": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/file_artifact.py::PlainTree.entries": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/file_artifact.py::PlainTree.lookup": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/file_artifact.py::PlainTree.walk": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/file_artifact.py::_HEX64": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/file_artifact.py::_MODULE_NAME": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/file_artifact.py::_compiles": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/file_artifact.py::_probe_digest": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/file_artifact.py::content_facts": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/file_artifact.py::entry": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/file_artifact.py::expected_sha256": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/file_artifact.py::facts_of": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/file_artifact.py::git_env": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/file_artifact.py::grep_facts": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/file_artifact.py::import_facts": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/file_artifact.py::normalised": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/file_artifact.py::observation_class": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/file_artifact.py::read": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/file_artifact.py::refusal": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/file_artifact.py::run_git": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/file_artifact.py::selected": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/file_artifact.py::spec_class": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/file_artifact.py::verdict_of": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/file_artifact.py::window_of": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::CLASSES": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::CLASS_TABLE": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::DIGEST": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::FAULTED": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::FAULTS": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::FILE_SHAPES": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::HARNESS/answer_to": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::HARNESS/answered": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::HARNESS/ask": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::HARNESS/count_lines": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::HARNESS/do_call": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::HARNESS/do_construct": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::HARNESS/do_edit": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::HARNESS/do_expect": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::HARNESS/do_fault": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::HARNESS/do_subprocess": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::HARNESS/do_workspace": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::HARNESS/do_write": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::HARNESS/emit": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::HARNESS/ended": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::HARNESS/file_fact": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::HARNESS/files_now": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::HARNESS/finish": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::HARNESS/guarded": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::HARNESS/identity": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::HARNESS/inside": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::HARNESS/main": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::HARNESS/reported": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::HARNESS/resolve": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::HARNESS/row_of": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::HARNESS/run": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::HARNESS/same": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::HARNESS/subject_call": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::HARNESS/unresolved": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::HARNESS/unws": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::ON_DEADLINE": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::PROBE_SOURCES": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::ProcessEffectProbe.__init__": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::ProcessEffectProbe._observe_in": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::ProcessEffectProbe.enforcement": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::ProcessEffectProbe.harness_preconditions": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::ProcessEffectProbe.observe": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::STEPS": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::_CONTENT": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::_FILE_HOLDS": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::_FILE_SHAPE_OK": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::_HOLDS": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::_SHAPES": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::_concluded": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::_content_of": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::_edit_ok": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::_expect_ok": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::_fault_ok": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::_file_shape_ok": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::_files_hold": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::_flat_ok": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::_harness_argv": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::_ident_ok": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::_identity": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::_invocation_ok": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::_jsonl_holds": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::_observed_files": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::_prepare": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::_probe_digest": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::_raises_hold": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::_resolved": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::_returns_hold": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::_same": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::_scenario_ok": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::_step_ok": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::_subprocess_ok": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::_substitute": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::_watch": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::_workspace_ok": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::_write_ok": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::_ws_path_ok": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::observation_class": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::spec_class": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/process_effect.py::verdict_of": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/python_callable_v2.py::CLASSES": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/python_callable_v2.py::DIGEST": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/python_callable_v2.py::HARNESS/answer_to": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/python_callable_v2.py::HARNESS/answered": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/python_callable_v2.py::HARNESS/ask": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/python_callable_v2.py::HARNESS/conclude": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/python_callable_v2.py::HARNESS/deadline": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/python_callable_v2.py::HARNESS/emit": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/python_callable_v2.py::HARNESS/ended": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/python_callable_v2.py::HARNESS/finish": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/python_callable_v2.py::HARNESS/inside": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/python_callable_v2.py::HARNESS/main": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/python_callable_v2.py::HARNESS/value_of": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/python_callable_v2.py::ON_DEADLINE": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/python_callable_v2.py::PROBE_SOURCES": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/python_callable_v2.py::PythonCallableV2Probe.__init__": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/python_callable_v2.py::PythonCallableV2Probe.enforcement": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/python_callable_v2.py::PythonCallableV2Probe.observe": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/python_callable_v2.py::_concluded": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/python_callable_v2.py::_file_ok": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/python_callable_v2.py::_harness_argv": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/python_callable_v2.py::_is_hex": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/python_callable_v2.py::_probe_digest": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/python_callable_v2.py::_substituted": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/python_callable_v2.py::_unsubstituted": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/python_callable_v2.py::_watch": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/python_callable_v2.py::_workspace_ok": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/python_callable_v2.py::_write_workspace": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/python_callable_v2.py::observation_class": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/python_callable_v2.py::spec_class": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/probe/python_callable_v2.py::verdict_of": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "aisef2/runtime/process_range.py::ProcessRange.__init__": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 6 (a770fbb)",
+   "result_from": "campaign 6 (a770fbb)"
+  },
+  "aisef2/runtime/process_range.py::ProcessRange._abort": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 6 (a770fbb)",
+   "result_from": "campaign 6 (a770fbb)"
+  },
+  "aisef2/runtime/process_range.py::ProcessRange._close_pipes": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 6 (a770fbb)",
+   "result_from": "campaign 6 (a770fbb)"
+  },
+  "aisef2/runtime/process_range.py::ProcessRange._ladder": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 6 (a770fbb)",
+   "result_from": "campaign 6 (a770fbb)"
+  },
+  "aisef2/runtime/process_range.py::ProcessRange._release": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 6 (a770fbb)",
+   "result_from": "campaign 6 (a770fbb)"
+  },
+  "aisef2/runtime/process_range.py::ProcessRange._signal": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 6 (a770fbb)",
+   "result_from": "campaign 6 (a770fbb)"
+  },
+  "aisef2/runtime/process_range.py::ProcessRange.anchor_returncode": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 6 (a770fbb)",
+   "result_from": "campaign 6 (a770fbb)"
+  },
+  "aisef2/runtime/process_range.py::ProcessRange.escaped": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 6 (a770fbb)",
+   "result_from": "campaign 6 (a770fbb)"
+  },
+  "aisef2/runtime/process_range.py::ProcessRange.members": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 6 (a770fbb)",
+   "result_from": "campaign 6 (a770fbb)"
+  },
+  "aisef2/runtime/process_range.py::ProcessRange.release": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 6 (a770fbb)",
+   "result_from": "campaign 6 (a770fbb)"
+  },
+  "aisef2/runtime/process_range.py::ProcessRange.start": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 6 (a770fbb)",
+   "result_from": "campaign 6 (a770fbb)"
+  },
+  "aisef2/runtime/process_range.py::ProcessRange.wait": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 6 (a770fbb)",
+   "result_from": "campaign 6 (a770fbb)"
+  },
+  "aisef2/runtime/process_range.py::ProcessRange.wait_empty": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 6 (a770fbb)",
+   "result_from": "campaign 6 (a770fbb)"
+  },
+  "aisef2/runtime/process_range.py::_Flight.__init__": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 6 (a770fbb)",
+   "result_from": "campaign 6 (a770fbb)"
+  },
+  "aisef2/runtime/process_range.py::_Flight.__slots__": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 6 (a770fbb)",
+   "result_from": "campaign 6 (a770fbb)"
+  },
+  "aisef2/runtime/process_range.py::_Job.controller_stopped": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 6 (a770fbb)",
+   "result_from": "campaign 6 (a770fbb)"
+  },
+  "aisef2/runtime/process_range.py::_Posix.abort": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 6 (a770fbb)",
+   "result_from": "campaign 6 (a770fbb)"
+  },
+  "aisef2/runtime/process_range.py::_Posix.escaped": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 6 (a770fbb)",
+   "result_from": "campaign 6 (a770fbb)"
+  },
+  "aisef2/runtime/process_range.py::_Posix.members": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 6 (a770fbb)",
+   "result_from": "campaign 6 (a770fbb)"
+  },
+  "aisef2/runtime/process_range.py::_linux_table": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 6 (a770fbb)",
+   "result_from": "campaign 6 (a770fbb)"
+  },
+  "aisef2/runtime/process_range.py::_ps_table": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 6 (a770fbb)",
+   "data_read_cleared": {
+    "by": "campaign-8/DATA-READ-ANALYSIS-from-a770fbb.json + campaign-6/CHANGED-FUNCTIONS.json",
+    "listings_that_changed": [],
+    "opened_and_changed": [],
+    "import_time_statements": {}
+   },
+   "result_from": "campaign 6 (a770fbb)"
+  },
+  "aisef2/runtime/process_range.py::descendants": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 6 (a770fbb)",
+   "data_read_cleared": {
+    "by": "campaign-8/DATA-READ-ANALYSIS-from-a770fbb.json + campaign-6/CHANGED-FUNCTIONS.json",
+    "listings_that_changed": [],
+    "opened_and_changed": [],
+    "import_time_statements": {}
+   },
+   "result_from": "campaign 6 (a770fbb)"
+  },
+  "aisef2/runtime/process_range.py::targets": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 6 (a770fbb)",
+   "data_read_cleared": {
+    "by": "campaign-8/DATA-READ-ANALYSIS-from-a770fbb.json + campaign-6/CHANGED-FUNCTIONS.json",
+    "listings_that_changed": [],
+    "opened_and_changed": [],
+    "import_time_statements": {}
+   },
+   "result_from": "campaign 6 (a770fbb)"
+  },
+  "validation/v2/cleanup_authority.py::_PS_ENV_ROW": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "validation/v2/cleanup_authority.py::_PS_ROW": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "validation/v2/cleanup_authority.py::_WIN_ROW": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "validation/v2/cleanup_authority.py::_env_rows": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "validation/v2/cleanup_authority.py::_lines": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "validation/v2/cleanup_authority.py::_lsof_cwds": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "validation/v2/cleanup_authority.py::_not_a_row": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "validation/v2/cleanup_authority.py::_ps_env": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "validation/v2/cleanup_authority.py::_ps_rows": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "validation/v2/cleanup_authority.py::_read": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "validation/v2/cleanup_authority.py::_twice": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "validation/v2/cleanup_authority.py::_win_rows": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "validation/v2/cleanup_authority.py::_windows_table": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "validation/v2/cleanup_authority.py::carriers": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "validation/v2/cleanup_authority.py::cwd_under": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  },
+  "validation/v2/cleanup_authority.py::host_table": {
+   "role": "STANDS",
+   "reasons": [],
+   "result_from_base": "campaign 5 (289885e)",
+   "result_from": "campaign 5 (289885e)"
+  }
+ }
+}

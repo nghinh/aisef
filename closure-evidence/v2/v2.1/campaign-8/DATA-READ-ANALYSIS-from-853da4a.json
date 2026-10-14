@@ -1,0 +1,689 @@
+{
+ "record": "AISEF V2.1 — campaign 6: the exact reading of the measured read-set for the targets the delta flags",
+ "base": "853da4add9e2a23d32d3e7a6f43dbd0c7a698f4e",
+ "head": "c186cb22330022991292a2481a5c69e61eaf93b8",
+ "read_set": "c186cb22330022991292a2481a5c69e61eaf93b8",
+ "rule": "The delta tool (`v21_snapshot_delta.py`) says a kill file READS a changed file when the measured read-set records that it\nopened or looked up the file, or LISTED A DIRECTORY ABOVE it (any ancestor). A listing returns the names of the\ndirectory's direct children and nothing below: the repository root listed by test_v21_confine.py (names of the top-level\nentries) makes every file of the repository \"read\". This tool states the exact reading, from the same measured read-set:",
+ "targets": {
+  "aisef2/app/cli.py::run": {
+   "delta_data_read": 110,
+   "kill_files": {
+    "tests/v2/test_app_units.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_inputs.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_bundle_tools.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_continue_integrity.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_app_run.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_s2_kills.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_confine.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_kills3_T23a.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    }
+   },
+   "exactly_read_and_changed": [],
+   "listings_that_changed": [],
+   "cleared": true
+  },
+  "aisef2/app/client.py::session": {
+   "delta_data_read": 110,
+   "kill_files": {
+    "tests/v2/test_app_units.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_transport.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_app_run.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_s2_kills.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_confine.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    }
+   },
+   "exactly_read_and_changed": [],
+   "listings_that_changed": [],
+   "cleared": true
+  },
+  "aisef2/app/confine.py::KEYS": {
+   "delta_data_read": 110,
+   "kill_files": {
+    "tests/v2/test_v21_confine.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    }
+   },
+   "exactly_read_and_changed": [],
+   "listings_that_changed": [],
+   "cleared": true
+  },
+  "aisef2/app/confine.py::NETWORKS": {
+   "delta_data_read": 110,
+   "kill_files": {
+    "tests/v2/test_v21_confine.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    }
+   },
+   "exactly_read_and_changed": [],
+   "listings_that_changed": [],
+   "cleared": true
+  },
+  "aisef2/app/confine.py::SYSTEM": {
+   "delta_data_read": 110,
+   "kill_files": {
+    "tests/v2/test_v21_confine.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_kills3_T07a.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    }
+   },
+   "exactly_read_and_changed": [],
+   "listings_that_changed": [],
+   "cleared": true
+  },
+  "aisef2/app/confine.py::USERNS_REFUSED": {
+   "delta_data_read": 110,
+   "kill_files": {
+    "tests/v2/test_v21_confine.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    }
+   },
+   "exactly_read_and_changed": [],
+   "listings_that_changed": [],
+   "cleared": true
+  },
+  "aisef2/app/confine.py::_link": {
+   "delta_data_read": 110,
+   "kill_files": {
+    "tests/v2/test_v21_confine.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    }
+   },
+   "exactly_read_and_changed": [],
+   "listings_that_changed": [],
+   "cleared": true
+  },
+  "aisef2/app/confine.py::_sections": {
+   "delta_data_read": 110,
+   "kill_files": {
+    "tests/v2/test_v21_confine.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_kills3_T07a.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_r3_client_readers.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_r3_judge_not_run.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    }
+   },
+   "exactly_read_and_changed": [],
+   "listings_that_changed": [],
+   "cleared": true
+  },
+  "aisef2/app/confine.py::_survivors": {
+   "delta_data_read": 110,
+   "kill_files": {
+    "tests/v2/test_v21_confine.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_kills3_TO2.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    }
+   },
+   "exactly_read_and_changed": [],
+   "listings_that_changed": [],
+   "cleared": true
+  },
+  "aisef2/app/confine.py::_within": {
+   "delta_data_read": 110,
+   "kill_files": {
+    "tests/v2/test_v21_confine.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_defects_confine.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_kills3_T07a.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    }
+   },
+   "exactly_read_and_changed": [],
+   "listings_that_changed": [],
+   "cleared": true
+  },
+  "aisef2/app/confine.py::_worktree": {
+   "delta_data_read": 110,
+   "kill_files": {
+    "tests/v2/test_v21_confine.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_kills3_A07.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_kills3_T07a.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    }
+   },
+   "exactly_read_and_changed": [],
+   "listings_that_changed": [],
+   "cleared": true
+  },
+  "aisef2/app/confine.py::argv": {
+   "delta_data_read": 110,
+   "kill_files": {
+    "tests/v2/test_v21_confine.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_kills3_A06.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_kills3_T06a.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    }
+   },
+   "exactly_read_and_changed": [],
+   "listings_that_changed": [],
+   "cleared": true
+  },
+  "aisef2/app/confine.py::config_dir": {
+   "delta_data_read": 110,
+   "kill_files": {
+    "tests/v2/test_v21_confine.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_kills3_T07a.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    }
+   },
+   "exactly_read_and_changed": [],
+   "listings_that_changed": [],
+   "cleared": true
+  },
+  "aisef2/app/confine.py::git_dir": {
+   "delta_data_read": 110,
+   "kill_files": {
+    "tests/v2/test_v21_confine.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_kills3_T07a.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    }
+   },
+   "exactly_read_and_changed": [],
+   "listings_that_changed": [],
+   "cleared": true
+  },
+  "aisef2/app/confine.py::namespaces": {
+   "delta_data_read": 110,
+   "kill_files": {
+    "tests/v2/test_v21_confine.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_kills3_T07b.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    }
+   },
+   "exactly_read_and_changed": [],
+   "listings_that_changed": [],
+   "cleared": true
+  },
+  "aisef2/app/confine.py::problem": {
+   "delta_data_read": 110,
+   "kill_files": {
+    "tests/v2/test_v21_confine.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_kills3_T07b.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    }
+   },
+   "exactly_read_and_changed": [],
+   "listings_that_changed": [],
+   "cleared": true
+  },
+  "aisef2/app/confine.py::targets": {
+   "delta_data_read": 110,
+   "kill_files": {
+    "tests/v2/test_v21_confine.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_defects_confine.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_kills3_T07b.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    }
+   },
+   "exactly_read_and_changed": [],
+   "listings_that_changed": [],
+   "cleared": true
+  },
+  "aisef2/app/confine.py::wrap": {
+   "delta_data_read": 110,
+   "kill_files": {
+    "tests/v2/test_v21_confine.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_kills3_A07.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_kills3_T07b.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_r3_conf_locale.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    }
+   },
+   "exactly_read_and_changed": [],
+   "listings_that_changed": [],
+   "cleared": true
+  },
+  "aisef2/app/run.py::client_on_path": {
+   "delta_data_read": 110,
+   "kill_files": {
+    "tests/v2/test_app_units.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_inputs.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_identity.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_verify.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_continue_usage.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_review_chain.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_continue_integrity.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_app_run.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_confine.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    }
+   },
+   "exactly_read_and_changed": [],
+   "listings_that_changed": [],
+   "cleared": true
+  },
+  "aisef2/app/run.py::execute": {
+   "delta_data_read": 110,
+   "kill_files": {
+    "tests/v2/test_app_units.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_inputs.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_identity.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_verify.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_continue_usage.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_review_chain.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_continue_integrity.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_app_run.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_s2_kills.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_confine.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_kills3_A13.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_kills3_T13a.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    }
+   },
+   "exactly_read_and_changed": [],
+   "listings_that_changed": [],
+   "cleared": true
+  },
+  "aisef2/app/settings.py::OPTIONAL": {
+   "delta_data_read": 110,
+   "kill_files": {
+    "tests/v2/test_app_units.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_inputs.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_identity.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_review.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_verify.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_continue_usage.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_review_chain.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_continue_integrity.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_app_run.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_confine.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    }
+   },
+   "exactly_read_and_changed": [],
+   "listings_that_changed": [],
+   "cleared": true
+  },
+  "aisef2/app/settings.py::load": {
+   "delta_data_read": 110,
+   "kill_files": {
+    "tests/v2/test_app_units.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_inputs.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_identity.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_review.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_verify.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_continue_usage.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_review_chain.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_continue_integrity.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_app_run.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_s2_kills.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_confine.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_kills3_T26a.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    }
+   },
+   "exactly_read_and_changed": [],
+   "listings_that_changed": [],
+   "cleared": true
+  },
+  "aisef2/runtime/process_range.py::_ps_table": {
+   "delta_data_read": 110,
+   "kill_files": {
+    "tests/v2/p4/test_process_table.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    },
+    "tests/v2/test_v21_r3_range_fu_ps_table.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    }
+   },
+   "exactly_read_and_changed": [],
+   "listings_that_changed": [],
+   "cleared": true
+  },
+  "aisef2/runtime/process_range.py::descendants": {
+   "delta_data_read": 110,
+   "kill_files": {
+    "tests/v2/p4/test_process_table.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    }
+   },
+   "exactly_read_and_changed": [],
+   "listings_that_changed": [],
+   "cleared": true
+  },
+  "aisef2/runtime/process_range.py::targets": {
+   "delta_data_read": 110,
+   "kill_files": {
+    "tests/v2/p4/test_process_table.py": {
+     "opened_and_changed": [],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": []
+    }
+   },
+   "exactly_read_and_changed": [],
+   "listings_that_changed": [],
+   "cleared": true
+  }
+ }
+}
