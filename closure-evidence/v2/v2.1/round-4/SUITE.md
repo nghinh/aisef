@@ -19,9 +19,10 @@
 * The pre-run at `1043186` had 7 failures (the suite's encoding rule for two child-process calls and six records that
   had been removed to be regenerated). Nothing was skipped, loosened or re-oracled to get here: the two calls name an
   encoding; the records were regenerated in dependency order by their own tools (see `README.md`).
-* 85 skips, all by an explicit condition of the test (`-v` output, `suite-45554e0/suite.txt`): 41 mock-up/playwright not
-  installed on this machine, 19 `references/` not cloned, 10 `AISEF_TEST_DOCKER=1` (needs a daemon), 3 the real Open Code
-  Review binary (`AISEF_TEST_OCR_EXE`), 2 release-only (`AISEF_RELEASE=1`), 2 dogfood (`AISEF_DOGFOOD=1` and `claude`),
-  1 SIGABRT crash-reporter dialog (`AISEF_ABORT_SUBJECT=1`), and the rest an absent optional fixture or an abstract
-  base class. None is a test this round disabled.
+* 85 skips, each by an explicit condition of the test (`-v` output, `suite-45554e0/suite.txt`): 40 mock-up (playwright
+  not installed on this machine), 19 `references/` not cloned, 10 `AISEF_TEST_DOCKER=1` (needs a daemon), 3 the real Open
+  Code Review binary (`AISEF_TEST_OCR_EXE`), 3 dogfood (`AISEF_DOGFOOD=1`, `claude`), 2 conformance (`AISEF_CONFORMANCE=1`
+  with `claude` / `opencode`), 2 release-only (`AISEF_RELEASE=1`), 1 bench (`AISEF_BENCH=1`), 1 Linux-only
+  (`/proc`, `prctl`), 1 a host's `/proc/self/ns`, 1 SIGABRT crash-reporter dialog (`AISEF_ABORT_SUBJECT=1`), 1 an absent
+  optional skill fixture, 1 abstract base class. None is a test this round disabled.
 * Not covered: Windows, Linux CI (no push), the Docker-gated tests, a live model.
