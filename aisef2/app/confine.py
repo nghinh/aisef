@@ -210,7 +210,9 @@ def _lines(text: str) -> list[str]:
 
 
 def _sections(out: str) -> tuple[dict, dict, dict]:
-    """The probe's output: its single values, its sections, its tries {name: (rc, output)}."""
+    """The probe's output: its single values, its sections, its tries {name: (rc, output)}. A try the output never gave
+    an exit status — the marker ran into the text of a command that ended without a line feed, so it is not at the start
+    of a line, or the output was cut — has rc None: it did not run as far as anything can tell."""
     values, sections, tries, cur, name = {}, {}, {}, None, None
     for line in _lines(out):
         if not line.startswith(MARK):
@@ -233,7 +235,8 @@ def _sections(out: str) -> tuple[dict, dict, dict]:
         else:
             values[word] = rest
             cur = None
-    return values, sections, tries
+    return values, sections, {k: v if isinstance(v, tuple) else (None, "\n".join(v).strip()[:300])
+                              for k, v in tries.items()}
 
 
 def _mounts(lines: list[str]) -> list[dict]:
@@ -527,10 +530,13 @@ def _judge(rep: dict, token: str, out: str, tries: dict, home: str, ws: pathlib.
     """What the measurement shows that confinement must not allow — or did not measure (a check that could not run
     is a problem, never a pass)."""
     inside, bad = rep["inside"], []
+    if unran := sorted(k for k, v in tries.items() if v[0] is None):
+        bad.append(f"the probe's {', '.join(unran)} reported no exit status: the check did not run")
     if token in out or tries.get("read_canary", (0,))[0] == 0:
         bad.append("a file of the run directory was readable")
     bad += [f"a file was created in the {k.replace('_', ' ')}" for k, v in rep["created_outside_workspace"].items() if v]
-    if tries.get("workspace", (1, ""))[0] != 0 or "ok" not in tries.get("workspace", (1, ""))[1]:
+    rc, said = tries.get("workspace", (None, ""))
+    if rc != 0 or "ok" not in said:
         bad.append("the workspace was not writable")
     if tries.get("read_git_directory", (1,))[0] != 0:
         bad.append("the workspace's git directory was not readable (git would not work in the session)")

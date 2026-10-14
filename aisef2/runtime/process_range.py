@@ -185,7 +185,13 @@ class _Posix:
 
     def abort(self, anchor: subprocess.Popen) -> None:
         if anchor.poll() is None:
-            os.killpg(anchor.pid, signal.SIGKILL)
+            try:
+                os.killpg(anchor.pid, signal.SIGKILL)
+            except (ProcessLookupError, PermissionError):
+                # the anchor ended between poll() and the signal (ESRCH, or EPERM where macOS answers it for a group
+                # of zombies): nothing is left to kill, and the failure that led here must not be replaced by this one
+                # — `_abort` goes on to reap the anchor and close the pipes
+                pass
 
     def close(self) -> None:
         pass
