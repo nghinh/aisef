@@ -1,0 +1,44 @@
+HEAD 534435ff84fe303a202d4a340e0172e9e88d7994 dirty: [] free 19 GiB
+=== sweep 2026-10-14 19:11:52
+19:11:52 heavy.sh: t0-sweep waits for: read-set pid=4606 since 2026-10-14 18:43:32
+19:12:52 heavy.sh: t0-sweep waits for: read-set pid=4606 since 2026-10-14 18:43:32
+19:13:52 heavy.sh: t0-sweep waits for: read-set pid=4606 since 2026-10-14 18:43:32
+19:14:52 heavy.sh: t0-sweep waits for: read-set pid=4606 since 2026-10-14 18:43:32
+19:15:52 heavy.sh: t0-sweep waits for: read-set pid=13236 since 2026-10-14 19:15:32
+19:16:52 heavy.sh: t0-sweep waits for: read-set pid=13236 since 2026-10-14 19:15:32
+19:17:52 heavy.sh: t0-sweep waits for: read-set pid=13236 since 2026-10-14 19:15:32
+19:18:52 heavy.sh: t0-sweep waits for: read-set pid=13236 since 2026-10-14 19:15:32
+19:19:52 heavy.sh: t0-sweep waits for: read-set pid=13236 since 2026-10-14 19:15:32
+19:20:52 heavy.sh: t0-sweep waits for: read-set pid=13236 since 2026-10-14 19:15:32
+19:21:52 heavy.sh: t0-sweep waits for: read-set pid=13236 since 2026-10-14 19:15:32
+19:22:52 heavy.sh: t0-sweep waits for: read-set pid=13236 since 2026-10-14 19:15:32
+19:23:52 heavy.sh: t0-sweep waits for: read-set pid=13236 since 2026-10-14 19:15:32
+19:24:52 heavy.sh: t0-sweep waits for: read-set pid=13236 since 2026-10-14 19:15:32
+19:25:52 heavy.sh: t0-sweep waits for: read-set pid=13236 since 2026-10-14 19:15:32
+19:26:52 heavy.sh: t0-sweep waits for: read-set pid=13236 since 2026-10-14 19:15:32
+19:27:52 heavy.sh: t0-sweep waits for: read-set pid=13236 since 2026-10-14 19:15:32
+19:28:52 heavy.sh: t0-sweep waits for: read-set pid=13236 since 2026-10-14 19:15:32
+19:29:52 heavy.sh: t0-sweep waits for: read-set pid=13236 since 2026-10-14 19:15:32
+19:30:52 heavy.sh: t0-sweep waits for: read-set pid=13236 since 2026-10-14 19:15:32
+19:31:52 heavy.sh: t0-sweep waits for: read-set pid=13236 since 2026-10-14 19:15:32
+19:32:52 heavy.sh: t0-sweep waits for: read-set pid=13236 since 2026-10-14 19:15:32
+19:33:52 heavy.sh: t0-sweep waits for: read-set pid=13236 since 2026-10-14 19:15:32
+19:34:52 heavy.sh: t0-sweep waits for: read-set pid=13236 since 2026-10-14 19:15:32
+19:35:52 heavy.sh: t0-sweep waits for: read-set pid=13236 since 2026-10-14 19:15:32
+19:36:52 heavy.sh: t0-sweep waits for: read-set pid=13236 since 2026-10-14 19:15:32
+19:37:52 heavy.sh: t0-sweep waits for: read-set pid=13236 since 2026-10-14 19:15:32
+19:38:52 heavy.sh: t0-sweep waits for: read-set pid=13236 since 2026-10-14 19:15:32
+19:39:52 heavy.sh: t0-sweep waits for: read-set pid=13236 since 2026-10-14 19:15:32
+19:40:52 heavy.sh: t0-sweep waits for: read-set pid=13236 since 2026-10-14 19:15:32
+19:41:52 heavy.sh: t0-sweep waits for: read-set pid=13236 since 2026-10-14 19:15:32
+19:42:52 heavy.sh: t0-sweep waits for: read-set pid=13236 since 2026-10-14 19:15:32
+19:43:52 heavy.sh: t0-sweep waits for: read-set pid=13236 since 2026-10-14 19:15:32
+19:44:52 heavy.sh: t0-sweep waits for: read-set pid=13236 since 2026-10-14 19:15:32
+19:45:53 heavy.sh: t0-sweep waits for: read-set pid=13236 since 2026-10-14 19:15:32
+19:46:53 heavy.sh: t0-sweep waits for: read-set pid=13236 since 2026-10-14 19:15:32
+19:47:53 heavy.sh: t0-sweep waits for: read-set pid=13236 since 2026-10-14 19:15:32
+273 pairs, 31 null mutants, 166 kill files
+PASS aisef2/app/confine.py|22dba98cf95288c6|tests/v2/test_v21_r4_probe_record.py  (7.4s)
+sweep RC 0
+HEAD after 534435ff84fe303a202d4a340e0172e9e88d7994 dirty: []
+=== DONE 2026-10-14 19:49:08
