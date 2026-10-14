@@ -387,7 +387,9 @@ def _execution_order() -> Checker:
         with tempfile.TemporaryDirectory() as t:
             edited = pathlib.Path(t) / "EXECUTION-ORDER.json"
             edited.write_text(_edit(table.read_text(encoding="utf-8"), fx), encoding="utf-8")
-            return eo.check(edited)
+            # the record keeps what was observed: not the run's temporary directory (a record that names it cannot be
+            # reproduced, so its own --check could never pass on another run)
+            return [x.replace(str(edited), "<the edited EXECUTION-ORDER.json>") for x in eo.check(edited)]
     return Checker("execution_order", "V2.1 (B-03b)", lambda: eo.check(table), bad, ("validation/v2/execution_order.py",))
 
 
