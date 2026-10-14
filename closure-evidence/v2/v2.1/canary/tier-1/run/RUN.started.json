@@ -1,0 +1,13 @@
+{
+ "bundle_digest": "8196b5f846e5f06a586827461b767732054c9379a98e3fff6e2e6ef0ccc617bf",
+ "format": "aisef-v2-run-record/1",
+ "kernel_digest": "bc6de98b0d665978245451a01cafe3e52ee79106d0d48debdda232acd654df57",
+ "plan_hash": "5bdcb4b36b38fe18952c8bab22ed014301a4d622724b54c015f0074e446efb2e",
+ "platform": {
+  "python": "3.14.7",
+  "system": "darwin"
+ },
+ "project": "calc",
+ "settings_sha256": "f2cc82776a2f12e8f1fee02552d56a112267b6824d7578a95876522ce52a4724",
+ "started": 1792018339.225106
+}

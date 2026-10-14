@@ -1,0 +1,24 @@
+{
+ "anchor_written_to": "run.anchor",
+ "delivery_blocked_by": [
+  "1 of the plan's stories did not commit: ['S1']",
+  "the budget ended the run: S1 not run: max_provider_requests: 4 of 4; max_input_tokens exceeded: 6270 of 2000"
+ ],
+ "delivery_verdict": "NOT_REACHED",
+ "evidence_anchor": "6753e444ab7ea7dcbe727ae5f424b0aa7186248a0fcb87e6c4bb0088254cfe79",
+ "final_main": "75ae0a7b7eeabcc98a27bc634554ce6d2d88b0dd",
+ "journal": {
+  "closed": "SHUTDOWN",
+  "lines": 15,
+  "path": "run/journals/aisef-run.jsonl",
+  "sha256": "322ed362221dc9a7f51ddabce4a4ca50cae2051be6e84e800017cb8400109c48"
+ },
+ "plan_quality_verdict": "NOT_CLAIMED",
+ "project": "calc",
+ "record": "run/RUN.json",
+ "story_outcomes": {
+  "S1": [
+   "NOT_RUN: max_provider_requests: 4 of 4"
+  ]
+ }
+}
