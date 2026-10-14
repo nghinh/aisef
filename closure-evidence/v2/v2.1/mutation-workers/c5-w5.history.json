@@ -1,0 +1,13 @@
+{
+ "worker": "c5-w5",
+ "snapshot": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+ "status": "finished 2026-10-14T00:33:29Z; git status --porcelain after: clean (campaign 5, snapshot 289885e; the worker directory is named c3-w5 by the campaign script)",
+ "log": {
+  "path": "closure-evidence/v2/v2.1/mutation-workers/c5-w5.log",
+  "sha256": "e8607fc5841186454ee8734db5975ce7efd858bae16107f904cb87bbc026a425"
+ },
+ "record": {
+  "path": "closure-evidence/v2/v2.1/mutation-workers/c5-w5.record.json",
+  "sha256": "2b8e29a8a9e5735ac1778e294c87470fbb8e0310abffb6b5b4818f09a012d9a8"
+ }
+}
