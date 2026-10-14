@@ -1146,3 +1146,44 @@ decisions), then the probe modules', then the reach-driven ones; longest expecte
 of `T0-SWEEP-5`); 5 workers (campaign 3 and 4 used 4; the machine has 8 cores; the longest known kill, T21a's 640 s of
 waiting, is under the 900 s limit at 4 workers and its margin at 5 is not measured: an INFRA or TIMEOUT row is re-run
 alone at the same snapshot, as `c3b` was, and is never counted as a kill).
+
+## 20. Campaigns 6 and 7: a change whose behaviour differs on a described class of inputs (B-03 round 4, 2026-10-14)
+
+**What changed.** An independent review of campaign 5's last survivors found two defects and the re-verification of the
+carried audits (18 agents, two blind copies per batch) refuted six audits. Product code changed in three functions, all
+of them under the measuring instrument's roots: `confine._sections`, `confine._judge` and
+`process_range._Posix.abort` (`campaign-6/CHANGED-FUNCTIONS.json`: `reach.watch_from_diff`, the whole of `aisef2/`;
+the import-time statements of both files are unchanged). The manifest's harness hash of `process_range.py` moved, as
+in §19.
+
+**Why §19's route was not usable, and what replaced it.** `reach.py` can say a function WAS executed, never that one
+was NOT, outside the children that inherit its PYTHONPATH — and 1,002 of the 1,090 Python children it saw in
+campaign 5 were unobserved. It could not give a basis here either: every target would have been measured again. The
+change, however, differs from the old code only on classes of inputs that can be described (`_sections`/`_judge`: a
+probe try with no exit status, or a try that is not a `(status, text)` pair; `abort`: `killpg` raising ESRCH/EPERM).
+`validation/v21/trace_paths.py` puts a one-line mark at each such path in the runner's fresh copy of the tree
+(`mutation._pristine`) — so every process that runs that tree's product code writes a line, whatever its environment
+or flags — and runs every kill file once under the runner's own `_run_file`. A kill file with no hit never reached the
+changed behaviour; its outcome on the unmutated tree is the old code's. Four controls each reach a mark from a
+`-E -S` child with its own environment. `diff_confine_old_new.py` adds the other direction on the unmutated code: the
+old and the new `_judge` agree on 20,000 inputs whose tries all reported (or are absent), and `_sections` on every
+output whose tries are closed.
+
+**The delta's reading of a listing.** `v21_snapshot_delta.py` counts a kill file as reading every file below a
+directory it listed (the repository root, listed by `test_v21_confine.py`, makes 1,542 new evidence files "read").
+`campaign-6/tools/data_read_analysis.py` states the exact reading from the same measured read-set: a listing returns the
+names of the directory's direct children; what a kill file read through one is the direct children that changed.
+No listed directory's children changed. What eight targets' kill files exactly read and that changed is code opened by
+a child's import (`confine.py`, `process_range.py`), whose import-time statements are unchanged; the trace says no
+kill file reached the changed behaviour: those eight stand, with the clearance written in the row of
+`campaign-6/SCOPE.json` (`data_read_cleared`).
+
+**Measured.** Campaign 6 (`campaign-6/`, snapshot `a770fbb`): 56 targets / 1,419 mutants (all of `confine.py` and
+`process_range.py`; `findings`, `verify` and `_canon`, whose kill set changed), 5 workers, 55 min: 1,393 KILLED,
+26 SURVIVED, 0 TIMEOUT/INFRA/NOT_RUN; the other 472 targets keep campaign 5's result (§19) on the basis above.
+Campaign 7 re-measures the two targets whose kill file was strengthened after campaign 6 (§ the table in
+`decisions/B03-R4-REVIEW.md`).
+
+**Not claimed.** That a mutant of ANOTHER module could not manufacture a probe output with a try that has no status:
+none can, because the probe's output comes from the bubblewrap process the test supplies, not from product code of
+another module; this is an argument, not a measurement.

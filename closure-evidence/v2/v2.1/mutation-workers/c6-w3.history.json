@@ -1,0 +1,13 @@
+{
+ "worker": "c6-w3",
+ "snapshot": "a770fbbfda20824f72bc2a9bcb29b47e44512d6a",
+ "status": "finished 2026-10-14T11:29:32Z; git status --porcelain after: clean (campaign 6, snapshot a770fbb; the worker directory is named c3-w3 by the campaign script)",
+ "log": {
+  "path": "closure-evidence/v2/v2.1/mutation-workers/c6-w3.log",
+  "sha256": "b8164588a28bfae80e7f4e2a5a3d8f201f1c0cce0917641156327fdc1f3ba4fc"
+ },
+ "record": {
+  "path": "closure-evidence/v2/v2.1/mutation-workers/c6-w3.record.json",
+  "sha256": "000c9a52073c7478904b7e1d62cd11caf365ce36e39a2227c9cb1053ee5e0f4f"
+ }
+}

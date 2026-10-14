@@ -950,7 +950,9 @@ _V21_R3_APPEND: dict[str, list[str]] = {
     "aisef2/app/verify.py::verify": [_R3 + "usage_boundary.py", _R3 + "usage_review.py", _R3 + "detail_product.py"],
     "aisef2/app/client.py::read_session": [_R3 + "client_stream.py"],
     "aisef2/app/usage.py::session_tokens": [_R3 + "client_stream.py"],
-    "aisef2/app/confine.py::_sections": [_R3 + "client_readers.py"],
+    # `_sections` reports a try that never gave an exit status as (None, its text): the judge_not_run test asserts it
+    # (campaign 6 left the three mutants of that line SURVIVED: the file was registered for `_judge` only)
+    "aisef2/app/confine.py::_sections": [_R3 + "client_readers.py", _R3 + "judge_not_run.py"],
     "aisef2/app/lineage.py::reconcile": [_R3 + "client_readers.py"],
 }
 _V21_R3_RANGE = {t: list(k) for t, k in P4_TARGETS.items() if t.startswith("aisef2/runtime/process_range.py::")}

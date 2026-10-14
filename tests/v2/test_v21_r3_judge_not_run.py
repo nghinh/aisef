@@ -104,11 +104,11 @@ class AnyTryThatDidNotReportIsNamed(unittest.TestCase):
                 problems = judged(**{name: (None, "ok" if name == "workspace" else "")})
                 self.assertTrue(any(name in p and DID_NOT_RUN in p for p in problems), problems)
 
-    def test_several_are_named_together_in_one_problem(self):
+    def test_several_are_named_together_in_one_problem_each_as_a_token_of_its_own(self):
         problems = judged(read_canary=(None, ""), setsid=(None, ""))
         [said] = [p for p in problems if DID_NOT_RUN in p]
-        self.assertIn("read_canary", said)
-        self.assertIn("setsid", said)
+        for name in ("read_canary", "setsid"):      # the operator reads the names: one must not run into the next
+            self.assertRegex(said, rf"(?<![A-Za-z_]){name}(?![A-Za-z_])")
 
 
 class AMarkerThatRanIntoItsTextLeavesATryWithoutAStatus(unittest.TestCase):
@@ -127,7 +127,7 @@ class AMarkerThatRanIntoItsTextLeavesATryWithoutAStatus(unittest.TestCase):
 
     def test_one_line_of_text_with_the_marker_glued_to_it(self):
         tries, problems = self.judged_from(self.probe_output([f"{REFUSALS[0]}{M}rc 1"]))
-        self.assertIsNone(tries["user_namespace"][0])
+        self.assertEqual(tries["user_namespace"], (None, f"{REFUSALS[0]}{M}rc 1"))
         self.assertIn(REFUSALS[0], tries["user_namespace"][1])
         self.assertTrue(any("user_namespace" in p and DID_NOT_RUN in p for p in problems), problems)
         self.assertEqual(len(unmeasured(problems)), 1, problems)
@@ -136,6 +136,8 @@ class AMarkerThatRanIntoItsTextLeavesATryWithoutAStatus(unittest.TestCase):
         """Before the change: `rc, said = ['first', 'second']`, and a refusal wording in the second line passed."""
         tries, problems = self.judged_from(self.probe_output(["unshare: first line", f"{REFUSALS[1]}{M}rc 1"]))
         self.assertIsNone(tries["user_namespace"][0])
+        # its text is what the probe wrote, line by line, as a try that reported has it
+        self.assertEqual(tries["user_namespace"], (None, f"unshare: first line\n{REFUSALS[1]}{M}rc 1"))
         self.assertNotEqual(problems, [])
         self.assertEqual(len(unmeasured(problems)), 1, problems)
 
