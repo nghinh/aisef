@@ -1,0 +1,366 @@
+[
+ {
+  "target": "aisef2/app/review_ocr.py::OCR",
+  "index": 0,
+  "mutant": "L40 string 'repository' emptied",
+  "class": "AUDITED",
+  "source_sha256": "043f8adca928861b290d8723a9a7a256cbe04566c1e44985b7c424f3ddca1609",
+  "group": "OCR provenance labels (repository, licence): no reader of the key or the value in the tracked tree, shown by AST scan and by a recording dict under 284 tests; the sibling final tests read only 'version' and 'commit'",
+  "grounds": "The key 'repository' becomes ''. AST scan of all 813 tracked .py (review/static-readers.py): the attribute reads of review_ocr.OCR/TERMINAL are adapters.py:198 and :219 (['version']) and tests/v2/test_v21_review_chain.py:458-459 (['version'], ['commit']); no `from ... review_ocr import`, no star import, no getattr/vars/dir/__dict__ of the module. independent recording probe (review/dynamic-readers.py, dyn-1.json + dyn-2.json): 13 test modules, 284 tests, 0 failures, 3 skips (RealBinary), a recording dict/tuple substituted for OCR/TERMINAL: only OCR['version'] x90 (adapters.py:198, :219, review_ocr.py:100, :101, :156); no get/iter/keys/items/copy/len/contains/eq/repr; TERMINAL untouched; gc scan: no other module holds the original objects.",
+  "consumers_checked": [
+   "AST scan: no subscript or .get of 'repository' on the OCR dict anywhere (the only 'repository' subscripts are body['workload']['repository'] in validation/qualification/c2_delivery_experiment.py:872 and pre['repository'] in release_smoke.py:489, both other data)",
+   "aisef2/app/adapters.py:198,219 and review_ocr.py:100,101,156: ['version'] only",
+   "tests/v2/test_v21_review_chain.py:458-459 (RealBinary.setUp, skipped without AISEF_TEST_OCR_EXE): ['version'], ['commit']",
+   "settings.py:42-43 / adapters.py:159-160: the pin that binds the binary is settings review.ocr {exe, sha256}, not this dict (settings.py does not import review_ocr)"
+  ],
+  "exceptions_checked": [
+   "a whole-dict reader (json.dumps, dict(), **OCR, a loop): none in the AST scan and none recorded by the probe",
+   "the key '' colliding with another key: only one key is emptied, the other three keys stay distinct",
+   "aisef2/app/run.py:77-84 kernel_digest hashes the source bytes of every aisef2 .py: any edit changes it, so it is not a reader of this key in particular"
+  ],
+  "batch": "A12",
+  "reviewed": true
+ },
+ {
+  "target": "aisef2/app/review_ocr.py::OCR",
+  "index": 3,
+  "mutant": "L41 string 'license' emptied",
+  "class": "AUDITED",
+  "source_sha256": "043f8adca928861b290d8723a9a7a256cbe04566c1e44985b7c424f3ddca1609",
+  "group": "OCR provenance labels (repository, licence): no reader of the key or the value in the tracked tree, shown by AST scan and by a recording dict under 284 tests; the sibling final tests read only 'version' and 'commit'",
+  "grounds": "The key 'license' becomes ''. AST scan of all 813 tracked .py (review/static-readers.py): the attribute reads of review_ocr.OCR/TERMINAL are adapters.py:198 and :219 (['version']) and tests/v2/test_v21_review_chain.py:458-459 (['version'], ['commit']); no `from ... review_ocr import`, no star import, no getattr/vars/dir/__dict__ of the module. independent recording probe (review/dynamic-readers.py, dyn-1.json + dyn-2.json): 13 test modules, 284 tests, 0 failures, 3 skips (RealBinary), a recording dict/tuple substituted for OCR/TERMINAL: only OCR['version'] x90 (adapters.py:198, :219, review_ocr.py:100, :101, :156); no get/iter/keys/items/copy/len/contains/eq/repr; TERMINAL untouched; gc scan: no other module holds the original objects.",
+  "consumers_checked": [
+   "git grep -i apache|licen[sc]e over aisef2/ validation/ bin/ framework/, and apache over tests/ aisef/ spike/: review_ocr.py:2 (docstring) and :41 (the entry) only for this pin; the rest is other data (aisef/kit/catalog.json:67 and catalog.py:78,88 and registry.py:370 are skill-kit entries with their own license field; tests/test_registry.py:93,96 a fixture; validation/v2/p1_evidence.py BC-LICENSE is a probe contract)",
+   "validation/v21/traceability_check.py and validation/experiments/harness.py mention UPSTREAM-RESEARCH only in text; neither imports review_ocr",
+   "final tests of the sibling batches (T10a/b/d, T11a, T12a, A10 in out/*/review): read ['version'] / ['commit'] only"
+  ],
+  "exceptions_checked": [
+   "a licence gate refusing a non-Apache pin: none exists; the value never varies at run time",
+   "a SBOM/notice generator over module constants: none (no importer of the module outside adapters and tests)",
+   "a record or journal field carrying the licence: run record writers (adapters.py sessions, usage.py) carry finder 'ocr <version>' only"
+  ],
+  "batch": "A12",
+  "reviewed": true
+ },
+ {
+  "target": "aisef2/app/review_ocr.py::OCR",
+  "index": 4,
+  "mutant": "L40 string 'https://github.com/alibaba/open-code-review' emptied",
+  "class": "AUDITED",
+  "source_sha256": "043f8adca928861b290d8723a9a7a256cbe04566c1e44985b7c424f3ddca1609",
+  "group": "OCR provenance labels (repository, licence): no reader of the key or the value in the tracked tree, shown by AST scan and by a recording dict under 284 tests; the sibling final tests read only 'version' and 'commit'",
+  "grounds": "OCR['repository'] becomes ''. AST scan of all 813 tracked .py (review/static-readers.py): the attribute reads of review_ocr.OCR/TERMINAL are adapters.py:198 and :219 (['version']) and tests/v2/test_v21_review_chain.py:458-459 (['version'], ['commit']); no `from ... review_ocr import`, no star import, no getattr/vars/dir/__dict__ of the module. independent recording probe (review/dynamic-readers.py, dyn-1.json + dyn-2.json): 13 test modules, 284 tests, 0 failures, 3 skips (RealBinary), a recording dict/tuple substituted for OCR/TERMINAL: only OCR['version'] x90 (adapters.py:198, :219, review_ocr.py:100, :101, :156); no get/iter/keys/items/copy/len/contains/eq/repr; TERMINAL untouched; gc scan: no other module holds the original objects.",
+  "consumers_checked": [
+   "git grep -n alibaba/open-code-review: code only at review_ocr.py:1-2 (docstring) and :40; the rest is docs prose and docs/v2.1/research/*.json (the research record), compared with nothing",
+   "aisef2/app/review_ocr.py:181 environment(): endpoint['url'] is the route's, a different value",
+   "the binary is run by absolute path with OCR_NO_UPDATE=1 (review_ocr.py:179): no download or update step reads the URL"
+  ],
+  "exceptions_checked": [
+   "a test comparing the dict with docs/v2.1/research/UPSTREAM-RESEARCH.json (url/repo): none exists (traceability_check.py reads TRACEABILITY.json and evidence files, never the module); a new one would be a doc-consistency check with no runtime reader, not a requirement of this module",
+   "an empty string refused somewhere (non-emptiness as the requirement): no reader, so nothing relies on it",
+   "the URL carried into evidence that --verify checks: verify.py reads none of it; the session record has finder 'ocr <version>'"
+  ],
+  "batch": "A12",
+  "reviewed": true
+ },
+ {
+  "target": "aisef2/app/review_ocr.py::OCR",
+  "index": 7,
+  "mutant": "L41 string 'Apache-2.0' emptied",
+  "class": "AUDITED",
+  "source_sha256": "043f8adca928861b290d8723a9a7a256cbe04566c1e44985b7c424f3ddca1609",
+  "group": "OCR provenance labels (repository, licence): no reader of the key or the value in the tracked tree, shown by AST scan and by a recording dict under 284 tests; the sibling final tests read only 'version' and 'commit'",
+  "grounds": "OCR['license'] becomes ''. AST scan of all 813 tracked .py (review/static-readers.py): the attribute reads of review_ocr.OCR/TERMINAL are adapters.py:198 and :219 (['version']) and tests/v2/test_v21_review_chain.py:458-459 (['version'], ['commit']); no `from ... review_ocr import`, no star import, no getattr/vars/dir/__dict__ of the module. independent recording probe (review/dynamic-readers.py, dyn-1.json + dyn-2.json): 13 test modules, 284 tests, 0 failures, 3 skips (RealBinary), a recording dict/tuple substituted for OCR/TERMINAL: only OCR['version'] x90 (adapters.py:198, :219, review_ocr.py:100, :101, :156); no get/iter/keys/items/copy/len/contains/eq/repr; TERMINAL untouched; gc scan: no other module holds the original objects.",
+  "consumers_checked": [
+   "same licence grep as [3] (the value 'Apache-2.0' appears in code only at review_ocr.py:2 and :41)",
+   "aisef2/app/adapters.py, usage.py, verify.py, settings.py: no licence field in any record the kernel writes or reads",
+   "tests/v2/test_v21_review_ocr.py and test_v21_review_chain.py: no assertion on a licence"
+  ],
+  "exceptions_checked": [
+   "the empty licence as a decision signal ('unknown licence refuses'): no branch reads the value",
+   "a notice file or SBOM built from the constant: none in aisef2/, validation/, bin/",
+   "the value reached through the key mutant [3]: separate mutants; neither key is read"
+  ],
+  "batch": "A12",
+  "reviewed": true
+ },
+ {
+  "target": "aisef2/app/review_ocr.py::TERMINAL",
+  "index": 0,
+  "mutant": "L43 string 'complete' emptied",
+  "class": "AUDITED",
+  "source_sha256": "043f8adca928861b290d8723a9a7a256cbe04566c1e44985b7c424f3ddca1609",
+  "group": "dead module constant since e897437: no reader in the tracked tree and no access under 284 tests; every terminal state is decided by an inline literal in coverage() that existing tests assert",
+  "grounds": "TERMINAL[0] becomes ''. Nothing reads the tuple. coverage() decides on the literal at review_ocr.py:90; Coverage.terminal_state (review_ocr.py:134) is returned raw and adapters.py:224 keeps status, reasons and not_reviewable only.",
+  "consumers_checked": [
+   "git grep -w TERMINAL (tracked tree, closure-evidence included): the definition, validation/v2/mutation.py:652 (target name as a string), validation/qualification/q3.py:27 (unrelated local tuple) and records that name the target",
+   "aisef2/app/adapters.py:224-232: the only consumer of Coverage; reads status/reasons/failure/failed/not_reviewable, never terminal_state",
+   "tests/v2/test_v21_review_ocr.py (module alias O; no O.TERMINAL) and test_v21_review_chain.py (no TERMINAL)",
+   "aisef2/invariants/registry.py:220-236, tests/test_meta.py:102, tests/v2/test_no_dual_authority.py:268 (getattr by symbol name): none names review_ocr"
+  ],
+  "exceptions_checked": [
+   "state '' accepted because '' is now in the tuple: coverage() never tests membership; state '' or a missing state adds the reason \"terminal state ''\" and the status stays INDETERMINATE (line 90)",
+   "a future reader turning the dead tuple into a decision: it could only add a reason, since line 90 already refuses every state but 'complete' (and 'skipped' with nothing required)",
+   "'complete' as the one state a complete review needs: asserted through the literal by Coverage.test_a_complete_run_of_the_frozen_range_covering_every_required_path and the chain's NothingToReview/FixLoop scenarios, none of which passes through the tuple"
+  ],
+  "batch": "A12",
+  "reviewed": true
+ },
+ {
+  "target": "aisef2/app/review_ocr.py::TERMINAL",
+  "index": 1,
+  "mutant": "L43 string 'partial' emptied",
+  "class": "AUDITED",
+  "source_sha256": "043f8adca928861b290d8723a9a7a256cbe04566c1e44985b7c424f3ddca1609",
+  "group": "dead module constant since e897437: no reader in the tracked tree and no access under 284 tests; every terminal state is decided by an inline literal in coverage() that existing tests assert",
+  "grounds": "TERMINAL[1] becomes ''. independent recording probe (review/dynamic-readers.py, dyn-1.json + dyn-2.json): 13 test modules, 284 tests, 0 failures, 3 skips (RealBinary), a recording dict/tuple substituted for OCR/TERMINAL: only OCR['version'] x90 (adapters.py:198, :219, review_ocr.py:100, :101, :156); no get/iter/keys/items/copy/len/contains/eq/repr; TERMINAL untouched; gc scan: no other module holds the original objects.",
+  "consumers_checked": [
+   "review_ocr.py:87-91: the partial refusal is a literal comparison",
+   "tests/v2/test_v21_review_chain.py:132-140 (FAKE_OCR 'partial' and 'budget' scenarios) and :338-339",
+   "tests/v2/fixtures/ocr/partial.json terminal_state partial, used by tests/v2/test_v21_review_ocr.py Coverage.test_exit_0_is_not_a_full_review"
+  ],
+  "exceptions_checked": [
+   "another reader matching the word 'partial': aisef2/ has the cost status 'partial: ...' (usage.py:107, lineage.py:317) and the PARTIAL measurement level (quality/test_execution.py); none derives from this tuple",
+   "a positional read TERMINAL[1]: none (AST scan; the probe recorded no getitem)",
+   "partial refusal depending on membership: line 90 compares with 'complete' only"
+  ],
+  "batch": "A12",
+  "reviewed": true
+ },
+ {
+  "target": "aisef2/app/review_ocr.py::TERMINAL",
+  "index": 2,
+  "mutant": "L43 string 'failed' emptied",
+  "class": "AUDITED",
+  "source_sha256": "043f8adca928861b290d8723a9a7a256cbe04566c1e44985b7c424f3ddca1609",
+  "group": "dead module constant since e897437: no reader in the tracked tree and no access under 284 tests; every terminal state is decided by an inline literal in coverage() that existing tests assert",
+  "grounds": "TERMINAL[2] becomes ''. independent recording probe (review/dynamic-readers.py, dyn-1.json + dyn-2.json): 13 test modules, 284 tests, 0 failures, 3 skips (RealBinary), a recording dict/tuple substituted for OCR/TERMINAL: only OCR['version'] x90 (adapters.py:198, :219, review_ocr.py:100, :101, :156); no get/iter/keys/items/copy/len/contains/eq/repr; TERMINAL untouched; gc scan: no other module holds the original objects.",
+  "consumers_checked": [
+   "review_ocr.py:90 (literal), :103-105 (failure from run_failure), :134-135 (Coverage.failure)",
+   "aisef2/app/adapters.py:227 (cov.failure == 'provider' or every failed item classified 'provider' -> ProviderOutage)",
+   "tests/v2/test_v21_review_chain.py:143-148 (the 'provider' scenario) and :361-362"
+  ],
+  "exceptions_checked": [
+   "a 'failed' state with no run_failure: still refused by line 90; the tuple is not consulted either way",
+   "classification by terminal state in the adapter: adapters.py reads cov.failure and cov.failed, not the state name",
+   "an unknown state outside the vocabulary: gets the same \"terminal state '<x>'\" reason; membership never changes a verdict"
+  ],
+  "batch": "A12",
+  "reviewed": true
+ },
+ {
+  "target": "aisef2/app/review_ocr.py::TERMINAL",
+  "index": 3,
+  "mutant": "L43 string 'skipped' emptied",
+  "class": "AUDITED",
+  "source_sha256": "043f8adca928861b290d8723a9a7a256cbe04566c1e44985b7c424f3ddca1609",
+  "group": "dead module constant since e897437: no reader in the tracked tree and no access under 284 tests; every terminal state is decided by an inline literal in coverage() that existing tests assert",
+  "grounds": "TERMINAL[3] becomes ''. independent recording probe (review/dynamic-readers.py, dyn-1.json + dyn-2.json): 13 test modules, 284 tests, 0 failures, 3 skips (RealBinary), a recording dict/tuple substituted for OCR/TERMINAL: only OCR['version'] x90 (adapters.py:198, :219, review_ocr.py:100, :101, :156); no get/iter/keys/items/copy/len/contains/eq/repr; TERMINAL untouched; gc scan: no other module holds the original objects.",
+  "consumers_checked": [
+   "review_ocr.py:87-91 (skipped rule is a literal)",
+   "tests/v2/test_v21_review_chain.py:372-388 (NothingToReview) and :498-506 (RealBinary, skipped without AISEF_TEST_OCR_EXE)",
+   "aisef2/app/adapters.py:222-232 (reads cov.status, not the state)"
+  ],
+  "exceptions_checked": [
+   "'skipped' with something required: refused by the same literal (`not required` false), not by absence from a tuple",
+   "the hermetic suite skipping RealBinary leaving the rule unexercised: NothingToReview exercises it with FAKE_OCR on every run",
+   "a reader taking TERMINAL as the set of acceptable states: none exists, membership is tested nowhere"
+  ],
+  "batch": "A12",
+  "reviewed": true
+ },
+ {
+  "target": "aisef2/app/review_ocr.py::coverage",
+  "index": 77,
+  "mutant": "L96 string 'reviewed head ' emptied",
+  "class": "AUDITED",
+  "source_sha256": "043f8adca928861b290d8723a9a7a256cbe04566c1e44985b7c424f3ddca1609",
+  "group": "T11-LABEL-AUDIT: a subject noun lost while the values and the comparator that says which check failed stay",
+  "grounds": "Subject noun 'reviewed head ' lost; values and the comparator phrase that names the frozen head stay in the same entry.",
+  "consumers_checked": [
+   "aisef2/app/adapters.py:224-232 (join with '; ', cut at 600/300)",
+   "aisef2/orchestrate/review.py:35-40 (provider/result detail)",
+   "aisef2/orchestrate/story_runner.py:288 (failure detail is 'review: CAPABILITY_UNRUNNABLE', not the reasons)",
+   "grep of the label strings over aisef2, validation, tests, docs: writer and module docstring only"
+  ],
+  "exceptions_checked": [
+   "resolved_head absent: 'None, not the candidate X' still states a fact about the candidate",
+   "head and base both wrong: each end is its own entry (pinned by the A11 base test), so no confusion",
+   "a parser or --verify path reading the text: none (verify.py does not read sessions[].coverage)"
+  ],
+  "batch": "A11",
+  "reviewed": true
+ },
+ {
+  "target": "aisef2/app/review_ocr.py::coverage",
+  "index": 81,
+  "mutant": "L101 string 'OCR ' emptied",
+  "class": "AUDITED",
+  "source_sha256": "043f8adca928861b290d8723a9a7a256cbe04566c1e44985b7c424f3ddca1609",
+  "group": "T11-LABEL-AUDIT: a subject noun lost while the values and the comparator that says which check failed stay",
+  "grounds": "Product noun 'OCR ' lost; both versions and the check phrase stay.",
+  "consumers_checked": [
+   "aisef2/app/adapters.py:219 (session finder), 224-232",
+   "tests/v2/test_v21_review_ocr.py::Coverage::test_a_manifest_that_does_not_hold_together_is_indeterminate (asserts 'pinned')",
+   "aisef2/app/review_ocr.py:199-208 (the binary pin message, raised before any run)"
+  ],
+  "exceptions_checked": [
+   "found version None: 'None, not the pinned v1.12.12' still states the check",
+   "confusion with the binary sha256 pin: a different message and exception (CapabilityUnrunnable before the run)",
+   "no parser of the text exists (grep)"
+  ],
+  "batch": "A11",
+  "reviewed": true
+ },
+ {
+  "target": "aisef2/app/review_ocr.py::coverage",
+  "index": 85,
+  "mutant": "L105 string ')' emptied",
+  "class": "AUDITED",
+  "source_sha256": "043f8adca928861b290d8723a9a7a256cbe04566c1e44985b7c424f3ddca1609",
+  "group": "T11-LABEL-AUDIT: punctuation of a diagnostic string",
+  "grounds": "Closing delimiter of OCR's free text: punctuation of a diagnostic; class and OCR's words stay.",
+  "consumers_checked": [
+   "aisef2/app/adapters.py:226 and 232 (the only '; ' joins)",
+   "aisef2/app/adapters.py:227 (decision from cov.failure/cov.failed)",
+   "RUN.json sessions[].coverage.reasons (a list)"
+  ],
+  "exceptions_checked": [
+   "OCR's text containing '; ' (cosmetic, next reason recognisable by its own words)",
+   "truncation at 120/300/600 characters bounds long text independently",
+   "a splitter of '; ': none (grep)"
+  ],
+  "batch": "A11",
+  "reviewed": true
+ },
+ {
+  "target": "aisef2/app/review_ocr.py::findings",
+  "index": 26,
+  "mutant": "L153 dict entry 8 dropped",
+  "class": "AUDITED",
+  "source_sha256": "043f8adca928861b290d8723a9a7a256cbe04566c1e44985b7c424f3ddca1609",
+  "group": "T11-SOURCE: provenance label duplicated by the session's finder field",
+  "grounds": "Per-finding provenance label duplicated by sessions[].finder; written to RUN.json sessions[].findings, no reader, not read by --verify.",
+  "consumers_checked": [
+   "aisef2/app/adapters.py:121-131, 219",
+   "aisef2/app/review_verify.py:74-103, 236-250",
+   "aisef2/app/verify.py (does not read sessions)",
+   "grep of 'source' readers over aisef2, aisef, validation, tests: unrelated structures only"
+  ],
+  "exceptions_checked": [
+   "findings copied out of their session (a triage list): nothing does; T11b pins category/path/start_line/in_scope only",
+   "a session mixing finders: one review.finder per run",
+   "a KeyError reader: none"
+  ],
+  "batch": "A11",
+  "reviewed": true
+ },
+ {
+  "target": "aisef2/app/review_ocr.py::findings",
+  "index": 41,
+  "mutant": "L156 string 'source' emptied",
+  "class": "AUDITED",
+  "source_sha256": "043f8adca928861b290d8723a9a7a256cbe04566c1e44985b7c424f3ddca1609",
+  "group": "T11-SOURCE: provenance label duplicated by the session's finder field",
+  "grounds": "Same record field as [26] under the key '' ; no reader.",
+  "consumers_checked": [
+   "aisef2/app/adapters.py:124-126 (assigns verification/anchor by key, never iterates keys)",
+   "aisef2/app/run.py:491 and 500 (RUN.json written with sort_keys, all keys str)",
+   "aisef2/app/review_verify.py (reads named keys only)"
+  ],
+  "exceptions_checked": [
+   "a consumer iterating a finding's keys: none",
+   "sort_keys with a mixed key type: all keys are str"
+  ],
+  "batch": "A11",
+  "reviewed": true
+ },
+ {
+  "target": "aisef2/app/review_ocr.py::findings",
+  "index": 51,
+  "mutant": "L153 string 'low' emptied",
+  "class": "AUDITED",
+  "source_sha256": "043f8adca928861b290d8723a9a7a256cbe04566c1e44985b7c424f3ddca1609",
+  "group": "T11-DEFAULTS: record-level default of a value whose only reader re-normalises",
+  "grounds": "Decision-level equivalence: severity_of re-normalises '' to 'low' in blocks() and detail(); record-level value differs, no reader of the field.",
+  "consumers_checked": [
+   "aisef2/app/review_verify.py:74-77 (severity_of), 236-239 (blocks), 241-250 (detail)",
+   "grep severity over aisef2, validation: adapters.py:31 (model prompt), settings.py (min_severity) only",
+   "docs/v2.1/research/UPSTREAM-RESEARCH.json N4 and adapter contract section 3"
+  ],
+  "exceptions_checked": [
+   "a reader that does not re-normalise: none",
+   "non-string severity (5): unchanged by the mutant",
+   "record versus journal disagreement ('' vs 'low'): cosmetic, nothing compares them"
+  ],
+  "batch": "A11",
+  "reviewed": true
+ },
+ {
+  "target": "aisef2/app/review_ocr.py::findings",
+  "index": 52,
+  "mutant": "L154 string 'other' emptied",
+  "class": "AUDITED",
+  "source_sha256": "043f8adca928861b290d8723a9a7a256cbe04566c1e44985b7c424f3ddca1609",
+  "group": "T11-DEFAULTS: record-level default of a value that no reader depends on",
+  "grounds": "Default of a record value that nothing reads; the id's own default does not go through it.",
+  "consumers_checked": [
+   "aisef2/app/review_ocr.py:61, 142",
+   "aisef2/app/review_verify.py (reads id, severity, summary, reproducer)",
+   "grep get('category')/['category'] over aisef2, validation: review_ocr.py only"
+  ],
+  "exceptions_checked": [
+   "an id re-derived from the record: finding_id({'category': ''}) also gives 'other'",
+   "grouping or filtering by category downstream: none"
+  ],
+  "batch": "A11",
+  "reviewed": true
+ },
+ {
+  "target": "aisef2/app/review_ocr.py::findings",
+  "index": 54,
+  "mutant": "L156 string 'ocr ' emptied",
+  "class": "AUDITED",
+  "source_sha256": "043f8adca928861b290d8723a9a7a256cbe04566c1e44985b7c424f3ddca1609",
+  "group": "T11-SOURCE: provenance label duplicated by the session's finder field",
+  "grounds": "Provenance label duplicated by sessions[].finder; no reader.",
+  "consumers_checked": [
+   "aisef2/app/adapters.py:219 (session finder, same constant)",
+   "aisef2/app/review_verify.py:74-103, 236-250",
+   "grep for startswith('ocr ') or a comparison with finder: none"
+  ],
+  "exceptions_checked": [
+   "a finding read without its session: nothing does; the version alone still names the pinned release",
+   "a parser of source: none"
+  ],
+  "batch": "A11",
+  "reviewed": true
+ },
+ {
+  "target": "aisef2/app/review_ocr.py::pinned",
+  "index": 11,
+  "mutant": "L207 string ')' emptied",
+  "class": "AUDITED",
+  "source_sha256": "043f8adca928861b290d8723a9a7a256cbe04566c1e44985b7c424f3ddca1609",
+  "group": "punctuation closing a parenthesised exception class at the end of a message nobody parses (same class as the audited ')' mutants A01[165], A02[113], A04[10], A22[33], A24[108])",
+  "grounds": "Rendered by the implementer and re-derived from the code: '<exe>: cannot be read (FileNotFoundError)' vs mutant '... (FileNotFoundError'. Path: review_ocr.pinned() is called only from adapters.py:159 -> CapabilityUnrunnable(why) -> orchestrate/review.py:37-38 f'reviewer cannot run: {e}' -> PROVIDER_RESULT detail (event.py:99 _text = isinstance(str), format2.py:130-132) ; the failure code CAPABILITY_UNRUNNABLE comes from classify(), and failure/observed detail is the fixed 'review: CAPABILITY_UNRUNNABLE' (story_runner.py:288). Nothing parses the detail.",
+  "consumers_checked": [
+   "aisef2/app/adapters.py:159-161 (the only caller of pinned in the tree: git grep -F 'pinned(')",
+   "aisef2/orchestrate/review.py:37-39 (composes the detail once; classification by code)",
+   "aisef2/journal/event.py:99 and format2.py:130-132 (provider/result detail is only required to be a str)",
+   "aisef2/app/feedback.py:134-135 context_pack: reads a provider/result detail only after a DEVELOPER request with no result yet (budget_owner DEVELOPER); the reviewer's request is Owner.REVIEW and story_runner.py:224-232 always records the developer result first, redacted and cut at 300 chars",
+   "aisef2/app/feedback.py:69 retry_feedback and usage.py:121 no_progress read failure/observed details (the fixed 'review: <code>'), not provider/result",
+   "aisef2/runtime/repair.py, sentinel.py, lineage.py:239 read provider/result only by source_seqs/outcome",
+   "tests: v2/test_v21_review_ocr.py::Process (asserts the 'not the pinned' and 'absolute' reasons) and T12b PinnedRefusals assert the path, kind and class, not the closing character"
+  ],
+  "exceptions_checked": [
+   "a consumer extracting the class with a pattern such as r'\\((\\w+)\\)': none (git grep over aisef2/ validation/ tests/ docs/ finds producers of 'cannot be read' only: bundle.py:201, settings.py:218, bundle_cli.py:459, verify.py:108, review_ocr.py:207)",
+   "text appended after the reason that the missing ')' would leave unbalanced mid-sentence: nothing is appended in review.py:38 or adapters.py:161",
+   "truncation hiding the end: pinned()'s reason is not cut on this path",
+   "an exe path containing '(' or ')': printed before the class, unaffected by the last character",
+   "the unreadable branch never having been replayed through --verify end to end: the verify path checks the hash chain and schema only (_text accepts any str), so no semantic reading of the detail exists to differ"
+  ],
+  "batch": "A12",
+  "reviewed": true
+ }
+]

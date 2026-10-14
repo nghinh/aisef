@@ -1,0 +1,279 @@
+{
+ "batch": "R1",
+ "copy": "a",
+ "snapshot": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+ "entries": [
+  {
+   "target": "aisef2/app/run.py::check_repository",
+   "index": 32,
+   "mutant": "L142 string 'aisef-check-' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "Only the basename of the --check clone's scratch directory changes ('aisef-check-<8>' -> '<8>'; tempfile.TemporaryDirectory keeps prefix='' as given and draws the 8 characters from [a-z0-9_]). The directory is `-C <abs tmp>` of the clone (run.py:143) and Path(tmp)/'repo' (run.py:146); nothing branches on its name and its TemporaryDirectory handle removes it either way. The name reaches operator-read text in two refusals: run.py:149 RunRefused(held.stderr) and run.py:145 'the project repository could not be cloned: <first 200 chars of git's stderr>' (reproduced at the snapshot with TMPDIR inside a repository holding core.fsmonitor: '...configuration at <tmp>/aisef-check-xxxxxxxx...' becomes '<tmp>/xxxxxxxx...'). cli.py:92-94 prints them as 'aisef run: refused: ...', exit 2; the key and '(not inert)' are carried unchanged; what goes is the word that says the path is --check's own scratch clone and not the operator's repository. No document, test or reader depends on that word; it is a label.",
+   "consumers_checked": [
+    "git grep 'aisef-check' over the tree (closure-evidence aside): aisef2/app/run.py:142 only; the other temp prefixes (aisef-confine- cli.py:84, aisef-mut- validation/v2/mutation.py:1439 and validation/mutate.py:175, aisef-p5f-, aisef-acceptance-, aisef-sim-) are other directories; no startswith/glob/listdir pattern over aisef2, validation, tests, docs, bin, framework, .github reads this one",
+    "aisef2/orchestrate/workspace.py:52-71 config_problems/git: tmp enters as `-C <absolute tmp>`; its REFUSED text (:70) is what run.py:149 and run.py:145 carry",
+    "aisef2/app/cli.py:80 (--check calls check_repository), :92-94 (RunRefused printed, exit 2): nothing parses the text; the caller in run.py:391 passes clone=False (no scratch directory)",
+    "tests that assert these refusals: tests/v2/test_v21_inputs.py:142-173 ('not inert', no 'does not hold', \"does not hold the plan's baseline\"), tests/v2/test_app_units.py:509-522, tests/v2/test_s2_kills.py:244-261 (the message names `repo`, the operator's path, never the scratch), tests/v2/test_v21_kills3_T14a.py:272-318 (cause class and git's words, via a mocked git): none asserts the scratch path",
+    "validation/v2/mutation.py:1334-1365 (_residue: listing set differences) and :1556-1562 (_tail: normalises only a test's own `tmp<8>` under <run>/tmp): mutation-runner text, not product behaviour; neither reads this prefix",
+    "line coverage: L142 is executed by test_app_units, test_s2_kills, test_app_run, test_v21_bundle_tools, test_v21_confine, test_v21_inputs, test_v21_kills3_T14a; the target's kill set holds all but bundle_tools and confine; the mutant run against those two: SURVIVED (confine re-run in a fresh process: SURVIVED)"
+   ],
+   "exceptions_checked": [
+    "an operator or script that cleans leftovers of a killed --check by name: none in repo, docs, .github (the OS reaps TMPDIR; the handle removes the directory)",
+    "a refusal where the label disambiguates: exists (run.py:145, run.py:149), reproduced. What a reader acts on (the key, '(not inert)', exit 2) is retained and the path is of a directory already deleted; whether these two texts should name `shown` as run.py:151 does is an owner question, not this mutant's",
+    "run.py:145's 200-character cut: with a long TMPDIR the cut falls inside the path in both variants (pre-existing); with a short TMPDIR the mutant leaves 12 more characters for the key",
+    "uniqueness / collision / Windows reserved names: delegated to mkdtemp's 8 random characters, not to the prefix; a leading '-' cannot occur and the path is absolute (mkdtemp abspaths it on 3.11-3.14)",
+    "created by round 3: confine.py, process_range.py and cleanup_authority.py changed; none names or matches this directory (grep above); cleanup_authority's name-prefix boundaries are the mutation runner's own aisef-mut-<worker>- scratch"
+   ],
+   "what_changed_since_b5c2457": "round 3 touched aisef2/app/run.py only in the module docstring (+4 lines before the mutated code), the `review_verify` import, and evidence_manifest (+2 lines: it now also lists review-findings/*.json, run.py:298-300). The mutated line is byte-identical and moved (L138 -> L142; the cited L139/L142/L145/L141/L147 are now :143/:146/:149/:145/:151); the body of check_repository is unchanged. Nothing else of round 3 reads what this entry's reasoning reads.",
+   "refutation": null,
+   "note": "CONFIRMED. The weakest of the batch in one respect, stated rather than hidden: the 'aisef-check-' word is the only thing in run.py:145/:149 that says the path is not the operator's repository. A requirement test would be: TMPDIR inside a repository with a non-inert key, `aisef run --check`, assert the refusal contains 'aisef-check-'. Not owed: no contract names the word, and the actionable content is unchanged. Dynamic check at the snapshot (scratchpad m21/r3/audit/scratch-R1-a: cover.py = sys.settrace line coverage of the 62 test modules that import the run/verify/cli modules; multi_kill4.py = the mutant against each module, every aisef2.app.* and tests.* module dropped and re-imported before each run, null run first; a same-process artifact found and re-run in fresh single-run processes)."
+  },
+  {
+   "target": "aisef2/app/run.py::execute",
+   "index": 18,
+   "mutant": "L352 dict entry 6 dropped",
+   "class_before": "EQUIVALENT",
+   "verdict": "REVISED",
+   "class_after": "EQUIVALENT",
+   "grounds": "Dominance proof re-derived at the snapshot. run.py:352-355 builds rec; :356-362 write RUN.started.json from the fixed key tuple at :357-358 (no 'stage'); :363-369 are plain assignments; :370 `try:`; its first statement is `if predecessor is not None:` (:371) whose body is `rec['stage']='claim'` (:372), else the first statement run is `rec['stage']='repository'` (:385). The only read of rec['stage'] in the product is `rec.get('stage')` at :499 inside the `finally` (:481), reachable only after the try was entered, and the RUN.json dump (:506, sort_keys=True). Dropping the key only changes the dict between :352 and :372/:385, where nothing reads it. The conclusion stands; the audit's sentence that no reader of a run record's stage exists outside run.py is no longer true (e2e_guest.py, below), and no line number it cites is the snapshot's (+6).",
+   "consumers_checked": [
+    "aisef2/app/run.py:356-362: the STARTED write reads rec only through the tuple (format, bundle_digest, project, plan_hash, started, kernel_digest, platform)",
+    "aisef2/app/run.py:499: the only product read of rec['stage'] (failure.stage); the value is also the top-level 'stage' of the RUN.json dumped at :506",
+    "aisef2/app/verify.py:185-188 reads rec['failure'] for its truthiness only; aisef2/app/usage.py:102 reads rec.get('started'/'finished') only; aisef2/app/cli.py:104-106 and validation/qualification/release_rehearsal.py:120-140 read named keys of the returned record, never 'stage' and never its key order",
+    "NEW since the audit: validation/v21/cli_integration/e2e_guest.py:615-617 (`rec.get('stage') == 'confinement'`), :624 and :774 (the stage as a fact; :868-891 compare() lists a fact that differs between two driver runs): readers of RUN.json's final stage, which this mutant does not change (every path through the try assigns it before the finally reads it)",
+    "grep of '\"stage\"' / ['stage'] over aisef2, validation, tests, bin, framework: the other hits are probe/range ledgers (process_range.py:446, :499; validation/v2/owned_run.py:59, p2_evidence.py:115-121; validation/v21/sandbox/linux_guest.py:304-306), not a run record",
+    "line coverage: L352-355 is executed by 19 test modules outside this target's kill set (release_acceptance, context_pack, defects_bundlecli, defects_lineageusage, defects_verify, T00a, T01a, T01b, T09a, T14a, T14b, T22a, T22b, TO1, r3_detail_model, r3_detail_failclosed, r3_usage_boundary, r3_detail_product, test_v21_review): the mutant run against all of them: SURVIVED"
+   ],
+   "exceptions_checked": [
+    "an exception between the literal and `try` (exclusive open :356, json.dumps :357-360, fsync :362): leaves execute before the try, so no finally and no RUN.json; the missing key is never seen",
+    "a path that reaches the finally without assigning: none; :371 holds no call, :372 and :385 are the first statements",
+    "an asynchronous KeyboardInterrupt delivered in the one-statement window after :370: the only observable difference (failure.stage None / '' instead of 'repository'); no argument of execute can inject it (no user callable runs there), so EQUIVALENT up to that, as written",
+    "in-memory key order of the returned record (the mutant appends 'stage' at the first assignment): RUN.json is dumped with sort_keys=True (:506) and every caller reads named keys",
+    "created by round 3: the e2e driver's readers of stage (named above) and the review-findings glob in evidence_manifest (does not read rec)"
+   ],
+   "what_changed_since_b5c2457": "round 3 touched aisef2/app/run.py only in the module docstring (+4 lines before the mutated code), the `review_verify` import, and evidence_manifest (+2 lines: it now also lists review-findings/*.json, run.py:298-300). The mutated line is byte-identical and moved (L346 -> L352 (+6)); the body of execute is unchanged. New reader of RUN.json's stage: validation/v21/cli_integration/e2e_guest.py (added by round 3, not in b5c2457).",
+   "refutation": null,
+   "note": "REVISED = corrected consumer list, same EQUIVALENT conclusion. No test is owed: nothing can observe the initial value without an asynchronous exception. Dynamic check at the snapshot (scratchpad m21/r3/audit/scratch-R1-a: cover.py = sys.settrace line coverage of the 62 test modules that import the run/verify/cli modules; multi_kill4.py = the mutant against each module, every aisef2.app.* and tests.* module dropped and re-imported before each run, null run first; a same-process artifact found and re-run in fresh single-run processes)."
+  },
+  {
+   "target": "aisef2/app/run.py::execute",
+   "index": 45,
+   "mutant": "L353 string 'repository' emptied",
+   "class_before": "EQUIVALENT",
+   "verdict": "REVISED",
+   "class_after": "EQUIVALENT",
+   "grounds": "Same store as 18, the value instead of the key. run.py:352-355 builds rec; :356-362 write RUN.started.json from the fixed key tuple at :357-358 (no 'stage'); :363-369 are plain assignments; :370 `try:`; its first statement is `if predecessor is not None:` (:371) whose body is `rec['stage']='claim'` (:372), else the first statement run is `rec['stage']='repository'` (:385). The only read of rec['stage'] in the product is `rec.get('stage')` at :499 inside the `finally` (:481), reachable only after the try was entered, and the RUN.json dump (:506, sort_keys=True). The value '' lives in rec['stage'] only from :353 to :372/:385, where it is overwritten before the single read (:499). It is never in RUN.started.json (tuple :357-358). Emptying it cannot reach failure.stage or the top-level 'stage' because every path through the try assigns first. The audit's 'no other reader of a run record's stage' is corrected by e2e_guest.py (below); the conclusion stands.",
+   "consumers_checked": [
+    "aisef2/app/run.py:356-362: the STARTED write reads rec only through the tuple (format, bundle_digest, project, plan_hash, started, kernel_digest, platform)",
+    "aisef2/app/run.py:499: the only product read of rec['stage'] (failure.stage); the value is also the top-level 'stage' of the RUN.json dumped at :506",
+    "aisef2/app/verify.py:185-188 reads rec['failure'] for its truthiness only; aisef2/app/usage.py:102 reads rec.get('started'/'finished') only; aisef2/app/cli.py:104-106 and validation/qualification/release_rehearsal.py:120-140 read named keys of the returned record, never 'stage' and never its key order",
+    "NEW since the audit: validation/v21/cli_integration/e2e_guest.py:615-617 (`rec.get('stage') == 'confinement'`), :624 and :774 (the stage as a fact; :868-891 compare() lists a fact that differs between two driver runs): readers of RUN.json's final stage, which this mutant does not change (every path through the try assigns it before the finally reads it)",
+    "grep of '\"stage\"' / ['stage'] over aisef2, validation, tests, bin, framework: the other hits are probe/range ledgers (process_range.py:446, :499; validation/v2/owned_run.py:59, p2_evidence.py:115-121; validation/v21/sandbox/linux_guest.py:304-306), not a run record",
+    "line coverage: L352-355 is executed by 19 test modules outside this target's kill set (release_acceptance, context_pack, defects_bundlecli, defects_lineageusage, defects_verify, T00a, T01a, T01b, T09a, T14a, T14b, T22a, T22b, TO1, r3_detail_model, r3_detail_failclosed, r3_usage_boundary, r3_detail_product, test_v21_review): the mutant run against all of them: SURVIVED"
+   ],
+   "exceptions_checked": [
+    "an exception between the literal and `try` (exclusive open :356, json.dumps :357-360, fsync :362): leaves execute before the try, so no finally and no RUN.json; the missing key is never seen",
+    "a path that reaches the finally without assigning: none; :371 holds no call, :372 and :385 are the first statements",
+    "an asynchronous KeyboardInterrupt delivered in the one-statement window after :370: the only observable difference (failure.stage None / '' instead of 'repository'); no argument of execute can inject it (no user callable runs there), so EQUIVALENT up to that, as written",
+    "in-memory key order of the returned record (the mutant appends 'stage' at the first assignment): RUN.json is dumped with sort_keys=True (:506) and every caller reads named keys",
+    "created by round 3: the e2e driver's readers of stage (named above) and the review-findings glob in evidence_manifest (does not read rec)",
+    "a downstream reader that treats '' differently from 'repository' (a stage filter, a resume point): none; e2e_guest.py:615 compares with 'confinement' only, and the final value is assigned"
+   ],
+   "what_changed_since_b5c2457": "round 3 touched aisef2/app/run.py only in the module docstring (+4 lines before the mutated code), the `review_verify` import, and evidence_manifest (+2 lines: it now also lists review-findings/*.json, run.py:298-300). The mutated line is byte-identical and moved (L347 -> L353 (+6)); the body of execute is unchanged. New reader of RUN.json's stage: validation/v21/cli_integration/e2e_guest.py.",
+   "refutation": null,
+   "note": "REVISED = corrected consumer list, same EQUIVALENT conclusion. Dynamic check at the snapshot (scratchpad m21/r3/audit/scratch-R1-a: cover.py = sys.settrace line coverage of the 62 test modules that import the run/verify/cli modules; multi_kill4.py = the mutant against each module, every aisef2.app.* and tests.* module dropped and re-imported before each run, null run first; a same-process artifact found and re-run in fresh single-run processes)."
+  },
+  {
+   "target": "aisef2/app/run.py::execute",
+   "index": 139,
+   "mutant": "L360 string '\\n' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "The file ends at the closing brace (run.py:356-360). Not EQUIVALENT: its bytes differ, so its entry in the manifest (run.py:298-302, a sha of the raw bytes) and the anchor value (run.py:313-315) differ for the same inputs. Nothing compares that value with one from another execution (the file also holds `started: clock()`, so the bytes are never reproducible across executions anyway): verify recomputes the manifest from the same bytes (verify.py:117-124) and every code reader json.loads the text. Completeness of this file is decided by parse, not by a trailing newline (one write call, then flush and fsync; a cut file does not parse, and a file cut after the brace is a whole JSON document either way).",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:322-331 predecessor_of: json.loads(read_text()), then doc.get('continues')",
+    "aisef2/app/bundle_cli.py:419-425 continue_from: json.loads(read_text()), then rec.get('bundle_digest'/'kernel_digest'/...)",
+    "aisef2/app/run.py:282-291 _content_sha (raw bytes for every file but RUN.json), :294-302 evidence_manifest (lists STARTED), :305-315 anchor_in/anchor_of; aisef2/app/verify.py:100-124 recomputes the manifest from the same bytes and compares as dicts",
+    "aisef2/app/run.py:346 (`(predecessor / STARTED).is_file()`), validation/v21/cli_integration/run.sh:49 and tests/v2/test_v21_continue_integrity.py:243: existence only",
+    "NEW since the audit: validation/v21/cli_integration/e2e_guest.py:492 and :555: a scripted session reads RUN.started.json as a canary and the control compares the client-reported sha256 with `sha(RUN.started.json bytes)` of the same file in the same run (equality of one file with itself, not across executions); :868-891 compare() lists anchors and journal sha as 'volatile'",
+    "docs: ANCHOR-THREAT-MODEL.md:3, ADR-V2.1.md:145, USAGE-2.1.md:131-133, REPORT.md:193 describe its role; none states a byte format; no RUN.started.json is committed (git ls-files)",
+    "line coverage: L357-360 is executed by the same 19 outside-kill-set modules as 18; the mutant run against all of them: SURVIVED"
+   ],
+   "exceptions_checked": [
+    "a line-oriented reader (splitlines / strip / count of b'\\n' / readline) of RUN.started.json: none (grep of STARTED / RUN.started.json over aisef2, validation, tests, docs, bin, framework, .github); verify.py:145 counts newlines of the journal, not of this file; round 3's LF-only reader (lineage.py:237, `block.split('\\n')`) reads git output",
+    "a stored or documented digest of RUN.started.json or of an anchor that a re-execution must reproduce: none",
+    "the single-line anchor file, which lineage.read_anchor does require newline-terminated (lineage.py:392-413): a different file, written by write_anchor",
+    "an end-of-file lint over run directories: none in tests/ or .githooks; no run directory is committed",
+    "created by round 3: the e2e driver's byte-sha comparison of this file with itself (above): independent of the trailing byte"
+   ],
+   "what_changed_since_b5c2457": "round 3 touched aisef2/app/run.py only in the module docstring (+4 lines before the mutated code), the `review_verify` import, and evidence_manifest (+2 lines: it now also lists review-findings/*.json, run.py:298-300). The mutated line is byte-identical and moved (L354 -> L360 (+6)); the body of execute is unchanged. New byte-level reader: e2e_guest.py:555 (a file against itself).",
+   "refutation": null,
+   "note": "CONFIRMED. No requirement names the file's trailing byte, so a test pinning it would be a verbatim-format test; none is natural. Dynamic check at the snapshot (scratchpad m21/r3/audit/scratch-R1-a: cover.py = sys.settrace line coverage of the 62 test modules that import the run/verify/cli modules; multi_kill4.py = the mutant against each module, every aisef2.app.* and tests.* module dropped and re-imported before each run, null run first; a same-process artifact found and re-run in fresh single-run processes)."
+  },
+  {
+   "target": "aisef2/app/run.py::execute",
+   "index": 185,
+   "mutant": "L347 string '--parent ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "The refusal reads '<abs path>: no run record there' for '--parent <abs path>: no run record there' (run.py:347). The refused object (the predecessor's absolute path) and the cause class are carried; it is raised at :347, before out.mkdir (:351), so it is never persisted and its only reader is the operator, through cli.py:92-94 ('aisef run: refused: ...', exit 2). The sibling refusals of the family name their path without a flag (run.py:342 '{out} exists', bundle_cli.py:425 '{run_dir}: no run record'); 'no run record' fits only a run directory and --parent is the only option that takes one (cli.py:39). The T13a test of index 186 (tests/v2/test_v21_kills3_T13a.py:304-317: the path, then 'no run record') is the contract and holds for this mutant. Owner call, not a gap: if the flag name is wanted in the refusal it is one assertIn('--parent', str(c.exception)) beside that assertion.",
+   "consumers_checked": [
+    "aisef2/app/cli.py:92-94: prints the message to stderr; no parse; execute is called with a predecessor from --parent only (cli.py:90-91, the single caller with predecessor=; release_rehearsal.py:120 passes none)",
+    "tests: tests/v2/test_v21_continue_usage.py:201-202 (class RunRefused only), tests/v2/test_v21_kills3_T13a.py:304-317 (path then 'no run record'); tests/v2/test_v21_kills3_T01b.py:160-178 assert 'no run record' of `aisef bundle continue` (bundle_cli.py:425), another refusal",
+    "grep 'no run record' over aisef2, validation, docs, tests: bundle_cli.py:425 and this line only; nothing quotes this one; docs/v2.1 name `aisef run --parent` as a command, not this message",
+    "line coverage: L347 is executed only by test_v21_continue_usage and test_v21_kills3_T13a, both in this target's kill set; no round-3 test and no other module reaches it"
+   ],
+   "exceptions_checked": [
+    "the path taken for another argument (--repo, --out, --project, --settings): 'no run record there' fits only a run directory, and an existing --out is refused one line earlier (run.py:341-342) with 'exists'",
+    "a relative --parent made absolute by the function (the operator sees a path he did not type): the path still identifies the directory; the flag adds nothing about which one",
+    "the flag name as a recovery instruction (where it is a contract, '--accept-unaccounted' in the lineage refusal, run.py:381-383, asserted elsewhere): here the remedy is a different path, not a different flag",
+    "persistence of the text in a record: raised before the run directory exists (run.py:351)",
+    "created by round 3: nothing quotes or parses it (the e2e driver's refusal checks are of the confinement refusal, e2e_guest.py:613)"
+   ],
+   "what_changed_since_b5c2457": "round 3 touched aisef2/app/run.py only in the module docstring (+4 lines before the mutated code), the `review_verify` import, and evidence_manifest (+2 lines: it now also lists review-findings/*.json, run.py:298-300). The mutated line is byte-identical and moved (L341 -> L347 (+6)); the body of execute is unchanged. Nothing else of round 3 reads this text.",
+   "refutation": null,
+   "note": "CONFIRMED. Test sketch if the owner wants the option named: T13a test_a_directory_with_neither_record_is_refused_naming_it_before_anything_is_made, add self.assertIn('--parent', str(c.exception)). Dynamic check at the snapshot (scratchpad m21/r3/audit/scratch-R1-a: cover.py = sys.settrace line coverage of the 62 test modules that import the run/verify/cli modules; multi_kill4.py = the mutant against each module, every aisef2.app.* and tests.* module dropped and re-imported before each run, null run first; a same-process artifact found and re-run in fresh single-run processes)."
+  },
+  {
+   "target": "aisef2/app/run.py::execute",
+   "index": 236,
+   "mutant": "L360 True->False",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "With sort_keys=False the object is written in construction order (the seven copied keys, settings_sha256, continues; nested platform / continues in literal order; run.py:357-360) instead of alphabetical. Not EQUIVALENT: the bytes, this file's manifest entry and the anchor differ for the same inputs. Every reader json.loads into a dict and indexes by key (lineage.py:322-331, bundle_cli.py:419-425); the sha is recomputed from the same bytes (verify.py:117-124); the order is a deterministic function of the code (insertion order), so two runs of one release give one order. The digest inside the file (settings_sha256, run.py:359) has its own sort_keys and is another mutant. All keys are str, so sort_keys=True cannot be what raises.",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:322-331 predecessor_of: json.loads(read_text()), then doc.get('continues')",
+    "aisef2/app/bundle_cli.py:419-425 continue_from: json.loads(read_text()), then rec.get('bundle_digest'/'kernel_digest'/...)",
+    "aisef2/app/run.py:282-291 _content_sha (raw bytes for every file but RUN.json), :294-302 evidence_manifest (lists STARTED), :305-315 anchor_in/anchor_of; aisef2/app/verify.py:100-124 recomputes the manifest from the same bytes and compares as dicts",
+    "aisef2/app/run.py:346 (`(predecessor / STARTED).is_file()`), validation/v21/cli_integration/run.sh:49 and tests/v2/test_v21_continue_integrity.py:243: existence only",
+    "NEW since the audit: validation/v21/cli_integration/e2e_guest.py:492 and :555: a scripted session reads RUN.started.json as a canary and the control compares the client-reported sha256 with `sha(RUN.started.json bytes)` of the same file in the same run (equality of one file with itself, not across executions); :868-891 compare() lists anchors and journal sha as 'volatile'",
+    "docs: ANCHOR-THREAT-MODEL.md:3, ADR-V2.1.md:145, USAGE-2.1.md:131-133, REPORT.md:193 describe its role; none states a byte format; no RUN.started.json is committed (git ls-files)",
+    "line coverage: L357-360 is executed by the same 19 outside-kill-set modules as 18; the mutant run against all of them: SURVIVED"
+   ],
+   "exceptions_checked": [
+    "a cross-release or cross-run comparison of the file's bytes or of an anchor: none (no stored digest of RUN.started.json; docs anchors are of preserved directories; e2e_guest.py:868-891 treats anchors as volatile); the file holds a timestamp, so it never reproduces anyway",
+    "an order-dependent reader (first key, zip of keys, text diff): none found",
+    "sort_keys=True raising on mixed key types where False would not: every key at both levels is a str",
+    "the nested 'continues' dict later extended with claim / account (run.py:374, :378, :384): the file is written at :356-362, before those additions (the dict is shared, but the dump has run), and the mutant does not touch the in-memory dict",
+    "created by round 3: nothing (the manifest glob added at run.py:300 is of review-findings/)"
+   ],
+   "what_changed_since_b5c2457": "round 3 touched aisef2/app/run.py only in the module docstring (+4 lines before the mutated code), the `review_verify` import, and evidence_manifest (+2 lines: it now also lists review-findings/*.json, run.py:298-300). The mutated line is byte-identical and moved (L354 -> L360 (+6)); the body of execute is unchanged. New byte-level reader: e2e_guest.py:555 (a file against itself).",
+   "refutation": null,
+   "note": "CONFIRMED. Dynamic check at the snapshot (scratchpad m21/r3/audit/scratch-R1-a: cover.py = sys.settrace line coverage of the 62 test modules that import the run/verify/cli modules; multi_kill4.py = the mutant against each module, every aisef2.app.* and tests.* module dropped and re-imported before each run, null run first; a same-process artifact found and re-run in fresh single-run processes)."
+  },
+  {
+   "target": "aisef2/app/run.py::execute",
+   "index": 269,
+   "mutant": "L508 string '\\n' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "EVIDENCE.json ends at the closing brace. The anchor is unchanged: anchor_of (run.py:313-315) hashes the canonical compact JSON of the parsed manifest, anchor_in (:305-310) and verify (verify.py:100-124) json.loads the file first. The file is not in its own manifest (run.py:298-300), so no digest of its bytes exists anywhere. The doc line 'Anchor = sha256 of EVIDENCE.json' (TRACEABILITY.md:926) is already untrue of the original.",
+   "consumers_checked": [
+    "aisef2/app/run.py:305-310 anchor_in (json.loads of the file, then anchor_of :313-315: sha256 of the canonical compact sorted JSON of the parsed manifest); callers cli.py:95 and bundle_cli.py:456",
+    "aisef2/app/verify.py:100-124: json.loads; `stored != fresh` as dicts; the names it lists are sorted; the file is not in its own manifest (run.py:298-300)",
+    "tests that write the manifest compact, unsorted and without a newline and expect VERIFIED with the same anchor: tests/v2/test_app_units.py:638, test_s2_kills.py:559, test_v21_kills3_A22.py:67, test_v21_kills3_R01.py:83, test_v21_defects_verify.py:67, test_v21_defects_lineageusage.py:279",
+    "NEW since the audit: tests/v2/test_v21_r3_detail_product.py:224 and validation/v21/cli_integration/e2e_guest.py:714 re-write EVIDENCE.json with `json.dumps(R.evidence_manifest(d), indent=1, sort_keys=True) + '\\n'` in a copy and verify it (writers that mirror run.py:508; the anchor is of the canonical form, so any byte format gives the same anchor)",
+    "docs: ANCHOR-THREAT-MODEL.md:3 and ADR-V2.1.md:66-69 ('digest of the manifest'); docs/v2.1/TRACEABILITY.md:926 and docs/v2.1/research/TRACEABILITY.json:2517 say 'Anchor = sha256 of EVIDENCE.json', which is not true of the original either (the file is indent=1 plus a newline, the anchor is of the compact canonical form)",
+    "git ls-files: no EVIDENCE.json is committed; grep EVIDENCE.json / R.MANIFEST over aisef2, validation, tests, bin, framework, .github: json readers and writers only",
+    "line coverage: L508 is executed by the same 19 outside-kill-set modules; the mutant run against all of them: SURVIVED"
+   ],
+   "exceptions_checked": [
+    "a script or doc hashing the file's bytes as the anchor (sha256sum EVIDENCE.json): none in validation/, bin/, framework/, .github/, tests/; and it would already differ from the anchor in the original",
+    "the --anchor-out file (lineage.write_anchor / read_anchor demand one 64-hex line plus newline): a different file, not touched by this line",
+    "a line-oriented reader of EVIDENCE.json: none",
+    "a committed or linted copy of a run's EVIDENCE.json: none (docs/v2.1/evidence/*.out hold printed anchors, not the file)",
+    "created by round 3: the manifest now lists review-findings/*.json (run.py:300; a journal row binds each file by sha256) and the e2e driver re-writes the manifest in a copy (above); neither reads the trailing byte of the original"
+   ],
+   "what_changed_since_b5c2457": "round 3 touched aisef2/app/run.py only in the module docstring (+4 lines before the mutated code), the `review_verify` import, and evidence_manifest (+2 lines: it now also lists review-findings/*.json, run.py:298-300). The mutated line is byte-identical and moved (L502 -> L508 (+6)); the body of execute is unchanged. The manifest's content grew (review-findings/*.json), not its framing.",
+   "refutation": null,
+   "note": "CONFIRMED. Dynamic check at the snapshot (scratchpad m21/r3/audit/scratch-R1-a: cover.py = sys.settrace line coverage of the 62 test modules that import the run/verify/cli modules; multi_kill4.py = the mutant against each module, every aisef2.app.* and tests.* module dropped and re-imported before each run, null run first; a same-process artifact found and re-run in fresh single-run processes)."
+  },
+  {
+   "target": "aisef2/app/run.py::execute",
+   "index": 318,
+   "mutant": "L508 True->False",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "With sort_keys=False EVIDENCE.json is written in evidence_manifest's construction order (top level format, files; files as RUN.json, RUN.started.json, sorted journals, sorted sessions, sorted preflight, and now sorted review-findings; run.py:298-302) instead of alphabetical. The bytes differ; the anchor does not: anchor_of canonicalises the parsed manifest with sort_keys=True and compact separators (run.py:313-315), and verify compares `stored != fresh` as dicts and sorts the names it lists (verify.py:121-124). The file is not in its own manifest.",
+   "consumers_checked": [
+    "aisef2/app/run.py:305-310 anchor_in (json.loads of the file, then anchor_of :313-315: sha256 of the canonical compact sorted JSON of the parsed manifest); callers cli.py:95 and bundle_cli.py:456",
+    "aisef2/app/verify.py:100-124: json.loads; `stored != fresh` as dicts; the names it lists are sorted; the file is not in its own manifest (run.py:298-300)",
+    "tests that write the manifest compact, unsorted and without a newline and expect VERIFIED with the same anchor: tests/v2/test_app_units.py:638, test_s2_kills.py:559, test_v21_kills3_A22.py:67, test_v21_kills3_R01.py:83, test_v21_defects_verify.py:67, test_v21_defects_lineageusage.py:279",
+    "NEW since the audit: tests/v2/test_v21_r3_detail_product.py:224 and validation/v21/cli_integration/e2e_guest.py:714 re-write EVIDENCE.json with `json.dumps(R.evidence_manifest(d), indent=1, sort_keys=True) + '\\n'` in a copy and verify it (writers that mirror run.py:508; the anchor is of the canonical form, so any byte format gives the same anchor)",
+    "docs: ANCHOR-THREAT-MODEL.md:3 and ADR-V2.1.md:66-69 ('digest of the manifest'); docs/v2.1/TRACEABILITY.md:926 and docs/v2.1/research/TRACEABILITY.json:2517 say 'Anchor = sha256 of EVIDENCE.json', which is not true of the original either (the file is indent=1 plus a newline, the anchor is of the compact canonical form)",
+    "git ls-files: no EVIDENCE.json is committed; grep EVIDENCE.json / R.MANIFEST over aisef2, validation, tests, bin, framework, .github: json readers and writers only",
+    "line coverage: L508 is executed by the same 19 outside-kill-set modules; the mutant run against all of them: SURVIVED"
+   ],
+   "exceptions_checked": [
+    "an order-dependent reader of 'files' (first entry, zip with another list): none; verify iterates a set union and sorted lists (verify.py:122-123)",
+    "a stored anchor a re-execution must reproduce: none, and the anchor does not depend on the order anyway",
+    "a hash of the file's bytes: none, and it would already differ from the anchor in the original",
+    "a different Python's dict order changing what is written: the order is insertion order from sorted globs (run.py:298-300), deterministic",
+    "created by round 3: an older verifier meeting the new `review-findings/` names lists them as differing (docs/v2.1/decisions/B03-R3-detail.md §3.3), still order-blind"
+   ],
+   "what_changed_since_b5c2457": "round 3 touched aisef2/app/run.py only in the module docstring (+4 lines before the mutated code), the `review_verify` import, and evidence_manifest (+2 lines: it now also lists review-findings/*.json, run.py:298-300). The mutated line is byte-identical and moved (L502 -> L508 (+6)); the body of execute is unchanged. The files map gained review-findings/*.json entries.",
+   "refutation": null,
+   "note": "CONFIRMED. Dynamic check at the snapshot (scratchpad m21/r3/audit/scratch-R1-a: cover.py = sys.settrace line coverage of the 62 test modules that import the run/verify/cli modules; multi_kill4.py = the mutant against each module, every aisef2.app.* and tests.* module dropped and re-imported before each run, null run first; a same-process artifact found and re-run in fresh single-run processes)."
+  },
+  {
+   "target": "aisef2/app/run.py::unfinished",
+   "index": 2,
+   "mutant": "L279 sorted() -> list()",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "run.py:279 sorted(...) -> list(...) changes only the order of the returned names: first story/begin (or story/end) in the journal (dict insertion order, fixed by the hash chain) instead of alphabetical; membership and count are unchanged (the n > 0 filter is untouched). The single product caller, verify.py:172, uses `refused` once (:183) to build [{'story': x, 'error': ...}] dicts concatenated with rec['story_errors'] and handed to R.delivery (:184), which reads only truthiness and len(errors) (run.py:254-256) and whose `blocked` list verify discards (`verdict, _, committed`); verify's returned dict (:204-205) carries no name from `refused`. Not EQUIVALENT: the order is visible to a caller of unfinished() itself, which no one but verify is. Round 3's verify boundary (verify.py:148-155: a journal the six control projections refuse gives events=[], so unfinished([]) is []) narrows its domain; it does not touch order.",
+   "consumers_checked": [
+    "git grep -w unfinished: run.py:272 (definition), verify.py:172 (the only call), validation/v2/mutation.py (target name); other hits are other words ('unfinished work', 'session:unfinished' note, run_scope 'unfinished operation')",
+    "aisef2/app/verify.py:172, :183-184, :204-205: `refused` -> errors -> delivery -> (len, truthiness); the result dict holds no story name from it; the earlier `refused` at :149 is a different value (the projection refusal tuple), consumed at :150-155 before :172 rebinds the name",
+    "aisef2/app/run.py:242-258 delivery: blocked text is f'{len(errors)} stories were refused'; story names never printed",
+    "aisef2/app/lineage.py:212-214 computes its own open_stories set from the same begin/end counting (used at :224 and :242 for membership); it does not call unfinished and is a set",
+    "tests/v2/test_v21_kills3_T14b.py:141-179: assertCountEqual with the comment 'which and how many; no reader takes the order'; docs/v2.1/ADR-V2.1.md ADR-3 and verify.py:8: 'a story begun and never ended is a refused story' - membership only",
+    "line coverage: L279 is executed by 16 test modules outside this target's kill set (test_s2_kills, release_acceptance, defects_lineageusage, defects_verify, A22, R01, T13a, T14a, T22a, T22b, T23a, r3_detail_model, r3_detail_failclosed, r3_usage_boundary, r3_usage_review, r3_detail_product): the mutant run against all: SURVIVED (test_s2_kills showed a same-process re-run artifact, reproduced with the null mutant; re-run in a fresh process: SURVIVED)"
+   ],
+   "exceptions_checked": [
+    "sorted() raising where list() does not (TypeError on mixed ids): unreachable - story/begin and story/end carry story_id: _str (non-empty str; journal/event.py:95-96, :201, :211; format3.py:283-285 refuses a wrong kind) and, since round 3, verify hands the function only journals the six projections admit",
+    "another reader that prints, hashes or iterates the list for effect: none in aisef2, validation, docs; rec['story_errors'] comes from execute's own `errors` (run.py:473), not from unfinished()",
+    "flakiness introduced by list(): none, the order is the journal's and the journal is fixed",
+    "created by round 3: the projection boundary (above) and review_verify.artifact_problems (verify.py:164) take `events`, not this list"
+   ],
+   "what_changed_since_b5c2457": "round 3 touched aisef2/app/run.py only in the module docstring (+4 lines before the mutated code), the `review_verify` import, and evidence_manifest (+2 lines: it now also lists review-findings/*.json, run.py:298-300). The mutated line is byte-identical and moved (L275 -> L279 (+4)); the body of unfinished is unchanged. verify.py gained the projection boundary (:148-155) and the artifact check (:164); the call moved from :123 to :172.",
+   "refutation": null,
+   "note": "CONFIRMED. Dynamic check at the snapshot (scratchpad m21/r3/audit/scratch-R1-a: cover.py = sys.settrace line coverage of the 62 test modules that import the run/verify/cli modules; multi_kill4.py = the mutant against each module, every aisef2.app.* and tests.* module dropped and re-imported before each run, null run first; a same-process artifact found and re-run in fresh single-run processes)."
+  },
+  {
+   "target": "aisef2/app/usage.py::usage",
+   "index": 61,
+   "mutant": "L101 sorted() -> list()",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "usage.py:101 sorted(set(retried)) -> list(set(retried)) changes only the insertion order of the `retries` dict (same items and counts; for str keys the set order is per-process) and removes one exception: sorted() raises TypeError on non-comparable keys. The retried story_id of a story/retry is a non-empty str by schema (journal/event.py:209 + _str :95-96, not overridden in format2/format3), so the TypeError path is unreachable from run.events (run.py:501), verify (format3.reconstruct, verify.py:148-151, which since round 3 also refuses journals the projections refuse) and lineage.events_of (format3.reconstruct, lineage.py:95-102). Round 3 changed session_tokens (client.events) and no_progress in this module, not these lines.",
+   "consumers_checked": [
+    "aisef2/app/run.py:501-506 (rec['usage'] written by json.dumps(..., sort_keys=True): recursive, so RUN.json's bytes do not depend on insertion order); run.py:282-291 + :502 (_content_sha canonicalises RUN.json with sort_keys before the manifest hash)",
+    "aisef2/app/verify.py:191-198: rec['usage'] != json.loads(json.dumps(usage.usage(...))): dict equality, order-blind",
+    "aisef2/app/lineage.py:365-387 usage_lineage: calls usage.usage on each run of a lineage (:373) and reads u['tokens'] and u['cost'] only (:380)",
+    "aisef2/app/cli.py:104-106 prints a fixed subset that omits usage (and _print uses sort_keys, :52-53)",
+    "tests: tests/v2/test_v21_kills3_T20b.py:65-73 (assertEqual with dict literals), test_v21_r3_usage_boundary.py:76 (json round-trip of usage into RUN.json, then verify's re-derivation), test_v21_review_chain.py:286, :358 (rec['usage']['tokens'], ['cost'] only); docs/v2.1/USAGE-2.1.md:86 names the field without an order; grep of aisef2, validation, tests, docs for 'retries': no code iterates usage['retries']",
+    "line coverage: L100-101 is executed by 26 test modules outside this target's kill set (app_units, s2_kills, app_run, release_acceptance, confine, context_pack, defects_bundlecli, experiment, A13, T00a, T01a, T01b, T09a, T13a, T14a, T14b, T22a, T22b, TO1, r3_client_stream, r3_detail_model, r3_detail_failclosed, r3_usage_boundary, r3_detail_product, test_v21_review, review_chain [by reading: tokens and cost only]): the mutant run against all but review_chain: SURVIVED (s2_kills and confine showed a same-process re-run artifact; re-run in fresh processes: SURVIVED)"
+   ],
+   "exceptions_checked": [
+    "a reader that iterates retries in insertion order and promises an order: none (grep)",
+    "a serialiser of usage without sort_keys that is then hashed or compared as text: none (verify compares parsed values; run.py:506 and :288 sort)",
+    "mixed / None story_id making sorted() raise in the original only (RUN.json would then hold usage={'error': ...}, run.py:505): excluded by the schema and by validated callers; a hand-built events list could, no caller passes one",
+    "a different PYTHONHASHSEED between the writing and the verifying process: only the insertion order moves; dict equality and sort_keys are unaffected",
+    "created by round 3: client.events as the stream reader for session_tokens (usage.py:51) and the rewritten no_progress (usage.py:118-142) are other code; the new tests read tokens/cost or call no_progress"
+   ],
+   "what_changed_since_b5c2457": "usage.py changed in round 3 (import of client, session_tokens reads client.events, no_progress rewritten, trailing blank line); the mutated line is byte-identical, moved L104 -> L101 (-3); `usage()` itself is unchanged. Nothing it reads changed.",
+   "refutation": null,
+   "note": "CONFIRMED. Dynamic check at the snapshot (scratchpad m21/r3/audit/scratch-R1-a: cover.py = sys.settrace line coverage of the 62 test modules that import the run/verify/cli modules; multi_kill4.py = the mutant against each module, every aisef2.app.* and tests.* module dropped and re-imported before each run, null run first; a same-process artifact found and re-run in fresh single-run processes)."
+  }
+ ]
+}

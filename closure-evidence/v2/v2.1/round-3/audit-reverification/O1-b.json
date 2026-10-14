@@ -1,0 +1,461 @@
+{
+ "batch": "O1",
+ "copy": "b",
+ "entries": [
+  {
+   "target": "aisef2/app/review_ocr.py::OCR",
+   "index": 0,
+   "mutant": "L40 string 'repository' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "Holds at 289885e. The key 'repository' becomes ''; nothing reads OCR['repository'] and nothing reads the dict whole. Static, AST over the 953 tracked .py of 289885e (0 unparsable; scratch-O1-b/ast_ocr.py): subscripts of review_ocr.OCR in the whole tree: ['version'] at aisef2/app/adapters.py:226 (the stream's ocr_started line) and :249 (the session's `finder`), aisef2/app/review_ocr.py:100, :101, :156, tests defects_ocr.py:53, kills3_A10.py:64, kills3_T10b.py:164, kills3_T10d.py:123 and :324, kills3_T11a.py:376, r3_detail_rv_finderfiles.py:111, review_chain.py:458; ['commit'] at kills3_T12a.py:103 and review_chain.py:459 (RealBinary.setUp, skipped without AISEF_TEST_OCR_EXE). No ['repository'], no ['license'], no .get, no whole-dict use; review_ocr.py has no getattr/vars/globals call and its only Name loads of OCR are :100, :101, :156. Dynamic: dynamic probe at 289885e (scratch-O1-b/probe.py: review_ocr.OCR and TERMINAL replaced by recording dict/tuple, the finding records of review_ocr.findings by a recording dict, caller file:line kept; 22 test modules in process incl. test_v21_review_chain and the r3_detail end-to-end files: 259 tests, 0 failures, 3 skips = RealBinary): OCR['version'] x1054 from the sites above, OCR['commit'] x1 (kills3_T12a.py:103); no get/iter/keys/values/items/copy/len/contains/eq/repr/or on the dict; gc: no module holds the original object. settings.py:42-43 and adapters.py:177-180: the binary is bound by settings review.ocr {exe, sha256} -> review_ocr.pinned(pin['exe'], pin['sha256']), not by this dict (settings.py imports no review_ocr).",
+   "consumers_checked": [
+    "static: subscripts of review_ocr.OCR in the whole tree: ['version'] at aisef2/app/adapters.py:226 (the stream's ocr_started line) and :249 (the session's `finder`), aisef2/app/review_ocr.py:100, :101, :156, tests defects_ocr.py:53, kills3_A10.py:64, kills3_T10b.py:164, kills3_T10d.py:123 and :324, kills3_T11a.py:376, r3_detail_rv_finderfiles.py:111, review_chain.py:458; ['commit'] at kills3_T12a.py:103 and review_chain.py:459 (RealBinary.setUp, skipped without AISEF_TEST_OCR_EXE). No ['repository'], no ['license'], no .get, no whole-dict use; review_ocr.py has no getattr/vars/globals call and its only Name loads of OCR are :100, :101, :156",
+    "dynamic: dynamic probe at 289885e (scratch-O1-b/probe.py: review_ocr.OCR and TERMINAL replaced by recording dict/tuple, the finding records of review_ocr.findings by a recording dict, caller file:line kept; 22 test modules in process incl. test_v21_review_chain and the r3_detail end-to-end files: 259 tests, 0 failures, 3 skips = RealBinary): OCR['version'] x1054 from the sites above, OCR['commit'] x1 (kills3_T12a.py:103); no get/iter/keys/values/items/copy/len/contains/eq/repr/or on the dict; gc: no module holds the original object",
+    "the URL value is also a string literal only at review_ocr.py:1-2 (docstring) and :40; docs/ and docs/v2.1/research/*.json repeat it as prose and are compared with nothing (validation/v21/traceability_check.py reads TRACEABILITY.json and evidence files, never the module)",
+    "settings.py:42-43 and adapters.py:177-180: the binary is bound by settings review.ocr {exe, sha256} -> review_ocr.pinned(pin['exe'], pin['sha256']), not by this dict (settings.py imports no review_ocr)",
+    "no new importer of review_ocr: `git grep review_ocr -- '*.py'` outside tests is adapters.py:20 (import), review_verify.py:3 (docstring), settings.py:43 (comment), validation/v2/mutation.py (file names as strings); the statement builder (review_verify.detail), the artifact (preserve/redacted), verify.artifact_problems, run.evidence_manifest, client.events, usage, lineage, confine and process_range do not read it",
+    "mutant written over a copy of aisef2/app/review_ocr.py in a copy of the tree at 289885e, each module run with `unittest discover -f` under the workers' environment (py.sh): fast set (test_v21_review_ocr, T12a, T12b, T11a, T11b, A11: 70 tests) SURVIVED; the mid and end-to-end sets were not re-run for this constant: the probe records every read of it under all 259 tests, and the static scan finds no other"
+   ],
+   "exceptions_checked": [
+    "a whole-dict reader (json.dumps(OCR), dict(OCR), **OCR, a loop, repr into a message): none in the AST scan, none recorded by the probe",
+    "the emptied key '' colliding with another key of the dict: only one key/value is emptied, the other three stay distinct",
+    "aisef2/app/run.py:81-88 kernel_digest hashes every aisef2 .py (used at run.py:214 and bundle_cli.py:428): any edit changes it; it reads the file, not this value",
+    "a provenance/SBOM/notice writer added by round 3: none (the e2e guest and its client use the model finder: validation/v21/cli_integration/e2e_client.py:153)"
+   ],
+   "what_changed_since_b5c2457": "review_ocr.py is byte-identical to b5c2457 (sha256 043f8adc..., no hunk in `git diff b5c2457 289885e -- aisef2/app/review_ocr.py`). adapters.py gained lines above the two ['version'] reads (+28 and +30: they moved from :198/:219 to :226/:249); review_verify.py, run.py, verify.py, usage.py, client.py, lineage.py, confine.py and process_range.py changed and none names review_ocr.OCR; the one new test that names it (r3_detail_rv_finderfiles.py:111) reads ['version'].",
+   "refutation": null,
+   "note": "Cites refreshed: adapters.py:198/:219 are now :226/:249; kernel_digest run.py:77-84 is now :81-88."
+  },
+  {
+   "target": "aisef2/app/review_ocr.py::OCR",
+   "index": 3,
+   "mutant": "L41 string 'license' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "Holds at 289885e. The key 'license' becomes ''; nothing reads OCR['license'] and nothing reads the dict whole. Static, AST over the 953 tracked .py of 289885e (0 unparsable; scratch-O1-b/ast_ocr.py): subscripts of review_ocr.OCR in the whole tree: ['version'] at aisef2/app/adapters.py:226 (the stream's ocr_started line) and :249 (the session's `finder`), aisef2/app/review_ocr.py:100, :101, :156, tests defects_ocr.py:53, kills3_A10.py:64, kills3_T10b.py:164, kills3_T10d.py:123 and :324, kills3_T11a.py:376, r3_detail_rv_finderfiles.py:111, review_chain.py:458; ['commit'] at kills3_T12a.py:103 and review_chain.py:459 (RealBinary.setUp, skipped without AISEF_TEST_OCR_EXE). No ['repository'], no ['license'], no .get, no whole-dict use; review_ocr.py has no getattr/vars/globals call and its only Name loads of OCR are :100, :101, :156. Dynamic: dynamic probe at 289885e (scratch-O1-b/probe.py: review_ocr.OCR and TERMINAL replaced by recording dict/tuple, the finding records of review_ocr.findings by a recording dict, caller file:line kept; 22 test modules in process incl. test_v21_review_chain and the r3_detail end-to-end files: 259 tests, 0 failures, 3 skips = RealBinary): OCR['version'] x1054 from the sites above, OCR['commit'] x1 (kills3_T12a.py:103); no get/iter/keys/values/items/copy/len/contains/eq/repr/or on the dict; gc: no module holds the original object. The value 'Apache-2.0' is a literal in code only at review_ocr.py:2 (docstring) and :41.",
+   "consumers_checked": [
+    "static: subscripts of review_ocr.OCR in the whole tree: ['version'] at aisef2/app/adapters.py:226 (the stream's ocr_started line) and :249 (the session's `finder`), aisef2/app/review_ocr.py:100, :101, :156, tests defects_ocr.py:53, kills3_A10.py:64, kills3_T10b.py:164, kills3_T10d.py:123 and :324, kills3_T11a.py:376, r3_detail_rv_finderfiles.py:111, review_chain.py:458; ['commit'] at kills3_T12a.py:103 and review_chain.py:459 (RealBinary.setUp, skipped without AISEF_TEST_OCR_EXE). No ['repository'], no ['license'], no .get, no whole-dict use; review_ocr.py has no getattr/vars/globals call and its only Name loads of OCR are :100, :101, :156",
+    "dynamic: dynamic probe at 289885e (scratch-O1-b/probe.py: review_ocr.OCR and TERMINAL replaced by recording dict/tuple, the finding records of review_ocr.findings by a recording dict, caller file:line kept; 22 test modules in process incl. test_v21_review_chain and the r3_detail end-to-end files: 259 tests, 0 failures, 3 skips = RealBinary): OCR['version'] x1054 from the sites above, OCR['commit'] x1 (kills3_T12a.py:103); no get/iter/keys/values/items/copy/len/contains/eq/repr/or on the dict; gc: no module holds the original object",
+    "`git grep -niE 'licen[sc]e' -- aisef2 validation bin framework` at 289885e: review_ocr.py:41 and other data only — validation/v2/p1_evidence.py BC-LICENSE (a probe contract of a fixture clause), validation/v2/packaging_check.py:24 (AISEF's own LICENSE file in the sdist); aisef/kit/catalog.json:67, catalog.py:78,88 and registry.py:370 are skill-kit entries with their own license field",
+    "no licence field in any record the kernel writes or reads: RUN.json sessions carry finder 'ocr <version>' only (adapters.py:249), the stream's ocr_started line the same (:226)",
+    "no new importer of review_ocr: `git grep review_ocr -- '*.py'` outside tests is adapters.py:20 (import), review_verify.py:3 (docstring), settings.py:43 (comment), validation/v2/mutation.py (file names as strings); the statement builder (review_verify.detail), the artifact (preserve/redacted), verify.artifact_problems, run.evidence_manifest, client.events, usage, lineage, confine and process_range do not read it",
+    "mutant written over a copy of aisef2/app/review_ocr.py in a copy of the tree at 289885e, each module run with `unittest discover -f` under the workers' environment (py.sh): fast set (test_v21_review_ocr, T12a, T12b, T11a, T11b, A11: 70 tests) SURVIVED; the mid and end-to-end sets were not re-run for this constant: the probe records every read of it under all 259 tests, and the static scan finds no other"
+   ],
+   "exceptions_checked": [
+    "a whole-dict reader (json.dumps(OCR), dict(OCR), **OCR, a loop, repr into a message): none in the AST scan, none recorded by the probe",
+    "the emptied key '' colliding with another key of the dict: only one key/value is emptied, the other three stay distinct",
+    "aisef2/app/run.py:81-88 kernel_digest hashes every aisef2 .py (used at run.py:214 and bundle_cli.py:428): any edit changes it; it reads the file, not this value",
+    "a provenance/SBOM/notice writer added by round 3: none (the e2e guest and its client use the model finder: validation/v21/cli_integration/e2e_client.py:153)",
+    "a licence gate refusing a non-Apache pin: none; the value never varies at run time and is not read"
+   ],
+   "what_changed_since_b5c2457": "review_ocr.py is byte-identical to b5c2457 (sha256 043f8adc..., no hunk in `git diff b5c2457 289885e -- aisef2/app/review_ocr.py`). adapters.py gained lines above the two ['version'] reads (+28 and +30: they moved from :198/:219 to :226/:249); review_verify.py, run.py, verify.py, usage.py, client.py, lineage.py, confine.py and process_range.py changed and none names review_ocr.OCR; the one new test that names it (r3_detail_rv_finderfiles.py:111) reads ['version'].",
+   "refutation": null,
+   "note": "Cites refreshed as for [0]."
+  },
+  {
+   "target": "aisef2/app/review_ocr.py::OCR",
+   "index": 4,
+   "mutant": "L40 string 'https://github.com/alibaba/open-code-review' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "Holds at 289885e. OCR['repository'] becomes ''; the value is read by nothing. Static, AST over the 953 tracked .py of 289885e (0 unparsable; scratch-O1-b/ast_ocr.py): subscripts of review_ocr.OCR in the whole tree: ['version'] at aisef2/app/adapters.py:226 (the stream's ocr_started line) and :249 (the session's `finder`), aisef2/app/review_ocr.py:100, :101, :156, tests defects_ocr.py:53, kills3_A10.py:64, kills3_T10b.py:164, kills3_T10d.py:123 and :324, kills3_T11a.py:376, r3_detail_rv_finderfiles.py:111, review_chain.py:458; ['commit'] at kills3_T12a.py:103 and review_chain.py:459 (RealBinary.setUp, skipped without AISEF_TEST_OCR_EXE). No ['repository'], no ['license'], no .get, no whole-dict use; review_ocr.py has no getattr/vars/globals call and its only Name loads of OCR are :100, :101, :156. Dynamic: dynamic probe at 289885e (scratch-O1-b/probe.py: review_ocr.OCR and TERMINAL replaced by recording dict/tuple, the finding records of review_ocr.findings by a recording dict, caller file:line kept; 22 test modules in process incl. test_v21_review_chain and the r3_detail end-to-end files: 259 tests, 0 failures, 3 skips = RealBinary): OCR['version'] x1054 from the sites above, OCR['commit'] x1 (kills3_T12a.py:103); no get/iter/keys/values/items/copy/len/contains/eq/repr/or on the dict; gc: no module holds the original object. No download or update step reads the URL: the binary is run by absolute path with OCR_NO_UPDATE=1 (review_ocr.py:179), pinned by sha256 (adapters.py:177-180).",
+   "consumers_checked": [
+    "static: subscripts of review_ocr.OCR in the whole tree: ['version'] at aisef2/app/adapters.py:226 (the stream's ocr_started line) and :249 (the session's `finder`), aisef2/app/review_ocr.py:100, :101, :156, tests defects_ocr.py:53, kills3_A10.py:64, kills3_T10b.py:164, kills3_T10d.py:123 and :324, kills3_T11a.py:376, r3_detail_rv_finderfiles.py:111, review_chain.py:458; ['commit'] at kills3_T12a.py:103 and review_chain.py:459 (RealBinary.setUp, skipped without AISEF_TEST_OCR_EXE). No ['repository'], no ['license'], no .get, no whole-dict use; review_ocr.py has no getattr/vars/globals call and its only Name loads of OCR are :100, :101, :156",
+    "dynamic: dynamic probe at 289885e (scratch-O1-b/probe.py: review_ocr.OCR and TERMINAL replaced by recording dict/tuple, the finding records of review_ocr.findings by a recording dict, caller file:line kept; 22 test modules in process incl. test_v21_review_chain and the r3_detail end-to-end files: 259 tests, 0 failures, 3 skips = RealBinary): OCR['version'] x1054 from the sites above, OCR['commit'] x1 (kills3_T12a.py:103); no get/iter/keys/values/items/copy/len/contains/eq/repr/or on the dict; gc: no module holds the original object",
+    "aisef2/app/review_ocr.py:174-183 environment(): endpoint['url'] is the route's OCR_LLM_URL, a different value; the repository URL is never put in argv (review_ocr.py:186-196) or the environment",
+    "docs/v2.1/research/UPSTREAM-RESEARCH.json (url/repo): prose compared with nothing; a consistency check between the dict and that record does not exist (traceability_check.py never imports the module)",
+    "the evidence --verify checks (verify.py, review_verify.artifact_problems at :443-493): none carries the URL; the session record has finder 'ocr <version>' only",
+    "mutant written over a copy of aisef2/app/review_ocr.py in a copy of the tree at 289885e, each module run with `unittest discover -f` under the workers' environment (py.sh): fast set (test_v21_review_ocr, T12a, T12b, T11a, T11b, A11: 70 tests) SURVIVED; the mid and end-to-end sets were not re-run for this constant: the probe records every read of it under all 259 tests, and the static scan finds no other"
+   ],
+   "exceptions_checked": [
+    "a whole-dict reader (json.dumps(OCR), dict(OCR), **OCR, a loop, repr into a message): none in the AST scan, none recorded by the probe",
+    "the emptied key '' colliding with another key of the dict: only one key/value is emptied, the other three stay distinct",
+    "aisef2/app/run.py:81-88 kernel_digest hashes every aisef2 .py (used at run.py:214 and bundle_cli.py:428): any edit changes it; it reads the file, not this value",
+    "a provenance/SBOM/notice writer added by round 3: none (the e2e guest and its client use the model finder: validation/v21/cli_integration/e2e_client.py:153)",
+    "an empty string refused somewhere (non-emptiness as the requirement): no reader, so nothing relies on it",
+    "a test comparing the dict with the research record: none exists; a new one would be a doc-consistency check with no runtime reader"
+   ],
+   "what_changed_since_b5c2457": "review_ocr.py is byte-identical to b5c2457 (sha256 043f8adc..., no hunk in `git diff b5c2457 289885e -- aisef2/app/review_ocr.py`). adapters.py gained lines above the two ['version'] reads (+28 and +30: they moved from :198/:219 to :226/:249); review_verify.py, run.py, verify.py, usage.py, client.py, lineage.py, confine.py and process_range.py changed and none names review_ocr.OCR; the one new test that names it (r3_detail_rv_finderfiles.py:111) reads ['version'].",
+   "refutation": null,
+   "note": "Cites refreshed as for [0]."
+  },
+  {
+   "target": "aisef2/app/review_ocr.py::OCR",
+   "index": 7,
+   "mutant": "L41 string 'Apache-2.0' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "Holds at 289885e. OCR['license'] becomes ''; the value is read by nothing. Static, AST over the 953 tracked .py of 289885e (0 unparsable; scratch-O1-b/ast_ocr.py): subscripts of review_ocr.OCR in the whole tree: ['version'] at aisef2/app/adapters.py:226 (the stream's ocr_started line) and :249 (the session's `finder`), aisef2/app/review_ocr.py:100, :101, :156, tests defects_ocr.py:53, kills3_A10.py:64, kills3_T10b.py:164, kills3_T10d.py:123 and :324, kills3_T11a.py:376, r3_detail_rv_finderfiles.py:111, review_chain.py:458; ['commit'] at kills3_T12a.py:103 and review_chain.py:459 (RealBinary.setUp, skipped without AISEF_TEST_OCR_EXE). No ['repository'], no ['license'], no .get, no whole-dict use; review_ocr.py has no getattr/vars/globals call and its only Name loads of OCR are :100, :101, :156. Dynamic: dynamic probe at 289885e (scratch-O1-b/probe.py: review_ocr.OCR and TERMINAL replaced by recording dict/tuple, the finding records of review_ocr.findings by a recording dict, caller file:line kept; 22 test modules in process incl. test_v21_review_chain and the r3_detail end-to-end files: 259 tests, 0 failures, 3 skips = RealBinary): OCR['version'] x1054 from the sites above, OCR['commit'] x1 (kills3_T12a.py:103); no get/iter/keys/values/items/copy/len/contains/eq/repr/or on the dict; gc: no module holds the original object. Separate from [3] (the key): neither the key nor the value is read.",
+   "consumers_checked": [
+    "static: subscripts of review_ocr.OCR in the whole tree: ['version'] at aisef2/app/adapters.py:226 (the stream's ocr_started line) and :249 (the session's `finder`), aisef2/app/review_ocr.py:100, :101, :156, tests defects_ocr.py:53, kills3_A10.py:64, kills3_T10b.py:164, kills3_T10d.py:123 and :324, kills3_T11a.py:376, r3_detail_rv_finderfiles.py:111, review_chain.py:458; ['commit'] at kills3_T12a.py:103 and review_chain.py:459 (RealBinary.setUp, skipped without AISEF_TEST_OCR_EXE). No ['repository'], no ['license'], no .get, no whole-dict use; review_ocr.py has no getattr/vars/globals call and its only Name loads of OCR are :100, :101, :156",
+    "dynamic: dynamic probe at 289885e (scratch-O1-b/probe.py: review_ocr.OCR and TERMINAL replaced by recording dict/tuple, the finding records of review_ocr.findings by a recording dict, caller file:line kept; 22 test modules in process incl. test_v21_review_chain and the r3_detail end-to-end files: 259 tests, 0 failures, 3 skips = RealBinary): OCR['version'] x1054 from the sites above, OCR['commit'] x1 (kills3_T12a.py:103); no get/iter/keys/values/items/copy/len/contains/eq/repr/or on the dict; gc: no module holds the original object",
+    "licence grep as for [3]: the value 'Apache-2.0' is in code only at review_ocr.py:2 and :41",
+    "aisef2/app/adapters.py, usage.py, verify.py, settings.py, review_verify.py (incl. round 3's preserve/artifact_problems), run.py: no licence field in any record the kernel writes or reads",
+    "tests/v2/test_v21_review_ocr.py and test_v21_review_chain.py, and every other test that reaches the finder: no assertion on a licence (probe: 0 reads of the key)",
+    "mutant written over a copy of aisef2/app/review_ocr.py in a copy of the tree at 289885e, each module run with `unittest discover -f` under the workers' environment (py.sh): fast set (test_v21_review_ocr, T12a, T12b, T11a, T11b, A11: 70 tests) SURVIVED; the mid and end-to-end sets were not re-run for this constant: the probe records every read of it under all 259 tests, and the static scan finds no other"
+   ],
+   "exceptions_checked": [
+    "a whole-dict reader (json.dumps(OCR), dict(OCR), **OCR, a loop, repr into a message): none in the AST scan, none recorded by the probe",
+    "the emptied key '' colliding with another key of the dict: only one key/value is emptied, the other three stay distinct",
+    "aisef2/app/run.py:81-88 kernel_digest hashes every aisef2 .py (used at run.py:214 and bundle_cli.py:428): any edit changes it; it reads the file, not this value",
+    "a provenance/SBOM/notice writer added by round 3: none (the e2e guest and its client use the model finder: validation/v21/cli_integration/e2e_client.py:153)",
+    "the empty licence as a decision signal ('unknown licence refuses'): no branch reads the value",
+    "a notice file or SBOM built from the constant: none in aisef2/, validation/, bin/, framework/"
+   ],
+   "what_changed_since_b5c2457": "review_ocr.py is byte-identical to b5c2457 (sha256 043f8adc..., no hunk in `git diff b5c2457 289885e -- aisef2/app/review_ocr.py`). adapters.py gained lines above the two ['version'] reads (+28 and +30: they moved from :198/:219 to :226/:249); review_verify.py, run.py, verify.py, usage.py, client.py, lineage.py, confine.py and process_range.py changed and none names review_ocr.OCR; the one new test that names it (r3_detail_rv_finderfiles.py:111) reads ['version'].",
+   "refutation": null,
+   "note": "Cites refreshed as for [0]."
+  },
+  {
+   "target": "aisef2/app/review_ocr.py::TERMINAL",
+   "index": 0,
+   "mutant": "L43 string 'complete' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "Holds at 289885e. TERMINAL[0] ('complete') becomes ''. TERMINAL is a dead field. AST over the 953 tracked .py of 289885e (0 unparsable; scratch-O1-b/ast_ocr.py): no Name load of TERMINAL in review_ocr.py (its only loads are OCR at :100, :101, :156), no import, attribute or string naming it outside validation/v2/mutation.py:652 (the target list, as a string) and validation/qualification/q3.py:27 (an unrelated local tuple of journal states). dynamic probe at 289885e (scratch-O1-b/probe.py: review_ocr.OCR and TERMINAL replaced by recording dict/tuple, the finding records of review_ocr.findings by a recording dict, caller file:line kept; 22 test modules in process incl. test_v21_review_chain and the r3_detail end-to-end files: 259 tests, 0 failures, 3 skips = RealBinary): 0 accesses to TERMINAL (no iter/contains/getitem/len/index/count/eq/repr/hash). Coverage.terminal_state (review_ocr.py:71, returned raw at :134-135) has no reader either: no `.terminal_state` read in aisef2/, tests/ or validation/ (adapters.py:252-262 keeps status, reasons, not_reviewable, failure and failed). The decision on the state is the literal at review_ocr.py:90. For this state: the one state a complete review needs is asserted through the literal at review_ocr.py:90 by tests/v2/test_v21_review_ocr.py Coverage.test_a_complete_run_of_the_frozen_range_covering_every_required_path (:36), kills3_T12a.py and the chain's FixLoop (review_chain.py:262) / NothingToReview (:372) scenarios — none passes through the tuple.",
+   "consumers_checked": [
+    "static: AST over the 953 tracked .py of 289885e (0 unparsable; scratch-O1-b/ast_ocr.py): no load, import, attribute or getattr of TERMINAL (only validation/v2/mutation.py:652, a string in the mutation target list, and an unrelated q3.py:27 tuple)",
+    "dynamic: dynamic probe at 289885e (scratch-O1-b/probe.py: review_ocr.OCR and TERMINAL replaced by recording dict/tuple, the finding records of review_ocr.findings by a recording dict, caller file:line kept; 22 test modules in process incl. test_v21_review_chain and the r3_detail end-to-end files: 259 tests, 0 failures, 3 skips = RealBinary): 0 accesses to TERMINAL",
+    "aisef2/app/adapters.py:252-262: the only consumer of Coverage; reads status, reasons, not_reviewable, failure, failed — never terminal_state",
+    "tests: tests/v2/test_v21_review_ocr.py (module alias O; no O.TERMINAL), test_v21_review_chain.py (no TERMINAL), test_v21_kills3_A11/T10d/T11a/T12a/T12b (no TERMINAL)",
+    "aisef2/invariants/registry.py, tests/test_meta.py, tests/v2/test_no_dual_authority.py (getattr by symbol name): none names review_ocr",
+    "mutant written over a copy of aisef2/app/review_ocr.py in a copy of the tree at 289885e, each module run with `unittest discover -f` under the workers' environment (py.sh): fast set (test_v21_review_ocr, T12a, T12b, T11a, T11b, A11: 70 tests) SURVIVED; the mid and end-to-end sets were not re-run for this constant: the probe records every read of it under all 259 tests, and the static scan finds no other"
+   ],
+   "exceptions_checked": [
+    "state '' (or a missing state) accepted because '' is now in the tuple: coverage() never tests membership; at :90 a state other than 'complete' (or 'skipped' with nothing required) adds the reason \"terminal state ''\" and the status stays INDETERMINATE",
+    "a future reader turning the tuple into a decision: it could only add a reason, since :90 already refuses every state but 'complete' (and 'skipped' with an empty required list)",
+    "a reflective reader (getattr/vars/importlib by name) added by round 3: none in the AST scan (reach.py, kill_check, traceability_check read source text, not module values) and none recorded",
+    "an outside importer of the module attribute: the module is internal (not exported by aisef2.app), so the constant is dead inside the tree but not provably unreachable from outside it — why this stays AUDITED and is not promoted to EQUIVALENT"
+   ],
+   "what_changed_since_b5c2457": "review_ocr.py is byte-identical to b5c2457 (sha256 043f8adc..., no hunk in `git diff b5c2457 289885e -- aisef2/app/review_ocr.py`). Nothing round 3 added reads TERMINAL or Coverage.terminal_state.",
+   "refutation": null,
+   "note": "Cites refreshed: adapters.py:224-232 is now :252-262. The constant could be deleted instead of audited; that is a product decision, not a test owed."
+  },
+  {
+   "target": "aisef2/app/review_ocr.py::TERMINAL",
+   "index": 1,
+   "mutant": "L43 string 'partial' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "Holds at 289885e. TERMINAL[1] ('partial') becomes ''. TERMINAL is a dead field. AST over the 953 tracked .py of 289885e (0 unparsable; scratch-O1-b/ast_ocr.py): no Name load of TERMINAL in review_ocr.py (its only loads are OCR at :100, :101, :156), no import, attribute or string naming it outside validation/v2/mutation.py:652 (the target list, as a string) and validation/qualification/q3.py:27 (an unrelated local tuple of journal states). dynamic probe at 289885e (scratch-O1-b/probe.py: review_ocr.OCR and TERMINAL replaced by recording dict/tuple, the finding records of review_ocr.findings by a recording dict, caller file:line kept; 22 test modules in process incl. test_v21_review_chain and the r3_detail end-to-end files: 259 tests, 0 failures, 3 skips = RealBinary): 0 accesses to TERMINAL (no iter/contains/getitem/len/index/count/eq/repr/hash). Coverage.terminal_state (review_ocr.py:71, returned raw at :134-135) has no reader either: no `.terminal_state` read in aisef2/, tests/ or validation/ (adapters.py:252-262 keeps status, reasons, not_reviewable, failure and failed). The decision on the state is the literal at review_ocr.py:90. For this state: the partial refusal is the literal comparison at review_ocr.py:90-91, exercised by tests/v2/fixtures/ocr/partial.json via test_v21_review_ocr.py Coverage.test_exit_0_is_not_a_full_review (:44) and by the chain's 'partial' and 'budget' scenarios (review_chain.py:132-141; IncompleteReview.test_partial :338).",
+   "consumers_checked": [
+    "static: AST over the 953 tracked .py of 289885e (0 unparsable; scratch-O1-b/ast_ocr.py): no load, import, attribute or getattr of TERMINAL (only validation/v2/mutation.py:652, a string in the mutation target list, and an unrelated q3.py:27 tuple)",
+    "dynamic: dynamic probe at 289885e (scratch-O1-b/probe.py: review_ocr.OCR and TERMINAL replaced by recording dict/tuple, the finding records of review_ocr.findings by a recording dict, caller file:line kept; 22 test modules in process incl. test_v21_review_chain and the r3_detail end-to-end files: 259 tests, 0 failures, 3 skips = RealBinary): 0 accesses to TERMINAL",
+    "aisef2/app/adapters.py:252-262: the only consumer of Coverage; reads status, reasons, not_reviewable, failure, failed — never terminal_state",
+    "tests: tests/v2/test_v21_review_ocr.py (module alias O; no O.TERMINAL), test_v21_review_chain.py (no TERMINAL), test_v21_kills3_A11/T10d/T11a/T12a/T12b (no TERMINAL)",
+    "aisef2/invariants/registry.py, tests/test_meta.py, tests/v2/test_no_dual_authority.py (getattr by symbol name): none names review_ocr",
+    "mutant written over a copy of aisef2/app/review_ocr.py in a copy of the tree at 289885e, each module run with `unittest discover -f` under the workers' environment (py.sh): fast set (test_v21_review_ocr, T12a, T12b, T11a, T11b, A11: 70 tests) SURVIVED; the mid and end-to-end sets were not re-run for this constant: the probe records every read of it under all 259 tests, and the static scan finds no other"
+   ],
+   "exceptions_checked": [
+    "state '' (or a missing state) accepted because '' is now in the tuple: coverage() never tests membership; at :90 a state other than 'complete' (or 'skipped' with nothing required) adds the reason \"terminal state ''\" and the status stays INDETERMINATE",
+    "a future reader turning the tuple into a decision: it could only add a reason, since :90 already refuses every state but 'complete' (and 'skipped' with an empty required list)",
+    "a reflective reader (getattr/vars/importlib by name) added by round 3: none in the AST scan (reach.py, kill_check, traceability_check read source text, not module values) and none recorded",
+    "an outside importer of the module attribute: the module is internal (not exported by aisef2.app), so the constant is dead inside the tree but not provably unreachable from outside it — why this stays AUDITED and is not promoted to EQUIVALENT"
+   ],
+   "what_changed_since_b5c2457": "review_ocr.py is byte-identical to b5c2457 (sha256 043f8adc..., no hunk in `git diff b5c2457 289885e -- aisef2/app/review_ocr.py`). Nothing round 3 added reads TERMINAL or Coverage.terminal_state.",
+   "refutation": null,
+   "note": "Cites refreshed: adapters.py:224-232 is now :252-262. The constant could be deleted instead of audited; that is a product decision, not a test owed."
+  },
+  {
+   "target": "aisef2/app/review_ocr.py::TERMINAL",
+   "index": 2,
+   "mutant": "L43 string 'failed' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "Holds at 289885e. TERMINAL[2] ('failed') becomes ''. TERMINAL is a dead field. AST over the 953 tracked .py of 289885e (0 unparsable; scratch-O1-b/ast_ocr.py): no Name load of TERMINAL in review_ocr.py (its only loads are OCR at :100, :101, :156), no import, attribute or string naming it outside validation/v2/mutation.py:652 (the target list, as a string) and validation/qualification/q3.py:27 (an unrelated local tuple of journal states). dynamic probe at 289885e (scratch-O1-b/probe.py: review_ocr.OCR and TERMINAL replaced by recording dict/tuple, the finding records of review_ocr.findings by a recording dict, caller file:line kept; 22 test modules in process incl. test_v21_review_chain and the r3_detail end-to-end files: 259 tests, 0 failures, 3 skips = RealBinary): 0 accesses to TERMINAL (no iter/contains/getitem/len/index/count/eq/repr/hash). Coverage.terminal_state (review_ocr.py:71, returned raw at :134-135) has no reader either: no `.terminal_state` read in aisef2/, tests/ or validation/ (adapters.py:252-262 keeps status, reasons, not_reviewable, failure and failed). The decision on the state is the literal at review_ocr.py:90. For this state: a failed run is refused by the literal at review_ocr.py:90; its classification comes from run_failure (review_ocr.py:103-105, Coverage.failure :134-135) and adapters.py:257-258 decides ProviderOutage from cov.failure/cov.failed, never from the state name (chain 'provider' scenario review_chain.py:143-148, IncompleteReview.test_a_provider_failure_is_the_providers :361).",
+   "consumers_checked": [
+    "static: AST over the 953 tracked .py of 289885e (0 unparsable; scratch-O1-b/ast_ocr.py): no load, import, attribute or getattr of TERMINAL (only validation/v2/mutation.py:652, a string in the mutation target list, and an unrelated q3.py:27 tuple)",
+    "dynamic: dynamic probe at 289885e (scratch-O1-b/probe.py: review_ocr.OCR and TERMINAL replaced by recording dict/tuple, the finding records of review_ocr.findings by a recording dict, caller file:line kept; 22 test modules in process incl. test_v21_review_chain and the r3_detail end-to-end files: 259 tests, 0 failures, 3 skips = RealBinary): 0 accesses to TERMINAL",
+    "aisef2/app/adapters.py:252-262: the only consumer of Coverage; reads status, reasons, not_reviewable, failure, failed — never terminal_state",
+    "tests: tests/v2/test_v21_review_ocr.py (module alias O; no O.TERMINAL), test_v21_review_chain.py (no TERMINAL), test_v21_kills3_A11/T10d/T11a/T12a/T12b (no TERMINAL)",
+    "aisef2/invariants/registry.py, tests/test_meta.py, tests/v2/test_no_dual_authority.py (getattr by symbol name): none names review_ocr",
+    "mutant written over a copy of aisef2/app/review_ocr.py in a copy of the tree at 289885e, each module run with `unittest discover -f` under the workers' environment (py.sh): fast set (test_v21_review_ocr, T12a, T12b, T11a, T11b, A11: 70 tests) SURVIVED; the mid and end-to-end sets were not re-run for this constant: the probe records every read of it under all 259 tests, and the static scan finds no other"
+   ],
+   "exceptions_checked": [
+    "state '' (or a missing state) accepted because '' is now in the tuple: coverage() never tests membership; at :90 a state other than 'complete' (or 'skipped' with nothing required) adds the reason \"terminal state ''\" and the status stays INDETERMINATE",
+    "a future reader turning the tuple into a decision: it could only add a reason, since :90 already refuses every state but 'complete' (and 'skipped' with an empty required list)",
+    "a reflective reader (getattr/vars/importlib by name) added by round 3: none in the AST scan (reach.py, kill_check, traceability_check read source text, not module values) and none recorded",
+    "an outside importer of the module attribute: the module is internal (not exported by aisef2.app), so the constant is dead inside the tree but not provably unreachable from outside it — why this stays AUDITED and is not promoted to EQUIVALENT"
+   ],
+   "what_changed_since_b5c2457": "review_ocr.py is byte-identical to b5c2457 (sha256 043f8adc..., no hunk in `git diff b5c2457 289885e -- aisef2/app/review_ocr.py`). Nothing round 3 added reads TERMINAL or Coverage.terminal_state.",
+   "refutation": null,
+   "note": "Cites refreshed: adapters.py:224-232 is now :252-262. The constant could be deleted instead of audited; that is a product decision, not a test owed."
+  },
+  {
+   "target": "aisef2/app/review_ocr.py::TERMINAL",
+   "index": 3,
+   "mutant": "L43 string 'skipped' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "Holds at 289885e. TERMINAL[3] ('skipped') becomes ''. TERMINAL is a dead field. AST over the 953 tracked .py of 289885e (0 unparsable; scratch-O1-b/ast_ocr.py): no Name load of TERMINAL in review_ocr.py (its only loads are OCR at :100, :101, :156), no import, attribute or string naming it outside validation/v2/mutation.py:652 (the target list, as a string) and validation/qualification/q3.py:27 (an unrelated local tuple of journal states). dynamic probe at 289885e (scratch-O1-b/probe.py: review_ocr.OCR and TERMINAL replaced by recording dict/tuple, the finding records of review_ocr.findings by a recording dict, caller file:line kept; 22 test modules in process incl. test_v21_review_chain and the r3_detail end-to-end files: 259 tests, 0 failures, 3 skips = RealBinary): 0 accesses to TERMINAL (no iter/contains/getitem/len/index/count/eq/repr/hash). Coverage.terminal_state (review_ocr.py:71, returned raw at :134-135) has no reader either: no `.terminal_state` read in aisef2/, tests/ or validation/ (adapters.py:252-262 keeps status, reasons, not_reviewable, failure and failed). The decision on the state is the literal at review_ocr.py:90. For this state: 'skipped' with an empty required list is the literal at review_ocr.py:90 (`state == \"skipped\" and not required`); exercised on every hermetic run by NothingToReview (review_chain.py:372, FAKE_OCR) — RealBinary's version (skipped without AISEF_TEST_OCR_EXE) is not needed for it.",
+   "consumers_checked": [
+    "static: AST over the 953 tracked .py of 289885e (0 unparsable; scratch-O1-b/ast_ocr.py): no load, import, attribute or getattr of TERMINAL (only validation/v2/mutation.py:652, a string in the mutation target list, and an unrelated q3.py:27 tuple)",
+    "dynamic: dynamic probe at 289885e (scratch-O1-b/probe.py: review_ocr.OCR and TERMINAL replaced by recording dict/tuple, the finding records of review_ocr.findings by a recording dict, caller file:line kept; 22 test modules in process incl. test_v21_review_chain and the r3_detail end-to-end files: 259 tests, 0 failures, 3 skips = RealBinary): 0 accesses to TERMINAL",
+    "aisef2/app/adapters.py:252-262: the only consumer of Coverage; reads status, reasons, not_reviewable, failure, failed — never terminal_state",
+    "tests: tests/v2/test_v21_review_ocr.py (module alias O; no O.TERMINAL), test_v21_review_chain.py (no TERMINAL), test_v21_kills3_A11/T10d/T11a/T12a/T12b (no TERMINAL)",
+    "aisef2/invariants/registry.py, tests/test_meta.py, tests/v2/test_no_dual_authority.py (getattr by symbol name): none names review_ocr",
+    "mutant written over a copy of aisef2/app/review_ocr.py in a copy of the tree at 289885e, each module run with `unittest discover -f` under the workers' environment (py.sh): fast set (test_v21_review_ocr, T12a, T12b, T11a, T11b, A11: 70 tests) SURVIVED; the mid and end-to-end sets were not re-run for this constant: the probe records every read of it under all 259 tests, and the static scan finds no other"
+   ],
+   "exceptions_checked": [
+    "state '' (or a missing state) accepted because '' is now in the tuple: coverage() never tests membership; at :90 a state other than 'complete' (or 'skipped' with nothing required) adds the reason \"terminal state ''\" and the status stays INDETERMINATE",
+    "a future reader turning the tuple into a decision: it could only add a reason, since :90 already refuses every state but 'complete' (and 'skipped' with an empty required list)",
+    "a reflective reader (getattr/vars/importlib by name) added by round 3: none in the AST scan (reach.py, kill_check, traceability_check read source text, not module values) and none recorded",
+    "an outside importer of the module attribute: the module is internal (not exported by aisef2.app), so the constant is dead inside the tree but not provably unreachable from outside it — why this stays AUDITED and is not promoted to EQUIVALENT"
+   ],
+   "what_changed_since_b5c2457": "review_ocr.py is byte-identical to b5c2457 (sha256 043f8adc..., no hunk in `git diff b5c2457 289885e -- aisef2/app/review_ocr.py`). Nothing round 3 added reads TERMINAL or Coverage.terminal_state.",
+   "refutation": null,
+   "note": "Cites refreshed: adapters.py:224-232 is now :252-262. The constant could be deleted instead of audited; that is a product decision, not a test owed."
+  },
+  {
+   "target": "aisef2/app/review_ocr.py::coverage",
+   "index": 77,
+   "mutant": "L96 string 'reviewed head ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "Holds at 289885e. The entry for a mismatched head becomes '<12 hex>, not the candidate <12 hex>' (review_ocr.py:95-96): the noun is lost, both values and the phrase that names which check failed ('not the candidate' = the frozen head, the candidate's) stay, and the base entry (:97-98) keeps its own 'reviewed base'. No code reads the text; the human reader is the operator of RUN.json (advisory: the only signal) or of the journal (fix-loop). The A11 requirement (kills3_A11.py:65-75) asks of the head entry its two ids (`entry(c, '2'*12, '9'*12)`, :71) and that base and head entries stay apart — which the mutant keeps.",
+   "consumers_checked": [
+    "aisef2/app/adapters.py:254 (s['coverage']['reasons'] = list(cov.reasons) -> RUN.json sessions[].coverage.reasons, written by run.py:497/:506), :256 (what = '; '.join(cov.reasons)), :258 (ProviderOutage(...)[:600]), :260 (CapabilityUnrunnable(...)[:600]), :261-262 (Reviewed detail 'coverage <status> (<reasons>[:300])', advisory only)",
+    "aisef2/orchestrate/review.py:35-40: the exception text becomes the provider/result detail 'reviewer cannot run: ...' / 'reviewer outage: ...'; the failure code comes from classify(), and story_runner.py:288 journals the fixed 'review: <CODE>' as failure/observed detail — not the reasons",
+    "aisef2/journal/event.py:99 (_text = isinstance(str)) and format2.py:130-132: a provider/result detail is only required to be a str",
+    "readers of a journaled provider/result at the snapshot: feedback.py:132-134 context_pack reads one only after a DEVELOPER request with no result yet (the reviewer's request is Owner.REVIEW and story_runner.py:224-232 always journals the developer's result first, redacted and cut at 300); lineage.py:290, repair.py:53, sentinel.py:103, run_scope.py:222 by source_seqs/outcome only; usage.no_progress (usage.py:118-142, rewritten in round 3) reads failure/observed, not provider/result; verify._projection_refusal (verify.py:39-52, called at :149; new) folds the six control projections, none of which reads a detail",
+    "no parser or matcher of the text: `git grep` over aisef2, validation, bin, tests, docs for the label strings finds the writer, the module docstring and the assertions listed per mutant only",
+    "tests/v2/test_v21_review_ocr.py Coverage.test_exit_0_is_not_a_full_review ('another head', :49) asserts status INDETERMINATE and a non-empty reasons list, not the text; kills3_A11.py:65-75 asserts the two ids; kills3_T11a.py mention()/tokens() (:44-56) look for the shas as tokens of >= 7 digits",
+    "mutant written over a copy of aisef2/app/review_ocr.py in a copy of the tree at 289885e, each module run with `unittest discover -f` under the workers' environment (py.sh): fast set (test_v21_review_ocr, T12a, T12b, T11a, T11b, A11: 70 tests) SURVIVED; mid set (A10, T10a-d, defects_ocr, defects_ocrz, R07, kills_adapters, T26a, r3_detail rv_finderfiles/artifact/statement: 172 tests) SURVIVED; r3 end-to-end set (r3_detail_model, failclosed, product: 22 tests) SURVIVED; test_v21_review_chain (515 s on this host) not re-run under this mutant: under the probe it reads none of the changed values, and its scenarios assert only the adapter's own substrings"
+   ],
+   "exceptions_checked": [
+    "OCR's own free text containing '; ' or ')': the reasons are joined with '; ' (adapters.py:256, :262); each reason starts with its own words ('terminal state', 'exit status', 'reviewed ...', 'OCR ...', 'run failure:', 'required paths ...', 'warning ...'), so the next reason is recognisable",
+    "truncation (review_ocr.py:105 [:120]; adapters.py:260 [:600]; :262 [:300]) hiding the end of the entry: independent of the mutated characters",
+    "round 3's redaction: client.redact runs on the finder's own files after they are read (adapters.py:223, :231) and on the stream (:244); cov.reasons is built from the in-memory documents and RUN.json's sessions[].coverage is not redacted by round 3 — unchanged by these mutants",
+    "resolved_head absent: the entry reads 'None, not the candidate <sha>', still a fact about the candidate",
+    "head and base both wrong: each end is its own entry (kills3_A11.py:65-75 pins that they stay apart), the base one says 'base'"
+   ],
+   "what_changed_since_b5c2457": "review_ocr.py unchanged. adapters.py moved the consumers down by 30 lines (:224-232 -> :254-262) and added client.redact calls on the finder's raw files; none reads cov.reasons. New artifact/statement code reads findings, not coverage. orchestrate/review.py, story_runner.py, feedback.py, event.py, format2.py are untouched.",
+   "refutation": null,
+   "note": "Cites refreshed: adapters.py:224-232 is now :254-262."
+  },
+  {
+   "target": "aisef2/app/review_ocr.py::coverage",
+   "index": 81,
+   "mutant": "L101 string 'OCR ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "Holds at 289885e. The version entry becomes \"'<found>', not the pinned v1.12.12\" (review_ocr.py:99-101): the product noun is lost, the found version and 'not the pinned <version>' stay. No code reads the text; test_v21_review_ocr.py:65 asserts 'pinned' in the reasons of a v1.13.0 manifest, which the mutant keeps. The binary-sha256 refusal is a different message from a different place (review_ocr.py:199-208, raised before any run).",
+   "consumers_checked": [
+    "aisef2/app/adapters.py:254 (s['coverage']['reasons'] = list(cov.reasons) -> RUN.json sessions[].coverage.reasons, written by run.py:497/:506), :256 (what = '; '.join(cov.reasons)), :258 (ProviderOutage(...)[:600]), :260 (CapabilityUnrunnable(...)[:600]), :261-262 (Reviewed detail 'coverage <status> (<reasons>[:300])', advisory only)",
+    "aisef2/orchestrate/review.py:35-40: the exception text becomes the provider/result detail 'reviewer cannot run: ...' / 'reviewer outage: ...'; the failure code comes from classify(), and story_runner.py:288 journals the fixed 'review: <CODE>' as failure/observed detail — not the reasons",
+    "aisef2/journal/event.py:99 (_text = isinstance(str)) and format2.py:130-132: a provider/result detail is only required to be a str",
+    "readers of a journaled provider/result at the snapshot: feedback.py:132-134 context_pack reads one only after a DEVELOPER request with no result yet (the reviewer's request is Owner.REVIEW and story_runner.py:224-232 always journals the developer's result first, redacted and cut at 300); lineage.py:290, repair.py:53, sentinel.py:103, run_scope.py:222 by source_seqs/outcome only; usage.no_progress (usage.py:118-142, rewritten in round 3) reads failure/observed, not provider/result; verify._projection_refusal (verify.py:39-52, called at :149; new) folds the six control projections, none of which reads a detail",
+    "no parser or matcher of the text: `git grep` over aisef2, validation, bin, tests, docs for the label strings finds the writer, the module docstring and the assertions listed per mutant only",
+    "tests/v2/test_v21_review_ocr.py Coverage.test_a_manifest_that_does_not_hold_together_is_indeterminate (:59-71; :65 asserts 'pinned' in the reasons)",
+    "the pin of the binary: review_ocr.pinned (:199-208) -> adapters.py:177-180: 'sha256 <12>, not the pinned <12>' — a different entry in a different exception",
+    "mutant written over a copy of aisef2/app/review_ocr.py in a copy of the tree at 289885e, each module run with `unittest discover -f` under the workers' environment (py.sh): fast set (test_v21_review_ocr, T12a, T12b, T11a, T11b, A11: 70 tests) SURVIVED; mid set (A10, T10a-d, defects_ocr, defects_ocrz, R07, kills_adapters, T26a, r3_detail rv_finderfiles/artifact/statement: 172 tests) SURVIVED; r3 end-to-end set (r3_detail_model, failclosed, product: 22 tests) SURVIVED; test_v21_review_chain (515 s on this host) not re-run under this mutant: under the probe it reads none of the changed values, and its scenarios assert only the adapter's own substrings"
+   ],
+   "exceptions_checked": [
+    "OCR's own free text containing '; ' or ')': the reasons are joined with '; ' (adapters.py:256, :262); each reason starts with its own words ('terminal state', 'exit status', 'reviewed ...', 'OCR ...', 'run failure:', 'required paths ...', 'warning ...'), so the next reason is recognisable",
+    "truncation (review_ocr.py:105 [:120]; adapters.py:260 [:600]; :262 [:300]) hiding the end of the entry: independent of the mutated characters",
+    "round 3's redaction: client.redact runs on the finder's own files after they are read (adapters.py:223, :231) and on the stream (:244); cov.reasons is built from the in-memory documents and RUN.json's sessions[].coverage is not redacted by round 3 — unchanged by these mutants",
+    "found version None: \"None, not the pinned v1.12.12\" still states the check",
+    "confusion with the binary pin message: different text and a different exception (CapabilityUnrunnable before the run)"
+   ],
+   "what_changed_since_b5c2457": "review_ocr.py unchanged. adapters.py moved the consumers down by 30 lines (:224-232 -> :254-262) and added client.redact calls on the finder's raw files; none reads cov.reasons. New artifact/statement code reads findings, not coverage. orchestrate/review.py, story_runner.py, feedback.py, event.py, format2.py are untouched.",
+   "refutation": null,
+   "note": "Cites refreshed: adapters.py:224-232 is now :254-262."
+  },
+  {
+   "target": "aisef2/app/review_ocr.py::coverage",
+   "index": 85,
+   "mutant": "L105 string ')' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "Holds at 289885e. The run-failure entry ends '(<OCR's reason[:120]>' without its closing delimiter (review_ocr.py:104-105): 'run failure: <class> (' and OCR's words stay; the class and the reason keep their place. The only readers are the operator of RUN.json/journal and the chain's 'provider' scenario, which asserts the adapter's own text ('OCR could not reach the provider', review_chain.py:361-362) and not the closing character. kills3_A11.py:53-63 asserts 'failure', the class and OCR's reason in the same entry — kept.",
+   "consumers_checked": [
+    "aisef2/app/adapters.py:254 (s['coverage']['reasons'] = list(cov.reasons) -> RUN.json sessions[].coverage.reasons, written by run.py:497/:506), :256 (what = '; '.join(cov.reasons)), :258 (ProviderOutage(...)[:600]), :260 (CapabilityUnrunnable(...)[:600]), :261-262 (Reviewed detail 'coverage <status> (<reasons>[:300])', advisory only)",
+    "aisef2/orchestrate/review.py:35-40: the exception text becomes the provider/result detail 'reviewer cannot run: ...' / 'reviewer outage: ...'; the failure code comes from classify(), and story_runner.py:288 journals the fixed 'review: <CODE>' as failure/observed detail — not the reasons",
+    "aisef2/journal/event.py:99 (_text = isinstance(str)) and format2.py:130-132: a provider/result detail is only required to be a str",
+    "readers of a journaled provider/result at the snapshot: feedback.py:132-134 context_pack reads one only after a DEVELOPER request with no result yet (the reviewer's request is Owner.REVIEW and story_runner.py:224-232 always journals the developer's result first, redacted and cut at 300); lineage.py:290, repair.py:53, sentinel.py:103, run_scope.py:222 by source_seqs/outcome only; usage.no_progress (usage.py:118-142, rewritten in round 3) reads failure/observed, not provider/result; verify._projection_refusal (verify.py:39-52, called at :149; new) folds the six control projections, none of which reads a detail",
+    "no parser or matcher of the text: `git grep` over aisef2, validation, bin, tests, docs for the label strings finds the writer, the module docstring and the assertions listed per mutant only",
+    "tests/v2/test_v21_kills3_A11.py:53-63 (test_a_run_failure_is_named_as_one_with_its_class_and_ocr_s_own_words: needles 'failure', 'input', 'bad revision'); review_chain.py IncompleteReview.test_a_provider_failure_is_the_providers (:361) asserts the substring 'OCR could not reach the provider'",
+    "adapters.py:257-258: the decision ProviderOutage comes from cov.failure (the classification, review_ocr.py:134-135) or cov.failed, not from the text",
+    "mutant written over a copy of aisef2/app/review_ocr.py in a copy of the tree at 289885e, each module run with `unittest discover -f` under the workers' environment (py.sh): fast set (test_v21_review_ocr, T12a, T12b, T11a, T11b, A11: 70 tests) SURVIVED; mid set (A10, T10a-d, defects_ocr, defects_ocrz, R07, kills_adapters, T26a, r3_detail rv_finderfiles/artifact/statement: 172 tests) SURVIVED; r3 end-to-end set (r3_detail_model, failclosed, product: 22 tests) SURVIVED; test_v21_review_chain (18 tests, 3 skipped) SURVIVED"
+   ],
+   "exceptions_checked": [
+    "OCR's own free text containing '; ' or ')': the reasons are joined with '; ' (adapters.py:256, :262); each reason starts with its own words ('terminal state', 'exit status', 'reviewed ...', 'OCR ...', 'run failure:', 'required paths ...', 'warning ...'), so the next reason is recognisable",
+    "truncation (review_ocr.py:105 [:120]; adapters.py:260 [:600]; :262 [:300]) hiding the end of the entry: independent of the mutated characters",
+    "round 3's redaction: client.redact runs on the finder's own files after they are read (adapters.py:223, :231) and on the stream (:244); cov.reasons is built from the in-memory documents and RUN.json's sessions[].coverage is not redacted by round 3 — unchanged by these mutants",
+    "an unbalanced '(' leaving the next entry looking like part of OCR's reason: the next entry starts with its own words after '; ' (adapters.py:256)",
+    "a splitter of '; ': none (grep)"
+   ],
+   "what_changed_since_b5c2457": "review_ocr.py unchanged. adapters.py moved the consumers down by 30 lines (:224-232 -> :254-262) and added client.redact calls on the finder's raw files; none reads cov.reasons. New artifact/statement code reads findings, not coverage. orchestrate/review.py, story_runner.py, feedback.py, event.py, format2.py are untouched.",
+   "refutation": null,
+   "note": "Cites refreshed: adapters.py:224-232 is now :254-262. A requirement test would be natural only if the owner wants punctuation asserted (round 3's r3_detail_artifact.py:244 does for its own message, `\\(FileNotFoundError\\)$`); it is not owed by the grounds."
+  },
+  {
+   "target": "aisef2/app/review_ocr.py::findings",
+   "index": 26,
+   "mutant": "L153 dict entry 8 dropped",
+   "class_before": "AUDITED",
+   "verdict": "REVISED",
+   "class_after": "AUDITED",
+   "grounds": "The conclusion holds, the consumer set is new. 'source' (review_ocr.py:156) is dropped from the record. At b5c2457 the only copy was RUN.json's. NEW since b5c2457: the finding dict is no longer only RUN.json's. adapters.py:142-143 passes it whole to review_verify.preserve (review_verify.py:408-440, through redacted() :291-325), which writes it under the key `finding` of review-findings/<story>.<attempt>.<index>.json; the journal row's statement names that file's path, sha256 and size (detail(), review_verify.py:382-383), EVIDENCE.json lists it (run.py:300) and --verify's artifact_problems (review_verify.py:443-493, called at verify.py:164) re-reads it; adapters.py:150 writes redacted(found) into RUN.json sessions[].findings. what reads those copies: artifact_problems reads doc['format'], doc['story_id'] and finding['id'] only (review_verify.py:489-491); detail() reads id, severity (through severity_of), summary and reproducer (:373-389); blocks() severity_of; reproducer_contract id/summary/reproducer (:91-123). Dynamic, dynamic probe at 289885e (scratch-O1-b/probe.py: review_ocr.OCR and TERMINAL replaced by recording dict/tuple, the finding records of review_ocr.findings by a recording dict, caller file:line kept; 22 test modules in process incl. test_v21_review_chain and the r3_detail end-to-end files: 259 tests, 0 failures, 3 skips = RealBinary): reads of watched keys: finding.get('severity') x13 at review_verify.py:87 only; finding.items x14 at review_verify.py:312 (redacted's whole-dict walk, the writer of both copies); finding['category'] by tests kills3_T11b.py:57/:62 and kills3_T12b.py:114; finding['in_scope'] by kills3_T11b.py:69 and review_ocr tests :98; no read of 'source'. provenance stays bound without the label: the artifact names the finder's stream in `session` (adapters.py:248 log.name -> preserve(session=...) review_verify.py:421), whose first line is {'type': 'ocr_started', 'finder': 'ocr <version>'} (adapters.py:226) and the session record has `finder` (:249); the stream is listed in EVIDENCE.json (run.py:299). The model finder's findings are the model's own dicts (adapters._model, :156-172): the kernel never sets 'source' on them, so no reader can require it.",
+   "consumers_checked": [
+    "static: AST over the 953 tracked .py of 289885e (0 unparsable; scratch-O1-b/ast_ocr.py): no subscript, .get or `in` of a finding's 'source' anywhere (the 'source' subscripts of the tree are unrelated data: requirements, price tables, workload manifests)",
+    "what reads those copies: artifact_problems reads doc['format'], doc['story_id'] and finding['id'] only (review_verify.py:489-491); detail() reads id, severity (through severity_of), summary and reproducer (:373-389); blocks() severity_of; reproducer_contract id/summary/reproducer (:91-123). Dynamic, dynamic probe at 289885e (scratch-O1-b/probe.py: review_ocr.OCR and TERMINAL replaced by recording dict/tuple, the finding records of review_ocr.findings by a recording dict, caller file:line kept; 22 test modules in process incl. test_v21_review_chain and the r3_detail end-to-end files: 259 tests, 0 failures, 3 skips = RealBinary): reads of watched keys: finding.get('severity') x13 at review_verify.py:87 only; finding.items x14 at review_verify.py:312 (redacted's whole-dict walk, the writer of both copies); finding['category'] by tests kills3_T11b.py:57/:62 and kills3_T12b.py:114; finding['in_scope'] by kills3_T11b.py:69 and review_ocr tests :98; no read of 'source'",
+    "aisef2/app/review_verify.py:443-493 artifact_problems and verify.py:164: format/story_id/finding.id; tests r3_detail_product.py:136-148 and r3_detail_artifact.py:98-106/:428-445 read the artifact's reproducer, verification, anchor, id, revision, session and redacted count, not 'source'",
+    "aisef2/app/review_verify.py (the old audit's :74-103 and :236-250): severity_of :85-88, reproducer_contract :91-123, blocks :254-257, detail :344-405 — they read id, severity, summary and reproducer only",
+    "provenance stays bound without the label: the artifact names the finder's stream in `session` (adapters.py:248 log.name -> preserve(session=...) review_verify.py:421), whose first line is {'type': 'ocr_started', 'finder': 'ocr <version>'} (adapters.py:226) and the session record has `finder` (:249); the stream is listed in EVIDENCE.json (run.py:299)",
+    "mutant written over a copy of aisef2/app/review_ocr.py in a copy of the tree at 289885e, each module run with `unittest discover -f` under the workers' environment (py.sh): fast set (test_v21_review_ocr, T12a, T12b, T11a, T11b, A11: 70 tests) SURVIVED; mid set (A10, T10a-d, defects_ocr, defects_ocrz, R07, kills_adapters, T26a, r3_detail rv_finderfiles/artifact/statement: 172 tests) SURVIVED; r3 end-to-end set (r3_detail_model, failclosed, product: 22 tests) SURVIVED; test_v21_review_chain (515 s on this host) not re-run under this mutant: under the probe it reads none of the changed values, and its scenarios assert only the adapter's own substrings"
+   ],
+   "exceptions_checked": [
+    "an operator/verifier attributing an artifact to a finder from the artifact alone: gets it through `session` (bound by the manifest); the label duplicates it",
+    "findings copied out of their session into a triage list: nothing does; T11b pins category/path/start_line/in_scope only",
+    "a KeyError reader (finding['source']): none, static and dynamic",
+    "a session mixing finders: one review.finder per run (settings.py:130-158)",
+    "a test comparing a whole finding record with a literal that holds 'source': the probe saw only unittest's assertEqual compare records (604 eq calls) and the mutant survived every module that calls review_ocr.findings (T11a, T11b, T12b, test_v21_review_ocr) and every end-to-end module; the r3 artifact tests compare a hand-built finding (r3_detail_artifact.py:106), not review_ocr.findings output"
+   ],
+   "what_changed_since_b5c2457": "review_ocr.py is byte-identical to b5c2457 (sha256 043f8adc..., no hunk in `git diff b5c2457 289885e -- aisef2/app/review_ocr.py`). What changed is the set of places the record is written: NEW since b5c2457: the finding dict is no longer only RUN.json's. adapters.py:142-143 passes it whole to review_verify.preserve (review_verify.py:408-440, through redacted() :291-325), which writes it under the key `finding` of review-findings/<story>.<attempt>.<index>.json; the journal row's statement names that file's path, sha256 and size (detail(), review_verify.py:382-383), EVIDENCE.json lists it (run.py:300) and --verify's artifact_problems (review_verify.py:443-493, called at verify.py:164) re-reads it; adapters.py:150 writes redacted(found) into RUN.json sessions[].findings. adapters.py's review() loop is now :131-148; findings are produced at :261-262.",
+   "refutation": null,
+   "note": "A one-line requirement test would be natural if the owner wants an OCR finding's artifact self-identifying: in r3_detail_product.py (the fake finder is OCR) `self.assertEqual(doc['finding']['source'], 'ocr ' + review_ocr.OCR['version'])` kills [26], [41] and [54]. Not owed: provenance is bound through `session`. Old cites adapters.py:121-131/:219 are now :131-148/:249."
+  },
+  {
+   "target": "aisef2/app/review_ocr.py::findings",
+   "index": 41,
+   "mutant": "L156 string 'source' emptied",
+   "class_before": "AUDITED",
+   "verdict": "REVISED",
+   "class_after": "AUDITED",
+   "grounds": "The conclusion holds, the consumer set is new. The key 'source' becomes '' (review_ocr.py:156): the record holds {'': 'ocr v1.12.12'}. NEW since b5c2457: the finding dict is no longer only RUN.json's. adapters.py:142-143 passes it whole to review_verify.preserve (review_verify.py:408-440, through redacted() :291-325), which writes it under the key `finding` of review-findings/<story>.<attempt>.<index>.json; the journal row's statement names that file's path, sha256 and size (detail(), review_verify.py:382-383), EVIDENCE.json lists it (run.py:300) and --verify's artifact_problems (review_verify.py:443-493, called at verify.py:164) re-reads it; adapters.py:150 writes redacted(found) into RUN.json sessions[].findings. what reads those copies: artifact_problems reads doc['format'], doc['story_id'] and finding['id'] only (review_verify.py:489-491); detail() reads id, severity (through severity_of), summary and reproducer (:373-389); blocks() severity_of; reproducer_contract id/summary/reproducer (:91-123). Dynamic, dynamic probe at 289885e (scratch-O1-b/probe.py: review_ocr.OCR and TERMINAL replaced by recording dict/tuple, the finding records of review_ocr.findings by a recording dict, caller file:line kept; 22 test modules in process incl. test_v21_review_chain and the r3_detail end-to-end files: 259 tests, 0 failures, 3 skips = RealBinary): reads of watched keys: finding.get('severity') x13 at review_verify.py:87 only; finding.items x14 at review_verify.py:312 (redacted's whole-dict walk, the writer of both copies); finding['category'] by tests kills3_T11b.py:57/:62 and kills3_T12b.py:114; finding['in_scope'] by kills3_T11b.py:69 and review_ocr tests :98; no read of 'source'. The key is only ever written: redacted() (review_verify.py:312-316) maps keys through walk() and handles a collision (`key in out`, :314) — none here, no other key is ''; json.dumps(sort_keys=True) (review_verify.py:420-422; run.py:506) orders str keys; all keys stay str. provenance stays bound without the label: the artifact names the finder's stream in `session` (adapters.py:248 log.name -> preserve(session=...) review_verify.py:421), whose first line is {'type': 'ocr_started', 'finder': 'ocr <version>'} (adapters.py:226) and the session record has `finder` (:249); the stream is listed in EVIDENCE.json (run.py:299).",
+   "consumers_checked": [
+    "static: AST over the 953 tracked .py of 289885e (0 unparsable; scratch-O1-b/ast_ocr.py): no subscript or .get of 'source' on a finding; nothing iterates a finding's keys but redacted (review_verify.py:312)",
+    "what reads those copies: artifact_problems reads doc['format'], doc['story_id'] and finding['id'] only (review_verify.py:489-491); detail() reads id, severity (through severity_of), summary and reproducer (:373-389); blocks() severity_of; reproducer_contract id/summary/reproducer (:91-123). Dynamic, dynamic probe at 289885e (scratch-O1-b/probe.py: review_ocr.OCR and TERMINAL replaced by recording dict/tuple, the finding records of review_ocr.findings by a recording dict, caller file:line kept; 22 test modules in process incl. test_v21_review_chain and the r3_detail end-to-end files: 259 tests, 0 failures, 3 skips = RealBinary): reads of watched keys: finding.get('severity') x13 at review_verify.py:87 only; finding.items x14 at review_verify.py:312 (redacted's whole-dict walk, the writer of both copies); finding['category'] by tests kills3_T11b.py:57/:62 and kills3_T12b.py:114; finding['in_scope'] by kills3_T11b.py:69 and review_ocr tests :98; no read of 'source'",
+    "aisef2/app/adapters.py:131-148: assigns f['verification'] and f['anchor'] by key, never iterates keys; aisef2/app/run.py:497 and :506 (RUN.json, sort_keys, all keys str)",
+    "review_verify.preserve (:408-440): `\"\": ...` is valid JSON; the artifact's ASCII dump and sha256 are of whatever dict was given (the row and the file are made from the same bytes)",
+    "provenance stays bound without the label: the artifact names the finder's stream in `session` (adapters.py:248 log.name -> preserve(session=...) review_verify.py:421), whose first line is {'type': 'ocr_started', 'finder': 'ocr <version>'} (adapters.py:226) and the session record has `finder` (:249); the stream is listed in EVIDENCE.json (run.py:299)",
+    "mutant written over a copy of aisef2/app/review_ocr.py in a copy of the tree at 289885e, each module run with `unittest discover -f` under the workers' environment (py.sh): fast set (test_v21_review_ocr, T12a, T12b, T11a, T11b, A11: 70 tests) SURVIVED; mid set (A10, T10a-d, defects_ocr, defects_ocrz, R07, kills_adapters, T26a, r3_detail rv_finderfiles/artifact/statement: 172 tests) SURVIVED; r3 end-to-end set (r3_detail_model, failclosed, product: 22 tests) SURVIVED; test_v21_review_chain (18 tests, 3 skipped) SURVIVED"
+   ],
+   "exceptions_checked": [
+    "a consumer iterating a finding's keys and treating '' specially: none (only redacted's walk)",
+    "sort_keys with a mixed key type: all keys are str",
+    "key collision after redaction/normalisation (`<key>#<n>` at review_verify.py:314-315): only if another key were '' — none",
+    "the artifact_problems startswith(id) check and doc['format']/['story_id']: unaffected"
+   ],
+   "what_changed_since_b5c2457": "review_ocr.py is byte-identical to b5c2457 (sha256 043f8adc..., no hunk in `git diff b5c2457 289885e -- aisef2/app/review_ocr.py`). What changed is the set of places the record is written: NEW since b5c2457: the finding dict is no longer only RUN.json's. adapters.py:142-143 passes it whole to review_verify.preserve (review_verify.py:408-440, through redacted() :291-325), which writes it under the key `finding` of review-findings/<story>.<attempt>.<index>.json; the journal row's statement names that file's path, sha256 and size (detail(), review_verify.py:382-383), EVIDENCE.json lists it (run.py:300) and --verify's artifact_problems (review_verify.py:443-493, called at verify.py:164) re-reads it; adapters.py:150 writes redacted(found) into RUN.json sessions[].findings. adapters.py's review() loop is now :131-148; findings are produced at :261-262.",
+   "refutation": null,
+   "note": "Same optional requirement test as [26]. Old cites adapters.py:124-126 and run.py:491/:500 are now adapters.py:131-148 and run.py:497/:506."
+  },
+  {
+   "target": "aisef2/app/review_ocr.py::findings",
+   "index": 51,
+   "mutant": "L153 string 'low' emptied",
+   "class_before": "AUDITED",
+   "verdict": "REVISED",
+   "class_after": "AUDITED",
+   "grounds": "The conclusion (decision-level equivalence) holds; the record-level value now has two more copies. For a comment with no severity the record's severity is '' instead of 'low' (review_ocr.py:153). Every decision re-normalises: severity_of (review_verify.py:85-88) maps any string off the scale, '' included, to 'low'; blocks() (:254-257) and detail() (:373, the journaled statement) use only severity_of, so the statement says 'low' under both. NEW since b5c2457: the finding dict is no longer only RUN.json's. adapters.py:142-143 passes it whole to review_verify.preserve (review_verify.py:408-440, through redacted() :291-325), which writes it under the key `finding` of review-findings/<story>.<attempt>.<index>.json; the journal row's statement names that file's path, sha256 and size (detail(), review_verify.py:382-383), EVIDENCE.json lists it (run.py:300) and --verify's artifact_problems (review_verify.py:443-493, called at verify.py:164) re-reads it; adapters.py:150 writes redacted(found) into RUN.json sessions[].findings: the artifact and RUN.json hold the raw value (''), the statement 'low' — nothing compares them (artifact_problems reads format/story_id/id). what reads those copies: artifact_problems reads doc['format'], doc['story_id'] and finding['id'] only (review_verify.py:489-491); detail() reads id, severity (through severity_of), summary and reproducer (:373-389); blocks() severity_of; reproducer_contract id/summary/reproducer (:91-123). Dynamic, dynamic probe at 289885e (scratch-O1-b/probe.py: review_ocr.OCR and TERMINAL replaced by recording dict/tuple, the finding records of review_ocr.findings by a recording dict, caller file:line kept; 22 test modules in process incl. test_v21_review_chain and the r3_detail end-to-end files: 259 tests, 0 failures, 3 skips = RealBinary): reads of watched keys: finding.get('severity') x13 at review_verify.py:87 only; finding.items x14 at review_verify.py:312 (redacted's whole-dict walk, the writer of both copies); finding['category'] by tests kills3_T11b.py:57/:62 and kills3_T12b.py:114; finding['in_scope'] by kills3_T11b.py:69 and review_ocr tests :98; no read of 'source'. The research record itself says a missing severity must not be read as 'low' (docs/v2.1/research/UPSTREAM-RESEARCH.json results[0].research.claims[21] note; risks[7]: OCR leaves an absent severity '' and omits it from JSON), so '' is the faithful record-level value and the default is applied where the decision is taken.",
+   "consumers_checked": [
+    "aisef2/app/review_verify.py:85-88 severity_of (the only reader of finding['severity']: probe x13 at :87), :254-257 blocks, :373 detail",
+    "aisef2/app/review_verify.py:408-440 preserve and :291-325 redacted: write the raw value into the artifact; adapters.py:150: into RUN.json",
+    "grep severity over aisef2, validation, bin: adapters.py:31 (the model prompt), review_ocr.py:153, review_verify.py:87/:373, settings.py (min_severity) — no other reader of a finding's severity",
+    "tests that read a finding's severity: kills3_T11a/T11b/T12b (explicit severities 'medium'/'high'), review_chain.py:524 (RealBinary, skipped), r3_detail_product.py:114 (statement's severity 'high' from the fake finder's severity) — none exercises the default",
+    "mutant written over a copy of aisef2/app/review_ocr.py in a copy of the tree at 289885e, each module run with `unittest discover -f` under the workers' environment (py.sh): fast set (test_v21_review_ocr, T12a, T12b, T11a, T11b, A11: 70 tests) SURVIVED; mid set (A10, T10a-d, defects_ocr, defects_ocrz, R07, kills_adapters, T26a, r3_detail rv_finderfiles/artifact/statement: 172 tests) SURVIVED; r3 end-to-end set (r3_detail_model, failclosed, product: 22 tests) SURVIVED; test_v21_review_chain (515 s on this host) not re-run under this mutant: under the probe it reads none of the changed values, and its scenarios assert only the adapter's own substrings"
+   ],
+   "exceptions_checked": [
+    "a reader that does not re-normalise: none (probe: only severity_of reads the key)",
+    "min_severity 'low' (settings: min_severity in SEVERITIES): a confirmed and anchored finding blocks under both ('' -> 'low' >= 'low'); with min_severity above 'low' it blocks under neither",
+    "non-string severity (5): unchanged by the mutant (the default only applies to a falsy value)",
+    "record versus journal disagreement ('' in the artifact/RUN.json, 'low' in the statement): cosmetic, nothing compares them; a human reading the artifact alone sees an absent severity, which is what OCR said"
+   ],
+   "what_changed_since_b5c2457": "review_ocr.py is byte-identical to b5c2457 (sha256 043f8adc..., no hunk in `git diff b5c2457 289885e -- aisef2/app/review_ocr.py`). What changed is the set of places the record is written: NEW since b5c2457: the finding dict is no longer only RUN.json's. adapters.py:142-143 passes it whole to review_verify.preserve (review_verify.py:408-440, through redacted() :291-325), which writes it under the key `finding` of review-findings/<story>.<attempt>.<index>.json; the journal row's statement names that file's path, sha256 and size (detail(), review_verify.py:382-383), EVIDENCE.json lists it (run.py:300) and --verify's artifact_problems (review_verify.py:443-493, called at verify.py:164) re-reads it; adapters.py:150 writes redacted(found) into RUN.json sessions[].findings. adapters.py's review() loop is now :131-148; findings are produced at :261-262.",
+   "refutation": "Tried: a comment without a severity but with a fenced reproducer that is CONFIRMED and ANCHORED; with min_severity 'low' it blocks, with 'medium'+ it does not, identically under the mutant (severity_of('') == 'low'). The statement bytes are equal; only the artifact's `severity` ('' vs 'low') and RUN.json differ, and no reader depends on them.",
+   "note": "Optional requirement test, natural now that the artifact is evidence: assert the artifact's finding for a severity-less comment (the decision default), or that the statement and the artifact agree. Not owed: the research record argues the opposite default at record level. Old cites review_verify.py:74-77/:236-250 are now :85-88/:254-257, :344-405."
+  },
+  {
+   "target": "aisef2/app/review_ocr.py::findings",
+   "index": 52,
+   "mutant": "L154 string 'other' emptied",
+   "class_before": "AUDITED",
+   "verdict": "REFUTED",
+   "class_after": "KILLED",
+   "grounds": "The audit does not hold, independently of round 3: a test asserts the value. tests/v2/test_v21_kills3_T12b.py:112-114 (FindingIdWithoutCategory.test_the_finding_carries_that_id_and_reports_the_category_other) feeds findings() a comment with no category and asserts [(f['id'], f['category'])] == [('ocr-<12 hex of p.py|other|x>-0', 'other')]. Under the mutant the record's category is '' and the test fails. The file exists since 04e0b0f (an ancestor of b5c2457); the audit's consumer search covered aisef2/ and validation/ and not the tests that call findings(). It is not registered for the target (validation/v2/mutation.py:813-814: finding_id -> T12b; findings -> T11a, T11b), which is why the campaign counted a survivor.",
+   "consumers_checked": [
+    "tests/v2/test_v21_kills3_T12b.py:112-114: asserts f['category'] == 'other' for a comment without a category (probe: finding['category'] read at :114)",
+    "tests/v2/test_v21_kills3_T11b.py:57, :62: read f['category'] for explicit categories (not the default)",
+    "aisef2/app/review_ocr.py:61 finding_id: `category or 'other'` — the id's own default, not through this line (L154)",
+    "round 3's new copies (artifact review-findings/*.json, RUN.json): carry the category an operator filters or reads; no code reads it",
+    "mutant written over a copy of aisef2/app/review_ocr.py in a copy of the tree at 289885e and tests/v2/test_v21_kills3_T12b.py run with `unittest discover -f`: KILLED, 1 failure: FindingIdWithoutCategory.test_the_finding_carries_that_id_and_reports_the_category_other (scratch-O1-b/res/f52-t12b.txt); the null run of the same file is OK (13 tests, every other mutant run of this batch)"
+   ],
+   "exceptions_checked": [
+    "an id re-derived from the record: finding_id({'category': ''}) also gives 'other' (review_ocr.py:61), so the id is not affected — the failure is the record's category only",
+    "T12b exercising it by accident: the test's own docstring says it pins finding_id [2]; its second test states the record's category as a requirement (`reports the category other`)"
+   ],
+   "what_changed_since_b5c2457": "review_ocr.py is byte-identical to b5c2457 (sha256 043f8adc..., no hunk in `git diff b5c2457 289885e -- aisef2/app/review_ocr.py`). Nothing in round 3 made the audit wrong: test_v21_kills3_T12b.py is unchanged since 04e0b0f. Round 3 added two more copies of the record (the artifact, RUN.json redacted), which makes the field more visible, not less.",
+   "refutation": "Input: findings({'comments': [{'path': 'p.py', 'existing_code': ' x ', 'start_line': 3, 'content': 'no category here'}]}, ['p.py']). Original category 'other'; mutant ''. Reader: tests/v2/test_v21_kills3_T12b.py:112-114 — AssertionError: Lists differ: [('ocr-fe0abe0f0954-0', '')] != [('ocr-fe0abe0f0954-0', 'other')] (run at 289885e, scratch-O1-b/res/f52-t12b.txt). No new test is owed: register tests/v2/test_v21_kills3_T12b.py for aisef2/app/review_ocr.py::findings in validation/v2/mutation.py:814 (or re-run the mutant against it) so the mutant is KILLED rather than AUDITED.",
+   "note": "Class after: KILLED by an existing test that the campaign did not run for this target."
+  },
+  {
+   "target": "aisef2/app/review_ocr.py::findings",
+   "index": 54,
+   "mutant": "L156 string 'ocr ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "REVISED",
+   "class_after": "AUDITED",
+   "grounds": "The conclusion holds, the consumer set is new. The label 'ocr v1.12.12' becomes 'v1.12.12' (review_ocr.py:156); the version, the only part anything compares, stays. NEW since b5c2457: the finding dict is no longer only RUN.json's. adapters.py:142-143 passes it whole to review_verify.preserve (review_verify.py:408-440, through redacted() :291-325), which writes it under the key `finding` of review-findings/<story>.<attempt>.<index>.json; the journal row's statement names that file's path, sha256 and size (detail(), review_verify.py:382-383), EVIDENCE.json lists it (run.py:300) and --verify's artifact_problems (review_verify.py:443-493, called at verify.py:164) re-reads it; adapters.py:150 writes redacted(found) into RUN.json sessions[].findings. what reads those copies: artifact_problems reads doc['format'], doc['story_id'] and finding['id'] only (review_verify.py:489-491); detail() reads id, severity (through severity_of), summary and reproducer (:373-389); blocks() severity_of; reproducer_contract id/summary/reproducer (:91-123). Dynamic, dynamic probe at 289885e (scratch-O1-b/probe.py: review_ocr.OCR and TERMINAL replaced by recording dict/tuple, the finding records of review_ocr.findings by a recording dict, caller file:line kept; 22 test modules in process incl. test_v21_review_chain and the r3_detail end-to-end files: 259 tests, 0 failures, 3 skips = RealBinary): reads of watched keys: finding.get('severity') x13 at review_verify.py:87 only; finding.items x14 at review_verify.py:312 (redacted's whole-dict walk, the writer of both copies); finding['category'] by tests kills3_T11b.py:57/:62 and kills3_T12b.py:114; finding['in_scope'] by kills3_T11b.py:69 and review_ocr tests :98; no read of 'source'. provenance stays bound without the label: the artifact names the finder's stream in `session` (adapters.py:248 log.name -> preserve(session=...) review_verify.py:421), whose first line is {'type': 'ocr_started', 'finder': 'ocr <version>'} (adapters.py:226) and the session record has `finder` (:249); the stream is listed in EVIDENCE.json (run.py:299). No code matches the prefix: no startswith('ocr '), no comparison of a finding's source with a session's finder, no parser.",
+   "consumers_checked": [
+    "static: AST over the 953 tracked .py of 289885e (0 unparsable; scratch-O1-b/ast_ocr.py): no read of a finding's 'source'; `git grep` for startswith(.ocr ) and for a comparison with `finder` finds nothing (the session's `finder` is only written: adapters.py:226, :249)",
+    "what reads those copies: artifact_problems reads doc['format'], doc['story_id'] and finding['id'] only (review_verify.py:489-491); detail() reads id, severity (through severity_of), summary and reproducer (:373-389); blocks() severity_of; reproducer_contract id/summary/reproducer (:91-123). Dynamic, dynamic probe at 289885e (scratch-O1-b/probe.py: review_ocr.OCR and TERMINAL replaced by recording dict/tuple, the finding records of review_ocr.findings by a recording dict, caller file:line kept; 22 test modules in process incl. test_v21_review_chain and the r3_detail end-to-end files: 259 tests, 0 failures, 3 skips = RealBinary): reads of watched keys: finding.get('severity') x13 at review_verify.py:87 only; finding.items x14 at review_verify.py:312 (redacted's whole-dict walk, the writer of both copies); finding['category'] by tests kills3_T11b.py:57/:62 and kills3_T12b.py:114; finding['in_scope'] by kills3_T11b.py:69 and review_ocr tests :98; no read of 'source'",
+    "aisef2/app/adapters.py:249 (session finder, built from the same OCR['version'] with its own 'ocr ' prefix): not derived from the record's label",
+    "aisef2/app/review_verify.py:443-493 artifact_problems: id/format/story_id only",
+    "provenance stays bound without the label: the artifact names the finder's stream in `session` (adapters.py:248 log.name -> preserve(session=...) review_verify.py:421), whose first line is {'type': 'ocr_started', 'finder': 'ocr <version>'} (adapters.py:226) and the session record has `finder` (:249); the stream is listed in EVIDENCE.json (run.py:299)",
+    "mutant written over a copy of aisef2/app/review_ocr.py in a copy of the tree at 289885e, each module run with `unittest discover -f` under the workers' environment (py.sh): fast set (test_v21_review_ocr, T12a, T12b, T11a, T11b, A11: 70 tests) SURVIVED; mid set (A10, T10a-d, defects_ocr, defects_ocrz, R07, kills_adapters, T26a, r3_detail rv_finderfiles/artifact/statement: 172 tests) SURVIVED; r3 end-to-end set (r3_detail_model, failclosed, product: 22 tests) SURVIVED; test_v21_review_chain (515 s on this host) not re-run under this mutant: under the probe it reads none of the changed values, and its scenarios assert only the adapter's own substrings"
+   ],
+   "exceptions_checked": [
+    "a finding read without its session: nothing does; the version alone still names the pinned release and the artifact's `session` names the stream",
+    "a parser of source: none",
+    "the label told apart from another finder's: one finder per run (settings.py:130-158); the model finder's findings are the model's own dicts, with no kernel-set source"
+   ],
+   "what_changed_since_b5c2457": "review_ocr.py is byte-identical to b5c2457 (sha256 043f8adc..., no hunk in `git diff b5c2457 289885e -- aisef2/app/review_ocr.py`). What changed is the set of places the record is written: NEW since b5c2457: the finding dict is no longer only RUN.json's. adapters.py:142-143 passes it whole to review_verify.preserve (review_verify.py:408-440, through redacted() :291-325), which writes it under the key `finding` of review-findings/<story>.<attempt>.<index>.json; the journal row's statement names that file's path, sha256 and size (detail(), review_verify.py:382-383), EVIDENCE.json lists it (run.py:300) and --verify's artifact_problems (review_verify.py:443-493, called at verify.py:164) re-reads it; adapters.py:150 writes redacted(found) into RUN.json sessions[].findings. adapters.py's review() loop is now :131-148; findings are produced at :261-262.",
+   "refutation": null,
+   "note": "Same optional requirement test as [26]. Old cite adapters.py:219 is now :249."
+  },
+  {
+   "target": "aisef2/app/review_ocr.py::pinned",
+   "index": 11,
+   "mutant": "L207 string ')' emptied",
+   "class_before": "AUDITED",
+   "verdict": "REVISED",
+   "class_after": "AUDITED",
+   "grounds": "The conclusion holds, three cites moved and one sibling contract appeared. The unreadable-binary reason becomes '<exe>: cannot be read (FileNotFoundError' (review_ocr.py:206-207). pinned() is still called once, adapters.py:178 -> raise CapabilityUnrunnable(why) :179-180 -> orchestrate/review.py:37-38 f'reviewer cannot run: {e}' -> _result() -> PROVIDER_RESULT detail (review.py:24-27; event.py:99 and format2.py:130-132: any str). The failure code comes from classify(CAPABILITY_UNRUNNABLE); the failure/observed detail is the fixed 'review: CAPABILITY_UNRUNNABLE' (story_runner.py:288). Nothing parses the detail; the path, the kind ('cannot be read') and the exception class are all there and pinned by kills3_T12b.py:160-166.",
+   "consumers_checked": [
+    "aisef2/app/adapters.py:177-180: the only caller of pinned() in the tree (`git grep -F 'pinned('`)",
+    "aisef2/orchestrate/review.py:35-40: composes the detail once, nothing appended; classification by code",
+    "aisef2/journal/event.py:99 _text and format2.py:130-132: provider/result detail only has to be a str; verify._projection_refusal (verify.py:39-52, called at :149; new) folds the six projections, none reads a detail",
+    "feedback.py:132-134 context_pack reads a provider/result only after a DEVELOPER request with no result yet (budget_owner DEVELOPER); the reviewer's is Owner.REVIEW and story_runner.py:224-232 journals the developer's result first, redacted and cut at 300; feedback.py:69-74 retry_feedback and usage.no_progress (usage.py:118-142, rewritten in round 3: still failure/observed only) read the fixed 'review: <code>', not provider/result",
+    "lineage.py:290, runtime/repair.py:53, sentinel.py:103, run_scope.py:222: provider/result by source_seqs/outcome only",
+    "tests: kills3_T12b.py PinnedRefusals (:140-186; :160 absent binary, asserts the path, 'cannot be read', 'FileNotFoundError', and the set-off of the path); test_v21_review_ocr.py:127-135 ('not the pinned', 'absolute'); review_chain.py:408-420 (a changed binary: the sha branch, not this one)",
+    "git grep 'cannot be read' at 289885e: producers only — bundle.py:211, bundle_cli.py:497, settings.py:218, verify.py:109/:119/:144, review_verify.py:480, lineage.py:150, review_ocr.py:207; no regex extracts the class name",
+    "mutant written over a copy of aisef2/app/review_ocr.py in a copy of the tree at 289885e, each module run with `unittest discover -f` under the workers' environment (py.sh): fast set (test_v21_review_ocr, T12a, T12b, T11a, T11b, A11: 70 tests) SURVIVED; mid set (A10, T10a-d, defects_ocr, defects_ocrz, R07, kills_adapters, T26a, r3_detail rv_finderfiles/artifact/statement: 172 tests) SURVIVED; r3 end-to-end set (r3_detail_model, failclosed, product: 22 tests) SURVIVED; test_v21_review_chain (515 s on this host) not re-run under this mutant: under the probe it reads none of the changed values, and its scenarios assert only the adapter's own substrings"
+   ],
+   "exceptions_checked": [
+    "a consumer extracting the class with r'\\((\\w+)\\)' or counting parentheses: none (grep over aisef2, validation, tests, docs)",
+    "text appended after the reason that the missing ')' would leave unbalanced: nothing is appended (review.py:38, adapters.py:179)",
+    "truncation hiding the end: pinned()'s reason is not cut on this path",
+    "an exe path containing '(' or ')': printed before the class, unaffected by the last character",
+    "the unreadable branch replayed through --verify end to end: --verify checks the chain and schemas, and round 3's new readers (_projection_refusal, artifact_problems at review_verify.py:443-493) read gate/check rows, not provider/result",
+    "round 3's typed errors/host table (confine.py, process_range.py): not on this path (CapabilityUnrunnable is orchestrate/adapters.py's, untouched)"
+   ],
+   "what_changed_since_b5c2457": "review_ocr.py is byte-identical to b5c2457 (sha256 043f8adc..., no hunk in `git diff b5c2457 289885e -- aisef2/app/review_ocr.py`). adapters.py: the caller moved from :159-161 to :177-180. usage.py: no_progress was rewritten (still failure/observed only; the old cite usage.py:121 is now in :118-142). New: review_verify.artifact_problems asserts the analogous artifact message with its closing character (r3_detail_artifact.py:244 `cannot be read \\(FileNotFoundError\\)$`), i.e. the same shape of text is now a tested contract in the sibling module.",
+   "refutation": null,
+   "note": "No reader depends on the closing ')': the audit holds. By the consistency round 3 introduced, a requirement test is natural and cheap: in kills3_T12b.py::PinnedRefusals.test_an_absent_binary_is_refused_... assert why.endswith('(FileNotFoundError)') (or the regex as r3_detail_artifact.py:244). Not owed by the grounds; the owner decides whether punctuation of an operator-facing refusal is a requirement."
+  }
+ ]
+}

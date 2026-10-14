@@ -1,0 +1,369 @@
+{
+ "batch": "C1",
+ "copy": "b",
+ "snapshot": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+ "entries": [
+  {
+   "target": "aisef2/app/confine.py::_judge",
+   "index": 95,
+   "mutant": "L570 string '/nonexistent' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "Original guard `home != '/nonexistent'` (confine.py:570), mutant `home != ''`. `home` is never '' (the only producer, _probe confine.py:365 `env.get('HOME') or '/nonexistent'`; the only caller of _judge is :422), so the mutant always applies the HOME listing check, while the original skips it exactly when home is the placeholder string (an absent or empty HOME, or a literal HOME=/nonexistent). For every other home both guards are True and the programs agree. For home == '/nonexistent' they disagree, but the outcomes still agree unless `ls -A /nonexistent` inside lists an entry that no mount below it names (names, :567-568, excludes at == home). The probe lists $5 only `if [ -e \"$5\" ]` (PROBE confine.py:71), and /nonexistent exists inside only (a) as the parent bubblewrap makes for a mount below it, where every listed entry is that mount's own first path component (shown <= names in both programs), or (b) as a bind of a HOST directory /nonexistent that has content. (b) needs that directory on the host AND bound by wrap: an operator read_only entry (wrap :185-187 refuses a missing one), the client's directory (:188), the workspace, a bare common git directory (:196); the config directory ends in 'opencode' and every other mount is a fixed path (argv :166-174). Nothing the wrapper builds creates /nonexistent. In state (b) the original admits and the mutant refuses ('HOME shows more than...') although no HOME is set: a false refusal, fail-closed; neither program admits a breach. Not re-measured in a Linux guest (none here): bubblewrap's creation of the parent directory is the earlier audit's measurement and its documented behaviour.",
+   "consumers_checked": [
+    "aisef2/app/confine.py:365 (_probe, the only producer of the placeholder) and :422 (the only caller of _judge); :567-571 (names, shown, guard)",
+    "aisef2/app/confine.py:71 (PROBE: $5 is listed only if it exists inside)",
+    "aisef2/app/run.py:401-405 (confine.measure; RunRefused joins the problems with '; ')",
+    "aisef2/app/cli.py:82-95 (`--check`: `ready` from the truthiness of problems at :86, the record printed as JSON)",
+    "tests/v2/test_v21_confine.py:629-690 (home='/h' for the refusal; '/nonexistent' with an empty listing for the clean cases: neither separates the guard); tests/v2/test_v21_kills3_T07a.py:140,249; T06a.py:84; A06.py:82; test_v21_r3_client_readers.py:199; test_v21_r3_conf_policy.py:88 (all '/nonexistent' with empty listings) and :483 (the recorded real home)",
+    "validation/v21/sandbox/r3_conf_guest.py:100-109, r3_conf_review_guest.py:47-55, r3_conf_fu_guest.py:50-78 (new direct callers of _probe: HOME is a real directory of the guest layout; docs/v2.1/evidence/sandbox/r3-conf/scenarios-X1.json: home_listing ['.config'] in all twelve scenarios)",
+    "docs/v2.1/SANDBOX-LINUX.md:137-138; grep 'nonexistent' over docs/v2.1: no document states the HOME-less behaviour"
+   ],
+   "exceptions_checked": [
+    "HOME set to the literal '/nonexistent' (Debian service accounts): the guards disagree but /nonexistent does not exist inside, listing [] and both outcomes []",
+    "an operator read_only entry /nonexistent/sub: /nonexistent is bubblewrap's parent directory, listing ['sub'] is named by the mount below, identical in both",
+    "a bind exactly at /nonexistent with content and no HOME: differs; needs a real host directory that nothing in the wrapper creates; fail-closed",
+    "`home` == '': never (the `or` of :365)",
+    "round 3's `_lines` (:203-209, LF-only split of the listing): a name holding U+2028/U+0085 is now one entry; it changes `shown`, not the guard, and is the same in both programs",
+    "a new reader of the guard's outcome: only the problem list, as before (grep 'HOME shows more' over aisef2/ validation/ tests/ docs/: confine.py and tests asserting startswith/assertIn on the text)"
+   ],
+   "what_changed_since_b5c2457": "_judge gained the write-policy block (:559-566) ahead of this guard and home_listing is read through `_lines`; neither reads `home`. The guard, its producer and the PROBE's home section are byte-identical (lines moved: 416->570, 291->365, 60->71).",
+   "refutation": "none found: no input on which a reader depends on the difference except a host directory named /nonexistent with content. the 21 test files that reach confine at the snapshot (the registered kill files of the target and the five round-3 files test_v21_r3_conf_policy/_rv_hostrows/_fu_before/_locale/client_readers, plus T13a/T23a/defects): every one passes with this mutant applied in a COPY of the snapshot tree (harness checked: a known-killed mutant, _survivors[1], fails TO2 there).",
+   "note": "Not owed. A requirement test is expressible with _judge alone (home='/nonexistent' + home_listing=['.ssh'] -> no HOME problem; home='/h' -> problem) but it would pin an operator-invisible convention; the owner's call. Line cites of the entry's grounds refreshed to the snapshot."
+  },
+  {
+   "target": "aisef2/app/confine.py::_judge",
+   "index": 142,
+   "mutant": "L541 string ')' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "The mutant drops only the closing ')' after the excerpt at confine.py:541: the cause words, `exit {rc}` and the <=120-character excerpt stay, in order. The message is joined with '; ' into one RunRefused line the operator reads (run.py:405) or listed in `--check`'s JSON, whose `ready` reads only truthiness (cli.py:86); nothing splits it, matches it or compares it. The tests that touch it assert the prefix (test_v21_confine.py:712 startswith; A06.py:88 startswith) or read `exit (\\d+)` and an `assertIn` of the excerpt (T06a.py:187-197: the excerpt is delimited from the exit code by ': ', not by ')'). The ')' is the only mark of where the excerpt (arbitrary, possibly localised text, possibly holding '; ') ends and the next problem begins: a legibility loss for a human reader, not a parse.",
+   "consumers_checked": [
+    "aisef2/app/confine.py:541 (message), :537-541 (the branch), :526-578 (problems list)",
+    "aisef2/app/run.py:401-405 (confine.measure; RunRefused joins the problems with '; ')",
+    "aisef2/app/cli.py:82-95 (`--check`: `ready` from the truthiness of problems at :86, the record printed as JSON)",
+    "tests/v2/test_v21_confine.py:712; test_v21_kills3_A06.py:88; test_v21_kills3_T06a.py:187-197",
+    "grep of the message text over aisef2/ validation/ tests/ docs/ (not closure-evidence): confine.py and those three tests; docs/v2.1/decisions/B03-R3-conf.md:175 names the other clause, not this one",
+    "validation/v21/sandbox/linux_guest.py:259 (copies problems as data); validation/v21/cli_integration/e2e_guest.py:599-620 (S2b matches `expect` substrings: 'do not exist', 'not an executable file', 'holds HOME', 'did not run the probe'; none is this message); aisef2/app/verify.py (does not read the confinement record)"
+   ],
+   "exceptions_checked": [
+    "a reader of the joined line: without ')' the excerpt runs into the next problem (cosmetic); the identifying elements (class of cause, exit code, excerpt) still read in order",
+    "anything splitting on '; ' or matching a closing bracket: none found",
+    "an excerpt that itself holds ')': unaffected",
+    "a new problem now follows this one in the joined line (the round-3 write-policy messages quote '(at: why; ...)' groups of their own): the missing ')' makes the boundary ambiguous to a human, still not to any program"
+   ],
+   "what_changed_since_b5c2457": "Nothing it reads: the message line and its consumers are unchanged (run.py moved to :401-405, cli.py to :82-95).",
+   "refutation": "none found. the 21 test files that reach confine at the snapshot (the registered kill files of the target and the five round-3 files test_v21_r3_conf_policy/_rv_hostrows/_fu_before/_locale/client_readers, plus T13a/T23a/defects): every one passes with this mutant applied in a COPY of the snapshot tree (harness checked: a known-killed mutant, _survivors[1], fails TO2 there).",
+   "note": "Not owed (punctuation of a message nothing parses)."
+  },
+  {
+   "target": "aisef2/app/confine.py::_probe",
+   "index": 131,
+   "mutant": "L380 string 'sleep ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "`_survivors('120.NNNNNN')` instead of `_survivors('sleep 120.NNNNNN')` (confine.py:380; _survivors :430-441): `command in pr.command` is a substring test, so every command line holding the original's 'sleep 120.N' holds '120.N' (the mutant's match set contains the original's: no under-reporting). Extra matches can only be a process whose command line carries the probe's nonce-derived number without 'sleep ' before it: the probe's own descendants (bwrap's argv, the pid-1 helper, `sh -c PROBE probe ... $7`). When _survivors is called subprocess.run has returned, i.e. the outer bwrap has been reaped and the probe shell has exited; a helper the kernel is still tearing down is looked at again for SURVIVOR_GRACE (:92, :436-441). Whatever remains is a process the session left, and a survivor is only ever a claim (cleanup_authority.signal_owned proves ownership before any signal, cleanup_authority.py:372-404). Measured on this host at the snapshot: a real unconfined probe (fake bwrap that execs the command, test_v21_confine.measure_in_range) reports exactly one survivor, the sleeper, with the original and with the mutant, and the same problem list.",
+   "consumers_checked": [
+    "aisef2/app/confine.py:380 (the only call), :430-441 (_survivors), :542-543 (_judge: the pids in 'a process the session left outlived it'), :416 (recorded as setsid_survivors)",
+    "aisef2/runtime/process_range.py:78-96 (_linux_table), :98-115 (_ps_table), :117-119 (process_table): `pr.command` is built as before (argv joined by spaces); round 3 changed decoding and row parsing, not what `command` holds",
+    "validation/v21/sandbox/linux_guest.py:259,353-355,383 and validation/v2/cleanup_authority.py:372-404 (signal_owned: reported pids are 'never trusted, only checked'; a superset cannot widen what is signalled; dedupes)",
+    "validation/v21/sandbox/teardown_race.py:52-72 (counts the reported list next to its own scan for 'sleep 120.': a superset shows as a longer `reported` row in that JSON, fail-closed, no automated comparison)",
+    "tests/v2/test_v21_kills3_T05c.py:195-215 (value uniqueness: asserts 'sleep a' not in 'sleep b' for equal-width values; the mutant's '120.N' is no more a substring of another value than 'sleep 120.N' is) and its docstring :14-17 (the validators find the sleeper by its 'sleep 120.' prefix); test_v21_confine.py:541-587 (_survivors given its own strings), :589-601 (an unconfined probe's survivors truthy: passes the mutant); T05a.py:150 and defects_confine.py:151 patch _survivors with a lambda that ignores its argument"
+   ],
+   "exceptions_checked": [
+    "under-reporting: impossible, the mutant's match set contains the original's",
+    "false positive on a clean sandbox: only a process holding the 10-character string '120.NNNNNN' that is not the sleeper; the probe's descendants are gone when subprocess.run returns (bwrap reaped, pid-1 helper dies with the namespace within SURVIVOR_GRACE); an unrelated host process with the same six random digits is a ~1e-6 coincidence, the same class as the original's; fail-closed",
+    "timeout path (TimeoutExpired, code None): problems already hold 'did not run the probe' and _judge is not reached (:421); a slow teardown could list the hung shell as well in the recorded setsid_survivors: evidence only, the run is refused either way",
+    "recorded real-guest evidence replayed by round 3 (docs/v2.1/evidence/sandbox/r3-conf/scenarios-X1.json, shared-pid-namespace): survivors [519], one pid; the replay test reads the record, it does not re-measure",
+    "a new ProcessTableError out of process_table() (round 3) propagates the same in both programs"
+   ],
+   "what_changed_since_b5c2457": "_probe now hands `run_env` to the probe (:373) and reads the host mount table before/after it (:371,:379); the _survivors call, the sleep value (:366) and _survivors itself are unchanged; process_table's readers changed (bytes decoding, strict ps rows) but not the command text.",
+   "refutation": "none found: an input needs a live process with the number and not 'sleep ' in front of it after bubblewrap has returned, and a reader that depends on the extra pid; the only readers truthiness-test or print it. the 21 test files that reach confine at the snapshot (the registered kill files of the target and the five round-3 files test_v21_r3_conf_policy/_rv_hostrows/_fu_before/_locale/client_readers, plus T13a/T23a/defects): every one passes with this mutant applied in a COPY of the snapshot tree (harness checked: a known-killed mutant, _survivors[1], fails TO2 there).",
+   "note": "Not owed. A decoy-process test (a process whose command holds the value but not 'sleep ') would pin the prefix, which the validators also use (T05c docstring); a convention shared by two readers, not a behaviour either needs. Cites refreshed (cleanup_authority.py moved from :268-290 to :372-404)."
+  },
+  {
+   "target": "aisef2/app/confine.py::_probe",
+   "index": 199,
+   "mutant": "L378 string ': ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "REVISED",
+   "class_after": "AUDITED",
+   "grounds": "Only the ': ' between exception class and message is lost ('OSError[Errno 8] Exec format error' for 'OSError: [Errno 8] ...'); 'exit None', the class, the errno text and the path stay, and they are what the tests assert (OSError, 'Exec format error': T05c.py:100-107,142-152; defects_confine.py:277-295 startswith 'the sandbox did not run the probe (exit None): '; A05.py:151-159; R02.py:101-127). Nobody parses the text: `_sections` (confine.py:212-236) only reads MARK-prefixed lines and neither form starts with MARK; the problem is `out.strip()[:300]` (:385) printed by run.py:405 / cli.py. CORRECTION of the earlier grounds: this line is reached only by an OSError (exec failure, ENOENT, EACCES, E2BIG) or a non-timeout SubprocessError (none is raised by subprocess.run without check=True). A TimeoutExpired is caught by the clause above it (:375-376) and gets its own constant text 'TimeoutExpired: timed out after 60 seconds', which this mutant does not touch: the earlier exception 'the mutant glues TimeoutExpired to Command ...' and the observation about the 300-character cut were about a path this line no longer takes.",
+   "consumers_checked": [
+    "aisef2/app/confine.py:377-378 (writer), :375-376 (the TimeoutExpired clause above it), :384-385 (the problem text), :212-236 (_sections), :421 (_judge not reached when problems exist)",
+    "aisef2/app/run.py:401-405 (confine.measure; RunRefused joins the problems with '; ')",
+    "aisef2/app/cli.py:82-95 (`--check`: `ready` from the truthiness of problems at :86, the record printed as JSON)",
+    "tests/v2/test_v21_kills3_T05c.py:100-107,142-152; test_v21_defects_confine.py:277-295; test_v21_kills3_A05.py:151-159; test_v21_kills3_R02.py:101-127; test_v21_confine.py:535 (exit-3 prefix); test_v21_r3_conf_locale.py:181 (`split(':')[0]` of the exit-97 problem: the exit-97 form, not this one)",
+    "docs/v2.1/SANDBOX-LINUX.md:106 and docs/v2.1/evidence/sandbox/*.json (quote 'the sandbox did not run the probe' and the exit-1 form); grep 'exit None' over aisef2/ validation/ tests/ docs/: no parser or matcher; validation/v21/cli_integration/e2e_guest.py:832 expects 'did not run the probe' only"
+   ],
+   "exceptions_checked": [
+    "a word-boundary matcher for the class name: none exists; the class substring is intact",
+    "removing 2 characters moves the [:300] cut by 2: no consumer of the tail",
+    "TimeoutExpired reaching this line: it cannot (first except clause)",
+    "a localised errno text: `strerror` is not part of the measurement's fixed C locale (LOCALE :104 sets the probe's environment, not the controller's); the text is the controller's either way and untouched by the mutant"
+   ],
+   "what_changed_since_b5c2457": "`run_env` replaced inside_env as the probe call's env (:373) and the host table is read around the call; the two except clauses and the f-string are unchanged. The earlier grounds' TimeoutExpired remark was already wrong for the code at b5c2457 (the clause at :375-376 predates it).",
+   "refutation": "none found. the 21 test files that reach confine at the snapshot (the registered kill files of the target and the five round-3 files test_v21_r3_conf_policy/_rv_hostrows/_fu_before/_locale/client_readers, plus T13a/T23a/defects): every one passes with this mutant applied in a COPY of the snapshot tree (harness checked: a known-killed mutant, _survivors[1], fails TO2 there).",
+   "note": "Not owed. REVISED only for the corrected exception analysis; the conclusion stands."
+  },
+  {
+   "target": "aisef2/app/confine.py::_probe",
+   "index": 208,
+   "mutant": "L364 string '.git' emptied",
+   "class_before": "EQUIVALENT",
+   "verdict": "REVISED",
+   "class_after": "EQUIVALENT",
+   "grounds": "`git_dir(str(ws)) or ws / '.git'` (confine.py:364): `or` evaluates its right operand only when git_dir returns a falsy value. git_dir (:139-150) returns None only for a plain checkout (`.git` not a file, or a file not starting 'gitdir: '); for a git worktree it returns str(Path.resolve()), never empty. Every path that reaches `_probe` first made its workspace with `git worktree add -q --detach <where>/ws` and refused on a non-zero exit (_worktree :304-307): measure() :328 -> :337, and, since round 3, the three validation guests, each of which calls `confine._worktree(where, lay['repo'])` immediately before `confine._probe(...)`. A worktree's `.git` is always git's regular file 'gitdir: <common>/worktrees/ws', so the right operand is dead code on every caller: the mutant's `ws / ''` is never evaluated.",
+   "consumers_checked": [
+    "aisef2/app/confine.py:337 (measure, the only caller inside aisef2/), :328 and :292-307 (_worktree), :364, :139-150 (git_dir), :196 (wrap calls git_dir on the same workspace)",
+    "validation/v21/sandbox/r3_conf_guest.py:100,109; r3_conf_review_guest.py:47,55; r3_conf_fu_guest.py:50,78 (NEW direct callers of _probe: each takes `repo, ws = confine._worktree(where, lay['repo'])` first, then wrap, then _probe)",
+    "grep '_probe(' / 'confine._probe' over aisef2/ validation/ tests/: those three and measure only (story_runner._probe, run_probe, test helpers named _probe are unrelated); no test calls confine._probe or patches _worktree/git_dir",
+    "tests/v2/test_v21_kills3_T07a.py:364-380 (git_dir: plain checkout -> None, worktree -> the common directory)"
+   ],
+   "exceptions_checked": [
+    "git_dir returning None for a worktree git just added: the file always starts 'gitdir: ' (relative values, as with worktree.useRelativePaths, are resolved against the workspace at :148)",
+    "git_dir returning '': it returns str(resolved Path), absolute and non-empty",
+    "git_dir raising: the same exception in both, before the operand",
+    "a future direct caller with a plain checkout would make the two differ (ws/.git/<probe> vs ws/<probe>, the latter being the workspace probe's own path $6): none exists; a test is owed then",
+    "the repository `repo` handed to _worktree being a linked worktree or a clone: `git worktree add` makes the new one's .git a gitdir file in every case"
+   ],
+   "what_changed_since_b5c2457": "The set of callers of _probe changed: three validation guests (r3_conf_*.py) were added in round 3; the proof does not depend on `measure` being the only caller, only on _worktree preceding _probe, which holds for all four. The line moved (293 -> 364).",
+   "refutation": "none found: no reachable input makes git_dir falsy there. the 21 test files that reach confine at the snapshot (the registered kill files of the target and the five round-3 files test_v21_r3_conf_policy/_rv_hostrows/_fu_before/_locale/client_readers, plus T13a/T23a/defects): every one passes with this mutant applied in a COPY of the snapshot tree (harness checked: a known-killed mutant, _survivors[1], fails TO2 there).",
+   "note": "REVISED for the caller list ('one caller, measure()' is no longer literally true). A test is owed only if a caller that hands _probe a plain checkout is ever added."
+  },
+  {
+   "target": "aisef2/app/confine.py::_survivors",
+   "index": 2,
+   "mutant": "L438 sorted() -> list()",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "Ascending order is a hygiene property of the evidence list: process_table() is /proc directory order on Linux (os.scandir, order unspecified) and `ps` order elsewhere; NOT ascending on this macOS host (measured at the snapshot: 500 pids, three reads, `list(process_table()) != sorted(...)` each time), so the sort is not a no-op and the mutant is not EQUIVALENT. No consumer indexes, compares or hashes the list for equality across reports, and a pid list differs from run to run anyway: it is printed in 'a process the session left outlived it: [..]' (confine.py:543), recorded as setsid_survivors (:416), counted/dry-run-claimed by the validators (signal_owned takes pids in any order, dedupes, cleanup_authority.py:380-392). The pin, if the owner wants a canonical list: a table inserted 30,10,20 returns [10,20,30].",
+   "consumers_checked": [
+    "aisef2/app/confine.py:438 (the call), :385-386 -> :542-543 (_judge), :416 (recorded)",
+    "validation/v21/sandbox/teardown_race.py:52-54,68,72 (`reported`/`survivors` printed; `alive` is a dict keyed by pid)",
+    "validation/v21/sandbox/linux_guest.py:259,353-355,383; validation/v2/cleanup_authority.py:372-404 (signal_owned: dedupe, order = signalling order, no dependence)",
+    "validation/v21/cli_integration/e2e_guest.py:408,414 (`== []` and a printed value only)",
+    "aisef2/app/verify.py, aisef2/app/run.py (no reference to the survivors)",
+    "tests/v2/test_v21_confine.py:541-587,651 (empty, one pid, or [42]); test_v21_kills3_TO2.py (loop semantics; single pids); test_v21_r3_conf_policy.py:560 (`== []` against a recorded scenario)",
+    "docs/v2.1/evidence/sandbox/** and r3-conf/*.json (empty lists or one pid: [519])"
+   ],
+   "exceptions_checked": [
+    "a reader that indexes [0] or compares two reports: none (grep)",
+    "a multiset difference: the table is a dict keyed by pid, each pid once either way",
+    "sorted() as the only thing making the order reproducible in a hashed record: the record stores the list as returned and its hash is over the file's bytes of that one run (EVIDENCE.json); verify never re-derives confinement",
+    "round 3's strict ps rows / ProcessTableError: change which rows exist, not their order"
+   ],
+   "what_changed_since_b5c2457": "process_range's table readers changed (bytes decoding, LF-only rows, a typed error for a malformed row); the order the table is produced in, and `_survivors` itself, did not. Lines moved (351 -> 438).",
+   "refutation": "none found: the only reader of the order is a person reading a pid list. the 21 test files that reach confine at the snapshot (the registered kill files of the target and the five round-3 files test_v21_r3_conf_policy/_rv_hostrows/_fu_before/_locale/client_readers, plus T13a/T23a/defects): every one passes with this mutant applied in a COPY of the snapshot tree (harness checked: a known-killed mutant, _survivors[1], fails TO2 there).",
+   "note": "Not owed. Natural precedent if the owner wants it: T06a.py:199-217 pins the order of the names in another refusal message; a pid list is not reproducible across runs, so 'the same exposure gives the same text' is not at stake here."
+  },
+  {
+   "target": "aisef2/app/confine.py::_worktree",
+   "index": 17,
+   "mutant": "L300 element 1 dropped",
+   "class_before": "EQUIVALENT",
+   "verdict": "CONFIRMED",
+   "class_after": "EQUIVALENT",
+   "grounds": "The dropped element is the `-q` of `git init -q` (confine.py:300). `--quiet` only silences git's 'Initialized empty Git repository' summary and default-branch hint; exit status and repository state do not depend on it, and the only reader of the call is `.returncode != 0` (:302) - the result object is discarded. workspace.git (aisef2/orchestrate/workspace.py:64-72) runs with capture_output and `encoding='utf-8', errors='replace'`, so the extra output is captured and cannot raise or reach a terminal. Measured at the snapshot (original vs mutant, same host): identical refs, HEAD, log (tree, author, committer, message), local configuration, .git layout and workspace listing.",
+   "consumers_checked": [
+    "aisef2/app/confine.py:300-303 (the tuple and its only reader), :304-307 (the worktree add: its own -q and its stderr)",
+    "aisef2/orchestrate/workspace.py:48-50 (_env: GIT_* redirections dropped, isolated configuration), :52-62 (config_problems runs before every git call), :64-72 (git())",
+    "no other reader: the tuple is local to _worktree; the three validation guests call `_worktree`, not the tuple",
+    "tests/v2/test_v21_kills3_A07.py (_worktree), T07a.py (the measurement repository is a real git repo)"
+   ],
+   "exceptions_checked": [
+    "output read for a decision: only :306 reads `.stderr`, of the worktree-add call",
+    "a git whose exit depends on -q: none; rc 0 both ways (measured)",
+    "caller-supplied GIT_* / configuration changing the summary path: _GIT_ENV_DROPPED + _ISOLATED_GIT, the repository is new and its configuration inert (INERT_KEY allowlist)",
+    "a locale-dependent hint: captured, not read"
+   ],
+   "what_changed_since_b5c2457": "Nothing it reads: workspace.py is not among round 3's changed files; confine.py's tuple moved 234 -> 300.",
+   "refutation": "none found: state differential identical (see grounds); no reader of the output.",
+   "note": "Not owed. The proof is git's documented --quiet semantics plus a reader that reads only the exit status."
+  },
+  {
+   "target": "aisef2/app/confine.py::_worktree",
+   "index": 23,
+   "mutant": "L300 element 5 dropped",
+   "class_before": "EQUIVALENT",
+   "verdict": "CONFIRMED",
+   "class_after": "EQUIVALENT",
+   "grounds": "The dropped element is the `-q` of `git commit -q --allow-empty` (confine.py:300-301). `--quiet` only suppresses the commit summary; the commit is empty (--allow-empty) with identities given by -c on the same line, so there is nothing for the summary machinery to fail on, and the only reader is `.returncode != 0` (:302). Output is captured and decoded with replacement (workspace.py:64-72). Measured at the snapshot: identical repository state with and without -q (refs, HEAD, tree, author, committer, message, config).",
+   "consumers_checked": [
+    "aisef2/app/confine.py:300-303",
+    "aisef2/orchestrate/workspace.py:48-72",
+    "no other reader (local tuple)",
+    "tests/v2/test_v21_kills3_A07.py, T07a.py"
+   ],
+   "exceptions_checked": [
+    "summary diff machinery failing and changing the exit: a fresh repository with an inert configuration (config_problems), GIT_EXTERNAL_DIFF/GIT_DIFF_OPTS/GIT_PAGER dropped by _GIT_ENV_DROPPED; rc 0 measured",
+    "identity prompts/hints: identities are given with -c, unchanged by the mutant",
+    "a pager started for the summary: stdout is a pipe, GIT_PAGER dropped"
+   ],
+   "what_changed_since_b5c2457": "Nothing it reads (workspace.py unchanged); tuple moved 234 -> 300.",
+   "refutation": "none found: state differential identical; no reader of the output.",
+   "note": "Not owed."
+  },
+  {
+   "target": "aisef2/app/confine.py::measure",
+   "index": 49,
+   "mutant": "L327 string '/' emptied",
+   "class_before": "EQUIVALENT",
+   "verdict": "CONFIRMED",
+   "class_after": "EQUIVALENT",
+   "grounds": "confine.py:326-327: the call `wrap(spec, cmd, env, '/', system=system)` sits under `if not system.startswith('linux')`; wrap's first statement (:181-182) tests the same predicate on the same `system` and raises Unavailable(f'... this host is {system}: no backend') before any use of `workspace`; no other statement of wrap runs; the message holds no workspace; the handler :338-339 returns it as problems identically. '/' and '' are never read. Differential at the snapshot (original vs mutant, measure() on darwin, win32, cygwin, freebsd14, '', 'Linux', aix, sunos5, 'Linux2'): identical result dicts, no directory made.",
+   "consumers_checked": [
+    "aisef2/app/confine.py:181-182 (wrap's first statement) and :338-339 (the only handler of Unavailable in measure)",
+    "tests/v2/test_v21_confine.py:471-482 (test_a_host_that_is_not_linux_has_no_backend: the problem text and that `where` is not made); :446-469 and test_v21_kills3_T06b.py:176-205 (spies on wrap run with system='linux': the guarded call is not reached)",
+    "aisef2/app/cli.py:82-95 and run.py:401-405 (measure's callers pass the real system)",
+    "validation/v21/sandbox/measure.py:136-140, r3_conf_guest.py:128 (system='linux')"
+   ],
+   "exceptions_checked": [
+    "a non-str `system`: .startswith raises AttributeError at :326 before the call, in both",
+    "a future wrap that reads `workspace` before checking `system`: wrap's first statement is the check today (unchanged since b5c2457: wrap is not among round 3's hunks)",
+    "system 'Linux' (capitalised): not startswith('linux') in both, the same refusal (measured)",
+    "a test double for wrap that records its arguments with a non-linux system: none (every spy passes system='linux')"
+   ],
+   "what_changed_since_b5c2457": "Nothing it reads: wrap is untouched; measure's own env no longer carries LANG (:322) and the line moved 260 -> 327.",
+   "refutation": "none found: dominance by wrap's first statement; the differential above agrees.",
+   "note": "Not owed."
+  },
+  {
+   "target": "aisef2/app/confine.py::problem",
+   "index": 32,
+   "mutant": "L122 sorted() -> list()",
+   "class_before": "EQUIVALENT",
+   "verdict": "CONFIRMED",
+   "class_after": "EQUIVALENT",
+   "grounds": "`sorted(spec) != list(KEYS)` and `sorted(spec) != sorted(KEYS)` (confine.py:122) are the same predicate: KEYS (:46) is a module-level tuple literal written in sorted order ('backend' < 'bwrap' < 'network' < 'read_only') and is never rebound (`KEYS =` appears once in confine.py; no patch.object(confine, 'KEYS') anywhere), so sorted(KEYS) == list(KEYS) for every run of the program.",
+   "consumers_checked": [
+    "aisef2/app/confine.py:46,122-123",
+    "aisef2/app/settings.py:153-158 (passes spec only; raises SettingsError(why))",
+    "validation/v2/mutation.py:667 (names KEYS as a mutation target of its own, not a reader)",
+    "tests/v2/test_v21_kills3_T06b.py:89 (`{k: rep.get(k) for k in confine.KEYS}`: reads KEYS, never reorders it); T07b.py:37-39 ('alphabetical, as confine.KEYS is'; a local set)"
+   ],
+   "exceptions_checked": [
+    "KEYS reordered in a later edit: then every valid setting is refused and tests/v2/test_v21_confine.py::Setting.test_absent_is_none_and_given_is_kept fails - another program than the one measured",
+    "a Mapping whose iteration order differs from sorted order: sorted(spec) in both",
+    "a non-Mapping: short-circuited before the comparison in both",
+    "non-str keys making sorted raise: the same TypeError in both"
+   ],
+   "what_changed_since_b5c2457": "Nothing it reads (KEYS and the line are unchanged; 97 -> 122).",
+   "refutation": "none found.",
+   "note": "Not owed."
+  },
+  {
+   "target": "aisef2/app/confine.py::problem",
+   "index": 34,
+   "mutant": "L123 string '}' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "The mutant drops the literal closing brace of 'confinement is {backend, bwrap, network, read_only}' (confine.py:123). The text is the SettingsError reason an operator reads (cli.py:92-94 prints it after 'aisef run: refused:') or the verifier prints in a problem line (verify.py:58-63 \"the record's settings do not load: {e}\"); both interpolate it with an f-string, nothing parses it, matches its closing bracket or uses it as a format template, and nothing follows it that it could fuse with (it is raised on its own: run.py:405 joins measure()'s problems, never problem()'s). The tests that touch it match 'confinement is' (test_v21_confine.py:326) or each key as a word (T07b.py:126-129, words() ignores punctuation).",
+   "consumers_checked": [
+    "aisef2/app/confine.py:123",
+    "aisef2/app/settings.py:153-158",
+    "aisef2/app/cli.py:92-94",
+    "aisef2/app/verify.py:58-63 and :194 (the verifier re-loads the record's settings: the text appears in a problem line only; the verdict does not depend on it)",
+    "tests/v2/test_v21_confine.py:316-327, test_v21_kills3_T07b.py:119-129, test_v21_kills3_T22a.py:183-203 (uses a non-confinement bad setting)",
+    "grep 'confinement is {' and 'backend, bwrap, network' over docs/ aisef2/ validation/ tests/ README*: confine.py only (closure-evidence holds the strings inside recorded test tails, which nothing reads back)"
+   ],
+   "exceptions_checked": [
+    "the message used as a str.format/%-template (an unclosed brace would matter): no .format or % over SettingsError text; argparse's p.error is not given it",
+    "joined with other problems so the brace is a delimiter: no, raised alone",
+    "a reader of RUN.json/verify output looking for the brace-delimited key list: none (it is prose)"
+   ],
+   "what_changed_since_b5c2457": "Nothing it reads: the line moved 98 -> 123; verify.py's settings-load path moved :39-41 -> :58-63 (same code).",
+   "refutation": "none found. the 21 test files that reach confine at the snapshot (the registered kill files of the target and the five round-3 files test_v21_r3_conf_policy/_rv_hostrows/_fu_before/_locale/client_readers, plus T13a/T23a/defects): every one passes with this mutant applied in a COPY of the snapshot tree (harness checked: a known-killed mutant, _survivors[1], fails TO2 there) (plus T14b, T24a, T26a, defects_bundleshape, test_app_run, test_app_units).",
+   "note": "Not owed (bracket punctuation of a message nothing parses)."
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "index": 42,
+   "mutant": "L198 string '/.local/share' emptied",
+   "class_before": "AUDITED",
+   "verdict": "REFUTED",
+   "class_after": "KILLED (existing test, not registered for wrap)",
+   "grounds": "The earlier grounds hold as to behaviour: the mutant moves XDG_DATA_HOME from /aisef-home/.local/share to the sandbox HOME itself, the per-session `--tmpfs /aisef-home` (confine.py:171), so what the client writes still lands in the namespace's own tmpfs and dies with it; the other two XDG variables keep distinct subdirectories (:198-199); nothing in the probe reads XDG_* (PROBE uses $1..$9). What no longer holds is 'nothing reads a value back / no test separates it': since round 3 the environment wrap returns is handed, value for value, to the probe's subprocess (_probe :349, :373) and a requirement test pins it exactly. The test the earlier grounds cite (test_v21_confine.py, test_home_is_an_empty_tmpfs_...:395-400) only asserts `startswith(confine.HOME)` (:399), which the mutant satisfies (its value IS confine.HOME).",
+   "consumers_checked": [
+    "aisef2/app/confine.py:198-199 (the three XDG values; :171 the HOME tmpfs), :196-200 (wrap returns argv, inside)",
+    "aisef2/app/confine.py:349 and :373 (NEW reader: run_env = inside_env minus LC_*/LANG plus LOCALE is the env of the probe's subprocess.run)",
+    "tests/v2/test_v21_r3_conf_locale.py:104-112 (the exact-equality reader; NEW in round 3), :114-117 (test_a_session_keeps_its_own_locale: family only)",
+    "tests/v2/test_v21_confine.py:395-405 (startswith only: passes the mutant), :150-160,202-203 (own env tables)",
+    "aisef2/app/client.py:131-137 (environment(): operator's pass-through names, overwritten by wrap) and :216-224 (wrap -> ProcessRange(env=env); the session result is the client's stdout log)",
+    "validation/v21/sandbox/measure.py:66-76,136-140 and linux_guest.py:269-272 (env passed on, XDG_* never read)",
+    "docs/v2.1/SANDBOX-LINUX.md:56,138; docs/v2.1/decisions/B03-R3-conf.md (:27-28 and §4.5 The locale, :142): the environment 'is what the session wrapper gives' is the contract the test pins"
+   ],
+   "exceptions_checked": [
+    "the variable coinciding with another XDG directory: only this one moves; the other keep /aisef-home/.local/share|.local/state|.cache and XDG_CONFIG_HOME is the operator's configuration base or /aisef-home/.config",
+    "the directory host-backed or read-only: /aisef-home is --tmpfs, mounted before every bind (argv :171-173)",
+    "something reading the store after the session: the stream is stdout; nothing opens the sandbox HOME; the next session has a new tmpfs",
+    "the probe's HOME listing: _judge lists the OPERATOR's HOME ($5) before the client writes anything",
+    "a test OUTSIDE wrap's registered kill files that reads the value: found, see refutation (the registered list is V21_TARGETS['aisef2/app/confine.py::wrap'] = test_v21_confine, kills3_A07, kills3_T07b; mutation.py:792 and _V21_R3_APPEND :927-941 do not name the locale file for wrap)"
+   ],
+   "what_changed_since_b5c2457": "WP conf (locale) made the environment wrap returns the probe's own environment (_probe :349, :373 via `measure`) and added PassedDown, which pins it exactly; wrap itself is unchanged (:177-200), so its registered kill set was not extended.",
+   "refutation": "Input: confine.measure(spec, where, exe, environ={'PATH','HOME','XDG_CONFIG_HOME'}, system='linux') with subprocess.run recorded. Reader: tests/v2/test_v21_r3_conf_locale.py::PassedDown.test_the_rest_of_the_environment_is_what_the_session_wrapper_gives (:104-112): it runs confine.measure with a recorder for subprocess.run and asserts the probe's environment, minus the locale family, EQUALS {PATH, HOME=/aisef-home, TMPDIR=/tmp, XDG_DATA_HOME=/aisef-home/.local/share, XDG_STATE_HOME=/aisef-home/.local/state, XDG_CACHE_HOME=/aisef-home/.cache, XDG_CONFIG_HOME}. Run at the snapshot with the mutant applied it FAILS (XDG_DATA_HOME='/aisef-home' instead of the expected value); on the unmutated copy all 10 tests of the file pass. Test owed: none to write; register tests/v2/test_v21_r3_conf_locale.py for 'aisef2/app/confine.py::wrap' (V21_TARGETS via _V21_R3_APPEND in validation/v2/mutation.py) and re-run the wrap mutants. Optional tightening of test_v21_confine.py:399 to `startswith(confine.HOME + '/')` and the three exact values.",
+   "note": "Same finding for wrap 42, 43 and 44 (each killed by the same single test, each failing on its own variable). The mutants are harmless to the host as the old audit said; they are not undetected. Cites refreshed: client.py :207/:213 -> :218/:224, mutation.py _FRESH :925 -> :1235."
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "index": 43,
+   "mutant": "L198 string '/.local/state' emptied",
+   "class_before": "AUDITED",
+   "verdict": "REFUTED",
+   "class_after": "KILLED (existing test, not registered for wrap)",
+   "grounds": "The earlier grounds hold as to behaviour: the mutant moves XDG_STATE_HOME from /aisef-home/.local/state to the sandbox HOME itself, the per-session `--tmpfs /aisef-home` (confine.py:171), so what the client writes still lands in the namespace's own tmpfs and dies with it; the other two XDG variables keep distinct subdirectories (:198-199); nothing in the probe reads XDG_* (PROBE uses $1..$9). What no longer holds is 'nothing reads a value back / no test separates it': since round 3 the environment wrap returns is handed, value for value, to the probe's subprocess (_probe :349, :373) and a requirement test pins it exactly. The test the earlier grounds cite (test_v21_confine.py, test_home_is_an_empty_tmpfs_...:395-400) only asserts `startswith(confine.HOME)` (:399), which the mutant satisfies (its value IS confine.HOME).",
+   "consumers_checked": [
+    "aisef2/app/confine.py:198-199 (the three XDG values; :171 the HOME tmpfs), :196-200 (wrap returns argv, inside)",
+    "aisef2/app/confine.py:349 and :373 (NEW reader: run_env = inside_env minus LC_*/LANG plus LOCALE is the env of the probe's subprocess.run)",
+    "tests/v2/test_v21_r3_conf_locale.py:104-112 (the exact-equality reader; NEW in round 3), :114-117 (test_a_session_keeps_its_own_locale: family only)",
+    "tests/v2/test_v21_confine.py:395-405 (startswith only: passes the mutant), :150-160,202-203 (own env tables)",
+    "aisef2/app/client.py:131-137 (environment(): operator's pass-through names, overwritten by wrap) and :216-224 (wrap -> ProcessRange(env=env); the session result is the client's stdout log)",
+    "validation/v21/sandbox/measure.py:66-76,136-140 and linux_guest.py:269-272 (env passed on, XDG_* never read)",
+    "docs/v2.1/SANDBOX-LINUX.md:56,138; docs/v2.1/decisions/B03-R3-conf.md (:27-28 and §4.5 The locale, :142): the environment 'is what the session wrapper gives' is the contract the test pins"
+   ],
+   "exceptions_checked": [
+    "the variable coinciding with another XDG directory: only this one moves; the other keep /aisef-home/.local/share|.local/state|.cache and XDG_CONFIG_HOME is the operator's configuration base or /aisef-home/.config",
+    "the directory host-backed or read-only: /aisef-home is --tmpfs, mounted before every bind (argv :171-173)",
+    "something reading the store after the session: the stream is stdout; nothing opens the sandbox HOME; the next session has a new tmpfs",
+    "the probe's HOME listing: _judge lists the OPERATOR's HOME ($5) before the client writes anything",
+    "a test OUTSIDE wrap's registered kill files that reads the value: found, see refutation (the registered list is V21_TARGETS['aisef2/app/confine.py::wrap'] = test_v21_confine, kills3_A07, kills3_T07b; mutation.py:792 and _V21_R3_APPEND :927-941 do not name the locale file for wrap)"
+   ],
+   "what_changed_since_b5c2457": "WP conf (locale) made the environment wrap returns the probe's own environment (_probe :349, :373 via `measure`) and added PassedDown, which pins it exactly; wrap itself is unchanged (:177-200), so its registered kill set was not extended.",
+   "refutation": "Input: confine.measure(spec, where, exe, environ={'PATH','HOME','XDG_CONFIG_HOME'}, system='linux') with subprocess.run recorded. Reader: tests/v2/test_v21_r3_conf_locale.py::PassedDown.test_the_rest_of_the_environment_is_what_the_session_wrapper_gives (:104-112): it runs confine.measure with a recorder for subprocess.run and asserts the probe's environment, minus the locale family, EQUALS {PATH, HOME=/aisef-home, TMPDIR=/tmp, XDG_DATA_HOME=/aisef-home/.local/share, XDG_STATE_HOME=/aisef-home/.local/state, XDG_CACHE_HOME=/aisef-home/.cache, XDG_CONFIG_HOME}. Run at the snapshot with the mutant applied it FAILS (XDG_STATE_HOME='/aisef-home' instead of the expected value); on the unmutated copy all 10 tests of the file pass. Test owed: none to write; register tests/v2/test_v21_r3_conf_locale.py for 'aisef2/app/confine.py::wrap' (V21_TARGETS via _V21_R3_APPEND in validation/v2/mutation.py) and re-run the wrap mutants. Optional tightening of test_v21_confine.py:399 to `startswith(confine.HOME + '/')` and the three exact values.",
+   "note": "Same finding for wrap 42, 43 and 44 (each killed by the same single test, each failing on its own variable). The mutants are harmless to the host as the old audit said; they are not undetected. Cites refreshed: client.py :207/:213 -> :218/:224, mutation.py _FRESH :925 -> :1235."
+  },
+  {
+   "target": "aisef2/app/confine.py::wrap",
+   "index": 44,
+   "mutant": "L199 string '/.cache' emptied",
+   "class_before": "AUDITED",
+   "verdict": "REFUTED",
+   "class_after": "KILLED (existing test, not registered for wrap)",
+   "grounds": "The earlier grounds hold as to behaviour: the mutant moves XDG_CACHE_HOME from /aisef-home/.cache to the sandbox HOME itself, the per-session `--tmpfs /aisef-home` (confine.py:171), so what the client writes still lands in the namespace's own tmpfs and dies with it; the other two XDG variables keep distinct subdirectories (:198-199); nothing in the probe reads XDG_* (PROBE uses $1..$9). What no longer holds is 'nothing reads a value back / no test separates it': since round 3 the environment wrap returns is handed, value for value, to the probe's subprocess (_probe :349, :373) and a requirement test pins it exactly. The test the earlier grounds cite (test_v21_confine.py, test_home_is_an_empty_tmpfs_...:395-400) only asserts `startswith(confine.HOME)` (:399), which the mutant satisfies (its value IS confine.HOME).",
+   "consumers_checked": [
+    "aisef2/app/confine.py:198-199 (the three XDG values; :171 the HOME tmpfs), :196-200 (wrap returns argv, inside)",
+    "aisef2/app/confine.py:349 and :373 (NEW reader: run_env = inside_env minus LC_*/LANG plus LOCALE is the env of the probe's subprocess.run)",
+    "tests/v2/test_v21_r3_conf_locale.py:104-112 (the exact-equality reader; NEW in round 3), :114-117 (test_a_session_keeps_its_own_locale: family only)",
+    "tests/v2/test_v21_confine.py:395-405 (startswith only: passes the mutant), :150-160,202-203 (own env tables)",
+    "aisef2/app/client.py:131-137 (environment(): operator's pass-through names, overwritten by wrap) and :216-224 (wrap -> ProcessRange(env=env); the session result is the client's stdout log)",
+    "validation/v21/sandbox/measure.py:66-76,136-140 and linux_guest.py:269-272 (env passed on, XDG_* never read)",
+    "docs/v2.1/SANDBOX-LINUX.md:56,138; docs/v2.1/decisions/B03-R3-conf.md (:27-28 and §4.5 The locale, :142): the environment 'is what the session wrapper gives' is the contract the test pins"
+   ],
+   "exceptions_checked": [
+    "the variable coinciding with another XDG directory: only this one moves; the other keep /aisef-home/.local/share|.local/state|.cache and XDG_CONFIG_HOME is the operator's configuration base or /aisef-home/.config",
+    "the directory host-backed or read-only: /aisef-home is --tmpfs, mounted before every bind (argv :171-173)",
+    "something reading the store after the session: the stream is stdout; nothing opens the sandbox HOME; the next session has a new tmpfs",
+    "the probe's HOME listing: _judge lists the OPERATOR's HOME ($5) before the client writes anything",
+    "a test OUTSIDE wrap's registered kill files that reads the value: found, see refutation (the registered list is V21_TARGETS['aisef2/app/confine.py::wrap'] = test_v21_confine, kills3_A07, kills3_T07b; mutation.py:792 and _V21_R3_APPEND :927-941 do not name the locale file for wrap)"
+   ],
+   "what_changed_since_b5c2457": "WP conf (locale) made the environment wrap returns the probe's own environment (_probe :349, :373 via `measure`) and added PassedDown, which pins it exactly; wrap itself is unchanged (:177-200), so its registered kill set was not extended.",
+   "refutation": "Input: confine.measure(spec, where, exe, environ={'PATH','HOME','XDG_CONFIG_HOME'}, system='linux') with subprocess.run recorded. Reader: tests/v2/test_v21_r3_conf_locale.py::PassedDown.test_the_rest_of_the_environment_is_what_the_session_wrapper_gives (:104-112): it runs confine.measure with a recorder for subprocess.run and asserts the probe's environment, minus the locale family, EQUALS {PATH, HOME=/aisef-home, TMPDIR=/tmp, XDG_DATA_HOME=/aisef-home/.local/share, XDG_STATE_HOME=/aisef-home/.local/state, XDG_CACHE_HOME=/aisef-home/.cache, XDG_CONFIG_HOME}. Run at the snapshot with the mutant applied it FAILS (XDG_CACHE_HOME='/aisef-home' instead of the expected value); on the unmutated copy all 10 tests of the file pass. Test owed: none to write; register tests/v2/test_v21_r3_conf_locale.py for 'aisef2/app/confine.py::wrap' (V21_TARGETS via _V21_R3_APPEND in validation/v2/mutation.py) and re-run the wrap mutants. Optional tightening of test_v21_confine.py:399 to `startswith(confine.HOME + '/')` and the three exact values.",
+   "note": "Same finding for wrap 42, 43 and 44 (each killed by the same single test, each failing on its own variable). The mutants are harmless to the host as the old audit said; they are not undetected. Cites refreshed: client.py :207/:213 -> :218/:224, mutation.py _FRESH :925 -> :1235."
+  }
+ ]
+}

@@ -1,0 +1,292 @@
+[
+ {
+  "target": "aisef2/app/review_verify.py::anchor",
+  "index": 69,
+  "mutant": "L228 string 'approved contract ' emptied",
+  "class": "AUDITED",
+  "source_sha256": "9a5fafceeeaa117ea41c78ec7797604b45bb3bf8d6c4f20db6b2fa1059838513",
+  "group": "lead-in label word of the CONTRADICTS_APPROVED sentence whose id, predicate and parsed outcome are pinned",
+  "grounds": "Mutated: \"BC-b decides this stimulus otherwise: {...}\": the id is a whole token (asserted), 'decides this stimulus' and the outcome intact ([69] SURVIVED, [70] KILLED). 'approved' is carried by the status name and by the loop, which compares approved contracts only.",
+  "consumers_checked": [
+   "aisef2/app/adapters.py:123-129 (Reviewer.review, the only caller of anchor() and detail(): f['anchor']['why'] = a.reason into RUN.json sessions[].findings[], and detail() into the review gate row)",
+   "aisef2/orchestrate/review.py:43-46 with aisef2/orchestrate/adapters.py:64-65 (the row passes unless blocking AND corroborated: an UNANCHORED/CONTRADICTS_APPROVED reason never fails a row, so aisef2/app/feedback.py:76-80 never prints it)",
+   "tests/v2/test_v21_review_chain.py:319 assertIn('BC-USAGE-0', anchor_why): holds on the mutant"
+  ],
+  "exceptions_checked": [
+   "an id not recognisable as a contract id without the label: status CONTRADICTS_APPROVED and Anchor.contracts == (id,) (asserted) say what it is",
+   "the outcome fused to the id: not here, the predicate is kept (that fusion is [70])"
+  ],
+  "batch": "A15",
+  "reviewed": true,
+  "remapped_from": {
+   "index": 69,
+   "mutant": "L217 string 'approved contract ' emptied",
+   "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+  }
+ },
+ {
+  "target": "aisef2/app/review_verify.py::reproducer_contract",
+  "index": 28,
+  "mutant": "L122 element 0 dropped",
+  "class": "EQUIVALENT",
+  "source_sha256": "9a5fafceeeaa117ea41c78ec7797604b45bb3bf8d6c4f20db6b2fa1059838513",
+  "group": "A15 / T25-EQ: a subclass listed next to its base class in one except tuple",
+  "grounds": "review_verify.py:111 `except (ContractError, ValueError, TypeError) as e`; the mutant drops element 0. aisef2/product/contract.py:26 `class ContractError(ValueError)`: every ContractError instance is a ValueError and is matched by element 1 into the same handler, same `e`, same returned f-string. The name is bound once, by the import at review_verify.py:53 (it occurs only at :53 and :111; grep over aisef2/ and validation/ finds the single definition at contract.py:26 and three subclasses, PlanError plan/obligation.py:25, CompileError product/compiler.py:40, UnapprovedContract product/approval.py:22, all ValueError by inheritance). kill_check of the behavioural scratch test (a NaN observable makes BehaviorContract.create raise ContractError; the reason carries 'finite'): [28] SURVIVED, as a proof by hierarchy requires.",
+  "consumers_checked": [
+   "aisef2/app/review_verify.py:119-120 verify(): `if isinstance(c, str): return Verification(UNVERIFIABLE, c)`; :205-206 anchor(): same branch -> UNANCHORED with the reason; the reason text is identical in both forms",
+   "tests/v2/test_v21_kills3_T15a.py ReproducerThatIsNotAContractIsAReason and test_v21_kills3_A15.py: assert the refusal is a reason carrying the cause for ContractError cases; both pass on the mutant",
+   "aisef2/plan/obligation.py, aisef2/product/compiler.py, aisef2/product/approval.py: raise subclasses of ContractError from code that is not in this try block"
+  ],
+  "exceptions_checked": [
+   "a ContractError that is not a ValueError: impossible by class definition (contract.py:26); separable only by rebinding aisef2.product.contract.ContractError, not an input; a module reload re-creates the class but still as a ValueError subclass",
+   "a ContractError raised outside the try block: unaffected by the clause",
+   "lint (reviewer measured): on a sed copy of the mutated module ruff F401 reports `ContractError imported but unused` (the other mutants of this batch pass F/B/E9); CI's `ruff check .` (tests.yml) would therefore refuse this mutant, which is the lint gate, not a behaviour, and kill_check does not run it"
+  ],
+  "batch": "R06",
+  "reviewed": true,
+  "remapped_from": {
+   "index": 28,
+   "mutant": "L111 element 0 dropped",
+   "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+  }
+ },
+ {
+  "target": "aisef2/app/review_verify.py::reproducer_contract",
+  "index": 30,
+  "mutant": "L122 element 2 dropped",
+  "class": "AUDITED",
+  "source_sha256": "9a5fafceeeaa117ea41c78ec7797604b45bb3bf8d6c4f20db6b2fa1059838513",
+  "group": "defensive element for a type no producer can raise",
+  "grounds": "20000 generated JSON-shaped findings (atoms incl. unhashable kinds, lone surrogates, 2**70, nested lists/dicts, missing/extra keys; 776 built a contract): original and mutant identical, no TypeError (tools/A15-fuzz.py). SubjectKind(unhashable) falls back to a search and raises ValueError. Findings reach this function only from json.loads.",
+  "consumers_checked": [
+   "review_verify.py:112 (verify) and :198 (anchor): the only callers; their findings come from adapters.py:149 and review_ocr.py:168 (json.loads) and are filtered to dict at adapters.py:153,123,235",
+   "git grep reproducer_contract over aisef2/validation/tests: tests call it with JSON dicts"
+  ],
+  "exceptions_checked": [
+   "a hostile non-JSON Mapping: differs; no producer in aisef2, validation or tests builds one",
+   "int-to-str limit (4300 digits): ValueError, and json.loads cannot yield such an int under the default limit"
+  ],
+  "batch": "A15",
+  "reviewed": true,
+  "remapped_from": {
+   "index": 30,
+   "mutant": "L111 element 2 dropped",
+   "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+  }
+ },
+ {
+  "target": "aisef2/app/review_verify.py::reproducer_contract",
+  "index": 33,
+  "mutant": "L107 string 'the clause ' emptied",
+  "class": "AUDITED",
+  "source_sha256": "9a5fafceeeaa117ea41c78ec7797604b45bb3bf8d6c4f20db6b2fa1059838513",
+  "group": "lead-in label word of the 'names no requirement' refusal whose clause literal and predicate are pinned",
+  "grounds": "Mutated: \"'R-404/1' names no requirement of the project\": quoted clause and predicate intact ([31] SURVIVED, [32] KILLED).",
+  "consumers_checked": [
+   "aisef2/app/adapters.py:234-239 (Reviewer._verify -> verify() -> Verification.reason -> f['verification']['why'] and detail()'s 'why'[:300]); UNVERIFIABLE never blocks (blocks() needs CONFIRMED), so feedback.py never prints it",
+   "tests/v2/test_v21_review.py:146 asserts the status only; git grep 'names no requirement': aisef/control/machine_gate.py:142 and tests/hardening/test_ac_proof_machine_gate.py:73 are the v1 gate's own string"
+  ],
+  "exceptions_checked": [
+   "the quoted literal read as a bare string: it is the repr, quotes kept",
+   "an empty clause: repr '' either way"
+  ],
+  "batch": "A15",
+  "reviewed": true,
+  "remapped_from": {
+   "index": 33,
+   "mutant": "L96 string 'the clause ' emptied",
+   "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+  }
+ },
+ {
+  "target": "aisef2/app/review_verify.py::reproducer_contract",
+  "index": 40,
+  "mutant": "L114 string 'the subject ' emptied",
+  "class": "AUDITED",
+  "source_sha256": "9a5fafceeeaa117ea41c78ec7797604b45bb3bf8d6c4f20db6b2fa1059838513",
+  "group": "lead-in label word of the 'not in the product' refusal whose locator, predicate and roots are pinned",
+  "grounds": "Mutated: \"'json:__main__' is not in the product (['app', 'tests'])\": locator token, 'not in the product' and each root asserted ([38] SURVIVED, [39] KILLED).",
+  "consumers_checked": [
+   "aisef2/app/adapters.py:234-239 (Reviewer._verify -> verify() -> Verification.reason -> f['verification']['why'] and detail()'s 'why'[:300]); UNVERIFIABLE never blocks (blocks() needs CONFIRMED), so feedback.py never prints it",
+   "tests/v2/test_v21_review.py:147 asserts the status only"
+  ],
+  "exceptions_checked": [
+   "the repr'd locator fused to the preceding word: nothing precedes it, the quotes bound it",
+   "a 'path:' locator: the label never depended on the kind"
+  ],
+  "batch": "A15",
+  "reviewed": true,
+  "remapped_from": {
+   "index": 40,
+   "mutant": "L103 string 'the subject ' emptied",
+   "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+  }
+ },
+ {
+  "target": "aisef2/app/review_verify.py::reproducer_contract",
+  "index": 42,
+  "mutant": "L114 string ')' emptied",
+  "class": "AUDITED",
+  "source_sha256": "9a5fafceeeaa117ea41c78ec7797604b45bb3bf8d6c4f20db6b2fa1059838513",
+  "group": "closing punctuation of a list that is itself bracketed and ends the string",
+  "grounds": "Mutated reason ends \"...(['app', 'tests']\": the roots are a bracketed list repr and the string ends there; locator, predicate and roots asserted ([40] SURVIVED).",
+  "consumers_checked": [
+   "aisef2/app/adapters.py:234-239 (Reviewer._verify -> verify() -> Verification.reason -> f['verification']['why'] and detail()'s 'why'[:300]); UNVERIFIABLE never blocks (blocks() needs CONFIRMED), so feedback.py never prints it",
+   "no code splits or parses the reason (git grep over aisef2/validation/tests)"
+  ],
+  "exceptions_checked": [
+   "the reason cut by detail()'s 'why'[:300] before its end: happens only for a locator of ~250+ characters, and removes the ')' under the original too",
+   "a following sentence this paren would separate: the string is returned whole"
+  ],
+  "batch": "A15",
+  "reviewed": true,
+  "remapped_from": {
+   "index": 42,
+   "mutant": "L103 string ')' emptied",
+   "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+  }
+ },
+ {
+  "target": "aisef2/app/review_verify.py::reproducer_contract",
+  "index": 46,
+  "mutant": "L114 sorted() -> list()",
+  "class": "AUDITED",
+  "source_sha256": "9a5fafceeeaa117ea41c78ec7797604b45bb3bf8d6c4f20db6b2fa1059838513",
+  "group": "order of a list printed for a person",
+  "grounds": "Differs only when product_roots is not alphabetical. bundle.dump writes sorted roots (bundle.py:146) and the seal path uses it; bundle.load keeps a hand-made file's order (bundle.py:75-77,187) and feedback.py:47 prints project.product_roots in that same order, so the mutant agrees with the developer's task text. The set of roots is asserted; no order is promised anywhere.",
+  "consumers_checked": [
+   "aisef2/app/adapters.py:234-239 (Reviewer._verify -> verify() -> Verification.reason -> f['verification']['why'] and detail()'s 'why'[:300]); UNVERIFIABLE never blocks (blocks() needs CONFIRMED), so feedback.py never prints it",
+   "aisef2/app/bundle.py:75-77,146,187; aisef2/app/feedback.py:47; adapters.py:171,182,238 (membership / globs, order-free)"
+  ],
+  "exceptions_checked": [
+   "product_roots passed as a set (list(set) order varies with the hash seed): every caller passes Project.product_roots, a tuple",
+   "a byte-stability requirement across runs: for one bundle both forms are deterministic and nothing re-derives the text"
+  ],
+  "batch": "A15",
+  "reviewed": true,
+  "remapped_from": {
+   "index": 46,
+   "mutant": "L103 sorted() -> list()",
+   "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+  }
+ },
+ {
+  "target": "aisef2/app/review_verify.py::verify",
+  "index": 20,
+  "mutant": "L155 string ' observes the stated behaviour: the finding does not reproduce' emptied",
+  "class": "AUDITED",
+  "source_sha256": "9a5fafceeeaa117ea41c78ec7797604b45bb3bf8d6c4f20db6b2fa1059838513",
+  "group": "A reason whose cause class is carried by status/observed beside it (NOT_REPRODUCED), unlike UNVERIFIABLE [21]/[22].",
+  "grounds": "The emptied sentence ' observes the stated behaviour: the finding does not reproduce' restates what the adjacent fields of the same Verification already carry (status NOT_REPRODUCED, probe id, observed verdict, all always set on this return). A NOT_REPRODUCED finding has no evidence (Verification.evidence() is '' unless CONFIRMED), so Finding.blocks is False, its gate row is passed and informational, and the developer's retry prompt prints only passed-False rows: the reason is never shown to anyone as an instruction. Unlike the UNVERIFIABLE reasons [21]/[22], where the reason is the only statement of the cause, here the cause class is the status. The sentence is also inaccurate on one path (verdict INDETERMINATE gets it; re-measured by me with observation-indeterminate.py: NOT_REPRODUCED, observed 'INDETERMINATE'), so pinning it would pin a false sentence. I tried to refute: no reader parses it.",
+  "consumers_checked": [
+   "aisef2/app/adapters.py:124-129 (journals f['verification'] = {status, why, probe, observed} and review_verify.detail; status/probe/observed beside why; Finding evidence only when confirmed)",
+   "aisef2/orchestrate/adapters.py:63-65 (Finding.blocks = blocking and bool(corroborated_by); NOT_REPRODUCED has none) and aisef2/orchestrate/review.py:43-46 (gate row passed = not blocks, detail informational)",
+   "aisef2/app/feedback.py:76-80 (retry feedback prints only gate rows with passed False for REVIEW_FINDING)",
+   "validation/qualification/authority_limits.py (AST of verify: statuses and run_probe order; no string constant of a reason is read) and tests/v2/test_v21_authority_limits.py (edits the L125 refusal text only)",
+   "tests/v2/test_v21_review_chain.py:324 and test_v21_review.py HistoricalDefects (assert status NOT_REPRODUCED / blocks, never the reason); tests/v2/test_v21_kills_adapters.py:143 (a fake's why passed through)",
+   "grep of aisef2/, validation/, docs/, tests/ for 'observes the stated' and 'does not reproduce': only review_verify.py:137"
+  ],
+  "exceptions_checked": [
+   "a reader with only the reason: observed and probe are separate fields, always set on this return",
+   "a blocking use: NOT_REPRODUCED is never CONFIRMED, never evidence, never in the retry prompt (Finding.blocks needs corroborated_by)",
+   "INDETERMINATE answered NOT_REPRODUCED with this sentence: reproduced; observed carries the truth, no decision depends on it; owner ruling whether INDETERMINATE belongs under UNVERIFIABLE",
+   "authority_limits source analysis: looked for string-constant or reason readers, none"
+  ],
+  "batch": "T16a",
+  "reviewed": true,
+  "remapped_from": {
+   "index": 20,
+   "mutant": "L144 string ' observes the stated behaviour: the finding does not reproduce' emptied",
+   "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+  }
+ },
+ {
+  "target": "aisef2/app/review_verify.py::verify",
+  "index": 24,
+  "mutant": "L143 string ' at the bytes that run: an unqualified observation corroborates nothing' emptied",
+  "class": "AUDITED",
+  "source_sha256": "9a5fafceeeaa117ea41c78ec7797604b45bb3bf8d6c4f20db6b2fa1059838513",
+  "group": "GRP-AUDIT-UNCAL-TAIL (separate from [23], which is killed).",
+  "grounds": "Explanatory tail of a refusal whose cause token, identifying elements, status and probe are intact.",
+  "consumers_checked": [
+   "aisef2/app/review_verify.py L124-126, L247",
+   "aisef2/probe/calibration.py calibration_for/executing (the keying)",
+   "aisef2/app/adapters.py:124,129,131; aisef2/orchestrate/review.py:43-46; aisef2/app/feedback.py:76-80; aisef2/app/run.py:500",
+   "validation/qualification/authority_limits.py:416-438, 468 (call shape / message about the checker, not this text)",
+   "tests/v2/test_v21_authority_limits.py:401-403,440-442 (source anchors, measured: 2 failures)",
+   "docs/, README*.md: no hit"
+  ],
+  "exceptions_checked": [
+   "an operator who must learn that a calibration of another digest does not count: the unmutated text never said it apart from 'at the bytes that run', the same constant for both cases",
+   "the cause being erased: only if [23] and [24] were both applied (each alone leaves one of the two)",
+   "a parser of the consequence clause: none; D-002's 'unqualified observation corroborates nothing' is enforced by blocks() (status == CONFIRMED only), not by this text"
+  ],
+  "batch": "A16",
+  "reviewed": true,
+  "remapped_from": {
+   "index": 24,
+   "mutant": "L132 string ' at the bytes that run: an unqualified observation corroborates nothing' emptied",
+   "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+  }
+ },
+ {
+  "target": "aisef2/app/review_verify.py::verify",
+  "index": 28,
+  "mutant": "L153 string ' is said to demand' emptied",
+  "class": "AUDITED",
+  "source_sha256": "9a5fafceeeaa117ea41c78ec7797604b45bb3bf8d6c4f20db6b2fa1059838513",
+  "group": "A16",
+  "grounds": "Epistemic qualifier in prose whose information is also machine-carried (status, anchor.status).",
+  "consumers_checked": [
+   "aisef2/app/review_verify.py L134-136, L236-239, L242-250",
+   "aisef2/app/adapters.py:122-131",
+   "aisef2/orchestrate/review.py:43-46",
+   "aisef2/app/feedback.py:76-80",
+   "aisef2/app/run.py:500",
+   "tests/v2/test_v21_review_chain.py FixLoop (assert fields and the retry prompt line, not the why)",
+   "tests/v2/test_v21_authority_limits.py (no anchor on L135: measured, 0 failures)",
+   "git grep 'is said to demand|refutes the behaviour': the source line only"
+  ],
+  "exceptions_checked": [
+   "a person reading CONFIRMED+UNANCHORED/CONTRADICTS_APPROVED: residual risk, mitigated by anchor/anchor_why in the same detail",
+   "a blocking row whose requirement is not demanded: cannot arise (blocking needs ANCHORED, which needs constant == expected, L231-233)",
+   "ids running together: 'R-9' is the last token, the probe id the first"
+  ],
+  "batch": "A16",
+  "reviewed": true,
+  "remapped_from": {
+   "index": 28,
+   "mutant": "L142 string ' is said to demand' emptied",
+   "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+  }
+ },
+ {
+  "target": "aisef2/app/review_verify.py::verify",
+  "index": 29,
+  "mutant": "L150 string 'the probe did not execute the reproducer: ' emptied",
+  "class": "AUDITED",
+  "source_sha256": "9a5fafceeeaa117ea41c78ec7797604b45bb3bf8d6c4f20db6b2fa1059838513",
+  "group": "A16",
+  "grounds": "Lead phrase in front of a typed result that is itself the cause.",
+  "consumers_checked": [
+   "aisef2/app/review_verify.py L131-132, L247",
+   "aisef2/product/outcome.py:54-68; aisef2/probe/protocol.py:203-204, 224-235, 283-285",
+   "aisef2/app/adapters.py:124,129,131; aisef2/orchestrate/review.py:43-46; aisef2/app/feedback.py:76-80; aisef2/app/run.py:500",
+   "aisef2/orchestrate/story_runner.py:288 reads 'review: REVIEW_FINDING' failure details, not gate rows",
+   "tests/v2/test_v21_authority_limits.py (no anchor on L132: measured)",
+   "git grep 'did not execute the reproducer': the source line only"
+  ],
+  "exceptions_checked": [
+   "a result whose repr does not name its cause: only Unrunnable/InvalidSpec exist, Executed never reaches L132",
+   "an empty detail: the class name still names the cause, and the lead phrase did not either",
+   "a consumer matching the lead phrase to classify why a finding was not verified: none"
+  ],
+  "batch": "A16",
+  "reviewed": true,
+  "remapped_from": {
+   "index": 29,
+   "mutant": "L139 string 'the probe did not execute the reproducer: ' emptied",
+   "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+  }
+ }
+]

@@ -1,0 +1,510 @@
+[
+ {
+  "target": "aisef2/app/adapters.py::Reviewer._ocr",
+  "index": 10,
+  "mutant": "L197 sorted() -> list()",
+  "class": "AUDITED",
+  "source_sha256": "2ee59736532802d7287a6948c5eade35e75f0e65282eaf3327b18bb5d0339aa2",
+  "group": "ORDER: a list the record carries whose order no consumer reads",
+  "grounds": "`required` (adapters.py:172) goes to three places only: review_ocr.coverage(), whose first statement is `required = sorted(set(required))` (review_ocr.py:80), so its `missing[:10]` and reasons do not depend on the caller's order; review_ocr.findings() `set(required)` (membership only); and the session record (adapters.py:220 -> run.py:491 -> RUN.json). The mutant yields git's own row order, which equals sorted() for every ASCII or valid-UTF-8 path (tree order = byte order of the full names = code-point order). It differs only where git's bytes and the decoded text disagree (an invalid UTF-8 byte under the allowlisted core.quotepath=false decodes to U+FFFD): then one list in RUN.json is ordered differently. Hence AUDITED, not EQUIVALENT. Nothing reads that order.",
+  "consumers_checked": [
+   "aisef2/app/review_ocr.py:80 coverage() re-sorts its copy; :144 findings() builds set(required)",
+   "aisef2/app/run.py:491 (RUN.json sessions, only 'text' stripped), :293-295 (evidence manifest hashes the written bytes)",
+   "aisef2/app/verify.py (never reads rec['sessions'])",
+   "grep of 'required' / \"required\" session reads over aisef2, validation, scripts, tests, docs: only tests/v2/test_v21_review_chain.py:387 (== [], order-free)"
+  ],
+  "exceptions_checked": [
+   "a reader of the order: none found; docs/v2.1 does not describe sessions[].required",
+   "invalid UTF-8 byte under core.quotepath=false: order differs (implementer and triage verifier measured), no reader",
+   "an ordering option reaching git: workspace.INERT_KEY has no diff.* key (diff.orderFile is refused by git()) and _GIT_ENV_DROPPED removes GIT_DIFF_OPTS and GIT_EXTERNAL_DIFF (workspace.py:34-44)",
+   "non-ASCII names under the default quotepath are not an order question: the C-quoted row fails the product-root filter and never reaches `required` (reviewer's defect-2)"
+  ],
+  "batch": "A10",
+  "reviewed": true,
+  "remapped_from": {
+   "index": 10,
+   "mutant": "L178 sorted() -> list()",
+   "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+  }
+ },
+ {
+  "target": "aisef2/app/adapters.py::Reviewer._ocr",
+  "index": 89,
+  "mutant": "L234 dict entry 2 dropped",
+  "class": "AUDITED",
+  "source_sha256": "2ee59736532802d7287a6948c5eade35e75f0e65282eaf3327b18bb5d0339aa2",
+  "group": "REASONING: constant-0 token class every reader takes as int(tk.get('reasoning') or 0)",
+  "grounds": "adapters.py:204 writes the constant 0 under `reasoning`. Every reader asks for the key by name with a default: client.read_session (client.py:62, `tk['output'] + int(tk.get('reasoning') or 0)`), usage.session_tokens (usage.py:65), release_smoke.py:291, c2_p9.py:425. Absent and 0 give the same number, the usage `reasoning` class stays 0 and cost (usage.py:72) and --verify's re-derivation (verify.py:142-148) are unchanged. Only the stream line's bytes differ, which EVIDENCE.json hashes as written.",
+  "consumers_checked": [
+   "aisef2/app/client.py:54-63",
+   "aisef2/app/usage.py:57-65, :72",
+   "aisef2/app/verify.py:142-148 (usage via the same readers)",
+   "validation/qualification/release_smoke.py:289-291, c2_p9.py:417-425"
+  ],
+  "exceptions_checked": [
+   "a reader indexing tk['reasoning']: grep of 'reasoning' over aisef2, validation, scripts, tests finds only .get(...) or 0 readers and fixtures that write it",
+   "a reader validating the tokens object's key set or iterating its items: none (client.py:56-62 and usage.py:57-65 read named keys)",
+   "a nonzero value: the value is the literal 0"
+  ],
+  "batch": "A10",
+  "reviewed": true,
+  "remapped_from": {
+   "index": 79,
+   "mutant": "L210 dict entry 2 dropped",
+   "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+  }
+ },
+ {
+  "target": "aisef2/app/adapters.py::Reviewer._ocr",
+  "index": 121,
+  "mutant": "L250 sorted() -> list()",
+  "class": "AUDITED",
+  "source_sha256": "2ee59736532802d7287a6948c5eade35e75f0e65282eaf3327b18bb5d0339aa2",
+  "group": "ORDER: a list the record carries whose order no consumer reads (here no reader of the list at all)",
+  "grounds": "`deleted` (adapters.py:220) has no reader: grep of \"deleted\"/'deleted' as a session key over aisef2, validation, scripts, tests, docs finds only this writer; verify.py does not re-derive it. The mutant keeps git's order for the same set (equal to sorted() except for an invalid UTF-8 byte under core.quotepath=false, see [8]).",
+  "consumers_checked": [
+   "grep for the session key 'deleted' over aisef2, validation, scripts, tests, docs: adapters.py:220 only",
+   "aisef2/app/run.py:491 (RUN.json writer), aisef2/app/verify.py (does not read sessions)"
+  ],
+  "exceptions_checked": [
+   "an order contract on the record's lists: none in run.py's layout docstring or docs/v2.1",
+   "invalid UTF-8 path under quotepath=false: order differs, no reader",
+   "a deleted path also in `required`: `required` filters k != 'D' and `deleted` k == 'D' over the same `mine`, disjoint"
+  ],
+  "batch": "A10",
+  "reviewed": true,
+  "remapped_from": {
+   "index": 113,
+   "mutant": "L226 sorted() -> list()",
+   "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+  }
+ },
+ {
+  "target": "aisef2/app/adapters.py::Reviewer._ocr",
+  "index": 152,
+  "mutant": "L219 string 'ocr preview ' emptied",
+  "class": "AUDITED",
+  "source_sha256": "2ee59736532802d7287a6948c5eade35e75f0e65282eaf3327b18bb5d0339aa2",
+  "group": "PROCESS-LABEL: the ProcessRange name of the preview and of the review process",
+  "grounds": "`name` is read in process_range.py only in five exception texts (:307 already started, :325 the target did not start, :411 anchor reaped, :428 not empty, :445 processes left the range); the ProcessRange built by _bounded is not acquired through a StoryScope, so no story/resource_* journal event carries it; no code matches those texts (grep of 'did not start', 'left the range', 'not empty after' outside process_range.py: none); callers catch RangeError by class (security.py:42, the probes). The text reaches RUN.json story_errors as 'RangeError: ...'. With this mutant the preview's failure text starts with the bare story id while the review's keeps 'ocr review S1', so the two stay distinguishable; RangeNotEmpty/RangeEscaped also list each member's command line (the preview's carries --preview).",
+  "consumers_checked": [
+   "aisef2/runtime/process_range.py:290-325, :411, :428, :445 (the only uses of .name)",
+   "aisef2/runtime/story_scope.py:86-150 (acquired resources only)",
+   "aisef2/app/run.py:467 (story_errors) and :238-252 (counts, reads no text)",
+   "aisef2/orchestrate/security.py:42, aisef2/probe/*.py, aisef2/quality/test_execution.py (catch RangeError by class)",
+   "grep for 'ocr preview' over aisef2, validation, scripts, tests, docs: adapters.py:194 only"
+  ],
+  "exceptions_checked": [
+   "both labels lost at once: not one build (this mutant keeps 'ocr review S1'; [147] is a separate mutant that keeps 'ocr preview S1')",
+   "a registry keyed on the name: ProcessRange keeps none; its ledger holds stage/signal/at",
+   "a RangeError at start (no command list): the story id stays, which of the two processes it was is told by preview.log vs ocr.log and by the stream existing only after the preview"
+  ],
+  "batch": "A10",
+  "reviewed": true,
+  "remapped_from": {
+   "index": 144,
+   "mutant": "L200 string 'ocr preview ' emptied",
+   "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+  }
+ },
+ {
+  "target": "aisef2/app/adapters.py::Reviewer._ocr",
+  "index": 155,
+  "mutant": "L224 True->False",
+  "class": "AUDITED",
+  "source_sha256": "2ee59736532802d7287a6948c5eade35e75f0e65282eaf3327b18bb5d0339aa2",
+  "group": "MKDIR-PARENTS: a directory whose parent the preceding statement has just created",
+  "grounds": "`log.parent` is `self.logs` for every story id without a path separator, and its parent `self.logs.parent` has just been created by `(work / 'home').mkdir(parents=True)` (adapters.py:179-180, work = self.logs.parent/'review'/...), so the single-level mkdir cannot find a missing parent; exist_ok is unchanged. The two differ only for a story id holding a separator ('a/b': log.parent = sessions/a with sessions/ absent), which never reaches _ocr: story_runner.py:179 acquires ws.scratch(f'scratch-{story_id}') first, TemporaryDirectory(prefix='scratch-a/b-', dir=root) cannot create root/scratch-a/b-XXXX (no root/scratch-a: scratch names are scratch-<id>-<random>), workspace.py:123-128 turns the OSError into ResourceUnavailable and no adapter is called.",
+  "consumers_checked": [
+   "aisef2/app/adapters.py:179-180, :196",
+   "aisef2/orchestrate/story_runner.py:178-182 (scratch before any adapter call)",
+   "aisef2/orchestrate/workspace.py:123-128 (scratch: OSError -> ResourceUnavailable)",
+   "aisef2/app/bundle.py:83-95 (no story-id format check, so this guard is what excludes separators)"
+  ],
+  "exceptions_checked": [
+   "a story id with a separator reaching _ocr: refused at story_runner.py:179 first",
+   "self.logs.parent missing: created at :180 with parents=True before :196",
+   "a direct call of _ocr with such an id (a test, not a run): the original creates sessions/a, the mutant raises; no caller does this"
+  ],
+  "batch": "A10",
+  "reviewed": true,
+  "remapped_from": {
+   "index": 146,
+   "mutant": "L202 True->False",
+   "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+  }
+ },
+ {
+  "target": "aisef2/app/adapters.py::Reviewer._ocr",
+  "index": 159,
+  "mutant": "L228 string 'ocr review ' emptied",
+  "class": "AUDITED",
+  "source_sha256": "2ee59736532802d7287a6948c5eade35e75f0e65282eaf3327b18bb5d0339aa2",
+  "group": "PROCESS-LABEL: the ProcessRange name of the preview and of the review process",
+  "grounds": "As [141] for the review process: 'ocr review S1' becomes 'S1' in the same five exception texts of process_range.py; nothing parses them, no journal event carries the name, the preview keeps 'ocr preview S1' and a RangeNotEmpty/RangeEscaped text still lists each member's command line (the review's has no --preview).",
+  "consumers_checked": [
+   "aisef2/runtime/process_range.py:307, :325, :411, :428, :445",
+   "aisef2/app/adapters.py:200 (the only place the label is built)",
+   "aisef2/app/run.py:467 (story_errors) and :238-252",
+   "grep for 'ocr review' over aisef2, validation, scripts, tests, docs: adapters.py:200 and the review_ocr.py docstring about the command"
+  ],
+  "exceptions_checked": [
+   "the two labels both lost: this mutant keeps the preview's",
+   "a stage ambiguity in a RangeError at start: ocr.log is opened 'x' per process and exists only after the preview finished",
+   "a consumer matching the prefix 'ocr ': grep of \"ocr \" literal prefix / startswith over aisef2 and validation: none"
+  ],
+  "batch": "A10",
+  "reviewed": true,
+  "remapped_from": {
+   "index": 150,
+   "mutant": "L206 string 'ocr review ' emptied",
+   "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+  }
+ },
+ {
+  "target": "aisef2/app/adapters.py::Reviewer._ocr",
+  "index": 166,
+  "mutant": "L234 string 'reasoning' emptied",
+  "class": "AUDITED",
+  "source_sha256": "2ee59736532802d7287a6948c5eade35e75f0e65282eaf3327b18bb5d0339aa2",
+  "group": "REASONING: constant-0 token class every reader takes as int(tk.get('reasoning') or 0)",
+  "grounds": "As [75] with the constant 0 written under the key '' and `reasoning` absent: every reader asks for 'reasoning' by name and gets 0 (client.py:62, usage.py:65, release_smoke.py:291, c2_p9.py:425); none iterates the tokens object's keys, so '' is never seen ('' is a valid JSON key, json.loads accepts it). Same budget, usage account and --verify result; only the stream line's bytes differ.",
+  "consumers_checked": [
+   "aisef2/app/client.py:54-63",
+   "aisef2/app/usage.py:57-65",
+   "aisef2/app/verify.py:142-148",
+   "validation/qualification/release_smoke.py:289-291, c2_p9.py:417-425"
+  ],
+  "exceptions_checked": [
+   "a reader iterating tokens.items() or comparing the key set: none",
+   "client.redact on the line: replaces bytes inside the file, independent of key names",
+   "the '' key shadowing another key: the object holds input, output, '', cache; no duplicate"
+  ],
+  "batch": "A10",
+  "reviewed": true,
+  "remapped_from": {
+   "index": 157,
+   "mutant": "L210 string 'reasoning' emptied",
+   "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+  }
+ },
+ {
+  "target": "aisef2/app/adapters.py::Reviewer._ocr",
+  "index": 262,
+  "mutant": "L262 string ')' emptied",
+  "class": "AUDITED",
+  "source_sha256": "2ee59736532802d7287a6948c5eade35e75f0e65282eaf3327b18bb5d0339aa2",
+  "group": "DETAIL-PUNCT: punctuation of the coverage detail where every token stays intact and nothing follows it",
+  "grounds": "The mutant leaves the reasons group unclosed at the end of the string: the status and every reason stay intact and delimited. Nothing is appended after it on any path that returns it: reasons exist iff the status is INDETERMINATE (review_ocr.coverage: COMPLETE iff no reasons); under fix-loop an INDETERMINATE review raises at adapters.py:229-230 and never returns the detail; the returned detail then only occurs under advisory, where review_verify.blocks (review_verify.py:236-239) is false for every finding (it requires policy == 'fix-loop') and review_ocr.findings() sets blocking False, so Reviewer.review appends neither ', confirmed=N' nor (OCR path) ', parsed=...'. The 300-character cut is applied inside the parenthesis. The detail is journaled as provider/result.detail as given (orchestrate/review.py:40) and nothing parses a '(' after the status.",
+  "consumers_checked": [
+   "aisef2/app/adapters.py:131-135 (composition of the review's detail)",
+   "aisef2/app/review_verify.py:236-239 (blocks), aisef2/app/review_ocr.py findings() (blocking False)",
+   "aisef2/orchestrate/review.py:40 (journaled as given)",
+   "aisef2/app/feedback.py:134-135 (context pack reads only the DEVELOPER request's result), :69-80 (retry feedback reads failure/observed, whose detail is 'review: <code>', story_runner.py:288)",
+   "tests/v2/test_v21_review_chain.py:368 and test_v21_kills_adapters.py:149-152 (assert the status as a substring)"
+  ],
+  "exceptions_checked": [
+   "a suffix after the parenthesis: ', confirmed=N' needs fix-loop plus a returned INDETERMINATE, which is refused first (settings POLICIES holds exactly fix-loop and advisory); ', parsed=' is the model finder's",
+   "a reader tokenising the detail on parentheses: none",
+   "truncation at 300 characters swallowing the parenthesis: the cut precedes it"
+  ],
+  "batch": "A10",
+  "reviewed": true,
+  "remapped_from": {
+   "index": 254,
+   "mutant": "L238 string ')' emptied",
+   "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+  }
+ },
+ {
+  "target": "aisef2/app/adapters.py::Reviewer._ocr",
+  "index": 285,
+  "mutant": "L243 True->False",
+  "class": "AUDITED",
+  "source_sha256": "2ee59736532802d7287a6948c5eade35e75f0e65282eaf3327b18bb5d0339aa2",
+  "group": "SORTKEYS: byte form of the stream's JSON lines",
+  "grounds": "Only the member order of the JSON objects written to the stream changes (the nested OCR documents keep OCR's order instead of sorted). Every reader parses each line with json.loads into a dict and reads named keys (client.read_session client.py:43-63, usage.session_tokens usage.py:50-65, c2_p9.py:417, release_smoke.py:289); none matches a line by prefix or key order. client.redact (client.py:169-181) replaces secret bytes in the raw file, a count independent of key order. EVIDENCE.json hashes the stream as written (run.py:293-295; only RUN.json is canonically re-serialised, run.py:278-286), so no digest is recomputed over another serialisation. sort_keys=True could only raise TypeError on a non-str key: the lines are literals plus json.loads output (str keys), so neither version can raise.",
+  "consumers_checked": [
+   "aisef2/app/client.py:35-63, :169-181",
+   "aisef2/app/usage.py:40-69",
+   "aisef2/app/run.py:278-295",
+   "aisef2/app/verify.py:142-148, aisef2/app/lineage.py:241-247",
+   "validation/qualification/c2_p9.py:417, release_smoke.py:281-297",
+   "grep of ocr_preview/ocr_output/ocr_started over aisef2, validation, scripts, tests, docs: adapters.py only"
+  ],
+  "exceptions_checked": [
+   "a reader matching a line by prefix such as startswith('{\"type\"'): none for these streams (read_session tests only startswith('{') then json.loads)",
+   "a digest over a re-serialisation of the lines: none",
+   "a secret split by key punctuation: a provider token holds none and redact works on the final bytes"
+  ],
+  "batch": "A10",
+  "reviewed": true,
+  "remapped_from": {
+   "index": 277,
+   "mutant": "L219 True->False",
+   "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+  }
+ },
+ {
+  "target": "aisef2/app/cli.py::run",
+  "index": 108,
+  "mutant": "L102 string ': ' emptied",
+  "class": "AUDITED",
+  "source_sha256": "555806041859c41be1cc47e6d95aecfbcb5cc5910cb0dd0835108e2be3ffd04e",
+  "group": "an operator-read stderr line whose identifying elements are pinned elsewhere; only a connective separator is left",
+  "grounds": "Nothing parses the pair; the machine channels are the stdout document and exit status 2, both asserted by T23a.",
+  "consumers_checked": [
+   "aisef2/app/cli.py:101-103 (only producer); git grep -e 'anchor was NOT' over aisef2, aisef, validation, tests: only cli.py",
+   "docs/v2.1/ANCHOR-THREAT-MODEL.md:52-54 (promises: message on stderr, exit 2, evidence unaffected, printed anchor usable)",
+   "T23a AnchorCopy.test_a_copy_that_cannot_be_written_exits_2_whatever_the_verdict_and_the_printed_anchor_stays and test_a_writer_that_refuses_the_anchor_is_also_only_the_copy_failing",
+   "aisef2/app/lineage.py:335-345 (what can be raised)"
+  ],
+  "exceptions_checked": [
+   "OSError subclasses: str(e) starts with '[Errno N]' (POSIX) or '[WinError N]' (Windows): type and text distinguishable without the separator",
+   "ValueError whose text starts with a letter: only the two unreachable cases above; both are still handled as the copy failing (T23a [59])"
+  ],
+  "batch": "A23",
+  "reviewed": true
+ },
+ {
+  "target": "aisef2/app/cli.py::run",
+  "index": 114,
+  "mutant": "L84 string 'aisef-confine-' emptied",
+  "class": "AUDITED",
+  "source_sha256": "555806041859c41be1cc47e6d95aecfbcb5cc5910cb0dd0835108e2be3ffd04e",
+  "group": "a temporary-directory name prefix: a breadcrumb for a human, read by no code",
+  "grounds": "The directory is created and removed by the `with` (cli.py:84-85), holds no evidence and decides nothing.",
+  "consumers_checked": [
+   "git grep -n 'aisef-confine' over aisef, aisef2, validation, tests, docs: cli.py:84 and confine.py:46,53,283 (different strings)",
+   "aisef2/app/confine.py:223-336,355-420 (_worktree, measure, _probe, _within, _judge: all derived from `where`)",
+   "validation/v2/destructive_authority.py:69 and cleanup_authority.py (creators and cwd prefixes of the mutation runner's own directories)",
+   "tests/v2/test_v21_confine.py:804-834 (class Check patches confine.measure, never inspects `where`)"
+  ],
+  "exceptions_checked": [
+   "a cleanup glob or leak detector keyed on the prefix: none exists; leftover probe files are reported by absolute path (confine.py:326-333)",
+   "a leading '-' in the name reaching git/bwrap: the paths are absolute and mkdtemp's alphabet is [a-z0-9_]",
+   "non-Linux: cli.py creates the (empty) directory, measure raises Unavailable before making anything inside it (confine.py:256-257); the name is irrelevant",
+   "sibling [115] (the 'confinement' sub-directory name) is behaviour and belongs to T23a"
+  ],
+  "batch": "A23",
+  "reviewed": true
+ },
+ {
+  "target": "aisef2/app/feedback.py::context_pack",
+  "index": 40,
+  "mutant": "L171 sorted() -> list()",
+  "class": "EQUIVALENT",
+  "source_sha256": "1b02a7bcc4351211075699033e8ad56f6541fb0374657051bbcdde82a50fabae",
+  "group": "A17",
+  "grounds": "L171 `unproved` is read only at L172 (`if unproved:`, truthiness) and L173 (`named((k, 0) for k in unproved)`); named() starts with `sorted(rows)` (L148) over (criterion, 0) pairs whose criteria are distinct str elements of a set difference, so the pairs order by criterion whatever order `unproved` had; `shown`, `more`, the PACK_LIST cut and both joins derive from that sorted list; `unproved` is local, never returned or stored. Re-derived from the code by me; supplementary only: 600 random journals (up to 30 criteria, 1-3 attempts, 1,034 'no proof recorded' lines) original vs mutant, 0 differences.",
+  "consumers_checked": [
+   "aisef2/app/feedback.py L171-174 (the only readers of `unproved`) and named() L147-150",
+   "aisef2/app/adapters.py:71 (Developer.implement, the only product caller: uses the text only)",
+   "validation/v21/cli_integration/readback.py:35, validation/v21/context_gap.py:193 (text only)",
+   "validation/v21/context_pack_mutants.py (its L171 hand mutant changes the content of the set difference, not its order)",
+   "tests/v2/test_v21_context_pack.py:108,142,191,273,299,457 assert the line's text; both forms produce it identically"
+  ],
+  "exceptions_checked": [
+   "ties in sorted(rows): impossible, set elements are distinct and `(k, 0)` has a constant second member",
+   "non-str criteria: a['criteria'] is map(str, ...) (L131) and a['proofs'] keys are str(...) (L138)",
+   "PACK_LIST cut (which twelve are shown): the slice is taken after named()'s own sort",
+   "set iteration order varying between processes (hash randomisation): re-sorted in named()",
+   "coupling to [87] (the sort in named() itself): mutants are measured one at a time; the equivalence rests on named()'s sort being present, which it is on the measured module"
+  ],
+  "batch": "A17",
+  "reviewed": true
+ },
+ {
+  "target": "aisef2/app/feedback.py::context_pack",
+  "index": 110,
+  "mutant": "L131 sorted() -> list()",
+  "class": "EQUIVALENT",
+  "source_sha256": "1b02a7bcc4351211075699033e8ad56f6541fb0374657051bbcdde82a50fabae",
+  "group": "A17",
+  "grounds": "L131 stores cur['criteria']; grep 'criteria' in feedback.py finds only L127 (init), L131 (the mutated store) and L171 `set(a['criteria'])` (a = {**cur, 'end': seq}, L142). set() discards the list order and the enclosing sorted() (L171) imposes name order, then named() sorts again; so sorted() vs list() on L131 cannot reach any output. Both forms iterate d.get('dispositions') or {} through map(str, ...): same elements, same TypeError for a non-iterable at the same point. `cur`/`ended` are locals; only `text` leaves context_pack. Supplementary differential (same 600 journals): 0 differences.",
+  "consumers_checked": [
+   "aisef2/app/feedback.py: every occurrence of 'criteria' (L12 docstring, L127, L131, L171)",
+   "aisef2/app/adapters.py:71 and validation/v21/cli_integration/readback.py:35, validation/v21/context_gap.py:193 consume the returned text only",
+   "validation/v21/context_pack_mutants.py:37 hand mutant removes `- set(a['proofs'])`: content, not order",
+   "tests/v2/test_v21_context_pack.py: asserts on the rendered lines only; no access to the intermediate list"
+  ],
+  "exceptions_checked": [
+   "a second story/admitted in one attempt: overwrites cur['criteria'] identically in both forms",
+   "str() collisions (1 and '1'): duplicates in the list, merged by set() in both",
+   "another reader of the list order (a line printing criteria in journal order): none, L154-174 print parent, seq, result, candidate, proofs and the unproved set",
+   "sorted() raising on mixed types: every element is str after map(str, ...)",
+   "aliasing of the list through {**cur, 'end': seq}: never mutated in place after the store"
+  ],
+  "batch": "A17",
+  "reviewed": true
+ },
+ {
+  "target": "aisef2/app/preflight.py::http_transport",
+  "index": 13,
+  "mutant": "L47 element 0 dropped",
+  "class": "AUDITED",
+  "source_sha256": "89a195632ef5045ec4bd9a73b4642b53dd87ebeef8dadbe26ea634d5c9c72c51",
+  "group": "T25-AUD-ANNOTATION: the return annotation of the nested def `call` (preflight.py:47), two elements of one unevaluated string",
+  "grounds": "The mutant changes only call.__annotations__['return'] ('tuple[dict,]' for 'tuple[int, dict]'); under `from __future__ import annotations` (preflight.py:7) it is one string nothing evaluates; call's result, exceptions and requests are identical (the runtime shape (status, document) is asserted by value in tests/v2/test_s2_kills_rc2.py::Transport.test_a_post_asks_for_one_json_answer_and_a_get_sends_no_body). Reproduced by me: kill_check of the implementer's scratch DeclaredReturnType test (typing.get_type_hints(call)['return'] == tuple[int, dict]) KILLS [13] and [14] and the behavioural URLError test kills neither; the six kill files of the target do not. Not EQUIVALENT in the strict sense (introspection separates it); not a requirement anyone relies on: a test of the annotation is the declaration equal to itself. REVISED by reviewer: grounds extended with the runner's own policy (validation/v2/mutation.py:1028 `_inert` calls every annotation inert and only fails to descend into nested defs: a generator gap, not a behaviour) and with the ruff result on the mutated source; the disposition is the implementer's. Round 1's reviewed A25 audit gave the same pair (then [7],[8]) EQUIVALENT; AUDITED is the stricter and stands.",
+  "consumers_checked": [
+   "aisef2/app/run.py:409 builds the transport and hands it to preflight.run; aisef2/app/preflight.py:101 and :110 `code, body = transport(...)` unpack the 2-tuple call returns (checked: line numbers match); preflight.run's `transport` parameter is unannotated, so no typed consumer of the closure's return type exists",
+   "grep over aisef2/ validation/ tests/ for __annotations__|get_type_hints|get_annotations|annotationlib|inspect.signature|eval_str|autospec|typeguard|beartype|pydantic|validate_call: no reader reaches `call` (a closure, never a module member); the only mock.patch of http_transport (tests/v2/test_app_run.py:355) uses side_effect, not autospec",
+   "pyproject.toml:68 select = [F, B, E9]; reviewer ran ruff on a sed copy of the mutated module: `All checks passed!`; no mypy/pyright/pytype/pyre in pyproject.toml or .github/workflows",
+   "validation/v2/mutation.py:1027-1038 `_inert`: the runner's own policy is that every annotation is inert (postponed, never evaluated); it exempts the target's own args/returns/AnnAssign but does not descend into nested defs, which is why `call`'s annotation was generated at all (reviewer addition)"
+  ],
+  "exceptions_checked": [
+   "a reader that unpacks the annotation to decide arity (autospec, dispatcher, serializer): none found (see above)",
+   "a static type checker reading `code, body = transport(...)` against a 1-tuple: none runs in this repository; this is the ceiling of the audit: if one is added, [13] and [14] become real findings and a declared-shape test would be warranted",
+   "evaluation of the annotation at import (PEP 649, Python 3.14): the module's `from __future__ import annotations` (preflight.py:7) keeps it a string; the mutant modules import and run under 3.14.7 (kc-scratch-http_transport.json: T0 PASS, [13]/[14] fail only in the get_type_hints test)"
+  ],
+  "batch": "R06",
+  "reviewed": true
+ },
+ {
+  "target": "aisef2/app/preflight.py::http_transport",
+  "index": 14,
+  "mutant": "L47 element 1 dropped",
+  "class": "AUDITED",
+  "source_sha256": "89a195632ef5045ec4bd9a73b4642b53dd87ebeef8dadbe26ea634d5c9c72c51",
+  "group": "T25-AUD-ANNOTATION: the return annotation of the nested def `call` (preflight.py:47), two elements of one unevaluated string",
+  "grounds": "Same mechanism as [13]: only call.__annotations__['return'] ('tuple[int,]') and inspect.signature(call).return_annotation differ; result, exception and request of `call` are identical. Separated only by the scratch get_type_hints test (reproduced: kc-scratch-http_transport.json [14] KILLED by it alone). REVISED by reviewer as [13]: runner policy (`_inert` does not descend into nested defs) and the ruff result added.",
+  "consumers_checked": [
+   "aisef2/app/run.py:409 builds the transport and hands it to preflight.run; aisef2/app/preflight.py:101 and :110 `code, body = transport(...)` unpack the 2-tuple call returns (checked: line numbers match); preflight.run's `transport` parameter is unannotated, so no typed consumer of the closure's return type exists",
+   "grep over aisef2/ validation/ tests/ for __annotations__|get_type_hints|get_annotations|annotationlib|inspect.signature|eval_str|autospec|typeguard|beartype|pydantic|validate_call: no reader reaches `call` (a closure, never a module member); the only mock.patch of http_transport (tests/v2/test_app_run.py:355) uses side_effect, not autospec",
+   "pyproject.toml:68 select = [F, B, E9]; reviewer ran ruff on a sed copy of the mutated module: `All checks passed!`; no mypy/pyright/pytype/pyre in pyproject.toml or .github/workflows",
+   "validation/v2/mutation.py:1027-1038 `_inert`: the runner's own policy is that every annotation is inert (postponed, never evaluated); it exempts the target's own args/returns/AnnAssign but does not descend into nested defs, which is why `call`'s annotation was generated at all (reviewer addition)"
+  ],
+  "exceptions_checked": [
+   "a reader that unpacks the annotation to decide arity (autospec, dispatcher, serializer): none found (see above)",
+   "a static type checker reading `code, body = transport(...)` against a 1-tuple: none runs in this repository; this is the ceiling of the audit: if one is added, [13] and [14] become real findings and a declared-shape test would be warranted",
+   "evaluation of the annotation at import (PEP 649, Python 3.14): the module's `from __future__ import annotations` (preflight.py:7) keeps it a string; the mutant modules import and run under 3.14.7 (kc-scratch-http_transport.json: T0 PASS, [13]/[14] fail only in the get_type_hints test)"
+  ],
+  "batch": "R06",
+  "reviewed": true
+ },
+ {
+  "target": "aisef2/app/settings.py::read",
+  "index": 5,
+  "mutant": "L218 string ': ' emptied",
+  "class": "AUDITED",
+  "source_sha256": "d24e645641798243016f0656b293fed944456633c0de138c1dcf4b858017dc1e",
+  "group": "T26-READ-PUNCTUATION: [5], [6], [8] each drop one separator/closing character of a refusal that only the operator reads (cli.py prints it, exit 2); path, cause class and the exception's own text stay present, in order and delimited; the only tests that kill them pin that punctuation (shown: kc-scratch-read-candidates.json, optional-read-punctuation.py).",
+  "grounds": "Mutant text: \"<path>: cannot be read (FileNotFoundError[Errno 2] No such file ...)\". I tried to refute with a test of what an operator needs: the class as a word of its own (not glued to a letter/digit/_/-) PASSES on the mutant (the next character is '['); only the literal \"(FileNotFoundError: \" kills it, i.e. the colon. Measured by me (read_text on FileNotFound, IsADirectory, NotADirectory, Permission, ENAMETOOLONG, ELOOP): every OSError text begins with '[' ([Errno n]; Windows' [WinError n] by CPython's format), UnicodeDecodeError's with a quote, so class and text stay separable on both arms.",
+  "consumers_checked": [
+   "aisef2/app/cli.py L77, L92-93: the only caller of settings.read; prints `aisef run: refused: {e}` to stderr, returns 2",
+   "aisef2/app/verify.py L38-39 and L144-145: settings.load only; read's text never reaches it",
+   "validation/qualification/release_smoke.py L199-216 (runs `aisef run --settings`, keeps stderr_tail[-400:] as a record field, parses nothing) and release_rehearsal.py L120 (settings.load): git grep of aisef2/ validation/ tests/ docs/ finds no reader of 'cannot be read (' for settings",
+   "tests: test_v21_inputs.py::InputFiles (SettingsError type, exit 2, 'refused' in stderr), test_app_units.py L140 (read == load); T26a's ReadRefusal (path and class as words; the separator is not asserted)",
+   "docs: TRACEABILITY.md P-V2-04 / R-P1-13 promise exit 2 and the path; nothing promises '(Class: text)'"
+  ],
+  "exceptions_checked": [
+   "an OSError whose text begins with a word character (would make 'OSErrordisk'): none reachable from read_text, measured on six causes",
+   "UnicodeDecodeError arm (the verification's gap 1): begins with a quote; stated for both arms",
+   "a reader splitting on ': ' to get the class: none by grep",
+   "sibling bundle.read pins '(FileNotFoundError: ' in test_v21_kills_bundle.py::Read (B-03b): divergence is a decision, flagged to the owner (issues)"
+  ],
+  "batch": "A26",
+  "reviewed": true
+ },
+ {
+  "target": "aisef2/app/settings.py::read",
+  "index": 6,
+  "mutant": "L218 string ')' emptied",
+  "class": "AUDITED",
+  "source_sha256": "d24e645641798243016f0656b293fed944456633c0de138c1dcf4b858017dc1e",
+  "group": "T26-READ-PUNCTUATION: [5], [6], [8] each drop one separator/closing character of a refusal that only the operator reads (cli.py prints it, exit 2); path, cause class and the exception's own text stay present, in order and delimited; the only tests that kill them pin that punctuation (shown: kc-scratch-read-candidates.json, optional-read-punctuation.py).",
+  "grounds": "The message ends one character short; after it nothing is appended: cli.py prints it as the last element of the line. Only a test that the parenthesis is closed (endswith ')' / balanced count) kills it, which I confirmed with kill_check on a scratch candidate: it is punctuation. The path, class and OS text are unchanged and the OS text ends in the quoted path, so the cause is complete.",
+  "consumers_checked": [
+   "aisef2/app/cli.py L92-93 (prints the message verbatim, ends the line)",
+   "validation/qualification/release_smoke.py L216: stderr_tail[-400:] is a diagnostic field of the smoke record, not parsed",
+   "aisef2/app/verify.py L38-39, L145 (load only)",
+   "tests: test_v21_inputs.py::InputFiles (type and exit code only); test_v21_kills_bundle.py::Read pins endswith(')') for bundle.read, a different function"
+  ],
+  "exceptions_checked": [
+   "text appended after the message by a caller (an unclosed '(' would misparse): none, the only caller prints it verbatim",
+   "a parser that balances parentheses or strips ')': none by grep of aisef2/, validation/, tests/, docs/",
+   "a path that contains '(' (ambiguity about where the cause starts): the path comes first and is delimited by ': cannot be read (', which the mutant keeps"
+  ],
+  "batch": "A26",
+  "reviewed": true
+ },
+ {
+  "target": "aisef2/app/settings.py::read",
+  "index": 8,
+  "mutant": "L222 string ')' emptied",
+  "class": "AUDITED",
+  "source_sha256": "d24e645641798243016f0656b293fed944456633c0de138c1dcf4b858017dc1e",
+  "group": "T26-READ-PUNCTUATION: [5], [6], [8] each drop one separator/closing character of a refusal that only the operator reads (cli.py prints it, exit 2); path, cause class and the exception's own text stay present, in order and delimited; the only tests that kill them pin that punctuation (shown: kc-scratch-read-candidates.json, optional-read-punctuation.py).",
+  "grounds": "Mutant text: \"<path>: not JSON (Expecting property name enclosed in double quotes: line 1 column 2 (char 1)\" - file, category 'not JSON' and the decoder's text with its line/column/char are unchanged and the decoder's text ends in its own ')'; only the outer ')' is missing. Killed only by the balanced-parentheses candidate (kill_check, scratch): punctuation.",
+  "consumers_checked": [
+   "aisef2/app/cli.py L92-93 (the only reader, stderr)",
+   "tests: test_v21_inputs.py::InputFiles::test_cli_exit_2_for_unreadable_inputs (settings file '[1, 2': exit 2 and 'refused', not the text); T26a ReadRefusal::test_a_file_that_is_not_json (path then JSON as words; position text not asserted); test_v21_kills_bundle.py::Read pins bundle.read's whole not-JSON text, a different function",
+   "aisef2/app/verify.py (load only), validation/, docs/: no reader of settings.read's 'not JSON (' text"
+  ],
+  "exceptions_checked": [
+   "a ValueError from json.loads that is not a JSONDecodeError (the except catches ValueError): still the decoder's own text after the path and 'not JSON'",
+   "a reader keyed on the decoder's '(char N)' to locate the error: none by grep; the position stays in the text",
+   "a settings path containing ': ' or '(': the path is first, delimited by the following ': not JSON (', which the mutant keeps"
+  ],
+  "batch": "A26",
+  "reviewed": true
+ },
+ {
+  "target": "aisef2/orchestrate/story_runner.py::_attempt",
+  "index": 144,
+  "mutant": "L247 ObligationRole.PRESERVE->INTRODUCE",
+  "class": "EQUIVALENT",
+  "source_sha256": "db394816ee96297205094282647c5896bf3a417c9ebd1ba04f15dd32fe70a4d0",
+  "group": "T28-EQ-ROLE-AT-CANDIDATE: the label reaches route() only and every CANDIDATE row is role-independent (own trace per mutant, own label)",
+  "grounds": "Re-derived from BASE c4c1720, not taken from the hand-over. Value flow: story_runner.py:247-248 builds `preserved` (`ObligationRole` is read at no other line of that module); :250 `spec_id, role = obligations.get(cid) or preserved[cid]` (the plan's own role wins whenever the cid is one of the story's obligations); :251-253 hands `role` to prove() with the literal point MeasurementPoint.CANDIDATE. In prove() (proof.py:80-111) `role` is read once, at :107 `route(bound, spec, point, role)`; prove() refuses PARENT first (:86-87), and the Proof (:28-37), the probe/evaluated payloads (plain(record), protocol.py:189-200), the proof/verified payload (format3.verified_payload :233-246) and the gate row (`proof:{cid}`) carry no role. In route/row_for (routing.py:96-127) role has three readers: the isinstance guard (:114-115; all three labels are ObligationRole members), the table lookup (:125-126) and the fail-closed text (:102-103). Lookup: every role-keyed row of _EXECUTED is at PARENT (:70, :73, :76); the CANDIDATE rows (:81-85) are keyed role None, so .get((C, sat, reason, label)) misses and the `or` falls to the (C, sat, reason, None) row: the same Route for any label. The text is reachable only when row_for returns None; at CANDIDATE it cannot, by totality: Executed.__post_init__ (outcome.py:43-49) allows a reason only on INDETERMINATE and only an IndeterminateReason, which has exactly PRECONDITION_ABSENT and NON_CONTROLLER_SIGNAL (:28-33); contract_satisfaction (:71-79) yields SATISFIED/UNSATISFIED (reason None) or INDETERMINATE; the table has (C,S,None), (C,U,None), (C,I,PA), (C,I,NCS); UNRUNNABLE/INVALID_SPEC return at routing.py:120-123 before the lookup. Experiment (review/probe_attempt_label_identity.py, corroboration not proof): the real run_story/_attempt/GitWorkspace/two-party proof over three results of the affected PRESERVE criterion at the candidate (UNSATISFIED, SATISFIED, subject ABSENT -> SUBJECT_ABSENT_AT_CANDIDATE), label PRESERVE vs the mutant's label (ObligationRole is substituted in story_runner, which is the mutant exactly): the spy sees the label differ, the whole journal (types and payloads, SHAs/digests normalised by first appearance; BASE-vs-BASE control identical) and the attempt outcomes are identical in all 6 comparisons. Also re-ran the hand-over's routing probe: 56 cells, one Route across the 3 roles. [144] label INTRODUCE: the only place INTRODUCE differs from PRESERVE in the table is the PARENT PRECONDITION_ABSENT row (routing.py:70 READY vs :73 PRECONDITION_BROKEN); PARENT is refused by prove() before any role is read, so that row is unreachable from this call site. INTRODUCE is not a foreign label here either: the same loop proves the story's own INTRODUCE obligations at the candidate through the identical prove() call (obligations_of, proof.py:114-116).",
+  "consumers_checked": [
+   "aisef2/orchestrate/story_runner.py:247-253 (only reader of `preserved`; only reader of ObligationRole in the module)",
+   "aisef2/orchestrate/proof.py:80-111 (single read of role at :107), :28-37 Proof",
+   "aisef2/control/routing.py:67-127 (table, route, row_for); callers of route/row_for in aisef2: proof.py:107 and plan/story_admission.py:80 (PARENT)",
+   "aisef2/product/outcome.py:28-79 (reason enum, Executed invariant, contract_satisfaction)",
+   "aisef2/journal/format3.py:233-246 verified_payload; story_runner.py:137-139 plan/frozen 'roles' (from plan.obligations, not `preserved`)",
+   "aisef2/app/feedback.py:30,88 and :63 retry prompt prints [role] for the failing criterion: read from project.plan.obligations, not from the label handed to prove (the label is journaled nowhere); adapters.py:70 is its caller",
+   "aisef2/orchestrate/merge.py:38-50 affected_preserve / reprove: the post-merge re-proof passes the plan's o.role",
+   "validation/v2/{p1_evidence,p2_evidence,freeze_conformance}.py call route() directly over the table, not through _attempt",
+   "tests/v2/test_p6_orchestration.py:343 ProofObserver spy on story_runner.prove passes role through and records none; no test asserts the label"
+  ],
+  "exceptions_checked": [
+   "a role-keyed CANDIDATE or POST_MERGE row in _EXECUTED at BASE: none (routing.py:81-92); _EXECUTED is changed at runtime only by mock.patch.dict in tests",
+   "a legal executed result with no CANDIDATE row, which would put role!r into UnroutableOutcome: none, by the totality argument",
+   "a cid of `preserved` that is also one of the story's own obligations: then the plan role is used and the label is not read",
+   "the retry prompt showing [INTRODUCE] for the preserved criterion: it reads the plan's obligation (feedback.py:63), so it shows [PRESERVE] under the mutant",
+   "the INTRODUCE PARENT row turning a PLAN failure into READY: needs point PARENT, refused by prove() at proof.py:86-87"
+  ],
+  "batch": "A28",
+  "reviewed": true
+ },
+ {
+  "target": "aisef2/probe/file_artifact.py::import_facts",
+  "index": 28,
+  "mutant": "L283 string 'python ' emptied",
+  "class": "AUDITED",
+  "source_sha256": "21ac55fd79ae6a5f814044394ea0033445d73378e2c8f17ef16c4d32edf0583b",
+  "group": "single mutant in this batch",
+  "grounds": "Claim holds; reviewer reproduced measure_28.py and tried to refute it. With the one literal replaced (file_artifact.py:283 f'python {major}.{minor}' -> f'{major}.{minor}'), import_facts returns the same keys in the same order and the same files/matches/locations; only stdlib_of differs ('python 3.14' vs '3.14'); verdict_of, observe() kind/verdict, spec id/semantic hash and evaluate() results over the python_imports positive and negative fixtures are identical. The value is written at one place and parsed at none: the only tracked file other than the writer that holds the token stdlib_of is the campaign-2 check.out (line 2088, the listing of survivor [19]; [28] is listed at line 2093 and does not contain the token); no test, doc, fixture, example bundle or committed record holds a 'python <digit>' literal or the key. Reach: observe() puts facts into Observation.detail only for OBSERVED, SUBJECT_ABSENT and SUBJECT_DEADLINE (:540-548); classify_failure (protocol.py:164-185) turns those into Executed(verdict)/on_subject_absent and keeps detail only for HARNESS_FAILED/UNSUPPORTED, whose details (:506-538) are built from locator/path/git text and never from facts; every in-product caller goes through run_probe (review_verify.py:128, orchestrate/proof.py:73, plan/story_admission.py:154, probe/calibration.py:123) and a ProbeRecord holds the Executed result, not the detail. The prefix is a constant, sys.version_info carries no implementation name, so 'python X.Y' and 'X.Y' are in bijection and nothing is lost; the run record's own interpreter field is already a bare version (platform.python = platform.python_version(), run.py:348), so a bare 'X.Y' is not out of the repository's convention. What the documents promise (docs/v2.1/decisions/B-04-LEDGERLOCK-S-10-a.md:26 sys.stdlib_module_names of the observing interpreter 'ghi trong detail'; draft r2 'the standard library of the observing interpreter') is still met: major.minor, the identifying element, remains and is asserted by the sibling batch T27a's test (assertIn of f'{major}.{minor}' in stdlib_of), which this mutant survives by design. Interpreter identity itself is bound independently by the RunSpec 'python' capability (run.py:211; test_v21_identity.py:100-104). Not a ground for or against: EXECUTION_DIGEST hashes this file's bytes (every edit of the file, docstrings included, changes it; pinned separately by tests/v2/test_v21_identity_bytes.py, a NOT_KILL_FILE).",
+  "consumers_checked": [
+   "aisef2/probe/file_artifact.py: writer :283; facts_of :477 merges it; observe :540-548 serialises it into detail; verdict_of :215-223 reads only present/sha256/matches",
+   "aisef2/probe/protocol.py: Observation :94-123, classify_failure :164-185 (detail kept only for HARNESS_FAILED/UNSUPPORTED), run_probe :264-287 (ProbeRecord holds the typed result)",
+   "aisef2/probe/calibration.py:123 (calls run_probe, records the verdict), aisef2/app/review_verify.py:128-139 (reads result.behavior_verdict; the 'did not execute' message embeds an Unrunnable/InvalidSpec detail, which never holds facts), aisef2/orchestrate/proof.py:73, aisef2/plan/story_admission.py:154, aisef2/app/verify.py, aisef2/app/adapters.py:124-129 (verdict/observed only)",
+   "validation/qualification/c2_file_artifact.py:148-152 (copies the detail facts into the C2-P1 calibration record when run) and the committed closure-evidence/v2/cycle2/P1-FILE-ARTIFACT-CALIBRATION.json (3 classes exists/content/grep_count; no python_imports row, no stdlib_of); readers: p10_contracts.py:822-825 (six keys probe_id, probe_digest, observation_class, positive_fixture, negative_fixture, demonstrated_at), q2.py:142-149 (probe_id, probe_digest, observation_class, qualified), c2_integration.py:104-107,135-143 (the record's probe digest and git-blob equality): none reads 'observed' or 'facts'",
+   "validation/qualification/p5_falsifiability.py:222-227 (diagnose persists detail[:1200] for non-QUALIFIED rows); no imports_outside spec in validation/ or aisef2/app/examples beyond calc-3-stories.json BC-STDLIB, which is not in the P5 corpus; nothing parses the text",
+   "closure-evidence/v2/release/V2.1.0.dev0-PROBE-CALIBRATIONS-2.json python_imports row and aisef2/app/calibrations.py:9 (key fields only, no facts)",
+   "docs/v2.1/decisions/B-04-LEDGERLOCK-S-10-a.md:26, docs/v2.1/ADR-V2.1.md ADR-5, docs/v2.1/drafts/LEDGERLOCK-BC-V22-S-10-a-r2.DRAFT.json:57, file_artifact.py module docstring: none gives a format for stdlib_of",
+   "tests/v2/test_c2_file_artifact.py (facts() :94-95 reads named keys; :183-189 compares facts of exists/content/grep_count specs across two read paths of the same module, python_imports not involved), tests/v2/test_v21_python_imports.py (matches/unparsable only), tests/v2/test_v21_identity.py (no stdlib_of)"
+  ],
+  "exceptions_checked": [
+   "A reader that splits or regex-parses the label (split()[1], 'python (\\d+)\\.(\\d+)') fails on '3.14': none exists (whole-tree grep for the key, for 'python <digit>' and for the 'python ' literal in aisef2/, validation/, tests/, docs/, closure-evidence/). Does not arise.",
+   "A stored record compared field for field with a fresh run: the committed P1 record predates the class and holds no python_imports row; no reader or test compares its facts; the release calibrations carry keys only. A re-run of c2_file_artifact.calibrations() would write '3.14' and nothing parses it. Does not arise.",
+   "A reader telling interpreter implementations apart by the prefix: the prefix is a literal constant, sys.version_info has no implementation field, so it discriminates nothing. Does not arise.",
+   "The detail reaching an operator, journal or finding as a refusal or recovery instruction: stdlib_of is only in OBSERVED/SUBJECT_ABSENT/SUBJECT_DEADLINE details, which classify_failure drops; HARNESS_FAILED/UNSUPPORTED details never include facts (import_facts raises nothing of the Refused kind). Does not arise.",
+   "A value-length bound on the detail (a cap a longer/shorter label could trip): detail is json.dumps of the facts with locations capped at _LOCATIONS; no size assertion exists on it and the mutant shortens it by 7 characters. Does not arise.",
+   "Byte identity: see grounds. A property of every edit of the file, not of this value."
+  ],
+  "batch": "A27",
+  "reviewed": true
+ }
+]

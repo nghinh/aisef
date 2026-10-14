@@ -1,0 +1,450 @@
+{
+ "batch": "O1",
+ "copy": "a",
+ "snapshot": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+ "method": "Each entry re-derived at the snapshot: mutant identity from validation/v2/mutation.py (mutant_view), consumers by git grep and an AST scan over 953 tracked .py, round-3 hunks read in full (adapters, review_verify, run, usage, verify, client), the mutant applied to a copy of the snapshot tree and run against 26 test modules: 20 (231 tests) + test_v21_review_chain (18) + 5 more (80). Read, not run, because they cannot see a changed element: test_v21_confine (settings.load of a review.ocr pin only), test_v21_authority_limits (edits adapters.py's text and checks its AST) and test_v21_mutation_record (asks git for HEAD; mutation.py's target lists). Static source-scanning hygiene tests (p0 code hygiene, no_dual_authority) were not run against the mutants.",
+ "entries": [
+  {
+   "target": "aisef2/app/review_ocr.py::OCR",
+   "index": 0,
+   "mutant": "L40 string 'repository' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "The key 'repository' becomes ''. AST re-scan at 289885e of all 953 tracked .py (the audit's scan was 813 files): outside review_ocr.py every `.OCR` attribute is the direct operand of a subscript with a literal key: ['version'] at aisef2/app/adapters.py:226 and :249, tests/v2/test_v21_defects_ocr.py:53, test_v21_kills3_A10.py:64, T10b.py:164, T10d.py:123 and :324, T11a.py:376, test_v21_review_chain.py:458, test_v21_r3_detail_rv_finderfiles.py:111; ['commit'] at test_v21_kills3_T12a.py:103 and test_v21_review_chain.py:459. Inside the module the dict is read at :100, :101, :156 (['version']) and nowhere else (grep -w OCR). No reader of 'repository' or 'license'. No `from ... import OCR`, no star import, no getattr/vars/dir/__dict__/import_module over the module in aisef2/, tests/, validation/, bin/.",
+   "consumers_checked": [
+    "AST re-scan, every ast.Attribute .OCR/.TERMINAL of the tracked tree with its parent node: 12 reads, all `OCR['version']` or `OCR['commit']` (list in grounds); zero reads of TERMINAL; zero non-subscript uses of .OCR",
+    "aisef2/app/adapters.py:177-180 (review_ocr.pinned(pin['exe'], pin['sha256'])): the pin that binds the binary is the settings review.ocr {exe, sha256} (aisef2/app/settings.py:41-43), not this dict; settings.py does not import review_ocr",
+    "aisef2/app/run.py:81-88 kernel_digest: hashes the bytes of every aisef2 .py, so any edit changes it; not a reader of this key in particular",
+    "validation/v21/traceability_check.py with docs/v2.1/research/TRACEABILITY.json: the only text reads of review_ocr.py are three `contains` cells ('NOT_REVIEWABLE = (...)', a docstring sentence, 'def pinned(') - none on lines 40-41 or 43",
+    "round-3 additions (tests/v2/test_v21_r3_*.py, validation/v21/reach.py, validation/v21/cli_integration/*, validation/v21/sandbox/r3_*): the only touch of the dict is test_v21_r3_detail_rv_finderfiles.py:111 (['version'])",
+    "git grep \"['\\\"]repository['\\\"]\" over .py: only body['workload']['repository'] (validation/qualification/c2_delivery_experiment.py:872) and pre['repository'] (release_smoke.py:489), both other data"
+   ],
+   "exceptions_checked": [
+    "a whole-dict reader (json.dumps(OCR), dict(OCR), **OCR, a loop, .items()): none - no non-subscript parent of .OCR in the AST scan, and review_ocr.py itself reads it only as OCR['version']",
+    "the key '' colliding with another key: only one key is emptied, the other three stay distinct; nothing looks '' up",
+    "a documentation-consistency check comparing the pin with docs/v2.1/research/UPSTREAM-RESEARCH.json or TRACEABILITY.json: traceability_check.py imports no aisef2 module and reads review_ocr.py only as `contains` text cells that do not touch line 40",
+    "the real-binary/e2e checks of round 3 (validation/v21/cli_integration/run.sh:14 prints `$OCR version`; RealBinary.setUp compares version and the commit prefix): neither reads the repository key"
+   ],
+   "what_changed_since_b5c2457": "Nothing it reads. review_ocr.py is byte-identical to its b5c2457 form (sha256 043f8adc..., not among the 11 changed files). Round 3 added one more reader of OCR['version'] (test_v21_r3_detail_rv_finderfiles.py:111) and moved adapters' two ['version'] reads (to :226, :249). The audit named only the chain test's two reads among the tests; the complete list is in grounds and still holds no reader of the changed element.",
+   "refutation": "",
+   "note": "Equivalent only in the sense of 'no reader'; the dict is provenance for a human and for the docstring. A requirement test would only restate the literal."
+  },
+  {
+   "target": "aisef2/app/review_ocr.py::OCR",
+   "index": 3,
+   "mutant": "L41 string 'license' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "The key 'license' becomes ''. AST re-scan at 289885e of all 953 tracked .py (the audit's scan was 813 files): outside review_ocr.py every `.OCR` attribute is the direct operand of a subscript with a literal key: ['version'] at aisef2/app/adapters.py:226 and :249, tests/v2/test_v21_defects_ocr.py:53, test_v21_kills3_A10.py:64, T10b.py:164, T10d.py:123 and :324, T11a.py:376, test_v21_review_chain.py:458, test_v21_r3_detail_rv_finderfiles.py:111; ['commit'] at test_v21_kills3_T12a.py:103 and test_v21_review_chain.py:459. Inside the module the dict is read at :100, :101, :156 (['version']) and nowhere else (grep -w OCR). No reader of 'repository' or 'license'. No `from ... import OCR`, no star import, no getattr/vars/dir/__dict__/import_module over the module in aisef2/, tests/, validation/, bin/.",
+   "consumers_checked": [
+    "AST re-scan, every ast.Attribute .OCR/.TERMINAL of the tracked tree with its parent node: 12 reads, all `OCR['version']` or `OCR['commit']` (list in grounds); zero reads of TERMINAL; zero non-subscript uses of .OCR",
+    "aisef2/app/adapters.py:177-180 (review_ocr.pinned(pin['exe'], pin['sha256'])): the pin that binds the binary is the settings review.ocr {exe, sha256} (aisef2/app/settings.py:41-43), not this dict; settings.py does not import review_ocr",
+    "aisef2/app/run.py:81-88 kernel_digest: hashes the bytes of every aisef2 .py, so any edit changes it; not a reader of this key in particular",
+    "validation/v21/traceability_check.py with docs/v2.1/research/TRACEABILITY.json: the only text reads of review_ocr.py are three `contains` cells ('NOT_REVIEWABLE = (...)', a docstring sentence, 'def pinned(') - none on lines 40-41 or 43",
+    "round-3 additions (tests/v2/test_v21_r3_*.py, validation/v21/reach.py, validation/v21/cli_integration/*, validation/v21/sandbox/r3_*): the only touch of the dict is test_v21_r3_detail_rv_finderfiles.py:111 (['version'])",
+    "git grep -i -E 'licen[sc]e|apache' over .py/.sh/.toml/.js outside closure-evidence and docs: review_ocr.py:2 (docstring) and :41 (the entry) for this pin; pyproject.toml:17-18 is the project's own MIT licence; tests/test_catalog.py, tests/test_install.py, aisef/kit/* are skill-kit entries with their own license field; validation/v2/p1_evidence.py and tests/v2/p1/test_outcome.py BC-LICENSE are probe contracts about a LICENSE file"
+   ],
+   "exceptions_checked": [
+    "a licence gate refusing a non-Apache pin: none exists, and the value never varies at run time",
+    "a notice/SBOM generator over module constants: none in aisef2/, validation/, bin/ (no importer of the module outside adapters and tests)",
+    "a record or journal field carrying the licence: the session record carries finder 'ocr <version>' only (adapters.py:249); RUN.json, the journal and the artifact carry no licence",
+    "the key '' of [0] and of this mutant are distinct mutants; neither key is read"
+   ],
+   "what_changed_since_b5c2457": "Nothing it reads. review_ocr.py is byte-identical to its b5c2457 form (sha256 043f8adc..., not among the 11 changed files). Round 3 added one more reader of OCR['version'] (test_v21_r3_detail_rv_finderfiles.py:111) and moved adapters' two ['version'] reads (to :226, :249). The audit named only the chain test's two reads among the tests; the complete list is in grounds and still holds no reader of the changed element.",
+   "refutation": "",
+   "note": ""
+  },
+  {
+   "target": "aisef2/app/review_ocr.py::OCR",
+   "index": 4,
+   "mutant": "L40 string 'https://github.com/alibaba/open-code-review' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "OCR['repository'] becomes ''. AST re-scan at 289885e of all 953 tracked .py (the audit's scan was 813 files): outside review_ocr.py every `.OCR` attribute is the direct operand of a subscript with a literal key: ['version'] at aisef2/app/adapters.py:226 and :249, tests/v2/test_v21_defects_ocr.py:53, test_v21_kills3_A10.py:64, T10b.py:164, T10d.py:123 and :324, T11a.py:376, test_v21_review_chain.py:458, test_v21_r3_detail_rv_finderfiles.py:111; ['commit'] at test_v21_kills3_T12a.py:103 and test_v21_review_chain.py:459. Inside the module the dict is read at :100, :101, :156 (['version']) and nowhere else (grep -w OCR). No reader of 'repository' or 'license'. No `from ... import OCR`, no star import, no getattr/vars/dir/__dict__/import_module over the module in aisef2/, tests/, validation/, bin/.",
+   "consumers_checked": [
+    "AST re-scan, every ast.Attribute .OCR/.TERMINAL of the tracked tree with its parent node: 12 reads, all `OCR['version']` or `OCR['commit']` (list in grounds); zero reads of TERMINAL; zero non-subscript uses of .OCR",
+    "aisef2/app/adapters.py:177-180 (review_ocr.pinned(pin['exe'], pin['sha256'])): the pin that binds the binary is the settings review.ocr {exe, sha256} (aisef2/app/settings.py:41-43), not this dict; settings.py does not import review_ocr",
+    "aisef2/app/run.py:81-88 kernel_digest: hashes the bytes of every aisef2 .py, so any edit changes it; not a reader of this key in particular",
+    "validation/v21/traceability_check.py with docs/v2.1/research/TRACEABILITY.json: the only text reads of review_ocr.py are three `contains` cells ('NOT_REVIEWABLE = (...)', a docstring sentence, 'def pinned(') - none on lines 40-41 or 43",
+    "round-3 additions (tests/v2/test_v21_r3_*.py, validation/v21/reach.py, validation/v21/cli_integration/*, validation/v21/sandbox/r3_*): the only touch of the dict is test_v21_r3_detail_rv_finderfiles.py:111 (['version'])",
+    "git grep -n alibaba/open-code-review (all file types, outside closure-evidence): code only at review_ocr.py:1-2 (docstring) and :40; the rest is docs/v2.1/TRACEABILITY.md, UPSTREAM-RESEARCH.md and docs/v2.1/research/*.json (the research record), compared with nothing",
+    "aisef2/app/review_ocr.py:181 environment(): endpoint['url'] is the route's, a different value; the binary runs by absolute path with OCR_NO_UPDATE=1 (:179) so no update step reads the URL"
+   ],
+   "exceptions_checked": [
+    "a test comparing the dict with docs/v2.1/research/UPSTREAM-RESEARCH.json (repo/url): none exists (traceability_check.py reads TRACEABILITY.json cells and git objects, never the module's dict)",
+    "an empty string refused somewhere (non-emptiness as the requirement): no reader, so nothing relies on it",
+    "the URL carried into evidence that --verify checks: verify.py reads none of it; the session record has finder 'ocr <version>' (adapters.py:249) and the stream's first line the same (:226)"
+   ],
+   "what_changed_since_b5c2457": "Nothing it reads. review_ocr.py is byte-identical to its b5c2457 form (sha256 043f8adc..., not among the 11 changed files). Round 3 added one more reader of OCR['version'] (test_v21_r3_detail_rv_finderfiles.py:111) and moved adapters' two ['version'] reads (to :226, :249). The audit named only the chain test's two reads among the tests; the complete list is in grounds and still holds no reader of the changed element.",
+   "refutation": "",
+   "note": ""
+  },
+  {
+   "target": "aisef2/app/review_ocr.py::OCR",
+   "index": 7,
+   "mutant": "L41 string 'Apache-2.0' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "OCR['license'] becomes ''. AST re-scan at 289885e of all 953 tracked .py (the audit's scan was 813 files): outside review_ocr.py every `.OCR` attribute is the direct operand of a subscript with a literal key: ['version'] at aisef2/app/adapters.py:226 and :249, tests/v2/test_v21_defects_ocr.py:53, test_v21_kills3_A10.py:64, T10b.py:164, T10d.py:123 and :324, T11a.py:376, test_v21_review_chain.py:458, test_v21_r3_detail_rv_finderfiles.py:111; ['commit'] at test_v21_kills3_T12a.py:103 and test_v21_review_chain.py:459. Inside the module the dict is read at :100, :101, :156 (['version']) and nowhere else (grep -w OCR). No reader of 'repository' or 'license'. No `from ... import OCR`, no star import, no getattr/vars/dir/__dict__/import_module over the module in aisef2/, tests/, validation/, bin/.",
+   "consumers_checked": [
+    "AST re-scan, every ast.Attribute .OCR/.TERMINAL of the tracked tree with its parent node: 12 reads, all `OCR['version']` or `OCR['commit']` (list in grounds); zero reads of TERMINAL; zero non-subscript uses of .OCR",
+    "aisef2/app/adapters.py:177-180 (review_ocr.pinned(pin['exe'], pin['sha256'])): the pin that binds the binary is the settings review.ocr {exe, sha256} (aisef2/app/settings.py:41-43), not this dict; settings.py does not import review_ocr",
+    "aisef2/app/run.py:81-88 kernel_digest: hashes the bytes of every aisef2 .py, so any edit changes it; not a reader of this key in particular",
+    "validation/v21/traceability_check.py with docs/v2.1/research/TRACEABILITY.json: the only text reads of review_ocr.py are three `contains` cells ('NOT_REVIEWABLE = (...)', a docstring sentence, 'def pinned(') - none on lines 40-41 or 43",
+    "round-3 additions (tests/v2/test_v21_r3_*.py, validation/v21/reach.py, validation/v21/cli_integration/*, validation/v21/sandbox/r3_*): the only touch of the dict is test_v21_r3_detail_rv_finderfiles.py:111 (['version'])",
+    "same licence grep as [1]: the value 'Apache-2.0' appears in code only at review_ocr.py:2 and :41",
+    "aisef2/app/adapters.py, usage.py, verify.py, settings.py, review_verify.py: no licence field in any record the kernel writes or reads",
+    "tests/v2/test_v21_review_ocr.py, test_v21_review_chain.py, test_v21_kills3_T12a.py: no assertion on a licence (T12a pins OCR['commit'] only)"
+   ],
+   "exceptions_checked": [
+    "the empty licence as a decision signal ('unknown licence refuses'): no branch reads the value",
+    "a notice file or SBOM built from the constant: none in aisef2/, validation/, bin/",
+    "the value reached through the key of [1]: separate mutants; neither is read"
+   ],
+   "what_changed_since_b5c2457": "Nothing it reads. review_ocr.py is byte-identical to its b5c2457 form (sha256 043f8adc..., not among the 11 changed files). Round 3 added one more reader of OCR['version'] (test_v21_r3_detail_rv_finderfiles.py:111) and moved adapters' two ['version'] reads (to :226, :249). The audit named only the chain test's two reads among the tests; the complete list is in grounds and still holds no reader of the changed element.",
+   "refutation": "",
+   "note": ""
+  },
+  {
+   "target": "aisef2/app/review_ocr.py::TERMINAL",
+   "index": 0,
+   "mutant": "L43 string 'complete' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "TERMINAL[0] ('complete') becomes ''. Nothing reads the tuple. AST re-scan at 289885e of all 953 tracked .py: no Attribute or Name `TERMINAL` bound to review_ocr outside the module (validation/v2/mutation.py:652 names it as a target string; validation/qualification/q3.py:27 defines an unrelated local TERMINAL tuple); inside the module line 43 is its only occurrence. coverage() decides on literals at review_ocr.py:90 (`state != 'complete' and not (state == 'skipped' and not required)`) and words the reason at :91; Coverage.terminal_state (:71, set :134-135) is never read (no `.terminal_state` access in aisef2/, tests/, validation/: the other grep hits are manifest keys and the unrelated journal projection TerminalState); adapters.py:254 keeps status, reasons and not_reviewable only, :257 reads cov.failure and cov.failed.",
+   "consumers_checked": [
+    "AST re-scan (as above): no read of TERMINAL anywhere; git grep -w TERMINAL: the definition, mutation.py:652 (a string), q3.py:27 (unrelated local tuple), records naming the target",
+    "aisef2/app/adapters.py:252-262: the only consumer of Coverage: status :255, reasons :254/:256/:262, failure/failed :257, not_reviewable :254 - never terminal_state",
+    "aisef2/invariants/registry.py:205-236, tests/test_meta.py:98-100, tests/v2/test_no_dual_authority.py (getattr by symbol name): none names review_ocr; no importlib/pkgutil walk of aisef2 modules enumerates module constants",
+    "tests/v2/test_v21_review_ocr.py (module alias O: no O.TERMINAL) and test_v21_review_chain.py (no TERMINAL)"
+   ],
+   "exceptions_checked": [
+    "state '' accepted because '' is now in the tuple: coverage() never tests membership; a state '' or None adds the reason \"terminal state ''\"/\"terminal state None\" (review_ocr.py:90-91) and the status stays INDETERMINATE",
+    "a future reader turning the dead tuple into a decision: it could only add a reason, since :90 already refuses every state but 'complete' (and 'skipped' with nothing required)",
+    "'complete' as the one state a complete review needs: asserted through the literal by test_v21_review_ocr.py::Coverage::test_a_complete_run_of_the_frozen_range_covering_every_required_path (:36) and the chain's NothingToReview/FixLoop scenarios, none of which passes through the tuple"
+   ],
+   "what_changed_since_b5c2457": "Nothing it reads. review_ocr.py unchanged; adapters._ocr's coverage handling (now :252-262, was :228-238) is byte-identical and still reads status, reasons, not_reviewable, failure, failed - never terminal_state. Round 3 added no reader of TERMINAL.",
+   "refutation": "",
+   "note": ""
+  },
+  {
+   "target": "aisef2/app/review_ocr.py::TERMINAL",
+   "index": 1,
+   "mutant": "L43 string 'partial' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "TERMINAL[1] ('partial') becomes ''. Nothing reads the tuple. AST re-scan at 289885e of all 953 tracked .py: no Attribute or Name `TERMINAL` bound to review_ocr outside the module (validation/v2/mutation.py:652 names it as a target string; validation/qualification/q3.py:27 defines an unrelated local TERMINAL tuple); inside the module line 43 is its only occurrence. coverage() decides on literals at review_ocr.py:90 (`state != 'complete' and not (state == 'skipped' and not required)`) and words the reason at :91; Coverage.terminal_state (:71, set :134-135) is never read (no `.terminal_state` access in aisef2/, tests/, validation/: the other grep hits are manifest keys and the unrelated journal projection TerminalState); adapters.py:254 keeps status, reasons and not_reviewable only, :257 reads cov.failure and cov.failed.",
+   "consumers_checked": [
+    "AST re-scan (as above): no read of TERMINAL anywhere; git grep -w TERMINAL: the definition, mutation.py:652 (a string), q3.py:27 (unrelated local tuple), records naming the target",
+    "aisef2/app/adapters.py:252-262: the only consumer of Coverage: status :255, reasons :254/:256/:262, failure/failed :257, not_reviewable :254 - never terminal_state",
+    "aisef2/invariants/registry.py:205-236, tests/test_meta.py:98-100, tests/v2/test_no_dual_authority.py (getattr by symbol name): none names review_ocr; no importlib/pkgutil walk of aisef2 modules enumerates module constants",
+    "review_ocr.py:87-91: the partial refusal is a literal comparison against 'complete'/'skipped'",
+    "tests/v2/test_v21_review_chain.py:132-140 (FAKE_OCR 'partial' and 'budget' scenarios) and :338-339 (test_partial asserts the journaled \"terminal state 'partial'\", which comes from the f-string at :91, not the tuple)",
+    "tests/v2/fixtures/ocr/partial.json (terminal_state partial) via test_v21_review_ocr.py::Coverage::test_exit_0_is_not_a_full_review (:44)"
+   ],
+   "exceptions_checked": [
+    "another reader matching the word 'partial': aisef2/ has the cost status 'partial: ...' (usage.py:112, lineage.py) and the PARTIAL measurement level (quality/test_execution.py); none derives from this tuple",
+    "a positional read TERMINAL[1]: none (AST scan: zero subscripts of TERMINAL)",
+    "the partial refusal depending on membership: :90 compares with 'complete' only"
+   ],
+   "what_changed_since_b5c2457": "Nothing it reads. review_ocr.py unchanged; adapters._ocr's coverage handling (now :252-262, was :228-238) is byte-identical and still reads status, reasons, not_reviewable, failure, failed - never terminal_state. Round 3 added no reader of TERMINAL.",
+   "refutation": "",
+   "note": ""
+  },
+  {
+   "target": "aisef2/app/review_ocr.py::TERMINAL",
+   "index": 2,
+   "mutant": "L43 string 'failed' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "TERMINAL[2] ('failed') becomes ''. Nothing reads the tuple. AST re-scan at 289885e of all 953 tracked .py: no Attribute or Name `TERMINAL` bound to review_ocr outside the module (validation/v2/mutation.py:652 names it as a target string; validation/qualification/q3.py:27 defines an unrelated local TERMINAL tuple); inside the module line 43 is its only occurrence. coverage() decides on literals at review_ocr.py:90 (`state != 'complete' and not (state == 'skipped' and not required)`) and words the reason at :91; Coverage.terminal_state (:71, set :134-135) is never read (no `.terminal_state` access in aisef2/, tests/, validation/: the other grep hits are manifest keys and the unrelated journal projection TerminalState); adapters.py:254 keeps status, reasons and not_reviewable only, :257 reads cov.failure and cov.failed.",
+   "consumers_checked": [
+    "AST re-scan (as above): no read of TERMINAL anywhere; git grep -w TERMINAL: the definition, mutation.py:652 (a string), q3.py:27 (unrelated local tuple), records naming the target",
+    "aisef2/app/adapters.py:252-262: the only consumer of Coverage: status :255, reasons :254/:256/:262, failure/failed :257, not_reviewable :254 - never terminal_state",
+    "aisef2/invariants/registry.py:205-236, tests/test_meta.py:98-100, tests/v2/test_no_dual_authority.py (getattr by symbol name): none names review_ocr; no importlib/pkgutil walk of aisef2 modules enumerates module constants",
+    "review_ocr.py:90 (literal), :103-105 (failure from run_failure), :134-135 (Coverage.failure)",
+    "aisef2/app/adapters.py:257 (cov.failure == 'provider' or every failed item classified 'provider' -> ProviderOutage)",
+    "tests/v2/test_v21_review_chain.py:143-148 (the 'provider' scenario) and :361-362"
+   ],
+   "exceptions_checked": [
+    "a 'failed' state with no run_failure: still refused by :90; the tuple is consulted in neither case",
+    "classification by terminal state in the adapter: adapters.py:257 reads cov.failure and cov.failed, not a state name",
+    "an unknown state outside the vocabulary: gets the same \"terminal state '<x>'\" reason; membership never changes a verdict"
+   ],
+   "what_changed_since_b5c2457": "Nothing it reads. review_ocr.py unchanged; adapters._ocr's coverage handling (now :252-262, was :228-238) is byte-identical and still reads status, reasons, not_reviewable, failure, failed - never terminal_state. Round 3 added no reader of TERMINAL.",
+   "refutation": "",
+   "note": ""
+  },
+  {
+   "target": "aisef2/app/review_ocr.py::TERMINAL",
+   "index": 3,
+   "mutant": "L43 string 'skipped' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "TERMINAL[3] ('skipped') becomes ''. Nothing reads the tuple. AST re-scan at 289885e of all 953 tracked .py: no Attribute or Name `TERMINAL` bound to review_ocr outside the module (validation/v2/mutation.py:652 names it as a target string; validation/qualification/q3.py:27 defines an unrelated local TERMINAL tuple); inside the module line 43 is its only occurrence. coverage() decides on literals at review_ocr.py:90 (`state != 'complete' and not (state == 'skipped' and not required)`) and words the reason at :91; Coverage.terminal_state (:71, set :134-135) is never read (no `.terminal_state` access in aisef2/, tests/, validation/: the other grep hits are manifest keys and the unrelated journal projection TerminalState); adapters.py:254 keeps status, reasons and not_reviewable only, :257 reads cov.failure and cov.failed.",
+   "consumers_checked": [
+    "AST re-scan (as above): no read of TERMINAL anywhere; git grep -w TERMINAL: the definition, mutation.py:652 (a string), q3.py:27 (unrelated local tuple), records naming the target",
+    "aisef2/app/adapters.py:252-262: the only consumer of Coverage: status :255, reasons :254/:256/:262, failure/failed :257, not_reviewable :254 - never terminal_state",
+    "aisef2/invariants/registry.py:205-236, tests/test_meta.py:98-100, tests/v2/test_no_dual_authority.py (getattr by symbol name): none names review_ocr; no importlib/pkgutil walk of aisef2 modules enumerates module constants",
+    "review_ocr.py:87-91 (the skipped rule is `state == 'skipped' and not required`, a literal)",
+    "tests/v2/test_v21_review_chain.py:372-388 (NothingToReview, FAKE_OCR, runs in the hermetic suite) and :498-506 (RealBinary.test_an_empty_range_is_skipped_without_a_model_call, skipped without AISEF_TEST_OCR_EXE)",
+    "aisef2/app/adapters.py:252-262 (reads cov.status, not the state)"
+   ],
+   "exceptions_checked": [
+    "'skipped' with something required: refused by the same literal (`not required` false), not by absence from a tuple",
+    "the hermetic suite skipping RealBinary leaving the rule unexercised: NothingToReview exercises it with FAKE_OCR on every run",
+    "a reader taking TERMINAL as the set of acceptable states: none exists, membership is tested nowhere"
+   ],
+   "what_changed_since_b5c2457": "Nothing it reads. review_ocr.py unchanged; adapters._ocr's coverage handling (now :252-262, was :228-238) is byte-identical and still reads status, reasons, not_reviewable, failure, failed - never terminal_state. Round 3 added no reader of TERMINAL.",
+   "refutation": "",
+   "note": ""
+  },
+  {
+   "target": "aisef2/app/review_ocr.py::coverage",
+   "index": 77,
+   "mutant": "L96 string 'reviewed head ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "The subject noun 'reviewed head ' is lost from the entry written at review_ocr.py:96. Measured rendering at 289885e (frozen head 9*40, reviewed head 2*40): original 'reviewed head 222222222222, not the candidate 999999999999', mutant '222222222222, not the candidate 999999999999'. Both ids and the comparator 'not the candidate' (which names the frozen head) stay, and the base end keeps its own noun in its own entry (:98). The text is read by an operator only: RUN.json sessions[].coverage.reasons (adapters.py:254, a list, one reason per element), the fix-loop refusal 'review coverage INDETERMINATE (...): <reasons joined by ; >' that becomes the journal's 'reviewer cannot run: ...' (adapters.py:256, :259-260; orchestrate/review.py:37-38), or under advisory the provider/result detail 'coverage INDETERMINATE (...)[:300]' (adapters.py:261-262; review.py:40). Nothing parses it. Measured here: the mutant applied to a copy of the 289885e tree and run against 26 test modules - 231 tests of 20 (review_ocr, A10, A11, T10a-d, T11a-b, T12a-b, defects_ocr, defects_ocrz, R07, and the round-3 detail_product, detail_failclosed, detail_rv_finderfiles, detail_artifact, detail_statement, detail_model), test_v21_review_chain (18 tests, 3 RealBinary skips) and 80 tests of 5 more (T13a, kills_adapters, r3_client_stream, T14b, T26a): no test fails.",
+   "consumers_checked": [
+    "aisef2/app/adapters.py:252-262 (coverage call, `what = ... '; '.join(cov.reasons)` :256, ProviderOutage :257-258, CapabilityUnrunnable :259-260 cut at 600, advisory detail `coverage <status> (<reasons joined>[:300])` :261-262, RUN.json sessions[].coverage.reasons :254) - the only consumer of Coverage",
+    "aisef2/orchestrate/review.py:35-40 composes the journaled provider/result detail ('reviewer outage: ...', 'reviewer cannot run: ...', or the Reviewed.detail); aisef2/orchestrate/story_runner.py:288: the failure detail is the fixed 'review: CAPABILITY_UNRUNNABLE' / 'review: PROVIDER_UNAVAILABLE', never the reasons",
+    "aisef2/app/usage.py:118-142 no_progress (rewritten in round 3): reads failure/observed code+detail only (:131-132), so a reason's wording never enters it; aisef2/app/feedback.py:61-98 retry_feedback reads failure/observed and gate/check rows of REVIEW_FINDING, not provider/result; feedback.py:132-135 context_pack reads provider/result detail only for the first result after a DEVELOPER request",
+    "aisef2/app/review_verify.py:443-492 artifact_problems (new): reads gate/check rows only; verify.py:39-52, :149-155 _projection_refusal (new): control projections, no provider/result detail",
+    "git grep -E 'reviewed head|reviewed base|not the candidate' (all file types, outside closure-evidence): the writers at review_ocr.py:96 and :98 only; the other hits are unrelated prose about 'the candidate'",
+    "tests: test_v21_kills3_A11.py::test_a_mismatched_base_is_named_as_the_base_with_both_ids_apart_from_the_head (:65-75) asserts the head entry by its two ids only; test_v21_review_ocr.py::test_exit_0_is_not_a_full_review ('another head') asserts status; chain tests assert 'terminal state', 'manifest schema', 'warning ...', 'timed out: no run manifest' - none this noun"
+   ],
+   "exceptions_checked": [
+    "resolved_head absent or not a string: 'None, not the candidate X' still states a fact about the candidate",
+    "head and base both wrong: each end is its own entry; A11 pins that the base entry says 'base' and that neither end's ids appear in the other's entry (:65-75)",
+    "a parser or a --verify path reading the text: none (verify.py reads no sessions[]; no splitter of '; ' and no regex on these words in aisef2/, validation/, tests/)",
+    "round 3's new readers of review rows (artifact_problems, _projection_refusal, client.events, no_progress): none touches coverage reasons or provider/result detail"
+   ],
+   "what_changed_since_b5c2457": "Nothing it reads. adapters._ocr gained client.redact calls on the finder's raw files after they are read (adapters.py:221-223, :230-231) and shares `keys` with the stream redaction (:244); the coverage call and the reason join (:252-262) are byte-identical to b5c2457 (:228-238); orchestrate/review.py and story_runner.py are not among the changed files; usage.no_progress was rewritten but reads failure/observed only. Line numbers moved.",
+   "refutation": "",
+   "note": "The lost word is the subject of the entry; the comparator 'not the candidate' keeps it self-explanatory and the base end is a separate entry with its own noun. No round-3 contract bears on it."
+  },
+  {
+   "target": "aisef2/app/review_ocr.py::coverage",
+   "index": 81,
+   "mutant": "L101 string 'OCR ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "The product noun 'OCR ' is lost from the entry written at review_ocr.py:101. Measured rendering at 289885e (manifest ocr_version v1.11.0): original \"OCR 'v1.11.0', not the pinned v1.12.12\", mutant \"'v1.11.0', not the pinned v1.12.12\". Both versions and the check phrase 'not the pinned' stay; the entry is distinguishable from the binary's sha256 pin refusal (pinned(): '<exe>: sha256 <12>, not the pinned <12>', review_ocr.py:208, raised before any run as CapabilityUnrunnable at adapters.py:178-180). Consumers are the operator's reading only, as in [8]. Measured here: the mutant applied to a copy of the 289885e tree and run against 26 test modules - 231 tests of 20 (review_ocr, A10, A11, T10a-d, T11a-b, T12a-b, defects_ocr, defects_ocrz, R07, and the round-3 detail_product, detail_failclosed, detail_rv_finderfiles, detail_artifact, detail_statement, detail_model), test_v21_review_chain (18 tests, 3 RealBinary skips) and 80 tests of 5 more (T13a, kills_adapters, r3_client_stream, T14b, T26a): no test fails.",
+   "consumers_checked": [
+    "aisef2/app/adapters.py:252-262 (coverage call, `what = ... '; '.join(cov.reasons)` :256, ProviderOutage :257-258, CapabilityUnrunnable :259-260 cut at 600, advisory detail `coverage <status> (<reasons joined>[:300])` :261-262, RUN.json sessions[].coverage.reasons :254) - the only consumer of Coverage",
+    "aisef2/orchestrate/review.py:35-40 composes the journaled provider/result detail ('reviewer outage: ...', 'reviewer cannot run: ...', or the Reviewed.detail); aisef2/orchestrate/story_runner.py:288: the failure detail is the fixed 'review: CAPABILITY_UNRUNNABLE' / 'review: PROVIDER_UNAVAILABLE', never the reasons",
+    "aisef2/app/usage.py:118-142 no_progress (rewritten in round 3): reads failure/observed code+detail only (:131-132), so a reason's wording never enters it; aisef2/app/feedback.py:61-98 retry_feedback reads failure/observed and gate/check rows of REVIEW_FINDING, not provider/result; feedback.py:132-135 context_pack reads provider/result detail only for the first result after a DEVELOPER request",
+    "aisef2/app/review_verify.py:443-492 artifact_problems (new): reads gate/check rows only; verify.py:39-52, :149-155 _projection_refusal (new): control projections, no provider/result detail",
+    "aisef2/app/adapters.py:249 (session finder 'ocr <version>', the sibling field of coverage in the same RUN.json session object) and :226 (the stream's first line)",
+    "tests/v2/test_v21_review_ocr.py::Coverage::test_a_manifest_that_does_not_hold_together_is_indeterminate (:59-65) asserts 'pinned' in the joined reasons for ocr_version v1.13.0; no test asserts the noun",
+    "aisef2/app/review_ocr.py:199-208 (the binary pin message): a different message and exception, raised before the run"
+   ],
+   "exceptions_checked": [
+    "found version None: 'None, not the pinned v1.12.12' still states the check",
+    "confusion with the binary sha256 pin: a different wording (a 64-hex prefix vs a version) and a different path (CapabilityUnrunnable before the run, adapters.py:178-180)",
+    "an operator reading one list element on its own (RUN.json holds the reasons unframed): the element still says which value was found and which was pinned; the finder is named by the same session's `finder` field",
+    "no parser of the text exists (grep over aisef2/, validation/, tests/)"
+   ],
+   "what_changed_since_b5c2457": "Nothing it reads. adapters._ocr gained client.redact calls on the finder's raw files after they are read (adapters.py:221-223, :230-231) and shares `keys` with the stream redaction (:244); the coverage call and the reason join (:252-262) are byte-identical to b5c2457 (:228-238); orchestrate/review.py and story_runner.py are not among the changed files; usage.no_progress was rewritten but reads failure/observed only. Line numbers moved.",
+   "refutation": "",
+   "note": "The weakest 'identifying element' case of the batch (the noun names whose version it is); no round-3 change touches it, and a requirement test (assert 'OCR' in the entry) would be one line in A11 if the owner wants it."
+  },
+  {
+   "target": "aisef2/app/review_ocr.py::coverage",
+   "index": 85,
+   "mutant": "L105 string ')' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "The closing ')' of the run-failure entry written at review_ocr.py:105 is lost. Measured rendering at 289885e (provider failure, reason 'HTTP 503', three dropped code_comment calls): original '...; run failure: provider (HTTP 503); 3 code_comment call(s) failed: findings may have been dropped', mutant '...; run failure: provider (HTTP 503; 3 code_comment call(s) failed: findings may have been dropped'. The class ('provider'), OCR's reason (cut at 120 characters) and the next entry's own words stay; what is lost is the delimiter that marks where OCR's free text ends in the joined strings (adapters.py:256, :262: the only '; ' joins). In RUN.json the reasons are a list and each is its own element. Measured here: the mutant applied to a copy of the 289885e tree and run against 26 test modules - 231 tests of 20 (review_ocr, A10, A11, T10a-d, T11a-b, T12a-b, defects_ocr, defects_ocrz, R07, and the round-3 detail_product, detail_failclosed, detail_rv_finderfiles, detail_artifact, detail_statement, detail_model), test_v21_review_chain (18 tests, 3 RealBinary skips) and 80 tests of 5 more (T13a, kills_adapters, r3_client_stream, T14b, T26a): no test fails.",
+   "consumers_checked": [
+    "aisef2/app/adapters.py:252-262 (coverage call, `what = ... '; '.join(cov.reasons)` :256, ProviderOutage :257-258, CapabilityUnrunnable :259-260 cut at 600, advisory detail `coverage <status> (<reasons joined>[:300])` :261-262, RUN.json sessions[].coverage.reasons :254) - the only consumer of Coverage",
+    "aisef2/orchestrate/review.py:35-40 composes the journaled provider/result detail ('reviewer outage: ...', 'reviewer cannot run: ...', or the Reviewed.detail); aisef2/orchestrate/story_runner.py:288: the failure detail is the fixed 'review: CAPABILITY_UNRUNNABLE' / 'review: PROVIDER_UNAVAILABLE', never the reasons",
+    "aisef2/app/usage.py:118-142 no_progress (rewritten in round 3): reads failure/observed code+detail only (:131-132), so a reason's wording never enters it; aisef2/app/feedback.py:61-98 retry_feedback reads failure/observed and gate/check rows of REVIEW_FINDING, not provider/result; feedback.py:132-135 context_pack reads provider/result detail only for the first result after a DEVELOPER request",
+    "aisef2/app/review_verify.py:443-492 artifact_problems (new): reads gate/check rows only; verify.py:39-52, :149-155 _projection_refusal (new): control projections, no provider/result detail",
+    "aisef2/app/adapters.py:257 (the decision to raise ProviderOutage comes from cov.failure / cov.failed, not from the text)",
+    "tests/v2/test_v21_kills3_A11.py::test_a_run_failure_is_named_as_one_with_its_class_and_ocr_s_own_words (:53-64) asserts class and reason in one entry, not its end; test_v21_kills3_A10.py::assert_apart (:184-192) pins that adjacent reasons are not run together by '; ' - still true for the mutant (the entry then ends in OCR's last character, followed by '; ')",
+    "tests/v2/test_v21_review_chain.py:361-362 ('OCR could not reach the provider') asserts the prefix of the refusal"
+   ],
+   "exceptions_checked": [
+    "an attribution reader: someone reading the joined refusal who takes the next entry as part of OCR's reason - possible only when a run failure is followed by another reason (here the dropped-call count); the next entry carries the controller's own words, so this is cosmetic and no fact is lost, but it is the one entry of the batch where the delimiter has a function",
+    "OCR's text containing '; ' (cosmetic; each next reason is recognisable by its own words)",
+    "truncation at 120/300/600 characters bounds long text independently of the delimiter",
+    "a splitter on '; ' or a regex on '(...)' over the reasons: none (git grep over aisef2/, validation/, tests/)",
+    "A10's concern (a reason ending in a number running into the next that begins with one): '; ' still separates them, and assert_apart passes on the mutant's rendering"
+   ],
+   "what_changed_since_b5c2457": "Nothing it reads. adapters._ocr gained client.redact calls on the finder's raw files after they are read (adapters.py:221-223, :230-231) and shares `keys` with the stream redaction (:244); the coverage call and the reason join (:252-262) are byte-identical to b5c2457 (:228-238); orchestrate/review.py and story_runner.py are not among the changed files; usage.no_progress was rewritten but reads failure/observed only. Line numbers moved.",
+   "refutation": "",
+   "note": "Natural, cheap test if the owner wants it killed: in A11's run-failure test assert `entry.endswith('(bad revision)')`, and with a dropped call present that the entry is closed before the '; 3 code_comment' one. Round 3 did not change this; the audit stands as AUDITED."
+  },
+  {
+   "target": "aisef2/app/review_ocr.py::findings",
+   "index": 26,
+   "mutant": "L153 dict entry 8 dropped",
+   "class_before": "AUDITED",
+   "verdict": "REVISED",
+   "class_after": "AUDITED",
+   "grounds": "Dict entry 8 of the record at review_ocr.py:156 ('source': 'ocr v1.12.12') is dropped. Where a finding record lands at 289885e: (a) RUN.json sessions[].findings through review_verify.redacted(found, secrets) (aisef2/app/adapters.py:150; run.py:497, :506) - as in b5c2457; (b) NEW in round 3: the artifact review-findings/<story>.<attempt>.<index>.json (adapters.py:142-143 -> review_verify.preserve, review_verify.py:408-440), the whole record, whose sha256 and size are in the gate row's statement (`artifact`) and in EVIDENCE.json (run.py:298-300). The only reader of the artifact is review_verify.artifact_problems (review_verify.py:443-492, called at verify.py:164): `format`, `story_id`, `finding.id`. The kernel's readers of a finding's fields are reproducer_contract (review_verify.py:91-123: reproducer, id, summary), anchor (:214), blocks (:254-257: severity_of), detail (:344-405: id, severity_of, summary, reproducer) and adapters.py:134-148 (reproducer, id, blocking). `source`, `category`, `in_scope`, `path`, `start_line` are read by none of them. The label's information is also carried by the artifact's own `session` key (the finder's stream name, `S1.reviewer.<n>.jsonl`: adapters.py:143, :248), whose first line is {'type': 'ocr_started', 'finder': 'ocr v1.12.12'} (adapters.py:225-226; the stream is listed in EVIDENCE.json, run.py:299), and by RUN.json sessions[].finder (adapters.py:249). Measured here: the mutant applied to a copy of the 289885e tree and run against 26 test modules - 231 tests of 20 (review_ocr, A10, A11, T10a-d, T11a-b, T12a-b, defects_ocr, defects_ocrz, R07, and the round-3 detail_product, detail_failclosed, detail_rv_finderfiles, detail_artifact, detail_statement, detail_model), test_v21_review_chain (18 tests, 3 RealBinary skips) and 80 tests of 5 more (T13a, kills_adapters, r3_client_stream, T14b, T26a): no test fails.",
+   "consumers_checked": [
+    "aisef2/app/adapters.py:133-150 (Reviewer.review loop, rewritten in round 3): verify, anchor, blocks, preserve, detail, redacted - reads reproducer, id, blocking, severity (via severity_of); never source/category/in_scope",
+    "aisef2/app/review_verify.py:443-492 artifact_problems (new in round 3): the only reader of the artifact file: format, story_id, finding.id (`str(found.get('id')).startswith(...)`)",
+    "aisef2/app/verify.py (does not read sessions[]; verify.py:164 calls artifact_problems; reads rec keys settings, continues, bundle_digest, journal, story_outcomes, budget, story_errors, failure, delivery_verdict, productproof, usage, no_progress, final_main)",
+    "git grep of finding fields over aisef2/ validation/ bin/ tests/v2/: tests/v2/test_v21_r3_detail_product.py:173-181 (RUN.json findings: verification.status, summary, reproducer), test_v21_r3_detail_artifact.py:60-110, :380-460 (hand built findings, stubbed finder) and test_s2_kills.py:882 (model finder) read named keys other than the five here",
+    "validation/v21/cli_integration/readback.py (reads RUN.json sessions of role developer only: story_id, attempt, prompt_sha256); validation/qualification/*: no reader of reviewer sessions[].findings"
+   ],
+   "exceptions_checked": [
+    "findings copied out of their session (a triage list): nothing does; T11b pins category/path/start_line/in_scope (test_v21_kills3_T11b.py:50-71) and the ids, not source",
+    "a session mixing finders: one review.finder per run (settings review.finder, settings.py:130-147); a single adapters.Reviewer instance",
+    "a KeyError reader of finding['source']: none (git grep \"['\\\"]source['\\\"]\" over aisef2/ validation/ bin/ framework/ finds only price tables, mount rows and requirement examples)",
+    "a verifier of the new artifact that needs the finder's identity from the file alone: artifact_problems does not; the identity is reached through `session` (stream first line) and RUN.json sessions[].finder",
+    "a secret equal to a substring of 'ocr v1.12.12' making redacted()'s count differ: degenerate, and the count is not read either"
+   ],
+   "what_changed_since_b5c2457": "The record now has a second, durable, hash-bound sink - the artifact - that the audit's consumer list could not name; the two consumers it did name (adapters.py:121-131 and review_verify.py:74-103, 236-250) were rewritten (Reviewer.review loop :133-150, detail :344-405, severity_of :85-88, blocks :254-257). review_ocr.findings itself is unchanged. docs/v2.1/USAGE-2.1.md:88-90 now tells the operator the directory holds each finding complete. The conclusion holds: nothing reads the changed element in the record or in the artifact.",
+   "refutation": "",
+   "note": "REVISED, not refuted: the artifact is a new sink the written grounds did not name. A requirement test is now natural (the artifact is promised as the finding, whole): in tests/v2/test_v21_r3_detail_product.py::test_the_artifact_holds_the_whole_reproducer_redacted_and_the_candidate_it_ran_at (a real `aisef run` with FAKE_OCR, which already opens the artifact) add `self.assertEqual(doc['finding']['source'], 'ocr ' + review_ocr.OCR['version'])` and compare it with sessions[].finder of RUN.json; that one assertion kills [26], [41] and [54] of review_ocr.findings."
+  },
+  {
+   "target": "aisef2/app/review_ocr.py::findings",
+   "index": 41,
+   "mutant": "L156 string 'source' emptied",
+   "class_before": "AUDITED",
+   "verdict": "REVISED",
+   "class_after": "AUDITED",
+   "grounds": "The 'source' key of the record at review_ocr.py:156 becomes '' (same value, key ''). Where a finding record lands at 289885e: (a) RUN.json sessions[].findings through review_verify.redacted(found, secrets) (aisef2/app/adapters.py:150; run.py:497, :506) - as in b5c2457; (b) NEW in round 3: the artifact review-findings/<story>.<attempt>.<index>.json (adapters.py:142-143 -> review_verify.preserve, review_verify.py:408-440), the whole record, whose sha256 and size are in the gate row's statement (`artifact`) and in EVIDENCE.json (run.py:298-300). The only reader of the artifact is review_verify.artifact_problems (review_verify.py:443-492, called at verify.py:164): `format`, `story_id`, `finding.id`. The kernel's readers of a finding's fields are reproducer_contract (review_verify.py:91-123: reproducer, id, summary), anchor (:214), blocks (:254-257: severity_of), detail (:344-405: id, severity_of, summary, reproducer) and adapters.py:134-148 (reproducer, id, blocking). `source`, `category`, `in_scope`, `path`, `start_line` are read by none of them. The label's information is also carried by the artifact's own `session` key (the finder's stream name, `S1.reviewer.<n>.jsonl`: adapters.py:143, :248), whose first line is {'type': 'ocr_started', 'finder': 'ocr v1.12.12'} (adapters.py:225-226; the stream is listed in EVIDENCE.json, run.py:299), and by RUN.json sessions[].finder (adapters.py:249). Measured here: the mutant applied to a copy of the 289885e tree and run against 26 test modules - 231 tests of 20 (review_ocr, A10, A11, T10a-d, T11a-b, T12a-b, defects_ocr, defects_ocrz, R07, and the round-3 detail_product, detail_failclosed, detail_rv_finderfiles, detail_artifact, detail_statement, detail_model), test_v21_review_chain (18 tests, 3 RealBinary skips) and 80 tests of 5 more (T13a, kills_adapters, r3_client_stream, T14b, T26a): no test fails.",
+   "consumers_checked": [
+    "aisef2/app/adapters.py:133-150 (Reviewer.review loop, rewritten in round 3): verify, anchor, blocks, preserve, detail, redacted - reads reproducer, id, blocking, severity (via severity_of); never source/category/in_scope",
+    "aisef2/app/review_verify.py:443-492 artifact_problems (new in round 3): the only reader of the artifact file: format, story_id, finding.id (`str(found.get('id')).startswith(...)`)",
+    "aisef2/app/verify.py (does not read sessions[]; verify.py:164 calls artifact_problems; reads rec keys settings, continues, bundle_digest, journal, story_outcomes, budget, story_errors, failure, delivery_verdict, productproof, usage, no_progress, final_main)",
+    "git grep of finding fields over aisef2/ validation/ bin/ tests/v2/: tests/v2/test_v21_r3_detail_product.py:173-181 (RUN.json findings: verification.status, summary, reproducer), test_v21_r3_detail_artifact.py:60-110, :380-460 (hand built findings, stubbed finder) and test_s2_kills.py:882 (model finder) read named keys other than the five here",
+    "validation/v21/cli_integration/readback.py (reads RUN.json sessions of role developer only: story_id, attempt, prompt_sha256); validation/qualification/*: no reader of reviewer sessions[].findings",
+    "aisef2/app/review_verify.py:291-326 redacted() (new): walks every key and value to replace the run's secrets; '' holds none (`wanted` drops empty secrets, :298) and the `key in out` collision branch applies only to a duplicate; json.dumps(sort_keys=True) at review_verify.py:420-422 and run.py:506 accept ''"
+   ],
+   "exceptions_checked": [
+    "a consumer iterating a finding's keys: none (adapters.py:136-138 assigns verification/anchor by name; review_verify reads named keys only)",
+    "sort_keys with a mixed key type: redacted() writes every key as a str (non-str keys as `<type>repr`), so the RUN.json and artifact dumps see only str keys",
+    "two keys collapsing to '' in redacted(): the record has no other empty key (findings() builds it from a literal at review_ocr.py:153-157)"
+   ],
+   "what_changed_since_b5c2457": "The record now has a second, durable, hash-bound sink - the artifact - that the audit's consumer list could not name; the two consumers it did name (adapters.py:121-131 and review_verify.py:74-103, 236-250) were rewritten (Reviewer.review loop :133-150, detail :344-405, severity_of :85-88, blocks :254-257). review_ocr.findings itself is unchanged. docs/v2.1/USAGE-2.1.md:88-90 now tells the operator the directory holds each finding complete. The conclusion holds: nothing reads the changed element in the record or in the artifact. redacted() (new) is the one new code that touches every key of the record; it handles ''.",
+   "refutation": "",
+   "note": "REVISED as [26]. A requirement test is now natural (the artifact is promised as the finding, whole): in tests/v2/test_v21_r3_detail_product.py::test_the_artifact_holds_the_whole_reproducer_redacted_and_the_candidate_it_ran_at (a real `aisef run` with FAKE_OCR, which already opens the artifact) add `self.assertEqual(doc['finding']['source'], 'ocr ' + review_ocr.OCR['version'])` and compare it with sessions[].finder of RUN.json; that one assertion kills [26], [41] and [54] of review_ocr.findings."
+  },
+  {
+   "target": "aisef2/app/review_ocr.py::findings",
+   "index": 51,
+   "mutant": "L153 string 'low' emptied",
+   "class_before": "AUDITED",
+   "verdict": "REVISED",
+   "class_after": "AUDITED",
+   "grounds": "The record's severity default at review_ocr.py:153 becomes '' instead of 'low' when OCR gives none (or a falsy one). Decision-level equivalence: severity_of (review_verify.py:85-88: `str(finding.get('severity','')).lower()`, 'low' when not in SEVERITIES) maps '' to 'low', and both users of a finding's severity go through it - blocks (:254-257) and detail (:373: the statement's `severity`) - so the journaled statement, the gate row and the developer's retry text (feedback.retry_feedback reads those rows, feedback.py:76-80) are identical under both. With min_severity 'low' the comparison is 0 >= 0 either way. The raw value is visible only in RUN.json sessions[].findings[].severity (adapters.py:150) and, new in round 3, in the artifact's finding.severity. No reader. Measured here: the mutant applied to a copy of the 289885e tree and run against 26 test modules - 231 tests of 20 (review_ocr, A10, A11, T10a-d, T11a-b, T12a-b, defects_ocr, defects_ocrz, R07, and the round-3 detail_product, detail_failclosed, detail_rv_finderfiles, detail_artifact, detail_statement, detail_model), test_v21_review_chain (18 tests, 3 RealBinary skips) and 80 tests of 5 more (T13a, kills_adapters, r3_client_stream, T14b, T26a): no test fails.",
+   "consumers_checked": [
+    "aisef2/app/adapters.py:133-150 (Reviewer.review loop, rewritten in round 3): verify, anchor, blocks, preserve, detail, redacted - reads reproducer, id, blocking, severity (via severity_of); never source/category/in_scope",
+    "aisef2/app/review_verify.py:443-492 artifact_problems (new in round 3): the only reader of the artifact file: format, story_id, finding.id (`str(found.get('id')).startswith(...)`)",
+    "aisef2/app/verify.py (does not read sessions[]; verify.py:164 calls artifact_problems; reads rec keys settings, continues, bundle_digest, journal, story_outcomes, budget, story_errors, failure, delivery_verdict, productproof, usage, no_progress, final_main)",
+    "git grep of finding fields over aisef2/ validation/ bin/ tests/v2/: tests/v2/test_v21_r3_detail_product.py:173-181 (RUN.json findings: verification.status, summary, reproducer), test_v21_r3_detail_artifact.py:60-110, :380-460 (hand built findings, stubbed finder) and test_s2_kills.py:882 (model finder) read named keys other than the five here",
+    "validation/v21/cli_integration/readback.py (reads RUN.json sessions of role developer only: story_id, attempt, prompt_sha256); validation/qualification/*: no reader of reviewer sessions[].findings",
+    "git grep -i severity over aisef2/ validation/v21 bin/: adapters.py:31 (the model prompt), review_ocr.py:139,153, review_verify.py:36,85-88,254-257,349,373, settings.py:41,51,130-147 (min_severity) only",
+    "tests/v2/test_v21_kills3_T15a.py:238-245 pins that a severity the scale does not know ('SEVERE') is stated as 'low' by detail - the same normalisation that maps ''",
+    "tests/v2/test_v21_r3_detail_statement.py:255-258 (severity 'CRITICAL' -> 'critical' through detail) exercises severity_of, not the record default; test_v21_r3_detail_product.py:114 asserts severity 'high' from a comment that names one",
+    "docs/v2.1/research/UPSTREAM-RESEARCH.json N4 and the adapter contract section 3 (the default is documented as low)"
+   ],
+   "exceptions_checked": [
+    "a reader that does not re-normalise: none (the two users above, and nothing else, read severity)",
+    "non-string severity (5, 0, False, [], None): `c.get('severity') or ...` keeps a truthy 5 under both and gives the default for the falsy ones; severity_of maps every non-member to 'low'",
+    "record versus journal disagreement ('' in RUN.json/artifact vs 'low' in the statement): nothing compares them; the artifact and RUN.json were never compared with the statement by --verify (artifact_problems reads finding.id only)",
+    "min_severity above 'low': the finding never blocks either way (it carries no reproducer, so never CONFIRMED)"
+   ],
+   "what_changed_since_b5c2457": "The record now has a second, durable, hash-bound sink - the artifact - that the audit's consumer list could not name; the two consumers it did name (adapters.py:121-131 and review_verify.py:74-103, 236-250) were rewritten (Reviewer.review loop :133-150, detail :344-405, severity_of :85-88, blocks :254-257). review_ocr.findings itself is unchanged. docs/v2.1/USAGE-2.1.md:88-90 now tells the operator the directory holds each finding complete. The conclusion holds: nothing reads the changed element in the record or in the artifact. The statement builder was rewritten but still takes severity from severity_of (:373).",
+   "refutation": "",
+   "note": "REVISED: same conclusion, corrected consumers. A unit assertion in T11b that a comment with no severity is recorded as 'low' (O.findings of a comment without severity) would kill it directly if the owner wants the record's default pinned."
+  },
+  {
+   "target": "aisef2/app/review_ocr.py::findings",
+   "index": 52,
+   "mutant": "L154 string 'other' emptied",
+   "class_before": "AUDITED",
+   "verdict": "REFUTED",
+   "class_after": "KILLED",
+   "grounds": "The record's category default at review_ocr.py:154 becomes '' instead of 'other' when OCR gives none. The audit's premise - 'a record value that nothing reads' - is false at the snapshot (and at b5c2457: the test file is unchanged since 04e0b0f, the commit that also carries the audits): tests/v2/test_v21_kills3_T12b.py:112-114 (FindingIdWithoutCategory::test_the_finding_carries_that_id_and_reports_the_category_other) calls review_ocr.findings on a comment with no category and asserts `f['category'] == 'other'` next to the id; with the mutant it FAILS: AssertionError [('ocr-fe0abe0f0954-0', '')] != [('ocr-fe0abe0f0954-0', 'other')] (measured here on a copy of the 289885e tree). The campaign counted it a survivor because validation/v2/mutation.py:814 lists only T11a and T11b as the kill set of `findings`; T12b is wired to `finding_id` (:813), whose own default it was written for ('Pins ... finding_id [2]'), and its second test is the one that also pins the record's. The audit's grep ('get(category)/[category] over aisef2, validation') did not look in tests/. The id itself is not affected by the mutant (finding_id uses its own `comment.get('category') or 'other'`, review_ocr.py:61). Measured here: the mutant applied to a copy of the 289885e tree and run against 26 test modules - 231 tests of 20 (review_ocr, A10, A11, T10a-d, T11a-b, T12a-b, defects_ocr, defects_ocrz, R07, and the round-3 detail_product, detail_failclosed, detail_rv_finderfiles, detail_artifact, detail_statement, detail_model), test_v21_review_chain (18 tests, 3 RealBinary skips) and 80 tests of 5 more (T13a, kills_adapters, r3_client_stream, T14b, T26a): ONE TEST FAILS (tests.v2.test_v21_kills3_T12b.FindingIdWithoutCategory.test_the_finding_carries_that_id_and_reports_the_category_other).",
+   "consumers_checked": [
+    "tests/v2/test_v21_kills3_T12b.py:95-114 FindingIdWithoutCategory (the reader; asserts the record's category default, the second test at :112-114)",
+    "validation/v2/mutation.py:813-814 (kill sets: finding_id -> [T12b]; findings -> [T11a, T11b]; T12b is not in the second)",
+    "aisef2/app/review_ocr.py:61, :142, :146 (the id and the dedupe key are computed from the comment, not from the record's default)",
+    "tests/v2/test_v21_kills3_T11b.py:54-64 asserts category when the comment names one ('bug', 'security', 'style'); T11a/T11b assert none of the default - hence the survivor",
+    "aisef2/, validation/v21, bin/: no other reader of a finding's category (review_ocr.py:13, 60-63, 142, 154 only; validation/v21/cli_integration/fakeprov.py:30 builds a fake comment); the record lands in RUN.json and, since round 3, the artifact, neither read for it"
+   ],
+   "exceptions_checked": [
+    "a reader in tests/ outside the kill set: found - T12b:112-114 (this is the refutation)",
+    "an id re-derived from the record: finding_id({'category': ''}) also gives 'other' (`'' or 'other'`, :61)",
+    "grouping or filtering by category downstream (triage view, report): none in aisef2/, validation/, bin/"
+   ],
+   "what_changed_since_b5c2457": "Nothing in round 3 made this wrong: the unwired test pre-dates it (tests/v2/test_v21_kills3_T12b.py is not among the round-3 test changes). Round 3's new sink (the artifact, adapters.py:142) only adds a place the default is stored. The error is in the carried audit, which looked for readers in aisef2/ and validation/ only.",
+   "refutation": "Input: review_ocr.findings({'comments': [{'path': 'p.py', 'existing_code': ' x ', 'start_line': 3, 'content': 'no category here'}]}, ['p.py']) - a comment with no category. Mutant: the record's category is '' where the original gives 'other'. Reader: tests/v2/test_v21_kills3_T12b.py:112-114 (FindingIdWithoutCategory.test_the_finding_carries_that_id_and_reports_the_category_other) asserts [(f['id'], f['category'])] == [('ocr-<12 hex>-0', 'other')]; fails on the mutant (measured). Test proposed: none to write - add T12b to the kill set of review_ocr.py::findings (validation/v2/mutation.py:814) or restate: `[f] = O.findings({'comments': [{'path': 'p.py', 'content': 'x'}]}, []); assertEqual(f['category'], 'other')` in T11b FindingRecord.",
+   "note": "No new test is needed: wire tests/v2/test_v21_kills3_T12b.py into the kill set of aisef2/app/review_ocr.py::findings (validation/v2/mutation.py:814) and re-measure, or copy its second assertion into test_v21_kills3_T11b.py::FindingRecord. Then [52] is KILLED, not AUDITED. This is the one entry of the batch where reading tests/ outside the target's kill set mattered; every other mutant of the batch was run against the same 26 test modules and survived them."
+  },
+  {
+   "target": "aisef2/app/review_ocr.py::findings",
+   "index": 54,
+   "mutant": "L156 string 'ocr ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "REVISED",
+   "class_after": "AUDITED",
+   "grounds": "The record's 'source' value at review_ocr.py:156 loses its 'ocr ' prefix: 'v1.12.12' instead of 'ocr v1.12.12'. Where a finding record lands at 289885e: (a) RUN.json sessions[].findings through review_verify.redacted(found, secrets) (aisef2/app/adapters.py:150; run.py:497, :506) - as in b5c2457; (b) NEW in round 3: the artifact review-findings/<story>.<attempt>.<index>.json (adapters.py:142-143 -> review_verify.preserve, review_verify.py:408-440), the whole record, whose sha256 and size are in the gate row's statement (`artifact`) and in EVIDENCE.json (run.py:298-300). The only reader of the artifact is review_verify.artifact_problems (review_verify.py:443-492, called at verify.py:164): `format`, `story_id`, `finding.id`. The kernel's readers of a finding's fields are reproducer_contract (review_verify.py:91-123: reproducer, id, summary), anchor (:214), blocks (:254-257: severity_of), detail (:344-405: id, severity_of, summary, reproducer) and adapters.py:134-148 (reproducer, id, blocking). `source`, `category`, `in_scope`, `path`, `start_line` are read by none of them. The label's information is also carried by the artifact's own `session` key (the finder's stream name, `S1.reviewer.<n>.jsonl`: adapters.py:143, :248), whose first line is {'type': 'ocr_started', 'finder': 'ocr v1.12.12'} (adapters.py:225-226; the stream is listed in EVIDENCE.json, run.py:299), and by RUN.json sessions[].finder (adapters.py:249). The version alone still names the pinned release. Measured here: the mutant applied to a copy of the 289885e tree and run against 26 test modules - 231 tests of 20 (review_ocr, A10, A11, T10a-d, T11a-b, T12a-b, defects_ocr, defects_ocrz, R07, and the round-3 detail_product, detail_failclosed, detail_rv_finderfiles, detail_artifact, detail_statement, detail_model), test_v21_review_chain (18 tests, 3 RealBinary skips) and 80 tests of 5 more (T13a, kills_adapters, r3_client_stream, T14b, T26a): no test fails.",
+   "consumers_checked": [
+    "aisef2/app/adapters.py:133-150 (Reviewer.review loop, rewritten in round 3): verify, anchor, blocks, preserve, detail, redacted - reads reproducer, id, blocking, severity (via severity_of); never source/category/in_scope",
+    "aisef2/app/review_verify.py:443-492 artifact_problems (new in round 3): the only reader of the artifact file: format, story_id, finding.id (`str(found.get('id')).startswith(...)`)",
+    "aisef2/app/verify.py (does not read sessions[]; verify.py:164 calls artifact_problems; reads rec keys settings, continues, bundle_digest, journal, story_outcomes, budget, story_errors, failure, delivery_verdict, productproof, usage, no_progress, final_main)",
+    "git grep of finding fields over aisef2/ validation/ bin/ tests/v2/: tests/v2/test_v21_r3_detail_product.py:173-181 (RUN.json findings: verification.status, summary, reproducer), test_v21_r3_detail_artifact.py:60-110, :380-460 (hand built findings, stubbed finder) and test_s2_kills.py:882 (model finder) read named keys other than the five here",
+    "validation/v21/cli_integration/readback.py (reads RUN.json sessions of role developer only: story_id, attempt, prompt_sha256); validation/qualification/*: no reader of reviewer sessions[].findings",
+    "git grep for startswith('ocr ') / a comparison with a session's finder / a parse of source: none in aisef2/, validation/, tests/ (test_v21_kills3_T10d.py:324 asserts the session's `finder` == 'ocr ' + version, which is built at adapters.py:249, not from the record)"
+   ],
+   "exceptions_checked": [
+    "a finding read without its session: nothing does; the artifact names its session",
+    "a parser of source: none",
+    "the stream's ocr_started line and sessions[].finder are built separately from the same constant (adapters.py:226, :249): unaffected by this mutant"
+   ],
+   "what_changed_since_b5c2457": "The record now has a second, durable, hash-bound sink - the artifact - that the audit's consumer list could not name; the two consumers it did name (adapters.py:121-131 and review_verify.py:74-103, 236-250) were rewritten (Reviewer.review loop :133-150, detail :344-405, severity_of :85-88, blocks :254-257). review_ocr.findings itself is unchanged. docs/v2.1/USAGE-2.1.md:88-90 now tells the operator the directory holds each finding complete. The conclusion holds: nothing reads the changed element in the record or in the artifact.",
+   "refutation": "",
+   "note": "REVISED as [26]. A requirement test is now natural (the artifact is promised as the finding, whole): in tests/v2/test_v21_r3_detail_product.py::test_the_artifact_holds_the_whole_reproducer_redacted_and_the_candidate_it_ran_at (a real `aisef run` with FAKE_OCR, which already opens the artifact) add `self.assertEqual(doc['finding']['source'], 'ocr ' + review_ocr.OCR['version'])` and compare it with sessions[].finder of RUN.json; that one assertion kills [26], [41] and [54] of review_ocr.findings."
+  },
+  {
+   "target": "aisef2/app/review_ocr.py::pinned",
+   "index": 11,
+   "mutant": "L207 string ')' emptied",
+   "class_before": "AUDITED",
+   "verdict": "REVISED",
+   "class_after": "AUDITED",
+   "grounds": "The ')' that closes the exception class at review_ocr.py:207 is lost: '<exe>: cannot be read (FileNotFoundError)' becomes '<exe>: cannot be read (FileNotFoundError'. Path at 289885e: review_ocr.pinned() has one caller, adapters.py:178 (git grep -F 'pinned(' over aisef2 tests validation bin: that call and tests) -> CapabilityUnrunnable(why) (:179-180) -> orchestrate/review.py:37-38 f'reviewer cannot run: {e}' -> PROVIDER_RESULT detail (journal/event.py:98-99 _text is isinstance(str); journal/format2.py:130-132) ; the failure code CAPABILITY_UNRUNNABLE comes from classify() and failure/observed carries the fixed 'review: CAPABILITY_UNRUNNABLE' (story_runner.py:288). Nothing parses the detail. The path, the kind ('cannot be read') and the exception class all stay; the loss is a balanced delimiter. Measured here: the mutant applied to a copy of the 289885e tree and run against 26 test modules - 231 tests of 20 (review_ocr, A10, A11, T10a-d, T11a-b, T12a-b, defects_ocr, defects_ocrz, R07, and the round-3 detail_product, detail_failclosed, detail_rv_finderfiles, detail_artifact, detail_statement, detail_model), test_v21_review_chain (18 tests, 3 RealBinary skips) and 80 tests of 5 more (T13a, kills_adapters, r3_client_stream, T14b, T26a): no test fails.",
+   "consumers_checked": [
+    "aisef2/app/adapters.py:177-180 (the only caller of pinned in the tree, unchanged but moved from :159-161)",
+    "aisef2/orchestrate/review.py:37-39 (composes the detail once; classification is by code, not text) and aisef2/orchestrate/story_runner.py:288 (failure/observed detail fixed)",
+    "aisef2/journal/event.py:98-99 and aisef2/journal/format2.py:130-132 (provider/result detail only has to be a str); aisef2/app/feedback.py:132-135 context_pack reads a provider/result detail only after a DEVELOPER request with no result yet - the reviewer's request is budget_owner REVIEW and story_runner.py:224-230 always records the developer's result first, redacted and cut at 300 characters",
+    "aisef2/app/feedback.py:67-69 retry_feedback and aisef2/app/usage.py:118-142 no_progress (rewritten in round 3, reads failure/observed code+detail only, :131-132): the fixed 'review: <code>' detail, never provider/result",
+    "aisef2/runtime/repair.py:53-56, sentinel.py:103, run_scope.py:222, app/lineage.py:290, journal/format2.py:230: read provider/result only by source_seqs/outcome",
+    "aisef2/app/review_verify.py:443-492 artifact_problems and app/verify.py:39-52 and :149-155 _projection_refusal (new in round 3): gate/check rows and control projections, not provider/result detail; the pinned() refusal produces no gate row",
+    "tests: test_v21_review_ocr.py:127-134 (asserts 'not the pinned' and 'absolute'), test_v21_kills3_T12b.py:138-190 PinnedRefusals (path set off, 'cannot be read', the class name) and test_v21_kills3_R07.py assert the path, kind and class, not the closing character"
+   ],
+   "exceptions_checked": [
+    "a consumer extracting the class with a pattern such as r'\\((\\w+)\\)': none (git grep over aisef2/ validation/ tests/ finds producers of 'cannot be read' at bundle.py:211, bundle_cli.py:497, settings.py:218, verify.py:109, review_verify.py:480 and review_ocr.py:207 and test regexes on the producers only)",
+    "text appended after the reason that the missing ')' would leave unbalanced mid-sentence: review.py:38 appends nothing and adapters.py:179-180 passes `why` whole",
+    "truncation hiding the end: pinned()'s reason is not cut on this path",
+    "an exe path containing '(' or ')': printed before the class, unaffected by the last character",
+    "the unreadable branch replayed through --verify: the journal's provider/result detail is validated as a str only (event.py:98-99), and no round-3 verifier code (artifact_problems, _projection_refusal) reads it",
+    "NOT_PRESERVED (adapters.py:51-52, new in round 3) is another CapabilityUnrunnable text through the same review.py:37-38 path; it is not parsed either"
+   ],
+   "what_changed_since_b5c2457": "Not what it reads, but what it is compared with: round 3 added a sibling message of the same form, review_verify.artifact_problems's 'its artifact <path> cannot be read (<Class>)' (review_verify.py:480) and pinned its closing parenthesis (tests/v2/test_v21_r3_detail_artifact.py:244, regex ending `\\(FileNotFoundError\\)$`); bundle.read's analogue ('cannot be read (<Class>: ...)', bundle.py:211) was already pinned by test_v21_kills_bundle.py:55-61 (`endswith(')')`). usage.no_progress (cited in the audit as usage.py:121) was rewritten; it still reads failure/observed only. adapters.py's call moved to :178.",
+   "refutation": "",
+   "note": "REVISED: grounds hold (no reader), cited lines and one cited consumer updated. A requirement test is now natural and cheap by precedent: in test_v21_kills3_T12b.py::PinnedRefusals::test_an_absent_binary_is_refused_naming_the_path_the_kind_and_the_exception add `self.assertTrue(why.endswith('(FileNotFoundError)'))`; it kills this mutant. Not owed: the information content of the message is unchanged."
+  }
+ ]
+}

@@ -1,0 +1,294 @@
+{
+ "batch": "V1",
+ "copy": "a",
+ "entries": [
+  {
+   "target": "aisef2/app/review_verify.py::_canon",
+   "index": 1,
+   "mutant": "L167 True->False",
+   "class_before": "EQUIVALENT",
+   "verdict": "CONFIRMED",
+   "class_after": "EQUIVALENT",
+   "grounds": "sort_keys=True (review_verify.py:167) is dominated by freeze(): every value that reaches _canon is a dict whose top level is built in ascending key order and whose nested values are freeze()d contract data. contract.py:32-44 freeze rebuilds every mapping as MappingProxyType({k: freeze(v) for k in sorted(value)}) after requiring str keys (:35-36), sequences become tuples; plain() (:47-57) maps mapping -> dict and tuple -> list in the same order. The five call sites at the snapshot: _stimulus review_verify.py:172 (dict comprehension over plain(stimulus).items(), order kept); :229 {k: d.observable.get(k) for k in keys}; :238 {k: d.observable[k] for k in keys}; :250 and :251 _canon(constant) with constant = {k: plain(observable[k]) for k in keys} (:243); keys = sorted(...) (:222) - json's sort_keys sorts str keys by code point, exactly sorted(). A contract reaches anchor() only as a BehaviorContract: reproducer_contract() :118 -> create -> __post_init__ (contract.py:144 freeze), and project.contracts is built by BehaviorContract.from_json (bundle.py:171, __post_init__ again); object.__setattr__ appears only at contract.py:130,144,147. The sorted-order pin is tests/v2/p1/test_contract.py:162-168. Re-measured at the snapshot: 3000 random trials (nested dicts and lists of dicts in shuffled insertion order, keys with digits / non-ASCII / '_x', one or two approved contracts, clause text with and without the numbers; statuses reached 1243 ANCHORED, 1286 UNANCHORED, 471 CONTRADICTS_APPROVED): 0 differences in (status, reason, contracts).",
+   "consumers_checked": [
+    "review_verify.py call sites :172, :229, :238, :250, :251 (each argument traced to freeze()d data, see grounds)",
+    "aisef2/product/contract.py:32-57, 124-149 (freeze, plain, __post_init__) and aisef2/app/bundle.py:116, 171 (Project.contracts: dict[str, BehaviorContract] from BehaviorContract.from_json)",
+    "git grep -w _canon aisef2/ validation/ tests/ docs/: review_verify.py only; the other _canon hits are unrelated functions (validation/qualification/*, tests/v2/test_c2_delivery_experiment.py:1014)",
+    "the readers of the strings _canon feeds (:229, :250, :251 -> Anchor.reason): the list under 'readers' below - they receive byte-identical text",
+    "tests/v2/p1/test_contract.py:162-168 (the sorted-order pin)"
+   ],
+   "exceptions_checked": [
+    "a BehaviorContract whose stimulus/observable bypassed __post_init__: object.__setattr__ only at contract.py:130,144,147; dataclasses.replace and from_json re-run __post_init__; none of round 3's files constructs a contract",
+    "non-str keys where sorted() and sort_keys could disagree (or sort_keys raise TypeError): freeze refuses them (contract.py:35-36)",
+    "a duck-typed contract in project.contracts: only a test double (tests/v2/test_v21_kills3_T16a.py builds real BehaviorContract objects too); Project.contracts comes from from_json",
+    "round 3 changed what READS the reason (detail/preserve/redacted), not what _canon is given: contract.py and bundle.py are unchanged between b5c2457 and 289885e",
+    "freeze ever ceasing to sort: the mutant would then be observable; pinned by test_contract.py:162-168"
+   ],
+   "what_changed_since_b5c2457": "nothing it reads: _canon's arguments are built from contract.py/bundle.py (unchanged) and review_verify.py:166-251 is byte-identical to b5c2457 (line numbers +11). The new readers of the produced text (detail, preserve, redacted) get the same bytes.",
+   "refutation": null,
+   "note": "Equivalent only by dominance of freeze(); jointly with [11] (sorted->list) both rest on the same fact, which tests/v2/p1/test_contract.py:162-168 pins.",
+   "re_measured_at_snapshot": "in-process at 289885e: 3000 random trials (anchor() original vs the mutant, (status, reason, contracts)): 0 differences; the proof is by dominance, the trials are a check"
+  },
+  {
+   "target": "aisef2/app/review_verify.py::_canon",
+   "index": 4,
+   "mutant": "L167 False->True",
+   "class_before": "AUDITED",
+   "verdict": "REFUTED",
+   "class_after": "SURVIVED (test owed)",
+   "grounds": "The audit's ground 'no reader depends on the unescaped text; lossless either way' no longer holds at 289885e. _canon's output is embedded in Anchor.reason (:250, :251) and that reason is now bounded on its ENCODING: detail() states anchor_why with fit(reason, WHY_MAX=160) (review_verify.py:381, 269; _fit :332-341 counts the JSON string body per character - a backslash is 2). With ensure_ascii=True each non-ASCII letter of an approved outcome becomes a 6-character \\uXXXX escape, 7 characters once the statement string is JSON-encoded, against 1 in the original; the identifying elements that END the reason - the approved contract ids '(BC-..., BC-...)' - are what the cut takes first. The statement has no `contracts` key (the ids exist in the text only: A15 AnchoredReason docstring; pinned as separate tokens by T15a:173-200), and the blocked row's detail is what the developer's retry prompt prints (feedback.py:76-80).",
+   "consumers_checked": [
+    "aisef2/app/adapters.py:133-150 (Reviewer.review, the only caller of anchor() and detail()): :135 anchor(); :138 f['anchor'] = {status, why: a.reason, contracts}; :139 blocks() reads a.status only; :142-143 preserve(f) writes the WHOLE finding, anchor.why included, to review-findings/<story>.<attempt>.<index>.json (secret-redacted, sha256 bound by the journal row and EVIDENCE.json); :148 detail(f, v, a, kept, secrets) -> the row's statement (anchor_why); :150 RUN.json sessions[].findings[] = redacted(found)",
+    "aisef2/app/review_verify.py:379-381 (detail: anchor / anchor_why = fit(anchored.reason, WHY_MAX=160) measured on the JSON-encoded string body, `elided` names a cut) and :408-440 (preserve), :443-493 (artifact_problems reads the statement's `artifact` and `finding`, and the artifact's format / story_id / finding.id: never the reason)",
+    "aisef2/orchestrate/review.py:43-46 with aisef2/orchestrate/adapters.py:63-65 and review_verify.py:256-257 (a row fails only when blocking AND corroborated, corroborated only when blocks() says CONFIRMED + ANCHORED: UNANCHORED/CONTRADICTS_APPROVED reasons are on rows that pass)",
+    "aisef2/app/feedback.py:76-80 (retry prompt: prints d['detail'] of the rows with passed False, i.e. ANCHORED only); feedback.py:107-184 context_pack reads no gate row; usage.no_progress (usage.py:118-142) reads failure/observed 'review: REVIEW_FINDING' (orchestrate/story_runner.py:288), not the statement",
+    "git grep at 289885e over aisef2/ validation/ tests/ docs/ (closure-evidence excluded): no split / regex / startswith / parse of anchor_why or Anchor.reason; assertions on it: tests/v2/test_v21_kills3_A15.py:110-132, 147-174, 177-194; test_v21_kills3_T15a.py:173-200; test_v21_kills3_T16a.py:200-211; test_v21_review.py:222; test_v21_review_chain.py:319; test_v21_r3_detail_product.py:116 (assertIn 'BC-USAGE-0'); the r3 detail_statement / detail_artifact tests use the template only as a hand-written Anchor FIXTURE for detail()/preserve() (test_v21_r3_detail_statement.py:39, test_v21_r3_detail_artifact.py:54), never anchor()'s output",
+    "aisef2/journal/event.py:285 / format3.py:392 (journal lines are canonical ensure_ascii=False UTF-8: the statement is raw there, the mutant's escapes would be backslash-doubled inside it); contract.py:61 (canonical() is ensure_ascii=False: _canon copies it)",
+    "app/run.py:506 RUN.json (ensure_ascii default): findings[].anchor.why holds the text as a JSON string either way",
+    "kill sets: anchor/_canon targets (test_v21_review*.py, A15, T15a, T16a: every outcome in them is ASCII; T16a:192-211 and A15 outcome_in() (:104-107) PARSE the JSON, which is equal under both forms) and the five round-3 files that run anchor() (r3 detail_product / model / artifact / failclosed / usage_review: ASCII outcomes only)"
+   ],
+   "exceptions_checked": [
+    "lone-surrogate collision under ensure_ascii=True (a surrogate pair vs an astral character give one text): unreachable - a contract with a lone surrogate has no UTF-8 canonical form (contract.py:61,65), so none can be approved",
+    "a long non-ASCII outcome cut by [:200] in anchor(): earlier under the mutant, same bound - but the NEW bound (WHY_MAX=160 encoded) is what makes it lose the ids at 35 characters of Vietnamese (see refutation)",
+    "the values being also raw in the same row's reproducer.observable (the B-time ground): the field is elastic now (review_verify.py:386-399, shared out smallest first, cut at its share) - it carries the finding's values, not the approved contracts' ids",
+    "the full text elsewhere: yes - the preserved artifact (finding.anchor.contracts / .why) and RUN.json hold the ids; but neither is in the developer's prompt, and `elided` only says that something was left out"
+   ],
+   "what_changed_since_b5c2457": "detail() was rewritten (review_verify.py:344-405). At b5c2457 anchor_why was reason[:300] of the TEXT inside a global [:1500] slice (an escaped 47-character message made a 185-character reason: whole). Now anchor_why is cut at 160 characters of the ENCODED string body with `elided` naming the cut, so an escaped letter costs 7 characters. Nothing else it reads changed.",
+   "refutation": "Input: clause R-1/1 with two approved contracts on two stimuli (BC-A on argv a, BC-B on argv b), both expecting {\"exit_code\": 3, \"stderr\": \"Không thể đọc tệp nhật ký: thiếu quyền truy cập\"} (47 characters); the finding states the same outcome on a third stimulus -> ANCHORED. Executed at 289885e through V.anchor() then V.detail(f, v, a) (what Reviewer.review journals, adapters.py:135,148): original anchor_why = the whole reason incl. '(BC-V22-S-9-d, BC-V22-S-9-e)', no `elided`; mutant [4] reason is 185 characters ('\"Kh\\u00f4ng th\\u1ec3 \\u0111\\u1ecdc ...'), statement anchor_why is cut inside the outcome, both ids absent, elided {'anchor_why': 39}. With short ids (BC-A, BC-B) a 35-character message already does it. Reader: the developer in the retry prompt (feedback.py:76-80 prints the blocked row's detail verbatim) - the approved contracts the block rests on are exactly what A15/T15a pin as read there. Proposed test (tests/v2, T16a-style builders contract()/project()/finding()): outcome = {'exit_code': 3, 'stderr': 'Không thể đọc tệp nhật ký: thiếu quyền truy cập'}; two contracts on two stimuli, a finding on a third; a = V.anchor(f, project(...)); assertEqual(status, ANCHORED); assertIn(outcome['stderr'], a.reason); assertNotIn('\\\\u', a.reason); d = json.loads(V.detail(f, V.Verification(V.CONFIRMED, 'r', 'probe.cli_invocation', 'REFUTED'), a)); for cid in a.contracts: assertIn(cid, d['anchor_why']); assertNotIn('anchor_why', d.get('elided', {})). Passes on the unmutated module and fails on [4] (checked in-process).",
+   "note": "Severity is bounded: the cut is declared (`elided`), the ids survive in the artifact and RUN.json, no decision reads the reason. It is nevertheless the one entry of this batch where a round-3 contract (a statement bounded on its encoding, decisive fields never evicted) makes a 'form' difference load-bearing.",
+   "re_measured_at_snapshot": "in-process at 289885e: _canon[4] patched into review_verify, then tests.v2.test_v21_kills3_A15 / T15a / T16a, test_v21_review, _review_ocr, _review_chain and the round-3 files test_v21_r3_detail_statement / _artifact / _model / _failclosed / _product / test_v21_r3_usage_review: 192 tests, 0 failures, 3 skipped - no existing test kills it (every outcome in them is ASCII or parsed as JSON)"
+  },
+  {
+   "target": "aisef2/app/review_verify.py::_scalars",
+   "index": 6,
+   "mutant": "L178 element 1 dropped",
+   "class_before": "EQUIVALENT",
+   "verdict": "CONFIRMED",
+   "class_after": "EQUIVALENT",
+   "grounds": "No tuple can reach _scalars (review_verify.py:175-180): its only entry is _states (:189), whose only caller is :244-245 with constant = {k: plain(same[0][0].observable[k]) for k in keys} (:243). The observable is frozen (contract.py:144: sequences become tuples, mappings MappingProxyType) and plain() (contract.py:47-57) maps tuple -> list and Mapping -> dict at every depth, so what is passed holds only dict / list / scalar and (list, tuple) and (list,) select the same values. The recursion (:177, :179) passes only the elements of those. Executed: 3000 random trials incl. nested lists and lists of dicts, 0 differences.",
+   "consumers_checked": [
+    "review_verify.py:186-194, :243-245 (_states, its single caller)",
+    "aisef2/product/contract.py:32-57",
+    "git grep -w _scalars aisef2/ validation/ tests/ docs/: review_verify.py:175-189 only (+ the target at validation/v2/mutation.py:657,821 and docstrings of tests/v2/test_v21_kills3_A16.py, T16a.py:216)"
+   ],
+   "exceptions_checked": [
+    "a tuple nested in a list/dict of the constant: plain() converts at every depth (a list's elements are plain()ed by the tuple branch only because freeze made every sequence a tuple)",
+    "a tuple subclass (namedtuple): freeze makes a plain tuple, plain() a list",
+    "a direct call _scalars((1, 2)) or _states(text, (1,2)): none exists; private helpers, Mapping-typed argument",
+    "a non-frozen list-with-tuple (plain() leaves raw lists alone): freeze never leaves a raw list, and no code path of round 3 builds an observable",
+    "plain() ceasing to convert tuples: the mutant would become observable; premise unpinned by a dedicated test (test_contract.py pins freeze, not plain on tuples)"
+   ],
+   "what_changed_since_b5c2457": "nothing it reads.",
+   "refutation": null,
+   "note": "Dominated by plain(); no round-3 reader of the value.",
+   "re_measured_at_snapshot": "in-process at 289885e: 3000 random trials (anchor() original vs the mutant, (status, reason, contracts)): 0 differences; the proof is by dominance, the trials are a check"
+  },
+  {
+   "target": "aisef2/app/review_verify.py::_states",
+   "index": 3,
+   "mutant": "L191 returns None",
+   "class_before": "EQUIVALENT",
+   "verdict": "CONFIRMED",
+   "class_after": "EQUIVALENT",
+   "grounds": "Single caller, truth test only: review_verify.py:244-245 `shown = len({...}) >= 2 or all(_states(...) for _, f in same)`; all() tests truthiness (None and False alike), `or` yields all()'s bool, and `shown` is then only `if not shown` (:246). The mutated line is the `return False` of :191; no other statement reads the value.",
+   "consumers_checked": [
+    "review_verify.py:186-194 and :244-248",
+    "git grep -w _states aisef2/ validation/ tests/ docs/: review_verify.py:186,244 only (+ mutation.py:657,822 and docstrings of A16.py:2, T16a.py:252,293)",
+    "pyproject.toml, .github/workflows/*.yml: no type checker (unchanged since b5c2457)"
+   ],
+   "exceptions_checked": [
+    "a caller that compares `is False` or serialises the value: none",
+    "getattr/importlib access to review_verify._states: none",
+    "use of the value outside all(): none; `shown` is a bool in both worlds",
+    "round 3 adding a reader (artifact, statement, verify): none of them calls _states"
+   ],
+   "what_changed_since_b5c2457": "nothing it reads.",
+   "refutation": null,
+   "note": "Equivalent by truthiness; the annotation says -> bool but no checker enforces it.",
+   "re_measured_at_snapshot": "in-process at 289885e: 3000 random trials (anchor() original vs the mutant, (status, reason, contracts)): 0 differences; the proof is by dominance, the trials are a check"
+  },
+  {
+   "target": "aisef2/app/review_verify.py::anchor",
+   "index": 11,
+   "mutant": "L222 sorted() -> list()",
+   "class_before": "EQUIVALENT",
+   "verdict": "CONFIRMED",
+   "class_after": "EQUIVALENT",
+   "grounds": "c is the BehaviorContract that reproducer_contract returns through BehaviorContract.create (review_verify.py:118; a str returns at :217-218). __post_init__ replaces observable by freeze() (contract.py:144) and freeze rebuilds every mapping as MappingProxyType({k: ... for k in sorted(value)}) (contract.py:37) after requiring str keys (:35-36), so iterating c.observable already yields ascending keys; the `k != 'within_s'` filter keeps relative order: list(gen) == sorted(gen) for every reachable c (:222). Executed at the snapshot: 3000 random observables (digits, non-ASCII, '_x', within_s, nested), 0 differences in (status, reason, contracts).",
+   "consumers_checked": [
+    "review_verify.py:223 expected (dict, by key), :227 dict comparison, :236 membership, :229 and :238 _canon (order-free: sort_keys, and :243 constant by key), :237 prints `{keys}` - the same order either way",
+    "aisef2/product/contract.py:32-57, 124-149; reproducer_contract() never bypasses create (:118)"
+   ],
+   "exceptions_checked": [
+    "an observable that is not the frozen sorted copy: __post_init__ always assigns freeze() (contract.py:144)",
+    "mixed-type keys where sorted() would raise: freeze refuses non-str keys first (contract.py:35-36); list() never raises, so the only observable difference could be an exception - unreachable",
+    "round 3: no change to reproducer_contract's contract construction (the diff of review_verify.py touches only detail/imports/docstring, and the new functions after blocks)"
+   ],
+   "what_changed_since_b5c2457": "nothing it reads.",
+   "refutation": null,
+   "note": "Same dominance as [0] (freeze order).",
+   "re_measured_at_snapshot": "in-process at 289885e: 3000 random trials (anchor() original vs the mutant, (status, reason, contracts)): 0 differences; the proof is by dominance, the trials are a check"
+  },
+  {
+   "target": "aisef2/app/review_verify.py::anchor",
+   "index": 47,
+   "mutant": "L251 string 'clause ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "REVISED",
+   "class_after": "AUDITED",
+   "grounds": "Executed at the snapshot: the mutated ANCHORED reason is 'R-1/1\\'s approved outcome {\"exit_code\":3} (BC-A, BC-B)' - the clause literal is still first and bounded by the apostrophe (has_token holds), the outcome JSON, 'approved outcome' and every id token are unchanged. The statement carries the clause apart as its own key `clause` (review_verify.py:372-375, cut at CLAUSE_MAX=40) and WHY_MAX=160 now bounds anchor_why on its encoding with `elided` (:381): the mutant is 7 characters SHORTER, so it can only cut later; the ids (the end of the string) survive at least as long as in the original. The carried kill_check [47] SURVIVED AnchoredReason (A15:110-132: clause token, parsed outcome, 'approved outcome', every id token); the round-3 files that run anchor() (r3 detail_product / model / artifact / failclosed / usage_review) were read at the snapshot: none asserts the lead-in (detail_product.py:116 asserts an id token only).",
+   "consumers_checked": [
+    "aisef2/app/adapters.py:133-150 (Reviewer.review, the only caller of anchor() and detail()): :135 anchor(); :138 f['anchor'] = {status, why: a.reason, contracts}; :139 blocks() reads a.status only; :142-143 preserve(f) writes the WHOLE finding, anchor.why included, to review-findings/<story>.<attempt>.<index>.json (secret-redacted, sha256 bound by the journal row and EVIDENCE.json); :148 detail(f, v, a, kept, secrets) -> the row's statement (anchor_why); :150 RUN.json sessions[].findings[] = redacted(found)",
+    "aisef2/app/review_verify.py:379-381 (detail: anchor / anchor_why = fit(anchored.reason, WHY_MAX=160) measured on the JSON-encoded string body, `elided` names a cut) and :408-440 (preserve), :443-493 (artifact_problems reads the statement's `artifact` and `finding`, and the artifact's format / story_id / finding.id: never the reason)",
+    "aisef2/orchestrate/review.py:43-46 with aisef2/orchestrate/adapters.py:63-65 and review_verify.py:256-257 (a row fails only when blocking AND corroborated, corroborated only when blocks() says CONFIRMED + ANCHORED: UNANCHORED/CONTRADICTS_APPROVED reasons are on rows that pass)",
+    "aisef2/app/feedback.py:76-80 (retry prompt: prints d['detail'] of the rows with passed False, i.e. ANCHORED only); feedback.py:107-184 context_pack reads no gate row; usage.no_progress (usage.py:118-142) reads failure/observed 'review: REVIEW_FINDING' (orchestrate/story_runner.py:288), not the statement",
+    "git grep at 289885e over aisef2/ validation/ tests/ docs/ (closure-evidence excluded): no split / regex / startswith / parse of anchor_why or Anchor.reason; assertions on it: tests/v2/test_v21_kills3_A15.py:110-132, 147-174, 177-194; test_v21_kills3_T15a.py:173-200; test_v21_kills3_T16a.py:200-211; test_v21_review.py:222; test_v21_review_chain.py:319; test_v21_r3_detail_product.py:116 (assertIn 'BC-USAGE-0'); the r3 detail_statement / detail_artifact tests use the template only as a hand-written Anchor FIXTURE for detail()/preserve() (test_v21_r3_detail_statement.py:39, test_v21_r3_detail_artifact.py:54), never anchor()'s output",
+    "new since b5c2457 and added to the consumers: preserve() copies the reason into the artifact (finding.anchor.why, adapters.py:138,142; sha256-bound), redacted(found) writes it to RUN.json (adapters.py:150), detail() bounds it at 160 encoded characters with `elided` (review_verify.py:381); none of them looks at its words, only at its bytes and its length"
+   ],
+   "exceptions_checked": [
+    "a reader cutting the clause id out of anchor_why by the word 'clause': none (grep), and the id is in the `clause` key",
+    "the clause glued to preceding text: nothing precedes it in the mutated reason; the statement's JSON key and quote do",
+    "a redaction that matches across the lead-in (a secret equal to 'clause '): secrets are the run's client_env values and tokens (adapters.py:131); a match would replace the same bytes in either world"
+   ],
+   "what_changed_since_b5c2457": "consumers moved and grew (see NEW_READERS); the reason's template is unchanged. detail() no longer cuts at 300 characters of text (it cuts at 160 of the encoding, declared by `elided`), which only helps this mutant.",
+   "refutation": null,
+   "note": "",
+   "re_measured_at_snapshot": "in-process at 289885e: the six AUDITED label mutants [47, 50, 60, 62, 64, 66] applied TOGETHER, then the round-3 files that run anchor() end to end (test_v21_r3_detail_product / _model / _artifact / _failclosed): 55 tests, 0 failures - none asserts a lead-in, a noun phrase or the closing parenthesis"
+  },
+  {
+   "target": "aisef2/app/review_verify.py::anchor",
+   "index": 50,
+   "mutant": "L251 string ')' emptied",
+   "class_before": "AUDITED",
+   "verdict": "REVISED",
+   "class_after": "AUDITED",
+   "grounds": "Executed at the snapshot: the mutated reason ends 'clause R-1/1\\'s approved outcome {\"exit_code\":3} (BC-A, BC-B': the ids are intact tokens (A15:110-132 and T15a:173-200 pin them as separate identifiers; delimiters are pinned by [49]/[80]) and the complete list is independently recorded in Anchor.contracts -> RUN.json findings[].anchor.contracts and, new, the artifact's finding.anchor.contracts (adapters.py:138,142). The ')' as a completeness marker is superseded by `elided` (review_verify.py:367-371, 403-404): detail() cuts the reason at WHY_MAX=160 encoded characters and says so ('elided': {'anchor_why': n}); a field it does not name is whole. The original shows ')' exactly when the reason fits in 160, the mutant one character later - the two differ only at that boundary (reason of 161 encoded characters: original elided 1, mutant whole).",
+   "consumers_checked": [
+    "aisef2/app/adapters.py:133-150 (Reviewer.review, the only caller of anchor() and detail()): :135 anchor(); :138 f['anchor'] = {status, why: a.reason, contracts}; :139 blocks() reads a.status only; :142-143 preserve(f) writes the WHOLE finding, anchor.why included, to review-findings/<story>.<attempt>.<index>.json (secret-redacted, sha256 bound by the journal row and EVIDENCE.json); :148 detail(f, v, a, kept, secrets) -> the row's statement (anchor_why); :150 RUN.json sessions[].findings[] = redacted(found)",
+    "aisef2/app/review_verify.py:379-381 (detail: anchor / anchor_why = fit(anchored.reason, WHY_MAX=160) measured on the JSON-encoded string body, `elided` names a cut) and :408-440 (preserve), :443-493 (artifact_problems reads the statement's `artifact` and `finding`, and the artifact's format / story_id / finding.id: never the reason)",
+    "aisef2/orchestrate/review.py:43-46 with aisef2/orchestrate/adapters.py:63-65 and review_verify.py:256-257 (a row fails only when blocking AND corroborated, corroborated only when blocks() says CONFIRMED + ANCHORED: UNANCHORED/CONTRADICTS_APPROVED reasons are on rows that pass)",
+    "aisef2/app/feedback.py:76-80 (retry prompt: prints d['detail'] of the rows with passed False, i.e. ANCHORED only); feedback.py:107-184 context_pack reads no gate row; usage.no_progress (usage.py:118-142) reads failure/observed 'review: REVIEW_FINDING' (orchestrate/story_runner.py:288), not the statement",
+    "git grep at 289885e over aisef2/ validation/ tests/ docs/ (closure-evidence excluded): no split / regex / startswith / parse of anchor_why or Anchor.reason; assertions on it: tests/v2/test_v21_kills3_A15.py:110-132, 147-174, 177-194; test_v21_kills3_T15a.py:173-200; test_v21_kills3_T16a.py:200-211; test_v21_review.py:222; test_v21_review_chain.py:319; test_v21_r3_detail_product.py:116 (assertIn 'BC-USAGE-0'); the r3 detail_statement / detail_artifact tests use the template only as a hand-written Anchor FIXTURE for detail()/preserve() (test_v21_r3_detail_statement.py:39, test_v21_r3_detail_artifact.py:54), never anchor()'s output",
+    "new since b5c2457 and added to the consumers: preserve() copies the reason into the artifact (finding.anchor.why, adapters.py:138,142; sha256-bound), redacted(found) writes it to RUN.json (adapters.py:150), detail() bounds it at 160 encoded characters with `elided` (review_verify.py:381); none of them looks at its words, only at its bytes and its length"
+   ],
+   "exceptions_checked": [
+    "the ')' read by a parser of '(' ... ')': none (grep); the string is the last text of anchor_why and the statement closes it with the JSON quote (review_verify.py:383-405)",
+    "more text following the reason that the missing ')' would merge: detail() puts `anchor_why` between its own keys; preserve() stores it as a JSON string value",
+    "'a cut reason is told by its missing paren': that was the B-time exception; the cut is now declared by `elided` and the artifact holds the whole reason"
+   ],
+   "what_changed_since_b5c2457": "the 300-character cut the audit measured against is gone (160 encoded, declared); the artifact is a new copy of the whole reason.",
+   "refutation": null,
+   "note": "",
+   "re_measured_at_snapshot": "in-process at 289885e: the six AUDITED label mutants [47, 50, 60, 62, 64, 66] applied TOGETHER, then the round-3 files that run anchor() end to end (test_v21_r3_detail_product / _model / _artifact / _failclosed): 55 tests, 0 failures - none asserts a lead-in, a noun phrase or the closing parenthesis"
+  },
+  {
+   "target": "aisef2/app/review_verify.py::anchor",
+   "index": 60,
+   "mutant": "L237 string 'the approved contracts of clause ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "REVISED",
+   "class_after": "AUDITED",
+   "grounds": "Executed at the snapshot: mutated reason \"R-1/1 do not observe ['stdout']\" for an UNANCHORED finding: status, the clause token (has_token), the predicate 'do not observe' and the key list are pinned by UnanchoredCauses.test_the_clause_s_contracts_do_not_observe_the_expected_keys (A15:168-170; T15a:122-150 asserts clause and key); the predicate keeps this cause distinct from the other UNANCHORED causes (:218, :232, :235, :241, :247 each keep their own predicate). Only the noun phrase 'the approved contracts of' is lost; the status is defined over them (module docstring :28-30) and the row passes (the finding never blocks), so the developer's prompt never carries it.",
+   "consumers_checked": [
+    "aisef2/app/adapters.py:133-150 (Reviewer.review, the only caller of anchor() and detail()): :135 anchor(); :138 f['anchor'] = {status, why: a.reason, contracts}; :139 blocks() reads a.status only; :142-143 preserve(f) writes the WHOLE finding, anchor.why included, to review-findings/<story>.<attempt>.<index>.json (secret-redacted, sha256 bound by the journal row and EVIDENCE.json); :148 detail(f, v, a, kept, secrets) -> the row's statement (anchor_why); :150 RUN.json sessions[].findings[] = redacted(found)",
+    "aisef2/app/review_verify.py:379-381 (detail: anchor / anchor_why = fit(anchored.reason, WHY_MAX=160) measured on the JSON-encoded string body, `elided` names a cut) and :408-440 (preserve), :443-493 (artifact_problems reads the statement's `artifact` and `finding`, and the artifact's format / story_id / finding.id: never the reason)",
+    "aisef2/orchestrate/review.py:43-46 with aisef2/orchestrate/adapters.py:63-65 and review_verify.py:256-257 (a row fails only when blocking AND corroborated, corroborated only when blocks() says CONFIRMED + ANCHORED: UNANCHORED/CONTRADICTS_APPROVED reasons are on rows that pass)",
+    "aisef2/app/feedback.py:76-80 (retry prompt: prints d['detail'] of the rows with passed False, i.e. ANCHORED only); feedback.py:107-184 context_pack reads no gate row; usage.no_progress (usage.py:118-142) reads failure/observed 'review: REVIEW_FINDING' (orchestrate/story_runner.py:288), not the statement",
+    "git grep at 289885e over aisef2/ validation/ tests/ docs/ (closure-evidence excluded): no split / regex / startswith / parse of anchor_why or Anchor.reason; assertions on it: tests/v2/test_v21_kills3_A15.py:110-132, 147-174, 177-194; test_v21_kills3_T15a.py:173-200; test_v21_kills3_T16a.py:200-211; test_v21_review.py:222; test_v21_review_chain.py:319; test_v21_r3_detail_product.py:116 (assertIn 'BC-USAGE-0'); the r3 detail_statement / detail_artifact tests use the template only as a hand-written Anchor FIXTURE for detail()/preserve() (test_v21_r3_detail_statement.py:39, test_v21_r3_detail_artifact.py:54), never anchor()'s output",
+    "aisef2/orchestrate/review.py:43-46 with aisef2/orchestrate/adapters.py:63-65 (never fails a row for an UNANCHORED reason), so feedback.py:76-80 never prints it",
+    "git grep 'do not observe' / 'approved contracts of clause': review_verify.py:237,241 and tests A15/T15a only",
+    "new since b5c2457 and added to the consumers: preserve() copies the reason into the artifact (finding.anchor.why, adapters.py:138,142; sha256-bound), redacted(found) writes it to RUN.json (adapters.py:150), detail() bounds it at 160 encoded characters with `elided` (review_verify.py:381); none of them looks at its words, only at its bytes and its length"
+   ],
+   "exceptions_checked": [
+    "'R-X/1.2' read as the subject so that a requirement clause 'observes' nothing: a clause cannot observe; the status and the keys fix the meaning; no code branches on the sentence",
+    "another UNANCHORED cause giving the same remaining text: :218 (reproducer_contract's reason), :232, :235, :241 :247 each keep their own predicate; executed: the mutated texts are pairwise distinct",
+    "a reason cut at 160 encoded characters after a long finding-supplied key list: the mutant is 33 characters shorter (shows more), never less"
+   ],
+   "what_changed_since_b5c2457": "consumers moved and grew (artifact, redacted RUN.json, bounded statement); no reader of the words.",
+   "refutation": null,
+   "note": "",
+   "re_measured_at_snapshot": "in-process at 289885e: the six AUDITED label mutants [47, 50, 60, 62, 64, 66] applied TOGETHER, then the round-3 files that run anchor() end to end (test_v21_r3_detail_product / _model / _artifact / _failclosed): 55 tests, 0 failures - none asserts a lead-in, a noun phrase or the closing parenthesis"
+  },
+  {
+   "target": "aisef2/app/review_verify.py::anchor",
+   "index": 62,
+   "mutant": "L241 string 'the approved contracts of clause ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "REVISED",
+   "class_after": "AUDITED",
+   "grounds": "Executed at the snapshot: mutated reason 'R-1/2 expect different values for different stimuli: its outcome depends on the input' (UNANCHORED, contracts ('BC-C', 'BC-D')): the sentence is whole, 'its outcome' still refers to the clause, 'different values', the clause token and contracts are asserted (A15:172-174; T15a:152-171 asserts contracts == both ids). Only 'the approved contracts of' is lost; the ids stay in Anchor.contracts (passed at :242) -> RUN.json and the artifact; the row passes (never printed to the developer).",
+   "consumers_checked": [
+    "aisef2/app/adapters.py:133-150 (Reviewer.review, the only caller of anchor() and detail()): :135 anchor(); :138 f['anchor'] = {status, why: a.reason, contracts}; :139 blocks() reads a.status only; :142-143 preserve(f) writes the WHOLE finding, anchor.why included, to review-findings/<story>.<attempt>.<index>.json (secret-redacted, sha256 bound by the journal row and EVIDENCE.json); :148 detail(f, v, a, kept, secrets) -> the row's statement (anchor_why); :150 RUN.json sessions[].findings[] = redacted(found)",
+    "aisef2/app/review_verify.py:379-381 (detail: anchor / anchor_why = fit(anchored.reason, WHY_MAX=160) measured on the JSON-encoded string body, `elided` names a cut) and :408-440 (preserve), :443-493 (artifact_problems reads the statement's `artifact` and `finding`, and the artifact's format / story_id / finding.id: never the reason)",
+    "aisef2/orchestrate/review.py:43-46 with aisef2/orchestrate/adapters.py:63-65 and review_verify.py:256-257 (a row fails only when blocking AND corroborated, corroborated only when blocks() says CONFIRMED + ANCHORED: UNANCHORED/CONTRADICTS_APPROVED reasons are on rows that pass)",
+    "aisef2/app/feedback.py:76-80 (retry prompt: prints d['detail'] of the rows with passed False, i.e. ANCHORED only); feedback.py:107-184 context_pack reads no gate row; usage.no_progress (usage.py:118-142) reads failure/observed 'review: REVIEW_FINDING' (orchestrate/story_runner.py:288), not the statement",
+    "git grep at 289885e over aisef2/ validation/ tests/ docs/ (closure-evidence excluded): no split / regex / startswith / parse of anchor_why or Anchor.reason; assertions on it: tests/v2/test_v21_kills3_A15.py:110-132, 147-174, 177-194; test_v21_kills3_T15a.py:173-200; test_v21_kills3_T16a.py:200-211; test_v21_review.py:222; test_v21_review_chain.py:319; test_v21_r3_detail_product.py:116 (assertIn 'BC-USAGE-0'); the r3 detail_statement / detail_artifact tests use the template only as a hand-written Anchor FIXTURE for detail()/preserve() (test_v21_r3_detail_statement.py:39, test_v21_r3_detail_artifact.py:54), never anchor()'s output",
+    "aisef2/orchestrate/review.py:43-46 with aisef2/orchestrate/adapters.py:63-65 (an UNANCHORED reason never fails a row), feedback.py:76-80 never prints it",
+    "git grep 'different values' / 'depends on the input': review_verify.py docstring and :241-242, tests A15/T15a",
+    "new since b5c2457 and added to the consumers: preserve() copies the reason into the artifact (finding.anchor.why, adapters.py:138,142; sha256-bound), redacted(found) writes it to RUN.json (adapters.py:150), detail() bounds it at 160 encoded characters with `elided` (review_verify.py:381); none of them looks at its words, only at its bytes and its length"
+   ],
+   "exceptions_checked": [
+    "the ids: kept in Anchor.contracts (:242), unlike the ANCHORED reason's list - and not in the statement either way (the statement has no `contracts` key; neither the original nor the mutant puts them in this sentence)",
+    "a sibling cause with the same text: no other reason contains this predicate"
+   ],
+   "what_changed_since_b5c2457": "consumers moved and grew; the ids are now also in the artifact.",
+   "refutation": null,
+   "note": "",
+   "re_measured_at_snapshot": "in-process at 289885e: the six AUDITED label mutants [47, 50, 60, 62, 64, 66] applied TOGETHER, then the round-3 files that run anchor() end to end (test_v21_r3_detail_product / _model / _artifact / _failclosed): 55 tests, 0 failures - none asserts a lead-in, a noun phrase or the closing parenthesis"
+  },
+  {
+   "target": "aisef2/app/review_verify.py::anchor",
+   "index": 64,
+   "mutant": "L247 string 'one approved contract of clause ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "REVISED",
+   "class_after": "AUDITED",
+   "grounds": "Executed at the snapshot: mutated reason \"R-1/3 does not show its outcome is the clause's constant (its clause text does not state the value)\" (UNANCHORED, contracts ('BC-S',)): clause token first, the predicate and the parenthetical cause intact; tests/v2/test_v21_review.py:222 asserts the predicate in detail['anchor_why'] of a real run and holds on the mutant, and the round-3 e2e test_v21_r3_detail_model.py asserts status UNANCHORED on the same path (add(2,2) vs one approved contract). Only 'one approved contract of' is lost; the cause (clause text does not state the value) and the contract (Anchor.contracts, :248) are kept. The row passes.",
+   "consumers_checked": [
+    "aisef2/app/adapters.py:133-150 (Reviewer.review, the only caller of anchor() and detail()): :135 anchor(); :138 f['anchor'] = {status, why: a.reason, contracts}; :139 blocks() reads a.status only; :142-143 preserve(f) writes the WHOLE finding, anchor.why included, to review-findings/<story>.<attempt>.<index>.json (secret-redacted, sha256 bound by the journal row and EVIDENCE.json); :148 detail(f, v, a, kept, secrets) -> the row's statement (anchor_why); :150 RUN.json sessions[].findings[] = redacted(found)",
+    "aisef2/app/review_verify.py:379-381 (detail: anchor / anchor_why = fit(anchored.reason, WHY_MAX=160) measured on the JSON-encoded string body, `elided` names a cut) and :408-440 (preserve), :443-493 (artifact_problems reads the statement's `artifact` and `finding`, and the artifact's format / story_id / finding.id: never the reason)",
+    "aisef2/orchestrate/review.py:43-46 with aisef2/orchestrate/adapters.py:63-65 and review_verify.py:256-257 (a row fails only when blocking AND corroborated, corroborated only when blocks() says CONFIRMED + ANCHORED: UNANCHORED/CONTRADICTS_APPROVED reasons are on rows that pass)",
+    "aisef2/app/feedback.py:76-80 (retry prompt: prints d['detail'] of the rows with passed False, i.e. ANCHORED only); feedback.py:107-184 context_pack reads no gate row; usage.no_progress (usage.py:118-142) reads failure/observed 'review: REVIEW_FINDING' (orchestrate/story_runner.py:288), not the statement",
+    "git grep at 289885e over aisef2/ validation/ tests/ docs/ (closure-evidence excluded): no split / regex / startswith / parse of anchor_why or Anchor.reason; assertions on it: tests/v2/test_v21_kills3_A15.py:110-132, 147-174, 177-194; test_v21_kills3_T15a.py:173-200; test_v21_kills3_T16a.py:200-211; test_v21_review.py:222; test_v21_review_chain.py:319; test_v21_r3_detail_product.py:116 (assertIn 'BC-USAGE-0'); the r3 detail_statement / detail_artifact tests use the template only as a hand-written Anchor FIXTURE for detail()/preserve() (test_v21_r3_detail_statement.py:39, test_v21_r3_detail_artifact.py:54), never anchor()'s output",
+    "aisef2/orchestrate/review.py:43-46 with aisef2/orchestrate/adapters.py:63-65; feedback.py:76-80 never prints it",
+    "tests/v2/test_v21_review.py:222 and tests/v2/test_v21_review_chain.py:271,319; test_v21_r3_detail_model.py (UNANCHORED e2e, status only): all hold on the mutant",
+    "new since b5c2457 and added to the consumers: preserve() copies the reason into the artifact (finding.anchor.why, adapters.py:138,142; sha256-bound), redacted(found) writes it to RUN.json (adapters.py:150), detail() bounds it at 160 encoded characters with `elided` (review_verify.py:381); none of them looks at its words, only at its bytes and its length"
+   ],
+   "exceptions_checked": [
+    "the one-contract case read as 'several': 'its clause text does not state the value' is retained, and `contracts` (one id) is recorded; two contracts on ONE stimulus reach this sentence too (:244-245 counts distinct stimuli), so 'one' was never an exact count",
+    "the ids: passed to Anchor (:248), kept in anchor.contracts / artifact",
+    "the word 'one' as the recovery hint 'add a second stimulus': the module docstring (:28-30) and A15 name the two ways, and the predicate discriminates this cause from the other four; not a branch"
+   ],
+   "what_changed_since_b5c2457": "consumers moved and grew; the real-run assertion is unchanged.",
+   "refutation": null,
+   "note": "",
+   "re_measured_at_snapshot": "in-process at 289885e: the six AUDITED label mutants [47, 50, 60, 62, 64, 66] applied TOGETHER, then the round-3 files that run anchor() end to end (test_v21_r3_detail_product / _model / _artifact / _failclosed): 55 tests, 0 failures - none asserts a lead-in, a noun phrase or the closing parenthesis"
+  },
+  {
+   "target": "aisef2/app/review_verify.py::anchor",
+   "index": 66,
+   "mutant": "L250 string 'clause ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "REVISED",
+   "class_after": "AUDITED",
+   "grounds": "Executed at the snapshot: mutated reason 'R-1/1\\'s approved outcome is {\"exit_code\":3}' (CONTRADICTS_APPROVED, contracts ('BC-A','BC-B')): clause literal first and bounded by the apostrophe, 'approved outcome' and the clause's outcome intact; ContradictedFindings.test_the_clause_s_approved_outcome_is_another (A15:189-194) asserts the clause token, 'approved outcome' and that the parsed outcome is the clause's (2), not the finding's (3). CONTRADICTS_APPROVED never blocks (review_verify.blocks needs ANCHORED, :256-257), so the sentence is triage text.",
+   "consumers_checked": [
+    "aisef2/app/adapters.py:133-150 (Reviewer.review, the only caller of anchor() and detail()): :135 anchor(); :138 f['anchor'] = {status, why: a.reason, contracts}; :139 blocks() reads a.status only; :142-143 preserve(f) writes the WHOLE finding, anchor.why included, to review-findings/<story>.<attempt>.<index>.json (secret-redacted, sha256 bound by the journal row and EVIDENCE.json); :148 detail(f, v, a, kept, secrets) -> the row's statement (anchor_why); :150 RUN.json sessions[].findings[] = redacted(found)",
+    "aisef2/app/review_verify.py:379-381 (detail: anchor / anchor_why = fit(anchored.reason, WHY_MAX=160) measured on the JSON-encoded string body, `elided` names a cut) and :408-440 (preserve), :443-493 (artifact_problems reads the statement's `artifact` and `finding`, and the artifact's format / story_id / finding.id: never the reason)",
+    "aisef2/orchestrate/review.py:43-46 with aisef2/orchestrate/adapters.py:63-65 and review_verify.py:256-257 (a row fails only when blocking AND corroborated, corroborated only when blocks() says CONFIRMED + ANCHORED: UNANCHORED/CONTRADICTS_APPROVED reasons are on rows that pass)",
+    "aisef2/app/feedback.py:76-80 (retry prompt: prints d['detail'] of the rows with passed False, i.e. ANCHORED only); feedback.py:107-184 context_pack reads no gate row; usage.no_progress (usage.py:118-142) reads failure/observed 'review: REVIEW_FINDING' (orchestrate/story_runner.py:288), not the statement",
+    "git grep at 289885e over aisef2/ validation/ tests/ docs/ (closure-evidence excluded): no split / regex / startswith / parse of anchor_why or Anchor.reason; assertions on it: tests/v2/test_v21_kills3_A15.py:110-132, 147-174, 177-194; test_v21_kills3_T15a.py:173-200; test_v21_kills3_T16a.py:200-211; test_v21_review.py:222; test_v21_review_chain.py:319; test_v21_r3_detail_product.py:116 (assertIn 'BC-USAGE-0'); the r3 detail_statement / detail_artifact tests use the template only as a hand-written Anchor FIXTURE for detail()/preserve() (test_v21_r3_detail_statement.py:39, test_v21_r3_detail_artifact.py:54), never anchor()'s output",
+    "aisef2/orchestrate/review.py:43-46 with aisef2/orchestrate/adapters.py:63-65 (never fails a row), feedback.py:76-80 never prints it; review_verify.py:256-257 (blocks needs ANCHORED)",
+    "new since b5c2457 and added to the consumers: preserve() copies the reason into the artifact (finding.anchor.why, adapters.py:138,142; sha256-bound), redacted(found) writes it to RUN.json (adapters.py:150), detail() bounds it at 160 encoded characters with `elided` (review_verify.py:381); none of them looks at its words, only at its bytes and its length"
+   ],
+   "exceptions_checked": [
+    "the clause token fused to preceding text: none precedes it",
+    "the JSON read as the finding's outcome: 'approved outcome is' is pinned and the test compares the parsed outcome to the clause's, not the finding's; executed: 'R-1/1's approved outcome is {...}' with the finding stating exit_code 5"
+   ],
+   "what_changed_since_b5c2457": "consumers moved and grew; nothing reads the words.",
+   "refutation": null,
+   "note": "",
+   "re_measured_at_snapshot": "in-process at 289885e: the six AUDITED label mutants [47, 50, 60, 62, 64, 66] applied TOGETHER, then the round-3 files that run anchor() end to end (test_v21_r3_detail_product / _model / _artifact / _failclosed): 55 tests, 0 failures - none asserts a lead-in, a noun phrase or the closing parenthesis"
+  }
+ ]
+}

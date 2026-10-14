@@ -1,0 +1,287 @@
+{
+ "batch": "V2",
+ "copy": "a",
+ "snapshot": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+ "entries": [
+  {
+   "target": "aisef2/app/review_verify.py::anchor",
+   "index": 69,
+   "mutant": "L228 string 'approved contract ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "Mutant as stated: review_verify.py:228, f'approved contract {d.id} decides this stimulus otherwise: ...' loses the label 'approved contract ' (kill_check at the snapshot with the five registered files, T0 PASS: SURVIVED). Measured on A15's project (BC-b expects exit 2, the finding says 3): original 'approved contract BC-b decides this stimulus otherwise: {\"exit_code\":2}', mutant 'BC-b decides this stimulus otherwise: {\"exit_code\":2}'; status CONTRADICTS_APPROVED and contracts ('BC-b',) identical. What the label states (that BC-b is an approved contract) is carried three other ways: the status name, the predicate (only a contract decides a stimulus), and Anchor.contracts (now also in the artifact's finding.anchor.contracts and RUN.json); and by construction: the loop at :224-229 ranges over _approved_by_clause (:197-211), approved contracts only. The id is still a whole token (A15 :185, has_token) and the predicate and parsed outcome are asserted (:186-187; neighbour [70] killed). The reason never reaches a failing row: CONTRADICTS_APPROVED never blocks (blocks() :254-257), so feedback.py:76-80 never prints it; it is journaled in an informational row and, new, in the artifact/RUN.json, which only people read.",
+   "consumers_checked": [
+    "Reviewer.review aisef2/app/adapters.py:134-150: v = _verify (:264-269) -> f['verification'] = {status, why, probe, observed} :136, a = anchor() :135 -> f['anchor'] = {status, why, contracts} :138, blocks() :139, preserve() :142 (NEW: the whole finding with verification and anchor, secret-redacted, in review-findings/<story>.<attempt>.<index>.json), detail() :148 (NEW: why and anchor_why cut only at WHY_MAX=160 encoded characters, `elided` counts what was cut, `observed` stated beside why), s['findings'] = redacted(found) :150 (RUN.json sessions[].findings[], run.py:497)",
+    "aisef2/orchestrate/review.py:43-46 (a row passes unless f.blocks; informational), aisef2/orchestrate/adapters.py:63-65 (blocks = blocking and corroborated_by), review_verify.blocks :254-257 (CONFIRMED and ANCHORED only), aisef2/app/feedback.py:76-80 (the retry prompt prints only gate rows with passed False)",
+    "review_verify.artifact_problems :443-493 (aisef run --verify, called from aisef2/app/verify.py:164) reads a row's `artifact` and `finding` and the file's format, story_id and finding.id; it reads no `why`/`anchor_why`; run.py:296-300 lists the files in EVIDENCE.json by sha256",
+    "tests/v2/test_v21_review_chain.py:314-319 (assertIn('BC-USAGE-0', stated['anchor_why']): holds on the mutant), tests/v2/test_v21_kills3_A15.py:182-187 (has_token(BC-b), 'decides this stimulus', outcome_in): all hold",
+    "tests/v2/test_v21_r3_detail_product.py:116 (assertIn('BC-USAGE-0', d['anchor_why']) on an ANCHORED row: the ids are in parentheses there, not after the label)",
+    "git grep over aisef2/ validation/ tests/ docs/ README*.md for 'approved contract {id}' / 'decides this stimulus': A15 :186 only (no document quotes the label); validation/qualification/authority_limits.py reads no reason text of anchor()"
+   ],
+   "exceptions_checked": [
+    "a contract id that is not recognisable as one without the label (ids are free-form; the shipped examples use BC-*, aisef2/app/examples/*.json): the statement has no `contracts`, so there the role rests on the status (CONTRADICTS_APPROVED) and the predicate; the artifact and RUN.json carry `contracts`",
+    "an id that equals a clause or requirement label: not shipped; the predicate 'decides this stimulus' is a contract's",
+    "the outcome fused to the id: the predicate is kept (that fusion is [70], killed)",
+    "round 3's bound: anchor_why is cut at 160 encoded characters; measured on an approved outcome of 250 characters, elided.anchor_why is 98 under the original and 80 under the mutant (the mutant shows 18 more characters of the outcome): each statement is self-consistent, nothing reads the count",
+    "a block resting on the label: none, blocking needs ANCHORED"
+   ],
+   "what_changed_since_b5c2457": "detail() now states anchor_why under its own bound and keeps the whole reason in an artifact; RUN.json sessions[].findings[] is a redacted copy; new readers are people only (artifact_problems reads no reason). The grounds' cite adapters.py:123-129 is now :133-150.",
+   "refutation": "",
+   "note": ""
+  },
+  {
+   "target": "aisef2/app/review_verify.py::reproducer_contract",
+   "index": 28,
+   "mutant": "L122 element 0 dropped",
+   "class_before": "EQUIVALENT",
+   "verdict": "CONFIRMED",
+   "class_after": "EQUIVALENT",
+   "grounds": "Proof by hierarchy, still valid at the snapshot: review_verify.py:122 `except (ContractError, ValueError, TypeError) as e` with element 0 dropped. aisef2/product/contract.py:26 `class ContractError(ValueError)`; every ContractError instance is a ValueError and is caught by element 1 into the same handler, same `e`, same returned f-string. `ContractError` is bound once in this module (import :64, use :122); the only definition in aisef2/ validation/ tests/ is contract.py:26 and its subclasses PlanError (plan/obligation.py:25), CompileError (product/compiler.py:40) and UnapprovedContract (product/approval.py:22) are ValueErrors by inheritance; no assignment or setattr of the name anywhere. Checked by running: 40,000 generated reproducers (23,015 reached the try block and raised a ContractError/ValueError there): original and mutant return the same text/contract every time. kill_check at the snapshot: SURVIVED.",
+   "consumers_checked": [
+    "review_verify.py:130-132 verify(): `if isinstance(c, str): return Verification(UNVERIFIABLE, c)`; :216-218 anchor(): the same text becomes Anchor(UNANCHORED, c): identical in both forms",
+    "tests/v2/test_v21_kills3_T15a.py (ReproducerThatIsNotAContractIsAReason) and test_v21_kills3_A15.py: refusals carry the cause; pass on the mutant",
+    "aisef2/plan/obligation.py, product/compiler.py, product/approval.py raise their ContractError subclasses outside this try block"
+   ],
+   "exceptions_checked": [
+    "a ContractError that is not a ValueError: impossible by class definition (contract.py:26); a module reload re-creates the class still as a ValueError subclass",
+    "a ContractError raised outside the try block: unaffected by the clause",
+    "the name evaluated only when an exception propagates: it is imported at module level (:64), no NameError",
+    "lint: on the mutated module ruff F401 (`ContractError` imported but unused) refuses it in CI: a lint gate, not a behaviour"
+   ],
+   "what_changed_since_b5c2457": "nothing it reads (line numbers only: :111 -> :122, :53 -> :64; contract.py, obligation.py, compiler.py, approval.py unchanged).",
+   "refutation": "",
+   "note": ""
+  },
+  {
+   "target": "aisef2/app/review_verify.py::reproducer_contract",
+   "index": 30,
+   "mutant": "L122 element 2 dropped",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "review_verify.py:122 loses TypeError from the tuple. A TypeError can arise in the try block (:115-121) only from an operation on a value that is not JSON data; the findings it sees are json.loads output (adapters.py:168 for the model finder, filtered to dict at :172; review_ocr.py:168 `json.loads(m.group(1))` for OCR's reproducer, reached through review_ocr.findings; anchor() is called only for a dict reproducer, adapters.py:135, and _verify answers a non-dict itself, :265-266). Read through every operation of that block on JSON-shaped input: f-string of finding.get('id') and str(summary) with backslashreplace (no TypeError), SubjectKind(x) (an unhashable x falls back to a search and raises ValueError: measured on [1], {'a':1}, None, 5, 1.5, True, {}), Subject.__post_init__ (isinstance-guarded, locator is str(...)), BehaviorContract.__post_init__ (isinstance guards, names_test_artefact on str only, freeze: ContractError for non-str keys, non-finite floats and non-JSON types, sorted() over str keys only), contract_hash -> canonical: json.dumps(allow_nan=False) and .encode('utf-8') raise ValueError (UnicodeEncodeError for a lone surrogate). Re-run: 40,000 generated findings (atoms incl. unhashable kinds, lone surrogates, 2**70, NaN/Infinity, nested lists/dicts, missing/extra keys, non-dict stimulus/observable): original and mutant identical, no TypeError raised anywhere. kill_check: SURVIVED.",
+   "consumers_checked": [
+    "review_verify.py:130 (verify) and :216 (anchor): the only callers; verify's other callers: adapters.py:267",
+    "producers: adapters.py:168/:172, review_ocr.py:138-171 (findings, reproducer_of :168), adapters.py:261",
+    "git grep reproducer_contract over aisef2/ validation/ tests/: tests call it with JSON dicts (T15a:62,429,438; defects_reproducer:91; A15 through verify/anchor)",
+    "tests/v2/test_v21_defects_reproducer.py (the lone-surrogate defect: ValueError, caught by element 1; passes on the mutant)"
+   ],
+   "exceptions_checked": [
+    "a hostile non-JSON Mapping: differs; no producer in aisef2, validation or tests builds one (round 3 added none: detail/preserve/redacted never call reproducer_contract)",
+    "int-to-str limit (4300 digits): ValueError, and json.loads cannot yield such an int under the default limit",
+    "RecursionError (a reproducer nested ~1000 deep): not a TypeError, propagates under both forms",
+    "TypeError raised outside the try block (sorted(r) :102, sorted(subject) :109 of a mixed-key Mapping): not JSON data, the same under both forms"
+   ],
+   "what_changed_since_b5c2457": "nothing it reads (line numbers only: :111 -> :122, the callers :112/:198 -> :130/:216, adapters.py:149/153/123/235 -> :168/:172/:135/:265).",
+   "refutation": "",
+   "note": "Still AUDITED rather than EQUIVALENT: the argument rests on library behaviour (Enum lookup) and on there being no non-JSON producer, not on a dominance inside the module."
+  },
+  {
+   "target": "aisef2/app/review_verify.py::reproducer_contract",
+   "index": 33,
+   "mutant": "L107 string 'the clause ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "REVISED",
+   "class_after": "AUDITED",
+   "grounds": "review_verify.py:107 `the clause {clause!r} names no requirement of the project` loses the lead-in label 'the clause '. Measured: 'the clause 'R-404/1' names no requirement of the project' -> ''R-404/1' names no requirement of the project'. The quoted literal (a repr: quotes kept) and the predicate are intact; the predicate mutant is [34] at the snapshot (killed by A15 :223 assertIn('no requirement')), the literal is asserted by has_token(R-404/1) A15 :222. The statement also carries the clause in its own field (detail :372-375: the finder's clause, or its JSON text when it is not a string; null stays null) next to why. Non-string clause examined (a model may write null or a number): reason 'None names no requirement of the project' / '5 names ...' with statement clause null / '5' beside it: awkward to read, still identified, still a refusal that blocks nothing. The text reaches a person only: UNVERIFIABLE (and the twin UNANCHORED, anchor() :216-218) never blocks. kill_check at the snapshot with the registered files, T0 PASS: SURVIVED.",
+   "consumers_checked": [
+    "review_verify.py:130-132 verify() -> Verification.reason; :216-218 anchor() returns the SAME text as Anchor(UNANCHORED, c): it is also anchor_why (this path was missing from the entry)",
+    "Reviewer.review aisef2/app/adapters.py:134-150: v = _verify (:264-269) -> f['verification'] = {status, why, probe, observed} :136, a = anchor() :135 -> f['anchor'] = {status, why, contracts} :138, blocks() :139, preserve() :142 (NEW: the whole finding with verification and anchor, secret-redacted, in review-findings/<story>.<attempt>.<index>.json), detail() :148 (NEW: why and anchor_why cut only at WHY_MAX=160 encoded characters, `elided` counts what was cut, `observed` stated beside why), s['findings'] = redacted(found) :150 (RUN.json sessions[].findings[], run.py:497)",
+    "aisef2/orchestrate/review.py:43-46 (a row passes unless f.blocks; informational), aisef2/orchestrate/adapters.py:63-65 (blocks = blocking and corroborated_by), review_verify.blocks :254-257 (CONFIRMED and ANCHORED only), aisef2/app/feedback.py:76-80 (the retry prompt prints only gate rows with passed False)",
+    "review_verify.artifact_problems :443-493 (aisef run --verify, called from aisef2/app/verify.py:164) reads a row's `artifact` and `finding` and the file's format, story_id and finding.id; it reads no `why`/`anchor_why`; run.py:296-300 lists the files in EVIDENCE.json by sha256",
+    "tests/v2/test_v21_review.py:146 asserts the status only; aisef/control/machine_gate.py:142 and tests/hardening/test_ac_proof_machine_gate.py:73 are the v1 gate's own string; docs/: the module docstring (review_verify.py:13) names the cause 'the clause names no requirement of the project': the predicate, intact"
+   ],
+   "exceptions_checked": [
+    "the quoted literal read as a bare string: it is the repr, quotes kept (str clause)",
+    "an empty clause: repr '' either way ('the clause '' names ...' / ''' names ...')",
+    "a non-string clause (None, number, list, dict): see grounds; statement `clause` field carries it",
+    "a fused read 'the clause R-404/1': not here, the quotes bound the literal",
+    "a block resting on this text: none (UNVERIFIABLE/UNANCHORED)"
+   ],
+   "what_changed_since_b5c2457": "(1) the grounds' 'why'[:300] is gone: detail() cuts why and anchor_why at WHY_MAX=160 and marks the cut in `elided`; the whole reason is kept in the artifact and in RUN.json; (2) the cross-references [31]/[32] are the pre-remap positions: this mutant is [33], the killed predicate [34]; (3) line cites adapters.py:234-239 -> :264-269.",
+   "refutation": "",
+   "note": "Conclusion unchanged; grounds corrected."
+  },
+  {
+   "target": "aisef2/app/review_verify.py::reproducer_contract",
+   "index": 40,
+   "mutant": "L114 string 'the subject ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "REVISED",
+   "class_after": "AUDITED",
+   "grounds": "review_verify.py:114 `the subject {locator!r} is not in the product ({sorted(product_roots)})` loses the lead-in 'the subject '. Measured: \"the subject 'json:__main__' is not in the product (['app', 'tests'])\" -> \"'json:__main__' is not in the product (['app', 'tests'])\". The locator literal (repr, quotes bound it), the predicate ' is not in the product (' (mutant [41] at the snapshot, killed by A15 :228) and each root (A15 :229-230) are asserted. The subject is also in the statement's `reproducer.subject` {kind, locator} (elastic field, whole when it fits) beside why. UNVERIFIABLE (and the UNANCHORED twin via anchor() :216-218) never blocks. kill_check at the snapshot with the registered files, T0 PASS: SURVIVED.",
+   "consumers_checked": [
+    "review_verify.py:130-132 verify(); :216-218 anchor() returns the same text as Anchor(UNANCHORED, c) -> anchor_why (path missing from the entry)",
+    "Reviewer.review aisef2/app/adapters.py:134-150: v = _verify (:264-269) -> f['verification'] = {status, why, probe, observed} :136, a = anchor() :135 -> f['anchor'] = {status, why, contracts} :138, blocks() :139, preserve() :142 (NEW: the whole finding with verification and anchor, secret-redacted, in review-findings/<story>.<attempt>.<index>.json), detail() :148 (NEW: why and anchor_why cut only at WHY_MAX=160 encoded characters, `elided` counts what was cut, `observed` stated beside why), s['findings'] = redacted(found) :150 (RUN.json sessions[].findings[], run.py:497)",
+    "aisef2/orchestrate/review.py:43-46 (a row passes unless f.blocks; informational), aisef2/orchestrate/adapters.py:63-65 (blocks = blocking and corroborated_by), review_verify.blocks :254-257 (CONFIRMED and ANCHORED only), aisef2/app/feedback.py:76-80 (the retry prompt prints only gate rows with passed False)",
+    "review_verify.artifact_problems :443-493 (aisef run --verify, called from aisef2/app/verify.py:164) reads a row's `artifact` and `finding` and the file's format, story_id and finding.id; it reads no `why`/`anchor_why`; run.py:296-300 lists the files in EVIDENCE.json by sha256",
+    "tests/v2/test_v21_review.py:147 asserts the status only; tests/v2/test_v21_kills3_T15a.py:433-440 (assertIn(locator, reason): the repr holds the locator, holds on the mutant)"
+   ],
+   "exceptions_checked": [
+    "the repr'd locator fused to a preceding word: nothing precedes it in the mutant, the quotes bound it",
+    "a 'path:' locator: the label never depended on the kind",
+    "a non-string locator (None, 5, list): str() first (:111), so the repr is of the string 'None'/'5'",
+    "a block resting on this text: none"
+   ],
+   "what_changed_since_b5c2457": "'why'[:300] -> WHY_MAX=160 with `elided` and an artifact; cross-references [38]/[39] are the pre-remap positions (this mutant is [40], the killed predicate [41]); adapters.py:234-239 -> :264-269; anchor() twin path added.",
+   "refutation": "",
+   "note": "Conclusion unchanged; grounds corrected."
+  },
+  {
+   "target": "aisef2/app/review_verify.py::reproducer_contract",
+   "index": 42,
+   "mutant": "L114 string ')' emptied",
+   "class_before": "AUDITED",
+   "verdict": "REVISED",
+   "class_after": "AUDITED",
+   "grounds": "review_verify.py:114 loses the final ')' of `... is not in the product ({sorted(product_roots)})`: the reason ends '(['app', 'tests']'. The ')' closes a parenthesis around a bracketed list repr and ends the string; locator, predicate and roots are asserted (A15 :227-230). Measured: a locator of 103 characters + ':m' gives a 160-character reason, still whole in the statement. The statement cut now bites far earlier than the grounds say: why and anchor_why are cut at WHY_MAX=160 encoded characters (detail :376, :381), i.e. for a locator repr of ~105+ characters (or several roots), and then the ')' is the cut character under the original too; `elided.why` is exactly one more under the original (measured: a locator of 104 characters + ':m' gives elided {why: 1} under the original and none under the mutant), the visible `why` identical. No code splits or parses a reason. kill_check at the snapshot with the registered files, T0 PASS: SURVIVED.",
+   "consumers_checked": [
+    "review_verify.py:130-132 verify(); :216-218 anchor() twin (anchor_why)",
+    "Reviewer.review aisef2/app/adapters.py:134-150: v = _verify (:264-269) -> f['verification'] = {status, why, probe, observed} :136, a = anchor() :135 -> f['anchor'] = {status, why, contracts} :138, blocks() :139, preserve() :142 (NEW: the whole finding with verification and anchor, secret-redacted, in review-findings/<story>.<attempt>.<index>.json), detail() :148 (NEW: why and anchor_why cut only at WHY_MAX=160 encoded characters, `elided` counts what was cut, `observed` stated beside why), s['findings'] = redacted(found) :150 (RUN.json sessions[].findings[], run.py:497)",
+    "aisef2/orchestrate/review.py:43-46 (a row passes unless f.blocks; informational), aisef2/orchestrate/adapters.py:63-65 (blocks = blocking and corroborated_by), review_verify.blocks :254-257 (CONFIRMED and ANCHORED only), aisef2/app/feedback.py:76-80 (the retry prompt prints only gate rows with passed False)",
+    "review_verify.artifact_problems :443-493 (aisef run --verify, called from aisef2/app/verify.py:164) reads a row's `artifact` and `finding` and the file's format, story_id and finding.id; it reads no `why`/`anchor_why`; run.py:296-300 lists the files in EVIDENCE.json by sha256",
+    "git grep over aisef2/ validation/ tests/ docs/: nothing matches a reason against a parenthesis; tests/v2/test_v21_kills3_A15.py:225-231 asserts the locator, the predicate and each root"
+   ],
+   "exceptions_checked": [
+    "the reason cut before its end: now at 160 encoded characters (the grounds said ~250+ for [:300]); the ')' is the last character, so it is out under the original as well; only the elided count differs",
+    "a following sentence this paren would separate: the string is returned whole",
+    "a parser or a regex over the reason: none"
+   ],
+   "what_changed_since_b5c2457": "the cut: `detail()['why'][:300]` -> WHY_MAX=160 per field with `elided`; the artifact and RUN.json keep the whole reason (the unbalanced paren is visible there); cross-reference [40] is the pre-remap position of this mutant.",
+   "refutation": "",
+   "note": "Conclusion unchanged; the cut threshold in the grounds was stale."
+  },
+  {
+   "target": "aisef2/app/review_verify.py::reproducer_contract",
+   "index": 46,
+   "mutant": "L114 sorted() -> list()",
+   "class_before": "AUDITED",
+   "verdict": "REVISED",
+   "class_after": "AUDITED",
+   "grounds": "review_verify.py:114 `sorted(product_roots)` -> `list(product_roots)`: differs only when product_roots is not alphabetical. Corrected cites: bundle.dump writes `sorted(product_roots)` (bundle.py:156; `aisef bundle seal` and every re-dump go through it, bundle_cli.py:247); bundle.load keeps the file's order as a tuple (bundle.py:197) and its shape check is names without separators (:85-87); the task text the developer reads prints project.product_roots in that same order (feedback.py:47). So the mutant's text agrees with the developer's task and differs from the original only for a hand-made, never re-dumped bundle. Measured (roots tests, app, ledgerlock): original (['app', 'ledgerlock', 'tests']), mutant (['tests', 'app', 'ledgerlock']); both deterministic. The set of roots is asserted (A15 :229-230); no order is promised anywhere. kill_check at the snapshot with the registered files, T0 PASS: SURVIVED.",
+   "consumers_checked": [
+    "review_verify.py:130-132 verify(); :216-218 anchor() twin (anchor_why)",
+    "Reviewer.review aisef2/app/adapters.py:134-150: v = _verify (:264-269) -> f['verification'] = {status, why, probe, observed} :136, a = anchor() :135 -> f['anchor'] = {status, why, contracts} :138, blocks() :139, preserve() :142 (NEW: the whole finding with verification and anchor, secret-redacted, in review-findings/<story>.<attempt>.<index>.json), detail() :148 (NEW: why and anchor_why cut only at WHY_MAX=160 encoded characters, `elided` counts what was cut, `observed` stated beside why), s['findings'] = redacted(found) :150 (RUN.json sessions[].findings[], run.py:497)",
+    "aisef2/orchestrate/review.py:43-46 (a row passes unless f.blocks; informational), aisef2/orchestrate/adapters.py:63-65 (blocks = blocking and corroborated_by), review_verify.blocks :254-257 (CONFIRMED and ANCHORED only), aisef2/app/feedback.py:76-80 (the retry prompt prints only gate rows with passed False)",
+    "review_verify.artifact_problems :443-493 (aisef run --verify, called from aisef2/app/verify.py:164) reads a row's `artifact` and `finding` and the file's format, story_id and finding.id; it reads no `why`/`anchor_why`; run.py:296-300 lists the files in EVIDENCE.json by sha256",
+    "aisef2/app/bundle.py:85-87,156,197; aisef2/app/feedback.py:47; adapters.py:196 (membership), :207 (the OCR rule's include list in project order: reads product_roots, not the reason), :268; run.py:465",
+    "tests pass tuples for product_roots (T15a:429,438, A15:93, A16:47, T16a:392, test_v21_review.py:109)"
+   ],
+   "exceptions_checked": [
+    "product_roots passed as a set (list(set) order varies with the hash seed): every caller passes Project.product_roots, a tuple (bundle.py:114,197)",
+    "a long roots list cut at 160 characters: the visible subset of roots differs between the two forms (measured, 14 roots: both cut with elided 144, a different prefix shown); `elided` says so and the artifact holds the whole list; the set is not asserted from the statement",
+    "a byte-stability requirement across runs: for one bundle both forms are deterministic; the artifact's sha256 (row-bound) depends on the text, but nothing re-derives the text and anchors are per-run"
+   ],
+   "what_changed_since_b5c2457": "bundle.py cites in the grounds (:75-77,:146,:187) were already off by ~10 lines at b5c2457: corrected to :85-87,:156,:197; 'why'[:300] -> WHY_MAX=160; anchor() twin path added; artifact and RUN.json copy the text.",
+   "refutation": "",
+   "note": "Conclusion unchanged; grounds corrected."
+  },
+  {
+   "target": "aisef2/app/review_verify.py::verify",
+   "index": 20,
+   "mutant": "L155 string ' observes the stated behaviour: the finding does not reproduce' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "review_verify.py:155 loses ' observes the stated behaviour: the finding does not reproduce': the reason becomes the probe id alone (measured: 'probe.cli_invocation'). The sentence restates what adjacent fields of the same Verification carry on this return: status NOT_REPRODUCED, probe (:156), observed = the verdict value; and, new in round 3, the statement states `observed` next to why (detail :377-378), so a row reader has status, observed and the probe id (still the reason's first token). A NOT_REPRODUCED finding has no evidence (Verification.evidence :81-82 is '' unless CONFIRMED), never blocks (blocks :254-257), its row passes and is informational (review.py:43-46), and the developer's retry prompt prints only passed-False rows (feedback.py:76-80). Unlike the UNVERIFIABLE reasons [21] (:135) and [22] (:139), where the reason is the only carrier of the cause, here the cause class is the status. The sentence is also inaccurate on one path (measured: verdict INDETERMINATE, Executed(INDETERMINATE, PRECONDITION_ABSENT) -> NOT_REPRODUCED, observed 'INDETERMINATE', sentence 'observes the stated behaviour'), so pinning it would pin a false sentence. kill_check at the snapshot: SURVIVED.",
+   "consumers_checked": [
+    "Reviewer.review aisef2/app/adapters.py:134-150: v = _verify (:264-269) -> f['verification'] = {status, why, probe, observed} :136, a = anchor() :135 -> f['anchor'] = {status, why, contracts} :138, blocks() :139, preserve() :142 (NEW: the whole finding with verification and anchor, secret-redacted, in review-findings/<story>.<attempt>.<index>.json), detail() :148 (NEW: why and anchor_why cut only at WHY_MAX=160 encoded characters, `elided` counts what was cut, `observed` stated beside why), s['findings'] = redacted(found) :150 (RUN.json sessions[].findings[], run.py:497)",
+    "aisef2/orchestrate/review.py:43-46 (a row passes unless f.blocks; informational), aisef2/orchestrate/adapters.py:63-65 (blocks = blocking and corroborated_by), review_verify.blocks :254-257 (CONFIRMED and ANCHORED only), aisef2/app/feedback.py:76-80 (the retry prompt prints only gate rows with passed False)",
+    "review_verify.artifact_problems :443-493 (aisef run --verify, called from aisef2/app/verify.py:164) reads a row's `artifact` and `finding` and the file's format, story_id and finding.id; it reads no `why`/`anchor_why`; run.py:296-300 lists the files in EVIDENCE.json by sha256",
+    "validation/qualification/authority_limits.py:415-438,454-475 (AST of verify: statuses and run_probe order); its only reading of string constants is GIT_COMMAND.search over every str constant of the closure (:411): an emptied constant cannot gain a match; tests/v2/test_v21_authority_limits.py anchors the calibration refusal (:400-403, :439-442, :448), not this line",
+    "tests/v2/test_v21_review_chain.py:324, test_v21_review.py HistoricalDefects (status NOT_REPRODUCED / not blocks, never the reason); tests/v2/test_v21_kills_adapters.py:143 (a fake's why passed through); T15a:408-410 (status, observed)",
+    "git grep over aisef2/ validation/ tests/ docs/ README*.md for 'observes the stated' / 'does not reproduce': only review_verify.py:155 (tests/v2/test_v21_kills3_T15a.py:408 has the words in a comment)"
+   ],
+   "exceptions_checked": [
+    "a reader with only the reason: observed and probe are separate fields, always set on this return (the statement now has observed too)",
+    "a blocking use: NOT_REPRODUCED is never CONFIRMED, never evidence",
+    "INDETERMINATE answered NOT_REPRODUCED with this sentence: the original is the inaccurate side; observed carries the truth; owner ruling whether INDETERMINATE belongs under UNVERIFIABLE (not this mutant)",
+    "authority_limits' constant scan: see consumers"
+   ],
+   "what_changed_since_b5c2457": "detail() rewritten: `observed` is now in the statement, why is bounded at 160 (the reason is far inside the bound), the whole finding is in an artifact and RUN.json: additive readers of fields that still carry the cause; nothing parses the sentence.",
+   "refutation": "",
+   "note": ""
+  },
+  {
+   "target": "aisef2/app/review_verify.py::verify",
+   "index": 24,
+   "mutant": "L143 string ' at the bytes that run: an unqualified observation corroborates nothing' emptied",
+   "class_before": "AUDITED",
+   "verdict": "REFUTED",
+   "class_after": "SURVIVOR",
+   "grounds": "review_verify.py:143-144 `f'{entry.probe_id} is not calibrated for {cls!r} at the bytes that run: an ' 'unqualified observation corroborates nothing'` loses its whole tail (kill_check at the snapshot with the registered five files, T0 PASS: SURVIVED). What is left, 'probe.cli_invocation is not calibrated for 'exits'', is no longer the documented cause: the module's own docstring states it as 'is not calibrated for that class at the bytes that run' (review_verify.py:13-16), the A16 and T16a docstrings define the cause with that qualifier (A16 :6-9, :35-39; T16a :405-411) and bundle_cli.py:376 / the V2-007 vocabulary use it. The qualifier is not decoration: the refusal fires when no row of calibrations() matches (probe id, executing(factory) digest, class) (:142; calibration_for's own docstring, aisef2/probe/calibration.py:136-137: 'a record for another digest qualifies nothing'), and the shipped release holds all 19 rows (measured), so in practice the refusal means 'a row exists, but not for the bytes that run' (a probe file changed). 'at the bytes that run' is the only element of the text that says so. The audit's 'docs/, README*.md: no hit' is false at the snapshot: round 3's docs/v2.1/decisions/B03-R3-PROBE-MODULE-FINDINGS.md:629-636 documents exactly this as what an operator sees after a probe-file change ('review_verify answers UNVERIFIABLE (\"not calibrated at the bytes that run\")', with 0/19 rows at the bytes that run). The previous exception ('the unmutated text never said it apart from 'at the bytes that run'') concedes that the phrase is the only element carrying it. The statement keeps the whole text (longest real reason is 136 characters, inside WHY_MAX=160), so the tail is in the row, the artifact and RUN.json today.",
+   "consumers_checked": [
+    "Reviewer.review aisef2/app/adapters.py:134-150: v = _verify (:264-269) -> f['verification'] = {status, why, probe, observed} :136, a = anchor() :135 -> f['anchor'] = {status, why, contracts} :138, blocks() :139, preserve() :142 (NEW: the whole finding with verification and anchor, secret-redacted, in review-findings/<story>.<attempt>.<index>.json), detail() :148 (NEW: why and anchor_why cut only at WHY_MAX=160 encoded characters, `elided` counts what was cut, `observed` stated beside why), s['findings'] = redacted(found) :150 (RUN.json sessions[].findings[], run.py:497)",
+    "aisef2/orchestrate/review.py:43-46 (a row passes unless f.blocks; informational), aisef2/orchestrate/adapters.py:63-65 (blocks = blocking and corroborated_by), review_verify.blocks :254-257 (CONFIRMED and ANCHORED only), aisef2/app/feedback.py:76-80 (the retry prompt prints only gate rows with passed False)",
+    "review_verify.artifact_problems :443-493 (aisef run --verify, called from aisef2/app/verify.py:164) reads a row's `artifact` and `finding` and the file's format, story_id and finding.id; it reads no `why`/`anchor_why`; run.py:296-300 lists the files in EVIDENCE.json by sha256",
+    "docs/v2.1/decisions/B03-R3-PROBE-MODULE-FINDINGS.md:103,441-445,629-636 (NEW in round 3: the operator-visible consequence of a stale calibration row is this refusal and its wording)",
+    "aisef2/app/review_verify.py:13-16 (module docstring), tests/v2/test_v21_kills3_A16.py:6-9,35-39,50-64, tests/v2/test_v21_kills3_T16a.py:405-411,429-440 (the case 'the probe's bytes are not the calibrated ones' is a subTest of both; they assert 'calibrated' and the class, not the qualifier)",
+    "tests/v2/test_v21_authority_limits.py:400-403 and :439-442 copy the whole sentence as a source anchor: edited() (:33-39) raises when it is absent, so two tests there fail on the mutant (anchor drift, outside verify's kill set; the earlier audit measured 2 failures); they do not pin the behaviour",
+    "validation/qualification/authority_limits.py:415-438 (_refuses reads the first argument's NAME, UNVERIFIABLE, never the text)"
+   ],
+   "exceptions_checked": [
+    "an operator who must learn that a class calibrated at another digest does not count: found, and it is the case that matters: the phrase is the text's only hint (the same constant serves 'no row at all' and 'a row at another digest', which is why it needs no second sentence, not why it can go)",
+    "the consequence clause 'an unqualified observation corroborates nothing': explanatory (D-002 is enforced by blocks(), not by this text); on its own it would stay AUDITED, it is the qualifier that is owed",
+    "a parser of the reason: none (git grep over aisef2/ validation/ tests/ docs/)",
+    "the cause erased: only if [23] and [24] were both applied"
+   ],
+   "what_changed_since_b5c2457": "round 3 added docs/v2.1/decisions/B03-R3-PROBE-MODULE-FINDINGS.md (912 lines), which quotes this refusal as the operator-visible consequence of a probe-file change; the statement builder now carries why as a decisive field that no other field can evict (detail :376) and the artifact keeps it whole. The audit's 'docs: no hit' and 'explanatory tail' no longer hold.",
+   "refutation": "Input: a finding on a class the release calibrates (all 19 classes have rows) whose probe's executing digest is not the calibrated one: A16's / T16a's subTest 'the probe's bytes are not the calibrated ones' (mock.patch.object(V, 'executing', lambda p: '0'*64)), or in the field any probe-file edit after release_calibration.py --write. Original reason: 'probe.cli_invocation is not calibrated for 'exits' at the bytes that run: an unqualified observation corroborates nothing'; mutant: 'probe.cli_invocation is not calibrated for 'exits''. Reader: the operator triaging UNVERIFIABLE rows (gate row why, RUN.json, the review-findings artifact), who is told by the round-3 findings document and the module docstring that the cause is 'not calibrated at the bytes that run'; without the qualifier the text says the class has no calibration, which the shipped rows contradict. Test sketch (tests/v2/test_v21_kills3_A16.py, in UncalibratedRefusalNamesItsCause.test_the_reason_names_the_probe_the_class_and_that_it_is_not_calibrated, both subTests): self.assertIn('at the bytes that run', v.reason)   # the cause's qualifier: calibrated, but not at these bytes; kills [24] and passes the unmutated module (the reason holds it today).",
+   "note": "Class after: SURVIVOR (a test is owed). The consequence clause alone would remain an audit."
+  },
+  {
+   "target": "aisef2/app/review_verify.py::verify",
+   "index": 28,
+   "mutant": "L153 string ' is said to demand' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "review_verify.py:153 loses ' is said to demand': 'probe.cli_invocation refutes the behaviour R-9 is said to demand' -> 'probe.cli_invocation refutes the behaviour R-9' (measured). The qualifier is the textual form of the module's own principle (docstring :17-18: a confirmation proves the candidate does not do what the finding states, never that the requirement demands it), and what it says is carried by a field of the same statement on every CONFIRMED finding: a CONFIRMED needs a dict reproducer, so adapters.py:135 always computes the anchor; the statement states `anchor` and `anchor_why` (detail :379-381) and, JSON being sorted by key, `anchor` is its first key, before `why`; ANCHORED / UNANCHORED / CONTRADICTS_APPROVED is exactly whether the demand is established. A row that blocks needs ANCHORED, i.e. constant == expected (:249-251), so for the one row a developer is told, the demand is established and the hedge is moot. Identifiers stay tokens of their own (probe id first, requirement id last; T16a ConfirmedFindingNamesItsIdentifiers :453-467 holds on the mutant). kill_check at the snapshot: SURVIVED.",
+   "consumers_checked": [
+    "Reviewer.review aisef2/app/adapters.py:134-150: v = _verify (:264-269) -> f['verification'] = {status, why, probe, observed} :136, a = anchor() :135 -> f['anchor'] = {status, why, contracts} :138, blocks() :139, preserve() :142 (NEW: the whole finding with verification and anchor, secret-redacted, in review-findings/<story>.<attempt>.<index>.json), detail() :148 (NEW: why and anchor_why cut only at WHY_MAX=160 encoded characters, `elided` counts what was cut, `observed` stated beside why), s['findings'] = redacted(found) :150 (RUN.json sessions[].findings[], run.py:497)",
+    "aisef2/orchestrate/review.py:43-46 (a row passes unless f.blocks; informational), aisef2/orchestrate/adapters.py:63-65 (blocks = blocking and corroborated_by), review_verify.blocks :254-257 (CONFIRMED and ANCHORED only), aisef2/app/feedback.py:76-80 (the retry prompt prints only gate rows with passed False)",
+    "review_verify.artifact_problems :443-493 (aisef run --verify, called from aisef2/app/verify.py:164) reads a row's `artifact` and `finding` and the file's format, story_id and finding.id; it reads no `why`/`anchor_why`; run.py:296-300 lists the files in EVIDENCE.json by sha256",
+    "aisef2/app/feedback.py:76-80 prints a blocking row's detail verbatim: there anchor ANCHORED, observed REFUTED and the clause are beside why",
+    "tests/v2/test_v21_review_chain.py FixLoop (fields and the retry line, not the why); test_v21_r3_detail_product.py:114-117 (assertIn('refutes', d['why'])), test_v21_r3_detail_statement.py:38 and test_v21_r3_detail_artifact.py:45 use the sentence as an INPUT constant to detail()/preserve() (not produced by verify here); test_v21_kills3_T15a.py:217 likewise",
+    "git grep 'is said to demand|refutes the behaviour' over aisef2/ validation/ tests/ docs/ README*.md: the source line and those test constants only"
+   ],
+   "exceptions_checked": [
+    "a person reading CONFIRMED + UNANCHORED / CONTRADICTS_APPROVED from why alone: residual risk (the row then says the behaviour R-9 is refuted without 'said'); mitigated by `anchor` as the statement's first key and anchor_why beside; the artifact keeps verification and anchor together",
+    "a blocking row whose requirement is not demanded: cannot arise (blocking needs ANCHORED, :249-251)",
+    "ids running together: 'R-9' is the last token, the probe id the first",
+    "a machine reader of the qualifier: none"
+   ],
+   "what_changed_since_b5c2457": "detail() states observed and bounds why at 160 (the reason is far inside the bound); an artifact and RUN.json copy keep verification and anchor side by side; nothing parses the sentence. Cites: adapters.py:122-131 -> :134-150, review_verify L134-136/L236-250 -> :152-154/:247-251.",
+   "refutation": "",
+   "note": "Residual risk acknowledged, as in the carried audit; a requirement test on the hedge is not natural (no contract asks for it)."
+  },
+  {
+   "target": "aisef2/app/review_verify.py::verify",
+   "index": 29,
+   "mutant": "L150 string 'the probe did not execute the reproducer: ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "review_verify.py:150 loses the lead 'the probe did not execute the reproducer: ' before the typed result: original 'the probe did not execute the reproducer: Unrunnable(detail='the checkout is missing: /x/y')', mutant 'Unrunnable(detail='the checkout is missing: /x/y')' (measured; InvalidSpec likewise). `result` here is an Unrunnable or an InvalidSpec (Executed is handled at :149 and was the only other member of ProbeResult, product/outcome.py:37-68, probe/protocol.py:177-179,275-280); their dataclass repr begins with the type, which names the cause more exactly than the lead (the lead lumps both under 'did not execute'). The identifying elements (probe id as Verification.probe, the detail) are intact, and the status is UNVERIFIABLE. The statement now shows MORE of the cause under the mutant: the original spends 42 characters of the 160 on the lead (verify's own [:300] likewise), the mutant gives them to the detail. kill_check at the snapshot: SURVIVED.",
+   "consumers_checked": [
+    "Reviewer.review aisef2/app/adapters.py:134-150: v = _verify (:264-269) -> f['verification'] = {status, why, probe, observed} :136, a = anchor() :135 -> f['anchor'] = {status, why, contracts} :138, blocks() :139, preserve() :142 (NEW: the whole finding with verification and anchor, secret-redacted, in review-findings/<story>.<attempt>.<index>.json), detail() :148 (NEW: why and anchor_why cut only at WHY_MAX=160 encoded characters, `elided` counts what was cut, `observed` stated beside why), s['findings'] = redacted(found) :150 (RUN.json sessions[].findings[], run.py:497)",
+    "aisef2/orchestrate/review.py:43-46 (a row passes unless f.blocks; informational), aisef2/orchestrate/adapters.py:63-65 (blocks = blocking and corroborated_by), review_verify.blocks :254-257 (CONFIRMED and ANCHORED only), aisef2/app/feedback.py:76-80 (the retry prompt prints only gate rows with passed False)",
+    "review_verify.artifact_problems :443-493 (aisef run --verify, called from aisef2/app/verify.py:164) reads a row's `artifact` and `finding` and the file's format, story_id and finding.id; it reads no `why`/`anchor_why`; run.py:296-300 lists the files in EVIDENCE.json by sha256",
+    "tests/v2/test_v21_kills3_T16a.py:442-450 (assertIn 'interpreter', 'no-such-interpreter', 'checkout', 'missing': the detail; hold on the mutant); its class docstring :406-411 lists 'did not execute' among the cause classes: carried by the type name",
+    "docs/v2.1/decisions/B03-R3-PROBE-MODULE-FINDINGS.md:103 (an UNRUNNABLE reproducer is UNVERIFIABLE: the status; it cites code lines, does not quote the phrase, and the mutant's text still contains 'Unrunnable')",
+    "validation/qualification/authority_limits.py:415-420 (_refuses reads the NAME UNVERIFIABLE), tests/v2/test_v21_authority_limits.py (no anchor on :150)",
+    "git grep 'did not execute the reproducer' over aisef2/ validation/ tests/ docs/ README*.md: the source line only"
+   ],
+   "exceptions_checked": [
+    "a result whose repr does not name its cause: only Unrunnable and InvalidSpec exist (RESULT_TYPES, outcome.py:68); Executed never reaches :150",
+    "an empty detail: the type name still names the cause, and the lead phrase did not either",
+    "a consumer matching the lead phrase to classify why a finding was not verified: none",
+    "a result cut by [:300]: the mutant keeps 42 more characters of the detail than the original"
+   ],
+   "what_changed_since_b5c2457": "why is bounded at 160 encoded characters (the original's 42-character lead used part of that), the artifact and RUN.json keep the reason as verify built it (<= 300 characters). Cites: adapters.py:124,129,131 -> :134-150; outcome.py:54-68 -> :54-68; protocol.py:203-204,224-235,283-285 -> :177-179,:223-234,:264-285.",
+   "refutation": "",
+   "note": ""
+  }
+ ]
+}

@@ -1,0 +1,260 @@
+{
+ "batch": "L1",
+ "copy": "a",
+ "snapshot": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+ "entries": [
+  {
+   "target": "aisef2/app/lineage.py::_claimed_run",
+   "index": 6,
+   "mutant": "L79 string 'not a claim' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "The mutant changes only the text of the ValueError raised at lineage.py:79 (`raise ValueError(\"not a claim\")` in _claimed_run, L73-80; the docstring L74-76 makes the exception CLASS the contract). Every call site catches (OSError, ValueError) without binding it, so the text is never read: continued_by L191-193 returns the marker (\"(an unreadable claim)\", None); lineage_account L346-348 sets `sibling = None` and L355-357 `continue`s. claim() does not call _claimed_run (its own json.loads at L152-157). The only caller of continued_by, bundle_cli.py:414, unpacks (child, state). Differential run at the snapshot (original module vs the mutant, claim lifecycle: refusal, supersede by digest, second generation, torn / non-object / run-not-a-string claims, dangling links, anchors written and read): identical on every observable. The class is held by the killed class mutants and by tests/v2/test_v21_defects_verify.py Claims.test_continued_by_gives_the_marker_and_no_state (L300) and test_the_lineage_account_passes_over_a_claim_that_names_no_run (L309).",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:191-193 continued_by: `except (OSError, ValueError): return \"(an unreadable claim)\", None` - no `as`",
+    "aisef2/app/lineage.py:346-348 lineage_account (the earlier runs' claims): `except (OSError, ValueError): sibling = None` - no `as`",
+    "aisef2/app/lineage.py:355-357 lineage_account (the predecessor's own claims): `except (OSError, ValueError): continue` - no `as`",
+    "aisef2/app/lineage.py:152-157 claim(): parses with its own json.loads, never calls _claimed_run",
+    "aisef2/app/bundle_cli.py:414-416 the only caller of continued_by in aisef2/ and validation/: unpacks (child, state)",
+    "aisef2/app/verify.py:84 lineage_account (via _spend): the ValueError is caught inside it, nothing reaches verify",
+    "grep -rn _claimed_run over aisef2 aisef validation tests docs bin: lineage.py (def + 3 calls) and validation/v2/mutation.py:733,747 (target tables) only",
+    "grep -rn 'not a claim' over aisef2 aisef validation tests docs bin: the message only at lineage.py:79; tests/v2/test_v21_r3_client_readers.py:237 has the words in a docstring sentence about something else (\"an open residual, not a claim\"): not a reader"
+   ],
+   "exceptions_checked": [
+    "a caller that binds the exception (`as e`) and logs, wraps or re-raises str(e): none of the three clauses binds it",
+    "the ValueError escaping uncaught to a traceback (where the text would be read): every call site catches ValueError; json.loads' own JSONDecodeError is a ValueError and takes the same path",
+    "a test matching the message (assertRaisesRegex / msg=): none in tests/",
+    "an external or future caller of the private helper: none in the repository; its documented contract is the class",
+    "a round-3 reader of claim files (artifact statement builder, host table, typed errors, LF-only reader): none opens a CONTINUED-BY file"
+   ],
+   "what_changed_since_b5c2457": "lineage.py changed in one hunk only: reconcile (now L234-237, `splitlines()` -> `split(\"\\n\")`), which shifts every line below L233 by +1 (_claimed_run and claim are above it and did not move). usage.py, run.py, verify.py, review_verify.py changed but none reads a claim file. Nothing it reads.",
+   "refutation": "Not refuted: no reader of the message exists; the differential found no observable that differs.",
+   "note": "The audit's cites were stale in line numbers (L74 -> L79, L186-187 -> L191-193, L314-315 -> L346-348, L323-324 -> L355-357); the facts are unchanged."
+  },
+  {
+   "target": "aisef2/app/lineage.py::claim",
+   "index": 54,
+   "mutant": "L179 string '\\n' emptied",
+   "class_before": "AUDITED",
+   "verdict": "REVISED",
+   "class_after": "AUDITED",
+   "grounds": "The claim file is written at lineage.py:179 as `json.dumps(doc, sort_keys=True) + \"\\n\"`; the mutant drops only the trailing newline. Every reader parses it as JSON or hashes the bytes it read: claim() L147-153 (read_bytes -> json.loads; `_sha(data)` at L163, L168, L169 is the digest of the bytes on disk), continued_by L191 and lineage_account L346/L355 via _claimed_run (read_text -> json.loads, whitespace-insensitive). The claim file is outside the evidence manifest: run.py:294-304 evidence_manifest lists RUN.json, RUN.started.json, run/journals/*.jsonl, sessions/*.jsonl, preflight/* and, new in round 3, review-findings/*.json (L298-300); CONTINUED-BY*.json is none of these, and tests/v2/test_v21_kills3_T14a.py ManifestMembers (L136-170, NOT_MEMBERS holds CONTINUED-BY.json) pins it. The dict, not the file, goes into rec['continues']['claim'] (run.py:374); RUN.json is dumped with sort_keys (run.py:506) and its digest is of the canonical JSON (_content_sha, run.py:283-291). verify.py never opens a claim file (L84: lineage_account only). Differential run at the snapshot (original module vs the mutant, claim lifecycle: refusal, supersede by digest, second generation, torn / non-object / run-not-a-string claims, dangling links, anchors written and read): only `ends_with_newline` differs; the parsed content, the refusal text, the supersede flow, continued_by and lineage_account are identical. Residual, accepted: a human `cat` runs on to the prompt.",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:85-92 claims() (exists / glob, never reads)",
+    "aisef2/app/lineage.py:147-153 claim() (read_bytes -> json.loads; `_sha(data)` L163/L168/L169 over the bytes read)",
+    "aisef2/app/lineage.py:191 continued_by and :346, :355 lineage_account (read_text -> _claimed_run -> json.loads)",
+    "aisef2/app/run.py:374 (the returned dict is recorded), :283-291 _content_sha (canonical JSON for RUN.json only), :294-304 evidence_manifest (explicit list; claim not in it), :506 RUN.json write",
+    "aisef2/app/verify.py:80-86 (_spend -> lineage_account only), :164 review_verify.artifact_problems (reads review-findings/ only)",
+    "aisef2/app/bundle_cli.py:414 continued_by",
+    "tests: test_v21_continue_integrity.py ClaimLifecycle (L399-470: fabricate() writes its own claim, digests come from p.read_bytes()); test_v21_kills3_T09a.py sha() L58-59 hashes read_bytes(); T14a ManifestMembers L136-170",
+    "docs/v2.1/USAGE-2.1.md:125-131 (names the sha256 of the claim, no byte format); TRACEABILITY.md:640-641 (predecessor's evidence byte-identical but for the added claim)",
+    "validation/v21/cli_integration/*.sh|py (round 3 added e2e_guest.py / e2e_linux.sh): none names CONTINUED-BY or reads a claim"
+   ],
+   "exceptions_checked": [
+    "a line-oriented reader of a claim file: none (claims() callers are the four JSON / bytes readers above)",
+    "something appending to or concatenating claim files: nothing appends; the file is created O_EXCL once, 0o444",
+    "an expected digest derived independently of the file's bytes (re-serialising rec['continues']['claim']): none; sha is always taken from bytes read; tests hash read_bytes()",
+    "the evidence manifest or anchor binding the claim's bytes: not a member (now also checked against the review-findings addition of round 3)",
+    "Windows text mode: the bytes are read back and hashed as written; json.loads tolerates either ending"
+   ],
+   "what_changed_since_b5c2457": "run.py evidence_manifest (L294-304) now also lists review-findings/*.json: the audit's list of manifest members was written without it. The conclusion is untouched (the claim file is still not a member). lineage.py claim() is unchanged (only the reconcile hunk, +1 line shift).",
+   "refutation": "Not refuted: no reader depends on the trailing newline.",
+   "note": "Cites refreshed: the audit's claim L126-136 / L164 / L286,L295 / run.py:290-296 / verify.py:61 are now L147-153 / L191 / L346,L355 / run.py:294-304 / verify.py:84."
+  },
+  {
+   "target": "aisef2/app/lineage.py::claim",
+   "index": 63,
+   "mutant": "L168 string ')' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "The mutant drops only the closing parenthesis of the parenthetical at lineage.py:166-168; the flag `--supersede-claim` and the 64-hex digest `_sha(data)` remain, the digest delimited by the preceding space and now the last token. The sibling batch's tests/v2/test_v21_kills3_T09b.py ClaimRefusalText.refuse (L148-170) extracts it by `--supersede-claim\\s+([0-9a-f]{64})(?![0-9a-f])` (L166), compares it with sha256(file bytes) and supersedes with the extracted value: that contract (flag + exact digest that works) does not depend on the `)`. cli.py compares by equality (lineage.py:163), so a copied `<sha>)` would not match: the mutant's last-token form is the safer one. The text is raised only here (L166-168) and travels as RunRefused(str(e)) (run.py:375-376) to stderr `aisef run: refused: ...` (cli.py:92-94) and into rec['failure']['detail'][:2000] (run.py:498); verify.py uses rec['failure'] only as truthiness (verify.py:185). Differential run at the snapshot (original module vs the mutant, claim lifecycle: refusal, supersede by digest, second generation, torn / non-object / run-not-a-string claims, dangling links, anchors written and read): only the refusal text differs, and the digest-by-pattern check on it is the same in both.",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:166-168 (only producer); aisef2/app/run.py:375-376 (RunRefused(str(e)) from None), :498 (failure detail, [:2000]); aisef2/app/cli.py:92-94 (stderr)",
+    "aisef2/app/verify.py:185 `rec.get(\"failure\")` truthiness only; validation/v21/cli_integration/e2e_guest.py:616 reads failure['type'] only",
+    "grep --supersede-claim / 'an operator may name' over aisef2 aisef validation tests bin docs: cli.py:46-48 help text, tests (test_v21_kills_cli.py help text; test_v21_kills3_T23a.py and test_v21_continue_integrity.py pass the flag / kwarg through, not the message), docs/v2.1/USAGE-2.1.md:131; the only extraction of the digest from the message is the T09b regex, which ends at the hex",
+    "tests assert the refusal by fragments: test_v21_continue_integrity.py:466, test_v21_kills3_R03.py:92, test_v21_kills3_T09a.py:272 assertIn 'not superseded without evidence' (before the parenthetical); T09b assert_identified delimits identifiers by [\\s),:] and the digest is checked by the regex above"
+   ],
+   "exceptions_checked": [
+    "a script taking the message's last token as the digest: the mutant is the better form",
+    "a regex or test expecting ')' after the digest: none (T09b's regex has a negative lookahead for hex only; `delimited` accepts end-of-text)",
+    "the [:2000] cut of the failure detail (run.py:498) making the paren the difference between a whole and a cut digest: the paren is the last character, so a cut that removes it in the original leaves the digest whole in both, and a cut that reaches the digest cuts both",
+    "an unbalanced '(' confusing a reader: cosmetic; no identifying element is lost"
+   ],
+   "what_changed_since_b5c2457": "Nothing it reads: lineage.py claim() is unchanged; run.py's round-3 hunks are the manifest list and the docstring; cli.py unchanged.",
+   "refutation": "Not refuted: the operative tokens are intact and the one pattern reader accepts the mutant's text.",
+   "note": "Cites refreshed (the audit's L168 / run.py:373-378 / cli.py:93 / USAGE-2.1.md:129 / continue_integrity.py:466 are now L166-168 / run.py:375-376 + 498 / cli.py:92-94 / USAGE-2.1.md:131 / continue_integrity.py:466 unchanged)."
+  },
+  {
+   "target": "aisef2/app/lineage.py::claim",
+   "index": 65,
+   "mutant": "L174 string 'O_NOFOLLOW' emptied",
+   "class_before": "EQUIVALENT",
+   "verdict": "REVISED",
+   "class_after": "EQUIVALENT",
+   "grounds": "Equivalence holds. lineage.py:173-174 opens `O_WRONLY | O_CREAT | O_EXCL | getattr(os, \"O_NOFOLLOW\", 0)`; the mutant's `getattr(os, \"\", 0)` is 0. O_NOFOLLOW governs only the final path component, and O_CREAT|O_EXCL already refuses a final component that exists, a symbolic link included, with EEXIST whatever it points at (POSIX open(); macOS open(2); Linux open(2): \"symbolic links are not followed: if pathname is a symbolic link, then open() fails\"; Linux build_open_flags ORs O_NOFOLLOW in for O_CREAT|O_EXCL itself - recalled, not readable on this host). Re-measured here on macOS / Python 3.14.7: dangling, to-file, to-dir, looping, regular-file and directory final components all give EEXIST (FileExistsError) with and without the flag; an intermediate symlinked directory is followed either way (the flag does not govern it). Where os has no O_NOFOLLOW (Windows) the original is already 0. The only handler is `except FileExistsError` (L175-177). Differential run at the snapshot (original module vs the mutant, claim lifecycle: refusal, supersede by digest, second generation, torn / non-object / run-not-a-string claims, dangling links, anchors written and read): identical on every observable, dangling links included.",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:173-177 (os.open; FileExistsError -> LineageRefused; no other OSError handled)",
+    "tests/v2/test_v21_continue_integrity.py L171-179 the `Os` shim (delegates __getattr__; the mutant's getattr(shim, '', 0) -> AttributeError -> 0 and reaches real open identically) and ClaimLifecycle.test_two_runs_at_once_one_claims_and_the_other_spends_nothing",
+    "docs/v2.1/TRACEABILITY.md:386, :640 (claim O_EXCL by generation: names O_EXCL, not O_NOFOLLOW)",
+    "grep NOFOLLOW over aisef2 aisef validation tests bin docs: lineage.py:174, :401 and docs naming it as the mechanism of the ANCHOR file (ANCHOR-THREAT-MODEL.md:49, REPORT.md:234); nothing asserts the flag's presence"
+   ],
+   "exceptions_checked": [
+    "error class when a link is planted (EEXIST vs ELOOP): EEXIST for dangling / to-file / to-dir / loop links with and without the flag (measured); the `except FileExistsError` is what every state gives",
+    "an intermediate symlinked directory: O_NOFOLLOW does not govern it; measured followed either way",
+    "Windows: the flag is absent from os, both values are 0",
+    "a link at a later generation that dangles: fails earlier at the read (L147-151), identically in both forms",
+    "a network or FUSE filesystem where O_EXCL is emulated: not an input this code has (the claim lives in a run directory of the operator's local disk)"
+   ],
+   "what_changed_since_b5c2457": "Nothing it reads (lineage.py claim() unchanged; the only hunk is reconcile, +1 line shift).",
+   "refutation": "Not refuted: no final-component state gives a different errno or outcome with the flag.",
+   "note": "Correction to the written grounds, not caused by round 3: the audit says a dangling link as the NEWEST generation 'raises a raw FileNotFoundError at L126 (path.read_bytes())'. At the snapshot the read is inside `try ... except OSError` (L147-151) and gives LineageRefused('claim cannot be read (FileNotFoundError): not superseded without evidence'), measured. A dangling GENERATION 1 link is not listed by claims() (exists() is False) and is refused by O_EXCL with 'another run took CONTINUED-BY.json at the same moment' - a refusal, but the wording names a race, not a link: an observation about the message, outside this mutant."
+  },
+  {
+   "target": "aisef2/app/lineage.py::claim",
+   "index": 72,
+   "mutant": "L179 True->False",
+   "class_before": "AUDITED",
+   "verdict": "REVISED",
+   "class_after": "AUDITED",
+   "grounds": "The mutant at lineage.py:179 is `json.dumps(doc, sort_keys=False)`: the key order of the file becomes the insertion order fixed at L172 (run, claimed, claimant, supersedes) and of the nested dicts (L169-170) instead of alphabetical. Bytes are deterministic in both forms; json.loads and every dict comparison are order-insensitive; every digest is of the bytes on disk (L148 -> L163/L168/L169; tests hash read_bytes()). The dict returned (L182) is the same object in both forms and is what run.py:374 records; RUN.json is dumped with sort_keys (run.py:506) and bound by the canonical-JSON digest (_content_sha, run.py:283-291). The claim file is not a member of the evidence manifest (run.py:294-304: RUN.json, RUN.started.json, journals, sessions, preflight and, new in round 3, review-findings/*.json; tests/v2/test_v21_kills3_T14a.py ManifestMembers pins CONTINUED-BY.json as a non-member). No document states a canonical byte form of a claim and nothing re-serialises one. Differential run at the snapshot (original module vs the mutant, claim lifecycle: refusal, supersede by digest, second generation, torn / non-object / run-not-a-string claims, dangling links, anchors written and read): only `keys_sorted` differs.",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:147-153, :191, :346, :355 (json.loads / hash of the bytes read)",
+    "aisef2/app/run.py:374 (returned dict recorded), :283-304 (canonical JSON for RUN.json, explicit manifest list), :506",
+    "aisef2/app/verify.py (no reference to claim files; lineage_account only, L84)",
+    "tests/v2/test_v21_continue_integrity.py, test_v21_kills3_T09a/T09b/T09c.py, test_v21_kills_lineage.py, test_v21_kills3_R03.py (none compares bytes of a production claim; fixtures write their own claims, some without sort_keys: test_v21_continue_integrity.py:441-447, test_v21_defects_verify.py:336)",
+    "docs/v2.1/USAGE-2.1.md:125-131, ADR-V2.1.md:144 (no byte form)"
+   ],
+   "exceptions_checked": [
+    "a verifier re-serialising a claim to compare bytes or digest: none (no sort_keys / json.dumps next to claim() or _sha in verify.py or validation/)",
+    "cross-host byte reproducibility of a claim: insertion order is code-fixed, no dependence on hash ordering",
+    "a human diff / operator copying the digest: both forms deterministic; the digest named in the refusal is of the file as written",
+    "the manifest or anchor binding the claim's bytes: not a member"
+   ],
+   "what_changed_since_b5c2457": "run.py evidence_manifest now also lists review-findings/*.json (the audit's member list predates it); the claim file is still not a member. lineage.py claim() unchanged.",
+   "refutation": "Not refuted: no reader depends on the key order.",
+   "note": "Cites refreshed as for [54]."
+  },
+  {
+   "target": "aisef2/app/lineage.py::read_anchor",
+   "index": 5,
+   "mutant": "L412 string ' is not a complete evidence anchor file' emptied",
+   "class_before": "AUDITED",
+   "verdict": "REVISED",
+   "class_after": "AUDITED",
+   "grounds": "The mutant changes the text of the ValueError at lineage.py:412 from `f\"{path} is not a complete evidence anchor file\"` to `f\"{path}\"`: class and identifying element (the path) are kept. No product code calls read_anchor (cli.py:99 calls write_anchor; --expect-anchor is a 64-hex string checked by regex at cli.py:69-70 and compared in verify.py, never read from a file). Callers are tests, which assert the class and, in T09c, that the refusal names the file: tests/v2/test_v21_continue_integrity.py:605-610, tests/v2/test_v21_kills3_T09c.py:276-298 (`assertIn(str(p), str(c.exception))`, held by the mutant). The docs (ANCHOR-THREAT-MODEL.md:51-52, REPORT.md:234-235) promise the refusal and its trigger, not its wording. Differential run at the snapshot (original module vs the mutant, claim lifecycle: refusal, supersede by digest, second generation, torn / non-object / run-not-a-string claims, dangling links, anchors written and read): only the text of the refusal of an incomplete anchor file differs. CORRECTION to the written grounds: the ValueError at L412 is not the only ValueError read_anchor can raise - a path containing a NUL gives ValueError('embedded null byte') from open() at L410 (measured); that one is untouched by the mutant and keeps its own text, so a script that prints the exception still tells the two apart.",
+   "consumers_checked": [
+    "grep read_anchor over aisef2 aisef validation tests docs bin: tests/v2/test_v21_continue_integrity.py:569,582,587,609-610; tests/v2/test_v21_kills3_T09c.py:276-298; tests/v2/test_v21_kills3_T23a.py:368 (reads back a written anchor, success path); docs ANCHOR-THREAT-MODEL.md:51 and REPORT.md:235 (state that it refuses); validation/v2/mutation.py:647,804 (target tables)",
+    "aisef2/app/cli.py:69-70 (anchor given on the command line, no file read) and :99-103 (write side, handler prints type and text of write_anchor's errors only)",
+    "grep 'complete evidence anchor' over aisef2 aisef validation tests docs bin: lineage.py:412 only",
+    "validation/v21/cli_integration/e2e_guest.py:462-466 reads anchor.txt with read_text().strip(), not read_anchor"
+   ],
+   "exceptions_checked": [
+    "an operator script printing str(e): sees the bare path for an incomplete anchor file (the residual the audit accepted); the path still identifies the refused file and the class says it is a refusal",
+    "a script splitting the message on ' is not': none in the repository",
+    "the non-ASCII case (sibling mutant [4], whose effect is a LookupError instead of the refusal) is a different mutant and is held by T09c",
+    "a second ValueError source in read_anchor: the NUL path above (not this mutant)"
+   ],
+   "what_changed_since_b5c2457": "Nothing it reads (lineage.py read_anchor unchanged; +1 line shift: the audit's L411 is now L412).",
+   "refutation": "Not refuted: no reader depends on the dropped words. A test that pinned the reason would be a cheap, natural requirement (one assertIn('not a complete evidence anchor', str(c.exception)) in T09c AnchorFileOfAnyBytes) but nothing owes it: the refusal is an API of an operator's own script with no product caller.",
+   "note": "Revised because a stated ground was wrong (single ValueError), not because of round 3; the conclusion stands."
+  },
+  {
+   "target": "aisef2/app/lineage.py::usage_lineage",
+   "index": 41,
+   "mutant": "L373 dict entry 0 dropped",
+   "class_before": "EQUIVALENT",
+   "verdict": "REVISED",
+   "class_after": "EQUIVALENT",
+   "grounds": "Equivalence holds. The mutant drops the `seq` entry of the temporary event dicts built at lineage.py:373 and handed to usage.usage (L373-374). usage.usage (usage.py:74-115) reads an event dict at exactly two places: e[\"type\"] (L99, L100) and e[\"data\"] (L100); it never enumerates, copies or serialises a dict, and its return (L113-115: provider_requests_journaled, sessions, tokens, preflight, retries, wall_s, cost) holds no event. The dicts exist only as that argument (usage_lineage uses `u` for u['cost'] and u['tokens'] only, L375-380) and are kept nowhere. Measured at the snapshot: a tracking dict handed to the real usage.usage over 22 events of 11 types records only the keys 'type' and 'data' and no whole-dict operation (iter, keys, items, values, copy, len, repr). Differential run at the snapshot (original module vs the mutant, usage_lineage over a lineage run with no events and with 22 events of 11 types, unpriced and priced): identical over the 4 calls. CORRECTION to the written grounds: 'the same shape is built by run.py:495 and verify.py:147 and read by none of them for seq' is not true as stated - run.py:228 (productproof) reads e['seq'] of the dicts run.py:487 and verify.py:151 build (pre-existing) and, new in round 3, review_verify.artifact_problems reads e.get('seq') of verify.py's dicts (review_verify.py:462, in a problem's text). Neither receives the dicts of lineage.py:373, which go to usage.usage only, so the equivalence is untouched.",
+   "consumers_checked": [
+    "aisef2/app/usage.py:99-100 (the only reads of events on usage.usage's path), :113-115 (return value), :75 (docstring declares '(seq, type, data) as dicts': an input-shape declaration with no reader)",
+    "aisef2/app/usage.py:118-142 no_progress (the other reader of such dicts: reads e['data'], e['type'] only, L130-136; not called by usage_lineage - grep no_progress aisef2/app/lineage.py: none)",
+    "aisef2/app/lineage.py:373-387 (use of `u`: u['cost'], u['tokens'])",
+    "aisef2/app/run.py:503 (sole caller of usage_lineage; its result goes to rec['lineage_usage']); validation/v21/cli_integration/run.sh:58 prints it; aisef2/app/verify.py never reads 'lineage_usage' (verify.py:196 re-derives `usage` from its own events, L151)",
+    "tests: usage.usage called directly with its own events (test_v21_kills3_T20b.py, test_v21_r3_usage_boundary.py:76, test_v21_verify.py:103, test_v21_kills3_T08b.py:127,157); nothing patches usage.usage; T08b ARetryInAJournalIsAccounted pins 'data' ([43, 62]), not 'seq'"
+   ],
+   "exceptions_checked": [
+    "usage.usage's docstring (usage.py:75) declares events as (seq, type, data): an input-shape declaration with no reader; if usage.usage started to read `seq`, the mutant would raise KeyError on the lineage tests' real path (T08b / T08a / A08 / continue_integrity), so the change would be caught where it is made",
+    "a test that spies or replaces usage.usage: none patches it (grep tests/)",
+    "a reader that enumerates the event dict (json.dumps, dict(e), e.items()) on usage.usage's path: none (tracking-dict run)",
+    "round 3's new readers of event dicts (review_verify.artifact_problems, verify._projection_refusal, no_progress's story/begin reset): none is handed lineage.py:373's dicts"
+   ],
+   "what_changed_since_b5c2457": "usage.py: session_tokens now reads streams via client.events (L51), no_progress's attempt rule changed (L118-142), `from aisef2.app import client` added; usage.usage's own reads of `events` (L99-100) and its return (L113-115) are the same code, +5 lines. verify.py: events built at L151 after _projection_refusal and handed to review_verify.artifact_problems (L164) - a new reader of `seq` on verify's dicts, not on lineage's. run.py: manifest list. lineage.py: reconcile hunk (+1 line shift: the audit's L372 is now L373).",
+   "refutation": "Not refuted: no input makes the result depend on `seq`.",
+   "note": "Revised for the side-claim about the other builders' dicts; the proof for the mutant's own path is unchanged."
+  },
+  {
+   "target": "aisef2/app/lineage.py::usage_lineage",
+   "index": 60,
+   "mutant": "L373 string 'seq' emptied",
+   "class_before": "EQUIVALENT",
+   "verdict": "CONFIRMED",
+   "class_after": "EQUIVALENT",
+   "grounds": "Same chain as [41]: the value of e.seq is stored under the key '' instead of 'seq' in the dicts built at lineage.py:373 and handed to usage.usage, which reads only 'type' and 'data' (usage.py:99-100), never enumerates a dict, and returns no event (usage.py:113-115). The key '' does not collide with 'type' or 'data'. Measured: usage.usage touches only 'type' and 'data' (tracking dict), and usage_lineage's results are identical for the original and the mutant over a lineage run with no events and with 22 events of 11 types, unpriced and priced.",
+   "consumers_checked": [
+    "aisef2/app/usage.py:99-100 (reads), :113-115 (return value)",
+    "aisef2/app/lineage.py:373-387 (use of `u`: u['cost'], u['tokens'])",
+    "aisef2/app/run.py:503 (sole caller of usage_lineage); aisef2/app/verify.py:196 re-derives `usage` from verify's own events (verify.py:151), not from lineage"
+   ],
+   "exceptions_checked": [
+    "a reader that enumerates the event dict (json.dumps, dict(e), e.items()) on usage.usage's path: none; the dicts are not serialised or stored",
+    "the key '' colliding with another key: the dict has only 'type' and 'data' besides it",
+    "usage.usage later reading `seq`: the mutant would then raise KeyError on the lineage tests' path, so the change would be caught where it is made"
+   ],
+   "what_changed_since_b5c2457": "As [41]: usage.py session_tokens / no_progress changed, usage.usage's reads of events did not; nothing that receives lineage.py:373's dicts reads another key.",
+   "refutation": "Not refuted.",
+   "note": "Cites refreshed (usage.py:94-95 -> :99-100, :108-110 -> :113-115, lineage.py:313 -> :373, run.py:497 -> :503, verify.py:147 -> :151/:196)."
+  },
+  {
+   "target": "aisef2/app/lineage.py::write_anchor",
+   "index": 5,
+   "mutant": "L400 string 'not an evidence anchor: ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "REVISED",
+   "class_after": "AUDITED",
+   "grounds": "The mutant changes the ValueError at lineage.py:400 from `f\"not an evidence anchor: {anchor!r}\"` to `f\"{anchor!r}\"`: the value (repr) is kept. Validation precedes os.open (L399-401), so no file is made. The only product caller, cli.py:99, passes R.anchor_in(a.out) (run.py:305-311), which is anchor_of(...) = a sha256 hexdigest (run.py:313-316, :77-78) or None, which `if anchor and a.anchor_out is not None` (cli.py:97) skips: the branch is unreachable from the CLI. Its handler (cli.py:101-103) prints `ValueError: <message>` on stderr, exits 2, and the printed anchor stays usable, so even a future reachable case loses only the prefix wording. Differential run at the snapshot (original module vs the mutant, claim lifecycle: refusal, supersede by digest, second generation, torn / non-object / run-not-a-string claims, dangling links, anchors written and read): only the text for None / '' / 'zz' / 64 upper-case letters differs (class, no file made: same).",
+   "consumers_checked": [
+    "aisef2/app/cli.py:95-109 (the only caller; handler L101-103 formats type(e).__name__ and e)",
+    "aisef2/app/run.py:305-316 (anchor_in / anchor_of: _sha hexdigest or None)",
+    "tests/v2/test_v21_continue_integrity.py:569, 594-604 (valid anchors; FileExistsError / PermissionError; no test of the ValueError text); tests/v2/test_v21_kills3_T09c.py:297, T23a.py:347-408 (valid anchors, and a mock of write_anchor)",
+    "tests/v2/test_v21_kills3_T23a.py:394: `mock.patch.object(lineage, \"write_anchor\", side_effect=ValueError(\"not an evidence anchor: 'x'\"))` - a second occurrence of the text, supplied by the test to drive cli.py's handler; the production message is never produced there and the test asserts only exit 2, the document with the anchor, and the `not ... written` line naming the path (copy_failure_line L335-346)",
+    "docs/v2.1/ANCHOR-THREAT-MODEL.md:47-57 (names the refusals, not the text)"
+   ],
+   "exceptions_checked": [
+    "anchor None or '': the message becomes 'None' / \"''\" (still the value; measured)",
+    "a direct caller (operator script): gets ValueError carrying the value",
+    "someone parsing the message: nothing in aisef2, validation, bin or docs does; the only other occurrence of the words is the T23a mock above",
+    "a NUL-containing path: ValueError('open: embedded null character in path') from os.open, after the validation; not this mutant"
+   ],
+   "what_changed_since_b5c2457": "Nothing it reads (write_anchor unchanged; +1 line shift: the audit's L399 is now L400).",
+   "refutation": "Not refuted: no reader of the dropped prefix; unreachable from the CLI. A cheap natural requirement test would be assertIn('not an evidence anchor', ...) on write_anchor(p, 'zz'); not owed (no caller can pass a non-hex value).",
+   "note": "Revised because the written grep ('lineage.py only') was already inexact at b5c2457 (T23a:394); the conclusion stands."
+  },
+  {
+   "target": "aisef2/app/lineage.py::write_anchor",
+   "index": 6,
+   "mutant": "L401 string 'O_NOFOLLOW' emptied",
+   "class_before": "EQUIVALENT",
+   "verdict": "CONFIRMED",
+   "class_after": "EQUIVALENT",
+   "grounds": "Equivalence holds on the same proof as claim [65]: lineage.py:401 opens `O_WRONLY | O_CREAT | O_EXCL | getattr(os, \"O_NOFOLLOW\", 0)`; O_CREAT|O_EXCL refuses an existing final component, a symbolic link included, with EEXIST (POSIX; macOS open(2); Linux open(2); Linux ORs O_NOFOLLOW in itself), O_NOFOLLOW governs only that component, and the mutant's flag value equals what Windows already gets. Re-measured on macOS / Python 3.14.7: EEXIST with and without the flag for dangling, to-file, to-dir, looping, regular and directory targets; an intermediate symlinked directory is followed either way. The documented promise (ANCHOR-THREAT-MODEL.md:49-50, REPORT.md:234: a symlink, even one pointing nowhere, is refused) is behavioural and is held by O_EXCL; the docs name O_NOFOLLOW as the mechanism but nothing observable depends on it. cli.py:65-66 also refuses an existing or dangling path with os.path.lexists before the run. Differential run at the snapshot (original module vs the mutant, claim lifecycle: refusal, supersede by digest, second generation, torn / non-object / run-not-a-string claims, dangling links, anchors written and read): identical on every observable (dangling link refused with FileExistsError in both).",
+   "consumers_checked": [
+    "tests/v2/test_v21_continue_integrity.py AnchorThreatModel.test_the_anchor_file_is_new_exact_and_never_through_a_link (L590-610: FileExistsError for an existing path and for a dangling link; passes on the mutant)",
+    "docs/v2.1/ANCHOR-THREAT-MODEL.md:49-50 and REPORT.md:234 (the mechanism as documented)",
+    "aisef2/app/cli.py:65-66 (lexists refusal before the run) and :99-103 (OSError / ValueError handler after)",
+    "grep NOFOLLOW over aisef2 aisef validation tests bin: lineage.py:174, :401 only; no test or check asserts the flag"
+   ],
+   "exceptions_checked": [
+    "error class for a planted link (ELOOP vs EEXIST): measured EEXIST with and without the flag (macOS 3.14.7); the existing test asserts FileExistsError on Linux CI with the flag, the class O_EXCL alone gives (Linux, recalled from the order in fs/namei.c do_open - not readable here: the O_EXCL check precedes the ELOOP of may_open)",
+    "an intermediate symlinked directory: not governed by O_NOFOLLOW, measured followed either way",
+    "Windows: the flag is absent, both values 0",
+    "a document or check that asserts the flag by name: none (docs only describe it)"
+   ],
+   "what_changed_since_b5c2457": "Nothing it reads (write_anchor unchanged; +1 line shift: the audit's L400 is now L401).",
+   "refutation": "Not refuted.",
+   "note": "Linux behaviour rests on the open(2) contract and on the existing CI test, not on a measurement on this host."
+  }
+ ]
+}

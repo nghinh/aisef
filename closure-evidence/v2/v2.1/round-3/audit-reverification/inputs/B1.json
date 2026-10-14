@@ -1,0 +1,455 @@
+[
+ {
+  "target": "aisef2/app/bundle_cli.py::_write_new",
+  "index": 0,
+  "mutant": "L511 string '\\n' emptied",
+  "class": "AUDITED",
+  "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+  "group": "T04-WRITE-NEW-FORM: byte form of a file written by init/seal/approve/continue; every reader parses JSON or hashes a canonical re-serialisation.",
+  "grounds": "Reproduced end to end (init -> seal -> approve x4 -> lint -> explain on calc-3-stories, time and commit date frozen): with '' instead of '\\n' the files end in `}` with no final newline and nothing else differs: Project.digest, plan_hash, lint READY, explain output identical. Readers of such a file: _read (json.loads), bundle.read (bundle.py:195-206 -> json.loads), digest = sha256 of _canonical (bundle.py:129-130, 190). A wide sweep (8 modules, 39 tests, incl. T04a and A04) is green with the mutant applied.",
+  "consumers_checked": [
+   "aisef2/app/bundle_cli.py:358-366, 512, 518, 524: the only callers (init, seal, approve, continue)",
+   "aisef2/app/bundle.py:195-206 read; aisef2/app/cli.py:72; aisef2/app/bundle.py:129-130, 190 digest",
+   "aisef2/app/run.py:278-293 _content_sha / evidence_manifest: hashes RUN.json, journals, sessions, preflight; never the bundle file",
+   "tests/v2/test_v21_identity.py:187-195: the byte pin is on migrate's own write (bundle_cli.py:537), not _write_new",
+   "validation/v21/cli_integration/run.sh:23-27: seal/approve outputs only go on to lint/run as --project"
+  ],
+  "exceptions_checked": [
+   "line-oriented reader: bundles are one JSON document, the journals are .jsonl and not written here",
+   "a tool that appends to a bundle file: every output goes through _create (exclusive create)",
+   "git diff shows `\\ No newline at end of file`: cosmetic, no reader"
+  ],
+  "batch": "A04",
+  "reviewed": true,
+  "remapped_from": {
+   "index": 0,
+   "mutant": "L473 string '\\n' emptied",
+   "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+  }
+ },
+ {
+  "target": "aisef2/app/bundle_cli.py::_write_new",
+  "index": 1,
+  "mutant": "L511 True->False",
+  "class": "AUDITED",
+  "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+  "group": "T04-WRITE-NEW-FORM (see [0])",
+  "grounds": "sort_keys=False writes the keys in insertion order (init: the example's authoring order; seal: B.dump's fixed order; approve/continue keep positions via {**dict(bundle), ...}). Reproduced (calc-3-stories, frozen time/commit): digest, plan_hash, lint verdict and explain output identical; only the file's key order and the in-memory order of `facts` differ. Kernel hashes are order-independent: I sealed the same authoring with every nested and top-level key order reversed and got the same contract hashes, plan_hash and digest (contract.py:61 sort_keys). Order-sensitive readers, all report-only: coverage() L306-312 appends criteria in facts order (the sibling lists at L324-325 are sorted), continue_from's `remaining` L450 and its stories dict L431-436 (Project.order sorts, bundle.py:114-126).",
+  "consumers_checked": [
+   "aisef2/app/bundle.py:129-130, 190 (digest over _canonical, sort_keys=True); aisef2/product/contract.py:61; aisef2/plan/obligation.py:108-110 plan_hash over the obligation tuple (order matters there)",
+   "aisef2/app/bundle_cli.py:300-316 coverage, 322-338 lint, 340-352 explain (rows from plan obligations, a list), 416-450 continue_from",
+   "aisef2/app/bundle.py:114-126 Project.order; aisef2/app/feedback.py:28-43, 82, 148, review_verify.py:185, run.py:169-170, 456 look facts/stories up by key",
+   "tests/v2/test_v21_kills_bundle_cli.py::Coverage (in-memory dict, not tied to the writer)"
+  ],
+  "exceptions_checked": [
+   "init's authoring.json feeding seal's plan order: seal iterates authoring['stories'] in file order and I reproduced that reversing calc-3's story keys changes plan_hash (f4a9... -> 086e...). init writes the example's keys sorted today; both shipped examples have alphabetical story ids, so the plan is identical under the mutant. A future example with non-alphabetical story ids would seal to a different, equally valid plan; no recorded hash of a sealed example exists (the plan binds the operator's HEAD)",
+   "nested dict order of a contract's stimulus/observable reaching a probe: spec ids digest the canonical form; probes taking the first item of a shape guard len(shape) == 1",
+   "a tool or test diffing two bundle files: none"
+  ],
+  "batch": "A04",
+  "reviewed": true,
+  "remapped_from": {
+   "index": 1,
+   "mutant": "L473 True->False",
+   "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+  }
+ },
+ {
+  "target": "aisef2/app/bundle_cli.py::continue_from",
+  "index": 89,
+  "mutant": "L466 tuple() -> list()",
+  "class": "EQUIVALENT",
+  "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+  "group": "A01",
+  "grounds": "obligation.py:93 accepts a list or a tuple (`tuple(self.obligations) if isinstance(..., (list, tuple))`), :94-95 checks that tuple, :96 `object.__setattr__(self, 'obligations', obligations)` REPLACES the field with the tuple, and only then :99-102 plan_hash is computed (digest(content_of(plain(self)))) or compared. So a list and a tuple of the same PlanObligations give the same frozen Plan: same field type, ==, same plan_hash, same plain(). require_str_fields (obligation.py:90, contract.py:172-176) looks only at fields annotated exactly 'str'; `obligations` is `tuple[PlanObligation, ...]`. In continue_from the local `obligations` list is not used after :429 and new_plan is read only through plain(new_plan) (:436). Reviewer's differential run on a real run (diff_probe.py, the fake client of test_v21_continue_usage): the whole `out` bundle and the whole `report` of the original and of the mutant are deep-equal (no differing path).",
+  "consumers_checked": [
+   "aisef2/app/bundle_cli.py:429,436 (new_plan flows only into plain(new_plan); nothing else after :429 names `obligations`)",
+   "aisef2/plan/obligation.py:89-106 (Plan.__post_init__ / create) and :109-110 plan_hash",
+   "aisef2/product/contract.py:47-57,66-70,172-176 (plain, content_of, require_str_fields)",
+   "diff_probe.py [89] out diff: [] ; report diff: [] ; B.load of the mutant's bundle accepts it"
+  ],
+  "exceptions_checked": [
+   "empty list: refused identically by obligation.py:94 for both forms; cannot arise (one rebuilt obligation per plan.obligations entry, and a Plan holds at least one)",
+   "an element that is not a PlanObligation: same refusal on both forms (obligation.py:94)",
+   "a hash or identity taken of the Plan before __post_init__ replaced the field: none (frozen dataclass; nothing hashes before __post_init__ runs)",
+   "a non-list/tuple iterable: cannot arise, `obligations` is the list built at :420-428"
+  ],
+  "batch": "A01",
+  "reviewed": true,
+  "remapped_from": {
+   "index": 89,
+   "mutant": "L429 tuple() -> list()",
+   "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+  }
+ },
+ {
+  "target": "aisef2/app/bundle_cli.py::continue_from",
+  "index": 115,
+  "mutant": "L429 string '): a new project, not a continuation' emptied",
+  "class": "AUDITED",
+  "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+  "group": "T01-KERNEL-TAIL: an explanatory clause closing a refusal whose raise, cause phrase and objects are retained",
+  "grounds": "Reviewer's differential run (diff_probe.py) on a run whose RUN.json names another kernel: original '<run> ran another kernel (000000000000): a new project, not a continuation'; mutant '<run> ran another kernel (000000000000'. Raise site, class (BundleError), exit code 2, run directory, the cause phrase 'another kernel' and the digest head are unchanged. The removed tail restates the rule of the module docstring (:19) and of docs/v2.1/USAGE-2.1.md:99 ('Bundle/kernel khac => tu choi (day la du an moi, khong phai noi tiep)'), which promise the REFUSAL, not its wording; it names no command, flag, path, id or limit and no override exists for it (the `continue` parser has only --leave-out-unidentified, about unidentified commits). No reader matches or parses it. Sibling L390 ('a continuation is of the same project') has the same shape and is asserted only by 'another bundle'; the explanatory tails that ARE tests in this function carry an instruction or a flag (L401 'run the bundle itself again', L410 '--leave-out-unidentified', test_v21_continue_integrity.py:431 'continue the lineage from it'). The closing ')' is lost with the tail (cosmetic).",
+  "consumers_checked": [
+   "aisef2/app/bundle_cli.py:538-540 main(): prints f'refused: {e}' to stderr and returns 2; the only caller of continue_from in the repo",
+   "aisef/cli/parser.py:421-426: `aisef bundle` hands argv to bundle_cli.main; nothing wraps or matches the message",
+   "git grep 'not a continuation|a new project|ran another kernel' over aisef2, aisef, validation, tests, docs (closure-evidence excluded): bundle_cli.py:19,392-393,414; tests/v2/test_v21_continue_usage.py:200 (assertIn 'another kernel'); tests/v2/test_c2_k_nowork_001.py:331 is a different producer (kn.check(): 'the kernel changed since the record')",
+   "docs/v2.1/USAGE-2.1.md:99 (the rule as a refusal) and docs/v2.1/TRACEABILITY.md, docs/v2.1/research/TRACEABILITY.json 'contains' checks on bundle_cli.py/evidence outs: none matches this text",
+   "validation/v21/cli_integration/run.sh:40-60: continue steps; no kernel refusal exercised or matched"
+  ],
+  "exceptions_checked": [
+   "a flag/command/path/id/limit in the tail that an operator needs: none, the tail is the rule; there is no override to name",
+   "a parser/classifier of the message (split at ':', startswith, regex on 'not a continuation'): none in aisef2, aisef, validation, tests",
+   "the digest head moved or removed by the mutant: no, '({digest12}' is kept before the lost tail; an absent kernel_digest renders '(None' in both",
+   "an operator who has not read USAGE: loses the in-tool statement that this is a new project; the cause phrase and exit code 2 stay; no wrong flag could be tried (stated as residual)"
+  ],
+  "batch": "A01",
+  "reviewed": true,
+  "remapped_from": {
+   "index": 115,
+   "mutant": "L392 string '): a new project, not a continuation' emptied",
+   "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+  }
+ },
+ {
+  "target": "aisef2/app/bundle_cli.py::continue_from",
+  "index": 127,
+  "mutant": "L466 string '-continued' emptied",
+  "class": "AUDITED",
+  "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+  "group": "T01-LABEL-PLANID: an id label inside an identity that is already distinct by hash",
+  "grounds": "Differential run (diff_probe.py): the only paths of `out` that differ are /plan/id ('PLAN-calc2-continued' -> 'PLAN-calc2') and /plan/plan_hash (which binds the id); the report is identical. End to end (gen_probe.py) with the mutant: child bundle loads; `execute(predecessor=...)` commits CARRIED; plan/frozen plan_id == the parent's id and plan_hash == the bundle's; verify() VERIFIED []; a second continue_from works. Everything derives from the stored bundle, so the value is consistent where it flows (plan/frozen story_runner.py:138, plan/static-admitted static_admission.py:298, 'no obligation in plan' texts story_runner.py:153, story_admission.py:147, PlanNotAdmitted :308). The only 'once' rules on plan_id are per journal (journal/format3.py:168-169; qualification_counters.py:36) and the child writes its own journal (run.py docstring :329-330, out.mkdir :345). Nothing compares ids across runs: lineage.py and verify.py name no plan id; run.py:338-375 reads the parent's record presence, anchor, claim and accounts and records plan_hash. `bundle migrate` (bundle_cli.py:127) already re-issues a plan with the SAME id and another hash, so the id is a label and the hash the identity. The child's plan_hash differs from the parent's irrespective of the suffix: every done story's obligations get story_id = `carried`, a name :416-417 guarantees is not a story of the bundle, and a story with a commit has at least one obligation (story_runner.py:152-153). A suffix test would pin a label.",
+  "consumers_checked": [
+   "git grep 'plan\\.id|plan_id|\\[\"id\"\\]' over aisef2, aisef, validation: story_runner.py:138,153; static_admission.py:298,308; story_admission.py:147; journal/event.py:200; journal/format3.py:147,168-169; projections/qualification_counters.py:36 — every one within one journal/run",
+   "aisef2/app/run.py:338-375 (predecessor: record, anchor, claim, accounts; the child's record carries plan_hash, not the id), aisef2/app/lineage.py and aisef2/app/verify.py (no plan id read; the plan is bound by bundle digest and plan_hash)",
+   "aisef2/app/bundle.py:133-138,163 (_plan/load: id is any str; no PLAN-<name> rule at load) and bundle_cli.py:127 (migrate keeps plan.id with a new hash), :221 (seal sets PLAN-<name>)",
+   "validation/qualification/c2_*.py, p10*.py, release_*.py: emit plan.id of a fresh plan into their own records; none reads a continuation or keys by id",
+   "docs: git grep '-continued' finds only the file name continued.json (USAGE-2.1.md:93,96); docs/v2.1/bundle-authoring.schema.json:26 describes the authoring `name` (PLAN-<name>), the seal's input; docs/v2.1/evidence/*.out contain no plan id",
+   "tests/v2/test_v21_continue_usage.py, test_v21_continue_integrity.py: assert stories, roles, baseline, outcomes, claims; no plan id and no hash literal (a continuation's baseline is a clock-dependent commit sha, so its hash cannot be pinned)"
+  ],
+  "exceptions_checked": [
+   "two plans of one lineage colliding in a once-per-run structure: the structures are per journal and the child's journal is its own (gen_probe.py: plan/frozen once, verify VERIFIED)",
+   "a store keyed by plan id across runs (cohort, qualification, caches): none takes ids from a continuation (grep above)",
+   "the child plan identical to the parent's: no, plan_hash differs by construction (obligations under CARRIED); shown by diff_probe.py/gen_probe.py ('plan_hash differs from parent's: True' for the mutant)",
+   "continuing a continuation: the id would accumulate '-continued-continued' in the original and stay equal under the mutant; neither is read (gen_probe.py, second generation)",
+   "a human tracing provenance from the id: a lost hint; provenance remains in RUN.json 'continues', the description's anchor (:437) and the CARRIED story"
+  ],
+  "batch": "A01",
+  "reviewed": true,
+  "remapped_from": {
+   "index": 127,
+   "mutant": "L429 string '-continued' emptied",
+   "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+  }
+ },
+ {
+  "target": "aisef2/app/bundle_cli.py::continue_from",
+  "index": 153,
+  "mutant": "L435 string ': ' emptied",
+  "class": "AUDITED",
+  "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+  "group": "T01-DIAG-PUNCT: punctuation inside a diagnostic whose identifying elements are all retained",
+  "grounds": "Rendered (diff_probe.py, a journal with one flipped byte): original '<run>: the journal does not reconstruct (JournalError: line 60: the chain does not link ...)'; mutant '(JournalErrorline 60: the chain ...'. Run directory, reason phrase, exception type and message are all present and in order; only the ': ' between type and message is gone. The raise, class, `from e` chain, exit code 2 and the [:400] cut (which applies to the whole string, shifting by two characters) are unchanged. No code splits or matches this message; the only reader is main()'s print and the only assertion is assertIn('does not reconstruct') (test_v21_continue_integrity.py:396).",
+  "consumers_checked": [
+   "aisef2/app/bundle_cli.py:538-540 main(): prints f'refused: {e}' to stderr and returns 2; the only caller of continue_from in the repo",
+   "tests/v2/test_v21_continue_integrity.py:396 test_a_corrupt_line_before_the_end_is_refused (the only test reaching this refusal; assertIn 'does not reconstruct'); kill_check against that file: kc-existing-integrity.json",
+   "git grep 'does not reconstruct' over aisef2, aisef, validation, tests, docs: bundle_cli.py:398 (this), verify.py:117 and runtime/repair.py:79 (separate producers with their own text), test_app_run.py:263, test_s2_kills.py:541-585, p4/test_interruption.py:371 (those producers)",
+   "git grep for partition/split/regex over a BundleError from continue_from in aisef2, aisef, validation, tests: none"
+  ],
+  "exceptions_checked": [
+   "a reader that splits type from message at ': ': none exists",
+   "a message whose text is empty ('JournalError: ' vs 'JournalError'), or KeyError renders (KeyError: 'journal') vs (KeyError'journal'): readable either way; nobody reads either",
+   "the [:400] cut dropping the part after the separator: the cut is on the whole string, the mutant moves it by two characters; reconstruct's messages are short (18 to 104 characters in probe_len.py)",
+   "the cause class carried by the separator: no, the class is the exception type name, retained"
+  ],
+  "batch": "A01",
+  "reviewed": true,
+  "remapped_from": {
+   "index": 153,
+   "mutant": "L398 string ': ' emptied",
+   "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+  }
+ },
+ {
+  "target": "aisef2/app/bundle_cli.py::continue_from",
+  "index": 157,
+  "mutant": "L462 string 'carried: ' emptied",
+  "class": "AUDITED",
+  "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+  "group": "T01-LABEL-RATIONALE: the prose label of an ownership_rationale whose identifying elements (story, anchor, criterion) are retained and separately asserted",
+  "grounds": "Re-checked at f860e57, not copied. The mutant turns f\"carried: {o.story_id} committed it in the run anchored {anchor[:16]...} ({o.criterion_id})\" into the same sentence without its label. I re-ran the implementer's differential (diff.py continue) on the real fake-client run of T01b: out differs at exactly /plan/obligations[0]/ownership_rationale and /plan/plan_hash; the report is identical; control fields (criterion, spec, story_id, role, expected_parent, depends_on), stories, specs, contracts and approvals are equal; the mutant bundle loads. The field is prose for human review that no control path may read (aisef2/plan/obligation.py:7-8; kernel_static_checks.py:167-176 flags attribute and getattr reads of it), it is hash-bound, so plan_hash follows its text and is recomputed from the stored plan at every load. My own grep for any reader of ownership_rationale / 'rationale' / 'carried:' over aisef2, aisef, validation, tests, docs: only bundle.py:146 (constructs PlanObligation from the stored plan), obligation.py (definition), bundle_cli.py:462 (the writer), the static check, and tests that read the rationale for its identifying elements. feedback.py (_line, task, retry_feedback) and review_verify.py/run.py build prompts and rows from facts, roles and specs, never from the plan's rationale. The one fact the label stated, that the obligation is carried, is carried in data as story_id == report['carried_as'] (CARRIED) and role VERIFY.",
+  "consumers_checked": [
+   "aisef2/app/bundle.py:146 (load: o['ownership_rationale'] into PlanObligation; no use of the text) and :158 (plain(plan) back out)",
+   "aisef2/plan/obligation.py:7-10, 37, 99-110 (definition; hash binds every field; never read by control)",
+   "validation/v2/kernel_static_checks.py:55, 167-176 (NO_PROSE_CONTROL: no attribute or getattr('...') read of text/rationale/ownership_rationale; subscript reads do not exist per my grep)",
+   "aisef2/app/feedback.py:22-70 and :115 and aisef2/app/review_verify.py:176-200, aisef2/app/run.py:218-235 (what a developer or reviewer prompt and the delivery rows are built from: facts, roles, specs; none names the rationale)",
+   "tests/v2/test_v21_kills3_T01b.py:313-319 and tests/v2/test_v21_defects_bundlecli.py:167-183 (read the rationale for S1, the criterion, a >=12-hex prefix of the anchor, 'anchored <16 hex> (C-ADD)' / 'without a manifest'; they do not read the label and the mutant still passes them)",
+   "tests/v2/test_v21_continue_usage.py:137-150 (asserts {'C-ADD': ('CARRIED','VERIFY')}: the carried marking is asserted in data)",
+   "docs/v2.1/USAGE-2.1.md:95-98 and ADR-V2.1: describe the CARRIED story and VERIFY obligations, never the rationale's wording"
+  ],
+  "exceptions_checked": [
+   "a reader detecting carried obligations by the 'carried:' prefix: none anywhere in the repo or docs (grep 'carried:' finds bundle_cli.py:462 only); detection that exists is by story_id and role",
+   "a continuation of a continuation: obligations of CARRIED are in `done` of generation 2 and rebuilt at :459-463 with a fresh sentence (the previous text is replaced, never parsed)",
+   "a stored hash compared with an independent value: the continued plan's hash depends on the baseline commit sha of that run and is recomputed from the stored plan; the report carries no hash, so no literal is pinned",
+   "a prompt or report dumping the whole plan JSON to a model or an operator (where the label would be read): none of the prompt builders serialises plan obligations; the only operator-visible output of continue is the report"
+  ],
+  "batch": "R04",
+  "reviewed": true
+ },
+ {
+  "target": "aisef2/app/bundle_cli.py::continue_from",
+  "index": 165,
+  "mutant": "L425 string ')' emptied",
+  "class": "AUDITED",
+  "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+  "group": "T01-DIAG-PUNCT: punctuation inside a diagnostic whose identifying elements are all retained",
+  "grounds": "Rendered (diff_probe.py, an empty run directory): original '<run>: no run record (FileNotFoundError)'; mutant '<run>: no run record (FileNotFoundError'. Run directory, the reason 'no run record' and the type name of the first read (RUN.json) remain; the raise, class, `from e` and exit code are unchanged. Nothing matches or parses it: main prints it and exits 2.",
+  "consumers_checked": [
+   "aisef2/app/bundle_cli.py:538-540 main(): prints f'refused: {e}' to stderr and returns 2; the only caller of continue_from in the repo",
+   "git grep 'no run record' over aisef2, aisef, validation, tests, docs: bundle_cli.py:388 and run.py:341 (execute's own RunRefused: '--parent ...: no run record there', a separate message)",
+   "tests/: no test reaches the refusal (tests/v2/test_v21_continue_usage.py test_refusals uses a run that has a record)",
+   "validation/v21/cli_integration/run.sh:40-60: continue runs on records that exist",
+   "docs/v2.1/USAGE-2.1.md:131-132: describes the RUN.started.json fallback, no message text"
+  ],
+  "exceptions_checked": [
+   "a caller that tells this refusal from others by text: none; every BundleError is one class printed by main",
+   "the type name carrying a decision: no, diagnostic only (FileNotFoundError / PermissionError / JSONDecodeError)",
+   "the RUN.started.json fallback failing for a different reason than the first read: the message names only the first read's type before and after the mutant; the closing parenthesis does not change which"
+  ],
+  "batch": "A01",
+  "reviewed": true,
+  "remapped_from": {
+   "index": 165,
+   "mutant": "L388 string ')' emptied",
+   "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+  }
+ },
+ {
+  "target": "aisef2/app/bundle_cli.py::coverage",
+  "index": 11,
+  "mutant": "L330 string 'clause -> criteria. Every clause of a bundle that loads is a string; one that is not (a missing one beside\\n        \"1.1\", a number, a list: `load` refuses it and lint says so) must not make this report unprintable, so it is\\n        keyed as it is while the keys hash and order (json.dumps(sort_keys=True) orders them), else by its JSON text.' emptied",
+  "class": "EQUIVALENT",
+  "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+  "group": "R04",
+  "grounds": "The mutant (survivor_view: `\"\"\"clause -> criteria. ...\"\"\"` -> `\"\"\"\"\"\"`) changes only the docstring of the closure by_clause (bundle_cli.py:329-332). Proof from the code: by_clause is created per call of coverage, referenced once, by its call at :346, and never returned, stored, passed or inspected; coverage returns the report dict. The AST probe (re-run by me, review/rv-cov-ast-11.out) finds the single Load of the name at :346, no locals/vars/globals/dir/getattr/eval/exec/help or .__doc__/_getframe/f_locals inside coverage, and no inspect/pydoc/__doc__/frame use anywhere in bundle_cli.py. A function's docstring has no effect on its behaviour; the only observable is by_clause.__doc__, which no code can reach (it is a local of a running call).",
+  "consumers_checked": [
+   "aisef2/app/bundle_cli.py:312-349 (coverage) and :352-371 (lint, the only caller, reads requirements and criteria_citing_no_requirement_of_the_bundle)",
+   "grep for __doc__, get_docstring, getdoc, pydoc, inspect, doctest, co_consts, __code__ over aisef2, aisef, validation, tests: module docstrings used as CLI help, validation/v2/gen_migration_table.py:136 (get_docstring of the v1 module aisef/control/obligation.py), aisef2/quality/relevance.py:151 (compiles a source file and collects line numbers from its code objects; reads no docstring); none reads a docstring of bundle_cli.py",
+   "the behaviour the docstring describes (a non-string clause keyed by its JSON text, no TypeError) is code in by_clause's body and pinned by test_v21_defects_lint.py and test_v21_kills_bundle_cli.py; the mutant leaves the body untouched",
+   "aisef2/app/run.py:77 kernel_digest hashes the source bytes, which every mutant changes; no kill-set test pins a literal digest, so it is not an observable of this mutant that distinguishes it from the other mutants"
+  ],
+  "exceptions_checked": [
+   "help() / pydoc / doc generator reaching a closure: a closure is not reachable from the module or from any object; none in the repo",
+   "a check that every function carries a docstring or a non-empty one: ruff select is F, B, E9 (pyproject.toml); validation/v2/kernel_static_checks.py has 11 rules (RULES, :68-71: NO_PROSE_CONTROL, NO_RAW_VERDICT_ROUTING, ...) and none is about docstrings",
+   "python -OO strips docstrings in production anyway, so no behaviour can depend on them"
+  ],
+  "batch": "R04",
+  "reviewed": true
+ },
+ {
+  "target": "aisef2/app/bundle_cli.py::main",
+  "index": 77,
+  "mutant": "L532 string 'the stories a run did not commit, from what it did commit' emptied",
+  "class": "AUDITED",
+  "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+  "group": "argparse help/description text, printed only by `aisef bundle [SUB] --help`. I executed each mutant (module source from validation.v2.mutation.mutants, exec'd) and ran `--help` of the top parser and of every subparser, plus an invalid --example and an empty argv, against the unmutated module: exit codes and stderr are identical and exactly one line of one --help stdout differs (the described item is listed without its description). No program parses it; the reader is the operator at the terminal. The codebase does not promise completeness of option documentation either (seal's `authoring`, `--out`, approve's `--contract`, continue's `--from-run` have no help at all), so there is no 'every option is documented' contract to test; a per-string test would be the verbatim-text test the round excludes.",
+  "grounds": "help of the continue subcommand; restates the docstring and USAGE-2.1 section 5; the behaviour is asserted at continue_from().",
+  "consumers_checked": [
+   "git grep of the exact string over the whole tree incl. closure-evidence: only bundle_cli.py itself and the campaign's own 'unaudited survivor' lines in closure-evidence/v2/v2.1/campaign-2/results/check.out",
+   "every --help in tests/: tests/test_cli.py:95 (V1 build_parser, the V1 `bundle` verb has its own help at aisef/cli/parser.py:189) and tests/v2/test_v21_kills_cli.py (a verbatim pin of `aisef run --help` only; none exists for `aisef bundle`)",
+   "docs/v2.1/research/TRACEABILITY.json 'contains' checks on bundle_cli.py: only `def _create(`, `--leave-out-unidentified`, `sub.add_parser(\"continue\"`, `sub.add_parser(\"migrate\"` - source-text checks on the name part, which a `help=` change does not touch",
+   "tests/v2/test_v21_continue_usage.py and tests/v2/test_v21_continue_integrity.py (carried/remaining; 'committed no story' refusal) - function level: no test calls main(['continue', ...]) (git grep: only validation/v21/cli_integration/run.sh:50,56)",
+   "docs/v2.1/USAGE-2.1.md:90-99 (section 5); TRACEABILITY.json check `sub.add_parser(\"continue\"` is on the name part and is untouched"
+  ],
+  "exceptions_checked": [
+   "'from what it did commit' (journal truth) as a rule: enforced by continue_from reading the journal's story/commit events (L399-403) and refusing a run that committed none (L400-401); the help only names it"
+  ],
+  "batch": "A00",
+  "reviewed": true,
+  "remapped_from": {
+   "index": 77,
+   "mutant": "L494 string 'the stories a run did not commit, from what it did commit' emptied",
+   "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+  }
+ },
+ {
+  "target": "aisef2/app/bundle_cli.py::main",
+  "index": 81,
+  "mutant": "L537 string 'continue although main holds commits no journaled operation identifies (they are left out)' emptied",
+  "class": "AUDITED",
+  "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+  "group": "argparse help/description text, printed only by `aisef bundle [SUB] --help`. I executed each mutant (module source from validation.v2.mutation.mutants, exec'd) and ran `--help` of the top parser and of every subparser, plus an invalid --example and an empty argv, against the unmutated module: exit codes and stderr are identical and exactly one line of one --help stdout differs (the described item is listed without its description). No program parses it; the reader is the operator at the terminal. The codebase does not promise completeness of option documentation either (seal's `authoring`, `--out`, approve's `--contract`, continue's `--from-run` have no help at all), so there is no 'every option is documented' contract to test; a per-string test would be the verbatim-text test the round excludes.",
+  "grounds": "help of --leave-out-unidentified: describes an override; the moments at which an operator must be warned are the refusal and the printed report, both asserted.",
+  "consumers_checked": [
+   "git grep of the exact string over the whole tree incl. closure-evidence: only bundle_cli.py itself and the campaign's own 'unaudited survivor' lines in closure-evidence/v2/v2.1/campaign-2/results/check.out",
+   "every --help in tests/: tests/test_cli.py:95 (V1 build_parser, the V1 `bundle` verb has its own help at aisef/cli/parser.py:189) and tests/v2/test_v21_kills_cli.py (a verbatim pin of `aisef run --help` only; none exists for `aisef bundle`)",
+   "docs/v2.1/research/TRACEABILITY.json 'contains' checks on bundle_cli.py: only `def _create(`, `--leave-out-unidentified`, `sub.add_parser(\"continue\"`, `sub.add_parser(\"migrate\"` - source-text checks on the name part, which a `help=` change does not touch",
+   "bundle_cli.py:408-411 the refusal names the flag and what is left out; tests/v2/test_v21_continue_usage.py:172-183 and tests/v2/test_v21_continue_integrity.py:337-346 assert 'nothing identifies' in it, report['left_out_unidentified'] is True and 'left out' in report['in_flight']",
+   "docs/v2.1/USAGE-2.1.md:110-116, docs/v2.1/REPORT.md:133; TRACEABILITY.json check contains `--leave-out-unidentified` in bundle_cli.py (the name stays in add_argument and the refusal)"
+  ],
+  "exceptions_checked": [
+   "closest string of the group to a warning (an override that drops commits): a warning needs a moment to be read; those moments are the refusal and the report; --help is read by nobody at the moment of the decision. The refusal's own wording that names the flag is a separate survivor ([124] of continue_from, another batch, still SURVIVED) - not this help"
+  ],
+  "batch": "A00",
+  "reviewed": true,
+  "remapped_from": {
+   "index": 81,
+   "mutant": "L499 string 'continue although main holds commits no journaled operation identifies (they are left out)' emptied",
+   "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+  }
+ },
+ {
+  "target": "aisef2/app/bundle_cli.py::main",
+  "index": 139,
+  "mutant": "L563 True->False",
+  "class": "AUDITED",
+  "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+  "group": "sort_keys of a printed report: only the order of one JSON object's members in stdout changes. I executed the unmutated and the mutated main on the real command and compared: same exit status, same stderr, the parsed stdout object is equal (apart from `written`, which differs only because my two runs wrote to different file names), the text differs in member order. The other effect of sort_keys=True - a TypeError on mixed-type keys, which is what [142] is about - cannot arise here: every dict reaching json.dumps has str keys (code literals, spec ids taken from str-keyed lookups) and list orders come from lists/tuples, never a set.",
+  "grounds": "member order of the continue report in stdout; no test reads this stdout at all.",
+  "consumers_checked": [
+   "git grep: no test calls main(['continue', ...]) or parses its stdout; tests/v2/test_v21_continue_usage.py and test_v21_continue_integrity.py read continue_from()'s report object; validation/v21/cli_integration/run.sh:50,56 is a human log",
+   "bundle_cli.py:440-451 the report literal and lineage.reconcile's items/cut_event (app/lineage.py:198-227): str literal keys; unaccounted/carried/remaining are lists of str"
+  ],
+  "exceptions_checked": [
+   "story ids or paths as dict keys: none (values and list items only); the triage's 'the continue test of [121] compares parsed objects' names a test that does not exist at BASE - the true state is that nothing compares this text"
+  ],
+  "batch": "A00",
+  "reviewed": true,
+  "remapped_from": {
+   "index": 139,
+   "mutant": "L525 True->False",
+   "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+  }
+ },
+ {
+  "target": "aisef2/app/bundle_cli.py::seal",
+  "index": 102,
+  "mutant": "L229 element 0 dropped",
+  "class": "EQUIVALENT",
+  "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+  "group": "A02",
+  "grounds": "Reviewer's own read of every operation of the try body L214-216: ObligationRole(cr['role']) and PlanObligation(cr['id'], _mint(contract, ref).id, sid, role, EXPECTED_AT_PARENT[role], tuple(cr['depends_on']), cr['why']). (a) cr['role'|'id'|'depends_on'|'why'] subscript keys whose exact set _closed (L153-156) verified at L206, outside the try. (b) ObligationRole is a plain Enum (arch/enums.py:62-65; no _missing_/__new__/metaclass anywhere in aisef2/): Enum.__new__ catches its own KeyError from the value map and ends in ValueError (an unhashable value: TypeError caught, linear search, ValueError). (c) EXPECTED_AT_PARENT (plan/obligation.py:76-78) holds all three members of the enum and role is one. (d) _mint (bundle_cli.py:137-146) -> expectation_for (product/compiler.py:51-56: identity tests, CompileError) and ProductProofSpec.create (product/spec.py:40-58: sorted()/freeze() over the mapping's own keys, then digest = json.dumps + encode: ValueError incl. UnicodeEncodeError) look nothing up by a key that comes from the document. (e) PlanObligation.__post_init__ (obligation.py:39-51) only does getattr/strip/isinstance/tuple. facts[cr['id']] (L219) is outside the try. Reviewer's own check, independent of the implementer's battery: a generator that replaces / deletes / inserts / grafts random values anywhere in the calc-3-stories document (12,000 documents, seeds 20261011 and 7, ~73% BundleError, ~24% sealed, the rest raw TypeError or ValueError at L204, L207 and in B.dump, outside the try): a recorder on the KeyError branch of L217 fired in 0 documents and the mutant equalled the original on (outcome, message, cause class) in all of them.",
+  "consumers_checked": [
+   "aisef2/app/bundle_cli.py main :504-543 (seal at :509-514; BundleError -> 'refused: <msg>' on stderr, exit 2; any other KeyError/TypeError/ValueError -> :541 'refused: <Class>: <msg>', exit 2)",
+   "grep of every *.py under aisef2/ validation/ tests/ aisef/ for seal( : callers are bundle_cli.main and the tests test_v21_bundle_tools, test_v21_continue_integrity, test_v21_continue_usage, test_v21_experiment (all use the returned bundle/report or assertIn a path, none a message tail)",
+   "a KeyError that escaped seal would be caught by main :541 and exit 2 as well: only the message prefix would differ, and the branch is dead"
+  ],
+  "exceptions_checked": [
+   "a fourth ObligationRole member without an EXPECTED_AT_PARENT row: makes the branch live, but is a change to a frozen vocabulary (arch/enums.py header: checked against the RFC; tests/v2/test_migration_table_repo.py:43-44 pins the three rows), not an input of seal",
+   "a Mapping subclass whose __getitem__ raises KeyError for a key it listed in iteration: not JSON-shaped; main reads the document with json (bundle_cli._read) and the schema docs/v2.1/bundle-authoring.schema.json describes JSON",
+   "role values that are unhashable or odd ([], {}, [[]], {'a':1}, nan, inf, bytes, object, 10**30): in the reviewer's pool and the implementer's battery, all end ValueError/TypeError",
+   "_mint reading something keyed by document text: it reads attributes of a BehaviorContract already validated at L189 and ProbeRef from refs.get(kind) at L210 (outside the try)"
+  ],
+  "batch": "A02",
+  "reviewed": true,
+  "remapped_from": {
+   "index": 102,
+   "mutant": "L217 element 0 dropped",
+   "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+  }
+ },
+ {
+  "target": "aisef2/app/bundle_cli.py::seal",
+  "index": 106,
+  "mutant": "L233 tuple() -> list()",
+  "class": "EQUIVALENT",
+  "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+  "group": "A02",
+  "grounds": "Plan.create (plan/obligation.py:104-106) only forwards **content to the dataclass __init__; Plan.__post_init__ (:89-102) runs require_str_fields(self, skip=('plan_hash',)) (product/contract.py:172-176: only fields annotated 'str': id, baseline), the baseline check (:91), then :93 obligations = tuple(self.obligations) if isinstance(..., (list, tuple)) else None, the same refusal for empty (:94-95), and stores the tuple at :96 before plan_hash is computed or compared (:99-102). list(x) and tuple(x) are the same sequence for a list/tuple argument, no refusal text interpolates `obligations` (:92 uses the baseline, :95/:98/:102 are constants), and both copy so seal's own list (read at L238) is unaffected. Reviewer's fuzz above: 0 of 12,000 documents differ in outcome/message/cause/report.",
+  "consumers_checked": [
+   "aisef2/plan/obligation.py Plan.__post_init__ :89-102 (the only reader of the argument)",
+   "aisef2/app/bundle_cli.py:238 reads seal's own `obligations` list, not the Plan's field"
+  ],
+  "exceptions_checked": [
+   "empty obligations (a story with criteria: []) and a baseline that is not 40-hex: same PlanError under both, framed by L224 as before (implementer's evidence/differential-plan-refusals.py; reviewer's fuzz)",
+   "a non-PlanObligation element: not reachable from seal (it appends only PlanObligation(...) results) and the :94 check is on the normalised tuple in both variants",
+   "Plan keeping a reference to the caller's list: the field is replaced by the tuple at :96"
+  ],
+  "batch": "A02",
+  "reviewed": true,
+  "remapped_from": {
+   "index": 106,
+   "mutant": "L221 tuple() -> list()",
+   "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+  }
+ },
+ {
+  "target": "aisef2/app/bundle_cli.py::seal",
+  "index": 113,
+  "mutant": "L185 string ')' emptied",
+  "class": "AUDITED",
+  "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+  "group": "punctuation closing a quoted diagnostic at the end of a message nobody parses",
+  "grounds": "L173 is raised outside every try and never re-wrapped, so ')' is the last character of the line main prints. What the operator needs is intact in the mutant: the repo path in front, the cause ('not a git repository with a commit') and git's own stderr excerpt. Reviewer re-measured four cases (non-git dir: '<T>: not a git repository with a commit (fatal: not a git repository (or any of the parent directories): .git)'; missing dir: '...(fatal: cannot change to '<T>/nope': No such file or direc)'; a long missing path, cut at 200 characters mid-word; git init without a commit: '(fatal: Needed a single revision)'). In every one the excerpt is a quotation of git, so an unbalanced closing parenthesis changes no word; nothing follows it.",
+  "consumers_checked": [
+   "aisef2/app/bundle_cli.py main :538-540 (prints 'refused: ' + the message to stderr, exit 2)",
+   "grep -r of the whole tree (excluding .git) for 'not a git repository with a commit': only the raise site and closure-evidence/v2/v2.1/campaign-2/results/check.out (the list of unaudited survivors)",
+   "aisef2/probe/file_artifact.py:559 matches b'not a git repository' in the stderr of its OWN git call, not in this message",
+   "docs/ and README*: no document quotes the refusal; README.md:83 and docs/v2/USAGE.md:79 promise only exit status 2 ('an input that does not hold')",
+   "tests/v2/test_v21_bundle_tools.py::Refusals.test_without_a_repository_head_cannot_be_resolved asserts the L170 refusal (\"HEAD\"), a different line"
+  ],
+  "exceptions_checked": [
+   "the excerpt truncated at 200 characters (measured): the quote ends mid-word with or without ')'; the cut is visible from the word and nothing follows",
+   "workspace.git's synthesised stderr for a repository whose configuration is not inert (orchestrate/workspace.py:69-70) already ends in '(not inert)': without the outer ')' the line still reads as balanced and names the same configuration keys",
+   "a reader that splits stderr on ')' or matches the message tail: none found by the greps above"
+  ],
+  "batch": "A02",
+  "reviewed": true,
+  "remapped_from": {
+   "index": 113,
+   "mutant": "L173 string ')' emptied",
+   "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+  }
+ },
+ {
+  "target": "aisef2/app/bundle_cli.py::seal",
+  "index": 131,
+  "mutant": "L202 tuple() -> list()",
+  "class": "EQUIVALENT",
+  "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+  "group": "A02",
+  "grounds": "BehaviorContract.create (product/contract.py:151-154) -> __post_init__ (:124-154): reads self.id (:125), then :127 ids = tuple(self.requirement_ids) if isinstance(..., (list, tuple)) else None, stored at :130 before require_str_fields (:145) and the hash (:146-147). The argument is evaluated at the same position under both variants (after c['id'], before Subject(...)); tuple(x) and list(x) iterate identically (str -> characters, dict -> keys) and raise the same TypeError text for every non-iterable (checked here on None, ints, bool, floats, nan, object(), a class, a function, Ellipsis). Reviewer's fuzz: 0 of 12,000 documents differ.",
+  "consumers_checked": [
+   "aisef2/product/contract.py BehaviorContract.__post_init__ :124-154 (the only reader of the argument)",
+   "BehaviorContract.from_json :159-165 is the bundle-load path, not this call"
+  ],
+  "exceptions_checked": [
+   "requirement_ids a str ('R-1'): both split into characters; normalised tuple and hash identical",
+   "requirement_ids a dict: both iterate keys",
+   "a non-iterable: identical TypeError text (measured), raised in the same try, framed by L195 as before"
+  ],
+  "batch": "A02",
+  "reviewed": true,
+  "remapped_from": {
+   "index": 131,
+   "mutant": "L190 tuple() -> list()",
+   "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+  }
+ },
+ {
+  "target": "aisef2/app/bundle_cli.py::seal",
+  "index": 136,
+  "mutant": "L228 tuple() -> list()",
+  "class": "EQUIVALENT",
+  "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+  "group": "A02",
+  "grounds": "PlanObligation.__post_init__ (plan/obligation.py:39-51): require_str_fields (:40) reads only the str-annotated fields (criterion_id, product_proof_spec_id, story_id, ownership_rationale), :48 deps = tuple(self.depends_on) if isinstance(..., (list, tuple)) else None, :49-50 the same refusal, :51 stored. Nothing hashes or compares the obligation before :51 (the frozen dataclass's generated __hash__/__eq__ are not called), and plan_hash (:109-110) reads the stored tuple. The argument is evaluated at the same position (6th of 7, after cr['id'], _mint(...).id, sid, role, EXPECTED_AT_PARENT[role]) and tuple()/list() raise the same TypeError for a non-iterable. Reviewer's fuzz: 0 of 12,000 documents differ.",
+  "consumers_checked": [
+   "aisef2/plan/obligation.py PlanObligation.__post_init__ :39-51 (the only reader of the argument)",
+   "aisef2/plan/obligation.py plan_hash :109-110 reads the stored tuple"
+  ],
+  "exceptions_checked": [
+   "depends_on a str: both split into characters, same normalised tuple",
+   "depends_on a non-iterable: same TypeError text, raised in the same try at L213-217 and framed by L218 as before",
+   "an unhashable element: nothing hashes it on this path",
+   "depends_on [''] / [5] (the PlanError path): same refusal, same message under both"
+  ],
+  "batch": "A02",
+  "reviewed": true,
+  "remapped_from": {
+   "index": 136,
+   "mutant": "L216 tuple() -> list()",
+   "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+  }
+ }
+]
