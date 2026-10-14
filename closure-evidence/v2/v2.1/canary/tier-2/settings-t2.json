@@ -1,0 +1,51 @@
+{
+ "budget": {
+  "input_tokens": 2000000,
+  "output_tokens": 40000,
+  "provider_requests": 12,
+  "turns": 120
+ },
+ "client": "opencode",
+ "client_env": [],
+ "format": "aisef-v2-run/1",
+ "limits": {
+  "DEVELOPER": 2,
+  "ENVIRONMENT": 1,
+  "INTEGRATION": 0,
+  "PLAN": 0,
+  "PROVIDER": 1,
+  "REVIEW": 1,
+  "SECURITY": 1
+ },
+ "max_turns_per_session": 40,
+ "preflight": {
+  "chat_probes": 3
+ },
+ "prices": {
+  "cache_read_per_mtok": 0.044,
+  "cache_write_per_mtok": 1.32,
+  "currency": "USD",
+  "effective_date": "2026-10-06",
+  "input_per_mtok": 1.32,
+  "output_per_mtok": 3.96,
+  "source": "https://api-docs.deepseek.com/quick_start/pricing/ \u2014 deepseek-v4-pro, peak rate (upper bound); cache write priced as cache miss; the route is served by 9router, whose own price is not known here"
+ },
+ "provider": {
+  "api_key_env": null,
+  "endpoint": "https://9router.vnteki.com/v1",
+  "listed_owner": "ds",
+  "model_limit": {
+   "context": 200000,
+   "output": 32768
+  },
+  "name": "9router",
+  "served_model": "deepseek-v4-pro"
+ },
+ "route": "9router/ds/deepseek-v4-pro",
+ "timeouts_s": {
+  "developer": 1200,
+  "probe": 60,
+  "reviewer": 600,
+  "tool": 120
+ }
+}

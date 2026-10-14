@@ -1,0 +1,8 @@
+ app/__pycache__/__init__.cpython-314.pyc   | Bin 0 -> 259 bytes
+ app/__pycache__/calc.cpython-314.pyc       | Bin 0 -> 484 bytes
+ app/calc.py                                |   4 ++++
+ tests/__init__.py                          |   0
+ tests/__pycache__/__init__.cpython-314.pyc | Bin 0 -> 261 bytes
+ tests/__pycache__/test_add.cpython-314.pyc | Bin 0 -> 1407 bytes
+ tests/test_add.py                          |  18 ++++++++++++++++++
+ 7 files changed, 22 insertions(+)

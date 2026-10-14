@@ -1,0 +1,21 @@
+{
+ "anchor_written_to": "run.anchor",
+ "delivery_blocked_by": [],
+ "delivery_verdict": "PASS",
+ "evidence_anchor": "26702f97bdf80867f7bfb50bc800a719baccb32385eddd7c44dae51137e397ee",
+ "final_main": "11dddc423e36e0d7471f4d5c55156b610e1a6a7a",
+ "journal": {
+  "closed": "SHUTDOWN",
+  "lines": 68,
+  "path": "run/journals/aisef-run.jsonl",
+  "sha256": "8a07d11ffdfec66ddf2a2a075ca7623ec846c4fdeff8c2ea6f672ec376c17df2"
+ },
+ "plan_quality_verdict": "NOT_CLAIMED",
+ "project": "calc",
+ "record": "run/RUN.json",
+ "story_outcomes": {
+  "S1": [
+   "COMMIT"
+  ]
+ }
+}

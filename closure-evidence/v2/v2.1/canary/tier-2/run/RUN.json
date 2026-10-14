@@ -1,0 +1,282 @@
+{
+ "admission": {
+  "admitted": true,
+  "engine_digest": "7668fc35709829d8324e914e0300b2b85221d9e83dedd32cd2c3996f761690c7",
+  "failed": [],
+  "result_digest": "c75e415edffcd8d110cc93b9e7d8aba4ebad7d8b817d0777f1ec721f28e7a3ea"
+ },
+ "aggregate_min_grade": "ATTESTED",
+ "budget": {
+  "limitation": "spend is what the client reports per finished step: an HTTP request that finishes no step (a client retry, a failed request, the one in flight when a stop is issued) is not in the telemetry, and a stop is issued at the first reading that shows a ceiling reached, so totals can pass a ceiling by the steps finished since the reading before",
+  "limits": {
+   "input_tokens": 2000000,
+   "output_tokens": 40000,
+   "provider_requests": 12,
+   "turns": 120
+  },
+  "preflight": {
+   "input_tokens": 6270,
+   "output_tokens": 34,
+   "provider_requests": 4,
+   "turns": 0
+  },
+  "reached": null,
+  "spent": {
+   "input_tokens": 464679,
+   "output_tokens": 2555,
+   "provider_requests": 6,
+   "requests_recorded": 2,
+   "sessions_started": 2,
+   "turns": 13,
+   "unaccounted": []
+  }
+ },
+ "budget_stop": null,
+ "bundle_digest": "6359ec0de1c1196e8cff3c631dca99cabdcf6a6eef06414bbce70f1a5d177e57",
+ "delivery_blocked_by": [],
+ "delivery_verdict": "PASS",
+ "failure": null,
+ "final_main": "11dddc423e36e0d7471f4d5c55156b610e1a6a7a",
+ "finished": 1792018430.5937338,
+ "format": "aisef-v2-run-record/1",
+ "generalization_claim": "NONE",
+ "journal": {
+  "closed": "SHUTDOWN",
+  "lines": 68,
+  "path": "run/journals/aisef-run.jsonl",
+  "sha256": "8a07d11ffdfec66ddf2a2a075ca7623ec846c4fdeff8c2ea6f672ec376c17df2"
+ },
+ "kernel_digest": "bc6de98b0d665978245451a01cafe3e52ee79106d0d48debdda232acd654df57",
+ "no_progress": [],
+ "plan_hash": "2a35679fe28055f076ce5df4674242369fa7c4f96b1469dddfa6df0ff81986b4",
+ "plan_quality_verdict": "NOT_CLAIMED",
+ "platform": {
+  "python": "3.14.7",
+  "system": "darwin"
+ },
+ "preflight": {
+  "accounting": {
+   "input_tokens": 6270,
+   "output_tokens": 34,
+   "provider_requests": 4,
+   "turns": 0,
+   "unaccounted": []
+  },
+  "observation": {
+   "declared_model": "ds/deepseek-v4-pro",
+   "expected_listed_owner": "ds",
+   "expected_served_model": "deepseek-v4-pro",
+   "listing": {
+    "http": 200,
+    "id": "ds/deepseek-v4-pro",
+    "listed": true,
+    "owned_by": "ds"
+   },
+   "probes": [
+    {
+     "http": 200,
+     "served_model": "deepseek-v4-pro",
+     "system_fingerprint": "a307abda487cd1b463329ccb945ce396"
+    },
+    {
+     "http": 200,
+     "served_model": "deepseek-v4-pro",
+     "system_fingerprint": "a307abda487cd1b463329ccb945ce396"
+    },
+    {
+     "http": 200,
+     "served_model": "deepseek-v4-pro",
+     "system_fingerprint": "a307abda487cd1b463329ccb945ce396"
+    }
+   ],
+   "route": "9router/ds/deepseek-v4-pro"
+  },
+  "problems": [],
+  "verdict": "ATTESTED"
+ },
+ "productproof": {
+  "delivered": 1,
+  "obligations": [
+   {
+    "criterion": "C-ADD",
+    "delivered": true,
+    "expected": "SATISFIED",
+    "last_proof": {
+     "agreement": true,
+     "candidate": "11dddc423e36e0d7471f4d5c55156b610e1a6a7a",
+     "seq": 57,
+     "verdict": "SATISFIED"
+    },
+    "probe_id": "probe.python_callable_v2",
+    "role": "INTRODUCE",
+    "satisfied_at_last_proof": true,
+    "spec": "PPS-cf4c46309253a0db294c049b936314841701a084f25ac91de188916ec6aefaa1",
+    "story": "S1"
+   }
+  ],
+  "satisfied_at_last_proof": 1,
+  "total": 1
+ },
+ "project": "calc",
+ "runspec_hash": "cf5743508ebc6cb3910840a859f70f5e03abbc82e2159605e67a3f68cfedb6c6",
+ "scanner": "ruff",
+ "sessions": [
+  {
+   "attempt": 1,
+   "candidate": "5cb94197c60df65a472d02a1e7e43c48abdbc645",
+   "developer_committed_itself": false,
+   "error": null,
+   "exit": 0,
+   "log": "S1.developer.1.jsonl",
+   "prompt_sha256": "e031c3019effa646f16e75e9aa70b2a6f9e652c3a9d46b3ea81b01e83c590b7a",
+   "redacted": 0,
+   "role": "developer",
+   "seconds": 34.2,
+   "started": true,
+   "stopped": null,
+   "story_id": "S1",
+   "timed_out": false,
+   "tokens": {
+    "input": 280730,
+    "output": 1658
+   },
+   "turns": 8
+  },
+  {
+   "attempt": 1,
+   "error": null,
+   "exit": 0,
+   "findings": [],
+   "log": "S1.reviewer.1.jsonl",
+   "parsed": true,
+   "prompt_sha256": "cef127e108cf5515d2487b4b7635c7cdb48842a1d9ec44f086025ce5757316e7",
+   "redacted": 0,
+   "role": "reviewer",
+   "seconds": 25.8,
+   "started": true,
+   "stopped": null,
+   "story_id": "S1",
+   "timed_out": false,
+   "tokens": {
+    "input": 177679,
+    "output": 863
+   },
+   "turns": 5
+  }
+ ],
+ "settings": {
+  "budget": {
+   "input_tokens": 2000000,
+   "output_tokens": 40000,
+   "provider_requests": 12,
+   "turns": 120
+  },
+  "client": "opencode",
+  "client_env": [],
+  "format": "aisef-v2-run/1",
+  "limits": {
+   "DEVELOPER": 2,
+   "ENVIRONMENT": 1,
+   "INTEGRATION": 0,
+   "PLAN": 0,
+   "PROVIDER": 1,
+   "REVIEW": 1,
+   "SECURITY": 1
+  },
+  "max_turns_per_session": 40,
+  "preflight": {
+   "chat_probes": 3
+  },
+  "prices": {
+   "cache_read_per_mtok": 0.044,
+   "cache_write_per_mtok": 1.32,
+   "currency": "USD",
+   "effective_date": "2026-10-06",
+   "input_per_mtok": 1.32,
+   "output_per_mtok": 3.96,
+   "source": "https://api-docs.deepseek.com/quick_start/pricing/ \u2014 deepseek-v4-pro, peak rate (upper bound); cache write priced as cache miss; the route is served by 9router, whose own price is not known here"
+  },
+  "provider": {
+   "api_key_env": null,
+   "endpoint": "https://9router.vnteki.com/v1",
+   "listed_owner": "ds",
+   "model_limit": {
+    "context": 200000,
+    "output": 32768
+   },
+   "name": "9router",
+   "served_model": "deepseek-v4-pro"
+  },
+  "route": "9router/ds/deepseek-v4-pro",
+  "timeouts_s": {
+   "developer": 1200,
+   "probe": 60,
+   "reviewer": 600,
+   "tool": 120
+  }
+ },
+ "stage": "finished",
+ "started": 1792018357.716798,
+ "story_errors": [],
+ "story_outcomes": {
+  "S1": [
+   "COMMIT"
+  ]
+ },
+ "usage": {
+  "cost": {
+   "currency": "USD",
+   "effective_date": "2026-10-06",
+   "known": 0.159152,
+   "sessions_unknown": [],
+   "source": "https://api-docs.deepseek.com/quick_start/pricing/ \u2014 deepseek-v4-pro, peak rate (upper bound); cache write priced as cache miss; the route is served by 9router, whose own price is not known here",
+   "status": "known",
+   "value": 0.159152
+  },
+  "preflight": {
+   "input_tokens": 6270,
+   "output_tokens": 34,
+   "provider_requests": 4,
+   "turns": 0,
+   "unaccounted": []
+  },
+  "provider_requests_journaled": 2,
+  "retries": {},
+  "sessions": [
+   {
+    "cost": 0.082812,
+    "session": "S1.developer.1.jsonl",
+    "steps": 8,
+    "steps_without_tokens": 0,
+    "tokens": {
+     "cache_read": 230656,
+     "cache_write": 0,
+     "input": 50074,
+     "output": 1380,
+     "reasoning": 278
+    }
+   },
+   {
+    "cost": 0.067929,
+    "session": "S1.reviewer.1.jsonl",
+    "steps": 5,
+    "steps_without_tokens": 0,
+    "tokens": {
+     "cache_read": 133248,
+     "cache_write": 0,
+     "input": 44431,
+     "output": 716,
+     "reasoning": 147
+    }
+   }
+  ],
+  "tokens": {
+   "cache_read": 363904,
+   "cache_write": 0,
+   "input": 94505,
+   "output": 2096,
+   "reasoning": 425
+  },
+  "wall_s": 72.877
+ }
+}

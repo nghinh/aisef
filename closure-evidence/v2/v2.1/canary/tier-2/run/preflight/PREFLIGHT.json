@@ -1,0 +1,40 @@
+{
+ "accounting": {
+  "input_tokens": 6270,
+  "output_tokens": 34,
+  "provider_requests": 4,
+  "turns": 0,
+  "unaccounted": []
+ },
+ "observation": {
+  "declared_model": "ds/deepseek-v4-pro",
+  "expected_listed_owner": "ds",
+  "expected_served_model": "deepseek-v4-pro",
+  "listing": {
+   "http": 200,
+   "id": "ds/deepseek-v4-pro",
+   "listed": true,
+   "owned_by": "ds"
+  },
+  "probes": [
+   {
+    "http": 200,
+    "served_model": "deepseek-v4-pro",
+    "system_fingerprint": "a307abda487cd1b463329ccb945ce396"
+   },
+   {
+    "http": 200,
+    "served_model": "deepseek-v4-pro",
+    "system_fingerprint": "a307abda487cd1b463329ccb945ce396"
+   },
+   {
+    "http": 200,
+    "served_model": "deepseek-v4-pro",
+    "system_fingerprint": "a307abda487cd1b463329ccb945ce396"
+   }
+  ],
+  "route": "9router/ds/deepseek-v4-pro"
+ },
+ "problems": [],
+ "verdict": "ATTESTED"
+}

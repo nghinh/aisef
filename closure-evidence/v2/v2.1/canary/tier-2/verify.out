@@ -1,0 +1,10 @@
+{
+ "delivery_verdict": "PASS",
+ "evidence_anchor": "26702f97bdf80867f7bfb50bc800a719baccb32385eddd7c44dae51137e397ee",
+ "journal_events": 68,
+ "notes": [
+  "the anchor matches the expected value: authentic only as far as that value came from a store the developer cannot write (docs/v2.1/ANCHOR-THREAT-MODEL.md); it does not prove the run happened as its journal says"
+ ],
+ "problems": [],
+ "verdict": "VERIFIED"
+}
