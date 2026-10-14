@@ -1,0 +1,75 @@
+{
+ "commit": "b4ab2ca0cc2c96610776dce02a189c2ccf5ad524",
+ "tool": "validation/v21/trace_paths.py",
+ "tree_sha256": "eded5e5addf8200b7bd2821d9e74cd1b7b8b09a7c84b28d2849f70312e45460c",
+ "python": "3.14.7",
+ "platform": "darwin",
+ "patched": [
+  "aisef2/app/confine.py",
+  "aisef2/runtime/process_range.py"
+ ],
+ "paths": {
+  "confine._sections:no-status": "the probe's output left a try without an exit status (the marker ran into text)",
+  "confine._judge:not-a-pair": "_judge was given a try that is not a (status, text) pair",
+  "confine._judge:status-none": "_judge was given a try whose status is None",
+  "range._Posix.abort:gone": "_Posix.abort's killpg raised ProcessLookupError or PermissionError"
+ },
+ "controls": [
+  {
+   "tag": "confine._sections:no-status",
+   "ok": true,
+   "got": [
+    "confine._sections:no-status"
+   ]
+  },
+  {
+   "tag": "confine._judge:not-a-pair",
+   "ok": true,
+   "got": [
+    "confine._judge:not-a-pair"
+   ]
+  },
+  {
+   "tag": "confine._judge:status-none",
+   "ok": true,
+   "got": [
+    "confine._judge:status-none"
+   ]
+  },
+  {
+   "tag": "range._Posix.abort:gone",
+   "ok": true,
+   "got": [
+    "range._Posix.abort:gone"
+   ]
+  }
+ ],
+ "complete": true,
+ "seconds": 15.54,
+ "kill_files": {
+  "tests/v2/test_v21_r4_anchor_nonascii.py": {
+   "outcome": "PASS",
+   "seconds": 0.52,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_r4_uncalibrated_qualifier.py": {
+   "outcome": "PASS",
+   "seconds": 0.51,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_T12b.py": {
+   "outcome": "PASS",
+   "seconds": 0.32,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_r3_conf_locale.py": {
+   "outcome": "PASS",
+   "seconds": 1.78,
+   "hits": {},
+   "pids": 0
+  }
+ }
+}

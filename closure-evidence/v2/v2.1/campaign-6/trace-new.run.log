@@ -1,0 +1,5 @@
+[1/4] PASS    0.52s hits={} tests/v2/test_v21_r4_anchor_nonascii.py
+[2/4] PASS    0.51s hits={} tests/v2/test_v21_r4_uncalibrated_qualifier.py
+[3/4] PASS    0.32s hits={} tests/v2/test_v21_kills3_T12b.py
+[4/4] PASS    1.78s hits={} tests/v2/test_v21_r3_conf_locale.py
+4/4 kill files measured in 15.54s; controls [True, True, True, True] -> /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c6/trace-new/trace.json
