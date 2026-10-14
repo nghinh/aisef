@@ -378,6 +378,18 @@ received, with a caller carrying `LANG=vi_VN.UTF-8`, `LC_ALL=de_DE.UTF-8`, `LC_M
 `LC_ALL=C LANG=C` and nothing else of the family (`locale-X1.json`). **Not measured:** a translated message (the guest has
 only the locales `C`, `C.utf8` and `POSIX`).
 
+### 6.2 A probe check without an exit status did not run (B03 round 4, 2026-10-14)
+
+The probe writes each check's exit status with `m rc $?`, a `printf` marker that sits at the start of a line only when
+the text before it ended with a line feed. A command that ends its output without one (the canary file, an `unshare`
+of another build) glues the marker to its last line; the check is then a try that never reported. It is not a pass,
+not a refusal and not an unreadable canary: `_sections` reports it as `(None, its text)` and `_judge` names every such
+check ("reported no exit status: the check did not run"), so the run is refused. Before this rule the try was a bare
+list, and a canary try without a status was no problem at all, two lines of text could be read as (status, text), and
+a single line made `_probe` raise at the report. Found by an independent review; decision and tests:
+[`decisions/B03-R4-REVIEW.md`](decisions/B03-R4-REVIEW.md). The probe script itself is unchanged (its text is part of
+the recorded `argv`).
+
 ## 7. Limits (not confined / not claimed)
 
 - **Not confined** by this track: the kernel's own execution of the developer's tests and the probes' execution of

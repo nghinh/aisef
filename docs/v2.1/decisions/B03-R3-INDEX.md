@@ -32,3 +32,39 @@ a real `aisef run` in the Linux guest (B03-R3-E2E.md); OCR identity; the probe-m
 | the same on Linux: a process named with bytes that are not UTF-8 made the whole table raise | `process_range._linux_table` | range-fu, real in the guest | B03-R3-range.md §11 |
 | **the mutation runner's own ownership root** accepted a command line that forged a row: a process born before the boundary was classified *signalled* (dry run) | `cleanup_authority._read` | range-fu | B03-R3-AUTH.md |
 | a session-stream event holding U+2028/U+2029/U+0085 was cut and dropped silently (the model reviewer's findings, a usage step) | `client.read_session`, `usage.session_tokens`, `confine._sections/_mounts/_host_mounts`, `lineage.reconcile` | range-fu, client WP | B03-R3-CLIENT.md |
+
+## 3. Round 4 (2026-10-14): what the last survivors and the re-verification of the audits found
+
+Hồ sơ: [B03-R4-REVIEW.md](B03-R4-REVIEW.md).
+
+| finding | where | disposition |
+|---|---|---|
+| campaign 5 left two TIMEOUT mutants (`_Posix.abort`, a live anchor left running hung the P4 test) and one survivor (`_judge` [100]) | `process_range._Posix.abort`, `confine._judge` | KILLED by `test_v21_r3_range_abort.py` and `test_v21_r3_judge_not_run.py` (no process, no signal; the contract of `_judge`'s input) |
+| a probe try without an exit status was read as a check that ran (a bare list: a traceback, or two lines read as (status, text), or a canary try with no status = no problem) | `confine._sections`, `confine._judge` | **fixed** (fail-closed); tests red on the committed code (11 failures, 3 errors), green after; found by an independent review, not by a mutant |
+| `abort()` let ESRCH/EPERM out and masked the start failure | `process_range._Posix.abort` | **fixed** (tolerated as `signal()` is); 2 errors red before |
+| the four `dict.get` defaults of `_judge` [135, 136, 138, 139] are equivalent only for a well-behaved mapping | `confine._judge` | the double `.get` replaced by one unpacking; the mutants no longer exist (not audited away) |
+| 122 carried survivor audits | all | re-verified by 18 independent agents, two copies each (`closure-evidence/v2/v2.1/round-3/audit-reverification/`): 116 stay (73 CONFIRMED + 43 REVISED: cites refreshed or consumers added, class unchanged); 6 refuted by both copies: `wrap` [42-44] and `findings` [52] were killed by existing tests that were not in the kill set (registered), `_canon` [4] and `verify` [24] got new kill files |
+| re-measurement scope | — | 56 targets / 1,419 mutants (all of `confine.py` and `process_range.py`, and the three whose kill set changed); the other 472 stand on the delta, the exact reading of the measured read-set and `trace_paths.py` (`closure-evidence/v2/v2.1/campaign-6/`) |
+
+## 4. What was verified, how, and what was not
+
+| claim | verified by | not verified |
+|---|---|---|
+| the write policy accepts the sandbox's own mounts and refuses the host's | unit tests of both cases over recorded mount tables; bubblewrap 0.12.0 in the Linux guest, 12 command lines (old clause accepted all 12) | another kernel, another bubblewrap; Windows/macOS have no bwrap |
+| the measurement's locale is `C` and nothing of the session's changes | the exact environment passed at the exec boundary (simulation) and with bwrap (guest) | a translated message (the guest has only `C`, `C.utf8`, `POSIX`) |
+| `no_progress` / the journal boundary | behaviour tests; 89 format-3 journals + the 2.0.0 smoke journal: 0 false refusals | a journal format 4 (none exists) |
+| the statement is bounded, the evidence is not | 12,000 adversarial findings; decisive field after character 1,500; secrets (string, number, straddling the cut); real runs | an artifact store that the operator edits afterwards (the manifest hash catches it, the verifier is `--verify`) |
+| `ProcessRange.release()` is safe under concurrent callers | controlled thread choreography over a fake anchor (mutual exclusion, idempotence, ownership, no deadlock) + a real range | a thousand-fold stress is not the proof and was not used as one |
+| a real `aisef run` runs isolated end to end | the real CLI in the Linux guest, scripted model, 92/92 checks twice, controls without confinement | a real model; anything beyond this guest |
+
+## 5. Evidence index
+
+* `closure-evidence/v2/v2.1/round-3/` — per work package reports and `kill_check` records; `OCR-IDENTITY-2026-10-13.json`;
+  `PROBE-FILES-RECHECK-2026-10-13.txt`; `r4/` (differential of the five `_judge` survivors, kill_check records);
+  `audit-reverification/` (the 18 agents' verdicts and summaries).
+* `closure-evidence/v2/v2.1/e2e-linux/` — the end-to-end run (environment, commands, results, outputs).
+* `closure-evidence/v2/v2.1/campaign-5/` — the campaign that measured all 528 targets at one snapshot, with its read-set,
+  reach, scope and results (`results/STORE-ATTRIBUTION.md`: the OpenCode store).
+* `closure-evidence/v2/v2.1/campaign-6/` — read-set, delta, exact reading, changed functions, trace, scope, T0 sweep
+  account, and the results of the re-measurement.
+* `closure-evidence/v2/v2.1/mutation-workers/` — every worker's record, log and history, byte for byte.

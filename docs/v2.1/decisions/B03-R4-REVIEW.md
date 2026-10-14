@@ -86,4 +86,33 @@ The numbers: `closure-evidence/v2/v2.1/campaign-6/SCOPE.json` (one row per targe
 
 122 carried audits were re-verified by 18 independent skeptic agents (two copies per batch, a and b, each re-deriving
 the claim at the snapshot, applying the mutant, running the tests): `closure-evidence/v2/v2.1/round-3/audit-reverification/`.
-Dispositions are in §6 of this file once the batches are merged.
+Dispositions are in §6.
+
+## 6. The re-verification of the carried audits: dispositions
+
+122 entries, 18 agents (9 batches x two copies, blind to each other). `apply_audits.py` (kept beside the reports) turns the
+verdicts into the audit file; the rule it applies: an entry stays only when neither copy refuted it, and its grounds
+become the (first) revised copy's, with the earlier ones kept as `grounds_before`.
+
+| outcome | entries | what it means |
+|---|---|---|
+| CONFIRMED by both | 73 | the claim holds at the snapshot; the cites were refreshed |
+| REVISED (one or both copies), class unchanged | 43 | the conclusion holds; a written ground was stale or wrong (a reader added by round 3, a cite, a test that now asserts the value) |
+| REFUTED by both, a test already kills it | 4 | `wrap` [42-44] (`test_v21_r3_conf_locale` asserts the probe's environment value for value), `findings` [52] (`T12b`'s second test): registered; not an audit |
+| REFUTED by both, a test is owed | 1 | `_canon` [4]: since round 3 the statement bounds `anchor_why` on its JSON encoding, the escape evicts the contract ids: `test_v21_r4_anchor_nonascii.py` |
+| the copies disagree | 1 | `verify` [24] ("at the bytes that run"): one refuted, one confirmed, both agree on the facts; the test states what they agree on (`test_v21_r4_uncalibrated_qualifier.py`) |
+
+Optional tests the agents sketched and that nothing owes (the audits stand): an `assertIn` for the closing parenthesis or
+the label of a few refusal messages (`pinned` [11], `read_anchor` [5], `write_anchor` [5], `continue_from` [115]), and a
+one-line artifact assertion for the finding's `source`. A test of a message's wording is not written to move a number
+(round 1's rule); each is the owner's to want.
+
+Side findings of the agents, none a mutant, none fixed here (each is fail-closed or documentation):
+
+| id | finding | measured | class |
+|---|---|---|---|
+| RV-1 | `reproducer_contract` raises `RecursionError` for a reproducer nested ~3,000 levels (800 is fine): the review stage ends with the story REFUSED, no verdict | `scratchpad` probe, kept as `round-3/r4/recursion_probe.py` | defect (low, fail-closed); same class as PM-3 (`file_artifact`): one bounded-depth fix in a probe window |
+| RV-2 | the NOT_REPRODUCED sentence ("observes the stated behaviour: the finding does not reproduce") is false for INDETERMINATE, and since round 3 the statement prints `observed=INDETERMINATE` beside it | read | wording; the ruling is the owner's (open since V2.1-backlog) |
+| RV-3 | the refusals of `check_repository` and `--parent` lose a label token under a mutant; whether `run.py:149` should name `shown` | read | owner question about the product's wording |
+| RV-4 | `test_v21_kills3_T25a`'s docstring lists preflight `http_transport` [13, 14] as pinned (numbering of an earlier enumeration): they survive it and every preflight test; only a `get_type_hints`/return-annotation test separates them | measured by two agents | test docstring is stale; the audits stand |
+| RV-5 | `test_c2_k_nowork_001` is red on the unmutated snapshot: the K-NOWORK record's `kernel.after.kernel_digest` is not this tree's `aisef2/` (stale after round 3) | measured | the record is regenerated on the final tree (§ the order of derived records) |
