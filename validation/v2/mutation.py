@@ -925,7 +925,7 @@ _V21_R3_NEW: dict[str, list[str]] = {
                  "_env_rows", "_lsof_cwds", "carriers", "cwd_under", "host_table", "_PS_ROW", "_PS_ENV_ROW", "_WIN_ROW")},
 }
 _V21_R3_APPEND: dict[str, list[str]] = {
-    "aisef2/app/confine.py::_judge": [*_R3_CONF],
+    "aisef2/app/confine.py::_judge": [*_R3_CONF, _R3 + "judge_not_run.py"],
     "aisef2/app/confine.py::_mounts": [_R3_CONF[0], _R3 + "client_readers.py"],
     "aisef2/app/confine.py::_probe": [_R3_CONF[0], _R3 + "conf_locale.py", _R3_CONF[2]],
     "aisef2/app/confine.py::measure": [_R3_CONF[0], _R3 + "conf_locale.py", _R3_CONF[2]],
@@ -944,6 +944,9 @@ _V21_R3_RANGE = {t: list(k) for t, k in P4_TARGETS.items() if t.startswith("aise
 _V21_R3_RANGE_APPEND = {
     "aisef2/runtime/process_range.py::_ps_table": [_R3 + "range_fu_ps_table.py"],
     "aisef2/runtime/process_range.py::ProcessRange.release": [_R3 + "range_release_contract.py"],
+    # campaign 5 left both mutants of `_Posix.abort` TIMEOUT (a live anchor left running hangs the P4 test that waits for
+    # it): a stand-in anchor and a recording killpg answer the same question without a process
+    "aisef2/runtime/process_range.py::_Posix.abort": [_R3 + "range_abort.py"],
 }
 for _t, _fs in {**_V21_R3_RANGE, **_V21_R3_NEW}.items():
     V21_TARGETS[_t] = list(_fs)
