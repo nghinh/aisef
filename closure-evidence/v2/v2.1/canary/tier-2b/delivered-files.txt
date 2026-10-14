@@ -1,0 +1,13 @@
+app/__init__.py
+app/__pycache__/__init__.cpython-314.pyc
+app/__pycache__/calc.cpython-314.pyc
+app/calc.py
+docs/requirements.md
+tests/__init__.py
+tests/__pycache__/__init__.cpython-314.pyc
+tests/__pycache__/test_add.cpython-314.pyc
+tests/__pycache__/test_mul.cpython-314.pyc
+tests/__pycache__/test_total.cpython-314.pyc
+tests/test_add.py
+tests/test_mul.py
+tests/test_total.py

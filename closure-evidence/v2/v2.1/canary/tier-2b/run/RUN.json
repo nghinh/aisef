@@ -1,0 +1,493 @@
+{
+ "admission": {
+  "admitted": true,
+  "engine_digest": "7668fc35709829d8324e914e0300b2b85221d9e83dedd32cd2c3996f761690c7",
+  "failed": [],
+  "result_digest": "c66fe0fed3031bc7c23149195ab03a264830f4cd78587647cb8266c51fcb7f66"
+ },
+ "aggregate_min_grade": "ATTESTED",
+ "budget": {
+  "limitation": "spend is what the client reports per finished step: an HTTP request that finishes no step (a client retry, a failed request, the one in flight when a stop is issued) is not in the telemetry, and a stop is issued at the first reading that shows a ceiling reached, so totals can pass a ceiling by the steps finished since the reading before",
+  "limits": {
+   "input_tokens": 2000000,
+   "output_tokens": 60000,
+   "provider_requests": 24,
+   "turns": 300
+  },
+  "preflight": {
+   "input_tokens": 6270,
+   "output_tokens": 45,
+   "provider_requests": 4,
+   "turns": 0
+  },
+  "reached": null,
+  "spent": {
+   "input_tokens": 1308539,
+   "output_tokens": 6632,
+   "provider_requests": 10,
+   "requests_recorded": 6,
+   "sessions_started": 6,
+   "turns": 37,
+   "unaccounted": []
+  }
+ },
+ "budget_stop": null,
+ "bundle_digest": "071db210d14858b715b6eb0c3efe2b7d096ae383fd87323c1b66a7ebd6bce1a1",
+ "delivery_blocked_by": [],
+ "delivery_verdict": "PASS",
+ "failure": null,
+ "final_main": "7879f615d58c46fb65c98af785406e3043a3b10a",
+ "finished": 1792018774.286904,
+ "format": "aisef-v2-run-record/1",
+ "generalization_claim": "NONE",
+ "journal": {
+  "closed": "SHUTDOWN",
+  "lines": 212,
+  "path": "run/journals/aisef-run.jsonl",
+  "sha256": "5b998104bd8907b55162c511a285ad4d01714f5131549bb906fc31919383dbde"
+ },
+ "kernel_digest": "bc6de98b0d665978245451a01cafe3e52ee79106d0d48debdda232acd654df57",
+ "no_progress": [],
+ "plan_hash": "15646627476fec817ffdbeded3986312df1ee3c6fe89e8e64f8b193b64296800",
+ "plan_quality_verdict": "NOT_CLAIMED",
+ "platform": {
+  "python": "3.14.7",
+  "system": "darwin"
+ },
+ "preflight": {
+  "accounting": {
+   "input_tokens": 6270,
+   "output_tokens": 45,
+   "provider_requests": 4,
+   "turns": 0,
+   "unaccounted": []
+  },
+  "observation": {
+   "declared_model": "ds/deepseek-v4-pro",
+   "expected_listed_owner": "ds",
+   "expected_served_model": "deepseek-v4-pro",
+   "listing": {
+    "http": 200,
+    "id": "ds/deepseek-v4-pro",
+    "listed": true,
+    "owned_by": "ds"
+   },
+   "probes": [
+    {
+     "http": 200,
+     "served_model": "deepseek-v4-pro",
+     "system_fingerprint": "a307abda487cd1b463329ccb945ce396"
+    },
+    {
+     "http": 200,
+     "served_model": "deepseek-v4-pro",
+     "system_fingerprint": "a307abda487cd1b463329ccb945ce396"
+    },
+    {
+     "http": 200,
+     "served_model": "deepseek-v4-pro",
+     "system_fingerprint": "a307abda487cd1b463329ccb945ce396"
+    }
+   ],
+   "route": "9router/ds/deepseek-v4-pro"
+  },
+  "problems": [],
+  "verdict": "ATTESTED"
+ },
+ "productproof": {
+  "delivered": 5,
+  "obligations": [
+   {
+    "criterion": "C-ADD",
+    "delivered": true,
+    "expected": "SATISFIED",
+    "last_proof": {
+     "agreement": true,
+     "candidate": "a16596cc2f8639017bea4c5ec53b0808576330bd",
+     "seq": 62,
+     "verdict": "SATISFIED"
+    },
+    "probe_id": "probe.python_callable_v2",
+    "role": "INTRODUCE",
+    "satisfied_at_last_proof": true,
+    "spec": "PPS-cf4c46309253a0db294c049b936314841701a084f25ac91de188916ec6aefaa1",
+    "story": "S1"
+   },
+   {
+    "criterion": "C-STDLIB-1",
+    "delivered": true,
+    "expected": "SATISFIED",
+    "last_proof": {
+     "agreement": true,
+     "candidate": "a16596cc2f8639017bea4c5ec53b0808576330bd",
+     "seq": 66,
+     "verdict": "SATISFIED"
+    },
+    "probe_id": "probe.file_artifact",
+    "role": "PRESERVE",
+    "satisfied_at_last_proof": true,
+    "spec": "PPS-157733ce32c3db810e90338b7d60c855a071849a38b5d589c5ebb08aa76bbabb",
+    "story": "S1"
+   },
+   {
+    "criterion": "C-MUL",
+    "delivered": true,
+    "expected": "SATISFIED",
+    "last_proof": {
+     "agreement": true,
+     "candidate": "268e064b1b47f29ec0c1cf519892b6aa46669f21",
+     "seq": 120,
+     "verdict": "SATISFIED"
+    },
+    "probe_id": "probe.python_callable_v2",
+    "role": "INTRODUCE",
+    "satisfied_at_last_proof": true,
+    "spec": "PPS-a832a295d9585e52ed3c115dea01dda22cd83818e59faa6609ec143f9ef2a6d6",
+    "story": "S2"
+   },
+   {
+    "criterion": "C-TOTAL",
+    "delivered": true,
+    "expected": "SATISFIED",
+    "last_proof": {
+     "agreement": true,
+     "candidate": "7879f615d58c46fb65c98af785406e3043a3b10a",
+     "seq": 189,
+     "verdict": "SATISFIED"
+    },
+    "probe_id": "probe.python_callable_v2",
+    "role": "INTRODUCE",
+    "satisfied_at_last_proof": true,
+    "spec": "PPS-5a77072eeed986acc6648fdac04d7144b4646bc20deace073f09b5684626e4a1",
+    "story": "S3"
+   },
+   {
+    "criterion": "C-ADD-3",
+    "delivered": true,
+    "expected": "SATISFIED",
+    "last_proof": {
+     "agreement": true,
+     "candidate": "7879f615d58c46fb65c98af785406e3043a3b10a",
+     "seq": 197,
+     "verdict": "SATISFIED"
+    },
+    "probe_id": "probe.python_callable_v2",
+    "role": "PRESERVE",
+    "satisfied_at_last_proof": true,
+    "spec": "PPS-cf4c46309253a0db294c049b936314841701a084f25ac91de188916ec6aefaa1",
+    "story": "S3"
+   }
+  ],
+  "satisfied_at_last_proof": 5,
+  "total": 5
+ },
+ "project": "calc3",
+ "runspec_hash": "8db465068e0d83837b4a2a1812e4130c72983f565bbfeb9fe8a9c971ca2d9fc5",
+ "scanner": "ruff",
+ "sessions": [
+  {
+   "attempt": 1,
+   "candidate": "3fc18ebb164d4650015402511b02110bc06b20f1",
+   "developer_committed_itself": false,
+   "error": null,
+   "exit": 0,
+   "log": "S1.developer.1.jsonl",
+   "prompt_sha256": "1d02c57a7c8fbb4d052bf6e66edfbedead9468da26f4ad5cce741847a389d271",
+   "redacted": 0,
+   "role": "developer",
+   "seconds": 41.6,
+   "started": true,
+   "stopped": null,
+   "story_id": "S1",
+   "timed_out": false,
+   "tokens": {
+    "input": 424275,
+    "output": 1728
+   },
+   "turns": 12
+  },
+  {
+   "attempt": 1,
+   "candidate": "84cfa45001881532a86b5f70e995202806e79854",
+   "developer_committed_itself": false,
+   "error": null,
+   "exit": 0,
+   "log": "S2.developer.1.jsonl",
+   "prompt_sha256": "fb7706c4cfea5b1d6d9bbcfc4589e98cad950b9a84c9821d2920842a6a5d1243",
+   "redacted": 0,
+   "role": "developer",
+   "seconds": 30.1,
+   "started": true,
+   "stopped": null,
+   "story_id": "S2",
+   "timed_out": false,
+   "tokens": {
+    "input": 211647,
+    "output": 1266
+   },
+   "turns": 6
+  },
+  {
+   "attempt": 1,
+   "candidate": "08e20ae0a2fb624c39e1f60c4eabe335d9ae89bf",
+   "developer_committed_itself": false,
+   "error": null,
+   "exit": 0,
+   "log": "S3.developer.1.jsonl",
+   "prompt_sha256": "f8c07195c82fa186810b7cd8c72074e6f0f2f797df3952ff3626230b64b9b400",
+   "redacted": 0,
+   "role": "developer",
+   "seconds": 30.1,
+   "started": true,
+   "stopped": null,
+   "story_id": "S3",
+   "timed_out": false,
+   "tokens": {
+    "input": 213495,
+    "output": 1211
+   },
+   "turns": 6
+  },
+  {
+   "attempt": 1,
+   "error": null,
+   "exit": 0,
+   "findings": [],
+   "log": "S1.reviewer.1.jsonl",
+   "parsed": true,
+   "prompt_sha256": "948209ff84254ce6a18205a719d39aa1cc593ae57d68ce70628e40cdacf97797",
+   "redacted": 0,
+   "role": "reviewer",
+   "seconds": 22.4,
+   "started": true,
+   "stopped": null,
+   "story_id": "S1",
+   "timed_out": false,
+   "tokens": {
+    "input": 139271,
+    "output": 753
+   },
+   "turns": 4
+  },
+  {
+   "attempt": 1,
+   "error": null,
+   "exit": 0,
+   "findings": [],
+   "log": "S2.reviewer.1.jsonl",
+   "parsed": true,
+   "prompt_sha256": "ec7b285a4fb9989936d6b77d3f362f093c4c1563099316102abc6713045c9ac0",
+   "redacted": 0,
+   "role": "reviewer",
+   "seconds": 28.0,
+   "started": true,
+   "stopped": null,
+   "story_id": "S2",
+   "timed_out": false,
+   "tokens": {
+    "input": 140527,
+    "output": 1073
+   },
+   "turns": 4
+  },
+  {
+   "attempt": 1,
+   "error": null,
+   "exit": 0,
+   "findings": [],
+   "log": "S3.reviewer.1.jsonl",
+   "parsed": true,
+   "prompt_sha256": "32f271b5d7348e861baec316909ffdbd756d2a517a45df3f8e88de18b821dc60",
+   "redacted": 0,
+   "role": "reviewer",
+   "seconds": 32.4,
+   "started": true,
+   "stopped": null,
+   "story_id": "S3",
+   "timed_out": false,
+   "tokens": {
+    "input": 173054,
+    "output": 556
+   },
+   "turns": 5
+  }
+ ],
+ "settings": {
+  "budget": {
+   "input_tokens": 2000000,
+   "output_tokens": 60000,
+   "provider_requests": 24,
+   "turns": 300
+  },
+  "client": "opencode",
+  "client_env": [],
+  "format": "aisef-v2-run/1",
+  "limits": {
+   "DEVELOPER": 2,
+   "ENVIRONMENT": 1,
+   "INTEGRATION": 0,
+   "PLAN": 0,
+   "PROVIDER": 1,
+   "REVIEW": 1,
+   "SECURITY": 1
+  },
+  "max_turns_per_session": 40,
+  "preflight": {
+   "chat_probes": 3
+  },
+  "prices": {
+   "cache_read_per_mtok": 0.044,
+   "cache_write_per_mtok": 1.32,
+   "currency": "USD",
+   "effective_date": "2026-10-06",
+   "input_per_mtok": 1.32,
+   "output_per_mtok": 3.96,
+   "source": "https://api-docs.deepseek.com/quick_start/pricing/ \u2014 deepseek-v4-pro, peak rate (upper bound); cache write priced as cache miss; the route is served by 9router, whose own price is not known here"
+  },
+  "provider": {
+   "api_key_env": null,
+   "endpoint": "https://9router.vnteki.com/v1",
+   "listed_owner": "ds",
+   "model_limit": {
+    "context": 200000,
+    "output": 32768
+   },
+   "name": "9router",
+   "served_model": "deepseek-v4-pro"
+  },
+  "review": {
+   "finder": "model",
+   "min_severity": "low",
+   "policy": "fix-loop"
+  },
+  "route": "9router/ds/deepseek-v4-pro",
+  "timeouts_s": {
+   "developer": 1200,
+   "probe": 60,
+   "reviewer": 600,
+   "tool": 120
+  }
+ },
+ "stage": "finished",
+ "started": 1792018559.647848,
+ "story_errors": [],
+ "story_outcomes": {
+  "S1": [
+   "COMMIT"
+  ],
+  "S2": [
+   "COMMIT"
+  ],
+  "S3": [
+   "COMMIT"
+  ]
+ },
+ "usage": {
+  "cost": {
+   "currency": "USD",
+   "effective_date": "2026-10-06",
+   "known": 0.431394,
+   "sessions_unknown": [],
+   "source": "https://api-docs.deepseek.com/quick_start/pricing/ \u2014 deepseek-v4-pro, peak rate (upper bound); cache write priced as cache miss; the route is served by 9router, whose own price is not known here",
+   "status": "known",
+   "value": 0.431394
+  },
+  "preflight": {
+   "input_tokens": 6270,
+   "output_tokens": 45,
+   "provider_requests": 4,
+   "turns": 0,
+   "unaccounted": []
+  },
+  "provider_requests_journaled": 6,
+  "retries": {},
+  "sessions": [
+   {
+    "cost": 0.097808,
+    "session": "S1.developer.1.jsonl",
+    "steps": 12,
+    "steps_without_tokens": 0,
+    "tokens": {
+     "cache_read": 367616,
+     "cache_write": 0,
+     "input": 56659,
+     "output": 1406,
+     "reasoning": 322
+    }
+   },
+   {
+    "cost": 0.05975,
+    "session": "S1.reviewer.1.jsonl",
+    "steps": 4,
+    "steps_without_tokens": 0,
+    "tokens": {
+     "cache_read": 99584,
+     "cache_write": 0,
+     "input": 39687,
+     "output": 638,
+     "reasoning": 115
+    }
+   },
+   {
+    "cost": 0.070591,
+    "session": "S2.developer.1.jsonl",
+    "steps": 6,
+    "steps_without_tokens": 0,
+    "tokens": {
+     "cache_read": 167552,
+     "cache_write": 0,
+     "input": 44095,
+     "output": 1238,
+     "reasoning": 28
+    }
+   },
+   {
+    "cost": 0.061696,
+    "session": "S2.reviewer.1.jsonl",
+    "steps": 4,
+    "steps_without_tokens": 0,
+    "tokens": {
+     "cache_read": 100352,
+     "cache_write": 0,
+     "input": 40175,
+     "output": 852,
+     "reasoning": 221
+    }
+   },
+   {
+    "cost": 0.070689,
+    "session": "S3.developer.1.jsonl",
+    "steps": 6,
+    "steps_without_tokens": 0,
+    "tokens": {
+     "cache_read": 169216,
+     "cache_write": 0,
+     "input": 44279,
+     "output": 1184,
+     "reasoning": 27
+    }
+   },
+   {
+    "cost": 0.062405,
+    "session": "S3.reviewer.1.jsonl",
+    "steps": 5,
+    "steps_without_tokens": 0,
+    "tokens": {
+     "cache_read": 131840,
+     "cache_write": 0,
+     "input": 41214,
+     "output": 339,
+     "reasoning": 217
+    }
+   }
+  ],
+  "tokens": {
+   "cache_read": 1036160,
+   "cache_write": 0,
+   "input": 266109,
+   "output": 5657,
+   "reasoning": 930
+  },
+  "wall_s": 214.639
+ }
+}

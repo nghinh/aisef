@@ -1,0 +1,3 @@
+ tests/__pycache__/test_total.cpython-314.pyc | Bin 0 -> 1950 bytes
+ tests/test_total.py                          |  24 ++++++++++++++++++++++++
+ 8 files changed, 28 insertions(+)

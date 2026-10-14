@@ -1,0 +1,8 @@
+{"event": "sent", "kind": "listing", "n": 1}
+{"event": "done", "http": 200, "n": 1}
+{"event": "sent", "kind": "chat", "n": 2}
+{"event": "done", "http": 200, "input_tokens": 2090, "n": 2, "output_tokens": 16}
+{"event": "sent", "kind": "chat", "n": 3}
+{"event": "done", "http": 200, "input_tokens": 2090, "n": 3, "output_tokens": 16}
+{"event": "sent", "kind": "chat", "n": 4}
+{"event": "done", "http": 200, "input_tokens": 2090, "n": 4, "output_tokens": 13}

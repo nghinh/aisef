@@ -1,0 +1,47 @@
+{
+ ".config/opencode/opencode.json": {
+  "inode": 142439922,
+  "mtime_ns": 1788673187695589256,
+  "size": 8376
+ },
+ ".local/share/opencode/auth.json": {
+  "inode": 103561194,
+  "mtime_ns": 1788325958598260104,
+  "size": 4112
+ },
+ ".local/share/opencode/log": {
+  "dir_mtime_ns": 1785580950211597934,
+  "entries": 12,
+  "newest_entry_mtime_ns": 1792018768382281076
+ },
+ ".local/share/opencode/opencode.db": {
+  "inode": 154785805,
+  "mtime_ns": 1792018739633091619,
+  "size": 5300666368
+ },
+ ".local/share/opencode/opencode.db-shm": {
+  "inode": 684717407,
+  "mtime_ns": 1792018739624052683,
+  "size": 32768
+ },
+ ".local/share/opencode/opencode.db-wal": {
+  "inode": 684717406,
+  "mtime_ns": 1792018769992539730,
+  "size": 3403152
+ },
+ ".local/share/opencode/snapshot": {
+  "dir_mtime_ns": 1792018572578994323,
+  "entries": 277,
+  "newest_entry_mtime_ns": 1792018744798771547
+ },
+ ".local/share/opencode/storage": {
+  "dir_mtime_ns": 1773102741277200712,
+  "entries": 2,
+  "newest_entry_mtime_ns": 1785580709621031195
+ },
+ ".local/share/opencode/tool-output": {
+  "dir_mtime_ns": 1791820810145437826,
+  "entries": 0,
+  "newest_entry_mtime_ns": null
+ }
+}
