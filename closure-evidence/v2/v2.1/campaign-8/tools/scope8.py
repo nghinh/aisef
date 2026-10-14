@@ -47,6 +47,7 @@ head = heads.pop()
 moved = sorted(f for f in git("diff", "--name-only", "534435ff84fe303a202d4a340e0172e9e88d7994", head).splitlines()
                if not f.startswith(("docs/", "closure-evidence/")))
 assert set(moved) == CODE_THAT_MAY_CHANGE, moved
+changed_fn = json.loads((E / "campaign-6/CHANGED-FUNCTIONS.json").read_text())["modules"]
 c7 = json.loads((E / "campaign-7/SCOPE.json").read_text())["targets"]
 rows = {}
 for t, prev in sorted(c7.items()):
@@ -58,12 +59,18 @@ for t, prev in sorted(c7.items()):
     cleared = None
     if not now and (d.get("data_read") or d.get("read_set_not_measured")):
         a = analysis[tag].get(t)
-        if a is None or d.get("read_set_not_measured") or a["listings_that_changed"] or a["exactly_read_and_changed"]:
+        # a changed file the kill files OPENED that is a module whose import-time statements are unchanged
+        # (reach.watch_from_diff, campaign-6/CHANGED-FUNCTIONS.json) is loaded, not executed: only the changed
+        # functions are, and the traces (campaign-6, campaign-7: no kill file reached them) cover those
+        if a is None or d.get("read_set_not_measured") or a["listings_that_changed"] or not all(
+                changed_fn.get(f) == "unchanged" for f in a["exactly_read_and_changed"]):
             now = True
             why = ["a kill file reads a changed file: " + json.dumps(a["listings_that_changed"] + a["exactly_read_and_changed"])[:300]
                    if a else "the reading of a changed file was not measured"]
         else:
-            cleared = {"by": f"campaign-8/DATA-READ-ANALYSIS-from-{tag}.json", "listings_that_changed": [], "opened_and_changed": []}
+            cleared = {"by": f"campaign-8/DATA-READ-ANALYSIS-from-{tag}.json + campaign-6/CHANGED-FUNCTIONS.json",
+                       "listings_that_changed": [], "opened_and_changed": a["exactly_read_and_changed"],
+                       "import_time_statements": {f: changed_fn[f] for f in a["exactly_read_and_changed"]}}
     rows[t] = {"role": "REMEASURE" if now else "STANDS", "reasons": why, "result_from_base": origin,
                **({"data_read_cleared": cleared} if cleared else {}),
                "result_from": "campaign 8 (this campaign)" if now else origin}

@@ -66,4 +66,9 @@ Hồ sơ: [B03-R4-REVIEW.md](B03-R4-REVIEW.md).
   reach, scope and results (`results/STORE-ATTRIBUTION.md`: the OpenCode store).
 * `closure-evidence/v2/v2.1/campaign-6/` — read-set, delta, exact reading, changed functions, trace, scope, T0 sweep
   account, and the results of the re-measurement.
+* `closure-evidence/v2/v2.1/campaign-7/` — the three targets re-measured after the second round of skeptics, with the
+  read-set, two deltas, the exact reading, the trace and the scope.
+* `closure-evidence/v2/v2.1/campaign-8/` — the 12 targets re-measured after two kill files named an encoding in a
+  child-process call (the suite's own rule): T0 of the two pairs, results, and (at the head carrying the regenerated
+  derived records) the read-set, three deltas, the exact reading and the scope.
 * `closure-evidence/v2/v2.1/mutation-workers/` — every worker's record, log and history, byte for byte.

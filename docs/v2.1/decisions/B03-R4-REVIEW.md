@@ -134,3 +134,35 @@ the strengthened test and a new kill file killed the others.
 Side finding fixed in the same commit: `run.sh`'s "bwrap ran" heuristic matched the round-4 message ("the check did not
 run") and printed "bwrap ran: NO" for a probe that ran with a try that never reported; it now matches the old specific
 message (`the sandbox did not run the probe`).
+
+## 8. Round 4c — the suite's encoding rule, and what it cost
+
+The pre-run of the full suite at `1043186` (after the mutation record was written PASS) found two child-process calls,
+both in kill files this round added or strengthened, that read text without naming an encoding:
+`tests/v2/test_v21_r3_conf_policy.py` (the `/bin/sh` run of the probe's device section) and
+`tests/v2/test_v21_r4_probe_record.py` (the real probe through `/bin/sh`). `tests/test_meta.py` refuses a
+`subprocess.run(..., text=True)` with no `encoding=` (lesson 99: on a Windows runner the machine's code page decodes the
+child's UTF-8, the reader thread dies, `stdout` is `None` and nothing says so). The rule was right and the two calls
+were mine; nothing was relaxed.
+
+The fix is one keyword in each call. Both files are **pinned** (kill files are in the manifest by sha256 and in each
+target's closure), so the change is a manifest revision and a re-measurement of the targets that register them — 12
+targets, 680 mutants, all in `confine.py` (`_probe`, `_judge`, `measure`, `_mounts`, `_owned`, `_host_mounts`,
+`_writes`, `DEVICES`, `_device_roots`, `PSEUDO`, `_DEV`, `_PEER`). It was **not** argued to be "only a decoding
+argument": the owner's rule is that no result is attached to a changed file without a measurement or a specific basis.
+
+| step | what | where |
+|---|---|---|
+| T0 | the two changed pairs (null mutant of `confine.py` × each file) measured again: both PASS; one stale row of campaign 7 (a null mutant no target has any more) is not carried | `T0-SWEEP-8.json`, `EXECUTION-ORDER-9.json`, `campaign-8/t0-sweep/` |
+| manifest | revision 8, snapshot `5df323a` | `REQUALIFICATION-MANIFEST-8.json` |
+| campaign 8 | the 12 targets measured at the snapshot, 4 workers | `campaign-8/results/`, `mutation-workers/c8-w*` |
+| basis for the other 516 | three deltas (from `289885e`, `a770fbb`, `853da4a`) at the head the read-set was measured at (`08b4ee0`) + the exact reading of the data each kill file read; the product (`aisef2/`) and the runner are byte for byte campaign 7's: the code that moved since campaign 7's read-set is those two kill files and `validation/v2/checker_calibration.py` | `campaign-8/SCOPE.json`, `delta-from-*`, `DATA-READ-ANALYSIS-from-*` |
+
+Result of campaign 8 (snapshot `5df323a`, 4 workers, 26 minutes): 12 targets / 680 mutants — **673 KILLED, 7 SURVIVED,
+0 TIMEOUT / INFRA / NOT_RUN**. Compared with each target's previous result (campaign 6 for ten of them, campaign 7 for
+`_judge` and `_probe`) mutant by mutant: **0 differences**. The seven survivors are the audited ones: `_probe` (3: `'sleep '`
+and `': '` emptied, AUDITED; `'.git'` emptied, EQUIVALENT), `_judge` (3, AUDITED), `measure` (1, EQUIVALENT). The audits are
+positional and valid at the module digest, which did not change (`confine.py` is byte for byte campaign 7's).
+
+What it taught: run `tests/test_meta.py` (the suite's own meta rules) **before** a kill file is pinned. A kill file
+written in a hurry that breaks a house rule costs a manifest revision and a campaign; the check costs two seconds.

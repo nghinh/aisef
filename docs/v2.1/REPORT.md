@@ -65,7 +65,7 @@ nguồn gốc của ba tệp probe trong `site-packages` (§0.7).
 
 | | số lượng |
 |---|---|
-| target (mỗi cái được tính đúng một lần) | **528** — 472 theo đợt 5 (`289885e`, toàn bộ 528 ở một snapshot), 53 theo đợt 6 (`a770fbb`), 3 theo đợt 7 (`853da4a`) |
+| target (mỗi cái được tính đúng một lần) | **528** — 472 theo đợt 5 (`289885e`, toàn bộ 528 ở một snapshot), 43 theo đợt 6 (`a770fbb`), 1 theo đợt 7 (`853da4a`), 12 theo đợt 8 (`5df323a`) |
 | mutant | **13,581** |
 | **KILLED** (một FAIL tái hiện, có kiểm chứng đối chứng) | **13,388** |
 | SURVIVED, có audit theo vị trí | **193** — **136 AUDITED** (khác biệt có thật, không người đọc nào dựa vào; nêu từng người đọc, từng ngoại lệ) + **57 EQUIVALENT** (chứng minh từ mã). **Không phải kill; báo riêng.** |
@@ -79,8 +79,11 @@ mutant) → chiến dịch 4 (`b5c2457`, 28 target, 1,378 mutant) → **chiến 
 mutant ở một snapshot, 5 worker, 24.3 giờ: 13,361 KILLED, 203 SURVIVED, 2 TIMEOUT, 0 INFRA, 0 NOT_RUN)** → vòng 4:
 review độc lập + kiểm lại 122 audit mang sang bằng 18 agent (hai bản mù mỗi lô) → **chiến dịch 6 (`a770fbb`, 56 target /
 1,419 mutant, 55 phút: 1,393 KILLED, 26 SURVIVED, 0 TIMEOUT)** → hai agent kiểm 3 audit mới, một test mới và một test được
-siết → **chiến dịch 7 (`853da4a`, 3 target / 448 mutant)**. Chi tiết và căn cứ: `campaign-5/`, `campaign-6/`,
-`campaign-7/`, [decisions/B03-R4-REVIEW.md](decisions/B03-R4-REVIEW.md), [MUTATION-RUNNER-V2.md](MUTATION-RUNNER-V2.md) §19–§20.
+siết → **chiến dịch 7 (`853da4a`, 3 target / 448 mutant)** → lượt chạy suite đầy đủ ở `1043186` thấy hai lệnh gọi tiến
+trình con thiếu `encoding="utf-8"` (quy tắc của chính suite, lỗi 99) trong hai tệp kill đã ghim → sửa đúng hai từ khoá,
+T0 hai cặp, manifest rev 8 → **chiến dịch 8 (`5df323a`, 12 target / 680 mutant: 673 KILLED, 7 SURVIVED đều đã có audit, 0
+TIMEOUT/INFRA/NOT_RUN; mỗi mutant có đúng lớp của lần đo trước)**. Chi tiết và căn cứ: `campaign-5/`, `campaign-6/`,
+`campaign-7/`, `campaign-8/`, [decisions/B03-R4-REVIEW.md](decisions/B03-R4-REVIEW.md), [MUTATION-RUNNER-V2.md](MUTATION-RUNNER-V2.md) §19–§20.
 
 **Căn cứ phụ thuộc của kết quả được giữ** (quy tắc của chủ dự án, mục 6: "phải có căn cứ phụ thuộc cụ thể; không nới quy
 tắc để tránh chi phí đo"). 472 kết quả của đợt 5 đứng vững ở cây cuối vì: (1) delta của tệp đích, bộ kill, closure test,
@@ -92,6 +95,15 @@ bản sao của runner: không tệp kill nào ngoài ba tệp do vòng này vi�
 (mà `reach.py` không thấy); (4) `diff_confine_old_new.py`: hai bản `_judge` trả cùng kết quả trên 20.000 đầu vào mà mọi try
 đều báo status. **Không** phủ: một mutant của module KHÁC tự tạo ra đúng đầu vào đó (không thể: đầu ra probe đến từ tiến
 trình bubblewrap do test cấp); đây là lập luận, không phải số đo.
+
+**Đợt 8 — vì sao phải đo lại 12 target dù thay đổi chỉ là một từ khoá.** Hai tệp kill (`test_v21_r3_conf_policy.py`,
+`test_v21_r4_probe_record.py`) bị ghim bằng sha256 trong manifest và nằm trong closure của từng target đăng ký chúng; đổi
+byte là đổi căn cứ của kết quả. Không lập luận "chỉ là tham số giải mã": 12 target (680 mutant, đều trong `confine.py`)
+được đo lại ở snapshot mới — kết quả giống lần trước từng mutant một. Căn cứ cho 516 target còn lại: ba delta (từ
+`289885e`, `a770fbb`, `853da4a`) ở đúng commit đo read-set + đọc chính xác dữ liệu từng tệp kill đọc; mã sản phẩm
+(`aisef2/`) và runner giống đợt 7 từng byte (`campaign-8/SCOPE.json`, `code_moved_since_campaign_7_read_set`). Read-set
+được đo ở commit có đủ các bản ghi phái sinh (ba tệp đó nằm trong `mutation.COPY`; một tệp đã xoá ở HEAD không thể được
+xoá nghi ngờ bằng phép đo ở HEAD).
 
 ### 0.3b Bảng: đã làm / đã kiểm chứng / chưa kiểm chứng / bị chặn
 
