@@ -1,0 +1,12 @@
+aisef2/app/confine.py::_probe
+aisef2/app/confine.py::_judge
+aisef2/app/confine.py::measure
+aisef2/app/confine.py::_mounts
+aisef2/app/confine.py::_owned
+aisef2/app/confine.py::_host_mounts
+aisef2/app/confine.py::_writes
+aisef2/app/confine.py::DEVICES
+aisef2/app/confine.py::_device_roots
+aisef2/app/confine.py::PSEUDO
+aisef2/app/confine.py::_DEV
+aisef2/app/confine.py::_PEER

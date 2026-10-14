@@ -1,0 +1,13 @@
+{
+ "worker": "c8-w1",
+ "snapshot": "5df323a30bf0b5be95660f1f053d6735bb363d87",
+ "status": "finished 2026-10-14T16:39:08Z; git status --porcelain after: clean (campaign 8, snapshot 5df323a; the worker directory is named c3-w1 by the campaign script)",
+ "log": {
+  "path": "closure-evidence/v2/v2.1/mutation-workers/c8-w1.log",
+  "sha256": "7a6bca7da371c0b6e5ca2f833fd55433f7a20f98726e2f3f4f4c56b12a81b902"
+ },
+ "record": {
+  "path": "closure-evidence/v2/v2.1/mutation-workers/c8-w1.record.json",
+  "sha256": "3f6674edd961333d44933d4043839cbd5e39732805dfa2091c472ce823dac30b"
+ }
+}
