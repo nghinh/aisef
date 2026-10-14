@@ -451,7 +451,7 @@ rule R2 — so option (a) leaves the superseded Cycle-1 probe outside, which is 
 ### PM-8 — the observation detail never reaches a record (PROBE-DIAGNOSTIC-GAP-001)
 
 Already a recorded, escalated finding (`closure-evidence/v2/cycle2/PROBE-DIAGNOSTIC-GAP-001.json`, design
-`docs/implementation/v2/cycle2/PROBE-DIAGNOSTIC-CHANNEL-DESIGN.md`, status OWNER_DECISION_REQUIRED). It matters here
+`docs/implementation/v2/cycle2/PROBE-DIAGNOSTIC-CHANNEL-DESIGN.md`, status: an owner decision is required). It matters here
 because it is why PM-1 is silent and why `unparsable`'s file name (PM-3, PM-4) is visible only to a direct `observe`
 caller: `classify_failure` (`probe/protocol.py:185`) turns OBSERVED into `Executed(verdict)`; `repro-3` shows the
 run-level result for a named unparsable file is `Executed(REFUTED, reason=None)`. **Not re-opened.** Constraint to carry
