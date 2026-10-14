@@ -926,6 +926,13 @@ _V21_R3_NEW: dict[str, list[str]] = {
 }
 _V21_R3_APPEND: dict[str, list[str]] = {
     "aisef2/app/confine.py::_judge": [*_R3_CONF, _R3 + "judge_not_run.py"],
+    # the environment `wrap` builds for the probe is asserted value for value by the locale test (the three XDG
+    # mutants of campaign 5 were audited as "nothing reads the value back"; two independent re-verifications found
+    # that test killing them, and that it was not in `wrap`'s kill set)
+    "aisef2/app/confine.py::wrap": [_R3 + "conf_locale.py"],
+    # the record's category default ('other') is asserted by T12b's second test, written for `finding_id` and wired
+    # only there; two independent re-verifications of the carried audit ("a value nothing reads") found it killing
+    "aisef2/app/review_ocr.py::findings": ["tests/v2/test_v21_kills3_T12b.py"],
     "aisef2/app/confine.py::_mounts": [_R3_CONF[0], _R3 + "client_readers.py"],
     "aisef2/app/confine.py::_probe": [_R3_CONF[0], _R3 + "conf_locale.py", _R3_CONF[2]],
     "aisef2/app/confine.py::measure": [_R3_CONF[0], _R3 + "conf_locale.py", _R3_CONF[2]],
