@@ -1,0 +1,3 @@
+_judge: 20000 inputs (every try with an exit status or absent): 20000 identical, 0 differ
+_sections: 36 outputs with every try closed: 36 identical
+_sections, a try left open: old {"a": ["text@@aisef-confine rc 1"]} | new {"a": [null, "text@@aisef-confine rc 1"]}

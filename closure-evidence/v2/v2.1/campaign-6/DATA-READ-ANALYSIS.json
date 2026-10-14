@@ -1,0 +1,785 @@
+{
+ "record": "AISEF V2.1 — campaign 6: the exact reading of the measured read-set for the targets the delta flags",
+ "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+ "head": "537f0b5210552e1c538bd0f92762f5e61d665e6a",
+ "read_set": "537f0b5210552e1c538bd0f92762f5e61d665e6a",
+ "rule": "The delta tool (`v21_snapshot_delta.py`) says a kill file READS a changed file when the measured read-set records that it\nopened or looked up the file, or LISTED A DIRECTORY ABOVE it (any ancestor). A listing returns the names of the\ndirectory's direct children and nothing below: the repository root listed by test_v21_confine.py (names of the top-level\nentries) makes every file of the repository \"read\". This tool states the exact reading, from the same measured read-set:",
+ "targets": {
+  "aisef2/app/cli.py::run": {
+   "delta_data_read": 1542,
+   "kill_files": {
+    "tests/v2/test_app_units.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_v21_inputs.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_v21_bundle_tools.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_v21_continue_integrity.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_app_run.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_s2_kills.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_v21_confine.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_v21_kills3_T23a.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    }
+   },
+   "exactly_read_and_changed": [
+    "aisef2/app/confine.py",
+    "aisef2/runtime/process_range.py"
+   ],
+   "listings_that_changed": [],
+   "cleared": false
+  },
+  "aisef2/app/client.py::session": {
+   "delta_data_read": 1542,
+   "kill_files": {
+    "tests/v2/test_app_units.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_v21_transport.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_app_run.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_s2_kills.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_v21_confine.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    }
+   },
+   "exactly_read_and_changed": [
+    "aisef2/app/confine.py",
+    "aisef2/runtime/process_range.py"
+   ],
+   "listings_that_changed": [],
+   "cleared": false
+  },
+  "aisef2/app/run.py::client_on_path": {
+   "delta_data_read": 1542,
+   "kill_files": {
+    "tests/v2/test_app_units.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_v21_inputs.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_v21_identity.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_v21_verify.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_v21_continue_usage.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_v21_review_chain.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_v21_continue_integrity.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_app_run.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_v21_confine.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    }
+   },
+   "exactly_read_and_changed": [
+    "aisef2/app/confine.py",
+    "aisef2/runtime/process_range.py"
+   ],
+   "listings_that_changed": [],
+   "cleared": false
+  },
+  "aisef2/app/run.py::execute": {
+   "delta_data_read": 1542,
+   "kill_files": {
+    "tests/v2/test_app_units.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_v21_inputs.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_v21_identity.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_v21_verify.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_v21_continue_usage.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_v21_review_chain.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_v21_continue_integrity.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_app_run.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_s2_kills.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_v21_confine.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_v21_kills3_A13.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_v21_kills3_T13a.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    }
+   },
+   "exactly_read_and_changed": [
+    "aisef2/app/confine.py",
+    "aisef2/runtime/process_range.py"
+   ],
+   "listings_that_changed": [],
+   "cleared": false
+  },
+  "aisef2/app/settings.py::OPTIONAL": {
+   "delta_data_read": 1542,
+   "kill_files": {
+    "tests/v2/test_app_units.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_v21_inputs.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_v21_identity.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_v21_review.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_v21_verify.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_v21_continue_usage.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_v21_review_chain.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_v21_continue_integrity.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_app_run.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_v21_confine.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    }
+   },
+   "exactly_read_and_changed": [
+    "aisef2/app/confine.py",
+    "aisef2/runtime/process_range.py"
+   ],
+   "listings_that_changed": [],
+   "cleared": false
+  },
+  "aisef2/app/settings.py::load": {
+   "delta_data_read": 1542,
+   "kill_files": {
+    "tests/v2/test_app_units.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_v21_inputs.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_v21_identity.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_v21_review.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_v21_verify.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_v21_continue_usage.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_v21_review_chain.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_v21_continue_integrity.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_app_run.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_s2_kills.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_v21_confine.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_v21_kills3_T26a.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    }
+   },
+   "exactly_read_and_changed": [
+    "aisef2/app/confine.py",
+    "aisef2/runtime/process_range.py"
+   ],
+   "listings_that_changed": [],
+   "cleared": false
+  },
+  "aisef2/orchestrate/story_runner.py::_attempt": {
+   "delta_data_read": 1,
+   "kill_files": {
+    "tests/v2/test_p6_stages.py": {
+     "opened_and_changed": [
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_v21_orchestration.py": {
+     "opened_and_changed": [
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_release_s2_kernel.py": {
+     "opened_and_changed": [
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_c2_k_nowork_001.py": {
+     "opened_and_changed": [
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_c2_k_presat_001.py": {
+     "opened_and_changed": [
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_c2_orchestration_conformance.py": {
+     "opened_and_changed": [
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_p6_orchestration.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    }
+   },
+   "exactly_read_and_changed": [
+    "aisef2/app/confine.py",
+    "aisef2/runtime/process_range.py"
+   ],
+   "listings_that_changed": [],
+   "cleared": false
+  },
+  "aisef2/orchestrate/story_runner.py::run_story": {
+   "delta_data_read": 1,
+   "kill_files": {
+    "tests/v2/test_p6_stages.py": {
+     "opened_and_changed": [
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_v21_orchestration.py": {
+     "opened_and_changed": [
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_release_s2_kernel.py": {
+     "opened_and_changed": [
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_c2_k_nowork_001.py": {
+     "opened_and_changed": [
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_c2_k_presat_001.py": {
+     "opened_and_changed": [
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_c2_orchestration_conformance.py": {
+     "opened_and_changed": [
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    },
+    "tests/v2/test_p6_orchestration.py": {
+     "opened_and_changed": [
+      "aisef2/app/confine.py",
+      "aisef2/runtime/process_range.py"
+     ],
+     "listed_dirs_whose_children_changed": [],
+     "listing_discounted": [
+      "tests/v2"
+     ]
+    }
+   },
+   "exactly_read_and_changed": [
+    "aisef2/app/confine.py",
+    "aisef2/runtime/process_range.py"
+   ],
+   "listings_that_changed": [],
+   "cleared": false
+  }
+ }
+}

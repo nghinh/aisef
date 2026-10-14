@@ -1,0 +1,1034 @@
+{
+ "commit": "60a75c8f7de138f95cca91c3d152ca9106631728",
+ "tool": "validation/v21/trace_paths.py",
+ "tree_sha256": "3b50237b2d42714aacfbca3e87c686edcd2ef512964c2ac38ae6623811b7b1ae",
+ "python": "3.14.7",
+ "platform": "darwin",
+ "patched": [
+  "aisef2/app/confine.py",
+  "aisef2/runtime/process_range.py"
+ ],
+ "paths": {
+  "confine._sections:no-status": "the probe's output left a try without an exit status (the marker ran into text)",
+  "confine._judge:not-a-pair": "_judge was given a try that is not a (status, text) pair",
+  "confine._judge:status-none": "_judge was given a try whose status is None",
+  "range._Posix.abort:gone": "_Posix.abort's killpg raised ProcessLookupError or PermissionError"
+ },
+ "controls": [
+  {
+   "tag": "confine._sections:no-status",
+   "ok": true,
+   "got": [
+    "confine._sections:no-status"
+   ]
+  },
+  {
+   "tag": "confine._judge:not-a-pair",
+   "ok": true,
+   "got": [
+    "confine._judge:not-a-pair"
+   ]
+  },
+  {
+   "tag": "confine._judge:status-none",
+   "ok": true,
+   "got": [
+    "confine._judge:status-none"
+   ]
+  },
+  {
+   "tag": "range._Posix.abort:gone",
+   "ok": true,
+   "got": [
+    "range._Posix.abort:gone"
+   ]
+  }
+ ],
+ "complete": true,
+ "seconds": 4908.44,
+ "kill_files": {
+  "tests/v2/p2/test_calibration.py": {
+   "outcome": "PASS",
+   "seconds": 0.37,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/p2/test_static_admission.py": {
+   "outcome": "PASS",
+   "seconds": 0.49,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/p4/test_process_range.py": {
+   "outcome": "PASS",
+   "seconds": 19.96,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/p4/test_process_table.py": {
+   "outcome": "PASS",
+   "seconds": 0.53,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_app_run.py": {
+   "outcome": "PASS",
+   "seconds": 52.89,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_app_units.py": {
+   "outcome": "PASS",
+   "seconds": 12.57,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_c2_cli_calibration.py": {
+   "outcome": "PASS",
+   "seconds": 69.63,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_c2_cli_invocation.py": {
+   "outcome": "PASS",
+   "seconds": 108.66,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_c2_cli_protocol.py": {
+   "outcome": "PASS",
+   "seconds": 63.17,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_c2_cli_verdicts.py": {
+   "outcome": "PASS",
+   "seconds": 1.27,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_c2_file_artifact.py": {
+   "outcome": "PASS",
+   "seconds": 11.68,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_c2_k_nowork_001.py": {
+   "outcome": "PASS",
+   "seconds": 75.25,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_c2_k_presat_001.py": {
+   "outcome": "PASS",
+   "seconds": 40.09,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_c2_orchestration_conformance.py": {
+   "outcome": "PASS",
+   "seconds": 84.69,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_p6_orchestration.py": {
+   "outcome": "PASS",
+   "seconds": 150.87,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_p6_stages.py": {
+   "outcome": "PASS",
+   "seconds": 19.66,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_probe_process_effect.py": {
+   "outcome": "PASS",
+   "seconds": 100.82,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_probe_process_effect_bytecode.py": {
+   "outcome": "PASS",
+   "seconds": 14.63,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_probe_process_effect_units.py": {
+   "outcome": "PASS",
+   "seconds": 2.82,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_python_callable_v2.py": {
+   "outcome": "PASS",
+   "seconds": 176.92,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_python_callable_v2_bytecode.py": {
+   "outcome": "PASS",
+   "seconds": 15.57,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_release_s2_kernel.py": {
+   "outcome": "PASS",
+   "seconds": 24.29,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_s2_kills.py": {
+   "outcome": "PASS",
+   "seconds": 65.97,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_s2_kills_deterministic.py": {
+   "outcome": "PASS",
+   "seconds": 1.89,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_s2_kills_k.py": {
+   "outcome": "PASS",
+   "seconds": 2.16,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_s2_kills_rc2.py": {
+   "outcome": "PASS",
+   "seconds": 2.06,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_bundle_tools.py": {
+   "outcome": "PASS",
+   "seconds": 4.67,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_confine.py": {
+   "outcome": "PASS",
+   "seconds": 47.39,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_context_pack.py": {
+   "outcome": "PASS",
+   "seconds": 21.29,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_continue_integrity.py": {
+   "outcome": "PASS",
+   "seconds": 801.66,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_continue_usage.py": {
+   "outcome": "PASS",
+   "seconds": 166.23,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_defects_bundlecli.py": {
+   "outcome": "PASS",
+   "seconds": 17.68,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_defects_bundleshape.py": {
+   "outcome": "PASS",
+   "seconds": 2.84,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_defects_confine.py": {
+   "outcome": "PASS",
+   "seconds": 5.13,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_defects_lineage2.py": {
+   "outcome": "PASS",
+   "seconds": 2.63,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_defects_lineageusage.py": {
+   "outcome": "PASS",
+   "seconds": 4.7,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_defects_lint.py": {
+   "outcome": "PASS",
+   "seconds": 2.71,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_defects_ocr.py": {
+   "outcome": "PASS",
+   "seconds": 6.09,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_defects_ocrz.py": {
+   "outcome": "PASS",
+   "seconds": 5.77,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_defects_preflight.py": {
+   "outcome": "PASS",
+   "seconds": 2.32,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_defects_reproducer.py": {
+   "outcome": "PASS",
+   "seconds": 11.58,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_defects_verify.py": {
+   "outcome": "PASS",
+   "seconds": 77.01,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_identity.py": {
+   "outcome": "PASS",
+   "seconds": 5.45,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_inputs.py": {
+   "outcome": "PASS",
+   "seconds": 5.4,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_A00.py": {
+   "outcome": "PASS",
+   "seconds": 1.37,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_A02.py": {
+   "outcome": "PASS",
+   "seconds": 1.72,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_A03.py": {
+   "outcome": "PASS",
+   "seconds": 1.33,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_A04.py": {
+   "outcome": "PASS",
+   "seconds": 1.92,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_A05.py": {
+   "outcome": "PASS",
+   "seconds": 3.42,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_A06.py": {
+   "outcome": "PASS",
+   "seconds": 2.79,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_A07.py": {
+   "outcome": "PASS",
+   "seconds": 1.83,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_A08.py": {
+   "outcome": "PASS",
+   "seconds": 2.62,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_A09.py": {
+   "outcome": "PASS",
+   "seconds": 1.46,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_A10.py": {
+   "outcome": "PASS",
+   "seconds": 4.06,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_A11.py": {
+   "outcome": "PASS",
+   "seconds": 1.36,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_A13.py": {
+   "outcome": "PASS",
+   "seconds": 2.1,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_A15.py": {
+   "outcome": "PASS",
+   "seconds": 1.51,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_A16.py": {
+   "outcome": "PASS",
+   "seconds": 1.74,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_A17.py": {
+   "outcome": "PASS",
+   "seconds": 2.09,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_A18.py": {
+   "outcome": "PASS",
+   "seconds": 5.89,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_A19.py": {
+   "outcome": "PASS",
+   "seconds": 6.16,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_A20.py": {
+   "outcome": "PASS",
+   "seconds": 1.22,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_A21.py": {
+   "outcome": "PASS",
+   "seconds": 6.84,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_A22.py": {
+   "outcome": "PASS",
+   "seconds": 2.03,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_A23.py": {
+   "outcome": "PASS",
+   "seconds": 2.23,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_A24.py": {
+   "outcome": "PASS",
+   "seconds": 1.93,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_A26.py": {
+   "outcome": "PASS",
+   "seconds": 2.56,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_R01.py": {
+   "outcome": "PASS",
+   "seconds": 2.52,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_R02.py": {
+   "outcome": "PASS",
+   "seconds": 2.13,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_R03.py": {
+   "outcome": "PASS",
+   "seconds": 1.58,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_R04.py": {
+   "outcome": "PASS",
+   "seconds": 2.08,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_R05.py": {
+   "outcome": "PASS",
+   "seconds": 1.5,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_R07.py": {
+   "outcome": "PASS",
+   "seconds": 1.65,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_T00a.py": {
+   "outcome": "PASS",
+   "seconds": 25.55,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_T00b.py": {
+   "outcome": "PASS",
+   "seconds": 3.34,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_T01a.py": {
+   "outcome": "PASS",
+   "seconds": 15.43,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_T01b.py": {
+   "outcome": "PASS",
+   "seconds": 30.12,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_T02a.py": {
+   "outcome": "PASS",
+   "seconds": 7.52,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_T03a.py": {
+   "outcome": "PASS",
+   "seconds": 5.36,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_T03b.py": {
+   "outcome": "PASS",
+   "seconds": 4.3,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_T04a.py": {
+   "outcome": "PASS",
+   "seconds": 3.94,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_T05a.py": {
+   "outcome": "PASS",
+   "seconds": 3.46,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_T05b.py": {
+   "outcome": "PASS",
+   "seconds": 2.71,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_T05c.py": {
+   "outcome": "PASS",
+   "seconds": 6.65,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_T06a.py": {
+   "outcome": "PASS",
+   "seconds": 1.88,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_T06b.py": {
+   "outcome": "PASS",
+   "seconds": 4.65,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_T07a.py": {
+   "outcome": "PASS",
+   "seconds": 1.88,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_T07b.py": {
+   "outcome": "PASS",
+   "seconds": 2.13,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_T08a.py": {
+   "outcome": "PASS",
+   "seconds": 5.49,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_T08b.py": {
+   "outcome": "PASS",
+   "seconds": 1.3,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_T09a.py": {
+   "outcome": "PASS",
+   "seconds": 2.64,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_T09b.py": {
+   "outcome": "PASS",
+   "seconds": 2.24,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_T09c.py": {
+   "outcome": "PASS",
+   "seconds": 1.89,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_T10a.py": {
+   "outcome": "PASS",
+   "seconds": 5.39,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_T10b.py": {
+   "outcome": "PASS",
+   "seconds": 12.57,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_T10c.py": {
+   "outcome": "PASS",
+   "seconds": 24.84,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_T10d.py": {
+   "outcome": "PASS",
+   "seconds": 22.45,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_T11a.py": {
+   "outcome": "PASS",
+   "seconds": 6.32,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_T11b.py": {
+   "outcome": "PASS",
+   "seconds": 1.54,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_T12a.py": {
+   "outcome": "PASS",
+   "seconds": 1.47,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_T12b.py": {
+   "outcome": "PASS",
+   "seconds": 1.44,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_T13a.py": {
+   "outcome": "PASS",
+   "seconds": 18.95,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_T14a.py": {
+   "outcome": "PASS",
+   "seconds": 16.26,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_T14b.py": {
+   "outcome": "PASS",
+   "seconds": 14.39,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_T15a.py": {
+   "outcome": "PASS",
+   "seconds": 6.28,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_T16a.py": {
+   "outcome": "PASS",
+   "seconds": 4.08,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_T17a.py": {
+   "outcome": "PASS",
+   "seconds": 1.19,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_T17b.py": {
+   "outcome": "PASS",
+   "seconds": 2.45,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_T17c.py": {
+   "outcome": "PASS",
+   "seconds": 1.71,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_T18a.py": {
+   "outcome": "PASS",
+   "seconds": 34.17,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_T18b.py": {
+   "outcome": "PASS",
+   "seconds": 39.19,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_T19a.py": {
+   "outcome": "PASS",
+   "seconds": 22.45,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_T19b.py": {
+   "outcome": "PASS",
+   "seconds": 28.43,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_T20a.py": {
+   "outcome": "PASS",
+   "seconds": 2.32,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_T20b.py": {
+   "outcome": "PASS",
+   "seconds": 2.01,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_T21a.py": {
+   "outcome": "PASS",
+   "seconds": 34.38,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_T21b.py": {
+   "outcome": "PASS",
+   "seconds": 20.14,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_T22a.py": {
+   "outcome": "PASS",
+   "seconds": 12.57,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_T22b.py": {
+   "outcome": "PASS",
+   "seconds": 22.14,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_T23a.py": {
+   "outcome": "PASS",
+   "seconds": 1.75,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_T24a.py": {
+   "outcome": "PASS",
+   "seconds": 1.58,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_T25a.py": {
+   "outcome": "PASS",
+   "seconds": 1.17,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_T26a.py": {
+   "outcome": "PASS",
+   "seconds": 1.71,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_T27a.py": {
+   "outcome": "PASS",
+   "seconds": 4.43,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_T28a.py": {
+   "outcome": "PASS",
+   "seconds": 1.58,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_TO1.py": {
+   "outcome": "PASS",
+   "seconds": 26.85,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_TO2.py": {
+   "outcome": "PASS",
+   "seconds": 1.32,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills3_TO3.py": {
+   "outcome": "PASS",
+   "seconds": 1.78,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills_adapters.py": {
+   "outcome": "PASS",
+   "seconds": 3.8,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills_bundle.py": {
+   "outcome": "PASS",
+   "seconds": 1.06,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills_bundle_cli.py": {
+   "outcome": "PASS",
+   "seconds": 1.47,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills_cli.py": {
+   "outcome": "PASS",
+   "seconds": 1.52,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills_lineage.py": {
+   "outcome": "PASS",
+   "seconds": 1.23,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills_settings.py": {
+   "outcome": "PASS",
+   "seconds": 1.63,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_kills_usage.py": {
+   "outcome": "PASS",
+   "seconds": 1.1,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_orchestration.py": {
+   "outcome": "PASS",
+   "seconds": 48.48,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_python_imports.py": {
+   "outcome": "PASS",
+   "seconds": 2.56,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_r3_auth_other_readers.py": {
+   "outcome": "PASS",
+   "seconds": 6.61,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_r3_auth_ps_table.py": {
+   "outcome": "PASS",
+   "seconds": 2.78,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_r3_auth_rv_digits.py": {
+   "outcome": "PASS",
+   "seconds": 1.99,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_r3_client_readers.py": {
+   "outcome": "PASS",
+   "seconds": 6.24,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_r3_client_stream.py": {
+   "outcome": "PASS",
+   "seconds": 4.87,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_r3_conf_fu_before.py": {
+   "outcome": "PASS",
+   "seconds": 6.05,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_r3_conf_locale.py": {
+   "outcome": "PASS",
+   "seconds": 4.36,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_r3_conf_policy.py": {
+   "outcome": "PASS",
+   "seconds": 5.32,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_r3_conf_rv_hostrows.py": {
+   "outcome": "PASS",
+   "seconds": 2.37,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_r3_detail_artifact.py": {
+   "outcome": "PASS",
+   "seconds": 6.4,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_r3_detail_product.py": {
+   "outcome": "PASS",
+   "seconds": 56.07,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_r3_detail_rv_finderfiles.py": {
+   "outcome": "PASS",
+   "seconds": 4.45,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_r3_detail_statement.py": {
+   "outcome": "PASS",
+   "seconds": 33.25,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_r3_judge_not_run.py": {
+   "outcome": "PASS",
+   "seconds": 1.72,
+   "hits": {
+    "confine._judge:status-none": 14,
+    "confine._sections:no-status": 3
+   },
+   "pids": 1
+  },
+  "tests/v2/test_v21_r3_range_abort.py": {
+   "outcome": "PASS",
+   "seconds": 1.51,
+   "hits": {
+    "range._Posix.abort:gone": 2
+   },
+   "pids": 1
+  },
+  "tests/v2/test_v21_r3_range_fu_linux_table.py": {
+   "outcome": "PASS",
+   "seconds": 1.44,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_r3_range_fu_ps_table.py": {
+   "outcome": "PASS",
+   "seconds": 3.47,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_r3_range_release_contract.py": {
+   "outcome": "PASS",
+   "seconds": 3.6,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_r3_usage_boundary.py": {
+   "outcome": "PASS",
+   "seconds": 18.41,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_r3_usage_no_progress.py": {
+   "outcome": "PASS",
+   "seconds": 1.73,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_r3_usage_review.py": {
+   "outcome": "PASS",
+   "seconds": 2.19,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_review.py": {
+   "outcome": "PASS",
+   "seconds": 58.94,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_review_chain.py": {
+   "outcome": "PASS",
+   "seconds": 797.32,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_review_ocr.py": {
+   "outcome": "PASS",
+   "seconds": 1.93,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_transport.py": {
+   "outcome": "PASS",
+   "seconds": 5.01,
+   "hits": {},
+   "pids": 0
+  },
+  "tests/v2/test_v21_verify.py": {
+   "outcome": "PASS",
+   "seconds": 118.94,
+   "hits": {},
+   "pids": 0
+  }
+ }
+}
