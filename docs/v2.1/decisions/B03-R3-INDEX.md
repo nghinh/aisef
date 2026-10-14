@@ -1,7 +1,6 @@
 # B-03 round 3 — the owner's decisions of 2026-10-12 on the nine open mutants: what was decided, done, verified, and not
 
-Status: **written before the re-measurement it names** (the numbers of the measurement are in `closure-evidence/v2/v2.1/`
-and in `docs/v2.1/REPORT.md` §0 once it is done). This file is the index; each decision has its own document.
+Status: **final for B-03 rounds 3 and 4 (2026-10-14)**. The measurement: 528 targets / 13,581 mutants, 13,388 KILLED, 193 SURVIVED (136 AUDITED + 57 EQUIVALENT, each with its readers named), 0 unaudited, 0 TIMEOUT/INFRA/NOT_RUN (`closure-evidence/v2/v2.1/MUTATION-SUMMARY.json`, `docs/v2.1/REPORT.md` §0.3). This file is the index; each decision has its own document.
 
 Rule of the round (owner): the aim is the right behaviour and the evidence for it; the mutation record turning PASS is
 never a reason to choose a requirement. Nothing was pushed, tagged or published; no paid provider was called; Docker
