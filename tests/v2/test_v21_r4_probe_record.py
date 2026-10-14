@@ -81,7 +81,7 @@ class TheReportIsTheRecord(unittest.TestCase):
             args = [at[1], *(str(sink / n) for n in ("a", "b", "c")), at[5], str(sink / "d"), "0.01", str(sink / "e"),
                     str(sink / "f"), str(sink)]
             return subprocess.run(["/bin/sh", "-c", confine.PROBE, "probe", *args], capture_output=True, text=True,
-                                  timeout=60, check=False).stdout
+                                  encoding="utf-8", timeout=60, check=False).stdout
         rep, home, ws = measured(answer)
         self.assertEqual(rep["tried"]["read_canary"]["exit"], 0)
         self.assertIn(READABLE, rep["problems"])

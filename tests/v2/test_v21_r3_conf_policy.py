@@ -425,7 +425,8 @@ class DevicesSection(unittest.TestCase):
             table = pathlib.Path(t) / "mountinfo"
             table.write_text("\n".join(lines) + "\n", encoding="utf-8")
             p = subprocess.run(["/bin/sh", "-c", block.replace("/proc/self/mountinfo", str(table))], capture_output=True,
-                               text=True, env={"PATH": os.environ.get("PATH", "/usr/bin:/bin"), "LC_ALL": "C"}, timeout=30)
+                               text=True, encoding="utf-8", env={"PATH": os.environ.get("PATH", "/usr/bin:/bin"), "LC_ALL": "C"},
+                               timeout=30)
         self.assertEqual((p.returncode, p.stderr), (0, ""))
         return p.stdout.splitlines()
 
