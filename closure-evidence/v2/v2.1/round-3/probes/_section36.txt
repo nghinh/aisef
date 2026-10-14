@@ -1,0 +1,14 @@
+6. **Existing tests against the patched scratch copy** (`modules2.base.txt`, `modules2.fixed-copy.txt`; real runs, macOS
+   3.14.7). Two scratch trees of BASE — one untouched, one with the PM-1…PM-4 sketches — each with `tests/`,
+   `validation/` and the `closure-evidence`/`docs` files the tests read; 36 modules: every probe test module and the
+   B-03 kill files of A18, A19, A21, T18a/b, T19a/b, T21a/b, T27a. Identical results (all OK) in both: `test_probe_process_effect`
+   (24 tests), `test_c2_cli_invocation` (32), `test_c2_cli_protocol` (18), `test_c2_file_artifact` (40),
+   `test_python_callable_v2` (33), `test_v21_identity` (13), `test_v21_python_imports` (5), A19 (3), A21 (2), T27a (12),
+   T18a/b, T19a, T21a/b and the calibration, protocol and signal-provenance modules. **Red only on the patched copy:**
+   `test_probe_process_effect_units::Vocabulary` ×2 (`test_the_scenario_rules`,
+   `test_the_step_vocabulary_is_closed_and_each_kind_has_exactly_its_typed_fields` — PM-2's pins),
+   `test_v21_kills3_T19b::FaultBeforeSubprocess` ×2 (PM-2), and `test_v21_identity_bytes::ThreeIdentities` ×2
+   (`test_the_shipped_calibrations_name_every_class_at_the_bytes_that_run_now`, `test_calibrations_of_other_bytes_admit_nothing`
+   — the calibration rows, until regenerated). Nothing else flipped: the existing A19/A21 namespace tests and T27a's
+   `startswith("x.py:")` pin hold under the sketches. (A first pass, `modules.*.txt`, ran before the trees held the
+   evidence files; its Q0 failures were identical in both trees and are artefacts of the incomplete scratch tree.)

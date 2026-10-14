@@ -1,0 +1,12 @@
+#!/bin/zsh
+# run-modules.sh OUTDIR MODULE... : one python -m unittest per module (the workers' env), a summary line each
+SP=/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad
+D=$1; shift
+cd $SP/m21/r3/wt/auth || exit 2
+for m in "$@"; do
+  s=$(date +%s)
+  $SP/m21/kills3/py.sh auth -m unittest $m > $D/$m.txt 2>&1
+  rc=$?
+  print -r -- "$m exit=$rc $(( $(date +%s) - s ))s $(grep -E '^(Ran|OK|FAILED)' $D/$m.txt | tr '\n' ' ')" >> $D/_summary.txt
+done
+print -r -- DONE >> $D/_summary.txt

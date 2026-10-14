@@ -1,0 +1,45 @@
+# rv-fa-bom: a UTF-8 file with a byte-order mark, observed through the real FileArtifactProbe over (a) a git repository
+# object store (what `aisef run` reads) and (b) a plain directory; the same bytes run under CPython.
+import os, pathlib, subprocess, sys, tempfile
+sys.path.insert(0, os.getcwd())
+from aisef2.arch.enums import BehaviorVerdict, Enforcement, SubjectAbsence
+from aisef2.probe import file_artifact as fa
+from aisef2.probe.protocol import ExecutionEnv, RevisionRef, run_probe
+from aisef2.product.spec import ProductProofSpec
+
+ENV = ExecutionEnv(sys.executable, 30, Enforcement.FULL)
+GIT_ENV = {k: os.environ[k] for k in ("PATH", "HOME", "TMPDIR") if k in os.environ}
+def git(root, *args):
+    return subprocess.run(["git", "-C", root, "-c", "user.name=t", "-c", "user.email=t@t", "-c", "commit.gpgsign=false", *args],
+                          capture_output=True, text=True, check=True, env=GIT_ENV).stdout.strip()
+def spec(matches):
+    return ProductProofSpec.create(
+        contract_id="BC-RV", probe_id=fa.PROBE_ID, probe_digest=fa.DIGEST,
+        probe_input={"subject": {"kind": "file_artifact", "locator": "path:pkg"},
+                     "stimulus": {"imports_outside": {"stdlib": True, "allowed": []}},
+                     "observable": {"matches": matches, "within_s": 30},
+                     "subject_absence": SubjectAbsence.REQUIRES_SUBJECT.value},
+        candidate_expectation=BehaviorVerdict.SATISFIED, compiler_id="test", compiler_digest="c" * 64)
+def tree(body, as_repo):
+    root = tempfile.mkdtemp(prefix="aisef2-rv-bom-")
+    pathlib.Path(root, "pkg").mkdir()
+    pathlib.Path(root, "pkg", "m.py").write_bytes(body)
+    if not as_repo:
+        return RevisionRef("0" * 40, root)
+    git(root, "init", "-q"); git(root, "add", "-A"); git(root, "commit", "-q", "-m", "x")
+    return RevisionRef(git(root, "rev-parse", "HEAD"), root)
+print("interpreter:", sys.version.split()[0], sys.platform)
+for label, body, want in (("no BOM, stdlib import only", b"import os\n", 0),
+                          ("BOM,    stdlib import only", b"\xef\xbb\xbfimport os\n", 0),
+                          ("no BOM, one third-party import", b"import requests\n", 1),
+                          ("BOM,    one third-party import", b"\xef\xbb\xbfimport requests\n", 1)):
+    for repo in (True, False):
+        at = tree(body, repo)
+        p = fa.FileArtifactProbe()
+        o = p.observe(spec(want), at, ENV)
+        r = run_probe(p, spec(want), at, ENV).result
+        src = pathlib.Path(at.checkout if hasattr(at, "checkout") else at.root, "pkg", "m.py")
+        rc = subprocess.run([sys.executable, "-I", "-S", "-B", "-c", "import ast,sys;compile(open(sys.argv[1],'rb').read(),'m','exec')", str(src)]).returncode
+        print("%-32s %-5s observe -> %-8s %-10s unparsable=%-12s | run_probe -> %s | CPython compile rc=%d" % (
+            label, "repo" if repo else "plain", o.kind.value, o.verdict.value if o.verdict else None,
+            ("pkg/m.py:1" if "unparsable" in o.detail else "-"), type(r).__name__ + ":" + str(getattr(r, "behavior_verdict", "")), rc))

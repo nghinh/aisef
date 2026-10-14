@@ -1,0 +1,81 @@
+{
+ "target": "aisef2/app/adapters.py::Reviewer._ocr",
+ "files": [
+  "tests/v2/test_v21_r3_detail_rv_finderfiles.py"
+ ],
+ "source_sha256": "2ee59736532802d7287a6948c5eade35e75f0e65282eaf3327b18bb5d0339aa2",
+ "t0": [
+  {
+   "file": "tests/v2/test_v21_r3_detail_rv_finderfiles.py",
+   "seconds": 3.0,
+   "outcome": "PASS",
+   "ran": 2
+  }
+ ],
+ "error": null,
+ "results": [
+  {
+   "index": 151,
+   "mutant": "L219 string 'preview.log' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_rv_finderfiles.py",
+   "first": "ERROR: test_no_file_of_the_finder_holds_a_secret_of_the_run (v2.test_v21_r3_detail_rv_finderfiles.TheFindersOwnFilesKeepNoSecret.test_no_file_of_the_finder_holds_a_secret_of_the_run) | FileExistsError"
+  },
+  {
+   "index": 158,
+   "mutant": "L228 string 'ocr.log' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_rv_finderfiles.py",
+   "first": "ERROR: test_no_file_of_the_finder_holds_a_secret_of_the_run (v2.test_v21_r3_detail_rv_finderfiles.TheFindersOwnFilesKeepNoSecret.test_no_file_of_the_finder_holds_a_secret_of_the_run) | FileExistsError"
+  },
+  {
+   "index": 221,
+   "mutant": "L221 string 'secrets' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_rv_finderfiles.py",
+   "first": "FAIL: test_no_file_of_the_finder_holds_a_secret_of_the_run (v2.test_v21_r3_detail_rv_finderfiles.TheFindersOwnFilesKeepNoSecret.test_no_file_of_the_finder_holds_a_secret_of_the_run) (file='ocr.log') | AssertionError"
+  },
+  {
+   "index": 247,
+   "mutant": "L213 element 0 dropped",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 248,
+   "mutant": "L213 element 1 dropped",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 257,
+   "mutant": "L250 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_rv_finderfiles.py",
+   "first": "ERROR: test_no_file_of_the_finder_holds_a_secret_of_the_run (v2.test_v21_r3_detail_rv_finderfiles.TheFindersOwnFilesKeepNoSecret.test_no_file_of_the_finder_holds_a_secret_of_the_run) | ValueError"
+  },
+  {
+   "index": 258,
+   "mutant": "L250 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_rv_finderfiles.py",
+   "first": "ERROR: test_no_file_of_the_finder_holds_a_secret_of_the_run (v2.test_v21_r3_detail_rv_finderfiles.TheFindersOwnFilesKeepNoSecret.test_no_file_of_the_finder_holds_a_secret_of_the_run) | ValueError"
+  },
+  {
+   "index": 268,
+   "mutant": "L218 string 'preview.json' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_rv_finderfiles.py",
+   "first": "FAIL: test_no_file_of_the_finder_holds_a_secret_of_the_run (v2.test_v21_r3_detail_rv_finderfiles.TheFindersOwnFilesKeepNoSecret.test_no_file_of_the_finder_holds_a_secret_of_the_run) | AssertionError"
+  },
+  {
+   "index": 272,
+   "mutant": "L227 string 'output.json' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_rv_finderfiles.py",
+   "first": "ERROR: test_no_file_of_the_finder_holds_a_secret_of_the_run (v2.test_v21_r3_detail_rv_finderfiles.TheFindersOwnFilesKeepNoSecret.test_no_file_of_the_finder_holds_a_secret_of_the_run) | aisef2.orchestrate.adapters.CapabilityUnrunnable"
+  }
+ ]
+}

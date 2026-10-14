@@ -1,0 +1,51 @@
+"""Reviewer: plausible WRONG implementations, one edit each of the FINAL module (67d5416); the implementer's three test
+files must FAIL for every one. usage: python3 -B -I wrong_impls_rv.py.txt WT SCRATCH_ROOT"""
+import pathlib, shutil, subprocess, sys
+
+wt, root = pathlib.Path(sys.argv[1]), pathlib.Path(sys.argv[2])
+src = (wt / "validation/v2/cleanup_authority.py").read_text(encoding="utf-8")
+FILES = ["tests/v2/test_v21_r3_auth_ps_table.py", "tests/v2/test_v21_r3_auth_other_readers.py", "tests/v2/test_v21_defects_runner.py"]
+LINES = 'return [line for line in (b.decode("utf-8", "replace") for b in raw.split(b"\\n")) if line.strip(" ")]'
+V = {
+ "R01 splitlines() of the decoded text (the old bug)": (LINES, 'return [line for line in raw.decode("utf-8", "replace").splitlines() if line.strip(" ")]'),
+ "R02 bytes.splitlines() (cuts at CR)": (LINES, 'return [line for line in (b.decode("utf-8", "replace") for b in raw.splitlines()) if line.strip(" ")]'),
+ "R03 a non-row is skipped in ps": ('        if m is None:\n            raise _not_a_row("ps", line)\n', '        if m is None:\n            continue\n'),
+ "R04 a bad date is skipped": ('        except (ValueError, OverflowError):\n            raise _not_a_row("ps", line) from None\n        if int(pid) in out:', '        except (ValueError, OverflowError):\n            continue\n        if int(pid) in out:'),
+ "R05 the later row of a pid wins": ('        if int(pid) in out:\n            raise _twice("ps", pid, line)\n        out[int(pid)] = Host(', '        out[int(pid)] = Host('),
+ "R06 the command is lstrip()ped (Unicode spaces)": ('born, command or "")', 'born, (command or "").lstrip())'),
+ "R07 ps in the user's locale": ('    env["LC_TIME"] = "C"\n    return env', '    return env'),
+ "R08 a failed ps is read": ('    if proc.returncode != 0:   # what a failed ps printed is not read: a partial table reads as "every process gone"\n        raise TableUnreadable(f"ps -A exited {proc.returncode}: the host table cannot be read")\n', ''),
+ "R09 the reader need not list itself": ('    if proc.pid not in out:\n        raise TableUnreadable("ps -A did not list itself: the host table cannot be read")\n', ''),
+ "R10 digits by \\d": ('_PS_ROW = re.compile(r" *([0-9]+) +([0-9]+) +([0-9]+) +', '_PS_ROW = re.compile(r" *(\\d+) +(\\d+) +(\\d+) +'),
+ "R11 blank = strip() of all whitespace (a lone CR / LS line is skipped)": ('if line.strip(" ")]', 'if line.strip()]'),
+ "R12 the FIRST row of a pid wins": ('        if int(pid) in out:\n            raise _twice("ps", pid, line)\n        out[int(pid)] = Host(', '        if int(pid) in out:\n            continue\n        out[int(pid)] = Host('),
+ "R13 day padding is one space only": ('+([A-Za-z]{3}) ([A-Za-z]{3}) +([0-9]{1,2}) "', '+([A-Za-z]{3}) ([A-Za-z]{3}) ([0-9]{1,2}) "'),
+ "R14 ps -E: a non-row is skipped": ('            raise _not_a_row("ps -E", line)\n', '            continue\n'),
+ "R15 ps -E: a pid twice is overwritten": ('        if int(m[1]) in out:\n            raise _twice("ps -E", m[1], line)\n', ''),
+ "R16 carriers: the reader need not be listed": ('        if proc.pid not in listed:\n            raise TableUnreadable("ps -E did not list itself: the environments cannot be read")\n', ''),
+ "R17 cwd_under: lsof without -a (every open file of those pids)": ('"-nP", "-w", "-a", "-d", "cwd"', '"-nP", "-w", "-d", "cwd"'),
+ "R18 ps pinned with LC_ALL=C instead of LC_TIME": ('    env["LC_TIME"] = "C"\n    return env', '    env["LC_ALL"] = "C"\n    return env'),
+ "R19 lsof: field terminator not NUL (-F, not -F0)": ('"-F0pn"', '"-Fpn"'),
+ "R20 windows: a non-row is skipped": ('            raise _not_a_row("powershell", line)\n        pid, ppid, born, command = m.groups()', '            continue\n        pid, ppid, born, command = m.groups()'),
+ "R21 windows: a pid twice is overwritten": ('        if int(pid) in out:\n            raise _twice("powershell", pid, line)\n        out[int(pid)] = Host(int(pid), int(ppid), -1', '        out[int(pid)] = Host(int(pid), int(ppid), -1'),
+ "R22 windows: command line not base64 (raw)": ('[Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes([string]$_.CommandLine))', '$_.CommandLine'),
+ "R23 windows: CRLF not folded (CR kept at the end of the line)": ('_lines(raw.replace(b"\\r\\n", b"\\n"))', '_lines(raw)'),
+ "R24 lsof: unknown field is ignored": ('        elif kind != b"f":\n            raise TableUnreadable(f"lsof printed a field that is not p, f or n of a process: {field[:80]!r}")\n', ''),
+ "R25 lsof: a process that is not listed (this one) is an empty answer": ('        if os.getpid() not in cwd:   # lsof exits 1 when an asked pid is gone; an empty answer would read as "none"\n            raise TableUnreadable("lsof did not list this process\'s cwd: the working directories cannot be read")\n', ''),
+}
+res = {}
+for name, (old, new) in V.items():
+    if src.count(old) != 1:
+        print(f"{name:75s} EDIT-NOT-APPLICABLE (count={src.count(old)})"); continue
+    tree = root / name.split()[0]
+    (tree / "validation/v2").mkdir(parents=True, exist_ok=True)
+    (tree / "tests/v2").mkdir(parents=True, exist_ok=True)
+    (tree / "validation/v2/cleanup_authority.py").write_text(src.replace(old, new), encoding="utf-8")
+    out = []
+    for f in FILES:
+        shutil.copy(wt / f, tree / f)
+        r = subprocess.run([sys.executable, "-B", "-I", f], cwd=tree, capture_output=True, text=True)
+        last = [l for l in r.stderr.splitlines() if l.startswith(("OK", "FAILED"))]
+        out.append(f"{pathlib.Path(f).stem.replace('test_v21_', '')}={'ok' if r.returncode == 0 else (last[-1] if last else 'exit ' + str(r.returncode))}")
+    verdict = "CAUGHT" if any("ok" != x.split("=")[1] for x in out) else "NOT CAUGHT"
+    print(f"{name:75s} {verdict:10s} " + " | ".join(out))

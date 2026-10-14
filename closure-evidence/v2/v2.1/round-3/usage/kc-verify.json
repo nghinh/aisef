@@ -1,0 +1,1411 @@
+{
+ "target": "aisef2/app/verify.py::verify",
+ "files": [
+  "tests/v2/test_v21_r3_usage_boundary.py"
+ ],
+ "source_sha256": "b30820f61194665ace24e317a06651334e86dc9fcb77e879b97450ee0514dc1b",
+ "t0": [
+  {
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "seconds": 7.98,
+   "outcome": "PASS",
+   "ran": 14
+  }
+ ],
+ "error": null,
+ "results": [
+  {
+   "index": 0,
+   "mutant": "L96 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 1,
+   "mutant": "L114 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "ERROR: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AttributeError"
+  },
+  {
+   "index": 2,
+   "mutant": "L125 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "ERROR: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | TypeError"
+  },
+  {
+   "index": 3,
+   "mutant": "L131 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 4,
+   "mutant": "L135 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 5,
+   "mutant": "L201 returns None",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "ERROR: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | TypeError"
+  },
+  {
+   "index": 6,
+   "mutant": "L96 Or swapped",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 7,
+   "mutant": "L97 returns None",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 8,
+   "mutant": "L111 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified (v2.test_v21_r3_usage_boundary.ExecutedRun.test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified) | AssertionError"
+  },
+  {
+   "index": 9,
+   "mutant": "L114 IsNot->Is",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "ERROR: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AttributeError"
+  },
+  {
+   "index": 10,
+   "mutant": "L125 And swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "ERROR: test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified (v2.test_v21_r3_usage_boundary.ExecutedRun.test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified) | TypeError"
+  },
+  {
+   "index": 11,
+   "mutant": "L127 condition negated",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 12,
+   "mutant": "L131 NotEq->Eq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 13,
+   "mutant": "L135 not removed",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "ERROR: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | TypeError"
+  },
+  {
+   "index": 14,
+   "mutant": "L137 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 15,
+   "mutant": "L167 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 16,
+   "mutant": "L173 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 17,
+   "mutant": "L182 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 18,
+   "mutant": "L184 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 19,
+   "mutant": "L186 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 20,
+   "mutant": "L188 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 21,
+   "mutant": "L196 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 22,
+   "mutant": "L201 dict entry 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "ERROR: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | KeyError"
+  },
+  {
+   "index": 23,
+   "mutant": "L201 dict entry 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "ERROR: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | KeyError"
+  },
+  {
+   "index": 24,
+   "mutant": "L201 dict entry 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "ERROR: test_a_journal_that_would_deliver_is_not_verified_as_delivering (v2.test_v21_r3_usage_boundary.RefusedJournals.test_a_journal_that_would_deliver_is_not_verified_as_delivering) | KeyError"
+  },
+  {
+   "index": 25,
+   "mutant": "L201 dict entry 3 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "ERROR: test_a_journal_the_kernel_writes_is_verified (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_journal_the_kernel_writes_is_verified) | KeyError"
+  },
+  {
+   "index": 26,
+   "mutant": "L201 dict entry 4 dropped",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 27,
+   "mutant": "L201 dict entry 5 dropped",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 28,
+   "mutant": "L94 element 0 dropped",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 29,
+   "mutant": "L94 element 1 dropped",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 30,
+   "mutant": "L95 returns None",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 31,
+   "mutant": "L96 not removed",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 32,
+   "mutant": "L96 NotEq->Eq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 33,
+   "mutant": "L97 dict entry 0 dropped",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 34,
+   "mutant": "L97 dict entry 1 dropped",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 35,
+   "mutant": "L111 Or swapped",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 36,
+   "mutant": "L121 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified (v2.test_v21_r3_usage_boundary.ExecutedRun.test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified) | AssertionError"
+  },
+  {
+   "index": 37,
+   "mutant": "L125 IsNot->Is",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "ERROR: test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified (v2.test_v21_r3_usage_boundary.ExecutedRun.test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified) | TypeError"
+  },
+  {
+   "index": 38,
+   "mutant": "L125 NotEq->Eq",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 39,
+   "mutant": "L127 IsNot->Is",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 40,
+   "mutant": "L133 string 'journal' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 41,
+   "mutant": "L137 not removed",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 42,
+   "mutant": "L145 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 43,
+   "mutant": "L165 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 44,
+   "mutant": "L166 sorted() -> list()",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 45,
+   "mutant": "L170 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 46,
+   "mutant": "L170 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 47,
+   "mutant": "L173 IsNot->Is",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 48,
+   "mutant": "L177 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified (v2.test_v21_r3_usage_boundary.ExecutedRun.test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified) | AssertionError"
+  },
+  {
+   "index": 49,
+   "mutant": "L181 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 50,
+   "mutant": "L181 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 51,
+   "mutant": "L181 element 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 52,
+   "mutant": "L182 And swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_journal_that_would_deliver_is_not_verified_as_delivering (v2.test_v21_r3_usage_boundary.RefusedJournals.test_a_journal_that_would_deliver_is_not_verified_as_delivering) | AssertionError"
+  },
+  {
+   "index": 53,
+   "mutant": "L184 NotEq->Eq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 54,
+   "mutant": "L186 And swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 55,
+   "mutant": "L188 And swapped",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 56,
+   "mutant": "L193 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 57,
+   "mutant": "L196 And swapped",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 58,
+   "mutant": "L197 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified (v2.test_v21_r3_usage_boundary.ExecutedRun.test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified) | AssertionError"
+  },
+  {
+   "index": 59,
+   "mutant": "L201 string 'verdict' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "ERROR: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | KeyError"
+  },
+  {
+   "index": 60,
+   "mutant": "L201 string 'problems' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "ERROR: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | KeyError"
+  },
+  {
+   "index": 61,
+   "mutant": "L201 string 'delivery_verdict' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "ERROR: test_a_journal_that_would_deliver_is_not_verified_as_delivering (v2.test_v21_r3_usage_boundary.RefusedJournals.test_a_journal_that_would_deliver_is_not_verified_as_delivering) | KeyError"
+  },
+  {
+   "index": 62,
+   "mutant": "L202 string 'journal_events' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "ERROR: test_a_journal_the_kernel_writes_is_verified (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_journal_the_kernel_writes_is_verified) | KeyError"
+  },
+  {
+   "index": 63,
+   "mutant": "L202 string 'evidence_anchor' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 64,
+   "mutant": "L202 string 'notes' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 65,
+   "mutant": "L201 conditional negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 66,
+   "mutant": "L95 dict entry 0 dropped",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 67,
+   "mutant": "L95 dict entry 1 dropped",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 68,
+   "mutant": "L97 string 'verdict' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 69,
+   "mutant": "L97 string 'problems' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 70,
+   "mutant": "L97 string 'REFUTED' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 71,
+   "mutant": "L111 not removed",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified (v2.test_v21_r3_usage_boundary.ExecutedRun.test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified) | AssertionError"
+  },
+  {
+   "index": 72,
+   "mutant": "L111 not removed",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified (v2.test_v21_r3_usage_boundary.ExecutedRun.test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified) | AssertionError"
+  },
+  {
+   "index": 73,
+   "mutant": "L121 NotEq->Eq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified (v2.test_v21_r3_usage_boundary.ExecutedRun.test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified) | AssertionError"
+  },
+  {
+   "index": 74,
+   "mutant": "L131 string 'bundle_digest' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 75,
+   "mutant": "L132 string 'the run is not of this project bundle' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 76,
+   "mutant": "L136 string 'the run has no journal (it ended before the run began)' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 77,
+   "mutant": "L145 Or swapped",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 78,
+   "mutant": "L150 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 79,
+   "mutant": "L156 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 80,
+   "mutant": "L174 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified (v2.test_v21_r3_usage_boundary.ExecutedRun.test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified) | AssertionError"
+  },
+  {
+   "index": 81,
+   "mutant": "L174 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified (v2.test_v21_r3_usage_boundary.ExecutedRun.test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified) | AssertionError"
+  },
+  {
+   "index": 82,
+   "mutant": "L175 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified (v2.test_v21_r3_usage_boundary.ExecutedRun.test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified) | AssertionError"
+  },
+  {
+   "index": 83,
+   "mutant": "L181 Or swapped",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 84,
+   "mutant": "L182 Eq->NotEq",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 85,
+   "mutant": "L183 string 'FAIL' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 86,
+   "mutant": "L186 NotEq->Eq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 87,
+   "mutant": "L188 NotIn->In",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 88,
+   "mutant": "L193 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 89,
+   "mutant": "L197 NotEq->Eq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified (v2.test_v21_r3_usage_boundary.ExecutedRun.test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified) | AssertionError"
+  },
+  {
+   "index": 90,
+   "mutant": "L201 string 'REFUTED' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 91,
+   "mutant": "L201 string 'VERIFIED' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 92,
+   "mutant": "L95 string 'verdict' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 93,
+   "mutant": "L95 string 'problems' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 94,
+   "mutant": "L95 string 'REFUTED' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 95,
+   "mutant": "L96 string 'format' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 96,
+   "mutant": "L122 sorted() -> list()",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 97,
+   "mutant": "L126 string 'the evidence anchor is ' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 98,
+   "mutant": "L126 string ', not the ' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 99,
+   "mutant": "L126 string ' the run printed' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 100,
+   "mutant": "L128 string 'the anchor matches the expected value: authentic only as far as that value came from a store the developer cannot write (docs/v2.1/ANCHOR-THREAT-MODEL.md); it does not prove the run happened as its journal says' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 101,
+   "mutant": "L138 string \"RUN.json's journal reference is not an object\" emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 102,
+   "mutant": "L142 element 0 dropped",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 103,
+   "mutant": "L142 element 1 dropped",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 104,
+   "mutant": "L142 element 2 dropped",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 105,
+   "mutant": "L142 element 3 dropped",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 106,
+   "mutant": "L145 NotEq->Eq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 107,
+   "mutant": "L145 NotEq->Eq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 108,
+   "mutant": "L150 Is->IsNot",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 109,
+   "mutant": "L165 string 'story_outcomes' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 110,
+   "mutant": "L180 dict entry 0 dropped",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 111,
+   "mutant": "L180 dict entry 1 dropped",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 112,
+   "mutant": "L180 Or swapped",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 113,
+   "mutant": "L182 string 'failure' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 114,
+   "mutant": "L182 string 'PASS' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 115,
+   "mutant": "L184 string 'delivery_verdict' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 116,
+   "mutant": "L187 string \"the record's ProductProof account is not the one the journal re-derives\" emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 117,
+   "mutant": "L188 string 'error' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 118,
+   "mutant": "L193 NotEq->Eq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 119,
+   "mutant": "L194 NotEq->Eq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 120,
+   "mutant": "L196 string 'final_main' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 121,
+   "mutant": "L93 string 'utf-8' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "ERROR: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | LookupError"
+  },
+  {
+   "index": 122,
+   "mutant": "L97 string 'RUN.json is not a run record of format ' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 123,
+   "mutant": "L100 string 'utf-8' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "ERROR: test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified (v2.test_v21_r3_usage_boundary.ExecutedRun.test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified) | LookupError"
+  },
+  {
+   "index": 124,
+   "mutant": "L103 string 'no ' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 125,
+   "mutant": "L103 string ': a run of a release before 2.1 \u2014 its record is bound by nothing but itself' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 126,
+   "mutant": "L106 string ' is not JSON' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 127,
+   "mutant": "L109 string ' cannot be read (' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 128,
+   "mutant": "L109 string ')' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 129,
+   "mutant": "L113 string ' is not an evidence manifest (a JSON object holding its files)' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 130,
+   "mutant": "L126 And swapped",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 131,
+   "mutant": "L146 string 'the journal is not the one RUN.json names (digest or length)' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 132,
+   "mutant": "L153 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_journal_that_would_deliver_is_not_verified_as_delivering (v2.test_v21_r3_usage_boundary.RefusedJournals.test_a_journal_that_would_deliver_is_not_verified_as_delivering) [story_state refuses story/commit] | AssertionError"
+  },
+  {
+   "index": 133,
+   "mutant": "L153 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_journal_that_would_deliver_is_not_verified_as_delivering (v2.test_v21_r3_usage_boundary.RefusedJournals.test_a_journal_that_would_deliver_is_not_verified_as_delivering) [story_state refuses story/commit] | AssertionError"
+  },
+  {
+   "index": 134,
+   "mutant": "L153 element 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_journal_that_would_deliver_is_not_verified_as_delivering (v2.test_v21_r3_usage_boundary.RefusedJournals.test_a_journal_that_would_deliver_is_not_verified_as_delivering) [story_state refuses story/commit] | AssertionError"
+  },
+  {
+   "index": 135,
+   "mutant": "L153 element 3 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_journal_that_would_deliver_is_not_verified_as_delivering (v2.test_v21_r3_usage_boundary.RefusedJournals.test_a_journal_that_would_deliver_is_not_verified_as_delivering) [story_state refuses story/commit] | AssertionError"
+  },
+  {
+   "index": 136,
+   "mutant": "L166 NotEq->Eq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 137,
+   "mutant": "L168 string \"the record's story outcomes are not the journal's for \" emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 138,
+   "mutant": "L175 string 'spent' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified (v2.test_v21_r3_usage_boundary.ExecutedRun.test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified) | AssertionError"
+  },
+  {
+   "index": 139,
+   "mutant": "L176 NotEq->Eq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified (v2.test_v21_r3_usage_boundary.ExecutedRun.test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified) | AssertionError"
+  },
+  {
+   "index": 140,
+   "mutant": "L180 string 'story' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 141,
+   "mutant": "L180 string 'error' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 142,
+   "mutant": "L180 string 'begun and never ended in the journal' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 143,
+   "mutant": "L181 string 'budget_stop' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 144,
+   "mutant": "L185 string 'the record says ' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 145,
+   "mutant": "L185 string '; the journal re-derives ' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 146,
+   "mutant": "L186 string 'productproof' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 147,
+   "mutant": "L188 string 'usage' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 148,
+   "mutant": "L188 string 'usage' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 149,
+   "mutant": "L195 string \"the record's usage is not what the evidence re-derives\" emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 150,
+   "mutant": "L197 string 'final_main' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified (v2.test_v21_r3_usage_boundary.ExecutedRun.test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified) | AssertionError"
+  },
+  {
+   "index": 151,
+   "mutant": "L198 string \"the run's repository main is not the record's final main\" emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 152,
+   "mutant": "L93 string 'RUN.json' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 153,
+   "mutant": "L95 string ': no readable run record (' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 154,
+   "mutant": "L95 string ')' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 155,
+   "mutant": "L111 string 'files' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 156,
+   "mutant": "L119 string 'an evidence file cannot be read (' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 157,
+   "mutant": "L119 string '): ' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 158,
+   "mutant": "L124 string 'the evidence manifest does not match the run directory: ' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 159,
+   "mutant": "L145 string 'sha256' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 160,
+   "mutant": "L145 string 'lines' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 161,
+   "mutant": "L148 string 'utf-8' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 162,
+   "mutant": "L151 dict entry 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified (v2.test_v21_r3_usage_boundary.ExecutedRun.test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified) | AssertionError"
+  },
+  {
+   "index": 163,
+   "mutant": "L151 dict entry 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 164,
+   "mutant": "L151 dict entry 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 165,
+   "mutant": "L157 string 'the journal ends in a torn line' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 166,
+   "mutant": "L175 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified (v2.test_v21_r3_usage_boundary.ExecutedRun.test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified) | AssertionError"
+  },
+  {
+   "index": 167,
+   "mutant": "L178 string \"the record's spend is not what the evidence re-derives for \" emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 168,
+   "mutant": "L180 string 'story_errors' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 169,
+   "mutant": "L190 Or swapped",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 170,
+   "mutant": "L193 string 'usage' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 171,
+   "mutant": "L194 string 'no_progress' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 172,
+   "mutant": "L196 string 'repo' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 173,
+   "mutant": "L200 string 'the record cannot be re-derived from the evidence: ' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 174,
+   "mutant": "L200 string ': ' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 175,
+   "mutant": "L123 NotEq->Eq",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 176,
+   "mutant": "L144 string 'the journal RUN.json names cannot be read (' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 177,
+   "mutant": "L144 string ')' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 178,
+   "mutant": "L151 string 'seq' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified (v2.test_v21_r3_usage_boundary.ExecutedRun.test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified) | AssertionError"
+  },
+  {
+   "index": 179,
+   "mutant": "L151 string 'type' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 180,
+   "mutant": "L151 string 'data' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 181,
+   "mutant": "L185 string 'delivery_verdict' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 182,
+   "mutant": "L95 string 'RUN.json' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 183,
+   "mutant": "L141 string 'path' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 184,
+   "mutant": "L154 string \"the journal violates the control projections the kernel's writer enforces: \" emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_each_is_refuted_by_a_finding_naming_the_projection_the_event_and_its_seq (v2.test_v21_r3_usage_boundary.RefusedJournals.test_each_is_refuted_by_a_finding_naming_the_projection_the_event_and_its_seq) [a story begins again after it committed] | AssertionError"
+  },
+  {
+   "index": 185,
+   "mutant": "L154 string ' refuses ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_journal_that_would_deliver_is_not_verified_as_delivering (v2.test_v21_r3_usage_boundary.RefusedJournals.test_a_journal_that_would_deliver_is_not_verified_as_delivering) [story_state refuses story/commit] | AssertionError"
+  },
+  {
+   "index": 186,
+   "mutant": "L155 string ' at seq ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_each_is_refuted_by_a_finding_naming_the_projection_the_event_and_its_seq (v2.test_v21_r3_usage_boundary.RefusedJournals.test_each_is_refuted_by_a_finding_naming_the_projection_the_event_and_its_seq) [a story begins again after it committed] | AssertionError"
+  },
+  {
+   "index": 187,
+   "mutant": "L155 string ': ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_each_is_refuted_by_a_finding_naming_the_projection_the_event_and_its_seq (v2.test_v21_r3_usage_boundary.RefusedJournals.test_each_is_refuted_by_a_finding_naming_the_projection_the_event_and_its_seq) [a story begins again after it committed] | AssertionError"
+  },
+  {
+   "index": 188,
+   "mutant": "L159 string 'the journal does not reconstruct: ' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 189,
+   "mutant": "L159 string ': ' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 190,
+   "mutant": "L175 string 'budget' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified (v2.test_v21_r3_usage_boundary.ExecutedRun.test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified) | AssertionError"
+  },
+  {
+   "index": 191,
+   "mutant": "L190 string 'settings' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 192,
+   "mutant": "L197 string 'rev-parse' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified (v2.test_v21_r3_usage_boundary.ExecutedRun.test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified) | AssertionError"
+  },
+  {
+   "index": 193,
+   "mutant": "L197 string 'main' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified (v2.test_v21_r3_usage_boundary.ExecutedRun.test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified) | AssertionError"
+  },
+  {
+   "index": 194,
+   "mutant": "L197 string 'repo' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified (v2.test_v21_r3_usage_boundary.ExecutedRun.test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified) | AssertionError"
+  },
+  {
+   "index": 195,
+   "mutant": "L122 string 'files' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 196,
+   "mutant": "L122 string 'files' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 197,
+   "mutant": "L123 string 'files' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 198,
+   "mutant": "L123 string 'files' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  }
+ ]
+}

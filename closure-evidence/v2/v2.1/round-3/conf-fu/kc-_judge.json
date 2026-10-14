@@ -1,0 +1,1362 @@
+{
+ "target": "aisef2/app/confine.py::_judge",
+ "files": [
+  "tests/v2/test_v21_r3_conf_fu_before.py",
+  "tests/v2/test_v21_r3_conf_rv_hostrows.py",
+  "tests/v2/test_v21_r3_conf_policy.py",
+  "tests/v2/test_v21_r3_conf_locale.py",
+  "tests/v2/test_v21_kills3_T07a.py",
+  "tests/v2/test_v21_kills3_T06a.py",
+  "tests/v2/test_v21_kills3_A06.py",
+  "tests/v2/test_v21_kills3_T05b.py",
+  "tests/v2/test_v21_kills3_T05a.py",
+  "tests/v2/test_v21_kills3_T05c.py",
+  "tests/v2/test_v21_kills3_A05.py",
+  "tests/v2/test_v21_kills3_R02.py",
+  "tests/v2/test_v21_kills3_T06b.py",
+  "tests/v2/test_v21_kills3_A07.py",
+  "tests/v2/test_v21_kills3_T07b.py",
+  "tests/v2/test_v21_kills3_TO2.py",
+  "tests/v2/test_v21_defects_confine.py",
+  "tests/v2/test_v21_confine.py"
+ ],
+ "source_sha256": "093e276c57b5b5c0b332937276ee41e04b0eb344ef05a4abcf23c38eddae16e9",
+ "t0": [
+  {
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "seconds": 1.58,
+   "outcome": "PASS",
+   "ran": 9
+  },
+  {
+   "file": "tests/v2/test_v21_r3_conf_rv_hostrows.py",
+   "seconds": 0.28,
+   "outcome": "PASS",
+   "ran": 3
+  },
+  {
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "seconds": 1.23,
+   "outcome": "PASS",
+   "ran": 42
+  },
+  {
+   "file": "tests/v2/test_v21_r3_conf_locale.py",
+   "seconds": 1.6,
+   "outcome": "PASS",
+   "ran": 10
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T07a.py",
+   "seconds": 0.31,
+   "outcome": "PASS",
+   "ran": 14
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T06a.py",
+   "seconds": 0.32,
+   "outcome": "PASS",
+   "ran": 14
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_A06.py",
+   "seconds": 1.03,
+   "outcome": "PASS",
+   "ran": 4
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "seconds": 0.73,
+   "outcome": "PASS",
+   "ran": 18
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T05a.py",
+   "seconds": 0.87,
+   "outcome": "PASS",
+   "ran": 8
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T05c.py",
+   "seconds": 2.0,
+   "outcome": "PASS",
+   "ran": 7
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_A05.py",
+   "seconds": 1.04,
+   "outcome": "PASS",
+   "ran": 6
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_R02.py",
+   "seconds": 0.46,
+   "outcome": "PASS",
+   "ran": 2
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T06b.py",
+   "seconds": 1.87,
+   "outcome": "PASS",
+   "ran": 8
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_A07.py",
+   "seconds": 0.33,
+   "outcome": "PASS",
+   "ran": 5
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T07b.py",
+   "seconds": 0.34,
+   "outcome": "PASS",
+   "ran": 11
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_TO2.py",
+   "seconds": 0.27,
+   "outcome": "PASS",
+   "ran": 3
+  },
+  {
+   "file": "tests/v2/test_v21_defects_confine.py",
+   "seconds": 1.42,
+   "outcome": "PASS",
+   "ran": 16
+  },
+  {
+   "file": "tests/v2/test_v21_confine.py",
+   "seconds": 19.5,
+   "outcome": "PASS",
+   "ran": 34
+  }
+ ],
+ "error": null,
+ "results": [
+  {
+   "index": 0,
+   "mutant": "L519 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 1,
+   "mutant": "L522 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 2,
+   "mutant": "L524 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 3,
+   "mutant": "L527 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 4,
+   "mutant": "L531 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 5,
+   "mutant": "L536 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 6,
+   "mutant": "L541 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 7,
+   "mutant": "L543 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 8,
+   "mutant": "L546 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 9,
+   "mutant": "L549 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 10,
+   "mutant": "L553 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 11,
+   "mutant": "L559 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 12,
+   "mutant": "L561 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 13,
+   "mutant": "L567 returns None",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | TypeError"
+  },
+  {
+   "index": 14,
+   "mutant": "L518 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | ValueError"
+  },
+  {
+   "index": 15,
+   "mutant": "L518 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | ValueError"
+  },
+  {
+   "index": 16,
+   "mutant": "L518 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | ValueError"
+  },
+  {
+   "index": 17,
+   "mutant": "L518 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | ValueError"
+  },
+  {
+   "index": 18,
+   "mutant": "L519 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_confine.py",
+   "first": "FAIL: test_each_check_refuses_on_its_own (v2.test_v21_confine.FailClosed.test_each_check_refuses_on_its_own) (want='a file of the run directory was readable') | AssertionError"
+  },
+  {
+   "index": 19,
+   "mutant": "L522 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_confine.py",
+   "first": "FAIL: test_each_check_refuses_on_its_own (v2.test_v21_confine.FailClosed.test_each_check_refuses_on_its_own) (want='the workspace was not writable') | AssertionError"
+  },
+  {
+   "index": 20,
+   "mutant": "L524 NotEq->Eq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 21,
+   "mutant": "L526 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | ValueError"
+  },
+  {
+   "index": 22,
+   "mutant": "L526 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | ValueError"
+  },
+  {
+   "index": 23,
+   "mutant": "L527 Eq->NotEq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 24,
+   "mutant": "L529 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 25,
+   "mutant": "L533 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_confine.py",
+   "first": "FAIL: test_each_check_refuses_on_its_own (v2.test_v21_confine.FailClosed.test_each_check_refuses_on_its_own) (want='CapInh is 0000000000000001, not 0') | AssertionError"
+  },
+  {
+   "index": 26,
+   "mutant": "L533 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_confine.py",
+   "first": "FAIL: test_each_check_refuses_on_its_own (v2.test_v21_confine.FailClosed.test_each_check_refuses_on_its_own) (want='CapPrm is 0000000000000001, not 0') | AssertionError"
+  },
+  {
+   "index": 27,
+   "mutant": "L533 element 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_confine.py",
+   "first": "FAIL: test_each_check_refuses_on_its_own (v2.test_v21_confine.FailClosed.test_each_check_refuses_on_its_own) (want='CapEff is 0000000000000001, not 0') | AssertionError"
+  },
+  {
+   "index": 28,
+   "mutant": "L533 element 3 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_confine.py",
+   "first": "FAIL: test_each_check_refuses_on_its_own (v2.test_v21_confine.FailClosed.test_each_check_refuses_on_its_own) (want='CapAmb is 0000000000000001, not 0') | AssertionError"
+  },
+  {
+   "index": 29,
+   "mutant": "L534 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 30,
+   "mutant": "L536 NotEq->Eq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 31,
+   "mutant": "L538 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_confine.py",
+   "first": "FAIL: test_each_check_refuses_on_its_own (v2.test_v21_confine.FailClosed.test_each_check_refuses_on_its_own) (want=\"the user namespace is not the session's own (shared)\") | AssertionError"
+  },
+  {
+   "index": 32,
+   "mutant": "L538 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_a_proc_of_the_hosts_pid_namespace_is_refused_twice_over (v2.test_v21_r3_conf_policy.RecordedGuest.test_a_proc_of_the_hosts_pid_namespace_is_refused_twice_over) (record='scenarios-X1-shared-tree.json') | AssertionError"
+  },
+  {
+   "index": 33,
+   "mutant": "L538 element 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_confine.py",
+   "first": "FAIL: test_each_check_refuses_on_its_own (v2.test_v21_confine.FailClosed.test_each_check_refuses_on_its_own) (want=\"the ipc namespace is not the session's own (shared)\") | AssertionError"
+  },
+  {
+   "index": 34,
+   "mutant": "L538 element 3 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_confine.py",
+   "first": "FAIL: test_each_check_refuses_on_its_own (v2.test_v21_confine.FailClosed.test_each_check_refuses_on_its_own) (want=\"the uts namespace is not the session's own (shared)\") | AssertionError"
+  },
+  {
+   "index": 35,
+   "mutant": "L538 element 4 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_confine.py",
+   "first": "FAIL: test_each_check_refuses_on_its_own (v2.test_v21_confine.FailClosed.test_each_check_refuses_on_its_own) (want=\"the mnt namespace is not the session's own (shared)\") | AssertionError"
+  },
+  {
+   "index": 36,
+   "mutant": "L538 element 5 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_confine.py",
+   "first": "FAIL: test_each_check_refuses_on_its_own (v2.test_v21_confine.FailClosed.test_each_check_refuses_on_its_own) (want=\"the net namespace is not the session's own (shared)\") | AssertionError"
+  },
+  {
+   "index": 37,
+   "mutant": "L541 And swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 38,
+   "mutant": "L543 not removed",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | TypeError"
+  },
+  {
+   "index": 39,
+   "mutant": "L559 And swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_every_recorded_report_is_judged_again_as_it_was (v2.test_v21_r3_conf_policy.RecordedGuest.test_every_recorded_report_is_judged_again_as_it_was) (record='scenarios-X1-shared-tree.json', scenario='alt-dev-sandbox-devpts') | AssertionError"
+  },
+  {
+   "index": 40,
+   "mutant": "L561 Is->IsNot",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 41,
+   "mutant": "L565 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 42,
+   "mutant": "L519 In->NotIn",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 43,
+   "mutant": "L519 Eq->NotEq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 44,
+   "mutant": "L522 NotEq->Eq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 45,
+   "mutant": "L522 NotIn->In",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 46,
+   "mutant": "L526 string 'user_namespace' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 47,
+   "mutant": "L526 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A05.py",
+   "first": "ERROR: test_routed_interfaces_are_the_unique_names_in_a_stable_order (v2.test_v21_kills3_A05.Order.test_routed_interfaces_are_the_unique_names_in_a_stable_order) | ValueError"
+  },
+  {
+   "index": 48,
+   "mutant": "L526 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A05.py",
+   "first": "ERROR: test_routed_interfaces_are_the_unique_names_in_a_stable_order (v2.test_v21_kills3_A05.Order.test_routed_interfaces_are_the_unique_names_in_a_stable_order) | ValueError"
+  },
+  {
+   "index": 49,
+   "mutant": "L529 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T06a.py",
+   "first": "FAIL: test_the_exit_code_of_the_user_namespace_try_can_be_read_back_from_the_problem (v2.test_v21_kills3_T06a.RefusalReasons.test_the_exit_code_of_the_user_namespace_try_can_be_read_back_from_the_problem) | AssertionError"
+  },
+  {
+   "index": 50,
+   "mutant": "L531 string 'setsid_survivors' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 51,
+   "mutant": "L533 string 'CapInh' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 52,
+   "mutant": "L533 string 'CapPrm' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 53,
+   "mutant": "L533 string 'CapEff' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 54,
+   "mutant": "L533 string 'CapAmb' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 55,
+   "mutant": "L534 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_confine.py",
+   "first": "FAIL: test_each_check_refuses_on_its_own (v2.test_v21_confine.FailClosed.test_each_check_refuses_on_its_own) (want='CapInh is 0000000000000001, not 0') | AssertionError"
+  },
+  {
+   "index": 56,
+   "mutant": "L536 string '1' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 57,
+   "mutant": "L538 string 'user' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 58,
+   "mutant": "L538 string 'pid' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 59,
+   "mutant": "L538 string 'ipc' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 60,
+   "mutant": "L538 string 'uts' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 61,
+   "mutant": "L538 string 'mnt' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 62,
+   "mutant": "L541 Eq->NotEq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 63,
+   "mutant": "L559 NotEq->Eq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T06a.py",
+   "first": "FAIL: test_the_names_home_shows_are_listed_in_name_order_and_cut_after_ten (v2.test_v21_kills3_T06a.RefusalReasons.test_the_names_home_shows_are_listed_in_name_order_and_cut_after_ten) | AssertionError"
+  },
+  {
+   "index": 64,
+   "mutant": "L559 not removed",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_every_recorded_report_is_judged_again_as_it_was (v2.test_v21_r3_conf_policy.RecordedGuest.test_every_recorded_report_is_judged_again_as_it_was) (record='scenarios-X1-shared-tree.json', scenario='alt-dev-sandbox-devpts') | AssertionError"
+  },
+  {
+   "index": 65,
+   "mutant": "L518 string 'inside' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 66,
+   "mutant": "L520 string 'a file of the run directory was readable' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_confine.py",
+   "first": "FAIL: test_each_check_refuses_on_its_own (v2.test_v21_confine.FailClosed.test_each_check_refuses_on_its_own) (want='a file of the run directory was readable') | AssertionError"
+  },
+  {
+   "index": 67,
+   "mutant": "L521 string 'a file was created in the ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_confine.py",
+   "first": "FAIL: test_each_check_refuses_on_its_own (v2.test_v21_confine.FailClosed.test_each_check_refuses_on_its_own) (want='a file was created in the kernel') | AssertionError"
+  },
+  {
+   "index": 68,
+   "mutant": "L521 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | ValueError"
+  },
+  {
+   "index": 69,
+   "mutant": "L521 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | ValueError"
+  },
+  {
+   "index": 70,
+   "mutant": "L522 string 'ok' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_confine.py",
+   "first": "FAIL: test_each_check_refuses_on_its_own (v2.test_v21_confine.FailClosed.test_each_check_refuses_on_its_own) (want='the workspace was not writable') | AssertionError"
+  },
+  {
+   "index": 71,
+   "mutant": "L523 string 'the workspace was not writable' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_confine.py",
+   "first": "FAIL: test_each_check_refuses_on_its_own (v2.test_v21_confine.FailClosed.test_each_check_refuses_on_its_own) (want='the workspace was not writable') | AssertionError"
+  },
+  {
+   "index": 72,
+   "mutant": "L525 string \"the workspace's git directory was not readable (git would not work in the session)\" emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_confine.py",
+   "first": "FAIL: test_a_check_that_did_not_run_is_a_problem_never_a_pass (v2.test_v21_confine.FailClosed.test_a_check_that_did_not_run_is_a_problem_never_a_pass) | AssertionError"
+  },
+  {
+   "index": 73,
+   "mutant": "L528 string 'a user namespace could be created' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_confine.py",
+   "first": "FAIL: test_a_check_that_did_not_run_is_a_problem_never_a_pass (v2.test_v21_confine.FailClosed.test_a_check_that_did_not_run_is_a_problem_never_a_pass) | AssertionError"
+  },
+  {
+   "index": 74,
+   "mutant": "L529 In->NotIn",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 75,
+   "mutant": "L529 not removed",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | TypeError"
+  },
+  {
+   "index": 76,
+   "mutant": "L534 Is->IsNot",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 77,
+   "mutant": "L534 NotEq->Eq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 78,
+   "mutant": "L536 string 'no_new_privs' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 79,
+   "mutant": "L538 conditional negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 80,
+   "mutant": "L539 string 'the ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_a_proc_of_the_hosts_pid_namespace_is_refused_twice_over (v2.test_v21_r3_conf_policy.RecordedGuest.test_a_proc_of_the_hosts_pid_namespace_is_refused_twice_over) (record='scenarios-X1-shared-tree.json') | AssertionError"
+  },
+  {
+   "index": 81,
+   "mutant": "L539 string \" namespace is not the session's own (\" emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_a_proc_of_the_hosts_pid_namespace_is_refused_twice_over (v2.test_v21_r3_conf_policy.RecordedGuest.test_a_proc_of_the_hosts_pid_namespace_is_refused_twice_over) (record='scenarios-X1-shared-tree.json') | AssertionError"
+  },
+  {
+   "index": 82,
+   "mutant": "L539 string ')' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_a_proc_of_the_hosts_pid_namespace_is_refused_twice_over (v2.test_v21_r3_conf_policy.RecordedGuest.test_a_proc_of_the_hosts_pid_namespace_is_refused_twice_over) (record='scenarios-X1-shared-tree.json') | AssertionError"
+  },
+  {
+   "index": 83,
+   "mutant": "L540 NotEq->Eq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 84,
+   "mutant": "L541 string 'none' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T06a.py",
+   "first": "FAIL: test_a_route_inside_a_network_namespace_of_its_own_is_the_problem_and_names_the_interface (v2.test_v21_kills3_T06a.AcceptedMeasurement.test_a_route_inside_a_network_namespace_of_its_own_is_the_problem_and_names_the_interface) | AssertionError"
+  },
+  {
+   "index": 85,
+   "mutant": "L541 string 'routed_interfaces' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T06a.py",
+   "first": "ERROR: test_a_network_namespace_of_its_own_without_a_route_is_not_a_problem (v2.test_v21_kills3_T06a.AcceptedMeasurement.test_a_network_namespace_of_its_own_without_a_route_is_not_a_problem) | KeyError"
+  },
+  {
+   "index": 86,
+   "mutant": "L543 string 'mounts' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 87,
+   "mutant": "L544 string 'the mounts could not be read' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_confine.py",
+   "first": "FAIL: test_each_check_refuses_on_its_own (v2.test_v21_confine.FailClosed.test_each_check_refuses_on_its_own) (want='the mounts could not be read') | AssertionError"
+  },
+  {
+   "index": 88,
+   "mutant": "L545 string 'at' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_a_writable_bind_of_a_super_block_the_host_held_is_refused_whatever_the_reading_after_says (v2.test_v21_r3_conf_fu_before.ReadingBefore.test_a_writable_bind_of_a_super_block_the_host_held_is_refused_whatever_the_reading_after_says) (after='holds it') | KeyError"
+  },
+  {
+   "index": 89,
+   "mutant": "L545 And swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 90,
+   "mutant": "L548 string 'host_mounts' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 91,
+   "mutant": "L549 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_a_super_block_the_reading_before_the_session_holds_is_the_hosts (v2.test_v21_r3_conf_fu_before.ReadingBefore.test_a_super_block_the_reading_before_the_session_holds_is_the_hosts) (after_holds_it=True) | ValueError"
+  },
+  {
+   "index": 92,
+   "mutant": "L549 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_a_super_block_the_reading_before_the_session_holds_is_the_hosts (v2.test_v21_r3_conf_fu_before.ReadingBefore.test_a_super_block_the_reading_before_the_session_holds_is_the_hosts) (after_holds_it=True) | ValueError"
+  },
+  {
+   "index": 93,
+   "mutant": "L557 And swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | ValueError"
+  },
+  {
+   "index": 94,
+   "mutant": "L558 string 'home_listing' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 95,
+   "mutant": "L559 string '/nonexistent' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 96,
+   "mutant": "L559 LtE->Gt",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_every_recorded_report_is_judged_again_as_it_was (v2.test_v21_r3_conf_policy.RecordedGuest.test_every_recorded_report_is_judged_again_as_it_was) (record='scenarios-X1-shared-tree.json', scenario='alt-dev-sandbox-devpts') | AssertionError"
+  },
+  {
+   "index": 97,
+   "mutant": "L561 string 'unix_sockets' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 98,
+   "mutant": "L562 string 'the reachable unix sockets could not be listed (no find in the sandbox)' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05a.py",
+   "first": "FAIL: test_a_sandbox_without_find_is_a_problem_not_a_pass (v2.test_v21_kills3_T05a.UnixSockets.test_a_sandbox_without_find_is_a_problem_not_a_pass) | AssertionError"
+  },
+  {
+   "index": 99,
+   "mutant": "L524 string 'read_git_directory' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 100,
+   "mutant": "L529 element 0 dropped",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 101,
+   "mutant": "L529 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A06.py",
+   "first": "FAIL: test_exit_127_is_never_a_measured_refusal_whatever_it_printed (v2.test_v21_kills3_A06.UserNamespaceCheckThatCouldNotRun.test_exit_127_is_never_a_measured_refusal_whatever_it_printed) | AssertionError"
+  },
+  {
+   "index": 102,
+   "mutant": "L532 string 'a process the session left outlived it: ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_every_recorded_report_is_judged_again_as_it_was (v2.test_v21_r3_conf_policy.RecordedGuest.test_every_recorded_report_is_judged_again_as_it_was) (record='scenarios-X1-shared-tree.json', scenario='shared-pid-namespace') | AssertionError"
+  },
+  {
+   "index": 103,
+   "mutant": "L537 string 'NoNewPrivs is ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_confine.py",
+   "first": "FAIL: test_each_check_refuses_on_its_own (v2.test_v21_confine.FailClosed.test_each_check_refuses_on_its_own) (want='NoNewPrivs is 0, not 1') | AssertionError"
+  },
+  {
+   "index": 104,
+   "mutant": "L537 string ', not 1' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_confine.py",
+   "first": "FAIL: test_each_check_refuses_on_its_own (v2.test_v21_confine.FailClosed.test_each_check_refuses_on_its_own) (want='NoNewPrivs is 0, not 1') | AssertionError"
+  },
+  {
+   "index": 105,
+   "mutant": "L538 Eq->NotEq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 106,
+   "mutant": "L540 string 'own' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 107,
+   "mutant": "L541 string 'network' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 108,
+   "mutant": "L542 string 'network none has routes on ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T06a.py",
+   "first": "FAIL: test_a_route_inside_a_network_namespace_of_its_own_is_the_problem_and_names_the_interface (v2.test_v21_kills3_T06a.AcceptedMeasurement.test_a_route_inside_a_network_namespace_of_its_own_is_the_problem_and_names_the_interface) | AssertionError"
+  },
+  {
+   "index": 109,
+   "mutant": "L542 string ' (a reachable network)' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_confine.py",
+   "first": "FAIL: test_each_check_refuses_on_its_own (v2.test_v21_confine.FailClosed.test_each_check_refuses_on_its_own) (want=\"network none has routes on ['eth0'] (a reachable network)\") | AssertionError"
+  },
+  {
+   "index": 110,
+   "mutant": "L545 string 'mounts' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 111,
+   "mutant": "L545 NotEq->Eq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 112,
+   "mutant": "L545 not removed",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 113,
+   "mutant": "L547 string 'mounted beyond what the wrapper names: ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_every_recorded_report_is_judged_again_as_it_was (v2.test_v21_r3_conf_policy.RecordedGuest.test_every_recorded_report_is_judged_again_as_it_was) (record='scenarios-X1-shared-tree.json', scenario='host-dev-bound') | AssertionError"
+  },
+  {
+   "index": 114,
+   "mutant": "L549 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_a_super_block_the_reading_before_the_session_holds_is_the_hosts (v2.test_v21_r3_conf_fu_before.ReadingBefore.test_a_super_block_the_reading_before_the_session_holds_is_the_hosts) (after_holds_it=True) | ValueError"
+  },
+  {
+   "index": 115,
+   "mutant": "L549 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_a_super_block_the_reading_before_the_session_holds_is_the_hosts (v2.test_v21_r3_conf_fu_before.ReadingBefore.test_a_super_block_the_reading_before_the_session_holds_is_the_hosts) (after_holds_it=True) | ValueError"
+  },
+  {
+   "index": 116,
+   "mutant": "L549 element 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_a_super_block_the_reading_before_the_session_holds_is_the_hosts (v2.test_v21_r3_conf_fu_before.ReadingBefore.test_a_super_block_the_reading_before_the_session_holds_is_the_hosts) (after_holds_it=True) | ValueError"
+  },
+  {
+   "index": 117,
+   "mutant": "L551 string ': ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_every_recorded_report_is_judged_again_as_it_was (v2.test_v21_r3_conf_policy.RecordedGuest.test_every_recorded_report_is_judged_again_as_it_was) (record='scenarios-X1-shared-tree.json', scenario='host-dev-bound') | AssertionError"
+  },
+  {
+   "index": 118,
+   "mutant": "L551 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_a_super_block_the_reading_before_the_session_holds_is_the_hosts (v2.test_v21_r3_conf_fu_before.ReadingBefore.test_a_super_block_the_reading_before_the_session_holds_is_the_hosts) (after_holds_it=True) | ValueError"
+  },
+  {
+   "index": 119,
+   "mutant": "L551 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_a_super_block_the_reading_before_the_session_holds_is_the_hosts (v2.test_v21_r3_conf_fu_before.ReadingBefore.test_a_super_block_the_reading_before_the_session_holds_is_the_hosts) (after_holds_it=True) | ValueError"
+  },
+  {
+   "index": 120,
+   "mutant": "L552 conditional negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_a_super_block_the_reading_before_the_session_holds_is_the_hosts (v2.test_v21_r3_conf_fu_before.ReadingBefore.test_a_super_block_the_reading_before_the_session_holds_is_the_hosts) (after_holds_it=True) | AssertionError"
+  },
+  {
+   "index": 121,
+   "mutant": "L553 string ': ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_rv_hostrows.py",
+   "first": "FAIL: test_a_row_without_what_would_rule_it_out_establishes_nothing (v2.test_v21_r3_conf_rv_hostrows.IncompleteHostTable.test_a_row_without_what_would_rule_it_out_establishes_nothing) (what='no super block') | AssertionError"
+  },
+  {
+   "index": 122,
+   "mutant": "L553 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_a_super_block_the_reading_before_the_session_holds_is_the_hosts (v2.test_v21_r3_conf_fu_before.ReadingBefore.test_a_super_block_the_reading_before_the_session_holds_is_the_hosts) (after_holds_it=True) | ValueError"
+  },
+  {
+   "index": 123,
+   "mutant": "L553 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_a_super_block_the_reading_before_the_session_holds_is_the_hosts (v2.test_v21_r3_conf_fu_before.ReadingBefore.test_a_super_block_the_reading_before_the_session_holds_is_the_hosts) (after_holds_it=True) | ValueError"
+  },
+  {
+   "index": 124,
+   "mutant": "L553 element 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_a_super_block_the_reading_before_the_session_holds_is_the_hosts (v2.test_v21_r3_conf_fu_before.ReadingBefore.test_a_super_block_the_reading_before_the_session_holds_is_the_hosts) (after_holds_it=True) | ValueError"
+  },
+  {
+   "index": 125,
+   "mutant": "L553 not removed",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_an_unreadable_reading_before_establishes_nothing (v2.test_v21_r3_conf_fu_before.ReadingLost.test_an_unreadable_reading_before_establishes_nothing) (reads=(None, [{'at': '/', 'access': 'rw', 'fs': 'ext4', 'dev': '8:1', 'root': '/', 'source': '/dev/vda1', 'options': ['rw', 'relatime'], 'super_options': ['rw'], 'optional': []}])) | ValueError"
+  },
+  {
+   "index": 126,
+   "mutant": "L554 string 'cannot establish that a writable mount belongs to the sandbox (isolation not established, not a write that was seen): ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_an_unreadable_reading_before_establishes_nothing (v2.test_v21_r3_conf_fu_before.ReadingLost.test_an_unreadable_reading_before_establishes_nothing) (reads=(None, [{'at': '/', 'access': 'rw', 'fs': 'ext4', 'dev': '8:1', 'root': '/', 'source': '/dev/vda1', 'options': ['rw', 'relatime'], 'super_options': ['rw'], 'optional': []}])) | ValueError"
+  },
+  {
+   "index": 127,
+   "mutant": "L556 string 'mounts' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 128,
+   "mutant": "L557 NotEq->Eq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_every_recorded_report_is_judged_again_as_it_was (v2.test_v21_r3_conf_policy.RecordedGuest.test_every_recorded_report_is_judged_again_as_it_was) (record='scenarios-X1-shared-tree.json', scenario='alt-dev-sandbox-devpts') | AssertionError"
+  },
+  {
+   "index": 129,
+   "mutant": "L560 string 'HOME shows more than the way to what is mounted: ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T06a.py",
+   "first": "FAIL: test_the_names_home_shows_are_listed_in_name_order_and_cut_after_ten (v2.test_v21_kills3_T06a.RefusalReasons.test_the_names_home_shows_are_listed_in_name_order_and_cut_after_ten) | AssertionError"
+  },
+  {
+   "index": 130,
+   "mutant": "L564 not removed",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05a.py",
+   "first": "FAIL: test_a_sandbox_as_required_is_not_refused (v2.test_v21_kills3_T05a.CleanSession.test_a_sandbox_as_required_is_not_refused) | AssertionError"
+  },
+  {
+   "index": 131,
+   "mutant": "L519 string 'read_canary' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 132,
+   "mutant": "L521 string '_' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_confine.py",
+   "first": "FAIL: test_each_check_refuses_on_its_own (v2.test_v21_confine.FailClosed.test_each_check_refuses_on_its_own) (want='a file was created in the kernel') | AssertionError"
+  },
+  {
+   "index": 133,
+   "mutant": "L521 string ' ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_confine.py",
+   "first": "FAIL: test_what_is_measured_decides_not_the_name_of_the_tool (v2.test_v21_confine.FailClosed.test_what_is_measured_decides_not_the_name_of_the_tool) | AssertionError"
+  },
+  {
+   "index": 134,
+   "mutant": "L522 string 'workspace' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 135,
+   "mutant": "L522 element 0 dropped",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 136,
+   "mutant": "L522 element 1 dropped",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 137,
+   "mutant": "L522 string 'workspace' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 138,
+   "mutant": "L522 element 0 dropped",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 139,
+   "mutant": "L522 element 1 dropped",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 140,
+   "mutant": "L530 string 'no refusal of a further user namespace was measured (exit ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T06a.py",
+   "first": "FAIL: test_the_exit_code_of_the_user_namespace_try_can_be_read_back_from_the_problem (v2.test_v21_kills3_T06a.RefusalReasons.test_the_exit_code_of_the_user_namespace_try_can_be_read_back_from_the_problem) | AssertionError"
+  },
+  {
+   "index": 141,
+   "mutant": "L530 string ': ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T06a.py",
+   "first": "FAIL: test_the_exit_code_of_the_user_namespace_try_can_be_read_back_from_the_problem (v2.test_v21_kills3_T06a.RefusalReasons.test_the_exit_code_of_the_user_namespace_try_can_be_read_back_from_the_problem) | AssertionError"
+  },
+  {
+   "index": 142,
+   "mutant": "L530 string ')' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 143,
+   "mutant": "L535 string ' is ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_confine.py",
+   "first": "FAIL: test_each_check_refuses_on_its_own (v2.test_v21_confine.FailClosed.test_each_check_refuses_on_its_own) (want='CapInh is 0000000000000001, not 0') | AssertionError"
+  },
+  {
+   "index": 144,
+   "mutant": "L535 string ', not 0' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_confine.py",
+   "first": "FAIL: test_each_check_refuses_on_its_own (v2.test_v21_confine.FailClosed.test_each_check_refuses_on_its_own) (want='CapInh is 0000000000000001, not 0') | AssertionError"
+  },
+  {
+   "index": 145,
+   "mutant": "L538 string 'none' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_confine.py",
+   "first": "FAIL: test_each_check_refuses_on_its_own (v2.test_v21_confine.FailClosed.test_each_check_refuses_on_its_own) (want=\"the net namespace is not the session's own (shared)\") | AssertionError"
+  },
+  {
+   "index": 146,
+   "mutant": "L538 string 'net' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T06a.py",
+   "first": "FAIL: test_a_network_namespace_of_its_own_without_a_route_is_not_a_problem (v2.test_v21_kills3_T06a.AcceptedMeasurement.test_a_network_namespace_of_its_own_without_a_route_is_not_a_problem) | AssertionError"
+  },
+  {
+   "index": 147,
+   "mutant": "L539 string 'not measured' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_confine.py",
+   "first": "FAIL: test_each_check_refuses_on_its_own (v2.test_v21_confine.FailClosed.test_each_check_refuses_on_its_own) (want=\"the user namespace is not the session's own (not measured)\") | AssertionError"
+  },
+  {
+   "index": 148,
+   "mutant": "L545 string '/' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 149,
+   "mutant": "L552 string 'writable outside the workspace: ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_a_super_block_the_reading_before_the_session_holds_is_the_hosts (v2.test_v21_r3_conf_fu_before.ReadingBefore.test_a_super_block_the_reading_before_the_session_holds_is_the_hosts) (after_holds_it=True) | ValueError"
+  },
+  {
+   "index": 150,
+   "mutant": "L564 string 'unix_sockets' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 151,
+   "mutant": "L566 string 'a unix socket outside the workspace is reachable (read-only does not stop a connect): ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05a.py",
+   "first": "FAIL: test_a_socket_below_a_bound_read_only_directory_is_refused_naming_it (v2.test_v21_kills3_T05a.UnixSockets.test_a_socket_below_a_bound_read_only_directory_is_refused_naming_it) | AssertionError"
+  },
+  {
+   "index": 152,
+   "mutant": "L521 string 'created_outside_workspace' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 153,
+   "mutant": "L532 string 'setsid_survivors' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_proc_of_the_hosts_pid_namespace_is_refused_twice_over (v2.test_v21_r3_conf_policy.RecordedGuest.test_a_proc_of_the_hosts_pid_namespace_is_refused_twice_over) (record='scenarios-X1-shared-tree.json') | KeyError"
+  },
+  {
+   "index": 154,
+   "mutant": "L534 string 'capabilities' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 155,
+   "mutant": "L537 string 'no_new_privs' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_confine.py",
+   "first": "ERROR: test_each_check_refuses_on_its_own (v2.test_v21_confine.FailClosed.test_each_check_refuses_on_its_own) (want='NoNewPrivs is 0, not 1') | KeyError"
+  },
+  {
+   "index": 156,
+   "mutant": "L538 string 'network' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 157,
+   "mutant": "L542 string 'routed_interfaces' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T06a.py",
+   "first": "ERROR: test_a_route_inside_a_network_namespace_of_its_own_is_the_problem_and_names_the_interface (v2.test_v21_kills3_T06a.AcceptedMeasurement.test_a_route_inside_a_network_namespace_of_its_own_is_the_problem_and_names_the_interface) | KeyError"
+  },
+  {
+   "index": 158,
+   "mutant": "L545 string 'at' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 159,
+   "mutant": "L552 string ' (' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_every_recorded_report_is_judged_again_as_it_was (v2.test_v21_r3_conf_policy.RecordedGuest.test_every_recorded_report_is_judged_again_as_it_was) (record='scenarios-X1-shared-tree.json', scenario='host-dev-bound') | AssertionError"
+  },
+  {
+   "index": 160,
+   "mutant": "L552 string ')' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_every_recorded_report_is_judged_again_as_it_was (v2.test_v21_r3_conf_policy.RecordedGuest.test_every_recorded_report_is_judged_again_as_it_was) (record='scenarios-X1-shared-tree.json', scenario='host-dev-bound') | AssertionError"
+  },
+  {
+   "index": 161,
+   "mutant": "L557 string 'at' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_proc_of_the_hosts_pid_namespace_is_refused_twice_over (v2.test_v21_r3_conf_policy.RecordedGuest.test_a_proc_of_the_hosts_pid_namespace_is_refused_twice_over) (record='scenarios-X1-shared-tree.json') | KeyError"
+  },
+  {
+   "index": 162,
+   "mutant": "L560 sorted() -> list()",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T06a.py",
+   "first": "FAIL: test_the_names_home_shows_are_listed_in_name_order_and_cut_after_ten (v2.test_v21_kills3_T06a.RefusalReasons.test_the_names_home_shows_are_listed_in_name_order_and_cut_after_ten) | AssertionError"
+  },
+  {
+   "index": 163,
+   "mutant": "L534 string 'capabilities' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 164,
+   "mutant": "L539 string 'namespaces' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_proc_of_the_hosts_pid_namespace_is_refused_twice_over (v2.test_v21_r3_conf_policy.RecordedGuest.test_a_proc_of_the_hosts_pid_namespace_is_refused_twice_over) (record='scenarios-X1-shared-tree.json') | KeyError"
+  },
+  {
+   "index": 165,
+   "mutant": "L540 string 'namespaces' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 166,
+   "mutant": "L545 string 'at' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 167,
+   "mutant": "L545 string 'mount_targets' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 168,
+   "mutant": "L555 string '; ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T06a.py",
+   "first": "FAIL: test_a_measurement_that_was_accepted_is_accepted_again (v2.test_v21_kills3_T06a.RecordedLinuxMeasurements.test_a_measurement_that_was_accepted_is_accepted_again) (record='P4-all.json', network='none') | AssertionError"
+  },
+  {
+   "index": 169,
+   "mutant": "L535 string 'capabilities' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_confine.py",
+   "first": "ERROR: test_each_check_refuses_on_its_own (v2.test_v21_confine.FailClosed.test_each_check_refuses_on_its_own) (want='CapInh is 0000000000000001, not 0') | KeyError"
+  },
+  {
+   "index": 170,
+   "mutant": "L552 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_a_super_block_the_reading_before_the_session_holds_is_the_hosts (v2.test_v21_r3_conf_fu_before.ReadingBefore.test_a_super_block_the_reading_before_the_session_holds_is_the_hosts) (after_holds_it=True) | ValueError"
+  },
+  {
+   "index": 171,
+   "mutant": "L552 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_a_super_block_the_reading_before_the_session_holds_is_the_hosts (v2.test_v21_r3_conf_fu_before.ReadingBefore.test_a_super_block_the_reading_before_the_session_holds_is_the_hosts) (after_holds_it=True) | ValueError"
+  },
+  {
+   "index": 172,
+   "mutant": "L556 string 'at' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_proc_of_the_hosts_pid_namespace_is_refused_twice_over (v2.test_v21_r3_conf_policy.RecordedGuest.test_a_proc_of_the_hosts_pid_namespace_is_refused_twice_over) (record='scenarios-X1-shared-tree.json') | KeyError"
+  },
+  {
+   "index": 173,
+   "mutant": "L557 string 'at' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 174,
+   "mutant": "L552 string '; ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_every_recorded_report_is_judged_again_as_it_was (v2.test_v21_r3_conf_policy.RecordedGuest.test_every_recorded_report_is_judged_again_as_it_was) (record='scenarios-X1-shared-tree.json', scenario='host-dev-bound') | AssertionError"
+  }
+ ]
+}

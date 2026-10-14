@@ -1,0 +1,30 @@
+# repro-5b (probes WP, item 5, the failing variant): a simulated hostile module answers an operation with a non-string
+# `agent_failure`.  python_callable_v2's controller builds a string from it inside its own `except` handler.
+# Run from the worktree root:  py.sh probes -I <this file>
+import os
+import pathlib
+import sys
+import tempfile
+
+sys.path.insert(0, os.getcwd())
+from aisef2.arch.enums import BehaviorVerdict, Enforcement, SubjectAbsence  # noqa: E402
+from aisef2.probe import process_effect as pe, python_callable_v2 as pc2  # noqa: E402
+from aisef2.probe.protocol import ExecutionEnv, RevisionRef  # noqa: E402
+from aisef2.product.spec import ProductProofSpec  # noqa: E402
+
+root = tempfile.mkdtemp(prefix="aisef2-r3-af-")
+pathlib.Path(root, "m.py").write_text(
+    "import __main__\n__main__.OPS['call'] = lambda r: {'agent_failure': 5}\n\n\ndef f():\n    return 1\n", encoding="utf-8")
+at, env = RevisionRef("89abcdef0123456789abcdef0123456789abcdef", root), ExecutionEnv(sys.executable, 20, Enforcement.PARTIAL)
+print("interpreter:", sys.version.split()[0], sys.platform)
+for name, probe, kind, stim, obs in (
+        ("python_callable_v2", pc2.PythonCallableV2Probe(), "python_callable", {}, {"returns": 1}),
+        ("process_effect    ", pe.ProcessEffectProbe(), "process_effect",
+         {"scenario": [{"step": "call", "args": [], "kwargs": {}}]}, {"returns": 1})):
+    s = ProductProofSpec.create(
+        contract_id="BC-R3", probe_id=probe.id, probe_digest=probe.digest,
+        probe_input={"subject": {"kind": kind, "locator": "m:f"}, "stimulus": stim, "observable": {**obs, "within_s": 20},
+                     "subject_absence": SubjectAbsence.REQUIRES_SUBJECT.value},
+        candidate_expectation=BehaviorVerdict.SATISFIED, compiler_id="test", compiler_digest="c" * 64)
+    o = probe.observe(s, at, env)
+    print("%s -> %s verdict=%s | %s" % (name, o.kind.value, o.verdict.value if o.verdict else None, o.detail[:110]))

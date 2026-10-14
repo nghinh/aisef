@@ -1,0 +1,25 @@
+R01 splitlines() of the decoded text (the old bug)                          CAUGHT     r3_auth_ps_table=FAILED (failures=43, errors=27) | r3_auth_other_readers=FAILED (failures=2, errors=11) | defects_runner=ok
+R02 bytes.splitlines() (cuts at CR)                                         CAUGHT     r3_auth_ps_table=FAILED (failures=7, errors=3) | r3_auth_other_readers=FAILED (failures=1, errors=1) | defects_runner=ok
+R03 a non-row is skipped in ps                                              CAUGHT     r3_auth_ps_table=FAILED (failures=51) | r3_auth_other_readers=ok | defects_runner=FAILED (failures=1)
+R04 a bad date is skipped                                                   CAUGHT     r3_auth_ps_table=FAILED (failures=10) | r3_auth_other_readers=ok | defects_runner=ok
+R05 the later row of a pid wins                                             CAUGHT     r3_auth_ps_table=FAILED (failures=2) | r3_auth_other_readers=ok | defects_runner=ok
+R06 the command is lstrip()ped (Unicode spaces)                             CAUGHT     r3_auth_ps_table=FAILED (failures=41) | r3_auth_other_readers=ok | defects_runner=ok
+R07 ps in the user's locale                                                 CAUGHT     r3_auth_ps_table=FAILED (failures=1, errors=2) | r3_auth_other_readers=ok | defects_runner=ok
+R08 a failed ps is read                                                     CAUGHT     r3_auth_ps_table=FAILED (failures=3) | r3_auth_other_readers=ok | defects_runner=ok
+R09 the reader need not list itself                                         CAUGHT     r3_auth_ps_table=FAILED (failures=3) | r3_auth_other_readers=ok | defects_runner=ok
+R10 digits by \d                                                            CAUGHT     r3_auth_ps_table=FAILED (failures=3) | r3_auth_other_readers=ok | defects_runner=ok
+R11 blank = strip() of all whitespace (a lone CR / LS line is skipped)      CAUGHT     r3_auth_ps_table=FAILED (failures=6) | r3_auth_other_readers=FAILED (failures=2) | defects_runner=ok
+R12 the FIRST row of a pid wins                                             CAUGHT     r3_auth_ps_table=FAILED (failures=2) | r3_auth_other_readers=ok | defects_runner=ok
+R13 day padding is one space only                                           CAUGHT     r3_auth_ps_table=FAILED (errors=4) | r3_auth_other_readers=FAILED (errors=2) | defects_runner=ok
+R14 ps -E: a non-row is skipped                                             CAUGHT     r3_auth_ps_table=ok | r3_auth_other_readers=FAILED (failures=2) | defects_runner=ok
+R15 ps -E: a pid twice is overwritten                                       CAUGHT     r3_auth_ps_table=ok | r3_auth_other_readers=FAILED (failures=1) | defects_runner=ok
+R16 carriers: the reader need not be listed                                 CAUGHT     r3_auth_ps_table=ok | r3_auth_other_readers=FAILED (failures=2) | defects_runner=ok
+R17 cwd_under: lsof without -a (every open file of those pids)              CAUGHT     r3_auth_ps_table=ok | r3_auth_other_readers=FAILED (failures=6) | defects_runner=ok
+R18 ps pinned with LC_ALL=C instead of LC_TIME                              CAUGHT     r3_auth_ps_table=FAILED (failures=2, errors=1) | r3_auth_other_readers=ok | defects_runner=ok
+R19 lsof: field terminator not NUL (-F, not -F0)                            CAUGHT     r3_auth_ps_table=ok | r3_auth_other_readers=FAILED (failures=1, errors=5) | defects_runner=ok
+R20 windows: a non-row is skipped                                           CAUGHT     r3_auth_ps_table=ok | r3_auth_other_readers=FAILED (failures=11) | defects_runner=ok
+R21 windows: a pid twice is overwritten                                     CAUGHT     r3_auth_ps_table=ok | r3_auth_other_readers=FAILED (failures=1) | defects_runner=ok
+R22 windows: command line not base64 (raw)                                  CAUGHT     r3_auth_ps_table=ok | r3_auth_other_readers=FAILED (failures=1) | defects_runner=ok
+R23 windows: CRLF not folded (CR kept at the end of the line)               CAUGHT     r3_auth_ps_table=ok | r3_auth_other_readers=FAILED (failures=1, errors=17) | defects_runner=ok
+R24 lsof: unknown field is ignored                                          CAUGHT     r3_auth_ps_table=ok | r3_auth_other_readers=FAILED (failures=3) | defects_runner=ok
+R25 lsof: a process that is not listed (this one) is an empty answer        CAUGHT     r3_auth_ps_table=ok | r3_auth_other_readers=FAILED (failures=3) | defects_runner=ok

@@ -1,0 +1,1397 @@
+{
+ "target": "aisef2/app/verify.py::verify",
+ "files": [
+  "tests/v2/test_v21_kills3_T22a.py",
+  "tests/v2/test_v21_kills3_T22b.py",
+  "tests/v2/test_v21_kills3_A22.py",
+  "tests/v2/test_v21_defects_verify.py",
+  "tests/v2/test_v21_verify.py",
+  "tests/v2/test_s2_kills.py",
+  "tests/v2/test_v21_r3_detail_product.py"
+ ],
+ "source_sha256": "0996b98ab6da683b30cc30adb58cbbe196eff47f990b7343eeecb71091a746a8",
+ "t0": [
+  {
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "seconds": 5.3,
+   "outcome": "PASS",
+   "ran": 13
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T22b.py",
+   "seconds": 8.89,
+   "outcome": "PASS",
+   "ran": 10
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_A22.py",
+   "seconds": 0.37,
+   "outcome": "PASS",
+   "ran": 7
+  },
+  {
+   "file": "tests/v2/test_v21_defects_verify.py",
+   "seconds": 28.66,
+   "outcome": "PASS",
+   "ran": 20
+  },
+  {
+   "file": "tests/v2/test_v21_verify.py",
+   "seconds": 31.47,
+   "outcome": "PASS",
+   "ran": 8
+  },
+  {
+   "file": "tests/v2/test_s2_kills.py",
+   "seconds": 22.74,
+   "outcome": "PASS",
+   "ran": 43
+  },
+  {
+   "file": "tests/v2/test_v21_r3_detail_product.py",
+   "seconds": 13.1,
+   "outcome": "PASS",
+   "ran": 14
+  }
+ ],
+ "error": null,
+ "results": [
+  {
+   "index": 0,
+   "mutant": "L74 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 1,
+   "mutant": "L92 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_changed_file_is_named_and_the_files_that_agree_are_not (v2.test_v21_kills3_T22a.ManifestProblemNamesTheFilesThatDiffer.test_a_changed_file_is_named_and_the_files_that_agree_are_not) | AssertionError"
+  },
+  {
+   "index": 2,
+   "mutant": "L103 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "ERROR: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | TypeError"
+  },
+  {
+   "index": 3,
+   "mutant": "L109 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 4,
+   "mutant": "L113 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 5,
+   "mutant": "L176 returns None",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "ERROR: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | TypeError"
+  },
+  {
+   "index": 6,
+   "mutant": "L74 Or swapped",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 7,
+   "mutant": "L75 returns None",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 8,
+   "mutant": "L89 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 9,
+   "mutant": "L92 IsNot->Is",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_changed_file_is_named_and_the_files_that_agree_are_not (v2.test_v21_kills3_T22a.ManifestProblemNamesTheFilesThatDiffer.test_a_changed_file_is_named_and_the_files_that_agree_are_not) | AssertionError"
+  },
+  {
+   "index": 10,
+   "mutant": "L103 And swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "ERROR: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | TypeError"
+  },
+  {
+   "index": 11,
+   "mutant": "L105 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22b.py",
+   "first": "FAIL: test_a_match_says_where_the_limit_of_what_it_proves_is_written (v2.test_v21_kills3_T22b.ExpectedAnchor.test_a_match_says_where_the_limit_of_what_it_proves_is_written) | AssertionError"
+  },
+  {
+   "index": 12,
+   "mutant": "L109 NotEq->Eq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 13,
+   "mutant": "L113 not removed",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "ERROR: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | TypeError"
+  },
+  {
+   "index": 14,
+   "mutant": "L115 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 15,
+   "mutant": "L142 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 16,
+   "mutant": "L148 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_capability_that_binds_no_digest_is_a_problem_of_the_journal_never_a_crash (v2.test_v21_kills3_T22a.CapabilitiesThatDoNotMakeARunSpec.test_a_capability_that_binds_no_digest_is_a_problem_of_the_journal_never_a_crash) | AssertionError"
+  },
+  {
+   "index": 17,
+   "mutant": "L157 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 18,
+   "mutant": "L159 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 19,
+   "mutant": "L161 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 20,
+   "mutant": "L163 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 21,
+   "mutant": "L171 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A22.py",
+   "first": "FAIL: test_the_note_names_the_file_and_the_release_boundary (v2.test_v21_kills3_A22.ARunWithoutAManifestIsVerifiedWithANoteThatNamesTheFileAndTheReleaseBoundary.test_the_note_names_the_file_and_the_release_boundary) | AssertionError"
+  },
+  {
+   "index": 22,
+   "mutant": "L176 dict entry 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "ERROR: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | KeyError"
+  },
+  {
+   "index": 23,
+   "mutant": "L176 dict entry 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "ERROR: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | KeyError"
+  },
+  {
+   "index": 24,
+   "mutant": "L176 dict entry 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_verify.py",
+   "first": "ERROR: test_a_budget_stop_removed_from_the_record_is_refuted (v2.test_v21_verify.RecordAlone.test_a_budget_stop_removed_from_the_record_is_refuted) | KeyError"
+  },
+  {
+   "index": 25,
+   "mutant": "L176 dict entry 3 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22b.py",
+   "first": "ERROR: test_a_journal_file_that_is_absent (v2.test_v21_kills3_T22b.JournalReferenceUnreadable.test_a_journal_file_that_is_absent) | KeyError"
+  },
+  {
+   "index": 26,
+   "mutant": "L176 dict entry 4 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22b.py",
+   "first": "ERROR: test_a_directory_without_its_manifest_is_refuted_not_a_crash (v2.test_v21_kills3_T22b.ExpectedAnchor.test_a_directory_without_its_manifest_is_refuted_not_a_crash) | KeyError"
+  },
+  {
+   "index": 27,
+   "mutant": "L176 dict entry 5 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22b.py",
+   "first": "ERROR: test_a_match_says_where_the_limit_of_what_it_proves_is_written (v2.test_v21_kills3_T22b.ExpectedAnchor.test_a_match_says_where_the_limit_of_what_it_proves_is_written) | KeyError"
+  },
+  {
+   "index": 28,
+   "mutant": "L72 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "ERROR: test_a_record_that_cannot_be_read_as_a_file_is_a_refutation_naming_the_file (v2.test_v21_kills3_T22a.NoReadableRunRecord.test_a_record_that_cannot_be_read_as_a_file_is_a_refutation_naming_the_file) | IsADirectoryError"
+  },
+  {
+   "index": 29,
+   "mutant": "L72 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "ERROR: test_a_record_that_is_not_json_is_a_refutation_naming_the_file (v2.test_v21_kills3_T22a.NoReadableRunRecord.test_a_record_that_is_not_json_is_a_refutation_naming_the_file) | json.decoder.JSONDecodeError"
+  },
+  {
+   "index": 30,
+   "mutant": "L73 returns None",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_record_that_cannot_be_read_as_a_file_is_a_refutation_naming_the_file (v2.test_v21_kills3_T22a.NoReadableRunRecord.test_a_record_that_cannot_be_read_as_a_file_is_a_refutation_naming_the_file) | AssertionError"
+  },
+  {
+   "index": 31,
+   "mutant": "L74 not removed",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 32,
+   "mutant": "L74 NotEq->Eq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 33,
+   "mutant": "L75 dict entry 0 dropped",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 34,
+   "mutant": "L75 dict entry 1 dropped",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 35,
+   "mutant": "L89 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_defects_verify.py",
+   "first": "ERROR: test_a_manifest_that_is_valid_json_and_no_manifest_is_refuted_never_a_crash_or_a_pass (v2.test_v21_defects_verify.DamagedRunDirectory.test_a_manifest_that_is_valid_json_and_no_manifest_is_refuted_never_a_crash_or_a_pass) (manifest='[]') | AttributeError"
+  },
+  {
+   "index": 36,
+   "mutant": "L99 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 37,
+   "mutant": "L103 IsNot->Is",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "ERROR: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | TypeError"
+  },
+  {
+   "index": 38,
+   "mutant": "L103 NotEq->Eq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22b.py",
+   "first": "FAIL: test_a_directory_without_its_manifest_is_refuted_not_a_crash (v2.test_v21_kills3_T22b.ExpectedAnchor.test_a_directory_without_its_manifest_is_refuted_not_a_crash) | AssertionError"
+  },
+  {
+   "index": 39,
+   "mutant": "L105 IsNot->Is",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22b.py",
+   "first": "FAIL: test_a_match_says_where_the_limit_of_what_it_proves_is_written (v2.test_v21_kills3_T22b.ExpectedAnchor.test_a_match_says_where_the_limit_of_what_it_proves_is_written) | AssertionError"
+  },
+  {
+   "index": 40,
+   "mutant": "L111 string 'journal' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 41,
+   "mutant": "L115 not removed",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 42,
+   "mutant": "L123 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 43,
+   "mutant": "L136 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 44,
+   "mutant": "L136 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 45,
+   "mutant": "L140 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 46,
+   "mutant": "L141 sorted() -> list()",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 47,
+   "mutant": "L145 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 48,
+   "mutant": "L145 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 49,
+   "mutant": "L148 IsNot->Is",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_capability_that_binds_no_digest_is_a_problem_of_the_journal_never_a_crash (v2.test_v21_kills3_T22a.CapabilitiesThatDoNotMakeARunSpec.test_a_capability_that_binds_no_digest_is_a_problem_of_the_journal_never_a_crash) | AssertionError"
+  },
+  {
+   "index": 50,
+   "mutant": "L152 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 51,
+   "mutant": "L156 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 52,
+   "mutant": "L156 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 53,
+   "mutant": "L156 element 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 54,
+   "mutant": "L157 And swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 55,
+   "mutant": "L159 NotEq->Eq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 56,
+   "mutant": "L161 And swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 57,
+   "mutant": "L163 And swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_record_without_a_usage_account_verifies (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_record_without_a_usage_account_verifies) | AssertionError"
+  },
+  {
+   "index": 58,
+   "mutant": "L168 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 59,
+   "mutant": "L171 And swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_s2_kills.py",
+   "first": "FAIL: test_the_answer_is_whole_and_every_branch_is_its_own (v2.test_s2_kills.AppVerify.test_the_answer_is_whole_and_every_branch_is_its_own) | AssertionError"
+  },
+  {
+   "index": 60,
+   "mutant": "L172 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 61,
+   "mutant": "L176 string 'verdict' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "ERROR: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | KeyError"
+  },
+  {
+   "index": 62,
+   "mutant": "L176 string 'problems' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "ERROR: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | KeyError"
+  },
+  {
+   "index": 63,
+   "mutant": "L176 string 'delivery_verdict' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_verify.py",
+   "first": "ERROR: test_a_budget_stop_removed_from_the_record_is_refuted (v2.test_v21_verify.RecordAlone.test_a_budget_stop_removed_from_the_record_is_refuted) | KeyError"
+  },
+  {
+   "index": 64,
+   "mutant": "L177 string 'journal_events' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22b.py",
+   "first": "ERROR: test_a_journal_file_that_is_absent (v2.test_v21_kills3_T22b.JournalReferenceUnreadable.test_a_journal_file_that_is_absent) | KeyError"
+  },
+  {
+   "index": 65,
+   "mutant": "L177 string 'evidence_anchor' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22b.py",
+   "first": "ERROR: test_a_directory_without_its_manifest_is_refuted_not_a_crash (v2.test_v21_kills3_T22b.ExpectedAnchor.test_a_directory_without_its_manifest_is_refuted_not_a_crash) | KeyError"
+  },
+  {
+   "index": 66,
+   "mutant": "L177 string 'notes' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22b.py",
+   "first": "ERROR: test_a_match_says_where_the_limit_of_what_it_proves_is_written (v2.test_v21_kills3_T22b.ExpectedAnchor.test_a_match_says_where_the_limit_of_what_it_proves_is_written) | KeyError"
+  },
+  {
+   "index": 67,
+   "mutant": "L176 conditional negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 68,
+   "mutant": "L73 dict entry 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_record_that_cannot_be_read_as_a_file_is_a_refutation_naming_the_file (v2.test_v21_kills3_T22a.NoReadableRunRecord.test_a_record_that_cannot_be_read_as_a_file_is_a_refutation_naming_the_file) | AssertionError"
+  },
+  {
+   "index": 69,
+   "mutant": "L73 dict entry 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_record_that_cannot_be_read_as_a_file_is_a_refutation_naming_the_file (v2.test_v21_kills3_T22a.NoReadableRunRecord.test_a_record_that_cannot_be_read_as_a_file_is_a_refutation_naming_the_file) | AssertionError"
+  },
+  {
+   "index": 70,
+   "mutant": "L75 string 'verdict' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 71,
+   "mutant": "L75 string 'problems' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 72,
+   "mutant": "L75 string 'REFUTED' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 73,
+   "mutant": "L89 not removed",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 74,
+   "mutant": "L89 not removed",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 75,
+   "mutant": "L99 NotEq->Eq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 76,
+   "mutant": "L109 string 'bundle_digest' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 77,
+   "mutant": "L110 string 'the run is not of this project bundle' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 78,
+   "mutant": "L114 string 'the run has no journal (it ended before the run began)' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 79,
+   "mutant": "L123 Or swapped",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 80,
+   "mutant": "L128 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 81,
+   "mutant": "L149 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 82,
+   "mutant": "L149 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 83,
+   "mutant": "L150 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 84,
+   "mutant": "L156 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_verify.py",
+   "first": "FAIL: test_a_budget_stop_removed_from_the_record_is_refuted (v2.test_v21_verify.RecordAlone.test_a_budget_stop_removed_from_the_record_is_refuted) | AssertionError"
+  },
+  {
+   "index": 85,
+   "mutant": "L157 Eq->NotEq",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 86,
+   "mutant": "L158 string 'FAIL' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 87,
+   "mutant": "L161 NotEq->Eq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 88,
+   "mutant": "L163 NotIn->In",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 89,
+   "mutant": "L168 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 90,
+   "mutant": "L172 NotEq->Eq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 91,
+   "mutant": "L176 string 'REFUTED' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 92,
+   "mutant": "L176 string 'VERIFIED' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 93,
+   "mutant": "L73 string 'verdict' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_record_that_cannot_be_read_as_a_file_is_a_refutation_naming_the_file (v2.test_v21_kills3_T22a.NoReadableRunRecord.test_a_record_that_cannot_be_read_as_a_file_is_a_refutation_naming_the_file) | AssertionError"
+  },
+  {
+   "index": 94,
+   "mutant": "L73 string 'problems' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_record_that_cannot_be_read_as_a_file_is_a_refutation_naming_the_file (v2.test_v21_kills3_T22a.NoReadableRunRecord.test_a_record_that_cannot_be_read_as_a_file_is_a_refutation_naming_the_file) | AssertionError"
+  },
+  {
+   "index": 95,
+   "mutant": "L73 string 'REFUTED' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_record_that_cannot_be_read_as_a_file_is_a_refutation_naming_the_file (v2.test_v21_kills3_T22a.NoReadableRunRecord.test_a_record_that_cannot_be_read_as_a_file_is_a_refutation_naming_the_file) | AssertionError"
+  },
+  {
+   "index": 96,
+   "mutant": "L74 string 'format' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 97,
+   "mutant": "L100 sorted() -> list()",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_the_paths_are_the_first_five_in_sorted_order_whatever_the_hash_seed (v2.test_v21_kills3_T22a.ManifestProblemNamesTheFilesThatDiffer.test_the_paths_are_the_first_five_in_sorted_order_whatever_the_hash_seed) | AssertionError"
+  },
+  {
+   "index": 98,
+   "mutant": "L104 string 'the evidence anchor is ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22b.py",
+   "first": "FAIL: test_a_directory_without_its_manifest_is_refuted_not_a_crash (v2.test_v21_kills3_T22b.ExpectedAnchor.test_a_directory_without_its_manifest_is_refuted_not_a_crash) | AssertionError"
+  },
+  {
+   "index": 99,
+   "mutant": "L104 string ', not the ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A22.py",
+   "first": "FAIL: test_the_directory_s_prefix_then_the_expected_one (v2.test_v21_kills3_A22.TheAnchorsOfAMismatchAreTwoTokensInRoleOrder.test_the_directory_s_prefix_then_the_expected_one) | AssertionError"
+  },
+  {
+   "index": 100,
+   "mutant": "L104 string ' the run printed' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 101,
+   "mutant": "L106 string 'the anchor matches the expected value: authentic only as far as that value came from a store the developer cannot write (docs/v2.1/ANCHOR-THREAT-MODEL.md); it does not prove the run happened as its journal says' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22b.py",
+   "first": "FAIL: test_a_match_says_where_the_limit_of_what_it_proves_is_written (v2.test_v21_kills3_T22b.ExpectedAnchor.test_a_match_says_where_the_limit_of_what_it_proves_is_written) | AssertionError"
+  },
+  {
+   "index": 102,
+   "mutant": "L116 string \"RUN.json's journal reference is not an object\" emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_defects_verify.py",
+   "first": "FAIL: test_a_journal_reference_that_is_no_object_or_no_path_is_refuted (v2.test_v21_defects_verify.DamagedRunDirectory.test_a_journal_reference_that_is_no_object_or_no_path_is_refuted) (journal='x') | AssertionError"
+  },
+  {
+   "index": 103,
+   "mutant": "L120 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22b.py",
+   "first": "ERROR: test_a_journal_file_that_is_absent (v2.test_v21_kills3_T22b.JournalReferenceUnreadable.test_a_journal_file_that_is_absent) | FileNotFoundError"
+  },
+  {
+   "index": 104,
+   "mutant": "L120 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22b.py",
+   "first": "ERROR: test_a_journal_reference_without_a_path (v2.test_v21_kills3_T22b.JournalReferenceUnreadable.test_a_journal_reference_without_a_path) | KeyError"
+  },
+  {
+   "index": 105,
+   "mutant": "L120 element 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22b.py",
+   "first": "ERROR: test_a_journal_path_that_is_not_a_path (v2.test_v21_kills3_T22b.JournalReferenceUnreadable.test_a_journal_path_that_is_not_a_path) | TypeError"
+  },
+  {
+   "index": 106,
+   "mutant": "L120 element 3 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_defects_verify.py",
+   "first": "ERROR: test_a_journal_reference_that_is_no_object_or_no_path_is_refuted (v2.test_v21_defects_verify.DamagedRunDirectory.test_a_journal_reference_that_is_no_object_or_no_path_is_refuted) | ValueError"
+  },
+  {
+   "index": 107,
+   "mutant": "L123 NotEq->Eq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 108,
+   "mutant": "L123 NotEq->Eq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 109,
+   "mutant": "L140 string 'story_outcomes' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 110,
+   "mutant": "L155 dict entry 0 dropped",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 111,
+   "mutant": "L155 dict entry 1 dropped",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 112,
+   "mutant": "L155 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A22.py",
+   "first": "FAIL: test_the_note_names_the_file_and_the_release_boundary (v2.test_v21_kills3_A22.ARunWithoutAManifestIsVerifiedWithANoteThatNamesTheFileAndTheReleaseBoundary.test_the_note_names_the_file_and_the_release_boundary) | AssertionError"
+  },
+  {
+   "index": 113,
+   "mutant": "L157 string 'failure' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 114,
+   "mutant": "L157 string 'PASS' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 115,
+   "mutant": "L159 string 'delivery_verdict' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 116,
+   "mutant": "L162 string \"the record's ProductProof account is not the one the journal re-derives\" emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 117,
+   "mutant": "L163 string 'error' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_usage_the_run_named_as_a_fault_is_not_an_account_to_compare (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_usage_the_run_named_as_a_fault_is_not_an_account_to_compare) | AssertionError"
+  },
+  {
+   "index": 118,
+   "mutant": "L168 NotEq->Eq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 119,
+   "mutant": "L169 NotEq->Eq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 120,
+   "mutant": "L171 string 'final_main' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 121,
+   "mutant": "L71 string 'utf-8' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "ERROR: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | LookupError"
+  },
+  {
+   "index": 122,
+   "mutant": "L75 string 'RUN.json is not a run record of format ' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 123,
+   "mutant": "L78 string 'utf-8' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "ERROR: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | LookupError"
+  },
+  {
+   "index": 124,
+   "mutant": "L81 string 'no ' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 125,
+   "mutant": "L81 string ': a run of a release before 2.1 \u2014 its record is bound by nothing but itself' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A22.py",
+   "first": "FAIL: test_the_note_names_the_file_and_the_release_boundary (v2.test_v21_kills3_A22.ARunWithoutAManifestIsVerifiedWithANoteThatNamesTheFileAndTheReleaseBoundary.test_the_note_names_the_file_and_the_release_boundary) | AssertionError"
+  },
+  {
+   "index": 126,
+   "mutant": "L84 string ' is not JSON' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22b.py",
+   "first": "FAIL: test_a_corrupt_manifest_is_refuted_naming_the_file_and_why (v2.test_v21_kills3_T22b.ManifestThatIsNotJson.test_a_corrupt_manifest_is_refuted_naming_the_file_and_why) | AssertionError"
+  },
+  {
+   "index": 127,
+   "mutant": "L87 string ' cannot be read (' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 128,
+   "mutant": "L87 string ')' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 129,
+   "mutant": "L91 string ' is not an evidence manifest (a JSON object holding its files)' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 130,
+   "mutant": "L104 And swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22b.py",
+   "first": "ERROR: test_a_directory_without_its_manifest_is_refuted_not_a_crash (v2.test_v21_kills3_T22b.ExpectedAnchor.test_a_directory_without_its_manifest_is_refuted_not_a_crash) | TypeError"
+  },
+  {
+   "index": 131,
+   "mutant": "L124 string 'the journal is not the one RUN.json names (digest or length)' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_defects_verify.py",
+   "first": "FAIL: test_a_journal_reference_that_is_no_object_or_no_path_is_refuted (v2.test_v21_defects_verify.DamagedRunDirectory.test_a_journal_reference_that_is_no_object_or_no_path_is_refuted) | AssertionError"
+  },
+  {
+   "index": 132,
+   "mutant": "L127 dict entry 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 133,
+   "mutant": "L127 dict entry 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 134,
+   "mutant": "L127 dict entry 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 135,
+   "mutant": "L141 NotEq->Eq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 136,
+   "mutant": "L143 string \"the record's story outcomes are not the journal's for \" emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_verify.py",
+   "first": "FAIL: test_story_outcomes_that_are_not_the_journal_s_are_refuted (v2.test_v21_verify.RecordAlone.test_story_outcomes_that_are_not_the_journal_s_are_refuted) | AssertionError"
+  },
+  {
+   "index": 137,
+   "mutant": "L150 string 'spent' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 138,
+   "mutant": "L151 NotEq->Eq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 139,
+   "mutant": "L155 string 'story' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 140,
+   "mutant": "L155 string 'error' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 141,
+   "mutant": "L155 string 'begun and never ended in the journal' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 142,
+   "mutant": "L156 string 'budget_stop' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 143,
+   "mutant": "L160 string 'the record says ' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 144,
+   "mutant": "L160 string '; the journal re-derives ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_verify.py",
+   "first": "FAIL: test_a_budget_stop_removed_from_the_record_is_refuted (v2.test_v21_verify.RecordAlone.test_a_budget_stop_removed_from_the_record_is_refuted) | AssertionError"
+  },
+  {
+   "index": 145,
+   "mutant": "L161 string 'productproof' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 146,
+   "mutant": "L163 string 'usage' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 147,
+   "mutant": "L163 string 'usage' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 148,
+   "mutant": "L170 string \"the record's usage is not what the evidence re-derives\" emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 149,
+   "mutant": "L172 string 'final_main' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 150,
+   "mutant": "L173 string \"the run's repository main is not the record's final main\" emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 151,
+   "mutant": "L71 string 'RUN.json' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 152,
+   "mutant": "L73 string ': no readable run record (' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A22.py",
+   "first": "FAIL: test_the_path_is_delimited_and_the_cause_class_is_a_token (v2.test_v21_kills3_A22.AnUnreadableRecordIsNamedByItsFileAndItsCause.test_the_path_is_delimited_and_the_cause_class_is_a_token) [absent] | AssertionError"
+  },
+  {
+   "index": 153,
+   "mutant": "L73 string ')' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 154,
+   "mutant": "L89 string 'files' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_defects_verify.py",
+   "first": "ERROR: test_a_manifest_that_is_valid_json_and_no_manifest_is_refuted_never_a_crash_or_a_pass (v2.test_v21_defects_verify.DamagedRunDirectory.test_a_manifest_that_is_valid_json_and_no_manifest_is_refuted_never_a_crash_or_a_pass) (manifest='{\"files\": []}') | AttributeError"
+  },
+  {
+   "index": 155,
+   "mutant": "L97 string 'an evidence file cannot be read (' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 156,
+   "mutant": "L97 string '): ' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 157,
+   "mutant": "L102 string 'the evidence manifest does not match the run directory: ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_changed_file_is_named_and_the_files_that_agree_are_not (v2.test_v21_kills3_T22a.ManifestProblemNamesTheFilesThatDiffer.test_a_changed_file_is_named_and_the_files_that_agree_are_not) | AssertionError"
+  },
+  {
+   "index": 158,
+   "mutant": "L123 string 'sha256' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 159,
+   "mutant": "L123 string 'lines' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 160,
+   "mutant": "L126 string 'utf-8' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 161,
+   "mutant": "L127 string 'seq' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 162,
+   "mutant": "L127 string 'type' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 163,
+   "mutant": "L127 string 'data' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 164,
+   "mutant": "L129 string 'the journal ends in a torn line' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 165,
+   "mutant": "L150 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 166,
+   "mutant": "L153 string \"the record's spend is not what the evidence re-derives for \" emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22b.py",
+   "first": "FAIL: test_the_counter_that_differs_is_named_and_the_ones_that_agree_are_not (v2.test_v21_kills3_T22b.SpendLoweredAlone.test_the_counter_that_differs_is_named_and_the_ones_that_agree_are_not) | AssertionError"
+  },
+  {
+   "index": 167,
+   "mutant": "L155 string 'story_errors' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_defects_verify.py",
+   "first": "FAIL: test_a_record_field_of_another_type_is_refuted_never_a_crash (v2.test_v21_defects_verify.DamagedRunDirectory.test_a_record_field_of_another_type_is_refuted_never_a_crash) [story_errors a number] | AssertionError"
+  },
+  {
+   "index": 168,
+   "mutant": "L165 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22b.py",
+   "first": "FAIL: test_a_priced_run_verifies_and_its_cost_stays_known (v2.test_v21_kills3_T22b.PricedRun.test_a_priced_run_verifies_and_its_cost_stays_known) | AssertionError"
+  },
+  {
+   "index": 169,
+   "mutant": "L168 string 'usage' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 170,
+   "mutant": "L169 string 'no_progress' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 171,
+   "mutant": "L171 string 'repo' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_s2_kills.py",
+   "first": "FAIL: test_the_answer_is_whole_and_every_branch_is_its_own (v2.test_s2_kills.AppVerify.test_the_answer_is_whole_and_every_branch_is_its_own) | AssertionError"
+  },
+  {
+   "index": 172,
+   "mutant": "L175 string 'the record cannot be re-derived from the evidence: ' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 173,
+   "mutant": "L175 string ': ' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 174,
+   "mutant": "L101 NotEq->Eq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_changed_file_is_named_and_the_files_that_agree_are_not (v2.test_v21_kills3_T22a.ManifestProblemNamesTheFilesThatDiffer.test_a_changed_file_is_named_and_the_files_that_agree_are_not) | AssertionError"
+  },
+  {
+   "index": 175,
+   "mutant": "L122 string 'the journal RUN.json names cannot be read (' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22b.py",
+   "first": "FAIL: test_a_journal_file_that_is_absent (v2.test_v21_kills3_T22b.JournalReferenceUnreadable.test_a_journal_file_that_is_absent) | AssertionError"
+  },
+  {
+   "index": 176,
+   "mutant": "L122 string ')' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 177,
+   "mutant": "L160 string 'delivery_verdict' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 178,
+   "mutant": "L73 string 'RUN.json' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_record_that_cannot_be_read_as_a_file_is_a_refutation_naming_the_file (v2.test_v21_kills3_T22a.NoReadableRunRecord.test_a_record_that_cannot_be_read_as_a_file_is_a_refutation_naming_the_file) | AssertionError"
+  },
+  {
+   "index": 179,
+   "mutant": "L119 string 'path' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 180,
+   "mutant": "L131 string 'the journal does not reconstruct: ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_s2_kills.py",
+   "first": "FAIL: test_the_answer_is_whole_and_every_branch_is_its_own (v2.test_s2_kills.AppVerify.test_the_answer_is_whole_and_every_branch_is_its_own) | AssertionError"
+  },
+  {
+   "index": 181,
+   "mutant": "L131 string ': ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_s2_kills.py",
+   "first": "FAIL: test_the_answer_is_whole_and_every_branch_is_its_own (v2.test_s2_kills.AppVerify.test_the_answer_is_whole_and_every_branch_is_its_own) | AssertionError"
+  },
+  {
+   "index": 182,
+   "mutant": "L150 string 'budget' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 183,
+   "mutant": "L165 string 'settings' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22b.py",
+   "first": "FAIL: test_a_priced_run_verifies_and_its_cost_stays_known (v2.test_v21_kills3_T22b.PricedRun.test_a_priced_run_verifies_and_its_cost_stays_known) | AssertionError"
+  },
+  {
+   "index": 184,
+   "mutant": "L172 string 'rev-parse' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 185,
+   "mutant": "L172 string 'main' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 186,
+   "mutant": "L172 string 'repo' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_no_progress_report_that_the_journal_does_not_hold_is_refuted_by_the_account) | AssertionError"
+  },
+  {
+   "index": 187,
+   "mutant": "L100 string 'files' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_file_the_manifest_binds_and_the_directory_lacks_is_named (v2.test_v21_kills3_T22a.ManifestProblemNamesTheFilesThatDiffer.test_a_file_the_manifest_binds_and_the_directory_lacks_is_named) | AssertionError"
+  },
+  {
+   "index": 188,
+   "mutant": "L100 string 'files' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "ERROR: test_a_changed_file_is_named_and_the_files_that_agree_are_not (v2.test_v21_kills3_T22a.ManifestProblemNamesTheFilesThatDiffer.test_a_changed_file_is_named_and_the_files_that_agree_are_not) | KeyError"
+  },
+  {
+   "index": 189,
+   "mutant": "L101 string 'files' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_changed_file_is_named_and_the_files_that_agree_are_not (v2.test_v21_kills3_T22a.ManifestProblemNamesTheFilesThatDiffer.test_a_changed_file_is_named_and_the_files_that_agree_are_not) | AssertionError"
+  },
+  {
+   "index": 190,
+   "mutant": "L101 string 'files' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "ERROR: test_a_changed_file_is_named_and_the_files_that_agree_are_not (v2.test_v21_kills3_T22a.ManifestProblemNamesTheFilesThatDiffer.test_a_changed_file_is_named_and_the_files_that_agree_are_not) | KeyError"
+  }
+ ]
+}

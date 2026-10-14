@@ -1,0 +1,268 @@
+{
+ "wp": "auth",
+ "reviewer_branch": "v21r3/auth-rv",
+ "head": "cefa67f6a7a713f58773811758a3d9024f9bacb3",
+ "reviewed": "v21r3/auth @ 67d5416f3c2c794df4563a644b7002bfa07e7cd5 (module digest 52bfcbdc60c3..., base v21r3/integ 643a6e0)",
+ "verdict": "ACCEPT_WITH_FIXES",
+ "owner_sentences": [
+  {
+   "sentence": "INV-MUTATION-AUTHORITY: implementation-under-test output MUST NOT expand host-side destructive authority (a command line is implementation output)",
+   "status": "MET for every ps measured (macOS 26.5.2, the guest's procps); NOT ESTABLISHED for a ps that prints a raw LF",
+   "evidence": "independent real-process matrix, 274 variants x host and guest: victim never in owned / prove_member / signalled, 0 refusals, every row equal to `ps -p` (adv-real-after-digits.json, adv-guest-after.json); the same matrix at the integration head: 68 owned, 63 member, 131 signalled entries (adv-real-before.json = positive control); 20 000 generated tables (fuzz-out.txt); raw LF measured again, argv/env/comm/zombie/empty argv, macOS and guest: never raw (probe_ps_env_lf.out.txt, probe_comm_lf.out.txt, guest-probe-comm.out.txt). Residual simulated: residual_sim.py.txt"
+  },
+  {
+   "sentence": "FU-AUTH 1: reproduce first, for real, read-only, dry_run: a forged row accepted by _read at the integration head; keep script and output",
+   "status": "MET",
+   "evidence": "implementer's repro-forged-row.py.txt + before/after; reproduced independently (adv_real.py.txt on tree-before: U+2028/U+2029 only; other separators are escaped by this ps)"
+  },
+  {
+   "sentence": "FU-AUTH 2: read bytes, decode with replacement, split at LF only; strict pattern (ASCII digits, five-field lstart, day possibly space-padded, command as printed); non-row line = typed fail-closed error; say what each caller does with it",
+   "status": "MET (one gap fixed in review: a digit run of > 4300 characters raised an untyped ValueError)",
+   "evidence": "cleanup_authority.py _lines/_PS_ROW/_ps_rows/_read; `Oct  6` seen in real ps and `ps -p`; callers table checked line by line against mutation.py (1317/1328-1331/1342-1344/1354-1356/1375-1378/1816/2047-2050); digits: tests/v2/test_v21_r3_auth_rv_digits.py"
+  },
+  {
+   "sentence": "FU-AUTH 2: test the real ps of this host (all 600+ rows parse) and the Linux guest's procps",
+   "status": "MET",
+   "evidence": "host 705-737 rows in 23 environments and 150 churned reads, 0 refusals (honest-real-out.json, honest-real-after-digits.json); guest 63 rows = independent call, 60/60 commands equal `ps -p` (guest-many-rows-rv.json, re-run)"
+  },
+  {
+   "sentence": "FU-AUTH 3: fix the sibling readers with the same split rule and typed failure: _windows_table (script emits no raw CR/LF; -replace), carriers, cwd_under (lsof -F, -0)",
+   "status": "carriers MET; cwd_under MET; _windows_table PARTLY: base64 instead of -replace (a stronger property, a deviation said so), NOT RUN on Windows",
+   "evidence": "kc over _windows_table 20/20, _win_rows 15/15, _env_rows 8/8, _lsof_cwds 27/27, carriers 39/39, cwd_under 48/48 KILLED; script read: balanced, one $_.CommandLine inside ToBase64String(UTF8.GetBytes([string]...)), no double quotes/backticks; real lsof/ps -E children found with U+2028/U+2029/NBSP in env and cwd"
+  },
+  {
+   "sentence": "FU-AUTH 4: tests through the module's seams for U+2028, U+2029, U+0085, \\x0c, \\x0b, \\x1c-\\x1e, \\r, an embedded forged row, a non-digit pid, a leading Unicode space, a failed ps, a table without its reader; assert the proofs; real-host reproduction if hermetic and < 3 s",
+   "status": "MET",
+   "evidence": "30 + 34 tests, 0.2 s + 1.2 s; 25 one-edit wrong implementations of the FINAL module all caught (wrong-impls-rv.txt)"
+  },
+  {
+   "sentence": "FU-AUTH 5: kill_check over ALL mutants of every changed function, survivors dispositioned; the listed test modules; guest roles a/b/c/d1",
+   "status": "MET",
+   "evidence": "222/222 KILLED re-run (kc/, kc2/); modules and guest roles re-run (test_runs)"
+  }
+ ],
+ "claims": [
+  {
+   "claim": "at the integration head U+2028/U+2029 + row-shaped text made a pre-boundary process `signalled`",
+   "verdict": "CONFIRMED",
+   "note": "own matrix: 68 victim-in-owned, 63 prove_member, 131 signalled entries; also forges the row (ppid = runner, born 2099)"
+  },
+  {
+   "claim": "the same cut lost the candidates of carriers (ps -E) and cwd_under (lsof -F)",
+   "verdict": "REVISED",
+   "note": "carriers: confirmed (env_carrier_not_found for U+2028/U+2029 variants). cwd_under: the candidate is lost only when the PREFIX itself holds the separator (the repro passes d + os.sep). The runner calls it with its scratch root + os.sep, so a U+2028 in a subdirectory name was found by the OLD code too (adv-real-before.json has no cwd_wrong). The fix is right; the production hazard of the old cwd_under was nil."
+  },
+  {
+   "claim": "in the Linux guest the hazard does not reproduce, before or after",
+   "verdict": "CONFIRMED",
+   "note": "adv matrix in the guest against both modules: 0 owned/member/signalled (adv-guest-before.json, adv-guest-after.json); procps prints a separator as `?` in a comm, argv, zombie [comm], empty-argv [comm] (guest-probe-comm.out.txt)"
+  },
+  {
+   "claim": "a pid listed twice, a failed ps and a table without its reader are refused alike; ps runs with LC_TIME=C because de/ja/fr made every row unparsable",
+   "verdict": "CONFIRMED",
+   "note": "integration-head module under LC_ALL de_DE/ja_JP/fr_FR: `ps -A exited 0 and did not list itself`; en_US reads 708 rows. R05/R08/R09/R12 wrong impls caught"
+  },
+  {
+   "claim": "Windows: base64 deviation; not run; Python side covered by injected-output tests",
+   "verdict": "CONFIRMED",
+   "note": "script is syntactically valid by reading; Python side: 9 tests + 35 mutants killed; NEVER executed in PowerShell (no pwsh here). A UTF-8 BOM or a warning line on stdout would be refused (fail-closed, Windows path unusable), never wider"
+  },
+  {
+   "claim": "every caller already stops on OSError as HOST_TABLE_UNREADABLE (:1330, :1356, :2048; :1816 RUNNER_EXCEPTION)",
+   "verdict": "CONFIRMED",
+   "note": "line numbers verified at 643a6e0; the caller table of the doc is complete for validation/ and tests/ (grep -rln cleanup_authority)"
+  },
+  {
+   "claim": "kill_check over all 12 functions: 222 mutants, 222 killed, 0 survived",
+   "verdict": "CONFIRMED",
+   "note": "re-run by the reviewer. Two targets (_windows_table, _lsof_cwds) first came out NOT_RUN: two kill_check runs started at once from one tree share the runner's worker id and see each other's test processes as leftovers (and I edited the tree during one window); run alone: 20/20 and 27/27. 6 kills (the argv elements of the ps call) were first caught by the real-ps test TheRealPs; the hermetic tests assert only argv[0] of that call"
+  },
+  {
+   "claim": "ten plausible wrong implementations each fail the new tests",
+   "verdict": "REVISED",
+   "note": "the evidence file was produced on an earlier state of the module (it says 29 tests; the anchor of its variant W8 is gone from the final module). Re-run on the final module with 25 variants (10 of theirs adapted + 15 new): 25/25 caught"
+  },
+  {
+   "claim": "one guest failure, p4.test_mutation_safety::test_MUT_SAFE_6: the container has 2 processes and the test needs > 50; identical at the integration head",
+   "verdict": "CONFIRMED (cause); the integration-head guest run was not repeated",
+   "note": "assertion `len(reported) > 50` is on what the mutant `_Posix.escaped` reports, not on this module. Consequence the doc does not state: that test's authority assertion is NOT exercised in the guest at all; its evidence is the host run only"
+  },
+  {
+   "claim": "the P4/calibration failures are stale sealed records, not this change",
+   "verdict": "CONFIRMED",
+   "note": "all 17 problems of Classify.test_historical_records_read_as_before name aisef2/runtime/process_range.py; calibration: mutation, migration_table, execution_order not calibrated, cleanup_authority and destructive_authority calibrated"
+  },
+  {
+   "claim": "residual: a ps that prints a raw LF cannot be told from a real row by shape; closed only for a pid also listed",
+   "verdict": "REVISED",
+   "note": "true but understated: the unlisted-pid case reaches killpg of an orphaned process group (a group id outlives its leader), not only 'a pid that might be reused' (residual_sim.py.txt, SIMULATED). prove_member still refuses a member born before the boundary; killpg looks at no member"
+  }
+ ],
+ "defects_found": [
+  {
+   "what": "all four readers (ps, ps -E, lsof, PowerShell) took [0-9]+ and int() of > 4300 digits raises ValueError (CPython 3.11+), not the typed TableUnreadable the runner stops on: the defect class of batch T23a (a ValueError out of the reader). Reachable only through a line no measured tool prints",
+   "severity": "low",
+   "fixed_in_commit": "cefa67f"
+  },
+  {
+   "what": "decision doc: the raw-LF residual understated (group ids outlive their leaders); the wrong-implementation evidence is from an earlier module state; lsof's escaping of control characters and strptime's dependence on the process's LC_TIME not stated",
+   "severity": "doc",
+   "fixed_in_commit": "cefa67f"
+  },
+  {
+   "what": "cwd_under (and the carriers' prefix) find nothing under a prefix holding TAB/LF/CR/FF/VT/ESC/DEL/NEL: lsof prints them escaped (\\t \\n \\r \\f ^K ^[ \\x7f \\xc2\\x85, a backslash as \\\\); the prefix with the real character does not match. Unchanged by this WP and not claimed fixed; the runner's prefix is its own scratch directory",
+   "severity": "info",
+   "fixed_in_commit": null
+  },
+  {
+   "what": "docs/v2.1/MUTATION-RUNNER-V2.md section 2.4 item 1 says HOST_TABLE_UNREADABLE is a `ps` fork failure: incomplete (any non-row line, a pid twice, a failed tool). The file is in the requalification HARNESS digest set (validation/qualification/v21_requalification.py:118), so not edited; docs/v2.1/decisions/B03-R3-range.md:459 still says cleanup_authority is 'Not fixed (not mine)' (another WP's file)",
+   "severity": "doc",
+   "fixed_in_commit": null
+  },
+  {
+   "what": "p4.test_mutation_safety::test_MUT_SAFE_6 cannot reach its authority assertion in a 2-process container: the guest does not exercise it (host only)",
+   "severity": "info",
+   "fixed_in_commit": null
+  }
+ ],
+ "counter_examples": [
+  {
+   "kind": "REAL, tried and failed to break the fix",
+   "what": "274 variants per run on macOS 26.5.2 and in the guest: 33 separator code points x {after, around a forged row} x {parent = runner, parent = a carrier whose group the victim is forged into}, argv[0] itself a row / a lstart lookalike / led by NBSP or U+2028 / a chain of rows / the reader's pid with an early date, invalid UTF-8, empty arguments, a 100 000-character argument, environments and cwds holding the same",
+   "result": "victim never owned, never a member, never signalled; no refusal; rows equal ps -p"
+  },
+  {
+   "kind": "SIMULATED (needs a ps that prints a raw LF; none measured)",
+   "what": "group 900: leader exited, unrelated member 901 alive; a carrier's command holds LF + `900 <runner> 900 <2099> x`",
+   "result": "signal_owned(groups=[900]) signalled group 900 (killpg would hit 901); prove_member(901, 900) None (born before the boundary). With the leader listed: refused as a pid listed twice. Fuzz: 7 648 of 9 500 accepted raw-LF readings added an unlisted pid; 0 altered or lost a listed row"
+  },
+  {
+   "kind": "SIMULATED input",
+   "what": "a pid of 5000 digits to _ps_rows/_env_rows/_lsof_cwds/_win_rows",
+   "result": "ValueError at 67d5416 (all four); TableUnreadable after cefa67f"
+  }
+ ],
+ "mutants_rerun": [
+  {
+   "function": "_lines",
+   "total": 4,
+   "killed": 4,
+   "survived": 0
+  },
+  {
+   "function": "_not_a_row",
+   "total": 2,
+   "killed": 2,
+   "survived": 0
+  },
+  {
+   "function": "_twice",
+   "total": 3,
+   "killed": 3,
+   "survived": 0
+  },
+  {
+   "function": "_ps_env",
+   "total": 8,
+   "killed": 8,
+   "survived": 0
+  },
+  {
+   "function": "_ps_rows",
+   "total": 25,
+   "killed": 25,
+   "survived": 0
+  },
+  {
+   "function": "_read",
+   "total": 23,
+   "killed": 23,
+   "survived": 0
+  },
+  {
+   "function": "_win_rows",
+   "total": 15,
+   "killed": 15,
+   "survived": 0
+  },
+  {
+   "function": "_windows_table",
+   "total": 20,
+   "killed": 20,
+   "survived": 0
+  },
+  {
+   "function": "_env_rows",
+   "total": 8,
+   "killed": 8,
+   "survived": 0
+  },
+  {
+   "function": "_lsof_cwds",
+   "total": 27,
+   "killed": 27,
+   "survived": 0
+  },
+  {
+   "function": "carriers",
+   "total": 39,
+   "killed": 39,
+   "survived": 0
+  },
+  {
+   "function": "cwd_under",
+   "total": 48,
+   "killed": 48,
+   "survived": 0
+  },
+  {
+   "function": "after the digit bound, three kill files",
+   "total": 75,
+   "killed": 75,
+   "survived": 0,
+   "note": "_ps_rows 25, _env_rows 8, _win_rows 15, _lsof_cwds 27; T0 PASS for the three files"
+  }
+ ],
+ "false_refusal_search": {
+  "real_host_tables": "23 environments (11 LC_ALL incl. th/ar/fa/he/zh/POSIX/C, LC_TIME/LANG/LANGUAGE alone, empty LC_ALL, COLUMNS 0/1/20, TZ UTC/New_York/Kolkata/Chatham): 0 refusals, 705-737 rows",
+  "churn": "150 _read under process start/exit/zombie churn: 0; 60 x (carriers, cwd_under none, cwd_under since) = 180: 0",
+  "whole_table": "carriers and cwd_under over all rows: ok; 42-row sample equal to ps -p",
+  "generated": "20 000 honest tables, commands with every separator / forged-row text / invalid UTF-8: reading == oracle, owned equal; arbitrary bytes into the four readers: only TableUnreadable after the digit bound (317 untyped ValueError before)",
+  "guest": "63 rows incl. 60 odd children; zombie [a?b] <defunct>, comm via prctl, empty argv: all rows",
+  "not_searched": "BSD/busybox/older macOS ps; procps under a non-C locale (the guest has only C, C.utf8, POSIX); Windows"
+ },
+ "real_vs_simulated_corrections": [
+  "decision doc section 2 table: the cwd_under row is real but is the prefix-equals-cwd configuration; the runner's own configuration was not hurt (see claims)",
+  "decision doc section 4: 'wrong implementations tried' is evidence of an earlier module state; re-run section added",
+  "carriers/cwd_under Linux branches (fake /proc, fake readlink) and every Windows test are SIMULATION and are labelled so; the guest runs TheRealHost against the real /proc (real)",
+  "my own residual_sim.py.txt, fuzz_parser.py.txt (injected bytes) are SIMULATION; adv_real.py.txt, honest_real.py.txt, stress_real.py.txt, probes are REAL (host) and REAL (guest, via guest.sh)"
+ ],
+ "test_runs": [
+  "HOST final tree (cefa67f), via py.sh: test_v21_r3_auth_ps_table 30 OK; test_v21_r3_auth_other_readers 34 OK; test_v21_r3_auth_rv_digits 4 OK; test_v21_defects_runner 3 OK; p0.test_destructive_authority 13 OK; p4.test_mutation_safety 10 OK; p5.test_invariants 50 OK; p4.test_process_range 24 OK; test_v21_confine 34 OK; test_v21_read_set 26 OK; destructive_authority.py --check PASS; ruff check . PASS",
+  "HOST final tree: p2.test_mutation_targets 4 OK; test_s2_mutation_record 12 OK; test_v21_mutation_record 7 OK; test_v21_identity_bytes 4 OK; test_s2_kills 43 OK; test_v21_kill_check 2 OK; test_v21_execution_order 3 OK; test_v21_requalification 3 OK; test_v21_snapshot_delta 51 OK",
+  "HOST final tree (cefa67f): test_v21_mutation_runner 67 run, 1 FAILED = Classify.test_historical_records_read_as_before [P4], 17 problems all naming aisef2/runtime/process_range.py (the same one failure as at 67d5416; not this file)",
+  "HOST at 67d5416 (before my commit): p0.test_checker_calibration 13 run, 4 FAILED = mutation / migration_table / execution_order not calibrated (process_range.py targets 'changed since the mutation run'); cleanup_authority checker calibrates",
+  "PYTHON 3.12.x (the nearest of 3.11-3.14 installed): the new and changed test files 30 + 34 + 4 + 3 OK",
+  "LINUX GUEST (REAL, guest.sh, git archive of cefa67f): linux_guest.py roles a, b, c, d1 exit 0, verdict-bearing fields identical to the recorded 2026-10-08-r2 with pids masked; test_v21_confine 34 OK; p4.test_process_range 24 OK; test_v21_defects_runner 3 OK; auth ps_table 30, other_readers 34, rv_digits 4 OK; p0.test_destructive_authority 13 OK; p4.test_mutation_safety 10 run, 1 FAILED = test_MUT_SAFE_6 (container has 2 processes)",
+  "LINUX GUEST (REAL): many_rows.py 63 rows / 60 children / 60 equal ps -p; adv matrix 274 variants before and after; comm/zombie/empty-argv probe"
+ ],
+ "remaining_risks": [
+  "a ps that prints a raw LF (none measured: macOS escapes, procps prints ?) would let a forged row for an UNLISTED pid in; reach = pid reuse and killpg of an orphaned group (simulated). Structural closure is a design change (see decisions_needed)",
+  "the PowerShell script and its base64 reading were never executed; a real Windows run (PS 5.1 and 7) is still owed; failure mode is an empty or refused table (fail-closed), never wider authority",
+  "ps other than macOS 26.5.2's and the guest's procps (BSD, busybox, older macOS) and glibc ps under non-C locales were not measured; a different lstart format is refused with the line named, not mis-read",
+  "time.strptime uses the process's LC_TIME: a caller that sets a non-English locale would make every honest table refuse (fail-closed, as before the change)",
+  "cwd_under / carriers candidates are lost for a prefix holding control characters (lsof escapes them)",
+  "test_MUT_SAFE_6 is not exercised in the guest; the 'raw U+2028..U+0085, \\x0c, \\x1c' characters are literal in the test source (works on 3.12/3.14 and ruff; fragile for editors)",
+  "sealed records (calibration, mutation record, K-NOWORK, Q0) are stale after any product change, as the WP file says; the lead regenerates"
+ ],
+ "decisions_needed": [
+  "OWNER: accept the raw-LF residual (hypothetical, no measured ps prints it) or require a structural closure: build the ownership table WITHOUT a free-text column (`ps -o pid=,ppid=,pgid=,lstart=` for authority, `command=` read separately and used only for candidates and display), which makes the view unforgeable by construction; cost: a second ps read and every fake-ps test split in two",
+  "OWNER/LEAD: run the Windows path once on a real Windows (PowerShell 5.1 and 7) before it is relied on",
+  "LEAD: wording of docs/v2.1/MUTATION-RUNNER-V2.md section 2.4 (requalification-hashed) and the stale 'Not fixed (not mine)' of B03-R3-range.md:459; register the kill files below if cleanup_authority.py is to become a mutation target"
+ ],
+ "kill_files_by_function": {
+  "validation/v2/cleanup_authority.py::_ps_rows|_env_rows|_win_rows|_lsof_cwds": [
+   "tests/v2/test_v21_r3_auth_rv_digits.py (added by the review, with the implementer's two files)"
+  ]
+ }
+}

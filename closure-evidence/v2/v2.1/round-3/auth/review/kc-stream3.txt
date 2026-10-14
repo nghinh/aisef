@@ -1,0 +1,1 @@
+_windows_table exit=0 # validation/v2/cleanup_authority.py::_windows_table: 20 mutants run, {'KILLED': 20}; T0 [{'file': 'tests/v2/test_v21_r3_auth_ps_table.py', 'seconds': 0.76, 'outcome': 'PASS', 'ran': 30}, {'file': 'tests/v2/test_v21_r3_a

@@ -1,0 +1,179 @@
+{
+ "target": "aisef2/runtime/process_range.py::ProcessRange.release",
+ "files": [
+  "tests/v2/test_v21_r3_range_release_contract.py"
+ ],
+ "source_sha256": "489e7ec3638c2f91365fa94263a38b9d20a36c4fd586c7213c1cbadf2b561c16",
+ "t0": [
+  {
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "seconds": 1.13,
+   "outcome": "PASS",
+   "ran": 25
+  }
+ ],
+ "error": null,
+ "results": [
+  {
+   "index": 0,
+   "mutant": "L469 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "FAIL: test_RangeEscaped_is_raised_to_the_caller_and_a_later_call_returns_as_it_always_did (v2.test_v21_r3_range_release_contract.Idempotence.test_RangeEscaped_is_raised_to_the_caller_and_a_later_call_returns_as_it_always_did) | AssertionError"
+  },
+  {
+   "index": 1,
+   "mutant": "L467 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "FAIL: test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller (v2.test_v21_r3_range_release_contract.AbandonedWorker.test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller) | AssertionError"
+  },
+  {
+   "index": 2,
+   "mutant": "L469 IsNot->Is",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "FAIL: test_RangeEscaped_is_raised_to_the_caller_and_a_later_call_returns_as_it_always_did (v2.test_v21_r3_range_release_contract.Idempotence.test_RangeEscaped_is_raised_to_the_caller_and_a_later_call_returns_as_it_always_did) | AssertionError"
+  },
+  {
+   "index": 3,
+   "mutant": "L445 Is->IsNot",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "FAIL: test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller (v2.test_v21_r3_range_release_contract.AbandonedWorker.test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller) | AssertionError"
+  },
+  {
+   "index": 4,
+   "mutant": "L452 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "FAIL: test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller (v2.test_v21_r3_range_release_contract.AbandonedWorker.test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller) | AssertionError"
+  },
+  {
+   "index": 5,
+   "mutant": "L464 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "ERROR: test_a_call_inside_the_ladder_that_cannot_empty_the_range_raises_to_its_caller_only (v2.test_v21_r3_range_release_contract.Reentry.test_a_call_inside_the_ladder_that_cannot_empty_the_range_raises_to_its_caller_only) | KeyError"
+  },
+  {
+   "index": 6,
+   "mutant": "L467 IsNot->Is",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "FAIL: test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller (v2.test_v21_r3_range_release_contract.AbandonedWorker.test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller) | AssertionError"
+  },
+  {
+   "index": 7,
+   "mutant": "L448 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "FAIL: test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller (v2.test_v21_r3_range_release_contract.AbandonedWorker.test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller) | AssertionError"
+  },
+  {
+   "index": 8,
+   "mutant": "L452 Is->IsNot",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "FAIL: test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller (v2.test_v21_r3_range_release_contract.AbandonedWorker.test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller) | AssertionError"
+  },
+  {
+   "index": 9,
+   "mutant": "L453 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "FAIL: test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller (v2.test_v21_r3_range_release_contract.AbandonedWorker.test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller) | AssertionError"
+  },
+  {
+   "index": 10,
+   "mutant": "L459 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "FAIL: test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller (v2.test_v21_r3_range_release_contract.AbandonedWorker.test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller) | AssertionError"
+  },
+  {
+   "index": 11,
+   "mutant": "L464 IsNot->Is",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "ERROR: test_a_call_inside_the_ladder_that_cannot_empty_the_range_raises_to_its_caller_only (v2.test_v21_r3_range_release_contract.Reentry.test_a_call_inside_the_ladder_that_cannot_empty_the_range_raises_to_its_caller_only) | KeyError"
+  },
+  {
+   "index": 12,
+   "mutant": "L468 True->False",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "FAIL: test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller (v2.test_v21_r3_range_release_contract.AbandonedWorker.test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller) | AssertionError"
+  },
+  {
+   "index": 13,
+   "mutant": "L448 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "FAIL: test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller (v2.test_v21_r3_range_release_contract.AbandonedWorker.test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller) | AssertionError"
+  },
+  {
+   "index": 14,
+   "mutant": "L449 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "FAIL: test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller (v2.test_v21_r3_range_release_contract.AbandonedWorker.test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller) | AssertionError"
+  },
+  {
+   "index": 15,
+   "mutant": "L453 Eq->NotEq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "FAIL: test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller (v2.test_v21_r3_range_release_contract.AbandonedWorker.test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller) | AssertionError"
+  },
+  {
+   "index": 16,
+   "mutant": "L454 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "FAIL: test_a_call_inside_the_ladder_stops_the_range_and_the_frame_below_disposes (v2.test_v21_r3_range_release_contract.Reentry.test_a_call_inside_the_ladder_stops_the_range_and_the_frame_below_disposes) | AssertionError"
+  },
+  {
+   "index": 17,
+   "mutant": "L457 not removed",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "FAIL: test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller (v2.test_v21_r3_range_release_contract.AbandonedWorker.test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller) | AssertionError"
+  },
+  {
+   "index": 18,
+   "mutant": "L459 IsNot->Is",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "FAIL: test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller (v2.test_v21_r3_range_release_contract.AbandonedWorker.test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller) | AssertionError"
+  },
+  {
+   "index": 19,
+   "mutant": "L448 Is->IsNot",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "FAIL: test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller (v2.test_v21_r3_range_release_contract.AbandonedWorker.test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller) | AssertionError"
+  },
+  {
+   "index": 20,
+   "mutant": "L449 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "FAIL: test_RangeEscaped_is_raised_to_the_caller_and_a_later_call_returns_as_it_always_did (v2.test_v21_r3_range_release_contract.Idempotence.test_RangeEscaped_is_raised_to_the_caller_and_a_later_call_returns_as_it_always_did) | AssertionError"
+  },
+  {
+   "index": 21,
+   "mutant": "L454 not removed",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "FAIL: test_a_call_inside_the_ladder_stops_the_range_and_the_frame_below_disposes (v2.test_v21_r3_range_release_contract.Reentry.test_a_call_inside_the_ladder_stops_the_range_and_the_frame_below_disposes) | AssertionError"
+  },
+  {
+   "index": 22,
+   "mutant": "L449 Is->IsNot",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "FAIL: test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller (v2.test_v21_r3_range_release_contract.AbandonedWorker.test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller) | AssertionError"
+  }
+ ]
+}

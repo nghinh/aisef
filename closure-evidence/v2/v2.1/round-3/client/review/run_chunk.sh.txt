@@ -1,0 +1,14 @@
+#!/bin/zsh
+# run_chunk.sh N : each module of chunk-N.txt sequentially from the review worktree, one summary line per module
+SP=/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad
+OUT=$SP/m21/r3/out/client/review
+cd $SP/m21/r3/wt/client-rv || exit 2
+mkdir -p $OUT/modlogs
+: > $OUT/result-$1.txt
+for m in $(cat $OUT/chunk-$1.txt); do
+  s=$(date +%s)
+  $SP/m21/kills3/py.sh rvmod$1 -m unittest $m > $OUT/modlogs/$m.txt 2>&1
+  c=$?
+  print -r -- "$m exit=$c $(grep -E '^(Ran |OK|FAILED)' $OUT/modlogs/$m.txt | tr '\n' ' ') $(( $(date +%s) - s ))s" >> $OUT/result-$1.txt
+done
+echo DONE >> $OUT/result-$1.txt

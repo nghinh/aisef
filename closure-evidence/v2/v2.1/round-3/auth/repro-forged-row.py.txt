@@ -1,0 +1,93 @@
+"""Reproduction (real, this host, read-only: `dry_run=True` throughout, nothing is signalled).
+
+usage: python3 -B -I repro-forged-row.py.txt TREE        (TREE: a checkout holding validation/v2/cleanup_authority.py)
+
+Every child is started by this script and ends by itself when its stdin is closed. A VICTIM is started and, 2.2 s
+later, the boundary is established: the victim is born BEFORE it, so it is not the runner's and must never be
+`signalled`. Then, for each separator `ps` prints raw (or escapes) in a UTF-8 locale, a CARRIER is started whose command
+line holds `carrier<SEP><a fabricated row naming the victim, the runner as its parent, born in 2099>`.
+
+Part 1 (the root, `_read`): is the victim signalled, and what is its row?
+Part 2 (`carriers`, ps -E): a child whose environment holds the token AFTER a variable with U+2028: found?
+Part 3 (`cwd_under`, lsof): a child whose working directory name holds U+2028: found?
+"""
+import json
+import os
+import subprocess
+import sys
+import tempfile
+import time
+
+sys.path.insert(0, sys.argv[1])
+from validation.v2 import cleanup_authority as ca  # noqa: E402
+
+os.environ["LC_ALL"] = "en_US.UTF-8"   # the locale `ps` prints U+2028 raw in (the mutation workers run LANG=en_US.UTF-8)
+
+SEPARATORS = {"U+2028": " ", "U+2029": " ", "U+0085": "\u0085", "VT": "\x0b", "FF": "\x0c", "FS": "\x1c",
+              "GS": "\x1d", "RS": "\x1e", "CR": "\r", "LF": "\n", "NBSP": " "}
+CHILD = [sys.executable, "-c", "import sys; sys.stdin.read()"]
+
+
+def start(*extra, env=None, cwd=None):
+    return subprocess.Popen([*CHILD, *extra], stdin=subprocess.PIPE, env=env, cwd=cwd)
+
+
+def stop(*procs):
+    for p in procs:
+        p.stdin.close()
+        p.wait()
+
+
+out = {"tree": sys.argv[1], "part1": {}, "part2": {}, "part3": {}}
+victim = start("victim: born before the boundary")
+time.sleep(2.2)    # births are whole seconds in the table's clock
+boundary = ca.establish(sys.argv[1])
+try:
+    out["victim"], out["runner"] = victim.pid, boundary.runner
+    for name, sep in SEPARATORS.items():
+        fake = f"{victim.pid} {boundary.runner} {victim.pid} Tue Oct 13 23:59:59 2099 fabricated-by-a-command-line"
+        carrier = start(f"carrier{sep}{fake}")
+        try:
+            try:
+                table = ca.host_table()
+            except OSError as e:
+                out["part1"][name] = {"table": "TableUnreadable" if type(e).__name__ == "TableUnreadable" else type(e).__name__}
+                continue
+            rep = ca.signal_owned(boundary, pids=[victim.pid], dry_run=True, table=table)
+            row = table.get(victim.pid)
+            out["part1"][name] = {
+                "victim_signalled": bool(rep.signalled),
+                "victim_row_is_the_real_one": bool(row) and "fabricated" not in row.command and row.born < boundary.since,
+                "carrier_command_whole": "fabricated-by-a-command-line" in table[carrier.pid].command}
+        finally:
+            stop(carrier)
+    # part 2: ps -E
+    token = "AISEF_MUTATION_RUN=repro:"
+    env = {"PATH": os.environ.get("PATH", ""), "A_FIRST": "x y", "AISEF_MUTATION_RUN": "repro:1"}
+    carrier = start(env=env)
+    time.sleep(0.3)
+    try:
+        try:
+            found = [h.pid for h in ca.carriers(token, ca.host_table())]
+            out["part2"] = {"carrier_found": carrier.pid in found}
+        except OSError as e:
+            out["part2"] = {"error": type(e).__name__, "msg": str(e)[:120]}
+    finally:
+        stop(carrier)
+    # part 3: lsof -F
+    base = tempfile.mkdtemp(prefix="aisef-auth-repro-")
+    d = os.path.join(base, "a b")
+    os.mkdir(d)
+    carrier = start(cwd=d)
+    time.sleep(0.3)
+    try:
+        try:
+            found = [h.pid for h in ca.cwd_under(d + os.sep, ca.host_table())]
+            out["part3"] = {"carrier_found": carrier.pid in found}
+        except OSError as e:
+            out["part3"] = {"error": type(e).__name__, "msg": str(e)[:120]}
+    finally:
+        stop(carrier)
+finally:
+    stop(victim)
+print(json.dumps(out, indent=1, ensure_ascii=True))

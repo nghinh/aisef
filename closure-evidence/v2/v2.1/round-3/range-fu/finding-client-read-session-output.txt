@@ -1,0 +1,3 @@
+U+2028  text events read: ''                       turns 1 tokens {'input': 7, 'output': 3}
+U+2029  text events read: ''                       turns 1 tokens {'input': 7, 'output': 3}
+plain   text events read: 'alpha beta'             turns 1 tokens {'input': 7, 'output': 3}

@@ -1,0 +1,214 @@
+{
+ "target": "aisef2/app/verify.py::verify",
+ "files": [
+  "tests/v2/test_app_units.py",
+  "tests/v2/test_s2_kills.py",
+  "tests/v2/test_app_run.py",
+  "tests/v2/test_v21_continue_usage.py",
+  "tests/v2/test_v21_continue_integrity.py"
+ ],
+ "source_sha256": "b30820f61194665ace24e317a06651334e86dc9fcb77e879b97450ee0514dc1b",
+ "t0": [
+  {
+   "file": "tests/v2/test_app_units.py",
+   "seconds": 8.02,
+   "outcome": "PASS",
+   "ran": 41
+  },
+  {
+   "file": "tests/v2/test_s2_kills.py",
+   "seconds": 26.87,
+   "outcome": "PASS",
+   "ran": 43
+  },
+  {
+   "file": "tests/v2/test_app_run.py",
+   "seconds": 41.45,
+   "outcome": "PASS",
+   "ran": 17
+  },
+  {
+   "file": "tests/v2/test_v21_continue_usage.py",
+   "seconds": 62.51,
+   "outcome": "PASS",
+   "ran": 10
+  },
+  {
+   "file": "tests/v2/test_v21_continue_integrity.py",
+   "seconds": 260.95,
+   "outcome": "PASS",
+   "ran": 24
+  }
+ ],
+ "error": null,
+ "results": [
+  {
+   "index": 6,
+   "mutant": "L96 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_app_units.py",
+   "first": "FAIL: test_every_way_a_run_directory_can_disagree_with_its_journal (v2.test_app_units.Verification.test_every_way_a_run_directory_can_disagree_with_its_journal) | AssertionError"
+  },
+  {
+   "index": 7,
+   "mutant": "L97 returns None",
+   "class": "KILLED",
+   "file": "tests/v2/test_app_units.py",
+   "first": "FAIL: test_every_way_a_run_directory_can_disagree_with_its_journal (v2.test_app_units.Verification.test_every_way_a_run_directory_can_disagree_with_its_journal) | AssertionError"
+  },
+  {
+   "index": 33,
+   "mutant": "L97 dict entry 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_app_units.py",
+   "first": "FAIL: test_every_way_a_run_directory_can_disagree_with_its_journal (v2.test_app_units.Verification.test_every_way_a_run_directory_can_disagree_with_its_journal) | AssertionError"
+  },
+  {
+   "index": 34,
+   "mutant": "L97 dict entry 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_app_units.py",
+   "first": "FAIL: test_every_way_a_run_directory_can_disagree_with_its_journal (v2.test_app_units.Verification.test_every_way_a_run_directory_can_disagree_with_its_journal) | AssertionError"
+  },
+  {
+   "index": 57,
+   "mutant": "L196 And swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_s2_kills.py",
+   "first": "FAIL: test_the_answer_is_whole_and_every_branch_is_its_own (v2.test_s2_kills.AppVerify.test_the_answer_is_whole_and_every_branch_is_its_own) | AssertionError"
+  },
+  {
+   "index": 68,
+   "mutant": "L97 string 'verdict' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_app_units.py",
+   "first": "FAIL: test_every_way_a_run_directory_can_disagree_with_its_journal (v2.test_app_units.Verification.test_every_way_a_run_directory_can_disagree_with_its_journal) | AssertionError"
+  },
+  {
+   "index": 69,
+   "mutant": "L97 string 'problems' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_app_units.py",
+   "first": "FAIL: test_every_way_a_run_directory_can_disagree_with_its_journal (v2.test_app_units.Verification.test_every_way_a_run_directory_can_disagree_with_its_journal) | AssertionError"
+  },
+  {
+   "index": 70,
+   "mutant": "L97 string 'REFUTED' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_app_units.py",
+   "first": "FAIL: test_every_way_a_run_directory_can_disagree_with_its_journal (v2.test_app_units.Verification.test_every_way_a_run_directory_can_disagree_with_its_journal) | AssertionError"
+  },
+  {
+   "index": 75,
+   "mutant": "L132 string 'the run is not of this project bundle' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_app_units.py",
+   "first": "FAIL: test_every_way_a_run_directory_can_disagree_with_its_journal (v2.test_app_units.Verification.test_every_way_a_run_directory_can_disagree_with_its_journal) | AssertionError"
+  },
+  {
+   "index": 77,
+   "mutant": "L145 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_app_units.py",
+   "first": "FAIL: test_every_way_a_run_directory_can_disagree_with_its_journal (v2.test_app_units.Verification.test_every_way_a_run_directory_can_disagree_with_its_journal) | AssertionError"
+  },
+  {
+   "index": 85,
+   "mutant": "L183 string 'FAIL' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_app_units.py",
+   "first": "FAIL: test_every_way_a_run_directory_can_disagree_with_its_journal (v2.test_app_units.Verification.test_every_way_a_run_directory_can_disagree_with_its_journal) | AssertionError"
+  },
+  {
+   "index": 113,
+   "mutant": "L182 string 'failure' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_app_units.py",
+   "first": "FAIL: test_every_way_a_run_directory_can_disagree_with_its_journal (v2.test_app_units.Verification.test_every_way_a_run_directory_can_disagree_with_its_journal) | AssertionError"
+  },
+  {
+   "index": 114,
+   "mutant": "L182 string 'PASS' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_app_units.py",
+   "first": "FAIL: test_every_way_a_run_directory_can_disagree_with_its_journal (v2.test_app_units.Verification.test_every_way_a_run_directory_can_disagree_with_its_journal) | AssertionError"
+  },
+  {
+   "index": 116,
+   "mutant": "L187 string \"the record's ProductProof account is not the one the journal re-derives\" emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_app_units.py",
+   "first": "FAIL: test_every_way_a_run_directory_can_disagree_with_its_journal (v2.test_app_units.Verification.test_every_way_a_run_directory_can_disagree_with_its_journal) | AssertionError"
+  },
+  {
+   "index": 120,
+   "mutant": "L196 string 'final_main' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_app_units.py",
+   "first": "FAIL: test_every_way_a_run_directory_can_disagree_with_its_journal (v2.test_app_units.Verification.test_every_way_a_run_directory_can_disagree_with_its_journal) | AssertionError"
+  },
+  {
+   "index": 122,
+   "mutant": "L97 string 'RUN.json is not a run record of format ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_app_units.py",
+   "first": "FAIL: test_every_way_a_run_directory_can_disagree_with_its_journal (v2.test_app_units.Verification.test_every_way_a_run_directory_can_disagree_with_its_journal) | AssertionError"
+  },
+  {
+   "index": 143,
+   "mutant": "L181 string 'budget_stop' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_app_units.py",
+   "first": "FAIL: test_every_way_a_run_directory_can_disagree_with_its_journal (v2.test_app_units.Verification.test_every_way_a_run_directory_can_disagree_with_its_journal) | AssertionError"
+  },
+  {
+   "index": 144,
+   "mutant": "L185 string 'the record says ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_app_units.py",
+   "first": "FAIL: test_every_way_a_run_directory_can_disagree_with_its_journal (v2.test_app_units.Verification.test_every_way_a_run_directory_can_disagree_with_its_journal) | AssertionError"
+  },
+  {
+   "index": 151,
+   "mutant": "L198 string \"the run's repository main is not the record's final main\" emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_app_units.py",
+   "first": "FAIL: test_every_way_a_run_directory_can_disagree_with_its_journal (v2.test_app_units.Verification.test_every_way_a_run_directory_can_disagree_with_its_journal) | AssertionError"
+  },
+  {
+   "index": 165,
+   "mutant": "L157 string 'the journal ends in a torn line' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_app_units.py",
+   "first": "FAIL: test_every_way_a_run_directory_can_disagree_with_its_journal (v2.test_app_units.Verification.test_every_way_a_run_directory_can_disagree_with_its_journal) | AssertionError"
+  },
+  {
+   "index": 172,
+   "mutant": "L196 string 'repo' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_s2_kills.py",
+   "first": "FAIL: test_the_answer_is_whole_and_every_branch_is_its_own (v2.test_s2_kills.AppVerify.test_the_answer_is_whole_and_every_branch_is_its_own) | AssertionError"
+  },
+  {
+   "index": 181,
+   "mutant": "L185 string 'delivery_verdict' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_app_units.py",
+   "first": "FAIL: test_every_way_a_run_directory_can_disagree_with_its_journal (v2.test_app_units.Verification.test_every_way_a_run_directory_can_disagree_with_its_journal) | AssertionError"
+  },
+  {
+   "index": 188,
+   "mutant": "L159 string 'the journal does not reconstruct: ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_s2_kills.py",
+   "first": "FAIL: test_the_answer_is_whole_and_every_branch_is_its_own (v2.test_s2_kills.AppVerify.test_the_answer_is_whole_and_every_branch_is_its_own) | AssertionError"
+  },
+  {
+   "index": 189,
+   "mutant": "L159 string ': ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_s2_kills.py",
+   "first": "FAIL: test_the_answer_is_whole_and_every_branch_is_its_own (v2.test_s2_kills.AppVerify.test_the_answer_is_whole_and_every_branch_is_its_own) | AssertionError"
+  }
+ ]
+}

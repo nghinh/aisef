@@ -1,0 +1,13 @@
+{
+ "bundle_digest": "9ad313e31b2b2ca3ec4e7fb4f42d0b09702d6a3a6527a320d70f0ab0f7c96f49",
+ "format": "aisef-v2-run-record/1",
+ "kernel_digest": "42e612707013159cb7bfbee3d63ccafa7a9ac03a9e6324e58171b58abdf3456b",
+ "plan_hash": "35ad86a86f69356517ff252b13925a51d2934e64fe30e9e02b86a0bf5907a69d",
+ "platform": {
+  "python": "3.14.8",
+  "system": "linux"
+ },
+ "project": "calc-cli",
+ "settings_sha256": "89094e056ffa0bb5d49432f4750674249f40eb732ed27c93fe77306017c616f2",
+ "started": 1791861881.1918042
+}

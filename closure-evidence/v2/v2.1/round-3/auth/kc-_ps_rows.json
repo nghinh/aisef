@@ -1,0 +1,200 @@
+{
+ "target": "validation/v2/cleanup_authority.py::_ps_rows",
+ "files": [
+  "tests/v2/test_v21_r3_auth_ps_table.py",
+  "tests/v2/test_v21_r3_auth_other_readers.py"
+ ],
+ "source_sha256": "52bfcbdc60c362b8966dbbf414beba593eaf41330fce9d94c4809397bfbf6d5e",
+ "t0": [
+  {
+   "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+   "seconds": 0.67,
+   "outcome": "PASS",
+   "ran": 30
+  },
+  {
+   "file": "tests/v2/test_v21_r3_auth_other_readers.py",
+   "seconds": 1.65,
+   "outcome": "PASS",
+   "ran": 34
+  }
+ ],
+ "error": null,
+ "results": [
+  {
+   "index": 0,
+   "mutant": "L159 returns None",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+   "first": "ERROR: test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table (v2.test_v21_r3_auth_ps_table.ACommandLineIsNeverAuthority.test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table) | TypeError"
+  },
+  {
+   "index": 1,
+   "mutant": "L149 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+   "first": "ERROR: test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table (v2.test_v21_r3_auth_ps_table.ACommandLineIsNeverAuthority.test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table) | cleanup_authority.TableUnreadable"
+  },
+  {
+   "index": 2,
+   "mutant": "L156 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+   "first": "ERROR: test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table (v2.test_v21_r3_auth_ps_table.ACommandLineIsNeverAuthority.test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table) | cleanup_authority.TableUnreadable"
+  },
+  {
+   "index": 3,
+   "mutant": "L149 Is->IsNot",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+   "first": "ERROR: test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table (v2.test_v21_r3_auth_ps_table.ACommandLineIsNeverAuthority.test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table) | cleanup_authority.TableUnreadable"
+  },
+  {
+   "index": 4,
+   "mutant": "L151 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+   "first": "ERROR: test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table (v2.test_v21_r3_auth_ps_table.ACommandLineIsNeverAuthority.test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table) | ValueError"
+  },
+  {
+   "index": 5,
+   "mutant": "L151 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+   "first": "ERROR: test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table (v2.test_v21_r3_auth_ps_table.ACommandLineIsNeverAuthority.test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table) | ValueError"
+  },
+  {
+   "index": 6,
+   "mutant": "L151 element 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+   "first": "ERROR: test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table (v2.test_v21_r3_auth_ps_table.ACommandLineIsNeverAuthority.test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table) | ValueError"
+  },
+  {
+   "index": 7,
+   "mutant": "L151 element 3 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+   "first": "ERROR: test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table (v2.test_v21_r3_auth_ps_table.ACommandLineIsNeverAuthority.test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table) | ValueError"
+  },
+  {
+   "index": 8,
+   "mutant": "L151 element 4 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+   "first": "ERROR: test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table (v2.test_v21_r3_auth_ps_table.ACommandLineIsNeverAuthority.test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table) | ValueError"
+  },
+  {
+   "index": 9,
+   "mutant": "L151 element 5 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+   "first": "ERROR: test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table (v2.test_v21_r3_auth_ps_table.ACommandLineIsNeverAuthority.test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table) | ValueError"
+  },
+  {
+   "index": 10,
+   "mutant": "L151 element 6 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+   "first": "ERROR: test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table (v2.test_v21_r3_auth_ps_table.ACommandLineIsNeverAuthority.test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table) | ValueError"
+  },
+  {
+   "index": 11,
+   "mutant": "L151 element 7 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+   "first": "ERROR: test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table (v2.test_v21_r3_auth_ps_table.ACommandLineIsNeverAuthority.test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table) | ValueError"
+  },
+  {
+   "index": 12,
+   "mutant": "L151 element 8 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+   "first": "ERROR: test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table (v2.test_v21_r3_auth_ps_table.ACommandLineIsNeverAuthority.test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table) | ValueError"
+  },
+  {
+   "index": 13,
+   "mutant": "L156 In->NotIn",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+   "first": "ERROR: test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table (v2.test_v21_r3_auth_ps_table.ACommandLineIsNeverAuthority.test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table) | cleanup_authority.TableUnreadable"
+  },
+  {
+   "index": 14,
+   "mutant": "L154 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+   "first": "ERROR: test_every_line_that_is_no_row_is_refused_with_a_typed_error (v2.test_v21_r3_auth_ps_table.NotARow.test_every_line_that_is_no_row_is_refused_with_a_typed_error) (line='a month that is no month', where='first') | ValueError"
+  },
+  {
+   "index": 15,
+   "mutant": "L154 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+   "first": "ERROR: test_a_date_the_clock_cannot_hold_is_not_a_row_and_not_an_overflow (v2.test_v21_r3_auth_ps_table.NotARow.test_a_date_the_clock_cannot_hold_is_not_a_row_and_not_an_overflow) | OverflowError"
+  },
+  {
+   "index": 16,
+   "mutant": "L158 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+   "first": "FAIL: test_a_row_inside_a_command_line_adds_and_replaces_nothing_whatever_separates_it (v2.test_v21_r3_auth_ps_table.ACommandLineIsNeverAuthority.test_a_row_inside_a_command_line_adds_and_replaces_nothing_whatever_separates_it) (sep='U+2028') | AssertionError"
+  },
+  {
+   "index": 17,
+   "mutant": "L150 string 'ps' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+   "first": "FAIL: test_every_line_that_is_no_row_is_refused_with_a_typed_error (v2.test_v21_r3_auth_ps_table.NotARow.test_every_line_that_is_no_row_is_refused_with_a_typed_error) (line='a continuation fragment', where='first') | AssertionError"
+  },
+  {
+   "index": 18,
+   "mutant": "L157 string 'ps' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+   "first": "FAIL: test_a_pid_listed_twice_is_refused_whichever_row_is_the_made_up_one (v2.test_v21_r3_auth_ps_table.NotARow.test_a_pid_listed_twice_is_refused_whichever_row_is_the_made_up_one) | AssertionError"
+  },
+  {
+   "index": 19,
+   "mutant": "L153 string '%a %b %d %H:%M:%S %Y' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+   "first": "ERROR: test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table (v2.test_v21_r3_auth_ps_table.ACommandLineIsNeverAuthority.test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table) | cleanup_authority.TableUnreadable"
+  },
+  {
+   "index": 20,
+   "mutant": "L155 string 'ps' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+   "first": "FAIL: test_a_date_the_clock_cannot_hold_is_not_a_row_and_not_an_overflow (v2.test_v21_r3_auth_ps_table.NotARow.test_a_date_the_clock_cannot_hold_is_not_a_row_and_not_an_overflow) | AssertionError"
+  },
+  {
+   "index": 21,
+   "mutant": "L153 string ' ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+   "first": "ERROR: test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table (v2.test_v21_r3_auth_ps_table.ACommandLineIsNeverAuthority.test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table) | cleanup_authority.TableUnreadable"
+  },
+  {
+   "index": 22,
+   "mutant": "L153 string ' ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+   "first": "ERROR: test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table (v2.test_v21_r3_auth_ps_table.ACommandLineIsNeverAuthority.test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table) | cleanup_authority.TableUnreadable"
+  },
+  {
+   "index": 23,
+   "mutant": "L153 string ' ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+   "first": "ERROR: test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table (v2.test_v21_r3_auth_ps_table.ACommandLineIsNeverAuthority.test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table) | cleanup_authority.TableUnreadable"
+  },
+  {
+   "index": 24,
+   "mutant": "L153 string ' ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+   "first": "ERROR: test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table (v2.test_v21_r3_auth_ps_table.ACommandLineIsNeverAuthority.test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table) | cleanup_authority.TableUnreadable"
+  }
+ ]
+}

@@ -1,0 +1,5 @@
+LINUX True 3.14.8 fsenc utf-8 utf8mode 1
+table before: 2 rows; me: python3 -B -I -c import ctypes, os, sys
+
+comm bytes now: b'\xff\xfeab\n'
+table after: 2 rows

@@ -1,0 +1,74 @@
+--- a/aisef2/probe/cli_invocation.py	2026-10-13 05:32:11
++++ b/aisef2/probe/cli_invocation.py	2026-10-13 05:55:15
+@@ -684,7 +684,7 @@
+ #: reads, and alone writes the protocol — to the marker file named in the request, each line authenticated with the
+ #: evaluation's key (HMAC-SHA256). The key and the nonce leave the request file before the subject's process exists.
+ HARNESS = r'''
+-import hashlib, hmac, json, os, queue, subprocess, sys, threading
++import hashlib, hmac, json, os, queue, subprocess, sys, threading, types
+ from importlib.machinery import PathFinder
+ ask_path = sys.argv[1]
+ req = json.loads(open(ask_path, encoding="utf-8").read())
+@@ -760,9 +760,22 @@
+ def resolve(dotted, search):
+     parts, spec, path = dotted.split("."), None, search
+     for i in range(len(parts)):
+-        spec = PathFinder.find_spec(".".join(parts[:i + 1]), path)
+-        if spec is None:
+-            return None
++        parent = ".".join(parts[:i])
++        # an implicit namespace portion reads its search path from sys.modules[parent].__path__; this process never
++        # imports the subject, so a stand-in module carrying the parent's locations is there for this one lookup
++        stub = i > 0 and parent not in sys.modules
++        if stub:
++            sys.modules[parent] = types.ModuleType(parent)
++            sys.modules[parent].__path__ = list(path)
++        try:
++            spec = PathFinder.find_spec(".".join(parts[:i + 1]), path)
++            if spec is None:
++                return None
++            if spec.submodule_search_locations is not None:
++                spec.submodule_search_locations = list(spec.submodule_search_locations)
++        finally:
++            if stub:
++                del sys.modules[parent]
+         path = spec.submodule_search_locations
+         if path is None and i + 1 < len(parts):
+             return None
+--- a/aisef2/probe/process_effect.py	2026-10-13 05:32:11
++++ b/aisef2/probe/process_effect.py	2026-10-13 05:55:15
+@@ -444,7 +444,7 @@
+ #: file named in the request and nowhere else, each line authenticated with the evaluation's key, which leaves the
+ #: request file before the subject's process exists.
+ HARNESS = r'''
+-import builtins, hashlib, hmac, importlib, json, os, queue, subprocess, sys, threading
++import builtins, hashlib, hmac, importlib, json, os, queue, subprocess, sys, threading, types
+ from importlib.machinery import PathFinder
+ ask_path = sys.argv[1]
+ req = json.loads(open(ask_path, encoding="utf-8").read())
+@@ -514,9 +514,22 @@
+ def resolve(dotted, search):
+     parts, spec, path = dotted.split("."), None, search
+     for i in range(len(parts)):
+-        spec = PathFinder.find_spec(".".join(parts[:i + 1]), path)
+-        if spec is None:
+-            return None
++        parent = ".".join(parts[:i])
++        # an implicit namespace portion reads its search path from sys.modules[parent].__path__; this process never
++        # imports the subject, so a stand-in module carrying the parent's locations is there for this one lookup
++        stub = i > 0 and parent not in sys.modules
++        if stub:
++            sys.modules[parent] = types.ModuleType(parent)
++            sys.modules[parent].__path__ = list(path)
++        try:
++            spec = PathFinder.find_spec(".".join(parts[:i + 1]), path)
++            if spec is None:
++                return None
++            if spec.submodule_search_locations is not None:
++                spec.submodule_search_locations = list(spec.submodule_search_locations)
++        finally:
++            if stub:
++                del sys.modules[parent]
+         path = spec.submodule_search_locations
+         if path is None and i + 1 < len(parts):
+             return None

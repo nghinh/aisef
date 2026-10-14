@@ -1,0 +1,179 @@
+test_nothing_appeared_is_an_empty_list_not_none (tests.v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) ... ERROR
+test_the_report_holds_the_real_readings_of_the_controllers_own_table (tests.v2.test_v21_r3_conf_fu_before.Appeared.test_the_report_holds_the_real_readings_of_the_controllers_own_table)
+Through the real `_host_mounts`: the controller's /proc/self/mountinfo read before the session and again ... FAIL
+test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (tests.v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) ... FAIL
+test_a_super_block_only_the_reading_after_the_session_holds_is_not_the_hosts (tests.v2.test_v21_r3_conf_fu_before.ReadingBefore.test_a_super_block_only_the_reading_after_the_session_holds_is_not_the_hosts)
+The hazard: the number the session's /tmp had is taken, at another path, by a host mount made between its ... FAIL
+test_a_super_block_the_reading_before_the_session_holds_is_the_hosts (tests.v2.test_v21_r3_conf_fu_before.ReadingBefore.test_a_super_block_the_reading_before_the_session_holds_is_the_hosts)
+The control: the same row in the reading before the session — a host mount that was there — refuses the ... 
+  test_a_super_block_the_reading_before_the_session_holds_is_the_hosts (tests.v2.test_v21_r3_conf_fu_before.ReadingBefore.test_a_super_block_the_reading_before_the_session_holds_is_the_hosts) (after_holds_it=True)
+The control: the same row in the reading before the session — a host mount that was there — refuses the ... ERROR
+  test_a_super_block_the_reading_before_the_session_holds_is_the_hosts (tests.v2.test_v21_r3_conf_fu_before.ReadingBefore.test_a_super_block_the_reading_before_the_session_holds_is_the_hosts) (after_holds_it=False)
+The control: the same row in the reading before the session — a host mount that was there — refuses the ... ERROR
+test_a_writable_bind_of_a_super_block_the_host_held_is_refused_whatever_the_reading_after_says (tests.v2.test_v21_r3_conf_fu_before.ReadingBefore.test_a_writable_bind_of_a_super_block_the_host_held_is_refused_whatever_the_reading_after_says)
+The host's own mqueue bound in at /hostmq (the container's, as `--dev-bind /dev/mqueue /hostmq` gives it): ... 
+  test_a_writable_bind_of_a_super_block_the_host_held_is_refused_whatever_the_reading_after_says (tests.v2.test_v21_r3_conf_fu_before.ReadingBefore.test_a_writable_bind_of_a_super_block_the_host_held_is_refused_whatever_the_reading_after_says) (after='unreadable')
+The host's own mqueue bound in at /hostmq (the container's, as `--dev-bind /dev/mqueue /hostmq` gives it): ... ERROR
+test_the_same_bind_is_not_refused_for_a_super_block_the_host_never_held_before_the_session (tests.v2.test_v21_r3_conf_fu_before.ReadingBefore.test_the_same_bind_is_not_refused_for_a_super_block_the_host_never_held_before_the_session)
+What the reading before decides, seen from the other side: the sandbox's own mqueue at /hostmq, whose ... ok
+test_an_unreadable_reading_after_refuses_nothing (tests.v2.test_v21_r3_conf_fu_before.ReadingLost.test_an_unreadable_reading_after_refuses_nothing) ... FAIL
+test_an_unreadable_reading_before_establishes_nothing (tests.v2.test_v21_r3_conf_fu_before.ReadingLost.test_an_unreadable_reading_before_establishes_nothing) ... 
+  test_an_unreadable_reading_before_establishes_nothing (tests.v2.test_v21_r3_conf_fu_before.ReadingLost.test_an_unreadable_reading_before_establishes_nothing) (reads=(None, [{'at': '/', 'access': 'rw', 'fs': 'ext4', 'dev': '8:1', 'root': '/', 'source': '/dev/vda1', 'options': ['rw', 'relatime'], 'super_options': ['rw'], 'optional': []}])) ... ERROR
+  test_an_unreadable_reading_before_establishes_nothing (tests.v2.test_v21_r3_conf_fu_before.ReadingLost.test_an_unreadable_reading_before_establishes_nothing) (reads=(None, None)) ... ERROR
+
+======================================================================
+ERROR: test_nothing_appeared_is_an_empty_list_not_none (tests.v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/wt/conf-fu/tests/v2/test_v21_r3_conf_fu_before.py", line 155, in test_nothing_appeared_is_an_empty_list_not_none
+    self.assertEqual(rep["host_mounts_appeared"], [])
+                     ~~~^^^^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'host_mounts_appeared'
+
+======================================================================
+ERROR: test_a_super_block_the_reading_before_the_session_holds_is_the_hosts (tests.v2.test_v21_r3_conf_fu_before.ReadingBefore.test_a_super_block_the_reading_before_the_session_holds_is_the_hosts) (after_holds_it=True)
+The control: the same row in the reading before the session — a host mount that was there — refuses the
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/wt/conf-fu/tests/v2/test_v21_r3_conf_fu_before.py", line 96, in test_a_super_block_the_reading_before_the_session_holds_is_the_hosts
+    self.assertEqual(rep["host_mounts_appeared"], [])       # nothing appeared; one may have gone
+                     ~~~^^^^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'host_mounts_appeared'
+
+======================================================================
+ERROR: test_a_super_block_the_reading_before_the_session_holds_is_the_hosts (tests.v2.test_v21_r3_conf_fu_before.ReadingBefore.test_a_super_block_the_reading_before_the_session_holds_is_the_hosts) (after_holds_it=False)
+The control: the same row in the reading before the session — a host mount that was there — refuses the
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/wt/conf-fu/tests/v2/test_v21_r3_conf_fu_before.py", line 96, in test_a_super_block_the_reading_before_the_session_holds_is_the_hosts
+    self.assertEqual(rep["host_mounts_appeared"], [])       # nothing appeared; one may have gone
+                     ~~~^^^^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'host_mounts_appeared'
+
+======================================================================
+ERROR: test_a_writable_bind_of_a_super_block_the_host_held_is_refused_whatever_the_reading_after_says (tests.v2.test_v21_r3_conf_fu_before.ReadingBefore.test_a_writable_bind_of_a_super_block_the_host_held_is_refused_whatever_the_reading_after_says) (after='unreadable')
+The host's own mqueue bound in at /hostmq (the container's, as `--dev-bind /dev/mqueue /hostmq` gives it):
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/wt/conf-fu/tests/v2/test_v21_r3_conf_fu_before.py", line 105, in test_a_writable_bind_of_a_super_block_the_host_held_is_refused_whatever_the_reading_after_says
+    [said] = self.refusals(rep)
+    ^^^^^^
+ValueError: not enough values to unpack (expected 1, got 0)
+
+======================================================================
+ERROR: test_an_unreadable_reading_before_establishes_nothing (tests.v2.test_v21_r3_conf_fu_before.ReadingLost.test_an_unreadable_reading_before_establishes_nothing) (reads=(None, [{'at': '/', 'access': 'rw', 'fs': 'ext4', 'dev': '8:1', 'root': '/', 'source': '/dev/vda1', 'options': ['rw', 'relatime'], 'super_options': ['rw'], 'optional': []}]))
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/wt/conf-fu/tests/v2/test_v21_r3_conf_fu_before.py", line 126, in test_an_unreadable_reading_before_establishes_nothing
+    self.assertIsNone(rep["host_mounts_appeared"])
+                      ~~~^^^^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'host_mounts_appeared'
+
+======================================================================
+ERROR: test_an_unreadable_reading_before_establishes_nothing (tests.v2.test_v21_r3_conf_fu_before.ReadingLost.test_an_unreadable_reading_before_establishes_nothing) (reads=(None, None))
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/wt/conf-fu/tests/v2/test_v21_r3_conf_fu_before.py", line 126, in test_an_unreadable_reading_before_establishes_nothing
+    self.assertIsNone(rep["host_mounts_appeared"])
+                      ~~~^^^^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'host_mounts_appeared'
+
+======================================================================
+FAIL: test_the_report_holds_the_real_readings_of_the_controllers_own_table (tests.v2.test_v21_r3_conf_fu_before.Appeared.test_the_report_holds_the_real_readings_of_the_controllers_own_table)
+Through the real `_host_mounts`: the controller's /proc/self/mountinfo read before the session and again
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/wt/conf-fu/tests/v2/test_v21_r3_conf_fu_before.py", line 174, in test_the_report_holds_the_real_readings_of_the_controllers_own_table
+    self.assertEqual(rep["host_mounts"], [{"at": "/proc", "fs": "proc", "dev": "0:66", "optional": []},
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                          {"at": "/dev/pts", "fs": "devpts", "dev": "0:72", "optional": []}])
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: [{'at[118 chars]: []}, {'at': '/w s', 'fs': 'tmpfs', 'dev': '0[27 chars]7']}] != [{'at[118 chars]: []}]
+
+First list contains 1 additional elements.
+First extra element 2:
+{'at': '/w s', 'fs': 'tmpfs', 'dev': '0:46', 'optional': ['shared:7']}
+
+  [{'at': '/proc', 'dev': '0:66', 'fs': 'proc', 'optional': []},
+-  {'at': '/dev/pts', 'dev': '0:72', 'fs': 'devpts', 'optional': []},
+?                                                                   ^
+
++  {'at': '/dev/pts', 'dev': '0:72', 'fs': 'devpts', 'optional': []}]
+?                                                                   ^
+
+-  {'at': '/w s', 'dev': '0:46', 'fs': 'tmpfs', 'optional': ['shared:7']}]
+
+======================================================================
+FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (tests.v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/wt/conf-fu/tests/v2/test_v21_r3_conf_fu_before.py", line 150, in test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read
+    self.assertEqual(rep["host_mounts"], [*rows.HOST, gone])        # the reading before, whole, nothing of the after
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: [{'at[220 chars]: []}, {'at': '/run/user/7', 'fs': 'tmpfs', 'd[99 chars] []}] != [{'at[220 chars]: []}]
+
+First list contains 2 additional elements.
+First extra element 2:
+{'at': '/run/user/7', 'fs': 'tmpfs', 'dev': '0:88', 'optional': ['shared:3']}
+
+  [{'access': 'rw',
+    'at': '/',
+    'dev': '8:1',
+    'fs': 'ext4',
+    'optional': [],
+    'options': ['rw', 'relatime'],
+    'root': '/',
+    'source': '/dev/vda1',
+    'super_options': ['rw']},
+-  {'at': '/mnt/gone', 'dev': '8:33', 'fs': 'ext4', 'optional': []},
+?                                                                  ^
+
++  {'at': '/mnt/gone', 'dev': '8:33', 'fs': 'ext4', 'optional': []}]
+?                                                                  ^
+
+-  {'at': '/run/user/7', 'dev': '0:88', 'fs': 'tmpfs', 'optional': ['shared:3']},
+-  {'at': '/mnt/usb', 'dev': '8:17', 'fs': 'vfat', 'optional': []}]
+
+======================================================================
+FAIL: test_a_super_block_only_the_reading_after_the_session_holds_is_not_the_hosts (tests.v2.test_v21_r3_conf_fu_before.ReadingBefore.test_a_super_block_only_the_reading_after_the_session_holds_is_not_the_hosts)
+The hazard: the number the session's /tmp had is taken, at another path, by a host mount made between its
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/wt/conf-fu/tests/v2/test_v21_r3_conf_fu_before.py", line 80, in test_a_super_block_only_the_reading_after_the_session_holds_is_not_the_hosts
+    self.assertEqual(rep["problems"], [])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: ["writable outside the workspace: ['/tmp'][70 chars]r))"] != []
+
+First list contains 1 additional elements.
+First extra element 0:
+"writable outside the workspace: ['/tmp'] (/tmp: its super block 0:58 is the host's (mounted there at /mnt/other))"
+
++ []
+- ["writable outside the workspace: ['/tmp'] (/tmp: its super block 0:58 is the "
+-  "host's (mounted there at /mnt/other))"]
+
+======================================================================
+FAIL: test_an_unreadable_reading_after_refuses_nothing (tests.v2.test_v21_r3_conf_fu_before.ReadingLost.test_an_unreadable_reading_after_refuses_nothing)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/wt/conf-fu/tests/v2/test_v21_r3_conf_fu_before.py", line 133, in test_an_unreadable_reading_after_refuses_nothing
+    self.assertEqual(rep["problems"], [])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: ["cannot establish that a writable mount b[370 chars]ead"] != []
+
+First list contains 1 additional elements.
+First extra element 0:
+"cannot establish that a writable mount belongs to the sandbox (isolation not established, not a write that was seen): /: the host's mount table could not be read; /proc: the host's mount table could not be read; /dev: the host's mount table could not be read; /dev/pts: the host's mount table could not be read; /tmp: the host's mount table could not be read; /aisef-home: the host's mount table could not be read"
+
++ []
+- ['cannot establish that a writable mount belongs to the sandbox (isolation not '
+-  "established, not a write that was seen): /: the host's mount table could not "
+-  "be read; /proc: the host's mount table could not be read; /dev: the host's "
+-  "mount table could not be read; /dev/pts: the host's mount table could not be "
+-  "read; /tmp: the host's mount table could not be read; /aisef-home: the "
+-  "host's mount table could not be read"]
+
+----------------------------------------------------------------------
+Ran 9 tests in 2.108s
+
+FAILED (failures=4, errors=6)

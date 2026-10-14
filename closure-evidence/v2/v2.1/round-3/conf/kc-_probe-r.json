@@ -1,0 +1,207 @@
+{
+ "target": "aisef2/app/confine.py::_probe",
+ "files": [
+  "tests/v2/test_v21_r3_conf_policy.py",
+  "tests/v2/test_v21_r3_conf_locale.py",
+  "tests/v2/test_v21_kills3_T07a.py",
+  "tests/v2/test_v21_kills3_T06a.py",
+  "tests/v2/test_v21_kills3_A06.py",
+  "tests/v2/test_v21_kills3_T05b.py",
+  "tests/v2/test_v21_kills3_T05a.py",
+  "tests/v2/test_v21_kills3_T05c.py",
+  "tests/v2/test_v21_kills3_A05.py",
+  "tests/v2/test_v21_kills3_R02.py",
+  "tests/v2/test_v21_kills3_T06b.py",
+  "tests/v2/test_v21_kills3_A07.py",
+  "tests/v2/test_v21_kills3_T07b.py",
+  "tests/v2/test_v21_kills3_TO2.py",
+  "tests/v2/test_v21_defects_confine.py",
+  "tests/v2/test_v21_confine.py"
+ ],
+ "source_sha256": "375489e7f4d1abc502cb6720c37631ad52511711cdb47803e0ecefb009778249",
+ "t0": [
+  {
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "seconds": 1.88,
+   "outcome": "PASS",
+   "ran": 42
+  },
+  {
+   "file": "tests/v2/test_v21_r3_conf_locale.py",
+   "seconds": 1.89,
+   "outcome": "PASS",
+   "ran": 10
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T07a.py",
+   "seconds": 0.41,
+   "outcome": "PASS",
+   "ran": 14
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T06a.py",
+   "seconds": 0.41,
+   "outcome": "PASS",
+   "ran": 14
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_A06.py",
+   "seconds": 1.12,
+   "outcome": "PASS",
+   "ran": 4
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "seconds": 1.0,
+   "outcome": "PASS",
+   "ran": 18
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T05a.py",
+   "seconds": 1.16,
+   "outcome": "PASS",
+   "ran": 8
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T05c.py",
+   "seconds": 2.68,
+   "outcome": "PASS",
+   "ran": 7
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_A05.py",
+   "seconds": 1.41,
+   "outcome": "PASS",
+   "ran": 6
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_R02.py",
+   "seconds": 0.59,
+   "outcome": "PASS",
+   "ran": 2
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T06b.py",
+   "seconds": 1.97,
+   "outcome": "PASS",
+   "ran": 8
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_A07.py",
+   "seconds": 0.44,
+   "outcome": "PASS",
+   "ran": 5
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T07b.py",
+   "seconds": 0.45,
+   "outcome": "PASS",
+   "ran": 11
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_TO2.py",
+   "seconds": 0.37,
+   "outcome": "PASS",
+   "ran": 3
+  },
+  {
+   "file": "tests/v2/test_v21_defects_confine.py",
+   "seconds": 1.95,
+   "outcome": "PASS",
+   "ran": 16
+  },
+  {
+   "file": "tests/v2/test_v21_confine.py",
+   "seconds": 23.12,
+   "outcome": "PASS",
+   "ran": 34
+  }
+ ],
+ "error": null,
+ "results": [
+  {
+   "index": 4,
+   "mutant": "L337 dict entry 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_locale.py",
+   "first": "FAIL: test_the_rest_of_the_environment_is_what_the_session_wrapper_gives (v2.test_v21_r3_conf_locale.PassedDown.test_the_rest_of_the_environment_is_what_the_session_wrapper_gives) | AssertionError"
+  },
+  {
+   "index": 5,
+   "mutant": "L337 dict entry 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_locale.py",
+   "first": "FAIL: test_the_environment_the_stand_in_bubblewrap_received (v2.test_v21_r3_conf_locale.AtTheExecBoundary.test_the_environment_the_stand_in_bubblewrap_received) (call=0) | AssertionError"
+  },
+  {
+   "index": 45,
+   "mutant": "L338 string 'locale' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_locale.py",
+   "first": "ERROR: test_the_environment_the_stand_in_bubblewrap_received (v2.test_v21_r3_conf_locale.AtTheExecBoundary.test_the_environment_the_stand_in_bubblewrap_received) | KeyError"
+  },
+  {
+   "index": 166,
+   "mutant": "L338 string 'LC_|LANG' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_locale.py",
+   "first": "FAIL: test_the_environment_the_stand_in_bubblewrap_received (v2.test_v21_r3_conf_locale.AtTheExecBoundary.test_the_environment_the_stand_in_bubblewrap_received) | AssertionError"
+  },
+  {
+   "index": 172,
+   "mutant": "L361 True->False",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_locale.py",
+   "first": "ERROR: test_the_environment_the_stand_in_bubblewrap_received (v2.test_v21_r3_conf_locale.AtTheExecBoundary.test_the_environment_the_stand_in_bubblewrap_received) | TypeError"
+  },
+  {
+   "index": 174,
+   "mutant": "L373 string 'the sandbox did not run the probe (exit ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_locale.py",
+   "first": "FAIL: test_the_environment_the_stand_in_bubblewrap_received (v2.test_v21_r3_conf_locale.AtTheExecBoundary.test_the_environment_the_stand_in_bubblewrap_received) | AssertionError"
+  },
+  {
+   "index": 175,
+   "mutant": "L373 string '): ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_locale.py",
+   "first": "FAIL: test_the_environment_the_stand_in_bubblewrap_received (v2.test_v21_r3_conf_locale.AtTheExecBoundary.test_the_environment_the_stand_in_bubblewrap_received) | AssertionError"
+  },
+  {
+   "index": 204,
+   "mutant": "L337 string 'LC_|LANG' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_locale.py",
+   "first": "FAIL: test_the_rest_of_the_environment_is_what_the_session_wrapper_gives (v2.test_v21_r3_conf_locale.PassedDown.test_the_rest_of_the_environment_is_what_the_session_wrapper_gives) | AssertionError"
+  },
+  {
+   "index": 205,
+   "mutant": "L340 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_locale.py",
+   "first": "FAIL: test_the_environment_the_stand_in_bubblewrap_received (v2.test_v21_r3_conf_locale.AtTheExecBoundary.test_the_environment_the_stand_in_bubblewrap_received) | AssertionError"
+  },
+  {
+   "index": 206,
+   "mutant": "L340 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_locale.py",
+   "first": "FAIL: test_the_probe_and_the_version_query_get_the_c_locale_and_nothing_else_of_the_family (v2.test_v21_r3_conf_locale.PassedDown.test_the_probe_and_the_version_query_get_the_c_locale_and_nothing_else_of_the_family) | AssertionError"
+  },
+  {
+   "index": 210,
+   "mutant": "L340 string '--version' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_locale.py",
+   "first": "FAIL: test_the_probe_and_the_version_query_get_the_c_locale_and_nothing_else_of_the_family (v2.test_v21_r3_conf_locale.PassedDown.test_the_probe_and_the_version_query_get_the_c_locale_and_nothing_else_of_the_family) | AssertionError"
+  },
+  {
+   "index": 211,
+   "mutant": "L340 True->False",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_locale.py",
+   "first": "ERROR: test_the_environment_the_stand_in_bubblewrap_received (v2.test_v21_r3_conf_locale.AtTheExecBoundary.test_the_environment_the_stand_in_bubblewrap_received) | AttributeError"
+  }
+ ]
+}

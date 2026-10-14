@@ -1,0 +1,102 @@
+{
+ "target": "aisef2/app/adapters.py::Reviewer._ocr",
+ "files": [
+  "tests/v2/test_v21_r3_detail_rv_finderfiles.py"
+ ],
+ "source_sha256": "2ee59736532802d7287a6948c5eade35e75f0e65282eaf3327b18bb5d0339aa2",
+ "t0": [
+  {
+   "file": "tests/v2/test_v21_r3_detail_rv_finderfiles.py",
+   "seconds": 2.46,
+   "outcome": "PASS",
+   "ran": 2
+  }
+ ],
+ "error": null,
+ "results": [
+  {
+   "index": 25,
+   "mutant": "L221 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_rv_finderfiles.py",
+   "first": "FAIL: test_no_file_of_the_finder_holds_a_secret_of_the_run (v2.test_v21_r3_detail_rv_finderfiles.TheFindersOwnFilesKeepNoSecret.test_no_file_of_the_finder_holds_a_secret_of_the_run) (file='ocr.log') | AssertionError"
+  },
+  {
+   "index": 26,
+   "mutant": "L221 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_rv_finderfiles.py",
+   "first": "FAIL: test_no_file_of_the_finder_holds_a_secret_of_the_run (v2.test_v21_r3_detail_rv_finderfiles.TheFindersOwnFilesKeepNoSecret.test_no_file_of_the_finder_holds_a_secret_of_the_run) (file='ocr.log') | AssertionError"
+  },
+  {
+   "index": 27,
+   "mutant": "L222 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_rv_finderfiles.py",
+   "first": "FAIL: test_no_file_of_the_finder_holds_a_secret_of_the_run (v2.test_v21_r3_detail_rv_finderfiles.TheFindersOwnFilesKeepNoSecret.test_no_file_of_the_finder_holds_a_secret_of_the_run) (file='preview.json') | AssertionError"
+  },
+  {
+   "index": 28,
+   "mutant": "L222 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_rv_finderfiles.py",
+   "first": "FAIL: test_no_file_of_the_finder_holds_a_secret_of_the_run (v2.test_v21_r3_detail_rv_finderfiles.TheFindersOwnFilesKeepNoSecret.test_no_file_of_the_finder_holds_a_secret_of_the_run) (file='preview.log') | AssertionError"
+  },
+  {
+   "index": 29,
+   "mutant": "L230 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_rv_finderfiles.py",
+   "first": "FAIL: test_no_file_of_the_finder_holds_a_secret_of_the_run (v2.test_v21_r3_detail_rv_finderfiles.TheFindersOwnFilesKeepNoSecret.test_no_file_of_the_finder_holds_a_secret_of_the_run) (file='output.json') | AssertionError"
+  },
+  {
+   "index": 30,
+   "mutant": "L230 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_rv_finderfiles.py",
+   "first": "FAIL: test_no_file_of_the_finder_holds_a_secret_of_the_run (v2.test_v21_r3_detail_rv_finderfiles.TheFindersOwnFilesKeepNoSecret.test_no_file_of_the_finder_holds_a_secret_of_the_run) (file='ocr.log') | AssertionError"
+  },
+  {
+   "index": 83,
+   "mutant": "L222 string 'preview.json' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_rv_finderfiles.py",
+   "first": "ERROR: test_no_file_of_the_finder_holds_a_secret_of_the_run (v2.test_v21_r3_detail_rv_finderfiles.TheFindersOwnFilesKeepNoSecret.test_no_file_of_the_finder_holds_a_secret_of_the_run) | IsADirectoryError"
+  },
+  {
+   "index": 84,
+   "mutant": "L222 string 'preview.log' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_rv_finderfiles.py",
+   "first": "ERROR: test_no_file_of_the_finder_holds_a_secret_of_the_run (v2.test_v21_r3_detail_rv_finderfiles.TheFindersOwnFilesKeepNoSecret.test_no_file_of_the_finder_holds_a_secret_of_the_run) | IsADirectoryError"
+  },
+  {
+   "index": 85,
+   "mutant": "L230 string 'output.json' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_rv_finderfiles.py",
+   "first": "ERROR: test_no_file_of_the_finder_holds_a_secret_of_the_run (v2.test_v21_r3_detail_rv_finderfiles.TheFindersOwnFilesKeepNoSecret.test_no_file_of_the_finder_holds_a_secret_of_the_run) | IsADirectoryError"
+  },
+  {
+   "index": 86,
+   "mutant": "L230 string 'ocr.log' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_rv_finderfiles.py",
+   "first": "ERROR: test_no_file_of_the_finder_holds_a_secret_of_the_run (v2.test_v21_r3_detail_rv_finderfiles.TheFindersOwnFilesKeepNoSecret.test_no_file_of_the_finder_holds_a_secret_of_the_run) | IsADirectoryError"
+  },
+  {
+   "index": 154,
+   "mutant": "L221 string 'token' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_rv_finderfiles.py",
+   "first": "ERROR: test_no_file_of_the_finder_holds_a_secret_of_the_run (v2.test_v21_r3_detail_rv_finderfiles.TheFindersOwnFilesKeepNoSecret.test_no_file_of_the_finder_holds_a_secret_of_the_run) | KeyError"
+  },
+  {
+   "index": 221,
+   "mutant": "L221 string 'secrets' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_rv_finderfiles.py",
+   "first": "FAIL: test_no_file_of_the_finder_holds_a_secret_of_the_run (v2.test_v21_r3_detail_rv_finderfiles.TheFindersOwnFilesKeepNoSecret.test_no_file_of_the_finder_holds_a_secret_of_the_run) (file='ocr.log') | AssertionError"
+  }
+ ]
+}

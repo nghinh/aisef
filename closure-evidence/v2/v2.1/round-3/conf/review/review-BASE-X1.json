@@ -1,0 +1,804 @@
+{
+ "environment": {
+  "bubblewrap": "bubblewrap 0.12.0",
+  "kernel": "Linux 7.0.12-linuxkit aarch64",
+  "locales": [
+   "C",
+   "C.utf8",
+   "POSIX"
+  ],
+  "os": "Debian GNU/Linux 13 (trixie)",
+  "python": "3.14.8",
+  "uid": 1000
+ },
+ "record": {
+  "bind-null-at-dev-x": {
+   "accepted": true,
+   "devices": null,
+   "extra": [
+    "--bind",
+    "/dev/null",
+    "/dev/x"
+   ],
+   "problems": [],
+   "read_only": [],
+   "table_unchanged": true,
+   "writable_outside_the_workspace": [
+    {
+     "at": "/",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/proc",
+     "dev": null,
+     "fs": "proc",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/null",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/zero",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/full",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/random",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/urandom",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/tty",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/pts",
+     "dev": null,
+     "fs": "devpts",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/tmp",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/aisef-home",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/x",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    }
+   ]
+  },
+  "dev-bind-null-over-null": {
+   "accepted": true,
+   "devices": null,
+   "extra": [
+    "--dev-bind",
+    "/dev/null",
+    "/dev/null"
+   ],
+   "problems": [],
+   "read_only": [],
+   "table_unchanged": true,
+   "writable_outside_the_workspace": [
+    {
+     "at": "/",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/proc",
+     "dev": null,
+     "fs": "proc",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/null",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/zero",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/full",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/random",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/urandom",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/tty",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/pts",
+     "dev": null,
+     "fs": "devpts",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/tmp",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/aisef-home",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/null",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    }
+   ]
+  },
+  "read_only /dev": {
+   "accepted": false,
+   "devices": null,
+   "extra": [],
+   "problems": [
+    "no refusal of a further user namespace was measured (exit 127: unshare: absent)",
+    "the reachable unix sockets could not be listed (no find in the sandbox)"
+   ],
+   "read_only": [
+    "/dev"
+   ],
+   "table_unchanged": true,
+   "writable_outside_the_workspace": [
+    {
+     "at": "/",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/proc",
+     "dev": null,
+     "fs": "proc",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/null",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/zero",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/full",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/random",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/urandom",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/tty",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/pts",
+     "dev": null,
+     "fs": "devpts",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/tmp",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/aisef-home",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    }
+   ]
+  },
+  "read_only /dev/pts": {
+   "accepted": true,
+   "devices": null,
+   "extra": [],
+   "problems": [],
+   "read_only": [
+    "/dev/pts"
+   ],
+   "table_unchanged": true,
+   "writable_outside_the_workspace": [
+    {
+     "at": "/",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/proc",
+     "dev": null,
+     "fs": "proc",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/null",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/zero",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/full",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/random",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/urandom",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/tty",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/pts",
+     "dev": null,
+     "fs": "devpts",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/tmp",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/aisef-home",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    }
+   ]
+  },
+  "read_only /dev/shm": {
+   "accepted": true,
+   "devices": null,
+   "extra": [],
+   "problems": [],
+   "read_only": [
+    "/dev/shm"
+   ],
+   "table_unchanged": true,
+   "writable_outside_the_workspace": [
+    {
+     "at": "/",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/proc",
+     "dev": null,
+     "fs": "proc",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/null",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/zero",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/full",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/random",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/urandom",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/tty",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/pts",
+     "dev": null,
+     "fs": "devpts",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/tmp",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/aisef-home",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    }
+   ]
+  },
+  "read_only /run": {
+   "accepted": true,
+   "devices": null,
+   "extra": [],
+   "problems": [],
+   "read_only": [
+    "/run"
+   ],
+   "table_unchanged": true,
+   "writable_outside_the_workspace": [
+    {
+     "at": "/",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/proc",
+     "dev": null,
+     "fs": "proc",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/null",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/zero",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/full",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/random",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/urandom",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/tty",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/pts",
+     "dev": null,
+     "fs": "devpts",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/tmp",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/aisef-home",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    }
+   ]
+  },
+  "read_only /tmp": {
+   "accepted": true,
+   "devices": null,
+   "extra": [],
+   "problems": [],
+   "read_only": [
+    "/tmp"
+   ],
+   "table_unchanged": true,
+   "writable_outside_the_workspace": [
+    {
+     "at": "/",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/proc",
+     "dev": null,
+     "fs": "proc",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/null",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/zero",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/full",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/random",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/urandom",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/tty",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/pts",
+     "dev": null,
+     "fs": "devpts",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/tmp",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/aisef-home",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    }
+   ]
+  },
+  "stdin-is-a-terminal": {
+   "accepted": true,
+   "devices": null,
+   "extra": [],
+   "problems": [],
+   "read_only": [],
+   "stdin": "/dev/pts/0",
+   "table_unchanged": true,
+   "writable_outside_the_workspace": [
+    {
+     "at": "/",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/proc",
+     "dev": null,
+     "fs": "proc",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/null",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/zero",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/full",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/random",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/urandom",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/tty",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/dev/pts",
+     "dev": null,
+     "fs": "devpts",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/tmp",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    },
+    {
+     "at": "/aisef-home",
+     "dev": null,
+     "fs": "tmpfs",
+     "optional": null,
+     "source": null
+    }
+   ]
+  }
+ }
+}

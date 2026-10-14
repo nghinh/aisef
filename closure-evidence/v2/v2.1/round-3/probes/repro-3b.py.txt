@@ -1,0 +1,46 @@
+# repro-3b: where ast.parse starts to raise RecursionError / MemoryError, per interpreter (bisection), for the shapes a
+# generated source file could plausibly contain.  Run: py.sh probes -I <this file>   (PATH selects the interpreter)
+import ast
+import sys
+
+SHAPES = {
+    "a+1+1+...": lambda n: "x = 1" + "+1" * n,
+    "'s' + 's' + ...": lambda n: "x = 's'" + " + 's'" * n,
+    "a.b.c.d...": lambda n: "x = a" + ".b" * n,
+    "not not ...": lambda n: "x = " + "not " * n + "1",
+    "- - - ... 1": lambda n: "x = " + "-" * n + "1",
+    "x if c else (chain)": lambda n: "x = 1" + " if c else 1" * n,
+    "f()()()...": lambda n: "x = f" + "()" * n,
+    "[0]*N flat list": lambda n: "x = [" + "0," * n + "]",
+    "(((...)))": lambda n: "x = " + "(" * n + "1" + ")" * n,
+}
+
+
+def fails(src):
+    try:
+        ast.parse(src)
+        return None
+    except RecursionError:
+        return "RecursionError"
+    except MemoryError:
+        return "MemoryError"
+    except SyntaxError as e:
+        return "SyntaxError(%s)" % str(e)[:40]
+
+
+print("interpreter:", sys.version.split()[0])
+for name, mk in SHAPES.items():
+    lo, hi = 1, 1
+    while fails(mk(hi)) is None and hi < 2_000_000:
+        lo, hi = hi, hi * 2
+    kind = fails(mk(hi))
+    if kind is None:
+        print("%-22s no failure up to N=%d" % (name, hi))
+        continue
+    while hi - lo > 1:
+        mid = (lo + hi) // 2
+        if fails(mk(mid)) is None:
+            lo = mid
+        else:
+            hi = mid
+    print("%-22s largest N parsed = %-8d first failure N = %-8d %s" % (name, lo, hi, fails(mk(hi))))

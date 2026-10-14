@@ -1,0 +1,35 @@
+{
+ "accounting": {
+  "input_tokens": 200,
+  "output_tokens": 40,
+  "provider_requests": 3,
+  "turns": 0,
+  "unaccounted": []
+ },
+ "observation": {
+  "declared_model": "model-1",
+  "expected_listed_owner": "fake",
+  "expected_served_model": "model-1",
+  "listing": {
+   "http": 200,
+   "id": "model-1",
+   "listed": true,
+   "owned_by": "fake"
+  },
+  "probes": [
+   {
+    "http": 200,
+    "served_model": "model-1",
+    "system_fingerprint": "fp-1"
+   },
+   {
+    "http": 200,
+    "served_model": "model-1",
+    "system_fingerprint": "fp-1"
+   }
+  ],
+  "route": "fakeprov/model-1"
+ },
+ "problems": [],
+ "verdict": "ATTESTED"
+}

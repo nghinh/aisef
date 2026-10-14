@@ -1,0 +1,263 @@
+{
+ "target": "aisef2/app/usage.py::no_progress",
+ "files": [
+  "tests/v2/test_v21_kills3_A20.py",
+  "tests/v2/test_v21_kills3_T20a.py",
+  "tests/v2/test_v21_kills_usage.py"
+ ],
+ "source_sha256": "d037098c55bab449a0bbd9cf4926fb87a89bc550e16554c849cc46272a7e17ce",
+ "t0": [
+  {
+   "file": "tests/v2/test_v21_kills3_A20.py",
+   "seconds": 0.49,
+   "outcome": "PASS",
+   "ran": 2
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T20a.py",
+   "seconds": 0.69,
+   "outcome": "PASS",
+   "ran": 16
+  },
+  {
+   "file": "tests/v2/test_v21_kills_usage.py",
+   "seconds": 0.24,
+   "outcome": "PASS",
+   "ran": 1
+  }
+ ],
+ "error": null,
+ "results": [
+  {
+   "index": 0,
+   "mutant": "L137 returns None",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A20.py",
+   "first": "FAIL: test_attempts_that_differ_in_one_failure_are_not_the_same_failures (v2.test_v21_kills3_A20.FailuresOfAnAttemptAreASet.test_attempts_that_differ_in_one_failure_are_not_the_same_failures) | AssertionError"
+  },
+  {
+   "index": 1,
+   "mutant": "L128 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A20.py",
+   "first": "FAIL: test_the_same_failures_observed_in_another_order_are_the_same_failures (v2.test_v21_kills3_A20.FailuresOfAnAttemptAreASet.test_the_same_failures_observed_in_another_order_are_the_same_failures) | AssertionError"
+  },
+  {
+   "index": 2,
+   "mutant": "L133 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A20.py",
+   "first": "ERROR: test_attempts_that_differ_in_one_failure_are_not_the_same_failures (v2.test_v21_kills3_A20.FailuresOfAnAttemptAreASet.test_attempts_that_differ_in_one_failure_are_not_the_same_failures) | ValueError"
+  },
+  {
+   "index": 3,
+   "mutant": "L133 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A20.py",
+   "first": "ERROR: test_attempts_that_differ_in_one_failure_are_not_the_same_failures (v2.test_v21_kills3_A20.FailuresOfAnAttemptAreASet.test_attempts_that_differ_in_one_failure_are_not_the_same_failures) | ValueError"
+  },
+  {
+   "index": 4,
+   "mutant": "L135 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A20.py",
+   "first": "ERROR: test_attempts_that_differ_in_one_failure_are_not_the_same_failures (v2.test_v21_kills3_A20.FailuresOfAnAttemptAreASet.test_attempts_that_differ_in_one_failure_are_not_the_same_failures) | IndexError"
+  },
+  {
+   "index": 5,
+   "mutant": "L128 Eq->NotEq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A20.py",
+   "first": "FAIL: test_the_same_failures_observed_in_another_order_are_the_same_failures (v2.test_v21_kills3_A20.FailuresOfAnAttemptAreASet.test_the_same_failures_observed_in_another_order_are_the_same_failures) | AssertionError"
+  },
+  {
+   "index": 6,
+   "mutant": "L130 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A20.py",
+   "first": "FAIL: test_the_same_failures_observed_in_another_order_are_the_same_failures (v2.test_v21_kills3_A20.FailuresOfAnAttemptAreASet.test_the_same_failures_observed_in_another_order_are_the_same_failures) | AssertionError"
+  },
+  {
+   "index": 7,
+   "mutant": "L127 string 'story_id' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A20.py",
+   "first": "FAIL: test_the_same_failures_observed_in_another_order_are_the_same_failures (v2.test_v21_kills3_A20.FailuresOfAnAttemptAreASet.test_the_same_failures_observed_in_another_order_are_the_same_failures) | AssertionError"
+  },
+  {
+   "index": 8,
+   "mutant": "L128 string 'failure/observed' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A20.py",
+   "first": "FAIL: test_the_same_failures_observed_in_another_order_are_the_same_failures (v2.test_v21_kills3_A20.FailuresOfAnAttemptAreASet.test_the_same_failures_observed_in_another_order_are_the_same_failures) | AssertionError"
+  },
+  {
+   "index": 9,
+   "mutant": "L130 In->NotIn",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A20.py",
+   "first": "FAIL: test_the_same_failures_observed_in_another_order_are_the_same_failures (v2.test_v21_kills3_A20.FailuresOfAnAttemptAreASet.test_the_same_failures_observed_in_another_order_are_the_same_failures) | AssertionError"
+  },
+  {
+   "index": 10,
+   "mutant": "L128 string 'type' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A20.py",
+   "first": "ERROR: test_attempts_that_differ_in_one_failure_are_not_the_same_failures (v2.test_v21_kills3_A20.FailuresOfAnAttemptAreASet.test_attempts_that_differ_in_one_failure_are_not_the_same_failures) | KeyError"
+  },
+  {
+   "index": 11,
+   "mutant": "L130 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A20.py",
+   "first": "FAIL: test_the_same_failures_observed_in_another_order_are_the_same_failures (v2.test_v21_kills3_A20.FailuresOfAnAttemptAreASet.test_the_same_failures_observed_in_another_order_are_the_same_failures) | AssertionError"
+  },
+  {
+   "index": 12,
+   "mutant": "L130 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A20.py",
+   "first": "FAIL: test_the_same_failures_observed_in_another_order_are_the_same_failures (v2.test_v21_kills3_A20.FailuresOfAnAttemptAreASet.test_the_same_failures_observed_in_another_order_are_the_same_failures) | AssertionError"
+  },
+  {
+   "index": 13,
+   "mutant": "L130 element 2 dropped",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 14,
+   "mutant": "L134 And swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A20.py",
+   "first": "FAIL: test_attempts_that_differ_in_one_failure_are_not_the_same_failures (v2.test_v21_kills3_A20.FailuresOfAnAttemptAreASet.test_attempts_that_differ_in_one_failure_are_not_the_same_failures) | AssertionError"
+  },
+  {
+   "index": 15,
+   "mutant": "L136 dict entry 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A20.py",
+   "first": "ERROR: test_the_same_failures_observed_in_another_order_are_the_same_failures (v2.test_v21_kills3_A20.FailuresOfAnAttemptAreASet.test_the_same_failures_observed_in_another_order_are_the_same_failures) | KeyError"
+  },
+  {
+   "index": 16,
+   "mutant": "L136 dict entry 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A20.py",
+   "first": "ERROR: test_the_same_failures_observed_in_another_order_are_the_same_failures (v2.test_v21_kills3_A20.FailuresOfAnAttemptAreASet.test_the_same_failures_observed_in_another_order_are_the_same_failures) | KeyError"
+  },
+  {
+   "index": 17,
+   "mutant": "L136 dict entry 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A20.py",
+   "first": "ERROR: test_the_same_failures_observed_in_another_order_are_the_same_failures (v2.test_v21_kills3_A20.FailuresOfAnAttemptAreASet.test_the_same_failures_observed_in_another_order_are_the_same_failures) | KeyError"
+  },
+  {
+   "index": 18,
+   "mutant": "L127 string 'data' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A20.py",
+   "first": "ERROR: test_attempts_that_differ_in_one_failure_are_not_the_same_failures (v2.test_v21_kills3_A20.FailuresOfAnAttemptAreASet.test_attempts_that_differ_in_one_failure_are_not_the_same_failures) | KeyError"
+  },
+  {
+   "index": 19,
+   "mutant": "L129 string ': ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A20.py",
+   "first": "FAIL: test_the_same_failures_observed_in_another_order_are_the_same_failures (v2.test_v21_kills3_A20.FailuresOfAnAttemptAreASet.test_the_same_failures_observed_in_another_order_are_the_same_failures) | AssertionError"
+  },
+  {
+   "index": 20,
+   "mutant": "L130 string 'type' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A20.py",
+   "first": "ERROR: test_attempts_that_differ_in_one_failure_are_not_the_same_failures (v2.test_v21_kills3_A20.FailuresOfAnAttemptAreASet.test_attempts_that_differ_in_one_failure_are_not_the_same_failures) | KeyError"
+  },
+  {
+   "index": 21,
+   "mutant": "L130 string 'story/retry' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A20.py",
+   "first": "FAIL: test_the_same_failures_observed_in_another_order_are_the_same_failures (v2.test_v21_kills3_A20.FailuresOfAnAttemptAreASet.test_the_same_failures_observed_in_another_order_are_the_same_failures) | AssertionError"
+  },
+  {
+   "index": 22,
+   "mutant": "L130 string 'story/rollback' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A20.py",
+   "first": "FAIL: test_the_same_failures_observed_in_another_order_are_the_same_failures (v2.test_v21_kills3_A20.FailuresOfAnAttemptAreASet.test_the_same_failures_observed_in_another_order_are_the_same_failures) | AssertionError"
+  },
+  {
+   "index": 23,
+   "mutant": "L130 string 'story/commit' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 24,
+   "mutant": "L131 sorted() -> list()",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A20.py",
+   "first": "FAIL: test_the_same_failures_observed_in_another_order_are_the_same_failures (v2.test_v21_kills3_A20.FailuresOfAnAttemptAreASet.test_the_same_failures_observed_in_another_order_are_the_same_failures) | AssertionError"
+  },
+  {
+   "index": 25,
+   "mutant": "L134 Eq->NotEq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A20.py",
+   "first": "FAIL: test_attempts_that_differ_in_one_failure_are_not_the_same_failures (v2.test_v21_kills3_A20.FailuresOfAnAttemptAreASet.test_attempts_that_differ_in_one_failure_are_not_the_same_failures) | AssertionError"
+  },
+  {
+   "index": 26,
+   "mutant": "L136 string 'story' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A20.py",
+   "first": "ERROR: test_the_same_failures_observed_in_another_order_are_the_same_failures (v2.test_v21_kills3_A20.FailuresOfAnAttemptAreASet.test_the_same_failures_observed_in_another_order_are_the_same_failures) | KeyError"
+  },
+  {
+   "index": 27,
+   "mutant": "L136 string 'attempts_repeating_the_one_before' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A20.py",
+   "first": "ERROR: test_the_same_failures_observed_in_another_order_are_the_same_failures (v2.test_v21_kills3_A20.FailuresOfAnAttemptAreASet.test_the_same_failures_observed_in_another_order_are_the_same_failures) | KeyError"
+  },
+  {
+   "index": 28,
+   "mutant": "L136 string 'failures' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A20.py",
+   "first": "ERROR: test_the_same_failures_observed_in_another_order_are_the_same_failures (v2.test_v21_kills3_A20.FailuresOfAnAttemptAreASet.test_the_same_failures_observed_in_another_order_are_the_same_failures) | KeyError"
+  },
+  {
+   "index": 29,
+   "mutant": "L129 string 'code' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A20.py",
+   "first": "FAIL: test_the_same_failures_observed_in_another_order_are_the_same_failures (v2.test_v21_kills3_A20.FailuresOfAnAttemptAreASet.test_the_same_failures_observed_in_another_order_are_the_same_failures) | AssertionError"
+  },
+  {
+   "index": 30,
+   "mutant": "L129 string 'detail' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A20.py",
+   "first": "FAIL: test_the_same_failures_observed_in_another_order_are_the_same_failures (v2.test_v21_kills3_A20.FailuresOfAnAttemptAreASet.test_the_same_failures_observed_in_another_order_are_the_same_failures) | AssertionError"
+  },
+  {
+   "index": 31,
+   "mutant": "L129 string 'data' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A20.py",
+   "first": "ERROR: test_attempts_that_differ_in_one_failure_are_not_the_same_failures (v2.test_v21_kills3_A20.FailuresOfAnAttemptAreASet.test_attempts_that_differ_in_one_failure_are_not_the_same_failures) | KeyError"
+  },
+  {
+   "index": 32,
+   "mutant": "L129 string 'data' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A20.py",
+   "first": "ERROR: test_attempts_that_differ_in_one_failure_are_not_the_same_failures (v2.test_v21_kills3_A20.FailuresOfAnAttemptAreASet.test_attempts_that_differ_in_one_failure_are_not_the_same_failures) | KeyError"
+  }
+ ]
+}

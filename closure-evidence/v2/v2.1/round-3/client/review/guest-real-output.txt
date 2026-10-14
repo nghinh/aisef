@@ -1,0 +1,45 @@
+== U2028
+    host      /repo: kernel lines by LF 16, by splitlines 17; _host_mounts() = 16 rows; mount found at its path: True
+    bwrap     /repo: exit 0; kernel printed 15 lines; _sections 15 lines; _mounts 15 rows; the bind mount found at its path: True
+    host   /_before: kernel lines by LF 16, by splitlines 17; _host_mounts() = None; mount found at its path: False
+    bwrap  /_before: exit 0; kernel printed 15 lines; _sections 16 lines; _mounts 14 rows; the bind mount found at its path: False
+== U2029
+    host      /repo: kernel lines by LF 16, by splitlines 17; _host_mounts() = 16 rows; mount found at its path: True
+    bwrap     /repo: exit 0; kernel printed 15 lines; _sections 15 lines; _mounts 15 rows; the bind mount found at its path: True
+    host   /_before: kernel lines by LF 16, by splitlines 17; _host_mounts() = None; mount found at its path: False
+    bwrap  /_before: exit 0; kernel printed 15 lines; _sections 16 lines; _mounts 14 rows; the bind mount found at its path: False
+== U0085
+    host      /repo: kernel lines by LF 16, by splitlines 17; _host_mounts() = 16 rows; mount found at its path: True
+    bwrap     /repo: exit 0; kernel printed 15 lines; _sections 15 lines; _mounts 15 rows; the bind mount found at its path: True
+    host   /_before: kernel lines by LF 16, by splitlines 17; _host_mounts() = None; mount found at its path: False
+    bwrap  /_before: exit 0; kernel printed 15 lines; _sections 16 lines; _mounts 14 rows; the bind mount found at its path: False
+== NBSP
+    host      /repo: kernel lines by LF 16, by splitlines 16; _host_mounts() = 16 rows; mount found at its path: True
+    bwrap     /repo: exit 0; kernel printed 15 lines; _sections 15 lines; _mounts 15 rows; the bind mount found at its path: True
+    host   /_before: kernel lines by LF 16, by splitlines 16; _host_mounts() = 16 rows; mount found at its path: False
+    bwrap  /_before: exit 0; kernel printed 15 lines; _sections 15 lines; _mounts 15 rows; the bind mount found at its path: False
+== U3000
+    host      /repo: kernel lines by LF 16, by splitlines 16; _host_mounts() = 16 rows; mount found at its path: True
+    bwrap     /repo: exit 0; kernel printed 15 lines; _sections 15 lines; _mounts 15 rows; the bind mount found at its path: True
+    host   /_before: kernel lines by LF 16, by splitlines 16; _host_mounts() = 16 rows; mount found at its path: False
+    bwrap  /_before: exit 0; kernel printed 15 lines; _sections 15 lines; _mounts 15 rows; the bind mount found at its path: False
+== VT
+    host      /repo: kernel lines by LF 16, by splitlines 17; _host_mounts() = 16 rows; mount found at its path: True
+    bwrap     /repo: exit 0; kernel printed 15 lines; _sections 15 lines; _mounts 15 rows; the bind mount found at its path: True
+    host   /_before: kernel lines by LF 16, by splitlines 17; _host_mounts() = None; mount found at its path: False
+    bwrap  /_before: exit 0; kernel printed 15 lines; _sections 16 lines; _mounts 14 rows; the bind mount found at its path: False
+== FF
+    host      /repo: kernel lines by LF 16, by splitlines 17; _host_mounts() = 16 rows; mount found at its path: True
+    bwrap     /repo: exit 0; kernel printed 15 lines; _sections 15 lines; _mounts 15 rows; the bind mount found at its path: True
+    host   /_before: kernel lines by LF 16, by splitlines 17; _host_mounts() = None; mount found at its path: False
+    bwrap  /_before: exit 0; kernel printed 15 lines; _sections 16 lines; _mounts 14 rows; the bind mount found at its path: False
+== FS
+    host      /repo: kernel lines by LF 16, by splitlines 17; _host_mounts() = 16 rows; mount found at its path: True
+    bwrap     /repo: exit 0; kernel printed 15 lines; _sections 15 lines; _mounts 15 rows; the bind mount found at its path: True
+    host   /_before: kernel lines by LF 16, by splitlines 17; _host_mounts() = None; mount found at its path: False
+    bwrap  /_before: exit 0; kernel printed 15 lines; _sections 16 lines; _mounts 14 rows; the bind mount found at its path: False
+== CR
+    host      /repo: kernel lines by LF 16, by splitlines 17; _host_mounts() = None; mount found at its path: False
+    bwrap     /repo: exit 0; kernel printed 15 lines; _sections 16 lines; _mounts 14 rows; the bind mount found at its path: False
+    host   /_before: kernel lines by LF 16, by splitlines 17; _host_mounts() = None; mount found at its path: False
+    bwrap  /_before: exit 0; kernel printed 15 lines; _sections 16 lines; _mounts 14 rows; the bind mount found at its path: False

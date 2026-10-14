@@ -1,0 +1,61 @@
+# repro-6 (probes WP, R-3.1 and the recalibration inventory): which bytes enter each probe's EXECUTION_DIGEST.
+# Works on scratch COPIES of the aisef2 package under a temp dir (the worktree is never edited): one byte is changed
+# in a copy, `_probe_digest()` of every probe is recomputed from that copy, and compared with the unchanged copy.
+# Run from the worktree root:  py.sh probes -I <this file>
+import importlib
+import os
+import pathlib
+import shutil
+import sys
+import tempfile
+
+SRC = pathlib.Path(os.getcwd()) / "aisef2"
+PROBES = ("file_artifact", "cli_invocation", "process_effect", "python_callable_v2", "python_callable", "RUNSPEC kernel capability")
+
+
+def digests(tree: pathlib.Path) -> dict:
+    for name in [n for n in sys.modules if n == "aisef2" or n.startswith("aisef2.")]:
+        del sys.modules[name]
+    sys.path.insert(0, str(tree))
+    try:
+        out = {}
+        for p in PROBES:
+            if p.startswith("RUNSPEC"):
+                out[p] = importlib.import_module("aisef2.app.run").kernel_digest()
+                continue
+            m = importlib.import_module("aisef2.probe." + p)
+            out[p] = m._probe_digest()
+        assert pathlib.Path(sys.modules["aisef2"].__file__).resolve().is_relative_to(tree.resolve())
+        return out
+    finally:
+        sys.path.remove(str(tree))
+
+
+def variant(label, base, rel, edit):
+    with tempfile.TemporaryDirectory(prefix="aisef2-r3-digest-") as t:
+        tree = pathlib.Path(t, "copy")
+        shutil.copytree(SRC.parent / "aisef2", tree / "aisef2", ignore=shutil.ignore_patterns("__pycache__"))
+        f = tree / "aisef2" / rel
+        f.write_bytes(edit(f.read_bytes()))
+        got = digests(tree)
+    changed = [p for p in PROBES if got[p] != base[p]]
+    print("%-62s changes the EXECUTION_DIGEST of: %s" % (label, changed or "none of them"))
+
+
+print("interpreter:", sys.version.split()[0], sys.platform)
+with tempfile.TemporaryDirectory(prefix="aisef2-r3-digest-") as t:
+    shutil.copytree(SRC, pathlib.Path(t, "aisef2"), ignore=shutil.ignore_patterns("__pycache__"))
+    base = digests(pathlib.Path(t))
+for p in PROBES:
+    print("  %-18s %s" % (p, base[p][:16]))
+comment = lambda b: b + b"\n# one comment line\n"
+variant("a comment in runtime/process_range.py", base, "runtime/process_range.py", comment)
+variant("a comment in runtime/range_anchor.py", base, "runtime/range_anchor.py", comment)
+variant("a SEMANTIC edit in process_range.py (members() returns [])", base, "runtime/process_range.py",
+        lambda b: b.replace(b"    def members(self) -> list[Proc]:\n", b"    def members(self) -> list[Proc]:\n        return []\n", 1))
+variant("a comment in product/outcome.py (verdict -> result mapping)", base, "product/outcome.py", comment)
+variant("a comment in probe/protocol.py (classify_failure)", base, "probe/protocol.py", comment)
+variant("a comment in probe/cli_invocation.py", base, "probe/cli_invocation.py", comment)
+variant("a comment in probe/process_effect.py", base, "probe/process_effect.py", comment)
+variant("a comment in probe/file_artifact.py", base, "probe/file_artifact.py", comment)
+variant("a comment in probe/python_callable_v2.py", base, "probe/python_callable_v2.py", comment)

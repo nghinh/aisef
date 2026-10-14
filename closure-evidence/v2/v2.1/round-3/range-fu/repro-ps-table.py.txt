@@ -1,0 +1,55 @@
+"""Repro (real, this host): `process_range.process_table()` while a process on the host has a command line that holds
+a character `str.splitlines()` breaks at.
+
+usage:  python3 -B -I repro-ps-table.py.txt TREE        (TREE: a checkout holding aisef2/)
+
+For each character, for `ps` run in a UTF-8 locale and in the C locale, and for three shapes of what follows the
+character in the command line, this starts ONE child of its own
+(`/bin/zsh -c 'echo ready; read x; : TEXT'`: it reports that it runs, then waits for its stdin to close), calls
+`process_table()`, shows what came back, and closes the child's stdin so the child ends by itself. Nothing is
+signalled. The characters are built with chr(), so no source text and no command line of the caller carries one.
+
+  words     TEXT = MARK <char> alpha beta gamma delta END      (>= 4 words after the character)
+  short     TEXT = MARK <char> END                              (< 4 words after the character)
+  fabricated TEXT = MARK <char> 99998 1 99998 S fabricated-row  (a row-shaped text; pid 99998 is not alive)
+"""
+import os
+import subprocess
+import sys
+
+sys.path.insert(0, sys.argv[1])
+from aisef2.runtime import process_range as pr  # noqa: E402
+
+FAKE = 99998
+CHARS = [("U+0085 NEL", 0x85), ("U+2028 LS", 0x2028), ("U+2029 PS", 0x2029), ("U+000B VT", 0x0B), ("U+000C FF", 0x0C),
+         ("U+001C FS", 0x1C), ("U+001D GS", 0x1D), ("U+001E RS", 0x1E), ("U+000A LF", 0x0A), ("U+000D CR", 0x0D)]
+SHAPES = {"words": "alpha beta gamma delta END", "short": "END", "fabricated": f"{FAKE} 1 {FAKE} S fabricated-row"}
+print("tree", sys.argv[1], "| LINUX", pr.LINUX, "| python", sys.version.split()[0], "|", os.uname().sysname,
+      os.uname().release)
+assert subprocess.run(["ps", "-p", str(FAKE)], capture_output=True).returncode != 0, f"pid {FAKE} is alive: pick another"
+
+for name, code in CHARS:
+    for locale in ("en_US.UTF-8", "C"):
+        os.environ["LC_ALL"] = locale
+        for shape, text in SHAPES.items():
+            mark = f"SEPTEST{code:04X}"
+            script = f"echo ready; read x; : '{mark}{chr(code)}{text}'"
+            child = subprocess.Popen(["/bin/zsh", "-c", script], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+            try:
+                assert child.stdout.readline() == b"ready\n"
+                printed = subprocess.run(["ps", "-p", str(child.pid), "-o", "command="], capture_output=True,
+                                         check=True).stdout.decode("utf-8", "replace").rstrip("\n")
+                try:
+                    table = pr.process_table()
+                except Exception as e:  # noqa: BLE001 — the repro reports whatever it is
+                    result = f"RAISED {type(e).__name__}: {str(e)[:70]!r}"
+                else:
+                    row = table.get(child.pid)
+                    whole = row is not None and row.command == printed
+                    result = (f"{len(table)} rows; child row {'MISSING' if row is None else 'present'}, "
+                              f"whole command: {whole}; fabricated pid {FAKE} in table: {FAKE in table}")
+                print(f"{name:10} LC_ALL={locale:11} {shape:10} printed raw: {chr(code) in printed!s:5} -> {result}")
+            finally:
+                child.stdin.close()
+                child.wait()
+                child.stdout.close()

@@ -1,0 +1,32 @@
+{
+ "target": "aisef2/runtime/process_range.py::_Posix.abort",
+ "files": [
+  "tests/v2/test_v21_r3_range_abort.py"
+ ],
+ "source_sha256": "05f606bf6473570dc98799f04809281282290a8964a67024fe1b402b10f82773",
+ "t0": [
+  {
+   "file": "tests/v2/test_v21_r3_range_abort.py",
+   "seconds": 0.6,
+   "outcome": "PASS",
+   "ran": 3
+  }
+ ],
+ "error": null,
+ "results": [
+  {
+   "index": 0,
+   "mutant": "L187 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_abort.py",
+   "first": "FAIL: test_a_live_anchor_has_its_whole_group_killed_once (v2.test_v21_r3_range_abort.AbortKillsOnlyALiveAnchorsGroup.test_a_live_anchor_has_its_whole_group_killed_once) | AssertionError"
+  },
+  {
+   "index": 1,
+   "mutant": "L187 Is->IsNot",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_abort.py",
+   "first": "FAIL: test_a_live_anchor_has_its_whole_group_killed_once (v2.test_v21_r3_range_abort.AbortKillsOnlyALiveAnchorsGroup.test_a_live_anchor_has_its_whole_group_killed_once) | AssertionError"
+  }
+ ]
+}

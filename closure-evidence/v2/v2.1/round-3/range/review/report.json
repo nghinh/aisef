@@ -1,0 +1,373 @@
+{
+ "wp": "range",
+ "reviewer_branch": "v21r3/range-rv",
+ "head": "75aac7af3b757b7e36670241b5d672b0f5092732",
+ "implementer_head": "fff916f562d6f5cb406e932375230bf089e1a4b7",
+ "verdict": "ACCEPT_WITH_FIXES",
+ "files_changed_by_review": [
+  "tests/v2/test_v21_r3_range_release_contract.py",
+  "docs/v2.1/decisions/B03-R3-range.md"
+ ],
+ "product_code_changed_by_review": false,
+ "tests_added_by_review": [
+  "ClaimAndWait.test_two_threads_that_arrive_together_are_not_both_leaders",
+  "ClaimAndWait.test_a_caller_is_held_until_the_release_has_ended_wherever_the_release_is (5 subtests)",
+  "ClaimAndWait.test_a_caller_waits_for_the_escapee_check_and_is_given_its_outcome",
+  "EscapeeLooks.test_an_escapee_seen_only_before_the_ladder_is_reported",
+  "EscapeeLooks.test_an_escapee_seen_only_after_the_ladder_is_reported",
+  "EscapeeLooks.test_an_escapee_seen_at_both_looks_is_named_once",
+  "EscapeeLooks.test_an_escapee_that_is_gone_when_the_release_ends_is_not_reported",
+  "AbandonedWorker.test_a_release_the_scope_abandoned_... (strengthened: the late caller is seen polling; design-bound)"
+ ],
+ "owner_sentences": [
+  {
+   "sentence": "Tôi chọn sửa lỗi thay vì giữ flake 1–5%.",
+   "status": "MET",
+   "evidence": "BASE fails the deterministic tests (12 of the 25, +7 of the review's; exact ValueError 'PyMemoryView_FromBuffer(): info->buf must not be NULL'; host x3, Python 3.12.14, Linux guest). Branch: 32/32 forty times on the host, 3 on 3.12.14, once in the guest. Supplement, 100 runs each: FM2_CLI_SUBJECT_3 BASE 96/100 (4 failures, all through run.release() -> _close_pipes()), branch 100/100; FM2_EFFECT_10 BASE 99/100 (1 failure, exact error), branch 100/100. Guest loop of FM2_CLI_SUBJECT_3 on BASE 100/100: does not discriminate (as the implementer said)."
+  },
+  {
+   "sentence": "Trước hết xác minh hợp đồng gọi đồng thời; lựa chọn RLock hay cách sửa khác phải dựa trên đường gọi thực tế.",
+   "status": "MET",
+   "evidence": "Every .release() caller in aisef2/ re-grepped and its thread read (client.py:218, adapters.py:291, test_execution.py:469, the four probes, StoryScope._release worker, Ranged, ToolCall.finish, RunScope.interrupt, the single SIGINT handler run_scope.py:254 that only sets a flag, mutation.py:1556/1583 sequential twice, no fork/multiprocessing/atexit/__del__ in aisef2): no product path overlaps two releases of one range; two by-design tests and a constructed abandoned-worker case do. This is a reading, not a measurement. The mechanism is argued from the contract and the RLock/Lock/swallow alternatives were re-applied to BASE and measured (RLock 7 of 32 fail, Lock 8, swallow 18)."
+  },
+  {
+   "sentence": "Có test tái hiện bằng điều phối luồng có kiểm soát, kiểm tra tính idempotent, quyền sở hữu tiến trình và tránh deadlock.",
+   "status": "PARTLY (at fff916f); MET at 75aac7a",
+   "evidence": "At the implementer's head the 25 tests passed three wrong implementations: a claim with no lock (and no _mx attribute), a claim with a lock around read and write separately (TOCTOU), and a waiter that returns once the leader is `disposing` (before the reap, pipe close and escapee check). RealRange (barrier aligned) saw the unlocked claim 0 times in 100 runs. 7 tests added; each fails those variants deterministically and passes the correct code 40/40."
+  },
+  {
+   "sentence": "Không chỉ lặp test nhiều lần rồi kết luận hết lỗi.",
+   "status": "MET",
+   "evidence": "The proof is the deterministic choreography (fake backend, thread parking); loops are labelled a supplement, and the guest loop that does not discriminate is said so. One test (ClaimAndWait claim test) uses a bounded wait (CLAIM_PROBE_S = 1 s) whose expiry is the expected outcome in a correct run; it can not fail a correct implementation."
+  },
+  {
+   "sentence": "Phân tích phạm vi bằng chứng bị ảnh hưởng.",
+   "status": "MET with corrections",
+   "evidence": "Section 7/8.5/8.6 of the doc. Corrected: validation/ importers are 15 files, not 16; ProcessRange.__init__ (changed) was missing from the registration list of section 7 (it is in the report). Sealed-record claims re-run: BASE k_nowork OK, p5_acceptance 1 failure, checker_calibration 2, orchestration_conformance 1; branch 1/2/2/1 + PlanCorrection + Classify[P4], all digest-bound."
+  }
+ ],
+ "claims": [
+  {
+   "claim": "release is single flight: first caller leads; a caller arriving during the release polls and is given a copy of RangeNotEmpty/RangeEscaped",
+   "verdict": "CONFIRMED",
+   "note": "code read in full; tests; the waiter gets a copy with __cause__ = the leader's"
+  },
+  {
+   "claim": "a call after the release ended behaves as before (None once reaped; a new ladder after RangeNotEmpty; mutation.py:1583 relies on it)",
+   "verdict": "CONFIRMED",
+   "note": "Idempotence tests; mutation.py:1556/1583 read: sequential twice with _wait lowered"
+  },
+  {
+   "claim": "re-entry on the releasing thread stops the range if the frame below is in the ladder, returns at once past it",
+   "verdict": "CONFIRMED",
+   "note": "Reentry tests; re-entry past the ladder never reaps (reap happens only in _release after disposing)"
+  },
+  {
+   "claim": "claim lock is an RLock; waiters poll with time.sleep and hold nothing",
+   "verdict": "CONFIRMED",
+   "note": "code; the polling is pinned by the AbandonedWorker assertion (design-bound) added in review"
+  },
+  {
+   "claim": "no product path overlaps two releases of one range",
+   "verdict": "CONFIRMED",
+   "note": "by reading; no counter-example found; a future signal handler calling release is the only plausible one and it is handled (re-entry)"
+  },
+  {
+   "claim": "the investigator's RLock diff fails 5 of 25; plain Lock 6 of 25 (3 by deadlock); swallow ValueError 11 of 25",
+   "verdict": "CONFIRMED",
+   "note": "counts reproduced (+1/+2/+7 with the review's tests); the split 'by deadlock' not re-counted (Lock run took 116 s: hangs end at the 10 s bounds)"
+  },
+  {
+   "claim": "against BASE 12 of 25 fail + 1 skipped, 40/40 runs, the exact ValueError",
+   "verdict": "CONFIRMED",
+   "note": "3 host runs, 1 on Python 3.12.14, 1 in the guest; 40/40 not repeated (deterministic)"
+  },
+  {
+   "claim": "the same 12 fail on Linux in the guest (real run)",
+   "verdict": "REVISED",
+   "note": "reproduced (19 with the review's tests, exact ValueError). The run is real; the tests are fake-backend simulations: the label 'real run' is of the execution, not of the process behaviour"
+  },
+  {
+   "claim": "69 mutants of release/_ladder/_release/_Flight.__init__/ProcessRange.__init__, all killed by the new file alone, 0 survivors",
+   "verdict": "REVISED",
+   "note": "re-run of the 25-test file: release 22 KILLED + 1 INFRA ([17] L457 not removed; alone KILLED, KILLED, INFRA in three runs by different tests). With the 32-test file 69/69 KILLED, [17] KILLED 5/5 by AbandonedWorker"
+  },
+  {
+   "claim": "FM2_CLI_SUBJECT_3 200x: BASE 195 pass/5 fail (exact error in 6), branch 200/200",
+   "verdict": "CONFIRMED",
+   "note": "re-run 100x: BASE 96/4 (exact in 7 outputs), branch 100/100"
+  },
+  {
+   "claim": "FM2_EFFECT_10 200x: BASE exact error in 2 outputs while the test passed; branch 200/200",
+   "verdict": "CONFIRMED",
+   "note": "re-run 100x: BASE 99 pass/1 fail, exact error in 1 output; branch 100/100"
+  },
+  {
+   "claim": "guest 100x on BASE showed no failure (does not discriminate)",
+   "verdict": "CONFIRMED",
+   "note": "100/100 in the guest on BASE"
+  },
+  {
+   "claim": "sweep: 55 modules, 1,122 tests, 52 OK; p4.test_interruption fails only as a background job",
+   "verdict": "CONFIRMED",
+   "note": "re-ran 23 of the 55 modules (incl. test_c2_cli_invocation, test_probe_process_effect, test_python_callable_v2, test_c2_p9_harness, conformance.test_freeze_f1_f11, test_v21_continue_integrity, test_v21_snapshot_delta, test_p6_orchestration): all OK; p4.test_interruption 20 OK x3 in the foreground; plus the sealed-record modules below. The other 32 modules were not re-run"
+  },
+  {
+   "claim": "BASE already fails 4 sealed-record tests; the change adds 4 (digest-bound)",
+   "verdict": "CONFIRMED",
+   "note": "BASE (git checkout of 3dc827b): k_nowork OK, p5_acceptance 1, calibration 2, conformance 1; branch: 1, 2, 2, 1, plus PlanCorrection and Classify[P4] (reason read: 'target changed since the mutation run', tree digest)"
+  },
+  {
+   "claim": "existing tests changed: none; RERAISES census did not move",
+   "verdict": "CONFIRMED",
+   "note": "git diff 3dc827b..fff916f touches 3 files, one new test file; p5.test_invariants 50 OK"
+  },
+  {
+   "claim": "'real io objects' in the ValueError test; the doc lists it under Real",
+   "verdict": "RECLASSIFIED",
+   "note": "CPython's TextIOWrapper/BufferedWriter over a simulated EPIPE raw, with the interleaving forced by a hook in close(): real io classes, simulated pipe and schedule"
+  },
+  {
+   "claim": "not established: KeyboardInterrupt between the claim and the try would strand waiters",
+   "verdict": "REVISED",
+   "note": "the claim is inside the try; only the two bytecodes before `flight.done = True` in the finally can strand a flight"
+  },
+  {
+   "claim": "validation/ has 16 importers of process_range",
+   "verdict": "REVISED",
+   "note": "15 (grep -rl process_range validation, excluding __pycache__)"
+  },
+  {
+   "claim": "a leak is never silent for a caller that waited",
+   "verdict": "CONFIRMED",
+   "note": "for a caller that arrives during the release. A caller arriving after it ended gets None (as BASE): the outcome depends on a microsecond window (D1)"
+  }
+ ],
+ "defects_found": [
+  {
+   "what": "TEST GAP: the atomicity of the claim across threads is not tested. A claim with no lock (no _mx attribute: the only test that looks for _mx skips) and a claim in two critical sections both pass all 25 tests; RealRange saw the unlocked claim 0/100.",
+   "severity": "high (the original defect's own window)",
+   "fixed_in_commit": "75aac7a"
+  },
+  {
+   "what": "TEST GAP: nothing holds a second caller while the leader is past the ladder. A waiter that returns when `disposing` is set (before reap, pipe close, escapee check) passes all 25 (by the 20 ms poll granularity) and re-creates the silent leak for that waiter.",
+   "severity": "medium-high",
+   "fixed_in_commit": "75aac7a"
+  },
+  {
+   "what": "UNSTABLE KILL: release mutant [17] (L457 'not' removed: a waiter that spins) was INFRA in one full run and in 1 of 3 isolated runs; killed by a different test each time (only a rare hang window made the file fail). It would have been a coin flip in the lead's re-measurement.",
+   "severity": "medium",
+   "fixed_in_commit": "75aac7a"
+  },
+  {
+   "what": "TEST GAP (pre-existing): deleting the second look at escapees in _release (Linux orphan re-parented to the anchor) is caught by neither the new file nor tests/v2/p4/test_process_range.py, on the host or in the guest.",
+   "severity": "low-medium",
+   "fixed_in_commit": "75aac7a"
+  },
+  {
+   "what": "DOC: validation importer count (15 not 16); ProcessRange.__init__ missing from the registration list; the asynchronous-exception window mis-stated; 'real' labels for the io test and the guest run.",
+   "severity": "low",
+   "fixed_in_commit": "75aac7a"
+  },
+  {
+   "what": "DESIGN (owner, not changed): the outcome a caller gets from a concurrent release depends on whether it arrived during the release (RangeEscaped) or after it (None). In the two by-design tests the stop thread's exception is read by nobody, so whether the probe's own finally sees a leak depends on a microsecond window. No product path has such a pair.",
+   "severity": "medium (decision D1)",
+   "fixed_in_commit": null
+  },
+  {
+   "what": "RESIDUAL: a leader that dies of a non-Residual after the reap (e.g. process_table() failing in the escapee check) hands its waiters None: the escapee check did not complete for anyone.",
+   "severity": "low",
+   "fixed_in_commit": null
+  },
+  {
+   "what": "STYLE (rule 6): three tests assert whole messages of RangeNotEmpty/RangeEscaped (the text is old, moved byte for byte; the assertion pins that). One design-bound assertion (polling) rejects a correct blocking-lock implementation (RLock/Lock alternatives fail AbandonedWorker for that reason as well).",
+   "severity": "low",
+   "fixed_in_commit": null
+  }
+ ],
+ "counter_examples": [
+  {
+   "impl": "no claim lock, no _mx attribute (variants/v14b_no_lock_no_attr.py)",
+   "passes": "24 OK + 1 skipped of 25",
+   "fails_now": "ClaimAndWait.test_two_threads_that_arrive_together_are_not_both_leaders"
+  },
+  {
+   "impl": "claim = two separate critical sections (v14c_toctou.py)",
+   "passes": "25/25",
+   "fails_now": "same test"
+  },
+  {
+   "impl": "waiter returns when leader.disposing (v9_waiter_returns_at_disposing.py)",
+   "passes": "25/25",
+   "fails_now": "ClaimAndWait held-until-ended (5 subtests) and escapee-check test"
+  },
+  {
+   "impl": "flight.done set right after the ladder (v_done_early.py)",
+   "passes": "24/25",
+   "fails_now": "held-until-ended (5), escapee-check"
+  },
+  {
+   "impl": "second escapee look deleted (stmt/s27)",
+   "passes": "25/25 and p4/test_process_range 24/24 (host, guest)",
+   "fails_now": "EscapeeLooks.test_an_escapee_seen_only_after_the_ladder_is_reported"
+  },
+  {
+   "impl": "first escapee look deleted (stmt/s20)",
+   "passes": "25/25 (p4 file kills it)",
+   "fails_now": "EscapeeLooks (after-the-ladder test)"
+  },
+  {
+   "impl": "waiter raises the same exception object (v_same_object.py)",
+   "passes": "-",
+   "fails_now": "pinned by the original 25 (IsNot / __cause__): a design pin"
+  },
+  {
+   "impl": "waiter swallows the outcome; fire-and-forget waiter; re-entry returns at once without a ladder",
+   "passes": "-",
+   "fails_now": "caught by the original 25 (2, 6, 2 tests)"
+  }
+ ],
+ "mutants_rerun": [
+  {
+   "function": "ProcessRange.release",
+   "file": "25-test",
+   "total": 23,
+   "killed": 22,
+   "infra": 1,
+   "note": "[17] L457 not removed: INFRA; isolated: KILLED(MutualExclusion test), KILLED(AbandonedWorker), INFRA"
+  },
+  {
+   "function": "ProcessRange.release",
+   "file": "32-test",
+   "total": 23,
+   "killed": 23,
+   "survived": 0,
+   "note": "[17] KILLED by AbandonedWorker, 5/5 (batch + 4 isolated)"
+  },
+  {
+   "function": "ProcessRange._ladder",
+   "file": "32-test",
+   "total": 15,
+   "killed": 15,
+   "survived": 0
+  },
+  {
+   "function": "ProcessRange._release",
+   "file": "32-test",
+   "total": 12,
+   "killed": 12,
+   "survived": 0
+  },
+  {
+   "function": "_Flight.__init__",
+   "file": "32-test",
+   "total": 2,
+   "killed": 2,
+   "survived": 0
+  },
+  {
+   "function": "ProcessRange.__init__",
+   "file": "32-test",
+   "total": 17,
+   "killed": 17,
+   "survived": 0,
+   "note": "[0-13] killed by a ValueError at construction (a dropped element of a tuple unpack), [15],[16] by RangeError in RealRange"
+  },
+  {
+   "function": "statement deletions (probe, not kill_check)",
+   "total": 38,
+   "killed": 33,
+   "killed_by_hang": 3,
+   "survived_before_additions": 2,
+   "survived_after": 0
+  }
+ ],
+ "false_refusal_search": {
+  "note": "release() refuses nothing and returns/raises the same classes; the risk is a new wait. Searched: product callers and threads (table above); signal handlers (one, sets a flag); fork/multiprocessing/register_at_fork/__del__/atexit in aisef2 (none: an RLock in a forked child is not a hazard here); subclasses or __new__ of ProcessRange and consumers of _mx/_flight (none); pickling/deepcopy of ranges (none); the Windows _Job path (stages class attribute, close() guarded: read, not run); Python 3.11 syntax (ast feature_version=(3,11) parse OK, no PEP 701 f-strings); run on 3.12.14.",
+  "result": "no false refusal or changed outcome found; sequential callers (mutation.py:1556/1583, Ranged, ToolCall.finish) behave as BASE (tests + importer modules)"
+ },
+ "real_vs_simulated_corrections": [
+  "ValueError test: real CPython io classes over a SIMULATED EPIPE raw with a forced interleaving (the doc listed it under 'Real'; reworded).",
+  "'guest (real run)' of the contract tests: a real run on Linux of fake-backend (simulated) tests; the reproduction shows the CPython-level ValueError is not macOS's, nothing about real process behaviour.",
+  "Real: RealRange (real target/anchor/pipes, 2 threads), the failed-start test, the existing p4/c2/probe tests host + guest, the supplement loops.",
+  "Not run by anyone: Windows; Python 3.11 and 3.13 (3.12.14 run by the review)."
+ ],
+ "test_runs": [
+  {
+   "what": "contract file, branch, host x40",
+   "result": "32/32 OK x40"
+  },
+  {
+   "what": "contract file on BASE, host x3 / Python 3.12.14 / guest",
+   "result": "12 FAIL + 1 skip of the original 25 (19 + 1 with the review's 7), exact ValueError"
+  },
+  {
+   "what": "contract file, Python 3.12.14 x3; guest x1",
+   "result": "32 OK each"
+  },
+  {
+   "what": "p4.test_process_range host / 3.12.14 / guest X1",
+   "result": "24 OK / 37 OK with p0.test_destructive_authority (1 skipped) / 24 OK"
+  },
+  {
+   "what": "test_v21_confine host / guest X1 / guest hardened",
+   "result": "34 OK each"
+  },
+  {
+   "what": "p0.test_destructive_authority, p4.test_mutation_safety, p5.test_invariants",
+   "result": "13 OK, 10 OK, 50 OK"
+  },
+  {
+   "what": "importers re-run (host)",
+   "result": "19 modules OK here (+ p0.test_destructive_authority, p4.test_mutation_safety, p4.test_process_range, p5.test_invariants above = 23): test_process_owner 7, p4.test_interruption 20 (x3 foreground), c2_cli_invocation 32, probe_process_effect 24, python_callable_v2 33, p2.test_python_callable 37, c2_p9_harness 31, p5.test_vacuity 19, p6_orchestration 32, p4.test_budgets 7, p4.test_process_table 6, no_dual_authority 17, old_path_audit 41, p2.test_static_admission 27, v21_read_set 26, conformance.test_freeze_f1_f11 22, v21_continue_integrity 24, v21_snapshot_delta 51"
+  },
+  {
+   "what": "sealed-record checkers BASE (git checkout 3dc827b) vs branch",
+   "result": "k_nowork OK vs 1 failure; p5_acceptance 1 vs 2; checker_calibration 2 vs 2; orchestration_conformance 1 vs 1; PlanCorrection and Classify[P4] fail on the branch (digest of process_range.py / aisef2/)"
+  },
+  {
+   "what": "ruff check . (whole tree)",
+   "result": "All checks passed (before the commit)"
+  },
+  {
+   "what": "supplement loops 100x: FM2_CLI_SUBJECT_3 BASE/branch; FM2_EFFECT_10 BASE/branch; guest FM2_CLI_SUBJECT_3 BASE",
+   "result": "96/100 (4 fail, 7 outputs with the exact error) / 100/100; 99/100 (1 fail) / 100/100; 100/100 (does not discriminate)"
+  }
+ ],
+ "kill_files_by_function": {
+  "aisef2/runtime/process_range.py::ProcessRange.release": [
+   "tests/v2/test_v21_r3_range_release_contract.py",
+   "tests/v2/p4/test_process_range.py"
+  ],
+  "aisef2/runtime/process_range.py::ProcessRange._ladder": [
+   "tests/v2/test_v21_r3_range_release_contract.py",
+   "tests/v2/p4/test_process_range.py"
+  ],
+  "aisef2/runtime/process_range.py::ProcessRange._release": [
+   "tests/v2/test_v21_r3_range_release_contract.py",
+   "tests/v2/p4/test_process_range.py"
+  ],
+  "aisef2/runtime/process_range.py::_Flight.__init__": [
+   "tests/v2/test_v21_r3_range_release_contract.py"
+  ],
+  "aisef2/runtime/process_range.py::ProcessRange.__init__": [
+   "tests/v2/test_v21_r3_range_release_contract.py"
+  ]
+ },
+ "remaining_risks": [
+  "Windows nothing run; Python 3.11/3.13 not run (3.12.14, 3.14.7, 3.14.8 run).",
+  "A real asynchronous signal is not exercised: the 'handler' is a call from inside a backend operation / the claim / the poll on the same thread.",
+  "ClaimAndWait claim test waits on a bounded Event (1 s) whose expiry is the expected outcome; the only wall-clock element of the file.",
+  "Two tests are design-bound to this mechanism (claim lock attribute _mx; polling by the module's time.sleep): a different correct mechanism needs them updated.",
+  "Waiters inherit the leader's bound; with wait_s=None a waiter waits as long as the leader would have.",
+  "Outcome of a concurrent release depends on arrival time (D1).",
+  "A flight can be stranded by an asynchronous exception inside the finally before done = True (two bytecodes); not closed.",
+  "Sealed records bound to aisef2/ or process_range.py are stale by construction: lead regenerates."
+ ],
+ "decisions_needed": [
+  "D1 (owner): should a range that completed a release in RangeEscaped re-raise it to every later caller? Today only a caller that arrived DURING the release gets it; after it ends the caller gets None and a StoryScope records RELEASED (so worktree/scratch are not held back, §17.1). Option (ii) keeps the Residual on the range; RangeNotEmpty keeps re-running the ladder (mutation.py:1583).",
+  "D2 (owner): Windows failed adopt: _Job.abort does not signal an anchor that never joined the job, so _abort waits on it (from reading; not run).",
+  "D3 (owner): p4.test_interruption RealSignals SIGINT_mid_story hung once in 150 runs on BASE (pre-existing, unexplained).",
+  "Lead: register ProcessRange._ladder, ProcessRange._release, _Flight.__init__ (new) and ProcessRange.release, ProcessRange.__init__ (changed) with the kill files above; regenerate the sealed records; accept or reject the 1 s bounded wait of the claim test and the two design-bound assertions; update REPORT.md (Q-RANGE row) and the MUTATION-RUNNER-V2.md paragraph on the intermittent failure."
+ ]
+}

@@ -1,0 +1,557 @@
+{
+ "target": "aisef2/app/confine.py::measure",
+ "files": [
+  "tests/v2/test_v21_r3_conf_fu_before.py",
+  "tests/v2/test_v21_r3_conf_rv_hostrows.py",
+  "tests/v2/test_v21_r3_conf_policy.py",
+  "tests/v2/test_v21_r3_conf_locale.py",
+  "tests/v2/test_v21_kills3_T07a.py",
+  "tests/v2/test_v21_kills3_T06a.py",
+  "tests/v2/test_v21_kills3_A06.py",
+  "tests/v2/test_v21_kills3_T05b.py",
+  "tests/v2/test_v21_kills3_T05a.py",
+  "tests/v2/test_v21_kills3_T05c.py",
+  "tests/v2/test_v21_kills3_A05.py",
+  "tests/v2/test_v21_kills3_R02.py",
+  "tests/v2/test_v21_kills3_T06b.py",
+  "tests/v2/test_v21_kills3_A07.py",
+  "tests/v2/test_v21_kills3_T07b.py",
+  "tests/v2/test_v21_kills3_TO2.py",
+  "tests/v2/test_v21_defects_confine.py",
+  "tests/v2/test_v21_confine.py"
+ ],
+ "source_sha256": "093e276c57b5b5c0b332937276ee41e04b0eb344ef05a4abcf23c38eddae16e9",
+ "t0": [
+  {
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "seconds": 1.66,
+   "outcome": "PASS",
+   "ran": 9
+  },
+  {
+   "file": "tests/v2/test_v21_r3_conf_rv_hostrows.py",
+   "seconds": 0.28,
+   "outcome": "PASS",
+   "ran": 3
+  },
+  {
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "seconds": 1.23,
+   "outcome": "PASS",
+   "ran": 42
+  },
+  {
+   "file": "tests/v2/test_v21_r3_conf_locale.py",
+   "seconds": 1.57,
+   "outcome": "PASS",
+   "ran": 10
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T07a.py",
+   "seconds": 0.29,
+   "outcome": "PASS",
+   "ran": 14
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T06a.py",
+   "seconds": 0.3,
+   "outcome": "PASS",
+   "ran": 14
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_A06.py",
+   "seconds": 1.0,
+   "outcome": "PASS",
+   "ran": 4
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "seconds": 0.69,
+   "outcome": "PASS",
+   "ran": 18
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T05a.py",
+   "seconds": 0.84,
+   "outcome": "PASS",
+   "ran": 8
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T05c.py",
+   "seconds": 1.88,
+   "outcome": "PASS",
+   "ran": 7
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_A05.py",
+   "seconds": 0.99,
+   "outcome": "PASS",
+   "ran": 6
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_R02.py",
+   "seconds": 0.43,
+   "outcome": "PASS",
+   "ran": 2
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T06b.py",
+   "seconds": 1.42,
+   "outcome": "PASS",
+   "ran": 8
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_A07.py",
+   "seconds": 0.33,
+   "outcome": "PASS",
+   "ran": 5
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T07b.py",
+   "seconds": 0.33,
+   "outcome": "PASS",
+   "ran": 11
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_TO2.py",
+   "seconds": 0.26,
+   "outcome": "PASS",
+   "ran": 3
+  },
+  {
+   "file": "tests/v2/test_v21_defects_confine.py",
+   "seconds": 1.37,
+   "outcome": "PASS",
+   "ran": 16
+  },
+  {
+   "file": "tests/v2/test_v21_confine.py",
+   "seconds": 18.53,
+   "outcome": "PASS",
+   "ran": 34
+  }
+ ],
+ "error": null,
+ "results": [
+  {
+   "index": 0,
+   "mutant": "L308 dict entry 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T06b.py",
+   "first": "FAIL: test_a_measurement_that_reached_its_probe_says_it_too (v2.test_v21_kills3_T06b.ReportHeader.test_a_measurement_that_reached_its_probe_says_it_too) | AssertionError"
+  },
+  {
+   "index": 1,
+   "mutant": "L308 dict entry 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T06b.py",
+   "first": "FAIL: test_a_measurement_that_reached_its_probe_says_it_too (v2.test_v21_kills3_T06b.ReportHeader.test_a_measurement_that_reached_its_probe_says_it_too) | AssertionError"
+  },
+  {
+   "index": 2,
+   "mutant": "L308 dict entry 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 3,
+   "mutant": "L308 dict entry 3 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T06b.py",
+   "first": "FAIL: test_a_measurement_that_reached_its_probe_says_it_too (v2.test_v21_kills3_T06b.ReportHeader.test_a_measurement_that_reached_its_probe_says_it_too) | AssertionError"
+  },
+  {
+   "index": 4,
+   "mutant": "L308 dict entry 4 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 5,
+   "mutant": "L308 dict entry 5 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T06b.py",
+   "first": "FAIL: test_a_measurement_that_reached_its_probe_says_it_too (v2.test_v21_kills3_T06b.ReportHeader.test_a_measurement_that_reached_its_probe_says_it_too) | AssertionError"
+  },
+  {
+   "index": 6,
+   "mutant": "L308 dict entry 6 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T06b.py",
+   "first": "FAIL: test_a_host_without_getuid_is_refused_not_crashed (v2.test_v21_kills3_T06b.OperatorUid.test_a_host_without_getuid_is_refused_not_crashed) | AssertionError"
+  },
+  {
+   "index": 7,
+   "mutant": "L312 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A06.py",
+   "first": "FAIL: test_the_recorded_argv_is_the_command_line_that_ran (v2.test_v21_kills3_A06.RecordedCommandLine.test_the_recorded_argv_is_the_command_line_that_ran) | AssertionError"
+  },
+  {
+   "index": 8,
+   "mutant": "L312 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A06.py",
+   "first": "FAIL: test_the_recorded_argv_is_the_command_line_that_ran (v2.test_v21_kills3_A06.RecordedCommandLine.test_the_recorded_argv_is_the_command_line_that_ran) | AssertionError"
+  },
+  {
+   "index": 9,
+   "mutant": "L312 element 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 10,
+   "mutant": "L312 element 3 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A06.py",
+   "first": "FAIL: test_the_recorded_argv_is_the_command_line_that_ran (v2.test_v21_kills3_A06.RecordedCommandLine.test_the_recorded_argv_is_the_command_line_that_ran) | AssertionError"
+  },
+  {
+   "index": 11,
+   "mutant": "L315 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T07a.py",
+   "first": "FAIL: test_a_repository_that_cannot_be_made_is_named_with_its_path (v2.test_v21_kills3_T07a.MeasurementStages.test_a_repository_that_cannot_be_made_is_named_with_its_path) | AssertionError"
+  },
+  {
+   "index": 12,
+   "mutant": "L319 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 13,
+   "mutant": "L326 returns None",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | TypeError"
+  },
+  {
+   "index": 14,
+   "mutant": "L330 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T07a.py",
+   "first": "ERROR: test_a_repository_that_cannot_be_made_is_named_with_its_path (v2.test_v21_kills3_T07a.MeasurementStages.test_a_repository_that_cannot_be_made_is_named_with_its_path) | TypeError"
+  },
+  {
+   "index": 15,
+   "mutant": "L307 conditional negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_locale.py",
+   "first": "FAIL: test_the_rest_of_the_environment_is_what_the_session_wrapper_gives (v2.test_v21_r3_conf_locale.PassedDown.test_the_rest_of_the_environment_is_what_the_session_wrapper_gives) | AssertionError"
+  },
+  {
+   "index": 16,
+   "mutant": "L308 string 'backend' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T06b.py",
+   "first": "FAIL: test_a_measurement_that_reached_its_probe_says_it_too (v2.test_v21_kills3_T06b.ReportHeader.test_a_measurement_that_reached_its_probe_says_it_too) | AssertionError"
+  },
+  {
+   "index": 17,
+   "mutant": "L308 string 'bwrap' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T06b.py",
+   "first": "FAIL: test_a_measurement_that_reached_its_probe_says_it_too (v2.test_v21_kills3_T06b.ReportHeader.test_a_measurement_that_reached_its_probe_says_it_too) | AssertionError"
+  },
+  {
+   "index": 18,
+   "mutant": "L308 string 'network' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 19,
+   "mutant": "L309 string 'read_only' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T06b.py",
+   "first": "FAIL: test_a_measurement_that_reached_its_probe_says_it_too (v2.test_v21_kills3_T06b.ReportHeader.test_a_measurement_that_reached_its_probe_says_it_too) | AssertionError"
+  },
+  {
+   "index": 20,
+   "mutant": "L309 string 'client' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 21,
+   "mutant": "L309 string 'system' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T06b.py",
+   "first": "FAIL: test_a_measurement_that_reached_its_probe_says_it_too (v2.test_v21_kills3_T06b.ReportHeader.test_a_measurement_that_reached_its_probe_says_it_too) | AssertionError"
+  },
+  {
+   "index": 22,
+   "mutant": "L310 string 'operator_uid' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T06b.py",
+   "first": "FAIL: test_a_host_without_getuid_is_refused_not_crashed (v2.test_v21_kills3_T06b.OperatorUid.test_a_host_without_getuid_is_refused_not_crashed) | AssertionError"
+  },
+  {
+   "index": 23,
+   "mutant": "L310 conditional negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T06b.py",
+   "first": "ERROR: test_a_host_without_getuid_is_refused_not_crashed (v2.test_v21_kills3_T06b.OperatorUid.test_a_host_without_getuid_is_refused_not_crashed) | AttributeError"
+  },
+  {
+   "index": 24,
+   "mutant": "L312 string '/bin/sh' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A06.py",
+   "first": "FAIL: test_the_recorded_argv_is_the_command_line_that_ran (v2.test_v21_kills3_A06.RecordedCommandLine.test_the_recorded_argv_is_the_command_line_that_ran) | AssertionError"
+  },
+  {
+   "index": 25,
+   "mutant": "L312 string '-c' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A06.py",
+   "first": "FAIL: test_the_recorded_argv_is_the_command_line_that_ran (v2.test_v21_kills3_A06.RecordedCommandLine.test_the_recorded_argv_is_the_command_line_that_ran) | AssertionError"
+  },
+  {
+   "index": 26,
+   "mutant": "L312 string 'probe' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A06.py",
+   "first": "FAIL: test_the_recorded_argv_is_the_command_line_that_ran (v2.test_v21_kills3_A06.RecordedCommandLine.test_the_recorded_argv_is_the_command_line_that_ran) | AssertionError"
+  },
+  {
+   "index": 27,
+   "mutant": "L315 not removed",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T07a.py",
+   "first": "FAIL: test_a_repository_that_cannot_be_made_is_named_with_its_path (v2.test_v21_kills3_T07a.MeasurementStages.test_a_repository_that_cannot_be_made_is_named_with_its_path) | AssertionError"
+  },
+  {
+   "index": 28,
+   "mutant": "L318 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | ValueError"
+  },
+  {
+   "index": 29,
+   "mutant": "L318 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | ValueError"
+  },
+  {
+   "index": 30,
+   "mutant": "L319 not removed",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | TypeError"
+  },
+  {
+   "index": 31,
+   "mutant": "L328 returns None",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T07a.py",
+   "first": "ERROR: test_a_repository_that_cannot_be_made_is_named_with_its_path (v2.test_v21_kills3_T07a.MeasurementStages.test_a_repository_that_cannot_be_made_is_named_with_its_path) | TypeError"
+  },
+  {
+   "index": 32,
+   "mutant": "L330 IsNot->Is",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T07a.py",
+   "first": "ERROR: test_a_repository_that_cannot_be_made_is_named_with_its_path (v2.test_v21_kills3_T07a.MeasurementStages.test_a_repository_that_cannot_be_made_is_named_with_its_path) | TypeError"
+  },
+  {
+   "index": 33,
+   "mutant": "L307 Is->IsNot",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_locale.py",
+   "first": "FAIL: test_the_rest_of_the_environment_is_what_the_session_wrapper_gives (v2.test_v21_r3_conf_locale.PassedDown.test_the_rest_of_the_environment_is_what_the_session_wrapper_gives) | AssertionError"
+  },
+  {
+   "index": 34,
+   "mutant": "L308 string 'backend' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 35,
+   "mutant": "L308 string 'bwrap' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 36,
+   "mutant": "L308 string 'network' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 37,
+   "mutant": "L311 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_locale.py",
+   "first": "FAIL: test_the_rest_of_the_environment_is_what_the_session_wrapper_gives (v2.test_v21_r3_conf_locale.PassedDown.test_the_rest_of_the_environment_is_what_the_session_wrapper_gives) | AssertionError"
+  },
+  {
+   "index": 38,
+   "mutant": "L311 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05a.py",
+   "first": "FAIL: test_a_sandbox_as_required_is_not_refused (v2.test_v21_kills3_T05a.CleanSession.test_a_sandbox_as_required_is_not_refused) | AssertionError"
+  },
+  {
+   "index": 39,
+   "mutant": "L311 element 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T06b.py",
+   "first": "FAIL: test_the_measured_wrapper_binds_the_configuration_a_session_binds (v2.test_v21_kills3_T06b.MeasureEnvironment.test_the_measured_wrapper_binds_the_configuration_a_session_binds) | AssertionError"
+  },
+  {
+   "index": 40,
+   "mutant": "L311 In->NotIn",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 41,
+   "mutant": "L328 dict entry 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T06b.py",
+   "first": "FAIL: test_a_host_without_getuid_is_refused_not_crashed (v2.test_v21_kills3_T06b.OperatorUid.test_a_host_without_getuid_is_refused_not_crashed) | AssertionError"
+  },
+  {
+   "index": 42,
+   "mutant": "L328 dict entry 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T07a.py",
+   "first": "ERROR: test_a_repository_that_cannot_be_made_is_named_with_its_path (v2.test_v21_kills3_T07a.MeasurementStages.test_a_repository_that_cannot_be_made_is_named_with_its_path) | KeyError"
+  },
+  {
+   "index": 43,
+   "mutant": "L309 string 'read_only' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 44,
+   "mutant": "L310 string 'getuid' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T06b.py",
+   "first": "FAIL: test_it_is_the_operators_real_uid_on_posix (v2.test_v21_kills3_T06b.OperatorUid.test_it_is_the_operators_real_uid_on_posix) | AssertionError"
+  },
+  {
+   "index": 45,
+   "mutant": "L311 string 'PATH' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_locale.py",
+   "first": "FAIL: test_the_rest_of_the_environment_is_what_the_session_wrapper_gives (v2.test_v21_r3_conf_locale.PassedDown.test_the_rest_of_the_environment_is_what_the_session_wrapper_gives) | AssertionError"
+  },
+  {
+   "index": 46,
+   "mutant": "L311 string 'HOME' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05a.py",
+   "first": "FAIL: test_a_sandbox_as_required_is_not_refused (v2.test_v21_kills3_T05a.CleanSession.test_a_sandbox_as_required_is_not_refused) | AssertionError"
+  },
+  {
+   "index": 47,
+   "mutant": "L311 string 'XDG_CONFIG_HOME' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T06b.py",
+   "first": "FAIL: test_the_measured_wrapper_binds_the_configuration_a_session_binds (v2.test_v21_kills3_T06b.MeasureEnvironment.test_the_measured_wrapper_binds_the_configuration_a_session_binds) | AssertionError"
+  },
+  {
+   "index": 48,
+   "mutant": "L315 string 'linux' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_confine.py",
+   "first": "FAIL: test_a_host_that_is_not_linux_has_no_backend (v2.test_v21_confine.FailClosed.test_a_host_that_is_not_linux_has_no_backend) | AssertionError"
+  },
+  {
+   "index": 49,
+   "mutant": "L316 string '/' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 50,
+   "mutant": "L320 string \"the client (opencode) is not on the PATH the run gives it: the session's wrapper cannot be measured\" emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_confine.py",
+   "first": "FAIL: test_no_client_no_measurement (v2.test_v21_confine.FailClosed.test_no_client_no_measurement) | AssertionError"
+  },
+  {
+   "index": 51,
+   "mutant": "L323 string 'bwrap_sha256' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T06b.py",
+   "first": "FAIL: test_it_is_the_digest_of_the_files_bytes (v2.test_v21_kills3_T06b.BinaryIdentity.test_it_is_the_digest_of_the_files_bytes) | AssertionError"
+  },
+  {
+   "index": 52,
+   "mutant": "L328 string 'problems' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T07a.py",
+   "first": "ERROR: test_a_repository_that_cannot_be_made_is_named_with_its_path (v2.test_v21_kills3_T07a.MeasurementStages.test_a_repository_that_cannot_be_made_is_named_with_its_path) | KeyError"
+  },
+  {
+   "index": 53,
+   "mutant": "L332 string 'worktree' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_confine.py",
+   "first": "FAIL: test_an_unreadable_bubblewrap_is_a_problem_not_a_crash (v2.test_v21_confine.CommandLine.test_an_unreadable_bubblewrap_is_a_problem_not_a_crash) | AssertionError"
+  },
+  {
+   "index": 54,
+   "mutant": "L332 string 'remove' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_confine.py",
+   "first": "FAIL: test_an_unreadable_bubblewrap_is_a_problem_not_a_crash (v2.test_v21_confine.CommandLine.test_an_unreadable_bubblewrap_is_a_problem_not_a_crash) | AssertionError"
+  },
+  {
+   "index": 55,
+   "mutant": "L332 string '--force' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_confine.py",
+   "first": "FAIL: test_an_unreadable_bubblewrap_is_a_problem_not_a_crash (v2.test_v21_confine.CommandLine.test_an_unreadable_bubblewrap_is_a_problem_not_a_crash) | AssertionError"
+  },
+  {
+   "index": 56,
+   "mutant": "L325 string 'bubblewrap at ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_confine.py",
+   "first": "FAIL: test_an_unreadable_bubblewrap_is_a_problem_not_a_crash (v2.test_v21_confine.CommandLine.test_an_unreadable_bubblewrap_is_a_problem_not_a_crash) | AssertionError"
+  },
+  {
+   "index": 57,
+   "mutant": "L325 string ' could not be read: ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_confine.py",
+   "first": "FAIL: test_an_unreadable_bubblewrap_is_a_problem_not_a_crash (v2.test_v21_confine.CommandLine.test_an_unreadable_bubblewrap_is_a_problem_not_a_crash) | AssertionError"
+  },
+  {
+   "index": 58,
+   "mutant": "L325 string 'bwrap' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_confine.py",
+   "first": "ERROR: test_an_unreadable_bubblewrap_is_a_problem_not_a_crash (v2.test_v21_confine.CommandLine.test_an_unreadable_bubblewrap_is_a_problem_not_a_crash) | KeyError"
+  },
+  {
+   "index": 59,
+   "mutant": "L323 string 'bwrap' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  }
+ ]
+}

@@ -1,0 +1,249 @@
+{
+ "target": "aisef2/app/confine.py::_host_mounts",
+ "files": [
+  "tests/v2/test_v21_r3_conf_fu_before.py",
+  "tests/v2/test_v21_r3_conf_rv_hostrows.py",
+  "tests/v2/test_v21_r3_conf_policy.py",
+  "tests/v2/test_v21_r3_conf_locale.py",
+  "tests/v2/test_v21_kills3_T07a.py",
+  "tests/v2/test_v21_kills3_T06a.py",
+  "tests/v2/test_v21_kills3_A06.py",
+  "tests/v2/test_v21_kills3_T05b.py",
+  "tests/v2/test_v21_kills3_T05a.py",
+  "tests/v2/test_v21_kills3_T05c.py",
+  "tests/v2/test_v21_kills3_A05.py",
+  "tests/v2/test_v21_kills3_R02.py",
+  "tests/v2/test_v21_kills3_T06b.py",
+  "tests/v2/test_v21_kills3_A07.py",
+  "tests/v2/test_v21_kills3_T07b.py",
+  "tests/v2/test_v21_kills3_TO2.py",
+  "tests/v2/test_v21_defects_confine.py",
+  "tests/v2/test_v21_confine.py"
+ ],
+ "source_sha256": "093e276c57b5b5c0b332937276ee41e04b0eb344ef05a4abcf23c38eddae16e9",
+ "t0": [
+  {
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "seconds": 1.58,
+   "outcome": "PASS",
+   "ran": 9
+  },
+  {
+   "file": "tests/v2/test_v21_r3_conf_rv_hostrows.py",
+   "seconds": 0.28,
+   "outcome": "PASS",
+   "ran": 3
+  },
+  {
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "seconds": 1.3,
+   "outcome": "PASS",
+   "ran": 42
+  },
+  {
+   "file": "tests/v2/test_v21_r3_conf_locale.py",
+   "seconds": 1.57,
+   "outcome": "PASS",
+   "ran": 10
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T07a.py",
+   "seconds": 0.29,
+   "outcome": "PASS",
+   "ran": 14
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T06a.py",
+   "seconds": 0.29,
+   "outcome": "PASS",
+   "ran": 14
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_A06.py",
+   "seconds": 0.99,
+   "outcome": "PASS",
+   "ran": 4
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "seconds": 0.69,
+   "outcome": "PASS",
+   "ran": 18
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T05a.py",
+   "seconds": 0.83,
+   "outcome": "PASS",
+   "ran": 8
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T05c.py",
+   "seconds": 1.86,
+   "outcome": "PASS",
+   "ran": 7
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_A05.py",
+   "seconds": 0.99,
+   "outcome": "PASS",
+   "ran": 6
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_R02.py",
+   "seconds": 0.43,
+   "outcome": "PASS",
+   "ran": 2
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T06b.py",
+   "seconds": 1.47,
+   "outcome": "PASS",
+   "ran": 8
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_A07.py",
+   "seconds": 0.33,
+   "outcome": "PASS",
+   "ran": 5
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T07b.py",
+   "seconds": 0.33,
+   "outcome": "PASS",
+   "ran": 11
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_TO2.py",
+   "seconds": 0.26,
+   "outcome": "PASS",
+   "ran": 3
+  },
+  {
+   "file": "tests/v2/test_v21_defects_confine.py",
+   "seconds": 1.35,
+   "outcome": "PASS",
+   "ran": 16
+  },
+  {
+   "file": "tests/v2/test_v21_confine.py",
+   "seconds": 18.29,
+   "outcome": "PASS",
+   "ran": 34
+  }
+ ],
+ "error": null,
+ "results": [
+  {
+   "index": 0,
+   "mutant": "L259 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_report_holds_the_real_readings_of_the_controllers_own_table (v2.test_v21_r3_conf_fu_before.Appeared.test_the_report_holds_the_real_readings_of_the_controllers_own_table) | AssertionError"
+  },
+  {
+   "index": 1,
+   "mutant": "L261 returns None",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_report_holds_the_real_readings_of_the_controllers_own_table (v2.test_v21_r3_conf_fu_before.Appeared.test_the_report_holds_the_real_readings_of_the_controllers_own_table) | AssertionError"
+  },
+  {
+   "index": 2,
+   "mutant": "L259 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_one_that_cannot_be_read_whole_is_none (v2.test_v21_r3_conf_policy.HostTable.test_one_that_cannot_be_read_whole_is_none) (text='', error=None) | AssertionError"
+  },
+  {
+   "index": 3,
+   "mutant": "L259 not removed",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_the_report_holds_the_real_readings_of_the_controllers_own_table (v2.test_v21_r3_conf_fu_before.Appeared.test_the_report_holds_the_real_readings_of_the_controllers_own_table) | TypeError"
+  },
+  {
+   "index": 4,
+   "mutant": "L259 NotEq->Eq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_report_holds_the_real_readings_of_the_controllers_own_table (v2.test_v21_r3_conf_fu_before.Appeared.test_the_report_holds_the_real_readings_of_the_controllers_own_table) | AssertionError"
+  },
+  {
+   "index": 5,
+   "mutant": "L261 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_report_holds_the_real_readings_of_the_controllers_own_table (v2.test_v21_r3_conf_fu_before.Appeared.test_the_report_holds_the_real_readings_of_the_controllers_own_table) | AssertionError"
+  },
+  {
+   "index": 6,
+   "mutant": "L261 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_report_holds_the_real_readings_of_the_controllers_own_table (v2.test_v21_r3_conf_fu_before.Appeared.test_the_report_holds_the_real_readings_of_the_controllers_own_table) | AssertionError"
+  },
+  {
+   "index": 7,
+   "mutant": "L261 element 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_report_holds_the_real_readings_of_the_controllers_own_table (v2.test_v21_r3_conf_fu_before.Appeared.test_the_report_holds_the_real_readings_of_the_controllers_own_table) | AssertionError"
+  },
+  {
+   "index": 8,
+   "mutant": "L261 element 3 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_report_holds_the_real_readings_of_the_controllers_own_table (v2.test_v21_r3_conf_fu_before.Appeared.test_the_report_holds_the_real_readings_of_the_controllers_own_table) | AssertionError"
+  },
+  {
+   "index": 9,
+   "mutant": "L261 string 'at' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_the_report_holds_the_real_readings_of_the_controllers_own_table (v2.test_v21_r3_conf_fu_before.Appeared.test_the_report_holds_the_real_readings_of_the_controllers_own_table) | KeyError"
+  },
+  {
+   "index": 10,
+   "mutant": "L261 string 'fs' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_the_report_holds_the_real_readings_of_the_controllers_own_table (v2.test_v21_r3_conf_fu_before.Appeared.test_the_report_holds_the_real_readings_of_the_controllers_own_table) | KeyError"
+  },
+  {
+   "index": 11,
+   "mutant": "L261 string 'dev' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_the_report_holds_the_real_readings_of_the_controllers_own_table (v2.test_v21_r3_conf_fu_before.Appeared.test_the_report_holds_the_real_readings_of_the_controllers_own_table) | KeyError"
+  },
+  {
+   "index": 12,
+   "mutant": "L261 string 'optional' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_the_report_holds_the_real_readings_of_the_controllers_own_table (v2.test_v21_r3_conf_fu_before.Appeared.test_the_report_holds_the_real_readings_of_the_controllers_own_table) | KeyError"
+  },
+  {
+   "index": 13,
+   "mutant": "L255 string 'utf-8' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_mount_point_that_is_not_utf8_is_read_not_a_reason_to_refuse_every_run (v2.test_v21_r3_conf_policy.HostTable.test_a_mount_point_that_is_not_utf8_is_read_not_a_reason_to_refuse_every_run) | LookupError"
+  },
+  {
+   "index": 14,
+   "mutant": "L255 string 'replace' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_mount_point_that_is_not_utf8_is_read_not_a_reason_to_refuse_every_run (v2.test_v21_r3_conf_policy.HostTable.test_a_mount_point_that_is_not_utf8_is_read_not_a_reason_to_refuse_every_run) | UnicodeDecodeError"
+  },
+  {
+   "index": 15,
+   "mutant": "L255 string '/proc/self/mountinfo' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_report_holds_the_real_readings_of_the_controllers_own_table (v2.test_v21_r3_conf_fu_before.Appeared.test_the_report_holds_the_real_readings_of_the_controllers_own_table) | AssertionError"
+  }
+ ]
+}

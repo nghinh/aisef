@@ -1,0 +1,17 @@
+#!/bin/zsh
+# run_modules.sh TAG LISTFILE OUTDIR : each tests/...py in LISTFILE as a unittest module, under the py.sh guard, from the reviewer checkout
+SP=/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad
+WT=$SP/m21/r3/wt/usage-rv
+TAG=$1; LIST=$2; OUTD=$3
+mkdir -p $OUTD
+cd $WT
+while read -r f; do
+  [[ -z $f || $f != tests/*.py ]] && continue
+  m=${f%.py}; m=${m//\//.}
+  s=$(date +%s)
+  $SP/m21/kills3/py.sh $TAG -m unittest $m > $OUTD/$m.log 2>&1
+  rc=$?
+  e=$(date +%s)
+  echo "$m exit=$rc secs=$((e-s)) $(grep -E '^(Ran |OK|FAILED)' $OUTD/$m.log | tr '\n' ' ')" >> $OUTD/summary.txt
+done < $LIST
+echo done >> $OUTD/summary.txt

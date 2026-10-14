@@ -1,0 +1,25 @@
+interpreter: 3.14.7 darwin | tree: fix-tree
+probe.file_artifact        EXECUTION_DIGEST 833be030fb7f..
+   exists             contrasts
+   content            contrasts
+   grep_count         contrasts
+   python_imports     contrasts
+probe.python_callable_v2   EXECUTION_DIGEST b0b716f9b9f8..
+   exists             contrasts
+   returns            contrasts
+   raises             contrasts
+   blocks             contrasts
+   returns_bytes      contrasts
+   equals             contrasts
+   raises_attrs       contrasts
+probe.cli_invocation       EXECUTION_DIGEST dcb9b7b1ac9e..
+   exits              contrasts
+   exits_streams      contrasts
+   exits_files        contrasts
+   blocks             contrasts
+   equality           contrasts
+probe.process_effect       EXECUTION_DIGEST 5a4a2d9ceb39..
+   scenario_returns   contrasts
+   scenario_raises    contrasts
+   scenario_files     contrasts
+classes that contrast: 19, problems: 0

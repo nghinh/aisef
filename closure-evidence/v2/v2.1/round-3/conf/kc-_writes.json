@@ -1,0 +1,249 @@
+{
+ "target": "aisef2/app/confine.py::_writes",
+ "files": [
+  "tests/v2/test_v21_r3_conf_policy.py",
+  "tests/v2/test_v21_r3_conf_locale.py",
+  "tests/v2/test_v21_kills3_T07a.py",
+  "tests/v2/test_v21_kills3_T06a.py",
+  "tests/v2/test_v21_kills3_A06.py",
+  "tests/v2/test_v21_kills3_T05b.py",
+  "tests/v2/test_v21_kills3_T05a.py",
+  "tests/v2/test_v21_kills3_T05c.py",
+  "tests/v2/test_v21_kills3_A05.py",
+  "tests/v2/test_v21_kills3_R02.py",
+  "tests/v2/test_v21_kills3_T06b.py",
+  "tests/v2/test_v21_kills3_A07.py",
+  "tests/v2/test_v21_kills3_T07b.py",
+  "tests/v2/test_v21_kills3_TO2.py",
+  "tests/v2/test_v21_defects_confine.py",
+  "tests/v2/test_v21_confine.py"
+ ],
+ "source_sha256": "375489e7f4d1abc502cb6720c37631ad52511711cdb47803e0ecefb009778249",
+ "t0": [
+  {
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "seconds": 2.05,
+   "outcome": "PASS",
+   "ran": 40
+  },
+  {
+   "file": "tests/v2/test_v21_r3_conf_locale.py",
+   "seconds": 1.96,
+   "outcome": "PASS",
+   "ran": 9
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T07a.py",
+   "seconds": 0.44,
+   "outcome": "PASS",
+   "ran": 14
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T06a.py",
+   "seconds": 0.44,
+   "outcome": "PASS",
+   "ran": 14
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_A06.py",
+   "seconds": 1.19,
+   "outcome": "PASS",
+   "ran": 4
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "seconds": 1.06,
+   "outcome": "PASS",
+   "ran": 18
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T05a.py",
+   "seconds": 1.26,
+   "outcome": "PASS",
+   "ran": 8
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T05c.py",
+   "seconds": 2.97,
+   "outcome": "PASS",
+   "ran": 7
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_A05.py",
+   "seconds": 1.53,
+   "outcome": "PASS",
+   "ran": 6
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_R02.py",
+   "seconds": 0.65,
+   "outcome": "PASS",
+   "ran": 2
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T06b.py",
+   "seconds": 2.14,
+   "outcome": "PASS",
+   "ran": 8
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_A07.py",
+   "seconds": 0.51,
+   "outcome": "PASS",
+   "ran": 5
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T07b.py",
+   "seconds": 0.5,
+   "outcome": "PASS",
+   "ran": 11
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_TO2.py",
+   "seconds": 0.4,
+   "outcome": "PASS",
+   "ran": 3
+  },
+  {
+   "file": "tests/v2/test_v21_defects_confine.py",
+   "seconds": 2.08,
+   "outcome": "PASS",
+   "ran": 16
+  },
+  {
+   "file": "tests/v2/test_v21_confine.py",
+   "seconds": 22.48,
+   "outcome": "PASS",
+   "ran": 34
+  }
+ ],
+ "error": null,
+ "results": [
+  {
+   "index": 0,
+   "mutant": "L502 returns None",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_node_outside_the_list_is_judged_as_any_mount (v2.test_v21_r3_conf_policy.DeviceNodes.test_a_node_outside_the_list_is_judged_as_any_mount) (name='sda') | TypeError"
+  },
+  {
+   "index": 1,
+   "mutant": "L499 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_node_outside_the_list_is_judged_as_any_mount (v2.test_v21_r3_conf_policy.DeviceNodes.test_a_node_outside_the_list_is_judged_as_any_mount) (name='sda') | TypeError"
+  },
+  {
+   "index": 2,
+   "mutant": "L498 string 'mounts' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_node_outside_the_list_is_judged_as_any_mount (v2.test_v21_r3_conf_policy.DeviceNodes.test_a_node_outside_the_list_is_judged_as_any_mount) (name='sda') | KeyError"
+  },
+  {
+   "index": 3,
+   "mutant": "L499 And swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_node_outside_the_list_is_judged_as_any_mount (v2.test_v21_r3_conf_policy.DeviceNodes.test_a_node_outside_the_list_is_judged_as_any_mount) (name='sda') | UnboundLocalError"
+  },
+  {
+   "index": 4,
+   "mutant": "L500 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_a_node_outside_the_list_is_judged_as_any_mount (v2.test_v21_r3_conf_policy.DeviceNodes.test_a_node_outside_the_list_is_judged_as_any_mount) (name='sda') | AssertionError"
+  },
+  {
+   "index": 5,
+   "mutant": "L499 Eq->NotEq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_a_node_outside_the_list_is_judged_as_any_mount (v2.test_v21_r3_conf_policy.DeviceNodes.test_a_node_outside_the_list_is_judged_as_any_mount) (name='sda') | AssertionError"
+  },
+  {
+   "index": 6,
+   "mutant": "L499 NotEq->Eq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_a_node_outside_the_list_is_judged_as_any_mount (v2.test_v21_r3_conf_policy.DeviceNodes.test_a_node_outside_the_list_is_judged_as_any_mount) (name='sda') | AssertionError"
+  },
+  {
+   "index": 7,
+   "mutant": "L499 IsNot->Is",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_node_outside_the_list_is_judged_as_any_mount (v2.test_v21_r3_conf_policy.DeviceNodes.test_a_node_outside_the_list_is_judged_as_any_mount) (name='sda') | TypeError"
+  },
+  {
+   "index": 8,
+   "mutant": "L500 NotIn->In",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_a_node_outside_the_list_is_judged_as_any_mount (v2.test_v21_r3_conf_policy.DeviceNodes.test_a_node_outside_the_list_is_judged_as_any_mount) (name='sda') | AssertionError"
+  },
+  {
+   "index": 9,
+   "mutant": "L499 string 'rw' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_a_node_outside_the_list_is_judged_as_any_mount (v2.test_v21_r3_conf_policy.DeviceNodes.test_a_node_outside_the_list_is_judged_as_any_mount) (name='sda') | AssertionError"
+  },
+  {
+   "index": 10,
+   "mutant": "L500 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_a_mount_covered_by_another_at_the_same_path_is_named_once (v2.test_v21_r3_conf_policy.HostBacked.test_a_mount_covered_by_another_at_the_same_path_is_named_once) | AssertionError"
+  },
+  {
+   "index": 11,
+   "mutant": "L500 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_a_mount_covered_by_another_at_the_same_path_is_named_once (v2.test_v21_r3_conf_policy.HostBacked.test_a_mount_covered_by_another_at_the_same_path_is_named_once) | AssertionError"
+  },
+  {
+   "index": 12,
+   "mutant": "L499 string 'access' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_node_outside_the_list_is_judged_as_any_mount (v2.test_v21_r3_conf_policy.DeviceNodes.test_a_node_outside_the_list_is_judged_as_any_mount) (name='sda') | KeyError"
+  },
+  {
+   "index": 13,
+   "mutant": "L499 string 'at' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_node_outside_the_list_is_judged_as_any_mount (v2.test_v21_r3_conf_policy.DeviceNodes.test_a_node_outside_the_list_is_judged_as_any_mount) (name='sda') | KeyError"
+  },
+  {
+   "index": 14,
+   "mutant": "L501 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_node_outside_the_list_is_judged_as_any_mount (v2.test_v21_r3_conf_policy.DeviceNodes.test_a_node_outside_the_list_is_judged_as_any_mount) (name='sda') | ValueError"
+  },
+  {
+   "index": 15,
+   "mutant": "L501 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_node_outside_the_list_is_judged_as_any_mount (v2.test_v21_r3_conf_policy.DeviceNodes.test_a_node_outside_the_list_is_judged_as_any_mount) (name='sda') | ValueError"
+  },
+  {
+   "index": 16,
+   "mutant": "L500 string 'at' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_node_outside_the_list_is_judged_as_any_mount (v2.test_v21_r3_conf_policy.DeviceNodes.test_a_node_outside_the_list_is_judged_as_any_mount) (name='sda') | KeyError"
+  },
+  {
+   "index": 17,
+   "mutant": "L501 string 'at' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_node_outside_the_list_is_judged_as_any_mount (v2.test_v21_r3_conf_policy.DeviceNodes.test_a_node_outside_the_list_is_judged_as_any_mount) (name='sda') | KeyError"
+  }
+ ]
+}

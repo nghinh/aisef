@@ -1,0 +1,15 @@
+#!/bin/zsh
+SP=/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad
+OUT=$SP/m21/r3/out/range
+cd $SP/m21/r3/wt/range
+: > $OUT/sweep-final-summary.txt
+for m in $(cat $OUT/modules-all.full.txt); do
+  s=$(date +%s)
+  $SP/m21/kills3/py.sh rangesweep -m unittest $m > $OUT/mods-final/$m.log 2>&1
+  code=$?
+  e=$(( $(date +%s) - s ))
+  ran=$(grep -E "^Ran [0-9]+ test" $OUT/mods-final/$m.log | tail -1)
+  res=$(grep -E "^(OK|FAILED)" $OUT/mods-final/$m.log | tail -1)
+  echo "$m exit=$code ${e}s | $ran | $res" >> $OUT/sweep-final-summary.txt
+done
+echo DONE >> $OUT/sweep-final-summary.txt

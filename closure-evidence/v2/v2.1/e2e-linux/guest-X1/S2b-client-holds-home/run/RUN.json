@@ -1,0 +1,142 @@
+{
+ "admission": {
+  "admitted": true,
+  "engine_digest": "7668fc35709829d8324e914e0300b2b85221d9e83dedd32cd2c3996f761690c7",
+  "failed": [],
+  "result_digest": "2b01083f0887d014bc82c80f31dec6c0e5f4f1ae5845ea943bbab29da535a8ae"
+ },
+ "budget": null,
+ "budget_stop": null,
+ "bundle_digest": "9ad313e31b2b2ca3ec4e7fb4f42d0b09702d6a3a6527a320d70f0ab0f7c96f49",
+ "confinement": {
+  "backend": "bwrap",
+  "bwrap": "/usr/bin/bwrap",
+  "client": "/tmp/e2e/S2b-client-holds-home/fakebin/opencode",
+  "network": "host",
+  "operator_uid": 1000,
+  "problems": [
+   "the client's directory /tmp/e2e/S2b-client-holds-home/fakebin holds HOME: bound read-only it would expose it; give the client a directory of its own"
+  ],
+  "read_only": [],
+  "system": "linux"
+ },
+ "delivery_blocked_by": [
+  "1 of the plan's stories did not commit: ['S1']"
+ ],
+ "delivery_verdict": "NOT_REACHED",
+ "failure": {
+  "detail": "confinement was asked for and is not provided: the client's directory /tmp/e2e/S2b-client-holds-home/fakebin holds HOME: bound read-only it would expose it; give the client a directory of its own",
+  "stage": "confinement",
+  "type": "RunRefused"
+ },
+ "final_main": "3176460308161b5e765e678323c35accbdad32a9",
+ "finished": 1791861911.0856686,
+ "format": "aisef-v2-run-record/1",
+ "generalization_claim": "NONE",
+ "journal": null,
+ "kernel_digest": "42e612707013159cb7bfbee3d63ccafa7a9ac03a9e6324e58171b58abdf3456b",
+ "no_progress": [],
+ "plan_hash": "35ad86a86f69356517ff252b13925a51d2934e64fe30e9e02b86a0bf5907a69d",
+ "plan_quality_verdict": "NOT_CLAIMED",
+ "platform": {
+  "python": "3.14.8",
+  "system": "linux"
+ },
+ "productproof": null,
+ "project": "calc-cli",
+ "sessions": [],
+ "settings": {
+  "budget": {
+   "input_tokens": 200000,
+   "output_tokens": 20000,
+   "provider_requests": 40,
+   "turns": 80
+  },
+  "client": "opencode",
+  "client_env": [],
+  "confinement": {
+   "backend": "bwrap",
+   "bwrap": "/usr/bin/bwrap",
+   "network": "host",
+   "read_only": []
+  },
+  "format": "aisef-v2-run/1",
+  "limits": {
+   "DEVELOPER": 1,
+   "ENVIRONMENT": 1,
+   "INTEGRATION": 1,
+   "PLAN": 1,
+   "PROVIDER": 1,
+   "REVIEW": 1,
+   "SECURITY": 1
+  },
+  "max_turns_per_session": 10,
+  "preflight": {
+   "chat_probes": 2
+  },
+  "prices": {
+   "cache_read_per_mtok": 0.044,
+   "cache_write_per_mtok": 1.32,
+   "currency": "USD",
+   "effective_date": "2026-10-12",
+   "input_per_mtok": 1.32,
+   "output_per_mtok": 3.96,
+   "source": "e2e fixture (not a real price)"
+  },
+  "provider": {
+   "api_key_env": "FAKE_PROVIDER_KEY",
+   "endpoint": "http://127.0.0.1:18437/v1",
+   "listed_owner": "fake",
+   "model_limit": {
+    "context": 100000,
+    "output": 8000
+   },
+   "name": "fakeprov",
+   "served_model": "model-1"
+  },
+  "review": {
+   "min_severity": "high",
+   "policy": "fix-loop"
+  },
+  "route": "fakeprov/model-1",
+  "timeouts_s": {
+   "developer": 60,
+   "probe": 60,
+   "reviewer": 120,
+   "tool": 120
+  }
+ },
+ "stage": "confinement",
+ "started": 1791861910.856985,
+ "story_errors": [],
+ "story_outcomes": {},
+ "usage": {
+  "cost": {
+   "currency": "USD",
+   "effective_date": "2026-10-12",
+   "known": 0.0,
+   "sessions_unknown": [],
+   "source": "e2e fixture (not a real price)",
+   "status": "known",
+   "value": 0.0
+  },
+  "preflight": {
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "provider_requests": 0,
+   "turns": 0,
+   "unaccounted": []
+  },
+  "provider_requests_journaled": 0,
+  "retries": {},
+  "sessions": [],
+  "tokens": {
+   "cache_read": 0,
+   "cache_write": 0,
+   "input": 0,
+   "output": 0,
+   "reasoning": 0
+  },
+  "wall_s": 0.229
+ }
+}

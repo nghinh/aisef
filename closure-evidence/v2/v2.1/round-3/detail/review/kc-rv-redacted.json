@@ -1,0 +1,340 @@
+{
+ "target": "aisef2/app/review_verify.py::redacted",
+ "files": [
+  "tests/v2/test_v21_r3_detail_statement.py"
+ ],
+ "source_sha256": "9a5fafceeeaa117ea41c78ec7797604b45bb3bf8d6c4f20db6b2fa1059838513",
+ "t0": [
+  {
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "seconds": 5.05,
+   "outcome": "PASS",
+   "ran": 38
+  }
+ ],
+ "error": null,
+ "results": [
+  {
+   "index": 0,
+   "mutant": "L325 returns None",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='dict') | TypeError"
+  },
+  {
+   "index": 1,
+   "mutant": "L298 sorted() -> list()",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='dict') | TypeError"
+  },
+  {
+   "index": 2,
+   "mutant": "L303 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='dict') | AttributeError"
+  },
+  {
+   "index": 3,
+   "mutant": "L308 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='dict') | AttributeError"
+  },
+  {
+   "index": 4,
+   "mutant": "L310 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='dict') | AttributeError"
+  },
+  {
+   "index": 5,
+   "mutant": "L318 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='dict') | TypeError"
+  },
+  {
+   "index": 6,
+   "mutant": "L320 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_secret_of_digits_is_not_in_the_statement_either (v2.test_v21_r3_detail_statement.Redacted.test_a_secret_of_digits_is_not_in_the_statement_either) | AssertionError"
+  },
+  {
+   "index": 7,
+   "mutant": "L322 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_secret_of_digits_is_not_in_the_statement_either (v2.test_v21_r3_detail_statement.Redacted.test_a_secret_of_digits_is_not_in_the_statement_either) | AssertionError"
+  },
+  {
+   "index": 8,
+   "mutant": "L324 returns None",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_values_that_are_not_json_data_are_stated_as_their_repr (v2.test_v21_r3_detail_statement.TextThatIsNotUtf8AndKeysThatAreNotStrings.test_values_that_are_not_json_data_are_stated_as_their_repr) | AssertionError"
+  },
+  {
+   "index": 9,
+   "mutant": "L325 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='dict') | AttributeError"
+  },
+  {
+   "index": 10,
+   "mutant": "L325 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_structure_exactly_at_the_limit_is_kept_whole (v2.test_v21_r3_detail_statement.DeepStructures.test_a_structure_exactly_at_the_limit_is_kept_whole) (kind='dict') | ValueError"
+  },
+  {
+   "index": 11,
+   "mutant": "L307 returns None",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='dict') | TypeError"
+  },
+  {
+   "index": 12,
+   "mutant": "L308 And swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='dict') | AttributeError"
+  },
+  {
+   "index": 13,
+   "mutant": "L309 returns None",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='dict') | AssertionError"
+  },
+  {
+   "index": 14,
+   "mutant": "L317 returns None",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='dict') | AttributeError"
+  },
+  {
+   "index": 15,
+   "mutant": "L319 returns None",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='list') | AssertionError"
+  },
+  {
+   "index": 16,
+   "mutant": "L320 And swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_secret_of_digits_is_not_in_the_statement_either (v2.test_v21_r3_detail_statement.Redacted.test_a_secret_of_digits_is_not_in_the_statement_either) | AssertionError"
+  },
+  {
+   "index": 17,
+   "mutant": "L321 returns None",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_secret_of_digits_is_not_in_the_statement_either (v2.test_v21_r3_detail_statement.Redacted.test_a_secret_of_digits_is_not_in_the_statement_either) | AssertionError"
+  },
+  {
+   "index": 18,
+   "mutant": "L322 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_secret_of_digits_is_not_in_the_statement_either (v2.test_v21_r3_detail_statement.Redacted.test_a_secret_of_digits_is_not_in_the_statement_either) | AssertionError"
+  },
+  {
+   "index": 19,
+   "mutant": "L323 returns None",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_secret_of_digits_is_not_in_the_statement_either (v2.test_v21_r3_detail_statement.Redacted.test_a_secret_of_digits_is_not_in_the_statement_either) | AssertionError"
+  },
+  {
+   "index": 20,
+   "mutant": "L298 True->False",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_secret_that_contains_another_is_replaced_whole (v2.test_v21_r3_detail_statement.Redacted.test_a_secret_that_contains_another_is_replaced_whole) | AssertionError"
+  },
+  {
+   "index": 21,
+   "mutant": "L308 GtE->Lt",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='dict') | AttributeError"
+  },
+  {
+   "index": 22,
+   "mutant": "L312 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='dict') | ValueError"
+  },
+  {
+   "index": 23,
+   "mutant": "L312 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='dict') | ValueError"
+  },
+  {
+   "index": 24,
+   "mutant": "L314 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='dict') | AssertionError"
+  },
+  {
+   "index": 25,
+   "mutant": "L318 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='list') | AssertionError"
+  },
+  {
+   "index": 26,
+   "mutant": "L318 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='tuple') | AssertionError"
+  },
+  {
+   "index": 27,
+   "mutant": "L320 not removed",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_secret_of_digits_is_not_in_the_statement_either (v2.test_v21_r3_detail_statement.Redacted.test_a_secret_of_digits_is_not_in_the_statement_either) | AssertionError"
+  },
+  {
+   "index": 28,
+   "mutant": "L322 Is->IsNot",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_secret_of_digits_is_out_when_the_finder_wrote_it_as_a_number (v2.test_v21_r3_detail_statement.Redacted.test_a_secret_of_digits_is_out_when_the_finder_wrote_it_as_a_number) | AssertionError"
+  },
+  {
+   "index": 29,
+   "mutant": "L322 And swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_values_that_are_not_json_data_are_stated_as_their_repr (v2.test_v21_r3_detail_statement.TextThatIsNotUtf8AndKeysThatAreNotStrings.test_values_that_are_not_json_data_are_stated_as_their_repr) | TypeError"
+  },
+  {
+   "index": 30,
+   "mutant": "L307 string 'utf-8' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='dict') | LookupError"
+  },
+  {
+   "index": 31,
+   "mutant": "L308 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='dict') | AssertionError"
+  },
+  {
+   "index": 32,
+   "mutant": "L308 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='list') | AssertionError"
+  },
+  {
+   "index": 33,
+   "mutant": "L308 element 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='tuple') | AssertionError"
+  },
+  {
+   "index": 34,
+   "mutant": "L309 string '<nested deeper than ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='dict') | AssertionError"
+  },
+  {
+   "index": 35,
+   "mutant": "L309 string ' levels>' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='dict') | AssertionError"
+  },
+  {
+   "index": 36,
+   "mutant": "L314 In->NotIn",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='dict') | AssertionError"
+  },
+  {
+   "index": 37,
+   "mutant": "L320 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_secret_of_digits_is_not_in_the_statement_either (v2.test_v21_r3_detail_statement.Redacted.test_a_secret_of_digits_is_not_in_the_statement_either) | AssertionError"
+  },
+  {
+   "index": 38,
+   "mutant": "L320 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_secret_of_digits_is_out_when_the_finder_wrote_it_as_a_number (v2.test_v21_r3_detail_statement.Redacted.test_a_secret_of_digits_is_out_when_the_finder_wrote_it_as_a_number) | AssertionError"
+  },
+  {
+   "index": 39,
+   "mutant": "L313 conditional negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='dict') | AssertionError"
+  },
+  {
+   "index": 40,
+   "mutant": "L320 In->NotIn",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_secret_of_digits_is_not_in_the_statement_either (v2.test_v21_r3_detail_statement.Redacted.test_a_secret_of_digits_is_not_in_the_statement_either) | AssertionError"
+  },
+  {
+   "index": 41,
+   "mutant": "L307 string 'utf-8' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='dict') | LookupError"
+  },
+  {
+   "index": 42,
+   "mutant": "L307 string 'backslashreplace' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_lone_surrogate_anywhere_is_written_as_its_escape (v2.test_v21_r3_detail_statement.TextThatIsNotUtf8AndKeysThatAreNotStrings.test_a_lone_surrogate_anywhere_is_written_as_its_escape) | LookupError"
+  },
+  {
+   "index": 43,
+   "mutant": "L315 string '#' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_two_keys_that_become_one_are_both_kept (v2.test_v21_r3_detail_statement.TextThatIsNotUtf8AndKeysThatAreNotStrings.test_two_keys_that_become_one_are_both_kept) | AssertionError"
+  },
+  {
+   "index": 44,
+   "mutant": "L313 string '<' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_keys_that_are_not_strings_are_stated_by_type_and_never_raise (v2.test_v21_r3_detail_statement.TextThatIsNotUtf8AndKeysThatAreNotStrings.test_keys_that_are_not_strings_are_stated_by_type_and_never_raise) | AssertionError"
+  },
+  {
+   "index": 45,
+   "mutant": "L313 string '>' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_keys_that_are_not_strings_are_stated_by_type_and_never_raise (v2.test_v21_r3_detail_statement.TextThatIsNotUtf8AndKeysThatAreNotStrings.test_keys_that_are_not_strings_are_stated_by_type_and_never_raise) | AssertionError"
+  }
+ ]
+}

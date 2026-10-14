@@ -1,0 +1,103 @@
+# repro-2 (probes WP, item 2): a `fault` step before a `subprocess` step.  Real entry points: ProcessEffectProbe.observe
+# and run_probe.  Real checkouts, real controller / agent / child processes; the fault table is the production FAULTS.
+# Two products with the same observable behaviour when nothing fails and different behaviour when os.replace raises:
+#   tolerant: catches OSError and falls back to a plain write      fragile: lets the OSError escape (exit 1)
+# Run from the worktree root:  py.sh probes -I <this file>
+import json
+import os
+import pathlib
+import subprocess
+import sys
+import tempfile
+
+sys.path.insert(0, os.getcwd())
+
+from aisef2.arch.enums import BehaviorVerdict, Enforcement, SubjectAbsence  # noqa: E402
+from aisef2.probe import process_effect as pe  # noqa: E402
+from aisef2.probe.protocol import ExecutionEnv, RevisionRef, run_probe  # noqa: E402
+from aisef2.product.spec import ProductProofSpec  # noqa: E402
+
+SHA = "89abcdef0123456789abcdef0123456789abcdef"
+ENV = ExecutionEnv(sys.executable, 30, Enforcement.PARTIAL)
+
+LIB_FRAGILE = '''import os
+
+
+def save():
+    with open("a.tmp", "w", encoding="utf-8") as f:
+        f.write("x")
+    os.replace("a.tmp", "a.txt")
+    return True
+'''
+LIB_TOLERANT = '''import os
+
+
+def save():
+    with open("a.tmp", "w", encoding="utf-8") as f:
+        f.write("x")
+    try:
+        os.replace("a.tmp", "a.txt")
+    except OSError:
+        with open("a.txt", "w", encoding="utf-8") as f:
+            f.write("x")
+    return True
+'''
+CLI = '''import sys
+
+import lib
+
+lib.save()
+sys.exit(0)
+'''
+
+
+def checkout(lib):
+    d = tempfile.mkdtemp(prefix="aisef2-r3-fault-")
+    for rel, text in {"lib.py": lib, "cli.py": CLI}.items():
+        pathlib.Path(d, rel).write_text(text, encoding="utf-8", newline="\n")
+    return d
+
+
+def spec(scenario, observable):
+    return ProductProofSpec.create(
+        contract_id="BC-R3", probe_id=pe.PROBE_ID, probe_digest=pe.DIGEST,
+        probe_input={"subject": {"kind": "process_effect", "locator": "lib:save"}, "stimulus": {"scenario": scenario},
+                     "observable": {**observable, "within_s": 30},
+                     "subject_absence": SubjectAbsence.REQUIRES_SUBJECT.value},
+        candidate_expectation=BehaviorVerdict.SATISFIED, compiler_id="test", compiler_digest="c" * 64)
+
+
+FAULT = {"step": "fault", "fault": "os.replace"}
+BEFORE_CALL = [FAULT, {"step": "call", "args": [], "kwargs": {}}]
+BEFORE_SUBPROCESS = [FAULT, {"step": "subprocess", "argv": ["-m", "cli"], "expect_exit": 0}]
+CALL_OBS = {"returns": True}
+FILES_OBS = {"files": {"<ws>/a.txt": {"line_count": 1}}}
+
+print("interpreter:", sys.version.split()[0], sys.platform, " process_effect EXECUTION_DIGEST", pe.EXECUTION_DIGEST[:12])
+print("FAULTED =", pe.FAULTED, " FAULTS =", sorted(pe.FAULTS))
+probe = pe.ProcessEffectProbe()
+for product, lib in (("tolerant", LIB_TOLERANT), ("fragile ", LIB_FRAGILE)):
+    at = RevisionRef(SHA, checkout(lib))
+    print("\nproduct:", product)
+    for label, scenario, obs in (("fault -> call        ", BEFORE_CALL, CALL_OBS),
+                                 ("fault -> subprocess  ", BEFORE_SUBPROCESS, FILES_OBS)):
+        s = spec(scenario, obs)
+        o = probe.observe(s, at, ENV)
+        facts = json.loads(o.detail) if o.detail.startswith("{") else {}
+        steps = [(t["kind"], t.get("fault"), t.get("fired"), t.get("exit", t["outcome"])) for t in facts.get("trace", [])]
+        print("  %s: %-8s %-9s class=%s  trace(kind,fault,fired,exit|outcome)=%s" % (
+            label, o.kind.value, o.verdict.value if o.verdict else None, pe.spec_class(s), steps))
+        if label.startswith("fault -> subprocess"):
+            r = run_probe(probe, s, at, ENV)
+            print("      run_probe record result: %r  (the record holds the verdict only; no trace, no `fired`)" % (r.result,))
+
+# the fault, delivered where the child can see it (what the step claims to do): the fragile product's own child
+d = checkout(LIB_FRAGILE)
+boot = ("import os, runpy, sys\n_r = os.replace\n_n = [0]\n"
+        "def _f(*a, **k):\n    _n[0] += 1\n    if _n[0] == 1:\n        raise OSError('controlled fault os.replace')\n    return _r(*a, **k)\n"
+        "os.replace = _f\nsys.path[:0] = [sys.argv[1]]\nrunpy.run_module('cli', run_name='__main__')\n")
+with tempfile.TemporaryDirectory(prefix="aisef2-r3-fault-ws-") as ws:
+    rc = subprocess.run([sys.executable, "-I", "-S", "-B", "-c", boot, d], cwd=ws, stdin=subprocess.DEVNULL,
+                        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=False).returncode
+print("\nfragile product's CLI with os.replace raising once INSIDE the child: exit", rc,
+      "(the probe's subprocess step reported exit 0 and SATISFIED above)")

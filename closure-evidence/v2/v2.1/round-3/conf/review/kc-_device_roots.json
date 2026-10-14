@@ -1,0 +1,165 @@
+{
+ "target": "aisef2/app/confine.py::_device_roots",
+ "files": [
+  "tests/v2/test_v21_r3_conf_policy.py",
+  "tests/v2/test_v21_r3_conf_locale.py",
+  "tests/v2/test_v21_kills3_T07a.py",
+  "tests/v2/test_v21_kills3_T06a.py",
+  "tests/v2/test_v21_kills3_A06.py",
+  "tests/v2/test_v21_kills3_T05b.py",
+  "tests/v2/test_v21_kills3_T05a.py",
+  "tests/v2/test_v21_kills3_T05c.py",
+  "tests/v2/test_v21_kills3_A05.py",
+  "tests/v2/test_v21_kills3_R02.py",
+  "tests/v2/test_v21_kills3_T06b.py",
+  "tests/v2/test_v21_kills3_A07.py",
+  "tests/v2/test_v21_kills3_T07b.py",
+  "tests/v2/test_v21_kills3_TO2.py",
+  "tests/v2/test_v21_defects_confine.py",
+  "tests/v2/test_v21_confine.py"
+ ],
+ "source_sha256": "375489e7f4d1abc502cb6720c37631ad52511711cdb47803e0ecefb009778249",
+ "t0": [
+  {
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "seconds": 1.5,
+   "outcome": "PASS",
+   "ran": 42
+  },
+  {
+   "file": "tests/v2/test_v21_r3_conf_locale.py",
+   "seconds": 1.61,
+   "outcome": "PASS",
+   "ran": 10
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T07a.py",
+   "seconds": 0.35,
+   "outcome": "PASS",
+   "ran": 14
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T06a.py",
+   "seconds": 0.34,
+   "outcome": "PASS",
+   "ran": 14
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_A06.py",
+   "seconds": 1.01,
+   "outcome": "PASS",
+   "ran": 4
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "seconds": 0.8,
+   "outcome": "PASS",
+   "ran": 18
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T05a.py",
+   "seconds": 0.95,
+   "outcome": "PASS",
+   "ran": 8
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T05c.py",
+   "seconds": 2.12,
+   "outcome": "PASS",
+   "ran": 7
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_A05.py",
+   "seconds": 1.14,
+   "outcome": "PASS",
+   "ran": 6
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_R02.py",
+   "seconds": 0.5,
+   "outcome": "PASS",
+   "ran": 2
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T06b.py",
+   "seconds": 1.67,
+   "outcome": "PASS",
+   "ran": 8
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_A07.py",
+   "seconds": 0.39,
+   "outcome": "PASS",
+   "ran": 5
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T07b.py",
+   "seconds": 0.39,
+   "outcome": "PASS",
+   "ran": 11
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_TO2.py",
+   "seconds": 0.31,
+   "outcome": "PASS",
+   "ran": 3
+  },
+  {
+   "file": "tests/v2/test_v21_defects_confine.py",
+   "seconds": 1.54,
+   "outcome": "PASS",
+   "ran": 16
+  },
+  {
+   "file": "tests/v2/test_v21_confine.py",
+   "seconds": 19.94,
+   "outcome": "PASS",
+   "ran": 34
+  }
+ ],
+ "error": null,
+ "results": [
+  {
+   "index": 0,
+   "mutant": "L267 returns None",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | TypeError"
+  },
+  {
+   "index": 1,
+   "mutant": "L267 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | ValueError"
+  },
+  {
+   "index": 2,
+   "mutant": "L267 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | ValueError"
+  },
+  {
+   "index": 3,
+   "mutant": "L267 Eq->NotEq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | IndexError"
+  },
+  {
+   "index": 4,
+   "mutant": "L266 string '--' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | ValueError"
+  },
+  {
+   "index": 5,
+   "mutant": "L267 string '--dev' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | AssertionError"
+  }
+ ]
+}

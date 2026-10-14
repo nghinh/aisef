@@ -1,0 +1,13 @@
+#!/bin/zsh
+# loop.sh TREE MODULE KEY N OUTFILE : N runs of one test through the wrapper; counts passes, failures, the exact error
+SP=/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad
+TREE=$1; MOD=$2; KEY=$3; N=$4; OUTF=$5
+cd $TREE || exit 2
+ok=0; bad=0; exact=0
+: > $OUTF
+for i in $(seq 1 $N); do
+  r=$($SP/m21/kills3/py.sh range -m unittest $MOD -k $KEY 2>&1)
+  if print -r -- "$r" | grep -q "^OK"; then ok=$((ok+1)); else bad=$((bad+1)); print -r -- "--- run $i" >> $OUTF; print -r -- "$r" | tail -25 >> $OUTF; fi
+  if print -r -- "$r" | grep -q "PyMemoryView_FromBuffer"; then exact=$((exact+1)); fi
+done
+echo "tree=$TREE module=$MOD key=$KEY runs=$N pass=$ok fail=$bad exact_ValueError=$exact" | tee -a $OUTF

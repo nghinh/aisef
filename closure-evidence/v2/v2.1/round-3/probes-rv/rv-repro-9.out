@@ -1,0 +1,6 @@
+tree: probes-rv | rows shipped: 19
+   probe.file_artifact        executing 833be030fb7f..  classes with a row at these bytes: 4/4
+   probe.python_callable_v2   executing e9f8dcdd6ec5..  classes with a row at these bytes: 7/7
+   probe.cli_invocation       executing ab0173818b69..  classes with a row at these bytes: 5/5
+   probe.process_effect       executing 3b39d380b361..  classes with a row at these bytes: 3/3
+classes calibrated at the bytes that run: 19/19

@@ -1,0 +1,12 @@
+{
+ "rows_parsed": 63,
+ "ps_lines_independent_call": 63,
+ "reader_listed": true,
+ "kids_listed": 60,
+ "forged_pids_in_table": [],
+ "command_equals_ps_p_command": {
+  "same": 60,
+  "different": 0
+ },
+ "max_command_length": 3104
+}

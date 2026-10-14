@@ -1,0 +1,15 @@
+#!/bin/zsh
+# kc.sh TARGET OUTNAME [extra kill_check args]: kill_check over the confinement kill set plus B03-R3 conf's and conf-fu's files
+SP=/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad
+WT=$SP/m21/r3/wt/conf-fu
+OUT=$SP/m21/r3/out/conf-fu
+cd $WT || exit 2
+T=$1; N=$2; shift 2
+exec $SP/m21/kills3/py.sh conf-fu validation/v21/kill_check.py $T \
+  tests/v2/test_v21_r3_conf_fu_before.py tests/v2/test_v21_r3_conf_rv_hostrows.py \
+  tests/v2/test_v21_r3_conf_policy.py tests/v2/test_v21_r3_conf_locale.py \
+  tests/v2/test_v21_kills3_T07a.py tests/v2/test_v21_kills3_T06a.py tests/v2/test_v21_kills3_A06.py \
+  tests/v2/test_v21_kills3_T05b.py tests/v2/test_v21_kills3_T05a.py tests/v2/test_v21_kills3_T05c.py \
+  tests/v2/test_v21_kills3_A05.py tests/v2/test_v21_kills3_R02.py tests/v2/test_v21_kills3_T06b.py \
+  tests/v2/test_v21_kills3_A07.py tests/v2/test_v21_kills3_T07b.py tests/v2/test_v21_kills3_TO2.py \
+  tests/v2/test_v21_defects_confine.py tests/v2/test_v21_confine.py --out $OUT/kc-$N.json "$@"

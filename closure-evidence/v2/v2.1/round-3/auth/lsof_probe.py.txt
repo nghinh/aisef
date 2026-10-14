@@ -1,0 +1,20 @@
+import os, subprocess, sys, tempfile, pathlib
+base = pathlib.Path(sys.argv[1]); base.mkdir(parents=True, exist_ok=True)
+names = {"u2028": "a b", "lf": "c\nd", "forged": "e\n123 f", "cr": "g\rh", "nbsp": "i j"}
+kids = {}
+for k, n in names.items():
+    if n is None:
+        d = os.path.join(os.fsencode(str(base)), b"bad\xffname")
+    else:
+        d = os.path.join(str(base), n)
+    os.makedirs(d, exist_ok=True)
+    kids[k] = (subprocess.Popen(["sleep", "6"], cwd=d), d)
+pids = [p.pid for p, _ in kids.values()]
+for flag in ("-Fpn", "-F0pn"):
+    r = subprocess.run(["lsof", "-nP", "-w", "-a", "-d", "cwd", flag, "-p", ",".join(map(str, pids))], capture_output=True,
+                       env={**os.environ, "LC_ALL": "en_US.UTF-8"})
+    print("###", flag, "rc", r.returncode)
+    for part in r.stdout.split(b"\n" if flag == "-Fpn" else b"\0"):
+        print("   ", repr(part))
+for k, (p, d) in kids.items():
+    p.wait()

@@ -1,0 +1,12 @@
+#!/bin/zsh
+# kc-rerun.sh: the mutants whose kills depended on the test classes edited after the first batch, and the INFRA/survivors
+SP=/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad
+OUT=$SP/m21/r3/out/conf
+run() { $OUT/kc.sh aisef2/app/confine.py::$1 $2 ${@:3} > $OUT/kcr-$2.log 2>&1; echo "$2 exit $?" >> $OUT/kc-rerun.status; }
+run LOCALE LOCALE
+run _host_mounts _host_mounts
+run _owned _owned-r --only 85,86,90,91,92
+run measure measure-r --only 15,33,37,45
+run _probe _probe-r --only 4,5,45,166,172,174,175,204,205,206,210,211
+run _judge _judge-r --only 32,39,64,68,69,80,81,82,88,96,102,113,117,128,153,159,160,161,164,172,174
+echo done >> $OUT/kc-rerun.status

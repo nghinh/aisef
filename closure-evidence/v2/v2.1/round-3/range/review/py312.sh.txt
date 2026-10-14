@@ -1,0 +1,8 @@
+#!/bin/zsh
+# py.sh TAG ARGS...: /opt/homebrew/bin/python3.12 -B under the workers' env (env -i, PATH without opencode, scratch HOME/TMPDIR per TAG)
+SP=/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad
+TAG=$1; shift
+[[ -n $TAG && $TAG != -* && $TAG != */* ]] || { echo "py.sh: TAG must be a plain name, got '$TAG'" >&2; exit 2; }
+H=$SP/m21/r3/out/range/review/home312/$TAG; mkdir -p $H
+GP=$(print -rl -- ${(s.:.)PATH} | while read -r d; do [[ -x $d/opencode ]] || print -r -- $d; done | paste -sd: -)
+exec env -i PATH="$GP" HOME=$H TMPDIR=$H LANG=en_US.UTF-8 /opt/homebrew/bin/python3.12 -B "$@"

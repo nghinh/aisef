@@ -1,0 +1,74 @@
+{
+ "target": "aisef2/app/client.py::events",
+ "files": [
+  "tests/v2/test_v21_r3_client_stream.py",
+  "tests/v2/test_s2_kills.py",
+  "tests/v2/test_app_units.py"
+ ],
+ "source_sha256": "612e537d07c2892e03b0db3c496d78bc8550c265b8194ba8a186ca36b370e592",
+ "t0": [
+  {
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "seconds": 2.05,
+   "outcome": "PASS",
+   "ran": 17
+  },
+  {
+   "file": "tests/v2/test_s2_kills.py",
+   "seconds": 27.42,
+   "outcome": "PASS",
+   "ran": 43
+  },
+  {
+   "file": "tests/v2/test_app_units.py",
+   "seconds": 8.52,
+   "outcome": "PASS",
+   "ran": 41
+  }
+ ],
+ "error": null,
+ "results": [
+  {
+   "index": 0,
+   "mutant": "L49 returns None",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "ERROR: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_a_findings_block_that_holds_a_separator_is_the_reviews_findings) (separator='U+2028') | TypeError"
+  },
+  {
+   "index": 1,
+   "mutant": "L44 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_a_findings_block_that_holds_a_separator_is_the_reviews_findings) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 2,
+   "mutant": "L43 string '\\n' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "ERROR: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_a_findings_block_that_holds_a_separator_is_the_reviews_findings) (separator='U+2028') | ValueError"
+  },
+  {
+   "index": 3,
+   "mutant": "L44 string '{' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "ERROR: test_a_line_that_is_no_event_costs_only_itself (v2.test_v21_r3_client_stream.ReadingAStream.test_a_line_that_is_no_event_costs_only_itself) | AttributeError"
+  },
+  {
+   "index": 4,
+   "mutant": "L43 string 'utf-8' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "ERROR: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_a_findings_block_that_holds_a_separator_is_the_reviews_findings) (separator='U+2028') | LookupError"
+  },
+  {
+   "index": 5,
+   "mutant": "L43 string 'replace' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "ERROR: test_a_line_that_is_no_event_costs_only_itself (v2.test_v21_r3_client_stream.ReadingAStream.test_a_line_that_is_no_event_costs_only_itself) | LookupError"
+  }
+ ]
+}

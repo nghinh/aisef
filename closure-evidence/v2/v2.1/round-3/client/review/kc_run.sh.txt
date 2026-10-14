@@ -1,0 +1,8 @@
+#!/bin/zsh
+# kc_run.sh ROOT NAME TARGET FILE...: kill_check of TARGET from lab/ROOT; JSON to review/kc-NAME.json, log to review/kc-NAME.log
+SP=/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad
+OUT=$SP/m21/r3/out/client/review
+R=$1; N=$2; T=$3; shift 3
+cd $OUT/lab/$R || exit 2
+$SP/m21/kills3/py.sh rv$R validation/v21/kill_check.py $T "$@" --out $OUT/kc-$N.json > $OUT/kc-$N.log 2>&1
+echo "$N exit=$? $(grep -E '^# ' $OUT/kc-$N.log | cut -c1-260)" >> $OUT/kc-status-$R.txt

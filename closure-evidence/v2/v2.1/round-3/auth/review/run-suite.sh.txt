@@ -1,0 +1,13 @@
+#!/bin/zsh
+# host runs of the modules that import cleanup_authority + the authority tests; one line per module
+SP=/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad
+cd $SP/m21/r3/wt/auth-rv || exit 2
+for m in tests.v2.p0.test_destructive_authority tests.v2.p4.test_mutation_safety tests.v2.p5.test_invariants \
+         tests.v2.p4.test_process_range tests.v2.test_v21_confine tests.v2.test_v21_read_set tests.v2.test_v21_snapshot_delta \
+         tests.v2.test_v21_defects_runner tests.v2.test_v21_mutation_runner tests.v2.p0.test_checker_calibration \
+         tests.v2.p2.test_mutation_targets tests.v2.test_v21_kill_check tests.v2.test_v21_execution_order tests.v2.test_v21_requalification; do
+  echo "=== $m"
+  $SP/m21/kills3/py.sh auth-rv -m unittest $m 2>&1 | tail -25
+done
+echo "=== destructive_authority --check"
+$SP/m21/kills3/py.sh auth-rv validation/v2/destructive_authority.py --check 2>&1 | tail -5

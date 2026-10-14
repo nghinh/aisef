@@ -1,0 +1,4 @@
+plain   story_diff lines: [2, 4]   (true: [2, 4])   file_patches: hunks 1, opaque False
+FF      story_diff lines: [2, 5]   (true: [2, 4])   file_patches: hunks 1, opaque True
+U+2028  story_diff lines: [2, 5]   (true: [2, 4])   file_patches: hunks 1, opaque True
+U+0085  story_diff lines: [2, 5]   (true: [2, 4])   file_patches: hunks 1, opaque True

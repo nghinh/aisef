@@ -1,0 +1,11 @@
+#!/bin/zsh
+OUT=/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/out/client/review
+T=tests/v2
+R=$T/test_v21_r3_client_readers.py
+S=$T/test_v21_r3_client_stream.py
+CONF="$T/test_v21_kills3_T07a.py $T/test_v21_confine.py $T/test_v21_r3_conf_policy.py $T/test_v21_r3_conf_fu_before.py $T/test_v21_r3_conf_rv_hostrows.py"
+$OUT/kc_run.sh kcA events aisef2/app/client.py::events $S $T/test_app_units.py
+$OUT/kc_run.sh kcA _lines aisef2/app/confine.py::_lines $R ${=CONF}
+$OUT/kc_run.sh kcA _host_mounts aisef2/app/confine.py::_host_mounts $R ${=CONF}
+$OUT/kc_run.sh kcA session_tokens aisef2/app/usage.py::session_tokens $S $T/test_v21_kills3_T20a.py
+echo DONE >> $OUT/kc-status-kcA.txt

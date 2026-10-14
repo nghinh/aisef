@@ -1,0 +1,508 @@
+{
+ "target": "aisef2/app/adapters.py::Reviewer.review",
+ "files": [
+  "tests/v2/test_v21_r3_detail_artifact.py",
+  "tests/v2/test_v21_kills_adapters.py",
+  "tests/v2/test_app_units.py",
+  "tests/v2/test_s2_kills.py",
+  "tests/v2/test_app_run.py",
+  "tests/v2/test_v21_identity.py",
+  "tests/v2/test_v21_review_chain.py"
+ ],
+ "source_sha256": "2ee59736532802d7287a6948c5eade35e75f0e65282eaf3327b18bb5d0339aa2",
+ "t0": [
+  {
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "seconds": 1.66,
+   "outcome": "PASS",
+   "ran": 33
+  },
+  {
+   "file": "tests/v2/test_v21_kills_adapters.py",
+   "seconds": 1.42,
+   "outcome": "PASS",
+   "ran": 10
+  },
+  {
+   "file": "tests/v2/test_app_units.py",
+   "seconds": 7.32,
+   "outcome": "PASS",
+   "ran": 41
+  },
+  {
+   "file": "tests/v2/test_s2_kills.py",
+   "seconds": 25.83,
+   "outcome": "PASS",
+   "ran": 43
+  },
+  {
+   "file": "tests/v2/test_app_run.py",
+   "seconds": 41.06,
+   "outcome": "PASS",
+   "ran": 17
+  },
+  {
+   "file": "tests/v2/test_v21_identity.py",
+   "seconds": 1.45,
+   "outcome": "PASS",
+   "ran": 13
+  },
+  {
+   "file": "tests/v2/test_v21_review_chain.py",
+   "seconds": 163.54,
+   "outcome": "PASS",
+   "ran": 18
+  }
+ ],
+ "error": null,
+ "results": [
+  {
+   "index": 0,
+   "mutant": "L124 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | aisef2.orchestrate.adapters.CapabilityUnrunnable"
+  },
+  {
+   "index": 1,
+   "mutant": "L152 returns None",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | AttributeError"
+  },
+  {
+   "index": 2,
+   "mutant": "L122 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | ValueError"
+  },
+  {
+   "index": 3,
+   "mutant": "L122 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | ValueError"
+  },
+  {
+   "index": 4,
+   "mutant": "L124 NotEq->Eq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | aisef2.orchestrate.adapters.CapabilityUnrunnable"
+  },
+  {
+   "index": 5,
+   "mutant": "L128 Eq->NotEq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | TypeError"
+  },
+  {
+   "index": 6,
+   "mutant": "L129 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | ValueError"
+  },
+  {
+   "index": 7,
+   "mutant": "L129 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | ValueError"
+  },
+  {
+   "index": 8,
+   "mutant": "L129 element 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | ValueError"
+  },
+  {
+   "index": 9,
+   "mutant": "L129 conditional negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | TypeError"
+  },
+  {
+   "index": 10,
+   "mutant": "L131 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | AssertionError"
+  },
+  {
+   "index": 11,
+   "mutant": "L131 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_the_finders_own_token_is_a_secret_of_the_run_too (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_the_finders_own_token_is_a_secret_of_the_run_too) | AssertionError"
+  },
+  {
+   "index": 12,
+   "mutant": "L133 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | ValueError"
+  },
+  {
+   "index": 13,
+   "mutant": "L133 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | ValueError"
+  },
+  {
+   "index": 14,
+   "mutant": "L137 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | KeyError"
+  },
+  {
+   "index": 15,
+   "mutant": "L145 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | aisef2.orchestrate.adapters.CapabilityUnrunnable"
+  },
+  {
+   "index": 16,
+   "mutant": "L123 string 'rev-parse' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | aisef2.orchestrate.adapters.CapabilityUnrunnable"
+  },
+  {
+   "index": 17,
+   "mutant": "L123 string 'HEAD' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | aisef2.orchestrate.adapters.CapabilityUnrunnable"
+  },
+  {
+   "index": 18,
+   "mutant": "L128 string 'ocr' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills_adapters.py",
+   "first": "ERROR: test_the_ocr_review_s_detail_names_its_coverage (v2.test_v21_kills_adapters.ReviewerReview.test_the_ocr_review_s_detail_names_its_coverage) | aisef2.app.client.SessionRefused"
+  },
+  {
+   "index": 19,
+   "mutant": "L130 string 'the finder' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills_adapters.py",
+   "first": "FAIL: test_a_change_to_the_checkout_names_the_stage_it_happened_in (v2.test_v21_kills_adapters.ReviewerReview.test_a_change_to_the_checkout_names_the_stage_it_happened_in) | AssertionError"
+  },
+  {
+   "index": 20,
+   "mutant": "L135 conditional negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | AssertionError"
+  },
+  {
+   "index": 21,
+   "mutant": "L136 dict entry 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | KeyError"
+  },
+  {
+   "index": 22,
+   "mutant": "L136 dict entry 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills_adapters.py",
+   "first": "FAIL: test_the_findings_record_carries_its_anchor_and_the_detail_counts_the_confirmed (v2.test_v21_kills_adapters.ReviewerReview.test_the_findings_record_carries_its_anchor_and_the_detail_counts_the_confirmed) | AssertionError"
+  },
+  {
+   "index": 23,
+   "mutant": "L136 dict entry 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills_adapters.py",
+   "first": "FAIL: test_the_findings_record_carries_its_anchor_and_the_detail_counts_the_confirmed (v2.test_v21_kills_adapters.ReviewerReview.test_the_findings_record_carries_its_anchor_and_the_detail_counts_the_confirmed) | AssertionError"
+  },
+  {
+   "index": 24,
+   "mutant": "L136 dict entry 3 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills_adapters.py",
+   "first": "FAIL: test_the_findings_record_carries_its_anchor_and_the_detail_counts_the_confirmed (v2.test_v21_kills_adapters.ReviewerReview.test_the_findings_record_carries_its_anchor_and_the_detail_counts_the_confirmed) | AssertionError"
+  },
+  {
+   "index": 25,
+   "mutant": "L137 IsNot->Is",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | KeyError"
+  },
+  {
+   "index": 26,
+   "mutant": "L145 And swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | aisef2.orchestrate.adapters.CapabilityUnrunnable"
+  },
+  {
+   "index": 27,
+   "mutant": "L149 string 'the verification' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills_adapters.py",
+   "first": "FAIL: test_a_change_to_the_checkout_names_the_stage_it_happened_in (v2.test_v21_kills_adapters.ReviewerReview.test_a_change_to_the_checkout_names_the_stage_it_happened_in) | AssertionError"
+  },
+  {
+   "index": 28,
+   "mutant": "L150 string 'findings' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | KeyError"
+  },
+  {
+   "index": 29,
+   "mutant": "L152 tuple() -> list()",
+   "class": "KILLED",
+   "file": "tests/v2/test_s2_kills.py",
+   "first": "FAIL: test_the_reviewer_s_session_and_findings (v2.test_s2_kills.AppAdapters.test_the_reviewer_s_session_and_findings) | AssertionError"
+  },
+  {
+   "index": 30,
+   "mutant": "L125 string 'the checkout to review has no revision' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills_adapters.py",
+   "first": "FAIL: test_a_checkout_with_no_revision_is_refused_saying_so (v2.test_v21_kills_adapters.ReviewerReview.test_a_checkout_with_no_revision_is_refused_saying_so) | AssertionError"
+  },
+  {
+   "index": 31,
+   "mutant": "L128 string 'finder' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills_adapters.py",
+   "first": "ERROR: test_the_ocr_review_s_detail_names_its_coverage (v2.test_v21_kills_adapters.ReviewerReview.test_the_ocr_review_s_detail_names_its_coverage) | aisef2.app.client.SessionRefused"
+  },
+  {
+   "index": 32,
+   "mutant": "L131 string 'token' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_the_finders_own_token_is_a_secret_of_the_run_too (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_the_finders_own_token_is_a_secret_of_the_run_too) | AssertionError"
+  },
+  {
+   "index": 33,
+   "mutant": "L136 string 'verification' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | KeyError"
+  },
+  {
+   "index": 34,
+   "mutant": "L136 string 'status' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | KeyError"
+  },
+  {
+   "index": 35,
+   "mutant": "L136 string 'why' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills_adapters.py",
+   "first": "FAIL: test_the_findings_record_carries_its_anchor_and_the_detail_counts_the_confirmed (v2.test_v21_kills_adapters.ReviewerReview.test_the_findings_record_carries_its_anchor_and_the_detail_counts_the_confirmed) | AssertionError"
+  },
+  {
+   "index": 36,
+   "mutant": "L136 string 'probe' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills_adapters.py",
+   "first": "FAIL: test_the_findings_record_carries_its_anchor_and_the_detail_counts_the_confirmed (v2.test_v21_kills_adapters.ReviewerReview.test_the_findings_record_carries_its_anchor_and_the_detail_counts_the_confirmed) | AssertionError"
+  },
+  {
+   "index": 37,
+   "mutant": "L136 string 'observed' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills_adapters.py",
+   "first": "FAIL: test_the_findings_record_carries_its_anchor_and_the_detail_counts_the_confirmed (v2.test_v21_kills_adapters.ReviewerReview.test_the_findings_record_carries_its_anchor_and_the_detail_counts_the_confirmed) | AssertionError"
+  },
+  {
+   "index": 38,
+   "mutant": "L138 dict entry 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | KeyError"
+  },
+  {
+   "index": 39,
+   "mutant": "L138 dict entry 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills_adapters.py",
+   "first": "FAIL: test_the_findings_record_carries_its_anchor_and_the_detail_counts_the_confirmed (v2.test_v21_kills_adapters.ReviewerReview.test_the_findings_record_carries_its_anchor_and_the_detail_counts_the_confirmed) | AssertionError"
+  },
+  {
+   "index": 40,
+   "mutant": "L138 dict entry 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills_adapters.py",
+   "first": "FAIL: test_the_findings_record_carries_its_anchor_and_the_detail_counts_the_confirmed (v2.test_v21_kills_adapters.ReviewerReview.test_the_findings_record_carries_its_anchor_and_the_detail_counts_the_confirmed) | AssertionError"
+  },
+  {
+   "index": 41,
+   "mutant": "L145 not removed",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | aisef2.orchestrate.adapters.CapabilityUnrunnable"
+  },
+  {
+   "index": 42,
+   "mutant": "L154 conditional negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills_adapters.py",
+   "first": "FAIL: test_the_findings_record_carries_its_anchor_and_the_detail_counts_the_confirmed (v2.test_v21_kills_adapters.ReviewerReview.test_the_findings_record_carries_its_anchor_and_the_detail_counts_the_confirmed) | AssertionError"
+  },
+  {
+   "index": 43,
+   "mutant": "L131 string 'secrets' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | AssertionError"
+  },
+  {
+   "index": 44,
+   "mutant": "L138 string 'anchor' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | KeyError"
+  },
+  {
+   "index": 45,
+   "mutant": "L138 string 'status' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | KeyError"
+  },
+  {
+   "index": 46,
+   "mutant": "L138 string 'why' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills_adapters.py",
+   "first": "FAIL: test_the_findings_record_carries_its_anchor_and_the_detail_counts_the_confirmed (v2.test_v21_kills_adapters.ReviewerReview.test_the_findings_record_carries_its_anchor_and_the_detail_counts_the_confirmed) | AssertionError"
+  },
+  {
+   "index": 47,
+   "mutant": "L138 string 'contracts' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills_adapters.py",
+   "first": "FAIL: test_the_findings_record_carries_its_anchor_and_the_detail_counts_the_confirmed (v2.test_v21_kills_adapters.ReviewerReview.test_the_findings_record_carries_its_anchor_and_the_detail_counts_the_confirmed) | AssertionError"
+  },
+  {
+   "index": 48,
+   "mutant": "L139 string 'policy' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | KeyError"
+  },
+  {
+   "index": 49,
+   "mutant": "L139 string 'min_severity' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | KeyError"
+  },
+  {
+   "index": 50,
+   "mutant": "L147 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills_adapters.py",
+   "first": "FAIL: test_the_findings_record_carries_its_anchor_and_the_detail_counts_the_confirmed (v2.test_v21_kills_adapters.ReviewerReview.test_the_findings_record_carries_its_anchor_and_the_detail_counts_the_confirmed) | AssertionError"
+  },
+  {
+   "index": 51,
+   "mutant": "L148 conditional negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | AssertionError"
+  },
+  {
+   "index": 52,
+   "mutant": "L153 conditional negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills_adapters.py",
+   "first": "FAIL: test_the_findings_record_carries_its_anchor_and_the_detail_counts_the_confirmed (v2.test_v21_kills_adapters.ReviewerReview.test_the_findings_record_carries_its_anchor_and_the_detail_counts_the_confirmed) | AssertionError"
+  },
+  {
+   "index": 53,
+   "mutant": "L135 string 'reproducer' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | AssertionError"
+  },
+  {
+   "index": 54,
+   "mutant": "L143 string 'log' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | AssertionError"
+  },
+  {
+   "index": 55,
+   "mutant": "L152 conditional negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills_adapters.py",
+   "first": "FAIL: test_the_findings_record_carries_its_anchor_and_the_detail_counts_the_confirmed (v2.test_v21_kills_adapters.ReviewerReview.test_the_findings_record_carries_its_anchor_and_the_detail_counts_the_confirmed) | AssertionError"
+  },
+  {
+   "index": 56,
+   "mutant": "L153 not removed",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills_adapters.py",
+   "first": "FAIL: test_the_findings_record_carries_its_anchor_and_the_detail_counts_the_confirmed (v2.test_v21_kills_adapters.ReviewerReview.test_the_findings_record_carries_its_anchor_and_the_detail_counts_the_confirmed) | AssertionError"
+  },
+  {
+   "index": 57,
+   "mutant": "L154 string ', confirmed=' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills_adapters.py",
+   "first": "FAIL: test_the_findings_record_carries_its_anchor_and_the_detail_counts_the_confirmed (v2.test_v21_kills_adapters.ReviewerReview.test_the_findings_record_carries_its_anchor_and_the_detail_counts_the_confirmed) | AssertionError"
+  },
+  {
+   "index": 58,
+   "mutant": "L144 string 'id' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | AssertionError"
+  },
+  {
+   "index": 59,
+   "mutant": "L152 string ' findings' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills_adapters.py",
+   "first": "FAIL: test_the_findings_record_carries_its_anchor_and_the_detail_counts_the_confirmed (v2.test_v21_kills_adapters.ReviewerReview.test_the_findings_record_carries_its_anchor_and_the_detail_counts_the_confirmed) | AssertionError"
+  },
+  {
+   "index": 60,
+   "mutant": "L153 string ', parsed=' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills_adapters.py",
+   "first": "FAIL: test_the_findings_record_carries_its_anchor_and_the_detail_counts_the_confirmed (v2.test_v21_kills_adapters.ReviewerReview.test_the_findings_record_carries_its_anchor_and_the_detail_counts_the_confirmed) | AssertionError"
+  },
+  {
+   "index": 61,
+   "mutant": "L147 string 'blocking' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_app_units.py",
+   "first": "FAIL: test_the_review_never_blocks_on_unparsed_text_and_an_outage_is_typed (v2.test_app_units.Adapters.test_the_review_never_blocks_on_unparsed_text_and_an_outage_is_typed) | AssertionError"
+  },
+  {
+   "index": 62,
+   "mutant": "L152 string ', ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills_adapters.py",
+   "first": "FAIL: test_the_ocr_review_s_detail_names_its_coverage (v2.test_v21_kills_adapters.ReviewerReview.test_the_ocr_review_s_detail_names_its_coverage) | AssertionError"
+  },
+  {
+   "index": 63,
+   "mutant": "L153 string 'parsed' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills_adapters.py",
+   "first": "FAIL: test_the_findings_record_carries_its_anchor_and_the_detail_counts_the_confirmed (v2.test_v21_kills_adapters.ReviewerReview.test_the_findings_record_carries_its_anchor_and_the_detail_counts_the_confirmed) | AssertionError"
+  }
+ ]
+}

@@ -1,0 +1,30 @@
+import json, pathlib, shutil, subprocess, re, concurrent.futures as cf
+SP = pathlib.Path("/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad")
+OUT = SP / "m21/r3/out/range/review"
+man = json.load(open(OUT / "stmt/manifest.json"))
+test_src = (OUT / "exp/tests/v2/test_v21_r3_range_release_contract.py").read_text()
+assert "BOUND_S = 10.0" in test_src and "HELD_FALLBACK_S = 5.0" in test_src
+test_src = test_src.replace("BOUND_S = 10.0", "BOUND_S = 2.0").replace("HELD_FALLBACK_S = 5.0", "HELD_FALLBACK_S = 1.0")
+
+def one(m):
+    T = OUT / "exp-run" / ("q_" + m["name"])
+    shutil.copytree(OUT / "exp", T)
+    shutil.copy(OUT / "stmt" / f"{m['name']}.py", T / "aisef2/runtime/process_range.py")
+    (T / "tests/v2/test_v21_r3_range_release_contract.py").write_text(test_src)
+    try:
+        r = subprocess.run([str(SP / "m21/kills3/py.sh"), "range-rv-stmt-" + m["name"][:3], "-m", "unittest",
+                            "tests.v2.test_v21_r3_range_release_contract"], cwd=T, capture_output=True, text=True, timeout=150)
+        out = r.stdout + r.stderr
+        end = re.findall(r"^(OK.*|FAILED.*)$", out, re.M)
+        failed = sorted(set(re.findall(r"^(?:FAIL|ERROR): (\w+)", out, re.M)))
+        status = end[-1] if end else "NO-SUMMARY"
+    except subprocess.TimeoutExpired:
+        status, failed = "TIMEOUT", []
+    shutil.rmtree(T)
+    return {**m, "status": status, "failed": failed}
+
+with cf.ThreadPoolExecutor(3) as ex:
+    res = list(ex.map(one, man))
+json.dump(res, open(OUT / "stmt/results2.json", "w"), indent=1)
+for r in res:
+    print(f"{r['name']:48s} L{r['line']:<4d} {r['status']:26s} {r['text']}")

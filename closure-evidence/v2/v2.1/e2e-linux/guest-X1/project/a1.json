@@ -1,0 +1,172 @@
+{
+ "approvals": [
+  {
+   "approved_at": 1791861878.4304054,
+   "approver": "human:e2e",
+   "contract_hash": "011f1b84ddd96bfb5f58bfe90a23c618f510dff691236a8faecde8dfa9c4ffee",
+   "contract_id": "BC-SUM",
+   "model_reviews": [],
+   "requirement_hash": "283b218dd44a905820e5daab7d806c3f64902e81226c91b9fcae4beb0c221042",
+   "requirement_id": "R-CLI"
+  }
+ ],
+ "contracts": [
+  {
+   "contract_hash": "011f1b84ddd96bfb5f58bfe90a23c618f510dff691236a8faecde8dfa9c4ffee",
+   "id": "BC-SUM",
+   "observable": {
+    "exit_code": 5,
+    "within_s": 20
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "the requirement's own example",
+   "requirement_ids": [
+    "R-CLI"
+   ],
+   "stimulus": {
+    "argv": [
+     "2",
+     "3"
+    ]
+   },
+   "subject": {
+    "kind": "cli_invocation",
+    "locator": "app:__main__"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "4d23b941431f199b7bb33c0dfd403ed84987277425650c6816225bffc9316ff8",
+   "id": "BC-USAGE-0",
+   "observable": {
+    "exit_code": 2,
+    "within_s": 20
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "the requirement's own example",
+   "requirement_ids": [
+    "R-CLI"
+   ],
+   "stimulus": {
+    "argv": []
+   },
+   "subject": {
+    "kind": "cli_invocation",
+    "locator": "app:__main__"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "1441ed48fd12737ffac142904306c1eb10018072c9a289e65e4cde63dd2e470c",
+   "id": "BC-USAGE-1",
+   "observable": {
+    "exit_code": 2,
+    "within_s": 20
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "the requirement's own example",
+   "requirement_ids": [
+    "R-CLI"
+   ],
+   "stimulus": {
+    "argv": [
+     "1"
+    ]
+   },
+   "subject": {
+    "kind": "cli_invocation",
+    "locator": "app:__main__"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  }
+ ],
+ "description": "A calculator command.",
+ "facts": {
+  "C-SUM": {
+   "clause": "1.1",
+   "clause_text": "exits with the sum of the integers A and B",
+   "requirement": "R-CLI",
+   "section": "§1",
+   "subject": "python -m app"
+  },
+  "C-USAGE-0": {
+   "clause": "1.2",
+   "clause_text": "exit 2 on a usage error (any other number of arguments)",
+   "requirement": "R-CLI",
+   "section": "§1",
+   "subject": "python -m app"
+  },
+  "C-USAGE-1": {
+   "clause": "1.2",
+   "clause_text": "exit 2 on a usage error (any other number of arguments)",
+   "requirement": "R-CLI",
+   "section": "§1",
+   "subject": "python -m app"
+  }
+ },
+ "format": "aisef-v2-project/1",
+ "name": "calc-cli",
+ "plan": {
+  "baseline": "3176460308161b5e765e678323c35accbdad32a9",
+  "id": "PLAN-calc-cli",
+  "obligations": [
+   {
+    "criterion_id": "C-SUM",
+    "depends_on": [],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "S1 introduces 1.1",
+    "product_proof_spec_id": "PPS-5ea4493062c1d89d8e6f8d40fbc9c92f289b309283fd3bed00ee6fdbd8c09243",
+    "role": "INTRODUCE",
+    "story_id": "S1"
+   },
+   {
+    "criterion_id": "C-USAGE-0",
+    "depends_on": [],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "S1 introduces 1.2",
+    "product_proof_spec_id": "PPS-5a52e3117c6159c058f31b67acff3e5deb3cb6a4f4760f6d3bf6ccc8dfb1bdb5",
+    "role": "INTRODUCE",
+    "story_id": "S1"
+   },
+   {
+    "criterion_id": "C-USAGE-1",
+    "depends_on": [],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "S1 introduces 1.2",
+    "product_proof_spec_id": "PPS-ca5b9c474e6d1c0b5b82b3f66be1de6e817f0ef488de814330428b57d4c10d5f",
+    "role": "INTRODUCE",
+    "story_id": "S1"
+   }
+  ],
+  "plan_hash": "35ad86a86f69356517ff252b13925a51d2934e64fe30e9e02b86a0bf5907a69d",
+  "plan_quality_policy": {
+   "max_fully_pre_satisfied_stories": null,
+   "max_pre_satisfied_introduce_ratio": null,
+   "max_unattributed_plan_drift": null
+  }
+ },
+ "product_roots": [
+  "app",
+  "tests"
+ ],
+ "requirements": [
+  {
+   "id": "R-CLI",
+   "requirement_hash": "283b218dd44a905820e5daab7d806c3f64902e81226c91b9fcae4beb0c221042",
+   "source": "docs/requirements.md §1",
+   "text": "python -m app A B exits with the sum of the integers A and B; exit 2 on a usage error (any other number of arguments)"
+  }
+ ],
+ "requirements_document": {
+  "path": "docs/requirements.md",
+  "sha256": "43219c17d13bb6e97138145e6622ef61f6a9a9a24c7640c7a5531ebdcd19c88c"
+ },
+ "stories": {
+  "S1": {
+   "depends_on": [],
+   "tests": [
+    "tests/test_cli.py"
+   ]
+  }
+ }
+}

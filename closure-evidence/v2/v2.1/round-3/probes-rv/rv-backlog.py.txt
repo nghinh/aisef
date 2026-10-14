@@ -1,0 +1,36 @@
+# rv-backlog: measured reproductions of backlog items V21-25 (blocks over a hanging IMPORT) and V21-09 (UNRUNNABLE and
+# INVALID_SPEC records serialise alike), through the real entry points.  Run from the worktree root under py.sh.
+import dataclasses, json, os, pathlib, sys, tempfile
+sys.path.insert(0, os.getcwd())
+from aisef2.arch.enums import BehaviorVerdict, Enforcement, SubjectAbsence
+from aisef2.probe import python_callable_v2 as pc2
+from aisef2.probe.protocol import ExecutionEnv, ProbeRecord, RevisionRef, run_probe
+from aisef2.product.outcome import InvalidSpec, Unrunnable
+from aisef2.product.spec import ProductProofSpec
+
+print("interpreter:", sys.version.split()[0], sys.platform)
+SHA = "89abcdef0123456789abcdef0123456789abcdef"
+root = tempfile.mkdtemp(prefix="aisef2-rv-blocks-")
+pathlib.Path(root, "hang.py").write_text("import time\ntime.sleep(60)\n\n\ndef serve():\n    return 1\n", encoding="utf-8", newline="\n")
+pathlib.Path(root, "ok.py").write_text("def serve():\n    return 1\n", encoding="utf-8", newline="\n")
+def spec(locator, cond):
+    obs = {"blocks": True, "within_s": 2}
+    return ProductProofSpec.create(
+        contract_id="BC-RV", probe_id=pc2.PROBE_ID, probe_digest=pc2.DIGEST,
+        probe_input={"subject": {"kind": "python_callable", "locator": locator}, "stimulus": {}, "observable": obs,
+                     "subject_absence": SubjectAbsence.REQUIRES_SUBJECT.value},
+        candidate_expectation=BehaviorVerdict.SATISFIED, compiler_id="test", compiler_digest="c" * 64)
+env = ExecutionEnv(sys.executable, 20, Enforcement.PARTIAL)
+at = RevisionRef(SHA, root)
+p = pc2.PythonCallableV2Probe()
+for loc in ("ok:serve", "hang:serve"):
+    o = p.observe(spec(loc, "blocks"), at, env)
+    print("blocks over %-11s -> %s %s | %s" % (loc, o.kind.value, o.verdict.value if o.verdict else None, o.detail[:100]))
+
+# V21-09: the two non-verdict results with one reason string
+s = spec("ok:serve", "blocks")
+mk = lambda r: ProbeRecord.create(spec_id=s.id, semantic_hash=s.semantic_hash, probe_id=pc2.PROBE_ID, probe_digest=pc2.DIGEST,
+                                  revision=SHA, enforcement=Enforcement.PARTIAL, result=r)
+a, b = mk(Unrunnable("x")), mk(InvalidSpec("x"))
+print("Unrunnable('x') vs InvalidSpec('x'): record_digest equal =", a.record_digest == b.record_digest,
+      "| results equal =", a.result == b.result, "| types:", type(a.result).__name__, type(b.result).__name__)

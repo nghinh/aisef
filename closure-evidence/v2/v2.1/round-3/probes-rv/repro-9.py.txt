@@ -1,0 +1,25 @@
+# repro-9 (probes WP, recalibration cost): which shipped calibration rows (aisef2/app/calibrations.py, read by static
+# admission check 9 and by review_verify) still name the bytes this tree's probes run.  No row names them => the plan is
+# refused at admission, before any probe runs.  Run from a tree root that holds aisef2/.
+import os
+import pathlib
+import sys
+
+ROOT = pathlib.Path(os.getcwd())
+sys.path.insert(0, str(ROOT))
+from aisef2.app.calibrations import CALIBRATIONS  # noqa: E402
+from aisef2.probe import catalog  # noqa: E402
+from aisef2.probe.calibration import executing  # noqa: E402
+
+print("tree:", ROOT.name, "| rows shipped:", len(CALIBRATIONS))
+have = {(r["probe_id"], r["probe_digest"], r["observation_class"]) for r in CALIBRATIONS}
+total = named = 0
+for e in catalog.CATALOG:
+    if not e.active:
+        continue
+    now = executing(e.factory)
+    ok = [c for c in e.classes if (e.probe_id, now, c) in have]
+    total += len(e.classes)
+    named += len(ok)
+    print("   %-26s executing %s..  classes with a row at these bytes: %d/%d" % (e.probe_id, now[:12], len(ok), len(e.classes)))
+print("classes calibrated at the bytes that run: %d/%d" % (named, total))

@@ -1,0 +1,49 @@
+"""Plausible WRONG implementations of the reader, each a one-edit variant of the fixed module; the test file must FAIL
+for every one of them. usage: python3 -B -I wrong_impls.py.txt WT SCRATCH_ROOT"""
+import pathlib, shutil, subprocess, sys
+
+wt, root = pathlib.Path(sys.argv[1]), pathlib.Path(sys.argv[2])
+src = (wt / "validation/v2/cleanup_authority.py").read_text(encoding="utf-8")
+VARIANTS = {
+    "W1 str.splitlines() of the decoded text (the old bug)": (
+        'return [line for line in (b.decode("utf-8", "replace") for b in raw.split(b"\\n")) if line.strip(" ")]',
+        'return [line for line in raw.decode("utf-8", "replace").splitlines() if line.strip(" ")]'),
+    "W2 bytes.splitlines() (cuts at CR)": (
+        'return [line for line in (b.decode("utf-8", "replace") for b in raw.split(b"\\n")) if line.strip(" ")]',
+        'return [line for line in (b.decode("utf-8", "replace") for b in raw.splitlines()) if line.strip(" ")]'),
+    "W3 a line that is no row is skipped (the old rule)": (
+        '        if m is None:\n            raise _not_a_row("ps", line)\n        pid, ppid, pgid, wday',
+        '        if m is None:\n            continue\n        pid, ppid, pgid, wday'),
+    "W4 a bad date is skipped": (
+        '        except (ValueError, OverflowError):\n            raise _not_a_row("ps", line) from None\n        if int(pid) in out:\n            raise _twice("ps", pid, line)',
+        '        except (ValueError, OverflowError):\n            continue\n        if int(pid) in out:\n            raise _twice("ps", pid, line)'),
+    "W5 the later row of a pid wins (no duplicate check)": (
+        '        if int(pid) in out:\n            raise _twice("ps", pid, line)\n        out[int(pid)] = Host(int(pid), int(ppid), int(pgid), born, command or "")',
+        '        out[int(pid)] = Host(int(pid), int(ppid), int(pgid), born, command or "")'),
+    "W6 the command is split off with str.split() (Unicode whitespace is a column separator)": (
+        '        out[int(pid)] = Host(int(pid), int(ppid), int(pgid), born, command or "")',
+        '        out[int(pid)] = Host(int(pid), int(ppid), int(pgid), born, (command or "").lstrip())'),
+    "W7 ps runs in the user's locale": (
+        '    env["LC_TIME"] = "C"\n    return env',
+        '    return env'),
+    "W8 a failed ps is parsed (its text read as rows)": (
+        'out = _ps_rows(raw) if proc.returncode == 0 else {}',
+        'out = _ps_rows(raw)'),
+    "W9 the reader need not list itself": (
+        'if proc.returncode != 0 or proc.pid not in out:',
+        'if proc.returncode != 0:'),
+    "W10 digits by str.isdigit() (superscripts and other scripts)": (
+        '_PS_ROW = re.compile(r" *([0-9]+) +([0-9]+) +([0-9]+) +',
+        '_PS_ROW = re.compile(r" *(\\d+) +(\\d+) +(\\d+) +'),
+}
+res = {}
+for name, (old, new) in VARIANTS.items():
+    assert src.count(old) == 1, (name, src.count(old))
+    tree = root / name.split()[0]
+    (tree / "validation/v2").mkdir(parents=True, exist_ok=True)
+    (tree / "tests/v2").mkdir(parents=True, exist_ok=True)
+    (tree / "validation/v2/cleanup_authority.py").write_text(src.replace(old, new), encoding="utf-8")
+    shutil.copy(wt / "tests/v2/test_v21_r3_auth_ps_table.py", tree / "tests/v2/test_v21_r3_auth_ps_table.py")
+    r = subprocess.run([sys.executable, "-B", "-I", "tests/v2/test_v21_r3_auth_ps_table.py"], cwd=tree, capture_output=True, text=True)
+    last = [l for l in r.stderr.splitlines() if l.startswith(("OK", "FAILED", "Ran"))]
+    print(f"{name:95s} exit={r.returncode} {' '.join(last)}")

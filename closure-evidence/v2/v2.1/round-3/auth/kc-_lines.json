@@ -1,0 +1,53 @@
+{
+ "target": "validation/v2/cleanup_authority.py::_lines",
+ "files": [
+  "tests/v2/test_v21_r3_auth_ps_table.py",
+  "tests/v2/test_v21_r3_auth_other_readers.py"
+ ],
+ "source_sha256": "52bfcbdc60c362b8966dbbf414beba593eaf41330fce9d94c4809397bfbf6d5e",
+ "t0": [
+  {
+   "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+   "seconds": 0.7,
+   "outcome": "PASS",
+   "ran": 30
+  },
+  {
+   "file": "tests/v2/test_v21_r3_auth_other_readers.py",
+   "seconds": 1.64,
+   "outcome": "PASS",
+   "ran": 34
+  }
+ ],
+ "error": null,
+ "results": [
+  {
+   "index": 0,
+   "mutant": "L120 returns None",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+   "first": "ERROR: test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table (v2.test_v21_r3_auth_ps_table.ACommandLineIsNeverAuthority.test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table) | TypeError"
+  },
+  {
+   "index": 1,
+   "mutant": "L120 string ' ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+   "first": "ERROR: test_blank_lines_and_the_end_of_the_output_are_no_rows (v2.test_v21_r3_auth_ps_table.RowIsALine.test_blank_lines_and_the_end_of_the_output_are_no_rows) | cleanup_authority.TableUnreadable"
+  },
+  {
+   "index": 2,
+   "mutant": "L120 string 'utf-8' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+   "first": "ERROR: test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table (v2.test_v21_r3_auth_ps_table.ACommandLineIsNeverAuthority.test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table) | LookupError"
+  },
+  {
+   "index": 3,
+   "mutant": "L120 string 'replace' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+   "first": "ERROR: test_bytes_that_are_not_utf8_are_replaced_and_end_nothing (v2.test_v21_r3_auth_ps_table.RowIsALine.test_bytes_that_are_not_utf8_are_replaced_and_end_nothing) | LookupError"
+  }
+ ]
+}

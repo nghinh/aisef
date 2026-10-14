@@ -1,0 +1,14 @@
+interpreter: 3.14.7 darwin  process_effect EXECUTION_DIGEST 1bf8d9602a5e
+FAULTED = ('call', 'expect_raises')  FAULTS = ['os.fsync', 'os.rename', 'os.replace', 'os.write']
+
+product: tolerant
+  fault -> call        : OBSERVED SATISFIED class=scenario_returns  trace(kind,fault,fired,exit|outcome)=[('fault', None, None, 'ok'), ('call', 'os.replace', True, 'ok')]
+  fault -> subprocess  : UNSUPPORTED None      class=None  trace(kind,fault,fired,exit|outcome)=[]
+      run_probe record result: InvalidSpec(detail="observable/stimulus is not a supported class ('scenario_returns', 'scenario_raises', 'scenario_files') over a scenario of the closed step vocabulary with a bounded window (within_s); refused, not degraded")  (the record holds the verdict only; no trace, no `fired`)
+
+product: fragile 
+  fault -> call        : OBSERVED REFUTED   class=scenario_returns  trace(kind,fault,fired,exit|outcome)=[('fault', None, None, 'ok'), ('call', 'os.replace', True, 'refuted:raised OSError')]
+  fault -> subprocess  : UNSUPPORTED None      class=None  trace(kind,fault,fired,exit|outcome)=[]
+      run_probe record result: InvalidSpec(detail="observable/stimulus is not a supported class ('scenario_returns', 'scenario_raises', 'scenario_files') over a scenario of the closed step vocabulary with a bounded window (within_s); refused, not degraded")  (the record holds the verdict only; no trace, no `fired`)
+
+fragile product's CLI with os.replace raising once INSIDE the child: exit 1 (the probe's subprocess step reported exit 0 and SATISFIED above)

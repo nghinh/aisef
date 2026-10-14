@@ -1,0 +1,55 @@
+{
+  "wp": "probes-rv",
+  "role": "independent verifier of the probe-module classification (B-03 round 3)",
+  "branch": "v21r3/probes-rv",
+  "stacked_on": "v21r3/probes (907946b)",
+  "base": "3dc827beb0f3dd2105cf1e41f28ec8d6da2b7cd1",
+  "decision_document": "docs/v2.1/decisions/B03-R3-PROBE-MODULE-FINDINGS.md",
+  "product_code_changed": false,
+  "items": [
+    {"id": "PM-1", "verdict": "CONFIRMED DEFECT", "reproduced": true, "hosts": ["macOS 3.14.7", "macOS 3.12.14", "guest 3.14.8"],
+     "notes": "fix sketch applied and validated; one residual not covered (nested namespace below an already-imported plain module: queue/types/hmac -> AttributeError -> HARNESS_FAILED, same with the sketch); variant validated on a scratch copy; python_callable_v2 is not defective (recalibrates only via shared bytes)"},
+    {"id": "PM-2", "verdict": "CONFIRMED DEFECT", "reproduced": true, "hosts": ["macOS 3.14.7", "macOS 3.12.14", "guest 3.14.8"],
+     "notes": "the only first-pass item where a missing stimulus is a verdict (SATISFIED, fail-open); no-bump judgment rests on a repo-only scan, 2.0.0 PyPI bundles unscanned"},
+    {"id": "PM-3", "verdict": "CONFIRMED DEFECT; argument for refuse-not-refute corrected", "reproduced": true, "hosts": ["macOS 3.14.7", "macOS 3.12.14", "guest (43,499 vs 43,497)"],
+     "notes": "'one thing a verdict must never be' overstated; python_imports is interpreter-dependent by design; stronger reasons: admission table and review gate; silent-retry cost of refusing stated"},
+    {"id": "PM-4", "verdict": "CONFIRMED DEFECT (cosmetic)", "reproduced": true},
+    {"id": "PM-5", "verdict": "CONFIRMED; split: KNOWN_LIMIT (limit) + OWNER_DECISION (option b) + DEFECT of text (3 docstrings, 2 WEAKEST_PATH constants)", "reproduced": true,
+     "notes": "already backlog V21-26 which asserts 'no false PASS' - measured otherwise"},
+    {"id": "PM-6", "verdict": "RECLASSIFIED: DEFECT (low) for unguarded open(harness.log) and NUL-in-argv admission; KNOWN_LIMIT for the rest", "reproduced": true,
+     "notes": "same rule that makes PM-3 a DEFECT; no extra digest (same two files as PM-1)"},
+    {"id": "PM-7", "verdict": "CONFIRMED OWNER_DECISION; live instance: v21r3/range edits runtime/process_range.py and 19/19 rows stay valid on v21r3/integ (19/19 still contrast, not recorded)", "reproduced": true,
+     "notes": "four probes import ProcessRange (three can take PROBE_SOURCES); decision must precede the single recalibration"},
+    {"id": "PM-8", "verdict": "CONFIRMED OWNER_DECISION (= backlog V21-04, already open)", "reproduced": true},
+    {"id": "PM-9", "verdict": "CONFIRMED OWNER_DECISION", "reproduced": true},
+    {"id": "PM-10", "verdict": "CONFIRMED KNOWN_LIMIT", "reproduced": true}
+  ],
+  "missed_items": [
+    {"id": "PM-11", "claim": "UTF-8 BOM: python_imports reports unparsable (REFUTED) for a file CPython compiles; grep_count misses ^-anchored line 1", "classification": "DEFECT", "fault_as_verdict": true, "fix": "decode('utf-8-sig') at file_artifact.py:247 and :265 (validated on scratch copy)", "scripts": ["rv-fa-bom.py", "rv-fa-edge.py", "rv-fa-bom-grep.py"], "hosts": ["macOS 3.14.7", "macOS 3.12.14", "guest 3.14.8"]},
+    {"id": "PM-12", "claim": "a complete file_artifact read is REFUTED (SUBJECT_DEADLINE) when it took longer than within_s; one git process per file, ~7.7 ms/file on macOS", "classification": "KNOWN_LIMIT", "fault_as_verdict": true, "scripts": ["rv-fa-scale.py"]},
+    {"id": "PM-13", "claim": "grep_count regex runs unbounded in the kernel's process; x4 per two characters on ^(\\w+\\s?)*$", "classification": "OWNER_DECISION", "fault_as_verdict": false, "scripts": ["rv-fa-redos.py"]},
+    {"id": "V21-24", "claim": "marker truncation -> HARNESS_FAILED instead of REFUTED", "classification": "KNOWN_LIMIT", "reproduced": true},
+    {"id": "V21-25", "claim": "blocks SATISFIED when the import (not the call) outlasts the window", "classification": "KNOWN_LIMIT (owner option: arm at call)", "reproduced": true, "fault_as_verdict": true},
+    {"id": "V21-09", "claim": "Unrunnable and InvalidSpec records have equal record_digest", "classification": "KNOWN_LIMIT", "reproduced": true},
+    {"id": "V21-15", "claim": "candidate code can shift ownership away from DEVELOPER", "classification": "KNOWN_LIMIT", "reproduced": "mechanism via V21-24/PM-5b"},
+    {"id": "V21-07", "claim": "file_artifact FULL weakest path vs same-user process", "classification": "KNOWN_LIMIT (charter D-05)", "reproduced": false},
+    {"id": "V21-01", "claim": "record_digest binds no witness", "classification": "KNOWN_LIMIT (charter D-08)", "reproduced": false},
+    {"id": "V21-32", "claim": "cli_invocation._concluded harness_failure branch unreachable", "classification": "KNOWN_LIMIT (cosmetic)", "reproduced": false},
+    {"id": "V21-33", "claim": "AGENT ops unreachable from the cli controller", "classification": "KNOWN_LIMIT (cosmetic)", "reproduced": false}
+  ],
+  "recalibration_cost_corrections": [
+    "records naming the aisef2 tree (P5-FALSIFIABILITY, P5-PLAN-V2.2-PROPOSAL, PLAN-V2.2-CORRECTION-1, REQUALIFICATION-MANIFEST-4, REFUSED C2-P5 re-verification) are staled by any aisef2 edit, not only by probe digests: marginal vs absolute cost",
+    "mutation staleness is whole-file (mutation.py _problems_v2 L1891): one byte stales all 86 targets of cli_invocation.py; the first pass's hour figures do not add (8 h already contains 3 h); window total ~7.7 h, ~9.1 h with python_callable_v2",
+    "probe_static_checks (6 rules) PASS on BASE and on the three sketches - not reported by the first pass",
+    "PM-7: v21r3/range's process_range.py change leaves 19/19 rows valid on integ; decision must precede the single release_calibration --write",
+    "PM-2 no-bump judgment: repo-only scan; PyPI 2.0.0 bundles unseen"
+  ],
+  "tests_run": {"modules": 17, "identical": 14, "red_only_on_patched": ["test_probe_process_effect_units::Vocabulary x2", "test_v21_kills3_T19b::FaultBeforeSubprocess x2", "test_v21_identity_bytes::ThreeIdentities x2"], "files": ["tests.base.txt", "tests.fix.txt"]},
+  "not_established": [
+    "Windows, CPython 3.11 and 3.13 not measured",
+    "release_calibration --write, mutation re-measure, kill_check and the full suite not run",
+    "BOM likelihood unmeasured; ReDoS hour-scale extrapolated",
+    "V21-01, V21-07, V21-15 leak-scan part read, not reproduced",
+    "fix sketches validated on scratch copies, not on the branch"
+  ]
+}

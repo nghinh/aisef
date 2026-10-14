@@ -1,0 +1,291 @@
+{
+ "target": "aisef2/app/review_verify.py::preserve",
+ "files": [
+  "tests/v2/test_v21_r3_detail_statement.py",
+  "tests/v2/test_v21_r3_detail_artifact.py"
+ ],
+ "source_sha256": "cf0c889e598f7ec6b9b6fac13b26b6bb73d7eb03100e025d42e29eaf528ce1ee",
+ "t0": [
+  {
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "seconds": 5.49,
+   "outcome": "PASS",
+   "ran": 35
+  },
+  {
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "seconds": 1.83,
+   "outcome": "PASS",
+   "ran": 31
+  }
+ ],
+ "error": null,
+ "results": [
+  {
+   "index": 0,
+   "mutant": "L422 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_missing_or_unreadable_artifact_is_a_problem_naming_the_row_and_the_file (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_missing_or_unreadable_artifact_is_a_problem_naming_the_row_and_the_file) | StopIteration"
+  },
+  {
+   "index": 1,
+   "mutant": "L430 returns None",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_missing_or_unreadable_artifact_is_a_problem_naming_the_row_and_the_file (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_missing_or_unreadable_artifact_is_a_problem_naming_the_row_and_the_file) | AssertionError"
+  },
+  {
+   "index": 2,
+   "mutant": "L414 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_missing_or_unreadable_artifact_is_a_problem_naming_the_row_and_the_file (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_missing_or_unreadable_artifact_is_a_problem_naming_the_row_and_the_file) | StopIteration"
+  },
+  {
+   "index": 3,
+   "mutant": "L414 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_missing_or_unreadable_artifact_is_a_problem_naming_the_row_and_the_file (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_missing_or_unreadable_artifact_is_a_problem_naming_the_row_and_the_file) | StopIteration"
+  },
+  {
+   "index": 4,
+   "mutant": "L431 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_failure_to_keep_is_a_reason_and_never_an_exception (v2.test_v21_r3_detail_artifact.PreserveWritesTheWholeFinding.test_a_failure_to_keep_is_a_reason_and_never_an_exception) | FileNotFoundError"
+  },
+  {
+   "index": 5,
+   "mutant": "L431 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_name_that_is_not_one_leaves_no_file (v2.test_v21_r3_detail_artifact.PreserveWritesTheWholeFinding.test_a_name_that_is_not_one_leaves_no_file) | ValueError"
+  },
+  {
+   "index": 6,
+   "mutant": "L431 element 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_failure_to_keep_is_a_reason_and_never_an_exception (v2.test_v21_r3_detail_artifact.PreserveWritesTheWholeFinding.test_a_failure_to_keep_is_a_reason_and_never_an_exception) | TypeError"
+  },
+  {
+   "index": 7,
+   "mutant": "L432 returns None",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_failure_to_keep_is_a_reason_and_never_an_exception (v2.test_v21_r3_detail_artifact.PreserveWritesTheWholeFinding.test_a_failure_to_keep_is_a_reason_and_never_an_exception) | TypeError"
+  },
+  {
+   "index": 8,
+   "mutant": "L417 string 'ascii' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_missing_or_unreadable_artifact_is_a_problem_naming_the_row_and_the_file (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_missing_or_unreadable_artifact_is_a_problem_naming_the_row_and_the_file) | LookupError"
+  },
+  {
+   "index": 9,
+   "mutant": "L418 string '.' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_missing_or_unreadable_artifact_is_a_problem_naming_the_row_and_the_file (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_missing_or_unreadable_artifact_is_a_problem_naming_the_row_and_the_file) | AssertionError"
+  },
+  {
+   "index": 10,
+   "mutant": "L418 string '.' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_missing_or_unreadable_artifact_is_a_problem_naming_the_row_and_the_file (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_missing_or_unreadable_artifact_is_a_problem_naming_the_row_and_the_file) | AssertionError"
+  },
+  {
+   "index": 11,
+   "mutant": "L418 string '.json' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_missing_or_unreadable_artifact_is_a_problem_naming_the_row_and_the_file (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_missing_or_unreadable_artifact_is_a_problem_naming_the_row_and_the_file) | StopIteration"
+  },
+  {
+   "index": 12,
+   "mutant": "L419 string '/' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_missing_or_unreadable_artifact_is_a_problem_naming_the_row_and_the_file (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_missing_or_unreadable_artifact_is_a_problem_naming_the_row_and_the_file) | StopIteration"
+  },
+  {
+   "index": 13,
+   "mutant": "L421 True->False",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_every_group_is_listed_in_name_order (v2.test_v21_r3_detail_artifact.ManifestBindsTheArtifacts.test_every_group_is_listed_in_name_order) | AssertionError"
+  },
+  {
+   "index": 14,
+   "mutant": "L424 string '.tmp' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_the_file_is_whole_before_it_is_visible_and_a_failed_write_leaves_nothing_visible (v2.test_v21_r3_detail_artifact.PreserveWritesTheWholeFinding.test_the_file_is_whole_before_it_is_visible_and_a_failed_write_leaves_nothing_visible) | AssertionError"
+  },
+  {
+   "index": 15,
+   "mutant": "L425 string 'xb' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_missing_or_unreadable_artifact_is_a_problem_naming_the_row_and_the_file (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_missing_or_unreadable_artifact_is_a_problem_naming_the_row_and_the_file) | StopIteration"
+  },
+  {
+   "index": 16,
+   "mutant": "L417 string '\\n' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_the_file_holds_the_whole_finding_with_the_run_s_secrets_replaced (v2.test_v21_r3_detail_artifact.PreserveWritesTheWholeFinding.test_the_file_holds_the_whole_finding_with_the_run_s_secrets_replaced) | AssertionError"
+  },
+  {
+   "index": 17,
+   "mutant": "L423 string ' exists: an artifact is never overwritten' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_an_artifact_is_never_overwritten (v2.test_v21_r3_detail_artifact.PreserveWritesTheWholeFinding.test_an_artifact_is_never_overwritten) | AssertionError"
+  },
+  {
+   "index": 18,
+   "mutant": "L432 string ': ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_failure_to_keep_is_a_reason_and_never_an_exception (v2.test_v21_r3_detail_artifact.PreserveWritesTheWholeFinding.test_a_failure_to_keep_is_a_reason_and_never_an_exception) | AssertionError"
+  },
+  {
+   "index": 19,
+   "mutant": "L415 dict entry 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_row_whose_artifact_is_there_and_is_the_one_it_binds_has_no_problem (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_row_whose_artifact_is_there_and_is_the_one_it_binds_has_no_problem) | AssertionError"
+  },
+  {
+   "index": 20,
+   "mutant": "L415 dict entry 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_row_whose_artifact_is_there_and_is_the_one_it_binds_has_no_problem (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_row_whose_artifact_is_there_and_is_the_one_it_binds_has_no_problem) | AssertionError"
+  },
+  {
+   "index": 21,
+   "mutant": "L415 dict entry 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_failure_to_keep_is_a_reason_and_never_an_exception (v2.test_v21_r3_detail_artifact.PreserveWritesTheWholeFinding.test_a_failure_to_keep_is_a_reason_and_never_an_exception) | AssertionError"
+  },
+  {
+   "index": 22,
+   "mutant": "L415 dict entry 3 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_the_file_holds_the_whole_finding_with_the_run_s_secrets_replaced (v2.test_v21_r3_detail_artifact.PreserveWritesTheWholeFinding.test_the_file_holds_the_whole_finding_with_the_run_s_secrets_replaced) | AssertionError"
+  },
+  {
+   "index": 23,
+   "mutant": "L415 dict entry 4 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_the_file_holds_the_whole_finding_with_the_run_s_secrets_replaced (v2.test_v21_r3_detail_artifact.PreserveWritesTheWholeFinding.test_the_file_holds_the_whole_finding_with_the_run_s_secrets_replaced) | AssertionError"
+  },
+  {
+   "index": 24,
+   "mutant": "L415 dict entry 5 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_the_file_holds_the_whole_finding_with_the_run_s_secrets_replaced (v2.test_v21_r3_detail_artifact.PreserveWritesTheWholeFinding.test_the_file_holds_the_whole_finding_with_the_run_s_secrets_replaced) | AssertionError"
+  },
+  {
+   "index": 25,
+   "mutant": "L415 dict entry 6 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_finding_with_nothing_to_replace_is_kept_exactly_and_says_so (v2.test_v21_r3_detail_artifact.PreserveWritesTheWholeFinding.test_a_finding_with_nothing_to_replace_is_kept_exactly_and_says_so) | KeyError"
+  },
+  {
+   "index": 26,
+   "mutant": "L415 dict entry 7 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_row_whose_artifact_is_there_and_is_the_one_it_binds_has_no_problem (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_row_whose_artifact_is_there_and_is_the_one_it_binds_has_no_problem) | AssertionError"
+  },
+  {
+   "index": 27,
+   "mutant": "L418 string '[^A-Za-z0-9_-]' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_missing_or_unreadable_artifact_is_a_problem_naming_the_row_and_the_file (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_missing_or_unreadable_artifact_is_a_problem_naming_the_row_and_the_file) | AssertionError"
+  },
+  {
+   "index": 28,
+   "mutant": "L418 string '_' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_an_unsafe_story_id_is_written_with_underscores_for_what_a_file_name_does_not_take (v2.test_v21_r3_detail_artifact.PreserveWritesTheWholeFinding.test_an_unsafe_story_id_is_written_with_underscores_for_what_a_file_name_does_not_take) | AssertionError"
+  },
+  {
+   "index": 29,
+   "mutant": "L415 string 'format' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_row_whose_artifact_is_there_and_is_the_one_it_binds_has_no_problem (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_row_whose_artifact_is_there_and_is_the_one_it_binds_has_no_problem) | AssertionError"
+  },
+  {
+   "index": 30,
+   "mutant": "L415 string 'story_id' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_row_whose_artifact_is_there_and_is_the_one_it_binds_has_no_problem (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_row_whose_artifact_is_there_and_is_the_one_it_binds_has_no_problem) | AssertionError"
+  },
+  {
+   "index": 31,
+   "mutant": "L415 string 'attempt' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_the_file_holds_the_whole_finding_with_the_run_s_secrets_replaced (v2.test_v21_r3_detail_artifact.PreserveWritesTheWholeFinding.test_the_file_holds_the_whole_finding_with_the_run_s_secrets_replaced) | AssertionError"
+  },
+  {
+   "index": 32,
+   "mutant": "L415 string 'index' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_the_file_holds_the_whole_finding_with_the_run_s_secrets_replaced (v2.test_v21_r3_detail_artifact.PreserveWritesTheWholeFinding.test_the_file_holds_the_whole_finding_with_the_run_s_secrets_replaced) | AssertionError"
+  },
+  {
+   "index": 33,
+   "mutant": "L416 string 'revision' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_the_file_holds_the_whole_finding_with_the_run_s_secrets_replaced (v2.test_v21_r3_detail_artifact.PreserveWritesTheWholeFinding.test_the_file_holds_the_whole_finding_with_the_run_s_secrets_replaced) | AssertionError"
+  },
+  {
+   "index": 34,
+   "mutant": "L416 string 'session' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_the_file_holds_the_whole_finding_with_the_run_s_secrets_replaced (v2.test_v21_r3_detail_artifact.PreserveWritesTheWholeFinding.test_the_file_holds_the_whole_finding_with_the_run_s_secrets_replaced) | AssertionError"
+  },
+  {
+   "index": 35,
+   "mutant": "L416 string 'redacted' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_finding_with_nothing_to_replace_is_kept_exactly_and_says_so (v2.test_v21_r3_detail_artifact.PreserveWritesTheWholeFinding.test_a_finding_with_nothing_to_replace_is_kept_exactly_and_says_so) | KeyError"
+  },
+  {
+   "index": 36,
+   "mutant": "L416 string 'finding' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_row_whose_artifact_is_there_and_is_the_one_it_binds_has_no_problem (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_row_whose_artifact_is_there_and_is_the_one_it_binds_has_no_problem) | AssertionError"
+  },
+  {
+   "index": 37,
+   "mutant": "L417 True->False",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_the_bytes_do_not_depend_on_the_order_of_the_finders_keys (v2.test_v21_r3_detail_artifact.PreserveWritesTheWholeFinding.test_the_bytes_do_not_depend_on_the_order_of_the_finders_keys) | AssertionError"
+  }
+ ]
+}

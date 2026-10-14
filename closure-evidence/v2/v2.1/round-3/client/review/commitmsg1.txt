@@ -1,0 +1,23 @@
+v2.1 B-03 r3 (client review): tests that a plausible wrong implementation passed now fail it; no raw U+2028/U+2029 in test sources
+
+Five wrong implementations of the requirement passed the 27 tests of the work package (measured by running them):
+a reader that drops the last line of the file as "possibly torn" (a whole record without its line feed was lost);
+session_tokens with a loop of its own in text mode (a carriage return between two tokens cut the record, the two
+accounts disagreed); a mountinfo field split at ASCII white space only (U+000B/U+000C in a path); a split that protects
+only the three named separators (U+00A0, U+3000, U+2000-U+200A ... still cut); a decode that drops undecodable bytes
+instead of replacing them. The mountinfo ones are not hypothetical: in
+the Linux guest, a real bind mount at a path with U+00A0 or U+3000 was read by the integration head as a row whose
+`at` is a prefix of the path (16 rows, none at the mount's path), a wrong row and not a refusal.
+
+Added: a last record without its line feed is read (3 separators); an undecodable byte inside an event is a replacement
+character (not strict, not ignore); a carriage return between tokens is whitespace for both accounts; every
+white-space character str.isspace() knows (but the three the kernel escapes) is inside one mountinfo field and one
+host-table row. U+000D is left out of the host-table case: Path.read_text turns it into a line end first, which the
+text handed to a patched read_text would hide (measured in the guest: None before and after).
+
+The two test files held 26 raw U+2028/U+2029 characters (on 19 lines) in their source; an editor or a tool that
+treats them as line ends (VS Code's "unusual line terminators" prompt) would have removed them and left a test that still passes. They
+are escapes now; the two files' ASTs are identical before and after.
+
+Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>
+

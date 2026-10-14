@@ -1,0 +1,15 @@
+"""Finding (synthetic patch): `aisef2/quality/relevance.py::story_diff` and `aisef2/quality/vacuity.py::file_patches`
+read a unified patch with `str.splitlines()`; a changed line that holds FF / U+0085 / U+2028 ... is more than one
+"line" to them, and git counts one. usage: python3 -B -I this.txt TREE"""
+import sys
+
+sys.path.insert(0, sys.argv[1])
+from aisef2.quality import relevance, vacuity  # noqa: E402
+
+for name, ch in (("plain", "-"), ("FF", chr(0x0C)), ("U+2028", chr(0x2028)), ("U+0085", chr(0x85))):
+    patch = "\n".join(["--- a/x.py", "+++ b/x.py", "@@ -1,3 +1,5 @@", " a", f"+b{ch}c", " d", "+e", " f", ""])
+    d = relevance.story_diff(patch)
+    fp = vacuity.file_patches(patch)
+    # git: b is line 2, e is line 4
+    print(f"{name:7} story_diff lines: {sorted(d.artefacts[0].lines)}   (true: [2, 4])   "
+          f"file_patches: hunks {len(fp[0].hunks)}, opaque {fp[0].opaque}")

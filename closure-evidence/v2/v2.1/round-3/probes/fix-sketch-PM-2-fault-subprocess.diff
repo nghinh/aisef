@@ -1,0 +1,11 @@
+--- a/aisef2/probe/process_effect.py	2026-10-13 05:55:15
++++ b/aisef2/probe/process_effect.py	2026-10-13 05:56:54
+@@ -142,7 +142,7 @@
+     "os.write": ("os", "write", "OSError"),
+ }
+ #: the steps a fault applies to: exactly the one that follows it
+-FAULTED = ("call", "expect_raises", "subprocess")
++FAULTED = ("call", "expect_raises")
+ FILE_SHAPES = ("sha256", "equals_before", "absent", "line_count", "final_byte", "jsonl")
+ _ONE = "the one declared scenario (its steps, in order, in one harness process): the domain is that scenario alone"
+ #: DECISION-1: what each class measures, under which quantifier, and every (observation facts -> verdict) row

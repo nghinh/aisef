@@ -1,0 +1,199 @@
+{
+  "wp": "probes",
+  "base": "3dc827beb0f3dd2105cf1e41f28ec8d6da2b7cd1",
+  "branch": "v21r3/probes",
+  "decision_document": "docs/v2.1/decisions/B03-R3-PROBE-MODULE-FINDINGS.md",
+  "product_code_changed": false,
+  "items": [
+    {
+      "id": "PM-1",
+      "source": "A19 defect-1 + review issue 1; A21 defect-1 + review issue 0; REPORT 0.4 'namespace-package'",
+      "claim": "A subject whose dotted module path crosses a directory without __init__.py below a package or another such directory is never located: the controller's resolve() calls PathFinder.find_spec('pkg.inner', pkg.__path__), the _NamespacePath constructor reads sys.modules['pkg'], the controller never imports the subject, KeyError ends the lookup and the probe answers UNRUNNABLE although the subject's own process imports and runs it (aisef2/probe/process_effect.py:514-523, called L727; aisef2/probe/cli_invocation.py:760-768, called L802).",
+      "reproduction": {
+        "script_sha256": "8a776cb4b48e4a65e4c5c8188fb9c0a13aad711fbbb66ec9bad95a291f4a847f",
+        "interpreter": "CPython 3.14.7 macOS arm64 (also 3.12.14 macOS, 3.14.8 Linux guest)",
+        "output_excerpt": "L1 pkg/__init__.py + pkg/inner/mod.py: python itself rc=0 | process_effect HARNESS_FAILED 'the harness raised KeyError' | cli_invocation HARNESS_FAILED 'controller ended without a result (exit 1)' | python_callable_v2 OBSERVED SATISFIED; L2 (src/) and L3 (ns/inner/mod.py) the same; controls L0, L4, L5 OBSERVED SATISFIED",
+        "reproduced": true
+      },
+      "consequence": "fail-closed: UNRUNNABLE -> PROBE_UNRUNNABLE, owner ENVIRONMENT, retryable; at CANDIDATE the story fails and nothing tells the developer to add __init__.py (detail dropped, PM-8). Never a verdict at BASE and in v2.0.0; at 098dd7a^ (before the B1 split) cli_invocation answered REFUTED for the same layouts (measured). Relied on by admit_story, prove/reprove, review_verify.verify, the calibration records.",
+      "classification": "DEFECT",
+      "fix_sketch": "In both HARNESS scripts, around each PathFinder.find_spec install for that lookup a stand-in types.ModuleType(parent) holding the parent's location list in sys.modules, freeze spec.submodule_search_locations to a plain list while it is there, remove it in a finally (about 15 lines + one import each; fix-sketch-PM-1-namespace.diff). Validated on a scratch copy only: L1-L3 and nested __main__ OBSERVED SATISFIED, controls unchanged, 19/19 classes still contrast.",
+      "recalibration_cost": "EXECUTION_DIGEST of cli_invocation, process_effect, python_callable_v2 changes (15 of 19 shipped rows must be re-demonstrated with release_calibration.py --write -> aisef2/app/calibrations.py + a new V2.1.0.dev0-PROBE-CALIBRATIONS-3.json); file_artifact unchanged; capability DIGEST unchanged, no CAPABILITY_VERSION bump (an unobservable layout gains an observation); mutation re-measure of cli_invocation.py (86 targets/1,769 mutants), process_effect.py (79/1,653) and importers (python_callable_v2 31/768); survivor-audit remap; check 9 refuses every plan using these probes until recalibrated.",
+      "reachable_from_run": "yes (catalog probes -> story_runner -> prove/admit_story); measured through observe/run_probe, not a full aisef run",
+      "decision_needed": "none for the fix; take in one probe window with PM-2, PM-3 (+PM-4, PM-7a)"
+    },
+    {
+      "id": "PM-2",
+      "source": "T19b defect-1 + review issue 1; A19 mutant 12 notes + review issue 2; triage T19 row 0; REPORT 0.4 'loi truoc subprocess'",
+      "claim": "A fault step before a subprocess step is admitted (FAULTED includes 'subprocess', process_effect.py:145, _scenario_ok L269-278) but HARNESS/guarded (L574-592) patches os.<attr> in the controller's own process around subprocess.run (do_subprocess L682-692); the child never sees it, fired is always false, no verdict reads fired, and the scenario is judged on the unfaulted run.",
+      "reproduction": {
+        "script_sha256": "62f904f36e492b886cf298f0e057a663ce6c4e2a49eea3221c5a1150c9409c08",
+        "interpreter": "CPython 3.14.7 macOS arm64 (also 3.12.14 macOS, 3.14.8 Linux guest)",
+        "output_excerpt": "fragile product (exits 1 when os.replace raises in the child): fault -> call: OBSERVED REFUTED (fired True); fault -> subprocess: OBSERVED SATISFIED trace [('subprocess','os.replace', fired=False, exit 0)]; run_probe record Executed(SATISFIED) with no trace; the same CLI with os.replace raising once inside the child exits 1",
+        "reproduced": true
+      },
+      "consequence": "the one measured place where a missing fault is reported as a verdict: a fault-tolerance obligation over a CLI subprocess is SATISFIED for a product that is not fault-tolerant, and nothing recorded afterwards shows the fault did not happen. Bounded: PARTIAL enforcement, FAULT_WITNESS says bounded witness. Scan of all tracked JSON: no scenario has a fault followed by subprocess; the shipped calibration uses fault only before call/expect_raises.",
+      "classification": "DEFECT",
+      "fix_sketch": "Drop 'subprocess' from FAULTED so admission refuses [fault, subprocess] (UNSUPPORTED -> INVALID_SPEC); one line plus docstring and pins (fix-sketch-PM-2-fault-subprocess.diff). Validated on a scratch copy: InvalidSpec, fault -> call unchanged. Delivering the patch into the child is a new capability (CAPABILITY_VERSION bump + migration), not a repair.",
+      "recalibration_cost": "EXECUTION_DIGEST of process_effect only (3 rows); python_callable_v2 does not import process_effect.py; existing pins that change: tests/v2/test_probe_process_effect_units.py:104 and :180 and tests/v2/test_v21_kills3_T19b.py::FaultBeforeSubprocess (measured: 4 tests fail on the patched scratch copy: units 2, T19b 2); mutation re-measure process_effect.py (79 targets/1,653 mutants); one judgment: narrowing the stimulus grammar would bump CAPABILITY_VERSION by ADR-2's wording, recommended no bump (no approved spec can use the combination).",
+      "reachable_from_run": "only through an authored plan containing the scenario (admission accepts it today); none shipped; reachable from a direct caller",
+      "decision_needed": "no decision for the refusal; the owner decides only if faulted child processes are wanted (new capability) and confirms the no-bump judgment"
+    },
+    {
+      "id": "PM-3",
+      "source": "T27a defect-1 + review issue 4; triage T27 row 9; REPORT 0.4 'file_artifact RecursionError'",
+      "claim": "import_facts (aisef2/probe/file_artifact.py:258-286) catches (SyntaxError, ValueError) around ast.parse (L265-269); a valid file nested past the compiler's stack raises RecursionError (and ~6,000 chained unary or conditional operators raise MemoryError), which escapes import_facts -> facts_of -> observe and run_probe.",
+      "reproduction": {
+        "script_sha256": "31e6f8a44e33f85025cb917d8f98890d00242db764d1f7b7f287809685140adf",
+        "interpreter": "CPython 3.14.7 macOS arm64 (also 3.12.14 macOS, 3.14.8 Linux guest)",
+        "output_excerpt": "'x = 1' + '+1'*100000, repo and plain readers: observe RAISED RecursionError: Stack overflow (used 16352 kB) during compilation; run_probe RAISED the same. Threshold: first failing N 95,094 (macOS 3.14.7), 43,497 (Linux guest 3.14.8), 9,996 (macOS 3.12.14); MemoryError from N=5,967 on all",
+        "reproduced": true
+      },
+      "consequence": "fail-closed at run level: app/run.py:466 records the story REFUSED, delivery FAIL (app/run.py:252, pinned by tests/v2/test_app_units.py:450); direct callers get the exception. No verdict. The failing size depends on host and Python version.",
+      "classification": "DEFECT",
+      "fix_sketch": "except (RecursionError, MemoryError): raise Refused(...) beside the existing except (fix-sketch-PM-3-4-file-artifact.diff); refuse rather than refute because the same file parses on one host and not on another and the module's own FILE_CAP rule is 'a harness refusal, never a verdict'. Validated on a scratch copy: Unrunnable on both readers, controls unchanged.",
+      "recalibration_cost": "EXECUTION_DIGEST of file_artifact only (4 rows); capability unchanged, no bump; mutation re-measure file_artifact.py (45 targets/763 mutants, about 1.5 h at campaign-3 rate, estimate); no existing test pins the exception.",
+      "reachable_from_run": "yes (python_imports over candidate trees at PARENT/CANDIDATE/POST_MERGE; reviewer reproducers via review_verify); narrow in practice (machine-generated or adversarial source)",
+      "decision_needed": "none; refuse-vs-refute is a recommended choice, say if REFUTED is preferred (host-dependent verdict)"
+    },
+    {
+      "id": "PM-4",
+      "source": "triage T27 rows 9 and 30; T27a report summary + review issue 5",
+      "claim": "file_artifact reports unparsable as 'x.py:None' for a NUL byte on CPython >= 3.12 (SyntaxError.lineno is None; L269), against the documented 'file and line named'; and the module docstring's Absence paragraph names grep_count only although observe applies the rule to python_imports (L545).",
+      "reproduction": {
+        "script_sha256": "31e6f8a44e33f85025cb917d8f98890d00242db764d1f7b7f287809685140adf",
+        "interpreter": "CPython 3.14.7 macOS arm64 (and 3.14.8 Linux guest)",
+        "output_excerpt": "NUL byte, repo reader: OBSERVED REFUTED ... \"unparsable\": \"pkg/deep.py:None\"",
+        "reproduced": true
+      },
+      "consequence": "cosmetic: the value is read by no code and is dropped on the run path (PM-8); the verdict (REFUTED) is right.",
+      "classification": "DEFECT",
+      "fix_sketch": "format 'file:?' when lineno is None (keeps the existing startswith('x.py:') pin valid) and add python_imports to the Absence paragraph; same edit as PM-3 (diff above).",
+      "recalibration_cost": "none of its own beyond PM-3: any byte of file_artifact.py changes EXECUTION_DIGEST (measured with a comment), so do not edit alone",
+      "reachable_from_run": "no consumer; detail dropped by classify_failure",
+      "decision_needed": "none"
+    },
+    {
+      "id": "PM-5",
+      "source": "triage T21 row 47 (unlisted_finding on HARNESS/finish); T21a report summary; T21a review issue 7 (reproduced by the reviewer); A18 review issue 5",
+      "claim": "The answers the subject's process relays to the controller (exit code, raised, returned value) are the subject's own claim: code of the revision runs in the agent process (cli_invocation.AGENT L514-680, shared by cli_invocation, process_effect, python_callable_v2) and can rewrite its operation table or answer on its channel, so the B1 docstring's 'cannot ... build the facts the verdict is decided from' does not hold for the relayed answers.",
+      "reproduction": {
+        "script_sha256": "ad72518d07f2db58e9aa7359345c907041105ba2f9213ba39cee9a9137d8e618",
+        "interpreter": "CPython 3.14.7 macOS arm64",
+        "output_excerpt": "simulated hostile candidate over main() that raises and compute() == 999: honest module REFUTED in all three; hostile module cli_invocation exits{exit_code:0} SATISFIED, process_effect returns 1 SATISFIED, python_callable_v2 returns 1 SATISFIED (Executed(SATISFIED)); a malformed agent_failure gives HARNESS_FAILED, not a verdict",
+        "reproduced": true
+      },
+      "consequence": "fail-open for adversarial candidate code only (no benign path); implementer and verifier run the same probe so agreement does not help. Precondition seen in attempt 4: a developer session read the probe source and hidden stimulus (DEVELOPER-CONFINEMENT-GAP-001, OPEN); no session was read here for forgery. What the controller reads itself (files, captures, trace, process exit) stays authentic.",
+      "classification": "OWNER_DECISION",
+      "fix_sketch": "no cheap correct change. (a) state the limit (docs now: REPORT limits table, ANCHOR-THREAT-MODEL; module docstrings on the next window); (b) cli exits only: controller starts the invocation as its own child and reads returncode (breaks same-process pre-steps; useless for returns/raises); (c) hide OPS/send/WOUT behind function scope (obstacle, not boundary).",
+      "recalibration_cost": "(a) in docs: none; in module docstrings: EXECUTION_DIGEST of cli_invocation, process_effect, python_callable_v2 (15 rows); (b) redesign of cli_invocation (a capability change: bump + re-measure of the 86-target module)",
+      "reachable_from_run": "only with candidate code written to do it",
+      "decision_needed": "owner: accept and state the limit (recommended now) or commission the exit-status redesign; whether the B1 claim should be corrected"
+    },
+    {
+      "id": "PM-6",
+      "source": "the lead's reading of 'a fault before the subprocess' (host-side exceptions before the controller starts); measured here",
+      "claim": "Host-side faults before the controller starts become UNRUNNABLE (OSError/RangeError handled paths, process_effect catch-all) or propagate out of observe as exceptions (non-OSError from _prepare/ProcessRange.start; open(harness.log) at process_effect.py:883, cli_invocation.py:1013 outside the try); no fault becomes a verdict. A NUL byte in a subprocess argv is admitted and surfaces as ENVIRONMENT 'the harness raised ValueError'.",
+      "reproduction": {
+        "script_sha256": "433a021587f77d28432ea845821e05a9562987beae24c88cb6b5b1cb6fe059f8",
+        "interpreter": "CPython 3.14.7 macOS arm64",
+        "output_excerpt": "[REAL] missing scratch dir -> HARNESS_FAILED FileNotFoundError; workspace 'a' + 'a/b' -> HARNESS_FAILED FileExistsError; NUL in argv -> HARNESS_FAILED ValueError; [SIM] _prepare/start raising ValueError and open(harness.log) raising EMFILE -> RAISED, nothing returned; [SIM] on_range raising after start leaves 1 range member until the acquirer releases (repro-4b)",
+        "reproduced": true
+      },
+      "consequence": "fail-closed; contained at run level exactly as PM-3; on the product path StoryScope.acquire releases the resource itself before it raises (read, not run). Cosmetic inconsistency: documented UNRUNNABLE vs an exception.",
+      "classification": "KNOWN_LIMIT",
+      "fix_sketch": "none now; state in the 'harness preconditions' paragraph on the next window; optional one-line _subprocess_ok rejecting NUL if INVALID_SPEC is wanted there",
+      "recalibration_cost": "none unless edited; any edit of cli_invocation.py/process_effect.py changes EXECUTION_DIGEST (see PM-1)",
+      "reachable_from_run": "yes, but only under host faults (fd exhaustion, disk full) or a plan-authoring error",
+      "decision_needed": "none"
+    },
+    {
+      "id": "PM-7",
+      "source": "TRACEABILITY R-3.1 (360 section 3.1); ADR-2 'adapted'",
+      "claim": "EXECUTION_DIGEST covers only each probe's PROBE_SOURCES; runtime/process_range.py and range_anchor.py (and product/outcome.py) decide what a probe observes but are outside, so editing them leaves every calibration row valid. Correction of R-3.1's wording: the RunSpec's 'kernel' capability (kernel_digest, app/run.py:77-84) does change; only the per-probe entries and the calibration rows do not.",
+      "reproduction": {
+        "script_sha256": "0a495698e78b3ff139a9f9372e67820c7252e991235bb786850abae84e246d32",
+        "interpreter": "CPython 3.14.7 macOS arm64 (scratch copies, one byte changed in each)",
+        "output_excerpt": "a semantic edit in runtime/process_range.py (members() returns []) changes the EXECUTION_DIGEST of none of the 5 probes and changes the RunSpec kernel capability; a comment in probe/protocol.py changes all five including the frozen Cycle-1 1961e84d; in cli_invocation.py: cli, effect, pc2; in process_effect.py: effect only",
+        "reproduced": true
+      },
+      "consequence": "no wrong verdict by itself: the evidence that the probe contrasts can drift from the code; remaining guards are the suite and the mutation kill sets, not check 9.",
+      "classification": "OWNER_DECISION",
+      "fix_sketch": "(a) add the two runtime files to PROBE_SOURCES of the three ProcessRange probes (not python_callable.py: frozen digest); (b) the transitive closure of aisef2 imports (not sized); (c) keep and state it in REPORT",
+      "recalibration_cost": "(a) EXECUTION_DIGEST of cli_invocation, process_effect, python_callable_v2 (15 rows), free if taken in the PM-1 window; afterwards every runtime edit costs one recalibration (intended); (b) any kernel edit forces recalibration",
+      "reachable_from_run": "identity/evidence only",
+      "decision_needed": "owner: scope of the execution identity (a)/(b)/(c)"
+    },
+    {
+      "id": "PM-8",
+      "source": "closure-evidence/v2/cycle2/PROBE-DIAGNOSTIC-GAP-001.json (ESCALATED_MEASURED_BLOCKER); docs/implementation/v2/cycle2/PROBE-DIAGNOSTIC-CHANNEL-DESIGN.md; triage T27 row 4",
+      "claim": "classify_failure (aisef2/probe/protocol.py:185) turns an OBSERVED observation into Executed(verdict) and drops Observation.detail, so the file/line/step a refutation names reaches no record; Executed holds behavior_verdict and reason only.",
+      "reproduction": {
+        "script_sha256": "31e6f8a44e33f85025cb917d8f98890d00242db764d1f7b7f287809685140adf",
+        "interpreter": "CPython 3.14.7 macOS arm64",
+        "output_excerpt": "syntax-error control: observe -> ... \"unparsable\": \"pkg/deep.py:2\"; run_probe -> Executed(behavior_verdict=REFUTED, reason=None)",
+        "reproduced": true
+      },
+      "consequence": "no verdict impact; actionability of retries (why PM-1 is silent). Already recorded and escalated; not re-opened.",
+      "classification": "OWNER_DECISION",
+      "fix_sketch": "H-DIAG-001 (harness-only, in the design document); protocol.py is part of the frozen Cycle-1 identity",
+      "recalibration_cost": "an edit of probe/protocol.py changes the EXECUTION_DIGEST of all five probes including the frozen Cycle-1 digest 1961e84d (test_the_cycle1_probe_keeps_its_one_frozen_digest, Q0 cycle2_baseline): a re-freeze, not a recalibration",
+      "reachable_from_run": "yes",
+      "decision_needed": "already pending with the owner (PROBE-DIAGNOSTIC-GAP-001)"
+    },
+    {
+      "id": "PM-9",
+      "source": "T27a review issue 6",
+      "claim": "A count of 0 over a selection of zero files (a single non-.py file, a directory without .py, a directory with only a dot-file) is OBSERVED SATISFIED with files 0 for python_imports and grep_count; visible only in the facts.",
+      "reproduction": {
+        "script_sha256": "087ffb68868cb282965373060184a271b3f7bd56e479a949ab5636ae1c6c6e57",
+        "interpreter": "CPython 3.14.7 macOS arm64",
+        "output_excerpt": "python_imports matches=0 over path:README.md -> OBSERVED SATISFIED files=0 matches=0 (same for a directory without .py and a dot-file-only directory)",
+        "reproduced": true
+      },
+      "consequence": "vacuous truth: fail-open only where the prohibition is the sole obligation guarding a tree whose .py files were moved or renamed; presence is protected by exists/behaviour obligations. Pinned as intended by T27a (test_a_single_non_python_file_is_not_selected).",
+      "classification": "OWNER_DECISION",
+      "fix_sketch": "options: keep vacuous truth (today); count unestablished -> REFUTED; refuse (HARNESS_FAILED). No change recommended without the decision.",
+      "recalibration_cost": "file_artifact only (4 rows) plus a changed pin in T27a; a verdict-rule change would bump CAPABILITY_VERSION of file_artifact (migration of its specs)",
+      "reachable_from_run": "yes",
+      "decision_needed": "owner: what a count over zero files means"
+    },
+    {
+      "id": "PM-10",
+      "source": "triage T27 row 19; A19 review issue 3; T19b review issue 5",
+      "claim": "Three cosmetic diagnostics: python_imports locations follow ast.walk (breadth first); a bare directory json/ without __init__.py gives SUBJECT_ABSENT with an empty note where 'resolves only outside the revision' is accurate; a memoryview result is a type name for process_effect and bytes for python_callable_v2 returns_bytes.",
+      "reproduction": {
+        "script_sha256": "087ffb68868cb282965373060184a271b3f7bd56e479a949ab5636ae1c6c6e57",
+        "interpreter": "CPython 3.14.7 macOS arm64",
+        "output_excerpt": "locations [['pkg/m.py',5,['yaml']],['pkg/m.py',2,['requests']]]; process_effect SUBJECT_ABSENT note=''; process_effect returns_bytes_hex REFUTED (last_unserializable 'memoryview') vs python_callable_v2 returns_bytes SATISFIED",
+        "reproduced": true
+      },
+      "consequence": "cosmetic; no verdict or routing changes; the first two are in detail, which the run path drops; the third is documented in both module docstrings.",
+      "classification": "KNOWN_LIMIT",
+      "fix_sketch": "none; one line each in REPORT's limits table",
+      "recalibration_cost": "none",
+      "reachable_from_run": "no",
+      "decision_needed": "none"
+    }
+  ],
+  "searched": [
+    "docs/v2.1/REPORT.md 0.4, STATUS.md B-03, TRACEABILITY.md (R-3.1 and every 'open' row)",
+    "memory aisef-trang-thai-2026-10-08-b03.md",
+    "closure-evidence/v2/v2.1/mutation/ROUND-2.md, SURVIVOR-AUDITS.json (213 entries; 38 in aisef2/probe/, none OPEN)",
+    "scratchpad m21/kills3/out/*/report.json and review/report.json for A18, A19, A21, A27, T18a, T18b, T19a, T19b, T21a, T21b, T27a (defects, issues, owner notes)",
+    "scratchpad m21/triage/out/T*.json unlisted_finding rows (T18, T19, T21, T27); m21/kills3/ledger.json, unresolved.json; m21/kills4/R2-UNRESOLVED.json",
+    "ledger by module for aisef2/probe/: no OPEN and no DEFECT mutant; the findings were found beside batches",
+    "excluded as not probe-module items: confine._probe (T05a, T05c, fixed beb974b), review_verify.detail (R06, Q-DETAIL), the three site-packages probe files (incident 2026-10-07), kill_check --only (tool, fixed 6288f07), reviewers' test-strength notes (T19b issue 4)",
+    "git history: 7de6d79 (FAULTED with subprocess, WP-2.3.1), 098dd7a (B1 split; v2.0.0 contains it), 06d4e62 (python_imports)"
+  ],
+  "not_established": [
+    "No full aisef run was executed (no provider); reachability is by call path and by calling observe/run_probe, the calls the kernel makes.",
+    "CPython 3.11, 3.13 and Windows were not measured.",
+    "How often model-written layouts omit __init__.py, or candidate files nest that deep, was not measured; PM-1's likelihood rests on a reviewer's remark.",
+    "PM-5 forged three observable shapes (cli exits, effect returns, pc2 returns); exits_streams, blocks, equality, raises were not tried; no developer session was read for forgery; the hostile candidate is simulated.",
+    "Fix sketches were validated on scratch copies under $OUT against 29 existing test modules and the 19-class calibration loop, not on the branch and not against the full suite.",
+    "Mutation re-measure hours are estimates from campaign 3's rate; the delta tool decides the real set.",
+    "CAPABILITY_VERSION bump judgments are a reading of ADR-2, not a measured property.",
+    "PM-7 option (b), the transitive closure of probe imports, was not sized."
+  ]
+}

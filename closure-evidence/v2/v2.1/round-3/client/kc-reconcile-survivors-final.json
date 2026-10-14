@@ -1,0 +1,88 @@
+{
+ "target": "aisef2/app/lineage.py::reconcile",
+ "files": [
+  "tests/v2/test_v21_r3_client_readers.py",
+  "tests/v2/test_v21_kills3_T08a.py",
+  "tests/v2/test_v21_kills3_A08.py",
+  "tests/v2/test_v21_continue_usage.py",
+  "tests/v2/test_v21_continue_integrity.py"
+ ],
+ "source_sha256": "85122bfb4d22125eeba871d91e8a848babb3fbaf41eb574dc20eb3869f4494f9",
+ "t0": [
+  {
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "seconds": 1.69,
+   "outcome": "PASS",
+   "ran": 10
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T08a.py",
+   "seconds": 1.95,
+   "outcome": "PASS",
+   "ran": 10
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_A08.py",
+   "seconds": 0.75,
+   "outcome": "PASS",
+   "ran": 4
+  },
+  {
+   "file": "tests/v2/test_v21_continue_usage.py",
+   "seconds": 56.56,
+   "outcome": "PASS",
+   "ran": 10
+  },
+  {
+   "file": "tests/v2/test_v21_continue_integrity.py",
+   "seconds": 244.2,
+   "outcome": "PASS",
+   "ran": 24
+  }
+ ],
+ "error": null,
+ "results": [
+  {
+   "index": 138,
+   "mutant": "L246 string \"the developer's candidate of \" emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "FAIL: test_the_item_says_whose_candidate_where_and_what_the_continuation_does_with_it (v2.test_v21_r3_client_readers.WorktreeListing.test_the_item_says_whose_candidate_where_and_what_the_continuation_does_with_it) | AssertionError"
+  },
+  {
+   "index": 139,
+   "mutant": "L246 string \" in the kernel's worktree \" emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "FAIL: test_the_item_says_whose_candidate_where_and_what_the_continuation_does_with_it (v2.test_v21_r3_client_readers.WorktreeListing.test_the_item_says_whose_candidate_where_and_what_the_continuation_does_with_it) | AssertionError"
+  },
+  {
+   "index": 140,
+   "mutant": "L246 string ', never journaled (no proof ran on it): developed again' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "FAIL: test_the_item_says_whose_candidate_where_and_what_the_continuation_does_with_it (v2.test_v21_r3_client_readers.WorktreeListing.test_the_item_says_whose_candidate_where_and_what_the_continuation_does_with_it) | AssertionError"
+  },
+  {
+   "index": 145,
+   "mutant": "L226 string \"the kernel's merge of \" emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "FAIL: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | AssertionError"
+  },
+  {
+   "index": 146,
+   "mutant": "L226 string \"'s proved candidate \" emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "FAIL: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | AssertionError"
+  },
+  {
+   "index": 147,
+   "mutant": "L226 string ': its post-merge proof and commit were never journaled' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "FAIL: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | AssertionError"
+  }
+ ]
+}

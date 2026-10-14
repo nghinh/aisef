@@ -1,0 +1,81 @@
+{
+ "target": "aisef2/app/confine.py::_lines",
+ "files": [
+  "tests/v2/test_v21_r3_client_readers.py",
+  "tests/v2/test_v21_kills3_T07a.py",
+  "tests/v2/test_v21_confine.py",
+  "tests/v2/test_v21_r3_conf_policy.py",
+  "tests/v2/test_v21_r3_conf_fu_before.py",
+  "tests/v2/test_v21_r3_conf_rv_hostrows.py"
+ ],
+ "source_sha256": "3dc6553e145884c2214f71f92280bd9633f2b1609d22b4c717be15e7ad8787f5",
+ "t0": [
+  {
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "seconds": 2.2,
+   "outcome": "PASS",
+   "ran": 10
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T07a.py",
+   "seconds": 0.47,
+   "outcome": "PASS",
+   "ran": 14
+  },
+  {
+   "file": "tests/v2/test_v21_confine.py",
+   "seconds": 23.36,
+   "outcome": "PASS",
+   "ran": 34
+  },
+  {
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "seconds": 1.6,
+   "outcome": "PASS",
+   "ran": 42
+  },
+  {
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "seconds": 2.19,
+   "outcome": "PASS",
+   "ran": 9
+  },
+  {
+   "file": "tests/v2/test_v21_r3_conf_rv_hostrows.py",
+   "seconds": 0.44,
+   "outcome": "PASS",
+   "ran": 3
+  }
+ ],
+ "error": null,
+ "results": [
+  {
+   "index": 0,
+   "mutant": "L209 returns None",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_a_host_mount_point_that_holds_a_separator_is_one_row (v2.test_v21_r3_client_readers.HostTable.test_a_host_mount_point_that_holds_a_separator_is_one_row) (separator='U+2028') | TypeError"
+  },
+  {
+   "index": 1,
+   "mutant": "L209 conditional negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "FAIL: test_a_host_mount_point_that_holds_a_separator_is_one_row (v2.test_v21_r3_client_readers.HostTable.test_a_host_mount_point_that_holds_a_separator_is_one_row) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 2,
+   "mutant": "L208 string '\\n' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_a_host_mount_point_that_holds_a_separator_is_one_row (v2.test_v21_r3_client_readers.HostTable.test_a_host_mount_point_that_holds_a_separator_is_one_row) (separator='U+2028') | ValueError"
+  },
+  {
+   "index": 3,
+   "mutant": "L209 Eq->NotEq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "FAIL: test_a_host_mount_point_that_holds_a_separator_is_one_row (v2.test_v21_r3_client_readers.HostTable.test_a_host_mount_point_that_holds_a_separator_is_one_row) (separator='U+2028') | AssertionError"
+  }
+ ]
+}

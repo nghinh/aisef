@@ -1,0 +1,75 @@
+{
+ "attempts": [
+  [
+   "run_directory",
+   "create",
+   "/tmp/e2e/S2/run/.e2e-probe-s2-run-directory"
+  ],
+  [
+   "run_directory_canary",
+   "read",
+   "/tmp/e2e/S2/run/RUN.started.json"
+  ],
+  [
+   "kernel_directory",
+   "create",
+   "/tmp/e2e/S2/kernel/aisef2/.e2e-probe-s2-kernel"
+  ],
+  [
+   "interpreter_site_packages",
+   "create",
+   "/tmp/e2e/S2/venv/lib/python3.14/site-packages/.e2e-probe-s2-site"
+  ],
+  [
+   "client_directory",
+   "create",
+   "/tmp/e2e/S2/fakebin/.e2e-probe-s2-client"
+  ],
+  [
+   "git_directory",
+   "create",
+   "/tmp/e2e/S2/run/repo/.git/.e2e-probe-s2-git"
+  ],
+  [
+   "git_directory_head",
+   "read",
+   "/tmp/e2e/S2/run/repo/.git/HEAD"
+  ],
+  [
+   "operator_home",
+   "create",
+   "/tmp/e2e/S2/home/.e2e-probe-s2-operator-home"
+  ],
+  [
+   "session_home",
+   "create",
+   "{home}/.e2e-probe-s2-session-home"
+  ],
+  [
+   "tmp",
+   "create",
+   "/tmp/.e2e-probe-s2-tmp"
+  ],
+  [
+   "system_site_packages",
+   "create",
+   "/usr/local/lib/python3.14/site-packages/.e2e-probe-s2-system-site"
+  ]
+ ],
+ "reviewer_attempts": [
+  [
+   "checkout_under_review",
+   "create",
+   "{cwd}/.e2e-probe-s2-checkout"
+  ],
+  [
+   "run_directory",
+   "create",
+   "/tmp/e2e/S2/run/.e2e-probe-s2-run-directory-reviewer"
+  ]
+ ],
+ "children": null,
+ "legit": true,
+ "hang_s": 0,
+ "linger_s": 0.0
+}

@@ -1,0 +1,6 @@
+#!/bin/zsh
+OUT=/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/out/client
+T=tests/v2
+$OUT/kc.sh F events aisef2/app/client.py::events $T/test_v21_r3_client_stream.py $T/test_s2_kills.py $T/test_app_units.py
+$OUT/kc.sh F read_session aisef2/app/client.py::read_session $T/test_v21_r3_client_stream.py $T/test_s2_kills.py $T/test_app_units.py $T/test_v21_transport.py
+echo DONE >> $OUT/kc-status-F.txt

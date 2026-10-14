@@ -1,0 +1,186 @@
+{
+ "target": "aisef2/runtime/process_range.py::_ps_table",
+ "files": [
+  "tests/v2/p4/test_process_table.py"
+ ],
+ "source_sha256": "05f606bf6473570dc98799f04809281282290a8964a67024fe1b402b10f82773",
+ "t0": [
+  {
+   "file": "tests/v2/p4/test_process_table.py",
+   "seconds": 0.34,
+   "outcome": "PASS",
+   "ran": 6
+  }
+ ],
+ "error": null,
+ "results": [
+  {
+   "index": 0,
+   "mutant": "L114 returns None",
+   "class": "KILLED",
+   "file": "tests/v2/p4/test_process_table.py",
+   "first": "ERROR: test_the_process_table_reads_this_process (v2.p4.test_process_table.NoPidAncestry.test_the_process_table_reads_this_process) | TypeError"
+  },
+  {
+   "index": 1,
+   "mutant": "L106 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/p4/test_process_table.py",
+   "first": "ERROR: test_the_process_table_reads_this_process (v2.p4.test_process_table.NoPidAncestry.test_the_process_table_reads_this_process) | aisef2.runtime.process_range.ProcessTableError"
+  },
+  {
+   "index": 2,
+   "mutant": "L109 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/p4/test_process_table.py",
+   "first": "ERROR: test_the_process_table_reads_this_process (v2.p4.test_process_table.NoPidAncestry.test_the_process_table_reads_this_process) | aisef2.runtime.process_range.ProcessTableError"
+  },
+  {
+   "index": 3,
+   "mutant": "L111 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/p4/test_process_table.py",
+   "first": "ERROR: test_the_process_table_reads_this_process (v2.p4.test_process_table.NoPidAncestry.test_the_process_table_reads_this_process) | KeyError"
+  },
+  {
+   "index": 4,
+   "mutant": "L99 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/p4/test_process_table.py",
+   "first": "ERROR: test_the_process_table_reads_this_process (v2.p4.test_process_table.NoPidAncestry.test_the_process_table_reads_this_process) | FileNotFoundError"
+  },
+  {
+   "index": 5,
+   "mutant": "L99 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/p4/test_process_table.py",
+   "first": "ERROR: test_the_process_table_reads_this_process (v2.p4.test_process_table.NoPidAncestry.test_the_process_table_reads_this_process) | KeyError"
+  },
+  {
+   "index": 6,
+   "mutant": "L99 element 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/p4/test_process_table.py",
+   "first": "ERROR: test_the_process_table_reads_this_process (v2.p4.test_process_table.NoPidAncestry.test_the_process_table_reads_this_process) | subprocess.CalledProcessError"
+  },
+  {
+   "index": 7,
+   "mutant": "L99 element 3 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/p4/test_process_table.py",
+   "first": "ERROR: test_the_process_table_reads_this_process (v2.p4.test_process_table.NoPidAncestry.test_the_process_table_reads_this_process) | subprocess.CalledProcessError"
+  },
+  {
+   "index": 8,
+   "mutant": "L105 string '\\n' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/p4/test_process_table.py",
+   "first": "ERROR: test_the_process_table_reads_this_process (v2.p4.test_process_table.NoPidAncestry.test_the_process_table_reads_this_process) | ValueError"
+  },
+  {
+   "index": 9,
+   "mutant": "L106 not removed",
+   "class": "KILLED",
+   "file": "tests/v2/p4/test_process_table.py",
+   "first": "ERROR: test_the_process_table_reads_this_process (v2.p4.test_process_table.NoPidAncestry.test_the_process_table_reads_this_process) | TypeError"
+  },
+  {
+   "index": 10,
+   "mutant": "L109 Is->IsNot",
+   "class": "KILLED",
+   "file": "tests/v2/p4/test_process_table.py",
+   "first": "ERROR: test_the_process_table_reads_this_process (v2.p4.test_process_table.NoPidAncestry.test_the_process_table_reads_this_process) | aisef2.runtime.process_range.ProcessTableError"
+  },
+  {
+   "index": 11,
+   "mutant": "L99 string 'ps' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/p4/test_process_table.py",
+   "first": "ERROR: test_the_process_table_reads_this_process (v2.p4.test_process_table.NoPidAncestry.test_the_process_table_reads_this_process) | PermissionError"
+  },
+  {
+   "index": 12,
+   "mutant": "L99 string '-A' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/p4/test_process_table.py",
+   "first": "ERROR: test_the_process_table_reads_this_process (v2.p4.test_process_table.NoPidAncestry.test_the_process_table_reads_this_process) | subprocess.CalledProcessError"
+  },
+  {
+   "index": 13,
+   "mutant": "L99 string '-o' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/p4/test_process_table.py",
+   "first": "ERROR: test_the_process_table_reads_this_process (v2.p4.test_process_table.NoPidAncestry.test_the_process_table_reads_this_process) | subprocess.CalledProcessError"
+  },
+  {
+   "index": 14,
+   "mutant": "L99 string 'pid=,ppid=,pgid=,stat=,command=' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/p4/test_process_table.py",
+   "first": "ERROR: test_the_process_table_reads_this_process (v2.p4.test_process_table.NoPidAncestry.test_the_process_table_reads_this_process) | subprocess.CalledProcessError"
+  },
+  {
+   "index": 15,
+   "mutant": "L99 True->False",
+   "class": "KILLED",
+   "file": "tests/v2/p4/test_process_table.py",
+   "first": "ERROR: test_the_process_table_reads_this_process (v2.p4.test_process_table.NoPidAncestry.test_the_process_table_reads_this_process) | AttributeError"
+  },
+  {
+   "index": 16,
+   "mutant": "L99 True->False",
+   "class": "KILLED",
+   "file": "tests/v2/p4/test_process_table.py",
+   "first": "FAIL: test_the_ps_reader_skips_zombies_while_a_line_that_is_not_a_row_and_a_failed_ps_are_errors (v2.p4.test_process_table.NoPidAncestry.test_the_ps_reader_skips_zombies_while_a_line_that_is_not_a_row_and_a_failed_ps_are_errors) | AssertionError"
+  },
+  {
+   "index": 17,
+   "mutant": "L108 string ' *([0-9]+) +([0-9]+) +([0-9]+) +([^ ]+)(?: +(.*))?' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/p4/test_process_table.py",
+   "first": "ERROR: test_the_process_table_reads_this_process (v2.p4.test_process_table.NoPidAncestry.test_the_process_table_reads_this_process) | aisef2.runtime.process_range.ProcessTableError"
+  },
+  {
+   "index": 18,
+   "mutant": "L111 string 'Z' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/p4/test_process_table.py",
+   "first": "ERROR: test_the_process_table_reads_this_process (v2.p4.test_process_table.NoPidAncestry.test_the_process_table_reads_this_process) | KeyError"
+  },
+  {
+   "index": 19,
+   "mutant": "L113 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/p4/test_process_table.py",
+   "first": "FAIL: test_the_process_table_reads_this_process (v2.p4.test_process_table.NoPidAncestry.test_the_process_table_reads_this_process) | AssertionError"
+  },
+  {
+   "index": 20,
+   "mutant": "L105 string 'utf-8' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/p4/test_process_table.py",
+   "first": "ERROR: test_the_process_table_reads_this_process (v2.p4.test_process_table.NoPidAncestry.test_the_process_table_reads_this_process) | LookupError"
+  },
+  {
+   "index": 21,
+   "mutant": "L105 string 'replace' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/p4/test_process_table.py",
+   "first": "ERROR: test_the_ps_reader_skips_zombies_while_a_line_that_is_not_a_row_and_a_failed_ps_are_errors (v2.p4.test_process_table.NoPidAncestry.test_the_ps_reader_skips_zombies_while_a_line_that_is_not_a_row_and_a_failed_ps_are_errors) | LookupError"
+  },
+  {
+   "index": 22,
+   "mutant": "L106 string ' ' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 23,
+   "mutant": "L110 string 'ps printed a line that is not a process row: ' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  }
+ ]
+}

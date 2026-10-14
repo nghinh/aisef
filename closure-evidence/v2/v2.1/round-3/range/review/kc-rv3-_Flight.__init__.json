@@ -1,0 +1,32 @@
+{
+ "target": "aisef2/runtime/process_range.py::_Flight.__init__",
+ "files": [
+  "tests/v2/test_v21_r3_range_release_contract.py"
+ ],
+ "source_sha256": "489e7ec3638c2f91365fa94263a38b9d20a36c4fd586c7213c1cbadf2b561c16",
+ "t0": [
+  {
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "seconds": 2.19,
+   "outcome": "PASS",
+   "ran": 32
+  }
+ ],
+ "error": null,
+ "results": [
+  {
+   "index": 0,
+   "mutant": "L294 False->True",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "FAIL: test_a_call_inside_the_ladder_stops_the_range_and_the_frame_below_disposes (v2.test_v21_r3_range_release_contract.Reentry.test_a_call_inside_the_ladder_stops_the_range_and_the_frame_below_disposes) | AssertionError"
+  },
+  {
+   "index": 1,
+   "mutant": "L296 False->True",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "FAIL: test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller (v2.test_v21_r3_range_release_contract.AbandonedWorker.test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller) | AssertionError"
+  }
+ ]
+}

@@ -1,0 +1,24 @@
+{
+ "tag": "run",
+ "argv": [
+  "/usr/local/bin/python3",
+  "-B",
+  "-m",
+  "aisef",
+  "run",
+  "--project",
+  "/tmp/e2e/project/approved.json",
+  "--settings",
+  "settings.json",
+  "--repo",
+  "/tmp/e2e/project/repo",
+  "--out",
+  "run"
+ ],
+ "cwd": "/tmp/e2e/S2b-client-holds-home",
+ "exit": 2,
+ "seconds": 0.9,
+ "stdout": "",
+ "stderr": "aisef run: refused: confinement was asked for and is not provided: the client's directory /tmp/e2e/S2b-client-holds-home/fakebin holds HOME: bound read-only it would expose it; give the client a directory of its own\n",
+ "json": null
+}

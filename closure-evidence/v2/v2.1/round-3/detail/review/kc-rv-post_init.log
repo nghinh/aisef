@@ -1,0 +1,8 @@
+[0] KILLED   L286 condition negated  <- ERROR: v2.test_v21_r3_detail_statement (unittest.loader._FailedTest.v2.test_v21_r3_detail_statement) | ValueError
+[1] KILLED   L286 not removed  <- ERROR: v2.test_v21_r3_detail_statement (unittest.loader._FailedTest.v2.test_v21_r3_detail_statement) | ValueError
+[2] KILLED   L286 And swapped  <- FAIL: test_a_reference_is_a_path_inside_the_directory_a_sha256_and_a_size (v2.test_v21_r3_detail_statement.AnArtifactReferenceHasAShape.test_a_reference_is_a_path_inside_the_directory_a_sha256_and_a_size) (args=('review-findings/../RUN.json', '0000000000000000000000000000000000000000000000000000000000000000', 1)) | AssertionError
+[3] KILLED   L286 Is->IsNot  <- ERROR: v2.test_v21_r3_detail_statement (unittest.loader._FailedTest.v2.test_v21_r3_detail_statement) | ValueError
+[4] KILLED   L287 LtE->Gt  <- ERROR: v2.test_v21_r3_detail_statement (unittest.loader._FailedTest.v2.test_v21_r3_detail_statement) | ValueError
+[5] KILLED   L287 Lt->GtE  <- ERROR: v2.test_v21_r3_detail_statement (unittest.loader._FailedTest.v2.test_v21_r3_detail_statement) | ValueError
+[6] KILLED   L288 string 'not a review artifact reference: ' emptied  <- FAIL: test_a_reference_is_a_path_inside_the_directory_a_sha256_and_a_size (v2.test_v21_r3_detail_statement.AnArtifactReferenceHasAShape.test_a_reference_is_a_path_inside_the_directory_a_sha256_and_a_size) | AssertionError
+# aisef2/app/review_verify.py::Artifact.__post_init__: 7 mutants run, {'KILLED': 7}; T0 [{'file': 'tests/v2/test_v21_r3_detail_statement.py', 'seconds': 5.83, 'outcome': 'PASS', 'ran': 38}]; source_sha256 9a5fafceeeaa117ea41c78ec7797604b45bb3bf8d6c4f20db6b2fa1059838513

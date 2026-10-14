@@ -1,0 +1,319 @@
+{
+ "wp": "detail",
+ "branch": "v21r3/detail",
+ "head": "ac25abfcd77c2ac0fb6b88c476e5cddf1f9f543f",
+ "files_changed": [
+  "aisef2/app/review_verify.py",
+  "aisef2/app/adapters.py",
+  "aisef2/app/run.py",
+  "aisef2/app/verify.py",
+  "docs/v2.1/decisions/B03-R3-detail.md"
+ ],
+ "tests_added": [
+  "tests/v2/test_v21_r3_detail_statement.py",
+  "tests/v2/test_v21_r3_detail_artifact.py",
+  "tests/v2/test_v21_r3_detail_product.py",
+  "tests/v2/test_v21_r3_detail_failclosed.py",
+  "tests/v2/test_v21_r3_detail_model.py"
+ ],
+ "existing_tests_changed": [
+  {
+   "file": "tests/v2/test_v21_kills3_T15a.py",
+   "test": "StatementOfAFinding.test_a_confirmed_and_anchored_finding_is_stated_in_full",
+   "change": "the expected statement gains the key \"observed\" (the probe's verdict); every other key and value asserted as before",
+   "owner_sentence": "Phần tóm tắt cần nêu điều kiện tái hiện, kết quả mong đợi/thực tế, dấu hiệu đã cắt và đường tham chiếu tới artifact."
+  },
+  {
+   "file": "tests/v2/test_v21_authority_limits.py",
+   "test": "OneDecisionPath.test_what_blocks_answered_rebound_or_not_asked_on_every_path_is_caught",
+   "change": "the two literal source anchors `whole` and `inner` copy the statement that builds a Finding; it now names the id `fid` (redacted) and passes the artifact reference and the run's secrets to detail(); no rule and no assertion of the checker changed",
+   "owner_sentence": "Giữ bản reproducer đầy đủ, đã che bí mật phù hợp, trong artifact có định danh và được ràng buộc vào evidence."
+  }
+ ],
+ "evidence_binding": {
+  "where_full_finding_lives_before": "RUN.json sessions[].findings[] (the finding with its verification and anchor, UNREDACTED, written in the finally of execute: a run that is killed has only RUN.started.json, the journal and the streams); the session stream (the model's text, or OCR's ocr_output document), byte-redacted with the run's secrets; never the journal, whose gate/check row held only the statement cut at 1,500 characters of its encoding. No journal row referenced either; the link was story + finding id + order of sessions, ambiguous when two findings of a review share an id (measured: scripts/before_product.py)",
+  "where_after": "<run>/review-findings/<story>.<attempt>.<index>.json: the whole finding, secret-redacted, ASCII JSON, create-only, written whole to a .tmp and renamed; RUN.json's findings are redacted from the same list",
+  "journal_link": "the gate/check row's detail (' — ' + the statement JSON) carries artifact {path, sha256, bytes}; the journal is hash-chained; gate/check has a closed payload schema (a new key is a journal format bump), so the reference lives in the detail text; the artifact holds story_id, attempt, index, revision (the candidate the probe ran at), session (the finder's stream)",
+  "manifest_change": "run.evidence_manifest lists review-findings/*.json (sorted); MANIFEST_FORMAT unchanged (aisef-v2-evidence/1; precedent: RUN.started.json was added to the list without a bump)",
+  "old_runs_unchanged_proof": "a directory without review-findings/ yields the same dict (test_a_run_directory_with_no_review_findings_lists_exactly_what_it_always_did pins an explicit dict; the 24 existing mutants of evidence_manifest and T14a/T22a/A22/... pass); measured over the 10 older run directories with an EVIDENCE.json under the scratchpad: the manifests computed by 3dc827b and by this tree are byte-identical (manifests-base.json == manifests-new.json); 6 of the 10 differ from their stored EVIDENCE.json under 3dc827b as well (the directories were changed after the run: unrelated). verify: a blocking row with no `artifact` key is a NOTE, never a problem."
+ },
+ "summary_contract": {
+  "fields": [
+   "finding",
+   "severity",
+   "clause",
+   "verification",
+   "why",
+   "observed",
+   "anchor",
+   "anchor_why",
+   "artifact{path,sha256,bytes} | artifact:null + artifact_why",
+   "summary",
+   "reproducer{subject,stimulus,observable}",
+   "elided{field: characters left out}"
+  ],
+  "bound": "valid JSON, <= SUMMARY_MAX (1500) characters of the whole text, by construction: decisive fields 60/40/20/160/24/20/160 (+120 artifact_why) measured on the encoding; the four elastic fields share what is left less 26 characters per marker, smallest first; checked by a seeded sweep of 400 adversarial findings and the worst encodings (longest 1,493 in the sweep)",
+  "marker": "elided: {field: number of characters of that field's text left out}; present only when something was cut and authoritative; a value that does not fit is the prefix of its canonical JSON text, a string"
+ },
+ "secrets": {
+  "sources": [
+   "kw['secrets'] of the Reviewer: the client environment's values (>= 8 characters) and the provider key (the list the session streams are redacted with, app/run)",
+   "route['token'] (OCR's token, redacted from its stream the same way)"
+  ],
+  "tested_cases": [
+   "in the stimulus (a value and a KEY), in the finder's prose (summary), in why (the probe's reason), in anchor_why, in the finding id (statement and gate row), in the clause, in the subject locator, in artifact_why",
+   "straddling a decisive field's own bound (3 fields x 22 offsets) and straddling the stimulus's cut (100 offsets): no prefix of the secret >= 6 characters in the statement",
+   "the longest of two secrets that contain each other goes first; empty/None entries ignored",
+   "through aisef run: OCR comment with the secret in prose and in the stimulus (statement, artifact, RUN.json, journal, manifest, streams, the developer's retry prompt: none holds it)",
+   "the model finder: the secret in a field and in the prose",
+   "the finder's own token (OCR route) in a reproducer",
+   "the probe still runs the in-memory, unredacted reproducer (asserted)"
+  ]
+ },
+ "failure_to_preserve": {
+  "behaviour": "a finding that would block (blocks() said so) and whose artifact cannot be preserved refuses the review: CapabilityUnrunnable (CAPABILITY_UNRUNNABLE, owner ENVIRONMENT, 'every finding discarded', the finding id and the reason in the provider/result row); a finding that would not block is journaled with artifact:null and artifact_why",
+  "why": "fail closed: 'reported but non-blocking' would turn every confirmed, anchored defect into a pass whenever the evidence store fails (a fail-open on an environment fault); the module's own answers to 'the review's evidence cannot be established' are the same (_unchanged: every finding discarded; OCR coverage INDETERMINATE under fix-loop). A cut fragment never blocks."
+ },
+ "adversarial_inputs_checked": [
+  "100,000-character fields (summary, stimulus, observable, locator) one at a time and together",
+  "every decisive field at 10,000 characters, plain and as control characters (six encoded characters each)",
+  "a seeded sweep of 400 findings: unicode, astral, quotes, backslashes, newlines, control characters, DEL, U+2028, lone surrogates, nested dicts/lists, numbers, None, reproducers that are {} / None / a string / a list, a clause that is an int/None/dict",
+  "keys that are not strings (int, None, tuple, float), non-JSON values (NaN, inf, set, bytes)",
+  "a lone surrogate in the summary, id, why, anchor_why, stimulus value and key: the journal line (canonical().encode('utf-8')) failed on the old statement (measured) and does not now",
+  "containers nested 100 and 5,000 levels deep (a marker past DEPTH_MAX = 64)",
+  "a story id that is not a file name (path separators, '..', 100 characters), two findings with one id, an existing artifact, an unwritable run directory (missing, a file in the directory's place), a failing fsync/replace, an attempt that is not an int, an attempt of 100 digits",
+  "an artifact reference that is not a dict, names a path outside the directory ('..', absolute, nested, backslash, empty), is missing, has the wrong size/sha256, is another story's or another finding's"
+ ],
+ "mutants": [
+  {
+   "function": "aisef2/app/review_verify.py::detail",
+   "total": 96,
+   "killed": 96,
+   "survived": 0,
+   "not_killed_other_class": {},
+   "dispositions": [
+    "exploratory run on an earlier revision of the source: 2 SURVIVED (the marker reserve measured with a second conditional: 'elided' emptied in the estimate, conditional negated) — removed by measuring with the elided object always present (one conditional fewer), re-measured 96/96 KILLED; the bound held under both mutants (it is reserve arithmetic), so they were AUDITED as differing only by a few characters of room before the change"
+   ],
+   "artifact": "kc-detail.json"
+  },
+  {
+   "function": "aisef2/app/review_verify.py::redacted",
+   "total": 39,
+   "killed": 39,
+   "survived": 0,
+   "not_killed_other_class": {},
+   "dispositions": [
+    "exploratory runs: `(bool, int)` with bool dropped SURVIVED — EQUIVALENT (bool is a subclass of int), the element removed; 3 containers/' levels>' marker survivors KILLED by DeepStructures; the key-collision `while` loop had two mutants that loop forever (TIMEOUT, 15 minutes each) — replaced by an `if`, re-measured 39/39 KILLED, no timeout"
+   ],
+   "artifact": "kc-redacted.json"
+  },
+  {
+   "function": "aisef2/app/review_verify.py::_fit",
+   "total": 11,
+   "killed": 11,
+   "survived": 0,
+   "not_killed_other_class": {},
+   "dispositions": [],
+   "artifact": "kc-fit.json"
+  },
+  {
+   "function": "aisef2/app/review_verify.py::_dumps",
+   "total": 3,
+   "killed": 3,
+   "survived": 0,
+   "not_killed_other_class": {},
+   "dispositions": [],
+   "artifact": "kc-dumps.json"
+  },
+  {
+   "function": "aisef2/app/review_verify.py::Artifact.__post_init__",
+   "total": 7,
+   "killed": 7,
+   "survived": 0,
+   "not_killed_other_class": {},
+   "dispositions": [
+    "exploratory run: the refusal's message string SURVIVED — KILLED by an assertion that names the offending reference"
+   ],
+   "artifact": "kc-post_init.json"
+  },
+  {
+   "function": "aisef2/app/review_verify.py::preserve",
+   "total": 38,
+   "killed": 38,
+   "survived": 0,
+   "not_killed_other_class": {},
+   "dispositions": [
+    "exploratory run: 6 SURVIVED — ValueError and RecursionError in the except tuple (RecursionError is unreachable since the depth cap: removed; ValueError KILLED by an oversized attempt number), the FileExistsError message and ': ' separator (KILLED by assertions on cause class and name), sort_keys True->False (KILLED by a key-order test), the '_' replacement (KILLED by an exact name); re-measured 38/38 KILLED"
+   ],
+   "artifact": "kc-preserve.json"
+  },
+  {
+   "function": "aisef2/app/review_verify.py::artifact_problems",
+   "total": 92,
+   "killed": 92,
+   "survived": 0,
+   "not_killed_other_class": {},
+   "dispositions": [
+    "exploratory run: 10 SURVIVED — 3 EQUIVALENT (\"\" and \".\" in the tuple of path components: a PurePosixPath never yields them; removed), 7 message pieces KILLED by assertions that name the row and the cause; re-measured 92/92 KILLED"
+   ],
+   "artifact": "kc-artifact_problems.json"
+  },
+  {
+   "function": "aisef2/app/run.py::evidence_manifest",
+   "total": 24,
+   "killed": 24,
+   "survived": 0,
+   "not_killed_other_class": {},
+   "dispositions": [
+    "3 of the 24 (`sorted() -> list()` on the journals, the sessions, the preflight files) are SURVIVED in the campaign's record of 3dc827b; with test_every_group_is_listed_in_name_order all 24 are KILLED on this machine — only because this file system lists a directory out of name order; on one that lists in name order those 4 mutants (3 old, 1 new) are equivalent (the manifest is a mapping and nothing reads its order)"
+   ],
+   "artifact": "kc-evidence_manifest.json"
+  },
+  {
+   "function": "aisef2/app/adapters.py::Reviewer.review",
+   "total": 64,
+   "killed": 64,
+   "survived": 0,
+   "not_killed_other_class": {},
+   "dispositions": [
+    "64 = the campaign's 54 + 10 new (the secrets tuple, the enumerate target, the `confirmed and not isinstance` refusal, the session name, the 'token'/'secrets' strings); run with this WP's artifact file first and the registered kill files after: all KILLED; the 10 new ones by tests/v2/test_v21_r3_detail_artifact.py alone"
+   ],
+   "artifact": "kc-review.json"
+  },
+  {
+   "function": "aisef2/app/verify.py::verify",
+   "total": 191,
+   "killed": 180,
+   "survived": 11,
+   "dispositions": [
+    "the 2 mutants this WP added (`found, said = review_verify.artifact_problems(...)`, element 0/1 dropped): 2/2 KILLED by tests/v2/test_v21_r3_detail_product.py (kc-verify-only-new.json)",
+    "all 191 were run in four steps, each with the files named: (1) T22a, T22b, A22, defects_verify, test_v21_verify, test_s2_kills + the product file: 152 killed, 39 survived (kc-verify-all.json); (2) the 38 of those 39 that are not the `sorted() -> list()` one, with test_app_units, test_app_run, test_v21_continue_usage, test_v21_continue_integrity: 22 killed, 16 survived (kc-verify-rest.json); (3) those 16 with test_v21_kills3_R01: 6 killed, 10 survived (kc-verify-r01.json); (4) the same 10 on a git archive of 3dc827b with the same files: all 10 SURVIVE there too (kc-verify-base10.json) — so 180 killed, 11 survive, and every survivor is a survivor of the UNCHANGED tree, not of this change",
+    "the 11, all AUDITED as pre-existing at 3dc827b: 5 are the dict {story, error} of `errors` (L152 dict entries 0/1, strings 'story', 'error', 'begun and never ended in the journal'): its only consumers are run.delivery and the record, which read len(errors) — EQUIVALENT for every reader; 5 are message pieces (' the run printed', 'no ' of the no-manifest note, ')' of two problem texts, ')' of the settings problem) read by an operator and not asserted by any registered file — OPEN for the lead (killable by asserting the identifying elements, as test_v21_kills3_R01 does for the others); 1 is `sorted() -> list()` of the manifest-mismatch message's changed files ([:5] of a set's iteration order: no deterministic kill)"
+   ]
+  }
+ ],
+ "kill_files_by_function": {
+  "aisef2/app/review_verify.py::detail": [
+   "tests/v2/test_v21_r3_detail_statement.py",
+   "tests/v2/test_v21_kills3_T15a.py (existing, changed)"
+  ],
+  "aisef2/app/review_verify.py::redacted": [
+   "tests/v2/test_v21_r3_detail_statement.py"
+  ],
+  "aisef2/app/review_verify.py::_fit": [
+   "tests/v2/test_v21_r3_detail_statement.py"
+  ],
+  "aisef2/app/review_verify.py::_dumps": [
+   "tests/v2/test_v21_r3_detail_statement.py"
+  ],
+  "aisef2/app/review_verify.py::Artifact.__post_init__": [
+   "tests/v2/test_v21_r3_detail_statement.py"
+  ],
+  "aisef2/app/review_verify.py::preserve": [
+   "tests/v2/test_v21_r3_detail_artifact.py"
+  ],
+  "aisef2/app/review_verify.py::artifact_problems": [
+   "tests/v2/test_v21_r3_detail_artifact.py"
+  ],
+  "aisef2/app/run.py::evidence_manifest": [
+   "tests/v2/test_v21_r3_detail_artifact.py",
+   "tests/v2/test_v21_kills3_T14a.py (existing)"
+  ],
+  "aisef2/app/adapters.py::Reviewer.review": [
+   "tests/v2/test_v21_r3_detail_artifact.py",
+   "(+ the registered: test_v21_kills_adapters, test_s2_kills, test_app_units, ...)"
+  ],
+  "aisef2/app/adapters.py::NOT_PRESERVED": [
+   "tests/v2/test_v21_r3_detail_artifact.py"
+  ],
+  "aisef2/app/verify.py::verify": [
+   "tests/v2/test_v21_r3_detail_product.py",
+   "(+ the registered)"
+  ],
+  "behaviour through aisef run (not kill files: 14-19 s each)": [
+   "tests/v2/test_v21_r3_detail_product.py",
+   "tests/v2/test_v21_r3_detail_failclosed.py",
+   "tests/v2/test_v21_r3_detail_model.py"
+  ]
+ },
+ "decisions_needed": [
+  "Raw finder output files: review/<story>.<attempt>/{output.json,preview.json,ocr.log} (written by the OCR binary into the run directory) keep a secret verbatim and are not in the manifest — measured with a secret in an OCR comment (secret_in_review_work_files). Redacting them after the finder ran is three lines in Reviewer._ocr with client.redact; it is outside the functions of this WP (Reviewer._ocr has its own kill set). Owner/lead: do it, or accept the finder's scratch as outside the evidence?",
+  "--verify treats a blocking review row with no `artifact` key (a run of an earlier release) as a NOTE, so no earlier run's verdict changes; the stricter reading (a problem: 'a cut fragment is not grounds to block') would REFUTE every earlier run that blocked on a review finding. Confirm the note.",
+  "MANIFEST_FORMAT was not bumped (precedent: RUN.started.json joined the list without a bump); an older verifier refuses a newer run by naming the files it does not know. Confirm, or ask for aisef-v2-evidence/2 when the group is non-empty.",
+  "A story whose finding cannot be preserved fails with CAPABILITY_UNRUNNABLE (owner ENVIRONMENT, retried through the ENVIRONMENT limit) rather than a new failure code: a new code is a taxonomy change.",
+  "Docs that enumerate what EVIDENCE.json binds (docs/v2.1/ANCHOR-THREAT-MODEL.md, USAGE-2.1.md, ADR-V2.1.md) and the run directory layout should name review-findings/: left to the lead's documentation pass (shared files)."
+ ],
+ "not_established": [
+  "behaviour with the real Open Code Review binary or a real model finder (only scripted finders and a fake client ran)",
+  "Windows and Python 3.11, 3.13 (3.12 and 3.14 ran; written for them: pathlib, bytes, skipUnless(posix) only for the shebang-script runs; not run)",
+  "that a secret JSON-escaped or split across two stream events is redacted in the session STREAM (client.redact is byte-level and unchanged); the statement, the artifact and RUN.json are redacted on decoded strings, so a secret split across two strings of one reproducer (two argv elements) is not matched",
+  "the other 189 mutants of verify with the campaign's full file set (a reduced set was run; see mutants)",
+  "the three kills of evidence_manifest's old `sorted()` survivors hold on file systems that list a directory out of name order (this one does); on a file system that lists in name order they are equivalent",
+  "that `observed` could state observed VALUES: the probe protocol returns a verdict only",
+  "the artifacts of a review that was then discarded (the checkout changed during the verification) are kept and in the manifest, with no journal row naming them",
+  "wall-clock: tests/v2/test_v21_r3_detail_product.py and _failclosed.py take 11-19 s each (a real aisef run with two attempts); near the 20 s guideline on a slow machine",
+  "the sealed-record checkers are RED/stale as expected after a product change: tests.v2.p0.test_checker_calibration (mutation record 'target changed since the mutation run'), test_c2_p5_acceptance, test_c2_k_nowork_001 — regenerated by the lead, not fixed here"
+ ],
+ "test_runs": [
+  {
+   "what": "the five new test files (89 tests)",
+   "where": "host (macOS Darwin 25.5.0, Python 3.14.7)",
+   "result": "statement 36, artifact 31, product 14, failclosed 5, model 3: all OK",
+   "kind": "real (finder, developer and provider are scripts; the probes, journal, manifest and --verify are real)"
+  },
+  {
+   "what": "every test module that imports review_verify / adapters / run / verify (grep over tests/ and validation/: 56 modules incl. test_destructive_authority and test_mutation_safety)",
+   "where": "host",
+   "result": "856 tests, all OK (importers-results.log)",
+   "kind": "real"
+  },
+  {
+   "what": "the five new files + T15a (109 tests) under Python 3.12.14",
+   "where": "host (/opt/homebrew/bin/python3.12)",
+   "result": "all OK",
+   "kind": "real"
+  },
+  {
+   "what": "ruff check . over the whole tree",
+   "where": "host",
+   "result": "All checks passed",
+   "kind": "real"
+  },
+  {
+   "what": "new files + T15a + T14a + test_v21_kills_adapters (137 tests); test_v21_review, test_v21_context_pack, test_app_run, test_s2_kills, test_app_units, test_v21_defects_verify (153 tests)",
+   "where": "Linux guest (aisef-sandbox-measure: Python 3.14.8, git 2.47.3, Linux 7.0.12-linuxkit aarch64, no network, tree = git archive of the branch, read-only)",
+   "result": "137 OK in 32.6 s; 153 OK in 87.7 s",
+   "kind": "real run in the guest"
+  },
+  {
+   "what": "kill_check over every mutant of the changed/new functions",
+   "where": "host",
+   "result": "see mutants",
+   "kind": "real"
+  },
+  {
+   "what": "sealed-record checkers: p2.test_mutation_targets (4), test_v21_mutation_record (7), test_v21_mutation_runner (67), test_s2_mutation_record (12), test_old_path_audit (41), test_v21_read_set (26), test_v21_snapshot_delta (51)",
+   "where": "host",
+   "result": "all OK",
+   "kind": "real"
+  },
+  {
+   "what": "expected red after a product change",
+   "where": "host",
+   "result": "tests.v2.p0.test_checker_calibration: 3 failures (the mutation record: 'target changed since the mutation run — re-run it'); tests.v2.test_c2_p5_acceptance: 2; tests.v2.test_c2_k_nowork_001: 1 (record binds the tree)",
+   "kind": "real; not fixed (the lead regenerates)"
+  },
+  {
+   "what": "measurement on the code as it was",
+   "where": "host, 3dc827b",
+   "result": "scripts/before_unit.py (statement 1,500 characters of invalid JSON; lone surrogate crashes the journal line; mixed keys raise), scripts/before_product.py (blocked row 1,563 characters without verification/why; the secret in RUN.json, the journal row and the developer's retry prompt)",
+   "kind": "real"
+  },
+  {
+   "what": "the 10 older run directories",
+   "where": "host",
+   "result": "manifests of 3dc827b and of this tree byte-identical",
+   "kind": "real"
+  }
+ ]
+}

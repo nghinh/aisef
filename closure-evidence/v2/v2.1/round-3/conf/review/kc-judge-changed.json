@@ -1,0 +1,403 @@
+{
+ "target": "aisef2/app/confine.py::_judge",
+ "files": [
+  "tests/v2/test_v21_r3_conf_policy.py",
+  "tests/v2/test_v21_r3_conf_locale.py",
+  "tests/v2/test_v21_kills3_T07a.py",
+  "tests/v2/test_v21_kills3_T06a.py",
+  "tests/v2/test_v21_kills3_A06.py",
+  "tests/v2/test_v21_kills3_T05b.py",
+  "tests/v2/test_v21_kills3_T05a.py",
+  "tests/v2/test_v21_kills3_T05c.py",
+  "tests/v2/test_v21_kills3_A05.py",
+  "tests/v2/test_v21_kills3_R02.py",
+  "tests/v2/test_v21_kills3_T06b.py",
+  "tests/v2/test_v21_kills3_A07.py",
+  "tests/v2/test_v21_kills3_T07b.py",
+  "tests/v2/test_v21_kills3_TO2.py",
+  "tests/v2/test_v21_defects_confine.py",
+  "tests/v2/test_v21_confine.py"
+ ],
+ "source_sha256": "375489e7f4d1abc502cb6720c37631ad52511711cdb47803e0ecefb009778249",
+ "t0": [
+  {
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "seconds": 1.43,
+   "outcome": "PASS",
+   "ran": 42
+  },
+  {
+   "file": "tests/v2/test_v21_r3_conf_locale.py",
+   "seconds": 1.56,
+   "outcome": "PASS",
+   "ran": 10
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T07a.py",
+   "seconds": 0.32,
+   "outcome": "PASS",
+   "ran": 14
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T06a.py",
+   "seconds": 0.31,
+   "outcome": "PASS",
+   "ran": 14
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_A06.py",
+   "seconds": 1.06,
+   "outcome": "PASS",
+   "ran": 4
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "seconds": 0.77,
+   "outcome": "PASS",
+   "ran": 18
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T05a.py",
+   "seconds": 0.89,
+   "outcome": "PASS",
+   "ran": 8
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T05c.py",
+   "seconds": 2.0,
+   "outcome": "PASS",
+   "ran": 7
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_A05.py",
+   "seconds": 1.07,
+   "outcome": "PASS",
+   "ran": 6
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_R02.py",
+   "seconds": 0.46,
+   "outcome": "PASS",
+   "ran": 2
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T06b.py",
+   "seconds": 1.76,
+   "outcome": "PASS",
+   "ran": 8
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_A07.py",
+   "seconds": 0.46,
+   "outcome": "PASS",
+   "ran": 5
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T07b.py",
+   "seconds": 0.43,
+   "outcome": "PASS",
+   "ran": 11
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_TO2.py",
+   "seconds": 0.29,
+   "outcome": "PASS",
+   "ran": 3
+  },
+  {
+   "file": "tests/v2/test_v21_defects_confine.py",
+   "seconds": 1.64,
+   "outcome": "PASS",
+   "ran": 16
+  },
+  {
+   "file": "tests/v2/test_v21_confine.py",
+   "seconds": 19.68,
+   "outcome": "PASS",
+   "ran": 34
+  }
+ ],
+ "error": null,
+ "results": [
+  {
+   "index": 8,
+   "mutant": "L536 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_a_node_outside_the_list_is_judged_as_any_mount (v2.test_v21_r3_conf_policy.DeviceNodes.test_a_node_outside_the_list_is_judged_as_any_mount) (name='sda') | AssertionError"
+  },
+  {
+   "index": 9,
+   "mutant": "L539 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_a_node_outside_the_list_is_judged_as_any_mount (v2.test_v21_r3_conf_policy.DeviceNodes.test_a_node_outside_the_list_is_judged_as_any_mount) (name='sda') | AssertionError"
+  },
+  {
+   "index": 10,
+   "mutant": "L543 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_a_node_outside_the_list_is_judged_as_any_mount (v2.test_v21_r3_conf_policy.DeviceNodes.test_a_node_outside_the_list_is_judged_as_any_mount) (name='sda') | AssertionError"
+  },
+  {
+   "index": 11,
+   "mutant": "L549 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_a_node_outside_the_list_is_judged_as_any_mount (v2.test_v21_r3_conf_policy.DeviceNodes.test_a_node_outside_the_list_is_judged_as_any_mount) (name='sda') | AssertionError"
+  },
+  {
+   "index": 39,
+   "mutant": "L549 And swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_every_recorded_report_is_judged_again_as_it_was (v2.test_v21_r3_conf_policy.RecordedGuest.test_every_recorded_report_is_judged_again_as_it_was) (record='scenarios-X1-shared-tree.json', scenario='alt-dev-sandbox-devpts') | AssertionError"
+  },
+  {
+   "index": 63,
+   "mutant": "L549 NotEq->Eq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T06a.py",
+   "first": "FAIL: test_the_names_home_shows_are_listed_in_name_order_and_cut_after_ten (v2.test_v21_kills3_T06a.RefusalReasons.test_the_names_home_shows_are_listed_in_name_order_and_cut_after_ten) | AssertionError"
+  },
+  {
+   "index": 64,
+   "mutant": "L549 not removed",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_every_recorded_report_is_judged_again_as_it_was (v2.test_v21_r3_conf_policy.RecordedGuest.test_every_recorded_report_is_judged_again_as_it_was) (record='scenarios-X1-shared-tree.json', scenario='alt-dev-sandbox-devpts') | AssertionError"
+  },
+  {
+   "index": 90,
+   "mutant": "L538 string 'host_mounts' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_a_node_outside_the_list_is_judged_as_any_mount (v2.test_v21_r3_conf_policy.DeviceNodes.test_a_node_outside_the_list_is_judged_as_any_mount) (name='sda') | AssertionError"
+  },
+  {
+   "index": 91,
+   "mutant": "L539 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_node_outside_the_list_is_judged_as_any_mount (v2.test_v21_r3_conf_policy.DeviceNodes.test_a_node_outside_the_list_is_judged_as_any_mount) (name='sda') | ValueError"
+  },
+  {
+   "index": 92,
+   "mutant": "L539 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_node_outside_the_list_is_judged_as_any_mount (v2.test_v21_r3_conf_policy.DeviceNodes.test_a_node_outside_the_list_is_judged_as_any_mount) (name='sda') | ValueError"
+  },
+  {
+   "index": 93,
+   "mutant": "L547 And swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_node_outside_the_list_is_judged_as_any_mount (v2.test_v21_r3_conf_policy.DeviceNodes.test_a_node_outside_the_list_is_judged_as_any_mount) (name='sda') | ValueError"
+  },
+  {
+   "index": 94,
+   "mutant": "L548 string 'home_listing' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_node_outside_the_list_is_judged_as_any_mount (v2.test_v21_r3_conf_policy.DeviceNodes.test_a_node_outside_the_list_is_judged_as_any_mount) (name='sda') | KeyError"
+  },
+  {
+   "index": 95,
+   "mutant": "L549 string '/nonexistent' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 96,
+   "mutant": "L549 LtE->Gt",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_every_recorded_report_is_judged_again_as_it_was (v2.test_v21_r3_conf_policy.RecordedGuest.test_every_recorded_report_is_judged_again_as_it_was) (record='scenarios-X1-shared-tree.json', scenario='alt-dev-sandbox-devpts') | AssertionError"
+  },
+  {
+   "index": 113,
+   "mutant": "L537 string 'mounted beyond what the wrapper names: ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_every_recorded_report_is_judged_again_as_it_was (v2.test_v21_r3_conf_policy.RecordedGuest.test_every_recorded_report_is_judged_again_as_it_was) (record='scenarios-X1-shared-tree.json', scenario='host-dev-bound') | AssertionError"
+  },
+  {
+   "index": 114,
+   "mutant": "L539 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_node_outside_the_list_is_judged_as_any_mount (v2.test_v21_r3_conf_policy.DeviceNodes.test_a_node_outside_the_list_is_judged_as_any_mount) (name='sda') | ValueError"
+  },
+  {
+   "index": 115,
+   "mutant": "L539 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_node_outside_the_list_is_judged_as_any_mount (v2.test_v21_r3_conf_policy.DeviceNodes.test_a_node_outside_the_list_is_judged_as_any_mount) (name='sda') | ValueError"
+  },
+  {
+   "index": 116,
+   "mutant": "L539 element 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_node_outside_the_list_is_judged_as_any_mount (v2.test_v21_r3_conf_policy.DeviceNodes.test_a_node_outside_the_list_is_judged_as_any_mount) (name='sda') | ValueError"
+  },
+  {
+   "index": 117,
+   "mutant": "L541 string ': ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_every_recorded_report_is_judged_again_as_it_was (v2.test_v21_r3_conf_policy.RecordedGuest.test_every_recorded_report_is_judged_again_as_it_was) (record='scenarios-X1-shared-tree.json', scenario='host-dev-bound') | AssertionError"
+  },
+  {
+   "index": 118,
+   "mutant": "L541 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_node_outside_the_list_is_judged_as_any_mount (v2.test_v21_r3_conf_policy.DeviceNodes.test_a_node_outside_the_list_is_judged_as_any_mount) (name='sda') | ValueError"
+  },
+  {
+   "index": 119,
+   "mutant": "L541 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_node_outside_the_list_is_judged_as_any_mount (v2.test_v21_r3_conf_policy.DeviceNodes.test_a_node_outside_the_list_is_judged_as_any_mount) (name='sda') | ValueError"
+  },
+  {
+   "index": 120,
+   "mutant": "L542 conditional negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_a_node_outside_the_list_is_judged_as_any_mount (v2.test_v21_r3_conf_policy.DeviceNodes.test_a_node_outside_the_list_is_judged_as_any_mount) (name='sda') | AssertionError"
+  },
+  {
+   "index": 121,
+   "mutant": "L543 string ': ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_a_node_the_probe_did_not_read_is_not_established (v2.test_v21_r3_conf_policy.DeviceNodes.test_a_node_the_probe_did_not_read_is_not_established) (devices={}) | AssertionError"
+  },
+  {
+   "index": 122,
+   "mutant": "L543 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_node_outside_the_list_is_judged_as_any_mount (v2.test_v21_r3_conf_policy.DeviceNodes.test_a_node_outside_the_list_is_judged_as_any_mount) (name='sda') | ValueError"
+  },
+  {
+   "index": 123,
+   "mutant": "L543 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_node_outside_the_list_is_judged_as_any_mount (v2.test_v21_r3_conf_policy.DeviceNodes.test_a_node_outside_the_list_is_judged_as_any_mount) (name='sda') | ValueError"
+  },
+  {
+   "index": 124,
+   "mutant": "L543 element 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_node_outside_the_list_is_judged_as_any_mount (v2.test_v21_r3_conf_policy.DeviceNodes.test_a_node_outside_the_list_is_judged_as_any_mount) (name='sda') | ValueError"
+  },
+  {
+   "index": 125,
+   "mutant": "L543 not removed",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_a_node_outside_the_list_is_judged_as_any_mount (v2.test_v21_r3_conf_policy.DeviceNodes.test_a_node_outside_the_list_is_judged_as_any_mount) (name='sda') | AssertionError"
+  },
+  {
+   "index": 126,
+   "mutant": "L544 string 'cannot establish that a writable mount belongs to the sandbox (isolation not established, not a write that was seen): ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_a_node_the_probe_did_not_read_is_not_established (v2.test_v21_r3_conf_policy.DeviceNodes.test_a_node_the_probe_did_not_read_is_not_established) (devices={}) | AssertionError"
+  },
+  {
+   "index": 127,
+   "mutant": "L546 string 'mounts' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_node_outside_the_list_is_judged_as_any_mount (v2.test_v21_r3_conf_policy.DeviceNodes.test_a_node_outside_the_list_is_judged_as_any_mount) (name='sda') | KeyError"
+  },
+  {
+   "index": 128,
+   "mutant": "L547 NotEq->Eq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_every_recorded_report_is_judged_again_as_it_was (v2.test_v21_r3_conf_policy.RecordedGuest.test_every_recorded_report_is_judged_again_as_it_was) (record='scenarios-X1-shared-tree.json', scenario='alt-dev-sandbox-devpts') | AssertionError"
+  },
+  {
+   "index": 149,
+   "mutant": "L542 string 'writable outside the workspace: ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_another_device_or_a_regular_file_under_the_name_is_refused (v2.test_v21_r3_conf_policy.DeviceNodes.test_another_device_or_a_regular_file_under_the_name_is_refused) (seen='1:5') | AssertionError"
+  },
+  {
+   "index": 159,
+   "mutant": "L542 string ' (' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_every_recorded_report_is_judged_again_as_it_was (v2.test_v21_r3_conf_policy.RecordedGuest.test_every_recorded_report_is_judged_again_as_it_was) (record='scenarios-X1-shared-tree.json', scenario='host-dev-bound') | AssertionError"
+  },
+  {
+   "index": 160,
+   "mutant": "L542 string ')' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_every_recorded_report_is_judged_again_as_it_was (v2.test_v21_r3_conf_policy.RecordedGuest.test_every_recorded_report_is_judged_again_as_it_was) (record='scenarios-X1-shared-tree.json', scenario='host-dev-bound') | AssertionError"
+  },
+  {
+   "index": 161,
+   "mutant": "L547 string 'at' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_proc_of_the_hosts_pid_namespace_is_refused_twice_over (v2.test_v21_r3_conf_policy.RecordedGuest.test_a_proc_of_the_hosts_pid_namespace_is_refused_twice_over) (record='scenarios-X1-shared-tree.json') | KeyError"
+  },
+  {
+   "index": 168,
+   "mutant": "L545 string '; ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T06a.py",
+   "first": "FAIL: test_a_measurement_that_was_accepted_is_accepted_again (v2.test_v21_kills3_T06a.RecordedLinuxMeasurements.test_a_measurement_that_was_accepted_is_accepted_again) (record='P4-all.json', network='none') | AssertionError"
+  },
+  {
+   "index": 170,
+   "mutant": "L542 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_node_outside_the_list_is_judged_as_any_mount (v2.test_v21_r3_conf_policy.DeviceNodes.test_a_node_outside_the_list_is_judged_as_any_mount) (name='sda') | ValueError"
+  },
+  {
+   "index": 171,
+   "mutant": "L542 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_node_outside_the_list_is_judged_as_any_mount (v2.test_v21_r3_conf_policy.DeviceNodes.test_a_node_outside_the_list_is_judged_as_any_mount) (name='sda') | ValueError"
+  },
+  {
+   "index": 172,
+   "mutant": "L546 string 'at' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_proc_of_the_hosts_pid_namespace_is_refused_twice_over (v2.test_v21_r3_conf_policy.RecordedGuest.test_a_proc_of_the_hosts_pid_namespace_is_refused_twice_over) (record='scenarios-X1-shared-tree.json') | KeyError"
+  },
+  {
+   "index": 173,
+   "mutant": "L547 string 'at' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_node_outside_the_list_is_judged_as_any_mount (v2.test_v21_r3_conf_policy.DeviceNodes.test_a_node_outside_the_list_is_judged_as_any_mount) (name='sda') | KeyError"
+  },
+  {
+   "index": 174,
+   "mutant": "L542 string '; ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_every_recorded_report_is_judged_again_as_it_was (v2.test_v21_r3_conf_policy.RecordedGuest.test_every_recorded_report_is_judged_again_as_it_was) (record='scenarios-X1-shared-tree.json', scenario='host-dev-bound') | AssertionError"
+  }
+ ]
+}

@@ -1,0 +1,23 @@
+import json, pathlib, shutil, subprocess, sys, re
+SP = pathlib.Path("/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad")
+OUT = SP / "m21/r3/out/range/review"
+man = json.load(open(OUT / "stmt/manifest.json"))
+res = []
+for m in man:
+    T = OUT / "exp-run" / m["name"]
+    if T.exists(): shutil.rmtree(T)
+    shutil.copytree(OUT / "exp", T)
+    shutil.copy(OUT / "stmt" / f"{m['name']}.py", T / "aisef2/runtime/process_range.py")
+    try:
+        r = subprocess.run([str(SP / "m21/kills3/py.sh"), "range-rv-stmt", "-m", "unittest", "tests.v2.test_v21_r3_range_release_contract"],
+                           cwd=T, capture_output=True, text=True, timeout=240)
+        out = r.stdout + r.stderr
+        end = re.findall(r"^(OK.*|FAILED.*)$", out, re.M)
+        failed = sorted(set(re.findall(r"^(?:FAIL|ERROR): (\w+)", out, re.M)))
+        status = end[-1] if end else "NO-SUMMARY"
+    except subprocess.TimeoutExpired:
+        status, failed = "TIMEOUT", []
+    shutil.rmtree(T)
+    res.append({**m, "status": status, "failed": failed})
+    print(f"{m['name']:48s} L{m['line']:<4d} {status:28s} {m['text']}", flush=True)
+json.dump(res, open(OUT / "stmt/results.json", "w"), indent=1)

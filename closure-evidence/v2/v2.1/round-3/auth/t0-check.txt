@@ -1,0 +1,24 @@
+## tests/v2/test_v21_r3_auth_ps_table.py
+{
+ "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+ "outcome": "PASS",
+ "ran": 29,
+ "seconds": 0.63,
+ "first": null
+}
+## tests/v2/test_v21_r3_auth_other_readers.py
+{
+ "file": "tests/v2/test_v21_r3_auth_other_readers.py",
+ "outcome": "PASS",
+ "ran": 34,
+ "seconds": 1.74,
+ "first": null
+}
+## tests/v2/test_v21_defects_runner.py
+{
+ "file": "tests/v2/test_v21_defects_runner.py",
+ "outcome": "PASS",
+ "ran": 3,
+ "seconds": 0.39,
+ "first": null
+}

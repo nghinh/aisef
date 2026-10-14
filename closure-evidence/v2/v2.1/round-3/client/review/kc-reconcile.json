@@ -1,0 +1,1075 @@
+{
+ "target": "aisef2/app/lineage.py::reconcile",
+ "files": [
+  "tests/v2/test_v21_r3_client_readers.py",
+  "tests/v2/test_v21_kills3_T08a.py",
+  "tests/v2/test_v21_kills3_A08.py",
+  "tests/v2/test_v21_continue_usage.py"
+ ],
+ "source_sha256": "85122bfb4d22125eeba871d91e8a848babb3fbaf41eb574dc20eb3869f4494f9",
+ "t0": [
+  {
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "seconds": 1.65,
+   "outcome": "PASS",
+   "ran": 12
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T08a.py",
+   "seconds": 1.94,
+   "outcome": "PASS",
+   "ran": 10
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_A08.py",
+   "seconds": 0.78,
+   "outcome": "PASS",
+   "ran": 4
+  },
+  {
+   "file": "tests/v2/test_v21_continue_usage.py",
+   "seconds": 56.2,
+   "outcome": "PASS",
+   "ran": 10
+  }
+ ],
+ "error": null,
+ "results": [
+  {
+   "index": 0,
+   "mutant": "L217 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | ValueError"
+  },
+  {
+   "index": 1,
+   "mutant": "L249 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | FileNotFoundError"
+  },
+  {
+   "index": 2,
+   "mutant": "L256 returns None",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | TypeError"
+  },
+  {
+   "index": 3,
+   "mutant": "L212 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | KeyError"
+  },
+  {
+   "index": 4,
+   "mutant": "L217 NotEq->Eq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | ValueError"
+  },
+  {
+   "index": 5,
+   "mutant": "L231 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | ValueError"
+  },
+  {
+   "index": 6,
+   "mutant": "L242 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | TypeError"
+  },
+  {
+   "index": 7,
+   "mutant": "L256 dict entry 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | KeyError"
+  },
+  {
+   "index": 8,
+   "mutant": "L256 dict entry 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T08a.py",
+   "first": "ERROR: test_a_merge_looking_commit_of_a_closed_story_is_unidentified_and_of_an_open_one_is_the_kernels (v2.test_v21_kills3_T08a.ClosedStory.test_a_merge_looking_commit_of_a_closed_story_is_unidentified_and_of_an_open_one_is_the_kernels) | KeyError"
+  },
+  {
+   "index": 9,
+   "mutant": "L256 dict entry 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T08a.py",
+   "first": "ERROR: test_a_whole_journal_has_no_cut_event (v2.test_v21_kills3_T08a.CutEvent.test_a_whole_journal_has_no_cut_event) | KeyError"
+  },
+  {
+   "index": 10,
+   "mutant": "L207 string 'repo' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | KeyError"
+  },
+  {
+   "index": 11,
+   "mutant": "L212 In->NotIn",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | KeyError"
+  },
+  {
+   "index": 12,
+   "mutant": "L224 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | KeyError"
+  },
+  {
+   "index": 13,
+   "mutant": "L231 not removed",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | TypeError"
+  },
+  {
+   "index": 14,
+   "mutant": "L234 string '\\n\\n' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | ValueError"
+  },
+  {
+   "index": 15,
+   "mutant": "L242 And swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | TypeError"
+  },
+  {
+   "index": 16,
+   "mutant": "L252 dict entry 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T08a.py",
+   "first": "FAIL: test_the_cut_event_has_exactly_its_five_fields_and_a_reason (v2.test_v21_kills3_T08a.CutEvent.test_the_cut_event_has_exactly_its_five_fields_and_a_reason) [cut before its type, the last field] | AssertionError"
+  },
+  {
+   "index": 17,
+   "mutant": "L252 dict entry 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T08a.py",
+   "first": "FAIL: test_the_cut_event_has_exactly_its_five_fields_and_a_reason (v2.test_v21_kills3_T08a.CutEvent.test_the_cut_event_has_exactly_its_five_fields_and_a_reason) [cut before its type, the last field] | AssertionError"
+  },
+  {
+   "index": 18,
+   "mutant": "L252 dict entry 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T08a.py",
+   "first": "FAIL: test_the_cut_event_has_exactly_its_five_fields_and_a_reason (v2.test_v21_kills3_T08a.CutEvent.test_the_cut_event_has_exactly_its_five_fields_and_a_reason) [cut before its type, the last field] | AssertionError"
+  },
+  {
+   "index": 19,
+   "mutant": "L252 dict entry 3 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T08a.py",
+   "first": "FAIL: test_the_cut_event_has_exactly_its_five_fields_and_a_reason (v2.test_v21_kills3_T08a.CutEvent.test_the_cut_event_has_exactly_its_five_fields_and_a_reason) [cut before its type, the last field] | AssertionError"
+  },
+  {
+   "index": 20,
+   "mutant": "L252 dict entry 4 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T08a.py",
+   "first": "FAIL: test_the_cut_event_has_exactly_its_five_fields_and_a_reason (v2.test_v21_kills3_T08a.CutEvent.test_the_cut_event_has_exactly_its_five_fields_and_a_reason) [cut before its type, the last field] | AssertionError"
+  },
+  {
+   "index": 21,
+   "mutant": "L256 string 'items' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | KeyError"
+  },
+  {
+   "index": 22,
+   "mutant": "L256 string 'unidentified' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T08a.py",
+   "first": "ERROR: test_a_merge_looking_commit_of_a_closed_story_is_unidentified_and_of_an_open_one_is_the_kernels (v2.test_v21_kills3_T08a.ClosedStory.test_a_merge_looking_commit_of_a_closed_story_is_unidentified_and_of_an_open_one_is_the_kernels) | KeyError"
+  },
+  {
+   "index": 23,
+   "mutant": "L256 string 'cut_event' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T08a.py",
+   "first": "ERROR: test_a_whole_journal_has_no_cut_event (v2.test_v21_kills3_T08a.CutEvent.test_a_whole_journal_has_no_cut_event) | KeyError"
+  },
+  {
+   "index": 24,
+   "mutant": "L208 string 'candidate' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | KeyError"
+  },
+  {
+   "index": 25,
+   "mutant": "L208 string 'story_id' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | KeyError"
+  },
+  {
+   "index": 26,
+   "mutant": "L209 And swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A08.py",
+   "first": "FAIL: test_an_event_that_only_names_a_candidate_does_not_identify_its_merge (v2.test_v21_kills3_A08.ReconcileIdentifiesAMergeByAProvedCandidateOnly.test_an_event_that_only_names_a_candidate_does_not_identify_its_merge) | AssertionError"
+  },
+  {
+   "index": 27,
+   "mutant": "L212 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | KeyError"
+  },
+  {
+   "index": 28,
+   "mutant": "L212 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T08a.py",
+   "first": "FAIL: test_a_merge_looking_commit_of_a_closed_story_is_unidentified_and_of_an_open_one_is_the_kernels (v2.test_v21_kills3_T08a.ClosedStory.test_a_merge_looking_commit_of_a_closed_story_is_unidentified_and_of_an_open_one_is_the_kernels) | AssertionError"
+  },
+  {
+   "index": 29,
+   "mutant": "L214 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | ValueError"
+  },
+  {
+   "index": 30,
+   "mutant": "L214 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | ValueError"
+  },
+  {
+   "index": 31,
+   "mutant": "L214 Gt->LtE",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | KeyError"
+  },
+  {
+   "index": 32,
+   "mutant": "L218 string 'rev-list' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | KeyError"
+  },
+  {
+   "index": 33,
+   "mutant": "L218 string '--first-parent' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | KeyError"
+  },
+  {
+   "index": 34,
+   "mutant": "L218 string '--reverse' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | KeyError"
+  },
+  {
+   "index": 35,
+   "mutant": "L218 string '--parents' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | KeyError"
+  },
+  {
+   "index": 36,
+   "mutant": "L220 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | NameError"
+  },
+  {
+   "index": 37,
+   "mutant": "L220 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | ValueError"
+  },
+  {
+   "index": 38,
+   "mutant": "L222 conditional negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | KeyError"
+  },
+  {
+   "index": 39,
+   "mutant": "L224 And swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T08a.py",
+   "first": "FAIL: test_a_merge_looking_commit_of_a_closed_story_is_unidentified_and_of_an_open_one_is_the_kernels (v2.test_v21_kills3_T08a.ClosedStory.test_a_merge_looking_commit_of_a_closed_story_is_unidentified_and_of_an_open_one_is_the_kernels) | AssertionError"
+  },
+  {
+   "index": 40,
+   "mutant": "L239 string 'wt-(.+)' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | IndexError"
+  },
+  {
+   "index": 41,
+   "mutant": "L240 string 'HEAD' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "FAIL: test_a_worktree_under_a_directory_whose_name_holds_a_separator_is_found (v2.test_v21_r3_client_readers.WorktreeListing.test_a_worktree_under_a_directory_whose_name_holds_a_separator_is_found) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 42,
+   "mutant": "L242 In->NotIn",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "FAIL: test_a_worktree_under_a_directory_whose_name_holds_a_separator_is_found (v2.test_v21_r3_client_readers.WorktreeListing.test_a_worktree_under_a_directory_whose_name_holds_a_separator_is_found) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 43,
+   "mutant": "L242 NotEq->Eq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "FAIL: test_a_worktree_under_a_directory_whose_name_holds_a_separator_is_found (v2.test_v21_r3_client_readers.WorktreeListing.test_a_worktree_under_a_directory_whose_name_holds_a_separator_is_found) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 44,
+   "mutant": "L242 NotIn->In",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "FAIL: test_a_worktree_under_a_directory_whose_name_holds_a_separator_is_found (v2.test_v21_r3_client_readers.WorktreeListing.test_a_worktree_under_a_directory_whose_name_holds_a_separator_is_found) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 45,
+   "mutant": "L243 NotIn->In",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "FAIL: test_a_worktree_under_a_directory_whose_name_holds_a_separator_is_found (v2.test_v21_r3_client_readers.WorktreeListing.test_a_worktree_under_a_directory_whose_name_holds_a_separator_is_found) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 46,
+   "mutant": "L243 NotEq->Eq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "FAIL: test_a_worktree_under_a_directory_whose_name_holds_a_separator_is_found (v2.test_v21_r3_client_readers.WorktreeListing.test_a_worktree_under_a_directory_whose_name_holds_a_separator_is_found) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 47,
+   "mutant": "L244 Eq->NotEq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "FAIL: test_a_worktree_under_a_directory_whose_name_holds_a_separator_is_found (v2.test_v21_r3_client_readers.WorktreeListing.test_a_worktree_under_a_directory_whose_name_holds_a_separator_is_found) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 48,
+   "mutant": "L252 string 'seq' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T08a.py",
+   "first": "FAIL: test_the_cut_event_has_exactly_its_five_fields_and_a_reason (v2.test_v21_kills3_T08a.CutEvent.test_the_cut_event_has_exactly_its_five_fields_and_a_reason) [cut before its type, the last field] | AssertionError"
+  },
+  {
+   "index": 49,
+   "mutant": "L252 string 'bytes' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T08a.py",
+   "first": "FAIL: test_the_cut_event_has_exactly_its_five_fields_and_a_reason (v2.test_v21_kills3_T08a.CutEvent.test_the_cut_event_has_exactly_its_five_fields_and_a_reason) [cut before its type, the last field] | AssertionError"
+  },
+  {
+   "index": 50,
+   "mutant": "L252 string 'type' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T08a.py",
+   "first": "FAIL: test_the_cut_event_has_exactly_its_five_fields_and_a_reason (v2.test_v21_kills3_T08a.CutEvent.test_the_cut_event_has_exactly_its_five_fields_and_a_reason) [cut before its type, the last field] | AssertionError"
+  },
+  {
+   "index": 51,
+   "mutant": "L253 string 'stories' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T08a.py",
+   "first": "FAIL: test_the_cut_event_has_exactly_its_five_fields_and_a_reason (v2.test_v21_kills3_T08a.CutEvent.test_the_cut_event_has_exactly_its_five_fields_and_a_reason) [cut before its type, the last field] | AssertionError"
+  },
+  {
+   "index": 52,
+   "mutant": "L254 string 'why' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T08a.py",
+   "first": "FAIL: test_the_cut_event_has_exactly_its_five_fields_and_a_reason (v2.test_v21_kills3_T08a.CutEvent.test_the_cut_event_has_exactly_its_five_fields_and_a_reason) [cut before its type, the last field] | AssertionError"
+  },
+  {
+   "index": 53,
+   "mutant": "L252 conditional negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T08a.py",
+   "first": "ERROR: test_the_cut_event_has_exactly_its_five_fields_and_a_reason (v2.test_v21_kills3_T08a.CutEvent.test_the_cut_event_has_exactly_its_five_fields_and_a_reason) [cut before its type, the last field] | AttributeError"
+  },
+  {
+   "index": 54,
+   "mutant": "L253 sorted() -> list()",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T08a.py",
+   "first": "FAIL: test_the_stories_the_cut_bytes_hold_are_listed_sorted (v2.test_v21_kills3_T08a.CutEvent.test_the_stories_the_cut_bytes_hold_are_listed_sorted) | AssertionError"
+  },
+  {
+   "index": 55,
+   "mutant": "L254 string 'the last append was cut: its record is lost; its effects, if any, are among the items reconciled against git \u2014 never assumed undone' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T08a.py",
+   "first": "FAIL: test_the_cut_event_has_exactly_its_five_fields_and_a_reason (v2.test_v21_kills3_T08a.CutEvent.test_the_cut_event_has_exactly_its_five_fields_and_a_reason) [cut before its type, the last field] | AssertionError"
+  },
+  {
+   "index": 56,
+   "mutant": "L209 Eq->NotEq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | KeyError"
+  },
+  {
+   "index": 57,
+   "mutant": "L212 string 'story/begin' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | KeyError"
+  },
+  {
+   "index": 58,
+   "mutant": "L212 string 'story/end' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T08a.py",
+   "first": "FAIL: test_a_merge_looking_commit_of_a_closed_story_is_unidentified_and_of_an_open_one_is_the_kernels (v2.test_v21_kills3_T08a.ClosedStory.test_a_merge_looking_commit_of_a_closed_story_is_unidentified_and_of_an_open_one_is_the_kernels) | AssertionError"
+  },
+  {
+   "index": 59,
+   "mutant": "L213 conditional negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | KeyError"
+  },
+  {
+   "index": 60,
+   "mutant": "L218 string '..' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | KeyError"
+  },
+  {
+   "index": 61,
+   "mutant": "L222 Eq->NotEq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | KeyError"
+  },
+  {
+   "index": 62,
+   "mutant": "L224 In->NotIn",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | KeyError"
+  },
+  {
+   "index": 63,
+   "mutant": "L224 Eq->NotEq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | KeyError"
+  },
+  {
+   "index": 64,
+   "mutant": "L232 dict entry 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T08a.py",
+   "first": "ERROR: test_main_behind_the_last_journaled_commit_is_one_unidentified_item (v2.test_v21_kills3_T08a.MainMovedBack.test_main_behind_the_last_journaled_commit_is_one_unidentified_item) | KeyError"
+  },
+  {
+   "index": 65,
+   "mutant": "L232 dict entry 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T08a.py",
+   "first": "FAIL: test_main_behind_the_last_journaled_commit_is_one_unidentified_item (v2.test_v21_kills3_T08a.MainMovedBack.test_main_behind_the_last_journaled_commit_is_one_unidentified_item) | AssertionError"
+  },
+  {
+   "index": 66,
+   "mutant": "L232 dict entry 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T08a.py",
+   "first": "ERROR: test_main_behind_the_last_journaled_commit_is_one_unidentified_item (v2.test_v21_kills3_T08a.MainMovedBack.test_main_behind_the_last_journaled_commit_is_one_unidentified_item) | KeyError"
+  },
+  {
+   "index": 67,
+   "mutant": "L232 dict entry 3 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T08a.py",
+   "first": "FAIL: test_main_behind_the_last_journaled_commit_is_one_unidentified_item (v2.test_v21_kills3_T08a.MainMovedBack.test_main_behind_the_last_journaled_commit_is_one_unidentified_item) | AssertionError"
+  },
+  {
+   "index": 68,
+   "mutant": "L241 string 'commit' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | KeyError"
+  },
+  {
+   "index": 69,
+   "mutant": "L245 dict entry 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_a_worktree_under_a_directory_whose_name_holds_a_separator_is_found (v2.test_v21_r3_client_readers.WorktreeListing.test_a_worktree_under_a_directory_whose_name_holds_a_separator_is_found) (separator='U+2028') | KeyError"
+  },
+  {
+   "index": 70,
+   "mutant": "L245 dict entry 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_a_worktree_under_a_directory_whose_name_holds_a_separator_is_found (v2.test_v21_r3_client_readers.WorktreeListing.test_a_worktree_under_a_directory_whose_name_holds_a_separator_is_found) (separator='U+2028') | KeyError"
+  },
+  {
+   "index": 71,
+   "mutant": "L245 dict entry 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_a_worktree_under_a_directory_whose_name_holds_a_separator_is_found (v2.test_v21_r3_client_readers.WorktreeListing.test_a_worktree_under_a_directory_whose_name_holds_a_separator_is_found) (separator='U+2028') | KeyError"
+  },
+  {
+   "index": 72,
+   "mutant": "L245 dict entry 3 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_a_worktree_under_a_directory_whose_name_holds_a_separator_is_found (v2.test_v21_r3_client_readers.WorktreeListing.test_a_worktree_under_a_directory_whose_name_holds_a_separator_is_found) (separator='U+2028') | KeyError"
+  },
+  {
+   "index": 73,
+   "mutant": "L245 dict entry 4 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_item_says_whose_candidate_where_and_what_the_continuation_does_with_it (v2.test_v21_r3_client_readers.WorktreeListing.test_the_item_says_whose_candidate_where_and_what_the_continuation_does_with_it) | KeyError"
+  },
+  {
+   "index": 74,
+   "mutant": "L256 not removed",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T08a.py",
+   "first": "FAIL: test_a_merge_looking_commit_of_a_closed_story_is_unidentified_and_of_an_open_one_is_the_kernels (v2.test_v21_kills3_T08a.ClosedStory.test_a_merge_looking_commit_of_a_closed_story_is_unidentified_and_of_an_open_one_is_the_kernels) | AssertionError"
+  },
+  {
+   "index": 75,
+   "mutant": "L209 string 'proof/verified' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | KeyError"
+  },
+  {
+   "index": 76,
+   "mutant": "L209 string 'candidate' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | KeyError"
+  },
+  {
+   "index": 77,
+   "mutant": "L213 string 'story_id' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | KeyError"
+  },
+  {
+   "index": 78,
+   "mutant": "L213 Eq->NotEq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | KeyError"
+  },
+  {
+   "index": 79,
+   "mutant": "L216 string 'rev-parse' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_a_worktree_under_a_directory_whose_name_holds_a_separator_is_found (v2.test_v21_r3_client_readers.WorktreeListing.test_a_worktree_under_a_directory_whose_name_holds_a_separator_is_found) (separator='U+2028') | KeyError"
+  },
+  {
+   "index": 80,
+   "mutant": "L216 string 'main' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_a_worktree_under_a_directory_whose_name_holds_a_separator_is_found (v2.test_v21_r3_client_readers.WorktreeListing.test_a_worktree_under_a_directory_whose_name_holds_a_separator_is_found) (separator='U+2028') | KeyError"
+  },
+  {
+   "index": 81,
+   "mutant": "L225 dict entry 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | KeyError"
+  },
+  {
+   "index": 82,
+   "mutant": "L225 dict entry 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | KeyError"
+  },
+  {
+   "index": 83,
+   "mutant": "L225 dict entry 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | KeyError"
+  },
+  {
+   "index": 84,
+   "mutant": "L225 dict entry 3 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | KeyError"
+  },
+  {
+   "index": 85,
+   "mutant": "L225 dict entry 4 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | KeyError"
+  },
+  {
+   "index": 86,
+   "mutant": "L225 dict entry 5 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | KeyError"
+  },
+  {
+   "index": 87,
+   "mutant": "L229 dict entry 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T08a.py",
+   "first": "ERROR: test_a_merge_looking_commit_of_a_closed_story_is_unidentified_and_of_an_open_one_is_the_kernels (v2.test_v21_kills3_T08a.ClosedStory.test_a_merge_looking_commit_of_a_closed_story_is_unidentified_and_of_an_open_one_is_the_kernels) | KeyError"
+  },
+  {
+   "index": 88,
+   "mutant": "L229 dict entry 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T08a.py",
+   "first": "ERROR: test_a_merge_looking_commit_of_a_closed_story_is_unidentified_and_of_an_open_one_is_the_kernels (v2.test_v21_kills3_T08a.ClosedStory.test_a_merge_looking_commit_of_a_closed_story_is_unidentified_and_of_an_open_one_is_the_kernels) | KeyError"
+  },
+  {
+   "index": 89,
+   "mutant": "L229 dict entry 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T08a.py",
+   "first": "ERROR: test_a_merge_looking_commit_of_a_closed_story_is_unidentified_and_of_an_open_one_is_the_kernels (v2.test_v21_kills3_T08a.ClosedStory.test_a_merge_looking_commit_of_a_closed_story_is_unidentified_and_of_an_open_one_is_the_kernels) | KeyError"
+  },
+  {
+   "index": 90,
+   "mutant": "L229 dict entry 3 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_continue_usage.py",
+   "first": "ERROR: test_a_merge_the_journal_never_committed_is_left_out (v2.test_v21_continue_usage.Continue.test_a_merge_the_journal_never_committed_is_left_out) | KeyError"
+  },
+  {
+   "index": 91,
+   "mutant": "L229 dict entry 4 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T08a.py",
+   "first": "ERROR: test_a_stray_commit_is_unidentified_with_a_reason_that_is_not_main_moved_back (v2.test_v21_kills3_T08a.UnidentifiedCommit.test_a_stray_commit_is_unidentified_with_a_reason_that_is_not_main_moved_back) | KeyError"
+  },
+  {
+   "index": 92,
+   "mutant": "L232 string 'commit' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T08a.py",
+   "first": "ERROR: test_main_behind_the_last_journaled_commit_is_one_unidentified_item (v2.test_v21_kills3_T08a.MainMovedBack.test_main_behind_the_last_journaled_commit_is_one_unidentified_item) | KeyError"
+  },
+  {
+   "index": 93,
+   "mutant": "L232 string 'operation' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T08a.py",
+   "first": "FAIL: test_main_behind_the_last_journaled_commit_is_one_unidentified_item (v2.test_v21_kills3_T08a.MainMovedBack.test_main_behind_the_last_journaled_commit_is_one_unidentified_item) | AssertionError"
+  },
+  {
+   "index": 94,
+   "mutant": "L232 string 'identified' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T08a.py",
+   "first": "ERROR: test_main_behind_the_last_journaled_commit_is_one_unidentified_item (v2.test_v21_kills3_T08a.MainMovedBack.test_main_behind_the_last_journaled_commit_is_one_unidentified_item) | KeyError"
+  },
+  {
+   "index": 95,
+   "mutant": "L233 string 'why' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T08a.py",
+   "first": "FAIL: test_main_behind_the_last_journaled_commit_is_one_unidentified_item (v2.test_v21_kills3_T08a.MainMovedBack.test_main_behind_the_last_journaled_commit_is_one_unidentified_item) | AssertionError"
+  },
+  {
+   "index": 96,
+   "mutant": "L232 string 'unknown' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T08a.py",
+   "first": "FAIL: test_main_behind_the_last_journaled_commit_is_one_unidentified_item (v2.test_v21_kills3_T08a.MainMovedBack.test_main_behind_the_last_journaled_commit_is_one_unidentified_item) | AssertionError"
+  },
+  {
+   "index": 97,
+   "mutant": "L232 False->True",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T08a.py",
+   "first": "FAIL: test_main_behind_the_last_journaled_commit_is_one_unidentified_item (v2.test_v21_kills3_T08a.MainMovedBack.test_main_behind_the_last_journaled_commit_is_one_unidentified_item) | AssertionError"
+  },
+  {
+   "index": 98,
+   "mutant": "L234 string 'worktree' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "FAIL: test_a_worktree_under_a_directory_whose_name_holds_a_separator_is_found (v2.test_v21_r3_client_readers.WorktreeListing.test_a_worktree_under_a_directory_whose_name_holds_a_separator_is_found) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 99,
+   "mutant": "L234 string 'list' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "FAIL: test_a_worktree_under_a_directory_whose_name_holds_a_separator_is_found (v2.test_v21_r3_client_readers.WorktreeListing.test_a_worktree_under_a_directory_whose_name_holds_a_separator_is_found) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 100,
+   "mutant": "L234 string '--porcelain' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "FAIL: test_a_worktree_under_a_directory_whose_name_holds_a_separator_is_found (v2.test_v21_r3_client_readers.WorktreeListing.test_a_worktree_under_a_directory_whose_name_holds_a_separator_is_found) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 101,
+   "mutant": "L237 string ' ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | ValueError"
+  },
+  {
+   "index": 102,
+   "mutant": "L237 In->NotIn",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | ValueError"
+  },
+  {
+   "index": 103,
+   "mutant": "L238 string 'worktree' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "FAIL: test_a_worktree_under_a_directory_whose_name_holds_a_separator_is_found (v2.test_v21_r3_client_readers.WorktreeListing.test_a_worktree_under_a_directory_whose_name_holds_a_separator_is_found) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 104,
+   "mutant": "L245 string 'commit' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_a_worktree_under_a_directory_whose_name_holds_a_separator_is_found (v2.test_v21_r3_client_readers.WorktreeListing.test_a_worktree_under_a_directory_whose_name_holds_a_separator_is_found) (separator='U+2028') | KeyError"
+  },
+  {
+   "index": 105,
+   "mutant": "L245 string 'operation' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_a_worktree_under_a_directory_whose_name_holds_a_separator_is_found (v2.test_v21_r3_client_readers.WorktreeListing.test_a_worktree_under_a_directory_whose_name_holds_a_separator_is_found) (separator='U+2028') | KeyError"
+  },
+  {
+   "index": 106,
+   "mutant": "L245 string 'story' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_a_worktree_under_a_directory_whose_name_holds_a_separator_is_found (v2.test_v21_r3_client_readers.WorktreeListing.test_a_worktree_under_a_directory_whose_name_holds_a_separator_is_found) (separator='U+2028') | KeyError"
+  },
+  {
+   "index": 107,
+   "mutant": "L245 string 'identified' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_a_worktree_under_a_directory_whose_name_holds_a_separator_is_found (v2.test_v21_r3_client_readers.WorktreeListing.test_a_worktree_under_a_directory_whose_name_holds_a_separator_is_found) (separator='U+2028') | KeyError"
+  },
+  {
+   "index": 108,
+   "mutant": "L246 string 'why' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_item_says_whose_candidate_where_and_what_the_continuation_does_with_it (v2.test_v21_r3_client_readers.WorktreeListing.test_the_item_says_whose_candidate_where_and_what_the_continuation_does_with_it) | KeyError"
+  },
+  {
+   "index": 109,
+   "mutant": "L245 string 'candidate' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "FAIL: test_a_worktree_under_a_directory_whose_name_holds_a_separator_is_found (v2.test_v21_r3_client_readers.WorktreeListing.test_a_worktree_under_a_directory_whose_name_holds_a_separator_is_found) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 110,
+   "mutant": "L245 True->False",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "FAIL: test_a_worktree_under_a_directory_whose_name_holds_a_separator_is_found (v2.test_v21_r3_client_readers.WorktreeListing.test_a_worktree_under_a_directory_whose_name_holds_a_separator_is_found) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 111,
+   "mutant": "L213 string 'story_id' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | KeyError"
+  },
+  {
+   "index": 112,
+   "mutant": "L213 string 'story/begin' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | KeyError"
+  },
+  {
+   "index": 113,
+   "mutant": "L224 string 'merge ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | KeyError"
+  },
+  {
+   "index": 114,
+   "mutant": "L225 string 'commit' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | KeyError"
+  },
+  {
+   "index": 115,
+   "mutant": "L225 string 'operation' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | KeyError"
+  },
+  {
+   "index": 116,
+   "mutant": "L225 string 'story' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | KeyError"
+  },
+  {
+   "index": 117,
+   "mutant": "L225 string 'candidate' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | KeyError"
+  },
+  {
+   "index": 118,
+   "mutant": "L225 string 'identified' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | KeyError"
+  },
+  {
+   "index": 119,
+   "mutant": "L226 string 'why' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | KeyError"
+  },
+  {
+   "index": 120,
+   "mutant": "L225 string 'merge' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "FAIL: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | AssertionError"
+  },
+  {
+   "index": 121,
+   "mutant": "L225 True->False",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "FAIL: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | AssertionError"
+  },
+  {
+   "index": 122,
+   "mutant": "L229 string 'commit' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T08a.py",
+   "first": "ERROR: test_a_merge_looking_commit_of_a_closed_story_is_unidentified_and_of_an_open_one_is_the_kernels (v2.test_v21_kills3_T08a.ClosedStory.test_a_merge_looking_commit_of_a_closed_story_is_unidentified_and_of_an_open_one_is_the_kernels) | KeyError"
+  },
+  {
+   "index": 123,
+   "mutant": "L229 string 'operation' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T08a.py",
+   "first": "ERROR: test_a_merge_looking_commit_of_a_closed_story_is_unidentified_and_of_an_open_one_is_the_kernels (v2.test_v21_kills3_T08a.ClosedStory.test_a_merge_looking_commit_of_a_closed_story_is_unidentified_and_of_an_open_one_is_the_kernels) | KeyError"
+  },
+  {
+   "index": 124,
+   "mutant": "L229 string 'identified' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T08a.py",
+   "first": "ERROR: test_a_merge_looking_commit_of_a_closed_story_is_unidentified_and_of_an_open_one_is_the_kernels (v2.test_v21_kills3_T08a.ClosedStory.test_a_merge_looking_commit_of_a_closed_story_is_unidentified_and_of_an_open_one_is_the_kernels) | KeyError"
+  },
+  {
+   "index": 125,
+   "mutant": "L229 string 'subject' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_continue_usage.py",
+   "first": "ERROR: test_a_merge_the_journal_never_committed_is_left_out (v2.test_v21_continue_usage.Continue.test_a_merge_the_journal_never_committed_is_left_out) | KeyError"
+  },
+  {
+   "index": 126,
+   "mutant": "L230 string 'why' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T08a.py",
+   "first": "ERROR: test_a_stray_commit_is_unidentified_with_a_reason_that_is_not_main_moved_back (v2.test_v21_kills3_T08a.UnidentifiedCommit.test_a_stray_commit_is_unidentified_with_a_reason_that_is_not_main_moved_back) | KeyError"
+  },
+  {
+   "index": 127,
+   "mutant": "L229 string 'unknown' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T08a.py",
+   "first": "FAIL: test_a_merge_looking_commit_of_a_closed_story_is_unidentified_and_of_an_open_one_is_the_kernels (v2.test_v21_kills3_T08a.ClosedStory.test_a_merge_looking_commit_of_a_closed_story_is_unidentified_and_of_an_open_one_is_the_kernels) | AssertionError"
+  },
+  {
+   "index": 128,
+   "mutant": "L229 False->True",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T08a.py",
+   "first": "FAIL: test_a_merge_looking_commit_of_a_closed_story_is_unidentified_and_of_an_open_one_is_the_kernels (v2.test_v21_kills3_T08a.ClosedStory.test_a_merge_looking_commit_of_a_closed_story_is_unidentified_and_of_an_open_one_is_the_kernels) | AssertionError"
+  },
+  {
+   "index": 129,
+   "mutant": "L230 string 'a commit on main no journaled operation of this run accounts for' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T08a.py",
+   "first": "FAIL: test_a_stray_commit_is_unidentified_with_a_reason_that_is_not_main_moved_back (v2.test_v21_kills3_T08a.UnidentifiedCommit.test_a_stray_commit_is_unidentified_with_a_reason_that_is_not_main_moved_back) | AssertionError"
+  },
+  {
+   "index": 130,
+   "mutant": "L233 string 'main ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T08a.py",
+   "first": "FAIL: test_main_behind_the_last_journaled_commit_is_one_unidentified_item (v2.test_v21_kills3_T08a.MainMovedBack.test_main_behind_the_last_journaled_commit_is_one_unidentified_item) | AssertionError"
+  },
+  {
+   "index": 131,
+   "mutant": "L233 string \" does not descend from the journal's last commit \" emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T08a.py",
+   "first": "FAIL: test_main_behind_the_last_journaled_commit_is_one_unidentified_item (v2.test_v21_kills3_T08a.MainMovedBack.test_main_behind_the_last_journaled_commit_is_one_unidentified_item) | AssertionError"
+  },
+  {
+   "index": 132,
+   "mutant": "L237 string '\\n' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | ValueError"
+  },
+  {
+   "index": 133,
+   "mutant": "L237 string ' ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | ValueError"
+  },
+  {
+   "index": 134,
+   "mutant": "L243 string 'merge-base' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T08a.py",
+   "first": "FAIL: test_a_head_main_already_contains_is_not_a_second_item_and_one_it_does_not_is_the_candidate (v2.test_v21_kills3_T08a.WorktreeHead.test_a_head_main_already_contains_is_not_a_second_item_and_one_it_does_not_is_the_candidate) | AssertionError"
+  },
+  {
+   "index": 135,
+   "mutant": "L243 string '--is-ancestor' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T08a.py",
+   "first": "FAIL: test_a_head_main_already_contains_is_not_a_second_item_and_one_it_does_not_is_the_candidate (v2.test_v21_kills3_T08a.WorktreeHead.test_a_head_main_already_contains_is_not_a_second_item_and_one_it_does_not_is_the_candidate) | AssertionError"
+  },
+  {
+   "index": 136,
+   "mutant": "L244 string 'merge-base' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "FAIL: test_a_worktree_under_a_directory_whose_name_holds_a_separator_is_found (v2.test_v21_r3_client_readers.WorktreeListing.test_a_worktree_under_a_directory_whose_name_holds_a_separator_is_found) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 137,
+   "mutant": "L244 string '--is-ancestor' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "FAIL: test_a_worktree_under_a_directory_whose_name_holds_a_separator_is_found (v2.test_v21_r3_client_readers.WorktreeListing.test_a_worktree_under_a_directory_whose_name_holds_a_separator_is_found) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 138,
+   "mutant": "L246 string \"the developer's candidate of \" emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "FAIL: test_the_item_says_whose_candidate_where_and_what_the_continuation_does_with_it (v2.test_v21_r3_client_readers.WorktreeListing.test_the_item_says_whose_candidate_where_and_what_the_continuation_does_with_it) | AssertionError"
+  },
+  {
+   "index": 139,
+   "mutant": "L246 string \" in the kernel's worktree \" emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "FAIL: test_the_item_says_whose_candidate_where_and_what_the_continuation_does_with_it (v2.test_v21_r3_client_readers.WorktreeListing.test_the_item_says_whose_candidate_where_and_what_the_continuation_does_with_it) | AssertionError"
+  },
+  {
+   "index": 140,
+   "mutant": "L246 string ', never journaled (no proof ran on it): developed again' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "FAIL: test_the_item_says_whose_candidate_where_and_what_the_continuation_does_with_it (v2.test_v21_r3_client_readers.WorktreeListing.test_the_item_says_whose_candidate_where_and_what_the_continuation_does_with_it) | AssertionError"
+  },
+  {
+   "index": 141,
+   "mutant": "L256 string 'identified' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | KeyError"
+  },
+  {
+   "index": 142,
+   "mutant": "L221 string 'log' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | KeyError"
+  },
+  {
+   "index": 143,
+   "mutant": "L221 string '-1' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | KeyError"
+  },
+  {
+   "index": 144,
+   "mutant": "L221 string '--format=%s' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | KeyError"
+  },
+  {
+   "index": 145,
+   "mutant": "L226 string \"the kernel's merge of \" emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "FAIL: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | AssertionError"
+  },
+  {
+   "index": 146,
+   "mutant": "L226 string \"'s proved candidate \" emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "FAIL: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | AssertionError"
+  },
+  {
+   "index": 147,
+   "mutant": "L226 string ': its post-merge proof and commit were never journaled' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "FAIL: test_the_kernels_merge_in_flight_is_stated (v2.test_v21_r3_client_readers.MergeStatement.test_the_kernels_merge_in_flight_is_stated) | AssertionError"
+  }
+ ]
+}

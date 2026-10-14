@@ -1,0 +1,120 @@
+{
+ "files": 12,
+ "distinct": 12,
+ "rows": [
+  {
+   "sha": "fbd6af3676213e6b8f4cea774caa47f18e7f43538fedf7976450cee3b6592034",
+   "path": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/wt/usage-rv/tests/v2/fixtures/journal/unknown_required.jsonl",
+   "copies": 1,
+   "status": "reader-refuses",
+   "why": "UnknownRequiredEvent: seq 2: unknown event type 'story/checkpoint' is not marked ignorable \u2014 this reader refuses to reconstruct the journal (\u00a7"
+  },
+  {
+   "sha": "20fd4b58c5a955dc592a3069add0866d087d095669185a89309f538048190dd6",
+   "path": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/wt/usage-rv/tests/v2/fixtures/journal/known_log.jsonl",
+   "copies": 1,
+   "status": "ok",
+   "format": 1,
+   "events": 4,
+   "torn": false,
+   "helper_refusal": null,
+   "own_refusal": null,
+   "no_progress_rows": 0
+  },
+  {
+   "sha": "8af2b1acfae5ceded32520849fa8028ddbbf534b43ac47f00ed3aafb64c11527",
+   "path": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/wt/usage-rv/tests/v2/fixtures/journal/unknown_ignorable.jsonl",
+   "copies": 1,
+   "status": "ok",
+   "format": 1,
+   "events": 4,
+   "torn": false,
+   "helper_refusal": null,
+   "own_refusal": null,
+   "no_progress_rows": 0
+  },
+  {
+   "sha": "3782ba3a3ff32ccf03ba0f1cdd3875c4864f669caacea79a3d3321a44fe34f31",
+   "path": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/wt/usage-rv/tests/v2/fixtures/journal/mixed_stream_new_required.jsonl",
+   "copies": 1,
+   "status": "reader-refuses",
+   "why": "UnknownRequiredEvent: seq 4: unknown event type 'story/checkpoint' is not marked ignorable \u2014 this reader refuses to reconstruct the journal (\u00a7"
+  },
+  {
+   "sha": "59e13ff878573bb931f20a9913afb96fb45d46f4c291e7cf3c537cf9f48ac2a0",
+   "path": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/wt/usage-rv/tests/v2/fixtures/journal/version_mismatch.jsonl",
+   "copies": 1,
+   "status": "ok",
+   "format": 2,
+   "events": 2,
+   "torn": false,
+   "helper_refusal": null,
+   "own_refusal": null,
+   "no_progress_rows": 0
+  },
+  {
+   "sha": "bf607ad6d41cc3635e5943446f2d397a0da03c4b3d83e308c11e6ab96c5df8db",
+   "path": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/wt/usage-rv/tests/v2/fixtures/journal/known_type_marked_ignorable.jsonl",
+   "copies": 1,
+   "status": "reader-refuses",
+   "why": "JournalError: failure/observed is a required event in format 1; it is never ignorable"
+  },
+  {
+   "sha": "1f2468b563f96826d03e49457130d768778becd1bdeb6453baedfcaaf2aeb432",
+   "path": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/wt/usage-rv/tests/v2/fixtures/journal/mixed_stream_new_ignorable.jsonl",
+   "copies": 1,
+   "status": "ok",
+   "format": 1,
+   "events": 4,
+   "torn": false,
+   "helper_refusal": null,
+   "own_refusal": null,
+   "no_progress_rows": 0
+  },
+  {
+   "sha": "525f0aebf07360732c294b0a874a72d49a3f697ebb1b195af782fc429b7069bf",
+   "path": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/wt/usage-rv/tests/v2/fixtures/journal/newer_schema_field.jsonl",
+   "copies": 1,
+   "status": "reader-refuses",
+   "why": "JournalError: story/begin: fields missing [], not in the schema ['attempt']"
+  },
+  {
+   "sha": "4abef520af411a42b3ccc37406b0c5cbd3a55077fbdcd6f79703c2a7a4e4fd8e",
+   "path": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/wt/usage-rv/tests/v2/fixtures/journal/torn_tail.jsonl",
+   "copies": 1,
+   "status": "ok",
+   "format": 1,
+   "events": 2,
+   "torn": true,
+   "helper_refusal": null,
+   "own_refusal": null,
+   "no_progress_rows": 0
+  },
+  {
+   "sha": "d4eb57c0dce21a192a48e6fe09d5c26b62509ba15459987e033eb5aac4e6a566",
+   "path": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/wt/usage-rv/tests/v2/fixtures/journal/malformed_known.jsonl",
+   "copies": 1,
+   "status": "reader-refuses",
+   "why": "JournalError: story/begin: fields of the wrong kind or enum ['parent']"
+  },
+  {
+   "sha": "0976072f4e4b67a26edf1ad7a2d5aa9b2f7476d3ef5a362201d6f0fbc58c339b",
+   "path": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/wt/usage-rv/tests/v2/fixtures/journal/mixed_stream_second_declaration.jsonl",
+   "copies": 1,
+   "status": "reader-refuses",
+   "why": "JournalError: run/begin at seq 2: a journal begins with run/begin, and only once"
+  },
+  {
+   "sha": "03fde541d5b5c8d4bd2f409bae7750ef28affdf24693810927cc71a386cbb81b",
+   "path": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/wt/usage-rv/closure-evidence/v2/release/smoke-2/run-1/aisef-run.jsonl",
+   "copies": 1,
+   "status": "ok",
+   "format": 3,
+   "events": 1834,
+   "torn": false,
+   "helper_refusal": null,
+   "own_refusal": null,
+   "no_progress_rows": 1
+  }
+ ]
+}

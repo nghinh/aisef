@@ -1,0 +1,26 @@
+bonding_masters type= operstate= flags=
+erspan0 type=1 operstate=down flags=0x1002
+gre0 type=778 operstate=down flags=0x80
+gretap0 type=1 operstate=down flags=0x1002
+ip6_vti0 type=769 operstate=down flags=0x80
+ip6gre0 type=823 operstate=down flags=0x80
+ip6tnl0 type=769 operstate=down flags=0x80
+ip_vti0 type=768 operstate=down flags=0x80
+lo type=772 operstate=unknown flags=0x9
+sit0 type=776 operstate=down flags=0x80
+tunl0 type=768 operstate=down flags=0x80
+routes: 0
+ipv6 routes: 3
+    lo
+ tunl0
+  gre0
+gretap0
+erspan0
+ip_vti0
+ip6_vti0
+  sit0
+ip6tnl0
+ip6gre0
+00000000000000000000000000000000 00 lo
+00000000000000000000000000000001 80 lo
+00000000000000000000000000000000 00 lo

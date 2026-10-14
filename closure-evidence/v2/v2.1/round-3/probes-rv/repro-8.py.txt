@@ -1,0 +1,76 @@
+# repro-8 (probes WP, the smaller items): real entry points, no fault injection.
+#   8a  python_imports / grep_count over a selection of zero files (vacuous SATISFIED)
+#   8b  the order of `locations` (ast.walk is breadth-first)
+#   8c  a memoryview result: process_effect (type name) vs python_callable_v2 returns_bytes (bytes)
+#   8d  the absence note for a bare directory that shadows a stdlib package (json/ without __init__.py)
+# Run from the worktree root:  py.sh probes -I <this file>
+import json
+import os
+import pathlib
+import sys
+import tempfile
+
+sys.path.insert(0, os.getcwd())
+
+from aisef2.arch.enums import BehaviorVerdict, Enforcement, SubjectAbsence  # noqa: E402
+from aisef2.probe import file_artifact as fa, process_effect as pe, python_callable_v2 as pc2  # noqa: E402
+from aisef2.probe.protocol import ExecutionEnv, RevisionRef  # noqa: E402
+from aisef2.product.spec import ProductProofSpec  # noqa: E402
+
+SHA = "89abcdef0123456789abcdef0123456789abcdef"
+ENV = ExecutionEnv(sys.executable, 30, Enforcement.PARTIAL)
+
+
+def tree(files):
+    d = tempfile.mkdtemp(prefix="aisef2-r3-small-")
+    for rel, text in files.items():
+        p = pathlib.Path(d, rel)
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(text, encoding="utf-8", newline="\n")
+    return RevisionRef("0" * 40, d)
+
+
+def mk(probe, kind, locator, stimulus, observable, absence=SubjectAbsence.REQUIRES_SUBJECT):
+    return ProductProofSpec.create(
+        contract_id="BC-R3", probe_id=probe.id, probe_digest=probe.digest,
+        probe_input={"subject": {"kind": kind, "locator": locator}, "stimulus": stimulus,
+                     "observable": {**observable, "within_s": 30}, "subject_absence": absence.value},
+        candidate_expectation=BehaviorVerdict.SATISFIED, compiler_id="test", compiler_digest="c" * 64)
+
+
+FA = fa.FileArtifactProbe()
+IMPORTS = {"imports_outside": {"stdlib": True, "allowed": []}}
+print("interpreter:", sys.version.split()[0], sys.platform)
+
+print("\n8a. a count of 0 over a selection of zero files")
+at = tree({"README.md": "no python here\n", "docs/notes.txt": "x\n", "empty/.keep": ""})
+for label, loc in (("a single non-.py file       ", "path:README.md"), ("a directory with no .py    ", "path:docs"),
+                   ("a directory holding only a dot-file", "path:empty")):
+    o = FA.observe(mk(FA, "file_artifact", loc, IMPORTS, {"matches": 0}), at, ENV)
+    f = json.loads(o.detail)
+    print("   python_imports matches=0 over %-36s -> %s %s files=%s matches=%s" % (
+        label, o.kind.value, o.verdict.value if o.verdict else None, f.get("files"), f.get("matches")))
+o = FA.observe(mk(FA, "file_artifact", "path:docs", {"grep": "import requests"}, {"matches": 0}), at, ENV)
+print("   grep_count     matches=0 over a directory with no .txt-free selection (default: every file) -> %s %s" % (
+    o.kind.value, o.verdict.value))
+
+print("\n8b. order of `locations`")
+at = tree({"pkg/m.py": "def f():\n    import requests\n\n\nimport yaml\n"})
+o = FA.observe(mk(FA, "file_artifact", "path:pkg", IMPORTS, {"matches": 2}), at, ENV)
+print("   locations:", json.loads(o.detail)["locations"], "(line 2 is inside f(); line 5 is module level)")
+
+print("\n8c. a memoryview result")
+at = tree({"m.py": "def blob():\n    return memoryview(b'ab')\n"})
+P_PE, P_PC = pe.ProcessEffectProbe(), pc2.PythonCallableV2Probe()
+o = P_PE.observe(mk(P_PE, "process_effect", "m:blob", {"scenario": [{"step": "call", "args": [], "kwargs": {}}]},
+                    {"returns_bytes_hex": "6162"}), at, ENV)
+print("   process_effect  returns_bytes_hex=6162 -> %s %s | %s" % (o.kind.value, o.verdict.value, o.detail[-90:]))
+o = P_PC.observe(mk(P_PC, "python_callable", "m:blob", {}, {"returns_bytes_hex": "6162"}), at, ENV)
+print("   python_callable returns_bytes=6162      -> %s %s" % (o.kind.value, o.verdict.value))
+
+print("\n8d. a bare directory json/ in the revision (no __init__.py), subject json.decoder:JSONDecoder")
+at = tree({"json/readme.txt": "x\n"})
+o = P_PE.observe(mk(P_PE, "process_effect", "json.decoder:JSONDecoder",
+                    {"scenario": [{"step": "call", "args": [], "kwargs": {}}]}, {"returns": 1}), at, ENV)
+print("   process_effect -> %s %s note=%r (the subject's own process imports the stdlib json.decoder, outside the revision)" % (
+    o.kind.value, o.verdict.value if o.verdict else None, o.detail))

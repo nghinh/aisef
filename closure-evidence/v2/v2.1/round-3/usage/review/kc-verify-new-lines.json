@@ -1,0 +1,130 @@
+{
+ "target": "aisef2/app/verify.py::verify",
+ "files": [
+  "tests/v2/test_v21_r3_usage_boundary.py"
+ ],
+ "source_sha256": "b30820f61194665ace24e317a06651334e86dc9fcb77e879b97450ee0514dc1b",
+ "t0": [
+  {
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "seconds": 5.56,
+   "outcome": "PASS",
+   "ran": 14
+  }
+ ],
+ "error": null,
+ "results": [
+  {
+   "index": 78,
+   "mutant": "L150 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 108,
+   "mutant": "L150 Is->IsNot",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 132,
+   "mutant": "L153 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_journal_that_would_deliver_is_not_verified_as_delivering (v2.test_v21_r3_usage_boundary.RefusedJournals.test_a_journal_that_would_deliver_is_not_verified_as_delivering) [story_state refuses story/commit] | AssertionError"
+  },
+  {
+   "index": 133,
+   "mutant": "L153 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_journal_that_would_deliver_is_not_verified_as_delivering (v2.test_v21_r3_usage_boundary.RefusedJournals.test_a_journal_that_would_deliver_is_not_verified_as_delivering) [story_state refuses story/commit] | AssertionError"
+  },
+  {
+   "index": 134,
+   "mutant": "L153 element 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_journal_that_would_deliver_is_not_verified_as_delivering (v2.test_v21_r3_usage_boundary.RefusedJournals.test_a_journal_that_would_deliver_is_not_verified_as_delivering) [story_state refuses story/commit] | AssertionError"
+  },
+  {
+   "index": 135,
+   "mutant": "L153 element 3 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_journal_that_would_deliver_is_not_verified_as_delivering (v2.test_v21_r3_usage_boundary.RefusedJournals.test_a_journal_that_would_deliver_is_not_verified_as_delivering) [story_state refuses story/commit] | AssertionError"
+  },
+  {
+   "index": 162,
+   "mutant": "L151 dict entry 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified (v2.test_v21_r3_usage_boundary.ExecutedRun.test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified) | AssertionError"
+  },
+  {
+   "index": 163,
+   "mutant": "L151 dict entry 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 164,
+   "mutant": "L151 dict entry 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 178,
+   "mutant": "L151 string 'seq' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified (v2.test_v21_r3_usage_boundary.ExecutedRun.test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified) | AssertionError"
+  },
+  {
+   "index": 179,
+   "mutant": "L151 string 'type' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 180,
+   "mutant": "L151 string 'data' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 184,
+   "mutant": "L154 string \"the journal violates the control projections the kernel's writer enforces: \" emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_each_is_refuted_by_a_finding_naming_the_projection_the_event_and_its_seq (v2.test_v21_r3_usage_boundary.RefusedJournals.test_each_is_refuted_by_a_finding_naming_the_projection_the_event_and_its_seq) [a story begins again after it committed] | AssertionError"
+  },
+  {
+   "index": 185,
+   "mutant": "L154 string ' refuses ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_journal_that_would_deliver_is_not_verified_as_delivering (v2.test_v21_r3_usage_boundary.RefusedJournals.test_a_journal_that_would_deliver_is_not_verified_as_delivering) [story_state refuses story/commit] | AssertionError"
+  },
+  {
+   "index": 186,
+   "mutant": "L155 string ' at seq ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_each_is_refuted_by_a_finding_naming_the_projection_the_event_and_its_seq (v2.test_v21_r3_usage_boundary.RefusedJournals.test_each_is_refuted_by_a_finding_naming_the_projection_the_event_and_its_seq) [a story begins again after it committed] | AssertionError"
+  },
+  {
+   "index": 187,
+   "mutant": "L155 string ': ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_each_is_refuted_by_a_finding_naming_the_projection_the_event_and_its_seq (v2.test_v21_r3_usage_boundary.RefusedJournals.test_each_is_refuted_by_a_finding_naming_the_projection_the_event_and_its_seq) [a story begins again after it committed] | AssertionError"
+  }
+ ]
+}

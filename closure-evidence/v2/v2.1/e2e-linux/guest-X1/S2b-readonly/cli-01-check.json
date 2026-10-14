@@ -1,0 +1,48 @@
+{
+ "tag": "check",
+ "argv": [
+  "/usr/local/bin/python3",
+  "-B",
+  "-m",
+  "aisef",
+  "run",
+  "--check",
+  "--project",
+  "/tmp/e2e/project/approved.json",
+  "--settings",
+  "settings.json",
+  "--repo",
+  "/tmp/e2e/project/repo"
+ ],
+ "cwd": "/tmp/e2e/S2b-readonly",
+ "exit": 2,
+ "seconds": 0.6,
+ "stdout": "{\n \"admission\": {\n  \"admitted\": true,\n  \"engine_digest\": \"7668fc35709829d8324e914e0300b2b85221d9e83dedd32cd2c3996f761690c7\",\n  \"failed\": [],\n  \"result_digest\": \"2b01083f0887d014bc82c80f31dec6c0e5f4f1ae5845ea943bbab29da535a8ae\"\n },\n \"confinement\": {\n  \"backend\": \"bwrap\",\n  \"bwrap\": \"/usr/bin/bwrap\",\n  \"client\": \"/tmp/e2e/S2b-readonly/fakebin/opencode\",\n  \"network\": \"host\",\n  \"operator_uid\": 1000,\n  \"problems\": [\n   \"confinement.read_only names paths that do not exist: ['/no/such/e2e-path']\"\n  ],\n  \"read_only\": [\n   \"/no/such/e2e-path\"\n  ],\n  \"system\": \"linux\"\n },\n \"plan_hash\": \"35ad86a86f69356517ff252b13925a51d2934e64fe30e9e02b86a0bf5907a69d\",\n \"project\": \"calc-cli\",\n \"ready\": false,\n \"route\": \"fakeprov/model-1\"\n}\n",
+ "stderr": "",
+ "json": {
+  "admission": {
+   "admitted": true,
+   "engine_digest": "7668fc35709829d8324e914e0300b2b85221d9e83dedd32cd2c3996f761690c7",
+   "failed": [],
+   "result_digest": "2b01083f0887d014bc82c80f31dec6c0e5f4f1ae5845ea943bbab29da535a8ae"
+  },
+  "confinement": {
+   "backend": "bwrap",
+   "bwrap": "/usr/bin/bwrap",
+   "client": "/tmp/e2e/S2b-readonly/fakebin/opencode",
+   "network": "host",
+   "operator_uid": 1000,
+   "problems": [
+    "confinement.read_only names paths that do not exist: ['/no/such/e2e-path']"
+   ],
+   "read_only": [
+    "/no/such/e2e-path"
+   ],
+   "system": "linux"
+  },
+  "plan_hash": "35ad86a86f69356517ff252b13925a51d2934e64fe30e9e02b86a0bf5907a69d",
+  "project": "calc-cli",
+  "ready": false,
+  "route": "fakeprov/model-1"
+ }
+}

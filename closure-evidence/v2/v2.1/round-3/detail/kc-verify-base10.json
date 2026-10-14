@@ -1,0 +1,144 @@
+{
+ "target": "aisef2/app/verify.py::verify",
+ "files": [
+  "tests/v2/test_v21_kills3_R01.py",
+  "tests/v2/test_v21_kills3_T22a.py",
+  "tests/v2/test_v21_kills3_T22b.py",
+  "tests/v2/test_v21_kills3_A22.py",
+  "tests/v2/test_v21_defects_verify.py",
+  "tests/v2/test_v21_verify.py",
+  "tests/v2/test_s2_kills.py",
+  "tests/v2/test_app_units.py",
+  "tests/v2/test_app_run.py"
+ ],
+ "source_sha256": "1259fc39d5733bf55d409a23a15e412ebaaf4c9fb1d59e01fd34df8c96a8dffb",
+ "t0": [
+  {
+   "file": "tests/v2/test_v21_kills3_R01.py",
+   "seconds": 0.5,
+   "outcome": "PASS",
+   "ran": 8
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "seconds": 4.81,
+   "outcome": "PASS",
+   "ran": 13
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T22b.py",
+   "seconds": 8.36,
+   "outcome": "PASS",
+   "ran": 10
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_A22.py",
+   "seconds": 0.34,
+   "outcome": "PASS",
+   "ran": 7
+  },
+  {
+   "file": "tests/v2/test_v21_defects_verify.py",
+   "seconds": 26.91,
+   "outcome": "PASS",
+   "ran": 20
+  },
+  {
+   "file": "tests/v2/test_v21_verify.py",
+   "seconds": 30.16,
+   "outcome": "PASS",
+   "ran": 8
+  },
+  {
+   "file": "tests/v2/test_s2_kills.py",
+   "seconds": 22.01,
+   "outcome": "PASS",
+   "ran": 43
+  },
+  {
+   "file": "tests/v2/test_app_units.py",
+   "seconds": 5.8,
+   "outcome": "PASS",
+   "ran": 41
+  },
+  {
+   "file": "tests/v2/test_app_run.py",
+   "seconds": 31.43,
+   "outcome": "PASS",
+   "ran": 17
+  }
+ ],
+ "error": null,
+ "results": [
+  {
+   "index": 98,
+   "mutant": "L104 string ' the run printed' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 108,
+   "mutant": "L152 dict entry 0 dropped",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 109,
+   "mutant": "L152 dict entry 1 dropped",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 122,
+   "mutant": "L81 string 'no ' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 126,
+   "mutant": "L87 string ')' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 137,
+   "mutant": "L152 string 'story' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 138,
+   "mutant": "L152 string 'error' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 139,
+   "mutant": "L152 string 'begun and never ended in the journal' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 151,
+   "mutant": "L73 string ')' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 174,
+   "mutant": "L122 string ')' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  }
+ ]
+}

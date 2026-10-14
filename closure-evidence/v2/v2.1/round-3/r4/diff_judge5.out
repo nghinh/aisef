@@ -1,0 +1,14 @@
+[100] L540 element 0 dropped: 2652 inputs, 360 differ
+     {"user_namespace": [null, "Operation not permitted"]} -> ["ok", ["a file of the run directory was readable", "the workspace was not writable", "the workspace vs ["ok", ["a file of the run directory was readable", "the workspace was not writable", "the workspace
+     {"user_namespace": [null, "Operation not permitted"], "read_git_directory": [0, "ref: refs/heads/main"]} -> ["ok", ["a file of the run directory was readable", "the workspace was not writable", "no refusal of vs ["ok", ["a file of the run directory was readable", "the workspace was not writable"]]
+     {"user_namespace": [null, "Operation not permitted"], "read_git_directory": [1, "No such file"]} -> ["ok", ["a file of the run directory was readable", "the workspace was not writable", "the workspace vs ["ok", ["a file of the run directory was readable", "the workspace was not writable", "the workspace
+     differing inputs hold keys: ['read_canary', 'read_git_directory', 'user_namespace', 'workspace'] | user_namespace values: ["(None, 'No space left on device')", "(None, 'Operation not permitted')"]
+[135] L533 element 0 dropped: 2652 inputs, 0 differ
+[136] L533 element 1 dropped: 2652 inputs, 0 differ
+[137] L533 string 'workspace' emptied: 2652 inputs, 552 differ
+     {"workspace": [0, "ok"]} -> ["ok", ["a file of the run directory was readable", "the workspace's git directory was not readable  vs ["ok", ["a file of the run directory was readable", "the workspace was not writable", "the workspace
+     {"workspace": [0, "ok"], "read_git_directory": [0, "ref: refs/heads/main"]} -> ["ok", ["a file of the run directory was readable", "no refusal of a further user namespace was meas vs ["ok", ["a file of the run directory was readable", "the workspace was not writable", "no refusal of
+     {"workspace": [0, "ok"], "read_git_directory": [1, "No such file"]} -> ["ok", ["a file of the run directory was readable", "the workspace's git directory was not readable  vs ["ok", ["a file of the run directory was readable", "the workspace was not writable", "the workspace
+     differing inputs hold keys: ['read_canary', 'read_git_directory', 'user_namespace', 'workspace'] | user_namespace values: ["(0, '')", "(1, '')", "(1, 'unshare: unshare failed: No space left on device')", "(1, 'unshare: unshare failed: Operation not permitted')", "(127, 'Operation not permitted')", "(127, 'unshare: absent')", "(2, 'x')", "(None, '')", "(None, 'No space left on device')", "(None, 'Operation not permitted')", 'None', "['Operation not permitted']", '[]']
+[138] L533 element 0 dropped: 2652 inputs, 0 differ
+[139] L533 element 1 dropped: 2652 inputs, 0 differ

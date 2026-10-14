@@ -1,0 +1,123 @@
+{
+ "target": "aisef2/runtime/process_range.py::ProcessRange._ladder",
+ "files": [
+  "tests/v2/test_v21_r3_range_release_contract.py"
+ ],
+ "source_sha256": "489e7ec3638c2f91365fa94263a38b9d20a36c4fd586c7213c1cbadf2b561c16",
+ "t0": [
+  {
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "seconds": 2.23,
+   "outcome": "PASS",
+   "ran": 32
+  }
+ ],
+ "error": null,
+ "results": [
+  {
+   "index": 0,
+   "mutant": "L481 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "FAIL: test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller (v2.test_v21_r3_range_release_contract.AbandonedWorker.test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller) | AssertionError"
+  },
+  {
+   "index": 1,
+   "mutant": "L475 And swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "FAIL: test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller (v2.test_v21_r3_range_release_contract.AbandonedWorker.test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller) | AssertionError"
+  },
+  {
+   "index": 2,
+   "mutant": "L476 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "FAIL: test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller (v2.test_v21_r3_range_release_contract.AbandonedWorker.test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller) | AssertionError"
+  },
+  {
+   "index": 3,
+   "mutant": "L476 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "FAIL: test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller (v2.test_v21_r3_range_release_contract.AbandonedWorker.test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller) | AssertionError"
+  },
+  {
+   "index": 4,
+   "mutant": "L476 element 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "FAIL: test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller (v2.test_v21_r3_range_release_contract.AbandonedWorker.test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller) | AssertionError"
+  },
+  {
+   "index": 5,
+   "mutant": "L477 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "FAIL: test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller (v2.test_v21_r3_range_release_contract.AbandonedWorker.test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller) | AssertionError"
+  },
+  {
+   "index": 6,
+   "mutant": "L481 not removed",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "FAIL: test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller (v2.test_v21_r3_range_release_contract.AbandonedWorker.test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller) | AssertionError"
+  },
+  {
+   "index": 7,
+   "mutant": "L475 IsNot->Is",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "FAIL: test_RangeNotEmpty_then_a_later_call_runs_the_ladder_again_as_it_always_did (v2.test_v21_r3_range_release_contract.Idempotence.test_RangeNotEmpty_then_a_later_call_runs_the_ladder_again_as_it_always_did) | AssertionError"
+  },
+  {
+   "index": 8,
+   "mutant": "L480 conditional negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "ERROR: test_RangeNotEmpty_then_a_later_call_runs_the_ladder_again_as_it_always_did (v2.test_v21_r3_range_release_contract.Idempotence.test_RangeNotEmpty_then_a_later_call_runs_the_ladder_again_as_it_always_did) | TypeError"
+  },
+  {
+   "index": 9,
+   "mutant": "L480 Is->IsNot",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "ERROR: test_RangeNotEmpty_then_a_later_call_runs_the_ladder_again_as_it_always_did (v2.test_v21_r3_range_release_contract.Idempotence.test_RangeNotEmpty_then_a_later_call_runs_the_ladder_again_as_it_always_did) | TypeError"
+  },
+  {
+   "index": 10,
+   "mutant": "L482 string ': not empty after ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "FAIL: test_the_message_of_a_range_that_will_not_empty_names_the_stages_and_the_members (v2.test_v21_r3_range_release_contract.Idempotence.test_the_message_of_a_range_that_will_not_empty_names_the_stages_and_the_members) | AssertionError"
+  },
+  {
+   "index": 11,
+   "mutant": "L482 string ': ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "FAIL: test_the_message_of_a_range_that_will_not_empty_names_the_stages_and_the_members (v2.test_v21_r3_range_release_contract.Idempotence.test_the_message_of_a_range_that_will_not_empty_names_the_stages_and_the_members) | AssertionError"
+  },
+  {
+   "index": 12,
+   "mutant": "L483 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "FAIL: test_the_message_of_a_range_that_will_not_empty_names_the_stages_and_the_members (v2.test_v21_r3_range_release_contract.Idempotence.test_the_message_of_a_range_that_will_not_empty_names_the_stages_and_the_members) | AssertionError"
+  },
+  {
+   "index": 13,
+   "mutant": "L483 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "FAIL: test_the_message_of_a_range_that_will_not_empty_names_the_stages_and_the_members (v2.test_v21_r3_range_release_contract.Idempotence.test_the_message_of_a_range_that_will_not_empty_names_the_stages_and_the_members) | AssertionError"
+  },
+  {
+   "index": 14,
+   "mutant": "L482 string 'stage' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "ERROR: test_RangeNotEmpty_then_a_later_call_runs_the_ladder_again_as_it_always_did (v2.test_v21_r3_range_release_contract.Idempotence.test_RangeNotEmpty_then_a_later_call_runs_the_ladder_again_as_it_always_did) | KeyError"
+  }
+ ]
+}

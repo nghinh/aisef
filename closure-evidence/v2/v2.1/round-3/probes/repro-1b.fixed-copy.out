@@ -1,0 +1,13 @@
+interpreter: 3.14.7 darwin
+N1 namespace package run as __main__ (ns/__main__.py)
+   python imports it: rc=0 | cli_invocation observe -> OBSERVED verdict=SATISFIED | {"exit_status_raw": 0, "exit_code": 0, "raised": null, "stdout": {"size": 0, "truncated": false, "sha256": "e3
+N2 nested namespace run as __main__ (a/b/__main__.py)
+   python imports it: rc=0 | cli_invocation observe -> OBSERVED verdict=SATISFIED | {"exit_status_raw": 0, "exit_code": 0, "raised": null, "stdout": {"size": 0, "truncated": false, "sha256": "e3
+N3 one namespace spanning root and src/
+   python imports it: rc=0 | process_effect observe -> OBSERVED verdict=SATISFIED | {"subject": "present", "trace": [{"i": 0, "kind": "call", "outcome": "ok"}], "bound": {}, "raised": null, "bef
+N4 regular package in src/ beats a namespace dir at root
+   python imports it: rc=1 | process_effect observe -> SUBJECT_ABSENT verdict=REFUTED | 
+N5 namespace dir named like a stdlib package (json/mod.py)
+   python imports it: rc=1 | process_effect observe -> OBSERVED verdict=REFUTED | {"subject": "present", "trace": [], "refuted": {"step": null, "kind": "import", "why": "importing the subject 
+N6 module only in the stdlib (json.tool), no json in revision
+   python imports it: rc=0 | process_effect observe -> SUBJECT_ABSENT verdict=REFUTED | resolves only outside the revision

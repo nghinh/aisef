@@ -1,0 +1,7 @@
+== tests.v2.p0.test_destructive_authority: Ran 13 tests in 11.233s OK 
+== tests.v2.p4.test_mutation_safety: Ran 10 tests in 13.550s OK 
+== tests.v2.p5.test_invariants: Ran 50 tests in 7.528s OK 
+== tests.v2.p4.test_process_range: Ran 24 tests in 17.534s OK 
+== tests.v2.test_v21_confine: Ran 34 tests in 19.863s OK 
+== tests.v2.test_v21_read_set: Ran 26 tests in 10.234s OK 
+== destructive_authority --check: destructive authority: PASS

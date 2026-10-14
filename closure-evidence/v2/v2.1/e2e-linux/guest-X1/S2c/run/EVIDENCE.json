@@ -1,0 +1,14 @@
+{
+ "files": {
+  "RUN.json": "a7bc8c55fa39db06f3c0c772e3946d37c3a0c7e575873a054c83e8b97aaf3859",
+  "RUN.started.json": "54e490985ebb872d545ee7ca27df83c8b69879ace0e147db73e54c429eebdaec",
+  "preflight/LEDGER.jsonl": "20103929ae4b91bd6f5d5c6050d3947a947f429fbc53535f553315ba0656eb1d",
+  "preflight/PREFLIGHT.json": "0d836b3568361c7b002d6956ea553a2120cda89cee54c8de622a0edab7570bdf",
+  "run/journals/aisef-run.jsonl": "55951bfca8e799957317aa2adf5347ac8b9e325a09a27e2721f6b47ffa87ce2b",
+  "sessions/S1.developer.1.jsonl": "681d837299b0eb313a1d4723ad8cb69ac959ad2b53e383c7df150b6699b2f8ff",
+  "sessions/S1.developer.2.jsonl": "634d9e8e5c96f85ac5afe5102a1ead4500a36a2b9026af59f7e4fe2946fdb0b7",
+  "sessions/S1.reviewer.1.jsonl": "812d4bb46dcc81dc838472bc8a2242e2903ae84ffab968e811c0f6e8f86fde31",
+  "sessions/S1.reviewer.2.jsonl": "f2e6008c10375fc5eab17779877b50d35714d9df963287e4488479a3ffc85477"
+ },
+ "format": "aisef-v2-evidence/1"
+}

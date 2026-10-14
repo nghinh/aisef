@@ -1,0 +1,27 @@
+# Does the macOS `ps -E` / `ps -A` print a raw LF (or CR, VT, FF ...) for a process whose env/argv holds one?
+# Real children only; they end when their stdin closes. Prints the raw bytes ps printed for each child.
+import os, subprocess, sys, time
+
+CODE = "import sys; print('ready', flush=True); sys.stdin.read()"
+CASES = {
+    "LF": "a\nb", "CR": "a\rb", "CRLF": "a\r\nb", "VT": "a\x0bb", "FF": "a\x0cb", "FS": "a\x1cb", "NEL": "a\u0085b",
+    "LS": "a b", "PS": "a b", "TAB": "a\tb", "ESC": "a\x1bb", "DEL": "a\x7fb", "BEL": "a\x07b",
+    "bashfunc": "() {  echo hi\n}",
+}
+def ps_bytes(args, pid):
+    return subprocess.run(["ps", *args, "-p", str(pid)], capture_output=True).stdout
+
+for name, val in CASES.items():
+    env = {"PATH": os.environ["PATH"], "PROBE_VAR": val}
+    p = subprocess.Popen([sys.executable, "-c", CODE, f"ARG<{val}>"], stdin=subprocess.PIPE, stdout=subprocess.PIPE, env=env)
+    try:
+        assert p.stdout.readline() == b"ready\n"
+        a = ps_bytes(["-ww", "-o", "pid=,ppid=,pgid=,lstart=,command="], p.pid)
+        e = ps_bytes(["-E", "-ww", "-o", "pid=,command="], p.pid)
+        def tail(b, key):
+            i = b.find(key)
+            return b[i:i + len(key) + 40] if i >= 0 else b"(key not found: env hidden?) " + b[-60:]
+        print(name, "| ps -A argv:", repr(tail(a, b"ARG<")), "| lines:", a.count(b"\n"))
+        print(name, "| ps -E env :", repr(tail(e, b"PROBE_VAR=")), "| lines:", e.count(b"\n"))
+    finally:
+        p.stdin.close(); p.wait(); p.stdout.close()

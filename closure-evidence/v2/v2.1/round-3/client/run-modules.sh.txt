@@ -1,0 +1,13 @@
+#!/bin/zsh
+# run-modules.sh CHUNKFILE TAG: each module sequentially from the client worktree; one summary line per module
+SP=/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad
+OUT=$SP/m21/r3/out/client
+cd $SP/m21/r3/wt/client || exit 2
+: > $OUT/modules-result-$2.txt
+for m in $(cat $1); do
+  s=$(date +%s)
+  $SP/m21/kills3/py.sh $2 -m unittest $m > $OUT/modlog-$m.txt 2>&1
+  c=$?
+  print -r -- "$m exit=$c $(grep -E '^(Ran |OK|FAILED)' $OUT/modlog-$m.txt | tr '\n' ' ') $(( $(date +%s) - s ))s" >> $OUT/modules-result-$2.txt
+done
+echo DONE >> $OUT/modules-result-$2.txt

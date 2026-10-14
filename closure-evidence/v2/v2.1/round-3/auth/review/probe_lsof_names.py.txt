@@ -1,0 +1,14 @@
+# What does `lsof -F0pn -a -d cwd` print for a cwd whose name holds a separator / control character? (real children)
+import os, subprocess, sys, tempfile
+root = tempfile.mkdtemp(prefix="lsofn-")
+CODE = "import sys; print('r', flush=True); sys.stdin.read()"
+for name in ["a\tb", "a\nb", "a\rb", "a\x0bb", "a\x0cb", "a\x1cb", "a\x1bb", "a\x7fb", "a b", "a b", "a\u0085b", "a b", "a b", "a\\nb", "a\\x09b", "é", "a\x01b"]:
+    d = os.path.join(root, name); os.mkdir(d)
+    p = subprocess.Popen([sys.executable, "-c", CODE], stdin=subprocess.PIPE, stdout=subprocess.PIPE, cwd=d)
+    p.stdout.readline()
+    raw = subprocess.run(["lsof", "-nP", "-w", "-a", "-d", "cwd", "-F0pn", "-p", str(p.pid)], capture_output=True).stdout
+    i = raw.find(b"n")
+    print(repr(name), "->", raw[raw.find(b"\0n") + 2:][-26:])
+    p.stdin.close(); p.wait(); p.stdout.close()
+    os.rmdir(d)
+os.rmdir(root)

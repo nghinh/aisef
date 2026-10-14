@@ -1,0 +1,3 @@
+[103] SURVIVED L120 element 0 dropped
+[104] SURVIVED L120 element 1 dropped
+# aisef2/app/verify.py::verify: 2 mutants run, {'SURVIVED': 2}; T0 [{'file': 'tests/v2/test_v21_r3_detail_product.py', 'seconds': 17.16, 'outcome': 'PASS', 'ran': 14}]; source_sha256 0996b98ab6da683b30cc30adb58cbbe196eff47f990b7343eeecb71091a746a8

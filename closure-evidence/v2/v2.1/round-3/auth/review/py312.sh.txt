@@ -1,0 +1,7 @@
+#!/bin/zsh
+# like py.sh but python3.12 (the nearest 3.11-3.14 interpreter installed here)
+SP=/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad
+TAG=$1; shift
+H=$SP/m21/kills3/home/$TAG; mkdir -p $H
+GP=$(print -rl -- ${(s.:.)PATH} | while read -r d; do [[ -x $d/opencode ]] || print -r -- $d; done | paste -sd: -)
+exec env -i PATH="$GP" HOME=$H TMPDIR=$H LANG=en_US.UTF-8 /opt/homebrew/bin/python3.12 -B "$@"

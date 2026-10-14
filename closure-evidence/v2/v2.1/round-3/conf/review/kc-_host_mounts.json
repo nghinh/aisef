@@ -1,0 +1,235 @@
+{
+ "target": "aisef2/app/confine.py::_host_mounts",
+ "files": [
+  "tests/v2/test_v21_r3_conf_policy.py",
+  "tests/v2/test_v21_r3_conf_locale.py",
+  "tests/v2/test_v21_kills3_T07a.py",
+  "tests/v2/test_v21_kills3_T06a.py",
+  "tests/v2/test_v21_kills3_A06.py",
+  "tests/v2/test_v21_kills3_T05b.py",
+  "tests/v2/test_v21_kills3_T05a.py",
+  "tests/v2/test_v21_kills3_T05c.py",
+  "tests/v2/test_v21_kills3_A05.py",
+  "tests/v2/test_v21_kills3_R02.py",
+  "tests/v2/test_v21_kills3_T06b.py",
+  "tests/v2/test_v21_kills3_A07.py",
+  "tests/v2/test_v21_kills3_T07b.py",
+  "tests/v2/test_v21_kills3_TO2.py",
+  "tests/v2/test_v21_defects_confine.py",
+  "tests/v2/test_v21_confine.py"
+ ],
+ "source_sha256": "375489e7f4d1abc502cb6720c37631ad52511711cdb47803e0ecefb009778249",
+ "t0": [
+  {
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "seconds": 1.5,
+   "outcome": "PASS",
+   "ran": 42
+  },
+  {
+   "file": "tests/v2/test_v21_r3_conf_locale.py",
+   "seconds": 1.6,
+   "outcome": "PASS",
+   "ran": 10
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T07a.py",
+   "seconds": 0.34,
+   "outcome": "PASS",
+   "ran": 14
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T06a.py",
+   "seconds": 0.33,
+   "outcome": "PASS",
+   "ran": 14
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_A06.py",
+   "seconds": 1.0,
+   "outcome": "PASS",
+   "ran": 4
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "seconds": 0.79,
+   "outcome": "PASS",
+   "ran": 18
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T05a.py",
+   "seconds": 0.94,
+   "outcome": "PASS",
+   "ran": 8
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T05c.py",
+   "seconds": 2.13,
+   "outcome": "PASS",
+   "ran": 7
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_A05.py",
+   "seconds": 1.13,
+   "outcome": "PASS",
+   "ran": 6
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_R02.py",
+   "seconds": 0.5,
+   "outcome": "PASS",
+   "ran": 2
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T06b.py",
+   "seconds": 1.48,
+   "outcome": "PASS",
+   "ran": 8
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_A07.py",
+   "seconds": 0.38,
+   "outcome": "PASS",
+   "ran": 5
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T07b.py",
+   "seconds": 0.38,
+   "outcome": "PASS",
+   "ran": 11
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_TO2.py",
+   "seconds": 0.31,
+   "outcome": "PASS",
+   "ran": 3
+  },
+  {
+   "file": "tests/v2/test_v21_defects_confine.py",
+   "seconds": 1.5,
+   "outcome": "PASS",
+   "ran": 16
+  },
+  {
+   "file": "tests/v2/test_v21_confine.py",
+   "seconds": 19.63,
+   "outcome": "PASS",
+   "ran": 34
+  }
+ ],
+ "error": null,
+ "results": [
+  {
+   "index": 0,
+   "mutant": "L258 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_mount_point_that_is_not_utf8_is_read_not_a_reason_to_refuse_every_run (v2.test_v21_r3_conf_policy.HostTable.test_a_mount_point_that_is_not_utf8_is_read_not_a_reason_to_refuse_every_run) | TypeError"
+  },
+  {
+   "index": 1,
+   "mutant": "L260 returns None",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_mount_point_that_is_not_utf8_is_read_not_a_reason_to_refuse_every_run (v2.test_v21_r3_conf_policy.HostTable.test_a_mount_point_that_is_not_utf8_is_read_not_a_reason_to_refuse_every_run) | TypeError"
+  },
+  {
+   "index": 2,
+   "mutant": "L258 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_one_that_cannot_be_read_whole_is_none (v2.test_v21_r3_conf_policy.HostTable.test_one_that_cannot_be_read_whole_is_none) (text='', error=None) | AssertionError"
+  },
+  {
+   "index": 3,
+   "mutant": "L258 not removed",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_mount_point_that_is_not_utf8_is_read_not_a_reason_to_refuse_every_run (v2.test_v21_r3_conf_policy.HostTable.test_a_mount_point_that_is_not_utf8_is_read_not_a_reason_to_refuse_every_run) | TypeError"
+  },
+  {
+   "index": 4,
+   "mutant": "L258 NotEq->Eq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_mount_point_that_is_not_utf8_is_read_not_a_reason_to_refuse_every_run (v2.test_v21_r3_conf_policy.HostTable.test_a_mount_point_that_is_not_utf8_is_read_not_a_reason_to_refuse_every_run) | TypeError"
+  },
+  {
+   "index": 5,
+   "mutant": "L260 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_mount_point_that_is_not_utf8_is_read_not_a_reason_to_refuse_every_run (v2.test_v21_r3_conf_policy.HostTable.test_a_mount_point_that_is_not_utf8_is_read_not_a_reason_to_refuse_every_run) | KeyError"
+  },
+  {
+   "index": 6,
+   "mutant": "L260 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_the_guests_table_is_read_into_what_a_judgement_needs (v2.test_v21_r3_conf_policy.HostTable.test_the_guests_table_is_read_into_what_a_judgement_needs) | AssertionError"
+  },
+  {
+   "index": 7,
+   "mutant": "L260 element 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_mount_point_that_is_not_utf8_is_read_not_a_reason_to_refuse_every_run (v2.test_v21_r3_conf_policy.HostTable.test_a_mount_point_that_is_not_utf8_is_read_not_a_reason_to_refuse_every_run) | KeyError"
+  },
+  {
+   "index": 8,
+   "mutant": "L260 element 3 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_the_guests_table_is_read_into_what_a_judgement_needs (v2.test_v21_r3_conf_policy.HostTable.test_the_guests_table_is_read_into_what_a_judgement_needs) | AssertionError"
+  },
+  {
+   "index": 9,
+   "mutant": "L260 string 'at' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_mount_point_that_is_not_utf8_is_read_not_a_reason_to_refuse_every_run (v2.test_v21_r3_conf_policy.HostTable.test_a_mount_point_that_is_not_utf8_is_read_not_a_reason_to_refuse_every_run) | KeyError"
+  },
+  {
+   "index": 10,
+   "mutant": "L260 string 'fs' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_mount_point_that_is_not_utf8_is_read_not_a_reason_to_refuse_every_run (v2.test_v21_r3_conf_policy.HostTable.test_a_mount_point_that_is_not_utf8_is_read_not_a_reason_to_refuse_every_run) | KeyError"
+  },
+  {
+   "index": 11,
+   "mutant": "L260 string 'dev' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_mount_point_that_is_not_utf8_is_read_not_a_reason_to_refuse_every_run (v2.test_v21_r3_conf_policy.HostTable.test_a_mount_point_that_is_not_utf8_is_read_not_a_reason_to_refuse_every_run) | KeyError"
+  },
+  {
+   "index": 12,
+   "mutant": "L260 string 'optional' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_mount_point_that_is_not_utf8_is_read_not_a_reason_to_refuse_every_run (v2.test_v21_r3_conf_policy.HostTable.test_a_mount_point_that_is_not_utf8_is_read_not_a_reason_to_refuse_every_run) | KeyError"
+  },
+  {
+   "index": 13,
+   "mutant": "L254 string 'utf-8' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_mount_point_that_is_not_utf8_is_read_not_a_reason_to_refuse_every_run (v2.test_v21_r3_conf_policy.HostTable.test_a_mount_point_that_is_not_utf8_is_read_not_a_reason_to_refuse_every_run) | LookupError"
+  },
+  {
+   "index": 14,
+   "mutant": "L254 string 'replace' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_mount_point_that_is_not_utf8_is_read_not_a_reason_to_refuse_every_run (v2.test_v21_r3_conf_policy.HostTable.test_a_mount_point_that_is_not_utf8_is_read_not_a_reason_to_refuse_every_run) | UnicodeDecodeError"
+  },
+  {
+   "index": 15,
+   "mutant": "L254 string '/proc/self/mountinfo' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_it_is_the_controllers_own_table (v2.test_v21_r3_conf_policy.HostTable.test_it_is_the_controllers_own_table) | AssertionError"
+  }
+ ]
+}

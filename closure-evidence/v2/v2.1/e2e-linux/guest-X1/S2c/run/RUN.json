@@ -1,0 +1,394 @@
+{
+ "admission": {
+  "admitted": true,
+  "engine_digest": "7668fc35709829d8324e914e0300b2b85221d9e83dedd32cd2c3996f761690c7",
+  "failed": [],
+  "result_digest": "2b01083f0887d014bc82c80f31dec6c0e5f4f1ae5845ea943bbab29da535a8ae"
+ },
+ "aggregate_min_grade": "OPAQUE",
+ "budget": {
+  "limitation": "spend is what the client reports per finished step: an HTTP request that finishes no step (a client retry, a failed request, the one in flight when a stop is issued) is not in the telemetry, and a stop is issued at the first reading that shows a ceiling reached, so totals can pass a ceiling by the steps finished since the reading before",
+  "limits": {
+   "input_tokens": 200000,
+   "output_tokens": 20000,
+   "provider_requests": 40,
+   "turns": 80
+  },
+  "preflight": {
+   "input_tokens": 200,
+   "output_tokens": 40,
+   "provider_requests": 3,
+   "turns": 0
+  },
+  "reached": null,
+  "spent": {
+   "input_tokens": 720,
+   "output_tokens": 80,
+   "provider_requests": 7,
+   "requests_recorded": 4,
+   "sessions_started": 4,
+   "turns": 4,
+   "unaccounted": []
+  }
+ },
+ "budget_stop": null,
+ "bundle_digest": "9ad313e31b2b2ca3ec4e7fb4f42d0b09702d6a3a6527a320d70f0ab0f7c96f49",
+ "delivery_blocked_by": [
+  "1 of the plan's stories did not commit: ['S1']"
+ ],
+ "delivery_verdict": "FAIL",
+ "failure": null,
+ "final_main": "3176460308161b5e765e678323c35accbdad32a9",
+ "finished": 1791861905.0927353,
+ "format": "aisef-v2-run-record/1",
+ "generalization_claim": "NONE",
+ "journal": {
+  "closed": "SHUTDOWN",
+  "lines": 136,
+  "path": "run/journals/aisef-run.jsonl",
+  "sha256": "55951bfca8e799957317aa2adf5347ac8b9e325a09a27e2721f6b47ffa87ce2b"
+ },
+ "kernel_digest": "42e612707013159cb7bfbee3d63ccafa7a9ac03a9e6324e58171b58abdf3456b",
+ "no_progress": [
+  {
+   "attempts_repeating_the_one_before": [
+    2
+   ],
+   "failures": [
+    "CAPABILITY_UNRUNNABLE: review: CAPABILITY_UNRUNNABLE"
+   ],
+   "story": "S1"
+  }
+ ],
+ "plan_hash": "35ad86a86f69356517ff252b13925a51d2934e64fe30e9e02b86a0bf5907a69d",
+ "plan_quality_verdict": "NOT_CLAIMED",
+ "platform": {
+  "python": "3.14.8",
+  "system": "linux"
+ },
+ "preflight": {
+  "accounting": {
+   "input_tokens": 200,
+   "output_tokens": 40,
+   "provider_requests": 3,
+   "turns": 0,
+   "unaccounted": []
+  },
+  "observation": {
+   "declared_model": "model-1",
+   "expected_listed_owner": "fake",
+   "expected_served_model": "model-1",
+   "listing": {
+    "http": 200,
+    "id": "model-1",
+    "listed": true,
+    "owned_by": "fake"
+   },
+   "probes": [
+    {
+     "http": 200,
+     "served_model": "model-1",
+     "system_fingerprint": "fp-1"
+    },
+    {
+     "http": 200,
+     "served_model": "model-1",
+     "system_fingerprint": "fp-1"
+    }
+   ],
+   "route": "fakeprov/model-1"
+  },
+  "problems": [],
+  "verdict": "ATTESTED"
+ },
+ "productproof": {
+  "delivered": 0,
+  "obligations": [
+   {
+    "criterion": "C-SUM",
+    "delivered": false,
+    "expected": "SATISFIED",
+    "last_proof": {
+     "agreement": true,
+     "candidate": "79a25a5ddd854dc502600ab231e2d35e5b6b83c2",
+     "seq": 98,
+     "verdict": "SATISFIED"
+    },
+    "probe_id": "probe.cli_invocation",
+    "role": "INTRODUCE",
+    "satisfied_at_last_proof": true,
+    "spec": "PPS-5ea4493062c1d89d8e6f8d40fbc9c92f289b309283fd3bed00ee6fdbd8c09243",
+    "story": "S1"
+   },
+   {
+    "criterion": "C-USAGE-0",
+    "delivered": false,
+    "expected": "SATISFIED",
+    "last_proof": {
+     "agreement": true,
+     "candidate": "79a25a5ddd854dc502600ab231e2d35e5b6b83c2",
+     "seq": 106,
+     "verdict": "SATISFIED"
+    },
+    "probe_id": "probe.cli_invocation",
+    "role": "INTRODUCE",
+    "satisfied_at_last_proof": true,
+    "spec": "PPS-5a52e3117c6159c058f31b67acff3e5deb3cb6a4f4760f6d3bf6ccc8dfb1bdb5",
+    "story": "S1"
+   },
+   {
+    "criterion": "C-USAGE-1",
+    "delivered": false,
+    "expected": "SATISFIED",
+    "last_proof": {
+     "agreement": true,
+     "candidate": "79a25a5ddd854dc502600ab231e2d35e5b6b83c2",
+     "seq": 114,
+     "verdict": "SATISFIED"
+    },
+    "probe_id": "probe.cli_invocation",
+    "role": "INTRODUCE",
+    "satisfied_at_last_proof": true,
+    "spec": "PPS-ca5b9c474e6d1c0b5b82b3f66be1de6e817f0ef488de814330428b57d4c10d5f",
+    "story": "S1"
+   }
+  ],
+  "satisfied_at_last_proof": 3,
+  "total": 3
+ },
+ "project": "calc-cli",
+ "runspec_hash": "05f77ddffc0a217f38da122ae439d722bfca09b3428342e718bd26f3efa6164f",
+ "scanner": "none",
+ "sessions": [
+  {
+   "attempt": 1,
+   "candidate": "1fca140c54060ad80ad3c8f068b43abcfd9abea0",
+   "developer_committed_itself": false,
+   "error": null,
+   "exit": 0,
+   "log": "S1.developer.1.jsonl",
+   "prompt_sha256": "c1cca26a656a14070d0df59fd0365febe849402b3ee0f6ca16a2b3ce45d35385",
+   "redacted": 0,
+   "role": "developer",
+   "seconds": 0.2,
+   "started": true,
+   "stopped": null,
+   "story_id": "S1",
+   "timed_out": false,
+   "tokens": {
+    "input": 130,
+    "output": 10
+   },
+   "turns": 1
+  },
+  {
+   "attempt": 2,
+   "candidate": "79a25a5ddd854dc502600ab231e2d35e5b6b83c2",
+   "developer_committed_itself": false,
+   "error": null,
+   "exit": 0,
+   "log": "S1.developer.2.jsonl",
+   "prompt_sha256": "3dc60cf8d7d5255889e1cdb0049006c0162c28a36a0db7f65af17e906ebe2b7f",
+   "redacted": 0,
+   "role": "developer",
+   "seconds": 0.2,
+   "started": true,
+   "stopped": null,
+   "story_id": "S1",
+   "timed_out": false,
+   "tokens": {
+    "input": 130,
+    "output": 10
+   },
+   "turns": 1
+  },
+  {
+   "attempt": 1,
+   "error": null,
+   "exit": 0,
+   "log": "S1.reviewer.1.jsonl",
+   "parsed": true,
+   "prompt_sha256": "9a4eda195f238ef3dd01326ad502d26978deae37c97f68c42ee77a2893b7f41a",
+   "redacted": 0,
+   "role": "reviewer",
+   "seconds": 0.2,
+   "started": true,
+   "stopped": null,
+   "story_id": "S1",
+   "timed_out": false,
+   "tokens": {
+    "input": 130,
+    "output": 10
+   },
+   "turns": 1
+  },
+  {
+   "attempt": 2,
+   "error": null,
+   "exit": 0,
+   "log": "S1.reviewer.2.jsonl",
+   "parsed": true,
+   "prompt_sha256": "9a4eda195f238ef3dd01326ad502d26978deae37c97f68c42ee77a2893b7f41a",
+   "redacted": 0,
+   "role": "reviewer",
+   "seconds": 0.2,
+   "started": true,
+   "stopped": null,
+   "story_id": "S1",
+   "timed_out": false,
+   "tokens": {
+    "input": 130,
+    "output": 10
+   },
+   "turns": 1
+  }
+ ],
+ "settings": {
+  "budget": {
+   "input_tokens": 200000,
+   "output_tokens": 20000,
+   "provider_requests": 40,
+   "turns": 80
+  },
+  "client": "opencode",
+  "client_env": [],
+  "format": "aisef-v2-run/1",
+  "limits": {
+   "DEVELOPER": 1,
+   "ENVIRONMENT": 1,
+   "INTEGRATION": 1,
+   "PLAN": 1,
+   "PROVIDER": 1,
+   "REVIEW": 1,
+   "SECURITY": 1
+  },
+  "max_turns_per_session": 10,
+  "preflight": {
+   "chat_probes": 2
+  },
+  "prices": {
+   "cache_read_per_mtok": 0.044,
+   "cache_write_per_mtok": 1.32,
+   "currency": "USD",
+   "effective_date": "2026-10-12",
+   "input_per_mtok": 1.32,
+   "output_per_mtok": 3.96,
+   "source": "e2e fixture (not a real price)"
+  },
+  "provider": {
+   "api_key_env": "FAKE_PROVIDER_KEY",
+   "endpoint": "http://127.0.0.1:18437/v1",
+   "listed_owner": "fake",
+   "model_limit": {
+    "context": 100000,
+    "output": 8000
+   },
+   "name": "fakeprov",
+   "served_model": "model-1"
+  },
+  "review": {
+   "min_severity": "high",
+   "policy": "fix-loop"
+  },
+  "route": "fakeprov/model-1",
+  "timeouts_s": {
+   "developer": 60,
+   "probe": 60,
+   "reviewer": 120,
+   "tool": 120
+  }
+ },
+ "stage": "finished",
+ "started": 1791861896.8243673,
+ "story_errors": [],
+ "story_outcomes": {
+  "S1": [
+   "RETRY",
+   "ROLLBACK"
+  ]
+ },
+ "usage": {
+  "cost": {
+   "currency": "USD",
+   "effective_date": "2026-10-12",
+   "known": 0.001214,
+   "sessions_unknown": [],
+   "source": "e2e fixture (not a real price)",
+   "status": "known",
+   "value": 0.001214
+  },
+  "preflight": {
+   "input_tokens": 200,
+   "output_tokens": 40,
+   "provider_requests": 3,
+   "turns": 0,
+   "unaccounted": []
+  },
+  "provider_requests_journaled": 4,
+  "retries": {
+   "S1": 1
+  },
+  "sessions": [
+   {
+    "cost": 0.000198,
+    "session": "S1.developer.1.jsonl",
+    "steps": 1,
+    "steps_without_tokens": 0,
+    "tokens": {
+     "cache_read": 10,
+     "cache_write": 0,
+     "input": 120,
+     "output": 7,
+     "reasoning": 3
+    }
+   },
+   {
+    "cost": 0.000198,
+    "session": "S1.developer.2.jsonl",
+    "steps": 1,
+    "steps_without_tokens": 0,
+    "tokens": {
+     "cache_read": 10,
+     "cache_write": 0,
+     "input": 120,
+     "output": 7,
+     "reasoning": 3
+    }
+   },
+   {
+    "cost": 0.000198,
+    "session": "S1.reviewer.1.jsonl",
+    "steps": 1,
+    "steps_without_tokens": 0,
+    "tokens": {
+     "cache_read": 10,
+     "cache_write": 0,
+     "input": 120,
+     "output": 7,
+     "reasoning": 3
+    }
+   },
+   {
+    "cost": 0.000198,
+    "session": "S1.reviewer.2.jsonl",
+    "steps": 1,
+    "steps_without_tokens": 0,
+    "tokens": {
+     "cache_read": 10,
+     "cache_write": 0,
+     "input": 120,
+     "output": 7,
+     "reasoning": 3
+    }
+   }
+  ],
+  "tokens": {
+   "cache_read": 40,
+   "cache_write": 0,
+   "input": 480,
+   "output": 28,
+   "reasoning": 12
+  },
+  "wall_s": 8.268
+ }
+}

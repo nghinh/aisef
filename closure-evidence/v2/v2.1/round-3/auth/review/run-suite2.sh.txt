@@ -1,0 +1,9 @@
+#!/bin/zsh
+SP=/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad
+cd $SP/m21/r3/wt/auth-rv || exit 2
+for m in tests.v2.p2.test_mutation_targets tests.v2.test_s2_mutation_record tests.v2.test_v21_mutation_record tests.v2.test_v21_identity_bytes \
+         tests.v2.test_s2_kills tests.v2.test_v21_kill_check tests.v2.test_v21_execution_order tests.v2.test_v21_requalification \
+         tests.v2.test_v21_snapshot_delta tests.v2.test_v21_mutation_runner; do
+  echo "=== $m: $($SP/m21/kills3/py.sh auth-rv -m unittest $m 2>&1 | grep -E '^Ran|^OK|^FAILED|^FAIL:' | tr '\n' ' ')"
+done
+echo DONE

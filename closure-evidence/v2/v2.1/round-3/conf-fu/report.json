@@ -1,0 +1,268 @@
+{
+ "wp": "conf-fu",
+ "branch": "v21r3/conf-fu",
+ "head": "fb73a3329d258f33df8f7baf637a1e54d8718908",
+ "code_commit": "5012420 (aisef2/app/confine.py + tests + driver); fb73a33 is docs and the guest record only",
+ "started_from": "v21r3/conf-rv c05d19c",
+ "files_changed": [
+  "aisef2/app/confine.py",
+  "tests/v2/test_v21_r3_conf_fu_before.py (new)",
+  "tests/v2/test_v21_r3_conf_policy.py",
+  "validation/v21/sandbox/r3_conf_fu_guest.py (new)",
+  "docs/v2.1/decisions/B03-R3-conf.md",
+  "docs/v2.1/SANDBOX-LINUX.md",
+  "docs/v2.1/evidence/sandbox/r3-conf/README.md",
+  "docs/v2.1/evidence/sandbox/r3-conf/fu-X1.json (new)"
+ ],
+ "change": "confine._probe: rep['host_mounts'] is the reading taken just before the session (None when it failed); rep['host_mounts_appeared'] (new) = rows of the reading after the session that the one before lacks, as _host_mounts shapes them, None when either reading failed; it decides nothing, and an unreadable reading after no longer refuses. _owned, _writes, _judge untouched.",
+ "tests_added": [
+  "tests/v2/test_v21_r3_conf_fu_before.py (9 tests: ReadingBefore 4, ReadingLost 2, Appeared 3)"
+ ],
+ "existing_tests_changed": [
+  {
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "test": "ReportedData.test_the_host_is_read_before_the_session_and_after_it_and_both_count -> test_the_host_is_judged_by_the_reading_before_the_session_the_one_after_decides_nothing",
+   "why": "it pinned the union: 'a super block the host held at either moment is the host's' (the case with the row in the reading after the session only expected a refusal). That case now expects acceptance; the cases whose row is in the reading before keep every refusal assertion (problem names ['/tmp'] and the host's mount point); a fourth case (row in both readings) added; host_mounts == the reading before and host_mounts_appeared == the rows that appeared asserted for all.",
+   "owner_sentence": "W3 (the owner, B03-R3 conf §1): Chỉ chấp nhận khi chứng minh được mount/namespace thuộc sandbox, không mở đường ghi vào host hoặc phiên khác và có vòng đời dọn dẹp phù hợp. (and the lead's FU-CONF requirement: judged by the reading before the session)"
+  },
+  {
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "test": "ReportedData.test_a_reading_that_failed_leaves_no_mount_shown_to_be_the_sandboxs -> test_a_reading_before_that_failed_leaves_no_mount_shown_to_be_the_sandboxs",
+   "why": "its case (reading before ok, reading after None) expected host_mounts None and a 'cannot establish' refusal: the pinned union. An unreadable reading after no longer refuses; the case is removed here and pinned in test_v21_r3_conf_fu_before.ReadingLost.test_an_unreadable_reading_after_refuses_nothing (problems [], host_mounts == the reading before, host_mounts_appeared None). The two remaining cases (None, ok), (None, None) keep every assertion.",
+   "owner_sentence": "W3 (the owner, B03-R3 conf §1): Chỉ chấp nhận khi chứng minh được mount/namespace thuộc sandbox, không mở đường ghi vào host hoặc phiên khác và có vòng đời dọn dẹp phù hợp. / W5 (cannot be established -> refuse): the reading before is still required"
+  }
+ ],
+ "also_edited_docs_that_described_the_union": [
+  "B03-R3-conf.md §4.1, §5.7, §7 table row, §12 last bullet (each points to the new §13)",
+  "SANDBOX-LINUX.md: the policy table row, the 'report records' paragraph, the residual-risk bullet",
+  "confine.py module docstring"
+ ],
+ "hazard_repro": {
+  "before_change": {
+   "simulation": "tests/v2/test_v21_r3_conf_fu_before.py run on the unchanged c05d19c code (out/conf-fu/before-change-run.txt): 4 failures + 6 errors of 9. ReadingBefore.test_a_super_block_only_the_reading_after_the_session_holds_is_not_the_hosts: the correct session was refused: \"writable outside the workspace: ['/tmp'] (/tmp: its super block 0:58 is the host's (mounted there at /mnt/other))\" with the row only in the reading after the session. Controls (row in the reading before; a rw bind of the host's mqueue 0:64) refused, as required. SIMULATED (T05b transcript, _host_mounts answered by the test).",
+   "real_guest": "r3_conf_fu_guest.py reuse at the c05d19c tree, real bubblewrap 0.12.0, Linux 7.0.12-linuxkit: 48 unrelated tmpfs mounted by the driver in place of the second reading took six of the session's own super blocks (/ 0:60, /proc 0:61, /dev 0:62, /dev/pts 0:63, /tmp 0:65, /aisef-home 0:85): accepted=false, 'writable outside the workspace: [/, /proc, /dev, /dev/pts, /tmp, /aisef-home] (/: its super block 0:60 is the host's ...)'. Without the mounts: accepted. REAL bubblewrap, probe and kernel numbers; the unrelated host activity is the driver's (simulated)."
+  },
+  "after_change": {
+   "simulation": "9/9 pass: the same session accepted, problems [], host_mounts == the reading before, host_mounts_appeared == [the row]; control rows in the reading before still refused ('is the host's (mounted there at /mnt/other)'); a rw bind of the host's mqueue 0:64 refused with the reading after holding it, lacking it, or unreadable.",
+   "real_guest": "same driver at 5012420: baseline with the 48 mounts ACCEPTED (problems [], 6 numbers taken, host_mounts_appeared 48 rows, host_mounts 15 rows); the container's mqueue bound rw at /hostmq REFUSED by its super block 0:64 (mounted there at /dev/mqueue) with the mounts and without them. REAL (same caveat).",
+   "wrong_implementations_tried": [
+    "union again (the old code)",
+    "the reading after only",
+    "appeared = every row of the reading after",
+    "appeared = the rows that went",
+    "host table lost when the reading after failed",
+    "appeared computed when the reading before failed",
+    "the reading after used when the one before failed"
+   ]
+  }
+ },
+ "mutants": [
+  {
+   "function": "aisef2/app/confine.py::_probe",
+   "total": 216,
+   "killed": 213,
+   "survived": 3,
+   "source_sha256": "093e276c57b5b5c0b332937276ee41e04b0eb344ef05a4abcf23c38eddae16e9",
+   "new_lines": "the 7 mutants of the two changed lines (L401, L402) are all KILLED, by test_v21_r3_conf_fu_before",
+   "dispositions": [
+    {
+     "mutant": "[131] L369 string 'sleep ' emptied",
+     "disposition": "AUDITED",
+     "ground": "same mutant as the base campaign's audit 110 (SURVIVOR-AUDITS.json), the line is byte-identical to c05d19c: `command in pr.command` is a substring test, a superset of matches can only be the probe's own descendants (a process the session left); consumers: _judge 'a process the session left outlived it', validation/v21/sandbox/linux_guest.py + validation/v2/cleanup_authority.py signal_owned (pids reported are never trusted, only checked)."
+    },
+    {
+     "mutant": "[199] L367 string ': ' emptied",
+     "disposition": "AUDITED",
+     "ground": "audit 167: only the ': ' between exception class and message is lost; nobody parses the text (_sections reads MARK lines only); consumers run.py RunRefused join, cli.py --check; line unchanged."
+    },
+    {
+     "mutant": "[208] L353 string '.git' emptied",
+     "disposition": "EQUIVALENT",
+     "ground": "audit 175: `git_dir(str(ws)) or ws / '.git'`: the right operand is evaluated only when git_dir returns a falsy value; every caller hands _probe a workspace made by confine._worktree (git worktree add): measure (confine.py:326) and the validation drivers r3_conf_guest.py:109, r3_conf_review_guest.py:55, r3_conf_fu_guest.py:78. Note: the base audit said 'one caller'; the drivers (since 7b5d67f) are callers too and all pass a worktree."
+    }
+   ]
+  },
+  {
+   "function": "aisef2/app/confine.py::_owned",
+   "total": 118,
+   "killed": 118,
+   "survived": 0,
+   "dispositions": [],
+   "note": "source unchanged; re-run because kill files it uses were edited"
+  },
+  {
+   "function": "aisef2/app/confine.py::_judge",
+   "total": 175,
+   "killed": 168,
+   "survived": 7,
+   "note": "source unchanged; re-run because kill files it uses were edited",
+   "dispositions": [
+    {
+     "mutant": "[95] L559 '/nonexistent' emptied",
+     "disposition": "AUDITED",
+     "ground": "base audit 92"
+    },
+    {
+     "mutant": "[100] L529 element 0 dropped (rc in (None, 127))",
+     "disposition": "AUDITED",
+     "ground": "base audit 97"
+    },
+    {
+     "mutant": "[135],[136],[138],[139] L522 workspace defaults",
+     "disposition": "EQUIVALENT",
+     "ground": "base audits 125, 126, 128, 129 (dominated by the `or`; the default is never read)"
+    },
+    {
+     "mutant": "[142] L530 string ')' emptied",
+     "disposition": "AUDITED",
+     "ground": "base audit 132 (legibility only; nobody parses the message)"
+    }
+   ]
+  },
+  {
+   "function": "aisef2/app/confine.py::_writes",
+   "total": 18,
+   "killed": 18,
+   "survived": 0,
+   "dispositions": []
+  },
+  {
+   "function": "aisef2/app/confine.py::_host_mounts",
+   "total": 16,
+   "killed": 16,
+   "survived": 0,
+   "dispositions": []
+  },
+  {
+   "function": "aisef2/app/confine.py::measure",
+   "total": 60,
+   "killed": 59,
+   "survived": 1,
+   "note": "source unchanged; re-run because kill files it uses were edited",
+   "dispositions": [
+    {
+     "mutant": "[49] L316 string '/' emptied",
+     "disposition": "EQUIVALENT",
+     "ground": "base audit 51: wrap raises Unavailable on the same predicate before the workspace is read"
+    }
+   ]
+  }
+ ],
+ "mutant_records": "out/conf-fu/kc-_probe.json, kc-_owned.json, kc-_judge.json, kc-_writes.json, kc-_host_mounts.json, kc-measure.json (+ .log); kill set order: fu_before, rv_hostrows, policy, locale, T07a, T06a, A06, T05b, T05a, T05c, A05, R02, T06b, A07, T07b, TO2, defects_confine, confine; T0 PASS for every file; INFRA 0. Mutant positions of _probe/_judge/measure shifted by the new lines: the 'Pins ... [indices]' docstrings and registry positions the lead regenerates.",
+ "kill_files_by_function": {
+  "_owned": [
+   "tests/v2/test_v21_r3_conf_fu_before.py",
+   "tests/v2/test_v21_r3_conf_rv_hostrows.py",
+   "tests/v2/test_v21_r3_conf_policy.py"
+  ],
+  "_writes": [
+   "tests/v2/test_v21_r3_conf_fu_before.py",
+   "tests/v2/test_v21_r3_conf_policy.py"
+  ],
+  "_host_mounts": [
+   "tests/v2/test_v21_r3_conf_fu_before.py",
+   "tests/v2/test_v21_r3_conf_policy.py"
+  ],
+  "_judge": [
+   "tests/v2/test_v21_r3_conf_fu_before.py",
+   "tests/v2/test_v21_r3_conf_rv_hostrows.py",
+   "tests/v2/test_v21_confine.py",
+   "tests/v2/test_v21_kills3_A06.py",
+   "tests/v2/test_v21_kills3_T06a.py",
+   "tests/v2/test_v21_r3_conf_policy.py"
+  ],
+  "measure": [
+   "tests/v2/test_v21_r3_conf_fu_before.py",
+   "tests/v2/test_v21_confine.py",
+   "tests/v2/test_v21_kills3_A06.py",
+   "tests/v2/test_v21_kills3_T06b.py",
+   "tests/v2/test_v21_r3_conf_locale.py",
+   "tests/v2/test_v21_r3_conf_policy.py"
+  ],
+  "_probe": [
+   "tests/v2/test_v21_r3_conf_fu_before.py",
+   "tests/v2/test_v21_defects_confine.py",
+   "tests/v2/test_v21_kills3_A05.py",
+   "tests/v2/test_v21_kills3_T05a.py",
+   "tests/v2/test_v21_kills3_T05b.py",
+   "tests/v2/test_v21_kills3_T05c.py",
+   "tests/v2/test_v21_kills3_R02.py",
+   "tests/v2/test_v21_r3_conf_locale.py",
+   "tests/v2/test_v21_r3_conf_policy.py"
+  ]
+ },
+ "kill_files_new": [
+  "tests/v2/test_v21_r3_conf_fu_before.py"
+ ],
+ "guest_runs": [
+  {
+   "cmd": "guest.sh <archive of c05d19c + the driver> X1 python3 -B /repo/validation/v21/sandbox/r3_conf_fu_guest.py reuse",
+   "class": "REAL bubblewrap 0.12.0 / kernel numbers; unrelated host activity SIMULATED by the driver",
+   "result": "baseline+48 mounts: refused (6 own super blocks 'the host's'); baseline: accepted; host mqueue bound: refused"
+  },
+  {
+   "cmd": "guest.sh <archive of 5012420> X1 python3 -B /repo/validation/v21/sandbox/r3_conf_fu_guest.py reuse",
+   "class": "REAL (same caveat)",
+   "result": "baseline+48 mounts: accepted (host_mounts_appeared 48 rows, 6 numbers taken); host mqueue bound refused with and without the mounts"
+  },
+  {
+   "cmd": "guest.sh <5012420> X1 python3 -B /repo/validation/v21/sandbox/r3_conf_guest.py scenarios | shared-tree | locale",
+   "class": "REAL",
+   "result": "12 scenarios x2 modes: verdicts and problems equal the committed records but for super block numbers and one pid; host_mounts_appeared [] and table_unchanged true in all 24; locale {LANG: C, LC_ALL: C}, problems []"
+  },
+  {
+   "cmd": "guest.sh <5012420> X1 python3 -B /repo/validation/v21/sandbox/r3_conf_review_guest.py",
+   "class": "REAL",
+   "result": "8 entries, same verdicts and problems as review-X1.json"
+  },
+  {
+   "cmd": "guest.sh <5012420> X1 env NETWORK={host,none} PROFILE=X1 python3 -B /repo/validation/v21/sandbox/measure.py",
+   "class": "REAL (confine.measure as run.execute calls it)",
+   "result": "measure.problems [] for both; host_mounts_appeared is a list ([]); locale C"
+  },
+  {
+   "cmd": "guest.sh <5012420> hardened python3 -B -m unittest <fu_before policy rv_hostrows locale T07a T06a A06 T05a T05b T05c defects_confine confine>",
+   "class": "REAL guest, tests are simulated at the bubblewrap boundary as before",
+   "result": "Ran 179 tests OK (skipped=1: the existing skip)"
+  }
+ ],
+ "guest_record": "docs/v2.1/evidence/sandbox/r3-conf/fu-X1.json (condensed; raw outputs in out/conf-fu/guest/)",
+ "test_runs": [
+  {
+   "what": "ruff check . (whole tree) before each commit",
+   "result": "All checks passed"
+  },
+  {
+   "what": "T0 (t0_check.py) of test_v21_r3_conf_fu_before against _probe",
+   "result": "PASS, 9 tests"
+  },
+  {
+   "what": "host (py.sh), at HEAD fb73a33: test_v21_confine 34, defects_confine 16, r3_conf_policy 42, r3_conf_locale 10, rv_hostrows 3, fu_before 9, kills3 A05 6 A06 4 A07 5 R02 2 T05a 8 T05b 18 T05c 7 T06a 14 T06b 8 T07a 14 T07b 11 (skip 1) TO2 3, T13a 12, T14b 15, T23a 20, T24a 24, T26a 23, defects_bundleshape 14, p0.test_destructive_authority 13, p4.test_mutation_safety 10, p5.test_invariants 50, release_s2_kernel 16, c2_p10_cohort_static 8, p6_stages 39, p6_orchestration 32, p2.test_mutation_targets 4, test_v21_mutation_record 7, test_s2_mutation_record 12, test_v21_requalification 3, test_v21_snapshot_delta 51",
+   "result": "all OK"
+  },
+  {
+   "what": "tests.v2.test_c2_k_nowork_001 at HEAD",
+   "result": "FAILED (failures=1): 'the kernel changed since the record: kernel.after.kernel_digest is not this tree's aisef2' — EXPECTED stale (the record binds the kernel tree; the lead regenerates), as at 7b5d67f and c05d19c"
+  },
+  {
+   "what": "tests.v2.test_v21_continue_integrity (24 tests) at HEAD",
+   "result": "INTERMITTENT, NOT CAUSED BY THIS CHANGE (fails the same way at the c05d19c tree). Nine full-module runs at HEAD: failures 3, 1, 2, 2+1 error, 0, 1, 0, 3, 2 (seven failing, two clean: 24 OK in 226 s and 227 s); at the c05d19c tree ProviderRequestWindows failed 3 of 3 at the same time as at HEAD (and passes alone, and passed at 07:03), then full-module runs there were clean, clean, and one with 4 failures (the traceback below). Cause captured with a traceback (a scratch copy of c05d19c with run.py's except block recording format_exc(), out/conf-fu/dbg/loopc-3.txt): story REFUSED: ValueError: invalid literal for int() with base 10: 'alpha' at aisef2/runtime/process_range.py:95 _ps_table <- process_table <- ProcessRange.escaped <- probe/python_callable_v2.observe -> run.release(). _ps_table parses the output of `ps` with str.splitlines(), which also splits on U+2028/U+0085/U+000B/U+000C/U+001C-1E: any process on the macOS host whose command line holds one raw followed by text (another agent's test here) makes process_table() raise. Reproduced on demand with one process of mine (python3 -c with U+2028 in its source, alive 6 s): process_table raised ValueError ... 'alpha'. Linux (/proc) is not affected. Confinement is not involved (these tests' settings carry none)."
+  }
+ ],
+ "found_outside_the_scope": [
+  "aisef2/runtime/process_range.py::_ps_table (non-Linux): `r.stdout.splitlines()` splits a ps row at U+2028, U+0085, U+000B, U+000C, U+001C-1E when a command line holds one raw (macOS ps escapes \\n as \\012 but prints these as UTF-8), and `int(f[0])` of the continuation raises ValueError: aisef run on macOS refuses a story ('REFUSED: ValueError') while any such process exists; confine._survivors calls process_table too (Linux only: not reachable on macOS, where measure raises Unavailable first). Fix would be `.split('\\n')` (and tolerating a row that does not parse). Not changed here: outside this WP; no test of it exists."
+ ],
+ "not_established": [
+  "A host mount made after the reading before the session and before bubblewrap bound its parent in read-write, still mounted at the second reading, is no longer told from the sandbox's own (the union refused it). Bounded by: confine.wrap binds read-write only the workspace; a mount the host makes while the session runs reaches it only by propagation, which carries a host peer-group tag the policy already calls 'not shown to be the sandbox's own'. Argued from the code and the shared-tree record; NOT measured (no run mounts on the host in that window); bubblewrap's remount of submounts under --ro-bind not re-measured.",
+  "Unchanged and still fail-closed: a super block the reading before holds that the host unmounts before bubblewrap makes the session's own mounts frees its number for them -> a spurious refusal; window = reading before -> session mount setup. Not removed (cannot be told from a leak without the data to decide it).",
+  "The unrelated host activity of the real-guest reproduction is the driver's mounts in the controller's own mount namespace (a user+mount namespace of the container), not a second container or a CI host; the freed-number reuse itself is the kernel's.",
+  "Not run: a systemd / bare-metal host, CI Linux, bubblewrap other than 0.12.0, Python 3.11-3.13 (the new tests ran on the host's 3.14.7 and the guest's 3.14.8 only; no syntax newer than 3.11 is used, not machine-checked).",
+  "test_v21_continue_integrity is intermittent on this macOS host for the reason above; two clean full-module passes at HEAD; the defect is in the base tree and independent of this change.",
+  "The mutation record, K-NOWORK and Q0 checkers: test_c2_k_nowork_001 is stale as expected; nothing else of the sealed records was regenerated (the lead's)."
+ ],
+ "decisions_needed": [
+  "Lead/owner: accept the cost named in not_established[0] (the union's only extra refusal) — it follows the requirement as given; if the owner wants it covered, the only data that could is a third reading right after the session starts, which cannot be taken from the controller.",
+  "Lead: register tests/v2/test_v21_r3_conf_fu_before.py as a kill file of _probe, _owned, _judge, _writes, _host_mounts, measure (it killed 120/59/101/16/13/16 mutants first in the order of this run); and regenerate the 'Pins ... [indices]' positions of _probe/_judge/measure which the two new lines shifted.",
+  "Lead: file the process_range._ps_table defect (found_outside_the_scope)."
+ ]
+}

@@ -1,0 +1,67 @@
+test_MUT_AUTH_NEG_2_a_claimed_pid_from_fixture_output_is_a_lookup_key_never_permission (tests.v2.p4.test_mutation_safety.CleanupAuthority.test_MUT_AUTH_NEG_2_a_claimed_pid_from_fixture_output_is_a_lookup_key_never_permission)
+INV-MUTATION-AUTHORITY, MUT-AUTH-NEG-2: a pid that a subject or a fixture wrote out (a pid file, a report) ... /usr/local/lib/python3.14/subprocess.py:1139: ResourceWarning: subprocess 12 is still running
+  _warn("subprocess %s is still running" % self.pid,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_MUT_AUTH_NEG_2_group_proof_needs_the_leader_proved_not_a_matching_number (tests.v2.p4.test_mutation_safety.CleanupAuthority.test_MUT_AUTH_NEG_2_group_proof_needs_the_leader_proved_not_a_matching_number)
+A pgid equal to some pid is not a group the controller created: the leader itself must be proved. ... ok
+test_MUT_SAFE_1_a_report_of_every_process_on_the_host_selects_only_the_runners_own (tests.v2.p4.test_mutation_safety.CleanupAuthority.test_MUT_SAFE_1_a_report_of_every_process_on_the_host_selects_only_the_runners_own) ... ok
+test_MUT_SAFE_2_the_runners_parent_shell_and_launchd_owned_processes_are_never_signalled (tests.v2.p4.test_mutation_safety.CleanupAuthority.test_MUT_SAFE_2_the_runners_parent_shell_and_launchd_owned_processes_are_never_signalled) ... ok
+test_MUT_SAFE_3_a_reused_pid_or_pgid_of_an_unrelated_process_is_refused (tests.v2.p4.test_mutation_safety.CleanupAuthority.test_MUT_SAFE_3_a_reused_pid_or_pgid_of_an_unrelated_process_is_refused) ... ok
+test_MUT_SAFE_4_ownership_that_cannot_be_proved_fails_closed (tests.v2.p4.test_mutation_safety.CleanupAuthority.test_MUT_SAFE_4_ownership_that_cannot_be_proved_fails_closed) ... ok
+test_MUT_SAFE_5_an_owned_child_is_cleaned_and_the_canary_beside_it_survives (tests.v2.p4.test_mutation_safety.CleanupAuthority.test_MUT_SAFE_5_an_owned_child_is_cleaned_and_the_canary_beside_it_survives) ... /usr/local/lib/python3.14/subprocess.py:1139: ResourceWarning: subprocess 8 is still running
+  _warn("subprocess %s is still running" % self.pid,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/local/lib/python3.14/subprocess.py:1139: ResourceWarning: subprocess 10 is still running
+  _warn("subprocess %s is still running" % self.pid,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/local/lib/python3.14/subprocess.py:1139: ResourceWarning: subprocess 16 is still running
+  _warn("subprocess %s is still running" % self.pid,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/local/lib/python3.14/subprocess.py:1139: ResourceWarning: subprocess 18 is still running
+  _warn("subprocess %s is still running" % self.pid,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/local/lib/python3.14/subprocess.py:1139: ResourceWarning: subprocess 20 is still running
+  _warn("subprocess %s is still running" % self.pid,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/local/lib/python3.14/subprocess.py:1139: ResourceWarning: subprocess 22 is still running
+  _warn("subprocess %s is still running" % self.pid,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/local/lib/python3.14/subprocess.py:1139: ResourceWarning: subprocess 24 is still running
+  _warn("subprocess %s is still running" % self.pid,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/local/lib/python3.14/subprocess.py:1139: ResourceWarning: subprocess 26 is still running
+  _warn("subprocess %s is still running" % self.pid,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/local/lib/python3.14/subprocess.py:1139: ResourceWarning: subprocess 28 is still running
+  _warn("subprocess %s is still running" % self.pid,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/local/lib/python3.14/subprocess.py:1139: ResourceWarning: subprocess 30 is still running
+  _warn("subprocess %s is still running" % self.pid,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/local/lib/python3.14/subprocess.py:1139: ResourceWarning: subprocess 32 is still running
+  _warn("subprocess %s is still running" % self.pid,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/usr/local/lib/python3.14/subprocess.py:1139: ResourceWarning: subprocess 34 is still running
+  _warn("subprocess %s is still running" % self.pid,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_MUT_SAFE_6_the_finding_011_mutant_cannot_expand_the_cleanup_set (tests.v2.p4.test_mutation_safety.CleanupAuthority.test_MUT_SAFE_6_the_finding_011_mutant_cannot_expand_the_cleanup_set)
+The mutant that took the login session down on 2026-09-23 15:38:28 (Python 93138): `_Posix.escaped` with ... FAIL
+test_MUT_SAFE_7_every_signal_the_authority_sends_targets_the_owned_set (tests.v2.p4.test_mutation_safety.CleanupAuthority.test_MUT_SAFE_7_every_signal_the_authority_sends_targets_the_owned_set) ... ok
+test_MUT_SAFE_8_the_authority_imports_no_code_under_mutation_and_the_runner_signals_only_through_it (tests.v2.p4.test_mutation_safety.DependencyBoundary.test_MUT_SAFE_8_the_authority_imports_no_code_under_mutation_and_the_runner_signals_only_through_it) ... ok
+
+======================================================================
+FAIL: test_MUT_SAFE_6_the_finding_011_mutant_cannot_expand_the_cleanup_set (tests.v2.p4.test_mutation_safety.CleanupAuthority.test_MUT_SAFE_6_the_finding_011_mutant_cannot_expand_the_cleanup_set)
+The mutant that took the login session down on 2026-09-23 15:38:28 (Python 93138): `_Posix.escaped` with
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/repo/tests/v2/p4/test_mutation_safety.py", line 140, in test_MUT_SAFE_6_the_finding_011_mutant_cannot_expand_the_cleanup_set
+    self.assertGreater(len(reported), 50, "the mutant is the catastrophic one: it reports the host")
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 not greater than 50 : the mutant is the catastrophic one: it reports the host
+
+----------------------------------------------------------------------
+Ran 10 tests in 12.745s
+
+FAILED (failures=1)

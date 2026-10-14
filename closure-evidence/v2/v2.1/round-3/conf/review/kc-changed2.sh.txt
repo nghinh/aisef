@@ -1,0 +1,12 @@
+#!/bin/zsh
+SP=/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad
+OUT=$SP/m21/r3/out/conf/review
+until grep -q '^done' $OUT/kc-changed.status 2>/dev/null; do sleep 5; done
+: > $OUT/kc-changed2.status
+MI=$(python3 -c "import json;print(','.join(map(str,json.load(open('$OUT/changed-idx.json'))['measure'])))")
+JI=$(python3 -c "import json;print(','.join(map(str,json.load(open('$OUT/changed-idx.json'))['_judge'])))")
+$OUT/kc.sh aisef2/app/confine.py::measure measure-changed --only $MI > $OUT/kc-measure-changed.log 2>&1
+echo "measure exit $? $(tail -1 $OUT/kc-measure-changed.log | cut -c1-150)" >> $OUT/kc-changed2.status
+$OUT/kc.sh aisef2/app/confine.py::_judge judge-changed --only $JI > $OUT/kc-judge-changed.log 2>&1
+echo "_judge exit $? $(tail -1 $OUT/kc-judge-changed.log | cut -c1-150)" >> $OUT/kc-changed2.status
+echo done >> $OUT/kc-changed2.status

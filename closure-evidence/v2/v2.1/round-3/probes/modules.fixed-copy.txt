@@ -1,0 +1,30 @@
+tests.v2.p2.test_calibration :: Ran 17 tests in 0.022s OK 
+tests.v2.p2.test_calibration_fixtures :: Ran 3 tests in 6.526s OK 
+tests.v2.p2.test_probe_protocol :: Ran 35 tests in 0.010s OK 
+tests.v2.p2.test_python_callable :: Ran 37 tests in 29.557s OK 
+tests.v2.test_c2_cli_calibration :: Ran 3 tests in 40.728s OK 
+tests.v2.test_c2_cli_invocation :: Ran 32 tests in 69.486s OK 
+tests.v2.test_c2_cli_protocol :: FAIL: test_CLI_Q0_the_module_passes_the_probe_rules_with_its_catalog_facts (tests.v2.test_c2_cli_protocol.Identity.test_CLI_Q0_the_module_passes_the_probe_rules_with_its_catalog_facts) Ran 18 tests in 61.472s FAILED (failures=1) 
+tests.v2.test_c2_cli_verdicts :: Ran 19 tests in 0.033s OK 
+tests.v2.test_c2_effect_calibration :: Ran 5 tests in 30.143s OK 
+tests.v2.test_c2_file_artifact :: FAIL: test_FA_Q0_the_probe_passes_the_probe_source_rules_and_is_registered_closed (tests.v2.test_c2_file_artifact.Catalog.test_FA_Q0_the_probe_passes_the_probe_source_rules_and_is_registered_closed) Ran 40 tests in 4.693s FAILED (failures=1) 
+tests.v2.test_probe_process_effect :: FAIL: test_PE_Q0_the_module_passes_the_six_probe_rules_with_its_catalog_facts (tests.v2.test_probe_process_effect.Identity.test_PE_Q0_the_module_passes_the_six_probe_rules_with_its_catalog_facts) Ran 24 tests in 43.894s FAILED (failures=1) 
+tests.v2.test_probe_process_effect_bytecode :: Ran 5 tests in 5.805s OK 
+tests.v2.test_probe_process_effect_units :: FAIL: test_the_scenario_rules (tests.v2.test_probe_process_effect_units.Vocabulary.test_the_scenario_rules) FAIL: test_the_step_vocabulary_is_closed_and_each_kind_has_exactly_its_typed_fields (tests.v2.test_probe_process_effect_units.Vocabulary.test_the_step_vocabulary_is_closed_and_each_kind_has_exactly_its_typed_fields) Ran 22 tests in 1.362s FAILED (failures=2) 
+tests.v2.test_python_callable_v2 :: FAIL: test_PCV2_Q0_the_probe_source_rules_pass_on_this_module (tests.v2.test_python_callable_v2.Q0.test_PCV2_Q0_the_probe_source_rules_pass_on_this_module) Ran 33 tests in 104.369s FAILED (failures=1) 
+tests.v2.test_python_callable_v2_bytecode :: Ran 10 tests in 6.331s OK 
+tests.v2.test_v21_identity :: ERROR: test_a_spec_no_release_compiles_is_refused_not_guessed (tests.v2.test_v21_identity.Migrate.test_a_spec_no_release_compiles_is_refused_not_guessed) ERROR: test_migration_rebinds_the_plan_and_nothing_else (tests.v2.test_v21_identity.Migrate.test_migration_rebinds_the_plan_and_nothing_else) ERROR: test_the_2_0_0_bundle_is_refused_naming_the_command (tests.v2.test_v21_identity.Migrate.test_the_2_0_0_bundle_is_refused_naming_the_command) ERROR: test_the_command_writes_a_new_file_and_never_the_input (tests.v2.test_v21_identity.Migrate.test_the_command_writes_a_new_file_and_never_the_input) ERROR: test_the_write_is_exclusive_so_a_file_that_appears_after_the_check_is_never_replaced (tests.v2.test_v21_identity.Migrate.test_the_write_is_exclusive_so_a_file_that_appears_after_the_check_is_never_replaced) ERROR: test_the_written_file_keeps_the_2_0_bytes_non_ascii_escaped (tests.v2.test_v21_identity.Migrate.test_the_written_file_keeps_the_2_0_bytes_non_ascii_escaped) ERROR: test_calibrations_bound_to_the_bytes_that_run_admit_and_other_bytes_admit_nothing (tests.v2.test_v21_identity.ThreeIdentities.test_calibrations_bound_to_the_bytes_that_run_admit_and_other_bytes_admit_nothing) Ran 13 tests in 0.613s FAILED (errors=7) 
+tests.v2.test_v21_identity_bytes :: ERROR: test_calibrations_of_other_bytes_admit_nothing (tests.v2.test_v21_identity_bytes.ThreeIdentities.test_calibrations_of_other_bytes_admit_nothing) FAIL: test_the_shipped_calibrations_name_every_class_at_the_bytes_that_run_now (tests.v2.test_v21_identity_bytes.ThreeIdentities.test_the_shipped_calibrations_name_every_class_at_the_bytes_that_run_now) Ran 4 tests in 0.167s FAILED (failures=1, errors=1) 
+tests.v2.test_v21_python_imports :: 
+tests.v2.test_v21_kills3_A18 :: Ran 1 test in 1.564s OK 
+tests.v2.test_v21_kills3_A19 :: Ran 3 tests in 1.711s OK 
+tests.v2.test_v21_kills3_A21 :: Ran 2 tests in 3.612s OK 
+tests.v2.test_v21_kills3_T18a :: Ran 9 tests in 10.005s OK 
+tests.v2.test_v21_kills3_T18b :: Ran 13 tests in 9.942s OK 
+tests.v2.test_v21_kills3_T19a :: Ran 11 tests in 6.468s OK 
+tests.v2.test_v21_kills3_T19b :: FAIL: test_the_scenario_is_admitted_runs_and_is_observed (tests.v2.test_v21_kills3_T19b.FaultBeforeSubprocess.test_the_scenario_is_admitted_runs_and_is_observed) FAIL: test_the_subprocess_step_exits_as_declared_through_the_guard (tests.v2.test_v21_kills3_T19b.FaultBeforeSubprocess.test_the_subprocess_step_exits_as_declared_through_the_guard) Ran 12 tests in 5.772s FAILED (failures=2) 
+tests.v2.test_v21_kills3_T21a :: Ran 14 tests in 10.040s OK 
+tests.v2.test_v21_kills3_T21b :: Ran 9 tests in 6.501s OK 
+tests.v2.test_v21_kills3_T27a :: Ran 12 tests in 1.447s OK 
+tests.v2.test_p7_finding_001 :: Ran 16 tests in 6.198s OK 
+DONE

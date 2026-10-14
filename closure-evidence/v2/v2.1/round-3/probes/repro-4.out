@@ -1,0 +1,23 @@
+interpreter: 3.14.7 darwin
+
+== [REAL] inputs the admission accepts that the harness cannot honour
+scratch dir that does not exist (process_effect):   HARNESS_FAILED verdict=None -> Unrunnable/UNRUNNABLE | the evaluation directory cannot be created: FileNotFoundError
+workspace names 'a' and 'a/b' (cli_invocation):     HARNESS_FAILED verdict=None -> Unrunnable/UNRUNNABLE | the evaluation directory cannot be prepared: FileExistsError
+NUL byte in a subprocess argv (process_effect):     HARNESS_FAILED verdict=None -> Unrunnable/UNRUNNABLE | the harness failed its own scenario: the harness raised ValueError
+fault -> subprocess whose module does not exist:    OBSERVED verdict=REFUTED -> Executed/EXECUTED | {"subject": "present", "trace": [{"i": 0, "kind": "fault", "outcome": "ok"}, {"i": 1, "kind": "
+
+== [SIM] faults injected before the controller starts (cli_invocation and process_effect alike)
+-- aisef2.probe.process_effect
+   _evaluation_dir raises OSError(ENOSPC)     HARNESS_FAILED verdict=None -> Unrunnable/UNRUNNABLE | the evaluation directory cannot be created: OSError
+   _prepare raises OSError(EACCES)            HARNESS_FAILED verdict=None -> Unrunnable/UNRUNNABLE | the evaluation directory cannot be prepared: PermissionError
+   _prepare raises ValueError                 RAISED ValueError: embedded null byte   (nothing is returned: no Observation, no ProbeResult)
+   ProcessRange.start raises OSError          HARNESS_FAILED verdict=None -> Unrunnable/UNRUNNABLE | the harness cannot launch: OSError
+   ProcessRange.start raises ValueError       RAISED ValueError: bad env   (nothing is returned: no Observation, no ProbeResult)
+   open(harness.log) raises OSError(EMFILE)   RAISED OSError: [Errno 24] too many open files   (nothing is returned: no Observation, no ProbeResult)
+-- aisef2.probe.cli_invocation
+   _evaluation_dir raises OSError(ENOSPC)     HARNESS_FAILED verdict=None -> Unrunnable/UNRUNNABLE | the evaluation directory cannot be created: OSError
+   _prepare raises OSError(EACCES)            HARNESS_FAILED verdict=None -> Unrunnable/UNRUNNABLE | the evaluation directory cannot be prepared: PermissionError
+   _prepare raises ValueError                 RAISED ValueError: embedded null byte   (nothing is returned: no Observation, no ProbeResult)
+   ProcessRange.start raises OSError          HARNESS_FAILED verdict=None -> Unrunnable/UNRUNNABLE | the harness cannot launch: OSError
+   ProcessRange.start raises ValueError       RAISED ValueError: bad env   (nothing is returned: no Observation, no ProbeResult)
+   open(harness.log) raises OSError(EMFILE)   RAISED OSError: [Errno 24] too many open files   (nothing is returned: no Observation, no ProbeResult)

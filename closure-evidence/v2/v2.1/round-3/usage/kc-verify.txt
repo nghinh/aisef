@@ -1,0 +1,200 @@
+[0] KILLED   L96 condition negated  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[1] KILLED   L114 condition negated  <- ERROR: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AttributeError
+[2] KILLED   L125 condition negated  <- ERROR: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | TypeError
+[3] KILLED   L131 condition negated  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[4] KILLED   L135 condition negated  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[5] KILLED   L201 returns None  <- ERROR: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | TypeError
+[6] SURVIVED L96 Or swapped
+[7] SURVIVED L97 returns None
+[8] KILLED   L111 condition negated  <- FAIL: test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified (v2.test_v21_r3_usage_boundary.ExecutedRun.test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified) | AssertionError
+[9] KILLED   L114 IsNot->Is  <- ERROR: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AttributeError
+[10] KILLED   L125 And swapped  <- ERROR: test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified (v2.test_v21_r3_usage_boundary.ExecutedRun.test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified) | TypeError
+[11] SURVIVED L127 condition negated
+[12] KILLED   L131 NotEq->Eq  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[13] KILLED   L135 not removed  <- ERROR: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | TypeError
+[14] KILLED   L137 condition negated  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[15] KILLED   L167 condition negated  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[16] KILLED   L173 condition negated  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[17] KILLED   L182 condition negated  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[18] KILLED   L184 condition negated  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[19] KILLED   L186 condition negated  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[20] KILLED   L188 condition negated  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[21] KILLED   L196 condition negated  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[22] KILLED   L201 dict entry 0 dropped  <- ERROR: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | KeyError
+[23] KILLED   L201 dict entry 1 dropped  <- ERROR: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | KeyError
+[24] KILLED   L201 dict entry 2 dropped  <- ERROR: test_a_journal_that_would_deliver_is_not_verified_as_delivering (v2.test_v21_r3_usage_boundary.RefusedJournals.test_a_journal_that_would_deliver_is_not_verified_as_delivering) | KeyError
+[25] KILLED   L201 dict entry 3 dropped  <- ERROR: test_a_journal_the_kernel_writes_is_verified (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_journal_the_kernel_writes_is_verified) | KeyError
+[26] SURVIVED L201 dict entry 4 dropped
+[27] SURVIVED L201 dict entry 5 dropped
+[28] SURVIVED L94 element 0 dropped
+[29] SURVIVED L94 element 1 dropped
+[30] SURVIVED L95 returns None
+[31] KILLED   L96 not removed  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[32] KILLED   L96 NotEq->Eq  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[33] SURVIVED L97 dict entry 0 dropped
+[34] SURVIVED L97 dict entry 1 dropped
+[35] SURVIVED L111 Or swapped
+[36] KILLED   L121 condition negated  <- FAIL: test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified (v2.test_v21_r3_usage_boundary.ExecutedRun.test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified) | AssertionError
+[37] KILLED   L125 IsNot->Is  <- ERROR: test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified (v2.test_v21_r3_usage_boundary.ExecutedRun.test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified) | TypeError
+[38] SURVIVED L125 NotEq->Eq
+[39] SURVIVED L127 IsNot->Is
+[40] KILLED   L133 string 'journal' emptied  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[41] KILLED   L137 not removed  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[42] KILLED   L145 condition negated  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[43] KILLED   L165 Or swapped  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[44] SURVIVED L166 sorted() -> list()
+[45] KILLED   L170 element 0 dropped  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[46] KILLED   L170 element 1 dropped  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[47] KILLED   L173 IsNot->Is  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[48] KILLED   L177 condition negated  <- FAIL: test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified (v2.test_v21_r3_usage_boundary.ExecutedRun.test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified) | AssertionError
+[49] KILLED   L181 element 0 dropped  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[50] KILLED   L181 element 1 dropped  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[51] KILLED   L181 element 2 dropped  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[52] KILLED   L182 And swapped  <- FAIL: test_a_journal_that_would_deliver_is_not_verified_as_delivering (v2.test_v21_r3_usage_boundary.RefusedJournals.test_a_journal_that_would_deliver_is_not_verified_as_delivering) | AssertionError
+[53] KILLED   L184 NotEq->Eq  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[54] KILLED   L186 And swapped  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[55] SURVIVED L188 And swapped
+[56] KILLED   L193 condition negated  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[57] SURVIVED L196 And swapped
+[58] KILLED   L197 condition negated  <- FAIL: test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified (v2.test_v21_r3_usage_boundary.ExecutedRun.test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified) | AssertionError
+[59] KILLED   L201 string 'verdict' emptied  <- ERROR: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | KeyError
+[60] KILLED   L201 string 'problems' emptied  <- ERROR: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | KeyError
+[61] KILLED   L201 string 'delivery_verdict' emptied  <- ERROR: test_a_journal_that_would_deliver_is_not_verified_as_delivering (v2.test_v21_r3_usage_boundary.RefusedJournals.test_a_journal_that_would_deliver_is_not_verified_as_delivering) | KeyError
+[62] KILLED   L202 string 'journal_events' emptied  <- ERROR: test_a_journal_the_kernel_writes_is_verified (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_journal_the_kernel_writes_is_verified) | KeyError
+[63] SURVIVED L202 string 'evidence_anchor' emptied
+[64] SURVIVED L202 string 'notes' emptied
+[65] KILLED   L201 conditional negated  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[66] SURVIVED L95 dict entry 0 dropped
+[67] SURVIVED L95 dict entry 1 dropped
+[68] SURVIVED L97 string 'verdict' emptied
+[69] SURVIVED L97 string 'problems' emptied
+[70] SURVIVED L97 string 'REFUTED' emptied
+[71] KILLED   L111 not removed  <- FAIL: test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified (v2.test_v21_r3_usage_boundary.ExecutedRun.test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified) | AssertionError
+[72] KILLED   L111 not removed  <- FAIL: test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified (v2.test_v21_r3_usage_boundary.ExecutedRun.test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified) | AssertionError
+[73] KILLED   L121 NotEq->Eq  <- FAIL: test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified (v2.test_v21_r3_usage_boundary.ExecutedRun.test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified) | AssertionError
+[74] KILLED   L131 string 'bundle_digest' emptied  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[75] SURVIVED L132 string 'the run is not of this project bundle' emptied
+[76] SURVIVED L136 string 'the run has no journal (it ended before the run began)' emptied
+[77] SURVIVED L145 Or swapped
+[78] KILLED   L150 condition negated  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[79] KILLED   L156 condition negated  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[80] KILLED   L174 element 0 dropped  <- FAIL: test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified (v2.test_v21_r3_usage_boundary.ExecutedRun.test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified) | AssertionError
+[81] KILLED   L174 element 1 dropped  <- FAIL: test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified (v2.test_v21_r3_usage_boundary.ExecutedRun.test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified) | AssertionError
+[82] KILLED   L175 Or swapped  <- FAIL: test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified (v2.test_v21_r3_usage_boundary.ExecutedRun.test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified) | AssertionError
+[83] SURVIVED L181 Or swapped
+[84] SURVIVED L182 Eq->NotEq
+[85] SURVIVED L183 string 'FAIL' emptied
+[86] KILLED   L186 NotEq->Eq  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[87] KILLED   L188 NotIn->In  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[88] KILLED   L193 Or swapped  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[89] KILLED   L197 NotEq->Eq  <- FAIL: test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified (v2.test_v21_r3_usage_boundary.ExecutedRun.test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified) | AssertionError
+[90] KILLED   L201 string 'REFUTED' emptied  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[91] KILLED   L201 string 'VERIFIED' emptied  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[92] SURVIVED L95 string 'verdict' emptied
+[93] SURVIVED L95 string 'problems' emptied
+[94] SURVIVED L95 string 'REFUTED' emptied
+[95] KILLED   L96 string 'format' emptied  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[96] SURVIVED L122 sorted() -> list()
+[97] SURVIVED L126 string 'the evidence anchor is ' emptied
+[98] SURVIVED L126 string ', not the ' emptied
+[99] SURVIVED L126 string ' the run printed' emptied
+[100] SURVIVED L128 string 'the anchor matches the expected value: authentic only as far as that value came from a store the developer cannot write (docs/v2.1/ANCHOR-THREAT-MODEL.md); it does not prove the run happened as its journal says' emptied
+[101] SURVIVED L138 string "RUN.json's journal reference is not an object" emptied
+[102] SURVIVED L142 element 0 dropped
+[103] SURVIVED L142 element 1 dropped
+[104] SURVIVED L142 element 2 dropped
+[105] SURVIVED L142 element 3 dropped
+[106] KILLED   L145 NotEq->Eq  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[107] KILLED   L145 NotEq->Eq  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[108] KILLED   L150 Is->IsNot  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[109] KILLED   L165 string 'story_outcomes' emptied  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[110] SURVIVED L180 dict entry 0 dropped
+[111] SURVIVED L180 dict entry 1 dropped
+[112] SURVIVED L180 Or swapped
+[113] SURVIVED L182 string 'failure' emptied
+[114] SURVIVED L182 string 'PASS' emptied
+[115] KILLED   L184 string 'delivery_verdict' emptied  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[116] SURVIVED L187 string "the record's ProductProof account is not the one the journal re-derives" emptied
+[117] SURVIVED L188 string 'error' emptied
+[118] KILLED   L193 NotEq->Eq  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[119] KILLED   L194 NotEq->Eq  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[120] SURVIVED L196 string 'final_main' emptied
+[121] KILLED   L93 string 'utf-8' emptied  <- ERROR: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | LookupError
+[122] SURVIVED L97 string 'RUN.json is not a run record of format ' emptied
+[123] KILLED   L100 string 'utf-8' emptied  <- ERROR: test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified (v2.test_v21_r3_usage_boundary.ExecutedRun.test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified) | LookupError
+[124] SURVIVED L103 string 'no ' emptied
+[125] SURVIVED L103 string ': a run of a release before 2.1 — its record is bound by nothing but itself' emptied
+[126] SURVIVED L106 string ' is not JSON' emptied
+[127] SURVIVED L109 string ' cannot be read (' emptied
+[128] SURVIVED L109 string ')' emptied
+[129] SURVIVED L113 string ' is not an evidence manifest (a JSON object holding its files)' emptied
+[130] SURVIVED L126 And swapped
+[131] SURVIVED L146 string 'the journal is not the one RUN.json names (digest or length)' emptied
+[132] KILLED   L153 element 0 dropped  <- FAIL: test_a_journal_that_would_deliver_is_not_verified_as_delivering (v2.test_v21_r3_usage_boundary.RefusedJournals.test_a_journal_that_would_deliver_is_not_verified_as_delivering) [story_state refuses story/commit] | AssertionError
+[133] KILLED   L153 element 1 dropped  <- FAIL: test_a_journal_that_would_deliver_is_not_verified_as_delivering (v2.test_v21_r3_usage_boundary.RefusedJournals.test_a_journal_that_would_deliver_is_not_verified_as_delivering) [story_state refuses story/commit] | AssertionError
+[134] KILLED   L153 element 2 dropped  <- FAIL: test_a_journal_that_would_deliver_is_not_verified_as_delivering (v2.test_v21_r3_usage_boundary.RefusedJournals.test_a_journal_that_would_deliver_is_not_verified_as_delivering) [story_state refuses story/commit] | AssertionError
+[135] KILLED   L153 element 3 dropped  <- FAIL: test_a_journal_that_would_deliver_is_not_verified_as_delivering (v2.test_v21_r3_usage_boundary.RefusedJournals.test_a_journal_that_would_deliver_is_not_verified_as_delivering) [story_state refuses story/commit] | AssertionError
+[136] KILLED   L166 NotEq->Eq  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[137] SURVIVED L168 string "the record's story outcomes are not the journal's for " emptied
+[138] KILLED   L175 string 'spent' emptied  <- FAIL: test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified (v2.test_v21_r3_usage_boundary.ExecutedRun.test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified) | AssertionError
+[139] KILLED   L176 NotEq->Eq  <- FAIL: test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified (v2.test_v21_r3_usage_boundary.ExecutedRun.test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified) | AssertionError
+[140] SURVIVED L180 string 'story' emptied
+[141] SURVIVED L180 string 'error' emptied
+[142] SURVIVED L180 string 'begun and never ended in the journal' emptied
+[143] SURVIVED L181 string 'budget_stop' emptied
+[144] SURVIVED L185 string 'the record says ' emptied
+[145] SURVIVED L185 string '; the journal re-derives ' emptied
+[146] KILLED   L186 string 'productproof' emptied  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[147] KILLED   L188 string 'usage' emptied  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[148] KILLED   L188 string 'usage' emptied  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[149] KILLED   L195 string "the record's usage is not what the evidence re-derives" emptied  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[150] KILLED   L197 string 'final_main' emptied  <- FAIL: test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified (v2.test_v21_r3_usage_boundary.ExecutedRun.test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified) | AssertionError
+[151] SURVIVED L198 string "the run's repository main is not the record's final main" emptied
+[152] KILLED   L93 string 'RUN.json' emptied  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[153] SURVIVED L95 string ': no readable run record (' emptied
+[154] SURVIVED L95 string ')' emptied
+[155] SURVIVED L111 string 'files' emptied
+[156] SURVIVED L119 string 'an evidence file cannot be read (' emptied
+[157] SURVIVED L119 string '): ' emptied
+[158] SURVIVED L124 string 'the evidence manifest does not match the run directory: ' emptied
+[159] KILLED   L145 string 'sha256' emptied  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[160] KILLED   L145 string 'lines' emptied  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[161] KILLED   L148 string 'utf-8' emptied  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[162] KILLED   L151 dict entry 0 dropped  <- FAIL: test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified (v2.test_v21_r3_usage_boundary.ExecutedRun.test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified) | AssertionError
+[163] KILLED   L151 dict entry 1 dropped  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[164] KILLED   L151 dict entry 2 dropped  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[165] SURVIVED L157 string 'the journal ends in a torn line' emptied
+[166] KILLED   L175 Or swapped  <- FAIL: test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified (v2.test_v21_r3_usage_boundary.ExecutedRun.test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified) | AssertionError
+[167] SURVIVED L178 string "the record's spend is not what the evidence re-derives for " emptied
+[168] SURVIVED L180 string 'story_errors' emptied
+[169] SURVIVED L190 Or swapped
+[170] KILLED   L193 string 'usage' emptied  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[171] KILLED   L194 string 'no_progress' emptied  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[172] SURVIVED L196 string 'repo' emptied
+[173] SURVIVED L200 string 'the record cannot be re-derived from the evidence: ' emptied
+[174] SURVIVED L200 string ': ' emptied
+[175] SURVIVED L123 NotEq->Eq
+[176] SURVIVED L144 string 'the journal RUN.json names cannot be read (' emptied
+[177] SURVIVED L144 string ')' emptied
+[178] KILLED   L151 string 'seq' emptied  <- FAIL: test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified (v2.test_v21_r3_usage_boundary.ExecutedRun.test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified) | AssertionError
+[179] KILLED   L151 string 'type' emptied  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[180] KILLED   L151 string 'data' emptied  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[181] SURVIVED L185 string 'delivery_verdict' emptied
+[182] SURVIVED L95 string 'RUN.json' emptied
+[183] KILLED   L141 string 'path' emptied  <- FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError
+[184] KILLED   L154 string "the journal violates the control projections the kernel's writer enforces: " emptied  <- FAIL: test_each_is_refuted_by_a_finding_naming_the_projection_the_event_and_its_seq (v2.test_v21_r3_usage_boundary.RefusedJournals.test_each_is_refuted_by_a_finding_naming_the_projection_the_event_and_its_seq) [a story begins again after it committed] | AssertionError
+[185] KILLED   L154 string ' refuses ' emptied  <- FAIL: test_a_journal_that_would_deliver_is_not_verified_as_delivering (v2.test_v21_r3_usage_boundary.RefusedJournals.test_a_journal_that_would_deliver_is_not_verified_as_delivering) [story_state refuses story/commit] | AssertionError
+[186] KILLED   L155 string ' at seq ' emptied  <- FAIL: test_each_is_refuted_by_a_finding_naming_the_projection_the_event_and_its_seq (v2.test_v21_r3_usage_boundary.RefusedJournals.test_each_is_refuted_by_a_finding_naming_the_projection_the_event_and_its_seq) [a story begins again after it committed] | AssertionError
+[187] KILLED   L155 string ': ' emptied  <- FAIL: test_each_is_refuted_by_a_finding_naming_the_projection_the_event_and_its_seq (v2.test_v21_r3_usage_boundary.RefusedJournals.test_each_is_refuted_by_a_finding_naming_the_projection_the_event_and_its_seq) [a story begins again after it committed] | AssertionError
+[188] SURVIVED L159 string 'the journal does not reconstruct: ' emptied
+[189] SURVIVED L159 string ': ' emptied
+[190] KILLED   L175 string 'budget' emptied  <- FAIL: test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified (v2.test_v21_r3_usage_boundary.ExecutedRun.test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified) | AssertionError
+[191] SURVIVED L190 string 'settings' emptied
+[192] KILLED   L197 string 'rev-parse' emptied  <- FAIL: test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified (v2.test_v21_r3_usage_boundary.ExecutedRun.test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified) | AssertionError
+[193] KILLED   L197 string 'main' emptied  <- FAIL: test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified (v2.test_v21_r3_usage_boundary.ExecutedRun.test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified) | AssertionError
+[194] KILLED   L197 string 'repo' emptied  <- FAIL: test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified (v2.test_v21_r3_usage_boundary.ExecutedRun.test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified) | AssertionError
+[195] SURVIVED L122 string 'files' emptied
+[196] SURVIVED L122 string 'files' emptied
+[197] SURVIVED L123 string 'files' emptied
+[198] SURVIVED L123 string 'files' emptied
+# aisef2/app/verify.py::verify: 199 mutants run, {'KILLED': 107, 'SURVIVED': 92}; T0 [{'file': 'tests/v2/test_v21_r3_usage_boundary.py', 'seconds': 7.98, 'outcome': 'PASS', 'ran': 14}]; source_sha256 b30820f61194665ace24e317a06651334e86dc9fcb77e879b97450ee0514dc1b

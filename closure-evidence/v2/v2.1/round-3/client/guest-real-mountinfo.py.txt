@@ -1,0 +1,37 @@
+"""Linux-guest evidence (a REAL kernel table, no stand-in): what `confine` makes of this process's own
+/proc/self/mountinfo and of a real bubblewrap session's, when a mount point holds U+2028. usage:
+  python3 -B this.txt TREE host   (in a mount namespace that has the bind mount: _host_mounts, the real reader)
+  python3 -B this.txt TREE bwrap  (runs real bubblewrap with a --bind to a path with U+2028; parses its mountinfo)
+TREE is a checkout (aisef2/ in it): the changed tree, or the integration head before the change."""
+import pathlib
+import subprocess
+import sys
+
+tree, mode = sys.argv[1], sys.argv[2]
+sys.path.insert(0, tree)
+from aisef2.app import confine  # noqa: E402
+
+SEP = " "
+raw = pathlib.Path("/proc/self/mountinfo").read_bytes()
+print(f"[{tree}] kernel prints U+2028 raw in mountinfo: {SEP.encode() in raw}; "
+      f"lines by LF: {raw.decode().count(chr(10))}; by splitlines(): {len(raw.decode().splitlines())}")
+if mode == "host":
+    got = confine._host_mounts()
+    print("  _host_mounts():", "None (the table is not read whole)" if got is None else
+          f"{len(got)} rows; with a separator in `at`: {[r['at'] for r in got if SEP in r['at']]}")
+elif mode == "bwrap":
+    src = pathlib.Path("/tmp/g-src")
+    src.mkdir(exist_ok=True)
+    dest = f"/mnt/a{SEP}b"
+    cmd = ["/usr/bin/bwrap", "--ro-bind", "/usr", "/usr", "--symlink", "usr/bin", "/bin", "--symlink", "usr/lib", "/lib",
+           "--symlink", "usr/lib64", "/lib64", "--proc", "/proc", "--dev", "/dev", "--bind", str(src), dest,
+           "--unshare-user", "--unshare-pid", "--unshare-ipc", "--unshare-uts", "--die-with-parent",
+           "/bin/cat", "/proc/self/mountinfo"]
+    p = subprocess.run(cmd, capture_output=True, env={"PATH": "/usr/bin:/bin", "LC_ALL": "C"})
+    text = p.stdout.decode("utf-8", "replace")
+    print(f"  bwrap exit {p.returncode}; the sandbox's table holds U+2028 raw: {SEP.encode() in p.stdout}")
+    out = f"{confine.MARK}section mountinfo\n{text}{confine.MARK}end\n"
+    _, sections, _ = confine._sections(out)
+    rows = confine._mounts(sections.get("mountinfo", []))
+    print(f"  _sections: {len(sections.get('mountinfo', []))} mountinfo lines (the kernel printed {text.count(chr(10))}); "
+          f"_mounts: {len(rows)} rows; the bind mount found at its path: {dest in [r['at'] for r in rows]}")

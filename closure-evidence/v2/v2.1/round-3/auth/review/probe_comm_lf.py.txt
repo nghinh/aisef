@@ -1,0 +1,22 @@
+# macOS: can a process's p_comm (the executable's basename, <= 16 bytes) hold LF, and does ps print it raw when it
+# shows `(comm)` (a zombie, or a process whose argv ps cannot read)?  Real children only.
+import os, subprocess, sys, tempfile, time
+d = tempfile.mkdtemp(prefix="comm-probe-")
+names = {"LF": "a\nb", "LS": "a b", "CR": "a\rb", "LF-long": "x\n" + "1 1 1 Mon Jan  1 00:00:00 2099"[:12]}
+for tag, nm in names.items():
+    link = os.path.join(d, nm)
+    os.symlink(sys.executable, link)
+    # a live child whose argv we control, and a zombie (exits at once; not reaped until after we read ps)
+    live = subprocess.Popen([link, "-c", "import sys; print('r',flush=True); sys.stdin.read()"], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+    live.stdout.readline()
+    z = subprocess.Popen([link, "-c", "pass"])
+    time.sleep(0.8)   # it has exited; unreaped = zombie
+    for what, p in (("live", live), ("zombie", z)):
+        raw = subprocess.run(["ps", "-ww", "-p", str(p.pid), "-o", "pid=,stat=,comm=,command="], capture_output=True).stdout
+        raw2 = subprocess.run(["ps", "-A", "-o", "pid=,ppid=,pgid=,lstart=,command="], capture_output=True).stdout
+        mine = [l for l in raw2.split(b"\n") if l.lstrip().startswith(str(p.pid).encode() + b" ")]
+        print(tag, what, "| ps -p:", raw, "| lines:", raw.count(b"\n"), "| row from -A:", mine[:1])
+    live.stdin.close(); live.wait(); live.stdout.close(); z.wait()
+for nm in os.listdir(d):
+    os.unlink(os.path.join(d, nm))
+os.rmdir(d)

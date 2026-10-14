@@ -1,0 +1,81 @@
+{
+ "target": "aisef2/app/verify.py::_projection_refusal",
+ "files": [
+  "tests/v2/test_v21_r3_usage_boundary.py"
+ ],
+ "source_sha256": "b30820f61194665ace24e317a06651334e86dc9fcb77e879b97450ee0514dc1b",
+ "t0": [
+  {
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "seconds": 6.08,
+   "outcome": "PASS",
+   "ran": 14
+  }
+ ],
+ "error": null,
+ "results": [
+  {
+   "index": 0,
+   "mutant": "L44 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 1,
+   "mutant": "L44 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 2,
+   "mutant": "L46 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 3,
+   "mutant": "L46 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing (v2.test_v21_r3_usage_boundary.AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing) | AssertionError"
+  },
+  {
+   "index": 4,
+   "mutant": "L50 returns None",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_journal_that_would_deliver_is_not_verified_as_delivering (v2.test_v21_r3_usage_boundary.RefusedJournals.test_a_journal_that_would_deliver_is_not_verified_as_delivering) [story_state refuses story/commit] | AssertionError"
+  },
+  {
+   "index": 5,
+   "mutant": "L50 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_journal_that_would_deliver_is_not_verified_as_delivering (v2.test_v21_r3_usage_boundary.RefusedJournals.test_a_journal_that_would_deliver_is_not_verified_as_delivering) [story_state refuses story/commit] | AssertionError"
+  },
+  {
+   "index": 6,
+   "mutant": "L50 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_journal_that_would_deliver_is_not_verified_as_delivering (v2.test_v21_r3_usage_boundary.RefusedJournals.test_a_journal_that_would_deliver_is_not_verified_as_delivering) [story_state refuses story/commit] | AssertionError"
+  },
+  {
+   "index": 7,
+   "mutant": "L50 element 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_journal_that_would_deliver_is_not_verified_as_delivering (v2.test_v21_r3_usage_boundary.RefusedJournals.test_a_journal_that_would_deliver_is_not_verified_as_delivering) [story_state refuses story/commit] | AssertionError"
+  },
+  {
+   "index": 8,
+   "mutant": "L50 element 3 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_usage_boundary.py",
+   "first": "FAIL: test_a_journal_that_would_deliver_is_not_verified_as_delivering (v2.test_v21_r3_usage_boundary.RefusedJournals.test_a_journal_that_would_deliver_is_not_verified_as_delivering) [story_state refuses story/commit] | AssertionError"
+  }
+ ]
+}

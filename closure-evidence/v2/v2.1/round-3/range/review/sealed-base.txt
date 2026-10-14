@@ -1,0 +1,17 @@
+== tests.v2.test_c2_k_nowork_001
+Ran 17 tests in 42.323s
+OK
+== tests.v2.test_c2_p5_acceptance
+FAIL: test_the_acceptance_re_derives_on_this_tree (tests.v2.test_c2_p5_acceptance.Acceptance.test_the_acceptance_re_derives_on_this_tree)
+Ran 30 tests in 33.713s
+FAILED (failures=1)
+== tests.v2.p0.test_checker_calibration
+FAIL: test_every_checker_has_a_committed_fixture_that_fails_it_for_the_named_reason (tests.v2.p0.test_checker_calibration.CheckerCalibration.test_every_checker_has_a_committed_fixture_that_fails_it_fo
+FAIL: test_every_checker_is_calibrated_and_the_committed_record_is_current (tests.v2.p0.test_checker_calibration.CheckerCalibration.test_every_checker_is_calibrated_and_the_committed_record_is_current
+Ran 13 tests in 220.124s
+FAILED (failures=2)
+== tests.v2.test_c2_orchestration_conformance
+FAIL: test_15_the_record_binds_this_tree_and_old_and_new_agree_on_every_single_probe_story (tests.v2.test_c2_orchestration_conformance.Record.test_15_the_record_binds_this_tree_and_old_and_new_agree_o
+Ran 24 tests in 191.018s
+FAILED (failures=1)
+DONE

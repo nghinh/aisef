@@ -1,0 +1,5 @@
+_ps_table exit=0 # aisef2/runtime/process_range.py::_ps_table: 24 mutants run, {'KILLED': 24}; T0 [{'file': 'tests/v2/test_v21_r3_range_fu_ps_table.py', 'seconds': 1.14, 'outcome': 'PASS', 'ran': 16}]; source_sha256 05f606bf6473570dc98799f04809281282290a8964a67024fe1b402b10f82
+_ps_table-with-existing exit=0 # aisef2/runtime/process_range.py::_ps_table: 24 mutants run, {'KILLED': 24}; T0 [{'file': 'tests/v2/p4/test_process_table.py', 'seconds': 0.37, 'outcome': 'PASS', 'ran': 6}, {'file': 'tests/v2/test_v21_r3_range_fu_ps_table.py', 'seconds': 1.06, 'outcome': 'PA
+_ps_table-existing-alone exit=1 # aisef2/runtime/process_range.py::_ps_table: 24 mutants run, {'KILLED': 22, 'SURVIVED': 2}; T0 [{'file': 'tests/v2/p4/test_process_table.py', 'seconds': 0.34, 'outcome': 'PASS', 'ran': 6}]; source_sha256 05f606bf6473570dc98799f04809281282290a8964a67024fe1b402
+_linux_table exit=0 # aisef2/runtime/process_range.py::_linux_table: 17 mutants run, {'KILLED': 17}; T0 [{'file': 'tests/v2/test_v21_r3_range_fu_linux_table.py', 'seconds': 0.38, 'outcome': 'PASS', 'ran': 7}]; source_sha256 05f606bf6473570dc98799f04809281282290a8964a67024fe1b402b
+DONE

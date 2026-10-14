@@ -1,0 +1,27 @@
+import subprocess, sys, re, collections, os
+loc = sys.argv[1] if len(sys.argv) > 1 else None
+env = dict(os.environ)
+if loc: env["LC_ALL"] = loc
+raw = subprocess.run(["ps", "-A", "-o", "pid=,ppid=,pgid=,lstart=,command="], capture_output=True, env=env).stdout
+lines = raw.split(b"\n")
+print("lines", len(lines), "last empty:", lines[-1] == b"")
+for l in lines[:3]: print(repr(l))
+# find day<10 rows
+for l in lines:
+    s = l.decode("utf-8", "replace")
+    m = re.match(r" *\d+ +\d+ +\d+ +(\S+ \S+ +\d+ \S+ \d{4})", s)
+    if m and "  " in m.group(1):
+        print("padded day:", repr(s[:80])); break
+# what separates lstart and the command?
+seps = collections.Counter()
+for l in lines:
+    s = l.decode("utf-8", "replace")
+    m = re.match(r" *\d+ +\d+ +\d+ +[A-Za-z]{3} [A-Za-z]{3} +\d{1,2} \d\d:\d\d:\d\d \d{4}( *)", s)
+    if m: seps[len(m.group(1))] += 1
+print("spaces after lstart:", dict(seps))
+widths = collections.Counter()
+for l in lines:
+    s = l.decode("utf-8", "replace")
+    m = re.match(r"( *)(\d+)( +)(\d+)( +)(\d+)( +)", s)
+    if m: widths[(len(m.group(1)) + len(m.group(2)), len(m.group(3)), len(m.group(5)), len(m.group(7)))] += 1
+print("pid col end / seps:", dict(widths.most_common(6)))

@@ -1,0 +1,48 @@
+# repro-4b (probes WP, item 2b): `on_range` — the harness hook that receives the started ProcessRange — raises after the
+# range has started.  SIMULATION (a hook that raises); the acquirer's own refusal path (StoryScope.acquire) is read, not
+# run, here.  The range is started by this script, observed through its own API and released through its own API.
+# Run from the worktree root:  py.sh probes -I <this file>
+import os
+import pathlib
+import sys
+import tempfile
+
+sys.path.insert(0, os.getcwd())
+
+from aisef2.arch.enums import BehaviorVerdict, Enforcement, SubjectAbsence  # noqa: E402
+from aisef2.probe import process_effect as pe  # noqa: E402
+from aisef2.probe.protocol import ExecutionEnv, RevisionRef  # noqa: E402
+from aisef2.product.spec import ProductProofSpec  # noqa: E402
+
+root = tempfile.mkdtemp(prefix="aisef2-r3-onrange-")
+pathlib.Path(root, "cli.py").write_text("import time\n\n\ndef main():\n    time.sleep(3)\n    return 1\n", encoding="utf-8")
+spec = ProductProofSpec.create(
+    contract_id="BC-R3", probe_id=pe.PROBE_ID, probe_digest=pe.DIGEST,
+    probe_input={"subject": {"kind": "process_effect", "locator": "cli:main"},
+                 "stimulus": {"scenario": [{"step": "call", "args": [], "kwargs": {}}]},
+                 "observable": {"returns": 1, "within_s": 20}, "subject_absence": SubjectAbsence.REQUIRES_SUBJECT.value},
+    candidate_expectation=BehaviorVerdict.SATISFIED, compiler_id="test", compiler_digest="c" * 64)
+held = []
+
+
+def hook(process_range):
+    held.append(process_range)
+    raise ValueError("the scope refused the range")
+
+
+print("interpreter:", sys.version.split()[0], sys.platform)
+probe = pe.ProcessEffectProbe(on_range=hook)
+try:
+    print("observe returned:", probe.observe(spec, RevisionRef("89abcdef0123456789abcdef0123456789abcdef", root),
+                                            ExecutionEnv(sys.executable, 20, Enforcement.PARTIAL)))
+except BaseException as e:
+    print("observe raised:", type(e).__name__, e)
+run = held[0]
+print("range after the exception: target_pid set=%s, returncode=%s, members=%d (the probe did not release it)" % (
+    run.target_pid is not None, run.returncode, len(run.members())))
+try:
+    run.release()
+    print("released by its acquirer (this script): ok")
+except BaseException as e:
+    print("release raised:", type(e).__name__, str(e)[:160])
+print("members after release:", len(run.members()))

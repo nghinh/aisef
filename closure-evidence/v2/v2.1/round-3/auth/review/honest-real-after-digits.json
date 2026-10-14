@@ -1,0 +1,161 @@
+{
+ "LC_ALL=en_US.UTF-8": {
+  "rows": 732,
+  "reader_listed": true,
+  "longest_command": 8450,
+  "any_truncated_at_80": 16
+ },
+ "LC_ALL=C": {
+  "rows": 732,
+  "reader_listed": true,
+  "longest_command": 8450,
+  "any_truncated_at_80": 16
+ },
+ "LC_ALL=POSIX": {
+  "rows": 732,
+  "reader_listed": true,
+  "longest_command": 8450,
+  "any_truncated_at_80": 16
+ },
+ "LC_ALL=de_DE.UTF-8": {
+  "rows": 731,
+  "reader_listed": true,
+  "longest_command": 8450,
+  "any_truncated_at_80": 16
+ },
+ "LC_ALL=ja_JP.UTF-8": {
+  "rows": 730,
+  "reader_listed": true,
+  "longest_command": 8450,
+  "any_truncated_at_80": 16
+ },
+ "LC_ALL=fr_FR.UTF-8": {
+  "rows": 733,
+  "reader_listed": true,
+  "longest_command": 8450,
+  "any_truncated_at_80": 16
+ },
+ "LC_ALL=th_TH.UTF-8": {
+  "rows": 732,
+  "reader_listed": true,
+  "longest_command": 8450,
+  "any_truncated_at_80": 16
+ },
+ "LC_ALL=ar_SA.UTF-8": {
+  "rows": 729,
+  "reader_listed": true,
+  "longest_command": 8450,
+  "any_truncated_at_80": 16
+ },
+ "LC_ALL=fa_IR.UTF-8": {
+  "rows": 728,
+  "reader_listed": true,
+  "longest_command": 8450,
+  "any_truncated_at_80": 16
+ },
+ "LC_ALL=zh_TW.UTF-8": {
+  "rows": 727,
+  "reader_listed": true,
+  "longest_command": 8450,
+  "any_truncated_at_80": 16
+ },
+ "LC_ALL=he_IL.UTF-8": {
+  "rows": 727,
+  "reader_listed": true,
+  "longest_command": 8450,
+  "any_truncated_at_80": 16
+ },
+ "LC_TIME=de_DE.UTF-8": {
+  "rows": 729,
+  "reader_listed": true,
+  "longest_command": 8450,
+  "any_truncated_at_80": 16
+ },
+ "LANG=ja_JP.UTF-8": {
+  "rows": 729,
+  "reader_listed": true,
+  "longest_command": 8450,
+  "any_truncated_at_80": 16
+ },
+ "LANG=ru_RU.UTF-8,LANGUAGE=ru": {
+  "rows": 725,
+  "reader_listed": true,
+  "longest_command": 8450,
+  "any_truncated_at_80": 16
+ },
+ "LC_ALL=": {
+  "rows": 725,
+  "reader_listed": true,
+  "longest_command": 8450,
+  "any_truncated_at_80": 16
+ },
+ "no locale vars": {
+  "rows": 727,
+  "reader_listed": true,
+  "longest_command": 8450,
+  "any_truncated_at_80": 16
+ },
+ "COLUMNS=20": {
+  "rows": 725,
+  "reader_listed": true,
+  "longest_command": 8450,
+  "any_truncated_at_80": 16
+ },
+ "COLUMNS=1": {
+  "rows": 725,
+  "reader_listed": true,
+  "longest_command": 8450,
+  "any_truncated_at_80": 16
+ },
+ "COLUMNS=0": {
+  "rows": 725,
+  "reader_listed": true,
+  "longest_command": 8450,
+  "any_truncated_at_80": 16
+ },
+ "TZ=UTC": {
+  "rows": 727,
+  "reader_listed": true,
+  "longest_command": 8450,
+  "any_truncated_at_80": 16
+ },
+ "TZ=America/New_York": {
+  "rows": 724,
+  "reader_listed": true,
+  "longest_command": 8450,
+  "any_truncated_at_80": 16
+ },
+ "TZ=Asia/Kolkata": {
+  "rows": 724,
+  "reader_listed": true,
+  "longest_command": 8450,
+  "any_truncated_at_80": 16
+ },
+ "TZ=Pacific/Chatham": {
+  "rows": 726,
+  "reader_listed": true,
+  "longest_command": 8450,
+  "any_truncated_at_80": 16
+ },
+ "churn_150_reads": {
+  "outcomes": {
+   "ok": 150
+  },
+  "rows_min_max": [
+   709,
+   737
+  ]
+ },
+ "carriers_whole_table": {
+  "n": 0,
+  "ok": true
+ },
+ "cwd_under_whole_table": {
+  "n": 427,
+  "ok": true
+ },
+ "sample_vs_ps_p": {
+  "checked": 42,
+  "differ": 0
+ }
+}

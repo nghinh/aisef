@@ -1,0 +1,56 @@
+/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/wt/conf-rv/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=10 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/wt/conf-rv/aisef2/orchestrate/story_runner.py:277: ResourceWarning: unclosed file <_io.TextIOWrapper name=9 encoding='utf-8'>
+  tests_held.release()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+./private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/wt/conf-rv/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=11 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/wt/conf-rv/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=10 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/wt/conf-rv/aisef2/orchestrate/story_runner.py:277: ResourceWarning: unclosed file <_io.TextIOWrapper name=9 encoding='utf-8'>
+  tests_held.release()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+./private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/wt/conf-rv/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=11 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/wt/conf-rv/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=10 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/wt/conf-rv/aisef2/orchestrate/story_runner.py:277: ResourceWarning: unclosed file <_io.TextIOWrapper name=9 encoding='utf-8'>
+  tests_held.release()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+.../private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/wt/conf-rv/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=11 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/wt/conf-rv/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=10 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/wt/conf-rv/aisef2/orchestrate/story_runner.py:277: ResourceWarning: unclosed file <_io.TextIOWrapper name=9 encoding='utf-8'>
+  tests_held.release()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+..........F.
+======================================================================
+FAIL: test_the_record_binds_this_tree_and_shows_the_cases_red_before_and_green_after (tests.v2.test_c2_k_nowork_001.Record.test_the_record_binds_this_tree_and_shows_the_cases_red_before_and_green_after)
+B-03a: the v2.1 record binds this tree (and the v2.1 plan correction); the 2.0 record is history — its blob
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/wt/conf-rv/tests/v2/test_c2_k_nowork_001.py", line 257, in test_the_record_binds_this_tree_and_shows_the_cases_red_before_and_green_after
+    self.assertEqual(kn.check(), [])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: ["the kernel changed since the record: ker[46 chars]ef2"] != []
+
+First list contains 1 additional elements.
+First extra element 0:
+"the kernel changed since the record: kernel.after.kernel_digest is not this tree's aisef2"
+
++ []
+- ['the kernel changed since the record: kernel.after.kernel_digest is not this '
+-  "tree's aisef2"]
+
+----------------------------------------------------------------------
+Ran 17 tests in 41.769s
+
+FAILED (failures=1)

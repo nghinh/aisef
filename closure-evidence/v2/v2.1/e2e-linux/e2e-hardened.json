@@ -1,0 +1,258 @@
+{
+ "code_path_proofs": [],
+ "environment": {
+  "bwrap": "bubblewrap 0.12.0",
+  "bwrap_sha256": "b3b829e18a7d43ee589dc37e351cb9480ff7301b493d8227b8c754294638b976",
+  "container_namespaces": {
+   "ipc": "ipc:[4026532834]",
+   "mnt": "mnt:[4026532832]",
+   "net": "net:[4026532837]",
+   "pid": "pid:[4026532835]",
+   "user": "user:[4026531837]",
+   "uts": "uts:[4026532833]"
+  },
+  "container_process_status": {
+   "CapBnd": "0000000000000000",
+   "CapEff": "0000000000000000",
+   "NoNewPrivs": "0",
+   "Seccomp": "2"
+  },
+  "debian": "13.7",
+  "gid": 1000,
+  "git": "git version 2.47.3",
+  "kernel_digest": "42e612707013159cb7bfbee3d63ccafa7a9ac03a9e6324e58171b58abdf3456b",
+  "max_user_namespaces": "31880",
+  "network_interfaces": [
+   "bonding_masters",
+   "erspan0",
+   "gre0",
+   "gretap0",
+   "ip6_vti0",
+   "ip6gre0",
+   "ip6tnl0",
+   "ip_vti0",
+   "lo",
+   "sit0",
+   "tunl0"
+  ],
+  "no_real_opencode_on_path": true,
+  "python": "3.14.8",
+  "python_executable": "/usr/local/bin/python3",
+  "routes": [],
+  "system_site_packages": "/usr/local/lib/python3.14/site-packages",
+  "tree": "/repo",
+  "uid": 1000,
+  "uname": "Linux 8298f80c3e3b 7.0.12-linuxkit #1 SMP PREEMPT Thu Aug 27 14:02:21 UTC 2026 aarch64"
+ },
+ "format": "aisef-v21-e2e-linux/1",
+ "passed": true,
+ "profile": "hardened",
+ "project_steps": [
+  {
+   "argv": [
+    "/usr/local/bin/python3",
+    "-B",
+    "-m",
+    "aisef",
+    "bundle",
+    "seal",
+    "authoring.json",
+    "--repo",
+    "repo",
+    "--out",
+    "sealed.json"
+   ],
+   "exit": 0
+  },
+  {
+   "argv": [
+    "/usr/local/bin/python3",
+    "-B",
+    "-m",
+    "aisef",
+    "bundle",
+    "approve",
+    "sealed.json",
+    "--contract",
+    "BC-SUM",
+    "--approver",
+    "human:e2e",
+    "--out",
+    "a1.json"
+   ],
+   "exit": 0
+  },
+  {
+   "argv": [
+    "/usr/local/bin/python3",
+    "-B",
+    "-m",
+    "aisef",
+    "bundle",
+    "approve",
+    "a1.json",
+    "--contract",
+    "BC-USAGE-0",
+    "--approver",
+    "human:e2e",
+    "--out",
+    "a2.json"
+   ],
+   "exit": 0
+  },
+  {
+   "argv": [
+    "/usr/local/bin/python3",
+    "-B",
+    "-m",
+    "aisef",
+    "bundle",
+    "approve",
+    "a2.json",
+    "--contract",
+    "BC-USAGE-1",
+    "--approver",
+    "human:e2e",
+    "--out",
+    "approved.json"
+   ],
+   "exit": 0
+  },
+  {
+   "argv": [
+    "/usr/local/bin/python3",
+    "-B",
+    "-m",
+    "aisef",
+    "bundle",
+    "lint",
+    "approved.json"
+   ],
+   "exit": 0
+  }
+ ],
+ "provider_log_total": 0,
+ "scenarios": [
+  {
+   "checks": [
+    {
+     "evidence": {
+      "exit": 2,
+      "problems": [
+       "the sandbox did not run the probe (exit 1): bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user namespaces. See <https://deb.li/bubblewrap> or <file:///usr/share/doc/bubblewrap/README.Debian.gz>."
+      ],
+      "ready": false
+     },
+     "name": "check_is_not_ready",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "exit": 2,
+      "stderr": "aisef run: refused: confinement was asked for and is not provided: the sandbox did not run the probe (exit 1): bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user namespaces. See <https://deb.li/bubblewrap> or <file:///usr/share/doc/bubblewrap/README.Debian.gz>.\n",
+      "stdout": ""
+     },
+     "name": "run_refused_exit_2_with_the_cause",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "confinement.problems": [
+       "the sandbox did not run the probe (exit 1): bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user namespaces. See <https://deb.li/bubblewrap> or <file:///usr/share/doc/bubblewrap/README.Debian.gz>."
+      ],
+      "delivery_verdict": "NOT_REACHED",
+      "failure": {
+       "detail": "confinement was asked for and is not provided: the sandbox did not run the probe (exit 1): bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user namespaces. See <https://deb.li/bubblewrap> or <file:///usr/share/doc/bubblewrap/README.Debian.gz>.",
+       "stage": "confinement",
+       "type": "RunRefused"
+      },
+      "journal": null,
+      "stage": "confinement"
+     },
+     "name": "record_names_the_stage_and_the_problems",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "preflight_in_record": false,
+      "provider_requests_seen": 0,
+      "run_directory_listing": [
+       "EVIDENCE.json",
+       "RUN.json",
+       "RUN.started.json",
+       "confinement",
+       "repo",
+       "test-python"
+      ],
+      "sessions_in_record": []
+     },
+     "name": "nothing_started_no_provider_request_no_session",
+     "passed": true
+    }
+   ],
+   "cli": [
+    {
+     "argv": [
+      "/usr/local/bin/python3",
+      "-B",
+      "-m",
+      "aisef",
+      "run",
+      "--check",
+      "--project",
+      "/tmp/e2e/project/approved.json",
+      "--settings",
+      "settings.json",
+      "--repo",
+      "/tmp/e2e/project/repo"
+     ],
+     "exit": 2,
+     "seconds": 0.6,
+     "tag": "check"
+    },
+    {
+     "argv": [
+      "/usr/local/bin/python3",
+      "-B",
+      "-m",
+      "aisef",
+      "run",
+      "--project",
+      "/tmp/e2e/project/approved.json",
+      "--settings",
+      "settings.json",
+      "--repo",
+      "/tmp/e2e/project/repo",
+      "--out",
+      "run"
+     ],
+     "exit": 2,
+     "seconds": 0.8,
+     "tag": "run"
+    }
+   ],
+   "facts": {
+    "check_exit": 2,
+    "problems": [
+     "the sandbox did not run the probe (exit 1): bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user namespaces. See <https://deb.li/bubblewrap> or <file:///usr/share/doc/bubblewrap/README.Debian.gz>."
+    ],
+    "provider_requests": 0,
+    "run_directory_listing": [
+     "EVIDENCE.json",
+     "RUN.json",
+     "RUN.started.json",
+     "confinement",
+     "repo",
+     "test-python"
+    ],
+    "run_exit": 2,
+    "stage": "confinement"
+   },
+   "observed": {},
+   "passed": true,
+   "scenario": "S2b-hardened",
+   "title": "refused: the container's own boundary stops bubblewrap",
+   "volatile": {}
+  }
+ ]
+}

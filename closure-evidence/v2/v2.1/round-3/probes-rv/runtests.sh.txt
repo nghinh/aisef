@@ -1,0 +1,11 @@
+#!/bin/zsh
+# runtests.sh TREE TAG OUTFILE: the probe-related modules, one process each (unittest), from TREE under py.sh TAG
+SP=/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad
+TREE=$1; TAG=$2; OUTF=$3
+cd $TREE
+: > $OUTF
+for m in tests.v2.test_probe_process_effect_units tests.v2.test_v21_kills3_T19b tests.v2.test_v21_kills3_A19 tests.v2.test_v21_kills3_A21 tests.v2.test_v21_kills3_T27a tests.v2.test_v21_kills3_T18a tests.v2.test_v21_kills3_T19a tests.v2.test_v21_kills3_T21a tests.v2.test_v21_kills3_T21b tests.v2.test_v21_python_imports tests.v2.test_c2_file_artifact tests.v2.test_probe_process_effect tests.v2.test_c2_cli_protocol tests.v2.test_c2_cli_invocation tests.v2.test_v21_identity tests.v2.test_v21_identity_bytes tests.v2.test_python_callable_v2; do
+  r=$($SP/m21/kills3/py.sh $TAG -m unittest $m 2>&1 | grep -E "^(Ran |OK|FAILED|FAIL:|ERROR:)" | tr '\n' ' ')
+  echo "$m :: $r" >> $OUTF
+done
+echo DONE >> $OUTF

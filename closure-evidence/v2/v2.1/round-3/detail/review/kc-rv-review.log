@@ -1,0 +1,65 @@
+[0] KILLED   L124 condition negated  <- ERROR: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | aisef2.orchestrate.adapters.CapabilityUnrunnable
+[1] KILLED   L152 returns None  <- ERROR: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | AttributeError
+[2] KILLED   L122 element 0 dropped  <- ERROR: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | ValueError
+[3] KILLED   L122 element 1 dropped  <- ERROR: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | ValueError
+[4] KILLED   L124 NotEq->Eq  <- ERROR: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | aisef2.orchestrate.adapters.CapabilityUnrunnable
+[5] KILLED   L128 Eq->NotEq  <- ERROR: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | TypeError
+[6] KILLED   L129 element 0 dropped  <- ERROR: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | ValueError
+[7] KILLED   L129 element 1 dropped  <- ERROR: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | ValueError
+[8] KILLED   L129 element 2 dropped  <- ERROR: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | ValueError
+[9] KILLED   L129 conditional negated  <- ERROR: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | TypeError
+[10] KILLED   L131 element 0 dropped  <- FAIL: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | AssertionError
+[11] KILLED   L131 element 1 dropped  <- FAIL: test_the_finders_own_token_is_a_secret_of_the_run_too (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_the_finders_own_token_is_a_secret_of_the_run_too) | AssertionError
+[12] KILLED   L133 element 0 dropped  <- ERROR: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | ValueError
+[13] KILLED   L133 element 1 dropped  <- ERROR: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | ValueError
+[14] KILLED   L137 condition negated  <- ERROR: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | KeyError
+[15] KILLED   L145 condition negated  <- ERROR: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | aisef2.orchestrate.adapters.CapabilityUnrunnable
+[16] KILLED   L123 string 'rev-parse' emptied  <- ERROR: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | aisef2.orchestrate.adapters.CapabilityUnrunnable
+[17] KILLED   L123 string 'HEAD' emptied  <- ERROR: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | aisef2.orchestrate.adapters.CapabilityUnrunnable
+[18] SURVIVED L128 string 'ocr' emptied
+[19] SURVIVED L130 string 'the finder' emptied
+[20] KILLED   L135 conditional negated  <- FAIL: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | AssertionError
+[21] KILLED   L136 dict entry 0 dropped  <- ERROR: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | KeyError
+[22] SURVIVED L136 dict entry 1 dropped
+[23] SURVIVED L136 dict entry 2 dropped
+[24] SURVIVED L136 dict entry 3 dropped
+[25] KILLED   L137 IsNot->Is  <- ERROR: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | KeyError
+[26] KILLED   L145 And swapped  <- ERROR: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | aisef2.orchestrate.adapters.CapabilityUnrunnable
+[27] SURVIVED L149 string 'the verification' emptied
+[28] KILLED   L150 string 'findings' emptied  <- ERROR: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | KeyError
+[29] SURVIVED L152 tuple() -> list()
+[30] SURVIVED L125 string 'the checkout to review has no revision' emptied
+[31] SURVIVED L128 string 'finder' emptied
+[32] KILLED   L131 string 'token' emptied  <- FAIL: test_the_finders_own_token_is_a_secret_of_the_run_too (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_the_finders_own_token_is_a_secret_of_the_run_too) | AssertionError
+[33] KILLED   L136 string 'verification' emptied  <- ERROR: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | KeyError
+[34] KILLED   L136 string 'status' emptied  <- ERROR: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | KeyError
+[35] SURVIVED L136 string 'why' emptied
+[36] SURVIVED L136 string 'probe' emptied
+[37] SURVIVED L136 string 'observed' emptied
+[38] KILLED   L138 dict entry 0 dropped  <- ERROR: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | KeyError
+[39] SURVIVED L138 dict entry 1 dropped
+[40] SURVIVED L138 dict entry 2 dropped
+[41] KILLED   L145 not removed  <- ERROR: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | aisef2.orchestrate.adapters.CapabilityUnrunnable
+[42] SURVIVED L154 conditional negated
+[43] KILLED   L131 string 'secrets' emptied  <- FAIL: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | AssertionError
+[44] KILLED   L138 string 'anchor' emptied  <- ERROR: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | KeyError
+[45] KILLED   L138 string 'status' emptied  <- ERROR: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | KeyError
+[46] SURVIVED L138 string 'why' emptied
+[47] SURVIVED L138 string 'contracts' emptied
+[48] KILLED   L139 string 'policy' emptied  <- ERROR: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | KeyError
+[49] KILLED   L139 string 'min_severity' emptied  <- ERROR: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | KeyError
+[50] SURVIVED L147 Or swapped
+[51] KILLED   L148 conditional negated  <- FAIL: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | AssertionError
+[52] SURVIVED L153 conditional negated
+[53] KILLED   L135 string 'reproducer' emptied  <- FAIL: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | AssertionError
+[54] KILLED   L143 string 'log' emptied  <- FAIL: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | AssertionError
+[55] SURVIVED L152 conditional negated
+[56] SURVIVED L153 not removed
+[57] SURVIVED L154 string ', confirmed=' emptied
+[58] KILLED   L144 string 'id' emptied  <- FAIL: test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it (v2.test_v21_r3_detail_artifact.ReviewerKeepsTheEvidence.test_a_blocking_finding_blocks_on_its_artifact_and_the_row_names_it) | AssertionError
+[59] SURVIVED L152 string ' findings' emptied
+[60] SURVIVED L153 string ', parsed=' emptied
+[61] SURVIVED L147 string 'blocking' emptied
+[62] SURVIVED L152 string ', ' emptied
+[63] SURVIVED L153 string 'parsed' emptied
+# aisef2/app/adapters.py::Reviewer.review: 64 mutants run, {'KILLED': 37, 'SURVIVED': 27}; T0 [{'file': 'tests/v2/test_v21_r3_detail_artifact.py', 'seconds': 2.29, 'outcome': 'PASS', 'ran': 33}]; source_sha256 2ee59736532802d7287a6948c5eade35e75f0e65282eaf3327b18bb5d0339aa2

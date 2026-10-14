@@ -1,0 +1,33 @@
+"""wrong.py.txt TREE VARIANT: apply one plausible wrong implementation to a copy of the tree (text edits of product code)."""
+import pathlib, sys
+tree, v = pathlib.Path(sys.argv[1]), sys.argv[2]
+def edit(rel, old, new):
+    p = tree / rel
+    s = p.read_text(encoding="utf-8")
+    assert s.count(old) == 1, (rel, old, s.count(old))
+    p.write_text(s.replace(old, new), encoding="utf-8")
+if v == "text-mode":
+    edit("aisef2/app/client.py", 'log.read_bytes().decode("utf-8", "replace").split("\\n")', 'log.read_text(encoding="utf-8", errors="replace").split("\\n")')
+elif v == "not-0085":
+    edit("aisef2/app/client.py", 'log.read_bytes().decode("utf-8", "replace").split("\\n")',
+         '__import__("re").split("\\r\\n|\\r|\\n|\\x0b|\\x0c|\\x1c|\\x1d|\\x1e|\\x85", log.read_bytes().decode("utf-8", "replace"))')
+elif v == "usage-untouched":
+    edit("aisef2/app/usage.py", "    for ev in client.events(log):", """    def _old(log):      # the loop as it was: splitlines(), skip what does not parse
+        out = []
+        for line in log.read_text(encoding="utf-8", errors="replace").splitlines():
+            if not line.startswith("{"):
+                continue
+            try:
+                out.append(__import__("json").loads(line))
+            except ValueError:
+                continue
+        return out
+    for ev in _old(log):""")
+elif v == "mounts-split":
+    edit("aisef2/app/confine.py", 'f, r = re.findall(r"[^ ]+", left), re.findall(r"[^ ]+", right)', 'f, r = left.split(), right.split()')
+elif v == "lines-splitlines":
+    edit("aisef2/app/confine.py", 'lines = text.split("\\n")\n    return lines[:-1] if lines[-1] == "" else lines', 'return text.splitlines()')
+elif v == "worktree-splitlines":
+    edit("aisef2/app/lineage.py", 'for ln in block.split("\\n") if " " in ln', 'for ln in block.splitlines() if " " in ln')
+else:
+    raise SystemExit("unknown variant " + v)

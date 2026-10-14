@@ -1,0 +1,1649 @@
+{
+ "target": "aisef2/app/confine.py::_probe",
+ "files": [
+  "tests/v2/test_v21_r3_conf_fu_before.py",
+  "tests/v2/test_v21_r3_conf_rv_hostrows.py",
+  "tests/v2/test_v21_r3_conf_policy.py",
+  "tests/v2/test_v21_r3_conf_locale.py",
+  "tests/v2/test_v21_kills3_T07a.py",
+  "tests/v2/test_v21_kills3_T06a.py",
+  "tests/v2/test_v21_kills3_A06.py",
+  "tests/v2/test_v21_kills3_T05b.py",
+  "tests/v2/test_v21_kills3_T05a.py",
+  "tests/v2/test_v21_kills3_T05c.py",
+  "tests/v2/test_v21_kills3_A05.py",
+  "tests/v2/test_v21_kills3_R02.py",
+  "tests/v2/test_v21_kills3_T06b.py",
+  "tests/v2/test_v21_kills3_A07.py",
+  "tests/v2/test_v21_kills3_T07b.py",
+  "tests/v2/test_v21_kills3_TO2.py",
+  "tests/v2/test_v21_defects_confine.py",
+  "tests/v2/test_v21_confine.py"
+ ],
+ "source_sha256": "093e276c57b5b5c0b332937276ee41e04b0eb344ef05a4abcf23c38eddae16e9",
+ "t0": [
+  {
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "seconds": 2.36,
+   "outcome": "PASS",
+   "ran": 9
+  },
+  {
+   "file": "tests/v2/test_v21_r3_conf_rv_hostrows.py",
+   "seconds": 0.37,
+   "outcome": "PASS",
+   "ran": 3
+  },
+  {
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "seconds": 1.98,
+   "outcome": "PASS",
+   "ran": 42
+  },
+  {
+   "file": "tests/v2/test_v21_r3_conf_locale.py",
+   "seconds": 1.99,
+   "outcome": "PASS",
+   "ran": 10
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T07a.py",
+   "seconds": 0.47,
+   "outcome": "PASS",
+   "ran": 14
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T06a.py",
+   "seconds": 0.49,
+   "outcome": "PASS",
+   "ran": 14
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_A06.py",
+   "seconds": 1.38,
+   "outcome": "PASS",
+   "ran": 4
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "seconds": 0.94,
+   "outcome": "PASS",
+   "ran": 18
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T05a.py",
+   "seconds": 1.27,
+   "outcome": "PASS",
+   "ran": 8
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T05c.py",
+   "seconds": 2.76,
+   "outcome": "PASS",
+   "ran": 7
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_A05.py",
+   "seconds": 1.49,
+   "outcome": "PASS",
+   "ran": 6
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_R02.py",
+   "seconds": 0.63,
+   "outcome": "PASS",
+   "ran": 2
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T06b.py",
+   "seconds": 2.22,
+   "outcome": "PASS",
+   "ran": 8
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_A07.py",
+   "seconds": 0.46,
+   "outcome": "PASS",
+   "ran": 5
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T07b.py",
+   "seconds": 0.52,
+   "outcome": "PASS",
+   "ran": 11
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_TO2.py",
+   "seconds": 0.33,
+   "outcome": "PASS",
+   "ran": 3
+  },
+  {
+   "file": "tests/v2/test_v21_defects_confine.py",
+   "seconds": 1.67,
+   "outcome": "PASS",
+   "ran": 16
+  },
+  {
+   "file": "tests/v2/test_v21_confine.py",
+   "seconds": 20.93,
+   "outcome": "PASS",
+   "ran": 34
+  }
+ ],
+ "error": null,
+ "results": [
+  {
+   "index": 0,
+   "mutant": "L373 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 1,
+   "mutant": "L410 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_a_super_block_the_reading_before_the_session_holds_is_the_hosts (v2.test_v21_r3_conf_fu_before.ReadingBefore.test_a_super_block_the_reading_before_the_session_holds_is_the_hosts) (after_holds_it=True) | ValueError"
+  },
+  {
+   "index": 2,
+   "mutant": "L412 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 3,
+   "mutant": "L416 returns None",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | TypeError"
+  },
+  {
+   "index": 4,
+   "mutant": "L338 dict entry 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_locale.py",
+   "first": "FAIL: test_the_rest_of_the_environment_is_what_the_session_wrapper_gives (v2.test_v21_r3_conf_locale.PassedDown.test_the_rest_of_the_environment_is_what_the_session_wrapper_gives) | AssertionError"
+  },
+  {
+   "index": 5,
+   "mutant": "L338 dict entry 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_locale.py",
+   "first": "FAIL: test_the_environment_the_stand_in_bubblewrap_received (v2.test_v21_r3_conf_locale.AtTheExecBoundary.test_the_environment_the_stand_in_bubblewrap_received) (call=0) | AssertionError"
+  },
+  {
+   "index": 6,
+   "mutant": "L345 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | ValueError"
+  },
+  {
+   "index": 7,
+   "mutant": "L345 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | ValueError"
+  },
+  {
+   "index": 8,
+   "mutant": "L345 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | ValueError"
+  },
+  {
+   "index": 9,
+   "mutant": "L345 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | ValueError"
+  },
+  {
+   "index": 10,
+   "mutant": "L349 dict entry 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 11,
+   "mutant": "L349 dict entry 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 12,
+   "mutant": "L349 dict entry 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 13,
+   "mutant": "L349 dict entry 3 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 14,
+   "mutant": "L349 dict entry 4 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 15,
+   "mutant": "L354 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | TypeError"
+  },
+  {
+   "index": 16,
+   "mutant": "L357 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "FAIL: test_operator_can_is_one_per_write_try_under_the_same_name (v2.test_v21_kills3_T05b.WhatWasTried.test_operator_can_is_one_per_write_try_under_the_same_name) | AssertionError"
+  },
+  {
+   "index": 17,
+   "mutant": "L357 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "FAIL: test_operator_can_is_one_per_write_try_under_the_same_name (v2.test_v21_kills3_T05b.WhatWasTried.test_operator_can_is_one_per_write_try_under_the_same_name) | AssertionError"
+  },
+  {
+   "index": 18,
+   "mutant": "L357 element 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "FAIL: test_operator_can_is_one_per_write_try_under_the_same_name (v2.test_v21_kills3_T05b.WhatWasTried.test_operator_can_is_one_per_write_try_under_the_same_name) | AssertionError"
+  },
+  {
+   "index": 19,
+   "mutant": "L357 element 3 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "FAIL: test_operator_can_is_one_per_write_try_under_the_same_name (v2.test_v21_kills3_T05b.WhatWasTried.test_operator_can_is_one_per_write_try_under_the_same_name) | AssertionError"
+  },
+  {
+   "index": 20,
+   "mutant": "L357 element 4 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "FAIL: test_operator_can_is_one_per_write_try_under_the_same_name (v2.test_v21_kills3_T05b.WhatWasTried.test_operator_can_is_one_per_write_try_under_the_same_name) | AssertionError"
+  },
+  {
+   "index": 21,
+   "mutant": "L357 element 5 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "FAIL: test_operator_can_is_one_per_write_try_under_the_same_name (v2.test_v21_kills3_T05b.WhatWasTried.test_operator_can_is_one_per_write_try_under_the_same_name) | AssertionError"
+  },
+  {
+   "index": 22,
+   "mutant": "L357 element 6 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "FAIL: test_operator_can_is_one_per_write_try_under_the_same_name (v2.test_v21_kills3_T05b.WhatWasTried.test_operator_can_is_one_per_write_try_under_the_same_name) | AssertionError"
+  },
+  {
+   "index": 23,
+   "mutant": "L357 element 7 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "FAIL: test_operator_can_is_one_per_write_try_under_the_same_name (v2.test_v21_kills3_T05b.WhatWasTried.test_operator_can_is_one_per_write_try_under_the_same_name) | AssertionError"
+  },
+  {
+   "index": 24,
+   "mutant": "L357 element 8 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05a.py",
+   "first": "FAIL: test_the_probe_is_given_every_host_directory_the_wrapper_binds_and_none_of_its_own_mounts (v2.test_v21_kills3_T05a.UnixSockets.test_the_probe_is_given_every_host_directory_the_wrapper_binds_and_none_of_its_own_mounts) | AssertionError"
+  },
+  {
+   "index": 25,
+   "mutant": "L357 element 9 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05a.py",
+   "first": "FAIL: test_a_sandbox_as_required_is_not_refused (v2.test_v21_kills3_T05a.CleanSession.test_a_sandbox_as_required_is_not_refused) | AssertionError"
+  },
+  {
+   "index": 26,
+   "mutant": "L371 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | ValueError"
+  },
+  {
+   "index": 27,
+   "mutant": "L371 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | ValueError"
+  },
+  {
+   "index": 28,
+   "mutant": "L371 element 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | ValueError"
+  },
+  {
+   "index": 29,
+   "mutant": "L373 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_confine.py",
+   "first": "FAIL: test_a_probe_that_did_not_exit_0_is_refused_even_when_it_reached_its_end (v2.test_v21_confine.FailClosed.test_a_probe_that_did_not_exit_0_is_refused_even_when_it_reached_its_end) | AssertionError"
+  },
+  {
+   "index": 30,
+   "mutant": "L388 dict entry 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "FAIL: test_the_record_has_each_reading_under_its_name (v2.test_v21_kills3_T05b.CorrectlyConfinedSession.test_the_record_has_each_reading_under_its_name) | AssertionError"
+  },
+  {
+   "index": 31,
+   "mutant": "L388 dict entry 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 32,
+   "mutant": "L388 dict entry 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 33,
+   "mutant": "L388 dict entry 3 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "ERROR: test_no_new_privs_and_seccomp_are_the_status_values (v2.test_v21_kills3_T05b.CorrectlyConfinedSession.test_no_new_privs_and_seccomp_are_the_status_values) | KeyError"
+  },
+  {
+   "index": 34,
+   "mutant": "L388 dict entry 4 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "ERROR: test_interfaces_are_listed_and_none_is_routed (v2.test_v21_kills3_T05b.AFreshNetworkNamespace.test_interfaces_are_listed_and_none_is_routed) | KeyError"
+  },
+  {
+   "index": 35,
+   "mutant": "L388 dict entry 5 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "ERROR: setUpClass (v2.test_v21_kills3_T05b.AFreshNetworkNamespace) | KeyError"
+  },
+  {
+   "index": 36,
+   "mutant": "L388 dict entry 6 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 37,
+   "mutant": "L388 dict entry 7 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 38,
+   "mutant": "L388 dict entry 8 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | KeyError"
+  },
+  {
+   "index": 39,
+   "mutant": "L388 dict entry 9 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 40,
+   "mutant": "L388 dict entry 10 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 41,
+   "mutant": "L388 dict entry 11 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 42,
+   "mutant": "L388 dict entry 12 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 43,
+   "mutant": "L402 conditional negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | AssertionError"
+  },
+  {
+   "index": 44,
+   "mutant": "L410 not removed",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | TypeError"
+  },
+  {
+   "index": 45,
+   "mutant": "L339 string 'locale' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_locale.py",
+   "first": "ERROR: test_the_environment_the_stand_in_bubblewrap_received (v2.test_v21_r3_conf_locale.AtTheExecBoundary.test_the_environment_the_stand_in_bubblewrap_received) | KeyError"
+  },
+  {
+   "index": 46,
+   "mutant": "L343 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05c.py",
+   "first": "ERROR: test_an_exec_failure_is_marked_unavailable_and_names_the_class (v2.test_v21_kills3_T05c.TheVersionReadCannotFail.test_an_exec_failure_is_marked_unavailable_and_names_the_class) | OSError"
+  },
+  {
+   "index": 47,
+   "mutant": "L343 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05c.py",
+   "first": "ERROR: test_a_hung_version_call_is_marked_unavailable_and_names_the_class (v2.test_v21_kills3_T05c.TheVersionReadCannotFail.test_a_hung_version_call_is_marked_unavailable_and_names_the_class) | subprocess.TimeoutExpired"
+  },
+  {
+   "index": 48,
+   "mutant": "L346 string '.aisef-confine-probe-' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_confine.py",
+   "first": "FAIL: test_what_is_measured_decides_not_the_name_of_the_tool (v2.test_v21_confine.FailClosed.test_what_is_measured_decides_not_the_name_of_the_tool) | AssertionError"
+  },
+  {
+   "index": 49,
+   "mutant": "L347 string 'canary' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | IsADirectoryError"
+  },
+  {
+   "index": 50,
+   "mutant": "L349 string 'run_directory' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 51,
+   "mutant": "L350 string 'kernel' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 52,
+   "mutant": "L351 string 'interpreter_site' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 53,
+   "mutant": "L352 string 'client_directory' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 54,
+   "mutant": "L353 string 'git_directory' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 55,
+   "mutant": "L354 string '/nonexistent' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05a.py",
+   "first": "FAIL: test_without_a_home_the_probe_is_given_a_path_that_is_not_there_and_no_home_is_judged (v2.test_v21_kills3_T05a.HomeListing.test_without_a_home_the_probe_is_given_a_path_that_is_not_there_and_no_home_is_judged) | AssertionError"
+  },
+  {
+   "index": 56,
+   "mutant": "L355 string '.' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05c.py",
+   "first": "FAIL: test_the_value_is_the_sleeper_and_six_fraction_digits_whatever_the_nonce (v2.test_v21_kills3_T05c.TheSleeperHasAFixedWidthDuration.test_the_value_is_the_sleeper_and_six_fraction_digits_whatever_the_nonce) (nonce=0) | AssertionError"
+  },
+  {
+   "index": 57,
+   "mutant": "L359 string 'argv' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A06.py",
+   "first": "ERROR: test_the_recorded_argv_is_the_command_line_that_ran (v2.test_v21_kills3_A06.RecordedCommandLine.test_the_recorded_argv_is_the_command_line_that_ran) | KeyError"
+  },
+  {
+   "index": 58,
+   "mutant": "L359 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A06.py",
+   "first": "FAIL: test_the_recorded_argv_is_the_command_line_that_ran (v2.test_v21_kills3_A06.RecordedCommandLine.test_the_recorded_argv_is_the_command_line_that_ran) | AssertionError"
+  },
+  {
+   "index": 59,
+   "mutant": "L359 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A06.py",
+   "first": "FAIL: test_the_recorded_argv_is_the_command_line_that_ran (v2.test_v21_kills3_A06.RecordedCommandLine.test_the_recorded_argv_is_the_command_line_that_ran) | AssertionError"
+  },
+  {
+   "index": 60,
+   "mutant": "L359 element 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A06.py",
+   "first": "FAIL: test_the_recorded_argv_is_the_command_line_that_ran (v2.test_v21_kills3_A06.RecordedCommandLine.test_the_recorded_argv_is_the_command_line_that_ran) | AssertionError"
+  },
+  {
+   "index": 61,
+   "mutant": "L359 element 3 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A06.py",
+   "first": "FAIL: test_the_recorded_argv_is_the_command_line_that_ran (v2.test_v21_kills3_A06.RecordedCommandLine.test_the_recorded_argv_is_the_command_line_that_ran) | AssertionError"
+  },
+  {
+   "index": 62,
+   "mutant": "L363 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | ValueError"
+  },
+  {
+   "index": 63,
+   "mutant": "L363 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | ValueError"
+  },
+  {
+   "index": 64,
+   "mutant": "L363 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | ValueError"
+  },
+  {
+   "index": 65,
+   "mutant": "L363 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | ValueError"
+  },
+  {
+   "index": 66,
+   "mutant": "L366 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05c.py",
+   "first": "ERROR: test_an_exec_failure_of_the_probe_is_a_problem_not_a_crash (v2.test_v21_kills3_T05c.TheProbeCannotBeRunOrHangs.test_an_exec_failure_of_the_probe_is_a_problem_not_a_crash) | OSError"
+  },
+  {
+   "index": 67,
+   "mutant": "L366 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_R02.py",
+   "first": "ERROR: test_a_subprocess_error_that_is_not_a_timeout_is_a_problem_not_a_crash (v2.test_v21_kills3_R02.AnyFailureOfTheProbeCallIsARecordedRefusal.test_a_subprocess_error_that_is_not_a_timeout_is_a_problem_not_a_crash) | subprocess.SubprocessError"
+  },
+  {
+   "index": 68,
+   "mutant": "L373 NotEq->Eq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 69,
+   "mutant": "L373 NotIn->In",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 70,
+   "mutant": "L380 string 'devices' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 71,
+   "mutant": "L381 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | ValueError"
+  },
+  {
+   "index": 72,
+   "mutant": "L381 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | ValueError"
+  },
+  {
+   "index": 73,
+   "mutant": "L381 element 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | ValueError"
+  },
+  {
+   "index": 74,
+   "mutant": "L382 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | ValueError"
+  },
+  {
+   "index": 75,
+   "mutant": "L382 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | ValueError"
+  },
+  {
+   "index": 76,
+   "mutant": "L382 element 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | ValueError"
+  },
+  {
+   "index": 77,
+   "mutant": "L383 conditional negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 78,
+   "mutant": "L388 string 'inside' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 79,
+   "mutant": "L388 string 'uid' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "FAIL: test_the_record_has_each_reading_under_its_name (v2.test_v21_kills3_T05b.CorrectlyConfinedSession.test_the_record_has_each_reading_under_its_name) | AssertionError"
+  },
+  {
+   "index": 80,
+   "mutant": "L388 string 'capabilities' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 81,
+   "mutant": "L388 string 'no_new_privs' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 82,
+   "mutant": "L389 string 'seccomp' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "ERROR: test_no_new_privs_and_seccomp_are_the_status_values (v2.test_v21_kills3_T05b.CorrectlyConfinedSession.test_no_new_privs_and_seccomp_are_the_status_values) | KeyError"
+  },
+  {
+   "index": 83,
+   "mutant": "L389 string 'network_interfaces' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "ERROR: test_interfaces_are_listed_and_none_is_routed (v2.test_v21_kills3_T05b.AFreshNetworkNamespace.test_interfaces_are_listed_and_none_is_routed) | KeyError"
+  },
+  {
+   "index": 84,
+   "mutant": "L389 string 'routed_interfaces' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "ERROR: setUpClass (v2.test_v21_kills3_T05b.AFreshNetworkNamespace) | KeyError"
+  },
+  {
+   "index": 85,
+   "mutant": "L390 string 'mounts' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 86,
+   "mutant": "L390 string 'mount_targets' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 87,
+   "mutant": "L391 string 'device_roots' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | KeyError"
+  },
+  {
+   "index": 88,
+   "mutant": "L391 string 'devices' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 89,
+   "mutant": "L392 string 'namespaces' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 90,
+   "mutant": "L393 string 'home_listing' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 91,
+   "mutant": "L394 string 'unix_sockets' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 92,
+   "mutant": "L389 sorted() -> list()",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "FAIL: test_the_interfaces_with_a_route_are_recorded_once_each_sorted (v2.test_v21_kills3_T05b.CorrectlyConfinedSession.test_the_interfaces_with_a_route_are_recorded_once_each_sorted) | AssertionError"
+  },
+  {
+   "index": 93,
+   "mutant": "L394 conditional negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 94,
+   "mutant": "L401 string 'host_mounts' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_the_report_holds_the_real_readings_of_the_controllers_own_table (v2.test_v21_r3_conf_fu_before.Appeared.test_the_report_holds_the_real_readings_of_the_controllers_own_table) | KeyError"
+  },
+  {
+   "index": 95,
+   "mutant": "L402 string 'host_mounts_appeared' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 96,
+   "mutant": "L402 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_a_writable_bind_of_a_super_block_the_host_held_is_refused_whatever_the_reading_after_says (v2.test_v21_r3_conf_fu_before.ReadingBefore.test_a_writable_bind_of_a_super_block_the_host_held_is_refused_whatever_the_reading_after_says) (after='unreadable') | TypeError"
+  },
+  {
+   "index": 97,
+   "mutant": "L403 string 'tried' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "ERROR: test_each_try_has_its_exit_and_the_text_it_printed (v2.test_v21_kills3_T05b.WhatWasTried.test_each_try_has_its_exit_and_the_text_it_printed) | KeyError"
+  },
+  {
+   "index": 98,
+   "mutant": "L403 dict entry 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "FAIL: test_each_try_has_its_exit_and_the_text_it_printed (v2.test_v21_kills3_T05b.WhatWasTried.test_each_try_has_its_exit_and_the_text_it_printed) | AssertionError"
+  },
+  {
+   "index": 99,
+   "mutant": "L403 dict entry 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "FAIL: test_each_try_has_its_exit_and_the_text_it_printed (v2.test_v21_kills3_T05b.WhatWasTried.test_each_try_has_its_exit_and_the_text_it_printed) | AssertionError"
+  },
+  {
+   "index": 100,
+   "mutant": "L404 string 'created_outside_workspace' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 101,
+   "mutant": "L405 string 'setsid_survivors' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 102,
+   "mutant": "L406 string 'operator_can' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "ERROR: test_operator_can_is_one_per_write_try_under_the_same_name (v2.test_v21_kills3_T05b.WhatWasTried.test_operator_can_is_one_per_write_try_under_the_same_name) | KeyError"
+  },
+  {
+   "index": 103,
+   "mutant": "L409 string 'left_on_host' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 104,
+   "mutant": "L412 string 'left_on_host' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 105,
+   "mutant": "L415 string 'problems' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | KeyError"
+  },
+  {
+   "index": 106,
+   "mutant": "L339 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | ValueError"
+  },
+  {
+   "index": 107,
+   "mutant": "L339 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | ValueError"
+  },
+  {
+   "index": 108,
+   "mutant": "L341 string 'bwrap_version' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "ERROR: test_the_record_holds_what_it_printed (v2.test_v21_kills3_T05b.BubblewrapRelease.test_the_record_holds_what_it_printed) | KeyError"
+  },
+  {
+   "index": 109,
+   "mutant": "L348 string '\\n' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_confine.py",
+   "first": "FAIL: test_a_probe_that_did_not_exit_0_is_refused_even_when_it_reached_its_end (v2.test_v21_confine.FailClosed.test_a_probe_that_did_not_exit_0_is_refused_even_when_it_reached_its_end) | ValueError"
+  },
+  {
+   "index": 110,
+   "mutant": "L348 string 'utf-8' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | LookupError"
+  },
+  {
+   "index": 111,
+   "mutant": "L354 string 'HOME' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05a.py",
+   "first": "FAIL: test_a_sandbox_as_required_is_not_refused (v2.test_v21_kills3_T05a.CleanSession.test_a_sandbox_as_required_is_not_refused) | AssertionError"
+  },
+  {
+   "index": 112,
+   "mutant": "L356 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | ValueError"
+  },
+  {
+   "index": 113,
+   "mutant": "L356 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | ValueError"
+  },
+  {
+   "index": 114,
+   "mutant": "L357 string 'run_directory' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 115,
+   "mutant": "L357 string 'kernel' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 116,
+   "mutant": "L357 string 'interpreter_site' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 117,
+   "mutant": "L358 string 'client_directory' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 118,
+   "mutant": "L358 string 'git_directory' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 119,
+   "mutant": "L359 string '/bin/sh' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A06.py",
+   "first": "FAIL: test_the_recorded_argv_is_the_command_line_that_ran (v2.test_v21_kills3_A06.RecordedCommandLine.test_the_recorded_argv_is_the_command_line_that_ran) | AssertionError"
+  },
+  {
+   "index": 120,
+   "mutant": "L359 string '-c' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A06.py",
+   "first": "FAIL: test_the_recorded_argv_is_the_command_line_that_ran (v2.test_v21_kills3_A06.RecordedCommandLine.test_the_recorded_argv_is_the_command_line_that_ran) | AssertionError"
+  },
+  {
+   "index": 121,
+   "mutant": "L359 string '<PROBE>' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A06.py",
+   "first": "FAIL: test_the_recorded_argv_is_the_command_line_that_ran (v2.test_v21_kills3_A06.RecordedCommandLine.test_the_recorded_argv_is_the_command_line_that_ran) | AssertionError"
+  },
+  {
+   "index": 122,
+   "mutant": "L359 string 'probe' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A06.py",
+   "first": "FAIL: test_the_recorded_argv_is_the_command_line_that_ran (v2.test_v21_kills3_A06.RecordedCommandLine.test_the_recorded_argv_is_the_command_line_that_ran) | AssertionError"
+  },
+  {
+   "index": 123,
+   "mutant": "L365 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05c.py",
+   "first": "ERROR: test_a_probe_over_its_limit_is_a_problem_not_a_crash (v2.test_v21_kills3_T05c.TheProbeCannotBeRunOrHangs.test_a_probe_over_its_limit_is_a_problem_not_a_crash) | ValueError"
+  },
+  {
+   "index": 124,
+   "mutant": "L365 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05c.py",
+   "first": "ERROR: test_a_probe_over_its_limit_is_a_problem_not_a_crash (v2.test_v21_kills3_T05c.TheProbeCannotBeRunOrHangs.test_a_probe_over_its_limit_is_a_problem_not_a_crash) | ValueError"
+  },
+  {
+   "index": 125,
+   "mutant": "L365 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05c.py",
+   "first": "ERROR: test_a_probe_over_its_limit_is_a_problem_not_a_crash (v2.test_v21_kills3_T05c.TheProbeCannotBeRunOrHangs.test_a_probe_over_its_limit_is_a_problem_not_a_crash) | ValueError"
+  },
+  {
+   "index": 126,
+   "mutant": "L365 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05c.py",
+   "first": "ERROR: test_a_probe_over_its_limit_is_a_problem_not_a_crash (v2.test_v21_kills3_T05c.TheProbeCannotBeRunOrHangs.test_a_probe_over_its_limit_is_a_problem_not_a_crash) | ValueError"
+  },
+  {
+   "index": 127,
+   "mutant": "L367 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05c.py",
+   "first": "ERROR: test_an_exec_failure_of_the_probe_is_a_problem_not_a_crash (v2.test_v21_kills3_T05c.TheProbeCannotBeRunOrHangs.test_an_exec_failure_of_the_probe_is_a_problem_not_a_crash) | ValueError"
+  },
+  {
+   "index": 128,
+   "mutant": "L367 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05c.py",
+   "first": "ERROR: test_an_exec_failure_of_the_probe_is_a_problem_not_a_crash (v2.test_v21_kills3_T05c.TheProbeCannotBeRunOrHangs.test_an_exec_failure_of_the_probe_is_a_problem_not_a_crash) | ValueError"
+  },
+  {
+   "index": 129,
+   "mutant": "L367 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05c.py",
+   "first": "ERROR: test_an_exec_failure_of_the_probe_is_a_problem_not_a_crash (v2.test_v21_kills3_T05c.TheProbeCannotBeRunOrHangs.test_an_exec_failure_of_the_probe_is_a_problem_not_a_crash) | ValueError"
+  },
+  {
+   "index": 130,
+   "mutant": "L367 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05c.py",
+   "first": "ERROR: test_an_exec_failure_of_the_probe_is_a_problem_not_a_crash (v2.test_v21_kills3_T05c.TheProbeCannotBeRunOrHangs.test_an_exec_failure_of_the_probe_is_a_problem_not_a_crash) | ValueError"
+  },
+  {
+   "index": 131,
+   "mutant": "L369 string 'sleep ' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 132,
+   "mutant": "L370 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | ValueError"
+  },
+  {
+   "index": 133,
+   "mutant": "L370 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | ValueError"
+  },
+  {
+   "index": 134,
+   "mutant": "L373 string 'end' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 135,
+   "mutant": "L376 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | ValueError"
+  },
+  {
+   "index": 136,
+   "mutant": "L376 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | ValueError"
+  },
+  {
+   "index": 137,
+   "mutant": "L377 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 138,
+   "mutant": "L377 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 139,
+   "mutant": "L377 element 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 140,
+   "mutant": "L377 element 3 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "FAIL: test_the_capabilities_are_the_five_sets_the_status_reports (v2.test_v21_kills3_T05b.CorrectlyConfinedSession.test_the_capabilities_are_the_five_sets_the_status_reports) | AssertionError"
+  },
+  {
+   "index": 141,
+   "mutant": "L377 element 4 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 142,
+   "mutant": "L378 string 'mountinfo' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 143,
+   "mutant": "L381 string ' ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | ValueError"
+  },
+  {
+   "index": 144,
+   "mutant": "L382 string ' ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | ValueError"
+  },
+  {
+   "index": 145,
+   "mutant": "L383 Eq->NotEq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 146,
+   "mutant": "L384 In->NotIn",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "FAIL: test_interfaces_are_listed_and_none_is_routed (v2.test_v21_kills3_T05b.AFreshNetworkNamespace.test_interfaces_are_listed_and_none_is_routed) | AssertionError"
+  },
+  {
+   "index": 147,
+   "mutant": "L387 In->NotIn",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "FAIL: test_the_interfaces_with_a_route_are_recorded_once_each_sorted (v2.test_v21_kills3_T05b.CorrectlyConfinedSession.test_the_interfaces_with_a_route_are_recorded_once_each_sorted) | AssertionError"
+  },
+  {
+   "index": 148,
+   "mutant": "L388 string 'uid' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "FAIL: test_the_uid_is_what_id_printed (v2.test_v21_kills3_T05b.CorrectlyConfinedSession.test_the_uid_is_what_id_printed) | AssertionError"
+  },
+  {
+   "index": 149,
+   "mutant": "L388 string 'NoNewPrivs' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 150,
+   "mutant": "L389 string 'Seccomp' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "FAIL: test_no_new_privs_and_seccomp_are_the_status_values (v2.test_v21_kills3_T05b.CorrectlyConfinedSession.test_no_new_privs_and_seccomp_are_the_status_values) | AssertionError"
+  },
+  {
+   "index": 151,
+   "mutant": "L393 string 'home' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05a.py",
+   "first": "FAIL: test_a_sandbox_as_required_is_not_refused (v2.test_v21_kills3_T05a.CleanSession.test_a_sandbox_as_required_is_not_refused) | AssertionError"
+  },
+  {
+   "index": 152,
+   "mutant": "L394 Eq->NotEq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 153,
+   "mutant": "L402 Is->IsNot",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | AssertionError"
+  },
+  {
+   "index": 154,
+   "mutant": "L402 Is->IsNot",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | AssertionError"
+  },
+  {
+   "index": 155,
+   "mutant": "L403 string 'exit' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "FAIL: test_each_try_has_its_exit_and_the_text_it_printed (v2.test_v21_kills3_T05b.WhatWasTried.test_each_try_has_its_exit_and_the_text_it_printed) | AssertionError"
+  },
+  {
+   "index": 156,
+   "mutant": "L403 string 'output' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "FAIL: test_each_try_has_its_exit_and_the_text_it_printed (v2.test_v21_kills3_T05b.WhatWasTried.test_each_try_has_its_exit_and_the_text_it_printed) | AssertionError"
+  },
+  {
+   "index": 157,
+   "mutant": "L403 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | ValueError"
+  },
+  {
+   "index": 158,
+   "mutant": "L403 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | ValueError"
+  },
+  {
+   "index": 159,
+   "mutant": "L406 string 'write_' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "FAIL: test_operator_can_is_one_per_write_try_under_the_same_name (v2.test_v21_kills3_T05b.WhatWasTried.test_operator_can_is_one_per_write_try_under_the_same_name) | AssertionError"
+  },
+  {
+   "index": 160,
+   "mutant": "L406 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | ValueError"
+  },
+  {
+   "index": 161,
+   "mutant": "L406 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | ValueError"
+  },
+  {
+   "index": 162,
+   "mutant": "L409 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | ValueError"
+  },
+  {
+   "index": 163,
+   "mutant": "L409 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | ValueError"
+  },
+  {
+   "index": 164,
+   "mutant": "L338 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | ValueError"
+  },
+  {
+   "index": 165,
+   "mutant": "L338 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | ValueError"
+  },
+  {
+   "index": 166,
+   "mutant": "L338 not removed",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | TypeError"
+  },
+  {
+   "index": 167,
+   "mutant": "L339 string 'LC_|LANG' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_locale.py",
+   "first": "FAIL: test_the_environment_the_stand_in_bubblewrap_received (v2.test_v21_r3_conf_locale.AtTheExecBoundary.test_the_environment_the_stand_in_bubblewrap_received) | AssertionError"
+  },
+  {
+   "index": 168,
+   "mutant": "L344 string 'bwrap_version' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05c.py",
+   "first": "FAIL: test_a_hung_version_call_is_marked_unavailable_and_names_the_class (v2.test_v21_kills3_T05c.TheVersionReadCannotFail.test_a_hung_version_call_is_marked_unavailable_and_names_the_class) | AssertionError"
+  },
+  {
+   "index": 169,
+   "mutant": "L344 string 'unavailable: ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05c.py",
+   "first": "FAIL: test_a_hung_version_call_is_marked_unavailable_and_names_the_class (v2.test_v21_kills3_T05c.TheVersionReadCannotFail.test_a_hung_version_call_is_marked_unavailable_and_names_the_class) | AssertionError"
+  },
+  {
+   "index": 170,
+   "mutant": "L349 string 'written-' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_confine.py",
+   "first": "FAIL: test_what_is_measured_decides_not_the_name_of_the_tool (v2.test_v21_confine.FailClosed.test_what_is_measured_decides_not_the_name_of_the_tool) | AssertionError"
+  },
+  {
+   "index": 171,
+   "mutant": "L353 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_confine.py",
+   "first": "FAIL: test_what_is_measured_decides_not_the_name_of_the_tool (v2.test_v21_confine.FailClosed.test_what_is_measured_decides_not_the_name_of_the_tool) | AssertionError"
+  },
+  {
+   "index": 172,
+   "mutant": "L355 string '06d' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05c.py",
+   "first": "FAIL: test_one_measurements_value_is_never_inside_anothers (v2.test_v21_kills3_T05c.TheSleeperHasAFixedWidthDuration.test_one_measurements_value_is_never_inside_anothers) (a='120.7', b='120.70') | AssertionError"
+  },
+  {
+   "index": 173,
+   "mutant": "L362 True->False",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_locale.py",
+   "first": "ERROR: test_the_environment_the_stand_in_bubblewrap_received (v2.test_v21_r3_conf_locale.AtTheExecBoundary.test_the_environment_the_stand_in_bubblewrap_received) | TypeError"
+  },
+  {
+   "index": 174,
+   "mutant": "L362 True->False",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_confine.py",
+   "first": "FAIL: test_a_probe_that_did_not_exit_0_is_refused_even_when_it_reached_its_end (v2.test_v21_confine.FailClosed.test_a_probe_that_did_not_exit_0_is_refused_even_when_it_reached_its_end) | TypeError"
+  },
+  {
+   "index": 175,
+   "mutant": "L374 string 'the sandbox did not run the probe (exit ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_locale.py",
+   "first": "FAIL: test_the_environment_the_stand_in_bubblewrap_received (v2.test_v21_r3_conf_locale.AtTheExecBoundary.test_the_environment_the_stand_in_bubblewrap_received) | AssertionError"
+  },
+  {
+   "index": 176,
+   "mutant": "L374 string '): ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_locale.py",
+   "first": "FAIL: test_the_environment_the_stand_in_bubblewrap_received (v2.test_v21_r3_conf_locale.AtTheExecBoundary.test_the_environment_the_stand_in_bubblewrap_received) | AssertionError"
+  },
+  {
+   "index": 177,
+   "mutant": "L375 string ':' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | ValueError"
+  },
+  {
+   "index": 178,
+   "mutant": "L375 In->NotIn",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 179,
+   "mutant": "L377 string 'CapInh' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 180,
+   "mutant": "L377 string 'CapPrm' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 181,
+   "mutant": "L377 string 'CapEff' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 182,
+   "mutant": "L377 string 'CapBnd' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "FAIL: test_the_capabilities_are_the_five_sets_the_status_reports (v2.test_v21_kills3_T05b.CorrectlyConfinedSession.test_the_capabilities_are_the_five_sets_the_status_reports) | AssertionError"
+  },
+  {
+   "index": 183,
+   "mutant": "L377 string 'CapAmb' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 184,
+   "mutant": "L383 string 'char' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 185,
+   "mutant": "L384 string ':' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A05.py",
+   "first": "FAIL: test_a_netdev_line_that_is_not_an_interface_row_is_no_interface (v2.test_v21_kills3_A05.Rows.test_a_netdev_line_that_is_not_an_interface_row_is_no_interface) | AssertionError"
+  },
+  {
+   "index": 186,
+   "mutant": "L387 string '\\t' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | ValueError"
+  },
+  {
+   "index": 187,
+   "mutant": "L387 string '\\t' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A05.py",
+   "first": "FAIL: test_a_route_line_that_is_not_a_route_row_is_no_route_and_refuses_nothing (v2.test_v21_kills3_A05.Rows.test_a_route_line_that_is_not_a_route_row_is_no_route_and_refuses_nothing) | AssertionError"
+  },
+  {
+   "index": 188,
+   "mutant": "L392 string 'ns' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 189,
+   "mutant": "L394 string 'listed' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 190,
+   "mutant": "L394 string 'sockets' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05a.py",
+   "first": "FAIL: test_a_sandbox_as_required_is_not_refused (v2.test_v21_kills3_T05a.CleanSession.test_a_sandbox_as_required_is_not_refused) | AssertionError"
+  },
+  {
+   "index": 191,
+   "mutant": "L402 NotIn->In",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | AssertionError"
+  },
+  {
+   "index": 192,
+   "mutant": "L403 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | ValueError"
+  },
+  {
+   "index": 193,
+   "mutant": "L403 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | ValueError"
+  },
+  {
+   "index": 194,
+   "mutant": "L413 string \"the probe's files are left where confinement did not stop them; nothing was removed, the operator removes them: \" emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_confine.py",
+   "first": "FAIL: test_a_probe_that_did_not_exit_0_is_refused_even_when_it_reached_its_end (v2.test_v21_confine.FailClosed.test_a_probe_that_did_not_exit_0_is_refused_even_when_it_reached_its_end) | AssertionError"
+  },
+  {
+   "index": 195,
+   "mutant": "L351 string 'purelib' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 196,
+   "mutant": "L358 True->False",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05a.py",
+   "first": "FAIL: test_the_probe_is_given_every_host_directory_the_wrapper_binds_and_none_of_its_own_mounts (v2.test_v21_kills3_T05a.UnixSockets.test_the_probe_is_given_every_host_directory_the_wrapper_binds_and_none_of_its_own_mounts) | AssertionError"
+  },
+  {
+   "index": 197,
+   "mutant": "L365 string 'TimeoutExpired: timed out after ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05c.py",
+   "first": "FAIL: test_a_probe_over_its_limit_is_a_problem_not_a_crash (v2.test_v21_kills3_T05c.TheProbeCannotBeRunOrHangs.test_a_probe_over_its_limit_is_a_problem_not_a_crash) | AssertionError"
+  },
+  {
+   "index": 198,
+   "mutant": "L365 string ' seconds' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_R02.py",
+   "first": "FAIL: test_the_refusal_names_the_limit_and_its_unit (v2.test_v21_kills3_R02.AProbeOverItsLimitSaysHowLongTheLimitIs.test_the_refusal_names_the_limit_and_its_unit) | AssertionError"
+  },
+  {
+   "index": 199,
+   "mutant": "L367 string ': ' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 200,
+   "mutant": "L375 string 'status' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 201,
+   "mutant": "L375 string ':' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A05.py",
+   "first": "ERROR: test_a_status_line_that_is_not_a_key_value_row_is_skipped_not_a_crash (v2.test_v21_kills3_A05.Rows.test_a_status_line_that_is_not_a_key_value_row_is_skipped_not_a_crash) | ValueError"
+  },
+  {
+   "index": 202,
+   "mutant": "L384 string 'netdev' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "FAIL: test_interfaces_are_listed_and_none_is_routed (v2.test_v21_kills3_T05b.AFreshNetworkNamespace.test_interfaces_are_listed_and_none_is_routed) | AssertionError"
+  },
+  {
+   "index": 203,
+   "mutant": "L387 string 'route' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "FAIL: test_the_interfaces_with_a_route_are_recorded_once_each_sorted (v2.test_v21_kills3_T05b.CorrectlyConfinedSession.test_the_interfaces_with_a_route_are_recorded_once_each_sorted) | AssertionError"
+  },
+  {
+   "index": 204,
+   "mutant": "L394 string 'sockets' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "FAIL: test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) | AssertionError"
+  },
+  {
+   "index": 205,
+   "mutant": "L338 string 'LC_|LANG' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_locale.py",
+   "first": "FAIL: test_the_rest_of_the_environment_is_what_the_session_wrapper_gives (v2.test_v21_r3_conf_locale.PassedDown.test_the_rest_of_the_environment_is_what_the_session_wrapper_gives) | AssertionError"
+  },
+  {
+   "index": 206,
+   "mutant": "L341 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_locale.py",
+   "first": "FAIL: test_the_environment_the_stand_in_bubblewrap_received (v2.test_v21_r3_conf_locale.AtTheExecBoundary.test_the_environment_the_stand_in_bubblewrap_received) | AssertionError"
+  },
+  {
+   "index": 207,
+   "mutant": "L341 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_locale.py",
+   "first": "FAIL: test_the_probe_and_the_version_query_get_the_c_locale_and_nothing_else_of_the_family (v2.test_v21_r3_conf_locale.PassedDown.test_the_probe_and_the_version_query_get_the_c_locale_and_nothing_else_of_the_family) | AssertionError"
+  },
+  {
+   "index": 208,
+   "mutant": "L353 string '.git' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 209,
+   "mutant": "L384 string ':' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | ValueError"
+  },
+  {
+   "index": 210,
+   "mutant": "L414 string 'left_on_host' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_confine.py",
+   "first": "FAIL: test_a_probe_that_did_not_exit_0_is_refused_even_when_it_reached_its_end (v2.test_v21_confine.FailClosed.test_a_probe_that_did_not_exit_0_is_refused_even_when_it_reached_its_end) | KeyError"
+  },
+  {
+   "index": 211,
+   "mutant": "L341 string '--version' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_locale.py",
+   "first": "FAIL: test_the_probe_and_the_version_query_get_the_c_locale_and_nothing_else_of_the_family (v2.test_v21_r3_conf_locale.PassedDown.test_the_probe_and_the_version_query_get_the_c_locale_and_nothing_else_of_the_family) | AssertionError"
+  },
+  {
+   "index": 212,
+   "mutant": "L341 True->False",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_locale.py",
+   "first": "ERROR: test_the_environment_the_stand_in_bubblewrap_received (v2.test_v21_r3_conf_locale.AtTheExecBoundary.test_the_environment_the_stand_in_bubblewrap_received) | AttributeError"
+  },
+  {
+   "index": 213,
+   "mutant": "L341 True->False",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_confine.py",
+   "first": "FAIL: test_a_probe_that_did_not_exit_0_is_refused_even_when_it_reached_its_end (v2.test_v21_confine.FailClosed.test_a_probe_that_did_not_exit_0_is_refused_even_when_it_reached_its_end) | TypeError"
+  },
+  {
+   "index": 214,
+   "mutant": "L352 string 'client' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  },
+  {
+   "index": 215,
+   "mutant": "L341 string 'bwrap' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "first": "ERROR: test_nothing_appeared_is_an_empty_list_not_none (v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) | KeyError"
+  }
+ ]
+}

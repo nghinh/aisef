@@ -1,0 +1,571 @@
+{
+ "target": "aisef2/app/client.py::read_session",
+ "files": [
+  "tests/v2/test_v21_r3_client_stream.py",
+  "tests/v2/test_app_units.py",
+  "tests/v2/test_v21_transport.py"
+ ],
+ "source_sha256": "612e537d07c2892e03b0db3c496d78bc8550c265b8194ba8a186ca36b370e592",
+ "t0": [
+  {
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "seconds": 1.74,
+   "outcome": "PASS",
+   "ran": 17
+  },
+  {
+   "file": "tests/v2/test_app_units.py",
+   "seconds": 8.97,
+   "outcome": "PASS",
+   "ran": 41
+  },
+  {
+   "file": "tests/v2/test_v21_transport.py",
+   "seconds": 2.8,
+   "outcome": "PASS",
+   "ran": 3
+  }
+ ],
+ "error": null,
+ "results": [
+  {
+   "index": 0,
+   "mutant": "L74 returns None",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "ERROR: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_a_findings_block_that_holds_a_separator_is_the_reviews_findings) (separator='U+2028') | TypeError"
+  },
+  {
+   "index": 1,
+   "mutant": "L55 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "ERROR: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_a_findings_block_that_holds_a_separator_is_the_reviews_findings) (separator='U+2028') | ValueError"
+  },
+  {
+   "index": 2,
+   "mutant": "L55 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "ERROR: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_a_findings_block_that_holds_a_separator_is_the_reviews_findings) (separator='U+2028') | ValueError"
+  },
+  {
+   "index": 3,
+   "mutant": "L55 element 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "ERROR: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_a_findings_block_that_holds_a_separator_is_the_reviews_findings) (separator='U+2028') | ValueError"
+  },
+  {
+   "index": 4,
+   "mutant": "L55 element 3 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "ERROR: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_a_findings_block_that_holds_a_separator_is_the_reviews_findings) (separator='U+2028') | ValueError"
+  },
+  {
+   "index": 5,
+   "mutant": "L55 element 4 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "ERROR: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_a_findings_block_that_holds_a_separator_is_the_reviews_findings) (separator='U+2028') | ValueError"
+  },
+  {
+   "index": 6,
+   "mutant": "L55 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "ERROR: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_a_findings_block_that_holds_a_separator_is_the_reviews_findings) (separator='U+2028') | ValueError"
+  },
+  {
+   "index": 7,
+   "mutant": "L55 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "ERROR: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_a_findings_block_that_holds_a_separator_is_the_reviews_findings) (separator='U+2028') | ValueError"
+  },
+  {
+   "index": 8,
+   "mutant": "L55 element 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "ERROR: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_a_findings_block_that_holds_a_separator_is_the_reviews_findings) (separator='U+2028') | ValueError"
+  },
+  {
+   "index": 9,
+   "mutant": "L55 element 3 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "ERROR: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_a_findings_block_that_holds_a_separator_is_the_reviews_findings) (separator='U+2028') | ValueError"
+  },
+  {
+   "index": 10,
+   "mutant": "L55 element 4 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "ERROR: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_a_findings_block_that_holds_a_separator_is_the_reviews_findings) (separator='U+2028') | ValueError"
+  },
+  {
+   "index": 11,
+   "mutant": "L58 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_a_findings_block_that_holds_a_separator_is_the_reviews_findings) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 12,
+   "mutant": "L74 dict entry 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "ERROR: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_a_findings_block_that_holds_a_separator_is_the_reviews_findings) (separator='U+2028') | KeyError"
+  },
+  {
+   "index": 13,
+   "mutant": "L74 dict entry 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "ERROR: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_a_findings_block_that_holds_a_separator_is_the_reviews_findings) (separator='U+2028') | KeyError"
+  },
+  {
+   "index": 14,
+   "mutant": "L74 dict entry 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "ERROR: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_a_findings_block_that_holds_a_separator_is_the_reviews_findings) (separator='U+2028') | KeyError"
+  },
+  {
+   "index": 15,
+   "mutant": "L74 dict entry 3 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "ERROR: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_a_findings_block_that_holds_a_separator_is_the_reviews_findings) (separator='U+2028') | KeyError"
+  },
+  {
+   "index": 16,
+   "mutant": "L74 dict entry 4 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "ERROR: test_a_finished_step_that_holds_a_separator_is_counted_not_lost (v2.test_v21_r3_client_stream.ReadingAStream.test_a_finished_step_that_holds_a_separator_is_counted_not_lost) (separator='U+2028') | KeyError"
+  },
+  {
+   "index": 17,
+   "mutant": "L55 dict entry 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "ERROR: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_a_findings_block_that_holds_a_separator_is_the_reviews_findings) (separator='U+2028') | KeyError"
+  },
+  {
+   "index": 18,
+   "mutant": "L55 dict entry 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "ERROR: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_a_findings_block_that_holds_a_separator_is_the_reviews_findings) (separator='U+2028') | KeyError"
+  },
+  {
+   "index": 19,
+   "mutant": "L57 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_a_findings_block_that_holds_a_separator_is_the_reviews_findings) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 20,
+   "mutant": "L58 Eq->NotEq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_a_findings_block_that_holds_a_separator_is_the_reviews_findings) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 21,
+   "mutant": "L60 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_a_findings_block_that_holds_a_separator_is_the_reviews_findings) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 22,
+   "mutant": "L74 string 'error' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "ERROR: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_a_findings_block_that_holds_a_separator_is_the_reviews_findings) (separator='U+2028') | KeyError"
+  },
+  {
+   "index": 23,
+   "mutant": "L74 string 'text' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "ERROR: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_a_findings_block_that_holds_a_separator_is_the_reviews_findings) (separator='U+2028') | KeyError"
+  },
+  {
+   "index": 24,
+   "mutant": "L74 string 'turns' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "ERROR: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_a_findings_block_that_holds_a_separator_is_the_reviews_findings) (separator='U+2028') | KeyError"
+  },
+  {
+   "index": 25,
+   "mutant": "L74 string 'tokens' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "ERROR: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_a_findings_block_that_holds_a_separator_is_the_reviews_findings) (separator='U+2028') | KeyError"
+  },
+  {
+   "index": 26,
+   "mutant": "L74 string 'steps_without_tokens' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "ERROR: test_a_finished_step_that_holds_a_separator_is_counted_not_lost (v2.test_v21_r3_client_stream.ReadingAStream.test_a_finished_step_that_holds_a_separator_is_counted_not_lost) (separator='U+2028') | KeyError"
+  },
+  {
+   "index": 27,
+   "mutant": "L55 string 'input' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "ERROR: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_a_findings_block_that_holds_a_separator_is_the_reviews_findings) (separator='U+2028') | KeyError"
+  },
+  {
+   "index": 28,
+   "mutant": "L55 string 'output' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "ERROR: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_a_findings_block_that_holds_a_separator_is_the_reviews_findings) (separator='U+2028') | KeyError"
+  },
+  {
+   "index": 29,
+   "mutant": "L58 string 'text' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_a_findings_block_that_holds_a_separator_is_the_reviews_findings) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 30,
+   "mutant": "L60 Eq->NotEq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_a_findings_block_that_holds_a_separator_is_the_reviews_findings) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 31,
+   "mutant": "L65 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_a_findings_block_that_holds_a_separator_is_the_reviews_findings) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 32,
+   "mutant": "L57 string 'part' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_a_findings_block_that_holds_a_separator_is_the_reviews_findings) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 33,
+   "mutant": "L58 string 'type' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_a_findings_block_that_holds_a_separator_is_the_reviews_findings) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 34,
+   "mutant": "L60 string 'error' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_an_error_that_holds_a_separator_is_a_provider_outage_not_no_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_an_error_that_holds_a_separator_is_a_provider_outage_not_no_findings) | AssertionError"
+  },
+  {
+   "index": 35,
+   "mutant": "L61 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_an_error_that_holds_a_separator_is_a_provider_outage_not_no_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_an_error_that_holds_a_separator_is_a_provider_outage_not_no_findings) | AssertionError"
+  },
+  {
+   "index": 36,
+   "mutant": "L62 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_an_error_that_holds_a_separator_is_a_provider_outage_not_no_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_an_error_that_holds_a_separator_is_a_provider_outage_not_no_findings) | AssertionError"
+  },
+  {
+   "index": 37,
+   "mutant": "L65 Eq->NotEq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_a_findings_block_that_holds_a_separator_is_the_reviews_findings) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 38,
+   "mutant": "L68 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_a_findings_block_that_holds_a_separator_is_the_reviews_findings) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 39,
+   "mutant": "L59 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_a_findings_block_that_holds_a_separator_is_the_reviews_findings) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 40,
+   "mutant": "L60 string 'type' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_an_error_that_holds_a_separator_is_a_provider_outage_not_no_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_an_error_that_holds_a_separator_is_a_provider_outage_not_no_findings) | AssertionError"
+  },
+  {
+   "index": 41,
+   "mutant": "L64 conditional negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_an_error_event_that_holds_a_separator_is_the_sessions_error (v2.test_v21_r3_client_stream.ReadingAStream.test_an_error_event_that_holds_a_separator_is_the_sessions_error) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 42,
+   "mutant": "L65 string 'step_finish' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_a_findings_block_that_holds_a_separator_is_the_reviews_findings) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 43,
+   "mutant": "L68 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "ERROR: test_a_step_without_a_token_report_is_still_counted_blind_next_to_one_that_holds_a_separator (v2.test_v21_r3_client_stream.ReadingAStream.test_a_step_without_a_token_report_is_still_counted_blind_next_to_one_that_holds_a_separator) | AttributeError"
+  },
+  {
+   "index": 44,
+   "mutant": "L71 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_a_findings_block_that_holds_a_separator_is_the_reviews_findings) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 45,
+   "mutant": "L61 string 'error' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_an_error_that_holds_a_separator_is_a_provider_outage_not_no_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_an_error_that_holds_a_separator_is_a_provider_outage_not_no_findings) | AssertionError"
+  },
+  {
+   "index": 46,
+   "mutant": "L62 string 'data' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_an_error_that_holds_a_separator_is_a_provider_outage_not_no_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_an_error_that_holds_a_separator_is_a_provider_outage_not_no_findings) | AssertionError"
+  },
+  {
+   "index": 47,
+   "mutant": "L63 string ': ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_an_error_event_that_holds_a_separator_is_the_sessions_error (v2.test_v21_r3_client_stream.ReadingAStream.test_an_error_event_that_holds_a_separator_is_the_sessions_error) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 48,
+   "mutant": "L65 string 'type' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_a_findings_block_that_holds_a_separator_is_the_reviews_findings) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 49,
+   "mutant": "L67 string 'tokens' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_a_findings_block_that_holds_a_separator_is_the_reviews_findings) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 50,
+   "mutant": "L68 not removed",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_a_findings_block_that_holds_a_separator_is_the_reviews_findings) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 51,
+   "mutant": "L68 not removed",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_a_findings_block_that_holds_a_separator_is_the_reviews_findings) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 52,
+   "mutant": "L72 string 'input' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "ERROR: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_a_findings_block_that_holds_a_separator_is_the_reviews_findings) (separator='U+2028') | KeyError"
+  },
+  {
+   "index": 53,
+   "mutant": "L73 string 'output' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "ERROR: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_a_findings_block_that_holds_a_separator_is_the_reviews_findings) (separator='U+2028') | KeyError"
+  },
+  {
+   "index": 54,
+   "mutant": "L59 string 'text' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_a_findings_block_that_holds_a_separator_is_the_reviews_findings) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 55,
+   "mutant": "L63 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_an_error_that_holds_a_separator_is_a_provider_outage_not_no_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_an_error_that_holds_a_separator_is_a_provider_outage_not_no_findings) | AssertionError"
+  },
+  {
+   "index": 56,
+   "mutant": "L64 string 'statusCode' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_an_error_event_that_holds_a_separator_is_the_sessions_error (v2.test_v21_r3_client_stream.ReadingAStream.test_an_error_event_that_holds_a_separator_is_the_sessions_error) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 57,
+   "mutant": "L64 string ' (HTTP ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_an_error_event_that_holds_a_separator_is_the_sessions_error (v2.test_v21_r3_client_stream.ReadingAStream.test_an_error_event_that_holds_a_separator_is_the_sessions_error) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 58,
+   "mutant": "L64 string ')' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_an_error_event_that_holds_a_separator_is_the_sessions_error (v2.test_v21_r3_client_stream.ReadingAStream.test_an_error_event_that_holds_a_separator_is_the_sessions_error) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 59,
+   "mutant": "L71 string 'cache' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_a_findings_block_that_holds_a_separator_is_the_reviews_findings) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 60,
+   "mutant": "L72 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_app_units.py",
+   "first": "ERROR: test_a_running_session_is_stopped_at_the_budget_or_its_turn_cap (v2.test_app_units.Sessions.test_a_running_session_is_stopped_at_the_budget_or_its_turn_cap) | TypeError"
+  },
+  {
+   "index": 61,
+   "mutant": "L73 string 'output' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "ERROR: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_a_findings_block_that_holds_a_separator_is_the_reviews_findings) (separator='U+2028') | KeyError"
+  },
+  {
+   "index": 62,
+   "mutant": "L73 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_a_findings_block_that_holds_a_separator_is_the_reviews_findings) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 63,
+   "mutant": "L63 string 'error' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_app_units.py",
+   "first": "FAIL: test_a_session_stream_is_read_for_text_error_turns_and_tokens (v2.test_app_units.Sessions.test_a_session_stream_is_read_for_text_error_turns_and_tokens) | AssertionError"
+  },
+  {
+   "index": 64,
+   "mutant": "L72 string 'input' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "ERROR: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_a_findings_block_that_holds_a_separator_is_the_reviews_findings) (separator='U+2028') | KeyError"
+  },
+  {
+   "index": 65,
+   "mutant": "L72 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_a_findings_block_that_holds_a_separator_is_the_reviews_findings) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 66,
+   "mutant": "L63 string 'name' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_an_error_that_holds_a_separator_is_a_provider_outage_not_no_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_an_error_that_holds_a_separator_is_a_provider_outage_not_no_findings) | AssertionError"
+  },
+  {
+   "index": 67,
+   "mutant": "L63 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_an_error_that_holds_a_separator_is_a_provider_outage_not_no_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_an_error_that_holds_a_separator_is_a_provider_outage_not_no_findings) | AssertionError"
+  },
+  {
+   "index": 68,
+   "mutant": "L64 string 'statusCode' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "ERROR: test_an_error_that_holds_a_separator_is_a_provider_outage_not_no_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_an_error_that_holds_a_separator_is_a_provider_outage_not_no_findings) | KeyError"
+  },
+  {
+   "index": 69,
+   "mutant": "L72 string 'write' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_app_units.py",
+   "first": "FAIL: test_a_session_stream_is_read_for_text_error_turns_and_tokens (v2.test_app_units.Sessions.test_a_session_stream_is_read_for_text_error_turns_and_tokens) | AssertionError"
+  },
+  {
+   "index": 70,
+   "mutant": "L73 string 'reasoning' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_a_findings_block_that_holds_a_separator_is_the_reviews_findings) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 71,
+   "mutant": "L68 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_app_units.py",
+   "first": "ERROR: test_a_session_stream_is_read_for_text_error_turns_and_tokens (v2.test_app_units.Sessions.test_a_session_stream_is_read_for_text_error_turns_and_tokens) | TypeError"
+  },
+  {
+   "index": 72,
+   "mutant": "L68 element 1 dropped",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 73,
+   "mutant": "L72 string 'read' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_a_findings_block_that_holds_a_separator_is_the_reviews_findings) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 74,
+   "mutant": "L63 string 'message' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_an_error_that_holds_a_separator_is_a_provider_outage_not_no_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_an_error_that_holds_a_separator_is_a_provider_outage_not_no_findings) | AssertionError"
+  },
+  {
+   "index": 75,
+   "mutant": "L68 string 'input' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_a_findings_block_that_holds_a_separator_is_the_reviews_findings) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 76,
+   "mutant": "L68 string 'output' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (v2.test_v21_r3_client_stream.ModelReviewer.test_a_findings_block_that_holds_a_separator_is_the_reviews_findings) (separator='U+2028') | AssertionError"
+  }
+ ]
+}

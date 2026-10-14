@@ -1,0 +1,135 @@
+{
+ "stories": [
+  "S1"
+ ],
+ "max_events_after_plan_frozen": 13,
+ "admitted_journals": 2733181,
+ "with_a_non_empty_report": 52620,
+ "new_differs_from_oracle": 0,
+ "old_differs_from_new": 59650,
+ "old_new_difference_kinds": {
+  "a failure after an outcome and before the next begin": 59372,
+  "a committed attempt that observed failures": 278
+ },
+ "extensions_refused_by_the_reader": 0,
+ "extensions_refused_by_a_projection": 5338093,
+ "seconds": 376.8
+}
+OLD != NEW examples: [
+ {
+  "labels": [
+   "S1.begin",
+   "S1.Fy",
+   "S1.retry",
+   "S1.dispose",
+   "S1.end",
+   "S1.Fy",
+   "S1.Fy",
+   "S1.Fy",
+   "S1.Fy",
+   "S1.Fy",
+   "S1.begin",
+   "S1.Fy",
+   "S1.rollback"
+  ],
+  "old": [],
+  "new": [
+   {
+    "story": "S1",
+    "attempts_repeating_the_one_before": [
+     2
+    ],
+    "failures": [
+     "TESTS_INADEQUATE: developer tests: TESTS_INADEQUATE"
+    ]
+   }
+  ]
+ },
+ {
+  "labels": [
+   "S1.begin",
+   "S1.Fy",
+   "S1.retry",
+   "S1.dispose",
+   "S1.end",
+   "S1.Fy",
+   "S1.Fy",
+   "S1.Fy",
+   "S1.Fy",
+   "S1.Fy",
+   "S1.begin",
+   "S1.Fy",
+   "S1.retry"
+  ],
+  "old": [],
+  "new": [
+   {
+    "story": "S1",
+    "attempts_repeating_the_one_before": [
+     2
+    ],
+    "failures": [
+     "TESTS_INADEQUATE: developer tests: TESTS_INADEQUATE"
+    ]
+   }
+  ]
+ },
+ {
+  "labels": [
+   "S1.begin",
+   "S1.Fy",
+   "S1.retry",
+   "S1.dispose",
+   "S1.end",
+   "S1.Fy",
+   "S1.Fy",
+   "S1.Fy",
+   "S1.Fy",
+   "S1.Fx",
+   "S1.begin",
+   "S1.Fy",
+   "S1.rollback"
+  ],
+  "old": [],
+  "new": [
+   {
+    "story": "S1",
+    "attempts_repeating_the_one_before": [
+     2
+    ],
+    "failures": [
+     "TESTS_INADEQUATE: developer tests: TESTS_INADEQUATE"
+    ]
+   }
+  ]
+ },
+ {
+  "labels": [
+   "S1.begin",
+   "S1.Fy",
+   "S1.retry",
+   "S1.dispose",
+   "S1.end",
+   "S1.Fy",
+   "S1.Fy",
+   "S1.Fy",
+   "S1.Fy",
+   "S1.Fx",
+   "S1.begin",
+   "S1.Fy",
+   "S1.retry"
+  ],
+  "old": [],
+  "new": [
+   {
+    "story": "S1",
+    "attempts_repeating_the_one_before": [
+     2
+    ],
+    "failures": [
+     "TESTS_INADEQUATE: developer tests: TESTS_INADEQUATE"
+    ]
+   }
+  ]
+ }
+]

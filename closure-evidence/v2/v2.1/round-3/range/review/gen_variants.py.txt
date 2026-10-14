@@ -1,0 +1,25 @@
+import pathlib, sys
+OUT = pathlib.Path(sys.argv[1])
+src = (OUT / "exp/aisef2/runtime/process_range.py").read_text()
+V = OUT / "variants"
+
+def variant(name, pairs):
+    s = src
+    for old, new in pairs:
+        assert s.count(old) == 1, (name, old, s.count(old))
+        s = s.replace(old, new)
+    (V / f"{name}.py").write_text(s)
+
+variant("v14_no_claim_lock", [("                with self._mx:\n", "                if True:\n")])
+variant("v9_waiter_returns_at_disposing", [(
+    "                    while not current.done:\n                        time.sleep(POLL_S)\n",
+    "                    while not (current.done or current.disposing):\n                        time.sleep(POLL_S)\n"
+    "                    if current.disposing and not current.done:\n                        return\n")])
+variant("v_done_early", [("        flight.disposing = True  # measured empty: from here the anchor may be reaped, and nothing is signalled\n",
+    "        flight.disposing = True  # measured empty: from here the anchor may be reaped, and nothing is signalled\n        flight.done = True\n")])
+variant("v_same_object", [("raise type(current.outcome)(*current.outcome.args) from current.outcome", "raise current.outcome")])
+variant("v_reentry_returns_at_once", [("                        if not current.disposing:\n                            self._ladder(current)\n", "                        pass\n")])
+variant("v_fire_and_forget", [("                    while not current.done:\n                        time.sleep(POLL_S)\n", "                    return\n")])
+# a waiter that polls but ignores the outcome (returns None when the leader raised)
+variant("v_waiter_swallows_outcome", [("                    if current.outcome is not None:\n                        raise type(current.outcome)(*current.outcome.args) from current.outcome\n", "")])
+print("ok", sorted(p.name for p in V.iterdir()))

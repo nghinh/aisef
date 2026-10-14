@@ -1,0 +1,57 @@
+"""Finding (real, this host, read-only; nothing is signalled — `dry_run=True` throughout):
+`validation/v2/cleanup_authority.py::_read` splits `ps` text with `str.splitlines()` too, and SKIPS lines that are not
+rows. A command line that holds U+2028 followed by a row-shaped text therefore puts a row into the table that no
+process has. `signal_owned` would accept it as the runner's.
+
+usage: python3 -B -I finding-cleanup-authority.py.txt TREE      (TREE: a checkout holding validation/v2/cleanup_authority.py)
+
+Both children are started by this script (`/bin/zsh -c 'echo ready; read x; : TEXT'`: they end when their stdin is
+closed). The victim is started, and then a boundary is established two seconds later, so the victim is born BEFORE the
+boundary: not owned. The carrier is started after the boundary; its text holds a fabricated row for the victim's pid
+whose parent is this runner and whose start is in the future.
+"""
+import os
+import subprocess
+import sys
+import time
+
+sys.path.insert(0, sys.argv[1])
+from validation.v2 import cleanup_authority as ca  # noqa: E402
+
+os.environ["LC_ALL"] = "en_US.UTF-8"   # the locale `ps` prints U+2028 raw in (the mutation workers run with LANG=en_US.UTF-8)
+
+
+def start(text: str):
+    p = subprocess.Popen(["/bin/zsh", "-c", f"echo ready; read x; : '{text}'"], stdin=subprocess.PIPE,
+                         stdout=subprocess.PIPE)
+    assert p.stdout.readline() == b"ready\n"
+    return p
+
+
+def stop(*procs):
+    for p in procs:
+        p.stdin.close()
+        p.wait()
+        p.stdout.close()
+
+
+victim = start("a process that is not owned by the runner: born before the boundary")
+time.sleep(2.2)    # births are whole seconds in the table's clock
+boundary = ca.establish(sys.argv[1])
+try:
+    before = ca.signal_owned(boundary, pids=[victim.pid], dry_run=True)
+    print("victim", victim.pid, "| runner", boundary.runner)
+    print("before the carrier   signalled:", [s["id"] for s in before.signalled], " unproven:", before.unproven)
+    fake = f"{victim.pid} {boundary.runner} {victim.pid} Tue Oct 13 23:59:59 2099 fabricated-by-a-command-line"
+    carrier = start(f"carrier{chr(0x2028)}{fake}")
+    try:
+        table = ca.host_table()
+        row = table.get(victim.pid)
+        print("table row of the victim:", row)
+        after = ca.signal_owned(boundary, pids=[victim.pid], dry_run=True, table=table)
+        print("after the carrier    signalled:", [(s["id"], s["proof"]["command"][:40]) for s in after.signalled],
+              " unproven:", after.unproven)
+    finally:
+        stop(carrier)
+finally:
+    stop(victim)

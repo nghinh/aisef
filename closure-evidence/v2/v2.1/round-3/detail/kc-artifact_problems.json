@@ -1,0 +1,669 @@
+{
+ "target": "aisef2/app/review_verify.py::artifact_problems",
+ "files": [
+  "tests/v2/test_v21_r3_detail_statement.py",
+  "tests/v2/test_v21_r3_detail_artifact.py"
+ ],
+ "source_sha256": "cf0c889e598f7ec6b9b6fac13b26b6bb73d7eb03100e025d42e29eaf528ce1ee",
+ "t0": [
+  {
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "seconds": 5.14,
+   "outcome": "PASS",
+   "ran": 35
+  },
+  {
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "seconds": 1.58,
+   "outcome": "PASS",
+   "ran": 31
+  }
+ ],
+ "error": null,
+ "results": [
+  {
+   "index": 0,
+   "mutant": "L485 returns None",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one) | TypeError"
+  },
+  {
+   "index": 1,
+   "mutant": "L441 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one) | ValueError"
+  },
+  {
+   "index": 2,
+   "mutant": "L441 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one) | ValueError"
+  },
+  {
+   "index": 3,
+   "mutant": "L441 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one) | ValueError"
+  },
+  {
+   "index": 4,
+   "mutant": "L441 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one) | ValueError"
+  },
+  {
+   "index": 5,
+   "mutant": "L446 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one) | AssertionError"
+  },
+  {
+   "index": 6,
+   "mutant": "L452 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one) | AssertionError"
+  },
+  {
+   "index": 7,
+   "mutant": "L456 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one) | AttributeError"
+  },
+  {
+   "index": 8,
+   "mutant": "L466 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_missing_or_unreadable_artifact_is_a_problem_naming_the_row_and_the_file (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_missing_or_unreadable_artifact_is_a_problem_naming_the_row_and_the_file) | AssertionError"
+  },
+  {
+   "index": 9,
+   "mutant": "L474 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_row_whose_artifact_is_there_and_is_the_one_it_binds_has_no_problem (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_row_whose_artifact_is_there_and_is_the_one_it_binds_has_no_problem) | AssertionError"
+  },
+  {
+   "index": 10,
+   "mutant": "L482 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_row_whose_artifact_is_there_and_is_the_one_it_binds_has_no_problem (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_row_whose_artifact_is_there_and_is_the_one_it_binds_has_no_problem) | AssertionError"
+  },
+  {
+   "index": 11,
+   "mutant": "L485 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one) | ValueError"
+  },
+  {
+   "index": 12,
+   "mutant": "L485 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one) | ValueError"
+  },
+  {
+   "index": 13,
+   "mutant": "L443 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one) | AssertionError"
+  },
+  {
+   "index": 14,
+   "mutant": "L444 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one) | ValueError"
+  },
+  {
+   "index": 15,
+   "mutant": "L444 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one) | ValueError"
+  },
+  {
+   "index": 16,
+   "mutant": "L444 element 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one) | ValueError"
+  },
+  {
+   "index": 17,
+   "mutant": "L445 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one) | ValueError"
+  },
+  {
+   "index": 18,
+   "mutant": "L445 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one) | ValueError"
+  },
+  {
+   "index": 19,
+   "mutant": "L445 element 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one) | ValueError"
+  },
+  {
+   "index": 20,
+   "mutant": "L446 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_what_is_not_a_review_row_with_a_statement_is_not_read (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_what_is_not_a_review_row_with_a_statement_is_not_read) | AssertionError"
+  },
+  {
+   "index": 21,
+   "mutant": "L452 not removed",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one) | AssertionError"
+  },
+  {
+   "index": 22,
+   "mutant": "L456 not removed",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one) | AttributeError"
+  },
+  {
+   "index": 23,
+   "mutant": "L457 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one) | AssertionError"
+  },
+  {
+   "index": 24,
+   "mutant": "L466 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_row_that_names_a_path_outside_the_directory_is_a_problem_and_nothing_is_read (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_row_that_names_a_path_outside_the_directory_is_a_problem_and_nothing_is_read) (path='RUN.json') | IndexError"
+  },
+  {
+   "index": 25,
+   "mutant": "L474 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_an_altered_artifact_is_a_problem_whatever_the_manifest_says (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_an_altered_artifact_is_a_problem_whatever_the_manifest_says) | AssertionError"
+  },
+  {
+   "index": 26,
+   "mutant": "L481 conditional negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_row_whose_artifact_is_there_and_is_the_one_it_binds_has_no_problem (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_row_whose_artifact_is_there_and_is_the_one_it_binds_has_no_problem) | AssertionError"
+  },
+  {
+   "index": 27,
+   "mutant": "L482 not removed",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_row_whose_artifact_is_there_and_is_the_one_it_binds_has_no_problem (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_row_whose_artifact_is_there_and_is_the_one_it_binds_has_no_problem) | AssertionError"
+  },
+  {
+   "index": 28,
+   "mutant": "L444 string ':review:' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one) | ValueError"
+  },
+  {
+   "index": 29,
+   "mutant": "L445 string ' \u2014 ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one) | ValueError"
+  },
+  {
+   "index": 30,
+   "mutant": "L446 NotEq->Eq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one) | AssertionError"
+  },
+  {
+   "index": 31,
+   "mutant": "L446 not removed",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one) | TypeError"
+  },
+  {
+   "index": 32,
+   "mutant": "L446 not removed",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one) | TypeError"
+  },
+  {
+   "index": 33,
+   "mutant": "L454 string 'review row ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one) | AssertionError"
+  },
+  {
+   "index": 34,
+   "mutant": "L454 string ' (' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one) | AssertionError"
+  },
+  {
+   "index": 35,
+   "mutant": "L454 string ')' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one) | AssertionError"
+  },
+  {
+   "index": 36,
+   "mutant": "L455 string 'artifact' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_missing_or_unreadable_artifact_is_a_problem_naming_the_row_and_the_file (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_missing_or_unreadable_artifact_is_a_problem_naming_the_row_and_the_file) | AssertionError"
+  },
+  {
+   "index": 37,
+   "mutant": "L457 IsNot->Is",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one) | AssertionError"
+  },
+  {
+   "index": 38,
+   "mutant": "L459 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one) | AssertionError"
+  },
+  {
+   "index": 39,
+   "mutant": "L466 NotEq->Eq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_missing_or_unreadable_artifact_is_a_problem_naming_the_row_and_the_file (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_missing_or_unreadable_artifact_is_a_problem_naming_the_row_and_the_file) | AssertionError"
+  },
+  {
+   "index": 40,
+   "mutant": "L466 NotEq->Eq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_missing_or_unreadable_artifact_is_a_problem_naming_the_row_and_the_file (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_missing_or_unreadable_artifact_is_a_problem_naming_the_row_and_the_file) | AssertionError"
+  },
+  {
+   "index": 41,
+   "mutant": "L466 Eq->NotEq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_missing_or_unreadable_artifact_is_a_problem_naming_the_row_and_the_file (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_missing_or_unreadable_artifact_is_a_problem_naming_the_row_and_the_file) | AssertionError"
+  },
+  {
+   "index": 42,
+   "mutant": "L474 NotEq->Eq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_row_whose_artifact_is_there_and_is_the_one_it_binds_has_no_problem (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_row_whose_artifact_is_there_and_is_the_one_it_binds_has_no_problem) | AssertionError"
+  },
+  {
+   "index": 43,
+   "mutant": "L474 NotEq->Eq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_row_whose_artifact_is_there_and_is_the_one_it_binds_has_no_problem (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_row_whose_artifact_is_there_and_is_the_one_it_binds_has_no_problem) | AssertionError"
+  },
+  {
+   "index": 44,
+   "mutant": "L482 And swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_an_artifact_of_another_story_or_another_finding_is_not_this_rows (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_an_artifact_of_another_story_or_another_finding_is_not_this_rows) (story='S2', fid='FND-7') | AssertionError"
+  },
+  {
+   "index": 45,
+   "mutant": "L443 string 'data' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one) | AssertionError"
+  },
+  {
+   "index": 46,
+   "mutant": "L446 string 'gate/check' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one) | AssertionError"
+  },
+  {
+   "index": 47,
+   "mutant": "L459 And swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one) | AssertionError"
+  },
+  {
+   "index": 48,
+   "mutant": "L461 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one) | AssertionError"
+  },
+  {
+   "index": 49,
+   "mutant": "L466 string '..' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_row_that_names_a_path_outside_the_directory_is_a_problem_and_nothing_is_read (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_row_that_names_a_path_outside_the_directory_is_a_problem_and_nothing_is_read) (path='review-findings/..') | AssertionError"
+  },
+  {
+   "index": 50,
+   "mutant": "L481 string 'finding' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_row_whose_artifact_is_there_and_is_the_one_it_binds_has_no_problem (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_row_whose_artifact_is_there_and_is_the_one_it_binds_has_no_problem) | AssertionError"
+  },
+  {
+   "index": 51,
+   "mutant": "L482 Eq->NotEq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_row_whose_artifact_is_there_and_is_the_one_it_binds_has_no_problem (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_row_whose_artifact_is_there_and_is_the_one_it_binds_has_no_problem) | AssertionError"
+  },
+  {
+   "index": 52,
+   "mutant": "L482 Eq->NotEq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_row_whose_artifact_is_there_and_is_the_one_it_binds_has_no_problem (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_row_whose_artifact_is_there_and_is_the_one_it_binds_has_no_problem) | AssertionError"
+  },
+  {
+   "index": 53,
+   "mutant": "L446 string 'type' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one) | AssertionError"
+  },
+  {
+   "index": 54,
+   "mutant": "L454 string 'seq' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one) | AssertionError"
+  },
+  {
+   "index": 55,
+   "mutant": "L454 string 'check' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one) | AssertionError"
+  },
+  {
+   "index": 56,
+   "mutant": "L459 Is->IsNot",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one) | AssertionError"
+  },
+  {
+   "index": 57,
+   "mutant": "L459 In->NotIn",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one) | AssertionError"
+  },
+  {
+   "index": 58,
+   "mutant": "L461 Is->IsNot",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one) | AssertionError"
+  },
+  {
+   "index": 59,
+   "mutant": "L467 string ': names ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_row_that_names_a_path_outside_the_directory_is_a_problem_and_nothing_is_read (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_row_that_names_a_path_outside_the_directory_is_a_problem_and_nothing_is_read) (path='RUN.json') | AssertionError"
+  },
+  {
+   "index": 60,
+   "mutant": "L467 string ', which is not a file of ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_row_that_names_a_path_outside_the_directory_is_a_problem_and_nothing_is_read (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_row_that_names_a_path_outside_the_directory_is_a_problem_and_nothing_is_read) (path='RUN.json') | AssertionError"
+  },
+  {
+   "index": 61,
+   "mutant": "L467 string '/' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_row_that_names_a_path_outside_the_directory_is_a_problem_and_nothing_is_read (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_row_that_names_a_path_outside_the_directory_is_a_problem_and_nothing_is_read) (path='RUN.json') | AssertionError"
+  },
+  {
+   "index": 62,
+   "mutant": "L474 string 'bytes' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_row_whose_artifact_is_there_and_is_the_one_it_binds_has_no_problem (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_row_whose_artifact_is_there_and_is_the_one_it_binds_has_no_problem) | AssertionError"
+  },
+  {
+   "index": 63,
+   "mutant": "L474 string 'sha256' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_row_whose_artifact_is_there_and_is_the_one_it_binds_has_no_problem (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_row_whose_artifact_is_there_and_is_the_one_it_binds_has_no_problem) | AssertionError"
+  },
+  {
+   "index": 64,
+   "mutant": "L475 string ': its artifact ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_an_altered_artifact_is_a_problem_whatever_the_manifest_says (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_an_altered_artifact_is_a_problem_whatever_the_manifest_says) | AssertionError"
+  },
+  {
+   "index": 65,
+   "mutant": "L475 string ' is not the file the row binds (size or sha256)' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_an_altered_artifact_is_a_problem_whatever_the_manifest_says (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_an_altered_artifact_is_a_problem_whatever_the_manifest_says) | AssertionError"
+  },
+  {
+   "index": 66,
+   "mutant": "L478 string 'utf-8' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_row_whose_artifact_is_there_and_is_the_one_it_binds_has_no_problem (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_row_whose_artifact_is_there_and_is_the_one_it_binds_has_no_problem) | LookupError"
+  },
+  {
+   "index": 67,
+   "mutant": "L484 string ': its artifact ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_an_artifact_of_another_story_or_another_finding_is_not_this_rows (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_an_artifact_of_another_story_or_another_finding_is_not_this_rows) (story='S2', fid='FND-7') | AssertionError"
+  },
+  {
+   "index": 68,
+   "mutant": "L484 string \" is not this story's statement of this finding\" emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_an_artifact_of_another_story_or_another_finding_is_not_this_rows (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_an_artifact_of_another_story_or_another_finding_is_not_this_rows) (story='S2', fid='FND-7') | AssertionError"
+  },
+  {
+   "index": 69,
+   "mutant": "L444 string 'check' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one) | AssertionError"
+  },
+  {
+   "index": 70,
+   "mutant": "L445 string 'detail' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one) | AssertionError"
+  },
+  {
+   "index": 71,
+   "mutant": "L458 string ': its artifact reference ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_reference_that_is_not_a_reference_is_a_problem (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_reference_that_is_not_a_reference_is_a_problem) (ref='\"review-findings/S1.2.0.json\"', passed=True) | AssertionError"
+  },
+  {
+   "index": 72,
+   "mutant": "L458 string ' is not a path, a size and a sha256' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_reference_that_is_not_a_reference_is_a_problem (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_reference_that_is_not_a_reference_is_a_problem) (ref='\"review-findings/S1.2.0.json\"', passed=True) | AssertionError"
+  },
+  {
+   "index": 73,
+   "mutant": "L459 False->True",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one) | AssertionError"
+  },
+  {
+   "index": 74,
+   "mutant": "L459 string 'artifact' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one) | AssertionError"
+  },
+  {
+   "index": 75,
+   "mutant": "L461 False->True",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one) | AssertionError"
+  },
+  {
+   "index": 76,
+   "mutant": "L465 string 'path' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_missing_or_unreadable_artifact_is_a_problem_naming_the_row_and_the_file (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_missing_or_unreadable_artifact_is_a_problem_naming_the_row_and_the_file) | AssertionError"
+  },
+  {
+   "index": 77,
+   "mutant": "L472 string ': its artifact ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_missing_or_unreadable_artifact_is_a_problem_naming_the_row_and_the_file (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_missing_or_unreadable_artifact_is_a_problem_naming_the_row_and_the_file) | AssertionError"
+  },
+  {
+   "index": 78,
+   "mutant": "L472 string ' cannot be read (' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_missing_or_unreadable_artifact_is_a_problem_naming_the_row_and_the_file (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_missing_or_unreadable_artifact_is_a_problem_naming_the_row_and_the_file) | AssertionError"
+  },
+  {
+   "index": 79,
+   "mutant": "L472 string ')' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_missing_or_unreadable_artifact_is_a_problem_naming_the_row_and_the_file (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_missing_or_unreadable_artifact_is_a_problem_naming_the_row_and_the_file) | AssertionError"
+  },
+  {
+   "index": 80,
+   "mutant": "L482 string 'format' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_row_whose_artifact_is_there_and_is_the_one_it_binds_has_no_problem (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_row_whose_artifact_is_there_and_is_the_one_it_binds_has_no_problem) | AssertionError"
+  },
+  {
+   "index": 81,
+   "mutant": "L482 string 'story_id' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_row_whose_artifact_is_there_and_is_the_one_it_binds_has_no_problem (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_row_whose_artifact_is_there_and_is_the_one_it_binds_has_no_problem) | AssertionError"
+  },
+  {
+   "index": 82,
+   "mutant": "L459 string 'passed' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one) | AssertionError"
+  },
+  {
+   "index": 83,
+   "mutant": "L460 string ': it blocked and names no artifact \u2014 the reproducer it rests on is not preserved' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one) | AssertionError"
+  },
+  {
+   "index": 84,
+   "mutant": "L461 string 'passed' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one) | AssertionError"
+  },
+  {
+   "index": 85,
+   "mutant": "L467 string 'path' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_row_that_names_a_path_outside_the_directory_is_a_problem_and_nothing_is_read (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_row_that_names_a_path_outside_the_directory_is_a_problem_and_nothing_is_read) (path='RUN.json') | AssertionError"
+  },
+  {
+   "index": 86,
+   "mutant": "L475 string 'path' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_an_altered_artifact_is_a_problem_whatever_the_manifest_says (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_an_altered_artifact_is_a_problem_whatever_the_manifest_says) | KeyError"
+  },
+  {
+   "index": 87,
+   "mutant": "L483 string 'finding' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_row_whose_artifact_is_there_and_is_the_one_it_binds_has_no_problem (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_row_whose_artifact_is_there_and_is_the_one_it_binds_has_no_problem) | AssertionError"
+  },
+  {
+   "index": 88,
+   "mutant": "L484 string 'path' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_an_artifact_of_another_story_or_another_finding_is_not_this_rows (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_an_artifact_of_another_story_or_another_finding_is_not_this_rows) (story='S2', fid='FND-7') | KeyError"
+  },
+  {
+   "index": 89,
+   "mutant": "L462 string ': blocked on a statement with no preserved reproducer (a run of a release before review artifacts)' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_blocking_row_without_an_artifact_is_a_note_for_an_earlier_release_and_a_problem_for_this_one) | AssertionError"
+  },
+  {
+   "index": 90,
+   "mutant": "L472 string 'path' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "ERROR: test_a_missing_or_unreadable_artifact_is_a_problem_naming_the_row_and_the_file (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_missing_or_unreadable_artifact_is_a_problem_naming_the_row_and_the_file) | KeyError"
+  },
+  {
+   "index": 91,
+   "mutant": "L483 string 'id' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "first": "FAIL: test_a_row_whose_artifact_is_there_and_is_the_one_it_binds_has_no_problem (v2.test_v21_r3_detail_artifact.ArtifactProblems.test_a_row_whose_artifact_is_there_and_is_the_one_it_binds_has_no_problem) | AssertionError"
+  }
+ ]
+}

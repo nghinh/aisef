@@ -1,0 +1,361 @@
+{
+ "target": "aisef2/app/confine.py::_sections",
+ "files": [
+  "tests/v2/test_v21_r3_client_readers.py",
+  "tests/v2/test_v21_kills3_T07a.py",
+  "tests/v2/test_v21_confine.py",
+  "tests/v2/test_v21_r3_conf_policy.py",
+  "tests/v2/test_v21_r3_conf_fu_before.py",
+  "tests/v2/test_v21_r3_conf_rv_hostrows.py"
+ ],
+ "source_sha256": "3dc6553e145884c2214f71f92280bd9633f2b1609d22b4c717be15e7ad8787f5",
+ "t0": [
+  {
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "seconds": 1.92,
+   "outcome": "PASS",
+   "ran": 10
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T07a.py",
+   "seconds": 0.38,
+   "outcome": "PASS",
+   "ran": 14
+  },
+  {
+   "file": "tests/v2/test_v21_confine.py",
+   "seconds": 23.35,
+   "outcome": "PASS",
+   "ran": 34
+  },
+  {
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "seconds": 1.54,
+   "outcome": "PASS",
+   "ran": 42
+  },
+  {
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "seconds": 1.87,
+   "outcome": "PASS",
+   "ran": 9
+  },
+  {
+   "file": "tests/v2/test_v21_r3_conf_rv_hostrows.py",
+   "seconds": 0.36,
+   "outcome": "PASS",
+   "ran": 3
+  }
+ ],
+ "error": null,
+ "results": [
+  {
+   "index": 0,
+   "mutant": "L236 returns None",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each (v2.test_v21_r3_client_readers.ProbeOutput.test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each) (separator='U+2028') | TypeError"
+  },
+  {
+   "index": 1,
+   "mutant": "L214 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each (v2.test_v21_r3_client_readers.ProbeOutput.test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each) (separator='U+2028') | ValueError"
+  },
+  {
+   "index": 2,
+   "mutant": "L214 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each (v2.test_v21_r3_client_readers.ProbeOutput.test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each) (separator='U+2028') | ValueError"
+  },
+  {
+   "index": 3,
+   "mutant": "L214 element 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each (v2.test_v21_r3_client_readers.ProbeOutput.test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each) (separator='U+2028') | ValueError"
+  },
+  {
+   "index": 4,
+   "mutant": "L214 element 3 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each (v2.test_v21_r3_client_readers.ProbeOutput.test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each) (separator='U+2028') | ValueError"
+  },
+  {
+   "index": 5,
+   "mutant": "L214 element 4 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each (v2.test_v21_r3_client_readers.ProbeOutput.test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each) (separator='U+2028') | ValueError"
+  },
+  {
+   "index": 6,
+   "mutant": "L214 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each (v2.test_v21_r3_client_readers.ProbeOutput.test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each) (separator='U+2028') | ValueError"
+  },
+  {
+   "index": 7,
+   "mutant": "L214 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each (v2.test_v21_r3_client_readers.ProbeOutput.test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each) (separator='U+2028') | ValueError"
+  },
+  {
+   "index": 8,
+   "mutant": "L214 element 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each (v2.test_v21_r3_client_readers.ProbeOutput.test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each) (separator='U+2028') | ValueError"
+  },
+  {
+   "index": 9,
+   "mutant": "L214 element 3 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each (v2.test_v21_r3_client_readers.ProbeOutput.test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each) (separator='U+2028') | ValueError"
+  },
+  {
+   "index": 10,
+   "mutant": "L214 element 4 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each (v2.test_v21_r3_client_readers.ProbeOutput.test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each) (separator='U+2028') | ValueError"
+  },
+  {
+   "index": 11,
+   "mutant": "L216 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each (v2.test_v21_r3_client_readers.ProbeOutput.test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each) (separator='U+2028') | KeyError"
+  },
+  {
+   "index": 12,
+   "mutant": "L221 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each (v2.test_v21_r3_client_readers.ProbeOutput.test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each) (separator='U+2028') | KeyError"
+  },
+  {
+   "index": 13,
+   "mutant": "L236 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each (v2.test_v21_r3_client_readers.ProbeOutput.test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each) (separator='U+2028') | ValueError"
+  },
+  {
+   "index": 14,
+   "mutant": "L236 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each (v2.test_v21_r3_client_readers.ProbeOutput.test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each) (separator='U+2028') | ValueError"
+  },
+  {
+   "index": 15,
+   "mutant": "L236 element 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each (v2.test_v21_r3_client_readers.ProbeOutput.test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each) (separator='U+2028') | ValueError"
+  },
+  {
+   "index": 16,
+   "mutant": "L216 not removed",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each (v2.test_v21_r3_client_readers.ProbeOutput.test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each) (separator='U+2028') | KeyError"
+  },
+  {
+   "index": 17,
+   "mutant": "L217 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "FAIL: test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each (v2.test_v21_r3_client_readers.ProbeOutput.test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 18,
+   "mutant": "L220 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each (v2.test_v21_r3_client_readers.ProbeOutput.test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each) (separator='U+2028') | ValueError"
+  },
+  {
+   "index": 19,
+   "mutant": "L220 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each (v2.test_v21_r3_client_readers.ProbeOutput.test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each) (separator='U+2028') | ValueError"
+  },
+  {
+   "index": 20,
+   "mutant": "L220 element 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each (v2.test_v21_r3_client_readers.ProbeOutput.test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each) (separator='U+2028') | ValueError"
+  },
+  {
+   "index": 21,
+   "mutant": "L221 Eq->NotEq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each (v2.test_v21_r3_client_readers.ProbeOutput.test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each) (separator='U+2028') | KeyError"
+  },
+  {
+   "index": 22,
+   "mutant": "L223 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "FAIL: test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each (v2.test_v21_r3_client_readers.ProbeOutput.test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 23,
+   "mutant": "L217 IsNot->Is",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "FAIL: test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each (v2.test_v21_r3_client_readers.ProbeOutput.test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 24,
+   "mutant": "L220 string ' ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each (v2.test_v21_r3_client_readers.ProbeOutput.test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each) (separator='U+2028') | ValueError"
+  },
+  {
+   "index": 25,
+   "mutant": "L221 string 'section' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each (v2.test_v21_r3_client_readers.ProbeOutput.test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each) (separator='U+2028') | KeyError"
+  },
+  {
+   "index": 26,
+   "mutant": "L223 Eq->NotEq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "FAIL: test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each (v2.test_v21_r3_client_readers.ProbeOutput.test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 27,
+   "mutant": "L226 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each (v2.test_v21_r3_client_readers.ProbeOutput.test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each) (separator='U+2028') | KeyError"
+  },
+  {
+   "index": 28,
+   "mutant": "L223 string 'try' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T07a.py",
+   "first": "FAIL: test_values_sections_and_tries (v2.test_v21_kills3_T07a.ProbeOutput.test_values_sections_and_tries) | AssertionError"
+  },
+  {
+   "index": 29,
+   "mutant": "L226 And swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T07a.py",
+   "first": "ERROR: test_values_sections_and_tries (v2.test_v21_kills3_T07a.ProbeOutput.test_values_sections_and_tries) | ValueError"
+  },
+  {
+   "index": 30,
+   "mutant": "L229 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "FAIL: test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each (v2.test_v21_r3_client_readers.ProbeOutput.test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 31,
+   "mutant": "L226 Eq->NotEq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T07a.py",
+   "first": "ERROR: test_values_sections_and_tries (v2.test_v21_kills3_T07a.ProbeOutput.test_values_sections_and_tries) | ValueError"
+  },
+  {
+   "index": 32,
+   "mutant": "L226 In->NotIn",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T07a.py",
+   "first": "FAIL: test_values_sections_and_tries (v2.test_v21_kills3_T07a.ProbeOutput.test_values_sections_and_tries) | AssertionError"
+  },
+  {
+   "index": 33,
+   "mutant": "L227 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T07a.py",
+   "first": "FAIL: test_values_sections_and_tries (v2.test_v21_kills3_T07a.ProbeOutput.test_values_sections_and_tries) | AssertionError"
+  },
+  {
+   "index": 34,
+   "mutant": "L227 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T07a.py",
+   "first": "FAIL: test_values_sections_and_tries (v2.test_v21_kills3_T07a.ProbeOutput.test_values_sections_and_tries) | AssertionError"
+  },
+  {
+   "index": 35,
+   "mutant": "L229 Eq->NotEq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "FAIL: test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each (v2.test_v21_r3_client_readers.ProbeOutput.test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 36,
+   "mutant": "L226 string 'rc' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T07a.py",
+   "first": "FAIL: test_values_sections_and_tries (v2.test_v21_kills3_T07a.ProbeOutput.test_values_sections_and_tries) | AssertionError"
+  },
+  {
+   "index": 37,
+   "mutant": "L229 string 'ns' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T07a.py",
+   "first": "FAIL: test_values_sections_and_tries (v2.test_v21_kills3_T07a.ProbeOutput.test_values_sections_and_tries) | AssertionError"
+  },
+  {
+   "index": 38,
+   "mutant": "L230 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T07a.py",
+   "first": "ERROR: test_values_sections_and_tries (v2.test_v21_kills3_T07a.ProbeOutput.test_values_sections_and_tries) | ValueError"
+  },
+  {
+   "index": 39,
+   "mutant": "L230 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T07a.py",
+   "first": "ERROR: test_values_sections_and_tries (v2.test_v21_kills3_T07a.ProbeOutput.test_values_sections_and_tries) | ValueError"
+  },
+  {
+   "index": 40,
+   "mutant": "L230 element 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T07a.py",
+   "first": "ERROR: test_values_sections_and_tries (v2.test_v21_kills3_T07a.ProbeOutput.test_values_sections_and_tries) | ValueError"
+  },
+  {
+   "index": 41,
+   "mutant": "L230 string ' ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T07a.py",
+   "first": "ERROR: test_values_sections_and_tries (v2.test_v21_kills3_T07a.ProbeOutput.test_values_sections_and_tries) | ValueError"
+  },
+  {
+   "index": 42,
+   "mutant": "L231 string 'ns' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T07a.py",
+   "first": "FAIL: test_values_sections_and_tries (v2.test_v21_kills3_T07a.ProbeOutput.test_values_sections_and_tries) | AssertionError"
+  },
+  {
+   "index": 43,
+   "mutant": "L227 string '\\n' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T07a.py",
+   "first": "FAIL: test_values_sections_and_tries (v2.test_v21_kills3_T07a.ProbeOutput.test_values_sections_and_tries) | AssertionError"
+  }
+ ]
+}

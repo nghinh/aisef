@@ -1,0 +1,17 @@
+interpreter: 3.14.7 darwin
+
+8a. a count of 0 over a selection of zero files
+   python_imports matches=0 over a single non-.py file                -> OBSERVED SATISFIED files=0 matches=0
+   python_imports matches=0 over a directory with no .py              -> OBSERVED SATISFIED files=0 matches=0
+   python_imports matches=0 over a directory holding only a dot-file  -> OBSERVED SATISFIED files=0 matches=0
+   grep_count     matches=0 over a directory with no .txt-free selection (default: every file) -> OBSERVED SATISFIED
+
+8b. order of `locations`
+   locations: [['pkg/m.py', 5, ['yaml']], ['pkg/m.py', 2, ['requests']]] (line 2 is inside f(); line 5 is module level)
+
+8c. a memoryview result
+   process_effect  returns_bytes_hex=6162 -> OBSERVED REFUTED | ound": {}, "raised": null, "before": {}, "files": {}, "last_unserializable": "memoryview"}
+   python_callable returns_bytes=6162      -> OBSERVED SATISFIED
+
+8d. a bare directory json/ in the revision (no __init__.py), subject json.decoder:JSONDecoder
+   process_effect -> SUBJECT_ABSENT REFUTED note='' (the subject's own process imports the stdlib json.decoder, outside the revision)

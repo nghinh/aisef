@@ -1,0 +1,40 @@
+# repro-7 (probes WP, recalibration cost): demonstrate every active probe's every observation class on the committed
+# calibration fixtures (positive SATISFIED, negative REFUTED, and (negative, negative) rejected) — the same loop as
+# validation/qualification/release_calibration.py::calibrate_all, writing nothing.  Run from a tree root that holds
+# aisef2/ and tests/v2/fixtures/calibration/.
+import dataclasses
+import os
+import pathlib
+import sys
+import time
+
+ROOT = pathlib.Path(os.getcwd())
+sys.path.insert(0, str(ROOT))
+from aisef2.probe import catalog  # noqa: E402
+from aisef2.probe.calibration import NotQualified, calibrate, calibration_env  # noqa: E402
+
+print("interpreter:", sys.version.split()[0], sys.platform, "| tree:", ROOT.name)
+registry, env = catalog.registry(), calibration_env(sys.executable)
+ok = bad = 0
+for e in catalog.CATALOG:
+    if not e.active:
+        continue
+    probe = e.factory()
+    print("%-26s EXECUTION_DIGEST %s.." % (e.probe_id, probe.execution_digest[:12]))
+    for cls in e.classes:
+        rel = f"tests/v2/fixtures/calibration/{e.fixture_root}/{cls}"
+        pos, neg = ROOT / rel / "positive", ROOT / rel / "negative"
+        try:
+            rec = calibrate(probe, cls, pos, neg, env, time.time, registry=registry, names=(f"{rel}/positive", f"{rel}/negative"))
+            try:
+                calibrate(probe, cls, neg, neg, env, time.time, registry=registry)
+                verdict = "PROBLEM: (negative, negative) not rejected"
+                bad += 1
+            except NotQualified:
+                verdict = "contrasts"
+                ok += 1
+        except NotQualified as x:
+            verdict = "NOT QUALIFIED: %s" % str(x)[:80]
+            bad += 1
+        print("   %-18s %s" % (cls, verdict))
+print("classes that contrast: %d, problems: %d" % (ok, bad))

@@ -1,0 +1,53 @@
+# rv-fa-edge: which inputs make file_artifact.import_facts raise (instead of returning a fact) or call a file that
+# CPython itself runs "unparsable".  Calls the module function directly (no harness), then observe() over a plain dir.
+import ast, os, sys, tempfile, pathlib
+sys.path.insert(0, os.getcwd())
+from aisef2.probe import file_artifact as fa
+OUTSIDE = {"stdlib": True, "allowed": []}
+cases = {
+ "BOM + import requests": b"\xef\xbb\xbfimport requests\n",
+ "BOM + plain":           b"\xef\xbb\xbfx = 1\n",
+ "latin-1 cookie non-utf8": b"# -*- coding: latin-1 -*-\nx = '\xe9'\nimport requests\n",
+ "utf-8 cookie + utf8":   b"# -*- coding: utf-8 -*-\nx = 'e\xcc\x81'\nimport requests\n",
+ "form feed":             b"\x0c\nimport requests\n",
+ "CR-only newlines":      b"import requests\rx = 1\r",
+ "CRLF":                  b"import requests\r\nx = 1\r\n",
+ "huge int literal 5000 digits": b"x = " + b"9" * 5000 + b"\nimport requests\n",
+ "huge float literal":    b"x = 1e" + b"9" * 400 + b"\nimport requests\n",
+ "nested parens 300":     b"x = " + b"(" * 300 + b"1" + b")" * 300 + b"\n",
+ "nested lists 150":      b"x = " + b"[" * 150 + b"]" * 150 + b"\n",
+ "nested if 120 levels":  b"".join(b" " * i + b"if 1:\n" for i in range(120)) + b" " * 120 + b"pass\n",
+ "lambda chain 3000":     b"f = " + b"lambda: " * 3000 + b"1\n",
+ "attribute chain 3000":  b"x = a" + b".b" * 3000 + b"\n",
+ "call chain 5000":       b"x = f" + b"()" * 5000 + b"\n",
+ "string concat 3000":    b"x = 's'" + b" + 's'" * 3000 + b"\n",
+ "implicit concat 100000": b"x = " + b"'a' " * 100000 + b"\n",
+ "bool chain 20000":      b"x = a" + b" and a" * 20000 + b"\n",
+ "compare chain 20000":   b"x = 1" + b" < 1" * 20000 + b"\n",
+ "unicode identifier nfkc": "import requests\n\u00aa = 1\n".encode(),
+ "match statement":       b"match x:\n    case 1:\n        pass\nimport requests\n",
+ "t-string (3.14)":       b"x = t'hi {a}'\nimport requests\n",
+ "except A, B (3.14)":    b"try:\n    pass\nexcept A, B:\n    pass\nimport requests\n",
+ "type alias stmt (3.12)": b"type X = int\nimport requests\n",
+ "PEP695 generics":       b"def f[T](x: T) -> T:\n    return x\nimport requests\n",
+ "walrus":                b"if (n := 1):\n    import requests\n",
+ "tab/space mix":         b"if 1:\n\tx = 1\n        y = 2\n",
+ "empty":                 b"",
+ "only comment":          b"# hi\n",
+ "lone surrogate escape": b"x = '\\ud800'\nimport requests\n",
+ "very long line 3M":     b"x = '" + b"a" * 3_000_000 + b"'\nimport requests\n",
+}
+print("interpreter:", sys.version.split()[0], sys.platform)
+for label, data in cases.items():
+    try:
+        r = fa.import_facts(OUTSIDE, [("p.py", data)])
+        got = ("unparsable " + r["unparsable"]) if "unparsable" in r else ("undecodable" if "undecodable" in r else "matches=%s" % r["matches"])
+    except BaseException as e:
+        got = "RAISED %s: %s" % (type(e).__name__, str(e)[:60])
+    # what does CPython itself do with those bytes (compile from bytes, as the import system does)?
+    try:
+        compile(data, "p.py", "exec", dont_inherit=True)
+        cp = "compiles"
+    except BaseException as e:
+        cp = "compile -> %s" % type(e).__name__
+    print("%-30s import_facts: %-40s | CPython compile(bytes): %s" % (label, got, cp))

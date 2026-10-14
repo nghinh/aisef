@@ -1,0 +1,72 @@
+# repro-1b (probes WP, item 1, completeness): other namespace-package layouts, including `:__main__` of a package,
+# a namespace spanning root and src/, a regular package that shadows a namespace directory, and a namespace directory
+# that shadows a stdlib package name (the "unexpected place" question).  The premise line says what CPython itself does.
+# Run from the worktree root:  py.sh probes -I <this file>
+import os
+import pathlib
+import subprocess
+import sys
+import tempfile
+
+sys.path.insert(0, os.getcwd())
+
+from aisef2.arch.enums import BehaviorVerdict, Enforcement, SubjectAbsence  # noqa: E402
+from aisef2.probe import cli_invocation as ci, process_effect as pe  # noqa: E402
+from aisef2.probe.protocol import ExecutionEnv, RevisionRef  # noqa: E402
+from aisef2.product.spec import ProductProofSpec  # noqa: E402
+
+SHA = "89abcdef0123456789abcdef0123456789abcdef"
+ENV = ExecutionEnv(sys.executable, 20, Enforcement.PARTIAL)
+MAIN = "import sys\nsys.exit(0)\n"
+F = "def f():\n    return 1\n\n\ndef main(argv):\n    return 0\n"
+
+
+def checkout(files):
+    d = tempfile.mkdtemp(prefix="aisef2-r3-ns2-")
+    for rel, text in files.items():
+        p = pathlib.Path(d, rel)
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(text, encoding="utf-8", newline="\n")
+    return d
+
+
+def spec(kind, locator):
+    if kind == "cli":
+        return ProductProofSpec.create(
+            contract_id="BC-R3", probe_id=ci.PROBE_ID, probe_digest=ci.DIGEST,
+            probe_input={"subject": {"kind": "cli_invocation", "locator": locator}, "stimulus": {"argv": []},
+                         "observable": {"exit_code": 0, "within_s": 20}, "subject_absence": SubjectAbsence.REQUIRES_SUBJECT.value},
+            candidate_expectation=BehaviorVerdict.SATISFIED, compiler_id="test", compiler_digest="c" * 64)
+    return ProductProofSpec.create(
+        contract_id="BC-R3", probe_id=pe.PROBE_ID, probe_digest=pe.DIGEST,
+        probe_input={"subject": {"kind": "process_effect", "locator": locator},
+                     "stimulus": {"scenario": [{"step": "call", "args": [], "kwargs": {}}]},
+                     "observable": {"returns": 1, "within_s": 20}, "subject_absence": SubjectAbsence.REQUIRES_SUBJECT.value},
+        candidate_expectation=BehaviorVerdict.SATISFIED, compiler_id="test", compiler_digest="c" * 64)
+
+
+def premise(root, module):
+    code = ("import importlib, sys\nroot = sys.argv[1]\nsys.path[:0] = [root, root + '/src']\n"
+            "importlib.import_module(sys.argv[2])\n")
+    return subprocess.run([sys.executable, "-I", "-S", "-B", "-c", code, root, module], stdin=subprocess.DEVNULL,
+                          stderr=subprocess.DEVNULL, check=False).returncode
+
+
+CASES = [
+    ("N1 namespace package run as __main__ (ns/__main__.py)", {"ns/__main__.py": MAIN}, "cli", "ns:__main__", "ns"),
+    ("N2 nested namespace run as __main__ (a/b/__main__.py)", {"a/b/__main__.py": MAIN}, "cli", "a.b:__main__", "a.b"),
+    ("N3 one namespace spanning root and src/", {"ns/a.py": F, "src/ns/b.py": F}, "effect", "ns.b:f", "ns.b"),
+    ("N4 regular package in src/ beats a namespace dir at root", {"pkg/x.py": F, "src/pkg/__init__.py": "", "src/pkg/y.py": F},
+     "effect", "pkg.x:f", "pkg.x"),
+    ("N5 namespace dir named like a stdlib package (json/mod.py)", {"json/mod.py": F}, "effect", "json.mod:f", "json.mod"),
+    ("N6 module only in the stdlib (json.tool), no json in revision", {"README.md": "x\n"}, "effect", "json.tool:main", "json.tool"),
+]
+print("interpreter:", sys.version.split()[0], sys.platform)
+for label, files, kind, locator, module in CASES:
+    root = checkout(files)
+    at = RevisionRef(SHA, root)
+    probe = ci.CliInvocationProbe() if kind == "cli" else pe.ProcessEffectProbe()
+    o = probe.observe(spec(kind, locator), at, ENV)
+    print("%s\n   python imports it: rc=%d | %s observe -> %s verdict=%s | %s" % (
+        label, premise(root, module), "cli_invocation" if kind == "cli" else "process_effect", o.kind.value,
+        o.verdict.value if o.verdict else None, o.detail[:110]))

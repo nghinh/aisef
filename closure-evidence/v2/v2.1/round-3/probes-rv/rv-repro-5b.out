@@ -1,0 +1,3 @@
+interpreter: 3.14.7 darwin
+python_callable_v2 -> HARNESS_FAILED verdict=None | the probe's controller ended without a result (exit 1)
+process_effect     -> HARNESS_FAILED verdict=None | the harness failed its own scenario: the harness raised KeyError

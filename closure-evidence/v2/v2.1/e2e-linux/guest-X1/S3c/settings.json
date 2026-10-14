@@ -1,0 +1,55 @@
+{
+ "format": "aisef-v2-run/1",
+ "client": "opencode",
+ "route": "fakeprov/model-1",
+ "provider": {
+  "name": "fakeprov",
+  "endpoint": "http://127.0.0.1:18437/v1",
+  "api_key_env": "FAKE_PROVIDER_KEY",
+  "served_model": "model-1",
+  "listed_owner": "fake",
+  "model_limit": {
+   "context": 100000,
+   "output": 8000
+  }
+ },
+ "client_env": [],
+ "budget": {
+  "provider_requests": 40,
+  "turns": 80,
+  "input_tokens": 200000,
+  "output_tokens": 20000
+ },
+ "max_turns_per_session": 10,
+ "limits": {
+  "DEVELOPER": 1,
+  "PLAN": 1,
+  "ENVIRONMENT": 1,
+  "PROVIDER": 1,
+  "INTEGRATION": 1,
+  "REVIEW": 1,
+  "SECURITY": 1
+ },
+ "timeouts_s": {
+  "developer": 60,
+  "reviewer": 120,
+  "tool": 120,
+  "probe": 60
+ },
+ "preflight": {
+  "chat_probes": 2
+ },
+ "review": {
+  "policy": "fix-loop",
+  "min_severity": "high"
+ },
+ "prices": {
+  "currency": "USD",
+  "input_per_mtok": 1.32,
+  "cache_read_per_mtok": 0.044,
+  "cache_write_per_mtok": 1.32,
+  "output_per_mtok": 3.96,
+  "source": "e2e fixture (not a real price)",
+  "effective_date": "2026-10-12"
+ }
+}

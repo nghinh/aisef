@@ -1,0 +1,137 @@
+{
+ "target": "aisef2/runtime/process_range.py::ProcessRange.__init__",
+ "files": [
+  "tests/v2/test_v21_r3_range_release_contract.py"
+ ],
+ "source_sha256": "489e7ec3638c2f91365fa94263a38b9d20a36c4fd586c7213c1cbadf2b561c16",
+ "t0": [
+  {
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "seconds": 2.23,
+   "outcome": "PASS",
+   "ran": 28
+  }
+ ],
+ "error": null,
+ "results": [
+  {
+   "index": 0,
+   "mutant": "L308 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "ERROR: test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller (v2.test_v21_r3_range_release_contract.AbandonedWorker.test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller) | ValueError"
+  },
+  {
+   "index": 1,
+   "mutant": "L308 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "ERROR: test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller (v2.test_v21_r3_range_release_contract.AbandonedWorker.test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller) | ValueError"
+  },
+  {
+   "index": 2,
+   "mutant": "L308 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "ERROR: test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller (v2.test_v21_r3_range_release_contract.AbandonedWorker.test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller) | ValueError"
+  },
+  {
+   "index": 3,
+   "mutant": "L308 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "ERROR: test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller (v2.test_v21_r3_range_release_contract.AbandonedWorker.test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller) | ValueError"
+  },
+  {
+   "index": 4,
+   "mutant": "L309 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "ERROR: test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller (v2.test_v21_r3_range_release_contract.AbandonedWorker.test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller) | ValueError"
+  },
+  {
+   "index": 5,
+   "mutant": "L309 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "ERROR: test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller (v2.test_v21_r3_range_release_contract.AbandonedWorker.test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller) | ValueError"
+  },
+  {
+   "index": 6,
+   "mutant": "L309 element 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "ERROR: test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller (v2.test_v21_r3_range_release_contract.AbandonedWorker.test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller) | ValueError"
+  },
+  {
+   "index": 7,
+   "mutant": "L309 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "ERROR: test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller (v2.test_v21_r3_range_release_contract.AbandonedWorker.test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller) | ValueError"
+  },
+  {
+   "index": 8,
+   "mutant": "L309 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "ERROR: test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller (v2.test_v21_r3_range_release_contract.AbandonedWorker.test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller) | ValueError"
+  },
+  {
+   "index": 9,
+   "mutant": "L309 element 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "ERROR: test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller (v2.test_v21_r3_range_release_contract.AbandonedWorker.test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller) | ValueError"
+  },
+  {
+   "index": 10,
+   "mutant": "L310 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "ERROR: test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller (v2.test_v21_r3_range_release_contract.AbandonedWorker.test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller) | ValueError"
+  },
+  {
+   "index": 11,
+   "mutant": "L310 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "ERROR: test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller (v2.test_v21_r3_range_release_contract.AbandonedWorker.test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller) | ValueError"
+  },
+  {
+   "index": 12,
+   "mutant": "L310 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "ERROR: test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller (v2.test_v21_r3_range_release_contract.AbandonedWorker.test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller) | ValueError"
+  },
+  {
+   "index": 13,
+   "mutant": "L310 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "ERROR: test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller (v2.test_v21_r3_range_release_contract.AbandonedWorker.test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller) | ValueError"
+  },
+  {
+   "index": 14,
+   "mutant": "L317 False->True",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "FAIL: test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller (v2.test_v21_r3_range_release_contract.AbandonedWorker.test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller) | AssertionError"
+  },
+  {
+   "index": 15,
+   "mutant": "L309 conditional negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "ERROR: test_a_stop_thread_and_the_owner_release_one_real_range_once (v2.test_v21_r3_range_release_contract.RealRange.test_a_stop_thread_and_the_owner_release_one_real_range_once) | aisef2.runtime.process_range.RangeError"
+  },
+  {
+   "index": 16,
+   "mutant": "L309 IsNot->Is",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "ERROR: test_a_stop_thread_and_the_owner_release_one_real_range_once (v2.test_v21_r3_range_release_contract.RealRange.test_a_stop_thread_and_the_owner_release_one_real_range_once) | aisef2.runtime.process_range.RangeError"
+  }
+ ]
+}

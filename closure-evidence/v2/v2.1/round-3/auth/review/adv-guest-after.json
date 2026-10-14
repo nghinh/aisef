@@ -1,0 +1,19 @@
+{
+ "locale": "C.UTF-8",
+ "n_separators": 33,
+ "variants": 274,
+ "victim_in_owned": [],
+ "victim_member": [],
+ "victim_signalled": [],
+ "table_unreadable": [],
+ "row_mismatch": [],
+ "carrier_command_not_whole": [
+  [
+   "argv0-ls-then-row",
+   "'?8 7 8 Tue Oct 13 23:59:59 2099 fabricated-by-a-command-line'"
+  ]
+ ],
+ "runner": 7,
+ "victim": 8,
+ "since": 1791859953.0
+}

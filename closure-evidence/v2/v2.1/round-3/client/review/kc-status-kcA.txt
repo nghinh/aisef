@@ -1,0 +1,7 @@
+events exit=0 # aisef2/app/client.py::events: 6 mutants run, {'KILLED': 6}; T0 [{'file': 'tests/v2/test_v21_r3_client_stream.py', 'seconds': 1.94, 'outcome': 'PASS', 'ran': 17}, {'file': 'tests/v2/test_app_units.py', 'seconds': 9.37, 'outcome': 'PASS', 'ran': 41}]; source_s
+_lines exit=0 # aisef2/app/confine.py::_lines: 4 mutants run, {'KILLED': 4}; T0 [{'file': 'tests/v2/test_v21_r3_client_readers.py', 'seconds': 1.85, 'outcome': 'PASS', 'ran': 10}, {'file': 'tests/v2/test_v21_kills3_T07a.py', 'seconds': 0.46, 'outcome': 'PASS', 'ran': 14}, {
+_host_mounts exit=0 # aisef2/app/confine.py::_host_mounts: 16 mutants run, {'KILLED': 16}; T0 [{'file': 'tests/v2/test_v21_r3_client_readers.py', 'seconds': 2.53, 'outcome': 'PASS', 'ran': 10}, {'file': 'tests/v2/test_v21_kills3_T07a.py', 'seconds': 0.55, 'outcome': 'PASS', 'ran'
+session_tokens exit=0 # aisef2/app/usage.py::session_tokens: 37 mutants run, {'KILLED': 37}; T0 [{'file': 'tests/v2/test_v21_r3_client_stream.py', 'seconds': 2.06, 'outcome': 'PASS', 'ran': 17}, {'file': 'tests/v2/test_v21_kills3_T20a.py', 'seconds': 0.5, 'outcome': 'PASS', 'ran': 
+DONE
+reconcile exit=0 # aisef2/app/lineage.py::reconcile: 148 mutants run, {'KILLED': 148}; T0 [{'file': 'tests/v2/test_v21_r3_client_readers.py', 'seconds': 1.65, 'outcome': 'PASS', 'ran': 12}, {'file': 'tests/v2/test_v21_kills3_T08a.py', 'seconds': 1.94, 'outcome': 'PASS', 'ran':
+DONE

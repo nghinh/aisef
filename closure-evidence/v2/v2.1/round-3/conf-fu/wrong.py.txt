@@ -1,0 +1,26 @@
+import pathlib, subprocess, sys, shutil
+WT = pathlib.Path(sys.argv[1]); SP = sys.argv[2]; OUT = pathlib.Path(sys.argv[3])
+target = WT / "aisef2/app/confine.py"
+fixed = (OUT / "confine.fixed.py").read_text()
+OLD_A = 'rep["host_mounts"] = before\n'
+OLD_B = 'rep["host_mounts_appeared"] = None if before is None or after is None else [r for r in after if r not in before]\n'
+assert OLD_A in fixed and OLD_B in fixed
+WRONG = {
+ "W1 union (the old code)": (OLD_A, 'rep["host_mounts"] = None if before is None or after is None else before + [r for r in after if r not in before]\n'),
+ "W2 the reading after only": (OLD_A, 'rep["host_mounts"] = after\n'),
+ "W3 appeared = every row after": (OLD_B, 'rep["host_mounts_appeared"] = after\n'),
+ "W4 after lost -> host table lost": (OLD_A, 'rep["host_mounts"] = None if after is None else before\n'),
+ "W5 appeared computed although before lost": (OLD_B, 'rep["host_mounts_appeared"] = None if after is None else [r for r in after if r not in (before or [])]\n'),
+ "W6 appeared = rows of before that went": (OLD_B, 'rep["host_mounts_appeared"] = None if before is None or after is None else [r for r in before if r not in after]\n'),
+ "W7 before is replaced by after when before lost": (OLD_A, 'rep["host_mounts"] = before if before is not None else after\n'),
+}
+mods = ["tests.v2.test_v21_r3_conf_fu_before", "tests.v2.test_v21_r3_conf_policy", "tests.v2.test_v21_r3_conf_rv_hostrows"]
+try:
+    for name, (old, new) in WRONG.items():
+        target.write_text(fixed.replace(old, new))
+        p = subprocess.run([f"{SP}/m21/kills3/py.sh", "conf-fu", "-m", "unittest", *mods], cwd=WT, capture_output=True, text=True)
+        last = [l for l in p.stderr.splitlines() if l.strip()][-1]
+        fails = sorted({l.split(" ")[1] for l in p.stderr.splitlines() if l.startswith(("FAIL:", "ERROR:"))})
+        print(f"{name}: {last} -> {fails}")
+finally:
+    target.write_text(fixed)

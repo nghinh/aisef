@@ -1,0 +1,21 @@
+"""Finding (synthetic input, no client run): `aisef2/app/client.py::read_session` reads the client's JSON-lines event
+stream with `str.splitlines()`. JSON allows U+2028 / U+2029 raw inside a string (JSON.stringify writes them raw), so
+a `text` event whose text holds one is cut in two, neither half parses, and `except ValueError: continue` drops the
+event: the model's text is silently lost. usage: python3 -B -I this.txt TREE"""
+import json
+import pathlib
+import sys
+import tempfile
+
+sys.path.insert(0, sys.argv[1])
+from aisef2.app import client  # noqa: E402
+
+ev = lambda t: {"type": "text", "part": {"text": t}}  # noqa: E731
+step = {"type": "step_finish", "part": {"tokens": {"input": 7, "output": 3}}}
+with tempfile.TemporaryDirectory() as d:
+    for name, text in (("U+2028", "alpha" + chr(0x2028) + "beta"), ("U+2029", "alpha" + chr(0x2029) + "beta"),
+                       ("plain", "alpha beta")):
+        log = pathlib.Path(d, "events.jsonl")
+        log.write_text("\n".join([json.dumps(ev(text), ensure_ascii=False), json.dumps(step)]) + "\n", encoding="utf-8")
+        got = client.read_session(log)
+        print(f"{name:7} text events read: {got['text']!r:24} turns {got['turns']} tokens {got['tokens']}")

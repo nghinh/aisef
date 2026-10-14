@@ -1,0 +1,10 @@
+#!/bin/zsh
+SP=/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad
+R3=$SP/m21/r3; WT=$R3/wt/probes-rv; OUT=$R3/out/probes-rv
+cd $WT
+for n in 2 3 4 4b 5 5b 6 8 9 7; do
+  cp $R3/out/probes/repro-$n.py.txt $OUT/repro-$n.py
+  $SP/m21/kills3/py.sh probes-rv -I $OUT/repro-$n.py > $OUT/rv-repro-$n.out 2>&1
+  echo "done $n rc=$?" >> $OUT/runall.log
+done
+echo ALLDONE >> $OUT/runall.log

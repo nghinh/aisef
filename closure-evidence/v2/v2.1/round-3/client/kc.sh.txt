@@ -1,0 +1,9 @@
+#!/bin/zsh
+# kc.sh WORKER NAME TARGET FILE...: kill_check of TARGET with FILEs from the lean root kcroots/WORKER (its own worker
+# identity: the runner's worker is the hash of the root), JSON into out/client/kc-NAME.json
+SP=/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad
+OUT=$SP/m21/r3/out/client
+W=$1; NAME=$2; TARGET=$3; shift 3
+cd $SP/m21/r3/kcroots/$W || exit 2
+$SP/m21/kills3/py.sh client$W validation/v21/kill_check.py $TARGET "$@" --out $OUT/kc-$NAME.json > $OUT/kc-$NAME.log 2>&1
+echo "$NAME exit=$? $(grep -E '^# ' $OUT/kc-$NAME.log | cut -c1-200)" >> $OUT/kc-status-$W.txt

@@ -1,0 +1,24 @@
+#!/bin/zsh
+# final-tests.sh: every test module that imports or exercises aisef2/app/confine.py, one process each
+SP=/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad
+WT=$SP/m21/r3/wt/conf-fu
+OUT=$SP/m21/r3/out/conf-fu
+cd $WT || exit 2
+mkdir -p $OUT/final
+for m in tests.v2.test_v21_confine tests.v2.test_v21_defects_confine tests.v2.test_v21_r3_conf_policy tests.v2.test_v21_r3_conf_locale \
+  tests.v2.test_v21_r3_conf_rv_hostrows tests.v2.test_v21_r3_conf_fu_before \
+  tests.v2.test_v21_kills3_A05 tests.v2.test_v21_kills3_A06 tests.v2.test_v21_kills3_A07 tests.v2.test_v21_kills3_R02 \
+  tests.v2.test_v21_kills3_T05a tests.v2.test_v21_kills3_T05b tests.v2.test_v21_kills3_T05c tests.v2.test_v21_kills3_T06a \
+  tests.v2.test_v21_kills3_T06b tests.v2.test_v21_kills3_T07a tests.v2.test_v21_kills3_T07b tests.v2.test_v21_kills3_TO2 \
+  tests.v2.test_v21_kills3_T13a tests.v2.test_v21_kills3_T14b tests.v2.test_v21_kills3_T23a tests.v2.test_v21_kills3_T24a \
+  tests.v2.test_v21_kills3_T26a tests.v2.test_v21_continue_integrity tests.v2.test_v21_defects_bundleshape \
+  tests.v2.p0.test_destructive_authority tests.v2.p4.test_mutation_safety tests.v2.p5.test_invariants \
+  tests.v2.test_release_s2_kernel tests.v2.test_c2_p10_cohort_static tests.v2.test_p6_stages tests.v2.test_p6_orchestration \
+  tests.v2.p2.test_mutation_targets tests.v2.test_v21_mutation_record tests.v2.test_s2_mutation_record \
+  tests.v2.test_c2_k_nowork_001 tests.v2.test_v21_requalification tests.v2.test_v21_snapshot_delta; do
+  start=$(date +%s)
+  $SP/m21/kills3/py.sh conf-fu -m unittest $m > $OUT/final/$m.log 2>&1
+  code=$?
+  echo "$m exit $code $(( $(date +%s) - start ))s $(grep -E '^(Ran |OK|FAILED)' $OUT/final/$m.log | tr '\n' ' ')" >> $OUT/final.status
+done
+echo done >> $OUT/final.status

@@ -1,0 +1,16 @@
+#!/bin/zsh
+# guest-all.sh: the conf drivers and the confinement tests in the Linux guest at the follow-up's commit (one container each)
+SP=/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad
+R3=$SP/m21/r3
+OUT=$R3/out/conf-fu
+T=$OUT/trees/new
+G=$OUT/guest
+run() { n=$1; shift; $R3/guest.sh $T "$@" > $G/$n.out 2> $G/$n.err; echo "$n exit $?" >> $OUT/guest-all.status; }
+run scenarios-X1 X1 python3 -B /repo/validation/v21/sandbox/r3_conf_guest.py scenarios
+run scenarios-X1-shared-tree X1 python3 -B /repo/validation/v21/sandbox/r3_conf_guest.py shared-tree
+run locale-X1 X1 python3 -B /repo/validation/v21/sandbox/r3_conf_guest.py locale
+run review-X1 X1 python3 -B /repo/validation/v21/sandbox/r3_conf_review_guest.py
+run measure-host X1 env NETWORK=host PROFILE=X1 python3 -B /repo/validation/v21/sandbox/measure.py
+run measure-none X1 env NETWORK=none PROFILE=X1 python3 -B /repo/validation/v21/sandbox/measure.py
+run unittest-hardened hardened python3 -B -m unittest tests.v2.test_v21_r3_conf_fu_before tests.v2.test_v21_r3_conf_policy tests.v2.test_v21_r3_conf_rv_hostrows tests.v2.test_v21_r3_conf_locale tests.v2.test_v21_kills3_T07a tests.v2.test_v21_kills3_T06a tests.v2.test_v21_kills3_A06 tests.v2.test_v21_kills3_T05a tests.v2.test_v21_kills3_T05b tests.v2.test_v21_kills3_T05c tests.v2.test_v21_defects_confine tests.v2.test_v21_confine
+echo done >> $OUT/guest-all.status

@@ -1,0 +1,60 @@
+import json, pathlib, re, sys
+G = pathlib.Path(sys.argv[1]); E = pathlib.Path(sys.argv[2]); dest = pathlib.Path(sys.argv[3])
+tidy = lambda s: re.sub(r"/tmp/tmp[a-z0-9_]{8}/unrelated-(\d+)", r"<unrelated-\1>", s)
+norm = lambda s: re.sub(r"\[\d+\]", "[pid]", re.sub(r"\b0:\d+\b", "0:N", s))
+
+def reuse(path):
+    r = json.load(open(path))
+    out = {}
+    for name, x in r["record"].items():
+        ap = x["host_mounts_appeared"]
+        out[name] = {"extra_options": x["extra"], "unrelated_mounts_made_before_the_second_reading": x["flood_mounted"],
+                     "accepted": x["accepted"],
+                     "sandbox_super_blocks_taken_by_those_mounts": [{"dev": c["dev"], "sandbox_mount": c["sandbox_mount"]}
+                                                                    for c in x["collisions"]],
+                     "sandbox_super_blocks_the_table_before_held": x["collisions_with_the_reading_before"],
+                     "host_mounts_rows": x["host_mounts_rows"],
+                     "host_mounts_appeared": len(ap) if isinstance(ap, list) else ap,
+                     "problems": [tidy(p) for p in x["problems"]]}
+    return r["environment"], out
+
+env_old, old = reuse(G / "reuse-old.json")
+env_new, new = reuse(G / "reuse-new.json")
+scen = {}
+for mode, committed in (("scenarios-X1", "scenarios-X1.json"), ("scenarios-X1-shared-tree", "scenarios-X1-shared-tree.json")):
+    o = json.load(open(E / committed))["record"]
+    n = json.load(open(G / f"{mode}.out"))["record"]
+    scen[mode] = {name: {"problems_equal_to_the_committed_record_but_for_super_block_numbers_and_pids":
+                         [norm(p) for p in o[name]["report"]["problems"]] == [norm(p) for p in n[name]["report"]["problems"]],
+                         "accepted": not n[name]["report"]["problems"], "table_unchanged": n[name]["table_unchanged"],
+                         "host_mounts_appeared": n[name]["report"]["host_mounts_appeared"],
+                         "host_mounts_rows": len(n[name]["report"]["host_mounts"])} for name in sorted(o)}
+rv_old = json.load(open(E / "review-X1.json"))["record"]
+rv_new = json.load(open(G / "review-X1.out"))["record"]
+review = {k: {"accepted": rv_new[k]["accepted"], "same_verdict_and_problems_as_the_committed_record":
+              rv_new[k]["accepted"] == rv_old[k]["accepted"] and
+              [norm(p) for p in rv_new[k]["problems"]] == [norm(p) for p in rv_old[k]["problems"]],
+              "table_unchanged": rv_new[k]["table_unchanged"]} for k in sorted(rv_new)}
+loc = json.load(open(G / "locale-X1.out"))["record"]
+meas = {}
+for h in ("host", "none"):
+    m = json.load(open(G / f"measure-{h}.out"))["measure"]
+    meas[h] = {"problems": m["problems"], "locale": m["locale"],
+               "host_mounts_appeared": m["host_mounts_appeared"], "host_mounts_rows": len(m["host_mounts"])}
+ut = pathlib.Path(G / "unittest-hardened.err").read_text().splitlines()
+summary = [l for l in ut if l.startswith(("Ran ", "OK", "FAILED"))]
+json.dump({
+    "what": "B03-R3 conf follow-up (FU-CONF), real bubblewrap 0.12.0 in the Linux guest (profile X1; the unit tests under `hardened`), 2026-10-13",
+    "trees": {"before_the_change": "c05d19c (aisef2/app/confine.py of the review head: host_mounts = the union of two readings)",
+              "after_the_change": "5012420 (host_mounts = the reading before the session; host_mounts_appeared)"},
+    "environment": env_new, "environment_of_the_before_the_change_run_equal": env_old == env_new,
+    "reuse": {"driver": "validation/v21/sandbox/r3_conf_fu_guest.py reuse",
+              "meaning": "48 unrelated tmpfs file systems are mounted in the controller's mount namespace (a user and mount namespace of the container) in place of the second reading of the host's table, i.e. after the session ended; real bubblewrap, real probe, real kernel device numbers; the unrelated host activity is the driver's (simulated)",
+              "before_the_change": old, "after_the_change": new},
+    "scenarios_replayed_at_the_new_tree": scen,
+    "review_scenarios_replayed_at_the_new_tree": review,
+    "locale": {"problems": loc["report"]["problems"], "locale": loc["report"]["locale"], "os_environ_unchanged": loc["os_environ_unchanged"]},
+    "measure_py": meas,
+    "unittest_hardened": {"modules": "test_v21_r3_conf_fu_before test_v21_r3_conf_policy test_v21_r3_conf_rv_hostrows test_v21_r3_conf_locale T07a T06a A06 T05a T05b T05c defects_confine confine",
+                          "result": summary},
+}, open(dest, "w"), indent=1, sort_keys=True)

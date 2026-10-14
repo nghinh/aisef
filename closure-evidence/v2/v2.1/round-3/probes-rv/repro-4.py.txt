@@ -1,0 +1,95 @@
+# repro-4 (probes WP, item 2b — the other reading of "a fault before the subprocess"): an exception raised inside a
+# probe BEFORE its controller/child starts, or in the step that precedes the subprocess step: what result / exception it
+# produces, and whether a fault can come out as a verdict.
+#   [REAL]  = real inputs through the real entry point (observe / run_probe), nothing patched.
+#   [SIM]   = fault injection by monkeypatch (a SIMULATION: the fault is injected, the probe's own handlers are real).
+# Run from the worktree root:  py.sh probes -I <this file>
+import builtins
+import os
+import pathlib
+import sys
+import tempfile
+from unittest import mock
+
+sys.path.insert(0, os.getcwd())
+
+from aisef2.arch.enums import BehaviorVerdict, Enforcement, SubjectAbsence  # noqa: E402
+from aisef2.probe import cli_invocation as ci, process_effect as pe  # noqa: E402
+from aisef2.probe.protocol import ExecutionEnv, RevisionRef, run_probe  # noqa: E402
+from aisef2.product.spec import ProductProofSpec  # noqa: E402
+
+SHA = "89abcdef0123456789abcdef0123456789abcdef"
+ENV = ExecutionEnv(sys.executable, 20, Enforcement.PARTIAL)
+CLI = "import sys\n\n\ndef main(argv):\n    return 0\n\n\nif __name__ == '__main__':\n    sys.exit(main(sys.argv[1:]))\n"
+
+
+def checkout():
+    d = tempfile.mkdtemp(prefix="aisef2-r3-pre-")
+    pathlib.Path(d, "cli.py").write_text(CLI, encoding="utf-8", newline="\n")
+    return d
+
+
+def pe_spec(scenario):
+    return ProductProofSpec.create(
+        contract_id="BC-R3", probe_id=pe.PROBE_ID, probe_digest=pe.DIGEST,
+        probe_input={"subject": {"kind": "process_effect", "locator": "cli:main"}, "stimulus": {"scenario": scenario},
+                     "observable": {"files": {"<ws>/a.txt": {"absent": True}}, "within_s": 20},
+                     "subject_absence": SubjectAbsence.REQUIRES_SUBJECT.value},
+        candidate_expectation=BehaviorVerdict.SATISFIED, compiler_id="test", compiler_digest="c" * 64)
+
+
+def ci_spec(stimulus):
+    return ProductProofSpec.create(
+        contract_id="BC-R3", probe_id=ci.PROBE_ID, probe_digest=ci.DIGEST,
+        probe_input={"subject": {"kind": "cli_invocation", "locator": "cli:main"}, "stimulus": stimulus,
+                     "observable": {"exit_code": 0, "within_s": 20}, "subject_absence": SubjectAbsence.REQUIRES_SUBJECT.value},
+        candidate_expectation=BehaviorVerdict.SATISFIED, compiler_id="test", compiler_digest="c" * 64)
+
+
+def outcome(probe, spec, at, env=ENV):
+    try:
+        o = probe.observe(spec, at, env)
+        r = run_probe(probe, spec, at, env).result
+        return "%s verdict=%s -> %s%s | %s" % (o.kind.value, o.verdict.value if o.verdict else None, type(r).__name__,
+                                               "/" + r.status.value if hasattr(r, "status") else "", o.detail[:95])
+    except BaseException as e:
+        return "RAISED %s: %s   (nothing is returned: no Observation, no ProbeResult)" % (type(e).__name__, str(e)[:70])
+
+
+print("interpreter:", sys.version.split()[0], sys.platform)
+at = RevisionRef(SHA, checkout())
+
+print("\n== [REAL] inputs the admission accepts that the harness cannot honour")
+print("scratch dir that does not exist (process_effect):  ",
+      outcome(pe.ProcessEffectProbe(scratch=os.path.join(tempfile.gettempdir(), "aisef2-r3-no-such-dir", "x")),
+              pe_spec([{"step": "call", "args": [], "kwargs": {}}]), at))
+print("workspace names 'a' and 'a/b' (cli_invocation):    ",
+      outcome(ci.CliInvocationProbe(), ci_spec({"argv": [], "workspace": {"a": {"text": "x"}, "a/b": {"text": "y"}}}), at))
+print("NUL byte in a subprocess argv (process_effect):    ",
+      outcome(pe.ProcessEffectProbe(), pe_spec([{"step": "subprocess", "argv": ["-m", "cli", "a\x00b"]}]), at))
+print("fault -> subprocess whose module does not exist:   ",
+      outcome(pe.ProcessEffectProbe(), pe_spec([{"step": "fault", "fault": "os.replace"},
+                                                {"step": "subprocess", "argv": ["-m", "no_such_module"]}]), at))
+
+print("\n== [SIM] faults injected before the controller starts (cli_invocation and process_effect alike)")
+for mod, probe_cls, mk in ((pe, pe.ProcessEffectProbe, lambda: pe_spec([{"step": "call", "args": [], "kwargs": {}}])),
+                           (ci, ci.CliInvocationProbe, lambda: ci_spec({"argv": []}))):
+    print("-- " + mod.__name__)
+    cases = {
+        "_evaluation_dir raises OSError(ENOSPC)": lambda: mock.patch.object(mod, "_evaluation_dir", side_effect=OSError(28, "no space")),
+        "_prepare raises OSError(EACCES)": lambda: mock.patch.object(mod, "_prepare", side_effect=OSError(13, "denied")),
+        "_prepare raises ValueError": lambda: mock.patch.object(mod, "_prepare", side_effect=ValueError("embedded null byte")),
+        "ProcessRange.start raises OSError": lambda: mock.patch.object(mod.ProcessRange, "start", side_effect=OSError(24, "too many open files")),
+        "ProcessRange.start raises ValueError": lambda: mock.patch.object(mod.ProcessRange, "start", side_effect=ValueError("bad env")),
+    }
+    for label, patcher in cases.items():
+        with patcher():
+            print("   %-42s %s" % (label, outcome(probe_cls(), mk(), at)))
+    real_open = builtins.open
+
+    def failing_open(path, *a, **k):
+        if str(path).endswith("harness.log"):
+            raise OSError(24, "too many open files")
+        return real_open(path, *a, **k)
+    with mock.patch.object(builtins, "open", failing_open):
+        print("   %-42s %s" % ("open(harness.log) raises OSError(EMFILE)", outcome(probe_cls(), mk(), at)))

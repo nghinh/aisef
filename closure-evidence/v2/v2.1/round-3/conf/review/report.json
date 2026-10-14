@@ -1,0 +1,430 @@
+{
+ "wp": "conf",
+ "reviewer_branch": "v21r3/conf-rv",
+ "head": "c05d19ccd9ff918ed00ef209af113ee66b07a37e",
+ "implementer_head": "7b5d67f226ed3f2be9d8c9103501ecb6efecb35f",
+ "verdict": "ACCEPT_WITH_FIXES",
+ "owner_sentences": [
+  {
+   "sentence": "W1: developer chỉ được ghi vào workspace và các tài nguyên phục vụ thực thi được cho phép rõ ràng, cô lập theo phiên.",
+   "status": "MET",
+   "evidence": "_owned classes W (workspace, by path), D (six --dev nodes, by identity read inside + a --dev destination), P (a pseudo fs the sandbox made). Real bubblewrap 0.12.0 in the guest, re-run by the reviewer: baseline accepted, 13 writable mounts (workspace + 6 nodes + root/proc/dev/pts/tmp/home); measure.py NETWORK=host|none problems []."
+  },
+  {
+   "sentence": "W2: Không coi mọi mount ghi được ngoài workspace đều là vi phạm; cũng không miễn trừ chung cho devpts/mqueue.",
+   "status": "MET",
+   "evidence": "Real: a second --dev (devpts+tmpfs at /alt-dev) and --mqueue accepted; the container's devpts, mqueue, /dev, /dev/shm, /proc bound or shared refused by super block/source. The wrong implementations 'exempt by name and by place under /dev/' and 'exempt by place under /dev/' are killed (90 failing results of 122 and 4 failing tests respectively: wi/wi_driver G, wi2 o6)."
+  },
+  {
+   "sentence": "W3: Chỉ chấp nhận khi chứng minh được mount/namespace thuộc sandbox, không mở đường ghi vào host hoặc phiên khác và có vòng đời dọn dẹp phù hợp.",
+   "status": "PARTLY",
+   "evidence": "Proved: not the host's (super block absent from the controller's table read before and after the session, source = type's own name, no peer group of the host) and the namespaces are the session's own (existing check). NOT excluded by observation: a super block of another mount namespace than the controller's (another session's) bound in by a wrapper other than confine.wrap — unreachable through wrap (only the workspace is bound rw); the /proc/<pid>/root route was refused EACCES in the guest, so not demonstrated either way. Lifecycle rests on kernel behaviour not measured; proxies measured: host table unchanged after every session (12+12 recorded, 12+12+8 re-run), setsid_survivors [] — the doc says so."
+  },
+  {
+   "sentence": "W4: Đánh giá bằng loại filesystem, nguồn mount, mount options và namespace; không chỉ dựa vào tên hay vị trí dưới /dev/.",
+   "status": "PARTLY",
+   "evidence": "type (PSEUDO membership), source (== the type's name), namespace (own + the host's super blocks and peer groups) decide; mount options: only the per-mount ro/rw and the propagation fields decide, nosuid/nodev/noexec/super options are recorded and decide nothing (argument in doc §4.2: they do not change what a write can reach; not measured). The owner may want options to be a criterion."
+  },
+  {
+   "sentence": "W5: Trường hợp không xác định được phải từ chối hoặc báo chưa đủ điều kiện cách ly.",
+   "status": "PARTLY at 7b5d67f (one fail-open); MET at c05d19c",
+   "evidence": "A host table whose rows lacked dev/optional matched nothing and passed the host's own mqueue super block (and a None row crashed): demonstrated on the work package's code, fixed in 7ae03ed (tests/v2/test_v21_r3_conf_rv_hostrows.py). Every other unread field, unreadable host table, unread node is 'cannot establish ... isolation not established' (never a pass): the wrong implementations 'unknown passes', 'host table unreadable passes' and 'unknown reported as known' are killed (wi2 f1, f2; wi F)."
+  },
+  {
+   "sentence": "W6: Áp dụng chính sách này cho 4 mutant confine._judge, bổ sung kiểm chứng cho cả trường hợp được phép và trường hợp có khả năng ảnh hưởng ra ngoài sandbox.",
+   "status": "MET",
+   "evidence": "The four mutants (#142,#143,#157,#158) stood on the removed tuple; every mutant of the new names is killed (re-run). Allowed cases and could-reach-outside cases both have tests and real runs (policy_cases)."
+  },
+  {
+   "sentence": "L1: Tôi chọn locale C cho subprocess thu thập bằng chứng của confine.measure, nhằm có đầu ra phân tích ổn định.",
+   "status": "MET",
+   "evidence": "The probe and `bwrap --version` get LC_ALL=C LANG=C and no other LANG*/LC_*; real bubblewrap's env recorded (re-run) and the env INSIDE the real sandbox read (LANG=C LC_ALL=C; old derivation gave vi_VN.UTF-8). The other evidence subprocesses: the process table is /proc on Linux (no text), git's output is not parsed."
+  },
+  {
+   "sentence": "L2: Ghi nhận locale sử dụng trong metadata;",
+   "status": "MET",
+   "evidence": "rep['locale'] = the family actually passed (test_what_the_report_says_is_what_was_passed_down), next to bwrap_version; it goes to RUN.json with the whole report."
+  },
+  {
+   "sentence": "L3: không thay đổi locale toàn phiên của người dùng hoặc mặc nhiên áp dụng cho ứng dụng đang được kiểm thử.",
+   "status": "MET",
+   "evidence": "os.environ unchanged (asserted in PassedDown, AtTheExecBoundary and the real-guest record); wrap() not in the diff and a session's env keeps the caller's family (test_a_session_keeps_its_own_locale; wrong implementations l1, l7 killed)."
+  },
+  {
+   "sentence": "L4: Image chỉ có C/POSIX chưa đủ để kiểm chứng khác biệt. Dùng môi trường thử có locale khác hoặc phép thử kiểm tra chính xác môi trường được truyền xuống subprocess. Phân biệt rõ bằng chứng mô phỏng và thực chạy.",
+   "status": "MET (second alternative); a translated message NOT measured",
+   "evidence": "Exact environment handed down checked three ways, labelled simulated (subprocess.run recorder), simulated bubblewrap with real exec (stand-in executable) and real (recording wrapper around /usr/bin/bwrap, re-run). A translated message: not produced — the reviewer's attempt with a hand-built German libc.mo on a tmpfs over /usr/share/locale was not loaded by glibc 2.41 in the guest (dcgettext returned the msgid), inconclusive."
+  }
+ ],
+ "claims": [
+  {
+   "claim": "the old clause accepted all 12 measured command lines, nine of them write paths; the new one refuses those nine and accepts baseline, a second --dev, --mqueue",
+   "verdict": "CONFIRMED",
+   "note": "Re-ran scenarios in the guest (12 real sessions) and r3_conf_old_judge.py against 3dc827b: old accepts 12/12, tree refuses 9, same problems as the committed record; table_unchanged true in all. The --mqueue session is accepted by the WRITE clause only: it still carries 'mounted beyond what the wrapper names' (targets() does not know --mqueue) — the implementer says so."
+  },
+  {
+   "claim": "kill_check: 663 mutants of the changed/new names, 652 killed, 11 survived (the old campaign's audited survivors)",
+   "verdict": "CONFIRMED",
+   "note": "Re-ran in full: _owned 107, _writes 18, _host_mounts 16, _device_roots 6, PSEUDO 4, DEVICES 12, LOCALE 4, _DEV 1, _PEER 1, _mounts 44 = 213/213 killed. Re-ran the mutants on the changed lines of measure (36/36), _judge (40: 39 killed + audited #95) and the new lines of _probe (75/75). The 11 survivors reproduced SURVIVED. NOT re-run: the ~300 mutants of measure/_probe/_judge on unchanged lines."
+  },
+  {
+   "claim": "the 11 survivors are the old campaign's, each audited",
+   "verdict": "CONFIRMED",
+   "note": "Mapped 1:1 to SURVIVOR-AUDITS.json entries (_judge 92,97,125,126,128,129,132; _probe 110,167,175; measure 51); read each against the new source and followed the values to consumers; no counter-example found (see counter_examples)."
+  },
+  {
+   "claim": "locale: the real bubblewrap received LANG=C LC_ALL=C and no other LANG*/LC_*; os.environ unchanged",
+   "verdict": "CONFIRMED",
+   "note": "Re-ran locale mode (two bwrap calls, keys listed); also read the environment inside the sandbox (LANG=C LC_ALL=C; the earlier derivation gives LANG=vi_VN.UTF-8)."
+  },
+  {
+   "claim": "167 confinement tests green in the hardened guest",
+   "verdict": "CONFIRMED",
+   "note": "167 (skipped=1) at 7b5d67f; 170 with the review's test at the review head."
+  },
+  {
+   "claim": "bubblewrap 0.12.0 has --mqueue; the sandbox root row has root /newroot; Docker's device nodes are tmpfs rows",
+   "verdict": "CONFIRMED",
+   "note": "Rows read from the re-run records (/ root=/newroot; /dev/null tmpfs root=/null of the container's /dev 0:69)."
+  },
+  {
+   "claim": "a super block that is not the host's is the sandbox's own; host table read before AND after",
+   "verdict": "REVISED",
+   "note": "Sound for what wrap builds. 'After' also makes a correct session refusable when an unrelated host mount reuses a freed anonymous device number within the window before the second reading (fails closed, not observed). And a super block of another mount namespace is not the host's yet not the sandbox's (not excluded; unreachable via wrap)."
+  },
+  {
+   "claim": "(decision doc §4.2) class D: 'the option made it' — placed by a --dev option",
+   "verdict": "REVISED",
+   "note": "Accepted by identity under a --dev DESTINATION; which option placed the node is not observable: --dev-bind /dev/null /dev/null gives the same row and is accepted (real run). Doc corrected."
+  },
+  {
+   "claim": "lead's gloss: a mount that matches nothing is worded 'cannot establish', not 'writable'",
+   "verdict": "RECLASSIFIED",
+   "note": "A rw mount of a file system a wrapper cannot make is determined (host storage) and keeps the existing 'writable outside the workspace' text that existing tests pin; 'cannot establish' is for what was not read. Consistent with the owner's words."
+  },
+  {
+   "claim": "rep.host_mounts adds tens of KB to RUN.json",
+   "verdict": "CONFIRMED",
+   "note": "15 rows = 1 KB in the guest; the whole report 15 KB. Also new in RUN.json: inside.mounts rows carry root/source/options/super_options (super options can name an NFS/CIFS server or user) that decide nothing."
+  },
+  {
+   "claim": "no reader of rep.inside.mounts other than _judge/_writes and tests",
+   "verdict": "CONFIRMED",
+   "note": "grep over aisef2, validation, tests, docs; run.py/cli.py only store/print the report."
+  },
+  {
+   "claim": "the four 2.1 recorded measurements are no longer 'accepted' (T06a changed)",
+   "verdict": "CONFIRMED",
+   "note": "They hold no source/super block/host table: the judge's one problem is 'cannot establish' for each writable mount; the changed assertion pins exactly that and nothing else (at least as strict for every other check)."
+  },
+  {
+   "claim": "a translated message cannot be measured in the guest",
+   "verdict": "CONFIRMED",
+   "note": "No locale sources, no catalogues in the image (checked); a synthetic catalogue attempt was inconclusive."
+  }
+ ],
+ "defects_found": [
+  {
+   "what": "_owned: a host table whose rows lack the super block (dev) or peer groups (optional) matches nothing, so a writable pseudo mount is accepted even when it IS the host's (measured: the host's own mqueue 0:64 judged []); a row that is None crashes the judge. Reachable only through a hand-built or incomplete report, never through _host_mounts; violates the owner's fail-closed sentence.",
+   "severity": "low",
+   "fixed_in_commit": "7ae03ed (cause text pinned in c05d19c)"
+  },
+  {
+   "what": "decision doc §4.2 said class D is 'placed by --dev (the option made it)'; only identity under a --dev destination is observed",
+   "severity": "info",
+   "fixed_in_commit": "7ae03ed"
+  },
+  {
+   "what": "(review's own, caught by kill_check) the new reason's text could be emptied unnoticed — the operator would read '/mq: '",
+   "severity": "info",
+   "fixed_in_commit": "c05d19c"
+  }
+ ],
+ "counter_examples": [
+  {
+   "tried": "host table rows without dev / without optional / dev unparsed / a None row (judge over the work package's code)",
+   "result": "accepted the host's own mqueue; None row crashed -> defect 1, fixed",
+   "how": "unit"
+  },
+  {
+   "tried": "--dev-bind /dev/null /dev/null added",
+   "result": "ACCEPTED (identity decides; harmless: the same null device); doc corrected",
+   "how": "real-guest"
+  },
+  {
+   "tried": "--bind /dev/null /dev/x",
+   "result": "refused (container's /dev super block); the 3dc827b judge accepted it by place",
+   "how": "real-guest"
+  },
+  {
+   "tried": "controller's stdin is a pseudo terminal (could add a host /dev/console row)",
+   "result": "no /dev/console row with bwrap 0.12.0 + --new-session; accepted (also BASE accepted)",
+   "how": "real-guest"
+  },
+  {
+   "tried": "another mount namespace's tmpfs bound via /proc/<pid>/root",
+   "result": "bwrap: Can't find source path ... Permission denied (EACCES) — not demonstrated; remains a documented gap",
+   "how": "real-guest"
+  },
+  {
+   "tried": "operator read_only of /tmp, /run, /dev/shm, /dev/pts (layout outside /tmp)",
+   "result": "accepted, no false refusal",
+   "how": "real-guest"
+  },
+  {
+   "tried": "operator read_only of /dev",
+   "result": "refused by 'unshare: absent' and 'no find' (a read-only /dev/null stops the probe's redirects) — same problems at 3dc827b; the device section adds 'cannot establish' for the six nodes",
+   "how": "real-guest"
+  },
+  {
+   "tried": "24 wrong implementations of the policy and the locale (textual substitutions of confine.py: place/name exemptions, root must be '/', any shared tag refused, ro also judged, host match by dev+root, before-only/after-only host reading, devices by name only / anywhere / major only / any fs, probe -e for -c, extra probe name, locale in wrap/ os.environ / literal report / strip only two keys / version query inheriting env, unknown-passes, host-none-passes) plus 8 earlier ones (wi/wi_driver)",
+   "result": "every non-evidence test fails under at least one; 3 policy RecordedGuest tests and 2 locale RecordedGuest tests assert properties of the committed evidence, not of product code (cannot fail from a product change); the 4 HostTable tests and PassedDown.test_the_rest_of_the_environment_... are not reached by those substitutions but are killed by mutants of _host_mounts / measure (kill_check)",
+   "how": "simulated (in-memory substitution)"
+  },
+  {
+   "tried": "a translated message via a hand-built German libc.mo (valid per python gettext) on a tmpfs over /usr/share/locale, LC_ALL=C.UTF-8 LANGUAGE=de",
+   "result": "glibc 2.41 dcgettext returned the msgid: nothing translated, inconclusive",
+   "how": "real-guest"
+  }
+ ],
+ "mutants_rerun": [
+  {
+   "function": "aisef2/app/confine.py::_owned (7b5d67f)",
+   "run": 107,
+   "by_class": {
+    "KILLED": 107
+   },
+   "source_sha256": "375489e7f4d1abc502cb6720c37631ad52511711cdb47803e0ecefb009778249",
+   "scope": "all"
+  },
+  {
+   "function": "aisef2/app/confine.py::_owned (review head, with the 4 new lines)",
+   "run": 118,
+   "by_class": {
+    "KILLED": 118
+   },
+   "source_sha256": "f820ade474204aeaa955a00d7bfbb458f0ecf4a5dd0916ec5ca7358dc8308759",
+   "scope": "all (118: 107 + 11 on the new lines; first run had 1 survivor, the new reason's text, killed by pinning the cause)"
+  },
+  {
+   "function": "aisef2/app/confine.py::_writes",
+   "run": 18,
+   "by_class": {
+    "KILLED": 18
+   },
+   "source_sha256": "f820ade474204aeaa955a00d7bfbb458f0ecf4a5dd0916ec5ca7358dc8308759",
+   "scope": "all"
+  },
+  {
+   "function": "aisef2/app/confine.py::_host_mounts",
+   "run": 16,
+   "by_class": {
+    "KILLED": 16
+   },
+   "source_sha256": "375489e7f4d1abc502cb6720c37631ad52511711cdb47803e0ecefb009778249",
+   "scope": "all"
+  },
+  {
+   "function": "aisef2/app/confine.py::_device_roots",
+   "run": 6,
+   "by_class": {
+    "KILLED": 6
+   },
+   "source_sha256": "375489e7f4d1abc502cb6720c37631ad52511711cdb47803e0ecefb009778249",
+   "scope": "all"
+  },
+  {
+   "function": "aisef2/app/confine.py::PSEUDO",
+   "run": 4,
+   "by_class": {
+    "KILLED": 4
+   },
+   "source_sha256": "375489e7f4d1abc502cb6720c37631ad52511711cdb47803e0ecefb009778249",
+   "scope": "all"
+  },
+  {
+   "function": "aisef2/app/confine.py::DEVICES",
+   "run": 12,
+   "by_class": {
+    "KILLED": 12
+   },
+   "source_sha256": "375489e7f4d1abc502cb6720c37631ad52511711cdb47803e0ecefb009778249",
+   "scope": "all"
+  },
+  {
+   "function": "aisef2/app/confine.py::LOCALE",
+   "run": 4,
+   "by_class": {
+    "KILLED": 4
+   },
+   "source_sha256": "375489e7f4d1abc502cb6720c37631ad52511711cdb47803e0ecefb009778249",
+   "scope": "all"
+  },
+  {
+   "function": "aisef2/app/confine.py::_DEV",
+   "run": 1,
+   "by_class": {
+    "KILLED": 1
+   },
+   "source_sha256": "375489e7f4d1abc502cb6720c37631ad52511711cdb47803e0ecefb009778249",
+   "scope": "all"
+  },
+  {
+   "function": "aisef2/app/confine.py::_PEER",
+   "run": 1,
+   "by_class": {
+    "KILLED": 1
+   },
+   "source_sha256": "375489e7f4d1abc502cb6720c37631ad52511711cdb47803e0ecefb009778249",
+   "scope": "all"
+  },
+  {
+   "function": "aisef2/app/confine.py::_mounts",
+   "run": 44,
+   "by_class": {
+    "KILLED": 44
+   },
+   "source_sha256": "375489e7f4d1abc502cb6720c37631ad52511711cdb47803e0ecefb009778249",
+   "scope": "all"
+  },
+  {
+   "function": "aisef2/app/confine.py::measure",
+   "run": 36,
+   "by_class": {
+    "KILLED": 36
+   },
+   "source_sha256": "375489e7f4d1abc502cb6720c37631ad52511711cdb47803e0ecefb009778249",
+   "scope": "the 36 mutants on the changed lines (of 60)"
+  },
+  {
+   "function": "aisef2/app/confine.py::_probe",
+   "run": 75,
+   "by_class": {
+    "KILLED": 75
+   },
+   "source_sha256": "375489e7f4d1abc502cb6720c37631ad52511711cdb47803e0ecefb009778249",
+   "scope": "the 75 mutants on the new lines (of 215)"
+  },
+  {
+   "function": "aisef2/app/confine.py::_judge",
+   "run": 40,
+   "by_class": {
+    "KILLED": 39,
+    "SURVIVED": 1
+   },
+   "source_sha256": "375489e7f4d1abc502cb6720c37631ad52511711cdb47803e0ecefb009778249",
+   "scope": "the 40 mutants on the changed lines (of 175); the 1 survivor is audited #95"
+  },
+  {
+   "function": "aisef2/app/confine.py::measure survivors",
+   "run": 1,
+   "by_class": {
+    "SURVIVED": 1
+   },
+   "source_sha256": "375489e7f4d1abc502cb6720c37631ad52511711cdb47803e0ecefb009778249",
+   "scope": "[49] reproduced SURVIVED: EQUIVALENT confirmed (wrap raises on its first statement for the same predicate)"
+  },
+  {
+   "function": "aisef2/app/confine.py::_probe survivors",
+   "run": 3,
+   "by_class": {
+    "SURVIVED": 3
+   },
+   "source_sha256": "375489e7f4d1abc502cb6720c37631ad52511711cdb47803e0ecefb009778249",
+   "scope": "[130,197,207] reproduced SURVIVED: AUDITED/EQUIVALENT confirmed, no counter-example"
+  },
+  {
+   "function": "aisef2/app/confine.py::_judge survivors",
+   "run": 7,
+   "by_class": {
+    "SURVIVED": 7
+   },
+   "source_sha256": "375489e7f4d1abc502cb6720c37631ad52511711cdb47803e0ecefb009778249",
+   "scope": "[95,100,135,136,138,139,142] reproduced SURVIVED: AUDITED/EQUIVALENT confirmed, no counter-example"
+  }
+ ],
+ "false_refusal_search": {
+  "real_runs_guest": "12 scenarios + shared-tree + locale + measure.py (host/none) re-run: every correctly confined session accepted; read_only /tmp,/run,/dev/shm,/dev/pts accepted; stdin terminal accepted.",
+  "intended_consequence": "The four 2.1 recorded measurements (no source, no super block, no host table) are 'cannot establish' for each writable mount — they cannot show ownership; new measurements carry the data.",
+  "pre_existing": "read_only ['/dev'] is refused at 3dc827b too (unshare absent, no find).",
+  "residual": "an unrelated host mount reusing a just-freed anonymous device number between the session's end and the 'after' reading would refuse a correct session as 'the host's' (fails closed; not observed; ms window). A wrapper that makes an overlay (--overlay/--tmp-overlay) or a path with a space/tab/backslash as a --dev destination would be refused/'not established' (wrap does neither).",
+  "interpreters": "new tests pass under Python 3.14.7 (host), 3.12.14 (host) and the guest's 3.14.8; the changed files parse with feature_version 3.11; 3.11/3.13 interpreters not available.",
+  "windows": "read, not run: PassedDown/AtTheExecBoundary/DevicesSection are skipUnless posix; HostTable patches Path.read_text; no hard-coded /tmp in assertions."
+ },
+ "real_vs_simulated_corrections": [
+  {
+   "where": "decisions/B03-R3-conf.md §4.2 class D",
+   "was": "'(the option made it)'",
+   "now": "a --dev option names the directory the node lies in; which option placed it is not observable; identity decides"
+  },
+  {
+   "where": "test_v21_r3_conf_policy.RecordedGuest (3 tests) and test_v21_r3_conf_locale.RecordedGuest (2)",
+   "was": "listed as tests of the policy / locale",
+   "now": "they pin properties of the committed evidence files (record consistency); they cannot catch a product regression — the product is covered by the unit/simulated classes and the other RecordedGuest tests that re-judge the records"
+  },
+  {
+   "where": "report.json policy_cases 'how_verified: unit' for the probe's devices section",
+   "was": "unit",
+   "now": "real shell and stat on the test host, simulated mount table (doc §8 already says so)"
+  },
+  {
+   "where": "report.json policy_cases for --mqueue",
+   "was": "'accepted'",
+   "now": "the write clause accepts; the session as a whole still carries 'mounted beyond' (--mqueue unknown to targets())"
+  }
+ ],
+ "test_runs": [
+  {
+   "what": "ruff check . (whole tree) at the review head",
+   "result": "All checks passed"
+  },
+  {
+   "what": "tests of confine modules on the host (py.sh): r3_conf_policy 42, r3_conf_locale 10, r3_conf_rv_hostrows 3, test_v21_confine 34, defects_confine 16, kills3 A05 6 A06 4 A07 5 R02 2 T05a 8 T05b 18 T05c 7 T06a 14 T06b 8 T07a 14 T07b 11(skip 1) TO2 3",
+   "result": "all OK"
+  },
+  {
+   "what": "p0.test_destructive_authority, p4.test_mutation_safety at 7b5d67f and at the review head",
+   "result": "13 OK, 10 OK (both)"
+  },
+  {
+   "what": "the same confinement set in the guest, profile hardened, at 7b5d67f / at the review head",
+   "result": "167 OK (skipped=1) / 170 OK (skipped=1)"
+  },
+  {
+   "what": "modules that import app code (T13a, T14b, T23a, T24a, T26a, defects_bundleshape, p5.test_invariants, release_s2_kernel, p6_stages, c2_p10_cohort_static, p6_orchestration, continue_integrity) at 7b5d67f",
+   "result": "all OK"
+  },
+  {
+   "what": "the same modules at the review head, plus p2.test_mutation_targets, test_v21_mutation_record, test_s2_mutation_record, test_v21_requalification, test_v21_snapshot_delta",
+   "result": "all OK (continue_integrity 24 in 234 s, p6_orchestration 32, snapshot_delta 51, mutation_targets 4, mutation_record 7)"
+  },
+  {
+   "what": "tests.v2.test_c2_k_nowork_001 at the review head",
+   "result": "FAILED (failures=1): 'the kernel changed since the record: kernel.after.kernel_digest is not this tree's aisef2' — EXPECTED stale (the record binds the kernel tree; the lead regenerates), as at 7b5d67f"
+  },
+  {
+   "what": "Python 3.12.14 over the policy/locale/T05a/T05b/T06a/T07a/A06/defects modules",
+   "result": "126 OK"
+  },
+  {
+   "what": "t0_check on the review's test file",
+   "result": "PASS"
+  }
+ ],
+ "remaining_risks": [
+  "A super block of another mount namespace than the controller's, bound in by a wrapper other than confine.wrap, is not excluded (documented; wrap binds only the workspace rw; not demonstrable in the guest).",
+  "The lifecycle claim rests on kernel behaviour not measured (a tmpfs/devpts/proc/mqueue super block lives with the namespace); proxies measured; a host process holding /proc/<pid>/ns/mnt of the session would keep it alive.",
+  "Only Docker Desktop's LinuxKit 7.0.12 + bubblewrap 0.12.0 was run: not a bare-metal or systemd host, not CI Linux; older bubblewrap versions may place other nodes (e.g. /dev/console) — not run.",
+  "The 'after' reading of the host's table can refuse a correct session when an unrelated host mount reuses a freed device number in the milliseconds after the session (fails closed).",
+  "A translated message is not measured; C locale is chosen so none need be.",
+  "RUN.json now carries every mount point of the host (host_mounts) and mount/super options of the sandbox's rows (they can name servers or users).",
+  "targets() does not know --mqueue/--dev-bind: a future wrapper using them is 'mounted beyond'."
+ ],
+ "decisions_needed": [
+  "Owner: are mount options other than ro/rw (nosuid, nodev, noexec, super options) and the propagation fields to be an acceptance criterion? Today they are recorded and decide nothing (W4 PARTLY).",
+  "Lead/owner: keep rep.host_mounts (all host mount points) and inside.mounts super_options in RUN.json, or elide them from RUN.json and keep them in the measurement's own evidence.",
+  "Owner: device allowance by identity on ANY file system (implementer's decision #1) — unchanged here; the review shows --dev-bind of the same device is accepted (harmless).",
+  "Lead: whether to mitigate the 'after' reading's device-number reuse (e.g. judge 'the host's' by the before reading and use 'after' only for leak detection of rows named under the sandbox) or accept the millisecond window.",
+  "Lead: register the new names (_owned, _writes, _host_mounts, _device_roots, PSEUDO, DEVICES, LOCALE, _DEV, _PEER) and the kill files; tests/v2/test_v21_r3_conf_rv_hostrows.py kills _owned's new lines (append it last for _owned)."
+ ]
+}

@@ -1,0 +1,130 @@
+{
+ "target": "validation/v2/cleanup_authority.py::_win_rows",
+ "files": [
+  "tests/v2/test_v21_r3_auth_ps_table.py",
+  "tests/v2/test_v21_r3_auth_other_readers.py"
+ ],
+ "source_sha256": "52bfcbdc60c362b8966dbbf414beba593eaf41330fce9d94c4809397bfbf6d5e",
+ "t0": [
+  {
+   "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+   "seconds": 0.75,
+   "outcome": "PASS",
+   "ran": 29
+  },
+  {
+   "file": "tests/v2/test_v21_r3_auth_other_readers.py",
+   "seconds": 2.0,
+   "outcome": "PASS",
+   "ran": 34
+  }
+ ],
+ "error": null,
+ "results": [
+  {
+   "index": 0,
+   "mutant": "L193 returns None",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_other_readers.py",
+   "first": "ERROR: test_a_command_holding_any_character_is_one_row_with_the_whole_command (v2.test_v21_r3_auth_other_readers.WindowsTable.test_a_command_holding_any_character_is_one_row_with_the_whole_command) (sep=\"'\\\\u2028'\") | TypeError"
+  },
+  {
+   "index": 1,
+   "mutant": "L183 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_other_readers.py",
+   "first": "ERROR: test_a_command_holding_any_character_is_one_row_with_the_whole_command (v2.test_v21_r3_auth_other_readers.WindowsTable.test_a_command_holding_any_character_is_one_row_with_the_whole_command) (sep=\"'\\\\u2028'\") | cleanup_authority.TableUnreadable"
+  },
+  {
+   "index": 2,
+   "mutant": "L190 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_other_readers.py",
+   "first": "ERROR: test_a_command_holding_any_character_is_one_row_with_the_whole_command (v2.test_v21_r3_auth_other_readers.WindowsTable.test_a_command_holding_any_character_is_one_row_with_the_whole_command) (sep=\"'\\\\u2028'\") | cleanup_authority.TableUnreadable"
+  },
+  {
+   "index": 3,
+   "mutant": "L183 Is->IsNot",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_other_readers.py",
+   "first": "ERROR: test_a_command_holding_any_character_is_one_row_with_the_whole_command (v2.test_v21_r3_auth_other_readers.WindowsTable.test_a_command_holding_any_character_is_one_row_with_the_whole_command) (sep=\"'\\\\u2028'\") | cleanup_authority.TableUnreadable"
+  },
+  {
+   "index": 4,
+   "mutant": "L185 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_other_readers.py",
+   "first": "ERROR: test_a_command_holding_any_character_is_one_row_with_the_whole_command (v2.test_v21_r3_auth_other_readers.WindowsTable.test_a_command_holding_any_character_is_one_row_with_the_whole_command) (sep=\"'\\\\u2028'\") | ValueError"
+  },
+  {
+   "index": 5,
+   "mutant": "L185 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_other_readers.py",
+   "first": "ERROR: test_a_command_holding_any_character_is_one_row_with_the_whole_command (v2.test_v21_r3_auth_other_readers.WindowsTable.test_a_command_holding_any_character_is_one_row_with_the_whole_command) (sep=\"'\\\\u2028'\") | ValueError"
+  },
+  {
+   "index": 6,
+   "mutant": "L185 element 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_other_readers.py",
+   "first": "ERROR: test_a_command_holding_any_character_is_one_row_with_the_whole_command (v2.test_v21_r3_auth_other_readers.WindowsTable.test_a_command_holding_any_character_is_one_row_with_the_whole_command) (sep=\"'\\\\u2028'\") | ValueError"
+  },
+  {
+   "index": 7,
+   "mutant": "L185 element 3 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_other_readers.py",
+   "first": "ERROR: test_a_command_holding_any_character_is_one_row_with_the_whole_command (v2.test_v21_r3_auth_other_readers.WindowsTable.test_a_command_holding_any_character_is_one_row_with_the_whole_command) (sep=\"'\\\\u2028'\") | ValueError"
+  },
+  {
+   "index": 8,
+   "mutant": "L190 In->NotIn",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_other_readers.py",
+   "first": "ERROR: test_a_command_holding_any_character_is_one_row_with_the_whole_command (v2.test_v21_r3_auth_other_readers.WindowsTable.test_a_command_holding_any_character_is_one_row_with_the_whole_command) (sep=\"'\\\\u2028'\") | cleanup_authority.TableUnreadable"
+  },
+  {
+   "index": 9,
+   "mutant": "L184 string 'powershell' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_other_readers.py",
+   "first": "FAIL: test_every_line_that_is_no_row_refuses_the_reading (v2.test_v21_r3_auth_other_readers.WindowsTable.test_every_line_that_is_no_row_refuses_the_reading) (bad='a raw command line, not encoded') | AssertionError"
+  },
+  {
+   "index": 10,
+   "mutant": "L187 string 'utf-8' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_other_readers.py",
+   "first": "ERROR: test_a_command_holding_any_character_is_one_row_with_the_whole_command (v2.test_v21_r3_auth_other_readers.WindowsTable.test_a_command_holding_any_character_is_one_row_with_the_whole_command) (sep=\"'\\\\u2028'\") | LookupError"
+  },
+  {
+   "index": 11,
+   "mutant": "L187 string 'replace' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_other_readers.py",
+   "first": "ERROR: test_the_command_is_utf8_and_a_byte_that_is_not_is_replaced (v2.test_v21_r3_auth_other_readers.WindowsTable.test_the_command_is_utf8_and_a_byte_that_is_not_is_replaced) | LookupError"
+  },
+  {
+   "index": 12,
+   "mutant": "L191 string 'powershell' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_other_readers.py",
+   "first": "FAIL: test_a_pid_listed_twice_is_refused (v2.test_v21_r3_auth_other_readers.WindowsTable.test_a_pid_listed_twice_is_refused) | AssertionError"
+  },
+  {
+   "index": 13,
+   "mutant": "L189 string 'powershell' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_other_readers.py",
+   "first": "FAIL: test_every_line_that_is_no_row_refuses_the_reading (v2.test_v21_r3_auth_other_readers.WindowsTable.test_every_line_that_is_no_row_refuses_the_reading) (bad='base64 with a bad pad') | AssertionError"
+  },
+  {
+   "index": 14,
+   "mutant": "L187 True->False",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_other_readers.py",
+   "first": "FAIL: test_every_line_that_is_no_row_refuses_the_reading (v2.test_v21_r3_auth_other_readers.WindowsTable.test_every_line_that_is_no_row_refuses_the_reading) (bad='base64 with a bad pad') | AssertionError"
+  }
+ ]
+}

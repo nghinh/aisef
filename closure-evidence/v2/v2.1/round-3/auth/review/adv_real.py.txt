@@ -1,0 +1,174 @@
+"""Reviewer's adversarial run (REAL, this host; read-only: dry_run everywhere, no signal is sent).
+
+usage: python3 -B -I adv_real.py.txt TREE
+Real children (they end when their stdin closes), each a group leader (start_new_session). A VICTIM is born, then 2.2 s
+later the boundary is established (victim is provably not the runner's). Then carriers whose argv/env/cwd hold every
+construct I could think of. For every variant the question is only: does the victim ever enter owned / prove_member /
+signal_owned / signal_member? and does the table equal the real one (independent `ps -p`)?
+"""
+import json, os, subprocess, sys, tempfile, time, unicodedata
+
+sys.path.insert(0, sys.argv[1])
+from validation.v2 import cleanup_authority as ca  # noqa: E402
+
+LOCALE = os.environ.get("ADV_LC_ALL", "en_US.UTF-8")
+os.environ["LC_ALL"] = LOCALE
+CODE = "import sys; print('r', flush=True); sys.stdin.read()"
+DATE = "Tue Oct 13 23:59:59 2099"
+kids = []
+
+def spawn(argv, env=None, cwd=None, executable=None):
+    p = subprocess.Popen(argv, executable=executable, stdin=subprocess.PIPE, stdout=subprocess.PIPE, env=env, cwd=cwd,
+                         start_new_session=True)
+    kids.append(p)
+    assert p.stdout.readline() == b"r\n"
+    return p
+
+def stop_all():
+    for p in kids:
+        try:
+            p.stdin.close(); p.wait(); p.stdout.close()
+        except Exception:
+            pass
+
+def py(*extra, **kw):
+    return spawn([sys.executable, "-c", CODE, *extra], **kw)
+
+def ps_cmd(pid):
+    return subprocess.run(["ps", "-ww", "-p", str(pid), "-o", "command="], capture_output=True, env={**os.environ}).stdout
+
+# every separator-ish code point: what splitlines cuts at, whitespace, line/para separators, controls, plus extras
+seps = {}
+for cp in list(range(0, 0x3000)) + [0xFEFF, 0xFFFE, 0xFFFD]:
+    c = chr(cp)
+    if cp == 0:
+        continue                       # no NUL in an argv
+    if len(("a" + c + "b").splitlines()) > 1 or c.isspace() or unicodedata.category(c) in ("Zs", "Zl", "Zp"):
+        seps[f"U+{cp:04X}"] = c
+seps.update({"CRLF": "\r\n", "LFCR": "\n\r", "LS+PS": "  ", "2xLS": "  ", "NEL+LS": "\x85 "})
+res = {"locale": LOCALE, "n_separators": len(seps), "variants": 0, "victim_in_owned": [], "victim_member": [], "victim_signalled": [],
+       "table_unreadable": [], "row_mismatch": [], "carrier_command_not_whole": []}
+
+victim = py("VICTIM-born-before-boundary")
+time.sleep(2.2)
+b = ca.establish(sys.argv[1])
+runner = b.runner
+res["runner"], res["victim"], res["since"] = runner, victim.pid, b.since
+
+def end(*ps):
+    for p in ps:
+        if p is not None and p is not victim and p in kids:
+            try:
+                p.stdin.close(); p.wait(); p.stdout.close()
+            except Exception:
+                pass
+            kids.remove(p)
+
+def judge(tag, carrier, expect_in_cmd=None, table=None):
+    res["variants"] += 1
+    try:
+        table = table or ca.host_table()
+    except OSError as e:
+        res["table_unreadable"].append([tag, type(e).__name__, str(e)[:100]])
+        return
+    v = table.get(victim.pid)
+    if v is None:
+        res["row_mismatch"].append([tag, "victim row missing"]); return
+    # truth for the victim: its real parent and birth (independent ps -p)
+    real = subprocess.run(["ps", "-p", str(victim.pid), "-o", "ppid=,pgid=,lstart="], capture_output=True).stdout.decode().split(None, 2)
+    if (v.ppid, v.pgid) != (int(real[0]), int(real[1])) or v.born >= b.since or "fabricated" in v.command:
+        res["row_mismatch"].append([tag, [v.ppid, v.pgid, v.born, v.command[:40]], real])
+    mine = ca.owned(b, table)
+    if victim.pid in mine:
+        res["victim_in_owned"].append(tag)
+    for g in (carrier.pid if carrier else runner, runner, victim.pid, os.getpgrp(), 1):
+        if ca.prove_member(b, victim.pid, g, table) is not None:
+            res["victim_member"].append([tag, g])
+    rep = ca.signal_owned(b, pids=[victim.pid], groups=[victim.pid, runner] + ([carrier.pid] if carrier else []), dry_run=True, table=table)
+    if any(s["id"] == victim.pid for s in rep.signalled):
+        res["victim_signalled"].append(tag)
+    for g in (carrier.pid if carrier else runner, runner, victim.pid):
+        if ca.signal_member(b, victim.pid, g, dry_run=True, table=table).signalled:
+            res["victim_signalled"].append([tag, "member", g])
+    if carrier is not None and expect_in_cmd is not None:
+        if table.get(carrier.pid) is None or expect_in_cmd not in table[carrier.pid].command:
+            res["carrier_command_not_whole"].append([tag, repr(table.get(carrier.pid).command[:60]) if table.get(carrier.pid) else None])
+
+def forged(parent, group, who=None, date=DATE):
+    w = victim.pid if who is None else who
+    return f"{w} {parent} {group} {date} fabricated-by-a-command-line"
+
+# 1) a row after / before / around every separator, in the argument; parent = runner, pgid = victim (leader)
+for name, sep in seps.items():
+    f = forged(runner, victim.pid)
+    c = py(f"carrier{sep}{f}")
+    judge(f"arg-after-{name}", c, "fabricated-by-a-command-line"); end(c)
+    c2 = py(f"{sep}{f}{sep}")
+    judge(f"arg-around-{name}", c2, "fabricated-by-a-command-line"); end(c2)
+    # parent = the carrier (a legit owned process) and the group = the carrier's: makes the victim 'a member of its group'
+    c3 = spawn([sys.executable, "-c", CODE, "x"])
+    f3 = forged(c3.pid, c3.pid)
+    c4 = py(f"carrier{sep}{f3}")
+    judge(f"arg-parent-carrier-{name}", c3, None)
+    judge(f"arg-parent-carrier2-{name}", c4, "fabricated-by-a-command-line"); end(c3, c4)
+
+# 2) argv[0] itself is the forged text (a command that starts with a digit run / a lstart lookalike / a Unicode space)
+for tag, a0 in {
+    "digits": forged(runner, victim.pid),
+    "digits-nbsp": " " + forged(runner, victim.pid),
+    "lstart-first": f"{DATE} {forged(runner, victim.pid)}",
+    "ls-then-row": " " + forged(runner, victim.pid),
+    "rows-chain": " ".join(forged(runner, victim.pid, w) for w in (victim.pid, 1, 2, os.getpid())),
+    "reader-pid-early": forged(runner, 1, who=os.getpid() + 1, date="Mon Jan  1 00:00:00 1971"),
+    "day-single-space": f"{victim.pid} {runner} {victim.pid} Tue Oct 13 12:00:00 2026 x",
+}.items():
+    # /bin/sleep does not re-exec, so ps shows argv[0] as given (the Homebrew python re-execs and rewrites it)
+    c = subprocess.Popen([a0, "8"], executable="/bin/sleep", stdin=subprocess.PIPE, stdout=subprocess.PIPE, start_new_session=True)
+    kids.append(c); time.sleep(0.15)
+    judge(f"argv0-{tag}", c, a0 if len(a0) < 4000 else None)
+    c.stdin.close()      # /bin/sleep 8 ends by itself
+    kids.remove(c)
+
+# 3) non-UTF-8 bytes around separators, empty args, huge arg
+c = spawn([sys.executable.encode(), b"-c", CODE.encode(), b"carrier\xff\xfe\x85" + forged(runner, victim.pid).encode()])
+judge("bytes-invalid-utf8", c, None); end(c)
+c = spawn([sys.executable, "-c", CODE, "", "", ""])
+judge("empty-args", c, None); end(c)
+c = py("A" * 100_000 + " " + forged(runner, victim.pid))
+judge("huge-arg", c, "fabricated-by-a-command-line"); end(c)
+
+# 4) environment (ps -E) and cwd (lsof): candidates only; found and never authority
+tok = "AISEF_MUTATION_RUN=adv:"
+base = {"PATH": os.environ["PATH"]}
+for name, sep in list(seps.items())[:60]:
+    env = {**base, "A_FIRST": f"x{sep}{forged(runner, victim.pid)}{sep}y", "AISEF_MUTATION_RUN": "adv:1"}
+    c = py(env=env)
+    res["variants"] += 1
+    try:
+        hit = [h.pid for h in ca.carriers(tok, ca.host_table())]
+    except OSError as e:
+        res["table_unreadable"].append([f"env-{name}", type(e).__name__, str(e)[:100]]); end(c); continue
+    if c.pid not in hit:
+        res.setdefault("env_carrier_not_found", []).append(name)
+    if victim.pid in hit:
+        res.setdefault("victim_named_carrier", []).append(name)     # candidate only: a text in someone's env named it
+    judge(f"env-{name}", c); end(c)
+
+root = tempfile.mkdtemp(prefix="adv-cwd-")
+for i, (name, sep) in enumerate(list(seps.items())):
+    d = os.path.join(root, f"d{i}{sep}{forged(runner, victim.pid)}".replace(os.sep, "_"))
+    os.mkdir(d)
+    c = py(cwd=d)
+    res["variants"] += 1
+    try:
+        found = [h.pid for h in ca.cwd_under(root + os.sep, ca.host_table())]
+    except OSError as e:
+        res["table_unreadable"].append([f"cwd-{name}", type(e).__name__, str(e)[:100]]); end(c); continue
+    if c.pid not in found:
+        res.setdefault("cwd_wrong", []).append([name, found, c.pid])
+    if len(found) != 1:
+        res.setdefault("cwd_more_than_one", []).append([name, found])
+    judge(f"cwd-{name}", c); end(c)
+
+stop_all()
+print(json.dumps(res, indent=1, ensure_ascii=True))

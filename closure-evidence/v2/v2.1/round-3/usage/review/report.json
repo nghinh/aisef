@@ -1,0 +1,505 @@
+{
+ "wp": "usage",
+ "reviewer_branch": "v21r3/usage-rv",
+ "head": "5315a6668100396f2014a09473952857531cfd67",
+ "owner_sentences": [
+  {
+   "sentence": "Không phê chuẩn 'miền A' chỉ dựa vào tên phương án.",
+   "status": "MET",
+   "evidence": "Domain A is tested against the principle, not the name: the reader (format3.reconstruct) folds no projection; BASE verify returned VERIFIED + delivery PASS for a chained, schema-valid journal that commits twice or commits with no admission (re-run with the boundary disabled: journal_events 8 and 10); the projections admit a committed attempt that observed failures (re-run enumeration: 18,952 of 100,337 admitted one-story journals break INV-A)."
+  },
+  {
+   "sentence": "Tôi chọn nguyên tắc: Miền hành vi phải bao phủ mọi journal hợp lệ mà các đường sản phẩm được hỗ trợ có thể đưa đến no_progress, gồm run, continue, verify và import/migrate nếu có.",
+   "status": "MET",
+   "evidence": "Callers of no_progress: run.py:495 and verify.py:194 only (grep over aisef, aisef2, bin, validation, docs). Continue: the child's own fresh journal; bundle continue/lineage.events_of/repair/sentinel read journals and never reach it. No import path exists; bundle migrate reads and writes bundles. 'Valid' is defined as admitted by the six projections (the writer's Authority); the function answers every such journal (enumeration, re-run one story <= 10 events: new == independent oracle on 100,337; tests in test_v21_r3_usage_no_progress). Residual: late failures (D-LATE) are answered by ignoring them, a choice the owner may revisit."
+  },
+  {
+   "sentence": "Journal không hợp lệ phải được kiểm tra và từ chối ở ranh giới xác định.",
+   "status": "MET",
+   "evidence": "verify._projection_refusal folds the six PROJECTIONS (Folder.advance, the writer's own step) right after reconstruct; first refusal -> one REFUTED finding naming projection, event type, seq and reason; journal_events 0. 8 refusal classes tested through real verify and the CLI (exit 1); my extra test shows it holds for a record with no usage account. The other readers (bundle continue, lineage.events_of, repair) do not refuse; none reaches no_progress (D-READERS stays open)."
+  },
+  {
+   "sentence": "Đối chiếu nguyên tắc này với hồ sơ mutation/no_progress-13-23.md.",
+   "status": "MET",
+   "evidence": "Decision doc §2 checks each dossier claim; I re-checked F1 (BASE kill_check: 33 mutants, 31 KILLED, 13 and 23 SURVIVED), F2 (_fail is the only writer of failure/observed), F3 (projections admit failure then commit), F4 (BASE verify VERIFIED+PASS), F5 (two callers)."
+  },
+  {
+   "sentence": "Nếu miền A đáp ứng thì áp dụng và ghi rõ phạm vi. Nếu không, sửa đề xuất theo nguyên tắc trên.",
+   "status": "MET",
+   "evidence": "A does not satisfy the principle; the proposal was revised: commit is no longer a closer, a story/begin clears what the story observed since its last outcome, and verify refuses what the projections refuse. No verify-only rule (INV-A is answered by the function)."
+  },
+  {
+   "sentence": "Không dùng 'kernel hiện tại không sinh ra' làm căn cứ duy nhất để loại một đầu vào mà reader vẫn chấp nhận.",
+   "status": "MET",
+   "evidence": "Every input the reader accepts is either answered by no_progress (projection-admitted) or refused by name at verify (projection-refused); none is excluded because the story runner does not write it. The one premise left (no event of type '') is the reader's refusal in every format, tested (EmptyType) with a faithful-encoder control."
+  },
+  {
+   "sentence": "Không xem thử nhiều journal là chứng minh tương đương.",
+   "status": "MET",
+   "evidence": "No equivalence is claimed from sampling. The enumeration is labelled conformance evidence against a second statement of the requirement by the same author; the behaviour is pinned by tests that fail on wrong implementations (re-run). The no-false-refusal claim rests on a structural argument I re-derived (projections, reader and run_scope byte-identical 2.0.0..BASE; no commit between 6b0b90d and ca26313 touched them; every writer path goes through Authority) plus the sample (671 admitted, 0 false)."
+  },
+  {
+   "sentence": "Hai mutant phải được kiểm chứng hành vi hoặc có hồ sơ tương đương đủ căn cứ, không tính thành KILLED nếu chỉ được audit.",
+   "status": "MET",
+   "evidence": "13 and 23 are dissolved by the product change and counted as neither KILLED nor AUDITED; the behaviour they stood for is pinned (BASE-like function fails 4 of 14 no_progress test methods, 8 failures with subtests; a function that compares with any earlier attempt was NOT caught until the review test). The changed function's 35 mutants are 35 KILLED (re-run). The lead retires the two rows on re-measurement."
+  }
+ ],
+ "claims": [
+  {
+   "claim": "At BASE, verify returns VERIFIED with delivery PASS for a journal whose story commits twice or commits with no admission, record derived from it",
+   "verdict": "CONFIRMED",
+   "note": "re-run with _projection_refusal := None: VERIFIED/PASS, journal_events 8 and 10"
+  },
+  {
+   "claim": "no_progress: 35 mutants, 35 KILLED; the new file alone kills L138 'story/begin' emptied",
+   "verdict": "CONFIRMED",
+   "note": "kill_check re-run, same source_sha256 96dd4b52...; [12] is killed by the new file only"
+  },
+  {
+   "claim": "_projection_refusal: 9 mutants, 9 KILLED",
+   "verdict": "CONFIRMED",
+   "note": "kill_check re-run; [0]-[3] and [5]-[8] are tuple-element mutants killed through an unpack error that surfaces as a changed finding"
+  },
+  {
+   "claim": "verify: the 16 mutants on the lines this change added or moved are all KILLED by the boundary file",
+   "verdict": "CONFIRMED",
+   "note": "kill_check --only re-run (indices 78,108,132-135,162-164,178-180,184-187)"
+  },
+  {
+   "claim": "verify: 11 survivors of the registered+campaign files are the campaign's BASE survivors, already AUDITED/EQUIVALENT against BASE's hash",
+   "verdict": "CONFIRMED",
+   "note": "matched by mutated text and by the line offset (+22 / +28) to SURVIVOR-AUDITS.json entries 44, 98, 108, 109, 122, 126, 137-139, 151, 174; not re-run against all eleven files; the entries are stale (source hash changed): the lead's to remap"
+  },
+  {
+   "claim": "BASE no_progress: 33 mutants, 31 KILLED, 13 and 23 SURVIVED",
+   "verdict": "CONFIRMED",
+   "note": "kill_check from a git archive of 3dc827b"
+  },
+  {
+   "claim": "8 of 14 no_progress tests FAIL on the BASE function",
+   "verdict": "REVISED",
+   "note": "4 of the 14 test methods fail (CommittedAttemptIsProgress x2, FailuresOutsideAnAttempt x2); 8 failures counting subtests. Corrected in the decision doc."
+  },
+  {
+   "claim": "The fold of the six projections is linear in the events (about a millisecond per event)",
+   "verdict": "REVISED",
+   "note": "quadratic in the number of stories: 1,102 events 1.0 s; 4,402 events 19 s; 17,602 events 291 s (writer's own pre-check 326 s). Corrected in the decision doc; product unchanged."
+  },
+  {
+   "claim": "0 false refusals: 85 of 89 format-3, 4 + 1 format-1/2 fixtures, the 2.0.0 smoke journal admitted; the 4 refused were not written by a kernel run",
+   "verdict": "CONFIRMED",
+   "note": "my own sweep: 2,200 files, 679 distinct, 673 readable: 666 format-3 + 4 format-1 + 1 format-2 admitted, 2 refused (the provider/request-without-begin mini-journals of test_v21_defects_verify), 6 not read by the reader; repo journals: smoke-2 (1,834) and the 5 fixtures admitted. The implementer's other two refused (a retry-after-commit experiment, one named forged) were not found in my corpus."
+  },
+  {
+   "claim": "The projections, reader and run_scope are byte-identical between 2.0.0 (ca26313) and BASE; no supported path wrote format 1/2",
+   "verdict": "CONFIRMED",
+   "note": "git diff ca26313 3dc827b over aisef2/journal, run_scope.py, control, arch is empty; no commit in 6b0b90d..ca26313 touches them; 175ba3a is an ancestor of 6b0b90d"
+  },
+  {
+   "claim": "BASE and changed no_progress agree on 87 of 94 readable distinct journals; 7 differ (writer experiments); 29 of 29 resolvable RUN.json equal both",
+   "verdict": "NOT_CONFIRMED",
+   "note": "not reproducible on today's corpus: on 673 readable distinct journals BASE and changed agree on all (0 differ); 38 of 38 resolvable RUN.json records equal both functions. The 7 differing journals are not in my corpus. The enumeration (below) is what shows where the two differ."
+  },
+  {
+   "claim": "Enumeration, one story <= 10 events: 100,337 admitted, 384 old != new (368 + 16), INV-A broken in 18,952, INV-B in 0, new == oracle everywhere",
+   "verdict": "CONFIRMED",
+   "note": "re-run of enumerate_admitted.py S1 10 (13.5 s) gives the same counts; the larger enumerations (13 events, two stories) were not re-run"
+  },
+  {
+   "claim": "The two product callers are run.py:495 and verify.py:194; no continue/lineage/bundle/repair/import path reaches no_progress",
+   "verdict": "CONFIRMED",
+   "note": "grep over aisef, aisef2, bin, validation, docs, scripts; bundle migrate reads bundles only; cli has run, --check, --verify"
+  },
+  {
+   "claim": "The new tests pin the requirements: they fail under plausible wrong implementations of the same requirement",
+   "verdict": "REVISED",
+   "note": "two wrong implementations passed every test of the WP: no_progress comparing with ANY earlier failed attempt; and a boundary placed inside the V2.1 usage branch (every record the tests build carries usage). Closed in tests/v2/test_v21_r3_usage_review.py."
+  },
+  {
+   "claim": "No existing test was changed",
+   "verdict": "CONFIRMED",
+   "note": "git diff 3dc827b..1474c3b touches 5 files, none an existing test"
+  }
+ ],
+ "defects_found": [
+  {
+   "what": "Test gap: no_progress comparing with any earlier failed attempt instead of the attempt before passes every test of the WP and of the registered kill files (the runner's catalogue cannot generate it)",
+   "severity": "low",
+   "fixed_in_commit": "5315a66"
+  },
+  {
+   "what": "Test gap: a verify boundary placed inside the V2.1 usage branch passes every boundary test, because every record they build carries usage; the decision doc says the boundary is at the reconstruction step so a 2.0.0 record is refused too",
+   "severity": "low",
+   "fixed_in_commit": "5315a66"
+  },
+  {
+   "what": "Decision doc: '8 of 14 tests fail on BASE' is 4 of 14 methods (8 failures with subtests)",
+   "severity": "low",
+   "fixed_in_commit": "5315a66"
+  },
+  {
+   "what": "Decision doc: the fold is described as linear; it is quadratic in the number of stories (measured)",
+   "severity": "low",
+   "fixed_in_commit": "5315a66"
+  },
+  {
+   "what": "tests/v2/test_v21_kills3_R05.py:15 still says no_progress 13 and 23 are not tested and 'the owner has not ruled (OPEN)': false after this change. Not edited (a registered kill file: editing its bytes may stale records that bind it).",
+   "severity": "info",
+   "fixed_in_commit": null
+  },
+  {
+   "what": "verify cost on a forged journal: the fold is quadratic, so a journal of ~100k story events can cost hours where verify was linear before; the writer pays the same, so an honest run never exceeds its own journaling cost. Not a defect of correctness; there is no bound on verify time.",
+   "severity": "low",
+   "fixed_in_commit": null
+  }
+ ],
+ "counter_examples": [
+  "no_progress, wrong implementation 'compare with any earlier failed attempt': U retry, T retry, U rollback -> reports attempt 3 (correct: []); passed all 47 tests of the WP + registered kill files before the review test",
+  "verify, wrong implementation 'refusal only inside the V2.1 usage branch': a record without usage whose journal commits with no admission is VERIFIED + PASS; passed all boundary tests",
+  "no_progress, late failure joins the attempt it followed (D-LATE option C): fails 7 of 47 tests incl. 2 pre-existing begin-less list tests (my quick implementation lacks the pre-scan the implementer describes) - the tests pin 'ignored', as the doc says",
+  "no_progress, 'commit pops the attempt's failures but adds no row': passes all 47 tests; equivalent on every projection-admitted journal (nothing follows a commit)"
+ ],
+ "mutants_rerun": [
+  {
+   "function": "aisef2/app/usage.py::no_progress",
+   "total": 35,
+   "killed": 35,
+   "survived": 0,
+   "files": [
+    "test_v21_kills3_A20",
+    "test_v21_kills3_T20a",
+    "test_v21_kills_usage",
+    "test_v21_r3_usage_no_progress"
+   ],
+   "note": "per-test kill matrix: every new test method kills >= 1 mutant; [12] 'story/begin' emptied and [30] sorted()->list() are killed by 2 tests each; mutants [2][3][11][18][20][27][33][34] are killed only through an exception (KeyError/ValueError on every input: key or tuple-element mutants)"
+  },
+  {
+   "function": "aisef2/app/usage.py::no_progress (BASE tree)",
+   "total": 33,
+   "killed": 31,
+   "survived": 2,
+   "files": [
+    "A20",
+    "T20a",
+    "kills_usage"
+   ],
+   "note": "13 and 23 SURVIVED, reproduced"
+  },
+  {
+   "function": "aisef2/app/verify.py::_projection_refusal",
+   "total": 9,
+   "killed": 9,
+   "survived": 0,
+   "files": [
+    "test_v21_r3_usage_boundary"
+   ]
+  },
+  {
+   "function": "aisef2/app/verify.py::verify (indices 78,108,132-135,162-164,178-180,184-187: the new lines)",
+   "total": 16,
+   "killed": 16,
+   "survived": 0,
+   "files": [
+    "test_v21_r3_usage_boundary"
+   ]
+  }
+ ],
+ "false_refusal_search": {
+  "journals_files": 2200,
+  "distinct": 679,
+  "readable": 673,
+  "admitted": {
+   "format_1": 4,
+   "format_2": 1,
+   "format_3": 666
+  },
+  "refused_by_a_projection": 2,
+  "refused_were": "two JournalWriter3 mini-journals of tests (provider/request with no story/begin) that no kernel wrote",
+  "reader_refuses": 6,
+  "repo_journals": "closure-evidence/v2/release/smoke-2/run-1 (1,834 events, real client, 2.0.0): admitted; tests/v2/fixtures/journal: 5 reconstruct (4 format 1, 1 format 2) admitted, 6 are the reader's refusal cases",
+  "fuzz": "1,358 variants of honest journals (drop/dup/swap/retarget/cut) through the bare writer: 623 admitted, 143 refused, 592 refused by the writer/reader; 0 non-ProjectionError exceptions; helper == independent from-scratch fold on all",
+  "run_json_records": "148 RUN.json found, 38 carry no_progress and resolve their journal: all equal BASE and changed",
+  "structural_argument": "every journal the product runtime ever wrote went through Authority(PROJECTIONS) with projections/reader/run_scope byte-identical since before 2.0.0",
+  "false_refusals": 0
+ },
+ "real_vs_simulated_corrections": [
+  "The new tests were also run in the Linux guest (hardened profile, Python 3.14.8, aarch64): 31 tests OK, ExecutedRun included (not skipped). That run is a real run of the kernel with a FAKE client and fake provider: a simulation of the provider, not a real client. The implementer ran nothing in the guest and said so.",
+  "The enumeration is a model (in-memory projections over a nine-event alphabet): conformance evidence, not a run, not a kill; the doc says so and I agree.",
+  "Only the 2.0.0 smoke journal is a real-client journal; every other journal in the corpus is from the test harness (real kernel, fake developer and provider) or a writer experiment."
+ ],
+ "test_runs": [
+  {
+   "what": "new files (31 tests) on macOS Python 3.14 via py.sh",
+   "result": "OK"
+  },
+  {
+   "what": "new files (31 tests) on macOS Python 3.12",
+   "result": "OK"
+  },
+  {
+   "what": "new files (31 tests) in the Linux guest hardened, Python 3.14.8",
+   "result": "OK, no skips"
+  },
+  {
+   "what": "ruff check . (whole tree)",
+   "result": "All checks passed"
+  },
+  {
+   "what": "kernel_static_checks over aisef2",
+   "result": "PASS"
+  },
+  {
+   "what": "t0_check: no_progress/_projection_refusal with each new test file",
+   "result": "PASS"
+  },
+  {
+   "what": "transitive importer tests.installed_smoke",
+   "result": "exit=5 secs=0 Ran 0 tests in 0.000s (a packaging script, not a unittest module: nothing to run, not a failure)"
+  },
+  {
+   "what": "transitive importer tests.test_cli",
+   "result": "exit=0 secs=14 Ran 115 tests in 13.346s OK (skipped=1)"
+  },
+  {
+   "what": "transitive importer tests.test_v21_bundle_dispatch",
+   "result": "exit=0 secs=0 Ran 2 tests in 0.140s OK"
+  },
+  {
+   "what": "transitive importer tests.v2.test_v21_authority_limits",
+   "result": "exit=0 secs=115 Ran 34 tests in 114.713s OK"
+  },
+  {
+   "what": "transitive importer tests.v2.test_v21_bundle_tools",
+   "result": "exit=0 secs=2 Ran 9 tests in 1.131s OK"
+  },
+  {
+   "what": "transitive importer tests.v2.test_v21_confine",
+   "result": "exit=0 secs=20 Ran 34 tests in 19.744s OK"
+  },
+  {
+   "what": "transitive importer tests.v2.test_v21_defects_bundlecli",
+   "result": "exit=0 secs=6 Ran 17 tests in 5.657s OK"
+  },
+  {
+   "what": "transitive importer tests.v2.test_v21_identity",
+   "result": "exit=0 secs=1 Ran 13 tests in 1.071s OK"
+  },
+  {
+   "what": "transitive importer tests.v2.test_v21_identity_bytes",
+   "result": "exit=0 secs=1 Ran 4 tests in 0.267s OK"
+  },
+  {
+   "what": "transitive importer tests.v2.test_v21_inputs",
+   "result": "exit=0 secs=2 Ran 20 tests in 1.344s OK"
+  },
+  {
+   "what": "transitive importer tests.v2.test_v21_kills3_A13",
+   "result": "exit=0 secs=0 Ran 2 tests in 0.035s OK"
+  },
+  {
+   "what": "transitive importer tests.v2.test_v21_kills3_A16",
+   "result": "exit=0 secs=1 Ran 1 test in 0.094s OK"
+  },
+  {
+   "what": "transitive importer tests.v2.test_v21_kills3_A23",
+   "result": "exit=0 secs=0 Ran 2 tests in 0.003s OK"
+  },
+  {
+   "what": "transitive importer tests.v2.test_v21_kills3_T00a",
+   "result": "exit=0 secs=9 Ran 19 tests in 8.542s OK"
+  },
+  {
+   "what": "transitive importer tests.v2.test_v21_kills3_T01a",
+   "result": "exit=0 secs=6 Ran 17 tests in 5.199s OK"
+  },
+  {
+   "what": "transitive importer tests.v2.test_v21_kills3_T01b",
+   "result": "exit=0 secs=9 Ran 13 tests in 8.897s OK"
+  },
+  {
+   "what": "transitive importer tests.v2.test_v21_kills3_T04a",
+   "result": "exit=0 secs=1 Ran 17 tests in 0.793s OK"
+  },
+  {
+   "what": "transitive importer tests.v2.test_v21_kills3_T09a",
+   "result": "exit=0 secs=1 Ran 18 tests in 0.262s OK"
+  },
+  {
+   "what": "transitive importer tests.v2.test_v21_kills3_T16a",
+   "result": "exit=0 secs=1 Ran 26 tests in 0.508s OK"
+  },
+  {
+   "what": "transitive importer tests.v2.test_v21_kills3_T26a",
+   "result": "exit=0 secs=0 Ran 23 tests in 0.047s OK"
+  },
+  {
+   "what": "transitive importer tests.v2.test_v21_kills3_TO1",
+   "result": "exit=0 secs=11 Ran 3 tests in 10.793s OK"
+  },
+  {
+   "what": "transitive importer tests.v2.test_v21_kills_cli",
+   "result": "exit=0 secs=1 Ran 2 tests in 0.001s OK"
+  },
+  {
+   "what": "transitive importer tests.v2.test_v21_review_chain",
+   "result": "exit=0 secs=192 Ran 18 tests in 192.545s OK (skipped=3)"
+  },
+  {
+   "what": "direct importer / safety / sealed-record checker tests.v2.test_app_run",
+   "result": "exit=0 secs=46 Ran 17 tests in 44.889s OK"
+  },
+  {
+   "what": "direct importer / safety / sealed-record checker tests.v2.test_app_units",
+   "result": "exit=0 secs=9 Ran 41 tests in 8.275s OK"
+  },
+  {
+   "what": "direct importer / safety / sealed-record checker tests.v2.test_s2_kills",
+   "result": "exit=0 secs=30 Ran 43 tests in 29.452s OK"
+  },
+  {
+   "what": "direct importer / safety / sealed-record checker tests.v2.test_v21_continue_integrity",
+   "result": "exit=0 secs=269 Ran 24 tests in 268.433s OK"
+  },
+  {
+   "what": "direct importer / safety / sealed-record checker tests.v2.test_v21_continue_usage",
+   "result": "exit=0 secs=56 Ran 10 tests in 55.850s OK"
+  },
+  {
+   "what": "direct importer / safety / sealed-record checker tests.v2.test_v21_defects_lineageusage",
+   "result": "exit=0 secs=1 Ran 15 tests in 0.914s OK"
+  },
+  {
+   "what": "direct importer / safety / sealed-record checker tests.v2.test_v21_defects_verify",
+   "result": "exit=0 secs=31 Ran 20 tests in 30.602s OK"
+  },
+  {
+   "what": "direct importer / safety / sealed-record checker tests.v2.test_v21_experiment",
+   "result": "exit=0 secs=3 Ran 5 tests in 2.711s OK"
+  },
+  {
+   "what": "direct importer / safety / sealed-record checker tests.v2.test_v21_kills3_A20",
+   "result": "exit=0 secs=0 Ran 2 tests in 0.007s OK"
+  },
+  {
+   "what": "direct importer / safety / sealed-record checker tests.v2.test_v21_kills3_A22",
+   "result": "exit=0 secs=0 Ran 7 tests in 0.017s OK"
+  },
+  {
+   "what": "direct importer / safety / sealed-record checker tests.v2.test_v21_kills3_R01",
+   "result": "exit=0 secs=0 Ran 8 tests in 0.027s OK"
+  },
+  {
+   "what": "direct importer / safety / sealed-record checker tests.v2.test_v21_kills3_R05",
+   "result": "exit=0 secs=1 Ran 3 tests in 0.035s OK"
+  },
+  {
+   "what": "direct importer / safety / sealed-record checker tests.v2.test_v21_kills3_T08b",
+   "result": "exit=0 secs=0 Ran 6 tests in 0.036s OK"
+  },
+  {
+   "what": "direct importer / safety / sealed-record checker tests.v2.test_v21_kills3_T10c",
+   "result": "exit=0 secs=11 Ran 14 tests in 11.272s OK"
+  },
+  {
+   "what": "direct importer / safety / sealed-record checker tests.v2.test_v21_kills3_T10d",
+   "result": "exit=0 secs=11 Ran 17 tests in 10.524s OK"
+  },
+  {
+   "what": "direct importer / safety / sealed-record checker tests.v2.test_v21_kills3_T13a",
+   "result": "exit=0 secs=7 Ran 12 tests in 7.036s OK"
+  },
+  {
+   "what": "direct importer / safety / sealed-record checker tests.v2.test_v21_kills3_T14a",
+   "result": "exit=0 secs=5 Ran 18 tests in 4.692s OK"
+  },
+  {
+   "what": "direct importer / safety / sealed-record checker tests.v2.test_v21_kills3_T14b",
+   "result": "exit=0 secs=5 Ran 15 tests in 4.419s OK"
+  },
+  {
+   "what": "direct importer / safety / sealed-record checker tests.v2.test_v21_kills3_T20a",
+   "result": "exit=0 secs=0 Ran 16 tests in 0.009s OK"
+  },
+  {
+   "what": "direct importer / safety / sealed-record checker tests.v2.test_v21_kills3_T20b",
+   "result": "exit=0 secs=0 Ran 8 tests in 0.033s OK"
+  },
+  {
+   "what": "direct importer / safety / sealed-record checker tests.v2.test_v21_kills3_T22a",
+   "result": "exit=0 secs=5 Ran 13 tests in 4.704s OK"
+  },
+  {
+   "what": "direct importer / safety / sealed-record checker tests.v2.test_v21_kills3_T22b",
+   "result": "exit=0 secs=10 Ran 10 tests in 9.370s OK"
+  },
+  {
+   "what": "direct importer / safety / sealed-record checker tests.v2.test_v21_kills3_T23a",
+   "result": "exit=0 secs=0 Ran 20 tests in 0.060s OK"
+  },
+  {
+   "what": "direct importer / safety / sealed-record checker tests.v2.test_v21_kills_usage",
+   "result": "exit=0 secs=1 Ran 1 test in 0.000s OK"
+  },
+  {
+   "what": "direct importer / safety / sealed-record checker tests.v2.test_v21_r3_usage_boundary",
+   "result": "exit=0 secs=4 Ran 14 tests in 4.547s OK"
+  },
+  {
+   "what": "direct importer / safety / sealed-record checker tests.v2.test_v21_r3_usage_no_progress",
+   "result": "exit=0 secs=1 Ran 14 tests in 0.065s OK"
+  },
+  {
+   "what": "direct importer / safety / sealed-record checker tests.v2.test_v21_verify",
+   "result": "exit=0 secs=36 Ran 8 tests in 36.364s OK"
+  },
+  {
+   "what": "direct importer / safety / sealed-record checker tests.v2.test_v21_r3_usage_review",
+   "result": "exit=0 secs=0 Ran 3 tests in 0.015s OK"
+  },
+  {
+   "what": "direct importer / safety / sealed-record checker tests.v2.p0.test_destructive_authority",
+   "result": "exit=0 secs=12 Ran 13 tests in 10.964s OK"
+  },
+  {
+   "what": "direct importer / safety / sealed-record checker tests.v2.p4.test_mutation_safety",
+   "result": "exit=0 secs=14 Ran 10 tests in 13.633s OK"
+  },
+  {
+   "what": "direct importer / safety / sealed-record checker tests.test_meta",
+   "result": "exit=0 secs=4 Ran 34 tests in 4.751s OK"
+  },
+  {
+   "what": "direct importer / safety / sealed-record checker tests.v2.p2.test_mutation_targets",
+   "result": "exit=0 secs=4 Ran 4 tests in 3.190s OK"
+  },
+  {
+   "what": "direct importer / safety / sealed-record checker tests.v2.test_v21_mutation_record",
+   "result": "exit=0 secs=5 Ran 7 tests in 5.408s OK"
+  },
+  {
+   "what": "direct importer / safety / sealed-record checker tests.v2.test_s2_mutation_record",
+   "result": "exit=0 secs=5 Ran 12 tests in 4.356s OK"
+  },
+  {
+   "what": "direct importer / safety / sealed-record checker tests.v2.test_c2_k_nowork_001",
+   "result": "exit=1 secs=47 Ran 17 tests in 46.487s FAILED (failures=1) (EXPECTED red: 'the kernel changed since the record', a sealed-record checker the lead regenerates)"
+  }
+ ],
+ "remaining_risks": [
+  "D-LATE: the late-failure answer (ignored) differs from the projections' attribution (previous attempt) on shapes no producer writes; in the one-story model 368 of the 384 BASE/new differences are this class, 16 are the commit class.",
+  "D-READERS: bundle continue, lineage.events_of, repair, sentinel still do not refuse a projection-violating journal (none reaches no_progress).",
+  "D-INVA: a commit with an open failure in its attempt stays admitted by the projections; the function answers it, the journal format still allows it.",
+  "Quadratic verify cost (see defects): no bound on verify time for a large or forged journal.",
+  "Consistency, not authenticity: without --expect-anchor an admitted, consistent rewrite still verifies.",
+  "Windows and Python 3.11/3.13 not run (3.12 and 3.14 on macOS, 3.14 in the Linux guest). Journals of kernels before 2.0.0 not checked.",
+  "The 11 verify survivors are the campaign's, audited against BASE's source hash; those audits are stale until the lead remaps them.",
+  "The late failure and commit semantic choices change RUN.json only for shapes outside the story runner's grammar; none of 673 journals found changes."
+ ],
+ "decisions_needed": [
+  "D-LATE (owner): keep 'a failure journaled between an outcome and the next story/begin is nobody's' or attach it to the attempt it followed. Review reading: both are defined; ignoring matches what the retry decision saw and what failure_owner keeps as the deciding failure.",
+  "D-READERS (owner): must bundle continue / lineage.events_of / repair also refuse a projection-violating journal (helper would move to aisef2/journal)?",
+  "D-INVA (owner): should 'failure then commit in one attempt' be impossible in the journal (projection change, version bump)?",
+  "VERIFY-COST (owner/lead): accept quadratic verify cost, or bound it (cap on events/stories, or a cheaper fold)?",
+  "REGISTER (lead): kill files - usage.py::no_progress += tests/v2/test_v21_r3_usage_no_progress.py (+ tests/v2/test_v21_r3_usage_review.py for the 'any earlier attempt' wrong implementation); verify.py::_projection_refusal = tests/v2/test_v21_r3_usage_boundary.py; verify.py::verify += tests/v2/test_v21_r3_usage_boundary.py (+ test_v21_r3_usage_review.py). Retire rows 13 and 23 on re-measurement; remap the 11 stale verify audits."
+ ]
+}

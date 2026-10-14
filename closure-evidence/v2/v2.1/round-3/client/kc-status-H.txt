@@ -1,0 +1,5 @@
+_lines exit=0 # aisef2/app/confine.py::_lines: 4 mutants run, {'KILLED': 4}; T0 [{'file': 'tests/v2/test_v21_r3_client_readers.py', 'seconds': 2.2, 'outcome': 'PASS', 'ran': 10}, {'file': 'tests/v2/test_v21_kills3_
+_host_mounts exit=0 # aisef2/app/confine.py::_host_mounts: 16 mutants run, {'KILLED': 16}; T0 [{'file': 'tests/v2/test_v21_r3_client_readers.py', 'seconds': 2.17, 'outcome': 'PASS', 'ran': 10}, {'file': 'tests/v2/test_v2
+_sections exit=0 # aisef2/app/confine.py::_sections: 44 mutants run, {'KILLED': 44}; T0 [{'file': 'tests/v2/test_v21_r3_client_readers.py', 'seconds': 2.13, 'outcome': 'PASS', 'ran': 10}, {'file': 'tests/v2/test_v21_k
+_mounts exit=0 # aisef2/app/confine.py::_mounts: 46 mutants run, {'KILLED': 46}; T0 [{'file': 'tests/v2/test_v21_r3_client_readers.py', 'seconds': 1.8, 'outcome': 'PASS', 'ran': 10}, {'file': 'tests/v2/test_v21_kill
+DONE

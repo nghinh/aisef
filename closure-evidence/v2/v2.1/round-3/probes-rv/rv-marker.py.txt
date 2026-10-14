@@ -1,0 +1,11 @@
+# rv-marker: V21-24, through the test module's own forger fixture (app.forge:rewrite): what kind/verdict a subject that
+# truncates the marker file gets, for the three Cycle-2 probes that use the marker-file channel.
+import os, sys
+sys.path.insert(0, os.getcwd())
+from tests.v2 import test_python_callable_v2 as t
+print("interpreter:", sys.version.split()[0], sys.platform)
+t._Revisions.setUpClass.__func__(t._Revisions)
+inst = t._Revisions("run_")
+for loc, obs in (("app.forge:rewrite", {"returns": 1}), ("app.forge:rewrite", {"returns": 2}), ("app.forge:rewrite", {"blocks": True})):
+    o = inst.see(t.spec(loc, obs))
+    print("pc2 %-18s %-22s -> %s %s | %s" % (loc, obs, o.kind.value, o.verdict.value if o.verdict else None, o.detail[:110]))

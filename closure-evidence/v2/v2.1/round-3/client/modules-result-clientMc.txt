@@ -1,0 +1,24 @@
+tests.v2.test_v21_kills3_T14a exit=0 Ran 18 tests in 5.989s OK  6s
+tests.v2.test_v21_kills3_T20a exit=0 Ran 16 tests in 0.014s OK  0s
+tests.v2.test_v21_kills3_T20b exit=0 Ran 8 tests in 0.041s OK  1s
+tests.v2.test_v21_kills3_T23a exit=0 Ran 20 tests in 0.075s OK  0s
+tests.v2.test_v21_kills3_T28a exit=0 Ran 8 tests in 0.012s OK  0s
+tests.v2.test_v21_kills3_TO2 exit=0 Ran 3 tests in 0.000s OK  0s
+tests.v2.test_v21_kills3_TO3 exit=0 Ran 4 tests in 0.190s OK  1s
+tests.v2.test_v21_kills_adapters exit=0 Ran 10 tests in 1.344s OK  2s
+tests.v2.test_v21_kills_lineage exit=0 Ran 1 test in 0.004s OK  0s
+tests.v2.test_v21_kills_usage exit=0 Ran 1 test in 0.000s OK  0s
+tests.v2.test_v21_orchestration exit=0 Ran 5 tests in 24.224s OK  25s
+tests.v2.test_v21_r3_conf_fu_before exit=0 Ran 9 tests in 1.737s OK  1s
+tests.v2.test_v21_r3_conf_locale exit=0 Ran 10 tests in 1.506s OK  2s
+tests.v2.test_v21_r3_conf_policy exit=0 Ran 42 tests in 1.335s OK  2s
+tests.v2.test_v21_r3_detail_rv_finderfiles exit=0 Ran 2 tests in 1.760s OK  2s
+tests.v2.test_v21_r3_detail_statement exit=0 Ran 38 tests in 5.299s OK  5s
+tests.v2.test_v21_r3_usage_boundary exit=0 Ran 14 tests in 5.217s OK  6s
+tests.v2.test_v21_r3_usage_no_progress exit=0 Ran 14 tests in 0.070s OK  0s
+tests.v2.test_v21_review exit=0 Ran 8 tests in 18.526s OK  19s
+tests.v2.test_v21_review_chain exit=0 Ran 18 tests in 165.922s OK (skipped=3)  166s
+tests.v2.test_v21_review_ocr exit=0 Ran 10 tests in 0.002s OK  1s
+tests.v2.test_v21_transport exit=0 Ran 3 tests in 2.593s OK  2s
+tests.v2.test_v21_verify exit=0 Ran 8 tests in 35.123s OK  36s
+DONE

@@ -1,0 +1,1628 @@
+{
+ "target": "aisef2/app/confine.py::_probe",
+ "files": [
+  "tests/v2/test_v21_r3_conf_policy.py",
+  "tests/v2/test_v21_r3_conf_locale.py",
+  "tests/v2/test_v21_kills3_T07a.py",
+  "tests/v2/test_v21_kills3_T06a.py",
+  "tests/v2/test_v21_kills3_A06.py",
+  "tests/v2/test_v21_kills3_T05b.py",
+  "tests/v2/test_v21_kills3_T05a.py",
+  "tests/v2/test_v21_kills3_T05c.py",
+  "tests/v2/test_v21_kills3_A05.py",
+  "tests/v2/test_v21_kills3_R02.py",
+  "tests/v2/test_v21_kills3_T06b.py",
+  "tests/v2/test_v21_kills3_A07.py",
+  "tests/v2/test_v21_kills3_T07b.py",
+  "tests/v2/test_v21_kills3_TO2.py",
+  "tests/v2/test_v21_defects_confine.py",
+  "tests/v2/test_v21_confine.py"
+ ],
+ "source_sha256": "375489e7f4d1abc502cb6720c37631ad52511711cdb47803e0ecefb009778249",
+ "t0": [
+  {
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "seconds": 1.86,
+   "outcome": "PASS",
+   "ran": 40
+  },
+  {
+   "file": "tests/v2/test_v21_r3_conf_locale.py",
+   "seconds": 1.69,
+   "outcome": "PASS",
+   "ran": 9
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T07a.py",
+   "seconds": 0.39,
+   "outcome": "PASS",
+   "ran": 14
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T06a.py",
+   "seconds": 0.37,
+   "outcome": "PASS",
+   "ran": 14
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_A06.py",
+   "seconds": 1.15,
+   "outcome": "PASS",
+   "ran": 4
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "seconds": 0.94,
+   "outcome": "PASS",
+   "ran": 18
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T05a.py",
+   "seconds": 1.13,
+   "outcome": "PASS",
+   "ran": 8
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T05c.py",
+   "seconds": 2.63,
+   "outcome": "PASS",
+   "ran": 7
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_A05.py",
+   "seconds": 1.48,
+   "outcome": "PASS",
+   "ran": 6
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_R02.py",
+   "seconds": 0.59,
+   "outcome": "PASS",
+   "ran": 2
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T06b.py",
+   "seconds": 1.64,
+   "outcome": "PASS",
+   "ran": 8
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_A07.py",
+   "seconds": 0.41,
+   "outcome": "PASS",
+   "ran": 5
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T07b.py",
+   "seconds": 0.47,
+   "outcome": "PASS",
+   "ran": 11
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_TO2.py",
+   "seconds": 0.35,
+   "outcome": "PASS",
+   "ran": 3
+  },
+  {
+   "file": "tests/v2/test_v21_defects_confine.py",
+   "seconds": 1.9,
+   "outcome": "PASS",
+   "ran": 16
+  },
+  {
+   "file": "tests/v2/test_v21_confine.py",
+   "seconds": 22.32,
+   "outcome": "PASS",
+   "ran": 34
+  }
+ ],
+ "error": "UNCLASSIFIED: 1 mutant(s) neither killed nor survived {'INFRA': 1} \u2014 re-run them",
+ "results": [
+  {
+   "index": 0,
+   "mutant": "L372 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | AssertionError"
+  },
+  {
+   "index": 1,
+   "mutant": "L404 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_device_node_the_probe_did_not_read_refuses_the_run_naming_it (v2.test_v21_r3_conf_policy.ReportedData.test_a_device_node_the_probe_did_not_read_refuses_the_run_naming_it) | ValueError"
+  },
+  {
+   "index": 2,
+   "mutant": "L406 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | AssertionError"
+  },
+  {
+   "index": 3,
+   "mutant": "L410 returns None",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | TypeError"
+  },
+  {
+   "index": 4,
+   "mutant": "L337 dict entry 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_locale.py",
+   "first": "FAIL: test_the_rest_of_the_environment_is_what_the_session_wrapper_gives (v2.test_v21_r3_conf_locale.PassedDown.test_the_rest_of_the_environment_is_what_the_session_wrapper_gives) | AssertionError"
+  },
+  {
+   "index": 5,
+   "mutant": "L337 dict entry 1 dropped",
+   "class": "INFRA",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 6,
+   "mutant": "L344 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | ValueError"
+  },
+  {
+   "index": 7,
+   "mutant": "L344 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | ValueError"
+  },
+  {
+   "index": 8,
+   "mutant": "L344 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | ValueError"
+  },
+  {
+   "index": 9,
+   "mutant": "L344 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | ValueError"
+  },
+  {
+   "index": 10,
+   "mutant": "L348 dict entry 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | KeyError"
+  },
+  {
+   "index": 11,
+   "mutant": "L348 dict entry 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | KeyError"
+  },
+  {
+   "index": 12,
+   "mutant": "L348 dict entry 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | KeyError"
+  },
+  {
+   "index": 13,
+   "mutant": "L348 dict entry 3 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | KeyError"
+  },
+  {
+   "index": 14,
+   "mutant": "L348 dict entry 4 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | KeyError"
+  },
+  {
+   "index": 15,
+   "mutant": "L353 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | TypeError"
+  },
+  {
+   "index": 16,
+   "mutant": "L356 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "FAIL: test_operator_can_is_one_per_write_try_under_the_same_name (v2.test_v21_kills3_T05b.WhatWasTried.test_operator_can_is_one_per_write_try_under_the_same_name) | AssertionError"
+  },
+  {
+   "index": 17,
+   "mutant": "L356 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "FAIL: test_operator_can_is_one_per_write_try_under_the_same_name (v2.test_v21_kills3_T05b.WhatWasTried.test_operator_can_is_one_per_write_try_under_the_same_name) | AssertionError"
+  },
+  {
+   "index": 18,
+   "mutant": "L356 element 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "FAIL: test_operator_can_is_one_per_write_try_under_the_same_name (v2.test_v21_kills3_T05b.WhatWasTried.test_operator_can_is_one_per_write_try_under_the_same_name) | AssertionError"
+  },
+  {
+   "index": 19,
+   "mutant": "L356 element 3 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "FAIL: test_operator_can_is_one_per_write_try_under_the_same_name (v2.test_v21_kills3_T05b.WhatWasTried.test_operator_can_is_one_per_write_try_under_the_same_name) | AssertionError"
+  },
+  {
+   "index": 20,
+   "mutant": "L356 element 4 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "FAIL: test_operator_can_is_one_per_write_try_under_the_same_name (v2.test_v21_kills3_T05b.WhatWasTried.test_operator_can_is_one_per_write_try_under_the_same_name) | AssertionError"
+  },
+  {
+   "index": 21,
+   "mutant": "L356 element 5 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "FAIL: test_operator_can_is_one_per_write_try_under_the_same_name (v2.test_v21_kills3_T05b.WhatWasTried.test_operator_can_is_one_per_write_try_under_the_same_name) | AssertionError"
+  },
+  {
+   "index": 22,
+   "mutant": "L356 element 6 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "FAIL: test_operator_can_is_one_per_write_try_under_the_same_name (v2.test_v21_kills3_T05b.WhatWasTried.test_operator_can_is_one_per_write_try_under_the_same_name) | AssertionError"
+  },
+  {
+   "index": 23,
+   "mutant": "L356 element 7 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "FAIL: test_operator_can_is_one_per_write_try_under_the_same_name (v2.test_v21_kills3_T05b.WhatWasTried.test_operator_can_is_one_per_write_try_under_the_same_name) | AssertionError"
+  },
+  {
+   "index": 24,
+   "mutant": "L356 element 8 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05a.py",
+   "first": "FAIL: test_the_probe_is_given_every_host_directory_the_wrapper_binds_and_none_of_its_own_mounts (v2.test_v21_kills3_T05a.UnixSockets.test_the_probe_is_given_every_host_directory_the_wrapper_binds_and_none_of_its_own_mounts) | AssertionError"
+  },
+  {
+   "index": 25,
+   "mutant": "L356 element 9 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05a.py",
+   "first": "FAIL: test_a_sandbox_as_required_is_not_refused (v2.test_v21_kills3_T05a.CleanSession.test_a_sandbox_as_required_is_not_refused) | AssertionError"
+  },
+  {
+   "index": 26,
+   "mutant": "L370 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | ValueError"
+  },
+  {
+   "index": 27,
+   "mutant": "L370 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | ValueError"
+  },
+  {
+   "index": 28,
+   "mutant": "L370 element 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | ValueError"
+  },
+  {
+   "index": 29,
+   "mutant": "L372 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_confine.py",
+   "first": "FAIL: test_a_probe_that_did_not_exit_0_is_refused_even_when_it_reached_its_end (v2.test_v21_confine.FailClosed.test_a_probe_that_did_not_exit_0_is_refused_even_when_it_reached_its_end) | AssertionError"
+  },
+  {
+   "index": 30,
+   "mutant": "L387 dict entry 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "FAIL: test_the_record_has_each_reading_under_its_name (v2.test_v21_kills3_T05b.CorrectlyConfinedSession.test_the_record_has_each_reading_under_its_name) | AssertionError"
+  },
+  {
+   "index": 31,
+   "mutant": "L387 dict entry 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | KeyError"
+  },
+  {
+   "index": 32,
+   "mutant": "L387 dict entry 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | KeyError"
+  },
+  {
+   "index": 33,
+   "mutant": "L387 dict entry 3 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "ERROR: test_no_new_privs_and_seccomp_are_the_status_values (v2.test_v21_kills3_T05b.CorrectlyConfinedSession.test_no_new_privs_and_seccomp_are_the_status_values) | KeyError"
+  },
+  {
+   "index": 34,
+   "mutant": "L387 dict entry 4 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "ERROR: test_interfaces_are_listed_and_none_is_routed (v2.test_v21_kills3_T05b.AFreshNetworkNamespace.test_interfaces_are_listed_and_none_is_routed) | KeyError"
+  },
+  {
+   "index": 35,
+   "mutant": "L387 dict entry 5 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "ERROR: setUpClass (v2.test_v21_kills3_T05b.AFreshNetworkNamespace) | KeyError"
+  },
+  {
+   "index": 36,
+   "mutant": "L387 dict entry 6 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | KeyError"
+  },
+  {
+   "index": 37,
+   "mutant": "L387 dict entry 7 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | KeyError"
+  },
+  {
+   "index": 38,
+   "mutant": "L387 dict entry 8 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | KeyError"
+  },
+  {
+   "index": 39,
+   "mutant": "L387 dict entry 9 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | AssertionError"
+  },
+  {
+   "index": 40,
+   "mutant": "L387 dict entry 10 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | KeyError"
+  },
+  {
+   "index": 41,
+   "mutant": "L387 dict entry 11 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | KeyError"
+  },
+  {
+   "index": 42,
+   "mutant": "L387 dict entry 12 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | KeyError"
+  },
+  {
+   "index": 43,
+   "mutant": "L396 conditional negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | AssertionError"
+  },
+  {
+   "index": 44,
+   "mutant": "L404 not removed",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | TypeError"
+  },
+  {
+   "index": 45,
+   "mutant": "L338 string 'locale' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_locale.py",
+   "first": "ERROR: test_the_environment_the_stand_in_bubblewrap_received (v2.test_v21_r3_conf_locale.AtTheExecBoundary.test_the_environment_the_stand_in_bubblewrap_received) | KeyError"
+  },
+  {
+   "index": 46,
+   "mutant": "L342 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05c.py",
+   "first": "ERROR: test_an_exec_failure_is_marked_unavailable_and_names_the_class (v2.test_v21_kills3_T05c.TheVersionReadCannotFail.test_an_exec_failure_is_marked_unavailable_and_names_the_class) | OSError"
+  },
+  {
+   "index": 47,
+   "mutant": "L342 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05c.py",
+   "first": "ERROR: test_a_hung_version_call_is_marked_unavailable_and_names_the_class (v2.test_v21_kills3_T05c.TheVersionReadCannotFail.test_a_hung_version_call_is_marked_unavailable_and_names_the_class) | subprocess.TimeoutExpired"
+  },
+  {
+   "index": 48,
+   "mutant": "L345 string '.aisef-confine-probe-' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_confine.py",
+   "first": "FAIL: test_what_is_measured_decides_not_the_name_of_the_tool (v2.test_v21_confine.FailClosed.test_what_is_measured_decides_not_the_name_of_the_tool) | AssertionError"
+  },
+  {
+   "index": 49,
+   "mutant": "L346 string 'canary' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | IsADirectoryError"
+  },
+  {
+   "index": 50,
+   "mutant": "L348 string 'run_directory' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | KeyError"
+  },
+  {
+   "index": 51,
+   "mutant": "L349 string 'kernel' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | KeyError"
+  },
+  {
+   "index": 52,
+   "mutant": "L350 string 'interpreter_site' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | KeyError"
+  },
+  {
+   "index": 53,
+   "mutant": "L351 string 'client_directory' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | KeyError"
+  },
+  {
+   "index": 54,
+   "mutant": "L352 string 'git_directory' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | KeyError"
+  },
+  {
+   "index": 55,
+   "mutant": "L353 string '/nonexistent' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05a.py",
+   "first": "FAIL: test_without_a_home_the_probe_is_given_a_path_that_is_not_there_and_no_home_is_judged (v2.test_v21_kills3_T05a.HomeListing.test_without_a_home_the_probe_is_given_a_path_that_is_not_there_and_no_home_is_judged) | AssertionError"
+  },
+  {
+   "index": 56,
+   "mutant": "L354 string '.' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05c.py",
+   "first": "FAIL: test_the_value_is_the_sleeper_and_six_fraction_digits_whatever_the_nonce (v2.test_v21_kills3_T05c.TheSleeperHasAFixedWidthDuration.test_the_value_is_the_sleeper_and_six_fraction_digits_whatever_the_nonce) (nonce=0) | AssertionError"
+  },
+  {
+   "index": 57,
+   "mutant": "L358 string 'argv' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A06.py",
+   "first": "ERROR: test_the_recorded_argv_is_the_command_line_that_ran (v2.test_v21_kills3_A06.RecordedCommandLine.test_the_recorded_argv_is_the_command_line_that_ran) | KeyError"
+  },
+  {
+   "index": 58,
+   "mutant": "L358 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A06.py",
+   "first": "FAIL: test_the_recorded_argv_is_the_command_line_that_ran (v2.test_v21_kills3_A06.RecordedCommandLine.test_the_recorded_argv_is_the_command_line_that_ran) | AssertionError"
+  },
+  {
+   "index": 59,
+   "mutant": "L358 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A06.py",
+   "first": "FAIL: test_the_recorded_argv_is_the_command_line_that_ran (v2.test_v21_kills3_A06.RecordedCommandLine.test_the_recorded_argv_is_the_command_line_that_ran) | AssertionError"
+  },
+  {
+   "index": 60,
+   "mutant": "L358 element 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A06.py",
+   "first": "FAIL: test_the_recorded_argv_is_the_command_line_that_ran (v2.test_v21_kills3_A06.RecordedCommandLine.test_the_recorded_argv_is_the_command_line_that_ran) | AssertionError"
+  },
+  {
+   "index": 61,
+   "mutant": "L358 element 3 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A06.py",
+   "first": "FAIL: test_the_recorded_argv_is_the_command_line_that_ran (v2.test_v21_kills3_A06.RecordedCommandLine.test_the_recorded_argv_is_the_command_line_that_ran) | AssertionError"
+  },
+  {
+   "index": 62,
+   "mutant": "L362 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | ValueError"
+  },
+  {
+   "index": 63,
+   "mutant": "L362 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | ValueError"
+  },
+  {
+   "index": 64,
+   "mutant": "L362 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | ValueError"
+  },
+  {
+   "index": 65,
+   "mutant": "L362 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | ValueError"
+  },
+  {
+   "index": 66,
+   "mutant": "L365 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05c.py",
+   "first": "ERROR: test_an_exec_failure_of_the_probe_is_a_problem_not_a_crash (v2.test_v21_kills3_T05c.TheProbeCannotBeRunOrHangs.test_an_exec_failure_of_the_probe_is_a_problem_not_a_crash) | OSError"
+  },
+  {
+   "index": 67,
+   "mutant": "L365 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_R02.py",
+   "first": "ERROR: test_a_subprocess_error_that_is_not_a_timeout_is_a_problem_not_a_crash (v2.test_v21_kills3_R02.AnyFailureOfTheProbeCallIsARecordedRefusal.test_a_subprocess_error_that_is_not_a_timeout_is_a_problem_not_a_crash) | subprocess.SubprocessError"
+  },
+  {
+   "index": 68,
+   "mutant": "L372 NotEq->Eq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | AssertionError"
+  },
+  {
+   "index": 69,
+   "mutant": "L372 NotIn->In",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | AssertionError"
+  },
+  {
+   "index": 70,
+   "mutant": "L379 string 'devices' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | AssertionError"
+  },
+  {
+   "index": 71,
+   "mutant": "L380 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | ValueError"
+  },
+  {
+   "index": 72,
+   "mutant": "L380 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | ValueError"
+  },
+  {
+   "index": 73,
+   "mutant": "L380 element 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | ValueError"
+  },
+  {
+   "index": 74,
+   "mutant": "L381 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | ValueError"
+  },
+  {
+   "index": 75,
+   "mutant": "L381 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | ValueError"
+  },
+  {
+   "index": 76,
+   "mutant": "L381 element 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | ValueError"
+  },
+  {
+   "index": 77,
+   "mutant": "L382 conditional negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | AssertionError"
+  },
+  {
+   "index": 78,
+   "mutant": "L387 string 'inside' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | KeyError"
+  },
+  {
+   "index": 79,
+   "mutant": "L387 string 'uid' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "FAIL: test_the_record_has_each_reading_under_its_name (v2.test_v21_kills3_T05b.CorrectlyConfinedSession.test_the_record_has_each_reading_under_its_name) | AssertionError"
+  },
+  {
+   "index": 80,
+   "mutant": "L387 string 'capabilities' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | KeyError"
+  },
+  {
+   "index": 81,
+   "mutant": "L387 string 'no_new_privs' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | KeyError"
+  },
+  {
+   "index": 82,
+   "mutant": "L388 string 'seccomp' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "ERROR: test_no_new_privs_and_seccomp_are_the_status_values (v2.test_v21_kills3_T05b.CorrectlyConfinedSession.test_no_new_privs_and_seccomp_are_the_status_values) | KeyError"
+  },
+  {
+   "index": 83,
+   "mutant": "L388 string 'network_interfaces' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "ERROR: test_interfaces_are_listed_and_none_is_routed (v2.test_v21_kills3_T05b.AFreshNetworkNamespace.test_interfaces_are_listed_and_none_is_routed) | KeyError"
+  },
+  {
+   "index": 84,
+   "mutant": "L388 string 'routed_interfaces' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "ERROR: setUpClass (v2.test_v21_kills3_T05b.AFreshNetworkNamespace) | KeyError"
+  },
+  {
+   "index": 85,
+   "mutant": "L389 string 'mounts' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | KeyError"
+  },
+  {
+   "index": 86,
+   "mutant": "L389 string 'mount_targets' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | KeyError"
+  },
+  {
+   "index": 87,
+   "mutant": "L390 string 'device_roots' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | KeyError"
+  },
+  {
+   "index": 88,
+   "mutant": "L390 string 'devices' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | AssertionError"
+  },
+  {
+   "index": 89,
+   "mutant": "L391 string 'namespaces' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | KeyError"
+  },
+  {
+   "index": 90,
+   "mutant": "L392 string 'home_listing' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | KeyError"
+  },
+  {
+   "index": 91,
+   "mutant": "L393 string 'unix_sockets' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | KeyError"
+  },
+  {
+   "index": 92,
+   "mutant": "L388 sorted() -> list()",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "FAIL: test_the_interfaces_with_a_route_are_recorded_once_each_sorted (v2.test_v21_kills3_T05b.CorrectlyConfinedSession.test_the_interfaces_with_a_route_are_recorded_once_each_sorted) | AssertionError"
+  },
+  {
+   "index": 93,
+   "mutant": "L393 conditional negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | AssertionError"
+  },
+  {
+   "index": 94,
+   "mutant": "L396 string 'host_mounts' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | AssertionError"
+  },
+  {
+   "index": 95,
+   "mutant": "L396 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_reading_that_failed_leaves_no_mount_shown_to_be_the_sandboxs (v2.test_v21_r3_conf_policy.ReportedData.test_a_reading_that_failed_leaves_no_mount_shown_to_be_the_sandboxs) (reads=(None, [{'at': '/', 'access': 'rw', 'fs': 'ext4', 'dev': '8:1', 'root': '/', 'source': '/dev/vda1', 'options': ['rw', 'relatime'], 'super_options': ['rw'], 'optional': []}])) | TypeError"
+  },
+  {
+   "index": 96,
+   "mutant": "L397 string 'tried' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "ERROR: test_each_try_has_its_exit_and_the_text_it_printed (v2.test_v21_kills3_T05b.WhatWasTried.test_each_try_has_its_exit_and_the_text_it_printed) | KeyError"
+  },
+  {
+   "index": 97,
+   "mutant": "L397 dict entry 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "FAIL: test_each_try_has_its_exit_and_the_text_it_printed (v2.test_v21_kills3_T05b.WhatWasTried.test_each_try_has_its_exit_and_the_text_it_printed) | AssertionError"
+  },
+  {
+   "index": 98,
+   "mutant": "L397 dict entry 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "FAIL: test_each_try_has_its_exit_and_the_text_it_printed (v2.test_v21_kills3_T05b.WhatWasTried.test_each_try_has_its_exit_and_the_text_it_printed) | AssertionError"
+  },
+  {
+   "index": 99,
+   "mutant": "L398 string 'created_outside_workspace' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | KeyError"
+  },
+  {
+   "index": 100,
+   "mutant": "L399 string 'setsid_survivors' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | KeyError"
+  },
+  {
+   "index": 101,
+   "mutant": "L400 string 'operator_can' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "ERROR: test_operator_can_is_one_per_write_try_under_the_same_name (v2.test_v21_kills3_T05b.WhatWasTried.test_operator_can_is_one_per_write_try_under_the_same_name) | KeyError"
+  },
+  {
+   "index": 102,
+   "mutant": "L403 string 'left_on_host' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | KeyError"
+  },
+  {
+   "index": 103,
+   "mutant": "L406 string 'left_on_host' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | KeyError"
+  },
+  {
+   "index": 104,
+   "mutant": "L409 string 'problems' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | KeyError"
+  },
+  {
+   "index": 105,
+   "mutant": "L338 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | ValueError"
+  },
+  {
+   "index": 106,
+   "mutant": "L338 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | ValueError"
+  },
+  {
+   "index": 107,
+   "mutant": "L340 string 'bwrap_version' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "ERROR: test_the_record_holds_what_it_printed (v2.test_v21_kills3_T05b.BubblewrapRelease.test_the_record_holds_what_it_printed) | KeyError"
+  },
+  {
+   "index": 108,
+   "mutant": "L347 string '\\n' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_confine.py",
+   "first": "FAIL: test_a_probe_that_did_not_exit_0_is_refused_even_when_it_reached_its_end (v2.test_v21_confine.FailClosed.test_a_probe_that_did_not_exit_0_is_refused_even_when_it_reached_its_end) | ValueError"
+  },
+  {
+   "index": 109,
+   "mutant": "L347 string 'utf-8' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | LookupError"
+  },
+  {
+   "index": 110,
+   "mutant": "L353 string 'HOME' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05a.py",
+   "first": "FAIL: test_a_sandbox_as_required_is_not_refused (v2.test_v21_kills3_T05a.CleanSession.test_a_sandbox_as_required_is_not_refused) | AssertionError"
+  },
+  {
+   "index": 111,
+   "mutant": "L355 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | ValueError"
+  },
+  {
+   "index": 112,
+   "mutant": "L355 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | ValueError"
+  },
+  {
+   "index": 113,
+   "mutant": "L356 string 'run_directory' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | KeyError"
+  },
+  {
+   "index": 114,
+   "mutant": "L356 string 'kernel' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | KeyError"
+  },
+  {
+   "index": 115,
+   "mutant": "L356 string 'interpreter_site' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | KeyError"
+  },
+  {
+   "index": 116,
+   "mutant": "L357 string 'client_directory' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | KeyError"
+  },
+  {
+   "index": 117,
+   "mutant": "L357 string 'git_directory' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | KeyError"
+  },
+  {
+   "index": 118,
+   "mutant": "L358 string '/bin/sh' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A06.py",
+   "first": "FAIL: test_the_recorded_argv_is_the_command_line_that_ran (v2.test_v21_kills3_A06.RecordedCommandLine.test_the_recorded_argv_is_the_command_line_that_ran) | AssertionError"
+  },
+  {
+   "index": 119,
+   "mutant": "L358 string '-c' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A06.py",
+   "first": "FAIL: test_the_recorded_argv_is_the_command_line_that_ran (v2.test_v21_kills3_A06.RecordedCommandLine.test_the_recorded_argv_is_the_command_line_that_ran) | AssertionError"
+  },
+  {
+   "index": 120,
+   "mutant": "L358 string '<PROBE>' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A06.py",
+   "first": "FAIL: test_the_recorded_argv_is_the_command_line_that_ran (v2.test_v21_kills3_A06.RecordedCommandLine.test_the_recorded_argv_is_the_command_line_that_ran) | AssertionError"
+  },
+  {
+   "index": 121,
+   "mutant": "L358 string 'probe' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A06.py",
+   "first": "FAIL: test_the_recorded_argv_is_the_command_line_that_ran (v2.test_v21_kills3_A06.RecordedCommandLine.test_the_recorded_argv_is_the_command_line_that_ran) | AssertionError"
+  },
+  {
+   "index": 122,
+   "mutant": "L364 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05c.py",
+   "first": "ERROR: test_a_probe_over_its_limit_is_a_problem_not_a_crash (v2.test_v21_kills3_T05c.TheProbeCannotBeRunOrHangs.test_a_probe_over_its_limit_is_a_problem_not_a_crash) | ValueError"
+  },
+  {
+   "index": 123,
+   "mutant": "L364 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05c.py",
+   "first": "ERROR: test_a_probe_over_its_limit_is_a_problem_not_a_crash (v2.test_v21_kills3_T05c.TheProbeCannotBeRunOrHangs.test_a_probe_over_its_limit_is_a_problem_not_a_crash) | ValueError"
+  },
+  {
+   "index": 124,
+   "mutant": "L364 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05c.py",
+   "first": "ERROR: test_a_probe_over_its_limit_is_a_problem_not_a_crash (v2.test_v21_kills3_T05c.TheProbeCannotBeRunOrHangs.test_a_probe_over_its_limit_is_a_problem_not_a_crash) | ValueError"
+  },
+  {
+   "index": 125,
+   "mutant": "L364 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05c.py",
+   "first": "ERROR: test_a_probe_over_its_limit_is_a_problem_not_a_crash (v2.test_v21_kills3_T05c.TheProbeCannotBeRunOrHangs.test_a_probe_over_its_limit_is_a_problem_not_a_crash) | ValueError"
+  },
+  {
+   "index": 126,
+   "mutant": "L366 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05c.py",
+   "first": "ERROR: test_an_exec_failure_of_the_probe_is_a_problem_not_a_crash (v2.test_v21_kills3_T05c.TheProbeCannotBeRunOrHangs.test_an_exec_failure_of_the_probe_is_a_problem_not_a_crash) | ValueError"
+  },
+  {
+   "index": 127,
+   "mutant": "L366 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05c.py",
+   "first": "ERROR: test_an_exec_failure_of_the_probe_is_a_problem_not_a_crash (v2.test_v21_kills3_T05c.TheProbeCannotBeRunOrHangs.test_an_exec_failure_of_the_probe_is_a_problem_not_a_crash) | ValueError"
+  },
+  {
+   "index": 128,
+   "mutant": "L366 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05c.py",
+   "first": "ERROR: test_an_exec_failure_of_the_probe_is_a_problem_not_a_crash (v2.test_v21_kills3_T05c.TheProbeCannotBeRunOrHangs.test_an_exec_failure_of_the_probe_is_a_problem_not_a_crash) | ValueError"
+  },
+  {
+   "index": 129,
+   "mutant": "L366 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05c.py",
+   "first": "ERROR: test_an_exec_failure_of_the_probe_is_a_problem_not_a_crash (v2.test_v21_kills3_T05c.TheProbeCannotBeRunOrHangs.test_an_exec_failure_of_the_probe_is_a_problem_not_a_crash) | ValueError"
+  },
+  {
+   "index": 130,
+   "mutant": "L368 string 'sleep ' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 131,
+   "mutant": "L369 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | ValueError"
+  },
+  {
+   "index": 132,
+   "mutant": "L369 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | ValueError"
+  },
+  {
+   "index": 133,
+   "mutant": "L372 string 'end' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | AssertionError"
+  },
+  {
+   "index": 134,
+   "mutant": "L375 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | ValueError"
+  },
+  {
+   "index": 135,
+   "mutant": "L375 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | ValueError"
+  },
+  {
+   "index": 136,
+   "mutant": "L376 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | KeyError"
+  },
+  {
+   "index": 137,
+   "mutant": "L376 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | KeyError"
+  },
+  {
+   "index": 138,
+   "mutant": "L376 element 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | KeyError"
+  },
+  {
+   "index": 139,
+   "mutant": "L376 element 3 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "FAIL: test_the_capabilities_are_the_five_sets_the_status_reports (v2.test_v21_kills3_T05b.CorrectlyConfinedSession.test_the_capabilities_are_the_five_sets_the_status_reports) | AssertionError"
+  },
+  {
+   "index": 140,
+   "mutant": "L376 element 4 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | KeyError"
+  },
+  {
+   "index": 141,
+   "mutant": "L377 string 'mountinfo' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | AssertionError"
+  },
+  {
+   "index": 142,
+   "mutant": "L380 string ' ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | ValueError"
+  },
+  {
+   "index": 143,
+   "mutant": "L381 string ' ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | ValueError"
+  },
+  {
+   "index": 144,
+   "mutant": "L382 Eq->NotEq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | AssertionError"
+  },
+  {
+   "index": 145,
+   "mutant": "L383 In->NotIn",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "FAIL: test_interfaces_are_listed_and_none_is_routed (v2.test_v21_kills3_T05b.AFreshNetworkNamespace.test_interfaces_are_listed_and_none_is_routed) | AssertionError"
+  },
+  {
+   "index": 146,
+   "mutant": "L386 In->NotIn",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "FAIL: test_the_interfaces_with_a_route_are_recorded_once_each_sorted (v2.test_v21_kills3_T05b.CorrectlyConfinedSession.test_the_interfaces_with_a_route_are_recorded_once_each_sorted) | AssertionError"
+  },
+  {
+   "index": 147,
+   "mutant": "L387 string 'uid' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "FAIL: test_the_uid_is_what_id_printed (v2.test_v21_kills3_T05b.CorrectlyConfinedSession.test_the_uid_is_what_id_printed) | AssertionError"
+  },
+  {
+   "index": 148,
+   "mutant": "L387 string 'NoNewPrivs' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | AssertionError"
+  },
+  {
+   "index": 149,
+   "mutant": "L388 string 'Seccomp' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "FAIL: test_no_new_privs_and_seccomp_are_the_status_values (v2.test_v21_kills3_T05b.CorrectlyConfinedSession.test_no_new_privs_and_seccomp_are_the_status_values) | AssertionError"
+  },
+  {
+   "index": 150,
+   "mutant": "L392 string 'home' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05a.py",
+   "first": "FAIL: test_a_sandbox_as_required_is_not_refused (v2.test_v21_kills3_T05a.CleanSession.test_a_sandbox_as_required_is_not_refused) | AssertionError"
+  },
+  {
+   "index": 151,
+   "mutant": "L393 Eq->NotEq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | AssertionError"
+  },
+  {
+   "index": 152,
+   "mutant": "L396 Is->IsNot",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | AssertionError"
+  },
+  {
+   "index": 153,
+   "mutant": "L396 Is->IsNot",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | AssertionError"
+  },
+  {
+   "index": 154,
+   "mutant": "L397 string 'exit' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "FAIL: test_each_try_has_its_exit_and_the_text_it_printed (v2.test_v21_kills3_T05b.WhatWasTried.test_each_try_has_its_exit_and_the_text_it_printed) | AssertionError"
+  },
+  {
+   "index": 155,
+   "mutant": "L397 string 'output' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "FAIL: test_each_try_has_its_exit_and_the_text_it_printed (v2.test_v21_kills3_T05b.WhatWasTried.test_each_try_has_its_exit_and_the_text_it_printed) | AssertionError"
+  },
+  {
+   "index": 156,
+   "mutant": "L397 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | ValueError"
+  },
+  {
+   "index": 157,
+   "mutant": "L397 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | ValueError"
+  },
+  {
+   "index": 158,
+   "mutant": "L400 string 'write_' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "FAIL: test_operator_can_is_one_per_write_try_under_the_same_name (v2.test_v21_kills3_T05b.WhatWasTried.test_operator_can_is_one_per_write_try_under_the_same_name) | AssertionError"
+  },
+  {
+   "index": 159,
+   "mutant": "L400 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | ValueError"
+  },
+  {
+   "index": 160,
+   "mutant": "L400 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | ValueError"
+  },
+  {
+   "index": 161,
+   "mutant": "L403 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | ValueError"
+  },
+  {
+   "index": 162,
+   "mutant": "L403 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | ValueError"
+  },
+  {
+   "index": 163,
+   "mutant": "L337 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | ValueError"
+  },
+  {
+   "index": 164,
+   "mutant": "L337 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | ValueError"
+  },
+  {
+   "index": 165,
+   "mutant": "L337 not removed",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | TypeError"
+  },
+  {
+   "index": 166,
+   "mutant": "L338 string 'LC_|LANG' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_locale.py",
+   "first": "FAIL: test_the_environment_the_stand_in_bubblewrap_received (v2.test_v21_r3_conf_locale.AtTheExecBoundary.test_the_environment_the_stand_in_bubblewrap_received) | AssertionError"
+  },
+  {
+   "index": 167,
+   "mutant": "L343 string 'bwrap_version' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05c.py",
+   "first": "FAIL: test_a_hung_version_call_is_marked_unavailable_and_names_the_class (v2.test_v21_kills3_T05c.TheVersionReadCannotFail.test_a_hung_version_call_is_marked_unavailable_and_names_the_class) | AssertionError"
+  },
+  {
+   "index": 168,
+   "mutant": "L343 string 'unavailable: ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05c.py",
+   "first": "FAIL: test_a_hung_version_call_is_marked_unavailable_and_names_the_class (v2.test_v21_kills3_T05c.TheVersionReadCannotFail.test_a_hung_version_call_is_marked_unavailable_and_names_the_class) | AssertionError"
+  },
+  {
+   "index": 169,
+   "mutant": "L348 string 'written-' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_confine.py",
+   "first": "FAIL: test_what_is_measured_decides_not_the_name_of_the_tool (v2.test_v21_confine.FailClosed.test_what_is_measured_decides_not_the_name_of_the_tool) | AssertionError"
+  },
+  {
+   "index": 170,
+   "mutant": "L352 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_confine.py",
+   "first": "FAIL: test_what_is_measured_decides_not_the_name_of_the_tool (v2.test_v21_confine.FailClosed.test_what_is_measured_decides_not_the_name_of_the_tool) | AssertionError"
+  },
+  {
+   "index": 171,
+   "mutant": "L354 string '06d' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05c.py",
+   "first": "FAIL: test_one_measurements_value_is_never_inside_anothers (v2.test_v21_kills3_T05c.TheSleeperHasAFixedWidthDuration.test_one_measurements_value_is_never_inside_anothers) (a='120.7', b='120.70') | AssertionError"
+  },
+  {
+   "index": 172,
+   "mutant": "L361 True->False",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_locale.py",
+   "first": "ERROR: test_the_environment_the_stand_in_bubblewrap_received (v2.test_v21_r3_conf_locale.AtTheExecBoundary.test_the_environment_the_stand_in_bubblewrap_received) | TypeError"
+  },
+  {
+   "index": 173,
+   "mutant": "L361 True->False",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_confine.py",
+   "first": "FAIL: test_a_probe_that_did_not_exit_0_is_refused_even_when_it_reached_its_end (v2.test_v21_confine.FailClosed.test_a_probe_that_did_not_exit_0_is_refused_even_when_it_reached_its_end) | TypeError"
+  },
+  {
+   "index": 174,
+   "mutant": "L373 string 'the sandbox did not run the probe (exit ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_locale.py",
+   "first": "FAIL: test_the_environment_the_stand_in_bubblewrap_received (v2.test_v21_r3_conf_locale.AtTheExecBoundary.test_the_environment_the_stand_in_bubblewrap_received) | AssertionError"
+  },
+  {
+   "index": 175,
+   "mutant": "L373 string '): ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_locale.py",
+   "first": "FAIL: test_the_environment_the_stand_in_bubblewrap_received (v2.test_v21_r3_conf_locale.AtTheExecBoundary.test_the_environment_the_stand_in_bubblewrap_received) | AssertionError"
+  },
+  {
+   "index": 176,
+   "mutant": "L374 string ':' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | ValueError"
+  },
+  {
+   "index": 177,
+   "mutant": "L374 In->NotIn",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | AssertionError"
+  },
+  {
+   "index": 178,
+   "mutant": "L376 string 'CapInh' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | KeyError"
+  },
+  {
+   "index": 179,
+   "mutant": "L376 string 'CapPrm' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | KeyError"
+  },
+  {
+   "index": 180,
+   "mutant": "L376 string 'CapEff' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | KeyError"
+  },
+  {
+   "index": 181,
+   "mutant": "L376 string 'CapBnd' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "FAIL: test_the_capabilities_are_the_five_sets_the_status_reports (v2.test_v21_kills3_T05b.CorrectlyConfinedSession.test_the_capabilities_are_the_five_sets_the_status_reports) | AssertionError"
+  },
+  {
+   "index": 182,
+   "mutant": "L376 string 'CapAmb' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | KeyError"
+  },
+  {
+   "index": 183,
+   "mutant": "L382 string 'char' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | AssertionError"
+  },
+  {
+   "index": 184,
+   "mutant": "L383 string ':' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A05.py",
+   "first": "FAIL: test_a_netdev_line_that_is_not_an_interface_row_is_no_interface (v2.test_v21_kills3_A05.Rows.test_a_netdev_line_that_is_not_an_interface_row_is_no_interface) | AssertionError"
+  },
+  {
+   "index": 185,
+   "mutant": "L386 string '\\t' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | ValueError"
+  },
+  {
+   "index": 186,
+   "mutant": "L386 string '\\t' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A05.py",
+   "first": "FAIL: test_a_route_line_that_is_not_a_route_row_is_no_route_and_refuses_nothing (v2.test_v21_kills3_A05.Rows.test_a_route_line_that_is_not_a_route_row_is_no_route_and_refuses_nothing) | AssertionError"
+  },
+  {
+   "index": 187,
+   "mutant": "L391 string 'ns' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | AssertionError"
+  },
+  {
+   "index": 188,
+   "mutant": "L393 string 'listed' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | AssertionError"
+  },
+  {
+   "index": 189,
+   "mutant": "L393 string 'sockets' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05a.py",
+   "first": "FAIL: test_a_sandbox_as_required_is_not_refused (v2.test_v21_kills3_T05a.CleanSession.test_a_sandbox_as_required_is_not_refused) | AssertionError"
+  },
+  {
+   "index": 190,
+   "mutant": "L397 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | ValueError"
+  },
+  {
+   "index": 191,
+   "mutant": "L397 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | ValueError"
+  },
+  {
+   "index": 192,
+   "mutant": "L407 string \"the probe's files are left where confinement did not stop them; nothing was removed, the operator removes them: \" emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_confine.py",
+   "first": "FAIL: test_a_probe_that_did_not_exit_0_is_refused_even_when_it_reached_its_end (v2.test_v21_confine.FailClosed.test_a_probe_that_did_not_exit_0_is_refused_even_when_it_reached_its_end) | AssertionError"
+  },
+  {
+   "index": 193,
+   "mutant": "L350 string 'purelib' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | KeyError"
+  },
+  {
+   "index": 194,
+   "mutant": "L357 True->False",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05a.py",
+   "first": "FAIL: test_the_probe_is_given_every_host_directory_the_wrapper_binds_and_none_of_its_own_mounts (v2.test_v21_kills3_T05a.UnixSockets.test_the_probe_is_given_every_host_directory_the_wrapper_binds_and_none_of_its_own_mounts) | AssertionError"
+  },
+  {
+   "index": 195,
+   "mutant": "L364 string 'TimeoutExpired: timed out after ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05c.py",
+   "first": "FAIL: test_a_probe_over_its_limit_is_a_problem_not_a_crash (v2.test_v21_kills3_T05c.TheProbeCannotBeRunOrHangs.test_a_probe_over_its_limit_is_a_problem_not_a_crash) | AssertionError"
+  },
+  {
+   "index": 196,
+   "mutant": "L364 string ' seconds' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_R02.py",
+   "first": "FAIL: test_the_refusal_names_the_limit_and_its_unit (v2.test_v21_kills3_R02.AProbeOverItsLimitSaysHowLongTheLimitIs.test_the_refusal_names_the_limit_and_its_unit) | AssertionError"
+  },
+  {
+   "index": 197,
+   "mutant": "L366 string ': ' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 198,
+   "mutant": "L374 string 'status' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | AssertionError"
+  },
+  {
+   "index": 199,
+   "mutant": "L374 string ':' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A05.py",
+   "first": "ERROR: test_a_status_line_that_is_not_a_key_value_row_is_skipped_not_a_crash (v2.test_v21_kills3_A05.Rows.test_a_status_line_that_is_not_a_key_value_row_is_skipped_not_a_crash) | ValueError"
+  },
+  {
+   "index": 200,
+   "mutant": "L383 string 'netdev' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "FAIL: test_interfaces_are_listed_and_none_is_routed (v2.test_v21_kills3_T05b.AFreshNetworkNamespace.test_interfaces_are_listed_and_none_is_routed) | AssertionError"
+  },
+  {
+   "index": 201,
+   "mutant": "L386 string 'route' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "first": "FAIL: test_the_interfaces_with_a_route_are_recorded_once_each_sorted (v2.test_v21_kills3_T05b.CorrectlyConfinedSession.test_the_interfaces_with_a_route_are_recorded_once_each_sorted) | AssertionError"
+  },
+  {
+   "index": 202,
+   "mutant": "L393 string 'sockets' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | AssertionError"
+  },
+  {
+   "index": 203,
+   "mutant": "L396 NotIn->In",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | AssertionError"
+  },
+  {
+   "index": 204,
+   "mutant": "L337 string 'LC_|LANG' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_locale.py",
+   "first": "FAIL: test_the_rest_of_the_environment_is_what_the_session_wrapper_gives (v2.test_v21_r3_conf_locale.PassedDown.test_the_rest_of_the_environment_is_what_the_session_wrapper_gives) | AssertionError"
+  },
+  {
+   "index": 205,
+   "mutant": "L340 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_locale.py",
+   "first": "FAIL: test_the_environment_the_stand_in_bubblewrap_received (v2.test_v21_r3_conf_locale.AtTheExecBoundary.test_the_environment_the_stand_in_bubblewrap_received) | AssertionError"
+  },
+  {
+   "index": 206,
+   "mutant": "L340 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_locale.py",
+   "first": "FAIL: test_the_probe_and_the_version_query_get_the_c_locale_and_nothing_else_of_the_family (v2.test_v21_r3_conf_locale.PassedDown.test_the_probe_and_the_version_query_get_the_c_locale_and_nothing_else_of_the_family) | AssertionError"
+  },
+  {
+   "index": 207,
+   "mutant": "L352 string '.git' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 208,
+   "mutant": "L383 string ':' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | ValueError"
+  },
+  {
+   "index": 209,
+   "mutant": "L408 string 'left_on_host' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_confine.py",
+   "first": "FAIL: test_a_probe_that_did_not_exit_0_is_refused_even_when_it_reached_its_end (v2.test_v21_confine.FailClosed.test_a_probe_that_did_not_exit_0_is_refused_even_when_it_reached_its_end) | KeyError"
+  },
+  {
+   "index": 210,
+   "mutant": "L340 string '--version' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_locale.py",
+   "first": "FAIL: test_the_probe_and_the_version_query_get_the_c_locale_and_nothing_else_of_the_family (v2.test_v21_r3_conf_locale.PassedDown.test_the_probe_and_the_version_query_get_the_c_locale_and_nothing_else_of_the_family) | AssertionError"
+  },
+  {
+   "index": 211,
+   "mutant": "L340 True->False",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_locale.py",
+   "first": "ERROR: test_the_environment_the_stand_in_bubblewrap_received (v2.test_v21_r3_conf_locale.AtTheExecBoundary.test_the_environment_the_stand_in_bubblewrap_received) | AttributeError"
+  },
+  {
+   "index": 212,
+   "mutant": "L340 True->False",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_confine.py",
+   "first": "FAIL: test_a_probe_that_did_not_exit_0_is_refused_even_when_it_reached_its_end (v2.test_v21_confine.FailClosed.test_a_probe_that_did_not_exit_0_is_refused_even_when_it_reached_its_end) | TypeError"
+  },
+  {
+   "index": 213,
+   "mutant": "L351 string 'client' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | KeyError"
+  },
+  {
+   "index": 214,
+   "mutant": "L340 string 'bwrap' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "ERROR: test_a_correct_session_is_accepted_and_the_report_holds_what_decided (v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) | KeyError"
+  }
+ ]
+}

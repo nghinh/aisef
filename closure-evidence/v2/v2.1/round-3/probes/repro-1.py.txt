@@ -1,0 +1,91 @@
+# repro-1 (probes WP, item 1): a subject whose dotted module name passes through an implicit (PEP 420) namespace
+# package that has a parent package.  Real entry points: ProcessEffectProbe.observe, CliInvocationProbe.observe,
+# PythonCallableV2Probe.observe and run_probe (-> ProbeResult).  No fault injection; real checkouts, real controller
+# and agent processes.  Run from the worktree root:  py.sh probes -I <this file>
+import json
+import os
+import pathlib
+import subprocess
+import sys
+import tempfile
+
+sys.path.insert(0, os.getcwd())
+
+from aisef2.arch.enums import BehaviorVerdict, Enforcement, SubjectAbsence  # noqa: E402
+from aisef2.probe import cli_invocation as ci, process_effect as pe, python_callable_v2 as pc2  # noqa: E402
+from aisef2.probe.protocol import ExecutionEnv, RevisionRef, run_probe  # noqa: E402
+from aisef2.product.spec import ProductProofSpec  # noqa: E402
+
+SHA = "89abcdef0123456789abcdef0123456789abcdef"
+ENV = ExecutionEnv(sys.executable, 20, Enforcement.PARTIAL)
+F = "def f():\n    return 1\n\n\ndef main(argv):\n    return 0\n"
+LAYOUTS = [
+    ("L0 control: namespace package, depth 1",              {"ns/mod.py": F}, "ns.mod"),
+    ("L1 namespace inside a regular package",               {"pkg/__init__.py": "", "pkg/inner/mod.py": F}, "pkg.inner.mod"),
+    ("L2 the same under src/",                              {"src/pkg/__init__.py": "", "src/pkg/inner/mod.py": F}, "pkg.inner.mod"),
+    ("L3 namespace inside a namespace",                     {"ns/inner/mod.py": F}, "ns.inner.mod"),
+    ("L4 control: regular package inside a namespace",      {"ns/reg/__init__.py": "", "ns/reg/mod.py": F}, "ns.reg.mod"),
+    ("L5 control: all regular",                             {"a/__init__.py": "", "a/b/__init__.py": "", "a/b/mod.py": F}, "a.b.mod"),
+]
+
+
+def checkout(files):
+    d = tempfile.mkdtemp(prefix="aisef2-r3-ns-")
+    for rel, text in files.items():
+        p = pathlib.Path(d, rel)
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(text, encoding="utf-8", newline="\n")
+    return d
+
+
+def pe_spec(locator):
+    return ProductProofSpec.create(
+        contract_id="BC-R3", probe_id=pe.PROBE_ID, probe_digest=pe.DIGEST,
+        probe_input={"subject": {"kind": "process_effect", "locator": locator},
+                     "stimulus": {"scenario": [{"step": "call", "args": [], "kwargs": {}}]},
+                     "observable": {"returns": 1, "within_s": 20}, "subject_absence": SubjectAbsence.REQUIRES_SUBJECT.value},
+        candidate_expectation=BehaviorVerdict.SATISFIED, compiler_id="test", compiler_digest="c" * 64)
+
+
+def ci_spec(locator):
+    return ProductProofSpec.create(
+        contract_id="BC-R3", probe_id=ci.PROBE_ID, probe_digest=ci.DIGEST,
+        probe_input={"subject": {"kind": "cli_invocation", "locator": locator}, "stimulus": {"argv": []},
+                     "observable": {"exit_code": 0, "within_s": 20}, "subject_absence": SubjectAbsence.REQUIRES_SUBJECT.value},
+        candidate_expectation=BehaviorVerdict.SATISFIED, compiler_id="test", compiler_digest="c" * 64)
+
+
+def pc_spec(locator):
+    return ProductProofSpec.create(
+        contract_id="BC-R3", probe_id=pc2.PROBE_ID, probe_digest=pc2.DIGEST,
+        probe_input={"subject": {"kind": "python_callable", "locator": locator}, "stimulus": {},
+                     "observable": {"condition": "exists", "within_s": 20},
+                     "subject_absence": SubjectAbsence.REQUIRES_SUBJECT.value},
+        candidate_expectation=BehaviorVerdict.SATISFIED, compiler_id="test", compiler_digest="c" * 64)
+
+
+def premise(root, module):
+    code = ("import importlib, sys\nroot = sys.argv[1]\nsys.path[:0] = [root, root + '/src']\n"
+            "m = importlib.import_module(sys.argv[2])\nsys.exit(0 if m.f() == 1 else 5)\n")
+    return subprocess.run([sys.executable, "-I", "-S", "-B", "-c", code, root, module], stdin=subprocess.DEVNULL,
+                          check=False).returncode
+
+
+print("interpreter:", sys.version.split()[0], sys.platform)
+print("probe digests: process_effect %s.. cli_invocation %s.. python_callable_v2 %s.." % (
+    pe.EXECUTION_DIGEST[:12], ci.EXECUTION_DIGEST[:12], pc2.EXECUTION_DIGEST[:12]))
+for label, files, module in LAYOUTS:
+    root = checkout(files)
+    at = RevisionRef(SHA, root)
+    print("\n%s  [%s]" % (label, ", ".join(sorted(files))))
+    print("   python itself imports it and f() == 1 (rc 0): rc=%d" % premise(root, module))
+    for name, probe, sp in (("process_effect  ", pe.ProcessEffectProbe(), pe_spec(module + ":f")),
+                            ("cli_invocation  ", ci.CliInvocationProbe(), ci_spec(module + ":main")),
+                            ("python_callable2", pc2.PythonCallableV2Probe(), pc_spec(module + ":f"))):
+        o = probe.observe(sp, at, ENV)
+        r = run_probe(probe, sp, at, ENV).result
+        print("   %s observe -> %-13s verdict=%-9s | run_probe -> %s %s" % (
+            name, o.kind.value, o.verdict.value if o.verdict else None, type(r).__name__,
+            getattr(getattr(r, "status", None), "value", "")))
+        if o.kind.value in ("HARNESS_FAILED",):
+            print("        detail:", o.detail[:150])

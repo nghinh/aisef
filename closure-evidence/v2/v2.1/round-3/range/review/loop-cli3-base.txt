@@ -1,0 +1,105 @@
+--- run 22
+    return classify_failure(spec, self.observe(spec, at, env))
+                                  ~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/out/range/review/loop-base-tree/aisef2/probe/cli_invocation.py", line 954, in observe
+    return self._observe(spec.id, cls, subject["locator"], plain(dict(pi["stimulus"])), observable, at, env)[0]
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/out/range/review/loop-base-tree/aisef2/probe/cli_invocation.py", line 969, in _observe
+    return self._observe_in(work, spec_id, cls, locator, stim, observable, at, env,
+           ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                            lambda facts: verdict_of(cls, observable, facts))
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/out/range/review/loop-base-tree/aisef2/probe/cli_invocation.py", line 1029, in _observe_in
+    run.release()  # RangeNotEmpty / RangeEscaped propagate: a leak is never silent (§17.1)
+    ~~~~~~~~~~~^^
+  File "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/out/range/review/loop-base-tree/aisef2/runtime/process_range.py", line 439, in release
+    self._close_pipes()
+    ~~~~~~~~~~~~~~~~~^^
+  File "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/out/range/review/loop-base-tree/aisef2/runtime/process_range.py", line 352, in _close_pipes
+    pipe.close()
+    ~~~~~~~~~~^^
+ValueError: PyMemoryView_FromBuffer(): info->buf must not be NULL
+
+----------------------------------------------------------------------
+Ran 1 test in 0.578s
+
+FAILED (errors=1)
+--- run 29
+    return classify_failure(spec, self.observe(spec, at, env))
+                                  ~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/out/range/review/loop-base-tree/aisef2/probe/cli_invocation.py", line 954, in observe
+    return self._observe(spec.id, cls, subject["locator"], plain(dict(pi["stimulus"])), observable, at, env)[0]
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/out/range/review/loop-base-tree/aisef2/probe/cli_invocation.py", line 969, in _observe
+    return self._observe_in(work, spec_id, cls, locator, stim, observable, at, env,
+           ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                            lambda facts: verdict_of(cls, observable, facts))
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/out/range/review/loop-base-tree/aisef2/probe/cli_invocation.py", line 1029, in _observe_in
+    run.release()  # RangeNotEmpty / RangeEscaped propagate: a leak is never silent (§17.1)
+    ~~~~~~~~~~~^^
+  File "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/out/range/review/loop-base-tree/aisef2/runtime/process_range.py", line 439, in release
+    self._close_pipes()
+    ~~~~~~~~~~~~~~~~~^^
+  File "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/out/range/review/loop-base-tree/aisef2/runtime/process_range.py", line 352, in _close_pipes
+    pipe.close()
+    ~~~~~~~~~~^^
+ValueError: PyMemoryView_FromBuffer(): info->buf must not be NULL
+
+----------------------------------------------------------------------
+Ran 1 test in 0.585s
+
+FAILED (errors=1)
+--- run 49
+    return classify_failure(spec, self.observe(spec, at, env))
+                                  ~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/out/range/review/loop-base-tree/aisef2/probe/cli_invocation.py", line 954, in observe
+    return self._observe(spec.id, cls, subject["locator"], plain(dict(pi["stimulus"])), observable, at, env)[0]
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/out/range/review/loop-base-tree/aisef2/probe/cli_invocation.py", line 969, in _observe
+    return self._observe_in(work, spec_id, cls, locator, stim, observable, at, env,
+           ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                            lambda facts: verdict_of(cls, observable, facts))
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/out/range/review/loop-base-tree/aisef2/probe/cli_invocation.py", line 1029, in _observe_in
+    run.release()  # RangeNotEmpty / RangeEscaped propagate: a leak is never silent (§17.1)
+    ~~~~~~~~~~~^^
+  File "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/out/range/review/loop-base-tree/aisef2/runtime/process_range.py", line 439, in release
+    self._close_pipes()
+    ~~~~~~~~~~~~~~~~~^^
+  File "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/out/range/review/loop-base-tree/aisef2/runtime/process_range.py", line 352, in _close_pipes
+    pipe.close()
+    ~~~~~~~~~~^^
+ValueError: PyMemoryView_FromBuffer(): info->buf must not be NULL
+
+----------------------------------------------------------------------
+Ran 1 test in 0.565s
+
+FAILED (errors=1)
+--- run 97
+    return classify_failure(spec, self.observe(spec, at, env))
+                                  ~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/out/range/review/loop-base-tree/aisef2/probe/cli_invocation.py", line 954, in observe
+    return self._observe(spec.id, cls, subject["locator"], plain(dict(pi["stimulus"])), observable, at, env)[0]
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/out/range/review/loop-base-tree/aisef2/probe/cli_invocation.py", line 969, in _observe
+    return self._observe_in(work, spec_id, cls, locator, stim, observable, at, env,
+           ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                            lambda facts: verdict_of(cls, observable, facts))
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/out/range/review/loop-base-tree/aisef2/probe/cli_invocation.py", line 1029, in _observe_in
+    run.release()  # RangeNotEmpty / RangeEscaped propagate: a leak is never silent (§17.1)
+    ~~~~~~~~~~~^^
+  File "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/out/range/review/loop-base-tree/aisef2/runtime/process_range.py", line 439, in release
+    self._close_pipes()
+    ~~~~~~~~~~~~~~~~~^^
+  File "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/out/range/review/loop-base-tree/aisef2/runtime/process_range.py", line 352, in _close_pipes
+    pipe.close()
+    ~~~~~~~~~~^^
+ValueError: PyMemoryView_FromBuffer(): info->buf must not be NULL
+
+----------------------------------------------------------------------
+Ran 1 test in 0.580s
+
+FAILED (errors=1)
+tree=/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/out/range/review/loop-base-tree module=tests.v2.test_c2_cli_invocation key=FM2_CLI_SUBJECT_3 runs=100 pass=96 fail=4 exact_ValueError=7

@@ -1,0 +1,17 @@
+{
+ "stories": [
+  "S1",
+  "S2"
+ ],
+ "max_events_after_plan_frozen": 8,
+ "admitted_journals": 785554,
+ "with_a_non_empty_report": 8,
+ "new_differs_from_oracle": 0,
+ "old_differs_from_new": 0,
+ "old_new_difference_kinds": {},
+ "journals_breaking_INV_A_a_committed_attempt_observed_a_failure": 100792,
+ "journals_breaking_INV_B_an_event_follows_a_commit": 0,
+ "extensions_refused_by_the_reader": 0,
+ "extensions_refused_by_a_projection": 1027212,
+ "seconds": 156.2
+}

@@ -1,0 +1,18 @@
+"""usage: python3 -B -I this.txt OUTDIR: a markdown table of the kc-*.json files of OUTDIR (target, mutants, classes, the files that killed)."""
+import collections
+import json
+import pathlib
+import sys
+
+out = pathlib.Path(sys.argv[1])
+rows = []
+for f in sorted(out.glob("kc-*.json")):
+    d = json.loads(f.read_text(encoding="utf-8"))
+    cls = collections.Counter(r["class"] for r in d["results"])
+    by = collections.Counter(r["file"].split("/")[-1] for r in d["results"] if r.get("file"))
+    rows.append((d["target"].split("/")[-1], len(d["results"]), cls.get("KILLED", 0), cls.get("SURVIVED", 0),
+                 ", ".join(f"{k} {v}" for k, v in by.most_common()), f.name))
+print("| function | mutants | KILLED | SURVIVED | killed by (file, count) | record |")
+print("|---|---|---|---|---|---|")
+for t, n, k, s, by, name in rows:
+    print(f"| `{t}` | {n} | {k} | {s} | {by} | `{name}` |")

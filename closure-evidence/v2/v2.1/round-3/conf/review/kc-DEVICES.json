@@ -1,0 +1,207 @@
+{
+ "target": "aisef2/app/confine.py::DEVICES",
+ "files": [
+  "tests/v2/test_v21_r3_conf_policy.py",
+  "tests/v2/test_v21_r3_conf_locale.py",
+  "tests/v2/test_v21_kills3_T07a.py",
+  "tests/v2/test_v21_kills3_T06a.py",
+  "tests/v2/test_v21_kills3_A06.py",
+  "tests/v2/test_v21_kills3_T05b.py",
+  "tests/v2/test_v21_kills3_T05a.py",
+  "tests/v2/test_v21_kills3_T05c.py",
+  "tests/v2/test_v21_kills3_A05.py",
+  "tests/v2/test_v21_kills3_R02.py",
+  "tests/v2/test_v21_kills3_T06b.py",
+  "tests/v2/test_v21_kills3_A07.py",
+  "tests/v2/test_v21_kills3_T07b.py",
+  "tests/v2/test_v21_kills3_TO2.py",
+  "tests/v2/test_v21_defects_confine.py",
+  "tests/v2/test_v21_confine.py"
+ ],
+ "source_sha256": "375489e7f4d1abc502cb6720c37631ad52511711cdb47803e0ecefb009778249",
+ "t0": [
+  {
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "seconds": 1.52,
+   "outcome": "PASS",
+   "ran": 42
+  },
+  {
+   "file": "tests/v2/test_v21_r3_conf_locale.py",
+   "seconds": 1.78,
+   "outcome": "PASS",
+   "ran": 10
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T07a.py",
+   "seconds": 0.39,
+   "outcome": "PASS",
+   "ran": 14
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T06a.py",
+   "seconds": 0.5,
+   "outcome": "PASS",
+   "ran": 14
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_A06.py",
+   "seconds": 1.22,
+   "outcome": "PASS",
+   "ran": 4
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "seconds": 0.83,
+   "outcome": "PASS",
+   "ran": 18
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T05a.py",
+   "seconds": 0.97,
+   "outcome": "PASS",
+   "ran": 8
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T05c.py",
+   "seconds": 2.26,
+   "outcome": "PASS",
+   "ran": 7
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_A05.py",
+   "seconds": 1.24,
+   "outcome": "PASS",
+   "ran": 6
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_R02.py",
+   "seconds": 0.5,
+   "outcome": "PASS",
+   "ran": 2
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T06b.py",
+   "seconds": 1.76,
+   "outcome": "PASS",
+   "ran": 8
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_A07.py",
+   "seconds": 0.37,
+   "outcome": "PASS",
+   "ran": 5
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T07b.py",
+   "seconds": 0.39,
+   "outcome": "PASS",
+   "ran": 11
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_TO2.py",
+   "seconds": 0.31,
+   "outcome": "PASS",
+   "ran": 3
+  },
+  {
+   "file": "tests/v2/test_v21_defects_confine.py",
+   "seconds": 1.69,
+   "outcome": "PASS",
+   "ran": 16
+  },
+  {
+   "file": "tests/v2/test_v21_confine.py",
+   "seconds": 20.2,
+   "outcome": "PASS",
+   "ran": 34
+  }
+ ],
+ "error": null,
+ "results": [
+  {
+   "index": 0,
+   "mutant": "L109 string 'null' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_a_node_the_probe_did_not_read_is_not_established (v2.test_v21_r3_conf_policy.DeviceNodes.test_a_node_the_probe_did_not_read_is_not_established) (devices={}) | AssertionError"
+  },
+  {
+   "index": 1,
+   "mutant": "L109 string 'zero' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_the_closed_list_is_the_six_nodes_bubblewrap_binds (v2.test_v21_r3_conf_policy.DeviceNodes.test_the_closed_list_is_the_six_nodes_bubblewrap_binds) | AssertionError"
+  },
+  {
+   "index": 2,
+   "mutant": "L109 string 'full' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_the_closed_list_is_the_six_nodes_bubblewrap_binds (v2.test_v21_r3_conf_policy.DeviceNodes.test_the_closed_list_is_the_six_nodes_bubblewrap_binds) | AssertionError"
+  },
+  {
+   "index": 3,
+   "mutant": "L109 string 'random' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_the_closed_list_is_the_six_nodes_bubblewrap_binds (v2.test_v21_r3_conf_policy.DeviceNodes.test_the_closed_list_is_the_six_nodes_bubblewrap_binds) | AssertionError"
+  },
+  {
+   "index": 4,
+   "mutant": "L109 string 'urandom' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_the_closed_list_is_the_six_nodes_bubblewrap_binds (v2.test_v21_r3_conf_policy.DeviceNodes.test_the_closed_list_is_the_six_nodes_bubblewrap_binds) | AssertionError"
+  },
+  {
+   "index": 5,
+   "mutant": "L109 string 'tty' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_the_closed_list_is_the_six_nodes_bubblewrap_binds (v2.test_v21_r3_conf_policy.DeviceNodes.test_the_closed_list_is_the_six_nodes_bubblewrap_binds) | AssertionError"
+  },
+  {
+   "index": 6,
+   "mutant": "L109 string '1:3' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_a_node_the_probe_did_not_read_is_not_established (v2.test_v21_r3_conf_policy.DeviceNodes.test_a_node_the_probe_did_not_read_is_not_established) (devices={}) | AssertionError"
+  },
+  {
+   "index": 7,
+   "mutant": "L109 string '1:5' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_the_closed_list_is_the_six_nodes_bubblewrap_binds (v2.test_v21_r3_conf_policy.DeviceNodes.test_the_closed_list_is_the_six_nodes_bubblewrap_binds) | AssertionError"
+  },
+  {
+   "index": 8,
+   "mutant": "L109 string '1:7' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_the_closed_list_is_the_six_nodes_bubblewrap_binds (v2.test_v21_r3_conf_policy.DeviceNodes.test_the_closed_list_is_the_six_nodes_bubblewrap_binds) | AssertionError"
+  },
+  {
+   "index": 9,
+   "mutant": "L109 string '1:8' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_the_closed_list_is_the_six_nodes_bubblewrap_binds (v2.test_v21_r3_conf_policy.DeviceNodes.test_the_closed_list_is_the_six_nodes_bubblewrap_binds) | AssertionError"
+  },
+  {
+   "index": 10,
+   "mutant": "L109 string '1:9' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_the_closed_list_is_the_six_nodes_bubblewrap_binds (v2.test_v21_r3_conf_policy.DeviceNodes.test_the_closed_list_is_the_six_nodes_bubblewrap_binds) | AssertionError"
+  },
+  {
+   "index": 11,
+   "mutant": "L109 string '5:0' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "first": "FAIL: test_the_closed_list_is_the_six_nodes_bubblewrap_binds (v2.test_v21_r3_conf_policy.DeviceNodes.test_the_closed_list_is_the_six_nodes_bubblewrap_binds) | AssertionError"
+  }
+ ]
+}

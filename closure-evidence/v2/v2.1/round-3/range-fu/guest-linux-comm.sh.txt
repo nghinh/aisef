@@ -1,0 +1,14 @@
+import ctypes, os, sys
+sys.path.insert(0, "/repo")
+from aisef2.runtime import process_range as pr
+print("LINUX", pr.LINUX, sys.version.split()[0], "fsenc", sys.getfilesystemencoding(), "utf8mode", sys.flags.utf8_mode)
+ok = pr.process_table()
+print("table before:", len(ok), "rows; me:", ok[os.getpid()].command[:40])
+libc = ctypes.CDLL(None)
+libc.prctl(15, b"\xff\xfeab", 0, 0, 0)       # PR_SET_NAME: a process name that is not valid UTF-8
+print("comm bytes now:", open("/proc/self/comm", "rb").read())
+try:
+    t = pr.process_table()
+    print("table after:", len(t), "rows")
+except Exception as e:
+    print("table after: RAISED", type(e).__name__, str(e)[:100])

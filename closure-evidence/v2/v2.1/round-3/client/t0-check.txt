@@ -1,0 +1,24 @@
+== aisef2/app/client.py::read_session tests/v2/test_v21_r3_client_stream.py
+{
+ "file": "tests/v2/test_v21_r3_client_stream.py",
+ "outcome": "PASS",
+ "ran": 17,
+ "seconds": 1.86,
+ "first": null
+}
+== aisef2/app/confine.py::_sections tests/v2/test_v21_r3_client_readers.py
+{
+ "file": "tests/v2/test_v21_r3_client_readers.py",
+ "outcome": "PASS",
+ "ran": 10,
+ "seconds": 1.66,
+ "first": null
+}
+== aisef2/app/lineage.py::reconcile tests/v2/test_v21_r3_client_readers.py
+{
+ "file": "tests/v2/test_v21_r3_client_readers.py",
+ "outcome": "PASS",
+ "ran": 10,
+ "seconds": 1.68,
+ "first": null
+}

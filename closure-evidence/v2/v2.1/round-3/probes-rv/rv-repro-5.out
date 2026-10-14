@@ -1,0 +1,11 @@
+interpreter: 3.14.7 darwin
+
+HONEST (control)
+  cli_invocation  exits {exit_code: 0}   over main() that raises -> OBSERVED REFUTED | Executed(behavior_verdict=<BehaviorVerdict.REFUTED: 'REFUTED'>, reason=None)
+  process_effect  returns 1              over compute() == 999  -> OBSERVED REFUTED | Executed(behavior_verdict=<BehaviorVerdict.REFUTED: 'REFUTED'>, reason=None)
+  python_callable returns 1              over compute() == 999  -> OBSERVED REFUTED | Executed(behavior_verdict=<BehaviorVerdict.REFUTED: 'REFUTED'>, reason=None)
+
+HOSTILE (simulated)
+  cli_invocation  exits {exit_code: 0}   over main() that raises -> OBSERVED SATISFIED | Executed(behavior_verdict=<BehaviorVerdict.SATISFIED: 'SATISFIED'>, reason=None)
+  process_effect  returns 1              over compute() == 999  -> OBSERVED SATISFIED | Executed(behavior_verdict=<BehaviorVerdict.SATISFIED: 'SATISFIED'>, reason=None)
+  python_callable returns 1              over compute() == 999  -> OBSERVED SATISFIED | Executed(behavior_verdict=<BehaviorVerdict.SATISFIED: 'SATISFIED'>, reason=None)

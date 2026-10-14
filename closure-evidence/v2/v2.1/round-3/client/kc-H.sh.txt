@@ -1,0 +1,10 @@
+#!/bin/zsh
+OUT=/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/out/client
+T=tests/v2
+R=$T/test_v21_r3_client_readers.py
+CONF="$T/test_v21_kills3_T07a.py $T/test_v21_confine.py $T/test_v21_r3_conf_policy.py $T/test_v21_r3_conf_fu_before.py $T/test_v21_r3_conf_rv_hostrows.py"
+$OUT/kc.sh H _lines aisef2/app/confine.py::_lines $R ${=CONF}
+$OUT/kc.sh H _host_mounts aisef2/app/confine.py::_host_mounts $R ${=CONF}
+$OUT/kc.sh H _sections aisef2/app/confine.py::_sections $R ${=CONF}
+$OUT/kc.sh H _mounts aisef2/app/confine.py::_mounts $R ${=CONF} $T/test_v21_kills3_T05b.py
+echo DONE >> $OUT/kc-status-H.txt

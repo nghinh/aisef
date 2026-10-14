@@ -1,0 +1,27 @@
+--- run 2
+  File "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/out/range/review/loop-base-tree/aisef2/probe/protocol.py", line 283, in run_probe
+    result = probe.evaluate(spec, at, env)
+  File "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/out/range/review/loop-base-tree/aisef2/probe/protocol.py", line 161, in evaluate
+    return classify_failure(spec, self.observe(spec, at, env))
+                                  ~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/out/range/review/loop-base-tree/aisef2/probe/process_effect.py", line 868, in observe
+    return self._observe_in(work, spec.id, cls, subject["locator"], plain(dict(pi["stimulus"]))["scenario"],
+           ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                            plain(dict(pi["observable"])), at, env)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/out/range/review/loop-base-tree/aisef2/probe/process_effect.py", line 899, in _observe_in
+    run.release()  # RangeNotEmpty / RangeEscaped propagate: a leak is never silent (§17.1)
+    ~~~~~~~~~~~^^
+  File "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/out/range/review/loop-base-tree/aisef2/runtime/process_range.py", line 439, in release
+    self._close_pipes()
+    ~~~~~~~~~~~~~~~~~^^
+  File "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/out/range/review/loop-base-tree/aisef2/runtime/process_range.py", line 352, in _close_pipes
+    pipe.close()
+    ~~~~~~~~~~^^
+ValueError: PyMemoryView_FromBuffer(): info->buf must not be NULL
+
+----------------------------------------------------------------------
+Ran 1 test in 0.509s
+
+FAILED (errors=1)
+tree=/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/out/range/review/loop-base-tree module=tests.v2.test_probe_process_effect key=FM2_EFFECT_10 runs=100 pass=99 fail=1 exact_ValueError=1

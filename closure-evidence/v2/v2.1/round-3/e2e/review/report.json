@@ -1,0 +1,276 @@
+{
+ "wp": "e2e",
+ "reviewer_branch": "v21r3/e2e-rv",
+ "head": "f7f308f628358e78f2d0072b805b6f0d7ab549d2",
+ "reviewed": {
+  "implementer_head": "11ec8233dd6ec483ac53f94d7987c5e6434cf7e2",
+  "base": "3dc827beb0f3dd2105cf1e41f28ec8d6da2b7cd1",
+  "last_code_commit": "8caebec94da15ab834aa5f54df2715a9bdfb0272"
+ },
+ "owner_sentences": [
+  {
+   "sentence": "Thực hiện một lượt aisef run đầu-cuối bằng CLI thật trong sandbox Linux, dùng adapter kịch bản/offline để không phát sinh phí provider.",
+   "status": "MET",
+   "evidence": "python3 -B -m aisef (check, run, run --verify) ran 6 times per X1 container in the Docker Desktop guest under bubblewrap 0.12.0; the client is a scripted Python 'opencode', the provider a loopback thread answering only the preflight (18 requests in X1, 0 in hardened, 0 spend). Four runs of my own reproduce the implementer's 88/88 + 4/4. 'Sandbox Linux' = the Docker VM + bwrap, profile X1 loosening the container's seccomp/systempaths (stated)."
+  },
+  {
+   "sentence": "Kiểm tra đường thành công",
+   "status": "MET",
+   "evidence": "S1 14 checks: measured confinement before the first request, both sessions PID 1 = bwrap with confine.argv, uid 1000/caps 0/NoNewPrivs 1/HOME /aisef-home, reviewer workspace ro, work landed on main, anchor 0444, VERIFIED. Seven reviewer experiments show S1 notices an unconfined session, a writable reviewer workspace and a kept operator HOME; it does NOT notice a sessions-only writable git directory (S2 does)."
+  },
+  {
+   "sentence": "từ chối ghi ngoài phạm vi",
+   "status": "MET",
+   "evidence": "S2 (13 attempts): no write reached the host (controller before/after + host_has); S2c shows the same attempts succeed unconfined. Precisely: 4 EROFS, 4 ENOENT (not mounted), 4 created on a sandbox tmpfs (absent on the host), 1 permitted read. 'Refused' is literal for 4 of 13; the other outcomes are containment. S2b: 5 ways isolation cannot be given -> exit 2, stage confinement, 0 provider requests. The review made the doc state the breakdown and fixed S2 passing a mistyped path alone."
+  },
+  {
+   "sentence": "xử lý tiến trình con",
+   "status": "MET",
+   "evidence": "S3 (background child + SIGINT/SIGTERM-ignoring grandchild + setsid child die with the confined session; 20 ms watch 0 polls with a child after; none alive after the CLI), S3t (timeout, teardown), S3c (control: setsid child outlives the CLI, RangeEscaped). Wrong-marker experiment: the watch check fails, not vacuous."
+  },
+  {
+   "sentence": "xác minh evidence/anchor",
+   "status": "MET",
+   "evidence": "S4 8 checks on copies: right anchor VERIFIED; wrong anchor, one stream byte, edited delivery_verdict, regenerated manifests REFUTED; original 111 entries unchanged; consistency-only limit shown as observed, not asserted."
+  },
+  {
+   "sentence": "Báo đúng môi trường Docker Linux guest, cấu hình và đường mã đã chạy.",
+   "status": "MET",
+   "evidence": "environment.txt/commands.txt/result carry kernel, image id, flags, bwrap sha256, settings verbatim, argv of every step, code_path_proofs with fields. After review: the network row, the S4 entry count, the developer_committed_itself credit and the S2 outcome classes were wrong or overstated in the doc and are corrected (638c0be)."
+  },
+  {
+   "sentence": "Lượt này chứng minh tích hợp có cách ly; không chứng minh hiệu quả với mô hình thật.",
+   "status": "MET",
+   "evidence": "Doc 7/8: scripted model, no real opencode, no OCR, egress host/not confined, one kernel/arch, X1 loosening. Not-shown list matches the report's."
+  },
+  {
+   "sentence": "Không tự tắt Docker Desktop hoặc các container dịch vụ của tôi... Giữ goe-postgres và goe-valkey hoạt động; chỉ quản lý tài nguyên riêng của chiến dịch.",
+   "status": "MET",
+   "evidence": "No docker stop/rm/kill/prune/rmi/build/pull anywhere in the launcher, driver or my commands; docker run --rm of the local image only; goe-postgres-1 and goe-valkey-1 'Up 5 hours (healthy)' before and after (docker ps)."
+  }
+ ],
+ "claims": [
+  {
+   "claim": "88 checks (X1) + 4 (hardened) passed in each of two runs; 0 differences",
+   "verdict": "CONFIRMED",
+   "note": "rerun1 (11ec823), rerun3 (638c0be), rerun4 (8caebec): 11 scenarios, 88/88, hardened 4/4, compare 0 differences in checks and facts vs implementer run 1; provider 18/0."
+  },
+  {
+   "claim": "negative control: S1 5/14, S2 13/17, S3 4/6 fail",
+   "verdict": "CONFIRMED",
+   "note": "reproduced on a fresh scratch tree with the same one-line change: S1 5 fail, S2 13 fail, S3 4 fail (exit 1)."
+  },
+  {
+   "claim": "no product code changed (aisef/ aisef2/ identical to 3dc827b; kernel_digest afe21212...)",
+   "verdict": "CONFIRMED",
+   "note": "git diff 3dc827b HEAD -- aisef aisef2 empty; every run's kernel_digest afe21212e1419292..."
+  },
+  {
+   "claim": "the container has lo only (doc 3)",
+   "verdict": "REVISED",
+   "note": "the driver's own environment.network_interfaces has 11 entries: lo (up) + nine DOWN tunnel pseudo-devices + bonding_masters; IPv4 route table empty, 3 IPv6 rows all on lo (measured, review/guest-network.txt). 'No route off the container' is true."
+  },
+  {
+   "claim": "S2: writes outside the scope refused, so the denials are bubblewrap's",
+   "verdict": "REVISED",
+   "note": "4 EROFS (refused), 4 ENOENT (not mounted), 4 created into a sandbox tmpfs (not on the host), 1 read by design. True that none reached the host and that the controls show the container would have allowed them; 'refused' is literal for 4 of 13."
+  },
+  {
+   "claim": "S4: the original's 110 entries re-hashed",
+   "verdict": "REVISED",
+   "note": "111 in every run."
+  },
+  {
+   "claim": "sessions[developer].developer_committed_itself=false because the git directory is read-only to the session",
+   "verdict": "RECLASSIFIED",
+   "note": "the scripted developer never runs git; false by construction. The read-only git dir is shown by S2 (EROFS), not by this field."
+  },
+  {
+   "claim": "PID 1's argv equals confine.argv recomputed proves the sessions ran under the kernel's wrapper",
+   "verdict": "REVISED",
+   "note": "it is an equality with the kernel's own function: proves the wrapper was applied with those inputs, not that the argv is right. Experiment: sessions-only RW git dir -> S1 14/14 pass, S2 developer:git_directory fails. Independent proofs are the inside view, S2 and the kernel's measurement."
+  },
+  {
+   "claim": "measured before the first provider request",
+   "verdict": "REVISED",
+   "note": "canary mtime is the measurement's start (58 ms before the first request in rerun1); that a failing measurement stops before any request is S2b + run.py stage order. Stated in doc 8.9."
+  },
+  {
+   "claim": "a record alone does not show a session was confined (every_session_recorded_as_bwrap passes in the negative control)",
+   "verdict": "CONFIRMED",
+   "note": "client.py builds the 'bwrap network=host' string from the confine parameter, not from what ran."
+  },
+  {
+   "claim": "S2c: 10 of 11 creates succeeded; 9 on the host by the controller, the tenth caught by the kernel's tree comparison; the failure is the container's EACCES",
+   "verdict": "CONFIRMED",
+   "note": "counted from the result; journal quote and CAPABILITY_UNRUNNABLE present."
+  },
+  {
+   "claim": "second run determinism",
+   "verdict": "CONFIRMED",
+   "note": "three further runs, all identical in checks and facts; only anchors, commit ids, journal digests, timestamps, timelines differ."
+  },
+  {
+   "claim": "S4 stream byte + regenerated manifest verifies without an anchor (documented limit)",
+   "verdict": "CONFIRMED",
+   "note": "observed, VERIFIED exit 0; with the anchor REFUTED."
+  }
+ ],
+ "defects_found": [
+  {
+   "what": "S2 passed a mistyped/nonexistent target path on its own: any errno counted as a refusal, so only the S2c control caught it (S2 17/17 with a parent that exists nowhere).",
+   "severity": "medium",
+   "fixed_in_commit": "2cd8826"
+  },
+  {
+   "what": "e2e_linux.sh exited 0 whatever the containers did (it ended with print done) and never checked that TREE was the ARCHIVE/COMMIT it recorded.",
+   "severity": "medium",
+   "fixed_in_commit": "2cd8826 (exit status, guard), 8caebec (guard counts every non-directory entry: find -type f would refuse a tree with a symlink)"
+  },
+  {
+   "what": "doc: the container has 'lo only' - contradicted by the run's own network_interfaces (lo + nine DOWN tunnel pseudo-devices).",
+   "severity": "low",
+   "fixed_in_commit": "638c0be"
+  },
+  {
+   "what": "doc: S4 re-hashes '110 entries' - data says 111 in every run.",
+   "severity": "low",
+   "fixed_in_commit": "638c0be"
+  },
+  {
+   "what": "doc/driver label: developer_committed_itself=false credited to the git directory being read-only; it is false because the scripted developer never runs git.",
+   "severity": "low",
+   "fixed_in_commit": "638c0be"
+  },
+  {
+   "what": "doc/summary: 'writes refused' overstates - 4 of 13 S2 attempts succeeded into a sandbox tmpfs and 4 were ENOENT (not mounted); the breakdown was not reported.",
+   "severity": "low",
+   "fixed_in_commit": "2cd8826 (what_the_session_was_told), 638c0be (doc)"
+  },
+  {
+   "what": "doc: real/simulated lists put the loopback HTTP preflight under Real without saying its answers are scripted; argv equality and canary-before-first-request limits not stated.",
+   "severity": "low",
+   "fixed_in_commit": "638c0be"
+  },
+  {
+   "what": "docs/v2.1/SANDBOX-LINUX.md section 8 row (confined real aisef run on Linux end to end: M6, not done) and docs/v2.1/REPORT.md rows 48 and 90 become stale when this evidence is committed.",
+   "severity": "info",
+   "fixed_in_commit": null
+  }
+ ],
+ "counter_examples": [
+  {
+   "name": "mistyped S2 target (d-s2-typo-parent)",
+   "result": "S2 17/17 pass (vacuous), S2c fails kernel_directory + control_the_controller_view_sees_every_write; after the fix S2 16/17 fails developer:kernel_directory"
+  },
+  {
+   "name": "sessions-only writable git directory (p-git-rw-sessions-only)",
+   "result": "measurement passes, S1 14/14 pass, S2 developer:git_directory fails"
+  },
+  {
+   "name": "operator HOME kept in the session env (p-home-exposed)",
+   "result": "S1 inside_view x2 fail, S2 17/17 pass (the path is not mounted either way: a functional regression, not an isolation one)"
+  }
+ ],
+ "mutants_rerun": [
+  {
+   "id": "neg-unconfined",
+   "scenarios": "S1,S2,S3",
+   "result": "S1 5/14 fail; S2 13/17; S3 4/6 (exit 1)"
+  },
+  {
+   "id": "p-reviewer-rw",
+   "scenarios": "S1,S2",
+   "result": "S1: every_session_recorded_as_bwrap, reviewer_ran_inside_bwrap..., reviewer_workspace_mount_is_ro; S2: reviewer:checkout_under_review, legitimate_work..."
+  },
+  {
+   "id": "p-git-rw-sessions-only",
+   "scenarios": "S1,S2",
+   "result": "S1 14/14 pass; S2 developer:git_directory fails"
+  },
+  {
+   "id": "p-home-exposed",
+   "scenarios": "S1,S2",
+   "result": "S1 developer/reviewer inside_view fail; S2 17/17 pass"
+  },
+  {
+   "id": "d-s2-allowed-target",
+   "scenarios": "S2",
+   "result": "developer:workspace_file fails (host has the file); the other 17 pass"
+  },
+  {
+   "id": "d-s2-typo-parent",
+   "scenarios": "S2,S2c",
+   "result": "before fix S2 17/17 pass, S2c 2 fail; fixed driver (d-s2-typo-parent-fixed): S2 developer:kernel_directory fails, S2c 2 fail"
+  },
+  {
+   "id": "d-s3-wrong-marker",
+   "scenarios": "S3",
+   "result": "children_died_with_their_session_not_later fails (children_first_seen_s null); 5 others pass"
+  }
+ ],
+ "false_refusal_search": {
+  "what": "the review's own changes can refuse a good input: the S2 ENOENT clause and the launcher guard",
+  "result": "S2 clause: all 13 real rows pass in rerun2/3/4 (ENOENT rows have host_has_the_place True; the tmpfs rows are untouched). Launcher guard: refuses a bogus COMMIT and a driver differing by one edit (exit 2, no OUT_DIR made); admits the real archive extraction; the file-count test was made symlink-safe after a two-entry tar showed find -type f (1) vs tar entries (2). Not searched: a TREE built by a tool other than git archive + tar; a non-aarch64 guest (the procps library path is aarch64)."
+ },
+ "real_vs_simulated_corrections": [
+  "loopback HTTP preflight: the socket exchange is real, the provider's answers are scripted (listed under both; now explained)",
+  "developer_committed_itself false: by construction of the scripted developer, not evidence of a read-only git directory",
+  "S2 'refused': 4 refused / 4 not visible / 4 contained in a sandbox tmpfs / 1 read; the attempts are fixed lists, not model behaviour"
+ ],
+ "test_runs": [
+  {
+   "what": "ruff check . (whole tree, before each commit)",
+   "result": "All checks passed"
+  },
+  {
+   "what": "tests.v2.p0.test_destructive_authority + tests.v2.p4.test_mutation_safety (twice: after the driver fix and on 638c0be)",
+   "result": "23 OK"
+  },
+  {
+   "what": "tests.v2.p0.test_v2_code_hygiene, test_freeze_manifest, tests.test_meta, test_v21_traceability, test_release_identity, test_v21_candidate_evidence (three times, last on f7f308f)",
+   "result": "111 OK"
+  },
+  {
+   "what": "tests.v2.test_cycle2_wp201 + test_no_dual_authority (twice)",
+   "result": "29 OK"
+  },
+  {
+   "what": "validation/v2/destructive_authority.py --check",
+   "result": "PASS"
+  },
+  {
+   "what": "launcher on 11ec823 / 2cd8826 / 638c0be / 8caebec in the X1 + hardened containers",
+   "result": "each: exit 0, 11 scenarios 88/88 + 4/4, 0 differences with the implementer's run 1; launcher exit 0 (from 2cd8826 on the exit status is meaningful)"
+  },
+  {
+   "what": "kill_check",
+   "result": "not applicable: no product function changed or added"
+  }
+ ],
+ "process_notes": [
+  "early JSON inspection of the implementer's evidence used bare python3 with stdin scripts (cwd the evidence directory, no stray .py files) before I switched to py.sh; nothing of the product was executed that way",
+  "the host load average reached 309 during rerun1; cause not established (other campaigns); all checks still passed",
+  "the extracted trees, their tars and the mutant copies were deleted after the runs (scratch only; each run's environment.txt names its commit, tree and archive sha256; bin/make_mutants*.py rebuild the mutants from any tree); the reviewer worktree was removed, branch v21r3/e2e-rv kept at f7f308f"
+ ],
+ "remaining_risks": [
+  "one kernel/arch/runtime (7.0.12-linuxkit aarch64, Docker Desktop), profile X1 loosens the container; scripted model; real opencode inside the sandbox not exercised (config, CA bundle, provider via --share-net)",
+  "S2/S3 attempts are fixed lists; ENOENT outcomes depend on the layout (the work directory is under /tmp, which the sandbox replaces with a tmpfs)",
+  "4 of 13 out-of-scope writes are absorbed silently into a sandbox tmpfs (a model sees success) - by design of --tmpfs /tmp and the root tmpfs, not refused",
+  "the session's bwrap argv is not recorded in RUN.json; the proof is from inside (and is an equality with confine.argv)",
+  "canary-before-first-request is timing evidence of the measurement's start only"
+ ],
+ "decisions_needed": [
+  "update docs/v2.1/SANDBOX-LINUX.md section 8 and docs/v2.1/REPORT.md rows 48 and 90 (M6 'not done' -> M4 by REPORT section 2's definition: real CLI/git/bwrap, scripted model) when the evidence is committed - other packages' files, not edited here",
+  "owner/lead: is silent absorption of writes outside the workspace into a sandbox tmpfs acceptable, or should a session get an error? (product design; nothing changed)"
+ ],
+ "evidence_dir": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/out/e2e/review",
+ "evidence_to_commit": [
+  "rerun1/",
+  "rerun4/",
+  "mutout/ (7 experiments + the fixed typo run)",
+  "test-runs/",
+  "guest-network.txt",
+  "bin/ (the scripts that built the mutants)"
+ ]
+}

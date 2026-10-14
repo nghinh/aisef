@@ -1,0 +1,19 @@
+interpreter: 3.14.7 darwin  file_artifact EXECUTION_DIGEST 0c60cc2dd80d
+ast.parse('x = 1' + '+1'*N): largest N parsed in the sweep = 50000 ; first failing N = 100000
+ast.parse N=100000 raises: RecursionError Stack overflow (used 16352 kB) during compilation
+
+valid, nested too deep             repo 
+      observe -> HARNESS_FAILED None 'pkg/deep.py' exceeds this interpreter's parser limits; refused, not a verdict
+      run_probe -> Unrunnable(detail="'pkg/deep.py' exceeds this interpreter's parser limits; refused, not a verdict")
+valid, nested too deep             plain
+      observe -> HARNESS_FAILED None 'pkg/deep.py' exceeds this interpreter's parser limits; refused, not a verdict
+      run_probe -> Unrunnable(detail="'pkg/deep.py' exceeds this interpreter's parser limits; refused, not a verdict")
+control: syntax error              repo 
+      observe -> OBSERVED REFUTED 894e2e7", "path": "pkg", "mode": "040000", "present": true, "unparsable": "pkg/deep.py:2"}
+      run_probe -> Executed(behavior_verdict=<BehaviorVerdict.REFUTED: 'REFUTED'>, reason=None)
+control: NUL byte                  repo 
+      observe -> OBSERVED REFUTED e87e6d5", "path": "pkg", "mode": "040000", "present": true, "unparsable": "pkg/deep.py:?"}
+      run_probe -> Executed(behavior_verdict=<BehaviorVerdict.REFUTED: 'REFUTED'>, reason=None)
+control: parses, one import        repo 
+      observe -> OBSERVED REFUTED "matches": 1, "locations": [["pkg/deep.py", 2, ["requests"]]], "stdlib_of": "python 3.14"}
+      run_probe -> Executed(behavior_verdict=<BehaviorVerdict.REFUTED: 'REFUTED'>, reason=None)

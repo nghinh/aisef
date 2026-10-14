@@ -1,0 +1,35 @@
+{
+ "tag": "verdict",
+ "argv": [
+  "/usr/local/bin/python3",
+  "-B",
+  "-m",
+  "aisef",
+  "run",
+  "--verify",
+  "--project",
+  "/tmp/e2e/project/approved.json",
+  "--out",
+  "/tmp/e2e/S4/copy-verdict",
+  "--expect-anchor",
+  "70871cc78ef03462d3bdb0ca140279a5f03cd9aa9a4199df1340ef43ac26bf20"
+ ],
+ "cwd": "/tmp/e2e/S4",
+ "exit": 1,
+ "seconds": 0.6,
+ "stdout": "{\n \"delivery_verdict\": \"PASS\",\n \"evidence_anchor\": \"70871cc78ef03462d3bdb0ca140279a5f03cd9aa9a4199df1340ef43ac26bf20\",\n \"journal_events\": 106,\n \"notes\": [\n  \"the anchor matches the expected value: authentic only as far as that value came from a store the developer cannot write (docs/v2.1/ANCHOR-THREAT-MODEL.md); it does not prove the run happened as its journal says\"\n ],\n \"problems\": [\n  \"the evidence manifest does not match the run directory: ['RUN.json']\",\n  \"the record says FAIL; the journal re-derives PASS\"\n ],\n \"verdict\": \"REFUTED\"\n}\n",
+ "stderr": "",
+ "json": {
+  "delivery_verdict": "PASS",
+  "evidence_anchor": "70871cc78ef03462d3bdb0ca140279a5f03cd9aa9a4199df1340ef43ac26bf20",
+  "journal_events": 106,
+  "notes": [
+   "the anchor matches the expected value: authentic only as far as that value came from a store the developer cannot write (docs/v2.1/ANCHOR-THREAT-MODEL.md); it does not prove the run happened as its journal says"
+  ],
+  "problems": [
+   "the evidence manifest does not match the run directory: ['RUN.json']",
+   "the record says FAIL; the journal re-derives PASS"
+  ],
+  "verdict": "REFUTED"
+ }
+}

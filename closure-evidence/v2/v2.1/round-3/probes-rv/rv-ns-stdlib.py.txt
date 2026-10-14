@@ -1,0 +1,25 @@
+# rv-ns-stdlib: a nested namespace directory named like a module the controller has already imported
+import os, pathlib, subprocess, sys, tempfile
+sys.path.insert(0, os.getcwd())
+from aisef2.arch.enums import BehaviorVerdict, Enforcement, SubjectAbsence
+from aisef2.probe import process_effect as pe, cli_invocation as ci
+from aisef2.probe.protocol import ExecutionEnv, RevisionRef
+from aisef2.product.spec import ProductProofSpec
+SHA = "89abcdef0123456789abcdef0123456789abcdef"
+ENV = ExecutionEnv(sys.executable, 20, Enforcement.PARTIAL)
+F = "def f():\n    return 1\n"
+def spec(locator):
+    return ProductProofSpec.create(contract_id="BC-RV", probe_id=pe.PROBE_ID, probe_digest=pe.DIGEST,
+        probe_input={"subject": {"kind": "process_effect", "locator": locator},
+                     "stimulus": {"scenario": [{"step": "call", "args": [], "kwargs": {}}]},
+                     "observable": {"returns": 1, "within_s": 20}, "subject_absence": SubjectAbsence.REQUIRES_SUBJECT.value},
+        candidate_expectation=BehaviorVerdict.SATISFIED, compiler_id="test", compiler_digest="c" * 64)
+print("interpreter:", sys.version.split()[0], sys.platform)
+for top in ("json", "queue", "types", "hmac"):
+    root = tempfile.mkdtemp(prefix="aisef2-rv-nsstd-")
+    p = pathlib.Path(root, top, "inner"); p.mkdir(parents=True); (p / "mod.py").write_text(F)
+    rc = subprocess.run([sys.executable, "-I", "-S", "-B", "-c",
+                         "import sys; sys.path[:0]=[sys.argv[1]]; import importlib; importlib.import_module(sys.argv[2])", root, top + ".inner.mod"],
+                        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode
+    o = pe.ProcessEffectProbe().observe(spec(top + ".inner.mod:f"), RevisionRef(SHA, root), ENV)
+    print("%-6s/inner/mod.py: CPython import rc=%d | process_effect %s %s | %s" % (top, rc, o.kind.value, o.verdict.value if o.verdict else None, o.detail[:90]))

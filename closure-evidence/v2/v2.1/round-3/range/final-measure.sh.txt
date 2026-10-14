@@ -1,0 +1,12 @@
+#!/bin/zsh
+SP=/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad
+OUT=$SP/m21/r3/out/range
+WT=$SP/m21/r3/wt/range
+cd $WT
+F=tests/v2/test_v21_r3_range_release_contract.py
+rm -f $OUT/kc-*.json
+for T in ProcessRange.release ProcessRange._ladder ProcessRange._release _Flight.__init__ ProcessRange.__init__; do
+  name=$(echo $T | tr '.' '_')
+  $SP/m21/kills3/py.sh rangekc validation/v21/kill_check.py aisef2/runtime/process_range.py::$T $F --out $OUT/kc-$name.json > $OUT/runs/kc-$name.log 2>&1
+done
+echo KC-DONE > $OUT/runs/kc-done.txt

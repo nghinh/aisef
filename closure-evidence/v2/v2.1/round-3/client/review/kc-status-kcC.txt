@@ -1,0 +1,2 @@
+read_session exit=1 # aisef2/app/client.py::read_session: 77 mutants run, {'KILLED': 76, 'SURVIVED': 1}; T0 [{'file': 'tests/v2/test_v21_r3_client_stream.py', 'seconds': 1.74, 'outcome': 'PASS', 'ran': 17}, {'file': 'tests/v2/test_app_units.py', 'seconds': 8.97, 'outcome': 'PASS'
+DONE

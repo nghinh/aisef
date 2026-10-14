@@ -1,0 +1,31 @@
+{
+ "record": "AISEF V2.1 — Open Code Review binary identity check before use (B-03 round 3, owner 2026-10-12 item 7)",
+ "checked_at": "2026-10-13T10:28:59+07:00",
+ "policy": "aisef2/app/review_ocr.py: the binary is named by an absolute path and its sha256 is checked against the operator's pin before it runs (`pinned`); OCR['version'] is compared with the manifest's execution.ocr_version after the run (`coverage`); docs/v2.1/UPSTREAM-RESEARCH.md: built from source (tag v1.12.12 = 182898c) with -trimpath",
+ "binary": {
+  "path": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/ocr-build/ocr-v1.12.12-darwin-arm64",
+  "size_bytes": 55014610,
+  "sha256": "bf38abf320ead4e106b71c15824463640207118f38e1c10c28a73b6839104af7",
+  "file": "Mach-O 64-bit executable arm64",
+  "signature": "adhoc, linker-signed (codesign -dv: Identifier=a.out, Signature=adhoc)"
+ },
+ "pin": {
+  "version": "v1.12.12",
+  "commit": "182898cf522da3d04157b422752d028417974e19",
+  "sha256": "bf38abf320ead4e106b71c15824463640207118f38e1c10c28a73b6839104af7"
+ },
+ "sha256_matches_pin": true,
+ "version_output": [
+  "open-code-review v1.12.12 (182898c) darwin/arm64",
+  "built at: 2026-10-05T00:00:00Z",
+  "https://github.com/alibaba/open-code-review"
+ ],
+ "version_matches_pin": true,
+ "how_run": "`<binary> version` with env -i HOME=<empty scratch dir> PATH=/usr/bin:/bin, cwd that dir; no provider, no network, no repository argument; exit 0",
+ "not_shown": [
+  "the binary is a build the project made itself: no upstream release artifact or signature was compared (none is pinned)",
+  "this host's darwin/arm64 binary only: the Linux guest has no OCR binary and OCR is refused together with confinement (settings.py)",
+  "no OCR run with a real model was made in this round"
+ ],
+ "location_note": "under the session scratchpad (macOS cleans /tmp after days); the pin, not the path, is the identity"
+}

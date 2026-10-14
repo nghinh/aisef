@@ -1,0 +1,41 @@
+Every writable mount of the baseline, by the file system and what showed it the sandbox's: the workspace and ... ok
+test_every_recorded_report_is_judged_again_as_it_was (tests.v2.test_v21_r3_conf_policy.RecordedGuest.test_every_recorded_report_is_judged_again_as_it_was) ... ok
+test_in_a_tree_with_peer_groups_what_the_sandbox_made_propagates_nowhere (tests.v2.test_v21_r3_conf_policy.RecordedGuest.test_in_a_tree_with_peer_groups_what_the_sandbox_made_propagates_nowhere)
+The shared-tree record (the container's mount tree made `rshared`, as a systemd host's is): the host's table ... ok
+test_no_mount_of_a_session_outlives_it_in_the_hosts_table (tests.v2.test_v21_r3_conf_policy.RecordedGuest.test_no_mount_of_a_session_outlives_it_in_the_hosts_table) ... ok
+test_what_each_scenario_shows (tests.v2.test_v21_r3_conf_policy.RecordedGuest.test_what_each_scenario_shows) ... ok
+test_a_correct_session_is_accepted_and_the_report_holds_what_decided (tests.v2.test_v21_r3_conf_policy.ReportedData.test_a_correct_session_is_accepted_and_the_report_holds_what_decided) ... ok
+test_a_device_node_the_probe_did_not_read_refuses_the_run_naming_it (tests.v2.test_v21_r3_conf_policy.ReportedData.test_a_device_node_the_probe_did_not_read_refuses_the_run_naming_it)
+T05b's session has the node `--dev` places that the transcript's mountinfo lists: /dev/null. ... ok
+test_a_node_of_another_number_is_refused (tests.v2.test_v21_r3_conf_policy.ReportedData.test_a_node_of_another_number_is_refused) ... ok
+test_a_node_the_probe_found_not_to_be_a_character_device_is_refused (tests.v2.test_v21_r3_conf_policy.ReportedData.test_a_node_the_probe_found_not_to_be_a_character_device_is_refused) ... ok
+test_a_reading_before_that_failed_leaves_no_mount_shown_to_be_the_sandboxs (tests.v2.test_v21_r3_conf_policy.ReportedData.test_a_reading_before_that_failed_leaves_no_mount_shown_to_be_the_sandboxs)
+(A reading AFTER that failed refuses nothing: test_v21_r3_conf_fu_before.ReadingLost.) ... ok
+test_the_host_is_judged_by_the_reading_before_the_session_the_one_after_decides_nothing (tests.v2.test_v21_r3_conf_policy.ReportedData.test_the_host_is_judged_by_the_reading_before_the_session_the_one_after_decides_nothing)
+A super block the host held when the session started is the host's: the sandbox's /tmp (whose number the ... ok
+test_a_peer_group_of_its_own_is_not_the_hosts (tests.v2.test_v21_r3_conf_policy.SandboxMade.test_a_peer_group_of_its_own_is_not_the_hosts) ... ok
+test_a_read_only_mount_is_not_a_write (tests.v2.test_v21_r3_conf_policy.SandboxMade.test_a_read_only_mount_is_not_a_write)
+Only a writable mount is judged by the policy: the system and the client are read-only binds of the host. ... ok
+test_each_pseudo_file_system_made_inside_is_accepted_wherever_it_lies (tests.v2.test_v21_r3_conf_policy.SandboxMade.test_each_pseudo_file_system_made_inside_is_accepted_wherever_it_lies) ... ok
+test_the_guests_own_rows_are_accepted (tests.v2.test_v21_r3_conf_policy.SandboxMade.test_the_guests_own_rows_are_accepted)
+What bubblewrap 0.12.0 made in the guest: a tmpfs root (a bind of the tmpfs's /newroot), proc, /dev, devpts ... ok
+test_nothing_appeared_is_an_empty_list_not_none (tests.v2.test_v21_r3_conf_fu_before.Appeared.test_nothing_appeared_is_an_empty_list_not_none) ... ok
+test_the_report_holds_the_real_readings_of_the_controllers_own_table (tests.v2.test_v21_r3_conf_fu_before.Appeared.test_the_report_holds_the_real_readings_of_the_controllers_own_table)
+Through the real `_host_mounts`: the controller's /proc/self/mountinfo read before the session and again ... ok
+test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read (tests.v2.test_v21_r3_conf_fu_before.Appeared.test_the_rows_that_appeared_are_those_after_that_were_not_before_in_the_order_read) ... ok
+test_a_super_block_only_the_reading_after_the_session_holds_is_not_the_hosts (tests.v2.test_v21_r3_conf_fu_before.ReadingBefore.test_a_super_block_only_the_reading_after_the_session_holds_is_not_the_hosts)
+The hazard: the number the session's /tmp had is taken, at another path, by a host mount made between its ... ok
+test_a_super_block_the_reading_before_the_session_holds_is_the_hosts (tests.v2.test_v21_r3_conf_fu_before.ReadingBefore.test_a_super_block_the_reading_before_the_session_holds_is_the_hosts)
+The control: the same row in the reading before the session — a host mount that was there — refuses the ... ok
+test_a_writable_bind_of_a_super_block_the_host_held_is_refused_whatever_the_reading_after_says (tests.v2.test_v21_r3_conf_fu_before.ReadingBefore.test_a_writable_bind_of_a_super_block_the_host_held_is_refused_whatever_the_reading_after_says)
+The host's own mqueue bound in at /hostmq (the container's, as `--dev-bind /dev/mqueue /hostmq` gives it): ... ok
+test_the_same_bind_is_not_refused_for_a_super_block_the_host_never_held_before_the_session (tests.v2.test_v21_r3_conf_fu_before.ReadingBefore.test_the_same_bind_is_not_refused_for_a_super_block_the_host_never_held_before_the_session)
+What the reading before decides, seen from the other side: the sandbox's own mqueue at /hostmq, whose ... ok
+test_an_unreadable_reading_after_refuses_nothing (tests.v2.test_v21_r3_conf_fu_before.ReadingLost.test_an_unreadable_reading_after_refuses_nothing) ... ok
+test_an_unreadable_reading_before_establishes_nothing (tests.v2.test_v21_r3_conf_fu_before.ReadingLost.test_an_unreadable_reading_before_establishes_nothing) ... ok
+
+----------------------------------------------------------------------
+Ran 200 tests in 24.491s
+
+OK
+$SP/m21/r3/guest.sh $T X1 sh -c   0.02s user 0.01s system 0% cpu 25.683 total

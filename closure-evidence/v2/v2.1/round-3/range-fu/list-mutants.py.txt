@@ -1,0 +1,10 @@
+import pathlib, sys
+ROOT = pathlib.Path(sys.argv[1]); sys.path.insert(0, str(ROOT))
+from validation.v2 import mutation as m
+for target in sys.argv[2:]:
+    path, func = target.split("::")
+    src = (ROOT / path).read_text(encoding="utf-8")
+    ms = m.mutants(src, func, m._enum_members(src, ROOT))
+    print(target, len(ms))
+    for i, (d, _) in enumerate(ms):
+        print(f"  [{i}] {d}")

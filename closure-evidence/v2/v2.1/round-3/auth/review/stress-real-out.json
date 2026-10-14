@@ -1,0 +1,9 @@
+{
+ "n": 60,
+ "outcomes": {
+  "carriers ok": 60,
+  "cwd_under(since=None) ok": 60,
+  "cwd_under(since=boundary) ok": 60
+ },
+ "first_messages": []
+}

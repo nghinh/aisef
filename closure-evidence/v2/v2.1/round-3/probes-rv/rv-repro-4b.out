@@ -1,0 +1,5 @@
+interpreter: 3.14.7 darwin
+observe raised: ValueError the scope refused the range
+range after the exception: target_pid set=True, returncode=None, members=1 (the probe did not release it)
+released by its acquirer (this script): ok
+members after release: 0

@@ -1,0 +1,11 @@
+#!/bin/zsh
+SP=/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad
+OUT=$SP/m21/r3/out/range/review
+cd $SP/m21/r3/wt/range-rv
+: > $OUT/heavy.txt
+for m in tests.v2.test_old_path_audit tests.v2.p2.test_static_admission tests.v2.test_v21_read_set tests.v2.conformance.test_freeze_f1_f11 tests.v2.test_v21_continue_integrity tests.v2.test_v21_snapshot_delta; do
+  s=$(date +%s)
+  r=$($SP/m21/kills3/py.sh rv-heavy -m unittest $m 2>&1 | grep -E "^(Ran|OK|FAILED|FAIL:|ERROR:)" | cut -c1-160 | tr '\n' ' ')
+  echo "$m | $r | $(( $(date +%s) - s ))s" >> $OUT/heavy.txt
+done
+echo DONE >> $OUT/heavy.txt

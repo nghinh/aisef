@@ -1,0 +1,4 @@
+victim 2392 | runner 2385
+before the carrier   signalled: []  unproven: [{'kind': 'pid', 'id': 2392, 'why': 'born before the boundary or not a descendant of the runner'}]
+table row of the victim: Host(pid=2392, ppid=2385, pgid=2392, born=4095593999.0, command="fabricated-by-a-command-line'")
+after the carrier    signalled: [(2392, "fabricated-by-a-command-line'")]  unproven: []

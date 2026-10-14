@@ -1,0 +1,186 @@
+{
+ "target": "aisef2/runtime/process_range.py::_ps_table",
+ "files": [
+  "tests/v2/test_v21_r3_range_fu_ps_table.py"
+ ],
+ "source_sha256": "05f606bf6473570dc98799f04809281282290a8964a67024fe1b402b10f82773",
+ "t0": [
+  {
+   "file": "tests/v2/test_v21_r3_range_fu_ps_table.py",
+   "seconds": 1.14,
+   "outcome": "PASS",
+   "ran": 16
+  }
+ ],
+ "error": null,
+ "results": [
+  {
+   "index": 0,
+   "mutant": "L114 returns None",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_fu_ps_table.py",
+   "first": "ERROR: test_a_release_that_cannot_read_the_table_is_failed_names_the_line_and_blocks_what_follows (v2.test_v21_r3_range_fu_ps_table.FailsClosedWhereItIsRead.test_a_release_that_cannot_read_the_table_is_failed_names_the_line_and_blocks_what_follows) | AttributeError"
+  },
+  {
+   "index": 1,
+   "mutant": "L106 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_fu_ps_table.py",
+   "first": "ERROR: test_a_release_that_cannot_read_the_table_is_failed_names_the_line_and_blocks_what_follows (v2.test_v21_r3_range_fu_ps_table.FailsClosedWhereItIsRead.test_a_release_that_cannot_read_the_table_is_failed_names_the_line_and_blocks_what_follows) | aisef2.runtime.process_range.ProcessTableError"
+  },
+  {
+   "index": 2,
+   "mutant": "L109 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_fu_ps_table.py",
+   "first": "ERROR: test_a_release_that_cannot_read_the_table_is_failed_names_the_line_and_blocks_what_follows (v2.test_v21_r3_range_fu_ps_table.FailsClosedWhereItIsRead.test_a_release_that_cannot_read_the_table_is_failed_names_the_line_and_blocks_what_follows) | aisef2.runtime.process_range.ProcessTableError"
+  },
+  {
+   "index": 3,
+   "mutant": "L111 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_fu_ps_table.py",
+   "first": "FAIL: test_the_row_of_a_real_process_whose_command_line_holds_separators (v2.test_v21_r3_range_fu_ps_table.RealPs.test_the_row_of_a_real_process_whose_command_line_holds_separators) | AssertionError"
+  },
+  {
+   "index": 4,
+   "mutant": "L99 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_fu_ps_table.py",
+   "first": "ERROR: test_a_release_that_cannot_read_the_table_is_failed_names_the_line_and_blocks_what_follows (v2.test_v21_r3_range_fu_ps_table.FailsClosedWhereItIsRead.test_a_release_that_cannot_read_the_table_is_failed_names_the_line_and_blocks_what_follows) | FileNotFoundError"
+  },
+  {
+   "index": 5,
+   "mutant": "L99 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_fu_ps_table.py",
+   "first": "FAIL: test_a_release_that_cannot_read_the_table_is_failed_names_the_line_and_blocks_what_follows (v2.test_v21_r3_range_fu_ps_table.FailsClosedWhereItIsRead.test_a_release_that_cannot_read_the_table_is_failed_names_the_line_and_blocks_what_follows) | AssertionError"
+  },
+  {
+   "index": 6,
+   "mutant": "L99 element 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_fu_ps_table.py",
+   "first": "ERROR: test_a_release_that_cannot_read_the_table_is_failed_names_the_line_and_blocks_what_follows (v2.test_v21_r3_range_fu_ps_table.FailsClosedWhereItIsRead.test_a_release_that_cannot_read_the_table_is_failed_names_the_line_and_blocks_what_follows) | subprocess.CalledProcessError"
+  },
+  {
+   "index": 7,
+   "mutant": "L99 element 3 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_fu_ps_table.py",
+   "first": "ERROR: test_a_release_that_cannot_read_the_table_is_failed_names_the_line_and_blocks_what_follows (v2.test_v21_r3_range_fu_ps_table.FailsClosedWhereItIsRead.test_a_release_that_cannot_read_the_table_is_failed_names_the_line_and_blocks_what_follows) | subprocess.CalledProcessError"
+  },
+  {
+   "index": 8,
+   "mutant": "L105 string '\\n' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_fu_ps_table.py",
+   "first": "ERROR: test_a_release_that_cannot_read_the_table_is_failed_names_the_line_and_blocks_what_follows (v2.test_v21_r3_range_fu_ps_table.FailsClosedWhereItIsRead.test_a_release_that_cannot_read_the_table_is_failed_names_the_line_and_blocks_what_follows) | ValueError"
+  },
+  {
+   "index": 9,
+   "mutant": "L106 not removed",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_fu_ps_table.py",
+   "first": "ERROR: test_a_release_that_cannot_read_the_table_is_failed_names_the_line_and_blocks_what_follows (v2.test_v21_r3_range_fu_ps_table.FailsClosedWhereItIsRead.test_a_release_that_cannot_read_the_table_is_failed_names_the_line_and_blocks_what_follows) | TypeError"
+  },
+  {
+   "index": 10,
+   "mutant": "L109 Is->IsNot",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_fu_ps_table.py",
+   "first": "ERROR: test_a_release_that_cannot_read_the_table_is_failed_names_the_line_and_blocks_what_follows (v2.test_v21_r3_range_fu_ps_table.FailsClosedWhereItIsRead.test_a_release_that_cannot_read_the_table_is_failed_names_the_line_and_blocks_what_follows) | aisef2.runtime.process_range.ProcessTableError"
+  },
+  {
+   "index": 11,
+   "mutant": "L99 string 'ps' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_fu_ps_table.py",
+   "first": "ERROR: test_a_release_that_cannot_read_the_table_is_failed_names_the_line_and_blocks_what_follows (v2.test_v21_r3_range_fu_ps_table.FailsClosedWhereItIsRead.test_a_release_that_cannot_read_the_table_is_failed_names_the_line_and_blocks_what_follows) | PermissionError"
+  },
+  {
+   "index": 12,
+   "mutant": "L99 string '-A' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_fu_ps_table.py",
+   "first": "ERROR: test_a_release_that_cannot_read_the_table_is_failed_names_the_line_and_blocks_what_follows (v2.test_v21_r3_range_fu_ps_table.FailsClosedWhereItIsRead.test_a_release_that_cannot_read_the_table_is_failed_names_the_line_and_blocks_what_follows) | subprocess.CalledProcessError"
+  },
+  {
+   "index": 13,
+   "mutant": "L99 string '-o' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_fu_ps_table.py",
+   "first": "ERROR: test_a_release_that_cannot_read_the_table_is_failed_names_the_line_and_blocks_what_follows (v2.test_v21_r3_range_fu_ps_table.FailsClosedWhereItIsRead.test_a_release_that_cannot_read_the_table_is_failed_names_the_line_and_blocks_what_follows) | subprocess.CalledProcessError"
+  },
+  {
+   "index": 14,
+   "mutant": "L99 string 'pid=,ppid=,pgid=,stat=,command=' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_fu_ps_table.py",
+   "first": "ERROR: test_a_release_that_cannot_read_the_table_is_failed_names_the_line_and_blocks_what_follows (v2.test_v21_r3_range_fu_ps_table.FailsClosedWhereItIsRead.test_a_release_that_cannot_read_the_table_is_failed_names_the_line_and_blocks_what_follows) | subprocess.CalledProcessError"
+  },
+  {
+   "index": 15,
+   "mutant": "L99 True->False",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_fu_ps_table.py",
+   "first": "ERROR: test_a_release_that_cannot_read_the_table_is_failed_names_the_line_and_blocks_what_follows (v2.test_v21_r3_range_fu_ps_table.FailsClosedWhereItIsRead.test_a_release_that_cannot_read_the_table_is_failed_names_the_line_and_blocks_what_follows) | AttributeError"
+  },
+  {
+   "index": 16,
+   "mutant": "L99 True->False",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_fu_ps_table.py",
+   "first": "FAIL: test_a_failed_ps_is_an_error_and_never_an_empty_or_partial_table (v2.test_v21_r3_range_fu_ps_table.RowShape.test_a_failed_ps_is_an_error_and_never_an_empty_or_partial_table) | AssertionError"
+  },
+  {
+   "index": 17,
+   "mutant": "L108 string ' *([0-9]+) +([0-9]+) +([0-9]+) +([^ ]+)(?: +(.*))?' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_fu_ps_table.py",
+   "first": "ERROR: test_a_release_that_cannot_read_the_table_is_failed_names_the_line_and_blocks_what_follows (v2.test_v21_r3_range_fu_ps_table.FailsClosedWhereItIsRead.test_a_release_that_cannot_read_the_table_is_failed_names_the_line_and_blocks_what_follows) | aisef2.runtime.process_range.ProcessTableError"
+  },
+  {
+   "index": 18,
+   "mutant": "L111 string 'Z' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_fu_ps_table.py",
+   "first": "FAIL: test_the_row_of_a_real_process_whose_command_line_holds_separators (v2.test_v21_r3_range_fu_ps_table.RealPs.test_the_row_of_a_real_process_whose_command_line_holds_separators) | AssertionError"
+  },
+  {
+   "index": 19,
+   "mutant": "L113 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_fu_ps_table.py",
+   "first": "FAIL: test_the_row_of_a_real_process_whose_command_line_holds_separators (v2.test_v21_r3_range_fu_ps_table.RealPs.test_the_row_of_a_real_process_whose_command_line_holds_separators) | AssertionError"
+  },
+  {
+   "index": 20,
+   "mutant": "L105 string 'utf-8' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_fu_ps_table.py",
+   "first": "ERROR: test_a_release_that_cannot_read_the_table_is_failed_names_the_line_and_blocks_what_follows (v2.test_v21_r3_range_fu_ps_table.FailsClosedWhereItIsRead.test_a_release_that_cannot_read_the_table_is_failed_names_the_line_and_blocks_what_follows) | LookupError"
+  },
+  {
+   "index": 21,
+   "mutant": "L105 string 'replace' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_fu_ps_table.py",
+   "first": "ERROR: test_bytes_that_are_not_utf8_are_replaced_beside_a_separator (v2.test_v21_r3_range_fu_ps_table.RowIsALine.test_bytes_that_are_not_utf8_are_replaced_beside_a_separator) | LookupError"
+  },
+  {
+   "index": 22,
+   "mutant": "L106 string ' ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_fu_ps_table.py",
+   "first": "ERROR: test_leading_trailing_and_blank_lines_are_no_rows (v2.test_v21_r3_range_fu_ps_table.RowIsALine.test_leading_trailing_and_blank_lines_are_no_rows) [a line of spaces] | aisef2.runtime.process_range.ProcessTableError"
+  },
+  {
+   "index": 23,
+   "mutant": "L110 string 'ps printed a line that is not a process row: ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_fu_ps_table.py",
+   "first": "FAIL: test_the_message_says_that_ps_printed_a_line_that_is_not_a_process_row (v2.test_v21_r3_range_fu_ps_table.NotARow.test_the_message_says_that_ps_printed_a_line_that_is_not_a_process_row) | AssertionError"
+  }
+ ]
+}

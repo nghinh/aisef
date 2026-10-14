@@ -1,0 +1,11 @@
+# rv-fa-redos: grep_count runs the spec's regex in the kernel's own process with no bound but the after-the-fact window
+import os, re, sys, time
+sys.path.insert(0, os.getcwd())
+from aisef2.probe import file_artifact as fa
+print("interpreter:", sys.version.split()[0], sys.platform)
+pat = re.compile(r"^(\w+\s?)*$")           # a plausible author-written 'a line of words' pattern
+for n in (18, 20, 22, 24):
+    line = ("a" * n + "!").encode()
+    t = time.monotonic()
+    fa.grep_facts(pat, [("x.py", line)])
+    print("line of %2d chars: %.2fs" % (n + 1, time.monotonic() - t))

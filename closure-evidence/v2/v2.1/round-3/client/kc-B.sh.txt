@@ -1,0 +1,5 @@
+#!/bin/zsh
+OUT=/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/out/client
+T=tests/v2
+$OUT/kc.sh B session_tokens aisef2/app/usage.py::session_tokens $T/test_v21_r3_client_stream.py $T/test_v21_kills3_T20a.py $T/test_v21_continue_usage.py $T/test_v21_verify.py $T/test_v21_continue_integrity.py
+echo DONE >> $OUT/kc-status-B.txt

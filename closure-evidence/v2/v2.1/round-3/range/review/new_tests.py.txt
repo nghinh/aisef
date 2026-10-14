@@ -1,0 +1,106 @@
+
+
+# --------------------------------------------------------------------------------------- reviewer additions (R3 review)
+
+CLAIM_PROBE_S = 1.0   # how long a second caller is given to get past a claim that should hold it: expires in a correct run
+
+
+def _gate_the_claim(rig: Rig) -> Park:
+    """Parks the first thread whose release() reads `_reaped` — the claim's own `if self._anchor is None or
+    self._reaped` — AFTER it has read the value (a stale `False` is what an unguarded claim would act on). Any other
+    thread that reads it meanwhile has got past the claim: that is what `rig.second` is set to say."""
+    park = Park(rig)
+    gate = {"ident": None}
+
+    def read(self):
+        value = self.__dict__["_reaped"]
+        me = threading.get_ident()
+        with rig._mx:
+            if gate["ident"] is None and not park.taken:
+                gate["ident"] = me
+            elif gate["ident"] not in (None, me) and not park.go.is_set():
+                rig.second.set()
+        if gate["ident"] == me:
+            park()
+        return value
+
+    def write(self, value):
+        self.__dict__["_reaped"] = value
+
+    rig.range.__class__ = type("Gated", (ProcessRange,), {"_reaped": property(read, write)})
+    return park
+
+
+class ClaimAndWait(unittest.TestCase):
+    def test_two_threads_that_arrive_together_are_not_both_leaders(self):
+        """A is inside the claim, having read that the range is not reaped; B arrives. A claim that is not one critical
+        section (no lock; a lock around the read and another around the write) lets B lead the whole release, and A —
+        with its stale read — a second one afterwards: two disposals, two closes."""
+        rig = Rig(self, dies_on="SIGINT")
+        park = _gate_the_claim(rig)
+        a = Caller(rig.range, "A")
+        a.start()
+        self.assertTrue(park.arrived.wait(BOUND_S), "the first caller never reached the claim")
+        b = Caller(rig.range, "B")
+        b.start()
+        rig.second.wait(CLAIM_PROBE_S)      # B got past the claim (it must not), or is held there / waiting (it must)
+        park.go.set()
+        a.finish(self)
+        b.finish(self)
+        self.assertEqual((a.error, b.error), (None, None))
+        self.assertEqual(rig.max_threads, 1)
+        self.assertEqual([s for s, _ in rig.sent], ["SIGINT"])
+        self.assertEqual(rig.writes, ["EXIT\n"])
+        self.assertEqual((rig.count("stdin.close"), rig.count("stdout.close")), (1, 1))
+        self.assertEqual((rig.count("anchor.wait"), rig.count("backend.close")), (1, 1))
+
+    def test_a_caller_is_held_until_the_release_has_ended_wherever_the_release_is(self):
+        """Past the ladder — the range is measured empty, the anchor is about to be, or is being, reaped and its pipes
+        closed — a second caller still waits: returning there would hand its caller a range whose anchor is unreaped
+        and whose escapees are not yet checked (a leak it would never see)."""
+        for point in ("anchor.poll", "anchor.wait", "stdin.close", "stdout.close", "backend.close"):
+            with self.subTest(parked_at=point):
+                rig = Rig(self, dies_on="SIGINT")
+                park = rig.park_at(point)
+                a = Caller(rig.range, "A")
+                a.start()
+                self.assertTrue(park.arrived.wait(BOUND_S), f"the release never reached {point}")
+                b = Caller(rig.range, "B")
+                b.start()
+                waited = 0
+                while not rig.second.is_set() and b.is_alive() and waited < 4000:    # B waits (polls) or has returned
+                    rig.second.wait(0.005)
+                    waited += 5
+                self.assertTrue(b.is_alive(), f"a caller returned while the release was parked at {point}")
+                park.go.set()
+                a.finish(self)
+                b.finish(self)
+                self.assertEqual((a.error, b.error), (None, None))
+                self.assertTrue(rig.range._reaped)
+                self.assertEqual((rig.count("stdin.close"), rig.count("anchor.wait")), (1, 1))
+
+    def test_a_caller_waits_for_the_escapee_check_and_is_given_its_outcome(self):
+        """The last thing a release does is look for what left the range: a caller that arrives before that is
+        given RangeEscaped like the first, not `None` — the leak that §17.1 says is never silent."""
+        rig = Rig(self, members=0, escapees=((9001, "leaver"),))
+        alive = {9001: Proc(9001, 1, None, None, "leaver")}
+        park = Park(rig)
+
+        def table():
+            park()
+            return alive
+        with mock.patch.object(pr, "process_table", side_effect=table):
+            a = Caller(rig.range, "A")
+            a.start()
+            self.assertTrue(park.arrived.wait(BOUND_S), "the release never reached the escapee check")
+            b = Caller(rig.range, "B")
+            b.start()
+            waited = 0
+            while not rig.second.is_set() and b.is_alive() and waited < 4000:
+                rig.second.wait(0.005)
+                waited += 5
+            self.assertTrue(b.is_alive(), "a caller returned before the escapee check had ended")
+            park.go.set()
+            a.finish(self)
+            b.finish(self)
+        self.assertEqual((type(a.error), type(b.error)), (RangeEscaped, RangeEscaped))

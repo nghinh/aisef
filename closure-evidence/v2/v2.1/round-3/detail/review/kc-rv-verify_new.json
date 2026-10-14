@@ -1,0 +1,32 @@
+{
+ "target": "aisef2/app/verify.py::verify",
+ "files": [
+  "tests/v2/test_v21_r3_detail_product.py"
+ ],
+ "source_sha256": "0996b98ab6da683b30cc30adb58cbbe196eff47f990b7343eeecb71091a746a8",
+ "t0": [
+  {
+   "file": "tests/v2/test_v21_r3_detail_product.py",
+   "seconds": 17.16,
+   "outcome": "PASS",
+   "ran": 14
+  }
+ ],
+ "error": null,
+ "results": [
+  {
+   "index": 103,
+   "mutant": "L120 element 0 dropped",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 104,
+   "mutant": "L120 element 1 dropped",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  }
+ ]
+}

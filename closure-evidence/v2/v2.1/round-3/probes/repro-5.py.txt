@@ -1,0 +1,84 @@
+# repro-5 (probes WP, item 5): the answers the subject's process relays to the controller are the subject's own claim.
+# The probes are real; the PRODUCT is a SIMULATED hostile candidate: a module that, when imported by the subject's
+# process, replaces the agent's operation table (`__main__.OPS`, the agent being the process the subject runs in) so
+# that every `invoke` / `call` answers success.  Control = the same module without the two patch lines.
+# Run from the worktree root:  py.sh probes -I <this file>
+import os
+import pathlib
+import sys
+import tempfile
+
+sys.path.insert(0, os.getcwd())
+
+from aisef2.arch.enums import BehaviorVerdict, Enforcement, SubjectAbsence  # noqa: E402
+from aisef2.probe import cli_invocation as ci, process_effect as pe, python_callable_v2 as pc2  # noqa: E402
+from aisef2.probe.protocol import ExecutionEnv, RevisionRef, run_probe  # noqa: E402
+from aisef2.product.spec import ProductProofSpec  # noqa: E402
+
+SHA = "89abcdef0123456789abcdef0123456789abcdef"
+ENV = ExecutionEnv(sys.executable, 20, Enforcement.PARTIAL)
+
+BODY = '''
+
+def main(argv):
+    raise ValueError("this product is broken")
+
+
+def compute():
+    return 999
+'''
+HONEST = BODY
+HOSTILE = r'''import json
+import os
+
+import __main__
+
+if hasattr(__main__, "OPS"):
+    __main__.OPS["call"] = lambda r: {"returned": {"json": 1}, "fired": False}
+
+
+def main(argv):
+    # the invocation is already running: answer it, and its closing exchange, on the agent's own channel
+    n = __main__.request["n"]
+    __main__.send = lambda answer: None
+    os.write(__main__.WOUT, (json.dumps({"n": n, "raw": 0, "code": 0, "raised": None}) + "\n" +
+                              json.dumps({"n": n + 1}) + "\n").encode("utf-8"))
+    raise ValueError("this product is broken")
+
+
+def compute():
+    return 999
+'''
+
+
+def checkout(src):
+    d = tempfile.mkdtemp(prefix="aisef2-r3-forge-")
+    pathlib.Path(d, "forge.py").write_text(src, encoding="utf-8", newline="\n")
+    return d
+
+
+def mk(probe, kind, locator, stimulus, observable):
+    return ProductProofSpec.create(
+        contract_id="BC-R3", probe_id=probe.id, probe_digest=probe.digest,
+        probe_input={"subject": {"kind": kind, "locator": locator}, "stimulus": stimulus,
+                     "observable": {**observable, "within_s": 20}, "subject_absence": SubjectAbsence.REQUIRES_SUBJECT.value},
+        candidate_expectation=BehaviorVerdict.SATISFIED, compiler_id="test", compiler_digest="c" * 64)
+
+
+P_CI, P_PE, P_PC = ci.CliInvocationProbe(), pe.ProcessEffectProbe(), pc2.PythonCallableV2Probe()
+CASES = (
+    ("cli_invocation  exits {exit_code: 0}   over main() that raises", P_CI,
+     mk(P_CI, "cli_invocation", "forge:main", {"argv": []}, {"exit_code": 0})),
+    ("process_effect  returns 1              over compute() == 999 ", P_PE,
+     mk(P_PE, "process_effect", "forge:compute", {"scenario": [{"step": "call", "args": [], "kwargs": {}}]}, {"returns": 1})),
+    ("python_callable returns 1              over compute() == 999 ", P_PC,
+     mk(P_PC, "python_callable", "forge:compute", {}, {"returns": 1})),
+)
+print("interpreter:", sys.version.split()[0], sys.platform)
+for name, src in (("HONEST (control)", HONEST), ("HOSTILE (simulated)", HOSTILE)):
+    at = RevisionRef(SHA, checkout(src))
+    print("\n" + name)
+    for label, probe, spec in CASES:
+        o = probe.observe(spec, at, ENV)
+        r = run_probe(probe, spec, at, ENV).result
+        print("  %s -> %s %s | %s" % (label, o.kind.value, o.verdict.value if o.verdict else None, r))

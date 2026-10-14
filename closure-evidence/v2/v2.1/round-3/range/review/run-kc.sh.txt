@@ -1,0 +1,9 @@
+#!/bin/zsh
+SP=/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad
+WT=$SP/m21/r3/wt/range-rv; OUT=$SP/m21/r3/out/range/review
+cd $WT
+T=tests/v2/test_v21_r3_range_release_contract.py
+for tgt in ProcessRange.release ProcessRange._ladder ProcessRange._release _Flight.__init__ ProcessRange.__init__; do
+  $SP/m21/kills3/py.sh range-rv validation/v21/kill_check.py aisef2/runtime/process_range.py::$tgt $T --out $OUT/kc-rv3-$tgt.json > $OUT/kc-rv3-$tgt.txt 2>&1
+done
+echo done > $OUT/kc-rv3-DONE

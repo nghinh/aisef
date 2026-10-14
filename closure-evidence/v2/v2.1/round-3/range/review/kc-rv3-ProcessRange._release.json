@@ -1,0 +1,102 @@
+{
+ "target": "aisef2/runtime/process_range.py::ProcessRange._release",
+ "files": [
+  "tests/v2/test_v21_r3_range_release_contract.py"
+ ],
+ "source_sha256": "489e7ec3638c2f91365fa94263a38b9d20a36c4fd586c7213c1cbadf2b561c16",
+ "t0": [
+  {
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "seconds": 2.31,
+   "outcome": "PASS",
+   "ran": 32
+  }
+ ],
+ "error": null,
+ "results": [
+  {
+   "index": 0,
+   "mutant": "L491 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "FAIL: test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller (v2.test_v21_r3_range_release_contract.AbandonedWorker.test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller) | AssertionError"
+  },
+  {
+   "index": 1,
+   "mutant": "L504 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "FAIL: test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller (v2.test_v21_r3_range_release_contract.AbandonedWorker.test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller) | AssertionError"
+  },
+  {
+   "index": 2,
+   "mutant": "L489 True->False",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "FAIL: test_a_call_past_the_ladder_returns_at_once_and_leaves_the_disposal_to_the_frame_below (v2.test_v21_r3_range_release_contract.Reentry.test_a_call_past_the_ladder_returns_at_once_and_leaves_the_disposal_to_the_frame_below) | AssertionError"
+  },
+  {
+   "index": 3,
+   "mutant": "L491 Is->IsNot",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "FAIL: test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller (v2.test_v21_r3_range_release_contract.AbandonedWorker.test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller) | AssertionError"
+  },
+  {
+   "index": 4,
+   "mutant": "L498 True->False",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "FAIL: test_a_caller_is_held_until_the_release_has_ended_wherever_the_release_is (v2.test_v21_r3_range_release_contract.ClaimAndWait.test_a_caller_is_held_until_the_release_has_ended_wherever_the_release_is) (parked_at='anchor.poll') | AssertionError"
+  },
+  {
+   "index": 5,
+   "mutant": "L502 conditional negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "FAIL: test_a_caller_waits_for_the_escapee_check_and_is_given_its_outcome (v2.test_v21_r3_range_release_contract.ClaimAndWait.test_a_caller_waits_for_the_escapee_check_and_is_given_its_outcome) | AssertionError"
+  },
+  {
+   "index": 6,
+   "mutant": "L503 sorted() -> list()",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "FAIL: test_RangeEscaped_is_raised_to_the_caller_and_a_later_call_returns_as_it_always_did (v2.test_v21_r3_range_release_contract.Idempotence.test_RangeEscaped_is_raised_to_the_caller_and_a_later_call_returns_as_it_always_did) | AssertionError"
+  },
+  {
+   "index": 7,
+   "mutant": "L493 string 'EXIT\\n' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "FAIL: test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller (v2.test_v21_r3_range_release_contract.AbandonedWorker.test_a_release_the_scope_abandoned_at_its_bound_is_not_the_end_of_a_later_caller) | AssertionError"
+  },
+  {
+   "index": 8,
+   "mutant": "L503 In->NotIn",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "FAIL: test_a_caller_waits_for_the_escapee_check_and_is_given_its_outcome (v2.test_v21_r3_range_release_contract.ClaimAndWait.test_a_caller_waits_for_the_escapee_check_and_is_given_its_outcome) | AssertionError"
+  },
+  {
+   "index": 9,
+   "mutant": "L505 string ': processes left the range and are alive: ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "FAIL: test_RangeEscaped_is_raised_to_the_caller_and_a_later_call_returns_as_it_always_did (v2.test_v21_r3_range_release_contract.Idempotence.test_RangeEscaped_is_raised_to_the_caller_and_a_later_call_returns_as_it_always_did) | AssertionError"
+  },
+  {
+   "index": 10,
+   "mutant": "L506 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "FAIL: test_an_escapee_seen_at_both_looks_is_named_once (v2.test_v21_r3_range_release_contract.EscapeeLooks.test_an_escapee_seen_at_both_looks_is_named_once) | AssertionError"
+  },
+  {
+   "index": 11,
+   "mutant": "L506 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_range_release_contract.py",
+   "first": "FAIL: test_an_escapee_seen_at_both_looks_is_named_once (v2.test_v21_r3_range_release_contract.EscapeeLooks.test_an_escapee_seen_at_both_looks_is_named_once) | AssertionError"
+  }
+ ]
+}

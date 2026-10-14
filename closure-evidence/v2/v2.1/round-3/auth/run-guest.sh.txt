@@ -1,0 +1,20 @@
+#!/bin/zsh
+# run-guest.sh TREE OUTDIR : linux_guest.sh's roles a b c d1 and the test modules, through $R3/guest.sh only
+SP=/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad
+G=$SP/m21/r3/guest.sh
+TREE=$1; D=$2; mkdir -p $D
+ENTRY='mkdir -p /tmp/g; H=/repo/validation/v21/sandbox/linux_guest.py
+python3 -B $H canary early &
+setsid python3 -B $H canary early-setsid &
+(until [ -e /tmp/g/boundary ]; do sleep 0.1; done; sleep 1.5; python3 -B $H canary late & wait) &
+python3 -B $H "$0"'
+run() { n=$1; shift; s=$(date +%s); "$@" > $D/$n.out 2> $D/$n.err; print -r -- "$n exit=$? $(( $(date +%s) - s ))s" >> $D/_summary.txt; }
+run a $G $TREE X1 sh -c "$ENTRY" a
+run b $G $TREE hardened sh -c "$ENTRY" b
+run c $G $TREE X1 sh -c "$ENTRY" c
+run d1 $G $TREE hardened python3 -B /repo/validation/v21/sandbox/linux_guest.py d1
+for m in tests.v2.test_v21_confine tests.v2.p4.test_process_range tests.v2.p4.test_mutation_safety tests.v2.test_v21_defects_runner \
+         tests.v2.test_v21_r3_auth_ps_table tests.v2.test_v21_r3_auth_other_readers tests.v2.p0.test_destructive_authority; do
+  run $m $G $TREE hardened python3 -B -m unittest -v $m
+done
+print -r -- DONE >> $D/_summary.txt

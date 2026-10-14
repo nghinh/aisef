@@ -1,0 +1,35 @@
+import pathlib, sys
+OUT = pathlib.Path(sys.argv[1])
+src = (OUT / "exp/aisef2/runtime/process_range.py").read_text()
+V = OUT / "variants"
+
+def variant(name, pairs):
+    s = src
+    for old, new in pairs:
+        assert s.count(old) == 1, (name, old, s.count(old))
+        s = s.replace(old, new)
+    (V / f"{name}.py").write_text(s)
+
+# V14b: no lock at all (and no _mx attribute): the claim is a plain check-then-set
+variant("v14b_no_lock_no_attr", [
+    ("                with self._mx:\n", "                if True:\n"),
+    ("        self._mx = threading.RLock()          # guards `_flight` only; re-entrant, never held while anything waits\n", ""),
+])
+# V14c: the lock is there, but the check and the set are two critical sections (TOCTOU)
+variant("v14c_toctou", [(
+"""                with self._mx:
+                    current = self._flight
+                    if current is None or current.done:
+                        if self._anchor is None or self._reaped:
+                            return
+                        flight = self._flight = _Flight()
+""",
+"""                with self._mx:
+                    current = self._flight
+                if current is None or current.done:
+                    if self._anchor is None or self._reaped:
+                        return
+                    with self._mx:
+                        flight = self._flight = _Flight()
+""")])
+print("ok")

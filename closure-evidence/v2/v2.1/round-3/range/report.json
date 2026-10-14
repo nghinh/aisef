@@ -1,0 +1,330 @@
+{
+ "wp": "range",
+ "branch": "v21r3/range",
+ "head": "fff916f562d6f5cb406e932375230bf089e1a4b7",
+ "base": "3dc827beb0f3dd2105cf1e41f28ec8d6da2b7cd1",
+ "decision_doc": "docs/v2.1/decisions/B03-R3-range.md",
+ "files_changed": [
+  "aisef2/runtime/process_range.py",
+  "tests/v2/test_v21_r3_range_release_contract.py",
+  "docs/v2.1/decisions/B03-R3-range.md"
+ ],
+ "tests_added": [
+  "tests/v2/test_v21_r3_range_release_contract.py (25 tests)"
+ ],
+ "existing_tests_changed": [],
+ "call_paths": [
+  {
+   "caller": "client.session",
+   "file": "aisef2/app/client.py",
+   "line": "213-218",
+   "thread": "the caller's; range is a local",
+   "overlaps": "no",
+   "expects": "return | RangeNotEmpty | RangeEscaped",
+   "on_exception": "propagates out of finally; stream redacted in an outer finally"
+  },
+  {
+   "caller": "adapters._bounded",
+   "file": "aisef2/app/adapters.py",
+   "line": "283-291",
+   "thread": "the caller's; local",
+   "overlaps": "no",
+   "expects": "as client.session",
+   "on_exception": "propagates"
+  },
+  {
+   "caller": "test_execution.execute",
+   "file": "aisef2/quality/test_execution.py",
+   "line": "453-469",
+   "thread": "the caller's; range handed to a StoryScope via on_range; a pump thread reads run.output only",
+   "overlaps": "no (the scope's release, on a worker, comes after in program order)",
+   "expects": "ladder on the deadline, else a no-op",
+   "on_exception": "propagates"
+  },
+  {
+   "caller": "cli_invocation probe",
+   "file": "aisef2/probe/cli_invocation.py",
+   "line": "1015-1029",
+   "thread": "the probe's evaluating thread",
+   "overlaps": "not in the product; BY DESIGN in test_c2_cli_invocation FM2_CLI_SUBJECT_3 (a controller's stop thread calls release() while the probe's own finally runs)",
+   "expects": "RangeNotEmpty/RangeEscaped propagate (a leak is never silent, 17.1); _after_dispatch reads run.ledger",
+   "on_exception": "propagates through run_probe"
+  },
+  {
+   "caller": "process_effect probe",
+   "file": "aisef2/probe/process_effect.py",
+   "line": "885-899",
+   "thread": "the probe's evaluating thread",
+   "overlaps": "not in the product; BY DESIGN in test_probe_process_effect FM2_EFFECT_10",
+   "expects": "as cli_invocation",
+   "on_exception": "propagates"
+  },
+  {
+   "caller": "python_callable probe",
+   "file": "aisef2/probe/python_callable.py",
+   "line": "296-308",
+   "thread": "the probe's evaluating thread; a pump reads run.output",
+   "overlaps": "no",
+   "expects": "as cli_invocation",
+   "on_exception": "propagates"
+  },
+  {
+   "caller": "python_callable_v2 probe",
+   "file": "aisef2/probe/python_callable_v2.py",
+   "line": "483-497",
+   "thread": "the probe's evaluating thread",
+   "overlaps": "no",
+   "expects": "as cli_invocation",
+   "on_exception": "propagates"
+  },
+  {
+   "caller": "StoryScope._release (release, dispose, refused acquire)",
+   "file": "aisef2/runtime/story_scope.py",
+   "line": "152-177 (release :109, dispose :119, acquire refusals :90-97)",
+   "thread": "a daemon worker thread per release (bound RELEASE_TIMEOUT_S=600 s; inline when None); joined with the bound and ABANDONED, not joined, at it",
+   "overlaps": "the abandoned worker may still be inside release(); nothing releases that range again through the scope (popped :115/:127 or never pushed); a later direct caller is not found in the product, constructed in AbandonedWorker",
+   "expects": "Residual -> RESIDUAL; other Exception -> FAILED; InvariantError re-raised",
+   "on_exception": "recorded in the journal"
+  },
+  {
+   "caller": "Ranged.release",
+   "file": "aisef2/orchestrate/proof.py",
+   "line": "50-51",
+   "thread": "StoryScope._release's worker",
+   "overlaps": "after the probe's own release, same logical thread of control",
+   "expects": "a no-op after the probe's own",
+   "on_exception": "as the scope"
+  },
+  {
+   "caller": "ToolCall.finish",
+   "file": "aisef2/runtime/tool.py",
+   "line": "77-92",
+   "thread": "main, via scope.release",
+   "overlaps": "no (popped before release)",
+   "expects": "RESIDUAL recorded; outcome() reads ledger/returncode after",
+   "on_exception": "as the scope"
+  },
+  {
+   "caller": "RunScope.interrupt -> StoryScope.dispose",
+   "file": "aisef2/runtime/run_scope.py",
+   "line": "204-247 (handler :254)",
+   "thread": "main, in except KeyboardInterrupt (the interrupted frame has already unwound); the only SIGINT handler sets _abandon and never calls release",
+   "overlaps": "no",
+   "expects": "RESIDUAL / abandoned",
+   "on_exception": "as the scope"
+  },
+  {
+   "caller": "mutation runner _run_file",
+   "file": "validation/v2/mutation.py",
+   "line": "1556, 1583",
+   "thread": "the runner's thread",
+   "overlaps": "sequential twice on one range (RangeNotEmpty, authority cleanup, _wait lowered :1581, release again)",
+   "expects": "the second call RE-RUNS the ladder",
+   "on_exception": "_Stop"
+  },
+  {
+   "caller": "owned_run / c2_p9 / q3 / linux_guest",
+   "file": "validation/...",
+   "line": "-",
+   "thread": "one thread each",
+   "overlaps": "no",
+   "expects": "return | the two exceptions",
+   "on_exception": "as written there"
+  }
+ ],
+ "contract": {
+  "mutual_exclusion": "At most one thread runs the ladder, the EXIT write, the reap and the pipe close of one range (single flight: the claim of a _Flight under an RLock that guards one pointer).",
+  "idempotence": "A call after a release has ended touches nothing and returns as before: None once reaped; a new ladder after RangeNotEmpty (mutation.py:1583 relies on it). A caller that WAITED for a release in flight is given its outcome: a copy of RangeNotEmpty/RangeEscaped (cause = the leader's), so a leak is never silent for it; a leader that died of something else produces no outcome and the waiter leads.",
+  "ownership": "_signal is reached only from _ladder; the anchor can be reaped only after flight.disposing is set; across threads the flight excludes a second signaller, on one thread a re-entry past the ladder returns without touching anything; the _reaped guard stays. A waiter never signals a range another thread emptied (BASE: ('SIGINT', True), 40/40).",
+  "deadlock_freedom": "Same thread re-entered: the claim lock is an RLock; a re-entry in the ladder runs the ladder, past it returns at once; it never waits for itself. Another thread: polls flight.done with time.sleep(POLL_S), holds nothing, waits exactly as long as the release (bounded by grace_s/wait_s; unbounded with wait_s=None, as its own ladder was). Abandoned StoryScope worker: a later caller waits for it and is free when it ends. start()->_abort() runs before the range is shared and overlaps nothing."
+ },
+ "mechanism": {
+  "chosen": "single flight: _Flight{thread, disposing, escaped, done, outcome}; release() = claim under _mx (RLock) -> lead (_ladder, disposing=True, _release tail) | wait by polling and share the outcome | re-entry (ladder if not disposing, else return); outcome raised after the finally",
+  "alternatives_rejected": [
+   {
+    "alt": "RLock around release (investigator's process_range.diff)",
+    "measured": "passes the 3 mutual-exclusion tests; fails 5 of 25: re-entry repeats the whole disposal under the frame below ((2,2,2) closes/waits), the waiter gets None for RangeEscaped (silent leak) and runs a second ladder for RangeNotEmpty"
+   },
+   {
+    "alt": "plain Lock around release",
+    "measured": "passes the mutual-exclusion tests; fails 6 of 25, 3 by deadlock (a handler re-entering the releasing thread waits for itself; ends at the test's 10 s bound)"
+   },
+   {
+    "alt": "except (OSError, ValueError) (process_range.alt-swallow.diff)",
+    "measured": "fails 11 of 25: two ladders, two EXIT writes, a signal after the reap still happen"
+   },
+   {
+    "alt": "wait on a threading.Event in 1 s slices (first version)",
+    "measured": "Event.wait takes a plain Lock inside; a handler landing there on the waiting thread self-deadlocks; replaced by polling"
+   },
+   {
+    "alt": "an except Residual clause ending in a bare raise (first version)",
+    "measured": "moves tests/v2/p5/test_invariants.py:396 RERAISES census 8 -> 9; restructured rather than the pin"
+   }
+  ],
+  "why": "The contract needed an owner (re-entry), an outcome (the waiter) and a phase (ownership); a lock carries none of them. An RLock does guard the claim, because a handler may land inside it (test: a plain Lock there hangs)."
+ },
+ "deterministic_repro": {
+  "test": "tests/v2/test_v21_r3_range_release_contract.py: MutualExclusion.test_two_threads_releasing_one_range_run_one_ladder_one_exit_write_and_one_close (+ ..._the_real_pipe_close_of_a_second_releaser_never_meets_the_first for the exact ValueError from real io objects)",
+  "fails_on_base": "12 of 25 FAIL + 1 skipped, 40/40 runs each on macOS (host); the same 12 on Linux (guest, a real run) with the exact ValueError('PyMemoryView_FromBuffer(): info->buf must not be NULL')",
+  "passes_after": "25/25 OK, 40/40 runs (host); 25/25 OK (guest)"
+ },
+ "supplement_runs": [
+  {
+   "test": "test_c2_cli_invocation FM2_CLI_SUBJECT_3",
+   "where": "host",
+   "base": "200 runs: 195 pass, 5 fail, exact error in 6 outputs",
+   "after": "200/200, 0 exact errors"
+  },
+  {
+   "test": "test_probe_process_effect FM2_EFFECT_10",
+   "where": "host",
+   "base": "200 runs: 200 pass, exact error in 2 outputs (died in the unread stop thread)",
+   "after": "200/200, 0"
+  },
+  {
+   "test": "test_c2_cli_invocation FM2_CLI_SUBJECT_3",
+   "where": "guest (Linux, real run)",
+   "base": "100/100, 0 (does not discriminate)",
+   "after": "100/100, 0"
+  },
+  {
+   "test": "tests.v2.p4.test_interruption RealSignals SIGINT_mid_story",
+   "where": "host",
+   "base": "150 runs: 149 pass, 1 hang (30 s timeout) - pre-existing",
+   "after": "150/150; 0 in 500 under a faulthandler probe on BASE"
+  }
+ ],
+ "mutants": [
+  {
+   "function": "ProcessRange.release",
+   "total": 23,
+   "killed": 23,
+   "survived": 0,
+   "dispositions": [
+    "all KILLED by the new test file alone"
+   ],
+   "source_sha256": "489e7ec3638c2f91365fa94263a38b9d20a36c4fd586c7213c1cbadf2b561c16"
+  },
+  {
+   "function": "ProcessRange._ladder",
+   "total": 15,
+   "killed": 15,
+   "survived": 0,
+   "dispositions": [
+    "all KILLED by the new test file alone"
+   ],
+   "source_sha256": "489e7ec3638c2f91365fa94263a38b9d20a36c4fd586c7213c1cbadf2b561c16"
+  },
+  {
+   "function": "ProcessRange._release",
+   "total": 12,
+   "killed": 12,
+   "survived": 0,
+   "dispositions": [
+    "all KILLED by the new test file alone"
+   ],
+   "source_sha256": "489e7ec3638c2f91365fa94263a38b9d20a36c4fd586c7213c1cbadf2b561c16"
+  },
+  {
+   "function": "_Flight.__init__",
+   "total": 2,
+   "killed": 2,
+   "survived": 0,
+   "dispositions": [
+    "all KILLED by the new test file alone"
+   ],
+   "source_sha256": "489e7ec3638c2f91365fa94263a38b9d20a36c4fd586c7213c1cbadf2b561c16"
+  },
+  {
+   "function": "ProcessRange.__init__",
+   "total": 17,
+   "killed": 17,
+   "survived": 0,
+   "dispositions": [
+    "all KILLED by the new test file alone"
+   ],
+   "source_sha256": "489e7ec3638c2f91365fa94263a38b9d20a36c4fd586c7213c1cbadf2b561c16"
+  }
+ ],
+ "kill_files_by_function": {
+  "aisef2/runtime/process_range.py::ProcessRange.release": [
+   "tests/v2/test_v21_r3_range_release_contract.py",
+   "tests/v2/p4/test_process_range.py"
+  ],
+  "aisef2/runtime/process_range.py::ProcessRange._ladder": [
+   "tests/v2/test_v21_r3_range_release_contract.py",
+   "tests/v2/p4/test_process_range.py"
+  ],
+  "aisef2/runtime/process_range.py::ProcessRange._release": [
+   "tests/v2/test_v21_r3_range_release_contract.py",
+   "tests/v2/p4/test_process_range.py"
+  ],
+  "aisef2/runtime/process_range.py::_Flight.__init__": [
+   "tests/v2/test_v21_r3_range_release_contract.py"
+  ],
+  "aisef2/runtime/process_range.py::ProcessRange.__init__": [
+   "tests/v2/test_v21_r3_range_release_contract.py"
+  ]
+ },
+ "decisions_needed": [
+  "D1: after the probe's own release() raised RangeEscaped, the scope's later release of the same range returns None and records RELEASED (measured, same on BASE), so worktree/scratch are not held back; decide whether a range remembers a completed release's Residual and re-raises it to every later caller (changes sequential outcomes: not done).",
+  "D2: Windows failed adopt: _Job.abort does not signal an anchor that never joined the job, so _abort waits on it (from reading, not run); decide whether to kill the anchor by its own handle in _abort.",
+  "D3: tests/v2/p4/test_interruption.py RealSignals SIGINT_mid_story hung once in 150 runs on BASE (pre-existing, unexplained, no stack captured); decide whether to investigate.",
+  "Lead: register targets ProcessRange._ladder, ProcessRange._release, _Flight.__init__ (new) and ProcessRange.release (changed) with the kill files above; regenerate the sealed records bound to aisef2/ or process_range.py."
+ ],
+ "not_established": [
+  "Windows (nothing run there); Python 3.11-3.13 (3.14.7 host, 3.14.8 guest).",
+  "A real asynchronous signal: the 'handler' is a call from inside a backend operation / time.sleep / the claim lock on the same thread.",
+  "An asynchronous exception between the claim and the try, or inside the finally before done=True, would strand waiters polling (not closed, not measured).",
+  "Whether any product path overlaps releases of one range: none found by reading (table), the abandoned-worker followed by a direct call is constructed, not found.",
+  "The cause of the pre-existing SIGINT hang (D3).",
+  "Two wait() callers share one queue (outside the contract, untouched)."
+ ],
+ "test_runs": [
+  {
+   "what": "new contract tests, host, this branch",
+   "result": "25 OK; 40/40 runs"
+  },
+  {
+   "what": "new contract tests, host, BASE file",
+   "result": "12 FAIL + 1 skipped; 40/40 runs"
+  },
+  {
+   "what": "new contract tests, guest (Linux), this branch / BASE",
+   "result": "25 OK / 12 FAIL + 1 skipped (exact ValueError)"
+  },
+  {
+   "what": "tests.v2.p4.test_process_range host / guest",
+   "result": "24 OK / 24 OK"
+  },
+  {
+   "what": "tests.v2.test_c2_cli_invocation (host)",
+   "result": "32 OK"
+  },
+  {
+   "what": "tests.v2.test_probe_process_effect (host)",
+   "result": "24 OK"
+  },
+  {
+   "what": "tests.v2.test_v21_confine host / guest X1 / guest hardened",
+   "result": "34 OK / 34 OK / 34 OK"
+  },
+  {
+   "what": "tests.v2.p0.test_destructive_authority, tests.v2.p4.test_mutation_safety, tests.v2.p5.test_invariants",
+   "result": "13 OK, 10 OK, 50 OK"
+  },
+  {
+   "what": "sweep of the 55 modules that reference process_range or a validation module that reads it",
+   "result": "1,122 tests; 52 modules OK; 3 not: p4.test_interruption (background-job SIGINT artifact; OK 3/3 in the foreground), test_c2_delivery_experiment.PlanCorrection (sealed record), test_v21_mutation_runner.Classify [P4] (sealed record)"
+  },
+  {
+   "what": "sealed-record checkers BASE vs this branch",
+   "result": "BASE already fails 4 (checker_calibration x2, orchestration_conformance x1, p5_acceptance x1); this branch adds 4: k_nowork_001, p5_acceptance KernelProvenance, delivery_experiment PlanCorrection, mutation_runner Classify [P4]; all bound to tree/file digests of aisef2/"
+  },
+  {
+   "what": "ruff check . (whole tree)",
+   "result": "All checks passed"
+  }
+ ]
+}

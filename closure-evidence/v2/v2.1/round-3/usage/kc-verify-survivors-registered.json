@@ -1,0 +1,697 @@
+{
+ "target": "aisef2/app/verify.py::verify",
+ "files": [
+  "tests/v2/test_v21_kills3_A22.py",
+  "tests/v2/test_v21_kills3_R01.py",
+  "tests/v2/test_v21_kills3_T22a.py",
+  "tests/v2/test_v21_kills3_T22b.py",
+  "tests/v2/test_v21_defects_verify.py",
+  "tests/v2/test_v21_verify.py"
+ ],
+ "source_sha256": "b30820f61194665ace24e317a06651334e86dc9fcb77e879b97450ee0514dc1b",
+ "t0": [
+  {
+   "file": "tests/v2/test_v21_kills3_A22.py",
+   "seconds": 0.77,
+   "outcome": "PASS",
+   "ran": 7
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_R01.py",
+   "seconds": 0.57,
+   "outcome": "PASS",
+   "ran": 8
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "seconds": 7.44,
+   "outcome": "PASS",
+   "ran": 13
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T22b.py",
+   "seconds": 13.5,
+   "outcome": "PASS",
+   "ran": 10
+  },
+  {
+   "file": "tests/v2/test_v21_defects_verify.py",
+   "seconds": 40.07,
+   "outcome": "PASS",
+   "ran": 20
+  },
+  {
+   "file": "tests/v2/test_v21_verify.py",
+   "seconds": 44.77,
+   "outcome": "PASS",
+   "ran": 8
+  }
+ ],
+ "error": null,
+ "results": [
+  {
+   "index": 6,
+   "mutant": "L96 Or swapped",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 7,
+   "mutant": "L97 returns None",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 11,
+   "mutant": "L127 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A22.py",
+   "first": "ERROR: test_the_note_names_the_file_and_the_release_boundary (v2.test_v21_kills3_A22.ARunWithoutAManifestIsVerifiedWithANoteThatNamesTheFileAndTheReleaseBoundary.test_the_note_names_the_file_and_the_release_boundary) | ValueError"
+  },
+  {
+   "index": 26,
+   "mutant": "L201 dict entry 4 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A22.py",
+   "first": "ERROR: test_the_note_names_the_file_and_the_release_boundary (v2.test_v21_kills3_A22.ARunWithoutAManifestIsVerifiedWithANoteThatNamesTheFileAndTheReleaseBoundary.test_the_note_names_the_file_and_the_release_boundary) | KeyError"
+  },
+  {
+   "index": 27,
+   "mutant": "L201 dict entry 5 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A22.py",
+   "first": "ERROR: test_the_note_names_the_file_and_the_release_boundary (v2.test_v21_kills3_A22.ARunWithoutAManifestIsVerifiedWithANoteThatNamesTheFileAndTheReleaseBoundary.test_the_note_names_the_file_and_the_release_boundary) | KeyError"
+  },
+  {
+   "index": 28,
+   "mutant": "L94 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A22.py",
+   "first": "ERROR: test_the_path_is_delimited_and_the_cause_class_is_a_token (v2.test_v21_kills3_A22.AnUnreadableRecordIsNamedByItsFileAndItsCause.test_the_path_is_delimited_and_the_cause_class_is_a_token) [absent] | FileNotFoundError"
+  },
+  {
+   "index": 29,
+   "mutant": "L94 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A22.py",
+   "first": "ERROR: test_the_path_is_delimited_and_the_cause_class_is_a_token (v2.test_v21_kills3_A22.AnUnreadableRecordIsNamedByItsFileAndItsCause.test_the_path_is_delimited_and_the_cause_class_is_a_token) [not JSON] | json.decoder.JSONDecodeError"
+  },
+  {
+   "index": 30,
+   "mutant": "L95 returns None",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A22.py",
+   "first": "ERROR: test_the_path_is_delimited_and_the_cause_class_is_a_token (v2.test_v21_kills3_A22.AnUnreadableRecordIsNamedByItsFileAndItsCause.test_the_path_is_delimited_and_the_cause_class_is_a_token) [absent] | TypeError"
+  },
+  {
+   "index": 33,
+   "mutant": "L97 dict entry 0 dropped",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 34,
+   "mutant": "L97 dict entry 1 dropped",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 35,
+   "mutant": "L111 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_R01.py",
+   "first": "ERROR: test_a_manifest_that_is_json_and_no_manifest_says_so (v2.test_v21_kills3_R01.TheManifestThatCannotBeUsedIsRefusedWithItsKindOfCause.test_a_manifest_that_is_json_and_no_manifest_says_so) (manifest='[]') | AttributeError"
+  },
+  {
+   "index": 38,
+   "mutant": "L125 NotEq->Eq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A22.py",
+   "first": "FAIL: test_the_directory_s_prefix_then_the_expected_one (v2.test_v21_kills3_A22.TheAnchorsOfAMismatchAreTwoTokensInRoleOrder.test_the_directory_s_prefix_then_the_expected_one) | AssertionError"
+  },
+  {
+   "index": 39,
+   "mutant": "L127 IsNot->Is",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A22.py",
+   "first": "ERROR: test_the_note_names_the_file_and_the_release_boundary (v2.test_v21_kills3_A22.ARunWithoutAManifestIsVerifiedWithANoteThatNamesTheFileAndTheReleaseBoundary.test_the_note_names_the_file_and_the_release_boundary) | ValueError"
+  },
+  {
+   "index": 44,
+   "mutant": "L166 sorted() -> list()",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 55,
+   "mutant": "L188 And swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A22.py",
+   "first": "FAIL: test_the_note_names_the_file_and_the_release_boundary (v2.test_v21_kills3_A22.ARunWithoutAManifestIsVerifiedWithANoteThatNamesTheFileAndTheReleaseBoundary.test_the_note_names_the_file_and_the_release_boundary) | AssertionError"
+  },
+  {
+   "index": 57,
+   "mutant": "L196 And swapped",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 63,
+   "mutant": "L202 string 'evidence_anchor' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A22.py",
+   "first": "ERROR: test_the_note_names_the_file_and_the_release_boundary (v2.test_v21_kills3_A22.ARunWithoutAManifestIsVerifiedWithANoteThatNamesTheFileAndTheReleaseBoundary.test_the_note_names_the_file_and_the_release_boundary) | KeyError"
+  },
+  {
+   "index": 64,
+   "mutant": "L202 string 'notes' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A22.py",
+   "first": "ERROR: test_the_note_names_the_file_and_the_release_boundary (v2.test_v21_kills3_A22.ARunWithoutAManifestIsVerifiedWithANoteThatNamesTheFileAndTheReleaseBoundary.test_the_note_names_the_file_and_the_release_boundary) | KeyError"
+  },
+  {
+   "index": 66,
+   "mutant": "L95 dict entry 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A22.py",
+   "first": "ERROR: test_the_path_is_delimited_and_the_cause_class_is_a_token (v2.test_v21_kills3_A22.AnUnreadableRecordIsNamedByItsFileAndItsCause.test_the_path_is_delimited_and_the_cause_class_is_a_token) [absent] | KeyError"
+  },
+  {
+   "index": 67,
+   "mutant": "L95 dict entry 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A22.py",
+   "first": "ERROR: test_the_path_is_delimited_and_the_cause_class_is_a_token (v2.test_v21_kills3_A22.AnUnreadableRecordIsNamedByItsFileAndItsCause.test_the_path_is_delimited_and_the_cause_class_is_a_token) [absent] | KeyError"
+  },
+  {
+   "index": 68,
+   "mutant": "L97 string 'verdict' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 69,
+   "mutant": "L97 string 'problems' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 70,
+   "mutant": "L97 string 'REFUTED' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 75,
+   "mutant": "L132 string 'the run is not of this project bundle' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 76,
+   "mutant": "L136 string 'the run has no journal (it ended before the run began)' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_R01.py",
+   "first": "FAIL: test_a_run_that_ended_before_it_began_is_refuted_for_its_missing_journal_alone (v2.test_v21_kills3_R01.ARunThatEndedBeforeItsRunSpecHasNothingToBind.test_a_run_that_ended_before_it_began_is_refuted_for_its_missing_journal_alone) | AssertionError"
+  },
+  {
+   "index": 77,
+   "mutant": "L145 Or swapped",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 83,
+   "mutant": "L181 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_verify.py",
+   "first": "FAIL: test_a_budget_stop_removed_from_the_record_is_refuted (v2.test_v21_verify.RecordAlone.test_a_budget_stop_removed_from_the_record_is_refuted) | AssertionError"
+  },
+  {
+   "index": 84,
+   "mutant": "L182 Eq->NotEq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_R01.py",
+   "first": "FAIL: test_a_run_that_ended_before_it_began_is_refuted_for_its_missing_journal_alone (v2.test_v21_kills3_R01.ARunThatEndedBeforeItsRunSpecHasNothingToBind.test_a_run_that_ended_before_it_began_is_refuted_for_its_missing_journal_alone) | AssertionError"
+  },
+  {
+   "index": 85,
+   "mutant": "L183 string 'FAIL' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 92,
+   "mutant": "L95 string 'verdict' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A22.py",
+   "first": "ERROR: test_the_path_is_delimited_and_the_cause_class_is_a_token (v2.test_v21_kills3_A22.AnUnreadableRecordIsNamedByItsFileAndItsCause.test_the_path_is_delimited_and_the_cause_class_is_a_token) [absent] | KeyError"
+  },
+  {
+   "index": 93,
+   "mutant": "L95 string 'problems' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A22.py",
+   "first": "ERROR: test_the_path_is_delimited_and_the_cause_class_is_a_token (v2.test_v21_kills3_A22.AnUnreadableRecordIsNamedByItsFileAndItsCause.test_the_path_is_delimited_and_the_cause_class_is_a_token) [absent] | KeyError"
+  },
+  {
+   "index": 94,
+   "mutant": "L95 string 'REFUTED' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A22.py",
+   "first": "FAIL: test_the_path_is_delimited_and_the_cause_class_is_a_token (v2.test_v21_kills3_A22.AnUnreadableRecordIsNamedByItsFileAndItsCause.test_the_path_is_delimited_and_the_cause_class_is_a_token) [absent] | AssertionError"
+  },
+  {
+   "index": 96,
+   "mutant": "L122 sorted() -> list()",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_the_paths_are_the_first_five_in_sorted_order_whatever_the_hash_seed (v2.test_v21_kills3_T22a.ManifestProblemNamesTheFilesThatDiffer.test_the_paths_are_the_first_five_in_sorted_order_whatever_the_hash_seed) | AssertionError"
+  },
+  {
+   "index": 97,
+   "mutant": "L126 string 'the evidence anchor is ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22b.py",
+   "first": "FAIL: test_a_directory_without_its_manifest_is_refuted_not_a_crash (v2.test_v21_kills3_T22b.ExpectedAnchor.test_a_directory_without_its_manifest_is_refuted_not_a_crash) | AssertionError"
+  },
+  {
+   "index": 98,
+   "mutant": "L126 string ', not the ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A22.py",
+   "first": "FAIL: test_the_directory_s_prefix_then_the_expected_one (v2.test_v21_kills3_A22.TheAnchorsOfAMismatchAreTwoTokensInRoleOrder.test_the_directory_s_prefix_then_the_expected_one) | AssertionError"
+  },
+  {
+   "index": 99,
+   "mutant": "L126 string ' the run printed' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 100,
+   "mutant": "L128 string 'the anchor matches the expected value: authentic only as far as that value came from a store the developer cannot write (docs/v2.1/ANCHOR-THREAT-MODEL.md); it does not prove the run happened as its journal says' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22b.py",
+   "first": "FAIL: test_a_match_says_where_the_limit_of_what_it_proves_is_written (v2.test_v21_kills3_T22b.ExpectedAnchor.test_a_match_says_where_the_limit_of_what_it_proves_is_written) | AssertionError"
+  },
+  {
+   "index": 101,
+   "mutant": "L138 string \"RUN.json's journal reference is not an object\" emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_defects_verify.py",
+   "first": "FAIL: test_a_journal_reference_that_is_no_object_or_no_path_is_refuted (v2.test_v21_defects_verify.DamagedRunDirectory.test_a_journal_reference_that_is_no_object_or_no_path_is_refuted) (journal='x') | AssertionError"
+  },
+  {
+   "index": 102,
+   "mutant": "L142 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22b.py",
+   "first": "ERROR: test_a_journal_file_that_is_absent (v2.test_v21_kills3_T22b.JournalReferenceUnreadable.test_a_journal_file_that_is_absent) | FileNotFoundError"
+  },
+  {
+   "index": 103,
+   "mutant": "L142 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22b.py",
+   "first": "ERROR: test_a_journal_reference_without_a_path (v2.test_v21_kills3_T22b.JournalReferenceUnreadable.test_a_journal_reference_without_a_path) | KeyError"
+  },
+  {
+   "index": 104,
+   "mutant": "L142 element 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22b.py",
+   "first": "ERROR: test_a_journal_path_that_is_not_a_path (v2.test_v21_kills3_T22b.JournalReferenceUnreadable.test_a_journal_path_that_is_not_a_path) | TypeError"
+  },
+  {
+   "index": 105,
+   "mutant": "L142 element 3 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_defects_verify.py",
+   "first": "ERROR: test_a_journal_reference_that_is_no_object_or_no_path_is_refuted (v2.test_v21_defects_verify.DamagedRunDirectory.test_a_journal_reference_that_is_no_object_or_no_path_is_refuted) | ValueError"
+  },
+  {
+   "index": 110,
+   "mutant": "L180 dict entry 0 dropped",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 111,
+   "mutant": "L180 dict entry 1 dropped",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 112,
+   "mutant": "L180 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A22.py",
+   "first": "FAIL: test_the_note_names_the_file_and_the_release_boundary (v2.test_v21_kills3_A22.ARunWithoutAManifestIsVerifiedWithANoteThatNamesTheFileAndTheReleaseBoundary.test_the_note_names_the_file_and_the_release_boundary) | AssertionError"
+  },
+  {
+   "index": 113,
+   "mutant": "L182 string 'failure' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 114,
+   "mutant": "L182 string 'PASS' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 116,
+   "mutant": "L187 string \"the record's ProductProof account is not the one the journal re-derives\" emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 117,
+   "mutant": "L188 string 'error' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_usage_the_run_named_as_a_fault_is_not_an_account_to_compare (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_usage_the_run_named_as_a_fault_is_not_an_account_to_compare) | AssertionError"
+  },
+  {
+   "index": 120,
+   "mutant": "L196 string 'final_main' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 122,
+   "mutant": "L97 string 'RUN.json is not a run record of format ' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 124,
+   "mutant": "L103 string 'no ' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 125,
+   "mutant": "L103 string ': a run of a release before 2.1 \u2014 its record is bound by nothing but itself' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A22.py",
+   "first": "FAIL: test_the_note_names_the_file_and_the_release_boundary (v2.test_v21_kills3_A22.ARunWithoutAManifestIsVerifiedWithANoteThatNamesTheFileAndTheReleaseBoundary.test_the_note_names_the_file_and_the_release_boundary) | AssertionError"
+  },
+  {
+   "index": 126,
+   "mutant": "L106 string ' is not JSON' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22b.py",
+   "first": "FAIL: test_a_corrupt_manifest_is_refuted_naming_the_file_and_why (v2.test_v21_kills3_T22b.ManifestThatIsNotJson.test_a_corrupt_manifest_is_refuted_naming_the_file_and_why) | AssertionError"
+  },
+  {
+   "index": 127,
+   "mutant": "L109 string ' cannot be read (' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_R01.py",
+   "first": "FAIL: test_a_manifest_that_cannot_be_read_names_the_file_and_the_class_of_the_failure (v2.test_v21_kills3_R01.TheManifestThatCannotBeUsedIsRefusedWithItsKindOfCause.test_a_manifest_that_cannot_be_read_names_the_file_and_the_class_of_the_failure) | AssertionError"
+  },
+  {
+   "index": 128,
+   "mutant": "L109 string ')' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 129,
+   "mutant": "L113 string ' is not an evidence manifest (a JSON object holding its files)' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_R01.py",
+   "first": "FAIL: test_a_manifest_that_is_json_and_no_manifest_says_so (v2.test_v21_kills3_R01.TheManifestThatCannotBeUsedIsRefusedWithItsKindOfCause.test_a_manifest_that_is_json_and_no_manifest_says_so) (manifest='[]') | AssertionError"
+  },
+  {
+   "index": 130,
+   "mutant": "L126 And swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A22.py",
+   "first": "FAIL: test_the_directory_s_prefix_then_the_expected_one (v2.test_v21_kills3_A22.TheAnchorsOfAMismatchAreTwoTokensInRoleOrder.test_the_directory_s_prefix_then_the_expected_one) | AssertionError"
+  },
+  {
+   "index": 131,
+   "mutant": "L146 string 'the journal is not the one RUN.json names (digest or length)' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_defects_verify.py",
+   "first": "FAIL: test_a_journal_reference_that_is_no_object_or_no_path_is_refuted (v2.test_v21_defects_verify.DamagedRunDirectory.test_a_journal_reference_that_is_no_object_or_no_path_is_refuted) | AssertionError"
+  },
+  {
+   "index": 137,
+   "mutant": "L168 string \"the record's story outcomes are not the journal's for \" emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_verify.py",
+   "first": "FAIL: test_story_outcomes_that_are_not_the_journal_s_are_refuted (v2.test_v21_verify.RecordAlone.test_story_outcomes_that_are_not_the_journal_s_are_refuted) | AssertionError"
+  },
+  {
+   "index": 140,
+   "mutant": "L180 string 'story' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 141,
+   "mutant": "L180 string 'error' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 142,
+   "mutant": "L180 string 'begun and never ended in the journal' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 143,
+   "mutant": "L181 string 'budget_stop' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 144,
+   "mutant": "L185 string 'the record says ' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 145,
+   "mutant": "L185 string '; the journal re-derives ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_verify.py",
+   "first": "FAIL: test_a_budget_stop_removed_from_the_record_is_refuted (v2.test_v21_verify.RecordAlone.test_a_budget_stop_removed_from_the_record_is_refuted) | AssertionError"
+  },
+  {
+   "index": 151,
+   "mutant": "L198 string \"the run's repository main is not the record's final main\" emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 153,
+   "mutant": "L95 string ': no readable run record (' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A22.py",
+   "first": "FAIL: test_the_path_is_delimited_and_the_cause_class_is_a_token (v2.test_v21_kills3_A22.AnUnreadableRecordIsNamedByItsFileAndItsCause.test_the_path_is_delimited_and_the_cause_class_is_a_token) [absent] | AssertionError"
+  },
+  {
+   "index": 154,
+   "mutant": "L95 string ')' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 155,
+   "mutant": "L111 string 'files' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_R01.py",
+   "first": "ERROR: test_a_manifest_that_is_json_and_no_manifest_says_so (v2.test_v21_kills3_R01.TheManifestThatCannotBeUsedIsRefusedWithItsKindOfCause.test_a_manifest_that_is_json_and_no_manifest_says_so) (manifest='{\"files\": []}') | AttributeError"
+  },
+  {
+   "index": 156,
+   "mutant": "L119 string 'an evidence file cannot be read (' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_R01.py",
+   "first": "FAIL: test_the_path_and_the_class_are_tokens_and_the_kind_of_failure_is_read (v2.test_v21_kills3_R01.AnEvidenceFileThatCannotBeReadIsNamedByItsPathAndTheClassOfTheFailure.test_the_path_and_the_class_are_tokens_and_the_kind_of_failure_is_read) | AssertionError"
+  },
+  {
+   "index": 157,
+   "mutant": "L119 string '): ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_R01.py",
+   "first": "FAIL: test_the_path_and_the_class_are_tokens_and_the_kind_of_failure_is_read (v2.test_v21_kills3_R01.AnEvidenceFileThatCannotBeReadIsNamedByItsPathAndTheClassOfTheFailure.test_the_path_and_the_class_are_tokens_and_the_kind_of_failure_is_read) | AssertionError"
+  },
+  {
+   "index": 158,
+   "mutant": "L124 string 'the evidence manifest does not match the run directory: ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_changed_file_is_named_and_the_files_that_agree_are_not (v2.test_v21_kills3_T22a.ManifestProblemNamesTheFilesThatDiffer.test_a_changed_file_is_named_and_the_files_that_agree_are_not) | AssertionError"
+  },
+  {
+   "index": 165,
+   "mutant": "L157 string 'the journal ends in a torn line' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 167,
+   "mutant": "L178 string \"the record's spend is not what the evidence re-derives for \" emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22b.py",
+   "first": "FAIL: test_the_counter_that_differs_is_named_and_the_ones_that_agree_are_not (v2.test_v21_kills3_T22b.SpendLoweredAlone.test_the_counter_that_differs_is_named_and_the_ones_that_agree_are_not) | AssertionError"
+  },
+  {
+   "index": 168,
+   "mutant": "L180 string 'story_errors' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_defects_verify.py",
+   "first": "FAIL: test_a_record_field_of_another_type_is_refuted_never_a_crash (v2.test_v21_defects_verify.DamagedRunDirectory.test_a_record_field_of_another_type_is_refuted_never_a_crash) [story_errors a number] | AssertionError"
+  },
+  {
+   "index": 169,
+   "mutant": "L190 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22b.py",
+   "first": "FAIL: test_a_priced_run_verifies_and_its_cost_stays_known (v2.test_v21_kills3_T22b.PricedRun.test_a_priced_run_verifies_and_its_cost_stays_known) | AssertionError"
+  },
+  {
+   "index": 172,
+   "mutant": "L196 string 'repo' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 173,
+   "mutant": "L200 string 'the record cannot be re-derived from the evidence: ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_R01.py",
+   "first": "FAIL: test_the_problem_says_the_record_the_class_and_the_message_apart (v2.test_v21_kills3_R01.ARecordThatCannotBeReDerivedNamesTheRecordTheClassAndTheMessage.test_the_problem_says_the_record_the_class_and_the_message_apart) | AssertionError"
+  },
+  {
+   "index": 174,
+   "mutant": "L200 string ': ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_R01.py",
+   "first": "FAIL: test_the_problem_says_the_record_the_class_and_the_message_apart (v2.test_v21_kills3_R01.ARecordThatCannotBeReDerivedNamesTheRecordTheClassAndTheMessage.test_the_problem_says_the_record_the_class_and_the_message_apart) | AssertionError"
+  },
+  {
+   "index": 175,
+   "mutant": "L123 NotEq->Eq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_changed_file_is_named_and_the_files_that_agree_are_not (v2.test_v21_kills3_T22a.ManifestProblemNamesTheFilesThatDiffer.test_a_changed_file_is_named_and_the_files_that_agree_are_not) | AssertionError"
+  },
+  {
+   "index": 176,
+   "mutant": "L144 string 'the journal RUN.json names cannot be read (' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22b.py",
+   "first": "FAIL: test_a_journal_file_that_is_absent (v2.test_v21_kills3_T22b.JournalReferenceUnreadable.test_a_journal_file_that_is_absent) | AssertionError"
+  },
+  {
+   "index": 177,
+   "mutant": "L144 string ')' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 181,
+   "mutant": "L185 string 'delivery_verdict' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 182,
+   "mutant": "L95 string 'RUN.json' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_A22.py",
+   "first": "FAIL: test_the_path_is_delimited_and_the_cause_class_is_a_token (v2.test_v21_kills3_A22.AnUnreadableRecordIsNamedByItsFileAndItsCause.test_the_path_is_delimited_and_the_cause_class_is_a_token) [absent] | AssertionError"
+  },
+  {
+   "index": 188,
+   "mutant": "L159 string 'the journal does not reconstruct: ' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 189,
+   "mutant": "L159 string ': ' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 191,
+   "mutant": "L190 string 'settings' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22b.py",
+   "first": "FAIL: test_a_priced_run_verifies_and_its_cost_stays_known (v2.test_v21_kills3_T22b.PricedRun.test_a_priced_run_verifies_and_its_cost_stays_known) | AssertionError"
+  },
+  {
+   "index": 195,
+   "mutant": "L122 string 'files' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_file_the_manifest_binds_and_the_directory_lacks_is_named (v2.test_v21_kills3_T22a.ManifestProblemNamesTheFilesThatDiffer.test_a_file_the_manifest_binds_and_the_directory_lacks_is_named) | AssertionError"
+  },
+  {
+   "index": 196,
+   "mutant": "L122 string 'files' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "ERROR: test_a_changed_file_is_named_and_the_files_that_agree_are_not (v2.test_v21_kills3_T22a.ManifestProblemNamesTheFilesThatDiffer.test_a_changed_file_is_named_and_the_files_that_agree_are_not) | KeyError"
+  },
+  {
+   "index": 197,
+   "mutant": "L123 string 'files' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "FAIL: test_a_changed_file_is_named_and_the_files_that_agree_are_not (v2.test_v21_kills3_T22a.ManifestProblemNamesTheFilesThatDiffer.test_a_changed_file_is_named_and_the_files_that_agree_are_not) | AssertionError"
+  },
+  {
+   "index": 198,
+   "mutant": "L123 string 'files' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T22a.py",
+   "first": "ERROR: test_a_changed_file_is_named_and_the_files_that_agree_are_not (v2.test_v21_kills3_T22a.ManifestProblemNamesTheFilesThatDiffer.test_a_changed_file_is_named_and_the_files_that_agree_are_not) | KeyError"
+  }
+ ]
+}

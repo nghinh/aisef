@@ -1,0 +1,165 @@
+{
+ "target": "validation/v2/cleanup_authority.py::_windows_table",
+ "files": [
+  "tests/v2/test_v21_r3_auth_ps_table.py",
+  "tests/v2/test_v21_r3_auth_other_readers.py"
+ ],
+ "source_sha256": "52bfcbdc60c362b8966dbbf414beba593eaf41330fce9d94c4809397bfbf6d5e",
+ "t0": [
+  {
+   "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+   "seconds": 0.77,
+   "outcome": "PASS",
+   "ran": 29
+  },
+  {
+   "file": "tests/v2/test_v21_r3_auth_other_readers.py",
+   "seconds": 1.57,
+   "outcome": "PASS",
+   "ran": 34
+  }
+ ],
+ "error": null,
+ "results": [
+  {
+   "index": 0,
+   "mutant": "L208 returns None",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_other_readers.py",
+   "first": "ERROR: test_a_command_holding_any_character_is_one_row_with_the_whole_command (v2.test_v21_r3_auth_other_readers.WindowsTable.test_a_command_holding_any_character_is_one_row_with_the_whole_command) (sep=\"'\\\\u2028'\") | TypeError"
+  },
+  {
+   "index": 1,
+   "mutant": "L199 string \"Get-CimInstance Win32_Process | ForEach-Object { '{0}|{1}|{2}|{3}' -f $_.ProcessId, $_.ParentProcessId, [int64]((Get-Date $_.CreationDate).ToUniversalTime() - (Get-Date '1970-01-01')).TotalSeconds, [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes([string]$_.CommandLine)) }\" emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_other_readers.py",
+   "first": "FAIL: test_the_script_asks_for_the_command_encoded_and_for_nothing_raw (v2.test_v21_r3_auth_other_readers.WindowsTable.test_the_script_asks_for_the_command_encoded_and_for_nothing_raw) | AssertionError"
+  },
+  {
+   "index": 2,
+   "mutant": "L208 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_other_readers.py",
+   "first": "ERROR: test_a_command_holding_any_character_is_one_row_with_the_whole_command (v2.test_v21_r3_auth_other_readers.WindowsTable.test_a_command_holding_any_character_is_one_row_with_the_whole_command) (sep=\"'\\\\u2028'\") | ValueError"
+  },
+  {
+   "index": 3,
+   "mutant": "L208 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_other_readers.py",
+   "first": "ERROR: test_a_command_holding_any_character_is_one_row_with_the_whole_command (v2.test_v21_r3_auth_other_readers.WindowsTable.test_a_command_holding_any_character_is_one_row_with_the_whole_command) (sep=\"'\\\\u2028'\") | ValueError"
+  },
+  {
+   "index": 4,
+   "mutant": "L205 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_other_readers.py",
+   "first": "ERROR: test_a_command_holding_any_character_is_one_row_with_the_whole_command (v2.test_v21_r3_auth_other_readers.WindowsTable.test_a_command_holding_any_character_is_one_row_with_the_whole_command) (sep=\"'\\\\u2028'\") | ValueError"
+  },
+  {
+   "index": 5,
+   "mutant": "L205 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_other_readers.py",
+   "first": "ERROR: test_a_command_holding_any_character_is_one_row_with_the_whole_command (v2.test_v21_r3_auth_other_readers.WindowsTable.test_a_command_holding_any_character_is_one_row_with_the_whole_command) (sep=\"'\\\\u2028'\") | ValueError"
+  },
+  {
+   "index": 6,
+   "mutant": "L206 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_other_readers.py",
+   "first": "ERROR: test_a_shell_that_cannot_run_or_times_out_proves_nothing_and_is_not_an_error (v2.test_v21_r3_auth_other_readers.WindowsTable.test_a_shell_that_cannot_run_or_times_out_proves_nothing_and_is_not_an_error) (exc='OSError') | OSError"
+  },
+  {
+   "index": 7,
+   "mutant": "L206 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_other_readers.py",
+   "first": "ERROR: test_a_shell_that_cannot_run_or_times_out_proves_nothing_and_is_not_an_error (v2.test_v21_r3_auth_other_readers.WindowsTable.test_a_shell_that_cannot_run_or_times_out_proves_nothing_and_is_not_an_error) (exc='TimeoutExpired') | subprocess.TimeoutExpired"
+  },
+  {
+   "index": 8,
+   "mutant": "L207 returns None",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_other_readers.py",
+   "first": "FAIL: test_a_shell_that_cannot_run_or_times_out_proves_nothing_and_is_not_an_error (v2.test_v21_r3_auth_other_readers.WindowsTable.test_a_shell_that_cannot_run_or_times_out_proves_nothing_and_is_not_an_error) (exc='OSError') | AssertionError"
+  },
+  {
+   "index": 9,
+   "mutant": "L203 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_other_readers.py",
+   "first": "FAIL: test_the_script_asks_for_the_command_encoded_and_for_nothing_raw (v2.test_v21_r3_auth_other_readers.WindowsTable.test_the_script_asks_for_the_command_encoded_and_for_nothing_raw) | AssertionError"
+  },
+  {
+   "index": 10,
+   "mutant": "L203 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_other_readers.py",
+   "first": "FAIL: test_the_script_asks_for_the_command_encoded_and_for_nothing_raw (v2.test_v21_r3_auth_other_readers.WindowsTable.test_the_script_asks_for_the_command_encoded_and_for_nothing_raw) | AssertionError"
+  },
+  {
+   "index": 11,
+   "mutant": "L203 element 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_other_readers.py",
+   "first": "FAIL: test_the_script_asks_for_the_command_encoded_and_for_nothing_raw (v2.test_v21_r3_auth_other_readers.WindowsTable.test_the_script_asks_for_the_command_encoded_and_for_nothing_raw) | AssertionError"
+  },
+  {
+   "index": 12,
+   "mutant": "L203 element 3 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_other_readers.py",
+   "first": "FAIL: test_the_script_asks_for_the_command_encoded_and_for_nothing_raw (v2.test_v21_r3_auth_other_readers.WindowsTable.test_the_script_asks_for_the_command_encoded_and_for_nothing_raw) | AssertionError"
+  },
+  {
+   "index": 13,
+   "mutant": "L203 element 4 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_other_readers.py",
+   "first": "ERROR: test_the_script_asks_for_the_command_encoded_and_for_nothing_raw (v2.test_v21_r3_auth_other_readers.WindowsTable.test_the_script_asks_for_the_command_encoded_and_for_nothing_raw) | IndexError"
+  },
+  {
+   "index": 14,
+   "mutant": "L207 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_other_readers.py",
+   "first": "FAIL: test_a_shell_that_cannot_run_or_times_out_proves_nothing_and_is_not_an_error (v2.test_v21_r3_auth_other_readers.WindowsTable.test_a_shell_that_cannot_run_or_times_out_proves_nothing_and_is_not_an_error) (exc='OSError') | AssertionError"
+  },
+  {
+   "index": 15,
+   "mutant": "L207 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_other_readers.py",
+   "first": "FAIL: test_a_shell_that_cannot_run_or_times_out_proves_nothing_and_is_not_an_error (v2.test_v21_r3_auth_other_readers.WindowsTable.test_a_shell_that_cannot_run_or_times_out_proves_nothing_and_is_not_an_error) (exc='OSError') | AssertionError"
+  },
+  {
+   "index": 16,
+   "mutant": "L203 string 'powershell' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_other_readers.py",
+   "first": "FAIL: test_the_script_asks_for_the_command_encoded_and_for_nothing_raw (v2.test_v21_r3_auth_other_readers.WindowsTable.test_the_script_asks_for_the_command_encoded_and_for_nothing_raw) | AssertionError"
+  },
+  {
+   "index": 17,
+   "mutant": "L203 string '-NoProfile' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_other_readers.py",
+   "first": "FAIL: test_the_script_asks_for_the_command_encoded_and_for_nothing_raw (v2.test_v21_r3_auth_other_readers.WindowsTable.test_the_script_asks_for_the_command_encoded_and_for_nothing_raw) | AssertionError"
+  },
+  {
+   "index": 18,
+   "mutant": "L203 string '-NonInteractive' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_other_readers.py",
+   "first": "FAIL: test_the_script_asks_for_the_command_encoded_and_for_nothing_raw (v2.test_v21_r3_auth_other_readers.WindowsTable.test_the_script_asks_for_the_command_encoded_and_for_nothing_raw) | AssertionError"
+  },
+  {
+   "index": 19,
+   "mutant": "L203 string '-Command' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_other_readers.py",
+   "first": "FAIL: test_the_script_asks_for_the_command_encoded_and_for_nothing_raw (v2.test_v21_r3_auth_other_readers.WindowsTable.test_the_script_asks_for_the_command_encoded_and_for_nothing_raw) | AssertionError"
+  }
+ ]
+}

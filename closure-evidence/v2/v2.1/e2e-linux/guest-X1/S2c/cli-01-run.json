@@ -1,0 +1,49 @@
+{
+ "tag": "run",
+ "argv": [
+  "/tmp/e2e/S2c/venv/bin/python",
+  "-B",
+  "-m",
+  "aisef",
+  "run",
+  "--project",
+  "/tmp/e2e/project/approved.json",
+  "--settings",
+  "settings.json",
+  "--repo",
+  "/tmp/e2e/project/repo",
+  "--out",
+  "run",
+  "--anchor-out",
+  "anchor.txt"
+ ],
+ "cwd": "/tmp/e2e/S2c",
+ "exit": 1,
+ "seconds": 8.9,
+ "stdout": "{\n \"anchor_written_to\": \"anchor.txt\",\n \"delivery_blocked_by\": [\n  \"1 of the plan's stories did not commit: ['S1']\"\n ],\n \"delivery_verdict\": \"FAIL\",\n \"evidence_anchor\": \"874e59095bf941f7e5fac82e2236499d87f804c49fe8e1743a297f8fe2d48b2e\",\n \"final_main\": \"3176460308161b5e765e678323c35accbdad32a9\",\n \"journal\": {\n  \"closed\": \"SHUTDOWN\",\n  \"lines\": 136,\n  \"path\": \"run/journals/aisef-run.jsonl\",\n  \"sha256\": \"55951bfca8e799957317aa2adf5347ac8b9e325a09a27e2721f6b47ffa87ce2b\"\n },\n \"plan_quality_verdict\": \"NOT_CLAIMED\",\n \"project\": \"calc-cli\",\n \"record\": \"run/RUN.json\",\n \"story_outcomes\": {\n  \"S1\": [\n   \"RETRY\",\n   \"ROLLBACK\"\n  ]\n }\n}\n",
+ "stderr": "",
+ "json": {
+  "anchor_written_to": "anchor.txt",
+  "delivery_blocked_by": [
+   "1 of the plan's stories did not commit: ['S1']"
+  ],
+  "delivery_verdict": "FAIL",
+  "evidence_anchor": "874e59095bf941f7e5fac82e2236499d87f804c49fe8e1743a297f8fe2d48b2e",
+  "final_main": "3176460308161b5e765e678323c35accbdad32a9",
+  "journal": {
+   "closed": "SHUTDOWN",
+   "lines": 136,
+   "path": "run/journals/aisef-run.jsonl",
+   "sha256": "55951bfca8e799957317aa2adf5347ac8b9e325a09a27e2721f6b47ffa87ce2b"
+  },
+  "plan_quality_verdict": "NOT_CLAIMED",
+  "project": "calc-cli",
+  "record": "run/RUN.json",
+  "story_outcomes": {
+   "S1": [
+    "RETRY",
+    "ROLLBACK"
+   ]
+  }
+ }
+}

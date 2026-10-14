@@ -1,0 +1,30 @@
+tests.v2.p2.test_calibration :: Ran 17 tests in 0.021s OK 
+tests.v2.p2.test_calibration_fixtures :: Ran 3 tests in 6.561s OK 
+tests.v2.p2.test_probe_protocol :: Ran 35 tests in 0.009s OK 
+tests.v2.p2.test_python_callable :: Ran 37 tests in 29.641s OK 
+tests.v2.test_c2_cli_calibration :: Ran 3 tests in 40.642s OK 
+tests.v2.test_c2_cli_invocation :: Ran 32 tests in 69.298s OK 
+tests.v2.test_c2_cli_protocol :: FAIL: test_CLI_Q0_the_module_passes_the_probe_rules_with_its_catalog_facts (tests.v2.test_c2_cli_protocol.Identity.test_CLI_Q0_the_module_passes_the_probe_rules_with_its_catalog_facts) Ran 18 tests in 61.440s FAILED (failures=1) 
+tests.v2.test_c2_cli_verdicts :: Ran 19 tests in 0.036s OK 
+tests.v2.test_c2_effect_calibration :: Ran 5 tests in 30.167s OK 
+tests.v2.test_c2_file_artifact :: FAIL: test_FA_Q0_the_probe_passes_the_probe_source_rules_and_is_registered_closed (tests.v2.test_c2_file_artifact.Catalog.test_FA_Q0_the_probe_passes_the_probe_source_rules_and_is_registered_closed) Ran 40 tests in 4.692s FAILED (failures=1) 
+tests.v2.test_probe_process_effect :: FAIL: test_PE_Q0_the_module_passes_the_six_probe_rules_with_its_catalog_facts (tests.v2.test_probe_process_effect.Identity.test_PE_Q0_the_module_passes_the_six_probe_rules_with_its_catalog_facts) Ran 24 tests in 43.984s FAILED (failures=1) 
+tests.v2.test_probe_process_effect_bytecode :: Ran 5 tests in 5.807s OK 
+tests.v2.test_probe_process_effect_units :: Ran 22 tests in 1.366s OK 
+tests.v2.test_python_callable_v2 :: FAIL: test_PCV2_Q0_the_probe_source_rules_pass_on_this_module (tests.v2.test_python_callable_v2.Q0.test_PCV2_Q0_the_probe_source_rules_pass_on_this_module) Ran 33 tests in 104.549s FAILED (failures=1) 
+tests.v2.test_python_callable_v2_bytecode :: Ran 10 tests in 6.343s OK 
+tests.v2.test_v21_identity :: ERROR: test_a_spec_no_release_compiles_is_refused_not_guessed (tests.v2.test_v21_identity.Migrate.test_a_spec_no_release_compiles_is_refused_not_guessed) ERROR: test_migration_rebinds_the_plan_and_nothing_else (tests.v2.test_v21_identity.Migrate.test_migration_rebinds_the_plan_and_nothing_else) ERROR: test_the_2_0_0_bundle_is_refused_naming_the_command (tests.v2.test_v21_identity.Migrate.test_the_2_0_0_bundle_is_refused_naming_the_command) ERROR: test_the_command_writes_a_new_file_and_never_the_input (tests.v2.test_v21_identity.Migrate.test_the_command_writes_a_new_file_and_never_the_input) ERROR: test_the_write_is_exclusive_so_a_file_that_appears_after_the_check_is_never_replaced (tests.v2.test_v21_identity.Migrate.test_the_write_is_exclusive_so_a_file_that_appears_after_the_check_is_never_replaced) ERROR: test_the_written_file_keeps_the_2_0_bytes_non_ascii_escaped (tests.v2.test_v21_identity.Migrate.test_the_written_file_keeps_the_2_0_bytes_non_ascii_escaped) ERROR: test_calibrations_bound_to_the_bytes_that_run_admit_and_other_bytes_admit_nothing (tests.v2.test_v21_identity.ThreeIdentities.test_calibrations_bound_to_the_bytes_that_run_admit_and_other_bytes_admit_nothing) Ran 13 tests in 0.616s FAILED (errors=7) 
+tests.v2.test_v21_identity_bytes :: ERROR: test_calibrations_of_other_bytes_admit_nothing (tests.v2.test_v21_identity_bytes.ThreeIdentities.test_calibrations_of_other_bytes_admit_nothing) Ran 4 tests in 0.168s FAILED (errors=1) 
+tests.v2.test_v21_python_imports :: 
+tests.v2.test_v21_kills3_A18 :: Ran 1 test in 1.598s OK 
+tests.v2.test_v21_kills3_A19 :: Ran 3 tests in 1.697s OK 
+tests.v2.test_v21_kills3_A21 :: Ran 2 tests in 3.636s OK 
+tests.v2.test_v21_kills3_T18a :: Ran 9 tests in 10.005s OK 
+tests.v2.test_v21_kills3_T18b :: Ran 13 tests in 9.908s OK 
+tests.v2.test_v21_kills3_T19a :: Ran 11 tests in 6.499s OK 
+tests.v2.test_v21_kills3_T19b :: Ran 12 tests in 7.889s OK 
+tests.v2.test_v21_kills3_T21a :: Ran 14 tests in 10.076s OK 
+tests.v2.test_v21_kills3_T21b :: Ran 9 tests in 6.497s OK 
+tests.v2.test_v21_kills3_T27a :: Ran 12 tests in 1.439s OK 
+tests.v2.test_p7_finding_001 :: Ran 16 tests in 6.084s OK 
+DONE

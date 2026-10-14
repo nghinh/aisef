@@ -1,0 +1,8 @@
+.......s...................../usr/local/lib/python3.14/unittest/case.py:615: ResourceWarning: unclosed file <_io.TextIOWrapper name=4 encoding='utf-8'>
+  result = method()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+........................................................
+----------------------------------------------------------------------
+Ran 85 tests in 20.079s
+
+OK (skipped=1)

@@ -1,0 +1,261 @@
+{
+ "wp": "range-fu",
+ "branch": "v21r3/range-fu",
+ "base": "v21r3/range-rv @ 75aac7a",
+ "head": "254777f72ffc18df3bb427a239f8d9dd1dbd830e",
+ "commits": [
+  "5cd5cdd _ps_table: split at LF only, typed ProcessTableError (+ ps test file, + the one existing test changed)",
+  "9c7b080 _linux_table: /proc/<pid>/stat read as bytes, decoded with replacement (droppable; own test file)",
+  "05b4abb tests: the readers of the table and the StoryScope do not swallow the typed error",
+  "837e454 + 254777f decision record, section 11 of docs/v2.1/decisions/B03-R3-range.md"
+ ],
+ "files_changed": [
+  "aisef2/runtime/process_range.py",
+  "tests/v2/p4/test_process_table.py",
+  "tests/v2/test_v21_r3_range_fu_ps_table.py",
+  "tests/v2/test_v21_r3_range_fu_linux_table.py",
+  "docs/v2.1/decisions/B03-R3-range.md"
+ ],
+ "tests_added": [
+  "tests/v2/test_v21_r3_range_fu_ps_table.py (16 tests: RowIsALine 5, RowShape 3, NotARow 5, FailsClosedWhereItIsRead 2, RealPs 1 [macOS only])",
+  "tests/v2/test_v21_r3_range_fu_linux_table.py (7 tests: LinuxTable 6, RealLinux 1 [Linux only; real /proc, real prctl])"
+ ],
+ "existing_tests_changed": [
+  {
+   "file": "tests/v2/p4/test_process_table.py",
+   "test": "NoPidAncestry.test_the_ps_reader_skips_zombies_and_short_lines_and_a_failed_ps_is_not_an_empty_table",
+   "now": "NoPidAncestry.test_the_ps_reader_skips_zombies_while_a_line_that_is_not_a_row_and_a_failed_ps_are_errors",
+   "change": "the fixture line '   12    10' (pid and ppid only) was skipped silently; it is no row, so it is now asserted to raise ProcessTableError. Every other assertion unchanged (the 4-field row keeps an empty command).",
+   "why": "brief: 'never a silently skipped row: a skipped row is a process the table cannot see'. If the lead reads 'short lines as today', the revert is the one branch that raises for a line with < 4 fields (variant A of section 11.5)."
+  }
+ ],
+ "real_repro": {
+  "host": "macOS 26.5.2 / Darwin 25.5.0, CPython 3.14.7 (real children of the script, ended by closing their stdin; nothing signalled)",
+  "script": "out/range-fu/repro-ps-table.py.txt  (python3 -B -I repro-ps-table.py.txt TREE)",
+  "before": "BASE 3dc827b (repro-before-base.txt; _ps_table identical at range-rv): with U+2028 or U+2029 in a command line and ps in a UTF-8 locale -> (words after it) ValueError: invalid literal for int() with base 10: 'alpha'; (< 4 words) no error, the child's command silently CUT at the character; (row-shaped text) no error, pid 99998 that does not exist is IN the table. U+0085, VT, FF, FS, GS, RS, CR, LF and the C locale: no effect on this ps (it escapes them: M^E, ^K, ^L, ^\\, ^], ^^, ^M, \\012). The earlier attribution to 'a newline' is wrong (ps prints \\012); the lead's U+0085 does not reproduce on this ps.",
+  "after": "this branch (repro-after-fix.txt): 60/60 cases return the whole table, the child's row present, command == `ps -p PID -o command=`, fabricated pid absent, no exception."
+ },
+ "exception_class_and_why": "ProcessTableError(Exception), message names repr(line[:80]). Nobody catches a table failure specifically (ProcessRange.release/members, confine._survivors, owned_run.harness_orphans propagate it, as the CalledProcessError of a failed ps always did); StoryScope._release turns any non-Residual Exception into FAILED and blocks sandbox/worktree/scratch (pinned by FailsClosedWhereItIsRead). Not Residual: RESIDUAL says 'named, not released' and this says nothing about what is alive. Not RangeError: its catchers (security.scan, the probes' start(), mutation.py:1545) read it as 'the tool could not start' and go on; a table that cannot be read must not be gone on from. Both pinned (NotARow asserts not Residual/RangeError/ValueError).",
+ "other_parsers": [
+  {
+   "file": "aisef2/runtime/process_range.py",
+   "line": "_linux_table 78-95",
+   "verdict": "SAME CLASS, other shape, REAL in the Linux guest: read_text() raised UnicodeDecodeError for a process name that is not UTF-8 (prctl PR_SET_NAME). FIXED (commit 9c7b080, droppable): read_bytes().decode('utf-8','replace')."
+  },
+  {
+   "file": "validation/v2/cleanup_authority.py",
+   "line": 99,
+   "verdict": "SAME HAZARD AND AUTHORITY-BEARING (_read): str.splitlines() + 'a continuation line is no row' skipped. MEASURED read-only with dry_run=True: a process born before the boundary (not owned) becomes 'signalled' when a carrier's command line holds U+2028 + a row naming its pid with the runner as ppid (finding-cleanup-authority.py.txt). A command line is implementation output: INV-MUTATION-AUTHORITY. NOT FIXED (not mine) - for the lead; the same bytes/split-at-LF/typed-error treatment applies."
+  },
+  {
+   "file": "validation/v2/cleanup_authority.py",
+   "line": 124,
+   "verdict": "same property on Windows (PowerShell '|'-joined CommandLine; a raw LF is possible there, so split('\\n') would not fix it: structured output). Not measured."
+  },
+  {
+   "file": "validation/v2/cleanup_authority.py",
+   "line": "184 (carriers, ps -E), 220 (cwd_under, lsof -Fpn)",
+   "verdict": "same property; they yield candidates that signal_owned re-proves against _read's table (so the root is line 99). Not measured."
+  },
+  {
+   "file": "validation/v2/mutation.py",
+   "line": "1317-1378",
+   "verdict": "every process scan goes through cleanup_authority (host_table/carriers/cwd_under): inherits line 99."
+  },
+  {
+   "file": "aisef2/app/client.py",
+   "line": 39,
+   "verdict": "read_session: str.splitlines() over a JSON-lines stream; U+2028/U+2029 are legal raw inside a JSON string, the event is cut, both halves fail json.loads, 'except ValueError: continue' drops it -> the model's text event is lost silently (finding-client-read-session.py.txt: synthetic log; whether the real OpenCode writes them raw is not established). NOT FIXED."
+  },
+  {
+   "file": "aisef2/app/usage.py",
+   "line": 48,
+   "verdict": "same read loop but only step_finish records are used (no free text): not affected as far as the file shows."
+  },
+  {
+   "file": "aisef2/quality/relevance.py",
+   "line": 101,
+   "verdict": "story_diff: a changed line holding FF/U+0085/U+2028 is two lines to splitlines, one to git: later added lines are reported one off ([2,5] for [2,4]) - silent (finding-diff-parsers.py.txt, synthetic patch, real parser). Developer-controlled input. NOT FIXED."
+  },
+  {
+   "file": "aisef2/quality/vacuity.py",
+   "line": 103,
+   "verdict": "file_patches: same cause; the patch is marked opaque (fails safe). NOT FIXED."
+  },
+  {
+   "file": "aisef2/app/lineage.py",
+   "line": "236",
+   "verdict": "git worktree list --porcelain: a path with U+2028 is cut; low (kernel-named wt-<story>). Line 219 reads hex ids: not affected."
+  },
+  {
+   "file": "aisef2/app/confine.py",
+   "line": "181 (_sections), 351 (_survivors)",
+   "verdict": "_sections parses the probe's own output; a mount path with U+2028 is cut (low, operator-given mounts). _survivors consumes process_table(): protected by this fix (it was exposed to both the raise and the silent cut)."
+  },
+  {
+   "file": "aisef2/probe/file_artifact.py",
+   "line": 250,
+   "verdict": "text.splitlines(): a different question (what a 'line' of an observed file is), not an OS-output parser; not changed."
+  },
+  {
+   "file": "aisef2/probe/cli_invocation.py",
+   "line": 415,
+   "verdict": "bytes.splitlines(): breaks at LF/CR only: not affected."
+  },
+  {
+   "file": "validation/p12_watchdog.py",
+   "line": 67,
+   "verdict": "regex per splitlines() line of ps -eo pid=,command=: a made-up 'running chunk' is possible (low; a watchdog)."
+  },
+  {
+   "file": "validation/v21/sandbox/linux_guest.py",
+   "line": "72 (/proc reader, errors=replace) and 116 (ps() display list)",
+   "verdict": "not affected."
+  },
+  {
+   "file": "aisef/harness/process_owner.py",
+   "line": "49, 177 (V1, frozen)",
+   "verdict": "reads pid ppid / pid pgid only, exactly two fields, digits: not affected."
+  }
+ ],
+ "mutants": [
+  {
+   "function": "aisef2/runtime/process_range.py::_ps_table",
+   "total": 24,
+   "killed": 24,
+   "survived": 0,
+   "dispositions": [],
+   "note": "new file alone T0 PASS 16 tests; with the existing p4/test_process_table.py also 24/24; the existing file ALONE (as changed): 22 killed, 2 SURVIVED (L106 ' ' emptied = the blank-line strip; L110 message prefix emptied) - both KILLED by the new file (test_leading_trailing_and_blank_lines_are_no_rows [a line of spaces]; test_the_message_says_that_ps_printed_a_line_that_is_not_a_process_row)",
+   "files": "kc-_ps_table.json, kc-_ps_table-with-existing.json, kc-_ps_table-existing-alone.json"
+  },
+  {
+   "function": "aisef2/runtime/process_range.py::_linux_table",
+   "total": 17,
+   "killed": 17,
+   "survived": 0,
+   "dispositions": [],
+   "files": "kc-_linux_table.json"
+  }
+ ],
+ "kill_files_by_function": {
+  "aisef2/runtime/process_range.py::_ps_table": [
+   "tests/v2/test_v21_r3_range_fu_ps_table.py",
+   "tests/v2/p4/test_process_table.py (already registered as _TABLE_TESTS; changed)"
+  ],
+  "aisef2/runtime/process_range.py::_linux_table": [
+   "tests/v2/test_v21_r3_range_fu_linux_table.py (not in any kill set today: validation/v2/mutation.py comment says the /proc reader 'runs on CI, not on the developer machine')"
+  ],
+  "new name": "aisef2.runtime.process_range.ProcessTableError (class, no function mutants)"
+ },
+ "test_runs": [
+  {
+   "where": "host macOS, CPython 3.14.7, py.sh wrapper",
+   "result": "OK",
+   "modules": {
+    "tests.v2.test_v21_r3_range_fu_ps_table": "16 OK",
+    "tests.v2.test_v21_r3_range_fu_linux_table": "7 OK (1 skipped: Linux only)",
+    "tests.v2.p4.test_process_table": "6 OK",
+    "tests.v2.p4.test_process_range": "24 OK",
+    "tests.v2.test_v21_r3_range_release_contract": "32 OK",
+    "tests.v2.test_v21_confine": "34 OK",
+    "tests.v2.p0.test_destructive_authority": "13 OK",
+    "tests.v2.p4.test_mutation_safety": "10 OK",
+    "tests.v2.p4.test_interruption": "OK (foreground, with the 5 other modules of the last batch: 72 tests, 1 skipped)",
+    "tests.v2.test_no_dual_authority": "17 OK",
+    "tests.v2.test_v21_continue_integrity": "24 OK",
+    "tests.v2.test_v2_006": "18 OK",
+    "tests.v2.test_v21_kills3_A05/R02/T05b/T05c/T18a/TO2": "6/2/18/7/9/3 OK",
+    "tests.v2.p2.test_python_callable": "37 OK",
+    "tests.v2.test_python_callable_v2": "33 OK",
+    "tests.v2.test_p6_orchestration": "32 OK",
+    "tests.v2.test_c2_cli_invocation": "32 OK",
+    "tests.v2.test_probe_process_effect": "24 OK",
+    "tests.v2.p5.test_invariants": "50 OK",
+    "tests.v2.test_c2_p9_harness": "31 OK",
+    "tests.v2.test_v21_mutation_record": "7 OK",
+    "tests.v2.test_p5_falsifiability": "11 OK",
+    "tests.v2.p2.test_mutation_targets": "4 OK"
+   }
+  },
+  {
+   "where": "host: EXPECTED stale sealed records (the lead regenerates; not fixed), same set and counts as range-rv's section 8.6",
+   "result": "failing",
+   "modules": {
+    "tests.v2.test_v21_mutation_runner": "1 failure of 67: Classify.test_historical_records_read_as_before [P4] (sealed P4 record names process_range.py targets)",
+    "tests.v2.test_c2_k_nowork_001": "1 failure of 17: kernel digest is not this tree's aisef2",
+    "tests.v2.test_c2_p5_acceptance": "2 failures of 30: C2-P5-ACCEPTANCE-REVERIFICATION.json missing (also on BASE); proposal identities.aisef2_tree",
+    "tests.v2.test_c2_delivery_experiment": "1 failure of 87: PlanCorrection.test_the_committed_record_is_what_this_tree_derives",
+    "tests.v2.p0.test_checker_calibration": "2 failures of 13 (same two as BASE)",
+    "tests.v2.test_c2_orchestration_conformance": "1 failure of 24 (same as BASE)"
+   }
+  },
+  {
+   "where": "Linux guest (guest.sh X1, Python 3.14.8) - REAL run",
+   "result": "OK",
+   "detail": "final head: ps_table, linux_table, p4.test_process_table, p4.test_process_range, release contract: 85 tests, 1 skipped (RealPs, macOS only); RealLinux ran for real (prctl with a name that is not UTF-8). Before the _linux_table fix the same file: 2 errors (UnicodeDecodeError), simulated and real. guest-comm-after.txt: process_table() returns 2 rows after prctl(b'\\xff\\xfeab')."
+  },
+  {
+   "where": "ruff",
+   "result": "ruff check . passes on the whole tree before every commit"
+  }
+ ],
+ "real_vs_simulated": {
+  "real": [
+   "macOS host: the 60-case reproduction before/after; RealPs; the cleanup_authority dry-run finding (real ps, real children)",
+   "Linux guest: _linux_table reproduction before/after; RealLinux; 85 tests"
+  ],
+  "simulated": [
+   "every other test: a real child process prints bytes I chose (subprocess capture/check/decode are real, the rows are mine); LinuxTable's /proc is a directory the test writes",
+   "finding-client-read-session and finding-diff-parsers: synthetic inputs through the real parsers"
+  ],
+  "neither": [
+   "Windows",
+   "a ps other than this macOS's",
+   "the real OpenCode client (never run)"
+  ]
+ },
+ "not_established": [
+  "which ps versions/locales print which characters raw: only this macOS 26.5.2 ps was measured; U+0085 does not reproduce on it although the brief names it",
+  "that a real ps never prints a line with fewer than four fields: it is now an error that names the line (was a silent skip) - an owner/lead decision recorded in existing_tests_changed",
+  "other failure shapes of _linux_table (rindex(')'), f[19]) were not measured and are untouched",
+  "Windows: the new tests are portable by construction (POSIX/darwin/linux ones skipped) but were not run there",
+  "whether the real OpenCode writes U+2028/U+2029 raw in its JSON lines (client.py:39 loses such an event silently)",
+  "a waiter of a single flight whose leader died of ProcessTableError after the reap gets None (section 10.5 b of the same doc; any non-Residual); this adds a way to reach it, not a class",
+  "the cleanup_authority.py finding is a dry-run measurement: nothing was signalled; whether a real mutant could craft the line is a design question for the lead"
+ ],
+ "process_notes": [
+  "bare 'python3 -B -I -' (not py.sh) was used for ~8 text-edit/analysis helpers that import nothing from the repo (pathlib/json only); all repo code ran through py.sh",
+  "the harness decodes \\uXXXX escapes in tool parameters: a command or file I wrote with one carried a raw U+2028 (which itself breaks the unfixed table while that command runs); the committed files hold none (chr() only) - checked",
+  "background runs: run-modules.sh and run-kc.sh (sequential, ended by themselves); no process left; scratch trees base-tree/wrong-tree/tree-commit1 removed"
+ ],
+ "evidence_files": [
+  "finding-cleanup-authority-output.txt",
+  "finding-cleanup-authority.py.txt",
+  "finding-client-read-session-output.txt",
+  "finding-client-read-session.py.txt",
+  "finding-diff-parsers-output.txt",
+  "finding-diff-parsers.py.txt",
+  "guest-comm-after.txt",
+  "guest-final.txt",
+  "guest-linux-comm.sh.txt",
+  "guest-tests-before-linux-fix.txt",
+  "guest-tests.txt",
+  "kc-_linux_table.json",
+  "kc-_linux_table.txt",
+  "kc-_ps_table-existing-alone.json",
+  "kc-_ps_table-existing-alone.txt",
+  "kc-_ps_table-with-existing.json",
+  "kc-_ps_table-with-existing.txt",
+  "kc-_ps_table.json",
+  "kc-_ps_table.txt",
+  "kc-summary.txt",
+  "list-mutants.py.txt",
+  "repro-after-fix.txt",
+  "repro-before-base.txt",
+  "repro-ps-table.py.txt",
+  "run-kc.sh",
+  "run-modules.sh",
+  "runs/",
+  "runs2/"
+ ]
+}

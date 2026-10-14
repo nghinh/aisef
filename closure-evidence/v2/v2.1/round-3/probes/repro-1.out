@@ -1,0 +1,44 @@
+interpreter: 3.14.7 darwin
+probe digests: process_effect 3b39d380b361.. cli_invocation ab0173818b69.. python_callable_v2 e9f8dcdd6ec5..
+
+L0 control: namespace package, depth 1  [ns/mod.py]
+   python itself imports it and f() == 1 (rc 0): rc=0
+   process_effect   observe -> OBSERVED      verdict=SATISFIED | run_probe -> Executed EXECUTED
+   cli_invocation   observe -> OBSERVED      verdict=SATISFIED | run_probe -> Executed EXECUTED
+   python_callable2 observe -> OBSERVED      verdict=SATISFIED | run_probe -> Executed EXECUTED
+
+L1 namespace inside a regular package  [pkg/__init__.py, pkg/inner/mod.py]
+   python itself imports it and f() == 1 (rc 0): rc=0
+   process_effect   observe -> HARNESS_FAILED verdict=None      | run_probe -> Unrunnable UNRUNNABLE
+        detail: the harness failed its own scenario: the harness raised KeyError
+   cli_invocation   observe -> HARNESS_FAILED verdict=None      | run_probe -> Unrunnable UNRUNNABLE
+        detail: the probe's controller ended without a result (exit 1)
+   python_callable2 observe -> OBSERVED      verdict=SATISFIED | run_probe -> Executed EXECUTED
+
+L2 the same under src/  [src/pkg/__init__.py, src/pkg/inner/mod.py]
+   python itself imports it and f() == 1 (rc 0): rc=0
+   process_effect   observe -> HARNESS_FAILED verdict=None      | run_probe -> Unrunnable UNRUNNABLE
+        detail: the harness failed its own scenario: the harness raised KeyError
+   cli_invocation   observe -> HARNESS_FAILED verdict=None      | run_probe -> Unrunnable UNRUNNABLE
+        detail: the probe's controller ended without a result (exit 1)
+   python_callable2 observe -> OBSERVED      verdict=SATISFIED | run_probe -> Executed EXECUTED
+
+L3 namespace inside a namespace  [ns/inner/mod.py]
+   python itself imports it and f() == 1 (rc 0): rc=0
+   process_effect   observe -> HARNESS_FAILED verdict=None      | run_probe -> Unrunnable UNRUNNABLE
+        detail: the harness failed its own scenario: the harness raised KeyError
+   cli_invocation   observe -> HARNESS_FAILED verdict=None      | run_probe -> Unrunnable UNRUNNABLE
+        detail: the probe's controller ended without a result (exit 1)
+   python_callable2 observe -> OBSERVED      verdict=SATISFIED | run_probe -> Executed EXECUTED
+
+L4 control: regular package inside a namespace  [ns/reg/__init__.py, ns/reg/mod.py]
+   python itself imports it and f() == 1 (rc 0): rc=0
+   process_effect   observe -> OBSERVED      verdict=SATISFIED | run_probe -> Executed EXECUTED
+   cli_invocation   observe -> OBSERVED      verdict=SATISFIED | run_probe -> Executed EXECUTED
+   python_callable2 observe -> OBSERVED      verdict=SATISFIED | run_probe -> Executed EXECUTED
+
+L5 control: all regular  [a/__init__.py, a/b/__init__.py, a/b/mod.py]
+   python itself imports it and f() == 1 (rc 0): rc=0
+   process_effect   observe -> OBSERVED      verdict=SATISFIED | run_probe -> Executed EXECUTED
+   cli_invocation   observe -> OBSERVED      verdict=SATISFIED | run_probe -> Executed EXECUTED
+   python_callable2 observe -> OBSERVED      verdict=SATISFIED | run_probe -> Executed EXECUTED

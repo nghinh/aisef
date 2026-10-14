@@ -1,0 +1,42 @@
+{
+ "m21/kills3/home/A22/a22-eafxn37g/out": {
+  "files": {
+   "RUN.json": "bd7c5913fe646d31b3a89eceb487d7b5c6bf002cd2f79ea06d9efa19861b095b",
+   "run/journals/aisef-run.jsonl": "86a7afee650a6056acc578648b4c216ff078912a8b83f883a9e979263acb1d5f"
+  },
+  "format": "aisef-v2-evidence/1"
+ },
+ "m21/kills3/home/A22/a22-in_erybi/out": {
+  "files": {
+   "RUN.json": "df6848a1a9902b84b8c4a9baeaa632c18db8f272b706cfbd7ef3ea6fc85c1114",
+   "run/journals/aisef-run.jsonl": "8b722658c5f3989ab3c8c55f6b1ed377d6ebf5f63b077dca1f51d33c51a5cb0c"
+  },
+  "format": "aisef-v2-evidence/1"
+ },
+ "m21/kills3/home/T01b/tmpg2xj893d/first": {
+  "files": {
+   "RUN.json": "58de26b35ef3ef752b17335924a3bd8beb570f5b9638de30f99b1553fdc2b0a3",
+   "RUN.started.json": "69a2cfc556fa63877dfed902f55b3237730466903569cbe32a9161c2f912784e",
+   "preflight/LEDGER.jsonl": "521c4209ef5a200c49c631fa7db4f79edfbd31deefb3178fe1d5844c59ac42ae",
+   "preflight/PREFLIGHT.json": "dcdf466fc3ebc19eff2b330c1bb526825d39b4917f91138eba61e92e4f79b5a3",
+   "run/journals/aisef-run.jsonl": "58939d0ceff7cd4b6752e64245f786f1292abfdb4870a6a7031cf018e19b050d",
+   "sessions/S1.developer.1.jsonl": "d35aacb3f0f34ceab43c6f7be038513baa6a1659393333262daba76302884004",
+   "sessions/S1.reviewer.1.jsonl": "2916374ef853d0560b97f1acf462257ed93c0f0c2c6fb083ba98ea46b112d4ee",
+   "sessions/S2.developer.1.jsonl": "d35aacb3f0f34ceab43c6f7be038513baa6a1659393333262daba76302884004",
+   "sessions/S2.developer.2.jsonl": "d35aacb3f0f34ceab43c6f7be038513baa6a1659393333262daba76302884004"
+  },
+  "format": "aisef-v2-evidence/1"
+ },
+ "m21/kills3/home/T14b/explore/r1/out": {
+  "files": {
+   "RUN.json": "de18fcd0ce1cffc3dc14c76f45ee724d6f9f12eaa367e94144d181094c7abc31",
+   "RUN.started.json": "287a83e43cd54e4d2e837b0fd22450d9cb26d1afd44ceb5f5ce1a757b1d8c64f",
+   "preflight/LEDGER.jsonl": "521c4209ef5a200c49c631fa7db4f79edfbd31deefb3178fe1d5844c59ac42ae",
+   "preflight/PREFLIGHT.json": "dcdf466fc3ebc19eff2b330c1bb526825d39b4917f91138eba61e92e4f79b5a3",
+   "run/journals/aisef-run.jsonl": "753a777de4c49cff65e71828186351264fb321be1ef7491a1dc6e459dfe7f2be",
+   "sessions/S1.developer.1.jsonl": "d35aacb3f0f34ceab43c6f7be038513baa6a1659393333262daba76302884004",
+   "sessions/S1.reviewer.1.jsonl": "2916374ef853d0560b97f1acf462257ed93c0f0c2c6fb083ba98ea46b112d4ee"
+  },
+  "format": "aisef-v2-evidence/1"
+ }
+}

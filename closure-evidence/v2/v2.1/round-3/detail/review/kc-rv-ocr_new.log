@@ -1,0 +1,10 @@
+[151] KILLED   L219 string 'preview.log' emptied  <- ERROR: test_no_file_of_the_finder_holds_a_secret_of_the_run (v2.test_v21_r3_detail_rv_finderfiles.TheFindersOwnFilesKeepNoSecret.test_no_file_of_the_finder_holds_a_secret_of_the_run) | FileExistsError
+[158] KILLED   L228 string 'ocr.log' emptied  <- ERROR: test_no_file_of_the_finder_holds_a_secret_of_the_run (v2.test_v21_r3_detail_rv_finderfiles.TheFindersOwnFilesKeepNoSecret.test_no_file_of_the_finder_holds_a_secret_of_the_run) | FileExistsError
+[221] KILLED   L221 string 'secrets' emptied  <- FAIL: test_no_file_of_the_finder_holds_a_secret_of_the_run (v2.test_v21_r3_detail_rv_finderfiles.TheFindersOwnFilesKeepNoSecret.test_no_file_of_the_finder_holds_a_secret_of_the_run) (file='ocr.log') | AssertionError
+[247] SURVIVED L213 element 0 dropped
+[248] SURVIVED L213 element 1 dropped
+[257] KILLED   L250 element 0 dropped  <- ERROR: test_no_file_of_the_finder_holds_a_secret_of_the_run (v2.test_v21_r3_detail_rv_finderfiles.TheFindersOwnFilesKeepNoSecret.test_no_file_of_the_finder_holds_a_secret_of_the_run) | ValueError
+[258] KILLED   L250 element 1 dropped  <- ERROR: test_no_file_of_the_finder_holds_a_secret_of_the_run (v2.test_v21_r3_detail_rv_finderfiles.TheFindersOwnFilesKeepNoSecret.test_no_file_of_the_finder_holds_a_secret_of_the_run) | ValueError
+[268] KILLED   L218 string 'preview.json' emptied  <- FAIL: test_no_file_of_the_finder_holds_a_secret_of_the_run (v2.test_v21_r3_detail_rv_finderfiles.TheFindersOwnFilesKeepNoSecret.test_no_file_of_the_finder_holds_a_secret_of_the_run) | AssertionError
+[272] KILLED   L227 string 'output.json' emptied  <- ERROR: test_no_file_of_the_finder_holds_a_secret_of_the_run (v2.test_v21_r3_detail_rv_finderfiles.TheFindersOwnFilesKeepNoSecret.test_no_file_of_the_finder_holds_a_secret_of_the_run) | aisef2.orchestrate.adapters.CapabilityUnrunnable
+# aisef2/app/adapters.py::Reviewer._ocr: 9 mutants run, {'KILLED': 7, 'SURVIVED': 2}; T0 [{'file': 'tests/v2/test_v21_r3_detail_rv_finderfiles.py', 'seconds': 3.0, 'outcome': 'PASS', 'ran': 2}]; source_sha256 2ee59736532802d7287a6948c5eade35e75f0e65282eaf3327b18bb5d0339aa2

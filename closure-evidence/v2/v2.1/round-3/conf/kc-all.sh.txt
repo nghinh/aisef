@@ -1,0 +1,9 @@
+#!/bin/zsh
+# kc-all.sh: kill_check over every changed or new product name of B03-R3 conf, one after the other
+SP=/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad
+OUT=$SP/m21/r3/out/conf
+for n in _owned _writes _mounts _host_mounts _device_roots PSEUDO DEVICES LOCALE _DEV _PEER measure _probe _judge; do
+  $OUT/kc.sh aisef2/app/confine.py::$n $n > $OUT/kc-$n.log 2>&1
+  echo "$n exit $?" >> $OUT/kc-all.status
+done
+echo done >> $OUT/kc-all.status

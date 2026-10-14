@@ -1,0 +1,46 @@
+{
+ "target": "aisef2/app/review_verify.py::_dumps",
+ "files": [
+  "tests/v2/test_v21_r3_detail_statement.py",
+  "tests/v2/test_v21_r3_detail_artifact.py"
+ ],
+ "source_sha256": "cf0c889e598f7ec6b9b6fac13b26b6bb73d7eb03100e025d42e29eaf528ce1ee",
+ "t0": [
+  {
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "seconds": 6.36,
+   "outcome": "PASS",
+   "ran": 35
+  },
+  {
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "seconds": 2.3,
+   "outcome": "PASS",
+   "ran": 31
+  }
+ ],
+ "error": null,
+ "results": [
+  {
+   "index": 0,
+   "mutant": "L326 returns None",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='dict') | TypeError"
+  },
+  {
+   "index": 1,
+   "mutant": "L326 False->True",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_the_bound_holds_for_a_seeded_sweep_of_adversarial_findings (v2.test_v21_r3_detail_statement.TheStatementIsBoundedByConstruction.test_the_bound_holds_for_a_seeded_sweep_of_adversarial_findings) | AssertionError"
+  },
+  {
+   "index": 2,
+   "mutant": "L326 True->False",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_the_statement_is_deterministic_in_its_key_order (v2.test_v21_r3_detail_statement.WhatIsStatedAndHowItIsMarked.test_the_statement_is_deterministic_in_its_key_order) | AssertionError"
+  }
+ ]
+}

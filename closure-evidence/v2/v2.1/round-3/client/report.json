@@ -1,0 +1,301 @@
+{
+ "wp": "client",
+ "branch": "v21r3/client",
+ "head": "d87bd86e1962c97043f1e0b0c996c21891ef5ef1",
+ "files_changed": [
+  "aisef2/app/client.py",
+  "aisef2/app/usage.py",
+  "aisef2/app/confine.py",
+  "aisef2/app/lineage.py",
+  "tests/v2/test_v21_r3_client_stream.py",
+  "tests/v2/test_v21_r3_client_readers.py",
+  "docs/v2.1/decisions/B03-R3-CLIENT.md"
+ ],
+ "tests_added": [
+  "tests/v2/test_v21_r3_client_stream.py (17)",
+  "tests/v2/test_v21_r3_client_readers.py (10)"
+ ],
+ "existing_tests_changed": [],
+ "repro": {
+  "before": [
+   "finding script (643a6e0): U+2028 text '' turns 1 tokens {input 7, output 3}; U+2029 text ''; plain 'alpha beta'",
+   "repro-chain (a scripted client process through client.session): U+2028/U+2029/U+0085: session text_chars=0, budget turns=1 in=7, usage 1 step, reviewer found=[] parsed=False; space: text_chars=104, found=['F1'] parsed=True",
+   "real kernel table in the Linux guest: _host_mounts() None (a host mount point with U+2028 makes the table 'not read whole'); a bubblewrap session's mountinfo of 15 lines read as 16 lines / 14 rows, the bind mount not found"
+  ],
+  "after": [
+   "finding script: U+2028 text 'alpha<U+2028>beta' turns 1 tokens {7, 3}; U+2029 likewise",
+   "repro-chain: every separator: text_chars=104, budget turns=1 in=7, usage 1 step, reviewer found=['F1'] parsed=True",
+   "guest: _host_mounts() 16 rows including the mount; bubblewrap table 15 lines / 15 rows, the mount found"
+  ]
+ },
+ "readers_checked": [
+  {
+   "file": "aisef2/app/client.py",
+   "line": "events (was read_session 39)",
+   "what": "session stream: text, error, steps",
+   "verdict": "FIXED"
+  },
+  {
+   "file": "aisef2/app/usage.py",
+   "line": "session_tokens (was 50)",
+   "what": "same stream, usage account",
+   "verdict": "FIXED: second copy of the loop; now client.events"
+  },
+  {
+   "file": "aisef2/app/lineage.py",
+   "line": "237 (was 236)",
+   "what": "git worktree list --porcelain blocks (kernel worktree wt-<story>)",
+   "verdict": "FIXED: a path with a separator was cut; the unjournaled candidate was not reported"
+  },
+  {
+   "file": "aisef2/app/confine.py",
+   "line": "_sections (was 206)",
+   "what": "the probe's output in the sandbox",
+   "verdict": "FIXED: mount point, name or socket with a separator were two entries"
+  },
+  {
+   "file": "aisef2/app/confine.py",
+   "line": "_mounts (left.split())",
+   "what": "fields of a mountinfo row",
+   "verdict": "FIXED: str.split() ended the mount-point field at the separator (found by the first test)"
+  },
+  {
+   "file": "aisef2/app/confine.py",
+   "line": "_host_mounts (was 255)",
+   "what": "controller's own /proc/self/mountinfo",
+   "verdict": "FIXED: a host mount point with a separator made the table None -> every confined run refused"
+  },
+  {
+   "file": "aisef2/app/lineage.py",
+   "line": 219,
+   "what": "git rev-list --parents (hex)",
+   "verdict": "NOT EXPOSED"
+  },
+  {
+   "file": "aisef2/app/preflight.py",
+   "line": 78,
+   "what": "preflight ledger JSON lines",
+   "verdict": "PINNED: _append writes ASCII (json.dumps); test through preflight.run; a cut line would raise, not skip"
+  },
+  {
+   "file": "aisef2/app/feedback.py",
+   "line": "178, 118-119",
+   "what": "own LF-joined text; intended whitespace folding",
+   "verdict": "NOT EXPOSED"
+  },
+  {
+   "file": "aisef2/app/adapters.py",
+   "line": 192,
+   "what": "git diff -z",
+   "verdict": "NOT EXPOSED"
+  },
+  {
+   "file": "aisef2/app/review_ocr.py",
+   "line": 50,
+   "what": "one JSON document; the fence needs an LF",
+   "verdict": "NOT EXPOSED"
+  },
+  {
+   "file": "aisef2/app/run.py / verify.py",
+   "line": "537 / 145",
+   "what": "count of LF on bytes",
+   "verdict": "NOT EXPOSED"
+  },
+  {
+   "file": "aisef2/app/bundle_cli.py",
+   "line": 159,
+   "what": "isspace() for quoting",
+   "verdict": "NOT EXPOSED (safe side)"
+  },
+  {
+   "file": "aisef2/orchestrate/workspace.py",
+   "line": 195,
+   "what": "git diff --name-only --diff-filter=U, splitlines()",
+   "verdict": "FINDING, not changed: git C-quotes by default, raw only with core.quotepath=false (an INERT_KEY); names reported in pieces, the truthiness test unaffected"
+  },
+  {
+   "file": "aisef2/quality/relevance.py / vacuity.py",
+   "line": "101 / 103",
+   "what": "candidate patch",
+   "verdict": "FINDING, not changed: real and silent for developer-controlled content (range-fu measured)"
+  },
+  {
+   "file": "aisef2/probe/file_artifact.py",
+   "line": 250,
+   "what": "grep_facts per splitlines() line",
+   "verdict": "FINDING, not changed: probe-contract question, developer-controlled content"
+  },
+  {
+   "file": "aisef2/probe/cli_invocation.py",
+   "line": 415,
+   "what": "bytes.splitlines()",
+   "verdict": "NOT EXPOSED (LF/CR only)"
+  },
+  {
+   "file": "aisef2/journal/format3.py, format2.py, compat.py",
+   "line": "315, 311, 55",
+   "what": "text.split(LF)",
+   "verdict": "NOT EXPOSED"
+  },
+  {
+   "file": "validation/qualification/release_smoke.py; validation/v21/context_gap.py",
+   "line": "284; 87, 119",
+   "what": "session streams, evidence tooling",
+   "verdict": "same pattern, not product, not changed; the recorded streams hold none"
+  }
+ ],
+ "mutants": [
+  {
+   "function": "aisef2/app/client.py::events",
+   "total": 6,
+   "killed": 6,
+   "survived": 0,
+   "dispositions": [
+    "none survived"
+   ],
+   "record": "out/client/kc-events.json"
+  },
+  {
+   "function": "aisef2/app/client.py::read_session",
+   "total": 77,
+   "killed": 77,
+   "survived": 0,
+   "dispositions": [
+    "none survived"
+   ],
+   "record": "out/client/kc-read_session.json"
+  },
+  {
+   "function": "aisef2/app/usage.py::session_tokens",
+   "total": 37,
+   "killed": 37,
+   "survived": 0,
+   "dispositions": [
+    "none survived"
+   ],
+   "record": "out/client/kc-session_tokens.json"
+  },
+  {
+   "function": "aisef2/app/confine.py::_lines",
+   "total": 4,
+   "killed": 4,
+   "survived": 0,
+   "dispositions": [
+    "none survived"
+   ],
+   "record": "out/client/kc-_lines.json"
+  },
+  {
+   "function": "aisef2/app/confine.py::_sections",
+   "total": 44,
+   "killed": 44,
+   "survived": 0,
+   "dispositions": [
+    "none survived"
+   ],
+   "record": "out/client/kc-_sections.json"
+  },
+  {
+   "function": "aisef2/app/confine.py::_mounts",
+   "total": 46,
+   "killed": 46,
+   "survived": 0,
+   "dispositions": [
+    "none survived"
+   ],
+   "record": "out/client/kc-_mounts.json"
+  },
+  {
+   "function": "aisef2/app/confine.py::_host_mounts",
+   "total": 16,
+   "killed": 16,
+   "survived": 0,
+   "dispositions": [
+    "none survived"
+   ],
+   "record": "out/client/kc-_host_mounts.json"
+  },
+  {
+   "function": "aisef2/app/lineage.py::reconcile",
+   "total": 148,
+   "killed": 148,
+   "survived": 0,
+   "dispositions": [
+    {
+     "mutants": "[138]-[140], [145]-[147] (the string fragments of the candidate item's and the merge item's why)",
+     "class": "KILLED",
+     "grounds": "survived the full run at 91b19ee (142 KILLED / 6 SURVIVED); statements an operator reads in the continue report; KILLED by WorktreeListing.test_the_item_says_whose_candidate_where_and_what_the_continuation_does_with_it and MergeStatement.test_the_kernels_merge_in_flight_is_stated; --only run on 6c2cfac 6/6 KILLED (kc-reconcile-survivors-final.json); full run on 6c2cfac 148/148 (kc-reconcile.json)"
+    }
+   ],
+   "record": "out/client/kc-reconcile.json"
+  }
+ ],
+ "kill_files_by_function": {
+  "aisef2/app/client.py::events (new: not in the registry)": [
+   "tests/v2/test_v21_r3_client_stream.py"
+  ],
+  "aisef2/app/client.py::read_session": [
+   "tests/v2/test_v21_r3_client_stream.py"
+  ],
+  "aisef2/app/usage.py::session_tokens": [
+   "tests/v2/test_v21_r3_client_stream.py"
+  ],
+  "aisef2/app/confine.py::_lines (new: not in the registry)": [
+   "tests/v2/test_v21_r3_client_readers.py"
+  ],
+  "aisef2/app/confine.py::_sections": [
+   "tests/v2/test_v21_r3_client_readers.py"
+  ],
+  "aisef2/app/confine.py::_mounts": [
+   "tests/v2/test_v21_r3_client_readers.py"
+  ],
+  "aisef2/app/confine.py::_host_mounts": [
+   "tests/v2/test_v21_r3_client_readers.py"
+  ],
+  "aisef2/app/lineage.py::reconcile": [
+   "tests/v2/test_v21_r3_client_readers.py"
+  ]
+ },
+ "test_runs": [
+  {
+   "what": "new files, host",
+   "result": "27 tests OK (17 + 10)"
+  },
+  {
+   "what": "73 modules importing client/usage/confine/lineage, incl. test_v21_review_chain, test_v21_transport, test_v21_continue_usage, p0.test_destructive_authority (13), p4.test_mutation_safety (10)",
+   "result": "966 tests, 72 modules OK, 4 skipped (T07b 1, review_chain 3: real binary needs AISEF_TEST_OCR_EXE), 1 module red: test_c2_delivery_experiment (1 failure: PLAN-V2.2-CORRECTION-1.json is not what this tree derives; identical on 643a6e0)"
+  },
+  {
+   "what": "sealed-record checkers",
+   "result": "p2.test_mutation_targets 4 OK; test_v21_mutation_record 7 OK; test_c2_k_nowork_001 1 failure (kernel_digest is not this tree's aisef2; identical on 643a6e0)"
+  },
+  {
+   "what": "traceability",
+   "result": "tests.test_v21_traceability 9 OK; validation/v21/traceability_check.py 88 rows OK"
+  },
+  {
+   "what": "Linux guest (X1, python 3.14.8, git 2.47.3, bubblewrap 0.12.0): REAL run",
+   "result": "200 tests OK, none skipped (new files + 9 existing confine/client/lineage modules); a real kernel mountinfo and a real bubblewrap session with a U+2028 mount path read by the real readers: before None / 14 rows, after 16 rows / 15 rows"
+  },
+  {
+   "what": "T0 (t0_check) of the new files",
+   "result": "PASS (stream on read_session; readers on _sections and reconcile)"
+  },
+  {
+   "what": "recorded real streams, before vs after",
+   "result": "67 session streams: read_session and session_tokens identical; none holds a raw separator"
+  }
+ ],
+ "not_established": [
+  "that the real OpenCode client writes U+2028/U+2029/U+0085 raw (not run); a JavaScript JSON.stringify does (Node v26 measured)",
+  "a raw carriage return in a mount point or worktree path is still cut (text mode: Path.read_text, subprocess text=True, workspace.git); a path with an LF needs git worktree list -z",
+  "a skipped non-last line that starts with a brace is surfaced nowhere (Q1 for the owner); a torn last line stays skipped",
+  "a lone-CR-separated stream is now one line (no writer known); the JSON-lines convention is LF",
+  "Windows and Python 3.11-3.13 not run here; RealSession is POSIX-only",
+  "events() catches ValueError only (RecursionError on deep nesting, as before)",
+  "the sealed-record checkers (K-NOWORK, PlanCorrection) are red on 643a6e0 already: the lead regenerates"
+ ],
+ "owner_questions": [
+  "Q1: should a line that starts with a brace, does not parse and is not the last line of a session stream count as unaccounted spend (ending the run like a reached ceiling) instead of being skipped silently? A torn last line (every stop the run issues makes one) must stay skipped; usage()'s record format cannot gain a field without breaking verify of recorded runs."
+ ]
+}

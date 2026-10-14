@@ -1,0 +1,5 @@
+import os, sys
+sys.path.insert(0, os.getcwd())
+from aisef2.probe import file_artifact as fa
+import re
+print(fa.grep_facts(re.compile(r"^import requests"), [("a.py", b"\xef\xbb\xbfimport requests\n"), ("b.py", b"x=1\nimport requests\n")]))

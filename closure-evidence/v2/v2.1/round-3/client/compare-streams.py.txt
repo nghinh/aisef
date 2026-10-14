@@ -1,0 +1,21 @@
+"""usage: python3 -B -I this.txt TREE STREAMS_LIST_FILE: read_session of every listed stream under TREE (a checkout);
+prints one JSON line per stream (path, account) and a count of streams that hold a raw U+2028/U+2029/U+0085."""
+import json
+import pathlib
+import sys
+
+tree, listing = pathlib.Path(sys.argv[1]), pathlib.Path(sys.argv[2])
+sys.path.insert(0, str(tree))
+from aisef2.app import client  # noqa: E402
+
+holding = 0
+for rel in listing.read_text(encoding="utf-8").split("\n"):
+    if not rel:
+        continue
+    p = tree / rel
+    raw = p.read_bytes()
+    holding += any(s in raw for s in (" ".encode(), " ".encode(), "\u0085".encode()))
+    got = client.read_session(p)
+    print(json.dumps({"path": rel, "bytes": len(raw), "lines": raw.count(b"\n"), "account": {k: v for k, v in got.items() if k != "text"},
+                      "text_chars": len(got["text"])}, sort_keys=True))
+print(json.dumps({"streams_with_a_raw_separator": holding}))

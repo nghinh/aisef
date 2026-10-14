@@ -1,0 +1,14 @@
+--- a/aisef2/probe/file_artifact.py	2026-10-13 05:55:15
++++ b/aisef2/probe/file_artifact.py	2026-10-13 06:04:34
+@@ -266,7 +266,10 @@
+         except UnicodeDecodeError:
+             return {"present": True, "undecodable": rel}
+         except (SyntaxError, ValueError) as e:     # ValueError: a NUL byte in the source
+-            return {"present": True, "unparsable": f"{rel}:{getattr(e, 'lineno', None)}"}
++            line = getattr(e, "lineno", None)
++            return {"present": True, "unparsable": f"{rel}:{'?' if line is None else line}"}
++        except (RecursionError, MemoryError):      # the interpreter's own parser limits: the host's, never a verdict
++            raise Refused(f"{rel!r} exceeds this interpreter's parser limits; refused, not a verdict") from None
+         for node in ast.walk(tree):
+             if isinstance(node, ast.Import):
+                 names = [a.name for a in node.names]

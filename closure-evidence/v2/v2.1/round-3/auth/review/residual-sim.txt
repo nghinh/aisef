@@ -1,0 +1,4 @@
+rows: [1, 500, 900, 901, 31337] | 900 in table: True | 900 owned: True
+signal_owned(groups=[900]) signalled: [('group', 900)] unproven: []
+prove_member(901, group 900): None
+leader listed -> TableUnreadable ps listed pid 900 twice: '   900      1    900 Tue Oct 13 09:00:00 202

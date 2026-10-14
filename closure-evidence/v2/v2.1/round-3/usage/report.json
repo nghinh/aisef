@@ -1,0 +1,1721 @@
+{
+ "boundary": {
+  "by_format": {
+   "1": {
+    "accepted": 4,
+    "distinct": 4,
+    "refused_by_a_projection": 0
+   },
+   "2": {
+    "accepted": 1,
+    "distinct": 1,
+    "refused_by_a_projection": 0
+   },
+   "3": {
+    "accepted": 85,
+    "distinct": 89,
+    "refused_by_a_projection": 4
+   },
+   "reader refuses (not a journal)": {
+    "accepted": 0,
+    "distinct": 7,
+    "refused_by_a_projection": 0
+   }
+  },
+  "false_refusals": 0,
+  "formats": "verify reads formats 1 and 2 through format3.reconstruct exactly as before; the same projections fold their events. No supported path wrote a format-1/2 run directory (175ba3a, the format-3 switch, precedes 6b0b90d, the product runtime)",
+  "honest_journals_checked": [
+   {
+    "accepted": true,
+    "copies": 99,
+    "events": 4,
+    "format": 1,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:integ-product/sbx-tip/tests/v2/fixtures/journal/known_log.jsonl"
+   },
+   {
+    "accepted": false,
+    "copies": 99,
+    "events": null,
+    "format": null,
+    "not_read_by_the_reader": "JournalError: failure/observed is a required event in format 1; it is never ignorable",
+    "path": "scratchpad:integ-product/sbx-tip/tests/v2/fixtures/journal/known_type_marked_ignorable.jsonl"
+   },
+   {
+    "accepted": false,
+    "copies": 99,
+    "events": null,
+    "format": null,
+    "not_read_by_the_reader": "JournalError: story/begin: fields of the wrong kind or enum ['parent']",
+    "path": "scratchpad:integ-product/sbx-tip/tests/v2/fixtures/journal/malformed_known.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 99,
+    "events": 4,
+    "format": 1,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:integ-product/sbx-tip/tests/v2/fixtures/journal/mixed_stream_new_ignorable.jsonl"
+   },
+   {
+    "accepted": false,
+    "copies": 99,
+    "events": null,
+    "format": null,
+    "not_read_by_the_reader": "UnknownRequiredEvent: seq 4: unknown event type 'story/checkpoint' is not marked ignorable \u2014 this reader refuses to reconstruct the journal (\u00a720.4)",
+    "path": "scratchpad:integ-product/sbx-tip/tests/v2/fixtures/journal/mixed_stream_new_required.jsonl"
+   },
+   {
+    "accepted": false,
+    "copies": 99,
+    "events": null,
+    "format": null,
+    "not_read_by_the_reader": "JournalError: run/begin at seq 2: a journal begins with run/begin, and only once",
+    "path": "scratchpad:integ-product/sbx-tip/tests/v2/fixtures/journal/mixed_stream_second_declaration.jsonl"
+   },
+   {
+    "accepted": false,
+    "copies": 99,
+    "events": null,
+    "format": null,
+    "not_read_by_the_reader": "JournalError: story/begin: fields missing [], not in the schema ['attempt']",
+    "path": "scratchpad:integ-product/sbx-tip/tests/v2/fixtures/journal/newer_schema_field.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 99,
+    "events": 2,
+    "format": 1,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:integ-product/sbx-tip/tests/v2/fixtures/journal/torn_tail.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 99,
+    "events": 4,
+    "format": 1,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:integ-product/sbx-tip/tests/v2/fixtures/journal/unknown_ignorable.jsonl"
+   },
+   {
+    "accepted": false,
+    "copies": 99,
+    "events": null,
+    "format": null,
+    "not_read_by_the_reader": "UnknownRequiredEvent: seq 2: unknown event type 'story/checkpoint' is not marked ignorable \u2014 this reader refuses to reconstruct the journal (\u00a720.4)",
+    "path": "scratchpad:integ-product/sbx-tip/tests/v2/fixtures/journal/unknown_required.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 99,
+    "events": 2,
+    "format": 2,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:integ-product/sbx-tip/tests/v2/fixtures/journal/version_mismatch.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 37,
+    "events": 1834,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:m21/c2/c2-w1/closure-evidence/v2/release/smoke-2/run-1/aisef-run.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 37,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:m21/kills3/home/A01-r/aisef-mut-cba553c151d4-dg0pmmvo/run-kgof8v89/tmp/tmpar_gdo1h/first/run/journals/aisef-run.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 13,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:m21/kills3/home/A17/tmp0sdguwtv/j.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 12,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:m21/kills3/home/A17/tmp529wj174/j.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 11,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:m21/kills3/home/A17/tmpc7u01n54/j.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 12,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:m21/kills3/home/A17/tmpd0uz1cc9/j.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 1,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:m21/kills3/home/A17/tmpe0z_97cz/j.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 12,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:m21/kills3/home/A17/tmpe58dlcfh/j.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 2,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:m21/kills3/home/A17/tmpfavv5l17/j.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 12,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:m21/kills3/home/A17/tmpo7os_h3_/j.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 20,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:m21/kills3/home/A17/tmpq2imsy3m/j.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 5,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:m21/kills3/home/A17/tmpr7fy5ddt/j.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 3,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:m21/kills3/home/A22/a22-eafxn37g/out/run/journals/aisef-run.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 3,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:m21/kills3/home/A22/a22-in_erybi/out/run/journals/aisef-run.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 124,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:m21/kills3/home/T01b/tmpg2xj893d/first/run/journals/aisef-run.jsonl"
+   },
+   {
+    "accepted": false,
+    "copies": 1,
+    "events": 2,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:m21/kills3/home/T09a/tmp452t520b/run/journals/aisef-run.jsonl",
+    "refusal": "story_state refuses provider/request at seq 1: story_state: provider/request for story S1 in state None: not a \u00a717 transition"
+   },
+   {
+    "accepted": false,
+    "copies": 1,
+    "events": 3,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:m21/kills3/home/T09a/tmph8_48ui3/run/journals/aisef-run.jsonl",
+    "refusal": "story_state refuses provider/request at seq 1: story_state: provider/request for story S1 in state None: not a \u00a717 transition"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 44,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:m21/kills3/home/T12a-r/tmpol43oqbe/out/run/journals/aisef-run.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 68,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:m21/kills3/home/T14b/explore/r1/out/run/journals/aisef-run.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 33,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:m21/m21-w2.env/tmp/tmpflsyl250/out/run/journals/aisef-run.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 76,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:m21/m21-w3.env/tmp/tmporpgru_y/first/run/journals/aisef-run.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 19,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:m21/m21-w4.env/tmp/tmp_p311xvb/first/run/journals/aisef-run.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 16,
+    "format": 3,
+    "no_progress_old_equals_new": false,
+    "path": "scratchpad:wf-followups/A-contract-callers/tmp/forged-journal.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 14,
+    "format": 3,
+    "no_progress_old_equals_new": false,
+    "path": "scratchpad:wf-followups/A-journal-writers/exp2/6367099e5ad64c80bb342773f5f7bf06.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 9,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-journal-writers/exp2/95b0eeb328b34c979d69fa9ed0516c9f.jsonl"
+   },
+   {
+    "accepted": false,
+    "copies": 1,
+    "events": 15,
+    "format": 3,
+    "no_progress_old_equals_new": false,
+    "path": "scratchpad:wf-followups/A-journal-writers/exp4/15ae6ca031b043d4a6c5d121d579c34f.jsonl",
+    "refusal": "story_state refuses story/retry at seq 12: story_state: story/retry for story S1 in state COMMIT: not a \u00a717 transition"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 14,
+    "format": 3,
+    "no_progress_old_equals_new": false,
+    "path": "scratchpad:wf-followups/A-journal-writers/exp4/3e790e67ccbb40a9b68759ab252bb0e2.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 12,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-journal-writers/exp4/76c894ccb60c449085cb08d8d6895b62.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 19,
+    "format": 3,
+    "no_progress_old_equals_new": false,
+    "path": "scratchpad:wf-followups/A-readers-recovery/e2-run-45040/journals/e2.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 19,
+    "format": 3,
+    "no_progress_old_equals_new": false,
+    "path": "scratchpad:wf-followups/A-readers-recovery/e3-torn-45040.jsonl"
+   },
+   {
+    "accepted": false,
+    "copies": 1,
+    "events": 10,
+    "format": 3,
+    "no_progress_old_equals_new": false,
+    "path": "scratchpad:wf-followups/A-readers-recovery/e5-forged-45040.jsonl",
+    "refusal": "story_state refuses story/commit at seq 3: story_state: story/commit for story S1 in state BEGIN: not a \u00a717 transition"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 66,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-recovery-windows/harvest/CommitWindows.test_a_commit_on_main_nothing_identifies_is_refused_unless_left_out_by_name/first.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 109,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-recovery-windows/harvest/CommitWindows.test_a_commit_on_main_nothing_identifies_is_refused_unless_left_out_by_name/second.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 76,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-recovery-windows/harvest/CommitWindows.test_the_developers_candidate_committed_nothing_journaled/first.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 109,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-recovery-windows/harvest/CommitWindows.test_the_developers_candidate_committed_nothing_journaled/second.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 103,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-recovery-windows/harvest/CommitWindows.test_the_merge_moved_main_the_journal_never_committed_it/first.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 109,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-recovery-windows/harvest/CommitWindows.test_the_merge_moved_main_the_journal_never_committed_it/second.jsonl"
+   },
+   {
+    "accepted": false,
+    "copies": 1,
+    "events": null,
+    "format": null,
+    "not_read_by_the_reader": "JournalError: line 60: the chain does not link \u2014 an earlier event was edited or removed, or this one was",
+    "path": "scratchpad:wf-followups/A-ref-recovery-windows/harvest/JournalAppendWindows.test_a_corrupt_line_before_the_end_is_refused/copy.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 66,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-recovery-windows/harvest/JournalAppendWindows.test_a_corrupt_line_before_the_end_is_refused/first.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 112,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-recovery-windows/harvest/JournalAppendWindows.test_a_short_write_is_a_torn_tail_whose_effect_is_still_reconciled/first.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 109,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-recovery-windows/harvest/JournalAppendWindows.test_a_short_write_is_a_torn_tail_whose_effect_is_still_reconciled/second.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 113,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-recovery-windows/harvest/JournalAppendWindows.test_after_the_fsync_the_event_is_kept/first.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 113,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-recovery-windows/harvest/JournalAppendWindows.test_after_the_write_before_the_fsync_a_killed_process_keeps_the_event/first.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 112,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-recovery-windows/harvest/JournalAppendWindows.test_before_the_write_the_event_is_absent_and_its_merge_reconciled/first.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 76,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-recovery-windows/harvest/ProviderRequestWindows.test_its_usage_reported_its_result_never_journaled/first.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 109,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-recovery-windows/harvest/ProviderRequestWindows.test_its_usage_reported_its_result_never_journaled/third.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 76,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-recovery-windows/harvest/ProviderRequestWindows.test_journaled_but_the_client_never_started_nothing_was_sent/first.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 109,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-recovery-windows/harvest/ProviderRequestWindows.test_journaled_but_the_client_never_started_nothing_was_sent/second.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 76,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-recovery-windows/harvest/ProviderRequestWindows.test_the_request_sent_before_any_usage_is_reported/first.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 109,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-recovery-windows/harvest/ProviderRequestWindows.test_the_request_sent_before_any_usage_is_reported/third.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 169,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-recovery-windows/harvest/RetryWindows.test_double_fault_on_commit/out.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 116,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-recovery-windows/harvest/RetryWindows.test_double_fault_on_second_failure/out.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 117,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-recovery-windows/harvest/RetryWindows.test_double_fault_on_second_retry/out.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 176,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-recovery-windows/harvest/RetryWindows.test_full_run_retry_retry_commit/out.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 169,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-recovery-windows/harvest/RetryWindows.test_kill_after_commit_write_before_fsync/first.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 76,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-recovery-windows/harvest/RetryWindows.test_kill_after_commit_write_before_fsync/second.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 168,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-recovery-windows/harvest/RetryWindows.test_kill_before_commit_write/first.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 109,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-recovery-windows/harvest/RetryWindows.test_kill_before_commit_write/second.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 76,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-recovery-windows/harvest/RetryWindows.test_kill_candidate_committed_not_journaled/first.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 137,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-recovery-windows/harvest/RetryWindows.test_kill_candidate_committed_not_journaled/second.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 159,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-recovery-windows/harvest/RetryWindows.test_kill_merge_moved_main_not_journaled/first.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 109,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-recovery-windows/harvest/RetryWindows.test_kill_merge_moved_main_not_journaled/second.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 168,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-recovery-windows/harvest/RetryWindows.test_kill_short_write_of_commit/first.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 109,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-recovery-windows/harvest/RetryWindows.test_kill_short_write_of_commit/second.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 165,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-recovery-windows/harvest/RetryWindows.test_sigint_after_merge_before_commit/first.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 109,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-recovery-windows/harvest/RetryWindows.test_sigint_after_merge_before_commit/second.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 122,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-recovery-windows/harvest/RetryWindows.test_sigint_between_fail_and_retry/first.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 109,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-recovery-windows/harvest/RetryWindows.test_sigint_between_fail_and_retry/second.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 89,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-verify-import-interleave/out-df/df-commit/aisef-run.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 116,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-verify-import-interleave/out-df/df-fail/aisef-run.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 117,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-verify-import-interleave/out-df/df-retry/aisef-run.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 126,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-verify-import-interleave/out/inter-charge/aisef-run.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 143,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-verify-import-interleave/out/inter-impl/aisef-run.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 111,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-verify-import-interleave/out/intr-s2/aisef-run.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 2,
+    "events": 89,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-verify-import-interleave/out/kill-commit-killed-torn/aisef-run.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 141,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-verify-import-interleave/out/kill-commit-second/aisef-run.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 2,
+    "events": 88,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-verify-import-interleave/out/kill-fail-killed-torn/aisef-run.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 141,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-verify-import-interleave/out/kill-fail-second/aisef-run.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 2,
+    "events": 89,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-verify-import-interleave/out/kill-retry-killed-torn/aisef-run.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 141,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-verify-import-interleave/out/kill-retry-second/aisef-run.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 68,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-verify-import-interleave/out/one-commit/aisef-run.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 96,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-verify-import-interleave/out/one-late2-l1/aisef-run.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 124,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-verify-import-interleave/out/one-late3-l3/aisef-run.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 152,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-verify-import-interleave/out/one-late4-l3/aisef-run.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 72,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-verify-import-interleave/out/one-nothing-l1/aisef-run.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 128,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-verify-import-interleave/out/one-nothing-l3/aisef-run.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 180,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-verify-import-interleave/out/two-l2-late2-first/aisef-run.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 141,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-verify-import-interleave/out/two-l2-late2-second/aisef-run.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 152,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-verify-import-interleave/out/two-l2-write-first/aisef-run.jsonl"
+   },
+   {
+    "accepted": true,
+    "copies": 1,
+    "events": 141,
+    "format": 3,
+    "no_progress_old_equals_new": true,
+    "path": "scratchpad:wf-followups/A-ref-verify-import-interleave/out/two-l2-write-second/aisef-run.jsonl"
+   }
+  ],
+  "not_refused_on_purpose": "a committed attempt that observed failures, and failures after an outcome: the projections admit them, so no_progress answers them instead (D1)",
+  "refuses": [
+   "a story that begins again after its commit (story_state, story/begin)",
+   "a retry that follows a commit (story_state, story/retry)",
+   "a commit with no admitted attempt (story_state, story/commit)",
+   "a failure of a story that never began (story_state, failure/observed)",
+   "a retry citing a failure of the attempt before (failure_owner, story/retry)",
+   "a retry citing a failure that is not its attempt's latest (budgets, story/retry)",
+   "a second plan/frozen (qualification_counters, plan/frozen)",
+   "a story that begins after run/end (terminal_state, story/begin)"
+  ],
+  "where": "aisef2/app/verify.py: `_projection_refusal` (new) called in `verify` right after `format3.reconstruct`, before `events` is built; the six PROJECTIONS advanced event by event with `Folder.advance`, the step Authority.append's pre-check runs; at the first ProjectionError verify adds one finding ('the journal violates the control projections the kernel's writer enforces: <projection> refuses <type> at seq <n>: <projection's reason>') and leaves `events` empty, so no outcome, delivery verdict, ProductProof, usage or no_progress is re-derived from it (journal_events 0)"
+ },
+ "branch": "v21r3/usage",
+ "callers_checked": [
+  {
+   "file": "aisef2/app/run.py",
+   "line": 495,
+   "what": "writes RUN.json `no_progress` from the RunScope writer's in-memory events (the only run path; --out must not exist; a continuation's child is a fresh journal)"
+  },
+  {
+   "file": "aisef2/app/verify.py",
+   "line": 194,
+   "what": "re-derives no_progress from the reconstructed events, after the projection boundary; only for records whose `usage` is a dict without `error`"
+  },
+  {
+   "file": "aisef2/app/lineage.py",
+   "line": 372,
+   "what": "usage_lineage calls usage.usage, never no_progress (checked by grep)"
+  },
+  {
+   "file": "aisef2/app/lineage.py",
+   "line": 99,
+   "what": "events_of: reads a predecessor's journal for spend and claims with format3.reconstruct; no projection fold; does not reach no_progress"
+  },
+  {
+   "file": "aisef2/app/bundle_cli.py",
+   "line": 432,
+   "what": "`aisef bundle continue` reads the predecessor's journal for its story/commit list and baseline; no projection fold; does not reach no_progress (D-READERS)"
+  },
+  {
+   "file": "aisef2/runtime/repair.py",
+   "line": 77,
+   "what": "repair reconstructs and folds all six projections; no product caller; does not reach no_progress"
+  },
+  {
+   "file": "aisef2/runtime/sentinel.py",
+   "line": 91,
+   "what": "reads the journal text to report a torn or unreadable one; does not reach no_progress"
+  },
+  {
+   "file": "aisef2/app/cli.py",
+   "line": 25,
+   "what": "aisef run --verify is the only CLI path to verify; `aisef bundle` has init, seal, approve, lint, explain, continue, migrate (bundle_cli.py:516-538): no journal import exists, and migrate reads and writes bundles only"
+  },
+  {
+   "file": "validation/qualification/release_acceptance.py",
+   "line": 128,
+   "what": "calls verify and reads its verdict; unchanged by the boundary on the 2.0.0 smoke run"
+  }
+ ],
+ "decisions_needed": [
+  "D-LATE: a failure journaled after an attempt's outcome and before the next story/begin is ignored (this change) or attached to the attempt it followed (the control projections' attribution). The second needs a pre-scan for stories that have a story/begin to keep begin-less unit-test lists meaning what the existing tests say. No producer writes the shape.",
+  "D-READERS: whether `aisef bundle continue` (bundle_cli.py:432), `lineage.events_of` (lineage.py:99) and `repair` must also refuse a journal the projections refuse. None reaches no_progress; the helper would move to aisef2/journal.",
+  "D-INVA: whether a commit with an open failure in its attempt should be impossible (a projection change: version, frozen items). This WP answers the shape in no_progress and does not touch the projections.",
+  "REGISTER: tests/v2/test_v21_r3_usage_boundary.py as the kill file of the NEW target aisef2/app/verify.py::_projection_refusal, and both new files in the kill sets above (lead's registry; not edited here)."
+ ],
+ "enumeration": {
+  "one_story_up_to_10_events": {
+   "admitted_journals": 100337,
+   "extensions_refused_by_a_projection": 194651,
+   "extensions_refused_by_the_reader": 0,
+   "journals_breaking_INV_A_a_committed_attempt_observed_a_failure": 18952,
+   "journals_breaking_INV_B_an_event_follows_a_commit": 0,
+   "max_events_after_plan_frozen": 10,
+   "new_differs_from_oracle": 0,
+   "old_differs_from_new": 384,
+   "old_new_difference_kinds": {
+    "a committed attempt that observed failures": 16,
+    "a failure after an outcome and before the next begin": 368
+   },
+   "seconds": 11.5,
+   "stories": [
+    "S1"
+   ],
+   "with_a_non_empty_report": 432
+  },
+  "one_story_up_to_13_events": {
+   "admitted_journals": 2733181,
+   "extensions_refused_by_a_projection": 5338093,
+   "extensions_refused_by_the_reader": 0,
+   "max_events_after_plan_frozen": 13,
+   "new_differs_from_oracle": 0,
+   "old_differs_from_new": 59650,
+   "old_new_difference_kinds": {
+    "a committed attempt that observed failures": 278,
+    "a failure after an outcome and before the next begin": 59372
+   },
+   "seconds": 376.8,
+   "stories": [
+    "S1"
+   ],
+   "with_a_non_empty_report": 52620
+  },
+  "two_stories_up_to_10_events": {
+   "admitted_journals": 42579530,
+   "extensions_refused_by_a_projection": 61317256,
+   "extensions_refused_by_the_reader": 0,
+   "journals_breaking_INV_A_a_committed_attempt_observed_a_failure": 8387736,
+   "journals_breaking_INV_B_an_event_follows_a_commit": 0,
+   "max_events_after_plan_frozen": 10,
+   "new_differs_from_oracle": 0,
+   "old_differs_from_new": 1448,
+   "old_new_difference_kinds": {
+    "a committed attempt that observed failures": 232,
+    "a failure after an outcome and before the next begin": 1216
+   },
+   "seconds": 6611.8,
+   "stories": [
+    "S1",
+    "S2"
+   ],
+   "with_a_non_empty_report": 3056
+  },
+  "two_stories_up_to_8_events": {
+   "admitted_journals": 785554,
+   "extensions_refused_by_a_projection": 1027212,
+   "extensions_refused_by_the_reader": 0,
+   "journals_breaking_INV_A_a_committed_attempt_observed_a_failure": 100792,
+   "journals_breaking_INV_B_an_event_follows_a_commit": 0,
+   "max_events_after_plan_frozen": 8,
+   "new_differs_from_oracle": 0,
+   "old_differs_from_new": 0,
+   "old_new_difference_kinds": {},
+   "seconds": 156.2,
+   "stories": [
+    "S1",
+    "S2"
+   ],
+   "with_a_non_empty_report": 8
+  }
+ },
+ "existing_tests_changed": [],
+ "files_changed": [
+  "aisef2/app/usage.py",
+  "aisef2/app/verify.py",
+  "tests/v2/test_v21_r3_usage_no_progress.py",
+  "tests/v2/test_v21_r3_usage_boundary.py",
+  "docs/v2.1/decisions/B03-R3-usage.md"
+ ],
+ "head": "1474c3b5d2ed57c7e08611c3bf1b889a060cb509",
+ "kill_files_by_function": {
+  "aisef2/app/usage.py::no_progress": [
+   "tests/v2/test_v21_kills3_A20.py",
+   "tests/v2/test_v21_kills3_T20a.py",
+   "tests/v2/test_v21_kills_usage.py (registered in V21_TARGETS)",
+   "tests/v2/test_v21_r3_usage_no_progress.py (new; the only killer of `L138 string 'story/begin' emptied`)"
+  ],
+  "aisef2/app/verify.py::_projection_refusal": [
+   "tests/v2/test_v21_r3_usage_boundary.py"
+  ],
+  "aisef2/app/verify.py::verify": [
+   "tests/v2/test_v21_kills3_A22.py",
+   "tests/v2/test_v21_kills3_T22a.py",
+   "tests/v2/test_v21_kills3_T22b.py",
+   "tests/v2/test_v21_kills3_R01.py",
+   "tests/v2/test_v21_defects_verify.py",
+   "tests/v2/test_v21_verify.py (registered)",
+   "tests/v2/test_v21_r3_usage_boundary.py (new: kills the wiring lines 149-155)"
+  ]
+ },
+ "mutants": [
+  {
+   "dispositions": [
+    {
+     "disposition": "DISSOLVED: the function this mutant was derived from no longer exists (story/commit is not a closer); see old_mutants_13_23_resolution",
+     "index": 13,
+     "mutant": "L130 element 2 dropped"
+    },
+    {
+     "disposition": "DISSOLVED: the function this mutant was derived from no longer exists (story/commit is not a closer); see old_mutants_13_23_resolution",
+     "index": 23,
+     "mutant": "L130 string 'story/commit' emptied"
+    }
+   ],
+   "function": "aisef2/app/usage.py::no_progress (BASE, before the change)",
+   "killed": 31,
+   "survived": 2,
+   "total": 33
+  },
+  {
+   "dispositions": [],
+   "files": [
+    "tests/v2/test_v21_kills3_A20.py",
+    "tests/v2/test_v21_kills3_T20a.py",
+    "tests/v2/test_v21_kills_usage.py",
+    "tests/v2/test_v21_r3_usage_no_progress.py"
+   ],
+   "function": "aisef2/app/usage.py::no_progress",
+   "killed": 35,
+   "not_run_or_other": 0,
+   "note": "L138 string 'story/begin' emptied is killed only by tests/v2/test_v21_r3_usage_no_progress.py",
+   "source_sha256": "96dd4b52fe40ed1e281cbd32ef90a1df60a8341ef49a5d91fb3499336ad7dc99",
+   "survived": 0,
+   "total": 35
+  },
+  {
+   "dispositions": [],
+   "files": [
+    "tests/v2/test_v21_r3_usage_boundary.py"
+   ],
+   "function": "aisef2/app/verify.py::_projection_refusal (new)",
+   "killed": 9,
+   "not_run_or_other": 0,
+   "source_sha256": "b30820f61194665ace24e317a06651334e86dc9fcb77e879b97450ee0514dc1b",
+   "survived": 0,
+   "total": 9
+  },
+  {
+   "dispositions": [
+    {
+     "disposition": "PRE-EXISTING, unchanged line, same mutated text as one the campaign recorded for BASE's verify: already AUDITED or EQUIVALENT in closure-evidence/v2/v2.1/mutation/SURVIVOR-AUDITS.json against BASE's source_sha256 1259fc39...; that entry is stale (source hash and line numbers changed) and is the lead's to remap. Not introduced by this change; not KILLED here.",
+     "index": 44,
+     "mutant": "L166 sorted() -> list()"
+    },
+    {
+     "disposition": "PRE-EXISTING, unchanged line, same mutated text as one the campaign recorded for BASE's verify: already AUDITED or EQUIVALENT in closure-evidence/v2/v2.1/mutation/SURVIVOR-AUDITS.json against BASE's source_sha256 1259fc39...; that entry is stale (source hash and line numbers changed) and is the lead's to remap. Not introduced by this change; not KILLED here.",
+     "index": 99,
+     "mutant": "L126 string ' the run printed' emptied"
+    },
+    {
+     "disposition": "PRE-EXISTING, unchanged line, same mutated text as one the campaign recorded for BASE's verify: already AUDITED or EQUIVALENT in closure-evidence/v2/v2.1/mutation/SURVIVOR-AUDITS.json against BASE's source_sha256 1259fc39...; that entry is stale (source hash and line numbers changed) and is the lead's to remap. Not introduced by this change; not KILLED here.",
+     "index": 110,
+     "mutant": "L180 dict entry 0 dropped"
+    },
+    {
+     "disposition": "PRE-EXISTING, unchanged line, same mutated text as one the campaign recorded for BASE's verify: already AUDITED or EQUIVALENT in closure-evidence/v2/v2.1/mutation/SURVIVOR-AUDITS.json against BASE's source_sha256 1259fc39...; that entry is stale (source hash and line numbers changed) and is the lead's to remap. Not introduced by this change; not KILLED here.",
+     "index": 111,
+     "mutant": "L180 dict entry 1 dropped"
+    },
+    {
+     "disposition": "PRE-EXISTING, unchanged line, same mutated text as one the campaign recorded for BASE's verify: already AUDITED or EQUIVALENT in closure-evidence/v2/v2.1/mutation/SURVIVOR-AUDITS.json against BASE's source_sha256 1259fc39...; that entry is stale (source hash and line numbers changed) and is the lead's to remap. Not introduced by this change; not KILLED here.",
+     "index": 124,
+     "mutant": "L103 string 'no ' emptied"
+    },
+    {
+     "disposition": "PRE-EXISTING, unchanged line, same mutated text as one the campaign recorded for BASE's verify: already AUDITED or EQUIVALENT in closure-evidence/v2/v2.1/mutation/SURVIVOR-AUDITS.json against BASE's source_sha256 1259fc39...; that entry is stale (source hash and line numbers changed) and is the lead's to remap. Not introduced by this change; not KILLED here.",
+     "index": 128,
+     "mutant": "L109 string ')' emptied"
+    },
+    {
+     "disposition": "PRE-EXISTING, unchanged line, same mutated text as one the campaign recorded for BASE's verify: already AUDITED or EQUIVALENT in closure-evidence/v2/v2.1/mutation/SURVIVOR-AUDITS.json against BASE's source_sha256 1259fc39...; that entry is stale (source hash and line numbers changed) and is the lead's to remap. Not introduced by this change; not KILLED here.",
+     "index": 140,
+     "mutant": "L180 string 'story' emptied"
+    },
+    {
+     "disposition": "PRE-EXISTING, unchanged line, same mutated text as one the campaign recorded for BASE's verify: already AUDITED or EQUIVALENT in closure-evidence/v2/v2.1/mutation/SURVIVOR-AUDITS.json against BASE's source_sha256 1259fc39...; that entry is stale (source hash and line numbers changed) and is the lead's to remap. Not introduced by this change; not KILLED here.",
+     "index": 141,
+     "mutant": "L180 string 'error' emptied"
+    },
+    {
+     "disposition": "PRE-EXISTING, unchanged line, same mutated text as one the campaign recorded for BASE's verify: already AUDITED or EQUIVALENT in closure-evidence/v2/v2.1/mutation/SURVIVOR-AUDITS.json against BASE's source_sha256 1259fc39...; that entry is stale (source hash and line numbers changed) and is the lead's to remap. Not introduced by this change; not KILLED here.",
+     "index": 142,
+     "mutant": "L180 string 'begun and never ended in the journal' emptied"
+    },
+    {
+     "disposition": "PRE-EXISTING, unchanged line, same mutated text as one the campaign recorded for BASE's verify: already AUDITED or EQUIVALENT in closure-evidence/v2/v2.1/mutation/SURVIVOR-AUDITS.json against BASE's source_sha256 1259fc39...; that entry is stale (source hash and line numbers changed) and is the lead's to remap. Not introduced by this change; not KILLED here.",
+     "index": 154,
+     "mutant": "L95 string ')' emptied"
+    },
+    {
+     "disposition": "PRE-EXISTING, unchanged line, same mutated text as one the campaign recorded for BASE's verify: already AUDITED or EQUIVALENT in closure-evidence/v2/v2.1/mutation/SURVIVOR-AUDITS.json against BASE's source_sha256 1259fc39...; that entry is stale (source hash and line numbers changed) and is the lead's to remap. Not introduced by this change; not KILLED here.",
+     "index": 177,
+     "mutant": "L144 string ')' emptied"
+    }
+   ],
+   "files": [
+    "tests/v2/test_v21_r3_usage_boundary.py"
+   ],
+   "function": "aisef2/app/verify.py::verify",
+   "killed_by_the_boundary_file_alone": 107,
+   "lines_added_or_moved_by_this_change": "149-155",
+   "mutants_on_those_lines": {
+    "killed": 16,
+    "survived": [],
+    "total": 16
+   },
+   "note": "runs: kc-verify.json (boundary file alone, 199), kc-verify-survivors-registered.json (its 92 survivors against A22, R01, T22a, T22b, defects_verify, test_v21_verify: 57 killed, 35 survive), kc-verify-24-with-the-campaigns-other-five.json (the 24 of the 35 that are not recorded, against test_app_units, test_s2_kills, test_app_run, continue_usage, continue_integrity: 24 killed). The first kill_check runs of this kind from the branch checkout were disturbed by a second runner of the same root (same worker identity) and are superseded by the clean-root runs named here.",
+   "of_the_rest_killed_by_the_campaigns_other_five_files": 24,
+   "of_those_killed_by_the_six_registered_files": 57,
+   "source_sha256": "b30820f61194665ace24e317a06651334e86dc9fcb77e879b97450ee0514dc1b",
+   "survived_the_boundary_file_alone": 92,
+   "survivors_of_the_six_registered_files_that_the_campaign_recorded_for_BASE_as_surviving_its_eleven": 11,
+   "total": 199
+  }
+ ],
+ "not_established": [
+  "Windows was not run; the Linux guest was not used (both changes are pure functions of journal bytes).",
+  "Real client and provider: only the 2.0.0 smoke journal (1,834 events) is a real-client journal; the 85 admitted format-3 journals found are from the test harness (real kernel, fake developer and provider) or writer experiments.",
+  "The enumeration is a bounded model (two failure codes, 1 story <= 13 events, 2 stories <= 10) checked against a second statement of the requirement written by the same author: conformance evidence, not proof, not a kill.",
+  "Consistency, not authenticity: without --expect-anchor an admitted, consistent rewrite of a directory still verifies.",
+  "Cost of the fold at 100,000 events (about 1 ms per event at 1,834).",
+  "That no projection can raise something other than ProjectionError on a reader-accepted event (such a failure would still be a finding through the outer handler, labelled 'does not reconstruct').",
+  "Formats 1 and 2: only 4 + 1 reader fixtures and generated journals (real writers, Authority) were folded; no honest run directory of those formats exists.",
+  "The `verify` mutants on lines this change did not touch: measured with the boundary file alone, not with the registered kill set.",
+  "Journals of kernels before 2.0.0."
+ ],
+ "old_mutants_13_23_resolution": "RESOLVED BY THE PRODUCT CHANGE. Neither KILLED nor AUDITED, and no equivalence is claimed. `story/commit` is no longer a closer, so the function the two mutants were derived from does not exist; mutant 13's closers are the product's, mutant 23's `''` closer would differ only on an event of type '' which the reader of every format refuses (event.py:64-65, decode event.py:298; test EmptyType) \u2014 an argument about a gone function, not offered as a kill. The behaviour they stood for (a commit closes a failed attempt) is pinned by tests that FAIL on the BASE function (8 of 14, measured by running them against `git show 3dc827b:aisef2/app/usage.py`; a wrong implementation run by hand, not a runner mutant). The changed function has 35 runner mutants, 35 KILLED, 0 survivors. The lead retires the two rows when the target is re-measured (its source hash changed).",
+ "run_dirs_with_no_progress_checked": [
+  {
+   "dir": "scratchpad:wf-followups/A-ref-verify-import-interleave/out-df/df-fail",
+   "journal_resolves": true,
+   "no_progress_in_record": [],
+   "record_equals_base": true,
+   "record_equals_changed": true
+  },
+  {
+   "dir": "scratchpad:wf-followups/A-ref-verify-import-interleave/out-df/df-commit",
+   "journal_resolves": true,
+   "no_progress_in_record": [],
+   "record_equals_base": true,
+   "record_equals_changed": true
+  },
+  {
+   "dir": "scratchpad:wf-followups/A-ref-verify-import-interleave/out-df/df-retry",
+   "journal_resolves": true,
+   "no_progress_in_record": [],
+   "record_equals_base": true,
+   "record_equals_changed": true
+  },
+  {
+   "dir": "scratchpad:wf-followups/A-ref-verify-import-interleave/out/two-l2-write-second",
+   "journal_resolves": true,
+   "no_progress_in_record": [
+    {
+     "attempts_repeating_the_one_before": [
+      2,
+      3
+     ],
+     "failures": [
+      "SUBJECT_ABSENT_AT_CANDIDATE: proof of C-MUL: SUBJECT_ABSENT_AT_CANDIDATE"
+     ],
+     "story": "S2"
+    }
+   ],
+   "record_equals_base": true,
+   "record_equals_changed": true
+  },
+  {
+   "dir": "scratchpad:wf-followups/A-ref-verify-import-interleave/out/one-late2-l1",
+   "journal_resolves": true,
+   "no_progress_in_record": [],
+   "record_equals_base": true,
+   "record_equals_changed": true
+  },
+  {
+   "dir": "scratchpad:wf-followups/A-ref-verify-import-interleave/out/two-l2-late2-first",
+   "journal_resolves": true,
+   "no_progress_in_record": [
+    {
+     "attempts_repeating_the_one_before": [
+      2,
+      3
+     ],
+     "failures": [
+      "SUBJECT_ABSENT_AT_CANDIDATE: proof of C-MUL: SUBJECT_ABSENT_AT_CANDIDATE"
+     ],
+     "story": "S2"
+    }
+   ],
+   "record_equals_base": true,
+   "record_equals_changed": true
+  },
+  {
+   "dir": "scratchpad:wf-followups/A-ref-verify-import-interleave/out/kill-commit-second",
+   "journal_resolves": true,
+   "no_progress_in_record": [
+    {
+     "attempts_repeating_the_one_before": [
+      2,
+      3
+     ],
+     "failures": [
+      "SUBJECT_ABSENT_AT_CANDIDATE: proof of C-MUL: SUBJECT_ABSENT_AT_CANDIDATE"
+     ],
+     "story": "S2"
+    }
+   ],
+   "record_equals_base": true,
+   "record_equals_changed": true
+  },
+  {
+   "dir": "scratchpad:wf-followups/A-ref-verify-import-interleave/out/one-nothing-l3",
+   "journal_resolves": true,
+   "no_progress_in_record": [
+    {
+     "attempts_repeating_the_one_before": [
+      2,
+      3,
+      4
+     ],
+     "failures": [
+      "SUBJECT_ABSENT_AT_CANDIDATE: proof of C-ADD: SUBJECT_ABSENT_AT_CANDIDATE"
+     ],
+     "story": "S1"
+    }
+   ],
+   "record_equals_base": true,
+   "record_equals_changed": true
+  },
+  {
+   "dir": "scratchpad:wf-followups/A-ref-verify-import-interleave/out/one-late4-l3",
+   "journal_resolves": true,
+   "no_progress_in_record": [
+    {
+     "attempts_repeating_the_one_before": [
+      2,
+      3
+     ],
+     "failures": [
+      "SUBJECT_ABSENT_AT_CANDIDATE: proof of C-ADD: SUBJECT_ABSENT_AT_CANDIDATE"
+     ],
+     "story": "S1"
+    }
+   ],
+   "record_equals_base": true,
+   "record_equals_changed": true
+  },
+  {
+   "dir": "scratchpad:wf-followups/A-ref-verify-import-interleave/out/inter-impl",
+   "journal_resolves": true,
+   "no_progress_in_record": [
+    {
+     "attempts_repeating_the_one_before": [
+      2,
+      3
+     ],
+     "failures": [
+      "SUBJECT_ABSENT_AT_CANDIDATE: proof of C-MUL: SUBJECT_ABSENT_AT_CANDIDATE"
+     ],
+     "story": "S2"
+    }
+   ],
+   "record_equals_base": true,
+   "record_equals_changed": true
+  },
+  {
+   "dir": "scratchpad:wf-followups/A-ref-verify-import-interleave/out/one-late3-l3",
+   "journal_resolves": true,
+   "no_progress_in_record": [
+    {
+     "attempts_repeating_the_one_before": [
+      2
+     ],
+     "failures": [
+      "SUBJECT_ABSENT_AT_CANDIDATE: proof of C-ADD: SUBJECT_ABSENT_AT_CANDIDATE"
+     ],
+     "story": "S1"
+    }
+   ],
+   "record_equals_base": true,
+   "record_equals_changed": true
+  },
+  {
+   "dir": "scratchpad:wf-followups/A-ref-verify-import-interleave/out/kill-retry-second",
+   "journal_resolves": true,
+   "no_progress_in_record": [
+    {
+     "attempts_repeating_the_one_before": [
+      2,
+      3
+     ],
+     "failures": [
+      "SUBJECT_ABSENT_AT_CANDIDATE: proof of C-MUL: SUBJECT_ABSENT_AT_CANDIDATE"
+     ],
+     "story": "S2"
+    }
+   ],
+   "record_equals_base": true,
+   "record_equals_changed": true
+  },
+  {
+   "dir": "scratchpad:wf-followups/A-ref-verify-import-interleave/out/intr-s2",
+   "journal_resolves": true,
+   "no_progress_in_record": [],
+   "record_equals_base": true,
+   "record_equals_changed": true
+  },
+  {
+   "dir": "scratchpad:wf-followups/A-ref-verify-import-interleave/out/two-l2-late2-second",
+   "journal_resolves": true,
+   "no_progress_in_record": [
+    {
+     "attempts_repeating_the_one_before": [
+      2,
+      3
+     ],
+     "failures": [
+      "SUBJECT_ABSENT_AT_CANDIDATE: proof of C-MUL: SUBJECT_ABSENT_AT_CANDIDATE"
+     ],
+     "story": "S2"
+    }
+   ],
+   "record_equals_base": true,
+   "record_equals_changed": true
+  },
+  {
+   "dir": "scratchpad:wf-followups/A-ref-verify-import-interleave/out/one-commit",
+   "journal_resolves": true,
+   "no_progress_in_record": [],
+   "record_equals_base": true,
+   "record_equals_changed": true
+  },
+  {
+   "dir": "scratchpad:wf-followups/A-ref-verify-import-interleave/out/two-l2-write-first",
+   "journal_resolves": true,
+   "no_progress_in_record": [
+    {
+     "attempts_repeating_the_one_before": [
+      2,
+      3
+     ],
+     "failures": [
+      "SUBJECT_ABSENT_AT_CANDIDATE: proof of C-MUL: SUBJECT_ABSENT_AT_CANDIDATE"
+     ],
+     "story": "S2"
+    }
+   ],
+   "record_equals_base": true,
+   "record_equals_changed": true
+  },
+  {
+   "dir": "scratchpad:wf-followups/A-ref-verify-import-interleave/out/kill-fail-second",
+   "journal_resolves": true,
+   "no_progress_in_record": [
+    {
+     "attempts_repeating_the_one_before": [
+      2,
+      3
+     ],
+     "failures": [
+      "SUBJECT_ABSENT_AT_CANDIDATE: proof of C-MUL: SUBJECT_ABSENT_AT_CANDIDATE"
+     ],
+     "story": "S2"
+    }
+   ],
+   "record_equals_base": true,
+   "record_equals_changed": true
+  },
+  {
+   "dir": "scratchpad:wf-followups/A-ref-verify-import-interleave/out/one-nothing-l1",
+   "journal_resolves": true,
+   "no_progress_in_record": [
+    {
+     "attempts_repeating_the_one_before": [
+      2
+     ],
+     "failures": [
+      "SUBJECT_ABSENT_AT_CANDIDATE: proof of C-ADD: SUBJECT_ABSENT_AT_CANDIDATE"
+     ],
+     "story": "S1"
+    }
+   ],
+   "record_equals_base": true,
+   "record_equals_changed": true
+  },
+  {
+   "dir": "scratchpad:wf-followups/A-ref-verify-import-interleave/out/inter-charge",
+   "journal_resolves": true,
+   "no_progress_in_record": [
+    {
+     "attempts_repeating_the_one_before": [
+      2,
+      3
+     ],
+     "failures": [
+      "SUBJECT_ABSENT_AT_CANDIDATE: proof of C-MUL: SUBJECT_ABSENT_AT_CANDIDATE"
+     ],
+     "story": "S2"
+    }
+   ],
+   "record_equals_base": true,
+   "record_equals_changed": true
+  },
+  {
+   "dir": "scratchpad:m21/kills3/home/T01b/tmpg2xj893d/first",
+   "journal_resolves": true,
+   "no_progress_in_record": [
+    {
+     "attempts_repeating_the_one_before": [
+      2
+     ],
+     "failures": [
+      "SUBJECT_ABSENT_AT_CANDIDATE: proof of C-MUL: SUBJECT_ABSENT_AT_CANDIDATE"
+     ],
+     "story": "S2"
+    }
+   ],
+   "record_equals_base": true,
+   "record_equals_changed": true
+  },
+  {
+   "dir": "scratchpad:m21/kills3/home/T14b/explore/r1/out",
+   "journal_resolves": true,
+   "no_progress_in_record": [],
+   "record_equals_base": true,
+   "record_equals_changed": true
+  },
+  {
+   "dir": "scratchpad:m21/r3/out/e2e/dev/allx/S3c/run",
+   "journal_resolves": true,
+   "no_progress_in_record": [],
+   "record_equals_base": true,
+   "record_equals_changed": true
+  },
+  {
+   "dir": "scratchpad:m21/r3/out/e2e/dev/allx/S2/run",
+   "journal_resolves": true,
+   "no_progress_in_record": [],
+   "record_equals_base": true,
+   "record_equals_changed": true
+  },
+  {
+   "dir": "scratchpad:m21/r3/out/e2e/dev/allx/S3/run",
+   "journal_resolves": true,
+   "no_progress_in_record": [],
+   "record_equals_base": true,
+   "record_equals_changed": true
+  },
+  {
+   "dir": "scratchpad:m21/r3/out/e2e/dev/allx/S4/copy-stream-byte",
+   "journal_resolves": true,
+   "no_progress_in_record": [],
+   "record_equals_base": true,
+   "record_equals_changed": true
+  },
+  {
+   "dir": "scratchpad:m21/r3/out/e2e/dev/allx/S2b-missing/run",
+   "journal_resolves": false,
+   "no_progress_in_record": []
+  },
+  {
+   "dir": "scratchpad:m21/r3/out/e2e/dev/allx/S2b-readonly/run",
+   "journal_resolves": false,
+   "no_progress_in_record": []
+  },
+  {
+   "dir": "scratchpad:m21/r3/out/e2e/dev/allx/S1/run",
+   "journal_resolves": true,
+   "no_progress_in_record": [],
+   "record_equals_base": true,
+   "record_equals_changed": true
+  },
+  {
+   "dir": "scratchpad:m21/r3/out/e2e/dev/allx/S3t/run",
+   "journal_resolves": true,
+   "no_progress_in_record": [
+    {
+     "attempts_repeating_the_one_before": [
+      2
+     ],
+     "failures": [
+      "SUBJECT_ABSENT_AT_CANDIDATE: proof of C-SUM: SUBJECT_ABSENT_AT_CANDIDATE"
+     ],
+     "story": "S1"
+    }
+   ],
+   "record_equals_base": true,
+   "record_equals_changed": true
+  },
+  {
+   "dir": "scratchpad:m21/r3/out/e2e/dev/allx/S2b-not-executable/run",
+   "journal_resolves": false,
+   "no_progress_in_record": []
+  },
+  {
+   "dir": "scratchpad:m21/r3/out/e2e/dev/allx/S2c/run",
+   "journal_resolves": true,
+   "no_progress_in_record": [
+    {
+     "attempts_repeating_the_one_before": [
+      2
+     ],
+     "failures": [
+      "CAPABILITY_UNRUNNABLE: review: CAPABILITY_UNRUNNABLE"
+     ],
+     "story": "S1"
+    }
+   ],
+   "record_equals_base": true,
+   "record_equals_changed": true
+  },
+  {
+   "dir": "scratchpad:m21/r3/out/e2e/dev/s1x/S1/run",
+   "journal_resolves": true,
+   "no_progress_in_record": [],
+   "record_equals_base": true,
+   "record_equals_changed": true
+  }
+ ],
+ "semantics": {
+  "after": "an attempt is failed when it ends in story/retry or story/rollback; its failures are the failure/observed of its story after the later of its story/begin and the story's previous outcome, up to the outcome; a committed attempt is never a row; a story/begin clears what the story observed since its last outcome; rows equal to the row before are reported (unchanged)",
+  "before": "an attempt is closed at story/retry, story/rollback and story/commit; each closer appends the sorted failures observed since the story's previous closer; rows equal to the row before are reported",
+  "shapes": [
+   {
+    "after": [],
+    "before": [
+     [
+      2
+     ]
+    ],
+    "shape": "F_x retry | F_x commit (the committed attempt repeats the failures before it)",
+    "why": "a retry that succeeded is progress; BASE called the committed attempt a repeated failed one (the owner's shape)"
+   },
+   {
+    "after": [
+     [
+      2
+     ]
+    ],
+    "before": [
+     [
+      2,
+      3
+     ]
+    ],
+    "shape": "F_x retry | F_x retry | F_x commit",
+    "why": "attempts 1 and 2 failed the same way; the commit is not a third failed attempt"
+   },
+   {
+    "after": [],
+    "before": [],
+    "shape": "F_x retry | F_x,F_y commit",
+    "why": "the committed attempt differs from the one before: nothing reported either way"
+   },
+   {
+    "after": [
+     [
+      2
+     ]
+    ],
+    "before": [
+     [
+      2
+     ]
+    ],
+    "shape": "F_x retry | F_x rollback (the shape the story runner writes)",
+    "why": "the shape the story runner writes: unchanged"
+   },
+   {
+    "after": [
+     [
+      2
+     ]
+    ],
+    "before": [],
+    "shape": "F_x retry | late F_y | F_x rollback (a failure after an outcome, next attempt repeats F_x)",
+    "why": "the failure journaled after the outcome is not attempt 2's: BASE carried it in and missed the repeat"
+   },
+   {
+    "after": [],
+    "before": [
+     [
+      2
+     ]
+    ],
+    "shape": "F_x,F_y retry | late F_x | F_y rollback (late failure would make attempt 2 look like attempt 1)",
+    "why": "attempt 2 observed only F_y; BASE credited it the late F_x and called it a repeat of attempt 1"
+   },
+   {
+    "after": [
+     [
+      2
+     ]
+    ],
+    "before": [
+     [
+      2
+     ]
+    ],
+    "shape": "F_x retry | F_x rollback | late F_y (a failure after the last outcome)",
+    "why": "no later closer: unchanged"
+   },
+   {
+    "after": [],
+    "before": [],
+    "shape": "F_x retry | F_x (no outcome: the run stopped)",
+    "why": "an attempt with no outcome is not a failed attempt: unchanged"
+   }
+  ]
+ },
+ "test_runs": {
+  "after_the_last_test_edit": [
+   "tests.v2.test_v21_r3_usage_no_progress exit=0 secs=0 Ran 14 tests in 0.069s OK ",
+   "tests.v2.test_v21_r3_usage_boundary exit=0 secs=7 Ran 14 tests in 6.462s OK ",
+   "tests.test_meta exit=0 secs=7 Ran 34 tests in 6.258s OK ",
+   "tests.v2.p0.test_destructive_authority exit=0 secs=14 Ran 13 tests in 14.251s OK ",
+   "tests.v2.p4.test_mutation_safety exit=0 secs=15 Ran 10 tests in 13.921s OK ",
+   "done"
+  ],
+  "direct_importers_and_safety_modules": [
+   "tests.v2.test_app_run exit=0 secs=47 Ran 17 tests in 47.082s OK ",
+   "tests.v2.test_app_units exit=0 secs=10 Ran 41 tests in 8.637s OK ",
+   "tests.v2.test_s2_kills exit=0 secs=30 Ran 43 tests in 29.705s OK ",
+   "tests.v2.test_v21_continue_integrity exit=0 secs=337 Ran 24 tests in 336.849s OK ",
+   "tests.v2.test_v21_continue_usage exit=0 secs=76 Ran 10 tests in 75.219s OK ",
+   "tests.v2.test_v21_defects_lineageusage exit=0 secs=2 Ran 15 tests in 1.365s OK ",
+   "tests.v2.test_v21_defects_verify exit=0 secs=39 Ran 20 tests in 39.457s OK ",
+   "tests.v2.test_v21_experiment exit=0 secs=4 Ran 5 tests in 3.396s OK ",
+   "tests.v2.test_v21_kills3_A20 exit=0 secs=0 Ran 2 tests in 0.007s OK ",
+   "tests.v2.test_v21_kills3_A22 exit=0 secs=1 Ran 7 tests in 0.018s OK ",
+   "tests.v2.test_v21_kills3_R01 exit=0 secs=0 Ran 8 tests in 0.029s OK ",
+   "tests.v2.test_v21_kills3_R05 exit=0 secs=0 Ran 3 tests in 0.035s OK ",
+   "tests.v2.test_v21_kills3_T08b exit=0 secs=0 Ran 6 tests in 0.041s OK ",
+   "tests.v2.test_v21_kills3_T10c exit=0 secs=16 Ran 14 tests in 14.830s OK ",
+   "tests.v2.test_v21_kills3_T10d exit=0 secs=17 Ran 17 tests in 17.136s OK ",
+   "tests.v2.test_v21_kills3_T13a exit=0 secs=12 Ran 12 tests in 10.806s OK ",
+   "tests.v2.test_v21_kills3_T14a exit=0 secs=6 Ran 18 tests in 6.298s OK ",
+   "tests.v2.test_v21_kills3_T14b exit=0 secs=7 Ran 15 tests in 6.176s OK ",
+   "tests.v2.test_v21_kills3_T20a exit=0 secs=0 Ran 16 tests in 0.012s OK ",
+   "tests.v2.test_v21_kills3_T20b exit=0 secs=1 Ran 8 tests in 0.045s OK ",
+   "tests.v2.test_v21_kills3_T22a exit=0 secs=7 Ran 13 tests in 6.756s OK ",
+   "tests.v2.test_v21_kills3_T22b exit=0 secs=15 Ran 10 tests in 15.295s OK ",
+   "tests.v2.test_v21_kills3_T23a exit=0 secs=1 Ran 20 tests in 0.093s OK ",
+   "tests.v2.test_v21_kills_usage exit=0 secs=0 Ran 1 test in 0.000s OK ",
+   "tests.v2.test_v21_r3_usage_boundary exit=0 secs=2 Ran 13 tests in 1.117s OK ",
+   "tests.v2.test_v21_r3_usage_no_progress exit=0 secs=0 Ran 14 tests in 0.082s OK ",
+   "tests.v2.test_v21_verify exit=0 secs=59 Ran 8 tests in 58.663s OK ",
+   "tests.v2.p0.test_destructive_authority exit=0 secs=17 Ran 13 tests in 16.187s OK ",
+   "tests.v2.p4.test_mutation_safety exit=0 secs=15 Ran 10 tests in 14.452s OK ",
+   "done"
+  ],
+  "expected_red_or_stale_sealed_record_checkers": [
+   "tests.v2.p2.test_mutation_targets exit=0 secs=5 Ran 4 tests in 4.785s OK ",
+   "tests.v2.test_v21_mutation_record exit=0 secs=9 Ran 7 tests in 9.149s OK ",
+   "tests.v2.test_c2_k_nowork_001 exit=1 secs=74 Ran 17 tests in 73.648s FAILED (failures=1) ",
+   "tests.v2.test_s2_mutation_record exit=0 secs=9 Ran 12 tests in 8.241s OK ",
+   "tests.v2.test_v21_mutation_runner exit=0 secs=760 Ran 67 tests in 759.350s OK ",
+   "done"
+  ],
+  "q0_checker_calibration": {
+   "base": "calibrated 53/54 (mutation)",
+   "branch": "calibrated 52/54 (mutation, execution_order)"
+  }
+ },
+ "tests_added": {
+  "tests/v2/test_v21_r3_usage_boundary.py": [
+   "AdmittedJournals.test_a_committed_attempt_that_observed_failures_is_verified_and_reports_nothing",
+   "AdmittedJournals.test_a_journal_the_kernel_writes_is_verified",
+   "AdmittedJournals.test_failures_after_an_outcome_are_verified_and_the_late_failure_is_nobodys",
+   "AdmittedJournals.test_journals_of_formats_1_and_2_are_admitted_by_the_same_authority",
+   "EmptyType.test_a_line_of_type_empty_is_refused_by_the_reader_of_every_format",
+   "EmptyType.test_the_event_itself_cannot_be_built",
+   "ExecutedRun.test_a_story_that_failed_twice_the_same_way_is_reported_by_the_run_and_verified",
+   "JournalsOfRecord.test_the_readers_fixtures_that_reconstruct_are_admitted_in_formats_1_and_2",
+   "JournalsOfRecord.test_the_release_smoke_journal_is_admitted",
+   "RefusedJournals.test_a_journal_that_would_deliver_is_not_verified_as_delivering",
+   "RefusedJournals.test_each_is_refuted_by_a_finding_naming_the_projection_the_event_and_its_seq",
+   "RefusedJournals.test_the_helper_names_the_first_event_in_seq_order_and_the_first_projection_to_refuse_it",
+   "RefusedJournals.test_the_operator_sees_the_finding_and_exit_status_1",
+   "RefusedJournals.test_the_projection_s_reason_is_in_the_finding"
+  ],
+  "tests/v2/test_v21_r3_usage_no_progress.py": [
+   "CommittedAttemptIsProgress.test_a_commit_after_a_different_failure_or_at_once_reports_nothing",
+   "CommittedAttemptIsProgress.test_a_committed_attempt_that_observed_the_failures_before_it_is_not_reported",
+   "CommittedAttemptIsProgress.test_a_failure_after_a_commit_is_nobodys_either",
+   "CommittedAttemptIsProgress.test_several_failures_in_a_committed_attempt_are_nobodys",
+   "CommittedAttemptIsProgress.test_the_failed_attempts_before_a_commit_are_still_compared_and_the_commit_is_not_one_of_them",
+   "FailedAttemptsAreCompared.test_a_rollback_ends_a_failed_attempt_as_a_retry_does",
+   "FailedAttemptsAreCompared.test_an_attempt_that_never_ended_is_not_a_failed_attempt",
+   "FailedAttemptsAreCompared.test_each_repeat_is_listed_and_the_first_one_names_the_failures",
+   "FailuresOutsideAnAttempt.test_a_failure_after_the_last_outcome_changes_nothing",
+   "FailuresOutsideAnAttempt.test_a_late_failure_does_not_make_a_different_attempt_look_like_a_repeat",
+   "FailuresOutsideAnAttempt.test_a_late_failure_is_not_carried_into_the_next_attempt",
+   "StoriesAreCompared.test_another_story_s_begin_does_not_discard_a_failure_this_story_has_observed",
+   "StoriesAreCompared.test_each_story_is_compared_with_itself",
+   "StoriesAreCompared.test_the_report_is_in_the_order_of_each_story_s_first_outcome"
+  ]
+ },
+ "wp": "usage"
+}

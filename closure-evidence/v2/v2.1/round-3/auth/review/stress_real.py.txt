@@ -1,0 +1,29 @@
+"""Reviewer: carriers() and cwd_under() (the macOS ps -E / lsof readers the runner calls after EVERY mutant) under process
+churn: any refusal of an honest reading is a false HOST_TABLE_UNREADABLE for the runner.  REAL tools, read-only."""
+import collections, json, subprocess, sys, threading, time
+sys.path.insert(0, sys.argv[1])
+from validation.v2 import cleanup_authority as ca  # noqa: E402
+stop = threading.Event()
+def churn():
+    while not stop.is_set():
+        ps = [subprocess.Popen(["/bin/sleep", "0.03"]) for _ in range(8)]
+        z = subprocess.Popen([sys.executable, "-c", "pass"])
+        for p in ps: p.wait()
+        z.wait()
+threading.Thread(target=churn, daemon=True).start()
+out = collections.Counter(); msgs = []
+N = int(sys.argv[2])
+for i in range(N):
+    for name, fn in (("carriers", lambda t: ca.carriers("AISEF_MUTATION_RUN=zz:", t)),
+                     ("cwd_under(since=None)", lambda t: ca.cwd_under("/nonexistent-prefix/", t)),
+                     ("cwd_under(since=boundary)", lambda t: ca.cwd_under("/nonexistent-prefix/", t, since=time.time() - 30))):
+        try:
+            t = ca.host_table()
+            fn(t)
+            out[name + " ok"] += 1
+        except OSError as e:
+            out[name + " REFUSED"] += 1; msgs.append([name, str(e)[:200]])
+        except Exception as e:  # noqa: BLE001
+            out[name + " UNTYPED " + type(e).__name__] += 1; msgs.append([name, repr(e)[:200]])
+stop.set()
+print(json.dumps({"n": N, "outcomes": dict(out), "first_messages": msgs[:6]}, indent=1))

@@ -1,0 +1,305 @@
+{
+ "target": "aisef2/app/usage.py::session_tokens",
+ "files": [
+  "tests/v2/test_v21_r3_client_stream.py",
+  "tests/v2/test_v21_kills3_T20a.py",
+  "tests/v2/test_v21_continue_usage.py",
+  "tests/v2/test_v21_verify.py",
+  "tests/v2/test_v21_continue_integrity.py"
+ ],
+ "source_sha256": "14e8008eb6f54ad77a4206c9e216901c5cbefd81c324084134383934d58e84b3",
+ "t0": [
+  {
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "seconds": 2.19,
+   "outcome": "PASS",
+   "ran": 17
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T20a.py",
+   "seconds": 0.53,
+   "outcome": "PASS",
+   "ran": 16
+  },
+  {
+   "file": "tests/v2/test_v21_continue_usage.py",
+   "seconds": 65.12,
+   "outcome": "PASS",
+   "ran": 10
+  },
+  {
+   "file": "tests/v2/test_v21_verify.py",
+   "seconds": 39.38,
+   "outcome": "PASS",
+   "ran": 8
+  },
+  {
+   "file": "tests/v2/test_v21_continue_integrity.py",
+   "seconds": 283.27,
+   "outcome": "PASS",
+   "ran": 24
+  }
+ ],
+ "error": null,
+ "results": [
+  {
+   "index": 0,
+   "mutant": "L65 returns None",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_a_finished_step_that_holds_a_separator_is_counted_not_lost (v2.test_v21_r3_client_stream.ReadingAStream.test_a_finished_step_that_holds_a_separator_is_counted_not_lost) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 1,
+   "mutant": "L52 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_a_finished_step_that_holds_a_separator_is_counted_not_lost (v2.test_v21_r3_client_stream.ReadingAStream.test_a_finished_step_that_holds_a_separator_is_counted_not_lost) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 2,
+   "mutant": "L56 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_a_finished_step_that_holds_a_separator_is_counted_not_lost (v2.test_v21_r3_client_stream.ReadingAStream.test_a_finished_step_that_holds_a_separator_is_counted_not_lost) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 3,
+   "mutant": "L65 dict entry 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_a_finished_step_that_holds_a_separator_is_counted_not_lost (v2.test_v21_r3_client_stream.ReadingAStream.test_a_finished_step_that_holds_a_separator_is_counted_not_lost) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 4,
+   "mutant": "L65 dict entry 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_a_finished_step_that_holds_a_separator_is_counted_not_lost (v2.test_v21_r3_client_stream.ReadingAStream.test_a_finished_step_that_holds_a_separator_is_counted_not_lost) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 5,
+   "mutant": "L65 dict entry 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_a_finished_step_that_holds_a_separator_is_counted_not_lost (v2.test_v21_r3_client_stream.ReadingAStream.test_a_finished_step_that_holds_a_separator_is_counted_not_lost) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 6,
+   "mutant": "L52 NotEq->Eq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_a_finished_step_that_holds_a_separator_is_counted_not_lost (v2.test_v21_r3_client_stream.ReadingAStream.test_a_finished_step_that_holds_a_separator_is_counted_not_lost) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 7,
+   "mutant": "L56 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T20a.py",
+   "first": "ERROR: test_sessions_follow_the_file_names_not_the_directory (v2.test_v21_kills3_T20a.AccountOrderAndWhy.test_sessions_follow_the_file_names_not_the_directory) | AttributeError"
+  },
+  {
+   "index": 8,
+   "mutant": "L59 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_a_finished_step_that_holds_a_separator_is_counted_not_lost (v2.test_v21_r3_client_stream.ReadingAStream.test_a_finished_step_that_holds_a_separator_is_counted_not_lost) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 9,
+   "mutant": "L65 string 'tokens' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_a_finished_step_that_holds_a_separator_is_counted_not_lost (v2.test_v21_r3_client_stream.ReadingAStream.test_a_finished_step_that_holds_a_separator_is_counted_not_lost) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 10,
+   "mutant": "L65 string 'steps' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_a_finished_step_that_holds_a_separator_is_counted_not_lost (v2.test_v21_r3_client_stream.ReadingAStream.test_a_finished_step_that_holds_a_separator_is_counted_not_lost) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 11,
+   "mutant": "L65 string 'steps_without_tokens' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_a_finished_step_that_holds_a_separator_is_counted_not_lost (v2.test_v21_r3_client_stream.ReadingAStream.test_a_finished_step_that_holds_a_separator_is_counted_not_lost) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 12,
+   "mutant": "L52 string 'step_finish' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_a_finished_step_that_holds_a_separator_is_counted_not_lost (v2.test_v21_r3_client_stream.ReadingAStream.test_a_finished_step_that_holds_a_separator_is_counted_not_lost) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 13,
+   "mutant": "L55 string 'tokens' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_a_finished_step_that_holds_a_separator_is_counted_not_lost (v2.test_v21_r3_client_stream.ReadingAStream.test_a_finished_step_that_holds_a_separator_is_counted_not_lost) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 14,
+   "mutant": "L56 not removed",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_a_finished_step_that_holds_a_separator_is_counted_not_lost (v2.test_v21_r3_client_stream.ReadingAStream.test_a_finished_step_that_holds_a_separator_is_counted_not_lost) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 15,
+   "mutant": "L56 not removed",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_a_finished_step_that_holds_a_separator_is_counted_not_lost (v2.test_v21_r3_client_stream.ReadingAStream.test_a_finished_step_that_holds_a_separator_is_counted_not_lost) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 16,
+   "mutant": "L60 string 'input' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "ERROR: test_a_finished_step_that_holds_a_separator_is_counted_not_lost (v2.test_v21_r3_client_stream.ReadingAStream.test_a_finished_step_that_holds_a_separator_is_counted_not_lost) (separator='U+2028') | KeyError"
+  },
+  {
+   "index": 17,
+   "mutant": "L60 string 'input' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "ERROR: test_a_finished_step_that_holds_a_separator_is_counted_not_lost (v2.test_v21_r3_client_stream.ReadingAStream.test_a_finished_step_that_holds_a_separator_is_counted_not_lost) (separator='U+2028') | KeyError"
+  },
+  {
+   "index": 18,
+   "mutant": "L61 string 'cache_read' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "ERROR: test_a_finished_step_that_holds_a_separator_is_counted_not_lost (v2.test_v21_r3_client_stream.ReadingAStream.test_a_finished_step_that_holds_a_separator_is_counted_not_lost) (separator='U+2028') | KeyError"
+  },
+  {
+   "index": 19,
+   "mutant": "L61 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_a_finished_step_that_holds_a_separator_is_counted_not_lost (v2.test_v21_r3_client_stream.ReadingAStream.test_a_finished_step_that_holds_a_separator_is_counted_not_lost) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 20,
+   "mutant": "L62 string 'cache_write' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "ERROR: test_a_finished_step_that_holds_a_separator_is_counted_not_lost (v2.test_v21_r3_client_stream.ReadingAStream.test_a_finished_step_that_holds_a_separator_is_counted_not_lost) (separator='U+2028') | KeyError"
+  },
+  {
+   "index": 21,
+   "mutant": "L62 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T20a.py",
+   "first": "ERROR: test_a_cache_report_may_lack_a_class (v2.test_v21_kills3_T20a.SessionStream.test_a_cache_report_may_lack_a_class) (cache={'read': 5}) | TypeError"
+  },
+  {
+   "index": 22,
+   "mutant": "L63 string 'output' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "ERROR: test_a_finished_step_that_holds_a_separator_is_counted_not_lost (v2.test_v21_r3_client_stream.ReadingAStream.test_a_finished_step_that_holds_a_separator_is_counted_not_lost) (separator='U+2028') | KeyError"
+  },
+  {
+   "index": 23,
+   "mutant": "L63 string 'output' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "ERROR: test_a_finished_step_that_holds_a_separator_is_counted_not_lost (v2.test_v21_r3_client_stream.ReadingAStream.test_a_finished_step_that_holds_a_separator_is_counted_not_lost) (separator='U+2028') | KeyError"
+  },
+  {
+   "index": 24,
+   "mutant": "L64 string 'reasoning' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "ERROR: test_a_finished_step_that_holds_a_separator_is_counted_not_lost (v2.test_v21_r3_client_stream.ReadingAStream.test_a_finished_step_that_holds_a_separator_is_counted_not_lost) (separator='U+2028') | KeyError"
+  },
+  {
+   "index": 25,
+   "mutant": "L64 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_a_finished_step_that_holds_a_separator_is_counted_not_lost (v2.test_v21_r3_client_stream.ReadingAStream.test_a_finished_step_that_holds_a_separator_is_counted_not_lost) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 26,
+   "mutant": "L52 string 'type' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_a_finished_step_that_holds_a_separator_is_counted_not_lost (v2.test_v21_r3_client_stream.ReadingAStream.test_a_finished_step_that_holds_a_separator_is_counted_not_lost) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 27,
+   "mutant": "L55 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_a_finished_step_that_holds_a_separator_is_counted_not_lost (v2.test_v21_r3_client_stream.ReadingAStream.test_a_finished_step_that_holds_a_separator_is_counted_not_lost) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 28,
+   "mutant": "L59 string 'cache' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_a_finished_step_that_holds_a_separator_is_counted_not_lost (v2.test_v21_r3_client_stream.ReadingAStream.test_a_finished_step_that_holds_a_separator_is_counted_not_lost) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 29,
+   "mutant": "L61 string 'read' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_a_finished_step_that_holds_a_separator_is_counted_not_lost (v2.test_v21_r3_client_stream.ReadingAStream.test_a_finished_step_that_holds_a_separator_is_counted_not_lost) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 30,
+   "mutant": "L62 string 'write' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T20a.py",
+   "first": "FAIL: test_a_cache_report_may_lack_a_class (v2.test_v21_kills3_T20a.SessionStream.test_a_cache_report_may_lack_a_class) (cache={'write': 3}) | AssertionError"
+  },
+  {
+   "index": 31,
+   "mutant": "L64 string 'reasoning' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_a_finished_step_that_holds_a_separator_is_counted_not_lost (v2.test_v21_r3_client_stream.ReadingAStream.test_a_finished_step_that_holds_a_separator_is_counted_not_lost) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 32,
+   "mutant": "L55 string 'part' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_a_finished_step_that_holds_a_separator_is_counted_not_lost (v2.test_v21_r3_client_stream.ReadingAStream.test_a_finished_step_that_holds_a_separator_is_counted_not_lost) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 33,
+   "mutant": "L56 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T20a.py",
+   "first": "ERROR: test_a_step_that_reports_part_of_its_tokens_reports_none (v2.test_v21_kills3_T20a.SessionStream.test_a_step_that_reports_part_of_its_tokens_reports_none) [no input] | KeyError"
+  },
+  {
+   "index": 34,
+   "mutant": "L56 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T20a.py",
+   "first": "ERROR: test_a_step_that_reports_part_of_its_tokens_reports_none (v2.test_v21_kills3_T20a.SessionStream.test_a_step_that_reports_part_of_its_tokens_reports_none) [no output] | KeyError"
+  },
+  {
+   "index": 35,
+   "mutant": "L56 string 'input' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_a_finished_step_that_holds_a_separator_is_counted_not_lost (v2.test_v21_r3_client_stream.ReadingAStream.test_a_finished_step_that_holds_a_separator_is_counted_not_lost) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 36,
+   "mutant": "L56 string 'output' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_stream.py",
+   "first": "FAIL: test_a_finished_step_that_holds_a_separator_is_counted_not_lost (v2.test_v21_r3_client_stream.ReadingAStream.test_a_finished_step_that_holds_a_separator_is_counted_not_lost) (separator='U+2028') | AssertionError"
+  }
+ ]
+}

@@ -1,0 +1,16 @@
+#!/bin/zsh
+# the kill checks of this WP, sequential; summary lines into out/kc-summary.txt
+SP=/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad
+OUT=$SP/m21/r3/out/range-fu
+cd $SP/m21/r3/wt/range-fu || exit 2
+: > $OUT/kc-summary.txt
+run() { # name target files...
+  local name=$1 target=$2; shift 2
+  $SP/m21/kills3/py.sh range-fu validation/v21/kill_check.py $target "$@" --out $OUT/kc-$name.json > $OUT/kc-$name.txt 2>&1
+  print -r -- "$name exit=$? $(grep -E '^# ' $OUT/kc-$name.txt | cut -c1-260)" >> $OUT/kc-summary.txt
+}
+run _ps_table aisef2/runtime/process_range.py::_ps_table tests/v2/test_v21_r3_range_fu_ps_table.py
+run _ps_table-with-existing aisef2/runtime/process_range.py::_ps_table tests/v2/p4/test_process_table.py tests/v2/test_v21_r3_range_fu_ps_table.py
+run _ps_table-existing-alone aisef2/runtime/process_range.py::_ps_table tests/v2/p4/test_process_table.py
+run _linux_table aisef2/runtime/process_range.py::_linux_table tests/v2/test_v21_r3_range_fu_linux_table.py
+print -r -- DONE >> $OUT/kc-summary.txt

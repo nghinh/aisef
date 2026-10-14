@@ -1,0 +1,767 @@
+{
+ "wp": "conf",
+ "branch": "v21r3/conf",
+ "head": "7b5d67f226ed3f2be9d8c9103501ecb6efecb35f",
+ "files_changed": [
+  "aisef2/app/confine.py",
+  "docs/v2.1/SANDBOX-LINUX.md",
+  "docs/v2.1/decisions/B03-R3-conf.md",
+  "docs/v2.1/evidence/sandbox/r3-conf/README.md",
+  "docs/v2.1/evidence/sandbox/r3-conf/locale-X1.json",
+  "docs/v2.1/evidence/sandbox/r3-conf/scenarios-X1-shared-tree.json",
+  "docs/v2.1/evidence/sandbox/r3-conf/scenarios-X1.json",
+  "tests/v2/test_v21_confine.py",
+  "tests/v2/test_v21_defects_confine.py",
+  "tests/v2/test_v21_kills3_A06.py",
+  "tests/v2/test_v21_kills3_T05a.py",
+  "tests/v2/test_v21_kills3_T05b.py",
+  "tests/v2/test_v21_kills3_T06a.py",
+  "tests/v2/test_v21_kills3_T07a.py",
+  "tests/v2/test_v21_r3_conf_locale.py",
+  "tests/v2/test_v21_r3_conf_policy.py",
+  "tests/v2/v21_r3_conf_rows.py",
+  "validation/v21/sandbox/r3_conf_guest.py",
+  "validation/v21/sandbox/r3_conf_old_judge.py"
+ ],
+ "tests_added": [
+  "tests/v2/test_v21_r3_conf_policy.py (42 tests)",
+  "tests/v2/test_v21_r3_conf_locale.py (10 tests)",
+  "tests/v2/v21_r3_conf_rows.py (fixtures, not a test module)"
+ ],
+ "existing_tests_changed": [
+  {
+   "file": "tests/v2/test_v21_confine.py",
+   "test": "FailClosed.test_each_check_refuses_on_its_own",
+   "why": "its clean measurement's `tmpfs` root row carried no mount source or super block and the rep no host table: such a row can no longer be accepted; the row is now rows.mount('/') and the rep holds host_mounts. Every assertion kept; the clean cases still assert [].",
+   "owner_sentence": "Trường hợp không xác định được phải từ chối hoặc báo chưa đủ điều kiện cách ly."
+  },
+  {
+   "file": "tests/v2/test_v21_confine.py",
+   "test": "FailClosed.test_a_check_that_did_not_run_is_a_problem_never_a_pass",
+   "why": "same fixture change (root row with source/super block, host table); assertions unchanged.",
+   "owner_sentence": "Trường hợp không xác định được phải từ chối hoặc báo chưa đủ điều kiện cách ly."
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T07a.py",
+   "test": "MountInfo.test_a_line_becomes_where_how_and_what_and_the_other_shapes_are_skipped",
+   "why": "a row is now what mountinfo says of the mount including dev, root, source, options, super_options, optional; the exact-equality assertion lists the new fields too (stricter), same lines, same skipped shapes.",
+   "owner_sentence": "Đánh giá bằng loại filesystem, nguồn mount, mount options và namespace; không chỉ dựa vào tên hay vị trí dưới /dev/."
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T07a.py",
+   "test": "MountInfo.judged (helper) -> test_a_guest_with_a_read_only_system_and_its_workspace_is_clean, test_a_writable_host_backed_mount_outside_the_workspace_is_refused; TrailingSlash.test_a_mount_below_a_read_only_path_written_with_a_trailing_slash_is_not_beyond",
+   "why": "the rep now carries the host's table (rows.HOST) and the root row of the TrailingSlash rep is rows.mount('/'); assertions unchanged.",
+   "owner_sentence": "Chỉ chấp nhận khi chứng minh được mount/namespace thuộc sandbox, không mở đường ghi vào host hoặc phiên khác."
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "test": "transcript()/measure() helpers; CorrectlyConfinedSession.test_the_mounts_are_what_mountinfo_says_and_their_targets_what_the_wrapper_names",
+   "why": "the scripted transcript carries the probe's `devices` section (the nodes --dev places), measure() takes the host's table (rows.host_table) and a `host` argument; the exact row comparison names the new fields (stricter).",
+   "owner_sentence": "Đánh giá bằng loại filesystem, nguồn mount, mount options và namespace; không chỉ dựa vào tên hay vị trí dưới /dev/."
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T05a.py",
+   "test": "Session.measure (all tests of the module)",
+   "why": "the host's mount table the measurement reads is the test's (rows.host_table): a CI host's table would hold the transcript's made-up super blocks, macOS/Windows has none; no assertion changed.",
+   "owner_sentence": "Trường hợp không xác định được phải từ chối hoặc báo chưa đủ điều kiện cách ly."
+  },
+  {
+   "file": "tests/v2/test_v21_defects_confine.py",
+   "test": "Case.measure (all tests of the module)",
+   "why": "same: rows.host_table() around the measurement; no assertion changed.",
+   "owner_sentence": "Trường hợp không xác định được phải từ chối hoặc báo chưa đủ điều kiện cách ly."
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_A06.py",
+   "test": "clean_report() (UserNamespaceCheckThatCouldNotRun)",
+   "why": "root row rows.mount('/') and host_mounts in the clean report; assertions unchanged.",
+   "owner_sentence": "Trường hợp không xác định được phải từ chối hoặc báo chưa đủ điều kiện cách ly."
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T06a.py",
+   "test": "mount()/measured() helpers (AcceptedMeasurement, RefusalReasons)",
+   "why": "mount() builds a row as mountinfo gives it (source, super block); measured() adds host_mounts, device_roots, devices for its /dev/null row; assertions unchanged.",
+   "owner_sentence": "Chỉ chấp nhận khi chứng minh được mount/namespace thuộc sandbox, không mở đường ghi vào host hoặc phiên khác."
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T06a.py",
+   "test": "RecordedLinuxMeasurements.test_a_measurement_that_was_accepted_is_accepted_again",
+   "why": "the four 2.1 records predate the policy (rows hold only at/access/fs, no host table): they cannot show a mount is the sandbox's, so `== []` cannot hold. The test now asserts the ONE problem the judge must give them — each writable mount named as not established — and nothing else; the records that carry the data are replayed whole to [] by test_v21_r3_conf_policy.RecordedGuest.",
+   "owner_sentence": "Trường hợp không xác định được phải từ chối hoặc báo chưa đủ điều kiện cách ly."
+  }
+ ],
+ "policy_cases": [
+  {
+   "case": "real bubblewrap, command line variant `baseline`",
+   "expected": "accepted: every writable mount is the workspace, a device node placed by --dev, or a sandbox-made pseudo file system",
+   "how_verified": "real-guest",
+   "evidence": "docs/v2.1/evidence/sandbox/r3-conf/scenarios-X1.json#baseline (problems: none); the same in scenarios-X1-shared-tree.json; replayed by tests/v2/test_v21_r3_conf_policy.py::RecordedGuest"
+  },
+  {
+   "case": "real bubblewrap, command line variant `alt-dev-sandbox-devpts`",
+   "expected": "accepted: a sandbox-made devpts (0:87) and tmpfs (0:86) at /alt-dev, outside /dev/ (not exempt by place)",
+   "how_verified": "real-guest",
+   "evidence": "docs/v2.1/evidence/sandbox/r3-conf/scenarios-X1.json#alt-dev-sandbox-devpts (problems: none); the same in scenarios-X1-shared-tree.json; replayed by tests/v2/test_v21_r3_conf_policy.py::RecordedGuest"
+  },
+  {
+   "case": "real bubblewrap, command line variant `mqueue-sandbox`",
+   "expected": "accepted: a sandbox-made mqueue (0:59) at /mq (only 'mounted beyond': --mqueue is not an option targets() knows)",
+   "how_verified": "real-guest",
+   "evidence": "docs/v2.1/evidence/sandbox/r3-conf/scenarios-X1.json#mqueue-sandbox (problems: [\"mounted beyond what the wrapper names: ['/mq']\"]); the same in scenarios-X1-shared-tree.json; replayed by tests/v2/test_v21_r3_conf_policy.py::RecordedGuest"
+  },
+  {
+   "case": "real bubblewrap, command line variant `host-devpts-at-other-path`",
+   "expected": "refused: the container's devpts (0:72) bound at /host-pts",
+   "how_verified": "real-guest",
+   "evidence": "docs/v2.1/evidence/sandbox/r3-conf/scenarios-X1.json#host-devpts-at-other-path (problems: [\"mounted beyond what the wrapper names: ['/host-pts']\", \"writable outside the workspace: ['/host-pts'] (/host-pts: its super block 0:72 is the host's (mounted there at /dev/pts))\"]); the same in scenarios-X1-shared-tree.json; replayed by tests/v2/test_v21_r3_conf_policy.py::RecordedGuest"
+  },
+  {
+   "case": "real bubblewrap, command line variant `host-mqueue-bound`",
+   "expected": "refused: the container's mqueue (0:64) bound at /hostmq",
+   "how_verified": "real-guest",
+   "evidence": "docs/v2.1/evidence/sandbox/r3-conf/scenarios-X1.json#host-mqueue-bound (problems: [\"mounted beyond what the wrapper names: ['/hostmq']\", \"writable outside the workspace: ['/hostmq'] (/hostmq: its super block 0:64 is the host's (mounted there at /dev/mqueue))\"]); the same in scenarios-X1-shared-tree.json; replayed by tests/v2/test_v21_r3_conf_policy.py::RecordedGuest"
+  },
+  {
+   "case": "real bubblewrap, command line variant `host-dev-bound`",
+   "expected": "refused: the container's /dev (0:69) and its devpts, mqueue, shm bound at /host-dev",
+   "how_verified": "real-guest",
+   "evidence": "docs/v2.1/evidence/sandbox/r3-conf/scenarios-X1.json#host-dev-bound (problems: [\"mounted beyond what the wrapper names: ['/host-dev', '/host-dev/pts', '/host-dev/mqueue', '/host-dev/shm']\", \"writable outside the workspace: ['/host-dev', '/host-dev/pts', '/host-dev/mqueue', '/host-dev/shm'] (/host-dev: its super block 0:69 is the host's (mounted there at /dev); /host-dev/pts: its super block 0:72 is the host's (mounted there at /dev/pts); /host-dev/mqueue: its super block 0:64 is the host's (mounted there at /dev/mqueue); /host-dev/shm: its mount source is 'shm', not tmpfs's own)\"]); the same in scenarios-X1-shared-tree.json; replayed by tests/v2/test_v21_r3_conf_policy.py::RecordedGuest"
+  },
+  {
+   "case": "real bubblewrap, command line variant `host-shm-over-dev-shm`",
+   "expected": "refused: the container's /dev/shm (source shm) over /dev/shm",
+   "how_verified": "real-guest",
+   "evidence": "docs/v2.1/evidence/sandbox/r3-conf/scenarios-X1.json#host-shm-over-dev-shm (problems: [\"writable outside the workspace: ['/dev/shm'] (/dev/shm: its mount source is 'shm', not tmpfs's own)\"]); the same in scenarios-X1-shared-tree.json; replayed by tests/v2/test_v21_r3_conf_policy.py::RecordedGuest"
+  },
+  {
+   "case": "real bubblewrap, command line variant `ext4-file-at-dev-x`",
+   "expected": "refused: a writable ext4 file at /dev/x (not exempt by place)",
+   "how_verified": "real-guest",
+   "evidence": "docs/v2.1/evidence/sandbox/r3-conf/scenarios-X1.json#ext4-file-at-dev-x (problems: [\"writable outside the workspace: ['/dev/x']\"]); the same in scenarios-X1-shared-tree.json; replayed by tests/v2/test_v21_r3_conf_policy.py::RecordedGuest"
+  },
+  {
+   "case": "real bubblewrap, command line variant `regular-file-at-dev-null`",
+   "expected": "refused: a regular file over /dev/null (read other, not the character device 1:3)",
+   "how_verified": "real-guest",
+   "evidence": "docs/v2.1/evidence/sandbox/r3-conf/scenarios-X1.json#regular-file-at-dev-null (problems: [\"writable outside the workspace: ['/dev/null'] (/dev/null: it is not shown to be the character device 1:3 (read: other))\"]); the same in scenarios-X1-shared-tree.json; replayed by tests/v2/test_v21_r3_conf_policy.py::RecordedGuest"
+  },
+  {
+   "case": "real bubblewrap, command line variant `zero-at-dev-null`",
+   "expected": "refused: /dev/zero's node over /dev/null (read 1:5, not 1:3)",
+   "how_verified": "real-guest",
+   "evidence": "docs/v2.1/evidence/sandbox/r3-conf/scenarios-X1.json#zero-at-dev-null (problems: [\"writable outside the workspace: ['/dev/null'] (/dev/null: it is not shown to be the character device 1:3 (read: 1:5))\"]); the same in scenarios-X1-shared-tree.json; replayed by tests/v2/test_v21_r3_conf_policy.py::RecordedGuest"
+  },
+  {
+   "case": "real bubblewrap, command line variant `ptmx-at-dev-ptmx2`",
+   "expected": "refused: a node outside the allowed list (the container's devpts 0:72)",
+   "how_verified": "real-guest",
+   "evidence": "docs/v2.1/evidence/sandbox/r3-conf/scenarios-X1.json#ptmx-at-dev-ptmx2 (problems: [\"writable outside the workspace: ['/dev/ptmx2'] (/dev/ptmx2: its super block 0:72 is the host's (mounted there at /dev/pts))\"]); the same in scenarios-X1-shared-tree.json; replayed by tests/v2/test_v21_r3_conf_policy.py::RecordedGuest"
+  },
+  {
+   "case": "real bubblewrap, command line variant `shared-pid-namespace`",
+   "expected": "refused: /proc is the container's (0:66) when no PID namespace of its own",
+   "how_verified": "real-guest",
+   "evidence": "docs/v2.1/evidence/sandbox/r3-conf/scenarios-X1.json#shared-pid-namespace (problems: ['a process the session left outlived it: [519]', \"the pid namespace is not the session's own (shared)\", \"writable outside the workspace: ['/proc'] (/proc: its super block 0:66 is the host's (mounted there at /proc))\"]); the same in scenarios-X1-shared-tree.json; replayed by tests/v2/test_v21_r3_conf_policy.py::RecordedGuest"
+  },
+  {
+   "case": "a pseudo file system (tmpfs, proc, devpts, mqueue) made inside, at /dev/x, /alt-dev/pts, /srv/session, /proc, /mq: accepted",
+   "expected": "as stated",
+   "how_verified": "unit",
+   "evidence": "tests/v2/test_v21_r3_conf_policy.py::SandboxMade.test_each_pseudo_file_system_made_inside_is_accepted_wherever_it_lies"
+  },
+  {
+   "case": "the guest's own rows (root bind of /newroot, proc, /dev, devpts, /tmp): accepted",
+   "expected": "as stated",
+   "how_verified": "unit",
+   "evidence": "tests/v2/test_v21_r3_conf_policy.py::SandboxMade.test_the_guests_own_rows_are_accepted"
+  },
+  {
+   "case": "a peer group of its own (shared:77, not the host's): accepted",
+   "expected": "as stated",
+   "how_verified": "unit",
+   "evidence": "tests/v2/test_v21_r3_conf_policy.py::SandboxMade.test_a_peer_group_of_its_own_is_not_the_hosts"
+  },
+  {
+   "case": "a read-only mount is not a write",
+   "expected": "as stated",
+   "how_verified": "unit",
+   "evidence": "tests/v2/test_v21_r3_conf_policy.py::SandboxMade.test_a_read_only_mount_is_not_a_write"
+  },
+  {
+   "case": "host devpts / mqueue / tmpfs / proc by super block, wherever bound: refused with super block and where the host holds it",
+   "expected": "as stated",
+   "how_verified": "unit",
+   "evidence": "tests/v2/test_v21_r3_conf_policy.py::HostBacked.test_the_hosts_devpts_is_refused_by_its_super_block_wherever_it_is_bound + test_the_hosts_mqueue_tmpfs_and_proc_are_refused_the_same_way"
+  },
+  {
+   "case": "a sub-directory of a host tmpfs: refused (same super block)",
+   "expected": "as stated",
+   "how_verified": "unit",
+   "evidence": "tests/v2/test_v21_r3_conf_policy.py::HostBacked.test_a_directory_of_a_host_tmpfs_is_the_hosts_tmpfs"
+  },
+  {
+   "case": "a writable ext4 mount or host shm under /dev/: refused (place exempts nothing)",
+   "expected": "as stated",
+   "how_verified": "unit",
+   "evidence": "tests/v2/test_v21_r3_conf_policy.py::HostBacked.test_a_place_under_dev_exempts_nothing"
+  },
+  {
+   "case": "tmpfs/devpts/proc/mqueue with a host path or device as mount source: refused",
+   "expected": "as stated",
+   "how_verified": "unit",
+   "evidence": "tests/v2/test_v21_r3_conf_policy.py::HostBacked.test_the_name_of_the_file_system_exempts_nothing_a_host_path_or_device_as_source_is_refused"
+  },
+  {
+   "case": "ext4, overlay, sysfs, cgroup2, devtmpfs, fuse, 9p, ramfs, virtiofs: refused",
+   "expected": "as stated",
+   "how_verified": "unit",
+   "evidence": "tests/v2/test_v21_r3_conf_policy.py::HostBacked.test_a_file_system_a_wrapper_cannot_make_is_refused_whatever_else_it_shows"
+  },
+  {
+   "case": "shared:N / master:N / propagate_from:N of a group the host holds: refused",
+   "expected": "as stated",
+   "how_verified": "unit",
+   "evidence": "tests/v2/test_v21_r3_conf_policy.py::HostBacked.test_a_peer_group_the_host_holds_is_the_hosts_whichever_side_receives"
+  },
+  {
+   "case": "host table unreadable or empty: not established (never a pass, never 'writable')",
+   "expected": "as stated",
+   "how_verified": "unit",
+   "evidence": "tests/v2/test_v21_r3_conf_policy.py::NotEstablished.test_an_unread_host_table_establishes_nothing"
+  },
+  {
+   "case": "source / dev / optional missing, unparseable, or master:99 / shared: / unbindable: not established",
+   "expected": "as stated",
+   "how_verified": "unit",
+   "evidence": "tests/v2/test_v21_r3_conf_policy.py::NotEstablished.test_a_row_that_lacks_what_decides_is_not_established + test_a_missing_key_is_not_established_either"
+  },
+  {
+   "case": "one refused and one not established are two problems",
+   "expected": "as stated",
+   "how_verified": "unit",
+   "evidence": "tests/v2/test_v21_r3_conf_policy.py::NotEstablished.test_a_refusal_and_a_mount_not_established_are_two_problems"
+  },
+  {
+   "case": "the six device nodes with the canonical character-device number under a --dev root: accepted",
+   "expected": "as stated",
+   "how_verified": "unit",
+   "evidence": "tests/v2/test_v21_r3_conf_policy.py::DeviceNodes.test_each_is_accepted_as_the_character_device_it_must_be"
+  },
+  {
+   "case": "a node on another file system with the right number: accepted (identity decides)",
+   "expected": "as stated",
+   "how_verified": "unit",
+   "evidence": "tests/v2/test_v21_r3_conf_policy.py::DeviceNodes.test_the_file_system_holding_the_node_is_not_what_decides"
+  },
+  {
+   "case": "another device number, a regular file: refused with what was read",
+   "expected": "as stated",
+   "how_verified": "unit",
+   "evidence": "tests/v2/test_v21_r3_conf_policy.py::DeviceNodes.test_another_device_or_a_regular_file_under_the_name_is_refused"
+  },
+  {
+   "case": "a node outside the list (/dev/sda, mem, kmsg, ptmx): refused as any mount",
+   "expected": "as stated",
+   "how_verified": "unit",
+   "evidence": "tests/v2/test_v21_r3_conf_policy.py::DeviceNodes.test_a_node_outside_the_list_is_judged_as_any_mount"
+  },
+  {
+   "case": "a node not under a --dev destination: not a device node of the list",
+   "expected": "as stated",
+   "how_verified": "unit",
+   "evidence": "tests/v2/test_v21_r3_conf_policy.py::DeviceNodes.test_a_node_where_no_dev_option_placed_it_is_not_one"
+  },
+  {
+   "case": "a node the probe did not read: not established",
+   "expected": "as stated",
+   "how_verified": "unit",
+   "evidence": "tests/v2/test_v21_r3_conf_policy.py::DeviceNodes.test_a_node_the_probe_did_not_read_is_not_established"
+  },
+  {
+   "case": "the host's table read before and after the session; a super block held at either moment counts; the report keeps both",
+   "expected": "as stated",
+   "how_verified": "simulated",
+   "evidence": "tests/v2/test_v21_r3_conf_policy.py::ReportedData.test_the_host_is_read_before_the_session_and_after_it_and_both_count"
+  },
+  {
+   "case": "a failed reading: nothing is shown to be the sandbox's",
+   "expected": "as stated",
+   "how_verified": "simulated",
+   "evidence": "tests/v2/test_v21_r3_conf_policy.py::ReportedData.test_a_reading_that_failed_leaves_no_mount_shown_to_be_the_sandboxs"
+  },
+  {
+   "case": "the probe's devices section on a real shell and stat",
+   "expected": "as stated",
+   "how_verified": "unit",
+   "evidence": "tests/v2/test_v21_r3_conf_policy.py::DevicesSection (both tests)"
+  },
+  {
+   "case": "the host table reading: whole or None; non-UTF-8 mount point read",
+   "expected": "as stated",
+   "how_verified": "unit",
+   "evidence": "tests/v2/test_v21_r3_conf_policy.py::HostTable (all tests)"
+  }
+ ],
+ "locale_checks": [
+  {
+   "check": "exact environment handed to the probe and to `bwrap --version`, caller carries LANG=vi_VN.UTF-8, LC_ALL=de_DE.UTF-8, LC_MESSAGES=fr_FR.UTF-8, LANGUAGE=ja: LC_ALL=C, LANG=C and no other LANG*/LC_* variable; rest = session wrapper's",
+   "result": "pass",
+   "how_verified": "simulated",
+   "evidence": "tests/v2/test_v21_r3_conf_locale.py::PassedDown (subprocess.run recorder)"
+  },
+  {
+   "check": "the same at the OS boundary: a stand-in bwrap executable saves its env",
+   "result": "pass",
+   "how_verified": "simulated",
+   "evidence": "tests/v2/test_v21_r3_conf_locale.py::AtTheExecBoundary (POSIX; a stand-in, real exec)"
+  },
+  {
+   "check": "the same for the REAL /usr/bin/bwrap 0.12.0 behind a recording wrapper, with `confine.measure` driving it",
+   "result": "pass: two calls, both LANG=C LC_ALL=C, no LANGUAGE/LC_MESSAGES; os.environ unchanged; measurement problems []",
+   "how_verified": "real-guest",
+   "evidence": "docs/v2.1/evidence/sandbox/r3-conf/locale-X1.json; replayed by tests/v2/test_v21_r3_conf_locale.py::RecordedGuest"
+  },
+  {
+   "check": "report.locale is the family actually passed (patching confine.LOCALE changes both)",
+   "result": "pass",
+   "how_verified": "simulated",
+   "evidence": "tests/v2/test_v21_r3_conf_locale.py::PassedDown.test_what_the_report_says_is_what_was_passed_down"
+  },
+  {
+   "check": "wrap() (shared with real sessions) does not carry the measurement's locale",
+   "result": "pass",
+   "how_verified": "unit",
+   "evidence": "tests/v2/test_v21_r3_conf_locale.py::PassedDown.test_a_session_keeps_its_own_locale"
+  },
+  {
+   "check": "a translated message (non-English unshare/cat text) under another locale differs from C and would not match USERNS_REFUSED",
+   "result": "NOT MEASURED: the guest has the locales C, C.utf8 and POSIX only",
+   "how_verified": "neither",
+   "evidence": "docs/v2.1/decisions/B03-R3-conf.md section 11 and the module docstring of test_v21_r3_conf_locale: what it needs"
+  }
+ ],
+ "mutants": [
+  {
+   "function": "aisef2/app/confine.py::_owned",
+   "total": 107,
+   "killed": 107,
+   "survived": 0,
+   "dispositions": []
+  },
+  {
+   "function": "aisef2/app/confine.py::_writes",
+   "total": 18,
+   "killed": 18,
+   "survived": 0,
+   "dispositions": []
+  },
+  {
+   "function": "aisef2/app/confine.py::_mounts",
+   "total": 44,
+   "killed": 44,
+   "survived": 0,
+   "dispositions": []
+  },
+  {
+   "function": "aisef2/app/confine.py::_host_mounts",
+   "total": 16,
+   "killed": 16,
+   "survived": 0,
+   "dispositions": []
+  },
+  {
+   "function": "aisef2/app/confine.py::_device_roots",
+   "total": 6,
+   "killed": 6,
+   "survived": 0,
+   "dispositions": []
+  },
+  {
+   "function": "aisef2/app/confine.py::PSEUDO",
+   "total": 4,
+   "killed": 4,
+   "survived": 0,
+   "dispositions": []
+  },
+  {
+   "function": "aisef2/app/confine.py::DEVICES",
+   "total": 12,
+   "killed": 12,
+   "survived": 0,
+   "dispositions": []
+  },
+  {
+   "function": "aisef2/app/confine.py::LOCALE",
+   "total": 4,
+   "killed": 4,
+   "survived": 0,
+   "dispositions": []
+  },
+  {
+   "function": "aisef2/app/confine.py::_DEV",
+   "total": 1,
+   "killed": 1,
+   "survived": 0,
+   "dispositions": []
+  },
+  {
+   "function": "aisef2/app/confine.py::_PEER",
+   "total": 1,
+   "killed": 1,
+   "survived": 0,
+   "dispositions": []
+  },
+  {
+   "function": "aisef2/app/confine.py::measure",
+   "total": 60,
+   "killed": 59,
+   "survived": 1,
+   "dispositions": [
+    {
+     "index": 49,
+     "description": "L315 string '/' emptied",
+     "disposition": "EQUIVALENT",
+     "test_or_grounds": "wrap() raises Unavailable on its first statement for a non-Linux system before reading `workspace`; the call is only reached when `not system.startswith('linux')`. SURVIVOR-AUDITS.json aisef2/app/confine.py::measure 51 (A06), same text at the old index."
+    }
+   ]
+  },
+  {
+   "function": "aisef2/app/confine.py::_probe",
+   "total": 215,
+   "killed": 212,
+   "survived": 3,
+   "dispositions": [
+    {
+     "index": 130,
+     "description": "L368 string 'sleep ' emptied",
+     "disposition": "AUDITED",
+     "test_or_grounds": "`_survivors('120.N')` for `_survivors('sleep 120.N')`: a substring test; extra matches are only processes carrying the probe's nonce-derived number (bwrap argv, sh -c PROBE ... $7, setsid sleep), each a process the session left if alive after SURVIVOR_GRACE. SURVIVOR-AUDITS.json _probe 110 (A05). Not changed by this WP."
+    },
+    {
+     "index": 197,
+     "description": "L366 string ': ' emptied",
+     "disposition": "AUDITED",
+     "test_or_grounds": "only the ': ' between exception class and message of the 'did not run the probe' text; nobody parses it (_sections reads MARK-prefixed lines only). SURVIVOR-AUDITS.json _probe 167 (A05). Not changed by this WP."
+    },
+    {
+     "index": 207,
+     "description": "L352 string '.git' emptied",
+     "disposition": "EQUIVALENT",
+     "test_or_grounds": "`git_dir(str(ws)) or ws / '.git'`: the right operand is read only when git_dir returns falsy, which a worktree made by _worktree never does. SURVIVOR-AUDITS.json _probe 175 (A05). Not changed by this WP."
+    }
+   ]
+  },
+  {
+   "function": "aisef2/app/confine.py::_judge",
+   "total": 175,
+   "killed": 168,
+   "survived": 7,
+   "dispositions": [
+    {
+     "index": 95,
+     "description": "L549 string '/nonexistent' emptied",
+     "disposition": "AUDITED",
+     "test_or_grounds": "`home != ''` for `home != '/nonexistent'`: home is never '' (_probe: env.get('HOME') or '/nonexistent'); for '/nonexistent' the probe lists nothing so shown <= names holds either way. SURVIVOR-AUDITS.json _judge 92 (T06). Not changed by this WP."
+    },
+    {
+     "index": 100,
+     "description": "L519 element 0 dropped",
+     "disposition": "AUDITED",
+     "test_or_grounds": "rc in (None, 127) -> (127,): rc is None only from the default (None, '') of tries.get('user_namespace'); then said == '' cannot match USERNS_REFUSED so the branch fires through the second operand with the same text. SURVIVOR-AUDITS.json _judge 97 (T06). Not changed by this WP."
+    },
+    {
+     "index": 135,
+     "description": "L512 element 0 dropped",
+     "disposition": "EQUIVALENT",
+     "test_or_grounds": "a dict.get default of the workspace try that is never read (the first operand is True when the key is absent; the second is not evaluated). SURVIVOR-AUDITS.json _judge 125/128 (T06). Not changed by this WP."
+    },
+    {
+     "index": 136,
+     "description": "L512 element 1 dropped",
+     "disposition": "EQUIVALENT",
+     "test_or_grounds": "same: element 1 of a default that is never read. SURVIVOR-AUDITS.json _judge 126/129 (T06). Not changed by this WP."
+    },
+    {
+     "index": 138,
+     "description": "L512 element 0 dropped",
+     "disposition": "EQUIVALENT",
+     "test_or_grounds": "a dict.get default of the workspace try that is never read (the first operand is True when the key is absent; the second is not evaluated). SURVIVOR-AUDITS.json _judge 125/128 (T06). Not changed by this WP."
+    },
+    {
+     "index": 139,
+     "description": "L512 element 1 dropped",
+     "disposition": "EQUIVALENT",
+     "test_or_grounds": "same: element 1 of a default that is never read. SURVIVOR-AUDITS.json _judge 126/129 (T06). Not changed by this WP."
+    },
+    {
+     "index": 142,
+     "description": "L520 string ')' emptied",
+     "disposition": "AUDITED",
+     "test_or_grounds": "closing delimiter of a message nothing parses. SURVIVOR-AUDITS.json _judge 132 (T06). Not changed by this WP."
+    }
+   ]
+  }
+ ],
+ "kill_files_by_function": {
+  "_owned": [
+   "tests/v2/test_v21_r3_conf_policy.py"
+  ],
+  "_writes": [
+   "tests/v2/test_v21_r3_conf_policy.py"
+  ],
+  "_host_mounts": [
+   "tests/v2/test_v21_r3_conf_policy.py"
+  ],
+  "_device_roots": [
+   "tests/v2/test_v21_r3_conf_policy.py"
+  ],
+  "PSEUDO": [
+   "tests/v2/test_v21_r3_conf_policy.py"
+  ],
+  "DEVICES": [
+   "tests/v2/test_v21_r3_conf_policy.py"
+  ],
+  "_DEV": [
+   "tests/v2/test_v21_r3_conf_policy.py"
+  ],
+  "_PEER": [
+   "tests/v2/test_v21_r3_conf_policy.py"
+  ],
+  "LOCALE": [
+   "tests/v2/test_v21_r3_conf_locale.py"
+  ],
+  "_mounts": [
+   "tests/v2/test_v21_kills3_T07a.py",
+   "tests/v2/test_v21_r3_conf_policy.py"
+  ],
+  "measure": [
+   "tests/v2/test_v21_confine.py",
+   "tests/v2/test_v21_kills3_A06.py",
+   "tests/v2/test_v21_kills3_T06b.py",
+   "tests/v2/test_v21_r3_conf_locale.py",
+   "tests/v2/test_v21_r3_conf_policy.py"
+  ],
+  "_probe": [
+   "tests/v2/test_v21_defects_confine.py",
+   "tests/v2/test_v21_kills3_A05.py",
+   "tests/v2/test_v21_kills3_T05a.py",
+   "tests/v2/test_v21_kills3_T05b.py",
+   "tests/v2/test_v21_kills3_T05c.py",
+   "tests/v2/test_v21_kills3_R02.py",
+   "tests/v2/test_v21_r3_conf_locale.py",
+   "tests/v2/test_v21_r3_conf_policy.py"
+  ],
+  "_judge": [
+   "tests/v2/test_v21_confine.py",
+   "tests/v2/test_v21_kills3_A06.py",
+   "tests/v2/test_v21_kills3_T06a.py",
+   "tests/v2/test_v21_r3_conf_policy.py"
+  ]
+ },
+ "guest_runs": [
+  {
+   "cmd": "guest.sh <tree> X1 sh -c 'uname -a; id; which bwrap python3; bwrap --version; locale -a; cat /proc/self/mountinfo'",
+   "exit": 0,
+   "what_it_showed": "Linux 7.0.12-linuxkit aarch64, uid 1000, bubblewrap 0.12.0, locales C C.utf8 POSIX only; the container's table (overlay /, proc 0:66, /dev tmpfs 0:69, devpts 0:72, mqueue 0:64, shm 0:84); exploratory, not a committed record"
+  },
+  {
+   "cmd": "guest.sh <tree> X1 bwrap --help | grep mqueue",
+   "exit": 0,
+   "what_it_showed": "bubblewrap 0.12.0 has `--mqueue DEST`: a sandbox-made mqueue can be produced for real (the WP text said it cannot)"
+  },
+  {
+   "cmd": "guest.sh <tree> X1 python3 -B /repo/validation/v21/sandbox/r3_conf_guest.py scenarios",
+   "exit": 0,
+   "what_it_showed": "twelve real sessions judged: 3 accepted (baseline, a second --dev, --mqueue), 9 refused each for what it is; the old clause accepted all 12, nine of them write paths; table_unchanged true in all; docs/v2.1/evidence/sandbox/r3-conf/scenarios-X1.json"
+  },
+  {
+   "cmd": "guest.sh <tree> X1 python3 -B /repo/validation/v21/sandbox/r3_conf_guest.py shared-tree",
+   "exit": 0,
+   "what_it_showed": "same verdicts inside a mount namespace made rshared: inherited rows are master:N of the host's groups, sandbox-made rows have no propagation field; scenarios-X1-shared-tree.json"
+  },
+  {
+   "cmd": "guest.sh <tree> X1 python3 -B /repo/validation/v21/sandbox/r3_conf_guest.py locale",
+   "exit": 0,
+   "what_it_showed": "the real bubblewrap's two calls got LANG=C LC_ALL=C and no other LANG*/LC_*; os.environ unchanged; measurement problems []; locale-X1.json"
+  },
+  {
+   "cmd": "guest.sh <tree> X1 env NETWORK={host,none} PROFILE=X1 python3 -B /repo/validation/v21/sandbox/measure.py",
+   "exit": 0,
+   "what_it_showed": "the 2.1 boundary harness at the new code: measure.problems [] for both networks, locale C, 13 writable mounts (not committed output)"
+  },
+  {
+   "cmd": "guest.sh <tree> hardened python3 -B -m unittest -v test_v21_r3_conf_policy test_v21_r3_conf_locale T07a T06a A06 T05a T05b T05c defects test_v21_confine",
+   "exit": 0,
+   "what_it_showed": "Ran 167 tests in 20.9 s, OK (skipped=1: an existing skip, the guest's temp directory lies below /tmp)"
+  }
+ ],
+ "decisions_needed": [
+  "Device allowance by identity: a node on ANY file system that the probe reads as the character device 1:3 under /dev/null (under a --dev destination) is accepted — the kernel's null device, whatever file system holds it. If the owner wants the node's file system or its origin (the host's /dev) to be part of the rule too, say so; today it is not, on purpose (§4.2, §5.5).",
+  "rep.host_mounts goes into RUN.json (trimmed to at/fs/dev/optional per mount): tens of KB on a host with hundreds of mounts, and it names the host's mount points. Lead: keep, or elide from RUN.json and keep it in the measurement's own evidence.",
+  "Register the kill files (tests/v2/test_v21_r3_conf_policy.py, tests/v2/test_v21_r3_conf_locale.py, and tests/v2/v21_r3_conf_rows.py is an import of the edited existing ones) and the new names _owned, _writes, _host_mounts, _device_roots, PSEUDO, DEVICES, LOCALE, _DEV, _PEER as targets; the existing kill files' order matters (first kill is attributed to the first file that kills).",
+  "If a wrapper that emits --mqueue (or --dev-bind) is ever added, confine.targets() must name it, or the judgement reports 'mounted beyond what the wrapper names' for it (the real-guest mqueue-sandbox record shows exactly that today)."
+ ],
+ "not_established": [
+  "A translated message of unshare/cat/sh under a non-C locale: the guest has only C, C.utf8, POSIX; nothing translated was observed. Needs an image with a non-English locale and its util-linux catalogue under the sandbox's /usr, the unshare --user true probe run under it and under C.",
+  "A super block of ANOTHER mount namespace than the controller's (another session's tmpfs reached through /proc/<pid>/root in a --bind) is not the host's and is not excluded by observation; confine.wrap binds only the workspace read-write so no command line it builds does that. No rule added (a rule 'destination also bound from the host' falsely refuses the covered --tmpfs /tmp row of read_only: [\"/tmp\"]).",
+  "Bare-metal Linux, a systemd host, a devtmpfs /dev, CI Linux, Windows, macOS (no backend): not run. The shared mount tree was imitated in a namespace of the container (rshared), not a systemd host.",
+  "The lifecycle claim rests on kernel behaviour that was not itself measured: a tmpfs / devpts / proc / mqueue super block lives with the mount namespace (proc's and mqueue's with the PID / IPC namespace). Measured proxies: the host's table is the same after every session; setsid_survivors is empty. A host process holding /proc/<pid>/ns/mnt of the session would keep the namespace: not looked for.",
+  "Two mounts at one path are judged by what the probe sees at the path (a covered mount is not separately observable).",
+  "Mount options other than ro/rw are recorded and decide nothing (nosuid/nodev/noexec limit execution, not what a write reaches); a super block that says ro is deliberately not credited when the mount says rw.",
+  "A confined `aisef run` end to end (no provider, no opencode) was not run."
+ ],
+ "test_runs": [
+  {
+   "what": "kill_check over every mutant of _owned, _writes, _mounts, _host_mounts, _device_roots, PSEUDO, DEVICES, LOCALE, _DEV, _PEER, measure, _probe, _judge (first batch, then the reruns after two test fixes)",
+   "result": "see mutants: 663 mutants, 652 killed, 11 survived (all the old campaign's audited ones)"
+  },
+  {
+   "what": "tests.v2.test_v21_confine",
+   "result": "0 22s Ran 34 tests in 21.603s OK "
+  },
+  {
+   "what": "tests.v2.test_v21_defects_confine",
+   "result": "0 2s Ran 16 tests in 1.485s OK "
+  },
+  {
+   "what": "tests.v2.test_v21_r3_conf_policy",
+   "result": "0 2s Ran 42 tests in 1.385s OK "
+  },
+  {
+   "what": "tests.v2.test_v21_r3_conf_locale",
+   "result": "0 2s Ran 10 tests in 1.516s OK "
+  },
+  {
+   "what": "tests.v2.test_v21_kills3_A05",
+   "result": "0 1s Ran 6 tests in 1.014s OK "
+  },
+  {
+   "what": "tests.v2.test_v21_kills3_A06",
+   "result": "0 1s Ran 4 tests in 0.600s OK "
+  },
+  {
+   "what": "tests.v2.test_v21_kills3_A07",
+   "result": "0 1s Ran 5 tests in 0.056s OK "
+  },
+  {
+   "what": "tests.v2.test_v21_kills3_R02",
+   "result": "0 0s Ran 2 tests in 0.234s OK "
+  },
+  {
+   "what": "tests.v2.test_v21_kills3_T05a",
+   "result": "0 1s Ran 8 tests in 0.741s OK "
+  },
+  {
+   "what": "tests.v2.test_v21_kills3_T05b",
+   "result": "0 1s Ran 18 tests in 0.587s OK "
+  },
+  {
+   "what": "tests.v2.test_v21_kills3_T05c",
+   "result": "0 3s Ran 7 tests in 2.375s OK "
+  },
+  {
+   "what": "tests.v2.test_v21_kills3_T06a",
+   "result": "0 0s Ran 14 tests in 0.017s OK "
+  },
+  {
+   "what": "tests.v2.test_v21_kills3_T06b",
+   "result": "0 2s Ran 8 tests in 1.562s OK "
+  },
+  {
+   "what": "tests.v2.test_v21_kills3_T07a",
+   "result": "0 1s Ran 14 tests in 0.012s OK "
+  },
+  {
+   "what": "tests.v2.test_v21_kills3_T07b",
+   "result": "0 0s Ran 11 tests in 0.011s OK (skipped=1) "
+  },
+  {
+   "what": "tests.v2.test_v21_kills3_TO2",
+   "result": "0 0s Ran 3 tests in 0.000s OK "
+  },
+  {
+   "what": "tests.v2.test_v21_kills3_T13a",
+   "result": "0 9s Ran 12 tests in 8.030s OK "
+  },
+  {
+   "what": "tests.v2.test_v21_kills3_T14b",
+   "result": "0 5s Ran 15 tests in 4.923s OK "
+  },
+  {
+   "what": "tests.v2.test_v21_kills3_T23a",
+   "result": "0 1s Ran 20 tests in 0.076s OK "
+  },
+  {
+   "what": "tests.v2.test_v21_kills3_T24a",
+   "result": "0 0s Ran 24 tests in 0.014s OK "
+  },
+  {
+   "what": "tests.v2.test_v21_kills3_T26a",
+   "result": "0 1s Ran 23 tests in 0.168s OK "
+  },
+  {
+   "what": "tests.v2.test_v21_continue_integrity",
+   "result": "0 254s Ran 24 tests in 253.821s OK "
+  },
+  {
+   "what": "tests.v2.test_v21_defects_bundleshape",
+   "result": "0 0s Ran 14 tests in 0.060s OK "
+  },
+  {
+   "what": "tests.v2.p0.test_destructive_authority",
+   "result": "0 10s Ran 13 tests in 9.587s OK "
+  },
+  {
+   "what": "tests.v2.p4.test_mutation_safety",
+   "result": "0 14s Ran 10 tests in 13.463s OK "
+  },
+  {
+   "what": "tests.v2.p5.test_invariants",
+   "result": "0 8s Ran 50 tests in 7.414s OK "
+  },
+  {
+   "what": "tests.v2.test_release_s2_kernel",
+   "result": "0 7s Ran 16 tests in 6.749s OK "
+  },
+  {
+   "what": "tests.v2.test_c2_p10_cohort_static",
+   "result": "0 23s Ran 8 tests in 22.977s OK "
+  },
+  {
+   "what": "tests.v2.test_p6_stages",
+   "result": "0 7s Ran 39 tests in 6.729s OK "
+  },
+  {
+   "what": "tests.v2.test_p6_orchestration",
+   "result": "0 73s Ran 32 tests in 72.626s OK "
+  },
+  {
+   "what": "tests.v2.p2.test_mutation_targets",
+   "result": "0 3s Ran 4 tests in 2.920s OK "
+  },
+  {
+   "what": "tests.v2.test_v21_mutation_record",
+   "result": "0 4s Ran 7 tests in 4.426s OK "
+  },
+  {
+   "what": "tests.v2.test_c2_k_nowork_001",
+   "result": "FAILED (failures=1) of 17: 'the kernel changed since the record' — EXPECTED stale (K-NOWORK record binds the kernel tree); the lead regenerates"
+  },
+  {
+   "what": "tests.v2.test_s2_mutation_record",
+   "result": "Ran 12 OK"
+  },
+  {
+   "what": "tests.v2.test_v21_requalification",
+   "result": "Ran 3 OK"
+  },
+  {
+   "what": "tests.v2.test_v21_snapshot_delta",
+   "result": "Ran 51 OK"
+  },
+  {
+   "what": "guest hardened: confinement modules",
+   "result": "Ran 167 tests in 20.9 s, OK (skipped=1)"
+  }
+ ]
+}

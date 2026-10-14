@@ -1,0 +1,32 @@
+"""Every row of the real `ps` of this host parses (read-only). usage: python3 -B -I real-ps-rows.py.txt TREE
+Prints: rows, ps's own line count (a second, independent `ps -A` call), the reader listed, the locales tried, and a
+sample comparison of each row's command with `ps -p PID -o command=` for up to 40 rows (a process may exit between)."""
+import json, os, subprocess, sys
+sys.path.insert(0, sys.argv[1])
+from validation.v2 import cleanup_authority as ca  # noqa: E402
+
+res = {"platform": sys.platform, "locale_env": {k: os.environ.get(k) for k in ("LANG", "LC_ALL", "LC_CTYPE", "LC_TIME")}}
+raw = subprocess.run(["ps", "-A", "-o", "pid=,ppid=,pgid=,lstart=,command="], capture_output=True).stdout
+res["ps_lines_independent_call"] = len([l for l in raw.split(b"\n") if l.strip(b" ")])
+table, reader = ca._read()
+res["rows_parsed"], res["reader_listed"] = len(table), reader in table
+res["lstart_padded_day_rows"] = sum(1 for l in raw.split(b"\n") if b"  " in l[:40] and l[:40].count(b" ") > 12)
+same = diff = 0
+for pid in sorted(table)[:40]:
+    one = subprocess.run(["ps", "-p", str(pid), "-o", "command="], capture_output=True).stdout.decode("utf-8", "replace").rstrip("\n")
+    if not one:
+        continue
+    if one.strip(" ") == table[pid].command.strip(" "):
+        same += 1
+    else:
+        diff += 1
+res["command_equals_ps_p_command"] = {"same": same, "different(race or truncated)": diff}
+# the rows under the locales a user may have (macOS has them installed); the table must still be readable
+for loc in ("en_US.UTF-8", "C", "de_DE.UTF-8", "ja_JP.UTF-8", "fr_FR.UTF-8"):
+    os.environ["LC_ALL"] = loc
+    try:
+        t, r = ca._read()
+        res.setdefault("locales", {})[loc] = {"rows": len(t), "reader_listed": r in t}
+    except OSError as e:
+        res.setdefault("locales", {})[loc] = {"error": type(e).__name__, "msg": str(e)[:100]}
+print(json.dumps(res, indent=1))

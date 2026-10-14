@@ -1,0 +1,94 @@
+[
+ {
+  "argv": [
+   "/usr/local/bin/python3",
+   "-B",
+   "-m",
+   "aisef",
+   "bundle",
+   "seal",
+   "authoring.json",
+   "--repo",
+   "repo",
+   "--out",
+   "sealed.json"
+  ],
+  "exit": 0,
+  "stdout": "{\n \"approvals_dropped\": [],\n \"approvals_kept\": 0,\n \"plan_hash\": \"35ad86a86f69356517ff252b13925a51d2934e64fe30e9e02b86a0bf5907a69d\",\n \"specs\": 3,\n \"to_approve\": [\n  {\n   \"contract\": \"BC-SUM\",\n   \"contract_hash\": \"011f1b84ddd96bfb5f58bfe90a23c618f510dff691236a8faecde8dfa9c4ffee\",\n   \"requirement\": \"R-CLI\",\n   \"requirement_hash\": \"283b218dd44a905820e5daab7d806c3f64902e81226c91b9fcae4beb0c221042\"\n  },\n  {\n   \"contract\": \"BC-USAGE-0\",\n   \"contract_hash\": \"4d23b941431f199b7bb33c0dfd403ed84987277425650c6816225bffc9316ff8\",\n   \"requirement\": \"R-CLI\",\n   \"requirement_hash\": \"283b218dd44a905820e5daab7d806c3f64902e81226c91b9fcae4beb0c221042\"\n  },\n  {\n   \"contract\": \"BC-USAGE-1\",\n   \"contract_hash\": \"1441ed48fd12737ffac142904306c1eb10018072c9a289e65e4cde63dd2e470c\",\n   \"requirement\": \"R-CLI\",\n   \"requirement_hash\": \"283b218dd44a905820e5daab7d806c3f64902e81226c91b9fcae4beb0c221042\"\n  }\n ],\n \"written\": \"sealed.json\"\n}\n",
+  "stderr": ""
+ },
+ {
+  "argv": [
+   "/usr/local/bin/python3",
+   "-B",
+   "-m",
+   "aisef",
+   "bundle",
+   "approve",
+   "sealed.json",
+   "--contract",
+   "BC-SUM",
+   "--approver",
+   "human:e2e",
+   "--out",
+   "a1.json"
+  ],
+  "exit": 0,
+  "stdout": "{\n \"approved\": \"BC-SUM\",\n \"by\": \"human:e2e\",\n \"still_to_approve\": [\n  {\n   \"contract\": \"BC-USAGE-0\",\n   \"contract_hash\": \"4d23b941431f199b7bb33c0dfd403ed84987277425650c6816225bffc9316ff8\",\n   \"requirement\": \"R-CLI\",\n   \"requirement_hash\": \"283b218dd44a905820e5daab7d806c3f64902e81226c91b9fcae4beb0c221042\"\n  },\n  {\n   \"contract\": \"BC-USAGE-1\",\n   \"contract_hash\": \"1441ed48fd12737ffac142904306c1eb10018072c9a289e65e4cde63dd2e470c\",\n   \"requirement\": \"R-CLI\",\n   \"requirement_hash\": \"283b218dd44a905820e5daab7d806c3f64902e81226c91b9fcae4beb0c221042\"\n  }\n ],\n \"written\": \"a1.json\"\n}\n",
+  "stderr": ""
+ },
+ {
+  "argv": [
+   "/usr/local/bin/python3",
+   "-B",
+   "-m",
+   "aisef",
+   "bundle",
+   "approve",
+   "a1.json",
+   "--contract",
+   "BC-USAGE-0",
+   "--approver",
+   "human:e2e",
+   "--out",
+   "a2.json"
+  ],
+  "exit": 0,
+  "stdout": "{\n \"approved\": \"BC-USAGE-0\",\n \"by\": \"human:e2e\",\n \"still_to_approve\": [\n  {\n   \"contract\": \"BC-USAGE-1\",\n   \"contract_hash\": \"1441ed48fd12737ffac142904306c1eb10018072c9a289e65e4cde63dd2e470c\",\n   \"requirement\": \"R-CLI\",\n   \"requirement_hash\": \"283b218dd44a905820e5daab7d806c3f64902e81226c91b9fcae4beb0c221042\"\n  }\n ],\n \"written\": \"a2.json\"\n}\n",
+  "stderr": ""
+ },
+ {
+  "argv": [
+   "/usr/local/bin/python3",
+   "-B",
+   "-m",
+   "aisef",
+   "bundle",
+   "approve",
+   "a2.json",
+   "--contract",
+   "BC-USAGE-1",
+   "--approver",
+   "human:e2e",
+   "--out",
+   "approved.json"
+  ],
+  "exit": 0,
+  "stdout": "{\n \"approved\": \"BC-USAGE-1\",\n \"by\": \"human:e2e\",\n \"still_to_approve\": [],\n \"written\": \"approved.json\"\n}\n",
+  "stderr": ""
+ },
+ {
+  "argv": [
+   "/usr/local/bin/python3",
+   "-B",
+   "-m",
+   "aisef",
+   "bundle",
+   "lint",
+   "approved.json"
+  ],
+  "exit": 0,
+  "stdout": "{\n \"admission\": {\n  \"admitted\": true,\n  \"engine_digest\": \"7668fc35709829d8324e914e0300b2b85221d9e83dedd32cd2c3996f761690c7\",\n  \"failed\": [],\n  \"result_digest\": \"2b01083f0887d014bc82c80f31dec6c0e5f4f1ae5845ea943bbab29da535a8ae\"\n },\n \"coverage\": {\n  \"criteria_citing_no_requirement_of_the_bundle\": [],\n  \"limit\": \"clauses are the ones the criteria's facts declare; AISEF does not parse the requirements document\",\n  \"requirements\": {\n   \"R-CLI\": {\n    \"clauses\": {\n     \"1.1\": [\n      \"C-SUM\"\n     ],\n     \"1.2\": [\n      \"C-USAGE-0\",\n      \"C-USAGE-1\"\n     ]\n    },\n    \"criteria\": [\n     \"C-SUM\",\n     \"C-USAGE-0\",\n     \"C-USAGE-1\"\n    ],\n    \"status\": \"COVERED\"\n   }\n  }\n },\n \"criteria_without_calibration\": [],\n \"criteria_without_contract\": [],\n \"to_approve\": [],\n \"verdict\": \"READY\"\n}\n",
+  "stderr": ""
+ }
+]

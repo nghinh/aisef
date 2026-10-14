@@ -1,0 +1,170 @@
+=== tests.v2.p0.test_destructive_authority
+.............
+----------------------------------------------------------------------
+Ran 13 tests in 10.470s
+
+OK
+=== tests.v2.p4.test_mutation_safety
+/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/subprocess.py:1139: ResourceWarning: subprocess 67614 is still running
+  _warn("subprocess %s is still running" % self.pid,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+./opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/subprocess.py:1139: ResourceWarning: subprocess 67439 is still running
+  _warn("subprocess %s is still running" % self.pid,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/subprocess.py:1139: ResourceWarning: subprocess 67595 is still running
+  _warn("subprocess %s is still running" % self.pid,
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+.........
+----------------------------------------------------------------------
+Ran 10 tests in 13.558s
+
+OK
+=== tests.v2.p5.test_invariants
+.................................................Exception in thread release verifier-session-5.0:
+Traceback (most recent call last):
+  File "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/threading.py", line 1082, in _bootstrap_inner
+    self._context.run(self.run)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/threading.py", line 1024, in run
+    self._target(*self._args, **self._kwargs)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/wt/auth-rv/aisef2/runtime/story_scope.py", line 157, in run
+    resource.release()
+    ~~~~~~~~~~~~~~~~^^
+  File "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/wt/auth-rv/tests/v2/p5/test_invariants.py", line 317, in release
+    raise InvariantError("the verifier's session was not the verifier's")
+aisef2.errors.InvariantError: the verifier's session was not the verifier's
+.
+----------------------------------------------------------------------
+Ran 50 tests in 8.087s
+
+OK
+=== tests.v2.p4.test_process_range
+/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/unittest/case.py:615: ResourceWarning: unclosed file <_io.TextIOWrapper name=4 encoding='utf-8'>
+  result = method()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+........................
+----------------------------------------------------------------------
+Ran 24 tests in 17.737s
+
+OK
+=== tests.v2.test_v21_confine
+............................/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/wt/auth-rv/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=11 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/wt/auth-rv/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=10 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/wt/auth-rv/aisef2/orchestrate/story_runner.py:277: ResourceWarning: unclosed file <_io.TextIOWrapper name=9 encoding='utf-8'>
+  tests_held.release()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+../private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/wt/auth-rv/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=11 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/wt/auth-rv/aisef2/orchestrate/story_runner.py:129: ResourceWarning: unclosed file <_io.TextIOWrapper name=10 encoding='utf-8'>
+  self._held.clear()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/wt/auth-rv/aisef2/orchestrate/story_runner.py:277: ResourceWarning: unclosed file <_io.TextIOWrapper name=9 encoding='utf-8'>
+  tests_held.release()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+....
+----------------------------------------------------------------------
+Ran 34 tests in 20.401s
+
+OK
+=== tests.v2.test_v21_read_set
+..........................
+----------------------------------------------------------------------
+Ran 26 tests in 9.954s
+
+OK
+=== tests.v2.test_v21_snapshot_delta
+...................................................
+----------------------------------------------------------------------
+Ran 51 tests in 63.175s
+
+OK
+=== tests.v2.test_v21_defects_runner
+...
+----------------------------------------------------------------------
+Ran 3 tests in 0.002s
+
+OK
+=== tests.v2.test_v21_mutation_runner
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/_strptime.py:582: ResourceWarning: unclosed file <_io.FileIO name=6 mode='rb' closefd=True>
+  for group_key in found_dict.keys():
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+.........
+======================================================================
+FAIL: test_historical_records_read_as_before (tests.v2.test_v21_mutation_runner.Classify.test_historical_records_read_as_before) [P4]
+§8: every committed record of P1..V2.0-S2 is read by the unchanged legacy branch and checks as it did at
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/wt/auth-rv/tests/v2/test_v21_mutation_runner.py", line 1659, in test_historical_records_read_as_before
+    self.assertEqual(m.problems_of(record, ROOT, phase), [])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: ['aisef2/runtime/process_range.py::Process[1751 chars] it'] != []
+
+First list contains 17 additional elements.
+First extra element 0:
+'aisef2/runtime/process_range.py::ProcessRange._abort: target changed since the mutation run — re-run it'
+
+Diff is 1956 characters long. Set self.maxDiff to None to see it.
+
+----------------------------------------------------------------------
+Ran 67 tests in 539.443s
+
+FAILED (failures=1)
+=== tests.v2.p0.test_checker_calibration
+Traceback (most recent call last):
+  File "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/wt/auth-rv/tests/v2/p0/test_checker_calibration.py", line 46, in test_every_checker_has_a_committed_fixture_that_fails_it_for_the_named_reason
+    self.assertTrue(r["clean_passes"])
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_every_checker_is_calibrated_and_the_committed_record_is_current (tests.v2.p0.test_checker_calibration.CheckerCalibration.test_every_checker_is_calibrated_and_the_committed_record_is_current)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/wt/auth-rv/tests/v2/p0/test_checker_calibration.py", line 31, in test_every_checker_is_calibrated_and_the_committed_record_is_current
+    self.assertEqual(cc.problems_of(self.result), [])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: ['mutation is NOT calibrated: {\'checker\'[2958 chars]ue}"] != []
+
+First list contains 3 additional elements.
+First extra element 0:
+'mutation is NOT calibrated: {\'checker\': \'mutation\', \'package\': \'WP-1.1\', \'fixture\': \'tests/v2/fixtures/known_bad/mutation.json\', \'clean_passes\': False, \'clean_problems\': [\'aisef2/runtime/process_range.py::ProcessRange._abort: target changed since the mutation run — re-run it\', \'aisef2/runtime/process_range.py::ProcessRange._close_pipes: target changed since the mutation run — re-run it\', \'aisef2/runtime/process_range.py::ProcessRange._signal: target changed since the mutation run — re-run it\', \'aisef2/runtime/process_range.py::ProcessRange.anchor_returncode: target changed since the mutation run — re-run it\', \'aisef2/runtime/process_range.py::ProcessRange.escaped: target changed since the mutation run — re-run it\'], \'rejects_known_bad\': True, \'rejects_for_the_expected_reason\': True, \'expected\': \'unaudited survivor\', \'observed\': ["aisef2/cal/m.py::positive: unaudited survivor \'L2 returns None\'", "aisef2/cal/m.py::positive: unaudited survivor \'L2 Gt->LtE\'"], \'calibrated\': False, \'always_pass_mutant_rejected_by_calibration\': True}'
+
+Diff is 3191 characters long. Set self.maxDiff to None to see it.
+
+----------------------------------------------------------------------
+Ran 13 tests in 224.318s
+
+FAILED (failures=4)
+=== tests.v2.p2.test_mutation_targets
+....
+----------------------------------------------------------------------
+Ran 4 tests in 3.624s
+
+OK
+=== tests.v2.test_v21_kill_check
+..
+----------------------------------------------------------------------
+Ran 2 tests in 0.005s
+
+OK
+=== tests.v2.test_v21_execution_order
+...
+----------------------------------------------------------------------
+Ran 3 tests in 0.713s
+
+OK
+=== tests.v2.test_v21_requalification
+...
+----------------------------------------------------------------------
+Ran 3 tests in 0.014s
+
+OK
+=== destructive_authority --check
+destructive authority: PASS

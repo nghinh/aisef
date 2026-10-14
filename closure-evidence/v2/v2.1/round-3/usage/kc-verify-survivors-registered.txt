@@ -1,0 +1,93 @@
+[6] SURVIVED L96 Or swapped
+[7] SURVIVED L97 returns None
+[11] KILLED   L127 condition negated  <- ERROR: test_the_note_names_the_file_and_the_release_boundary (v2.test_v21_kills3_A22.ARunWithoutAManifestIsVerifiedWithANoteThatNamesTheFileAndTheReleaseBoundary.test_the_note_names_the_file_and_the_release_boundary) | ValueError
+[26] KILLED   L201 dict entry 4 dropped  <- ERROR: test_the_note_names_the_file_and_the_release_boundary (v2.test_v21_kills3_A22.ARunWithoutAManifestIsVerifiedWithANoteThatNamesTheFileAndTheReleaseBoundary.test_the_note_names_the_file_and_the_release_boundary) | KeyError
+[27] KILLED   L201 dict entry 5 dropped  <- ERROR: test_the_note_names_the_file_and_the_release_boundary (v2.test_v21_kills3_A22.ARunWithoutAManifestIsVerifiedWithANoteThatNamesTheFileAndTheReleaseBoundary.test_the_note_names_the_file_and_the_release_boundary) | KeyError
+[28] KILLED   L94 element 0 dropped  <- ERROR: test_the_path_is_delimited_and_the_cause_class_is_a_token (v2.test_v21_kills3_A22.AnUnreadableRecordIsNamedByItsFileAndItsCause.test_the_path_is_delimited_and_the_cause_class_is_a_token) [absent] | FileNotFoundError
+[29] KILLED   L94 element 1 dropped  <- ERROR: test_the_path_is_delimited_and_the_cause_class_is_a_token (v2.test_v21_kills3_A22.AnUnreadableRecordIsNamedByItsFileAndItsCause.test_the_path_is_delimited_and_the_cause_class_is_a_token) [not JSON] | json.decoder.JSONDecodeError
+[30] KILLED   L95 returns None  <- ERROR: test_the_path_is_delimited_and_the_cause_class_is_a_token (v2.test_v21_kills3_A22.AnUnreadableRecordIsNamedByItsFileAndItsCause.test_the_path_is_delimited_and_the_cause_class_is_a_token) [absent] | TypeError
+[33] SURVIVED L97 dict entry 0 dropped
+[34] SURVIVED L97 dict entry 1 dropped
+[35] KILLED   L111 Or swapped  <- ERROR: test_a_manifest_that_is_json_and_no_manifest_says_so (v2.test_v21_kills3_R01.TheManifestThatCannotBeUsedIsRefusedWithItsKindOfCause.test_a_manifest_that_is_json_and_no_manifest_says_so) (manifest='[]') | AttributeError
+[38] KILLED   L125 NotEq->Eq  <- FAIL: test_the_directory_s_prefix_then_the_expected_one (v2.test_v21_kills3_A22.TheAnchorsOfAMismatchAreTwoTokensInRoleOrder.test_the_directory_s_prefix_then_the_expected_one) | AssertionError
+[39] KILLED   L127 IsNot->Is  <- ERROR: test_the_note_names_the_file_and_the_release_boundary (v2.test_v21_kills3_A22.ARunWithoutAManifestIsVerifiedWithANoteThatNamesTheFileAndTheReleaseBoundary.test_the_note_names_the_file_and_the_release_boundary) | ValueError
+[44] SURVIVED L166 sorted() -> list()
+[55] KILLED   L188 And swapped  <- FAIL: test_the_note_names_the_file_and_the_release_boundary (v2.test_v21_kills3_A22.ARunWithoutAManifestIsVerifiedWithANoteThatNamesTheFileAndTheReleaseBoundary.test_the_note_names_the_file_and_the_release_boundary) | AssertionError
+[57] SURVIVED L196 And swapped
+[63] KILLED   L202 string 'evidence_anchor' emptied  <- ERROR: test_the_note_names_the_file_and_the_release_boundary (v2.test_v21_kills3_A22.ARunWithoutAManifestIsVerifiedWithANoteThatNamesTheFileAndTheReleaseBoundary.test_the_note_names_the_file_and_the_release_boundary) | KeyError
+[64] KILLED   L202 string 'notes' emptied  <- ERROR: test_the_note_names_the_file_and_the_release_boundary (v2.test_v21_kills3_A22.ARunWithoutAManifestIsVerifiedWithANoteThatNamesTheFileAndTheReleaseBoundary.test_the_note_names_the_file_and_the_release_boundary) | KeyError
+[66] KILLED   L95 dict entry 0 dropped  <- ERROR: test_the_path_is_delimited_and_the_cause_class_is_a_token (v2.test_v21_kills3_A22.AnUnreadableRecordIsNamedByItsFileAndItsCause.test_the_path_is_delimited_and_the_cause_class_is_a_token) [absent] | KeyError
+[67] KILLED   L95 dict entry 1 dropped  <- ERROR: test_the_path_is_delimited_and_the_cause_class_is_a_token (v2.test_v21_kills3_A22.AnUnreadableRecordIsNamedByItsFileAndItsCause.test_the_path_is_delimited_and_the_cause_class_is_a_token) [absent] | KeyError
+[68] SURVIVED L97 string 'verdict' emptied
+[69] SURVIVED L97 string 'problems' emptied
+[70] SURVIVED L97 string 'REFUTED' emptied
+[75] SURVIVED L132 string 'the run is not of this project bundle' emptied
+[76] KILLED   L136 string 'the run has no journal (it ended before the run began)' emptied  <- FAIL: test_a_run_that_ended_before_it_began_is_refuted_for_its_missing_journal_alone (v2.test_v21_kills3_R01.ARunThatEndedBeforeItsRunSpecHasNothingToBind.test_a_run_that_ended_before_it_began_is_refuted_for_its_missing_journal_alone) | AssertionError
+[77] SURVIVED L145 Or swapped
+[83] KILLED   L181 Or swapped  <- FAIL: test_a_budget_stop_removed_from_the_record_is_refuted (v2.test_v21_verify.RecordAlone.test_a_budget_stop_removed_from_the_record_is_refuted) | AssertionError
+[84] KILLED   L182 Eq->NotEq  <- FAIL: test_a_run_that_ended_before_it_began_is_refuted_for_its_missing_journal_alone (v2.test_v21_kills3_R01.ARunThatEndedBeforeItsRunSpecHasNothingToBind.test_a_run_that_ended_before_it_began_is_refuted_for_its_missing_journal_alone) | AssertionError
+[85] SURVIVED L183 string 'FAIL' emptied
+[92] KILLED   L95 string 'verdict' emptied  <- ERROR: test_the_path_is_delimited_and_the_cause_class_is_a_token (v2.test_v21_kills3_A22.AnUnreadableRecordIsNamedByItsFileAndItsCause.test_the_path_is_delimited_and_the_cause_class_is_a_token) [absent] | KeyError
+[93] KILLED   L95 string 'problems' emptied  <- ERROR: test_the_path_is_delimited_and_the_cause_class_is_a_token (v2.test_v21_kills3_A22.AnUnreadableRecordIsNamedByItsFileAndItsCause.test_the_path_is_delimited_and_the_cause_class_is_a_token) [absent] | KeyError
+[94] KILLED   L95 string 'REFUTED' emptied  <- FAIL: test_the_path_is_delimited_and_the_cause_class_is_a_token (v2.test_v21_kills3_A22.AnUnreadableRecordIsNamedByItsFileAndItsCause.test_the_path_is_delimited_and_the_cause_class_is_a_token) [absent] | AssertionError
+[96] KILLED   L122 sorted() -> list()  <- FAIL: test_the_paths_are_the_first_five_in_sorted_order_whatever_the_hash_seed (v2.test_v21_kills3_T22a.ManifestProblemNamesTheFilesThatDiffer.test_the_paths_are_the_first_five_in_sorted_order_whatever_the_hash_seed) | AssertionError
+[97] KILLED   L126 string 'the evidence anchor is ' emptied  <- FAIL: test_a_directory_without_its_manifest_is_refuted_not_a_crash (v2.test_v21_kills3_T22b.ExpectedAnchor.test_a_directory_without_its_manifest_is_refuted_not_a_crash) | AssertionError
+[98] KILLED   L126 string ', not the ' emptied  <- FAIL: test_the_directory_s_prefix_then_the_expected_one (v2.test_v21_kills3_A22.TheAnchorsOfAMismatchAreTwoTokensInRoleOrder.test_the_directory_s_prefix_then_the_expected_one) | AssertionError
+[99] SURVIVED L126 string ' the run printed' emptied
+[100] KILLED   L128 string 'the anchor matches the expected value: authentic only as far as that value came from a store the developer cannot write (docs/v2.1/ANCHOR-THREAT-MODEL.md); it does not prove the run happened as its journal says' emptied  <- FAIL: test_a_match_says_where_the_limit_of_what_it_proves_is_written (v2.test_v21_kills3_T22b.ExpectedAnchor.test_a_match_says_where_the_limit_of_what_it_proves_is_written) | AssertionError
+[101] KILLED   L138 string "RUN.json's journal reference is not an object" emptied  <- FAIL: test_a_journal_reference_that_is_no_object_or_no_path_is_refuted (v2.test_v21_defects_verify.DamagedRunDirectory.test_a_journal_reference_that_is_no_object_or_no_path_is_refuted) (journal='x') | AssertionError
+[102] KILLED   L142 element 0 dropped  <- ERROR: test_a_journal_file_that_is_absent (v2.test_v21_kills3_T22b.JournalReferenceUnreadable.test_a_journal_file_that_is_absent) | FileNotFoundError
+[103] KILLED   L142 element 1 dropped  <- ERROR: test_a_journal_reference_without_a_path (v2.test_v21_kills3_T22b.JournalReferenceUnreadable.test_a_journal_reference_without_a_path) | KeyError
+[104] KILLED   L142 element 2 dropped  <- ERROR: test_a_journal_path_that_is_not_a_path (v2.test_v21_kills3_T22b.JournalReferenceUnreadable.test_a_journal_path_that_is_not_a_path) | TypeError
+[105] KILLED   L142 element 3 dropped  <- ERROR: test_a_journal_reference_that_is_no_object_or_no_path_is_refuted (v2.test_v21_defects_verify.DamagedRunDirectory.test_a_journal_reference_that_is_no_object_or_no_path_is_refuted) | ValueError
+[110] SURVIVED L180 dict entry 0 dropped
+[111] SURVIVED L180 dict entry 1 dropped
+[112] KILLED   L180 Or swapped  <- FAIL: test_the_note_names_the_file_and_the_release_boundary (v2.test_v21_kills3_A22.ARunWithoutAManifestIsVerifiedWithANoteThatNamesTheFileAndTheReleaseBoundary.test_the_note_names_the_file_and_the_release_boundary) | AssertionError
+[113] SURVIVED L182 string 'failure' emptied
+[114] SURVIVED L182 string 'PASS' emptied
+[116] SURVIVED L187 string "the record's ProductProof account is not the one the journal re-derives" emptied
+[117] KILLED   L188 string 'error' emptied  <- FAIL: test_a_usage_the_run_named_as_a_fault_is_not_an_account_to_compare (v2.test_v21_kills3_T22a.AccountOfUsageIsTheEvidences.test_a_usage_the_run_named_as_a_fault_is_not_an_account_to_compare) | AssertionError
+[120] SURVIVED L196 string 'final_main' emptied
+[122] SURVIVED L97 string 'RUN.json is not a run record of format ' emptied
+[124] SURVIVED L103 string 'no ' emptied
+[125] KILLED   L103 string ': a run of a release before 2.1 — its record is bound by nothing but itself' emptied  <- FAIL: test_the_note_names_the_file_and_the_release_boundary (v2.test_v21_kills3_A22.ARunWithoutAManifestIsVerifiedWithANoteThatNamesTheFileAndTheReleaseBoundary.test_the_note_names_the_file_and_the_release_boundary) | AssertionError
+[126] KILLED   L106 string ' is not JSON' emptied  <- FAIL: test_a_corrupt_manifest_is_refuted_naming_the_file_and_why (v2.test_v21_kills3_T22b.ManifestThatIsNotJson.test_a_corrupt_manifest_is_refuted_naming_the_file_and_why) | AssertionError
+[127] KILLED   L109 string ' cannot be read (' emptied  <- FAIL: test_a_manifest_that_cannot_be_read_names_the_file_and_the_class_of_the_failure (v2.test_v21_kills3_R01.TheManifestThatCannotBeUsedIsRefusedWithItsKindOfCause.test_a_manifest_that_cannot_be_read_names_the_file_and_the_class_of_the_failure) | AssertionError
+[128] SURVIVED L109 string ')' emptied
+[129] KILLED   L113 string ' is not an evidence manifest (a JSON object holding its files)' emptied  <- FAIL: test_a_manifest_that_is_json_and_no_manifest_says_so (v2.test_v21_kills3_R01.TheManifestThatCannotBeUsedIsRefusedWithItsKindOfCause.test_a_manifest_that_is_json_and_no_manifest_says_so) (manifest='[]') | AssertionError
+[130] KILLED   L126 And swapped  <- FAIL: test_the_directory_s_prefix_then_the_expected_one (v2.test_v21_kills3_A22.TheAnchorsOfAMismatchAreTwoTokensInRoleOrder.test_the_directory_s_prefix_then_the_expected_one) | AssertionError
+[131] KILLED   L146 string 'the journal is not the one RUN.json names (digest or length)' emptied  <- FAIL: test_a_journal_reference_that_is_no_object_or_no_path_is_refuted (v2.test_v21_defects_verify.DamagedRunDirectory.test_a_journal_reference_that_is_no_object_or_no_path_is_refuted) | AssertionError
+[137] KILLED   L168 string "the record's story outcomes are not the journal's for " emptied  <- FAIL: test_story_outcomes_that_are_not_the_journal_s_are_refuted (v2.test_v21_verify.RecordAlone.test_story_outcomes_that_are_not_the_journal_s_are_refuted) | AssertionError
+[140] SURVIVED L180 string 'story' emptied
+[141] SURVIVED L180 string 'error' emptied
+[142] SURVIVED L180 string 'begun and never ended in the journal' emptied
+[143] SURVIVED L181 string 'budget_stop' emptied
+[144] SURVIVED L185 string 'the record says ' emptied
+[145] KILLED   L185 string '; the journal re-derives ' emptied  <- FAIL: test_a_budget_stop_removed_from_the_record_is_refuted (v2.test_v21_verify.RecordAlone.test_a_budget_stop_removed_from_the_record_is_refuted) | AssertionError
+[151] SURVIVED L198 string "the run's repository main is not the record's final main" emptied
+[153] KILLED   L95 string ': no readable run record (' emptied  <- FAIL: test_the_path_is_delimited_and_the_cause_class_is_a_token (v2.test_v21_kills3_A22.AnUnreadableRecordIsNamedByItsFileAndItsCause.test_the_path_is_delimited_and_the_cause_class_is_a_token) [absent] | AssertionError
+[154] SURVIVED L95 string ')' emptied
+[155] KILLED   L111 string 'files' emptied  <- ERROR: test_a_manifest_that_is_json_and_no_manifest_says_so (v2.test_v21_kills3_R01.TheManifestThatCannotBeUsedIsRefusedWithItsKindOfCause.test_a_manifest_that_is_json_and_no_manifest_says_so) (manifest='{"files": []}') | AttributeError
+[156] KILLED   L119 string 'an evidence file cannot be read (' emptied  <- FAIL: test_the_path_and_the_class_are_tokens_and_the_kind_of_failure_is_read (v2.test_v21_kills3_R01.AnEvidenceFileThatCannotBeReadIsNamedByItsPathAndTheClassOfTheFailure.test_the_path_and_the_class_are_tokens_and_the_kind_of_failure_is_read) | AssertionError
+[157] KILLED   L119 string '): ' emptied  <- FAIL: test_the_path_and_the_class_are_tokens_and_the_kind_of_failure_is_read (v2.test_v21_kills3_R01.AnEvidenceFileThatCannotBeReadIsNamedByItsPathAndTheClassOfTheFailure.test_the_path_and_the_class_are_tokens_and_the_kind_of_failure_is_read) | AssertionError
+[158] KILLED   L124 string 'the evidence manifest does not match the run directory: ' emptied  <- FAIL: test_a_changed_file_is_named_and_the_files_that_agree_are_not (v2.test_v21_kills3_T22a.ManifestProblemNamesTheFilesThatDiffer.test_a_changed_file_is_named_and_the_files_that_agree_are_not) | AssertionError
+[165] SURVIVED L157 string 'the journal ends in a torn line' emptied
+[167] KILLED   L178 string "the record's spend is not what the evidence re-derives for " emptied  <- FAIL: test_the_counter_that_differs_is_named_and_the_ones_that_agree_are_not (v2.test_v21_kills3_T22b.SpendLoweredAlone.test_the_counter_that_differs_is_named_and_the_ones_that_agree_are_not) | AssertionError
+[168] KILLED   L180 string 'story_errors' emptied  <- FAIL: test_a_record_field_of_another_type_is_refuted_never_a_crash (v2.test_v21_defects_verify.DamagedRunDirectory.test_a_record_field_of_another_type_is_refuted_never_a_crash) [story_errors a number] | AssertionError
+[169] KILLED   L190 Or swapped  <- FAIL: test_a_priced_run_verifies_and_its_cost_stays_known (v2.test_v21_kills3_T22b.PricedRun.test_a_priced_run_verifies_and_its_cost_stays_known) | AssertionError
+[172] SURVIVED L196 string 'repo' emptied
+[173] KILLED   L200 string 'the record cannot be re-derived from the evidence: ' emptied  <- FAIL: test_the_problem_says_the_record_the_class_and_the_message_apart (v2.test_v21_kills3_R01.ARecordThatCannotBeReDerivedNamesTheRecordTheClassAndTheMessage.test_the_problem_says_the_record_the_class_and_the_message_apart) | AssertionError
+[174] KILLED   L200 string ': ' emptied  <- FAIL: test_the_problem_says_the_record_the_class_and_the_message_apart (v2.test_v21_kills3_R01.ARecordThatCannotBeReDerivedNamesTheRecordTheClassAndTheMessage.test_the_problem_says_the_record_the_class_and_the_message_apart) | AssertionError
+[175] KILLED   L123 NotEq->Eq  <- FAIL: test_a_changed_file_is_named_and_the_files_that_agree_are_not (v2.test_v21_kills3_T22a.ManifestProblemNamesTheFilesThatDiffer.test_a_changed_file_is_named_and_the_files_that_agree_are_not) | AssertionError
+[176] KILLED   L144 string 'the journal RUN.json names cannot be read (' emptied  <- FAIL: test_a_journal_file_that_is_absent (v2.test_v21_kills3_T22b.JournalReferenceUnreadable.test_a_journal_file_that_is_absent) | AssertionError
+[177] SURVIVED L144 string ')' emptied
+[181] SURVIVED L185 string 'delivery_verdict' emptied
+[182] KILLED   L95 string 'RUN.json' emptied  <- FAIL: test_the_path_is_delimited_and_the_cause_class_is_a_token (v2.test_v21_kills3_A22.AnUnreadableRecordIsNamedByItsFileAndItsCause.test_the_path_is_delimited_and_the_cause_class_is_a_token) [absent] | AssertionError
+[188] SURVIVED L159 string 'the journal does not reconstruct: ' emptied
+[189] SURVIVED L159 string ': ' emptied
+[191] KILLED   L190 string 'settings' emptied  <- FAIL: test_a_priced_run_verifies_and_its_cost_stays_known (v2.test_v21_kills3_T22b.PricedRun.test_a_priced_run_verifies_and_its_cost_stays_known) | AssertionError
+[195] KILLED   L122 string 'files' emptied  <- FAIL: test_a_file_the_manifest_binds_and_the_directory_lacks_is_named (v2.test_v21_kills3_T22a.ManifestProblemNamesTheFilesThatDiffer.test_a_file_the_manifest_binds_and_the_directory_lacks_is_named) | AssertionError
+[196] KILLED   L122 string 'files' emptied  <- ERROR: test_a_changed_file_is_named_and_the_files_that_agree_are_not (v2.test_v21_kills3_T22a.ManifestProblemNamesTheFilesThatDiffer.test_a_changed_file_is_named_and_the_files_that_agree_are_not) | KeyError
+[197] KILLED   L123 string 'files' emptied  <- FAIL: test_a_changed_file_is_named_and_the_files_that_agree_are_not (v2.test_v21_kills3_T22a.ManifestProblemNamesTheFilesThatDiffer.test_a_changed_file_is_named_and_the_files_that_agree_are_not) | AssertionError
+[198] KILLED   L123 string 'files' emptied  <- ERROR: test_a_changed_file_is_named_and_the_files_that_agree_are_not (v2.test_v21_kills3_T22a.ManifestProblemNamesTheFilesThatDiffer.test_a_changed_file_is_named_and_the_files_that_agree_are_not) | KeyError
+# aisef2/app/verify.py::verify: 92 mutants run, {'SURVIVED': 35, 'KILLED': 57}; T0 [{'file': 'tests/v2/test_v21_kills3_A22.py', 'seconds': 0.77, 'outcome': 'PASS', 'ran': 7}, {'file': 'tests/v2/test_v21_kills3_R01.py', 'seconds': 0.57, 'outcome': 'PASS', 'ran': 8}, {'file': 'tests/v2/test_v21_kills3_T22a.py', 'seconds': 7.44, 'outcome': 'PASS', 'ran': 13}, {'file': 'tests/v2/test_v21_kills3_T22b.py', 'seconds': 13.5, 'outcome': 'PASS', 'ran': 10}, {'file': 'tests/v2/test_v21_defects_verify.py', 'seconds': 40.07, 'outcome': 'PASS', 'ran': 20}, {'file': 'tests/v2/test_v21_verify.py', 'seconds': 44.77, 'outcome': 'PASS', 'ran': 8}]; source_sha256 b30820f61194665ace24e317a06651334e86dc9fcb77e879b97450ee0514dc1b

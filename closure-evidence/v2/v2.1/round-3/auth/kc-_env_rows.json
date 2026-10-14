@@ -1,0 +1,81 @@
+{
+ "target": "validation/v2/cleanup_authority.py::_env_rows",
+ "files": [
+  "tests/v2/test_v21_r3_auth_ps_table.py",
+  "tests/v2/test_v21_r3_auth_other_readers.py"
+ ],
+ "source_sha256": "52bfcbdc60c362b8966dbbf414beba593eaf41330fce9d94c4809397bfbf6d5e",
+ "t0": [
+  {
+   "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+   "seconds": 0.68,
+   "outcome": "PASS",
+   "ran": 29
+  },
+  {
+   "file": "tests/v2/test_v21_r3_auth_other_readers.py",
+   "seconds": 1.62,
+   "outcome": "PASS",
+   "ran": 34
+  }
+ ],
+ "error": null,
+ "results": [
+  {
+   "index": 0,
+   "mutant": "L251 returns None",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_other_readers.py",
+   "first": "ERROR: test_a_line_that_is_no_row_or_a_pid_twice_or_a_failed_ps_refuses_the_reading (v2.test_v21_r3_auth_other_readers.Carriers.test_a_line_that_is_no_row_or_a_pid_twice_or_a_failed_ps_refuses_the_reading) [exit 0, without itself] | TypeError"
+  },
+  {
+   "index": 1,
+   "mutant": "L246 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_other_readers.py",
+   "first": "FAIL: test_a_line_that_is_no_row_or_a_pid_twice_or_a_failed_ps_refuses_the_reading (v2.test_v21_r3_auth_other_readers.Carriers.test_a_line_that_is_no_row_or_a_pid_twice_or_a_failed_ps_refuses_the_reading) [no row] | AssertionError"
+  },
+  {
+   "index": 2,
+   "mutant": "L248 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_other_readers.py",
+   "first": "FAIL: test_a_line_that_is_no_row_or_a_pid_twice_or_a_failed_ps_refuses_the_reading (v2.test_v21_r3_auth_other_readers.Carriers.test_a_line_that_is_no_row_or_a_pid_twice_or_a_failed_ps_refuses_the_reading) [no row] | AssertionError"
+  },
+  {
+   "index": 3,
+   "mutant": "L246 Is->IsNot",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_other_readers.py",
+   "first": "FAIL: test_a_line_that_is_no_row_or_a_pid_twice_or_a_failed_ps_refuses_the_reading (v2.test_v21_r3_auth_other_readers.Carriers.test_a_line_that_is_no_row_or_a_pid_twice_or_a_failed_ps_refuses_the_reading) [no row] | AssertionError"
+  },
+  {
+   "index": 4,
+   "mutant": "L248 In->NotIn",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_other_readers.py",
+   "first": "FAIL: test_a_line_that_is_no_row_or_a_pid_twice_or_a_failed_ps_refuses_the_reading (v2.test_v21_r3_auth_other_readers.Carriers.test_a_line_that_is_no_row_or_a_pid_twice_or_a_failed_ps_refuses_the_reading) [no row] | AssertionError"
+  },
+  {
+   "index": 5,
+   "mutant": "L250 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_other_readers.py",
+   "first": "FAIL: test_a_process_whose_environment_holds_the_token_is_a_candidate (v2.test_v21_r3_auth_other_readers.Carriers.test_a_process_whose_environment_holds_the_token_is_a_candidate) | AssertionError"
+  },
+  {
+   "index": 6,
+   "mutant": "L247 string 'ps -E' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_other_readers.py",
+   "first": "FAIL: test_a_line_that_is_no_row_or_a_pid_twice_or_a_failed_ps_refuses_the_reading (v2.test_v21_r3_auth_other_readers.Carriers.test_a_line_that_is_no_row_or_a_pid_twice_or_a_failed_ps_refuses_the_reading) [no row] | AssertionError"
+  },
+  {
+   "index": 7,
+   "mutant": "L249 string 'ps -E' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_other_readers.py",
+   "first": "FAIL: test_a_line_that_is_no_row_or_a_pid_twice_or_a_failed_ps_refuses_the_reading (v2.test_v21_r3_auth_other_readers.Carriers.test_a_line_that_is_no_row_or_a_pid_twice_or_a_failed_ps_refuses_the_reading) [a pid twice] | AssertionError"
+  }
+ ]
+}

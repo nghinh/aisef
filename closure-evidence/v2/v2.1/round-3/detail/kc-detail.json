@@ -1,0 +1,697 @@
+{
+ "target": "aisef2/app/review_verify.py::detail",
+ "files": [
+  "tests/v2/test_v21_r3_detail_statement.py",
+  "tests/v2/test_v21_r3_detail_artifact.py"
+ ],
+ "source_sha256": "cf0c889e598f7ec6b9b6fac13b26b6bb73d7eb03100e025d42e29eaf528ce1ee",
+ "t0": [
+  {
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "seconds": 6.36,
+   "outcome": "PASS",
+   "ran": 35
+  },
+  {
+   "file": "tests/v2/test_v21_r3_detail_artifact.py",
+   "seconds": 2.26,
+   "outcome": "PASS",
+   "ran": 31
+  }
+ ],
+ "error": null,
+ "results": [
+  {
+   "index": 0,
+   "mutant": "L374 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_short_finding_is_stated_whole_and_nothing_is_marked (v2.test_v21_r3_detail_statement.TheStatementIsBoundedByConstruction.test_a_short_finding_is_stated_whole_and_nothing_is_marked) | AssertionError"
+  },
+  {
+   "index": 1,
+   "mutant": "L376 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_secret_is_replaced_wherever_the_statement_carries_prose_of_the_reviewer_or_the_probe (v2.test_v21_r3_detail_statement.SecretsAreOutBeforeAnythingIsCut.test_a_secret_is_replaced_wherever_the_statement_carries_prose_of_the_reviewer_or_the_probe) | KeyError"
+  },
+  {
+   "index": 2,
+   "mutant": "L379 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_secret_is_replaced_wherever_the_statement_carries_prose_of_the_reviewer_or_the_probe (v2.test_v21_r3_detail_statement.SecretsAreOutBeforeAnythingIsCut.test_a_secret_is_replaced_wherever_the_statement_carries_prose_of_the_reviewer_or_the_probe) | AttributeError"
+  },
+  {
+   "index": 3,
+   "mutant": "L384 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='dict') | AssertionError"
+  },
+  {
+   "index": 4,
+   "mutant": "L398 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='dict') | AssertionError"
+  },
+  {
+   "index": 5,
+   "mutant": "L400 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_secret_straddling_a_decisive_fields_own_bound_is_not_half_leaked (v2.test_v21_r3_detail_statement.SecretsAreOutBeforeAnythingIsCut.test_a_secret_straddling_a_decisive_fields_own_bound_is_not_half_leaked) (field='why', pad=147) | AssertionError"
+  },
+  {
+   "index": 6,
+   "mutant": "L402 returns None",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='dict') | TypeError"
+  },
+  {
+   "index": 7,
+   "mutant": "L360 returns None",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='dict') | AttributeError"
+  },
+  {
+   "index": 8,
+   "mutant": "L361 conditional negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='dict') | AssertionError"
+  },
+  {
+   "index": 9,
+   "mutant": "L366 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_secret_straddling_a_decisive_fields_own_bound_is_not_half_leaked (v2.test_v21_r3_detail_statement.SecretsAreOutBeforeAnythingIsCut.test_a_secret_straddling_a_decisive_fields_own_bound_is_not_half_leaked) (field='why', pad=147) | AssertionError"
+  },
+  {
+   "index": 10,
+   "mutant": "L368 returns None",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_secret_is_replaced_wherever_the_statement_carries_prose_of_the_reviewer_or_the_probe (v2.test_v21_r3_detail_statement.SecretsAreOutBeforeAnythingIsCut.test_a_secret_is_replaced_wherever_the_statement_carries_prose_of_the_reviewer_or_the_probe) | AssertionError"
+  },
+  {
+   "index": 11,
+   "mutant": "L370 dict entry 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_secret_is_replaced_wherever_the_statement_carries_prose_of_the_reviewer_or_the_probe (v2.test_v21_r3_detail_statement.SecretsAreOutBeforeAnythingIsCut.test_a_secret_is_replaced_wherever_the_statement_carries_prose_of_the_reviewer_or_the_probe) | KeyError"
+  },
+  {
+   "index": 12,
+   "mutant": "L370 dict entry 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_short_finding_is_stated_whole_and_nothing_is_marked (v2.test_v21_r3_detail_statement.TheStatementIsBoundedByConstruction.test_a_short_finding_is_stated_whole_and_nothing_is_marked) | AssertionError"
+  },
+  {
+   "index": 13,
+   "mutant": "L370 dict entry 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_short_finding_is_stated_whole_and_nothing_is_marked (v2.test_v21_r3_detail_statement.TheStatementIsBoundedByConstruction.test_a_short_finding_is_stated_whole_and_nothing_is_marked) | AssertionError"
+  },
+  {
+   "index": 14,
+   "mutant": "L370 dict entry 3 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_short_finding_is_stated_whole_and_nothing_is_marked (v2.test_v21_r3_detail_statement.TheStatementIsBoundedByConstruction.test_a_short_finding_is_stated_whole_and_nothing_is_marked) | AssertionError"
+  },
+  {
+   "index": 15,
+   "mutant": "L370 dict entry 4 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_secret_is_replaced_wherever_the_statement_carries_prose_of_the_reviewer_or_the_probe (v2.test_v21_r3_detail_statement.SecretsAreOutBeforeAnythingIsCut.test_a_secret_is_replaced_wherever_the_statement_carries_prose_of_the_reviewer_or_the_probe) | KeyError"
+  },
+  {
+   "index": 16,
+   "mutant": "L374 IsNot->Is",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_short_finding_is_stated_whole_and_nothing_is_marked (v2.test_v21_r3_detail_statement.TheStatementIsBoundedByConstruction.test_a_short_finding_is_stated_whole_and_nothing_is_marked) | AssertionError"
+  },
+  {
+   "index": 17,
+   "mutant": "L381 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_secret_is_replaced_wherever_the_statement_carries_prose_of_the_reviewer_or_the_probe (v2.test_v21_r3_detail_statement.SecretsAreOutBeforeAnythingIsCut.test_a_secret_is_replaced_wherever_the_statement_carries_prose_of_the_reviewer_or_the_probe) | KeyError"
+  },
+  {
+   "index": 18,
+   "mutant": "L383 dict entry 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='dict') | KeyError"
+  },
+  {
+   "index": 19,
+   "mutant": "L386 dict entry 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_the_bound_holds_for_a_seeded_sweep_of_adversarial_findings (v2.test_v21_r3_detail_statement.TheStatementIsBoundedByConstruction.test_the_bound_holds_for_a_seeded_sweep_of_adversarial_findings) | AssertionError"
+  },
+  {
+   "index": 20,
+   "mutant": "L386 dict entry 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_several_huge_fields_share_what_is_left_and_all_are_marked (v2.test_v21_r3_detail_statement.TheStatementIsBoundedByConstruction.test_several_huge_fields_share_what_is_left_and_all_are_marked) | AssertionError"
+  },
+  {
+   "index": 21,
+   "mutant": "L386 dict entry 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='dict') | KeyError"
+  },
+  {
+   "index": 22,
+   "mutant": "L389 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='dict') | ValueError"
+  },
+  {
+   "index": 23,
+   "mutant": "L389 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='dict') | ValueError"
+  },
+  {
+   "index": 24,
+   "mutant": "L389 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='dict') | ValueError"
+  },
+  {
+   "index": 25,
+   "mutant": "L389 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='dict') | ValueError"
+  },
+  {
+   "index": 26,
+   "mutant": "L390 sorted() -> list()",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='dict') | TypeError"
+  },
+  {
+   "index": 27,
+   "mutant": "L393 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='dict') | AssertionError"
+  },
+  {
+   "index": 28,
+   "mutant": "L400 not removed",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='dict') | TypeError"
+  },
+  {
+   "index": 29,
+   "mutant": "L365 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='dict') | ValueError"
+  },
+  {
+   "index": 30,
+   "mutant": "L365 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='dict') | ValueError"
+  },
+  {
+   "index": 31,
+   "mutant": "L369 string 'clause' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_short_finding_is_stated_whole_and_nothing_is_marked (v2.test_v21_r3_detail_statement.TheStatementIsBoundedByConstruction.test_a_short_finding_is_stated_whole_and_nothing_is_marked) | AssertionError"
+  },
+  {
+   "index": 32,
+   "mutant": "L370 string 'finding' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_secret_is_replaced_wherever_the_statement_carries_prose_of_the_reviewer_or_the_probe (v2.test_v21_r3_detail_statement.SecretsAreOutBeforeAnythingIsCut.test_a_secret_is_replaced_wherever_the_statement_carries_prose_of_the_reviewer_or_the_probe) | KeyError"
+  },
+  {
+   "index": 33,
+   "mutant": "L370 string 'severity' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_short_finding_is_stated_whole_and_nothing_is_marked (v2.test_v21_r3_detail_statement.TheStatementIsBoundedByConstruction.test_a_short_finding_is_stated_whole_and_nothing_is_marked) | AssertionError"
+  },
+  {
+   "index": 34,
+   "mutant": "L371 string 'clause' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_short_finding_is_stated_whole_and_nothing_is_marked (v2.test_v21_r3_detail_statement.TheStatementIsBoundedByConstruction.test_a_short_finding_is_stated_whole_and_nothing_is_marked) | AssertionError"
+  },
+  {
+   "index": 35,
+   "mutant": "L373 string 'verification' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_short_finding_is_stated_whole_and_nothing_is_marked (v2.test_v21_r3_detail_statement.TheStatementIsBoundedByConstruction.test_a_short_finding_is_stated_whole_and_nothing_is_marked) | AssertionError"
+  },
+  {
+   "index": 36,
+   "mutant": "L373 string 'why' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_secret_is_replaced_wherever_the_statement_carries_prose_of_the_reviewer_or_the_probe (v2.test_v21_r3_detail_statement.SecretsAreOutBeforeAnythingIsCut.test_a_secret_is_replaced_wherever_the_statement_carries_prose_of_the_reviewer_or_the_probe) | KeyError"
+  },
+  {
+   "index": 37,
+   "mutant": "L371 conditional negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_short_finding_is_stated_whole_and_nothing_is_marked (v2.test_v21_r3_detail_statement.TheStatementIsBoundedByConstruction.test_a_short_finding_is_stated_whole_and_nothing_is_marked) | AssertionError"
+  },
+  {
+   "index": 38,
+   "mutant": "L380 dict entry 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_short_finding_is_stated_whole_and_nothing_is_marked (v2.test_v21_r3_detail_statement.TheStatementIsBoundedByConstruction.test_a_short_finding_is_stated_whole_and_nothing_is_marked) | AssertionError"
+  },
+  {
+   "index": 39,
+   "mutant": "L380 dict entry 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_short_finding_is_stated_whole_and_nothing_is_marked (v2.test_v21_r3_detail_statement.TheStatementIsBoundedByConstruction.test_a_short_finding_is_stated_whole_and_nothing_is_marked) | AssertionError"
+  },
+  {
+   "index": 40,
+   "mutant": "L380 dict entry 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_short_finding_is_stated_whole_and_nothing_is_marked (v2.test_v21_r3_detail_statement.TheStatementIsBoundedByConstruction.test_a_short_finding_is_stated_whole_and_nothing_is_marked) | AssertionError"
+  },
+  {
+   "index": 41,
+   "mutant": "L381 IsNot->Is",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_secret_is_replaced_wherever_the_statement_carries_prose_of_the_reviewer_or_the_probe (v2.test_v21_r3_detail_statement.SecretsAreOutBeforeAnythingIsCut.test_a_secret_is_replaced_wherever_the_statement_carries_prose_of_the_reviewer_or_the_probe) | KeyError"
+  },
+  {
+   "index": 42,
+   "mutant": "L383 string 'summary' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='dict') | KeyError"
+  },
+  {
+   "index": 43,
+   "mutant": "L386 string 'summary' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_short_finding_is_stated_whole_and_nothing_is_marked (v2.test_v21_r3_detail_statement.TheStatementIsBoundedByConstruction.test_a_short_finding_is_stated_whole_and_nothing_is_marked) | AssertionError"
+  },
+  {
+   "index": 44,
+   "mutant": "L386 string 'reproducer' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_short_finding_is_stated_whole_and_nothing_is_marked (v2.test_v21_r3_detail_statement.TheStatementIsBoundedByConstruction.test_a_short_finding_is_stated_whole_and_nothing_is_marked) | AssertionError"
+  },
+  {
+   "index": 45,
+   "mutant": "L386 string 'elided' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='dict') | KeyError"
+  },
+  {
+   "index": 46,
+   "mutant": "L386 Or swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_the_bound_holds_for_a_seeded_sweep_of_adversarial_findings (v2.test_v21_r3_detail_statement.TheStatementIsBoundedByConstruction.test_the_bound_holds_for_a_seeded_sweep_of_adversarial_findings) | AssertionError"
+  },
+  {
+   "index": 47,
+   "mutant": "L392 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='dict') | ValueError"
+  },
+  {
+   "index": 48,
+   "mutant": "L392 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='dict') | ValueError"
+  },
+  {
+   "index": 49,
+   "mutant": "L392 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='dict') | ValueError"
+  },
+  {
+   "index": 50,
+   "mutant": "L392 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='dict') | ValueError"
+  },
+  {
+   "index": 51,
+   "mutant": "L393 LtE->Gt",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='dict') | AssertionError"
+  },
+  {
+   "index": 52,
+   "mutant": "L397 string 'summary' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_the_longest_secret_goes_first_and_an_empty_or_missing_one_is_ignored (v2.test_v21_r3_detail_statement.SecretsAreOutBeforeAnythingIsCut.test_the_longest_secret_goes_first_and_an_empty_or_missing_one_is_ignored) | AssertionError"
+  },
+  {
+   "index": 53,
+   "mutant": "L397 string 'summary' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='dict') | KeyError"
+  },
+  {
+   "index": 54,
+   "mutant": "L370 string 'finding' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_secret_straddling_a_decisive_fields_own_bound_is_not_half_leaked (v2.test_v21_r3_detail_statement.SecretsAreOutBeforeAnythingIsCut.test_a_secret_straddling_a_decisive_fields_own_bound_is_not_half_leaked) (field='finding', pad=47) | AssertionError"
+  },
+  {
+   "index": 55,
+   "mutant": "L371 Is->IsNot",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_short_finding_is_stated_whole_and_nothing_is_marked (v2.test_v21_r3_detail_statement.TheStatementIsBoundedByConstruction.test_a_short_finding_is_stated_whole_and_nothing_is_marked) | AssertionError"
+  },
+  {
+   "index": 56,
+   "mutant": "L373 string 'verification' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_each_decisive_field_is_cut_at_its_own_bound_and_marked_exactly (v2.test_v21_r3_detail_statement.TheStatementIsBoundedByConstruction.test_each_decisive_field_is_cut_at_its_own_bound_and_marked_exactly) (name='verification', width=1) | AssertionError"
+  },
+  {
+   "index": 57,
+   "mutant": "L373 string 'why' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_secret_straddling_a_decisive_fields_own_bound_is_not_half_leaked (v2.test_v21_r3_detail_statement.SecretsAreOutBeforeAnythingIsCut.test_a_secret_straddling_a_decisive_fields_own_bound_is_not_half_leaked) (field='why', pad=147) | AssertionError"
+  },
+  {
+   "index": 58,
+   "mutant": "L375 string 'observed' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_short_finding_is_stated_whole_and_nothing_is_marked (v2.test_v21_r3_detail_statement.TheStatementIsBoundedByConstruction.test_a_short_finding_is_stated_whole_and_nothing_is_marked) | AssertionError"
+  },
+  {
+   "index": 59,
+   "mutant": "L375 string 'observed' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_each_decisive_field_is_cut_at_its_own_bound_and_marked_exactly (v2.test_v21_r3_detail_statement.TheStatementIsBoundedByConstruction.test_each_decisive_field_is_cut_at_its_own_bound_and_marked_exactly) (name='observed', width=1) | AssertionError"
+  },
+  {
+   "index": 60,
+   "mutant": "L377 string 'anchor' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_short_finding_is_stated_whole_and_nothing_is_marked (v2.test_v21_r3_detail_statement.TheStatementIsBoundedByConstruction.test_a_short_finding_is_stated_whole_and_nothing_is_marked) | AssertionError"
+  },
+  {
+   "index": 61,
+   "mutant": "L377 string 'anchor' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_each_decisive_field_is_cut_at_its_own_bound_and_marked_exactly (v2.test_v21_r3_detail_statement.TheStatementIsBoundedByConstruction.test_each_decisive_field_is_cut_at_its_own_bound_and_marked_exactly) (name='anchor', width=1) | AssertionError"
+  },
+  {
+   "index": 62,
+   "mutant": "L378 string 'anchor_why' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_secret_is_replaced_wherever_the_statement_carries_prose_of_the_reviewer_or_the_probe (v2.test_v21_r3_detail_statement.SecretsAreOutBeforeAnythingIsCut.test_a_secret_is_replaced_wherever_the_statement_carries_prose_of_the_reviewer_or_the_probe) | KeyError"
+  },
+  {
+   "index": 63,
+   "mutant": "L378 string 'anchor_why' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_secret_straddling_a_decisive_fields_own_bound_is_not_half_leaked (v2.test_v21_r3_detail_statement.SecretsAreOutBeforeAnythingIsCut.test_a_secret_straddling_a_decisive_fields_own_bound_is_not_half_leaked) (field='anchor_why', pad=147) | AssertionError"
+  },
+  {
+   "index": 64,
+   "mutant": "L380 string 'artifact' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_short_finding_is_stated_whole_and_nothing_is_marked (v2.test_v21_r3_detail_statement.TheStatementIsBoundedByConstruction.test_a_short_finding_is_stated_whole_and_nothing_is_marked) | AssertionError"
+  },
+  {
+   "index": 65,
+   "mutant": "L380 string 'path' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_short_finding_is_stated_whole_and_nothing_is_marked (v2.test_v21_r3_detail_statement.TheStatementIsBoundedByConstruction.test_a_short_finding_is_stated_whole_and_nothing_is_marked) | AssertionError"
+  },
+  {
+   "index": 66,
+   "mutant": "L380 string 'sha256' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_short_finding_is_stated_whole_and_nothing_is_marked (v2.test_v21_r3_detail_statement.TheStatementIsBoundedByConstruction.test_a_short_finding_is_stated_whole_and_nothing_is_marked) | AssertionError"
+  },
+  {
+   "index": 67,
+   "mutant": "L380 string 'bytes' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_short_finding_is_stated_whole_and_nothing_is_marked (v2.test_v21_r3_detail_statement.TheStatementIsBoundedByConstruction.test_a_short_finding_is_stated_whole_and_nothing_is_marked) | AssertionError"
+  },
+  {
+   "index": 68,
+   "mutant": "L382 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_secret_is_replaced_wherever_the_statement_carries_prose_of_the_reviewer_or_the_probe (v2.test_v21_r3_detail_statement.SecretsAreOutBeforeAnythingIsCut.test_a_secret_is_replaced_wherever_the_statement_carries_prose_of_the_reviewer_or_the_probe) | ValueError"
+  },
+  {
+   "index": 69,
+   "mutant": "L382 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_secret_is_replaced_wherever_the_statement_carries_prose_of_the_reviewer_or_the_probe (v2.test_v21_r3_detail_statement.SecretsAreOutBeforeAnythingIsCut.test_a_secret_is_replaced_wherever_the_statement_carries_prose_of_the_reviewer_or_the_probe) | ValueError"
+  },
+  {
+   "index": 70,
+   "mutant": "L382 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_secret_is_replaced_wherever_the_statement_carries_prose_of_the_reviewer_or_the_probe (v2.test_v21_r3_detail_statement.SecretsAreOutBeforeAnythingIsCut.test_a_secret_is_replaced_wherever_the_statement_carries_prose_of_the_reviewer_or_the_probe) | ValueError"
+  },
+  {
+   "index": 71,
+   "mutant": "L382 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_secret_is_replaced_wherever_the_statement_carries_prose_of_the_reviewer_or_the_probe (v2.test_v21_r3_detail_statement.SecretsAreOutBeforeAnythingIsCut.test_a_secret_is_replaced_wherever_the_statement_carries_prose_of_the_reviewer_or_the_probe) | ValueError"
+  },
+  {
+   "index": 72,
+   "mutant": "L388 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='dict') | ValueError"
+  },
+  {
+   "index": 73,
+   "mutant": "L388 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='dict') | ValueError"
+  },
+  {
+   "index": 74,
+   "mutant": "L396 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_secret_that_straddles_the_cut_is_not_half_leaked (v2.test_v21_r3_detail_statement.SecretsAreOutBeforeAnythingIsCut.test_a_secret_that_straddles_the_cut_is_not_half_leaked) (pad=300) | ValueError"
+  },
+  {
+   "index": 75,
+   "mutant": "L396 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_secret_that_straddles_the_cut_is_not_half_leaked (v2.test_v21_r3_detail_statement.SecretsAreOutBeforeAnythingIsCut.test_a_secret_that_straddles_the_cut_is_not_half_leaked) (pad=300) | ValueError"
+  },
+  {
+   "index": 76,
+   "mutant": "L399 string 'reproducer' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_secret_is_replaced_wherever_the_statement_carries_prose_of_the_reviewer_or_the_probe (v2.test_v21_r3_detail_statement.SecretsAreOutBeforeAnythingIsCut.test_a_secret_is_replaced_wherever_the_statement_carries_prose_of_the_reviewer_or_the_probe) | TypeError"
+  },
+  {
+   "index": 77,
+   "mutant": "L401 string 'elided' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='dict') | KeyError"
+  },
+  {
+   "index": 78,
+   "mutant": "L361 string 'reproducer' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='dict') | AssertionError"
+  },
+  {
+   "index": 79,
+   "mutant": "L361 string 'reproducer' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='dict') | KeyError"
+  },
+  {
+   "index": 80,
+   "mutant": "L370 string 'id' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_secret_is_replaced_wherever_the_statement_carries_prose_of_the_reviewer_or_the_probe (v2.test_v21_r3_detail_statement.SecretsAreOutBeforeAnythingIsCut.test_a_secret_is_replaced_wherever_the_statement_carries_prose_of_the_reviewer_or_the_probe) | AssertionError"
+  },
+  {
+   "index": 81,
+   "mutant": "L371 string 'clause' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_each_decisive_field_is_cut_at_its_own_bound_and_marked_exactly (v2.test_v21_r3_detail_statement.TheStatementIsBoundedByConstruction.test_each_decisive_field_is_cut_at_its_own_bound_and_marked_exactly) (name='clause', width=1) | AssertionError"
+  },
+  {
+   "index": 82,
+   "mutant": "L371 conditional negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_short_finding_is_stated_whole_and_nothing_is_marked (v2.test_v21_r3_detail_statement.TheStatementIsBoundedByConstruction.test_a_short_finding_is_stated_whole_and_nothing_is_marked) | AssertionError"
+  },
+  {
+   "index": 83,
+   "mutant": "L385 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_short_finding_is_stated_whole_and_nothing_is_marked (v2.test_v21_r3_detail_statement.TheStatementIsBoundedByConstruction.test_a_short_finding_is_stated_whole_and_nothing_is_marked) | AssertionError"
+  },
+  {
+   "index": 84,
+   "mutant": "L385 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='dict') | AssertionError"
+  },
+  {
+   "index": 85,
+   "mutant": "L385 element 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_short_finding_is_stated_whole_and_nothing_is_marked (v2.test_v21_r3_detail_statement.TheStatementIsBoundedByConstruction.test_a_short_finding_is_stated_whole_and_nothing_is_marked) | AssertionError"
+  },
+  {
+   "index": 86,
+   "mutant": "L396 conditional negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_secret_that_straddles_the_cut_is_not_half_leaked (v2.test_v21_r3_detail_statement.SecretsAreOutBeforeAnythingIsCut.test_a_secret_that_straddles_the_cut_is_not_half_leaked) (pad=300) | AssertionError"
+  },
+  {
+   "index": 87,
+   "mutant": "L382 string 'artifact' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_each_decisive_field_is_cut_at_its_own_bound_and_marked_exactly (v2.test_v21_r3_detail_statement.TheStatementIsBoundedByConstruction.test_each_decisive_field_is_cut_at_its_own_bound_and_marked_exactly) (name='artifact_why', width=1) | KeyError"
+  },
+  {
+   "index": 88,
+   "mutant": "L382 string 'artifact_why' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: test_a_secret_is_replaced_wherever_the_statement_carries_prose_of_the_reviewer_or_the_probe (v2.test_v21_r3_detail_statement.SecretsAreOutBeforeAnythingIsCut.test_a_secret_is_replaced_wherever_the_statement_carries_prose_of_the_reviewer_or_the_probe) | KeyError"
+  },
+  {
+   "index": 89,
+   "mutant": "L382 string 'artifact_why' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_each_decisive_field_is_cut_at_its_own_bound_and_marked_exactly (v2.test_v21_r3_detail_statement.TheStatementIsBoundedByConstruction.test_each_decisive_field_is_cut_at_its_own_bound_and_marked_exactly) (name='artifact_why', width=1) | AssertionError"
+  },
+  {
+   "index": 90,
+   "mutant": "L383 string 'summary' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_the_longest_secret_goes_first_and_an_empty_or_missing_one_is_ignored (v2.test_v21_r3_detail_statement.SecretsAreOutBeforeAnythingIsCut.test_the_longest_secret_goes_first_and_an_empty_or_missing_one_is_ignored) | AssertionError"
+  },
+  {
+   "index": 91,
+   "mutant": "L385 string 'subject' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_short_finding_is_stated_whole_and_nothing_is_marked (v2.test_v21_r3_detail_statement.TheStatementIsBoundedByConstruction.test_a_short_finding_is_stated_whole_and_nothing_is_marked) | AssertionError"
+  },
+  {
+   "index": 92,
+   "mutant": "L385 string 'stimulus' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker (v2.test_v21_r3_detail_statement.DeepStructures.test_a_deep_structure_in_a_reproducer_is_stated_with_the_marker) (kind='dict') | AssertionError"
+  },
+  {
+   "index": 93,
+   "mutant": "L385 string 'observable' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_short_finding_is_stated_whole_and_nothing_is_marked (v2.test_v21_r3_detail_statement.TheStatementIsBoundedByConstruction.test_a_short_finding_is_stated_whole_and_nothing_is_marked) | AssertionError"
+  },
+  {
+   "index": 94,
+   "mutant": "L386 NotEq->Eq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_the_bound_holds_for_a_seeded_sweep_of_adversarial_findings (v2.test_v21_r3_detail_statement.TheStatementIsBoundedByConstruction.test_the_bound_holds_for_a_seeded_sweep_of_adversarial_findings) | AssertionError"
+  },
+  {
+   "index": 95,
+   "mutant": "L386 string 'summary' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_finding_without_a_reproducer_states_none_and_a_whole_summary (v2.test_v21_r3_detail_statement.WhatIsStatedAndHowItIsMarked.test_a_finding_without_a_reproducer_states_none_and_a_whole_summary) | AssertionError"
+  }
+ ]
+}

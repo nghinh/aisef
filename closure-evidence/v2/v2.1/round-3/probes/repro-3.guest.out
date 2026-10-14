@@ -1,0 +1,19 @@
+interpreter: 3.14.8 linux  file_artifact EXECUTION_DIGEST 833be030fb7f
+ast.parse('x = 1' + '+1'*N): largest N parsed in the sweep = 20000 ; first failing N = 50000
+ast.parse N=100000 raises: RecursionError Stack overflow (used 8160 kB) during compilation
+
+valid, nested too deep             repo 
+      observe RAISED RecursionError: Stack overflow (used 8160 kB) during compilation
+      run_probe RAISED RecursionError: Stack overflow (used 8160 kB) during compilation
+valid, nested too deep             plain
+      observe RAISED RecursionError: Stack overflow (used 8160 kB) during compilation
+      run_probe RAISED RecursionError: Stack overflow (used 8160 kB) during compilation
+control: syntax error              repo 
+      observe -> OBSERVED REFUTED ab06da2", "path": "pkg", "mode": "040000", "present": true, "unparsable": "pkg/deep.py:2"}
+      run_probe -> Executed(behavior_verdict=<BehaviorVerdict.REFUTED: 'REFUTED'>, reason=None)
+control: NUL byte                  repo 
+      observe -> OBSERVED REFUTED 07b7", "path": "pkg", "mode": "040000", "present": true, "unparsable": "pkg/deep.py:None"}
+      run_probe -> Executed(behavior_verdict=<BehaviorVerdict.REFUTED: 'REFUTED'>, reason=None)
+control: parses, one import        repo 
+      observe -> OBSERVED REFUTED "matches": 1, "locations": [["pkg/deep.py", 2, ["requests"]]], "stdlib_of": "python 3.14"}
+      run_probe -> Executed(behavior_verdict=<BehaviorVerdict.REFUTED: 'REFUTED'>, reason=None)

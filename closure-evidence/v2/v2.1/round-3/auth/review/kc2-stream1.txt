@@ -1,0 +1,3 @@
+_ps_rows exit=0 # validation/v2/cleanup_authority.py::_ps_rows: 25 mutants run, {'KILLED': 25}; T0 [{'file': 'tests/v2/test_v21_r3_auth_ps_table.py', 'seconds': 0.71, 'outcome': 'PASS', 'ran': 30}, {'file': 'tests/v2/test_v21_r3_auth_ot
+_env_rows exit=1 # validation/v2/cleanup_authority.py::_env_rows: 8 mutants run, {'NOT_RUN': 8}; T0 [{'file': 'tests/v2/test_v21_r3_auth_ps_table.py', 'seconds': 0.87, 'outcome': 'PASS', 'ran': 30}, {'file': 'tests/v2/test_v21_r3_auth_ot
+_win_rows exit=1 # validation/v2/cleanup_authority.py::_win_rows: 15 mutants run, {'NOT_RUN': 15}; T0 [{'file': 'tests/v2/test_v21_r3_auth_ps_table.py', 'seconds': 0.84, 'outcome': 'PASS', 'ran': 30}, {'file': 'tests/v2/test_v21_r3_auth_

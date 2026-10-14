@@ -1,0 +1,3 @@
+probe static checks (validation/v2/probe_static_checks.py --check), macOS 3.14.7:
+  BASE (aisef2 of v21r3/probes): probe static checks: PASS (6 rules)
+  the three first-pass sketches applied: probe static checks: PASS (6 rules)

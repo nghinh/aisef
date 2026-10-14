@@ -1,0 +1,10 @@
+#!/bin/zsh
+# runexp.sh VARIANT_FILE [TEST_MODULE...] : copy exp tree, overlay VARIANT_FILE as process_range.py, run the contract tests
+SP=/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad
+OUT=$SP/m21/r3/out/range/review
+V=$1; shift
+if [[ $# -eq 0 ]]; then set -- tests.v2.test_v21_r3_range_release_contract; fi
+T=$OUT/exp-run/$(basename $V .py); rm -rf $T; mkdir -p $T
+cp -R $OUT/exp/. $T/
+cp $V $T/aisef2/runtime/process_range.py
+cd $T && $SP/m21/kills3/py.sh range-rv-exp -m unittest "$@" 2>&1 | grep -E "^(FAIL|ERROR|Ran|OK|FAILED)" | sed -e 's/ (tests.*//'

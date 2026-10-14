@@ -1,0 +1,48 @@
+"""Reproduction through the real entry points, no real client: a fake client process (a script run by its shebang) writes
+a session stream the way JavaScript's JSON.stringify does (U+2028/U+2029/U+0085 raw). Shows, for a text event that holds
+a separator and for the same text with a space: what `client.session` returns, the budget's spend, the usage account and
+what the model reviewer finds. usage: python3 -B -I this.txt TREE   (POSIX; TREE a checkout)"""
+import json
+import os
+import pathlib
+import sys
+import tempfile
+import types
+
+tree = pathlib.Path(sys.argv[1]).resolve()
+sys.path.insert(0, str(tree))
+from aisef2.app import adapters as ad  # noqa: E402
+from aisef2.app import bundle, client, usage  # noqa: E402
+from aisef2.arch.enums import ControlProjection  # noqa: E402
+from tests.v2 import test_app_run as e2e  # noqa: E402
+
+CLIENT = """import json, pathlib, sys
+for ev in json.loads((pathlib.Path(__file__).parent / "events.json").read_text(encoding="utf-8")):
+    sys.stdout.buffer.write(json.dumps(ev, ensure_ascii=False).encode("utf-8") + b"\\n")
+"""
+LIMITS = {"provider_requests": 99, "turns": 99, "input_tokens": 9999, "output_tokens": 9999}
+step = {"type": "step_finish", "part": {"tokens": {"input": 7, "output": 3}}}
+
+with tempfile.TemporaryDirectory() as d:
+    root = pathlib.Path(os.path.realpath(d))
+    e2e.make_repo(root / "repo")
+    project = bundle.load(e2e.project_bundle("a" * 40))
+    run = types.SimpleNamespace(events=[], state=lambda p: {"S1": {"attempt": 1}} if p is ControlProjection.STORY_STATE else None)
+    for label, sep in (("U+2028", " "), ("U+2029", " "), ("U+0085", "\u0085"), ("space", " ")):
+        w = root / label.replace("+", "")
+        (w / "bin").mkdir(parents=True)
+        exe = w / "bin" / "client"
+        exe.write_text(f"#!{sys.executable}\n" + CLIENT, encoding="utf-8")
+        exe.chmod(0o755)
+        findings = json.dumps({"findings": [{"id": "F1", "blocking": True, "severity": "high", "summary": f"a{sep}b",
+                                             "reproducer": None}]}, ensure_ascii=False)
+        (w / "bin" / "events.json").write_text(json.dumps([{"type": "text", "part": {"text": findings}}, step]), encoding="utf-8")
+        budget = client.Budget(LIMITS, dict.fromkeys(LIMITS, 0), w / "logs", lambda: 1)
+        kw = {"model": "p/m", "env": {"PATH": ""}, "budget": budget, "turn_cap": 5, "exe": str(exe)}
+        rev = ad.Reviewer(run, project, w / "logs", kw, 60)
+        found, s, _ = rev._model(types.SimpleNamespace(story_id="S1", root=str(root / "repo")), 1)
+        log = w / "logs" / s["log"]
+        spend = budget.spend()
+        print(f"{label:7} stream_has_it={sep.encode() in log.read_bytes()!s:5} session: text_chars={len(s['text']):3} turns={s['turns']} "
+              f"tokens={s['tokens']} | budget: turns={spend['turns']} in={spend['input_tokens']} unaccounted={spend['unaccounted']} "
+              f"| usage: {usage.session_tokens(log)['steps']} steps | reviewer: found={[f['id'] for f in found]} parsed={s['parsed']}")

@@ -1,0 +1,33 @@
+{
+ "tag": "verdict-rebound-anchor",
+ "argv": [
+  "/usr/local/bin/python3",
+  "-B",
+  "-m",
+  "aisef",
+  "run",
+  "--verify",
+  "--project",
+  "/tmp/e2e/project/approved.json",
+  "--out",
+  "/tmp/e2e/S4/copy-verdict-rebound",
+  "--expect-anchor",
+  "70871cc78ef03462d3bdb0ca140279a5f03cd9aa9a4199df1340ef43ac26bf20"
+ ],
+ "cwd": "/tmp/e2e/S4",
+ "exit": 1,
+ "seconds": 0.6,
+ "stdout": "{\n \"delivery_verdict\": \"PASS\",\n \"evidence_anchor\": \"7c1f48f0bb17f70142cbb54975fd96a4d08862f579599356e7a20959e73487e8\",\n \"journal_events\": 106,\n \"notes\": [],\n \"problems\": [\n  \"the evidence anchor is 7c1f48f0bb17, not the 70871cc78ef0 the run printed\",\n  \"the record says FAIL; the journal re-derives PASS\"\n ],\n \"verdict\": \"REFUTED\"\n}\n",
+ "stderr": "",
+ "json": {
+  "delivery_verdict": "PASS",
+  "evidence_anchor": "7c1f48f0bb17f70142cbb54975fd96a4d08862f579599356e7a20959e73487e8",
+  "journal_events": 106,
+  "notes": [],
+  "problems": [
+   "the evidence anchor is 7c1f48f0bb17, not the 70871cc78ef0 the run printed",
+   "the record says FAIL; the journal re-derives PASS"
+  ],
+  "verdict": "REFUTED"
+ }
+}

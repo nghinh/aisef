@@ -1,0 +1,88 @@
+"""Reviewer: no refusal of an honest table (REAL ps / lsof of this host; read-only, nothing signalled).
+usage: python3 -B -I honest_real.py.txt TREE
+1. the real table under many locale / timezone / COLUMNS environments (each in a fresh interpreter-independent call:
+   the environment is set in os.environ before the call; _ps_env hands it to ps)
+2. 150 reads while a thread churns short-lived processes (rows appear/vanish; zombies; processes that exit mid-listing)
+3. carriers() and cwd_under() over the whole real table
+4. each real row equals an independent `ps -p PID -o ppid=,pgid=,lstart=` for a sample
+"""
+import collections, json, os, subprocess, sys, threading, time
+sys.path.insert(0, sys.argv[1])
+from validation.v2 import cleanup_authority as ca  # noqa: E402
+
+res = {}
+base = dict(os.environ)
+envs = {
+    "LC_ALL=en_US.UTF-8": {"LC_ALL": "en_US.UTF-8"}, "LC_ALL=C": {"LC_ALL": "C"}, "LC_ALL=POSIX": {"LC_ALL": "POSIX"},
+    "LC_ALL=de_DE.UTF-8": {"LC_ALL": "de_DE.UTF-8"}, "LC_ALL=ja_JP.UTF-8": {"LC_ALL": "ja_JP.UTF-8"},
+    "LC_ALL=fr_FR.UTF-8": {"LC_ALL": "fr_FR.UTF-8"}, "LC_ALL=th_TH.UTF-8": {"LC_ALL": "th_TH.UTF-8"},
+    "LC_ALL=ar_SA.UTF-8": {"LC_ALL": "ar_SA.UTF-8"}, "LC_ALL=fa_IR.UTF-8": {"LC_ALL": "fa_IR.UTF-8"},
+    "LC_ALL=zh_TW.UTF-8": {"LC_ALL": "zh_TW.UTF-8"}, "LC_ALL=he_IL.UTF-8": {"LC_ALL": "he_IL.UTF-8"},
+    "LC_TIME=de_DE.UTF-8": {"LC_TIME": "de_DE.UTF-8"}, "LANG=ja_JP.UTF-8": {"LANG": "ja_JP.UTF-8"},
+    "LANG=ru_RU.UTF-8,LANGUAGE=ru": {"LANG": "ru_RU.UTF-8", "LANGUAGE": "ru"},
+    "LC_ALL=": {"LC_ALL": ""}, "no locale vars": {},
+    "COLUMNS=20": {"COLUMNS": "20"}, "COLUMNS=1": {"COLUMNS": "1"}, "COLUMNS=0": {"COLUMNS": "0"},
+    "TZ=UTC": {"TZ": "UTC"}, "TZ=America/New_York": {"TZ": "America/New_York"},
+    "TZ=Asia/Kolkata": {"TZ": "Asia/Kolkata"}, "TZ=Pacific/Chatham": {"TZ": "Pacific/Chatham"},
+}
+for name, extra in envs.items():
+    env = {k: v for k, v in base.items() if not k.startswith(("LC_", "LANG", "COLUMNS", "TZ"))}
+    env.update(extra)
+    os.environ.clear(); os.environ.update(env)
+    try:
+        t, r = ca._read()
+        cmds = [h.command for h in t.values()]
+        res[name] = {"rows": len(t), "reader_listed": r in t, "longest_command": max(map(len, cmds)),
+                     "any_truncated_at_80": sum(1 for c in cmds if len(c) == 79 or len(c) == 80)}
+    except OSError as e:
+        res[name] = {"REFUSED": type(e).__name__, "msg": str(e)[:160]}
+    except Exception as e:  # noqa: BLE001
+        res[name] = {"UNTYPED": type(e).__name__, "msg": str(e)[:160]}
+os.environ.clear(); os.environ.update(base)
+
+# 2. churn
+stop = threading.Event()
+def churn():
+    i = 0
+    while not stop.is_set():
+        procs = [subprocess.Popen(["/bin/sleep", "0.02"]) for _ in range(6)]
+        z = subprocess.Popen([sys.executable, "-c", "pass"])          # a zombie until reaped below
+        time.sleep(0.01)
+        for p in procs:
+            p.wait()
+        z.wait()
+        i += 1
+t = threading.Thread(target=churn, daemon=True); t.start()
+outcomes = collections.Counter(); sizes = []
+for _ in range(150):
+    try:
+        tab, r = ca._read()
+        outcomes["ok"] += 1; sizes.append(len(tab))
+    except OSError as e:
+        outcomes["REFUSED " + str(e)[:80]] += 1
+    except Exception as e:  # noqa: BLE001
+        outcomes["UNTYPED " + type(e).__name__] += 1
+stop.set(); t.join(5)
+res["churn_150_reads"] = {"outcomes": dict(outcomes), "rows_min_max": [min(sizes), max(sizes)] if sizes else None}
+
+# 3. carriers / cwd_under over the whole real table
+tab = ca.host_table()
+try:
+    res["carriers_whole_table"] = {"n": len(ca.carriers("AISEF_NOPE=", tab)), "ok": True}
+except OSError as e:
+    res["carriers_whole_table"] = {"REFUSED": str(e)[:160]}
+try:
+    res["cwd_under_whole_table"] = {"n": len(ca.cwd_under("/", tab)), "ok": True}
+except OSError as e:
+    res["cwd_under_whole_table"] = {"REFUSED": str(e)[:160]}
+
+# 4. a sample against `ps -p`
+bad = 0; checked = 0
+for pid in sorted(tab)[:: max(1, len(tab) // 40)]:
+    q = subprocess.run(["ps", "-p", str(pid), "-o", "ppid=,pgid="], capture_output=True).stdout.split()
+    if len(q) == 2:
+        checked += 1
+        if (int(q[0]), int(q[1])) != (tab[pid].ppid, tab[pid].pgid):
+            bad += 1
+res["sample_vs_ps_p"] = {"checked": checked, "differ": bad}
+print(json.dumps(res, indent=1))

@@ -1,0 +1,130 @@
+{
+ "target": "aisef2/app/verify.py::verify",
+ "files": [
+  "tests/v2/test_v21_kills3_R01.py"
+ ],
+ "source_sha256": "0996b98ab6da683b30cc30adb58cbbe196eff47f990b7343eeecb71091a746a8",
+ "t0": [
+  {
+   "file": "tests/v2/test_v21_kills3_R01.py",
+   "seconds": 0.52,
+   "outcome": "PASS",
+   "ran": 8
+  }
+ ],
+ "error": null,
+ "results": [
+  {
+   "index": 100,
+   "mutant": "L104 string ' the run printed' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 110,
+   "mutant": "L155 dict entry 0 dropped",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 111,
+   "mutant": "L155 dict entry 1 dropped",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 124,
+   "mutant": "L81 string 'no ' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 127,
+   "mutant": "L87 string ' cannot be read (' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_R01.py",
+   "first": "FAIL: test_a_manifest_that_cannot_be_read_names_the_file_and_the_class_of_the_failure (v2.test_v21_kills3_R01.TheManifestThatCannotBeUsedIsRefusedWithItsKindOfCause.test_a_manifest_that_cannot_be_read_names_the_file_and_the_class_of_the_failure) | AssertionError"
+  },
+  {
+   "index": 128,
+   "mutant": "L87 string ')' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 129,
+   "mutant": "L91 string ' is not an evidence manifest (a JSON object holding its files)' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_R01.py",
+   "first": "FAIL: test_a_manifest_that_is_json_and_no_manifest_says_so (v2.test_v21_kills3_R01.TheManifestThatCannotBeUsedIsRefusedWithItsKindOfCause.test_a_manifest_that_is_json_and_no_manifest_says_so) (manifest='[]') | AssertionError"
+  },
+  {
+   "index": 139,
+   "mutant": "L155 string 'story' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 140,
+   "mutant": "L155 string 'error' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 141,
+   "mutant": "L155 string 'begun and never ended in the journal' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 153,
+   "mutant": "L73 string ')' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 155,
+   "mutant": "L97 string 'an evidence file cannot be read (' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_R01.py",
+   "first": "FAIL: test_the_path_and_the_class_are_tokens_and_the_kind_of_failure_is_read (v2.test_v21_kills3_R01.AnEvidenceFileThatCannotBeReadIsNamedByItsPathAndTheClassOfTheFailure.test_the_path_and_the_class_are_tokens_and_the_kind_of_failure_is_read) | AssertionError"
+  },
+  {
+   "index": 156,
+   "mutant": "L97 string '): ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_R01.py",
+   "first": "FAIL: test_the_path_and_the_class_are_tokens_and_the_kind_of_failure_is_read (v2.test_v21_kills3_R01.AnEvidenceFileThatCannotBeReadIsNamedByItsPathAndTheClassOfTheFailure.test_the_path_and_the_class_are_tokens_and_the_kind_of_failure_is_read) | AssertionError"
+  },
+  {
+   "index": 172,
+   "mutant": "L175 string 'the record cannot be re-derived from the evidence: ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_R01.py",
+   "first": "FAIL: test_the_problem_says_the_record_the_class_and_the_message_apart (v2.test_v21_kills3_R01.ARecordThatCannotBeReDerivedNamesTheRecordTheClassAndTheMessage.test_the_problem_says_the_record_the_class_and_the_message_apart) | AssertionError"
+  },
+  {
+   "index": 173,
+   "mutant": "L175 string ': ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_R01.py",
+   "first": "FAIL: test_the_problem_says_the_record_the_class_and_the_message_apart (v2.test_v21_kills3_R01.ARecordThatCannotBeReDerivedNamesTheRecordTheClassAndTheMessage.test_the_problem_says_the_record_the_class_and_the_message_apart) | AssertionError"
+  },
+  {
+   "index": 176,
+   "mutant": "L122 string ')' emptied",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  }
+ ]
+}

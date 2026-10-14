@@ -1,0 +1,26 @@
+tests.v2.test_v21_kills3_A13 exit=0 Ran 2 tests in 0.056s OK  0s
+tests.v2.test_v21_kills3_A20 exit=0 Ran 2 tests in 0.008s OK  0s
+tests.v2.test_v21_kills3_A22 exit=0 Ran 7 tests in 0.019s OK  1s
+tests.v2.test_v21_kills3_R01 exit=0 Ran 8 tests in 0.030s OK  0s
+tests.v2.test_v21_kills3_R02 exit=0 Ran 2 tests in 0.242s OK  0s
+tests.v2.test_v21_kills3_R03 exit=0 Ran 5 tests in 0.036s OK  1s
+tests.v2.test_v21_kills3_R05 exit=0 Ran 3 tests in 0.042s OK  0s
+tests.v2.test_v21_kills3_T01a exit=0 Ran 17 tests in 6.703s OK  7s
+tests.v2.test_v21_kills3_T05a exit=0 Ran 8 tests in 0.797s OK  1s
+tests.v2.test_v21_kills3_T05b exit=0 Ran 18 tests in 0.614s OK  1s
+tests.v2.test_v21_kills3_T05c exit=0 Ran 7 tests in 2.276s OK  2s
+tests.v2.test_v21_kills3_T06a exit=0 Ran 14 tests in 0.017s OK  1s
+tests.v2.test_v21_kills3_T06b exit=0 Ran 8 tests in 1.404s OK  1s
+tests.v2.test_v21_kills3_T07a exit=0 Ran 14 tests in 0.010s OK  1s
+tests.v2.test_v21_kills3_T07b exit=0 Ran 11 tests in 0.010s OK (skipped=1)  0s
+tests.v2.test_v21_kills3_T08a exit=0 Ran 10 tests in 1.808s OK  2s
+tests.v2.test_v21_kills3_T08b exit=0 Ran 6 tests in 0.037s OK  0s
+tests.v2.test_v21_kills3_T09a exit=0 Ran 18 tests in 0.321s OK  1s
+tests.v2.test_v21_kills3_T09b exit=0 Ran 14 tests in 0.092s OK  0s
+tests.v2.test_v21_kills3_T09c exit=0 Ran 15 tests in 0.179s OK  0s
+tests.v2.test_v21_kills3_T10a exit=0 Ran 8 tests in 2.411s OK  3s
+tests.v2.test_v21_kills3_T10b exit=0 Ran 5 tests in 7.220s OK  8s
+tests.v2.test_v21_kills3_T10c exit=0 Ran 14 tests in 12.475s OK  12s
+tests.v2.test_v21_kills3_T10d exit=0 Ran 17 tests in 12.280s OK  13s
+tests.v2.test_v21_kills3_T13a exit=0 Ran 12 tests in 8.062s OK  8s
+DONE

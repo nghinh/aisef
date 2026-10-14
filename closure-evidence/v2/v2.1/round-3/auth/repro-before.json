@@ -1,0 +1,68 @@
+{
+ "tree": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/out/auth/before-tree",
+ "part1": {
+  "U+2028": {
+   "victim_signalled": true,
+   "victim_row_is_the_real_one": false,
+   "carrier_command_whole": false
+  },
+  "U+2029": {
+   "victim_signalled": true,
+   "victim_row_is_the_real_one": false,
+   "carrier_command_whole": false
+  },
+  "U+0085": {
+   "victim_signalled": false,
+   "victim_row_is_the_real_one": true,
+   "carrier_command_whole": true
+  },
+  "VT": {
+   "victim_signalled": false,
+   "victim_row_is_the_real_one": true,
+   "carrier_command_whole": true
+  },
+  "FF": {
+   "victim_signalled": false,
+   "victim_row_is_the_real_one": true,
+   "carrier_command_whole": true
+  },
+  "FS": {
+   "victim_signalled": false,
+   "victim_row_is_the_real_one": true,
+   "carrier_command_whole": true
+  },
+  "GS": {
+   "victim_signalled": false,
+   "victim_row_is_the_real_one": true,
+   "carrier_command_whole": true
+  },
+  "RS": {
+   "victim_signalled": false,
+   "victim_row_is_the_real_one": true,
+   "carrier_command_whole": true
+  },
+  "CR": {
+   "victim_signalled": false,
+   "victim_row_is_the_real_one": true,
+   "carrier_command_whole": true
+  },
+  "LF": {
+   "victim_signalled": false,
+   "victim_row_is_the_real_one": true,
+   "carrier_command_whole": true
+  },
+  "NBSP": {
+   "victim_signalled": false,
+   "victim_row_is_the_real_one": true,
+   "carrier_command_whole": true
+  }
+ },
+ "part2": {
+  "carrier_found": false
+ },
+ "part3": {
+  "carrier_found": false
+ },
+ "victim": 5072,
+ "runner": 5064
+}

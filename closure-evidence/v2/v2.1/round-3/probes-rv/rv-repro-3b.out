@@ -1,0 +1,10 @@
+interpreter: 3.14.7
+a+1+1+...              largest N parsed = 95093    first failure N = 95094    RecursionError
+'s' + 's' + ...        largest N parsed = 95093    first failure N = 95094    RecursionError
+a.b.c.d...             largest N parsed = 95093    first failure N = 95094    RecursionError
+not not ...            largest N parsed = 5966     first failure N = 5967     MemoryError
+- - - ... 1            largest N parsed = 5966     first failure N = 5967     MemoryError
+x if c else (chain)    largest N parsed = 5966     first failure N = 5967     MemoryError
+f()()()...             largest N parsed = 95093    first failure N = 95094    RecursionError
+[0]*N flat list        no failure up to N=2097152
+(((...)))              largest N parsed = 200      first failure N = 201      SyntaxError(too many nested parentheses (<unknown>, )

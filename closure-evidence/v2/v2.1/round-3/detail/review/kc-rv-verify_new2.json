@@ -1,0 +1,32 @@
+{
+ "target": "aisef2/app/verify.py::verify",
+ "files": [
+  "tests/v2/test_v21_r3_detail_product.py"
+ ],
+ "source_sha256": "0996b98ab6da683b30cc30adb58cbbe196eff47f990b7343eeecb71091a746a8",
+ "t0": [
+  {
+   "file": "tests/v2/test_v21_r3_detail_product.py",
+   "seconds": 15.52,
+   "outcome": "PASS",
+   "ran": 14
+  }
+ ],
+ "error": null,
+ "results": [
+  {
+   "index": 43,
+   "mutant": "L136 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_product.py",
+   "first": "FAIL: test_a_removed_artifact_is_refuted (v2.test_v21_r3_detail_product.ABlockedFindingLongerThanItsStatement.test_a_removed_artifact_is_refuted) | AssertionError"
+  },
+  {
+   "index": 44,
+   "mutant": "L136 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_product.py",
+   "first": "FAIL: test_a_removed_artifact_is_refuted (v2.test_v21_r3_detail_product.ABlockedFindingLongerThanItsStatement.test_a_removed_artifact_is_refuted) | AssertionError"
+  }
+ ]
+}

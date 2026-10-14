@@ -1,0 +1,28 @@
+LF | ps -A argv: b'ARG<a\\012b>\n' | lines: 1
+LF | ps -E env : b'PROBE_VAR=a\\012b __CF_USER_TEXT_ENCODING=0x1F5:0x0' | lines: 1
+CR | ps -A argv: b'ARG<a^Mb>\n' | lines: 1
+CR | ps -E env : b'PROBE_VAR=a^Mb __CF_USER_TEXT_ENCODING=0x1F5:0x0:0' | lines: 1
+CRLF | ps -A argv: b'ARG<a^M\\012b>\n' | lines: 1
+CRLF | ps -E env : b'PROBE_VAR=a^M\\012b __CF_USER_TEXT_ENCODING=0x1F5:0' | lines: 1
+VT | ps -A argv: b'ARG<a^Kb>\n' | lines: 1
+VT | ps -E env : b'PROBE_VAR=a^Kb __CF_USER_TEXT_ENCODING=0x1F5:0x0:0' | lines: 1
+FF | ps -A argv: b'ARG<a^Lb>\n' | lines: 1
+FF | ps -E env : b'PROBE_VAR=a^Lb __CF_USER_TEXT_ENCODING=0x1F5:0x0:0' | lines: 1
+FS | ps -A argv: b'ARG<a^\\b>\n' | lines: 1
+FS | ps -E env : b'PROBE_VAR=a^\\b __CF_USER_TEXT_ENCODING=0x1F5:0x0:0' | lines: 1
+NEL | ps -A argv: b'ARG<aM^Eb>\n' | lines: 1
+NEL | ps -E env : b'PROBE_VAR=aM^Eb __CF_USER_TEXT_ENCODING=0x1F5:0x0:' | lines: 1
+LS | ps -A argv: b'ARG<a\xe2\x80\xa8b>\n' | lines: 1
+LS | ps -E env : b'PROBE_VAR=a\xe2\x80\xa8b __CF_USER_TEXT_ENCODING=0x1F5:0x0:' | lines: 1
+PS | ps -A argv: b'ARG<a\xe2\x80\xa9b>\n' | lines: 1
+PS | ps -E env : b'PROBE_VAR=a\xe2\x80\xa9b __CF_USER_TEXT_ENCODING=0x1F5:0x0:' | lines: 1
+TAB | ps -A argv: b'ARG<a\\011b>\n' | lines: 1
+TAB | ps -E env : b'PROBE_VAR=a\\011b __CF_USER_TEXT_ENCODING=0x1F5:0x0' | lines: 1
+ESC | ps -A argv: b'ARG<a^[b>\n' | lines: 1
+ESC | ps -E env : b'PROBE_VAR=a^[b __CF_USER_TEXT_ENCODING=0x1F5:0x0:0' | lines: 1
+DEL | ps -A argv: b'ARG<a^?b>\n' | lines: 1
+DEL | ps -E env : b'PROBE_VAR=a^?b __CF_USER_TEXT_ENCODING=0x1F5:0x0:0' | lines: 1
+BEL | ps -A argv: b'ARG<a^Gb>\n' | lines: 1
+BEL | ps -E env : b'PROBE_VAR=a^Gb __CF_USER_TEXT_ENCODING=0x1F5:0x0:0' | lines: 1
+bashfunc | ps -A argv: b'ARG<() {  echo hi\\012}>\n' | lines: 1
+bashfunc | ps -E env : b'PROBE_VAR=() {  echo hi\\012} __CF_USER_TEXT_ENCODI' | lines: 1

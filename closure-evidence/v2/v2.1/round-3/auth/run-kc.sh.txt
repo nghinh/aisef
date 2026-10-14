@@ -1,0 +1,10 @@
+#!/bin/zsh
+# run-kc.sh FUNCTION... : kill_check over every mutant of each function of cleanup_authority.py with the WP's two files
+SP=/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad
+OUT=$SP/m21/r3/out/auth
+cd $SP/m21/r3/wt/auth || exit 2
+for f in "$@"; do
+  $SP/m21/kills3/py.sh auth validation/v21/kill_check.py "validation/v2/cleanup_authority.py::$f" \
+    tests/v2/test_v21_r3_auth_ps_table.py tests/v2/test_v21_r3_auth_other_readers.py --out $OUT/kc-$f.json > $OUT/kc-$f.txt 2>&1
+  print -r -- "$f exit=$? $(tail -1 $OUT/kc-$f.txt | cut -c1-200)"
+done

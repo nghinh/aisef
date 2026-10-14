@@ -1,0 +1,53 @@
+{
+ "target": "aisef2/app/confine.py::_judge",
+ "files": [
+  "tests/v2/test_v21_r3_judge_not_run.py"
+ ],
+ "source_sha256": "3dc6553e145884c2214f71f92280bd9633f2b1609d22b4c717be15e7ad8787f5",
+ "t0": [
+  {
+   "file": "tests/v2/test_v21_r3_judge_not_run.py",
+   "seconds": 0.65,
+   "outcome": "PASS",
+   "ran": 3
+  }
+ ],
+ "error": null,
+ "results": [
+  {
+   "index": 100,
+   "mutant": "L540 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_judge_not_run.py",
+   "first": "FAIL: test_no_exit_status_is_unmeasured_whatever_the_text_beside_it_says (v2.test_v21_r3_judge_not_run.ATryWithoutAnExitStatusDidNotRun.test_no_exit_status_is_unmeasured_whatever_the_text_beside_it_says) (text='unshare: unshare failed: No space left on device') | AssertionError"
+  },
+  {
+   "index": 135,
+   "mutant": "L533 element 0 dropped",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 136,
+   "mutant": "L533 element 1 dropped",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 138,
+   "mutant": "L533 element 0 dropped",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  },
+  {
+   "index": 139,
+   "mutant": "L533 element 1 dropped",
+   "class": "SURVIVED",
+   "file": null,
+   "first": null
+  }
+ ]
+}

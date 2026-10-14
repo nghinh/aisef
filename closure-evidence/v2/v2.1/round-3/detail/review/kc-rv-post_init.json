@@ -1,0 +1,67 @@
+{
+ "target": "aisef2/app/review_verify.py::Artifact.__post_init__",
+ "files": [
+  "tests/v2/test_v21_r3_detail_statement.py"
+ ],
+ "source_sha256": "9a5fafceeeaa117ea41c78ec7797604b45bb3bf8d6c4f20db6b2fa1059838513",
+ "t0": [
+  {
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "seconds": 5.83,
+   "outcome": "PASS",
+   "ran": 38
+  }
+ ],
+ "error": null,
+ "results": [
+  {
+   "index": 0,
+   "mutant": "L286 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: v2.test_v21_r3_detail_statement (unittest.loader._FailedTest.v2.test_v21_r3_detail_statement) | ValueError"
+  },
+  {
+   "index": 1,
+   "mutant": "L286 not removed",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: v2.test_v21_r3_detail_statement (unittest.loader._FailedTest.v2.test_v21_r3_detail_statement) | ValueError"
+  },
+  {
+   "index": 2,
+   "mutant": "L286 And swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_reference_is_a_path_inside_the_directory_a_sha256_and_a_size (v2.test_v21_r3_detail_statement.AnArtifactReferenceHasAShape.test_a_reference_is_a_path_inside_the_directory_a_sha256_and_a_size) (args=('review-findings/../RUN.json', '0000000000000000000000000000000000000000000000000000000000000000', 1)) | AssertionError"
+  },
+  {
+   "index": 3,
+   "mutant": "L286 Is->IsNot",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: v2.test_v21_r3_detail_statement (unittest.loader._FailedTest.v2.test_v21_r3_detail_statement) | ValueError"
+  },
+  {
+   "index": 4,
+   "mutant": "L287 LtE->Gt",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: v2.test_v21_r3_detail_statement (unittest.loader._FailedTest.v2.test_v21_r3_detail_statement) | ValueError"
+  },
+  {
+   "index": 5,
+   "mutant": "L287 Lt->GtE",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "ERROR: v2.test_v21_r3_detail_statement (unittest.loader._FailedTest.v2.test_v21_r3_detail_statement) | ValueError"
+  },
+  {
+   "index": 6,
+   "mutant": "L288 string 'not a review artifact reference: ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_detail_statement.py",
+   "first": "FAIL: test_a_reference_is_a_path_inside_the_directory_a_sha256_and_a_size (v2.test_v21_r3_detail_statement.AnArtifactReferenceHasAShape.test_a_reference_is_a_path_inside_the_directory_a_sha256_and_a_size) | AssertionError"
+  }
+ ]
+}

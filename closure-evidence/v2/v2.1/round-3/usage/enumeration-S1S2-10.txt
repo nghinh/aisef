@@ -1,0 +1,126 @@
+{
+ "stories": [
+  "S1",
+  "S2"
+ ],
+ "max_events_after_plan_frozen": 10,
+ "admitted_journals": 42579530,
+ "with_a_non_empty_report": 3056,
+ "new_differs_from_oracle": 0,
+ "old_differs_from_new": 1448,
+ "old_new_difference_kinds": {
+  "a failure after an outcome and before the next begin": 1216,
+  "a committed attempt that observed failures": 232
+ },
+ "journals_breaking_INV_A_a_committed_attempt_observed_a_failure": 8387736,
+ "journals_breaking_INV_B_an_event_follows_a_commit": 0,
+ "extensions_refused_by_the_reader": 0,
+ "extensions_refused_by_a_projection": 61317256,
+ "seconds": 6611.8
+}
+OLD != NEW examples: [
+ {
+  "labels": [
+   "S2.begin",
+   "S2.Fy",
+   "S2.retry",
+   "S2.dispose",
+   "S2.end",
+   "S2.Fy",
+   "S2.Fy",
+   "S2.begin",
+   "S2.Fy",
+   "S2.rollback"
+  ],
+  "old": [],
+  "new": [
+   {
+    "story": "S2",
+    "attempts_repeating_the_one_before": [
+     2
+    ],
+    "failures": [
+     "TESTS_INADEQUATE: developer tests: TESTS_INADEQUATE"
+    ]
+   }
+  ]
+ },
+ {
+  "labels": [
+   "S2.begin",
+   "S2.Fy",
+   "S2.retry",
+   "S2.dispose",
+   "S2.end",
+   "S2.Fy",
+   "S2.Fy",
+   "S2.begin",
+   "S2.Fy",
+   "S2.retry"
+  ],
+  "old": [],
+  "new": [
+   {
+    "story": "S2",
+    "attempts_repeating_the_one_before": [
+     2
+    ],
+    "failures": [
+     "TESTS_INADEQUATE: developer tests: TESTS_INADEQUATE"
+    ]
+   }
+  ]
+ },
+ {
+  "labels": [
+   "S2.begin",
+   "S2.Fy",
+   "S2.retry",
+   "S2.dispose",
+   "S2.end",
+   "S2.Fy",
+   "S2.Fx",
+   "S2.begin",
+   "S2.Fy",
+   "S2.rollback"
+  ],
+  "old": [],
+  "new": [
+   {
+    "story": "S2",
+    "attempts_repeating_the_one_before": [
+     2
+    ],
+    "failures": [
+     "TESTS_INADEQUATE: developer tests: TESTS_INADEQUATE"
+    ]
+   }
+  ]
+ },
+ {
+  "labels": [
+   "S2.begin",
+   "S2.Fy",
+   "S2.retry",
+   "S2.dispose",
+   "S2.end",
+   "S2.Fy",
+   "S2.Fx",
+   "S2.begin",
+   "S2.Fy",
+   "S2.retry"
+  ],
+  "old": [],
+  "new": [
+   {
+    "story": "S2",
+    "attempts_repeating_the_one_before": [
+     2
+    ],
+    "failures": [
+     "TESTS_INADEQUATE: developer tests: TESTS_INADEQUATE"
+    ]
+   }
+  ]
+ }
+]

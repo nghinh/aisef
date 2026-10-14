@@ -1,0 +1,32 @@
+# rv-fa-scale: wall time of python_imports / grep_count over N files through the git object store (one `git cat-file`
+# per file), and what an observation window smaller than that does to the verdict.
+import os, pathlib, subprocess, sys, tempfile, time
+sys.path.insert(0, os.getcwd())
+from aisef2.arch.enums import BehaviorVerdict, Enforcement, SubjectAbsence
+from aisef2.probe import file_artifact as fa
+from aisef2.probe.protocol import ExecutionEnv, RevisionRef
+from aisef2.product.spec import ProductProofSpec
+GIT_ENV = {k: os.environ[k] for k in ("PATH", "HOME", "TMPDIR") if k in os.environ}
+def git(root, *a):
+    return subprocess.run(["git", "-C", root, "-c", "user.name=t", "-c", "user.email=t@t", "-c", "commit.gpgsign=false", *a],
+                          capture_output=True, text=True, check=True, env=GIT_ENV).stdout.strip()
+def spec(within):
+    return ProductProofSpec.create(contract_id="BC-RV", probe_id=fa.PROBE_ID, probe_digest=fa.DIGEST,
+        probe_input={"subject": {"kind": "file_artifact", "locator": "path:pkg"},
+                     "stimulus": {"imports_outside": {"stdlib": True, "allowed": []}},
+                     "observable": {"matches": 0, "within_s": within}, "subject_absence": SubjectAbsence.REQUIRES_SUBJECT.value},
+        candidate_expectation=BehaviorVerdict.SATISFIED, compiler_id="test", compiler_digest="c" * 64)
+print("interpreter:", sys.version.split()[0], sys.platform)
+for n in (50, 400):
+    root = tempfile.mkdtemp(prefix="aisef2-rv-scale-")
+    pathlib.Path(root, "pkg").mkdir()
+    for i in range(n):
+        pathlib.Path(root, "pkg", "m%04d.py" % i).write_text("import os\nimport json\n\n\ndef f():\n    return %d\n" % i)
+    git(root, "init", "-q"); git(root, "add", "-A"); git(root, "commit", "-q", "-m", "x")
+    at = RevisionRef(git(root, "rev-parse", "HEAD"), root)
+    p = fa.FileArtifactProbe()
+    for within in (30, 0.05):
+        t = time.monotonic()
+        o = p.observe(spec(within), at, ExecutionEnv(sys.executable, 60, Enforcement.FULL))
+        dt = time.monotonic() - t
+        print("N=%4d files, within_s=%-5s -> %-16s %-9s in %.2fs" % (n, within, o.kind.value, o.verdict.value if o.verdict else None, dt))

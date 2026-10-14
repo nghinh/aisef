@@ -1,0 +1,4 @@
+U+2028  stream_has_it=True  session: text_chars=104 turns=1 tokens={'input': 7, 'output': 3} | budget: turns=1 in=7 unaccounted=[] | usage: 1 steps | reviewer: found=['F1'] parsed=True
+U+2029  stream_has_it=True  session: text_chars=104 turns=1 tokens={'input': 7, 'output': 3} | budget: turns=1 in=7 unaccounted=[] | usage: 1 steps | reviewer: found=['F1'] parsed=True
+U+0085  stream_has_it=True  session: text_chars=104 turns=1 tokens={'input': 7, 'output': 3} | budget: turns=1 in=7 unaccounted=[] | usage: 1 steps | reviewer: found=['F1'] parsed=True
+space   stream_has_it=True  session: text_chars=104 turns=1 tokens={'input': 7, 'output': 3} | budget: turns=1 in=7 unaccounted=[] | usage: 1 steps | reviewer: found=['F1'] parsed=True

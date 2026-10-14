@@ -1,0 +1,2 @@
+{'A_B': {'A_ok': 20000, 'B_refused': 10500, 'B_accepted': 9500, 'B_accepted_with_unlisted_pid': 7648}, 'bad': [], 'n_bad': 0}
+{'ps:TableUnreadable': 18358, 'env:TableUnreadable': 17077, 'lsof:TableUnreadable': 18415, 'win:TableUnreadable': 18261, 'ps:ok': 1642, 'env:ok': 2606, 'lsof:ok': 1585, 'win:ok': 1739, 'env:UNTYPED ValueError': 317}

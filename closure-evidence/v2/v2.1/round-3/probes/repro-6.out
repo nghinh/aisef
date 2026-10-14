@@ -1,0 +1,16 @@
+interpreter: 3.14.7 darwin
+  file_artifact      833be030fb7f4d2c
+  cli_invocation     ab0173818b697f5b
+  process_effect     3b39d380b3619d56
+  python_callable_v2 e9f8dcdd6ec59662
+  python_callable    1961e84d913edc68
+  RUNSPEC kernel capability afe21212e1419292
+a comment in runtime/process_range.py                          changes the EXECUTION_DIGEST of: ['RUNSPEC kernel capability']
+a comment in runtime/range_anchor.py                           changes the EXECUTION_DIGEST of: ['RUNSPEC kernel capability']
+a SEMANTIC edit in process_range.py (members() returns [])     changes the EXECUTION_DIGEST of: ['RUNSPEC kernel capability']
+a comment in product/outcome.py (verdict -> result mapping)    changes the EXECUTION_DIGEST of: ['RUNSPEC kernel capability']
+a comment in probe/protocol.py (classify_failure)              changes the EXECUTION_DIGEST of: ['file_artifact', 'cli_invocation', 'process_effect', 'python_callable_v2', 'python_callable', 'RUNSPEC kernel capability']
+a comment in probe/cli_invocation.py                           changes the EXECUTION_DIGEST of: ['cli_invocation', 'process_effect', 'python_callable_v2', 'RUNSPEC kernel capability']
+a comment in probe/process_effect.py                           changes the EXECUTION_DIGEST of: ['process_effect', 'RUNSPEC kernel capability']
+a comment in probe/file_artifact.py                            changes the EXECUTION_DIGEST of: ['file_artifact', 'RUNSPEC kernel capability']
+a comment in probe/python_callable_v2.py                       changes the EXECUTION_DIGEST of: ['python_callable_v2', 'RUNSPEC kernel capability']

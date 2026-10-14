@@ -1,0 +1,34 @@
+"""SIMULATION (no process touched): what a `ps` that printed a raw LF inside a command would still allow in the fixed
+reader. usage: python3 -B -I residual_sim.py.txt TREE"""
+import os, sys, time
+from unittest import mock
+sys.path.insert(0, sys.argv[1] + "/validation/v2")
+import cleanup_authority as ca
+
+RUNNER, READER = os.getpid(), 31337
+def row(pid, ppid, pgid, date, cmd): return f"{pid:>6} {ppid:>6} {pgid:>6} {date}     {cmd}\n"
+EARLY, LATE, FUT = "Tue Oct 13 09:00:00 2026", "Tue Oct 13 09:30:10 2026", "Tue Oct 13 23:59:59 2099"
+# group 900: its leader exited, a member (901, parent launchd, born long before the boundary) is alive: an unrelated
+# user's pipeline. 900 has NO row. A carrier (born after the boundary, the runner's child) holds a raw LF + a row for 900.
+carrier = "carrier\n" + f"900 {RUNNER} 900 {FUT} fabricated"
+raw = (row(1, 0, 1, EARLY, "/sbin/launchd") + row(901, 1, 900, EARLY, "/usr/bin/unrelated-member") +
+       row(500, RUNNER, 500, LATE, carrier) + row(READER, RUNNER, READER, LATE, "ps -A")).encode()
+class P:
+    pid, returncode = READER, 0
+    def __init__(self, *a, **k): pass
+    def communicate(self, *a, **k): return raw, None
+with mock.patch.object(ca, "POSIX", True), mock.patch.object(ca.subprocess, "Popen", P):
+    b = ca.establish("root"); t = ca.host_table()
+print("rows:", sorted(t), "| 900 in table:", 900 in t, "| 900 owned:", 900 in ca.owned(b, t))
+rep = ca.signal_owned(b, groups=[900], dry_run=True, table=t)
+print("signal_owned(groups=[900]) signalled:", [(s["kind"], s["id"]) for s in rep.signalled], "unproven:", rep.unproven)
+m = ca.prove_member(b, 901, 900, t)
+print("prove_member(901, group 900):", m.pid if m else None)
+# the same, with the forged pid LISTED (its leader alive): refused as a pid listed twice
+raw2 = raw + row(900, 1, 900, EARLY, "/usr/bin/leader").encode()
+raw = raw2
+with mock.patch.object(ca, "POSIX", True), mock.patch.object(ca.subprocess, "Popen", P):
+    try:
+        ca.host_table(); print("leader listed: accepted?!")
+    except ca.TableUnreadable as e:
+        print("leader listed ->", type(e).__name__, str(e)[:70])

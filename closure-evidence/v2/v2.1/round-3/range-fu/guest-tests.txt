@@ -1,0 +1,34 @@
+test_a_command_line_that_is_not_utf8_is_replaced_not_fatal (tests.v2.test_v21_r3_range_fu_linux_table.LinuxTable.test_a_command_line_that_is_not_utf8_is_replaced_not_fatal) ... ok
+test_a_kernel_thread_has_an_empty_command (tests.v2.test_v21_r3_range_fu_linux_table.LinuxTable.test_a_kernel_thread_has_an_empty_command) ... ok
+test_a_process_name_that_is_not_utf8_does_not_end_the_table (tests.v2.test_v21_r3_range_fu_linux_table.LinuxTable.test_a_process_name_that_is_not_utf8_does_not_end_the_table) ... ok
+test_a_process_that_exited_under_the_reader_and_names_that_are_no_pid_are_skipped (tests.v2.test_v21_r3_range_fu_linux_table.LinuxTable.test_a_process_that_exited_under_the_reader_and_names_that_are_no_pid_are_skipped) ... ok
+test_a_row_has_its_pid_parent_group_start_and_command (tests.v2.test_v21_r3_range_fu_linux_table.LinuxTable.test_a_row_has_its_pid_parent_group_start_and_command) ... ok
+test_a_zombie_and_a_dead_task_are_not_listed (tests.v2.test_v21_r3_range_fu_linux_table.LinuxTable.test_a_zombie_and_a_dead_task_are_not_listed) ... ok
+test_this_process_with_a_name_that_is_not_utf8_is_in_the_table (tests.v2.test_v21_r3_range_fu_linux_table.RealLinux.test_this_process_with_a_name_that_is_not_utf8_is_in_the_table)
+The real /proc, the real kernel: this process names itself with bytes that are not UTF-8 (restored at the ... ok
+test_a_line_that_is_not_a_row_is_a_typed_error_naming_the_line (tests.v2.test_v21_r3_range_fu_ps_table.NotARow.test_a_line_that_is_not_a_row_is_a_typed_error_naming_the_line) ... ok
+test_no_row_is_returned_when_one_line_is_not_one (tests.v2.test_v21_r3_range_fu_ps_table.NotARow.test_no_row_is_returned_when_one_line_is_not_one) ... ok
+test_only_the_first_80_characters_of_the_line_are_named (tests.v2.test_v21_r3_range_fu_ps_table.NotARow.test_only_the_first_80_characters_of_the_line_are_named) ... ok
+test_the_message_says_that_ps_printed_a_line_that_is_not_a_process_row (tests.v2.test_v21_r3_range_fu_ps_table.NotARow.test_the_message_says_that_ps_printed_a_line_that_is_not_a_process_row) ... ok
+test_the_name_shows_a_separator_instead_of_printing_it (tests.v2.test_v21_r3_range_fu_ps_table.NotARow.test_the_name_shows_a_separator_instead_of_printing_it) ... ok
+test_the_row_of_a_real_process_whose_command_line_holds_separators (tests.v2.test_v21_r3_range_fu_ps_table.RealPs.test_the_row_of_a_real_process_whose_command_line_holds_separators)
+A real `/bin/sh` that holds U+2028, U+2029 and U+0085 in its command line, and `ps` in a UTF-8 locale (where ... skipped 'the `ps` of macOS: the table that is read from `ps`'
+test_a_carriage_return_is_not_turned_into_a_line_feed_by_a_text_mode_read (tests.v2.test_v21_r3_range_fu_ps_table.RowIsALine.test_a_carriage_return_is_not_turned_into_a_line_feed_by_a_text_mode_read) ... ok
+test_a_command_holding_a_separator_is_one_row_with_the_whole_command (tests.v2.test_v21_r3_range_fu_ps_table.RowIsALine.test_a_command_holding_a_separator_is_one_row_with_the_whole_command) ... ok
+test_bytes_that_are_not_utf8_are_replaced_beside_a_separator (tests.v2.test_v21_r3_range_fu_ps_table.RowIsALine.test_bytes_that_are_not_utf8_are_replaced_beside_a_separator) ... ok
+test_leading_trailing_and_blank_lines_are_no_rows (tests.v2.test_v21_r3_range_fu_ps_table.RowIsALine.test_leading_trailing_and_blank_lines_are_no_rows) ... ok
+test_the_escaped_line_feed_stays_as_ps_printed_it (tests.v2.test_v21_r3_range_fu_ps_table.RowIsALine.test_the_escaped_line_feed_stays_as_ps_printed_it) ... ok
+test_a_failed_ps_is_an_error_and_never_an_empty_or_partial_table (tests.v2.test_v21_r3_range_fu_ps_table.RowShape.test_a_failed_ps_is_an_error_and_never_an_empty_or_partial_table) ... ok
+test_a_zombie_is_not_listed_and_a_row_without_a_command_has_an_empty_one (tests.v2.test_v21_r3_range_fu_ps_table.RowShape.test_a_zombie_is_not_listed_and_a_row_without_a_command_has_an_empty_one) ... ok
+test_the_command_is_asked_for_once_with_these_columns (tests.v2.test_v21_r3_range_fu_ps_table.RowShape.test_the_command_is_asked_for_once_with_these_columns) ... ok
+test_WIN_PID_1_a_stale_parent_cycle_terminates_bounded_and_targets_nothing_unowned (tests.v2.p4.test_process_table.NoPidAncestry.test_WIN_PID_1_a_stale_parent_cycle_terminates_bounded_and_targets_nothing_unowned) ... ok
+test_WIN_PID_2_a_stale_parent_without_a_cycle_never_selects_the_unrelated_process (tests.v2.p4.test_process_table.NoPidAncestry.test_WIN_PID_2_a_stale_parent_without_a_cycle_never_selects_the_unrelated_process) ... ok
+test_the_process_table_reads_this_process (tests.v2.p4.test_process_table.NoPidAncestry.test_the_process_table_reads_this_process) ... ok
+test_the_ps_reader_skips_zombies_while_a_line_that_is_not_a_row_and_a_failed_ps_are_errors (tests.v2.p4.test_process_table.NoPidAncestry.test_the_ps_reader_skips_zombies_while_a_line_that_is_not_a_row_and_a_failed_ps_are_errors) ... ok
+test_the_walk_and_the_targets_are_in_pid_order (tests.v2.p4.test_process_table.NoPidAncestry.test_the_walk_and_the_targets_are_in_pid_order) ... ok
+test_the_walk_keeps_true_edges_and_self_parents_and_unknown_times (tests.v2.p4.test_process_table.NoPidAncestry.test_the_walk_keeps_true_edges_and_self_parents_and_unknown_times) ... ok
+
+----------------------------------------------------------------------
+Ran 27 tests in 0.362s
+
+OK (skipped=1)

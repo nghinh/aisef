@@ -1,0 +1,23 @@
+.....................................................F.................................
+======================================================================
+FAIL: test_the_committed_record_is_what_this_tree_derives (tests.v2.test_c2_delivery_experiment.PlanCorrection.test_the_committed_record_is_what_this_tree_derives)
+B-03a: the committed v2.1 record is what this tree derives, exactly; the 2.0 record (made on the 2.0 kernel)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/r3/wt/client/tests/v2/test_c2_delivery_experiment.py", line 59, in test_the_committed_record_is_what_this_tree_derives
+    self.assertEqual(pc.check(), [])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: ['closure-evidence/v2/v2.1/PLAN-V2.2-CORRE[39 chars]ves'] != []
+
+First list contains 1 additional elements.
+First extra element 0:
+'closure-evidence/v2/v2.1/PLAN-V2.2-CORRECTION-1.json is not what this tree derives'
+
++ []
+- ['closure-evidence/v2/v2.1/PLAN-V2.2-CORRECTION-1.json is not what this tree '
+-  'derives']
+
+----------------------------------------------------------------------
+Ran 87 tests in 61.417s
+
+FAILED (failures=1)

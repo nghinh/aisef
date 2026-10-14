@@ -1,0 +1,9 @@
+#!/bin/zsh
+SP=/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad
+R3=$SP/m21/r3; OUT=$R3/out/range/review
+cd $R3/wt/range-rv-base
+for m in tests.v2.test_c2_k_nowork_001 tests.v2.test_c2_p5_acceptance tests.v2.p0.test_checker_calibration tests.v2.test_c2_orchestration_conformance; do
+  echo "== $m" >> $OUT/sealed-base.txt
+  $SP/m21/kills3/py.sh rv-base -m unittest $m 2>&1 | grep -E "^(FAIL|ERROR|Ran|OK|FAILED)" | cut -c1-200 >> $OUT/sealed-base.txt
+done
+echo DONE >> $OUT/sealed-base.txt

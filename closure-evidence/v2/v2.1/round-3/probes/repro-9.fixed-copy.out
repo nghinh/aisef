@@ -1,0 +1,6 @@
+tree: fix-tree-all | rows shipped: 19
+   probe.file_artifact        executing fd0e8bda8b3f..  classes with a row at these bytes: 0/4
+   probe.python_callable_v2   executing b0b716f9b9f8..  classes with a row at these bytes: 0/7
+   probe.cli_invocation       executing dcb9b7b1ac9e..  classes with a row at these bytes: 0/5
+   probe.process_effect       executing 1bf8d9602a5e..  classes with a row at these bytes: 0/3
+classes calibrated at the bytes that run: 0/19

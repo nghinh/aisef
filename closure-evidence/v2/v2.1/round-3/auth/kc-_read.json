@@ -1,0 +1,186 @@
+{
+ "target": "validation/v2/cleanup_authority.py::_read",
+ "files": [
+  "tests/v2/test_v21_r3_auth_ps_table.py",
+  "tests/v2/test_v21_r3_auth_other_readers.py"
+ ],
+ "source_sha256": "52bfcbdc60c362b8966dbbf414beba593eaf41330fce9d94c4809397bfbf6d5e",
+ "t0": [
+  {
+   "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+   "seconds": 0.71,
+   "outcome": "PASS",
+   "ran": 30
+  },
+  {
+   "file": "tests/v2/test_v21_r3_auth_other_readers.py",
+   "seconds": 1.92,
+   "outcome": "PASS",
+   "ran": 34
+  }
+ ],
+ "error": null,
+ "results": [
+  {
+   "index": 0,
+   "mutant": "L165 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+   "first": "ERROR: test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table (v2.test_v21_r3_auth_ps_table.ACommandLineIsNeverAuthority.test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table) | cleanup_authority.TableUnreadable"
+  },
+  {
+   "index": 1,
+   "mutant": "L170 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+   "first": "ERROR: test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table (v2.test_v21_r3_auth_ps_table.ACommandLineIsNeverAuthority.test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table) | cleanup_authority.TableUnreadable"
+  },
+  {
+   "index": 2,
+   "mutant": "L173 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+   "first": "ERROR: test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table (v2.test_v21_r3_auth_ps_table.ACommandLineIsNeverAuthority.test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table) | cleanup_authority.TableUnreadable"
+  },
+  {
+   "index": 3,
+   "mutant": "L175 returns None",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+   "first": "ERROR: test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table (v2.test_v21_r3_auth_ps_table.ACommandLineIsNeverAuthority.test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table) | TypeError"
+  },
+  {
+   "index": 4,
+   "mutant": "L165 not removed",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+   "first": "ERROR: test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table (v2.test_v21_r3_auth_ps_table.ACommandLineIsNeverAuthority.test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table) | cleanup_authority.TableUnreadable"
+  },
+  {
+   "index": 5,
+   "mutant": "L166 returns None",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_other_readers.py",
+   "first": "ERROR: test_a_command_holding_any_character_is_one_row_with_the_whole_command (v2.test_v21_r3_auth_other_readers.WindowsTable.test_a_command_holding_any_character_is_one_row_with_the_whole_command) (sep=\"'\\\\u2028'\") | TypeError"
+  },
+  {
+   "index": 6,
+   "mutant": "L169 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+   "first": "ERROR: test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table (v2.test_v21_r3_auth_ps_table.ACommandLineIsNeverAuthority.test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table) | ValueError"
+  },
+  {
+   "index": 7,
+   "mutant": "L169 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+   "first": "ERROR: test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table (v2.test_v21_r3_auth_ps_table.ACommandLineIsNeverAuthority.test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table) | ValueError"
+  },
+  {
+   "index": 8,
+   "mutant": "L170 NotEq->Eq",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+   "first": "ERROR: test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table (v2.test_v21_r3_auth_ps_table.ACommandLineIsNeverAuthority.test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table) | cleanup_authority.TableUnreadable"
+  },
+  {
+   "index": 9,
+   "mutant": "L173 NotIn->In",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+   "first": "ERROR: test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table (v2.test_v21_r3_auth_ps_table.ACommandLineIsNeverAuthority.test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table) | cleanup_authority.TableUnreadable"
+  },
+  {
+   "index": 10,
+   "mutant": "L175 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+   "first": "ERROR: test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table (v2.test_v21_r3_auth_ps_table.ACommandLineIsNeverAuthority.test_a_fabricated_row_for_a_pid_that_is_not_there_is_not_in_the_table) | TypeError"
+  },
+  {
+   "index": 11,
+   "mutant": "L175 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+   "first": "ERROR: test_a_row_inside_a_command_line_adds_and_replaces_nothing_whatever_separates_it (v2.test_v21_r3_auth_ps_table.ACommandLineIsNeverAuthority.test_a_row_inside_a_command_line_adds_and_replaces_nothing_whatever_separates_it) (sep='U+2028') | ValueError"
+  },
+  {
+   "index": 12,
+   "mutant": "L167 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+   "first": "FAIL: test_a_time_locale_of_the_user_is_overridden (v2.test_v21_r3_auth_ps_table.PsRunsInTheCLocaleForItsDates.test_a_time_locale_of_the_user_is_overridden) | AssertionError"
+  },
+  {
+   "index": 13,
+   "mutant": "L167 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+   "first": "ERROR: test_a_locale_that_words_its_dates_is_still_a_table (v2.test_v21_r3_auth_ps_table.TheRealPs.test_a_locale_that_words_its_dates_is_still_a_table) | cleanup_authority.TableUnreadable"
+  },
+  {
+   "index": 14,
+   "mutant": "L167 element 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+   "first": "ERROR: test_a_locale_that_words_its_dates_is_still_a_table (v2.test_v21_r3_auth_ps_table.TheRealPs.test_a_locale_that_words_its_dates_is_still_a_table) | cleanup_authority.TableUnreadable"
+  },
+  {
+   "index": 15,
+   "mutant": "L167 element 3 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+   "first": "ERROR: test_a_locale_that_words_its_dates_is_still_a_table (v2.test_v21_r3_auth_ps_table.TheRealPs.test_a_locale_that_words_its_dates_is_still_a_table) | cleanup_authority.TableUnreadable"
+  },
+  {
+   "index": 16,
+   "mutant": "L167 string 'ps' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+   "first": "FAIL: test_a_time_locale_of_the_user_is_overridden (v2.test_v21_r3_auth_ps_table.PsRunsInTheCLocaleForItsDates.test_a_time_locale_of_the_user_is_overridden) | AssertionError"
+  },
+  {
+   "index": 17,
+   "mutant": "L167 string '-A' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+   "first": "ERROR: test_a_locale_that_words_its_dates_is_still_a_table (v2.test_v21_r3_auth_ps_table.TheRealPs.test_a_locale_that_words_its_dates_is_still_a_table) | cleanup_authority.TableUnreadable"
+  },
+  {
+   "index": 18,
+   "mutant": "L167 string '-o' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+   "first": "ERROR: test_a_locale_that_words_its_dates_is_still_a_table (v2.test_v21_r3_auth_ps_table.TheRealPs.test_a_locale_that_words_its_dates_is_still_a_table) | cleanup_authority.TableUnreadable"
+  },
+  {
+   "index": 19,
+   "mutant": "L167 string 'pid=,ppid=,pgid=,lstart=,command=' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+   "first": "ERROR: test_a_locale_that_words_its_dates_is_still_a_table (v2.test_v21_r3_auth_ps_table.TheRealPs.test_a_locale_that_words_its_dates_is_still_a_table) | cleanup_authority.TableUnreadable"
+  },
+  {
+   "index": 20,
+   "mutant": "L174 string 'ps -A did not list itself: the host table cannot be read' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+   "first": "FAIL: test_a_failed_ps_is_never_an_empty_or_a_partial_table (v2.test_v21_r3_auth_ps_table.NotARow.test_a_failed_ps_is_never_an_empty_or_a_partial_table) [exit 0, no output] | AssertionError"
+  },
+  {
+   "index": 21,
+   "mutant": "L171 string 'ps -A exited ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+   "first": "FAIL: test_the_failure_says_which_of_the_two_it_was (v2.test_v21_r3_auth_ps_table.NotARow.test_the_failure_says_which_of_the_two_it_was) | AssertionError"
+  },
+  {
+   "index": 22,
+   "mutant": "L171 string ': the host table cannot be read' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_auth_ps_table.py",
+   "first": "FAIL: test_a_failed_ps_is_never_an_empty_or_a_partial_table (v2.test_v21_r3_auth_ps_table.NotARow.test_a_failed_ps_is_never_an_empty_or_a_partial_table) [exit 1, no output] | AssertionError"
+  }
+ ]
+}

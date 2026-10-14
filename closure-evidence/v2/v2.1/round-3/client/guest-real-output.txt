@@ -1,0 +1,10 @@
+[/repo] kernel prints U+2028 raw in mountinfo: True; lines by LF: 16; by splitlines(): 17
+  _host_mounts(): 16 rows; with a separator in `at`: ['/tmp/g/dst\u2028x']
+[/repo] kernel prints U+2028 raw in mountinfo: False; lines by LF: 15; by splitlines(): 15
+  bwrap exit 0; the sandbox's table holds U+2028 raw: True
+  _sections: 15 mountinfo lines (the kernel printed 15); _mounts: 15 rows; the bind mount found at its path: True
+[/repo/_before] kernel prints U+2028 raw in mountinfo: True; lines by LF: 16; by splitlines(): 17
+  _host_mounts(): None (the table is not read whole)
+[/repo/_before] kernel prints U+2028 raw in mountinfo: False; lines by LF: 15; by splitlines(): 15
+  bwrap exit 0; the sandbox's table holds U+2028 raw: True
+  _sections: 16 mountinfo lines (the kernel printed 15); _mounts: 14 rows; the bind mount found at its path: False

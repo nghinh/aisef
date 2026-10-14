@@ -1,0 +1,64 @@
+== text-mode
+   1 FAIL: test_a_record_ends_at_a_line_feed_and_a_carriage_return_is_whitespace
+   1 FAILED (failures=1)
+   1 Ran 27 tests in 2.450s
+== not-0085
+   1 FAIL: test_a_findings_block_that_holds_a_separator_is_the_reviews_findings (separator='U+0085')
+   1 FAIL: test_a_finished_step_that_holds_a_separator_is_counted_not_lost (separator='U+0085')
+   1 FAIL: test_a_record_ends_at_a_line_feed_and_a_carriage_return_is_whitespace
+   1 FAIL: test_an_error_event_that_holds_a_separator_is_the_sessions_error (separator='U+0085')
+   1 FAIL: test_an_event_that_holds_a_separator_is_read_whole (separator='U+0085')
+   1 FAIL: test_the_budgets_spend_is_the_same_with_and_without_a_separator
+   1 FAILED (failures=6)
+   1 Ran 27 tests in 2.212s
+== usage-untouched
+   1 ERROR: test_a_finished_step_that_holds_a_separator_is_counted_not_lost (separator='U+0085')
+   1 ERROR: test_a_finished_step_that_holds_a_separator_is_counted_not_lost (separator='U+2028')
+   1 ERROR: test_a_finished_step_that_holds_a_separator_is_counted_not_lost (separator='U+2029')
+   1 ERROR: test_the_two_accounts_agree_on_every_stream (separator='U+0085')
+   1 ERROR: test_the_two_accounts_agree_on_every_stream (separator='U+2028')
+   1 ERROR: test_the_two_accounts_agree_on_every_stream (separator='U+2029')
+   1 ERROR: test_the_usage_account_is_the_same_with_and_without_a_separator
+   1 FAILED (errors=7)
+   1 Ran 27 tests in 2.197s
+== mounts-split
+   1 FAIL: test_a_host_mount_point_that_holds_a_separator_is_one_row (separator='U+0085')
+   1 FAIL: test_a_host_mount_point_that_holds_a_separator_is_one_row (separator='U+2028')
+   1 FAIL: test_a_host_mount_point_that_holds_a_separator_is_one_row (separator='U+2029')
+   1 FAIL: test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each (separator='U+0085')
+   1 FAIL: test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each (separator='U+2028')
+   1 FAIL: test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each (separator='U+2029')
+   1 FAIL: test_a_writable_host_mount_whose_path_holds_a_separator_is_refused_like_any_other (separator='U+0085', name='data\x85disk')
+   1 FAIL: test_a_writable_host_mount_whose_path_holds_a_separator_is_refused_like_any_other (separator='U+2028', name='data\u2028disk')
+   1 FAIL: test_a_writable_host_mount_whose_path_holds_a_separator_is_refused_like_any_other (separator='U+2029', name='data\u2029disk')
+   1 FAILED (failures=9)
+   1 Ran 27 tests in 2.451s
+== lines-splitlines
+   1 FAIL: test_a_host_mount_point_that_holds_a_separator_is_one_row (separator='U+0085')
+   1 FAIL: test_a_host_mount_point_that_holds_a_separator_is_one_row (separator='U+2028')
+   1 FAIL: test_a_host_mount_point_that_holds_a_separator_is_one_row (separator='U+2029')
+   1 FAIL: test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each (separator='U+0085')
+   1 FAIL: test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each (separator='U+2028')
+   1 FAIL: test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each (separator='U+2029')
+   1 FAIL: test_a_writable_host_mount_whose_path_holds_a_separator_is_refused_like_any_other (separator='U+0085', name='data\x85disk')
+   1 FAIL: test_a_writable_host_mount_whose_path_holds_a_separator_is_refused_like_any_other (separator='U+2028', name='data\u2028disk')
+   1 FAIL: test_a_writable_host_mount_whose_path_holds_a_separator_is_refused_like_any_other (separator='U+2029', name='data\u2029disk')
+   1 FAIL: test_lines (text='a\u2028b\u2029c\x85d\x0be\x0cf\x1cg\x1dh\x1ei\n')
+   1 FAILED (failures=10)
+   1 Ran 27 tests in 2.250s
+== worktree-splitlines
+   1 FAIL: test_a_worktree_under_a_directory_whose_name_holds_a_separator_is_found (separator='U+0085')
+   1 FAIL: test_a_worktree_under_a_directory_whose_name_holds_a_separator_is_found (separator='U+2028')
+   1 FAIL: test_a_worktree_under_a_directory_whose_name_holds_a_separator_is_found (separator='U+2029')
+   1 FAILED (failures=3)
+   1 Ran 27 tests in 2.162s
+== usage-untouched
+   1 FAIL: test_a_finished_step_that_holds_a_separator_is_counted_not_lost (separator='U+0085')
+   1 FAIL: test_a_finished_step_that_holds_a_separator_is_counted_not_lost (separator='U+2028')
+   1 FAIL: test_a_finished_step_that_holds_a_separator_is_counted_not_lost (separator='U+2029')
+   1 FAIL: test_the_two_accounts_agree_on_every_stream (separator='U+0085')
+   1 FAIL: test_the_two_accounts_agree_on_every_stream (separator='U+2028')
+   1 FAIL: test_the_two_accounts_agree_on_every_stream (separator='U+2029')
+   1 FAIL: test_the_usage_account_is_the_same_with_and_without_a_separator
+   1 FAILED (failures=7)
+   1 Ran 27 tests in 2.389s

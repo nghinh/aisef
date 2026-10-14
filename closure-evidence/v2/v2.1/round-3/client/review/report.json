@@ -1,0 +1,397 @@
+{
+ "wp": "client",
+ "reviewer_branch": "v21r3/client-rv",
+ "head": "0041c28766917415301bf5366a4b3fd83ed7067e",
+ "implementer_head": "d87bd86e1962c97043f1e0b0c996c21891ef5ef1",
+ "verdict": "ACCEPT_WITH_FIXES",
+ "scope_note": "The task text carries a paragraph headed 'For FU-AUTH specifically' (a forged-ownership check of validation/v2/cleanup_authority.py::_read, owned/prove_member/signalled, PowerShell _windows_table, ps tables). It names a different work package (auth; reviewed on v21r3/auth-rv). This branch changes none of those files (git diff 643a6e0..d87bd86 --stat: client.py, usage.py, confine.py, lineage.py, two test files, one doc), so none of its checks apply and none was performed. The general rule it opens with, 're-run, do not read', was applied.",
+ "owner_sentences": [
+  {
+   "sentence": "FU-CLIENT 1: Reproduce through the real parser with the real stream shape (text and step_finish events whose text contains each separator).",
+   "status": "MET",
+   "evidence": "re-ran out/client/repro-chain.py.txt through client.session with a fake client process on lab trees of 643a6e0 and d87bd86: before text_chars=0, reviewer found=[] parsed=False for U+2028/U+2029/U+0085; after 104 chars, found=['F1'] parsed=True; budget turns=1 in=7 and usage 1 step on both sides (tools/rv_repro_chain.py; output identical to the implementer's)."
+  },
+  {
+   "sentence": "FU-CLIENT 2a: split at LF only; keep tolerating a trailing CR; nothing else changes.",
+   "status": "MET",
+   "evidence": "client.events = read_bytes().decode('utf-8','replace').split('\\n'), startswith('{'), json.loads, ValueError skipped. CRLF test and lone-CR-between-tokens test pass; property check 3000/3000 random streams (LF/CRLF, ASCII or raw non-ASCII, unterminated last record) return exactly the events written (tools/rv_property.py); 67 unique recorded real streams read identically before and after (corpus-before/after.jsonl)."
+  },
+  {
+   "sentence": "FU-CLIENT 2b: decide what a line that does not parse does; surface a skipped non-last line only if that is already part of the record; do not widen the contract.",
+   "status": "MET",
+   "evidence": "skipped as before; Budget.spend, usage() record and the session record have no field for it (read in client.py, usage.py, verify.py:196); Q1 left to the owner. A torn last line stays skipped (test_a_line_that_is_no_event_costs_only_itself)."
+  },
+  {
+   "sentence": "FU-CLIENT 3: look for the same pattern in every reader of a stream or JSON-lines file in aisef2/app; fix where a cut changes a decision or loses evidence, a test each; list the rest with a verdict; do not touch modules outside aisef2/app.",
+   "status": "PARTLY",
+   "evidence": "every aisef2/app reader re-checked by grep (splitlines, split(), jsonl, json.loads, stdout parsing) and by reading: the verdicts hold (events/session_tokens/reconcile/_sections/_mounts/_host_mounts fixed with tests; preflight.py:78 PINNED, verified: a writer with ensure_ascii=False fails the pin; the rest NOT EXPOSED). Nothing outside aisef2/app changed. The outside-app list missed validation/qualification/c2_p9.py:402 (verbatim third copy of the loop; its Budget is the C2 experiment's ceiling guard) and validation/v21/cli_integration/e2e_client.py:44: added to the doc, not fixed (out of scope). The _mounts fix is as wide as str.split() but only three characters were tested: strengthened. A raw CR is still cut (text mode), measured, see decisions_needed."
+  },
+  {
+   "sentence": "FU-CLIENT 4: tests through read_session and through the consumer that matters (the model reviewer's findings block with U+2028), the tokens/usage events too; the usage account of a stream with a separator in a text event equals the same stream without.",
+   "status": "MET",
+   "evidence": "ModelReviewer (3 tests), RealSession (2, a real process), TheAccounts (5). Note: the equality test is a control, it passes before and after (a cut text event never changed the account); the discriminating ones are the step-with-separator tests (fail on 643a6e0: test_a_finished_step_that_holds_a_separator_is_counted_not_lost, test_the_turn_cap_counts...)."
+  },
+  {
+   "sentence": "FU-CLIENT 5: kill_check over ALL mutants of every changed function; run the modules that import client and test_v21_review_chain, test_v21_transport, test_v21_continue_usage.",
+   "status": "MET",
+   "evidence": "re-ran: events 6/6, _lines 4/4, _host_mounts 16/16, session_tokens 37/37, _sections 44/44, _mounts 46/46, reconcile 148/148; read_session 76/77 with the reduced file set (survivor L68 element 1 dropped is killed by registered test_s2_kills, as the implementer's record says). 125 importing modules (direct and through run/cli/verify/adapters): 1519 tests, 4 skipped, 124 modules OK, 1 red (sealed PlanCorrection record, identical on a fresh 643a6e0)."
+  },
+  {
+   "sentence": "FU-CLIENT 6: commit on v21r3/client, ruff check . over the whole tree first.",
+   "status": "MET",
+   "evidence": "ruff check . passes at d87bd86 and at the review head; commits carry the Co-Authored-By line; no existing test changed (diff 643a6e0..d87bd86: 7 files, 2 new tests + 1 doc + 4 product)."
+  }
+ ],
+ "claims": [
+  {
+   "claim": "The defect is real and silent: an event holding U+2028/U+2029/U+0085 is cut and lost; the model reviewer returns found=[] parsed=False; a provider error becomes 'no findings'.",
+   "verdict": "CONFIRMED",
+   "note": "re-ran through client.session + Reviewer._model on 643a6e0 (found=[] parsed=False) and on d87bd86 (found=['F1']); the error case is test_an_error_that_holds_a_separator_is_a_provider_outage (fails on 643a6e0)."
+  },
+  {
+   "claim": "One reader, client.events, serves read_session and usage.session_tokens; no import cycle.",
+   "verdict": "CONFIRMED",
+   "note": "usage imports client; client does not import usage; verify.py and run.py already import both; all importing modules pass."
+  },
+  {
+   "claim": "The same cut was fixed in four other readers under aisef2/app (reconcile, _sections, _mounts, _host_mounts).",
+   "verdict": "CONFIRMED",
+   "note": "measured on real git (macOS) and in the Linux guest; the fix is WIDER than stated: str.split() also cut at VT, FF, FS-US, NBSP, U+1680, U+2000-200A, U+202F, U+205F, U+3000; for NBSP/U+3000 the old reader misread (row with at = prefix of the path), it did not refuse."
+  },
+  {
+   "claim": "17 + 10 new tests; wrong implementations were run against them and fail where expected.",
+   "verdict": "REVISED",
+   "note": "five plausible wrong implementations passed the 27 tests (drop last line as torn; session_tokens loop of its own in text mode; errors='ignore'; ASCII-white-space field split; only the three named separators protected). 5 tests added (+2 parametrised over every isspace() character): 32 tests; all 16 wrong implementations of the review now fail (one is equivalent)."
+  },
+  {
+   "claim": "kill_check: every mutant of every changed or new function killed on the final head (events 6/6, read_session 77/77, session_tokens 37/37, _lines 4/4, _sections 44/44, _mounts 46/46, _host_mounts 16/16, reconcile 148/148).",
+   "verdict": "CONFIRMED",
+   "note": "re-ran all; read_session needs the registered test_s2_kills.py for 1 of 77 (L68 element 1 dropped), the new files alone leave it; 5 of 6 events kills, 30/44 _sections, 23/46 _mounts, 33/77 read_session, 11/37 session_tokens, 95/148 reconcile went through an exception: each is a shape a consumer reads, none found that hides an untested behaviour."
+  },
+  {
+   "claim": "73 modules, 966 tests, 72 modules OK; test_c2_delivery_experiment red identically on 643a6e0; test_c2_k_nowork_001 red as a stale record, identical on 643a6e0.",
+   "verdict": "CONFIRMED",
+   "note": "125 modules / 1519 tests here (direct + transitive importers); the same single failure; both sealed-record failures reproduced on a fresh detached checkout of 643a6e0."
+  },
+  {
+   "claim": "Linux guest: 200 tests OK; a real kernel mountinfo and a real bubblewrap session with a U+2028 mount path: before _host_mounts() None, after 16 rows.",
+   "verdict": "CONFIRMED",
+   "note": "re-ran with my own staged tree: 238 tests OK (1 skipped: an existing conf test about the temp dir), before None / 14 rows, after 16 / 15 rows with the mount found; also for U+2029, U+0085, VT, FF, FS. Real run in the guest (X1, Python 3.14.8, git 2.47.3, bubblewrap 0.12.0)."
+  },
+  {
+   "claim": "67 recorded real session streams read identically before and after.",
+   "verdict": "CONFIRMED",
+   "note": "67 unique by sha256 of 134 paths (closure-evidence and scratchpad copies); identical read_session and session_tokens. The corpus holds no CR, no separator, no non-record line, no unterminated last line: it cannot exercise those differences (the property check and the tests do)."
+  },
+  {
+   "claim": "Not established: whether the real OpenCode writes these characters raw.",
+   "verdict": "CONFIRMED",
+   "note": "still not established; added: the 67 real streams hold 23,799 raw non-ASCII characters (no ASCII escaping), which is what JavaScript JSON.stringify does for U+2028/U+2029 too (node v26 re-measured: e2 80 a8, e2 80 a9, c2 85 raw; U+000B escaped). No U+2028 was ever observed in a real stream."
+  },
+  {
+   "claim": "A raw CR in a mount or worktree path is still cut in text mode (not measured).",
+   "verdict": "REVISED",
+   "note": "measured by the review in the guest and on a real worktree: before == after. _host_mounts() is None (every confined run refused: fail closed); the probe's table loses the row (14 of 15) and nothing judges that mount; lineage.reconcile reports no candidate under a directory named with CR."
+  },
+  {
+   "claim": "Windows and 3.11-3.13 not run.",
+   "verdict": "CONFIRMED",
+   "note": "the review ran 3.12.14 and 3.14.7 (host) and 3.14.8 (guest); not 3.11, 3.13, Windows. WorktreeListing runs git worktree add under a path with U+2028/U+0085: on Windows a git failure there is an error, not a skip (unverified)."
+  }
+ ],
+ "defects_found": [
+  {
+   "what": "Test gap: five plausible wrong implementations passed all 27 tests (unterminated last record dropped; session_tokens loop in text mode; errors='ignore'; mountinfo field split at ASCII white space only; split protecting only U+2028/U+2029/U+0085).",
+   "severity": "medium",
+   "fixed_in_commit": "973d8a4"
+  },
+  {
+   "what": "26 raw U+2028/U+2029 characters (19 lines) in the two test sources: an editor/tool that treats them as line ends (VS Code unusual-line-terminators prompt) removes them and the tests still pass vacuously (assertIn(b'', raw) holds).",
+   "severity": "low",
+   "fixed_in_commit": "973d8a4 (escapes; ast.dump identical)"
+  },
+  {
+   "what": "Audit list incomplete: validation/qualification/c2_p9.py:402 is a verbatim third copy of the splitlines() loop (its Budget is the C2 delivery experiment's hard-ceiling guard; also read by c2_delivery_experiment.py:273); validation/v21/cli_integration/e2e_client.py:44 reads mountinfo with splitlines().",
+   "severity": "low (spend exposed only when a step_finish record itself holds a separator; text/error events lost as in the product)",
+   "fixed_in_commit": "b751972 (listed in the doc); code NOT changed: outside aisef2/app, out of scope"
+  },
+  {
+   "what": "Doc understated: the mountinfo fix covers VT, FF, FS-US, NBSP and the Unicode spaces (NBSP/U+3000 were misread, not refused); a raw CR was called 'not measured' and described as a cut only.",
+   "severity": "low",
+   "fixed_in_commit": "b751972"
+  },
+  {
+   "what": "Residual, unfixed, measured: a raw CR (U+000D) in a mount point or worktree path. Host table None (fail closed); probe table drops the row so that mount is never judged (a fail-open class; the path is operator- or kernel-chosen: workspace, client dir, common git dir, read_only); reconcile misses the candidate.",
+   "severity": "low-medium",
+   "fixed_in_commit": null
+  }
+ ],
+ "counter_examples": [
+  {
+   "impl": "S1 events over bytes.splitlines()",
+   "27_tests": "caught (1)",
+   "32_tests": "caught (2)"
+  },
+  {
+   "impl": "S2 events drops the last line of the file (as 'possibly torn')",
+   "27_tests": "PASSED",
+   "32_tests": "caught (3)"
+  },
+  {
+   "impl": "S3 events stops at the first line that does not parse",
+   "27_tests": "caught (1)",
+   "32_tests": "caught (1)"
+  },
+  {
+   "impl": "S4 separators replaced by a space before the cut",
+   "27_tests": "caught (14)",
+   "32_tests": "caught (17)"
+  },
+  {
+   "impl": "S5 events over read_text(...).split('\\n')",
+   "27_tests": "caught (1)",
+   "32_tests": "caught (2)"
+  },
+  {
+   "impl": "S6 session_tokens with its own loop in text mode",
+   "27_tests": "PASSED",
+   "32_tests": "caught (1)"
+  },
+  {
+   "impl": "S7 events decoding with errors='ignore'",
+   "27_tests": "PASSED",
+   "32_tests": "caught (1)"
+  },
+  {
+   "impl": "S8 session_tokens with the old splitlines() loop",
+   "27_tests": "caught (7)",
+   "32_tests": "caught (8)"
+  },
+  {
+   "impl": "C1 _mounts fields split at ASCII white space only",
+   "27_tests": "PASSED",
+   "32_tests": "caught (6)"
+  },
+  {
+   "impl": "C2 _mounts protecting only U+2028/U+2029/U+0085",
+   "27_tests": "PASSED",
+   "32_tests": "caught (46)"
+  },
+  {
+   "impl": "C3 _lines keeps the empty element after a final LF",
+   "27_tests": "caught (9)",
+   "32_tests": "caught (35)"
+  },
+  {
+   "impl": "C4 _host_mounts over splitlines()",
+   "27_tests": "caught (3)",
+   "32_tests": "caught (12)"
+  },
+  {
+   "impl": "C5 _lines drops every empty line",
+   "27_tests": "caught (4)",
+   "32_tests": "caught (4)"
+  },
+  {
+   "impl": "L1 reconcile worktree block over splitlines()",
+   "27_tests": "caught (3)",
+   "32_tests": "caught (3)"
+  },
+  {
+   "impl": "L2 reconcile fields over ln.split(None, 1)",
+   "27_tests": "passed",
+   "32_tests": "passed",
+   "note": "equivalent: only Path(worktree).name (leaf wt-<story>) and HEAD are read"
+  },
+  {
+   "impl": "P1 preflight ledger written with ensure_ascii=False",
+   "27_tests": "caught (1 error)",
+   "32_tests": "caught (1 error)"
+  }
+ ],
+ "mutants_rerun": [
+  {
+   "function": "aisef2/app/client.py::events",
+   "total": 6,
+   "killed": 6,
+   "record": "review/kc-events.json",
+   "errors": 5
+  },
+  {
+   "function": "aisef2/app/client.py::read_session",
+   "total": 77,
+   "killed": 76,
+   "survived": [
+    "[72] L68 element 1 dropped: killed by registered test_s2_kills.py::ClientReadSession (not in the reduced set run here)"
+   ],
+   "record": "review/kc-read_session.json",
+   "errors": 33
+  },
+  {
+   "function": "aisef2/app/usage.py::session_tokens",
+   "total": 37,
+   "killed": 37,
+   "record": "review/kc-session_tokens.json",
+   "errors": 11
+  },
+  {
+   "function": "aisef2/app/confine.py::_lines",
+   "total": 4,
+   "killed": 4,
+   "record": "review/kc-_lines.json",
+   "errors": 2
+  },
+  {
+   "function": "aisef2/app/confine.py::_sections",
+   "total": 44,
+   "killed": 44,
+   "record": "review/kc-_sections.json",
+   "errors": 30
+  },
+  {
+   "function": "aisef2/app/confine.py::_mounts",
+   "total": 46,
+   "killed": 46,
+   "record": "review/kc-_mounts.json",
+   "errors": 23
+  },
+  {
+   "function": "aisef2/app/confine.py::_host_mounts",
+   "total": 16,
+   "killed": 16,
+   "record": "review/kc-_host_mounts.json",
+   "errors": 7
+  },
+  {
+   "function": "aisef2/app/lineage.py::reconcile",
+   "total": 148,
+   "killed": 148,
+   "record": "review/kc-reconcile.json",
+   "errors": 95,
+   "note": "run with the review's version of the readers file; the six statement mutants [138]-[140],[145]-[147] killed by assertion"
+  }
+ ],
+ "false_refusal_search": {
+  "recorded_real_streams": "67 unique (of 134 paths) read_session + session_tokens identical before/after; corpus holds only LF-ended '{' records",
+  "property_check": "3000 random streams: client.events == events written, 0 differences (S2 574, S4 1114 differences: the check has power for those)",
+  "guest_mountinfo": "real kernel table, real bubblewrap: no refusal introduced; U+2028/9/0085/VT/FF/FS and NBSP/U+3000 rows read whole; CR unchanged",
+  "real_git": "reconcile on real worktrees under directories named with plain, U+2028, U+00A0, VT: candidate reported after; CR not",
+  "inputs_considered": "empty stream, no trailing LF, CRLF, lone CR between tokens, invalid UTF-8, BOM, non-object JSON, torn last line, deep nesting (RecursionError is not a ValueError on 3.12 and 3.14: pre-existing, unchanged)",
+  "found": "none new in product code"
+ },
+ "real_vs_simulated_corrections": [
+  "HostTable tests patch Path.read_text with the final text: they cannot show a raw CR (real read_text translates it first). Measured for real in the guest instead; the review's added host-table case leaves U+000D out and says why.",
+  "The implementer's guest evidence was a git archive of 283f499 (product code identical to d87bd86): consistent, re-run here on my own staged tree.",
+  "RealSession uses a script as the client: a real process, not OpenCode; the Windows branch of WorktreeListing (git worktree add under a U+2028 path) was not run.",
+  "'U+2028 raw in the real client's stream' remains neither run nor observed; only the raw non-ASCII property (23,799 chars in 67 streams) and Node's JSON.stringify were measured."
+ ],
+ "test_runs": [
+  {
+   "what": "tests.v2.test_v21_r3_client_stream + test_v21_r3_client_readers, host macOS Python 3.14.7",
+   "result": "32 tests OK (27 + 5)"
+  },
+  {
+   "what": "same two files + test_app_units, test_v21_transport, T20a, T07a on Python 3.12.14",
+   "result": "106 tests OK"
+  },
+  {
+   "what": "125 test modules importing client/usage/confine/lineage directly or transitively (host, 4 parallel chunks)",
+   "result": "1519 tests, 4 skipped, 124 modules exit 0; 1 red: tests.v2.test_c2_delivery_experiment.PlanCorrection (sealed record, identical on a fresh 643a6e0)"
+  },
+  {
+   "what": "Linux guest X1 (Python 3.14.8, git 2.47.3, bwrap 0.12.0): two new files + 11 confinement/client/lineage/usage modules",
+   "result": "238 tests OK, 1 skipped (existing conf test: temp dir below the sandbox's /tmp). REAL run."
+  },
+  {
+   "what": "Linux guest: real kernel mountinfo + real bubblewrap session, 9 characters, before (643a6e0) vs after",
+   "result": "U+2028/U+2029/U+0085/VT/FF/FS: None -> 16 rows, 14 -> 15 rows found; NBSP/U+3000: misread -> found; CR: unchanged. REAL run."
+  },
+  {
+   "what": "p0.test_destructive_authority, p4.test_mutation_safety",
+   "result": "13 OK, 10 OK (also OK on a simulated merge into integ 56cd387)"
+  },
+  {
+   "what": "p2.test_mutation_targets, test_v21_mutation_record, test_c2_k_nowork_001",
+   "result": "4 OK; 7 OK (also 11 OK together on this branch's full tree with integ 56cd387's registry); K-NOWORK 1 failure (kernel_digest is not this tree's aisef2), identical on a fresh 643a6e0. (An earlier run of test_v21_mutation_record on a lean tree without closure-evidence errored: lean-tree artifact, retracted.)"
+  },
+  {
+   "what": "ruff check . whole tree; tests.test_v21_traceability; validation/v21/traceability_check.py; 14 doc-reading modules",
+   "result": "all passed; 88 rows OK; 324 tests OK"
+  },
+  {
+   "what": "t0_check of the review's two files on read_session, session_tokens, _mounts, _host_mounts, reconcile",
+   "result": "PASS (20 and 12 tests)"
+  },
+  {
+   "what": "merge-tree of v21r3/client-rv into v21r3/integ (56cd387)",
+   "result": "clean"
+  }
+ ],
+ "kill_files_by_function": {
+  "aisef2/app/client.py::events (new)": [
+   "tests/v2/test_v21_r3_client_stream.py",
+   "tests/v2/test_app_units.py"
+  ],
+  "aisef2/app/client.py::read_session": [
+   "tests/v2/test_v21_r3_client_stream.py",
+   "tests/v2/test_s2_kills.py",
+   "tests/v2/test_app_units.py",
+   "tests/v2/test_v21_transport.py"
+  ],
+  "aisef2/app/usage.py::session_tokens": [
+   "tests/v2/test_v21_r3_client_stream.py",
+   "tests/v2/test_v21_kills3_T20a.py"
+  ],
+  "aisef2/app/confine.py::_lines (new)": [
+   "tests/v2/test_v21_r3_client_readers.py"
+  ],
+  "aisef2/app/confine.py::_sections": [
+   "tests/v2/test_v21_r3_client_readers.py",
+   "tests/v2/test_v21_kills3_T07a.py"
+  ],
+  "aisef2/app/confine.py::_mounts": [
+   "tests/v2/test_v21_r3_client_readers.py",
+   "tests/v2/test_v21_kills3_T07a.py"
+  ],
+  "aisef2/app/confine.py::_host_mounts": [
+   "tests/v2/test_v21_r3_client_readers.py",
+   "tests/v2/test_v21_r3_conf_policy.py"
+  ],
+  "aisef2/app/lineage.py::reconcile": [
+   "tests/v2/test_v21_r3_client_readers.py",
+   "tests/v2/test_v21_kills3_T08a.py",
+   "tests/v2/test_v21_kills3_A08.py",
+   "tests/v2/test_v21_continue_usage.py"
+  ]
+ },
+ "remaining_risks": [
+  "A raw CR (U+000D) in a mount point or worktree path is still cut by text mode: host table None (every confined run refused), the probe's table drops that row (that mount is never judged), reconcile misses an unjournaled candidate. Operator- or kernel-chosen paths only. Measured, not fixed.",
+  "A path holding LF in git worktree list --porcelain needs -z (not handled).",
+  "validation/qualification/c2_p9.py:402 still has the defect (the C2 experiment's Budget, its turn cap and session record); also validation/qualification/release_smoke.py:284, validation/v21/context_gap.py:87,119, validation/v21/cli_integration/e2e_client.py:44.",
+  "A line that starts with '{', does not parse and is not the last line is skipped silently (owner question Q1). A deeply nested record raises RecursionError, which is not a ValueError (3.12, 3.14), out of events() as it was out of the old loops.",
+  "Not run: Windows, Python 3.11, 3.13 (3.12.14, 3.14.7, 3.14.8 were). WorktreeListing's git worktree add under a U+2028/U+0085 path on Windows is unverified (a git failure there is an error, not a skip).",
+  "Whether the real OpenCode writes U+2028/U+2029/U+0085 raw is not established (not run; 0 observed in 67 real streams; the writer is shown to emit raw non-ASCII).",
+  "Sealed records stale by design after a product change: test_c2_k_nowork_001 (kernel digest), test_c2_delivery_experiment PlanCorrection; events and confine._lines are new functions not yet in the mutation registry."
+ ],
+ "decisions_needed": [
+  "Q1 (implementer's, still open): should a '{' line that does not parse and is not the last line count as unaccounted spend (end the run like a ceiling) instead of being skipped silently?",
+  "CR in paths: fix _host_mounts and measure() to read bytes and reconcile to use git worktree list -z? It replaces Path.read_text as what test_v21_r3_conf_policy.py:385 and test_v21_r3_conf_fu_before.py:171 feed and the subprocess.run fakes of the confinement tests (existing tests that need an owner sentence), or accept the residual and the fail-closed host table.",
+  "c2_p9.py read_session/Budget (and the other validation copies): fix before any further C2 delivery run that is judged by it, or leave as historical tooling?"
+ ],
+ "not_applicable": [
+  "FU-AUTH paragraph of the task text (WP auth)"
+ ],
+ "commits_of_the_review": [
+  "973d8a4 tests: wrong implementations that passed now fail; escapes instead of raw U+2028/U+2029 in test sources",
+  "b751972 doc: review addendum (section 11), outside-app readers missed, measured U+000D and U+00A0/U+3000",
+  "ef2b30d doc: retract a lean-tree artifact (mutation record checker)",
+  "0041c28 doc: where the wrong implementations are regenerated and logged"
+ ],
+ "files_changed_by_review": [
+  "tests/v2/test_v21_r3_client_stream.py",
+  "tests/v2/test_v21_r3_client_readers.py",
+  "docs/v2.1/decisions/B03-R3-CLIENT.md"
+ ],
+ "existing_tests_changed_by_review": [],
+ "product_code_changed_by_review": false
+}

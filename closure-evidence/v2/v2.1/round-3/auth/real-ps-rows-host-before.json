@@ -1,0 +1,39 @@
+{
+ "platform": "darwin",
+ "locale_env": {
+  "LANG": "en_US.UTF-8",
+  "LC_ALL": null,
+  "LC_CTYPE": null,
+  "LC_TIME": null
+ },
+ "ps_lines_independent_call": 654,
+ "rows_parsed": 654,
+ "reader_listed": true,
+ "lstart_padded_day_rows": 117,
+ "command_equals_ps_p_command": {
+  "same": 40,
+  "different(race or truncated)": 0
+ },
+ "locales": {
+  "en_US.UTF-8": {
+   "rows": 654,
+   "reader_listed": true
+  },
+  "C": {
+   "rows": 654,
+   "reader_listed": true
+  },
+  "de_DE.UTF-8": {
+   "error": "OSError",
+   "msg": "ps -A exited 0 and did not list itself: the host table cannot be read"
+  },
+  "ja_JP.UTF-8": {
+   "error": "OSError",
+   "msg": "ps -A exited 0 and did not list itself: the host table cannot be read"
+  },
+  "fr_FR.UTF-8": {
+   "error": "OSError",
+   "msg": "ps -A exited 0 and did not list itself: the host table cannot be read"
+  }
+ }
+}

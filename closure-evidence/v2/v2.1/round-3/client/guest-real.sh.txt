@@ -1,0 +1,8 @@
+#!/bin/sh
+# runs inside the guest: for each tree (changed, before) the real readers over a real kernel table
+S=$(printf '\342\200\250')
+for tree in /repo /repo/_before; do
+  rm -rf /tmp/g && mkdir -p /tmp/g/src "/tmp/g/dst${S}x"
+  unshare --user --map-root-user --mount sh -c "mount --bind /tmp/g/src '/tmp/g/dst${S}x' && python3 -B /repo/_guest_mountinfo.py $tree host"
+  python3 -B /repo/_guest_mountinfo.py $tree bwrap
+done

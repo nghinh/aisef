@@ -1,0 +1,382 @@
+{
+ "target": "aisef2/app/confine.py::_mounts",
+ "files": [
+  "tests/v2/test_v21_r3_client_readers.py",
+  "tests/v2/test_v21_kills3_T07a.py",
+  "tests/v2/test_v21_confine.py",
+  "tests/v2/test_v21_r3_conf_policy.py",
+  "tests/v2/test_v21_r3_conf_fu_before.py",
+  "tests/v2/test_v21_r3_conf_rv_hostrows.py",
+  "tests/v2/test_v21_kills3_T05b.py"
+ ],
+ "source_sha256": "3dc6553e145884c2214f71f92280bd9633f2b1609d22b4c717be15e7ad8787f5",
+ "t0": [
+  {
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "seconds": 2.44,
+   "outcome": "PASS",
+   "ran": 10
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T07a.py",
+   "seconds": 0.47,
+   "outcome": "PASS",
+   "ran": 14
+  },
+  {
+   "file": "tests/v2/test_v21_confine.py",
+   "seconds": 24.45,
+   "outcome": "PASS",
+   "ran": 34
+  },
+  {
+   "file": "tests/v2/test_v21_r3_conf_policy.py",
+   "seconds": 2.14,
+   "outcome": "PASS",
+   "ran": 42
+  },
+  {
+   "file": "tests/v2/test_v21_r3_conf_fu_before.py",
+   "seconds": 2.52,
+   "outcome": "PASS",
+   "ran": 9
+  },
+  {
+   "file": "tests/v2/test_v21_r3_conf_rv_hostrows.py",
+   "seconds": 0.39,
+   "outcome": "PASS",
+   "ran": 3
+  },
+  {
+   "file": "tests/v2/test_v21_kills3_T05b.py",
+   "seconds": 1.01,
+   "outcome": "PASS",
+   "ran": 18
+  }
+ ],
+ "error": null,
+ "results": [
+  {
+   "index": 0,
+   "mutant": "L257 returns None",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "FAIL: test_a_host_mount_point_that_holds_a_separator_is_one_row (v2.test_v21_r3_client_readers.HostTable.test_a_host_mount_point_that_holds_a_separator_is_one_row) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 1,
+   "mutant": "L248 returns None",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "FAIL: test_a_host_mount_point_that_holds_a_separator_is_one_row (v2.test_v21_r3_client_readers.HostTable.test_a_host_mount_point_that_holds_a_separator_is_one_row) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 2,
+   "mutant": "L253 condition negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "FAIL: test_a_host_mount_point_that_holds_a_separator_is_one_row (v2.test_v21_r3_client_readers.HostTable.test_a_host_mount_point_that_holds_a_separator_is_one_row) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 3,
+   "mutant": "L251 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: v2.test_v21_r3_client_readers (unittest.loader._FailedTest.v2.test_v21_r3_client_readers) | ValueError"
+  },
+  {
+   "index": 4,
+   "mutant": "L251 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: v2.test_v21_r3_client_readers (unittest.loader._FailedTest.v2.test_v21_r3_client_readers) | ValueError"
+  },
+  {
+   "index": 5,
+   "mutant": "L251 element 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: v2.test_v21_r3_client_readers (unittest.loader._FailedTest.v2.test_v21_r3_client_readers) | ValueError"
+  },
+  {
+   "index": 6,
+   "mutant": "L252 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: v2.test_v21_r3_client_readers (unittest.loader._FailedTest.v2.test_v21_r3_client_readers) | ValueError"
+  },
+  {
+   "index": 7,
+   "mutant": "L252 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: v2.test_v21_r3_client_readers (unittest.loader._FailedTest.v2.test_v21_r3_client_readers) | ValueError"
+  },
+  {
+   "index": 8,
+   "mutant": "L252 element 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: v2.test_v21_r3_client_readers (unittest.loader._FailedTest.v2.test_v21_r3_client_readers) | ValueError"
+  },
+  {
+   "index": 9,
+   "mutant": "L252 element 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: v2.test_v21_r3_client_readers (unittest.loader._FailedTest.v2.test_v21_r3_client_readers) | ValueError"
+  },
+  {
+   "index": 10,
+   "mutant": "L253 And swapped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T07a.py",
+   "first": "ERROR: test_a_line_becomes_where_how_and_what_and_the_other_shapes_are_skipped (v2.test_v21_kills3_T07a.MountInfo.test_a_line_becomes_where_how_and_what_and_the_other_shapes_are_skipped) | IndexError"
+  },
+  {
+   "index": 11,
+   "mutant": "L248 string '\\\\\\\\([0-7]{3})' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: v2.test_v21_r3_client_readers (unittest.loader._FailedTest.v2.test_v21_r3_client_readers) | IndexError"
+  },
+  {
+   "index": 12,
+   "mutant": "L251 string ' - ' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: v2.test_v21_r3_client_readers (unittest.loader._FailedTest.v2.test_v21_r3_client_readers) | ValueError"
+  },
+  {
+   "index": 13,
+   "mutant": "L253 GtE->Lt",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "FAIL: test_a_host_mount_point_that_holds_a_separator_is_one_row (v2.test_v21_r3_client_readers.HostTable.test_a_host_mount_point_that_holds_a_separator_is_one_row) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 14,
+   "mutant": "L252 string '[^ ]+' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "FAIL: test_a_host_mount_point_that_holds_a_separator_is_one_row (v2.test_v21_r3_client_readers.HostTable.test_a_host_mount_point_that_holds_a_separator_is_one_row) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 15,
+   "mutant": "L252 string '[^ ]+' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "FAIL: test_a_host_mount_point_that_holds_a_separator_is_one_row (v2.test_v21_r3_client_readers.HostTable.test_a_host_mount_point_that_holds_a_separator_is_one_row) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 16,
+   "mutant": "L254 dict entry 0 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_a_host_mount_point_that_holds_a_separator_is_one_row (v2.test_v21_r3_client_readers.HostTable.test_a_host_mount_point_that_holds_a_separator_is_one_row) (separator='U+2028') | KeyError"
+  },
+  {
+   "index": 17,
+   "mutant": "L254 dict entry 1 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each (v2.test_v21_r3_client_readers.ProbeOutput.test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each) (separator='U+2028') | KeyError"
+  },
+  {
+   "index": 18,
+   "mutant": "L254 dict entry 2 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_a_host_mount_point_that_holds_a_separator_is_one_row (v2.test_v21_r3_client_readers.HostTable.test_a_host_mount_point_that_holds_a_separator_is_one_row) (separator='U+2028') | KeyError"
+  },
+  {
+   "index": 19,
+   "mutant": "L254 dict entry 3 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_a_host_mount_point_that_holds_a_separator_is_one_row (v2.test_v21_r3_client_readers.HostTable.test_a_host_mount_point_that_holds_a_separator_is_one_row) (separator='U+2028') | KeyError"
+  },
+  {
+   "index": 20,
+   "mutant": "L254 dict entry 4 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T07a.py",
+   "first": "FAIL: test_a_line_becomes_where_how_and_what_and_the_other_shapes_are_skipped (v2.test_v21_kills3_T07a.MountInfo.test_a_line_becomes_where_how_and_what_and_the_other_shapes_are_skipped) | AssertionError"
+  },
+  {
+   "index": 21,
+   "mutant": "L254 dict entry 5 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "FAIL: test_a_writable_host_mount_whose_path_holds_a_separator_is_refused_like_any_other (v2.test_v21_r3_client_readers.ProbeOutput.test_a_writable_host_mount_whose_path_holds_a_separator_is_refused_like_any_other) (separator='U+2028', name='data\\u2028disk') | AssertionError"
+  },
+  {
+   "index": 22,
+   "mutant": "L254 dict entry 6 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T07a.py",
+   "first": "FAIL: test_a_line_becomes_where_how_and_what_and_the_other_shapes_are_skipped (v2.test_v21_kills3_T07a.MountInfo.test_a_line_becomes_where_how_and_what_and_the_other_shapes_are_skipped) | AssertionError"
+  },
+  {
+   "index": 23,
+   "mutant": "L254 dict entry 7 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T07a.py",
+   "first": "FAIL: test_a_line_becomes_where_how_and_what_and_the_other_shapes_are_skipped (v2.test_v21_kills3_T07a.MountInfo.test_a_line_becomes_where_how_and_what_and_the_other_shapes_are_skipped) | AssertionError"
+  },
+  {
+   "index": 24,
+   "mutant": "L254 dict entry 8 dropped",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_a_host_mount_point_that_holds_a_separator_is_one_row (v2.test_v21_r3_client_readers.HostTable.test_a_host_mount_point_that_holds_a_separator_is_one_row) (separator='U+2028') | KeyError"
+  },
+  {
+   "index": 25,
+   "mutant": "L254 string 'at' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_a_host_mount_point_that_holds_a_separator_is_one_row (v2.test_v21_r3_client_readers.HostTable.test_a_host_mount_point_that_holds_a_separator_is_one_row) (separator='U+2028') | KeyError"
+  },
+  {
+   "index": 26,
+   "mutant": "L254 string 'access' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each (v2.test_v21_r3_client_readers.ProbeOutput.test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each) (separator='U+2028') | KeyError"
+  },
+  {
+   "index": 27,
+   "mutant": "L254 string 'fs' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_a_host_mount_point_that_holds_a_separator_is_one_row (v2.test_v21_r3_client_readers.HostTable.test_a_host_mount_point_that_holds_a_separator_is_one_row) (separator='U+2028') | KeyError"
+  },
+  {
+   "index": 28,
+   "mutant": "L254 string 'dev' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_a_host_mount_point_that_holds_a_separator_is_one_row (v2.test_v21_r3_client_readers.HostTable.test_a_host_mount_point_that_holds_a_separator_is_one_row) (separator='U+2028') | KeyError"
+  },
+  {
+   "index": 29,
+   "mutant": "L255 string 'root' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T07a.py",
+   "first": "FAIL: test_a_line_becomes_where_how_and_what_and_the_other_shapes_are_skipped (v2.test_v21_kills3_T07a.MountInfo.test_a_line_becomes_where_how_and_what_and_the_other_shapes_are_skipped) | AssertionError"
+  },
+  {
+   "index": 30,
+   "mutant": "L255 string 'source' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "FAIL: test_a_writable_host_mount_whose_path_holds_a_separator_is_refused_like_any_other (v2.test_v21_r3_client_readers.ProbeOutput.test_a_writable_host_mount_whose_path_holds_a_separator_is_refused_like_any_other) (separator='U+2028', name='data\\u2028disk') | AssertionError"
+  },
+  {
+   "index": 31,
+   "mutant": "L255 string 'options' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T07a.py",
+   "first": "FAIL: test_a_line_becomes_where_how_and_what_and_the_other_shapes_are_skipped (v2.test_v21_kills3_T07a.MountInfo.test_a_line_becomes_where_how_and_what_and_the_other_shapes_are_skipped) | AssertionError"
+  },
+  {
+   "index": 32,
+   "mutant": "L256 string 'super_options' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T07a.py",
+   "first": "FAIL: test_a_line_becomes_where_how_and_what_and_the_other_shapes_are_skipped (v2.test_v21_kills3_T07a.MountInfo.test_a_line_becomes_where_how_and_what_and_the_other_shapes_are_skipped) | AssertionError"
+  },
+  {
+   "index": 33,
+   "mutant": "L256 string 'optional' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: test_a_host_mount_point_that_holds_a_separator_is_one_row (v2.test_v21_r3_client_readers.HostTable.test_a_host_mount_point_that_holds_a_separator_is_one_row) (separator='U+2028') | KeyError"
+  },
+  {
+   "index": 34,
+   "mutant": "L254 conditional negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "FAIL: test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each (v2.test_v21_r3_client_readers.ProbeOutput.test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 35,
+   "mutant": "L255 conditional negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "FAIL: test_a_writable_host_mount_whose_path_holds_a_separator_is_refused_like_any_other (v2.test_v21_r3_client_readers.ProbeOutput.test_a_writable_host_mount_whose_path_holds_a_separator_is_refused_like_any_other) (separator='U+2028', name='data\\u2028disk') | AssertionError"
+  },
+  {
+   "index": 36,
+   "mutant": "L256 conditional negated",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T07a.py",
+   "first": "FAIL: test_a_line_becomes_where_how_and_what_and_the_other_shapes_are_skipped (v2.test_v21_kills3_T07a.MountInfo.test_a_line_becomes_where_how_and_what_and_the_other_shapes_are_skipped) | AssertionError"
+  },
+  {
+   "index": 37,
+   "mutant": "L254 In->NotIn",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "FAIL: test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each (v2.test_v21_r3_client_readers.ProbeOutput.test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 38,
+   "mutant": "L254 string 'ro' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T07a.py",
+   "first": "FAIL: test_a_line_becomes_where_how_and_what_and_the_other_shapes_are_skipped (v2.test_v21_kills3_T07a.MountInfo.test_a_line_becomes_where_how_and_what_and_the_other_shapes_are_skipped) | AssertionError"
+  },
+  {
+   "index": 39,
+   "mutant": "L254 string 'rw' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "FAIL: test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each (v2.test_v21_r3_client_readers.ProbeOutput.test_a_mount_point_a_name_and_a_socket_that_hold_a_separator_are_one_entry_each) (separator='U+2028') | AssertionError"
+  },
+  {
+   "index": 40,
+   "mutant": "L255 Gt->LtE",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "FAIL: test_a_writable_host_mount_whose_path_holds_a_separator_is_refused_like_any_other (v2.test_v21_r3_client_readers.ProbeOutput.test_a_writable_host_mount_whose_path_holds_a_separator_is_refused_like_any_other) (separator='U+2028', name='data\\u2028disk') | AssertionError"
+  },
+  {
+   "index": 41,
+   "mutant": "L255 string ',' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: v2.test_v21_r3_client_readers (unittest.loader._FailedTest.v2.test_v21_r3_client_readers) | ValueError"
+  },
+  {
+   "index": 42,
+   "mutant": "L256 Gt->LtE",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T07a.py",
+   "first": "FAIL: test_a_line_becomes_where_how_and_what_and_the_other_shapes_are_skipped (v2.test_v21_kills3_T07a.MountInfo.test_a_line_becomes_where_how_and_what_and_the_other_shapes_are_skipped) | AssertionError"
+  },
+  {
+   "index": 43,
+   "mutant": "L254 string 'ro' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_kills3_T07a.py",
+   "first": "FAIL: test_a_guest_with_a_read_only_system_and_its_workspace_is_clean (v2.test_v21_kills3_T07a.MountInfo.test_a_guest_with_a_read_only_system_and_its_workspace_is_clean) | AssertionError"
+  },
+  {
+   "index": 44,
+   "mutant": "L256 string ',' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: v2.test_v21_r3_client_readers (unittest.loader._FailedTest.v2.test_v21_r3_client_readers) | ValueError"
+  },
+  {
+   "index": 45,
+   "mutant": "L254 string ',' emptied",
+   "class": "KILLED",
+   "file": "tests/v2/test_v21_r3_client_readers.py",
+   "first": "ERROR: v2.test_v21_r3_client_readers (unittest.loader._FailedTest.v2.test_v21_r3_client_readers) | ValueError"
+  }
+ ]
+}

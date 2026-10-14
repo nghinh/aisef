@@ -1,0 +1,11 @@
+import os, pty, subprocess
+master, slave = pty.openpty()
+print("pty slave:", os.ttyname(slave))
+base = ['/usr/bin/bwrap','--unshare-user','--unshare-pid','--unshare-ipc','--unshare-uts','--share-net','--disable-userns',
+        '--die-with-parent','--new-session','--cap-drop','ALL','--ro-bind','/usr','/usr','--symlink','usr/bin','/bin',
+        '--symlink','usr/lib','/lib','--proc','/proc','--dev','/dev','--tmpfs','/tmp','--']
+for label, stdin in (("stdin=pty", slave), ("stdin=devnull", subprocess.DEVNULL)):
+    p = subprocess.run(base + ['/bin/sh','-c','grep -E "/dev" /proc/self/mountinfo; ls -l /dev | head -30'], stdin=stdin,
+                       capture_output=True, text=True)
+    print("=====", label, "rc", p.returncode)
+    print(p.stdout); print(p.stderr)

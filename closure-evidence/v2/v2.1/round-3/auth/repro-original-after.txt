@@ -1,0 +1,4 @@
+victim 82538 | runner 82527
+before the carrier   signalled: []  unproven: [{'kind': 'pid', 'id': 82538, 'why': 'born before the boundary or not a descendant of the runner'}]
+table row of the victim: Host(pid=82538, ppid=82527, pgid=82050, born=1791857740.0, command="/bin/zsh -c echo ready; read x; : 'a process that is not owned by the runner: born before the boundary'")
+after the carrier    signalled: []  unproven: [{'kind': 'pid', 'id': 82538, 'why': 'born before the boundary or not a descendant of the runner'}]

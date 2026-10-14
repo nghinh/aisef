@@ -1,0 +1,11 @@
+[S1] PASS
+[S2] PASS
+[S2c] PASS
+[S2b-readonly] PASS
+[S2b-missing] PASS
+[S2b-not-executable] PASS
+[S2b-client-holds-home] PASS
+[S3] PASS
+[S3t] PASS
+[S3c] PASS
+[S4] PASS

@@ -1,0 +1,293 @@
+{
+ "wp": "auth",
+ "branch": "v21r3/auth",
+ "head": "67d5416f3c2c794df4563a644b7002bfa07e7cd5",
+ "base": "v21r3/integ @ 643a6e0",
+ "commits": [
+  "dae42a2 the reader: bytes, LF only, strict rows, TableUnreadable; ps in LC_TIME=C; PowerShell base64; carriers and cwd_under; two test files; one existing test changed",
+  "ee51eda the year the clock cannot hold is made to refuse (Linux guest finding)",
+  "67d5416 the decision record; the fake-lsof prefix tests are POSIX-only"
+ ],
+ "files_changed": [
+  "validation/v2/cleanup_authority.py",
+  "tests/v2/test_v21_r3_auth_ps_table.py",
+  "tests/v2/test_v21_r3_auth_other_readers.py",
+  "tests/v2/test_v21_defects_runner.py",
+  "docs/v2.1/decisions/B03-R3-AUTH.md"
+ ],
+ "tests_added": [
+  "tests/v2/test_v21_r3_auth_ps_table.py (30 tests: RowIsALine 10, NotARow 8, PsRunsInTheCLocaleForItsDates 4, ACommandLineIsNeverAuthority 5, TheRealPs 3 [posix only; real ps, real children])",
+  "tests/v2/test_v21_r3_auth_other_readers.py (34 tests: WindowsTable 9, Carriers 8, CarriersOnLinux 2, CwdUnder 11 [posix], CwdUnderOnLinux 2 [posix], TheRealHost 2 [posix; real ps -E / lsof / /proc])"
+ ],
+ "existing_tests_changed": [
+  {
+   "file": "tests/v2/test_v21_defects_runner.py",
+   "test": "ContinuationLines.test_a_continuation_line_that_reads_as_a_date_is_no_row (+ the FakePs helper)",
+   "now": "ContinuationLines.test_a_continuation_line_that_reads_as_a_date_refuses_the_reading_with_a_typed_error; FakePs.communicate returns the bytes ps printed",
+   "change": "three lines that are no row were skipped and the table was [100, 31337]; now each of them alone and all three together is TableUnreadable (an OSError, not a ValueError - the original defect was the ValueError). The other two tests are unchanged.",
+   "owner_sentence": "FU-AUTH: 'make a non-blank line that is not a row a typed fail-closed error'; INV-MUTATION-AUTHORITY (owner, 2026-09-24): implementation output may NEVER expand destructive authority (a skipped line is a process the table cannot see, a made-up row is one that is not there)."
+  }
+ ],
+ "forged_row_repro": {
+  "script": "repro-forged-row.py.txt (python3 -B -I repro-forged-row.py.txt TREE); original finding script: repro-forged-row-original.py.txt",
+  "host": "macOS 26.5.2, Python 3.14.7, LC_ALL=en_US.UTF-8, real children (stdin-closed), dry_run=True, nothing signalled",
+  "before": "integration head 643a6e0 (repro-before.json, repro-original-before.txt): U+2028 and U+2029 -> victim (born before the boundary) in `signalled`, its table row is the forged one (ppid = runner, born 2099); U+0085 VT FF FS GS RS CR LF NBSP -> not signalled (this ps escapes them); carriers: token after a variable holding U+2028 NOT found; cwd_under: a cwd named a<U+2028>b NOT found",
+  "after": "this branch (repro-after.json, repro-original-after.txt): no separator signals the victim, its row is the real one, the carrier's command is whole; carriers and cwd_under find their carriers. Linux guest (repro-before-guest.json / repro-after-guest.json): negative before and after - procps prints every separator as ? or . and LF as a space"
+ },
+ "exception_class_and_why": "TableUnreadable(OSError), also raised for the two conditions that were a plain OSError (failed ps / reader not listed / lsof not listing this process). Every caller already stops on OSError as 'the table cannot be read': mutation.py _clean (:1330) and _settle (:1356) -> _Stop HOST_TABLE_UNREADABLE; _earlier's caller (:2048) -> STOPPED before the first target, exit 3; establish at :1816 is inside the target's except Exception -> _Stop RUNNER_EXCEPTION (no mutant runs). A ValueError would be the old defect (RUNNER_EXCEPTION out of the reader, batch T23a) and an unrelated type an uncaught traceback (VS-4). The only except (OSError, RangeError) that goes on (:1545) wraps ProcessRange.start(), which never calls this module. Pinned: it is an OSError and not a ValueError.",
+ "callers": [
+  {
+   "file": "validation/v2/mutation.py",
+   "line": 1317,
+   "what": "_watch: host_table(); not caught here; called by _clean (inside its try) and by _earlier (caught by its caller)"
+  },
+  {
+   "file": "validation/v2/mutation.py",
+   "line": 1328,
+   "what": "_clean: signal_owned(...) and _watch(); except OSError (:1330) -> _Stop('HOST_TABLE_UNREADABLE: ...')"
+  },
+  {
+   "file": "validation/v2/mutation.py",
+   "line": 1342,
+   "what": "_leftovers: strays / carriers (:1343) / cwd_under (:1344); called inside _settle's try -> except OSError (:1356) -> _Stop HOST_TABLE_UNREADABLE"
+  },
+  {
+   "file": "validation/v2/mutation.py",
+   "line": 1354,
+   "what": "_settle: host_table(); except OSError -> _Stop HOST_TABLE_UNREADABLE"
+  },
+  {
+   "file": "validation/v2/mutation.py",
+   "line": 1375,
+   "what": "_earlier: host_table(), strays/carriers/cwd_under (:1377-1378), _watch; its caller (:2047-2050) except OSError -> 'STOPPED before the first target: HOST_TABLE_UNREADABLE', exit 3"
+  },
+  {
+   "file": "validation/v2/mutation.py",
+   "line": 1816,
+   "what": "run_target: ca.establish(scratch) inside the target's try/except Exception -> _Stop('RUNNER_EXCEPTION: TableUnreadable(...)'); no mutant runs (an OSError read the same before)"
+  },
+  {
+   "file": "validation/v21/read_set.py",
+   "line": 367,
+   "what": "record(): ca.establish(scratch); not caught - the tool fails loudly (as for an OSError before)"
+  },
+  {
+   "file": "validation/v2/checker_calibration.py",
+   "line": 261,
+   "what": "_cleanup_authority.clean(): ca.establish(ROOT) then signal_owned(dry_run=True); not caught - the calibration check fails loudly"
+  },
+  {
+   "file": "validation/qualification/q3.py",
+   "line": 409,
+   "what": "_fault_G: ca.host_table() (also :412); not caught - the fault case fails loudly"
+  },
+  {
+   "file": "validation/v21/sandbox/linux_guest.py",
+   "line": 160,
+   "what": "roles a/b/c/d1: ca.establish (:160), ca.host_table (:170, :320, :336); not caught - the guest check fails loudly"
+  },
+  {
+   "file": "tests/v2/test_v21_mutation_runner.py",
+   "line": 564,
+   "what": "test_a_host_table_that_cannot_be_read_stops_instead_of_reading_as_empty: assertRaises(OSError, host_table / carriers) and _Stop HOST_TABLE_UNREADABLE; still holds (subclass)"
+  },
+  {
+   "file": "tests/v2/p4/test_mutation_safety.py",
+   "line": 58,
+   "what": "host_table() / owned / signal_owned / signal_member over the real host or a table=; unchanged"
+  }
+ ],
+ "other_readers": [
+  {
+   "function": "_windows_table (+ new _win_rows)",
+   "change": "PowerShell prints the command as base64 of its UTF-8 bytes (pid|ppid|seconds|base64); bytes; CR LF terminators turned into LF, a lone CR is data; a line that is no row, a bad base64, a pid twice -> TableUnreadable; a shell that cannot run / times out still returns ({}, -1)",
+   "verdict": "FIXED, NOT RUN on Windows. Deviates from the brief's -replace: a closed ASCII grammar, exact command, no judgement about replacements; if the script is wrong the table is empty or refused, never wider"
+  },
+  {
+   "function": "carriers (macOS ps -E branch; new _env_rows)",
+   "change": "bytes, LF-only, strict '<pid> <command and environment>' rows; non-row / pid twice / failed ps / reader not listed -> TableUnreadable (messages: 'ps -E exited N' / 'ps -E did not list itself'). Linux /proc branch unchanged, its mutants pinned by a fake /proc",
+   "verdict": "FIXED. Measured: a token after a U+2028 variable was lost (the candidate), now found"
+  },
+  {
+   "function": "cwd_under (macOS lsof branch; new _lsof_cwds)",
+   "change": "lsof -F0pn read as bytes, split at NUL into p/f/n fields; output that stops inside a field, an unknown field letter, p non-digits, n before p -> TableUnreadable; 'does not list this process' now typed. Linux readlink branch unchanged, pinned by a fake readlink",
+   "verdict": "FIXED. Measured: a cwd named a<U+2028>b was cut and not found, now found"
+  },
+  {
+   "function": "_ps_env (new)",
+   "change": "ps runs with LC_TIME=C (LC_ALL moved to LC_CTYPE)",
+   "verdict": "ADDED. Measured: LC_ALL=de_DE/ja_JP/fr_FR.UTF-8 made every row unparsable ('ps -A exited 0 and did not list itself'); with the pin all five locales read the whole table. Not measured for glibc ps under non-C locales (the guest has none)"
+  }
+ ],
+ "windows": {
+  "changed": "the PowerShell script (command line as base64 of UTF-8), the reader (bytes, LF split after CR LF -> LF, strict row, typed refusals, pid twice)",
+  "tested_how": "SIMULATION: the output is built from the format the script prints (win_row()) and fed through a fake Popen with posix=False: exact command for 12 separator shapes incl. raw CR/LF and a forged-row text, UTF-8 and non-UTF-8 bytes, CRLF/LF terminators, 13 shapes of non-row, pid twice, shell failing/timeout, the proofs (owned/signal_owned) over a Windows table, and the script text (one use of $_.CommandLine, inside ToBase64String(UTF8.GetBytes([string]...)))",
+  "not_run": "the PowerShell script has never been executed (no PowerShell here): neither PS 5.1 nor 7; the CIM property names, the base64 call and the output encoding are as the old script used them / standard .NET but unobserved"
+ },
+ "real_ps_rows_parsed": {
+  "host": "macOS 26.5.2: 713 rows parsed (independent ps -A call taken just before: 712; 654 and 654 on an earlier, quieter run); reader listed; rows with a space-padded day (`Oct  6`) parse; 40/40 commands equal `ps -p PID -o command=`; the same table under LC_ALL=en_US, C, de_DE, ja_JP, fr_FR (real-ps-rows-host-after.json; the integration head fails the last three: real-ps-rows-host-before.json)",
+  "guest": "Linux 7.0.12-linuxkit aarch64, Debian procps copied into the image, Python 3.14.8: 63 rows parsed = 63 in an independent ps call (60 real children with U+2028/U+2029/U+0085/VT/FF/FS/CR/LF/NBSP/U+3000/TAB/DEL/ESC/emoji in their argv, a 3000-character argument, non-UTF-8 bytes + docker-init, python, ps); reader listed; 60/60 commands equal `ps -p`; max command 3104 characters (guest-many-rows.json). The guest's own tiny table: real-ps-rows-guest-after.json (3 rows)"
+ },
+ "mutants": [
+  {
+   "function": "_lines",
+   "total": 4,
+   "killed": 4,
+   "survived": 0,
+   "dispositions": []
+  },
+  {
+   "function": "_not_a_row",
+   "total": 2,
+   "killed": 2,
+   "survived": 0,
+   "dispositions": [
+    "first run: 1 survivor (the message text emptied) -> KILLED by an assertion on the message prefix"
+   ]
+  },
+  {
+   "function": "_twice",
+   "total": 3,
+   "killed": 3,
+   "survived": 0,
+   "dispositions": [
+    "first run: 2 survivors (message text emptied) -> KILLED by an assertion on the message"
+   ]
+  },
+  {
+   "function": "_ps_env",
+   "total": 8,
+   "killed": 8,
+   "survived": 0,
+   "dispositions": []
+  },
+  {
+   "function": "_ps_rows",
+   "total": 25,
+   "killed": 25,
+   "survived": 0,
+   "dispositions": [
+    "first run: 4 survivors ('ps' emptied x3 in the messages; OverflowError dropped from the except) -> KILLED by message-prefix assertions and a test that makes time.mktime raise OverflowError"
+   ]
+  },
+  {
+   "function": "_read",
+   "total": 23,
+   "killed": 23,
+   "survived": 0,
+   "dispositions": [
+    "first run: 2 survivors (message words emptied) -> KILLED by full-message assertions"
+   ]
+  },
+  {
+   "function": "_win_rows",
+   "total": 15,
+   "killed": 15,
+   "survived": 0,
+   "dispositions": [
+    "first run: 1 survivor ('powershell' emptied in one refusal) -> KILLED by a message-prefix assertion on each refusal"
+   ]
+  },
+  {
+   "function": "_windows_table",
+   "total": 20,
+   "killed": 20,
+   "survived": 0,
+   "dispositions": [
+    "the script text is killed by the assertion on the script (not by running it)"
+   ]
+  },
+  {
+   "function": "_env_rows",
+   "total": 8,
+   "killed": 8,
+   "survived": 0,
+   "dispositions": [
+    "first run: 2 survivors ('ps -E' emptied) -> KILLED by full-message assertions"
+   ]
+  },
+  {
+   "function": "_lsof_cwds",
+   "total": 27,
+   "killed": 27,
+   "survived": 0,
+   "dispositions": [
+    "first run: 3 survivors (two refusal messages; decode 'replace') -> KILLED by full-message assertions and a path with a byte that is not UTF-8"
+   ]
+  },
+  {
+   "function": "carriers",
+   "total": 39,
+   "killed": 39,
+   "survived": 0,
+   "dispositions": [
+    "first run: 10 survivors (the failure message; the unchanged Linux branch: '/proc/', '/environ', a negated condition) -> KILLED by full-message assertions and a hermetic fake /proc"
+   ]
+  },
+  {
+   "function": "cwd_under",
+   "total": 48,
+   "killed": 48,
+   "survived": 0,
+   "dispositions": [
+    "first run: 4 survivors (sorted -> list; the '-w' element; the Linux branch '/proc/', '/cwd') -> KILLED by an unsorted table, the exact lsof argv, and a fake readlink"
+   ]
+  }
+ ],
+ "kill_files_by_function": {
+  "validation/v2/cleanup_authority.py::_lines": [
+   "tests/v2/test_v21_r3_auth_ps_table.py"
+  ],
+  "validation/v2/cleanup_authority.py::_not_a_row": [
+   "tests/v2/test_v21_r3_auth_ps_table.py"
+  ],
+  "validation/v2/cleanup_authority.py::_twice": [
+   "tests/v2/test_v21_r3_auth_ps_table.py"
+  ],
+  "validation/v2/cleanup_authority.py::_ps_env": [
+   "tests/v2/test_v21_r3_auth_ps_table.py"
+  ],
+  "validation/v2/cleanup_authority.py::_ps_rows": [
+   "tests/v2/test_v21_r3_auth_ps_table.py"
+  ],
+  "validation/v2/cleanup_authority.py::_read": [
+   "tests/v2/test_v21_r3_auth_ps_table.py",
+   "tests/v2/test_v21_r3_auth_other_readers.py"
+  ],
+  "validation/v2/cleanup_authority.py::_win_rows": [
+   "tests/v2/test_v21_r3_auth_other_readers.py"
+  ],
+  "validation/v2/cleanup_authority.py::_windows_table": [
+   "tests/v2/test_v21_r3_auth_other_readers.py"
+  ],
+  "validation/v2/cleanup_authority.py::_env_rows": [
+   "tests/v2/test_v21_r3_auth_other_readers.py"
+  ],
+  "validation/v2/cleanup_authority.py::_lsof_cwds": [
+   "tests/v2/test_v21_r3_auth_other_readers.py"
+  ],
+  "validation/v2/cleanup_authority.py::carriers": [
+   "tests/v2/test_v21_r3_auth_other_readers.py"
+  ],
+  "validation/v2/cleanup_authority.py::cwd_under": [
+   "tests/v2/test_v21_r3_auth_other_readers.py"
+  ],
+  "note": "cleanup_authority.py is not a registered mutation target (grep in validation/v2/mutation.py: only the import), so there is no registered kill set; kill_check used the two new files (T0 PASS, t0_check PASS for both and for the changed existing file). The files above are what to register if the lead wants this module measured by the runner."
+ },
+ "test_runs": [
+  "HOST (macOS 26.5.2, workers' env via py.sh), final tree: tests.v2.test_v21_r3_auth_ps_table 30 OK; tests.v2.test_v21_r3_auth_other_readers 34 OK; tests.v2.test_v21_defects_runner 3 OK; tests.v2.p0.test_destructive_authority 13 OK; tests.v2.p4.test_mutation_safety 10 OK; tests.v2.p5.test_invariants 50 OK; validation/v2/destructive_authority.py --check PASS",
+  "HOST, the module as committed (modules that import cleanup_authority, directly or through mutation.py): p4.test_process_range 24 OK; test_v21_confine 34 OK; test_v21_read_set 26 OK; test_v21_snapshot_delta 51 OK; test_v21_kill_check 2 OK; test_v21_execution_order 3 OK; test_v21_requalification 3 OK; p2.test_mutation_targets 4 OK; test_s2_mutation_record 12 OK; test_v21_mutation_record 7 OK; test_v21_identity_bytes 4 OK; test_s2_kills 43 OK",
+  "HOST, EXPECTED-STALE sealed records (named process_range.py targets 'changed since the mutation run', i.e. WP range-fu, not this file): p0.test_checker_calibration 13 run, 4 FAILED (mutation, migration_table, execution_order clean_passes + the summary; the cleanup_authority checker passes); test_v21_mutation_runner 67 run, 1 FAILED (Classify.test_historical_records_read_as_before [P4])",
+  "LINUX GUEST (real, $R3/guest.sh, archive of ee51eda = the module of 67d5416): roles a, b, c, d1 of linux_guest.py exit 0 with the pattern of the recorded 2026-10-08 evidence (the runner's own child proved; canaries unproven and alive; nothing outside signalled); test_v21_confine 34 OK; p4.test_process_range 24 OK; test_v21_defects_runner 3 OK; both new files 30 + 34 OK; p0.test_destructive_authority 13 OK; p4.test_mutation_safety 10 run, 1 FAILED: test_MUT_SAFE_6 'the mutant is the catastrophic one: it reports the host' needs > 50 processes and the container has 2 - fails identically at the integration head in the guest (guest-integ-mutation-safety.err), so not caused by this change",
+  "WRONG IMPLEMENTATIONS (wrong-impls-ps-table.txt): 10 one-edit variants of the module; the new ps_table file fails for each",
+  "ruff check . over the whole tree: passed before every commit"
+ ],
+ "not_established": [
+  "Windows: the PowerShell script and the base64 reading were never run (no PowerShell here); only the format was simulated. Run once on a real Windows (PS 5.1 and 7) before relying on it.",
+  "A ps that prints a raw LF inside a command line: none measured (macOS prints \\012, procps a space). By shape such a row cannot be told from a real one; closed only for a forged pid that is also listed (pid twice); a forged row for a pid that is not listed (and might be reused) is not caught - that needs a second source (sysctl or /proc), not built.",
+  "The LC_TIME=C pin is measured on macOS; for glibc ps it follows from strftime, not from a measurement (the guest has only C, C.utf8, POSIX).",
+  "ps versions other than macOS 26.5.2's and the guest's procps (BSD, busybox, older macOS) were not measured; the pattern is 'exactly as strict as the column format measured', and a ps that pads or words lstart differently would be refused (typed, naming the line), not mis-read.",
+  "mutation.py:1816 reports an unreadable table at establish as RUNNER_EXCEPTION, not HOST_TABLE_UNREADABLE (unchanged behaviour, not my file).",
+  "The sealed records (calibration, mutation record, K-NOWORK, Q0) are stale after this change as after any product change; the lead regenerates them."
+ ]
+}

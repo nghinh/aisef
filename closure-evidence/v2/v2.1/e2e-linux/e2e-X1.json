@@ -1,0 +1,3648 @@
+{
+ "code_path_proofs": [
+  {
+   "field": "stdout of `python3 -B -m aisef run ...`: keys delivery_verdict, evidence_anchor, record",
+   "segment": "CLI -> aisef2/app/cli.py::run",
+   "value": {
+    "delivery_verdict": "PASS",
+    "record": "run/RUN.json"
+   }
+  },
+  {
+   "field": "RUN.json format / stage / kernel_digest",
+   "segment": "cli.run -> run.execute (the record)",
+   "value": {
+    "format": "aisef-v2-run-record/1",
+    "kernel_digest": "42e612707013159cb7bfbee3d63ccafa7a9ac03a9e6324e58171b58abdf3456b",
+    "stage": "finished"
+   }
+  },
+  {
+   "field": "RUN.json confinement.{bwrap,bwrap_version,bwrap_sha256,argv[0],problems} and <out>/confinement/canary mtime < first provider request",
+   "segment": "run.execute -> confine.measure (before the first provider request)",
+   "value": {
+    "argv_0": "/usr/bin/bwrap",
+    "bwrap": "/usr/bin/bwrap",
+    "bwrap_sha256": "b3b829e18a7d43ee589dc37e351cb9480ff7301b493d8227b8c754294638b976",
+    "bwrap_version": "bubblewrap 0.12.0",
+    "problems": []
+   }
+  },
+  {
+   "field": "RUN.json preflight.verdict, accounting",
+   "segment": "run.execute -> preflight against the loopback provider",
+   "value": {
+    "accounting": {
+     "input_tokens": 200,
+     "output_tokens": 40,
+     "provider_requests": 3,
+     "turns": 0,
+     "unaccounted": []
+    },
+    "verdict": "ATTESTED"
+   }
+  },
+  {
+   "field": "RUN.json sessions[].confinement; the client's own /proc/1/cmdline equals confine.argv (S1 check *_ran_inside_bwrap_as_pid_1_with_the_kernels_argv)",
+   "segment": "adapters.Developer/Reviewer -> client.session -> confine.wrap -> bwrap",
+   "value": [
+    "bwrap network=host",
+    "bwrap network=host workspace=read-only"
+   ]
+  },
+  {
+   "field": "RUN.json story_outcomes, final_main, sessions[developer].developer_committed_itself",
+   "segment": "story_runner -> merge (the kernel commits the developer's files; the scripted developer never runs git, so developer_committed_itself is false by construction; the read-only git directory is shown by S2)",
+   "value": {
+    "developer_committed_itself": [
+     false
+    ],
+    "final_main": "7e222c9ce095b5f7a9700bcaf24ab3ec753e4e4f",
+    "story_outcomes": {
+     "S1": [
+      "COMMIT"
+     ]
+    }
+   }
+  },
+  {
+   "field": "stdout verdict, journal_events, evidence_anchor, notes",
+   "segment": "cli --verify -> aisef2/app/verify.py::verify",
+   "value": {
+    "evidence_anchor": "70871cc78ef03462d3bdb0ca140279a5f03cd9aa9a4199df1340ef43ac26bf20",
+    "journal_events": 106,
+    "notes": [
+     "the anchor matches the expected value: authentic only as far as that value came from a store the developer cannot write (docs/v2.1/ANCHOR-THREAT-MODEL.md); it does not prove the run happened as its journal says"
+    ],
+    "verdict": "VERIFIED"
+   }
+  }
+ ],
+ "environment": {
+  "bwrap": "bubblewrap 0.12.0",
+  "bwrap_sha256": "b3b829e18a7d43ee589dc37e351cb9480ff7301b493d8227b8c754294638b976",
+  "container_namespaces": {
+   "ipc": "ipc:[4026532834]",
+   "mnt": "mnt:[4026532832]",
+   "net": "net:[4026532837]",
+   "pid": "pid:[4026532835]",
+   "user": "user:[4026531837]",
+   "uts": "uts:[4026532833]"
+  },
+  "container_process_status": {
+   "CapBnd": "0000000000000000",
+   "CapEff": "0000000000000000",
+   "NoNewPrivs": "0",
+   "Seccomp": "0"
+  },
+  "debian": "13.7",
+  "gid": 1000,
+  "git": "git version 2.47.3",
+  "kernel_digest": "42e612707013159cb7bfbee3d63ccafa7a9ac03a9e6324e58171b58abdf3456b",
+  "max_user_namespaces": "31880",
+  "network_interfaces": [
+   "bonding_masters",
+   "erspan0",
+   "gre0",
+   "gretap0",
+   "ip6_vti0",
+   "ip6gre0",
+   "ip6tnl0",
+   "ip_vti0",
+   "lo",
+   "sit0",
+   "tunl0"
+  ],
+  "no_real_opencode_on_path": true,
+  "python": "3.14.8",
+  "python_executable": "/usr/local/bin/python3",
+  "routes": [],
+  "system_site_packages": "/usr/local/lib/python3.14/site-packages",
+  "tree": "/repo",
+  "uid": 1000,
+  "uname": "Linux 807ab93fb114 7.0.12-linuxkit #1 SMP PREEMPT Thu Aug 27 14:02:21 UTC 2026 aarch64"
+ },
+ "format": "aisef-v21-e2e-linux/1",
+ "passed": true,
+ "profile": "X1",
+ "project_steps": [
+  {
+   "argv": [
+    "/usr/local/bin/python3",
+    "-B",
+    "-m",
+    "aisef",
+    "bundle",
+    "seal",
+    "authoring.json",
+    "--repo",
+    "repo",
+    "--out",
+    "sealed.json"
+   ],
+   "exit": 0
+  },
+  {
+   "argv": [
+    "/usr/local/bin/python3",
+    "-B",
+    "-m",
+    "aisef",
+    "bundle",
+    "approve",
+    "sealed.json",
+    "--contract",
+    "BC-SUM",
+    "--approver",
+    "human:e2e",
+    "--out",
+    "a1.json"
+   ],
+   "exit": 0
+  },
+  {
+   "argv": [
+    "/usr/local/bin/python3",
+    "-B",
+    "-m",
+    "aisef",
+    "bundle",
+    "approve",
+    "a1.json",
+    "--contract",
+    "BC-USAGE-0",
+    "--approver",
+    "human:e2e",
+    "--out",
+    "a2.json"
+   ],
+   "exit": 0
+  },
+  {
+   "argv": [
+    "/usr/local/bin/python3",
+    "-B",
+    "-m",
+    "aisef",
+    "bundle",
+    "approve",
+    "a2.json",
+    "--contract",
+    "BC-USAGE-1",
+    "--approver",
+    "human:e2e",
+    "--out",
+    "approved.json"
+   ],
+   "exit": 0
+  },
+  {
+   "argv": [
+    "/usr/local/bin/python3",
+    "-B",
+    "-m",
+    "aisef",
+    "bundle",
+    "lint",
+    "approved.json"
+   ],
+   "exit": 0
+  }
+ ],
+ "provider_log_total": 18,
+ "scenarios": [
+  {
+   "checks": [
+    {
+     "evidence": {
+      "exit": 0,
+      "problems": [],
+      "provider_requests_during_check": 0,
+      "ready": true
+     },
+     "name": "check_is_ready_and_measured",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "delivery_blocked_by": [],
+      "delivery_verdict": "PASS",
+      "exit": 0,
+      "stderr": "",
+      "story_outcomes": {
+       "S1": [
+        "COMMIT"
+       ]
+      }
+     },
+     "name": "run_exit_0_delivery_pass",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "bwrap": "/usr/bin/bwrap",
+      "bwrap_sha256": "b3b829e18a7d43ee589dc37e351cb9480ff7301b493d8227b8c754294638b976",
+      "bwrap_version": "bubblewrap 0.12.0",
+      "capabilities": {
+       "CapAmb": "0000000000000000",
+       "CapBnd": "0000000000000000",
+       "CapEff": "0000000000000000",
+       "CapInh": "0000000000000000",
+       "CapPrm": "0000000000000000"
+      },
+      "mount_targets": [
+       "/usr",
+       "/etc",
+       "/proc",
+       "/dev",
+       "/tmp",
+       "/aisef-home",
+       "/tmp/e2e/S1/fakebin",
+       "/tmp/e2e/S1/run/repo/.git",
+       "/tmp/e2e/S1/xdg/opencode",
+       "/tmp/e2e/S1/run/confinement/ws"
+      ],
+      "mounts": [
+       {
+        "access": "rw",
+        "at": "/",
+        "dev": "0:60",
+        "fs": "tmpfs",
+        "optional": [],
+        "options": [
+         "rw",
+         "nosuid",
+         "nodev",
+         "relatime"
+        ],
+        "root": "/newroot",
+        "source": "tmpfs",
+        "super_options": [
+         "rw",
+         "uid=1000",
+         "gid=1000"
+        ]
+       },
+       {
+        "access": "ro",
+        "at": "/usr",
+        "dev": "0:57",
+        "fs": "overlay",
+        "optional": [],
+        "options": [
+         "ro",
+         "nosuid",
+         "nodev",
+         "relatime"
+        ],
+        "root": "/usr",
+        "source": "overlay",
+        "super_options": [
+         "rw",
+         "lowerdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167942/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166976/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166963/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166962/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166961/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166960/fs",
+         "upperdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167943/fs",
+         "workdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167943/work",
+         "nouserxattr"
+        ]
+       },
+       {
+        "access": "ro",
+        "at": "/usr/sbin/docker-init",
+        "dev": "0:26",
+        "fs": "overlay",
+        "optional": [],
+        "options": [
+         "ro",
+         "nosuid",
+         "nodev",
+         "relatime"
+        ],
+        "root": "/usr/libexec/docker/docker-init",
+        "source": "overlay",
+        "super_options": [
+         "rw",
+         "lowerdir=/",
+         "upperdir=/run/rootfs.upper",
+         "workdir=/run/rootfs.workdir",
+         "uuid=on",
+         "nouserxattr"
+        ]
+       },
+       {
+        "access": "ro",
+        "at": "/usr/lib/aarch64-linux-gnu/libproc2.so.0",
+        "dev": "0:46",
+        "fs": "virtiofs",
+        "optional": [],
+        "options": [
+         "ro",
+         "nosuid",
+         "nodev",
+         "relatime"
+        ],
+        "root": "/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/linux/procps/libproc2.so.0",
+        "source": "virtiofs2",
+        "super_options": [
+         "rw",
+         "ignore_atime",
+         "no_xattr"
+        ]
+       },
+       {
+        "access": "ro",
+        "at": "/usr/local/bin/ps",
+        "dev": "0:46",
+        "fs": "virtiofs",
+        "optional": [],
+        "options": [
+         "ro",
+         "nosuid",
+         "nodev",
+         "relatime"
+        ],
+        "root": "/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/linux/procps/ps",
+        "source": "virtiofs2",
+        "super_options": [
+         "rw",
+         "ignore_atime",
+         "no_xattr"
+        ]
+       },
+       {
+        "access": "ro",
+        "at": "/etc",
+        "dev": "0:57",
+        "fs": "overlay",
+        "optional": [],
+        "options": [
+         "ro",
+         "nosuid",
+         "nodev",
+         "relatime"
+        ],
+        "root": "/etc",
+        "source": "overlay",
+        "super_options": [
+         "rw",
+         "lowerdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167942/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166976/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166963/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166962/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166961/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166960/fs",
+         "upperdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167943/fs",
+         "workdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167943/work",
+         "nouserxattr"
+        ]
+       },
+       {
+        "access": "ro",
+        "at": "/etc/hostname",
+        "dev": "254:1",
+        "fs": "ext4",
+        "optional": [],
+        "options": [
+         "ro",
+         "nosuid",
+         "nodev",
+         "relatime"
+        ],
+        "root": "/docker/containers/807ab93fb114868683719253f9a083b8f256e9b5dd15640ed9ffb4809a6e1162/hostname",
+        "source": "/dev/vda1",
+        "super_options": [
+         "rw",
+         "discard"
+        ]
+       },
+       {
+        "access": "ro",
+        "at": "/etc/hosts",
+        "dev": "254:1",
+        "fs": "ext4",
+        "optional": [],
+        "options": [
+         "ro",
+         "nosuid",
+         "nodev",
+         "relatime"
+        ],
+        "root": "/docker/containers/807ab93fb114868683719253f9a083b8f256e9b5dd15640ed9ffb4809a6e1162/hosts",
+        "source": "/dev/vda1",
+        "super_options": [
+         "rw",
+         "discard"
+        ]
+       },
+       {
+        "access": "ro",
+        "at": "/etc/resolv.conf",
+        "dev": "254:1",
+        "fs": "ext4",
+        "optional": [],
+        "options": [
+         "ro",
+         "nosuid",
+         "nodev",
+         "relatime"
+        ],
+        "root": "/docker/containers/807ab93fb114868683719253f9a083b8f256e9b5dd15640ed9ffb4809a6e1162/resolv.conf",
+        "source": "/dev/vda1",
+        "super_options": [
+         "rw",
+         "discard"
+        ]
+       },
+       {
+        "access": "rw",
+        "at": "/proc",
+        "dev": "0:61",
+        "fs": "proc",
+        "optional": [],
+        "options": [
+         "rw",
+         "nosuid",
+         "nodev",
+         "noexec",
+         "relatime"
+        ],
+        "root": "/",
+        "source": "proc",
+        "super_options": [
+         "rw"
+        ]
+       },
+       {
+        "access": "rw",
+        "at": "/dev",
+        "dev": "0:62",
+        "fs": "tmpfs",
+        "optional": [],
+        "options": [
+         "rw",
+         "nosuid",
+         "nodev",
+         "relatime"
+        ],
+        "root": "/",
+        "source": "tmpfs",
+        "super_options": [
+         "rw",
+         "mode=755",
+         "uid=1000",
+         "gid=1000"
+        ]
+       },
+       {
+        "access": "rw",
+        "at": "/dev/null",
+        "dev": "0:69",
+        "fs": "tmpfs",
+        "optional": [],
+        "options": [
+         "rw",
+         "nosuid"
+        ],
+        "root": "/null",
+        "source": "tmpfs",
+        "super_options": [
+         "rw",
+         "size=65536k",
+         "mode=755"
+        ]
+       },
+       {
+        "access": "rw",
+        "at": "/dev/zero",
+        "dev": "0:69",
+        "fs": "tmpfs",
+        "optional": [],
+        "options": [
+         "rw",
+         "nosuid"
+        ],
+        "root": "/zero",
+        "source": "tmpfs",
+        "super_options": [
+         "rw",
+         "size=65536k",
+         "mode=755"
+        ]
+       },
+       {
+        "access": "rw",
+        "at": "/dev/full",
+        "dev": "0:69",
+        "fs": "tmpfs",
+        "optional": [],
+        "options": [
+         "rw",
+         "nosuid"
+        ],
+        "root": "/full",
+        "source": "tmpfs",
+        "super_options": [
+         "rw",
+         "size=65536k",
+         "mode=755"
+        ]
+       },
+       {
+        "access": "rw",
+        "at": "/dev/random",
+        "dev": "0:69",
+        "fs": "tmpfs",
+        "optional": [],
+        "options": [
+         "rw",
+         "nosuid"
+        ],
+        "root": "/random",
+        "source": "tmpfs",
+        "super_options": [
+         "rw",
+         "size=65536k",
+         "mode=755"
+        ]
+       },
+       {
+        "access": "rw",
+        "at": "/dev/urandom",
+        "dev": "0:69",
+        "fs": "tmpfs",
+        "optional": [],
+        "options": [
+         "rw",
+         "nosuid"
+        ],
+        "root": "/urandom",
+        "source": "tmpfs",
+        "super_options": [
+         "rw",
+         "size=65536k",
+         "mode=755"
+        ]
+       },
+       {
+        "access": "rw",
+        "at": "/dev/tty",
+        "dev": "0:69",
+        "fs": "tmpfs",
+        "optional": [],
+        "options": [
+         "rw",
+         "nosuid"
+        ],
+        "root": "/tty",
+        "source": "tmpfs",
+        "super_options": [
+         "rw",
+         "size=65536k",
+         "mode=755"
+        ]
+       },
+       {
+        "access": "rw",
+        "at": "/dev/pts",
+        "dev": "0:63",
+        "fs": "devpts",
+        "optional": [],
+        "options": [
+         "rw",
+         "nosuid",
+         "noexec",
+         "relatime"
+        ],
+        "root": "/",
+        "source": "devpts",
+        "super_options": [
+         "rw",
+         "mode=620",
+         "ptmxmode=666"
+        ]
+       },
+       {
+        "access": "rw",
+        "at": "/tmp",
+        "dev": "0:65",
+        "fs": "tmpfs",
+        "optional": [],
+        "options": [
+         "rw",
+         "nosuid",
+         "nodev",
+         "relatime"
+        ],
+        "root": "/",
+        "source": "tmpfs",
+        "super_options": [
+         "rw",
+         "mode=755",
+         "uid=1000",
+         "gid=1000"
+        ]
+       },
+       {
+        "access": "rw",
+        "at": "/aisef-home",
+        "dev": "0:85",
+        "fs": "tmpfs",
+        "optional": [],
+        "options": [
+         "rw",
+         "nosuid",
+         "nodev",
+         "relatime"
+        ],
+        "root": "/",
+        "source": "tmpfs",
+        "super_options": [
+         "rw",
+         "mode=755",
+         "uid=1000",
+         "gid=1000"
+        ]
+       },
+       {
+        "access": "ro",
+        "at": "/tmp/e2e/S1/fakebin",
+        "dev": "0:57",
+        "fs": "overlay",
+        "optional": [],
+        "options": [
+         "ro",
+         "nosuid",
+         "nodev",
+         "relatime"
+        ],
+        "root": "/tmp/e2e/S1/fakebin",
+        "source": "overlay",
+        "super_options": [
+         "rw",
+         "lowerdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167942/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166976/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166963/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166962/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166961/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166960/fs",
+         "upperdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167943/fs",
+         "workdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167943/work",
+         "nouserxattr"
+        ]
+       },
+       {
+        "access": "ro",
+        "at": "/tmp/e2e/S1/run/repo/.git",
+        "dev": "0:57",
+        "fs": "overlay",
+        "optional": [],
+        "options": [
+         "ro",
+         "nosuid",
+         "nodev",
+         "relatime"
+        ],
+        "root": "/tmp/e2e/S1/run/repo/.git",
+        "source": "overlay",
+        "super_options": [
+         "rw",
+         "lowerdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167942/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166976/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166963/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166962/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166961/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166960/fs",
+         "upperdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167943/fs",
+         "workdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167943/work",
+         "nouserxattr"
+        ]
+       },
+       {
+        "access": "ro",
+        "at": "/tmp/e2e/S1/xdg/opencode",
+        "dev": "0:57",
+        "fs": "overlay",
+        "optional": [],
+        "options": [
+         "ro",
+         "nosuid",
+         "nodev",
+         "relatime"
+        ],
+        "root": "/tmp/e2e/S1/xdg/opencode",
+        "source": "overlay",
+        "super_options": [
+         "rw",
+         "lowerdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167942/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166976/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166963/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166962/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166961/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166960/fs",
+         "upperdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167943/fs",
+         "workdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167943/work",
+         "nouserxattr"
+        ]
+       },
+       {
+        "access": "rw",
+        "at": "/tmp/e2e/S1/run/confinement/ws",
+        "dev": "0:57",
+        "fs": "overlay",
+        "optional": [],
+        "options": [
+         "rw",
+         "nosuid",
+         "nodev",
+         "relatime"
+        ],
+        "root": "/tmp/e2e/S1/run/confinement/ws",
+        "source": "overlay",
+        "super_options": [
+         "rw",
+         "lowerdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167942/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166976/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166963/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166962/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166961/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166960/fs",
+         "upperdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167943/fs",
+         "workdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167943/work",
+         "nouserxattr"
+        ]
+       }
+      ],
+      "namespaces": {
+       "ipc": "own",
+       "mnt": "own",
+       "net": "shared",
+       "pid": "own",
+       "user": "own",
+       "uts": "own"
+      },
+      "network": "host",
+      "no_new_privs": "1",
+      "operator_can": {
+       "write_client_directory": true,
+       "write_git_directory": true,
+       "write_interpreter_site": false,
+       "write_kernel": false,
+       "write_run_directory": true
+      },
+      "operator_uid": 1000,
+      "problems": [],
+      "seccomp": "0",
+      "setsid_survivors": [],
+      "tried": {
+       "read_canary": {
+        "exit": 1,
+        "output": "cat: /tmp/e2e/S1/run/confinement/canary: No such file or directory"
+       },
+       "read_git_directory": {
+        "exit": 0,
+        "output": "ref: refs/heads/main"
+       },
+       "setsid": {
+        "exit": 0,
+        "output": ""
+       },
+       "user_namespace": {
+        "exit": 1,
+        "output": "unshare: unshare failed: No space left on device"
+       },
+       "workspace": {
+        "exit": 0,
+        "output": "ok"
+       },
+       "write_client_directory": {
+        "exit": 2,
+        "output": "probe: 19: cannot create /tmp/e2e/S1/fakebin/.aisef-confine-probe-16a661c61ae6cf6a: Read-only file system"
+       },
+       "write_git_directory": {
+        "exit": 2,
+        "output": "probe: 20: cannot create /tmp/e2e/S1/run/repo/.git/.aisef-confine-probe-16a661c61ae6cf6a: Read-only file system"
+       },
+       "write_interpreter_site": {
+        "exit": 2,
+        "output": "probe: 18: cannot create /usr/local/lib/python3.14/site-packages/.aisef-confine-probe-16a661c61ae6cf6a: Read-only file system"
+       },
+       "write_kernel": {
+        "exit": 2,
+        "output": "probe: 17: cannot create /repo/aisef2/.aisef-confine-probe-16a661c61ae6cf6a: Directory nonexistent"
+       },
+       "write_run_directory": {
+        "exit": 0,
+        "output": ""
+       }
+      },
+      "uid": "1000"
+     },
+     "name": "record_confinement_measured",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "canary_mtime_ns": 1791861881415681000,
+      "first_provider_request_ns": 1791861881452357666,
+      "preflight_verdict": "ATTESTED",
+      "requests_seen_by_provider": [
+       [
+        "GET",
+        "/v1/models",
+        true
+       ],
+       [
+        "POST",
+        "/v1/chat/completions",
+        true
+       ],
+       [
+        "POST",
+        "/v1/chat/completions",
+        true
+       ]
+      ]
+     },
+     "name": "measured_before_the_first_provider_request",
+     "passed": true
+    },
+    {
+     "evidence": [
+      {
+       "attempt": 1,
+       "confinement": "bwrap network=host",
+       "exit": 0,
+       "log": "S1.developer.1.jsonl",
+       "role": "developer",
+       "story_id": "S1",
+       "timed_out": false,
+       "turns": 1
+      },
+      {
+       "attempt": 1,
+       "confinement": "bwrap network=host workspace=read-only",
+       "exit": 0,
+       "log": "S1.reviewer.1.jsonl",
+       "role": "reviewer",
+       "story_id": "S1",
+       "timed_out": false,
+       "turns": 1
+      }
+     ],
+     "name": "every_session_recorded_as_bwrap",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "client_argv": [
+       "/tmp/e2e/S1/fakebin/opencode",
+       "run",
+       "--format",
+       "json",
+       "--model",
+       "fakeprov/model-1",
+       "--title",
+       "developer S1",
+       "--dir",
+       "/tmp/e2e/S1/run/work/ws/wt-S1",
+       "You are the developer of story S1 of calc-cli. A calculator command. docs/requirements.md in this repository is the authoritative specification. Implement this story in this repository (the project's own source: app, tests), working only inside this directory.\n\nWhat this story must deliver is defined by the requirement clauses listed below and by docs/requirements.md, and by nothing else.\n\nWhen you finish, each of the following requirement clauses is verified independently against the requirements (INTRODUCE: this story makes it true; PRESERVE: it must stay true):\n- [INTRODUCE] R-CLI (docs/requirements.md \u00a71), clause 1.1: exits with the sum of the integers A and B\n- [INTRODUCE] R-CLI (docs/requirements.md \u00a71), clause 1.2: exit 2 on a usage error (any other number of arguments)\n\nThe product subjects those clauses are verified on: python -m app.\n\nWrite this story's unit tests in tests/test_cli.py (unittest; `python -m unittest` must pass from the repository root) and keep every earlier test passing. Do not edit docs/requirements.md. Do not run git commit; the harness commits your working tree."
+      ],
+      "pid1_cmdline_prefix_equals_confine.argv": true,
+      "pid1_comm": "bwrap",
+      "tail_equals_the_clients_own_argv": true,
+      "wrapper_argv": [
+       "/usr/bin/bwrap",
+       "--unshare-user",
+       "--unshare-pid",
+       "--unshare-ipc",
+       "--unshare-uts",
+       "--unshare-cgroup-try",
+       "--share-net",
+       "--disable-userns",
+       "--die-with-parent",
+       "--new-session",
+       "--cap-drop",
+       "ALL",
+       "--ro-bind",
+       "/usr",
+       "/usr",
+       "--ro-bind",
+       "/etc",
+       "/etc",
+       "--symlink",
+       "usr/bin",
+       "/bin",
+       "--symlink",
+       "usr/sbin",
+       "/sbin",
+       "--symlink",
+       "usr/lib",
+       "/lib",
+       "--proc",
+       "/proc",
+       "--dev",
+       "/dev",
+       "--tmpfs",
+       "/tmp",
+       "--tmpfs",
+       "/aisef-home",
+       "--ro-bind",
+       "/tmp/e2e/S1/fakebin",
+       "/tmp/e2e/S1/fakebin",
+       "--ro-bind",
+       "/tmp/e2e/S1/run/repo/.git",
+       "/tmp/e2e/S1/run/repo/.git",
+       "--ro-bind",
+       "/tmp/e2e/S1/xdg/opencode",
+       "/tmp/e2e/S1/xdg/opencode",
+       "--bind",
+       "/tmp/e2e/S1/run/work/ws/wt-S1",
+       "/tmp/e2e/S1/run/work/ws/wt-S1",
+       "--chdir",
+       "/tmp/e2e/S1/run/work/ws/wt-S1",
+       "--"
+      ]
+     },
+     "name": "developer_ran_inside_bwrap_as_pid_1_with_the_kernels_argv",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "home": "/aisef-home",
+      "home_listing": [],
+      "namespaces_inside": {
+       "ipc": "ipc:[4026532969]",
+       "mnt": "mnt:[4026532967]",
+       "net": "net:[4026532837]",
+       "pid": "pid:[4026532970]",
+       "user": "user:[4026532972]",
+       "uts": "uts:[4026532968]"
+      },
+      "namespaces_of_the_container": {
+       "ipc": "ipc:[4026532834]",
+       "mnt": "mnt:[4026532832]",
+       "net": "net:[4026532837]",
+       "pid": "pid:[4026532835]",
+       "user": "user:[4026531837]",
+       "uts": "uts:[4026532833]"
+      },
+      "pid": 2,
+      "ppid": 1,
+      "status": {
+       "CapAmb": "0000000000000000",
+       "CapBnd": "0000000000000000",
+       "CapEff": "0000000000000000",
+       "CapInh": "0000000000000000",
+       "CapPrm": "0000000000000000",
+       "Gid": "1000",
+       "NoNewPrivs": "1",
+       "Seccomp": "0",
+       "Uid": "1000"
+      },
+      "uid": 1000
+     },
+     "name": "developer_inside_view_unprivileged_and_namespaced",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "mount": [
+       "/tmp/e2e/S1/run/work/ws/wt-S1",
+       "overlay",
+       "rw"
+      ],
+      "workspace": "/tmp/e2e/S1/run/work/ws/wt-S1"
+     },
+     "name": "developer_workspace_mount_is_rw",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "client_argv": [
+       "/tmp/e2e/S1/fakebin/opencode",
+       "run",
+       "--format",
+       "json",
+       "--model",
+       "fakeprov/model-1",
+       "--title",
+       "reviewer S1",
+       "--dir",
+       "/tmp/e2e/S1/run/work/ws/verifier-wt-S1",
+       "Review the implementation of story S1 of calc-cli in this read-only checkout against docs/requirements.md and these clauses:\n- [INTRODUCE] R-CLI (docs/requirements.md \u00a71), clause 1.1: exits with the sum of the integers A and B\n- [INTRODUCE] R-CLI (docs/requirements.md \u00a71), clause 1.2: exit 2 on a usage error (any other number of arguments)\nDo not modify any file. Answer with ONLY one JSON object: {\"findings\": [{\"id\": \"short-id\", \"blocking\": true or false, \"severity\": \"low|medium|high|critical\", \"summary\": \"one line\", \"reproducer\": null or {\"clause\": \"<requirement id>/<clause> as listed above, e.g. R-9/3\", \"subject\": {\"kind\": \"cli_invocation|python_callable|file_artifact|process_effect\", \"locator\": \"...\"}, \"stimulus\": {...}, \"observable\": {..., \"within_s\": 10}}}]}\nA finding is acted on only when its reproducer \u2014 the behaviour the cited clause demands, in the probe's grammar \u2014 is observed NOT to hold when the kernel runs it, and the clause's approved criteria expect exactly that behaviour; any other finding is recorded for a person to triage."
+      ],
+      "pid1_cmdline_prefix_equals_confine.argv": true,
+      "pid1_comm": "bwrap",
+      "tail_equals_the_clients_own_argv": true,
+      "wrapper_argv": [
+       "/usr/bin/bwrap",
+       "--unshare-user",
+       "--unshare-pid",
+       "--unshare-ipc",
+       "--unshare-uts",
+       "--unshare-cgroup-try",
+       "--share-net",
+       "--disable-userns",
+       "--die-with-parent",
+       "--new-session",
+       "--cap-drop",
+       "ALL",
+       "--ro-bind",
+       "/usr",
+       "/usr",
+       "--ro-bind",
+       "/etc",
+       "/etc",
+       "--symlink",
+       "usr/bin",
+       "/bin",
+       "--symlink",
+       "usr/sbin",
+       "/sbin",
+       "--symlink",
+       "usr/lib",
+       "/lib",
+       "--proc",
+       "/proc",
+       "--dev",
+       "/dev",
+       "--tmpfs",
+       "/tmp",
+       "--tmpfs",
+       "/aisef-home",
+       "--ro-bind",
+       "/tmp/e2e/S1/fakebin",
+       "/tmp/e2e/S1/fakebin",
+       "--ro-bind",
+       "/tmp/e2e/S1/run/repo/.git",
+       "/tmp/e2e/S1/run/repo/.git",
+       "--ro-bind",
+       "/tmp/e2e/S1/xdg/opencode",
+       "/tmp/e2e/S1/xdg/opencode",
+       "--ro-bind",
+       "/tmp/e2e/S1/run/work/ws/verifier-wt-S1",
+       "/tmp/e2e/S1/run/work/ws/verifier-wt-S1",
+       "--chdir",
+       "/tmp/e2e/S1/run/work/ws/verifier-wt-S1",
+       "--"
+      ]
+     },
+     "name": "reviewer_ran_inside_bwrap_as_pid_1_with_the_kernels_argv",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "home": "/aisef-home",
+      "home_listing": [],
+      "namespaces_inside": {
+       "ipc": "ipc:[4026532969]",
+       "mnt": "mnt:[4026532967]",
+       "net": "net:[4026532837]",
+       "pid": "pid:[4026532970]",
+       "user": "user:[4026532972]",
+       "uts": "uts:[4026532968]"
+      },
+      "namespaces_of_the_container": {
+       "ipc": "ipc:[4026532834]",
+       "mnt": "mnt:[4026532832]",
+       "net": "net:[4026532837]",
+       "pid": "pid:[4026532835]",
+       "user": "user:[4026531837]",
+       "uts": "uts:[4026532833]"
+      },
+      "pid": 2,
+      "ppid": 1,
+      "status": {
+       "CapAmb": "0000000000000000",
+       "CapBnd": "0000000000000000",
+       "CapEff": "0000000000000000",
+       "CapInh": "0000000000000000",
+       "CapPrm": "0000000000000000",
+       "Gid": "1000",
+       "NoNewPrivs": "1",
+       "Seccomp": "0",
+       "Uid": "1000"
+      },
+      "uid": 1000
+     },
+     "name": "reviewer_inside_view_unprivileged_and_namespaced",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "mount": [
+       "/tmp/e2e/S1/run/work/ws/verifier-wt-S1",
+       "overlay",
+       "ro"
+      ],
+      "workspace": "/tmp/e2e/S1/run/work/ws/verifier-wt-S1"
+     },
+     "name": "reviewer_workspace_mount_is_ro",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "app/cli.py": "def main(args):\n    if len(args) != 2:\n        return 2\n    return int(args[0]) + int(args[1])\n",
+      "developer_committed_itself": [
+       false
+      ],
+      "final_main": "7e222c9ce095b5f7a9700bcaf24ab3ec753e4e4f"
+     },
+     "name": "developer_work_landed_on_main",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "file": "70871cc78ef03462d3bdb0ca140279a5f03cd9aa9a4199df1340ef43ac26bf20",
+      "mode": "0o444",
+      "printed": "70871cc78ef03462d3bdb0ca140279a5f03cd9aa9a4199df1340ef43ac26bf20"
+     },
+     "name": "anchor_file_is_0444_and_is_the_printed_anchor",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "evidence_anchor": "70871cc78ef03462d3bdb0ca140279a5f03cd9aa9a4199df1340ef43ac26bf20",
+      "exit": 0,
+      "journal_events": 106,
+      "notes": [
+       "the anchor matches the expected value: authentic only as far as that value came from a store the developer cannot write (docs/v2.1/ANCHOR-THREAT-MODEL.md); it does not prove the run happened as its journal says"
+      ],
+      "problems": [],
+      "verdict": "VERIFIED"
+     },
+     "name": "verify_with_the_anchor_is_VERIFIED",
+     "passed": true
+    }
+   ],
+   "cli": [
+    {
+     "argv": [
+      "/usr/local/bin/python3",
+      "-B",
+      "-m",
+      "aisef",
+      "run",
+      "--check",
+      "--project",
+      "/tmp/e2e/project/approved.json",
+      "--settings",
+      "settings.json",
+      "--repo",
+      "/tmp/e2e/project/repo"
+     ],
+     "exit": 0,
+     "seconds": 0.7,
+     "tag": "check"
+    },
+    {
+     "argv": [
+      "/usr/local/bin/python3",
+      "-B",
+      "-m",
+      "aisef",
+      "run",
+      "--project",
+      "/tmp/e2e/project/approved.json",
+      "--settings",
+      "settings.json",
+      "--repo",
+      "/tmp/e2e/project/repo",
+      "--out",
+      "run",
+      "--anchor-out",
+      "anchor.txt"
+     ],
+     "exit": 0,
+     "seconds": 6.9,
+     "tag": "run"
+    },
+    {
+     "argv": [
+      "/usr/local/bin/python3",
+      "-B",
+      "-m",
+      "aisef",
+      "run",
+      "--verify",
+      "--project",
+      "/tmp/e2e/project/approved.json",
+      "--out",
+      "run",
+      "--expect-anchor",
+      "70871cc78ef03462d3bdb0ca140279a5f03cd9aa9a4199df1340ef43ac26bf20"
+     ],
+     "exit": 0,
+     "seconds": 0.6,
+     "tag": "verify"
+    }
+   ],
+   "facts": {
+    "check_exit": 0,
+    "confinement_problems": [],
+    "delivery_verdict": "PASS",
+    "journal_event_types_sha": "ee4cf17466733f40f0b80d575568f5b68e925b95126d73e55f1a511f3f1219ff",
+    "journal_events": 106,
+    "kernel_digest": "42e612707013159cb7bfbee3d63ccafa7a9ac03a9e6324e58171b58abdf3456b",
+    "namespaces": {
+     "ipc": "own",
+     "mnt": "own",
+     "net": "shared",
+     "pid": "own",
+     "user": "own",
+     "uts": "own"
+    },
+    "provider_requests": 3,
+    "run_exit": 0,
+    "sessions": [
+     [
+      "developer",
+      0,
+      1,
+      "bwrap network=host"
+     ],
+     [
+      "reviewer",
+      0,
+      1,
+      "bwrap network=host workspace=read-only"
+     ]
+    ],
+    "story_outcomes": {
+     "S1": [
+      "COMMIT"
+     ]
+    },
+    "verify_exit": 0,
+    "verify_verdict": "VERIFIED"
+   },
+   "observed": {},
+   "passed": true,
+   "scenario": "S1",
+   "title": "success, confined",
+   "volatile": {
+    "evidence_anchor": "70871cc78ef03462d3bdb0ca140279a5f03cd9aa9a4199df1340ef43ac26bf20",
+    "final_main": "7e222c9ce095b5f7a9700bcaf24ab3ec753e4e4f",
+    "journal_sha256": "f22a2a964e4088bfa2ce21c74346178a9e2739b93368f2d4003aa045cc36303b",
+    "started": 1791861881.1918042
+   }
+  },
+  {
+   "checks": [
+    {
+     "evidence": {
+      "client_mount_of_the_path": [
+       "/tmp",
+       "tmpfs",
+       "rw"
+      ],
+      "client_saw": "created",
+      "errno": 0,
+      "host_has_the_file": false,
+      "host_has_the_place": true,
+      "op": "create",
+      "path": "/tmp/e2e/S2/run/.e2e-probe-s2-run-directory",
+      "recorded": true,
+      "sha256_read": null
+     },
+     "name": "developer:run_directory",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "client_mount_of_the_path": [
+       null,
+       null,
+       null
+      ],
+      "client_saw": "ENOENT",
+      "errno": 2,
+      "host_has_the_file": null,
+      "host_has_the_place": true,
+      "op": "read",
+      "path": "/tmp/e2e/S2/run/RUN.started.json",
+      "recorded": true,
+      "sha256_read": null
+     },
+     "name": "developer:run_directory_canary",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "client_mount_of_the_path": [
+       null,
+       null,
+       null
+      ],
+      "client_saw": "ENOENT",
+      "errno": 2,
+      "host_has_the_file": false,
+      "host_has_the_place": true,
+      "op": "create",
+      "path": "/tmp/e2e/S2/kernel/aisef2/.e2e-probe-s2-kernel",
+      "recorded": true,
+      "sha256_read": null
+     },
+     "name": "developer:kernel_directory",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "client_mount_of_the_path": [
+       null,
+       null,
+       null
+      ],
+      "client_saw": "ENOENT",
+      "errno": 2,
+      "host_has_the_file": false,
+      "host_has_the_place": true,
+      "op": "create",
+      "path": "/tmp/e2e/S2/venv/lib/python3.14/site-packages/.e2e-probe-s2-site",
+      "recorded": true,
+      "sha256_read": null
+     },
+     "name": "developer:interpreter_site_packages",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "client_mount_of_the_path": [
+       null,
+       null,
+       null
+      ],
+      "client_saw": "EROFS",
+      "errno": 30,
+      "host_has_the_file": false,
+      "host_has_the_place": true,
+      "op": "create",
+      "path": "/tmp/e2e/S2/fakebin/.e2e-probe-s2-client",
+      "recorded": true,
+      "sha256_read": null
+     },
+     "name": "developer:client_directory",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "client_mount_of_the_path": [
+       null,
+       null,
+       null
+      ],
+      "client_saw": "EROFS",
+      "errno": 30,
+      "host_has_the_file": false,
+      "host_has_the_place": true,
+      "op": "create",
+      "path": "/tmp/e2e/S2/run/repo/.git/.e2e-probe-s2-git",
+      "recorded": true,
+      "sha256_read": null
+     },
+     "name": "developer:git_directory",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "client_mount_of_the_path": [
+       null,
+       null,
+       null
+      ],
+      "client_saw": "read",
+      "errno": 0,
+      "host_has_the_file": null,
+      "host_has_the_place": true,
+      "op": "read",
+      "path": "/tmp/e2e/S2/run/repo/.git/HEAD",
+      "recorded": true,
+      "sha256_read": "28d25bf82af4c0e2b72f50959b2beb859e3e60b9630a5e8c603dad4ddb2b6e80"
+     },
+     "name": "developer:git_directory_head",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "client_mount_of_the_path": [
+       null,
+       null,
+       null
+      ],
+      "client_saw": "ENOENT",
+      "errno": 2,
+      "host_has_the_file": false,
+      "host_has_the_place": true,
+      "op": "create",
+      "path": "/tmp/e2e/S2/home/.e2e-probe-s2-operator-home",
+      "recorded": true,
+      "sha256_read": null
+     },
+     "name": "developer:operator_home",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "client_mount_of_the_path": [
+       "/aisef-home",
+       "tmpfs",
+       "rw"
+      ],
+      "client_saw": "created",
+      "errno": 0,
+      "host_has_the_file": false,
+      "host_has_the_place": false,
+      "op": "create",
+      "path": "/aisef-home/.e2e-probe-s2-session-home",
+      "recorded": true,
+      "sha256_read": null
+     },
+     "name": "developer:session_home",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "client_mount_of_the_path": [
+       "/tmp",
+       "tmpfs",
+       "rw"
+      ],
+      "client_saw": "created",
+      "errno": 0,
+      "host_has_the_file": false,
+      "host_has_the_place": true,
+      "op": "create",
+      "path": "/tmp/.e2e-probe-s2-tmp",
+      "recorded": true,
+      "sha256_read": null
+     },
+     "name": "developer:tmp",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "client_mount_of_the_path": [
+       null,
+       null,
+       null
+      ],
+      "client_saw": "EROFS",
+      "errno": 30,
+      "host_has_the_file": false,
+      "host_has_the_place": true,
+      "op": "create",
+      "path": "/usr/local/lib/python3.14/site-packages/.e2e-probe-s2-system-site",
+      "recorded": true,
+      "sha256_read": null
+     },
+     "name": "developer:system_site_packages",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "client_mount_of_the_path": [
+       null,
+       null,
+       null
+      ],
+      "client_saw": "EROFS",
+      "errno": 30,
+      "host_has_the_file": null,
+      "host_has_the_place": null,
+      "op": "create",
+      "path": "/tmp/e2e/S2/run/work/ws/verifier-wt-S1/.e2e-probe-s2-checkout",
+      "recorded": true,
+      "sha256_read": null
+     },
+     "name": "reviewer:checkout_under_review",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "client_mount_of_the_path": [
+       "/tmp",
+       "tmpfs",
+       "rw"
+      ],
+      "client_saw": "created",
+      "errno": 0,
+      "host_has_the_file": false,
+      "host_has_the_place": true,
+      "op": "create",
+      "path": "/tmp/e2e/S2/run/.e2e-probe-s2-run-directory-reviewer",
+      "recorded": true,
+      "sha256_read": null
+     },
+     "name": "reviewer:run_directory",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "interpreter": "/tmp/e2e/S2/venv/bin/python",
+      "ran_from": "/tmp/e2e/S2/kernel",
+      "record": "42e612707013159cb7bfbee3d63ccafa7a9ac03a9e6324e58171b58abdf3456b",
+      "tree": "42e612707013159cb7bfbee3d63ccafa7a9ac03a9e6324e58171b58abdf3456b"
+     },
+     "name": "kernel_that_ran_is_this_trees_kernel",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "entries_added_or_changed": {
+       "client_directory": [],
+       "interpreter_site": [],
+       "kernel": [],
+       "operator_home": []
+      },
+      "run_directory_listing": [
+       "EVIDENCE.json",
+       "RUN.json",
+       "RUN.started.json",
+       "confinement",
+       "preflight",
+       "repo",
+       "run",
+       "sessions",
+       "test-python",
+       "work"
+      ],
+      "watched": {
+       "client_directory": "2 entries",
+       "interpreter_site": "0 entries",
+       "kernel": "241 entries",
+       "operator_home": "0 entries"
+      }
+     },
+     "name": "controller_view_nothing_changed_on_the_host",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "delivery_verdict": "PASS",
+      "exit": 0,
+      "sessions": [
+       [
+        "developer",
+        0,
+        "bwrap network=host"
+       ],
+       [
+        "reviewer",
+        0,
+        "bwrap network=host workspace=read-only"
+       ]
+      ],
+      "story_outcomes": {
+       "S1": [
+        "COMMIT"
+       ]
+      }
+     },
+     "name": "legitimate_work_landed_and_run_completes_as_S1",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "exit": 0,
+      "problems": []
+     },
+     "name": "verify_with_the_anchor_is_VERIFIED",
+     "passed": true
+    }
+   ],
+   "cli": [
+    {
+     "argv": [
+      "/tmp/e2e/S2/venv/bin/python",
+      "-B",
+      "-m",
+      "aisef",
+      "run",
+      "--project",
+      "/tmp/e2e/project/approved.json",
+      "--settings",
+      "settings.json",
+      "--repo",
+      "/tmp/e2e/project/repo",
+      "--out",
+      "run",
+      "--anchor-out",
+      "anchor.txt"
+     ],
+     "exit": 0,
+     "seconds": 6.9,
+     "tag": "run"
+    },
+    {
+     "argv": [
+      "/tmp/e2e/S2/venv/bin/python",
+      "-B",
+      "-m",
+      "aisef",
+      "run",
+      "--verify",
+      "--project",
+      "/tmp/e2e/project/approved.json",
+      "--out",
+      "run",
+      "--expect-anchor",
+      "d552be3e959773ed614edc2de6b1b19d679e615dfad675a847e6ecef014ea840"
+     ],
+     "exit": 0,
+     "seconds": 0.6,
+     "tag": "verify"
+    }
+   ],
+   "facts": {
+    "attempts": {
+     "developer:client_directory": [
+      "EROFS",
+      false,
+      [
+       null,
+       null
+      ]
+     ],
+     "developer:git_directory": [
+      "EROFS",
+      false,
+      [
+       null,
+       null
+      ]
+     ],
+     "developer:git_directory_head": [
+      "read",
+      null,
+      [
+       null,
+       null
+      ]
+     ],
+     "developer:interpreter_site_packages": [
+      "ENOENT",
+      false,
+      [
+       null,
+       null
+      ]
+     ],
+     "developer:kernel_directory": [
+      "ENOENT",
+      false,
+      [
+       null,
+       null
+      ]
+     ],
+     "developer:operator_home": [
+      "ENOENT",
+      false,
+      [
+       null,
+       null
+      ]
+     ],
+     "developer:run_directory": [
+      "created",
+      false,
+      [
+       "tmpfs",
+       "rw"
+      ]
+     ],
+     "developer:run_directory_canary": [
+      "ENOENT",
+      null,
+      [
+       null,
+       null
+      ]
+     ],
+     "developer:session_home": [
+      "created",
+      false,
+      [
+       "tmpfs",
+       "rw"
+      ]
+     ],
+     "developer:system_site_packages": [
+      "EROFS",
+      false,
+      [
+       null,
+       null
+      ]
+     ],
+     "developer:tmp": [
+      "created",
+      false,
+      [
+       "tmpfs",
+       "rw"
+      ]
+     ],
+     "reviewer:checkout_under_review": [
+      "EROFS",
+      null,
+      [
+       null,
+       null
+      ]
+     ],
+     "reviewer:run_directory": [
+      "created",
+      false,
+      [
+       "tmpfs",
+       "rw"
+      ]
+     ]
+    },
+    "changed_on_the_host": {
+     "client_directory": 0,
+     "interpreter_site": 0,
+     "kernel": 0,
+     "operator_home": 0
+    },
+    "delivery_verdict": "PASS",
+    "kernel_digest": "42e612707013159cb7bfbee3d63ccafa7a9ac03a9e6324e58171b58abdf3456b",
+    "run_exit": 0,
+    "story_outcomes": {
+     "S1": [
+      "COMMIT"
+     ]
+    }
+   },
+   "observed": {
+    "what_the_session_was_told": {
+     "ENOENT": [
+      "developer:run_directory_canary",
+      "developer:kernel_directory",
+      "developer:interpreter_site_packages",
+      "developer:operator_home"
+     ],
+     "EROFS": [
+      "developer:client_directory",
+      "developer:git_directory",
+      "developer:system_site_packages",
+      "reviewer:checkout_under_review"
+     ],
+     "created (a tmpfs mount)": [
+      "developer:run_directory",
+      "developer:session_home",
+      "developer:tmp",
+      "reviewer:run_directory"
+     ],
+     "read": [
+      "developer:git_directory_head"
+     ]
+    }
+   },
+   "passed": true,
+   "scenario": "S2",
+   "title": "writes outside the allowed scope are refused",
+   "volatile": {
+    "evidence_anchor": "d552be3e959773ed614edc2de6b1b19d679e615dfad675a847e6ecef014ea840"
+   }
+  },
+  {
+   "checks": [
+    {
+     "evidence": {
+      "client_mount_of_the_path": [
+       "/",
+       "overlay",
+       "rw"
+      ],
+      "client_saw": "created",
+      "errno": 0,
+      "host_has_the_file": true,
+      "host_has_the_place": true,
+      "op": "create",
+      "path": "/tmp/e2e/S2c/run/.e2e-probe-s2c-run-directory",
+      "recorded": true,
+      "sha256_read": null
+     },
+     "name": "developer:run_directory",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "client_mount_of_the_path": [
+       null,
+       null,
+       null
+      ],
+      "client_saw": "read",
+      "errno": 0,
+      "host_has_the_file": null,
+      "host_has_the_place": true,
+      "op": "read",
+      "path": "/tmp/e2e/S2c/run/RUN.started.json",
+      "recorded": true,
+      "sha256_read": "54e490985ebb872d545ee7ca27df83c8b69879ace0e147db73e54c429eebdaec"
+     },
+     "name": "developer:run_directory_canary",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "client_mount_of_the_path": [
+       "/",
+       "overlay",
+       "rw"
+      ],
+      "client_saw": "created",
+      "errno": 0,
+      "host_has_the_file": true,
+      "host_has_the_place": true,
+      "op": "create",
+      "path": "/tmp/e2e/S2c/kernel/aisef2/.e2e-probe-s2c-kernel",
+      "recorded": true,
+      "sha256_read": null
+     },
+     "name": "developer:kernel_directory",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "client_mount_of_the_path": [
+       "/",
+       "overlay",
+       "rw"
+      ],
+      "client_saw": "created",
+      "errno": 0,
+      "host_has_the_file": true,
+      "host_has_the_place": true,
+      "op": "create",
+      "path": "/tmp/e2e/S2c/venv/lib/python3.14/site-packages/.e2e-probe-s2c-site",
+      "recorded": true,
+      "sha256_read": null
+     },
+     "name": "developer:interpreter_site_packages",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "client_mount_of_the_path": [
+       "/",
+       "overlay",
+       "rw"
+      ],
+      "client_saw": "created",
+      "errno": 0,
+      "host_has_the_file": true,
+      "host_has_the_place": true,
+      "op": "create",
+      "path": "/tmp/e2e/S2c/fakebin/.e2e-probe-s2c-client",
+      "recorded": true,
+      "sha256_read": null
+     },
+     "name": "developer:client_directory",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "client_mount_of_the_path": [
+       "/",
+       "overlay",
+       "rw"
+      ],
+      "client_saw": "created",
+      "errno": 0,
+      "host_has_the_file": true,
+      "host_has_the_place": true,
+      "op": "create",
+      "path": "/tmp/e2e/S2c/run/repo/.git/.e2e-probe-s2c-git",
+      "recorded": true,
+      "sha256_read": null
+     },
+     "name": "developer:git_directory",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "client_mount_of_the_path": [
+       null,
+       null,
+       null
+      ],
+      "client_saw": "read",
+      "errno": 0,
+      "host_has_the_file": null,
+      "host_has_the_place": true,
+      "op": "read",
+      "path": "/tmp/e2e/S2c/run/repo/.git/HEAD",
+      "recorded": true,
+      "sha256_read": "28d25bf82af4c0e2b72f50959b2beb859e3e60b9630a5e8c603dad4ddb2b6e80"
+     },
+     "name": "developer:git_directory_head",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "client_mount_of_the_path": [
+       "/",
+       "overlay",
+       "rw"
+      ],
+      "client_saw": "created",
+      "errno": 0,
+      "host_has_the_file": true,
+      "host_has_the_place": true,
+      "op": "create",
+      "path": "/tmp/e2e/S2c/home/.e2e-probe-s2c-operator-home",
+      "recorded": true,
+      "sha256_read": null
+     },
+     "name": "developer:operator_home",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "client_mount_of_the_path": [
+       "/",
+       "overlay",
+       "rw"
+      ],
+      "client_saw": "created",
+      "errno": 0,
+      "host_has_the_file": true,
+      "host_has_the_place": true,
+      "op": "create",
+      "path": "/tmp/e2e/S2c/home/.e2e-probe-s2c-session-home",
+      "recorded": true,
+      "sha256_read": null
+     },
+     "name": "developer:session_home",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "client_mount_of_the_path": [
+       "/",
+       "overlay",
+       "rw"
+      ],
+      "client_saw": "created",
+      "errno": 0,
+      "host_has_the_file": true,
+      "host_has_the_place": true,
+      "op": "create",
+      "path": "/tmp/.e2e-probe-s2c-tmp",
+      "recorded": true,
+      "sha256_read": null
+     },
+     "name": "developer:tmp",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "client_mount_of_the_path": [
+       null,
+       null,
+       null
+      ],
+      "client_saw": "EACCES",
+      "errno": 13,
+      "host_has_the_file": false,
+      "host_has_the_place": true,
+      "op": "create",
+      "path": "/usr/local/lib/python3.14/site-packages/.e2e-probe-s2c-system-site",
+      "recorded": true,
+      "sha256_read": null
+     },
+     "name": "developer:system_site_packages",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "client_mount_of_the_path": [
+       "/",
+       "overlay",
+       "rw"
+      ],
+      "client_saw": "created",
+      "errno": 0,
+      "host_has_the_file": null,
+      "host_has_the_place": null,
+      "op": "create",
+      "path": "/tmp/e2e/S2c/run/work/ws/verifier-wt-S1/.e2e-probe-s2c-checkout",
+      "recorded": true,
+      "sha256_read": null
+     },
+     "name": "reviewer:checkout_under_review",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "client_mount_of_the_path": [
+       "/",
+       "overlay",
+       "rw"
+      ],
+      "client_saw": "created",
+      "errno": 0,
+      "host_has_the_file": true,
+      "host_has_the_place": true,
+      "op": "create",
+      "path": "/tmp/e2e/S2c/run/.e2e-probe-s2c-run-directory-reviewer",
+      "recorded": true,
+      "sha256_read": null
+     },
+     "name": "reviewer:run_directory",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "interpreter": "/tmp/e2e/S2c/venv/bin/python",
+      "ran_from": "/tmp/e2e/S2c/kernel",
+      "record": "42e612707013159cb7bfbee3d63ccafa7a9ac03a9e6324e58171b58abdf3456b",
+      "tree": "42e612707013159cb7bfbee3d63ccafa7a9ac03a9e6324e58171b58abdf3456b"
+     },
+     "name": "kernel_that_ran_is_this_trees_kernel",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "entries_added_or_changed": {
+       "client_directory": [
+        ".e2e-probe-s2c-client"
+       ],
+       "interpreter_site": [
+        ".e2e-probe-s2c-site"
+       ],
+       "kernel": [
+        "aisef2/.e2e-probe-s2c-kernel"
+       ],
+       "operator_home": [
+        ".e2e-probe-s2c-operator-home",
+        ".e2e-probe-s2c-session-home"
+       ]
+      },
+      "run_directory_listing": [
+       ".e2e-probe-s2c-run-directory",
+       ".e2e-probe-s2c-run-directory-reviewer",
+       "EVIDENCE.json",
+       "RUN.json",
+       "RUN.started.json",
+       "preflight",
+       "repo",
+       "run",
+       "sessions",
+       "test-python",
+       "work"
+      ]
+     },
+     "name": "control_the_controller_view_sees_every_write",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "delivery_verdict": "FAIL",
+      "exit": 1,
+      "journal_provider_result": [
+       "reviewer cannot run: the reviewed checkout changed during the finder: ['.e2e-probe-s2c-checkout'] (every finding discarded)"
+      ],
+      "story_errors": [],
+      "story_outcomes": {
+       "S1": [
+        "RETRY",
+        "ROLLBACK"
+       ]
+      }
+     },
+     "name": "control_the_kernel_itself_noticed_the_reviewers_write",
+     "passed": true
+    }
+   ],
+   "cli": [
+    {
+     "argv": [
+      "/tmp/e2e/S2c/venv/bin/python",
+      "-B",
+      "-m",
+      "aisef",
+      "run",
+      "--project",
+      "/tmp/e2e/project/approved.json",
+      "--settings",
+      "settings.json",
+      "--repo",
+      "/tmp/e2e/project/repo",
+      "--out",
+      "run",
+      "--anchor-out",
+      "anchor.txt"
+     ],
+     "exit": 1,
+     "seconds": 8.9,
+     "tag": "run"
+    }
+   ],
+   "facts": {
+    "attempts": {
+     "developer:client_directory": [
+      "created",
+      true,
+      [
+       "overlay",
+       "rw"
+      ]
+     ],
+     "developer:git_directory": [
+      "created",
+      true,
+      [
+       "overlay",
+       "rw"
+      ]
+     ],
+     "developer:git_directory_head": [
+      "read",
+      null,
+      [
+       null,
+       null
+      ]
+     ],
+     "developer:interpreter_site_packages": [
+      "created",
+      true,
+      [
+       "overlay",
+       "rw"
+      ]
+     ],
+     "developer:kernel_directory": [
+      "created",
+      true,
+      [
+       "overlay",
+       "rw"
+      ]
+     ],
+     "developer:operator_home": [
+      "created",
+      true,
+      [
+       "overlay",
+       "rw"
+      ]
+     ],
+     "developer:run_directory": [
+      "created",
+      true,
+      [
+       "overlay",
+       "rw"
+      ]
+     ],
+     "developer:run_directory_canary": [
+      "read",
+      null,
+      [
+       null,
+       null
+      ]
+     ],
+     "developer:session_home": [
+      "created",
+      true,
+      [
+       "overlay",
+       "rw"
+      ]
+     ],
+     "developer:system_site_packages": [
+      "EACCES",
+      false,
+      [
+       null,
+       null
+      ]
+     ],
+     "developer:tmp": [
+      "created",
+      true,
+      [
+       "overlay",
+       "rw"
+      ]
+     ],
+     "reviewer:checkout_under_review": [
+      "created",
+      null,
+      [
+       "overlay",
+       "rw"
+      ]
+     ],
+     "reviewer:run_directory": [
+      "created",
+      true,
+      [
+       "overlay",
+       "rw"
+      ]
+     ]
+    },
+    "changed_on_the_host": {
+     "client_directory": 1,
+     "interpreter_site": 1,
+     "kernel": 1,
+     "operator_home": 2
+    },
+    "delivery_verdict": "FAIL",
+    "kernel_digest": "42e612707013159cb7bfbee3d63ccafa7a9ac03a9e6324e58171b58abdf3456b",
+    "run_exit": 1,
+    "story_outcomes": {
+     "S1": [
+      "RETRY",
+      "ROLLBACK"
+     ]
+    }
+   },
+   "observed": {
+    "what_the_session_was_told": {
+     "EACCES": [
+      "developer:system_site_packages"
+     ],
+     "created (a overlay mount)": [
+      "developer:run_directory",
+      "developer:kernel_directory",
+      "developer:interpreter_site_packages",
+      "developer:client_directory",
+      "developer:git_directory",
+      "developer:operator_home",
+      "developer:session_home",
+      "developer:tmp",
+      "reviewer:checkout_under_review",
+      "reviewer:run_directory"
+     ],
+     "read": [
+      "developer:run_directory_canary",
+      "developer:git_directory_head"
+     ]
+    }
+   },
+   "passed": true,
+   "scenario": "S2c",
+   "title": "control: the same attempts without confinement",
+   "volatile": {
+    "evidence_anchor": "874e59095bf941f7e5fac82e2236499d87f804c49fe8e1743a297f8fe2d48b2e"
+   }
+  },
+  {
+   "checks": [
+    {
+     "evidence": {
+      "exit": 2,
+      "problems": [
+       "confinement.read_only names paths that do not exist: ['/no/such/e2e-path']"
+      ],
+      "ready": false
+     },
+     "name": "check_is_not_ready",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "exit": 2,
+      "stderr": "aisef run: refused: confinement was asked for and is not provided: confinement.read_only names paths that do not exist: ['/no/such/e2e-path']\n",
+      "stdout": ""
+     },
+     "name": "run_refused_exit_2_with_the_cause",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "confinement.problems": [
+       "confinement.read_only names paths that do not exist: ['/no/such/e2e-path']"
+      ],
+      "delivery_verdict": "NOT_REACHED",
+      "failure": {
+       "detail": "confinement was asked for and is not provided: confinement.read_only names paths that do not exist: ['/no/such/e2e-path']",
+       "stage": "confinement",
+       "type": "RunRefused"
+      },
+      "journal": null,
+      "stage": "confinement"
+     },
+     "name": "record_names_the_stage_and_the_problems",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "preflight_in_record": false,
+      "provider_requests_seen": 0,
+      "run_directory_listing": [
+       "EVIDENCE.json",
+       "RUN.json",
+       "RUN.started.json",
+       "confinement",
+       "repo",
+       "test-python"
+      ],
+      "sessions_in_record": []
+     },
+     "name": "nothing_started_no_provider_request_no_session",
+     "passed": true
+    }
+   ],
+   "cli": [
+    {
+     "argv": [
+      "/usr/local/bin/python3",
+      "-B",
+      "-m",
+      "aisef",
+      "run",
+      "--check",
+      "--project",
+      "/tmp/e2e/project/approved.json",
+      "--settings",
+      "settings.json",
+      "--repo",
+      "/tmp/e2e/project/repo"
+     ],
+     "exit": 2,
+     "seconds": 0.6,
+     "tag": "check"
+    },
+    {
+     "argv": [
+      "/usr/local/bin/python3",
+      "-B",
+      "-m",
+      "aisef",
+      "run",
+      "--project",
+      "/tmp/e2e/project/approved.json",
+      "--settings",
+      "settings.json",
+      "--repo",
+      "/tmp/e2e/project/repo",
+      "--out",
+      "run"
+     ],
+     "exit": 2,
+     "seconds": 0.8,
+     "tag": "run"
+    }
+   ],
+   "facts": {
+    "check_exit": 2,
+    "problems": [
+     "confinement.read_only names paths that do not exist: ['/no/such/e2e-path']"
+    ],
+    "provider_requests": 0,
+    "run_directory_listing": [
+     "EVIDENCE.json",
+     "RUN.json",
+     "RUN.started.json",
+     "confinement",
+     "repo",
+     "test-python"
+    ],
+    "run_exit": 2,
+    "stage": "confinement"
+   },
+   "observed": {},
+   "passed": true,
+   "scenario": "S2b-readonly",
+   "title": "refused: read_only names a path that does not exist",
+   "volatile": {}
+  },
+  {
+   "checks": [
+    {
+     "evidence": {
+      "exit": 2,
+      "problems": [
+       "bubblewrap is not an executable file at /usr/bin/bwrap-e2e-absent"
+      ],
+      "ready": false
+     },
+     "name": "check_is_not_ready",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "exit": 2,
+      "stderr": "aisef run: refused: confinement was asked for and is not provided: bubblewrap is not an executable file at /usr/bin/bwrap-e2e-absent\n",
+      "stdout": ""
+     },
+     "name": "run_refused_exit_2_with_the_cause",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "confinement.problems": [
+       "bubblewrap is not an executable file at /usr/bin/bwrap-e2e-absent"
+      ],
+      "delivery_verdict": "NOT_REACHED",
+      "failure": {
+       "detail": "confinement was asked for and is not provided: bubblewrap is not an executable file at /usr/bin/bwrap-e2e-absent",
+       "stage": "confinement",
+       "type": "RunRefused"
+      },
+      "journal": null,
+      "stage": "confinement"
+     },
+     "name": "record_names_the_stage_and_the_problems",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "preflight_in_record": false,
+      "provider_requests_seen": 0,
+      "run_directory_listing": [
+       "EVIDENCE.json",
+       "RUN.json",
+       "RUN.started.json",
+       "confinement",
+       "repo",
+       "test-python"
+      ],
+      "sessions_in_record": []
+     },
+     "name": "nothing_started_no_provider_request_no_session",
+     "passed": true
+    }
+   ],
+   "cli": [
+    {
+     "argv": [
+      "/usr/local/bin/python3",
+      "-B",
+      "-m",
+      "aisef",
+      "run",
+      "--check",
+      "--project",
+      "/tmp/e2e/project/approved.json",
+      "--settings",
+      "settings.json",
+      "--repo",
+      "/tmp/e2e/project/repo"
+     ],
+     "exit": 2,
+     "seconds": 0.6,
+     "tag": "check"
+    },
+    {
+     "argv": [
+      "/usr/local/bin/python3",
+      "-B",
+      "-m",
+      "aisef",
+      "run",
+      "--project",
+      "/tmp/e2e/project/approved.json",
+      "--settings",
+      "settings.json",
+      "--repo",
+      "/tmp/e2e/project/repo",
+      "--out",
+      "run"
+     ],
+     "exit": 2,
+     "seconds": 0.8,
+     "tag": "run"
+    }
+   ],
+   "facts": {
+    "check_exit": 2,
+    "problems": [
+     "bubblewrap is not an executable file at /usr/bin/bwrap-e2e-absent"
+    ],
+    "provider_requests": 0,
+    "run_directory_listing": [
+     "EVIDENCE.json",
+     "RUN.json",
+     "RUN.started.json",
+     "confinement",
+     "repo",
+     "test-python"
+    ],
+    "run_exit": 2,
+    "stage": "confinement"
+   },
+   "observed": {},
+   "passed": true,
+   "scenario": "S2b-missing",
+   "title": "refused: bubblewrap is not at the given path",
+   "volatile": {}
+  },
+  {
+   "checks": [
+    {
+     "evidence": {
+      "exit": 2,
+      "problems": [
+       "bubblewrap is not an executable file at /tmp/e2e/project/not-bwrap"
+      ],
+      "ready": false
+     },
+     "name": "check_is_not_ready",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "exit": 2,
+      "stderr": "aisef run: refused: confinement was asked for and is not provided: bubblewrap is not an executable file at /tmp/e2e/project/not-bwrap\n",
+      "stdout": ""
+     },
+     "name": "run_refused_exit_2_with_the_cause",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "confinement.problems": [
+       "bubblewrap is not an executable file at /tmp/e2e/project/not-bwrap"
+      ],
+      "delivery_verdict": "NOT_REACHED",
+      "failure": {
+       "detail": "confinement was asked for and is not provided: bubblewrap is not an executable file at /tmp/e2e/project/not-bwrap",
+       "stage": "confinement",
+       "type": "RunRefused"
+      },
+      "journal": null,
+      "stage": "confinement"
+     },
+     "name": "record_names_the_stage_and_the_problems",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "preflight_in_record": false,
+      "provider_requests_seen": 0,
+      "run_directory_listing": [
+       "EVIDENCE.json",
+       "RUN.json",
+       "RUN.started.json",
+       "confinement",
+       "repo",
+       "test-python"
+      ],
+      "sessions_in_record": []
+     },
+     "name": "nothing_started_no_provider_request_no_session",
+     "passed": true
+    }
+   ],
+   "cli": [
+    {
+     "argv": [
+      "/usr/local/bin/python3",
+      "-B",
+      "-m",
+      "aisef",
+      "run",
+      "--check",
+      "--project",
+      "/tmp/e2e/project/approved.json",
+      "--settings",
+      "settings.json",
+      "--repo",
+      "/tmp/e2e/project/repo"
+     ],
+     "exit": 2,
+     "seconds": 0.6,
+     "tag": "check"
+    },
+    {
+     "argv": [
+      "/usr/local/bin/python3",
+      "-B",
+      "-m",
+      "aisef",
+      "run",
+      "--project",
+      "/tmp/e2e/project/approved.json",
+      "--settings",
+      "settings.json",
+      "--repo",
+      "/tmp/e2e/project/repo",
+      "--out",
+      "run"
+     ],
+     "exit": 2,
+     "seconds": 0.8,
+     "tag": "run"
+    }
+   ],
+   "facts": {
+    "check_exit": 2,
+    "problems": [
+     "bubblewrap is not an executable file at /tmp/e2e/project/not-bwrap"
+    ],
+    "provider_requests": 0,
+    "run_directory_listing": [
+     "EVIDENCE.json",
+     "RUN.json",
+     "RUN.started.json",
+     "confinement",
+     "repo",
+     "test-python"
+    ],
+    "run_exit": 2,
+    "stage": "confinement"
+   },
+   "observed": {},
+   "passed": true,
+   "scenario": "S2b-not-executable",
+   "title": "refused: the given bubblewrap is not executable",
+   "volatile": {}
+  },
+  {
+   "checks": [
+    {
+     "evidence": {
+      "exit": 2,
+      "problems": [
+       "the client's directory /tmp/e2e/S2b-client-holds-home/fakebin holds HOME: bound read-only it would expose it; give the client a directory of its own"
+      ],
+      "ready": false
+     },
+     "name": "check_is_not_ready",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "exit": 2,
+      "stderr": "aisef run: refused: confinement was asked for and is not provided: the client's directory /tmp/e2e/S2b-client-holds-home/fakebin holds HOME: bound read-only it would expose it; give the client a directory of its own\n",
+      "stdout": ""
+     },
+     "name": "run_refused_exit_2_with_the_cause",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "confinement.problems": [
+       "the client's directory /tmp/e2e/S2b-client-holds-home/fakebin holds HOME: bound read-only it would expose it; give the client a directory of its own"
+      ],
+      "delivery_verdict": "NOT_REACHED",
+      "failure": {
+       "detail": "confinement was asked for and is not provided: the client's directory /tmp/e2e/S2b-client-holds-home/fakebin holds HOME: bound read-only it would expose it; give the client a directory of its own",
+       "stage": "confinement",
+       "type": "RunRefused"
+      },
+      "journal": null,
+      "stage": "confinement"
+     },
+     "name": "record_names_the_stage_and_the_problems",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "preflight_in_record": false,
+      "provider_requests_seen": 0,
+      "run_directory_listing": [
+       "EVIDENCE.json",
+       "RUN.json",
+       "RUN.started.json",
+       "confinement",
+       "repo",
+       "test-python"
+      ],
+      "sessions_in_record": []
+     },
+     "name": "nothing_started_no_provider_request_no_session",
+     "passed": true
+    }
+   ],
+   "cli": [
+    {
+     "argv": [
+      "/usr/local/bin/python3",
+      "-B",
+      "-m",
+      "aisef",
+      "run",
+      "--check",
+      "--project",
+      "/tmp/e2e/project/approved.json",
+      "--settings",
+      "settings.json",
+      "--repo",
+      "/tmp/e2e/project/repo"
+     ],
+     "exit": 2,
+     "seconds": 0.6,
+     "tag": "check"
+    },
+    {
+     "argv": [
+      "/usr/local/bin/python3",
+      "-B",
+      "-m",
+      "aisef",
+      "run",
+      "--project",
+      "/tmp/e2e/project/approved.json",
+      "--settings",
+      "settings.json",
+      "--repo",
+      "/tmp/e2e/project/repo",
+      "--out",
+      "run"
+     ],
+     "exit": 2,
+     "seconds": 0.9,
+     "tag": "run"
+    }
+   ],
+   "facts": {
+    "check_exit": 2,
+    "problems": [
+     "the client's directory /tmp/e2e/S2b-client-holds-home/fakebin holds HOME: bound read-only it would expose it; give the client a directory of its own"
+    ],
+    "provider_requests": 0,
+    "run_directory_listing": [
+     "EVIDENCE.json",
+     "RUN.json",
+     "RUN.started.json",
+     "confinement",
+     "repo",
+     "test-python"
+    ],
+    "run_exit": 2,
+    "stage": "confinement"
+   },
+   "observed": {},
+   "passed": true,
+   "scenario": "S2b-client-holds-home",
+   "title": "refused: the client's directory would expose HOME",
+   "volatile": {}
+  },
+  {
+   "checks": [
+    {
+     "evidence": {
+      "marker": "e2e-S3-44d6a8a7",
+      "processes_with_the_marker_before": []
+     },
+     "name": "marker_unique_before_the_run",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "observed_by_the_client": {
+       "alive": {
+        "background": {
+         "pid": 3,
+         "ppid": 2,
+         "sid": 1,
+         "state": "S"
+        },
+        "grandchild": {
+         "pid": 5,
+         "ppid": 3,
+         "sid": 1,
+         "state": "R"
+        },
+        "setsid": {
+         "pid": 4,
+         "ppid": 2,
+         "sid": 4,
+         "state": "S"
+        }
+       },
+       "marker": "e2e-S3-44d6a8a7",
+       "my_pid": 2,
+       "my_sid": 1,
+       "name": "children",
+       "role": "developer",
+       "started": {
+        "background": 3,
+        "setsid": 4
+       },
+       "type": "e2e_observation"
+      }
+     },
+     "name": "children_were_alive_in_the_session",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "delivery_verdict": "PASS",
+      "developer_sessions": [
+       {
+        "confinement": "bwrap network=host",
+        "error": null,
+        "exit": 0,
+        "seconds": 0.8,
+        "stopped": null,
+        "timed_out": false,
+        "turns": 1
+       }
+      ],
+      "processes_alive_after_re_looks": [],
+      "processes_alive_first_look": [],
+      "run_exit": 0,
+      "story_errors": [],
+      "story_outcomes": {
+       "S1": [
+        "COMMIT"
+       ]
+      }
+     },
+     "name": "run_completes_session_exit_0",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "after_re_looks": [],
+      "first_look": []
+     },
+     "name": "no_child_alive_after_the_cli_returned",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "watch_every_20ms_while_the_cli_ran": {
+       "children_first_seen_s": 2.12,
+       "children_last_seen_s": 2.74,
+       "polls": 316,
+       "polls_with_children_after_the_session_was_gone": 0,
+       "session_first_seen_s": 2.02,
+       "session_last_seen_s": 2.74,
+       "session_windows": 1
+      }
+     },
+     "name": "children_died_with_their_session_not_later",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "session_record_fields": [
+       "attempt",
+       "candidate",
+       "confinement",
+       "developer_committed_itself",
+       "error",
+       "exit",
+       "log",
+       "prompt_sha256",
+       "redacted",
+       "role",
+       "seconds",
+       "started",
+       "stopped",
+       "story_id",
+       "timed_out",
+       "tokens",
+       "turns"
+      ],
+      "story_errors": [],
+      "story_outcomes": {
+       "S1": [
+        "COMMIT"
+       ]
+      }
+     },
+     "name": "no_residual_reported_by_the_kernel",
+     "passed": true
+    }
+   ],
+   "cli": [
+    {
+     "argv": [
+      "/usr/local/bin/python3",
+      "-B",
+      "-m",
+      "aisef",
+      "run",
+      "--project",
+      "/tmp/e2e/project/approved.json",
+      "--settings",
+      "settings.json",
+      "--repo",
+      "/tmp/e2e/project/repo",
+      "--out",
+      "run"
+     ],
+     "exit": 0,
+     "seconds": 7.7,
+     "tag": "run"
+    }
+   ],
+   "facts": {
+    "alive_after_3s": 0,
+    "alive_after_cli_first_look": 0,
+    "delivery_verdict": "PASS",
+    "developer_sessions": [
+     [
+      0,
+      false,
+      null
+     ]
+    ],
+    "polls_with_children_after_the_session_was_gone_is_zero": true,
+    "run_exit": 0,
+    "session_windows": 1,
+    "story_errors": [],
+    "story_outcomes": {
+     "S1": [
+      "COMMIT"
+     ]
+    },
+    "survivors": []
+   },
+   "observed": {},
+   "passed": true,
+   "scenario": "S3",
+   "title": "children of a confined session",
+   "volatile": {
+    "session_seconds": [
+     0.8
+    ],
+    "timeline": {
+     "children_first_seen_s": 2.12,
+     "children_last_seen_s": 2.74,
+     "polls": 316,
+     "polls_with_children_after_the_session_was_gone": 0,
+     "session_first_seen_s": 2.02,
+     "session_last_seen_s": 2.74,
+     "session_windows": 1
+    }
+   }
+  },
+  {
+   "checks": [
+    {
+     "evidence": {
+      "marker": "e2e-S3t-0d4517d5",
+      "processes_with_the_marker_before": []
+     },
+     "name": "marker_unique_before_the_run",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "observed_by_the_client": {
+       "alive": {
+        "background": {
+         "pid": 3,
+         "ppid": 2,
+         "sid": 1,
+         "state": "S"
+        },
+        "grandchild": {
+         "pid": 5,
+         "ppid": 3,
+         "sid": 1,
+         "state": "R"
+        },
+        "setsid": {
+         "pid": 4,
+         "ppid": 2,
+         "sid": 4,
+         "state": "S"
+        }
+       },
+       "marker": "e2e-S3t-0d4517d5",
+       "my_pid": 2,
+       "my_sid": 1,
+       "name": "children",
+       "role": "developer",
+       "started": {
+        "background": 3,
+        "setsid": 4
+       },
+       "type": "e2e_observation"
+      }
+     },
+     "name": "children_were_alive_in_the_session",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "client_slept_s": 120,
+      "delivery_verdict": "FAIL",
+      "developer_sessions": [
+       {
+        "confinement": "bwrap network=host",
+        "error": null,
+        "exit": null,
+        "seconds": 5.1,
+        "stopped": null,
+        "timed_out": true,
+        "turns": 1
+       },
+       {
+        "confinement": "bwrap network=host",
+        "error": null,
+        "exit": null,
+        "seconds": 5.1,
+        "stopped": null,
+        "timed_out": true,
+        "turns": 1
+       }
+      ],
+      "processes_alive_after_re_looks": [],
+      "processes_alive_first_look": [],
+      "run_exit": 1,
+      "story_errors": [],
+      "story_outcomes": {
+       "S1": [
+        "RETRY",
+        "ROLLBACK"
+       ]
+      },
+      "timeout_s": 5
+     },
+     "name": "session_timed_out_and_the_kernels_teardown_ran",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "after_re_looks": [],
+      "first_look": []
+     },
+     "name": "no_child_alive_after_the_cli_returned",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "watch_every_20ms_while_the_cli_ran": {
+       "children_first_seen_s": 2.13,
+       "children_last_seen_s": 13.76,
+       "polls": 551,
+       "polls_with_children_after_the_session_was_gone": 0,
+       "session_first_seen_s": 2.03,
+       "session_last_seen_s": 13.76,
+       "session_windows": 2
+      }
+     },
+     "name": "children_died_with_their_session_not_later",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "session_record_fields": [
+       "attempt",
+       "confinement",
+       "developer_committed_itself",
+       "error",
+       "exit",
+       "log",
+       "prompt_sha256",
+       "redacted",
+       "role",
+       "seconds",
+       "started",
+       "stopped",
+       "story_id",
+       "timed_out",
+       "tokens",
+       "turns"
+      ],
+      "story_errors": [],
+      "story_outcomes": {
+       "S1": [
+        "RETRY",
+        "ROLLBACK"
+       ]
+      }
+     },
+     "name": "no_residual_reported_by_the_kernel",
+     "passed": true
+    }
+   ],
+   "cli": [
+    {
+     "argv": [
+      "/usr/local/bin/python3",
+      "-B",
+      "-m",
+      "aisef",
+      "run",
+      "--project",
+      "/tmp/e2e/project/approved.json",
+      "--settings",
+      "settings.json",
+      "--repo",
+      "/tmp/e2e/project/repo",
+      "--out",
+      "run"
+     ],
+     "exit": 1,
+     "seconds": 14.5,
+     "tag": "run"
+    }
+   ],
+   "facts": {
+    "alive_after_3s": 0,
+    "alive_after_cli_first_look": 0,
+    "delivery_verdict": "FAIL",
+    "developer_sessions": [
+     [
+      null,
+      true,
+      null
+     ],
+     [
+      null,
+      true,
+      null
+     ]
+    ],
+    "polls_with_children_after_the_session_was_gone_is_zero": true,
+    "run_exit": 1,
+    "session_windows": 2,
+    "story_errors": [],
+    "story_outcomes": {
+     "S1": [
+      "RETRY",
+      "ROLLBACK"
+     ]
+    },
+    "survivors": []
+   },
+   "observed": {},
+   "passed": true,
+   "scenario": "S3t",
+   "title": "children, the session times out (the kernel's teardown)",
+   "volatile": {
+    "session_seconds": [
+     5.1,
+     5.1
+    ],
+    "timeline": {
+     "children_first_seen_s": 2.13,
+     "children_last_seen_s": 13.76,
+     "polls": 551,
+     "polls_with_children_after_the_session_was_gone": 0,
+     "session_first_seen_s": 2.03,
+     "session_last_seen_s": 13.76,
+     "session_windows": 2
+    }
+   }
+  },
+  {
+   "checks": [
+    {
+     "evidence": {
+      "marker": "e2e-S3c-bfdfd500",
+      "processes_with_the_marker_before": []
+     },
+     "name": "marker_unique_before_the_run",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "observed_by_the_client": {
+       "alive": {
+        "background": {
+         "pid": 1785,
+         "ppid": 1782,
+         "sid": 1780,
+         "state": "S"
+        },
+        "grandchild": {
+         "pid": 1787,
+         "ppid": 1785,
+         "sid": 1780,
+         "state": "R"
+        },
+        "setsid": {
+         "pid": 1786,
+         "ppid": 1782,
+         "sid": 1786,
+         "state": "S"
+        }
+       },
+       "marker": "e2e-S3c-bfdfd500",
+       "my_pid": 1782,
+       "my_sid": 1780,
+       "name": "children",
+       "role": "developer",
+       "started": {
+        "background": 1785,
+        "setsid": 1786
+       },
+       "type": "e2e_observation"
+      }
+     },
+     "name": "children_were_alive_in_the_session",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "delivery_verdict": "NOT_REACHED",
+      "developer_sessions": [],
+      "processes_alive_after_re_looks": [
+       {
+        "last_arg": "e2e-S3c-bfdfd500-setsid",
+        "pgrp": 1786,
+        "pid": 1786,
+        "ppid": 1,
+        "sid": 1786,
+        "state": "S"
+       }
+      ],
+      "processes_alive_first_look": [
+       {
+        "last_arg": "e2e-S3c-bfdfd500-setsid",
+        "pgrp": 1786,
+        "pid": 1786,
+        "ppid": 1,
+        "sid": 1786,
+        "state": "S"
+       }
+      ],
+      "run_exit": 1,
+      "story_errors": [
+       {
+        "error": "RangeEscaped: developer S1: processes left the range and are alive: [(1786, '/usr/local/bin/python3 -c import time; time.sleep(300) e2e-S3c-bfdfd500-setsid')]",
+        "story": "S1"
+       }
+      ],
+      "story_outcomes": {
+       "S1": [
+        "REFUSED: RangeEscaped"
+       ]
+      }
+     },
+     "name": "control_the_setsid_child_outlives_the_cli",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "watch_every_20ms_while_the_cli_ran": {
+       "children_first_seen_s": 2.09,
+       "children_last_seen_s": 6.84,
+       "polls": 262,
+       "polls_with_children_after_the_session_was_gone": 151,
+       "session_first_seen_s": 2.0,
+       "session_last_seen_s": 2.69,
+       "session_windows": 1
+      }
+     },
+     "name": "control_the_child_is_seen_after_its_session_is_gone",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "story_errors": [
+       {
+        "error": "RangeEscaped: developer S1: processes left the range and are alive: [(1786, '/usr/local/bin/python3 -c import time; time.sleep(300) e2e-S3c-bfdfd500-setsid')]",
+        "story": "S1"
+       }
+      ],
+      "story_outcomes": {
+       "S1": [
+        "REFUSED: RangeEscaped"
+       ]
+      }
+     },
+     "name": "control_the_kernel_reports_the_escape",
+     "passed": true
+    }
+   ],
+   "cli": [
+    {
+     "argv": [
+      "/usr/local/bin/python3",
+      "-B",
+      "-m",
+      "aisef",
+      "run",
+      "--project",
+      "/tmp/e2e/project/approved.json",
+      "--settings",
+      "settings.json",
+      "--repo",
+      "/tmp/e2e/project/repo",
+      "--out",
+      "run"
+     ],
+     "exit": 1,
+     "seconds": 6.8,
+     "tag": "run"
+    }
+   ],
+   "facts": {
+    "alive_after_3s": 1,
+    "alive_after_cli_first_look": 1,
+    "delivery_verdict": "NOT_REACHED",
+    "developer_sessions": [],
+    "polls_with_children_after_the_session_was_gone_is_zero": false,
+    "run_exit": 1,
+    "session_windows": 1,
+    "story_errors": [
+     "RangeEscaped"
+    ],
+    "story_outcomes": {
+     "S1": [
+      "REFUSED: RangeEscaped"
+     ]
+    },
+    "survivors": [
+     "setsid"
+    ]
+   },
+   "observed": {},
+   "passed": true,
+   "scenario": "S3c",
+   "title": "control: children without confinement",
+   "volatile": {
+    "session_seconds": [],
+    "timeline": {
+     "children_first_seen_s": 2.09,
+     "children_last_seen_s": 6.84,
+     "polls": 262,
+     "polls_with_children_after_the_session_was_gone": 151,
+     "session_first_seen_s": 2.0,
+     "session_last_seen_s": 2.69,
+     "session_windows": 1
+    }
+   }
+  },
+  {
+   "checks": [
+    {
+     "evidence": {
+      "delivery_verdict": "PASS",
+      "exit": 0,
+      "problems": [],
+      "stderr": "",
+      "verdict": "VERIFIED"
+     },
+     "name": "original_with_the_right_anchor_VERIFIED",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "delivery_verdict": "PASS",
+      "exit": 1,
+      "given": "00871cc78ef03462d3bdb0ca140279a5f03cd9aa9a4199df1340ef43ac26bf20",
+      "problems": [
+       "the evidence anchor is 70871cc78ef0, not the 00871cc78ef0 the run printed"
+      ],
+      "right": "70871cc78ef03462d3bdb0ca140279a5f03cd9aa9a4199df1340ef43ac26bf20",
+      "stderr": "",
+      "verdict": "REFUTED"
+     },
+     "name": "original_with_a_wrong_anchor_REFUTED",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "byte_offset": 11,
+      "delivery_verdict": "PASS",
+      "exit": 1,
+      "from": "2",
+      "problems": [
+       "the evidence manifest does not match the run directory: ['sessions/S1.developer.1.jsonl']"
+      ],
+      "stderr": "",
+      "to": "3",
+      "verdict": "REFUTED"
+     },
+     "name": "one_byte_of_a_session_stream_changed_REFUTED_naming_the_file",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "delivery_verdict": "PASS",
+      "exit": 1,
+      "problems": [
+       "the evidence manifest does not match the run directory: ['RUN.json']",
+       "the record says FAIL; the journal re-derives PASS"
+      ],
+      "stderr": "",
+      "verdict": "REFUTED"
+     },
+     "name": "delivery_verdict_edited_REFUTED",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "delivery_verdict": "PASS",
+      "exit": 1,
+      "problems": [
+       "the evidence anchor is 7c1f48f0bb17, not the 70871cc78ef0 the run printed",
+       "the record says FAIL; the journal re-derives PASS"
+      ],
+      "stderr": "",
+      "verdict": "REFUTED"
+     },
+     "name": "verdict_edited_and_manifest_regenerated_REFUTED_with_the_anchor",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "delivery_verdict": "PASS",
+      "exit": 1,
+      "problems": [
+       "the record says FAIL; the journal re-derives PASS"
+      ],
+      "stderr": "",
+      "verdict": "REFUTED"
+     },
+     "name": "verdict_edited_and_manifest_regenerated_REFUTED_by_the_journal_alone",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "delivery_verdict": "PASS",
+      "exit": 1,
+      "problems": [
+       "the evidence anchor is 6a14e3af3304, not the 70871cc78ef0 the run printed"
+      ],
+      "stderr": "",
+      "verdict": "REFUTED"
+     },
+     "name": "stream_changed_and_manifest_regenerated_REFUTED_with_the_anchor",
+     "passed": true
+    },
+    {
+     "evidence": {
+      "entries": 111
+     },
+     "name": "the_original_run_directory_is_unchanged",
+     "passed": true
+    }
+   ],
+   "cli": [
+    {
+     "argv": [
+      "/usr/local/bin/python3",
+      "-B",
+      "-m",
+      "aisef",
+      "run",
+      "--verify",
+      "--project",
+      "/tmp/e2e/project/approved.json",
+      "--out",
+      "/tmp/e2e/S1/run",
+      "--expect-anchor",
+      "70871cc78ef03462d3bdb0ca140279a5f03cd9aa9a4199df1340ef43ac26bf20"
+     ],
+     "exit": 0,
+     "seconds": 0.7,
+     "tag": "original-right-anchor"
+    },
+    {
+     "argv": [
+      "/usr/local/bin/python3",
+      "-B",
+      "-m",
+      "aisef",
+      "run",
+      "--verify",
+      "--project",
+      "/tmp/e2e/project/approved.json",
+      "--out",
+      "/tmp/e2e/S1/run",
+      "--expect-anchor",
+      "00871cc78ef03462d3bdb0ca140279a5f03cd9aa9a4199df1340ef43ac26bf20"
+     ],
+     "exit": 1,
+     "seconds": 0.6,
+     "tag": "original-wrong-anchor"
+    },
+    {
+     "argv": [
+      "/usr/local/bin/python3",
+      "-B",
+      "-m",
+      "aisef",
+      "run",
+      "--verify",
+      "--project",
+      "/tmp/e2e/project/approved.json",
+      "--out",
+      "/tmp/e2e/S4/copy-stream-byte",
+      "--expect-anchor",
+      "70871cc78ef03462d3bdb0ca140279a5f03cd9aa9a4199df1340ef43ac26bf20"
+     ],
+     "exit": 1,
+     "seconds": 0.6,
+     "tag": "stream-byte"
+    },
+    {
+     "argv": [
+      "/usr/local/bin/python3",
+      "-B",
+      "-m",
+      "aisef",
+      "run",
+      "--verify",
+      "--project",
+      "/tmp/e2e/project/approved.json",
+      "--out",
+      "/tmp/e2e/S4/copy-verdict",
+      "--expect-anchor",
+      "70871cc78ef03462d3bdb0ca140279a5f03cd9aa9a4199df1340ef43ac26bf20"
+     ],
+     "exit": 1,
+     "seconds": 0.6,
+     "tag": "verdict"
+    },
+    {
+     "argv": [
+      "/usr/local/bin/python3",
+      "-B",
+      "-m",
+      "aisef",
+      "run",
+      "--verify",
+      "--project",
+      "/tmp/e2e/project/approved.json",
+      "--out",
+      "/tmp/e2e/S4/copy-verdict-rebound",
+      "--expect-anchor",
+      "70871cc78ef03462d3bdb0ca140279a5f03cd9aa9a4199df1340ef43ac26bf20"
+     ],
+     "exit": 1,
+     "seconds": 0.6,
+     "tag": "verdict-rebound-anchor"
+    },
+    {
+     "argv": [
+      "/usr/local/bin/python3",
+      "-B",
+      "-m",
+      "aisef",
+      "run",
+      "--verify",
+      "--project",
+      "/tmp/e2e/project/approved.json",
+      "--out",
+      "/tmp/e2e/S4/copy-verdict-rebound"
+     ],
+     "exit": 1,
+     "seconds": 0.6,
+     "tag": "verdict-rebound-no-anchor"
+    },
+    {
+     "argv": [
+      "/usr/local/bin/python3",
+      "-B",
+      "-m",
+      "aisef",
+      "run",
+      "--verify",
+      "--project",
+      "/tmp/e2e/project/approved.json",
+      "--out",
+      "/tmp/e2e/S4/copy-stream-rebound",
+      "--expect-anchor",
+      "70871cc78ef03462d3bdb0ca140279a5f03cd9aa9a4199df1340ef43ac26bf20"
+     ],
+     "exit": 1,
+     "seconds": 0.6,
+     "tag": "stream-rebound-anchor"
+    },
+    {
+     "argv": [
+      "/usr/local/bin/python3",
+      "-B",
+      "-m",
+      "aisef",
+      "run",
+      "--verify",
+      "--project",
+      "/tmp/e2e/project/approved.json",
+      "--out",
+      "/tmp/e2e/S4/copy-stream-rebound"
+     ],
+     "exit": 0,
+     "seconds": 0.6,
+     "tag": "stream-rebound-no-anchor"
+    }
+   ],
+   "facts": {
+    "right": [
+     0,
+     "VERIFIED"
+    ],
+    "stream_byte": [
+     1,
+     "REFUTED"
+    ],
+    "stream_rebound_alone": [
+     0,
+     "VERIFIED"
+    ],
+    "stream_rebound_anchor": [
+     1,
+     "REFUTED"
+    ],
+    "verdict": [
+     1,
+     "REFUTED"
+    ],
+    "verdict_rebound_alone": [
+     1,
+     "REFUTED"
+    ],
+    "verdict_rebound_anchor": [
+     1,
+     "REFUTED"
+    ],
+    "wrong": [
+     1,
+     "REFUTED"
+    ]
+   },
+   "observed": {
+    "a_stream_changed_and_the_manifest_regenerated_verified_without_an_anchor": {
+     "delivery_verdict": "PASS",
+     "exit": 0,
+     "note": "not an assertion: without an anchor, verification proves consistency, not authenticity (the docstring of aisef2/app/verify.py); the check above, with the anchor, is the one that holds",
+     "problems": [],
+     "stderr": "",
+     "verdict": "VERIFIED"
+    }
+   },
+   "passed": true,
+   "scenario": "S4",
+   "title": "evidence and anchor, on copies of S1's run directory",
+   "volatile": {}
+  }
+ ]
+}

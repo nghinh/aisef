@@ -1,0 +1,17 @@
+ocr_new exit 1 05:17:06
+preserve exit 1 05:18:25
+review exit 1 05:19:22
+ocr_new2 exit 0 05:19:43
+fit exit 0 05:20:00
+dumps exit 0 05:20:32
+post_init exit 0 05:21:05
+detail exit 0 05:21:21
+preserve2 exit 0 05:22:25
+artifact_problems exit 0 05:23:17
+redacted exit 0 05:23:37
+verify_new exit 1 05:23:52
+evidence_manifest exit 0 05:24:44
+ALLDONE
+verify_new2 exit 0 05:26:48
+review2 exit 0 05:31:04
+K3DONE

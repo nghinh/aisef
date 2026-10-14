@@ -1,0 +1,128 @@
+"""Reviewer's property fuzz of the readers (SIMULATION: injected bytes, no process is touched).
+usage: python3 -B -I fuzz_parser.py.txt TREE [N] [SEED]
+A. honest tables whose commands hold every separator / forged-row text (but no LF byte): the reading equals the oracle
+   exactly and no victim born before the boundary is owned.
+B. the same with a raw LF injected into a command (a ps nobody measured): never an altered row for a listed pid;
+   counts how often an extra (unlisted) pid is accepted.
+C. arbitrary junk / structured junk: the only exception type is TableUnreadable.
+"""
+import collections, random, sys, time
+sys.path.insert(0, sys.argv[1])
+from validation.v2 import cleanup_authority as ca  # noqa: E402
+
+N = int(sys.argv[2]) if len(sys.argv) > 2 else 20000
+rnd = random.Random(int(sys.argv[3]) if len(sys.argv) > 3 else 7)
+SEPS = [" ", " ", "\x85", "\u0085", "\x0b", "\x0c", "\x1c", "\x1d", "\x1e", "\x1f", "\r", "\r\n", "\t", "\xa0", "　",
+        "﻿", "​", " ", "  ", "\x00", "\x7f", "\x1b"]
+WEEK = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+READER, RUNNER = 99991, 4242
+
+def lstart(t):
+    tm = time.localtime(t)
+    return f"{WEEK[tm.tm_wday]} {MON[tm.tm_mon-1]} {tm.tm_mday:>2} {tm.tm_hour:02}:{tm.tm_min:02}:{tm.tm_sec:02} {tm.tm_year:04}"
+
+def forged_text():
+    pid = rnd.choice([1, 2, 100, 5000, READER, RUNNER, rnd.randrange(1, 99999)])
+    return f"{pid} {rnd.choice([RUNNER, 1, pid])} {rnd.choice([RUNNER, pid])} {lstart(rnd.randrange(4_100_000_000, 4_200_000_000))} x"
+
+def command(allow_lf=False):
+    parts = []
+    for _ in range(rnd.randrange(0, 6)):
+        k = rnd.randrange(6)
+        if k == 0: parts.append(rnd.choice(SEPS))
+        elif k == 1: parts.append(forged_text())
+        elif k == 2: parts.append("".join(rnd.choice("0123456789 ") for _ in range(rnd.randrange(1, 12))))
+        elif k == 3: parts.append(rnd.choice(WEEK) + " " + rnd.choice(MON) + " 13 08:00:00 2026")
+        elif k == 4: parts.append("".join(chr(rnd.randrange(0x20, 0x3000)) for _ in range(rnd.randrange(1, 8))))
+        else: parts.append(rnd.choice(["/usr/bin/x", "python3 -c", "(defunct)", "[kworker/0:1]", "a b  c"]))
+    b = "".join(parts).encode("utf-8", "surrogatepass")
+    if rnd.random() < 0.1:
+        b += bytes(rnd.randrange(0x80, 0x100) for _ in range(rnd.randrange(1, 4)))     # invalid UTF-8
+    if not allow_lf:
+        b = b.replace(b"\n", b" ")
+    return b
+
+BOUNDARY = time.mktime((2026, 10, 11, 9, 30, 10, 0, 0, -1))
+
+def honest(n):
+    pids = rnd.sample(range(2, 90000), n)
+    rows, oracle = [], {}
+    heads.clear()
+    for pid in pids:
+        born = BOUNDARY + rnd.randrange(-86400, 86400)
+        born = float(int(born))
+        host = (pid, rnd.choice([RUNNER, 1, rnd.choice(pids)]), rnd.choice([pid, RUNNER, rnd.choice(pids)]), born)
+        cmd = command()
+        pad = rnd.randrange(1, 8)
+        head = (f"{pid:>7} {host[1]:>7} {host[2]:>7} {lstart(born)}" + " " * pad).encode()
+        rows.append(head + cmd)
+        heads.append(len(head))
+        txt = cmd.decode("utf-8", "replace").lstrip(" ")
+        oracle[pid] = ca.Host(pid, host[1], host[2], born, txt)
+    rb = float(int(BOUNDARY))
+    rhead = f"{READER:>7} {RUNNER:>7} {READER:>7} {lstart(rb)}     ".encode()
+    rows.append(rhead + b"ps -A")
+    heads.append(len(rhead))
+    oracle[READER] = ca.Host(READER, RUNNER, READER, rb, "ps -A")
+    return rows, oracle
+
+heads = []
+stats = collections.Counter()
+bad = []
+for i in range(N):
+    rows, oracle = honest(rnd.randrange(1, 12))
+    order = list(range(len(rows) - 1))
+    rnd.shuffle(order)
+    order.append(len(rows) - 1)
+    rows, hl = [rows[j] for j in order], [heads[j] if j < len(heads) else 0 for j in order]
+    raw = b"\n".join(rows) + b"\n"
+    # A. honest
+    try:
+        got = ca._ps_rows(raw)
+    except Exception as e:      # noqa: BLE001
+        bad.append(("A-exception", type(e).__name__, str(e)[:120])); continue
+    if got != oracle:
+        bad.append(("A-mismatch", sorted(set(got) ^ set(oracle))[:5]))
+    stats["A_ok"] += 1
+    # ownership computed from the parsed table must equal ownership computed from the oracle structure
+    b = ca.Boundary(RUNNER, float(int(BOUNDARY)), "root")
+    if sorted(ca.owned(b, got)) != sorted(ca.owned(b, oracle)):
+        bad.append(("A-owned-differs",))
+    # B. a raw LF injected into one command (what no measured ps prints)
+    k = rnd.randrange(len(rows))
+    cut = rnd.randrange(hl[k], len(rows[k]) + 1)     # inside the COMMAND: the only bytes a process controls
+    inject = rnd.choice([b"\n", b"\n" + forged_text().encode(), b"\n\n", b" \n" + forged_text().encode() + b"\n" + forged_text().encode()])
+    mut = rows[:k] + [rows[k][:cut] + inject + rows[k][cut:]] + rows[k + 1:]
+    try:
+        got2 = ca._ps_rows(b"\n".join(mut) + b"\n")
+    except ca.TableUnreadable:
+        stats["B_refused"] += 1
+        continue
+    except Exception as e:      # noqa: BLE001
+        bad.append(("B-exception", type(e).__name__, str(e)[:120])); continue
+    extra = set(got2) - set(oracle)
+    changed = [p for p in got2 if p in oracle and (got2[p].ppid, got2[p].pgid, got2[p].born) != (oracle[p].ppid, oracle[p].pgid, oracle[p].born)]
+    missing = set(oracle) - set(got2)
+    stats["B_accepted"] += 1
+    if extra: stats["B_accepted_with_unlisted_pid"] += 1
+    if changed: bad.append(("B-listed-row-altered", changed[:3]))
+    if missing: bad.append(("B-row-lost", sorted(missing)[:3]))
+print({"A_B": dict(stats), "bad": bad[:10], "n_bad": len(bad)})
+
+# C. arbitrary bytes into every reader: only TableUnreadable may come out
+kinds = collections.Counter()
+atoms = [b"\n", b"\0", b"\r\n", b" ", b"p", b"n", b"f", b"cwd", b"123", b"|", b"=", b"AAAA", b"\xff", " ".encode(), b"9" * 5000,
+         b"Tue Oct 13 08:00:00 2026", b"1 1 1 ", b"0" * 30, b"-", b"/"]
+readers = {"ps": ca._ps_rows, "env": ca._env_rows, "lsof": ca._lsof_cwds, "win": ca._win_rows}
+for i in range(N):
+    raw = b"".join(rnd.choice(atoms) for _ in range(rnd.randrange(0, 14)))
+    for name, fn in readers.items():
+        try:
+            fn(raw)
+            kinds[name + ":ok"] += 1
+        except ca.TableUnreadable:
+            kinds[name + ":TableUnreadable"] += 1
+        except Exception as e:  # noqa: BLE001
+            kinds[f"{name}:UNTYPED {type(e).__name__}"] += 1
+print(dict(kinds))

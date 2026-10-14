@@ -1,0 +1,7 @@
+#!/bin/zsh
+SP=/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad
+R3=$SP/m21/r3; OUT=$R3/out/range/review
+N=${1:-100}
+$OUT/loop.sh $OUT/loop-base-tree tests.v2.test_probe_process_effect FM2_EFFECT_10 $N $OUT/loop-eff10-base.txt > /dev/null 2>&1
+$OUT/loop.sh $R3/wt/range-rv tests.v2.test_probe_process_effect FM2_EFFECT_10 $N $OUT/loop-eff10-branch.txt > /dev/null 2>&1
+echo done > $OUT/loops2-DONE
