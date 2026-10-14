@@ -1,0 +1,62 @@
+HEAD 73af60cf809035b56e3cd25f79bdcb5ebb37265f dirty: [] free 28 GiB
+=== sweep 2026-10-14 16:31:36
+16:31:36 heavy.sh: t0-sweep waits for: read-set pid=7888 since 2026-10-14 16:29:23
+16:32:36 heavy.sh: t0-sweep waits for: read-set pid=7888 since 2026-10-14 16:29:23
+16:33:36 heavy.sh: t0-sweep waits for: read-set pid=7888 since 2026-10-14 16:29:23
+16:34:36 heavy.sh: t0-sweep waits for: read-set pid=7888 since 2026-10-14 16:29:23
+16:35:36 heavy.sh: t0-sweep waits for: read-set pid=7888 since 2026-10-14 16:29:23
+16:36:36 heavy.sh: t0-sweep waits for: read-set pid=7888 since 2026-10-14 16:29:23
+16:37:36 heavy.sh: t0-sweep waits for: read-set pid=7888 since 2026-10-14 16:29:23
+16:38:36 heavy.sh: t0-sweep waits for: read-set pid=7888 since 2026-10-14 16:29:23
+16:39:36 heavy.sh: t0-sweep waits for: read-set pid=7888 since 2026-10-14 16:29:23
+16:40:36 heavy.sh: t0-sweep waits for: read-set pid=7888 since 2026-10-14 16:29:23
+16:41:36 heavy.sh: t0-sweep waits for: read-set pid=7888 since 2026-10-14 16:29:23
+16:42:36 heavy.sh: t0-sweep waits for: read-set pid=7888 since 2026-10-14 16:29:23
+16:43:36 heavy.sh: t0-sweep waits for: read-set pid=7888 since 2026-10-14 16:29:23
+16:44:36 heavy.sh: t0-sweep waits for: read-set pid=7888 since 2026-10-14 16:29:23
+16:45:36 heavy.sh: t0-sweep waits for: read-set pid=7888 since 2026-10-14 16:29:23
+16:46:36 heavy.sh: t0-sweep waits for: read-set pid=7888 since 2026-10-14 16:29:23
+16:47:36 heavy.sh: t0-sweep waits for: read-set pid=7888 since 2026-10-14 16:29:23
+16:48:36 heavy.sh: t0-sweep waits for: read-set pid=7888 since 2026-10-14 16:29:23
+16:49:36 heavy.sh: t0-sweep waits for: read-set pid=7888 since 2026-10-14 16:29:23
+16:50:36 heavy.sh: t0-sweep waits for: read-set pid=7888 since 2026-10-14 16:29:23
+16:51:36 heavy.sh: t0-sweep waits for: read-set pid=7888 since 2026-10-14 16:29:23
+16:52:36 heavy.sh: t0-sweep waits for: read-set pid=7888 since 2026-10-14 16:29:23
+16:53:36 heavy.sh: t0-sweep waits for: read-set pid=7888 since 2026-10-14 16:29:23
+16:54:36 heavy.sh: t0-sweep waits for: read-set pid=7888 since 2026-10-14 16:29:23
+16:55:36 heavy.sh: t0-sweep waits for: read-set pid=7888 since 2026-10-14 16:29:23
+16:56:36 heavy.sh: t0-sweep waits for: read-set pid=7888 since 2026-10-14 16:29:23
+16:57:36 heavy.sh: t0-sweep waits for: read-set pid=7888 since 2026-10-14 16:29:23
+16:58:36 heavy.sh: t0-sweep waits for: read-set pid=7888 since 2026-10-14 16:29:23
+272 pairs, 31 null mutants, 165 kill files
+PASS aisef2/app/confine.py|22dba98cf95288c6|tests/v2/test_v21_confine.py  (22.0s)
+PASS aisef2/app/confine.py|22dba98cf95288c6|tests/v2/test_v21_defects_confine.py  (8.5s)
+PASS aisef2/app/confine.py|22dba98cf95288c6|tests/v2/test_v21_kills3_A05.py  (8.3s)
+PASS aisef2/app/confine.py|22dba98cf95288c6|tests/v2/test_v21_kills3_A06.py  (7.6s)
+PASS aisef2/app/confine.py|22dba98cf95288c6|tests/v2/test_v21_kills3_A07.py  (3.8s)
+PASS aisef2/app/confine.py|22dba98cf95288c6|tests/v2/test_v21_kills3_R02.py  (8.1s)
+PASS aisef2/app/confine.py|22dba98cf95288c6|tests/v2/test_v21_kills3_T05a.py  (7.8s)
+PASS aisef2/app/confine.py|22dba98cf95288c6|tests/v2/test_v21_kills3_T05b.py  (7.9s)
+PASS aisef2/app/confine.py|22dba98cf95288c6|tests/v2/test_v21_kills3_T05c.py  (9.1s)
+PASS aisef2/app/confine.py|22dba98cf95288c6|tests/v2/test_v21_kills3_T06a.py  (6.6s)
+PASS aisef2/app/confine.py|22dba98cf95288c6|tests/v2/test_v21_kills3_T06b.py  (5.3s)
+PASS aisef2/app/confine.py|22dba98cf95288c6|tests/v2/test_v21_kills3_T07a.py  (2.7s)
+PASS aisef2/app/confine.py|22dba98cf95288c6|tests/v2/test_v21_kills3_T07b.py  (2.9s)
+PASS aisef2/app/confine.py|22dba98cf95288c6|tests/v2/test_v21_kills3_TO2.py  (2.5s)
+PASS aisef2/app/confine.py|22dba98cf95288c6|tests/v2/test_v21_r3_client_readers.py  (4.1s)
+PASS aisef2/app/confine.py|22dba98cf95288c6|tests/v2/test_v21_r3_conf_fu_before.py  (4.1s)
+PASS aisef2/app/confine.py|22dba98cf95288c6|tests/v2/test_v21_r3_conf_locale.py  (4.3s)
+PASS aisef2/app/confine.py|22dba98cf95288c6|tests/v2/test_v21_r3_conf_policy.py  (3.8s)
+PASS aisef2/app/confine.py|22dba98cf95288c6|tests/v2/test_v21_r3_conf_rv_hostrows.py  (6.7s)
+PASS aisef2/app/confine.py|22dba98cf95288c6|tests/v2/test_v21_r3_judge_not_run.py  (6.7s)
+PASS aisef2/app/review_verify.py|fb6dac158f49d7cd|tests/v2/test_v21_r4_anchor_nonascii.py  (2.7s)
+PASS aisef2/app/review_verify.py|fb6dac158f49d7cd|tests/v2/test_v21_r4_uncalibrated_qualifier.py  (3.1s)
+PASS aisef2/runtime/process_range.py|34e4d4736546dd57|tests/v2/p4/test_process_range.py  (19.3s)
+PASS aisef2/runtime/process_range.py|34e4d4736546dd57|tests/v2/p4/test_process_table.py  (3.0s)
+PASS aisef2/runtime/process_range.py|34e4d4736546dd57|tests/v2/test_v21_r3_range_abort.py  (2.7s)
+PASS aisef2/runtime/process_range.py|34e4d4736546dd57|tests/v2/test_v21_r3_range_fu_linux_table.py  (2.9s)
+PASS aisef2/runtime/process_range.py|34e4d4736546dd57|tests/v2/test_v21_r3_range_fu_ps_table.py  (3.7s)
+PASS aisef2/runtime/process_range.py|34e4d4736546dd57|tests/v2/test_v21_r3_range_release_contract.py  (4.6s)
+sweep RC 0
+HEAD after 73af60cf809035b56e3cd25f79bdcb5ebb37265f dirty: []
+=== DONE 2026-10-14 17:02:38
