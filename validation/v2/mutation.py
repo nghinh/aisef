@@ -933,6 +933,9 @@ _V21_R3_APPEND: dict[str, list[str]] = {
     # the record's category default ('other') is asserted by T12b's second test, written for `finding_id` and wired
     # only there; two independent re-verifications of the carried audit ("a value nothing reads") found it killing
     "aisef2/app/review_ocr.py::findings": ["tests/v2/test_v21_kills3_T12b.py"],
+    # `_canon`'s spelling reaches the statement's `anchor_why`, bounded on its ENCODING since round 3: the escape of a
+    # non-ASCII letter evicts the contract ids (the carried audit "lossless either way" was refuted by both copies)
+    "aisef2/app/review_verify.py::_canon": ["tests/v2/test_v21_r4_anchor_nonascii.py"],
     "aisef2/app/confine.py::_mounts": [_R3_CONF[0], _R3 + "client_readers.py"],
     "aisef2/app/confine.py::_probe": [_R3_CONF[0], _R3 + "conf_locale.py", _R3_CONF[2]],
     "aisef2/app/confine.py::measure": [_R3_CONF[0], _R3 + "conf_locale.py", _R3_CONF[2]],
