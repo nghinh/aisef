@@ -1,0 +1,48 @@
+{
+ "target": "aisef2/app/confine.py::_judge",
+ "index": 106,
+ "mutant": "L534 string \"the probe's \" emptied",
+ "class": "AUDITED",
+ "source_sha256": "07e1c7ca528afa7442c9105690dfc43e2b10dfe08179c0120abe8799d1bd1594",
+ "group": "R4-UNRAN-LEADIN: the lead-in words of the message that names the checks that did not run; the names (each a token) and the cause words stay.",
+ "grounds": "confine.py:534 `f\"the probe's {', '.join(unran)} reported no exit status: the check did not run\"`; the mutant drops the first constant 'the probe's ' only (diff verified with mutant_view), leaving '<names> reported no exit status: the check did not run'. What a reader needs stays: each name as a token (test_v21_r3_judge_not_run.py:107-110, look-behind passes at the start of the string) and the cause words (DID_NOT_RUN, :38, asserted at :88, :105, :132, :179). Corrections to the draft: 'nothing parses it' is false in letter — validation/v21/sandbox/run.sh:67 matches 'did not run' in every problem — but on the tail that this mutant keeps; no script, test or document matches the lead-in (grep \"the probe's\" with startswith/regex: none; docs/v2.1/SANDBOX-LINUX.md:386-387 quotes only 'reported no exit status: the check did not run'). The other message that begins 'the probe's ' (confine.py:427, the left_on_host problem) is matched by equality (test_v21_confine.py:538-540), never by prefix, so dropping this lead-in cannot merge the two. In the operator's text the refusal reads '...is not provided: write_kernel, setsid reported no exit status: the check did not run; ...', which still says which checks and why.",
+ "consumers_checked": [
+  "producer: confine.py:533-534; sole caller confine.py:425",
+  "aisef2/app/run.py:403-405: `confine.measure(...)` -> `if rec['confinement']['problems']` (truthiness) -> RunRefused('confinement was asked for and is not provided: ' + '; '.join(problems)); the report is RUN.json `confinement` (run.py:403) and the refusal text is RUN.json `failure.detail[:2000]` (run.py:498)",
+  "aisef2/app/cli.py:85-88: `--check`: `ready = ... and not (conf and conf['problems'])` (truthiness), then prints the whole report (problems, tried) as JSON",
+  "validation/v21/sandbox/run.sh:67 (reads confine.measure's problems from measure.py:136): `'did not run' in p` over each problem — the draft missed it; it parses the message TAIL",
+  "validation/v21/cli_integration/e2e_guest.py:389/607-614: `problems == []` and `any(expect in x for x in problems)` with expect in {'do not exist','not an executable file','holds HOME','did not run the probe'}; none names a try or the lead-in",
+  "validation/v21/sandbox/linux_guest.py:258-266 and measure.py:193: record problems/tried as evidence, no parsing",
+  "docs/v2.1/SANDBOX-LINUX.md:381-391 (6.2): quotes only the tail 'reported no exit status: the check did not run'",
+  "tests/v2/test_v21_r3_judge_not_run.py:88,105-110,132,179 (names as tokens, cause words), test_v21_confine.py (problem lists by membership); none asserts the lead-in",
+  "other messages with the same lead-in: confine.py:427 (matched by equality in test_v21_confine.py:538-540); no prefix filter anywhere (grep startswith/regex on \"the probe\" in aisef2, tests, validation: only 'the sandbox did not run the probe' prefixes of a different message)"
+ ],
+ "exceptions_checked": [
+  "a reader that identifies the problem by its lead-in or by a startswith('the probe')/regex: none found in aisef2, tests, validation, docs",
+  "a collision with 'the sandbox did not run the probe (exit N)' expectations (e2e_guest.py:832 expect='did not run the probe'): the unran message contains 'did not run' but not 'did not run the probe', with or without the lead-in",
+  "run.sh:67 `'did not run' in p`: unaffected (tail kept)",
+  "kill tests: the 7 registered `_judge` files and the other 15 modules reaching confine all pass under the mutant (tests/v2/test_v21_confine.py, test_v21_defects_confine.py, test_v21_kills3_{A05,A06,A07,R02,T05a,T05b,T05c,T06a,T06b,T07a,T07b,T13a,T23a,TO2}.py, test_v21_r3_{client_readers,conf_policy,conf_locale,conf_fu_before,conf_rv_hostrows,judge_not_run}.py (22 files; every module of tests/ that imports confine and calls measure/_judge/_sections; T07b 1 skip, every other run without a skip))",
+  "the draft's `exceptions_checked` was empty",
+  "a reader that matches the prefix 'the probe' (startswith / regex) over problems: none found (git grep \"probe's\" tests validation aisef2; startswith filters: 'a process the session left', 'writable outside', 'cannot establish', \"the {n} namespace is not the session's own (\", 'the sandbox did not run the probe')",
+  "a reader of the substrings the round-4 message shares with other problems ('did not run'): run.sh:67, e2e_guest.py:608/615 - unchanged by the mutant",
+  "ambiguity of the bare subject for `workspace`/`setsid`: the cause clause 'the check did not run' remains; the other problems of the same list name the object in full ('the workspace was not writable'). Judged readable; wording only"
+ ],
+ "batch": "N1",
+ "reviewed": true,
+ "reverification": {
+  "snapshot": "9a4f1b3",
+  "copies": {
+   "a": {
+    "verdict": "REVISED",
+    "class": "AUDITED",
+    "report": "round-3/audit-reverification-r4/N1-a.json"
+   },
+   "b": {
+    "verdict": "REVISED",
+    "class": "AUDITED",
+    "report": "round-3/audit-reverification-r4/N1-b.json"
+   }
+  },
+  "note": "drafted by the author of the change; both independent copies revised the draft's grounds (a reader the draft missed: validation/v21/sandbox/run.sh:67, on the tail the mutant keeps) and kept the class; [109] and [45] of the same batch were REFUTED by both and killed by tests/v2/test_v21_r4_probe_record.py"
+ }
+}

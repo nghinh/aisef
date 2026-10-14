@@ -1,0 +1,95 @@
+{
+ "batch": "N1",
+ "copy": "a",
+ "head": "9a4f1b3d3ad2fbb96bc424427aab925a48aeeb02",
+ "source_sha256_checked": "07e1c7ca528afa7442c9105690dfc43e2b10dfe08179c0120abe8799d1bd1594",
+ "entries": [
+  {
+   "target": "aisef2/app/confine.py::_probe",
+   "index": 109,
+   "mutant": "L362 string '\\n' emptied",
+   "class_before": "AUDITED",
+   "verdict": "REFUTED",
+   "class_after": "SURVIVED, TEST OWED (not AUDITED)",
+   "grounds": "What holds: confine.py:362 is the mutated line (`canary.write_text(token + \"\\n\", ...)`, same function); the probe's `m try read_canary; cat -- \"$1\" 2>&1; m rc $?` is confine.py:72; with a canary that is NOT readable both programs print the same (cat's own error ends with a line feed; real-bubblewrap records docs/v2.1/evidence/sandbox/P4-all.json:397-400, X1:398, X3:401, P5:401 show exit 1 'No such file or directory'); with a readable canary `token in out` is True in both (confine.py:535), so the run is refused in both; before round 4 the mutant raised ValueError at `rep['tried']` (confine.py:417 of 289885e; reproduced, and campaign 5 record c5-w3.record.json has 'L359 string \\'\\\\n\\' emptied' KILLED by test_a_probe_that_did_not_exit_0_is_refused_even_when_it_reached_its_end, ValueError). What does NOT hold: 'the difference is one extra problem line on a path that is already a refusal, nobody depends on it'. Measured through confine.measure with the unconfined stand-in (the test's own harness), HEAD vs mutant: rep['tried']['read_canary'] = {exit: 0, output: token} vs {exit: None, output: token+marker}; 21 vs 22 problems; the new problem is the FIRST one, 'the probe's read_canary reported no exit status: the check did not run', which is false for a try that ran and read the file, and the breach itself ('a file of the run directory was readable') becomes the second; the substring read by validation/v21/sandbox/run.sh:67 ('did not run') flips False -> True, so that script prints 'bwrap ran: NO' for a probe that ran. The round-4 change is what turned this mutant from KILLED (a crash) into a silent wrong status; the tests beside it already pin exit 0 for the other tries that ran (test_v21_confine.py:521-522 workspace, read_git_directory) and omit read_canary.",
+   "consumers_checked": [
+    "producer: confine.py:362 writes the canary; confine.py:72 reads it through the probe; confine.py:212-239 (_sections, glued marker -> (None, text)); confine.py:417 builds rep['tried']; confine.py:424-425 calls _judge only when no earlier problem; confine.py:533-536 names the unran try and the breach",
+    "aisef2/app/run.py:403-405: `confine.measure(...)` -> `if rec['confinement']['problems']` (truthiness) -> RunRefused('confinement was asked for and is not provided: ' + '; '.join(problems)); the report is RUN.json `confinement` (run.py:403) and the refusal text is RUN.json `failure.detail[:2000]` (run.py:498)",
+    "aisef2/app/cli.py:85-88: `--check`: `ready = ... and not (conf and conf['problems'])` (truthiness), then prints the whole report (problems, tried) as JSON",
+    "validation/v21/sandbox/run.sh:67 (reads confine.measure's problems from measure.py:136): `'did not run' in p` over each problem — the draft missed it; it parses the message TAIL",
+    "validation/v21/cli_integration/e2e_guest.py:389/607-614: `problems == []` and `any(expect in x for x in problems)` with expect in {'do not exist','not an executable file','holds HOME','did not run the probe'}; none names a try or the lead-in",
+    "validation/v21/sandbox/linux_guest.py:258-266 and measure.py:193: record problems/tried as evidence, no parsing",
+    "docs/v2.1/SANDBOX-LINUX.md:381-391 (6.2): quotes only the tail 'reported no exit status: the check did not run'",
+    "readers of the canary file's bytes: grep canary in aisef2/validation/tests: only the path and (e2e_guest.py:416) its mtime; nothing reads its content or size",
+    "readers of tried.read_canary: tests (test_v21_confine.py:521-522 pin the neighbours, not this one); validation/v21/sandbox/r3_conf_old_judge.py:43 and tests/v2/test_v21_r3_conf_policy.py:482 re-judge RECORDED reports (data, unaffected by a producer mutant)"
+   ],
+   "exceptions_checked": [
+    "a readable canary with `token in out` False (the only way the glued line could escape the leak test): not possible, `out = p.stdout + p.stderr` is whole (confine.py:377) and cat prints the file's bytes before the marker",
+    "the glued line perturbing `values`/`sections`: it does not start with MARK, so `_sections` appends it to the open try and the next `m try` closes it; 'end' is still found; no section is lost (run under the mutant: problems has 22 entries, the same plus one)",
+    "the mutant accepting a run the original refuses: `_judge` adds 'a file of the run directory was readable' on `token in out` in both; checked by running the real probe unconfined under both",
+    "a canary that is unreadable and whose error has no trailing line feed: the unconfined stand-in cannot produce it; real-bubblewrap evidence records show a line-feed-ended error; a hostile `cat` was not constructed",
+    "tests that kill it: the 10 registered `_probe` kill files and 12 further modules reaching confine all pass under the mutant (tests/v2/test_v21_confine.py, test_v21_defects_confine.py, test_v21_kills3_{A05,A06,A07,R02,T05a,T05b,T05c,T06a,T06b,T07a,T07b,T13a,T23a,TO2}.py, test_v21_r3_{client_readers,conf_policy,conf_locale,conf_fu_before,conf_rv_hostrows,judge_not_run}.py (22 files; every module of tests/ that imports confine and calls measure/_judge/_sections; T07b 1 skip, every other run without a skip)); no test kills it",
+    "the draft's own `exceptions_checked` was empty"
+   ],
+   "refutation": "Input: a measurement in which the canary is readable (the unconfined stand-in of test_v21_confine.py:490, or the exit-3 variant of :526 which used to kill it). Reader: the operator reading the refusal (run.py:405 / `--check` JSON, first problem is false), the record's status (RUN.json confinement.tried.read_canary.exit) and run.sh:67. Test owed (sketch, in $SP/m21/r4/audit/n1a_sketch.py, green at HEAD, red under [109] with 'None != 0'): in the unconfined measurement `self.assertEqual(rep['tried']['read_canary']['exit'], 0)` beside test_v21_confine.py:521-522, `self.assertEqual([k for k, v in rep['tried'].items() if v['exit'] is None], [])`, `self.assertIn('a file of the run directory was readable', rep['problems'])` and `self.assertFalse([p for p in rep['problems'] if 'reported no exit status' in p])`. Contract: a probe that ran to its end reports every try; a breach is recorded as the breach, not as an unrun check. Register the file for `_probe` (it is already in the kill set of test_v21_confine.py).",
+   "note": "The refusal (the safety property) is NOT refuted: both programs refuse. What is refuted is the claim that no reader depends on the difference. SANDBOX-LINUX 6.2 lists 'the canary file' among commands whose missing line feed makes a try 'never reported'; that is the reader-side rule for output whose status is invisible, it does not make a false status on a canary the harness itself writes without a line feed a documented contract. Weighed against that, I still call it owed because the status is read by an operator and a verifier of the record and the fix is one assertion."
+  },
+  {
+   "target": "aisef2/app/confine.py::_judge",
+   "index": 45,
+   "mutant": "L533 sorted() -> list()",
+   "class_before": "AUDITED",
+   "verdict": "REVISED",
+   "class_after": "AUDITED",
+   "grounds": "confine.py:533 `sorted(k for k, v in tries.items() if v[0] is None)` vs `list(...)` (the mutant is exactly that, same line and function). Same set of names, same truthiness, same prefix and suffix of the message; only the ORDER of the names inside the one problem differs. `tries` is `_sections`' dict (confine.py:212-239; the comprehension keeps the insertion order = the order of the first `m try NAME` of each name in the probe's output = the probe script's fixed order, confine.py:72-87), so the mutant is deterministic too: measured on a probe output with three unreported tries, HEAD says 'the probe's user_namespace, workspace, write_run_directory reported ...', the mutant 'the probe's write_run_directory, workspace, user_namespace reported ...' (the whole order, not only which name comes first). Corrections to the draft: 'nothing parses the message' is false in letter — validation/v21/sandbox/run.sh:67 substring-matches 'did not run' in every problem — but it reads the TAIL that both versions keep, never the names or their order. The unran problem is the first one `_judge` adds (confine.py:533, `_judge` is reached only with no earlier problem, :424), so the 2000-character cut of the joined refusal in RUN.json failure.detail (run.py:498) cannot reach into it, and the full list is in confinement.problems.",
+   "consumers_checked": [
+    "producer: confine.py:212-239 (_sections -> tries), :533-534 (the one problem); sole caller confine.py:425 (plus validation/v21/sandbox/r3_conf_old_judge.py:47 and tests, which pass recorded or hand-built dicts)",
+    "aisef2/app/run.py:403-405: `confine.measure(...)` -> `if rec['confinement']['problems']` (truthiness) -> RunRefused('confinement was asked for and is not provided: ' + '; '.join(problems)); the report is RUN.json `confinement` (run.py:403) and the refusal text is RUN.json `failure.detail[:2000]` (run.py:498)",
+    "aisef2/app/cli.py:85-88: `--check`: `ready = ... and not (conf and conf['problems'])` (truthiness), then prints the whole report (problems, tried) as JSON",
+    "validation/v21/sandbox/run.sh:67 (reads confine.measure's problems from measure.py:136): `'did not run' in p` over each problem — the draft missed it; it parses the message TAIL",
+    "validation/v21/cli_integration/e2e_guest.py:389/607-614: `problems == []` and `any(expect in x for x in problems)` with expect in {'do not exist','not an executable file','holds HOME','did not run the probe'}; none names a try or the lead-in",
+    "validation/v21/sandbox/linux_guest.py:258-266 and measure.py:193: record problems/tried as evidence, no parsing",
+    "docs/v2.1/SANDBOX-LINUX.md:381-391 (6.2): quotes only the tail 'reported no exit status: the check did not run'",
+    "tests/v2/test_v21_r3_judge_not_run.py:105-110 asserts each name as a token (regex with look-arounds) and DID_NOT_RUN — both independent of the order; no test or script expects a particular order of names (grep 'reported no exit status' in tests/validation/aisef2/docs)"
+   ],
+   "exceptions_checked": [
+    "an order that matters to a reader: a joined text compared across runs or hashed (grep confinement/problems in verify.py, lineage.py, usage.py: no use of the confinement report); a truncation that would hide a late name (run.py:498 cut is 2000 chars and the unran message is the first `_judge` problem)",
+    "a `tries` that is not built by `_sections` (non-probe insertion order): only tests and r3_conf_old_judge.py pass their own dict; the recorded JSON objects keep the probe's order",
+    "a non-str key that `sorted` would refuse: keys are the strings after `m try`",
+    "kill tests: the 7 registered `_judge` files and the other 15 modules reaching confine all pass under the mutant (tests/v2/test_v21_confine.py, test_v21_defects_confine.py, test_v21_kills3_{A05,A06,A07,R02,T05a,T05b,T05c,T06a,T06b,T07a,T07b,T13a,T23a,TO2}.py, test_v21_r3_{client_readers,conf_policy,conf_locale,conf_fu_before,conf_rv_hostrows,judge_not_run}.py (22 files; every module of tests/ that imports confine and calls measure/_judge/_sections; T07b 1 skip, every other run without a skip))",
+    "the draft's `exceptions_checked` was empty"
+   ],
+   "refutation": "none found: no input gives a different decision, status, set of names or tail; only the order of the names in one string",
+   "note": "Optional, owed by nothing: a test that two dicts with the same unran names in opposite insertion orders give equal problem lists would pin the 'sorted' (determinism of the refusal text independent of recording order). The class stays AUDITED, not EQUIVALENT: the strings differ for two or more names."
+  },
+  {
+   "target": "aisef2/app/confine.py::_judge",
+   "index": 106,
+   "mutant": "L534 string \"the probe's \" emptied",
+   "class_before": "AUDITED",
+   "verdict": "REVISED",
+   "class_after": "AUDITED",
+   "grounds": "confine.py:534 `f\"the probe's {', '.join(unran)} reported no exit status: the check did not run\"`; the mutant drops the first constant 'the probe's ' only (diff verified with mutant_view), leaving '<names> reported no exit status: the check did not run'. What a reader needs stays: each name as a token (test_v21_r3_judge_not_run.py:107-110, look-behind passes at the start of the string) and the cause words (DID_NOT_RUN, :38, asserted at :88, :105, :132, :179). Corrections to the draft: 'nothing parses it' is false in letter — validation/v21/sandbox/run.sh:67 matches 'did not run' in every problem — but on the tail that this mutant keeps; no script, test or document matches the lead-in (grep \"the probe's\" with startswith/regex: none; docs/v2.1/SANDBOX-LINUX.md:386-387 quotes only 'reported no exit status: the check did not run'). The other message that begins 'the probe's ' (confine.py:427, the left_on_host problem) is matched by equality (test_v21_confine.py:538-540), never by prefix, so dropping this lead-in cannot merge the two. In the operator's text the refusal reads '...is not provided: write_kernel, setsid reported no exit status: the check did not run; ...', which still says which checks and why.",
+   "consumers_checked": [
+    "producer: confine.py:533-534; sole caller confine.py:425",
+    "aisef2/app/run.py:403-405: `confine.measure(...)` -> `if rec['confinement']['problems']` (truthiness) -> RunRefused('confinement was asked for and is not provided: ' + '; '.join(problems)); the report is RUN.json `confinement` (run.py:403) and the refusal text is RUN.json `failure.detail[:2000]` (run.py:498)",
+    "aisef2/app/cli.py:85-88: `--check`: `ready = ... and not (conf and conf['problems'])` (truthiness), then prints the whole report (problems, tried) as JSON",
+    "validation/v21/sandbox/run.sh:67 (reads confine.measure's problems from measure.py:136): `'did not run' in p` over each problem — the draft missed it; it parses the message TAIL",
+    "validation/v21/cli_integration/e2e_guest.py:389/607-614: `problems == []` and `any(expect in x for x in problems)` with expect in {'do not exist','not an executable file','holds HOME','did not run the probe'}; none names a try or the lead-in",
+    "validation/v21/sandbox/linux_guest.py:258-266 and measure.py:193: record problems/tried as evidence, no parsing",
+    "docs/v2.1/SANDBOX-LINUX.md:381-391 (6.2): quotes only the tail 'reported no exit status: the check did not run'",
+    "tests/v2/test_v21_r3_judge_not_run.py:88,105-110,132,179 (names as tokens, cause words), test_v21_confine.py (problem lists by membership); none asserts the lead-in",
+    "other messages with the same lead-in: confine.py:427 (matched by equality in test_v21_confine.py:538-540); no prefix filter anywhere (grep startswith/regex on \"the probe\" in aisef2, tests, validation: only 'the sandbox did not run the probe' prefixes of a different message)"
+   ],
+   "exceptions_checked": [
+    "a reader that identifies the problem by its lead-in or by a startswith('the probe')/regex: none found in aisef2, tests, validation, docs",
+    "a collision with 'the sandbox did not run the probe (exit N)' expectations (e2e_guest.py:832 expect='did not run the probe'): the unran message contains 'did not run' but not 'did not run the probe', with or without the lead-in",
+    "run.sh:67 `'did not run' in p`: unaffected (tail kept)",
+    "kill tests: the 7 registered `_judge` files and the other 15 modules reaching confine all pass under the mutant (tests/v2/test_v21_confine.py, test_v21_defects_confine.py, test_v21_kills3_{A05,A06,A07,R02,T05a,T05b,T05c,T06a,T06b,T07a,T07b,T13a,T23a,TO2}.py, test_v21_r3_{client_readers,conf_policy,conf_locale,conf_fu_before,conf_rv_hostrows,judge_not_run}.py (22 files; every module of tests/ that imports confine and calls measure/_judge/_sections; T07b 1 skip, every other run without a skip))",
+    "the draft's `exceptions_checked` was empty"
+   ],
+   "refutation": "none found. Weakest point, stated: the lead-in is the only words that say these names are the PROBE's checks (an identifying element); the remaining text 'reported no exit status: the check did not run' names a check, so the operator is not misled. The same standing as the carried label-token audits (B03-R4-REVIEW §6: 'an assertIn for the label of a few refusal messages ... nothing owes').",
+   "note": "Optional sketch, owed by nothing (a wording test, round 1's rule): `self.assertTrue(said.startswith(\"the probe's \"))` in test_several_are_named_together_in_one_problem_each_as_a_token_of_its_own. Side finding (not a mutant): validation/v21/sandbox/run.sh:67's heuristic `'did not run' in p` for 'bwrap did not run the probe' now also matches the round-4 message ('the check did not run'), so that evidence helper prints 'bwrap ran: NO' for a probe that ran with one try left without a status; informational, outside the product."
+  }
+ ]
+}

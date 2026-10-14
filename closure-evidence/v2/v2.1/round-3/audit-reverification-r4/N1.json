@@ -1,0 +1,53 @@
+[
+ {
+  "target": "aisef2/app/confine.py::_probe",
+  "index": 109,
+  "mutant": "L362 string '\\n' emptied",
+  "class": "AUDITED",
+  "source_sha256": "07e1c7ca528afa7442c9105690dfc43e2b10dfe08179c0120abe8799d1bd1594",
+  "group": "R4-CANARY-LF: the canary file's trailing line feed matters only when the canary is READABLE from inside, and then the run is refused either way.",
+  "grounds": "confine.py:362 `canary.write_text(token + \"\\n\", ...)`; mutant: no trailing line feed. The probe's `m try read_canary; cat -- \"$1\" 2>&1; m rc $?` prints the file: when the canary is NOT readable from inside (the only measurement a correctly confined session gives) `cat` prints its own error, which ends with a line feed, and the file's bytes are never printed: the two programs print the same. When it IS readable (a breach) `cat` prints the token and, with the mutant, the `@@aisef-confine rc 0` marker is glued to it, so `_sections` reports the try as (None, text) (round 4) and `_judge` adds the problem \"the probe's read_canary reported no exit status: the check did not run\" to \"a file of the run directory was readable\" (`token in out` is True in both). The run is refused in both; `rep[\"tried\"][\"read_canary\"][\"exit\"]` is None instead of 0 and the problem list has one more line. Before round 4 the same mutant made `_probe` raise at `rep[\"tried\"]` on a readable canary (a traceback instead of a refusal), which is why a test killed it; since the fail-closed rule the difference is one extra problem line on a path that is already a refusal.",
+  "consumers_checked": [
+   "aisef2/app/confine.py:_judge / _probe (the only producers and callers)",
+   "aisef2/app/run.py and aisef2/app/cli.py: read `problems` by truthiness and print the text",
+   "tests: tests/v2/test_v21_r3_judge_not_run.py (asserts the names as tokens and the cause words), test_v21_confine.py"
+  ],
+  "exceptions_checked": [],
+  "batch": "N1",
+  "reviewed": false
+ },
+ {
+  "target": "aisef2/app/confine.py::_judge",
+  "index": 45,
+  "mutant": "L533 sorted() -> list()",
+  "class": "AUDITED",
+  "source_sha256": "07e1c7ca528afa7442c9105690dfc43e2b10dfe08179c0120abe8799d1bd1594",
+  "group": "R4-UNRAN-ORDER: the order of the names in the message of the checks that did not run.",
+  "grounds": "confine.py:533 `sorted(k for k, v in tries.items() if v[0] is None)` vs `list(...)`: the names are joined into one problem; `tries` is built by `_sections` in the order of the probe's output (the probe script writes its tries in a fixed order), so the mutant's order is deterministic too (the probe's) and differs from the alphabetical one only in which name comes first when two or more tries did not report. Nothing parses the message; the set of names is the same.",
+  "consumers_checked": [
+   "aisef2/app/confine.py:_judge / _probe (the only producers and callers)",
+   "aisef2/app/run.py and aisef2/app/cli.py: read `problems` by truthiness and print the text",
+   "tests: tests/v2/test_v21_r3_judge_not_run.py (asserts the names as tokens and the cause words), test_v21_confine.py"
+  ],
+  "exceptions_checked": [],
+  "batch": "N1",
+  "reviewed": false
+ },
+ {
+  "target": "aisef2/app/confine.py::_judge",
+  "index": 106,
+  "mutant": "L534 string \"the probe's \" emptied",
+  "class": "AUDITED",
+  "source_sha256": "07e1c7ca528afa7442c9105690dfc43e2b10dfe08179c0120abe8799d1bd1594",
+  "group": "R4-UNRAN-LEADIN: the lead-in words of the same message.",
+  "grounds": "confine.py:534 the f-string `the probe's {names} reported no exit status: the check did not run`; mutant: the words `the probe's ` are dropped, leaving `{names} reported no exit status: the check did not run`. The names (each a token of its own: asserted) and the cause (\"reported no exit status\", \"did not run\": asserted by test_v21_r3_judge_not_run) remain; the lead-in only says whose names they are. Read by the operator in `run`/`--check`'s refusal and `confinement.problems`; nothing parses it.",
+  "consumers_checked": [
+   "aisef2/app/confine.py:_judge / _probe (the only producers and callers)",
+   "aisef2/app/run.py and aisef2/app/cli.py: read `problems` by truthiness and print the text",
+   "tests: tests/v2/test_v21_r3_judge_not_run.py (asserts the names as tokens and the cause words), test_v21_confine.py"
+  ],
+  "exceptions_checked": [],
+  "batch": "N1",
+  "reviewed": false
+ }
+]

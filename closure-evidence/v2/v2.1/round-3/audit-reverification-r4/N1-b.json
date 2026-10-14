@@ -1,0 +1,91 @@
+{
+ "batch": "N1",
+ "copy": "b",
+ "head": "9a4f1b3d3ad2fbb96bc424427aab925a48aeeb02",
+ "entries": [
+  {
+   "target": "aisef2/app/confine.py::_probe",
+   "index": 109,
+   "mutant": "L362 string '\\n' emptied",
+   "class_before": "AUDITED",
+   "verdict": "REFUTED",
+   "class_after": "SURVIVED (test owed)",
+   "source_sha256": "07e1c7ca528afa7442c9105690dfc43e2b10dfe08179c0120abe8799d1bd1594",
+   "grounds": "Facts of the draft hold, measured: confine.py:362 `canary.write_text(token + \"\\n\")`; confined (canary unreadable) the two programs print the same (cat's own error ends with LF: tried.read_canary = {exit 1, 'cat: <path>: No such file or directory'} in both, same problems); readable canary (the REAL probe run by /bin/sh through confine.measure, every write redirected into a scratch directory): original tried.read_canary = {exit 0, output '<token>'}, problems ['a file of the run directory was readable', ...]; mutant tried.read_canary = {exit null, output '<token>@@aisef-confine rc 0'}, problems ['the probe's read_canary reported no exit status: the check did not run', 'a file of the run directory was readable', ...]. Refused in both; before round 4 the mutant raised ValueError at rep['tried'] (measured on 289885e). What the draft leaves out, and why the 'harmless' conclusion does not stand: (1) the extra line is FIRST in the list (L533 precedes L535), so it heads the refusal text and RUN.json failure.detail, and says 'the check did not run' of a check that ran and read the file; (2) the record is wrong, not just longer: tried.read_canary.exit is null where the probe wrote rc 0 (RUN.json is written in a finally, run.py:506, refused run included, and cli --check prints it); (3) the record no longer carries the breach for a re-judgement: the suite's own replay (test_v21_r3_conf_policy.py:480-485 `_judge(rep,'tok','',tries-from-rep['tried'])`, T06a.py:158, r3_conf_old_judge.py:43) finds 'a file of the run directory was readable' from exit 0 alone (the replay has no probe `out`, and 'tok' is not the run's token); with exit null the replay says only 'did not run' - measured: replay == live is True for the original, False for the mutant (live has 'readable', replay has not). No recorded report in docs/v2.1/evidence has read_canary exit 0, so nothing in the suite feeds it - which is why it survives.",
+   "consumers_checked": [
+    "aisef2/app/confine.py:385,417,425 (_sections -> rep['tried'] -> _judge; _judge has no other caller in aisef2/)",
+    "aisef2/app/run.py:403-405: `rec['confinement']`, `'; '.join(problems)` in the RunRefused text; run.py:506 writes RUN.json in a `finally` with sort_keys=True, so the whole report (tried, problems) and failure.detail are recorded even for a refused run",
+    "aisef2/app/cli.py:85-91: `--check` truthiness of problems and prints the whole report (tried included)",
+    "validation/v21/sandbox/run.sh:67: `'did not run' in p` over problems (bwrap ran: yes/NO)",
+    "validation/v21/cli_integration/e2e_guest.py:415,607-617: records conf['tried']; `expect in problem` substrings ('do not exist', 'not an executable file', 'holds HOME', 'did not run the probe')",
+    "validation/v21/sandbox/teardown_race.py:55: counts problems by exact string over 400 live measurements; r3_conf_old_judge.py:43-48 and tests/v2/test_v21_r3_conf_policy.py:480-485, test_v21_kills3_T06a.py:158: re-judge a recorded report from rep['tried'] with token 'tok', out ''",
+    "tests that import confine: 22 test modules (registered kill files of the target + test_v21_r3_conf_rv_hostrows, judge_not_run, client_readers, kills3_A06/A07/T06a/T06b/T07a/T07b/T13a/T23a/TO2, defects_confine, r3_conf_locale): run against the mutant, see below"
+   ],
+   "exceptions_checked": [
+    "an input on which the observable result differs: YES - canary readable (an unconfined 'bubblewrap'; the repo's own fixture test_v21_confine.py:490 test_what_is_measured_decides_not_the_name_of_the_tool): exit/output of read_canary and problems[0] differ; demo: out/N1-b-demo-109.py",
+    "a consumer that depends on exit == 0 of read_canary in a record: replay readers (r3_conf_policy.py:480-485, T06a.py:158, r3_conf_old_judge.py:43) - the only carrier of the leak once `out` is gone; none is fed a readable-canary record today (grep of docs/v2.1/evidence, closure-evidence: every read_canary exit is 1)",
+    "a test that kills it and is not registered: ran the mutant against the 10 registered files of `_probe` and the other 12 modules that import confine (T0 PASS for all): SURVIVED both times (validation/v21/kill_check.py --only 109)",
+    "a probe output that makes the canary end without LF in a confined session: none - cat prints its own error (LF-terminated) when the file is unreadable",
+    "whether the probe script itself ever sees a canary without LF otherwise: only via this write (L362); no other writer of `canary` in aisef2/ tests/ validation/ (git grep)"
+   ],
+   "refutation": "Input: a measurement whose canary IS readable (a breach: an unconfined wrapper - the fixture of test_v21_confine.py:490 already builds it). Reader: the report as the record (RUN.json confinement.tried, and any re-judgement of it) and the operator's first problem. Sketch (validated: passes on the tree, kills the mutant through validation/v21/kill_check.py; out/N1-b-candidate-test.py): in that breach, assertEqual(rep['tried']['read_canary']['exit'], 0); assertFalse(any('reported no exit status' in p for p in rep['problems'])); and assertIn('a file of the run directory was readable', _judge(json-roundtrip(rep), 'tok', '', {k:(v['exit'],v['output']) ...}, home, ws)). The one-line form is `self.assertEqual(rep['tried']['read_canary']['exit'], 0)` beside L521-522 of test_v21_confine.py (it asserts workspace and read_git_directory exits there and not this one; not run here: that fixture builds a venv and leaves a sleeper).",
+   "note": "The refusal DECISION is the same - the draft is right about that and I measured it. The disagreement is whether 'a status in the record' and 'the first words of the refusal' are things nobody reads. By the owner's rule (a refusal, a status is read by an operator or a verifier) they are, and the replay is a concrete reader. Round 4 turned what used to be a crash-kill into a survivor; the LF at L362 is deliberate (so a readable canary does not swallow the marker) and states a requirement no test pins by contract. The facts above are the same whichever way the owner classes it."
+  },
+  {
+   "target": "aisef2/app/confine.py::_judge",
+   "index": 45,
+   "mutant": "L533 sorted() -> list()",
+   "class_before": "AUDITED",
+   "verdict": "REVISED",
+   "class_after": "AUDITED",
+   "source_sha256": "07e1c7ca528afa7442c9105690dfc43e2b10dfe08179c0120abe8799d1bd1594",
+   "grounds": "confine.py:533 `if unran := sorted(k for k, v in tries.items() if v[0] is None)`; mutant `list(...)`. The set of names, the problem, and the refusal are identical; only the order of names inside the one problem differs, and only for two or more unran tries whose probe order is not alphabetical. Live, `tries` is in the probe's order (confine.py:58-89: read_canary, write_run_directory, write_kernel, write_interpreter_site, write_client_directory, write_git_directory, read_git_directory, workspace, user_namespace, setsid; measured), so the mutant is deterministic - as the draft says. CORRECTION to the draft's reading: that order is not the only one a reader meets. RUN.json is written with sort_keys=True (run.py:506), so the recorded `confinement.tried` is alphabetical; a re-judgement from the record (the suite's replay: r3_conf_policy.py:480-485, T06a.py:158, r3_conf_old_judge.py:43) prints the names alphabetically under the original AND the mutant, while the live text under the mutant is the probe's order. Measured with `workspace` and `user_namespace` both glued: original live 'user_namespace, workspace' = replay; mutant live 'workspace, user_namespace' != replay 'user_namespace, workspace' (replay == live problems: True / False). `sorted` is what makes the text a function of the set, equal live and from the record. No finding is lost and no record is wrong - an exact-list comparison of live against replay would be a false alarm, nothing else. Also corrected: 'tests' - test_several_are_named_together... (judge_not_run.py:107-111) uses read_canary and setsid, whose insertion order IS alphabetical, so it cannot see order; every other test passes at most one name.",
+   "consumers_checked": [
+    "aisef2/app/confine.py:385,417,425 (_sections -> rep['tried'] -> _judge; _judge has no other caller in aisef2/)",
+    "aisef2/app/run.py:403-405: `rec['confinement']`, `'; '.join(problems)` in the RunRefused text; run.py:506 writes RUN.json in a `finally` with sort_keys=True, so the whole report (tried, problems) and failure.detail are recorded even for a refused run",
+    "aisef2/app/cli.py:85-91: `--check` truthiness of problems and prints the whole report (tried included)",
+    "validation/v21/sandbox/run.sh:67: `'did not run' in p` over problems (bwrap ran: yes/NO)",
+    "validation/v21/cli_integration/e2e_guest.py:415,607-617: records conf['tried']; `expect in problem` substrings ('do not exist', 'not an executable file', 'holds HOME', 'did not run the probe')",
+    "validation/v21/sandbox/teardown_race.py:55: counts problems by exact string over 400 live measurements; r3_conf_old_judge.py:43-48 and tests/v2/test_v21_r3_conf_policy.py:480-485, test_v21_kills3_T06a.py:158: re-judge a recorded report from rep['tried'] with token 'tok', out ''",
+    "tests that import confine: 22 test modules (registered kill files of the target + test_v21_r3_conf_rv_hostrows, judge_not_run, client_readers, kills3_A06/A07/T06a/T06b/T07a/T07b/T13a/T23a/TO2, defects_confine, r3_conf_locale): run against the mutant, see below"
+   ],
+   "exceptions_checked": [
+    "another caller of _judge with a differently ordered dict: none (git grep '_judge(' aisef2 -> confine.py:425 only; tests/validation call it with hand-built or replayed dicts)",
+    "a consumer that parses or keys on the message: run.sh:67 and e2e_guest.py:608/615 match substrings ('did not run', 'did not run the probe') that are outside the changed words; teardown_race.py:55 counts by exact string but over live measurements whose order is stable under the mutant",
+    "a replay of a recorded report with >= 2 unran tries: exists as a pattern (r3_conf_policy.py:485 asserts judge(rec) == rec['report']['problems']); no recorded report in docs/v2.1/evidence has such a problem, so nothing feeds it",
+    "a test that kills it and is not registered: mutant run against the 7 registered files of `_judge` and the other 15 modules that import confine (T0 PASS): SURVIVED both times",
+    "sorted() raising where list() does not (non-comparable keys): keys are str from `_sections` partitions; hand-built dicts in tests are str"
+   ],
+   "refutation": "",
+   "note": "Optional test, nothing owes it by wording alone, but it is the same property as [109]'s replay: the candidate test test_what_a_run_refused_with_is_what_its_record_says_when_judged_again (out/N1-b-candidate-test.py: canned probe output with workspace and user_namespace glued, report round-tripped through json sort_keys, re-judged, the 'did not run' problem compared with the live one) passes on the tree and KILLS this mutant (kill_check). So the test that [109] is owed, written over two glued tries, also settles [45]; whether to want it for the order alone is the owner's. Side finding (not a mutant): the round-4 message contains 'did not run', which validation/v21/sandbox/run.sh:67 reads as 'bwrap ran: NO' - a try without a status now prints that although bubblewrap ran (docker matrix diagnostic only)."
+  },
+  {
+   "target": "aisef2/app/confine.py::_judge",
+   "index": 106,
+   "mutant": "L534 string \"the probe's \" emptied",
+   "class_before": "AUDITED",
+   "verdict": "REVISED",
+   "class_after": "AUDITED",
+   "source_sha256": "07e1c7ca528afa7442c9105690dfc43e2b10dfe08179c0120abe8799d1bd1594",
+   "grounds": "confine.py:534 `bad.append(f\"the probe's {', '.join(unran)} reported no exit status: the check did not run\")`; mutant drops the literal \"the probe's \", leaving `{names} reported no exit status: the check did not run` (measured: 'user_namespace, workspace reported no exit status: the check did not run'). Same problem count, same position, same names, same cause words; refusal decision identical; replay == live in both. The lead-in is what says the bare words (workspace, setsid, user_namespace, read_canary) are the probe's checks - the cause clause says it again. CORRECTIONS to the draft: (a) 'nothing parses it' is literally wrong: validation/v21/sandbox/run.sh:67 tests `'did not run' in p` over every problem and e2e_guest.py:608/615 test `expect in problem` for 'do not exist', 'not an executable file', 'holds HOME', 'did not run the probe'. None of those substrings lies in the dropped words, so their results are the same (measured: 'did not run' present in original and mutant; 'did not run the probe' absent in both); (b) no consumer filters on the prefix \"the probe's\" (git grep over tests/ validation/ aisef2/: only confine.py:427's own 'the probe's files are left' message, which is a different problem and is appended after _judge); (c) the draft's consumer list omitted RUN.json (failure.detail repeats the text), run.sh, e2e_guest, teardown_race (exact-string counts).",
+   "consumers_checked": [
+    "aisef2/app/confine.py:385,417,425 (_sections -> rep['tried'] -> _judge; _judge has no other caller in aisef2/)",
+    "aisef2/app/run.py:403-405: `rec['confinement']`, `'; '.join(problems)` in the RunRefused text; run.py:506 writes RUN.json in a `finally` with sort_keys=True, so the whole report (tried, problems) and failure.detail are recorded even for a refused run",
+    "aisef2/app/cli.py:85-91: `--check` truthiness of problems and prints the whole report (tried included)",
+    "validation/v21/sandbox/run.sh:67: `'did not run' in p` over problems (bwrap ran: yes/NO)",
+    "validation/v21/cli_integration/e2e_guest.py:415,607-617: records conf['tried']; `expect in problem` substrings ('do not exist', 'not an executable file', 'holds HOME', 'did not run the probe')",
+    "validation/v21/sandbox/teardown_race.py:55: counts problems by exact string over 400 live measurements; r3_conf_old_judge.py:43-48 and tests/v2/test_v21_r3_conf_policy.py:480-485, test_v21_kills3_T06a.py:158: re-judge a recorded report from rep['tried'] with token 'tok', out ''",
+    "tests that import confine: 22 test modules (registered kill files of the target + test_v21_r3_conf_rv_hostrows, judge_not_run, client_readers, kills3_A06/A07/T06a/T06b/T07a/T07b/T13a/T23a/TO2, defects_confine, r3_conf_locale): run against the mutant, see below"
+   ],
+   "exceptions_checked": [
+    "a reader that matches the prefix 'the probe' (startswith / regex) over problems: none found (git grep \"probe's\" tests validation aisef2; startswith filters: 'a process the session left', 'writable outside', 'cannot establish', \"the {n} namespace is not the session's own (\", 'the sandbox did not run the probe')",
+    "a reader of the substrings the round-4 message shares with other problems ('did not run'): run.sh:67, e2e_guest.py:608/615 - unchanged by the mutant",
+    "ambiguity of the bare subject for `workspace`/`setsid`: the cause clause 'the check did not run' remains; the other problems of the same list name the object in full ('the workspace was not writable'). Judged readable; wording only",
+    "a test that kills it and is not registered: SURVIVED against the 7 registered `_judge` files and the 15 other confine-importing modules (T0 PASS), and against my candidate test",
+    "documents quoting the message with its lead-in: docs/v2.1/SANDBOX-LINUX.md:387 and B03-R4-REVIEW.md quote only 'reported no exit status: the check did not run' / 'did not run'; none quotes the lead-in"
+   ],
+   "refutation": "",
+   "note": "Wording of an operator-facing message, same class as the optional label/closing-parenthesis tests in B03-R4-REVIEW.md section 6 ('nothing owes them, the audits stand'); sketch if wanted: assertTrue(said.startswith(\"the probe's \")) in test_several_are_named_together_in_one_problem_each_as_a_token_of_its_own. A test of wording is not written to move a number (round 1's rule)."
+  }
+ ]
+}

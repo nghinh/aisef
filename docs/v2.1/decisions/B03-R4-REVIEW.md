@@ -116,3 +116,21 @@ Side findings of the agents, none a mutant, none fixed here (each is fail-closed
 | RV-3 | the refusals of `check_repository` and `--parent` lose a label token under a mutant; whether `run.py:149` should name `shown` | read | owner question about the product's wording |
 | RV-4 | `test_v21_kills3_T25a`'s docstring lists preflight `http_transport` [13, 14] as pinned (numbering of an earlier enumeration): they survive it and every preflight test; only a `get_type_hints`/return-annotation test separates them | measured by two agents | test docstring is stale; the audits stand |
 | RV-5 | `test_c2_k_nowork_001` is red on the unmutated snapshot: the K-NOWORK record's `kernel.after.kernel_digest` is not this tree's `aisef2/` (stale after round 3) | measured | the record is regenerated on the final tree (§ the order of derived records) |
+
+## 7. The seven survivors campaign 6 left without an audit (and the second round of skeptics)
+
+Campaign 6 ended with 26 survivors; 19 carried an audit, 7 did not. All seven were new: they live in the lines round 4
+changed. The author drafted audits; two blind skeptic copies tried to break them (`round-3/audit-reverification-r4/`);
+the strengthened test and a new kill file killed the others.
+
+| mutant | what it is | disposition |
+|---|---|---|
+| `_sections` [32], [33], [48] | the tuple `(None, text)` of a try that never reported: element dropped, the join's separator emptied | KILLED: the test written for them existed and was registered for `_judge` only (the same shape as the six refuted audits); registered for `_sections`, and its assertions made exact (the whole tuple) |
+| `_judge` [169] | `', '` of the list of names: the checks ran together | KILLED: the names asserted as tokens |
+| `_probe` [109] | the canary file written without its trailing line feed | draft audit "refused either way"; **REFUTED by both copies**: without the line feed the breach is recorded as a try that never reported — "did not run" is the first line of the refusal of a check that read the file, in RUN.json and `--check`, and the replay of the record (`_judge` over `tried`) loses the finding. KILLED by `tests/v2/test_v21_r4_probe_record.py` (the real probe through /bin/sh, every write redirected into the test's directory) |
+| `_judge` [45] | `sorted()` -> `list()` of the names | draft audit "deterministic either way"; both copies: live order is the probe's, a replay from the sorted record is alphabetical — the report is not its own record. KILLED by the same file |
+| `_judge` [106] | the lead-in `the probe's ` of the message | **AUDITED** (both copies REVISED the grounds and kept the class): the names and the cause words stay; the one reader the draft missed (`validation/v21/sandbox/run.sh:67`, `'did not run' in p`) matches the tail the mutant keeps |
+
+Side finding fixed in the same commit: `run.sh`'s "bwrap ran" heuristic matched the round-4 message ("the check did not
+run") and printed "bwrap ran: NO" for a probe that ran with a try that never reported; it now matches the old specific
+message (`the sandbox did not run the probe`).
