@@ -3,7 +3,7 @@ Run from a checkout of the snapshot through py.sh. Prints, per mutant, the numbe
 import itertools, json, pathlib, sys, types
 sys.path.insert(0, "."); sys.dont_write_bytecode = True
 from validation.v2 import mutation as m
-from aisef2.app import confine
+from aisef2.app import confine  # noqa: F401 — the package the mutant's relative imports resolve in
 from tests.v2.test_v21_kills3_A06 import clean_report
 src = pathlib.Path("aisef2/app/confine.py").read_text(encoding="utf-8")
 found = m.mutants(src, "_judge", m._enum_members(src, pathlib.Path(".")))
@@ -37,7 +37,7 @@ base = [judged(orig, t) for t in grid]
 for i in (100, 135, 136, 137, 138, 139):
     desc, text = found[i]
     mod = load(text)
-    diff = [(t, b, judged(mod, t)) for t, b in zip(grid, base) if judged(mod, t) != b]
+    diff = [(t, b, judged(mod, t)) for t, b in zip(grid, base, strict=True) if judged(mod, t) != b]
     print(f"[{i}] {desc}: {len(grid)} inputs, {len(diff)} differ")
     for t, b, a in diff[:3]:
         print("    ", json.dumps(t, default=str), "->", json.dumps(b, default=str)[:100], "vs", json.dumps(a, default=str)[:100])
