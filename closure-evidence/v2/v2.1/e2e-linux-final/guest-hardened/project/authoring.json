@@ -1,0 +1,139 @@
+{
+ "format": "aisef-v2-authoring/1",
+ "name": "calc-cli",
+ "description": "A calculator command.",
+ "requirements_document": {
+  "path": "docs/requirements.md"
+ },
+ "product_roots": [
+  "app",
+  "tests"
+ ],
+ "baseline": "HEAD",
+ "requirements": [
+  {
+   "id": "R-CLI",
+   "text": "python -m app A B exits with the sum of the integers A and B; exit 2 on a usage error (any other number of arguments)",
+   "source": "docs/requirements.md \u00a71"
+  }
+ ],
+ "contracts": [
+  {
+   "id": "BC-SUM",
+   "requirement_ids": [
+    "R-CLI"
+   ],
+   "subject": {
+    "kind": "cli_invocation",
+    "locator": "app:__main__"
+   },
+   "stimulus": {
+    "argv": [
+     "2",
+     "3"
+    ]
+   },
+   "observable": {
+    "exit_code": 5,
+    "within_s": 20
+   },
+   "polarity": "MUST_HOLD",
+   "subject_absence": "REQUIRES_SUBJECT",
+   "rationale": "the requirement's own example"
+  },
+  {
+   "id": "BC-USAGE-0",
+   "requirement_ids": [
+    "R-CLI"
+   ],
+   "subject": {
+    "kind": "cli_invocation",
+    "locator": "app:__main__"
+   },
+   "stimulus": {
+    "argv": []
+   },
+   "observable": {
+    "exit_code": 2,
+    "within_s": 20
+   },
+   "polarity": "MUST_HOLD",
+   "subject_absence": "REQUIRES_SUBJECT",
+   "rationale": "the requirement's own example"
+  },
+  {
+   "id": "BC-USAGE-1",
+   "requirement_ids": [
+    "R-CLI"
+   ],
+   "subject": {
+    "kind": "cli_invocation",
+    "locator": "app:__main__"
+   },
+   "stimulus": {
+    "argv": [
+     "1"
+    ]
+   },
+   "observable": {
+    "exit_code": 2,
+    "within_s": 20
+   },
+   "polarity": "MUST_HOLD",
+   "subject_absence": "REQUIRES_SUBJECT",
+   "rationale": "the requirement's own example"
+  }
+ ],
+ "stories": {
+  "S1": {
+   "depends_on": [],
+   "tests": [
+    "tests/test_cli.py"
+   ],
+   "criteria": [
+    {
+     "id": "C-SUM",
+     "contract": "BC-SUM",
+     "role": "INTRODUCE",
+     "depends_on": [],
+     "why": "S1 introduces 1.1",
+     "facts": {
+      "requirement": "R-CLI",
+      "section": "\u00a71",
+      "clause": "1.1",
+      "clause_text": "exits with the sum of the integers A and B",
+      "subject": "python -m app"
+     }
+    },
+    {
+     "id": "C-USAGE-0",
+     "contract": "BC-USAGE-0",
+     "role": "INTRODUCE",
+     "depends_on": [],
+     "why": "S1 introduces 1.2",
+     "facts": {
+      "requirement": "R-CLI",
+      "section": "\u00a71",
+      "clause": "1.2",
+      "clause_text": "exit 2 on a usage error (any other number of arguments)",
+      "subject": "python -m app"
+     }
+    },
+    {
+     "id": "C-USAGE-1",
+     "contract": "BC-USAGE-1",
+     "role": "INTRODUCE",
+     "depends_on": [],
+     "why": "S1 introduces 1.2",
+     "facts": {
+      "requirement": "R-CLI",
+      "section": "\u00a71",
+      "clause": "1.2",
+      "clause_text": "exit 2 on a usage error (any other number of arguments)",
+      "subject": "python -m app"
+     }
+    }
+   ]
+  }
+ }
+}

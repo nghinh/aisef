@@ -1,0 +1,24 @@
+{
+ "tag": "run",
+ "argv": [
+  "/usr/local/bin/python3",
+  "-B",
+  "-m",
+  "aisef",
+  "run",
+  "--project",
+  "/tmp/e2e/project/approved.json",
+  "--settings",
+  "settings.json",
+  "--repo",
+  "/tmp/e2e/project/repo",
+  "--out",
+  "run"
+ ],
+ "cwd": "/tmp/e2e/S2b-hardened",
+ "exit": 2,
+ "seconds": 1.7,
+ "stdout": "",
+ "stderr": "aisef run: refused: confinement was asked for and is not provided: the sandbox did not run the probe (exit 1): bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user namespaces. See <https://deb.li/bubblewrap> or <file:///usr/share/doc/bubblewrap/README.Debian.gz>.\n",
+ "json": null
+}

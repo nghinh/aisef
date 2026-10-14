@@ -1,0 +1,24 @@
+{
+ "tag": "run",
+ "argv": [
+  "/usr/local/bin/python3",
+  "-B",
+  "-m",
+  "aisef",
+  "run",
+  "--project",
+  "/tmp/e2e/project/approved.json",
+  "--settings",
+  "settings.json",
+  "--repo",
+  "/tmp/e2e/project/repo",
+  "--out",
+  "run"
+ ],
+ "cwd": "/tmp/e2e/S2b-missing",
+ "exit": 2,
+ "seconds": 2.4,
+ "stdout": "",
+ "stderr": "aisef run: refused: confinement was asked for and is not provided: bubblewrap is not an executable file at /usr/bin/bwrap-e2e-absent\n",
+ "json": null
+}

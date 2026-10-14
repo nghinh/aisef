@@ -1,0 +1,799 @@
+{
+ "tag": "check",
+ "argv": [
+  "/usr/local/bin/python3",
+  "-B",
+  "-m",
+  "aisef",
+  "run",
+  "--check",
+  "--project",
+  "/tmp/e2e/project/approved.json",
+  "--settings",
+  "settings.json",
+  "--repo",
+  "/tmp/e2e/project/repo"
+ ],
+ "cwd": "/tmp/e2e/S1",
+ "exit": 0,
+ "seconds": 2.1,
+ "stdout": "{\n \"admission\": {\n  \"admitted\": true,\n  \"engine_digest\": \"7668fc35709829d8324e914e0300b2b85221d9e83dedd32cd2c3996f761690c7\",\n  \"failed\": [],\n  \"result_digest\": \"2b01083f0887d014bc82c80f31dec6c0e5f4f1ae5845ea943bbab29da535a8ae\"\n },\n \"confinement\": {\n  \"argv\": [\n   \"/usr/bin/bwrap\",\n   \"--unshare-user\",\n   \"--unshare-pid\",\n   \"--unshare-ipc\",\n   \"--unshare-uts\",\n   \"--unshare-cgroup-try\",\n   \"--share-net\",\n   \"--disable-userns\",\n   \"--die-with-parent\",\n   \"--new-session\",\n   \"--cap-drop\",\n   \"ALL\",\n   \"--ro-bind\",\n   \"/usr\",\n   \"/usr\",\n   \"--ro-bind\",\n   \"/etc\",\n   \"/etc\",\n   \"--symlink\",\n   \"usr/bin\",\n   \"/bin\",\n   \"--symlink\",\n   \"usr/sbin\",\n   \"/sbin\",\n   \"--symlink\",\n   \"usr/lib\",\n   \"/lib\",\n   \"--proc\",\n   \"/proc\",\n   \"--dev\",\n   \"/dev\",\n   \"--tmpfs\",\n   \"/tmp\",\n   \"--tmpfs\",\n   \"/aisef-home\",\n   \"--ro-bind\",\n   \"/tmp/e2e/S1/fakebin\",\n   \"/tmp/e2e/S1/fakebin\",\n   \"--ro-bind\",\n   \"/tmp/aisef-confine-qb2hwcim/confinement/repo/.git\",\n   \"/tmp/aisef-confine-qb2hwcim/confinement/repo/.git\",\n   \"--ro-bind\",\n   \"/tmp/e2e/S1/xdg/opencode\",\n   \"/tmp/e2e/S1/xdg/opencode\",\n   \"--bind\",\n   \"/tmp/aisef-confine-qb2hwcim/confinement/ws\",\n   \"/tmp/aisef-confine-qb2hwcim/confinement/ws\",\n   \"--chdir\",\n   \"/tmp/aisef-confine-qb2hwcim/confinement/ws\",\n   \"--\",\n   \"/bin/sh\",\n   \"-c\",\n   \"<PROBE>\",\n   \"probe\"\n  ],\n  \"backend\": \"bwrap\",\n  \"bwrap\": \"/usr/bin/bwrap\",\n  \"bwrap_sha256\": \"b3b829e18a7d43ee589dc37e351cb9480ff7301b493d8227b8c754294638b976\",\n  \"bwrap_version\": \"bubblewrap 0.12.0\",\n  \"client\": \"/tmp/e2e/S1/fakebin/opencode\",\n  \"created_outside_workspace\": {\n   \"client_directory\": false,\n   \"git_directory\": false,\n   \"interpreter_site\": false,\n   \"kernel\": false,\n   \"run_directory\": false\n  },\n  \"host_mounts\": [\n   {\n    \"at\": \"/\",\n    \"dev\": \"0:57\",\n    \"fs\": \"overlay\",\n    \"optional\": []\n   },\n   {\n    \"at\": \"/proc\",\n    \"dev\": \"0:66\",\n    \"fs\": \"proc\",\n    \"optional\": []\n   },\n   {\n    \"at\": \"/dev\",\n    \"dev\": \"0:69\",\n    \"fs\": \"tmpfs\",\n    \"optional\": []\n   },\n   {\n    \"at\": \"/dev/pts\",\n    \"dev\": \"0:72\",\n    \"fs\": \"devpts\",\n    \"optional\": []\n   },\n   {\n    \"at\": \"/sys\",\n    \"dev\": \"0:83\",\n    \"fs\": \"sysfs\",\n    \"optional\": []\n   },\n   {\n    \"at\": \"/sys/fs/cgroup\",\n    \"dev\": \"0:41\",\n    \"fs\": \"cgroup2\",\n    \"optional\": []\n   },\n   {\n    \"at\": \"/dev/mqueue\",\n    \"dev\": \"0:64\",\n    \"fs\": \"mqueue\",\n    \"optional\": []\n   },\n   {\n    \"at\": \"/dev/shm\",\n    \"dev\": \"0:84\",\n    \"fs\": \"tmpfs\",\n    \"optional\": []\n   },\n   {\n    \"at\": \"/usr/sbin/docker-init\",\n    \"dev\": \"0:26\",\n    \"fs\": \"overlay\",\n    \"optional\": []\n   },\n   {\n    \"at\": \"/repo\",\n    \"dev\": \"0:46\",\n    \"fs\": \"virtiofs\",\n    \"optional\": []\n   },\n   {\n    \"at\": \"/etc/hostname\",\n    \"dev\": \"254:1\",\n    \"fs\": \"ext4\",\n    \"optional\": []\n   },\n   {\n    \"at\": \"/etc/hosts\",\n    \"dev\": \"254:1\",\n    \"fs\": \"ext4\",\n    \"optional\": []\n   },\n   {\n    \"at\": \"/etc/resolv.conf\",\n    \"dev\": \"254:1\",\n    \"fs\": \"ext4\",\n    \"optional\": []\n   },\n   {\n    \"at\": \"/usr/lib/aarch64-linux-gnu/libproc2.so.0\",\n    \"dev\": \"0:46\",\n    \"fs\": \"virtiofs\",\n    \"optional\": []\n   },\n   {\n    \"at\": \"/usr/local/bin/ps\",\n    \"dev\": \"0:46\",\n    \"fs\": \"virtiofs\",\n    \"optional\": []\n   }\n  ],\n  \"host_mounts_appeared\": [],\n  \"inside\": {\n   \"capabilities\": {\n    \"CapAmb\": \"0000000000000000\",\n    \"CapBnd\": \"0000000000000000\",\n    \"CapEff\": \"0000000000000000\",\n    \"CapInh\": \"0000000000000000\",\n    \"CapPrm\": \"0000000000000000\"\n   },\n   \"device_roots\": [\n    \"/dev\"\n   ],\n   \"devices\": {\n    \"/dev/full\": \"1:7\",\n    \"/dev/null\": \"1:3\",\n    \"/dev/random\": \"1:8\",\n    \"/dev/tty\": \"5:0\",\n    \"/dev/urandom\": \"1:9\",\n    \"/dev/zero\": \"1:5\"\n   },\n   \"home_listing\": [],\n   \"mount_targets\": [\n    \"/usr\",\n    \"/etc\",\n    \"/proc\",\n    \"/dev\",\n    \"/tmp\",\n    \"/aisef-home\",\n    \"/tmp/e2e/S1/fakebin\",\n    \"/tmp/aisef-confine-qb2hwcim/confinement/repo/.git\",\n    \"/tmp/e2e/S1/xdg/opencode\",\n    \"/tmp/aisef-confine-qb2hwcim/confinement/ws\"\n   ],\n   \"mounts\": [\n    {\n     \"access\": \"rw\",\n     \"at\": \"/\",\n     \"dev\": \"0:60\",\n     \"fs\": \"tmpfs\",\n     \"optional\": [],\n     \"options\": [\n      \"rw\",\n      \"nosuid\",\n      \"nodev\",\n      \"relatime\"\n     ],\n     \"root\": \"/newroot\",\n     \"source\": \"tmpfs\",\n     \"super_options\": [\n      \"rw\",\n      \"uid=1000\",\n      \"gid=1000\"\n     ]\n    },\n    {\n     \"access\": \"ro\",\n     \"at\": \"/usr\",\n     \"dev\": \"0:57\",\n     \"fs\": \"overlay\",\n     \"optional\": [],\n     \"options\": [\n      \"ro\",\n      \"nosuid\",\n      \"nodev\",\n      \"relatime\"\n     ],\n     \"root\": \"/usr\",\n     \"source\": \"overlay\",\n     \"super_options\": [\n      \"rw\",\n      \"lowerdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167950/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166976/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166963/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166962/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166961/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166960/fs\",\n      \"upperdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167951/fs\",\n      \"workdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167951/work\",\n      \"nouserxattr\"\n     ]\n    },\n    {\n     \"access\": \"ro\",\n     \"at\": \"/usr/sbin/docker-init\",\n     \"dev\": \"0:26\",\n     \"fs\": \"overlay\",\n     \"optional\": [],\n     \"options\": [\n      \"ro\",\n      \"nosuid\",\n      \"nodev\",\n      \"relatime\"\n     ],\n     \"root\": \"/usr/libexec/docker/docker-init\",\n     \"source\": \"overlay\",\n     \"super_options\": [\n      \"rw\",\n      \"lowerdir=/\",\n      \"upperdir=/run/rootfs.upper\",\n      \"workdir=/run/rootfs.workdir\",\n      \"uuid=on\",\n      \"nouserxattr\"\n     ]\n    },\n    {\n     \"access\": \"ro\",\n     \"at\": \"/usr/lib/aarch64-linux-gnu/libproc2.so.0\",\n     \"dev\": \"0:46\",\n     \"fs\": \"virtiofs\",\n     \"optional\": [],\n     \"options\": [\n      \"ro\",\n      \"nosuid\",\n      \"nodev\",\n      \"relatime\"\n     ],\n     \"root\": \"/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/linux/procps/libproc2.so.0\",\n     \"source\": \"virtiofs2\",\n     \"super_options\": [\n      \"rw\",\n      \"ignore_atime\",\n      \"no_xattr\"\n     ]\n    },\n    {\n     \"access\": \"ro\",\n     \"at\": \"/usr/local/bin/ps\",\n     \"dev\": \"0:46\",\n     \"fs\": \"virtiofs\",\n     \"optional\": [],\n     \"options\": [\n      \"ro\",\n      \"nosuid\",\n      \"nodev\",\n      \"relatime\"\n     ],\n     \"root\": \"/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/linux/procps/ps\",\n     \"source\": \"virtiofs2\",\n     \"super_options\": [\n      \"rw\",\n      \"ignore_atime\",\n      \"no_xattr\"\n     ]\n    },\n    {\n     \"access\": \"ro\",\n     \"at\": \"/etc\",\n     \"dev\": \"0:57\",\n     \"fs\": \"overlay\",\n     \"optional\": [],\n     \"options\": [\n      \"ro\",\n      \"nosuid\",\n      \"nodev\",\n      \"relatime\"\n     ],\n     \"root\": \"/etc\",\n     \"source\": \"overlay\",\n     \"super_options\": [\n      \"rw\",\n      \"lowerdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167950/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166976/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166963/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166962/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166961/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166960/fs\",\n      \"upperdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167951/fs\",\n      \"workdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167951/work\",\n      \"nouserxattr\"\n     ]\n    },\n    {\n     \"access\": \"ro\",\n     \"at\": \"/etc/hostname\",\n     \"dev\": \"254:1\",\n     \"fs\": \"ext4\",\n     \"optional\": [],\n     \"options\": [\n      \"ro\",\n      \"nosuid\",\n      \"nodev\",\n      \"relatime\"\n     ],\n     \"root\": \"/docker/containers/6f70c3301b1cd029ea28b3a8793b0721b6d9e47e4b0ce27474c8988b7a5601d6/hostname\",\n     \"source\": \"/dev/vda1\",\n     \"super_options\": [\n      \"rw\",\n      \"discard\"\n     ]\n    },\n    {\n     \"access\": \"ro\",\n     \"at\": \"/etc/hosts\",\n     \"dev\": \"254:1\",\n     \"fs\": \"ext4\",\n     \"optional\": [],\n     \"options\": [\n      \"ro\",\n      \"nosuid\",\n      \"nodev\",\n      \"relatime\"\n     ],\n     \"root\": \"/docker/containers/6f70c3301b1cd029ea28b3a8793b0721b6d9e47e4b0ce27474c8988b7a5601d6/hosts\",\n     \"source\": \"/dev/vda1\",\n     \"super_options\": [\n      \"rw\",\n      \"discard\"\n     ]\n    },\n    {\n     \"access\": \"ro\",\n     \"at\": \"/etc/resolv.conf\",\n     \"dev\": \"254:1\",\n     \"fs\": \"ext4\",\n     \"optional\": [],\n     \"options\": [\n      \"ro\",\n      \"nosuid\",\n      \"nodev\",\n      \"relatime\"\n     ],\n     \"root\": \"/docker/containers/6f70c3301b1cd029ea28b3a8793b0721b6d9e47e4b0ce27474c8988b7a5601d6/resolv.conf\",\n     \"source\": \"/dev/vda1\",\n     \"super_options\": [\n      \"rw\",\n      \"discard\"\n     ]\n    },\n    {\n     \"access\": \"rw\",\n     \"at\": \"/proc\",\n     \"dev\": \"0:61\",\n     \"fs\": \"proc\",\n     \"optional\": [],\n     \"options\": [\n      \"rw\",\n      \"nosuid\",\n      \"nodev\",\n      \"noexec\",\n      \"relatime\"\n     ],\n     \"root\": \"/\",\n     \"source\": \"proc\",\n     \"super_options\": [\n      \"rw\"\n     ]\n    },\n    {\n     \"access\": \"rw\",\n     \"at\": \"/dev\",\n     \"dev\": \"0:62\",\n     \"fs\": \"tmpfs\",\n     \"optional\": [],\n     \"options\": [\n      \"rw\",\n      \"nosuid\",\n      \"nodev\",\n      \"relatime\"\n     ],\n     \"root\": \"/\",\n     \"source\": \"tmpfs\",\n     \"super_options\": [\n      \"rw\",\n      \"mode=755\",\n      \"uid=1000\",\n      \"gid=1000\"\n     ]\n    },\n    {\n     \"access\": \"rw\",\n     \"at\": \"/dev/null\",\n     \"dev\": \"0:69\",\n     \"fs\": \"tmpfs\",\n     \"optional\": [],\n     \"options\": [\n      \"rw\",\n      \"nosuid\"\n     ],\n     \"root\": \"/null\",\n     \"source\": \"tmpfs\",\n     \"super_options\": [\n      \"rw\",\n      \"size=65536k\",\n      \"mode=755\"\n     ]\n    },\n    {\n     \"access\": \"rw\",\n     \"at\": \"/dev/zero\",\n     \"dev\": \"0:69\",\n     \"fs\": \"tmpfs\",\n     \"optional\": [],\n     \"options\": [\n      \"rw\",\n      \"nosuid\"\n     ],\n     \"root\": \"/zero\",\n     \"source\": \"tmpfs\",\n     \"super_options\": [\n      \"rw\",\n      \"size=65536k\",\n      \"mode=755\"\n     ]\n    },\n    {\n     \"access\": \"rw\",\n     \"at\": \"/dev/full\",\n     \"dev\": \"0:69\",\n     \"fs\": \"tmpfs\",\n     \"optional\": [],\n     \"options\": [\n      \"rw\",\n      \"nosuid\"\n     ],\n     \"root\": \"/full\",\n     \"source\": \"tmpfs\",\n     \"super_options\": [\n      \"rw\",\n      \"size=65536k\",\n      \"mode=755\"\n     ]\n    },\n    {\n     \"access\": \"rw\",\n     \"at\": \"/dev/random\",\n     \"dev\": \"0:69\",\n     \"fs\": \"tmpfs\",\n     \"optional\": [],\n     \"options\": [\n      \"rw\",\n      \"nosuid\"\n     ],\n     \"root\": \"/random\",\n     \"source\": \"tmpfs\",\n     \"super_options\": [\n      \"rw\",\n      \"size=65536k\",\n      \"mode=755\"\n     ]\n    },\n    {\n     \"access\": \"rw\",\n     \"at\": \"/dev/urandom\",\n     \"dev\": \"0:69\",\n     \"fs\": \"tmpfs\",\n     \"optional\": [],\n     \"options\": [\n      \"rw\",\n      \"nosuid\"\n     ],\n     \"root\": \"/urandom\",\n     \"source\": \"tmpfs\",\n     \"super_options\": [\n      \"rw\",\n      \"size=65536k\",\n      \"mode=755\"\n     ]\n    },\n    {\n     \"access\": \"rw\",\n     \"at\": \"/dev/tty\",\n     \"dev\": \"0:69\",\n     \"fs\": \"tmpfs\",\n     \"optional\": [],\n     \"options\": [\n      \"rw\",\n      \"nosuid\"\n     ],\n     \"root\": \"/tty\",\n     \"source\": \"tmpfs\",\n     \"super_options\": [\n      \"rw\",\n      \"size=65536k\",\n      \"mode=755\"\n     ]\n    },\n    {\n     \"access\": \"rw\",\n     \"at\": \"/dev/pts\",\n     \"dev\": \"0:63\",\n     \"fs\": \"devpts\",\n     \"optional\": [],\n     \"options\": [\n      \"rw\",\n      \"nosuid\",\n      \"noexec\",\n      \"relatime\"\n     ],\n     \"root\": \"/\",\n     \"source\": \"devpts\",\n     \"super_options\": [\n      \"rw\",\n      \"mode=620\",\n      \"ptmxmode=666\"\n     ]\n    },\n    {\n     \"access\": \"rw\",\n     \"at\": \"/tmp\",\n     \"dev\": \"0:65\",\n     \"fs\": \"tmpfs\",\n     \"optional\": [],\n     \"options\": [\n      \"rw\",\n      \"nosuid\",\n      \"nodev\",\n      \"relatime\"\n     ],\n     \"root\": \"/\",\n     \"source\": \"tmpfs\",\n     \"super_options\": [\n      \"rw\",\n      \"mode=755\",\n      \"uid=1000\",\n      \"gid=1000\"\n     ]\n    },\n    {\n     \"access\": \"rw\",\n     \"at\": \"/aisef-home\",\n     \"dev\": \"0:85\",\n     \"fs\": \"tmpfs\",\n     \"optional\": [],\n     \"options\": [\n      \"rw\",\n      \"nosuid\",\n      \"nodev\",\n      \"relatime\"\n     ],\n     \"root\": \"/\",\n     \"source\": \"tmpfs\",\n     \"super_options\": [\n      \"rw\",\n      \"mode=755\",\n      \"uid=1000\",\n      \"gid=1000\"\n     ]\n    },\n    {\n     \"access\": \"ro\",\n     \"at\": \"/tmp/e2e/S1/fakebin\",\n     \"dev\": \"0:57\",\n     \"fs\": \"overlay\",\n     \"optional\": [],\n     \"options\": [\n      \"ro\",\n      \"nosuid\",\n      \"nodev\",\n      \"relatime\"\n     ],\n     \"root\": \"/tmp/e2e/S1/fakebin\",\n     \"source\": \"overlay\",\n     \"super_options\": [\n      \"rw\",\n      \"lowerdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167950/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166976/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166963/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166962/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166961/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166960/fs\",\n      \"upperdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167951/fs\",\n      \"workdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167951/work\",\n      \"nouserxattr\"\n     ]\n    },\n    {\n     \"access\": \"ro\",\n     \"at\": \"/tmp/aisef-confine-qb2hwcim/confinement/repo/.git\",\n     \"dev\": \"0:57\",\n     \"fs\": \"overlay\",\n     \"optional\": [],\n     \"options\": [\n      \"ro\",\n      \"nosuid\",\n      \"nodev\",\n      \"relatime\"\n     ],\n     \"root\": \"/tmp/aisef-confine-qb2hwcim/confinement/repo/.git\",\n     \"source\": \"overlay\",\n     \"super_options\": [\n      \"rw\",\n      \"lowerdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167950/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166976/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166963/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166962/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166961/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166960/fs\",\n      \"upperdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167951/fs\",\n      \"workdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167951/work\",\n      \"nouserxattr\"\n     ]\n    },\n    {\n     \"access\": \"ro\",\n     \"at\": \"/tmp/e2e/S1/xdg/opencode\",\n     \"dev\": \"0:57\",\n     \"fs\": \"overlay\",\n     \"optional\": [],\n     \"options\": [\n      \"ro\",\n      \"nosuid\",\n      \"nodev\",\n      \"relatime\"\n     ],\n     \"root\": \"/tmp/e2e/S1/xdg/opencode\",\n     \"source\": \"overlay\",\n     \"super_options\": [\n      \"rw\",\n      \"lowerdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167950/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166976/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166963/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166962/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166961/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166960/fs\",\n      \"upperdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167951/fs\",\n      \"workdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167951/work\",\n      \"nouserxattr\"\n     ]\n    },\n    {\n     \"access\": \"rw\",\n     \"at\": \"/tmp/aisef-confine-qb2hwcim/confinement/ws\",\n     \"dev\": \"0:57\",\n     \"fs\": \"overlay\",\n     \"optional\": [],\n     \"options\": [\n      \"rw\",\n      \"nosuid\",\n      \"nodev\",\n      \"relatime\"\n     ],\n     \"root\": \"/tmp/aisef-confine-qb2hwcim/confinement/ws\",\n     \"source\": \"overlay\",\n     \"super_options\": [\n      \"rw\",\n      \"lowerdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167950/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166976/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166963/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166962/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166961/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166960/fs\",\n      \"upperdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167951/fs\",\n      \"workdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167951/work\",\n      \"nouserxattr\"\n     ]\n    }\n   ],\n   \"namespaces\": {\n    \"ipc\": \"own\",\n    \"mnt\": \"own\",\n    \"net\": \"shared\",\n    \"pid\": \"own\",\n    \"user\": \"own\",\n    \"uts\": \"own\"\n   },\n   \"network_interfaces\": [\n    \"lo\",\n    \"tunl0\",\n    \"gre0\",\n    \"gretap0\",\n    \"erspan0\",\n    \"ip_vti0\",\n    \"ip6_vti0\",\n    \"sit0\",\n    \"ip6tnl0\",\n    \"ip6gre0\"\n   ],\n   \"no_new_privs\": \"1\",\n   \"routed_interfaces\": [],\n   \"seccomp\": \"0\",\n   \"uid\": \"1000\",\n   \"unix_sockets\": []\n  },\n  \"left_on_host\": [],\n  \"locale\": {\n   \"LANG\": \"C\",\n   \"LC_ALL\": \"C\"\n  },\n  \"network\": \"host\",\n  \"operator_can\": {\n   \"write_client_directory\": true,\n   \"write_git_directory\": true,\n   \"write_interpreter_site\": false,\n   \"write_kernel\": false,\n   \"write_run_directory\": true\n  },\n  \"operator_uid\": 1000,\n  \"problems\": [],\n  \"read_only\": [],\n  \"setsid_survivors\": [],\n  \"system\": \"linux\",\n  \"tried\": {\n   \"read_canary\": {\n    \"exit\": 1,\n    \"output\": \"cat: /tmp/aisef-confine-qb2hwcim/confinement/canary: No such file or directory\"\n   },\n   \"read_git_directory\": {\n    \"exit\": 0,\n    \"output\": \"ref: refs/heads/master\"\n   },\n   \"setsid\": {\n    \"exit\": 0,\n    \"output\": \"\"\n   },\n   \"user_namespace\": {\n    \"exit\": 1,\n    \"output\": \"unshare: unshare failed: No space left on device\"\n   },\n   \"workspace\": {\n    \"exit\": 0,\n    \"output\": \"ok\"\n   },\n   \"write_client_directory\": {\n    \"exit\": 2,\n    \"output\": \"probe: 19: cannot create /tmp/e2e/S1/fakebin/.aisef-confine-probe-111f68db4274aa3e: Read-only file system\"\n   },\n   \"write_git_directory\": {\n    \"exit\": 2,\n    \"output\": \"probe: 20: cannot create /tmp/aisef-confine-qb2hwcim/confinement/repo/.git/.aisef-confine-probe-111f68db4274aa3e: Read-only file system\"\n   },\n   \"write_interpreter_site\": {\n    \"exit\": 2,\n    \"output\": \"probe: 18: cannot create /usr/local/lib/python3.14/site-packages/.aisef-confine-probe-111f68db4274aa3e: Read-only file system\"\n   },\n   \"write_kernel\": {\n    \"exit\": 2,\n    \"output\": \"probe: 17: cannot create /repo/aisef2/.aisef-confine-probe-111f68db4274aa3e: Directory nonexistent\"\n   },\n   \"write_run_directory\": {\n    \"exit\": 0,\n    \"output\": \"\"\n   }\n  }\n },\n \"plan_hash\": \"33b439d5dfd6c668d294a9f5ef2234a4756c2a3c2a1e8de02080a98059051af8\",\n \"project\": \"calc-cli\",\n \"ready\": true,\n \"route\": \"fakeprov/model-1\"\n}\n",
+ "stderr": "",
+ "json": {
+  "admission": {
+   "admitted": true,
+   "engine_digest": "7668fc35709829d8324e914e0300b2b85221d9e83dedd32cd2c3996f761690c7",
+   "failed": [],
+   "result_digest": "2b01083f0887d014bc82c80f31dec6c0e5f4f1ae5845ea943bbab29da535a8ae"
+  },
+  "confinement": {
+   "argv": [
+    "/usr/bin/bwrap",
+    "--unshare-user",
+    "--unshare-pid",
+    "--unshare-ipc",
+    "--unshare-uts",
+    "--unshare-cgroup-try",
+    "--share-net",
+    "--disable-userns",
+    "--die-with-parent",
+    "--new-session",
+    "--cap-drop",
+    "ALL",
+    "--ro-bind",
+    "/usr",
+    "/usr",
+    "--ro-bind",
+    "/etc",
+    "/etc",
+    "--symlink",
+    "usr/bin",
+    "/bin",
+    "--symlink",
+    "usr/sbin",
+    "/sbin",
+    "--symlink",
+    "usr/lib",
+    "/lib",
+    "--proc",
+    "/proc",
+    "--dev",
+    "/dev",
+    "--tmpfs",
+    "/tmp",
+    "--tmpfs",
+    "/aisef-home",
+    "--ro-bind",
+    "/tmp/e2e/S1/fakebin",
+    "/tmp/e2e/S1/fakebin",
+    "--ro-bind",
+    "/tmp/aisef-confine-qb2hwcim/confinement/repo/.git",
+    "/tmp/aisef-confine-qb2hwcim/confinement/repo/.git",
+    "--ro-bind",
+    "/tmp/e2e/S1/xdg/opencode",
+    "/tmp/e2e/S1/xdg/opencode",
+    "--bind",
+    "/tmp/aisef-confine-qb2hwcim/confinement/ws",
+    "/tmp/aisef-confine-qb2hwcim/confinement/ws",
+    "--chdir",
+    "/tmp/aisef-confine-qb2hwcim/confinement/ws",
+    "--",
+    "/bin/sh",
+    "-c",
+    "<PROBE>",
+    "probe"
+   ],
+   "backend": "bwrap",
+   "bwrap": "/usr/bin/bwrap",
+   "bwrap_sha256": "b3b829e18a7d43ee589dc37e351cb9480ff7301b493d8227b8c754294638b976",
+   "bwrap_version": "bubblewrap 0.12.0",
+   "client": "/tmp/e2e/S1/fakebin/opencode",
+   "created_outside_workspace": {
+    "client_directory": false,
+    "git_directory": false,
+    "interpreter_site": false,
+    "kernel": false,
+    "run_directory": false
+   },
+   "host_mounts": [
+    {
+     "at": "/",
+     "dev": "0:57",
+     "fs": "overlay",
+     "optional": []
+    },
+    {
+     "at": "/proc",
+     "dev": "0:66",
+     "fs": "proc",
+     "optional": []
+    },
+    {
+     "at": "/dev",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": []
+    },
+    {
+     "at": "/dev/pts",
+     "dev": "0:72",
+     "fs": "devpts",
+     "optional": []
+    },
+    {
+     "at": "/sys",
+     "dev": "0:83",
+     "fs": "sysfs",
+     "optional": []
+    },
+    {
+     "at": "/sys/fs/cgroup",
+     "dev": "0:41",
+     "fs": "cgroup2",
+     "optional": []
+    },
+    {
+     "at": "/dev/mqueue",
+     "dev": "0:64",
+     "fs": "mqueue",
+     "optional": []
+    },
+    {
+     "at": "/dev/shm",
+     "dev": "0:84",
+     "fs": "tmpfs",
+     "optional": []
+    },
+    {
+     "at": "/usr/sbin/docker-init",
+     "dev": "0:26",
+     "fs": "overlay",
+     "optional": []
+    },
+    {
+     "at": "/repo",
+     "dev": "0:46",
+     "fs": "virtiofs",
+     "optional": []
+    },
+    {
+     "at": "/etc/hostname",
+     "dev": "254:1",
+     "fs": "ext4",
+     "optional": []
+    },
+    {
+     "at": "/etc/hosts",
+     "dev": "254:1",
+     "fs": "ext4",
+     "optional": []
+    },
+    {
+     "at": "/etc/resolv.conf",
+     "dev": "254:1",
+     "fs": "ext4",
+     "optional": []
+    },
+    {
+     "at": "/usr/lib/aarch64-linux-gnu/libproc2.so.0",
+     "dev": "0:46",
+     "fs": "virtiofs",
+     "optional": []
+    },
+    {
+     "at": "/usr/local/bin/ps",
+     "dev": "0:46",
+     "fs": "virtiofs",
+     "optional": []
+    }
+   ],
+   "host_mounts_appeared": [],
+   "inside": {
+    "capabilities": {
+     "CapAmb": "0000000000000000",
+     "CapBnd": "0000000000000000",
+     "CapEff": "0000000000000000",
+     "CapInh": "0000000000000000",
+     "CapPrm": "0000000000000000"
+    },
+    "device_roots": [
+     "/dev"
+    ],
+    "devices": {
+     "/dev/full": "1:7",
+     "/dev/null": "1:3",
+     "/dev/random": "1:8",
+     "/dev/tty": "5:0",
+     "/dev/urandom": "1:9",
+     "/dev/zero": "1:5"
+    },
+    "home_listing": [],
+    "mount_targets": [
+     "/usr",
+     "/etc",
+     "/proc",
+     "/dev",
+     "/tmp",
+     "/aisef-home",
+     "/tmp/e2e/S1/fakebin",
+     "/tmp/aisef-confine-qb2hwcim/confinement/repo/.git",
+     "/tmp/e2e/S1/xdg/opencode",
+     "/tmp/aisef-confine-qb2hwcim/confinement/ws"
+    ],
+    "mounts": [
+     {
+      "access": "rw",
+      "at": "/",
+      "dev": "0:60",
+      "fs": "tmpfs",
+      "optional": [],
+      "options": [
+       "rw",
+       "nosuid",
+       "nodev",
+       "relatime"
+      ],
+      "root": "/newroot",
+      "source": "tmpfs",
+      "super_options": [
+       "rw",
+       "uid=1000",
+       "gid=1000"
+      ]
+     },
+     {
+      "access": "ro",
+      "at": "/usr",
+      "dev": "0:57",
+      "fs": "overlay",
+      "optional": [],
+      "options": [
+       "ro",
+       "nosuid",
+       "nodev",
+       "relatime"
+      ],
+      "root": "/usr",
+      "source": "overlay",
+      "super_options": [
+       "rw",
+       "lowerdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167950/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166976/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166963/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166962/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166961/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166960/fs",
+       "upperdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167951/fs",
+       "workdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167951/work",
+       "nouserxattr"
+      ]
+     },
+     {
+      "access": "ro",
+      "at": "/usr/sbin/docker-init",
+      "dev": "0:26",
+      "fs": "overlay",
+      "optional": [],
+      "options": [
+       "ro",
+       "nosuid",
+       "nodev",
+       "relatime"
+      ],
+      "root": "/usr/libexec/docker/docker-init",
+      "source": "overlay",
+      "super_options": [
+       "rw",
+       "lowerdir=/",
+       "upperdir=/run/rootfs.upper",
+       "workdir=/run/rootfs.workdir",
+       "uuid=on",
+       "nouserxattr"
+      ]
+     },
+     {
+      "access": "ro",
+      "at": "/usr/lib/aarch64-linux-gnu/libproc2.so.0",
+      "dev": "0:46",
+      "fs": "virtiofs",
+      "optional": [],
+      "options": [
+       "ro",
+       "nosuid",
+       "nodev",
+       "relatime"
+      ],
+      "root": "/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/linux/procps/libproc2.so.0",
+      "source": "virtiofs2",
+      "super_options": [
+       "rw",
+       "ignore_atime",
+       "no_xattr"
+      ]
+     },
+     {
+      "access": "ro",
+      "at": "/usr/local/bin/ps",
+      "dev": "0:46",
+      "fs": "virtiofs",
+      "optional": [],
+      "options": [
+       "ro",
+       "nosuid",
+       "nodev",
+       "relatime"
+      ],
+      "root": "/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/linux/procps/ps",
+      "source": "virtiofs2",
+      "super_options": [
+       "rw",
+       "ignore_atime",
+       "no_xattr"
+      ]
+     },
+     {
+      "access": "ro",
+      "at": "/etc",
+      "dev": "0:57",
+      "fs": "overlay",
+      "optional": [],
+      "options": [
+       "ro",
+       "nosuid",
+       "nodev",
+       "relatime"
+      ],
+      "root": "/etc",
+      "source": "overlay",
+      "super_options": [
+       "rw",
+       "lowerdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167950/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166976/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166963/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166962/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166961/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166960/fs",
+       "upperdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167951/fs",
+       "workdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167951/work",
+       "nouserxattr"
+      ]
+     },
+     {
+      "access": "ro",
+      "at": "/etc/hostname",
+      "dev": "254:1",
+      "fs": "ext4",
+      "optional": [],
+      "options": [
+       "ro",
+       "nosuid",
+       "nodev",
+       "relatime"
+      ],
+      "root": "/docker/containers/6f70c3301b1cd029ea28b3a8793b0721b6d9e47e4b0ce27474c8988b7a5601d6/hostname",
+      "source": "/dev/vda1",
+      "super_options": [
+       "rw",
+       "discard"
+      ]
+     },
+     {
+      "access": "ro",
+      "at": "/etc/hosts",
+      "dev": "254:1",
+      "fs": "ext4",
+      "optional": [],
+      "options": [
+       "ro",
+       "nosuid",
+       "nodev",
+       "relatime"
+      ],
+      "root": "/docker/containers/6f70c3301b1cd029ea28b3a8793b0721b6d9e47e4b0ce27474c8988b7a5601d6/hosts",
+      "source": "/dev/vda1",
+      "super_options": [
+       "rw",
+       "discard"
+      ]
+     },
+     {
+      "access": "ro",
+      "at": "/etc/resolv.conf",
+      "dev": "254:1",
+      "fs": "ext4",
+      "optional": [],
+      "options": [
+       "ro",
+       "nosuid",
+       "nodev",
+       "relatime"
+      ],
+      "root": "/docker/containers/6f70c3301b1cd029ea28b3a8793b0721b6d9e47e4b0ce27474c8988b7a5601d6/resolv.conf",
+      "source": "/dev/vda1",
+      "super_options": [
+       "rw",
+       "discard"
+      ]
+     },
+     {
+      "access": "rw",
+      "at": "/proc",
+      "dev": "0:61",
+      "fs": "proc",
+      "optional": [],
+      "options": [
+       "rw",
+       "nosuid",
+       "nodev",
+       "noexec",
+       "relatime"
+      ],
+      "root": "/",
+      "source": "proc",
+      "super_options": [
+       "rw"
+      ]
+     },
+     {
+      "access": "rw",
+      "at": "/dev",
+      "dev": "0:62",
+      "fs": "tmpfs",
+      "optional": [],
+      "options": [
+       "rw",
+       "nosuid",
+       "nodev",
+       "relatime"
+      ],
+      "root": "/",
+      "source": "tmpfs",
+      "super_options": [
+       "rw",
+       "mode=755",
+       "uid=1000",
+       "gid=1000"
+      ]
+     },
+     {
+      "access": "rw",
+      "at": "/dev/null",
+      "dev": "0:69",
+      "fs": "tmpfs",
+      "optional": [],
+      "options": [
+       "rw",
+       "nosuid"
+      ],
+      "root": "/null",
+      "source": "tmpfs",
+      "super_options": [
+       "rw",
+       "size=65536k",
+       "mode=755"
+      ]
+     },
+     {
+      "access": "rw",
+      "at": "/dev/zero",
+      "dev": "0:69",
+      "fs": "tmpfs",
+      "optional": [],
+      "options": [
+       "rw",
+       "nosuid"
+      ],
+      "root": "/zero",
+      "source": "tmpfs",
+      "super_options": [
+       "rw",
+       "size=65536k",
+       "mode=755"
+      ]
+     },
+     {
+      "access": "rw",
+      "at": "/dev/full",
+      "dev": "0:69",
+      "fs": "tmpfs",
+      "optional": [],
+      "options": [
+       "rw",
+       "nosuid"
+      ],
+      "root": "/full",
+      "source": "tmpfs",
+      "super_options": [
+       "rw",
+       "size=65536k",
+       "mode=755"
+      ]
+     },
+     {
+      "access": "rw",
+      "at": "/dev/random",
+      "dev": "0:69",
+      "fs": "tmpfs",
+      "optional": [],
+      "options": [
+       "rw",
+       "nosuid"
+      ],
+      "root": "/random",
+      "source": "tmpfs",
+      "super_options": [
+       "rw",
+       "size=65536k",
+       "mode=755"
+      ]
+     },
+     {
+      "access": "rw",
+      "at": "/dev/urandom",
+      "dev": "0:69",
+      "fs": "tmpfs",
+      "optional": [],
+      "options": [
+       "rw",
+       "nosuid"
+      ],
+      "root": "/urandom",
+      "source": "tmpfs",
+      "super_options": [
+       "rw",
+       "size=65536k",
+       "mode=755"
+      ]
+     },
+     {
+      "access": "rw",
+      "at": "/dev/tty",
+      "dev": "0:69",
+      "fs": "tmpfs",
+      "optional": [],
+      "options": [
+       "rw",
+       "nosuid"
+      ],
+      "root": "/tty",
+      "source": "tmpfs",
+      "super_options": [
+       "rw",
+       "size=65536k",
+       "mode=755"
+      ]
+     },
+     {
+      "access": "rw",
+      "at": "/dev/pts",
+      "dev": "0:63",
+      "fs": "devpts",
+      "optional": [],
+      "options": [
+       "rw",
+       "nosuid",
+       "noexec",
+       "relatime"
+      ],
+      "root": "/",
+      "source": "devpts",
+      "super_options": [
+       "rw",
+       "mode=620",
+       "ptmxmode=666"
+      ]
+     },
+     {
+      "access": "rw",
+      "at": "/tmp",
+      "dev": "0:65",
+      "fs": "tmpfs",
+      "optional": [],
+      "options": [
+       "rw",
+       "nosuid",
+       "nodev",
+       "relatime"
+      ],
+      "root": "/",
+      "source": "tmpfs",
+      "super_options": [
+       "rw",
+       "mode=755",
+       "uid=1000",
+       "gid=1000"
+      ]
+     },
+     {
+      "access": "rw",
+      "at": "/aisef-home",
+      "dev": "0:85",
+      "fs": "tmpfs",
+      "optional": [],
+      "options": [
+       "rw",
+       "nosuid",
+       "nodev",
+       "relatime"
+      ],
+      "root": "/",
+      "source": "tmpfs",
+      "super_options": [
+       "rw",
+       "mode=755",
+       "uid=1000",
+       "gid=1000"
+      ]
+     },
+     {
+      "access": "ro",
+      "at": "/tmp/e2e/S1/fakebin",
+      "dev": "0:57",
+      "fs": "overlay",
+      "optional": [],
+      "options": [
+       "ro",
+       "nosuid",
+       "nodev",
+       "relatime"
+      ],
+      "root": "/tmp/e2e/S1/fakebin",
+      "source": "overlay",
+      "super_options": [
+       "rw",
+       "lowerdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167950/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166976/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166963/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166962/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166961/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166960/fs",
+       "upperdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167951/fs",
+       "workdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167951/work",
+       "nouserxattr"
+      ]
+     },
+     {
+      "access": "ro",
+      "at": "/tmp/aisef-confine-qb2hwcim/confinement/repo/.git",
+      "dev": "0:57",
+      "fs": "overlay",
+      "optional": [],
+      "options": [
+       "ro",
+       "nosuid",
+       "nodev",
+       "relatime"
+      ],
+      "root": "/tmp/aisef-confine-qb2hwcim/confinement/repo/.git",
+      "source": "overlay",
+      "super_options": [
+       "rw",
+       "lowerdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167950/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166976/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166963/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166962/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166961/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166960/fs",
+       "upperdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167951/fs",
+       "workdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167951/work",
+       "nouserxattr"
+      ]
+     },
+     {
+      "access": "ro",
+      "at": "/tmp/e2e/S1/xdg/opencode",
+      "dev": "0:57",
+      "fs": "overlay",
+      "optional": [],
+      "options": [
+       "ro",
+       "nosuid",
+       "nodev",
+       "relatime"
+      ],
+      "root": "/tmp/e2e/S1/xdg/opencode",
+      "source": "overlay",
+      "super_options": [
+       "rw",
+       "lowerdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167950/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166976/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166963/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166962/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166961/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166960/fs",
+       "upperdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167951/fs",
+       "workdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167951/work",
+       "nouserxattr"
+      ]
+     },
+     {
+      "access": "rw",
+      "at": "/tmp/aisef-confine-qb2hwcim/confinement/ws",
+      "dev": "0:57",
+      "fs": "overlay",
+      "optional": [],
+      "options": [
+       "rw",
+       "nosuid",
+       "nodev",
+       "relatime"
+      ],
+      "root": "/tmp/aisef-confine-qb2hwcim/confinement/ws",
+      "source": "overlay",
+      "super_options": [
+       "rw",
+       "lowerdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167950/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166976/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166963/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166962/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166961/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166960/fs",
+       "upperdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167951/fs",
+       "workdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167951/work",
+       "nouserxattr"
+      ]
+     }
+    ],
+    "namespaces": {
+     "ipc": "own",
+     "mnt": "own",
+     "net": "shared",
+     "pid": "own",
+     "user": "own",
+     "uts": "own"
+    },
+    "network_interfaces": [
+     "lo",
+     "tunl0",
+     "gre0",
+     "gretap0",
+     "erspan0",
+     "ip_vti0",
+     "ip6_vti0",
+     "sit0",
+     "ip6tnl0",
+     "ip6gre0"
+    ],
+    "no_new_privs": "1",
+    "routed_interfaces": [],
+    "seccomp": "0",
+    "uid": "1000",
+    "unix_sockets": []
+   },
+   "left_on_host": [],
+   "locale": {
+    "LANG": "C",
+    "LC_ALL": "C"
+   },
+   "network": "host",
+   "operator_can": {
+    "write_client_directory": true,
+    "write_git_directory": true,
+    "write_interpreter_site": false,
+    "write_kernel": false,
+    "write_run_directory": true
+   },
+   "operator_uid": 1000,
+   "problems": [],
+   "read_only": [],
+   "setsid_survivors": [],
+   "system": "linux",
+   "tried": {
+    "read_canary": {
+     "exit": 1,
+     "output": "cat: /tmp/aisef-confine-qb2hwcim/confinement/canary: No such file or directory"
+    },
+    "read_git_directory": {
+     "exit": 0,
+     "output": "ref: refs/heads/master"
+    },
+    "setsid": {
+     "exit": 0,
+     "output": ""
+    },
+    "user_namespace": {
+     "exit": 1,
+     "output": "unshare: unshare failed: No space left on device"
+    },
+    "workspace": {
+     "exit": 0,
+     "output": "ok"
+    },
+    "write_client_directory": {
+     "exit": 2,
+     "output": "probe: 19: cannot create /tmp/e2e/S1/fakebin/.aisef-confine-probe-111f68db4274aa3e: Read-only file system"
+    },
+    "write_git_directory": {
+     "exit": 2,
+     "output": "probe: 20: cannot create /tmp/aisef-confine-qb2hwcim/confinement/repo/.git/.aisef-confine-probe-111f68db4274aa3e: Read-only file system"
+    },
+    "write_interpreter_site": {
+     "exit": 2,
+     "output": "probe: 18: cannot create /usr/local/lib/python3.14/site-packages/.aisef-confine-probe-111f68db4274aa3e: Read-only file system"
+    },
+    "write_kernel": {
+     "exit": 2,
+     "output": "probe: 17: cannot create /repo/aisef2/.aisef-confine-probe-111f68db4274aa3e: Directory nonexistent"
+    },
+    "write_run_directory": {
+     "exit": 0,
+     "output": ""
+    }
+   }
+  },
+  "plan_hash": "33b439d5dfd6c668d294a9f5ef2234a4756c2a3c2a1e8de02080a98059051af8",
+  "project": "calc-cli",
+  "ready": true,
+  "route": "fakeprov/model-1"
+ }
+}

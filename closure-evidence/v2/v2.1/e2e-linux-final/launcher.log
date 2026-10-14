@@ -1,0 +1,4 @@
+X1: container exit 0;  "passed": true,; 0 failed entries
+hardened: container exit 0;  "passed": true,; 0 failed entries
+done: /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/e2e-final/out (exit 0)
+zsh validation/v21/cli_integration/e2e_linux.sh $E/tree $SP/m21/linux/procps   6.59s user 1.45s system 4% cpu 2:51.73 total

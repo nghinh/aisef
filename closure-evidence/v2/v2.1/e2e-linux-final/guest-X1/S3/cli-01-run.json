@@ -1,0 +1,43 @@
+{
+ "tag": "run",
+ "argv": [
+  "/usr/local/bin/python3",
+  "-B",
+  "-m",
+  "aisef",
+  "run",
+  "--project",
+  "/tmp/e2e/project/approved.json",
+  "--settings",
+  "settings.json",
+  "--repo",
+  "/tmp/e2e/project/repo",
+  "--out",
+  "run"
+ ],
+ "cwd": "/tmp/e2e/S3",
+ "exit": 0,
+ "seconds": 19.0,
+ "stdout": "{\n \"delivery_blocked_by\": [],\n \"delivery_verdict\": \"PASS\",\n \"evidence_anchor\": \"60c8a3afc4d3bdbc0eac314aa2bfdfe624d5523fc47947cb68facb317752415e\",\n \"final_main\": \"101ad24caf624d7012e708ba015f760a3a9b5dfc\",\n \"journal\": {\n  \"closed\": \"SHUTDOWN\",\n  \"lines\": 106,\n  \"path\": \"run/journals/aisef-run.jsonl\",\n  \"sha256\": \"d6d178840ac4269833f33424f8dec24ef24805db1f9d48c2f5f22e36a89a2af9\"\n },\n \"plan_quality_verdict\": \"NOT_CLAIMED\",\n \"project\": \"calc-cli\",\n \"record\": \"run/RUN.json\",\n \"story_outcomes\": {\n  \"S1\": [\n   \"COMMIT\"\n  ]\n }\n}\n",
+ "stderr": "",
+ "json": {
+  "delivery_blocked_by": [],
+  "delivery_verdict": "PASS",
+  "evidence_anchor": "60c8a3afc4d3bdbc0eac314aa2bfdfe624d5523fc47947cb68facb317752415e",
+  "final_main": "101ad24caf624d7012e708ba015f760a3a9b5dfc",
+  "journal": {
+   "closed": "SHUTDOWN",
+   "lines": 106,
+   "path": "run/journals/aisef-run.jsonl",
+   "sha256": "d6d178840ac4269833f33424f8dec24ef24805db1f9d48c2f5f22e36a89a2af9"
+  },
+  "plan_quality_verdict": "NOT_CLAIMED",
+  "project": "calc-cli",
+  "record": "run/RUN.json",
+  "story_outcomes": {
+   "S1": [
+    "COMMIT"
+   ]
+  }
+ }
+}

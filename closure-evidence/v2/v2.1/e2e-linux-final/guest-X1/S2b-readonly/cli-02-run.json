@@ -1,0 +1,24 @@
+{
+ "tag": "run",
+ "argv": [
+  "/usr/local/bin/python3",
+  "-B",
+  "-m",
+  "aisef",
+  "run",
+  "--project",
+  "/tmp/e2e/project/approved.json",
+  "--settings",
+  "settings.json",
+  "--repo",
+  "/tmp/e2e/project/repo",
+  "--out",
+  "run"
+ ],
+ "cwd": "/tmp/e2e/S2b-readonly",
+ "exit": 2,
+ "seconds": 2.2,
+ "stdout": "",
+ "stderr": "aisef run: refused: confinement was asked for and is not provided: confinement.read_only names paths that do not exist: ['/no/such/e2e-path']\n",
+ "json": null
+}

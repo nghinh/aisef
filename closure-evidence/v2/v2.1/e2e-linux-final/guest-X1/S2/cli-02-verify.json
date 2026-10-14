@@ -1,0 +1,32 @@
+{
+ "tag": "verify",
+ "argv": [
+  "/tmp/e2e/S2/venv/bin/python",
+  "-B",
+  "-m",
+  "aisef",
+  "run",
+  "--verify",
+  "--project",
+  "/tmp/e2e/project/approved.json",
+  "--out",
+  "run",
+  "--expect-anchor",
+  "56ae4c44fb2f17dec8837e7de76052d165b3fa293a3ced355c6f127eb96425fc"
+ ],
+ "cwd": "/tmp/e2e/S2",
+ "exit": 0,
+ "seconds": 1.2,
+ "stdout": "{\n \"delivery_verdict\": \"PASS\",\n \"evidence_anchor\": \"56ae4c44fb2f17dec8837e7de76052d165b3fa293a3ced355c6f127eb96425fc\",\n \"journal_events\": 106,\n \"notes\": [\n  \"the anchor matches the expected value: authentic only as far as that value came from a store the developer cannot write (docs/v2.1/ANCHOR-THREAT-MODEL.md); it does not prove the run happened as its journal says\"\n ],\n \"problems\": [],\n \"verdict\": \"VERIFIED\"\n}\n",
+ "stderr": "",
+ "json": {
+  "delivery_verdict": "PASS",
+  "evidence_anchor": "56ae4c44fb2f17dec8837e7de76052d165b3fa293a3ced355c6f127eb96425fc",
+  "journal_events": 106,
+  "notes": [
+   "the anchor matches the expected value: authentic only as far as that value came from a store the developer cannot write (docs/v2.1/ANCHOR-THREAT-MODEL.md); it does not prove the run happened as its journal says"
+  ],
+  "problems": [],
+  "verdict": "VERIFIED"
+ }
+}

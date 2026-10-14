@@ -1,0 +1,46 @@
+{
+ "tag": "run",
+ "argv": [
+  "/usr/local/bin/python3",
+  "-B",
+  "-m",
+  "aisef",
+  "run",
+  "--project",
+  "/tmp/e2e/project/approved.json",
+  "--settings",
+  "settings.json",
+  "--repo",
+  "/tmp/e2e/project/repo",
+  "--out",
+  "run"
+ ],
+ "cwd": "/tmp/e2e/S3c",
+ "exit": 1,
+ "seconds": 10.6,
+ "stdout": "{\n \"delivery_blocked_by\": [\n  \"1 of the plan's stories did not commit: ['S1']\",\n  \"1 stories were refused\"\n ],\n \"delivery_verdict\": \"NOT_REACHED\",\n \"evidence_anchor\": \"3433080108456269d77156f42447ba98c7c98898935ccdea6d56152246a9dabc\",\n \"final_main\": \"3756262d35ebd18bb686587208a00e3713dcc016\",\n \"journal\": {\n  \"closed\": \"INTERRUPTED after a refused shutdown: stories ['S1'] are not ENDED: a successful shutdown would leave them logically open (\\u00a718); interrupt the run instead\",\n  \"lines\": 37,\n  \"path\": \"run/journals/aisef-run.jsonl\",\n  \"sha256\": \"5e4c09a3787415939c228b7b7c41703f26ec7a81f582f6bd28d8099457057763\"\n },\n \"plan_quality_verdict\": \"NOT_CLAIMED\",\n \"project\": \"calc-cli\",\n \"record\": \"run/RUN.json\",\n \"story_outcomes\": {\n  \"S1\": [\n   \"REFUSED: RangeEscaped\"\n  ]\n }\n}\n",
+ "stderr": "",
+ "json": {
+  "delivery_blocked_by": [
+   "1 of the plan's stories did not commit: ['S1']",
+   "1 stories were refused"
+  ],
+  "delivery_verdict": "NOT_REACHED",
+  "evidence_anchor": "3433080108456269d77156f42447ba98c7c98898935ccdea6d56152246a9dabc",
+  "final_main": "3756262d35ebd18bb686587208a00e3713dcc016",
+  "journal": {
+   "closed": "INTERRUPTED after a refused shutdown: stories ['S1'] are not ENDED: a successful shutdown would leave them logically open (\u00a718); interrupt the run instead",
+   "lines": 37,
+   "path": "run/journals/aisef-run.jsonl",
+   "sha256": "5e4c09a3787415939c228b7b7c41703f26ec7a81f582f6bd28d8099457057763"
+  },
+  "plan_quality_verdict": "NOT_CLAIMED",
+  "project": "calc-cli",
+  "record": "run/RUN.json",
+  "story_outcomes": {
+   "S1": [
+    "REFUSED: RangeEscaped"
+   ]
+  }
+ }
+}

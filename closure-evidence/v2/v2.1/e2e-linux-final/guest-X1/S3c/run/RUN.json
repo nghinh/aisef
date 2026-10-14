@@ -1,0 +1,250 @@
+{
+ "admission": {
+  "admitted": true,
+  "engine_digest": "7668fc35709829d8324e914e0300b2b85221d9e83dedd32cd2c3996f761690c7",
+  "failed": [],
+  "result_digest": "2b01083f0887d014bc82c80f31dec6c0e5f4f1ae5845ea943bbab29da535a8ae"
+ },
+ "aggregate_min_grade": "OPAQUE",
+ "budget": {
+  "limitation": "spend is what the client reports per finished step: an HTTP request that finishes no step (a client retry, a failed request, the one in flight when a stop is issued) is not in the telemetry, and a stop is issued at the first reading that shows a ceiling reached, so totals can pass a ceiling by the steps finished since the reading before",
+  "limits": {
+   "input_tokens": 200000,
+   "output_tokens": 20000,
+   "provider_requests": 40,
+   "turns": 80
+  },
+  "preflight": {
+   "input_tokens": 200,
+   "output_tokens": 40,
+   "provider_requests": 3,
+   "turns": 0
+  },
+  "reached": null,
+  "spent": {
+   "input_tokens": 330,
+   "output_tokens": 50,
+   "provider_requests": 4,
+   "requests_recorded": 1,
+   "sessions_started": 1,
+   "turns": 1,
+   "unaccounted": []
+  }
+ },
+ "budget_stop": null,
+ "bundle_digest": "cdfd22e3a927e4ec8a411b04ee1b1a65f90da6563811c96a49e4b1659a4cbc61",
+ "delivery_blocked_by": [
+  "1 of the plan's stories did not commit: ['S1']",
+  "1 stories were refused"
+ ],
+ "delivery_verdict": "NOT_REACHED",
+ "failure": null,
+ "final_main": "3756262d35ebd18bb686587208a00e3713dcc016",
+ "finished": 1792020774.7596946,
+ "format": "aisef-v2-run-record/1",
+ "generalization_claim": "NONE",
+ "journal": {
+  "closed": "INTERRUPTED after a refused shutdown: stories ['S1'] are not ENDED: a successful shutdown would leave them logically open (\u00a718); interrupt the run instead",
+  "lines": 37,
+  "path": "run/journals/aisef-run.jsonl",
+  "sha256": "5e4c09a3787415939c228b7b7c41703f26ec7a81f582f6bd28d8099457057763"
+ },
+ "kernel_digest": "bc6de98b0d665978245451a01cafe3e52ee79106d0d48debdda232acd654df57",
+ "no_progress": [],
+ "plan_hash": "33b439d5dfd6c668d294a9f5ef2234a4756c2a3c2a1e8de02080a98059051af8",
+ "plan_quality_verdict": "NOT_CLAIMED",
+ "platform": {
+  "python": "3.14.8",
+  "system": "linux"
+ },
+ "preflight": {
+  "accounting": {
+   "input_tokens": 200,
+   "output_tokens": 40,
+   "provider_requests": 3,
+   "turns": 0,
+   "unaccounted": []
+  },
+  "observation": {
+   "declared_model": "model-1",
+   "expected_listed_owner": "fake",
+   "expected_served_model": "model-1",
+   "listing": {
+    "http": 200,
+    "id": "model-1",
+    "listed": true,
+    "owned_by": "fake"
+   },
+   "probes": [
+    {
+     "http": 200,
+     "served_model": "model-1",
+     "system_fingerprint": "fp-1"
+    },
+    {
+     "http": 200,
+     "served_model": "model-1",
+     "system_fingerprint": "fp-1"
+    }
+   ],
+   "route": "fakeprov/model-1"
+  },
+  "problems": [],
+  "verdict": "ATTESTED"
+ },
+ "productproof": {
+  "delivered": 0,
+  "obligations": [
+   {
+    "criterion": "C-SUM",
+    "delivered": false,
+    "expected": "SATISFIED",
+    "last_proof": null,
+    "probe_id": "probe.cli_invocation",
+    "role": "INTRODUCE",
+    "satisfied_at_last_proof": false,
+    "spec": "PPS-5ea4493062c1d89d8e6f8d40fbc9c92f289b309283fd3bed00ee6fdbd8c09243",
+    "story": "S1"
+   },
+   {
+    "criterion": "C-USAGE-0",
+    "delivered": false,
+    "expected": "SATISFIED",
+    "last_proof": null,
+    "probe_id": "probe.cli_invocation",
+    "role": "INTRODUCE",
+    "satisfied_at_last_proof": false,
+    "spec": "PPS-5a52e3117c6159c058f31b67acff3e5deb3cb6a4f4760f6d3bf6ccc8dfb1bdb5",
+    "story": "S1"
+   },
+   {
+    "criterion": "C-USAGE-1",
+    "delivered": false,
+    "expected": "SATISFIED",
+    "last_proof": null,
+    "probe_id": "probe.cli_invocation",
+    "role": "INTRODUCE",
+    "satisfied_at_last_proof": false,
+    "spec": "PPS-ca5b9c474e6d1c0b5b82b3f66be1de6e817f0ef488de814330428b57d4c10d5f",
+    "story": "S1"
+   }
+  ],
+  "satisfied_at_last_proof": 0,
+  "total": 3
+ },
+ "project": "calc-cli",
+ "runspec_hash": "b888cbb4f889b278963185371d1c0de17cbab58248d0806bb4b31a8985ebcf96",
+ "scanner": "none",
+ "sessions": [],
+ "settings": {
+  "budget": {
+   "input_tokens": 200000,
+   "output_tokens": 20000,
+   "provider_requests": 40,
+   "turns": 80
+  },
+  "client": "opencode",
+  "client_env": [],
+  "format": "aisef-v2-run/1",
+  "limits": {
+   "DEVELOPER": 1,
+   "ENVIRONMENT": 1,
+   "INTEGRATION": 1,
+   "PLAN": 1,
+   "PROVIDER": 1,
+   "REVIEW": 1,
+   "SECURITY": 1
+  },
+  "max_turns_per_session": 10,
+  "preflight": {
+   "chat_probes": 2
+  },
+  "prices": {
+   "cache_read_per_mtok": 0.044,
+   "cache_write_per_mtok": 1.32,
+   "currency": "USD",
+   "effective_date": "2026-10-12",
+   "input_per_mtok": 1.32,
+   "output_per_mtok": 3.96,
+   "source": "e2e fixture (not a real price)"
+  },
+  "provider": {
+   "api_key_env": "FAKE_PROVIDER_KEY",
+   "endpoint": "http://127.0.0.1:18437/v1",
+   "listed_owner": "fake",
+   "model_limit": {
+    "context": 100000,
+    "output": 8000
+   },
+   "name": "fakeprov",
+   "served_model": "model-1"
+  },
+  "review": {
+   "min_severity": "high",
+   "policy": "fix-loop"
+  },
+  "route": "fakeprov/model-1",
+  "timeouts_s": {
+   "developer": 60,
+   "probe": 60,
+   "reviewer": 120,
+   "tool": 120
+  }
+ },
+ "stage": "finished",
+ "started": 1792020766.0683892,
+ "story_errors": [
+  {
+   "error": "RangeEscaped: developer S1: processes left the range and are alive: [(1786, '/usr/local/bin/python3 -c import time; time.sleep(300) e2e-S3c-bfdfd500-setsid')]",
+   "story": "S1"
+  }
+ ],
+ "story_outcomes": {
+  "S1": [
+   "REFUSED: RangeEscaped"
+  ]
+ },
+ "usage": {
+  "cost": {
+   "currency": "USD",
+   "effective_date": "2026-10-12",
+   "known": 0.00062,
+   "sessions_unknown": [],
+   "source": "e2e fixture (not a real price)",
+   "status": "known",
+   "value": 0.00062
+  },
+  "preflight": {
+   "input_tokens": 200,
+   "output_tokens": 40,
+   "provider_requests": 3,
+   "turns": 0,
+   "unaccounted": []
+  },
+  "provider_requests_journaled": 1,
+  "retries": {},
+  "sessions": [
+   {
+    "cost": 0.000198,
+    "session": "S1.developer.1.jsonl",
+    "steps": 1,
+    "steps_without_tokens": 0,
+    "tokens": {
+     "cache_read": 10,
+     "cache_write": 0,
+     "input": 120,
+     "output": 7,
+     "reasoning": 3
+    }
+   }
+  ],
+  "tokens": {
+   "cache_read": 10,
+   "cache_write": 0,
+   "input": 120,
+   "output": 7,
+   "reasoning": 3
+  },
+  "wall_s": 8.691
+ }
+}

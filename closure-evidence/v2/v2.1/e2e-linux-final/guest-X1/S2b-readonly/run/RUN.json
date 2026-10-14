@@ -1,0 +1,146 @@
+{
+ "admission": {
+  "admitted": true,
+  "engine_digest": "7668fc35709829d8324e914e0300b2b85221d9e83dedd32cd2c3996f761690c7",
+  "failed": [],
+  "result_digest": "2b01083f0887d014bc82c80f31dec6c0e5f4f1ae5845ea943bbab29da535a8ae"
+ },
+ "budget": null,
+ "budget_stop": null,
+ "bundle_digest": "cdfd22e3a927e4ec8a411b04ee1b1a65f90da6563811c96a49e4b1659a4cbc61",
+ "confinement": {
+  "backend": "bwrap",
+  "bwrap": "/usr/bin/bwrap",
+  "client": "/tmp/e2e/S2b-readonly/fakebin/opencode",
+  "network": "host",
+  "operator_uid": 1000,
+  "problems": [
+   "confinement.read_only names paths that do not exist: ['/no/such/e2e-path']"
+  ],
+  "read_only": [
+   "/no/such/e2e-path"
+  ],
+  "system": "linux"
+ },
+ "delivery_blocked_by": [
+  "1 of the plan's stories did not commit: ['S1']"
+ ],
+ "delivery_verdict": "NOT_REACHED",
+ "failure": {
+  "detail": "confinement was asked for and is not provided: confinement.read_only names paths that do not exist: ['/no/such/e2e-path']",
+  "stage": "confinement",
+  "type": "RunRefused"
+ },
+ "final_main": "3756262d35ebd18bb686587208a00e3713dcc016",
+ "finished": 1792020710.0824459,
+ "format": "aisef-v2-run-record/1",
+ "generalization_claim": "NONE",
+ "journal": null,
+ "kernel_digest": "bc6de98b0d665978245451a01cafe3e52ee79106d0d48debdda232acd654df57",
+ "no_progress": [],
+ "plan_hash": "33b439d5dfd6c668d294a9f5ef2234a4756c2a3c2a1e8de02080a98059051af8",
+ "plan_quality_verdict": "NOT_CLAIMED",
+ "platform": {
+  "python": "3.14.8",
+  "system": "linux"
+ },
+ "productproof": null,
+ "project": "calc-cli",
+ "sessions": [],
+ "settings": {
+  "budget": {
+   "input_tokens": 200000,
+   "output_tokens": 20000,
+   "provider_requests": 40,
+   "turns": 80
+  },
+  "client": "opencode",
+  "client_env": [],
+  "confinement": {
+   "backend": "bwrap",
+   "bwrap": "/usr/bin/bwrap",
+   "network": "host",
+   "read_only": [
+    "/no/such/e2e-path"
+   ]
+  },
+  "format": "aisef-v2-run/1",
+  "limits": {
+   "DEVELOPER": 1,
+   "ENVIRONMENT": 1,
+   "INTEGRATION": 1,
+   "PLAN": 1,
+   "PROVIDER": 1,
+   "REVIEW": 1,
+   "SECURITY": 1
+  },
+  "max_turns_per_session": 10,
+  "preflight": {
+   "chat_probes": 2
+  },
+  "prices": {
+   "cache_read_per_mtok": 0.044,
+   "cache_write_per_mtok": 1.32,
+   "currency": "USD",
+   "effective_date": "2026-10-12",
+   "input_per_mtok": 1.32,
+   "output_per_mtok": 3.96,
+   "source": "e2e fixture (not a real price)"
+  },
+  "provider": {
+   "api_key_env": "FAKE_PROVIDER_KEY",
+   "endpoint": "http://127.0.0.1:18437/v1",
+   "listed_owner": "fake",
+   "model_limit": {
+    "context": 100000,
+    "output": 8000
+   },
+   "name": "fakeprov",
+   "served_model": "model-1"
+  },
+  "review": {
+   "min_severity": "high",
+   "policy": "fix-loop"
+  },
+  "route": "fakeprov/model-1",
+  "timeouts_s": {
+   "developer": 60,
+   "probe": 60,
+   "reviewer": 120,
+   "tool": 120
+  }
+ },
+ "stage": "confinement",
+ "started": 1792020709.4766443,
+ "story_errors": [],
+ "story_outcomes": {},
+ "usage": {
+  "cost": {
+   "currency": "USD",
+   "effective_date": "2026-10-12",
+   "known": 0.0,
+   "sessions_unknown": [],
+   "source": "e2e fixture (not a real price)",
+   "status": "known",
+   "value": 0.0
+  },
+  "preflight": {
+   "input_tokens": 0,
+   "output_tokens": 0,
+   "provider_requests": 0,
+   "turns": 0,
+   "unaccounted": []
+  },
+  "provider_requests_journaled": 0,
+  "retries": {},
+  "sessions": [],
+  "tokens": {
+   "cache_read": 0,
+   "cache_write": 0,
+   "input": 0,
+   "output": 0,
+   "reasoning": 0
+  },
+  "wall_s": 0.606
+ }
+}

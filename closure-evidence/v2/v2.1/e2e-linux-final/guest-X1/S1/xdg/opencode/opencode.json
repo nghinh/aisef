@@ -1,0 +1,1 @@
+{"provider": {"fakeprov": {"options": {"baseURL": "http://127.0.0.1:18437/v1", "apiKey": "{env:FAKE_PROVIDER_KEY}"}}}}

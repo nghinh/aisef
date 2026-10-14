@@ -1,0 +1,28 @@
+{
+ "tag": "stream-rebound-no-anchor",
+ "argv": [
+  "/usr/local/bin/python3",
+  "-B",
+  "-m",
+  "aisef",
+  "run",
+  "--verify",
+  "--project",
+  "/tmp/e2e/project/approved.json",
+  "--out",
+  "/tmp/e2e/S4/copy-stream-rebound"
+ ],
+ "cwd": "/tmp/e2e/S4",
+ "exit": 0,
+ "seconds": 1.4,
+ "stdout": "{\n \"delivery_verdict\": \"PASS\",\n \"evidence_anchor\": \"8c30c822cb8d62d8297ad647e47244fb8543e27543a2673b2cdb7cea884d2779\",\n \"journal_events\": 106,\n \"notes\": [],\n \"problems\": [],\n \"verdict\": \"VERIFIED\"\n}\n",
+ "stderr": "",
+ "json": {
+  "delivery_verdict": "PASS",
+  "evidence_anchor": "8c30c822cb8d62d8297ad647e47244fb8543e27543a2673b2cdb7cea884d2779",
+  "journal_events": 106,
+  "notes": [],
+  "problems": [],
+  "verdict": "VERIFIED"
+ }
+}

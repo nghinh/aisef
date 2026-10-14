@@ -1,0 +1,32 @@
+{
+ "tag": "original-wrong-anchor",
+ "argv": [
+  "/usr/local/bin/python3",
+  "-B",
+  "-m",
+  "aisef",
+  "run",
+  "--verify",
+  "--project",
+  "/tmp/e2e/project/approved.json",
+  "--out",
+  "/tmp/e2e/S1/run",
+  "--expect-anchor",
+  "0eb8511cf7b1e15e33b837c08245802fc19830c35bed5dd9a18bd9c14af5bcab"
+ ],
+ "cwd": "/tmp/e2e/S4",
+ "exit": 1,
+ "seconds": 1.5,
+ "stdout": "{\n \"delivery_verdict\": \"PASS\",\n \"evidence_anchor\": \"6eb8511cf7b1e15e33b837c08245802fc19830c35bed5dd9a18bd9c14af5bcab\",\n \"journal_events\": 106,\n \"notes\": [],\n \"problems\": [\n  \"the evidence anchor is 6eb8511cf7b1, not the 0eb8511cf7b1 the run printed\"\n ],\n \"verdict\": \"REFUTED\"\n}\n",
+ "stderr": "",
+ "json": {
+  "delivery_verdict": "PASS",
+  "evidence_anchor": "6eb8511cf7b1e15e33b837c08245802fc19830c35bed5dd9a18bd9c14af5bcab",
+  "journal_events": 106,
+  "notes": [],
+  "problems": [
+   "the evidence anchor is 6eb8511cf7b1, not the 0eb8511cf7b1 the run printed"
+  ],
+  "verdict": "REFUTED"
+ }
+}

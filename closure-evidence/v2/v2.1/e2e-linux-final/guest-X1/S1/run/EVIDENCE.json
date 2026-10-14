@@ -1,0 +1,12 @@
+{
+ "files": {
+  "RUN.json": "48f63444ce98800815ff213593b0278aacf8c97f6df821c1dea335b15e02f6a6",
+  "RUN.started.json": "4f27c9db648cef9fc070ac9e46d88e1924fbfdfffcffcc6a8ac4d29b9ea7fa3e",
+  "preflight/LEDGER.jsonl": "20103929ae4b91bd6f5d5c6050d3947a947f429fbc53535f553315ba0656eb1d",
+  "preflight/PREFLIGHT.json": "0d836b3568361c7b002d6956ea553a2120cda89cee54c8de622a0edab7570bdf",
+  "run/journals/aisef-run.jsonl": "22ff3bce3b2dea8421a5e6e0ca3b50a7e99fff01ab4829813b39c735355d1442",
+  "sessions/S1.developer.1.jsonl": "61dcdae7e249fbdc3976cd93586f475bb0f1c602c87e839500a820aaa4a13cc2",
+  "sessions/S1.reviewer.1.jsonl": "c8c9036164aa13520a2495a1a8e9b0b1e113b4e35520b2987a9a9f132494efaf"
+ },
+ "format": "aisef-v2-evidence/1"
+}

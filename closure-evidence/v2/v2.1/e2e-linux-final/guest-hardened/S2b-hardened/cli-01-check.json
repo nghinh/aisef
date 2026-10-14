@@ -1,0 +1,318 @@
+{
+ "tag": "check",
+ "argv": [
+  "/usr/local/bin/python3",
+  "-B",
+  "-m",
+  "aisef",
+  "run",
+  "--check",
+  "--project",
+  "/tmp/e2e/project/approved.json",
+  "--settings",
+  "settings.json",
+  "--repo",
+  "/tmp/e2e/project/repo"
+ ],
+ "cwd": "/tmp/e2e/S2b-hardened",
+ "exit": 2,
+ "seconds": 1.5,
+ "stdout": "{\n \"admission\": {\n  \"admitted\": true,\n  \"engine_digest\": \"7668fc35709829d8324e914e0300b2b85221d9e83dedd32cd2c3996f761690c7\",\n  \"failed\": [],\n  \"result_digest\": \"2b01083f0887d014bc82c80f31dec6c0e5f4f1ae5845ea943bbab29da535a8ae\"\n },\n \"confinement\": {\n  \"argv\": [\n   \"/usr/bin/bwrap\",\n   \"--unshare-user\",\n   \"--unshare-pid\",\n   \"--unshare-ipc\",\n   \"--unshare-uts\",\n   \"--unshare-cgroup-try\",\n   \"--share-net\",\n   \"--disable-userns\",\n   \"--die-with-parent\",\n   \"--new-session\",\n   \"--cap-drop\",\n   \"ALL\",\n   \"--ro-bind\",\n   \"/usr\",\n   \"/usr\",\n   \"--ro-bind\",\n   \"/etc\",\n   \"/etc\",\n   \"--symlink\",\n   \"usr/bin\",\n   \"/bin\",\n   \"--symlink\",\n   \"usr/sbin\",\n   \"/sbin\",\n   \"--symlink\",\n   \"usr/lib\",\n   \"/lib\",\n   \"--proc\",\n   \"/proc\",\n   \"--dev\",\n   \"/dev\",\n   \"--tmpfs\",\n   \"/tmp\",\n   \"--tmpfs\",\n   \"/aisef-home\",\n   \"--ro-bind\",\n   \"/tmp/e2e/S2b-hardened/fakebin\",\n   \"/tmp/e2e/S2b-hardened/fakebin\",\n   \"--ro-bind\",\n   \"/tmp/aisef-confine-ql0qxp9f/confinement/repo/.git\",\n   \"/tmp/aisef-confine-ql0qxp9f/confinement/repo/.git\",\n   \"--ro-bind\",\n   \"/tmp/e2e/S2b-hardened/xdg/opencode\",\n   \"/tmp/e2e/S2b-hardened/xdg/opencode\",\n   \"--bind\",\n   \"/tmp/aisef-confine-ql0qxp9f/confinement/ws\",\n   \"/tmp/aisef-confine-ql0qxp9f/confinement/ws\",\n   \"--chdir\",\n   \"/tmp/aisef-confine-ql0qxp9f/confinement/ws\",\n   \"--\",\n   \"/bin/sh\",\n   \"-c\",\n   \"<PROBE>\",\n   \"probe\"\n  ],\n  \"backend\": \"bwrap\",\n  \"bwrap\": \"/usr/bin/bwrap\",\n  \"bwrap_sha256\": \"b3b829e18a7d43ee589dc37e351cb9480ff7301b493d8227b8c754294638b976\",\n  \"bwrap_version\": \"bubblewrap 0.12.0\",\n  \"client\": \"/tmp/e2e/S2b-hardened/fakebin/opencode\",\n  \"created_outside_workspace\": {\n   \"client_directory\": false,\n   \"git_directory\": false,\n   \"interpreter_site\": false,\n   \"kernel\": false,\n   \"run_directory\": false\n  },\n  \"host_mounts\": [\n   {\n    \"at\": \"/\",\n    \"dev\": \"0:57\",\n    \"fs\": \"overlay\",\n    \"optional\": []\n   },\n   {\n    \"at\": \"/proc\",\n    \"dev\": \"0:66\",\n    \"fs\": \"proc\",\n    \"optional\": []\n   },\n   {\n    \"at\": \"/dev\",\n    \"dev\": \"0:69\",\n    \"fs\": \"tmpfs\",\n    \"optional\": []\n   },\n   {\n    \"at\": \"/dev/pts\",\n    \"dev\": \"0:72\",\n    \"fs\": \"devpts\",\n    \"optional\": []\n   },\n   {\n    \"at\": \"/sys\",\n    \"dev\": \"0:83\",\n    \"fs\": \"sysfs\",\n    \"optional\": []\n   },\n   {\n    \"at\": \"/sys/fs/cgroup\",\n    \"dev\": \"0:41\",\n    \"fs\": \"cgroup2\",\n    \"optional\": []\n   },\n   {\n    \"at\": \"/dev/mqueue\",\n    \"dev\": \"0:64\",\n    \"fs\": \"mqueue\",\n    \"optional\": []\n   },\n   {\n    \"at\": \"/dev/shm\",\n    \"dev\": \"0:84\",\n    \"fs\": \"tmpfs\",\n    \"optional\": []\n   },\n   {\n    \"at\": \"/usr/sbin/docker-init\",\n    \"dev\": \"0:26\",\n    \"fs\": \"overlay\",\n    \"optional\": []\n   },\n   {\n    \"at\": \"/repo\",\n    \"dev\": \"0:46\",\n    \"fs\": \"virtiofs\",\n    \"optional\": []\n   },\n   {\n    \"at\": \"/etc/hostname\",\n    \"dev\": \"254:1\",\n    \"fs\": \"ext4\",\n    \"optional\": []\n   },\n   {\n    \"at\": \"/etc/hosts\",\n    \"dev\": \"254:1\",\n    \"fs\": \"ext4\",\n    \"optional\": []\n   },\n   {\n    \"at\": \"/etc/resolv.conf\",\n    \"dev\": \"254:1\",\n    \"fs\": \"ext4\",\n    \"optional\": []\n   },\n   {\n    \"at\": \"/usr/lib/aarch64-linux-gnu/libproc2.so.0\",\n    \"dev\": \"0:46\",\n    \"fs\": \"virtiofs\",\n    \"optional\": []\n   },\n   {\n    \"at\": \"/usr/local/bin/ps\",\n    \"dev\": \"0:46\",\n    \"fs\": \"virtiofs\",\n    \"optional\": []\n   },\n   {\n    \"at\": \"/proc/bus\",\n    \"dev\": \"0:66\",\n    \"fs\": \"proc\",\n    \"optional\": []\n   },\n   {\n    \"at\": \"/proc/fs\",\n    \"dev\": \"0:66\",\n    \"fs\": \"proc\",\n    \"optional\": []\n   },\n   {\n    \"at\": \"/proc/irq\",\n    \"dev\": \"0:66\",\n    \"fs\": \"proc\",\n    \"optional\": []\n   },\n   {\n    \"at\": \"/proc/sys\",\n    \"dev\": \"0:66\",\n    \"fs\": \"proc\",\n    \"optional\": []\n   },\n   {\n    \"at\": \"/proc/sysrq-trigger\",\n    \"dev\": \"0:66\",\n    \"fs\": \"proc\",\n    \"optional\": []\n   },\n   {\n    \"at\": \"/proc/interrupts\",\n    \"dev\": \"0:69\",\n    \"fs\": \"tmpfs\",\n    \"optional\": []\n   },\n   {\n    \"at\": \"/proc/kcore\",\n    \"dev\": \"0:69\",\n    \"fs\": \"tmpfs\",\n    \"optional\": []\n   },\n   {\n    \"at\": \"/proc/keys\",\n    \"dev\": \"0:69\",\n    \"fs\": \"tmpfs\",\n    \"optional\": []\n   },\n   {\n    \"at\": \"/proc/scsi\",\n    \"dev\": \"0:85\",\n    \"fs\": \"tmpfs\",\n    \"optional\": []\n   },\n   {\n    \"at\": \"/proc/timer_list\",\n    \"dev\": \"0:69\",\n    \"fs\": \"tmpfs\",\n    \"optional\": []\n   },\n   {\n    \"at\": \"/sys/firmware\",\n    \"dev\": \"0:85\",\n    \"fs\": \"tmpfs\",\n    \"optional\": []\n   }\n  ],\n  \"host_mounts_appeared\": [],\n  \"inside\": {\n   \"capabilities\": {\n    \"CapAmb\": null,\n    \"CapBnd\": null,\n    \"CapEff\": null,\n    \"CapInh\": null,\n    \"CapPrm\": null\n   },\n   \"device_roots\": [\n    \"/dev\"\n   ],\n   \"devices\": {},\n   \"home_listing\": [],\n   \"mount_targets\": [\n    \"/usr\",\n    \"/etc\",\n    \"/proc\",\n    \"/dev\",\n    \"/tmp\",\n    \"/aisef-home\",\n    \"/tmp/e2e/S2b-hardened/fakebin\",\n    \"/tmp/aisef-confine-ql0qxp9f/confinement/repo/.git\",\n    \"/tmp/e2e/S2b-hardened/xdg/opencode\",\n    \"/tmp/aisef-confine-ql0qxp9f/confinement/ws\"\n   ],\n   \"mounts\": [],\n   \"namespaces\": {},\n   \"network_interfaces\": [],\n   \"no_new_privs\": null,\n   \"routed_interfaces\": [],\n   \"seccomp\": null,\n   \"uid\": null,\n   \"unix_sockets\": null\n  },\n  \"left_on_host\": [],\n  \"locale\": {\n   \"LANG\": \"C\",\n   \"LC_ALL\": \"C\"\n  },\n  \"network\": \"host\",\n  \"operator_can\": {\n   \"write_client_directory\": true,\n   \"write_git_directory\": true,\n   \"write_interpreter_site\": false,\n   \"write_kernel\": false,\n   \"write_run_directory\": true\n  },\n  \"operator_uid\": 1000,\n  \"problems\": [\n   \"the sandbox did not run the probe (exit 1): bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user namespaces. See <https://deb.li/bubblewrap> or <file:///usr/share/doc/bubblewrap/README.Debian.gz>.\"\n  ],\n  \"read_only\": [],\n  \"setsid_survivors\": [],\n  \"system\": \"linux\",\n  \"tried\": {}\n },\n \"plan_hash\": \"dcd01d497434bb4ee6007513649de9f408adf6d21fbffb24d67821074edc753f\",\n \"project\": \"calc-cli\",\n \"ready\": false,\n \"route\": \"fakeprov/model-1\"\n}\n",
+ "stderr": "",
+ "json": {
+  "admission": {
+   "admitted": true,
+   "engine_digest": "7668fc35709829d8324e914e0300b2b85221d9e83dedd32cd2c3996f761690c7",
+   "failed": [],
+   "result_digest": "2b01083f0887d014bc82c80f31dec6c0e5f4f1ae5845ea943bbab29da535a8ae"
+  },
+  "confinement": {
+   "argv": [
+    "/usr/bin/bwrap",
+    "--unshare-user",
+    "--unshare-pid",
+    "--unshare-ipc",
+    "--unshare-uts",
+    "--unshare-cgroup-try",
+    "--share-net",
+    "--disable-userns",
+    "--die-with-parent",
+    "--new-session",
+    "--cap-drop",
+    "ALL",
+    "--ro-bind",
+    "/usr",
+    "/usr",
+    "--ro-bind",
+    "/etc",
+    "/etc",
+    "--symlink",
+    "usr/bin",
+    "/bin",
+    "--symlink",
+    "usr/sbin",
+    "/sbin",
+    "--symlink",
+    "usr/lib",
+    "/lib",
+    "--proc",
+    "/proc",
+    "--dev",
+    "/dev",
+    "--tmpfs",
+    "/tmp",
+    "--tmpfs",
+    "/aisef-home",
+    "--ro-bind",
+    "/tmp/e2e/S2b-hardened/fakebin",
+    "/tmp/e2e/S2b-hardened/fakebin",
+    "--ro-bind",
+    "/tmp/aisef-confine-ql0qxp9f/confinement/repo/.git",
+    "/tmp/aisef-confine-ql0qxp9f/confinement/repo/.git",
+    "--ro-bind",
+    "/tmp/e2e/S2b-hardened/xdg/opencode",
+    "/tmp/e2e/S2b-hardened/xdg/opencode",
+    "--bind",
+    "/tmp/aisef-confine-ql0qxp9f/confinement/ws",
+    "/tmp/aisef-confine-ql0qxp9f/confinement/ws",
+    "--chdir",
+    "/tmp/aisef-confine-ql0qxp9f/confinement/ws",
+    "--",
+    "/bin/sh",
+    "-c",
+    "<PROBE>",
+    "probe"
+   ],
+   "backend": "bwrap",
+   "bwrap": "/usr/bin/bwrap",
+   "bwrap_sha256": "b3b829e18a7d43ee589dc37e351cb9480ff7301b493d8227b8c754294638b976",
+   "bwrap_version": "bubblewrap 0.12.0",
+   "client": "/tmp/e2e/S2b-hardened/fakebin/opencode",
+   "created_outside_workspace": {
+    "client_directory": false,
+    "git_directory": false,
+    "interpreter_site": false,
+    "kernel": false,
+    "run_directory": false
+   },
+   "host_mounts": [
+    {
+     "at": "/",
+     "dev": "0:57",
+     "fs": "overlay",
+     "optional": []
+    },
+    {
+     "at": "/proc",
+     "dev": "0:66",
+     "fs": "proc",
+     "optional": []
+    },
+    {
+     "at": "/dev",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": []
+    },
+    {
+     "at": "/dev/pts",
+     "dev": "0:72",
+     "fs": "devpts",
+     "optional": []
+    },
+    {
+     "at": "/sys",
+     "dev": "0:83",
+     "fs": "sysfs",
+     "optional": []
+    },
+    {
+     "at": "/sys/fs/cgroup",
+     "dev": "0:41",
+     "fs": "cgroup2",
+     "optional": []
+    },
+    {
+     "at": "/dev/mqueue",
+     "dev": "0:64",
+     "fs": "mqueue",
+     "optional": []
+    },
+    {
+     "at": "/dev/shm",
+     "dev": "0:84",
+     "fs": "tmpfs",
+     "optional": []
+    },
+    {
+     "at": "/usr/sbin/docker-init",
+     "dev": "0:26",
+     "fs": "overlay",
+     "optional": []
+    },
+    {
+     "at": "/repo",
+     "dev": "0:46",
+     "fs": "virtiofs",
+     "optional": []
+    },
+    {
+     "at": "/etc/hostname",
+     "dev": "254:1",
+     "fs": "ext4",
+     "optional": []
+    },
+    {
+     "at": "/etc/hosts",
+     "dev": "254:1",
+     "fs": "ext4",
+     "optional": []
+    },
+    {
+     "at": "/etc/resolv.conf",
+     "dev": "254:1",
+     "fs": "ext4",
+     "optional": []
+    },
+    {
+     "at": "/usr/lib/aarch64-linux-gnu/libproc2.so.0",
+     "dev": "0:46",
+     "fs": "virtiofs",
+     "optional": []
+    },
+    {
+     "at": "/usr/local/bin/ps",
+     "dev": "0:46",
+     "fs": "virtiofs",
+     "optional": []
+    },
+    {
+     "at": "/proc/bus",
+     "dev": "0:66",
+     "fs": "proc",
+     "optional": []
+    },
+    {
+     "at": "/proc/fs",
+     "dev": "0:66",
+     "fs": "proc",
+     "optional": []
+    },
+    {
+     "at": "/proc/irq",
+     "dev": "0:66",
+     "fs": "proc",
+     "optional": []
+    },
+    {
+     "at": "/proc/sys",
+     "dev": "0:66",
+     "fs": "proc",
+     "optional": []
+    },
+    {
+     "at": "/proc/sysrq-trigger",
+     "dev": "0:66",
+     "fs": "proc",
+     "optional": []
+    },
+    {
+     "at": "/proc/interrupts",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": []
+    },
+    {
+     "at": "/proc/kcore",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": []
+    },
+    {
+     "at": "/proc/keys",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": []
+    },
+    {
+     "at": "/proc/scsi",
+     "dev": "0:85",
+     "fs": "tmpfs",
+     "optional": []
+    },
+    {
+     "at": "/proc/timer_list",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": []
+    },
+    {
+     "at": "/sys/firmware",
+     "dev": "0:85",
+     "fs": "tmpfs",
+     "optional": []
+    }
+   ],
+   "host_mounts_appeared": [],
+   "inside": {
+    "capabilities": {
+     "CapAmb": null,
+     "CapBnd": null,
+     "CapEff": null,
+     "CapInh": null,
+     "CapPrm": null
+    },
+    "device_roots": [
+     "/dev"
+    ],
+    "devices": {},
+    "home_listing": [],
+    "mount_targets": [
+     "/usr",
+     "/etc",
+     "/proc",
+     "/dev",
+     "/tmp",
+     "/aisef-home",
+     "/tmp/e2e/S2b-hardened/fakebin",
+     "/tmp/aisef-confine-ql0qxp9f/confinement/repo/.git",
+     "/tmp/e2e/S2b-hardened/xdg/opencode",
+     "/tmp/aisef-confine-ql0qxp9f/confinement/ws"
+    ],
+    "mounts": [],
+    "namespaces": {},
+    "network_interfaces": [],
+    "no_new_privs": null,
+    "routed_interfaces": [],
+    "seccomp": null,
+    "uid": null,
+    "unix_sockets": null
+   },
+   "left_on_host": [],
+   "locale": {
+    "LANG": "C",
+    "LC_ALL": "C"
+   },
+   "network": "host",
+   "operator_can": {
+    "write_client_directory": true,
+    "write_git_directory": true,
+    "write_interpreter_site": false,
+    "write_kernel": false,
+    "write_run_directory": true
+   },
+   "operator_uid": 1000,
+   "problems": [
+    "the sandbox did not run the probe (exit 1): bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user namespaces. See <https://deb.li/bubblewrap> or <file:///usr/share/doc/bubblewrap/README.Debian.gz>."
+   ],
+   "read_only": [],
+   "setsid_survivors": [],
+   "system": "linux",
+   "tried": {}
+  },
+  "plan_hash": "dcd01d497434bb4ee6007513649de9f408adf6d21fbffb24d67821074edc753f",
+  "project": "calc-cli",
+  "ready": false,
+  "route": "fakeprov/model-1"
+ }
+}

@@ -1,0 +1,69 @@
+== host: Darwin 25.5.0 arm64; macOS 26.5.2
+host load average { 26.74 21.35 15.29 } at 2026-10-15T06:30:29+0700
+== docker version
+Client:
+ Version:           29.8.0
+ API version:       1.56
+ Go version:        go1.26.8
+ Git commit:        88096ef
+ Built:             Thu Sep  3 21:49:43 2026
+ OS/Arch:           darwin/arm64
+ Context:           desktop-linux
+
+Server: Docker Desktop 4.91.0 (239619)
+ Engine:
+  Version:          29.8.0
+  API version:      1.56 (minimum version 1.40)
+  Go version:       go1.26.8
+  Git commit:       3ce5872
+  Built:            Thu Sep  3 21:49:37 2026
+  OS/Arch:          linux/arm64
+  Experimental:     false
+ containerd:
+  Version:          v2.3.4
+  GitCommit:        db8809540e1a7a9da5d518876894933ff55692ab
+ runc:
+  Version:          1.4.3
+  GitCommit:        v1.4.3-0-gbb14dabe
+ docker-init:
+  Version:          0.19.0
+  GitCommit:        de40ad0
+guest: Docker Desktop; kernel 7.0.12-linuxkit; 8 CPUs; 8319770624 bytes; cgroup v2; security [name=seccomp,profile=builtin name=cgroupns]
+== other containers running in the same VM (not started by this script)
+b7057425c7c2 postgres:16.15 Up 2 days (healthy)
+f06b8b7c6ca3 valkey/valkey:9.1.1 Up 2 days (healthy)
+image: aisef-sandbox-measure sha256:568d868ab18d64f7da961ab103e604ff7e5d18fc05cfccaa1946890b0d8b15ed created 2026-10-07T02:35:50.325134004Z linux/arm64
+tree: /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/e2e-final/tree
+archive: /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/e2e-final/archive.tar sha256 2145f7bd2330b7c22655aed6f78d327cfafe4ccd9784da15d7f140d0fdf50a66; files 7780
+tree files: 7780
+commit: 2d01fe46f24cd17af01065a12e1fa1df41170e99 tree 4c9175241cf5a87251786a85608bce6b5aa945c7
+procps: 388a50620b101a212cee94b180d867240a142a397c9270ff3d6c5244fd979023 edb1e9823b60ea9bc4dc244445b4802863c745ec804e4318a16a131699b5383d 
+base flags: --rm --init --network none --user 1000:1000 --cap-drop ALL --pids-limit 512 --memory 1g --cpus 2 -w /repo -v /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/e2e-final/tree:/repo:ro -v /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/linux/procps/ps:/usr/local/bin/ps:ro -v /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/linux/procps/libproc2.so.0:/usr/lib/aarch64-linux-gnu/libproc2.so.0:ro
+X1 flags: --security-opt seccomp=unconfined --security-opt systempaths=unconfined
+driver: python3 -B /repo/validation/v21/cli_integration/e2e_guest.py run --profile <X1|hardened>   (X1: the container run with the X1 flags above; hardened: with none)
+== guest view, hardened:
+kernel Linux 7.0.12-linuxkit #1 SMP PREEMPT Thu Aug 27 14:02:21 UTC 2026 aarch64
+debian 13.7
+uid 1000 gid 1000 HOME /home/op
+CapEff:	0000000000000000 CapBnd:	0000000000000000 NoNewPrivs:	0 Seccomp:	2 
+max_user_namespaces 31880
+bubblewrap 0.12.0
+b3b829e18a7d43ee589dc37e351cb9480ff7301b493d8227b8c754294638b976  /usr/bin/bwrap
+Python 3.14.8 (main, Oct  6 2026, 02:02:59) [GCC 14.2.0]
+git version 2.47.3
+opencode: absent from the guest
+bwrap starts: no
+bwrap: No permissions to create a new namespace, likely because the kernel does not allow non-privileged user namespaces. See <https://deb.li/bubblewrap> or <file:///usr/share/doc/bubblewrap/README.Debian.gz>.
+== guest view, X1:
+kernel Linux 7.0.12-linuxkit #1 SMP PREEMPT Thu Aug 27 14:02:21 UTC 2026 aarch64
+debian 13.7
+uid 1000 gid 1000 HOME /home/op
+CapEff:	0000000000000000 CapBnd:	0000000000000000 NoNewPrivs:	0 Seccomp:	0 
+max_user_namespaces 31880
+bubblewrap 0.12.0
+b3b829e18a7d43ee589dc37e351cb9480ff7301b493d8227b8c754294638b976  /usr/bin/bwrap
+Python 3.14.8 (main, Oct  6 2026, 02:02:59) [GCC 14.2.0]
+git version 2.47.3
+opencode: absent from the guest
+bwrap starts: yes
+host load average { 26.53 21.49 15.40 } at 2026-10-15T06:30:41+0700

@@ -1,0 +1,1089 @@
+{
+ "admission": {
+  "admitted": true,
+  "engine_digest": "7668fc35709829d8324e914e0300b2b85221d9e83dedd32cd2c3996f761690c7",
+  "failed": [],
+  "result_digest": "2b01083f0887d014bc82c80f31dec6c0e5f4f1ae5845ea943bbab29da535a8ae"
+ },
+ "aggregate_min_grade": "OPAQUE",
+ "budget": {
+  "limitation": "spend is what the client reports per finished step: an HTTP request that finishes no step (a client retry, a failed request, the one in flight when a stop is issued) is not in the telemetry, and a stop is issued at the first reading that shows a ceiling reached, so totals can pass a ceiling by the steps finished since the reading before",
+  "limits": {
+   "input_tokens": 200000,
+   "output_tokens": 20000,
+   "provider_requests": 40,
+   "turns": 80
+  },
+  "preflight": {
+   "input_tokens": 200,
+   "output_tokens": 40,
+   "provider_requests": 3,
+   "turns": 0
+  },
+  "reached": null,
+  "spent": {
+   "input_tokens": 460,
+   "output_tokens": 60,
+   "provider_requests": 5,
+   "requests_recorded": 2,
+   "sessions_started": 2,
+   "turns": 2,
+   "unaccounted": []
+  }
+ },
+ "budget_stop": null,
+ "bundle_digest": "cdfd22e3a927e4ec8a411b04ee1b1a65f90da6563811c96a49e4b1659a4cbc61",
+ "confinement": {
+  "argv": [
+   "/usr/bin/bwrap",
+   "--unshare-user",
+   "--unshare-pid",
+   "--unshare-ipc",
+   "--unshare-uts",
+   "--unshare-cgroup-try",
+   "--share-net",
+   "--disable-userns",
+   "--die-with-parent",
+   "--new-session",
+   "--cap-drop",
+   "ALL",
+   "--ro-bind",
+   "/usr",
+   "/usr",
+   "--ro-bind",
+   "/etc",
+   "/etc",
+   "--symlink",
+   "usr/bin",
+   "/bin",
+   "--symlink",
+   "usr/sbin",
+   "/sbin",
+   "--symlink",
+   "usr/lib",
+   "/lib",
+   "--proc",
+   "/proc",
+   "--dev",
+   "/dev",
+   "--tmpfs",
+   "/tmp",
+   "--tmpfs",
+   "/aisef-home",
+   "--ro-bind",
+   "/tmp/e2e/S3t/fakebin",
+   "/tmp/e2e/S3t/fakebin",
+   "--ro-bind",
+   "/tmp/e2e/S3t/run/repo/.git",
+   "/tmp/e2e/S3t/run/repo/.git",
+   "--ro-bind",
+   "/tmp/e2e/S3t/xdg/opencode",
+   "/tmp/e2e/S3t/xdg/opencode",
+   "--bind",
+   "/tmp/e2e/S3t/run/confinement/ws",
+   "/tmp/e2e/S3t/run/confinement/ws",
+   "--chdir",
+   "/tmp/e2e/S3t/run/confinement/ws",
+   "--",
+   "/bin/sh",
+   "-c",
+   "<PROBE>",
+   "probe"
+  ],
+  "backend": "bwrap",
+  "bwrap": "/usr/bin/bwrap",
+  "bwrap_sha256": "b3b829e18a7d43ee589dc37e351cb9480ff7301b493d8227b8c754294638b976",
+  "bwrap_version": "bubblewrap 0.12.0",
+  "client": "/tmp/e2e/S3t/fakebin/opencode",
+  "created_outside_workspace": {
+   "client_directory": false,
+   "git_directory": false,
+   "interpreter_site": false,
+   "kernel": false,
+   "run_directory": false
+  },
+  "host_mounts": [
+   {
+    "at": "/",
+    "dev": "0:57",
+    "fs": "overlay",
+    "optional": []
+   },
+   {
+    "at": "/proc",
+    "dev": "0:66",
+    "fs": "proc",
+    "optional": []
+   },
+   {
+    "at": "/dev",
+    "dev": "0:69",
+    "fs": "tmpfs",
+    "optional": []
+   },
+   {
+    "at": "/dev/pts",
+    "dev": "0:72",
+    "fs": "devpts",
+    "optional": []
+   },
+   {
+    "at": "/sys",
+    "dev": "0:83",
+    "fs": "sysfs",
+    "optional": []
+   },
+   {
+    "at": "/sys/fs/cgroup",
+    "dev": "0:41",
+    "fs": "cgroup2",
+    "optional": []
+   },
+   {
+    "at": "/dev/mqueue",
+    "dev": "0:64",
+    "fs": "mqueue",
+    "optional": []
+   },
+   {
+    "at": "/dev/shm",
+    "dev": "0:84",
+    "fs": "tmpfs",
+    "optional": []
+   },
+   {
+    "at": "/usr/sbin/docker-init",
+    "dev": "0:26",
+    "fs": "overlay",
+    "optional": []
+   },
+   {
+    "at": "/repo",
+    "dev": "0:46",
+    "fs": "virtiofs",
+    "optional": []
+   },
+   {
+    "at": "/etc/hostname",
+    "dev": "254:1",
+    "fs": "ext4",
+    "optional": []
+   },
+   {
+    "at": "/etc/hosts",
+    "dev": "254:1",
+    "fs": "ext4",
+    "optional": []
+   },
+   {
+    "at": "/etc/resolv.conf",
+    "dev": "254:1",
+    "fs": "ext4",
+    "optional": []
+   },
+   {
+    "at": "/usr/lib/aarch64-linux-gnu/libproc2.so.0",
+    "dev": "0:46",
+    "fs": "virtiofs",
+    "optional": []
+   },
+   {
+    "at": "/usr/local/bin/ps",
+    "dev": "0:46",
+    "fs": "virtiofs",
+    "optional": []
+   }
+  ],
+  "host_mounts_appeared": [],
+  "inside": {
+   "capabilities": {
+    "CapAmb": "0000000000000000",
+    "CapBnd": "0000000000000000",
+    "CapEff": "0000000000000000",
+    "CapInh": "0000000000000000",
+    "CapPrm": "0000000000000000"
+   },
+   "device_roots": [
+    "/dev"
+   ],
+   "devices": {
+    "/dev/full": "1:7",
+    "/dev/null": "1:3",
+    "/dev/random": "1:8",
+    "/dev/tty": "5:0",
+    "/dev/urandom": "1:9",
+    "/dev/zero": "1:5"
+   },
+   "home_listing": [],
+   "mount_targets": [
+    "/usr",
+    "/etc",
+    "/proc",
+    "/dev",
+    "/tmp",
+    "/aisef-home",
+    "/tmp/e2e/S3t/fakebin",
+    "/tmp/e2e/S3t/run/repo/.git",
+    "/tmp/e2e/S3t/xdg/opencode",
+    "/tmp/e2e/S3t/run/confinement/ws"
+   ],
+   "mounts": [
+    {
+     "access": "rw",
+     "at": "/",
+     "dev": "0:60",
+     "fs": "tmpfs",
+     "optional": [],
+     "options": [
+      "rw",
+      "nosuid",
+      "nodev",
+      "relatime"
+     ],
+     "root": "/newroot",
+     "source": "tmpfs",
+     "super_options": [
+      "rw",
+      "uid=1000",
+      "gid=1000"
+     ]
+    },
+    {
+     "access": "ro",
+     "at": "/usr",
+     "dev": "0:57",
+     "fs": "overlay",
+     "optional": [],
+     "options": [
+      "ro",
+      "nosuid",
+      "nodev",
+      "relatime"
+     ],
+     "root": "/usr",
+     "source": "overlay",
+     "super_options": [
+      "rw",
+      "lowerdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167950/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166976/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166963/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166962/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166961/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166960/fs",
+      "upperdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167951/fs",
+      "workdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167951/work",
+      "nouserxattr"
+     ]
+    },
+    {
+     "access": "ro",
+     "at": "/usr/sbin/docker-init",
+     "dev": "0:26",
+     "fs": "overlay",
+     "optional": [],
+     "options": [
+      "ro",
+      "nosuid",
+      "nodev",
+      "relatime"
+     ],
+     "root": "/usr/libexec/docker/docker-init",
+     "source": "overlay",
+     "super_options": [
+      "rw",
+      "lowerdir=/",
+      "upperdir=/run/rootfs.upper",
+      "workdir=/run/rootfs.workdir",
+      "uuid=on",
+      "nouserxattr"
+     ]
+    },
+    {
+     "access": "ro",
+     "at": "/usr/lib/aarch64-linux-gnu/libproc2.so.0",
+     "dev": "0:46",
+     "fs": "virtiofs",
+     "optional": [],
+     "options": [
+      "ro",
+      "nosuid",
+      "nodev",
+      "relatime"
+     ],
+     "root": "/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/linux/procps/libproc2.so.0",
+     "source": "virtiofs2",
+     "super_options": [
+      "rw",
+      "ignore_atime",
+      "no_xattr"
+     ]
+    },
+    {
+     "access": "ro",
+     "at": "/usr/local/bin/ps",
+     "dev": "0:46",
+     "fs": "virtiofs",
+     "optional": [],
+     "options": [
+      "ro",
+      "nosuid",
+      "nodev",
+      "relatime"
+     ],
+     "root": "/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/linux/procps/ps",
+     "source": "virtiofs2",
+     "super_options": [
+      "rw",
+      "ignore_atime",
+      "no_xattr"
+     ]
+    },
+    {
+     "access": "ro",
+     "at": "/etc",
+     "dev": "0:57",
+     "fs": "overlay",
+     "optional": [],
+     "options": [
+      "ro",
+      "nosuid",
+      "nodev",
+      "relatime"
+     ],
+     "root": "/etc",
+     "source": "overlay",
+     "super_options": [
+      "rw",
+      "lowerdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167950/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166976/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166963/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166962/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166961/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166960/fs",
+      "upperdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167951/fs",
+      "workdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167951/work",
+      "nouserxattr"
+     ]
+    },
+    {
+     "access": "ro",
+     "at": "/etc/hostname",
+     "dev": "254:1",
+     "fs": "ext4",
+     "optional": [],
+     "options": [
+      "ro",
+      "nosuid",
+      "nodev",
+      "relatime"
+     ],
+     "root": "/docker/containers/6f70c3301b1cd029ea28b3a8793b0721b6d9e47e4b0ce27474c8988b7a5601d6/hostname",
+     "source": "/dev/vda1",
+     "super_options": [
+      "rw",
+      "discard"
+     ]
+    },
+    {
+     "access": "ro",
+     "at": "/etc/hosts",
+     "dev": "254:1",
+     "fs": "ext4",
+     "optional": [],
+     "options": [
+      "ro",
+      "nosuid",
+      "nodev",
+      "relatime"
+     ],
+     "root": "/docker/containers/6f70c3301b1cd029ea28b3a8793b0721b6d9e47e4b0ce27474c8988b7a5601d6/hosts",
+     "source": "/dev/vda1",
+     "super_options": [
+      "rw",
+      "discard"
+     ]
+    },
+    {
+     "access": "ro",
+     "at": "/etc/resolv.conf",
+     "dev": "254:1",
+     "fs": "ext4",
+     "optional": [],
+     "options": [
+      "ro",
+      "nosuid",
+      "nodev",
+      "relatime"
+     ],
+     "root": "/docker/containers/6f70c3301b1cd029ea28b3a8793b0721b6d9e47e4b0ce27474c8988b7a5601d6/resolv.conf",
+     "source": "/dev/vda1",
+     "super_options": [
+      "rw",
+      "discard"
+     ]
+    },
+    {
+     "access": "rw",
+     "at": "/proc",
+     "dev": "0:61",
+     "fs": "proc",
+     "optional": [],
+     "options": [
+      "rw",
+      "nosuid",
+      "nodev",
+      "noexec",
+      "relatime"
+     ],
+     "root": "/",
+     "source": "proc",
+     "super_options": [
+      "rw"
+     ]
+    },
+    {
+     "access": "rw",
+     "at": "/dev",
+     "dev": "0:62",
+     "fs": "tmpfs",
+     "optional": [],
+     "options": [
+      "rw",
+      "nosuid",
+      "nodev",
+      "relatime"
+     ],
+     "root": "/",
+     "source": "tmpfs",
+     "super_options": [
+      "rw",
+      "mode=755",
+      "uid=1000",
+      "gid=1000"
+     ]
+    },
+    {
+     "access": "rw",
+     "at": "/dev/null",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": [],
+     "options": [
+      "rw",
+      "nosuid"
+     ],
+     "root": "/null",
+     "source": "tmpfs",
+     "super_options": [
+      "rw",
+      "size=65536k",
+      "mode=755"
+     ]
+    },
+    {
+     "access": "rw",
+     "at": "/dev/zero",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": [],
+     "options": [
+      "rw",
+      "nosuid"
+     ],
+     "root": "/zero",
+     "source": "tmpfs",
+     "super_options": [
+      "rw",
+      "size=65536k",
+      "mode=755"
+     ]
+    },
+    {
+     "access": "rw",
+     "at": "/dev/full",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": [],
+     "options": [
+      "rw",
+      "nosuid"
+     ],
+     "root": "/full",
+     "source": "tmpfs",
+     "super_options": [
+      "rw",
+      "size=65536k",
+      "mode=755"
+     ]
+    },
+    {
+     "access": "rw",
+     "at": "/dev/random",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": [],
+     "options": [
+      "rw",
+      "nosuid"
+     ],
+     "root": "/random",
+     "source": "tmpfs",
+     "super_options": [
+      "rw",
+      "size=65536k",
+      "mode=755"
+     ]
+    },
+    {
+     "access": "rw",
+     "at": "/dev/urandom",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": [],
+     "options": [
+      "rw",
+      "nosuid"
+     ],
+     "root": "/urandom",
+     "source": "tmpfs",
+     "super_options": [
+      "rw",
+      "size=65536k",
+      "mode=755"
+     ]
+    },
+    {
+     "access": "rw",
+     "at": "/dev/tty",
+     "dev": "0:69",
+     "fs": "tmpfs",
+     "optional": [],
+     "options": [
+      "rw",
+      "nosuid"
+     ],
+     "root": "/tty",
+     "source": "tmpfs",
+     "super_options": [
+      "rw",
+      "size=65536k",
+      "mode=755"
+     ]
+    },
+    {
+     "access": "rw",
+     "at": "/dev/pts",
+     "dev": "0:63",
+     "fs": "devpts",
+     "optional": [],
+     "options": [
+      "rw",
+      "nosuid",
+      "noexec",
+      "relatime"
+     ],
+     "root": "/",
+     "source": "devpts",
+     "super_options": [
+      "rw",
+      "mode=620",
+      "ptmxmode=666"
+     ]
+    },
+    {
+     "access": "rw",
+     "at": "/tmp",
+     "dev": "0:65",
+     "fs": "tmpfs",
+     "optional": [],
+     "options": [
+      "rw",
+      "nosuid",
+      "nodev",
+      "relatime"
+     ],
+     "root": "/",
+     "source": "tmpfs",
+     "super_options": [
+      "rw",
+      "mode=755",
+      "uid=1000",
+      "gid=1000"
+     ]
+    },
+    {
+     "access": "rw",
+     "at": "/aisef-home",
+     "dev": "0:85",
+     "fs": "tmpfs",
+     "optional": [],
+     "options": [
+      "rw",
+      "nosuid",
+      "nodev",
+      "relatime"
+     ],
+     "root": "/",
+     "source": "tmpfs",
+     "super_options": [
+      "rw",
+      "mode=755",
+      "uid=1000",
+      "gid=1000"
+     ]
+    },
+    {
+     "access": "ro",
+     "at": "/tmp/e2e/S3t/fakebin",
+     "dev": "0:57",
+     "fs": "overlay",
+     "optional": [],
+     "options": [
+      "ro",
+      "nosuid",
+      "nodev",
+      "relatime"
+     ],
+     "root": "/tmp/e2e/S3t/fakebin",
+     "source": "overlay",
+     "super_options": [
+      "rw",
+      "lowerdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167950/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166976/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166963/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166962/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166961/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166960/fs",
+      "upperdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167951/fs",
+      "workdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167951/work",
+      "nouserxattr"
+     ]
+    },
+    {
+     "access": "ro",
+     "at": "/tmp/e2e/S3t/run/repo/.git",
+     "dev": "0:57",
+     "fs": "overlay",
+     "optional": [],
+     "options": [
+      "ro",
+      "nosuid",
+      "nodev",
+      "relatime"
+     ],
+     "root": "/tmp/e2e/S3t/run/repo/.git",
+     "source": "overlay",
+     "super_options": [
+      "rw",
+      "lowerdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167950/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166976/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166963/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166962/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166961/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166960/fs",
+      "upperdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167951/fs",
+      "workdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167951/work",
+      "nouserxattr"
+     ]
+    },
+    {
+     "access": "ro",
+     "at": "/tmp/e2e/S3t/xdg/opencode",
+     "dev": "0:57",
+     "fs": "overlay",
+     "optional": [],
+     "options": [
+      "ro",
+      "nosuid",
+      "nodev",
+      "relatime"
+     ],
+     "root": "/tmp/e2e/S3t/xdg/opencode",
+     "source": "overlay",
+     "super_options": [
+      "rw",
+      "lowerdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167950/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166976/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166963/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166962/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166961/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166960/fs",
+      "upperdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167951/fs",
+      "workdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167951/work",
+      "nouserxattr"
+     ]
+    },
+    {
+     "access": "rw",
+     "at": "/tmp/e2e/S3t/run/confinement/ws",
+     "dev": "0:57",
+     "fs": "overlay",
+     "optional": [],
+     "options": [
+      "rw",
+      "nosuid",
+      "nodev",
+      "relatime"
+     ],
+     "root": "/tmp/e2e/S3t/run/confinement/ws",
+     "source": "overlay",
+     "super_options": [
+      "rw",
+      "lowerdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167950/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166976/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166963/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166962/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166961/fs:/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/166960/fs",
+      "upperdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167951/fs",
+      "workdir=/var/lib/desktop-containerd/daemon/io.containerd.snapshotter.v1.overlayfs/snapshots/167951/work",
+      "nouserxattr"
+     ]
+    }
+   ],
+   "namespaces": {
+    "ipc": "own",
+    "mnt": "own",
+    "net": "shared",
+    "pid": "own",
+    "user": "own",
+    "uts": "own"
+   },
+   "network_interfaces": [
+    "lo",
+    "tunl0",
+    "gre0",
+    "gretap0",
+    "erspan0",
+    "ip_vti0",
+    "ip6_vti0",
+    "sit0",
+    "ip6tnl0",
+    "ip6gre0"
+   ],
+   "no_new_privs": "1",
+   "routed_interfaces": [],
+   "seccomp": "0",
+   "uid": "1000",
+   "unix_sockets": []
+  },
+  "left_on_host": [],
+  "locale": {
+   "LANG": "C",
+   "LC_ALL": "C"
+  },
+  "network": "host",
+  "operator_can": {
+   "write_client_directory": true,
+   "write_git_directory": true,
+   "write_interpreter_site": false,
+   "write_kernel": false,
+   "write_run_directory": true
+  },
+  "operator_uid": 1000,
+  "problems": [],
+  "read_only": [],
+  "setsid_survivors": [],
+  "system": "linux",
+  "tried": {
+   "read_canary": {
+    "exit": 1,
+    "output": "cat: /tmp/e2e/S3t/run/confinement/canary: No such file or directory"
+   },
+   "read_git_directory": {
+    "exit": 0,
+    "output": "ref: refs/heads/main"
+   },
+   "setsid": {
+    "exit": 0,
+    "output": ""
+   },
+   "user_namespace": {
+    "exit": 1,
+    "output": "unshare: unshare failed: No space left on device"
+   },
+   "workspace": {
+    "exit": 0,
+    "output": "ok"
+   },
+   "write_client_directory": {
+    "exit": 2,
+    "output": "probe: 19: cannot create /tmp/e2e/S3t/fakebin/.aisef-confine-probe-ea87b18fce3ae719: Read-only file system"
+   },
+   "write_git_directory": {
+    "exit": 2,
+    "output": "probe: 20: cannot create /tmp/e2e/S3t/run/repo/.git/.aisef-confine-probe-ea87b18fce3ae719: Read-only file system"
+   },
+   "write_interpreter_site": {
+    "exit": 2,
+    "output": "probe: 18: cannot create /usr/local/lib/python3.14/site-packages/.aisef-confine-probe-ea87b18fce3ae719: Read-only file system"
+   },
+   "write_kernel": {
+    "exit": 2,
+    "output": "probe: 17: cannot create /repo/aisef2/.aisef-confine-probe-ea87b18fce3ae719: Directory nonexistent"
+   },
+   "write_run_directory": {
+    "exit": 0,
+    "output": ""
+   }
+  }
+ },
+ "delivery_blocked_by": [
+  "1 of the plan's stories did not commit: ['S1']"
+ ],
+ "delivery_verdict": "FAIL",
+ "failure": null,
+ "final_main": "3756262d35ebd18bb686587208a00e3713dcc016",
+ "finished": 1792020764.1339276,
+ "format": "aisef-v2-run-record/1",
+ "generalization_claim": "NONE",
+ "journal": {
+  "closed": "SHUTDOWN",
+  "lines": 84,
+  "path": "run/journals/aisef-run.jsonl",
+  "sha256": "4759fec839908362284e8404a746e9401674b9bc740efa37d5f5ece1db042e09"
+ },
+ "kernel_digest": "bc6de98b0d665978245451a01cafe3e52ee79106d0d48debdda232acd654df57",
+ "no_progress": [
+  {
+   "attempts_repeating_the_one_before": [
+    2
+   ],
+   "failures": [
+    "SUBJECT_ABSENT_AT_CANDIDATE: proof of C-SUM: SUBJECT_ABSENT_AT_CANDIDATE"
+   ],
+   "story": "S1"
+  }
+ ],
+ "plan_hash": "33b439d5dfd6c668d294a9f5ef2234a4756c2a3c2a1e8de02080a98059051af8",
+ "plan_quality_verdict": "NOT_CLAIMED",
+ "platform": {
+  "python": "3.14.8",
+  "system": "linux"
+ },
+ "preflight": {
+  "accounting": {
+   "input_tokens": 200,
+   "output_tokens": 40,
+   "provider_requests": 3,
+   "turns": 0,
+   "unaccounted": []
+  },
+  "observation": {
+   "declared_model": "model-1",
+   "expected_listed_owner": "fake",
+   "expected_served_model": "model-1",
+   "listing": {
+    "http": 200,
+    "id": "model-1",
+    "listed": true,
+    "owned_by": "fake"
+   },
+   "probes": [
+    {
+     "http": 200,
+     "served_model": "model-1",
+     "system_fingerprint": "fp-1"
+    },
+    {
+     "http": 200,
+     "served_model": "model-1",
+     "system_fingerprint": "fp-1"
+    }
+   ],
+   "route": "fakeprov/model-1"
+  },
+  "problems": [],
+  "verdict": "ATTESTED"
+ },
+ "productproof": {
+  "delivered": 0,
+  "obligations": [
+   {
+    "criterion": "C-SUM",
+    "delivered": false,
+    "expected": "SATISFIED",
+    "last_proof": {
+     "agreement": true,
+     "candidate": "3756262d35ebd18bb686587208a00e3713dcc016",
+     "seq": 72,
+     "verdict": "INDETERMINATE"
+    },
+    "probe_id": "probe.cli_invocation",
+    "role": "INTRODUCE",
+    "satisfied_at_last_proof": false,
+    "spec": "PPS-5ea4493062c1d89d8e6f8d40fbc9c92f289b309283fd3bed00ee6fdbd8c09243",
+    "story": "S1"
+   },
+   {
+    "criterion": "C-USAGE-0",
+    "delivered": false,
+    "expected": "SATISFIED",
+    "last_proof": null,
+    "probe_id": "probe.cli_invocation",
+    "role": "INTRODUCE",
+    "satisfied_at_last_proof": false,
+    "spec": "PPS-5a52e3117c6159c058f31b67acff3e5deb3cb6a4f4760f6d3bf6ccc8dfb1bdb5",
+    "story": "S1"
+   },
+   {
+    "criterion": "C-USAGE-1",
+    "delivered": false,
+    "expected": "SATISFIED",
+    "last_proof": null,
+    "probe_id": "probe.cli_invocation",
+    "role": "INTRODUCE",
+    "satisfied_at_last_proof": false,
+    "spec": "PPS-ca5b9c474e6d1c0b5b82b3f66be1de6e817f0ef488de814330428b57d4c10d5f",
+    "story": "S1"
+   }
+  ],
+  "satisfied_at_last_proof": 0,
+  "total": 3
+ },
+ "project": "calc-cli",
+ "runspec_hash": "567b59cbc30a28b4c3b2e8eb63f7a5d40bc13f0ac4af9d27b641d8dbea886032",
+ "scanner": "none",
+ "sessions": [
+  {
+   "attempt": 1,
+   "confinement": "bwrap network=host",
+   "developer_committed_itself": false,
+   "error": null,
+   "exit": null,
+   "log": "S1.developer.1.jsonl",
+   "prompt_sha256": "c1cca26a656a14070d0df59fd0365febe849402b3ee0f6ca16a2b3ce45d35385",
+   "redacted": 0,
+   "role": "developer",
+   "seconds": 5.2,
+   "started": true,
+   "stopped": null,
+   "story_id": "S1",
+   "timed_out": true,
+   "tokens": {
+    "input": 130,
+    "output": 10
+   },
+   "turns": 1
+  },
+  {
+   "attempt": 2,
+   "confinement": "bwrap network=host",
+   "developer_committed_itself": false,
+   "error": null,
+   "exit": null,
+   "log": "S1.developer.2.jsonl",
+   "prompt_sha256": "8915b5753f9c5a7edc06c877e15dc0e5d012814c079cb592858dad614e2e8377",
+   "redacted": 0,
+   "role": "developer",
+   "seconds": 5.3,
+   "started": true,
+   "stopped": null,
+   "story_id": "S1",
+   "timed_out": true,
+   "tokens": {
+    "input": 130,
+    "output": 10
+   },
+   "turns": 1
+  }
+ ],
+ "settings": {
+  "budget": {
+   "input_tokens": 200000,
+   "output_tokens": 20000,
+   "provider_requests": 40,
+   "turns": 80
+  },
+  "client": "opencode",
+  "client_env": [],
+  "confinement": {
+   "backend": "bwrap",
+   "bwrap": "/usr/bin/bwrap",
+   "network": "host",
+   "read_only": []
+  },
+  "format": "aisef-v2-run/1",
+  "limits": {
+   "DEVELOPER": 1,
+   "ENVIRONMENT": 1,
+   "INTEGRATION": 1,
+   "PLAN": 1,
+   "PROVIDER": 1,
+   "REVIEW": 1,
+   "SECURITY": 1
+  },
+  "max_turns_per_session": 10,
+  "preflight": {
+   "chat_probes": 2
+  },
+  "prices": {
+   "cache_read_per_mtok": 0.044,
+   "cache_write_per_mtok": 1.32,
+   "currency": "USD",
+   "effective_date": "2026-10-12",
+   "input_per_mtok": 1.32,
+   "output_per_mtok": 3.96,
+   "source": "e2e fixture (not a real price)"
+  },
+  "provider": {
+   "api_key_env": "FAKE_PROVIDER_KEY",
+   "endpoint": "http://127.0.0.1:18437/v1",
+   "listed_owner": "fake",
+   "model_limit": {
+    "context": 100000,
+    "output": 8000
+   },
+   "name": "fakeprov",
+   "served_model": "model-1"
+  },
+  "review": {
+   "min_severity": "high",
+   "policy": "fix-loop"
+  },
+  "route": "fakeprov/model-1",
+  "timeouts_s": {
+   "developer": 5,
+   "probe": 60,
+   "reviewer": 120,
+   "tool": 120
+  }
+ },
+ "stage": "finished",
+ "started": 1792020744.561501,
+ "story_errors": [],
+ "story_outcomes": {
+  "S1": [
+   "RETRY",
+   "ROLLBACK"
+  ]
+ },
+ "usage": {
+  "cost": {
+   "currency": "USD",
+   "effective_date": "2026-10-12",
+   "known": 0.000818,
+   "sessions_unknown": [],
+   "source": "e2e fixture (not a real price)",
+   "status": "known",
+   "value": 0.000818
+  },
+  "preflight": {
+   "input_tokens": 200,
+   "output_tokens": 40,
+   "provider_requests": 3,
+   "turns": 0,
+   "unaccounted": []
+  },
+  "provider_requests_journaled": 2,
+  "retries": {
+   "S1": 1
+  },
+  "sessions": [
+   {
+    "cost": 0.000198,
+    "session": "S1.developer.1.jsonl",
+    "steps": 1,
+    "steps_without_tokens": 0,
+    "tokens": {
+     "cache_read": 10,
+     "cache_write": 0,
+     "input": 120,
+     "output": 7,
+     "reasoning": 3
+    }
+   },
+   {
+    "cost": 0.000198,
+    "session": "S1.developer.2.jsonl",
+    "steps": 1,
+    "steps_without_tokens": 0,
+    "tokens": {
+     "cache_read": 10,
+     "cache_write": 0,
+     "input": 120,
+     "output": 7,
+     "reasoning": 3
+    }
+   }
+  ],
+  "tokens": {
+   "cache_read": 20,
+   "cache_write": 0,
+   "input": 240,
+   "output": 14,
+   "reasoning": 6
+  },
+  "wall_s": 19.572
+ }
+}

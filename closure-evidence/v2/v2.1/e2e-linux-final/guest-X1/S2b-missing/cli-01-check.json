@@ -1,0 +1,46 @@
+{
+ "tag": "check",
+ "argv": [
+  "/usr/local/bin/python3",
+  "-B",
+  "-m",
+  "aisef",
+  "run",
+  "--check",
+  "--project",
+  "/tmp/e2e/project/approved.json",
+  "--settings",
+  "settings.json",
+  "--repo",
+  "/tmp/e2e/project/repo"
+ ],
+ "cwd": "/tmp/e2e/S2b-missing",
+ "exit": 2,
+ "seconds": 1.9,
+ "stdout": "{\n \"admission\": {\n  \"admitted\": true,\n  \"engine_digest\": \"7668fc35709829d8324e914e0300b2b85221d9e83dedd32cd2c3996f761690c7\",\n  \"failed\": [],\n  \"result_digest\": \"2b01083f0887d014bc82c80f31dec6c0e5f4f1ae5845ea943bbab29da535a8ae\"\n },\n \"confinement\": {\n  \"backend\": \"bwrap\",\n  \"bwrap\": \"/usr/bin/bwrap-e2e-absent\",\n  \"client\": \"/tmp/e2e/S2b-missing/fakebin/opencode\",\n  \"network\": \"host\",\n  \"operator_uid\": 1000,\n  \"problems\": [\n   \"bubblewrap is not an executable file at /usr/bin/bwrap-e2e-absent\"\n  ],\n  \"read_only\": [],\n  \"system\": \"linux\"\n },\n \"plan_hash\": \"33b439d5dfd6c668d294a9f5ef2234a4756c2a3c2a1e8de02080a98059051af8\",\n \"project\": \"calc-cli\",\n \"ready\": false,\n \"route\": \"fakeprov/model-1\"\n}\n",
+ "stderr": "",
+ "json": {
+  "admission": {
+   "admitted": true,
+   "engine_digest": "7668fc35709829d8324e914e0300b2b85221d9e83dedd32cd2c3996f761690c7",
+   "failed": [],
+   "result_digest": "2b01083f0887d014bc82c80f31dec6c0e5f4f1ae5845ea943bbab29da535a8ae"
+  },
+  "confinement": {
+   "backend": "bwrap",
+   "bwrap": "/usr/bin/bwrap-e2e-absent",
+   "client": "/tmp/e2e/S2b-missing/fakebin/opencode",
+   "network": "host",
+   "operator_uid": 1000,
+   "problems": [
+    "bubblewrap is not an executable file at /usr/bin/bwrap-e2e-absent"
+   ],
+   "read_only": [],
+   "system": "linux"
+  },
+  "plan_hash": "33b439d5dfd6c668d294a9f5ef2234a4756c2a3c2a1e8de02080a98059051af8",
+  "project": "calc-cli",
+  "ready": false,
+  "route": "fakeprov/model-1"
+ }
+}

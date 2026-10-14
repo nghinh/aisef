@@ -1,0 +1,2 @@
+goe-postgres-1 Up 2 days (healthy)
+goe-valkey-1 Up 2 days (healthy)

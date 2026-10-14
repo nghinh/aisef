@@ -1,0 +1,14 @@
+{
+ "files": {
+  "RUN.json": "c8f23512014f1b09e72399b679a6c85b86e860a9d7359b3ab4ae83c7e3377580",
+  "RUN.started.json": "3da9047484e1dada308fe6f23475c3040fde56127614ed246379b7914796763c",
+  "preflight/LEDGER.jsonl": "20103929ae4b91bd6f5d5c6050d3947a947f429fbc53535f553315ba0656eb1d",
+  "preflight/PREFLIGHT.json": "0d836b3568361c7b002d6956ea553a2120cda89cee54c8de622a0edab7570bdf",
+  "run/journals/aisef-run.jsonl": "5860e25dafebb3df2ae331fa0fff23a28a91ad67a39aa7e0ad51f62a162bc543",
+  "sessions/S1.developer.1.jsonl": "e6363e3c84700cd347bc8036ebfb059141f9284ffbee0d120031672058583eb4",
+  "sessions/S1.developer.2.jsonl": "f72486a248277f82e987bf8f546cd90329d421344912114cff40023c7d765b56",
+  "sessions/S1.reviewer.1.jsonl": "812d4bb46dcc81dc838472bc8a2242e2903ae84ffab968e811c0f6e8f86fde31",
+  "sessions/S1.reviewer.2.jsonl": "f2e6008c10375fc5eab17779877b50d35714d9df963287e4488479a3ffc85477"
+ },
+ "format": "aisef-v2-evidence/1"
+}
