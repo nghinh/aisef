@@ -2,7 +2,7 @@
  "record": "AISEF V2.1 — MUTATION, FINAL (owner directive B-03b, 2026-10-06; RELEASE-DECISIONS seq 5)",
  "phase": "V2.1",
  "snapshot": "cc5359699c057f666f1693b90f1beb4762676478",
- "FINAL_HEAD": "104318643cae7fc11105b2781ee32bed1427effb",
+ "FINAL_HEAD": "8043387c562c31429215430c6954aefb747aee72",
  "TOTAL_TARGETS": 528,
  "ACCOUNTED_EXACTLY_ONCE": true,
  "measured_at_final_head": 0,
@@ -24,7 +24,7 @@
   "V2.0_REFERENCE_MODEL": 0
  },
  "UNAUDITED_SURVIVORS": 0,
- "STALE_RESULTS_EXCLUDED": 754,
+ "STALE_RESULTS_EXCLUDED": 766,
  "RERUN_TARGETS": 0,
  "MISSING_TARGETS": [],
  "NOT_PASSING": {},
@@ -403,6 +403,62 @@
     "sha256": "e519dd137c7c7a3af6e4646c6b294d9c1de23f037089413e4ad02459753ccf60"
    },
    "results": 1
+  },
+  {
+   "worker": "c8-w1",
+   "snapshot": "5df323a30bf0b5be95660f1f053d6735bb363d87",
+   "status": "finished 2026-10-14T16:39:08Z; git status --porcelain after: clean (campaign 8, snapshot 5df323a; the worker directory is named c3-w1 by the campaign script)",
+   "log": {
+    "path": "closure-evidence/v2/v2.1/mutation-workers/c8-w1.log",
+    "sha256": "7a6bca7da371c0b6e5ca2f833fd55433f7a20f98726e2f3f4f4c56b12a81b902"
+   },
+   "record": {
+    "path": "closure-evidence/v2/v2.1/mutation-workers/c8-w1.record.json",
+    "sha256": "3f6674edd961333d44933d4043839cbd5e39732805dfa2091c472ce823dac30b"
+   },
+   "results": 1
+  },
+  {
+   "worker": "c8-w2",
+   "snapshot": "5df323a30bf0b5be95660f1f053d6735bb363d87",
+   "status": "finished 2026-10-14T16:30:47Z; git status --porcelain after: clean (campaign 8, snapshot 5df323a; the worker directory is named c3-w2 by the campaign script)",
+   "log": {
+    "path": "closure-evidence/v2/v2.1/mutation-workers/c8-w2.log",
+    "sha256": "3ffc5deb6f79d4139bee1abefda02bd028490c3a7d822bddba36730f53b23be2"
+   },
+   "record": {
+    "path": "closure-evidence/v2/v2.1/mutation-workers/c8-w2.record.json",
+    "sha256": "bf80598eadcf1cf8d28e33705af1bd223404a1b429d9a68d0f2fa21943a2b653"
+   },
+   "results": 1
+  },
+  {
+   "worker": "c8-w3",
+   "snapshot": "5df323a30bf0b5be95660f1f053d6735bb363d87",
+   "status": "finished 2026-10-14T16:24:43Z; git status --porcelain after: clean (campaign 8, snapshot 5df323a; the worker directory is named c3-w3 by the campaign script)",
+   "log": {
+    "path": "closure-evidence/v2/v2.1/mutation-workers/c8-w3.log",
+    "sha256": "778584d908ba9815d09e3392344fc10fdbf2b6d5401e04f9b2ec68611323faab"
+   },
+   "record": {
+    "path": "closure-evidence/v2/v2.1/mutation-workers/c8-w3.record.json",
+    "sha256": "468520a529e0a301dce39cb7220dcb9784c0957e1f55b6b75e75adc27b7726dc"
+   },
+   "results": 5
+  },
+  {
+   "worker": "c8-w4",
+   "snapshot": "5df323a30bf0b5be95660f1f053d6735bb363d87",
+   "status": "finished 2026-10-14T16:24:34Z; git status --porcelain after: clean (campaign 8, snapshot 5df323a; the worker directory is named c3-w4 by the campaign script)",
+   "log": {
+    "path": "closure-evidence/v2/v2.1/mutation-workers/c8-w4.log",
+    "sha256": "c5a5ececf6d3edee466c68fdac60943b23a110ec06c27b438af1ada4675de1a8"
+   },
+   "record": {
+    "path": "closure-evidence/v2/v2.1/mutation-workers/c8-w4.record.json",
+    "sha256": "d639d703a6e35ed74f845dc64fa9b16271a85a416d8a3011088d5cc068f960a2"
+   },
+   "results": 5
   },
   {
    "worker": "l1-ord",
@@ -1681,8 +1737,8 @@
    ]
   },
   "aisef2/app/confine.py::DEVICES": {
-   "worker": "c6-w4",
-   "measured_on": "a770fbbfda20824f72bc2a9bcb29b47e44512d6a",
+   "worker": "c8-w4",
+   "measured_on": "5df323a30bf0b5be95660f1f053d6735bb363d87",
    "class": "reused_after_mechanical_proof"
   },
   "aisef2/app/confine.py::KEYS": {
@@ -1701,8 +1757,8 @@
    "class": "reused_after_mechanical_proof"
   },
   "aisef2/app/confine.py::PSEUDO": {
-   "worker": "c6-w2",
-   "measured_on": "a770fbbfda20824f72bc2a9bcb29b47e44512d6a",
+   "worker": "c8-w3",
+   "measured_on": "5df323a30bf0b5be95660f1f053d6735bb363d87",
    "class": "reused_after_mechanical_proof"
   },
   "aisef2/app/confine.py::SYSTEM": {
@@ -1716,28 +1772,28 @@
    "class": "reused_after_mechanical_proof"
   },
   "aisef2/app/confine.py::_DEV": {
-   "worker": "c6-w2",
-   "measured_on": "a770fbbfda20824f72bc2a9bcb29b47e44512d6a",
+   "worker": "c8-w4",
+   "measured_on": "5df323a30bf0b5be95660f1f053d6735bb363d87",
    "class": "reused_after_mechanical_proof"
   },
   "aisef2/app/confine.py::_PEER": {
-   "worker": "c6-w4",
-   "measured_on": "a770fbbfda20824f72bc2a9bcb29b47e44512d6a",
+   "worker": "c8-w3",
+   "measured_on": "5df323a30bf0b5be95660f1f053d6735bb363d87",
    "class": "reused_after_mechanical_proof"
   },
   "aisef2/app/confine.py::_device_roots": {
-   "worker": "c6-w2",
-   "measured_on": "a770fbbfda20824f72bc2a9bcb29b47e44512d6a",
+   "worker": "c8-w3",
+   "measured_on": "5df323a30bf0b5be95660f1f053d6735bb363d87",
    "class": "reused_after_mechanical_proof"
   },
   "aisef2/app/confine.py::_host_mounts": {
-   "worker": "c6-w2",
-   "measured_on": "a770fbbfda20824f72bc2a9bcb29b47e44512d6a",
+   "worker": "c8-w4",
+   "measured_on": "5df323a30bf0b5be95660f1f053d6735bb363d87",
    "class": "reused_after_mechanical_proof"
   },
   "aisef2/app/confine.py::_judge": {
-   "worker": "c7-w2",
-   "measured_on": "853da4add9e2a23d32d3e7a6f43dbd0c7a698f4e",
+   "worker": "c8-w2",
+   "measured_on": "5df323a30bf0b5be95660f1f053d6735bb363d87",
    "class": "reused_after_mechanical_proof"
   },
   "aisef2/app/confine.py::_lines": {
@@ -1751,18 +1807,18 @@
    "class": "reused_after_mechanical_proof"
   },
   "aisef2/app/confine.py::_mounts": {
-   "worker": "c6-w4",
-   "measured_on": "a770fbbfda20824f72bc2a9bcb29b47e44512d6a",
+   "worker": "c8-w4",
+   "measured_on": "5df323a30bf0b5be95660f1f053d6735bb363d87",
    "class": "reused_after_mechanical_proof"
   },
   "aisef2/app/confine.py::_owned": {
-   "worker": "c6-w2",
-   "measured_on": "a770fbbfda20824f72bc2a9bcb29b47e44512d6a",
+   "worker": "c8-w4",
+   "measured_on": "5df323a30bf0b5be95660f1f053d6735bb363d87",
    "class": "reused_after_mechanical_proof"
   },
   "aisef2/app/confine.py::_probe": {
-   "worker": "c7-w1",
-   "measured_on": "853da4add9e2a23d32d3e7a6f43dbd0c7a698f4e",
+   "worker": "c8-w1",
+   "measured_on": "5df323a30bf0b5be95660f1f053d6735bb363d87",
    "class": "reused_after_mechanical_proof"
   },
   "aisef2/app/confine.py::_sections": {
@@ -1786,8 +1842,8 @@
    "class": "reused_after_mechanical_proof"
   },
   "aisef2/app/confine.py::_writes": {
-   "worker": "c6-w4",
-   "measured_on": "a770fbbfda20824f72bc2a9bcb29b47e44512d6a",
+   "worker": "c8-w3",
+   "measured_on": "5df323a30bf0b5be95660f1f053d6735bb363d87",
    "class": "reused_after_mechanical_proof"
   },
   "aisef2/app/confine.py::argv": {
@@ -1806,8 +1862,8 @@
    "class": "reused_after_mechanical_proof"
   },
   "aisef2/app/confine.py::measure": {
-   "worker": "c6-w5",
-   "measured_on": "a770fbbfda20824f72bc2a9bcb29b47e44512d6a",
+   "worker": "c8-w3",
+   "measured_on": "5df323a30bf0b5be95660f1f053d6735bb363d87",
    "class": "reused_after_mechanical_proof"
   },
   "aisef2/app/confine.py::namespaces": {
@@ -11255,7 +11311,8 @@
    "measured_on": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
    "target": "aisef2/app/confine.py::_mounts",
    "why": [
-    "the target file changed since it was measured"
+    "the target file changed since it was measured",
+    "kill tests changed: tests/v2/test_v21_r3_conf_policy.py"
    ]
   },
   {
@@ -11935,7 +11992,8 @@
    "measured_on": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
    "target": "aisef2/app/confine.py::PSEUDO",
    "why": [
-    "the target file changed since it was measured"
+    "the target file changed since it was measured",
+    "kill tests changed: tests/v2/test_v21_r3_conf_policy.py"
    ]
   },
   {
@@ -12385,7 +12443,8 @@
    "target": "aisef2/app/confine.py::_judge",
    "why": [
     "the target file changed since it was measured",
-    "its kill set is not the current one"
+    "its kill set is not the current one",
+    "kill tests changed: tests/v2/test_v21_r3_conf_policy.py"
    ]
   },
   {
@@ -12394,7 +12453,8 @@
    "target": "aisef2/app/confine.py::_probe",
    "why": [
     "the target file changed since it was measured",
-    "its kill set is not the current one"
+    "its kill set is not the current one",
+    "kill tests changed: tests/v2/test_v21_r3_conf_policy.py"
    ]
   },
   {
@@ -13074,7 +13134,8 @@
    "measured_on": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
    "target": "aisef2/app/confine.py::_DEV",
    "why": [
-    "the target file changed since it was measured"
+    "the target file changed since it was measured",
+    "kill tests changed: tests/v2/test_v21_r3_conf_policy.py"
    ]
   },
   {
@@ -13098,7 +13159,8 @@
    "measured_on": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
    "target": "aisef2/app/confine.py::measure",
    "why": [
-    "the target file changed since it was measured"
+    "the target file changed since it was measured",
+    "kill tests changed: tests/v2/test_v21_r3_conf_policy.py"
    ]
   },
   {
@@ -13755,7 +13817,8 @@
    "measured_on": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
    "target": "aisef2/app/confine.py::DEVICES",
    "why": [
-    "the target file changed since it was measured"
+    "the target file changed since it was measured",
+    "kill tests changed: tests/v2/test_v21_r3_conf_policy.py"
    ]
   },
   {
@@ -13787,7 +13850,8 @@
    "measured_on": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
    "target": "aisef2/app/confine.py::_PEER",
    "why": [
-    "the target file changed since it was measured"
+    "the target file changed since it was measured",
+    "kill tests changed: tests/v2/test_v21_r3_conf_policy.py"
    ]
   },
   {
@@ -13795,7 +13859,8 @@
    "measured_on": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
    "target": "aisef2/app/confine.py::_device_roots",
    "why": [
-    "the target file changed since it was measured"
+    "the target file changed since it was measured",
+    "kill tests changed: tests/v2/test_v21_r3_conf_policy.py"
    ]
   },
   {
@@ -13803,7 +13868,8 @@
    "measured_on": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
    "target": "aisef2/app/confine.py::_host_mounts",
    "why": [
-    "the target file changed since it was measured"
+    "the target file changed since it was measured",
+    "kill tests changed: tests/v2/test_v21_r3_conf_policy.py"
    ]
   },
   {
@@ -13811,7 +13877,8 @@
    "measured_on": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
    "target": "aisef2/app/confine.py::_owned",
    "why": [
-    "the target file changed since it was measured"
+    "the target file changed since it was measured",
+    "kill tests changed: tests/v2/test_v21_r3_conf_policy.py"
    ]
   },
   {
@@ -13827,7 +13894,8 @@
    "measured_on": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
    "target": "aisef2/app/confine.py::_writes",
    "why": [
-    "the target file changed since it was measured"
+    "the target file changed since it was measured",
+    "kill tests changed: tests/v2/test_v21_r3_conf_policy.py"
    ]
   },
   {
@@ -14457,9 +14525,50 @@
   {
    "worker": "c6-w2",
    "measured_on": "a770fbbfda20824f72bc2a9bcb29b47e44512d6a",
+   "target": "aisef2/app/confine.py::PSEUDO",
+   "why": [
+    "kill tests changed: tests/v2/test_v21_r3_conf_policy.py"
+   ]
+  },
+  {
+   "worker": "c6-w2",
+   "measured_on": "a770fbbfda20824f72bc2a9bcb29b47e44512d6a",
+   "target": "aisef2/app/confine.py::_DEV",
+   "why": [
+    "kill tests changed: tests/v2/test_v21_r3_conf_policy.py"
+   ]
+  },
+  {
+   "worker": "c6-w2",
+   "measured_on": "a770fbbfda20824f72bc2a9bcb29b47e44512d6a",
+   "target": "aisef2/app/confine.py::_device_roots",
+   "why": [
+    "kill tests changed: tests/v2/test_v21_r3_conf_policy.py"
+   ]
+  },
+  {
+   "worker": "c6-w2",
+   "measured_on": "a770fbbfda20824f72bc2a9bcb29b47e44512d6a",
+   "target": "aisef2/app/confine.py::_host_mounts",
+   "why": [
+    "kill tests changed: tests/v2/test_v21_r3_conf_policy.py"
+   ]
+  },
+  {
+   "worker": "c6-w2",
+   "measured_on": "a770fbbfda20824f72bc2a9bcb29b47e44512d6a",
+   "target": "aisef2/app/confine.py::_owned",
+   "why": [
+    "kill tests changed: tests/v2/test_v21_r3_conf_policy.py"
+   ]
+  },
+  {
+   "worker": "c6-w2",
+   "measured_on": "a770fbbfda20824f72bc2a9bcb29b47e44512d6a",
    "target": "aisef2/app/confine.py::_probe",
    "why": [
-    "its kill set is not the current one"
+    "its kill set is not the current one",
+    "kill tests changed: tests/v2/test_v21_r3_conf_policy.py"
    ]
   },
   {
@@ -14473,10 +14582,66 @@
   {
    "worker": "c6-w4",
    "measured_on": "a770fbbfda20824f72bc2a9bcb29b47e44512d6a",
+   "target": "aisef2/app/confine.py::DEVICES",
+   "why": [
+    "kill tests changed: tests/v2/test_v21_r3_conf_policy.py"
+   ]
+  },
+  {
+   "worker": "c6-w4",
+   "measured_on": "a770fbbfda20824f72bc2a9bcb29b47e44512d6a",
+   "target": "aisef2/app/confine.py::_PEER",
+   "why": [
+    "kill tests changed: tests/v2/test_v21_r3_conf_policy.py"
+   ]
+  },
+  {
+   "worker": "c6-w4",
+   "measured_on": "a770fbbfda20824f72bc2a9bcb29b47e44512d6a",
    "target": "aisef2/app/confine.py::_judge",
    "why": [
     "its kill set is not the current one",
-    "kill tests changed: tests/v2/test_v21_r3_judge_not_run.py"
+    "kill tests changed: tests/v2/test_v21_r3_conf_policy.py, tests/v2/test_v21_r3_judge_not_run.py"
+   ]
+  },
+  {
+   "worker": "c6-w4",
+   "measured_on": "a770fbbfda20824f72bc2a9bcb29b47e44512d6a",
+   "target": "aisef2/app/confine.py::_mounts",
+   "why": [
+    "kill tests changed: tests/v2/test_v21_r3_conf_policy.py"
+   ]
+  },
+  {
+   "worker": "c6-w4",
+   "measured_on": "a770fbbfda20824f72bc2a9bcb29b47e44512d6a",
+   "target": "aisef2/app/confine.py::_writes",
+   "why": [
+    "kill tests changed: tests/v2/test_v21_r3_conf_policy.py"
+   ]
+  },
+  {
+   "worker": "c6-w5",
+   "measured_on": "a770fbbfda20824f72bc2a9bcb29b47e44512d6a",
+   "target": "aisef2/app/confine.py::measure",
+   "why": [
+    "kill tests changed: tests/v2/test_v21_r3_conf_policy.py"
+   ]
+  },
+  {
+   "worker": "c7-w1",
+   "measured_on": "853da4add9e2a23d32d3e7a6f43dbd0c7a698f4e",
+   "target": "aisef2/app/confine.py::_probe",
+   "why": [
+    "kill tests changed: tests/v2/test_v21_r3_conf_policy.py, tests/v2/test_v21_r4_probe_record.py"
+   ]
+  },
+  {
+   "worker": "c7-w2",
+   "measured_on": "853da4add9e2a23d32d3e7a6f43dbd0c7a698f4e",
+   "target": "aisef2/app/confine.py::_judge",
+   "why": [
+    "kill tests changed: tests/v2/test_v21_r3_conf_policy.py, tests/v2/test_v21_r4_probe_record.py"
    ]
   },
   {
