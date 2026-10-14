@@ -1,0 +1,3 @@
+[1/2] PASS    0.5s hits={'confine._judge:status-none': 14, 'confine._sections:no-status': 3} tests/v2/test_v21_r3_judge_not_run.py
+[2/2] PASS    0.62s hits={'confine._judge:status-none': 2, 'confine._sections:no-status': 1} tests/v2/test_v21_r4_probe_record.py
+2/2 kill files measured in 11.27s; controls [True, True, True, True] -> /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c7/trace/trace.json
