@@ -17,7 +17,7 @@ B-08, B-09, B-10), [STATUS.md](STATUS.md) (phát hiện → sửa, theo từng d
 
 | Trục | Trạng thái | Căn cứ |
 |---|---|---|
-| Mutation B-03 | bản ghi V2.1: 528 target, 13.581 mutant, **0 mutant chưa quyết**; kết luận ghi ở `MUTATION-SUMMARY.json` | §0.3 |
+| Mutation B-03 | bản ghi V2.1: 528 target, 13.581 mutant, **0 mutant chưa quyết**; `MUTATION_VERDICT` **PASS** (`MUTATION-SUMMARY.json`, `v21_mutation_record.py --check` PASS) | §0.3 |
 | Tích hợp có cách ly (`aisef run` thật, mô hình kịch bản) | **đạt** ở M4 trên Linux guest | §0.4, `closure-evidence/v2/v2.1/e2e-linux/` |
 | Hiệu quả / chất lượng với mô hình thật | **chưa đo** (không lượt live; không gọi provider trả tiền) | §0.6, §0.8 |
 | Sẵn sàng phát hành 2.1 | **chưa** | §0.8 |
