@@ -381,7 +381,7 @@ def _execution_order() -> Checker:
     derives, byte for byte (validation/v2/execution_order.py --check). Known bad: the committed table with its rule
     edited — a table that no longer is the record's derivation."""
     eo = _load("aisef_v21_execution_order", V2 / "execution_order.py")
-    table = ROOT / "closure-evidence/v2/v2.1/EXECUTION-ORDER-7.json"   # campaign 6's (-6 is campaign 5's: the null mutants of confine.py and process_range.py differ); -3, -4, -5 and the unnumbered one are history
+    table = ROOT / "closure-evidence/v2/v2.1/EXECUTION-ORDER-8.json"   # campaign 7's (one new pair over -7); -7 is campaign 6's, -6 campaign 5's; -3, -4, -5 and the unnumbered one are history
 
     def bad(fx):
         with tempfile.TemporaryDirectory() as t:
