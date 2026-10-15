@@ -46,7 +46,8 @@ and every superseded child, whose preflight may have spent). A continuation of a
 no paid work unless the operator accepts it by name (`--accept-unaccounted`), and the lineage's known spend counts
 against the run's ceilings (continuing never resets a budget). Evidence the system will not let `account_of` look at — a
 run directory with no search permission, a `sessions` that is a link into a directory that cannot be traversed or is a
-directory that cannot be listed — is unknown spend, listed: never raised out of it, never a 0 shown as known. What is
+directory that cannot be listed, a journal that is there and cannot be read (what it recorded is the provider
+requests) — is unknown spend, listed: never raised out of it, never a 0 shown as known. What is
 genuinely not there (no sessions directory, no ledger, no run directory) is not unknown: it is what a run that spent
 nothing there looks like.
 
@@ -457,6 +458,13 @@ def account_of(run_dir: pathlib.Path) -> dict:
                  "unaccounted": [f"{run_dir.name}: a session's event stream does not read ({type(e).__name__}): what "
                                  "the sessions spent is unknown"]}
     unaccounted = list(spent["unaccounted"]) + [f"preflight request {n} sent and never answered" for n in pre.get("unaccounted") or []]
+    if got is None:     # no journal that reconstructs: not there is a run that spent nothing there; there and unread is unknown
+        state, why = child_evidence(run_dir)
+        # a link to nothing or a file in a directory's place is what `_look` has always called not there (nothing was
+        # spent THERE): for a claim's child it is damaged evidence of a beginning, for spend it is no journal
+        if state == UNREAD and _in_the_way(run_dir) is None:
+            unaccounted.append(f"{run_dir.name}: its journal evidence is there and cannot be read ({why}): the provider "
+                               "requests it recorded are unknown spend")
     logs = [p.name for p in sessions.glob("*.jsonl")] if os.path.isdir(sessions) else []
     for r in requests:
         if r.seq in answered:
