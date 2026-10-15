@@ -27,7 +27,7 @@ Kết quả `VERIFIED` với `--expect-anchor` chỉ có nghĩa xác thực khi 
 | sửa thư mục run sau lượt chạy (đồng nghiệp, script, đồng bộ hỏng) | có | **không** | REFUTED — đo: `AnchorThreatModel.test_an_attacker_who_cannot_write_the_store_is_refuted` |
 | cùng quyền với nơi giữ anchor (sửa cả hai) | có | **có** | VERIFIED — **không phát hiện được**; đo: `test_the_limit_an_attacker_who_can_write_the_store_too_is_not_detected` |
 | không có anchor | có | — | chỉ chứng minh *nhất quán*, không chứng minh *xác thực* |
-| mã ứng viên khai sai về chính nó (PM-5: mã thoát, giá trị trả về) | **không** (không sửa thư mục nào) | không | VERIFIED — **không phát hiện được**; đây không phải việc của anchor (mục dưới) |
+| mã ứng viên khai sai về chính nó (PM-5: mã thoát, giá trị trả về) | **không cần** (chỉ khai sai đáp án, không sửa thư mục nào) | không | VERIFIED — **không phát hiện được**; đây không phải việc của anchor (mục dưới) |
 
 "Ngoài thư mục run" **không** đồng nghĩa "ngoài quyền kiểm soát của developer". Khi không có cách ly, developer agent và mã
 test chạy dưới chính user của người vận hành và ghi được mọi thứ user đó ghi được, kể cả một tệp anchor trong HOME. Cách ly
@@ -38,8 +38,9 @@ chính user của người vận hành sau lượt chạy.
 
 `aisef bundle continue … --expect-anchor A` áp luật của `--verify --expect-anchor` lên continuation: anchor của manifest
 mà run đã viết phải bằng `A`, và manifest phải bằng những gì thư mục run đang giữ (`EVIDENCE_MISMATCH` nếu không;
-`EVIDENCE_MISSING` nếu run không có `EVIDENCE.json`); việc đó được kiểm **trước** khi đọc gì khác của run, và báo cáo ghi
-`anchor_checked`. Không có `A`, continuation chỉ chứng minh *nhất quán* (journal đọc được, khớp digest và độ dài mà
+`EVIDENCE_MISSING` nếu run không có `EVIDENCE.json`); việc đó được kiểm **trước** khi đọc `RUN.json`, journal và manifest của run (sau khi liệt kê các claim
+`CONTINUED-BY*.json` của nó và đọc bằng chứng của child: một từ chối của lần đọc ấy, hoặc một child đã `BEGUN`, được báo
+trước khi anchor được so), và báo cáo ghi `anchor_checked`. Không có `A`, continuation chỉ chứng minh *nhất quán* (journal đọc được, khớp digest và độ dài mà
 `RUN.json` nêu, dựng lại được, qua các projection của writer của kernel) — `anchor_checked: false` — và **không** đối
 chiếu `EVIDENCE.json` với thư mục dù nó có đó (backlog V21-54). `A` nhận một *giá trị*, như `--verify`: nó không bao giờ
 được đọc từ thư mục run.
@@ -60,8 +61,9 @@ và journal ghi `COMMIT`; người dùng cuối chạy sản phẩm thì gặp t
 (không giữ mã thoát mà chủ thể đã khai), nên anchor, journal và verify đều khớp. Một anchor đúng chứng minh bản ghi không
 bị sửa sau lượt chạy; nó **không** chứng minh lượt chạy đã đo đúng sản phẩm.
 
-**Tần suất: chưa đo.** 0 trường hợp quan sát được trong 3 phiên developer của attempt 4 (đọc nguồn probe và scratch của
-probe, không đổi gì: `DEVELOPER-CONFINEMENT-GAP-001` mục 1, 4–7) và trong 4 phiên developer của canary tier 2 và 2b
+**Tần suất: chưa đo.** 0 trường hợp quan sát được trong 3 phiên developer của attempt 4 (chạm tới tài liệu của probe — một đọc
+`process_effect.py`, một đọc scratch (`request.json`, `protocol.log`), hai tìm probe trên máy — và không phiên nào đổi gì:
+`DEVELOPER-CONFINEMENT-GAP-001` mục 1, 4, 5 và 7) và trong 4 phiên developer của canary tier 2 và 2b
 (1 + 3; 0 dòng nhắc `aisef2/probe`, `OPS`, `request.json`, `protocol.log`). N nhỏ, workload tầm thường: không phải bằng
 chứng vắng mặt.
 

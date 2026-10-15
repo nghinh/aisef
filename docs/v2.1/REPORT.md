@@ -21,7 +21,7 @@ B-08, B-09, B-10), [STATUS.md](STATUS.md) (phát hiện → sửa, theo từng d
 | Trục | Trạng thái | Căn cứ |
 |---|---|---|
 | Mutation B-03 | bản ghi V2.1: 528 target, 13.581 mutant, **0 mutant chưa quyết**; `MUTATION_VERDICT` **PASS** (`MUTATION-SUMMARY.json`, `v21_mutation_record.py --check` PASS) — đo trên cây `aisef2/` `1d4f0156…`, **đã đổi sau đó** (§0.9) | §0.3 |
-| Tích hợp có cách ly (`aisef run` thật, mô hình kịch bản) | **đạt** ở M4 trên Linux guest | §0.4, `closure-evidence/v2/v2.1/e2e-linux/` |
+| Tích hợp có cách ly (`aisef run` thật, mô hình kịch bản) | **đạt** ở M4 trên Linux guest | §0.4, `closure-evidence/v2/v2.1/e2e-linux/` (cây `427afeec…`) và `…/e2e-linux-final/` (cây `1d4f0156…`) |
 | Hiệu quả / chất lượng với mô hình thật | **chưa đo** (ba lượt canary tầm thường chỉ cho thấy đường chạy) | §0.6, §0.8, §0.10 |
 | Sẵn sàng phát hành 2.1 | **chưa** | §0.8 |
 
@@ -118,13 +118,16 @@ xoá nghi ngờ bằng phép đo ở HEAD).
 | `ProcessRange.release()` | sửa + test điều phối luồng | mutation (23 target ở đợt 6) + test | — | — |
 | Ranh giới `--verify` và `no_progress` | sửa | 89 journal + smoke 2.0.0: 0 từ chối sai | journal format 4 (chưa có) | — |
 | Reproducer đầy đủ trong artifact | thiết kế + sửa | 12.000 finding đối kháng; thật | một lượt OCR với mô hình thật | ngân sách B-09 |
-| Bản ghi phái sinh 2.1 | sinh đúng thứ tự trên cây cuối (§0.5b) | công cụ tự kiểm từng cái | — | — |
-| Suite đầy đủ | chạy trên commit đã định (§5) | hermetic, `env -i`, không có `opencode` | — | — |
+| Bản ghi phái sinh 2.1 | sinh đúng thứ tự trên cây cuối (§0.5b) | công cụ tự kiểm từng cái | cây sau cửa sổ probe (§0.9): chưa tái sinh | tái sinh một lần, theo thứ tự phụ thuộc, sau hiệu chuẩn (§0.9) |
+| Suite đầy đủ | chạy trên commit đã định (§5) | hermetic, `env -i`, không có `opencode` | cây sau cửa sổ probe (§0.9, §5): chưa chạy; trong guest Linux mới 84/405 module | chạy trên commit đã định, sau hiệu chuẩn |
 | Phát hiện module probe | phân loại PM-1…13; **sửa trên nhánh ứng viên** (§0.9) | reproducer đo được, kỹ sư thứ hai chạy lại; test đỏ trước / xanh sau của từng làn | hiệu chuẩn lại 19 hàng, mutation, suite đầy đủ cho cây đã đổi | hiệu chuẩn một lần ở cuối cửa sổ; quyết định mở: backlog V21-54 … V21-74 |
 | OCR với mô hình thật; chiến dịch đối chứng (E2) | — | — | **chưa đo** | B-09 |
 ### 0.4 Lượt `aisef run` thật trong sandbox Linux (mô hình kịch bản; chứng minh **tích hợp có cách ly**, không chứng minh hiệu quả với mô hình thật)
 
-Tài liệu và bằng chứng: [decisions/B03-R3-E2E.md](decisions/B03-R3-E2E.md), `closure-evidence/v2/v2.1/e2e-linux/`.
+Tài liệu và bằng chứng: [decisions/B03-R3-E2E.md](decisions/B03-R3-E2E.md), `closure-evidence/v2/v2.1/e2e-linux/`. Bảng dưới đây
+là của lượt đó (2026-10-13), chạy trên `9f336fb` (`aisef2/` `427afeec…`). Lượt chạy lại trên cây cuối `1d4f0156…` (commit
+`2d01fe4`, 2026-10-15; hai tệp khác `427afeec…`: `confine._sections`/`_judge` và `process_range._Posix.abort`) nằm ở
+`closure-evidence/v2/v2.1/e2e-linux-final/`: X1 và hardened đạt, cùng kịch bản và kiểm tra, mọi kết quả giống lượt đầu.
 
 | Mục | Giá trị |
 |---|---|
@@ -183,14 +186,14 @@ của chính nó) và trong báo cáo gửi chủ dự án.
 ### 0.6 Trạng thái từng cải tiến học từ OpenResearch, open-code-review, MiMo-Code (tách: đã tích hợp / đã kiểm chứng / lợi ích chưa đo)
 
 Từng hàng nguồn → commit → test (88 hàng, kể cả hàng bị từ chối): [TRACEABILITY.md](TRACEABILITY.md). Dưới đây là phần cô
-đọng theo từng cải tiến. "Kiểm chứng" nói **bằng gì**; chưa mục nào đạt M5 (provider thật), nên cột cuối luôn là
-"chưa đo".
+đọng theo từng cải tiến. "Kiểm chứng" nói **bằng gì**; chưa cải tiến nào có số đo lợi ích với mô hình thật (ba lượt canary, §0.10,
+chỉ chạy đường chạy trên workload tầm thường), nên cột cuối là "chưa đo" (trừ chi phí: một ước tính).
 
 | Nguồn | Cải tiến | Tích hợp vào `aisef run` | Kiểm chứng (bằng gì, mức) | Lợi ích với mô hình thật |
 |---|---|---|---|---|
 | open-code-review | bộ chuyển OCR có phiên bản; finding chỉ chặn khi AISEF tái hiện **và** contract đã duyệt neo kỳ vọng; thiếu manifest ⇒ INDETERMINATE | có (`review.finder: "ocr"`, **mặc định tắt**; từ chối khi dùng chung cách ly) | mutation; `test_v21_review*`; CLI thật + nhị phân v1.12.12 (sha256 khớp pin) với mô hình kịch bản (M4); bằng chứng cho các lỗi tìm được ở vòng 3 (artifact reproducer, tên artifact, bí mật) | **chưa đo**: chất lượng/độ phủ finding với mô hình thật; 4/5 lỗi lịch sử neo được, lỗi thứ năm vẫn lọt theo luật neo |
 | open-code-review + MiMo-Code | nối tiếp từ journal (`bundle continue`, `run --parent`), claim theo thế hệ, đối soát git | có | mutation; SIGKILL thật ở 13 điểm; CLI thật (M4); bắt được một lỗi thật (`b72e51e`) | **chưa đo**; resume tại chỗ **không làm** (cần format journal mới) |
-| open-code-review + MiMo-Code | sổ chi phí, "không biết ≠ 0", `no_progress` | có; `no_progress` **chỉ báo cáo**, không chặn | mutation; `test_v21_continue_usage`; vòng 3: miền = mọi journal projection chấp nhận, ranh giới `--verify` có tên (M3–M4) | **chưa đo**: giá thật |
+| open-code-review + MiMo-Code | sổ chi phí, "không biết ≠ 0", `no_progress` | có; `no_progress` **chỉ báo cáo**, không chặn | mutation; `test_v21_continue_usage`; vòng 3: miền = mọi journal projection chấp nhận, ranh giới `--verify` có tên (M3–M4) | ước tính ≈ 0,599 USD cho ba lượt canary (§0.10; telemetry × bảng giá công bố, không phải hóa đơn); giá thật: **chưa đối chiếu** |
 | MiMo-Code | gói ngữ cảnh do controller dựng cho lượt thử lại — **không** phải checkpoint (P-5.3a vẫn **MỞ**) | có, trong một run | mutation; đo trên 16 lượt thử lại đã ghi; CLI thật (M4) | **chưa đo**: hiệu quả sửa lỗi (cần lượt trả tiền, B-09) |
 | OpenSandbox | cách ly Linux tối thiểu (bwrap), opt-in | opt-in; **một lượt `aisef run` thật có cách ly đã chạy trong Linux guest** (mô hình kịch bản, §0.4) | mutation + guest (M4) + e2e (M4) | **chưa đo**: ranh giới với phiên của mô hình thật; mạng của phiên không cách ly |
 | OpenResearch | harness thí nghiệm đối chứng: manifest niêm phong, cặp một biến, evaluator ẩn | **không** thuộc đường sản phẩm (công cụ riêng) | `test_v21_experiment` (replay offline, M3) | chiến dịch đối chứng (E2) **chưa chạy**: ngân sách B-09 và sandbox cho evaluator ẩn |
@@ -211,8 +214,8 @@ Hồ sơ đầy đủ, mỗi mục có reproducer đo được và được mộ
 | | PM-3, PM-4 | `ast.parse` raise `RecursionError`/`MemoryError` trên tệp hợp lệ lồng sâu thoát khỏi `observe`/`run_probe`; chi tiết `x.py:None` |
 | | PM-6 (thấp) | `open(harness.log)` không bọc và NUL trong argv được nhận |
 | | PM-11 | tệp UTF-8 có BOM bị coi là `unparsable` dù CPython biên dịch được ⇒ một giới hạn của parser bị REFUTED và tính cho developer; `grep_count` bỏ sót khớp neo `^` ở dòng đầu |
-| **Quyết định của chủ dự án** | PM-5 | câu trả lời tiến trình chủ thể chuyển tiếp (mã thoát, giá trị) là lời khai của chính chủ thể: mã ứng viên đối kháng làm một sản phẩm hỏng thành SATISFIED (backlog V21-26 ghi "không có PASS giả": đã đo khác) |
-| | PM-7 | `EXECUTION_DIGEST` không phủ `process_range.py`, `range_anchor.py`, `product/outcome.py`: sửa chúng giữ nguyên mọi hàng hiệu chuẩn "hợp lệ" — **đã có ví dụ sống** (`process_range.py` bị sửa hai lần ở vòng 3–4, 19/19 hàng vẫn hợp lệ) |
+| **Quyết định của chủ dự án** | PM-5 | câu trả lời tiến trình chủ thể chuyển tiếp (mã thoát, giá trị) là lời khai của chính chủ thể: mã ứng viên đối kháng làm một sản phẩm hỏng thành SATISFIED (backlog V21-26 từng ghi "không có PASS giả"; đã đo khác và được đính chính ở cửa sổ này) |
+| | PM-7 | `EXECUTION_DIGEST` không phủ `process_range.py`, `range_anchor.py`, `product/outcome.py`: sửa chúng giữ nguyên mọi hàng hiệu chuẩn "hợp lệ" — **đã có ví dụ sống** (`process_range.py` bị sửa ở 5 commit của vòng 3–4 — `6296315`, `0917ff7`, `5cd5cdd`, `9c7b080`, `257a233` — mà 19/19 hàng vẫn hợp lệ) |
 | | PM-8, PM-9, PM-13 | `Observation.detail` bị bỏ cho OBSERVED (đã ghi PROBE-DIAGNOSTIC-GAP-001); đếm 0 trên tập rỗng là SATISFIED; regex lồng lượng từ trong tiến trình kernel làm treo lượt |
 | **Giới hạn đã biết** | PM-10, PM-12 | chẩn đoán thẩm mỹ; `file_artifact` quyết định cửa sổ thời gian sau khi đọc (REFUTED trên một lần đọc hoàn tất khi máy tải cao) |
 
@@ -237,7 +240,7 @@ PM-8, PM-9, PM-13 theo quyết định của chủ dự án ngày 2026-10-15
 
 ### 0.9 Cửa sổ probe 2026-10-15 — nhánh ứng viên `v2.1/probe-window` (`2d01fe4` → `f69124c`)
 
-Cây `aisef2/` đổi từ `1d4f0156…` (cây của bản ghi mutation §0.3, của suite `45554e0`, của e2e §0.4 và của canary §0.10)
+Cây `aisef2/` đổi từ `1d4f0156…` (cây của bản ghi mutation §0.3, của suite `45554e0`, của e2e §0.4 — lượt `e2e-linux-final/`; lượt `e2e-linux/` đầu tiên chạy trên `427afeec…` — và của canary §0.10)
 sang `168ad7d4…`. Nguồn thay đổi: các mục lỗi PM-1, 2, 3, 4, 6, 11 và RV-1, RV-2 (§0.7); các quyết định của chủ dự án
 ngày 2026-10-15 cho PM-5, PM-7, PM-8, PM-9, PM-13 và họ lineage
 (`closure-evidence/v2/v2.1/round-5/OWNER-DECISIONS-2026-10-15.md` §B); cổng danh tính OCR; công cụ chạy suite trong guest
@@ -274,7 +277,7 @@ quyết định):
   phụ thuộc — kiểm cuối từng làn ghi các test này xanh ở nền;
 * e2e trong guest Linux, CI Windows/Linux, mô hình thật.
 
-Mọi bằng chứng gắn cây `1d4f0156…` (mutation 528 target, suite `45554e0`, e2e §0.4, kernel của canary §0.10) mô tả cây
+Mọi bằng chứng gắn cây `1d4f0156…` (mutation 528 target, suite `45554e0`, e2e §0.4 lượt `e2e-linux-final/`, kernel của canary §0.10) mô tả cây
 trước cửa sổ, không phải cây này. Các quyết định mở của cửa sổ là các hàng V21-54 … V21-74 của
 [V2.1-BACKLOG.md](../v2/V2.1-BACKLOG.md); tài liệu này không quyết thay chủ dự án.
 
@@ -301,7 +304,12 @@ Route `9router/ds/deepseek-v4-pro`, client `opencode` 1.18.31, macOS không các
 * **Phần trần còn lại không phải một phép chạy.** 5 − 0,599 ≈ 4,40 USD không cấp phép thí nghiệm nào thêm: không lượt trả
   tiền nào được phép ngoài bậc 1, 2, 2b; lượt kế cần chủ dự án duyệt tường minh. Chiến dịch 140 USD: chưa quyết.
 * **Preflight là 4 request** (3 chat probe + 1 listing), không phải 3 như hồ sơ B-09 viết; bậc 1 được đặt trần 4. (Hồ sơ
-  `docs/v2.1/decisions/B-09-CANARY-THEN-CAMPAIGN.md` và `EXPERIMENT-PLAN.md` chưa sửa: ngoài phạm vi tài liệu này.)
+  `docs/v2.1/decisions/B-09-CANARY-THEN-CAMPAIGN.md` và `EXPERIMENT-PLAN.md` chưa sửa: ngoài phạm vi tài liệu này. Sau
+  canary, các câu sau **không còn đúng**: `B-09-CANARY-THEN-CAMPAIGN.md:3` "Chưa có lượt chạy trả tiền nào", dòng 14 và 21
+  (preflight 3 request; `budget.provider_requests = 3`) và `EXPERIMENT-PLAN.md:3` "Không lượt chạy trả tiền nào đã được
+  thực hiện". `docs/v2.1/TRACEABILITY.md:491` và `docs/v2.1/research/TRACEABILITY.json:1163` ghim bằng kiểm cơ học câu "ĐỀ XUẤT, CHƯA DUYỆT" của
+  hồ sơ B-09 (mặc định đọc ở commit đầu của bảng, `c9c736f`; `--at HEAD` đọc ở cây hiện tại): đổi câu đó làm kiểm `--at HEAD`
+  đỏ cho tới khi bảng được cập nhật.)
 * **Cho thấy:** đường cài → seal → approve → lint → `run --check` → `run` → `--verify` đi hết với mô hình thật, client thật
   và preflight thật, trên workload tầm thường (≈ 0,14 USD và ≈ 70 s mỗi story). **Không cho thấy:** vòng sửa, một REFUTED
   thật, `--parent` sau lỗi, OCR, cách ly Linux với mô hình thật, hiệu quả so với agent trực tiếp, workload cỡ LedgerLock.
@@ -326,7 +334,10 @@ Checkout chính (`docs/v2`) có các tệp chưa commit trong `closure-evidence/
 Mức: **M1** đã triển khai module · **M2** đã tích hợp vào đường chạy sản phẩm (`aisef run` / `aisef bundle`, cùng một
 đường quyết định `_attempt`) · **M3** đã kiểm chứng offline (test; developer và provider giả) · **M4** đã kiểm chứng bằng
 công cụ thật (CLI `aisef` thật, nhị phân Open Code Review thật, git thật, SIGKILL thật — **mô hình vẫn là kịch bản**) ·
-**M5** đã kiểm chứng live (provider thật) · **M6** chưa làm hoặc thực sự bị chặn. Không mục nào đạt M5. "Mức đạt" là mức
+**M5** đã kiểm chứng live (provider thật) · **M6** chưa làm hoặc thực sự bị chặn. Không hàng nào của bảng này được ghi ở M5:
+ba lượt canary (§0.10) chạy đường seal → approve → lint → run → `--verify` với mô hình thật, client thật và preflight thật
+trên workload tầm thường, và chưa được tách thành mức đạt từng hàng (vòng sửa, OCR, `--parent` sau lỗi, cách ly Linux với
+mô hình thật: chưa). "Mức đạt" là mức
 cao nhất có bằng chứng; mục ở M3/M4 đã qua M1–M2, trừ E1 và A9–A10 (công cụ riêng, không thuộc `aisef run`).
 
 | # | Hạng mục | Mức đạt | Bằng chứng | Còn thiếu |
@@ -483,8 +494,9 @@ Cây của cửa sổ probe (§0.9, `f69124c`) **chưa có suite đầy đủ**:
 tập con) trên cây `git archive` trong một container (image cục bộ `aisef-sandbox-measure`, Python 3.14.8, bubblewrap
 0.12.0, `--network none`, profile X1). Đã đo 84 trên 405 module (1.354 trên 7.309 test) qua bốn lượt ≤ 10 phút: hai lệch
 Linux thật — 9 test đỏ ở `v2.test_v21_read_set` (recorder đếm đôi mỗi lần khởi chạy con trên Linux) và `MUT_SAFE_6` giả
-định host đông tiến trình — và một nhóm skip do thiếu node (backlog V21-73, V21-74). Đây **chưa** là suite đầy đủ trong
-guest; ước tính 50–65 phút (± 30 %) lúc máy rảnh.
+định host đông tiến trình — và một nhóm skip do thiếu node (backlog V21-73, V21-74). Các con số là của làn `linux-suite`; báo cáo kết quả của làn
+chưa được commit (công cụ và test giữ bộ chạy thì đã). Đây **chưa** là suite đầy đủ trong guest; ước tính 50–65 phút
+(± 30 %) từ các số đo lấy lúc host tải 49–123: một cận trên, chưa đo lúc máy rảnh.
 
 **Test đỏ:** từng test, kỳ vọng/thực tế, artifact, công cụ sinh và căn cứ phân loại: [RED-SUITE.md](RED-SUITE.md). Không
 test nào bị bỏ, nới hay đổi oracle.
@@ -534,7 +546,8 @@ sát — bị loại; công cụ giờ từ chối mọi đường ra trong repo
   cuối* cài sản phẩm và chạy thì gặp traceback hay mã thoát 1. Bản ghi probe chỉ giữ verdict (không giữ mã thoát mà chủ
   thể đã khai), nên không dấu vết nào nói điều đó; reviewer chạy cùng probe cho reproducer nên một finding thật cũng có
   thể không được CONFIRMED (đọc mã, chưa đo). *Tần suất: chưa đo* — 0 trường hợp quan sát được trong 3 phiên developer của
-  attempt 4 (đọc nguồn probe, không đổi gì) và trong 4 phiên developer của canary tier 2/2b (1 + 3); N nhỏ, workload tầm
+  attempt 4 (chạm tới tài liệu của probe: một đọc nguồn, một đọc scratch, hai tìm probe trên máy; không phiên nào đổi gì)
+  và trong 4 phiên developer của canary tier 2/2b (1 + 3); N nhỏ, workload tầm
   thường, **không phải bằng chứng vắng mặt**. Biện pháp thật nằm ở chỗ khác trong backlog: V21-02 (developer đọc được
   ngoài workspace), B-07 (sandbox V2-05), F (ranh giới cách ly), review độc lập. Câu công khai "mã đang bị kiểm không thể
   tự chế ra kết quả đạt" (`README.md:45`, `README.vi.md:45`, `docs/v2/USAGE.md:110`, `docs/v2/USAGE.vi.md:113`,
@@ -544,6 +557,11 @@ sát — bị loại; công cụ giờ từ chối mọi đường ra trong repo
   lần đầu vào; một parser-limit refusal vẫn retry được trong `limits.ENVIRONMENT` và lời khắc phục chưa tới developer; chuỗi
   regex của `cli_invocation` chạy trong tiến trình kernel không hạn chót; `probe-observations/` đọc được bởi mọi tiến trình
   của user (không cách ly) và chỉ che giá trị bí mật của chính run; OCR chưa có bằng chứng dựng lại.
+- **Phần dư của họ lineage** (USAGE-2.1.md §7; backlog V21-56): một `CR`/`LF` trong đường dẫn của thư mục chứa worktree
+  `wt-<story>` làm `reconcile` không báo mục `candidate` (báo cáo thiếu một dòng; kế hoạch không đổi vì story đã giao lấy từ
+  `story/commit` của journal); một dòng luồng phiên bắt đầu bằng `{`, không parse được và không phải dòng cuối, bị bỏ im lặng
+  (0/176 dòng trong 8 luồng phiên mô hình thật của canary tier 2 và 2b); một `CR` trong tên một mount point làm bảng mount
+  của host là `None` và mọi lượt có cách ly bị từ chối (fail-closed; do review đo trong guest, B03-R3-CLIENT, không đo lại).
 - Anchor chỉ có nghĩa khi bản tin cậy nằm ngoài tầm ghi của developer; hiện chưa có nơi đó.
 - Tiến trình con tách session thoát việc dọn dẹp.
 - Mất điện / OS sập không được mô phỏng; trên macOS `fsync` không ép cache của ổ.

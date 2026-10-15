@@ -68,7 +68,8 @@ báo kiểm tra `load` (`the plan names 1 spec(s) no approved contract compiles 
 bundle of an earlier release: `aisef bundle migrate``) và chính `migrate` từ chối (`refused: 1 obligation(s) name a spec no
 known release (2.0.0 or this one) compiles from the bundle's approved contracts: ['C-STDLIB-1']`) — đo trên `f69124c`
 với `calc-3-stories` niêm phong ở `2d01fe4`. Lối ra: niêm phong lại từ tệp soạn bằng
-`aisef bundle seal … --keep-approvals-from OLD` (đo: `approvals_kept: 4`, `approvals_dropped: []`).
+`aisef bundle seal … --keep-approvals-from OLD` (đo lúc viết, đầu ra không được lưu: `approvals_kept: 4`, `approvals_dropped: []`; tái lập bằng đúng lệnh này trên bundle
+`calc-3-stories` niêm phong ở `2d01fe4`).
 **Cửa sổ không di trú, không thu hồi và không duyệt lại một approval nào** (§8.7): approval buộc `requirement_hash` và
 `contract_hash` chứ không buộc probe (`product/approval.py::binding_problems`), nên `migrate` và `seal --keep-approvals-from`
 giữ chúng và `lint`/`explain` vẫn báo `approved` cho một contract mà quan sát của nó vừa đổi nghĩa. Bốn lớp contract bị ảnh
@@ -198,7 +199,9 @@ kill ngẫu nhiên (`test_v21_continue_integrity`):
   (Một lượt bị từ chối trước khi có journal — `RUN.json` không nêu journal — trên cây trước cửa sổ in `the journal does not
   reconstruct (TypeError: 'NoneType' object is not subscriptable)`; nay là `EVIDENCE_MISSING`.)
 - **`--expect-anchor A`** (`aisef bundle continue … --expect-anchor A`): anchor lượt chạy đã in, giữ ngoài thư mục run —
-  được kiểm **trước** khi đọc gì khác của run; báo cáo ghi `anchor_checked`. Không có nó, continuation chỉ chứng minh nhất
+  được kiểm **trước** khi đọc `RUN.json`, journal và manifest của run (sau khi liệt kê các claim `CONTINUED-BY*.json` của nó
+  và đọc bằng chứng của child: một từ chối của lần đọc ấy, hoặc một child đã `BEGUN`, được báo trước khi anchor được so);
+  báo cáo ghi `anchor_checked`. Không có nó, continuation chỉ chứng minh nhất
   quán, không phải xác thực (`anchor_checked: false`: thư mục run ghi được bởi chính user của người vận hành,
   [ANCHOR-THREAT-MODEL.md](ANCHOR-THREAT-MODEL.md)). Mặc định cũng **không** đối chiếu `EVIDENCE.json` với thư mục dù nó có
   đó (`--verify` thì có): chỉ `--expect-anchor` là đường xác thực (backlog V21-54).
@@ -251,9 +254,13 @@ mới, journal mới, bắt đầu từ commit cuối đã xác nhận — công
   của mệnh đề hay không (giới hạn đã đo bằng test).
 - Chưa có số đo hiệu quả so với agent chạy trực tiếp — xem [EXPERIMENT-PLAN.md](EXPERIMENT-PLAN.md).
 
-## 8. Cửa sổ probe 2026-10-15: thay đổi so với 2.0.0
+## 8. Cửa sổ probe 2026-10-15: thay đổi so với `2d01fe4` (2.1.0.dev0 trước cửa sổ)
 
-Nhánh ứng viên `v2.1/probe-window`, từ `2d01fe4` tới `f69124c` (cây `aisef2/` `1d4f0156…` → `168ad7d4…`). **Đã làm** = có
+Nhánh ứng viên `v2.1/probe-window`, từ `2d01fe4` tới `f69124c` (cây `aisef2/` `1d4f0156…` → `168ad7d4…`). **So với cái
+gì:** mỗi "trước cửa sổ" dưới đây là cây `2d01fe4`, **không** phải bản 2.0.0 đã phát hành. Nơi hành vi đó có cả ở `v2.0.0`
+(tag, `ca26313`; đối chiếu trên mã) mục ghi *2.0.0 và trước cửa sổ*; nơi `v2.0.0` chưa có mã (lớp `python_imports`, hằng
+`CAPABILITY_VERSION` và `EXECUTION_DIGEST`, `review_verify.py`, `review_ocr.py`, `lineage.py`, `bundle_cli.py`) mục ghi
+*chưa có ở 2.0.0*. **Đã làm** = có
 trong mã và test của nhánh (mỗi thay đổi hành vi có test đỏ trên mã trước cửa sổ, xanh sau, do làn tương ứng chạy). **Chưa có** =
 hiệu chuẩn lại 19 hàng (§1), đo mutation, suite đầy đủ, e2e trong guest Linux và CI Windows/Linux cho cây này (REPORT §0.9).
 Tên trạng thái dưới đây là tên trong mã: kết quả probe `SATISFIED`/`REFUTED`/`INDETERMINATE(PRECONDITION_ABSENT)`;
@@ -263,7 +270,8 @@ Tên trạng thái dưới đây là tên trong mã: kết quả probe `SATISFIE
 ### 8.1 `file_artifact`: `grep_count`, `python_imports`
 
 - **PM-9 — một lựa chọn không có tệp nào là chủ thể vắng** (chủ dự án duyệt phương án C ngày 2026-10-15;
-  `CAPABILITY_VERSION` 2 → 3). *2.0.0:* một đường dẫn **có** trong cây mà chọn ra 0 tệp (thư mục chỉ có `README.md` và
+  `CAPABILITY_VERSION` 2 → 3 so với `2d01fe4`; `v2.0.0` chưa có hằng này, danh tính khi đó là digest nguồn). *2.0.0 và trước
+  cửa sổ (với `grep_count`; `python_imports` chưa có ở 2.0.0, trước cửa sổ cùng hành vi):* một đường dẫn **có** trong cây mà chọn ra 0 tệp (thư mục chỉ có `README.md` và
   JSON, một tệp `.md` đơn lẻ, `suffixes: [".py"]` trên thư mục không có `.py`) cho `Executed(SATISFIED)` khi `matches: 0`
   (`REFUTED` khi `matches` ≥ 1), không dấu hiệu nào — `files: 0` chỉ lộ cho người gọi `observe` trực tiếp; một đường dẫn
   **không** có trong cây cho `INDETERMINATE(PRECONDITION_ABSENT)`. *Nay:* cả hai là chủ thể vắng. Quan sát là
@@ -276,7 +284,7 @@ Tên trạng thái dưới đây là tên trong mã: kết quả probe `SATISFIE
   **Không đổi:** một tệp rỗng, tệp chỉ có BOM, tệp nhị phân đã được *chọn* vẫn là chủ thể. **Còn lại:** `grep_count` trên
   lựa chọn toàn tệp nhị phân (tệp `.py` có NUL: `files: 1`, `matches: 0`, `skipped_binary`) vẫn `SATISFIED`;
   `python_imports` trên cùng tệp là `REFUTED` (không phân tích được) — backlog V21-60. Spec/approval bị ảnh hưởng: §8.7.
-- **PM-13 — vòng khớp regex của `grep_count` có hạn chót** (chủ dự án duyệt phương án a). *2.0.0:* `pattern.search(line)`
+- **PM-13 — vòng khớp regex của `grep_count` có hạn chót** (chủ dự án duyệt phương án a). *2.0.0 và trước cửa sổ:* `pattern.search(line)`
   chạy trong chính tiến trình kernel, không hạn chót; một mẫu có lượng từ lồng trên một dòng dài (ví dụ `^(\w+\s?)*$` trên
   một dòng gồm chữ rồi `!`) làm `aisef run` đứng im — một lõi 100%, không dòng journal nào. Đo ở `becf3c0` (máy tải 10–16 nên
   số tuyệt đối bị thổi phồng; `within_s` = 10): 26 ký tự 5,9 s `SATISFIED`; 28 ký tự 24,5 s `REFUTED` (cửa sổ `within_s`
@@ -289,10 +297,13 @@ Tên trạng thái dưới đây là tên trong mã: kết quả probe `SATISFIE
   `within_s` vẫn quyết sau khi đọc). *Giới hạn:* (1) trần thật của một quan sát `grep_count` là
   `max(timeouts_s.probe, 30 s)` cộng dọn range, vì `ProcessRange.start` chờ tối đa 30 s cố định cho target báo đã chạy —
   một range chậm khởi động dừng ở `LAUNCH` (backlog V21-63); (2) đời sống của worker (≈ 25 ms trên máy đo) tính vào thời
-  gian đọc, nên một `within_s` dưới ≈ 0,1 s với cây nhỏ có thể lật so với 2.0.0 (chi phí sở hữu worker ≈ 0,1 s đã trừ khỏi
+  gian đọc, nên một `within_s` dưới ≈ 0,1 s với cây nhỏ có thể lật so với 2.0.0 và `2d01fe4` (chi phí sở hữu worker ≈ 0,1 s đã trừ khỏi
   cửa sổ; spec trong kho dùng 5 và 30 s); (3) bộ nhớ của worker ≈ 2,2 lần đầu vào, không có trần tổng đầu vào, chỉ
-  `FILE_CAP` 4 MiB mỗi tệp. Regex của luồng `cli_invocation` (`{"regex": r}`) **không** nằm trong vùng này.
-- **PM-3, PM-4 — giới hạn của parser là một từ chối có kiểu.** *2.0.0:* `ast.parse` raise `RecursionError`/`MemoryError`
+  `FILE_CAP` 4 MiB mỗi tệp. Các số đo ở (2) và (3) là của làn `file-artifact-2` trên một laptop đang tải ((1) đọc từ mã); báo cáo kết quả của
+  làn **chưa được commit** và `tests/v2/test_v21_fa_grep_worker.py` ghim hành vi, không ghim các con số (backlog V21-62,
+  V21-63). Regex của luồng `cli_invocation` (`{"regex": r}`) **không** nằm trong vùng này.
+- **PM-3, PM-4 — giới hạn của parser là một từ chối có kiểu.** *Chưa có ở 2.0.0 (không có lớp `python_imports`); trước cửa sổ:* `ast.parse`
+  raise `RecursionError`/`MemoryError`
   trên một tệp hợp lệ nhưng lồng sâu thoát khỏi `observe`/`run_probe` như một exception; detail của lỗi không nêu dòng
   ghi `x.py:None`. *Nay:* `python_imports` trả **UNRUNNABLE** (`PROBE_UNRUNNABLE`, owner `ENVIRONMENT`), không verdict,
   không đếm; `detail` mở bằng `'<tệp>': this interpreter's parser stopped (RecursionError|MemoryError: a nesting, stack
@@ -304,22 +315,25 @@ Tên trạng thái dưới đây là tên trong mã: kết quả probe `SATISFIE
   `PROBE_UNRUNNABLE` còn retry được trong `limits.ENVIRONMENT` và mỗi retry gọi lại developer (đo: giới hạn 1 → 2 lần gọi);
   và lời khắc phục không tới developer (`failure/observed.detail` chỉ là `proof of <tiêu chí>: PROBE_UNRUNNABLE`; thông
   điệp đầy đủ nằm ở `probe/evaluated` của journal).
-- **PM-11 — một BOM không phải nội dung.** *2.0.0:* tệp UTF-8 có BOM bị coi `unparsable` dù CPython biên dịch được ⇒
-  `REFUTED` tính cho developer; neo `^` ở dòng đầu bị lỡ. *Nay:* `python_imports` và `grep_count` bỏ một BOM UTF-8 đứng
+- **PM-11 — một BOM không phải nội dung.** *`python_imports`, trước cửa sổ (chưa có ở 2.0.0):* tệp UTF-8 có BOM bị coi
+  `unparsable` dù CPython biên dịch được ⇒ `REFUTED` tính cho developer. *`grep_count`, 2.0.0 và trước cửa sổ:* BOM còn là
+  U+FEFF ở đầu dòng 1 nên neo `^` ở dòng đầu bị lỡ (một nghĩa vụ `^from …`, `matches: 1`, thấy 0). *Nay:* `python_imports` và `grep_count` bỏ một BOM UTF-8 đứng
   đầu tệp (như CPython). Hai hệ quả, nêu để không ai tự phát hiện từ một verdict: (1) **không pattern `grep_count` nào
   thấy BOM đầu tệp** (không phải U+FEFF, không phải lớp ngoài ASCII) — muốn cấm BOM, nêu trên byte bằng `content`;
   (2) BOM đi kèm một coding cookie nói khác UTF-8 (hoặc codec không tồn tại) là syntax error như CPython: `unparsable`
-  `<tệp>:?`; một cookie không có BOM không được đọc (tệp không UTF-8 ⇒ `undecodable`, như trước).
+  `<tệp>:?`; một cookie không có BOM không được đọc (tệp không UTF-8 ⇒ `undecodable`, như trước). Verdict `grep_count` có thể
+  đổi trên một tệp có BOM: §8.7.
 
 ### 8.2 Probe chạy chủ thể: `cli_invocation`, `process_effect`, `python_callable_v2`
 
-- **PM-1 — module dưới thư mục không có `__init__.py`.** *2.0.0:* một module nằm dưới một thư mục không có
+- **PM-1 — module dưới thư mục không có `__init__.py`.** *2.0.0 và trước cửa sổ:* một module nằm dưới một thư mục không có
   `__init__.py` (namespace package) không bao giờ được định vị ⇒ `UNRUNNABLE` (`HARNESS_FAILED`; đo: 23 layout × 3 probe và
-  6 layout `__main__`). *Nay:* mỗi thành phần của tên chấm được tra bằng tên của riêng nó trong các vị trí của cha, ở mọi
+  6 layout `__main__`, bởi làn `effect-cli` trên mã trước cửa sổ; kết quả từng layout chưa được commit, reproducer ở
+  `decisions/B03-R3-PROBE-MODULE-FINDINGS.md`). *Nay:* mỗi thành phần của tên chấm được tra bằng tên của riêng nó trong các vị trí của cha, ở mọi
   độ sâu, như hệ thống import: có ⇒ quan sát bình thường; vắng ⇒ `SUBJECT_ABSENT`; một module chỉ có trong stdlib ⇒
   `SUBJECT_ABSENT` (`resolves only outside the revision`). Một thư mục dưới tên trùng module stdlib đã nạp (`queue`,
   `types`, `os`…): `REFUTED` bằng chính lần import của agent (`ModuleNotFoundError`), như CPython.
-- **PM-2 — bước `fault` đứng trước bước `subprocess`.** *2.0.0:* được nhận, nhưng lỗi chỉ được cài trong tiến trình của
+- **PM-2 — bước `fault` đứng trước bước `subprocess`.** *2.0.0 và trước cửa sổ:* được nhận, nhưng lỗi chỉ được cài trong tiến trình của
   chủ thể còn bước `subprocess` chạy một interpreter khác nên không bao giờ thấy nó (`fired: false`); kịch bản bị phán như
   chưa khai lỗi ⇒ một sản phẩm hỏng dưới lỗi vẫn `SATISFIED`. *Nay:* `FAULTED = (call, expect_raises)`; kịch bản
   `[fault, subprocess]` không có lớp ⇒ `INVALID_SPEC` tại admission (`aisef bundle lint`, kiểm tra 9:
@@ -351,14 +365,16 @@ Tên trạng thái dưới đây là tên trong mã: kết quả probe `SATISFIE
   (refused)`); một `streams` có phần tử không phải tên ⇒ vô nghĩa; một giá trị ứng viên trả về lồng sâu ở
   `python_callable_v2` ⇒ `REFUTED` (`unserializable`). *Còn khác nhau giữa các probe* (backlog V21-70): ở dải sát giới hạn
   đệ quy `process_effect` (từ ~500 tầng) và một dải hẹp của `python_callable_v2` (~990 tầng) trả `UNRUNNABLE` có kiểu
-  (`the harness raised RecursionError`), còn các độ sâu khác là `REFUTED`.
+  (`the harness raised RecursionError`), còn các độ sâu khác là `REFUTED` (đo của làn `review-contracts` trên Python 3.11.15;
+  báo cáo của làn chưa được commit).
 
 ### 8.3 Review
 
 - **RV-1 — giới hạn độ lồng của reproducer.** Một reproducer lồng container quá 63 tầng là một lý do có cấu trúc: `verify`
   `UNVERIFIABLE` (`the reproducer nests containers deeper than 63 levels: state it with a flatter stimulus and observable
   (no probe grammar needs more)`), anchor `UNANCHORED`, không chạy probe, không chặn; các finding khác của lượt vẫn được xét
-  và review `COMPLETED`. *2.0.0:* `RecursionError` thoát khỏi review ở ~3.000 tầng. Hành vi đổi có chủ đích: reproducer
+  và review `COMPLETED`. *Chưa có ở 2.0.0 (không có reproducer của review); trước cửa sổ:* `RecursionError` thoát khỏi review
+  ở ~3.000 tầng. Hành vi đổi có chủ đích: reproducer
   64…~980 tầng trước đây được probe chạy (dữ liệu thật lớn nhất trong kho: 8 tầng); chủ dự án chưa xác nhận con số 63
   (backlog V21-67). Văn bản trả lời của mô hình lồng quá độ sâu parser JSON được xử như mọi văn bản không parse được
   (0 finding, `COMPLETED`): một reply cực sâu làm mất cả lượt finding của review đó.
@@ -366,19 +382,23 @@ Tên trạng thái dưới đây là tên trong mã: kết quả probe `SATISFIE
   reproduce": thông điệp nay là `<probe> could not decide the stated behaviour (INDETERMINATE, <nguyên nhân>): neither
   confirmed nor ruled out`. Trạng thái vẫn là `NOT_REPRODUCED` (token giữ nguyên, backlog V21-66), `observed` và luật
   chặn không đổi: không block.
-- **Cổng danh tính OCR — tự khai khác bằng chứng dựng.** *Trước:* chỉ kiểm sha256 của binary. *Nay*, trước mọi lệnh
+- **Cổng danh tính OCR — tự khai khác bằng chứng dựng.** *Trước cửa sổ (OCR chưa có ở 2.0.0):* chỉ kiểm sha256 của binary. *Nay*, trước mọi lệnh
   review (cả `advisory` lẫn `fix-loop`): (1) `pinned` — đường dẫn tuyệt đối, đọc được, sha256 = pin; (2) `declared` — chạy
   `<exe> version` trong môi trường sạch (`PATH=/usr/bin:/bin`, HOME rỗng, không kế thừa gì, `OCR_NO_UPDATE=1`, tối đa
   15 s); dòng đầu phải là `open-code-review <version> (<commit>) <platform>` với version `v1.12.12` và commit (in dạng
-  ngắn) là tiền tố của `182898cf522da3d04157b422752d028417974e19`. Lệch ⇒ không lệnh review nào được chạy; thông điệp là
-  một trong:
+  ngắn) là tiền tố của `182898cf522da3d04157b422752d028417974e19`. Lệch ⇒ không lệnh review nào được chạy; thông điệp của
+  bước (2) là một trong:
 
   ```
   <exe>: declares itself <version> (<commit>), not the pinned v1.12.12 (182898c): no review command was run
   <exe>: `version` did not answer in time
   <exe>: `version` exited <N>
   <exe>: `version` printed no version line (first line '<…>')
+  <exe>: `version` could not be started (<ExcType>)
   ```
+
+  Bước (1) có ba thông điệp riêng, nêu trước `version`: `<exe>: the OCR binary is named by an absolute path, never looked up`,
+  `<exe>: cannot be read (<ExcType>)` và `<exe>: sha256 <12 hex>, not the pinned <12 hex>`.
 
   Mỗi thông điệp là một `CapabilityUnrunnable`, tức failure `CAPABILITY_UNRUNNABLE` (owner `ENVIRONMENT`, retry được trong
   `limits.ENVIRONMENT`) **ở cả hai `review.policy`**: khác với coverage chưa đủ — chỉ chặn dưới `fix-loop` —, kiểm sha256
@@ -398,7 +418,7 @@ Tên trạng thái dưới đây là tên trong mã: kết quả probe `SATISFIE
 
 ### 8.4 PM-8 — điều probe thấy, cho người vận hành
 
-*2.0.0:* bản ghi probe niêm phong, journal và mọi prompt chỉ nói `{behavior_verdict: REFUTED}`; bước, tệp:dòng và lớp
+*2.0.0 và trước cửa sổ:* bản ghi probe niêm phong, journal và mọi prompt chỉ nói `{behavior_verdict: REFUTED}`; bước, tệp:dòng và lớp
 ngoại lệ làm nên verdict chỉ có trong `Observation` (chủ dự án duyệt phương án B, chỉ cho người vận hành). *Nay:* mỗi lần
 đánh giá probe **đã thực thi** mà verdict không phải cái contract kỳ vọng (và không phải trạng thái đầu vào mà bảng định
 tuyến chờ ở parent: INTRODUCE ⇒ verdict xác định hoặc `PRECONDITION_ABSENT`; VERIFY ⇒ verdict xác định) để lại một tệp
@@ -430,8 +450,11 @@ tuyến chờ ở parent: INTRODUCE ⇒ verdict xác định hoặc `PRECONDITIO
 
 Xem §5: trạng thái `UNREAD`, mã `EVIDENCE_*`, `--expect-anchor`, `bundle continue` hợp lệ đúng như `--verify`, chi phí
 unknown cho journal không đọc được, `run --parent` từ chối thay vì traceback. Phạm vi: `child_state`/`claim`/`claims`,
-`bundle continue`, `account_of`; `lineage.events_of` không từ chối (nó trả "không có journal" cho journal bị từ chối, vì
-`child_state` dùng nó để kết luận "đã bắt đầu"), `repair` giữ nguyên. Hai thay đổi nằm ngoài văn bản chủ dự án duyệt và
+`bundle continue`, `account_of`; `lineage.events_of` không từ chối một journal mà các projection từ chối (nó chỉ dựng lại
+journal bằng `format3.reconstruct`, không qua projection nào; hai nơi gọi nó là `account_of` và `usage_lineage`, tức
+chi tiêu). Lý do ghi lúc duyệt, "`child_state` dùng nó để kết
+luận đã bắt đầu", không còn mô tả mã: `child_state` tự đọc journal trong `child_evidence`. Lý do còn lại là của `account_of`:
+nó cần thấy các request mà journal ghi (đọc mã, chưa đo). `repair` giữ nguyên. Hai thay đổi nằm ngoài văn bản chủ dự án duyệt và
 chờ xác nhận (backlog V21-55): `account_of` (commit `4d245f4`, lấy ra được bằng một `git revert`) và `RUN.json` không phải
 UTF-8 (từ "rơi xuống `RUN.started.json`" sang `EVIDENCE_MALFORMED`).
 
@@ -451,8 +474,9 @@ verdict hay kênh của nó, nhưng khai sai được về chính nó.
   **Người dùng cuối** cài sản phẩm và chạy thì gặp traceback hay mã thoát 1. Bản ghi probe chỉ giữ verdict — không có mã
   thoát mà chủ thể đã khai — nên người vận hành không thấy dấu vết nào. Reviewer chạy cùng probe cho reproducer, nên một
   finding thật cũng có thể không được `CONFIRMED` (đọc mã, chưa đo).
-- **Tần suất: chưa đo.** Quan sát được 0 trường hợp: trong 3 phiên developer của attempt 4 đọc nguồn probe (47.255 ký tự
-  của `process_effect.py`) và đọc scratch của probe, không phiên nào đổi gì (`DEVELOPER-CONFINEMENT-GAP-001` mục 1 và 4–7);
+- **Tần suất: chưa đo.** Quan sát được 0 trường hợp: 3 phiên developer của attempt 4 chạm tới tài liệu của probe — một đọc nguồn
+  (`process_effect.py`, 47.255 ký tự), một đọc scratch của probe (`request.json`, `protocol.log`), hai tìm probe trên máy
+  (một trong hai là phiên đọc scratch) — và không phiên nào đổi gì (`DEVELOPER-CONFINEMENT-GAP-001` mục 1, 4, 5 và 7);
   trong 4 phiên developer của canary tier 2 và 2b (1 + 3), 0 dòng nhắc `aisef2/probe`, `OPS`, `request.json` hay
   `protocol.log` (đếm bằng grep). N nhỏ, workload tầm thường: không phải bằng chứng vắng mặt.
 - **Biện pháp thật nằm ở chỗ khác:** không cho developer đọc probe và máy chủ (V21-02, B-07, F), review độc lập. Một thiết
@@ -465,7 +489,7 @@ verdict hay kênh của nó, nhưng khai sai được về chính nó.
 
 | Thay đổi | `CAPABILITY_VERSION` / digest | spec id | verdict có thể đổi | hiệu chuẩn |
 |---|---|---|---|---|
-| PM-9 (và PM-3/4/11/13 cùng tệp) | `file_artifact` 2 → 3 (`DIGEST` đổi) | đổi, một lần | có, ở lớp dưới đây | 4 hàng `file_artifact` |
+| PM-9 (và PM-3/4/11/13 cùng tệp) | `file_artifact` 2 → 3 (`DIGEST` đổi) | đổi, một lần | có, ở ba lớp dưới đây (PM-9; PM-11; PM-3/PM-13) | 4 hàng `file_artifact` |
 | PM-1, PM-2, PM-6, PM-7, họ RV-1 | giữ 1 (`DIGEST` không đổi); `EXECUTION_DIGEST` của 3 probe đổi (và của `file_artifact`, dòng trên) | không đổi | PM-2: tổ hợp bị từ chối; PM-1: layout trước `UNRUNNABLE` nay quan sát được | 15 hàng (cli 5, process_effect 3, python_callable_v2 7) |
 
 **Lớp contract mà verdict có thể đổi (PM-9):** contract `file_artifact` ở lớp `grep_count` hoặc `python_imports` mà đường
@@ -473,10 +497,22 @@ dẫn có thể chọn ra 0 tệp. Với `subject_absence: REQUIRES_SUBJECT`: `S
 đổi thành `INDETERMINATE(PRECONDITION_ABSENT)`. Với `ABSENCE_IS_DECIDABLE`: verdict giữ nguyên, chỉ nhãn quan sát đổi
 sang `SUBJECT_ABSENT`. Lớp `exists`/`content` không đổi.
 
+**Lớp thứ hai (PM-11, `grep_count`):** mẫu có neo đầu dòng (`^`, tác dụng ở dòng 1) hoặc nêu U+FEFF, trên một tệp được chọn
+mà byte đầu là BOM UTF-8. Trước cửa sổ (và ở 2.0.0) dòng 1 mang U+FEFF nên `^from …` không khớp ở dòng đó — một nghĩa vụ `matches: 1` thấy 0 và
+`REFUTED`; nay khớp. Ngược lại một mẫu cấm BOM (`matches: 0`) trước bắt được BOM, nay không bao giờ khớp (`SATISFIED`; muốn
+cấm BOM phải nêu trên byte, bằng `content`). Với `python_imports`: một tệp có BOM trước `REFUTED` (`unparsable`), nay được
+đếm. Trong kho, `BC-V22-S-10-a`, `S-10-b`, `S-10-c` và nhánh đầu của `S-12-a`, `S-12-b` có neo `^`; không spec, bản nháp
+hay tệp ví dụ nào nêu hoặc mang U+FEFF (đếm byte `EF BB BF` và `\ufeff` trong `calc-*`, `LEDGERLOCK-PROJECT.json` và bản
+nháp: 0). **Chưa đo:** tệp `.py` của LedgerLock có BOM hay không (cây đó không nằm trong kho).
+
+**Lớp thứ ba (PM-13, PM-3):** `grep_count` có vòng khớp chạy quá `timeouts_s.probe` (mẫu lồng lượng từ hoặc đầu vào lớn):
+trước cửa sổ là treo hoặc `REFUTED` muộn, nay `UNRUNNABLE`; `python_imports` trên tệp lồng sâu tới mức parser dừng: trước là
+một exception, nay `UNRUNNABLE`. Mẫu `grep` của LedgerLock không có lượng từ lồng nhau (đọc mẫu, chưa đo trên cây thật).
+
 | Nơi kho giữ | Gì | verdict có thể đổi | approval |
 |---|---|---|---|
-| `closure-evidence/v2/release/LEDGERLOCK-PROJECT.json` | bundle 2.0.0 của LedgerLock; 9 contract `file_artifact`: `BC-V22-S-10-a`, `S-12-a`, `S-12-b`, `S-12-c` (`grep_count`, `matches: 0`, `REQUIRES_SUBJECT`, `path:ledgerlock`, `.py`) thuộc lớp bị ảnh hưởng; `S-10-b`, `S-10-c` (một tệp, `matches: 1`) và `S-13-a/b/c` (`exists`) thì không | chỉ khi `ledgerlock/` không chọn ra `.py` nào (hôm nay có) | mang theo qua `migrate` theo `contract_hash`; **không** bị cửa sổ này thu hồi hay duyệt lại |
-| `closure-evidence/v2/v2.1/P5-PLAN-V2.2-PROPOSAL.json`, `closure-evidence/v2/cycle2/P5-PLAN-V2.2-PROPOSAL.json`, `closure-evidence/v2/v2.1/PLAN-V2.2-CORRECTION-1.json` | cùng 4 contract và 5 contract không bị ảnh hưởng của kế hoạch PLAN-V2.2 | như trên | `closure-evidence/v2/cycle2/P5-CONTRACT-APPROVALS.json`: 59 approval `human:owner` (2026-09-30); `binds` nêu `proposal_digest`, `plan_hash`, baseline và mỗi approval mang `spec_id` — các giá trị đó đổi khi spec id đổi; cửa sổ không dựng lại chúng |
+| `closure-evidence/v2/release/LEDGERLOCK-PROJECT.json` | bundle 2.0.0 của LedgerLock; 9 contract `file_artifact`: `BC-V22-S-10-a`, `S-12-a`, `S-12-b`, `S-12-c` (`grep_count`, `matches: 0`, `REQUIRES_SUBJECT`, `path:ledgerlock`, `.py`) thuộc lớp PM-9; `S-10-b`, `S-10-c` (một tệp, `matches: 1`) và `S-13-a/b/c` (`exists`) thì không thuộc lớp PM-9 | PM-9: chỉ khi `ledgerlock/` không chọn ra `.py` nào (hôm nay có). PM-11: `S-10-a/b/c`, `S-12-a/b` (neo `^`) chỉ khi một tệp `.py` được chọn có BOM đứng đầu (chưa đo) | mang theo qua `migrate` theo `contract_hash`; **không** bị cửa sổ này thu hồi hay duyệt lại |
+| `closure-evidence/v2/v2.1/P5-PLAN-V2.2-PROPOSAL.json`, `closure-evidence/v2/cycle2/P5-PLAN-V2.2-PROPOSAL.json`, `closure-evidence/v2/v2.1/PLAN-V2.2-CORRECTION-1.json` | cùng 4 contract và 5 contract không bị ảnh hưởng của kế hoạch PLAN-V2.2 | như trên | `closure-evidence/v2/cycle2/P5-CONTRACT-APPROVALS.json`: 59 approval `human:owner` (2026-09-30); `binds` nêu `proposal_digest`, `plan_hash`, baseline, bản ghi đề xuất và candidate: `proposal_digest` và `plan_hash` đổi khi spec id đổi (đề xuất và kế hoạch nêu 59 spec id PPS). `spec_id` của mỗi approval là mã tiêu chí `S-*`, không phải spec id PPS, và nằm ngoài bảy trường của digest approval, nên không đổi; cửa sổ không dựng lại chúng |
 | `aisef2/app/examples/calc-3-stories.json` | `BC-STDLIB`: `python_imports` trên `path:app`, `matches: 0`, `REQUIRES_SUBJECT` (ví dụ sống) | chỉ khi `app/` không còn `.py` (canary 2b chạy mẫu này trên lựa chọn không rỗng: không bị ảnh hưởng) | ví dụ không mang approval của chủ dự án |
 | `docs/v2.1/drafts/LEDGERLOCK-BC-V22-S-10-a-r2.DRAFT.json` | bản nháp r2 của `BC-V22-S-10-a`: hai contract `python_imports` `REQUIRES_SUBJECT`, `matches: 0` | như trên | bản nháp chưa duyệt (B-04) |
 
