@@ -156,12 +156,15 @@ from aisef2.product.spec import ProductProofSpec
 from aisef2.runtime.process_range import ProcessRange, RangeError
 
 PROBE_ID = "probe.file_artifact"
-#: The bytes this probe takes behaviour from, in dependency order, and no more (PM-7): the module, the protocol that turns
-#: an observation into a result (`classify_failure`, `run_probe`), the result types with the verdict over an absent
-#: subject (`product/outcome.py`) and the invariant-IX name gate `run_probe` answers InvalidSpec by
-#: (`product/contract.py`: a change to it changes a record). They are hashed into EXECUTION_DIGEST and nothing else
-#: reads this tuple: it grants no access and loads nothing (`_probe_digest` is its one reader).
-PROBE_SOURCES = ("product/contract.py", "product/outcome.py", "probe/protocol.py", "probe/file_artifact.py")
+#: The bytes this probe takes behaviour from, in dependency order, and no more (PM-7): the protocol that turns an
+#: observation into a result (`classify_failure`, `run_probe`), the result types with the verdict over an absent subject
+#: (`product/outcome.py`), the invariant-IX name gate `run_probe` answers InvalidSpec by (`product/contract.py`: a change
+#: to it changes a record), the owned process range the grep worker runs in (`runtime/process_range.py`, whose code runs
+#: in every observation of grep_count) with the anchor script it launches (`runtime/range_anchor.py`) -- the same files
+#: the three probes that run a subject declare -- and the module itself. They are hashed into EXECUTION_DIGEST and
+#: nothing else reads this tuple: it grants no access and loads nothing (`_probe_digest` is its one reader).
+PROBE_SOURCES = ("product/contract.py", "product/outcome.py", "probe/protocol.py", "runtime/process_range.py",
+                 "runtime/range_anchor.py", "probe/file_artifact.py")
 CLASSES = ("exists", "content", "grep_count", "python_imports")
 #: Each class's meaning of an expired observation window (§9.2): a read that did not complete is no observation.
 ON_DEADLINE = {"exists": BehaviorVerdict.REFUTED, "content": BehaviorVerdict.REFUTED,

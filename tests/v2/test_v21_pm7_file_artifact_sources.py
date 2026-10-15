@@ -20,7 +20,9 @@ Three things are pinned, each by measurement and not by a list copied from the m
 4. (PM-13) the probe now starts a worker through `aisef2.runtime.process_range`, which imports a good part of the kernel
    for its own types. Which of the modules held are only imported, and which have code that runs in an observation, is
    measured with a profile hook around `run_probe`, not argued: the only aisef2 module whose code runs there besides
-   PROBE_SOURCES is the process range — the ownership mechanism, a source of no other probe's digest either. The
+   the probe's own sources is none -- the process range, the ownership mechanism, IS a source (its code runs in every
+   observation of grep_count, as in the three probes that run a subject, and the anchor script it launches is the
+   one source no profile of this process can see). The
    scenarios measured are the observations the probe makes by its own branches: every class over a directory, an absent
    path, an empty selection, a refused locator, an unsupported pattern, a pattern over the cap, a file that is not UTF-8,
    a binary file, a file that does not parse and a pattern that does not finish (the worker stopped by its deadline).
@@ -48,6 +50,7 @@ if str(ROOT) not in sys.path:
 
 from aisef2.probe import file_artifact as fa  # noqa: E402
 from aisef2.probe.protocol import RevisionRef, run_probe  # noqa: E402
+from aisef2.runtime import process_range  # noqa: E402
 from tests.v2 import test_c2_file_artifact as base  # noqa: E402   (helpers only: its test classes are not imported)
 
 #: aisef2 modules the probe process holds that its behaviour is NOT taken from, and why. Anything else it holds must be
@@ -63,14 +66,6 @@ NOT_SOURCES = {
     "aisef2.errors": "exception types; no decision",
     "aisef2.product.spec": "the spec's data type: the probe reads its fields; none of its code runs in an observation "
                            "(its constructor runs in the caller, before the probe is given the spec)",
-    # PM-13: the worker of grep_count is started through the process range
-    "aisef2.runtime.process_range": "the controller's ownership mechanism (§17.1): it starts the worker in a session of "
-                                    "its own and empties it, graceful-first; it takes no part in what is observed (the "
-                                    "facts, the verdict, the result are this module's and protocol's). Its code RUNS in "
-                                    "an observation of grep_count (measured below) and is, like for cli_invocation, "
-                                    "python_callable_v2 and process_effect, which launch through it, not a source of "
-                                    "the digest: the mechanism has its own P4 tests and mutation targets, and a change "
-                                    "to it moves no observation of a file",
 }
 #: held only because the process range imports them (its `Residual` type from story_scope, `ResourceKind` from the
 #: journal), and they import the rest of the kernel for their own work. Each is held by the module(s) named, derived from
@@ -101,8 +96,9 @@ NOT_SOURCES.update({
            "a package: held as the parent of a submodule that is held") +
     "; none of its functions is called in an observation (measured, per call event of a profile hook)"
     for name, by in IMPORTED_ONLY.items()})
-#: not sources whose code runs in an observation, and why: the process range alone
-RAN_NOT_SOURCES = ("aisef2.runtime.process_range",)
+#: the one source no profile of this process can see run: the anchor script the process range launches as a process of
+#: its own (declared, as for the three probes that run a subject; test_v21_probe_sources)
+ANCHOR = "runtime/range_anchor.py"
 
 SCRIPT = r'''
 import json, os, pathlib, sys, tempfile
@@ -243,10 +239,12 @@ class Measured(unittest.TestCase):
         # never has a function called; the one not-source that runs is the ownership mechanism, named
         ran = set(self.found["ran"])
         sources = {module_of(rel) for rel in fa.PROBE_SOURCES}
-        self.assertEqual(ran - sources, set(RAN_NOT_SOURCES))
+        self.assertEqual(ran - sources, set(), "code of a module ran in an observation and is not a source")
         self.assertEqual(ran & set(IMPORTED_ONLY), set())
-        self.assertEqual(set(RAN_NOT_SOURCES) - set(NOT_SOURCES), set())            # said, with its reason
-        self.assertEqual(sources - ran, set(), "a declared source no observation runs: it decides nothing")
+        self.assertIn("aisef2.runtime.process_range", ran)
+        self.assertEqual(sources - ran - {module_of(ANCHOR)}, set(),
+                         "a declared source no observation runs: it decides nothing")
+        self.assertEqual(os.path.relpath(process_range.ANCHOR, ROOT / "aisef2").replace(os.sep, "/"), ANCHOR)
 
     def test_each_module_that_is_only_imported_is_held_by_the_modules_the_table_names(self):
         # the reason a module is held is its own and is checked against the source, not copied: a module imported by
@@ -273,7 +271,9 @@ class Measured(unittest.TestCase):
         for rel in fa.PROBE_SOURCES:
             with self.subTest(source=rel):
                 self.assertTrue((ROOT / "aisef2" / rel).is_file())
-                self.assertIn(module_of(rel), held)
+                if rel != ANCHOR:       # a script of a process of its own: not loaded here
+                    self.assertIn(module_of(rel), held)
+        self.assertIn(ANCHOR, fa.PROBE_SOURCES)
         self.assertEqual(len(set(fa.PROBE_SOURCES)), len(fa.PROBE_SOURCES))
         self.assertEqual(set(NOT_SOURCES) - held, set(), "NOT_SOURCES names a module the probe no longer holds: drop it")
 
@@ -281,7 +281,8 @@ class Measured(unittest.TestCase):
         # what an observation becomes (classify_failure, run_probe), the result types and the verdict over an absent
         # subject (outcome), and the invariant-IX name gate run_probe answers InvalidSpec by (contract): the modules
         # whose code turns a spec and the probe's facts into a ProbeResult
-        for rel in ("probe/protocol.py", "product/outcome.py", "product/contract.py"):
+        for rel in ("probe/protocol.py", "product/outcome.py", "product/contract.py", "runtime/process_range.py",
+                    ANCHOR):
             self.assertIn(rel, fa.PROBE_SOURCES)
         self.assertEqual(fa.PROBE_SOURCES[-1], "probe/file_artifact.py")     # the module itself, last (dependency order)
         order = [fa.PROBE_SOURCES.index(r) for r in ("product/contract.py", "product/outcome.py", "probe/protocol.py")]
