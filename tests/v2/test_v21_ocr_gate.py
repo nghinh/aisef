@@ -12,8 +12,9 @@ already uses) before the preview and before the review — under advisory as und
 What this proves, and does not: the version line is the binary's own word (a self-declaration). The sha256 identifies
 the bytes; neither says how they were built. The session record states both, and says which is which.
 
-Three layers: `Declared` (the pure judgement, a table of answers), `Gate` (the product's `Reviewer.review` over a script
-started by its shebang that records every start), `Chain` (the same through `aisef run`, the one decision path)."""
+Two layers here: `Gate` (the product's `Reviewer.review` over a script started by its shebang that records every start)
+and `Chain` (the same through `aisef run`, the one decision path). The pure judgement and its table of answers are in
+test_v21_ocr_declared.py."""
 
 from __future__ import annotations
 
@@ -37,88 +38,9 @@ from aisef2.app import bundle, client, review_ocr  # noqa: E402
 from aisef2.orchestrate.adapters import CapabilityUnrunnable  # noqa: E402
 from tests.v2 import test_app_run as e2e  # noqa: E402
 from tests.v2 import test_v21_review_chain as chain  # noqa: E402
+from tests.v2.test_v21_ocr_declared import ANSWERS, PINNED_LINE, REFUSED  # noqa: E402
 
-PINNED_LINE = "open-code-review v1.12.12 (182898c) darwin/arm64"
-REAL = f"{PINNED_LINE}\nbuilt at: 2026-10-05T00:00:00Z\nhttps://github.com/alibaba/open-code-review\n"
 POSIX = unittest.skipUnless(os.name == "posix", "the finder is a script started by its shebang")
-
-#: what the version question is answered with, per kind of binary: (text printed, exit status, seconds it sleeps first)
-ANSWERS = {
-    "pinned": (REAL, 0, 0),
-    "another version": ("open-code-review v1.11.0 (182898c) darwin/arm64\n", 0, 0),
-    "another commit": ("open-code-review v1.12.12 (deadbee) darwin/arm64\n", 0, 0),
-    "a dev build": ("open-code-review dev (none) darwin/arm64\n", 0, 0),
-    "no version command": ("", 0, 0),
-    "a banner first": ("Welcome to ocr\n" + REAL, 0, 0),
-    "garbage": ("\x00\x01 segmentation noise \xff\n{not a version}\n", 0, 0),
-    "the right line, a failing exit": (REAL, 3, 0),
-    "never answers": ("", 0, 30),
-}
-#: the answers that are not the pinned one, and a word each refusal must carry
-REFUSED = {
-    "another version": ("v1.11.0", "v1.12.12", "182898c"),
-    "another commit": ("deadbee", "v1.12.12", "182898c"),
-    "a dev build": ("dev", "v1.12.12", "182898c"),
-    "no version command": ("no version line",),
-    "a banner first": ("no version line", "Welcome"),
-    "garbage": ("no version line",),
-    "the right line, a failing exit": ("exited 3",),
-    "never answers": ("did not answer in time",),
-}
-
-
-class Declared(unittest.TestCase):
-    """`review_ocr.declared`: the pure judgement of `version`'s exit status and output."""
-
-    def test_the_pinned_build_s_own_output_is_accepted_and_read_into_fields(self):
-        seen, why = review_ocr.declared("/x/ocr", 0, REAL)
-        self.assertIsNone(why)
-        self.assertEqual(seen, {"version": "v1.12.12", "commit": "182898c", "platform": "darwin/arm64", "line": PINNED_LINE})
-
-    def test_the_commit_may_be_printed_short_or_whole_and_must_be_the_pinned_one(self):
-        pinned = review_ocr.OCR["commit"]
-        for printed in (pinned[:7], pinned[:12], pinned):
-            with self.subTest(printed=printed):
-                self.assertIsNone(review_ocr.declared("/x/ocr", 0, f"open-code-review v1.12.12 ({printed}) linux/amd64\n")[1])
-        for printed in (pinned[:6], "0" + pinned[1:7], pinned[:6] + "0", "182898X", pinned + "0"):
-            with self.subTest(refused=printed):
-                seen, why = review_ocr.declared("/x/ocr", 0, f"open-code-review v1.12.12 ({printed}) linux/amd64\n")
-                self.assertIsNotNone(why)
-                self.assertEqual(seen["commit"], printed)       # what it said is kept, to be named
-
-    def test_every_answer_that_is_not_the_pinned_build_is_refused_naming_what_was_seen_and_what_is_pinned(self):
-        for name, words in REFUSED.items():
-            text, code, sleep = ANSWERS[name]
-            with self.subTest(name):
-                seen, why = review_ocr.declared("/x/ocr", None if sleep else code, text)
-                self.assertIsNotNone(why)
-                for word in words:
-                    self.assertIn(word, why)
-                self.assertIn("/x/ocr", why)
-
-    def test_a_mismatch_names_both_the_version_and_the_commit_of_each_side(self):
-        _, why = review_ocr.declared("/x/ocr", 0, "open-code-review v1.13.0 (1234567) linux/arm64\n")
-        for word in ("v1.13.0", "1234567", review_ocr.OCR["version"], review_ocr.OCR["commit"][:7]):
-            self.assertIn(word, why)
-
-    def test_only_the_first_line_is_a_version_line_and_blank_lines_before_it_are_skipped(self):
-        self.assertIsNone(review_ocr.declared("/x/ocr", 0, "\n\n  " + REAL)[1])
-        self.assertIsNotNone(review_ocr.declared("/x/ocr", 0, "x\n" + REAL)[1])       # a version line that is not first
-        self.assertIsNotNone(review_ocr.declared("/x/ocr", 0, PINNED_LINE + " and more\n")[1])   # not the whole line
-
-    def test_a_long_garbage_line_is_cut_in_the_refusal(self):
-        _, why = review_ocr.declared("/x/ocr", 0, "z" * 5000 + "\n")
-        self.assertLess(len(why), 400)
-
-    def test_the_command_is_version_alone_and_its_environment_inherits_nothing(self):
-        self.assertEqual(review_ocr.version_argv("/opt/ocr"), ["/opt/ocr", "version"])
-        base = {"PATH": "/home/me/bin", "HOME": "/home/me", "OCR_LLM_TOKEN": "t", "ANTHROPIC_API_KEY": "k",
-                "AISEF_ANYTHING": "v", "XDG_CONFIG_HOME": "/home/me/.config"}
-        env = review_ocr.version_environment("/iso", base)
-        self.assertEqual(env, {"PATH": "/usr/bin:/bin", "HOME": "/iso", "USERPROFILE": "/iso", "OCR_NO_UPDATE": "1"})
-        self.assertEqual(review_ocr.version_environment("/iso", {"SYSTEMROOT": r"C:\Windows"}),
-                         env | {"SYSTEMROOT": r"C:\Windows"})    # the one variable a Windows process cannot start without
-
 
 #: the finder: records every start (argv, environment, working directory, what HOME held at that moment) in call-NN.json,
 #: answers `version` as scenario.json says, and otherwise behaves as a complete review of the story's change
