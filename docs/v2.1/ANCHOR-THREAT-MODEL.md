@@ -27,11 +27,48 @@ Kết quả `VERIFIED` với `--expect-anchor` chỉ có nghĩa xác thực khi 
 | sửa thư mục run sau lượt chạy (đồng nghiệp, script, đồng bộ hỏng) | có | **không** | REFUTED — đo: `AnchorThreatModel.test_an_attacker_who_cannot_write_the_store_is_refuted` |
 | cùng quyền với nơi giữ anchor (sửa cả hai) | có | **có** | VERIFIED — **không phát hiện được**; đo: `test_the_limit_an_attacker_who_can_write_the_store_too_is_not_detected` |
 | không có anchor | có | — | chỉ chứng minh *nhất quán*, không chứng minh *xác thực* |
+| mã ứng viên khai sai về chính nó (PM-5: mã thoát, giá trị trả về) | **không cần** (chỉ khai sai đáp án, không sửa thư mục nào) | không | VERIFIED — **không phát hiện được**; đây không phải việc của anchor (mục dưới) |
 
 "Ngoài thư mục run" **không** đồng nghĩa "ngoài quyền kiểm soát của developer". Khi không có cách ly, developer agent và mã
 test chạy dưới chính user của người vận hành và ghi được mọi thứ user đó ghi được, kể cả một tệp anchor trong HOME. Cách ly
 Linux (ADR cách ly) không gắn nơi giữ anchor vào sandbox — điều đó bảo vệ nơi giữ **trong lúc chạy**, không bảo vệ nó khỏi
 chính user của người vận hành sau lượt chạy.
+
+## `bundle continue` (V2.1, cửa sổ probe 2026-10-15)
+
+`aisef bundle continue … --expect-anchor A` áp luật của `--verify --expect-anchor` lên continuation: anchor của manifest
+mà run đã viết phải bằng `A`, và manifest phải bằng những gì thư mục run đang giữ (`EVIDENCE_MISMATCH` nếu không;
+`EVIDENCE_MISSING` nếu run không có `EVIDENCE.json`); việc đó được kiểm **trước** khi đọc `RUN.json`, journal và manifest của run (sau khi liệt kê các claim
+`CONTINUED-BY*.json` của nó và đọc bằng chứng của child: một từ chối của lần đọc ấy, hoặc một child đã `BEGUN`, được báo
+trước khi anchor được so), và báo cáo ghi `anchor_checked`. Không có `A`, continuation chỉ chứng minh *nhất quán* (journal đọc được, khớp digest và độ dài mà
+`RUN.json` nêu, dựng lại được, qua các projection của writer của kernel) — `anchor_checked: false` — và **không** đối
+chiếu `EVIDENCE.json` với thư mục dù nó có đó (backlog V21-54). `A` nhận một *giá trị*, như `--verify`: nó không bao giờ
+được đọc từ thư mục run.
+
+## Điều `VERIFIED` và anchor không nói: lời khai của chủ thể về chính nó (PM-5)
+
+Anchor và `--verify` nói về **bản ghi**: các tệp hôm nay là các tệp lúc giá trị được lấy, và verdict dựng lại được từ bằng
+chứng. Chúng không nói câu trả lời mà **tiến trình của chủ thể đưa về chính nó** — mã thoát, giá trị trả về, ngoại lệ
+được ném — có trung thực hay không. Kênh giao thức của probe do controller giữ và được xác thực (HMAC); mã của ứng viên
+chạy trong chính tiến trình đưa ra các câu trả lời ấy. Mã được viết để trả lời hộ chính nó, hoặc nhận ra mình đang bị
+probe (`sys.flags.isolated`, môi trường bị lọc), biến được một sản phẩm hỏng thành `SATISFIED`; đo trên cả ba probe chạy
+chủ thể: `closure-evidence/v2/v2.1/round-3/probes/repro-5.py.txt` (đối chứng trung thực REFUTED ×3, ứng viên viết để trả
+lời hộ SATISFIED ×3) và, cho một ứng viên chỉ đọc `sys.flags.isolated` và cho cây nguồn của tag `v2.0.0`,
+`closure-evidence/v2/v2.1/round-5/OWNER-DECISIONS-2026-10-15.md` (PM-5).
+
+**Hệ quả cho người dùng.** Người vận hành thấy `delivery_verdict` PASS, `aisef run --verify --expect-anchor` in `VERIFIED`
+và journal ghi `COMMIT`; người dùng cuối chạy sản phẩm thì gặp traceback hay mã thoát 1. Bản ghi probe chỉ giữ verdict
+(không giữ mã thoát mà chủ thể đã khai), nên anchor, journal và verify đều khớp. Một anchor đúng chứng minh bản ghi không
+bị sửa sau lượt chạy; nó **không** chứng minh lượt chạy đã đo đúng sản phẩm.
+
+**Tần suất: chưa đo.** 0 trường hợp quan sát được trong 3 phiên developer của attempt 4 (chạm tới tài liệu của probe — một đọc
+`process_effect.py`, một đọc scratch (`request.json`, `protocol.log`), hai tìm probe trên máy — và không phiên nào đổi gì:
+`DEVELOPER-CONFINEMENT-GAP-001` mục 1, 4, 5 và 7) và trong 4 phiên developer của canary tier 2 và 2b
+(1 + 3; 0 dòng nhắc `aisef2/probe`, `OPS`, `request.json`, `protocol.log`). N nhỏ, workload tầm thường: không phải bằng
+chứng vắng mặt.
+
+**Đây là mô tả một giới hạn, không phải chấp nhận rủi ro.** Biện pháp thật nằm ở chỗ khác trong backlog: không cho
+developer đọc probe và máy chủ (V21-02, B-07, F) và review độc lập; xem V21-26.
 
 ## Các nơi giữ thường được đề xuất — và điều kiện để chúng có nghĩa
 
@@ -60,3 +97,5 @@ chính user của người vận hành sau lượt chạy.
 
 - Không có chữ ký số trong AISEF: không có khoá nào mà developer chắc chắn không đọc được khi chạy cùng user.
 - Anchor không chứng minh lượt chạy diễn ra như journal kể.
+- `VERIFIED` không chứng minh sản phẩm đúng: probe nói điều tiến trình của chủ thể đã trả lời, không nói rằng câu trả lời
+  trung thực (mục trên, PM-5).
