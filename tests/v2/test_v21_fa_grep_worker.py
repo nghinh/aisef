@@ -394,6 +394,79 @@ class TheDeadlineCoversTheOperation(Tmp):
         self.assertEqual((o.kind, o.verdict), (K.OBSERVED, S))
 
 
+def lagging(start: float = 0.0, release: float = 0.0):
+    """ProcessRange whose start and whose release each take `start` / `release` seconds more than they do: the cost of
+    the mechanism that owns the worker, which the worker's own life does not include."""
+    class Lagging(PR.ProcessRange):
+        def start(self):
+            time.sleep(start)
+            return super().start()
+
+        def release(self):
+            time.sleep(release)
+            super().release()
+    return Lagging
+
+
+class TheWindowIsTheReadsOwn(Tmp):
+    """V2.1 review (r2-1). `within_s` is the window of the read (PM-12), decided after it: a worker process must not make
+    a read that returned in a window return outside it. What it costs to own the worker — the range's start and its
+    release, about a tenth of a second on a laptop and the greater part of what a worker costs — is not the read's; the
+    worker's own life (its interpreter, the request, the loop, the result) is, as the in-process loop was."""
+
+    WINDOW = 1.0
+    LAG = 1.5       # more than the window, and many times what the same read takes without it
+
+    def setUp(self):
+        self.ref = self.tree("window", {"f.txt": b"x\n"})
+        self.s = base.spec("path:f.txt", {"matches": 1}, {"grep": "x"}, window=self.WINDOW)
+
+    def test_a_slow_start_of_the_range_does_not_expire_the_window_of_a_read_that_is_quick(self):
+        with mock.patch.object(fa, "ProcessRange", lagging(start=self.LAG)):
+            o = P.observe(self.s, self.ref, FULL)
+        self.assertEqual((o.kind, o.verdict), (K.OBSERVED, S), o.detail)
+
+    def test_a_slow_release_of_the_range_does_not_expire_it_either(self):
+        with mock.patch.object(fa, "ProcessRange", lagging(release=self.LAG)):
+            o = P.observe(self.s, self.ref, FULL)
+        self.assertEqual((o.kind, o.verdict), (K.OBSERVED, S), o.detail)
+
+    def test_the_life_of_the_worker_is_the_reads_own_time(self):
+        # a worker that takes longer than the window before it does its work is a read that did not complete in it
+        with worker(f"import time\ntime.sleep({self.LAG})\n" + fa.GREP_WORKER):
+            o = P.observe(self.s, self.ref, FULL)
+        self.assertEqual((o.kind, o.verdict), (K.SUBJECT_DEADLINE, R), o.detail)
+        self.assertTrue(o.detail.startswith(f"the {self.WINDOW:g}s observation window expired (grep_count); "), o.detail)
+
+    def test_grep_facts_says_what_the_mechanism_cost_and_only_when_it_returns_facts(self):
+        cost: list = []
+        with mock.patch.object(fa, "ProcessRange", lagging(start=0.6, release=0.6)):
+            facts = fa.grep_facts("x", [("f.txt", b"x\n")], timeout_s=30.0, work=self.work(), hosting=cost)
+        self.assertEqual(facts["matches"], 1)
+        self.assertEqual(len(cost), 1)
+        self.assertTrue(1.2 <= cost[0] < 1.2 + 8, cost)      # both lags, and no more than the lags and the machine's own
+        # the worker's own life is not what the mechanism cost
+        cost = []
+        with worker("import time\ntime.sleep(1.5)\n" + fa.GREP_WORKER):
+            fa.grep_facts("x", [("f.txt", b"x\n")], timeout_s=30.0, work=self.work(), hosting=cost)
+        self.assertEqual(len(cost), 1)
+        self.assertTrue(0.0 <= cost[0] < 1.0, cost)
+        # a failure gives no facts and so no cost; nothing is asked for by default
+        cost = []
+        with worker("import sys\nsys.exit(3)\n"):
+            with self.assertRaises(fa.WorkerFailed):
+                fa.grep_facts("x", [("f.txt", b"x\n")], timeout_s=30.0, work=self.work(), hosting=cost)
+        self.assertEqual(cost, [])
+        self.assertEqual(fa.grep_facts("x", [("f.txt", b"x\n")], timeout_s=30.0, work=self.work())["matches"], 1)
+
+    def test_a_read_that_took_longer_than_its_window_is_still_refuted_by_it(self):
+        # the clock of the read replaced in the module, as PM-12's own test does: what the range cost is taken out of
+        # the read's time and the rest is judged by the window, here one the read's time (2 s) is past
+        with mock.patch.object(fa, "time", mock.Mock(monotonic=mock.Mock(side_effect=[0.0, self.WINDOW + 1.0]))):
+            o = P.observe(self.s, self.ref, FULL)
+        self.assertEqual((o.kind, o.verdict), (K.SUBJECT_DEADLINE, R))
+
+
 class FailureModes(Tmp):
     """Each way the worker can fail is UNRUNNABLE with a reason of its own, and is never retried."""
 
@@ -503,6 +576,24 @@ class FailureModes(Tmp):
             o = P.observe(s, self.ref, FULL)
         self.assertTrue(o.detail.startswith("grep_count worker LAUNCH: "), o.detail)
         self.assertIn("RangeError", o.detail)
+
+    def test_a_range_whose_anchor_never_says_it_started_is_LAUNCH_and_leaves_nothing(self):
+        # V2.1 review (r2-2): the watchdog does not shorten the range's own handshake (`ProcessRange.start` waits up to
+        # 30 s for its target to say it started, whatever timeouts_s.probe is: said in the module's docstring). What it
+        # ends as is pinned: the answer is given at once here, as the range gives it when its wait is over
+        class Unanswered(PR.ProcessRange):
+            def _line(self, timeout):
+                return ("TIMEOUT", "") if timeout == 30.0 else super()._line(timeout)
+        mine = os.getpid()
+
+        def children() -> set:     # the anchors this process started (the table lists its own `ps` as a child too)
+            return {pid for pid, row in PR.process_table().items() if row.ppid == mine and str(PR.ANCHOR) in row.command}
+        before = children()
+        with mock.patch.object(fa, "ProcessRange", Unanswered):
+            o = P.observe(spec("path:f.txt", 0, "x"), self.ref, ExecutionEnv(sys.executable, 1.5, Enforcement.PARTIAL))
+        self.assertEqual((o.kind, o.verdict), (K.HARNESS_FAILED, None))
+        self.assertTrue(o.detail.startswith("grep_count worker LAUNCH: the worker did not start (RangeError)"), o.detail)
+        self.assertEqual(children() - before, set())       # the anchor was ended and reaped: nothing of this one is left
 
     def test_a_range_that_ends_without_saying_how_is_CRASHED_not_a_deadline(self):
         class Silent(PR.ProcessRange):

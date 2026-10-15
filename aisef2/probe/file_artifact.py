@@ -91,7 +91,7 @@ script (`GREP_WORKER`, in this module, so in EXECUTION_DIGEST) started as `sys.e
 range (`aisef2.runtime.process_range`, §17.1) with a scrubbed environment; it is given the pattern and the bytes of
 the selected files by a file of the evaluation directory and gives back the facts the in-process loop always gave, as
 numbers by file index, in a second file. Nothing of the subject runs: it holds bytes, it executes none. One deadline
-covers the whole operation — the request written, the worker started, the files decoded, the lines matched, the result
+covers the operation — the request written, the worker running, the files decoded, the lines matched, the result
 read — and a worker that does not give a valid result inside it is a harness failure, UNRUNNABLE (owner ENVIRONMENT),
 never a verdict: it hung (DEADLINE: the file, the line being matched and the head of the pattern are named, and the
 way out), it could not start (LAUNCH), it ended by an exit status or a signal (CRASHED), it wrote nothing (NO_RESULT),
@@ -99,7 +99,14 @@ or what it wrote is not facts of this request (BAD_RESULT: not JSON, a field mis
 request this size can produce). A failure is never retried here — the same pattern over the same bytes within the same
 deadline stops the same way — and the process range is emptied before the observation returns: what the worker
 started, a grandchild included, is the range's, and nothing outside the range is signalled. The window `within_s` is
-still decided after the read, as before (PM-12): a read that finished is judged by its own window.
+still decided after the read, as before (PM-12): a read that finished is judged by its own window. The worker's own
+life — its interpreter, the request, the loop, the result — is part of the read, as the in-process loop was (about
+25 ms on the laptop it was measured on); what it costs to own the worker is not: the range's start and its release,
+a tenth of a second there, are measured by `grep_facts` (`hosting`) and taken out of the read's time by `observe`,
+so a window a read kept before is kept now to within the worker's own start. The deadline has one limit that is the
+range's, not this module's: `ProcessRange.start` waits at most 30 s for its target to say it started, whatever
+`timeouts_s.probe` is. A range that cannot start stops as LAUNCH at that bound (the range emptied, never a verdict);
+one that was slow but did start is DEADLINE as soon as it returns, the watchdog having passed.
 
 **Why git runs outside the owned process range** (design note). The Cycle-1 probe runs the subject inside a P4
 process range because the subject is untrusted code that may fork, hang or leave processes behind, and what ended
@@ -108,7 +115,8 @@ invoked with an argv this module builds (`shell=False`, the binary resolved once
 reading only objects the revision SHA identifies, its output captured as bytes, bounded by `ExecutionEnv.timeout_s`
 (the harness watchdog: a git that does not answer in time is HARNESS_FAILED, never a verdict) and by the per-file
 size cap; it starts nothing of the subject's. `on_range` and `scratch` are accepted for the harness-owned
-constructor convention (PROBE-META-1), recorded and unused. The environment is scrubbed to an allowlist of the
+constructor convention (PROBE-META-1): `on_range` receives the process range of a `grep_count` worker, never one for
+git; `scratch` is recorded and unused. The environment is scrubbed to an allowlist of the
 host's (the temporary-directory and system-root variables, and PATH so that git's own helpers load on Windows —
 the binary itself is never looked up through it again): no user or system git configuration
 (`GIT_CONFIG_NOSYSTEM`, a global config path that does not exist, `HOME` inside a fresh temporary directory of
@@ -116,7 +124,9 @@ this evaluation), no prompt, no background maintenance, `LC_ALL=C`.
 
 **Enforcement: FULL.** No subject code runs: the worker of `grep_count` is the harness's own script on bytes. Weakest
 path: git's own object store at the revision SHA (the binary's identity is a RunSpec capability), or the bytes of a
-directory that is not a repository.
+directory that is not a repository. The catalog declares this probe `in_harness_process` / `captured_stdout`: no
+subject runs and the worker is none — it answers by a file of the evaluation, and its stdout is never read (the
+words beside the catalog entry that no child script exists were written before the worker).
 """
 
 from __future__ import annotations
@@ -388,13 +398,17 @@ def _worker_facts(obj, rels: list[str]) -> dict:
             "locations": [[rels[i], n] for i, n in where]}
 
 
-def grep_facts(pattern: str, files: list[tuple[str, bytes]], *, timeout_s: float, work: str, on_range=None) -> dict:
+def grep_facts(pattern: str, files: list[tuple[str, bytes]], *, timeout_s: float, work: str, on_range=None,
+               hosting: list | None = None) -> dict:
     """Lines matching `pattern` over the decoded files, one match per matching line: what a worker process computes,
     under `timeout_s` for the whole operation (module docstring, "Bounded matching"). A file holding a NUL byte is
     binary: skipped and named. A file that is not UTF-8 leaves the count unestablished (no `matches`). `work` is the
     evaluation's directory: the request, the progress mark, the result and the worker's output live in it.
-    `on_range` is the harness's hook for the worker's process range (the story's scope releases it). Raises
-    `WorkerFailed` when the worker gives no valid facts; the range is emptied before it returns either way."""
+    `on_range` is the harness's hook for the worker's process range (the story's scope releases it). `hosting`, when
+    given, is appended the seconds this call spent that the worker's own life was not: the request written, the range
+    started and released, the result read — what it costs to own the worker, which the observation window of the read
+    does not count (module docstring). Raises `WorkerFailed` when the worker gives no valid facts, and then appends
+    nothing; the range is emptied before it returns either way."""
     begun = _monotonic()
     request, result, progress, log = (os.path.join(work, n) for n in ("request", "result", "progress", "worker.log"))
     try:
@@ -418,11 +432,13 @@ def grep_facts(pattern: str, files: list[tuple[str, bytes]], *, timeout_s: float
         raise WorkerFailed("LAUNCH", f"the worker did not start ({type(e).__name__})") from None
     finally:
         out.close()
+    running = _monotonic()      # the worker's process exists from here, and its life is what `wait` below takes
     try:
         if on_range is not None:
             on_range(run)
         status = run.wait(max(0.0, timeout_s - (_monotonic() - begun)))
-        elapsed = _monotonic() - begun
+        ended = _monotonic()
+        elapsed = ended - begun
     finally:
         run.release()   # RangeNotEmpty / RangeEscaped propagate: a leak is never silent (§17.1)
     if status is None and elapsed < timeout_s:   # the range's report ended before the watchdog did: no exit status
@@ -448,7 +464,10 @@ def grep_facts(pattern: str, files: list[tuple[str, bytes]], *, timeout_s: float
         obj = json.loads(pathlib.Path(result).read_bytes())
     except (OSError, ValueError, RecursionError) as e:
         raise WorkerFailed("BAD_RESULT", f"the result is not JSON ({type(e).__name__})") from None
-    return _worker_facts(obj, rels)
+    facts = _worker_facts(obj, rels)
+    if hosting is not None:     # what came before the worker's life and what came after it, as seen from here
+        hosting.append((running - begun) + (_monotonic() - ended))
+    return facts
 
 
 def _said(log: str) -> str:
@@ -797,16 +816,17 @@ class FileArtifactProbe(HarnessProbe):
             return Observation(ObservationKind.HARNESS_FAILED, detail="cannot inspect: the revision checkout is missing")
         window = window_of(pi["observable"])
         started = time.monotonic()
+        hosting: list[float] = []      # what owning the worker cost: not the read's time (module docstring)
         with tempfile.TemporaryDirectory(prefix="aisef2-file-artifact-") as home:
             try:
                 reader = self._reader(at, env, home)
                 facts = facts_of(reader, cls, rel, pi["observable"], stim,
                                  grep=lambda pattern, files: grep_facts(pattern, files, timeout_s=env.timeout_s,
                                                                         work=os.path.join(home, "grep"),
-                                                                        on_range=self._on_range))
+                                                                        on_range=self._on_range, hosting=hosting))
             except Refused as e:
                 return Observation(ObservationKind.HARNESS_FAILED, detail=str(e))
-        expired = time.monotonic() - started > window
+        expired = time.monotonic() - started - sum(hosting) > window
         detail = json.dumps({"read": reader.name, "revision": at.sha, **facts})
         if expired:
             return Observation(ObservationKind.SUBJECT_DEADLINE, ON_DEADLINE[cls],
