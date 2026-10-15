@@ -714,10 +714,12 @@ class Tables(unittest.TestCase):
 
     def test_declared_tables_identity_and_preconditions(self):
         self.assertEqual(fa.PROBE_ID, "probe.file_artifact")
-        # PM-7: the module, the protocol that turns an observation into a result, and the result types it builds
-        # (the verdict over an absent subject is outcome.py's): the bytes this probe takes behaviour from, no more.
+        # PM-7: the module, the protocol that turns an observation into a result, the result types it builds (the
+        # verdict over an absent subject is outcome.py's) and the invariant-IX name gate it answers InvalidSpec by
+        # (contract.py): the bytes this probe takes behaviour from, no more, in dependency order.
         # test_v21_pm7_file_artifact_sources.py measures them against what the probe process really loads.
-        self.assertEqual(fa.PROBE_SOURCES, ("product/outcome.py", "probe/protocol.py", "probe/file_artifact.py"))
+        self.assertEqual(fa.PROBE_SOURCES, ("product/contract.py", "product/outcome.py", "probe/protocol.py",
+                                            "probe/file_artifact.py"))
         self.assertEqual(fa.CLASSES, ("exists", "content", "grep_count", "python_imports"))     # V2.1: + python_imports
         self.assertEqual(fa.ON_DEADLINE, {"exists": R, "content": R, "grep_count": R, "python_imports": R})
         self.assertEqual(fa.NEWLINES, ("\n", "\r\n"))

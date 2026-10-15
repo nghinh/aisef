@@ -3,7 +3,10 @@
 EXECUTION_DIGEST is the sha256 of PROBE_SOURCES, and a calibration row and the run's RunSpec bind it: "the bytes that
 run" (ARCHITECTURE-EXCEPTION-V2-007). The tuple is a declaration, so it can drift from what the probe really takes
 behaviour from. PM-7 found `product/outcome.py` outside it: the protocol builds every result from its types, and the
-verdict over an absent subject is its `on_subject_absent` — an edit to it left every calibration row valid.
+verdict over an absent subject is its `on_subject_absent` — an edit to it left every calibration row valid. Review of
+that change found `product/contract.py` outside it for the same reason, and it is in: `run_probe` applies the invariant-IX
+name gate (`names_test_artefact`) before any probe looks and the answer it gives is a record's result (InvalidSpec), so an
+edit to the gate changed a probe's records with every calibration row still valid.
 
 Three things are pinned, each by measurement and not by a list copied from the module:
 
@@ -32,7 +35,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from aisef2.probe import file_artifact as fa  # noqa: E402
-from aisef2.probe.protocol import RevisionRef  # noqa: E402
+from aisef2.probe.protocol import RevisionRef, run_probe  # noqa: E402
 from tests.v2 import test_c2_file_artifact as base  # noqa: E402   (helpers only: its test classes are not imported)
 
 #: aisef2 modules the probe process holds that its behaviour is NOT taken from, and why. Anything else it holds must be
@@ -48,9 +51,6 @@ NOT_SOURCES = {
     "aisef2.errors": "exception types; no decision",
     "aisef2.product.spec": "the spec's data type: the probe reads its fields; none of its code runs in an observation "
                            "(its constructor runs in the caller, before the probe is given the spec)",
-    "aisef2.product.contract": "the contract plane's seal and invariant-IX name gate: `run_probe` re-applies the gate "
-                               "before any probe looks, so it decides which specs reach a probe, not what a probe "
-                               "observes of one; the record's digest is identity, not a verdict",
 }
 
 SCRIPT = r'''
@@ -127,11 +127,28 @@ class Measured(unittest.TestCase):
         self.assertEqual(set(NOT_SOURCES) - held, set(), "NOT_SOURCES names a module the probe no longer holds: drop it")
 
     def test_the_modules_that_decide_a_result_are_sources(self):
-        # what an observation becomes (classify_failure, run_probe) and the result types and the verdict over an absent
-        # subject (outcome): the two modules whose code turns the probe's facts into a ProbeResult
-        for rel in ("probe/protocol.py", "product/outcome.py"):
+        # what an observation becomes (classify_failure, run_probe), the result types and the verdict over an absent
+        # subject (outcome), and the invariant-IX name gate run_probe answers InvalidSpec by (contract): the modules
+        # whose code turns a spec and the probe's facts into a ProbeResult
+        for rel in ("probe/protocol.py", "product/outcome.py", "product/contract.py"):
             self.assertIn(rel, fa.PROBE_SOURCES)
         self.assertEqual(fa.PROBE_SOURCES[-1], "probe/file_artifact.py")     # the module itself, last (dependency order)
+        order = [fa.PROBE_SOURCES.index(r) for r in ("product/contract.py", "product/outcome.py", "probe/protocol.py")]
+        self.assertEqual(order, sorted(order))                              # each before what imports it
+
+    def test_the_name_gate_decides_a_record_so_a_change_to_it_is_a_change_to_the_bytes_that_run(self):
+        # the evidence for the entry above, measured and not argued: with the gate's answer changed, the record of the
+        # same spec at the same revision is a different result
+        with tempfile.TemporaryDirectory(prefix="aisef2-pm7-gate-") as d:
+            ref = RevisionRef("0" * 40, d)
+            spec = base.spec("path:tests/test_calc.py")           # a locator that names a developer test artefact
+            probe = fa.FileArtifactProbe()
+            asked = run_probe(probe, spec, ref, base.ENV)
+            with mock.patch("aisef2.probe.protocol.names_test_artefact", return_value=[]):
+                answered = run_probe(probe, spec, ref, base.ENV)
+        self.assertEqual(type(asked.result).__name__, "InvalidSpec")
+        self.assertIn("invariant IX", asked.result.detail)
+        self.assertNotEqual(type(answered.result).__name__, "InvalidSpec")
 
     def test_the_sources_feed_the_digest_in_order_and_the_digest_names_the_bytes_that_run(self):
         self.assertEqual(self.found["digest_before"], fa.EXECUTION_DIGEST)

@@ -36,15 +36,21 @@ whose top-level module is neither in `allowed` nor, when `stdlib` is true, in th
 count unestablished: REFUTED, the file and line named (`file:?` when the parser names none: a NUL byte). A file the
 parser cannot take at all — it stops on its own stack or memory limit (`RecursionError`, `MemoryError`) before it can
 say what the file is — is a harness refusal, never a verdict (as `FILE_CAP`): UNRUNNABLE, the file named, and the way
-out said in the detail. Of the files selected, the first in tree order that gives no count decides, whichever way it
-gives none. It sees the syntax only: `importlib.import_module(...)` and `__import__` are calls, not import statements,
+out said in the detail. A refusal outranks any file's own answer, whichever comes first: the kind of the result is
+the tree's, not the order a reader lists it in (a git tree lists `a.py` before `a/b.py`, a plain directory the
+reverse). It sees the syntax only: `importlib.import_module(...)` and `__import__` are calls, not import statements,
 and are not counted.
 
 **A byte-order mark.** A UTF-8 byte-order mark at the start of a file is the encoding's signature, not text:
 `grep_count` and `python_imports` drop it before they read the file, as CPython's tokenizer drops it (a file Python
 imports is a file that parses, and `^` anchors the first line's text). One anywhere else, or a second one after it, is
 a character: a syntax error in source, as it is for CPython. A UTF-16 or UTF-32 mark is no UTF-8: the file is not
-UTF-8. `content` is over the exact bytes of the blob, the mark included.
+UTF-8. `content` is over the exact bytes of the blob, the mark included. Two consequences, both stated so that nobody
+finds them out from a verdict. The leading mark is not text, so **no `grep_count` pattern sees it** (not U+FEFF, not a
+non-ASCII class): a requirement that no file may carry the mark is stated over the bytes, with `content`. And the mark
+declares UTF-8: a coding cookie beside it that names anything else (or no codec at all) contradicts it, which is a
+syntax error for CPython and is here (`file:?`, the tokenizer names no line). A cookie with no mark is not read: the
+probe takes UTF-8 only and says `undecodable` for anything else, as it did before.
 
 **Reading rule — the object store, never the working file.** When the checkout root is itself the top level of a
 git repository (a worktree the harness made of the revision), existence, mode and content are read from that
@@ -85,7 +91,9 @@ identity is a RunSpec capability), or the bytes of a directory that is not a rep
 from __future__ import annotations
 
 import ast
+import codecs
 import hashlib
+import io
 import json
 import math
 import os
@@ -97,6 +105,7 @@ import subprocess
 import sys
 import tempfile
 import time
+import tokenize
 from typing import Mapping
 
 from aisef2.arch.enums import BehaviorVerdict, Enforcement
@@ -105,10 +114,11 @@ from aisef2.product.spec import ProductProofSpec
 
 PROBE_ID = "probe.file_artifact"
 #: The bytes this probe takes behaviour from, in dependency order, and no more (PM-7): the module, the protocol that turns
-#: an observation into a result (`classify_failure`, `run_probe`) and the result types with the verdict over an absent
-#: subject (`product/outcome.py`, which the protocol imports). They are hashed into EXECUTION_DIGEST and nothing else
+#: an observation into a result (`classify_failure`, `run_probe`), the result types with the verdict over an absent
+#: subject (`product/outcome.py`) and the invariant-IX name gate `run_probe` answers InvalidSpec by
+#: (`product/contract.py`: a change to it changes a record). They are hashed into EXECUTION_DIGEST and nothing else
 #: reads this tuple: it grants no access and loads nothing (`_probe_digest` is its one reader).
-PROBE_SOURCES = ("product/outcome.py", "probe/protocol.py", "probe/file_artifact.py")
+PROBE_SOURCES = ("product/contract.py", "product/outcome.py", "probe/protocol.py", "probe/file_artifact.py")
 CLASSES = ("exists", "content", "grep_count", "python_imports")
 #: Each class's meaning of an expired observation window (§9.2): a read that did not complete is no observation.
 ON_DEADLINE = {"exists": BehaviorVerdict.REFUTED, "content": BehaviorVerdict.REFUTED,
@@ -272,26 +282,28 @@ def grep_facts(pattern: re.Pattern, files: list[tuple[str, bytes]]) -> dict:
 def import_facts(outside, files: list[tuple[str, bytes]]) -> dict:
     """Import statements (by syntax, this interpreter's `ast`) naming a top-level module outside `outside`, one per
     statement. A file that is not UTF-8 or does not parse leaves the count unestablished (no `matches`): that is the
-    file's own answer. A file the parser stops on (`RecursionError`, `MemoryError`) is `Refused`: the harness could
-    not say what the file is, so there is no answer and no verdict — here, once, for every caller."""
+    file's own answer. A file the parser stops on (`RecursionError`, `MemoryError`) is `Refused`: the harness could not
+    say what the file is, so there is no answer and no verdict — here, once, for every caller. Every file is looked at
+    before any answer is given, and a refusal outranks a file's own answer: the kind of the result is the tree's, never
+    the order a reader lists it in (a git tree and a plain directory list `a.py` and `a/b.py` in opposite orders)."""
     allowed = set(outside["allowed"]) | (set(sys.stdlib_module_names) if outside["stdlib"] else set())
-    matches, where = 0, []
+    matches, where, own, stopped = 0, [], None, None
     for rel, data in files:
         try:
-            tree = ast.parse(data.decode("utf-8-sig"), filename=rel)   # CPython drops a leading BOM from source bytes
+            text = data.decode("utf-8-sig")        # CPython drops a leading BOM from source bytes
+            if data.startswith(codecs.BOM_UTF8):   # the mark declares UTF-8: a cookie that says otherwise is its error
+                tokenize.detect_encoding(io.BytesIO(data).readline)
+            tree = ast.parse(text, filename=rel)
         except UnicodeDecodeError:
-            return {"present": True, "undecodable": rel}
+            own = own or {"present": True, "undecodable": rel}
+            continue
         except (SyntaxError, ValueError) as e:     # ValueError: a NUL byte in the source, up to Python 3.11
-            line = getattr(e, "lineno", None)       # a NUL byte names none: never write the word None as a line
-            return {"present": True, "unparsable": f"{rel}:{'?' if line is None else line}"}
+            line = getattr(e, "lineno", None)       # a NUL byte or a cookie names none: never write the word None
+            own = own or {"present": True, "unparsable": f"{rel}:{'?' if line is None else line}"}
+            continue
         except (RecursionError, MemoryError) as e:  # the parser's own limit, not a statement about the file
-            raise Refused(f"{rel!r}: this interpreter's parser stopped ({type(e).__name__}: a nesting, stack or memory "
-                          "limit of its own) before it could say what the file is, so there is no count and no verdict "
-                          "(refused, not refuted). The same file under the same interpreter stops the same way, so "
-                          "running it again changes nothing: it is read once the file is made shallower (split long "
-                          "operator chains, `elif` ladders and nested lambdas) or the proof runs on an interpreter "
-                          f"whose limit admits it (this one: python {sys.version_info.major}.{sys.version_info.minor})"
-                          ) from None
+            stopped = stopped or (rel, type(e).__name__)
+            continue
         for node in ast.walk(tree):
             if isinstance(node, ast.Import):
                 names = [a.name for a in node.names]
@@ -304,6 +316,15 @@ def import_facts(outside, files: list[tuple[str, bytes]]) -> dict:
                 matches += 1
                 if len(where) < _LOCATIONS:
                     where.append([rel, node.lineno, outside_names])
+    if stopped is not None:
+        raise Refused(f"{stopped[0]!r}: this interpreter's parser stopped ({stopped[1]}: a nesting, stack or memory "
+                      "limit of its own) before it could say what the file is, so there is no count and no verdict "
+                      "(refused, not refuted). The same file under the same interpreter stops the same way, so "
+                      "running it again changes nothing: it is read once the file is made shallower (split long "
+                      "operator chains, `elif` ladders and nested lambdas) or the proof runs on an interpreter "
+                      f"whose limit admits it (this one: python {sys.version_info.major}.{sys.version_info.minor})")
+    if own is not None:
+        return own
     return {"present": True, "files": len(files), "matches": matches, "locations": where,
             "stdlib_of": f"python {sys.version_info.major}.{sys.version_info.minor}"}
 

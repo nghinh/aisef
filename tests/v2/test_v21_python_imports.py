@@ -151,18 +151,21 @@ class ByteOrderMark(unittest.TestCase):
                b"s = '\xef\xbb\xbf'\nimport requests\n", b"def (:\n", b"# caf\xe9\n")
     FILES = {"pkg/stdlib.py": BOM + b"import os\n", "pkg/outside.py": BOM + b"import requests\n"}
 
-    def refs(self) -> dict:
-        """The same two files read from a repository's object store and from a plain directory."""
+    def refs_of(self, files: dict) -> dict:
+        """The same files read from a repository's object store and from a plain directory."""
         tmp = tempfile.TemporaryDirectory(prefix="aisef2-pm11-")
         self.addCleanup(tmp.cleanup)
         repo = base.Repo(pathlib.Path(tmp.name) / "repo")
-        refs = {"object_store": base.at(repo.path, repo.commit(self.FILES))}
+        refs = {"object_store": base.at(repo.path, repo.commit(files))}
         plain = pathlib.Path(tmp.name) / "plain"
-        for rel, data in self.FILES.items():
+        for rel, data in files.items():
             (plain / rel).parent.mkdir(parents=True, exist_ok=True)
             (plain / rel).write_bytes(data)
         refs["directory"] = RevisionRef("0" * 40, str(plain))
         return refs
+
+    def refs(self) -> dict:
+        return self.refs_of(self.FILES)
 
     def test_a_leading_mark_changes_nothing_in_the_facts(self):
         for src in self.SOURCES:
@@ -186,17 +189,54 @@ class ByteOrderMark(unittest.TestCase):
                 self.assertNotIn("matches", f)
 
     def test_the_verdict_is_the_one_cpython_gives_the_same_bytes(self):
-        # the oracle is this interpreter's compiler on the bytes, not a table: the probe parses what Python reads
+        # the oracle is this interpreter's compiler on the bytes, not a table: the probe parses what Python reads.
+        # Over UTF-8 sources only: a file that is not UTF-8 is "undecodable" here whatever its cookie says (stricter than
+        # CPython, never looser), and a cookie on a file with no mark is not read (below).
+        cookie = b"# -*- coding: %s -*-\n"
         for name, data in (("plain", b"import os\n"), ("mark", BOM + b"import os\n"), ("mark only", BOM),
                            ("two marks", BOM + BOM + b"import os\n"), ("mid-file", b"x = 1\n" + BOM + b"import os\n"),
-                           ("mark and a syntax error", BOM + b"def (:\n"), ("mark in a comment", BOM + b"# \xef\xbb\xbf\n")):
+                           ("mark and a syntax error", BOM + b"def (:\n"), ("mark in a comment", BOM + b"# \xef\xbb\xbf\n"),
+                           ("mark and a utf-8 cookie", BOM + cookie % b"utf-8" + b"import os\n"),
+                           ("mark and an alias of utf-8", BOM + cookie % b"UTF8" + b"import os\n"),
+                           ("mark and a cookie on line 2", BOM + b"#!/usr/bin/env python3\n" + cookie % b"latin-1" + b"import os\n"),
+                           ("mark and a latin-1 cookie", BOM + cookie % b"latin-1" + b"import requests\n"),
+                           ("mark and an ascii cookie", BOM + cookie % b"ascii" + b"import os\n"),
+                           ("mark and an unknown cookie", BOM + cookie % b"no-such-codec" + b"import os\n"),
+                           ("mark and a cookie on line 3 (not read by CPython)",
+                            BOM + b"\n\n" + cookie % b"latin-1" + b"import os\n"),
+                           ("no mark, a cookie that agrees with the bytes", cookie % b"latin-1" + b"import os\n")):
             with self.subTest(name):
                 try:
                     compile(data, "m.py", "exec")
                     compiles = True
                 except SyntaxError:
                     compiles = False
-                self.assertEqual("matches" in fa.import_facts(OUTSIDE, [("m.py", data)]), compiles)
+                facts = fa.import_facts(OUTSIDE, [("m.py", data)])
+                self.assertEqual("matches" in facts, compiles, facts)
+
+    def test_a_mark_declares_utf8_and_a_cookie_that_says_otherwise_contradicts_it(self):
+        # CPython: "encoding problem: iso-8859-1 with BOM". The mark must not turn such a file into one that is counted
+        # (and, under "only the standard library", accepted): before PM-11 it was refuted by the mark itself.
+        for cookie in (b"latin-1", b"iso-8859-15", b"cp1252", b"ascii", b"utf-16", b"no-such-codec"):
+            data = BOM + b"# -*- coding: " + cookie + b" -*-\nimport os\n"
+            with self.subTest(cookie=cookie):
+                facts = fa.import_facts(OUTSIDE, [("m.py", data)])
+                self.assertEqual(facts, {"present": True, "unparsable": "m.py:?"})      # no line is named: `?`
+                self.assertEqual(fa.verdict_of("python_imports", {"matches": 0}, facts), BehaviorVerdict.REFUTED)
+        # the same cookie with no mark is not read (the probe takes UTF-8 only, as before): counted by its imports,
+        # a codec Python does not know included (CPython refuses that one; this probe has never read the cookie)
+        for cookie in (b"latin-1", b"no-such-codec", b"utf-16"):
+            plain = fa.import_facts(OUTSIDE, [("m.py", b"# -*- coding: " + cookie + b" -*-\nimport requests\n")])
+            with self.subTest(no_mark=cookie):
+                self.assertEqual((plain["matches"], plain["locations"]), (1, [["m.py", 2, ["requests"]]]))
+        # and each reader decides it so
+        for read, ref in self.refs_of({"pkg/m.py": BOM + b"# -*- coding: latin-1 -*-\nimport requests\n"}).items():
+            for matches in (0, 1):
+                with self.subTest(read=read, matches=matches):
+                    o = fa.FileArtifactProbe().observe(base.spec("path:pkg", {"matches": matches},
+                                                                  {"imports_outside": OUTSIDE}), ref, base.ENV)
+                    self.assertEqual((o.kind, o.verdict), (K.OBSERVED, BehaviorVerdict.REFUTED))
+                    self.assertEqual(base.facts(o)["unparsable"], "pkg/m.py:?")
 
     def test_a_mark_does_not_make_a_file_utf8_that_is_not(self):
         # a UTF-8 mark followed by bytes that are not UTF-8, and a UTF-16 / UTF-32 mark: not UTF-8, so no count — the
@@ -252,6 +292,10 @@ class ByteOrderMark(unittest.TestCase):
         self.assertEqual((only["files"], only["matches"], only["skipped_binary"]), (1, 0, []))
         mid = fa.grep_facts(re.compile("\ufeff"), [("d.py", b"x = 1\n" + BOM + b"y\n")])
         self.assertEqual(mid["locations"], [["d.py", 2]])
+        # the consequence, said and pinned: a leading mark is not text, so no grep pattern sees it (not U+FEFF, not a
+        # non-ASCII class); a spec that must forbid the mark states it over the bytes, as `content` does
+        lead = fa.grep_facts(re.compile("\ufeff|[^\x00-\x7f]"), [("a.py", BOM + b"x = 1\n")])
+        self.assertEqual((lead["files"], lead["matches"]), (1, 0))
         for read, ref in self.refs().items():
             with self.subTest(read=read):
                 s = base.spec("path:pkg/outside.py", {"matches": 1}, {"grep": r"^import requests"})
@@ -287,12 +331,13 @@ class ParserLimits(unittest.TestCase):
         cls.refs["directory"] = RevisionRef("0" * 40, str(plain))
 
     @staticmethod
-    def stops_on(name: str, exc: BaseException):
-        """`ast.parse` as it is, except that it stops on `exc` for the file named `name`."""
+    def stops_on(name, exc: BaseException):
+        """`ast.parse` as it is, except that it stops on `exc` for the file named `name` (or any of the names given)."""
         real = fa.ast.parse
+        names = (name,) if isinstance(name, str) else tuple(name)
 
         def parse(source, filename="<unknown>", *a, **k):
-            if filename == name:
+            if filename in names:
                 raise exc
             return real(source, filename, *a, **k)
         return mock.patch.object(fa.ast, "parse", parse)
@@ -347,29 +392,86 @@ class ParserLimits(unittest.TestCase):
 
     def test_a_syntax_error_is_still_the_files_own_answer(self):
         # the distinction the owner asked for: what the parser says about the file is REFUTED and named with its line;
-        # what stops the parser is not. Real sources for the first, a limit raised for the second, in one tree.
+        # what stops the parser is not. Real sources for the first, a limit raised for the second; the third tree holds
+        # both, and then the harness has not looked at the whole tree, so there is no verdict to give.
         spec = base.spec("path:pkg", {"matches": 1}, {"imports_outside": OUTSIDE}, expectation=BehaviorVerdict.SATISFIED,
                          absence=base.REQUIRES)
-        with tempfile.TemporaryDirectory(prefix="aisef2-pm3-syn-") as d:
-            root = pathlib.Path(d)
-            for rel, data in {"pkg/a_bad.py": b"import os\n\ndef (:\n", "pkg/z_deep.py": b"x = 1\n"}.items():
-                (root / rel).parent.mkdir(parents=True, exist_ok=True)
-                (root / rel).write_bytes(data)
-            ref = RevisionRef("0" * 40, str(root))
-            with self.stops_on("pkg/z_deep.py", LIMITS["RecursionError"]):
-                o = fa.FileArtifactProbe().observe(spec, ref, base.ENV)
-        self.assertEqual((o.kind, o.verdict), (K.OBSERVED, BehaviorVerdict.REFUTED))
-        self.assertEqual(base.facts(o)["unparsable"], "pkg/a_bad.py:3")
+        trees = {"syntax error": {"pkg/a_bad.py": b"import os\n\ndef (:\n", "pkg/z_ok.py": b"x = 1\n"},
+                 "limit": {"pkg/a_ok.py": b"x = 1\n", "pkg/z_deep.py": b"x = 1\n"},
+                 "both": {"pkg/a_bad.py": b"import os\n\ndef (:\n", "pkg/z_deep.py": b"x = 1\n"}}
+        for name, files in trees.items():
+            with tempfile.TemporaryDirectory(prefix="aisef2-pm3-syn-") as d:
+                root = pathlib.Path(d)
+                for rel, data in files.items():
+                    (root / rel).parent.mkdir(parents=True, exist_ok=True)
+                    (root / rel).write_bytes(data)
+                with self.subTest(name), self.stops_on("pkg/z_deep.py", LIMITS["RecursionError"]):
+                    o = fa.FileArtifactProbe().observe(spec, RevisionRef("0" * 40, str(root)), base.ENV)
+            if name == "syntax error":
+                self.assertEqual((o.kind, o.verdict), (K.OBSERVED, BehaviorVerdict.REFUTED))
+                self.assertEqual(base.facts(o)["unparsable"], "pkg/a_bad.py:3")
+            else:
+                self.assertEqual((o.kind, o.verdict), (K.HARNESS_FAILED, None))
+                self.assertIn("'pkg/z_deep.py'", o.detail)
 
-    def test_the_first_file_in_tree_order_that_gives_no_count_decides(self):
-        # as for a file that is not UTF-8: the tree is read in its own order and the first file with no count to give
-        # decides, whichever way it gives none (the order is the reader's listing: deterministic for a revision)
-        syntax = ("a.py", b"def (:\n")
+    def test_a_refusal_outranks_a_files_own_answer_whichever_the_tree_lists_first(self):
+        # An over-cap file is refused whatever else the tree holds (every file is read before any is looked at). A file
+        # the parser stops on ranks the same: the harness could not look, so there is no count to be refuted, and the
+        # kind of the result must not depend on the order a reader lists the tree in (a git tree lists `a.py` before
+        # `a/b.py`, a plain directory `a/b.py` before `a.py`: the same tree gave REFUTED on one and UNRUNNABLE on the other).
+        own = {"syntax error": b"def (:\n", "not UTF-8": b"# caf\xe9\n", "NUL byte": b"x = '\x00'\n",
+               "mark and a contradicting cookie": BOM + b"# coding: latin-1\n"}
         deep = ("b.py", b"x = 1\n")
-        with self.stops_on("b.py", LIMITS["RecursionError"]):
-            self.assertEqual(fa.import_facts(OUTSIDE, [syntax, deep]), {"present": True, "unparsable": "a.py:1"})
-            with self.assertRaises(fa.Refused):
-                fa.import_facts(OUTSIDE, [deep, syntax])
+        for kind, exc in LIMITS.items():
+            with self.stops_on("b.py", exc):
+                for name, data in own.items():
+                    for order in ((("a.py", data), deep), (deep, ("a.py", data))):
+                        with self.subTest(limit=kind, own=name, first=order[0][0]):
+                            with self.assertRaises(fa.Refused) as caught:
+                                fa.import_facts(OUTSIDE, list(order))
+                            self.assertIn("'b.py'", str(caught.exception))      # the file the parser stopped on
+                            self.assertNotIn("a.py", str(caught.exception))
+
+    def test_of_two_files_the_parser_stops_on_the_first_listed_is_the_one_named(self):
+        with self.stops_on(("a.py", "c.py"), LIMITS["MemoryError"]):
+            for order, named, other in ((("a.py", "b.py", "c.py"), "'a.py'", "'c.py'"),
+                                        (("c.py", "b.py", "a.py"), "'c.py'", "'a.py'")):
+                with self.subTest(order=order), self.assertRaises(fa.Refused) as caught:
+                    fa.import_facts(OUTSIDE, [(f, b"x = 1\n") for f in order])
+                self.assertIn(named, str(caught.exception))
+                self.assertNotIn(other, str(caught.exception))
+
+    def test_of_two_files_that_answer_for_themselves_the_first_listed_is_the_one_named(self):
+        # no refusal here: the first file in the reader's listing that gives no count is the one the facts name, as
+        # before; a file listed after it is looked at (a refusal may be hiding there) and never replaces it
+        bad, latin = ("a.py", b"import os\n\ndef (:\n"), ("b.py", b"# caf\xe9\n")
+        self.assertEqual(fa.import_facts(OUTSIDE, [bad, latin]), {"present": True, "unparsable": "a.py:3"})
+        self.assertEqual(fa.import_facts(OUTSIDE, [latin, bad]), {"present": True, "undecodable": "b.py"})
+        ok = ("c.py", b"import requests\n")
+        self.assertEqual(fa.import_facts(OUTSIDE, [ok, bad, ok]), {"present": True, "unparsable": "a.py:3"})
+
+    def test_a_tree_that_two_readers_list_in_two_orders_gets_one_kind_of_result(self):
+        # `p/a.py` and `p/a/b.py`: the object store lists the first, a plain directory the second. Whichever holds the
+        # file the parser stops on and whichever the file that is its own answer, both readers say UNRUNNABLE.
+        for deep_is, files in (("a.py", {"p/a.py": b"x = 1\n", "p/a/b.py": b"def (:\n"}),
+                               ("a/b.py", {"p/a.py": b"def (:\n", "p/a/b.py": b"x = 1\n"})):
+            named = f"p/{deep_is}"
+            tmp = tempfile.TemporaryDirectory(prefix="aisef2-pm3-order-")
+            self.addCleanup(tmp.cleanup)
+            repo = base.Repo(pathlib.Path(tmp.name) / "repo")
+            refs = {"object_store": base.at(repo.path, repo.commit(files))}
+            plain = pathlib.Path(tmp.name) / "plain"
+            for rel, data in files.items():
+                (plain / rel).parent.mkdir(parents=True, exist_ok=True)
+                (plain / rel).write_bytes(data)
+            refs["directory"] = RevisionRef("0" * 40, str(plain))
+            spec = base.spec("path:p", {"matches": 0}, {"imports_outside": OUTSIDE}, expectation=BehaviorVerdict.SATISFIED,
+                             absence=base.REQUIRES)
+            for read, ref in refs.items():
+                with self.subTest(deep=deep_is, read=read), self.stops_on(named, LIMITS["MemoryError"]):
+                    o = fa.FileArtifactProbe().observe(spec, ref, base.ENV)
+                    self.assertEqual((o.kind, o.verdict), (K.HARNESS_FAILED, None))
+                    self.assertIn(f"'{named}'", o.detail)
 
     def test_only_python_imports_parses_so_only_it_can_hit_a_parser_limit(self):
         for spec in (base.spec("path:pkg", {"matches": 1}, {"grep": "^import json"}, expectation=BehaviorVerdict.SATISFIED),

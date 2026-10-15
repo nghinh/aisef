@@ -207,7 +207,9 @@ class UnestablishedCount(Tmp):
     and REFUTED whatever M and whichever subject_absence the contract declares — never SUBJECT_ABSENT (a prohibition
     would be satisfied by an unreadable module), never INDETERMINATE, never an exception of the harness — and the facts
     name the file (and, for syntax, the line) and carry no `matches`.
-    Pins aisef2/probe/file_artifact.py::import_facts [21, 32, 33, 34, 39, 40, 41, 42, 44] and [23]."""
+    Pins aisef2/probe/file_artifact.py::import_facts [21, 32, 33, 34, 39, 40, 41, 42, 44] and [23] (numbered as the
+    function stood at c1121580; PM-3, PM-4 and PM-11 have since added statements to it and renumbered the mutants.
+    The registered kill set is the target's, not an index)."""
 
     FILES = {"undec/ok.py": b"import yaml\n", "undec/latin1.py": b"# caf\xe9\n",
              "unpars/ok.py": b"import yaml\n", "unpars/bad.py": b"def (:\n",

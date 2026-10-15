@@ -4,19 +4,21 @@ path.
 The unit cases (`ast.parse` made to raise what CPython raises, on every interpreter) are `ParserLimits` in
 test_v21_python_imports.py. Here the parser is not touched:
 
-* `RealSources` — real files that are valid Python and past what this interpreter's parser takes: a chain of 100,000
+* `RealSources` — real files that are valid Python and past what this interpreter's parser takes: a chain of 96,000
   operands (CPython's `RecursionError` while building the AST: from about 95,000 on 3.14 macOS, 43,500 on 3.14 Linux,
   10,000 on 3.12) and 20,000 `not`s (its `MemoryError` "Parser stack overflowed": a compile-time constant, about 6,000,
   every host). Both readers — the object store of a real repository, which is what `aisef run` reads, and a plain
   directory. The oracle is the interpreter's own `ast.parse`, so the test needs no skip on an interpreter that takes a
-  file: it then owes the count.
+  file: it then owes the count. The `not` chain is the one that does not depend on the host's stack, so it is the one
+  every assertion about *which* kind of result is given leans on; the operand chain is only the host-dependent twin.
 * `RunPath` — the real `run_story` (a real git repository and worktrees, the real probes, journal format 3; typed doubles
   only for the developer, reviewer and scanner, as test_p6_orchestration.py): a source the parser cannot take, in the
   parent's tree and in the candidate's, ends the story at its own gate instead of raising out of it, releases
   everything the story held, is never charged to the developer, retries only as often as the ENVIRONMENT budget the
   run's settings give, and leaves the next story and the run's closing as they were.
 
-Nothing here goes past 100,000 operands: the parser's own limit is reached well below it on every host measured."""
+Nothing here goes past 96,000 operands: the parser's own limit is reached at or below it on every host measured, and an
+operand chain is never pushed to the point where the process itself would be what stops."""
 
 from __future__ import annotations
 
@@ -39,8 +41,9 @@ from tests.v2 import test_c2_file_artifact as base  # noqa: E402   (helpers only
 S, R = BehaviorVerdict.SATISFIED, BehaviorVerdict.REFUTED
 P_ = fa.FileArtifactProbe()
 STIM = {"imports_outside": {"stdlib": True, "allowed": []}}
-#: CPython's RecursionError out of the AST conversion (3.12: from ~10,000 operands; 3.14 macOS: ~95,000)
-DEEP_SUM = b"import os\nx = 1" + b"+1" * 100_000 + b"\n"
+#: CPython's RecursionError out of the AST conversion (3.12: from ~10,000 operands; 3.14 macOS: ~95,000). Kept below
+#: 100,000: past it a host's own stack, not the parser's limit, is what ends the process.
+DEEP_SUM = b"import os\nx = 1" + b"+1" * 96_000 + b"\n"
 #: CPython's MemoryError "Parser stack overflowed": a compile-time constant (about 6,000 nested operators), every host
 DEEP_NOT = b"import os\nx = " + b"not " * 20_000 + b"1\n"
 
@@ -62,7 +65,11 @@ class RealSources(unittest.TestCase):
     """One tree per subject, both readers."""
 
     FILES = {"pkg/ok.py": b"import json\n", "sum/deep.py": DEEP_SUM, "not_/deep.py": DEEP_NOT,
-             "mixed/a_ok.py": b"import json\n", "mixed/b_deep.py": DEEP_NOT, "mixed/c_ok.py": b"import yaml\n"}
+             "mixed/a_ok.py": b"import json\n", "mixed/b_deep.py": DEEP_NOT, "mixed/c_ok.py": b"import yaml\n",
+             # `a.py` / `a/b.py`: a git tree lists the first before the second, a plain directory the second first —
+             # one tree, two listing orders, so the kind of the result must not depend on which file comes first
+             "hybrid_deep_last/a.py": b"def (:\n", "hybrid_deep_last/a/b.py": DEEP_NOT,
+             "hybrid_deep_first/a.py": DEEP_NOT, "hybrid_deep_first/a/b.py": b"def (:\n"}
 
     @classmethod
     def setUpClass(cls):
@@ -113,6 +120,23 @@ class RealSources(unittest.TestCase):
                     else:
                         self.assertEqual((o.kind, o.verdict), (K.HARNESS_FAILED, None))
                         self.assertIn("'mixed/b_deep.py'", o.detail)
+
+    def test_the_kind_of_the_result_does_not_depend_on_the_order_a_reader_lists_the_tree_in(self):
+        # a file the parser stops on and a file that is a syntax error of its own, in one tree: whichever comes first
+        # in whichever reader's listing, the harness could not look at the whole tree, so there is no verdict
+        limit = stops(DEEP_NOT)
+        for subject, deep_file in (("hybrid_deep_last", "hybrid_deep_last/a/b.py"),
+                                   ("hybrid_deep_first", "hybrid_deep_first/a.py")):
+            for read, ref in self.refs.items():
+                with self.subTest(subject=subject, read=read, parser=limit or "takes it"):
+                    o = P_.observe(spec(f"path:{subject}", 0), ref, base.ENV)
+                    result = run_probe(P_, spec(f"path:{subject}", 0), ref, base.ENV).result
+                    if limit is None:           # an interpreter that parses it: the syntax error is then the answer
+                        self.assertEqual((o.kind, o.verdict), (K.OBSERVED, R))
+                    else:
+                        self.assertEqual((o.kind, o.verdict), (K.HARNESS_FAILED, None))
+                        self.assertIn(f"'{deep_file}'", o.detail)
+                        self.assertIsInstance(result, Unrunnable)
 
     def test_the_tree_beside_it_that_parses_is_counted_as_before(self):
         for read, ref in self.refs.items():
