@@ -93,7 +93,9 @@ SUBJECT_DEADLINE, REFUTED; nothing left and no status reported -> HARNESS_FAILED
 DISPATCHED goes through python_callable._after_dispatch (C2-P2-FINDING-002).
 
 **Enforcement: PARTIAL.** `WEAKEST_PATH`: the subject and every subprocess step run as the harness user, with that
-user's filesystem and network; the subject cannot read the key nor build a fact; isolation, not a sandbox.
+user's filesystem and network; the subject cannot read the key nor write the protocol, but the facts the controller builds
+come from answers the subject's own process gives about itself, which that code can misreport (cli_invocation, PM-5);
+isolation, not a sandbox.
 """
 
 from __future__ import annotations
@@ -176,9 +178,12 @@ FAULT_WITNESS = ("a fault step measures one declared fault at one declared call:
                  "quantified over every crash point, never a proof of it (DECISION-1)")
 WEAKEST_PATH = ("the subject, in a process of its own, and every subprocess step run as the harness user with that "
                 "user's filesystem and network access; the subject can read the evaluation directory but not the key "
-                "that authenticates the protocol, and the controller alone builds the facts and writes the protocol; "
-                "-I interpreter isolation, a scrubbed environment, fresh working and temporary directories and "
-                "harness-owned bytecode caches (-X pycache_prefix, -B) are isolation, not a sandbox")
+                "that authenticates the protocol, and the controller alone builds the facts and writes the protocol -- "
+                "from answers the subject's own process gives about itself (a returned value, an exit status), "
+                "which code written to answer for itself, or to recognise that it is being probed, can misreport: "
+                "the channel is protected, the truth of an answer is not; -I interpreter isolation, a scrubbed "
+                "environment, fresh working and temporary directories and harness-owned bytecode caches "
+                "(-X pycache_prefix, -B) are isolation, not a sandbox")
 PLACEHOLDER = ci.PLACEHOLDER
 _CONTENT = ("text", "newline", "bytes_hex")
 _FLAT = re.compile(r"[A-Za-z0-9_][A-Za-z0-9._-]*")

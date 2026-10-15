@@ -67,8 +67,9 @@ without a namespace, for instance) is a harness failure the controller reports â
 harness's exit was REFUTED.
 
 **Enforcement: PARTIAL.** `WEAKEST_PATH`, cli_invocation's: the subject runs in a process of its own as the harness
-user, with that user's filesystem and network; it can read the evaluation directory, never the key, and builds no
-fact. Isolation, not a sandbox.
+user, with that user's filesystem and network; it can read the evaluation directory, never the key. The controller
+builds every fact, from answers the subject's own process gives about itself (a returned value, a raised exception),
+which that code can misreport (cli_invocation, PM-5). Isolation, not a sandbox.
 """
 
 from __future__ import annotations

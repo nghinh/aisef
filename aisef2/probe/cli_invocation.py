@@ -77,6 +77,12 @@ subject's process exists. Code of the revision therefore cannot write, forge or 
 the facts the verdict is decided from: what it controls is its own behaviour, which is what is observed. A hard exit
 or a signal of the subject's process is reported by the controller, which outlives it.
 
+What this does not give (PM-5, V21-26; measured, closure-evidence/v2/v2.1/round-3/probes/repro-5*): the answers of the
+subject's process -- an exit code, a returned value, a raised exception -- are given by a process the subject's own code
+shares, so the channel is protected and the truth of an answer is not. Code written to answer for itself, or to recognise
+that it is being probed (`sys.flags.isolated`, the scrubbed environment), can make a product that fails when a person
+runs it come out SATISFIED here. The probe says what the process answered; it cannot say the answer is honest.
+
 **Protocol channel (DESIGN-CHECK-1).** The taxonomy proposal suggested a dedicated descriptor (fd 3) on POSIX and a
 marker file on Windows. The owned process range (`aisef2/runtime/process_range.py`) launches the target through an
 anchor process that forwards no extra descriptor, and the runtime is out of this package's scope, so the channel is a
@@ -119,8 +125,9 @@ HOME. Both processes run with `python_callable._scrubbed_env` plus `LC_ALL=C.UTF
 objects between invocations so each capture holds what its invocation wrote; it never writes to them.
 
 **Enforcement: PARTIAL.** Weakest path (`WEAKEST_PATH`): the subject runs in a process of its own as the harness user,
-with that user's filesystem and network; it can read the evaluation directory, never the key, and builds no fact.
-`-I`, the scrubbed environment, the fresh working and temporary directories and the harness-owned bytecode caches are
+with that user's filesystem and network; it can read the evaluation directory, never the key. The controller builds
+every fact, from answers the subject's own process gives about itself, which that code can misreport (the section
+above). `-I`, the scrubbed environment, the fresh working and temporary directories and the harness-owned bytecode caches are
 isolation, not a sandbox.
 """
 
@@ -200,9 +207,12 @@ CLASS_TABLE = {
 }
 WEAKEST_PATH = ("the subject runs in a process of its own, a child of the probe's controller, as the harness user with "
                 "that user's filesystem and network access; it can read the evaluation directory but not the key that "
-                "authenticates the protocol, and the controller alone builds the facts and writes the protocol; -I "
-                "interpreter isolation, a scrubbed environment, fresh working and temporary directories and "
-                "harness-owned bytecode caches (-X pycache_prefix, -B) are isolation, not a sandbox")
+                "authenticates the protocol, and the controller alone builds the facts and writes the protocol -- from "
+                "answers the subject's own process gives about itself (an exit code, a returned value), which code "
+                "written to answer for itself, or to recognise that it is being probed, can misreport: the channel "
+                "is protected, the truth of an answer is not; -I interpreter isolation, a scrubbed environment, "
+                "fresh working and temporary directories and harness-owned bytecode caches (-X pycache_prefix, -B) "
+                "are isolation, not a sandbox")
 STREAM_CAP = 8 * 1024 * 1024   # bytes kept per captured stream; a subject may write more, the fact says truncated
 STREAM_SHAPES = ("text", "contains", "regex", "lines", "first_word")
 FILE_SHAPES = ("sha256", "text", "absent", "equals_before")
