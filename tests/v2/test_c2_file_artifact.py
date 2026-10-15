@@ -95,6 +95,13 @@ def facts(o: Observation) -> dict:
     return json.loads(o.detail[o.detail.index("{"):])
 
 
+def counted(pattern, files: list) -> dict:
+    """`fa.grep_facts` as the probe runs it — in its worker process (PM-13) — for a pattern given compiled or as text,
+    under a deadline generous for any of these inputs."""
+    with tempfile.TemporaryDirectory(prefix="aisef2-fa-grep-") as work:
+        return fa.grep_facts(getattr(pattern, "pattern", pattern), files, timeout_s=60.0, work=work)
+
+
 class Repo:
     """A throwaway repository. `commit` writes files and commits them; `index` puts an entry into the index by
     content and mode without touching the working tree (a symlink entry, a case-colliding path, a gitlink)."""
@@ -219,8 +226,11 @@ class ObjectStoreRule(unittest.TestCase):
         self.assertEqual((o.verdict, facts(o)["matches"], facts(o)["files"]), (R, 3, 3))
         o = self.observe(self.sha1, "path:app/sub/deep.py", *grep("tele", 2))
         self.assertEqual((o.kind, o.verdict), (K.OBSERVED, S))
-        o = self.observe(self.sha1, "path:app/sub/deep.py", *grep("tele", 2, [".md"]))
-        self.assertEqual((o.verdict, facts(o)["files"], facts(o)["matches"]), (R, 0, 0))
+        o = self.observe(self.sha1, "path:app/sub/deep.py", *grep("tele", 2, [".md"]))   # the file is there, the suffix takes none
+        self.assertEqual((o.kind, o.verdict), (K.SUBJECT_ABSENT, R))     # PM-9: a selection of none is an absent subject
+        self.assertEqual((facts(o)["present"], facts(o)["files"], facts(o)["suffixes"], facts(o)["path"]),
+                         (False, 0, [".md"], "app/sub/deep.py"))
+        self.assertNotIn("matches", facts(o))                            # nothing was counted: no zero to be read as one
         o = self.observe(self.sha1, "path:app/sub/deep.py", *grep("e", 2))   # one per matching line, never per match
         self.assertEqual((o.verdict, facts(o)["matches"], facts(o)["path"], facts(o)["mode"]), (S, 2, "app/sub/deep.py", "100644"))
 
@@ -288,7 +298,11 @@ class ObjectStoreRule(unittest.TestCase):
         self.assertEqual((o.kind, o.verdict), (K.HARNESS_FAILED, None))
         self.assertIn("nest/l (120000)", o.detail)
         o = P.observe(spec("path:nest", *grep("telemetry", 0, [".py"])), at(repo.path, rev), ENV)
-        self.assertEqual((o.kind, o.verdict, facts(o)["files"]), (K.OBSERVED, S, 0))   # not selected: not read
+        self.assertEqual((o.kind, o.verdict, facts(o)["present"], facts(o)["files"]),
+                         (K.SUBJECT_ABSENT, S, False, 0))               # not selected: not read, and nothing to count over
+        self.assertEqual(run_probe(P, spec("path:nest", *grep("telemetry", 0, [".py"]), absence=REQUIRES),
+                                   at(repo.path, rev), ENV).result,
+                         Executed(BehaviorVerdict.INDETERMINATE, IndeterminateReason.PRECONDITION_ABSENT))
 
     def test_a_gitlink_is_not_a_file_of_this_repository(self):
         repo = Repo(pathlib.Path(self.tmp.name) / "gitlink")
@@ -685,20 +699,20 @@ class Tables(unittest.TestCase):
     def test_grep_facts_counts_lines_skips_binary_and_names_undecodable(self):
         import re
         p = re.compile("a")
-        self.assertEqual(fa.grep_facts(p, [("f", b"aa\nb\na\r\n"), ("g", b"\x00a"), ("h", b"")]),
+        self.assertEqual(counted(p, [("f", b"aa\nb\na\r\n"), ("g", b"\x00a"), ("h", b"")]),
                          {"present": True, "files": 3, "matches": 2, "skipped_binary": ["g"], "locations": [["f", 1], ["f", 3]]})
-        self.assertEqual(fa.grep_facts(p, [("g", b"\x00a"), ("f", b"\xff")]), {"present": True, "undecodable": "f", "skipped_binary": ["g"]})
-        many = fa.grep_facts(p, [("f", b"a\n" * 70)])
+        self.assertEqual(counted(p, [("g", b"\x00a"), ("f", b"\xff")]), {"present": True, "undecodable": "f", "skipped_binary": ["g"]})
+        many = counted(p, [("f", b"a\n" * 70)])
         self.assertEqual((many["matches"], len(many["locations"]), many["locations"][-1]), (70, fa._LOCATIONS, ["f", 50]))
-        self.assertEqual(fa.grep_facts(p, []), {"present": True, "files": 0, "matches": 0, "skipped_binary": [], "locations": []})
+        self.assertEqual(counted(p, []), {"present": True, "files": 0, "matches": 0, "skipped_binary": [], "locations": []})
         # PM-11: a leading UTF-8 byte-order mark is the signature, not the first line's text: `^` anchors the text, and the
         # same file read with or without it answers alike; a mark that is not leading, and a file whose bytes after it are
         # not UTF-8, are unchanged
         bom = b"\xef\xbb\xbf"
         anchored = re.compile("^a")
-        self.assertEqual(fa.grep_facts(anchored, [("m", bom + b"ab\nb\n"), ("n", b"ab\n"), ("o", b"b\n" + bom + b"a\n")]),
+        self.assertEqual(counted(anchored, [("m", bom + b"ab\nb\n"), ("n", b"ab\n"), ("o", b"b\n" + bom + b"a\n")]),
                          {"present": True, "files": 3, "matches": 2, "skipped_binary": [], "locations": [["m", 1], ["n", 1]]})
-        self.assertEqual(fa.grep_facts(anchored, [("m", bom + b"\xff")]),
+        self.assertEqual(counted(anchored, [("m", bom + b"\xff")]),
                          {"present": True, "undecodable": "m", "skipped_binary": []})
         self.assertTrue(fa.selected("a/b.py", None) and fa.selected("a/b.py", []) and fa.selected("a/b.py", [".md", ".py"]))
         self.assertFalse(fa.selected("a/b.py", [".md"]) or fa.selected("a/py", [".py"]))
@@ -736,8 +750,8 @@ class Tables(unittest.TestCase):
         self.assertEqual((fa.METADATA.probe_id, fa.METADATA.observation_class, P.id), (fa.PROBE_ID, fa.spec_class, fa.PROBE_ID))
         self.assertIs(P.enforcement(), Enforcement.FULL)
         pre = P.harness_preconditions()
-        self.assertEqual(len(pre), 3)
-        for word in ("git", "checkout", "object store", "timeout_s", "RevisionRef.sha"):
+        self.assertEqual(len(pre), 4)      # PM-13: the worker of grep_count is a fourth thing that must function
+        for word in ("git", "checkout", "object store", "timeout_s", "RevisionRef.sha", "worker", "-I -S", "process range"):
             self.assertTrue(any(word in p for p in pre), word)
 
     def test_git_env_is_an_allowlist_plus_pins(self):
@@ -811,7 +825,9 @@ class Catalog(unittest.TestCase):
         src = (ROOT / "aisef2" / "probe" / "file_artifact.py").read_text(encoding="utf-8")
         self.assertEqual(ps.violations("aisef2/probe/file_artifact.py", src, ps.SOURCE_RULES,
                                        {"subject_process": "in_harness_process", "stimulus_shape": "none"}), [])
-        self.assertEqual(ps.child_scripts(__import__("ast").parse(src)), [])   # no child script: nothing runs the subject
+        # PM-13: one child script, the worker of grep_count — a harness script on bytes; no subject code runs. The rules
+        # above read it too: no clock, no test artefact, nothing on stdout
+        self.assertEqual([name for name, _, _ in ps.child_scripts(__import__("ast").parse(src))], ["GREP_WORKER"])
         self.assertEqual(ps.check(ROOT), [])
         e = entry_for("aisef2/probe/file_artifact.py")
         self.assertIsNotNone(e)

@@ -14,8 +14,8 @@ one gives an expired window no meaning and is INVALID_SPEC. Negation is the cont
 |---|---|---|---|
 | `exists` | `{"condition": "exists", "within_s": W}` | `{}` | the path is an entry of the tree |
 | `content` | `{"sha256": H, ["newline": N,] "within_s": W}` or `{"equals_text": T, "newline": N, "within_s": W}` | `{}` | the blob hashes to H / equals T |
-| `grep_count` | `{"matches": M, "within_s": W}` | `{"grep": R, ["suffixes": [".py", ...]]}` | exactly M lines match R |
-| `python_imports` | `{"matches": M, "within_s": W}` | `{"imports_outside": {"stdlib": B, "allowed": [N, ...]}, ["suffixes": [".py", ...]]}` | exactly M import statements name a module outside the set |
+| `grep_count` | `{"matches": M, "within_s": W}` | `{"grep": R, ["suffixes": [".py", ...]]}` | exactly M lines match R, over at least one selected file |
+| `python_imports` | `{"matches": M, "within_s": W}` | `{"imports_outside": {"stdlib": B, "allowed": [N, ...]}, ["suffixes": [".py", ...]]}` | exactly M import statements name a module outside the set, over at least one selected file |
 
 `newline` (`"\\n"` or `"\\r\\n"`) declares the line convention: when it is declared the blob's line endings are
 normalised to it (CRLF to LF, then LF to the declared one) before hashing or comparing, and `equals_text` is a text
@@ -27,6 +27,16 @@ the default selecting every file. A file holding a NUL byte is binary: skipped a
 not UTF-8 leaves the count unestablished: REFUTED, the file named. A file over `FILE_CAP` bytes is a harness refusal,
 never a verdict. `content` over a directory is observed and REFUTED (a tree has no blob). Every class means REFUTED by
 an expired window (`ON_DEADLINE`): a read that did not complete in W is not an observation of presence.
+
+**A selection of no file** (V2.1, PM-9, `CAPABILITY_VERSION` 3). `grep_count` and `python_imports` count over the files
+a path selects. A path that is in the tree but selects none — a directory holding no file the suffixes take (a
+documentation directory, a package whose modules moved), or one file the suffixes do not take — has nothing to count
+over, and a count of zero over nothing is not an observation that the files satisfy a prohibition: it is the absence of
+the subject, decided by the spec's declaration exactly as a path that is not in the tree (`Absence`, below). A selection
+that holds a file is a subject whatever the file holds: an empty file, a file of the byte-order mark alone, a binary file
+(`grep_count` skips it and names it; `python_imports` cannot parse it: REFUTED) all keep the verdict they always had.
+Only the selection by path and suffix is meant: the files `facts_of` takes, before any is read — never a judgement of
+what is in them.
 
 `python_imports` (V2.1, V21-37 — a line regex counted a docstring line beginning `from` as an import and rolled back a
 correct story) reads the same files as `grep_count` (default suffix `.py`) and parses each with this interpreter's
@@ -66,10 +76,30 @@ refusal rules, names matched exactly against the directory listing (never the fi
 links never followed. The decision is by repository presence at the root, made by git's own discovery with
 `GIT_CEILING_DIRECTORIES` set to the root's parent — never by the SHA's value. The detail records which was read.
 
-**Absence.** A path that is not in the tree is SUBJECT_ABSENT with the verdict the observable gives the absent
-subject: REFUTED for `exists` and `content`; for `grep_count` and `python_imports` the verdict the count gives zero
-matches (SATISFIED when M is 0), so a prohibition declared ABSENCE_IS_DECIDABLE decides (§10.2); whether it counts is
-the spec's declaration, applied by `protocol.classify_failure`, never here.
+**Absence.** A path that is not in the tree — or, for `grep_count` and `python_imports`, one that selects no file (see
+above) — is SUBJECT_ABSENT with the verdict the observable gives the absent subject: REFUTED for `exists` and `content`;
+for `grep_count` and `python_imports` the verdict the count gives zero matches (SATISFIED when M is 0), so a
+prohibition declared ABSENCE_IS_DECIDABLE decides (§10.2); whether it counts is the spec's declaration, applied by
+`protocol.classify_failure`, never here: REQUIRES_SUBJECT drops it for INDETERMINATE(PRECONDITION_ABSENT). The facts of
+a selection of none say so (`present` false, `files` 0, the `suffixes` that selected), so the detail of a direct
+observation tells a path that is not there from one that selects nothing.
+
+**Bounded matching** (V2.1, PM-13). The regex loop of `grep_count` — the one operation of this probe whose time depends
+on the text and the pattern, not on the size of what it reads — runs in a worker process of its own, under the harness
+watchdog `ExecutionEnv.timeout_s` (the operator's `timeouts_s.probe`), never in this process. The worker is a harness
+script (`GREP_WORKER`, in this module, so in EXECUTION_DIGEST) started as `sys.executable -I -S -B` inside a process
+range (`aisef2.runtime.process_range`, §17.1) with a scrubbed environment; it is given the pattern and the bytes of
+the selected files by a file of the evaluation directory and gives back the facts the in-process loop always gave, as
+numbers by file index, in a second file. Nothing of the subject runs: it holds bytes, it executes none. One deadline
+covers the whole operation — the request written, the worker started, the files decoded, the lines matched, the result
+read — and a worker that does not give a valid result inside it is a harness failure, UNRUNNABLE (owner ENVIRONMENT),
+never a verdict: it hung (DEADLINE: the file, the line being matched and the head of the pattern are named, and the
+way out), it could not start (LAUNCH), it ended by an exit status or a signal (CRASHED), it wrote nothing (NO_RESULT),
+or what it wrote is not facts of this request (BAD_RESULT: not JSON, a field missing or of another type, more than a
+request this size can produce). A failure is never retried here — the same pattern over the same bytes within the same
+deadline stops the same way — and the process range is emptied before the observation returns: what the worker
+started, a grandchild included, is the range's, and nothing outside the range is signalled. The window `within_s` is
+still decided after the read, as before (PM-12): a read that finished is judged by its own window.
 
 **Why git runs outside the owned process range** (design note). The Cycle-1 probe runs the subject inside a P4
 process range because the subject is untrusted code that may fork, hang or leave processes behind, and what ended
@@ -84,8 +114,9 @@ the binary itself is never looked up through it again): no user or system git co
 (`GIT_CONFIG_NOSYSTEM`, a global config path that does not exist, `HOME` inside a fresh temporary directory of
 this evaluation), no prompt, no background maintenance, `LC_ALL=C`.
 
-**Enforcement: FULL.** No subject code runs. Weakest path: git's own object store at the revision SHA (the binary's
-identity is a RunSpec capability), or the bytes of a directory that is not a repository.
+**Enforcement: FULL.** No subject code runs: the worker of `grep_count` is the harness's own script on bytes. Weakest
+path: git's own object store at the revision SHA (the binary's identity is a RunSpec capability), or the bytes of a
+directory that is not a repository.
 """
 
 from __future__ import annotations
@@ -101,6 +132,7 @@ import pathlib
 import re
 import shutil
 import stat
+import struct
 import subprocess
 import sys
 import tempfile
@@ -111,6 +143,7 @@ from typing import Mapping
 from aisef2.arch.enums import BehaviorVerdict, Enforcement
 from aisef2.probe.protocol import ExecutionEnv, HarnessProbe, Observation, ObservationKind, ProbeMetadata, RevisionRef
 from aisef2.product.spec import ProductProofSpec
+from aisef2.runtime.process_range import ProcessRange, RangeError
 
 PROBE_ID = "probe.file_artifact"
 #: The bytes this probe takes behaviour from, in dependency order, and no more (PM-7): the module, the protocol that turns
@@ -135,6 +168,15 @@ _HEX64 = re.compile(r"[0-9a-f]{64}")
 _MODULE_NAME = re.compile(r"[A-Za-z_]\w*")      # a top-level module name, as python_imports compares them
 _PREFIX = "path:"
 _LOCATIONS = 50               # match locations kept in the detail
+#: PM-13. The failures of grep_count's worker, each its own reason in the detail (`grep_count worker <REASON>: ...`).
+WORKER_REASONS = ("DEADLINE", "LAUNCH", "CRASHED", "NO_RESULT", "BAD_RESULT", "INPUT")
+_WORKER_GRACE_S = (0.5, 0.5)  # the worker's range ladder once the observation is over: it holds nothing to flush
+_WORKER_WAIT_S = 30.0         # bounded: a range that will not empty is a residual, never an endless wait
+_PATTERN_HEAD = 40            # characters of the pattern a DEADLINE names
+_RESULT_FLOOR = 65536         # bytes a worker's result may hold before the size of its request is counted
+#: The deadline clock of the worker. Bound here, once, to the function: the observation window of `observe` reads the
+#: module's `time` (a test clock replaces it there), and the watchdog of a subprocess is not that window.
+_monotonic = time.monotonic
 
 
 def _probe_digest() -> str:
@@ -151,7 +193,7 @@ def _probe_digest() -> str:
 #: (a stimulus grammar, a verdict rule, a class's meaning). The bytes that run are EXECUTION_DIGEST: a calibration row
 #: and the run's RunSpec bind them, so a byte change needs its calibrations demonstrated again before anything admits.
 #: A matching digest is not evidence that two executions behave alike; the calibration contrast is the evidence.
-CAPABILITY_VERSION = 2     # 2: the class python_imports (V21-37)
+CAPABILITY_VERSION = 3     # 2: the class python_imports (V21-37); 3: a selection of no file is an absent subject (PM-9)
 EXECUTION_DIGEST = _probe_digest()
 DIGEST = hashlib.sha256(json.dumps([PROBE_ID, CAPABILITY_VERSION, list(CLASSES)]).encode("utf-8")).hexdigest()
 
@@ -259,24 +301,186 @@ def content_facts(data: bytes, observable) -> dict:
             "sha256": hashlib.sha256(normalised(data, dict(observable).get("newline"))).hexdigest()}
 
 
-def grep_facts(pattern: re.Pattern, files: list[tuple[str, bytes]]) -> dict:
-    """Lines matching `pattern` over the decoded files, one match per matching line. A file holding a NUL byte is
-    binary: skipped and named. A file that is not UTF-8 leaves the count unestablished (no `matches`)."""
-    matches, skipped, where = 0, [], []
-    for rel, data in files:
+#: The worker of `grep_count` (PM-13): a harness script, never given anything of the subject but bytes. It is started as
+#: `sys.executable -I -S -B -c GREP_WORKER <request> <result> <progress>`; stdlib only, no clock, nothing on stdout.
+#: `request` is one JSON line {pattern, sizes, locations} then the selected files' bytes end to end; `progress` is eight
+#: bytes the worker keeps up to date through a mapping (the 1-based index of the file it is on, the 1-based number of the
+#: line it is matching: 0 for none yet) so that a stop can say where; `result` is the facts, by file index.
+GREP_WORKER = r"""
+import json, mmap, os, re, struct, sys
+
+
+def grep(pattern, sizes, blob, cap, mark):
+    matches, skipped, where, offset = 0, [], [], 0
+    for index, size in enumerate(sizes):
+        data = blob[offset:offset + size]
+        offset += size
+        mark[0:8] = struct.pack("<II", index + 1, 0)
         if b"\0" in data:
-            skipped.append(rel)
+            skipped.append(index)
             continue
         try:
-            text = data.decode("utf-8-sig")     # a leading byte-order mark is the signature, not the first line's text
+            text = data.decode("utf-8-sig")
         except UnicodeDecodeError:
-            return {"present": True, "undecodable": rel, "skipped_binary": skipped}
-        for n, line in enumerate(text.splitlines(), 1):
+            return {"undecodable": index, "skipped_binary": skipped}
+        for number, line in enumerate(text.splitlines(), 1):
+            mark[4:8] = struct.pack("<I", number)
             if pattern.search(line):
                 matches += 1
-                if len(where) < _LOCATIONS:
-                    where.append([rel, n])
-    return {"present": True, "files": len(files), "matches": matches, "skipped_binary": skipped, "locations": where}
+                if len(where) < cap:
+                    where.append([index, number])
+    return {"files": len(sizes), "matches": matches, "skipped_binary": skipped, "locations": where}
+
+
+def main(request, result, progress):
+    with open(request, "rb") as f:
+        head, _, blob = f.read().partition(b"\n")
+    ask = json.loads(head)
+    with open(progress, "r+b") as f:
+        mark = mmap.mmap(f.fileno(), 8)
+        facts = grep(re.compile(ask["pattern"]), ask["sizes"], blob, ask["locations"], mark)
+    with open(result, "w", encoding="utf-8") as f:
+        json.dump(facts, f)
+
+
+main(sys.argv[1], sys.argv[2], sys.argv[3])
+"""
+
+
+def _worker_env() -> dict:
+    """What the worker's process is given: the variables Python needs to start on Windows, and nothing else (under -I
+    it would ignore PYTHON* anyway)."""
+    keep = ("SYSTEMROOT", "SystemRoot", "WINDIR", "TEMP", "TMP", "TMPDIR")
+    return {k: os.environ[k] for k in keep if k in os.environ}
+
+
+def _worker_facts(obj, rels: list[str]) -> dict:
+    """The facts a worker's result stands for, with the files named: a result that is not the shape the worker writes
+    for a request of these files is BAD_RESULT (a result is data from another process, never trusted for its shape)."""
+    def bad(why: str):
+        raise WorkerFailed("BAD_RESULT", f"the result is not the facts of this request ({why})")
+
+    def index(v) -> bool:
+        return isinstance(v, int) and not isinstance(v, bool) and 0 <= v < len(rels)
+    if not isinstance(obj, dict):
+        bad(f"a {type(obj).__name__}, not an object")
+    if set(obj) not in ({"undecodable", "skipped_binary"}, {"files", "matches", "skipped_binary", "locations"}):
+        bad(f"fields {sorted(obj)}")
+    skipped = obj["skipped_binary"]
+    if not isinstance(skipped, list) or not all(index(i) for i in skipped) or skipped != sorted(set(skipped)):
+        bad("skipped_binary is not an ascending list of file indexes")
+    named = [rels[i] for i in skipped]
+    if "undecodable" in obj:
+        if not index(obj["undecodable"]):
+            bad("undecodable is not a file index")
+        return {"present": True, "undecodable": rels[obj["undecodable"]], "skipped_binary": named}
+    matches, where = obj["matches"], obj["locations"]
+    if obj["files"] != len(rels) or isinstance(obj["files"], bool):
+        bad("files is not the number of files sent")
+    if not isinstance(matches, int) or isinstance(matches, bool) or matches < 0:
+        bad("matches is not a count")
+    if not isinstance(where, list) or len(where) != min(matches, _LOCATIONS) \
+            or not all(isinstance(w, list) and len(w) == 2 and index(w[0]) and isinstance(w[1], int)
+                       and not isinstance(w[1], bool) and w[1] >= 1 and w[0] not in skipped for w in where) \
+            or where != sorted(where):
+        bad("locations are not the first matching lines, in order")
+    return {"present": True, "files": len(rels), "matches": matches, "skipped_binary": named,
+            "locations": [[rels[i], n] for i, n in where]}
+
+
+def grep_facts(pattern: str, files: list[tuple[str, bytes]], *, timeout_s: float, work: str, on_range=None) -> dict:
+    """Lines matching `pattern` over the decoded files, one match per matching line: what a worker process computes,
+    under `timeout_s` for the whole operation (module docstring, "Bounded matching"). A file holding a NUL byte is
+    binary: skipped and named. A file that is not UTF-8 leaves the count unestablished (no `matches`). `work` is the
+    evaluation's directory: the request, the progress mark, the result and the worker's output live in it.
+    `on_range` is the harness's hook for the worker's process range (the story's scope releases it). Raises
+    `WorkerFailed` when the worker gives no valid facts; the range is emptied before it returns either way."""
+    begun = _monotonic()
+    request, result, progress, log = (os.path.join(work, n) for n in ("request", "result", "progress", "worker.log"))
+    try:
+        os.makedirs(work, exist_ok=True)
+        with open(request, "wb") as f:
+            f.write(json.dumps({"pattern": pattern, "sizes": [len(d) for _, d in files],
+                                "locations": _LOCATIONS}).encode("ascii") + b"\n")
+            for _, data in files:
+                f.write(data)
+        with open(progress, "wb") as f:
+            f.write(bytes(8))
+        out = open(log, "wb")
+    except OSError as e:
+        raise WorkerFailed("INPUT", f"the request cannot be written ({type(e).__name__})") from None
+    try:
+        run = ProcessRange("grep_count worker", [sys.executable, "-I", "-S", "-B", "-c", GREP_WORKER, request, result,
+                                                 progress],
+                           cwd=work, env=_worker_env(), output=out, grace_s=_WORKER_GRACE_S, wait_s=_WORKER_WAIT_S)
+        run.start()
+    except (RangeError, OSError) as e:
+        raise WorkerFailed("LAUNCH", f"the worker did not start ({type(e).__name__})") from None
+    finally:
+        out.close()
+    try:
+        if on_range is not None:
+            on_range(run)
+        status = run.wait(max(0.0, timeout_s - (_monotonic() - begun)))
+        elapsed = _monotonic() - begun
+    finally:
+        run.release()   # RangeNotEmpty / RangeEscaped propagate: a leak is never silent (§17.1)
+    if status is None and elapsed < timeout_s:   # the range's report ended before the watchdog did: no exit status
+        raise WorkerFailed("CRASHED", "the process range ended without reporting how the worker ended" + _said(log))
+    if status is None or elapsed > timeout_s:    # the deadline is the whole operation: a late answer is no answer
+        raise WorkerFailed("DEADLINE", _stopped(pattern, files, progress, timeout_s, None if status is None else elapsed))
+    if status != 0:
+        how = f"ended by signal {-status}" if status < 0 else f"exited with status {status}"
+        raise WorkerFailed("CRASHED", f"the worker {how} before it gave its result" + _said(log) + "; it is not "
+                           "retried here: a harness that ends the same way again is the environment's to fix")
+    rels = [rel for rel, _ in files]
+    cap = _RESULT_FLOOR + 8 * sum(len(rel) + 8 for rel in rels)
+    try:
+        size = os.path.getsize(result)
+    except OSError:
+        raise WorkerFailed("NO_RESULT", "the worker exited 0 and wrote no result" + _said(log)) from None
+    if size == 0:
+        raise WorkerFailed("NO_RESULT", "the worker exited 0 and its result is empty" + _said(log))
+    if size > cap:
+        raise WorkerFailed("BAD_RESULT", f"the result is {size} bytes: more than a request of {len(rels)} file(s) can "
+                                         f"produce ({cap})")
+    try:
+        obj = json.loads(pathlib.Path(result).read_bytes())
+    except (OSError, ValueError, RecursionError) as e:
+        raise WorkerFailed("BAD_RESULT", f"the result is not JSON ({type(e).__name__})") from None
+    return _worker_facts(obj, rels)
+
+
+def _said(log: str) -> str:
+    """What the worker printed (its traceback, when it crashed), cut: the tail of its output file."""
+    try:
+        tail = pathlib.Path(log).read_bytes()[-300:].decode("utf-8", "replace").strip()
+    except OSError:
+        return ""
+    return f": {tail!r}" if tail else ""
+
+
+def _stopped(pattern: str, files: list[tuple[str, bytes]], progress: str, timeout_s: float,
+             finished_after: float | None) -> str:
+    """The DEADLINE message: where the worker was when its range was stopped (the progress mark, read after the stop),
+    the head of the pattern, and what to do — not to run it again. `finished_after` is the time a worker took that
+    did finish, but only after the watchdog had passed (the start of the range counts): its answer is not taken."""
+    try:
+        at, line = struct.unpack("<II", pathlib.Path(progress).read_bytes()[:8])
+    except (OSError, struct.error):
+        at = line = 0
+    name = files[at - 1][0] if 0 < at <= len(files) else None
+    where = ("before it began on the first file" if name is None else
+             f"reading {name!r}" if line == 0 else f"matching line {line} of {name!r}")
+    head = pattern[:_PATTERN_HEAD] + ("..." if len(pattern) > _PATTERN_HEAD else "")
+    what = ("the regex loop did not finish within" if finished_after is None else
+            f"the worker answered only after the watchdog had passed ({finished_after:.1f}s, start included; nothing is "
+            "taken from a late answer):")
+    return (f"{what} the harness watchdog ({timeout_s:g}s: timeouts_s.probe), {where}, "
+            f"against the pattern {head!r} ({len(pattern)} characters); its process range was emptied and nothing was "
+            "observed, so this is a stop of the harness and never a verdict. The same pattern over the same bytes "
+            "within the same deadline stops the same way: running it again changes nothing. Simplify the pattern "
+            "(no nested or overlapping quantifiers over the same text) or raise timeouts_s.probe on purpose")
 
 
 def import_facts(outside, files: list[tuple[str, bytes]]) -> dict:
@@ -335,6 +539,15 @@ def selected(path: str, suffixes) -> bool:
 
 class Refused(Exception):
     """The harness could not read the tree honestly: an escape, a link, a cap, a missing revision, a git failure."""
+
+
+class WorkerFailed(Refused):
+    """The harness could not count: the worker of `grep_count` gave no valid facts (PM-13). `reason` is one of
+    `WORKER_REASONS` and opens the message, so a reader and a machine tell a hang from a crash from a bad answer."""
+
+    def __init__(self, reason: str, message: str) -> None:
+        super().__init__(f"grep_count worker {reason}: {message}")
+        self.reason = reason
 
 
 def git_env(home: str) -> dict:
@@ -496,8 +709,10 @@ def read(reader, path: str, oid: str, size: int) -> bytes:
     return reader.blob(path, oid)
 
 
-def facts_of(reader, cls: str, rel: str, observable, stim: dict) -> dict:
-    """The facts `verdict_of` decides on, read through `reader`; `present` False when the path is not in the tree."""
+def facts_of(reader, cls: str, rel: str, observable, stim: dict, grep) -> dict:
+    """The facts `verdict_of` decides on, read through `reader`; `present` False when the path is not in the tree or,
+    for a count, when it selects no file (PM-9). `grep(pattern, files)` gives the facts of a `grep_count` (the bounded
+    worker, PM-13); a count of a selection of none needs none."""
     found = entry(reader, rel)
     if found is None:
         return {"present": False, "path": rel}
@@ -518,10 +733,12 @@ def facts_of(reader, cls: str, rel: str, observable, stim: dict) -> dict:
     odd = [f"{f[0]} ({f[1]})" for f in chosen if f[1] not in ("100644", "100755")]
     if odd:
         raise Refused(f"entries under {rel!r} selected for grep that are not files: {odd[:5]}; a link is never read")
+    if not chosen:    # PM-9: nothing is selected, so nothing is counted: the subject of the count is absent
+        return {"present": False, "path": rel, "mode": mode, "files": 0, "suffixes": list(suffixes)}
     contents = [(f[0], read(reader, f[0], f[2], f[3])) for f in chosen]
     if cls == "python_imports":
         return {"path": rel, "mode": mode, **import_facts(stim["imports_outside"], contents)}
-    return {"path": rel, "mode": mode, **grep_facts(re.compile(stim["grep"]), contents)}
+    return {"path": rel, "mode": mode, **grep(stim["grep"], contents)}
 
 
 class FileArtifactProbe(HarnessProbe):
@@ -531,8 +748,10 @@ class FileArtifactProbe(HarnessProbe):
 
     def __init__(self, on_range=None, scratch: str | None = None) -> None:
         """`on_range` and `scratch` are the harness-owned constructor convention every catalog probe accepts
-        (PROBE-META-1); this probe starts no subject process and keeps no state, so both are recorded and unused.
-        The git binary is resolved once, here: a probe constructed without one refuses every observation."""
+        (PROBE-META-1). This probe starts no subject process and keeps no state: `on_range` receives the process range
+        of a `grep_count` worker (the story's scope releases it; the probe releases it itself first), `scratch` is
+        recorded and unused. The git binary is resolved once, here: a probe constructed without one refuses every
+        observation."""
         self._on_range, self._scratch = on_range, scratch
         self._git = shutil.which("git")
 
@@ -543,7 +762,9 @@ class FileArtifactProbe(HarnessProbe):
         return ("git: a git binary was resolvable when the probe was constructed and answers within the harness "
                 "watchdog (ExecutionEnv.timeout_s)",
                 "checkout: the revision's checkout root exists — the top level of a repository, or a directory",
-                "object store: when the root is a repository, it holds the revision (RevisionRef.sha)")
+                "object store: when the root is a repository, it holds the revision (RevisionRef.sha)",
+                "worker: this interpreter launches under -I -S in a process range of the harness and answers a "
+                "grep_count within the harness watchdog (ExecutionEnv.timeout_s)")
 
     def observe(self, spec: ProductProofSpec, at: RevisionRef, env: ExecutionEnv) -> Observation:
         pi = spec.probe_input
@@ -579,7 +800,10 @@ class FileArtifactProbe(HarnessProbe):
         with tempfile.TemporaryDirectory(prefix="aisef2-file-artifact-") as home:
             try:
                 reader = self._reader(at, env, home)
-                facts = facts_of(reader, cls, rel, pi["observable"], stim)
+                facts = facts_of(reader, cls, rel, pi["observable"], stim,
+                                 grep=lambda pattern, files: grep_facts(pattern, files, timeout_s=env.timeout_s,
+                                                                        work=os.path.join(home, "grep"),
+                                                                        on_range=self._on_range))
             except Refused as e:
                 return Observation(ObservationKind.HARNESS_FAILED, detail=str(e))
         expired = time.monotonic() - started > window

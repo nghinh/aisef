@@ -251,7 +251,7 @@ class ByteOrderMark(unittest.TestCase):
                 self.assertEqual(fa.import_facts(OUTSIDE, [("u.py", data)]), {"present": True, "undecodable": "u.py"})
         for name in ("utf-16-le mark, no NUL byte", "utf-8 mark, then latin-1"):      # the text class says the same
             with self.subTest(grep=name):
-                self.assertEqual(fa.grep_facts(re.compile("import"), [("u.py", cases[name])]),
+                self.assertEqual(base.counted(re.compile("import"), [("u.py", cases[name])]),
                                  {"present": True, "undecodable": "u.py", "skipped_binary": []})
 
     def test_each_reader_decides_a_marked_file_by_its_imports(self):
@@ -285,16 +285,16 @@ class ByteOrderMark(unittest.TestCase):
         # grep_count reads the mark the same way: `^import requests` is line 1's text, with or without the signature,
         # and the lines keep their numbers; a mark that is not leading is a character of its line
         pattern = re.compile(r"^import requests")
-        marked = fa.grep_facts(pattern, [("a.py", BOM + b"import requests\nx = 1\n"), ("b.py", b"import requests\n"),
-                                         ("c.py", b"x = 1\nimport requests\n"), ("d.py", b"x = 1\n" + BOM + b"import requests\n")])
+        marked = base.counted(pattern, [("a.py", BOM + b"import requests\nx = 1\n"), ("b.py", b"import requests\n"),
+                                        ("c.py", b"x = 1\nimport requests\n"), ("d.py", b"x = 1\n" + BOM + b"import requests\n")])
         self.assertEqual((marked["matches"], marked["locations"]), (3, [["a.py", 1], ["b.py", 1], ["c.py", 2]]))
-        only = fa.grep_facts(re.compile("^$"), [("e.py", BOM)])
+        only = base.counted(re.compile("^$"), [("e.py", BOM)])
         self.assertEqual((only["files"], only["matches"], only["skipped_binary"]), (1, 0, []))
-        mid = fa.grep_facts(re.compile("\ufeff"), [("d.py", b"x = 1\n" + BOM + b"y\n")])
+        mid = base.counted(re.compile("\ufeff"), [("d.py", b"x = 1\n" + BOM + b"y\n")])
         self.assertEqual(mid["locations"], [["d.py", 2]])
         # the consequence, said and pinned: a leading mark is not text, so no grep pattern sees it (not U+FEFF, not a
         # non-ASCII class); a spec that must forbid the mark states it over the bytes, as `content` does
-        lead = fa.grep_facts(re.compile("\ufeff|[^\x00-\x7f]"), [("a.py", BOM + b"x = 1\n")])
+        lead = base.counted(re.compile("\ufeff|[^\x00-\x7f]"), [("a.py", BOM + b"x = 1\n")])
         self.assertEqual((lead["files"], lead["matches"]), (1, 0))
         for read, ref in self.refs().items():
             with self.subTest(read=read):

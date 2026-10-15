@@ -16,7 +16,11 @@ Three things are pinned, each by measurement and not by a list copied from the m
    someone classifies it — declares it a source, or says why it is not one;
 2. every declared source exists and is loaded: nothing is declared that the probe does not use;
 3. PROBE_SOURCES only feeds the digest. It grants nothing and loads nothing: its one reader is `_probe_digest`, a probe
-   whose tuple is emptied answers the same, and naming a module in it does not import that module."""
+   whose tuple is emptied answers the same, and naming a module in it does not import that module;
+4. (PM-13) the probe now starts a worker through `aisef2.runtime.process_range`, which imports a good part of the kernel
+   for its own types. Which of the modules held are only imported, and which have code that runs in an observation, is
+   measured with a profile hook around `run_probe`, not argued: the only aisef2 module whose code runs there besides
+   PROBE_SOURCES is the process range — the ownership mechanism, a source of no other probe's digest either."""
 
 from __future__ import annotations
 
@@ -51,7 +55,28 @@ NOT_SOURCES = {
     "aisef2.errors": "exception types; no decision",
     "aisef2.product.spec": "the spec's data type: the probe reads its fields; none of its code runs in an observation "
                            "(its constructor runs in the caller, before the probe is given the spec)",
+    # PM-13: the worker of grep_count is started through the process range
+    "aisef2.runtime.process_range": "the controller's ownership mechanism (§17.1): it starts the worker in a session of "
+                                    "its own and empties it, graceful-first; it takes no part in what is observed (the "
+                                    "facts, the verdict, the result are this module's and protocol's). Its code RUNS in "
+                                    "an observation of grep_count (measured below) and is, like for cli_invocation, "
+                                    "python_callable_v2 and process_effect, which launch through it, not a source of "
+                                    "the digest: the mechanism has its own P4 tests and mutation targets, and a change "
+                                    "to it moves no observation of a file",
 }
+#: held only because the process range imports them (its `Residual` type from story_scope, `ResourceKind` from the
+#: journal), and they import the rest of the kernel for their own work: no function of any of them is called during an
+#: observation — measured (4.), and a module that starts to run there must move to PROBE_SOURCES or to NOT_SOURCES
+#: with the reason it is not one.
+IMPORTED_ONLY = {n: "imported by the process range's import chain (story_scope -> the kernel's plan, control, journal "
+                    "and product modules); no code of it runs in an observation" for n in (
+    "aisef2.control", "aisef2.control.owner", "aisef2.control.routing", "aisef2.journal", "aisef2.journal.compat",
+    "aisef2.journal.event", "aisef2.journal.format2", "aisef2.plan", "aisef2.plan.drift", "aisef2.plan.obligation",
+    "aisef2.plan.static_admission", "aisef2.plan.story_admission", "aisef2.probe.calibration", "aisef2.product.approval",
+    "aisef2.product.compiler", "aisef2.runtime", "aisef2.runtime.story_scope")}
+NOT_SOURCES.update(IMPORTED_ONLY)
+#: not sources whose code runs in an observation, and why: the process range alone
+RAN_NOT_SOURCES = ("aisef2.runtime.process_range",)
 
 SCRIPT = r'''
 import json, os, pathlib, sys, tempfile
@@ -61,6 +86,16 @@ from aisef2.probe import file_artifact as fa
 from aisef2.arch.enums import BehaviorVerdict, Enforcement
 from aisef2.probe.protocol import ExecutionEnv, RevisionRef, run_probe
 from aisef2.product.spec import ProductProofSpec
+
+ran = set()
+
+
+def watch(frame, event, arg):
+    if event == "call":
+        name = frame.f_globals.get("__name__", "")
+        if name == "aisef2" or name.startswith("aisef2."):
+            ran.add(name)
+
 
 with tempfile.TemporaryDirectory(prefix="aisef2-pm7-") as d:
     pathlib.Path(d, "pkg").mkdir()
@@ -79,14 +114,18 @@ with tempfile.TemporaryDirectory(prefix="aisef2-pm7-") as d:
                 probe_input={"subject": {"kind": "file_artifact", "locator": locator}, "stimulus": stimulus,
                              "observable": {**observable, "within_s": 10}, "subject_absence": absence},
                 candidate_expectation=BehaviorVerdict.SATISFIED, compiler_id="pm7", compiler_digest="0" * 64)
-            run_probe(probe, spec, ref, env)
+            sys.setprofile(watch)               # PM-13: which aisef2 code RUNS in an observation (not merely loaded)
+            try:
+                run_probe(probe, spec, ref, env)
+            finally:
+                sys.setprofile(None)
 
 held = sorted(n for n in sys.modules if n == "aisef2" or n.startswith("aisef2."))
 before_naming = "aisef2.app.run" in sys.modules
 digest_before = fa._probe_digest()
 fa.PROBE_SOURCES = (*fa.PROBE_SOURCES, "app/run.py")        # a name in the tuple: read for the hash, nothing else
 digest_named = fa._probe_digest()
-print(json.dumps({"held": held, "named_module_loaded_before": before_naming,
+print(json.dumps({"held": held, "ran": sorted(ran), "named_module_loaded_before": before_naming,
                   "named_module_loaded_after": "aisef2.app.run" in sys.modules,
                   "digest_changed_by_naming": digest_named != digest_before, "digest_before": digest_before}))
 '''
@@ -116,6 +155,16 @@ class Measured(unittest.TestCase):
                          "the probe now loads a module that is neither a PROBE_SOURCE nor in NOT_SOURCES: decide which "
                          "(a source changes EXECUTION_DIGEST, so its calibration rows are proved again)")
         self.assertEqual(sources & set(NOT_SOURCES), set(), "a module is a source or it is not, never both")
+
+    def test_the_modules_whose_code_runs_are_the_sources_and_the_process_range_alone(self):
+        # measured, per call event of a profile hook around run_probe: a module that is only imported (IMPORTED_ONLY)
+        # never has a function called; the one not-source that runs is the ownership mechanism, named
+        ran = set(self.found["ran"])
+        sources = {module_of(rel) for rel in fa.PROBE_SOURCES}
+        self.assertEqual(ran - sources, set(RAN_NOT_SOURCES))
+        self.assertEqual(ran & set(IMPORTED_ONLY), set())
+        self.assertEqual(set(RAN_NOT_SOURCES) - set(NOT_SOURCES), set())            # said, with its reason
+        self.assertEqual(sources - ran, set(), "a declared source no observation runs: it decides nothing")
 
     def test_every_declared_source_exists_is_loaded_and_is_not_a_table_entry_for_nothing(self):
         held = set(self.found["held"])
