@@ -38,6 +38,9 @@ from tests.v2 import test_v21_review_chain as chain  # noqa: E402
 #: items carry those classifications, and `summary` replaces the token summary.
 FAKE_OCR = r'''import hashlib, json, pathlib, subprocess, sys
 argv = sys.argv[1:]
+if argv == ["version"]:      # the identity gate asks before any review command
+    print("open-code-review v1.12.12 (182898c) darwin/arm64")
+    raise SystemExit(0)
 here = pathlib.Path(__file__).parent
 sc = json.loads((here / "scenario.json").read_text(encoding="utf-8"))
 def opt(name):

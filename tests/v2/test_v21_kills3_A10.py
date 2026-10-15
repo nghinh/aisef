@@ -43,14 +43,18 @@ BAD_PARENT = "deadbeef" * 5      # a well-formed revision the repository does no
 class _Process:
     """One `ProcessRange` of the stand-in: records its name and command line, writes OCR's document, answers its exit."""
 
-    def __init__(self, finder: "_Finder", name: str, argv: list[str]) -> None:
-        self.finder, self.name, self.argv = finder, name, argv
+    def __init__(self, finder: "_Finder", name: str, argv: list[str], output=None) -> None:
+        self.finder, self.name, self.argv, self.output = finder, name, argv, output
         self.preview = "--preview" in argv
 
     def opt(self, flag: str) -> str:
         return self.argv[self.argv.index(flag) + 1]
 
     def start(self) -> "_Process":
+        if self.argv[1:] == ["version"]:      # the identity gate, before any review command: not a review, not a call
+            self.output.write(f"open-code-review {review_ocr.OCR['version']} ({review_ocr.OCR['commit'][:7]}) darwin/arm64\n")
+            self.output.flush()
+            return self
         f, base, head = self.finder, self.opt("--from"), self.opt("--to")
         out = pathlib.Path(self.opt("--output"))
         f.calls.append({"name": self.name, "preview": self.preview, "output": out, "base": base, "head": head})
@@ -70,7 +74,7 @@ class _Process:
         return self
 
     def wait(self, timeout=None):
-        return 0 if self.preview else self.finder.exit_code
+        return 0 if self.preview or self.argv[1:] == ["version"] else self.finder.exit_code
 
     def release(self) -> None:
         pass
@@ -85,7 +89,7 @@ class _Finder:
         self.calls: list[dict] = []
 
     def __call__(self, name, argv, *, cwd=None, env=None, output=None) -> _Process:
-        return _Process(self, name, [str(a) for a in argv])
+        return _Process(self, name, [str(a) for a in argv], output)
 
 
 class _Ocr(unittest.TestCase):

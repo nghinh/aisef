@@ -314,6 +314,9 @@ class TheItemsOcrFailedAreTheVerdictsOwn(unittest.TestCase):
 
 OCR_SCRIPT = r'''import json, pathlib, sys
 argv = sys.argv[1:]
+if argv == ["version"]:      # the identity gate asks before any review command
+    print("open-code-review v1.12.12 (182898c) darwin/arm64")
+    raise SystemExit(0)
 doc = json.loads(pathlib.Path(__file__).with_name("scenario.json").read_text(encoding="utf-8"))
 out = pathlib.Path(argv[argv.index("--output") + 1])
 if "--preview" in argv:

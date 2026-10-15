@@ -33,6 +33,7 @@ import subprocess
 import sys
 import tempfile
 import threading
+import types
 import unittest
 from unittest import mock
 
@@ -41,7 +42,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from aisef2.app import adapters as ad  # noqa: E402
-from aisef2.app import bundle, review_ocr, settings  # noqa: E402
+from aisef2.app import bundle, client, review_ocr, settings  # noqa: E402
 from aisef2.app import run as R  # noqa: E402
 from aisef2.arch.enums import ObligationRole, Polarity, SubjectAbsence, SubjectKind  # noqa: E402
 from aisef2.journal import format3  # noqa: E402
@@ -96,6 +97,13 @@ print(json.dumps({"type": "step_finish", "part": {"tokens": {"input": 120, "outp
 FAKE_OCR = r'''import hashlib, json, pathlib, subprocess, sys, time
 argv = sys.argv[1:]
 here = pathlib.Path(__file__).parent
+with (here / "calls.jsonl").open("a", encoding="utf-8") as _calls:     # every start, whatever it was asked
+    _calls.write(json.dumps(argv) + "\n")
+if argv == ["version"]:      # the identity gate asks before any review command; identity.json scripts a different answer
+    said = json.loads((here / "identity.json").read_text(encoding="utf-8")) if (here / "identity.json").exists() else {}
+    time.sleep(said.get("sleep", 0))
+    sys.stdout.write(said.get("text", "open-code-review v1.12.12 (182898c) darwin/arm64\nbuilt at: 2026-10-05T00:00:00Z\n"))
+    raise SystemExit(said.get("exit", 0))
 def opt(name):
     return argv[argv.index(name) + 1]
 repo, base, head, out = opt("--repo"), opt("--from"), opt("--to"), opt("--output")
@@ -415,13 +423,15 @@ class CandidateChangedDuringReview(ChainBase):
                         cals=R.calibrations())
         self.assertEqual(rec["story_outcomes"], {"S1": ["RETRY", "ROLLBACK"]})
         self.assertEqual(self.failures(), ["CAPABILITY_UNRUNNABLE", "CAPABILITY_UNRUNNABLE"])
-        self.assertEqual(list(self.bin.glob("review-*.json")), [])        # it never ran
+        self.assertEqual(list(self.bin.glob("review-*.json")), [])
+        self.assertFalse((self.bin / "calls.jsonl").exists())              # it was never started: not even for `version`
 
 
 class _ScriptedModel(http.server.BaseHTTPRequestHandler):
     """An OpenAI-compatible chat completions endpoint on loopback: every request with OCR's tools is answered with one
     code_comment (carrying an aisef-reproducer block) and task_done. Records what it was sent."""
     seen: list = []
+    COMMENT = True      # False: the model finds nothing and only says it is done
 
     def do_POST(self):  # noqa: N802 — http.server's name
         body = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
@@ -429,10 +439,11 @@ class _ScriptedModel(http.server.BaseHTTPRequestHandler):
         type(self).seen.append({"path": self.path, "tools": tools, "authorization": self.headers.get("Authorization"),
                                 "model": body.get("model")})
         content = "three arguments are summed as two\n```aisef-reproducer\n" + json.dumps(THREE_ARGS) + "\n```"
-        calls = [{"id": "c1", "type": "function", "function": {"name": "code_comment", "arguments": json.dumps(
-                     {"comments": [{"path": "app/cli.py", "content": content, "category": "bug", "severity": "high",
-                                    "existing_code": "    return int(args[0]) + int(args[1])"}]})}},
-                 {"id": "c2", "type": "function", "function": {"name": "task_done", "arguments": '{"state": "DONE"}'}}]
+        calls = [{"id": "c2", "type": "function", "function": {"name": "task_done", "arguments": '{"state": "DONE"}'}}]
+        if self.COMMENT:
+            calls.insert(0, {"id": "c1", "type": "function", "function": {"name": "code_comment", "arguments": json.dumps(
+                {"comments": [{"path": "app/cli.py", "content": content, "category": "bug", "severity": "high",
+                               "existing_code": "    return int(args[0]) + int(args[1])"}]})}})
         out = json.dumps({"id": "x", "object": "chat.completion", "created": 0, "model": body.get("model"),
                           "choices": [{"index": 0, "finish_reason": "tool_calls",
                                        "message": {"role": "assistant", "content": "", "tool_calls": calls}}],
@@ -447,6 +458,12 @@ class _ScriptedModel(http.server.BaseHTTPRequestHandler):
         pass
 
 
+class _QuietModel(_ScriptedModel):
+    """The same endpoint, a model that finds nothing: every request is answered with task_done alone."""
+    seen: list = []
+    COMMENT = False
+
+
 @unittest.skipUnless(os.environ.get("AISEF_TEST_OCR_EXE"), "the real Open Code Review binary (AISEF_TEST_OCR_EXE)")
 class RealBinary(unittest.TestCase):
     """The real `ocr` built from the pinned commit: its preview, and a full review against a scripted model."""
@@ -454,10 +471,13 @@ class RealBinary(unittest.TestCase):
     def setUp(self) -> None:
         self.exe = os.environ["AISEF_TEST_OCR_EXE"]
         self.sha = hashlib.sha256(pathlib.Path(self.exe).read_bytes()).hexdigest()
-        version = subprocess.run([self.exe, "version"], capture_output=True, text=True, encoding="utf-8").stdout
-        self.assertIn(review_ocr.OCR["version"], version)
-        self.assertIn(review_ocr.OCR["commit"][:7], version)
-        print(f"\n[real OCR] {version.splitlines()[0]} sha256 {self.sha}", file=sys.stderr)
+        # the product's own question, as the review stage asks it (clean environment, empty HOME): the real binary
+        # must be accepted by the same function that refuses another version or commit — not a substring of its output
+        self.declared, why = ad._declared(self.exe, review_ocr.VERSION_TIMEOUT_S)
+        self.assertIsNone(why)
+        self.assertEqual((self.declared["version"], review_ocr.OCR["commit"].startswith(self.declared["commit"])),
+                         (review_ocr.OCR["version"], True))
+        print(f"\n[real OCR] {self.declared['line']} sha256 {self.sha}", file=sys.stderr)
         t = tempfile.TemporaryDirectory()
         self.addCleanup(t.cleanup)
         self.tmp = pathlib.Path(t.name).resolve()
@@ -504,6 +524,39 @@ class RealBinary(unittest.TestCase):
         self.assertEqual(cov.status, review_ocr.COMPLETE)
         self.assertEqual(review_ocr.coverage(output, code, required=["app/cli.py"], base=self.base, head=self.head).status,
                          review_ocr.INDETERMINATE)
+
+    def test_the_review_stage_runs_the_real_binary_as_the_product_does(self):
+        """`Reviewer.review` — the kernel's own call, under fix-loop — over the real binary: the identity question in the
+        clean environment, the preview, the review against a model that finds nothing, the coverage COMPLETE (fix-loop
+        raises on anything else) and the session record carrying what the binary declared. Real here: the binary, the
+        stage's process handling, the controller's scope and coverage. Scripted: the model, on loopback."""
+        _QuietModel.seen = []
+        server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), _QuietModel)
+        threading.Thread(target=server.serve_forever, daemon=True).start()
+        self.addCleanup(server.server_close)
+        self.addCleanup(server.shutdown)
+        logs = self.tmp / "out" / "sessions"
+        budget = client.Budget({"provider_requests": 50, "turns": 50, "input_tokens": 10 ** 6, "output_tokens": 10 ** 6},
+                               dict.fromkeys(client.Budget.KEYS, 0), logs)
+        review = {"policy": "fix-loop", "min_severity": "high", "finder": "ocr", "given": True,
+                  "ocr": {"exe": self.exe, "sha256": self.sha, "timeout_min": 2, "max_tokens": 4000}}
+        run = types.SimpleNamespace(events=[types.SimpleNamespace(type="story/begin",
+                                                                  data={"story_id": "S1", "parent": self.base})],
+                                    state=lambda proj: {"S1": {"attempt": 1}})
+        rev = ad.Reviewer(run, bundle.load(cli_bundle(self.base)), logs, {"budget": budget, "secrets": ()}, 300.0,
+                          review=review, route={"url": f"http://127.0.0.1:{server.server_address[1]}/v1",
+                                                "token": "sk-test-not-a-key", "model": "model-1",
+                                                "env": {"PATH": os.environ["PATH"]}})
+        result = rev.review(types.SimpleNamespace(story_id="S1", root=str(self.repo)), ("C-SUM",))
+        (s,) = rev.sessions
+        self.assertEqual((result.outcome.name, result.findings), ("COMPLETED", ()))
+        self.assertEqual((s["coverage"]["status"], s["required"], s["exit"]), (review_ocr.COMPLETE, ["app/cli.py"], 0))
+        self.assertEqual(s["identity"]["declared"], {k: self.declared[k] for k in ("version", "commit", "platform", "line")})
+        self.assertEqual(s["identity"]["sha256_checked"], self.sha)
+        self.assertTrue(_QuietModel.seen and all(r["path"] == "/v1/chat/completions"
+                                                 and r["authorization"] == "Bearer sk-test-not-a-key"
+                                                 for r in _QuietModel.seen), _QuietModel.seen)
+        self.assertEqual(git(self.repo, "status", "--porcelain", "--ignored"), "")
 
     def test_a_full_review_against_a_scripted_model(self):
         _ScriptedModel.seen = []
