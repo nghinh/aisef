@@ -968,6 +968,141 @@ for _t, _fs in {**_V21_R3_RANGE, **_V21_R3_NEW}.items():
     V21_TARGETS[_t] = list(_fs)
 for _t, _fs in {**_V21_R3_RANGE_APPEND, **_V21_R3_APPEND}.items():
     V21_TARGETS[_t] = [*V21_TARGETS[_t], *[f for f in _fs if f not in V21_TARGETS[_t]]]
+# --- round 5 ---
+# B-03 round 5 (2026-10-15): the window's lanes (effect-cli PM-1/2/6/7, review-contracts, file-artifact PM-7/9/13,
+# ocr-gate, pm8-diagnostics, lineage) changed aisef2/app/{adapters,bundle_cli,client,diagnostics (new),lineage,
+# review_ocr,review_verify,run,verify}.py and aisef2/probe/{cli_invocation,file_artifact,process_effect,
+# python_callable_v2}.py. The digest is whole-file: every registered name of those files is re-measured. Each name a
+# lane added is a target of its own with the files its lane's final check named; each name a lane changed gets its
+# lane's files appended last (lane order). Not targets: names with no mutant (file_artifact.py GREP_WORKER,
+# CAPABILITY_VERSION, _PATTERN_HEAD, _RESULT_FLOOR, _WORKER_GRACE_S, _WORKER_WAIT_S, _monotonic; review_ocr.py
+# VERSION_TIMEOUT_S; lineage.py UNREADABLE_CLAIM; diagnostics.py ARTIFACT_DIR, ARTIFACT_FORMAT, AUTHORITY, DETAIL_MAX,
+# FAILURES_MAX, FILES_MAX, SAME_USER, SESSIONS_CONFINED), the class WorkerFailed (no function or table of that name;
+# its __init__ is), and a function nested in a registered one (where, maker, listed, observe, walk, bad, index: its
+# mutants are the enclosing target's). The kill sets are the lanes' proposals by which test calls the function; none
+# is measured yet.
+_T = "tests/v2/test_v21_"
+_PM8_RUN = [_T + "pm8_diagnostics_run.py"]
+#: tests/v2/test_v21_pm8_diagnostics.py is the unit file of aisef2/app/diagnostics.py and is NOT a kill file yet: its
+#: test `test_what_verify_reaches_never_writes_or_names_the_sink` imports validation.qualification.authority_limits
+#: with no `skipUnless` guard (test_c2_orchestration_conformance and test_c2_k_nowork_001 guard theirs: "validation/
+#: qualification is not in this tree (the mutation runner's copy)"), and the copy holds no validation/qualification,
+#: so on the unmutated tree the file fails (T0) and every target that names it errors. Once that test is guarded, set
+#: this to [_T + "pm8_diagnostics.py"]: it goes first in every pm8 kill set below.
+_PM8_UNIT: list[str] = []
+_PM8 = [*_PM8_UNIT, *_PM8_RUN]
+_FA = "aisef2/probe/file_artifact.py::"
+_V21_R5_NEW: dict[str, list[str]] = {
+    # PM-13: the grep_count worker, a child script in a process range under timeouts_s.probe
+    _FA + "GREP_WORKER/grep": [*_FILE_ARTIFACT_TESTS, _T + "fa_grep_worker.py"],
+    _FA + "GREP_WORKER/main": [_T + "fa_grep_worker.py"],
+    _FA + "_worker_facts": [_T + "fa_grep_worker.py", _T + "fa_grep_runpath.py"],
+    _FA + "_worker_env": [_T + "fa_grep_worker.py"],
+    _FA + "_stopped": [_T + "fa_grep_worker.py", _T + "fa_grep_runpath.py"],
+    _FA + "_said": [_T + "fa_grep_worker.py"],
+    _FA + "WorkerFailed.__init__": [_T + "fa_grep_worker.py", _T + "fa_grep_runpath.py"],
+    _FA + "WORKER_REASONS": [_T + "fa_grep_worker.py"],
+    # the OCR finder's declared version (ocr-gate): the question, its environment, the gate in Reviewer._ocr
+    "aisef2/app/adapters.py::_declared": [_T + "ocr_gate.py", _T + "review_chain.py"],
+    "aisef2/app/review_ocr.py::declared": [_T + "ocr_declared.py", _T + "ocr_gate.py"],
+    "aisef2/app/review_ocr.py::version_argv": [_T + "ocr_declared.py"],
+    "aisef2/app/review_ocr.py::version_environment": [_T + "ocr_declared.py", _T + "ocr_gate.py"],
+    "aisef2/app/review_ocr.py::VERSION_LINE": [_T + "ocr_declared.py"],
+    # review-contracts: a reproducer nested too deep, a model's data in a probe's spec
+    "aisef2/app/review_verify.py::_deeper_than": [_T + "r5_review_deep_input.py"],
+    "aisef2/app/review_verify.py::bounded": [_T + "r5_review_deep_input.py"],
+    "aisef2/app/review_verify.py::_NESTED_TOO_DEEP": [_T + "r5_review_deep_input.py", _T + "r3_detail_artifact.py"],
+    "aisef2/probe/cli_invocation.py::_compiles": [_T + "r5_probe_model_data.py"],
+    # PM-8: the diagnostics sink, the probes it taps, the one place a story id becomes a file name
+    "aisef2/app/review_verify.py::artifact_stem": [*_PM8_UNIT, _T + "r3_detail_artifact.py",
+                                                   _T + "r3_detail_statement.py"],
+    "aisef2/app/run.py::story_where": list(_PM8),
+    "aisef2/app/run.py::probe_factories": list(_PM8),
+    **{f"aisef2/app/diagnostics.py::{n}": list(_PM8) for n in (
+        "NOT_INSPECTED", "PERMISSIONS", "_NAME", "access_of", "_parsed", "_pre_state", "_identity", "artifact_problems",
+        "tapped", "Sink.__init__", "Sink.note", "Sink._document", "Sink._keep", "Sink.entries", "Sink.report")},
+    # lineage: evidence that is there but unreadable is UNREAD, never UNBEGUN; bundle continue's refusals
+    "aisef2/app/lineage.py::child_evidence": [_T + "pw_lineage_unread.py"],
+    "aisef2/app/lineage.py::_in_the_way": [_T + "pw_lineage_unread.py"],
+    "aisef2/app/lineage.py::_without_a_journal": [_T + "pw_lineage_unread.py"],
+    "aisef2/app/lineage.py::not_there": [_T + "pw_lineage_unread.py", _T + "pw_lineage_continue.py"],
+    "aisef2/app/lineage.py::is_file": [_T + "pw_lineage_unread.py"],
+    "aisef2/app/lineage.py::claim_unread": [_T + "pw_lineage_continue.py"],
+    "aisef2/app/bundle_cli.py::_record": [_T + "pw_lineage_continue.py", _T + "kills3_T01b.py"],
+    "aisef2/app/bundle_cli.py::_authentic": [_T + "pw_lineage_continue.py"],
+    "aisef2/app/bundle_cli.py::_journal": [_T + "pw_lineage_continue.py", _T + "continue_integrity.py",
+                                           _T + "kills3_T01b.py"],
+    "aisef2/app/bundle_cli.py::JournalRefused.__init__": [_T + "pw_lineage_continue.py"],
+    "aisef2/app/bundle_cli.py::_INTEGRITY": [_T + "pw_lineage_continue.py", _T + "continue_integrity.py"],
+}
+_V21_R5_APPEND: dict[str, list[str]] = {
+    # effect-cli: PM-1 (a namespace package at every depth), PM-6 (a host fault is a harness failure, not a verdict),
+    # PM-2 (a fault before a subprocess step is refused), PM-7 (the declared sources are the sources that run)
+    "aisef2/probe/cli_invocation.py::HARNESS/resolve": [_T + "r3_probe_namespace.py"],
+    "aisef2/probe/cli_invocation.py::HARNESS/main": [_T + "r3_probe_namespace.py"],
+    "aisef2/probe/cli_invocation.py::CliInvocationProbe._observe_in": [_T + "pm6_host_faults.py"],
+    "aisef2/probe/cli_invocation.py::PROBE_SOURCES": [_T + "probe_sources.py"],
+    "aisef2/probe/process_effect.py::HARNESS/resolve": [_T + "r3_probe_namespace.py"],
+    "aisef2/probe/process_effect.py::ProcessEffectProbe._observe_in": [_T + "pm6_host_faults.py"],
+    "aisef2/probe/process_effect.py::_subprocess_ok": [_T + "pm6_host_faults.py"],
+    "aisef2/probe/process_effect.py::FAULTED": [_T + "kills3_T19b.py"],
+    "aisef2/probe/process_effect.py::PROBE_SOURCES": [_T + "probe_sources.py"],
+    "aisef2/probe/python_callable_v2.py::PythonCallableV2Probe.observe": [_T + "pm6_host_faults.py"],
+    "aisef2/probe/python_callable_v2.py::PROBE_SOURCES": [_T + "probe_sources.py"],
+    # review-contracts
+    "aisef2/app/review_verify.py::reproducer_contract": [_T + "r5_review_deep_input.py"],
+    "aisef2/app/review_verify.py::redacted": [_T + "r5_review_deep_input.py"],
+    "aisef2/app/review_verify.py::verify": [_T + "r5_review_indeterminate.py", _T + "r5_probe_model_data.py", *_PM8],
+    "aisef2/app/adapters.py::Reviewer.review": [_T + "r5_review_deep_input.py", *_PM8],
+    "aisef2/app/adapters.py::Reviewer._model": [_T + "r5_review_deep_input.py"],
+    "aisef2/app/review_ocr.py::reproducer_of": [_T + "r5_review_deep_input.py"],
+    "aisef2/app/review_ocr.py::read_output": [_T + "r5_review_deep_input.py"],
+    "aisef2/app/client.py::events": [_T + "r5_review_deep_input.py"],
+    "aisef2/probe/cli_invocation.py::_equal": [_T + "r5_probe_model_data.py"],
+    "aisef2/probe/cli_invocation.py::_streams_ok": [_T + "r5_probe_model_data.py"],
+    "aisef2/probe/cli_invocation.py::_stream_shape_ok": [_T + "r5_probe_model_data.py"],
+    "aisef2/probe/python_callable_v2.py::_unsubstituted": [_T + "r5_probe_model_data.py"],
+    "aisef2/probe/python_callable_v2.py::_watch": [_T + "r5_probe_model_data.py"],
+    # file-artifact: PM-7 (sources), PM-9 (an empty selection is an absent subject), PM-13 (the worker), the
+    # parser's limits
+    _FA + "import_facts": [_T + "fa_parser_limits.py"],
+    _FA + "grep_facts": [_T + "fa_grep_worker.py", _T + "fa_grep_runpath.py"],
+    _FA + "PROBE_SOURCES": [_T + "pm7_file_artifact_sources.py"],
+    _FA + "facts_of": [_T + "fa_empty_selection.py"],
+    _FA + "FileArtifactProbe.observe": [_T + "fa_empty_selection.py", _T + "fa_grep_worker.py",
+                                        _T + "fa_grep_runpath.py"],
+    # ocr-gate
+    "aisef2/app/adapters.py::Reviewer._ocr": [_T + "ocr_gate.py"],
+    # pm8-diagnostics (the changed names the sink reaches)
+    "aisef2/app/run.py::evidence_manifest": list(_PM8),
+    "aisef2/app/adapters.py::Reviewer.__init__": list(_PM8),
+    "aisef2/app/adapters.py::Reviewer._verify": list(_PM8),
+    "aisef2/app/review_verify.py::preserve": list(_PM8),
+    "aisef2/app/verify.py::verify": list(_PM8),
+    # lineage
+    "aisef2/app/run.py::execute": [*_PM8, _T + "pw_lineage_unread.py"],
+    "aisef2/app/lineage.py::claim": [_T + "pw_lineage_unread.py"],
+    "aisef2/app/lineage.py::claims": [_T + "pw_lineage_unread.py"],
+    "aisef2/app/lineage.py::child_state": [_T + "pw_lineage_unread.py"],
+    "aisef2/app/lineage.py::continued_by": [_T + "pw_lineage_unread.py"],
+    "aisef2/app/lineage.py::lineage_account": [_T + "pw_lineage_unread.py"],
+    "aisef2/app/lineage.py::_look": [_T + "pw_lineage_unread.py"],
+    "aisef2/app/lineage.py::account_of": [_T + "pw_lineage_unread.py", _T + "pw_lineage_spend.py"],
+    "aisef2/app/bundle_cli.py::continue_from": [_T + "pw_lineage_continue.py"],
+    "aisef2/app/bundle_cli.py::main": [_T + "pw_lineage_continue.py"],
+}
+for _t, _fs in _V21_R5_NEW.items():
+    V21_TARGETS[_t] = list(_fs)
+for _t, _fs in _V21_R5_APPEND.items():
+    V21_TARGETS[_t] = [*V21_TARGETS[_t], *[f for f in _fs if f not in V21_TARGETS[_t]]]
+#: PM-2 deleted the controller's own-process guard `HARNESS/guarded` (its only caller, a fault before a subprocess step,
+#: is refused at admission now). It is no V2.1 target: no function of that name is left to mutate. S2_TARGETS keeps it
+#: (the sealed V2.0 record's 261 and its summary), and SUPERSEDED keeps it historical in every earlier record (the V2.1
+#: phase "took it over", and then no record can hold a result for it again).
+V21_RETIRED = ("aisef2/probe/process_effect.py::HARNESS/guarded",)
+for _t in V21_RETIRED:
+    del V21_TARGETS[_t]
+    SUPERSEDED[_t] = "V2.1"
 SUPERSEDED.update({t: "V2.1" for t in V21_TARGETS})
 for _phase in (P2_TARGETS, P4_TARGETS, P6_TARGETS, C2_P1_TARGETS):
     for _t in [t for t in _phase if t in V21_TARGETS]:
@@ -976,7 +1111,8 @@ RECORDS["V2.1"] = "closure-evidence/v2/v2.1/MUTATION.json"
 PHASE_TARGETS = {"P1": P1_TARGETS, "P2": P2_TARGETS, "P3": P3_TARGETS, "P4": P4_TARGETS, "P5": P5_TARGETS,
                  "P6": P6_TARGETS, "C2-P1": C2_P1_TARGETS, "C2-P2": C2P2_TARGETS, "C2-P3": C2P3_TARGETS, "C2-P4": C2_P4_TARGETS,
                  "C2-ORCH": C2_ORCH_TARGETS, "C2-P10": C2_P10_TARGETS, "K-PRESAT-001": K_PRESAT_TARGETS,
-                 "K-NOWORK-001": K_NOWORK_TARGETS, "V2.0-S2": {t: k for t, k in S2_TARGETS.items() if t not in V21_TARGETS},
+                 "K-NOWORK-001": K_NOWORK_TARGETS,
+                 "V2.0-S2": {t: k for t, k in S2_TARGETS.items() if t not in V21_TARGETS and t not in V21_RETIRED},
                  "V2.1": V21_TARGETS}
 TARGETS: dict[str, list[str]] = {t: k for targets in PHASE_TARGETS.values() for t, k in targets.items()}
 #: Targets whose survivors may not be audited away.

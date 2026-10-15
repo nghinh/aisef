@@ -29,6 +29,8 @@ class Phase(unittest.TestCase):
             self.assertEqual(m.phase_of(t), "V2.1", t)
             self.assertEqual(m.SUPERSEDED[t], "V2.1", t)
         for t, k in m.S2_TARGETS.items():                    # every S2 target is re-measured, its kill set kept first
+            if t in m.V21_RETIRED:                           # but a function 2.1 deleted has nothing left to re-measure
+                continue
             self.assertIn(t, m.V21_TARGETS)
             self.assertEqual(m.V21_TARGETS[t][0], k[0])
             self.assertEqual([f for f in m.V21_TARGETS[t] if f in k], list(dict.fromkeys(k)))
@@ -36,6 +38,19 @@ class Phase(unittest.TestCase):
                     "aisef2/app/bundle_cli.py"):
             self.assertTrue(any(t.startswith(rel + "::") for t in m.V21_TARGETS), rel)
         self.assertNotIn("aisef2/app/calibrations.py::CALIBRATIONS", m.TARGETS)
+
+    def test_a_retired_target_is_historical_in_s2_and_no_target_of_any_phase(self):
+        """PM-2 deleted `HARNESS/guarded` from process_effect.py: the sealed V2.0-S2 set keeps its name (261, its summary),
+        V2.1 re-measures nothing of it, and no phase lists it, so no record is asked for a result it cannot hold."""
+        import ast
+        self.assertTrue(m.V21_RETIRED)
+        for t in m.V21_RETIRED:
+            rel, name = t.split("::")
+            self.assertIn(t, m.S2_TARGETS)
+            self.assertNotIn(t, m.TARGETS)
+            self.assertFalse([ph for ph, targets in m.PHASE_TARGETS.items() if t in targets], t)
+            self.assertEqual(m.SUPERSEDED[t], "V2.1", t)                 # historical in the V2.0-S2 and C2 records
+            self.assertIsNone(m._root(ast.parse((ROOT / rel).read_text(encoding="utf-8")), name), t)   # really gone
 
     def test_the_criteria_and_the_snapshot_are_frozen_before_any_result(self):
         import json
