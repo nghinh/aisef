@@ -38,13 +38,14 @@ def events(log: pathlib.Path) -> list[dict]:
     inside a JSON string (JavaScript's JSON.stringify writes them so), and `str.splitlines()` — like text mode, which
     also makes a carriage return a line end — cut such a record in two, neither half parsed, and the event was lost
     without a word (a model's text, a finished step's tokens). A line that is not a JSON object — the torn last line
-    of a stream that was stopped mid-write, a line of the client's own — is no event and is skipped."""
+    of a stream that was stopped mid-write, a line of the client's own, one nested past the parser's depth (a
+    `RecursionError`: a tool call's arguments are the model's) — is no event and is skipped."""
     out = []
     for line in log.read_bytes().decode("utf-8", "replace").split("\n"):
         if line.startswith("{"):
             try:
                 out.append(json.loads(line))
-            except ValueError:
+            except (ValueError, RecursionError):
                 pass
     return out
 

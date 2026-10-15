@@ -127,6 +127,8 @@ class Reviewer:
         before = tree_of(scope.root)
         ocr = self.review_policy.get("finder") == "ocr"
         found, s, coverage = (self._ocr(scope, attempt, head) if ocr else self._model(scope, attempt))
+        # a finding's prose is read with `str()`: nothing of it nests deeper than the artifact keeps
+        found = [review_verify.bounded(f) for f in found]
         _unchanged(scope.root, head, before, "the finder")
         secrets = (*self.kw.get("secrets", ()), self.route.get("token"))     # what the session streams are redacted with
         typed = []
@@ -166,7 +168,9 @@ class Reviewer:
         m = re.search(r"\{.*\}", s["text"], re.S)
         try:
             found = json.loads(m.group(0))["findings"] if m else []
-        except (ValueError, KeyError):  # a {...} match loads as an object or not at all: no TypeError is possible
+        except (ValueError, KeyError, RecursionError):
+            # a {...} match loads as an object or not at all: no TypeError is possible; nested past the parser's depth
+            # (a RecursionError) is text that does not parse, like any other
             found = []
         s["parsed"] = m is not None
         return ([f for f in found if isinstance(f, dict)] if isinstance(found, list) else []), s, None
