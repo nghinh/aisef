@@ -15,6 +15,7 @@ machine-read names and values (path, mode, files, locations, the file that broke
 
 from __future__ import annotations
 
+import ast
 import contextlib
 import pathlib
 import sys
@@ -42,6 +43,17 @@ INDETERMINATE = Executed(BehaviorVerdict.INDETERMINATE, IndeterminateReason.PREC
 
 def spec(locator: str, matches: int, stimulus: dict = STIM, *, absence=REQUIRES, expectation=S):
     return base.spec(locator, {"matches": matches}, stimulus, absence=absence, expectation=expectation)
+
+
+def nul_line(data: bytes) -> str:
+    """What the facts must say where a NUL byte's line would be, on this interpreter: the line its own parser names
+    for the source, or `?` when it names none (a SyntaxError without one from Python 3.12, a ValueError before)."""
+    try:
+        ast.parse(data.decode("utf-8"))
+    except (SyntaxError, ValueError) as e:
+        line = getattr(e, "lineno", None)
+        return "?" if line is None else str(line)
+    return "parses"
 
 
 class Tmp(unittest.TestCase):
@@ -198,8 +210,15 @@ class UnestablishedCount(Tmp):
     Pins aisef2/probe/file_artifact.py::import_facts [21, 32, 33, 34, 39, 40, 41, 42, 44] and [23]."""
 
     FILES = {"undec/ok.py": b"import yaml\n", "undec/latin1.py": b"# caf\xe9\n",
-             "unpars/ok.py": b"import yaml\n", "unpars/bad.py": b"def (:\n"}
-    WHICH = (("undec", "undecodable", "undec/latin1.py"), ("unpars", "unparsable", "unpars/bad.py:1"))
+             "unpars/ok.py": b"import yaml\n", "unpars/bad.py": b"def (:\n",
+             "unpars3/ok.py": b"import yaml\n", "unpars3/bad.py": b"import os\nimport sys\ndef (:\n",
+             "nulbyte/ok.py": b"import yaml\n", "nulbyte/x.py": b"import os\nx = '\x00'\n"}
+    # a NUL byte is a SyntaxError with no line from Python 3.12 (a ValueError before): the facts name the file and say
+    # `?` where the line would be, never the text "None"; a syntax error names its own line (here the third). A name
+    # that is not a Windows device name: the directory is `nulbyte`, not `nul`.
+    WHICH = (("undec", "undecodable", "undec/latin1.py"), ("unpars", "unparsable", "unpars/bad.py:1"),
+             ("unpars3", "unparsable", "unpars3/bad.py:3"),
+             ("nulbyte", "unparsable", "nulbyte/x.py:" + nul_line(FILES["nulbyte/x.py"])))
 
     @classmethod
     def setUpClass(cls):
@@ -240,7 +259,8 @@ class UnestablishedCount(Tmp):
             with self.subTest(parser=name), parser:
                 f = fa.import_facts(STIM["imports_outside"], [("ok.py", b"import json\n"), ("x.py", b"a = 1\x00\n")])
                 self.assertIs(f["present"], True)
-                self.assertTrue(f["unparsable"].startswith("x.py:"))
+                want = "?" if name == "the 3.11 parser" else nul_line(b"a = 1\x00\n")   # never the text "None"
+                self.assertEqual(f["unparsable"], f"x.py:{want}")
                 self.assertNotIn("matches", f)
                 self.assertEqual(fa.verdict_of("python_imports", {"matches": 0}, f), R)
 

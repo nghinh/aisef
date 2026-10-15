@@ -691,6 +691,15 @@ class Tables(unittest.TestCase):
         many = fa.grep_facts(p, [("f", b"a\n" * 70)])
         self.assertEqual((many["matches"], len(many["locations"]), many["locations"][-1]), (70, fa._LOCATIONS, ["f", 50]))
         self.assertEqual(fa.grep_facts(p, []), {"present": True, "files": 0, "matches": 0, "skipped_binary": [], "locations": []})
+        # PM-11: a leading UTF-8 byte-order mark is the signature, not the first line's text: `^` anchors the text, and the
+        # same file read with or without it answers alike; a mark that is not leading, and a file whose bytes after it are
+        # not UTF-8, are unchanged
+        bom = b"\xef\xbb\xbf"
+        anchored = re.compile("^a")
+        self.assertEqual(fa.grep_facts(anchored, [("m", bom + b"ab\nb\n"), ("n", b"ab\n"), ("o", b"b\n" + bom + b"a\n")]),
+                         {"present": True, "files": 3, "matches": 2, "skipped_binary": [], "locations": [["m", 1], ["n", 1]]})
+        self.assertEqual(fa.grep_facts(anchored, [("m", bom + b"\xff")]),
+                         {"present": True, "undecodable": "m", "skipped_binary": []})
         self.assertTrue(fa.selected("a/b.py", None) and fa.selected("a/b.py", []) and fa.selected("a/b.py", [".md", ".py"]))
         self.assertFalse(fa.selected("a/b.py", [".md"]) or fa.selected("a/py", [".py"]))
 
@@ -705,7 +714,10 @@ class Tables(unittest.TestCase):
 
     def test_declared_tables_identity_and_preconditions(self):
         self.assertEqual(fa.PROBE_ID, "probe.file_artifact")
-        self.assertEqual(fa.PROBE_SOURCES, ("probe/protocol.py", "probe/file_artifact.py"))
+        # PM-7: the module, the protocol that turns an observation into a result, and the result types it builds
+        # (the verdict over an absent subject is outcome.py's): the bytes this probe takes behaviour from, no more.
+        # test_v21_pm7_file_artifact_sources.py measures them against what the probe process really loads.
+        self.assertEqual(fa.PROBE_SOURCES, ("product/outcome.py", "probe/protocol.py", "probe/file_artifact.py"))
         self.assertEqual(fa.CLASSES, ("exists", "content", "grep_count", "python_imports"))     # V2.1: + python_imports
         self.assertEqual(fa.ON_DEADLINE, {"exists": R, "content": R, "grep_count": R, "python_imports": R})
         self.assertEqual(fa.NEWLINES, ("\n", "\r\n"))

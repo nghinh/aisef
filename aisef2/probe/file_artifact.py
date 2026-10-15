@@ -21,20 +21,30 @@ one gives an expired window no meaning and is INVALID_SPEC. Negation is the cont
 normalised to it (CRLF to LF, then LF to the declared one) before hashing or comparing, and `equals_text` is a text
 whose lines end in `\\n`; without it `sha256` is over the exact blob bytes. `grep_count` compiles R (a pattern that
 does not compile is UNSUPPORTED; one longer than `PATTERN_CAP` is a harness refusal), decodes each selected file as
-UTF-8 and counts the lines with at least one match — one per matching line, never overlapping matches. A directory
-is walked recursively; `suffixes` selects by file-name suffix, the default selecting every file. A file holding a
-NUL byte is binary: skipped and named in the detail. A file that is not UTF-8 leaves the count unestablished:
-REFUTED, the file named. A file over `FILE_CAP` bytes is a harness refusal, never a verdict. `content` over a
-directory is observed and REFUTED (a tree has no blob). Every class means REFUTED by an expired window
-(`ON_DEADLINE`): a read that did not complete in W is not an observation of presence.
+UTF-8 (a leading byte-order mark is dropped, see below) and counts the lines with at least one match — one per
+matching line, never overlapping matches. A directory is walked recursively; `suffixes` selects by file-name suffix,
+the default selecting every file. A file holding a NUL byte is binary: skipped and named in the detail. A file that is
+not UTF-8 leaves the count unestablished: REFUTED, the file named. A file over `FILE_CAP` bytes is a harness refusal,
+never a verdict. `content` over a directory is observed and REFUTED (a tree has no blob). Every class means REFUTED by
+an expired window (`ON_DEADLINE`): a read that did not complete in W is not an observation of presence.
 
 `python_imports` (V2.1, V21-37 — a line regex counted a docstring line beginning `from` as an import and rolled back a
 correct story) reads the same files as `grep_count` (default suffix `.py`) and parses each with this interpreter's
 `ast`: it counts the `import` / `from ... import` statements (relative imports excluded: they are the project's own)
 whose top-level module is neither in `allowed` nor, when `stdlib` is true, in this interpreter's
 `sys.stdlib_module_names`. Comments, strings and docstrings are never statements. A file that does not parse leaves the
-count unestablished: REFUTED, the file and line named. It sees the syntax only: `importlib.import_module(...)` and
-`__import__` are calls, not import statements, and are not counted.
+count unestablished: REFUTED, the file and line named (`file:?` when the parser names none: a NUL byte). A file the
+parser cannot take at all — it stops on its own stack or memory limit (`RecursionError`, `MemoryError`) before it can
+say what the file is — is a harness refusal, never a verdict (as `FILE_CAP`): UNRUNNABLE, the file named, and the way
+out said in the detail. Of the files selected, the first in tree order that gives no count decides, whichever way it
+gives none. It sees the syntax only: `importlib.import_module(...)` and `__import__` are calls, not import statements,
+and are not counted.
+
+**A byte-order mark.** A UTF-8 byte-order mark at the start of a file is the encoding's signature, not text:
+`grep_count` and `python_imports` drop it before they read the file, as CPython's tokenizer drops it (a file Python
+imports is a file that parses, and `^` anchors the first line's text). One anywhere else, or a second one after it, is
+a character: a syntax error in source, as it is for CPython. A UTF-16 or UTF-32 mark is no UTF-8: the file is not
+UTF-8. `content` is over the exact bytes of the blob, the mark included.
 
 **Reading rule — the object store, never the working file.** When the checkout root is itself the top level of a
 git repository (a worktree the harness made of the revision), existence, mode and content are read from that
@@ -51,9 +61,9 @@ links never followed. The decision is by repository presence at the root, made b
 `GIT_CEILING_DIRECTORIES` set to the root's parent — never by the SHA's value. The detail records which was read.
 
 **Absence.** A path that is not in the tree is SUBJECT_ABSENT with the verdict the observable gives the absent
-subject: REFUTED for `exists` and `content`; for `grep_count` the verdict the count gives zero matches (SATISFIED
-when M is 0), so a prohibition declared ABSENCE_IS_DECIDABLE decides (§10.2); whether it counts is the spec's
-declaration, applied by `protocol.classify_failure`, never here.
+subject: REFUTED for `exists` and `content`; for `grep_count` and `python_imports` the verdict the count gives zero
+matches (SATISFIED when M is 0), so a prohibition declared ABSENCE_IS_DECIDABLE decides (§10.2); whether it counts is
+the spec's declaration, applied by `protocol.classify_failure`, never here.
 
 **Why git runs outside the owned process range** (design note). The Cycle-1 probe runs the subject inside a P4
 process range because the subject is untrusted code that may fork, hang or leave processes behind, and what ended
@@ -94,7 +104,11 @@ from aisef2.probe.protocol import ExecutionEnv, HarnessProbe, Observation, Obser
 from aisef2.product.spec import ProductProofSpec
 
 PROBE_ID = "probe.file_artifact"
-PROBE_SOURCES = ("probe/protocol.py", "probe/file_artifact.py")
+#: The bytes this probe takes behaviour from, in dependency order, and no more (PM-7): the module, the protocol that turns
+#: an observation into a result (`classify_failure`, `run_probe`) and the result types with the verdict over an absent
+#: subject (`product/outcome.py`, which the protocol imports). They are hashed into EXECUTION_DIGEST and nothing else
+#: reads this tuple: it grants no access and loads nothing (`_probe_digest` is its one reader).
+PROBE_SOURCES = ("product/outcome.py", "probe/protocol.py", "probe/file_artifact.py")
 CLASSES = ("exists", "content", "grep_count", "python_imports")
 #: Each class's meaning of an expired observation window (§9.2): a read that did not complete is no observation.
 ON_DEADLINE = {"exists": BehaviorVerdict.REFUTED, "content": BehaviorVerdict.REFUTED,
@@ -244,7 +258,7 @@ def grep_facts(pattern: re.Pattern, files: list[tuple[str, bytes]]) -> dict:
             skipped.append(rel)
             continue
         try:
-            text = data.decode("utf-8")
+            text = data.decode("utf-8-sig")     # a leading byte-order mark is the signature, not the first line's text
         except UnicodeDecodeError:
             return {"present": True, "undecodable": rel, "skipped_binary": skipped}
         for n, line in enumerate(text.splitlines(), 1):
@@ -257,16 +271,27 @@ def grep_facts(pattern: re.Pattern, files: list[tuple[str, bytes]]) -> dict:
 
 def import_facts(outside, files: list[tuple[str, bytes]]) -> dict:
     """Import statements (by syntax, this interpreter's `ast`) naming a top-level module outside `outside`, one per
-    statement. A file that is not UTF-8 or does not parse leaves the count unestablished (no `matches`)."""
+    statement. A file that is not UTF-8 or does not parse leaves the count unestablished (no `matches`): that is the
+    file's own answer. A file the parser stops on (`RecursionError`, `MemoryError`) is `Refused`: the harness could
+    not say what the file is, so there is no answer and no verdict — here, once, for every caller."""
     allowed = set(outside["allowed"]) | (set(sys.stdlib_module_names) if outside["stdlib"] else set())
     matches, where = 0, []
     for rel, data in files:
         try:
-            tree = ast.parse(data.decode("utf-8"), filename=rel)
+            tree = ast.parse(data.decode("utf-8-sig"), filename=rel)   # CPython drops a leading BOM from source bytes
         except UnicodeDecodeError:
             return {"present": True, "undecodable": rel}
-        except (SyntaxError, ValueError) as e:     # ValueError: a NUL byte in the source
-            return {"present": True, "unparsable": f"{rel}:{getattr(e, 'lineno', None)}"}
+        except (SyntaxError, ValueError) as e:     # ValueError: a NUL byte in the source, up to Python 3.11
+            line = getattr(e, "lineno", None)       # a NUL byte names none: never write the word None as a line
+            return {"present": True, "unparsable": f"{rel}:{'?' if line is None else line}"}
+        except (RecursionError, MemoryError) as e:  # the parser's own limit, not a statement about the file
+            raise Refused(f"{rel!r}: this interpreter's parser stopped ({type(e).__name__}: a nesting, stack or memory "
+                          "limit of its own) before it could say what the file is, so there is no count and no verdict "
+                          "(refused, not refuted). The same file under the same interpreter stops the same way, so "
+                          "running it again changes nothing: it is read once the file is made shallower (split long "
+                          "operator chains, `elif` ladders and nested lambdas) or the proof runs on an interpreter "
+                          f"whose limit admits it (this one: python {sys.version_info.major}.{sys.version_info.minor})"
+                          ) from None
         for node in ast.walk(tree):
             if isinstance(node, ast.Import):
                 names = [a.name for a in node.names]
