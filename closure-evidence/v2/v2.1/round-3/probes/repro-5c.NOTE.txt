@@ -1,0 +1,7 @@
+repro-5c: the variant of repro-5 whose hostile module touches NO protocol name and only reads sys.flags.isolated
+(the -I flag the probes always set), measured 2026-10-15 for the PM-5 decision (OWNER-DECISIONS-2026-10-15.md, PM-5).
+Run on the aisef2 tree of commit f69124c (tree 168ad7d4e8d6bb2c22be639348e67498a6529ab3), CPython 3.14.7 darwin/arm64, no provider, no client.
+Result (repro-5c.out): the honest control is REFUTED x3 (cli_invocation, process_effect, python_callable_v2); the hostile
+module is SATISFIED x3. The same module run outside the probe (python -c, no -I): compute() == 999, main() exits 1.
+Also measured the same way on the tree of becf3c0 and of tag ca26313 (2.0.0) by the decision-table analysis; those two
+outputs are not committed (see OWNER-DECISIONS-2026-10-15.md, PM-5, ĐO LẠI (2) and (3)).

@@ -381,9 +381,9 @@ section { padding: 80px 0; }
       </div>
       <div class="usp-card">
         <div class="usp-num">02</div>
-        <h3>A Verdict the Code Cannot Forge</h3>
-        <p>Candidate code runs only inside the probe's agent process; the verdict comes from a controller that never imports it, over an authenticated channel, so within an evaluation the code under test cannot manufacture a passing result. Known gap across evaluations: a <code>.pth</code> planted in the run&rsquo;s writable probe interpreter runs inside later controllers (V21-28, scheduled for 2.0.1).</p>
-        <span class="usp-tag">Structural guarantee</span>
+        <h3>A Verdict Channel the Code Cannot Forge</h3>
+        <p>Candidate code runs only inside the probe's agent process; the verdict comes from a controller that never imports it, over an authenticated channel, so within an evaluation the code under test cannot forge a verdict the controller accepts; at most it can suppress its own observation, which is reported as a harness failure, not as SATISFIED. It can still misreport itself &mdash; its exit code, its returned value &mdash; so a candidate written to do that, or one that recognises it is being probed, can turn a broken product into a SATISFIED result: the guarantee is about the channel, not about the value a subject reports. Known gap across evaluations: a <code>.pth</code> planted in the run&rsquo;s writable probe interpreter runs inside later controllers (V21-28, scheduled for 2.0.1).</p>
+        <span class="usp-tag">Channel guarantee</span>
       </div>
       <div class="usp-card">
         <div class="usp-num">03</div>

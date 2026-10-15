@@ -1,0 +1,2 @@
+isolated= 0 compute()= 999
+main raises ValueError this product is broken
