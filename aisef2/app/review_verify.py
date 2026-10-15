@@ -124,13 +124,18 @@ def reproducer_contract(finding: Mapping, requirements: Mapping[str, object], pr
 
 
 def verify(finding: Mapping, *, requirements: Mapping, product_roots, root: str, revision: str,
-           timeout_s: float, interpreter: str) -> Verification:
-    """Run the finding's reproducer with the active probe of its subject kind on the checkout `root` at `revision`."""
+           timeout_s: float, interpreter: str, entries: Mapping | None = None) -> Verification:
+    """Run the finding's reproducer with the active probe of its subject kind on the checkout `root` at `revision`.
+
+    `entries` (PM-8, app/diagnostics): the catalog's active entries as the run's diagnostic sink wraps them — the same
+    entries, their probes the same classes with `observe()` the only method overridden, so that what the probe saw is
+    kept for the operator. A probe the sink wraps has the identity, the digest and the calibration lookup of the
+    catalog's; nothing it records reaches the verdict this function returns. Without it, the catalog's own."""
     from aisef2.app.bundle_cli import _mint      # compile_spec's mapping, without the approval gate: never approved
     c = reproducer_contract(finding, requirements, product_roots)
     if isinstance(c, str):
         return Verification(UNVERIFIABLE, c)
-    entry = catalog.active().get(c.subject.kind)
+    entry = (catalog.active() if entries is None else entries).get(c.subject.kind)
     if entry is None:
         return Verification(UNVERIFIABLE, f"no active probe observes {c.subject.kind.value}")
     spec = _mint(c, ProbeRef(entry.probe_id, entry.probe_digest))
@@ -405,6 +410,16 @@ def detail(finding: Mapping, v: Verification, anchored: Anchor | None = None, ar
     return _dumps(out)
 
 
+def artifact_stem(story: str) -> str:
+    """The story id as the stem of an artifact's file name (`<stem>.<attempt>.<index>.json`): the id as it is when it
+    is a file name of at most 40 characters, and otherwise its name-safe prefix and `-` and the first 8 hex digits of
+    the id's sha256, so two ids that read alike do not meet."""
+    stem = re.sub(r'[^A-Za-z0-9_-]', '_', story)[:40]
+    if stem != story:     # changed or cut: another story id makes the same stem, so the id's digest tells them apart
+        stem += "-" + hashlib.sha256(story.encode("utf-8", "backslashreplace")).hexdigest()[:8]
+    return stem
+
+
 def preserve(out: pathlib.Path, finding: Mapping, *, story: str, attempt: int, index: int, revision: str,
              session: str | None = None, secrets=()) -> Artifact | str:
     """The finding as the finder wrote it — its whole reproducer, with the verification and anchor the kernel attached —
@@ -420,10 +435,7 @@ def preserve(out: pathlib.Path, finding: Mapping, *, story: str, attempt: int, i
         data = (json.dumps({"format": ARTIFACT_FORMAT, "story_id": story, "attempt": attempt, "index": index,
                             "revision": revision, "session": session, "redacted": count, "finding": body},
                            indent=1, sort_keys=True) + "\n").encode("ascii")
-        stem = re.sub(r'[^A-Za-z0-9_-]', '_', story)[:40]
-        if stem != story:     # changed or cut: another story id makes the same stem, so the id's digest tells them apart
-            stem += "-" + hashlib.sha256(story.encode("utf-8", "backslashreplace")).hexdigest()[:8]
-        name = f"{stem}.{attempt}.{index}.json"
+        name = f"{artifact_stem(story)}.{attempt}.{index}.json"
         kept = Artifact(f"{ARTIFACT_DIR}/{name}", hashlib.sha256(data).hexdigest(), len(data))   # a name it refuses: no file
         folder = pathlib.Path(out) / ARTIFACT_DIR
         folder.mkdir(exist_ok=True)

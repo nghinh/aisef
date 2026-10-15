@@ -23,7 +23,7 @@ import hashlib
 import json
 import pathlib
 
-from aisef2.app import client, preflight, review_verify, settings, usage
+from aisef2.app import client, diagnostics, preflight, review_verify, settings, usage
 from aisef2.app import run as R
 from aisef2.app.bundle import Project
 from aisef2.arch.enums import Enforcement, IdentityGrade
@@ -162,6 +162,9 @@ def verify(project: Project, out: pathlib.Path, expect_anchor: str | None = None
     verdict = None
     try:
         found, said = review_verify.artifact_problems(out, events)     # a review row binds its artifact's bytes
+        problems += found
+        notes += said
+        found, said = diagnostics.artifact_problems(out, events, rec)  # PM-8: the operator's probe observations; no verdict
         problems += found
         notes += said
         outcomes = R.outcomes_from(events)

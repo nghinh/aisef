@@ -105,13 +105,18 @@ class Reviewer:
     Each finding is kept whole, secret-redacted, in an artifact of the run directory (`review_verify.preserve`) that
     its journaled statement names; the statement is bounded and says so when it cut. A finding that would block and
     whose artifact cannot be kept refuses the review the same way (`NOT_PRESERVED`): a cut statement is never what
-    blocks a story, and a confirmed finding is never passed silently. The run's secrets are the session streams'."""
+    blocks a story, and a confirmed finding is never passed silently. The run's secrets are the session streams'.
+
+    `diagnostics` (PM-8, app/diagnostics): the run's sink, which keeps for the operator what the probe saw of each
+    reproducer it did not satisfy. It is handed the probes' entries and nothing else: what it keeps reaches no verdict."""
 
     def __init__(self, run, project: Project, logs: pathlib.Path, session_kw: dict, timeout_s: float,
                  review: dict | None = None, probe_timeout_s: float = 60.0, interpreter: str | None = None,
-                 route: dict | None = None) -> None:
+                 route: dict | None = None, diagnostics=None) -> None:
         self.run, self.project, self.logs, self.kw, self.timeout_s = run, project, logs, session_kw, timeout_s
         self.sessions: list[dict] = []
+        self.diagnostics = diagnostics
+        self._at: dict = {}      # the finding being verified, for the sink: its place in the finder's list
         from aisef2.app.settings import REVIEW_ABSENT
         self.review_policy = review or REVIEW_ABSENT     # V2.1 (app/review_verify): what a confirmed finding does
         self.probe_timeout_s = probe_timeout_s
@@ -131,6 +136,8 @@ class Reviewer:
         secrets = (*self.kw.get("secrets", ()), self.route.get("token"))     # what the session streams are redacted with
         typed = []
         for index, f in enumerate(found):     # evidence only when the kernel's probe reproduces it and its clause anchors it
+            fid = review_verify.redacted(str(f.get("id")), secrets)[0]      # it names the gate row: no secret there either
+            self._at = {"origin": "review", "story_id": scope.story_id, "attempt": attempt, "index": index, "finding": fid}
             v = self._verify(f, scope.root, head)
             a = review_verify.anchor(f, self.project) if isinstance(f.get("reproducer"), dict) else None
             f["verification"] = {"status": v.status, "why": v.reason, "probe": v.probe, "observed": v.observed}
@@ -141,7 +148,6 @@ class Reviewer:
             # manifest binds — and a block rests on that artifact, never on the statement's cut text
             kept = review_verify.preserve(self.logs.parent, f, story=scope.story_id, attempt=attempt, index=index,
                                           revision=head, session=s.get("log"), secrets=secrets)
-            fid = review_verify.redacted(str(f.get("id")), secrets)[0]      # it names the gate row: no secret there either
             if confirmed and not isinstance(kept, review_verify.Artifact):
                 raise CapabilityUnrunnable(NOT_PRESERVED.format(id=fid, why=kept))
             typed.append(Finding(fid, confirmed or bool(f.get("blocking")),
@@ -264,9 +270,10 @@ class Reviewer:
     def _verify(self, finding: dict, root: str, head: str) -> review_verify.Verification:
         if not isinstance(finding.get("reproducer"), dict):
             return review_verify.Verification(review_verify.UNVERIFIABLE, "no reproducer: the finding states no observable behaviour")
+        tapped = {} if self.diagnostics is None else {"entries": self.diagnostics.entries(self._at)}
         return review_verify.verify(finding, requirements=self.project.requirements,
                                     product_roots=self.project.product_roots, root=root, revision=head,
-                                    timeout_s=self.probe_timeout_s, interpreter=self.interpreter)
+                                    timeout_s=self.probe_timeout_s, interpreter=self.interpreter, **tapped)
 
 
 def tree_of(root: str) -> dict[str, str]:
