@@ -96,15 +96,23 @@ class WithoutItsArtifactAFindingNeverBlocksAndTheStoryIsNeverCommittedOnIt(unitt
         self.assertNotIn("blocking, corroborated", "".join(e.data.get("detail", "") for e in self.events
                                                           if e.type == "gate/check"))
 
-    def test_a_run_that_kept_no_artifact_has_the_manifest_it_always_had(self):
+    def test_a_run_that_kept_no_artifact_has_the_manifest_it_always_had_and_the_probes_observations(self):
+        """No review artifact was kept, so none is listed (what the manifest always listed of a run, nothing of
+        `review-findings/`); the operator's probe observations of the two reproducers (PM-8: what the probe saw — a
+        separate file, kept although the finding's artifact was not) are listed, and `--verify` accepts the run, noting
+        that the finding artifact each observation belongs to was not kept."""
         manifest = json.loads((self.out / "EVIDENCE.json").read_text(encoding="utf-8"))
         self.assertEqual(manifest["format"], "aisef-v2-evidence/1")
         self.assertEqual(sorted(manifest["files"]), [
             "RUN.json", "RUN.started.json", "preflight/LEDGER.jsonl", "preflight/PREFLIGHT.json",
+            "probe-observations/S1.1.r0.json", "probe-observations/S1.2.r0.json",
             "run/journals/aisef-run.jsonl", "sessions/S1.developer.1.jsonl", "sessions/S1.developer.2.jsonl",
             "sessions/S1.reviewer.1.jsonl", "sessions/S1.reviewer.2.jsonl"])
+        self.assertFalse([f for f in manifest["files"] if f.startswith("review-findings/")])
         self.assertEqual(manifest, R.evidence_manifest(self.out))
-        self.assertEqual(verify(self.project, self.out)["verdict"], "VERIFIED")
+        v = verify(self.project, self.out)
+        self.assertEqual((v["verdict"], v["problems"]), ("VERIFIED", []))
+        self.assertEqual(len([n for n in v["notes"] if "the artifact of the finding it observes was not kept" in n]), 2)
 
 
 if __name__ == "__main__":

@@ -20,6 +20,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
 from aisef2.app import bundle  # noqa: E402
+from aisef2.app import diagnostics as D  # noqa: E402
 from aisef2.app import run as R  # noqa: E402
 from aisef2.arch.enums import BehaviorVerdict, Enforcement, SubjectAbsence  # noqa: E402
 from aisef2.orchestrate import workspace as w  # noqa: E402
@@ -434,7 +435,17 @@ class AppExecute(unittest.TestCase):
             "admission", "preflight", "runspec_hash", "aggregate_min_grade", "scanner", "journal", "finished", "story_outcomes",
             "story_errors", "final_main", "delivery_verdict", "delivery_blocked_by", "plan_quality_verdict",
             "generalization_claim", "productproof", "budget", "budget_stop", "sessions", "failure",
-            "usage", "no_progress"]))      # V2.1 (D): the account re-derived from the evidence
+            "usage", "no_progress", "diagnostics"]))      # V2.1 (D): the account re-derived from the evidence; PM-8
+        # PM-8: what the operator's diagnostics say of a run that delivered — nothing kept (every proof held and what the
+        # story introduces is not at its parent a finding), nothing lost, and what is and is not enforced about them
+        self.assertEqual(rec["diagnostics"], {
+            "dir": "probe-observations", "audience": "operator", "access": "same-user, not enforced",
+            "permissions": D.PERMISSIONS,
+            "authority": ("none: no delivery verdict, retry, budget, merge or route reads these files; `aisef run "
+                          "--verify` checks them against the journal, and a file it finds changed or unbound refutes "
+                          "the verification, never the delivery"),
+            "written": 0, "not_written": 0, "failures": [], "dropped": 0, "limits": {"detail_chars": 8192, "files": 500}})
+        self.assertFalse((out / "probe-observations").exists())
         self.assertEqual((rec["usage"]["cost"]["value"], rec["usage"]["cost"]["status"], rec["no_progress"]),
                          (None, "unknown", []))     # no price table: unknown, never 0
         main = subprocess.run(["git", "-C", str(out / "repo"), "rev-parse", "main"], capture_output=True, text=True,

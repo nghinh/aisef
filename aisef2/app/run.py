@@ -21,8 +21,14 @@
     <out>/review-findings  V2.1: one file per review finding, whole and secret-redacted (app/review_verify.preserve);
                        the journal row of the finding names it by sha256, so what a verifier needs to reproduce a
                        finding is never only in the row's bounded statement
+    <out>/probe-observations  PM-8: what a probe saw of each proof that was not SATISFIED — the step, the file and line,
+                       the exception — one file each, secret-redacted, bound to the sealed record the journal holds
+                       (app/diagnostics). For the operator, never read by a verdict, a retry, a budget or a prompt;
+                       readable by any process of the operator's user (RUN.json `diagnostics.access` says what is and is
+                       not enforced)
     <out>/EVIDENCE.json the evidence manifest (V2.1): the sha256 of the record, the journal, every session stream, the
-                       preflight's files and the review findings' files, written after the record; its own digest is
+                       preflight's files, the review findings' files and the probe observations', written after the
+                       record; its own digest is
                        the run's evidence anchor, printed for the operator to keep outside the run directory
                        (`aisef run --verify --expect-anchor`)
 
@@ -47,10 +53,10 @@ import tempfile
 import time
 
 from aisef2.app import adapters as ad
-from aisef2.app import client, confine, lineage, preflight, review_verify, usage
+from aisef2.app import client, confine, diagnostics, lineage, preflight, review_verify, usage
 from aisef2.app.bundle import Project
 from aisef2.app.settings import Settings
-from aisef2.arch.enums import Enforcement
+from aisef2.arch.enums import Enforcement, ObligationRole
 from aisef2.orchestrate import story_runner as sr
 from aisef2.orchestrate.quality import TestsPolicy
 from aisef2.orchestrate.workspace import REFUSED, GitMerger, GitWorkspace, git
@@ -174,6 +180,42 @@ def regression_tests(repo: pathlib.Path, project: Project, story: str, delivered
     return named or tuple(project.stories[story]["tests"])
 
 
+def story_where(run, project: Project, story: str):
+    """What the diagnostic sink (app/diagnostics) names a probe observation of `story` by, read when it is made: the
+    attempt the kernel's projection holds, the parent the attempt began at (the journal's `story/begin`) and whether
+    its admission is over (a `story/admitted` of the story after that `story/begin`: what is measured after it is the
+    candidate's or the merge's, whatever commit it is at) and — fixed by the plan — the specs the story introduces or
+    verifies and the criteria each spec answers. Read-only: nothing here writes the journal or reaches a decision."""
+    mine = [o for o in project.plan.obligations if o.story_id == story]
+    criteria: dict[str, list[str]] = {}
+    for o in mine:
+        criteria.setdefault(o.product_proof_spec_id, []).append(o.criterion_id)
+    introduces = frozenset(o.product_proof_spec_id for o in mine if o.role is ObligationRole.INTRODUCE)
+    verifies = frozenset(o.product_proof_spec_id for o in mine if o.role is ObligationRole.VERIFY)
+
+    def where() -> dict:
+        began, admitted = None, False
+        for e in reversed(run.events):      # back to the attempt's own `story/begin`; an admission met on the way is its
+            if e.type == "story/admitted" and e.data.get("story_id") == story:
+                admitted = True
+            elif e.type == "story/begin" and e.data.get("story_id") == story:
+                began = e.data.get("parent")
+                break
+        return {"origin": "proof", "story_id": story, "attempt": ad.attempt_of(run, story)[0], "parent": began,
+                "introduces": introduces, "verifies": verifies, "admitted": admitted, "criteria": criteria}
+    return where
+
+
+def probe_factories(sink, where) -> dict:
+    """The harness's probe factories by probe id — each probe class as the catalog gives it, tapped by the diagnostic
+    `sink` (app/diagnostics: `observe()` overridden, its result returned unchanged; identity, digest and execution
+    digest are the catalog's). `where` names what its observations are of."""
+    def maker(factory):
+        probe = diagnostics.tapped(factory, sink, where)
+        return lambda on_range, scratch: probe(on_range=on_range, scratch=scratch)
+    return {e.probe_id: maker(e.factory) for e in catalog.CATALOG}
+
+
 def client_identity(exe: str | None) -> str:
     if not exe:
         return "opencode (absent)"
@@ -293,11 +335,12 @@ def _content_sha(p: pathlib.Path) -> str:
 
 def evidence_manifest(out: pathlib.Path) -> dict:
     """The sha256 of every file a verification re-derives from (the repository aside: `final_main` is checked in it):
-    the record, the journal, each session stream, the preflight's ledger and observation, and the review findings'
-    artifacts (a run directory without any lists exactly what it always did)."""
+    the record, the journal, each session stream, the preflight's ledger and observation, the review findings'
+    artifacts and the probe observations' (a run directory without any lists exactly what it always did)."""
     files = [out / "RUN.json", out / STARTED, *sorted((out / "run" / "journals").glob("*.jsonl")),
              *sorted((out / "sessions").glob("*.jsonl")), *sorted((out / "preflight").glob("*")),
-             *sorted((out / review_verify.ARTIFACT_DIR).glob("*.json"))]
+             *sorted((out / review_verify.ARTIFACT_DIR).glob("*.json")),
+             *sorted((out / diagnostics.ARTIFACT_DIR).glob("*.json"))]
     return {"format": MANIFEST_FORMAT,
             "files": {p.relative_to(out).as_posix(): _content_sha(p) for p in files if p.is_file()}}
 
@@ -362,7 +405,7 @@ def execute(project: Project, settings: Settings, source: pathlib.Path, out: pat
         os.fsync(f.fileno())
     inherited = None
     run = None
-    developer = reviewer = budget = None
+    developer = reviewer = budget = sink = None
     results: dict = {}
     errors: list = []
     not_run: list[str] = []
@@ -439,6 +482,10 @@ def execute(project: Project, settings: Settings, source: pathlib.Path, out: pat
               # the operator's values the client receives, and the provider key: never left in a session's evidence
               "secrets": tuple(v for v in (*(os.environ.get(n, "") for n in settings.client_env), key) if len(v) >= 8),
               **({"confine": settings.confinement} if settings.confinement is not None else {})}
+        # PM-8: what a probe saw, for the operator (app/diagnostics) — the directory beside the run's other evidence,
+        # outside every checkout; whether the sessions' sandbox mounts it is read from the wrapper's own command line
+        sink = diagnostics.Sink(out, kw["secrets"], diagnostics.access_of(
+            out / diagnostics.ARTIFACT_DIR, settings.confinement, kw["env"], exe))
         developer = ad.Developer(run, project, logs, kw, settings.timeouts_s["developer"])
         # V2.1 (F): confined, the model reviewer's checkout is bound read-only — it writes nothing of the host
         rkw = {**kw, "workspace_writable": False} if settings.confinement is not None else kw
@@ -446,10 +493,8 @@ def execute(project: Project, settings: Settings, source: pathlib.Path, out: pat
                                probe_timeout_s=settings.timeouts_s["probe"], interpreter=sys.executable,
                                route={"url": settings.endpoint, "token": key, "model": settings.model,
                                       "env": {k: v for k, v in client.environment(settings.client_env, {}).items()
-                                              if k != "OPENCODE_CONFIG_CONTENT"}})
+                                              if k != "OPENCODE_CONFIG_CONTENT"}}, diagnostics=sink)
         adapters = sr.Adapters(developer, reviewer, scanner, merger, ws)
-        factories = {e.probe_id: (lambda on_range, scratch, f=e.factory: f(on_range=on_range, scratch=scratch))
-                     for e in catalog.CATALOG}
         env = ExecutionEnv(sys.executable, settings.timeouts_s["probe"], Enforcement.PARTIAL)   # V2.1: never the tests' venv
         policy = sr.Policy(settings.limits, TestsPolicy(True), tool_timeout_s=settings.timeouts_s["tool"])
         delivered: dict[str, bool] = {}
@@ -460,7 +505,8 @@ def execute(project: Project, settings: Settings, source: pathlib.Path, out: pat
                 not_run.append(f"{story} not run: {why}")
                 continue
             tests = tuple(project.stories[story]["tests"])
-            inputs = sr.StoryInputs(project.specs, factories, env, te.DeveloperTests(story, tests),
+            inputs = sr.StoryInputs(project.specs, probe_factories(sink, story_where(run, project, story)), env,
+                                    te.DeveloperTests(story, tests),
                                     te.DeveloperTests(story, regression_tests(repo, project, story, delivered)),
                                     te.Dependencies(frozenset(), frozenset(project.product_roots)), te.UNITTEST,
                                     test_interpreter=python)
@@ -497,6 +543,8 @@ def execute(project: Project, settings: Settings, source: pathlib.Path, out: pat
                        sessions=[{k: v for k, v in s.items() if k != "text"} for s in sessions],
                        failure=None if failure is None else {"type": type(failure).__name__, "detail": str(failure)[:2000],
                                                              "stage": rec.get("stage")})
+            if sink is not None:     # PM-8: the operator's diagnostics: where, for whom, what is and is not enforced
+                rec["diagnostics"] = sink.report()
             try:    # V2.1 (D): what the run used, from its evidence; a fault here never costs the record
                 rec["usage"], rec["no_progress"] = usage.usage(out, events, settings.prices, rec), usage.no_progress(events)
                 if continues:     # each run of the lineage once: the predecessor's lineage, then this run's own

@@ -53,7 +53,10 @@ TAIL = "END-OF-STDIN-MARKER"
 LONG = {"clause": "R-CLI/1.2", "subject": C.MAIN,
         "stimulus": {"argv": ["1", "2", "3"], "stdin": {"text": f"key={SECRET} " + "x" * 4000 + TAIL}},
         "observable": {"exit_code": 2, "within_s": 20}}
-LIGHT = ("RUN.json", "RUN.started.json", "EVIDENCE.json", "run", "sessions", "preflight", V.ARTIFACT_DIR)
+#: PM-8: the run's probe observations (app/diagnostics) are evidence the manifest binds too, so a copy that lacks them is
+#: not this run's evidence (test_v21_pm8_diagnostics_run.py asserts that refusal)
+LIGHT = ("RUN.json", "RUN.started.json", "EVIDENCE.json", "run", "sessions", "preflight", V.ARTIFACT_DIR,
+         "probe-observations")
 
 
 @unittest.skipUnless(os.name == "posix", "the fake client and the fake finder are scripts started by their shebang")
