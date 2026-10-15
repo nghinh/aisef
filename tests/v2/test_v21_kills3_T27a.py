@@ -146,12 +146,20 @@ class DefaultSuffix(Tmp):
         self.assertNotIn("unparsable", f)
 
     def test_a_single_non_python_file_is_not_selected(self):
+        # PM-9: the path is in the tree and selects no file, so there is nothing to count over: an absent subject, as a
+        # path that is not there is, and the contract's own declaration decides — REQUIRES_SUBJECT drops the zero
+        # (it was SATISFIED, silently), ABSENCE_IS_DECIDABLE keeps the verdict zero statements always gave
         for name in self.NOT_PYTHON:
-            with self.subTest(name=name):
-                o = P.observe(spec(f"path:pkg/{name}", 0), self.ref, ENV)
-                self.assertEqual((o.kind, o.verdict), (K.OBSERVED, S))
-                f = base.facts(o)
-                self.assertEqual((f["files"], f["matches"], f["locations"]), (0, 0, []))
+            for absence, want in ((REQUIRES, INDETERMINATE), (DECIDABLE, Executed(S))):
+                s = spec(f"path:pkg/{name}", 0, absence=absence)
+                with self.subTest(name=name, absence=absence.value):
+                    o = P.observe(s, self.ref, ENV)
+                    self.assertEqual((o.kind, o.verdict), (K.SUBJECT_ABSENT, S))
+                    f = base.facts(o)
+                    self.assertEqual((f["present"], f["files"], f["path"], f["suffixes"]), (False, 0, f"pkg/{name}", [".py"]))
+                    self.assertNotIn("matches", f)
+                    self.assertNotIn("locations", f)
+                    self.assertEqual(run_probe(P, s, self.ref, ENV).result, want)
 
     def test_explicit_suffixes_replace_the_default(self):
         o = P.observe(spec("path:pkg", 1, {**STIM, "suffixes": [".md"]}), self.ref, ENV)
