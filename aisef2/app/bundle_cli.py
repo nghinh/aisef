@@ -7,7 +7,8 @@
     aisef bundle lint B                                     approvals, admission (RFC §12), calibration, clause coverage
     aisef bundle explain B                                  per story: each criterion, its contract, probe and class
     aisef bundle migrate IN --out OUT     a bundle of an earlier release, its plan re-bound to this release's spec ids
-    aisef bundle continue B --from-run DIR --out B2   the stories DIR's run did not commit, from what it did commit
+    aisef bundle continue B --from-run DIR [--expect-anchor A] --out B2   the stories DIR's run did not commit,
+                     from what it did commit
 
 `continue` (V2.1, proposal D): a run that was interrupted or stopped is never resumed in place and never modified. Its
 journal says which stories committed and at which revision; the continuation's baseline is the last of them (journal
@@ -17,6 +18,25 @@ hold; the one review request K-NOWORK-001 keeps for a story without developer wo
 inheriting — and the other stories run as they were. Contracts and approvals are
 untouched (their semantics did not change). Run it against DIR/repo, the run's own clone, which holds the baseline,
 with `aisef run --parent DIR` to record the lineage. A bundle or kernel that changed is a new project, not a continuation.
+
+**The journal is read by the rule of `aisef run --verify`** (the same functions): it reads; it is the journal RUN.json
+names (digest and length); it reconstructs (every event, the hash chain, the sequence); and no control projection the
+kernel's writer enforces refuses it (`verify._projection_refusal`). A torn last line is the approved exception: it is
+what a run killed mid-append leaves, and a continuation is for it — the reader's verified prefix is taken, the cut is
+reported (`cut_event`) and its effects are reconciled against git, never assumed undone. Each way it can fail is told
+apart (`JournalRefused.code`, in the text of `refused:`), because what the operator does differs:
+
+    EVIDENCE_UNREADABLE   a file of the run exists or is named and cannot be read (permission, I/O, not there)
+    EVIDENCE_MALFORMED    it was read and is not what a run writes (not text, a line, a format, a record)
+    EVIDENCE_INTEGRITY    the journal is not the one that was written (hash chain, sequence, RUN.json's digest or length)
+    EVIDENCE_PROJECTION   a valid chain the kernel's writer would have refused (a story that commits twice, ...)
+    EVIDENCE_MISSING      nothing to continue from or to authenticate with: the record names no journal; or the
+                          operator gave --expect-anchor and the run has no EVIDENCE.json
+    EVIDENCE_MISMATCH     --expect-anchor, or the manifest, is not what the run directory holds
+
+Without `--expect-anchor` a continuation proves consistency, not authenticity (the run directory is writable by its
+operator's user: docs/v2.1/ANCHOR-THREAT-MODEL.md), and the report says `anchor_checked: false`. A refusal writes
+nothing, and the run is never modified.
 
 The authoring document (AUTHORING_FORMAT, schema: docs/v2.1/bundle-authoring.schema.json) is the bundle without what
 the kernel derives: no requirement, contract or plan hash, no spec id, no approval. `seal` derives them with the
@@ -38,6 +58,7 @@ import argparse
 import dataclasses
 import json
 import pathlib
+import re
 import shlex
 import sys
 from typing import Mapping
@@ -72,6 +93,20 @@ RELEASES: Mapping[str, dict] = {
 
 class MigrationError(B.BundleError):
     """The bundle cannot be re-bound: what it names is not what any known release compiled from its contracts."""
+
+
+class JournalRefused(B.BundleError):
+    """A continuation refused for what the run's evidence is. `code` names which failure (module docstring) and the text
+    says what it is and what the operator does; it is raised before anything is written."""
+
+    def __init__(self, code: str, message: str) -> None:
+        super().__init__(f"{code}: {message}")
+        self.code = code
+
+
+#: what `format3.reconstruct` says (aisef2/journal/event.decode, format3.validate) when the chain or the sequence of
+#: a journal is broken: the journal is not the one that was written. Every other refusal of the reader is its form.
+_INTEGRITY = ("the chain does not link", "seq == index")
 
 
 def _earlier(spec: ProductProofSpec, release: dict) -> str | None:
@@ -403,36 +438,141 @@ def init(example: str, out: pathlib.Path) -> None:
     _write_new(out / "authoring.json", doc["authoring"])
 
 
-def continue_from(data: Mapping, run_dir: pathlib.Path, *, leave_out_unidentified: bool = False) -> tuple[dict, dict]:
-    """(the continuation bundle, the report) of `data`'s run in `run_dir` (module docstring). What the run did that its
-    journal does not confirm is reconciled against git and the journal's operation identities (app/lineage); a commit
-    on main nothing identifies is refused unless `leave_out_unidentified` (the report names it either way)."""
+def _record(run_dir: pathlib.Path) -> tuple[dict, bool]:
+    """(the run's record, whether it is RUN.json). A run killed before its record has only RUN.started.json (V2.1);
+    a record that is not there, or that does not parse (a kill during its write), is the next best evidence. One that
+    is there and cannot be read is not: it is refused (`EVIDENCE_UNREADABLE`), never demoted to the weaker record —
+    which binds no journal digest."""
     from aisef2.app import lineage
     from aisef2.app import run as R
+    for name, recorded in (("RUN.json", True), (R.STARTED, False)):
+        try:
+            rec = json.loads((run_dir / name).read_text(encoding="utf-8"))
+        except OSError as e:
+            if lineage.not_there(e):
+                continue
+            raise JournalRefused("EVIDENCE_UNREADABLE", f"{run_dir / name} cannot be read ({type(e).__name__}: "
+                                 f"{e.strerror or e}): restore read access to it (or a faithful copy of the run "
+                                 "directory) and run the command again — the run is never modified and nothing was "
+                                 "written") from None
+        except ValueError:
+            continue
+        if not isinstance(rec, dict):     # valid JSON that is no record is damage, not a kill during a write
+            raise JournalRefused("EVIDENCE_MALFORMED", f"{run_dir / name} is not a run record (a JSON object): restore "
+                                 "it from a faithful copy of the run directory — nothing was written")
+        if not recorded:    # V2.1: a run killed before its record still names its identities
+            rec["journal"] = {"path": "run/journals/aisef-run.jsonl"}
+        return rec, recorded
+    raise B.BundleError(f"{run_dir}: no run record (neither RUN.json nor {R.STARTED} reads as one)")
+
+
+def _authentic(run_dir: pathlib.Path, expect: str) -> None:
+    """`--verify`'s `--expect-anchor`, applied to a continuation: the anchor of the manifest the run wrote is the one the
+    operator kept outside the run directory, and the manifest is what the directory holds."""
+    from aisef2.app import lineage
+    from aisef2.app import run as R
+    try:
+        stored = json.loads((run_dir / R.MANIFEST).read_text(encoding="utf-8"))
+    except OSError as e:
+        if lineage.not_there(e):
+            raise JournalRefused("EVIDENCE_MISSING", f"{run_dir} has no {R.MANIFEST}: nothing binds its evidence to an "
+                                 f"anchor, so the expected anchor {expect[:12]} cannot be checked — a run killed before "
+                                 "its record has none; without --expect-anchor a continuation proves consistency only"
+                                 ) from None
+        raise JournalRefused("EVIDENCE_UNREADABLE", f"{run_dir / R.MANIFEST} cannot be read ({type(e).__name__}: "
+                             f"{e.strerror or e}): restore read access to it and run the command again") from None
+    except ValueError:
+        stored = None
+    if not isinstance(stored, dict) or not isinstance(stored.get("files", {}), dict):
+        raise JournalRefused("EVIDENCE_MISMATCH", f"{run_dir / R.MANIFEST} is not an evidence manifest: the expected "
+                             f"anchor {expect[:12]} cannot be reproduced from it")
+    anchor = R.anchor_of(stored)
+    if anchor != expect:
+        raise JournalRefused("EVIDENCE_MISMATCH", f"{run_dir}: the evidence anchor is {anchor[:12]}, not the "
+                             f"{expect[:12]} expected: this is not the run that printed it, or its evidence was "
+                             "rewritten")
+    try:
+        fresh = R.evidence_manifest(run_dir)
+    except OSError as e:
+        raise JournalRefused("EVIDENCE_UNREADABLE", f"{run_dir}: an evidence file cannot be read ({type(e).__name__}): "
+                             f"{e.filename}") from None
+    if stored != fresh:
+        changed = sorted(k for k in set(stored.get("files", {})) | set(fresh["files"])
+                         if stored.get("files", {}).get(k) != fresh["files"].get(k))
+        raise JournalRefused("EVIDENCE_MISMATCH", f"{run_dir}: the evidence manifest does not match the run directory: "
+                             f"{changed[:5]} — evidence was changed after the run wrote it")
+
+
+def _journal(run_dir: pathlib.Path, rec: dict, recorded: bool):
+    """The run's journal (a `format3.Journal`), under the rule of `aisef run --verify` (module docstring): read, the
+    digest and length RUN.json names, reconstructed, and no control projection refuses it — the verifier's own
+    `_projection_refusal`. A torn last line is returned as the reader gives it (`torn_tail`): the approved policy."""
+    from aisef2.app import run as R
+    from aisef2.app.verify import _projection_refusal
     from aisef2.journal import format3
+    j = rec.get("journal")
+    path = j.get("path") if isinstance(j, dict) else None
+    if not isinstance(path, str) or not path:
+        raise JournalRefused("EVIDENCE_MISSING", f"{run_dir}: the record names no journal (the run ended before it "
+                             "began): there is nothing to continue from — run the bundle itself again")
+    where = run_dir / path
+    try:
+        data = where.read_bytes()
+    except OSError as e:
+        raise JournalRefused("EVIDENCE_UNREADABLE", f"{where} cannot be read ({type(e).__name__}: {e.strerror or e}): "
+                             "restore read access to it, or the journal from a faithful copy of the run directory, and "
+                             "run the command again — the run is never modified and nothing was written") from None
+    if recorded and (R._sha(data) != j.get("sha256") or data.count(b"\n") != j.get("lines")):
+        raise JournalRefused("EVIDENCE_INTEGRITY", f"{where} is not the journal {run_dir / 'RUN.json'} names (its digest "
+                             "or length differs): it was changed or replaced after the run ended — restore it from a "
+                             "faithful copy; `aisef run --verify` on the run refuses it the same way")
+    try:
+        journal = format3.reconstruct(data.decode("utf-8"))
+    except Exception as e:  # noqa: BLE001 — each refusal of the reader is a class of failure, told apart
+        broken = any(m in str(e) for m in _INTEGRITY)
+        raise JournalRefused(
+            "EVIDENCE_INTEGRITY" if broken else "EVIDENCE_MALFORMED",
+            f"{where}: {type(e).__name__}: {e}"[:400] + (
+                " — its hash chain or sequence is broken: the journal is not the one that was written; restore it "
+                "from a faithful copy" if broken else
+                " — what is there is not a journal this reader accepts (damage, another format, another kernel's "
+                "events); restore it from a faithful copy, or run the bundle itself again")) from None
+    refused = _projection_refusal(journal.events)
+    if refused is not None:
+        pid, kind, seq, why = refused
+        raise JournalRefused("EVIDENCE_PROJECTION", f"{where} violates the control projections the kernel's writer "
+                             f"enforces: {pid} refuses {kind} at seq {seq}: {why}"[:480] +
+                             " — no kernel wrote it, and nothing is carried from it; `aisef run --verify` refuses it "
+                             "the same way")
+    return journal
+
+
+def continue_from(data: Mapping, run_dir: pathlib.Path, *, leave_out_unidentified: bool = False,
+                  expect_anchor: str | None = None) -> tuple[dict, dict]:
+    """(the continuation bundle, the report) of `data`'s run in `run_dir` (module docstring). What the run did that its
+    journal does not confirm is reconciled against git and the journal's operation identities (app/lineage); a commit
+    on main nothing identifies is refused unless `leave_out_unidentified` (the report names it either way).
+    `expect_anchor`: the evidence anchor the run printed (as `--verify --expect-anchor`), checked before anything of
+    the run is read."""
+    from aisef2.app import lineage
+    from aisef2.app import run as R
     project = B.load(data)
-    child, state = lineage.continued_by(run_dir)
+    try:
+        child, state = lineage.continued_by(run_dir)
+    except lineage.LineageRefused as e:     # the run's claims cannot be listed: a refusal, not "no claims"
+        raise B.BundleError(str(e)) from None
     if state == lineage.BEGUN:
         raise B.BundleError(f"{run_dir} is already continued by {child}, which began: continue the lineage from it")
-    recorded = True
-    try:
-        rec = json.loads((run_dir / "RUN.json").read_text(encoding="utf-8"))
-    except (OSError, ValueError) as e:
-        try:    # V2.1: a run killed before its record still names its identities (RUN.started.json)
-            rec = json.loads((run_dir / R.STARTED).read_text(encoding="utf-8"))
-            rec["journal"], recorded = {"path": "run/journals/aisef-run.jsonl"}, False
-        except (OSError, ValueError):
-            raise B.BundleError(f"{run_dir}: no run record ({type(e).__name__})") from e
+    if expect_anchor is not None:
+        _authentic(run_dir, expect_anchor)
+    rec, recorded = _record(run_dir)
     if rec.get("bundle_digest") != project.digest:
         raise B.BundleError(f"{run_dir} is a run of another bundle: a continuation is of the same project")
     if rec.get("kernel_digest") != R.kernel_digest():
         raise B.BundleError(f"{run_dir} ran another kernel ({str(rec.get('kernel_digest'))[:12]}): a new project, "
                             "not a continuation")
-    try:
-        journal = format3.reconstruct((run_dir / rec["journal"]["path"]).read_text(encoding="utf-8"))
-        events = journal.events
-    except Exception as e:  # noqa: BLE001 — any refusal of the reader is the answer
-        raise B.BundleError(f"{run_dir}: the journal does not reconstruct ({type(e).__name__}: {e})"[:400]) from e
+    journal = _journal(run_dir, rec, recorded)
+    events = journal.events
     commits = [(e.data["story_id"], e.data["revision"]) for e in events if e.type == "story/commit"]
     if not commits:
         raise B.BundleError(f"{run_dir} committed no story: run the bundle itself again")
@@ -475,7 +615,10 @@ def continue_from(data: Mapping, run_dir: pathlib.Path, *, leave_out_unidentifie
     B.load(out)
     account = lineage.account_of(run_dir)
     report = {"carried": done, "carried_as": carried, "baseline": baseline, "run": str(run_dir), "evidence_anchor": anchor,
-              "recorded": recorded, "already_continued_by": {"run": child, "state": state} if child else None,
+              "recorded": recorded, "anchor_checked": expect_anchor is not None,
+              "already_continued_by": ({"run": child, "state": state,
+                                        **({"why": lineage.child_evidence(pathlib.Path(child))[1]}
+                                           if state == lineage.UNREAD else {})} if child else None),
               # a torn last line is the reader's verified prefix; the torn event's EFFECTS are not assumed undone —
               # they are among `unconfirmed`, reconciled against git (app/lineage)
               "torn_tail": bool(journal.torn_tail), "cut_event": reconciled["cut_event"],
@@ -535,6 +678,9 @@ def main(argv: list[str] | None = None) -> int:
     c.add_argument("--out", type=pathlib.Path, required=True)
     c.add_argument("--leave-out-unidentified", action="store_true",
                    help="continue although main holds commits no journaled operation identifies (they are left out)")
+    c.add_argument("--expect-anchor", metavar="SHA256",
+                   help="the evidence anchor the run printed, kept outside the run directory: refused when the run "
+                        "cannot show it (without it a continuation proves consistency, not authenticity)")
     m = sub.add_parser("migrate", help="re-bind an earlier release's bundle to this release's spec ids")
     m.add_argument("bundle", type=pathlib.Path)
     m.add_argument("--out", type=pathlib.Path, required=True, help="the migrated bundle (a new file; never the input)")
@@ -558,7 +704,10 @@ def main(argv: list[str] | None = None) -> int:
                               "still_to_approve": unapproved(doc)}, indent=1, sort_keys=True))
             return 0
         if a.command == "continue":
-            doc, report = continue_from(_read(a.bundle), a.from_run, leave_out_unidentified=a.leave_out_unidentified)
+            if a.expect_anchor is not None and not re.fullmatch(r"[0-9a-f]{64}", a.expect_anchor):
+                p.error("--expect-anchor is the 64-hex evidence anchor the run printed")
+            doc, report = continue_from(_read(a.bundle), a.from_run, leave_out_unidentified=a.leave_out_unidentified,
+                                        expect_anchor=a.expect_anchor)
             _write_new(a.out, doc)
             print(json.dumps({"written": str(a.out), **report}, indent=1, sort_keys=True))
             return 0

@@ -14,6 +14,7 @@ from __future__ import annotations
 import contextlib
 import copy
 import dataclasses
+import hashlib
 import io
 import json
 import os
@@ -202,15 +203,36 @@ class NothingCommitted(Case):
 
     Pins aisef2/app/bundle_cli.py::continue_from [119]."""
 
-    def test_a_run_that_committed_no_story_is_refused_by_name(self):
+    def before_the_first_commit(self) -> bytes:
+        """The run's journal cut at a line boundary, before its first story/commit: a valid chain that holds none."""
         lines = (FX.first / JOURNAL).read_bytes().split(b"\n")
         first_commit = next(i for i, ln in enumerate(lines) if ln and json.loads(ln)["event"]["type"] == "story/commit")
         before = b"\n".join(lines[:first_commit]) + b"\n"
         self.assertEqual(sum(1 for e in format3.reconstruct(before.decode("utf-8")).events if e.type == "story/commit"), 0)
-        moved = self.moved(record=FX.record, journal=before)
+        return before
+
+    def test_a_run_that_committed_no_story_is_refused_by_name(self):
+        """The record names the journal it has (its digest and length: `aisef run --verify`'s rule, which a continuation
+        applies since the lineage decision of 2026-10-15), so what is refused is the journal's own account."""
+        before = self.before_the_first_commit()
+        record = json.loads(FX.record)
+        record["journal"] = {**record["journal"], "sha256": hashlib.sha256(before).hexdigest(),
+                             "lines": before.count(b"\n")}
+        moved = self.moved(record=json.dumps(record), journal=before)
         text = self.refusal(moved)
         self.assertIn(str(moved), text)
         self.assertIn("committed no story", text)
+
+    def test_a_journal_cut_before_its_commits_under_the_record_of_the_whole_run_is_not_the_journal_it_names(self):
+        """Before the lineage decision a continuation did not read the digest and length RUN.json names, so a journal
+        cut at a line boundary — which the reader takes — was "a run that committed no story". `--verify` refuses it
+        as not the journal the record names; so does a continuation, and says which failure it is."""
+        moved = self.moved(record=FX.record, journal=self.before_the_first_commit())
+        with self.assertRaises(bundle.BundleError) as c:
+            bundle_cli.continue_from(FX.doc, moved)
+        self.assertEqual(getattr(c.exception, "code", None), "EVIDENCE_INTEGRITY")
+        self.assertIn(str(moved / RECORD), str(c.exception))
+        self.assertNotIn("committed no story", str(c.exception))
 
 
 class BaselineOfTheClone(Case):

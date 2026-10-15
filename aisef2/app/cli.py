@@ -45,7 +45,8 @@ def _parser() -> argparse.ArgumentParser:
                    help="run --parent only: start although the lineage has spend no evidence accounts for (recorded)")
     p.add_argument("--supersede-claim", metavar="SHA256",
                    help="run --parent only: supersede the predecessor's claim with this sha256 whose child never began "
-                        "and whose claimant cannot be shown gone (the operator's assertion, recorded)")
+                        "and whose claimant cannot be shown gone, or whose child's evidence cannot be read (the "
+                        "operator's assertion, recorded)")
     return p
 
 

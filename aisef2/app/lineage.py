@@ -18,14 +18,24 @@ another run may continue the same predecessor:
 
 | the claim's child | the claimant | decision |
 |---|---|---|
-| BEGUN (its journal holds an event) | — | refused: the lineage continues from the child — never a fork |
+| BEGUN (its journal reads and holds an event) | — | refused: the lineage continues from the child — never a fork |
 | ENDED_UNBEGUN (a record, no journal: refused before it began) | done | superseded: a new generation records the evidence |
-| UNBEGUN (no record, no journal) | provably gone (same host, the pid absent or another process) | superseded, with the evidence |
+| UNBEGUN (no record, no journal, or a journal of no bytes) | provably gone (same host, the pid absent or another process) | superseded, with the evidence |
 | UNBEGUN | alive, on another host, or not decidable | refused; the operator may supersede by naming the claim's sha256 (recorded as their assertion) |
+| UNREAD (evidence there that cannot be read: see below) | whatever it is | refused; only the operator's sha256 supersedes (recorded as their assertion, with the cause) |
 
-Nothing is deleted: a superseded claim stays, the new generation points at it. A child that began is never superseded,
-by evidence or by assertion. The claim is taken before the run's first provider request, so a run that loses the race
-spends nothing.
+Nothing is deleted: a superseded claim stays, the new generation points at it. A child whose journal reads and holds an
+event began and is never superseded, by evidence or by assertion. **A child whose evidence is there and cannot be read
+is not one that did not begin** (it is UNREAD, never UNBEGUN): a directory the system will not let this process search,
+a journal it will not open, one that does not reconstruct, one that holds bytes and no complete event. That the
+evidence of the beginning is damaged says nothing about whether the child began, and the claimant's absence is evidence
+about a process, not about the child's run; so no evidence supersedes it — and a failure to read releases and takes
+nothing. What is genuinely not there is still not evidence of a beginning. The claim is taken before the run's first
+provider request, so a run that loses the race spends nothing.
+
+**A predecessor this process may not list, search or write** is a refusal (`LineageRefused`, which `aisef run` answers
+with exit 2 and `aisef bundle continue` with `refused:`), never a traceback and never "no claims": the generations of
+a directory whose listing is denied cannot be told, and the newest decides.
 
 **Spend.** `account_of` re-derives a run's spend from its evidence alone (the Budget's rules: sessions, journaled
 requests, the preflight's ledger) and adds what only the journal shows: a provider request with no result — in flight
@@ -57,7 +67,7 @@ from typing import Mapping
 STARTED = "RUN.started.json"
 CLAIM = "CONTINUED-BY.json"
 JOURNAL = pathlib.Path("run") / "journals" / "aisef-run.jsonl"
-BEGUN, ENDED_UNBEGUN, UNBEGUN = "BEGUN", "ENDED_UNBEGUN", "UNBEGUN"
+BEGUN, ENDED_UNBEGUN, UNBEGUN, UNREAD = "BEGUN", "ENDED_UNBEGUN", "UNBEGUN", "UNREAD"
 SPEND = ("provider_requests", "turns", "input_tokens", "output_tokens")
 
 
@@ -83,7 +93,16 @@ def _claimed_run(text: str) -> str | None:
 # ------------------------------------------------------------------------------------------------ claims
 
 def claims(predecessor: pathlib.Path) -> list[tuple[int, pathlib.Path]]:
-    """The claim generations on `predecessor`, oldest first."""
+    """The claim generations on `predecessor`, oldest first. A directory the system will not let this process list and
+    search is not "no claims" (`_look`): `glob` answers an empty listing for what it cannot list, so the later
+    generations were not seen and the first, found by its name, was taken for the newest — `LineageRefused`."""
+    try:
+        _look(predecessor)
+        _look(predecessor / CLAIM)
+    except OSError as e:
+        raise LineageRefused(f"{predecessor}: its claims cannot be listed ({type(e).__name__}: {e.strerror or e}): a "
+                             "lineage cannot be known from a directory this process may not list and search — restore "
+                             "its permissions (nothing was taken or released)") from None
     out = [(1, predecessor / CLAIM)] if (predecessor / CLAIM).exists() else []
     for p in predecessor.glob("CONTINUED-BY.*.json"):
         m = re.fullmatch(r"CONTINUED-BY\.(\d+)\.json", p.name)
@@ -102,11 +121,36 @@ def events_of(run_dir: pathlib.Path) -> tuple[list, bool] | None:
     return list(j.events), bool(j.torn_tail)
 
 
+def child_evidence(child: pathlib.Path) -> tuple[str, str | None]:
+    """(the child's state, and why when it is UNREAD). BEGUN: its journal reads and holds an event. UNREAD: its evidence
+    is there and cannot be read — the journal cannot be opened (a directory of it that cannot be searched, a file with
+    no read permission, a directory in its place), is not text, does not reconstruct, or holds bytes and no complete
+    event (a first line that was cut). Else the evidence is not there: ENDED_UNBEGUN (a record: it was refused before it
+    began) or UNBEGUN (nothing, or a journal of no bytes)."""
+    from aisef2.journal import format3
+    try:
+        text = (child / JOURNAL).read_text(encoding="utf-8")
+    except UnicodeDecodeError as e:
+        return UNREAD, f"{JOURNAL.name} is not text ({e.reason})"
+    except OSError as e:
+        if not not_there(e):
+            return UNREAD, f"{JOURNAL.name} cannot be read ({type(e).__name__}: {e.strerror or e})"
+        text = None
+    except ValueError:      # a name with a NUL byte names no file
+        text = None
+    if text:
+        try:
+            events = format3.reconstruct(text).events
+        except Exception as e:  # noqa: BLE001 — a journal the reader refuses is evidence that cannot be read, not none
+            return UNREAD, f"{JOURNAL.name} does not reconstruct ({type(e).__name__}: {e})"[:300]
+        if events:
+            return BEGUN, None
+        return UNREAD, f"{JOURNAL.name} holds bytes and no complete event (a first line that was cut)"
+    return (ENDED_UNBEGUN if (child / "RUN.json").is_file() else UNBEGUN), None
+
+
 def child_state(child: pathlib.Path) -> str:
-    got = events_of(child) if (child / JOURNAL).exists() else None
-    if got is not None and got[0]:
-        return BEGUN
-    return ENDED_UNBEGUN if (child / "RUN.json").is_file() else UNBEGUN
+    return child_evidence(child)[0]
 
 
 def process_started(pid: int) -> str | None:
@@ -156,18 +200,26 @@ def claim(predecessor: pathlib.Path, child: pathlib.Path, at: float, supersede: 
         if not isinstance(doc, dict):     # JSON that is no claim is as torn as a torn one
             doc = {}
         held = pathlib.Path(str(doc.get("run", "")))
-        state = child_state(held) if doc.get("run") else UNBEGUN
+        state, unread = child_evidence(held) if doc.get("run") else (UNBEGUN, None)
         if state == BEGUN:
             raise LineageRefused(f"{predecessor} is continued by {held}, which began: continue the lineage from it")
         gone = True if state == ENDED_UNBEGUN else _gone(doc.get("claimant") or {})
         asserted = supersede is not None and supersede == _sha(data)
-        if gone is not True and not asserted:
+        if state == UNREAD and not asserted:    # the claimant's absence is no evidence about a child that may have begun
+            raise LineageRefused(f"{predecessor} is claimed by {held} ({path.name}), whose evidence exists and cannot be "
+                                 f"read ({unread}): it may have begun (UNREAD), so it is not superseded — not even by its "
+                                 f"claimant's absence. Make it readable again (its permissions, or its journal from a "
+                                 f"faithful copy) and run again: it is then a child that began (continue from it) or one "
+                                 f"that did not; or, having inspected it, assert that it is not to be continued: "
+                                 f"--supersede-claim {_sha(data)}")
+        if state != UNREAD and gone is not True and not asserted:
             why = "is alive" if gone is False else "cannot be shown gone (another host, or its identity unreadable)"
             raise LineageRefused(f"{predecessor} is claimed by {held} ({path.name}), whose claimant {why} and which has "
                                  f"not begun: not superseded without evidence (an operator may name it: "
                                  f"--supersede-claim {_sha(data)})")
         supersedes = {"claim": path.name, "sha256": _sha(data), "child": str(held), "child_state": state,
-                      "claimant_gone": gone, "operator_asserted": asserted and gone is not True}
+                      "claimant_gone": gone, "operator_asserted": asserted and (state == UNREAD or gone is not True),
+                      **({"unread": unread} if state == UNREAD else {})}
         target = predecessor / f"CONTINUED-BY.{n + 1}.json"
     doc = {"run": str(child), "claimed": at, "claimant": claimant(), **({"supersedes": supersedes} if supersedes else {})}
     try:
@@ -175,6 +227,11 @@ def claim(predecessor: pathlib.Path, child: pathlib.Path, at: float, supersede: 
     except FileExistsError:
         raise LineageRefused(f"{predecessor}: another run took {target.name} at the same moment: a run is continued "
                              "once") from None
+    except OSError as e:    # an archived, read-only or unwritable predecessor: the claim is a file in its directory
+        raise LineageRefused(f"{predecessor} cannot be claimed: {target.name} cannot be created ({type(e).__name__}: "
+                             f"{e.strerror or e}) — the claim is a file in that directory: restore write access to it "
+                             "(or continue a writable copy of the run, which is then the run that is claimed); nothing "
+                             "was taken") from None
     with os.fdopen(fd, "w", encoding="utf-8") as f:
         f.write(json.dumps(doc, sort_keys=True) + "\n")
         f.flush()
@@ -265,6 +322,11 @@ _NOT_THERE = (errno.ENOENT, errno.ENOTDIR, errno.EBADF, errno.ELOOP)
 _NOT_THERE_WINERROR = (21, 123, 1921)
 
 
+def not_there(e: OSError) -> bool:
+    """Whether `e` is the system's answer for "nothing at that path" (`_NOT_THERE`) and not a refusal to look."""
+    return e.errno in _NOT_THERE or getattr(e, "winerror", None) in _NOT_THERE_WINERROR
+
+
 def _look(path: pathlib.Path) -> None:
     """Raise what keeps the system from listing `path` — or, `path` being a file, from finding it: no permission (a link
     into a directory that cannot be traversed, a run directory with no search permission, a directory that cannot be
@@ -275,10 +337,22 @@ def _look(path: pathlib.Path) -> None:
     try:
         os.listdir(path)
     except OSError as e:
-        if e.errno not in _NOT_THERE and getattr(e, "winerror", None) not in _NOT_THERE_WINERROR:
+        if not not_there(e):
             raise
     except ValueError:      # a name with a NUL byte names no file: pathlib has always answered "not there"
         pass
+
+
+def is_file(path: pathlib.Path) -> bool:
+    """`path.is_file()` that does not take a refusal for absence: a component the system will not let this process
+    search raised PermissionError out of `is_file` on 3.11-3.13 and answered False on 3.14 ("no record there"). A file
+    that is not there is False; one that cannot be looked at is `LineageRefused`, with the cause."""
+    try:
+        _look(path)
+    except OSError as e:
+        raise LineageRefused(f"{path} cannot be looked at ({type(e).__name__}: {e.strerror or e}): restore the "
+                             "permissions of the run directory") from None
+    return path.is_file()
 
 
 def account_of(run_dir: pathlib.Path) -> dict:
@@ -336,12 +410,21 @@ def lineage_account(predecessor: pathlib.Path, child: pathlib.Path | None = None
     (its preflight may have spent) but `child` (the run asking). Unknown spend is listed, never counted as 0."""
     def key(p) -> str:      # a claim names a run absolute; a caller may give one relative (`--verify --out run3`)
         return str(pathlib.Path(p).resolve())
+    def listed(where: pathlib.Path, holder: dict) -> list:
+        """The claims on `where`; a directory that cannot be listed hides the runs it superseded: what they spent is
+        unknown, listed on `holder`'s account — never raised out of the account, never a known 0."""
+        try:
+            return claims(where)
+        except LineageRefused as e:
+            holder["unaccounted"].append(f"{e}: what the runs it superseded spent is unknown")
+            return []
+
     runs, seen, at = [], {key(child)} if child is not None else set(), predecessor
     while at is not None and key(at) not in seen:
         seen.add(key(at))
         runs.append(account_of(at))
         nxt = predecessor_of(at)
-        for _, path in claims(nxt) if nxt is not None else []:
+        for _, path in listed(nxt, runs[-1]) if nxt is not None else []:
             try:
                 sibling = _claimed_run(path.read_text(encoding="utf-8"))
             except (OSError, ValueError):
@@ -350,7 +433,7 @@ def lineage_account(predecessor: pathlib.Path, child: pathlib.Path | None = None
                 seen.add(key(sibling))
                 runs.append(account_of(pathlib.Path(sibling)) | {"superseded": True})
         at = nxt
-    for _, path in claims(predecessor):     # siblings of `child`: superseded children of the predecessor itself
+    for _, path in listed(predecessor, runs[0] if runs else {"unaccounted": []}):     # siblings of `child`: superseded
         try:
             sibling = _claimed_run(path.read_text(encoding="utf-8"))
         except (OSError, ValueError):
