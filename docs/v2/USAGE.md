@@ -107,8 +107,12 @@ was refused; **NOT_REACHED** when no story reached its gate. `plan_quality_verdi
 
 Claimed: deterministic, evidence-bound orchestration and product verification. During a proof, candidate code (what
 the developer writes) runs only in the probe's agent process; the verdict comes from a controller that never imports
-it, over an authenticated channel, so within an evaluation the candidate cannot manufacture a probe result (a gap
-across evaluations is listed under Known limitations). Raw run evidence is preserved.
+it, over an authenticated channel, so within an evaluation the candidate cannot forge a verdict the controller accepts:
+every line carries an authentication under a key it never holds, and at most it can suppress its own observation, which
+is reported as a harness failure, not as SATISFIED (a gap across evaluations is listed under Known limitations). It can
+still misreport itself — its exit code, its returned value — so a candidate written to do that, or one that recognises
+it is being probed, can turn a broken product into a SATISFIED result (the probe's passing behaviour verdict): the
+guarantee is about the channel, not about the value a subject reports. Raw run evidence is preserved.
 
 Threat model: a trusted operator; generated code may be faulty or opportunistic. Not claimed: generalization across
 arbitrary workloads, superiority over V1, model quality, hostile multi-tenant isolation, full isolation against a

@@ -841,10 +841,10 @@ section { padding: 100px 0; }
         </div>
       </li>
       <li class="diff-item">
-        <span class="diff-label">Sealed verdict channel</span>
+        <span class="diff-label">Authenticated verdict channel</span>
         <div class="diff-desc">
-          <h3>The code under test cannot manufacture a pass</h3>
-          <p>During a proof, candidate code runs only inside the probe&rsquo;s agent process, and the verdict comes from a controller that never imports it, over an authenticated channel. This holds within an evaluation; one known gap across evaluations (a writable probe interpreter) is scheduled for 2.0.1.</p>
+          <h3>The code under test cannot forge the verdict, but it can still misreport itself</h3>
+          <p>During a proof, candidate code runs only inside the probe&rsquo;s agent process, and the verdict comes from a controller that never imports it, over an authenticated channel: the code under test cannot forge a verdict the controller accepts, because every line carries an authentication under a key it never holds; at most it can suppress its own observation, which is reported as a harness failure, not as SATISFIED. This holds within an evaluation; one known gap across evaluations (a writable probe interpreter) is scheduled for 2.0.1. What the channel does not give is the truth of an answer: the code can misreport its exit code or its returned value, so a candidate written to do that, or one that recognises it is being probed, can turn a broken product into a SATISFIED result.</p>
         </div>
       </li>
       <li class="diff-item">

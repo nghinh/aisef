@@ -42,7 +42,12 @@ pip install aisef==2.0.0
    - **ProductProof** — các probe do harness sở hữu (gọi hàm Python, gọi CLI, hiệu ứng tiến trình, file artifact) kiểm
      từng behaviour contract trên candidate. Mã candidate chỉ chạy trong tiến trình agent của probe; kết luận do một
      controller không bao giờ import mã đó đưa ra, qua một kênh đã xác thực, nên trong một lần đánh giá mã đang bị
-     kiểm không thể tự chế ra kết quả đạt (có một lỗ đã biết giữa các lần đánh giá, xem dưới).
+     kiểm không thể giả mạo một kết luận mà controller chấp nhận: mỗi dòng mang một xác thực dưới khoá mà nó không bao
+     giờ có, và nhiều nhất nó chỉ chặn được quan sát của chính mình, việc đó được báo là lỗi harness, không phải
+     SATISFIED (có một lỗ đã biết giữa các lần đánh giá, xem dưới). Nhưng nó vẫn khai sai được về chính nó — mã thoát,
+     giá trị trả về — nên một candidate viết ra để làm vậy, hoặc nhận ra mình đang bị probe, có thể làm một sản phẩm
+     hỏng ra kết quả SATISFIED (kết luận hành vi đạt của probe): bảo đảm nằm ở kênh, không nằm ở giá trị mà mã đang bị
+     kiểm khai.
    - **Độ đầy đủ của test kỹ thuật** — test của developer phải chạy được, không rỗng và có liên quan; chúng là bằng
      chứng về chất lượng kỹ thuật, không bao giờ là bằng chứng sản phẩm đúng. Khi không quyết được tính rỗng, kết quả
      là INCOMPLETE và không bao giờ chặn.
