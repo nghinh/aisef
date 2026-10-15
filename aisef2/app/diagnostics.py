@@ -23,14 +23,20 @@ and the verdict, the retry and the budget are what they would have been.
 **What is kept.** Only an evaluation the probe executed (an unrunnable or invalid-spec result's `detail` is in the
 journal's own record) whose verdict is not the one the contract expects (`candidate_expectation`: the comparison
 the frozen `contract_satisfaction` makes, used here to decide whether there is something to explain, never to route;
-this module neither calls that function nor seals a record), and not the expected state of what the story
-introduces, at its parent: the verdict the kernel recorded and the verdict expected, beside the observation (its
-kind, its verdict, its detail — parsed when the probe made JSON of it), and the identity of the sealed record the
-journal's `probe/evaluated` row holds (story, spec, probe and its digest, revision, enforcement, result), so
-`aisef run --verify` binds the file to that row — and the criteria the spec answers. Every string in it
-has the run's secrets replaced (`review_verify.redacted`, the mechanism of the review artifacts); the detail is cut at
-`DETAIL_MAX` characters (`elided` says how many it left out, `detail_chars` its length) and a run writes at most
-`FILES_MAX` files (`diagnostics.dropped`).
+this module neither calls that function nor seals a record), and not what the routing table expects at the story's
+parent (`control/routing.py`; the parent is the point at which the story's admission ran, not a commit id): of a spec
+the story introduces, a definite verdict other than the contract's, or PRECONDITION_ABSENT; of one it verifies, any
+definite verdict (its expectation is unconstrained). An INDETERMINATE for another reason — a signal the controller did
+not send — is kept even there: it is what the sealed record cannot explain. What is kept is the verdict the kernel
+recorded and the verdict expected, beside the observation (its kind, its verdict, its detail — parsed when the probe
+made JSON of it), and the identity of the sealed record the journal's `probe/evaluated` row holds (story, spec, probe
+and its digest, revision, enforcement, result), so `aisef run --verify` binds the file to that row — and the criteria
+the spec answers. Every string in it has the run's secrets replaced (`review_verify.redacted`, the mechanism of the
+review artifacts, searched for in the secret's JSON-escaped forms too, because a probe's detail may be text with JSON
+in it); the detail is cut at `DETAIL_MAX` characters (`elided` says how many it left out, `detail_chars` its length)
+and a run writes at most `FILES_MAX` files (`diagnostics.dropped`). A review file's `finding` is the finder's own id as
+the journal's gate row carries it — text, redacted, uncut — and RUN.json's `failures[].why` is redacted and cut at 200
+characters.
 
 **Who reads it.** The operator — and, today, not enforcement. The directory is made 0700 and its files 0600 where the
 platform has modes, which binds other users and never the operator's own; it is outside every checkout a developer
@@ -42,9 +48,10 @@ executed by the kernel as the operator's user and are not confined. Nothing here
 
 **What it decides: nothing.** No code in aisef2 reads this directory but `artifact_problems`, which `aisef run
 --verify` calls to check the files against the journal as it checks every evidence file (a changed or unbound one makes
-the *verification* REFUTED, never the delivery verdict, which the journal alone gives). The module imports no deciding
-module (control, orchestrate, journal, plan), the `Sink` has no read method, and `feedback.py`, `client.py` and the
-developer's prompt builders do not name it (tests/v2/test_v21_pm8_diagnostics.py)."""
+the *verification* REFUTED, never the delivery verdict, which the journal alone gives; the sibling a failed write left is
+a note). The module imports no deciding module (control, orchestrate, journal, plan), the `Sink` has no read method,
+and `feedback.py`, `client.py` and the developer's prompt builders do not name it
+(tests/v2/test_v21_pm8_diagnostics.py)."""
 
 from __future__ import annotations
 
@@ -57,10 +64,11 @@ import sys
 from typing import Callable, Mapping
 
 from aisef2.app import confine, review_verify
+from aisef2.arch.enums import BehaviorVerdict
 from aisef2.probe import catalog
 from aisef2.probe.protocol import classify_failure
 from aisef2.product.contract import plain
-from aisef2.product.outcome import Executed
+from aisef2.product.outcome import Executed, IndeterminateReason
 
 ARTIFACT_DIR = "probe-observations"
 ARTIFACT_FORMAT = "aisef-v2-probe-observation/1"
@@ -77,7 +85,9 @@ NOT_INSPECTED = SAME_USER + " (confinement is asked for; what its sessions mount
 SESSIONS_CONFINED = ("model sessions confined, the directory is not mounted in them; same-user, not enforced for the "
                      "developer's tests and the candidate under a probe, which the kernel runs as the operator's user")
 PERMISSIONS = "directory 0700, files 0600" if os.name == "posix" else "platform default (modes are not applied)"
-AUTHORITY = "none: no verdict, retry, budget, merge or route reads these files"
+AUTHORITY = ("none: no delivery verdict, retry, budget, merge or route reads these files; `aisef run --verify` checks "
+             "them against the journal, and a file it finds changed or unbound refutes the verification, never the "
+             "delivery")
 _NAME = re.compile(r"[A-Za-z0-9_-]{1,49}\.\d{1,6}\.[pr]\d{1,6}\.json")
 
 
@@ -111,6 +121,16 @@ def _parsed(detail: str):
     return value if isinstance(value, (dict, list)) else detail
 
 
+def _pre_state(spec_id: str, result: Executed, ctx: Mapping) -> bool:
+    """Is `result`, measured at the story's parent, what the routing table expects there (no finding)? Of a spec the
+    story introduces: a definite verdict (it is not the contract's — the caller saw to that) or PRECONDITION_ABSENT; of
+    one it verifies, any definite verdict. Anything else is kept, an INDETERMINATE(NON_CONTROLLER_SIGNAL) first."""
+    definite = result.behavior_verdict is not BehaviorVerdict.INDETERMINATE
+    if spec_id in ctx.get("introduces", ()):
+        return definite or result.reason is IndeterminateReason.PRECONDITION_ABSENT
+    return definite and spec_id in ctx.get("verifies", ())
+
+
 class Sink:
     """The artifacts of one run. It only writes: it has no method that reads a file back, and `report()` is what
     RUN.json says of it."""
@@ -118,6 +138,10 @@ class Sink:
     def __init__(self, out, secrets=(), access: str = SAME_USER, files_max: int = FILES_MAX) -> None:
         self.folder = pathlib.Path(out) / ARTIFACT_DIR
         self.secrets, self.access, self.files_max = tuple(secrets), access, files_max
+        # a probe's detail may be text with JSON in it (file_artifact's expired window): json.dumps wrote a quote, a
+        # backslash or a non-ASCII letter of a secret as an escape, so the secret is looked for in those forms as well
+        texts = [str(x) for x in self.secrets if x]
+        self._forms = tuple(dict.fromkeys(f for t in texts for f in (t, json.dumps(t)[1:-1])))
         self.written = self.dropped = self.not_written = 0
         self.failures: list[dict] = []
         self._counted: dict[tuple, int] = {}
@@ -135,9 +159,9 @@ class Sink:
         except Exception as e:  # noqa: BLE001 — fail open: a diagnostic's fault is a mark in RUN.json, never a verdict
             self.not_written += 1
             if len(self.failures) < FAILURES_MAX:
+                why = review_verify.redacted(f"{type(e).__name__}: {e}", self._forms)[0]      # then cut: no half a secret
                 self.failures.append({"story_id": str(ctx.get("story_id")) if isinstance(ctx, Mapping) else None,
-                                      "spec_id": str(getattr(spec, "id", None)),
-                                      "why": f"{type(e).__name__}: {e}"[:200]})
+                                      "spec_id": str(getattr(spec, "id", None)), "why": why[:200]})
 
     def _document(self, ctx: Mapping, spec, at, probe, observation) -> tuple[str, dict] | None:
         result = classify_failure(spec, observation)
@@ -146,9 +170,11 @@ class Sink:
         if result.behavior_verdict is spec.candidate_expectation:      # what the contract expects: nothing to explain
             return None
         proof = ctx["origin"] == "proof"
-        at_parent = proof and at.sha == ctx.get("parent")
-        if at_parent and spec.id in ctx.get("introduces", ()):
-            return None      # what the story introduces is not there yet at its parent: the expected state, no finding
+        # the parent is the point of the story's admission (no `story/admitted` yet), at the commit its attempt began at:
+        # a story with no developer work proves at the candidate that is the same commit, and that proof is the candidate's
+        at_parent = proof and at.sha == ctx.get("parent") and not ctx.get("admitted", False)
+        if at_parent and _pre_state(spec.id, result, ctx):
+            return None      # the pre-state the routing table expects of the role at the parent: no finding
         story, attempt = ctx["story_id"], ctx["attempt"]
         if proof:
             key = (story, attempt)
@@ -165,7 +191,7 @@ class Sink:
                "audience": "operator", "diagnostics_access": self.access,
                **({"at_parent": at_parent, "criteria": list(ctx.get("criteria", {}).get(spec.id, ()))} if proof
                   else {"finding": ctx.get("finding")})}
-        body, count = review_verify.redacted(doc, self.secrets)     # keys, values, the finder's own id: all of it
+        body, count = review_verify.redacted(doc, self._forms)     # keys, values, the finder's own id: all of it
         shown = body["observation"]
         text = shown["detail"] if isinstance(shown["detail"], str) else json.dumps(shown["detail"], sort_keys=True,
                                                                                     ensure_ascii=False)
@@ -246,6 +272,12 @@ def artifact_problems(out: pathlib.Path, events: list[dict], rec: Mapping) -> tu
             and isinstance(d := e.get("data"), dict) and isinstance(d.get("record"), dict)}
     for path in sorted(folder.glob("*")) if folder.is_dir() else []:
         what = f"diagnostic artifact {ARTIFACT_DIR}/{path.name}"
+        if path.name.endswith(".tmp") and _NAME.fullmatch(path.name[:-4]):
+            # the sibling `Sink._keep` made and a failed write (a full disk, a lock) left: unlisted by the manifest,
+            # read by nothing, never removed (INV-MUTATION-AUTHORITY) — the diagnostic's own fault, not the run's
+            notes.append(f"{what} is what a failed write left behind: not an artifact, nothing was removed, "
+                         "no verdict depends on it")
+            continue
         if not _NAME.fullmatch(path.name):
             problems.append(f"{what} is not a file this release writes")
             continue
@@ -266,8 +298,8 @@ def artifact_problems(out: pathlib.Path, events: list[dict], rec: Mapping) -> tu
                 notes.append(f"{what}: the artifact of the finding it observes was not kept "
                              f"({review_verify.ARTIFACT_DIR}/{finding.name})")
                 continue
-            try:
-                held = json.loads(finding.read_bytes().decode("utf-8")).get("finding", {}).get("id")
+            try:      # the id as the finder wrote it (any JSON), as the gate row and the sink carry it: its text
+                held = str(json.loads(finding.read_bytes().decode("utf-8")).get("finding", {}).get("id"))
             except (OSError, ValueError, AttributeError):
                 held = None
             if held is None or held != doc.get("finding"):

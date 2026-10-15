@@ -17,7 +17,10 @@ What is asserted is what the operator relies on, and what must not change:
   run without the tap produces; a developer's retry prompt holds nothing of the directory or of what it keeps;
 * fail-open: an artifact that cannot be written (or a context that cannot be read) changes no outcome, is counted and
   named in RUN.json, and is a note — not a refutation — in `--verify`;
-* a review reproducer's observation, at the finding's place in the finder's list, bound to the finding's artifact.
+* a review reproducer's observation, at the finding's place in the finder's list, bound to the finding's artifact —
+  whatever JSON type the finder gave the finding's id (the gate row carries it as text);
+* a write that fails after its sibling was made leaves the sibling, counted and named — a note in `--verify`, never a
+  refutation of a run that delivered.
 
 Pins aisef2/app/diagnostics.py, aisef2/app/run.py::probe_factories, ::story_where, ::evidence_manifest, ::execute,
 aisef2/app/adapters.py::Reviewer.review, ::Reviewer._verify, aisef2/app/review_verify.py::verify (`entries`),
@@ -117,6 +120,17 @@ def rewrite_manifest(out: pathlib.Path) -> None:
     """The manifest as an operator with write access could make it match the run directory as it now is."""
     (out / "EVIDENCE.json").write_text(json.dumps(R.evidence_manifest(out), indent=1, sort_keys=True) + "\n",
                                        encoding="utf-8")
+
+
+class FailingOs:
+    """`os` as the diagnostics module sees it, with the named functions made to fail (the sibling is made, the rename is
+    not: a full disk, a lock on Windows)."""
+
+    def __init__(self, **failing) -> None:
+        self._failing = failing
+
+    def __getattr__(self, name):
+        return self._failing.get(name) or getattr(os, name)
 
 
 def normalized(events) -> list:
@@ -329,6 +343,25 @@ class ARefutedProof(unittest.TestCase):
         self.assertEqual((v["verdict"], v["problems"]), ("VERIFIED", []))
         self.assertTrue(any("4 probe observation(s) could not be written" in n for n in v["notes"]), v["notes"])
 
+    def test_a_write_that_fails_after_its_sibling_was_made_leaves_it_and_is_a_note_not_a_refutation(self):
+        from aisef2.app import diagnostics as D
+
+        def full_disk(*args, **kw):
+            raise OSError(28, "No space left on device")
+        with mock.patch.object(D, "os", FailingOs(replace=full_disk)):
+            rec = self.scene.run("halfwritten")
+        out = self.tmp / "halfwritten"
+        # nothing removed (INV-MUTATION-AUTHORITY): the four siblings stay, none of them an artifact
+        self.assertEqual(sorted(p.name for p in (out / DIR).iterdir()),
+                         [f"S1.{a}.p{n}.json.tmp" for a in (1, 2) for n in (1, 2)])
+        for key in ("story_outcomes", "delivery_verdict", "delivery_blocked_by"):
+            self.assertEqual(rec[key], self.rec[key], key)
+        self.assertEqual((rec["diagnostics"]["written"], rec["diagnostics"]["not_written"]), (0, 4))
+        v = verify(self.scene.project, out)
+        self.assertEqual((v["verdict"], v["problems"], v["delivery_verdict"]), ("VERIFIED", [], "FAIL"))
+        self.assertEqual(len([n for n in v["notes"] if ".json.tmp" in n]), 4, v["notes"])
+        self.assertTrue(any("4 probe observation(s) could not be written" in n for n in v["notes"]), v["notes"])
+
     def test_a_context_that_cannot_be_read_changes_nothing_and_is_named(self):
         def broken(run, project, story):
             def where():
@@ -399,6 +432,37 @@ class AReviewersReproducer(unittest.TestCase):
         self.assertEqual([x for x in v["problems"] if "S1.1.r1.json" in x], [])
         self.assertTrue(any("S1.1.r0.json: the finding it observes is not at review-findings/S1.1.0.json" in x
                             for x in v["problems"]), v["problems"])
+
+
+@unittest.skipUnless(os.name == "posix", "the fake client is a script started by its shebang")
+class AFindersIdThatIsNotAString(unittest.TestCase):
+    """A finder writes the id it likes. The gate row carries `str(id)` (adapters.Reviewer.review), the finding's own
+    artifact the id as JSON: the observation's file is bound to the finding by the one text both say, not by a type."""
+
+    ABSENT = object()
+
+    def test_the_run_is_verified_whatever_json_value_the_finding_s_id_is(self):
+        cases = (("a string", "F1", "F1"), ("a number", 5, "5"), ("a fraction", 1.5, "1.5"), ("null", None, "None"),
+                 ("no id at all", self.ABSENT, "None"), ("a list", [1, 2], "[1, 2]"))
+        for name, value, shown in cases:
+            with self.subTest(id=name), tempfile.TemporaryDirectory() as t:
+                tmp = pathlib.Path(t).resolve()
+                scene = Scene(tmp, add=base.ADD)
+                finding = {**AReviewersReproducer.FINDING}
+                if value is self.ABSENT:
+                    finding.pop("id")
+                else:
+                    finding["id"] = value
+                scene.review([finding])
+                rec = scene.run("out")
+                out = tmp / "out"
+                self.assertEqual((rec["story_outcomes"], rec["delivery_verdict"]), ({"S1": ["COMMIT"]}, "PASS"))
+                d = json.loads((out / DIR / "S1.1.r0.json").read_text(encoding="utf-8"))
+                self.assertEqual(d["finding"], shown)
+                kept = json.loads((out / "review-findings" / "S1.1.0.json").read_text(encoding="utf-8"))["finding"]
+                self.assertEqual(str(kept.get("id")), shown)      # the artifact holds it as JSON: not always text
+                v = verify(scene.project, out)
+                self.assertEqual((v["verdict"], v["problems"]), ("VERIFIED", []), name)
 
 
 if __name__ == "__main__":

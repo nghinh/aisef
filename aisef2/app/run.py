@@ -182,20 +182,27 @@ def regression_tests(repo: pathlib.Path, project: Project, story: str, delivered
 
 def story_where(run, project: Project, story: str):
     """What the diagnostic sink (app/diagnostics) names a probe observation of `story` by, read when it is made: the
-    attempt the kernel's projection holds and the parent the attempt began at (the journal's `story/begin`), and — fixed
-    by the plan — the specs the story introduces and the criteria each spec answers. Read-only: nothing here writes
-    the journal or reaches a decision."""
+    attempt the kernel's projection holds, the parent the attempt began at (the journal's `story/begin`) and whether
+    its admission is over (a `story/admitted` of the story after that `story/begin`: what is measured after it is the
+    candidate's or the merge's, whatever commit it is at) and — fixed by the plan — the specs the story introduces or
+    verifies and the criteria each spec answers. Read-only: nothing here writes the journal or reaches a decision."""
     mine = [o for o in project.plan.obligations if o.story_id == story]
     criteria: dict[str, list[str]] = {}
     for o in mine:
         criteria.setdefault(o.product_proof_spec_id, []).append(o.criterion_id)
     introduces = frozenset(o.product_proof_spec_id for o in mine if o.role is ObligationRole.INTRODUCE)
+    verifies = frozenset(o.product_proof_spec_id for o in mine if o.role is ObligationRole.VERIFY)
 
     def where() -> dict:
-        began = next((e.data.get("parent") for e in reversed(run.events)
-                      if e.type == "story/begin" and e.data.get("story_id") == story), None)
+        began, admitted = None, False
+        for e in reversed(run.events):      # back to the attempt's own `story/begin`; an admission met on the way is its
+            if e.type == "story/admitted" and e.data.get("story_id") == story:
+                admitted = True
+            elif e.type == "story/begin" and e.data.get("story_id") == story:
+                began = e.data.get("parent")
+                break
         return {"origin": "proof", "story_id": story, "attempt": ad.attempt_of(run, story)[0], "parent": began,
-                "introduces": introduces, "criteria": criteria}
+                "introduces": introduces, "verifies": verifies, "admitted": admitted, "criteria": criteria}
     return where
 
 

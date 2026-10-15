@@ -440,7 +440,10 @@ class AppExecute(unittest.TestCase):
         # story introduces is not at its parent a finding), nothing lost, and what is and is not enforced about them
         self.assertEqual(rec["diagnostics"], {
             "dir": "probe-observations", "audience": "operator", "access": "same-user, not enforced",
-            "permissions": D.PERMISSIONS, "authority": "none: no verdict, retry, budget, merge or route reads these files",
+            "permissions": D.PERMISSIONS,
+            "authority": ("none: no delivery verdict, retry, budget, merge or route reads these files; `aisef run "
+                          "--verify` checks them against the journal, and a file it finds changed or unbound refutes "
+                          "the verification, never the delivery"),
             "written": 0, "not_written": 0, "failures": [], "dropped": 0, "limits": {"detail_chars": 8192, "files": 500}})
         self.assertFalse((out / "probe-observations").exists())
         self.assertEqual((rec["usage"]["cost"]["value"], rec["usage"]["cost"]["status"], rec["no_progress"]),

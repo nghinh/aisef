@@ -4,9 +4,10 @@ gives it no authority.
 
 * `tapped`: a subclass that overrides `observe()` only; the probe's own `Observation` returned unchanged; identity,
   digest, execution digest and sealed record the untapped probe's; an exception of the probe is the probe's;
-* `Sink.note`: the findings it keeps (an executed evaluation whose contract is not SATISFIED; not the expected state of
-  what a story introduces at its parent), the record digest it names, redaction, bounds, create-only, private modes,
-  fail-open — never an exception, a counted mark;
+* `Sink.note`: the findings it keeps (an executed evaluation whose contract is not SATISFIED; not the pre-state the
+  routing table expects of an INTRODUCE or a VERIFY at its parent — a signal the controller did not send is kept), the
+  record digest it names, redaction (the JSON-escaped forms of a secret too), bounds, create-only, private modes,
+  fail-open — never an exception, a counted mark whose text names no secret;
 * `access_of`: what the sandbox's own command line mounts decides the statement, and what is not shown is not claimed;
 * `artifact_problems`: the file checks `--verify` makes (the end-to-end ones: test_v21_pm8_diagnostics_run.py);
 * structure: no module that decides imports or names it, the sink cannot read, the prompt builders do not name it.
@@ -25,6 +26,7 @@ import sys
 import tempfile
 import types
 import unittest
+from unittest import mock
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
@@ -71,6 +73,16 @@ def spec_of(expect=BV.SATISFIED, absence=SubjectAbsence.REQUIRES_SUBJECT, locato
 
 def refuted(detail='{"step": 1, "why": "raised ValueError"}'):
     return Observation(K.OBSERVED, BV.REFUTED, detail)
+
+
+class FailingOs:
+    """`os` as the module sees it, with the named functions made to fail (the sibling is made, the rename is not)."""
+
+    def __init__(self, **failing) -> None:
+        self._failing = failing
+
+    def __getattr__(self, name):
+        return self._failing.get(name) or getattr(os, name)
 
 
 class Scratch(unittest.TestCase):
@@ -236,6 +248,43 @@ class WhatIsKept(Scratch):
                 if kept:
                     self.assertEqual(docs[0]["at_parent"], at is at_parent)
 
+    def test_at_the_parent_only_the_pre_state_the_routing_table_expects_of_the_role_is_no_finding(self):
+        spec = spec_of()
+        at_parent = RevisionRef(PARENT, str(self.tmp / "checkout"))
+        absent = Observation(K.SUBJECT_ABSENT, None, "the module has no add")             # INDETERMINATE(PRECONDITION_ABSENT)
+        signal = Observation(K.NON_CONTROLLER_SIGNAL, None, "SIGSEGV after the dispatch")  # INDETERMINATE(NON_CONTROLLER_SIGNAL)
+        deadline = Observation(K.SUBJECT_DEADLINE, BV.REFUTED, "the 2s window expired")
+        rows = (       # (what the plan says of the spec in this story, what the probe saw, is it a finding)
+            ("introduces", refuted(), False), ("introduces", deadline, False), ("introduces", absent, False),
+            ("introduces", signal, True),      # the table routes it to INTEGRATION at every point: the very gap PM-8 is
+            ("verifies", refuted(), False), ("verifies", deadline, False),     # UNCONSTRAINED: either is READY
+            ("verifies", absent, True), ("verifies", signal, True),           # PRECONDITION_BROKEN; INTEGRATION
+            ("preserves", refuted(), True), ("preserves", deadline, True), ("preserves", absent, True),
+            ("preserves", signal, True))
+        for role, answer, kept in rows:
+            with self.subTest(role=role, kind=answer.kind.value, detail=answer.detail[:24]):
+                self.fresh()
+                ctx = self.ctx(spec, **{"introduces": frozenset({spec.id})} if role == "introduces" else
+                               {"verifies": frozenset({spec.id})} if role == "verifies" else {})
+                sink, _ = self.see(answer, spec=spec, at=at_parent, ctx=ctx)
+                self.assertEqual((sink.written, sink.not_written), (int(kept), 0))
+                if kept:
+                    self.assertTrue(self.docs()[0]["at_parent"])
+
+    def test_the_parent_is_the_measurement_point_not_a_commit_id(self):
+        # a story with no developer work proves at the candidate that is its parent's own commit: the proof is the
+        # candidate's — the journal holds `story/admitted` by then — and what it saw is a finding
+        spec = spec_of()
+        at_parent = RevisionRef(PARENT, str(self.tmp / "checkout"))
+        for admitted, kept in ((False, 0), (True, 1)):
+            with self.subTest(admitted=admitted):
+                self.fresh()
+                sink, _ = self.see(refuted(), spec=spec, at=at_parent,
+                                   ctx=self.ctx(spec, introduces=frozenset({spec.id}), admitted=admitted))
+                self.assertEqual(sink.written, kept)
+                if kept:
+                    self.assertFalse(self.docs()[0]["at_parent"])
+
     def test_the_detail_is_data_when_the_probe_made_json_of_it_and_text_otherwise(self):
         for detail, shown in (('{"a": [1, 2]}', {"a": [1, 2]}), ("[1, 2]", [1, 2]), ("not json", "not json"),
                               ('"quoted"', '"quoted"'), ("42", "42"), ("", ""), ("{broken", "{broken")):
@@ -287,6 +336,31 @@ class SecretsAndBounds(Scratch):
         self.assertEqual(d["observation"]["detail"], {"why": f"raised KeyError: {V.REDACTED}",
                                                       "files": {V.REDACTED: [1, f"x{V.REDACTED}y"]}, "n": 7})
         self.assertEqual((d["finding"], d["redacted"]), (f"id-{V.REDACTED}", 4))
+
+    def test_a_secret_is_replaced_in_the_json_part_of_a_text_detail_where_json_wrote_it_escaped(self):
+        # file_artifact: "the 2s observation window expired (cls); " + json.dumps(facts) — not JSON as a whole, so the
+        # text is searched, and json.dumps wrote a quote, a backslash, a non-ASCII letter as an escape
+        secret = 'k"ey\\\u00e9-91827364'
+        facts = {"read": "git", "revision": SHA, "text": f"line: {secret}"}
+        detail = "the 2s observation window expired (grep_count); " + json.dumps(facts)
+        self.assertNotIn(secret, detail)      # as the probe wrote it, the secret is not there in its own form
+        sink = D.Sink(self.out, secrets=(secret,))
+        self.see(Observation(K.SUBJECT_DEADLINE, BV.REFUTED, detail), sink=sink)
+        (d,) = self.docs()
+        shown = d["observation"]["detail"]
+        for form in (secret, json.dumps(secret)[1:-1]):      # as the user's env holds it, as json.dumps wrote it
+            self.assertNotIn(form, shown)
+        self.assertIn(V.REDACTED, shown)
+        self.assertGreater(d["redacted"], 0)
+        self.assertIn(SHA, shown)      # and nothing else of the detail is touched
+
+    def test_the_why_of_a_failure_in_RUN_json_names_no_secret(self):
+        sink = self.sink()
+        with mock.patch.object(D.Sink, "_document", side_effect=RuntimeError(f"cannot render {SECRET}")):
+            sink.note(self.ctx(), spec_of(), self.at, make_probe(None)(), refuted())
+        self.assertEqual(sink.not_written, 1)
+        self.assertNotIn(SECRET, json.dumps(sink.report()))
+        self.assertEqual(sink.failures[0]["why"], f"RuntimeError: cannot render {V.REDACTED}")
 
     def test_a_secret_made_of_digits_in_a_number_is_replaced_too(self):
         sink = D.Sink(self.out, secrets=("918273645",))
@@ -356,6 +430,20 @@ class PrivateAndFailOpen(Scratch):
         self.assertEqual(len(sink.failures), 3)
         self.assertTrue(all(f["why"] and f["spec_id"] == spec.id for f in sink.failures))
 
+    def test_a_write_that_fails_after_the_sibling_was_made_leaves_it_counted_and_unlisted(self):
+        def full_disk(*args, **kw):
+            raise OSError(28, "No space left on device")
+        with mock.patch.object(D, "os", FailingOs(replace=full_disk)):
+            sink, record = self.see(refuted())
+        self.assertEqual(record.result, run_probe(make_probe(refuted())(), spec_of(), self.at, self.env).result)
+        self.assertEqual((sink.written, sink.not_written, sink.dropped), (0, 1, 0))
+        self.assertIn("No space left on device", sink.failures[0]["why"])
+        self.assertEqual([p.name for p in self.folder.iterdir()], ["S1.1.p1.json.tmp"])      # nothing removed
+        self.assertEqual(self.docs(), [])
+        problems, notes = D.artifact_problems(self.out, [], {"diagnostics": sink.report()})
+        self.assertEqual(problems, [])      # the failed write is the diagnostic's own fault, not the run's
+        self.assertTrue(any("S1.1.p1.json.tmp" in n and "failed write" in n for n in notes), notes)
+
     def test_a_failure_to_write_is_named_and_leaves_the_probes_answer_alone(self):
         self.folder.write_text("a file where the directory goes", encoding="utf-8")
         answer = refuted()
@@ -378,7 +466,8 @@ class PrivateAndFailOpen(Scratch):
         r = sink.report()
         self.assertEqual((r["dir"], r["audience"], r["access"]), ("probe-observations", "operator", D.SESSIONS_CONFINED))
         self.assertEqual((r["written"], r["not_written"], r["dropped"], r["failures"]), (0, 0, 0, []))
-        self.assertTrue(r["authority"].startswith("none: no verdict, retry, budget, merge or route"))
+        self.assertTrue(r["authority"].startswith("none: no delivery verdict, retry, budget, merge or route"))
+        self.assertIn("--verify", r["authority"])      # it says who does read them: the verification, by the journal
         self.assertIn(("directory 0700, files 0600" if os.name == "posix" else "platform default"), r["permissions"])
 
 
@@ -541,11 +630,47 @@ class WhatVerifyChecks(Scratch):
         self.assertEqual(len(self.check()[0]), 1)
 
 
+    def test_the_finding_is_compared_as_the_text_the_gate_row_carries_whatever_json_it_is_in_its_file(self):
+        for stored, shown in ((5, "5"), (1.5, "1.5"), (None, "None"), (True, "True"), ([1, 2], "[1, 2]"), ("F1", "F1")):
+            with self.subTest(stored=stored):
+                self.fresh()
+                self.put("S1.1.r0.json", self.doc(origin="review", index=0, finding=shown))
+                (self.out / "review-findings").mkdir()
+                (self.out / "review-findings" / "S1.1.0.json").write_text(json.dumps({"finding": {"id": stored}}),
+                                                                         encoding="utf-8")
+                self.assertEqual(self.check(), ([], []))
+        self.fresh()      # a finding with no id at all is the text "None" — the gate row's too
+        self.put("S1.1.r0.json", self.doc(origin="review", index=0, finding="None"))
+        (self.out / "review-findings").mkdir()
+        (self.out / "review-findings" / "S1.1.0.json").write_text(json.dumps({"finding": {"summary": "s"}}), encoding="utf-8")
+        self.assertEqual(self.check(), ([], []))
+        # and another finding is still another: 5 is not "6", and an artifact that cannot be read binds nothing
+        for body in ('{"finding": {"id": 6}}', '{ not json', '{"finding": "F"}'):
+            with self.subTest(body=body):
+                (self.out / "review-findings" / "S1.1.0.json").write_text(body, encoding="utf-8")
+                self.put("S1.1.r0.json", self.doc(origin="review", index=0, finding="5"))
+                self.assertEqual(len(self.check()[0]), 1)
+
+    def test_a_sibling_a_failed_write_left_is_a_note_and_any_other_name_is_still_a_problem(self):
+        self.put("S1.1.p1.json.tmp", '{"half')
+        self.put("stray.json.tmp", "x")
+        self.put("S1.1.p2.json.tmp.tmp", "x")
+        self.put("S1.1.p3.tmp", "x")
+        problems, notes = self.check(rec={"diagnostics": {"written": 0, "not_written": 1}})
+        self.assertEqual(len(problems), 3, problems)
+        for stray in ("stray.json.tmp", "S1.1.p2.json.tmp.tmp", "S1.1.p3.tmp"):
+            self.assertTrue(any(f"{stray} is not a file this release writes" in p for p in problems), (stray, problems))
+        self.assertEqual(len([n for n in notes if "S1.1.p1.json.tmp" in n]), 1, notes)
+        self.assertIn("a failed write", [n for n in notes if "S1.1.p1.json.tmp" in n][0])
+
+
 class TheContextTheRunGives(unittest.TestCase):
     def setUp(self) -> None:
         self.project = bundle.load(e2e.project_bundle("a" * 40))
         self.events = [types.SimpleNamespace(type="story/begin", data={"story_id": "S0", "parent": "0" * 40}),
+                       types.SimpleNamespace(type="story/admitted", data={"story_id": "S0", "parent": "0" * 40}),
                        types.SimpleNamespace(type="story/begin", data={"story_id": "S1", "parent": "1" * 40}),
+                       types.SimpleNamespace(type="story/admitted", data={"story_id": "S1", "parent": "1" * 40}),
                        types.SimpleNamespace(type="story/begin", data={"story_id": "S1", "parent": "2" * 40})]
         self.run = types.SimpleNamespace(events=self.events, state=lambda p: {"S1": {"attempt": 2}}
                                          if p is ControlProjection.STORY_STATE else None)
@@ -554,9 +679,33 @@ class TheContextTheRunGives(unittest.TestCase):
         spec_id = next(iter(self.project.plan.obligations)).product_proof_spec_id
         where = R.story_where(self.run, self.project, "S1")
         self.assertEqual(where(), {"origin": "proof", "story_id": "S1", "attempt": 2, "parent": "2" * 40,
-                                   "introduces": frozenset({spec_id}), "criteria": {spec_id: ["C-ADD"]}})
+                                   "introduces": frozenset({spec_id}), "verifies": frozenset(), "admitted": False,
+                                   "criteria": {spec_id: ["C-ADD"]}})
         self.events.append(types.SimpleNamespace(type="story/begin", data={"story_id": "S1", "parent": "3" * 40}))
         self.assertEqual(where()["parent"], "3" * 40)       # the latest attempt's: read now, not when the story began
+
+    def test_admission_is_over_when_the_journal_holds_this_attempt_s_story_admitted(self):
+        where = R.story_where(self.run, self.project, "S1")
+        self.assertFalse(where()["admitted"])      # attempt 2 began after attempt 1's `story/admitted`: not that one
+        self.events.append(types.SimpleNamespace(type="story/admitted", data={"story_id": "S2", "parent": "2" * 40}))
+        self.assertFalse(where()["admitted"])      # another story's is not this story's
+        self.events.append(types.SimpleNamespace(type="story/admitted", data={"story_id": "S1", "parent": "2" * 40}))
+        self.assertTrue(where()["admitted"])
+        self.events.append(types.SimpleNamespace(type="story/begin", data={"story_id": "S1", "parent": "3" * 40}))
+        self.assertFalse(where()["admitted"])      # a retry admits again
+
+    def test_the_specs_a_story_only_verifies_are_named_apart_from_those_it_introduces(self):
+        from aisef2.arch.enums import ObligationRole
+        mine = [o for o in self.project.plan.obligations if o.story_id == "S1"]
+        spec_id = mine[0].product_proof_spec_id
+        verifying = [types.SimpleNamespace(story_id="S1", role=ObligationRole.VERIFY, product_proof_spec_id=spec_id,
+                                           criterion_id="C-V"),
+                     types.SimpleNamespace(story_id="S2", role=ObligationRole.VERIFY, product_proof_spec_id="PPS-other",
+                                           criterion_id="C-O")]
+        project = types.SimpleNamespace(plan=types.SimpleNamespace(obligations=verifying))
+        got = R.story_where(self.run, project, "S1")()
+        self.assertEqual((got["introduces"], got["verifies"], got["criteria"]),
+                         (frozenset(), frozenset({spec_id}), {spec_id: ["C-V"]}))
 
     def test_a_story_the_journal_has_not_begun_has_no_parent_yet(self):
         where = R.story_where(types.SimpleNamespace(events=[], state=self.run.state), self.project, "S1")
