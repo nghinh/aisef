@@ -466,8 +466,12 @@ class Identity(_Revisions):
     def test_PCV2_6_the_cycle1_identity_is_unchanged_and_the_second_is_its_own(self):
         self.assertEqual(pc.DIGEST, cb.CYCLE1_PROBE["digest"])
         # B1: the subject's process and the protocol reader are cli_invocation's, so its source is one of this digest's
+        # PM-7: and what cli_invocation declares (the process range and its anchor, the product plane's contract and
+        # outcome): their code runs in every observation of this probe too
         self.assertEqual(tuple(pc2.PROBE_SOURCES), ("probe/protocol.py", "probe/python_callable.py",
-                                                    "probe/cli_invocation.py", "probe/python_callable_v2.py"))
+                                                    "probe/cli_invocation.py", "product/contract.py",
+                                                    "product/outcome.py", "runtime/process_range.py",
+                                                    "runtime/range_anchor.py", "probe/python_callable_v2.py"))
         self.assertEqual((pc2.PROBE_ID, P.id), ("probe.python_callable_v2", "probe.python_callable_v2"))
         self.assertNotEqual(P.digest, pc.DIGEST)
         self.assertEqual((pc2.METADATA.probe_id, pc2.METADATA.probe_digest), (P.id, P.digest))

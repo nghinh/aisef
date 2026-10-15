@@ -5,6 +5,9 @@ with the import system's path finder inside the revision (its root and, if prese
 anything — python_callable's inside() rule, as cli_invocation applies it; a module that does not resolve, resolves
 only outside the checkout, or does not define the name is absent *at this revision*: SUBJECT_ABSENT before any step
 runs. A module that resolves and raises on import is a present subject that does not work: OBSERVED, REFUTED.
+A directory without `__init__.py` is a namespace package like any other, at every depth: each component of the
+dotted name is looked up by its own name within its parent's locations, so a module below one is located as the
+import system locates it, never an environment failure.
 
 **Stimulus.** `{"scenario": [step, ...]}`, every step a mapping whose `"step"` names its kind in the closed vocabulary
 `STEPS` (kind -> required fields, optional fields); each kind's fields have one typed shape (`_SHAPES`, keyed by the
@@ -19,8 +22,8 @@ class: UNSUPPORTED -> INVALID_SPEC at admission (`ProbeMetadata.observation_clas
 | `expect_raises` | `args, kwargs, exception, method?, attrs?` | the call raises exactly that type name, every declared attribute equal after JSON serialisation |
 | `write` | `path, (text, newline?) or bytes_hex, append?` | the harness itself writes (or appends to) `<ws>/name`, never through the subject |
 | `edit_jsonl` | `path, line, field, value` | the harness rewrites one JSON line's field (the line re-serialised compactly, its key order kept) |
-| `subprocess` | `argv: ["-m", module, ...], expect_exit?` | one child of the harness: the revision's module run as `__main__` under the same isolation |
-| `fault` | `fault: <id of FAULTS>` | DECISION-2: the next call / expect_raises / subprocess step sees one controlled fault |
+| `subprocess` | `argv: ["-m", module, ...], expect_exit?` | one child of the harness: the revision's module run as `__main__` under the same isolation; an argv string is an operating-system argument, so one holding a NUL gives the spec no class |
+| `fault` | `fault: <id of FAULTS>` | DECISION-2: the next call / expect_raises step sees one controlled fault |
 
 A step that raises where it should not, a missing method, an expect_raises that does not match, a subprocess that does
 not exit as declared, an edit_jsonl on a line that is not a JSON object with that field: the scenario stops there and
@@ -33,8 +36,10 @@ the request. Right before the next step's call the harness replaces that one att
 invocation raises the declared type (later invocations pass through to the original); right after the call, in a
 `finally`, it restores the original and asserts mechanically that the attribute IS the original object again. A
 failed restoration ends the scenario as a harness failure (`{"harness_failure": ...}` -> HARNESS_FAILED, never a
-verdict). A fault not followed by a call, expect_raises or subprocess step is refused at admission. The step's trace
-records the fault and whether it fired.
+verdict). A fault not followed by a call or expect_raises step is refused at admission, a subprocess step included:
+the stand-in is installed in the subject's own process, the step's child is another interpreter that would never see
+it, and the scenario would be judged as if no fault had been declared (UNSUPPORTED -> INVALID_SPEC, never a default
+meaning). The step's trace records the fault and whether it fired.
 
 **Placeholder.** `<ws>` is the only token: a string of a step's args, kwargs or argv that is `<ws>` or starts with
 `<ws>/` gets the workspace's absolute path (`<ws>/x` becomes the workspace path, a `/`, then `x`, on every platform);
@@ -115,8 +120,11 @@ from aisef2.product.spec import ProductProofSpec
 
 PROBE_ID = "probe.process_effect"
 #: every module this probe takes behaviour from is a source of its digest (§35): the Cycle-1 helpers, cli_invocation's
-#: watch primitives, and this module (the step vocabulary, the fault table and the harness scripts are in it)
-PROBE_SOURCES = ("probe/protocol.py", "probe/python_callable.py", "probe/cli_invocation.py", "probe/process_effect.py")
+#: watch primitives and subject process (with everything cli_invocation declares: the product plane's contract and
+#: outcome modules, the owned process range and its anchor script), and this module (the step vocabulary, the fault
+#: table and the harness scripts are in it). Only hashed: a source here is never read, run or copied for the probe.
+PROBE_SOURCES = ("probe/protocol.py", "probe/python_callable.py", "probe/cli_invocation.py", "product/contract.py",
+                 "product/outcome.py", "runtime/process_range.py", "runtime/range_anchor.py", "probe/process_effect.py")
 LOCATOR = re.compile(r"[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*:[A-Za-z_]\w*")
 CLASSES = ("scenario_returns", "scenario_raises", "scenario_files")
 #: Each class's meaning of an expired window (§9.2): the scenario did not complete, so nothing it declares was seen.
@@ -141,8 +149,9 @@ FAULTS = {
     "os.fsync": ("os", "fsync", "OSError"),
     "os.write": ("os", "write", "OSError"),
 }
-#: the steps a fault applies to: exactly the one that follows it
-FAULTED = ("call", "expect_raises", "subprocess")
+#: the steps a fault applies to: exactly the one that follows it, and only one that runs in the subject's own process,
+#: where the stand-in is installed (a subprocess step's child is another interpreter: a fault before it is refused)
+FAULTED = ("call", "expect_raises")
 FILE_SHAPES = ("sha256", "equals_before", "absent", "line_count", "final_byte", "jsonl")
 _ONE = "the one declared scenario (its steps, in order, in one harness process): the domain is that scenario alone"
 #: DECISION-1: what each class measures, under which quantifier, and every (observation facts -> verdict) row
@@ -244,8 +253,8 @@ def _edit_ok(step: dict) -> bool:
 
 def _subprocess_ok(step: dict) -> bool:
     argv = step["argv"]
-    return isinstance(argv, list) and len(argv) >= 2 and all(isinstance(a, str) for a in argv) and argv[0] == "-m" \
-        and _MODULE.fullmatch(argv[1]) is not None and ci._is_int(step.get("expect_exit", 0))
+    return isinstance(argv, list) and len(argv) >= 2 and all(isinstance(a, str) and "\0" not in a for a in argv) \
+        and argv[0] == "-m" and _MODULE.fullmatch(argv[1]) is not None and ci._is_int(step.get("expect_exit", 0))
 
 
 def _fault_ok(step: dict) -> bool:
@@ -444,7 +453,7 @@ def _observed_files(observable) -> dict:
 #: file named in the request and nowhere else, each line authenticated with the evaluation's key, which leaves the
 #: request file before the subject's process exists.
 HARNESS = r'''
-import builtins, hashlib, hmac, importlib, json, os, queue, subprocess, sys, threading
+import hashlib, hmac, json, os, queue, subprocess, sys, threading
 from importlib.machinery import PathFinder
 ask_path = sys.argv[1]
 req = json.loads(open(ask_path, encoding="utf-8").read())
@@ -514,7 +523,10 @@ def inside(spec):
 def resolve(dotted, search):
     parts, spec, path = dotted.split("."), None, search
     for i in range(len(parts)):
-        spec = PathFinder.find_spec(".".join(parts[:i + 1]), path)
+        # a finder looks a component up by its own name within the parent's locations: the dotted name would make an
+        # implicit namespace portion read sys.modules[parent].__path__, which this process (it never imports the
+        # subject) does not hold
+        spec = PathFinder.find_spec(parts[i], path)
         if spec is None:
             return None
         path = spec.submodule_search_locations
@@ -571,25 +583,6 @@ def files_now():
     return {n: file_fact(n, probes) for n, probes in req["files"].items()}
 def identity(fact):
     return {"absent": True} if fact.get("absent") else {"sha256": fact["sha256"]}
-def guarded(state, call):
-    step = state["fault"]
-    if step is None:
-        return call()
-    module, target, error = step["patch"]
-    owner = importlib.import_module(module)
-    original, kind, fired = getattr(owner, target), getattr(builtins, error), state["fired"]
-    def fault(*args, **kwargs):
-        if fired:
-            return original(*args, **kwargs)
-        fired.append(step["fault"])
-        raise kind("controlled fault " + step["fault"])
-    setattr(owner, target, fault)
-    try:
-        return call()
-    finally:
-        setattr(owner, target, original)
-        if getattr(owner, target) is not original:
-            raise Leak("the fault " + step["fault"] + " was not restored after step " + str(state["i"]))
 def subject_call(step, state, attrs):
     op = {"op": "call", "args": step["args"], "kwargs": step["kwargs"], "attrs": attrs}
     if "method" in step:
@@ -684,8 +677,8 @@ def do_subprocess(step, state):
     os.mkdir(prefix)
     cmd = [req["interpreter"], "-I", "-S", "-B", "-X", "pycache_prefix=" + prefix, "-X", "utf8=1", "-c", req["boot"],
            root] + step["argv"]
-    done = guarded(state, lambda: subprocess.run(cmd, cwd=ws, env=req["env"], stdin=subprocess.DEVNULL,
-                                                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL))
+    done = subprocess.run(cmd, cwd=ws, env=req["env"], stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
+                          stderr=subprocess.DEVNULL)
     want = step.get("expect_exit", 0)
     if done.returncode != want:
         return {"outcome": "refuted:the subprocess exited " + str(done.returncode) + ", not " + str(want),
@@ -877,10 +870,10 @@ class ProcessEffectProbe(HarnessProbe):
         try:
             ask, ws, pycache = _prepare(work, at.root, locator, steps, _observed_files(observable), nonce, key,
                                         env.interpreter)
+            log = open(os.path.join(work, "harness.log"), "wb")  # closed once the range has started
         except OSError as e:
             return Observation(ObservationKind.HARNESS_FAILED, detail="the evaluation directory cannot be "
                                                                      f"prepared: {type(e).__name__}")
-        log = open(os.path.join(work, "harness.log"), "wb")  # closed once the range has started
         try:
             run = ProcessRange(f"probe {spec_id}", _harness_argv(env.interpreter, ask, pycache), cwd=ws,
                                env=ci._child_env(ws), output=log, grace_s=_GRACE_S, wait_s=_WAIT_S)

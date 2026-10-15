@@ -868,7 +868,7 @@ class Identity(_Product):
         defects = {
             "PROTOCOL_CHANNEL_DISCIPLINE": ("    proto.write((req['mark']", "    sys.stdout.write((req['mark']"),
             "SINGLE_PLACEHOLDER_TOKEN": ("value = value.replace(form, '<ws>')", "value = value.replace(form, '<root>')"),
-            "NO_CLOCK_IN_PROBE_FACTS": ("import builtins, hashlib,", "import time, builtins, hashlib,"),
+            "NO_CLOCK_IN_PROBE_FACTS": ("import hashlib,", "import time, hashlib,"),
             "CLOSED_DISPATCH_IN_SCENARIO_PROBES": ("    if kind != step['exception']:\n",
                                                   "    if kind == 'x':\n        pass\n    elif kind != step['exception']:\n"),
         }

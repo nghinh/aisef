@@ -521,7 +521,11 @@ class FaultStream(_Product):
 
 class Identity(_Product):
     def test_the_digest_covers_exactly_the_sources_it_names_and_is_stable_across_processes(self):
-        self.assertEqual(tuple(ci.PROBE_SOURCES), ("probe/protocol.py", "probe/python_callable.py", "probe/cli_invocation.py"))
+        # PM-7: the files whose code runs in an observation are all sources (measured: tests/v2/test_v21_probe_sources.py)
+        self.assertEqual(tuple(ci.PROBE_SOURCES), ("probe/protocol.py", "probe/python_callable.py",
+                                                   "probe/cli_invocation.py", "product/contract.py",
+                                                   "product/outcome.py", "runtime/process_range.py",
+                                                   "runtime/range_anchor.py"))
 
         def digest_of(files):
             h = hashlib.sha256()

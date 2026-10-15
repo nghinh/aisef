@@ -95,8 +95,11 @@ from aisef2.product.spec import ProductProofSpec
 PROBE_ID = "probe.python_callable_v2"
 WEAKEST_PATH = ci.WEAKEST_PATH  # PARTIAL: the subject runs in a process of its own, a child of the controller
 #: every module this probe takes behaviour from is a source of its digest (§35): the Cycle-1 helpers, cli_invocation's
-#: subject process and protocol reader, and this module (its classes and controller script)
-PROBE_SOURCES = ("probe/protocol.py", "probe/python_callable.py", "probe/cli_invocation.py",
+#: subject process and protocol reader (with everything cli_invocation declares: the product plane's contract and
+#: outcome modules, the owned process range and its anchor script), and this module (its classes and controller
+#: script). Only hashed: a source here is never read, run or copied for the probe.
+PROBE_SOURCES = ("probe/protocol.py", "probe/python_callable.py", "probe/cli_invocation.py", "product/contract.py",
+                 "product/outcome.py", "runtime/process_range.py", "runtime/range_anchor.py",
                  "probe/python_callable_v2.py")
 CLASSES = ("exists", "returns", "raises", "blocks", "returns_bytes", "equals", "raises_attrs")
 #: Each class's meaning of an expired observation window (§9.2).
@@ -477,8 +480,12 @@ class PythonCallableV2Probe(HarnessProbe):
                        "interpreter": env.interpreter, "agent": ci.AGENT, "agent_pycache": pycache,
                        "env": {**_scrubbed_env(), "TMPDIR": tmp, "TEMP": tmp, "TMP": tmp},
                        "window": window_of(pi["observable"])}
-            pathlib.Path(ask).write_text(json.dumps(_plain(request)), encoding="utf-8")
-            log = open(os.path.join(work, "harness.log"), "wb")  # closed once the range has started
+            try:
+                pathlib.Path(ask).write_text(json.dumps(_plain(request)), encoding="utf-8")
+                log = open(os.path.join(work, "harness.log"), "wb")  # closed once the range has started
+            except OSError as e:
+                return Observation(ObservationKind.HARNESS_FAILED, detail="the evaluation directory cannot be "
+                                                                         f"prepared: {type(e).__name__}")
             try:
                 run = ProcessRange(f"probe {spec.id}", _harness_argv(env.interpreter, ask, pycache), cwd=at.root,
                                    env=_scrubbed_env(), output=log, grace_s=_GRACE_S, wait_s=_WAIT_S)
