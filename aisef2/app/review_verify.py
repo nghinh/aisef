@@ -174,17 +174,19 @@ def verify(finding: Mapping, *, requirements: Mapping, product_roots, root: str,
     if entry is None:
         return Verification(UNVERIFIABLE, f"no active probe observes {c.subject.kind.value}")
     spec = _mint(c, ProbeRef(entry.probe_id, entry.probe_digest))
+    no_meaning = Verification(UNVERIFIABLE, f"{entry.probe_id} gives the reproducer's observation no meaning (refused)",
+                              entry.probe_id)
     try:
         cls = catalog.registry().observation_class(spec.probe_id, spec.probe_digest, spec)
     except (OverflowError, RecursionError):
         # what a probe's classifier cannot take of a model's reproducer: a `within_s` that is an integer no float
         # holds (400 digits; the shared `window_of` asks `math.isfinite` of it, and its Cycle-1 file is immutable), or
         # a pattern `re.compile` fails on with OverflowError or RecursionError (file_artifact's grep). The caller
-        # answers it for every probe: no meaning
-        cls = None
+        # answers it for every probe: no meaning. (`cls` stays bound once: the calibration lookup below is checked
+        # against the one binding of the class.)
+        return no_meaning
     if cls is None:
-        return Verification(UNVERIFIABLE, f"{entry.probe_id} gives the reproducer's observation no meaning (refused)",
-                            entry.probe_id)
+        return no_meaning
     from aisef2.app.run import calibrations
     if calibration_for(calibrations(), entry.probe_id, executing(entry.factory), cls) is None:
         return Verification(UNVERIFIABLE, f"{entry.probe_id} is not calibrated for {cls!r} at the bytes that run: an "
