@@ -250,8 +250,8 @@ def _edit_ok(step: dict) -> bool:
 
 def _subprocess_ok(step: dict) -> bool:
     argv = step["argv"]
-    return isinstance(argv, list) and len(argv) >= 2 and all(isinstance(a, str) for a in argv) and argv[0] == "-m" \
-        and _MODULE.fullmatch(argv[1]) is not None and ci._is_int(step.get("expect_exit", 0))
+    return isinstance(argv, list) and len(argv) >= 2 and all(isinstance(a, str) and "\0" not in a for a in argv) \
+        and argv[0] == "-m" and _MODULE.fullmatch(argv[1]) is not None and ci._is_int(step.get("expect_exit", 0))
 
 
 def _fault_ok(step: dict) -> bool:
@@ -867,10 +867,10 @@ class ProcessEffectProbe(HarnessProbe):
         try:
             ask, ws, pycache = _prepare(work, at.root, locator, steps, _observed_files(observable), nonce, key,
                                         env.interpreter)
+            log = open(os.path.join(work, "harness.log"), "wb")  # closed once the range has started
         except OSError as e:
             return Observation(ObservationKind.HARNESS_FAILED, detail="the evaluation directory cannot be "
                                                                      f"prepared: {type(e).__name__}")
-        log = open(os.path.join(work, "harness.log"), "wb")  # closed once the range has started
         try:
             run = ProcessRange(f"probe {spec_id}", _harness_argv(env.interpreter, ask, pycache), cwd=ws,
                                env=ci._child_env(ws), output=log, grace_s=_GRACE_S, wait_s=_WAIT_S)

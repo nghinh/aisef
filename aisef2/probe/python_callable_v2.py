@@ -477,8 +477,12 @@ class PythonCallableV2Probe(HarnessProbe):
                        "interpreter": env.interpreter, "agent": ci.AGENT, "agent_pycache": pycache,
                        "env": {**_scrubbed_env(), "TMPDIR": tmp, "TEMP": tmp, "TMP": tmp},
                        "window": window_of(pi["observable"])}
-            pathlib.Path(ask).write_text(json.dumps(_plain(request)), encoding="utf-8")
-            log = open(os.path.join(work, "harness.log"), "wb")  # closed once the range has started
+            try:
+                pathlib.Path(ask).write_text(json.dumps(_plain(request)), encoding="utf-8")
+                log = open(os.path.join(work, "harness.log"), "wb")  # closed once the range has started
+            except OSError as e:
+                return Observation(ObservationKind.HARNESS_FAILED, detail="the evaluation directory cannot be "
+                                                                         f"prepared: {type(e).__name__}")
             try:
                 run = ProcessRange(f"probe {spec.id}", _harness_argv(env.interpreter, ask, pycache), cwd=at.root,
                                    env=_scrubbed_env(), output=log, grace_s=_GRACE_S, wait_s=_WAIT_S)

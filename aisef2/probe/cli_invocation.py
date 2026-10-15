@@ -1013,10 +1013,10 @@ class CliInvocationProbe(HarnessProbe):
         try:
             ask, ws, pycache = _prepare(work, at.root, locator, stim, files, nonce, key, env.interpreter,
                                         window_of(observable))
+            log = open(os.path.join(work, "harness.log"), "wb")  # closed once the range has started
         except OSError as e:
             return Observation(ObservationKind.HARNESS_FAILED, detail="the evaluation directory cannot be "
                                                                      f"prepared: {type(e).__name__}"), None
-        log = open(os.path.join(work, "harness.log"), "wb")  # closed once the range has started
         try:
             run = ProcessRange(f"probe {spec_id}", _harness_argv(env.interpreter, ask, pycache), cwd=ws,
                                env=_child_env(ws), output=log, grace_s=_GRACE_S, wait_s=_WAIT_S)
