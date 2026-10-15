@@ -9,10 +9,14 @@ probe's own grammar and citing the requirement clause —
 
 — and AISEF runs that observation with its own trusted, calibrated probe on the candidate. The finding is CONFIRMED
 when the probe executes and REFUTES the stated behaviour (the candidate does not do what the finding says the
-requirement demands): the probe is the corroborating authority D-002 asks for. NOT_REPRODUCED when it is SATISFIED;
-UNVERIFIABLE when there is no reproducer, the clause names no requirement of the project, the subject is outside the
-product, the probe cannot give the observation a meaning (refused, not degraded), is not calibrated for that class at
-the bytes that run, or cannot run.
+requirement demands): the probe is the corroborating authority D-002 asks for. NOT_REPRODUCED when it is not REFUTED:
+SATISFIED (the reason says the finding does not reproduce) or INDETERMINATE (the probe executed and decided nothing:
+the subject is not in the candidate, or its process ended by a signal the controller did not send; the reason says so,
+with the typed cause, and never that the finding was shown not to reproduce; `observed` is the verdict). Either way
+the finding is not CONFIRMED, so it never blocks. UNVERIFIABLE when there is no reproducer, it nests containers
+deeper than the finding's artifact keeps (`DEPTH_MAX`), the clause names no requirement of the project, the subject is
+outside the product, the probe cannot give the observation a meaning (refused, not degraded), is not calibrated for
+that class at the bytes that run, or cannot run.
 
 **Anchoring: whose expectation it is.** A confirmation proves the candidate does not do what the finding states —
 never that the requirement demands it. A reproducible finding with a wrong expectation must not block by itself, so
@@ -88,6 +92,35 @@ def severity_of(finding: Mapping) -> str:
     return s if s in SEVERITIES else "low"
 
 
+def _deeper_than(value, levels: int) -> bool:
+    """Whether `value` holds containers (mappings, their keys too, lists, tuples) nested more than `levels` deep, the
+    first being level 1. It walks with a stack of its own and never goes below `levels + 1`: it cannot meet the
+    interpreter's recursion limit however deep `value` is (a cycle ends at the bound as well)."""
+    stack = [(value, 1)]
+    while stack:
+        node, level = stack.pop()
+        if isinstance(node, Mapping):
+            children = (*node, *node.values())
+        elif isinstance(node, (list, tuple)):
+            children = node
+        else:
+            continue
+        if level > levels:
+            return True
+        stack.extend((child, level + 1) for child in children)
+    return False
+
+
+def bounded(finding: Mapping) -> Mapping:
+    """`finding` with every field but its reproducer that the artifact would not keep whole — a container nested
+    deeper than `DEPTH_MAX - 1` levels — written as the marker `redacted` writes in its place. The id, severity and
+    summary are read with `str()`, which is recursive: a model's 70,000-level summary is a `RecursionError` out of the
+    review, the story REFUSED. The reproducer is left as it was stated (`reproducer_contract` refuses one that nests
+    deeper than the artifact keeps). A finding with nothing to bound is returned as it is, not copied."""
+    deep = [k for k, v in finding.items() if k != "reproducer" and _deeper_than(v, DEPTH_MAX - 1)]
+    return {**finding, **dict.fromkeys(deep, _NESTED_TOO_DEEP)} if deep else finding
+
+
 def reproducer_contract(finding: Mapping, requirements: Mapping[str, object], product_roots) -> BehaviorContract | str:
     """The finding's reproducer as an (unapproved, never compiled into the plan) MUST_HOLD contract, or why not.
 
@@ -95,12 +128,19 @@ def reproducer_contract(finding: Mapping, requirements: Mapping[str, object], pr
     no control path reads, so it never decides the verdict. The contract's hash is over UTF-8, which has no form for a
     lone surrogate (`json.loads` yields one from a model's "\\ud800"): each is written as its own escape, `\\ud800`; text
     that encodes is hashed as it is. A surrogate in the reproducer itself (stimulus, observable, locator) is not prose:
-    the reproducer is refused, naming why."""
+    the reproducer is refused, naming why. So is one that nests containers deeper than the finding's artifact keeps
+    (`DEPTH_MAX`, the root of the artifact's walk being the finding): the contract's own walks are recursive, so a
+    deeper one would end the review in a `RecursionError` (the story REFUSED, no verdict), and an artifact that does
+    not hold the reproducer that ran is no evidence a finding may block on. The recursion limit is never raised to
+    make a deeper one fit."""
     r = finding.get("reproducer")
     if not isinstance(r, Mapping):
         return "no reproducer: the finding states no observable behaviour"
     if sorted(r) != sorted(REPRODUCER_KEYS):
         return f"a reproducer holds exactly {list(REPRODUCER_KEYS)}"
+    if _deeper_than(r, DEPTH_MAX - 1):     # before anything reads it: `repr`, `str` and the contract's walks recurse
+        return (f"the reproducer nests containers deeper than {DEPTH_MAX - 1} levels: state it with a flatter stimulus "
+                "and observable (no probe grammar needs more)")
     clause = r["clause"]
     rid = clause.split("/")[0] if isinstance(clause, str) else None
     if rid not in requirements:
@@ -134,10 +174,19 @@ def verify(finding: Mapping, *, requirements: Mapping, product_roots, root: str,
     if entry is None:
         return Verification(UNVERIFIABLE, f"no active probe observes {c.subject.kind.value}")
     spec = _mint(c, ProbeRef(entry.probe_id, entry.probe_digest))
-    cls = catalog.registry().observation_class(spec.probe_id, spec.probe_digest, spec)
+    no_meaning = Verification(UNVERIFIABLE, f"{entry.probe_id} gives the reproducer's observation no meaning (refused)",
+                              entry.probe_id)
+    try:
+        cls = catalog.registry().observation_class(spec.probe_id, spec.probe_digest, spec)
+    except (OverflowError, RecursionError):
+        # what a probe's classifier cannot take of a model's reproducer: a `within_s` that is an integer no float
+        # holds (400 digits; the shared `window_of` asks `math.isfinite` of it, and its Cycle-1 file is immutable), or
+        # a pattern `re.compile` fails on with OverflowError or RecursionError (file_artifact's grep). The caller
+        # answers it for every probe: no meaning. (`cls` stays bound once: the calibration lookup below is checked
+        # against the one binding of the class.)
+        return no_meaning
     if cls is None:
-        return Verification(UNVERIFIABLE, f"{entry.probe_id} gives the reproducer's observation no meaning (refused)",
-                            entry.probe_id)
+        return no_meaning
     from aisef2.app.run import calibrations
     if calibration_for(calibrations(), entry.probe_id, executing(entry.factory), cls) is None:
         return Verification(UNVERIFIABLE, f"{entry.probe_id} is not calibrated for {cls!r} at the bytes that run: an "
@@ -152,8 +201,13 @@ def verify(finding: Mapping, *, requirements: Mapping, product_roots, root: str,
     if v is BehaviorVerdict.REFUTED:
         return Verification(CONFIRMED, f"{entry.probe_id} refutes the behaviour {c.requirement_ids[0]} is said to demand",
                             entry.probe_id, v.value)
-    return Verification(NOT_REPRODUCED, f"{entry.probe_id} observes the stated behaviour: the finding does not reproduce",
-                        entry.probe_id, v.value)
+    if v is BehaviorVerdict.SATISFIED:
+        return Verification(NOT_REPRODUCED, f"{entry.probe_id} observes the stated behaviour: the finding does not "
+                            "reproduce", entry.probe_id, v.value)
+    # INDETERMINATE: the probe looked and decided nothing — no proof that the finding does not reproduce (RV-2)
+    cause = result.reason.value if result.reason else v.value
+    return Verification(NOT_REPRODUCED, f"{entry.probe_id} could not decide the stated behaviour (INDETERMINATE, "
+                        f"{cause}): neither confirmed nor ruled out", entry.probe_id, v.value)
 
 
 @dataclass(frozen=True, slots=True)
@@ -265,6 +319,7 @@ ARTIFACT_DIR = "review-findings"
 ARTIFACT_FORMAT = "aisef-v2-review-finding/1"
 REDACTED = "[REDACTED]"      # what app/client.redact writes into a session's stream
 DEPTH_MAX = 64               # containers nested deeper are not kept (no probe grammar nests that far)
+_NESTED_TOO_DEEP = f"<nested deeper than {DEPTH_MAX} levels>"
 #: the decisive text fields' bounds, in characters of the encoded string body (each cut at its own bound only)
 FINDING_MAX, CLAUSE_MAX, STATUS_MAX, WHY_MAX, OBSERVED_MAX, NOT_KEPT_MAX = 60, 40, 20, 160, 24, 120
 #: what one more marker may add to the statement: `, "<field>": <count>` (an elastic field's name is at most 10
@@ -306,7 +361,7 @@ def redacted(value, secrets=()):
                 x = x.replace(s, REDACTED)
             return x.encode("utf-8", "backslashreplace").decode("utf-8")
         if isinstance(x, (Mapping, list, tuple)) and depth >= DEPTH_MAX:
-            return f"<nested deeper than {DEPTH_MAX} levels>"
+            return _NESTED_TOO_DEEP
         if isinstance(x, Mapping):
             out = {}
             for k, item in x.items():

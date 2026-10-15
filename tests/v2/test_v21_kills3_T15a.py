@@ -378,6 +378,8 @@ class AFindingAboutAnAbsentSubject(Checkout):
         a = V.anchor(f, PROJECT)
         self.assertEqual(a.status, V.ANCHORED)
         self.assertEqual((v.status, v.observed), (V.NOT_REPRODUCED, "INDETERMINATE"), v)
+        self.assertIn("INDETERMINATE", v.reason, v)     # RV-2: the reason says the probe decided nothing ...
+        self.assertNotIn("does not reproduce", v.reason, v)     # ... never that the finding was shown not to reproduce
         self.assertFalse(V.blocks(v, f, "fix-loop", "low", a))
         self.assertEqual(v.evidence(), "")
 

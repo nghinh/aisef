@@ -160,13 +160,14 @@ def findings(output: Mapping | None, required: Iterable[str]) -> list[dict]:
 
 def reproducer_of(content: str) -> tuple[object, str]:
     """(the reproducer a comment carries, the comment without it): the first fenced aisef-reproducer block holding one
-    JSON value, or None — a block that does not parse is kept as text and carries nothing."""
+    JSON value, or None — a block that does not parse is kept as text and carries nothing (one nested past the
+    parser's depth, a `RecursionError`, does not parse)."""
     m = REPRODUCER_FENCE.search(content)
     if m is None:
         return None, content
     try:
         rep = json.loads(m.group(1))
-    except ValueError:
+    except (ValueError, RecursionError):
         return None, content
     return rep, (content[:m.start()] + content[m.end():]).strip()
 
@@ -209,10 +210,11 @@ def pinned(exe: str, sha256: str) -> str | None:
 
 
 def read_output(path: pathlib.Path) -> dict | None:
-    """The one JSON document OCR wrote to --output, or None (a failed run may write nothing; stdout is never parsed)."""
+    """The one JSON document OCR wrote to --output, or None (a failed run may write nothing; stdout is never parsed; a
+    document nested past the parser's depth is not one)."""
     try:
         doc = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, ValueError):
+    except (OSError, ValueError, RecursionError):
         return None
     return doc if isinstance(doc, dict) else None
 

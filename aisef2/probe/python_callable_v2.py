@@ -49,7 +49,10 @@ of the evaluation directory, never to the protocol. Decision table after DISPATC
   HARNESS_FAILED (a failure the controller reported); NON_CONTROLLER_SIGNAL (the subject's process ended by a signal
   the controller did not send, §9.3); OBSERVED, REFUTED, `"the subject ended the process before the observable (exit
   N)"` (its process ended by an exit status before the observable); OBSERVED, REFUTED (an answer on the subject's
-  channel the agent did not write); otherwise OBSERVED with `verdict_of`, `detail` the facts' JSON;
+  channel the agent did not write); otherwise OBSERVED with `verdict_of`, `detail` the facts' JSON. A RESULT this
+  process cannot read — the subject's answer nests deeper than the parent's recursion budget, which is the limit less
+  the caller's depth — is OBSERVED, REFUTED: the answer of a subject whose own process could not serialise it is
+  `unserializable`, REFUTED, and the verdict does not depend on how deep the caller's stack is;
 * no RESULT, the controller exited by a status: HARNESS_FAILED; by a signal: NON_CONTROLLER_SIGNAL unless the
   controller's ledger holds it (an interruption);
 * no RESULT at the window's end with the process still there: SUBJECT_DEADLINE with the class's `ON_DEADLINE`;
@@ -220,14 +223,23 @@ def _substituted(value, ws: str):
 
 def _unsubstituted(value, ws: str):
     """The harness's facts (parsed JSON: dicts, lists) with every occurrence of the workspace path in a string
-    replaced back by `<ws>`."""
-    if isinstance(value, str):
-        return value.replace(ws, PLACEHOLDER)
-    if isinstance(value, dict):
-        return {k: _unsubstituted(v, ws) for k, v in value.items()}
-    if isinstance(value, list):
-        return [_unsubstituted(v, ws) for v in value]
-    return value
+    replaced back by `<ws>`. Walked with a stack of its own: a value the subject returned or raised is the subject's,
+    nested as deep as it likes, and a recursive walk of it is a `RecursionError` out of the probe, no verdict."""
+    top = [None]
+    todo = [(value, top, 0)]
+    while todo:
+        node, into, at = todo.pop()
+        if isinstance(node, str):
+            into[at] = node.replace(ws, PLACEHOLDER)
+        elif isinstance(node, dict):
+            into[at] = copy = dict.fromkeys(node)      # the keys in their order; the values are filled in below
+            todo.extend((v, copy, k) for k, v in node.items())
+        elif isinstance(node, list):
+            into[at] = copy = [None] * len(node)
+            todo.extend((v, copy, i) for i, v in enumerate(node))
+        else:
+            into[at] = node
+    return top[0]
 
 
 def _write_workspace(ws: str, workspace) -> None:
@@ -522,7 +534,17 @@ def _watch(run, proto: str, nonce: str, key: str, cls: str, observable, env: Exe
                                                            "never reported"))
         seen = ci._protocol(proto, nonce, key)
     if "RESULT" in seen:
-        facts = json.loads(seen["RESULT"][0])
+        try:
+            facts = json.loads(seen["RESULT"][0])
+        except RecursionError:
+            # the subject's answer — a value it returned, an attribute of what it raised — nests deeper than THIS
+            # process can read: the parser's budget is the limit less the caller's depth, the controller and the
+            # subject's process run shallow, so a window below the limit moves with the caller. No expectation a spec
+            # states nests that far, and a value the subject's own process cannot serialise is `unserializable`
+            # (REFUTED): the same answer, whoever asks from however deep a stack
+            return _after_dispatch(run, Observation(ObservationKind.OBSERVED, BehaviorVerdict.REFUTED,
+                                                    detail="the subject's answer nests deeper than the controller "
+                                                           "reads: no expectation states it"))
         if facts.get("deadline"):
             return _after_dispatch(run, ci._deadline(cls, window, ON_DEADLINE))
         return _after_dispatch(run, _concluded(cls, observable, _unsubstituted(facts, ws)))

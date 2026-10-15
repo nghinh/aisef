@@ -45,9 +45,10 @@ verdict) `verdict_of` and `ON_DEADLINE` answer, tested exhaustively.
 
 Stream shapes (a closed set, compared over the captured bytes; prose matching is not offered): an exact string or
 `{"text": s, "newline": nl}` (the text's newlines written as `nl`, default `"\\n"`, compared as bytes), `{"contains":
-[s, ...]}` (every string present as bytes), `{"regex": r}` (`re.search` over the utf-8 decoding), `{"lines": n}` (the
-number of lines) and `{"first_word": w}`. File shapes: `{"sha256": hex}`, `{"text": s, "newline": nl}` (its digest),
-`{"absent": true}` and `{"equals_before": true}` (the file's digest, or its absence, is what it was before the main
+[s, ...]}` (every string present as bytes), `{"regex": r}` (`re.search` over the utf-8 decoding; `r` is a pattern
+`re.compile` takes, else the observable has no meaning), `{"lines": n}` (the number of lines) and `{"first_word": w}`.
+File shapes: `{"sha256": hex}`, `{"text": s, "newline": nl}` (its digest), `{"absent": true}` and `{"equals_before":
+true}` (the file's digest, or its absence, is what it was before the main
 invocation — the harness records every named file before and after). Exit codes are recorded as CPython reports them:
 `SystemExit(None)` is 0, an int is itself, any other status is 1 and is printed to stderr; an uncaught exception is
 recorded by its type name, with a traceback on stderr and exit code 1. The raw status is kept beside the code.
@@ -281,6 +282,18 @@ def _stimulus_ok(stim: dict) -> bool:
                                          for p in pre)
 
 
+def _compiles(pattern: str) -> bool:
+    """Whether `re` takes the pattern. `re.compile` says no in three ways: `re.error` (a malformed pattern),
+    `OverflowError` (a repetition count past the engine's) and `RecursionError` (groups nested past the compiler's).
+    The pattern is a model's; an observable that names one `re` cannot take has no meaning, and is never an exception
+    at the verdict (`_stream_matches`), which only ever searches with a pattern this accepted."""
+    try:
+        re.compile(pattern)
+    except (re.error, OverflowError, RecursionError):
+        return False
+    return True
+
+
 def _stream_shape_ok(shape) -> bool:
     if isinstance(shape, str):
         return True
@@ -296,7 +309,7 @@ def _stream_shape_ok(shape) -> bool:
     if kind == "contains":
         return isinstance(v, list) and bool(v) and all(isinstance(s, str) for s in v)
     if kind == "regex":
-        return isinstance(v, str)
+        return isinstance(v, str) and _compiles(v)
     if kind == "lines":
         return _is_int(v) and v >= 0
     return isinstance(v, str) and bool(v) and v.split() == [v]   # first_word: one word, no whitespace
@@ -334,8 +347,10 @@ def _equality_ok(eq) -> bool:
 
 
 def _streams_ok(streams) -> bool:
-    return isinstance(streams, list) and bool(streams) and len(set(streams)) == len(streams) \
-        and set(streams) <= {"stdout", "stderr"}
+    # names first: a set is built of the entries, and a list or a dict in it is unhashable — a TypeError out of a
+    # classifier whose answer is a class or None, for a reproducer a model wrote
+    return isinstance(streams, list) and bool(streams) and all(isinstance(s, str) for s in streams) \
+        and len(set(streams)) == len(streams) and set(streams) <= {"stdout", "stderr"}
 
 
 def observation_class(observable, stimulus) -> str | None:
@@ -447,7 +462,11 @@ def _equal(a: bytes, b: bytes, comparator: str) -> bool:
     if comparator == "json_equal":
         try:
             return json.loads(a.decode("utf-8")) == json.loads(b.decode("utf-8"))
-        except ValueError:   # a JSON error or a decoding error (UnicodeDecodeError is one)
+        except (ValueError, RecursionError):
+            # a JSON error or a decoding error (UnicodeDecodeError is one) — or a document nested past what the parser
+            # (~1,000 levels on 3.11, ~10,000 on 3.12) or the comparison ("Stack overflow in comparison") can take:
+            # the streams are the candidate's, and what is no document this comparator can read is not equal. It is
+            # never UNVERIFIABLE: a candidate would then make its own output undecidable by nesting it.
             return False
     return a == b
 
