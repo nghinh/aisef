@@ -120,8 +120,11 @@ from aisef2.product.spec import ProductProofSpec
 
 PROBE_ID = "probe.process_effect"
 #: every module this probe takes behaviour from is a source of its digest (§35): the Cycle-1 helpers, cli_invocation's
-#: watch primitives, and this module (the step vocabulary, the fault table and the harness scripts are in it)
-PROBE_SOURCES = ("probe/protocol.py", "probe/python_callable.py", "probe/cli_invocation.py", "probe/process_effect.py")
+#: watch primitives and subject process (with everything cli_invocation declares: the product plane's contract and
+#: outcome modules, the owned process range and its anchor script), and this module (the step vocabulary, the fault
+#: table and the harness scripts are in it). Only hashed: a source here is never read, run or copied for the probe.
+PROBE_SOURCES = ("probe/protocol.py", "probe/python_callable.py", "probe/cli_invocation.py", "product/contract.py",
+                 "product/outcome.py", "runtime/process_range.py", "runtime/range_anchor.py", "probe/process_effect.py")
 LOCATOR = re.compile(r"[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*:[A-Za-z_]\w*")
 CLASSES = ("scenario_returns", "scenario_raises", "scenario_files")
 #: Each class's meaning of an expired window (§9.2): the scenario did not complete, so nothing it declares was seen.

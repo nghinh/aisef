@@ -632,8 +632,11 @@ class Decision(_Checkout):
 
 class Identity(unittest.TestCase):
     def test_the_digest_covers_exactly_the_sources_it_names_and_is_stable_across_processes(self):
+        # PM-7: cli_invocation's sources (the process range and its anchor, the product plane's contract and outcome
+        # included: their code runs in every observation) and this module's own
         self.assertEqual(pe.PROBE_SOURCES, ("probe/protocol.py", "probe/python_callable.py", "probe/cli_invocation.py",
-                                            "probe/process_effect.py"))
+                                            "product/contract.py", "product/outcome.py", "runtime/process_range.py",
+                                            "runtime/range_anchor.py", "probe/process_effect.py"))
 
         def digest_of(files):
             h = hashlib.sha256()

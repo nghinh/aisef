@@ -148,8 +148,13 @@ from aisef2.product.contract import plain
 from aisef2.product.spec import ProductProofSpec
 
 PROBE_ID = "probe.cli_invocation"
-#: python_callable's frozen helpers are imported, so this probe's behaviour depends on that source too (§35).
-PROBE_SOURCES = ("probe/protocol.py", "probe/python_callable.py", "probe/cli_invocation.py")
+#: Every file whose code decides what this probe observes is a source of its digest (§35) — measured, not assumed
+#: (tests/v2/test_v21_probe_sources.py): the protocol and python_callable's frozen helpers it imports, this module
+#: (the observation logic, and the AGENT and HARNESS scripts of its child processes), the product plane's `plain`,
+#: `names_test_artefact` and `on_subject_absent` that `observe` and `run_probe` call, and the owned process range
+#: with the anchor script it launches. A source is only hashed here: this tuple grants no access to anything.
+PROBE_SOURCES = ("probe/protocol.py", "probe/python_callable.py", "probe/cli_invocation.py", "product/contract.py",
+                 "product/outcome.py", "runtime/process_range.py", "runtime/range_anchor.py")
 LOCATOR = re.compile(r"[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*:[A-Za-z_]\w*")
 CLASSES = ("exits", "exits_streams", "exits_files", "blocks", "equality")
 #: Each class's meaning of an expired observation window (§9.2): what "not returned by W" says about the observable.
