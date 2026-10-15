@@ -69,13 +69,17 @@ from tests.v2 import test_python_callable_v2 as pc2  # noqa: E402
 AISEF2 = pathlib.Path(ci.__file__).resolve().parents[1]
 MOD = "def f():\n    return 1\n\n\ndef main(argv):\n    return 0\n"
 
+#: the observation window of the four real observations: generous for any runner, like the sibling probe tests' W
+#: (10 / 20) -- a window the cases outlive would end an observation as something other than the one the test names
+W = 20
+
 #: probe module (relative to aisef2/) -> the module, a spec builder taking the window, and the probe's own test module
 #: (its builders, SHA, env and probe instance)
 PROBES = {
-    "probe/cli_invocation.py": (ci, lambda window=5: cli.spec("m:main", {"exit_code": 0}, window=window), cli),
-    "probe/process_effect.py": (pe_module, lambda window=5: pe.spec("m:f", [pe.call(None)], {"returns": 1},
+    "probe/cli_invocation.py": (ci, lambda window=W: cli.spec("m:main", {"exit_code": 0}, window=window), cli),
+    "probe/process_effect.py": (pe_module, lambda window=W: pe.spec("m:f", [pe.call(None)], {"returns": 1},
                                                                     window=window), pe),
-    "probe/python_callable_v2.py": (pc2_module, lambda window=5: pc2.spec("m:f", {"returns": 1}, {}, window=window),
+    "probe/python_callable_v2.py": (pc2_module, lambda window=W: pc2.spec("m:f", {"returns": 1}, {}, window=window),
                                     pc2),
 }
 

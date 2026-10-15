@@ -453,7 +453,7 @@ def _observed_files(observable) -> dict:
 #: file named in the request and nowhere else, each line authenticated with the evaluation's key, which leaves the
 #: request file before the subject's process exists.
 HARNESS = r'''
-import builtins, hashlib, hmac, importlib, json, os, queue, subprocess, sys, threading
+import hashlib, hmac, json, os, queue, subprocess, sys, threading
 from importlib.machinery import PathFinder
 ask_path = sys.argv[1]
 req = json.loads(open(ask_path, encoding="utf-8").read())
