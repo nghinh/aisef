@@ -26,12 +26,15 @@ what a run killed mid-append leaves, and a continuation is for it — the reader
 reported (`cut_event`) and its effects are reconciled against git, never assumed undone. Each way it can fail is told
 apart (`JournalRefused.code`, in the text of `refused:`), because what the operator does differs:
 
-    EVIDENCE_UNREADABLE   a file of the run exists or is named and cannot be read (permission, I/O, not there)
-    EVIDENCE_MALFORMED    it was read and is not what a run writes (not text, a line, a format, a record)
+    EVIDENCE_UNREADABLE   a file of the run exists or is named and cannot be read (permission, I/O, not there), or
+                          the run's directory cannot be searched or listed
+    EVIDENCE_MALFORMED    it was read and is not what a run writes (not text, a line, a format, a record: a RUN.json or
+                          RUN.started.json that is not UTF-8 is damage — the kernel writes ASCII, a kill cannot make it)
     EVIDENCE_INTEGRITY    the journal is not the one that was written (hash chain, sequence, RUN.json's digest or length)
     EVIDENCE_PROJECTION   a valid chain the kernel's writer would have refused (a story that commits twice, ...)
-    EVIDENCE_MISSING      nothing to continue from or to authenticate with: the record names no journal; or the
-                          operator gave --expect-anchor and the run has no EVIDENCE.json
+    EVIDENCE_MISSING      nothing to continue from or to authenticate with: no run record, the record names no journal,
+                          the journal committed no story; or the operator gave --expect-anchor and the run has no
+                          EVIDENCE.json
     EVIDENCE_MISMATCH     --expect-anchor, or the manifest, is not what the run directory holds
 
 Without `--expect-anchor` a continuation proves consistency, not authenticity (the run directory is writable by its
@@ -442,12 +445,19 @@ def _record(run_dir: pathlib.Path) -> tuple[dict, bool]:
     """(the run's record, whether it is RUN.json). A run killed before its record has only RUN.started.json (V2.1);
     a record that is not there, or that does not parse (a kill during its write), is the next best evidence. One that
     is there and cannot be read is not: it is refused (`EVIDENCE_UNREADABLE`), never demoted to the weaker record —
-    which binds no journal digest."""
+    which binds no journal digest. One that is not text is damage (the kernel writes ASCII; a kill cuts, never garbles):
+    `EVIDENCE_MALFORMED`, never a record that "does not parse"."""
     from aisef2.app import lineage
     from aisef2.app import run as R
+    cut = []
     for name, recorded in (("RUN.json", True), (R.STARTED, False)):
         try:
             rec = json.loads((run_dir / name).read_text(encoding="utf-8"))
+        except UnicodeDecodeError as e:
+            raise JournalRefused("EVIDENCE_MALFORMED", f"{run_dir}: no run record — {run_dir / name} is not text "
+                                 f"({e.reason}): it is damage, not a write a kill cut; restore it from a faithful copy "
+                                 "of the run directory (or, if it is to be given up, remove it: the run is then "
+                                 "continued from what it still names) — nothing was written") from None
         except OSError as e:
             if lineage.not_there(e):
                 continue
@@ -456,6 +466,7 @@ def _record(run_dir: pathlib.Path) -> tuple[dict, bool]:
                                  "directory) and run the command again — the run is never modified and nothing was "
                                  "written") from None
         except ValueError:
+            cut.append(name)
             continue
         if not isinstance(rec, dict):     # valid JSON that is no record is damage, not a kill during a write
             raise JournalRefused("EVIDENCE_MALFORMED", f"{run_dir / name} is not a run record (a JSON object): restore "
@@ -463,7 +474,11 @@ def _record(run_dir: pathlib.Path) -> tuple[dict, bool]:
         if not recorded:    # V2.1: a run killed before its record still names its identities
             rec["journal"] = {"path": "run/journals/aisef-run.jsonl"}
         return rec, recorded
-    raise B.BundleError(f"{run_dir}: no run record (neither RUN.json nor {R.STARTED} reads as one)")
+    if cut:
+        raise JournalRefused("EVIDENCE_MALFORMED", f"{run_dir}: no run record ({' and '.join(cut)} cut: not JSON) — "
+                             "nothing identifies the run; run the bundle itself again")
+    raise JournalRefused("EVIDENCE_MISSING", f"{run_dir}: no run record (neither RUN.json nor {R.STARTED} is there) — "
+                         "nothing identifies the run; run the bundle itself again")
 
 
 def _authentic(run_dir: pathlib.Path, expect: str) -> None:
@@ -560,9 +575,15 @@ def continue_from(data: Mapping, run_dir: pathlib.Path, *, leave_out_unidentifie
     try:
         child, state = lineage.continued_by(run_dir)
     except lineage.LineageRefused as e:     # the run's claims cannot be listed: a refusal, not "no claims"
-        raise B.BundleError(str(e)) from None
+        raise JournalRefused("EVIDENCE_UNREADABLE", str(e)) from None
     if state == lineage.BEGUN:
         raise B.BundleError(f"{run_dir} is already continued by {child}, which began: continue the lineage from it")
+    held = None
+    if child == lineage.UNREADABLE_CLAIM:   # the claim cannot be read: whose child it is, is not known — UNREAD, with why
+        held = {"run": child, "state": lineage.UNREAD, "why": lineage.claim_unread(run_dir)}
+    elif child:
+        held = {"run": child, "state": state,
+                **({"why": lineage.child_evidence(pathlib.Path(child))[1]} if state == lineage.UNREAD else {})}
     if expect_anchor is not None:
         _authentic(run_dir, expect_anchor)
     rec, recorded = _record(run_dir)
@@ -575,7 +596,7 @@ def continue_from(data: Mapping, run_dir: pathlib.Path, *, leave_out_unidentifie
     events = journal.events
     commits = [(e.data["story_id"], e.data["revision"]) for e in events if e.type == "story/commit"]
     if not commits:
-        raise B.BundleError(f"{run_dir} committed no story: run the bundle itself again")
+        raise JournalRefused("EVIDENCE_MISSING", f"{run_dir} committed no story: run the bundle itself again")
     done = [s for s, _ in commits]
     baseline = commits[-1][1]
     repo = run_dir / "repo"
@@ -616,9 +637,7 @@ def continue_from(data: Mapping, run_dir: pathlib.Path, *, leave_out_unidentifie
     account = lineage.account_of(run_dir)
     report = {"carried": done, "carried_as": carried, "baseline": baseline, "run": str(run_dir), "evidence_anchor": anchor,
               "recorded": recorded, "anchor_checked": expect_anchor is not None,
-              "already_continued_by": ({"run": child, "state": state,
-                                        **({"why": lineage.child_evidence(pathlib.Path(child))[1]}
-                                           if state == lineage.UNREAD else {})} if child else None),
+              "already_continued_by": held,
               # a torn last line is the reader's verified prefix; the torn event's EFFECTS are not assumed undone —
               # they are among `unconfirmed`, reconciled against git (app/lineage)
               "torn_tail": bool(journal.torn_tail), "cut_event": reconciled["cut_event"],

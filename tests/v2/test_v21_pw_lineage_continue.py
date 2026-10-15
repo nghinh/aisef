@@ -19,9 +19,16 @@ failures told apart so the operator knows what to do:
   journal, or the run has no manifest -> EVIDENCE_MISSING; the manifest or the anchor are not the ones the evidence
   has -> EVIDENCE_MISMATCH
 
+Round 2 of the lane's review added: a run's directory that cannot be searched or listed is `EVIDENCE_UNREADABLE`
+(it was a refusal with no code); "no run record" is told apart (nothing there: `EVIDENCE_MISSING`; a record that is cut
+or garbled: `EVIDENCE_MALFORMED`) and so is "committed no story" (`EVIDENCE_MISSING`); a RUN.json that is not text is
+damage, not a kill's cut, and is not replaced by RUN.started.json; and a claim that cannot be read is reported as
+UNREAD with the cause — not as a marker with no state.
+
 A refusal changes nothing (the continuation file is not written; the run is never modified). The run directories are
 built in a temporary directory from a real repository and a real bundle; the journals are written by the kernel's own
-writer. Offline; no client, no provider."""
+writer. The tests that need permission modes say so (a user that is not root); the rest run as root too. Offline; no
+client, no provider."""
 
 from __future__ import annotations
 
@@ -158,10 +165,11 @@ class ControlsThatMustKeepWorking(Continuation):
         """Not one of the failures below: nothing was verified, so nothing is carried — the refusal it always had."""
         err = self.refused(self.run_dir(self.delivered()[:60], record=False))
         self.assertIn("committed no story", str(err))
+        self.assertEqual(getattr(err, "code", None), "EVIDENCE_MISSING", str(err))      # nothing to continue from
 
 
-@POSIX_USER
 class TheJournalCannotBeRead(Continuation):
+    @POSIX_USER
     def test_a_journal_without_read_permission(self):
         run = self.run_dir(self.delivered(), manifest=True)
         (run / JOURNAL).chmod(0o000)
@@ -178,15 +186,22 @@ class TheJournalCannotBeRead(Continuation):
         self.assertEqual(getattr(err, "code", None), "EVIDENCE_UNREADABLE")
         self.assertIn("FileNotFoundError", str(err))
 
-    def test_a_run_directory_that_cannot_be_searched_is_not_a_missing_record(self):
-        """Neither "no run record" nor a journal that does not reconstruct: the directory the operator named."""
-        run = self.run_dir(self.delivered())
-        run.chmod(0o000)
-        self.addCleanup(run.chmod, 0o755)
-        err = self.refused(run)
-        self.assertIn("PermissionError", str(err))
-        self.assertNotIn("no run record", str(err))
+    @POSIX_USER
+    def test_a_run_directory_that_cannot_be_searched_or_listed_is_unreadable_evidence_not_a_missing_record(self):
+        """Neither "no run record" nor a journal that does not reconstruct: the directory the operator named, and the
+        refusal carries the code the other unreadable files of the run carry."""
+        for mode in (0o000, 0o300, 0o100, 0o400):
+            with self.subTest(oct(mode)):
+                run = self.run_dir(self.delivered())
+                run.chmod(mode)
+                self.addCleanup(run.chmod, 0o755)
+                err = self.refused(run)
+                self.assertEqual(getattr(err, "code", None), "EVIDENCE_UNREADABLE", str(err))
+                self.assertIn("PermissionError", str(err))
+                self.assertNotIn("no run record", str(err))
+                self.assertRegex(str(err), r"restore|permissions")        # what to do
 
+    @POSIX_USER
     def test_the_text_says_nothing_was_changed_and_what_to_do(self):
         run = self.run_dir(self.delivered())
         (run / JOURNAL).chmod(0o000)
@@ -198,7 +213,41 @@ class TheJournalCannotBeRead(Continuation):
 
 class TheRecordItself(Continuation):
     """RUN.json is what binds the journal (its digest and length). A run killed before it wrote one is continued from
-    RUN.started.json; a record that is there is never quietly replaced by that weaker one."""
+    RUN.started.json; a record that is there is never quietly replaced by that weaker one — which includes a record that
+    is not text: the kernel writes ASCII, a kill cuts and never garbles, so it is damage (`EVIDENCE_MALFORMED`)."""
+
+    def test_a_record_that_is_not_text_is_damage_and_is_not_replaced_by_the_started_record(self):
+        """Replaced, the journal's digest is not checked — a journal swapped under a garbled RUN.json was continued, and
+        the report said `recorded: false`, as for a run killed before its record."""
+        run = self.run_dir(self.delivered())
+        (run / "RUN.json").write_bytes(b"\xff\xfe\x00")
+        err = self.refused(run)
+        self.assertEqual(getattr(err, "code", None), "EVIDENCE_MALFORMED", str(err))
+        self.assertIn("RUN.json", str(err))
+        self.assertIn("not text", str(err))
+        self.assertRegex(str(err), r"restore|faithful copy")
+        self.assertIn("nothing was written", str(err))
+
+    def test_a_started_record_that_is_not_text_is_damage_too(self):
+        run = self.run_dir(self.delivered(), record=False)
+        (run / R.STARTED).write_bytes(b"\xff\xfe\x00")
+        err = self.refused(run)
+        self.assertEqual(getattr(err, "code", None), "EVIDENCE_MALFORMED", str(err))
+        self.assertIn(R.STARTED, str(err))
+        self.assertIn("no run record", str(err))        # nothing identifies the run: said the way it always was
+
+    def test_no_run_record_is_told_apart_missing_from_cut(self):
+        nothing = self.run_dir(self.delivered(), record=False)
+        (nothing / R.STARTED).unlink()
+        err = self.refused(nothing)
+        self.assertEqual(getattr(err, "code", None), "EVIDENCE_MISSING", str(err))
+        self.assertIn("no run record", str(err))
+        cut = self.run_dir(self.delivered(), record=False)
+        (cut / R.STARTED).write_text('{"format": "aisef-v2-run-rec', encoding="utf-8")
+        err = self.refused(cut)
+        self.assertEqual(getattr(err, "code", None), "EVIDENCE_MALFORMED", str(err))
+        self.assertIn("no run record", str(err))
+        self.assertIn(R.STARTED, str(err))
 
     @POSIX_USER
     def test_a_record_that_cannot_be_read_is_not_demoted_to_the_started_record(self):
@@ -372,7 +421,6 @@ class TheOperatorAsksForAnAnchor(Continuation):
                 self.cli(run, "--expect-anchor", "not-hex")
 
 
-@POSIX_USER
 class WhatTheLineageHolds(Continuation):
     """The run asked about is claimed already: the report says by whom and in what state, and a reading failure of
     the child is that state — not a refusal of the continuation bundle (the claim is taken by `aisef run --parent`)."""
@@ -381,6 +429,7 @@ class WhatTheLineageHolds(Continuation):
         (run / lineage.CLAIM).write_text(json.dumps({"run": str(child), "claimed": 1.0, "claimant": {}}) + "\n",
                                          encoding="utf-8")
 
+    @POSIX_USER
     def test_a_child_that_cannot_be_read_is_reported_unread_with_its_cause(self):
         run = self.run_dir(self.delivered(), manifest=True)
         child = self.tmp / "child"
@@ -402,16 +451,55 @@ class WhatTheLineageHolds(Continuation):
         self.claim_naming(run, child)
         self.assertIn("which began", str(self.refused(run)))
 
+    @POSIX_USER
     def test_a_run_directory_that_cannot_be_listed_is_refused_not_a_traceback(self):
-        """The claims of the run are in its directory: a listing that is denied is not "no claims"."""
+        """The claims of the run are in its directory: a listing that is denied is not "no claims", and the refusal has
+        the code of every other evidence of the run that cannot be read."""
         run = self.run_dir(self.delivered(), manifest=True)
         run.chmod(0o300)
         self.addCleanup(run.chmod, 0o755)
         code, err, out = self.cli(run)
         self.assertEqual(code, 2, err)
-        self.assertRegex(err, r"^refused: ")
+        self.assertRegex(err, r"^refused: EVIDENCE_UNREADABLE: ")
         self.assertIn("PermissionError", err)
         self.assertFalse(out.exists())
+
+    def test_a_claim_that_cannot_be_read_is_reported_unread_with_its_cause_not_as_a_marker_with_no_state(self):
+        """Whose child the claim names is not known: the state is UNREAD, with what happened to the file and what to do.
+        The bundle is still written — the claim is taken by `aisef run --parent`, which refuses until it reads."""
+        bodies = {"cut by a kill after the file was created": '{"run": "/x/y', "empty": "", "JSON and no claim": "[1]",
+                  "a directory in its place": None}
+        for name, body in bodies.items():
+            with self.subTest(name):
+                run = self.run_dir(self.delivered(), manifest=True)
+                if body is None:
+                    (run / lineage.CLAIM).mkdir()
+                else:
+                    (run / lineage.CLAIM).write_text(body, encoding="utf-8")
+                _, report = bundle_cli.continue_from(self.doc, run)
+                held = report["already_continued_by"]
+                self.assertEqual((held["run"], held["state"]), (lineage.UNREADABLE_CLAIM, "UNREAD"))
+                self.assertIn(lineage.CLAIM, held["why"])
+                self.assertIn("cannot be read", held["why"])
+                self.assertIn("aisef run --parent", held["why"])
+
+    @POSIX_USER
+    def test_a_claim_without_read_permission_is_reported_unread(self):
+        run = self.run_dir(self.delivered(), manifest=True)
+        self.claim_naming(run, self.tmp / "child")
+        (run / lineage.CLAIM).chmod(0o000)
+        self.addCleanup((run / lineage.CLAIM).chmod, 0o644)
+        _, report = bundle_cli.continue_from(self.doc, run)
+        held = report["already_continued_by"]
+        self.assertEqual((held["run"], held["state"]), (lineage.UNREADABLE_CLAIM, "UNREAD"))
+        self.assertIn("PermissionError", held["why"])
+
+    def test_a_claim_that_reads_keeps_the_report_it_had(self):
+        """No `why` where nothing was unread: the child's state, as before."""
+        run = self.run_dir(self.delivered(), manifest=True)
+        self.claim_naming(run, self.tmp / "never-began")
+        _, report = bundle_cli.continue_from(self.doc, run)
+        self.assertEqual(report["already_continued_by"], {"run": str(self.tmp / "never-began"), "state": "UNBEGUN"})
 
 
 if __name__ == "__main__":

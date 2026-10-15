@@ -125,14 +125,18 @@ class Case(unittest.TestCase):
 class RecordOfTheRun(Case):
     """Which record of the predecessor is trusted. RUN.json is the record; a run killed before it wrote one still names
     its identities in RUN.started.json, and that is what a continuation falls back to — for a record that is not
-    there AND for one that cannot be read (a torn write, a file that is not UTF-8). With neither, the run is refused
-    by name as a typed refusal, so `aisef bundle continue` ends with status 2, never a traceback.
+    there AND for one a kill cut during its write (a truncated JSON, an empty file). One that is not text is not a
+    cut: the kernel writes ASCII, so it is damage, and a continuation does not take the weaker record in its place
+    (that record binds no journal digest): `EVIDENCE_MALFORMED`, naming the file (lineage decision of 2026-10-15; the
+    round-2 review of that family found both reviewers on this). With no record the run is refused by name as a typed
+    refusal, so `aisef bundle continue` ends with status 2, never a traceback.
 
     Pins aisef2/app/bundle_cli.py::continue_from [48, 111, 112, 164]."""
 
-    TORN = {"truncated JSON": b'{"bundle_digest": "', "empty": b"", "not UTF-8": b"\xff\xfe\x00"}
+    TORN = {"truncated JSON": b'{"bundle_digest": "', "empty": b""}
+    GARBLED = b"\xff\xfe\x00"
 
-    def test_a_record_that_cannot_be_read_falls_back_to_the_started_record(self):
+    def test_a_record_that_a_kill_cut_falls_back_to_the_started_record(self):
         _, whole = bundle_cli.continue_from(FX.doc, FX.first)
         self.assertTrue(whole["recorded"])
         for label, torn in self.TORN.items():
@@ -142,6 +146,19 @@ class RecordOfTheRun(Case):
                 self.assertEqual((report["carried"], report["baseline"], report["remaining"]),
                                  (whole["carried"], whole["baseline"], whole["remaining"]))
                 self.assertEqual(report["baseline"], FX.s1)
+
+    def test_a_record_that_is_not_text_is_damage_and_is_refused_not_replaced_by_the_started_record(self):
+        """A journal swapped under a RUN.json made unreadable by garbling it was continued without its digest checked,
+        and the report said only `recorded: false` — the same as a run killed before its record."""
+        for label, started in (("with a started record", FX.started), ("with none", None)):
+            with self.subTest(label):
+                moved = self.moved(record=self.GARBLED, started=started)
+                with self.assertRaises(bundle.BundleError) as c:
+                    bundle_cli.continue_from(FX.doc, moved)
+                self.assertEqual(getattr(c.exception, "code", None), "EVIDENCE_MALFORMED", str(c.exception))
+                self.assertIn(str(moved / RECORD), str(c.exception))
+                self.assertIn("not text", str(c.exception))
+                self.assertRegex(str(c.exception), r"restore|faithful copy")
 
     def test_the_command_continues_from_the_started_record_when_the_record_is_torn(self):
         bundle_file = self.scratch() / "bundle.json"
@@ -156,7 +173,7 @@ class RecordOfTheRun(Case):
 
     def test_a_run_with_no_readable_record_is_refused_by_name_and_as_a_typed_refusal(self):
         cases = {"neither record": {}, "the started record torn": {"started": self.TORN["truncated JSON"]},
-                 "the started record not UTF-8": {"started": self.TORN["not UTF-8"]},
+                 "the started record not UTF-8": {"started": self.GARBLED},
                  "both records torn": {"record": self.TORN["truncated JSON"], "started": self.TORN["empty"]},
                  "the record torn and no started record": {"record": self.TORN["truncated JSON"]}}
         for label, files in cases.items():
@@ -165,6 +182,11 @@ class RecordOfTheRun(Case):
                 text = self.refusal(moved)
                 self.assertIn(str(moved), text)
                 self.assertIn("no run record", text)
+                # told apart: nothing there at all is MISSING; a record that is there and cut or garbled is MALFORMED
+                with self.assertRaises(bundle.BundleError) as c:
+                    bundle_cli.continue_from(FX.doc, moved)
+                self.assertEqual(getattr(c.exception, "code", None),
+                                 "EVIDENCE_MISSING" if not files else "EVIDENCE_MALFORMED", label)
 
     def test_the_command_refuses_a_directory_that_is_no_run_with_status_2(self):
         bundle_file = self.scratch() / "bundle.json"
