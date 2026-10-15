@@ -41,6 +41,10 @@ from aisef2.app import adapters, review_ocr  # noqa: E402
 
 #: the strings `version` prints, which the binary must hold as data (they are not computed)
 DECLARED_STRINGS = (b"v1.12.12", b"182898c", b"2026-10-05T00:00:00Z")
+#: the sentinels the Go toolchain puts around the module-info string it stamps into a binary (runtime/debug/mod.go
+#: infoStart and infoEnd): the lines `go version -m` prints lie between them, and the stamp is in the file twice
+INFO_START = bytes.fromhex("3077af0c9274080241e1c107e6d618e6")
+INFO_END = bytes.fromhex("f932433186182072008242104116d8f2")
 
 
 def sha256(path: pathlib.Path) -> str:
@@ -93,13 +97,26 @@ def embedded(exe: pathlib.Path) -> dict:
             "note": "with -trimpath the toolchain omits -ldflags from the build info: the flags that set (a) are not here"}
 
 
+def held_as_data(data: bytes) -> dict:
+    """Per string `version` prints: how often the file holds it, and how often OUTSIDE the stamped build info. The build
+    info alone already carries `v1.12.12` (the `mod` line) and the first seven characters of `vcs.revision`, so `s in
+    data` could not tell a string the builder set (-ldflags -X) from one the toolchain wrote; only an occurrence outside
+    the stamp is the binary holding the string as data of its own. A stamp that is not closed counts as inside."""
+    outside, pos = [], 0
+    while (a := data.find(INFO_START, pos)) != -1:
+        b = data.find(INFO_END, a)
+        outside.append(data[pos:a])
+        pos = len(data) if b == -1 else b + len(INFO_END)
+    rest = b"\0".join([*outside, data[pos:]])
+    return {s.decode(): {"in_file": data.count(s), "outside_build_info": rest.count(s)} for s in DECLARED_STRINGS}
+
+
 def declared(exe: pathlib.Path) -> dict:
-    """(a): the binary's own word, asked as the review stage asks (and the strings it holds as data)."""
+    """(a): the binary's own word, asked as the review stage asks (and the strings it holds as data of its own)."""
     seen, why = adapters._declared(str(exe), review_ocr.VERSION_TIMEOUT_S)
-    data = exe.read_bytes()
     return {"as_asked_by": "aisef2.app.adapters._declared (clean environment, empty HOME, cwd = that HOME)",
             "declared": seen, "accepted_by_the_gate": why is None, "why_not": why,
-            "strings_held_as_data": {s.decode(): s in data for s in DECLARED_STRINGS}}
+            "strings_held_as_data": held_as_data(exe.read_bytes())}
 
 
 def codesign(exe: pathlib.Path) -> dict | None:

@@ -18,6 +18,7 @@ test_v21_ocr_declared.py."""
 
 from __future__ import annotations
 
+import contextlib
 import hashlib
 import json
 import os
@@ -182,8 +183,12 @@ class Gate(unittest.TestCase):
                     for leftover in (self.logs, self.logs.parent / "review"):     # a review that ran leaves these
                         shutil.rmtree(leftover, ignore_errors=True)
                     self.answer(name)
-                    with mock.patch.object(review_ocr, "VERSION_TIMEOUT_S", 1.0, create=True), \
-                            self.assertRaises(CapabilityUnrunnable) as cm:
+                    # a shorter bound only for the binary that never answers (long enough for the script to start and
+                    # record itself); every other answer gets the real one, so a slow interpreter start under load
+                    # is not mistaken for "did not answer in time"
+                    bound = mock.patch.object(review_ocr, "VERSION_TIMEOUT_S", 3.0, create=True) \
+                        if ANSWERS[name][2] else contextlib.nullcontext()
+                    with bound, self.assertRaises(CapabilityUnrunnable) as cm:
                         self.review(policy)
                     said = str(cm.exception)
                     for word in REFUSED[name]:

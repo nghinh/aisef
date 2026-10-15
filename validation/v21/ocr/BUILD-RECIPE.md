@@ -29,12 +29,15 @@ không phải bằng chứng dựng.
 | Tag / commit | `v1.12.12` / `182898cf522da3d04157b422752d028417974e19` |
 | Binary duy nhất đã dùng | `darwin/arm64`, 55 014 610 byte, sha256 `bf38abf320ead4e106b71c15824463640207118f38e1c10c28a73b6839104af7`, mtime 2026-10-06 14:32 |
 | Vị trí | thư mục scratchpad của phiên (`ocr-build/ocr-v1.12.12-darwin-arm64`); macOS dọn `/tmp` sau vài ngày, định danh là pin chứ không phải đường dẫn |
-| Nền tảng khác | chưa có binary, chưa có pin cho Linux/Windows |
+| Nền tảng khác | chưa có binary, chưa có pin cho Linux/Windows; `version` chưa được hỏi ở đó. Cổng hỏi trong môi trường sạch (`PATH=/usr/bin:/bin`, HOME rỗng, không `APPDATA`/`LOCALAPPDATA`) và stdout với stderr chung một luồng: một dòng cảnh báo in trước dòng version làm cổng từ chối (đóng khi lỗi, đúng quy tắc "dòng đầu phải là dòng version") — cần một lượt có binary thật trên nền tảng đó trước khi ghim |
 
 ## 3. Đã đo gì (2026-10-15, `inspect_binary.py` trên bản ghim)
 
 **(a) Tự khai** — chấp nhận bởi cổng: `v1.12.12`, `182898c` (dạng ngắn, là tiền tố của commit ghim), `darwin/arm64`.
-Ba chuỗi `v1.12.12`, `182898c`, `2026-10-05T00:00:00Z` có trong tệp như dữ liệu (không tính ra lúc chạy). Chuỗi
+Ba chuỗi `v1.12.12`, `182898c`, `2026-10-05T00:00:00Z` có trong tệp như dữ liệu (không tính ra lúc chạy): mỗi chuỗi có
+đúng 1 lần xuất hiện NGOÀI chuỗi build info mà toolchain nhúng (hai dấu hiệu bao quanh của `runtime/debug`; build info
+tự nó đã chứa `v1.12.12` ở dòng `mod` và 7 ký tự đầu của `vcs.revision`, nên chỉ lần ngoài đó mới tính; tệp chứa build
+info hai lần, nên trong tệp là 3/3/1 lần). Chuỗi
 `built at` là 00:00:00Z đúng, trong khi `vcs.time` là 06:34:14Z cùng ngày: ngày do người dựng điền, không phải giờ commit.
 
 **(b) Nhúng** — `go1.26.5`, `path github.com/alibaba/open-code-review/cmd/opencodereview`, `mod … v1.12.12` (không

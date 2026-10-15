@@ -89,9 +89,31 @@ class Declared(unittest.TestCase):
         self.assertIsNotNone(review_ocr.declared("/x/ocr", 0, "x\n" + REAL)[1])       # a version line that is not first
         self.assertIsNotNone(review_ocr.declared("/x/ocr", 0, PINNED_LINE + " and more\n")[1])   # not the whole line
 
+    def test_only_a_newline_ends_the_line_and_what_follows_any_other_break_is_part_of_it(self):
+        # str.splitlines() also breaks at \v \f \x1c-\x1e \x85 \u2028 \u2029: what follows such a break is then never read,
+        # and a physical line longer than the version line was accepted as the version line
+        for brk in ("\x0b", "\x0c", "\x1c", "\x1d", "\x1e", "\x85", "\u2028", "\u2029"):
+            with self.subTest(brk=repr(brk)):
+                _, why = review_ocr.declared("/x/ocr", 0, f"{PINNED_LINE}{brk}ANYTHING FOLLOWS\n{REAL}")
+                self.assertIsNotNone(why)
+                self.assertIn("no version line", why)
+        self.assertIsNone(review_ocr.declared("/x/ocr", 0, PINNED_LINE + "\r\nbuilt at: x\r\n")[1])   # CRLF is a newline
+
     def test_a_long_garbage_line_is_cut_in_the_refusal(self):
         _, why = review_ocr.declared("/x/ocr", 0, "z" * 5000 + "\n")
         self.assertLess(len(why), 400)
+
+    def test_whatever_a_binary_says_is_cut_where_it_is_named_and_where_it_is_recorded(self):
+        for what, line in (("a version", "open-code-review " + "v" * 3000 + " (182898c) darwin/arm64"),
+                           ("a commit", "open-code-review v1.12.12 (" + "c" * 3000 + ") darwin/arm64")):
+            with self.subTest(what):
+                seen, why = review_ocr.declared("/x/ocr", 0, line + "\n")
+                self.assertIsNotNone(why)
+                self.assertLess(len(why), 400)          # the refusal goes to the journal as written
+        seen, why = review_ocr.declared("/x/ocr", 0, "open-code-review v1.12.12 (182898c) " + "p" * 3000 + "\n")
+        self.assertIsNone(why)                          # the platform is not compared: it is recorded, and bounded
+        self.assertLessEqual(len(seen["platform"]), 40)
+        self.assertLessEqual(len(seen["line"]), 200)
 
     def test_the_command_is_version_alone_and_its_environment_inherits_nothing(self):
         self.assertEqual(review_ocr.version_argv("/opt/ocr"), ["/opt/ocr", "version"])

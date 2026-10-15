@@ -237,14 +237,17 @@ def declared(exe: str, code: int | None, text: str) -> tuple[dict | None, str | 
         return None, f"{exe}: `version` did not answer in time"
     if code != 0:
         return None, f"{exe}: `version` exited {code}"
-    first = next((ln.strip() for ln in text.splitlines() if ln.strip()), "")
+    # split at "\n" only: str.splitlines() also breaks at \v \f \x1c-\x1e \x85 \u2028 \u2029, and what followed such a
+    # break was never read — a longer physical line would have been taken for the version line
+    first = next((ln.strip() for ln in text.split("\n") if ln.strip()), "")
     m = VERSION_LINE.fullmatch(first)
     if m is None:
         return None, f"{exe}: `version` printed no version line (first line {first[:80]!r})"
-    seen = {"version": m[1], "commit": m[2], "platform": m[3], "line": first[:200]}
+    seen = {"version": m[1], "commit": m[2], "platform": m[3][:40], "line": first[:200]}
+    # version and commit are kept whole (they are compared); what is named or recorded is cut: it goes to the journal
     if seen["version"] != OCR["version"] or len(seen["commit"]) < 7 or not OCR["commit"].startswith(seen["commit"]):
-        return seen, (f"{exe}: declares itself {seen['version']} ({seen['commit'][:40]}), not the pinned {OCR['version']} "
-                      f"({OCR['commit'][:7]}): no review command was run")
+        return seen, (f"{exe}: declares itself {seen['version'][:40]} ({seen['commit'][:40]}), not the pinned "
+                      f"{OCR['version']} ({OCR['commit'][:7]}): no review command was run")
     return seen, None
 
 
