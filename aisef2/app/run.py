@@ -17,7 +17,8 @@
                        a refused shutdown, an interruption) still leaves it beside its journal (B3)
     <out>/CONTINUED-BY.json  V2.1: created (exclusively) in a run directory when another run continues it: one
                        continuation per run, the claimant named; a later generation (CONTINUED-BY.<n>.json) only
-                       supersedes, with evidence, a claim whose child never began (app/lineage); nothing is deleted
+                       supersedes a claim whose child never began (with evidence) or whose child's evidence cannot be
+                       read (UNREAD: only on the operator's assertion) (app/lineage); nothing is deleted
     <out>/review-findings  V2.1: one file per review finding, whole and secret-redacted (app/review_verify.preserve);
                        the journal row of the finding names it by sha256, so what a verifier needs to reproduce a
                        finding is never only in the row's bounded statement
@@ -385,9 +386,12 @@ def execute(project: Project, settings: Settings, source: pathlib.Path, out: pat
         raise RunRefused(f"{out} exists: a run directory is never reused or overwritten")
     continues = None
     if predecessor is not None:
-        recorded = (predecessor / "RUN.json").is_file()
-        if not recorded and not (predecessor / STARTED).is_file():
-            raise RunRefused(f"--parent {predecessor}: no run record there")
+        try:    # a directory this process may not search is a refusal that says so, not "no record" (or a traceback)
+            recorded = lineage.is_file(predecessor / "RUN.json")
+            if not recorded and not lineage.is_file(predecessor / STARTED):
+                raise RunRefused(f"--parent {predecessor}: no run record there")
+        except lineage.LineageRefused as e:
+            raise RunRefused(f"--parent {predecessor}: {e}") from None
         continues = {"path": str(predecessor), "evidence_anchor": anchor_in(predecessor)}
         if not recorded:    # killed before its record: what it spent is re-derived from its streams, marked so
             continues["recorded"] = False

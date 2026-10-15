@@ -393,7 +393,12 @@ class JournalAppendWindows(LineageBase):
         journal.write_bytes(bytes(data))
         with self.assertRaises(bundle.BundleError) as c:
             bundle_cli.continue_from(self.doc, copy)
-        self.assertIn("does not reconstruct", str(c.exception))
+        # lineage decision 2026-10-15: each failure of the journal is told apart. A byte edited inside an event breaks
+        # its line's hash chain — not "a journal that does not reconstruct" in general: the integrity class, naming the
+        # journal and the chain, so the operator knows it is the file that is not the one that was written
+        self.assertEqual(getattr(c.exception, "code", None), "EVIDENCE_INTEGRITY")
+        self.assertIn(str(journal), str(c.exception))
+        self.assertIn("chain", str(c.exception))
 
 
 class ClaimLifecycle(LineageBase):

@@ -63,7 +63,8 @@ class Parser(unittest.TestCase):
             " --accept-unaccounted run --parent only: start although the lineage has spend no evidence accounts for"
             " (recorded)"
             " --supersede-claim SHA256 run --parent only: supersede the predecessor's claim with this sha256 whose"
-            " child never began and whose claimant cannot be shown gone (the operator's assertion, recorded)"), ""))
+            " child never began and whose claimant cannot be shown gone, or whose child's evidence cannot be read"
+            " (the operator's assertion, recorded)"), ""))
 
     def test_a_run_named_without_its_project_bundle_is_refused_with_the_usage(self):
         self.assertEqual(self.aisef_run(["--check", "--settings", "settings.json", "--repo", "repo"]), (2, "", (
