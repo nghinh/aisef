@@ -1,5 +1,5 @@
 """Mutation survivors, batch T19b: `aisef2/probe/process_effect.py` (the `process_effect` scenario probe, RFC §9,
-DECISION-2, B1, B6) — the controller's guard of a fault before a subprocess step, the namespace-package rule of
+DECISION-2, B1, B6) — the refusal of a fault before a subprocess step (PM-2), the namespace-package rule of
 `inside`, the controller's reading of the subject's process ending (or forging an answer and ending) while its module
 is imported or its name resolved, the report of a memoryview result, the per-step `fired` fact, the evaluation
 directory's layout and the parent's decision once a RESULT is read.
@@ -23,7 +23,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from aisef2.arch.enums import BehaviorVerdict  # noqa: E402
+from aisef2.arch.enums import BehaviorVerdict, ProbeExecutionStatus  # noqa: E402
 from aisef2.probe import process_effect as pe  # noqa: E402
 from aisef2.probe.protocol import ObservationKind as K, RevisionRef, run_probe  # noqa: E402
 from aisef2.product.outcome import Executed  # noqa: E402
@@ -58,6 +58,10 @@ EXTRA = {
     "store/forges.py": "import os\nimport __main__\n\n__main__.send({'n': 99})\nos._exit(0)\n",
     "store/forges_late.py": ("def __getattr__(name):\n    import os\n    import __main__\n"
                             "    __main__.send({'n': 99})\n    os._exit(0)\n"),
+    # PM-2: two CLIs over one `save` that renames a temporary file over its target: the fragile one lets an OSError of
+    # the rename escape (exit 1), the tolerant one catches it (exit 0 either way)
+    "store/saver.py": "import sys\n\nfrom store.book import Book\n\nBook(sys.argv[1]).save('a\\n')\n",
+    "store/saver_quiet.py": "import sys\n\nfrom store.book import Book\n\nBook(sys.argv[1]).save_quietly('a\\n')\n",
     # a directory of the revision with no __init__.py: a namespace package, which holds no code
     "nsdir/readme.txt": "a directory without __init__.py\n",
 }
@@ -82,55 +86,69 @@ class _Revision(unittest.TestCase):
 
 
 class FaultBeforeSubprocess(_Revision):
-    """DECISION-2 / `FAULTED`: a `fault` step directly before a `subprocess` step is admitted (`_scenario_ok` holds), so
-    it is a scenario that RUNS: observed, never a harness failure, the verdict is the one the facts give, the
-    subprocess exits as declared and its trace entry carries the step's own fields plus the declared fault id and a
-    boolean `fired`; the step after it still runs and does not see the fault.
+    """DECISION-2 / `FAULTED` (PM-2): a `fault` step directly before a `subprocess` step is refused at admission
+    (UNSUPPORTED -> INVALID_SPEC) and nothing runs. The stand-in is installed in the subject's own process; a subprocess
+    step's child is another interpreter and never sees it, so such a scenario used to run unfaulted (`fired: false`)
+    and be judged: a product that fails under the fault was SATISFIED, and nothing in the verdict said no fault had
+    happened. The unfaulted subprocess step is unchanged, and the faulted call that measures the same property of
+    the same code still tells a fragile product from a tolerant one.
 
-    `fired` itself is deliberately not pinned: the controller patches its own process around subprocess.run, which the
-    child does not see (a product defect, reported with the batch: the owner decides between delivering the patch to
-    the child and refusing `subprocess` after a fault at admission). If the owner takes the second way this class goes
-    with the change — the guarded path is then unreachable and its mutants equivalent by dominance.
-    Every mutant below dies the same way: the exception its change raises on this path reaches the harness's
-    last-resort handler and surfaces as HARNESS_FAILED instead of the observation these tests require.
-    Pins aisef2/probe/process_effect.py::HARNESS/guarded [3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 16, 18, 19]."""
+    The 27 mutants of the controller's own-process guard `HARNESS/guarded`, 14 of which this class used to kill, left
+    with the function: after the refusal nothing could reach it."""
 
-    def scenario(self, *, expect_exit=None, count="1"):
-        argv = ["-m", "store", "check", BOOK, count]
-        sub = base.step("subprocess", argv=argv, **({} if expect_exit is None else {"expect_exit": expect_exit}))
-        return base.book(base.call("append", "a", 1, "r1"), base.step("fault", fault="os.replace"), sub,
-                         base.call("count"))
+    FILES = {"files": {BOOK: {"line_count": 1}}}
 
-    def test_the_scenario_is_admitted_runs_and_is_observed(self):
-        s = base.spec("store.book:Book", self.scenario(), {"returns": 1})
-        self.assertEqual(pe.spec_class(s), "scenario_returns")   # admitted: the fault is followed by a FAULTED step
-        o = self.see(s)
-        self.assertEqual((o.kind, o.verdict), (K.OBSERVED, S), o.detail)   # not HARNESS_FAILED, not a leak
-        trace = facts_of(o)["trace"]
-        self.assertEqual([e["kind"] for e in trace], ["construct", "call", "fault", "subprocess", "call"])
-        entry = trace[3]
-        self.assertEqual({k: entry[k] for k in ("i", "kind", "outcome", "exit", "fault")},
-                         {"i": 3, "kind": "subprocess", "outcome": "ok", "exit": 0, "fault": "os.replace"})
-        self.assertIsInstance(entry["fired"], bool)
-        # the step after it runs, sees no fault, and answers: the book still holds the one record
-        self.assertEqual(trace[4], {"i": 4, "kind": "call", "outcome": "ok"})
-        self.assertEqual(facts_of(o)["last_returned"], 1)
-        self.assertEqual(run_probe(base.P, s, self.at, base.env()).result, Executed(S))
+    def test_a_fault_before_a_subprocess_step_is_refused_and_nothing_runs(self):
+        for cli in ("store.saver", "store.saver_quiet"):
+            for fault in pe.FAULTS:   # the production table, every id
+                with self.subTest(cli=cli, fault=fault):
+                    scenario = base.book(base.step("fault", fault=fault),
+                                         base.step("subprocess", argv=["-m", cli, BOOK]))
+                    s = base.spec("store.book:Book", scenario, self.FILES)
+                    self.assertIsNone(pe.spec_class(s))   # no class: the admission answer
+                    with base.never_runs():   # no range is started, so no controller, no subject, no child
+                        o = self.see(s)
+                        self.assertEqual((o.kind, o.verdict), (K.UNSUPPORTED, None), o.detail)
+                        self.assertIs(run_probe(base.P, s, self.at, base.env()).result.status,
+                                      ProbeExecutionStatus.INVALID_SPEC)
 
-    def test_the_subprocess_step_exits_as_declared_through_the_guard(self):
-        # the child's own exit status comes back through the guarded call: declared (3: the book holds 1, not 5), then
-        # undeclared (a refuted step naming the status) — the same verdicts a subprocess step without a fault gives
-        declared = base.spec("store.book:Book", self.scenario(expect_exit=3, count="5"), {"returns": 1})
-        o = self.see(declared)
+    def test_a_refused_fault_does_not_refuse_the_subprocess_step_itself(self):
+        # the same two CLIs, no fault: admitted, run, judged, and the trace carries neither a fault nor `fired`
+        for cli in ("store.saver", "store.saver_quiet"):
+            with self.subTest(cli=cli):
+                scenario = base.book(base.step("subprocess", argv=["-m", cli, BOOK]))
+                o = self.see(base.spec("store.book:Book", scenario, self.FILES))
+                self.assertEqual((o.kind, o.verdict), (K.OBSERVED, S), o.detail)
+                self.assertEqual(facts_of(o)["trace"][1], {"i": 1, "kind": "subprocess", "outcome": "ok", "exit": 0})
+        # the child's own exit status is judged as declared (3: the book holds 1 record, not 5), then undeclared
+        declared = base.book(base.call("append", "a", 1, "r1"),
+                             base.step("subprocess", argv=["-m", "store", "check", BOOK, "5"], expect_exit=3),
+                             base.call("count"))
+        o = self.see(base.spec("store.book:Book", declared, {"returns": 1}))
         self.assertEqual((o.kind, o.verdict), (K.OBSERVED, S), o.detail)
-        self.assertEqual(facts_of(o)["trace"][3]["exit"], 3)
-        undeclared = base.spec("store.book:Book", self.scenario(count="5"), {"returns": 1})
-        o = self.see(undeclared)
+        self.assertEqual(facts_of(o)["trace"][2], {"i": 2, "kind": "subprocess", "outcome": "ok", "exit": 3})
+        undeclared = base.book(base.call("append", "a", 1, "r1"),
+                               base.step("subprocess", argv=["-m", "store", "check", BOOK, "5"]),
+                               base.call("count"))
+        o = self.see(base.spec("store.book:Book", undeclared, {"returns": 1}))
         self.assertEqual((o.kind, o.verdict), (K.OBSERVED, R), o.detail)
         refuted = facts_of(o)["refuted"]
-        self.assertEqual((refuted["step"], refuted["kind"]), (3, "subprocess"))   # the step named, as through no guard
+        self.assertEqual((refuted["step"], refuted["kind"]), (2, "subprocess"))
         self.assertIn("3", refuted["why"])   # the status the child exited with (the sentence is PE-4's to pin)
-        self.assertEqual(facts_of(o)["trace"][3]["fault"], "os.replace")
+        self.assertNotIn("fault", facts_of(o)["trace"][2])
+
+    def test_the_faulted_call_that_replaces_it_tells_a_fragile_product_from_a_tolerant_one(self):
+        # what the refused scenario was meant to measure, through the one step a fault reaches: `save` renames a
+        # temporary file over the target; with that rename failing once, the fragile `save` raises (a refuted step) and
+        # the tolerant `save_quietly` leaves the target absent. The fault fires in both, and the trace says so.
+        gone = {"files": {BOOK: {"absent": True}}}
+        for method, verdict in (("save", R), ("save_quietly", S)):
+            with self.subTest(method=method):
+                scenario = base.book(base.step("fault", fault="os.replace"), base.call(method, "a\n"))
+                o = self.see(base.spec("store.book:Book", scenario, gone))
+                self.assertEqual((o.kind, o.verdict), (K.OBSERVED, verdict), o.detail)
+                entry = facts_of(o)["trace"][2]
+                self.assertEqual((entry["kind"], entry["fault"], entry["fired"]), ("call", "os.replace", True))
 
 
 class NamespacePackageIsInside(_Revision):

@@ -22,8 +22,8 @@ class: UNSUPPORTED -> INVALID_SPEC at admission (`ProbeMetadata.observation_clas
 | `expect_raises` | `args, kwargs, exception, method?, attrs?` | the call raises exactly that type name, every declared attribute equal after JSON serialisation |
 | `write` | `path, (text, newline?) or bytes_hex, append?` | the harness itself writes (or appends to) `<ws>/name`, never through the subject |
 | `edit_jsonl` | `path, line, field, value` | the harness rewrites one JSON line's field (the line re-serialised compactly, its key order kept) |
-| `subprocess` | `argv: ["-m", module, ...], expect_exit?` | one child of the harness: the revision's module run as `__main__` under the same isolation |
-| `fault` | `fault: <id of FAULTS>` | DECISION-2: the next call / expect_raises / subprocess step sees one controlled fault |
+| `subprocess` | `argv: ["-m", module, ...], expect_exit?` | one child of the harness: the revision's module run as `__main__` under the same isolation; an argv string is an operating-system argument, so one holding a NUL gives the spec no class |
+| `fault` | `fault: <id of FAULTS>` | DECISION-2: the next call / expect_raises step sees one controlled fault |
 
 A step that raises where it should not, a missing method, an expect_raises that does not match, a subprocess that does
 not exit as declared, an edit_jsonl on a line that is not a JSON object with that field: the scenario stops there and
@@ -36,8 +36,10 @@ the request. Right before the next step's call the harness replaces that one att
 invocation raises the declared type (later invocations pass through to the original); right after the call, in a
 `finally`, it restores the original and asserts mechanically that the attribute IS the original object again. A
 failed restoration ends the scenario as a harness failure (`{"harness_failure": ...}` -> HARNESS_FAILED, never a
-verdict). A fault not followed by a call, expect_raises or subprocess step is refused at admission. The step's trace
-records the fault and whether it fired.
+verdict). A fault not followed by a call or expect_raises step is refused at admission, a subprocess step included:
+the stand-in is installed in the subject's own process, the step's child is another interpreter that would never see
+it, and the scenario would be judged as if no fault had been declared (UNSUPPORTED -> INVALID_SPEC, never a default
+meaning). The step's trace records the fault and whether it fired.
 
 **Placeholder.** `<ws>` is the only token: a string of a step's args, kwargs or argv that is `<ws>` or starts with
 `<ws>/` gets the workspace's absolute path (`<ws>/x` becomes the workspace path, a `/`, then `x`, on every platform);
@@ -144,8 +146,9 @@ FAULTS = {
     "os.fsync": ("os", "fsync", "OSError"),
     "os.write": ("os", "write", "OSError"),
 }
-#: the steps a fault applies to: exactly the one that follows it
-FAULTED = ("call", "expect_raises", "subprocess")
+#: the steps a fault applies to: exactly the one that follows it, and only one that runs in the subject's own process,
+#: where the stand-in is installed (a subprocess step's child is another interpreter: a fault before it is refused)
+FAULTED = ("call", "expect_raises")
 FILE_SHAPES = ("sha256", "equals_before", "absent", "line_count", "final_byte", "jsonl")
 _ONE = "the one declared scenario (its steps, in order, in one harness process): the domain is that scenario alone"
 #: DECISION-1: what each class measures, under which quantifier, and every (observation facts -> verdict) row
@@ -577,25 +580,6 @@ def files_now():
     return {n: file_fact(n, probes) for n, probes in req["files"].items()}
 def identity(fact):
     return {"absent": True} if fact.get("absent") else {"sha256": fact["sha256"]}
-def guarded(state, call):
-    step = state["fault"]
-    if step is None:
-        return call()
-    module, target, error = step["patch"]
-    owner = importlib.import_module(module)
-    original, kind, fired = getattr(owner, target), getattr(builtins, error), state["fired"]
-    def fault(*args, **kwargs):
-        if fired:
-            return original(*args, **kwargs)
-        fired.append(step["fault"])
-        raise kind("controlled fault " + step["fault"])
-    setattr(owner, target, fault)
-    try:
-        return call()
-    finally:
-        setattr(owner, target, original)
-        if getattr(owner, target) is not original:
-            raise Leak("the fault " + step["fault"] + " was not restored after step " + str(state["i"]))
 def subject_call(step, state, attrs):
     op = {"op": "call", "args": step["args"], "kwargs": step["kwargs"], "attrs": attrs}
     if "method" in step:
@@ -690,8 +674,8 @@ def do_subprocess(step, state):
     os.mkdir(prefix)
     cmd = [req["interpreter"], "-I", "-S", "-B", "-X", "pycache_prefix=" + prefix, "-X", "utf8=1", "-c", req["boot"],
            root] + step["argv"]
-    done = guarded(state, lambda: subprocess.run(cmd, cwd=ws, env=req["env"], stdin=subprocess.DEVNULL,
-                                                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL))
+    done = subprocess.run(cmd, cwd=ws, env=req["env"], stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
+                          stderr=subprocess.DEVNULL)
     want = step.get("expect_exit", 0)
     if done.returncode != want:
         return {"outcome": "refuted:the subprocess exited " + str(done.returncode) + ", not " + str(want),

@@ -101,7 +101,10 @@ class Vocabulary(unittest.TestCase):
                                            "subprocess", "fault"))
         self.assertEqual(set(pe._SHAPES), set(pe.STEPS))
         self.assertEqual(set(MINIMAL), set(pe.STEPS))
-        self.assertEqual(pe.FAULTED, ("call", "expect_raises", "subprocess"))
+        # a fault is a stand-in installed in the subject's own process: only the steps that run there take one. A
+        # subprocess step is a vocabulary kind whose child is another interpreter and never sees it (PM-2)
+        self.assertEqual(pe.FAULTED, ("call", "expect_raises"))
+        self.assertTrue(set(pe.FAULTED) < set(pe.STEPS) and "subprocess" in pe.STEPS)
         for kind, step in MINIMAL.items():
             required, optional = pe.STEPS[kind]
             with self.subTest(kind=kind):
@@ -165,7 +168,7 @@ class Vocabulary(unittest.TestCase):
 
     def test_the_scenario_rules(self):
         ok = [MINIMAL["workspace"], NEW, MINIMAL["fault"], {**CALL, "as": "a"}, MINIMAL["fault"],
-              MINIMAL["expect_raises"], MINIMAL["fault"], MINIMAL["subprocess"], {**CALL, "as": "b"}]
+              MINIMAL["expect_raises"], MINIMAL["subprocess"], {**CALL, "as": "b"}]
         self.assertIs(True, pe._scenario_ok(ok))
         for name, scenario in {
             "empty": [], "not a list": {"0": CALL}, "a bad step": [CALL, {"step": "nope"}],
@@ -174,11 +177,21 @@ class Vocabulary(unittest.TestCase):
             "a trailing fault": [CALL, MINIMAL["fault"]], "a fault before a write": [MINIMAL["fault"], MINIMAL["write"], CALL],
             "a fault before a construct": [MINIMAL["fault"], NEW, CALL],
             "two faults": [MINIMAL["fault"], MINIMAL["fault"], CALL],
+            # PM-2: the child of a subprocess step never sees a stand-in installed in this process
+            "a fault before a subprocess": [MINIMAL["fault"], MINIMAL["subprocess"], CALL],
+            "a fault before a subprocess, after a faulted call": [MINIMAL["fault"], CALL, MINIMAL["fault"],
+                                                                  MINIMAL["subprocess"]],
         }.items():
             with self.subTest(case=name):
                 self.assertIs(False, pe._scenario_ok(scenario))
         for kind in pe.FAULTED:
             self.assertIs(True, pe._scenario_ok([MINIMAL["fault"], MINIMAL[kind]]))
+        for kind in sorted(set(pe.STEPS) - set(pe.FAULTED)):   # a fault applies to those two and to no other kind
+            with self.subTest(fault_before=kind):
+                self.assertIs(False, pe._scenario_ok([MINIMAL["fault"], MINIMAL[kind], CALL]))
+        # and the admission answer follows: such a scenario has no class, the same one without the fault has
+        self.assertIsNone(cls_of([NEW, MINIMAL["fault"], MINIMAL["subprocess"], CALL], {"returns": 0}))
+        self.assertEqual(cls_of([NEW, MINIMAL["subprocess"], CALL], {"returns": 0}), "scenario_returns")
         self.assertIs(True, pe._scenario_ok([MINIMAL["workspace"]]))
 
     def test_the_observation_classes(self):
