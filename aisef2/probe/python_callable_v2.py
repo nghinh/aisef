@@ -217,14 +217,23 @@ def _substituted(value, ws: str):
 
 def _unsubstituted(value, ws: str):
     """The harness's facts (parsed JSON: dicts, lists) with every occurrence of the workspace path in a string
-    replaced back by `<ws>`."""
-    if isinstance(value, str):
-        return value.replace(ws, PLACEHOLDER)
-    if isinstance(value, dict):
-        return {k: _unsubstituted(v, ws) for k, v in value.items()}
-    if isinstance(value, list):
-        return [_unsubstituted(v, ws) for v in value]
-    return value
+    replaced back by `<ws>`. Walked with a stack of its own: a value the subject returned or raised is the subject's,
+    nested as deep as it likes, and a recursive walk of it is a `RecursionError` out of the probe, no verdict."""
+    top = [None]
+    todo = [(value, top, 0)]
+    while todo:
+        node, into, at = todo.pop()
+        if isinstance(node, str):
+            into[at] = node.replace(ws, PLACEHOLDER)
+        elif isinstance(node, dict):
+            into[at] = copy = dict.fromkeys(node)      # the keys in their order; the values are filled in below
+            todo.extend((v, copy, k) for k, v in node.items())
+        elif isinstance(node, list):
+            into[at] = copy = [None] * len(node)
+            todo.extend((v, copy, i) for i, v in enumerate(node))
+        else:
+            into[at] = node
+    return top[0]
 
 
 def _write_workspace(ws: str, workspace) -> None:

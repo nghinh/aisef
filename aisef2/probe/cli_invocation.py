@@ -326,8 +326,10 @@ def _equality_ok(eq) -> bool:
 
 
 def _streams_ok(streams) -> bool:
-    return isinstance(streams, list) and bool(streams) and len(set(streams)) == len(streams) \
-        and set(streams) <= {"stdout", "stderr"}
+    # names first: a set is built of the entries, and a list or a dict in it is unhashable — a TypeError out of a
+    # classifier whose answer is a class or None, for a reproducer a model wrote
+    return isinstance(streams, list) and bool(streams) and all(isinstance(s, str) for s in streams) \
+        and len(set(streams)) == len(streams) and set(streams) <= {"stdout", "stderr"}
 
 
 def observation_class(observable, stimulus) -> str | None:
