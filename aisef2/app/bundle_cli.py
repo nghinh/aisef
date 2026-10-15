@@ -67,6 +67,7 @@ import sys
 from typing import Mapping
 
 from aisef2.app import bundle as B
+from aisef2.app import lineage
 from aisef2.arch.enums import ObligationRole, Polarity, SubjectAbsence, SubjectKind
 from aisef2.plan.obligation import EXPECTED_AT_PARENT, NOT_PREREGISTERED, Plan, PlanObligation
 from aisef2.probe import catalog
@@ -447,7 +448,6 @@ def _record(run_dir: pathlib.Path) -> tuple[dict, bool]:
     is there and cannot be read is not: it is refused (`EVIDENCE_UNREADABLE`), never demoted to the weaker record —
     which binds no journal digest. One that is not text is damage (the kernel writes ASCII; a kill cuts, never garbles):
     `EVIDENCE_MALFORMED`, never a record that "does not parse"."""
-    from aisef2.app import lineage
     from aisef2.app import run as R
     cut = []
     for name, recorded in (("RUN.json", True), (R.STARTED, False)):
@@ -484,7 +484,6 @@ def _record(run_dir: pathlib.Path) -> tuple[dict, bool]:
 def _authentic(run_dir: pathlib.Path, expect: str) -> None:
     """`--verify`'s `--expect-anchor`, applied to a continuation: the anchor of the manifest the run wrote is the one the
     operator kept outside the run directory, and the manifest is what the directory holds."""
-    from aisef2.app import lineage
     from aisef2.app import run as R
     try:
         stored = json.loads((run_dir / R.MANIFEST).read_text(encoding="utf-8"))
@@ -569,7 +568,6 @@ def continue_from(data: Mapping, run_dir: pathlib.Path, *, leave_out_unidentifie
     on main nothing identifies is refused unless `leave_out_unidentified` (the report names it either way).
     `expect_anchor`: the evidence anchor the run printed (as `--verify --expect-anchor`), checked before anything of
     the run is read."""
-    from aisef2.app import lineage
     from aisef2.app import run as R
     project = B.load(data)
     try:

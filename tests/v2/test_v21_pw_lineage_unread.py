@@ -33,7 +33,6 @@ import io
 import json
 import os
 import pathlib
-import shutil
 import socket
 import subprocess
 import sys
@@ -374,11 +373,11 @@ class TheOperatorSeesARefusalNotATraceback(Lineage):
         self.settings.write_text(json.dumps(SETTINGS), encoding="utf-8")
         (self.pred / lineage.STARTED).write_text("{}\n", encoding="utf-8")
 
-    def run_cli(self, name: str, *extra: str) -> tuple[int, str]:
+    def run_cli(self, name: str, *extra: str, parent: pathlib.Path | None = None) -> tuple[int, str]:
         err = io.StringIO()
         with contextlib.redirect_stderr(err), contextlib.redirect_stdout(io.StringIO()):
             code = cli.run(["--project", str(self.bundle), "--settings", str(self.settings), "--repo", str(self.source),
-                            "--out", str(self.root / name), "--parent", str(self.pred), *extra])
+                            "--out", str(self.root / name), "--parent", str(parent or self.pred), *extra])
         return code, err.getvalue()
 
     @POSIX_USER
@@ -420,8 +419,7 @@ class TheOperatorSeesARefusalNotATraceback(Lineage):
 
     def test_a_predecessor_that_is_not_there_keeps_its_own_refusal(self):
         """Absence is not a read error: the refusal it always had, and no claim anywhere."""
-        shutil.rmtree(self.pred)
-        code, err = self.run_cli("out-absent")
+        code, err = self.run_cli("out-absent", parent=self.root / "never-made")
         self.assertEqual(code, 2, err)
         self.assertIn("no run record there", err)
         self.assertNotIn("PermissionError", err)

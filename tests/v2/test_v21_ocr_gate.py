@@ -23,7 +23,6 @@ import hashlib
 import json
 import os
 import pathlib
-import shutil
 import sys
 import tempfile
 import types
@@ -178,10 +177,7 @@ class Gate(unittest.TestCase):
         for policy in ("advisory", "fix-loop"):
             for name in REFUSED:
                 with self.subTest(policy=policy, answer=name):
-                    for stale in self.bin.glob("call-*.json"):
-                        stale.unlink()
-                    for leftover in (self.logs, self.logs.parent / "review"):     # a review that ran leaves these
-                        shutil.rmtree(leftover, ignore_errors=True)
+                    before = len(self.calls())           # what earlier answers left is not this one's: counted, not removed
                     self.answer(name)
                     # a shorter bound only for the binary that never answers (long enough for the script to start and
                     # record itself); every other answer gets the real one, so a slow interpreter start under load
@@ -193,7 +189,8 @@ class Gate(unittest.TestCase):
                     said = str(cm.exception)
                     for word in REFUSED[name]:
                         self.assertIn(word, said)
-                    self.assertEqual([c["argv"] for c in self.calls()], [["version"]], "only the version question ran")
+                    self.assertEqual([c["argv"] for c in self.calls()[before:]], [["version"]],
+                                     "only the version question ran")
                     self.assertEqual(list(self.logs.glob("*")) if self.logs.exists() else [], [], "no stream was opened")
                     self.assertFalse((self.logs.parent / "review").exists(), "no review work directory was made")
 

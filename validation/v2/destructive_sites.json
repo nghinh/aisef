@@ -501,6 +501,26 @@
    "authority_source": "TEST_CREATED_PATH",
    "justification": "d = project(files): the candidate tree one end-to-end adequacy assembly starts from",
    "enforcement": "static: bound from project(), a module helper that creates the directory with mkdtemp("
+  },
+  {
+   "path": "tests/v2/test_v21_pw_lineage_continue.py",
+   "scope": "TheJournalCannotBeRead.test_a_journal_the_record_names_that_is_not_there",
+   "callable": "(run / JOURNAL).unlink",
+   "target": "run / JOURNAL",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "the journal file of a run directory the test itself built in a temporary directory (the test removes it to show the refusal)",
+   "enforcement": "static: run is bound to self.run_dir(...), a helper of the class that creates the directory under tempfile"
+  },
+  {
+   "path": "tests/v2/test_v21_pw_lineage_continue.py",
+   "scope": "TheRecordItself.test_no_run_record_is_told_apart_missing_from_cut",
+   "callable": "(nothing / R.STARTED).unlink",
+   "target": "nothing / R.STARTED",
+   "target_kind": "path",
+   "authority_source": "TEST_CREATED_PATH",
+   "justification": "the RUN.started.json of a run directory the test itself built in a temporary directory",
+   "enforcement": "static: nothing is bound to self.run_dir(...), a helper of the class that creates the directory under tempfile"
   }
  ]
 }
