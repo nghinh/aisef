@@ -72,6 +72,9 @@ Limits — what a result recorded here is not (also in the output, `limits`):
     -I, -E or -S. A test that builds its own `env=` starts a child this recorder cannot see (`children.unhooked_python`),
     and so does a child of one. A child launched by something that raises no `subprocess.Popen` / `os.posix_spawn` /
     `os.spawn` / `os.system` audit event (`_posixsubprocess` called directly, multiprocessing's spawn) is not counted.
+    One launch is one child: the os.posix_spawn that subprocess.Popen itself makes (Linux with glibc's
+    POSIX_SPAWN_CLOSEFROM; macOS with close_fds=False) follows Popen's own event and is not counted again; a direct
+    os.posix_spawn of the traced code is (told by its caller `Popen._posix_spawn`, not by its arguments).
   * C-level calls, and code with no file of the tree (exec/compile, dataclass-generated methods): not matched.
   * A hit is lost when the process has no free file descriptor at that moment (retried at the next call).
   * What "executed" says: the function's code object started. Not a line, a branch, or that its result was used.
@@ -377,7 +380,20 @@ def _has_hook(env):
     return False
 
 
+def _of_popen():
+    """True when the os.posix_spawn being audited is the one subprocess.Popen makes itself: its caller is
+    `Popen._posix_spawn`, which only `Popen._execute_child` calls, and that raised its own `subprocess.Popen` event for
+    this launch just before. One child, two events: the second is not another launch."""
+    f, own = sys._getframe(1), _of_popen.__code__.co_filename
+    while f is not None and f.f_code.co_filename == own:   # this hook's own frames
+        f = f.f_back
+    spawn = getattr(getattr(sys.modules.get("subprocess"), "Popen", None), "_posix_spawn", None)
+    return f is not None and spawn is not None and f.f_code is getattr(spawn, "__code__", None)
+
+
 def _launch(event, a):
+    if event == "os.posix_spawn" and _of_popen():
+        return
     py = hooked = 0
     words = ""
     if event != "os.system":

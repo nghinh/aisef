@@ -441,5 +441,54 @@ class Recorder(unittest.TestCase):
         self.assertEqual(e.exception.code, 2)
 
 
+@unittest.skipUnless(POSIX and MONITORING, "the hook is sys.monitoring (3.12+); the launches are real processes")
+class Launches(unittest.TestCase):
+    """One child process is one launch (V2.1 fix window, owner decision of 2026-10-15, item 6; the same test as
+    tests/v2/test_v21_read_set.py::Launches, for this tool's own copy of the hook). subprocess.Popen raises its own
+    event and may make an os.posix_spawn of its own (Linux with glibc's POSIX_SPAWN_CLOSEFROM; macOS with
+    close_fds=False): the same child. The traced code reports the pid of every process it really started and the record
+    must hold one launch per pid; a direct os.posix_spawn is a launch of its own."""
+
+    CHILD = textwrap.dedent("""
+        import json, os, subprocess, sys
+        sh, started, via = "/bin/sh", [], []
+        def spy(event, a):
+            if event == "os.posix_spawn":
+                via.append(sys._getframe(1).f_code.co_name)   # the function that called os.posix_spawn
+        sys.addaudithook(spy)
+        for kw in ({}, {"close_fds": False}):   # posix_spawn on Linux / fork_exec on macOS; posix_spawn on both
+            p = subprocess.Popen([sh, "-c", "true"], **kw)
+            p.wait()
+            started.append([p.pid, False])
+        p = subprocess.Popen([sys.executable, "-I", "-c", "pass"], close_fds=False)   # Python that will not load the hook
+        p.wait()
+        started.append([p.pid, True])
+        pid = os.posix_spawn(sh, [sh, "-c", "true"], os.environ)   # the traced code's own, no Popen behind it
+        os.waitpid(pid, 0)
+        started.append([pid, False])
+        print(json.dumps({"started": started, "via": via}))
+        """)
+
+    def test_a_popen_that_posix_spawns_is_one_launch_and_a_direct_posix_spawn_is_another(self):
+        with tempfile.TemporaryDirectory() as t:
+            base = pathlib.Path(t)
+            tree, events, hook = base / "tree", base / "ev", base / "hook"
+            for d in (tree, events, hook):
+                d.mkdir()
+            (hook / "sitecustomize.py").write_text(R.hook_source(events, tree, {}), encoding="utf-8")
+            env = {"PATH": os.environ.get("PATH", ""), "PYTHONPATH": str(hook)}
+            r = subprocess.run([sys.executable, "-c", self.CHILD], cwd=tree, env=env, capture_output=True, text=True,
+                               encoding="utf-8")
+            self.assertEqual((r.returncode, r.stderr), (0, ""))
+            out, got = json.loads(r.stdout), R.merge(events)
+        pids = [p for p, _ in out["started"]]
+        python = [p for p, py in out["started"] if py]
+        self.assertEqual(len(set(pids)), 4)
+        self.assertGreaterEqual(out["via"].count("_posix_spawn"), 2)   # close_fds=False twice: the path really was taken
+        self.assertEqual(out["via"].count("<module>"), 1)              # and one call is the traced code's own
+        self.assertEqual(got["children"], {"hooked": 0, "unhooked_python": len(python),
+                                           "other": len(pids) - len(python)})
+
+
 if __name__ == "__main__":
     unittest.main()
