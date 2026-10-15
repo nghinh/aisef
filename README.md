@@ -42,7 +42,10 @@ pip install aisef==2.0.0
    - **ProductProof** — harness-owned probes (a Python callable, a CLI invocation, a process effect, a file artifact)
      check each behaviour contract against the candidate. Candidate code runs only in the probe's agent process; the
      verdict comes from a controller that never imports it, over an authenticated channel, so within an evaluation
-     the code under test cannot manufacture a passing result (one known gap across evaluations, below).
+     the code under test cannot write the verdict or its channel (one known gap across evaluations, below). It can
+     still misreport itself — its exit code, its returned value — so a candidate written to do that, or one that
+     recognises it is being probed, can turn a broken product into a SATISFIED result (the probe's passing behaviour
+     verdict): the guarantee is about the channel, not about the value a subject reports.
    - **Engineering test adequacy** — the developer's tests must run, must not be vacuous, and must be relevant; they
      are evidence of engineering quality, never of product correctness. When vacuity cannot be decided the result is
      INCOMPLETE, which never blocks.

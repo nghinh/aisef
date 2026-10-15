@@ -110,8 +110,11 @@ nào bị từ chối; **NOT_REACHED** khi không story nào tới được cổ
 
 Khẳng định: điều phối và kiểm chứng sản phẩm tất định, gắn với bằng chứng. Trong một phép chứng minh, mã candidate
 (thứ developer viết) chỉ chạy trong tiến trình agent của probe; kết luận do một controller không bao giờ import nó đưa
-ra, qua một kênh đã xác thực, nên trong một lần đánh giá candidate không thể tự chế ra kết quả probe (lỗ giữa các lần
-đánh giá được nêu ở Giới hạn đã biết). Bằng chứng thô của lần chạy được giữ nguyên.
+ra, qua một kênh đã xác thực, nên trong một lần đánh giá candidate không thể ghi kết luận hay kênh của nó (lỗ giữa các
+lần đánh giá được nêu ở Giới hạn đã biết). Nhưng nó vẫn khai sai được về chính nó — mã thoát, giá trị trả về — nên một
+candidate viết ra để làm vậy, hoặc nhận ra mình đang bị probe, có thể làm một sản phẩm hỏng ra kết quả SATISFIED (kết
+luận hành vi đạt của probe): bảo đảm nằm ở kênh, không nằm ở giá trị mà mã đang bị kiểm khai. Bằng chứng thô của lần
+chạy được giữ nguyên.
 
 Mô hình đe doạ: người vận hành đáng tin; mã sinh ra có thể sai hoặc "lách". Không khẳng định: tổng quát hoá cho mọi
 loại workload, vượt trội so với V1, chất lượng model, cô lập đa người thuê có tính thù địch, cô lập hoàn toàn trước
