@@ -1000,14 +1000,12 @@ for _t, _fs in {**_V21_R3_RANGE_APPEND, **_V21_R3_APPEND}.items():
 # The kill sets are the lanes' proposals by which test calls the function, so far as said above; none is measured yet.
 _T = "tests/v2/test_v21_"
 _PM8_RUN = [_T + "pm8_diagnostics_run.py"]
-#: tests/v2/test_v21_pm8_diagnostics.py is the unit file of aisef2/app/diagnostics.py and is NOT a kill file yet: its
-#: test `test_what_verify_reaches_never_writes_or_names_the_sink` imports validation.qualification.authority_limits
-#: with no `skipUnless` guard (test_c2_orchestration_conformance and test_c2_k_nowork_001 guard theirs: "validation/
-#: qualification is not in this tree (the mutation runner's copy)"), and the copy holds no validation/qualification,
-#: so on the unmutated tree the file fails (T0) and every target that names it errors. Once that test is guarded, set
-#: this to [_T + "pm8_diagnostics.py"]: it goes first among the pm8 files of every kill set below (after any file
-#: another lane gave the name).
-_PM8_UNIT: list[str] = []
+#: tests/v2/test_v21_pm8_diagnostics.py is the unit file of aisef2/app/diagnostics.py. Its one test that imports
+#: validation.qualification.authority_limits is guarded as test_c2_orchestration_conformance and test_c2_k_nowork_001 guard
+#: theirs ("validation/qualification is not in this tree (the mutation runner's copy)": the suite runs it, the copy skips
+#: it), so on the unmutated copy the file passes (T0) and it is a kill file. It goes first among the pm8 files of every
+#: kill set below (after any file another lane gave the name).
+_PM8_UNIT: list[str] = [_T + "pm8_diagnostics.py"]
 _PM8 = [*_PM8_UNIT, *_PM8_RUN]
 _FA = "aisef2/probe/file_artifact.py::"
 _V21_R5_NEW: dict[str, list[str]] = {

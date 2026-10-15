@@ -795,6 +795,8 @@ class NothingDecidesFromIt(unittest.TestCase):
         self.assertEqual({m.name for m in sink.body if isinstance(m, ast.FunctionDef) and not m.name.startswith("_")},
                          {"note", "entries", "report"})
 
+    @unittest.skipUnless((ROOT / "validation/qualification/authority_limits.py").exists(),
+                         "validation/qualification is not in this tree (the mutation runner's copy); the suite runs it")
     def test_what_verify_reaches_never_writes_or_names_the_sink(self):
         from validation.qualification import authority_limits as al
         self.assertEqual(al.check(), [])
