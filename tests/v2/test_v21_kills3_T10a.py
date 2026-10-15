@@ -41,6 +41,9 @@ VERSION = "v1.12.12"       # the pinned OCR version (app/review_ocr.OCR): a mani
 #: What it wrote it also keeps beside itself (wrote-*.json), so a test compares the stream with the file OCR wrote.
 FINDER = r'''import hashlib, json, pathlib, subprocess, sys, time
 argv = sys.argv[1:]
+if argv == ["version"]:      # the identity gate asks before any review command
+    print("open-code-review v1.12.12 (182898c) darwin/arm64")
+    raise SystemExit(0)
 here = pathlib.Path(__file__).parent
 sc = json.loads((here / "scenario.json").read_text(encoding="utf-8"))
 def opt(name):

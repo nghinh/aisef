@@ -45,6 +45,9 @@ TOKEN = "ocr-token-5d0c77e1aa"
 #: stderr in its preview and in its review (what a finder that logs its environment or its prompt does)
 FAKE_OCR = r'''import hashlib, json, pathlib, subprocess, sys
 argv = sys.argv[1:]
+if argv == ["version"]:      # the identity gate asks before any review command
+    print("open-code-review v1.12.12 (182898c) darwin/arm64")
+    raise SystemExit(0)
 here = pathlib.Path(__file__).parent
 sc = json.loads((here / "scenario.json").read_text(encoding="utf-8"))
 def opt(name):

@@ -168,7 +168,8 @@ class ConfinementRefusal(Fixture):
 #: test_v21_review_chain's finder (no findings: the candidate is committed)
 DUMP_ENVIRONMENT = (
     "import json as _j, os as _o, pathlib as _p, sys as _s\n"
-    "_p.Path(__file__).with_name('env-' + ('preview' if '--preview' in _s.argv else 'review') + '.json')"
+    "_p.Path(__file__).with_name('env-' + ('version' if _s.argv[1:] == ['version'] else 'preview' if '--preview' in _s.argv "
+    "else 'review') + '.json')"
     ".write_text(_j.dumps(dict(_o.environ)), encoding='utf-8')\n")
 OPERATOR_SECRET = "operator-value-0123456789"
 UNLISTED = "AISEF_TEST_UNLISTED_VARIABLE"      # an operator variable the settings do not name

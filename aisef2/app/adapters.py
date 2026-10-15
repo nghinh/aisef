@@ -15,6 +15,7 @@ import pathlib
 import re
 import shutil
 import sys
+import tempfile
 import time
 
 from aisef2.app import client, feedback, review_ocr, review_verify
@@ -24,7 +25,7 @@ from aisef2.journal.format2 import OperationOutcome as O
 from aisef2.orchestrate.adapters import CapabilityUnrunnable, Finding, Implemented, ProviderOutage, Reviewed, Scanned
 from aisef2.orchestrate.workspace import _ISOLATED_GIT as ISOLATED_GIT
 from aisef2.orchestrate.workspace import commit_all, git
-from aisef2.runtime.process_range import ProcessRange
+from aisef2.runtime.process_range import ProcessRange, RangeError
 
 REVIEW_PROMPT = ("Review the implementation of story {story} of {name} in this read-only checkout against {requirements} "
                  "and these clauses:\n{clauses}\nDo not modify any file. Answer with ONLY one JSON object: "
@@ -176,10 +177,14 @@ class Reviewer:
         return ([f for f in found if isinstance(f, dict)] if isinstance(found, list) else []), s, None
 
     def _ocr(self, scope, attempt: int, head: str) -> tuple[list, dict, str]:
-        """Open Code Review on exactly the story's change (app/review_ocr): the controller's scope, its pinned binary,
-        its environment and HOME, a preview then the review, one session stream the budget and the evidence read."""
+        """Open Code Review on exactly the story's change (app/review_ocr): the controller's scope, its pinned binary
+        (the bytes, then what it declares, both before any review command), its environment and HOME, a preview then
+        the review, one session stream the budget and the evidence read."""
         pin = self.review_policy["ocr"]
         why = review_ocr.pinned(pin["exe"], pin["sha256"])
+        if why:
+            raise CapabilityUnrunnable(why)
+        declared, why = _declared(pin["exe"], review_ocr.VERSION_TIMEOUT_S)     # before any review command, its own bound
         if why:
             raise CapabilityUnrunnable(why)
         story = scope.story_id
@@ -251,7 +256,9 @@ class Reviewer:
              "text": seen["text"], "turns": seen["turns"], "tokens": seen["tokens"],
              "seconds": round(time.monotonic() - started, 1), "log": log.name, "redacted": redacted,
              "story_id": story, "attempt": attempt, "role": "reviewer", "finder": f"ocr {review_ocr.OCR['version']}",
-             "required": required, "deleted": sorted(p for k, p in mine if k == "D")}
+             "required": required, "deleted": sorted(p for k, p in mine if k == "D"),
+             "identity": {"sha256_checked": pin["sha256"], "declared": declared,
+                          "declared_by": "the binary's own `version` output: a self-declaration, not build evidence"}}
         self.sessions.append(s)
         cov = review_ocr.coverage(output, -1 if code is None else code, required=required, base=base, head=head,
                                   preview=preview)
@@ -302,6 +309,22 @@ def _unchanged(root: str, head: str, before: dict, during: str) -> None:
     if after != before:
         diff = sorted(k for k in set(before) | set(after) if before.get(k) != after.get(k))
         raise CapabilityUnrunnable(f"the reviewed checkout changed during {during}: {diff[:10]} (every finding discarded)")
+
+
+def _declared(exe: str, timeout_s: float) -> tuple[dict | None, str | None]:
+    """What `exe` says it is (app/review_ocr.declared), asked once before any review command, in a clean environment:
+    nothing inherited, an empty HOME that is its working directory, no repository and no model route."""
+    with tempfile.TemporaryDirectory(prefix="aisef-ocr-version-") as d:
+        home = pathlib.Path(d, "home")
+        home.mkdir()
+        out = pathlib.Path(d, "version.out")
+        try:
+            code = _bounded(review_ocr.version_argv(exe), str(home), review_ocr.version_environment(home, os.environ),
+                            out, timeout_s, "ocr version")
+        except (OSError, RangeError) as e:      # not executable, or the range could not start it
+            return None, f"{exe}: `version` could not be started ({type(e).__name__})"
+        text = out.read_bytes()[:4096].decode("utf-8", "replace")
+    return review_ocr.declared(exe, code, text)
 
 
 def _bounded(argv: list[str], cwd: str, env: dict, out: pathlib.Path, timeout_s: float, name: str) -> int | None:

@@ -61,6 +61,9 @@ ENDPOINT = "https://provider.invalid/v1"
 #: argv, environment, the rule's content, HOME's state; and, beside it, the message it printed.
 FAKE_OCR = r'''import hashlib, json, os, pathlib, subprocess, sys
 argv = sys.argv[1:]
+if argv == ["version"]:      # the identity gate asks before any review command
+    print("open-code-review v1.12.12 (182898c) darwin/arm64")
+    raise SystemExit(0)
 here = pathlib.Path(__file__).parent
 def opt(name):
     return argv[argv.index(name) + 1]

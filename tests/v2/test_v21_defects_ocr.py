@@ -35,12 +35,20 @@ CHANGED = ("app/cli.py", "app/util.py")
 SEPARATED = (("app/a\u0085b.py", "app/a"), ("app/c d.py", "app/c"), ("app/e f.py", "app/e"))
 
 
+#: what the pinned build prints for `version` (app/review_ocr.VERSION_LINE): the identity gate asks it first
+VERSION_REPLY = f"open-code-review {review_ocr.OCR['version']} ({review_ocr.OCR['commit'][:7]}) darwin/arm64\n"
+
+
 class _Process:
-    def __init__(self, finder: "_Finder", argv: list[str]) -> None:
-        self.finder, self.argv = finder, argv
+    def __init__(self, finder: "_Finder", argv: list[str], output=None) -> None:
+        self.finder, self.argv, self.output = finder, argv, output
         self.preview = "--preview" in argv
 
     def start(self) -> "_Process":
+        if self.argv[1:] == ["version"]:      # the identity gate, before any review command: not a review
+            self.output.write(VERSION_REPLY)
+            self.output.flush()
+            return self
         opt = lambda flag: self.argv[self.argv.index(flag) + 1]    # noqa: E731
         base, head, out = opt("--from"), opt("--to"), pathlib.Path(opt("--output"))
         done = [{"item_id": review_ocr.item_id("range", p, p), "path": p} for p in self.finder.completed]
@@ -71,7 +79,7 @@ class _Finder:
         self.completed = tuple(completed)
 
     def __call__(self, name, argv, *, cwd=None, env=None, output=None) -> _Process:
-        return _Process(self, [str(a) for a in argv])
+        return _Process(self, [str(a) for a in argv], output)
 
 
 class OneNameStatusRowIsOneRow(unittest.TestCase):

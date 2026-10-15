@@ -20,7 +20,9 @@ What this module decides, and what it leaves to OCR:
   default or user exclusion, a secret, a provider directory — is a gap: INDETERMINATE.
 * **The process is AISEF's.** The argv and environment are built here: an isolated HOME holding only a config this module
   writes, every OCR_/ANTHROPIC_/OTEL_ variable scrubbed, OCR_NO_UPDATE=1, a fresh --output file read instead of stdout,
-  the binary by absolute path with its sha256 checked against the operator's pin before it runs.
+  the binary by absolute path with its sha256 checked against the operator's pin before it runs, and what it says it is
+  (`version`: version and commit) compared with `OCR` — also before any review command (`declared`). The sha256 is the
+  identity of the bytes; the printed version is the binary's own word, never evidence of how it was built.
 
 Code facts cite the upstream source at 182898c (research record: docs/v2.1/UPSTREAM-RESEARCH.md). Exercised against the
 real binary built from that commit (tests/v2/test_v21_review_chain.py RealBinary: `--preview`, and a full review whose
@@ -48,6 +50,11 @@ COMPLETE, INDETERMINATE = "COMPLETE", "INDETERMINATE"
 #: preview exclusions that mean "this finder cannot read the file" rather than "it chose not to"
 NOT_REVIEWABLE = ("unsupported_ext", "binary")
 REPRODUCER_FENCE = re.compile(r"```aisef-reproducer\s*\n(\{.*?\})\s*\n```", re.S)
+#: `<exe> version` is run once before any review command and given this long: a build answers at once
+VERSION_TIMEOUT_S = 15.0
+#: its first line, as the pinned build prints it (measured; the commit is the short form): `open-code-review v1.12.12
+#: (182898c) darwin/arm64`. Any other first line is not a version line.
+VERSION_LINE = re.compile(r"open-code-review (\S+) \((\S+)\) (\S+)")
 
 
 def item_id(mode: str, old_path: str, new_path: str) -> str:
@@ -207,6 +214,42 @@ def pinned(exe: str, sha256: str) -> str | None:
     except OSError as e:
         return f"{exe}: cannot be read ({type(e).__name__})"
     return None if have == sha256 else f"{exe}: sha256 {have[:12]}, not the pinned {sha256[:12]}"
+
+
+def version_argv(exe: str) -> list[str]:
+    """`<exe> version`: no repository, no route, no flag."""
+    return [exe, "version"]
+
+
+def version_environment(home: pathlib.Path | str, base: Mapping[str, str]) -> dict[str, str]:
+    """The environment `version` runs in: nothing inherited (as `env -i`) but SYSTEMROOT where `base` has one (Windows
+    starts no process without it), a minimal PATH, an empty HOME, no self-update."""
+    env = {"PATH": "/usr/bin:/bin", "HOME": str(home), "USERPROFILE": str(home), "OCR_NO_UPDATE": "1"}
+    return env | ({"SYSTEMROOT": base["SYSTEMROOT"]} if "SYSTEMROOT" in base else {})
+
+
+def declared(exe: str, code: int | None, text: str) -> tuple[dict | None, str | None]:
+    """(what the binary says it is, why it may not run), from `<exe> version`'s exit status (None: it did not answer in
+    time) and its output. Its first line must be a version line whose version is `OCR["version"]` and whose commit —
+    printed short — is a prefix of `OCR["commit"]`; a mismatch names both. This is a SELF-DECLARATION: a binary prints
+    what it was built or edited to print. The bytes are the pin's (`pinned`), and nothing here attests how they were
+    built."""
+    if code is None:
+        return None, f"{exe}: `version` did not answer in time"
+    if code != 0:
+        return None, f"{exe}: `version` exited {code}"
+    # split at "\n" only: str.splitlines() also breaks at \v \f \x1c-\x1e \x85 \u2028 \u2029, and what followed such a
+    # break was never read — a longer physical line would have been taken for the version line
+    first = next((ln.strip() for ln in text.split("\n") if ln.strip()), "")
+    m = VERSION_LINE.fullmatch(first)
+    if m is None:
+        return None, f"{exe}: `version` printed no version line (first line {first[:80]!r})"
+    seen = {"version": m[1], "commit": m[2], "platform": m[3][:40], "line": first[:200]}
+    # version and commit are kept whole (they are compared); what is named or recorded is cut: it goes to the journal
+    if seen["version"] != OCR["version"] or len(seen["commit"]) < 7 or not OCR["commit"].startswith(seen["commit"]):
+        return seen, (f"{exe}: declares itself {seen['version'][:40]} ({seen['commit'][:40]}), not the pinned "
+                      f"{OCR['version']} ({OCR['commit'][:7]}): no review command was run")
+    return seen, None
 
 
 def read_output(path: pathlib.Path) -> dict | None:

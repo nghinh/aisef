@@ -30,6 +30,7 @@ if str(ROOT) not in sys.path:
 
 from aisef2.app import adapters as ad  # noqa: E402
 from aisef2.orchestrate.adapters import CapabilityUnrunnable  # noqa: E402
+from tests.v2.test_v21_defects_ocr import _Finder  # noqa: E402  (the OCR stand-in: it answers `version`, the gate before the diff)
 
 #: the story's parent and the candidate: well-formed revisions with different, recognisable first characters
 PARENT = "a1b2c3d4e5f6" + "0" * 28
@@ -68,7 +69,8 @@ class ARowOfAnotherShapeIsRefusedWithItsRangeItsCauseAndItsFields(unittest.TestC
 
     def refusal(self, listing: str) -> str:
         done = subprocess.CompletedProcess([], 0, listing, "")
-        with mock.patch.object(ad, "git", return_value=done), self.assertRaises(CapabilityUnrunnable) as cm:
+        with mock.patch.object(ad, "git", return_value=done), mock.patch.object(ad, "ProcessRange", _Finder(())), \
+                self.assertRaises(CapabilityUnrunnable) as cm:
             self.reviewer._ocr(types.SimpleNamespace(story_id="S1", root=self.root), 1, HEAD)
         return str(cm.exception)
 
