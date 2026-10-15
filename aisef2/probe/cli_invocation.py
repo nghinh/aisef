@@ -6,6 +6,9 @@ called with the argv list; its return value is its exit status, as `sys.exit(mai
 is located with the import system's path finder against the revision checkout (its root and, if present, `src/`)
 without executing anything; a module that does not resolve, or resolves only outside the checkout, is absent *at this
 revision*. A console-script name is never accepted: it resolves through the environment, not the revision.
+A directory without `__init__.py` is a namespace package like any other, at every depth: each component of the
+dotted name is looked up by its own name within its parent's locations, so a module below one is located as the
+import system locates it, never an environment failure.
 
 **Stimulus.** `{"argv": [...], "stdin": null | {"text", "newline"} | {"bytes_hex"}, "workspace": {name: content},
 "pre": [{"argv": [...]}, ...]}`. Workspace files are written byte-exactly into the subject's workspace before any
@@ -760,7 +763,10 @@ def inside(spec):
 def resolve(dotted, search):
     parts, spec, path = dotted.split("."), None, search
     for i in range(len(parts)):
-        spec = PathFinder.find_spec(".".join(parts[:i + 1]), path)
+        # a finder looks a component up by its own name within the parent's locations: the dotted name would make an
+        # implicit namespace portion read sys.modules[parent].__path__, which this process (it never imports the
+        # subject) does not hold
+        spec = PathFinder.find_spec(parts[i], path)
         if spec is None:
             return None
         path = spec.submodule_search_locations
@@ -803,7 +809,7 @@ def main():
     if spec is None and PathFinder.find_spec(name.split(".")[0], SEARCH) is None:
         spec = resolve(name, None)   # the revision is not on this process's path: where else the name resolves
     if attr == "__main__" and spec is not None and spec.submodule_search_locations is not None:
-        spec = PathFinder.find_spec(name + ".__main__", spec.submodule_search_locations)
+        spec = PathFinder.find_spec("__main__", spec.submodule_search_locations)
     if spec is None or not inside(spec):
         return {"subject": "absent", "note": "" if spec is None else "resolves only outside the revision"}
     pre = []

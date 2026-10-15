@@ -5,6 +5,9 @@ with the import system's path finder inside the revision (its root and, if prese
 anything — python_callable's inside() rule, as cli_invocation applies it; a module that does not resolve, resolves
 only outside the checkout, or does not define the name is absent *at this revision*: SUBJECT_ABSENT before any step
 runs. A module that resolves and raises on import is a present subject that does not work: OBSERVED, REFUTED.
+A directory without `__init__.py` is a namespace package like any other, at every depth: each component of the
+dotted name is looked up by its own name within its parent's locations, so a module below one is located as the
+import system locates it, never an environment failure.
 
 **Stimulus.** `{"scenario": [step, ...]}`, every step a mapping whose `"step"` names its kind in the closed vocabulary
 `STEPS` (kind -> required fields, optional fields); each kind's fields have one typed shape (`_SHAPES`, keyed by the
@@ -514,7 +517,10 @@ def inside(spec):
 def resolve(dotted, search):
     parts, spec, path = dotted.split("."), None, search
     for i in range(len(parts)):
-        spec = PathFinder.find_spec(".".join(parts[:i + 1]), path)
+        # a finder looks a component up by its own name within the parent's locations: the dotted name would make an
+        # implicit namespace portion read sys.modules[parent].__path__, which this process (it never imports the
+        # subject) does not hold
+        spec = PathFinder.find_spec(parts[i], path)
         if spec is None:
             return None
         path = spec.submodule_search_locations
