@@ -76,7 +76,9 @@ class Derivation(unittest.TestCase):
                 self.assertTrue(r["change"] and r["backlog"] and r["owner_approval"] and r["requirement"])
         found = {x.split(" ", 2)[1] for x in rp.check() if x.startswith("(d) ")}
         self.assertEqual({r["path"] for r in rows}, {p for p in found if p in R.ROWS})
-        self.assertEqual(found - {r["path"] for r in rows}, {"aisef2/probe/catalog.py"})   # V2.0's B1, unchanged by 2.1
+        # every file the record reports changed has a row: catalog.py too, which V2.0's B1 changed and the 2.1 probe window
+        # changed again (the capability a catalog entry carries: owner item 1 of 2026-10-15), so it is ruled like the others
+        self.assertEqual(found - {r["path"] for r in rows}, set())
 
     def test_each_row_s_behaviour_tests_exist_and_a_missing_one_is_named(self):
         for r in self.rec["conformance"]["rows"]:

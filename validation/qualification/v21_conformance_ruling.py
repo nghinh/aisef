@@ -132,6 +132,21 @@ ROWS = {
                        "retryable), from the typed outcome; §22.1",
         "behaviour_tests": ("tests.v2.test_p6_stages.Workspace.test_checkouts_are_detached_worktrees_at_a_full_sha_moved_and_released_through_git",
                             "tests.v2.test_v21_orchestration.DiffFailure.test_a_diff_git_cannot_produce_is_RESOURCE_ACQUISITION_FAILED")},
+    "aisef2/probe/catalog.py": {
+        "change": "the 2.1 probe window, owner item 1 of 2026-10-15 (`bundle migrate` keeps no approval whose contract a "
+                  "capability change evaluates differently): CatalogEntry carries the probe's capability_version and its "
+                  "CAPABILITY_CHANGES (neither is compared: compare=False), read from the probe module the entry registers. "
+                  "The registrations, active() and registry() are 2.0's",
+        "backlog": "closure-evidence/v2/v2.1/round-5/OWNER-DECISIONS-2026-10-15.md (PM-9) and the owner's decisions of "
+                   "2026-10-15, item 1 (D-PM9-APPROVALS)",
+        "owner_approval": "owner decision 2026-10-15, item 1: \"sua bundle migrate trong cua so nay\" (the change to catalog.py is "
+                          "its mechanism, not a decision of its own)",
+        "requirement": "ARCHITECTURE-EXCEPTION-V2-007 (a spec binds the probe's capability, a change of what a capability "
+                       "observes is a new capability version); the owner's item 1: an approval is not kept for a semantics it "
+                       "did not see",
+        "behaviour_tests": ("tests.v2.test_v21_migrate_semantics.Declarations."
+                            "test_every_probe_of_the_catalog_declares_every_capability_version_above_1",
+                            "tests.v2.test_v21_migrate_semantics.Declarations.test_the_catalog_entry_is_what_the_module_declares")},
     "aisef2/probe/calibration.py": {
         "change": "executing(probe): a ProbeCapabilityCalibration binds the digest of the bytes that ran (EXECUTION_DIGEST); "
                   "calibration_for matches on it, so a byte change admits nothing until it is calibrated again",
@@ -141,22 +156,63 @@ ROWS = {
                             "tests.v2.test_v21_identity.ThreeIdentities.test_calibrations_bound_to_the_bytes_that_run_admit_and_other_bytes_admit_nothing",
                             "tests.v2.test_v21_identity_bytes.ThreeIdentities.test_the_shipped_calibrations_name_every_class_at_the_bytes_that_run_now",
                             "tests.v2.test_v21_identity.ThreeIdentities.test_the_cycle1_probe_keeps_its_one_frozen_digest")},
-    "aisef2/probe/cli_invocation.py": _PROBE,
+    "aisef2/probe/cli_invocation.py": {
+        **_PROBE,
+        "change": _PROBE["change"] + "; the 2.1 probe window (2026-10-15): the subject is located by component name as CPython "
+                  "locates it (PM-1); the harness log is opened inside the guarded step (PM-6); a regex that a spec or a model "
+                  "reviewer supplies is matched in a worker child process under timeouts_s.probe, and a deadline, a launch "
+                  "failure or a crash is UNRUNNABLE, never REFUTED or NOT_REPRODUCED (owner item 4)",
+        "owner_approval": _PROBE["owner_approval"] + "; the 2.1 probe window: owner decisions of 2026-10-15 (PM-1, PM-6 and "
+                          "item 4, ReDoS in the reproducer)",
+        "behaviour_tests": (*_PROBE["behaviour_tests"],
+                            "tests.v2.test_v21_r3_probe_namespace.TheControllersOwnLookup.test_every_layout_is_located_where_cpython_locates_it",
+                            "tests.v2.test_v21_pm6_host_faults.HostFaultInTheEvaluationDirectory."
+                            "test_a_harness_log_that_cannot_be_created_is_an_unrunnable_harness_and_nothing_runs",
+                            "tests.v2.test_v21_r5_regex_worker.SameAnswerAsInProcess.test_every_row")},
     "aisef2/probe/file_artifact.py": {
         "change": "V2-007 (919a271): DIGEST is the capability digest, EXECUTION_DIGEST the bytes. V21-37 (06d4e62): the class "
-                  "python_imports (imports counted by syntax, never by a line regex), CAPABILITY_VERSION 2",
+                  "python_imports (imports counted by syntax, never by a line regex), CAPABILITY_VERSION 2. The 2.1 probe window "
+                  "(owner decisions of 2026-10-15, CAPABILITY_VERSION 3): a selection of no file is an absent subject (PM-9: a "
+                  "REQUIRES_SUBJECT contract is INDETERMINATE, an ABSENCE_IS_DECIDABLE one keeps its verdict); a leading UTF-8 "
+                  "mark is not content (PM-11); the grep_count regex loop runs in a worker child process under timeouts_s.probe "
+                  "and a deadline is UNRUNNABLE (PM-13); a file the parser cannot take is a typed refusal (PM-3, PM-4)",
         "backlog": "docs/v2.1/STATUS.md §2 B6 (919a271); §2 B3, V21-37 (06d4e62)",
         "owner_approval": V2_007 + "; V21-37: NOT owner-approved — " + _engineering("docs/v2.1/ADR-V2.1.md ADR-5")
-                          + "; the revised LedgerLock contract that would use python_imports is an unapproved draft (STATUS §2 B3)",
+                          + "; the revised LedgerLock contract that would use python_imports is an unapproved draft (STATUS §2 B3)"
+                          + "; the 2.1 probe window: PM-9 (option C, CAPABILITY_VERSION 3), PM-13 (option a), PM-11, PM-3 and PM-4 "
+                          "are owner decisions of 2026-10-15",
         "requirement": "RFC §8 and §35 (amended V2-007): a spec binds the probe's capability, a new observation class is a new "
                        "capability version; §9.1.1",
         "behaviour_tests": ("tests.v2.test_v21_identity.ThreeIdentities.test_a_spec_binds_the_capability_and_the_bytes_are_their_own_digest",
                             "tests.v2.test_v21_python_imports.Controls.test_the_approved_regex_reproduces_the_false_rollback",
                             "tests.v2.test_v21_python_imports.Controls.test_each_draft_holds_on_the_smoke2_shape_and_refutes_a_real_import",
                             "tests.v2.test_v21_python_imports.Controls.test_a_file_that_does_not_parse_is_no_count",
-                            "tests.v2.test_v21_python_imports.Controls.test_the_grammar_is_closed")},
-    "aisef2/probe/process_effect.py": _PROBE,
-    "aisef2/probe/python_callable_v2.py": _PROBE,
+                            "tests.v2.test_v21_python_imports.Controls.test_the_grammar_is_closed",
+                            "tests.v2.test_v21_fa_empty_selection.SelectionOfNone."
+                            "test_every_branch_is_an_absent_subject_decided_by_the_declaration",
+                            "tests.v2.test_v21_fa_grep_worker.SameFacts.test_every_pattern_over_the_set_and_a_few_over_every_file",
+                            "tests.v2.test_v21_fa_parser_limits.RealSources."
+                            "test_a_file_the_parser_stops_on_is_typed_named_and_never_counted_on_both_readers")},
+    "aisef2/probe/process_effect.py": {
+        **_PROBE,
+        "change": _PROBE["change"] + "; the 2.1 probe window (2026-10-15): the subject is located by component name (PM-1); a "
+                  "fault step that expects a raise is a structured answer, not swallowed and not a verdict by itself (PM-2); "
+                  "the harness log is opened inside the guarded step and a NUL in an argv is refused at admission (PM-6)",
+        "owner_approval": _PROBE["owner_approval"] + "; the 2.1 probe window: owner decisions of 2026-10-15 (PM-1, PM-2, PM-6)",
+        "behaviour_tests": (*_PROBE["behaviour_tests"],
+                            "tests.v2.test_v21_kills3_T19b.FaultBeforeSubprocess."
+                            "test_the_faulted_call_that_replaces_it_tells_a_fragile_product_from_a_tolerant_one",
+                            "tests.v2.test_v21_pm6_host_faults.HostFaultInTheEvaluationDirectory."
+                            "test_a_harness_log_that_cannot_be_created_is_an_unrunnable_harness_and_nothing_runs")},
+    "aisef2/probe/python_callable_v2.py": {
+        **_PROBE,
+        "change": _PROBE["change"] + "; the 2.1 probe window (2026-10-15): the request and the harness log are written inside "
+                  "the guarded step (PM-6); a value that nests deeper than a parser takes is a typed answer, not an exception "
+                  "out of the probe",
+        "owner_approval": _PROBE["owner_approval"] + "; the 2.1 probe window: owner decisions of 2026-10-15 (PM-6, RV-1)",
+        "behaviour_tests": (*_PROBE["behaviour_tests"],
+                            "tests.v2.test_v21_pm6_host_faults.HostFaultInTheEvaluationDirectory."
+                            "test_a_harness_log_that_cannot_be_created_is_an_unrunnable_harness_and_nothing_runs")},
     "tests/v2/test_c2_orchestration_conformance.py": {
         "change": "91a8968: ReproofOfAnotherKind's regression case re-aimed to V21-38 (the developer's at the candidate, never "
                   "merged), each assertion kept. B-03d: test_15 names this ruling; test_15b accepts a 2.1 change only as this "

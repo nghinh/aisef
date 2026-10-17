@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import contextlib
 import io
+import hashlib
 import json
 import os
 import pathlib
@@ -239,6 +240,8 @@ class MigratePrintsWhatItWroteAndWhatItRebound(unittest.TestCase):
             self.assertEqual((code, stderr), (0, ""))
             self.assertTrue(out.exists())
             _, report = bundle_cli.migrate(json.loads(LEDGERLOCK_2_0_0.read_text(encoding="utf-8")))
+            report = bundle_cli.with_commands(report, out)          # what the command prints: the report and the commands
+            report["candidate"]["file_sha256"] = hashlib.sha256(out.read_bytes()).hexdigest()    # and the bytes it wrote
             self.assertEqual(json.loads(stdout), {"written": str(out), **json.loads(json.dumps(report))})
 
 
