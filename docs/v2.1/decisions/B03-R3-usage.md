@@ -114,6 +114,12 @@ construction; read back with `format3.reconstruct` as `--verify` reads):
 * **Real client and provider:** the V2.0.0 release smoke run's journal (`closure-evidence/v2/release/smoke-2`, 1,834
   events) is admitted (test, and `verify` on the run directory with the migrated release bundle gives the same findings
   at BASE and here, none of them a projection's).
+  *Correction 2026-10-18:* "the migrated release bundle" is the bundle as `aisef bundle migrate` produced it on the tree this
+  was measured on (the plan re-bound, every approval kept). Since `d1460fd` `migrate` withholds six of the 59 approvals of the
+  LedgerLock bundle and its candidate does not load until they are approved again (USAGE-2.1 §2), so `verify` on that run
+  directory with a migrated bundle needs the candidate with the six approved (the repository's tests do it in memory with a
+  stand-in, `tests/v2/ledgerlock_candidate.py`). The measurement is unchanged: it is a measurement of the tree it was made on,
+  not of the current `migrate`.
 * **Simulation of the provider, real kernel:** the 85 admitted format-3 journals found under the scratchpad (fault
   windows of refuters 1-3, test-suite runs with the fake client): `aisef run` code paths, fake developer/provider.
 * **Neither real run nor simulation of a run:** the exhaustive enumeration (in-memory projections over an alphabet of
@@ -138,6 +144,10 @@ construction; read back with `format3.reconstruct` as `--verify` reads):
 | Enumeration, one story, <= 13 events after plan/frozen | 2,733,181 admitted journals; changed function == the oracle on all; BASE differs on 59,650 (59,372 and 278, the same two classes) | idem (an earlier version of the script, without the INV counters) |
 | Enumeration, two stories, <= 10 events after plan/frozen | 42,579,530 admitted journals; changed function == the oracle on all; BASE differs on 1,448 (1,216: a failure after an outcome; 232: a committed attempt that observed failures); INV-B broken in 0, INV-A in 8,387,736 | idem (110 minutes) |
 | The release smoke run directory under `verify`, bundle migrated to this tree's probes | identical findings at BASE and here (the bundle digest, the RunSpec re-derivation and the ProductProof account, all three caused by the 2.0 to 2.1 differences, not by this change); none is a projection's; `journal_events` 1,834 | `verify_release.py` |
+
+*Correction 2026-10-18, last row:* "bundle migrated to this tree's probes" is the bundle as `migrate` wrote it on that tree, with
+every approval kept; the same note as in section 5 applies (`migrate` now withholds six approvals, USAGE-2.1 §2). The row stays
+as the measurement it was.
 
 Test modules run, alone, under the guard wrapper: the 27 that import `usage` or `verify` (two of them new) plus
 `p0.test_destructive_authority`, `p4.test_mutation_safety`, `test_meta`: all OK (no failure, no error, no skip),

@@ -3,6 +3,10 @@
 **Trạng thái: ĐỀ XUẤT, CHƯA DUYỆT.** Đã áp dụng trên nhánh `v2.1/foundation` theo chỉ thị 2026-10-06 ("tách ba danh
 tính"); không có bản ghi phê duyệt nào được tạo. Không có gì ở đây là phê duyệt của chủ dự án.
 
+> **Hiệu đính 2026-10-18** (phần còn lại của tệp giữ nguyên văn đề xuất): trạng thái trên là của lúc đề xuất. Chủ dự án đã duyệt B-01
+> trong chat ngày 2026-10-06 (kỹ thuật chép vào `RELEASE-DECISIONS.json` seq 4, chủ dự án không ký; STATUS B6, ADR-2). Câu "không duyệt
+> lại" ở mục Tương thích cũng không còn đúng: xem hiệu đính ngay sau mục ấy.
+
 ## Quy tắc cũ / mới
 
 | | 2.0.0 (`610a593`) | 2.1 (`919a271`, `06d4e62`) |
@@ -31,6 +35,16 @@ tính"); không có bản ghi phê duyệt nào được tạo. Không có gì �
   spec, 67 obligation, admit 9/9, không duyệt lại — approval buộc `contract_hash`, không đổi).
 - Run 2.0.0 vẫn verify được: bằng chứng cũ giữ nguyên byte; RunSpec của 2.0.0 dựng lại không đổi.
 - Không đổi format journal, taxonomy, đường quyết định.
+
+> **Hiệu đính 2026-10-18** (đoạn trên giữ nguyên làm lịch sử: nó là phép đo lúc đề xuất). Câu "không duyệt lại — approval buộc
+> `contract_hash`, không đổi" và "admit 9/9" **không còn đúng**. Từ chỉ thị 2026-10-15 mục 1 (`d1460fd`), `aisef bundle migrate`
+> không giữ một approval chỉ vì `contract_hash` không đổi: nó ghi một bundle **ứng viên mới**, chỉ mang approval nào mà contract
+> không bị một thay đổi capability đã khai báo (`CAPABILITY_CHANGES`) chọn trúng. Trên LedgerLock 2.0.0: giữ 53 trong 59 approval,
+> giữ lại **sáu** contract (`BC-V22-S-10-a`, `S-10-b`, `S-10-c`, `S-12-a`, `S-12-b`, `S-12-c`); ứng viên chưa nạp được (`lint`
+> `NOT_READY`) cho tới khi chủ dự án duyệt lại sáu contract ấy, và admission thật chỉ chứng minh được sau khi hiệu chuẩn sinh lại
+> (USAGE-2.1 §1, §2). Chủ dự án đã giữ sáu ngày 2026-10-18 (D-1). Rủi ro "quên tăng `CAPABILITY_VERSION`" ở mục Tác động bảo mật đã xảy ra
+> với ba probe `cli_invocation`, `process_effect`, `python_callable_v2` (D-2): chủ dự án chấp nhận giới hạn ngày 2026-10-18, nên 50 trong 53
+> approval được giữ vẫn chỉ dựa vào luật phiên bản (`closure-evidence/v2/v2.1/round-5/OWNER-ANSWERS-2026-10-18.md`).
 
 ## Phương án
 

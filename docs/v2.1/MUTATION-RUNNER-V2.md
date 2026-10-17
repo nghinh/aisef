@@ -487,6 +487,14 @@ F8; Q5):
   `calibrations()` with no rows is the shipped table (run.py `admit` and `calibrations`, bundle `load`, bundle_cli
   `migrate`).
 
+  *Correction 2026-10-18 (the entry above stays as written; it describes commit 5b):* "the migrated 2.0.0 bundle" no longer
+  means what `aisef bundle migrate` writes. Since `d1460fd` (owner directive 2026-10-15, item 1) `migrate` withholds the
+  approvals of the contracts a declared capability change selects, six of the 59 on LedgerLock 2.0.0, so its candidate does not
+  load until they are approved again (USAGE-2.1 §2). The bundle the restated test loads is
+  `tests/v2/ledgerlock_candidate.py::loadable()`: the migrated candidate with each withheld contract approved in memory
+  through `bundle_cli.approve` by a stand-in (`human:test-stand-in-for-the-owner`); nothing is written, and nothing in it is the
+  owner's approval.
+
 Re-swept after 5b: the 16 (null, `test_v21_identity.py`) pairs PASS, 16/16. The other two moved methods carry nothing valid for any target that held them
 (text of run.py; shipped rows whose only killable reader, `calibration.py::executing`, keeps `test_the_cycle1_probe_
 keeps_its_one_frozen_digest` and the rebound restatement).

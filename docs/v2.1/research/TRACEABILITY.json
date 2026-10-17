@@ -529,7 +529,7 @@
     "tests/v2/test_v21_identity.py::Migrate::test_migration_rebinds_the_plan_and_nothing_else",
     "tests/test_v21_bundle_dispatch.py::BundleIsV2::test_migrate_through_the_aisef_command"
    ],
-   "reproducer_note": "",
+   "reproducer_note": "— Hiệu đính 2026-10-18 (sau đầu bảng `c9c736f`; các tên ở trên đúng tại đầu bảng và không bị sửa: bảng ghim ở `c9c736f`, checker đọc reproducer ở đầu bảng và chỉ nhận tên được liệt kê `ok` trong lượt chạy đã commit `docs/v2.1/evidence/traceability-reproducers-c9c736f.out`, nên hai tên không còn ở cây hiện tại ở lại trong danh sách): ở cây hiện tại `tests/v2/test_v21_identity.py::Migrate::test_migration_rebinds_the_plan_and_nothing_else` đã đổi tên thành `tests/v2/test_v21_identity.py::Migrate::test_migration_rebinds_the_plan_and_withholds_only_what_a_declared_change_selects` (từ `d1460fd`: `migrate` không còn mang sang mọi approval; nó không mang sang approval của contract bị một thay đổi capability đã khai báo chọn trúng, tức là withholds, nên `nothing_else` không còn đúng); `tests/v2/test_v21_identity.py::ThreeIdentities::test_calibrations_of_other_bytes_admit_nothing` nay là `tests/v2/test_v21_identity_bytes.py::ThreeIdentities::test_calibrations_of_other_bytes_admit_nothing`; hành vi của `migrate` được ghim ở `tests/v2/test_v21_migrate_semantics.py`. `tests/test_v21_bundle_dispatch.py::BundleIsV2::test_migrate_through_the_aisef_command` vẫn còn.",
    "impact": "cao: trên 2.0 sửa một byte probe (kể cả docstring) làm gãy mọi bundle (360 §3.1, §3.10)",
    "decision": "adapted",
    "why": "Nhận tách ba danh tính; năng lực probe là CAPABILITY_VERSION tăng bằng tay, không băm AST (ADR-2: băm AST không chứng minh tương đương). Execution digest chỉ phủ byte nguồn probe, chưa phủ runtime/dependency như §9.2 mục 3.",
@@ -2730,13 +2730,13 @@
    "ref": "§13 việc nên hoãn",
    "item": "Cho LLM tự sửa acceptance, tự cấp approval hoặc tự kết luận metric đạt.",
    "upstream": [],
-   "evidence": "`aisef bundle approve` chỉ nhận `human:<tên>`; `seal` không bao giờ duyệt; checker B-03c bắt mọi đường `migrate` tạo/sửa approval.",
+   "evidence": "`aisef bundle approve` chỉ nhận `human:<tên>`; `seal` không bao giờ duyệt; checker B-03c bắt mọi đường `migrate` tạo/sửa approval. [Hiệu đính 2026-10-18: một ngoại lệ có chủ đích, xem dòng Reproducer.]",
    "refs": [],
    "reproducers": [
     "tests/v2/test_v21_bundle_tools.py::Refusals::test_an_approver_that_is_not_a_human_identity_is_refused",
     "tests/v2/test_v21_authority_limits.py::MigrateNeverApproves::test_an_approval_created_rather_than_re_loaded_is_caught"
    ],
-   "reproducer_note": "",
+   "reproducer_note": "— Hiệu đính 2026-10-18 (sau đầu bảng `c9c736f`): câu \"checker B-03c bắt mọi đường `migrate` tạo/sửa approval\" đúng tại đầu bảng và nay phải đọc kèm một ngoại lệ có chủ đích. Từ `d1460fd`, `migrate` ghi một bundle ứng viên mới **không mang** approval của contract bị một thay đổi capability chọn trúng (chỉ thị 2026-10-15 mục 1; USAGE-2.1 §2): đó là một lọc bỏ approval của chính đầu vào (`[a for a in data[\"approvals\"] if …]`), không tạo và không sửa approval nào. `validation/qualification/authority_limits.py` cho phép đúng một đường ghi khoá `approvals` này; mọi hình thức khác (tạo `ContractApproval`, sao chép có sửa, ghi vào approval có sẵn, gọi `approve`) vẫn bị bắt. Test của hai phía, đều ở `tests/v2/test_v21_authority_limits.py::MigrateNeverApproves`: `test_leaving_an_approval_out_is_the_one_write_a_migration_may_make`, `test_anything_else_in_the_key_is_caught_where_it_is_written`, `test_a_filtered_list_is_still_the_approvals_for_what_is_written_into_it`; test trích ở trên vẫn tồn tại. `migrate` vẫn không ký gì: ứng viên chưa nạp được (`lint` `NOT_READY`) cho tới khi chủ dự án duyệt lại.",
    "impact": "—",
    "decision": "declined",
    "why": "Hoãn theo đề xuất; tại HEAD được giữ.",
