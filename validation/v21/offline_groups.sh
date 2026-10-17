@@ -123,6 +123,24 @@ while IFS='|' read -r _ name _ commit _; do
   else SKIPPED_REFS+=("$name: HEAD ${head[1,12]} is not the pinned ${commit[1,12]}"); print "   $name: HEAD ${head[1,12]} is NOT the pinned ${commit[1,12]} (not linked)"; fi
 done < <(grep -E '^\| [A-Za-z0-9._-]+ .*\| `[0-9a-f]{40}` \|' $OUT/PINS.md)
 
+# The clones the catalog points at (aisef/kit/catalog.json at COMMIT): test_catalog and test_install read all of them.
+# A references/ holding only some of them makes those tests FAIL, not skip (measured: 1 of 5 linked: 4 failures, 1 error),
+# so the group is run with the tools only when every one is linked; the other pinned clones are not read by these tests
+# (measured: the 5 alone: 97 ran, 0 skipped).
+NEED=(${(f)"$(git -C $REPO show ${SHA}:aisef/kit/catalog.json 2>/dev/null | $PY -I -c '
+import json, sys
+def walk(o):
+    if isinstance(o, dict):
+        for k, v in o.items():
+            if k == "local_path" and isinstance(v, str) and v.startswith("references/"):
+                print(v.split("/")[1])
+            walk(v)
+    elif isinstance(o, list):
+        for x in o:
+            walk(x)
+walk(json.load(sys.stdin))' 2>/dev/null | sort -u)"})
+NEED_MISSING=(${NEED:|PINNED})
+
 # ---- the tree and the clean environment --------------------------------------------------------------------------
 git -C $REPO archive --format=tar $SHA -- . ':(exclude)closure-evidence' | tar -x -C $TREE || { print "export failed"; exit 2 }
 print "== tree: git archive $SHA (no closure-evidence): $(find $TREE -type f | wc -l | tr -d ' ') files, $(du -sh $TREE | cut -f1)"
@@ -229,7 +247,11 @@ for g in mockup references; do
   if [[ $g == references ]] && (( ! $#PINNED )); then
     print "== group $g with the tools: not run (no pinned clone linked)"; PARTIAL+=("references: no pinned clone linked"); continue
   fi
-  [[ $g == references ]] && print "== group $g with the tools ($#PINNED of $NPINS pinned clones linked): ${mods[*]}" || print "== group $g with the tools: ${mods[*]}"
+  if [[ $g == references ]] && (( $#NEED_MISSING )); then
+    print "== group $g with the tools: not run (the catalog's clones not linked: ${(j:, :)NEED_MISSING}; a references/ without them fails the tests, it does not skip them)"
+    PARTIAL+=("references: not run with the tools, the catalog's clones ${(j:, :)NEED_MISSING} are not linked"); continue
+  fi
+  [[ $g == references ]] && print "== group $g with the tools ($#PINNED of $NPINS pinned clones linked, all ${#NEED} of the catalog's): ${mods[*]}" || print "== group $g with the tools: ${mods[*]}"
   run_group $g-with 1 $mods; code=$?
   print "   $(counts $OUT/$g-with.txt $code)"
   reasons $OUT/$g-with.txt
@@ -237,10 +259,7 @@ for g in mockup references; do
   if failed $OUT/$g-with.txt $code; then RC=1
   elif (( SKIP > 0 )); then PARTIAL+=("$g: the run with the tools still skipped $SKIP tests"); fi
 done
-if (( $#SKIPPED_REFS )); then
-  print "== pinned clones not linked: ${(j:; :)SKIPPED_REFS}"
-  (( $#PINNED )) && PARTIAL+=("references: ${#SKIPPED_REFS} of $NPINS pinned clones not linked")
-fi
+(( $#SKIPPED_REFS )) && print "== pinned clones not linked: ${(j:; :)SKIPPED_REFS}"
 
 print "== not run: the Docker-gated group (AISEF_TEST_DOCKER=1 tests.test_sandbox tests.test_tools: 10 tests; image alpine:latest, --network=none)"
 if (( RC )); then print "== FAILED: a test failed or errored, or a run timed out or ended without a status line (exit 1)"
