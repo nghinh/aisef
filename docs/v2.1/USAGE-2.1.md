@@ -5,7 +5,8 @@
 
 Mục 8 và các ghi chú "cửa sổ probe" mô tả cây ứng viên `v2.1/probe-window` (2026-10-15 … 2026-10-17, từ `2d01fe4` tới
 `3e1e83a`, hai đợt): *đã làm trên nhánh ứng viên, bằng chứng đo (hiệu chuẩn lại, mutation, suite đầy đủ) chưa có*. Đó
-không phải bản phát hành và chủ dự án chưa nghiệm thu (REPORT §0.9).
+không phải bản phát hành và chủ dự án chưa nghiệm thu (REPORT §0.9). "Chỉ thị 2026-10-15, mục N" trong tài liệu này là chỉ thị
+lần thứ tư của ngày ấy; văn bản nguyên văn của nó ở commit `8e6f583` của nhánh `v2.1/probe-window`, chưa nằm trong cây này (REPORT §0.9).
 
 **Chưa sửa, và chặn mọi tuyên bố "hành trình người dùng đã đạt" hay "hỗ trợ Windows đã đạt"** (§7, REPORT §6.0): lệnh chi
 phí/báo cáo của V1 (`aisef cost`, `aisef report`, `aisef status`) nhận thư mục run V2 và trả toàn số 0 với exit 0; hai điểm
@@ -70,7 +71,9 @@ theo quy tắc danh tính V2-007. Với từng contract, `migrate` đọc nhữn
 `CAPABILITY_VERSION` nằm giữa bản phát hành của bundle (`bundle_cli.RELEASES`) và bản này (`CAPABILITY_CHANGES` trong
 module probe). Một thay đổi **chọn trúng** contract — theo lớp quan sát và `subject_absence`, không tên contract nào được
 viết cứng — thì approval của contract đó bị giữ lại khỏi ứng viên; nó vẫn nằm nguyên trong bundle gốc, làm lịch sử. Một
-thay đổi mà không ai khai báo là **đóng** (fail-closed): nó chọn mọi contract của probe đó. Một obligation mà không bản phát
+`CAPABILITY_VERSION` được nâng mà không có bản khai báo đúng dạng cho nó là **đóng** (fail-closed): nó chọn mọi contract
+của probe đó (cũng vậy khi probe không khai báo phiên bản, hoặc không phải probe mà bản phát hành đã dùng). Điều này
+**không** phủ một thay đổi hành vi mà không nâng phiên bản: nó không bị thấy (D-2, bên dưới). Một obligation mà không bản phát
 hành nào biết đến bị từ chối, không đoán.
 
 Báo cáo (JSON ra stdout; lưu bằng `>`):
@@ -163,8 +166,9 @@ nó dùng) là việc của chủ dự án (backlog V21-61).
   lỗi provider ⇒ PROVIDER_UNAVAILABLE); dưới `advisory` chỉ ghi lại. Một lượt OCR bị dừng vì hết giờ có chi phí không xác định ⇒ ngân sách "unaccounted", run
   không mở thêm phiên trả tiền nào.
 - Với `finder: "ocr"` (dưới `fix-loop` cũng như `advisory`: binary hỏng lúc dùng kết thúc mọi story), `aisef run` hỏi
-  binary **trước mọi việc khác** — trước khi nhận kế thừa (`--parent`), clone, mở phiên developer hay gửi request
-  provider. Ba điều phải đúng, theo thứ tự: `review.ocr.exe` là đường dẫn tuyệt đối đọc được; sha256 của nó bằng
+  binary **sớm nhất có thể**: sau ba việc nhỏ — từ chối nếu `--out` đã có, từ chối nếu `--parent` không có bản ghi (`no
+  run record there`), tạo `--out` và ghi `RUN.started.json` — và **trước** claim của `--parent`, clone, admission,
+  preflight, mở phiên developer hay gửi request provider. Ba điều phải đúng, theo thứ tự: `review.ocr.exe` là đường dẫn tuyệt đối đọc được; sha256 của nó bằng
   `review.ocr.sha256`; `<exe> version` (môi trường sạch, có giới hạn thời gian) in dòng phiên bản của Open Code Review
   v1.12.12 (182898c). Sai ⇒ từ chối trước khi chạy: mã thoát 2, không phiên nào được mở, không request nào được gửi;
   thông báo nêu check nào hỏng, giá trị mong đợi, giá trị quan sát và việc operator cần làm. Thư mục `--out` của lượt bị
@@ -238,10 +242,16 @@ kill ngẫu nhiên (`test_v21_continue_integrity`):
      preflight không có câu trả lời): `aisef run --parent` không mở phiên trả tiền nào (từ chối trước preflight, `the
      lineage of … has spend no evidence accounts for`) trừ khi người vận hành nêu `--accept-unaccounted` — danh sách được
      ghi vào `continues.accepted_unaccounted`; tổng chi phí dòng dõi khi đó là `null`.
-  2. *Bằng chứng có mặt mà không đọc được* (`unread`): journal, ledger preflight hay một luồng phiên có mà không đọc được
-     (quyền, liên kết trỏ vào hư không hay lặp, một tệp đứng chỗ thư mục, không phải văn bản, không dựng lại được); một
-     journal đọc được nhưng **không phải journal mà `RUN.json` của run nêu** (digest và số dòng: rỗng, cắt ở một dòng hay
-     giữa dòng, bị thay); một record hay claim không đọc được, hỏng, không phải object hay là liên kết hỏng (nên không biết
+  2. *Bằng chứng có mặt mà không đọc được* (`unread`). Theo từng đối tượng (đo bằng `lineage.account_of` trên cây này):
+     **journal** — quyền, một liên kết trỏ vào hư không hay lặp, một tệp đứng chỗ thư mục hay một thư mục đứng chỗ tệp,
+     không phải văn bản, không dựng lại được; **ledger preflight** — quyền, không phải văn bản, không parse được, một thư mục đứng
+     chỗ tệp; **luồng phiên** — quyền (của luồng hay của thư mục `sessions/`), một liên kết trỏ vào hư không, một thư mục
+     đứng chỗ tệp. Một luồng *không phải văn bản* thì khác: nó chỉ thêm một dòng `unaccounted` (`a session that started
+     finished no step`) mà `--accept-unaccounted` phủ được, không phải `unread`. Bằng chứng *thiếu hay sai hình dạng* cạnh một journal đọc được (`sessions/` là một tệp,
+     một liên kết hỏng hay lặp; ledger là một liên kết hỏng hay lặp) **không** nằm trong danh sách này — quy tắc cho nó là
+     R2, **[ĐANG HOÀN THIỆN]**, §8.5. Cũng là `unread`: một journal
+     đọc được nhưng **không phải journal mà `RUN.json` của run nêu** (digest và số dòng: rỗng, cắt ở một dòng hay giữa
+     dòng, bị thay); một record hay claim không đọc được, hỏng, không phải object hay là liên kết hỏng (nên không biết
      nó nêu run nào); một run tổ tiên mà record nêu nhưng thư mục đã mất (mất, là tệp, hay liên kết hỏng). Đây là chi phí
      unknown mà **không cờ nào chấp nhận**: `aisef run --parent` thoát 2 (`refused:`) **trước clone, admission và
      preflight, dù nêu `--accept-unaccounted`, `--supersede-claim` hay cả hai**; không phiên nào được mở, không request nào
@@ -548,7 +558,10 @@ trạng thái *coverage* của reviewer OCR (hai bên đều có tên `INDETERMI
   đồng hồ bắt đầu từ chính lần đọc, đã trừ chi phí worker. `tests/v2/test_v21_r5_window_boundary.py` (bốn test) ghim nó cho
   `exists`/`content`/`grep_count` ở {0, W−1e-6, W, W+1e-6}; các test ấy xanh cả trên mã trước, vì chúng đặc trưng hoá hành
   vi sẵn có (người xác minh đột biến `>` thành `>=` trong `file_artifact.py`: 5 lỗi). Những điểm còn lại là **quyết định của chủ dự án**, lane không chọn hành
-  vi nào:
+  vi nào. Đánh số: D1–D5 theo thứ tự trình bày ở đây; lane `review-limits` đánh số hai chỗ ngược lại (D3 của lane là trần
+  `within_s` = D5 ở đây; D5 của lane là toán tử biên = D3 ở đây; backlog V21-83 ghi ánh xạ) và nêu thêm D6, D7 ngoài năm
+  quyết định (V21-88). Một đầu vào dưới đây là **đo** (lane hay người xác minh chạy nó) hay **đọc từ mã, chưa chạy**
+  được ghi ở từng chỗ:
   - **D1 — `within_s` dưới sàn mà công cụ giữ được** (backlog V21-81). Biểu thức: `aisef2/probe/python_callable.py:108-112`
     (`window_of` chỉ đòi hữu hạn và `> 0`); `aisef2/probe/cli_invocation.py:908`
     `threading.Timer(req["window"], conclude, ({"deadline": True},))`; `cli_invocation._deadline` (`:1320`) trả
@@ -556,19 +569,30 @@ trạng thái *coverage* của reviewer OCR (hai bên đều có tên `INDETERMI
     (không phân biệt `SUBJECT_DEADLINE` với sai hành vi). Đầu vào: chủ thể `echo hi`, `exit_code` 0. A (hiện tại):
     `within_s` 0,001 ⇒ `SUBJECT_DEADLINE`/`REFUTED` sau 0,39 s ⇒ review `CONFIRMED` (và nếu `ANCHORED` thì chặn dưới
     `fix-loop`); cùng chủ thể với `within_s` 0,02 hoặc 20 ⇒ `SATISFIED`. B: khai báo một sàn (ví dụ thời gian khởi động tối
-    thiểu đo được); cửa sổ nhỏ hơn không có nghĩa ⇒ `UNVERIFIABLE`, như `within_s` không hữu hạn.
+    thiểu đo được); cửa sổ nhỏ hơn không có nghĩa ⇒ `UNVERIFIABLE`, như `within_s` không hữu hạn. B2 (lane ghi thêm, chỉ
+    sửa anchor, không đụng probe): đưa `within_s` vào anchor, `UNANCHORED` khi cửa sổ của reviewer nhỏ hơn cửa sổ nhỏ nhất
+    của các contract đã duyệt cho cùng mệnh đề. Lane đo trên reference LedgerLock, finding `R-9/3` (`snapshot
+    <ws>/missing.jsonl`, kỳ vọng exit 3): `within_s` 20 ⇒ `NOT_REPRODUCED`, không chặn; `within_s` 0,001 ⇒ `CONFIRMED` +
+    `ANCHORED`, chặn dưới `fix-loop` (mức `high`).
   - **D2 — stream bị cắt ở `STREAM_CAP`** (V21-82). Biểu thức: `aisef2/probe/cli_invocation.py:253`
     `STREAM_CAP = 8 * 1024 * 1024`; `:565` `"truncated": size > STREAM_CAP`; `:582-601` `_stream_matches` chỉ shape
     `text` (`:591`) kiểm `truncated`, các shape `contains`, `regex`, `lines`, `first_word` quyết trên các byte đã giữ.
     Đầu vào: chủ thể in 9 MiB `x`. A (hiện tại): `stdout` `{"regex": "x{9000000}"}` ⇒ `REFUTED` (review `CONFIRMED`);
     `x{8000000}` ⇒ `SATISFIED`. B: stream bị cắt dưới một shape không chính xác mà các byte đã giữ chưa quyết được ⇒
     `INDETERMINATE` (hay `HARNESS_FAILED`), vì phần bị cắt là giới hạn của công cụ; shape chính xác vẫn `REFUTED` như nay.
-  - **D3 — toán tử biên của probe dùng timer ở đúng W** (V21-83). Biểu thức: `aisef2/probe/file_artifact.py:881` `> window`
-    (chặt, đã công bố bởi PM-12) so với `aisef2/probe/cli_invocation.py:908` và `aisef2/probe/python_callable_v2.py:291`
-    `threading.Timer(req["window"], …)`: câu trả lời đúng lúc W và timer tranh một khoá, không có `<` hay `<=`. Đầu vào:
-    `within_s` 5, chủ thể trả lời ở 5,000 s. A: công bố "elapsed ≤ W là trong cửa sổ" và triển khai bằng so sánh thời gian
-    ở controller thay vì tranh khoá ⇒ `SATISFIED`. B: công bố "elapsed < W" ⇒ `SUBJECT_DEADLINE`. Hiện tại: không xác
-    định (một cuộc đua).
+  - **D3 — toán tử biên của probe dùng timer ở đúng W** (V21-83; D5 trong số của lane). Biểu thức:
+    `aisef2/probe/file_artifact.py:881` `> window` (chặt, đã công bố bởi PM-12), so với `aisef2/probe/cli_invocation.py:895-908`
+    (`settle()` và `conclude()` tranh một khoá; `Timer` được bật ngay sau `DISPATCHED`, trước khi phân giải module và
+    pre-step) và `aisef2/probe/python_callable_v2.py:278-291` (như vậy); `process_effect.py:907` đi qua
+    `cli_invocation.py:1097` (`tag in seen`, kiểm trước `:1103` `left <= 0`: câu trả lời đã có thì thắng, nhưng chu kỳ poll
+    là 20 ms); `python_callable.py:362-363` (v1, không active) kiểm `left <= 0 ⇒ TIMEOUT` trước khi đọc hàng đợi. Đầu vào
+    (của lane): `{argv: ["sleep", "0.3"]}` với `within_s` 0,3. A: khi hoà thì **câu trả lời thắng** (trong W, như
+    `file_artifact` và như `process_effect` khi tệp đã có dòng). B: khi hoà thì **deadline thắng** (như `python_callable`
+    v1). Hiện tại: với `cli_invocation` và `python_callable_v2` là một cuộc đua giữa hai thread, không xác định, không
+    test được. Còn phải chọn (lane ghi, backlog V21-83): *mốc bắt đầu* của đồng hồ (`file_artifact`: `started` trước khi dựng
+    reader, gồm `git rev-parse`; harness: sau `DISPATCHED`) và *phần bị loại trừ* (chỉ hosting của worker grep; thời gian
+    `git cat-file` và vòng regex trong worker tính vào cửa sổ — giới hạn đã biết PM-12). Lane giữ cho việc này một câu
+    hỏi mở, không chọn toán tử theo test nào dễ xanh.
   - **D4 — trần độ dài pattern và giới hạn compile** (V21-84). Biểu thức: `re.compile(pattern)` trong `_compiles`
     (`aisef2/probe/cli_invocation.py:446`, `aisef2/probe/file_artifact.py:274`), chạy trong kernel, không hạn chót, từ
     `observation_class`; `PATTERN_CAP = 512` (`file_artifact.py:176`) chỉ được kiểm sau compile (`:864`) và
@@ -576,15 +600,36 @@ trạng thái *coverage* của reviewer OCR (hai bên đều có tên `INDETERMI
     (người xác minh: 38 KB ≈ 7,8 s); chi phí tuyến tính theo kích thước trên 10 họ pattern, không thấy siêu tuyến tính.
     A (hiện tại, đã ghi trong docstring): giữ nguyên. B: trả `None` (không có nghĩa) khi pattern dài hơn một trần (ví dụ
     512) ở cả hai classifier, trước compile. C: compile cũng trong worker.
-  - **D5 — trần của `within_s` do reviewer chọn** (V21-85). Biểu thức: `aisef2/probe/python_callable.py:108-112` (không
-    có trần); `aisef2/probe/cli_invocation.py:1301` `time.monotonic() + window + env.timeout_s` và `:908`. Đầu vào:
-    `within_s` 3600 và ứng viên treo (`sleep 3600`). A (hiện tại): review chờ ≈ 3600 s rồi `SUBJECT_DEADLINE`
-    (`REFUTED`). B: đặt trần cho cửa sổ do reviewer chọn: vượt trần ⇒ `UNVERIFIABLE`, hoặc kẹp về trần và ghi lại. Cùng
-    biểu thức: một `within_s` hữu hạn ≥ `threading.TIMEOUT_MAX` (9223372036 s) giết thread của `Timer` (đo ở lane: `within_s`
-    1e10, `is_alive` `False` sau 0,3 s), controller không bao giờ phát deadline và bên cha chờ `window + timeouts_s.probe`.
+  - **D5 — trần của `within_s` do reviewer chọn** (V21-85; D3 trong số của lane). Biểu thức:
+    `aisef2/probe/python_callable.py:108-112` (`window_of`: chỉ đòi hữu hạn và `> 0`, không có trần);
+    `aisef2/probe/cli_invocation.py:908` `threading.Timer(req["window"], conclude, …)` và `:1301` `time.monotonic() + window
+    + env.timeout_s`; `aisef2/probe/python_callable_v2.py:291` và `:528`; `aisef2/probe/process_effect.py:907` (không có
+    `timeout_s`). **Đầu vào đã đo (lane):** `within_s` 1e10 và chủ thể treo — `threading.Timer(1e10).start()` chết ngay
+    (`OverflowError`; `is_alive` `False` sau 0,3 s; 1e9 thì sống), nên với một `within_s` hữu hạn ≥ `threading.TIMEOUT_MAX`
+    (9223372036 s) controller không bao giờ phát deadline và bên cha chờ `window + timeouts_s.probe`; chủ thể quay lại bình
+    thường thì verdict bình thường. **Đầu vào đọc từ mã, chưa chạy:** một `within_s` lớn nhưng nhỏ hơn `TIMEOUT_MAX` (lane
+    viết 86400; ví dụ 3600 với chủ thể `sleep 3600`): review chờ ≈ W rồi `SUBJECT_DEADLINE` (`REFUTED`), nghĩa là một
+    chủ thể treo giữ review đúng bằng cửa sổ do reviewer chọn. A (hiện tại): giữ. B1: đặt trần cho `within_s` (trị số do
+    chủ dự án) trong classifier của ba probe — trên trần là không có nghĩa (`INVALID_SPEC` ở admission, `UNVERIFIABLE` ở
+    review); đổi ngữ pháp, tăng `CAPABILITY_VERSION` (RFC §35) và mất hiệu lực approval/plan dùng probe. B2: chỉ đặt trần
+    trong `review_verify` (ví dụ ≤ `timeouts_s.probe`) ⇒ `UNVERIFIABLE`, không đụng probe.
+  - **D6 — chủ thể ở lại ghi đè tệp capture mà fact trỏ tới** (V21-88; phát hiện thêm của lane, không thuộc năm quyết định
+    trên). Biểu thức: `aisef2/probe/cli_invocation.py:573-579` `_stream_bytes` đọc `min(size, STREAM_CAP)` byte từ
+    `fact["path"]` mà không so `fact["sha256"]`; `:973-977` `stream_fact` đã tính `sha256`. Đầu vào đo (lane): sản phẩm in
+    `bad\n`, ở lại và ghi vào chính `stdout.bin` của nó. A (hiện tại; một phần, họ PM-5): spec stdout `OK!\n` `SATISFIED`
+    4/4, `bad\n` `REFUTED` 4/4 — chủ thể quyết verdict của chính nó. B: so sha256 của `size` byte đầu với fact; lệch ⇒
+    `tampered` và `REFUTED` như một dòng protocol giả (quy tắc B1), hoặc `HARNESS_FAILED`; fixture fact của
+    `test_c2_cli_verdicts` khi đó phải mang sha256 đúng.
+  - **D7 — `_IMPORT_ERROR` bậc hai trên output test của ứng viên** (V21-88; phát hiện thêm của lane). Biểu thức:
+    `aisef2/quality/test_execution.py:401` và `:416`: `.+? from` quét tới hết dòng ở mỗi `ImportError: cannot import name`.
+    Đây là output test của chính ứng viên, không phải pattern của reviewer hay của tác giả spec. Đo (lane): một dòng 97 KB
+    lặp cụm ấy mất 1,1 s, 388 KB mất 18,4 s; nhiều dòng ngắn 3 ms. A: để, ghi nhận. B: quét tuyến tính như
+    `_fence`/`_braces` (lần mở đầu thất bại trên một dòng thì mọi lần sau trên dòng ấy cũng thất bại) cùng một test vét cạn
+    so với pattern. C: chỉ tìm trong N ký tự cuối của phần thân.
 - **Cổng danh tính OCR — tự khai khác bằng chứng dựng, và hỏi sớm.** *Trước cửa sổ (OCR chưa có ở 2.0.0):* chỉ kiểm sha256
   của binary. *Nay*, với `review.finder: "ocr"` (cả `advisory` lẫn `fix-loop`), AISEF kiểm hai điều, **hai lần**:
-  (i) **ngay đầu `aisef run`** (và `aisef run --check`) — việc đầu tiên của `run.execute`, trước claim `--parent`, clone,
+  (i) **ngay đầu `aisef run`** (và `aisef run --check`) — việc đầu tiên trong thân `try` của `run.execute` (sau các kiểm
+  tra `--out` và `--parent` có bản ghi, và `RUN.started.json`), trước claim `--parent`, clone,
   admission, test interpreter, preflight provider và mọi phiên, nên một binary sai không để developer chạy rồi mới lộ (chỉ
   thị 2026-10-15, mục 5): từ chối có cấu trúc, mã thoát 2, không phiên nào, không request nào; (ii) **trước mọi lệnh
   review** — kiểm soát lúc dùng, không bị lần nhìn sớm thay thế (cùng hai hàm, `review_ocr.pinned` rồi
@@ -762,7 +807,7 @@ verdict hay kênh của nó, nhưng khai sai được về chính nó.
 |---|---|---|---|---|
 | PM-9 (và PM-3/4/11/13 cùng tệp) | `file_artifact` 2 → 3 (`DIGEST` đổi) | đổi, một lần | có, ở ba lớp dưới đây (PM-9; PM-11; PM-3/PM-13) | 4 hàng `file_artifact` |
 | PM-1, PM-2, PM-6, PM-7, họ RV-1 | giữ 1 (`DIGEST` không đổi); `EXECUTION_DIGEST` của 3 probe đổi (và của `file_artifact`, dòng trên) | không đổi | PM-2: tổ hợp bị từ chối; PM-1: layout trước `UNRUNNABLE` nay quan sát được | 15 hàng (cli 5, process_effect 3, python_callable_v2 7) |
-| đợt hai: khai báo `CAPABILITY_CHANGES` và `_compiles` (`file_artifact.py`), worker regex (`cli_invocation.py`) | `CAPABILITY_VERSION` và `DIGEST` không đổi (3, 1, 1, 1); `EXECUTION_DIGEST` của **cả bốn** probe đổi nữa (đo trên `3e1e83a`: `file_artifact` `d0630797…`, `python_callable_v2` `042fe41e…`, `cli_invocation` `82d95f1f…`, `process_effect` `c3ea1ca6…`; hai probe sau vì `probe/cli_invocation.py` nằm trong `PROBE_SOURCES` của chúng) | không đổi | chỉ ở đầu vào mà trước là một exception hay một lần treo: regex không kết thúc ⇒ `UNRUNNABLE`; pattern làm `re.compile` raise `OverflowError`/`RecursionError` ⇒ không có nghĩa | cùng 19 hàng, phải chứng minh lại một lần cho các byte cuối. Văn bản `CAPABILITY_CHANGES` nằm trong `EXECUTION_DIGEST` của `file_artifact`: sửa lời về sau lại làm cũ hiệu chuẩn |
+| đợt hai: khai báo `CAPABILITY_CHANGES` và `_compiles` (`file_artifact.py`), worker regex (`cli_invocation.py`) | `CAPABILITY_VERSION` và `DIGEST` không đổi (3, 1, 1, 1); `EXECUTION_DIGEST` của **cả bốn** probe đổi nữa (đo trên `3e1e83a`: `file_artifact` `d0630797…`, `python_callable_v2` `042fe41e…`, `cli_invocation` `82d95f1f…`, `process_effect` `c3ea1ca6…`; `file_artifact` và `cli_invocation` vì chính tệp của chúng đổi, còn `process_effect` và `python_callable_v2` vì `probe/cli_invocation.py` nằm trong `PROBE_SOURCES` của cả hai — đo bằng `grep` và bằng import) | không đổi | chỉ ở đầu vào mà trước là một exception hay một lần treo: regex không kết thúc ⇒ `UNRUNNABLE`; pattern làm `re.compile` raise `OverflowError`/`RecursionError` ⇒ không có nghĩa | cùng 19 hàng, phải chứng minh lại một lần cho các byte cuối. Văn bản `CAPABILITY_CHANGES` nằm trong `EXECUTION_DIGEST` của `file_artifact`: sửa lời về sau lại làm cũ hiệu chuẩn |
 
 **Lớp contract mà verdict có thể đổi (PM-9):** contract `file_artifact` ở lớp `grep_count` hoặc `python_imports` mà đường
 dẫn có thể chọn ra 0 tệp. Với `subject_absence: REQUIRES_SUBJECT`: `SATISFIED` (matches 0) hoặc `REFUTED` (matches ≥ 1)

@@ -279,16 +279,16 @@ Linux. Hành vi người dùng thấy, từng mục, với tên trạng thái tr
 | Lineage | `UNREAD`, mã `EVIDENCE_*`, `--expect-anchor`, `continue` hợp lệ như `--verify`, chi phí unknown cho journal không đọc được | `042a245`, `1501d17`, `4d245f4`, `d3b6cd9` | `test_v21_pw_lineage_continue`, `…_unread`, `…_spend` |
 | Công cụ suite trong guest | `validation/v21/sandbox/linux_suite.sh`, `linux_suite_guest.py` (suite hoặc tập con, trong container) | `ff6be69`, `2155228` | `test_v21_linux_suite_guest` |
 | PM-5 | mô tả một giới hạn: docstring và `WEAKEST_PATH` của ba probe không còn nói chủ thể "builds no fact" (không đổi hành vi); §6 | `f69124c` | — (giữ cụm "isolation, not a sandbox" mà test ghim) |
-| **Đợt hai** `migrate-semantics` (chỉ thị 2026-10-15 lần thứ tư, mục 1) | `migrate` và `seal --keep-approvals-from` không giữ approval chỉ vì `contract_hash` không đổi: ứng viên mới, chỉ mang approval còn buộc hash mà contract không bị một thay đổi capability đã khai báo (`CAPABILITY_CHANGES`) chọn trúng; báo cáo `semantic_changes`, `needs_owner_reapproval`, `candidate`, `approvals_kept_grounds`, `limits`; thay đổi không khai báo ⇒ đóng. Trên LedgerLock 2.0.0: giữ 53/59, giữ lại **sáu** contract (D-1), 50/53 approval giữ dựa vào luật phiên bản (D-2). Cửa sổ không di trú approval PM-9 nào của kho (59 approval `human:owner` ở `P5-CONTRACT-APPROVALS.json`); duyệt lại là việc của chủ dự án | `d1460fd`, `d6ef913` | `test_v21_migrate_semantics` |
+| **Đợt hai** `migrate-semantics` (chỉ thị 2026-10-15 lần thứ tư, mục 1) | `migrate` và `seal --keep-approvals-from` không giữ approval chỉ vì `contract_hash` không đổi: ứng viên mới, chỉ mang approval còn buộc hash mà contract không bị một thay đổi capability đã khai báo (`CAPABILITY_CHANGES`) chọn trúng; báo cáo `semantic_changes`, `needs_owner_reapproval`, `candidate`, `approvals_kept_grounds`, `limits`; một `CAPABILITY_VERSION` nâng mà không có khai báo đúng dạng ⇒ đóng (chọn mọi contract của probe); một thay đổi hành vi không nâng phiên bản thì không bị thấy (D-2). Trên LedgerLock 2.0.0: giữ 53/59, giữ lại **sáu** contract (D-1), 50/53 approval giữ dựa vào luật phiên bản (D-2). Cửa sổ không di trú approval PM-9 nào của kho (59 approval `human:owner` ở `P5-CONTRACT-APPROVALS.json`); duyệt lại là việc của chủ dự án | `d1460fd`, `d6ef913` | `test_v21_migrate_semantics` |
 | `lineage-proof` (mục 2) | chi phí unknown ≠ 0 ở mọi đầu ra: bằng chứng của dòng dõi có mà không đọc được, journal không phải cái `RUN.json` nêu, tổ tiên mất ⇒ `unread`, `exact: false`, `total: null`; `aisef run --parent` từ chối (exit 2) trước clone, admission, preflight bất kể cờ; R2–R5 mở | `3b738a4`, `e3fc210`, `286d511` | `test_v21_x_lineage_proof`, `test_v21_pw_lineage_spend`, `test_v21_kills_cli` |
-| `review-limits` (mục 3, 4) | `INDETERMINATE` là trạng thái kiểm chứng riêng, `NOT_REPRODUCED` chỉ cho `SATISFIED`; regex của `cli_invocation` khớp trong worker dưới `timeouts_s.probe` (lỗi ⇒ `UNRUNNABLE`/`UNVERIFIABLE`); `_braces`, `_fence` tuyến tính; biên `within_s` chỉ ghim nơi định nghĩa và mã khớp; D1–D5 mở | `5d192e1`, `a692f06`, `3e26945` | `test_v21_r5_review_status`, `…_review_indeterminate`, `…_regex_worker`, `…_regex_isolation`, `…_linear_text`, `…_window_boundary`, `…_probe_model_data` |
+| `review-limits` (mục 3, 4) | `INDETERMINATE` là trạng thái kiểm chứng riêng, `NOT_REPRODUCED` chỉ cho `SATISFIED`; regex của `cli_invocation` khớp trong worker dưới `timeouts_s.probe` (lỗi ⇒ `UNRUNNABLE`/`UNVERIFIABLE`); `_braces`, `_fence` tuyến tính; biên `within_s` chỉ ghim nơi định nghĩa và mã khớp; D1–D5 mở, và hai phát hiện thêm D6, D7 (chỉ ở backlog V21-88 trước nay) | `5d192e1`, `a692f06`, `3e26945` | `test_v21_r5_review_status`, `…_review_indeterminate`, `…_regex_worker`, `…_regex_isolation`, `…_linear_text`, `…_window_boundary`, `…_probe_model_data` |
 | `ocr-preflight` (mục 5) | `aisef run` và `--check` hỏi binary OCR — pin, rồi `version` — ngay đầu lượt chạy, trước claim, clone, preflight, phiên; từ chối có cấu trúc; cổng lúc dùng giữ nguyên | `9abc1c6`, `84b4543` | `test_v21_ocr_preflight`, `test_v21_ocr_identity`, `test_v21_ocr_gate`, `test_v21_review_chain` |
 | `ocr-build` (mục 5) | binary ghim dựng lại byte-identical từ commit `182898c` (go1.26.5), trên một máy; bản ghi nguồn gốc và công thức dựng | `891cd20`, `ccb65a2`, `3e1e83a` | không thêm test: bằng chứng là phép dựng (`closure-evidence/v2/v2.1/round-5/ocr-build/`, `validation/v21/ocr/test_inspect_binary.py`) |
-| `linux-recorder` (mục 6) | recorder đếm đôi một lần khởi chạy trên Linux (`os.posix_spawn` do chính `Popen._posix_spawn` gọi) sửa theo định danh lần gọi; `validation/v21/offline_groups.sh` chạy nhóm mockup và references ngoại tuyến | `dcd2429` (test đỏ), `bc51113`, `6f5be44`, `1f7dcf9`, `6619494`, `72db8ca`, `c89466c` | `test_v21_read_set` `Launches`, `validation/v21/test_reach.py` `Launches` |
+| `linux-recorder` (mục 6) | recorder đếm đôi một lần khởi chạy trên Linux (`os.posix_spawn` do chính `Popen._posix_spawn` gọi) sửa theo định danh lần gọi; `validation/v21/offline_groups.sh` chạy nhóm mockup và references ngoại tuyến | `dcd2429` (test đỏ), `bc51113`, `6f5be44`, `1f7dcf9`, `6619494`, `72db45c`, `c89466c` | `test_v21_read_set` `Launches`, `validation/v21/test_reach.py` `Launches` |
 
 **Trạng thái bằng chứng: đã làm trên nhánh ứng viên, bằng chứng đo chưa có.** Mỗi thay đổi hành vi có test đỏ trước, xanh
 sau, do làn của nó chạy trên cây của làn. Tại `3e1e83a` chưa có (kiểm: `closure-evidence/v2/v2.1/round-5/` có bảng quyết
-định, chỉ thị của chủ dự án và bằng chứng dựng OCR; không có bản ghi hiệu chuẩn, mutation hay suite):
+định `OWNER-DECISIONS-2026-10-15.md` và bằng chứng dựng OCR `ocr-build/`; không có bản ghi hiệu chuẩn, mutation hay suite):
 
 * **hiệu chuẩn**: `aisef2/app/calibrations.py` còn 19 hàng ở `EXECUTION_DIGEST` cũ (cli_invocation 5, process_effect 3,
   python_callable_v2 7, file_artifact 4); `aisef bundle lint` trên `calc-1-story` báo `NOT_READY` ở kiểm tra
@@ -296,20 +296,32 @@ sau, do làn của nó chạy trên cây của làn. Tại `3e1e83a` chưa có (
   executing 042fe41e8e68 class 'returns'`; USAGE-2.1 §1) cho tới một lần `release_calibration.py --write`. Đợt hai đổi
   `EXECUTION_DIGEST` của cả bốn probe thêm một lần (USAGE-2.1 §8.7), nên một lần hiệu chuẩn phải làm sau khi đóng băng
   văn bản của chúng;
-* **mutation**: đợt một đã đăng ký ở `67ee880` (46 target thêm, 45 mở rộng, `HARNESS`/`guarded` bỏ); các tên mới và thân
-  hàm đổi của đợt hai — `bundle_cli` (`_assess`, `_declared`, `_grounds`, `with_commands`, `exposure_of`; thân `migrate`,
-  `seal`, `approve`, `main`), `lineage` (`_journal_mismatch`, `_predecessor`, `unread_runs`), `review_verify`
-  (`INDETERMINATE`, `STATUSES`), `cli_invocation` (`REGEX_WORKER`, `search_in_worker`), `adapters._braces`,
-  `review_ocr._fence`, `run.ocr_identity`/`ocr_refusal`, thân `run.execute`, `cli.run`, `review_ocr.pinned` — **chưa được
-  đăng ký và chưa đo**; ghi chú `Pins …[chỉ số]` trong các tệp kill của `bundle_cli` lệch cho tới khi chạy lại;
+* **mutation**: đợt một đã đăng ký ở `67ee880` (46 target thêm, 45 mở rộng, `HARNESS`/`guarded` bỏ); đợt hai thêm các tên
+  mới — `bundle_cli` (`_assess`, `_declared`, `_grounds`, `with_commands`, `exposure_of`), `lineage` (`_journal_mismatch`,
+  `_predecessor`, `unread_runs`), `review_verify` (`INDETERMINATE`, `STATUSES`), `cli_invocation` (`REGEX_WORKER`,
+  `search_in_worker`), `adapters._braces`, `review_ocr._fence`, `run.ocr_identity`/`ocr_refusal` — **chưa đăng ký**
+  (`validation/v2/mutation.py` không có tên nào trong số đó; đếm bằng grep) và đổi thân các hàm **đã đăng ký** —
+  `bundle_cli.migrate`/`seal`/`approve`/`main`, `run.execute`, `cli.run`, `review_ocr.pinned` — mà phép đo (kill, chỉ số)
+  là của byte cũ: **chưa đo lại trên byte mới**; ghi chú `Pins …[chỉ số]` trong các tệp kill của `bundle_cli` lệch cho tới
+  khi chạy lại;
 * **suite đầy đủ** và các bản ghi phái sinh ràng buộc cây (P5-PLAN-V2.2-PROPOSAL, P5-FALSIFIABILITY,
   C2-P5-ACCEPTANCE-REVERIFICATION, PLAN-V2.2-CORRECTION-1, Q5-KERNEL-COMPARISON, CONFORMANCE-RULING, bản ghi
   C2-ORCHESTRATION, bản ghi K-NOWORK-001, bảng execution order): đỏ có chủ đích cho tới khi tái sinh một lần theo thứ tự
   phụ thuộc. Các làn đợt một ghi chúng xanh ở nền; ở đợt hai, những test dùng probe thật (6 test của `review-limits`, các
   test `Chain` của `ocr_gate` và `review_chain`) đỏ cho tới khi hiệu chuẩn sinh lại và cũng đỏ y hệt ở nền `f69124c`. Hai
-  chỗ lane `migrate-semantics` làm đỏ (T00a và bản ruling của `catalog.py`) đã sửa ở `df22c04` (bản ruling đã commit được
-  sinh lại sau hiệu chuẩn, theo thứ tự phụ thuộc);
+  chỗ lane `migrate-semantics` làm đỏ (T00a và bản ruling của `catalog.py`) đã sửa **mã** ở `df22c04` (T00a so với đúng đầu ra
+  mới của lệnh; mã sinh bản ruling có hàng cho `catalog.py` và cho thay đổi của bốn probe) — chỉ ba tệp đó đổi. Bản ruling
+  đã commit (`CONFORMANCE-RULING.json`, lần đổi cuối `c186cb2`, 2026-10-15) **chưa** được sinh lại và hiệu chuẩn chưa
+  chạy lại; commit message của `df22c04` ghi "The committed ruling is regenerated in dependency order after the
+  calibration" — một kế hoạch, không phải một trạng thái: bản ruling sẽ được sinh lại sau hiệu chuẩn, theo thứ tự phụ thuộc (đo lại trên cây của làn docs-b, mã của `575aa7e`: `aisef bundle lint` trên `calc-1-story`
+  vẫn `NOT_READY` ở `9. probe_calibration`, `no ProbeCapabilityCalibration for probe.python_callable_v2@0821c14651a9
+  executing 042fe41e8e68 class 'returns'`);
 * e2e trong guest Linux, CI Windows/Linux, mô hình thật.
+
+Văn bản nguyên văn của chỉ thị 2026-10-15 lần thứ tư — nguồn của "mục 1 … 7" mà các tài liệu này trích — **không nằm trong
+cây này**: nó là `closure-evidence/v2/v2.1/round-5/OWNER-DIRECTIVE-2026-10-15-B.md` ở commit `8e6f583` của nhánh
+`v2.1/probe-window`, chưa gộp vào đây (`git merge-base --is-ancestor 8e6f583 HEAD` ⇒ không). Mỗi trích dẫn "chỉ thị
+2026-10-15, mục N" trong REPORT, USAGE-2.1, ADR-V2.1 và backlog trỏ tới tệp đó, chưa tới tệp nào trong cây này.
 
 Mọi bằng chứng gắn cây `1d4f0156…` (mutation 528 target, suite `45554e0`, e2e §0.4 lượt `e2e-linux-final/`, kernel của canary §0.10) mô tả cây
 trước cửa sổ, không phải cây này. Các quyết định mở của cửa sổ là các hàng V21-54 … V21-88 của
@@ -665,7 +677,7 @@ phải hiệu chuẩn lại Q0, một quyết định của chủ dự án; cầ
   khớp regex của `cli_invocation` nay chạy trong worker dưới `timeouts_s.probe` (đợt hai), nhưng `re.compile` của mẫu vẫn
   chạy trong kernel không hạn chót, tuyến tính theo kích thước mẫu (D4); `within_s` dưới sàn của công cụ, stream bị cắt ở
   `STREAM_CAP`, toán tử biên của probe dùng timer ở đúng W và trần `within_s` do reviewer chọn chưa có định nghĩa công bố
-  (D1–D3, D5); `migrate` giữ lại sáu contract LedgerLock chứ không phải bốn (D-1) và giữ 50/53 approval chỉ dựa vào luật
+  (D1–D3, D5); tệp capture mà fact trỏ tới bị một chủ thể ở lại ghi đè trước khi range release, nên chủ thể quyết verdict của chính nó (D6, họ PM-5), và `quality/test_execution._IMPORT_ERROR` bậc hai trên output test của ứng viên (D7; 18,4 s ở 388 KB một dòng); `migrate` giữ lại sáu contract LedgerLock chứ không phải bốn (D-1) và giữ 50/53 approval chỉ dựa vào luật
   phiên bản (D-2); `probe-observations/` đọc được bởi mọi tiến trình của user (không cách ly) và chỉ che giá trị bí mật của
   chính run; OCR dựng lại được trên một máy nhưng không biết ai dựng tệp ghim và chưa so artifact upstream (D-OCR-1).
 - **Lineage: quyết định mở của đợt hai** (USAGE-2.1.md §8.5): **[ĐANG HOÀN THIỆN]** quy tắc cho bằng chứng *thiếu* cạnh một
@@ -709,7 +721,8 @@ phải hiệu chuẩn lại Q0, một quyết định của chủ dự án; cầ
 | R3 | lineage: child của claim bị thay thế mà thư mục đã mất; tổ tiên bị xoá hay lưu trữ | (A) giữ `UNBEGUN` cho child; (B) coi là `unread` (đổi 2 test `ClaimLifecycle`); chuỗi: giữ `unread`, hoặc thêm cờ khẳng định có ghi lại | chưa quyết. Backlog V21-78 |
 | R4 | lineage: `--accept-unaccounted` trên chi tiêu đọc được là đã gửi chưa trả lời | (A) giữ như ADR-8; (B) cấm khi `total` chưa biết (`--parent` không còn nối được run bị giết); (C) cho cờ nhưng bắt khai cận trên và trừ vào trần | lane: C nếu chủ dự án muốn đóng hẳn, A nếu không. Backlog V21-79 |
 | R5 | lineage: claim đi trước cổng `unread` | (A) giữ; (B) cổng trước claim; (C) giữ khẳng định, `claim()` kiểm lại child | lane: B hoặc C. Backlog V21-80 |
-| D1–D5 | review: `within_s` dưới sàn công cụ (D1); stream cắt ở `STREAM_CAP` (D2); toán tử biên của probe dùng timer ở đúng W (D3); trần độ dài pattern và giới hạn compile (D4); trần `within_s` do reviewer chọn (D5) | mỗi quyết định có biểu thức (file:dòng) và hai hành vi A/B với một đầu vào, ở USAGE-2.1 §8.3 | không quyết thay chủ dự án. Backlog V21-81 … V21-85 |
+| D1–D5 | review: `within_s` dưới sàn công cụ (D1); stream cắt ở `STREAM_CAP` (D2); toán tử biên của probe dùng timer ở đúng W (D3); trần độ dài pattern và giới hạn compile (D4); trần `within_s` do reviewer chọn (D5) | mỗi quyết định có biểu thức (file:dòng) và hai hành vi A/B với một đầu vào, ở USAGE-2.1 §8.3 | không quyết thay chủ dự án. Đánh số theo USAGE-2.1 §8.3 (lane `review-limits` đánh D3 và D5 ngược lại). Backlog V21-81 … V21-85 |
+| D6, D7 | review (phát hiện thêm của lane `review-limits`, ngoài năm quyết định): tệp capture mà fact trỏ tới bị chủ thể ở lại ghi đè, `_stream_bytes` không so sha256 của fact — chủ thể quyết verdict của chính nó (D6, họ PM-5); `_IMPORT_ERROR` quét bậc hai trên output test của ứng viên (D7) | D6: (A) giữ (một phần, PM-5); (B) so sha256 của `size` byte đầu, lệch ⇒ `tampered`/`REFUTED` hoặc `HARNESS_FAILED`. D7: (A) để, ghi nhận; (B) quét tuyến tính như `_fence`/`_braces` kèm test vét cạn; (C) chỉ tìm N ký tự cuối. Biểu thức, đầu vào và số đo ở USAGE-2.1 §8.3 | không quyết thay chủ dự án. Backlog V21-88 |
 | D-OCR-1 | tải artifact phát hành, `sha256sum.txt` và attestation của upstream để so với binary ghim | (a) cho phép một lượt tải đúng các tệp đó trong thư mục làm việc riêng; (b) không | chưa quyết. Backlog V21-86 |
 | — | recorder Linux: khoá theo định danh lần gọi chứ không theo pid (D-1 của lane); chạy hay không nhóm Docker-gated 10 test (D-2) | D-1: (a) chấp nhận cách đọc của lane; (b) đòi khoá theo pid thật (phải bọc `Popen`/`os.posix_spawn`, đổi cách tính launch lỗi và số macOS). D-2: chạy trong container `--network=none` của chính các test, hoặc giữ dòng "not run" | chưa quyết. Backlog V21-87 |
 | RM-3 | xoá ba tệp probe trong `site-packages` (§0.5) | chủ dự án chạy đúng ba `rm` đã nêu / duyệt để phiên này chạy | chủ dự án tự chạy sau khi đối chiếu đường dẫn |

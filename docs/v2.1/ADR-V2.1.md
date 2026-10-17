@@ -1,6 +1,7 @@
 # AISEF 2.1 — Quyết định kiến trúc (nhánh `v2.1/foundation`, 2026-10-06)
 
-Nguồn: chỉ thị của chủ dự án trong phiên 2026-10-06 (đề xuất cải tiến + báo cáo 360°). Mỗi quyết định nêu: vấn đề đã đo,
+Nguồn: chỉ thị của chủ dự án trong phiên 2026-10-06 (đề xuất cải tiến + báo cáo 360°); "chỉ thị 2026-10-15, mục N" là chỉ thị lần
+thứ tư của ngày ấy, nguyên văn ở commit `8e6f583` của nhánh `v2.1/probe-window`, chưa nằm trong cây này (REPORT §0.9). Mỗi quyết định nêu: vấn đề đã đo,
 quyết định, phương án bị loại, hệ quả, và cái **không** tuyên bố. Giữ nguyên: một đường quyết định, taxonomy owner, journal
 format 3, ràng buộc candidate↔evidence, chính sách commit/rollback. Không viết lại khung, không nhập orchestrator ngoài.
 
