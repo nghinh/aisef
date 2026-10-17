@@ -9,11 +9,12 @@ không phải bản phát hành và chủ dự án chưa nghiệm thu (REPORT §
 lần thứ tư của ngày ấy; văn bản nguyên văn của nó là `closure-evidence/v2/v2.1/round-5/OWNER-DIRECTIVE-2026-10-15-B.md` (commit `8e6f583`, nay đã nằm trong cây này).
 
 **Câu trả lời của chủ dự án, 2026-10-18** (`closure-evidence/v2/v2.1/round-5/OWNER-ANSWERS-2026-10-18.md`, sau bảng phạm vi
-`closure-evidence/v2/v2.1/round-5/SCOPE-BEFORE-PIN.md`): ghim snapshot với hành vi mặc định; D-1 **giữ sáu** contract LedgerLock (§2); D-2 **chấp nhận giới hạn**,
+`closure-evidence/v2/v2.1/round-5/SCOPE-BEFORE-PIN.md`): ghim snapshot với hành vi mặc định (ghim khi suite chạy thử lần 2 xanh; tài liệu này không nói snapshot nào đã được ghim); D-1 **giữ sáu** contract LedgerLock (§2); D-2 **chấp nhận giới hạn**,
 `CAPABILITY_VERSION` giữ 1 cho `cli_invocation`, `process_effect`, `python_callable_v2` (§2); nhóm R2-D1/D2/D3, R3, R4, R5 và
 D1–D5 **giữ mặc định** (§8.3, §8.5). Đó là các quyết định *giữ hành vi hiện tại*: hành vi mô tả trong tài liệu này không đổi, và
 không có ghi nhận nghiệm thu nào được tạo từ chúng. Phần phương án ở các mục ấy được giữ làm bản ghi điều đã cân nhắc, kèm cái giá
-nếu đổi sau này (`SCOPE-BEFORE-PIN.md` §5). **Vẫn mở** (chưa được hỏi hay không nằm trong câu trả lời): D-OCR-1, V21-65, PM-9 với tệp
+nếu đổi sau này (`SCOPE-BEFORE-PIN.md` §5). Backlog còn ba hàng được suy ra từ các câu trả lời ấy, không hỏi riêng: V21-61 (theo V21-75, V21-76),
+V21-69 (theo D1 và D5) và V21-71 (a) phần `CAPABILITY_VERSION` (theo D-2). **Vẫn mở** (chưa được hỏi hay không nằm trong câu trả lời): D-OCR-1, V21-65, PM-9 với tệp
 nhị phân, PM-13 bắt tay khởi động, D6 và D7 (V21-88), hai quyết định recorder Linux (V21-87), và mọi hàng khác của backlog còn ghi
 `OWNER DECISION`.
 
@@ -113,8 +114,9 @@ trong `to_approve` (`candidate.bundle_digest` `1010f0da…7417`, `file_sha256` `
   chọn không có tệp nào là chủ thể vắng) một mình đã chọn đủ sáu. PM-11 (một BOM UTF-8 không còn là ký tự của dòng 1; v2.0.0
   giải mã `utf-8`, nay `utf-8-sig`) cũng đổi verdict của `grep_count` và cũng chọn đủ sáu, nên hai contract thêm (`S-10-b`,
   `S-10-c`) không loại trừ được nếu `migrate` không đọc repo. Đó là phía an toàn. **Chủ dự án đã quyết D-1 ngày 2026-10-18:
-  giữ sáu** (`closure-evidence/v2/v2.1/round-5/OWNER-ANSWERS-2026-10-18.md`; REPORT §7, backlog V21-75): chủ dự án duyệt thêm hai
-  contract (`S-10-b`, `S-10-c`) bằng hai lệnh `aisef bundle approve`, mã không đổi. Hai phương án đã cân nhắc và không chọn — thu về
+  giữ sáu** (`closure-evidence/v2/v2.1/round-5/OWNER-ANSWERS-2026-10-18.md`; REPORT §7, backlog V21-75): mã không đổi. Việc còn lại của
+  chủ dự án, **chưa làm**: duyệt lại cả sáu contract — hai lệnh `aisef bundle approve` cho `S-10-b` và `S-10-c`, ngoài bốn đã dự kiến; chưa lệnh nào
+  được chạy, nên `lint` ứng viên vẫn `NOT_READY` với sáu contract trong `to_approve`. Hai phương án đã cân nhắc và không chọn — thu về
   bốn bằng bộ chọn thấy đường dẫn (heuristic không giải quyết PM-11), hoặc cho `migrate` đọc repo (đổi thiết kế) — nằm ở backlog
   V21-75. Đổi sau này tốn: đo lại `bundle_cli` (45 target) và `file_artifact` (54), ≈ 100 target, ≈ 2,8k mutant, ~5 giờ
   (`SCOPE-BEFORE-PIN.md` §5).

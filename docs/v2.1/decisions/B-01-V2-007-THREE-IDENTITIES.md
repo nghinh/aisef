@@ -3,6 +3,10 @@
 **Trạng thái: ĐỀ XUẤT, CHƯA DUYỆT.** Đã áp dụng trên nhánh `v2.1/foundation` theo chỉ thị 2026-10-06 ("tách ba danh
 tính"); không có bản ghi phê duyệt nào được tạo. Không có gì ở đây là phê duyệt của chủ dự án.
 
+> **Hiệu đính 2026-10-18** (phần còn lại của tệp giữ nguyên văn đề xuất): trạng thái trên là của lúc đề xuất. Chủ dự án đã duyệt B-01
+> trong chat ngày 2026-10-06 (kỹ thuật chép vào `RELEASE-DECISIONS.json` seq 4, chủ dự án không ký; STATUS B6, ADR-2). Câu "không duyệt
+> lại" ở mục Tương thích cũng không còn đúng: xem hiệu đính ngay sau mục ấy.
+
 ## Quy tắc cũ / mới
 
 | | 2.0.0 (`610a593`) | 2.1 (`919a271`, `06d4e62`) |
@@ -30,6 +34,7 @@ tính"); không có bản ghi phê duyệt nào được tạo. Không có gì �
 - Bundle 2.0.0 bị từ chối khi nạp vào 2.1, kèm gợi ý; `aisef bundle migrate` buộc lại một lần (đo trên LedgerLock: 59
   spec, 67 obligation, admit 9/9, không duyệt lại — approval buộc `contract_hash`, không đổi).
 - Run 2.0.0 vẫn verify được: bằng chứng cũ giữ nguyên byte; RunSpec của 2.0.0 dựng lại không đổi.
+- Không đổi format journal, taxonomy, đường quyết định.
 
 > **Hiệu đính 2026-10-18** (đoạn trên giữ nguyên làm lịch sử: nó là phép đo lúc đề xuất). Câu "không duyệt lại — approval buộc
 > `contract_hash`, không đổi" và "admit 9/9" **không còn đúng**. Từ chỉ thị 2026-10-15 mục 1 (`d1460fd`), `aisef bundle migrate`
@@ -39,9 +44,7 @@ tính"); không có bản ghi phê duyệt nào được tạo. Không có gì �
 > `NOT_READY`) cho tới khi chủ dự án duyệt lại sáu contract ấy, và admission thật chỉ chứng minh được sau khi hiệu chuẩn sinh lại
 > (USAGE-2.1 §1, §2). Chủ dự án đã giữ sáu ngày 2026-10-18 (D-1). Rủi ro "quên tăng `CAPABILITY_VERSION`" ở mục Tác động bảo mật đã xảy ra
 > với ba probe `cli_invocation`, `process_effect`, `python_callable_v2` (D-2): chủ dự án chấp nhận giới hạn ngày 2026-10-18, nên 50 trong 53
-> approval được giữ vẫn chỉ dựa vào luật phiên bản (`closure-evidence/v2/v2.1/round-5/OWNER-ANSWERS-2026-10-18.md`). Về trạng thái ở đầu tệp: chủ dự án đã duyệt B-01 trong chat ngày
-> 2026-10-06 (kỹ thuật chép vào `RELEASE-DECISIONS.json` seq 4, chủ dự án không ký — STATUS B6, ADR-2); tệp này giữ nguyên văn đề xuất.
-- Không đổi format journal, taxonomy, đường quyết định.
+> approval được giữ vẫn chỉ dựa vào luật phiên bản (`closure-evidence/v2/v2.1/round-5/OWNER-ANSWERS-2026-10-18.md`).
 
 ## Phương án
 
