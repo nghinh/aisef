@@ -1191,6 +1191,9 @@ _V21_R5B_NEW: dict[str, list[str]] = {
                                                _T + "defects_lineage2.py"],
     "aisef2/app/lineage.py::_journal_mismatch": [_T + "x_lineage_proof.py"],
     "aisef2/app/lineage.py::unread_runs": [_T + "x_lineage_proof.py"],
+    # lineage-r2: evidence that is gone beside a readable journal (the run's own record or its journal says it was there)
+    "aisef2/app/lineage.py::_recorded_spend": [_T + "x_lineage_gone.py"],
+    "aisef2/app/lineage.py::_evidence_gone": [_T + "x_lineage_gone.py", _T + "x_lineage_proof.py"],
     # review-limits: a pattern the reviewer wrote is searched in a worker under a deadline; a comment's scan is linear
     **{f"aisef2/probe/cli_invocation.py::{n}": [_T + "r5_regex_worker.py", _T + "r5_regex_isolation.py"] for n in (
         "SEARCH_REASONS", "StreamSearchFailed.__init__", "search_in_worker", "_said", "REGEX_WORKER/found")},
@@ -1209,12 +1212,14 @@ _V21_R5B_APPEND: dict[str, list[str]] = {
     **{f"aisef2/app/bundle_cli.py::{n}": [_T + "migrate_semantics.py"] for n in (
         "RELEASES", "migrate", "seal", "approve", "main")},
     # lineage-proof
-    "aisef2/app/bundle_cli.py::continue_from": [_T + "x_lineage_proof.py"],
+    "aisef2/app/bundle_cli.py::continue_from": [_T + "x_lineage_proof.py", _T + "x_lineage_gone.py"],
     **{f"aisef2/app/lineage.py::{n}": [_T + "x_lineage_proof.py"] for n in (
-        "claim", "claims", "_claimed_run", "claim_unread", "process_started", "account_of", "predecessor_of",
+        "claim", "claims", "_claimed_run", "claim_unread", "process_started", "predecessor_of",
         "lineage_account", "usage_lineage")},
+    "aisef2/app/lineage.py::account_of": [_T + "x_lineage_proof.py", _T + "x_lineage_gone.py"],
     **{f"aisef2/app/client.py::Budget.{n}": [_T + "x_lineage_proof.py"] for n in ("__init__", "spend", "account")},
-    **{f"aisef2/app/verify.py::{n}": [_T + "x_lineage_proof.py"] for n in ("_spend", "verify")},
+    "aisef2/app/verify.py::_spend": [_T + "x_lineage_proof.py", _T + "x_lineage_gone.py"],
+    "aisef2/app/verify.py::verify": [_T + "x_lineage_proof.py"],
     # review-limits
     "aisef2/probe/cli_invocation.py::_stream_matches": [_T + "r5_regex_worker.py"],
     "aisef2/probe/cli_invocation.py::verdict_of": [_T + "r5_regex_worker.py"],
@@ -1232,7 +1237,7 @@ _V21_R5B_APPEND: dict[str, list[str]] = {
     "aisef2/app/adapters.py::_declared": [_T + "ocr_identity.py"],
     "aisef2/app/review_ocr.py::pinned": [_T + "ocr_identity.py"],
     "aisef2/app/cli.py::run": [_T + "ocr_identity.py"],
-    "aisef2/app/run.py::execute": [_T + "x_lineage_proof.py", _T + "ocr_identity.py"],
+    "aisef2/app/run.py::execute": [_T + "x_lineage_proof.py", _T + "x_lineage_gone.py", _T + "ocr_identity.py"],
 }
 for _t, _fs in _V21_R5B_NEW.items():
     V21_TARGETS[_t] = list(_fs)
