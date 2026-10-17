@@ -91,7 +91,7 @@ RangeError)` that "goes on" (`mutation.py:1545`) wraps `ProcessRange.start()`, w
 | `:1342-1344` `_leftovers` (`strays`, `carriers`, `cwd_under`) | inside `_settle`'s `try` at `:1354`: `except OSError` -> `_Stop("HOST_TABLE_UNREADABLE")` |
 | `:1375-1378` `_earlier` | its caller `:2047-2050`: `except OSError` -> "STOPPED before the first target", exit 3 |
 | `:1816` `establish(scratch)` | inside the target's `try`/`except Exception` -> `_Stop("RUNNER_EXCEPTION: TableUnreadable(...)")`; no mutant runs (an `OSError` read the same before) |
-| `validation/v21/read_set.py:367`, `validation/v2/checker_calibration.py:261`, `validation/qualification/q3.py:409,412`, `validation/v21/sandbox/linux_guest.py:160,170,320,336` | not caught: the tool or the check fails loudly (before: the same for an `OSError`) |
+| `validation/v21/read_set.py:396` (`record`: `ca.establish(scratch)`), `validation/v2/checker_calibration.py:261`, `validation/qualification/q3.py:409,412`, `validation/v21/sandbox/linux_guest.py:160,170,320,336` | not caught: the tool or the check fails loudly (before: the same for an `OSError`) |
 | tests: `p4/test_mutation_safety.py`, `p4/test_process_range.py`, `test_v21_confine.py`, `test_v21_read_set.py`, `test_v21_snapshot_delta.py`, `test_v21_mutation_runner.py:564-593` | pass a `table=`, or read the real host; `assertRaises(OSError, ...)` still holds (subclass) |
 
 **Alternatives rejected.** (1) *Keep skipping, but join a continuation line to the previous row*: a forged row is

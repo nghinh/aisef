@@ -452,6 +452,102 @@ class Callers(unittest.TestCase):
         self.assertEqual((got["listed_by"], got["listed_via"]), ({"data": ["<native>"]}, {"data": ["<native>"]}))
 
 
+@unittest.skipUnless(POSIX, "exercised on POSIX only (hooked child processes)")
+class Launches(unittest.TestCase):
+    """One child process is one launch, whichever way the interpreter starts it (V2.1 fix window, owner decision of
+    2026-10-15, item 6). subprocess.Popen announces a launch with its `subprocess.Popen` audit event and, on the way to
+    the child, may make an `os.posix_spawn` of its own: for a launch by a path with none of cwd=, preexec_fn, pass_fds,
+    start_new_session, user, group, umask, with close_fds=False, or with the default close_fds where the interpreter has
+    os.POSIX_SPAWN_CLOSEFROM (measured: 3.13.15 and 3.14.8 on Linux, glibc 2.41; not 3.12.14, nor 3.14.7 on macOS). That
+    second event is the same child; counting it made such a launch two, and six tests of ToyRecord red in the Linux
+    guest (nine failure entries with their subtests).
+
+    The expected counts are not constants: the traced code reports the pid of every process it really started, and the
+    record must hold one launch per pid and one event file per hooked pid. `close_fds=False` takes the posix_spawn path
+    on macOS and on every Python too, so the double count reproduces there; the traced code's own audit hook says which
+    launches really went through `Popen._posix_spawn` (a test that never reached that path would prove nothing). The
+    pid is the oracle of the tests, not the key of the recorder: both events are raised before the child exists."""
+
+    CHILD = textwrap.dedent("""
+        import json, os, subprocess, sys
+        py, kid = sys.executable, ["-c", "import os; os.listdir('.')"]   # one listing: the child writes its own P line
+        started, via = [], []
+        def spy(event, a):
+            if event == "os.posix_spawn":
+                via.append(sys._getframe(1).f_code.co_name)   # the function that called os.posix_spawn
+        sys.addaudithook(spy)
+        def run(argv, **kw):
+            p = subprocess.Popen(argv, **kw)
+            p.wait()
+            started.append([p.pid, os.path.basename(argv[0]).startswith("python")])
+        def direct(argv):
+            pid = os.posix_spawn(argv[0], argv, os.environ)
+            os.waitpid(pid, 0)
+            started.append([pid, os.path.basename(argv[0]).startswith("python")])
+        %s
+        print(json.dumps({"me": os.getpid(), "started": started, "via": via}))
+        """)
+
+    def traced(self, body):
+        """Run `body` in a hooked Python process: (what it reports, merge of its events, pids of the event files)."""
+        with tempfile.TemporaryDirectory() as t:
+            base = pathlib.Path(t)
+            tree, events, hook = base / "tree", base / "ev", base / "hook"
+            for d in (tree, events, hook):
+                d.mkdir()
+            (hook / "sitecustomize.py").write_text(RS.hook_source(events, tree), encoding="utf-8")
+            env = {"PATH": os.environ.get("PATH", ""), "PYTHONPATH": str(hook)}
+            r = subprocess.run([sys.executable, "-c", self.CHILD % textwrap.dedent(body).strip()], cwd=tree, env=env,
+                               capture_output=True, text=True, encoding="utf-8")
+            self.assertEqual((r.returncode, r.stderr), (0, ""))
+            return json.loads(r.stdout), RS.merge(events, tree), sorted(int(f.stem) for f in events.glob("*.ev"))
+
+    def test_every_process_started_is_one_launch_and_one_hooked_pid_is_one_event_file(self):
+        out, got, files = self.traced("""
+        run([py, *kid])                    # the defaults: posix_spawn with CLOSEFROM (3.13+ Linux), else fork_exec
+        run([py, *kid], close_fds=False)   # posix_spawn on both
+        run([py, *kid], cwd=".")           # fork_exec on both: a cwd
+        run(["sh", "-c", "true"])          # fork_exec on both: a bare name; not Python, so no event file
+        direct([py, *kid])                 # the traced code's own os.posix_spawn: no Popen behind it
+        """)
+        pids = [p for p, _ in out["started"]]
+        python = [p for p, py in out["started"] if py]
+        self.assertEqual(len(set(pids)), 5)
+        self.assertGreaterEqual(out["via"].count("_posix_spawn"), 1)   # close_fds=False: the path really was taken
+        self.assertEqual(out["via"].count("direct"), 1)                # and the direct call is the traced code's own
+        k = got["children"]
+        self.assertEqual(k["started"], len(pids))   # one launch per process, not one per audit event
+        self.assertEqual((k["python"], k["other"], k["python_unhooked"]), (len(python), len(pids) - len(python), 0))
+        self.assertEqual(files, sorted([out["me"], *python]))   # the hooked processes are exactly the Python children
+        self.assertEqual(k["hooked"], len(python))
+
+    def test_a_launch_by_the_traced_code_after_a_popen_with_the_same_arguments_is_its_own(self):
+        """The second event of a Popen is told by who made it, not by 'the same arguments as the event before':
+        a fork_exec Popen raises one event, and the os.posix_spawn that follows it with the same executable and argv is
+        another process."""
+        out, got, files = self.traced("""
+        run([py, *kid], cwd=".")   # fork_exec: one event
+        direct([py, *kid])         # the same executable and argv by the traced code: another child
+        run([py, *kid], close_fds=False)   # posix_spawn: Popen's own, one launch
+        """)
+        pids = [p for p, _ in out["started"]]
+        self.assertEqual(len(set(pids)), 3)
+        self.assertEqual(got["children"]["started"], 3)
+        self.assertEqual(files, sorted([out["me"], *pids]))
+
+    def test_a_launch_that_fails_is_counted_once_on_either_path(self):
+        out, got, files = self.traced("""
+        for kw in ({}, {"close_fds": False}):   # posix_spawn only with CLOSEFROM, then on every Python
+            try:
+                subprocess.Popen(["/nonexistent/aisef-launch"], **kw)
+            except FileNotFoundError:
+                pass
+        """)
+        k = got["children"]
+        self.assertEqual((k["started"], k["python"], k["other"], k["hooked"]), (2, 0, 2, 0))
+        self.assertEqual(files, [out["me"]])
+
+
 class Cli(unittest.TestCase):
     """main(): the HEAD check, the file arguments, the exit status and the document written to --out."""
 
