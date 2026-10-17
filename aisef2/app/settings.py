@@ -40,7 +40,9 @@ KEYS = ("format", "client", "route", "provider", "client_env", "budget", "max_tu
 #: V2.1: optional keys. Absent, the run is exactly a 2.0.0 run and the record says which rule applied:
 #: review — {"policy": "fix-loop" | "advisory", "min_severity": "low" | "medium" | "high" | "critical"} (app/review_verify),
 #:   and optionally "finder": "model" (the default, 2.0.0's model reviewer) | "ocr" with "ocr": {"exe": <absolute path>,
-#:   "sha256": <the binary's>, "timeout_min": n, "max_tokens": n} (app/review_ocr)
+#:   "sha256": <the binary's>, "timeout_min": n, "max_tokens": n} (app/review_ocr). With finder "ocr" — under either
+#:   policy: no story commits without its review — the run asks the binary before it starts anything (the pin, then its
+#:   `version`; app/run.ocr_identity, `aisef run --check` too) and the review asks again at the moment of use
 #: prices — the price table money is computed with (app/usage); absent, every cost is unknown (null), never 0
 #: confinement — {"backend": "bwrap", "bwrap": <absolute path>, "network": "host", "read_only": [<absolute path>, ...]}
 #:   (app/confine): every session the client starts (developer, model reviewer) confined, egress NOT confined ("none" is

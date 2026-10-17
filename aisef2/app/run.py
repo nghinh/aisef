@@ -33,11 +33,15 @@
                        the run's evidence anchor, printed for the operator to keep outside the run directory
                        (`aisef run --verify --expect-anchor`)
 
-Order: the bundle and the settings load (every seal re-checked); the repository is cloned and its requirements document
-checked against the bundle; the plan is admitted (RFC §12); the test interpreter is made; the route is attested by
-the preflight (an identity stop otherwise); the RunSpec is resolved and the run begins; the stories run in dependency
-order through the kernel's story runner while the budget holds. The delivery verdict comes from the journal only;
-plan quality is NOT_CLAIMED (no PlanQualityPolicy is preregistered by a run)."""
+Order: the bundle and the settings load (every seal re-checked); when the review is Open Code Review (settings
+review.finder "ocr"; whatever review.policy: no story commits without its review), its binary is checked — the pin,
+then what it says it is — before anything else is started or sent (`ocr_identity`; RUN.json `ocr_identity` says which
+level was established; refused otherwise, with no claim on a predecessor, no session and no provider request; the
+review checks both again at the moment of use); a predecessor is claimed (`--parent`); the repository is
+cloned and its requirements document checked against the bundle; the plan is admitted (RFC §12); the test interpreter
+is made; the route is attested by the preflight (an identity stop otherwise); the RunSpec is resolved and the run
+begins; the stories run in dependency order through the kernel's story runner while the budget holds. The delivery
+verdict comes from the journal only; plan quality is NOT_CLAIMED (no PlanQualityPolicy is preregistered by a run)."""
 
 from __future__ import annotations
 
@@ -54,7 +58,7 @@ import tempfile
 import time
 
 from aisef2.app import adapters as ad
-from aisef2.app import client, confine, diagnostics, lineage, preflight, review_verify, usage
+from aisef2.app import client, confine, diagnostics, lineage, preflight, review_ocr, review_verify, usage
 from aisef2.app.bundle import Project
 from aisef2.app.settings import Settings
 from aisef2.arch.enums import Enforcement, ObligationRole
@@ -135,6 +139,70 @@ def check_git() -> None:
     m = re.match(r"git version (\d+)\.(\d+)", v)
     if not m or (int(m[1]), int(m[2])) < MIN_GIT:
         raise RunRefused(f"git {MIN_GIT[0]}.{MIN_GIT[1]} or newer is required (B4): found {v or 'nothing'}")
+
+
+#: what each OCR identity check is, and what the operator does when it fails
+OCR_CHECKS = {
+    "pinned": ("pinned: review.ocr.exe is an absolute path, readable, and its sha256 is review.ocr.sha256",
+               "Set review.ocr.exe to the absolute path of the Open Code Review binary you pinned and review.ocr.sha256 "
+               "to that file's sha256 (shasum -a 256 <exe>), or set review.finder to \"model\"; then run again."),
+    "declared": ("declared: `<exe> version`, run alone in a clean environment, prints the pinned release and commit",
+                 "The file is the one review.ocr.sha256 pins, but its own `version` line is not the one of Open Code "
+                 f"Review {review_ocr.OCR['version']} ({review_ocr.OCR['commit'][:7]}) (observed, above). Run `<exe> "
+                 "version` yourself: if it names another release, pin the sha256 of a build of that release in "
+                 "review.ocr.sha256; if it fails or hangs, that file does not run on this machine. Or set review.finder "
+                 "to \"model\"; then run again.")}
+OCR_STATEMENT = ("levels: sha256_matches_pin — the file's bytes are the operator's pin; declared_matches_release — the "
+                 "binary's own `version` line names the pinned release and commit (a self-declaration: a binary prints "
+                 "what it was built or edited to print); build_provenance — never established by a run, and not stated "
+                 "here. This is an earlier look, not the control: the review makes both checks again at the moment of use")
+
+
+def ocr_identity(settings: Settings) -> dict | None:
+    """V2.1 (owner 2026-10-15, item 5): what a run whose review is Open Code Review (settings review.finder "ocr")
+    knows of the binary before it starts anything or sends anything; None for a run whose review is not (finder
+    "model", or no `review`: nothing here concerns it).
+
+    The two checks are the review stage's own, the same functions in the same order (`Reviewer._ocr`):
+    `review_ocr.pinned` (absolute path, readable, sha256 = review.ocr.sha256), then `adapters._declared` (`<exe>
+    version` in a clean environment, its first line the pinned release and commit). This is an earlier look and
+    replaces nothing: the review makes both again at the moment of use, so a binary replaced since is refused there.
+
+    The policy does not make the review optional: a check that fails at use is CapabilityUnrunnable under `advisory`
+    as under `fix-loop`, and no story commits without its review — so with finder "ocr" a binary that fails either
+    check ends every story, and the run refuses at once instead of after the developer sessions."""
+    review = getattr(settings, "review", None) or {}
+    if review.get("finder") != "ocr":
+        return None
+    pin = review.get("ocr") or {}
+    exe, want, release = pin.get("exe"), pin.get("sha256"), review_ocr.OCR
+    levels = {"sha256_matches_pin": False, "declared_matches_release": False, "build_provenance": False}
+    seen, check = None, "pinned"
+    if not (isinstance(exe, str) and exe and isinstance(want, str) and want):
+        why = "review.ocr.exe and review.ocr.sha256 name no binary"
+    else:
+        why = review_ocr.pinned(exe, want)
+        if why is None:
+            levels["sha256_matches_pin"], check = True, "declared"
+            seen, why = ad._declared(exe, review_ocr.VERSION_TIMEOUT_S)
+            levels["declared_matches_release"] = why is None
+    out = {"finder": f"ocr {release['version']}", "exe": exe,
+           "when": "at the start of the run: before any claim, clone, session or provider request",
+           "status": "PASSED" if why is None else "REFUSED", "levels": levels, "statement": OCR_STATEMENT,
+           "expected": {"sha256": want, "version": release["version"], "commit": release["commit"]},
+           "observed": {"declared": seen}}
+    if why is not None:
+        out |= {"check": OCR_CHECKS[check][0], "reason": why, "operator": OCR_CHECKS[check][1]}
+    return out
+
+
+def ocr_refusal(ident: dict) -> str:
+    """The refusal of a run whose OCR identity check failed: the check, what it expected, what it saw, what to do."""
+    exp = ident["expected"]
+    return (f"review.finder is ocr and its binary fails the identity check before the run — check {ident['check']}; "
+            f"expected sha256 {exp['sha256'] or '(none given)'} and a `version` line naming {exp['version']} "
+            f"({str(exp['commit'])[:7]}); observed {ident['reason']}. {ident['operator']} "
+            "No session was started and no provider request was sent.")
 
 
 def check_repository(project: Project, repo: pathlib.Path, *, clone: bool = True, shown: pathlib.Path | None = None) -> None:
@@ -415,6 +483,14 @@ def execute(project: Project, settings: Settings, source: pathlib.Path, out: pat
     not_run: list[str] = []
     failure: BaseException | None = None
     try:
+        # V2.1: the first thing the run does, before the claim on a predecessor, the clone, the test interpreter, the
+        # route's preflight and any session; a run whose review is not OCR has no such record
+        rec["stage"] = "ocr identity"
+        ident = ocr_identity(settings)
+        if ident is not None:
+            rec["ocr_identity"] = ident
+            if ident["status"] != "PASSED":
+                raise RunRefused(ocr_refusal(ident))
         if predecessor is not None:     # V2.1: before any provider request — a run that loses the claim spends nothing
             rec["stage"] = "claim"
             try:
