@@ -21,6 +21,11 @@ và commit với `review_ocr.OCR`) → mới đến preview và review; sau lư�
 `manifest.execution.ocr_version`. Bản ghi phiên (`s["identity"]`) ghi điều binary tự khai và ghi rõ đó là lời tự khai,
 không phải bằng chứng dựng.
 
+Lượt chạy (`aisef run` và `aisef run --check`, V2.1, làn ocr-preflight) hỏi **cùng hai hàm đó** một lần ngay từ đầu —
+trước khi nhận kế thừa, clone, mở phiên developer hay gửi request provider — để không làm việc rồi mới biết công cụ không
+dùng được. Đó là lần nhìn sớm, không phải cổng: cổng lúc dùng vẫn chạy lại. Khối `ocr_identity` trong `RUN.json` ghi
+`build_provenance: NOT_ESTABLISHED` — lớp (c) không bao giờ được một lượt chạy thiết lập.
+
 ## 2. Cái được ghim
 
 | | |

@@ -11,12 +11,14 @@ still holds).
 
 What the record says, and what it does not: `ocr_identity.levels` names three levels — the bytes are the pin's
 (`sha256_matches_pin`), the binary's own `version` line names the pinned release (`declared_matches_release`: a
-self-declaration, a binary prints what it was built or edited to print) and `build_provenance`, which a run never
-establishes. Nothing here says "verified build".
+self-declaration, a binary prints what it was built or edited to print) and `build_provenance`, "NOT_ESTABLISHED": a run
+never establishes it. Nothing here says "verified build".
 
-`review.policy` does not decide whether the review is mandatory: a failed check at use is CapabilityUnrunnable under
-`advisory` as under `fix-loop`, and no story commits without its review. So the early check applies to every run whose
-`review.finder` is "ocr", whatever the policy, and to no other run.
+`review.policy` does not decide whether the binary is asked: an identity failure at the moment of use is
+CapabilityUnrunnable under `advisory` as under `fix-loop`, and that ends every story. So the early check applies to
+every run whose `review.finder` is "ocr", whatever the policy, and to no other run. (It does not say that every committed
+story has a complete review: under `advisory` an incomplete review is recorded and does not block —
+test_v21_review_chain.py, `test_under_advisory_the_incomplete_review_is_recorded_and_does_not_block`.)
 
 The scenario is `test_app_run.ProductBase` (a one-story calc project, a fake client, a fake provider) with the finder
 of `test_v21_review_chain` (a fake Open Code Review executable, pinned by sha256 like the real one) and the table of
@@ -157,7 +159,7 @@ class PreflightRefuses(OcrBase):
                                              "commit": review_ocr.OCR["commit"]})
         self.assertTrue(ident["operator"] and "review.ocr" in ident["operator"])
         self.assertIn("review.finder", ident["operator"])
-        self.assertFalse(ident["levels"]["build_provenance"])
+        self.assertEqual(ident["levels"]["build_provenance"], "NOT_ESTABLISHED")
         self.assertNotIn("verified build", json.dumps(ident))
         self.assertIn(said, ident["reason"])
 
@@ -175,7 +177,8 @@ class PreflightRefuses(OcrBase):
         said, ident = self.refused()
         self.assertIn("absolute path", said)
         self.assertEqual(ident["levels"], {"sha256_matches_pin": False, "declared_matches_release": False,
-                                           "build_provenance": False})
+                                           "build_provenance": "NOT_ESTABLISHED"})
+        self.assertEqual(ident["observed"], {"asked": False, "declared": None})
         self.assertEqual(self.asked(), [])
 
     def test_a_binary_that_cannot_be_read_is_refused_before_any_session(self):
@@ -204,6 +207,36 @@ class PreflightRefuses(OcrBase):
         self.assertIn("cannot be read (PermissionError)", said)
         self.assertFalse(ident["levels"]["sha256_matches_pin"])
         self.assertEqual(ident["check"][:6], "pinned")
+        self.assertEqual(self.asked(), [])
+
+    def test_a_path_the_system_cannot_name_is_refused_before_any_session_not_raised(self):
+        # a NUL byte or a lone surrogate: the loader accepts any absolute string; the read raised ValueError out of the
+        # run (a traceback, RUN.json without ocr_identity) before pinned() answered for it
+        for what, exe, error in (("NUL", str(self.exe) + "\x00x", "ValueError"),
+                                 ("lone surrogate", str(self.exe) + "\ud800", "UnicodeEncodeError")):
+            with self.subTest(what):
+                self.settings = self.forced(exe=exe)
+                said, ident = self.refused()
+                self.assertIn(f"cannot be read ({error})", said)
+                self.assertEqual(ident["check"][:6], "pinned")
+                self.assertEqual(ident["observed"], {"asked": False, "declared": None})
+                self.assertEqual(self.asked(), [])
+
+    def test_a_binary_that_cannot_be_started_is_refused_before_any_session_with_the_system_s_reason(self):
+        self.exe.chmod(0o644)       # readable, so the pin holds; not executable
+        said, ident = self.refused()
+        self.assert_structured(ident, "declared", "`version` could not be started")
+        self.assertIn("Permission denied", said)
+        self.assertNotIn("(RangeError)", said, "the kernel's type name tells the operator nothing")
+        self.assertEqual(ident["observed"], {"asked": True, "declared": None})
+        self.assertTrue(ident["levels"]["sha256_matches_pin"])
+        self.assertEqual(self.asked(), [])
+        self.exe.chmod(0o755)
+        self.exe.write_text("#!/nonexistent/interpreter\n", encoding="utf-8")      # other bytes, pinned
+        self.settings = self.with_pin()
+        said, ident = self.refused()
+        self.assertIn("`version` could not be started", said)
+        self.assertIn("No such file", said)
         self.assertEqual(self.asked(), [])
 
     def test_the_preflight_asks_the_review_stage_s_own_two_functions_in_their_order(self):
@@ -278,13 +311,28 @@ class PreflightRefuses(OcrBase):
         self.assertEqual(ident["observed"]["declared"], None)
 
     def test_the_policy_does_not_decide_it_advisory_is_refused_too(self):
-        # the use-time refusal is CapabilityUnrunnable under advisory as under fix-loop and no story commits without its
-        # review: a run that would end every story is refused at once, not after the developer sessions
+        # an identity failure at the moment of use is CapabilityUnrunnable under advisory as under fix-loop (the policy is
+        # not consulted: SwapAfterPreflight shows both stories ending); a run that would end every story is refused at
+        # once, not after the developer sessions
         self.answer("another commit")
         self.settings = self.with_pin("advisory")
         said, ident = self.refused()
         self.assertIn("deadbee", said)
         self.assertEqual(ident["status"], "REFUSED")
+
+    def test_the_remedy_the_operator_text_gives_works_a_new_out_runs_and_the_same_out_does_not(self):
+        good = self.settings
+        self.settings = self.with_pin(sha256="0" * 64)
+        self.refused(out="out-first")
+        self.assertIn("give it a new --out", R.OCR_CHECKS["pinned"][1])
+        self.settings = good                                   # the pin corrected, as the text says
+        with mock.patch.object(preflight, "http_transport", side_effect=AssertionError("a provider was reached")), \
+                self.assertRaises(R.RunRefused) as cm:
+            self.execute(out="out-first", transport=None)
+        self.assertIn("never reused", str(cm.exception))      # the refused run's directory is its record
+        self.assertEqual(self.asked(), [], "the second attempt asked nothing: it stopped at the directory")
+        rec = self.execute(out="out-second", transport=self.transport)
+        self.assertEqual((rec["delivery_verdict"], rec["ocr_identity"]["status"]), ("PASS", "PASSED"))
 
     def test_the_settings_loader_refuses_a_pin_without_a_path_before_anything(self):
         base = {**e2e.SETTINGS, "review": {"policy": "fix-loop", "min_severity": "high", "finder": "ocr"}}
@@ -320,10 +368,12 @@ class PreflightPasses(OcrBase):
         ident = rec["ocr_identity"]
         self.assertEqual(ident["status"], "PASSED")
         self.assertEqual(ident["levels"], {"sha256_matches_pin": True, "declared_matches_release": True,
-                                           "build_provenance": False})
+                                           "build_provenance": "NOT_ESTABLISHED"})
+        self.assertEqual(ident["observed"]["asked"], True)
         self.assertEqual(ident["observed"]["declared"]["version"], "v1.12.12")
         self.assertEqual(ident["expected"]["sha256"], hashlib.sha256(self.exe.read_bytes()).hexdigest())
-        self.assertEqual(ident["finder"], "ocr v1.12.12")
+        self.assertEqual(ident["finder"], "ocr", "what the settings name; the release the run expects is in `expected`")
+        self.assertEqual(ident["expected"]["version"], "v1.12.12")
         self.assertIn("self-declaration", ident["statement"])
         self.assertIn("never established by a run", ident["statement"])
         self.assertIn("not the control", ident["statement"])
@@ -389,6 +439,16 @@ class SwapAfterPreflight(OcrBase):
         self.assertEqual(len(said), 2)
         self.assertTrue(all("v1.11.0" in d and "v1.12.12" in d for d in said), said)
         self.assertEqual(self.asked(), [["version"]] * 3, "the preflight's question and one at each of two reviews")
+
+    def test_under_advisory_the_same_failure_at_the_review_ends_the_story_too(self):
+        # the evidence for applying the early look whatever the policy: the identity check at use is made before the
+        # policy is consulted (an incomplete review, by contrast, does not block under advisory)
+        self.settings = self.with_pin("advisory")
+        self.answer("another version", after_asks=1)
+        self.swapped_run()
+        said = self.reasons()
+        self.assertEqual(len(said), 2)
+        self.assertTrue(all("v1.11.0" in d for d in said), said)
 
 
 if __name__ == "__main__":

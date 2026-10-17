@@ -211,7 +211,7 @@ def pinned(exe: str, sha256: str) -> str | None:
         return f"{exe}: the OCR binary is named by an absolute path, never looked up"
     try:
         have = hashlib.sha256(p.read_bytes()).hexdigest()
-    except OSError as e:
+    except (OSError, ValueError) as e:      # ValueError: a NUL byte, or a lone surrogate (UnicodeEncodeError), in the path
         return f"{exe}: cannot be read ({type(e).__name__})"
     return None if have == sha256 else f"{exe}: sha256 {have[:12]}, not the pinned {sha256[:12]}"
 

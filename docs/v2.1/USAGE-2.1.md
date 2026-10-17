@@ -72,6 +72,21 @@ cần duyệt lại. Một obligation mà không bản phát hành nào biết �
   trợ) ⇒ dưới `fix-loop` story không được commit (CAPABILITY_UNRUNNABLE; lỗi provider ⇒ PROVIDER_UNAVAILABLE); dưới
   `advisory` chỉ ghi lại. Một lượt OCR bị dừng vì hết giờ có chi phí không xác định ⇒ ngân sách "unaccounted", run
   không mở thêm phiên trả tiền nào.
+- Với `finder: "ocr"` (dưới `fix-loop` cũng như `advisory`: binary hỏng lúc dùng kết thúc mọi story), `aisef run` hỏi
+  binary **trước mọi việc khác** — trước khi nhận kế thừa (`--parent`), clone, mở phiên developer hay gửi request
+  provider. Ba điều phải đúng, theo thứ tự: `review.ocr.exe` là đường dẫn tuyệt đối đọc được; sha256 của nó bằng
+  `review.ocr.sha256`; `<exe> version` (môi trường sạch, có giới hạn thời gian) in dòng phiên bản của Open Code Review
+  v1.12.12 (182898c). Sai ⇒ từ chối trước khi chạy: mã thoát 2, không phiên nào được mở, không request nào được gửi;
+  thông báo nêu check nào hỏng, giá trị mong đợi, giá trị quan sát và việc operator cần làm. Thư mục `--out` của lượt bị
+  từ chối được giữ làm bản ghi và không bao giờ dùng lại ⇒ lượt kế tiếp cần `--out` mới. Hai lối ra: sửa pin (chỉ sau khi
+  kiểm binary với [BUILD-RECIPE.md](../../validation/v21/ocr/BUILD-RECIPE.md)), hoặc bỏ `review.ocr` và đặt
+  `finder: "model"` — một reviewer khác.
+- `aisef run --check` hỏi binary theo cùng cách, in khối `ocr_identity` và `ready: false` (mã thoát 2) nếu binary không
+  qua. `RUN.json` của một lượt có `finder: "ocr"` có khối `ocr_identity` nói đã thiết lập được gì:
+  `sha256_matches_pin` (byte là pin của operator), `declared_matches_release` (binary **tự khai** đúng bản — lời
+  tự khai, không phải bằng chứng dựng) và `build_provenance`, luôn là `NOT_ESTABLISHED`. Đây là lần nhìn sớm, **không
+  thay** cổng lúc dùng: giai đoạn review kiểm lại cả hai ngay trước mỗi lần review, nên một binary bị thay giữa chừng bị
+  từ chối ở đó.
 - Checkout được review không được đổi trong lúc review (cả với finder mô hình): đổi tệp hay commit ⇒ mọi finding bị bỏ,
   CAPABILITY_UNRUNNABLE.
 - `prices` vắng ⇒ `usage.cost.value = null`, `status: unknown` — không bao giờ 0.
