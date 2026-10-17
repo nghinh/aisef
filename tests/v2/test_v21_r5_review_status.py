@@ -117,34 +117,128 @@ class TheVocabulary(unittest.TestCase):
                 self.assertNotIn("elided", stated)
 
 
+STATUS_NAMES = frozenset(("CONFIRMED", "NOT_REPRODUCED", "INDETERMINATE", "UNVERIFIABLE"))
+#: the three names no other vocabulary of aisef2 uses: any mention, by name or by literal, is a reference
+UNIQUE = frozenset(("CONFIRMED", "NOT_REPRODUCED", "UNVERIFIABLE"))
+#: the two files whose own `INDETERMINATE` is another record's (review_ocr: the coverage of a finder's run; arch/enums:
+#: the verdict enums): the literal may be there, as the definition of that vocabulary and as nothing else
+OTHER_INDETERMINATE = ("aisef2/app/review_ocr.py", "aisef2/arch/enums.py")
+
+
+def _is_review_verify(module: str | None) -> bool:
+    return module is not None and (module == "review_verify" or module.endswith(".review_verify"))
+
+
+def references(source: str, rel: str) -> set[str]:
+    """Every way `source` (the file `rel` of aisef2) names a verification status of `review_verify`: the module's
+    attribute (`review_verify.X`, through any alias of the module), a name imported from it (through any alias), the three
+    names no other vocabulary has (as a name or a string), and the literal "INDETERMINATE" outside the two files whose
+    own INDETERMINATE is another record's. A reader of `Verification.status` has to say one of these to compare it with
+    anything, so a reader that is new fails the census whichever way it is written."""
+    tree = ast.parse(source)
+    modules, imported, found = set(), {}, set()
+    for n in ast.walk(tree):
+        if isinstance(n, ast.Import):
+            modules |= {a.asname or a.name for a in n.names if _is_review_verify(a.name)}
+        elif isinstance(n, ast.ImportFrom):
+            if _is_review_verify(n.module):
+                for a in n.names:
+                    if a.name in STATUS_NAMES | {"STATUSES"}:
+                        imported[a.asname or a.name] = a.name
+                        found.add(f"review_verify.{a.name}")
+            else:
+                modules |= {a.asname or a.name for a in n.names if a.name == "review_verify"}
+    for n in ast.walk(tree):
+        if isinstance(n, ast.Attribute) and n.attr in STATUS_NAMES | {"STATUSES"} and (
+                (isinstance(n.value, ast.Name) and n.value.id in modules)
+                or (isinstance(n.value, ast.Attribute) and n.value.attr == "review_verify")):
+            found.add(f"review_verify.{n.attr}")
+        elif isinstance(n, ast.Name) and (n.id in UNIQUE or n.id in imported):
+            found.add(n.id if n.id in UNIQUE else f"review_verify.{imported[n.id]}")
+        elif isinstance(n, ast.Constant) and isinstance(n.value, str) and (
+                n.value in UNIQUE or (n.value == "INDETERMINATE" and rel not in OTHER_INDETERMINATE)):
+            found.add(repr(n.value))
+    return found
+
+
+def only_defined(source: str) -> bool:
+    """Whether every "INDETERMINATE" literal of `source` is (an element of) the value of an assignment — the definition of
+    a vocabulary — and nowhere else: in a comparison, a call, a subscript or a collection key it would be a reader."""
+    tree = ast.parse(source)
+    parents = {child: parent for parent in ast.walk(tree) for child in ast.iter_child_nodes(parent)}
+    for n in ast.walk(tree):
+        if isinstance(n, ast.Constant) and n.value == "INDETERMINATE":
+            up = parents[n]
+            held = up.elts if isinstance(up, ast.Tuple) else [n]
+            holder = parents[up] if isinstance(up, ast.Tuple) else up
+            if not (isinstance(holder, ast.Assign) and (holder.value is n or holder.value is up) and n in held):
+                return False
+    return True
+
+
 class WhoReadsTheVocabulary(unittest.TestCase):
     """The census of who names a verification status in aisef2. Nothing reads the value of `verification.status` but
     `review_verify` itself (`blocks`, `evidence`, `detail`): `artifact_problems` binds an artifact to a row by bytes and
     identity, never by status; the adapter stores what `verify` answered; RUN.json and the journal row carry it. A new
-    reader would have to be shown to handle INDETERMINATE (and every status a later release adds), so it fails here."""
+    reader would have to be shown to handle INDETERMINATE (and every status a later release adds), so it fails here —
+    whether it names the status through the module, through a name imported from it, through the three names no other
+    vocabulary has, or through the literal "INDETERMINATE" (F5 of the review: the first version of this census watched
+    `review_verify.INDETERMINATE` only, so `from aisef2.app.review_verify import INDETERMINATE` and
+    `status == "INDETERMINATE"` passed it)."""
 
-    OWN = {"CONFIRMED", "NOT_REPRODUCED", "UNVERIFIABLE"}
     #: the only references outside review_verify.py: the adapter answers a finding with no reproducer UNVERIFIABLE
     ALLOWED = {"aisef2/app/adapters.py": {"review_verify.UNVERIFIABLE"}}
 
-    def references(self) -> dict[str, set[str]]:
+    def census(self) -> dict[str, set[str]]:
         found: dict[str, set[str]] = {}
         for path in sorted((ROOT / "aisef2").rglob("*.py")):
             rel = path.relative_to(ROOT).as_posix()
-            if rel == "aisef2/app/review_verify.py":
-                continue
-            for n in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
-                if isinstance(n, ast.Name) and n.id in self.OWN:
-                    found.setdefault(rel, set()).add(n.id)
-                elif isinstance(n, ast.Attribute) and isinstance(n.value, ast.Name) and n.value.id == "review_verify" \
-                        and n.attr in {*self.OWN, "INDETERMINATE", "STATUSES"}:
-                    found.setdefault(rel, set()).add(f"review_verify.{n.attr}")
-                elif isinstance(n, ast.Constant) and n.value in self.OWN:
-                    found.setdefault(rel, set()).add(repr(n.value))
+            if rel != "aisef2/app/review_verify.py" and (names := references(path.read_text(encoding="utf-8"), rel)):
+                found[rel] = names
         return found
 
     def test_no_reader_of_the_status_but_the_one_that_answers_a_finding_without_a_reproducer(self):
-        self.assertEqual(self.references(), self.ALLOWED)
+        self.assertEqual(self.census(), self.ALLOWED)
+
+    def test_the_two_files_with_an_indeterminate_of_their_own_only_define_it(self):
+        for rel in OTHER_INDETERMINATE:
+            with self.subTest(rel):
+                self.assertTrue(only_defined((ROOT / rel).read_text(encoding="utf-8")), rel)
+
+    def test_the_census_sees_every_way_to_name_a_status(self):
+        """Each way a new reader could be written, as source: found. And what is not a reader: not."""
+        readers = {
+            "a name imported from the module": "from aisef2.app.review_verify import INDETERMINATE\nif s == INDETERMINATE: pass\n",
+            "... under another name": "from aisef2.app.review_verify import INDETERMINATE as UNDECIDED\nx = UNDECIDED\n",
+            "the module's attribute": "from aisef2.app import review_verify\nx = review_verify.INDETERMINATE\n",
+            "... through an alias of the module": "from aisef2.app import review_verify as rv\nx = rv.INDETERMINATE\n",
+            "... through import as": "import aisef2.app.review_verify as rv\nx = rv.STATUSES\n",
+            "... through the dotted path": "import aisef2.app.review_verify\nx = aisef2.app.review_verify.INDETERMINATE\n",
+            "a literal compared with a status": "def f(v):\n    return v.status == 'INDETERMINATE'\n",
+            "a literal in a collection": "X = ('CONFIRMED', 'INDETERMINATE')\n",
+            "a name no other vocabulary has": "def f(v):\n    return v.status == CONFIRMED\n",
+            "the literal of one of them": "def f(v):\n    return v.status != 'NOT_REPRODUCED'\n",
+        }
+        for what, source in readers.items():
+            with self.subTest(what):
+                self.assertTrue(references(source, "aisef2/app/new_reader.py"), source)
+        not_readers = {
+            "the module's other names": "from aisef2.app import review_verify\nx = review_verify.ARTIFACT_DIR\n",
+            "a class of the module": "from aisef2.app.review_verify import Verification\nx = Verification\n",
+            "another vocabulary's attribute": "from aisef2.arch.enums import BehaviorVerdict\nx = BehaviorVerdict.INDETERMINATE\n",
+            "a sentence that holds the word": "x = 'vacuity is INDETERMINATE'\n",
+        }
+        for what, source in not_readers.items():
+            with self.subTest(what):
+                self.assertEqual(references(source, "aisef2/app/new_reader.py"), set(), source)
+        self.assertEqual(references("COMPLETE, INDETERMINATE = 'COMPLETE', 'INDETERMINATE'\n", OTHER_INDETERMINATE[0]), set())
+
+    def test_the_definition_check_sees_a_reader_in_the_files_that_are_allowed_the_literal(self):
+        self.assertTrue(only_defined("COMPLETE, INDETERMINATE = 'COMPLETE', 'INDETERMINATE'\nINDETERMINATE = 'INDETERMINATE'\n"))
+        for source in ("def f(s):\n    return s == 'INDETERMINATE'\n", "X = f('INDETERMINATE')\n",
+                       "X = {'INDETERMINATE': 1}\n", "if s in ('INDETERMINATE',):\n    pass\n"):
+            with self.subTest(source):
+                self.assertFalse(only_defined(source))
 
     def test_the_other_indeterminate_is_a_different_record(self):
         """review_ocr's INDETERMINATE is the COVERAGE of a finder's run (`session.coverage.status`: the candidate was not

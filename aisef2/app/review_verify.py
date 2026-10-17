@@ -45,6 +45,10 @@ approved contracts and sealed clause facts only — never from the reviewer's te
 The known limit, measured in tests rather than hidden: anchoring decides that the expected value is the clause's
 approved outcome; it cannot decide that a NEW stimulus falls under the clause's condition (a reviewer claiming a
 corrupt file is an I/O error). A stimulus an approved contract decides differently is caught (CONTRADICTS_APPROVED).
+A second one, open: the anchor compares the expected values and leaves out `within_s`, so a window the reviewer chose
+and the product cannot keep (a few milliseconds) is an expired window, which the class's table makes REFUTED, which is
+CONFIRMED here, and ANCHORED all the same — the correct reference of the LedgerLock bundle blocks under `fix-loop` at
+`within_s: 0.001` and does not at 20. Whether that should block is not decided by this module: it is an open owner decision.
 
 Policy (settings `review`): under `fix-loop` a CONFIRMED and ANCHORED finding at or above `min_severity` blocks
 (REVIEW_FINDING, owner REVIEW, retryable through the taxonomy's REVIEW limit: the bounded fix loop), its statement and

@@ -69,6 +69,12 @@ def in_process(pattern: str, data: bytes) -> bool:
     return re.search(pattern, data.decode("utf-8", "replace")) is not None
 
 
+def oracle(pattern: str, data: bytes, stream: str = "") -> bool:
+    """`in_process` as the `search` of a caller that holds no harness (the class table's fixture facts): `verdict_of` and
+    `_stream_matches` have no search of their own to fall back to, so what they are compared with is given explicitly."""
+    return in_process(pattern, data)
+
+
 def recording(calls: list, work: str):
     """A `search` for `_stream_matches` that records what it is asked and asks the worker."""
     def bounded(pattern, data, stream):
@@ -164,7 +170,7 @@ class SameAnswerAsInProcess(Work):
                     calls = []
                     shape = {"regex": pattern}
                     self.assertEqual(ci._stream_matches(shape, fact, recording(calls, work), "stdout"),
-                                     ci._stream_matches(shape, fact))
+                                     ci._stream_matches(shape, fact, oracle, "stdout"))
                     self.assertEqual(calls, [(pattern, ci._stream_bytes(fact))])
         self.assertEqual(ci._stream_bytes({"path": path, "size": 12, "truncated": True}), b"first\nsecond")
 
@@ -189,7 +195,8 @@ class SameAnswerAsInProcess(Work):
                 ("an exit code that differs", {"exit_code": 1, "stdout": {"regex": "hello"}}),
                 ("only a regex on stderr", {"exit_code": 0, "stderr": {"regex": "x$"}})):
             with self.subTest(what):
-                self.assertEqual(ci.verdict_of("exits_streams", obs, facts, bounded), ci.verdict_of("exits_streams", obs, facts))
+                self.assertEqual(ci.verdict_of("exits_streams", obs, facts, bounded),
+                                 ci.verdict_of("exits_streams", obs, facts, oracle))
 
 
 class AStuckSearchStopsAtItsDeadline(Work):
@@ -368,7 +375,7 @@ class FailureModes(Work):
                     with self.assertRaises(ci.StreamSearchFailed) as caught:
                         search("x", b"x", work=self.work())
                 self.assertEqual(caught.exception.reason, "LAUNCH")
-        fake = mock.Mock(wait=mock.Mock(return_value=None), release=mock.Mock())
+        fake = mock.Mock(wait=mock.Mock(return_value=None), release=mock.Mock(), ledger=[])
         with mock.patch.object(ci, "ProcessRange", mock.Mock(return_value=fake)):
             with self.assertRaises(ci.StreamSearchFailed) as caught:
                 search("x", b"x", work=self.work(), timeout=60.0)
@@ -401,11 +408,13 @@ class FailureModes(Work):
         argv, env, cwd = seen[0]
         self.assertEqual(argv[:5], [sys.executable, "-I", "-S", "-B", "-c"])
         self.assertEqual(argv[5], ci.REGEX_WORKER)
-        self.assertEqual([pathlib.Path(a).name for a in argv[6:]], ["regex-stdout.request", "regex-stdout.result"])
-        self.assertEqual(cwd, work)
+        # a directory of its own, made for this search inside the evaluation directory: not a name in `work` itself
+        home = pathlib.Path(cwd)
+        self.assertEqual((home.parent, home.name.startswith("regex-")), (pathlib.Path(work), True))
+        self.assertEqual([pathlib.Path(a) for a in argv[6:]], [home / "request", home / "result"])
         self.assertFalse({k for k in env if k not in ("SYSTEMROOT", "SystemRoot", "WINDIR", "TEMP", "TMP", "TMPDIR",
                                                       "PYTHONDONTWRITEBYTECODE", "PYTHONHASHSEED", "PYTHONIOENCODING")})
-        head, _, data = pathlib.Path(work, "regex-stdout.request").read_bytes().partition(b"\n")
+        head, _, data = (home / "request").read_bytes().partition(b"\n")
         self.assertEqual((json.loads(head), data), ({"pattern": "a"}, b"banana"))
         modules = {a.name for n in ast.parse(ci.REGEX_WORKER).body if isinstance(n, ast.Import) for a in n.names}
         self.assertEqual(modules, {"json", "re", "sys"})
@@ -530,8 +539,11 @@ class EveryPatternClassifierTakesNoPatternReCannotCompile(unittest.TestCase):
     ways — `re.error`, `OverflowError` (`a{4294967296}`), `RecursionError` (2,000 nested groups) — and a classifier
     answers "the class, or None when this probe cannot give it a meaning", never an exception: `file_artifact`'s caught
     `re.error` only, so static admission and `aisef bundle coverage` (which call it on an authored spec, with no guard of
-    their own) ended in a traceback. Compiling is linear in the pattern (a megabyte took 0.6 s, measured), so a deadline
-    is not what it needs; a pattern that compiles is searched in a worker."""
+    their own) ended in a traceback. A pattern that compiles is searched in a worker; the compile itself is made here, in the
+    classifier, in the kernel's process, with no deadline. Its cost is linear in the pattern's size, but the constant is the
+    pattern's: a megabyte of plain letters took 0.6 s, and `(?i)` with a thousand `[\\u0000-\\U0010ffff]` (19 KB) took 3.7 s,
+    76 KB of them 15 s (measured, CPython 3.14.7, macOS). What bounds it is the size of the reply the pattern came in,
+    not a clock; whether to bound it otherwise is the owner's (decision D4 of the review-limits lane's report)."""
 
     BAD = ("(", "[", "a{2,1}", "(?P=n)", "\\", "(?z)", "a{4294967296}", "(" * 2000 + "a" + ")" * 2000)
     GOOD = ("hel+o", "^ok$", "(a+)b", "a{2,3}", ".*", "[0-9]+", "(?i)x", EVIL)

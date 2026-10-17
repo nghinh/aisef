@@ -6,6 +6,7 @@ import hashlib
 import json
 import os
 import pathlib
+import re
 import sys
 import tempfile
 import unittest
@@ -25,6 +26,12 @@ W = {"within_s": 5}
 
 def sha(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
+
+
+def oracle(pattern: str, data: bytes, stream: str = "") -> bool:
+    """The search of a caller that holds no harness, like these fixture facts: `verdict_of` has none of its own for a
+    `regex` shape (the probe's is a worker under a deadline, tests/v2/test_v21_r5_regex_worker.py), so it is given."""
+    return re.search(pattern, data.decode("utf-8", "replace")) is not None
 
 
 def spec(locator="app:__main__", observable=None, stimulus=None, kind="cli_invocation"):
@@ -215,18 +222,40 @@ class Verdicts(unittest.TestCase):
         ]
         for extra, verdict in cases:
             with self.subTest(observable=extra):
-                self.assertIs(ci.verdict_of("exits_streams", {"exit_code": 0, **extra}, f), verdict)
-                self.assertIs(ci.verdict_of("exits_streams", {"exit_code": 1, **extra}, f), R)   # the code counts too
+                self.assertIs(ci.verdict_of("exits_streams", {"exit_code": 0, **extra}, f, oracle), verdict)
+                self.assertIs(ci.verdict_of("exits_streams", {"exit_code": 1, **extra}, f, oracle), R)   # the code counts too
         raw = self.facts(0, b"\xff\xfe abc\n", b"\xff")   # bytes that are not UTF-8: decoded with replacement, never an error
-        self.assertIs(ci.verdict_of("exits_streams", {"exit_code": 0, "stdout": {"regex": "abc"}}, raw), S)
+        self.assertIs(ci.verdict_of("exits_streams", {"exit_code": 0, "stdout": {"regex": "abc"}}, raw, oracle), S)
         self.assertIs(ci.verdict_of("exits_streams", {"exit_code": 0, "stdout": {"first_word": "��"}}, raw), S)
         self.assertIs(ci.verdict_of("exits_streams", {"exit_code": 0, "stderr": {"first_word": "x"}}, raw), R)
-        self.assertIs(ci.verdict_of("exits_streams", {"exit_code": 0, "stderr": {"regex": "^�$"}}, raw), S)
+        self.assertIs(ci.verdict_of("exits_streams", {"exit_code": 0, "stderr": {"regex": "^�$"}}, raw, oracle), S)
         empty = self.facts(0, b"", b"")
         self.assertIs(ci.verdict_of("exits_streams", {"exit_code": 0, "stdout": "", "stderr": ""}, empty), S)
         self.assertIs(ci.verdict_of("exits_streams", {"exit_code": 0, "stdout": {"lines": 0}}, empty), S)
         self.assertIs(ci.verdict_of("exits_streams", {"exit_code": 0, "stdout": {"first_word": "a"}}, empty), R)
         self.assertIs(ci.verdict_of("exits_streams", {"exit_code": 0, "stdout": {"contains": [""]}}, empty), S)
+
+    def test_a_regex_shape_is_never_searched_in_this_process_a_search_is_required(self):
+        """F7 (review of the review-limits lane): `_stream_matches` had `re.search` of the data-supplied pattern as the
+        default when no search was given, so a caller that forgot one ran the unbounded search in the probe's own process
+        again. There is no such default now: the shape needs a search, the other shapes need none, and a conjunct that is
+        not reached asks for none."""
+        f = self.facts(0, b"verify ok\n", b"warn: x\n")
+        with self.assertRaises(TypeError):
+            ci.verdict_of("exits_streams", {"exit_code": 0, "stdout": {"regex": "ok"}}, f)
+        with self.assertRaises(TypeError):
+            ci._stream_matches({"regex": "ok"}, f["stdout"])
+        calls = []
+
+        def asked(pattern, data, stream):
+            calls.append((pattern, data, stream))
+            return True
+        self.assertIs(ci.verdict_of("exits_streams", {"exit_code": 0, "stdout": {"regex": "ok"}}, f, asked), S)
+        self.assertEqual(calls, [("ok", b"verify ok\n", "stdout")])
+        self.assertIs(ci.verdict_of("exits_streams", {"exit_code": 0, "stdout": "verify ok\n", "stderr": {"lines": 1}}, f), S)
+        self.assertIs(ci.verdict_of("exits_streams", {"exit_code": 1, "stdout": {"regex": "ok"}}, f), R)    # not reached
+        self.assertIs(ci.verdict_of("exits", {"exit_code": 0}, f), S)
+        self.assertEqual(len(calls), 1)
 
     def test_a_stream_fact_names_a_prefix_a_truncation_or_no_file(self):
         f = self.facts(0, b"earlylate")
