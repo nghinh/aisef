@@ -456,14 +456,17 @@ class Callers(unittest.TestCase):
 class Launches(unittest.TestCase):
     """One child process is one launch, whichever way the interpreter starts it (V2.1 fix window, owner decision of
     2026-10-15, item 6). subprocess.Popen announces a launch with its `subprocess.Popen` audit event and, on the way to
-    the child, may make an `os.posix_spawn` of its own: for every launch by a path on Linux with glibc's
-    POSIX_SPAWN_CLOSEFROM (Python 3.13+), on macOS only with `close_fds=False`. That second event is the same child;
-    counting it made such a launch two, and nine tests of ToyRecord red in the Linux guest.
+    the child, may make an `os.posix_spawn` of its own: for a launch by a path with none of cwd=, preexec_fn, pass_fds,
+    start_new_session, user, group, umask, with close_fds=False, or with the default close_fds where the interpreter has
+    os.POSIX_SPAWN_CLOSEFROM (measured: 3.13.15 and 3.14.8 on Linux, glibc 2.41; not 3.12.14, nor 3.14.7 on macOS). That
+    second event is the same child; counting it made such a launch two, and six tests of ToyRecord red in the Linux
+    guest (nine failure entries with their subtests).
 
     The expected counts are not constants: the traced code reports the pid of every process it really started, and the
     record must hold one launch per pid and one event file per hooked pid. `close_fds=False` takes the posix_spawn path
-    on macOS too, so the double count reproduces on both platforms; the traced code's own audit hook says which
-    launches really went through `Popen._posix_spawn` (a test that never reached that path would prove nothing)."""
+    on macOS and on every Python too, so the double count reproduces there; the traced code's own audit hook says which
+    launches really went through `Popen._posix_spawn` (a test that never reached that path would prove nothing). The
+    pid is the oracle of the tests, not the key of the recorder: both events are raised before the child exists."""
 
     CHILD = textwrap.dedent("""
         import json, os, subprocess, sys
@@ -501,7 +504,7 @@ class Launches(unittest.TestCase):
 
     def test_every_process_started_is_one_launch_and_one_hooked_pid_is_one_event_file(self):
         out, got, files = self.traced("""
-        run([py, *kid])                    # the defaults: posix_spawn on Linux (CLOSEFROM), fork_exec on macOS
+        run([py, *kid])                    # the defaults: posix_spawn with CLOSEFROM (3.13+ Linux), else fork_exec
         run([py, *kid], close_fds=False)   # posix_spawn on both
         run([py, *kid], cwd=".")           # fork_exec on both: a cwd
         run(["sh", "-c", "true"])          # fork_exec on both: a bare name; not Python, so no event file
@@ -534,7 +537,7 @@ class Launches(unittest.TestCase):
 
     def test_a_launch_that_fails_is_counted_once_on_either_path(self):
         out, got, files = self.traced("""
-        for kw in ({}, {"close_fds": False}):   # posix_spawn on Linux / fork_exec on macOS, then posix_spawn on both
+        for kw in ({}, {"close_fds": False}):   # posix_spawn only with CLOSEFROM, then on every Python
             try:
                 subprocess.Popen(["/nonexistent/aisef-launch"], **kw)
             except FileNotFoundError:

@@ -72,9 +72,14 @@ Limits — what a result recorded here is not (also in the output, `limits`):
     -I, -E or -S. A test that builds its own `env=` starts a child this recorder cannot see (`children.unhooked_python`),
     and so does a child of one. A child launched by something that raises no `subprocess.Popen` / `os.posix_spawn` /
     `os.spawn` / `os.system` audit event (`_posixsubprocess` called directly, multiprocessing's spawn) is not counted.
-    One launch is one child: the os.posix_spawn that subprocess.Popen itself makes (Linux with glibc's
-    POSIX_SPAWN_CLOSEFROM; macOS with close_fds=False) follows Popen's own event and is not counted again; a direct
-    os.posix_spawn of the traced code is (told by its caller `Popen._posix_spawn`, not by its arguments).
+    One launch is one child, not one event: the os.posix_spawn that subprocess.Popen itself makes on the way to the same
+    child follows Popen's own event and is not counted again (it happens for a launch by a path with none of cwd=,
+    preexec_fn, pass_fds, start_new_session, user, group, umask, and with close_fds=False, or the default close_fds
+    on an interpreter that has os.POSIX_SPAWN_CLOSEFROM: 3.13.15 and 3.14.8 on Linux/glibc 2.41, not 3.12.14 nor
+    3.14.7 on macOS; the full conditions and the measurements are in read_set.py's Limits, whose hook this one copies).
+    It is told by its caller (`Popen._posix_spawn`), not by its arguments and not by a pid (both events precede the
+    child). A direct os.posix_spawn of the traced code is counted; a traced program that replaces
+    `Popen._posix_spawn` with a wrapper is counted twice for that launch.
   * C-level calls, and code with no file of the tree (exec/compile, dataclass-generated methods): not matched.
   * A hit is lost when the process has no free file descriptor at that moment (retried at the next call).
   * What "executed" says: the function's code object started. Not a line, a branch, or that its result was used.

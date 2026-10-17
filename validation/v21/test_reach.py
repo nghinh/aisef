@@ -445,9 +445,10 @@ class Recorder(unittest.TestCase):
 class Launches(unittest.TestCase):
     """One child process is one launch (V2.1 fix window, owner decision of 2026-10-15, item 6; the same test as
     tests/v2/test_v21_read_set.py::Launches, for this tool's own copy of the hook). subprocess.Popen raises its own
-    event and may make an os.posix_spawn of its own (Linux with glibc's POSIX_SPAWN_CLOSEFROM; macOS with
-    close_fds=False): the same child. The traced code reports the pid of every process it really started and the record
-    must hold one launch per pid; a direct os.posix_spawn is a launch of its own."""
+    event and may make an os.posix_spawn of its own (close_fds=False; or the default close_fds where the interpreter
+    has os.POSIX_SPAWN_CLOSEFROM: 3.13.15 and 3.14.8 on Linux, not 3.12.14 nor 3.14.7 on macOS): the same child. The
+    traced code reports the pid of every process it really started and the record must hold one launch per pid; a
+    direct os.posix_spawn is a launch of its own."""
 
     CHILD = textwrap.dedent("""
         import json, os, subprocess, sys
@@ -456,7 +457,7 @@ class Launches(unittest.TestCase):
             if event == "os.posix_spawn":
                 via.append(sys._getframe(1).f_code.co_name)   # the function that called os.posix_spawn
         sys.addaudithook(spy)
-        for kw in ({}, {"close_fds": False}):   # posix_spawn on Linux / fork_exec on macOS; posix_spawn on both
+        for kw in ({}, {"close_fds": False}):   # posix_spawn only with CLOSEFROM; on every Python
             p = subprocess.Popen([sh, "-c", "true"], **kw)
             p.wait()
             started.append([p.pid, False])

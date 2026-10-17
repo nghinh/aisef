@@ -62,15 +62,24 @@ Limits — what a read-set recorded here is not (also in the output, `limits`, w
   * A child Python process is seen only when it loads our sitecustomize: it must inherit PYTHONPATH and not run with
     -I, -E or -S. A test that builds its own environment (`env={...}` without PYTHONPATH, or `{**os.environ,
     "PYTHONPATH": X}`) starts a child this recorder cannot see; so does a child of such a child. Counted per kill
-    file from the launch events of the hooked processes (subprocess.Popen, os.posix_spawn, os.spawn, os.system), one
-    launch per child: the os.posix_spawn that subprocess.Popen itself makes (every launch by a path on Linux with
-    glibc's POSIX_SPAWN_CLOSEFROM, Python 3.13+; on macOS only with close_fds=False) is the second event of a launch
-    Popen already announced and is not counted again — it is told by its caller (`Popen._posix_spawn`), not by its
-    arguments, so a direct os.posix_spawn of the traced code with the same arguments still counts:
+    file from the launch events of the hooked processes (subprocess.Popen, os.posix_spawn, os.spawn, os.system):
     `children.python_unhooked`; `children.hooked` is the number of child processes that did run the hook. A child
     launched by something that raises no such event (`_posixsubprocess` called directly) is not counted either way;
     nor is one of os.spawnv on POSIX, which CPython 3.14 reports as os.fork and os.exec (the `os.spawn` event is raised
     on Windows only: measured with 3.14.7 on macOS and 3.14.8 on Linux).
+    One launch is one child, not one event. subprocess.Popen raises `subprocess.Popen` for every launch and may then
+    make an os.posix_spawn of its own on the way to the same child (the same Popen object at both events: measured);
+    that second event is not counted. It happens for a launch by a path (the executable has a directory part) with none
+    of cwd=, preexec_fn, pass_fds, start_new_session, process_group, user, group, extra_groups, umask (the conditions
+    of subprocess.py 3.14.7, which also looks at the standard streams), and either close_fds=False, or the default
+    close_fds on an interpreter that has os.POSIX_SPAWN_CLOSEFROM (measured there: 3.13.15 and 3.14.8, Linux, glibc
+    2.41, arm64; absent from 3.12.14 and from 3.14.7 on macOS, where only close_fds=False takes the path). The second
+    event is told by its caller (`Popen._posix_spawn`), not by its arguments and not by a pid: both events are raised
+    before the child exists (the Popen object's pid is still None at each: measured), so there is no pid to key on;
+    the tests take the pids of the processes really started as the oracle. A direct os.posix_spawn of the traced code,
+    with the arguments of the Popen just before or not, has another caller and counts. A traced program that replaces
+    `Popen._posix_spawn` with a wrapper defeats the guard: that launch counts twice (measured: 3.12.14 and 3.14.7 on
+    macOS; 3.12.14, 3.13.15 and 3.14.8 on Linux). Not measured: 3.11, 3.13.0 to 3.13.14, a glibc older than 2.41.
     Measured over the kill files of V21_TARGETS at 875c85e by grep of each file's own text (not its helpers):
     23 of 45 mention subprocess, Popen, ProcessRange, os.system/fork/exec/spawn or multiprocessing; 11 of those pass
     `env=`; 3 name PYTHONPATH (test_s2_kills, test_v21_continue_integrity, test_c2_cli_verdicts). Measured by the
