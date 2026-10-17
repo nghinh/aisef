@@ -239,10 +239,14 @@ class CriterionWithoutAContract(unittest.TestCase):
         self.assertEqual({e["contract"] for e in rows.values()}, {None})
         self.assertEqual([c for c, e in rows.items() if e["approved"] is True], [])
         self.assertEqual(bundle_cli.lint(doc)["verdict"], "NOT_READY")
-        migrated, _ = bundle_cli.migrate(doc)      # the contracts and their approvals are untouched: now they bind
+        migrated, report = bundle_cli.migrate(doc)      # the contracts are untouched, and so are the approvals nothing selects
         rows = self.entries(migrated)
-        self.assertEqual(({e["contract"] is None for e in rows.values()}, {e["approved"] for e in rows.values()}),
-                         ({False}, {True}))
+        withheld = {r["contract"] for r in report["approvals_withheld"]}
+        self.assertEqual(len(withheld), 6)     # what a declared capability change evaluates differently: waiting for the owner
+        self.assertEqual({e["contract"] is None for e in rows.values()}, {False})
+        self.assertEqual({e["contract"] for e in rows.values() if e["approved"] is False}, withheld)
+        self.assertEqual({e["approved"] for e in rows.values()} - {False}, {True})
+        self.assertFalse(withheld & {e["contract"] for e in rows.values() if e["approved"] is True})
 
 
 class RequirementFactThatIsNotAnId(unittest.TestCase):

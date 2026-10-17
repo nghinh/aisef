@@ -368,16 +368,18 @@ class ApprovalsToKeepThatDoNotLoad(Base):
                 "a timestamp that is not a number": {**self.good, "approved_at": "x"}}
 
     def test_a_loading_approval_is_kept(self):
-        _, report = bundle_cli.seal(self.authoring(), repo=self.repo, approvals=[self.good])
+        _, report = bundle_cli.seal(self.authoring(), repo=self.repo, approvals=[self.good],
+                                    exposed=bundle_cli.exposure_of(self.old))
         self.assertEqual((report["approvals_kept"], report["approvals_dropped"]), (1, []))
 
     def test_each_one_that_does_not_load_refuses_the_seal(self):
         for what, approval in self.bad().items():
             with self.subTest(what):
-                self.refused(self.authoring(), approvals=[self.good, approval])
+                self.refused(self.authoring(), approvals=[self.good, approval], exposed=bundle_cli.exposure_of(self.old))
 
     def test_the_refusal_names_an_approval_even_when_the_kernel_detail_does_not(self):
-        message = self.refused(self.authoring(), approvals=[{**self.good, "approved_at": "x"}])
+        message = self.refused(self.authoring(), approvals=[{**self.good, "approved_at": "x"}],
+                               exposed=bundle_cli.exposure_of(self.old))
         self.assertIn("approval", message)
 
     def test_the_command_refuses_an_agent_approval_with_exit_2_and_writes_nothing(self):

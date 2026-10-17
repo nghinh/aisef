@@ -206,7 +206,49 @@ def _probe_digest() -> str:
 #: (a stimulus grammar, a verdict rule, a class's meaning). The bytes that run are EXECUTION_DIGEST: a calibration row
 #: and the run's RunSpec bind them, so a byte change needs its calibrations demonstrated again before anything admits.
 #: A matching digest is not evidence that two executions behave alike; the calibration contrast is the evidence.
-CAPABILITY_VERSION = 3     # 2: the class python_imports (V21-37); 3: a selection of no file is an absent subject (PM-9)
+CAPABILITY_VERSION = 3     # 2: the class python_imports (V21-37); 3: a selection of no file is an absent subject (PM-9), see CAPABILITY_CHANGES
+#: What each capability version above 1 changed in what a contract of this probe means (V2.1, owner decision
+#: 2026-10-15 item 1). `aisef bundle migrate` and `seal --keep-approvals-from` keep an approval given under an earlier
+#: capability only for a contract these records say is evaluated as it was; a version with no record, or one that is not
+#: well formed, is read as changing every contract of this probe (fail closed; tests/v2/test_v21_migrate_semantics.py
+#: holds every probe of the catalog to a record for each version it is at). `affects` lists selectors: a contract is
+#: affected when its observation class is one of `classes` and its `subject_absence` one of those named (a key left out
+#: takes every value) — the selector sees the contract, never the repository, so it selects every contract that could
+#: meet the condition; `when` says what the repository must hold for the verdict to differ, `before` and `after` the
+#: verdict then, `ref` the short name the report gives the change. An empty `affects` is a declaration: no contract that
+#: could be written before changed. A change made while the number stayed where it was is declared under the next
+#: version, since the number is what a release recorded.
+def _capability_changes() -> dict:
+    """The table below, built in a scope of its own: it names the members of the absence declaration (a selector says which
+    contracts a change reaches), and the check NO_VERDICT_FROM_ABSENCE_DECLARATION (RFC §10.2) reads a scope that names
+    them next to a decided verdict, as `ON_DEADLINE` above is, as a verdict inferred from the declaration. Nothing here
+    decides a verdict: the table is read by `aisef bundle migrate` and nothing else."""
+    return {
+        2: {"summary": "the class python_imports was added; no class that existed changed", "affects": ()},
+        3: {"summary": "a path that is in the tree but selects no file is an absent subject, no longer a count of zero over "
+                       "no file (PM-9); one leading UTF-8 byte-order mark is dropped before a file is read (PM-11); the "
+                       "matching of grep_count runs in a worker under timeouts_s.probe (PM-13), which gives a pattern that "
+                       "does not finish no verdict it ever had",
+            "affects": ({"ref": "PM-9", "classes": ("grep_count", "python_imports"), "subject_absence": ("REQUIRES_SUBJECT",),
+                         "when": "PM-9: the path is in the tree and selects no file the suffixes take: a directory holding no "
+                                 "such file (a package whose modules moved, a documentation directory), a file whose name "
+                                 "ends with none of the suffixes, or a directory that bears the name of a file",
+                         "before": "a count of zero matches over no file: SATISFIED when the observable's matches is 0, "
+                                   "REFUTED when it is 1 or more",
+                         "after": "INDETERMINATE (PRECONDITION_ABSENT): the subject is absent and the contract requires it"},
+                        {"ref": "PM-11", "classes": ("grep_count", "python_imports"),
+                         "when": "PM-11: a selected file begins with a UTF-8 byte-order mark (EF BB BF) and what its first line "
+                                 "gives depends on it: a pattern anchored at the start of the line, or one that tells the mark "
+                                 "from a character (grep_count); any import statement of the file (python_imports)",
+                         "before": "the mark was a character of line 1: a start-anchored pattern did not match that line "
+                                   "(grep_count), and a file with the mark did not parse (python_imports: REFUTED)",
+                         "after": "the mark is not text: the same line matches and the file is counted, so the count differs "
+                                  "by that line (a prohibition, matches 0, can be REFUTED where it was SATISFIED; a requirement "
+                                  "the reverse)"})},
+    }
+
+
+CAPABILITY_CHANGES = _capability_changes()
 EXECUTION_DIGEST = _probe_digest()
 DIGEST = hashlib.sha256(json.dumps([PROBE_ID, CAPABILITY_VERSION, list(CLASSES)]).encode("utf-8")).hexdigest()
 

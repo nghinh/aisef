@@ -32,17 +32,17 @@ ROOT = pathlib.Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from aisef2.app import bundle, bundle_cli  # noqa: E402
 from aisef2.app import review_verify as V  # noqa: E402
 from aisef2.app import settings  # noqa: E402
+from tests.v2 import ledgerlock_candidate as LL  # noqa: E402
 from tests.v2.test_app_run import SETTINGS, ProductBase  # noqa: E402
 
 REFERENCE = ROOT / "tests/v2/fixtures/workloads/ledgerlock-reference/reference/ledgerlock"
 REQUIREMENTS = {"R-7": object(), "R-9": object()}
 MAIN = {"kind": "cli_invocation", "locator": "ledgerlock:__main__"}
-#: the approved LedgerLock bundle of release 2.0.0, re-bound to this release's spec ids (approvals unchanged)
-LEDGERLOCK = bundle.load(bundle_cli.migrate(json.loads((ROOT / "closure-evidence/v2/release/LEDGERLOCK-PROJECT.json")
-                                                       .read_text(encoding="utf-8")))[0])
+#: the approved LedgerLock bundle of release 2.0.0, re-bound to this release's spec ids; the six approvals migration
+#: withholds (a declared capability change evaluates their contracts differently) given again by a stand-in, in memory
+LEDGERLOCK = LL.project()
 
 
 def _ledger_bytes(*lines_of) -> bytes:

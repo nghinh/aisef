@@ -13,7 +13,11 @@ violation reported as `RULE rel:line explanation`:
   (`dataclasses.replace`, `copy.replace`), or writes approvals: an `approvals` key or keyword, a store, delete or
   mutating method call (update, append, ...; setattr, operator.setitem) on the approvals, on a part of them, on a name bound to them or
   to a part of them, or with the key "approvals" among its arguments. A parameter of a reached function is bound to the
-  approvals when a call in the closure passes them (or a part of them) to it.
+  approvals when a call in the closure passes them (or a part of them) to it. The one write there is: a migration may
+  leave an approval out of the bundle it builds (owner decision 2026-10-15, item 1 — an approval whose contract is
+  evaluated differently since is not carried over), as the value of the key `approvals` in a dict display: a
+  comprehension of one loop `[a for a in data["approvals"] if ...]` whose element is the loop's own name, `data` as
+  above. A filter holds some of the input's own approvals and nothing else: it puts none in and changes none.
 * **NO_COMMIT_OR_MERGE** — module-based: nothing migrate or verify reaches in aisef2/app names (calls or not) anything
   of a deciding module — the kernel's git, merge, gate, review and story runner (aisef2.orchestrate), the owner's
   control (aisef2.control), the journal (aisef2.journal), story admission (aisef2.plan.story_admission) — or a control
@@ -42,8 +46,9 @@ commit_all` is workspace.commit_all) — inside aisef2/app. Known ceiling: a cal
 `self.x`) is not followed, nor what a reached class's `__init__` does with an argument (`K(out["approvals"])`); the
 analysis is flow-insensitive except
 that a binding of the corroboration name after its Finding counts only inside a loop that holds both; the behavioural
-tests (test_v21_identity Migrate — `test_migration_rebinds_the_plan_and_nothing_else` asserts the input unchanged and
-the output's approvals equal to the input's —, test_v21_review, test_v21_review_chain) cover what those do at run time.
+tests (test_v21_identity Migrate — `test_migration_rebinds_the_plan_and_withholds_only_what_a_declared_change_selects`
+asserts the input unchanged and the output's approvals the input's less exactly what the report says it withheld —,
+test_v21_migrate_semantics, test_v21_review, test_v21_review_chain) cover what those do at run time.
 
     python -P validation/qualification/authority_limits.py     # exit 1 on any violation
 """
@@ -299,13 +304,31 @@ def _held(node: ast.AST, params=()) -> set[str]:
         held |= more
 
 
+def _input(node: ast.AST) -> list[str]:
+    """The function's first parameter as a one-name list — empty when `node` is no function or rebinds it: the name
+    of the input a migration is given, never another document."""
+    first = _params(node)[:1] if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) else []
+    if first and any(isinstance(t, ast.Name) and t.id == first[0] and isinstance(t.ctx, ast.Store) for t in ast.walk(node)):
+        first = []
+    return first
+
+
+def _filters(node: ast.AST) -> set[int]:
+    """The ids of the comprehensions in `node` that hold some of the input's own approvals untouched: one loop
+    `for a in D["approvals"]` (D as in `_reloads`), its element the loop's own name. Any `if` is allowed: a filter
+    leaves approvals out, and puts none in or changes none."""
+    first = _input(node)
+    return {id(c) for c in ast.walk(node) if isinstance(c, ast.ListComp) and len(c.generators) == 1
+            and isinstance(g := c.generators[0], ast.comprehension) and not g.is_async and isinstance(g.target, ast.Name)
+            and _is_approvals(g.iter) and isinstance(g.iter, ast.Subscript) and isinstance(g.iter.value, ast.Name)
+            and g.iter.value.id in first and isinstance(c.elt, ast.Name) and c.elt.id == g.target.id}
+
+
 def _reloads(node: ast.AST) -> set[int]:
     """The callees (by id) of the `ContractApproval(**a)` calls that re-load an approval of the input: each the element
     of a comprehension whose one loop is `for a in D["approvals"]`, D the function's first parameter and never rebound
     in it — `a` is then the input's element and nothing rebinds it."""
-    first = _params(node)[:1] if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) else []
-    if first and any(isinstance(t, ast.Name) and t.id == first[0] and isinstance(t.ctx, ast.Store) for t in ast.walk(node)):
-        first = []
+    first = _input(node)
     return {id(c.elt.func) for c in ast.walk(node) if isinstance(c, (ast.ListComp, ast.GeneratorExp, ast.SetComp))
             and len(c.generators) == 1 and isinstance(g := c.generators[0], ast.comprehension)
             and isinstance(g.target, ast.Name) and _is_approvals(g.iter) and isinstance(g.iter, ast.Subscript)
@@ -357,7 +380,7 @@ def _created(m: _Module, node: ast.AST) -> list[int]:
     return [n.lineno for n, _, q in _refs(m, node) if _under(q, (APPROVAL,)) and id(n) not in skip]
 
 
-def _approves(m: _Module, n: ast.AST, held: set[str]) -> str | None:
+def _approves(m: _Module, n: ast.AST, held: set[str], filters: set[int] = frozenset()) -> str | None:
     if isinstance(n, ast.Call):
         callee = m.name(n.func)
         if callee == APPROVE:
@@ -370,7 +393,8 @@ def _approves(m: _Module, n: ast.AST, held: set[str]) -> str | None:
             return "writes the approvals"
         if callee in SETATTR and (n.args and _holds(n.args[0], held) or _names_key(n)):
             return "writes the approvals"
-    if isinstance(n, ast.Dict) and any(isinstance(k, ast.Constant) and k.value == "approvals" for k in n.keys):
+    if isinstance(n, ast.Dict) and any(isinstance(k, ast.Constant) and k.value == "approvals" and id(v) not in filters
+                                       for k, v in zip(n.keys, n.values, strict=True)):
         return "writes an 'approvals' key"
     if isinstance(n, (ast.Subscript, ast.Attribute)) and isinstance(n.ctx, (ast.Store, ast.Del)):
         if _is_approvals(n):
@@ -554,9 +578,10 @@ def check(root: pathlib.Path = ROOT, sources: dict[str, str] | None = None) -> l
     migrate = _closure(mods, index, (MIGRATE,))
     passed = _passed(mods, migrate)
     for q, rel, node in migrate:
-        m, held = mods[rel], _held(node, passed.get(q, ()))
+        m, held, filters = mods[rel], _held(node, passed.get(q, ())), _filters(node)
         whys = [(line, "creates a ContractApproval (a migration only re-loads the input's: ContractApproval(**a))")
-                for line in _created(m, node)] + [(n.lineno, why) for n in ast.walk(node) if (why := _approves(m, n, held))]
+                for line in _created(m, node)] + [(n.lineno, why) for n in ast.walk(node)
+                                                  if (why := _approves(m, n, held, filters))]
         out += [f"MIGRATE_NEVER_APPROVES {rel}:{line} {_short(q)} {why}: what migrate reaches re-binds the plan and never "
                 "approves" for line, why in sorted(whys, key=lambda w: w[0])]
     for q, rel, node in _closure(mods, index, (MIGRATE, VERIFY)):

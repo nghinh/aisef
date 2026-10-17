@@ -7,7 +7,6 @@ assertions stay in tests/v2/test_v21_identity.py, which is a kill file."""
 
 from __future__ import annotations
 
-import json
 import os
 import pathlib
 import subprocess
@@ -19,7 +18,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from aisef2.app import bundle, bundle_cli  # noqa: E402
+from aisef2.app import bundle  # noqa: E402
 from aisef2.app import run as R  # noqa: E402
 from aisef2.app.calibrations import CALIBRATIONS  # noqa: E402
 from aisef2.probe import catalog  # noqa: E402
@@ -27,6 +26,7 @@ from aisef2.probe import cli_invocation as ci  # noqa: E402
 from aisef2.probe import process_effect as pe  # noqa: E402
 from aisef2.probe import python_callable_v2 as pc2  # noqa: E402
 from aisef2.probe.calibration import calibration_env, executing  # noqa: E402
+from tests.v2 import ledgerlock_candidate as LL  # noqa: E402
 
 LEDGERLOCK_2_0_0 = ROOT / "closure-evidence/v2/release/LEDGERLOCK-PROJECT.json"
 
@@ -42,7 +42,7 @@ class ThreeIdentities(unittest.TestCase):
 
     def test_calibrations_of_other_bytes_admit_nothing(self):
         stale = tuple(dict(r, probe_digest="0" * 64) for r in CALIBRATIONS)
-        project = bundle.load(bundle_cli.migrate(json.loads(LEDGERLOCK_2_0_0.read_text(encoding="utf-8")))[0])
+        project = bundle.load(LL.loadable())     # the migrated bundle, its withheld approvals approved by a stand-in
         self.assertTrue(R.admit(project, R.calibrations())["admitted"])
         a = R.admit(project, R.calibrations(stale))
         self.assertFalse(a["admitted"])

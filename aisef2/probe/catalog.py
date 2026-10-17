@@ -23,7 +23,7 @@ stimulus shape that scopes the closed-vocabulary rules); a wrong declaration is 
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Callable
 
 from aisef2.arch.enums import SubjectKind
@@ -60,6 +60,11 @@ class CatalogEntry:
     stimulus_shape: str
     cycle: int
     active: bool = True
+    #: what the probe's module declares of its own capability (`_capability`): its CAPABILITY_VERSION and the record of
+    #: what each version above 1 changed (CAPABILITY_CHANGES). None when the module declares none; read by
+    #: `aisef bundle migrate` to tell an approval that still holds from one whose contract now evaluates differently.
+    capability_version: int | None = field(default=None, compare=False, hash=False)
+    capability_changes: dict | None = field(default=None, compare=False, hash=False)
 
     def __post_init__(self) -> None:
         if not isinstance(self.probe_id, str) or not _ID.fullmatch(self.probe_id):
@@ -87,23 +92,33 @@ class CatalogEntry:
             raise InvariantError(f"{self.probe_id}: cycle is a positive integer")
 
 
+def _capability(module) -> dict:
+    """The capability declarations of a probe module, as the keyword arguments of its entry — None for what it does
+    not declare, which a reader of the entry treats as undeclared and never as "nothing changed"."""
+    return {"capability_version": getattr(module, "CAPABILITY_VERSION", None),
+            "capability_changes": getattr(module, "CAPABILITY_CHANGES", None)}
+
+
 CATALOG: tuple[CatalogEntry, ...] = (
     CatalogEntry(pc.PROBE_ID, pc.DIGEST, SubjectKind.PYTHON_CALLABLE, pc.CLASSES, pc.METADATA, pc.PythonCallableProbe,
                  "aisef2/probe/python_callable.py", "python_callable", "in_harness_process", "captured_stdout",
-                 "call", 1, active=False),
+                 "call", 1, active=False, **_capability(pc)),
     # WP-2.1.1 (Cycle 2): no child script exists — the probe reads the object store in the harness process — so
     # in_harness_process / captured_stdout are the only truthful declarations for a probe that runs no subject
     CatalogEntry(fa.PROBE_ID, fa.DIGEST, SubjectKind.FILE_ARTIFACT, fa.CLASSES, fa.METADATA, fa.FileArtifactProbe,
-                 "aisef2/probe/file_artifact.py", "file_artifact", "in_harness_process", "captured_stdout", "none", 2),
+                 "aisef2/probe/file_artifact.py", "file_artifact", "in_harness_process", "captured_stdout", "none", 2,
+                 **_capability(fa)),
     # WP-2.4.1 (DECISION-6): the second identity supersedes as the active python_callable probe; B1 (V2.0 release
     # charter §7): its subject runs in a process of its own, the protocol on the controller's marker file
     CatalogEntry(pc2.PROBE_ID, pc2.DIGEST, SubjectKind.PYTHON_CALLABLE, pc2.CLASSES, pc2.METADATA,
                  pc2.PythonCallableV2Probe, "aisef2/probe/python_callable_v2.py", "python_callable_v2",
-                 "child_of_harness", "marker_file", "call", 2),
+                 "child_of_harness", "marker_file", "call", 2, **_capability(pc2)),
     CatalogEntry(ci.PROBE_ID, ci.DIGEST, SubjectKind.CLI_INVOCATION, ci.CLASSES, ci.METADATA, ci.CliInvocationProbe,
-                 "aisef2/probe/cli_invocation.py", "cli_invocation", "child_of_harness", "marker_file", "invocation", 2),
+                 "aisef2/probe/cli_invocation.py", "cli_invocation", "child_of_harness", "marker_file", "invocation", 2,
+                 **_capability(ci)),
     CatalogEntry(pe.PROBE_ID, pe.DIGEST, SubjectKind.PROCESS_EFFECT, pe.CLASSES, pe.METADATA, pe.ProcessEffectProbe,
-                 "aisef2/probe/process_effect.py", "process_effect", "child_of_harness", "marker_file", "scenario", 2),
+                 "aisef2/probe/process_effect.py", "process_effect", "child_of_harness", "marker_file", "scenario", 2,
+                 **_capability(pe)),
 )
 
 

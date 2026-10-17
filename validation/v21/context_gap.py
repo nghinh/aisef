@@ -125,12 +125,33 @@ def calls(stream: pathlib.Path):
             yield json.dumps(((e.get("part") or {}).get("state") or {}).get("input") or {}, ensure_ascii=False)
 
 
+def migrated_project():
+    """The 2.0.0 bundle migrated in memory (V2-007): the plan, the specs and the facts the two parts below read. The
+    candidate `migrate` makes lacks the approvals of the contracts whose evaluation changed since 2.0.0 (owner decision
+    2026-10-15) — they are the owner's to give, so it does not load, and nothing here approves: the specs are minted
+    without the approval gate (`bundle_cli._mint`, as `aisef bundle explain` does), and an approval enters neither a
+    spec's id nor what is read from it."""
+    sys.path.insert(0, str(ROOT))
+    from aisef2.app import bundle, bundle_cli
+    from aisef2.product.approval import ContractApproval, Requirement
+    from aisef2.product.contract import BehaviorContract
+    cand, _ = bundle_cli.migrate(json.loads(BUNDLE.read_text(encoding="utf-8")))
+    refs = bundle_cli._refs()
+    contracts = {c["id"]: BehaviorContract.from_json(c) for c in cand["contracts"]}
+    specs = {s.id: s for s in (bundle_cli._mint(c, refs[c.subject.kind]) for c in contracts.values())}
+    return bundle.Project(
+        cand["name"], cand["description"], cand["requirements_document"]["path"], cand["requirements_document"]["sha256"],
+        tuple(cand["product_roots"]), {r["id"]: Requirement(**r) for r in cand["requirements"]}, contracts,
+        tuple(ContractApproval(**a) for a in cand["approvals"]), specs, bundle._plan(cand["plan"]),
+        {k: dict(v) for k, v in cand["facts"].items()},
+        {k: {"depends_on": list(v["depends_on"]), "tests": list(v["tests"])} for k, v in cand["stories"].items()},
+        "not-a-loaded-bundle")
+
+
 def expectations() -> dict[str, str]:
     """criterion -> the candidate expectation of its spec in the 2.0.0 bundle (migrated, V2-007; the same plan's criteria
     as P10's journals)."""
-    sys.path.insert(0, str(ROOT))
-    from aisef2.app import bundle, bundle_cli
-    project = bundle.load(bundle_cli.migrate(json.loads(BUNDLE.read_text(encoding="utf-8")))[0])
+    project = migrated_project()
     return {o.criterion_id: project.specs[o.product_proof_spec_id].candidate_expectation.value for o in project.plan.obligations}
 
 
@@ -187,8 +208,8 @@ def told_200() -> list:
 def pack_now() -> list[tuple[int, str]]:
     """Part 3: the context pack this tree builds at smoke-2's STORY-04-02 retries."""
     sys.path.insert(0, str(ROOT))
-    from aisef2.app import bundle, bundle_cli, feedback
-    project = bundle.load(bundle_cli.migrate(json.loads(BUNDLE.read_text(encoding="utf-8")))[0])
+    from aisef2.app import feedback
+    project = migrated_project()
     evs = events(SMOKE2 / "aisef-run.jsonl")
     return [(q, feedback.context_pack([(e["seq"], e["type"], e["data"]) for e in evs if e["seq"] < q], "STORY-04-02", project))
             for q in (1473, 1584)]

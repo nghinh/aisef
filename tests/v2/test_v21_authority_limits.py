@@ -210,6 +210,58 @@ class MigrateNeverApproves(unittest.TestCase):
             f"a ContractApproval (a migration only re-loads the input's: ContractApproval(**a)){APPROVES}",
             f"MIGRATE_NEVER_APPROVES {BUNDLE_CLI}:{line_of(src, written)} bundle_cli.approve writes an 'approvals' key{APPROVES}"])
 
+    #: the one place migrate writes the key: the candidate leaves out the approvals whose contract a declared change
+    #: evaluates differently (owner decision 2026-10-15, item 1) — a filter of the input's own, which puts none in
+    FILTER = '    candidate = {**out, "approvals": [a for a in data["approvals"] if _key(a) not in dropped]}'
+
+    def test_leaving_an_approval_out_is_the_one_write_a_migration_may_make(self):
+        src = edited(BUNDLE_CLI, (self.FILTER, self.FILTER))
+        self.assertIn(self.FILTER, src)
+        self.assertEqual(check(BUNDLE_CLI, src), [])     # the real line: a filter of one loop, its element the loop's own name
+        # a filter with another condition is still one: it only leaves approvals out
+        src = edited(BUNDLE_CLI, (self.FILTER, self.FILTER.replace("if _key(a) not in dropped", "")))
+        self.assertEqual(check(BUNDLE_CLI, src), [])
+
+    def test_anything_else_in_the_key_is_caught_where_it_is_written(self):
+        written = f"MIGRATE_NEVER_APPROVES {BUNDLE_CLI}:{{}} bundle_cli.migrate writes an 'approvals' key{APPROVES}"
+        for edit in (
+                # an element that is not the input's own approval: a copy with changes, an approval put in
+                '    candidate = {**out, "approvals": [{**a, "approver": "human:migrate"} for a in data["approvals"]]}',
+                '    candidate = {**out, "approvals": [*[a for a in data["approvals"]], {"approver": "human:migrate"}]}',
+                '    candidate = {**out, "approvals": [a for a in data["approvals"]] + [{"approver": "human:migrate"}]}',
+                '    candidate = {**out, "approvals": [a for a in data["approvals"] for b in data["approvals"]]}',
+                # another iterable: a document the migration built, or the output rather than the input
+                '    candidate = {**out, "approvals": [a for a in [{"approver": "human:migrate"}]]}',
+                '    candidate = {**out, "approvals": [a for a in out["approvals"] if _key(a) not in dropped]}',
+                # a comprehension that is not a list, a bare reference, a store rather than a dict display
+                '    candidate = {**out, "approvals": {a for a in data["approvals"]}}',
+                '    candidate = {**out, "approvals": (a for a in data["approvals"])}',
+                '    candidate = {**out, "approvals": data["approvals"] + [{"approver": "human:migrate"}]}'):
+            with self.subTest(edit=edit):
+                src = edited(BUNDLE_CLI, (self.FILTER, edit))
+                self.assertEqual(check(BUNDLE_CLI, src), [written.format(line_of(src, edit))])
+        store = '    candidate = {**out}\n    candidate["approvals"] = [a for a in data["approvals"] if _key(a) not in dropped]'
+        src = edited(BUNDLE_CLI, (self.FILTER, store))
+        self.assertEqual(check(BUNDLE_CLI, src), [written.format(line_of(src, 'candidate["approvals"] ='))])
+        # the input is the function's own, never rebound: a filter of a name it rebound is not the input's — and neither
+        # is the re-load of its approvals above it, which the function no longer owns the name of
+        src = edited(BUNDLE_CLI, (self.FILTER, f'    data = {{**data, "plan": {{}}}}\n{self.FILTER}'))
+        self.assertCountEqual(check(BUNDLE_CLI, src), [
+            written.format(line_of(src, self.FILTER.strip())),
+            f"MIGRATE_NEVER_APPROVES {BUNDLE_CLI}:{line_of(src, 'approvals = tuple(ContractApproval(**a)')} "
+            f"bundle_cli.migrate creates a ContractApproval (a migration only re-loads the input's: "
+            f"ContractApproval(**a)){APPROVES}"])
+
+    def test_a_filtered_list_is_still_the_approvals_for_what_is_written_into_it(self):
+        held = '    candidate["approvals"][0]["approver"] = "human:migrate"'
+        src = edited(BUNDLE_CLI, (self.FILTER, f"{self.FILTER}\n{held}"))
+        self.assertEqual(check(BUNDLE_CLI, src), [f"MIGRATE_NEVER_APPROVES {BUNDLE_CLI}:{line_of(src, held)} "
+                                                  f"bundle_cli.migrate writes the approvals{APPROVES}"])
+        append = '    candidate["approvals"].append({"approver": "human:migrate"})'
+        src = edited(BUNDLE_CLI, (self.FILTER, f"{self.FILTER}\n{append}"))
+        self.assertEqual(check(BUNDLE_CLI, src), [f"MIGRATE_NEVER_APPROVES {BUNDLE_CLI}:{line_of(src, append)} "
+                                                  f"bundle_cli.migrate writes the approvals{APPROVES}"])
+
 
 class NoCommitOrMerge(unittest.TestCase):
     FACTORY = "    probe = entry.factory()"
