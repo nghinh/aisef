@@ -1,7 +1,7 @@
 # AISEF 2.1 — Quyết định kiến trúc (nhánh `v2.1/foundation`, 2026-10-06)
 
 Nguồn: chỉ thị của chủ dự án trong phiên 2026-10-06 (đề xuất cải tiến + báo cáo 360°); "chỉ thị 2026-10-15, mục N" là chỉ thị lần
-thứ tư của ngày ấy, nguyên văn ở commit `8e6f583` của nhánh `v2.1/probe-window`, chưa nằm trong cây này (REPORT §0.9). Mỗi quyết định nêu: vấn đề đã đo,
+thứ tư của ngày ấy, nguyên văn ở `closure-evidence/v2/v2.1/round-5/OWNER-DIRECTIVE-2026-10-15-B.md` (commit `8e6f583`, nay đã nằm trong cây này). Mỗi quyết định nêu: vấn đề đã đo,
 quyết định, phương án bị loại, hệ quả, và cái **không** tuyên bố. Giữ nguyên: một đường quyết định, taxonomy owner, journal
 format 3, ràng buộc candidate↔evidence, chính sách commit/rollback. Không viết lại khung, không nhập orchestrator ngoài.
 
@@ -47,14 +47,15 @@ Sửa byte mà không đổi điều quan sát ⇒ spec/approval/plan giữ nguy
 
 **Không tuyên bố:** digest khớp **không** chứng minh hai lần thực thi tương đương hành vi; băm AST cũng không. Bằng chứng là
 tương phản hiệu chuẩn trên fixture đã commit. Kỷ luật tăng version là trách nhiệm review, không máy nào kiểm: ba probe
-(`cli_invocation`, `process_effect`, `python_callable_v2`) đã đổi hành vi từ 2.0.0 mà `CAPABILITY_VERSION` vẫn 1 (quyết định
-mở D-2, USAGE-2.1 §2).
+(`cli_invocation`, `process_effect`, `python_callable_v2`) đã đổi hành vi từ 2.0.0 mà `CAPABILITY_VERSION` vẫn 1 (D-2: chủ dự án
+chấp nhận giới hạn này ngày 2026-10-18 và giữ `CAPABILITY_VERSION` 1, `closure-evidence/v2/v2.1/round-5/OWNER-ANSWERS-2026-10-18.md`,
+USAGE-2.1 §2; 50 trong 53 approval được giữ vẫn chỉ dựa vào luật phiên bản).
 
 **Di trú:** spec id của 2.0.0 đổi một lần → `aisef bundle migrate` buộc lại `plan` và ghi một bundle **ứng viên mới** (bản
 gốc không bị sửa). Một approval chỉ được mang sang khi nó còn buộc đúng hash **và** không có thay đổi capability đã khai báo
 (`CAPABILITY_CHANGES`) chọn trúng contract của nó (chỉ thị 2026-10-15, mục 1); approval của contract bị chọn bị giữ lại và
 là việc duyệt lại của chủ dự án. LedgerLock 2.0.0: 59 spec, 67 obligation; 53 trong 59 approval được giữ, **sáu** contract
-bị giữ lại (D-1: chủ dự án đã nêu bốn). Lần ghi trước, "admit 9/9, không duyệt lại", là phép đo trước khi `migrate` thôi
+bị giữ lại (D-1: chủ dự án đã nêu bốn và quyết giữ sáu ngày 2026-10-18). Lần ghi trước, "admit 9/9, không duyệt lại", là phép đo trước khi `migrate` thôi
 giữ approval chỉ vì hash: ứng viên chưa nạp được cho tới khi sáu contract được duyệt lại, và admission thật chỉ chứng minh
 được sau khi hiệu chuẩn sinh lại. Bằng chứng cũ giữ nguyên byte.
 
@@ -157,7 +158,7 @@ thêm tệp claim). Quy tắc (module `aisef2/app/lineage.py`):
 - **Đối soát.** Mọi thứ journal không xác nhận được nhận diện với git và danh tính thao tác của journal (merge của kernel
   cho candidate đã chứng minh; candidate trong worktree của kernel); không nhận diện được ⇒ từ chối trừ khi người vận hành
   bỏ ra có tên. Request không có result mà luồng phiên *đọc được* ⇒ chi phí unknown ⇒ không mở phiên trả tiền nào trừ khi
-  người vận hành chấp nhận (`--accept-unaccounted`, ghi lại; quyết định mở R4). Bằng chứng *có mặt mà không đọc được*
+  người vận hành chấp nhận (`--accept-unaccounted`, ghi lại; R4: chủ dự án giữ như vậy ngày 2026-10-18). Bằng chứng *có mặt mà không đọc được*
   (journal, ledger, luồng phiên, record hay claim; một journal đọc được mà không phải cái `RUN.json` nêu; một tổ tiên mà
   record nêu nhưng thư mục đã mất) là chi phí chưa xác định mà **không cờ nào chấp nhận**: `aisef run --parent` từ chối
   trước clone, admission và preflight, tổng chi phí là `null`, phần đã biết của từng run còn nguyên (chỉ thị 2026-10-15

@@ -117,6 +117,14 @@ Side findings of the agents, none a mutant, none fixed here (each is fail-closed
 | RV-4 | `test_v21_kills3_T25a`'s docstring lists preflight `http_transport` [13, 14] as pinned (numbering of an earlier enumeration): they survive it and every preflight test; only a `get_type_hints`/return-annotation test separates them | measured by two agents | test docstring is stale; the audits stand |
 | RV-5 | `test_c2_k_nowork_001` is red on the unmutated snapshot: the K-NOWORK record's `kernel.after.kernel_digest` is not this tree's `aisef2/` (stale after round 3) | measured | the record is regenerated on the final tree (§ the order of derived records) |
 
+*Correction 2026-10-18 (the table above stays as written):* RV-2 is no longer open. The owner decided it (directive of
+2026-10-15, item 3, `closure-evidence/v2/v2.1/round-5/OWNER-DIRECTIVE-2026-10-15-B.md`): `INDETERMINATE` is a machine-readable
+status of its own and `NOT_REPRODUCED` is only for a probe that ran and gave the stated behaviour (`SATISFIED`); it was made in the
+second wave of the probe window (`5d192e1`; backlog V21-66). `review_verify.STATUSES` is `CONFIRMED`, `NOT_REPRODUCED`,
+`INDETERMINATE`, `UNVERIFIABLE`; the sentence this row quotes is the sentence of the time. RV-1 was fixed in the same window
+(a reproducer nested beyond the limit is `UNVERIFIABLE`, not an exception; the limit itself is backlog V21-67, an open owner
+decision). RV-3, RV-4 and RV-5 are as written.
+
 ## 7. The seven survivors campaign 6 left without an audit (and the second round of skeptics)
 
 Campaign 6 ended with 26 survivors; 19 carried an audit, 7 did not. All seven were new: they live in the lines round 4

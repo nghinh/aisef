@@ -50,6 +50,16 @@ or the record so two runs are comparable only when it is equal; **declared** = i
 | a symlink in the tree points outside | `git ls-tree` mode `120000` entries are refused for content classes (`HARNESS_FAILED` with the entry named) |
 | a regex that matches across lines or is catastrophic | regex compiled with a bounded pattern length and evaluated per line with a per-file size cap; a cap exceeded is `HARNESS_FAILED`, not a verdict |
 
+*Correction 2026-10-18 (the row above is the Cycle-2 design text and stays as written; what the 2.1 code bounds is stated here):*
+(1) `file_artifact`: `re.compile(pattern)` (`_compiles`, `aisef2/probe/file_artifact.py:274`) runs in the kernel's own process with no
+deadline, and the pattern-length cap `PATTERN_CAP = 512` is looked at only after that compile (`observe`, `:864`; a longer pattern is a
+harness refusal); the per-line matching loop of `grep_count` does not run in the kernel any more: it runs in a worker (`GREP_WORKER`,
+`sys.executable -I -S -B`, in a process range) under `timeouts_s.probe`, and a worker that does not answer in time is `UNRUNNABLE`, never
+`REFUTED` (PM-13). (2) `cli_invocation`, the `{"regex": r}` stream shape: there is no pattern-length cap at all; `re.compile`
+(`_compiles`, `aisef2/probe/cli_invocation.py:446`) runs in the kernel with no deadline; the match runs in a worker (`REGEX_WORKER`)
+under `timeouts_s.probe` (`UNRUNNABLE`, and `UNVERIFIABLE` at review, never `REFUTED` or `NOT_REPRODUCED`). The compile of neither is
+bounded: backlog V21-84 (D4), which the owner kept as it is on 2026-10-18; the match: V21-68; USAGE-2.1 §8.3 and §6.
+
 ## 4. What the matrix proves for the core invariants
 
 - **Semantic determinism / Reproducible qualification.** Every row is removed, bound or declared; nothing is "usually

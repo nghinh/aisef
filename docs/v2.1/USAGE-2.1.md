@@ -6,7 +6,16 @@
 Mục 8 và các ghi chú "cửa sổ probe" mô tả cây ứng viên `v2.1/probe-window` (2026-10-15 … 2026-10-17, từ `2d01fe4` tới
 `3e1e83a`, hai đợt): *đã làm trên nhánh ứng viên, bằng chứng đo (hiệu chuẩn lại, mutation, suite đầy đủ) chưa có*. Đó
 không phải bản phát hành và chủ dự án chưa nghiệm thu (REPORT §0.9). "Chỉ thị 2026-10-15, mục N" trong tài liệu này là chỉ thị
-lần thứ tư của ngày ấy; văn bản nguyên văn của nó ở commit `8e6f583` của nhánh `v2.1/probe-window`, chưa nằm trong cây này (REPORT §0.9).
+lần thứ tư của ngày ấy; văn bản nguyên văn của nó là `closure-evidence/v2/v2.1/round-5/OWNER-DIRECTIVE-2026-10-15-B.md` (commit `8e6f583`, nay đã nằm trong cây này).
+
+**Câu trả lời của chủ dự án, 2026-10-18** (`closure-evidence/v2/v2.1/round-5/OWNER-ANSWERS-2026-10-18.md`, sau bảng phạm vi
+`closure-evidence/v2/v2.1/round-5/SCOPE-BEFORE-PIN.md`): ghim snapshot với hành vi mặc định; D-1 **giữ sáu** contract LedgerLock (§2); D-2 **chấp nhận giới hạn**,
+`CAPABILITY_VERSION` giữ 1 cho `cli_invocation`, `process_effect`, `python_callable_v2` (§2); nhóm R2-D1/D2/D3, R3, R4, R5 và
+D1–D5 **giữ mặc định** (§8.3, §8.5). Đó là các quyết định *giữ hành vi hiện tại*: hành vi mô tả trong tài liệu này không đổi, và
+không có ghi nhận nghiệm thu nào được tạo từ chúng. Phần phương án ở các mục ấy được giữ làm bản ghi điều đã cân nhắc, kèm cái giá
+nếu đổi sau này (`SCOPE-BEFORE-PIN.md` §5). **Vẫn mở** (chưa được hỏi hay không nằm trong câu trả lời): D-OCR-1, V21-65, PM-9 với tệp
+nhị phân, PM-13 bắt tay khởi động, D6 và D7 (V21-88), hai quyết định recorder Linux (V21-87), và mọi hàng khác của backlog còn ghi
+`OWNER DECISION`.
 
 **Chưa sửa, và chặn mọi tuyên bố "hành trình người dùng đã đạt" hay "hỗ trợ Windows đã đạt"** (§7, REPORT §6.0): lệnh chi
 phí/báo cáo của V1 (`aisef cost`, `aisef report`, `aisef status`) nhận thư mục run V2 và trả toàn số 0 với exit 0; hai điểm
@@ -103,9 +112,13 @@ trong `to_approve` (`candidate.bundle_digest` `1010f0da…7417`, `file_sha256` `
   `REQUIRES_SUBJECT`, và bộ chọn chỉ thấy lớp quan sát cùng `subject_absence`, không thấy repo hay đường dẫn: PM-9 (một lựa
   chọn không có tệp nào là chủ thể vắng) một mình đã chọn đủ sáu. PM-11 (một BOM UTF-8 không còn là ký tự của dòng 1; v2.0.0
   giải mã `utf-8`, nay `utf-8-sig`) cũng đổi verdict của `grep_count` và cũng chọn đủ sáu, nên hai contract thêm (`S-10-b`,
-  `S-10-c`) không loại trừ được nếu `migrate` không đọc repo. Đó là phía an toàn. **Chấp nhận sáu hay không là quyết định
-  D-1 của chủ dự án** (REPORT §7, backlog V21-75): tài liệu này không quyết.
-- **50 trong 53 approval được giữ chỉ dựa vào luật phiên bản (D-2).** Ba probe `cli_invocation`, `process_effect`,
+  `S-10-c`) không loại trừ được nếu `migrate` không đọc repo. Đó là phía an toàn. **Chủ dự án đã quyết D-1 ngày 2026-10-18:
+  giữ sáu** (`closure-evidence/v2/v2.1/round-5/OWNER-ANSWERS-2026-10-18.md`; REPORT §7, backlog V21-75): chủ dự án duyệt thêm hai
+  contract (`S-10-b`, `S-10-c`) bằng hai lệnh `aisef bundle approve`, mã không đổi. Hai phương án đã cân nhắc và không chọn — thu về
+  bốn bằng bộ chọn thấy đường dẫn (heuristic không giải quyết PM-11), hoặc cho `migrate` đọc repo (đổi thiết kế) — nằm ở backlog
+  V21-75. Đổi sau này tốn: đo lại `bundle_cli` (45 target) và `file_artifact` (54), ≈ 100 target, ≈ 2,8k mutant, ~5 giờ
+  (`SCOPE-BEFORE-PIN.md` §5).
+- **50 trong 53 approval được giữ chỉ dựa vào luật phiên bản (D-2) — giới hạn đã được chấp nhận.** Ba probe `cli_invocation`, `process_effect`,
   `python_callable_v2` đã đổi hành vi kể từ 2.0.0 (PM-1, PM-2, PM-6, cờ `-S`, họ RV-1) mà `CAPABILITY_VERSION` vẫn là 1,
   nên `migrate` không thể thấy các thay đổi ấy: contract của chúng được giữ (cli 10, process_effect 34, python_callable_v2
   6; `file_artifact` 3). Lane `migrate-semantics` đo cùng một repo đồ chơi qua probe của tag `v2.0.0` rồi qua `d1460fd`: (1)
@@ -114,8 +127,13 @@ trong `to_approve` (`candidate.bundle_digest` `1010f0da…7417`, `file_sha256` `
   package: `UNRUNNABLE` → `SATISFIED`; (4) `process_effect`, `fault` rồi `subprocess`: `SATISFIED` → `INVALID_SPEC`
   (đầu ra không được commit). Tham chiếu LedgerLock của kho (`tests/v2/fixtures/workloads/ledgerlock-reference`) chỉ dùng
   stdlib, không gọi `exit()` và là package thường nên không dính (1)–(3); nhưng đó là fixture, không phải mọi bản cài đặt
-  của contract. Tăng `CAPABILITY_VERSION` (đổi spec id, phải làm lại hiệu chuẩn) hay chấp nhận giới hạn là **quyết định D-2
-  của chủ dự án** (backlog V21-76).
+  của contract. Tăng `CAPABILITY_VERSION` (đổi spec id, phải làm lại hiệu chuẩn) hay chấp nhận giới hạn: **chủ dự án đã quyết D-2
+  ngày 2026-10-18: chấp nhận giới hạn** (`OWNER-ANSWERS-2026-10-18.md`; backlog V21-76). `CAPABILITY_VERSION` giữ 1 cho ba probe
+  ấy; giới hạn nằm trong `report.limits` của `migrate` và ở đây. Nghĩa là **50 trong 53 approval được giữ vẫn chỉ dựa vào luật
+  phiên bản**, không dựa vào bằng chứng rằng hành vi mà approval ấy áp vào chưa đổi — một giới hạn được chấp nhận, không phải
+  một khẳng định. Hai phương án đã cân nhắc và không chọn (tăng phiên bản; một máy kiểm thay đổi `PROBE_SOURCES`) nằm ở backlog V21-76.
+  Đổi sau này tốn nhiều: đổi `CAPABILITY_VERSION` đổi spec id, hiệu chuẩn, bản ghi dẫn xuất và buộc đo lại ba probe (203 target,
+  ≈ 4,4k mutant, ~8–9 giờ; `SCOPE-BEFORE-PIN.md` §5).
 - **PM-9 không được cửa sổ di trú.** 59 approval `human:owner` ở `closure-evidence/v2/cycle2/P5-CONTRACT-APPROVALS.json`
   (2026-09-30) không bị cửa sổ sửa hay thu hồi; duyệt lại các contract bị giữ lại là việc của chủ dự án.
 
@@ -504,8 +522,8 @@ trạng thái *coverage* của reviewer OCR (hai bên đều có tên `INDETERMI
   `[fault, subprocess]` không có lớp ⇒ `INVALID_SPEC` tại admission (`aisef bundle lint`, kiểm tra 9:
   `spec …: probe.process_effect does not support the observation it asks for`), không tiến trình nào được dựng. *Không
   đổi (ghi nhận):* một `fault` đứng trước một `call` mà mã gọi không chạm tới vẫn `SATISFIED` với `fired: false`.
-  `CAPABILITY_VERSION` của `process_effect` giữ 1 (lựa chọn của làn theo quy ước; chủ dự án quyết lại được — backlog
-  V21-71). Quét kho: 0 spec/plan/approval/bundle chứa tổ hợp này; bundle 2.0.0 trên PyPI và dự án ngoài kho không quét
+  `CAPABILITY_VERSION` của `process_effect` giữ 1 (lựa chọn của làn theo quy ước; chủ dự án đã chấp nhận giới hạn này ngày
+  2026-10-18, D-2, §2 — backlog V21-71, V21-76). Quét kho: 0 spec/plan/approval/bundle chứa tổ hợp này; bundle 2.0.0 trên PyPI và dự án ngoài kho không quét
   được.
 - **PM-6 — lỗi máy chủ.** `open(harness.log)` (và `request.json` ở `python_callable_v2`) nằm trong khối `try`: lỗi ⇒
   `HARNESS_FAILED` `the evaluation directory cannot be prepared: <Loại>` ⇒ `UNRUNNABLE`, thư mục đánh giá được dọn.
@@ -582,12 +600,17 @@ trạng thái *coverage* của reviewer OCR (hai bên đều có tên `INDETERMI
   `expired = time.monotonic() - started - sum(hosting) > window` (`aisef2/probe/file_artifact.py:881`) là so sánh chặt,
   đồng hồ bắt đầu từ chính lần đọc, đã trừ chi phí worker. `tests/v2/test_v21_r5_window_boundary.py` (bốn test) ghim nó cho
   `exists`/`content`/`grep_count` ở {0, W−1e-6, W, W+1e-6}; các test ấy xanh cả trên mã trước, vì chúng đặc trưng hoá hành
-  vi sẵn có (người xác minh đột biến `>` thành `>=` trong `file_artifact.py`: 5 lỗi). Những điểm còn lại là **quyết định của chủ dự án**, lane không chọn hành
-  vi nào. Đánh số: D1–D5 theo thứ tự trình bày ở đây; lane `review-limits` đánh số hai chỗ ngược lại (D3 của lane là trần
+  vi sẵn có (người xác minh đột biến `>` thành `>=` trong `file_artifact.py`: 5 lỗi). Những điểm còn lại (D1–D5) là quyết định của chủ dự án, lane không chọn hành
+  vi nào; **chủ dự án đã quyết ngày 2026-10-18: giữ mặc định cho cả nhóm D1–D5**, tức giữ hành vi hiện tại
+  (`closure-evidence/v2/v2.1/round-5/OWNER-ANSWERS-2026-10-18.md`): ở D1, D2, D4, D5 đó là phương án A; ở D3 hành vi hiện tại là cuộc đua không
+  xác định đã mô tả (không phải A hay B), và nó ở lại. Các phương án B/C dưới đây là bản ghi điều đã cân nhắc, không còn là việc đang
+  chờ. Đổi bất kỳ điểm nào sau này tốn: đo lại `cli_invocation` + `python_callable_v2` + `file_artifact`, ≈ 180 target, ≈ 3,8k mutant
+  (`SCOPE-BEFORE-PIN.md` §5); B của D4 và B1 của D5 đổi ngữ pháp stimulus nên còn kèm tăng `CAPABILITY_VERSION`. D6 và D7 không nằm
+  trong câu trả lời đó: vẫn mở. Đánh số: D1–D5 theo thứ tự trình bày ở đây; lane `review-limits` đánh số hai chỗ ngược lại (D3 của lane là trần
   `within_s` = D5 ở đây; D5 của lane là toán tử biên = D3 ở đây; backlog V21-83 ghi ánh xạ) và nêu thêm D6, D7 ngoài năm
   quyết định (V21-88). Một đầu vào dưới đây là **đo** (lane hay người xác minh chạy nó) hay **đọc từ mã, chưa chạy**
   được ghi ở từng chỗ:
-  - **D1 — `within_s` dưới sàn mà công cụ giữ được** (backlog V21-81). Biểu thức: `aisef2/probe/python_callable.py:108-112`
+  - **D1 — `within_s` dưới sàn mà công cụ giữ được** (backlog V21-81; đã quyết 2026-10-18: giữ A). Biểu thức: `aisef2/probe/python_callable.py:108-112`
     (`window_of` chỉ đòi hữu hạn và `> 0`); `aisef2/probe/cli_invocation.py:908`
     `threading.Timer(req["window"], conclude, ({"deadline": True},))`; `cli_invocation._deadline` (`:1320`) trả
     `ON_DEADLINE[cls]` (`REFUTED` với `exits_streams`); `aisef2/app/review_verify.py:224` biến `REFUTED` thành `CONFIRMED`
@@ -599,13 +622,13 @@ trạng thái *coverage* của reviewer OCR (hai bên đều có tên `INDETERMI
     của các contract đã duyệt cho cùng mệnh đề. Lane đo trên reference LedgerLock, finding `R-9/3` (`snapshot
     <ws>/missing.jsonl`, kỳ vọng exit 3): `within_s` 20 ⇒ `NOT_REPRODUCED`, không chặn; `within_s` 0,001 ⇒ `CONFIRMED` +
     `ANCHORED`, chặn dưới `fix-loop` (mức `high`).
-  - **D2 — stream bị cắt ở `STREAM_CAP`** (V21-82). Biểu thức: `aisef2/probe/cli_invocation.py:253`
+  - **D2 — stream bị cắt ở `STREAM_CAP`** (V21-82; đã quyết 2026-10-18: giữ A). Biểu thức: `aisef2/probe/cli_invocation.py:253`
     `STREAM_CAP = 8 * 1024 * 1024`; `:565` `"truncated": size > STREAM_CAP`; `:582-601` `_stream_matches` chỉ shape
     `text` (`:591`) kiểm `truncated`, các shape `contains`, `regex`, `lines`, `first_word` quyết trên các byte đã giữ.
     Đầu vào: chủ thể in 9 MiB `x`. A (hiện tại): `stdout` `{"regex": "x{9000000}"}` ⇒ `REFUTED` (review `CONFIRMED`);
     `x{8000000}` ⇒ `SATISFIED`. B: stream bị cắt dưới một shape không chính xác mà các byte đã giữ chưa quyết được ⇒
     `INDETERMINATE` (hay `HARNESS_FAILED`), vì phần bị cắt là giới hạn của công cụ; shape chính xác vẫn `REFUTED` như nay.
-  - **D3 — toán tử biên của probe dùng timer ở đúng W** (V21-83; D5 trong số của lane). Biểu thức:
+  - **D3 — toán tử biên của probe dùng timer ở đúng W** (V21-83; D5 trong số của lane; đã quyết 2026-10-18: giữ hành vi hiện tại, cuộc đua). Biểu thức:
     `aisef2/probe/file_artifact.py:881` `> window` (chặt, đã công bố bởi PM-12), so với `aisef2/probe/cli_invocation.py:895-908`
     (`settle()` và `conclude()` tranh một khoá; `Timer` được bật ngay sau `DISPATCHED`, trước khi phân giải module và
     pre-step) và `aisef2/probe/python_callable_v2.py:278-291` (như vậy); `process_effect.py:907` đi qua
@@ -618,14 +641,14 @@ trạng thái *coverage* của reviewer OCR (hai bên đều có tên `INDETERMI
     reader, gồm `git rev-parse`; harness: sau `DISPATCHED`) và *phần bị loại trừ* (chỉ hosting của worker grep; thời gian
     `git cat-file` và vòng regex trong worker tính vào cửa sổ — giới hạn đã biết PM-12). Lane giữ cho việc này một câu
     hỏi mở, không chọn toán tử theo test nào dễ xanh.
-  - **D4 — trần độ dài pattern và giới hạn compile** (V21-84). Biểu thức: `re.compile(pattern)` trong `_compiles`
+  - **D4 — trần độ dài pattern và giới hạn compile** (V21-84; đã quyết 2026-10-18: giữ A). Biểu thức: `re.compile(pattern)` trong `_compiles`
     (`aisef2/probe/cli_invocation.py:446`, `aisef2/probe/file_artifact.py:274`), chạy trong kernel, không hạn chót, từ
     `observation_class`; `PATTERN_CAP = 512` (`file_artifact.py:176`) chỉ được kiểm sau compile (`:864`) và
     `cli_invocation` không có trần. Đo: `(?i)` + 1000 lớp `[\u0000-\U0010ffff]` (19 KB) 3,7 s, 76 KB 15 s trong kernel
     (người xác minh: 38 KB ≈ 7,8 s); chi phí tuyến tính theo kích thước trên 10 họ pattern, không thấy siêu tuyến tính.
     A (hiện tại, đã ghi trong docstring): giữ nguyên. B: trả `None` (không có nghĩa) khi pattern dài hơn một trần (ví dụ
     512) ở cả hai classifier, trước compile. C: compile cũng trong worker.
-  - **D5 — trần của `within_s` do reviewer chọn** (V21-85; D3 trong số của lane). Biểu thức:
+  - **D5 — trần của `within_s` do reviewer chọn** (V21-85; D3 trong số của lane; đã quyết 2026-10-18: giữ A). Biểu thức:
     `aisef2/probe/python_callable.py:108-112` (`window_of`: chỉ đòi hữu hạn và `> 0`, không có trần);
     `aisef2/probe/cli_invocation.py:908` `threading.Timer(req["window"], conclude, …)` và `:1301` `time.monotonic() + window
     + env.timeout_s`; `aisef2/probe/python_callable_v2.py:291` và `:528`; `aisef2/probe/process_effect.py:907` (không có
@@ -639,13 +662,13 @@ trạng thái *coverage* của reviewer OCR (hai bên đều có tên `INDETERMI
     review); đổi ngữ pháp, tăng `CAPABILITY_VERSION` (RFC §35) và mất hiệu lực approval/plan dùng probe. B2: chỉ đặt trần
     trong `review_verify` (ví dụ ≤ `timeouts_s.probe`) ⇒ `UNVERIFIABLE`, không đụng probe.
   - **D6 — chủ thể ở lại ghi đè tệp capture mà fact trỏ tới** (V21-88; phát hiện thêm của lane, không thuộc năm quyết định
-    trên). Biểu thức: `aisef2/probe/cli_invocation.py:573-579` `_stream_bytes` đọc `min(size, STREAM_CAP)` byte từ
+    trên; vẫn mở). Biểu thức: `aisef2/probe/cli_invocation.py:573-579` `_stream_bytes` đọc `min(size, STREAM_CAP)` byte từ
     `fact["path"]` mà không so `fact["sha256"]`; `:973-977` `stream_fact` đã tính `sha256`. Đầu vào đo (lane): sản phẩm in
     `bad\n`, ở lại và ghi vào chính `stdout.bin` của nó. A (hiện tại; một phần, họ PM-5): spec stdout `OK!\n` `SATISFIED`
     4/4, `bad\n` `REFUTED` 4/4 — chủ thể quyết verdict của chính nó. B: so sha256 của `size` byte đầu với fact; lệch ⇒
     `tampered` và `REFUTED` như một dòng protocol giả (quy tắc B1), hoặc `HARNESS_FAILED`; fixture fact của
     `test_c2_cli_verdicts` khi đó phải mang sha256 đúng.
-  - **D7 — `_IMPORT_ERROR` bậc hai trên output test của ứng viên** (V21-88; phát hiện thêm của lane). Biểu thức:
+  - **D7 — `_IMPORT_ERROR` bậc hai trên output test của ứng viên** (V21-88; phát hiện thêm của lane; vẫn mở). Biểu thức:
     `aisef2/quality/test_execution.py:401` và `:416`: `.+? from` quét tới hết dòng ở mỗi `ImportError: cannot import name`.
     Đây là output test của chính ứng viên, không phải pattern của reviewer hay của tác giả spec. Đo (lane): một dòng 97 KB
     lặp cụm ấy mất 1,1 s, 388 KB mất 18,4 s; nhiều dòng ngắn 3 ms. A: để, ghi nhận. B: quét tuyến tính như
@@ -761,16 +784,20 @@ phần chưa đối soát). Commit `3b738a4`, `e3fc210`, `286d511`; test `tests/
   không chứa lệnh xoá, đổi tên, ghi đè, cắt hay kill nào (đo bằng grep); chỗ ghi duy nhất của `lineage.py` vẫn là `claim()`
   (`O_EXCL|O_NOFOLLOW`) và `write_anchor`. Một lượt bị từ chối sau claim để lại bản ghi riêng của nó và một thế hệ claim
   (nối thêm). Test chụp mọi byte của cây lineage trước và sau một từ chối.
-- *Chưa nằm trong registry mutation:* các hàm mới `lineage._journal_mismatch`, `_is_a_directory`, `_predecessor`,
-  `unread_runs` (người xác minh đặt 8 mutant tay trên các luật chính, cả 8 bị test của lane giết; chưa đo bằng chiến dịch).
+- *Đã đăng ký trong registry mutation, chưa đo:* các hàm mới `lineage._journal_mismatch`, `_is_a_directory`, `_predecessor`,
+  `unread_runs` (cùng `_recorded_spend`, `_evidence_gone` của lane `lineage-r2`) là target của `V21_TARGETS` (người xác minh đặt 8 mutant tay trên các
+  luật chính, cả 8 bị test của lane giết; chưa đo bằng chiến dịch).
 
 Hai thay đổi ngoài văn bản chủ dự án duyệt lúc đầu (backlog V21-55): `account_of` (commit `4d245f4`) — **chủ dự án đã xác
 nhận giữ** bằng chỉ thị 2026-10-15 mục 2 — và `RUN.json` không phải UTF-8 (từ "rơi xuống `RUN.started.json`" sang
-`EVIDENCE_MALFORMED`), còn chờ xác nhận.
+`EVIDENCE_MALFORMED`), còn chờ xác nhận (backlog V21-55 (b); không nằm trong câu trả lời 2026-10-18, vẫn mở).
 
-**Quyết định của chủ dự án còn mở** (tài liệu này không quyết; mỗi hàng có mã ở backlog):
-- **R2 — bằng chứng *đã mất* cạnh một journal đọc được (V21-77): ĐÃ LÀM theo luật hẹp (a); ba điểm còn chờ chủ dự án.**
-  Luật và hệ quả ở §5. Còn mở, tài liệu này không quyết: **R2-D1** — khi không có `RUN.json`, mọi request đã trả lời mà không
+**Quyết định của chủ dự án, đã chốt ngày 2026-10-18: giữ mặc định cho R2-D1/D2/D3, R3, R4, R5**
+(`closure-evidence/v2/v2.1/round-5/OWNER-ANSWERS-2026-10-18.md`; mỗi hàng có mã ở backlog). Các phương án dưới đây giữ làm bản ghi
+điều đã cân nhắc; hành vi mô tả ở đây và ở §5 không đổi. Đổi sau này tốn (`SCOPE-BEFORE-PIN.md` §5): R2-D1/D2/D3 — đo lại `lineage` + `run` +
+`verify` (≈ 70 target); R3, R4, R5 — đo lại `lineage`, `run`, `bundle_cli`.
+- **R2 — bằng chứng *đã mất* cạnh một journal đọc được (V21-77): ĐÃ LÀM theo luật hẹp (a); ba điểm đã quyết 2026-10-18: giữ như đã gộp.**
+  Luật và hệ quả ở §5. Ba điểm, với phương án đã cân nhắc: **R2-D1** — khi không có `RUN.json`, mọi request đã trả lời mà không
   có luồng đều là "mất" (kể cả phiên chưa từng bắt đầu vì chạm ngân sách): giữ (an toàn về tiền, có thể khoá dòng dõi của một
   run chạm trần rồi bị kill trước `RUN.json`), hay chỉ request `COMPLETED` mới nợ một luồng, hay trung gian (`FAILED` không
   luồng là `unaccounted` mà `--accept-unaccounted` chấp nhận theo tên); **R2-D2** — hai lỗi cùng lúc (`RUN.json` cắt hoặc mode
@@ -785,7 +812,8 @@ nhận giữ** bằng chỉ thị 2026-10-15 mục 2 — và `RUN.json` không p
   nó nối tiếp mà thư mục đã mất thì là `unread`. Hệ quả: một tổ tiên đã bị xoá hay lưu trữ nay chặn `--parent` vĩnh viễn,
   không cờ nào qua. Phương án child: (A) giữ `UNBEGUN`; (B) coi là `unread` (phải đổi 2 test của `ClaimLifecycle` — child
   vắng, và claimant còn sống hay ở máy khác; thử áp dụng thì 3 mục của chúng đỏ). Phương án chuỗi: giữ `unread` (an toàn),
-  hoặc thêm một cờ khẳng định có ghi lại (kiểu `--assume-spent-nothing PATH`), rõ ràng là lời của operator.
+  hoặc thêm một cờ khẳng định có ghi lại (kiểu `--assume-spent-nothing PATH`), rõ ràng là lời của operator. **Đã quyết 2026-10-18:
+  giữ (child: A, `UNBEGUN`; chuỗi: giữ `unread`)** — một tổ tiên đã bị xoá hay lưu trữ vẫn chặn `--parent` vĩnh viễn, không cờ nào qua.
 - **R4 — `--accept-unaccounted` trên chi tiêu đọc được là đã gửi mà chưa trả lời (V21-79).** Hiện (ADR-8): một request
   đang bay khi run bị giết mà luồng phiên đọc được ⇒ chi phí unknown; `--accept-unaccounted` mở phiên, trần tính theo `cap
   − known`, ghi `continues.accepted_unaccounted` và `budget.inherited_unaccounted`, `total` là `null`, `--verify` ghi chú
@@ -794,7 +822,8 @@ nhận giữ** bằng chỉ thị 2026-10-15 mục 2 — và `RUN.json` không p
   ADR-8; (B) cấm luôn khi `total` chưa biết (đảo pin ở `test_v21_continue_usage` / `test_v21_pw_lineage_spend` và câu của
   ADR-8) — nhưng một run bị giết giữa chừng gần như luôn có request đang bay, nên `--parent` không còn nối được run bị
   giết, là mục đích của tính năng; (C) cho cờ nhưng bắt khai cận trên cho phần chưa biết (ví dụ `--unaccounted-bound N`) và
-  trừ vào trần: `remaining = cap − (known + N)`. Lane đề xuất C nếu chủ dự án muốn đóng hẳn, A nếu không.
+  trừ vào trần: `remaining = cap − (known + N)`. Lane đề xuất C nếu chủ dự án muốn đóng hẳn, A nếu không. **Đã quyết 2026-10-18: A
+  (như ADR-8)** — `--accept-unaccounted` vẫn mở phiên trả tiền, trần `cap − known`, trên chi tiêu đọc được là đã gửi mà chưa trả lời.
 - **R5 — thứ tự claim rồi mới tới cổng (V21-80).** Hiện (luồng chủ đã duyệt 2026-10-15, vòng 2): `aisef run --parent` lấy
   claim *trước*, rồi cổng `unread` từ chối; lượt bị từ chối để lại một thế hệ claim trên tiền nhiệm (với `--supersede-claim`
   là lời khẳng định của operator, được ghi). Tái hiện của người xác minh: (1) chạy thường ⇒ từ chối, 0 request; (2)
@@ -803,7 +832,9 @@ nhận giữ** bằng chỉ thị 2026-10-15 mục 2 — và `RUN.json` không p
   tiêu của nó vào trần) — tức một continuation chạy dù có child `BEGUN`. Phương án: (A) giữ; (B) cổng trước claim: lượt bị
   từ chối không ghi gì vào tiền nhiệm, nhưng `--supersede-claim` lên một child `UNREAD` vô nghĩa cho tới khi child đọc được
   (khi đó hoặc `BEGUN` ⇒ không thay, hoặc `UNBEGUN` ⇒ thay bằng bằng chứng); (C) giữ khẳng định nhưng `claim()` kiểm lại
-  mọi thế hệ bị thay thế bằng khẳng định: nếu child nay đọc ra `BEGUN` thì từ chối "tiếp tục từ nó". Lane đề xuất B hoặc C.
+  mọi thế hệ bị thay thế bằng khẳng định: nếu child nay đọc ra `BEGUN` thì từ chối "tiếp tục từ nó". Lane đề xuất B hoặc C. **Đã quyết
+  2026-10-18: giữ A** — một lượt bị từ chối vẫn để một thế hệ claim trên tiền nhiệm, và một continuation vẫn có thể chạy dù child
+  `BEGUN` như ở kịch bản (3).
 
 ### 8.6 PM-5 — mã của chủ thể trả lời hộ chính nó (mô tả một giới hạn, không phải chấp nhận rủi ro)
 
@@ -877,4 +908,4 @@ Một `ContractApproval` buộc `requirement_hash` và `contract_hash`, không b
 đánh dấu approval cũ (có nên có không: backlog V21-61). Đợt hai thêm một cơ chế **ở lúc di trú, không ở lúc đọc**:
 `migrate` và `seal --keep-approvals-from` không còn mang approval của contract mà một thay đổi capability đã khai báo chọn
 trúng (§2). Duyệt lại (`aisef bundle approve`, trên digest mới) là **việc của chủ dự án**, không phải của bất kỳ lệnh nào ở
-đây: sáu contract của LedgerLock ở §2 nếu chủ dự án chấp nhận sáu (D-1).
+đây: sáu contract của LedgerLock ở §2, vì chủ dự án đã giữ sáu (D-1, 2026-10-18).
