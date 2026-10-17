@@ -2,18 +2,20 @@
 probe could not decide is not said to be a proof that the finding does not reproduce.
 
 The module's own contract (aisef2/app/review_verify.py, docstring): a finding is CONFIRMED when the probe REFUTES the
-stated behaviour; the reason of a NOT_REPRODUCED says what the probe saw. A probe that ran and decided nothing —
+stated behaviour; NOT_REPRODUCED is the one status that says it was shown not to reproduce. A probe that ran and decided
+nothing —
 `Executed(INDETERMINATE, reason)`: the subject is not in the candidate (PRECONDITION_ABSENT) or its process ended by a
 signal the controller did not send (NON_CONTROLLER_SIGNAL) — has shown the candidate nothing, and `Verification.observed`
 carries that verdict. Before this file `verify` gave the one sentence "observes the stated behaviour: the finding does
 not reproduce" for every verdict but REFUTED, and since round 3 the journaled statement prints it beside
 `observed: INDETERMINATE`.
 
-Pinned here: the reason of an INDETERMINATE names the probe, the verdict and the typed cause and makes neither claim of a
-SATISFIED one ("observes the stated behaviour", "does not reproduce"); a SATISFIED one still says the finding does not
-reproduce; the statement holds the reason whole, for every probe and cause. NOT pinned, by the suite's rule (a reason
-holds its identifying element and the class of its cause, never the wording around them): the sentence's other words.
-The status an INDETERMINATE carries is not changed by this window (NOT_REPRODUCED, pinned in T15a): it never blocks."""
+Pinned here: the status of an INDETERMINATE is INDETERMINATE — not NOT_REPRODUCED, which only a SATISFIED verdict gets
+(owner decision of 2026-10-15, item 3: the machine reader tells them apart, not only the sentence) — and it never
+blocks; its reason names the probe, the verdict and the typed cause and makes neither claim of a SATISFIED one
+("observes the stated behaviour", "does not reproduce"); a SATISFIED one still says the finding does not reproduce; the
+statement holds the reason whole, for every probe and cause. NOT pinned, by the suite's rule (a reason holds its
+identifying element and the class of its cause, never the wording around them): the sentence's other words."""
 
 from __future__ import annotations
 
@@ -47,7 +49,7 @@ def decided_nothing(case: unittest.TestCase, v: V.Verification, cause: str | Non
         case.assertIn(cause, v.reason)
     for claim in CLAIMS:
         case.assertNotIn(claim, v.reason, v)
-    case.assertNotEqual(v.status, V.CONFIRMED, v)
+    case.assertEqual(v.status, V.INDETERMINATE, v)     # its own status: NOT_REPRODUCED is evidence it was shown not to
     case.assertEqual(v.evidence(), "")
 
 
@@ -75,7 +77,7 @@ class WhatTheRealProbeSaw(T.Checkout):
         v = self.verify(f, self.checkout(without=("__main__.py",)))
         stated = json.loads(V.detail(f, v, V.anchor(f, T.PROJECT), None))
         self.assertEqual(stated["why"], v.reason)
-        self.assertEqual(stated["observed"], "INDETERMINATE")
+        self.assertEqual((stated["verification"], stated["observed"]), (V.INDETERMINATE, "INDETERMINATE"))
         self.assertIn("INDETERMINATE", stated["why"])
         for claim in CLAIMS:
             self.assertNotIn(claim, stated["why"])
@@ -125,15 +127,17 @@ class OnTheProductPath(C.ChainBase):
         self.assertEqual(len(rows), 1)
         self.assertTrue(rows[0]["passed"])
         stated = json.loads(rows[0]["detail"].split(" — ", 1)[1])
-        self.assertEqual((stated["anchor"], stated["observed"]), ("ANCHORED", "INDETERMINATE"))
+        self.assertEqual((stated["anchor"], stated["verification"], stated["observed"]),
+                         ("ANCHORED", V.INDETERMINATE, "INDETERMINATE"))
         reviewer = next(s for s in rec["sessions"] if s["role"] == "reviewer")
         kept = json.loads((self.out / stated["artifact"]["path"]).read_text(encoding="utf-8"))["finding"]["verification"]
-        for where, why, observed in (("the statement", stated["why"], stated["observed"]),
-                                     ("RUN.json", reviewer["findings"][0]["verification"]["why"],
-                                      reviewer["findings"][0]["verification"]["observed"]),
-                                     ("the artifact", kept["why"], kept["observed"])):
+        for where, status, why, observed in (("the statement", stated["verification"], stated["why"], stated["observed"]),
+                                             ("RUN.json", reviewer["findings"][0]["verification"]["status"],
+                                              reviewer["findings"][0]["verification"]["why"],
+                                              reviewer["findings"][0]["verification"]["observed"]),
+                                             ("the artifact", kept["status"], kept["why"], kept["observed"])):
             with self.subTest(where):
-                decided_nothing(self, V.Verification(V.NOT_REPRODUCED, why, PROBE, observed), "NON_CONTROLLER_SIGNAL")
+                decided_nothing(self, V.Verification(status, why, PROBE, observed), "NON_CONTROLLER_SIGNAL")
 
 
 if __name__ == "__main__":

@@ -9,14 +9,23 @@ probe's own grammar and citing the requirement clause —
 
 — and AISEF runs that observation with its own trusted, calibrated probe on the candidate. The finding is CONFIRMED
 when the probe executes and REFUTES the stated behaviour (the candidate does not do what the finding says the
-requirement demands): the probe is the corroborating authority D-002 asks for. NOT_REPRODUCED when it is not REFUTED:
-SATISFIED (the reason says the finding does not reproduce) or INDETERMINATE (the probe executed and decided nothing:
-the subject is not in the candidate, or its process ended by a signal the controller did not send; the reason says so,
-with the typed cause, and never that the finding was shown not to reproduce; `observed` is the verdict). Either way
-the finding is not CONFIRMED, so it never blocks. UNVERIFIABLE when there is no reproducer, it nests containers
-deeper than the finding's artifact keeps (`DEPTH_MAX`), the clause names no requirement of the project, the subject is
-outside the product, the probe cannot give the observation a meaning (refused, not degraded), is not calibrated for
-that class at the bytes that run, or cannot run.
+requirement demands): the probe is the corroborating authority D-002 asks for. The other three statuses are all "not
+CONFIRMED", so none ever blocks, and each says something different:
+
+* NOT_REPRODUCED — the probe executed and the candidate does what the finding says the requirement demands (SATISFIED):
+  the one status that is evidence that the finding does not reproduce.
+* INDETERMINATE — the probe executed and decided nothing: the subject is not in the candidate (PRECONDITION_ABSENT), or
+  its process ended by a signal the controller did not send (NON_CONTROLLER_SIGNAL). The reason names the typed cause;
+  `observed` is the verdict. It is **not** evidence of anything about the finding, and triage shows it as undecided
+  (owner decision of 2026-10-15, item 3: the state of the machine reader, not only the sentence, tells it from
+  NOT_REPRODUCED).
+* UNVERIFIABLE — nothing was observed: there is no reproducer, it nests containers deeper than the finding's artifact
+  keeps (`DEPTH_MAX`), the clause names no requirement of the project, the subject is outside the product, the probe
+  cannot give the observation a meaning (refused, not degraded), is not calibrated for that class at the bytes that run,
+  or cannot run (its harness failed or reached a limit of its own — a deadline, a file cap, a worker that did not
+  answer: UNRUNNABLE, never a verdict about the product).
+
+A check that could not be carried out, or did not suffice to conclude, is never NOT_REPRODUCED.
 
 **Anchoring: whose expectation it is.** A confirmation proves the candidate does not do what the finding states —
 never that the requirement demands it. A reproducible finding with a wrong expectation must not block by itself, so
@@ -36,6 +45,10 @@ approved contracts and sealed clause facts only — never from the reviewer's te
 The known limit, measured in tests rather than hidden: anchoring decides that the expected value is the clause's
 approved outcome; it cannot decide that a NEW stimulus falls under the clause's condition (a reviewer claiming a
 corrupt file is an I/O error). A stimulus an approved contract decides differently is caught (CONTRADICTS_APPROVED).
+A second one, open: the anchor compares the expected values and leaves out `within_s`, so a window the reviewer chose
+and the product cannot keep (a few milliseconds) is an expired window, which the class's table makes REFUTED, which is
+CONFIRMED here, and ANCHORED all the same — the correct reference of the LedgerLock bundle blocks under `fix-loop` at
+`within_s: 0.001` and does not at 20. Whether that should block is not decided by this module: it is an open owner decision.
 
 Policy (settings `review`): under `fix-loop` a CONFIRMED and ANCHORED finding at or above `min_severity` blocks
 (REVIEW_FINDING, owner REVIEW, retryable through the taxonomy's REVIEW limit: the bounded fix loop), its statement and
@@ -68,7 +81,12 @@ from aisef2.product.compiler import ProbeRef
 from aisef2.product.contract import BehaviorContract, ContractError, Subject, plain
 from aisef2.product.outcome import Executed
 
-CONFIRMED, NOT_REPRODUCED, UNVERIFIABLE = "CONFIRMED", "NOT_REPRODUCED", "UNVERIFIABLE"
+CONFIRMED, NOT_REPRODUCED, INDETERMINATE, UNVERIFIABLE = "CONFIRMED", "NOT_REPRODUCED", "INDETERMINATE", "UNVERIFIABLE"
+#: What a statement's `verification` says. Extending it needs no format change: `artifact_problems` never reads the
+#: value, so a journal or an artifact of the earlier vocabulary (an INDETERMINATE probe verdict under NOT_REPRODUCED,
+#: before the owner's decision of 2026-10-15) still verifies and stays as it was written — it is not reinterpreted.
+#: Every name must fit `STATUS_MAX`, or `detail` would cut it.
+STATUSES = (CONFIRMED, NOT_REPRODUCED, INDETERMINATE, UNVERIFIABLE)
 ANCHORED, UNANCHORED, CONTRADICTS_APPROVED = "ANCHORED", "UNANCHORED", "CONTRADICTS_APPROVED"
 SEVERITIES = ("low", "medium", "high", "critical")
 POLICIES = ("fix-loop", "advisory")
@@ -186,9 +204,9 @@ def verify(finding: Mapping, *, requirements: Mapping, product_roots, root: str,
     except (OverflowError, RecursionError):
         # what a probe's classifier cannot take of a model's reproducer: a `within_s` that is an integer no float
         # holds (400 digits; the shared `window_of` asks `math.isfinite` of it, and its Cycle-1 file is immutable), or
-        # a pattern `re.compile` fails on with OverflowError or RecursionError (file_artifact's grep). The caller
-        # answers it for every probe: no meaning. (`cls` stays bound once: the calibration lookup below is checked
-        # against the one binding of the class.)
+        # whatever else raises OverflowError or RecursionError there (the patterns of cli_invocation and file_artifact
+        # answer None themselves). The caller answers it for every probe: no meaning. (`cls` stays bound once: the
+        # calibration lookup below is checked against the one binding of the class.)
         return no_meaning
     if cls is None:
         return no_meaning
@@ -209,9 +227,10 @@ def verify(finding: Mapping, *, requirements: Mapping, product_roots, root: str,
     if v is BehaviorVerdict.SATISFIED:
         return Verification(NOT_REPRODUCED, f"{entry.probe_id} observes the stated behaviour: the finding does not "
                             "reproduce", entry.probe_id, v.value)
-    # INDETERMINATE: the probe looked and decided nothing — no proof that the finding does not reproduce (RV-2)
+    # INDETERMINATE: the probe looked and decided nothing — no proof that the finding does not reproduce (RV-2): its own
+    # status, never NOT_REPRODUCED, which is the one status that says the finding was shown not to reproduce
     cause = result.reason.value if result.reason else v.value
-    return Verification(NOT_REPRODUCED, f"{entry.probe_id} could not decide the stated behaviour (INDETERMINATE, "
+    return Verification(INDETERMINATE, f"{entry.probe_id} could not decide the stated behaviour (INDETERMINATE, "
                         f"{cause}): neither confirmed nor ruled out", entry.probe_id, v.value)
 
 

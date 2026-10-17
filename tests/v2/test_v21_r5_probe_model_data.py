@@ -52,8 +52,8 @@ classification: UNVERIFIABLE, "gives the reproducer's observation no meaning".
 6. A `within_s` that is an integer no float holds (400 digits). `window_of` of the Cycle-1 probe, which every probe
 shares or copies, asks `math.isfinite` of it: `OverflowError` out of the classifier. The Cycle-1 file is immutable, so
 the caller that hands a model's reproducer to a probe's classifier answers it: no meaning, UNVERIFIABLE. The same
-guard answers `file_artifact`'s grep pattern, whose own check catches `re.error` only (`a{4294967296}`:
-`OverflowError`; 2,000 nested groups: `RecursionError`) and whose file is another lane's."""
+guard answers `file_artifact`'s grep pattern, whose own check caught `re.error` only (`a{4294967296}`:
+`OverflowError`; 2,000 nested groups: `RecursionError`) and whose file was another lane's (since fixed there)."""
 
 from __future__ import annotations
 
@@ -316,9 +316,10 @@ class ARegexThatIsNotAPattern(unittest.TestCase):
 
 
 class AGrepPatternOfTheFileArtifactProbe(unittest.TestCase):
-    """The probe's own `_compiles` catches `re.error` only (its file belongs to another lane of this window): a pattern
-    `re.compile` fails on with `OverflowError` or `RecursionError` ends its classifier in an exception. The caller of
-    every probe's classifier answers it, so the review is safe whichever way that file is fixed."""
+    """The probe's own `_compiles` caught `re.error` only (its file belonged to another lane of this window): a pattern
+    `re.compile` fails on with `OverflowError` or `RecursionError` ended its classifier in an exception. The caller of
+    every probe's classifier answers it, so the review was safe whichever way that file was fixed; it is fixed now
+    (test_v21_r5_regex_worker.py pins the classifier itself) and this stays as the review's own."""
 
     def verify(self, grep):
         f = {"id": "F-G", "severity": "high", "summary": "s", "reproducer": {

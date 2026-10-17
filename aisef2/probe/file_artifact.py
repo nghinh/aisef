@@ -261,11 +261,18 @@ def window_of(observable) -> float | None:
 
 
 def _compiles(pattern) -> bool:
+    """Whether `re` takes the pattern. `re.compile` says no in three ways: `re.error` (a malformed pattern),
+    `OverflowError` (a repetition count past the engine's: `a{4294967296}`) and `RecursionError` (groups nested past
+    the compiler's). The pattern is a model reviewer's or a spec author's: one `re` cannot take gives the observable no
+    meaning (`observation_class` answers None), and is never an exception out of a classifier. This compile is made in the
+    kernel's process with no deadline, before `PATTERN_CAP` is looked at (`observe`): its cost grows with the pattern's
+    size and with what it holds (3.7 s for 19 KB of case-insensitive full-range classes, measured), and nothing here
+    bounds it."""
     if not isinstance(pattern, str) or not pattern:
         return False
     try:
         re.compile(pattern)
-    except re.error:
+    except (re.error, OverflowError, RecursionError):
         return False
     return True
 
