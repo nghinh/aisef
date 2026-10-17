@@ -1,4 +1,4 @@
-# AISEF 2.1 — Báo cáo trạng thái (2026-10-06, bản sửa theo yêu cầu nghiệm thu; §0 cập nhật 2026-10-14; §0.9–§0.10 và §6 cập nhật 2026-10-15)
+# AISEF 2.1 — Báo cáo trạng thái (2026-10-06, bản sửa theo yêu cầu nghiệm thu; §0 cập nhật 2026-10-14; §0.9–§0.10 và §6 cập nhật 2026-10-15; §0.5, §0.9, §4–§7 cập nhật 2026-10-17 cho đợt hai của cửa sổ probe)
 
 **Chưa đủ điều kiện phát hành 2.1.** Cách ly hệ điều hành: có mã opt-in, đã đo trong Linux guest và đã chạy một lượt
 `aisef run` thật qua CLI thật với mô hình kịch bản (§0.4). Lượt live: ba lượt canary nhỏ với mô hình thật do chủ dự án
@@ -9,6 +9,11 @@ mutation (§0.3), 19 hàng hiệu chuẩn, các bản ghi phái sinh và suite p
 Không có gì được push, gắn tag, publish, deploy; không phiên kỹ thuật nào gọi provider trả tiền (ba lượt canary do chủ dự
 án tự chạy trong terminal của mình). Chủ dự án chưa nghiệm thu, chưa duyệt phát hành, chưa duyệt ngân sách 140 USD của
 chiến dịch, chưa duyệt B-02/B-04/B-08/B-10 — báo cáo này không thay cho những quyết định đó; B-09: §0.10.
+
+**Hai lỗi chưa sửa, giữ nổi bật (§6.0):** lệnh chi phí/báo cáo của V1 (`aisef cost`, `aisef report`, `aisef status`) trả
+toàn số 0 với exit 0 trên thư mục run V2; và hai điểm CRLF trên Windows (`tests/v2/p0/test_freeze_manifest.py:171`, checker
+`execution_order`). Cho tới khi chúng được sửa, **không tài liệu nào ở đây nói hành trình người dùng hay hỗ trợ Windows đã
+đạt**. AISEF 2.1 là một **ứng viên**: chưa phát hành, chưa được chủ dự án nghiệm thu.
 
 Tài liệu đi kèm: [RED-SUITE.md](RED-SUITE.md) (từng test đỏ), [ADR-V2.1.md](ADR-V2.1.md),
 [ANCHOR-THREAT-MODEL.md](ANCHOR-THREAT-MODEL.md), [USAGE-2.1.md](USAGE-2.1.md), [decisions/](decisions/) (hồ sơ B-01, B-04,
@@ -120,7 +125,7 @@ xoá nghi ngờ bằng phép đo ở HEAD).
 | Reproducer đầy đủ trong artifact | thiết kế + sửa | 12.000 finding đối kháng; thật | một lượt OCR với mô hình thật | ngân sách B-09 |
 | Bản ghi phái sinh 2.1 | sinh đúng thứ tự trên cây cuối (§0.5b) | công cụ tự kiểm từng cái | cây sau cửa sổ probe (§0.9): chưa tái sinh | tái sinh một lần, theo thứ tự phụ thuộc, sau hiệu chuẩn (§0.9) |
 | Suite đầy đủ | chạy trên commit đã định (§5) | hermetic, `env -i`, không có `opencode` | cây sau cửa sổ probe (§0.9, §5): chưa chạy; trong guest Linux mới 84/405 module | chạy trên commit đã định, sau hiệu chuẩn |
-| Phát hiện module probe | phân loại PM-1…13; **sửa trên nhánh ứng viên** (§0.9) | reproducer đo được, kỹ sư thứ hai chạy lại; test đỏ trước / xanh sau của từng làn | hiệu chuẩn lại 19 hàng, mutation, suite đầy đủ cho cây đã đổi | hiệu chuẩn một lần ở cuối cửa sổ; quyết định mở: backlog V21-54 … V21-74 |
+| Phát hiện module probe | phân loại PM-1…13; **sửa trên nhánh ứng viên** (§0.9) | reproducer đo được, kỹ sư thứ hai chạy lại; test đỏ trước / xanh sau của từng làn | hiệu chuẩn lại 19 hàng, mutation, suite đầy đủ cho cây đã đổi | hiệu chuẩn một lần ở cuối cửa sổ; quyết định mở: backlog V21-54 … V21-88 |
 | OCR với mô hình thật; chiến dịch đối chứng (E2) | — | — | **chưa đo** | B-09 |
 ### 0.4 Lượt `aisef run` thật trong sandbox Linux (mô hình kịch bản; chứng minh **tích hợp có cách ly**, không chứng minh hiệu quả với mô hình thật)
 
@@ -149,14 +154,25 @@ không phân biệt được trong cấu hình S1 (cây gắn chỉ đọc, site
 
 ### 0.5 Nhị phân Open Code Review, ba tệp probe trong `site-packages`, hiện tượng log OpenCode Desktop
 
-* **OCR**: sha256 `bf38abf3…04af7` **khớp pin**; `version` in `open-code-review v1.12.12 (182898c) darwin/arm64`. Ba lớp
-  bằng chứng, không gộp (`validation/v21/ocr/BUILD-RECIPE.md`): (a) **tự khai** — dòng `version`, do người dựng đặt;
-  (b) **metadata nhúng** — `go1.26.5`, `-trimpath=true`, `vcs.revision` = commit ghim, `vcs.modified=false`; (c) **dựng
-  lại được** — `NOT_PERFORMED` (không có nguồn upstream, module cache 0 tệp, không mạng, `-ldflags` của bản dựng gốc chưa
-  biết). Nhãn "dựng từ nguồn (`-trimpath`)" từng ghi ở đây là lời của dự án: phù hợp (a) và (b), chưa được chứng minh.
-  Chưa so với artifact phát hành upstream (không có pin nào để so). Chỉ nhị phân darwin/arm64 của máy này; guest không có
-  OCR (OCR bị từ chối cùng cách ly). Từ cửa sổ probe (§0.9) cổng hỏi `version` của binary **trước mọi lệnh review**. Không
-  có lượt OCR với mô hình thật. `closure-evidence/v2/v2.1/round-3/OCR-IDENTITY-2026-10-13.json`.
+* **OCR**: sha256 `bf38abf3…04af7` **khớp pin**; `version` in `open-code-review v1.12.12 (182898c) darwin/arm64`. Ba mức
+  bằng chứng, không gộp (`validation/v21/ocr/BUILD-RECIPE.md`,
+  [PROVENANCE.md](../../closure-evidence/v2/v2.1/round-5/ocr-build/PROVENANCE.md)): (a) **tự khai** — dòng `version`, do
+  người dựng đặt; (b) **sha256 bằng pin, cộng metadata nhúng** — `go1.26.5`, `-trimpath=true`, `vcs.revision` = commit
+  ghim, `vcs.modified=false`, 84 phụ thuộc; (c) **dựng lại được: `IDENTICAL` trên một máy** — dựng từ commit
+  `182898cf522da3d04157b422752d028417974e19` bằng go1.26.5 (Homebrew), `-trimpath` và cờ liên kết của Makefile upstream
+  (ba giá trị `-X` lấy từ chính binary) cho đúng sha256 `bf38abf3…04af7`, 55 014 610 byte: 3/3 lần dựng ngày 2026-10-15,
+  rồi 3/3 ở lượt rà soát 2026-10-17 với GOCACHE nguội mới; mỗi đối chứng đổi đúng một thứ cho sha256 khác. Mức (c) nghĩa
+  chính xác là các byte này *tái tạo được* từ nguồn công khai. **Không được xác minh:** ai và ở đâu đã dựng chính tệp được
+  ghim (câu "dự án tự dựng" ở bản ghi vòng 3 là lời tuyên bố, không có phép đo); toolchain độc lập; hai chữ ký của tag và
+  commit (máy không có `gpg`); artifact phát hành của upstream — không tải, không so (workflow upstream chạy
+  `golang:1.26.6`, không `-trimpath`, ghi giờ lúc chạy vào `BuildDate`, nên artifact đó, nếu do workflow ấy dựng, dự đoán
+  sẽ khác; chưa đo); nền tảng khác (chỉ darwin/arm64 trên một máy). Các nhãn "dựng từ nguồn (`-trimpath`)" cũ nay đúng ở
+  mức (c) này và không hơn. Quyết định **D-OCR-1** (mở, backlog V21-86): có tải artifact phát hành, `sha256sum.txt` và
+  attestation của upstream để so không? Guest không có OCR (OCR bị từ chối cùng cách ly). Từ cửa sổ probe (§0.9)
+  `aisef run` hỏi binary (pin rồi `version`) **ngay đầu lượt chạy**, trước claim `--parent`, clone, preflight và mọi
+  phiên, và cổng hỏi lại **trước mọi lệnh review**; `RUN.json` `ocr_identity` ghi `build_provenance: NOT_ESTABLISHED` vì
+  một lượt chạy không dựng lại binary. Không có lượt OCR với mô hình thật.
+  `closure-evidence/v2/v2.1/round-3/OCR-IDENTITY-2026-10-13.json`.
 * **Ba tệp probe** (rỗng, 0 byte, `nghinh:admin`, sinh 2026-10-07 17:28:29 / 17:33:53 / 19:39:42; không phải tệp của
   gói nào; sự cố `closure-evidence/v2/v2.1/incidents/2026-10-07-site-packages-probe-files`, trạng thái **mở**; **không
   xoá**: chưa có duyệt cho đúng ba đường dẫn này):
@@ -223,7 +239,7 @@ Cửa sổ đã mở trên nhánh ứng viên (§0.9): PM-1, PM-2, PM-3/4, PM-6,
 PM-8, PM-9, PM-13 theo quyết định của chủ dự án ngày 2026-10-15
 (`closure-evidence/v2/v2.1/round-5/OWNER-DECISIONS-2026-10-15.md` §B); PM-5 là một mô tả giới hạn (§6), không phải sửa.
 **Còn lại**: hiệu chuẩn lại 19 hàng + Q-checker liên quan, đo mutation, suite đầy đủ, và các quyết định mở của cửa sổ
-(backlog V21-54 … V21-74).
+(backlog V21-54 … V21-88).
 
 ### 0.8 Phát hành, hiệu quả với mô hình thật, và những gì chưa được duyệt
 
@@ -238,10 +254,11 @@ PM-8, PM-9, PM-13 theo quyết định của chủ dự án ngày 2026-10-15
   (B-09).
 * **Ba tệp probe trong `site-packages`**: đường dẫn chính xác và nguồn gốc ở §0.5; việc xoá cần duyệt đúng ba đường dẫn.
 
-### 0.9 Cửa sổ probe 2026-10-15 — nhánh ứng viên `v2.1/probe-window` (`2d01fe4` → `f69124c`)
+### 0.9 Cửa sổ probe 2026-10-15 — nhánh ứng viên `v2.1/probe-window` (`2d01fe4` → `f69124c` đợt một; → `3e1e83a` đợt hai, 2026-10-17)
 
 Cây `aisef2/` đổi từ `1d4f0156…` (cây của bản ghi mutation §0.3, của suite `45554e0`, của e2e §0.4 — lượt `e2e-linux-final/`; lượt `e2e-linux/` đầu tiên chạy trên `427afeec…` — và của canary §0.10)
-sang `168ad7d4…`. Nguồn thay đổi: các mục lỗi PM-1, 2, 3, 4, 6, 11 và RV-1, RV-2 (§0.7); các quyết định của chủ dự án
+sang `168ad7d4…` ở `f69124c` và `28313c59…` ở `3e1e83a` (đợt hai: sáu làn, mỗi làn gộp bằng một commit `merge lane …`;
+các số này là id cây git của `aisef2/`). Nguồn thay đổi: các mục lỗi PM-1, 2, 3, 4, 6, 11 và RV-1, RV-2 (§0.7); các quyết định của chủ dự án
 ngày 2026-10-15 cho PM-5, PM-7, PM-8, PM-9, PM-13 và họ lineage
 (`closure-evidence/v2/v2.1/round-5/OWNER-DECISIONS-2026-10-15.md` §B); cổng danh tính OCR; công cụ chạy suite trong guest
 Linux. Hành vi người dùng thấy, từng mục, với tên trạng thái trong mã: [USAGE-2.1.md](USAGE-2.1.md) §5 và §8.
@@ -262,24 +279,41 @@ Linux. Hành vi người dùng thấy, từng mục, với tên trạng thái tr
 | Lineage | `UNREAD`, mã `EVIDENCE_*`, `--expect-anchor`, `continue` hợp lệ như `--verify`, chi phí unknown cho journal không đọc được | `042a245`, `1501d17`, `4d245f4`, `d3b6cd9` | `test_v21_pw_lineage_continue`, `…_unread`, `…_spend` |
 | Công cụ suite trong guest | `validation/v21/sandbox/linux_suite.sh`, `linux_suite_guest.py` (suite hoặc tập con, trong container) | `ff6be69`, `2155228` | `test_v21_linux_suite_guest` |
 | PM-5 | mô tả một giới hạn: docstring và `WEAKEST_PATH` của ba probe không còn nói chủ thể "builds no fact" (không đổi hành vi); §6 | `f69124c` | — (giữ cụm "isolation, not a sandbox" mà test ghim) |
+| **Đợt hai** `migrate-semantics` (chỉ thị 2026-10-15 lần thứ tư, mục 1) | `migrate` và `seal --keep-approvals-from` không giữ approval chỉ vì `contract_hash` không đổi: ứng viên mới, chỉ mang approval còn buộc hash mà contract không bị một thay đổi capability đã khai báo (`CAPABILITY_CHANGES`) chọn trúng; báo cáo `semantic_changes`, `needs_owner_reapproval`, `candidate`, `approvals_kept_grounds`, `limits`; thay đổi không khai báo ⇒ đóng. Trên LedgerLock 2.0.0: giữ 53/59, giữ lại **sáu** contract (D-1), 50/53 approval giữ dựa vào luật phiên bản (D-2). Cửa sổ không di trú approval PM-9 nào của kho (59 approval `human:owner` ở `P5-CONTRACT-APPROVALS.json`); duyệt lại là việc của chủ dự án | `d1460fd`, `d6ef913` | `test_v21_migrate_semantics` |
+| `lineage-proof` (mục 2) | chi phí unknown ≠ 0 ở mọi đầu ra: bằng chứng của dòng dõi có mà không đọc được, journal không phải cái `RUN.json` nêu, tổ tiên mất ⇒ `unread`, `exact: false`, `total: null`; `aisef run --parent` từ chối (exit 2) trước clone, admission, preflight bất kể cờ; R2–R5 mở | `3b738a4`, `e3fc210`, `286d511` | `test_v21_x_lineage_proof`, `test_v21_pw_lineage_spend`, `test_v21_kills_cli` |
+| `review-limits` (mục 3, 4) | `INDETERMINATE` là trạng thái kiểm chứng riêng, `NOT_REPRODUCED` chỉ cho `SATISFIED`; regex của `cli_invocation` khớp trong worker dưới `timeouts_s.probe` (lỗi ⇒ `UNRUNNABLE`/`UNVERIFIABLE`); `_braces`, `_fence` tuyến tính; biên `within_s` chỉ ghim nơi định nghĩa và mã khớp; D1–D5 mở | `5d192e1`, `a692f06`, `3e26945` | `test_v21_r5_review_status`, `…_review_indeterminate`, `…_regex_worker`, `…_regex_isolation`, `…_linear_text`, `…_window_boundary`, `…_probe_model_data` |
+| `ocr-preflight` (mục 5) | `aisef run` và `--check` hỏi binary OCR — pin, rồi `version` — ngay đầu lượt chạy, trước claim, clone, preflight, phiên; từ chối có cấu trúc; cổng lúc dùng giữ nguyên | `9abc1c6`, `84b4543` | `test_v21_ocr_preflight`, `test_v21_ocr_identity`, `test_v21_ocr_gate`, `test_v21_review_chain` |
+| `ocr-build` (mục 5) | binary ghim dựng lại byte-identical từ commit `182898c` (go1.26.5), trên một máy; bản ghi nguồn gốc và công thức dựng | `891cd20`, `ccb65a2`, `3e1e83a` | không thêm test: bằng chứng là phép dựng (`closure-evidence/v2/v2.1/round-5/ocr-build/`, `validation/v21/ocr/test_inspect_binary.py`) |
+| `linux-recorder` (mục 6) | recorder đếm đôi một lần khởi chạy trên Linux (`os.posix_spawn` do chính `Popen._posix_spawn` gọi) sửa theo định danh lần gọi; `validation/v21/offline_groups.sh` chạy nhóm mockup và references ngoại tuyến | `dcd2429` (test đỏ), `bc51113`, `6f5be44`, `1f7dcf9`, `6619494`, `72db8ca`, `c89466c` | `test_v21_read_set` `Launches`, `validation/v21/test_reach.py` `Launches` |
 
 **Trạng thái bằng chứng: đã làm trên nhánh ứng viên, bằng chứng đo chưa có.** Mỗi thay đổi hành vi có test đỏ trước, xanh
-sau, do làn của nó chạy trên cây của làn. Tại `f69124c` chưa có (kiểm: `closure-evidence/v2/v2.1/round-5/` chỉ có bảng
-quyết định):
+sau, do làn của nó chạy trên cây của làn. Tại `3e1e83a` chưa có (kiểm: `closure-evidence/v2/v2.1/round-5/` có bảng quyết
+định, chỉ thị của chủ dự án và bằng chứng dựng OCR; không có bản ghi hiệu chuẩn, mutation hay suite):
 
 * **hiệu chuẩn**: `aisef2/app/calibrations.py` còn 19 hàng ở `EXECUTION_DIGEST` cũ (cli_invocation 5, process_effect 3,
   python_callable_v2 7, file_artifact 4); `aisef bundle lint` trên `calc-1-story` báo `NOT_READY` ở kiểm tra
-  `9. probe_calibration` (đo trên `f69124c`, USAGE-2.1 §1) cho tới một lần `release_calibration.py --write`;
-* **mutation**: target mới và target đổi thân (đăng ký đề nghị của từng làn; `validation/v2/mutation.py` chưa sửa);
+  `9. probe_calibration` (đo trên `3e1e83a`: `no ProbeCapabilityCalibration for probe.python_callable_v2@0821c14651a9
+  executing 042fe41e8e68 class 'returns'`; USAGE-2.1 §1) cho tới một lần `release_calibration.py --write`. Đợt hai đổi
+  `EXECUTION_DIGEST` của cả bốn probe thêm một lần (USAGE-2.1 §8.7), nên một lần hiệu chuẩn phải làm sau khi đóng băng
+  văn bản của chúng;
+* **mutation**: đợt một đã đăng ký ở `67ee880` (46 target thêm, 45 mở rộng, `HARNESS`/`guarded` bỏ); các tên mới và thân
+  hàm đổi của đợt hai — `bundle_cli` (`_assess`, `_declared`, `_grounds`, `with_commands`, `exposure_of`; thân `migrate`,
+  `seal`, `approve`, `main`), `lineage` (`_journal_mismatch`, `_predecessor`, `unread_runs`), `review_verify`
+  (`INDETERMINATE`, `STATUSES`), `cli_invocation` (`REGEX_WORKER`, `search_in_worker`), `adapters._braces`,
+  `review_ocr._fence`, `run.ocr_identity`/`ocr_refusal`, thân `run.execute`, `cli.run`, `review_ocr.pinned` — **chưa được
+  đăng ký và chưa đo**; ghi chú `Pins …[chỉ số]` trong các tệp kill của `bundle_cli` lệch cho tới khi chạy lại;
 * **suite đầy đủ** và các bản ghi phái sinh ràng buộc cây (P5-PLAN-V2.2-PROPOSAL, P5-FALSIFIABILITY,
   C2-P5-ACCEPTANCE-REVERIFICATION, PLAN-V2.2-CORRECTION-1, Q5-KERNEL-COMPARISON, CONFORMANCE-RULING, bản ghi
   C2-ORCHESTRATION, bản ghi K-NOWORK-001, bảng execution order): đỏ có chủ đích cho tới khi tái sinh một lần theo thứ tự
-  phụ thuộc — kiểm cuối từng làn ghi các test này xanh ở nền;
+  phụ thuộc. Các làn đợt một ghi chúng xanh ở nền; ở đợt hai, những test dùng probe thật (6 test của `review-limits`, các
+  test `Chain` của `ocr_gate` và `review_chain`) đỏ cho tới khi hiệu chuẩn sinh lại và cũng đỏ y hệt ở nền `f69124c`. Hai
+  chỗ lane `migrate-semantics` làm đỏ (T00a và bản ruling của `catalog.py`) đã sửa ở `df22c04` (bản ruling đã commit được
+  sinh lại sau hiệu chuẩn, theo thứ tự phụ thuộc);
 * e2e trong guest Linux, CI Windows/Linux, mô hình thật.
 
 Mọi bằng chứng gắn cây `1d4f0156…` (mutation 528 target, suite `45554e0`, e2e §0.4 lượt `e2e-linux-final/`, kernel của canary §0.10) mô tả cây
-trước cửa sổ, không phải cây này. Các quyết định mở của cửa sổ là các hàng V21-54 … V21-74 của
-[V2.1-BACKLOG.md](../v2/V2.1-BACKLOG.md); tài liệu này không quyết thay chủ dự án.
+trước cửa sổ, không phải cây này. Các quyết định mở của cửa sổ là các hàng V21-54 … V21-88 của
+[V2.1-BACKLOG.md](../v2/V2.1-BACKLOG.md) (mục 7 dưới đây liệt kê); tài liệu này không quyết thay chủ dự án.
 
 ### 0.10 Canary B-09 với mô hình thật (2026-10-15; `closure-evidence/v2/v2.1/canary/`)
 
@@ -320,7 +354,7 @@ Route `9router/ds/deepseek-v4-pro`, client `opencode` 1.18.31, macOS không các
 | Nhánh | HEAD | Trạng thái |
 |---|---|---|
 | `v2.1/foundation` | xem `git log -1` (commit chứa báo cáo này; mã cuối `534435f`: `confine.py`, `process_range.py`, `mutation.py` (dữ liệu), tệp kill và `trace_paths.py` đổi sau `b72e51e`) | local, chưa push. Gồm hai nhánh chủ đề đã merge: `v21/review` (`181d68e`), `v21/continue` (`872e83c`) |
-| `v2.1/probe-window` | `f69124c` (`aisef2/` `168ad7d4…`) | local, chưa push, chưa merge; nền `2d01fe4`; ứng viên của cửa sổ probe 2026-10-15 (§0.9) |
+| `v2.1/probe-window` | `3e1e83a` (`aisef2/` `28313c59…`; `f69124c`, `168ad7d4…` là cuối đợt một) | local, chưa push, chưa merge; nền `2d01fe4`; ứng viên của cửa sổ probe 2026-10-15 … 17 (§0.9) |
 | `v21p/context` | xem `git log -1` | local, chưa push, chưa merge: D4 ([CONTEXT-PACK.md](CONTEXT-PACK.md)). Mang thay đổi mã `f15026b`, `80f4437`, `1899bb0`, `7797061` trong `aisef2/app/` (`feedback.py`, `adapters.py`) — sau `b72e51e`; cần mutation và tái thẩm định ngoài snapshot đang đo |
 | `release/v2.0.1-prep` | `f006d3d` | local, chưa push; bản vá 2.0.1 chuẩn bị, **chưa đủ điều kiện phát hành** (§5) |
 | `master`, `docs/v2` | `610a593` | không đổi trong phiên này (2.0.0 + tài liệu) |
@@ -354,10 +388,10 @@ cao nhất có bằng chứng; mục ở M3/M4 đã qua M1–M2, trừ E1 và A9
 | B4–B5 | `aisef bundle init/seal/approve/lint/…`, độ phủ mệnh đề | **M4** | `test_v21_bundle_tools`; CLI thật: seal → approve ×7 → lint READY | — |
 | B6 | ba danh tính | M3 | `test_v21_identity.ThreeIdentities` | phê chuẩn V2-007: **M6** (B-01) |
 | C1 | finding chỉ chặn khi AISEF tái hiện **và** contract đã duyệt neo kỳ vọng | **M4** | `test_v21_review`, `test_v21_review_chain`; CLI thật: OCR tìm finding ⇒ tái hiện ⇒ ANCHORED ⇒ chặn ⇒ sửa ⇒ review lại sạch ⇒ COMMIT | chất lượng finding của mô hình thật: **M6** (B-06, ngân sách) |
-| C2 | OCR v1.12.12 nối vào `aisef run` (`review.finder: "ocr"`) | **M4** | nhị phân thật: preview, khoảng rỗng, review đầy đủ với mô hình kịch bản (`RealBinary` ×3, §4.1) | OCR với mô hình thật: **M6** |
+| C2 | OCR v1.12.12 nối vào `aisef run` (`review.finder: "ocr"`) | **M4** | nhị phân thật: preview, khoảng rỗng, review đầy đủ với mô hình kịch bản (`RealBinary` ×3, §4.1). Kiểm danh tính ngay đầu lượt chạy (đợt hai): **M3** (`test_v21_ocr_preflight`), thêm một lần `ocr_identity` với binary thật chỉ gồm lệnh `version` | OCR với mô hình thật: **M6**; nguồn gốc binary: mức (c) trên một máy, §0.5 |
 | C3 | vòng sửa có biên, có ngân sách | M4 | `FixLoop`; CLI thật: hai lượt | — |
 | D1 | nối tiếp lượt chạy (`bundle continue`, `run --parent`), claim theo thế hệ, đối soát với git | **M4** | `test_v21_continue_integrity` (SIGKILL ở 13 điểm đồng bộ + hai run cùng lúc); CLI thật: §4.2 — bắt được một lỗi (`b72e51e`) | resume tại chỗ: **M6** (không làm: cần format journal mới) |
-| D2 | usage/chi phí: không biết ≠ 0; chi phí chưa đối soát chặn phiên trả tiền | **M4** | `test_v21_continue_usage`; CLI thật: `--parent` bị từ chối, `--accept-unaccounted` ghi lại | giá thật: **M6** |
+| D2 | usage/chi phí: không biết ≠ 0; chi phí chưa đối soát chặn phiên trả tiền | **M4** | `test_v21_continue_usage`; CLI thật: `--parent` bị từ chối, `--accept-unaccounted` ghi lại. Đợt hai (cửa sổ probe): bằng chứng của dòng dõi có mà không đọc được ⇒ chi phí `unread`/`null`, `--parent` từ chối bất kể cờ — **M3** (`test_v21_x_lineage_proof`) | giá thật: **M6**; R2 (bằng chứng *thiếu*) đang hoàn thiện, R3–R5 mở (§7) |
 | D3 | `no_progress` (chỉ báo cáo) | M3 | `test_v21_continue_usage.Usage` | — |
 | D4 | gói ngữ cảnh do controller dựng cho lượt thử lại ([CONTEXT-PACK.md](CONTEXT-PACK.md)) | **M4** | cần: đo trên 16 lượt thử lại đã ghi (`validation/v21/context_gap.py`); `test_v21_context_pack`; CLI thật tại `7797061`: prompt developer của run1 tính lại từ journal trùng `prompt_sha256`, lượt 2 nhận gói, seq trích đọc lại đúng, journal không chứa gói (bước read-back của `run.sh`, `evidence/cli-integration-7797061.out`) | hiệu quả với mô hình thật: **M6** (lượt chạy trả tiền); nối tiếp: chưa làm (chưa có bằng chứng cần) |
 | D5 | tệp anchor an toàn (`--anchor-out`) | M4 | `AnchorThreatModel`; CLI thật: tệp 0444 | nơi giữ tin cậy (§4.3) |
@@ -386,7 +420,8 @@ sử là thật. Và: mã của chủ thể trả lời hộ chính nó (mã tho
 
 `validation/v21/cli_integration/run.sh` trên `b72e51e`, cây sạch (output đầy đủ:
 [evidence/cli-integration-b72e51e.out](evidence/cli-integration-b72e51e.out)). CLI `aisef` thật của cây; **nhị phân Open
-Code Review v1.12.12 thật** (`182898c`, darwin-arm64, sha256 `bf38abf3…b6839104af7`, build từ nguồn với `-trimpath`);
+Code Review v1.12.12 thật** (`182898c`, darwin-arm64, sha256 `bf38abf3…b6839104af7`; tự khai `v1.12.12 (182898c)`, và byte tái tạo được từ commit
+đó trên một máy — §0.5, không nói ai dựng tệp ghim);
 preflight HTTP thật tới một provider OpenAI-compatible trên loopback (`fakeprov.py`, cũng đóng vai mô hình của OCR theo
 kịch bản); developer giả (`fake_opencode.py`) trên PATH đã loại mọi thư mục có `opencode` thật; HOME/XDG riêng.
 
@@ -404,8 +439,9 @@ finding ⇒ developer sửa ⇒ OCR review lại, sạch ⇒ COMMIT ⇒ `--verif
 |---|---|---|
 | finding đúng yêu cầu, tái hiện, neo được | chặn; sửa trước merge | CLI thật (trên) + `FixLoop` |
 | tái hiện nhưng kỳ vọng không có contract đã duyệt nào neo (UNANCHORED) hoặc trái contract đã duyệt (CONTRADICTS_APPROVED) | ghi lại, **không** tự chặn | `NotABlocker` ×2 |
-| không tái hiện được | không chặn | `NotABlocker` |
-| partial, hết token, schema manifest không hỗ trợ, timeout (chi phí unknown), lỗi provider | INDETERMINATE ⇒ không bao giờ là "sạch"; fix-loop: lỗi năng lực, hoặc ProviderOutage; advisory: ghi, không chặn | `IncompleteReview` ×6 |
+| không tái hiện được (probe `SATISFIED` hành vi được nêu: `NOT_REPRODUCED`) | không chặn | `NotABlocker` |
+| probe chạy mà không quyết được (`INDETERMINATE`), hoặc kiểm tra không chạy được hay không quyết được vì giới hạn của công cụ (`UNVERIFIABLE`: probe `UNRUNNABLE`, spec vô nghĩa, regex không kết thúc trong hạn `timeouts_s.probe`, reproducer lồng quá 63 tầng) | ghi lại, **không** chặn, và không bao giờ là bằng chứng rằng finding không tái hiện (đợt hai của cửa sổ probe) | `test_v21_r5_review_status`, `…_review_indeterminate`, `…_regex_worker` (M3) |
+| partial, hết token, schema manifest không hỗ trợ, timeout (chi phí unknown), lỗi provider | INDETERMINATE (trạng thái *coverage* của reviewer OCR, một từ vựng khác với trạng thái kiểm chứng finding ở hàng trên) ⇒ không bao giờ là "sạch"; fix-loop: lỗi năng lực, hoặc ProviderOutage; advisory: ghi, không chặn | `IncompleteReview` ×6 |
 | khoảng rỗng (story không đổi gì) | OCR thật trả `skipped`, 0 token, không gọi mô hình ⇒ review hoàn tất của "không có gì" | `RealBinary` (nhị phân thật) + `NothingToReview` |
 | candidate đổi trong lúc review (tệp sửa, commit mới, nhị phân không đúng pin) | review bị loại, không tới main | `CandidateChangedDuringReview` ×3 |
 | hết vòng sửa mà lỗi còn | ROLLBACK | `FixLoop` |
@@ -445,7 +481,8 @@ dòng cuối bị cắt — reader trả prefix hợp lệ + `torn_tail`, và tr
 | append journal: trước write / ghi ngắn / sau write trước fsync / sau fsync | dòng cắt ⇒ `torn_tail`, tác dụng của nó vẫn được đối soát với git |
 | claim đã lấy, child chưa bắt đầu (`ENDED_UNBEGUN`: chính `RUN.json` nói run kết thúc trước khi bắt đầu; `UNBEGUN`: không có bằng chứng nào, hoặc journal 0 byte và không có bản ghi) | claimant đã mất ⇒ thế hệ mới thay thế **có bằng chứng** (claim cũ giữ nguyên); claimant còn sống hoặc ở máy khác ⇒ từ chối, chỉ thay khi người vận hành nêu sha256 của claim |
 | child đã bắt đầu rồi chết | không bao giờ bị thay **khi journal của child đọc được**; dòng dõi nối tiếp từ child |
-| bằng chứng của child có mà không đọc được (`UNREAD`: thư mục không tìm kiếm được, journal không mở/dựng lại được, liên kết trỏ vào hư không, `RUN.json` nêu journal có sự kiện mà journal vắng) | không bị thay bằng bằng chứng, kể cả khi claimant đã mất; chỉ thay khi người vận hành nêu sha256 của claim (ghi cùng nguyên nhân); một lần đọc hỏng không bao giờ giải phóng hay lấy một claim |
+| bằng chứng của child có mà không đọc được (`UNREAD`: thư mục không tìm kiếm được, journal không mở/dựng lại được, liên kết trỏ vào hư không, `RUN.json` nêu journal có sự kiện mà journal vắng) | không bị thay bằng bằng chứng, kể cả khi claimant đã mất; chỉ thay khi người vận hành nêu sha256 của claim (ghi cùng nguyên nhân); một lần đọc hỏng không bao giờ giải phóng hay lấy một claim; chi tiêu của child ấy vẫn chưa biết nên `run --parent` vẫn bị từ chối (dòng dưới) |
+| bằng chứng của dòng dõi có mà không đọc được (journal, ledger preflight hay luồng phiên không đọc được; journal không phải cái `RUN.json` nêu; record hay claim hỏng hoặc là liên kết hỏng; tổ tiên mà record nêu nhưng thư mục đã mất) | `unread`: chi phí `null`, `exact: false`; `aisef run --parent` từ chối (exit 2) trước clone, admission và preflight, không phiên nào, không cờ nào mở (`--accept-unaccounted`, `--supersede-claim`); `bundle continue` báo `unread` và `run_parent_refused`; `--verify` `REFUTED` với lý do (đợt hai, M3) |
 | hai tiến trình cùng yêu cầu | đúng một lấy được (`O_EXCL`), bên kia không tiêu gì |
 | child xong, yêu cầu continue lặp lại | từ chối, chỉ tới child — cũng đo qua CLI thật |
 
@@ -456,6 +493,16 @@ journal mà `RUN.json` nêu, dựng lại được, qua các projection của wr
 mỗi cách hỏng có mã (`EVIDENCE_UNREADABLE`, `_MALFORMED`, `_INTEGRITY`, `_PROJECTION`, `_MISSING`, `_MISMATCH`), thêm
 `--expect-anchor` (`anchor_checked`). Chi tiết và bảng mã: [USAGE-2.1.md](USAGE-2.1.md) §5. Không có `--expect-anchor`,
 một continuation chỉ chứng minh nhất quán và không đối chiếu `EVIDENCE.json` với thư mục (backlog V21-54).
+
+**Đợt hai (`lineage-proof`, chỉ thị 2026-10-15 mục 2).** Chi phí của một dòng dõi mà bằng chứng có mặt nhưng không đọc được
+là *chưa xác định* ở mọi đầu ra — `account_of`/`lineage_account` (`unread`, `exact` từng run, `total: null`),
+`RUN.json` `continues.account` và `lineage_usage` (`cost` `null`, `tokens_status` `lower bound`), `Budget` (dừng mọi
+việc thay vì tính theo trần trừ phần đã biết), `--verify` (`REFUTED`), báo cáo của `bundle continue` — và `aisef run --parent`
+từ chối trước clone, admission và preflight bất kể `--accept-unaccounted` hay `--supersede-claim`. Phần đã biết của từng
+run còn nguyên và quy được về run đó; lịch sử không bị sửa. `--accept-unaccounted` còn dùng được cho chi tiêu *đọc được*
+là đã gửi mà chưa trả lời (R4, quyết định mở). **[ĐANG HOÀN THIỆN]** Quy tắc cho bằng chứng *thiếu* cạnh một journal đọc
+được (R2) đang được một lane khác hoàn thiện; người điều phối sẽ mô tả nó, tài liệu này chưa mô tả. R3 và R5 là quyết định
+mở (§7, USAGE-2.1 §8.5).
 
 Tiến trình của lượt bị giết (đo): probe nhận diện theo process group và pid của candidate — đều biến mất (watchdog của
 range anchor `killpg` nhóm của nó khi controller chết). Tiến trình con đã `setsid` **không** bị kiểm soát: sống sau lượt
@@ -488,15 +535,48 @@ thư mục chứa `opencode`, dưới khoá nặng toàn máy. Kết quả mỗi
 | HEAD cuối của 2.1 (vòng 4) | 2.1 | chạy sau commit này, trên đúng SHA đã định (một commit không chứa được kết quả suite của chính nó): `closure-evidence/v2/v2.1/round-4/SUITE.md` và báo cáo gửi chủ dự án; nếu một commit sau đó đổi bằng chứng, các checker phụ thuộc bằng chứng được xác minh lại trên HEAD mới và kết quả của commit cũ không được gán cho HEAD mới |
 
 Các commit `51f2eb5` … `b72e51e` của 2.1 **chưa có suite đầy đủ riêng**; kết quả của `4fd070a` không đại diện cho chúng.
-Cây của cửa sổ probe (§0.9, `f69124c`) **chưa có suite đầy đủ**: kết quả `45554e0` (7.305 test, OK) là của cây `1d4f0156…`.
+Cây của cửa sổ probe (§0.9, `3e1e83a`) **chưa có suite đầy đủ**: kết quả `45554e0` (7.305 test, OK) là của cây `1d4f0156…`.
 
 **Suite trong guest Linux** (`validation/v21/sandbox/linux_suite.sh`, 2026-10-15): chạy `unittest discover` (toàn bộ hoặc
 tập con) trên cây `git archive` trong một container (image cục bộ `aisef-sandbox-measure`, Python 3.14.8, bubblewrap
 0.12.0, `--network none`, profile X1). Đã đo 84 trên 405 module (1.354 trên 7.309 test) qua bốn lượt ≤ 10 phút: hai lệch
-Linux thật — 9 test đỏ ở `v2.test_v21_read_set` (recorder đếm đôi mỗi lần khởi chạy con trên Linux) và `MUT_SAFE_6` giả
-định host đông tiến trình — và một nhóm skip do thiếu node (backlog V21-73, V21-74). Các con số là của làn `linux-suite`; báo cáo kết quả của làn
+Linux thật — 9 mục đỏ ở `v2.test_v21_read_set` (recorder đếm đôi mỗi lần khởi chạy con trên Linux; **đã sửa ở đợt hai**,
+dưới đây) và `MUT_SAFE_6` giả định host đông tiến trình — và một nhóm skip do thiếu node (backlog V21-73 đã sửa, V21-74
+còn). Các con số là của làn `linux-suite`; báo cáo kết quả của làn
 chưa được commit (công cụ và test giữ bộ chạy thì đã). Đây **chưa** là suite đầy đủ trong guest; ước tính 50–65 phút
 (± 30 %) từ các số đo lấy lúc host tải 49–123: một cận trên, chưa đo lúc máy rảnh.
+
+**Recorder đếm đôi một lần khởi chạy trên Linux (đợt hai, lane `linux-recorder`, chỉ thị 2026-10-15 mục 6).** Trên Linux với
+Python ≥ 3.13 và glibc có `POSIX_SPAWN_CLOSEFROM` (đo: 3.13.15 và 3.14.8, glibc 2.41, arm64), `subprocess.Popen` của một
+đường dẫn đi qua `os.posix_spawn` và phát hai sự kiện kiểm toán (`subprocess.Popen`, `os.posix_spawn`) cho một lần khởi
+chạy; macOS phát một, trừ khi `close_fds=False` (hai). `validation/v21/read_set.py` và `reach.py` đếm hai. Bản sửa bỏ qua
+`os.posix_spawn` mà người gọi là `Popen._posix_spawn` (`_of_popen`: so code object), tức khoá theo **định danh của lần
+gọi**, không theo pid: cả hai sự kiện phát trước khi tiến trình con tồn tại (pid của đối tượng `Popen` là `None` ở cả
+hai, đo trên 5 trình thông dịch), nên không có pid để khoá; pid thật của các tiến trình đã khởi chạy là chuẩn đối chiếu của
+test (chủ dự án nói "theo định danh tiến trình thực tế": lane đọc điều đó như trên, backlog V21-87). Test đỏ trước, xanh
+sau: trong guest Linux (3.14.8) ở `dcd2429` 29 test chạy, 12 mục đỏ (3 `Launches` mới và 9 mục của 6 test `ToyRecord`); ở
+`c89466c` `v2.test_v21_read_set` 29, `validation.v21.test_reach` 32 và `v2.test_v21_snapshot_delta` 51 đều xanh, 0 skip;
+trên macOS, chạy test mới với `read_set.py` và `reach.py` của `f69124c` thì đỏ. Không test cũ nào bị xoá hay nới (0 dòng
+xoá). Số của recorder trên macOS với các kịch bản mặc định không đổi (chỉ `close_fds=False` đổi, 4 → 2). Giới hạn đã ghi
+trong `limits` của recorder: `os.spawnv` trên POSIX không bao giờ được đếm (CPython 3.14 phát `os.fork` và `os.exec`; sự kiện
+`os.spawn` chỉ có trên Windows — đo 3.14.7 macOS và 3.14.8 Linux); một chương trình được theo dõi mà bọc
+`Popen._posix_spawn` làm launch đó đếm hai lần (hướng an toàn); chưa đo 3.11, 3.13.0 … 3.13.14 và glibc cũ hơn 2.41.
+Lane còn ghi `ToyRecord` `[registry]` đỏ dưới Python 3.12 trên macOS từ trước diff này (CI có 3.12 trong ma trận); lane
+không sửa, vì sửa recorder có thể đổi số macOS (backlog V21-87).
+
+**Nhóm test mà suite skip, chạy ngoại tuyến (`validation/v21/offline_groups.sh`, cùng chỉ thị mục 6).** Suite skip một nhóm
+khi máy thiếu công cụ. Hai nhóm chạy được ngoại tuyến ở đây: *mockup* (`tests/test_mockup.py`, `test_mockup_map.py`,
+`test_cli.py::TestMockupCommand`: cần `node`, gói `playwright` và chromium; render từ fixture của repo và một app server
+loopback) và *references* (`test_catalog.py`, `test_install.py`, `test_security_filter.py`, `test_detect_stack.py`,
+`test_experience.py`: cần các clone ghim của `references/PINS.md`, không tải gì). Mỗi nhóm chạy hai lần như suite sẽ chạy:
+không công cụ (đếm skip và lý do) và có công cụ, trong `env -i` với HOME/XDG/TMPDIR mới, PATH không có `opencode` và mạng ra
+ngoài bị chặn (macOS `sandbox-exec`: loopback thông, `1.1.1.1` bị từ chối). Một lượt của người xác minh, thoát 0
+`COMPLETE`: mockup **66 test, 0 skip** (không công cụ: 40 skip, 39 "playwright not installed" và 1 khác); references **97
+test, 0 skip** (không clone: 94 chạy, 19 skip). Mã thoát: 0 mọi nhóm chạy có công cụ, không skip và xanh; 1 test đỏ, hết
+giờ hay không có dòng trạng thái; 2 từ chối; 3 `PARTIAL` (một nhóm không chạy được với công cụ, hoặc vẫn skip). **Nhóm
+Docker-gated** (`AISEF_TEST_DOCKER=1`: `tests.test_sandbox.TestIsolation` 8 test và `tests.test_tools.TestRunToolQuaDockerThat`
+2 test, `alpine:latest` có sẵn cục bộ, `--network=none`) **không chạy**: script in một dòng "not run". Có chạy 10 test đó
+không là quyết định D-2 của lane (backlog V21-87); `goe-postgres-1` và `goe-valkey-1` không bị chạm.
 
 **Test đỏ:** từng test, kỳ vọng/thực tế, artifact, công cụ sinh và căn cứ phân loại: [RED-SUITE.md](RED-SUITE.md). Không
 test nào bị bỏ, nới hay đổi oracle.
@@ -510,6 +590,32 @@ tính probe theo luật `rebind`, phần không được dung sai là engine dig
 sát — bị loại; công cụ giờ từ chối mọi đường ra trong repo.
 
 ## 6. Giới hạn còn tồn tại
+
+### 6.0 Lỗi chưa sửa, giữ nổi bật (chỉ thị 2026-10-15 lần thứ tư, mục 7)
+
+Ba điều dưới đây **chưa được sửa**. Chừng nào chúng còn, tài liệu này **không** nói hành trình người dùng đã đạt và
+**không** nói hỗ trợ Windows đã đạt.
+
+1. **Lệnh chi phí/báo cáo của V1 trả toàn số 0 với exit 0 trên thư mục run V2** (backlog V21-43, "O-2"; làn đánh giá hành
+   trình người dùng, 2026-10-15). `aisef cost`, `aisef report` và `aisef status` của V1 (`aisef/cli/implement.py`:
+   `cmd_cost`, `cmd_report`, `cmd_status`) nhận một thư mục run V2 mà không từ chối, và không có lệnh V2 nào đọc chi phí hay
+   báo cáo của một run V2. Đo trên bản sao một run thật (`RUN.json`: chi phí 0,000818 USD, 2 phiên): `aisef cost` nói 0
+   phiên, nothing spent; `aisef report` còn ghi `docs/ACCEPTANCE-REPORT.md` và `_bmad-output/` vào thư mục run hoặc repo
+   của người dùng (`--verify` vẫn `VERIFIED` sau đó). `README.md` liệt kê `aisef report` như một lệnh 1.x không đổi (dòng
+   160 và 298). Chi phí và kết quả của một run V2 nằm ở `RUN.json` (`usage.cost`, `story_outcomes`).
+2. **Windows, CRLF (1):** `tests/v2/p0/test_freeze_manifest.py:171` so byte của manifest đã commit với byte LF mà writer
+   sinh: 1 test đỏ dưới CRLF (21/21 dưới LF).
+3. **Windows, CRLF (2):** `validation/v2/execution_order.py` (`_committed_record`) đưa byte thô của tệp làm việc cho
+   `mutation.committed` (so `blob.stdout == raw`), nên trên checkout `core.autocrlf=true` nó báo "is not a file committed
+   at HEAD" và `v2.p0.test_checker_calibration` đỏ ở checker `execution_order` (suy ra: Q0 trên Windows đỏ).
+
+Hai điểm CRLF đo bằng **mô phỏng CRLF trên macOS** (trong ≈ 47 module, ≈ 780 test đã đo, đó là hai khác biệt duy nhất),
+không phải Windows thật; CI Windows/Linux chưa chạy cho 2.1. Sửa phía đọc (đọc dạng đã commit, không nới oracle) đổi một checker nên
+phải hiệu chuẩn lại Q0, một quyết định của chủ dự án; cần sửa trước khi push lên CI. Các rủi ro Windows còn lại (`ps` trong
+`lineage.process_started`, mode `0o444`, `ProcessRange.release()` trên backend Windows, ≈ 70 test `skipUnless(posix)`) là
+đọc từ mã, chưa đo (backlog V21-41).
+
+### 6.1 Các giới hạn còn lại
 
 - **Cách ly OS cho phiên model: có mã opt-in, đo bằng thao tác đã thử** ([SANDBOX-LINUX.md](SANDBOX-LINUX.md),
   `aisef2/app/confine.py`, `validation/v21/sandbox`, đo ở `764dfa2`). Trong container `python:3.14-slim-trixie@sha256:3353bb7e…`
@@ -549,14 +655,23 @@ sát — bị loại; công cụ giờ từ chối mọi đường ra trong repo
   attempt 4 (chạm tới tài liệu của probe: một đọc nguồn, một đọc scratch, hai tìm probe trên máy; không phiên nào đổi gì)
   và trong 4 phiên developer của canary tier 2/2b (1 + 3); N nhỏ, workload tầm
   thường, **không phải bằng chứng vắng mặt**. Biện pháp thật nằm ở chỗ khác trong backlog: V21-02 (developer đọc được
-  ngoài workspace), B-07 (sandbox V2-05), F (ranh giới cách ly), review độc lập. Câu công khai "mã đang bị kiểm không thể
-  tự chế ra kết quả đạt" (`README.md:45`, `README.vi.md:45`, `docs/v2/USAGE.md:110`, `docs/v2/USAGE.vi.md:113`,
-  `landingpage/index.html:846`) quá rộng so với phép đo này; sửa chúng không thuộc báo cáo này (backlog V21-26).
-- **Cửa sổ probe để lại các giới hạn có tên** (USAGE-2.1.md §8; backlog V21-54 … V21-74): trần của một quan sát
+  ngoài workspace), B-07 (sandbox V2-05), F (ranh giới cách ly), review độc lập. Các câu công khai "mã đang bị kiểm không thể
+  tự chế ra kết quả đạt" (`README.md`, `README.vi.md`, `docs/v2/USAGE.md`, `docs/v2/USAGE.vi.md`,
+  `landingpage/index.html`) quá rộng so với phép đo này; chúng đã được sửa sau đó ở `5f6b7e9` và `7b029e6`
+  (`docs/SALEKIT.html`) và nay nói bảo đảm là về kênh, không về giá trị mà chủ thể khai (backlog V21-26).
+- **Cửa sổ probe để lại các giới hạn có tên** (USAGE-2.1.md §8; backlog V21-54 … V21-88): trần của một quan sát
   `grep_count` là `max(timeouts_s.probe, 30 s)`; một `within_s` dưới ≈ 0,1 s có thể lật so với 2.0.0; bộ nhớ worker ≈ 2,2
-  lần đầu vào; một parser-limit refusal vẫn retry được trong `limits.ENVIRONMENT` và lời khắc phục chưa tới developer; chuỗi
-  regex của `cli_invocation` chạy trong tiến trình kernel không hạn chót; `probe-observations/` đọc được bởi mọi tiến trình
-  của user (không cách ly) và chỉ che giá trị bí mật của chính run; OCR chưa có bằng chứng dựng lại.
+  lần đầu vào; một parser-limit refusal vẫn retry được trong `limits.ENVIRONMENT` và lời khắc phục chưa tới developer; việc
+  khớp regex của `cli_invocation` nay chạy trong worker dưới `timeouts_s.probe` (đợt hai), nhưng `re.compile` của mẫu vẫn
+  chạy trong kernel không hạn chót, tuyến tính theo kích thước mẫu (D4); `within_s` dưới sàn của công cụ, stream bị cắt ở
+  `STREAM_CAP`, toán tử biên của probe dùng timer ở đúng W và trần `within_s` do reviewer chọn chưa có định nghĩa công bố
+  (D1–D3, D5); `migrate` giữ lại sáu contract LedgerLock chứ không phải bốn (D-1) và giữ 50/53 approval chỉ dựa vào luật
+  phiên bản (D-2); `probe-observations/` đọc được bởi mọi tiến trình của user (không cách ly) và chỉ che giá trị bí mật của
+  chính run; OCR dựng lại được trên một máy nhưng không biết ai dựng tệp ghim và chưa so artifact upstream (D-OCR-1).
+- **Lineage: quyết định mở của đợt hai** (USAGE-2.1.md §8.5): **[ĐANG HOÀN THIỆN]** quy tắc cho bằng chứng *thiếu* cạnh một
+  journal đọc được (R2) đang được một lane khác làm và sẽ do người điều phối mô tả; R3 (child của claim bị thay thế mà
+  thư mục đã mất; tổ tiên bị xoá chặn `--parent` vĩnh viễn), R4 (`--accept-unaccounted` trên chi tiêu đọc được là đã gửi
+  chưa trả lời) và R5 (claim đi trước cổng) là quyết định của chủ dự án.
 - **Phần dư của họ lineage** (USAGE-2.1.md §7; backlog V21-56): một `CR`/`LF` trong đường dẫn của thư mục chứa worktree
   `wt-<story>` làm `reconcile` không báo mục `candidate` (báo cáo thiếu một dòng; kế hoạch không đổi vì story đã giao lấy từ
   `story/commit` của journal); một dòng luồng phiên bắt đầu bằng `{`, không parse được và không phải dòng cuối, bị bỏ im lặng
@@ -586,7 +701,16 @@ sát — bị loại; công cụ giờ từ chối mọi đường ra trong repo
 | B-10 | nơi đăng tài liệu công khai | A README tự chứa / B repo docs công khai / C host khác / D public repo | A — [hồ sơ](decisions/B-10-PUBLIC-DOCS.md) |
 | F | ranh giới cách ly Linux | (a) container là ranh giới (cap-drop, mount chỉ đọc, user không root, giữ seccomp; mạng chỉ tới provider qua egress allowlist — `--network none` thì phiên không tới được provider), không bwrap lồng; (b) bwrap trong container đã nới seccomp + systempaths (đo: X1, [SANDBOX-LINUX §3](SANDBOX-LINUX.md)); (c) máy/VM Linux riêng | (a), **chưa đo**: không phải nới ranh giới của container; (c) khi cần chạy song song |
 | P-WIN | cửa sổ sửa module probe (PM-1, 2, 3/4, 6, 11 là lỗi; PM-5, 7, 8, 9, 13 là quyết định) | (a) một cửa sổ: sửa chung rồi hiệu chuẩn lại 19 hàng + checker liên quan; (b) từng mục; (c) giữ nguyên, ghi là giới hạn | (a) — [decisions/B03-R3-PROBE-MODULE-FINDINGS.md](decisions/B03-R3-PROBE-MODULE-FINDINGS.md) §4. **Đã thực hiện trên nhánh ứng viên (§0.9)**; còn hiệu chuẩn lại, mutation, suite |
-| RV-1/2 | `reproducer_contract` raise `RecursionError` ở lồng ~3.000 tầng (fail-closed); câu NOT_REPRODUCED sai cho INDETERMINATE | sửa cùng cửa sổ probe / để nguyên | sửa cùng P-WIN (cùng họ PM-3). **Đã sửa trên nhánh ứng viên (§0.9)**; còn mở: giới hạn 63 (V21-67) và token trạng thái `NOT_REPRODUCED` (V21-66) |
-| — | các quyết định mở của cửa sổ probe (không-retry của PM-3, duyệt lại approval PM-9, ReDoS, `within_s`, thống nhất UNRUNNABLE/REFUTED, cổng OCR sớm, `account_of`, `--expect-anchor` mặc định, đọc CRLF trên Windows…) | cột Disposition của backlog V21-39 … V21-74 | không quyết thay chủ dự án; mỗi hàng nêu các phương án và khuyến nghị của làn |
+| RV-1/2 | `reproducer_contract` raise `RecursionError` ở lồng ~3.000 tầng (fail-closed); câu NOT_REPRODUCED sai cho INDETERMINATE | sửa cùng cửa sổ probe / để nguyên | sửa cùng P-WIN (cùng họ PM-3). **Đã sửa trên nhánh ứng viên (§0.9)**; trạng thái `INDETERMINATE` riêng đã được chủ dự án duyệt (chỉ thị 2026-10-15, mục 3) và làm ở đợt hai (V21-66 đóng); còn mở: giới hạn 63 (V21-67) |
+| — | các quyết định mở của cửa sổ probe (không-retry của PM-3, thống nhất UNRUNNABLE/REFUTED, `--expect-anchor` mặc định, đọc CRLF trên Windows…). Chủ dự án đã quyết ở đợt hai và đã thực hiện: ReDoS, trạng thái `INDETERMINATE`, cổng OCR sớm, giữ `account_of` (unknown ≠ 0), không giữ approval chỉ vì hash | cột Disposition của backlog V21-39 … V21-88 | không quyết thay chủ dự án; mỗi hàng nêu các phương án và khuyến nghị của làn |
+| D-1 | `migrate` giữ lại **sáu** contract LedgerLock (`S-10-a/b/c`, `S-12-a/b/c`); chủ dự án đã nêu bốn | (a) chấp nhận sáu: bộ chọn chỉ thấy lớp và `subject_absence`, PM-9 một mình và PM-11 đều chọn đủ sáu; (b) thu hẹp bằng bộ chọn thấy đường dẫn (chỉ chọn thư mục): thêm heuristic, không giải quyết PM-11; (c) cho `migrate` đọc repo và chỉ giữ lại khi điều kiện `when` thật xảy ra: đổi thiết kế, thêm đầu vào | (a) theo lane (phía an toàn); chưa duyệt. Backlog V21-75 |
+| D-2 | ba probe (`cli_invocation`, `process_effect`, `python_callable_v2`) đã đổi hành vi từ 2.0.0 mà `CAPABILITY_VERSION` vẫn 1, nên 50/53 approval giữ chỉ dựa vào luật phiên bản | (a) chấp nhận, giới hạn đã ghi trong `limits` (kỷ luật tăng phiên bản là việc của review); (b) rà từng thay đổi PM-1/2/6/RV-1, tăng `CAPABILITY_VERSION`, khai `CAPABILITY_CHANGES` cho cái đổi verdict, di trú lại (đổi spec id, làm lại hiệu chuẩn và bản ghi phái sinh; bộ chọn không phân biệt chủ thể dùng gì nên gần hết 50 approval bị giữ lại, ≈ 56 duyệt lại với LedgerLock); (c) thêm máy kiểm: mọi thay đổi `PROBE_SOURCES` của probe phải kèm tăng phiên bản hoặc một miễn trừ có chữ ký | chưa quyết. Backlog V21-76 |
+| R2 | lineage: bằng chứng *thiếu* cạnh một journal đọc được | **[ĐANG HOÀN THIỆN]** quy tắc đang được một lane khác làm; người điều phối sẽ mô tả | chưa mô tả. Backlog V21-77 |
+| R3 | lineage: child của claim bị thay thế mà thư mục đã mất; tổ tiên bị xoá hay lưu trữ | (A) giữ `UNBEGUN` cho child; (B) coi là `unread` (đổi 2 test `ClaimLifecycle`); chuỗi: giữ `unread`, hoặc thêm cờ khẳng định có ghi lại | chưa quyết. Backlog V21-78 |
+| R4 | lineage: `--accept-unaccounted` trên chi tiêu đọc được là đã gửi chưa trả lời | (A) giữ như ADR-8; (B) cấm khi `total` chưa biết (`--parent` không còn nối được run bị giết); (C) cho cờ nhưng bắt khai cận trên và trừ vào trần | lane: C nếu chủ dự án muốn đóng hẳn, A nếu không. Backlog V21-79 |
+| R5 | lineage: claim đi trước cổng `unread` | (A) giữ; (B) cổng trước claim; (C) giữ khẳng định, `claim()` kiểm lại child | lane: B hoặc C. Backlog V21-80 |
+| D1–D5 | review: `within_s` dưới sàn công cụ (D1); stream cắt ở `STREAM_CAP` (D2); toán tử biên của probe dùng timer ở đúng W (D3); trần độ dài pattern và giới hạn compile (D4); trần `within_s` do reviewer chọn (D5) | mỗi quyết định có biểu thức (file:dòng) và hai hành vi A/B với một đầu vào, ở USAGE-2.1 §8.3 | không quyết thay chủ dự án. Backlog V21-81 … V21-85 |
+| D-OCR-1 | tải artifact phát hành, `sha256sum.txt` và attestation của upstream để so với binary ghim | (a) cho phép một lượt tải đúng các tệp đó trong thư mục làm việc riêng; (b) không | chưa quyết. Backlog V21-86 |
+| — | recorder Linux: khoá theo định danh lần gọi chứ không theo pid (D-1 của lane); chạy hay không nhóm Docker-gated 10 test (D-2) | D-1: (a) chấp nhận cách đọc của lane; (b) đòi khoá theo pid thật (phải bọc `Popen`/`os.posix_spawn`, đổi cách tính launch lỗi và số macOS). D-2: chạy trong container `--network=none` của chính các test, hoặc giữ dòng "not run" | chưa quyết. Backlog V21-87 |
 | RM-3 | xoá ba tệp probe trong `site-packages` (§0.5) | chủ dự án chạy đúng ba `rm` đã nêu / duyệt để phiên này chạy | chủ dự án tự chạy sau khi đối chiếu đường dẫn |
 | — | nơi giữ anchor tin cậy | commit đã ký / kho append-only / máy khác | commit đã ký trong repo riêng của người vận hành |

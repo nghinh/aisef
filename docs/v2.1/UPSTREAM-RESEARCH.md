@@ -57,8 +57,11 @@ AISEF coi **mọi** phát hiện của OCR là tuyên bố chưa xác minh.
 
 ## Rủi ro mở (chưa đo, ghi để không tuyên bố quá)
 
-- `review_ocr` chưa chạy với nhị phân OCR thật (không có trên máy, chưa có ngân sách provider); hình dạng `rule.json`
-  (`include`) là **INFERENCE** từ `system_rules.go`.
+- `review_ocr` đã chạy với nhị phân OCR thật v1.12.12 (sha256 khớp pin) và một mô hình kịch bản trên loopback (REPORT
+  §4.1); **chưa** chạy với mô hình thật (chưa có ngân sách provider). Byte của nhị phân ghim tái tạo được từ commit
+  `182898c` trên một máy (REPORT §0.5, `closure-evidence/v2/v2.1/round-5/ocr-build/PROVENANCE.md`); ai dựng chính tệp ghim
+  thì không biết, và artifact phát hành của upstream chưa được so (quyết định D-OCR-1). Hình dạng `rule.json` (`include`)
+  là **INFERENCE** từ `system_rules.go`.
 - Ngày 2026-10-06 trang giá chính thức của DeepSeek ghi tên model cũ được phục vụ bởi V4.1-Flash; một nguồn thứ ba nói
   `deepseek-v4-pro` cũng bị chuyển — **chưa xác nhận**. Mọi lượt chạy thật phải ghi danh tính model ở mức
   `provider_reported` và kiểm lại trang giá đúng ngày chạy (xem [EXPERIMENT-PLAN.md](EXPERIMENT-PLAN.md)).
