@@ -1,6 +1,6 @@
 # Câu trả lời của chủ dự án, 2026-10-18 (sau bảng phạm vi `SCOPE-BEFORE-PIN.md`) — nguyên văn
 
-Trả lời bốn câu hỏi đóng khung trong phiên làm việc, nhận khoảng 2026-10-18 03:20 (Asia/Saigon). Câu hỏi và lựa chọn do người
+Trả lời bốn câu hỏi đóng khung trong phiên làm việc, nhận trong khoảng 03:05–04:43 ngày 2026-10-18 (Asia/Saigon; công cụ không ghi giờ chính xác). Câu hỏi và lựa chọn do người
 điều phối soạn; **các lựa chọn dưới đây là của chủ dự án**. Không có ghi nhận nghiệm thu nào được tạo từ nó.
 
 | Câu hỏi (rút gọn) | Câu trả lời của chủ dự án |
