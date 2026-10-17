@@ -971,10 +971,12 @@ for _t, _fs in {**_V21_R3_RANGE_APPEND, **_V21_R3_APPEND}.items():
 # B-03 round 5 (2026-10-15): the window's lanes (effect-cli PM-1/2/6/7, review-contracts, file-artifact PM-7/9/13,
 # ocr-gate, pm8-diagnostics, lineage) changed aisef2/app/{adapters,bundle_cli,cli,client,diagnostics (new),lineage,
 # review_ocr,review_verify,run,verify}.py and aisef2/probe/{cli_invocation,file_artifact,process_effect,
-# python_callable_v2}.py: 14 files, 418 targets, 10,704 mutants by the runner's own enumeration. The digest is
+# python_callable_v2}.py: 14 files, 418 targets, 10,704 mutants by the runner's own enumeration (the first pass; the
+# second pass, below, adds to it and counts again). The digest is
 # whole-file: every registered name of those files is re-measured (13 recorded files; diagnostics.py has no record
-# yet). cli.py changed in `_parser`'s --supersede-claim help text only: its two targets are stale by digest and take no
-# new file (test_v21_kills_cli.py, already in `_parser`'s set, was updated by the lineage lane). Five modules other
+# yet). At this pass cli.py had changed in `_parser`'s --supersede-claim help text only: its two targets were stale by
+# digest and took no new file (test_v21_kills_cli.py, already in `_parser`'s set, was updated by the lineage lane; the
+# second pass adds `run`, which the OCR look changed). Five modules other
 # than its own are file_artifact's PROBE_SOURCES and have targets: runtime/process_range.py (23 V2.1), runtime/
 # range_anchor.py (4 P4), product/contract.py (6 P1), product/outcome.py (3 P1), probe/protocol.py (7 P2); not one byte
 # of them changed in the window, their records still match, so nothing of them is re-measured or extended.
@@ -1111,6 +1113,100 @@ _V21_R5_APPEND: dict[str, list[str]] = {
 for _t, _fs in _V21_R5_NEW.items():
     V21_TARGETS[_t] = list(_fs)
 for _t, _fs in _V21_R5_APPEND.items():
+    V21_TARGETS[_t] = [*V21_TARGETS[_t], *[f for f in _fs if f not in V21_TARGETS[_t]]]
+# --- round 5, second pass ---
+# The second wave of the window (owner directive 2026-10-15, points 1-6; lanes migrate-semantics, lineage-proof,
+# review-limits, ocr-preflight, ocr-build and linux-recorder, merged by 3e1e83a) changed aisef2/app/{adapters,
+# bundle_cli,cli,client,lineage,review_ocr,review_verify,run,verify}.py and aisef2/probe/{cli_invocation,
+# file_artifact}.py again, and aisef2/probe/catalog.py, which has no target before this pass. ocr-build (a build
+# recipe and a provenance record) and linux-recorder (validation/v21/{read_set,reach}.py, outside the mutation copy and
+# no target; tests/v2/test_v21_read_set.py is no kill file) change nothing the registry reads. As in the first pass:
+# each name a lane added that has a mutant is a target of its own with the lane's files, each name it changed gets them
+# appended last, in the lane's order. The lanes' reports (verify over fix over impl) were read against the source
+# by the runner's own enumeration; where they differ the source decides:
+#   * lineage.py `_journal_mismatch` and `unread_runs` are new, have a mutant, and are in no lane's proposal (the verify
+#     report names them unregistered): registered with the one file that asserts them. `claims`, `_claimed_run` and
+#     `claim_unread` changed in the lineage-proof lane (a link, or a NUL, as the claim) and get its file although its
+#     report lists `claim` only; `verify.py::_spend` (the report calls it no target; it is one) and `client.py::
+#     Budget.spend` (the report lists __init__ and account) changed too. Not registered: the names of the lane that is
+#     still writing lineage.py (lineage-r2: `_recorded_spend`, `_evidence_gone`), which are not in this tree;
+#   * test_v21_ocr_identity.py is appended to `adapters._declared` (changed by the ocr-preflight fix: it names the
+#     system's reason), `review_ocr.pinned` (a NUL or a lone surrogate in the path is a reason, not an exception),
+#     `cli.run` (the --check look) and `run.execute` (the check before the claim). test_v21_ocr_preflight.py, a full run
+#     per test (~70 s), is in the sets of the two new run.py functions only, after the fast file, so it runs for a
+#     mutant the fast file lets by;
+#   * catalog.py is new to the registry: `_capability` and the two fields the migrate lane added. `CATALOG` (its table,
+#     changed by `**_capability(...)`) is not registered: no lane proposed it and the file had no target;
+#   * `_capability_changes` (file_artifact.py) is prose read by `bundle migrate`: registered as the fix report lists it;
+#     the impl report says no test kills a mutant of its description strings, so a survivor there may need an audit;
+#   * no mutant, so no target: `bundle_cli.PLACEHOLDER`, `file_artifact.CAPABILITY_CHANGES` (a call), `cli_invocation.
+#     REGEX_WORKER` (a script with no function), `_PATTERN_HEAD`, `_SEARCH_GRACE_S`, `_monotonic`, `review_verify.
+#     STATUSES`, run.py `SHA256_OF`, `OCR_INSTEAD`, `OCR_STATEMENT`, `OCR_WHEN`. The runner cannot resolve
+#     `review_verify.INDETERMINATE` (one name of a tuple assignment) or the class names `StreamSearchFailed` and
+#     `_Later` (their `__init__` and `settle` are the targets);
+#   * `cli_invocation._watch` changed in an annotation and a docstring only: its mutants are as they were.
+# The kill sets are the lanes' proposals by which test calls the function; none is measured yet.
+_V21_R5B_NEW: dict[str, list[str]] = {
+    # migrate-semantics: an approval is kept only while the contract it was given for is evaluated as it was
+    **{f"aisef2/app/bundle_cli.py::{n}": [_T + "migrate_semantics.py"] for n in (
+        "_known", "_earliest", "_origins", "_declared", "_assess", "_selected", "_exposure", "_group", "_ground",
+        "_grounds", "LIMITS", "APPROVAL_KEY", "_key", "_binds", "with_commands", "exposure_of")},
+    "aisef2/probe/catalog.py::_capability": [_T + "migrate_semantics.py"],
+    "aisef2/probe/catalog.py::CatalogEntry.capability_version": [_T + "migrate_semantics.py"],
+    "aisef2/probe/catalog.py::CatalogEntry.capability_changes": [_T + "migrate_semantics.py"],
+    _FA + "_capability_changes": [_T + "migrate_semantics.py"],
+    # lineage-proof: evidence that cannot be read is cost unknown, never 0 and never a sum that looks complete
+    "aisef2/app/lineage.py::_predecessor": [_T + "x_lineage_proof.py", _T + "defects_verify.py", _T + "kills3_T09c.py"],
+    "aisef2/app/lineage.py::_is_a_directory": [_T + "x_lineage_proof.py", _T + "kills3_A09.py",
+                                               _T + "defects_lineage2.py"],
+    "aisef2/app/lineage.py::_journal_mismatch": [_T + "x_lineage_proof.py"],
+    "aisef2/app/lineage.py::unread_runs": [_T + "x_lineage_proof.py"],
+    # review-limits: a pattern the reviewer wrote is searched in a worker under a deadline; a comment's scan is linear
+    **{f"aisef2/probe/cli_invocation.py::{n}": [_T + "r5_regex_worker.py", _T + "r5_regex_isolation.py"] for n in (
+        "SEARCH_REASONS", "StreamSearchFailed.__init__", "search_in_worker", "_said")},
+    "aisef2/probe/cli_invocation.py::_SEARCH_STOPPED": [_T + "r5_regex_isolation.py", _T + "r5_regex_worker.py"],
+    "aisef2/probe/cli_invocation.py::_Later.settle": [_T + "r5_regex_isolation.py", _T + "r5_regex_worker.py"],
+    "aisef2/app/adapters.py::_braces": [_T + "r5_linear_text.py", _T + "kills_adapters.py"],
+    **{f"aisef2/app/review_ocr.py::{n}": [_T + "r5_linear_text.py", _T + "review_ocr.py"] for n in (
+        "_FENCE_OPEN", "_FENCE_CLOSE", "_SPACE", "_fence")},
+    # ocr-preflight: the review's OCR binary is asked before any session is opened
+    "aisef2/app/run.py::ocr_identity": [_T + "ocr_identity.py", _T + "ocr_preflight.py"],
+    "aisef2/app/run.py::ocr_refusal": [_T + "ocr_identity.py", _T + "ocr_preflight.py"],
+    "aisef2/app/run.py::OCR_CHECKS": [_T + "ocr_identity.py"],
+}
+_V21_R5B_APPEND: dict[str, list[str]] = {
+    # migrate-semantics
+    **{f"aisef2/app/bundle_cli.py::{n}": [_T + "migrate_semantics.py"] for n in (
+        "RELEASES", "migrate", "seal", "approve", "main")},
+    # lineage-proof
+    "aisef2/app/bundle_cli.py::continue_from": [_T + "x_lineage_proof.py"],
+    **{f"aisef2/app/lineage.py::{n}": [_T + "x_lineage_proof.py"] for n in (
+        "claim", "claims", "_claimed_run", "claim_unread", "process_started", "account_of", "predecessor_of",
+        "lineage_account", "usage_lineage")},
+    **{f"aisef2/app/client.py::Budget.{n}": [_T + "x_lineage_proof.py"] for n in ("__init__", "spend", "account")},
+    **{f"aisef2/app/verify.py::{n}": [_T + "x_lineage_proof.py"] for n in ("_spend", "verify")},
+    # review-limits
+    "aisef2/probe/cli_invocation.py::_stream_matches": [_T + "r5_regex_worker.py"],
+    "aisef2/probe/cli_invocation.py::verdict_of": [_T + "r5_regex_worker.py"],
+    "aisef2/probe/cli_invocation.py::CliInvocationProbe._observe": [_T + "r5_regex_worker.py",
+                                                                    _T + "r5_regex_isolation.py"],
+    "aisef2/probe/cli_invocation.py::CliInvocationProbe._observe_in": [_T + "r5_regex_isolation.py",
+                                                                       _T + "r5_regex_worker.py"],
+    "aisef2/probe/cli_invocation.py::_concluded": [_T + "r5_regex_isolation.py", _T + "r5_regex_worker.py"],
+    _FA + "_compiles": [_T + "r5_regex_worker.py"],
+    _FA + "FileArtifactProbe.observe": [_T + "r5_window_boundary.py"],
+    "aisef2/app/review_verify.py::verify": [_T + "r5_review_status.py", _T + "kills3_T15a.py"],
+    "aisef2/app/adapters.py::Reviewer._model": [_T + "r5_linear_text.py"],
+    "aisef2/app/review_ocr.py::reproducer_of": [_T + "r5_linear_text.py"],
+    # ocr-preflight
+    "aisef2/app/adapters.py::_declared": [_T + "ocr_identity.py"],
+    "aisef2/app/review_ocr.py::pinned": [_T + "ocr_identity.py"],
+    "aisef2/app/cli.py::run": [_T + "ocr_identity.py"],
+    "aisef2/app/run.py::execute": [_T + "ocr_identity.py", _T + "x_lineage_proof.py"],
+}
+for _t, _fs in _V21_R5B_NEW.items():
+    V21_TARGETS[_t] = list(_fs)
+for _t, _fs in _V21_R5B_APPEND.items():
     V21_TARGETS[_t] = [*V21_TARGETS[_t], *[f for f in _fs if f not in V21_TARGETS[_t]]]
 #: PM-2 deleted the controller's own-process guard `HARNESS/guarded` (its only caller, a fault before a subprocess step,
 #: is refused at admission now). It is no V2.1 target: no function of that name is left to mutate. S2_TARGETS keeps it
