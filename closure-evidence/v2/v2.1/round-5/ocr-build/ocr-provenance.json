@@ -1,0 +1,110 @@
+{
+ "record": "Open Code Review binary: what is declared, what is embedded, what was rebuilt (never merged)",
+ "checked_at": "2026-10-15T18:27:22+0700",
+ "tool": {
+  "path": "validation/v21/ocr/inspect_binary.py",
+  "tree": "f69124cc4b991bd8419dfa1865e01bc0b0dad284",
+  "platform": "macOS-26.5.2-arm64-arm-64bit-Mach-O"
+ },
+ "pin": {
+  "repository": "https://github.com/alibaba/open-code-review",
+  "version": "v1.12.12",
+  "commit": "182898cf522da3d04157b422752d028417974e19",
+  "license": "Apache-2.0"
+ },
+ "binary": {
+  "path": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/ocr-build-2/bin/ocr-pinned",
+  "size_bytes": 55014610,
+  "sha256": "bf38abf320ead4e106b71c15824463640207118f38e1c10c28a73b6839104af7",
+  "codesign": {
+   "output": [
+    "Identifier=a.out",
+    "Format=Mach-O thin (arm64)",
+    "CodeDirectory v=20400 size=426590 flags=0x20002(adhoc,linker-signed) hashes=13328+0 location=embedded",
+    "Signature=adhoc",
+    "Info.plist=not bound",
+    "TeamIdentifier=not set",
+    "Sealed Resources=none",
+    "Internal requirements=none"
+   ]
+  }
+ },
+ "a_declared": {
+  "as_asked_by": "aisef2.app.adapters._declared (clean environment, empty HOME, cwd = that HOME)",
+  "declared": {
+   "version": "v1.12.12",
+   "commit": "182898c",
+   "platform": "darwin/arm64",
+   "line": "open-code-review v1.12.12 (182898c) darwin/arm64"
+  },
+  "accepted_by_the_gate": true,
+  "why_not": null,
+  "strings_held_as_data": {
+   "v1.12.12": {
+    "in_file": 3,
+    "outside_build_info": 1
+   },
+   "182898c": {
+    "in_file": 3,
+    "outside_build_info": 1
+   },
+   "2026-10-05T00:00:00Z": {
+    "in_file": 1,
+    "outside_build_info": 1
+   }
+  }
+ },
+ "b_embedded": {
+  "status": "READ",
+  "tool": "go version go1.26.5 darwin/arm64",
+  "go": "go1.26.5",
+  "path": "github.com/alibaba/open-code-review/cmd/opencodereview",
+  "module": [
+   "github.com/alibaba/open-code-review",
+   "v1.12.12"
+  ],
+  "settings": {
+   "-buildmode": "exe",
+   "-compiler": "gc",
+   "-trimpath": "true",
+   "DefaultGODEBUG": "cryptocustomrand=1,tlssecpmlkem=0,urlstrictcolons=0",
+   "CGO_ENABLED": "0",
+   "GOARCH": "arm64",
+   "GOOS": "darwin",
+   "GOARM64": "v8.0",
+   "vcs": "git",
+   "vcs.revision": "182898cf522da3d04157b422752d028417974e19",
+   "vcs.time": "2026-10-05T06:34:14Z",
+   "vcs.modified": "false"
+  },
+  "dependencies": 84,
+  "dependencies_sha256": "6bedbaefd6eb0d563ea2b5ac7c9354f8e1290c265af97b74e52ecb9fab8e8413",
+  "vcs_revision_is_the_pinned_commit": true,
+  "vcs_modified": "false",
+  "trimpath": "true",
+  "ldflags_recorded": false,
+  "note": "with -trimpath the toolchain omits -ldflags from the build info: the flags that set (a) are not here"
+ },
+ "c_rebuilt": {
+  "status": "IDENTICAL",
+  "argv": [
+   "go",
+   "build",
+   "-trimpath",
+   "-buildvcs=true",
+   "-ldflags",
+   "-s -w -X main.Version=v1.12.12 -X main.GitCommit=182898c -X main.BuildDate=2026-10-05T00:00:00Z",
+   "-o",
+   "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/ocr-build-2/tmp/aisef-ocr-rebuild-p2xbga8u/ocr",
+   "./cmd/opencodereview"
+  ],
+  "ldflags_given": "-s -w -X main.Version=v1.12.12 -X main.GitCommit=182898c -X main.BuildDate=2026-10-05T00:00:00Z",
+  "rebuilt_sha256": "bf38abf320ead4e106b71c15824463640207118f38e1c10c28a73b6839104af7",
+  "binary_sha256": "bf38abf320ead4e106b71c15824463640207118f38e1c10c28a73b6839104af7",
+  "rebuilt_size": 55014610
+ },
+ "what_this_is_not": [
+  "a comparison with an upstream release artifact (none is pinned, none was fetched)",
+  "evidence of how the bytes were built unless c_rebuilt is IDENTICAL"
+ ]
+}

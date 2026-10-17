@@ -1,0 +1,91 @@
+# Nhật ký rút gọn của lượt dựng lại OCR v1.12.12 ($W = thư mục làm việc riêng của lượt). Giờ UTC.
+# Lược: dòng 'go: downloading' (84 dòng) chỉ đếm; đường dẫn tuyệt đối thay bằng $W.
+
+== binary đang kiểm (sao chép rồi băm lại)
+sha256 bf38abf320ead4e106b71c15824463640207118f38e1c10c28a73b6839104af7  $W/bin/ocr-pinned  (55014610 byte; bản gốc cùng hash)
+
+== môi trường
+date_start 2026-10-15T11:22:27Z
+macOS 26.5.2 (25F84) arm64; go version go1.26.5 darwin/arm64 (/opt/homebrew/bin/go); git 2.53.0; Python 3.14.7
+GOENV=off GOPROXY=https://proxy.golang.org,direct GOSUMDB=sum.golang.org GOFLAGS=-mod=readonly GOTOOLCHAIN=local GOARM64=v8.0
+
+== git clone  (11:22:32Z - 11:22:40Z)
+Cloning into '$W/src'...
+GIT_TERMINAL_PROMPT=0 git clone https://github.com/alibaba/open-code-review   1.64s user 0.43s system 24% cpu 8.511 total
+
+== tag và commit
+v1.12.12^{commit} = 182898cf522da3d04157b422752d028417974e19
+HEAD (detached)    = 182898cf522da3d04157b422752d028417974e19
+0 tệp thay đổi (checkout sạch)
+tác giả Dante, giờ commit 2026-10-05T14:34:14+08:00 (= 2026-10-05T06:34:14Z = vcs.time trong binary)
+
+== go list -deps ./cmd/opencodereview  (11:23:36Z - 11:23:46Z, có mạng)
+go: downloading ... x84 module
+go list -deps: 9.556 s tường (2.25 s user, 2.56 s system)
+module phân biệt trong đầu ra: 85 (84 phụ thuộc + module chính)
+
+== go list -m all  /  go mod verify
+go list -m all: 1.646 s tường
+dòng trong đầu ra:      152 (module chính + 151)
+all modules verified
+go mod verify: 0.737 s tường
+
+== dựng A  (OFFLINE GOPROXY=off, GOCACHE nguội, thư mục src)
+label=a src=$W/src start=2026-10-15T11:24:33Z
+go build -trimpath -buildvcs=true -ldflags "-s -w -X main.Version=v1.12.12 -X main.GitCommit=182898c -X main.BuildDate=2026-10-05T00:00:00Z"  -o $W/out-a/ocr ./cmd/opencodereview
+exit=0 seconds=30 end=2026-10-15T11:25:03Z
+bf38abf320ead4e106b71c15824463640207118f38e1c10c28a73b6839104af7  $W/out-a/ocr
+55014610 bytes
+
+== dựng B  (OFFLINE, GOCACHE nguội riêng, thư mục src-b)
+label=b src=$W/src-b start=2026-10-15T11:25:23Z
+go build -trimpath -buildvcs=true -ldflags "-s -w -X main.Version=v1.12.12 -X main.GitCommit=182898c -X main.BuildDate=2026-10-05T00:00:00Z"  -o $W/out-b/ocr ./cmd/opencodereview
+exit=0 seconds=28 end=2026-10-15T11:25:51Z
+bf38abf320ead4e106b71c15824463640207118f38e1c10c28a73b6839104af7  $W/out-b/ocr
+55014610 bytes
+
+== đối chứng (đổi đúng một thứ; GOCACHE của A đã ấm)
+control=c1-builddate-1s
+go build -trimpath -buildvcs=true -ldflags "-s -w -X main.Version=v1.12.12 -X main.GitCommit=182898c -X main.BuildDate=2026-10-05T00:00:01Z" -o $W/out-c1/ocr ./cmd/opencodereview
+exit=0
+bc1b50646c503eee6267b7b26652288168db3dcbc4b90e7ccede937da3c4895c  $W/out-c1/ocr
+55014610 bytes
+control=c2-no-trimpath
+go build -buildvcs=true -ldflags "-s -w -X main.Version=v1.12.12 -X main.GitCommit=182898c -X main.BuildDate=2026-10-05T00:00:00Z" -o $W/out-c2/ocr ./cmd/opencodereview
+exit=0
+4b52379affb7a27f3d536c2a519e4eaa1539666636bad3fb65454b0c9fba69ed  $W/out-c2/ocr
+55245778 bytes
+
+== inspect_binary.py  (11:27:22Z - 11:27:56Z)
+exit=0, 33.6 s tường (113.4 s user)  -> ocr-provenance.json: c_rebuilt.status = IDENTICAL
+
+== kiểm chéo go.sum với sum.golang.org  (11:26:53Z - 11:26:56Z)
+go.sum bỏ đi, GOFLAGS=-mod=mod, go list -deps ./cmd/opencodereview trên bản sao cây nguồn
+exit=0; go.mod không đổi; go.sum mới = 168 dòng
+dòng của go.sum mới KHÔNG có trong go.sum của upstream: 0
+tệp tra cứu sumdb trong cache: 84 (một cho mỗi phụ thuộc)
+
+== LƯỢT RÀ SOÁT 2026-10-17 (giờ UTC; $W2 = $W/replay, đã xoá). Đo thêm; các dòng ở trên không đổi.
+toolchain (chỉ đọc): GOROOT=/opt/homebrew/Cellar/go/1.26.5/libexec; VERSION = go1.26.5, time 2026-07-01T21:24:27Z
+  sha256 go 3f947495f00cb7f8088a5cfd694da8dc43869b33f5e7377b048fb18922ffb7e0; compile a4b63e08...7f2a1e; link 9bb5a9fb...6d5e98
+  (đầy đủ trong PROVENANCE.md mục 9); Homebrew bottle cài 2026-08-01 19:53 (mtime Cellar/go/1.26.5)
+git: origin/HEAD = 11ac6d4c57082f310067a4a1654ad5b63cb57410; fsck --connectivity-only: chỉ dòng 'dangling'; commit có gpgsig: 1; tag có khối SSH SIGNATURE
+
+== đối chứng từ src-b (ngoại tuyến, GOCACHE gocache-b)  11:37:35Z - 11:38:06Z
+c1b  -trimpath, BuildDate 00:00:01Z : bc1b50646c503eee6267b7b26652288168db3dcbc4b90e7ccede937da3c4895c  55014610 byte   = c1 (từ src)
+c2b  không -trimpath               : bafc4fdcad762aeb36ccb949e383b6aa7a44b2cbfd3f69ba62cf42a59cfd5534  55245778 byte   != c2 (4b52379a...69ed, từ src)
+đường dẫn tuyệt đối trong binary (grep -a -o, số lần): chuỗi 'ocr-build-2/src/' | 'ocr-build-2/src-b/' | 'ocr-build-2/gomodcache/'
+  bin/ocr-pinned 0 | 0 | 0     out-a 0 | 0 | 0     out-c2 117 | 0 | 1297     out-c2b 0 | 117 | 1297
+src-b: HEAD = pin, 0 tệp thay đổi trước và sau
+
+== replay bằng build-commands.sh đã sửa, /bin/bash 3.2.57, thư mục mới $W2 (src, src-b = git clone cục bộ từ $W/src rồi checkout --detach pin;
+   gomodcache = cp -R; GOCACHE nguội mới; bước 2, 3, 6 cần mạng: KHÔNG chạy)  11:40:13Z - ~11:42:58Z, exit 0, 2:45 tổng
+bước 1  sha256 binary sao chép = bf38abf3...04af7
+bước 4  out-a = out-b = bf38abf320ead4e106b71c15824463640207118f38e1c10c28a73b6839104af7 (55014610 byte); cmp với binary ghim: trùng cả hai
+bước 5  c1  = bc1b50646c503eee6267b7b26652288168db3dcbc4b90e7ccede937da3c4895c  55014610 byte (trùng c1 lượt đầu)
+        c2  = a0ebc754dc98db4dd9c9595ff0bc4667df45a497b8e0a6b7ff4f9434a1576055  55262290 byte (khác c2 lượt đầu)
+bước 7  inspect_binary.py (env -i, TMPDIR trong $W2): c_rebuilt.status = IDENTICAL; so với ocr-provenance.json đã commit, chỉ khác 4 trường:
+        binary.path, c_rebuilt.argv[7] (tên thư mục tạm), checked_at, tool.tree
+bước 8  c1b = bc1b50646c503eee6267b7b26652288168db3dcbc4b90e7ccede937da3c4895c  55014610 byte (trùng c1)
+        c2b = 08db280af7ccf404457be9673155b7ea9644ec2a4d4ec476846c4ca414c927d2  55262290 byte (khác c2, c2b-lượt-trước, c2-replay)
+đĩa: 17 GiB trước, 11 GiB sau, 15 GiB sau khi xoá $W2. Nhật ký và JSON của replay: ocr-build-2/logs/replay-2026-10-17.log, ocr-provenance-replay-2026-10-17.json
