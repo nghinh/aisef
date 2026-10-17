@@ -47,6 +47,23 @@ Stream shapes (a closed set, compared over the captured bytes; prose matching is
 `{"text": s, "newline": nl}` (the text's newlines written as `nl`, default `"\\n"`, compared as bytes), `{"contains":
 [s, ...]}` (every string present as bytes), `{"regex": r}` (`re.search` over the utf-8 decoding; `r` is a pattern
 `re.compile` takes, else the observable has no meaning), `{"lines": n}` (the number of lines) and `{"first_word": w}`.
+The pattern is a model's or a spec author's and the stream is the candidate's, and the time a search takes depends on
+both (`(a+)+$` over a line of `a`s does not return): so the search of a `regex` shape never runs in the probe's own
+process. It runs in a worker of its own (`REGEX_WORKER`, `sys.executable -I -S -B`, in a process range of its own), given
+the pattern and the captured bytes by a file and answering by a file, under the harness watchdog
+`ExecutionEnv.timeout_s` (the operator's `timeouts_s.probe`) for the whole operation. A worker that does not answer
+inside it — it hung (DEADLINE), could not start (LAUNCH), ended by a status or a signal (CRASHED), wrote nothing
+(NO_RESULT) or something that is not an answer (BAD_RESULT) — is a stop of the harness: HARNESS_FAILED, UNRUNNABLE
+(owner ENVIRONMENT), never a verdict about the product, never retried (the same pattern over the same bytes within the
+same deadline stops the same way), its range emptied before the observation returns. A search that returned gives the
+verdict the in-process search always gave. It is not part of the subject's window: it begins after RESULT, and the time
+it takes is the harness's, never charged to `within_s` (a search that is slow and finishes inside the watchdog changes
+no verdict; one that does not finish is not a verdict at all). The conjuncts are read in the order exit code, stdout,
+stderr: one that already fails is REFUTED without a search, and a search that cannot be made for a conjunct that is
+reached is HARNESS_FAILED even where a later conjunct would have failed — the harness does not decide by what it did
+not compute. The worker's request and result are files of the evaluation directory, which the subject's user can
+reach while its range is alive (PARTIAL, as for every file of it): what it could forge there it can already say on its
+stream.
 File shapes: `{"sha256": hex}`, `{"text": s, "newline": nl}` (its digest), `{"absent": true}` and `{"equals_before":
 true}` (the file's digest, or its absence, is what it was before the main
 invocation — the harness records every named file before and after). Exit codes are recorded as CPython reports them:
@@ -98,7 +115,8 @@ The exit is lifecycle evidence, asked of the range with a non-blocking wait at e
 exited, the file is read once more, to its end, before anything is concluded (RFC §9.4 applied to the file: no
 timing window orders the exit and the last write). Decision table, after DISPATCHED:
 
-* RESULT read -> OBSERVED with `verdict_of` (SUBJECT_ABSENT when the controller found no subject). The subject's process
+* RESULT read -> OBSERVED with `verdict_of` (SUBJECT_ABSENT when the controller found no subject); a `regex` shape whose
+  search gave no answer (above) is HARNESS_FAILED instead, there being no verdict to give. The subject's process
   ending itself is in RESULT: by an exit status (`os._exit`, a hard exit) — the facts carry its exit code and the capture
   files as the streams (`hard_exit`); a hard exit during a pre-step is REFUTED with that step's index; by a signal —
   NON_CONTROLLER_SIGNAL (§9.3) unless the controller's own ledger holds a signal (an interruption, `ProbeInterrupted`,
@@ -141,6 +159,7 @@ import os
 import pathlib
 import re
 import secrets
+import sys
 import time
 
 from aisef2.arch.enums import BehaviorVerdict, Enforcement
@@ -241,6 +260,105 @@ def _probe_digest() -> str:
 CAPABILITY_VERSION = 1
 EXECUTION_DIGEST = _probe_digest()
 DIGEST = hashlib.sha256(json.dumps([PROBE_ID, CAPABILITY_VERSION, list(CLASSES)]).encode("utf-8")).hexdigest()
+
+
+#: The worker of a `regex` stream shape (owner decision of 2026-10-15, item 4): a harness script that is given bytes and
+#: a pattern and executes nothing of the subject. Started as `sys.executable -I -S -B -c REGEX_WORKER <request>
+#: <result>`; stdlib only, no clock, nothing on stdout. `request` is one JSON line {pattern} then the stream's bytes;
+#: `result` is `1` when the pattern is found in the utf-8 decoding (undecodable bytes replaced) and `0` when it is not.
+REGEX_WORKER = r"""
+import json, re, sys
+with open(sys.argv[1], "rb") as f:
+    head, _, data = f.read().partition(b"\n")
+found = re.search(json.loads(head)["pattern"], data.decode("utf-8", "replace")) is not None
+with open(sys.argv[2], "wb") as f:
+    f.write(b"1" if found else b"0")
+"""
+#: The failures of that worker, each its own reason in the message (`regex search <REASON>: ...`): the vocabulary of
+#: file_artifact's grep worker (PM-13), for the same kind of stop.
+SEARCH_REASONS = ("DEADLINE", "LAUNCH", "CRASHED", "NO_RESULT", "BAD_RESULT", "INPUT")
+_PATTERN_HEAD = 40       # characters of the pattern a DEADLINE names
+_SEARCH_GRACE_S = (0.5, 0.5)   # the worker's range ladder once the search is over: it holds nothing to flush
+#: The deadline clock of the worker, bound once to the function (as file_artifact's): not the observation window.
+_monotonic = time.monotonic
+
+
+class StreamSearchFailed(Exception):
+    """The search a `regex` shape asks for gave no answer (module docstring): the harness could not tell whether the
+    pattern is in the stream, so there is no verdict. `reason` is one of `SEARCH_REASONS` and opens the message."""
+
+    def __init__(self, reason: str, message: str) -> None:
+        super().__init__(f"regex search {reason}: {message}")
+        self.reason = reason
+
+
+def search_in_worker(pattern: str, data: bytes, *, stream: str, work: str, name: str, timeout_s: float,
+                     on_range=None) -> bool:
+    """Whether `pattern` is found in `data` (utf-8, undecodable bytes replaced): the answer of `REGEX_WORKER`, under
+    `timeout_s` for the whole operation — the request written, the worker started, run and answered, the result read.
+    `work` is a directory of the evaluation and `name` the range's (and the files') own name, unique within it;
+    `stream` names the stream in a message. `on_range` is the harness's hook for the worker's process range (the
+    story's scope releases it). Raises `StreamSearchFailed` for every way the worker gave no answer; the range is
+    emptied before it returns either way (a range that will not empty raises RangeNotEmpty: a leak is never silent)."""
+    begun = _monotonic()
+    stem = os.path.join(work, "regex-" + stream)
+    request, result, log = stem + ".request", stem + ".result", stem + ".log"
+    try:
+        with open(request, "wb") as f:
+            f.write(json.dumps({"pattern": pattern}).encode("ascii") + b"\n" + data)
+        out = open(log, "wb")
+    except OSError as e:
+        raise StreamSearchFailed("INPUT", f"the request cannot be written ({type(e).__name__})") from None
+    try:
+        run = ProcessRange(name, [sys.executable, "-I", "-S", "-B", "-c", REGEX_WORKER, request, result], cwd=work,
+                           env=_scrubbed_env(), output=out, grace_s=_SEARCH_GRACE_S, wait_s=_WAIT_S)
+        run.start()
+    except (RangeError, OSError) as e:
+        raise StreamSearchFailed("LAUNCH", f"the worker did not start ({type(e).__name__})") from None
+    finally:
+        out.close()
+    try:
+        if on_range is not None:
+            on_range(run)
+        status = run.wait(max(0.0, timeout_s - (_monotonic() - begun)))
+        elapsed = _monotonic() - begun
+    finally:
+        run.release()   # RangeNotEmpty / RangeEscaped propagate: a leak is never silent (§17.1)
+    if status is None and elapsed < timeout_s:   # the range's report ended before the watchdog did: no exit status
+        raise StreamSearchFailed("CRASHED", "the process range ended without reporting how the worker ended"
+                                 + _said(log))
+    if status is None or elapsed > timeout_s:    # the deadline is the whole operation: a late answer is no answer
+        head = pattern[:_PATTERN_HEAD] + ("..." if len(pattern) > _PATTERN_HEAD else "")
+        raise StreamSearchFailed(
+            "DEADLINE", f"the search did not finish within the harness watchdog ({timeout_s:g}s: timeouts_s.probe) "
+                        f"over {len(data)} bytes of the {stream} stream, against the pattern {head!r} "
+                        f"({len(pattern)} characters); its process range was emptied and nothing was decided from "
+                        "it, so this is a stop of the harness and never a verdict about the product. The same "
+                        "pattern over the same bytes within the same deadline stops the same way: running it again "
+                        "changes nothing. Simplify the pattern (no nested or overlapping quantifiers over the same "
+                        "text) or raise timeouts_s.probe on purpose")
+    if status != 0:
+        how = f"ended by signal {-status}" if status < 0 else f"exited with status {status}"
+        raise StreamSearchFailed("CRASHED", f"the worker {how} before it gave its result" + _said(log))
+    try:
+        with open(result, "rb") as f:
+            said = f.read(2)     # an answer is one byte: a longer file is read for what it is, not whole
+    except OSError:
+        raise StreamSearchFailed("NO_RESULT", "the worker exited 0 and wrote no result" + _said(log)) from None
+    if said not in (b"0", b"1"):
+        raise StreamSearchFailed("NO_RESULT" if not said else "BAD_RESULT",
+                                 "the worker exited 0 and its result is " + ("empty" if not said else
+                                                                          "not an answer (0 or 1)"))
+    return said == b"1"
+
+
+def _said(log: str) -> str:
+    """What the worker printed (its traceback, when it crashed), cut: the tail of its output file."""
+    try:
+        tail = pathlib.Path(log).read_bytes()[-300:].decode("utf-8", "replace").strip()
+    except OSError:
+        return ""
+    return f": {tail!r}" if tail else ""
 
 
 # --------------------------------------------------------------------------------------- shapes
@@ -434,7 +552,10 @@ def _stream_bytes(fact: dict) -> bytes:
         return f.read(min(int(fact.get("size", 0)), STREAM_CAP))
 
 
-def _stream_matches(shape, fact: dict) -> bool:
+def _stream_matches(shape, fact: dict, search=None, stream: str = "") -> bool:
+    """Whether the bytes `fact` names match `shape`. A `regex` shape is searched by `search(pattern, data, stream)` when
+    one is given — the probe's own is `search_in_worker`, which may raise `StreamSearchFailed` — and in this process
+    otherwise: a caller that holds no harness (the class table's fixture facts) has none to give."""
     data = _stream_bytes(fact)
     if isinstance(shape, str):
         shape = {"text": shape}
@@ -443,6 +564,8 @@ def _stream_matches(shape, fact: dict) -> bool:
     if "contains" in shape:
         return all(s.encode("utf-8") in data for s in shape["contains"])
     if "regex" in shape:
+        if search is not None:
+            return search(shape["regex"], data, stream)
         return re.search(shape["regex"], data.decode("utf-8", "replace")) is not None
     if "lines" in shape:
         return len(data.splitlines()) == shape["lines"]
@@ -496,9 +619,11 @@ def _equality_verdict(obs: dict, facts: dict) -> BehaviorVerdict:
     return BehaviorVerdict.SATISFIED if ok else BehaviorVerdict.REFUTED
 
 
-def verdict_of(cls: str, observable, facts: dict) -> BehaviorVerdict:
+def verdict_of(cls: str, observable, facts: dict, search=None) -> BehaviorVerdict:
     """What a present subject's facts say about the observable, when the invocation returned (or ended the process)
-    before the window closed. Pure over the facts and the capture files they name; no clock."""
+    before the window closed. Pure over the facts and the capture files they name; no clock. `search` is how a `regex`
+    shape is searched (`_stream_matches`): `observe` always gives the bounded one, and what it raises
+    (`StreamSearchFailed`) is no verdict — `_concluded` makes it HARNESS_FAILED."""
     if cls == "equality":
         return _equality_verdict(dict(observable), facts)
     if facts.get("pre_failed") is not None or cls == "blocks":
@@ -506,7 +631,7 @@ def verdict_of(cls: str, observable, facts: dict) -> BehaviorVerdict:
     obs = dict(observable)
     ok = facts.get("exit_code") == obs["exit_code"]
     if cls == "exits_streams":
-        ok = ok and all(_stream_matches(obs[k], facts.get(k, {})) for k in ("stdout", "stderr") if k in obs)
+        ok = ok and all(_stream_matches(obs[k], facts.get(k, {}), search, k) for k in ("stdout", "stderr") if k in obs)
     elif cls == "exits_files":
         after, before = facts.get("files", {}), facts.get("before", {})
         ok = ok and all(_file_matches(shape, after.get(_ws_name(k)), before.get(_ws_name(k)))
@@ -1006,8 +1131,11 @@ class CliInvocationProbe(HarnessProbe):
             return Observation(ObservationKind.HARNESS_FAILED, detail=f"the evaluation directory cannot be created: "
                                                                      f"{type(e).__name__}"), None
         with _disposed(holder) as work:
+            def search(pattern: str, data: bytes, stream: str) -> bool:
+                return search_in_worker(pattern, data, stream=stream, work=work, timeout_s=env.timeout_s,
+                                        name=f"probe {spec_id} regex {stream}", on_range=self._on_range)
             return self._observe_in(work, spec_id, cls, locator, stim, observable, at, env,
-                                    lambda facts: verdict_of(cls, observable, facts))
+                                    lambda facts: verdict_of(cls, observable, facts, search))
 
     def _observe_equality(self, spec_id: str, locator: str, observable: dict, at: RevisionRef,
                           env: ExecutionEnv) -> Observation:
@@ -1186,8 +1314,11 @@ def _concluded(run, facts: dict, decide) -> tuple[Observation, dict | None]:
     if "tampered" in facts:
         return _after_dispatch(run, Observation(ObservationKind.OBSERVED, BehaviorVerdict.REFUTED,
                                                 detail=json.dumps(facts))), None
-    return _after_dispatch(run, Observation(ObservationKind.OBSERVED, decide(facts),
-                                            detail=json.dumps(_public(facts)))), facts
+    try:
+        verdict = decide(facts)
+    except StreamSearchFailed as e:     # the harness could not search: nothing was observed of the product's output
+        return _after_dispatch(run, Observation(ObservationKind.HARNESS_FAILED, detail=str(e))), None
+    return _after_dispatch(run, Observation(ObservationKind.OBSERVED, verdict, detail=json.dumps(_public(facts)))), facts
 
 
 def _no_result(run) -> Observation:

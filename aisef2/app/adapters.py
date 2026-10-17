@@ -12,7 +12,6 @@ import hashlib
 import json
 import os
 import pathlib
-import re
 import shutil
 import sys
 import tempfile
@@ -95,6 +94,14 @@ class Developer:
         return Implemented(O.COMPLETED, sha, f"opencode exit {s['exit']}, {s['turns']} turns" + (f", {s['stopped']}" if s["stopped"] else ""))
 
 
+def _braces(text: str) -> str | None:
+    r"""From the first `{` of `text` to the last `}` after it — what `re.search(r"\{.*\}", text, re.S)` matches — or
+    None. Found by two scans: the regex tries every `{` and reads to the end of the text for each, so a reviewer's reply
+    (a model's text, of any length) of `{` with no `}` after them costs the square of its length."""
+    first, last = text.find("{"), text.rfind("}")
+    return text[first:last + 1] if 0 <= first < last else None
+
+
 class Reviewer:
     """The review stage's finder and the verification of what it finds (V2.1). The finder is the model reviewer (an
     OpenCode session, 2.0.0's) or Open Code Review (settings review.finder = "ocr": app/review_ocr). Whichever finds,
@@ -172,14 +179,14 @@ class Reviewer:
         if s["error"] and not s["text"]:
             raise ProviderOutage(s["error"])
         found = []
-        m = re.search(r"\{.*\}", s["text"], re.S)
+        braced = _braces(s["text"])
         try:
-            found = json.loads(m.group(0))["findings"] if m else []
+            found = json.loads(braced)["findings"] if braced is not None else []
         except (ValueError, KeyError, RecursionError):
             # a {...} match loads as an object or not at all: no TypeError is possible; nested past the parser's depth
             # (a RecursionError) is text that does not parse, like any other
             found = []
-        s["parsed"] = m is not None
+        s["parsed"] = braced is not None
         return ([f for f in found if isinstance(f, dict)] if isinstance(found, list) else []), s, None
 
     def _ocr(self, scope, attempt: int, head: str) -> tuple[list, dict, str]:

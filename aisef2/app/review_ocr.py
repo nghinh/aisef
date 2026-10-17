@@ -165,11 +165,31 @@ def findings(output: Mapping | None, required: Iterable[str]) -> list[dict]:
     return out
 
 
+_FENCE_OPEN = re.compile(r"```aisef-reproducer\s*\n(?=\{)")
+_FENCE_CLOSE = re.compile(r"\}(?=\s*\n```)")
+_SPACE = re.compile(r"\s*")
+
+
+def _fence(content: str) -> re.Match | None:
+    """`REPRODUCER_FENCE.search(content)` — the same match, or None — in time linear in `content`. The search tries each
+    place the block opens and reads to the end of the text for the `}` that closes it, so a comment (a model's text, of
+    any length) of many openings and no closing costs the square of its length. The first opening decides:
+    it fails only when no `}` closes anything after it, and then none after it does either. The close is the first `}`
+    after its `{` that a blank run ending in a newline and the fence follow; the grammar itself confirms the span."""
+    opening = _FENCE_OPEN.search(content)
+    if opening is None:
+        return None
+    close = _FENCE_CLOSE.search(content, opening.end() + 1)
+    if close is None:
+        return None
+    return REPRODUCER_FENCE.fullmatch(content, opening.start(), _SPACE.match(content, close.end()).end() + 3)
+
+
 def reproducer_of(content: str) -> tuple[object, str]:
     """(the reproducer a comment carries, the comment without it): the first fenced aisef-reproducer block holding one
     JSON value, or None — a block that does not parse is kept as text and carries nothing (one nested past the
     parser's depth, a `RecursionError`, does not parse)."""
-    m = REPRODUCER_FENCE.search(content)
+    m = _fence(content)
     if m is None:
         return None, content
     try:

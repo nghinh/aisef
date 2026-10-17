@@ -346,7 +346,7 @@ class NoReproducerIsRefusedNamingIt(Checkout):
 class ReproducerContractStatesTheRequirement(unittest.TestCase):
     """The contract a reproducer becomes states what the requirement demands (MUST_HOLD: the spec's candidate
     expectation is SATISFIED) and REQUIRES its subject: for a subject the candidate does not contain the probe
-    reports SUBJECT_ABSENT/REFUTED, which REQUIRES_SUBJECT drops (INDETERMINATE: NOT_REPRODUCED) — so a finding
+    reports SUBJECT_ABSENT/REFUTED, which REQUIRES_SUBJECT drops (INDETERMINATE: undecided, status INDETERMINATE) — so a finding
     about a module a later story introduces is never CONFIRMED and never blocks, however well it anchors.
 
     Pins aisef2/app/review_verify.py::reproducer_contract [45, 46]"""
@@ -365,7 +365,7 @@ class ReproducerContractStatesTheRequirement(unittest.TestCase):
 @PROBE_RUNS
 class AFindingAboutAnAbsentSubject(Checkout):
     """The candidate has no `ledgerlock/__main__.py`; the finding is anchored (R-9/3, exit 3) and critical. The probe
-    runs and reports the subject absent: not CONFIRMED, observed INDETERMINATE, never blocks.
+    runs and reports the subject absent: not CONFIRMED, status and observed INDETERMINATE, never blocks.
 
     Pins aisef2/app/review_verify.py::reproducer_contract [46]"""
 
@@ -377,7 +377,7 @@ class AFindingAboutAnAbsentSubject(Checkout):
         v = self.verify(f, root)
         a = V.anchor(f, PROJECT)
         self.assertEqual(a.status, V.ANCHORED)
-        self.assertEqual((v.status, v.observed), (V.NOT_REPRODUCED, "INDETERMINATE"), v)
+        self.assertEqual((v.status, v.observed), (V.INDETERMINATE, "INDETERMINATE"), v)     # not NOT_REPRODUCED (owner, 2026-10-15)
         self.assertIn("INDETERMINATE", v.reason, v)     # RV-2: the reason says the probe decided nothing ...
         self.assertNotIn("does not reproduce", v.reason, v)     # ... never that the finding was shown not to reproduce
         self.assertFalse(V.blocks(v, f, "fix-loop", "low", a))

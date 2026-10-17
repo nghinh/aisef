@@ -608,7 +608,9 @@ class Identity(_Product):
         self.assertEqual(ps.violations("aisef2/probe/cli_invocation.py", src, ps.SOURCE_RULES, facts), [])
         self.assertEqual(ps.check(ROOT), [])   # catalog closure: registered, digest live, fixtures for every class
         scripts = ps.child_scripts(ast.parse(src))
-        self.assertEqual([name for name, _, _ in scripts], ["AGENT", "HARNESS"])   # B1: the subject's process, the controller
+        # the regex worker (harness bytes, no subject: owner decision 2026-10-15 item 4), then B1: the subject's process,
+        # the controller
+        self.assertEqual([name for name, _, _ in scripts], ["REGEX_WORKER", "AGENT", "HARNESS"])
         # the channel rule is what rejects a harness that puts its protocol on the subject's stdout: the defect is
         # written into the parsed HARNESS (its ast.unparse text), so the site does not depend on its formatting (ORD-1)
         tree = ast.parse(src)
