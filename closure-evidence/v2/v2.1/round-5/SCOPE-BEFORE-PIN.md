@@ -1,6 +1,6 @@
 # Phạm vi trước khi ghim snapshot (cửa sổ sửa lỗi probe, bản ứng viên AISEF 2.1)
 
-Lập theo chỉ thị 2026-10-15 điểm 7 (`OWNER-DIRECTIVE-2026-10-15-B.md`), **trước** khi ghim. Đo lúc 2026-10-18 03:10 (Asia/Saigon)
+Lập theo chỉ thị 2026-10-15 điểm 7 (`OWNER-DIRECTIVE-2026-10-15-B.md`), **trước** khi ghim. Đo lúc 2026-10-18 03:00 (Asia/Saigon)
 trên nhánh `v2.1/probe-window` ở `2c9488d`. Đây là ứng viên, chưa được nghiệm thu, chưa phát hành; không có ghi nhận
 nghiệm thu nào được tạo. Chưa push, tag, publish, deploy; chưa gọi provider trả tiền; Docker và `goe-*` vẫn chạy.
 
