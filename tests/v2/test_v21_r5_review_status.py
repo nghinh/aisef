@@ -212,5 +212,19 @@ class RecordsOfTheEarlierVocabulary(A.Scratch):
                                  ([], []))
 
 
+class RecordsOfTheReleaseBeforeTheStatements(unittest.TestCase):
+    """The review rows of a committed 2.0.0 journal (closure-evidence/v2/release/smoke-2) carry no statement at all —
+    "advisory: ..." or "informational" — so there is no status in them and nothing to bind: `--verify` takes them as it
+    always did. (The 28 RUN.json tracked in closure-evidence hold no finding with a `verification`: no committed
+    record carries the vocabulary of 2.1, old or new.)"""
+
+    def test_its_review_rows_are_no_problem_and_no_note(self):
+        path = ROOT / "closure-evidence/v2/release/smoke-2/run-1/aisef-run.jsonl"
+        events = [json.loads(line)["event"] for line in path.read_text(encoding="utf-8").splitlines() if ":review:" in line]
+        self.assertTrue(events)
+        self.assertTrue(all(" — " not in e["data"]["detail"] for e in events))
+        self.assertEqual(V.artifact_problems(path.parent, events), ([], []))
+
+
 if __name__ == "__main__":
     unittest.main()
