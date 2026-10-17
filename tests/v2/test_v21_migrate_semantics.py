@@ -12,11 +12,18 @@ contract's name.
   release's, an approval that no longer binds — each withholds, and a release already at the current version withholds
   nothing;
 * the real 2.0.0 LedgerLock bundle (closure-evidence, read only): exactly six of its 59 approvals are withheld — its
-  six counts (grep_count, REQUIRES_SUBJECT): the four over the directory `ledgerlock` and the two over one .py file,
-  which a reading of PM-9 alone by the path's name would have kept and PM-11 (the byte-order mark) does not — the
-  candidate lints NOT_READY with those six to approve, and approving them through the printed commands in a scratch
-  copy makes it READY;
-* `seal --keep-approvals-from` applies the same rule.
+  six counts (grep_count, REQUIRES_SUBJECT): the four over the directory `ledgerlock` that the owner named and the two
+  over one .py file each. A selector sees a contract's class and `subject_absence`, never its path or the repository, so
+  PM-9 and PM-11 each select all six; what tells the four from the two is the `when` of each change, which the report
+  prints beside the contract: PM-9's condition (a path that selects no file) can hold for a file only when a directory
+  bears its name, PM-11's (a byte-order mark) holds for a file as for a directory. The candidate lints NOT_READY with
+  those six to approve, and running the printed commands in a scratch copy makes it READY — under the shipped
+  calibration rows re-bound to the bytes that run now (the shipped table is stale for every probe at this commit, so
+  admission itself is the final snapshot's to show);
+* what the keep rests on: `approvals_kept_grounds` (which versions were read) and `limits` (what a declaration-reading
+  rule cannot see), the commands as the operator pastes them (the candidate's own path, the files they write, the
+  placeholder approver refused), the candidate's two digests;
+* `seal --keep-approvals-from` applies the same rule, and refuses approvals handed over without it.
 
 Offline; no provider, no probe runs a subject (one test runs file_artifact over a plain directory)."""
 
@@ -137,6 +144,23 @@ def run_main(*argv) -> tuple[int, dict | None, str]:
     return code, (json.loads(out.getvalue()) if out.getvalue().strip() else None), err.getvalue()
 
 
+def follow(test: unittest.TestCase, report: dict, candidate: dict, approver: str = "human:fixture-reviewer") -> dict:
+    """What the owner does with the report: the candidate is written where the first printed command reads it, each
+    command is run as printed — only the placeholder approver replaced — and the file the last one wrote is read back.
+    Where a shell splits a command as POSIX does, the printed words are the arguments."""
+    rows = report["needs_owner_reapproval"]["contracts"]
+    pathlib.Path(rows[0]["reads"]).write_text(json.dumps(candidate), encoding="utf-8")
+    for row in rows:
+        argv = ["bundle", "approve", row["reads"], "--contract", row["contract"], "--approver", bundle_cli.PLACEHOLDER,
+                "--out", row["writes"]]
+        if sys.platform != "win32":
+            test.assertEqual(shlex.split(row["command"]), ["aisef", *argv])
+        code, printed, err = run_main(*[approver if w == bundle_cli.PLACEHOLDER else w for w in argv[1:]])
+        test.assertEqual(code, 0, err)
+        test.assertEqual(printed["approved"], row["contract"])
+    return json.loads(pathlib.Path(rows[-1]["writes"]).read_text(encoding="utf-8"))
+
+
 def with_entry(**changes):
     """`catalog.active` as it is, the file_artifact entry replaced with these fields changed."""
     real = catalog.active
@@ -203,12 +227,28 @@ class Declarations(unittest.TestCase):
                  "a key no selector has (a function)": {3: {"summary": "s", "affects": (
                      {**good["affects"][0], "applies_to": lambda i: True},)}},
                  "a selector that is not an object": {3: {"summary": "s", "affects": ("grep_count",)}},
-                 "classes that are empty": {3: {"summary": "s", "affects": ({**good["affects"][0], "classes": ()},)}}}
+                 "classes that are empty": {3: {"summary": "s", "affects": ({**good["affects"][0], "classes": ()},)}},
+                 # a record the reader cannot take is None whatever its members are: none of these is an exception
+                 "a class that is a list (unhashable)": {3: {"summary": "s", "affects": (
+                     {**good["affects"][0], "classes": (["grep_count"],)},)}},
+                 "a subject_absence that is a dict (unhashable)": {3: {"summary": "s", "affects": (
+                     {**good["affects"][0], "subject_absence": ({"REQUIRES_SUBJECT": 1},)},)}},
+                 "a class that is a number": {3: {"summary": "s", "affects": ({**good["affects"][0], "classes": (3,)},)}},
+                 "classes that are a bare string": {3: {"summary": "s", "affects": (
+                     {**good["affects"][0], "classes": "grep_count"},)}},
+                 "a when that is not text": {3: {"summary": "s", "affects": ({**good["affects"][0], "when": 3},)}},
+                 "a ref that is empty": {3: {"summary": "s", "affects": ({**good["affects"][0], "ref": ""},)}},
+                 "a ref that is not text": {3: {"summary": "s", "affects": ({**good["affects"][0], "ref": 9},)}},
+                 "an affects that is a mapping": {3: {"summary": "s", "affects": good["affects"][0]}}}
         self.assertIsNotNone(bundle_cli._declared(dataclasses.replace(e, capability_changes={3: good}), 3))
+        self.assertIsNotNone(bundle_cli._declared(dataclasses.replace(e, capability_changes={
+            3: {**good, "affects": ({**good["affects"][0], "ref": "PM-9"},)}}), 3))      # a ref is allowed
         for label, changes in cases.items():
             with self.subTest(label):
                 self.assertIsNone(bundle_cli._declared(dataclasses.replace(e, capability_changes=changes), 3))
-        self.assertIsNone(bundle_cli._declared(dataclasses.replace(e, capability_changes=None), 3))
+        for label, changes in {"none": None, "a list": [good], "a tuple of pairs": ((3, good),), "a number": 3}.items():
+            with self.subTest(label):
+                self.assertIsNone(bundle_cli._declared(dataclasses.replace(e, capability_changes=changes), 3))
 
     def test_file_artifact_declares_what_pm9_and_pm11_changed_and_what_the_python_imports_class_did_not(self):
         self.assertEqual(fa.CAPABILITY_VERSION, 3)
@@ -293,12 +333,16 @@ class WhatMigrateWithholds(unittest.TestCase):
 
     def test_each_contract_names_the_changes_that_select_it(self):
         """PM-9 selects a count whose absence the contract requires, PM-11 every count: a decidable absence is selected
-        by PM-11 alone, a path that names a .py file by both (a file the suffixes take is not what PM-9 is about, and
-        PM-11 does not ask)."""
-        tags = {c["contract"]: [h["when"].split(":")[0] for h in c["changes"]] for c in self.report["semantic_changes"]}
+        by PM-11 alone. A path that names a .py file is selected by both, because a selector reads the contract's class
+        and absence and not its path (a directory can bear a file's name): the `when` beside each says which condition
+        the repository must meet."""
+        tags = {c["contract"]: [h["ref"] for h in c["changes"]] for c in self.report["semantic_changes"]}
         self.assertEqual(tags["BC-GREP-DIR-REQ"], ["PM-9", "PM-11"])
         self.assertEqual(tags["BC-GREP-FILE-REQ"], ["PM-9", "PM-11"])
         self.assertEqual(tags["BC-GREP-DIR-DEC"], ["PM-11"])
+        for c in self.report["semantic_changes"]:
+            for h in c["changes"]:
+                self.assertTrue(h["when"].startswith(h["ref"] + ":"), (c["contract"], h["ref"]))
 
     def test_the_candidate_keeps_only_approvals_the_input_held_untouched_and_signs_nothing(self):
         for a in self.out["approvals"]:
@@ -334,6 +378,32 @@ class WhatMigrateWithholds(unittest.TestCase):
         self.assertEqual((given["approver"], given["approved_at"]), ("human:fixture-owner", 100.0))
         self.assertEqual(given["contract_hash"], contract("BC-GREP-DIR-REQ").contract_hash)
 
+    def test_the_report_gives_the_ground_of_every_approval_it_keeps(self):
+        """Not a count: for each group of kept approvals, the probe, class and absence, the capability versions it was
+        read between, the records consulted, and why none selected it."""
+        rows = self.report["approvals_kept_grounds"]
+        kept = {a["contract_id"] for a in self.out["approvals"]}
+        self.assertEqual(sorted(c for r in rows for c in r["contracts"]), sorted(kept))      # each once, none other
+        by = {(r["probe"], r["class"]): r for r in rows}
+        exists = by[(fa.PROBE_ID, "exists")]
+        self.assertEqual((exists["from"], exists["to"]), ({"release": "2.0.0", "capability_version": 1},
+                                                          {"capability_version": fa.CAPABILITY_VERSION}))
+        self.assertEqual([(c["version"], c["selectors"]) for c in exists["consulted"]], [(2, 0), (3, 2)])
+        self.assertTrue(all(c["summary"] for c in exists["consulted"]))
+        self.assertIn("none selects class exists", exists["ground"])
+        unmoved = by[("probe.python_callable_v2", "returns")]
+        self.assertEqual((unmoved["consulted"], unmoved["from"]["capability_version"], unmoved["to"]["capability_version"]),
+                         ([], 1, 1))
+        self.assertIn("did not move", unmoved["ground"])      # nothing was read because nothing could have been declared
+        for r in rows:
+            self.assertTrue(r["ground"] and r["contracts"])
+
+    def test_the_report_says_what_the_rule_cannot_see(self):
+        text = " ".join(self.report["limits"])
+        for words in ("identity rule", "ARCHITECTURE-EXCEPTION-V2-007", "without moving its CAPABILITY_VERSION",
+                      "never the repository", "earlier build of `migrate`"):
+            self.assertIn(words, text)
+
     def test_the_contract_no_criterion_names_takes_the_bundle_s_release(self):
         self.assertIn("BC-GREP-UNUSED-REQ", self.withheld())
 
@@ -348,27 +418,56 @@ class WhatMigrateWithholds(unittest.TestCase):
         self.assertEqual(B.load(approved).digest, hashlib.sha256(B._canonical(approved)).hexdigest())
         self.assertNotEqual(B.load(approved).digest, candidate["bundle_digest"])    # each approval is a new bundle
 
-    def test_the_printed_commands_are_the_commands_that_approve_and_the_bundle_then_loads(self):
+    def test_the_printed_commands_name_the_candidate_and_chain_and_the_bundle_then_loads(self):
+        """The commands are paste-ready: the candidate's own path (the one given to `migrate`), the file each writes and
+        the next reads, `lint` for the last — only the approver is left to the operator."""
         with tempfile.TemporaryDirectory() as t:
-            t = pathlib.Path(t)
-            here = t / "candidate.json"
-            here.write_text(json.dumps(self.out), encoding="utf-8")
-            self.assertIn("nothing was signed", self.report["needs_owner_reapproval"]["how"])
-            for n, row in enumerate(self.report["needs_owner_reapproval"]["contracts"]):
-                words = shlex.split(row["command"])
-                self.assertEqual(words[:3], ["aisef", "bundle", "approve"])
-                self.assertEqual([w for w in words if w in ("BUNDLE.json", "NEXT.json")], ["BUNDLE.json", "NEXT.json"])
-                self.assertEqual(words[words.index("--contract") + 1], row["contract"])
+            here = pathlib.Path(t) / "candidate.json"
+            candidate, report = bundle_cli.migrate(self.before)
+            report = bundle_cli.with_commands(report, here)
+            rows = report["needs_owner_reapproval"]["contracts"]
+            self.assertIn("nothing was signed", report["needs_owner_reapproval"]["how"])
+            self.assertEqual(rows[0]["reads"], str(here))
+            self.assertEqual([r["reads"] for r in rows[1:]], [r["writes"] for r in rows[:-1]])
+            self.assertEqual(len({r["writes"] for r in rows}), len(rows))
+            self.assertEqual(report["needs_owner_reapproval"]["then"], f"aisef bundle lint {bundle_cli._shell_word(rows[-1]['writes'])}")
+            for row in rows:
                 self.assertEqual(row["contract_hash"], contract(row["contract"]).contract_hash)
-                nxt = t / f"approved-{n}.json"
-                argv = [here if w == "BUNDLE.json" else nxt if w == "NEXT.json" else "human:fixture-reviewer"
-                        if w == "human:NAME" else w for w in words[2:]]
-                code, printed, err = run_main(*argv)
-                self.assertEqual(code, 0, err)
-                self.assertEqual(printed["approved"], row["contract"])
-                here = nxt
-            self.assertEqual(printed["still_to_approve"], [])
-            self.assertEqual(len(B.load(json.loads(here.read_text(encoding="utf-8"))).approvals), len(CONTRACTS))
+            done = follow(self, report, candidate)
+            self.assertEqual(len(B.load(done).approvals), len(CONTRACTS))
+            self.assertEqual(bundle_cli.unapproved(done), [])
+
+    def test_a_printed_command_pasted_as_it_is_signs_nothing(self):
+        """`human:NAME` is a placeholder, not a person: the kernel takes any `human:<name>`, so `approve` refuses this one."""
+        with tempfile.TemporaryDirectory() as t:
+            here = pathlib.Path(t) / "candidate.json"
+            candidate, report = bundle_cli.migrate(self.before)
+            report = bundle_cli.with_commands(report, here)
+            here.write_text(json.dumps(candidate), encoding="utf-8")
+            row = report["needs_owner_reapproval"]["contracts"][0]
+            code, printed, err = run_main("approve", row["reads"], "--contract", row["contract"],
+                                          "--approver", bundle_cli.PLACEHOLDER, "--out", row["writes"])
+            self.assertEqual((code, printed), (2, None))
+            self.assertIn("placeholder", err)
+            self.assertFalse(pathlib.Path(row["writes"]).exists())
+            with self.assertRaises(B.BundleError):
+                bundle_cli.approve(candidate, row["contract"], bundle_cli.PLACEHOLDER, 1.0)
+
+    def test_the_candidate_has_two_digests_and_each_says_what_it_is_of(self):
+        """`bundle_digest` is what `load` gives the project (canonical JSON), not the sha256 of the file written;
+        `migrate` through the command adds the file's."""
+        with tempfile.TemporaryDirectory() as t:
+            src, out = pathlib.Path(t) / "in.json", pathlib.Path(t) / "candidate.json"
+            src.write_text(json.dumps(self.before), encoding="utf-8")
+            code, printed, err = run_main("migrate", src, "--out", out)
+            self.assertEqual((code, err), (0, ""))
+            c = printed["candidate"]
+            self.assertEqual(c["file_sha256"], hashlib.sha256(out.read_bytes()).hexdigest())
+            self.assertEqual(c["bundle_digest"], hashlib.sha256(B._canonical(json.loads(out.read_text(encoding="utf-8")))).hexdigest())
+            self.assertNotEqual(c["file_sha256"], c["bundle_digest"])
+            self.assertIn("canonical", c["bundle_digest_is"])
+            self.assertTrue(printed["needs_owner_reapproval"]["contracts"][0]["reads"].endswith("candidate.json"))
+            self.assertEqual(printed["needs_owner_reapproval"]["contracts"][0]["reads"], str(out))
 
 
 class WhatIsNotKept(unittest.TestCase):
@@ -388,6 +487,8 @@ class WhatIsNotKept(unittest.TestCase):
         doc = era_bundle(release=None)
         out, report = bundle_cli.migrate(doc)
         self.assertEqual(out, doc)
+        [ground] = report["approvals_kept_grounds"]
+        self.assertEqual((ground["from"], ground["probe"], len(ground["contracts"])), ({"release": "current"}, None, len(CONTRACTS)))
         self.assertEqual((report["specs_rebound"], report["approvals_withheld"], report["semantic_changes"],
                           report["needs_owner_reapproval"]), (0, [], [], None))
         self.assertEqual(report["unchanged"], ["requirements", "contracts", "approvals", "facts", "stories",
@@ -475,6 +576,13 @@ class FailClosed(unittest.TestCase):
         bad = {2: fa.CAPABILITY_CHANGES[2], 3: {"summary": "x", "affects": ({"classes": ("grep_count",)},)}}
         self.assertEqual(self.withheld_with(capability_changes=bad), self.FILE_ARTIFACT)
 
+    def test_a_record_with_an_unhashable_member_is_the_same_and_migrate_does_not_raise(self):
+        """The case that used to be a TypeError out of migrate: a class written as a list."""
+        bad = {2: fa.CAPABILITY_CHANGES[2], 3: {"summary": "x", "affects": ({"classes": (["grep_count"],), "when": "w",
+                                                                              "before": "b", "after": "a"},)}}
+        self.assertEqual(self.withheld_with(capability_changes=bad), self.FILE_ARTIFACT)
+        self.assertEqual(self.withheld_with(capability_changes=[fa.CAPABILITY_CHANGES[2]]), self.FILE_ARTIFACT)
+
     def test_a_probe_with_no_capability_version_is_the_same(self):
         self.assertEqual(self.withheld_with(capability_version=None), self.FILE_ARTIFACT)
 
@@ -549,6 +657,22 @@ class TheLedgerLockBundle(unittest.TestCase):
         for row in self.report["approvals_withheld"]:       # the approval stays in the input, as history: who and when
             self.assertEqual(row["approver"], "human:owner")
 
+    def test_the_ground_of_the_53_kept_approvals_is_read_not_counted(self):
+        rows = self.report["approvals_kept_grounds"]
+        self.assertEqual(sum(len(r["contracts"]) for r in rows), 53)
+        self.assertEqual({r["probe"] for r in rows}, {fa.PROBE_ID, "probe.cli_invocation", "probe.process_effect",
+                                                      "probe.python_callable_v2"})
+        for r in rows:
+            if r["probe"] != fa.PROBE_ID:
+                # their capability version is the release's: nothing is declared for them, and the report says so
+                self.assertEqual((r["from"]["capability_version"], r["to"]["capability_version"], r["consulted"]), (1, 1, []))
+                self.assertIn("did not move", r["ground"])
+            else:
+                self.assertEqual([c["version"] for c in r["consulted"]], [2, 3])
+        counts = {p: sum(len(r["contracts"]) for r in rows if r["probe"] == p) for p in {r["probe"] for r in rows}}
+        self.assertEqual(counts, {fa.PROBE_ID: 3, "probe.cli_invocation": 10, "probe.process_effect": 34,
+                                  "probe.python_callable_v2": 6})
+
     def test_the_plan_is_rebound_as_it_always_was(self):
         self.assertEqual((self.report["specs_rebound"], self.report["obligations"]), (59, 67))
         self.assertEqual(self.report["plan_hash"]["from"], self.doc["plan"]["plan_hash"])
@@ -568,16 +692,9 @@ class TheLedgerLockBundle(unittest.TestCase):
             self.assertIn("not run", lint["admission"])
             self.assertEqual(lint["criteria_without_calibration"], [])
             with tempfile.TemporaryDirectory() as t:
-                here = pathlib.Path(t) / "candidate.json"
-                here.write_text(json.dumps(self.out), encoding="utf-8")
-                for n, row in enumerate(self.report["needs_owner_reapproval"]["contracts"]):
-                    nxt = pathlib.Path(t) / f"approved-{n}.json"
-                    words = shlex.split(row["command"])[2:]
-                    argv = [here if w == "BUNDLE.json" else nxt if w == "NEXT.json" else "human:scratch-stand-in"
-                            if w == "human:NAME" else w for w in words]
-                    self.assertEqual(run_main(*argv)[0], 0)
-                    here = nxt
-                done = json.loads(here.read_text(encoding="utf-8"))
+                candidate, report = bundle_cli.migrate(json.loads(json.dumps(self.doc)))
+                done = follow(self, bundle_cli.with_commands(report, pathlib.Path(t) / "candidate.json"), candidate,
+                              "human:scratch-stand-in")
             ready = bundle_cli.lint(done)
         self.assertEqual((ready["verdict"], ready["to_approve"]), ("READY", []))
         self.assertTrue(ready["admission"]["admitted"], ready["admission"])
@@ -635,6 +752,21 @@ class SealKeepsTheSameRule(unittest.TestCase):
         self.assertEqual({x["contract"] for x in report["to_approve"]}, SELECTED)
         row = next(r for r in report["approvals_withheld_semantic"] if r["contract"] == "BC-GREP-DIR-REQ")
         self.assertEqual((row["approver"], row["changes"][0]["version"]), ("human:fixture-owner", 3))
+
+    def test_approvals_handed_over_without_their_exposure_are_refused(self):
+        """The library does not keep by hash alone: a caller that hands `seal` approvals says what is exposed (the
+        command does, from the bundle they come from), and `exposed={}` is the statement that none is."""
+        old = era_bundle()
+        with self.assertRaises(B.BundleError) as c:
+            bundle_cli.seal(self.authoring(), approvals=old["approvals"])
+        self.assertIn("exposed", str(c.exception))
+        with self.assertRaises(B.BundleError):
+            bundle_cli.seal(self.authoring(), approvals=iter(old["approvals"]))        # a generator is as many
+        _, report = bundle_cli.seal(self.authoring())                                  # no approvals: nothing to be told
+        self.assertEqual(report["approvals_kept"], 0)
+        _, report = bundle_cli.seal(self.authoring(), approvals=old["approvals"], exposed={})
+        self.assertEqual(report["approvals_kept"], len(CONTRACTS))
+        self.assertEqual(self.seal(old)[1]["approvals_kept"], len(NOT_SELECTED))       # the rule, as the command applies it
 
     def test_an_old_bundle_of_this_release_loses_nothing(self):
         _, report = self.seal(era_bundle(release=None))

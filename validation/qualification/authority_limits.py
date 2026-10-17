@@ -46,8 +46,9 @@ commit_all` is workspace.commit_all) — inside aisef2/app. Known ceiling: a cal
 `self.x`) is not followed, nor what a reached class's `__init__` does with an argument (`K(out["approvals"])`); the
 analysis is flow-insensitive except
 that a binding of the corroboration name after its Finding counts only inside a loop that holds both; the behavioural
-tests (test_v21_identity Migrate — `test_migration_rebinds_the_plan_and_nothing_else` asserts the input unchanged and
-the output's approvals equal to the input's —, test_v21_review, test_v21_review_chain) cover what those do at run time.
+tests (test_v21_identity Migrate — `test_migration_rebinds_the_plan_and_withholds_only_what_a_declared_change_selects`
+asserts the input unchanged and the output's approvals the input's less exactly what the report says it withheld —,
+test_v21_migrate_semantics, test_v21_review, test_v21_review_chain) cover what those do at run time.
 
     python -P validation/qualification/authority_limits.py     # exit 1 on any violation
 """

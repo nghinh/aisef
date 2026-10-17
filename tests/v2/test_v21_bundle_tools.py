@@ -124,11 +124,12 @@ class Refusals(Tool):
         approved = bundle_cli.approve(self.doc, "BC-ADD", "human:t", 1.0)
         a = json.loads((self.d / "authoring.json").read_text(encoding="utf-8"))
         a["contracts"][0]["observable"]["returns"] = 6        # a different claim is a different contract
-        doc, report = bundle_cli.seal(a, repo=self.d / "repo", approvals=approved["approvals"])
+        exposed = bundle_cli.exposure_of(approved)      # the bundle the approvals come from: nothing is exposed in this release's own
+        doc, report = bundle_cli.seal(a, repo=self.d / "repo", approvals=approved["approvals"], exposed=exposed)
         self.assertEqual(report["approvals_dropped"], ["BC-ADD/R-1"])
         self.assertEqual([x["contract"] for x in report["to_approve"]], ["BC-ADD"])
         same, kept = bundle_cli.seal(json.loads((self.d / "authoring.json").read_text(encoding="utf-8")),
-                                     repo=self.d / "repo", approvals=approved["approvals"])
+                                     repo=self.d / "repo", approvals=approved["approvals"], exposed=exposed)
         self.assertEqual((kept["approvals_kept"], kept["to_approve"]), (1, []))
 
     def test_an_uncovered_requirement_is_named_where_admission_refuses_it(self):

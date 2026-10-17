@@ -213,9 +213,11 @@ CAPABILITY_VERSION = 3     # 2: the class python_imports (V21-37); 3: a selectio
 #: well formed, is read as changing every contract of this probe (fail closed; tests/v2/test_v21_migrate_semantics.py
 #: holds every probe of the catalog to a record for each version it is at). `affects` lists selectors: a contract is
 #: affected when its observation class is one of `classes` and its `subject_absence` one of those named (a key left out
-#: takes every value); `when` says what the repository must hold for the verdict to differ, `before` and `after` the
-#: verdict then. An empty `affects` is a declaration: no contract that could be written before changed. A change made
-#: while the number stayed where it was is declared under the next version, since the number is what a release recorded.
+#: takes every value) — the selector sees the contract, never the repository, so it selects every contract that could
+#: meet the condition; `when` says what the repository must hold for the verdict to differ, `before` and `after` the
+#: verdict then, `ref` the short name the report gives the change. An empty `affects` is a declaration: no contract that
+#: could be written before changed. A change made while the number stayed where it was is declared under the next
+#: version, since the number is what a release recorded.
 def _capability_changes() -> dict:
     """The table below, built in a scope of its own: it names the members of the absence declaration (a selector says which
     contracts a change reaches), and the check NO_VERDICT_FROM_ABSENCE_DECLARATION (RFC §10.2) reads a scope that names
@@ -227,14 +229,14 @@ def _capability_changes() -> dict:
                        "no file (PM-9); one leading UTF-8 byte-order mark is dropped before a file is read (PM-11); the "
                        "matching of grep_count runs in a worker under timeouts_s.probe (PM-13), which gives a pattern that "
                        "does not finish no verdict it ever had",
-            "affects": ({"classes": ("grep_count", "python_imports"), "subject_absence": ("REQUIRES_SUBJECT",),
+            "affects": ({"ref": "PM-9", "classes": ("grep_count", "python_imports"), "subject_absence": ("REQUIRES_SUBJECT",),
                          "when": "PM-9: the path is in the tree and selects no file the suffixes take: a directory holding no "
                                  "such file (a package whose modules moved, a documentation directory), a file whose name "
                                  "ends with none of the suffixes, or a directory that bears the name of a file",
                          "before": "a count of zero matches over no file: SATISFIED when the observable's matches is 0, "
                                    "REFUTED when it is 1 or more",
                          "after": "INDETERMINATE (PRECONDITION_ABSENT): the subject is absent and the contract requires it"},
-                        {"classes": ("grep_count", "python_imports"),
+                        {"ref": "PM-11", "classes": ("grep_count", "python_imports"),
                          "when": "PM-11: a selected file begins with a UTF-8 byte-order mark (EF BB BF) and what its first line "
                                  "gives depends on it: a pattern anchored at the start of the line, or one that tells the mark "
                                  "from a character (grep_count); any import statement of the file (python_imports)",

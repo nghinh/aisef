@@ -63,15 +63,25 @@ decision 2026-10-15, item 1): for each contract whose spec came from an earlier 
 between that release's (`RELEASES`) and this one's, and the changes each probe declares for them (`CAPABILITY_CHANGES`
 in the probe module, copied by the catalog); a change that selects the contract — by its observation class and its
 `subject_absence`, derived from the probe, no contract is named — withholds its approvals from the candidate, which is a
-new bundle; the input and its approvals stay as they were, as history. A capability change nobody declared selects every
-contract of its probe, and so does a probe that declares no version: the mechanism sees only what a probe says it
-changed between two numbers, never a change made without one. An approval that no longer binds its requirement and
-contract hashes is not carried either. The report says what differs and when (`semantic_changes`),
-what the owner must approve again, by which command and signing nothing (`needs_owner_reapproval`), and which bundle
-this is (`candidate`). Exit status 0 is a migration performed: the candidate does not load until its withheld
-contracts are approved, and `lint` says so (NOT_READY). `seal --keep-approvals-from` applies the same rule to the
-approvals it keeps (`approvals_withheld_semantic`). Limit: a bundle an earlier build of `migrate` already wrote carries
-its approvals as they were and says nothing of it — migrate again from the original, which is never modified."""
+new bundle; the input and its approvals stay as they were, as history. A selector sees the contract, never the
+repository: it selects every contract that could differ, so a change whose `when` needs a repository condition (a
+directory without a .py file, a file that begins with a byte-order mark) selects the contracts that could meet it, and
+the report names each change that selected a contract (`semantic_changes[].changes[].ref`) beside the condition. A
+capability change nobody declared selects every contract of its probe, and so does a probe that declares no version.
+What the rule rests on, and what it cannot see: an approval is kept on the identity rule above (the probe's id, version
+and classes are the release's, no declared change selects the contract) — `approvals_kept_grounds` says, for each group
+of kept approvals, which versions were read; `migrate` reads declarations and runs no probe, so a change to a probe
+made without moving its CAPABILITY_VERSION and declaring it is not seen (`limits`). An approval that no longer binds
+its requirement and contract hashes is not carried either. The report says what differs and when (`semantic_changes`),
+what the owner must approve again, by which command and signing nothing (`needs_owner_reapproval`: the commands name
+the candidate and the files they write, and keep `human:NAME` for the owner to replace — `approve` refuses the
+placeholder), and which bundle this is (`candidate`: `bundle_digest` is the canonical digest `load` gives the project,
+`file_sha256` the sha256 of the file's bytes). Exit status 0 is a migration performed: the candidate does not load until
+its withheld contracts are approved, and `lint` says so (NOT_READY). `seal --keep-approvals-from` applies the same rule
+to the approvals it keeps (`approvals_withheld_semantic`); a caller of `seal` that hands it approvals must hand it
+`exposed` too (`exposure_of` the bundle they come from), or it refuses. Limit: a bundle an earlier build of `migrate`
+already wrote carries its approvals as they were and says nothing of it — migrate again from the original, which is
+never modified."""
 
 from __future__ import annotations
 
@@ -184,8 +194,11 @@ def _origins(specs: Mapping[str, ProductProofSpec], plan: Plan) -> dict[str, str
 def _declared(entry, version: int) -> Mapping | None:
     """The record of what capability `version` of `entry`'s probe changed, or None when the probe declares none or one that
     is not well formed (`summary`; `affects`: selectors of `classes` / `subject_absence`, each with `when`, `before`,
-    `after`). What is not declared is not "nothing changed": the caller reads it as changing every contract of the probe."""
-    rec = (entry.capability_changes or {}).get(version)
+    `after`, and optionally a `ref`, the short name a report gives the change). What is not declared is not "nothing
+    changed": the caller reads it as changing every contract of the probe — so this is total, whatever the probe's module
+    holds: a record it cannot take is None, never an exception."""
+    changes = entry.capability_changes
+    rec = changes.get(version) if isinstance(changes, Mapping) else None
     if not isinstance(rec, Mapping) or set(rec) != {"summary", "affects"} or not isinstance(rec["summary"], str) \
             or not rec["summary"] or not isinstance(rec["affects"], (tuple, list)):
         return None
@@ -193,23 +206,25 @@ def _declared(entry, version: int) -> Mapping | None:
 
     def well_formed(sel) -> bool:
         if not isinstance(sel, Mapping) or not {"when", "before", "after"} <= set(sel) \
-                or not set(sel) <= {"classes", "subject_absence", "when", "before", "after"}:
+                or not set(sel) <= {"classes", "subject_absence", "when", "before", "after", "ref"}:
             return False
-        if not all(isinstance(sel[k], str) and sel[k] for k in ("when", "before", "after")):
+        if not all(isinstance(sel[k], str) and sel[k] for k in ("when", "before", "after", "ref") if k in sel):
             return False
-        return all(isinstance(sel[k], (tuple, list)) and sel[k] and set(sel[k]) <= allowed[k]
-                   for k in allowed if k in sel)
+        return all(isinstance(sel[k], (tuple, list)) and sel[k] and all(isinstance(x, str) for x in sel[k])
+                   and set(sel[k]) <= allowed[k] for k in allowed if k in sel)
 
     return rec if all(well_formed(sel) for sel in rec["affects"]) else None
 
 
-def _exposure(contracts: Mapping[str, BehaviorContract], specs: Mapping[str, ProductProofSpec],
-              origins: Mapping[str, str | None]) -> dict[str, dict]:
-    """contract id -> what makes an approval given under the release `origins` names for it unsafe to carry over: the
-    capability changes of its probe between that release's version and this one's that select it, by the class the probe
-    observes the spec as and the contract's `subject_absence`. A contract no change selects is absent. Fail closed: a
-    version with no declared record, a probe that declares no version, or one that is not the release's probe selects
-    every contract of it; so does a class the probe cannot name."""
+def _assess(contracts: Mapping[str, BehaviorContract], specs: Mapping[str, ProductProofSpec],
+            origins: Mapping[str, str | None]) -> dict[str, dict]:
+    """contract id -> how it stands against the capability changes of its probe since the release `origins` names for
+    it: the probe, the class the probe observes the spec as, the capability versions from and to, `consulted` (each
+    version read, with the summary of its record and the number of selectors it declares) and `changes` (the ones that
+    select the contract, by that class and its `subject_absence`; empty: by the declarations, it is evaluated as it was).
+    A contract the plan names under this release's own ids, or one with no probe, is absent. Fail closed: a version with
+    no declared record, a probe that declares no version, or one that is not the release's probe selects every contract
+    of it; so does a class the probe cannot name."""
     active, registry, out = catalog.active(), catalog.registry(), {}
     for cid, c in contracts.items():
         name, entry, spec = origins.get(cid), active.get(c.subject.kind), specs.get(cid)
@@ -219,8 +234,10 @@ def _exposure(contracts: Mapping[str, BehaviorContract], specs: Mapping[str, Pro
         base = then[2] if then else 1
         top = entry.capability_version
         cls = registry.observation_class(spec.probe_id, spec.probe_digest, spec)
-        every = {"version": None, "when": "every use of the probe", "before": "as the earlier release evaluated it",
+        every = {"version": None, "ref": None, "when": "every use of the probe",
+                 "before": "as the earlier release evaluated it",
                  "after": "as this release evaluates it: the difference is not declared, so it is not ruled out"}
+        consulted: list[dict] = []
         if not isinstance(top, int) or isinstance(top, bool) or top < 1:
             hits = [{**every, "summary": f"{entry.probe_id} declares no capability version"}]
         elif then and then[0] != entry.probe_id:
@@ -231,17 +248,77 @@ def _exposure(contracts: Mapping[str, BehaviorContract], specs: Mapping[str, Pro
             for version in range(base + 1, top + 1):
                 rec = _declared(entry, version)
                 if rec is None:
+                    consulted.append({"version": version, "summary": None, "selectors": None})
                     hits.append({**every, "version": version, "summary": f"{entry.probe_id} capability {version} "
                                  "declares no well formed record of what it changed (CAPABILITY_CHANGES)"})
                     continue
-                hits += [{"version": version, "summary": rec["summary"], "when": sel["when"], "before": sel["before"],
-                          "after": sel["after"]} for sel in rec["affects"]
+                consulted.append({"version": version, "summary": rec["summary"], "selectors": len(rec["affects"])})
+                hits += [{"version": version, "ref": sel.get("ref"), "summary": rec["summary"], "when": sel["when"],
+                          "before": sel["before"], "after": sel["after"]} for sel in rec["affects"]
                          if (cls is None or "classes" not in sel or cls in sel["classes"])
                          and ("subject_absence" not in sel or c.subject_absence.value in sel["subject_absence"])]
-        if hits:
-            out[cid] = {"probe": entry.probe_id, "class": cls, "from": {"release": name, "capability_version": base},
-                        "to": {"capability_version": top}, "changes": hits}
+        out[cid] = {"probe": entry.probe_id, "class": cls, "from": {"release": name, "capability_version": base},
+                    "to": {"capability_version": top}, "consulted": consulted, "changes": hits}
     return out
+
+
+def _selected(assessed: Mapping[str, dict]) -> dict[str, dict]:
+    """The contracts of `_assess` that at least one change selects."""
+    return {name: how for name, how in assessed.items() if how["changes"]}
+
+
+def _exposure(contracts: Mapping[str, BehaviorContract], specs: Mapping[str, ProductProofSpec],
+              origins: Mapping[str, str | None]) -> dict[str, dict]:
+    """contract id -> what makes an approval given under the release `origins` names for it unsafe to carry over: `_assess`
+    of the contracts at least one declared (or undeclared) change selects. A contract no change selects is absent."""
+    return _selected(_assess(contracts, specs, origins))
+
+
+def _group(assessed: Mapping[str, dict], contracts: Mapping[str, BehaviorContract], name: str) -> tuple:
+    """What makes the grounds of two kept contracts one: the probe, the class, the contract's `subject_absence`, the release
+    and the capability versions its approval was read between. A contract `_assess` did not reach is "current"."""
+    how = assessed.get(name)
+    if how is None:
+        return ("current",)
+    return (how["probe"], how["class"], contracts[name].subject_absence.value, how["from"]["release"],
+            how["from"]["capability_version"], how["to"]["capability_version"])
+
+
+def _ground(how: Mapping | None, key: tuple) -> dict:
+    """The row of `_grounds` for the group `key` whose first contract `_assess` says `how` of."""
+    if how is None:
+        return {"probe": None, "class": None, "subject_absence": None, "from": {"release": "current"}, "to": None,
+                "consulted": [], "ground": "the plan names this release's own spec ids for these contracts: there is no "
+                                           "earlier release whose capability to compare"}
+    then, now = how["from"]["capability_version"], how["to"]["capability_version"]
+    return {"probe": how["probe"], "class": how["class"], "subject_absence": key[2], "from": how["from"], "to": how["to"],
+            "consulted": how["consulted"],
+            "ground": (f"capability {then} to {now}: {len(how['consulted'])} declared change(s) read, none selects class "
+                       f"{how['class']} under {key[2]}" if then != now else
+                       f"the probe is at capability {now}, the release's, and no change is declared for it: its version "
+                       "did not move, so nothing could be (see `limits`)")}
+
+
+def _grounds(kept: set[str], assessed: Mapping[str, dict], contracts: Mapping[str, BehaviorContract]) -> list[dict]:
+    """The ground for each approval kept, `kept` the ids of the contracts they approve: one row per group read the same
+    way (`_group`), the versions consulted among its fields, so that the owner sees what "no change selects it" was read
+    from. Pure: it builds rows and changes nothing it is given."""
+    keys = {name: _group(assessed, contracts, name) for name in sorted(kept)}
+    return [{**_ground(assessed.get(next(n for n in keys if keys[n] == key)), key),
+             "contracts": [n for n in keys if keys[n] == key]} for key in dict.fromkeys(keys.values())]
+
+
+#: what a kept approval rests on, and what the rule cannot see (the report's `limits`)
+LIMITS = (
+    "A kept approval rests on the identity rule of ARCHITECTURE-EXCEPTION-V2-007: the probe's id, capability version and "
+    "classes are the release's and no change declared for the versions between selects the contract. `migrate` reads "
+    "those declarations and runs no probe: a change made to a probe's behaviour without moving its CAPABILITY_VERSION and "
+    "declaring it in CAPABILITY_CHANGES is not seen, and a contract of such a probe is kept.",
+    "A selector sees a contract, never the repository it is evaluated against: a change whose `when` needs a condition of "
+    "the repository (an empty selection, a byte-order mark) selects the contracts that could meet it, whether or not the "
+    "repository does.",
+    "A bundle an earlier build of `migrate` wrote already names this release's spec ids and is read as approved under "
+    "this release: migrate again from the original bundle.")
 
 
 #: what identifies one approval among a bundle's: the contract and the requirement it binds, both hashes, who and when
@@ -252,22 +329,46 @@ def _key(a: Mapping) -> tuple:
     return tuple(a[k] for k in APPROVAL_KEY)
 
 
-def _quoted(word: str) -> str:
-    """`word` as one word of a POSIX shell line: as it is when it holds nothing a shell reads, else single-quoted."""
-    return word if re.fullmatch(r"[A-Za-z0-9_.,:/@%+=-]+", word) else "'" + word.replace("'", "'\\''") + "'"
-
-
 def _binds(ap: ContractApproval, requirements: Mapping[str, Requirement], contracts: Mapping[str, BehaviorContract]) -> bool:
     """`ap` binds a requirement and a contract of the bundle at their current hashes (and so is a ground to keep it)."""
     r, c = requirements.get(ap.requirement_id), contracts.get(ap.contract_id)
     return r is not None and c is not None and not binding_problems(ap, r, c)
 
 
+PLACEHOLDER = "human:NAME"      # the approver a printed command carries for its reader to replace; `approve` refuses it
+
+
+def with_commands(report: Mapping, out: pathlib.Path | None = None) -> dict:
+    """`report` (from `migrate`) with the commands that approve what the owner must approve again, one after the other:
+    the first reads the candidate (`out`, the file it is written to; `candidate.json` when none is given), each next the
+    file the one before wrote (`<stem>.approved-N<suffix>`, beside it), and `then` lints the last. Words as the operator's
+    shell reads them (`_shell_word`); the approver is the one thing left to them. Nothing here signs anything. Kept out of
+    `migrate` itself, which prints no command and reaches no shell quoting."""
+    todo = report["needs_owner_reapproval"]
+    if todo is None:
+        return dict(report)
+    first = out or pathlib.Path("candidate.json")
+    here, rows = first, []
+    for n, row in enumerate(todo["contracts"], 1):
+        nxt = first.with_name(f"{first.stem}.approved-{n}{first.suffix}")
+        rows.append({**row, "reads": str(here), "writes": str(nxt),
+                     "command": f"aisef bundle approve {_shell_word(here)} --contract {_shell_word(row['contract'])} "
+                                f"--approver {PLACEHOLDER} --out {_shell_word(nxt)}"})
+        here = nxt
+    return {**report, "needs_owner_reapproval": {
+        **todo, "contracts": rows, "then": f"aisef bundle lint {_shell_word(here)}",
+        "how": "nothing was signed. Each command writes a new file: the one it reads and one more approval, by the human "
+               f"named in --approver, who has read the contract and the change above. Replace {PLACEHOLDER} by `human:` and "
+               "your name (`approve` refuses the placeholder); run them in order, each reads what the one before wrote; "
+               "`then` lints the last."}}
+
+
 def migrate(data: Mapping) -> tuple[dict, dict]:
     """(the candidate bundle, the report). Refuses a bundle whose shape does not hold or whose plan names a spec that no
     known release compiles from one of its approved contracts. The candidate is a new bundle: its plan re-bound, and
     its approvals only those that still bind and whose contract no declared capability change evaluates differently
-    (module docstring); the input and its approvals are never written."""
+    (module docstring); the input and its approvals are never written. The commands that approve what it withholds are
+    `with_commands`'s."""
     if not isinstance(data, Mapping) or data.get("format") != B.FORMAT:
         raise MigrationError(f"not a project bundle of format {B.FORMAT}")
     B.shape_problems(data)
@@ -303,7 +404,8 @@ def migrate(data: Mapping) -> tuple[dict, dict]:
     out = {**dict(data), "plan": plain(new_plan)}
     B.load(out)     # the trial: the re-bound plan, with every approval of the input, loads under this release's probes
     by_id = {c.id: c for c in contracts}
-    exposed = _exposure(by_id, current, _origins(current, plan))
+    assessed = _assess(by_id, current, _origins(current, plan))
+    exposed = _selected(assessed)
     withheld = [(ap, "semantic" if ap.contract_id in exposed else "unbound") for ap in approvals
                 if ap.contract_id in exposed or not _binds(ap, requirements, by_id)]
     dropped = {_key(plain(ap)) for ap, _ in withheld}
@@ -319,31 +421,31 @@ def migrate(data: Mapping) -> tuple[dict, dict]:
     rows = [{"contract": ap.contract_id, "requirement": ap.requirement_id, "approver": ap.approver,
              "approved_at": ap.approved_at, "contract_hash": ap.contract_hash, "requirement_hash": ap.requirement_hash,
              "why": why} for ap, why in withheld]
-    changes = [{"contract": cid, "requirements": list(by_id[cid].requirement_ids), **e,
+    changes = [{"contract": cid, "requirements": list(by_id[cid].requirement_ids),
+                **e,
                 "subject": f"{by_id[cid].subject.kind.value} {by_id[cid].subject.locator}",
                 "subject_absence": by_id[cid].subject_absence.value, "polarity": by_id[cid].polarity.value,
                 "observable": by_id[cid].to_json()["observable"], "stimulus": by_id[cid].to_json()["stimulus"],
                 "approvals_in_input": [r for r in rows if r["contract"] == cid]} for cid, e in sorted(exposed.items())]
     reapprove = [{"contract": cid, "requirements": list(by_id[cid].requirement_ids),
-                  "contract_hash": by_id[cid].contract_hash,
-                  "command": f"aisef bundle approve BUNDLE.json --contract {_quoted(cid)} --approver human:NAME "
-                             "--out NEXT.json"} for cid in sorted(exposed)]
+                  "contract_hash": by_id[cid].contract_hash} for cid in sorted(exposed)]
+    kept = {ap["contract_id"] for ap in candidate["approvals"]}
     report = {"specs_rebound": len(mapped), "obligations": len(obligations), "mapping": mapped,
               "plan_hash": {"from": plan.plan_hash, "to": new_plan.plan_hash},
               "unchanged": [k for k in ("requirements", "contracts", "approvals", "facts", "stories",
                                         "requirements_document") if candidate[k] == data[k]],
-              "approvals_kept": len(candidate["approvals"]), "approvals_withheld": rows,
+              "approvals_kept": len(candidate["approvals"]),
+              "approvals_kept_grounds": _grounds(kept, assessed, by_id), "approvals_withheld": rows,
               "semantic_changes": changes,
-              "needs_owner_reapproval": {
-                  "contracts": reapprove,
-                  "how": "nothing was signed: each command writes a new bundle with one approval of the human named in "
-                         "--approver (`human:` and a name), who has read the contract and the change above. BUNDLE.json "
-                         "is the candidate for the first command and the --out of the one before for each next; NEXT.json "
-                         "is a new file. Then `aisef bundle lint` the last."} if reapprove else None,
+              "needs_owner_reapproval": {"contracts": reapprove} if reapprove else None,
               "candidate": {"bundle_digest": hashlib.sha256(B._canonical(candidate)).hexdigest(),
+                            "bundle_digest_is": "sha256 of the bundle's canonical JSON (sorted keys, no spaces), the "
+                                                "digest `load` gives the project; `file_sha256`, when the command wrote "
+                                                "the file, is the sha256 of that file's bytes",
                             "plan_id": new_plan.id, "plan_hash": new_plan.plan_hash, "contracts": len(contracts),
                             "approvals_kept": len(candidate["approvals"]), "contracts_to_approve": len(reapprove),
-                            "loads": not reapprove}}
+                            "loads": not reapprove},
+              "limits": list(LIMITS)}
     return candidate, report
 
 
@@ -402,7 +504,13 @@ def seal(authoring: Mapping, *, repo: pathlib.Path | None = None, approvals=(), 
     constructors; `approvals` (a bundle's) kept when they still bind both hashes, the others named as dropped. An
     approval whose contract is in `exposed` (`exposure_of` the bundle they come from: a declared capability change
     evaluates it differently since) binds and is still not kept: it is named in `approvals_withheld_semantic`, and the
-    contract is among `to_approve`. The baseline "HEAD" and the requirements document's sha256 are read from `repo`."""
+    contract is among `to_approve`. Approvals handed over without `exposed` are refused: kept by hash alone they would
+    outlive a capability change that evaluates their contract differently (`exposed={}` says that none does). The
+    baseline "HEAD" and the requirements document's sha256 are read from `repo`."""
+    approvals = tuple(approvals)
+    if approvals and exposed is None:
+        raise B.BundleError("approvals to keep come with `exposed` (exposure_of the bundle they are from): kept by their "
+                            "hashes alone they would outlive a capability change that evaluates their contract differently")
     _closed(authoring, AUTHORING_KEYS, "$")
     if authoring["format"] != AUTHORING_FORMAT:
         raise B.BundleError(f"$.format: {AUTHORING_FORMAT}")
@@ -507,7 +615,10 @@ def unapproved(bundle: Mapping) -> list[dict]:
 
 def approve(bundle: Mapping, contract_id: str, approver: str, at: float) -> dict:
     """The bundle with `approver`'s approval of `contract_id` against every requirement it cites (already binding
-    ones are not repeated). The kernel's ContractApproval refuses an approver that is not `human:<name>`."""
+    ones are not repeated). The kernel's ContractApproval refuses an approver that is not `human:<name>`; this refuses
+    the placeholder a printed command carries (`PLACEHOLDER`), which is no one."""
+    if approver == PLACEHOLDER:
+        raise B.BundleError(f"{PLACEHOLDER} is the placeholder of a printed command, not a person: write `human:` and your name")
     B.shape_problems(bundle)
     c = next((BehaviorContract.from_json(x) for x in bundle["contracts"] if x["id"] == contract_id), None)
     if c is None:
@@ -944,6 +1055,11 @@ def main(argv: list[str] | None = None) -> int:
             raise MigrationError(f"{a.out} exists: migrate writes a new file and never overwrites one")
         out, report = migrate(_read(a.bundle))
         _create(a.out, json.dumps(out, indent=1, sort_keys=True) + "\n")     # 2.0's bytes (non-ASCII escaped)
+        report = with_commands(report, a.out)
+        try:        # the bytes as written (a text file on Windows is not the text encoded)
+            report["candidate"]["file_sha256"] = hashlib.sha256(a.out.read_bytes()).hexdigest()
+        except OSError:
+            report["candidate"]["file_sha256"] = None
     except B.BundleError as e:
         print(f"refused: {e}", file=sys.stderr)
         return 2

@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import contextlib
 import dataclasses
+import hashlib
 import io
 import json
 import os
@@ -114,7 +115,10 @@ class ReportScopeStatement(_LedgerLock):
                 self.assertEqual(bundle_cli.main(["migrate", os.fspath(LEDGERLOCK_2_0_0), "--out",
                                                   os.fspath(target)]), 0)
             printed = json.loads(stdout.getvalue())
-            self.assertEqual(printed, {"written": os.fspath(target), **bundle_cli.migrate(self.fresh())[1]})
+            # the library's report, with the commands that name the file written and that file's own digest added
+            expected = bundle_cli.with_commands(bundle_cli.migrate(self.fresh())[1], target)
+            expected["candidate"]["file_sha256"] = hashlib.sha256(target.read_bytes()).hexdigest()
+            self.assertEqual(printed, {"written": os.fspath(target), **expected})
         self.assertLessEqual((self.DOCUMENTED - self.SELECTED) | self.ALSO_STATED, set(printed["unchanged"]))
         self.assertNotIn("approvals", printed["unchanged"])
 
