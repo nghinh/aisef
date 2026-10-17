@@ -1,6 +1,7 @@
 # AISEF 2.1 — Quyết định kiến trúc (nhánh `v2.1/foundation`, 2026-10-06)
 
-Nguồn: chỉ thị của chủ dự án trong phiên 2026-10-06 (đề xuất cải tiến + báo cáo 360°). Mỗi quyết định nêu: vấn đề đã đo,
+Nguồn: chỉ thị của chủ dự án trong phiên 2026-10-06 (đề xuất cải tiến + báo cáo 360°); "chỉ thị 2026-10-15, mục N" là chỉ thị lần
+thứ tư của ngày ấy, nguyên văn ở commit `8e6f583` của nhánh `v2.1/probe-window`, chưa nằm trong cây này (REPORT §0.9). Mỗi quyết định nêu: vấn đề đã đo,
 quyết định, phương án bị loại, hệ quả, và cái **không** tuyên bố. Giữ nguyên: một đường quyết định, taxonomy owner, journal
 format 3, ràng buộc candidate↔evidence, chính sách commit/rollback. Không viết lại khung, không nhập orchestrator ngoài.
 
@@ -45,10 +46,17 @@ Sửa byte mà không đổi điều quan sát ⇒ spec/approval/plan giữ nguy
 `CAPABILITY_VERSION` bằng tay (file_artifact đã lên 2 khi thêm `python_imports`).
 
 **Không tuyên bố:** digest khớp **không** chứng minh hai lần thực thi tương đương hành vi; băm AST cũng không. Bằng chứng là
-tương phản hiệu chuẩn trên fixture đã commit. Kỷ luật tăng version là trách nhiệm review, không máy nào kiểm.
+tương phản hiệu chuẩn trên fixture đã commit. Kỷ luật tăng version là trách nhiệm review, không máy nào kiểm: ba probe
+(`cli_invocation`, `process_effect`, `python_callable_v2`) đã đổi hành vi từ 2.0.0 mà `CAPABILITY_VERSION` vẫn 1 (quyết định
+mở D-2, USAGE-2.1 §2).
 
-**Di trú:** spec id của 2.0.0 đổi một lần → `aisef bundle migrate` (LedgerLock: 59 spec, 67 obligation, admit 9/9, không
-duyệt lại). Bằng chứng cũ giữ nguyên byte.
+**Di trú:** spec id của 2.0.0 đổi một lần → `aisef bundle migrate` buộc lại `plan` và ghi một bundle **ứng viên mới** (bản
+gốc không bị sửa). Một approval chỉ được mang sang khi nó còn buộc đúng hash **và** không có thay đổi capability đã khai báo
+(`CAPABILITY_CHANGES`) chọn trúng contract của nó (chỉ thị 2026-10-15, mục 1); approval của contract bị chọn bị giữ lại và
+là việc duyệt lại của chủ dự án. LedgerLock 2.0.0: 59 spec, 67 obligation; 53 trong 59 approval được giữ, **sáu** contract
+bị giữ lại (D-1: chủ dự án đã nêu bốn). Lần ghi trước, "admit 9/9, không duyệt lại", là phép đo trước khi `migrate` thôi
+giữ approval chỉ vì hash: ứng viên chưa nạp được cho tới khi sáu contract được duyệt lại, và admission thật chỉ chứng minh
+được sau khi hiệu chuẩn sinh lại. Bằng chứng cũ giữ nguyên byte.
 
 **Trạng thái của ngoại lệ:** **ĐÃ DUYỆT** — chủ dự án phê duyệt B-01 trong chat ngày 2026-10-06; kỹ thuật chép nguyên
 văn vào `closure-evidence/v2/cycle2/RELEASE-DECISIONS.json` (seq 4) theo chỉ thị của chủ dự án "Ghi quyết định này vào sổ
@@ -109,15 +117,25 @@ và `snapshot thiếu tệp → 4` không chặn.
 **Toàn vẹn.** Reviewer chụp HEAD và mọi tệp của checkout trước finder; so lại sau finder và sau các probe kiểm chứng. Đổi
 ⇒ bỏ mọi finding, CAPABILITY_UNRUNNABLE. Kiểm chứng chạy ở SHA đã chụp.
 
+**Trạng thái kiểm chứng của một finding** (cửa sổ probe, chỉ thị 2026-10-15 mục 3–4): `CONFIRMED` (probe bác hành vi đã nêu),
+`NOT_REPRODUCED` (**chỉ** khi probe `SATISFIED`), `INDETERMINATE` (probe chạy mà không quyết được), `UNVERIFIABLE` (không
+chạy được hay không quyết được vì công cụ: spec vô nghĩa, probe `UNRUNNABLE`, hết hạn, lồng quá 63 tầng). Chỉ `CONFIRMED`
+cùng ANCHORED chặn; một kiểm tra không thực hiện được hay không đủ kết luận không bao giờ là bằng chứng rằng finding
+không tái hiện. Một regex do reviewer (hay tác giả spec) cấp khớp trong một worker dưới `timeouts_s.probe`; hết hạn hay
+lỗi là `UNRUNNABLE`/`UNVERIFIABLE`, không bao giờ `REFUTED` hay `NOT_REPRODUCED`. Bản ghi cũ được đọc như đã viết.
+
 **OCR** (v1.12.12 = 182898c, Apache-2.0) là một finder, chạy như tiến trình ngoài: binary ghim theo sha256, route chỉ qua
 biến OCR_LLM_* (không `--provider`, không tệp cấu hình, HOME riêng), phạm vi do AISEF tính từ journal. Coverage do AISEF kiểm
 (module review_ocr). Không đủ ⇒ dưới `fix-loop`: CAPABILITY_UNRUNNABLE (lỗi provider ⇒ PROVIDER_UNAVAILABLE). Token của OCR
-vào ngân sách của run qua một luồng phiên; không báo token ⇒ "unaccounted" ⇒ run dừng chi tiêu. Settings **không có**
-`review` ⇒ luật 2.0.0 (advisory), ghi rõ trong record.
+vào ngân sách của run qua một luồng phiên; không báo token ⇒ "unaccounted" ⇒ run dừng chi tiêu. Danh tính binary
+(pin, rồi dòng `version` tự khai) được kiểm **hai lần**: ngay đầu `aisef run` (trước claim, clone, preflight và mọi phiên;
+từ chối có cấu trúc, mã thoát 2) và trước mọi lệnh review (kiểm soát lúc dùng, không bị lần nhìn sớm thay thế). Settings
+**không có** `review` ⇒ luật 2.0.0 (advisory), ghi rõ trong record.
 
-**Đã kiểm chứng:** offline với finder giả (6 nhóm trường hợp, `test_v21_review_chain`); với **nhị phân OCR thật** build từ
-commit đã ghim: preview, và một lượt review đầy đủ mà mô hình là server giả trên loopback (manifest thật COMPLETE theo luật
-của adapter, finding có reproducer được đọc). **Chưa:** mô hình thật.
+**Đã kiểm chứng:** offline với finder giả (6 nhóm trường hợp, `test_v21_review_chain`); với **nhị phân OCR thật** (sha256
+khớp pin; byte tái tạo được từ commit đã ghim trên một máy — REPORT §0.5, không nói ai dựng tệp ghim): preview, và một
+lượt review đầy đủ mà mô hình là server giả trên loopback (manifest thật COMPLETE theo luật của adapter, finding có
+reproducer được đọc). **Chưa:** mô hình thật.
 
 **Không tuyên bố:** neo không quyết định được một stimulus **mới** có thuộc điều kiện của mệnh đề hay không — reviewer gọi
 tệp hỏng là "lỗi I/O" (R-9/3) vẫn neo được (đo bằng `test_known_limit_a_new_stimulus_under_the_wrong_clause_anchors`).
@@ -138,10 +156,15 @@ thêm tệp claim). Quy tắc (module `aisef2/app/lineage.py`):
   nguyên tử.)*
 - **Đối soát.** Mọi thứ journal không xác nhận được nhận diện với git và danh tính thao tác của journal (merge của kernel
   cho candidate đã chứng minh; candidate trong worktree của kernel); không nhận diện được ⇒ từ chối trừ khi người vận hành
-  bỏ ra có tên. Request không có result mà luồng phiên tồn tại ⇒ chi phí unknown ⇒ không mở phiên trả tiền nào trừ khi
-  người vận hành chấp nhận (`--accept-unaccounted`, ghi lại). Chi tiêu đã biết của dòng dõi tính vào trần của run mới.
+  bỏ ra có tên. Request không có result mà luồng phiên *đọc được* ⇒ chi phí unknown ⇒ không mở phiên trả tiền nào trừ khi
+  người vận hành chấp nhận (`--accept-unaccounted`, ghi lại; quyết định mở R4). Bằng chứng *có mặt mà không đọc được*
+  (journal, ledger, luồng phiên, record hay claim; một journal đọc được mà không phải cái `RUN.json` nêu; một tổ tiên mà
+  record nêu nhưng thư mục đã mất) là chi phí chưa xác định mà **không cờ nào chấp nhận**: `aisef run --parent` từ chối
+  trước clone, admission và preflight, tổng chi phí là `null`, phần đã biết của từng run còn nguyên (chỉ thị 2026-10-15
+  mục 2). Chi tiêu đã biết của dòng dõi tính vào trần của run mới.
 - **Claim có thế hệ, quyết định bằng bằng chứng**, lấy trước request provider đầu tiên; child đã bắt đầu không bao giờ bị
-  thay thế; thay thế child chưa bắt đầu khi claimant chắc chắn đã mất hoặc khi người vận hành nêu sha256 của claim.
+  thay thế; thay thế child chưa bắt đầu khi claimant chắc chắn đã mất hoặc khi người vận hành nêu sha256 của claim — lời
+  khẳng định ấy thay *claim*, không làm biết chi tiêu của một child mà bằng chứng không đọc được.
 - `RUN.started.json` cho phép nối tiếp một lượt bị giết trước khi ghi record. `usage` của mỗi run chỉ đếm luồng phiên của
   nó; `lineage_usage` cộng mỗi run một lần; chi phí của run bị giết không bao giờ `known`.
 
