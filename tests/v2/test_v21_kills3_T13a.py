@@ -334,7 +334,10 @@ class WholeRun(unittest.TestCase):
         """A lineage with unknown spend starts no paid work unless the operator accepts it: the refusal carries the
         recovery instruction and every entry the operator is asked to accept, each recognisable as one entry.
         Pins aisef2/app/run.py::execute [333]"""
-        parent = self.predecessor("unknown-spend")
+        # a run killed before its record: two sessions that started and finished no step. (With the finished run's own
+        # RUN.json, which records the steps these streams once held, the cut streams are evidence that is gone — unread,
+        # accepted by nothing: tests/v2/test_v21_x_lineage_gone.py)
+        parent = self.predecessor("unknown-spend", "RUN.json")
         for log in sorted((parent / "sessions").glob("*.jsonl")):     # both sessions started; no step ever finished
             log.write_text(json.dumps({"type": "text", "part": {"text": "cut"}}) + "\n", encoding="utf-8")
         unknown = lineage.account_of(parent)["unaccounted"]

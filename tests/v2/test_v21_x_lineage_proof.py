@@ -35,9 +35,10 @@ NOT pinned here — each is an open decision for the owner, stated in the lane's
 * A child that a claim names and whose directory is not there is UNBEGUN and spent nothing there (the claim lifecycle,
   tests/v2/test_v21_continue_integrity.py::ClaimLifecycle): a child that vanished may have begun and spent, and the
   lineage counts it as 0 (`RunsTheLineageNamesAndThatAreNotThere` pins what IS, as a control).
-* A `sessions` directory or a preflight ledger in a wrong shape (a link to nothing, a file) or missing beside a journal
-  that records answered requests is read as no tokens and no turns (tests/v2/test_v21_defects_lineage2.py pins the former
-  for `sessions`): the requests are counted from the journal, the tokens are not known.
+* (Closed by the owner's decision of 2026-10-15, round 2: tests/v2/test_v21_x_lineage_gone.py.) A `sessions` directory or
+  a preflight ledger missing beside a journal that records answered requests was read as no tokens and no turns: the run's
+  record, or the answered requests with no stream, now make that run unread. What stays as it was
+  (tests/v2/test_v21_defects_lineage2.py): the same shapes beside a request in flight, which the pins there keep known.
 
 Offline and deterministic; the full-run classes use the fake client of tests/v2/test_app_run.py. Nothing here deletes or
 kills (INV-MUTATION-AUTHORITY): the temporary directories are the framework's."""
@@ -50,6 +51,7 @@ import io
 import json
 import os
 import pathlib
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -91,12 +93,17 @@ class Hand(unittest.TestCase):
         return self.root
 
     def run_dir(self, name: str, requests: int = 1, continues: pathlib.Path | None = None, *, journal: bool = True,
-                in_flight: bool = False, stream: bool = False, records: bool = True, seal: bool = False) -> pathlib.Path:
-        """`requests` provider requests journaled and answered; `in_flight`: the last one has no result, and every
-        request has its session stream (7 + 3 tokens) — more streams than answers: unknown spend that READS; `stream`:
-        a session stream of one finished step — the first request's, answered; `records=False`: neither RUN.started.json
-        nor RUN.json (the test puts what it needs there: a link, say); `seal`: RUN.json names the journal as the run
-        left it (its digest and length, as `run._journal_info` writes them)."""
+                in_flight: bool = False, stream: bool = False, streams: bool = True, records: bool = True,
+                seal: bool = False) -> pathlib.Path:
+        """`requests` provider requests journaled and answered, each with the session stream a run leaves for it (one
+        finished step, 7 + 3 tokens: a journal that records an answered request with no stream to stand for it is evidence
+        that is gone, which `EvidenceThatIsGone` makes and this fixture must not); `in_flight`: the last one has no result
+        — more streams than answers: unknown spend that READS; `stream`: a stream for the first request, which is all
+        there was before `streams` (default: a stream for every request); `streams=False` is for a test whose journal is
+        the evidence under test and is cut, emptied or unreadable — it is unknown on its own and the streams add findings
+        of their own that the test does not count; `records=False`: neither RUN.started.json nor RUN.json (the test puts
+        what it needs there: a link, say); `seal`: RUN.json names the journal as the run left it (its digest and length,
+        as `run._journal_info` writes them)."""
         run = self.root / name
         run.mkdir()
         if journal:
@@ -111,9 +118,10 @@ class Hand(unittest.TestCase):
                                                      "detail": "answered"}, source_seqs=(e.seq,))
             finally:
                 w.close()
-        if stream or in_flight:
+        every = in_flight or (journal and streams)
+        if stream or every and requests:
             (run / "sessions").mkdir()
-            for n in range(1, (requests if in_flight else 1) + 1):
+            for n in range(1, (requests if every else 1) + 1):
                 (run / "sessions" / f"S1.developer.{n}.jsonl").write_text(STEP, encoding="utf-8")
         rec = {"continues": {"path": str(continues)}} if continues else {}
         if records:
@@ -185,7 +193,7 @@ class KnownAndTotal(Hand):
         self.assertEqual(got["total"]["provider_requests"], 5)
 
     def test_a_part_that_cannot_be_read_is_unknown_the_known_part_stays_exact_and_the_total_is_none(self):
-        r1 = self.run_dir("run1", 3, stream=True)
+        r1 = self.run_dir("run1", 3, stream=True, streams=False)
         (r1 / lineage.JOURNAL).write_bytes(NOT_TEXT)
         r2 = self.run_dir("run2", 2, continues=r1)
         got = lineage.lineage_account(r2, self.root / "out")
@@ -298,9 +306,10 @@ class RecordsAndClaimsThatDoNotRead(Hand):
 
     def test_a_run_with_no_record_at_all_continues_nothing_as_before(self):
         r1 = self.run_dir("run1", 3)
-        bare = self.root / "bare"     # the same journal, and neither RUN.started.json nor RUN.json
+        bare = self.root / "bare"     # the same journal and streams, and neither RUN.started.json nor RUN.json
         (bare / lineage.JOURNAL).parent.mkdir(parents=True)
         (bare / lineage.JOURNAL).write_bytes((r1 / lineage.JOURNAL).read_bytes())
+        shutil.copytree(r1 / "sessions", bare / "sessions")
         got = lineage.lineage_account(bare)
         self.assertEqual((got["unaccounted"], got["unread"]), ([], []))
         self.assertEqual(got["total"]["provider_requests"], 3)
@@ -578,7 +587,7 @@ class JournalThatIsNotTheOneTheRecordNames(UnreadAsserts):
         for name, cut in self.CUTS.items():
             with self.subTest(name):
                 self.fresh(name)
-                r1 = self.run_dir("run1", 3, seal=True)
+                r1 = self.run_dir("run1", 3, seal=True, streams=False)
                 (r1 / lineage.JOURNAL).write_bytes(cut((r1 / lineage.JOURNAL).read_bytes()))
                 got = lineage.account_of(r1)
                 self.assertEqual(got["unread"], got["unaccounted"])

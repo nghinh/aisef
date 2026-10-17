@@ -959,10 +959,12 @@ def continue_from(data: Mapping, run_dir: pathlib.Path, *, leave_out_unidentifie
                                ({"superseded": True} if r.get("superseded") else {}) for r in account["runs"]],
               "unaccounted": account["unaccounted"], "unread": account["unread"],
               "run_parent_refused": None if not account["unread"] else
-              "evidence of the lineage is there and cannot be read, so what it spent is not known (not 0): `aisef run "
-              "--parent` starts no paid work (no flag accepts it) until it is readable again — its permissions, or a "
-              f"faithful copy of the run directory at {lineage.unread_runs(account)}; where that cannot be done this lineage "
-              "cannot be continued (a run without --parent inherits nothing): " + "; ".join(account["unread"])[:1000],
+              "evidence of the lineage cannot be read, or the run's own record or journal shows it was there and it is "
+              "gone, so what it spent is not known (not 0): `aisef run --parent` starts no paid work (no flag accepts it) "
+              "until it is readable again — its permissions, or a faithful copy of the run directory at "
+              f"{lineage.unread_runs(account)} (a sessions directory, a session stream or the preflight's ledger that is "
+              "gone comes back from such a copy); where that cannot be done this lineage cannot be continued (a run "
+              "without --parent inherits nothing): " + "; ".join(account["unread"])[:1000],
               "in_flight": None if not reconciled["items"] else
               f"{len(reconciled['items'])} effect(s) the journal does not confirm are left out of the continuation's "
               f"baseline {baseline[:12]} (each identified in `unconfirmed`); their stories run again",

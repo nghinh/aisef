@@ -75,11 +75,13 @@ def setUpModule() -> None:
 
 
 def twin(name: str, *, manifest: bool = True) -> pathlib.Path:
-    """A run directory of its own, `name`, that is the real run seen as: its journal and clone linked, its record and
-    start record copied, and its evidence manifest copied when `manifest` (a run killed before it wrote one without)."""
+    """A run directory of its own, `name`, that is the real run seen as: its journal, clone and the evidence its record
+    counts (the session streams and the preflight's ledger: a record that holds spend whose evidence is not there is a run
+    whose cost is unknown, and `bundle continue` then sends the operator to restore it) linked, its record and start
+    record copied, and its evidence manifest copied when `manifest` (a run killed before it wrote one without)."""
     d = pathlib.Path(tempfile.mkdtemp(dir=W.tmp)) / name      # a parent of its own: `name` is its last component
     d.mkdir()
-    for link in ("run", "repo"):
+    for link in ("run", "repo", "sessions", "preflight"):
         os.symlink(W.first / link, d / link)
     for kept in ("RUN.json", R.STARTED, *((R.MANIFEST,) if manifest else ())):
         shutil.copyfile(W.first / kept, d / kept)

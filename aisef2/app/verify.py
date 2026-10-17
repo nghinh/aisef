@@ -87,7 +87,8 @@ def _spend(out: pathlib.Path, s: settings.Settings, events: list[dict], rec: dic
     b = client.Budget(s.budget, base, out / "sessions", lambda: requests, inherited)
     cannot = None
     if inherited is not None and inherited["unread"]:
-        cannot = ("the lineage's evidence cannot be read now, so the spend the record inherited cannot be re-derived "
+        cannot = ("the lineage's evidence cannot be read now (or is gone: its run's own record shows more than it holds), "
+                  "so the spend the record inherited cannot be re-derived "
                   f"(restore it — its permissions, or a faithful copy of the run directories at {lineage.unread_runs(inherited)}"
                   " — and verify again): " + "; ".join(inherited["unread"])[:600])
     return b.spend(), None if cannot else b.exceeded(), cannot
