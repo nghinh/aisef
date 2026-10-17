@@ -64,3 +64,28 @@ go.sum bỏ đi, GOFLAGS=-mod=mod, go list -deps ./cmd/opencodereview trên bả
 exit=0; go.mod không đổi; go.sum mới = 168 dòng
 dòng của go.sum mới KHÔNG có trong go.sum của upstream: 0
 tệp tra cứu sumdb trong cache: 84 (một cho mỗi phụ thuộc)
+
+== LƯỢT RÀ SOÁT 2026-10-17 (giờ UTC; $W2 = $W/replay, đã xoá). Đo thêm; các dòng ở trên không đổi.
+toolchain (chỉ đọc): GOROOT=/opt/homebrew/Cellar/go/1.26.5/libexec; VERSION = go1.26.5, time 2026-07-01T21:24:27Z
+  sha256 go 3f947495f00cb7f8088a5cfd694da8dc43869b33f5e7377b048fb18922ffb7e0; compile a4b63e08...7f2a1e; link 9bb5a9fb...6d5e98
+  (đầy đủ trong PROVENANCE.md mục 9); Homebrew bottle cài 2026-08-01 19:53 (mtime Cellar/go/1.26.5)
+git: origin/HEAD = 11ac6d4c57082f310067a4a1654ad5b63cb57410; fsck --connectivity-only: chỉ dòng 'dangling'; commit có gpgsig: 1; tag có khối SSH SIGNATURE
+
+== đối chứng từ src-b (ngoại tuyến, GOCACHE gocache-b)  11:37:35Z - 11:38:06Z
+c1b  -trimpath, BuildDate 00:00:01Z : bc1b50646c503eee6267b7b26652288168db3dcbc4b90e7ccede937da3c4895c  55014610 byte   = c1 (từ src)
+c2b  không -trimpath               : bafc4fdcad762aeb36ccb949e383b6aa7a44b2cbfd3f69ba62cf42a59cfd5534  55245778 byte   != c2 (4b52379a...69ed, từ src)
+đường dẫn tuyệt đối trong binary (grep -a -o, số lần): chuỗi 'ocr-build-2/src/' | 'ocr-build-2/src-b/' | 'ocr-build-2/gomodcache/'
+  bin/ocr-pinned 0 | 0 | 0     out-a 0 | 0 | 0     out-c2 117 | 0 | 1297     out-c2b 0 | 117 | 1297
+src-b: HEAD = pin, 0 tệp thay đổi trước và sau
+
+== replay bằng build-commands.sh đã sửa, /bin/bash 3.2.57, thư mục mới $W2 (src, src-b = git clone cục bộ từ $W/src rồi checkout --detach pin;
+   gomodcache = cp -R; GOCACHE nguội mới; bước 2, 3, 6 cần mạng: KHÔNG chạy)  11:40:13Z - ~11:42:58Z, exit 0, 2:45 tổng
+bước 1  sha256 binary sao chép = bf38abf3...04af7
+bước 4  out-a = out-b = bf38abf320ead4e106b71c15824463640207118f38e1c10c28a73b6839104af7 (55014610 byte); cmp với binary ghim: trùng cả hai
+bước 5  c1  = bc1b50646c503eee6267b7b26652288168db3dcbc4b90e7ccede937da3c4895c  55014610 byte (trùng c1 lượt đầu)
+        c2  = a0ebc754dc98db4dd9c9595ff0bc4667df45a497b8e0a6b7ff4f9434a1576055  55262290 byte (khác c2 lượt đầu)
+bước 7  inspect_binary.py (env -i, TMPDIR trong $W2): c_rebuilt.status = IDENTICAL; so với ocr-provenance.json đã commit, chỉ khác 4 trường:
+        binary.path, c_rebuilt.argv[7] (tên thư mục tạm), checked_at, tool.tree
+bước 8  c1b = bc1b50646c503eee6267b7b26652288168db3dcbc4b90e7ccede937da3c4895c  55014610 byte (trùng c1)
+        c2b = 08db280af7ccf404457be9673155b7ea9644ec2a4d4ec476846c4ca414c927d2  55262290 byte (khác c2, c2b-lượt-trước, c2-replay)
+đĩa: 17 GiB trước, 11 GiB sau, 15 GiB sau khi xoá $W2. Nhật ký và JSON của replay: ocr-build-2/logs/replay-2026-10-17.log, ocr-provenance-replay-2026-10-17.json
