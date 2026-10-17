@@ -10,10 +10,11 @@ word was "1 sessions were started but 0 provider requests are recorded", the cau
 then started paid work on a count of provider requests that was a guess.
 
 What is not there is still a run that spent nothing there (no journal and no record; a record of a run that ended before
-it began; a first line cut — no event was ever appended, so no request); a link to nothing or a file in a directory's
-place is what `_look` has always called "not there" for spend (nothing was spent THERE). Every reading of the journal
-that was there and failed is listed with its cause, and a continuation then starts no paid work until the operator accepts
-it by name (`--accept-unaccounted`).
+it began; a first line cut — no event was ever appended, so no request); a run directory that is not there, or is not a
+directory, is "not there" for spend (nothing was spent THERE; a journal that is a link to nothing, or a file in a
+directory's place, in a run directory that is there is a journal that is there and cannot be read:
+tests/v2/test_v21_x_lineage_proof.py). Every reading of the journal that was there and failed is listed with its cause, and
+a continuation then starts no paid work at all — no flag accepts evidence that cannot be read (the same file).
 
 Kept apart from the rest of the lane's tests on purpose: the owner's approval text listed `account_of` among what does not
 change; this is the one place the lane changes it, as a restoration of the module's own documented rule, and the change is
@@ -104,7 +105,7 @@ class AJournalThatIsThereAndCannotBeReadIsUnknownSpend(Lineage):
 
     def test_the_lineage_lists_the_spend_of_a_superseded_child_it_cannot_read(self):
         """The operator asserted the claim; the child's journal is still there and still unread: what it spent is
-        unknown, and it is in the lineage's account (the continuation then needs `--accept-unaccounted`)."""
+        unknown, and it is in the lineage's account (the continuation then starts no paid work: no flag accepts it)."""
         self.put_journal(b"\xff\xfe\x00 not text\n")
         claimed = self.claim_by(self.child)
         sha = hashlib.sha256(claimed).hexdigest()
