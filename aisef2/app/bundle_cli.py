@@ -2,11 +2,14 @@
 
     aisef bundle init [--example NAME] --out DIR            an example to start from: DIR/authoring.json, DIR/repo/
     aisef bundle seal AUTHORING.json --repo REPO --out B    every hash and spec id computed: the bundle, unapproved
-                     [--keep-approvals-from OLD]            (an earlier bundle's approvals that still bind are kept)
+                     [--keep-approvals-from OLD]            (an earlier bundle's approvals that still bind are kept,
+                                                             unless their contract's evaluation changed since)
     aisef bundle approve B --contract ID --approver human:NAME --out B2    one contract approved, by its human
     aisef bundle lint B                                     approvals, admission (RFC §12), calibration, clause coverage
     aisef bundle explain B                                  per story: each criterion, its contract, probe and class
-    aisef bundle migrate IN --out OUT     a bundle of an earlier release, its plan re-bound to this release's spec ids
+    aisef bundle migrate IN --out OUT     a bundle of an earlier release, its plan re-bound to this release's spec ids;
+                     the candidate it writes is new and carries only the approvals whose contract still means what it
+                     meant (the others are named, with the command that approves each — it signs nothing)
     aisef bundle continue B --from-run DIR [--expect-anchor A] --out B2   the stories DIR's run did not commit,
                      from what it did commit
 
@@ -51,14 +54,30 @@ READY), 1 lint NOT_READY, 2 refused input.
 `migrate` — V2.1 (ARCHITECTURE-EXCEPTION-V2-007): a ProductProofSpec binds its probe's capability (id, version, classes), no longer
 the bytes of its source. A bundle written for 2.0.0 names spec ids compiled under 2.0.0's source digests, so its plan
 names specs this release does not compile; `migrate` re-binds each obligation to the spec its own approved contract
-compiles to now. The contracts, approvals, requirements and facts are untouched — nothing is re-approved, because the
-contract semantics an approval binds did not change. An obligation whose spec no known release compiles from one of
-the bundle's approved contracts is refused, never guessed. The input is never written."""
+compiles to now. The contracts, requirements and facts are untouched. An obligation whose spec no known release
+compiles from one of the bundle's approved contracts is refused, never guessed. The input is never written.
+
+An approval binds a contract's hash, and a hash does not change when the probe's capability does. So `migrate` keeps
+an approval only while the contract it approved is still evaluated as it was when the owner approved it (owner
+decision 2026-10-15, item 1): for each contract whose spec came from an earlier release it reads the capability versions
+between that release's (`RELEASES`) and this one's, and the changes each probe declares for them (`CAPABILITY_CHANGES`
+in the probe module, copied by the catalog); a change that selects the contract — by its observation class and its
+`subject_absence`, derived from the probe, no contract is named — withholds its approvals from the candidate, which is a
+new bundle; the input and its approvals stay as they were, as history. A capability change nobody declared selects every
+contract of its probe, and so does a probe that declares no version: the mechanism sees only what a probe says it
+changed between two numbers, never a change made without one. An approval that no longer binds its requirement and
+contract hashes is not carried either. The report says what differs and when (`semantic_changes`),
+what the owner must approve again, by which command and signing nothing (`needs_owner_reapproval`), and which bundle
+this is (`candidate`). Exit status 0 is a migration performed: the candidate does not load until its withheld
+contracts are approved, and `lint` says so (NOT_READY). `seal --keep-approvals-from` applies the same rule to the
+approvals it keeps (`approvals_withheld_semantic`). Limit: a bundle an earlier build of `migrate` already wrote carries
+its approvals as they were and says nothing of it — migrate again from the original, which is never modified."""
 
 from __future__ import annotations
 
 import argparse
 import dataclasses
+import hashlib
 import json
 import pathlib
 import re
@@ -84,14 +103,17 @@ CONTRACT_KEYS = ("id", "requirement_ids", "subject", "stimulus", "observable", "
 CRITERION_KEYS = ("id", "contract", "role", "depends_on", "why", "facts")
 EXAMPLES = pathlib.Path(__file__).resolve().parent / "examples"      # <name>.json: {readme, authoring, repo: {path: text}}
 
-#: what each earlier release compiled specs under: its active probes' digests and its compiler digest (2.0.0 =
-#: tag v2.0.0 at ca26313: the source digests its shipped calibrations name; the compiler is unchanged since)
+#: what each earlier release compiled specs under: its active probes' (id, digest, capability version) and its compiler
+#: digest (2.0.0 = tag v2.0.0 at ca26313: the source digests its shipped calibrations name; the compiler is unchanged
+#: since). The capability version is the probe's CAPABILITY_VERSION counted from the release that introduced it:
+#: 2.0.0 predates the counter and is version 1 for each probe — the classes it observed are the classes version 1 names
+#: (file_artifact: exists, content, grep_count; python_callable_v2, cli_invocation and process_effect as they are).
 RELEASES: Mapping[str, dict] = {
     "2.0.0": {"compiler_digest": "f31a4602a61d412d834890f46dcc9ca4d0ce240a106a4772dc9a1e8e7fb8ea76",
-              "probes": {SubjectKind.FILE_ARTIFACT: ("probe.file_artifact", "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901"),
-                         SubjectKind.PYTHON_CALLABLE: ("probe.python_callable_v2", "b1f25878d350b7848caddd8be01f09da63066876d5b3adb71af61ed9d874b3ae"),
-                         SubjectKind.CLI_INVOCATION: ("probe.cli_invocation", "d42449fd8e3ac428758b78d2136e3f2280c2c97223385cdd4d87ec5885572f3f"),
-                         SubjectKind.PROCESS_EFFECT: ("probe.process_effect", "815e4c865274d43a7c0467e3af3fbceb67f9086a84eb8f3d2074e43ac16f9273")}},
+              "probes": {SubjectKind.FILE_ARTIFACT: ("probe.file_artifact", "31465b73cbe2440e0e9f6b418665b6f4b1682ee7da2b8968357709daea5e5901", 1),
+                         SubjectKind.PYTHON_CALLABLE: ("probe.python_callable_v2", "b1f25878d350b7848caddd8be01f09da63066876d5b3adb71af61ed9d874b3ae", 1),
+                         SubjectKind.CLI_INVOCATION: ("probe.cli_invocation", "d42449fd8e3ac428758b78d2136e3f2280c2c97223385cdd4d87ec5885572f3f", 1),
+                         SubjectKind.PROCESS_EFFECT: ("probe.process_effect", "815e4c865274d43a7c0467e3af3fbceb67f9086a84eb8f3d2074e43ac16f9273", 1)}},
 }
 
 
@@ -124,9 +146,128 @@ def _earlier(spec: ProductProofSpec, release: dict) -> str | None:
                                    compiler_id=spec.compiler_id, compiler_digest=release["compiler_digest"]).id
 
 
+def _known(specs: Mapping[str, ProductProofSpec]) -> tuple[dict[str, str], dict[str, str]]:
+    """(spec id -> the id this release compiles it to, spec id -> the release that compiled it) over `specs` (contract id
+    -> the spec this release compiles it to): this release's own ids, then each earlier release's in order — an id two
+    releases compile keeps the first attribution."""
+    known = {s.id: s.id for s in specs.values()}
+    origin = {s.id: "current" for s in specs.values()}
+    for name, release in RELEASES.items():
+        for s in specs.values():
+            old = _earlier(s, release)
+            if old is not None and old not in known:
+                known[old], origin[old] = s.id, name
+    return known, origin
+
+
+def _earliest(names) -> str | None:
+    """The earliest of release names (`RELEASES` order, "current" after them all), None for none."""
+    order = [*RELEASES, "current"]
+    return min(names, key=order.index, default=None)
+
+
+def _origins(specs: Mapping[str, ProductProofSpec], plan: Plan) -> dict[str, str | None]:
+    """contract id -> the release whose spec ids the plan names for it (the earliest, when two): a name of RELEASES, or
+    "current". A contract no obligation names takes the bundle's earliest, and None (unknown) when the plan names none
+    that a release compiles: a contract nobody evaluates is not known to be approved under this release."""
+    known, origin = _known(specs)
+    contract_of = {s.id: cid for cid, s in specs.items()}
+    named: dict[str, set[str]] = {}
+    for o in plan.obligations:
+        new = known.get(o.product_proof_spec_id)
+        if new is not None:
+            named.setdefault(contract_of[new], set()).add(origin[o.product_proof_spec_id])
+    bundle_wide = _earliest(n for names in named.values() for n in names)
+    return {cid: _earliest(named.get(cid, ())) or bundle_wide for cid in specs}
+
+
+def _declared(entry, version: int) -> Mapping | None:
+    """The record of what capability `version` of `entry`'s probe changed, or None when the probe declares none or one that
+    is not well formed (`summary`; `affects`: selectors of `classes` / `subject_absence`, each with `when`, `before`,
+    `after`). What is not declared is not "nothing changed": the caller reads it as changing every contract of the probe."""
+    rec = (entry.capability_changes or {}).get(version)
+    if not isinstance(rec, Mapping) or set(rec) != {"summary", "affects"} or not isinstance(rec["summary"], str) \
+            or not rec["summary"] or not isinstance(rec["affects"], (tuple, list)):
+        return None
+    allowed = {"classes": set(entry.classes), "subject_absence": {a.value for a in SubjectAbsence}}
+
+    def well_formed(sel) -> bool:
+        if not isinstance(sel, Mapping) or not {"when", "before", "after"} <= set(sel) \
+                or not set(sel) <= {"classes", "subject_absence", "when", "before", "after"}:
+            return False
+        if not all(isinstance(sel[k], str) and sel[k] for k in ("when", "before", "after")):
+            return False
+        return all(isinstance(sel[k], (tuple, list)) and sel[k] and set(sel[k]) <= allowed[k]
+                   for k in allowed if k in sel)
+
+    return rec if all(well_formed(sel) for sel in rec["affects"]) else None
+
+
+def _exposure(contracts: Mapping[str, BehaviorContract], specs: Mapping[str, ProductProofSpec],
+              origins: Mapping[str, str | None]) -> dict[str, dict]:
+    """contract id -> what makes an approval given under the release `origins` names for it unsafe to carry over: the
+    capability changes of its probe between that release's version and this one's that select it, by the class the probe
+    observes the spec as and the contract's `subject_absence`. A contract no change selects is absent. Fail closed: a
+    version with no declared record, a probe that declares no version, or one that is not the release's probe selects
+    every contract of it; so does a class the probe cannot name."""
+    active, registry, out = catalog.active(), catalog.registry(), {}
+    for cid, c in contracts.items():
+        name, entry, spec = origins.get(cid), active.get(c.subject.kind), specs.get(cid)
+        if name == "current" or entry is None or spec is None:
+            continue
+        then = RELEASES.get(name, {}).get("probes", {}).get(c.subject.kind) if name else None
+        base = then[2] if then else 1
+        top = entry.capability_version
+        cls = registry.observation_class(spec.probe_id, spec.probe_digest, spec)
+        every = {"version": None, "when": "every use of the probe", "before": "as the earlier release evaluated it",
+                 "after": "as this release evaluates it: the difference is not declared, so it is not ruled out"}
+        if not isinstance(top, int) or isinstance(top, bool) or top < 1:
+            hits = [{**every, "summary": f"{entry.probe_id} declares no capability version"}]
+        elif then and then[0] != entry.probe_id:
+            hits = [{**every, "summary": f"the release evaluated this contract with {then[0]} and this one with "
+                                         f"{entry.probe_id}: their capabilities are not comparable"}]
+        else:
+            hits = []
+            for version in range(base + 1, top + 1):
+                rec = _declared(entry, version)
+                if rec is None:
+                    hits.append({**every, "version": version, "summary": f"{entry.probe_id} capability {version} "
+                                 "declares no well formed record of what it changed (CAPABILITY_CHANGES)"})
+                    continue
+                hits += [{"version": version, "summary": rec["summary"], "when": sel["when"], "before": sel["before"],
+                          "after": sel["after"]} for sel in rec["affects"]
+                         if (cls is None or "classes" not in sel or cls in sel["classes"])
+                         and ("subject_absence" not in sel or c.subject_absence.value in sel["subject_absence"])]
+        if hits:
+            out[cid] = {"probe": entry.probe_id, "class": cls, "from": {"release": name, "capability_version": base},
+                        "to": {"capability_version": top}, "changes": hits}
+    return out
+
+
+#: what identifies one approval among a bundle's: the contract and the requirement it binds, both hashes, who and when
+APPROVAL_KEY = ("contract_id", "requirement_id", "contract_hash", "requirement_hash", "approver", "approved_at")
+
+
+def _key(a: Mapping) -> tuple:
+    return tuple(a[k] for k in APPROVAL_KEY)
+
+
+def _quoted(word: str) -> str:
+    """`word` as one word of a POSIX shell line: as it is when it holds nothing a shell reads, else single-quoted."""
+    return word if re.fullmatch(r"[A-Za-z0-9_.,:/@%+=-]+", word) else "'" + word.replace("'", "'\\''") + "'"
+
+
+def _binds(ap: ContractApproval, requirements: Mapping[str, Requirement], contracts: Mapping[str, BehaviorContract]) -> bool:
+    """`ap` binds a requirement and a contract of the bundle at their current hashes (and so is a ground to keep it)."""
+    r, c = requirements.get(ap.requirement_id), contracts.get(ap.contract_id)
+    return r is not None and c is not None and not binding_problems(ap, r, c)
+
+
 def migrate(data: Mapping) -> tuple[dict, dict]:
-    """(the re-bound bundle, the report). Refuses a bundle whose shape does not hold or whose plan names a spec that no
-    known release compiles from one of its approved contracts."""
+    """(the candidate bundle, the report). Refuses a bundle whose shape does not hold or whose plan names a spec that no
+    known release compiles from one of its approved contracts. The candidate is a new bundle: its plan re-bound, and
+    its approvals only those that still bind and whose contract no declared capability change evaluates differently
+    (module docstring); the input and its approvals are never written."""
     if not isinstance(data, Mapping) or data.get("format") != B.FORMAT:
         raise MigrationError(f"not a project bundle of format {B.FORMAT}")
     B.shape_problems(data)
@@ -144,14 +285,7 @@ def migrate(data: Mapping) -> tuple[dict, dict]:
             current[c.id] = compile_spec(c, requirements=requirements, approvals=approvals, probes=refs)
         except ValueError as e:
             raise MigrationError(f"contract {c.id} does not compile: {e}") from e
-    now = {s.id: s.id for s in current.values()}
-    known = dict(now)
-    origin = {s.id: "current" for s in current.values()}
-    for name, release in RELEASES.items():
-        for s in current.values():
-            old = _earlier(s, release)
-            if old is not None and old not in known:
-                known[old], origin[old] = s.id, name
+    known, origin = _known(current)
     obligations, mapped, unknown = [], {}, []
     for o in plan.obligations:
         new = known.get(o.product_proof_spec_id)
@@ -167,11 +301,50 @@ def migrate(data: Mapping) -> tuple[dict, dict]:
     new_plan = Plan.create(id=plan.id, baseline=plan.baseline, obligations=tuple(obligations),
                            plan_quality_policy=plan.plan_quality_policy)
     out = {**dict(data), "plan": plain(new_plan)}
-    B.load(out)     # the result loads, every seal re-checked, under this release's probes
+    B.load(out)     # the trial: the re-bound plan, with every approval of the input, loads under this release's probes
+    by_id = {c.id: c for c in contracts}
+    exposed = _exposure(by_id, current, _origins(current, plan))
+    withheld = [(ap, "semantic" if ap.contract_id in exposed else "unbound") for ap in approvals
+                if ap.contract_id in exposed or not _binds(ap, requirements, by_id)]
+    dropped = {_key(plain(ap)) for ap, _ in withheld}
+    candidate = {**out, "approvals": [a for a in data["approvals"] if _key(a) not in dropped]}
+    # what the candidate lacks is exactly what was withheld: every contract a change selects, for each requirement it
+    # cites, and what the input had unapproved — never less (a kept approval of an affected contract) or more
+    lacks = {(r["contract"], r["requirement"]) for r in unapproved(candidate)}
+    owed = {(cid, rid) for cid in exposed for rid in by_id[cid].requirement_ids} \
+        | {(r["contract"], r["requirement"]) for r in unapproved(data)}
+    if lacks != owed or len(candidate["approvals"]) + len(withheld) != len(data["approvals"]):
+        raise MigrationError(f"the candidate's unapproved contracts {sorted(lacks ^ owed)[:5]} are not what the withheld "
+                             f"approvals account for ({len(withheld)} withheld of {len(data['approvals'])})")
+    rows = [{"contract": ap.contract_id, "requirement": ap.requirement_id, "approver": ap.approver,
+             "approved_at": ap.approved_at, "contract_hash": ap.contract_hash, "requirement_hash": ap.requirement_hash,
+             "why": why} for ap, why in withheld]
+    changes = [{"contract": cid, "requirements": list(by_id[cid].requirement_ids), **e,
+                "subject": f"{by_id[cid].subject.kind.value} {by_id[cid].subject.locator}",
+                "subject_absence": by_id[cid].subject_absence.value, "polarity": by_id[cid].polarity.value,
+                "observable": by_id[cid].to_json()["observable"], "stimulus": by_id[cid].to_json()["stimulus"],
+                "approvals_in_input": [r for r in rows if r["contract"] == cid]} for cid, e in sorted(exposed.items())]
+    reapprove = [{"contract": cid, "requirements": list(by_id[cid].requirement_ids),
+                  "contract_hash": by_id[cid].contract_hash,
+                  "command": f"aisef bundle approve BUNDLE.json --contract {_quoted(cid)} --approver human:NAME "
+                             "--out NEXT.json"} for cid in sorted(exposed)]
     report = {"specs_rebound": len(mapped), "obligations": len(obligations), "mapping": mapped,
               "plan_hash": {"from": plan.plan_hash, "to": new_plan.plan_hash},
-              "unchanged": ["requirements", "contracts", "approvals", "facts", "stories", "requirements_document"]}
-    return out, report
+              "unchanged": [k for k in ("requirements", "contracts", "approvals", "facts", "stories",
+                                        "requirements_document") if candidate[k] == data[k]],
+              "approvals_kept": len(candidate["approvals"]), "approvals_withheld": rows,
+              "semantic_changes": changes,
+              "needs_owner_reapproval": {
+                  "contracts": reapprove,
+                  "how": "nothing was signed: each command writes a new bundle with one approval of the human named in "
+                         "--approver (`human:` and a name), who has read the contract and the change above. BUNDLE.json "
+                         "is the candidate for the first command and the --out of the one before for each next; NEXT.json "
+                         "is a new file. Then `aisef bundle lint` the last."} if reapprove else None,
+              "candidate": {"bundle_digest": hashlib.sha256(B._canonical(candidate)).hexdigest(),
+                            "plan_id": new_plan.id, "plan_hash": new_plan.plan_hash, "contracts": len(contracts),
+                            "approvals_kept": len(candidate["approvals"]), "contracts_to_approve": len(reapprove),
+                            "loads": not reapprove}}
+    return candidate, report
 
 
 def _mint(contract: BehaviorContract, ref: ProbeRef, compiler_digest: str = COMPILER_DIGEST) -> ProductProofSpec:
@@ -207,10 +380,29 @@ def _closed(obj, keys: tuple[str, ...], where: str) -> None:
         raise B.BundleError(f"{where}: an object of exactly {list(keys)} (it holds {held})")
 
 
-def seal(authoring: Mapping, *, repo: pathlib.Path | None = None, approvals=()) -> tuple[dict, dict]:
+def exposure_of(old: Mapping) -> dict[str, dict]:
+    """For `seal --keep-approvals-from`: contract id -> the declared capability changes that evaluate that contract of
+    the earlier bundle `old` differently now (`_exposure`, the rule `migrate` applies), derived from the release its own
+    plan was bound under. A contract of `old` no obligation names takes the earliest release its plan shows, and the
+    earliest capability when the plan shows none a release compiles: an approval is never carried over on a release
+    nobody can name."""
+    try:
+        contracts = {c["id"]: BehaviorContract.from_json(c) for c in old["contracts"]}
+        plan = B._plan(old["plan"])
+    except (KeyError, TypeError, ValueError) as e:
+        raise B.BundleError(f"the bundle to keep approvals from does not load: {type(e).__name__}: {e}") from e
+    refs = _refs()
+    usable = {cid: c for cid, c in contracts.items() if c.subject.kind in refs}      # no probe: nothing to evaluate
+    specs = {cid: _mint(c, refs[c.subject.kind]) for cid, c in usable.items()}
+    return _exposure(usable, specs, _origins(specs, plan))
+
+
+def seal(authoring: Mapping, *, repo: pathlib.Path | None = None, approvals=(), exposed: Mapping | None = None) -> tuple[dict, dict]:
     """(the sealed bundle, the report): every hash and spec id derived from the authoring document by the kernel's own
-    constructors; `approvals` (a bundle's) kept when they still bind both hashes, the others named as dropped.
-    The baseline "HEAD" and the requirements document's sha256 are read from `repo`."""
+    constructors; `approvals` (a bundle's) kept when they still bind both hashes, the others named as dropped. An
+    approval whose contract is in `exposed` (`exposure_of` the bundle they come from: a declared capability change
+    evaluates it differently since) binds and is still not kept: it is named in `approvals_withheld_semantic`, and the
+    contract is among `to_approve`. The baseline "HEAD" and the requirements document's sha256 are read from `repo`."""
     _closed(authoring, AUTHORING_KEYS, "$")
     if authoring["format"] != AUTHORING_FORMAT:
         raise B.BundleError(f"$.format: {AUTHORING_FORMAT}")
@@ -274,20 +466,28 @@ def seal(authoring: Mapping, *, repo: pathlib.Path | None = None, approvals=()) 
     except ValueError as e:
         raise B.BundleError(f"the plan does not hold: {e}") from e
     reqs = {r.id: r for r in requirements}
-    kept, dropped = [], []
+    kept, dropped, withheld = [], [], []
     for a in approvals:
         try:
             ap = ContractApproval(**a)
         except (TypeError, ValueError) as e:
             raise B.BundleError(f"an approval to keep does not load: {e}") from e
         c, r = by_id.get(ap.contract_id), reqs.get(ap.requirement_id)
-        (kept if c is not None and r is not None and not binding_problems(ap, r, c) else dropped).append(ap)
+        if c is None or r is None or binding_problems(ap, r, c):
+            dropped.append(ap)
+        elif ap.contract_id in (exposed or {}):
+            withheld.append(ap)
+        else:
+            kept.append(ap)
     bundle = B.dump(name=authoring["name"], description=authoring["description"], requirements_path=doc["path"],
                     requirements_sha256=sha or "", product_roots=authoring["product_roots"], requirements=requirements,
                     contracts=contracts, approvals=kept, plan=plan, facts=facts, stories=stories)
     B.shape_problems(bundle)
     return bundle, {"plan_hash": plan.plan_hash, "specs": len({o.product_proof_spec_id for o in obligations}),
                     "approvals_kept": len(kept), "approvals_dropped": [f"{a.contract_id}/{a.requirement_id}" for a in dropped],
+                    "approvals_withheld_semantic": [
+                        {"contract": a.contract_id, "requirement": a.requirement_id, "approver": a.approver,
+                         "approved_at": a.approved_at, "changes": exposed[a.contract_id]["changes"]} for a in withheld],
                     "to_approve": unapproved(bundle)}
 
 
@@ -680,7 +880,9 @@ def main(argv: list[str] | None = None) -> int:
     s = sub.add_parser("seal", help="derive every hash and spec id: the bundle, unapproved")
     s.add_argument("authoring", type=pathlib.Path)
     s.add_argument("--repo", type=pathlib.Path, help="the project's repository: HEAD and the requirements document")
-    s.add_argument("--keep-approvals-from", type=pathlib.Path, help="an earlier bundle whose still-binding approvals stay")
+    s.add_argument("--keep-approvals-from", type=pathlib.Path,
+                   help="an earlier bundle whose still-binding approvals stay, those of a contract a declared "
+                        "capability change evaluates differently excepted (named in the report)")
     s.add_argument("--out", type=pathlib.Path, required=True)
     ap = sub.add_parser("approve", help="approve one contract as a named human")
     ap.add_argument("bundle", type=pathlib.Path)
@@ -698,7 +900,8 @@ def main(argv: list[str] | None = None) -> int:
     c.add_argument("--expect-anchor", metavar="SHA256",
                    help="the evidence anchor the run printed, kept outside the run directory: refused when the run "
                         "cannot show it (without it a continuation proves consistency, not authenticity)")
-    m = sub.add_parser("migrate", help="re-bind an earlier release's bundle to this release's spec ids")
+    m = sub.add_parser("migrate", help="re-bind an earlier release's bundle to this release's spec ids; the approvals "
+                                       "of a contract a declared capability change evaluates differently are withheld")
     m.add_argument("bundle", type=pathlib.Path)
     m.add_argument("--out", type=pathlib.Path, required=True, help="the migrated bundle (a new file; never the input)")
     a = p.parse_args(argv)
@@ -708,8 +911,10 @@ def main(argv: list[str] | None = None) -> int:
             print(json.dumps({"written": str(a.out), "next": _read(EXAMPLES / f"{a.example}.json")["readme"]}, indent=1))
             return 0
         if a.command == "seal":
-            keep = _read(a.keep_approvals_from)["approvals"] if a.keep_approvals_from else ()
-            doc, report = seal(_read(a.authoring), repo=a.repo, approvals=keep)
+            old = _read(a.keep_approvals_from) if a.keep_approvals_from else None
+            keep = old["approvals"] if old is not None else ()
+            doc, report = seal(_read(a.authoring), repo=a.repo, approvals=keep,
+                               exposed=exposure_of(old) if old is not None else None)
             _write_new(a.out, doc)
             print(json.dumps({"written": str(a.out), **report}, indent=1, sort_keys=True))
             return 0

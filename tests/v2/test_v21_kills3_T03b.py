@@ -3,7 +3,9 @@
 `migrate` re-binds a 2.0.0 bundle's plan to this release's spec ids and returns (the bundle, the report); the command
 prints the report as JSON beside the path it wrote. What the operator relies on, and what this file holds:
 
-* the report's `unchanged` is the scope statement "nothing but the plan changed, no re-approval needed" (USAGE-2.1 §2);
+* the report's `unchanged` is the scope statement "nothing but the plan changed", with the one exception the owner
+  decided on 2026-10-15 (item 1): the approvals of the contracts a declared capability change evaluates differently
+  are withheld from the candidate and named, so they are not among the sections it says it left as they were;
 * the report's `mapping` is the audit trail old spec id -> new spec id, and the release that compiled the old one;
 * a bundle that cannot be re-bound is refused as a MigrationError (never a raw KeyError / TypeError / PlanError), and
   the refusal says which stage failed and why, with the count / the contract it is about;
@@ -37,6 +39,8 @@ from aisef2.plan.obligation import Plan  # noqa: E402
 from aisef2.probe import catalog  # noqa: E402
 from aisef2.product.contract import BehaviorContract, Subject, plain  # noqa: E402
 
+from tests.v2 import ledgerlock_candidate as LL  # noqa: E402
+
 LEDGERLOCK_2_0_0 = ROOT / "closure-evidence/v2/release/LEDGERLOCK-PROJECT.json"
 
 
@@ -64,8 +68,10 @@ class ReportScopeStatement(_LedgerLock):
     (the command prints the report); the guarantee itself is `{**data, "plan": ...}` and `B.load(out)`, the list
     declares it. Pins aisef2/app/bundle_cli.py::migrate [20, 38, 41, 42, 43, 44, 45, 46, 55, 56, 57, 58, 59, 60]."""
 
-    #: USAGE-2.1 §2: "requirement, contract, approval, facts: unchanged; nothing is re-approved"
+    #: USAGE-2.1 §2: "requirement, contract, approval, facts: unchanged" — approvals only while no declared capability
+    #: change selects their contract (UNAFFECTED, below; the LedgerLock bundle has six that it does)
     DOCUMENTED = {"requirements", "contracts", "approvals", "facts"}
+    SELECTED = {"approvals"}
     #: also declared by the report, and asserted untouched by tests/v2/test_v21_identity.py::Migrate: the stories the
     #: plan's story ids must match (B.load) and the requirements document the run checks at the baseline
     ALSO_STATED = {"stories", "requirements_document"}
@@ -79,11 +85,26 @@ class ReportScopeStatement(_LedgerLock):
         for section in named:
             self.assertEqual(out[section], self.doc[section], section)
         self.assertNotIn("plan", named)
-        self.assertEqual({k for k in out if out[k] != self.doc[k]}, {"plan"})     # the one section that did change
+        # the two sections that did change: the plan, and the approvals the candidate does not carry over
+        self.assertEqual({k for k in out if out[k] != self.doc[k]}, {"plan", "approvals"})
+        self.assertNotIn("approvals", named)
 
     def test_the_report_names_the_sections_migration_leaves_as_they_were(self):
         _, report = bundle_cli.migrate(self.fresh())
+        self.assertLessEqual((self.DOCUMENTED - self.SELECTED) | self.ALSO_STATED, set(report["unchanged"]))
+        self.assertNotIn("approvals", report["unchanged"])      # six of its approvals are not in the candidate
+        self.assertEqual(len(report["approvals_withheld"]), 6)
+
+    def test_the_approvals_stay_among_the_sections_left_as_they_were_when_no_change_selects_a_contract(self):
+        """The statement the owner's decision narrowed, kept where it still holds: a bundle whose contracts no declared
+        change selects (the A03 fixture, python_callable) is migrated with every approval and says so."""
+        from tests.v2 import test_v21_kills3_A03 as fixture
+        doc = fixture._bundle(fixture._approved_add()[3])
+        out, report = bundle_cli.migrate(json.loads(json.dumps(doc)))
+        self.assertEqual(out["approvals"], doc["approvals"])
         self.assertLessEqual(self.DOCUMENTED | self.ALSO_STATED, set(report["unchanged"]))
+        self.assertEqual((report["approvals_withheld"], report["semantic_changes"], report["needs_owner_reapproval"]),
+                         ([], [], None))
 
     def test_the_command_prints_the_report_beside_the_path_it_wrote(self):
         with tempfile.TemporaryDirectory() as t:
@@ -94,7 +115,8 @@ class ReportScopeStatement(_LedgerLock):
                                                   os.fspath(target)]), 0)
             printed = json.loads(stdout.getvalue())
             self.assertEqual(printed, {"written": os.fspath(target), **bundle_cli.migrate(self.fresh())[1]})
-        self.assertLessEqual(self.DOCUMENTED | self.ALSO_STATED, set(printed["unchanged"]))
+        self.assertLessEqual((self.DOCUMENTED - self.SELECTED) | self.ALSO_STATED, set(printed["unchanged"]))
+        self.assertNotIn("approvals", printed["unchanged"])
 
 
 class ReportMapping(_LedgerLock):
@@ -112,8 +134,9 @@ class ReportMapping(_LedgerLock):
         self.assertEqual(len(expected), 59)
         self.assertEqual(report["mapping"], expected)
         self.assertEqual(report["specs_rebound"], len(report["mapping"]))
-        # the new ids are the specs this release compiles from the bundle's approved contracts
-        self.assertLessEqual({v["to"] for v in report["mapping"].values()}, set(B.load(out).specs))
+        # the new ids are the specs this release compiles from the bundle's approved contracts — once the owner has
+        # approved the ones the candidate lacks (the candidate itself does not load: an unapproved contract compiles to nothing)
+        self.assertLessEqual({v["to"] for v in report["mapping"].values()}, set(B.load(LL.approved(out, report)).specs))
 
 
 class KernelObjectsThatDoNotLoad(_LedgerLock):

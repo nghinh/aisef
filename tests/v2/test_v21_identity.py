@@ -8,8 +8,10 @@ migration of a 2.0.0 bundle.
   that test code wrote into its site-packages ran in every later probe controller (`-I` does not disable `site`).
   Now the probes run on this kernel's interpreter with `-I -S`, the tests on their own venv. Not a sandbox: test code
   runs as the operator's user and can still change that interpreter or the installed kernel (V2-05 is the sandbox).
-* `aisef bundle migrate` re-binds the 2.0.0 LedgerLock bundle — 59 specs, 67 obligations — without re-approval, and it
-  is then admitted under this release; the unmigrated bundle is refused naming the command.
+* `aisef bundle migrate` re-binds the 2.0.0 LedgerLock bundle — 59 specs, 67 obligations — without re-approval of any
+  contract a declared capability change leaves as it was (53 of its 59 approvals; owner decision 2026-10-15, item 1:
+  the six whose evaluation changed are withheld, and the candidate is admitted under this release once the owner
+  approves them); the unmigrated bundle is refused naming the command.
 Offline; the probes run on committed calibration fixtures."""
 
 from __future__ import annotations
@@ -33,6 +35,7 @@ if str(ROOT) not in sys.path:
 
 from aisef2.app import bundle, bundle_cli  # noqa: E402
 from aisef2.app import run as R  # noqa: E402
+from tests.v2 import ledgerlock_candidate as LL  # noqa: E402
 from aisef2.app.calibrations import CALIBRATIONS  # noqa: E402
 from aisef2.arch.enums import Enforcement  # noqa: E402
 from aisef2.plan.obligation import Plan  # noqa: E402
@@ -81,7 +84,7 @@ class ThreeIdentities(unittest.TestCase):
         now = {e.probe_id: executing(e.factory) for e in catalog.CATALOG if e.active}
         rows = tuple(dict(r, probe_digest=now.get(r["probe_id"], r["probe_digest"])) for r in CALIBRATIONS)
         self.assertEqual(R.calibrations(), R.calibrations(CALIBRATIONS))
-        project = bundle.load(bundle_cli.migrate(json.loads(LEDGERLOCK_2_0_0.read_text(encoding="utf-8")))[0])
+        project = bundle.load(LL.loadable())
         self.assertTrue(R.admit(project, R.calibrations(rows))["admitted"])
         a = R.admit(project, R.calibrations(tuple(dict(r, probe_digest="0" * 64) for r in rows)))
         self.assertFalse(a["admitted"])
@@ -144,18 +147,30 @@ class Migrate(unittest.TestCase):
             bundle.load(self.doc)
         self.assertIn("aisef bundle migrate", str(c.exception))
 
-    def test_migration_rebinds_the_plan_and_nothing_else(self):
+    def test_migration_rebinds_the_plan_and_withholds_only_what_a_declared_change_selects(self):
         data = json.loads(json.dumps(self.doc))     # B-03c: a copy, so an in-place edit of the input shows below
         out, report = bundle_cli.migrate(data)
         self.assertEqual(data, self.doc)             # the input is read, never written
         self.assertEqual((report["specs_rebound"], report["obligations"]), (59, 67))
         self.assertEqual({v["from_release"] for v in report["mapping"].values()}, {"2.0.0"})
-        for k in ("requirements", "contracts", "approvals", "facts", "stories", "requirements_document", "name"):
+        for k in ("requirements", "contracts", "facts", "stories", "requirements_document", "name"):
             self.assertEqual(out[k], self.doc[k], k)
-        project = bundle.load(out)
+        # the approvals: the input's, less exactly what the report says it withheld — never changed, never added
+        withheld = {(r["contract"], r["requirement"]) for r in report["approvals_withheld"]}
+        self.assertEqual(len(withheld), 6)
+        self.assertEqual(out["approvals"], [a for a in self.doc["approvals"]
+                                            if (a["contract_id"], a["requirement_id"]) not in withheld])
+        self.assertEqual(report["approvals_kept"], len(self.doc["approvals"]) - 6)
+        with self.assertRaises(bundle.BundleError) as c:      # it is not run until the owner has approved them
+            bundle.load(out)
+        self.assertIn("is not approved", str(c.exception))
+        full = LL.approved(out, report)
+        project = bundle.load(full)
         self.assertEqual(len(project.specs), 59)
-        again, report2 = bundle_cli.migrate(out)
-        self.assertEqual((again, report2["specs_rebound"]), (out, 0))     # idempotent
+        again, report2 = bundle_cli.migrate(full)
+        self.assertEqual((again, report2["specs_rebound"], report2["approvals_withheld"]), (full, 0, []))   # idempotent
+        with self.assertRaises(bundle_cli.MigrationError):     # a candidate is not migrated again before it is approved
+            bundle_cli.migrate(out)
 
     def test_a_spec_no_release_compiles_is_refused_not_guessed(self):
         plan = bundle._plan(self.doc["plan"])       # a sealed plan whose first obligation names an unknown spec
@@ -175,7 +190,11 @@ class Migrate(unittest.TestCase):
             out = pathlib.Path(t) / "migrated.json"
             with contextlib.redirect_stdout(io.StringIO()):
                 self.assertEqual(bundle_cli.main(["migrate", str(LEDGERLOCK_2_0_0), "--out", str(out)]), 0)
-            self.assertEqual(json.loads(out.read_text(encoding="utf-8"))["approvals"], self.doc["approvals"])
+            written = json.loads(out.read_text(encoding="utf-8"))
+            self.assertEqual(written["approvals"],     # the input's approvals, less the six the report names
+                             [a for a in self.doc["approvals"] if a["contract_id"] not in {
+                                 r["contract"] for r in bundle_cli.migrate(self.doc)[1]["approvals_withheld"]}])
+            self.assertEqual(len(written["approvals"]), len(self.doc["approvals"]) - 6)
             err = io.StringIO()
             with contextlib.redirect_stderr(err):
                 self.assertEqual(bundle_cli.main(["migrate", str(LEDGERLOCK_2_0_0), "--out", str(out)]), 2)

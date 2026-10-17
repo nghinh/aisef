@@ -32,6 +32,7 @@ if str(ROOT) not in sys.path:
 from aisef2.app import bundle as B  # noqa: E402
 from aisef2.app import bundle_cli  # noqa: E402
 from aisef2.app import calibrations as shipped  # noqa: E402
+from tests.v2 import ledgerlock_candidate as LL  # noqa: E402
 
 LEDGERLOCK_2_0_0 = ROOT / "closure-evidence/v2/release/LEDGERLOCK-PROJECT.json"
 CALC3 = ("BC-ADD", "BC-MUL", "BC-TOTAL", "BC-STDLIB")
@@ -302,7 +303,7 @@ class MigrateStatesTheTwoPlanHashes(unittest.TestCase):
         self.assertNotEqual(self.doc["plan"]["plan_hash"], out["plan"]["plan_hash"])     # the plan did change
         self.assertEqual(report["plan_hash"]["from"], self.doc["plan"]["plan_hash"])
         self.assertEqual(report["plan_hash"]["to"], out["plan"]["plan_hash"])
-        self.assertEqual(B.load(out).plan.plan_hash, report["plan_hash"]["to"])
+        self.assertEqual(B.load(LL.approved(out, report)).plan.plan_hash, report["plan_hash"]["to"])
 
     def test_the_command_prints_the_same_pair_for_the_file_it_wrote(self):
         with tempfile.TemporaryDirectory() as t:

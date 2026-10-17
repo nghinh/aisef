@@ -125,12 +125,23 @@ def calls(stream: pathlib.Path):
             yield json.dumps(((e.get("part") or {}).get("state") or {}).get("input") or {}, ensure_ascii=False)
 
 
+def migrated_project():
+    """The 2.0.0 bundle migrated in memory (V2-007), loaded: the plan, specs and facts the two parts below read. The
+    candidate migration writes lacks the approvals of the contracts whose evaluation changed (owner decision
+    2026-10-15), so it is loaded with them approved by a stand-in — in memory, written nowhere, and used only for the
+    plan and the specs, which an approval does not enter."""
+    sys.path.insert(0, str(ROOT))
+    from aisef2.app import bundle, bundle_cli
+    candidate, report = bundle_cli.migrate(json.loads(BUNDLE.read_text(encoding="utf-8")))
+    for row in (report["needs_owner_reapproval"] or {}).get("contracts", ()):
+        candidate = bundle_cli.approve(candidate, row["contract"], "human:stand-in-for-a-read-only-analysis", 0.0)
+    return bundle.load(candidate)
+
+
 def expectations() -> dict[str, str]:
     """criterion -> the candidate expectation of its spec in the 2.0.0 bundle (migrated, V2-007; the same plan's criteria
     as P10's journals)."""
-    sys.path.insert(0, str(ROOT))
-    from aisef2.app import bundle, bundle_cli
-    project = bundle.load(bundle_cli.migrate(json.loads(BUNDLE.read_text(encoding="utf-8")))[0])
+    project = migrated_project()
     return {o.criterion_id: project.specs[o.product_proof_spec_id].candidate_expectation.value for o in project.plan.obligations}
 
 
@@ -187,8 +198,8 @@ def told_200() -> list:
 def pack_now() -> list[tuple[int, str]]:
     """Part 3: the context pack this tree builds at smoke-2's STORY-04-02 retries."""
     sys.path.insert(0, str(ROOT))
-    from aisef2.app import bundle, bundle_cli, feedback
-    project = bundle.load(bundle_cli.migrate(json.loads(BUNDLE.read_text(encoding="utf-8")))[0])
+    from aisef2.app import feedback
+    project = migrated_project()
     evs = events(SMOKE2 / "aisef-run.jsonl")
     return [(q, feedback.context_pack([(e["seq"], e["type"], e["data"]) for e in evs if e["seq"] < q], "STORY-04-02", project))
             for q in (1473, 1584)]

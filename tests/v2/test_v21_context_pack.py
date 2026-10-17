@@ -23,7 +23,8 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from aisef2.app import adapters as ad  # noqa: E402
-from aisef2.app import bundle, bundle_cli, client, feedback  # noqa: E402
+from aisef2.app import bundle, client, feedback  # noqa: E402
+from tests.v2 import ledgerlock_candidate as LL  # noqa: E402
 from tests.v2 import test_app_run as e2e  # noqa: E402
 
 P, C = "p" * 40, "c" * 40
@@ -70,10 +71,10 @@ def widened(project, criteria):
 
 @functools.lru_cache(maxsize=1)
 def ledgerlock():
-    """The 2.0.0 release's LedgerLock bundle (closure-evidence, read only), migrated in memory (V2-007): its plan holds a
-    MUST_NOT_HOLD criterion, S-3.4-a of STORY-03-01, whose candidate expectation is REFUTED."""
-    raw = json.loads((ROOT / "closure-evidence/v2/release/LEDGERLOCK-PROJECT.json").read_text(encoding="utf-8"))
-    return bundle.load(bundle_cli.migrate(raw)[0])
+    """The 2.0.0 release's LedgerLock bundle (closure-evidence, read only), migrated in memory (V2-007) with the approvals
+    migration withholds given again by a stand-in: its plan holds a MUST_NOT_HOLD criterion, S-3.4-a of STORY-03-01,
+    whose candidate expectation is REFUTED."""
+    return LL.project()
 
 
 class Fixture(unittest.TestCase):
