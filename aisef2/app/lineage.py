@@ -22,7 +22,7 @@ another run may continue the same predecessor:
 | ENDED_UNBEGUN (a record that says it ended before it began — it names no journal of events — and no journal) | done | superseded: a new generation records the evidence |
 | UNBEGUN (no record, no journal, or a journal of no bytes) | provably gone (same host, the pid absent or another process) | superseded, with the evidence |
 | UNBEGUN | alive, on another host, or not decidable | refused; the operator may supersede by naming the claim's sha256 (recorded as their assertion) |
-| UNREAD (evidence there that cannot be read: see below) | whatever it is | refused; only the operator's sha256 supersedes (recorded as their assertion, with the cause) — and the run is then still refused while that evidence does not read (`unread`, below) |
+| UNREAD (evidence there that cannot be read: see below) | whatever it is | refused; only the operator's sha256 supersedes (recorded as their assertion, with the cause) — and the run is then still refused while that evidence does not read or is gone (`unread`, below) |
 
 Nothing is deleted: a superseded claim stays, the new generation points at it. A child whose journal reads and holds an
 event began and is never superseded, by evidence or by assertion. **A child whose evidence is there and cannot be read
@@ -78,14 +78,20 @@ that is not there beside a journal that reads is not a run that spent less: a nu
 no evidence shows is what the decision forbids. Two witnesses say the evidence existed, and a run they show it for is
 UNREAD (cost unknown, `exact` False, `total` None, `aisef run --parent` refused whatever the flags, as for any unread
 part): (1) the run's own RUN.json — its `budget.spent`, less the `budget.inherited` share, is the Budget's account of
-the same evidence when the run ended, so a counter the record holds and the evidence now re-derives LESS of (the four
-counters, and the number of session streams) is spend whose evidence has gone; (2) with no record that names a spend (a
-run killed before RUN.json was written), a provider request the journal records as answered — a result that is not a
-closer's — that no session stream stands for. What the run's record vouches for (its counters equal what the evidence
-re-derives) is not gone, whatever the journal: a session that never started (a budget reached, a reviewer that could
-not run) leaves a request and no stream. A request in flight (no result) is neither: it is spend that READS as unknown,
-accepted by name (`--accept-unaccounted`) as before. The figures the run keeps are what is left, attributed to it and no
-more exact than that. Nothing is rewritten and no claim is released because of it.
+the same evidence when the run ended (a run that failed before its Budget was built: its `preflight.accounting`, which is
+all it spent), so a counter the record holds and the evidence now re-derives LESS of (the four counters, and the number of
+session streams) is spend whose evidence has gone; (2) with no record that names a spend (a run killed before RUN.json
+was written, or while it was), a provider request the journal records as answered — a result that is not a closer's —
+that no session stream stands for. What the run's record vouches for (its counters equal what the evidence re-derives) is
+not gone, whatever the journal: a session that never started (a budget reached, a reviewer that could not run) leaves a
+request and no stream. Without a record the two cannot be told apart, and (2) takes the unknown — saying so: where no
+session started there is no stream to restore, and the lineage cannot be continued. A request in flight (no result) is
+neither: it is spend that READS as unknown, accepted by name (`--accept-unaccounted`) as before. The figures the run keeps
+are what is left, attributed to it and no more exact than that. Nothing is rewritten and no claim is released because of
+it. What neither witness reaches (a limit, not a promise): with no record the journal does not hold the preflight's
+requests, so a preflight ledger that is gone beside a record that does not read is not seen; and (2) pairs answered
+requests with streams by COUNT per story and role, as the in-flight check does — a stream's name is the kernel's attempt
+number, which a request does not follow (a reviewer is not reached on an attempt whose proof failed).
 
 **A file that is damaged, or is not what a run writes** — a ledger line or a claim that is valid JSON and no object, a
 session stream the reader refuses — is answered as the torn form of the same file is: unknown spend, listed; the
@@ -480,8 +486,8 @@ def is_file(path: pathlib.Path) -> bool:
 def account_of(run_dir: pathlib.Path) -> dict:
     """What `run_dir` spent, re-derived from its evidence (the run's Budget rules), and what is unknown: `unaccounted`
     lists it all; `unread` is the part of it whose evidence is there and cannot be read (a journal, a ledger, a session
-    stream) — spend not even a request count is known for, which no acceptance of the operator covers (module
-    docstring)."""
+    stream), or that the run's own record or journal shows and is gone (a sessions directory, a stream, the ledger) —
+    spend not even a request count is known for, which no acceptance of the operator covers (module docstring)."""
     from aisef2.app import client, preflight
     got = events_of(run_dir)
     events = got[0] if got else []
@@ -567,19 +573,23 @@ def _journal_mismatch(run_dir: pathlib.Path) -> str | None:
 def _recorded_spend(run_dir: pathlib.Path) -> tuple[dict | None, str | None]:
     """(what RUN.json says the run ITSELF spent, why it cannot be compared). The record's `budget.spent` is the Budget's
     account at the end of the run, the lineage's known share (`budget.inherited`) included: less that share it is the
-    four counters of this run's own evidence. (None, None): the record names no spend — there is none, it cannot be read
-    (its damage is answered where the record is read: `_predecessor`, `child_evidence`), or the run built no budget.
-    (None, why): a budget that is there and is not an account of four counts."""
+    four counters of this run's own evidence. A run that built no Budget (it failed after its preflight and before: a
+    route that is not attested, say) names the preflight's own account, `preflight.accounting`, which is all it spent.
+    (None, None): the record names no spend — there is none, or it is not there or does not read (a run killed while
+    it was being written, whose damage `_predecessor` and `child_evidence` answer for the claim, not for the cost: only
+    the journal decides there). (None, why): a budget that is there and is not an account of four counts."""
     try:
         doc = json.loads((run_dir / "RUN.json").read_text(encoding="utf-8"))
     except (OSError, ValueError):
         return None, None
-    budget = doc.get("budget") if isinstance(doc, dict) else None
-    if budget is None:
-        return None, None
 
     def counts(x) -> bool:
         return isinstance(x, dict) and all(type(x.get(k)) is int and x[k] >= 0 for k in SPEND)
+    budget = doc.get("budget") if isinstance(doc, dict) else None
+    if budget is None:
+        pre = doc.get("preflight") if isinstance(doc, dict) else None
+        pre = pre.get("accounting") if isinstance(pre, dict) else None
+        return ({k: pre[k] for k in SPEND}, None) if counts(pre) else (None, None)
     spent = budget.get("spent") if isinstance(budget, dict) else None
     shared = budget.get("inherited", dict.fromkeys(SPEND, 0)) if isinstance(budget, dict) else None
     if not counts(spent) or not counts(shared) or any(spent[k] < shared[k] for k in SPEND):
@@ -598,13 +608,16 @@ def _evidence_gone(run_dir: pathlib.Path, events: list, requests: list, logs: li
     that looks reconciled and is not (owner decision 2026-10-15). Two witnesses, neither a guess:
 
     * the run's own record: RUN.json's `budget.spent` is what the Budget derived from this same evidence when the run
-      ended, so a counter the record holds and the evidence now re-derives LESS of — the four counters, and the number
-      of session streams there were (`sessions_started`: a stream that held no step has no counter) — is spend whose
-      evidence has gone;
+      ended (a run that built no Budget: its `preflight.accounting`, all it spent), so a counter the record holds and
+      the evidence now re-derives LESS of — the four counters, and the number of session streams there were
+      (`sessions_started`: a stream that held no step has no counter) — is spend whose evidence has gone;
     * without a record that names a spend (a run killed before it was written): a provider request the journal records
       as answered (a result that is not a closer's) and that no session stream stands for — a request that is in flight
       (no result) is not that: the evidence of one that never started is not expected, and the pins of `account_of` keep
       it so. Where the record vouches for the figures, an answered request whose session never started is not gone.
+      Without a record the two cannot be told apart — a stream that is gone, and a session that never started (a budget
+      reached, a reviewer that could not run) leave the same journal — and the rule takes the unknown: the cause says
+      so, because then there is nothing to restore and the lineage cannot be continued.
 
     The cause names what the operator restores; None when nothing is missing."""
     recorded, why = _recorded_spend(run_dir)
@@ -633,7 +646,9 @@ def _evidence_gone(run_dir: pathlib.Path, events: list, requests: list, logs: li
         return None
     return (f"{run_dir.name}: the journal records provider requests as answered that no session stream stands for "
             f"({'; '.join(lacking)}) and no record names what the run spent: the evidence of what they spent is not "
-            "there, so it is unknown")
+            "there, so it is unknown (a session that never started — a budget reached, a reviewer that could not run — "
+            "leaves the same journal, and only RUN.json would tell the two apart: where that is what happened there is "
+            "no stream to restore)")
 
 
 def _is_a_directory(path: pathlib.Path) -> bool:
@@ -764,8 +779,8 @@ def lineage_account(predecessor: pathlib.Path, child: pathlib.Path | None = None
 
 
 def unread_runs(account: Mapping) -> str:
-    """The run directories of a lineage account whose evidence does not read — where the operator restores it (the entries
-    of `unread` name a run by its basename: two runs of a lineage may both be called `out`)."""
+    """The run directories of a lineage account whose evidence does not read, or is gone — where the operator restores it
+    (the entries of `unread` name a run by its basename: two runs of a lineage may both be called `out`)."""
     return ", ".join(dict.fromkeys(r["run"] for r in account["runs"] if r["unread"])) or "the runs named below"
 
 

@@ -98,7 +98,7 @@ class Budget:
         seen = {p: read_session(p) for p in logs}
         recorded = int(self.requests())
         unaccounted = [f"{len(logs)} sessions were started but {recorded} provider requests are recorded"] if len(logs) > recorded else []
-        unaccounted += [f"the lineage's evidence cannot be read: {u}" for u in self.inherited_unread]
+        unaccounted += [f"the lineage's evidence cannot be read, or is gone: {u}" for u in self.inherited_unread]
         for p, x in seen.items():
             if x["steps_without_tokens"]:
                 unaccounted.append(f"{p.name}: {x['steps_without_tokens']} finished steps report no tokens")

@@ -19,7 +19,13 @@ What the owner required (the narrow rule, option (a)) and what is pinned here, s
   evidence than the record names is not gone either; a request in flight (no result) is the state
   tests/v2/test_v21_defects_lineage2.py pins and is neither;
 * a normal complete lineage is unchanged: its total is what its records say, and a continuation does not count the share
-  it inherited as its own evidence.
+  it inherited as its own evidence;
+* (review round 2) a run that failed before its Budget was built (the route not attested) names the preflight's own
+  account in RUN.json (`preflight.accounting`): that is its record of spend, compared like `budget.spent`;
+* (review round 2) with no record, an answered request with no stream is gone OR a session that never started (a budget
+  reached, a reviewer that could not run) — the journal cannot tell them apart. The rule takes the unknown, as the owner
+  wrote it, and the cause says there may be nothing to restore. Narrowing it (only a COMPLETED request owes a stream) is an
+  open owner decision, pinned here as it is: `NoRecordCannotTellGoneFromNeverStarted`.
 
 Unchanged and not touched here (owner decisions already recorded): the three `StaysAsItWas` pins of
 tests/v2/test_v21_defects_lineage2.py (one request in flight), R3 (a replaced child a claim names whose directory is gone
@@ -45,13 +51,13 @@ ROOT = pathlib.Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from aisef2.app import bundle_cli, cli, client, lineage  # noqa: E402
+from aisef2.app import bundle_cli, cli, client, lineage, preflight, settings  # noqa: E402
 from aisef2.app import run as R  # noqa: E402
 from aisef2.app.verify import verify  # noqa: E402
 from aisef2.journal import format3  # noqa: E402
 from aisef2.journal.event import EventType as T  # noqa: E402
 from tests.v2 import test_v21_x_lineage_proof as P  # noqa: E402
-from tests.v2.test_app_run import SETTINGS, calibrations, project_bundle, provider  # noqa: E402
+from tests.v2.test_app_run import SETTINGS, ProductBase, calibrations, project_bundle, provider  # noqa: E402
 
 SPEND = lineage.SPEND
 #: what the fake client's run spends (tests/v2/test_app_run.py): the preflight is a listing and two probes (3 requests,
@@ -288,6 +294,7 @@ class Gone(P.Delivered):
         with_the_unread = client.Budget(limits, base, self.tmp / "no-sessions", lambda: 0, account)
         for stop in (with_the_unread.reached(), with_the_unread.exceeded()):
             self.assertTrue(stop.startswith("unaccounted:") and "RUN.json records" in stop, stop)
+            self.assertIn("cannot be read, or is gone", stop)       # evidence that is gone is not said to be unreadable
         known_only = {**{k: account[k] for k in SPEND}, "unaccounted": [], "unread": []}
         self.assertIsNone(client.Budget(limits, base, self.tmp / "no-sessions", lambda: 0, known_only).reached())
 
@@ -344,8 +351,9 @@ class HandGone(P.Hand):
         (run / "RUN.json").write_text(json.dumps(rec), encoding="utf-8")
 
     def journaled(self, name: str, *rows, streams: tuple = ()) -> pathlib.Path:
-        """A run killed before its record: a journal of requests — each row `answered`, `in flight` or `closed` (a closer's
-        result: the run ended without it), optionally `(row, "REVIEW")` — and the session streams named (`S1.developer.1`)."""
+        """A run killed before its record: a journal of requests — each row `answered`, `failed` (a measured failure that
+        needs no session), `in flight` or `closed` (a closer's result: the run ended without it), optionally
+        `(row, "REVIEW")` — and the session streams named (`S1.developer.1`)."""
         run = self.root / name
         (run / lineage.JOURNAL).parent.mkdir(parents=True)
         w = format3.JournalWriter3(run / lineage.JOURNAL, clock=lambda: 0.0)
@@ -357,6 +365,9 @@ class HandGone(P.Hand):
                 if kind == "answered":
                     w.append(T.PROVIDER_RESULT, {"story_id": "S1", "outcome": "COMPLETED", "synthetic": False, "detail": "answered"},
                              source_seqs=(e.seq,))
+                elif kind == "failed":      # a measured failure (not a closer's): the session may never have started
+                    w.append(T.PROVIDER_RESULT, {"story_id": "S1", "outcome": "FAILED", "synthetic": False,
+                                                 "detail": "reviewer cannot run: a budget was reached"}, source_seqs=(e.seq,))
                 elif kind == "closed":
                     w.append(T.PROVIDER_RESULT, {"story_id": "S1", "outcome": "OUTCOME_UNKNOWN", "synthetic": True,
                                                  "detail": "the run ended without its result (repair)"}, source_seqs=(e.seq,))
@@ -471,6 +482,57 @@ class HandGone(P.Hand):
         got = lineage.account_of(run)
         self.assertEqual(len(got["unread"]), 1, got["unread"])
         self.assertIn("cannot be read", got["unread"][0])
+    # ------------------------------------------------------------------------------- a run that built no Budget (round 2)
+
+    def ledger(self, run: pathlib.Path, requests: int) -> None:
+        """The preflight's ledger as the preflight writes it: each request sent and answered (6 input, 1 output tokens)."""
+        (run / "preflight").mkdir()
+        rows = [row for n in range(1, requests + 1) for row in ({"n": n, "event": "sent", "kind": "probe"},
+                                                                  {"n": n, "event": "done", "http": 200, "input_tokens": 6,
+                                                                   "output_tokens": 1})]
+        (run / "preflight" / "LEDGER.jsonl").write_text("".join(json.dumps(r) + "\n" for r in rows), encoding="utf-8")
+
+    def preflight_record(self, run: pathlib.Path, accounting) -> None:
+        rec = json.loads((run / "RUN.json").read_text(encoding="utf-8"))
+        rec["budget"], rec["preflight"] = None, {"accounting": accounting}
+        (run / "RUN.json").write_text(json.dumps(rec), encoding="utf-8")
+
+    def test_a_run_that_built_no_budget_is_compared_with_the_preflights_account_its_record_holds(self):
+        """The run failed after its preflight and before its Budget: RUN.json has `budget: null`, and the preflight's
+        `accounting` is the only spend it names — the same kind of witness as `budget.spent`."""
+        said = dict(provider_requests=3, turns=0, input_tokens=18, output_tokens=3, unaccounted=[])
+        run = self.run_dir("run", 0)
+        self.ledger(run, 3)
+        self.preflight_record(run, said)
+        got = lineage.account_of(run)
+        self.assertEqual((got["unread"], got["unaccounted"], got["exact"], got["provider_requests"]), ([], [], True, 3))
+        for name, damage in (("the ledger directory is gone", lambda: os.rename(run / "preflight", run / "preflight.moved")),
+                             ("the ledger is cut to its first rows", lambda: (run / "preflight" / "LEDGER.jsonl").write_text(
+                                 "".join((run / "preflight.moved" / "LEDGER.jsonl").read_text(encoding="utf-8")
+                                         .splitlines(keepends=True)[:2]), encoding="utf-8"))):
+            with self.subTest(name):
+                if "cut" in name:
+                    (run / "preflight").mkdir()
+                damage()
+                got = lineage.account_of(run)
+                self.assertEqual(len(got["unread"]), 1, got["unread"])
+                self.assertIn("RUN.json records that the run spent provider_requests 3 (the evidence shows", got["unread"][0])
+                self.assertIs(got["exact"], False)
+                self.assertIsNone(lineage.lineage_account(run)["total"])
+
+    def test_a_preflight_account_that_is_not_four_counts_names_no_spend(self):
+        """Nothing to compare is nothing to exceed: the journal's answered requests decide, as for a run with no record."""
+        for name, accounting in (("a word", "three"), ("a count is missing", dict(provider_requests=3, turns=0, input_tokens=18)),
+                                 ("a count is negative", dict(provider_requests=-3, turns=0, input_tokens=18, output_tokens=3)),
+                                 ("a count is a bool", dict(provider_requests=True, turns=0, input_tokens=18, output_tokens=3)),
+                                 ("none", None)):
+            with self.subTest(name):
+                self.fresh(name)
+                run = self.run_dir("run", 0)
+                self.preflight_record(run, accounting)
+                got = lineage.account_of(run)
+                self.assertEqual((got["unread"], got["exact"]), ([], True))
+
 
     # ---------------------------------------------------------------------------------------------------- no record
 
@@ -500,6 +562,24 @@ class HandGone(P.Hand):
         whole = self.journaled("whole", "answered", ("answered", "REVIEW"), streams=("S1.developer.1", "S1.reviewer.1"))
         self.assertEqual(lineage.account_of(whole)["unread"], [])
 
+    def test_the_cause_without_a_record_says_where_a_session_never_started_there_is_nothing_to_restore(self):
+        """The journal of a stream that is gone and that of a session that never started are the same one: the rule takes
+        the unknown, and the operator is told, not sent to restore what may never have existed."""
+        run = self.journaled("run", "answered", ("failed", "REVIEW"), streams=("S1.developer.1",))
+        got = lineage.account_of(run)
+        self.assertEqual(len(got["unread"]), 1, got["unread"])
+        self.assertIn("S1 reviewer: 1 answered, 0 streams", got["unread"][0])
+        for needle in ("a session that never started", "a budget reached", "only RUN.json would tell the two apart",
+                       "no stream to restore"):
+            self.assertIn(needle, got["unread"][0])
+
+    def test_answered_requests_are_paired_with_streams_by_count_not_by_the_number_in_a_stream_name(self):
+        """A stream's name carries the kernel's attempt number, which a request does not follow: the reviewer is not
+        reached on an attempt whose proof failed, so a run's first review request may stand for `S1.reviewer.2`."""
+        run = self.journaled("run", "answered", ("answered", "REVIEW"), streams=("S1.developer.1", "S1.reviewer.2"))
+        got = lineage.account_of(run)
+        self.assertEqual((got["unread"], got["unaccounted"], got["exact"]), ([], [], True))
+
     def test_a_request_in_flight_and_one_a_closer_closed_are_not_answered_requests(self):
         """The state tests/v2/test_v21_defects_lineage2.py pins (one request in flight, no stream, no record: not unknown,
         not unread), and a request the run's repair closed with a synthetic result — no answer was measured."""
@@ -514,6 +594,102 @@ class HandGone(P.Hand):
         self.assertEqual(lineage.account_of(self.root / "gone")["unread"], [])
         run = self.journaled("no requests")
         self.assertEqual((lineage.account_of(run)["unread"], lineage.account_of(run)["exact"]), ([], True))
+
+
+@P.POSIX_CLIENT
+class UnattestedRoute(ProductBase):
+    """A real run that failed after its preflight and before its Budget (the route is not attested): RUN.json has
+    `budget: null`, and 3 preflight requests (18 input and 2 output tokens) are all it spent."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        with self.assertRaises(preflight.IdentityStop):
+            self.execute("first", transport=provider(served="model-2"))
+        self.first = self.tmp / "first"
+        self.n = 0
+
+    def copy(self, name: str) -> pathlib.Path:
+        dst = self.tmp / name
+        shutil.copytree(self.first, dst, symlinks=True)
+        return dst
+
+    def test_intact_it_is_exact_and_gone_it_is_unknown_with_what_is_left_attributed(self):
+        rec = json.loads((self.first / "RUN.json").read_text(encoding="utf-8"))
+        self.assertIsNone(rec["budget"])
+        left = {"provider_requests": 3, "turns": 0, "input_tokens": 18, "output_tokens": 2}
+        acct = lineage.account_of(self.first)
+        self.assertEqual(({k: acct[k] for k in SPEND}, acct["exact"], acct["unread"]), (left, True, []))
+        whole = lineage.usage_lineage(self.first, self.tmp / "next", OWN, P.PRICES)
+        self.assertEqual(whole["cost"]["status"], "known")
+        self.assertAlmostEqual(whole["cost"]["value"], 2.2e-05, places=9)
+        for name, damage, kept in (("the preflight directory is moved away", lambda d: moved(d / "preflight"),
+                                    {k: 0 for k in SPEND}),
+                                   ("the ledger is cut to its first rows", ledger_two_rows,
+                                    {"provider_requests": 1, "turns": 0, "input_tokens": 0, "output_tokens": 0})):
+            with self.subTest(name):
+                d = self.copy("cut" if "cut" in name else "away")
+                damage(d)
+                acct = lineage.account_of(d)
+                self.assertIs(acct["exact"], False)
+                self.assertEqual(len(acct["unread"]), 1, acct["unread"])
+                self.assertIn("RUN.json records that the run spent provider_requests 3", acct["unread"][0])
+                self.assertEqual({k: acct[k] for k in SPEND}, kept)
+                got = lineage.lineage_account(d, self.tmp / "next")
+                self.assertIsNone(got["total"])
+                self.assertEqual(lineage.unread_runs(got), str(d))
+                whole = lineage.usage_lineage(d, self.tmp / "next", OWN, P.PRICES)
+                self.assertIsNone(whole["cost"]["value"])
+                self.assertTrue(whole["cost"]["status"].startswith("unknown"), whole["cost"])
+                self.assertTrue(whole["tokens_status"].startswith("lower bound"), whole["tokens_status"])
+
+    def test_no_flag_opens_a_session_over_it_and_nothing_is_written_into_the_run(self):
+        d = self.copy("away")
+        moved(d / "preflight")
+        before = P.snapshot(d)
+        for flags in ({}, {"accept_unaccounted": True}):
+            with self.subTest(flags=flags), self.assertRaises(R.RunRefused) as c:
+                self.n += 1
+                transport = provider()
+                try:
+                    R.execute(self.project, self.settings, self.tmp / "source", self.tmp / f"asked{self.n}", transport=transport,
+                              client_exe=str(self.client), cals=calibrations(), predecessor=d, **flags)
+                finally:
+                    self.assertEqual(transport.calls, [], "no provider request was made")
+            for needle in THE_REFUSAL:
+                self.assertIn(needle, str(c.exception))
+            self.assertIn(str(d), str(c.exception))
+        after = P.snapshot(d)
+        self.assertEqual({k: after[k] for k in before}, before, "history was not rewritten, a byte")
+
+
+@P.POSIX_CLIENT
+class BudgetStopped(ProductBase):
+    """A real run that stopped at its turn ceiling: its journal holds answered requests no session ever started for."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.settings = settings.load({**SETTINGS, "budget": {"provider_requests": 20, "turns": 1, "input_tokens": 100000,
+                                                               "output_tokens": 10000}})
+        self.rec = self.execute("first")
+        self.first = self.tmp / "first"
+
+    def test_the_run_that_wrote_its_record_is_exact_and_the_same_run_killed_before_it_is_the_unknown_the_rule_takes(self):
+        """The record vouches for the figures (6 requests, 1 turn: three requests started no session); without it the
+        journal alone cannot tell a stream that is gone from a session that never started. Pinned as the owner wrote the
+        rule; whether only a COMPLETED request owes a stream is an open owner decision."""
+        spent = {k: self.rec["budget"]["spent"][k] for k in SPEND}
+        self.assertEqual(spent, {"provider_requests": 6, "turns": 1, "input_tokens": 148, "output_tokens": 12})
+        acct = lineage.account_of(self.first)
+        self.assertEqual(({k: acct[k] for k in SPEND}, acct["exact"], acct["unread"]), (spent, True, []))
+        killed = self.tmp / "killed"
+        shutil.copytree(self.first, killed, symlinks=True)
+        moved(killed / "RUN.json")
+        got = lineage.account_of(killed)
+        self.assertEqual({k: got[k] for k in SPEND}, spent)         # nothing was lost: the figures are the same
+        self.assertIs(got["exact"], False)
+        self.assertEqual(len(got["unread"]), 1, got["unread"])
+        self.assertIn("a session that never started", got["unread"][0])
+        self.assertIsNone(lineage.lineage_account(killed)["total"])
 
 
 if __name__ == "__main__":
