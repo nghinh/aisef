@@ -73,17 +73,24 @@ def _runspec_problems(project: Project, rec: dict, events: list[dict]) -> tuple[
     return [], s
 
 
-def _spend(out: pathlib.Path, s: settings.Settings, events: list[dict], rec: dict) -> tuple[dict, str | None]:
+def _spend(out: pathlib.Path, s: settings.Settings, events: list[dict], rec: dict) -> tuple[dict, str | None, str | None]:
     """What the evidence says was spent (the session streams, the preflight ledger, the journal's provider requests,
-    and — V2.1, a continuation — the lineage's, re-derived from the predecessor's evidence as it is now) and whether it
-    broke a ceiling or cannot be accounted for — the run's own Budget, re-derived."""
+    and — V2.1, a continuation — the lineage's, re-derived from the predecessor's evidence as it is now), whether it
+    broke a ceiling or cannot be accounted for — the run's own Budget, re-derived — and, when part of the lineage's
+    evidence cannot be read now, why the inherited share the record states cannot be re-derived (a finding: it is not
+    0, and not what the readable parts sum to)."""
     from aisef2.app import lineage
     base = preflight.accounting(out / "preflight" / "LEDGER.jsonl")
     requests = sum(1 for e in events if e["type"] == "provider/request")
     c = rec.get("continues") or {}
     inherited = lineage.lineage_account(pathlib.Path(c["path"]), out) if c.get("account") else None
     b = client.Budget(s.budget, base, out / "sessions", lambda: requests, inherited)
-    return b.spend(), b.exceeded()
+    cannot = None
+    if inherited is not None and inherited["unread"]:
+        cannot = ("the lineage's evidence cannot be read now, so the spend the record inherited cannot be re-derived "
+                  f"(restore it — its permissions, or a faithful copy of the run directories at {lineage.unread_runs(inherited)}"
+                  " — and verify again): " + "; ".join(inherited["unread"])[:600])
+    return b.spend(), None if cannot else b.exceeded(), cannot
 
 
 def verify(project: Project, out: pathlib.Path, expect_anchor: str | None = None) -> dict:
@@ -177,11 +184,18 @@ def verify(project: Project, out: pathlib.Path, expect_anchor: str | None = None
         problems += bound
         stop = None
         if s is not None:
-            spent, stop = _spend(out, s, events, rec)
+            spent, stop, cannot = _spend(out, s, events, rec)
             claimed = (rec.get("budget") or {}).get("spent") or {}
             off = [k for k in client.Budget.KEYS if claimed.get(k) != spent[k]]
-            if off:
+            if cannot:
+                problems.append(cannot)
+            elif off:
                 problems.append(f"the record's spend is not what the evidence re-derives for {off}")
+            accepted = (rec.get("continues") or {}).get("accepted_unaccounted")
+            if accepted:    # the ceilings were enforced against the known part of the lineage: said, not hidden
+                notes.append(f"the run continued a lineage with spend no evidence accounts for ({len(accepted)} listed in "
+                             "continues.accepted_unaccounted), accepted by name: its ceilings were enforced against the "
+                             "known part, and the lineage's total is not known")
         # what can only lower the verdict is taken from the record too; nothing in it can raise one
         errors = [{"story": x, "error": "begun and never ended in the journal"} for x in refused] + list(rec.get("story_errors") or [])
         verdict, _, committed = R.delivery(project, events, outcomes, stop or rec.get("budget_stop"), errors)

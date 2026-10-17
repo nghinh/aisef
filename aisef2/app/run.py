@@ -376,8 +376,11 @@ def execute(project: Project, settings: Settings, source: pathlib.Path, out: pat
     """Run the project; the record (also written to <out>/RUN.json, whatever happens). `predecessor`: the run this one
     continues (`aisef run --parent`, V2.1, app/lineage): claimed before the first provider request, its path and
     evidence anchor recorded, its lineage's spend counted against this run's ceilings; a lineage with unaccounted spend
-    starts nothing unless `accept_unaccounted`. Nothing of the predecessor's evidence is written — and it is a run,
-    never a revision: nothing runs at it."""
+    starts nothing unless `accept_unaccounted` — and one with evidence that cannot be read (`unread`, app/lineage) starts
+    nothing at all: no flag accepts spend not even a request count is known for. Nothing of the predecessor's evidence
+    is written — a run refused after the claim leaves its own record and the one claim generation it took (append-only
+    history on the predecessor, with the operator's `supersede_claim` assertion if given), never a rewrite — and it is a
+    run, never a revision: nothing runs at it."""
     # every path the run hands git or records is absolute: a relative --out given to `git -C out clone ... out/repo`
     # would clone into out/out/repo (found by the CLI integration run, V2.1)
     out, source = pathlib.Path(out).absolute(), pathlib.Path(source).absolute()
@@ -422,7 +425,20 @@ def execute(project: Project, settings: Settings, source: pathlib.Path, out: pat
             except lineage.LineageRefused as e:
                 raise RunRefused(str(e)) from None
             inherited = lineage.lineage_account(predecessor, out)
-            rec["continues"]["account"] = {k: inherited[k] for k in (*lineage.SPEND, "unaccounted")}
+            # the four counters are what the readable parts spent (a lower bound while `total` is None: no sum stands for
+            # the lineage's total), `runs` which part spent what, `unaccounted` and `unread` what is not known
+            rec["continues"]["account"] = {k: inherited[k] for k in (*lineage.SPEND, "unaccounted", "unread", "total",
+                                                                   "runs")}
+            if inherited["unread"]:     # a part not reconciled at all: nothing the operator names accepts it
+                raise RunRefused(f"the lineage of {predecessor} has evidence that is there and cannot be read, so what it "
+                                 f"spent is not known (not 0): no paid work starts, and --accept-unaccounted does not "
+                                 f"cover it (it accepts spend the evidence reads as sent and never answered, not "
+                                 f"evidence that cannot be read). Make it readable again — its permissions, or a faithful "
+                                 f"copy of the run directory at {lineage.unread_runs(inherited)} — and run again; where that cannot be "
+                                 f"done this lineage cannot be continued (`aisef run` without --parent inherits nothing, "
+                                 f"its ceilings are its own). This run began nothing and nothing earlier was written or "
+                                 f"changed (the claim it took stays as history, superseded by evidence on the next run): "
+                                 f"{'; '.join(inherited['unread'])[:1500]}")
             if inherited["unaccounted"]:
                 if not accept_unaccounted:
                     raise RunRefused(f"the lineage of {predecessor} has spend no evidence accounts for — no paid work "
