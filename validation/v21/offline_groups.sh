@@ -30,12 +30,24 @@
 #                          allowed, so Chromium reaching the loopback app server works and nothing reaches the
 #                          internet) | none (not enforced; the report says so)
 #   OFFLINE_KEEP           1 keeps OUT/tree
+#   OFFLINE_TIMEOUT        seconds one run of one group may take [900]; at the limit the run's process group gets SIGTERM
+#                          (Playwright's node closes its Chromium on it), 10 s later SIGKILL; the run counts as failed
 #
 # Each group is run twice, as the suite would run it: WITHOUT the tools (what the suite does here: the skips counted
 # and their reasons) and WITH them. The environment is `env -i`: HOME, XDG_*, TMPDIR fresh under OUT, PATH without any
 # directory holding `opencode`, no AISEF_* variable, no proxy; only PLAYWRIGHT_BROWSERS_PATH when the browsers are named.
 # Output: OUT/<group>-without.txt, OUT/<group>-with.txt (the unittest -v log), OUT/result.txt (what this prints).
-# Exit: 0 every group that ran passed; 1 a test failed or errored; 2 refused (no commit, no python, OUT exists).
+# Exit: 0 every group ran WITH its tools, nothing was skipped there, and everything passed;
+#       1 a test failed or errored (in either run of a group), a run timed out or printed no unittest status line;
+#       2 refused (no commit, no python, OUT exists, outbound network not enforceable, export failed);
+#       3 PARTIAL: everything that ran passed, but a group could not run with its tools (a tool or a pinned clone is
+#         missing) or its run with them still skipped tests. The line before the last says which (COMPLETE, PARTIAL,
+#         FAILED): a caller that gates on the status can tell "the groups ran" (0) from "nothing the suite skips was
+#         run" (3).
+# An interrupt (INT, TERM, HUP) stops the run in progress the same way as the timeout and removes OUT/tree. Only the
+# process group that this script started for the run is signalled (Playwright puts Chromium in a group of its own: node
+# closes it on SIGTERM; measured here: no node or Chromium left after a timeout, a SIGINT to the script's group, and a
+# SIGTERM to the script alone). A Chromium that survived a SIGKILL of node would be left, not hunted.
 set -u
 HERE=${0:A:h}
 REPO=$(git -C $HERE rev-parse --show-toplevel) || { print "not inside a git repository"; exit 2 }
@@ -56,7 +68,26 @@ NETWORK=${OFFLINE_NETWORK:-deny}
 [[ $NETWORK == deny && ! -x /usr/bin/sandbox-exec ]] && { print "sandbox-exec is absent: OFFLINE_NETWORK=none to run without enforcement"; exit 2 }
 mkdir -p $OUT/home $OUT/xdg/{config,data,state,cache} $OUT/tmp $OUT/tree || exit 2
 TREE=$OUT/tree
-{
+# What is printed from here on is also kept in OUT/result.txt: through a fifo read by one `tee -i`, not a pipeline, so
+# that a signal sent to this shell reaches the trap at once (zsh runs a trap after a foreground pipeline, not during it).
+mkfifo $OUT/out.fifo || exit 2
+tee -i $OUT/result.txt < $OUT/out.fifo &
+TEEPID=$!
+exec > $OUT/out.fifo 2>&1
+# An interrupt or any exit from here on stops the run in progress, removes OUT/tree (the export and the links into it;
+# the links' targets are not touched: `rm -rf` of a symlink removes the link) and lets tee finish.
+RPID=
+cleanup() {
+  local rc=$?
+  [[ -n $RPID ]] && { kill -TERM $RPID 2>/dev/null; wait $RPID 2>/dev/null; RPID= }
+  [[ ${OFFLINE_KEEP:-0} == 1 ]] || { [[ -n $TREE && $TREE == $OUT/tree ]] && rm -rf -- $TREE }
+  exec >&- 2>&-
+  wait $TEEPID 2>/dev/null
+  rm -f $OUT/out.fifo
+  exit $rc
+}
+trap cleanup EXIT
+trap 'print "interrupted"; exit 130' INT TERM HUP
 print "== offline groups of the suite, commit ${SHA[1,12]} of $REPO"
 print "   $(date '+%Y-%m-%dT%H:%M:%S%z'); $(uname -srm); python $($PY -c 'import sys; print(sys.version.split()[0])')"
 print "   network: $([[ $NETWORK == deny ]] && print 'outbound refused (sandbox-exec; loopback and unix sockets allowed)' || print 'NOT enforced')"
@@ -71,19 +102,21 @@ if [[ -f $PW/playwright/package.json ]]; then
 else
   MOCKUP_WHY+=("no playwright/ under AISEF_PW_NODE_MODULES=$PW")
 fi
-CHROMIUM=(${(f)"$(ls -d $BROWSERS/chromium* 2>/dev/null)"})
+CHROMIUM=("$BROWSERS"/chromium*(N))   # (N): no match is an empty list, not zsh's "no matches found"
 (( $#CHROMIUM )) || MOCKUP_WHY+=("no chromium under AISEF_PW_BROWSERS=$BROWSERS")
 BNAMES=(); for d in $CHROMIUM; do BNAMES+=(${d:t}); done
 print "== mockup tools: node ${NODE:-MISSING} ${NODE:+$($NODE --version)}; playwright ${PWV:-MISSING} at $PW"
 print "   browsers: ${${(j:, :)BNAMES}:-MISSING} at $BROWSERS"
 
-PINNED=()    # name -> linked
+PINNED=()    # linked
 SKIPPED_REFS=()
+NPINS=0
 print "== references: clones under $REFS against the commits of references/PINS.md at ${SHA[1,12]}"
 git -C $REPO show ${SHA}:references/PINS.md > $OUT/PINS.md 2>/dev/null || { print "no references/PINS.md at $SHA"; exit 2 }
 while IFS='|' read -r _ name _ commit _; do
   name=${name# }; name=${name%% *}; commit=${commit//[ \`]/}
   [[ $commit =~ '^[0-9a-f]{40}$' ]] || continue
+  NPINS=$(( NPINS + 1 ))
   if [[ ! -d $REFS/$name/.git && ! -f $REFS/$name/.git ]]; then SKIPPED_REFS+=("$name: not cloned"); print "   $name: not cloned"; continue; fi
   head=$(git -C $REFS/$name rev-parse HEAD 2>/dev/null)
   if [[ $head == $commit ]]; then PINNED+=($name); print "   $name: ${commit[1,12]} ok"
@@ -102,64 +135,116 @@ GP=$(print -rl -- ${(s.:.)PATH} | while read -r d; do [[ -x $d/opencode ]] || pr
 (allow network-outbound (remote unix-socket))
 SB
 NETCMD=(); [[ $NETWORK == deny ]] && NETCMD=(/usr/bin/sandbox-exec -f $OUT/deny-net.sb)
+# bounded.py SECONDS CMD...: CMD in a session of its own (its process group is the one this script started, read from
+# the child it created, nothing else is signalled). At the limit, or on INT/TERM, SIGTERM the group, 10 s later SIGKILL.
+# Exit: CMD's status; 124 at the limit; 128+n on signal n.
+cat > $OUT/bounded.py <<'PYEOF'
+import os, signal, subprocess, sys
+limit, argv = float(sys.argv[1]), sys.argv[2:]
+p = subprocess.Popen(argv, start_new_session=True)
+def stop():
+    for sig, grace in ((signal.SIGTERM, 10), (signal.SIGKILL, 5)):
+        try:
+            os.killpg(p.pid, sig)
+        except ProcessLookupError:
+            return
+        try:
+            p.wait(grace)
+            return
+        except subprocess.TimeoutExpired:
+            pass
+def on_signal(n, _frame):
+    stop()
+    sys.exit(128 + n)
+for n in (signal.SIGINT, signal.SIGTERM, signal.SIGHUP):
+    signal.signal(n, on_signal)
+try:
+    rc = p.wait(limit)
+except subprocess.TimeoutExpired:
+    stop()
+    sys.exit(124)
+sys.exit(rc if rc >= 0 else 128 - rc)
+PYEOF
+TIMEOUT=${OFFLINE_TIMEOUT:-900}
 
-# run_group LABEL TOOLS(0|1) MODULE...: unittest -v in the export; the log is OUT/LABEL.txt
+# run_group LABEL TOOLS(0|1) MODULE...: unittest -v in the export, bounded; the log is OUT/LABEL.txt; returns the status
 run_group() {
   local label=$1 tools=$2; shift 2
   local extra=(); (( tools )) && [[ -d $BROWSERS ]] && extra=(PLAYWRIGHT_BROWSERS_PATH=$BROWSERS)
-  (cd $TREE && $NETCMD env -i PATH=$GP HOME=$OUT/home XDG_CONFIG_HOME=$OUT/xdg/config XDG_DATA_HOME=$OUT/xdg/data \
-      XDG_STATE_HOME=$OUT/xdg/state XDG_CACHE_HOME=$OUT/xdg/cache TMPDIR=$OUT/tmp LANG=en_US.UTF-8 USER=${USER:-op} \
-      LOGNAME=${LOGNAME:-op} PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=$TREE/tests $extra \
-      $PY -B -m unittest -v "$@") > $OUT/$label.txt 2>&1
-  return $?
+  ( cd $TREE && exec $PY -I $OUT/bounded.py $TIMEOUT $NETCMD env -i PATH=$GP HOME=$OUT/home XDG_CONFIG_HOME=$OUT/xdg/config \
+      XDG_DATA_HOME=$OUT/xdg/data XDG_STATE_HOME=$OUT/xdg/state XDG_CACHE_HOME=$OUT/xdg/cache TMPDIR=$OUT/tmp \
+      LANG=en_US.UTF-8 USER=${USER:-op} LOGNAME=${LOGNAME:-op} PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=$TREE/tests $extra \
+      $PY -B -m unittest -v "$@" ) > $OUT/$label.txt 2>&1 &
+  RPID=$!
+  wait $RPID; local code=$?
+  RPID=
+  return $code
 }
-# the counts of one log: ran, skipped, failures, errors, the skip reasons
+# parse LOG: RAN SKIP FAIL ERR STATUS of one unittest log; counts LOG CODE: the line that is printed
+parse() {
+  local f=$1
+  RAN=$(sed -n 's/^Ran \([0-9]*\) test.*/\1/p' $f | tail -1)
+  STATUS=$(grep -E '^(OK|FAILED)' $f | tail -1)
+  SKIP=$(print -r -- $STATUS | sed -n 's/.*skipped=\([0-9]*\).*/\1/p'); SKIP=${SKIP:-0}
+  FAIL=$(print -r -- $STATUS | sed -n 's/.*failures=\([0-9]*\).*/\1/p'); FAIL=${FAIL:-0}
+  ERR=$(print -r -- $STATUS | sed -n 's/.*errors=\([0-9]*\).*/\1/p'); ERR=${ERR:-0}
+  STATUS=${STATUS:-NO STATUS LINE}
+}
 counts() {
-  local f=$1 ran st sk fl er
-  ran=$(sed -n 's/^Ran \([0-9]*\) test.*/\1/p' $f | tail -1)
-  st=$(grep -E '^(OK|FAILED)' $f | tail -1)
-  sk=$(print -r -- $st | sed -n 's/.*skipped=\([0-9]*\).*/\1/p')
-  fl=$(print -r -- $st | sed -n 's/.*failures=\([0-9]*\).*/\1/p')
-  er=$(print -r -- $st | sed -n 's/.*errors=\([0-9]*\).*/\1/p')
-  print -r -- "ran ${ran:-?}, skipped ${sk:-0}, failures ${fl:-0}, errors ${er:-0}  [${st:-NO STATUS LINE}]"
+  parse $1
+  local why=; (( $2 == 124 )) && why=" TIMEOUT after ${TIMEOUT} s"
+  print -r -- "ran ${RAN:-?}, skipped $SKIP, failures $FAIL, errors $ERR  [$STATUS]; exit $2$why"
 }
 reasons() { sed -n "s/.* skipped '\(.*\)'\$/\1/p" $1 | sort | uniq -c | sort -rn | sed 's/^ */      /' | cut -c1-170; }
+# a run counts as failed when its status is not 0, or it ended with no unittest status line, or it has failures/errors
+failed() { parse $1; (( $2 != 0 )) || [[ $STATUS == "NO STATUS LINE" ]] || (( FAIL + ERR > 0 )); }
 
 MOCKUP=(test_mockup test_mockup_map test_cli.TestMockupCommand)
 REFERENCES=(test_catalog test_install test_security_filter test_detect_stack test_experience)
 RC=0
+PARTIAL=()
 for g in mockup references; do
   mods=(); [[ $g == mockup ]] && mods=($MOCKUP) || mods=($REFERENCES)
   print "== group $g: ${mods[*]}"
-  run_group $g-without 0 $mods
-  print "   without the tools (what the suite does on a machine that has none): $(counts $OUT/$g-without.txt)"
+  run_group $g-without 0 $mods; code=$?
+  print "   without the tools (what the suite does on a machine that has none): $(counts $OUT/$g-without.txt $code)"
   reasons $OUT/$g-without.txt
+  failed $OUT/$g-without.txt $code && RC=1
 done
 
 # ---- link the tools into the export, then the same groups again --------------------------------------------------
 LINKED=()
-if [[ -z $MOCKUP_WHY ]]; then
+if (( ! $#MOCKUP_WHY )); then
   mkdir -p $TREE/spike/s7 && ln -s $PW $TREE/spike/s7/node_modules && LINKED+=("spike/s7/node_modules -> $PW")
 fi
 mkdir -p $TREE/references
 for n in $PINNED; do ln -s $REFS/$n $TREE/references/$n && LINKED+=("references/$n"); done
 print "== linked into the export: ${#LINKED} (${(j:; :)LINKED})"
-[[ -n $MOCKUP_WHY ]] && print "   mockup group NOT run with its tools: ${(j:; :)MOCKUP_WHY}"
+(( $#MOCKUP_WHY )) && print "   mockup group NOT run with its tools: ${(j:; :)MOCKUP_WHY}"
 for g in mockup references; do
   mods=(); [[ $g == mockup ]] && mods=($MOCKUP) || mods=($REFERENCES)
-  if [[ $g == mockup && -n $MOCKUP_WHY ]]; then print "== group $g with the tools: not run"; continue; fi
-  print "== group $g with the tools: ${mods[*]}"
+  if [[ $g == mockup ]] && (( $#MOCKUP_WHY )); then
+    print "== group $g with the tools: not run"; PARTIAL+=("mockup: not run with its tools (${(j:; :)MOCKUP_WHY})"); continue
+  fi
+  if [[ $g == references ]] && (( ! $#PINNED )); then
+    print "== group $g with the tools: not run (no pinned clone linked)"; PARTIAL+=("references: no pinned clone linked"); continue
+  fi
+  [[ $g == references ]] && print "== group $g with the tools ($#PINNED of $NPINS pinned clones linked): ${mods[*]}" || print "== group $g with the tools: ${mods[*]}"
   run_group $g-with 1 $mods; code=$?
-  print "   $(counts $OUT/$g-with.txt); exit $code"
+  print "   $(counts $OUT/$g-with.txt $code)"
   reasons $OUT/$g-with.txt
   grep -E '^(FAIL|ERROR):' $OUT/$g-with.txt | sed 's/^/   /' | head -20
-  (( code )) && RC=1
+  if failed $OUT/$g-with.txt $code; then RC=1
+  elif (( SKIP > 0 )); then PARTIAL+=("$g: the run with the tools still skipped $SKIP tests"); fi
 done
-(( $#SKIPPED_REFS )) && print "== pinned clones not linked: ${(j:; :)SKIPPED_REFS}"
+if (( $#SKIPPED_REFS )); then
+  print "== pinned clones not linked: ${(j:; :)SKIPPED_REFS}"
+  (( $#PINNED )) && PARTIAL+=("references: ${#SKIPPED_REFS} of $NPINS pinned clones not linked")
+fi
 
 print "== not run: the Docker-gated group (AISEF_TEST_DOCKER=1 tests.test_sandbox tests.test_tools: 10 tests; image alpine:latest, --network=none)"
-[[ ${OFFLINE_KEEP:-0} == 1 ]] || { [[ -n $TREE && $TREE == $OUT/tree ]] && rm -rf $TREE; }
+if (( RC )); then print "== FAILED: a test failed or errored, or a run timed out or ended without a status line (exit 1)"
+elif (( $#PARTIAL )); then RC=3; print "== PARTIAL (exit 3): everything that ran passed, but ${(j:; :)PARTIAL}"
+else print "== COMPLETE (exit 0): both groups ran with their tools, nothing skipped, everything passed"; fi
 print "== result in $OUT/result.txt; exit $RC"
 exit $RC
-} 2>&1 | tee $OUT/result.txt
-exit ${pipestatus[1]}
