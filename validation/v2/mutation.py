@@ -1115,8 +1115,9 @@ for _t, _fs in _V21_R5_NEW.items():
 for _t, _fs in _V21_R5_APPEND.items():
     V21_TARGETS[_t] = [*V21_TARGETS[_t], *[f for f in _fs if f not in V21_TARGETS[_t]]]
 # --- round 5, second pass ---
-# The second wave of the window (owner directive 2026-10-15, points 1-6; lanes migrate-semantics, lineage-proof,
-# review-limits, ocr-preflight, ocr-build and linux-recorder, merged by 3e1e83a) changed aisef2/app/{adapters,
+# The second wave of the window (owner directive 2026-10-15 as the lane reports cite it; lanes migrate-semantics,
+# lineage-proof, review-limits and ocr-preflight, which merged in that order, then ocr-build and linux-recorder, up to
+# 3e1e83a) changed aisef2/app/{adapters,
 # bundle_cli,cli,client,lineage,review_ocr,review_verify,run,verify}.py and aisef2/probe/{cli_invocation,
 # file_artifact}.py again, and aisef2/probe/catalog.py, which has no target before this pass. ocr-build (a build
 # recipe and a provenance record) and linux-recorder (validation/v21/{read_set,reach}.py, outside the mutation copy and
@@ -1132,20 +1133,49 @@ for _t, _fs in _V21_R5_APPEND.items():
 #     still writing lineage.py (lineage-r2: `_recorded_spend`, `_evidence_gone`), which are not in this tree;
 #   * test_v21_ocr_identity.py is appended to `adapters._declared` (changed by the ocr-preflight fix: it names the
 #     system's reason), `review_ocr.pinned` (a NUL or a lone surrogate in the path is a reason, not an exception),
-#     `cli.run` (the --check look) and `run.execute` (the check before the claim). test_v21_ocr_preflight.py, a full run
-#     per test (~70 s), is in the sets of the two new run.py functions only, after the fast file, so it runs for a
-#     mutant the fast file lets by;
+#     `cli.run` (the --check look) and `run.execute` (the check before the claim; the lineage-proof lane's file first,
+#     as the lanes merged). test_v21_ocr_preflight.py, a full run per test (~70 s), is in the sets of the two new
+#     run.py functions only, after the fast file, so it runs for a mutant the fast file lets by;
 #   * catalog.py is new to the registry: `_capability` and the two fields the migrate lane added. `CATALOG` (its table,
-#     changed by `**_capability(...)`) is not registered: no lane proposed it and the file had no target;
+#     changed by `**_capability(...)`) is not registered, an owner decision: the impl report lists it as changed, but
+#     the change is a call and has no mutant, and the table's 46 mutants (subject kinds, paths, vocabulary) are data no
+#     lane touched and none gave a kill file for. Registering it with test_v21_migrate_semantics.py adds 46 mutants;
 #   * `_capability_changes` (file_artifact.py) is prose read by `bundle migrate`: registered as the fix report lists it;
 #     the impl report says no test kills a mutant of its description strings, so a survivor there may need an audit;
 #   * no mutant, so no target: `bundle_cli.PLACEHOLDER`, `file_artifact.CAPABILITY_CHANGES` (a call), `cli_invocation.
-#     REGEX_WORKER` (a script with no function), `_PATTERN_HEAD`, `_SEARCH_GRACE_S`, `_monotonic`, `review_verify.
-#     STATUSES`, run.py `SHA256_OF`, `OCR_INSTEAD`, `OCR_STATEMENT`, `OCR_WHEN`. The runner cannot resolve
+#     REGEX_WORKER` as a bare name (its one assignment, `REGEX_WORKER/found`, has 3 mutants and is a target),
+#     `_PATTERN_HEAD`, `_SEARCH_GRACE_S`, `_monotonic`, `review_verify.STATUSES`, run.py `SHA256_OF`, `OCR_INSTEAD`,
+#     `OCR_STATEMENT`, `OCR_WHEN`. The runner cannot resolve
 #     `review_verify.INDETERMINATE` (one name of a tuple assignment) or the class names `StreamSearchFailed` and
 #     `_Later` (their `__init__` and `settle` are the targets);
 #   * `cli_invocation._watch` changed in an annotation and a docstring only: its mutants are as they were.
-# The kill sets are the lanes' proposals by which test calls the function; none is measured yet.
+# The kill sets are the lanes' proposals by which test calls the function; none is measured yet. Where the fix report
+# gives one set for a whole group (review-limits: test_c2_cli_verdicts.py and test_c2_cli_protocol.py beside the two r5
+# files, for every cli_invocation name), the names it added keep the impl report's narrower set: verdicts hands
+# verdict_of its own search, so it never reaches `search_in_worker`, and protocol only pins the list of child scripts.
+# The changed names `_stream_matches`, `verdict_of`, `_observe`, `_observe_in` and `_concluded` already hold the one
+# that reaches them.
+# Counts, by the runner's own enumeration (read only, over the tree of 3e1e83a with this registry): the 14 files of the
+# first pass carry 418 targets and 11,063 mutants (10,704 when that pass was written: the lanes changed bodies); with
+# this pass the 15 files whose bytes changed in the window (those and catalog.py) carry 457 targets and 11,852 mutants.
+# The registry is 612 targets, 15,972 mutants, 29 files, 193 kill files (573, 15,183, 28, 184 before this pass). That is
+# not the whole stale scope: 52 targets (1,899 mutants) of 9 files that did not change have a kill-test closure that did
+# (v21_mutation_record's reuse proof): bundle.py 6/214, feedback.py 2/346, preflight.py 6/323, settings.py 10/343,
+# usage.py 8/259, orchestrate/review.py 2/131, workspace.py 1/34, plan/static_admission.py 13/192, probe/calibration.py
+# 4/57 (changed there: ledgerlock_candidate, test_s2_kills and test_v21_{bundle_tools, context_pack,
+# continue_integrity, identity, review, review_chain}). So at least 509 targets and 13,751 mutants are stale, of 612
+# and 15,972.
+# Not met by this registry, listed and not fixed (each is outside this file). T0 refuses a target whose kill file fails
+# the null mutant: (1) tests/v2/test_c2_file_artifact.py pins file_artifact.PROBE_SOURCES as 4 entries (Tables.
+# test_declared_tables_identity_and_preconditions, since e34e6dd); the source has 6 (runtime/process_range.py and
+# runtime/range_anchor.py): 46 file_artifact.py targets (901 mutants) hold that file and cannot pass T0 until its pin
+# follows the source;
+# (2) aisef2/app/calibrations.py binds none of the 4 active probes' EXECUTION_DIGEST at this tree, so the kill files
+# that run a real probe, test_v21_kills3_T15a.py (review_verify anchor, detail, reproducer_contract, verify: 4 targets,
+# 290 mutants) and test_v21_r5_review_indeterminate.py (verify), pass only after validation/qualification/
+# release_calibration.py --write at the final snapshot (the fix report adds test_v21_review_chain.py); (3) the verify
+# report of review-limits names tests/v2/test_c2_orchestration_conformance.py red at the lane's base (Record.test_15),
+# and 11 story_runner.py targets (409 mutants) hold it.
 _V21_R5B_NEW: dict[str, list[str]] = {
     # migrate-semantics: an approval is kept only while the contract it was given for is evaluated as it was
     **{f"aisef2/app/bundle_cli.py::{n}": [_T + "migrate_semantics.py"] for n in (
@@ -1163,7 +1193,7 @@ _V21_R5B_NEW: dict[str, list[str]] = {
     "aisef2/app/lineage.py::unread_runs": [_T + "x_lineage_proof.py"],
     # review-limits: a pattern the reviewer wrote is searched in a worker under a deadline; a comment's scan is linear
     **{f"aisef2/probe/cli_invocation.py::{n}": [_T + "r5_regex_worker.py", _T + "r5_regex_isolation.py"] for n in (
-        "SEARCH_REASONS", "StreamSearchFailed.__init__", "search_in_worker", "_said")},
+        "SEARCH_REASONS", "StreamSearchFailed.__init__", "search_in_worker", "_said", "REGEX_WORKER/found")},
     "aisef2/probe/cli_invocation.py::_SEARCH_STOPPED": [_T + "r5_regex_isolation.py", _T + "r5_regex_worker.py"],
     "aisef2/probe/cli_invocation.py::_Later.settle": [_T + "r5_regex_isolation.py", _T + "r5_regex_worker.py"],
     "aisef2/app/adapters.py::_braces": [_T + "r5_linear_text.py", _T + "kills_adapters.py"],
@@ -1202,7 +1232,7 @@ _V21_R5B_APPEND: dict[str, list[str]] = {
     "aisef2/app/adapters.py::_declared": [_T + "ocr_identity.py"],
     "aisef2/app/review_ocr.py::pinned": [_T + "ocr_identity.py"],
     "aisef2/app/cli.py::run": [_T + "ocr_identity.py"],
-    "aisef2/app/run.py::execute": [_T + "ocr_identity.py", _T + "x_lineage_proof.py"],
+    "aisef2/app/run.py::execute": [_T + "x_lineage_proof.py", _T + "ocr_identity.py"],
 }
 for _t, _fs in _V21_R5B_NEW.items():
     V21_TARGETS[_t] = list(_fs)
