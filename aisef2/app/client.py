@@ -87,8 +87,9 @@ class Budget:
         #: what the lineage's account lists as unknown and the operator accepted by name: the ceilings are then
         #: enforced against the known part — the account says so (`account`), it is never a total
         self.inherited_unaccounted = [str(u) for u in (inherited or {}).get("unaccounted") or []]
-        #: what the lineage's account lists as unread (evidence there that cannot be read): the ceilings are never enforced
-        #: against the known part of such a lineage. The gate refuses before a budget is built (run.execute); one built
+        #: what the lineage's account lists as unread (evidence there that cannot be read, or that the run's own record shows
+        #: and is gone): the ceilings are never enforced against the known part of such a lineage — cap - total is a
+        #: remaining only when no part is unread; with one, all work stops. The gate refuses before a budget is built (run.execute); one built
         #: anyway reports it unaccounted, as it does a session that finished no step: all work stops
         self.inherited_unread = [str(u) for u in (inherited or {}).get("unread") or []]
 

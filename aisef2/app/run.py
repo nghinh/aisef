@@ -464,8 +464,9 @@ def execute(project: Project, settings: Settings, source: pathlib.Path, out: pat
     """Run the project; the record (also written to <out>/RUN.json, whatever happens). `predecessor`: the run this one
     continues (`aisef run --parent`, V2.1, app/lineage): claimed before the first provider request, its path and
     evidence anchor recorded, its lineage's spend counted against this run's ceilings; a lineage with unaccounted spend
-    starts nothing unless `accept_unaccounted` — and one with evidence that cannot be read (`unread`, app/lineage) starts
-    nothing at all: no flag accepts spend not even a request count is known for. Nothing of the predecessor's evidence
+    starts nothing unless `accept_unaccounted` — and one with evidence that cannot be read, or that the run's own record
+    shows and is gone (`unread`, app/lineage), starts nothing at all: no flag accepts spend not even a request count is
+    known for. Nothing of the predecessor's evidence
     is written — a run refused after the claim leaves its own record and the one claim generation it took (append-only
     history on the predecessor, with the operator's `supersede_claim` assertion if given), never a rewrite — and it is a
     run, never a revision: nothing runs at it."""
@@ -526,11 +527,15 @@ def execute(project: Project, settings: Settings, source: pathlib.Path, out: pat
             rec["continues"]["account"] = {k: inherited[k] for k in (*lineage.SPEND, "unaccounted", "unread", "total",
                                                                    "runs")}
             if inherited["unread"]:     # a part not reconciled at all: nothing the operator names accepts it
-                raise RunRefused(f"the lineage of {predecessor} has evidence that is there and cannot be read, so what it "
+                raise RunRefused(f"the lineage of {predecessor} has evidence that is there and cannot be read, or that the "
+                                 f"run's own record or journal shows was there and is gone, so what it "
                                  f"spent is not known (not 0): no paid work starts, and --accept-unaccounted does not "
                                  f"cover it (it accepts spend the evidence reads as sent and never answered, not "
-                                 f"evidence that cannot be read). Make it readable again — its permissions, or a faithful "
-                                 f"copy of the run directory at {lineage.unread_runs(inherited)} — and run again; where that cannot be "
+                                 f"evidence that cannot be read or is gone; --supersede-claim does not either). Make it "
+                                 f"readable again — its permissions, or a faithful "
+                                 f"copy of the run directory at {lineage.unread_runs(inherited)} (a sessions directory, a "
+                                 f"session stream or the preflight's ledger that is gone comes back from such a copy, "
+                                 f"never from a rebuilt or edited file) — and run again; where that cannot be "
                                  f"done this lineage cannot be continued (`aisef run` without --parent inherits nothing, "
                                  f"its ceilings are its own). This run began nothing and nothing earlier was written or "
                                  f"changed (the claim it took stays as history, superseded by evidence on the next run): "
