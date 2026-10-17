@@ -247,9 +247,9 @@ kill ngẫu nhiên (`test_v21_continue_integrity`):
      không phải văn bản, không dựng lại được; **ledger preflight** — quyền, không phải văn bản, không parse được, một thư mục đứng
      chỗ tệp; **luồng phiên** — quyền (của luồng hay của thư mục `sessions/`), một liên kết trỏ vào hư không, một thư mục
      đứng chỗ tệp. Một luồng *không phải văn bản* thì khác: nó chỉ thêm một dòng `unaccounted` (`a session that started
-     finished no step`) mà `--accept-unaccounted` phủ được, không phải `unread`. Bằng chứng *thiếu hay sai hình dạng* cạnh một journal đọc được (`sessions/` là một tệp,
-     một liên kết hỏng hay lặp; ledger là một liên kết hỏng hay lặp) **không** nằm trong danh sách này — quy tắc cho nó là
-     R2, **[ĐANG HOÀN THIỆN]**, §8.5. Cũng là `unread`: một journal
+     finished no step`) mà `--accept-unaccounted` phủ được, không phải `unread`. Một `sessions/` là tệp, một liên kết hỏng hay lặp, hay một ledger là liên kết hỏng hay lặp **không** tự nó là `unread`
+     nếu bản ghi và journal của run không cho thấy gì từng ở đó; khi chúng cho thấy, đó là *bằng chứng đã mất* (đoạn ngay sau
+     mục này, R2) và cũng là `unread`. Cũng là `unread`: một journal
      đọc được nhưng **không phải journal mà `RUN.json` của run nêu** (digest và số dòng: rỗng, cắt ở một dòng hay giữa
      dòng, bị thay); một record hay claim không đọc được, hỏng, không phải object hay là liên kết hỏng (nên không biết
      nó nêu run nào); một run tổ tiên mà record nêu nhưng thư mục đã mất (mất, là tệp, hay liên kết hỏng). Đây là chi phí
@@ -258,6 +258,31 @@ kill ngẫu nhiên (`test_v21_continue_integrity`):
      được gửi. Thông báo nêu thư mục run cần khôi phục (quyền của nó, hay một bản sao trung thành) và rằng nếu không khôi
      phục được thì dòng dõi không nối tiếp được (`aisef run` không `--parent` là một run mới, không kế thừa gì, trần riêng).
      Run đó vẫn không bị "đoán 0": phần đã biết của mỗi run còn nguyên và quy được về run đó.
+
+  **Bằng chứng đã mất khác với run tiêu ít hơn (quyết định 2026-10-15, mục 2; R2).** `sessions/`, một luồng phiên
+  `sessions/<story>.<role>.<n>.jsonl` hoặc sổ cái `preflight/LEDGER.jsonl` của một run đã bàn giao mà **không còn** cạnh một
+  journal vẫn đọc được thì run đó không phải "tiêu ít hơn": chi phí của nó là **chưa xác định** (không bao giờ 0, không bao
+  giờ một số trông như đã đối soát). Hai nhân chứng, không đoán: (1) bản ghi của chính run, `RUN.json` `budget.spent` trừ
+  phần `budget.inherited` (run chưa dựng `Budget`, ví dụ route không attested, thì `preflight.accounting`), mà bằng chứng nay
+  chỉ suy ra được *ít hơn* ở bốn bộ đếm request, turn, input_tokens, output_tokens và ở số luồng phiên `sessions_started`;
+  (2) khi không có bản ghi nêu chi tiêu (run bị kill trước hoặc trong lúc ghi `RUN.json`), journal ghi một request đã có
+  result (result không phải của closer) mà không luồng phiên nào ứng với nó (ghép theo số đếm mỗi story và vai trò). Hệ quả
+  giống mọi bằng chứng `unread`: `exact:false`, tổng của dòng dõi `total:null`, chi phí `null`; phần còn đọc được vẫn gán cho
+  đúng run đó và không được coi là chính xác (`spend.known`, `spend_by_run[].exact:false`); `aisef run --parent` bị từ chối
+  **với mọi cờ** trước preflight, không request nào; không ghi gì vào thư mục run, không giải phóng claim nào. Lời từ chối
+  nêu thư mục run cần khôi phục và loại bằng chứng đã mất; khôi phục là một **bản sao trung thành** của thư mục run (hoặc trả
+  lại quyền đọc), không phải tệp dựng lại hay sửa tay; nếu không làm được thì dòng dõi không tiếp tục được (`aisef run` không
+  `--parent` không thừa kế gì). *Không* bị coi là mất: bản ghi của run xác nhận số liệu (bộ đếm bằng nhau — một phiên chưa
+  từng bắt đầu vì chạm ngân sách hay reviewer không chạy được để lại request mà không có luồng), bằng chứng *nhiều hơn* bản
+  ghi nêu, và request đang bay (chưa có result: ba pin `StaysAsItWas`), vẫn là chi phí unknown mà `--accept-unaccounted`
+  chấp nhận như trước. Dòng dõi đầy đủ không đổi: tổng bằng đúng số ghi trong các `RUN.json`. **Giới hạn đã biết (không phải
+  lời hứa):** (a) không có `RUN.json` thì journal không chứa request của preflight, nên mất sổ cái preflight không bị phát
+  hiện; (b) `RUN.json` không đọc được hoặc bị cắt cạnh một thư mục mất cũng thế (hai lỗi cùng lúc); (c) ghép request với
+  luồng theo số đếm, vì tên luồng là số lần thử của kernel chứ không phải thứ tự request, nên một luồng đã mất và một luồng
+  của request đang bay có thể bù nhau; (d) khi không có bản ghi, "luồng đã mất" và "phiên chưa từng bắt đầu" cho cùng một
+  journal: quy tắc lấy "chưa xác định" và lời từ chối nói rõ, kể cả khi thực ra không có gì để khôi phục. Đo trên run thật
+  (xoá `sessions/`): trước sửa `exact:true`, tổng `{5,0,18,2}`, chi phí `2.2e-05` "known" (thật `0.000304`) và `--parent` chạy
+  phiên trả tiền; sau sửa `exact:false`, `total:null`, chi phí `null`, `--parent` thoát 2 với mọi cờ.
 
   Chi tiêu đã biết của dòng dõi tính vào trần ngân sách của run mới (nối tiếp không bao giờ đặt lại ngân sách: muốn chạy
   tiếp một run đã chạm trần thì nâng trần trong settings — một quyết định tường minh). `aisef bundle continue` tính cả dòng
@@ -744,8 +769,16 @@ nhận giữ** bằng chỉ thị 2026-10-15 mục 2 — và `RUN.json` không p
 `EVIDENCE_MALFORMED`), còn chờ xác nhận.
 
 **Quyết định của chủ dự án còn mở** (tài liệu này không quyết; mỗi hàng có mã ở backlog):
-- **R2 — bằng chứng *thiếu* cạnh một journal đọc được (V21-77).** **[ĐANG HOÀN THIỆN — quy tắc cho trường hợp này đang
-  được một lane khác làm; người điều phối sẽ mô tả nó ở đây khi xong. Tài liệu này chưa mô tả.]**
+- **R2 — bằng chứng *đã mất* cạnh một journal đọc được (V21-77): ĐÃ LÀM theo luật hẹp (a); ba điểm còn chờ chủ dự án.**
+  Luật và hệ quả ở §5. Còn mở, tài liệu này không quyết: **R2-D1** — khi không có `RUN.json`, mọi request đã trả lời mà không
+  có luồng đều là "mất" (kể cả phiên chưa từng bắt đầu vì chạm ngân sách): giữ (an toàn về tiền, có thể khoá dòng dõi của một
+  run chạm trần rồi bị kill trước `RUN.json`), hay chỉ request `COMPLETED` mới nợ một luồng, hay trung gian (`FAILED` không
+  luồng là `unaccounted` mà `--accept-unaccounted` chấp nhận theo tên); **R2-D2** — hai lỗi cùng lúc (`RUN.json` cắt hoặc mode
+  000 cạnh `preflight/` mất): giữ là giới hạn đã ghi, hoặc thêm nhân chứng thứ ba (ghi `preflight.accounting` vào
+  `RUN.started.json`, hoặc dùng `EVIDENCE.json`); **R2-D3** — xác nhận cách đọc "và/hoặc": khi `RUN.json` hợp lệ nêu chi tiêu
+  thì nó quyết (so bộ đếm), nhân chứng "request đã trả lời không luồng" chỉ dùng khi không có bản ghi — nếu áp nguyên văn cả
+  hai thì mọi run chạm trần đều không nối tiếp được — và xác nhận `preflight.accounting` là bản ghi chi tiêu cùng loại với
+  `budget.spent` cho run chưa dựng `Budget`.
 - **R3 — child của một claim bị thay thế mà thư mục đã mất, và tổ tiên đã bị xoá hay lưu trữ (V21-78).** Hiện: child mà
   một claim bị thay thế nêu và thư mục đã mất vẫn là `UNBEGUN` (0, không `unread`) vì `ClaimLifecycle` của
   `test_v21_continue_integrity` ghim "child vắng = `UNBEGUN`, bị thay thế, run đi tiếp"; còn một run mà *record* nêu là run

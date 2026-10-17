@@ -512,9 +512,10 @@ là *chưa xác định* ở mọi đầu ra — `account_of`/`lineage_account` 
 việc thay vì tính theo trần trừ phần đã biết), `--verify` (`REFUTED`), báo cáo của `bundle continue` — và `aisef run --parent`
 từ chối trước clone, admission và preflight bất kể `--accept-unaccounted` hay `--supersede-claim`. Phần đã biết của từng
 run còn nguyên và quy được về run đó; lịch sử không bị sửa. `--accept-unaccounted` còn dùng được cho chi tiêu *đọc được*
-là đã gửi mà chưa trả lời (R4, quyết định mở). **[ĐANG HOÀN THIỆN]** Quy tắc cho bằng chứng *thiếu* cạnh một journal đọc
-được (R2) đang được một lane khác hoàn thiện; người điều phối sẽ mô tả nó, tài liệu này chưa mô tả. R3 và R5 là quyết định
-mở (§7, USAGE-2.1 §8.5).
+là đã gửi mà chưa trả lời (R4, quyết định mở). Bằng chứng *đã mất* cạnh một journal đọc được (R2: `sessions/`, một luồng phiên hay sổ cái preflight không còn mà
+`RUN.json` hay journal cho thấy từng có) cũng là chi phí chưa xác định, `exact:false`, `total:null`, và `--parent` bị từ chối
+với mọi cờ (luật hẹp, USAGE-2.1 §5; đo: trước sửa chi phí báo `2.2e-05` "known" trong khi thật là `0.000304`). R3, R5 và
+ba điểm của R2 (R2-D1, R2-D2, R2-D3) là quyết định mở (§7, USAGE-2.1 §8.5).
 
 Tiến trình của lượt bị giết (đo): probe nhận diện theo process group và pid của candidate — đều biến mất (watchdog của
 range anchor `killpg` nhóm của nó khi controller chết). Tiến trình con đã `setsid` **không** bị kiểm soát: sống sau lượt
@@ -680,8 +681,8 @@ phải hiệu chuẩn lại Q0, một quyết định của chủ dự án; cầ
   (D1–D3, D5); tệp capture mà fact trỏ tới bị một chủ thể ở lại ghi đè trước khi range release, nên chủ thể quyết verdict của chính nó (D6, họ PM-5), và `quality/test_execution._IMPORT_ERROR` bậc hai trên output test của ứng viên (D7; 18,4 s ở 388 KB một dòng); `migrate` giữ lại sáu contract LedgerLock chứ không phải bốn (D-1) và giữ 50/53 approval chỉ dựa vào luật
   phiên bản (D-2); `probe-observations/` đọc được bởi mọi tiến trình của user (không cách ly) và chỉ che giá trị bí mật của
   chính run; OCR dựng lại được trên một máy nhưng không biết ai dựng tệp ghim và chưa so artifact upstream (D-OCR-1).
-- **Lineage: quyết định mở của đợt hai** (USAGE-2.1.md §8.5): **[ĐANG HOÀN THIỆN]** quy tắc cho bằng chứng *thiếu* cạnh một
-  journal đọc được (R2) đang được một lane khác làm và sẽ do người điều phối mô tả; R3 (child của claim bị thay thế mà
+- **Lineage: quyết định mở của đợt hai** (USAGE-2.1.md §8.5): R2 (bằng chứng *đã mất* cạnh một journal đọc được) đã làm theo
+  luật hẹp và còn ba điểm chờ chủ dự án (R2-D1, R2-D2, R2-D3); R3 (child của claim bị thay thế mà
   thư mục đã mất; tổ tiên bị xoá chặn `--parent` vĩnh viễn), R4 (`--accept-unaccounted` trên chi tiêu đọc được là đã gửi
   chưa trả lời) và R5 (claim đi trước cổng) là quyết định của chủ dự án.
 - **Phần dư của họ lineage** (USAGE-2.1.md §7; backlog V21-56): một `CR`/`LF` trong đường dẫn của thư mục chứa worktree
@@ -717,7 +718,7 @@ phải hiệu chuẩn lại Q0, một quyết định của chủ dự án; cầ
 | — | các quyết định mở của cửa sổ probe (không-retry của PM-3, thống nhất UNRUNNABLE/REFUTED, `--expect-anchor` mặc định, đọc CRLF trên Windows…). Chủ dự án đã quyết ở đợt hai và đã thực hiện: ReDoS, trạng thái `INDETERMINATE`, cổng OCR sớm, giữ `account_of` (unknown ≠ 0), không giữ approval chỉ vì hash | cột Disposition của backlog V21-39 … V21-88 | không quyết thay chủ dự án; mỗi hàng nêu các phương án và khuyến nghị của làn |
 | D-1 | `migrate` giữ lại **sáu** contract LedgerLock (`S-10-a/b/c`, `S-12-a/b/c`); chủ dự án đã nêu bốn | (a) chấp nhận sáu: bộ chọn chỉ thấy lớp và `subject_absence`, PM-9 một mình và PM-11 đều chọn đủ sáu; (b) thu hẹp bằng bộ chọn thấy đường dẫn (chỉ chọn thư mục): thêm heuristic, không giải quyết PM-11; (c) cho `migrate` đọc repo và chỉ giữ lại khi điều kiện `when` thật xảy ra: đổi thiết kế, thêm đầu vào | (a) theo lane (phía an toàn); chưa duyệt. Backlog V21-75 |
 | D-2 | ba probe (`cli_invocation`, `process_effect`, `python_callable_v2`) đã đổi hành vi từ 2.0.0 mà `CAPABILITY_VERSION` vẫn 1, nên 50/53 approval giữ chỉ dựa vào luật phiên bản | (a) chấp nhận, giới hạn đã ghi trong `limits` (kỷ luật tăng phiên bản là việc của review); (b) rà từng thay đổi PM-1/2/6/RV-1, tăng `CAPABILITY_VERSION`, khai `CAPABILITY_CHANGES` cho cái đổi verdict, di trú lại (đổi spec id, làm lại hiệu chuẩn và bản ghi phái sinh; bộ chọn không phân biệt chủ thể dùng gì nên gần hết 50 approval bị giữ lại, ≈ 56 duyệt lại với LedgerLock); (c) thêm máy kiểm: mọi thay đổi `PROBE_SOURCES` của probe phải kèm tăng phiên bản hoặc một miễn trừ có chữ ký | chưa quyết. Backlog V21-76 |
-| R2 | lineage: bằng chứng *thiếu* cạnh một journal đọc được | **[ĐANG HOÀN THIỆN]** quy tắc đang được một lane khác làm; người điều phối sẽ mô tả | chưa mô tả. Backlog V21-77 |
+| R2 | lineage: bằng chứng *đã mất* cạnh một journal đọc được — **đã làm** theo luật hẹp (a); còn: R2-D1 (không `RUN.json`: request đã trả lời không luồng), R2-D2 (hai lỗi cùng lúc), R2-D3 (cách đọc "và/hoặc", `preflight.accounting`) | R2-D1: (A) giữ; (B) chỉ `COMPLETED` nợ luồng; (C) `FAILED` không luồng là `unaccounted` chấp nhận theo tên. R2-D2: (A) giới hạn đã ghi; (B) `RUN.started.json` ghi `preflight.accounting`; (C) `EVIDENCE.json` làm nhân chứng. R2-D3: xác nhận hoặc áp nguyên văn cả hai nhân chứng | lane: R2-D1 giữ (A) trừ khi chủ dự án chịu khoá hiếm gặp; R2-D2 (A); R2-D3 xác nhận. Backlog V21-77 |
 | R3 | lineage: child của claim bị thay thế mà thư mục đã mất; tổ tiên bị xoá hay lưu trữ | (A) giữ `UNBEGUN` cho child; (B) coi là `unread` (đổi 2 test `ClaimLifecycle`); chuỗi: giữ `unread`, hoặc thêm cờ khẳng định có ghi lại | chưa quyết. Backlog V21-78 |
 | R4 | lineage: `--accept-unaccounted` trên chi tiêu đọc được là đã gửi chưa trả lời | (A) giữ như ADR-8; (B) cấm khi `total` chưa biết (`--parent` không còn nối được run bị giết); (C) cho cờ nhưng bắt khai cận trên và trừ vào trần | lane: C nếu chủ dự án muốn đóng hẳn, A nếu không. Backlog V21-79 |
 | R5 | lineage: claim đi trước cổng `unread` | (A) giữ; (B) cổng trước claim; (C) giữ khẳng định, `claim()` kiểm lại child | lane: B hoặc C. Backlog V21-80 |
