@@ -25,8 +25,10 @@ What this module decides, and what it leaves to OCR:
   identity of the bytes; the printed version is the binary's own word, never evidence of how it was built.
 
 Code facts cite the upstream source at 182898c (research record: docs/v2.1/UPSTREAM-RESEARCH.md). Exercised against the
-real binary built from that commit (tests/v2/test_v21_review_chain.py RealBinary: `--preview`, and a full review whose
-model is a scripted OpenAI-compatible server on loopback); never against a real model. The endpoint reaches OCR only
+pinned binary (tests/v2/test_v21_review_chain.py RealBinary: `--preview`, and a full review whose model is a scripted
+OpenAI-compatible server on loopback); never against a real model. That binary's bytes are reproduced by a rebuild from
+the pinned commit on one machine (closure-evidence/v2/v2.1/round-5/ocr-build/PROVENANCE.md): that says what the bytes
+are, not who built the pinned file. The endpoint reaches OCR only
 through its environment strategy (OCR_LLM_URL/TOKEN/MODEL/PROTOCOL, internal/llm/resolver.go): no `--provider`, so no
 configuration file is read, and HOME is a directory of the controller's own."""
 

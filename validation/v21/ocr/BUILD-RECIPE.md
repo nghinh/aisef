@@ -85,7 +85,7 @@ chữ ký của tag/commit; so với artifact phát hành của upstream (không
 đo); ba giá trị `-X` lấy từ chính binary nên phép dựng lại không nói `BuildDate` mô tả điều gì; Linux/Windows.
 
 Lượt thử trước cùng ngày (buổi sáng) dừng ở `NOT_PERFORMED` vì máy khi ấy không có cây nguồn (clone upstream chỉ còn
-`.git/objects` rỗng), module cache có 438 thư mục và 0 tệp, và làn không được dùng mạng; đó là lịch sử, không phải trạng thái
+`.git/objects` rỗng), module cache chỉ có thư mục rỗng (0 tệp), và làn không được dùng mạng; đó là lịch sử, không phải trạng thái
 hiện tại.
 
 Hệ quả cho nhãn "dựng từ nguồn (`-trimpath`)": nay được (c) đỡ ở mức `IDENTICAL` trên máy này; vẫn không được hiểu là
@@ -98,15 +98,16 @@ làn này, việc của chủ sở hữu): `docs/v2.1/REPORT.md:146-147` và `:2
 ## 4. Công thức (chạy ở máy có nguồn và mạng MỘT lần, hoặc module cache đủ)
 
 Môi trường cô lập: mọi thứ nằm trong một thư mục làm việc riêng, không đụng `~/go`, `~/Library/Caches/go-build`, cấu hình
-`go` của người dùng hay `/tmp` hệ thống. (Bản trước của công thức dùng `MC=$(go env GOMODCACHE)`: làm theo nguyên văn thì
+`go` của người dùng hay `/tmp` hệ thống, và `HOME` trỏ vào thư mục đó (đã đo: `GOTELEMETRY=off` KHÔNG ngăn Go ghi bộ đếm
+telemetry cục bộ vào `$HOME/Library/Application Support/go/telemetry`; chỉ `HOME` riêng thì bộ đếm nằm trong thư mục làm việc). (Bản trước của công thức dùng `MC=$(go env GOMODCACHE)`: làm theo nguyên văn thì
 84 module đổ vào `~/go/pkg/mod`.)
 
 ```sh
 W=...                 # thư mục làm việc RIÊNG, rỗng; EXE=...  binary cần kiểm
 SRC=$W/src
-export GOENV=off GOTOOLCHAIN=local GOFLAGS=-mod=readonly GOTELEMETRY=off \
+export GOENV=off GOTOOLCHAIN=local GOFLAGS=-mod=readonly GOTELEMETRY=off HOME=$W/home \
        GOMODCACHE=$W/gomodcache GOCACHE=$W/gocache GOPATH=$W/gopath TMPDIR=$W/tmp
-mkdir -p "$TMPDIR"
+mkdir -p "$TMPDIR" "$HOME"
 git clone https://github.com/alibaba/open-code-review "$SRC"
 git -C "$SRC" checkout --detach v1.12.12
 test "$(git -C "$SRC" rev-parse HEAD)" = 182898cf522da3d04157b422752d028417974e19   # tag đúng commit ghim?

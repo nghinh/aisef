@@ -278,3 +278,19 @@ sửa). Thay đổi so với bản ngày 2026-10-15 (commit `891cd20`):
 * Tự phát hiện: đường đi mạng của phép kiểm chéo sumdb (mục 8) từng được viết là "chỉ tới sum.golang.org"; không có bằng
   chứng, và `go` ưu tiên đi qua proxy. Đã sửa. Cũng bỏ "Không gì khác" khỏi hàng Mạng (không có bản ghi gói).
 * Đã chạy lại, không đổi kết quả: ba lần dựng nguội, công cụ, `git fsck`, `origin/HEAD`.
+
+## 14. Sau khi gộp vào nhánh tích hợp (2026-10-17, người điều phối)
+
+Hai lượt rà soát độc lập sau khi làn xong (mức bằng chứng không đổi: `IDENTICAL` trên một máy, một toolchain) chỉ ra bốn điểm
+nhỏ; đã xử lý, và đây là bản ghi của việc đó:
+
+* `GOTELEMETRY=off` không ngăn Go ghi bộ đếm telemetry cục bộ (đo: `HOME` mới vẫn nhận `Library/Application Support/go/
+  telemetry/local/*.count`). `BUILD-RECIPE.md` mục 4 và `build-commands.sh` nay đặt `HOME=$W/home`; câu "không đụng cấu hình
+  `go` của người dùng" đúng với bản công thức mới, không đúng với lượt 2026-10-15 (bộ đếm local của lượt đó nằm trong HOME thật
+  của người chạy, ngoài thư mục làm việc; không có tệp nào ngoài bộ đếm).
+* Bảng ở mục 12 thiếu hai docstring của `tests/v2/test_v21_review_chain.py` (dòng 21 và 469 theo bản `ccb65a2`; thêm cả
+  docstring lớp `RealBinary`). Cả ba, và docstring `aisef2/app/review_ocr.py:27-28`, đã được sửa chữ trong nhánh tích hợp:
+  "tái tạo được byte trên một máy từ commit ghim, không nói ai dựng tệp ghim".
+* "438 thư mục" ở `BUILD-RECIPE.md` mục 3 là số của lượt buổi sáng không tái lập được; câu nay nói "thư mục rỗng (0 tệp)".
+* Mặc định `OUT` của `build-commands.sh` không còn trỏ vào bản ghi đã commit.
+* Việc chữ trong `docs/` (REPORT, ADR, USAGE-2.1) do lượt tài liệu thứ hai của đợt này viết.

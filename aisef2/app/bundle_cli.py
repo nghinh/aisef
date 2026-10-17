@@ -877,8 +877,9 @@ def continue_from(data: Mapping, run_dir: pathlib.Path, *, leave_out_unidentifie
     """(the continuation bundle, the report) of `data`'s run in `run_dir` (module docstring). What the run did that its
     journal does not confirm is reconciled against git and the journal's operation identities (app/lineage); a commit
     on main nothing identifies is refused unless `leave_out_unidentified` (the report names it either way).
-    `expect_anchor`: the evidence anchor the run printed (as `--verify --expect-anchor`), checked before anything of
-    the run is read."""
+    `expect_anchor`: the evidence anchor the run printed (as `--verify --expect-anchor`), checked against the run's
+    EVIDENCE.json before its record and journal are read (the claims on the run are listed first: that reads its
+    children, not the run)."""
     from aisef2.app import run as R
     project = B.load(data)
     try:

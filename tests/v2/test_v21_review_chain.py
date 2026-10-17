@@ -18,7 +18,8 @@ sha256 like the real one) writing OCR's documents from a scripted scenario per r
   every finding discarded, the change never reaches main;
 * the fix rounds spent while the defect persists: ROLLBACK, main unchanged.
 
-The real binary (built from the pinned commit; AISEF_TEST_OCR_EXE) is exercised in RealBinary: `--preview` on a real
+The real binary (the pinned one, whose bytes a rebuild from the pinned commit reproduces on one machine: closure-evidence/
+v2/v2.1/round-5/ocr-build/PROVENANCE.md; AISEF_TEST_OCR_EXE) is exercised in RealBinary: `--preview` on a real
 repository, and a full review whose model is a scripted OpenAI-compatible server on loopback. Nothing reaches a real
 model or provider."""
 
@@ -479,7 +480,8 @@ class _QuietModel(_ScriptedModel):
 
 @unittest.skipUnless(os.environ.get("AISEF_TEST_OCR_EXE"), "the real Open Code Review binary (AISEF_TEST_OCR_EXE)")
 class RealBinary(unittest.TestCase):
-    """The real `ocr` built from the pinned commit: its preview, and a full review against a scripted model."""
+    """The real `ocr`, the pinned binary (a rebuild from the pinned commit reproduces its bytes on one machine): its preview,
+    and a full review against a scripted model."""
 
     def setUp(self) -> None:
         self.exe = os.environ["AISEF_TEST_OCR_EXE"]

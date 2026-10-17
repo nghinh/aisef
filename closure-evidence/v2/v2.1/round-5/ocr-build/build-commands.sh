@@ -15,11 +15,12 @@ set -eu
 PIN=182898cf522da3d04157b422752d028417974e19
 SHA=bf38abf320ead4e106b71c15824463640207118f38e1c10c28a73b6839104af7   # sha256 của binary đã ghim
 ROOT=$(cd "$(dirname "$0")/../../../../.." && pwd)                      # gốc kho aisef (có validation/v21/ocr/)
-OUT=${OUT:-$ROOT/closure-evidence/v2/v2.1/round-5/ocr-build/ocr-provenance.json}
+OUT=${OUT:-$W/ocr-provenance.json}          # never the committed record: a run of this script writes beside its own work
 
 goenv() {      # = scripts-as-run/env.sh; GOSUMDB và GOPROXY để mặc định (proxy.golang.org,direct / sum.golang.org)
   export PATH=/opt/homebrew/bin:/usr/bin:/bin GOENV=off GOMODCACHE="$W/gomodcache" GOCACHE="$W/gocache" \
-         GOPATH="$W/gopath" GOFLAGS=-mod=readonly GOTOOLCHAIN=local GOTELEMETRY=off GIT_TERMINAL_PROMPT=0
+         GOPATH="$W/gopath" GOFLAGS=-mod=readonly GOTOOLCHAIN=local GOTELEMETRY=off GIT_TERMINAL_PROMPT=0 HOME="$W/home"
+  mkdir -p "$W/home"       # 2026-10-17: GOTELEMETRY=off does not stop Go's local telemetry counters; a HOME of its own does
   unset GOPROXY GOSUMDB GONOSUMDB GONOSUMCHECK GOPRIVATE GONOPROXY GOINSECURE GOWORK
 }
 offline() { export GOPROXY=off GOSUMDB=off CGO_ENABLED=0 GOOS=darwin GOARCH=arm64; }
