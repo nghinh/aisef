@@ -8,7 +8,9 @@
 #               they render pages with Chromium from the repository's own fixtures and a loopback app server.
 #   references  tests/test_catalog.py, test_install.py, test_security_filter.py, test_detect_stack.py,
 #               test_experience.py: the tests that skip unless the pinned clones of references/PINS.md are under
-#               references/ (they read the clones; nothing is fetched).
+#               references/ (they read the clones; nothing is fetched). Run with the tools only when every clone that
+#               aisef/kit/catalog.json points at is linked: a references/ holding some of them makes these tests fail,
+#               not skip.
 #
 # The third group the suite skips, AISEF_TEST_DOCKER=1 (tests.test_sandbox.TestIsolation + tests.test_tools.
 # TestRunToolQuaDockerThat, 10 tests), needs a Docker daemon and runs containers: this script does NOT run it.
