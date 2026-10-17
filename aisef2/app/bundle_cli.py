@@ -643,19 +643,21 @@ def continue_from(data: Mapping, run_dir: pathlib.Path, *, leave_out_unidentifie
               # what the lineage's readable parts spent (`known`), which run spent it, and the lineage's `total` — None
               # while anything is not known; `unread` is what `aisef run --parent` is refused on, whatever flag
               "spend": {"known": {k: account[k] for k in lineage.SPEND}, "total": account["total"]},
-              "spend_by_run": [{k: r[k] for k in ("run", *lineage.SPEND, "unaccounted", "recorded")} |
+              "spend_by_run": [{k: r[k] for k in ("run", *lineage.SPEND, "exact", "unaccounted", "recorded")} |
                                ({"superseded": True} if r.get("superseded") else {}) for r in account["runs"]],
               "unaccounted": account["unaccounted"], "unread": account["unread"],
               "run_parent_refused": None if not account["unread"] else
               "evidence of the lineage is there and cannot be read, so what it spent is not known (not 0): `aisef run "
               "--parent` starts no paid work (no flag accepts it) until it is readable again — its permissions, or a "
-              "faithful copy of the run directory at the path named; where that cannot be done this lineage cannot be "
-              "continued (a run without --parent inherits nothing): " + "; ".join(account["unread"])[:1000],
+              f"faithful copy of the run directory at {lineage.unread_runs(account)}; where that cannot be done this lineage "
+              "cannot be continued (a run without --parent inherits nothing): " + "; ".join(account["unread"])[:1000],
               "in_flight": None if not reconciled["items"] else
               f"{len(reconciled['items'])} effect(s) the journal does not confirm are left out of the continuation's "
               f"baseline {baseline[:12]} (each identified in `unconfirmed`); their stories run again",
               "remaining": [s for s in project.stories if s not in done],
-              "next": f"aisef run --project <this bundle> --repo {_shell_word(repo)} --parent {_shell_word(run_dir)} "
+              "next": ("" if not account["unread"] else "restore the evidence listed in `unread` first (`aisef run --parent` "
+                       "is refused until then, whatever the flags), then: ") +
+                      f"aisef run --project <this bundle> --repo {_shell_word(repo)} --parent {_shell_word(run_dir)} "
                       "--settings S --out NEW"}
     return out, report
 

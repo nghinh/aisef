@@ -1,30 +1,43 @@
-"""V2.1 (owner decision 2026-10-15, lineage family, item 2) PROVED against the code, consumer by consumer: evidence of a
-lineage that cannot be read or reconciled is cost UNKNOWN — never 0, never a sum that looks complete — history is not
-rewritten, no claim is released because a read failed, and no paid session opens by skipping the part not reconciled.
+"""V2.1 (owner decision 2026-10-15, lineage family, item 2): what this file pins, consumer by consumer — evidence of a
+lineage that cannot be read or reconciled is cost UNKNOWN, never 0 and never a sum that looks complete; history is not
+rewritten; and no flag lets a paid session open over a part that cannot be read. Two blind reviews of the first version
+found the gaps now pinned here (the rows marked R- and F- below); what is NOT pinned is listed at the end.
 
 The decision as five properties, and the test that pins each on each consumer of lineage cost or claims:
 
 P1  unreadable evidence is unknown in EVERY output (never 0, never a reconciled number)
-      lineage.account_of           the journal, whatever stands on its path        -> JournalThatIsThere
-      lineage.lineage_account      a record or a claim of the chain that does not read -> RecordsAndClaimsThatDoNotRead
-      lineage.usage_lineage        RUN.json `lineage_usage`: money and tokens      -> KnownAndTotal
-      run.execute                  RUN.json `continues.account`, `budget`, the refusal -> NoFlagOpensAPaidSession
-      bundle_cli.continue_from     the report, and what it prints                  -> BundleContinue
-      verify.verify                `aisef run --verify`                            -> VerifyCannotRederive
-P2  the known cost of the readable parts (exact, per run) is kept apart from the total (None while any part is unknown)
-                                                                                  -> KnownAndTotal, BundleContinue
+      lineage.account_of        the journal, whatever stands on its path; a journal that reads and is not the one
+                                RUN.json names (F-1, R-9)       -> JournalThatIsThere, JournalThatIsNotTheOneTheRecordNames
+      lineage.lineage_account   a record or a claim of the chain that does not read; a link to nothing or a loop in their
+                                place (R-1); a name that is no path (F-4); a run a record names and whose directory is
+                                gone (R-3, F-2)                 -> RecordsAndClaimsThatDoNotRead, LinksInPlaceOfRecordsAndClaims,
+                                                                   RunsTheLineageNamesAndThatAreNotThere, NamesThatAreNoPath
+      lineage.usage_lineage     RUN.json `lineage_usage`: money and tokens (R-7)  -> KnownAndTotal, NoFlagOpensAPaidSession
+      run.execute               RUN.json `continues.account`, `budget`, the refusal -> NoFlagOpensAPaidSession
+      bundle_cli.continue_from  the report, and what it prints  -> BundleContinue
+      verify.verify             `aisef run --verify`            -> VerifyCannotRederive, JournalCutUnderItsRecord
+P2  the known cost of the readable parts (exact, per run; `exact` says whether a row is a count or a lower bound — R-8) is
+    kept apart from the total (None while any part is unknown)  -> KnownAndTotal, BundleContinue
 P3  history is never rewritten and a claim is never released or retaken because a read failed
       lineage.process_started / _gone   a `ps` that failed is not "no such process" -> ProcessTableThatFailed
-      lineage.claim                 an unread child, `--supersede-claim`            -> NoFlagOpensAPaidSession
-P4  nothing that could open a paid session does while a part of the lineage is unreconciled
-      run.execute: --parent, --accept-unaccounted, --supersede-claim, the Budget    -> NoFlagOpensAPaidSession,
-                                                                                       BudgetArithmetic
-P5  the refusal says what the operator does                                         -> NoFlagOpensAPaidSession
+      lineage.claim                     an unread child, `--supersede-claim`        -> NoFlagOpensAPaidSession
+P4  nothing that could open a paid session does while a part of the lineage cannot be read
+      run.execute: --parent, --accept-unaccounted, --supersede-claim, the Budget -> NoFlagOpensAPaidSession, BudgetArithmetic (F-6)
+P5  the refusal says what the operator does, and where (R-6, F-5)  -> NoFlagOpensAPaidSession, BundleContinue
 
-What stays as designed, pinned beside the change as controls: a request in flight (evidence that READS and says it was
-sent and never answered) is still accepted by name (`--accept-unaccounted`, recorded; ceilings are then enforced against
-the known part and every output says the total is not known); a run directory that is not there is a run that spent
-nothing there; a claim of nothing (an object without `run`) is a claim of nothing.
+NOT pinned here — each is an open decision for the owner, stated in the lane's result, not decided by this file:
+* `--accept-unaccounted` over spend the evidence READS as sent and never answered (a request in flight): it is accepted by
+  name and recorded, and the ceilings are then enforced against cap - known (the account says the total is not known);
+  `test_a_request_in_flight_is_still_refused_without_the_flag_and_accepted_by_name_with_it` pins what IS, as a control.
+* A run refused after its claim leaves one claim generation on the predecessor, and `--supersede-claim` over a child that
+  does not read records the operator's assertion in it (owner-approved 2026-10-15, round 2): the claim is released by an
+  assertion, and a child that reads as BEGUN afterwards sits beside the continuation that was started.
+* A child that a claim names and whose directory is not there is UNBEGUN and spent nothing there (the claim lifecycle,
+  tests/v2/test_v21_continue_integrity.py::ClaimLifecycle): a child that vanished may have begun and spent, and the
+  lineage counts it as 0 (`RunsTheLineageNamesAndThatAreNotThere` pins what IS, as a control).
+* A `sessions` directory or a preflight ledger in a wrong shape (a link to nothing, a file) or missing beside a journal
+  that records answered requests is read as no tokens and no turns (tests/v2/test_v21_defects_lineage2.py pins the former
+  for `sessions`): the requests are counted from the journal, the tokens are not known.
 
 Offline and deterministic; the full-run classes use the fake client of tests/v2/test_app_run.py. Nothing here deletes or
 kills (INV-MUTATION-AUTHORITY): the temporary directories are the framework's."""
@@ -78,10 +91,12 @@ class Hand(unittest.TestCase):
         return self.root
 
     def run_dir(self, name: str, requests: int = 1, continues: pathlib.Path | None = None, *, journal: bool = True,
-                in_flight: bool = False, stream: bool = False) -> pathlib.Path:
+                in_flight: bool = False, stream: bool = False, records: bool = True, seal: bool = False) -> pathlib.Path:
         """`requests` provider requests journaled and answered; `in_flight`: the last one has no result, and every
         request has its session stream (7 + 3 tokens) — more streams than answers: unknown spend that READS; `stream`:
-        a session stream of one finished step — the first request's, answered."""
+        a session stream of one finished step — the first request's, answered; `records=False`: neither RUN.started.json
+        nor RUN.json (the test puts what it needs there: a link, say); `seal`: RUN.json names the journal as the run
+        left it (its digest and length, as `run._journal_info` writes them)."""
         run = self.root / name
         run.mkdir()
         if journal:
@@ -101,9 +116,20 @@ class Hand(unittest.TestCase):
             for n in range(1, (requests if in_flight else 1) + 1):
                 (run / "sessions" / f"S1.developer.{n}.jsonl").write_text(STEP, encoding="utf-8")
         rec = {"continues": {"path": str(continues)}} if continues else {}
-        (run / lineage.STARTED).write_text(json.dumps(rec), encoding="utf-8")
-        (run / "RUN.json").write_text(json.dumps(rec), encoding="utf-8")
+        if records:
+            (run / lineage.STARTED).write_text(json.dumps(rec), encoding="utf-8")
+            (run / "RUN.json").write_text(json.dumps(rec), encoding="utf-8")
+        if seal:
+            self.seal(run)
         return run
+
+    def seal(self, run: pathlib.Path) -> None:
+        """RUN.json names the journal that is on disk now: what the record of a run that closed holds."""
+        data = (run / lineage.JOURNAL).read_bytes()
+        rec = json.loads((run / "RUN.json").read_text(encoding="utf-8"))
+        rec["journal"] = {"path": lineage.JOURNAL.as_posix(), "sha256": hashlib.sha256(data).hexdigest(),
+                          "lines": data.count(b"\n"), "closed": "SHUTDOWN"}
+        (run / "RUN.json").write_text(json.dumps(rec), encoding="utf-8")
 
     def claim(self, pred: pathlib.Path, n: int, child: pathlib.Path | str | None, raw: bytes | None = None) -> bytes:
         name = lineage.CLAIM if n == 1 else f"CONTINUED-BY.{n}.json"
@@ -169,6 +195,16 @@ class KnownAndTotal(Hand):
         self.assertEqual(got["runs"][1]["input_tokens"], 7)           # what its stream shows is known, and attributed
         self.assertTrue(got["unread"] and all("run1" in u for u in got["unread"]), got["unread"])
         self.assertEqual(got["unread"], [u for u in got["unaccounted"] if u in got["unread"]])
+
+    def test_a_part_whose_figures_are_a_lower_bound_says_so_beside_them(self):
+        """R-8: a part whose journal does not read has `provider_requests: 0` in its row — not a count, a lower bound; the
+        row says so (`exact`), as the lineage's `total` does for the whole."""
+        r1 = self.run_dir("run1", 3, stream=True)
+        (r1 / lineage.JOURNAL).write_bytes(NOT_TEXT)
+        r2 = self.run_dir("run2", 2, continues=r1)
+        by_run = {pathlib.Path(r["run"]).name: r for r in lineage.lineage_account(r2, self.root / "out")["runs"]}
+        self.assertEqual((by_run["run2"]["exact"], by_run["run1"]["exact"]), (True, False))
+        self.assertIs(lineage.account_of(self.run_dir("run3", 1, in_flight=True))["exact"], False)
 
     def test_a_part_in_flight_is_unknown_but_it_reads(self):
         r1 = self.run_dir("run1", 2, in_flight=True)
@@ -303,12 +339,14 @@ class RecordsAndClaimsThatDoNotRead(Hand):
         self.assertEqual(requests_of(got), {"run2": 2, "superseded": 5, "run1": 3})
         self.assertEqual(got["total"]["provider_requests"], 10)
 
-    def test_a_run_that_is_not_there_is_what_a_run_that_spent_nothing_there_looks_like(self):
-        """Absence is not a read failure (the lineage lane's design, kept): a record names a run, and its directory is gone."""
+    def test_a_run_a_record_names_and_whose_directory_is_gone_is_not_a_run_that_spent_nothing(self):
+        """The first version of this lane kept "absence is not a read failure" here, and two blind reviews showed the
+        total then looked complete over a run that existed (a record names it) and whose journal cannot be read because
+        its directory is gone. Inverted on purpose; every shape is in RunsTheLineageNamesAndThatAreNotThere."""
         r2 = self.run_dir("run2", 2, continues=self.root / "gone")
         got = lineage.lineage_account(r2, self.root / "out")
-        self.assertEqual((got["unaccounted"], got["unread"]), ([], []))
-        self.assertEqual(requests_of(got), {"run2": 2, "gone": 0})
+        self.assert_unread(got, "gone")
+        self.assertEqual(requests_of(got), {"run2": 2, "gone": 0})      # run2's 2 are known; gone's are not 0: not known
 
     def test_a_predecessor_whose_claims_cannot_be_listed_is_unknown(self):
         r1 = self.run_dir("run1", 3)
@@ -389,6 +427,212 @@ class JournalThatIsThere(Hand):
                 self.assertEqual({k: got[k] for k in lineage.SPEND}, dict.fromkeys(lineage.SPEND, 0))
 
 
+# ------------------------------------------------------------------------------------------------ review round: the gaps
+
+class UnreadAsserts(Hand):
+    """What a part the lineage cannot know looks like: listed, unread, and no total."""
+
+    def assert_unread(self, got: dict, *needles: str) -> None:
+        self.assertTrue(got["unaccounted"], "unknown spend is listed, not passed over")
+        self.assertTrue(got["unread"], got)
+        self.assertIsNone(got["total"])
+        for n in needles:
+            self.assertTrue(any(n in u for u in got["unread"]), (n, got["unread"]))
+
+    def nowhere(self, at: pathlib.Path, kind: str) -> None:
+        """`at` is what the system answers "nothing there" for, and is there: a link to nothing, or one that loops."""
+        self.link(at, at if kind == "a link that loops" else self.top / "nowhere")
+
+
+LINKS = ("a link to nothing", "a link that loops")
+
+
+class LinksInPlaceOfRecordsAndClaims(UnreadAsserts):
+    """R-1: a record (RUN.started.json, RUN.json) or a claim that is a link to nothing, or one that loops, is evidence
+    that is there and cannot be read — the same damage as a record that is cut. It was read as "not there": the walk ended
+    silently, the claim was invisible, the total looked complete and `aisef run --parent` opened a paid session."""
+
+    def chain(self, name: str, records: bool = False) -> tuple[pathlib.Path, pathlib.Path]:
+        self.fresh(name)
+        r1 = self.run_dir("run1", 3)
+        return r1, self.run_dir("run2", 2, continues=r1, records=records)
+
+    def test_records_that_are_links_are_unknown_not_the_end_of_the_chain(self):
+        for kind in LINKS:
+            for both in (True, False):
+                with self.subTest(kind, both=both):
+                    r1, r2 = self.chain(f"{kind} {both}")
+                    self.nowhere(r2 / "RUN.json", kind)
+                    if both:
+                        self.nowhere(r2 / lineage.STARTED, kind)
+                    got = lineage.lineage_account(r2, self.root / "out")
+                    self.assertEqual(requests_of(got), {"run2": 2})       # run1's 3 are not in the known part: said so
+                    self.assert_unread(got, "run2")
+
+    def test_a_record_that_reads_and_names_none_still_ends_the_walk_whatever_the_other_is(self):
+        for kind in LINKS:
+            for broken in (lineage.STARTED, "RUN.json"):
+                with self.subTest(kind, broken=broken):
+                    self.fresh(f"{kind} {broken}")
+                    r1 = self.run_dir("run1", 3, records=False)
+                    (r1 / (lineage.STARTED if broken == "RUN.json" else "RUN.json")).write_text("{}", encoding="utf-8")
+                    self.nowhere(r1 / broken, kind)
+                    got = lineage.lineage_account(r1, self.root / "out")
+                    self.assertEqual((got["unaccounted"], got["unread"]), ([], []))
+                    self.assertEqual(got["total"]["provider_requests"], 3)
+
+    def test_a_first_generation_claim_that_is_a_link_is_listed_and_the_run_it_names_is_unknown(self):
+        for kind in LINKS:
+            with self.subTest(kind):
+                r1, r2 = self.chain(kind, records=True)
+                self.nowhere(r1 / lineage.CLAIM, kind)
+                self.claim(r1, 2, r2)
+                self.assertEqual([n for n, _ in lineage.claims(r1)], [1, 2])
+                self.assert_unread(lineage.lineage_account(r2, self.root / "out"), "run1/CONTINUED-BY.json")
+
+    def test_a_later_generation_that_is_a_link_is_unknown_too(self):
+        for kind in LINKS:
+            with self.subTest(kind):
+                r1, r2 = self.chain(kind, records=True)
+                self.claim(r1, 1, self.run_dir("sup", 5))
+                self.nowhere(r1 / "CONTINUED-BY.2.json", kind)
+                self.claim(r1, 3, r2)
+                self.assertEqual([n for n, _ in lineage.claims(r1)], [1, 2, 3])
+                got = lineage.lineage_account(r2, self.root / "out")
+                self.assert_unread(got, "run1/CONTINUED-BY.2.json")
+                self.assertEqual(requests_of(got), {"run2": 2, "run1": 3, "sup": 5})
+
+    def test_claiming_over_a_claim_that_is_a_link_says_it_cannot_be_read_not_that_another_run_took_it(self):
+        for kind in LINKS:
+            with self.subTest(kind):
+                self.fresh(kind)
+                r1 = self.run_dir("run1", 3)
+                self.nowhere(r1 / lineage.CLAIM, kind)
+                with self.assertRaises(lineage.LineageRefused) as c:
+                    lineage.claim(r1, self.root / "next", 1.0)
+                self.assertIn("cannot be read", str(c.exception))
+                self.assertNotIn("same moment", str(c.exception))
+                self.assertEqual(sorted(p.name for p in r1.glob("CONTINUED-BY*")), [lineage.CLAIM], "nothing was taken")
+                self.assertEqual(lineage.continued_by(r1), (lineage.UNREADABLE_CLAIM, None))
+                self.assertIn("cannot be read", lineage.claim_unread(r1) or "")
+
+
+class RunsTheLineageNamesAndThatAreNotThere(UnreadAsserts):
+    """R-3 / F-2: a run that a record of the chain NAMES as the one it continues existed (`aisef run --parent` refuses a
+    parent with no run record). What it spent cannot be told when its directory is not there, is a file, or is a link that
+    leads nowhere: unknown — not a run that spent nothing. (`account_of` of a directory nothing names stays a run that
+    spent nothing there: tests/v2/test_v21_defects_lineage2.py; so does a claim's superseded child, below.)"""
+
+    SHAPES = {"missing": lambda t, p: None, "a file": lambda t, p: p.write_text("x", encoding="utf-8"),
+              "a link to nothing": lambda t, p: t.link(p, t.top / "nowhere"), "a link that loops": lambda t, p: t.link(p, p)}
+
+    def test_an_ancestor_a_record_names_is_unknown(self):
+        for name, make in self.SHAPES.items():
+            with self.subTest(name):
+                self.fresh(name)
+                gone = self.root / "run1"
+                r2 = self.run_dir("run2", 2, continues=gone)
+                make(self, gone)
+                got = lineage.lineage_account(r2, self.root / "out")
+                self.assertEqual(requests_of(got), {"run2": 2, "run1": 0})   # run2's 2 are known; run1's are not 0
+                self.assert_unread(got, "run1")
+                self.assertTrue(any("is not there" in u for u in got["unread"]), got["unread"])
+                self.assertIs(got["runs"][1]["exact"], False)
+
+    def test_a_predecessor_that_is_given_and_is_not_there_is_unknown(self):
+        self.assert_unread(lineage.lineage_account(self.root / "gone"), "gone")
+
+    def test_a_child_a_claim_names_and_whose_directory_is_not_there_stays_a_run_that_spent_nothing(self):
+        """A control that is NOT a decision of the owner's: tests/v2/test_v21_continue_integrity.py pins that a claim whose
+        child is not there is UNBEGUN and is superseded (the claim lifecycle, owner-approved), and the lineage counts that
+        child as it always did. Whether a child that vanished may have spent is an open question in the lane's result."""
+        for name, make in self.SHAPES.items():
+            with self.subTest(name):
+                self.fresh(name)
+                r1 = self.run_dir("run1", 3)
+                r2 = self.run_dir("run2", 2, continues=r1)
+                child = self.root / "child"
+                make(self, child)
+                self.claim(r1, 1, child)
+                self.claim(r1, 2, r2)
+                got = lineage.lineage_account(r2, self.root / "out")
+                self.assertEqual((got["unaccounted"], got["unread"]), ([], []))
+                self.assertEqual(requests_of(got), {"run2": 2, "run1": 3, "child": 0})
+
+    def test_the_account_of_a_directory_nothing_names_stays_a_run_that_spent_nothing(self):
+        got = lineage.account_of(self.root / "gone")
+        self.assertEqual((got["unaccounted"], got["unread"]), ([], []))
+        self.assertIs(got["exact"], True)
+
+
+class JournalThatIsNotTheOneTheRecordNames(UnreadAsserts):
+    """F-1 / R-9: a journal that READS and is not the journal the run's own RUN.json names (its digest and length: what
+    `--verify` and `bundle continue` compare) — emptied, cut at a line boundary, cut in a line — is not the run's spend. A
+    zero-length or truncated journal is what a crash or a full disk leaves: its requests are unknown, not the few that
+    are left, and not 0. No RUN.json, or one that names no journal digest: nothing to compare with."""
+
+    CUTS = {"no bytes": lambda d: b"", "cut at a line": lambda d: b"\n".join(d.split(b"\n")[:3]) + b"\n",
+            "cut in a line": lambda d: d[:-9]}
+
+    def test_each_is_unknown_spend_listed_with_its_cause(self):
+        for name, cut in self.CUTS.items():
+            with self.subTest(name):
+                self.fresh(name)
+                r1 = self.run_dir("run1", 3, seal=True)
+                (r1 / lineage.JOURNAL).write_bytes(cut((r1 / lineage.JOURNAL).read_bytes()))
+                got = lineage.account_of(r1)
+                self.assertEqual(got["unread"], got["unaccounted"])
+                self.assertEqual(len(got["unread"]), 1, got["unread"])
+                self.assertIn("RUN.json", got["unread"][0])
+                self.assertIn("unknown", got["unread"][0])
+                self.assertIs(got["exact"], False)
+                self.assert_unread(lineage.lineage_account(r1), "run1")
+
+    def test_an_ancestor_is_unknown_and_the_known_part_stays_attributed(self):
+        r1 = self.run_dir("run1", 3, seal=True)
+        r2 = self.run_dir("run2", 2, continues=r1)
+        (r1 / lineage.JOURNAL).write_bytes(self.CUTS["cut at a line"]((r1 / lineage.JOURNAL).read_bytes()))
+        got = lineage.lineage_account(r2, self.root / "out")
+        self.assertEqual(requests_of(got), {"run2": 2, "run1": 1})      # what is left of run1 is a lower bound, said so
+        self.assert_unread(got, "run1")
+
+    def test_controls_a_journal_that_is_the_one_named_and_a_run_that_names_none(self):
+        self.fresh("intact")
+        r1 = self.run_dir("run1", 3, seal=True)
+        got = lineage.account_of(r1)
+        self.assertEqual((got["unaccounted"], got["unread"], got["provider_requests"]), ([], [], 3))
+        self.assertIs(got["exact"], True)
+        for name, cut in self.CUTS.items():     # a run with no record (killed before it) or a record with no digest
+            for sealed in (False, True):
+                with self.subTest(name, record_names_a_journal=sealed):
+                    self.fresh(f"{name} {sealed}")
+                    r = self.run_dir("run1", 3)
+                    if sealed:
+                        (r / "RUN.json").write_text(json.dumps({"journal": {"lines": 7}}), encoding="utf-8")
+                    (r / lineage.JOURNAL).write_bytes(cut((r / lineage.JOURNAL).read_bytes()))
+                    self.assertEqual(lineage.account_of(r)["unread"], [])
+
+
+class NamesThatAreNoPath(UnreadAsserts):
+    """F-4: a record or a claim that names a run by a string no file can have (a NUL byte) raised ValueError out of
+    `lineage_account` — a traceback in `aisef run --parent`. It is a part the lineage cannot name: unknown, listed."""
+
+    def test_a_record_that_names_its_predecessor_by_such_a_string_is_unknown(self):
+        r1 = self.run_dir("run1", 3)
+        r2 = self.run_dir("run2", 2, continues=r1, records=False)
+        for f in (lineage.STARTED, "RUN.json"):
+            (r2 / f).write_text(json.dumps({"continues": {"path": str(r1) + "\0x"}}), encoding="utf-8")
+        self.assert_unread(lineage.lineage_account(r2, self.root / "out"), "run2")
+
+    def test_a_claim_that_names_its_run_by_such_a_string_is_unknown(self):
+        r1 = self.run_dir("run1", 3)
+        r2 = self.run_dir("run2", 2, continues=r1)
+        self.claim(r1, 1, str(self.root / "child") + "\0x")
+        self.claim(r1, 2, r2)
+        self.assert_unread(lineage.lineage_account(r2, self.root / "out"), "CONTINUED-BY.json")
+        self.assertEqual(lineage.continued_by(r1)[0], str(r2))     # the newest claim is a claim: as it was
+
+
 # ------------------------------------------------------------------------------------------------ P3: the process table
 
 class ProcessTableThatFailed(Hand):
@@ -460,6 +704,17 @@ class BudgetArithmetic(unittest.TestCase):
         self.assertIsNone(self.budget(known, own_requests=3).reached())                       # 1 + 5 + 3 = 9 of 10
         self.assertTrue(self.budget(known, own_requests=4).reached().startswith("max_provider_requests: 10 of 10"))
 
+    def test_a_budget_over_a_lineage_with_evidence_that_cannot_be_read_stops_all_work(self):
+        """F-6: the gate never builds one (run.execute refuses first); the arithmetic itself does not stand on that. The
+        ceilings are not enforced against the known part of such a lineage: the budget reports it unaccounted, as it
+        does a session that finished no step. (Spend the evidence READS as unknown is not that: ADR-8, accepted by name.)"""
+        known = {"provider_requests": 2, "turns": 0, "input_tokens": 0, "output_tokens": 0}
+        said = "run1: its journal evidence is there and cannot be read (not text): the provider requests it recorded are unknown spend"
+        b = self.budget({**known, "unaccounted": [said], "unread": [said], "total": None})
+        for stop in (b.reached(), b.exceeded()):
+            self.assertTrue(stop.startswith("unaccounted:") and "cannot be read" in stop, stop)
+        self.assertIsNone(self.budget({**known, "unaccounted": [said], "unread": [], "total": None}).reached())
+
     def test_what_was_accepted_is_in_the_account_beside_what_was_counted(self):
         known = {"provider_requests": 4, "turns": 0, "input_tokens": 0, "output_tokens": 0}
         said = ["run1: provider request seq 2 (S1, DEVELOPER) has no result — in flight when the run ended: what it "
@@ -479,7 +734,8 @@ class NoFlagOpensAPaidSession(ProductBase):
     says what to do; nothing of the lineage's history is written or changed. A request in flight (evidence that reads) is
     still accepted by name."""
 
-    run_dir, claim, locked, link, fresh = Hand.run_dir, Hand.claim, Hand.locked, Hand.link, Hand.fresh
+    run_dir, claim, locked, link, fresh, seal = (Hand.run_dir, Hand.claim, Hand.locked, Hand.link, Hand.fresh,
+                                                 Hand.seal)
 
     def setUp(self) -> None:
         super().setUp()
@@ -558,13 +814,75 @@ class NoFlagOpensAPaidSession(ProductBase):
         self.link(r1 / lineage.JOURNAL, self.root / "nowhere.jsonl")
         return self.run_dir("run2", requests=2, continues=r1)
 
+    def records_are_links_to_nothing(self) -> pathlib.Path:
+        """run3 (readable) continues run2, whose two records are links to nothing, and run2 continued run1 (3 requests)."""
+        self.run_dir("run1", requests=3)
+        r2 = self.run_dir("run2", requests=2, records=False)
+        for f in (lineage.STARTED, "RUN.json"):
+            self.link(r2 / f, self.root / "nowhere.json")
+        return self.run_dir("run3", requests=1, continues=r2)
+
+    def records_are_links_that_loop(self) -> pathlib.Path:
+        self.run_dir("run1", requests=3)
+        r2 = self.run_dir("run2", requests=2, records=False)
+        for f in (lineage.STARTED, "RUN.json"):
+            self.link(r2 / f, r2 / f)
+        return self.run_dir("run3", requests=1, continues=r2)
+
+    def claim_generation_is_a_link_to_nothing(self) -> pathlib.Path:
+        r1 = self.run_dir("run1", requests=3)
+        r2 = self.run_dir("run2", requests=2, continues=r1)
+        self.link(r1 / lineage.CLAIM, self.root / "nowhere.json")
+        self.claim(r1, 2, r2)
+        return r2
+
+    def ancestor_directory_is_not_there(self) -> pathlib.Path:
+        return self.run_dir("run2", requests=2, continues=self.root / "run1")
+
+    def ancestor_directory_is_a_link_to_nothing(self) -> pathlib.Path:
+        self.link(self.root / "run1", self.root / "nowhere")
+        return self.run_dir("run2", requests=2, continues=self.root / "run1")
+
+    def predecessors_journal_emptied_under_its_record(self) -> pathlib.Path:
+        r1 = self.run_dir("run1", requests=3, seal=True)
+        (r1 / lineage.JOURNAL).write_bytes(b"")
+        return r1
+
+    def ancestors_journal_cut_at_a_line_under_its_record(self) -> pathlib.Path:
+        r1 = self.run_dir("run1", requests=3, seal=True)
+        (r1 / lineage.JOURNAL).write_bytes(b"\n".join((r1 / lineage.JOURNAL).read_bytes().split(b"\n")[:3]) + b"\n")
+        return self.run_dir("run2", requests=2, continues=r1)
+
+    def record_names_a_path_with_a_nul(self) -> pathlib.Path:
+        r1 = self.run_dir("run1", requests=3)
+        r2 = self.run_dir("run2", requests=2, continues=r1, records=False)
+        for f in (lineage.STARTED, "RUN.json"):
+            (r2 / f).write_text(json.dumps({"continues": {"path": str(r1) + "\0x"}}), encoding="utf-8")
+        return r2
+
+    def claim_names_a_run_with_a_nul(self) -> pathlib.Path:
+        r1 = self.run_dir("run1", requests=3)
+        r2 = self.run_dir("run2", requests=2, continues=r1)
+        self.claim(r1, 1, str(self.root / "child") + "\0x")
+        self.claim(r1, 2, r2)
+        return r2
+
     def test_no_flag_opens_a_session_over_a_part_that_does_not_read(self):
         builders = {"a journal that is not text": self.journal_not_text, "a ledger that is not text": self.ledger_not_text,
                     "the predecessor's own journal": self.the_predecessors_own_journal,
                     "a record of the chain that is not text": self.record_not_text,
                     "the record of the first run, cut": self.record_of_the_first_run_cut,
                     "a claim generation that is cut": self.claim_generation_cut,
-                    "a journal that is a link to nothing": self.journal_a_link_to_nothing}
+                    "a journal that is a link to nothing": self.journal_a_link_to_nothing,
+                    "records that are links to nothing": self.records_are_links_to_nothing,
+                    "records that are links that loop": self.records_are_links_that_loop,
+                    "a claim generation that is a link to nothing": self.claim_generation_is_a_link_to_nothing,
+                    "an ancestor whose directory is not there": self.ancestor_directory_is_not_there,
+                    "an ancestor that is a link to nothing": self.ancestor_directory_is_a_link_to_nothing,
+                    "the predecessor's journal emptied under its record": self.predecessors_journal_emptied_under_its_record,
+                    "an ancestor's journal cut at a line under its record": self.ancestors_journal_cut_at_a_line_under_its_record,
+                    "a record that names its predecessor by a path with a NUL": self.record_names_a_path_with_a_nul,
+                    "a claim that names its run by a string with a NUL": self.claim_names_a_run_with_a_nul}
         if IS_POSIX_USER:
             builders["a session stream with no read permission"] = self.stream_without_permission
         for name, build in builders.items():
@@ -644,6 +962,31 @@ class NoFlagOpensAPaidSession(ProductBase):
         self.assertEqual({k: after[k] for k in before}, before)
         self.assertTrue(any(json.loads(v).get("supersedes", {}).get("operator_asserted") is True
                             for k, v in after.items() if k not in before), "the operator's assertion is recorded")
+
+    def test_the_refusal_names_the_directory_of_each_run_whose_evidence_must_be_made_readable(self):
+        """P5: "a faithful copy of the run directory at the path named" — the entries name a run by its basename (two runs
+        of a lineage may be called `out`), so the refusal names the paths."""
+        for build in (self.journal_not_text, self.ancestor_directory_is_not_there, self.ancestors_journal_cut_at_a_line_under_its_record):
+            with self.subTest(build.__name__):
+                self.fresh(build.__name__)
+                text = self.refused_at_the_claim(predecessor=build())
+                self.assertIn(str(self.root / "run1"), text)
+
+    @POSIX_USER
+    def test_a_stream_of_the_lineage_that_cannot_be_read_does_not_cost_the_record_its_usage(self):
+        """R-7: the lineage's money and tokens raised out of `usage_lineage`, and one handler dropped this run's own `usage`
+        and the whole `lineage_usage` with it: the readable parts' cost stays attributed beside an unknown total."""
+        self.refused_at_the_claim(predecessor=self.stream_without_permission())
+        rec = self.last_rec
+        self.assertNotIn("error", rec["usage"], rec["usage"])
+        whole = rec["lineage_usage"]
+        self.assertIsNotNone(whole)
+        by_run = {pathlib.Path(e["run"]).name: e for e in whole["runs"]}
+        self.assertIsNone(by_run["run1"]["cost"]["value"])
+        self.assertIn("cannot be read", by_run["run1"]["cost"]["status"])
+        self.assertIn("run2", by_run)                               # the readable part is still there, attributed
+        self.assertIsNone(whole["cost"]["value"])
+        self.assertTrue(whole["tokens_status"].startswith("lower bound"), whole["tokens_status"])
 
     def test_the_cli_refuses_with_exit_2_and_says_what_to_do(self):
         r2 = self.journal_not_text()
@@ -736,6 +1079,20 @@ class BundleContinue(Delivered):
             self.continue_run("second", accept_unaccounted=True)
         self.assertIn("Make it readable again", str(c.exception))
 
+    def test_the_report_names_where_to_restore_and_sends_the_operator_to_no_command_that_will_be_refused(self):
+        """P5: `run_parent_refused` says "the run directory at the path named" — and names only a basename; `next` was the
+        `aisef run --parent` command that is refused. Each row of `spend_by_run` says whether its figures are exact."""
+        _, clean = bundle_cli.continue_from(self.doc, self.first)
+        self.assertTrue(clean["next"].startswith("aisef run "), clean["next"])
+        self.assertEqual([r["exact"] for r in clean["spend_by_run"]], [True])
+        self.spoil_ledger_of(self.first)
+        _, report = bundle_cli.continue_from(self.doc, self.first)
+        self.assertIn(str(self.first), report["run_parent_refused"])
+        self.assertEqual([r["exact"] for r in report["spend_by_run"]], [False])
+        self.assertFalse(report["next"].startswith("aisef run "), report["next"])
+        self.assertIn("aisef run ", report["next"])
+        self.assertIn("unread", report["next"])
+
     def test_the_report_names_the_whole_lineage_not_only_the_run_it_continues(self):
         second = self.continue_run()
         self.assertEqual(second["delivery_verdict"], "PASS", second.get("failure"))
@@ -785,6 +1142,33 @@ class VerifyCannotRederive(Delivered):
         self.assertEqual(v["verdict"], "REFUTED", v)
         self.assertTrue(any("cannot be read now" in p for p in v["problems"]), v["problems"])
         self.assertFalse(any("spend is not what the evidence re-derives" in p for p in v["problems"]), v["problems"])
+
+
+class JournalCutUnderItsRecord(Delivered):
+    """F-1 end to end: a delivered run `first` is continued by `second`; then the journal of `first` is cut at a line
+    boundary — a hash chain that is valid, under a RUN.json that names the whole journal. Reading it as the run's spend
+    made the requests that were cut unknown only by luck (fewer journaled requests than session streams: an unaccounted
+    spend `--accept-unaccounted` accepted) and, with no streams, nothing at all."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.assertEqual(self.continue_run()["delivery_verdict"], "PASS")
+        journal = self.first / lineage.JOURNAL
+        journal.write_bytes(b"\n".join(journal.read_bytes().split(b"\n")[:5]) + b"\n")
+
+    def test_the_next_continuation_is_refused_whatever_the_flag(self):
+        second = self.tmp / "second"
+        for n, flags in enumerate(({}, {"accept_unaccounted": True})):
+            with self.subTest(flags=flags), self.assertRaises(R.RunRefused) as c:
+                R.execute(self.project2, self.settings, second / "repo", self.tmp / f"third{n}", transport=provider(),
+                          client_exe=str(self.client), cals=calibrations(), predecessor=second, **flags)
+            self.assertIn("Make it readable again", str(c.exception))
+            self.assertIn(str(self.first), str(c.exception))
+
+    def test_verify_cannot_rederive_the_inherited_share(self):
+        v = verify(self.project2, self.tmp / "second")
+        self.assertEqual(v["verdict"], "REFUTED")
+        self.assertTrue(any("lineage's evidence cannot be read now" in p for p in v["problems"]), v["problems"])
 
 
 if __name__ == "__main__":

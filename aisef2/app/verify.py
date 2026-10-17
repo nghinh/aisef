@@ -88,9 +88,9 @@ def _spend(out: pathlib.Path, s: settings.Settings, events: list[dict], rec: dic
     cannot = None
     if inherited is not None and inherited["unread"]:
         cannot = ("the lineage's evidence cannot be read now, so the spend the record inherited cannot be re-derived "
-                  "(restore it — its permissions, or a faithful copy of the run directories — and verify again): "
-                  + "; ".join(inherited["unread"])[:600])
-    return b.spend(), b.exceeded(), cannot
+                  f"(restore it — its permissions, or a faithful copy of the run directories at {lineage.unread_runs(inherited)}"
+                  " — and verify again): " + "; ".join(inherited["unread"])[:600])
+    return b.spend(), None if cannot else b.exceeded(), cannot
 
 
 def verify(project: Project, out: pathlib.Path, expect_anchor: str | None = None) -> dict:
