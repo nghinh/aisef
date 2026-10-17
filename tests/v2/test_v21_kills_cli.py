@@ -61,10 +61,10 @@ class Parser(unittest.TestCase):
             " --anchor-out ANCHOR_OUT run only: a new file (never overwritten) the evidence anchor is written to — keep"
             " it where the developer cannot write (docs/v2.1/ANCHOR-THREAT-MODEL.md)"
             " --accept-unaccounted run --parent only: start although the lineage has spend no evidence accounts for"
-            " (recorded)"
+            " (recorded); never for evidence that cannot be read: make it readable again"
             " --supersede-claim SHA256 run --parent only: supersede the predecessor's claim with this sha256 whose"
             " child never began and whose claimant cannot be shown gone, or whose child's evidence cannot be read"
-            " (the operator's assertion, recorded)"), ""))
+            " (the operator's assertion, recorded; what that child spent stays unknown until its evidence reads)"), ""))
 
     def test_a_run_named_without_its_project_bundle_is_refused_with_the_usage(self):
         self.assertEqual(self.aisef_run(["--check", "--settings", "settings.json", "--repo", "repo"]), (2, "", (

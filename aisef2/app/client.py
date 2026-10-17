@@ -84,6 +84,9 @@ class Budget:
         self.limits, self.base, self.logs, self.requests = dict(limits), {k: int(base[k]) for k in self.KEYS}, logs, requests
         #: V2.1: what the lineage this run continues spent (app/lineage) — continuing never resets a ceiling
         self.inherited = {k: int((inherited or {}).get(k, 0)) for k in self.KEYS}
+        #: what the lineage's account lists as unknown and the operator accepted by name: the ceilings are then
+        #: enforced against the known part — the account says so (`account`), it is never a total
+        self.inherited_unaccounted = [str(u) for u in (inherited or {}).get("unaccounted") or []]
 
     def spend(self, live: pathlib.Path | None = None) -> dict:
         logs = sorted(self.logs.glob("*.jsonl")) if self.logs.is_dir() else []
@@ -126,7 +129,8 @@ class Budget:
 
     def account(self) -> dict:
         return {"limits": dict(self.limits), "preflight": dict(self.base), "spent": self.spend(), "reached": self.reached(),
-                "limitation": LIMITATION, **({"inherited": dict(self.inherited)} if any(self.inherited.values()) else {})}
+                "limitation": LIMITATION, **({"inherited": dict(self.inherited)} if any(self.inherited.values()) else {}),
+                **({"inherited_unaccounted": list(self.inherited_unaccounted)} if self.inherited_unaccounted else {})}
 
 
 def environment(names: tuple[str, ...], overlay: dict) -> dict:

@@ -42,11 +42,12 @@ def _parser() -> argparse.ArgumentParser:
                    help="run only: a new file (never overwritten) the evidence anchor is written to — keep it where the "
                         "developer cannot write (docs/v2.1/ANCHOR-THREAT-MODEL.md)")
     p.add_argument("--accept-unaccounted", action="store_true",
-                   help="run --parent only: start although the lineage has spend no evidence accounts for (recorded)")
+                   help="run --parent only: start although the lineage has spend no evidence accounts for (recorded); "
+                        "never for evidence that cannot be read: make it readable again")
     p.add_argument("--supersede-claim", metavar="SHA256",
                    help="run --parent only: supersede the predecessor's claim with this sha256 whose child never began "
                         "and whose claimant cannot be shown gone, or whose child's evidence cannot be read (the "
-                        "operator's assertion, recorded)")
+                        "operator's assertion, recorded; what that child spent stays unknown until its evidence reads)")
     return p
 
 

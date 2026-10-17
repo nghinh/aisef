@@ -22,7 +22,7 @@ another run may continue the same predecessor:
 | ENDED_UNBEGUN (a record that says it ended before it began — it names no journal of events — and no journal) | done | superseded: a new generation records the evidence |
 | UNBEGUN (no record, no journal, or a journal of no bytes) | provably gone (same host, the pid absent or another process) | superseded, with the evidence |
 | UNBEGUN | alive, on another host, or not decidable | refused; the operator may supersede by naming the claim's sha256 (recorded as their assertion) |
-| UNREAD (evidence there that cannot be read: see below) | whatever it is | refused; only the operator's sha256 supersedes (recorded as their assertion, with the cause) |
+| UNREAD (evidence there that cannot be read: see below) | whatever it is | refused; only the operator's sha256 supersedes (recorded as their assertion, with the cause) — and the run is then still refused while that evidence does not read (`unread`, below) |
 
 Nothing is deleted: a superseded claim stays, the new generation points at it. A child whose journal reads and holds an
 event began and is never superseded, by evidence or by assertion. **A child whose evidence is there and cannot be read
@@ -42,14 +42,28 @@ a directory whose listing is denied cannot be told, and the newest decides.
 **Spend.** `account_of` re-derives a run's spend from its evidence alone (the Budget's rules: sessions, journaled
 requests, the preflight's ledger) and adds what only the journal shows: a provider request with no result — in flight
 when the run ended — whose session stream exists is unknown spend. `lineage_account` sums the lineage (each run once,
-and every superseded child, whose preflight may have spent). A continuation of a lineage with unaccounted spend starts
-no paid work unless the operator accepts it by name (`--accept-unaccounted`), and the lineage's known spend counts
-against the run's ceilings (continuing never resets a budget). Evidence the system will not let `account_of` look at — a
+and every superseded child, whose preflight may have spent). Evidence the system will not let `account_of` look at — a
 run directory with no search permission, a `sessions` that is a link into a directory that cannot be traversed or is a
 directory that cannot be listed, a journal that is there and cannot be read (what it recorded is the provider
 requests) — is unknown spend, listed: never raised out of it, never a 0 shown as known. What is
 genuinely not there (no sessions directory, no ledger, no run directory) is not unknown: it is what a run that spent
 nothing there looks like.
+
+**Two kinds of unknown, and what a continuation may do about each.** The sums a lineage account holds are what its
+readable parts spent — exact, per run in `runs` — and a lower bound on the lineage's total whenever `unaccounted` is not
+empty (`total` is then None): the total is unknown while any part is, and no sum stands for it. What the evidence READS and
+says was sent and never answered (a request in flight, a session that finished no step, a preflight request with no
+answer) is unknown spend with a cause: a continuation starts no paid work unless the operator accepts it by name
+(`--accept-unaccounted`, recorded), and the lineage's known spend counts against the run's ceilings (continuing never
+resets a budget; the budget account names what was accepted). What the evidence CANNOT BE READ for (`unread`: a journal,
+a ledger or a session stream that is there and does not read — whatever stands on the journal's path, a link to
+nothing included; a record or a claim that cannot be read, so the run it names — a predecessor, a superseded child — is
+not known) is a part that was not reconciled at all, not one whose request count is known: no flag skips it, and the
+operator's assertion that a claim is superseded (`--supersede-claim`) does not make its child's spend known.
+`aisef run --parent` is refused until the evidence is readable again (restored from a faithful copy, its permissions
+given back); where that cannot be, the lineage cannot be continued and a run without `--parent` inherits nothing.
+Nothing earlier is written or changed by the refusal, and no claim is superseded by a read that failed. A run directory
+that is not there (or is not a directory) is still what a run that spent nothing there looks like.
 
 **A file that is damaged, or is not what a run writes** — a ledger line or a claim that is valid JSON and no object, a
 session stream the reader refuses — is answered as the torn form of the same file is: unknown spend, listed; the
@@ -223,7 +237,10 @@ def process_started(pid: int) -> str | None:
                            errors="replace", timeout=30)
     except (OSError, subprocess.SubprocessError):
         return "unknown"
-    return p.stdout.strip() or None
+    started = p.stdout.strip()
+    if not started and (p.returncode != 1 or p.stderr.strip()):
+        return "unknown"    # a `ps` that failed answers nothing: "no such process" is empty output, status 1, no message
+    return started or None
 
 
 def claimant() -> dict:
@@ -274,7 +291,8 @@ def claim(predecessor: pathlib.Path, child: pathlib.Path, at: float, supersede: 
                                  f"claimant's absence. Make it readable again (its permissions, or its journal from a "
                                  f"faithful copy) and run again: it is then a child that began (continue from it) or one "
                                  f"that did not; or, having inspected it, assert that it is not to be continued: "
-                                 f"--supersede-claim {_sha(data)}")
+                                 f"--supersede-claim {_sha(data)} (recorded; the run is still refused while that "
+                                 "evidence does not read, because what the child spent is not known)")
         if state != UNREAD and gone is not True and not asserted:
             why = "is alive" if gone is False else "cannot be shown gone (another host, or its identity unreadable)"
             raise LineageRefused(f"{predecessor} is claimed by {held} ({path.name}), whose claimant {why} and which has "
@@ -328,7 +346,8 @@ def claim_unread(predecessor: pathlib.Path) -> str | None:
     except (OSError, ValueError) as e:
         return (f"{path.name} cannot be read ({type(e).__name__}: {getattr(e, 'strerror', None) or e})"[:300] +
                 ": make it readable again (its permissions, or a faithful copy) — until then `aisef run --parent` "
-                "refuses the run, and only the operator naming the claim's sha256 supersedes it")
+                "refuses the run (naming the claim's sha256 supersedes the claim, not what its child spent, which "
+                "stays unknown), and no claim is ever rewritten")
     return None
 
 
@@ -437,34 +456,46 @@ def is_file(path: pathlib.Path) -> bool:
 
 
 def account_of(run_dir: pathlib.Path) -> dict:
-    """What `run_dir` spent, re-derived from its evidence (the run's Budget rules), and what is unknown."""
+    """What `run_dir` spent, re-derived from its evidence (the run's Budget rules), and what is unknown: `unaccounted`
+    lists it all; `unread` is the part of it whose evidence is there and cannot be read (a journal, a ledger, a session
+    stream) — spend not even a request count is known for, which no acceptance of the operator covers (module
+    docstring)."""
     from aisef2.app import client, preflight
     got = events_of(run_dir)
     events = got[0] if got else []
     requests = [e for e in events if e.type == "provider/request"]
     answered = {s for e in events if e.type == "provider/result" for s in e.source_seqs}
     ledger, sessions = run_dir / "preflight" / "LEDGER.jsonl", run_dir / "sessions"
+    unread: list[str] = []
     try:
         _look(ledger)
         pre = preflight.accounting(ledger)
-    except Exception:  # noqa: BLE001 — a ledger the reader refuses, whatever its damage, is spend that is unknown
-        pre = {k: 0 for k in SPEND} | {"unaccounted": ["the preflight's ledger does not read"]}
+    except Exception as e:  # noqa: BLE001 — a ledger the reader refuses, whatever its damage, is spend that is unknown
+        pre = {k: 0 for k in SPEND} | {"unaccounted": []}
+        unread.append(f"{run_dir.name}: the preflight's ledger does not read ({type(e).__name__}): what the preflight "
+                      "spent is unknown")
     huge = {k: 10 ** 12 for k in SPEND}
     try:
         _look(sessions)
         spent = client.Budget(huge, pre, sessions, lambda: len(requests)).spend()
     except Exception as e:  # noqa: BLE001 — a stream the reader refuses: what the sessions spent is unknown, not 0
+        stream = (f"{run_dir.name}: a session's event stream does not read ({type(e).__name__}): what the sessions "
+                  "spent is unknown")
         spent = {**{k: pre[k] for k in SPEND}, "provider_requests": pre["provider_requests"] + len(requests),
-                 "unaccounted": [f"{run_dir.name}: a session's event stream does not read ({type(e).__name__}): what "
-                                 "the sessions spent is unknown"]}
-    unaccounted = list(spent["unaccounted"]) + [f"preflight request {n} sent and never answered" for n in pre.get("unaccounted") or []]
+                 "unaccounted": []}
+        unread.append(stream)
+    unaccounted = list(spent["unaccounted"]) + unread + [f"preflight request {n} sent and never answered"
+                                                           for n in pre.get("unaccounted") or []]
     if got is None:     # no journal that reconstructs: not there is a run that spent nothing there; there and unread is unknown
         state, why = child_evidence(run_dir)
-        # a link to nothing or a file in a directory's place is what `_look` has always called not there (nothing was
-        # spent THERE): for a claim's child it is damaged evidence of a beginning, for spend it is no journal
-        if state == UNREAD and _in_the_way(run_dir) is None:
-            unaccounted.append(f"{run_dir.name}: its journal evidence is there and cannot be read ({why}): the provider "
-                               "requests it recorded are unknown spend")
+        # nothing there is a run directory that is not one (not there, a file, a link to nothing); a run directory with
+        # something on the journal's path that does not read — a link to nothing, a link that loops, a file in a
+        # directory's place — has a journal that is there and cannot be read: its requests are unknown, never a 0
+        if state == UNREAD and _is_a_directory(run_dir):
+            journal = (f"{run_dir.name}: its journal evidence is there and cannot be read ({why}): the provider "
+                       "requests it recorded are unknown spend")
+            unaccounted.append(journal)
+            unread.append(journal)
     logs = [p.name for p in sessions.glob("*.jsonl")] if os.path.isdir(sessions) else []
     for r in requests:
         if r.seq in answered:
@@ -478,67 +509,129 @@ def account_of(run_dir: pathlib.Path) -> dict:
             unaccounted.append(f"{run_dir.name}: provider request seq {r.seq} ({story}, {owner}) has no result — in "
                                "flight when the run ended: what it spent is unknown")
     return {"run": str(run_dir), "recorded": os.path.isfile(run_dir / "RUN.json"),
-            **{k: int(spent[k]) for k in SPEND}, "unaccounted": unaccounted}
+            **{k: int(spent[k]) for k in SPEND}, "unaccounted": unaccounted, "unread": unread}
 
 
-def predecessor_of(run_dir: pathlib.Path) -> pathlib.Path | None:
+def _is_a_directory(path: pathlib.Path) -> bool:
+    """Whether a directory is there. What is not there (a name nothing answers to, a file, a link to nothing or one that
+    loops) is not; a refusal to look is not its absence."""
+    try:
+        return stat.S_ISDIR(os.stat(path).st_mode)
+    except OSError as e:
+        return not not_there(e)
+    except ValueError:      # a name with a NUL byte names no file
+        return False
+
+
+def _predecessor(run_dir: pathlib.Path) -> tuple[pathlib.Path | None, str | None]:
+    """(the run `run_dir` continues, why that cannot be told). A record that reads and names no predecessor says the run
+    continued nothing; so does one that reads while the other is damaged (RUN.started.json is written before anything
+    else and names the predecessor the run was given). A record that is there and cannot be read, is not text, is no
+    object, or names its predecessor by anything but a path — and no other says — is not "continued nothing": what that
+    run continued, and what the runs before it spent, is not known (the cause). No record at all: continued nothing."""
+    damaged: list[str] = []
+    answered = False
     for name in (STARTED, "RUN.json"):
         try:
-            doc = json.loads((run_dir / name).read_text(encoding="utf-8"))
-        except (OSError, ValueError):
+            text = (run_dir / name).read_text(encoding="utf-8")
+        except UnicodeDecodeError as e:
+            damaged.append(f"{name} is not text ({e.reason})")
+            continue
+        except OSError as e:
+            if not not_there(e):
+                damaged.append(f"{name} cannot be read ({type(e).__name__}: {e.strerror or e})")
+            continue
+        except ValueError:      # a name with a NUL byte names no file
+            continue
+        try:
+            doc = json.loads(text)
+        except ValueError:
+            damaged.append(f"{name} is cut or is not JSON")
             continue
         c = doc.get("continues") if isinstance(doc, dict) else None     # a record that is no object names no predecessor
         if isinstance(c, Mapping) and isinstance(c.get("path"), str) and c["path"]:
-            return pathlib.Path(c["path"])
-    return None
+            return pathlib.Path(c["path"]), None
+        if not isinstance(doc, dict):
+            damaged.append(f"{name} is not a run record (a JSON object)")
+        elif c is not None:
+            damaged.append(f"{name} names the run it continues by something that is not a path")
+        else:
+            answered = True
+    return None, (None if answered else "; ".join(damaged) or None)
+
+
+def predecessor_of(run_dir: pathlib.Path) -> pathlib.Path | None:
+    return _predecessor(run_dir)[0]
 
 
 def lineage_account(predecessor: pathlib.Path, child: pathlib.Path | None = None) -> dict:
     """What the lineage ending at `predecessor` spent: every run of it once, and every child a superseded claim names
-    (its preflight may have spent) but `child` (the run asking). Unknown spend is listed, never counted as 0."""
+    (its preflight may have spent) but `child` (the run asking). What the readable parts spent is summed — the four
+    counters, exact, and `runs` says which part spent what; unknown spend is listed — `unaccounted`, and in it `unread`
+    (module docstring) — never counted as 0, and `total` is None while any is listed: the sums are then what is known,
+    not the lineage's total.
+    A part the lineage cannot name — the run a record continues when the record cannot be read, the run a claim names
+    when the claim cannot be read — is `unread`, as is evidence there that does not read: no account passes it over."""
     def key(p) -> str:      # a claim names a run absolute; a caller may give one relative (`--verify --out run3`)
         return str(pathlib.Path(p).resolve())
+
+    def unknown(holder: dict, text: str) -> None:
+        holder["unaccounted"].append(text)
+        holder["unread"].append(text)
+
     def listed(where: pathlib.Path, holder: dict) -> list:
         """The claims on `where`; a directory that cannot be listed hides the runs it superseded: what they spent is
         unknown, listed on `holder`'s account — never raised out of the account, never a known 0."""
         try:
             return claims(where)
         except LineageRefused as e:
-            holder["unaccounted"].append(f"{e}: what the runs it superseded spent is unknown")
+            unknown(holder, f"{e}: what the runs it superseded spent is unknown")
             return []
+
+    def sibling_of(path: pathlib.Path, holder: dict) -> str | None:
+        """The run a claim file names. A claim that names none (an object without `run`) is a claim of nothing; one that
+        cannot be read names a run that is not known: its spend is unknown, listed — not passed over."""
+        try:
+            return _claimed_run(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError) as e:
+            unknown(holder, f"{path.parent.name}/{path.name} cannot be read ({type(e).__name__}): the run it names, "
+                            "and what that run spent, is unknown")
+            return None
 
     runs, seen, at = [], {key(child)} if child is not None else set(), predecessor
     while at is not None and key(at) not in seen:
         seen.add(key(at))
         runs.append(account_of(at))
-        nxt = predecessor_of(at)
+        nxt, why = _predecessor(at)
+        if why:     # the walk ends here because the record cannot say what comes next, not because nothing does
+            unknown(runs[-1], f"{at.name}: {why}: what it continued, and what the runs before it spent, is unknown")
         for _, path in listed(nxt, runs[-1]) if nxt is not None else []:
-            try:
-                sibling = _claimed_run(path.read_text(encoding="utf-8"))
-            except (OSError, ValueError):
-                sibling = None
+            sibling = sibling_of(path, runs[-1])
             if sibling and key(sibling) not in seen:
                 seen.add(key(sibling))
                 runs.append(account_of(pathlib.Path(sibling)) | {"superseded": True})
         at = nxt
-    for _, path in listed(predecessor, runs[0] if runs else {"unaccounted": []}):     # siblings of `child`: superseded
-        try:
-            sibling = _claimed_run(path.read_text(encoding="utf-8"))
-        except (OSError, ValueError):
-            continue
+    holder = runs[0] if runs else {"unaccounted": [], "unread": []}
+    for _, path in listed(predecessor, holder):     # siblings of `child`: superseded
+        sibling = sibling_of(path, holder)
         if sibling and key(sibling) not in seen:
             seen.add(key(sibling))
             runs.append(account_of(pathlib.Path(sibling)) | {"superseded": True})
-    return {"runs": runs, **{k: sum(r[k] for r in runs) for k in SPEND},
-            "unaccounted": [u for r in runs for u in r["unaccounted"]]}
+    unaccounted = [u for r in runs for u in r["unaccounted"]]
+    known = {k: sum(r[k] for r in runs) for k in SPEND}
+    return {"runs": runs, **known, "unaccounted": unaccounted, "unread": [u for r in runs for u in r["unread"]],
+            "total": None if unaccounted else dict(known)}
 
 
 def usage_lineage(predecessor: pathlib.Path, child: pathlib.Path, own: Mapping, prices: Mapping | None) -> dict:
     """Tokens and money over the lineage of `child` (this run): every run once (as `lineage_account`), this run's own
-    last; a total whose any part is unknown is `null`, never a partial sum shown as the whole."""
+    last; a total whose any part is unknown is `null`, never a partial sum shown as the whole. Each run's entry holds
+    what that run's readable evidence shows (`cost.known`, `tokens`), attributed; `tokens` is their sum and
+    `tokens_status` says whether it is the lineage's total or only what is known."""
     from aisef2.app import usage
+    account = lineage_account(predecessor, child)
     entries = []
-    for acct in lineage_account(predecessor, child)["runs"]:
+    for acct in account["runs"]:
         d = pathlib.Path(acct["run"])
         got = events_of(d)
         u = usage.usage(d, [{"seq": e.seq, "type": e.type, "data": dict(e.data)} for e in (got[0] if got else [])],
@@ -553,7 +646,12 @@ def usage_lineage(predecessor: pathlib.Path, child: pathlib.Path, own: Mapping, 
                     "cost": dict(own.get("cost") or {})})
     values = [(e["cost"] or {}).get("value") for e in entries]
     known = all(isinstance(v, (int, float)) for v in values)
+    # the runs before this one: whatever their sessions lack is listed in their account (`unaccounted`); this run's own
+    # sessions are outside it
+    own_blind = any(x.get("steps_without_tokens") or not x.get("steps") for x in own.get("sessions") or [])
+    exact = not any(a["unaccounted"] for a in account["runs"]) and not own_blind and all(e["recorded"] for e in entries)
     return {"runs": entries, "tokens": {k: sum(int(e["tokens"].get(k, 0)) for e in entries) for k in usage.CLASSES},
+            "tokens_status": "known" if exact else "lower bound: some run's spend is unknown (not 0)",
             "cost": {"value": round(sum(values), 6) if known else None,
                      "status": "known" if known else "unknown: some run's cost is not known (not 0)"}}
 
