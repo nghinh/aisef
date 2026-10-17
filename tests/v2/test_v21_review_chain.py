@@ -101,6 +101,10 @@ with (here / "calls.jsonl").open("a", encoding="utf-8") as _calls:     # every s
     _calls.write(json.dumps(argv) + "\n")
 if argv == ["version"]:      # the identity gate asks before any review command; identity.json scripts a different answer
     said = json.loads((here / "identity.json").read_text(encoding="utf-8")) if (here / "identity.json").exists() else {}
+    # "after_asks": N — the first N questions (the run's own preflight is the first) are answered as the pinned build
+    asked = sum(1 for ln in (here / "calls.jsonl").read_text(encoding="utf-8").splitlines() if json.loads(ln) == ["version"])
+    if asked <= said.get("after_asks", 0):
+        said = {}
     time.sleep(said.get("sleep", 0))
     sys.stdout.write(said.get("text", "open-code-review v1.12.12 (182898c) darwin/arm64\nbuilt at: 2026-10-05T00:00:00Z\n"))
     raise SystemExit(said.get("exit", 0))
@@ -414,8 +418,14 @@ class CandidateChangedDuringReview(ChainBase):
         self.assertNotIn("reviewer", log.splitlines())
 
     def test_a_finder_binary_that_is_not_the_pinned_one_does_not_run(self):
+        """The run's own preflight asks the pinned binary once (before any session) and refuses one that is not the pin
+        there (test_v21_ocr_preflight.py). What is tested here is the review's check at the moment of use: a developer
+        session — the process that runs between the preflight and the review — edits the binary after it was asked."""
         s = self.settings()
-        self.ocr.write_text(self.ocr.read_text() + "\n# changed\n")
+        swap = (f"import pathlib as _p, sys as _s\n_o = _p.Path({str(self.ocr)!r})\nif '--title' in _s.argv:\n"
+                "    _o.write_text(_o.read_text() + '\\n# changed\\n')\n")
+        head, body = self.client.read_text().split("\n", 1)
+        self.client.write_text(head + "\n" + swap + body)
         (self.bin / "answers.json").write_text(json.dumps([answer(FIXED)]), encoding="utf-8")
         (self.bin / "scenarios.json").write_text(json.dumps([{}]), encoding="utf-8")
         self.out = self.tmp / "out"
@@ -424,7 +434,10 @@ class CandidateChangedDuringReview(ChainBase):
         self.assertEqual(rec["story_outcomes"], {"S1": ["RETRY", "ROLLBACK"]})
         self.assertEqual(self.failures(), ["CAPABILITY_UNRUNNABLE", "CAPABILITY_UNRUNNABLE"])
         self.assertEqual(list(self.bin.glob("review-*.json")), [])
-        self.assertFalse((self.bin / "calls.jsonl").exists())              # it was never started: not even for `version`
+        # asked once, by the preflight, before it was edited; the edited bytes were never started: not even for `version`
+        self.assertEqual([json.loads(ln) for ln in (self.bin / "calls.jsonl").read_text(encoding="utf-8").splitlines()],
+                         [["version"]])
+        self.assertNotEqual(hashlib.sha256(self.ocr.read_bytes()).hexdigest(), s.review["ocr"]["sha256"])
 
 
 class _ScriptedModel(http.server.BaseHTTPRequestHandler):

@@ -3,11 +3,13 @@
     aisef run --project BUNDLE --settings SETTINGS --repo REPO --out DIR [--anchor-out FILE] [--parent RUN]
                                                                           run the project's plan on REPO (a new DIR)
     aisef run --check --project BUNDLE --settings SETTINGS --repo REPO      everything before the provider: no request
+                                                                          (review.finder "ocr": its binary asked too)
     aisef run --verify --project BUNDLE --out DIR [--expect-anchor A]     re-derive a finished run from its journal
                                                                           and evidence (A: the anchor the run printed)
 
 Exit status: 0 the delivery verdict is PASS (check: ready; verify: VERIFIED); 1 FAIL or NOT_REACHED (verify: REFUTED);
-2 refused before the run began (an input that does not hold, an identity stop) — no session was started."""
+2 refused before the run began (an input that does not hold, an identity stop, the review's OCR binary that is not
+the pinned one) — no session was started."""
 
 from __future__ import annotations
 
@@ -85,9 +87,11 @@ def run(argv: list[str]) -> int:
             if spec is not None:   # V2.1 (F): measured here too — the sessions' client, in a directory of its own
                 with tempfile.TemporaryDirectory(prefix="aisef-confine-") as tmp:
                     conf = confine.measure(spec, pathlib.Path(tmp) / "confinement", R.client_on_path(s))
-            ready = adm["admitted"] and not (conf and conf["problems"])
+            ocr = R.ocr_identity(s)     # V2.1: the review's binary, asked here too — before any run, no request
+            ready = adm["admitted"] and not (conf and conf["problems"]) and not (ocr and ocr["status"] != "PASSED")
             _print({"project": project.name, "plan_hash": project.plan.plan_hash, "route": s.route, "admission": adm,
-                    **({"confinement": conf} if conf is not None else {}), "ready": ready})
+                    **({"confinement": conf} if conf is not None else {}),
+                    **({"ocr_identity": ocr} if ocr is not None else {}), "ready": ready})
             return 0 if ready else 2
         rec = R.execute(project, s, a.repo, a.out, **({"predecessor": a.parent, "accept_unaccounted": a.accept_unaccounted,
                                                          "supersede_claim": a.supersede_claim} if a.parent is not None else {}))

@@ -230,11 +230,17 @@ class Gate(unittest.TestCase):
 @POSIX
 class Chain(chain.ChainBase):
     """Through `aisef run`: a binary that is not the pinned build never reviews the candidate, the story is never
-    committed on it, and the operator reads both sides in the journal."""
+    committed on it, and the operator reads both sides in the journal.
+
+    The run's own preflight asks the binary first (test_v21_ocr_preflight.py: a binary that is wrong from the start is
+    refused there, before any session). What is tested here is the review's own question at the moment of use, so
+    the binary answers as the pinned build the first time — the preflight's — and as `name` every time after: a
+    binary that said one thing before the developer worked and another when it was to review."""
 
     def identity(self, name: str) -> None:
         text, code, sleep = ANSWERS[name]
-        (self.bin / "identity.json").write_text(json.dumps({"text": text, "exit": code, "sleep": sleep}), encoding="utf-8")
+        (self.bin / "identity.json").write_text(json.dumps({"text": text, "exit": code, "sleep": sleep, "after_asks": 1}),
+                                                encoding="utf-8")
 
     def started(self) -> list[list[str]]:
         p = self.bin / "calls.jsonl"
@@ -250,6 +256,7 @@ class Chain(chain.ChainBase):
         for word in REFUSED[name]:
             self.assertTrue(all(word in d for d in said), (name, word, said))
         self.assertEqual(set(map(tuple, self.started())), {("version",)}, "only the version question was ever asked")
+        self.assertEqual(len(self.started()), 3, "the preflight's question, then one at the moment of each of two reviews")
         self.assertEqual(list(self.bin.glob("review-*.json")), [])
         self.assertEqual(git_main(self), self.baseline)
         self.assertEqual([s["role"] for s in rec["sessions"]], ["developer", "developer"])     # no reviewer session at all
@@ -267,7 +274,9 @@ class Chain(chain.ChainBase):
         rec = self.run_with([chain.FIXED], [{}])
         self.assertEqual(rec["story_outcomes"], {"S1": ["COMMIT"]})
         kinds = ["version" if a == ["version"] else "preview" if "--preview" in a else "review" for a in self.started()]
-        self.assertEqual(kinds, ["version", "preview", "review"])
+        # the first question is the run's preflight (before the clone and every session); the second is the review's
+        # own, at the moment of use, before its preview and its review
+        self.assertEqual(kinds, ["version", "version", "preview", "review"])
         (s,) = [x for x in rec["sessions"] if x["role"] == "reviewer"]
         self.assertEqual(s["identity"]["declared"]["version"], "v1.12.12")
         self.assertIn("self-declaration", s["identity"]["declared_by"])

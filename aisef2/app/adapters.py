@@ -336,7 +336,7 @@ def _declared(exe: str, timeout_s: float) -> tuple[dict | None, str | None]:
             code = _bounded(review_ocr.version_argv(exe), str(home), review_ocr.version_environment(home, os.environ),
                             out, timeout_s, "ocr version")
         except (OSError, RangeError) as e:      # not executable, or the range could not start it
-            return None, f"{exe}: `version` could not be started ({type(e).__name__})"
+            return None, f"{exe}: `version` could not be started ({type(e).__name__}: {str(e)[:300]})"
         text = out.read_bytes()[:4096].decode("utf-8", "replace")
     return review_ocr.declared(exe, code, text)
 
