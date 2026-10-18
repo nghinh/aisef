@@ -53,9 +53,10 @@ USAGE-2.1 §2; 50 trong 53 approval được giữ vẫn chỉ dựa vào luật
 
 **Di trú:** spec id của 2.0.0 đổi một lần → `aisef bundle migrate` buộc lại `plan` và ghi một bundle **ứng viên mới** (bản
 gốc không bị sửa). Một approval chỉ được mang sang khi nó còn buộc đúng hash **và** không có thay đổi capability đã khai báo
-(`CAPABILITY_CHANGES`) chọn trúng contract của nó (chỉ thị 2026-10-15, mục 1); approval của contract bị chọn bị giữ lại và
-là việc duyệt lại của chủ dự án. LedgerLock 2.0.0: 59 spec, 67 obligation; 53 trong 59 approval được giữ, **sáu** contract
-bị giữ lại (D-1: chủ dự án đã nêu bốn và quyết giữ sáu ngày 2026-10-18). Lần ghi trước, "admit 9/9, không duyệt lại", là phép đo trước khi `migrate` thôi
+(`CAPABILITY_CHANGES`) chọn trúng contract của nó (chỉ thị 2026-10-15, mục 1); approval của contract bị chọn không được mang
+sang ứng viên (chỉ còn trong bundle gốc, làm lịch sử; không có hiệu lực trong ứng viên mới) và là việc duyệt lại của chủ dự
+án. LedgerLock 2.0.0: 59 spec, 67 obligation; 53 trong 59 approval được giữ, **sáu** contract
+không được mang approval sang (D-1: chủ dự án đã nêu bốn và quyết giữ sáu ngày 2026-10-18). Lần ghi trước, "admit 9/9, không duyệt lại", là phép đo trước khi `migrate` thôi
 giữ approval chỉ vì hash: ứng viên chưa nạp được cho tới khi sáu contract được duyệt lại, và admission thật chỉ chứng minh
 được sau khi hiệu chuẩn sinh lại. Bằng chứng cũ giữ nguyên byte.
 
