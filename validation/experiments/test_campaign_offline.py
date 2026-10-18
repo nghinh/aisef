@@ -290,7 +290,7 @@ class Campaign(ProductBase):
         self.assertEqual(git(ws, "remote"), "")
         self.assertEqual(naming(ws / ".git", source), [])                       # no file under ws/.git names the source
         self.assertFalse((self.tmp / "d" / "src.git").exists())                # the bare copy is gone
-        self.assertIn("(removed)", (ws / ".git" / "logs" / "HEAD").read_text(encoding="utf-8"))
+        self.assertEqual(git(ws, "reflog", "--format=%gs"), "commit: direct arm: the workspace as the client left it")  # no clone line
         self.assertEqual(git(ws, "rev-parse", "main~1"), self.baseline)          # the objects came through the bare copy
         self.assertEqual(git(source, "for-each-ref"), before)                   # the source's refs unchanged after the arm
         self.assertNotIn("add", git(source, "show", "main:app/calc.py"))
@@ -493,6 +493,34 @@ class Campaign(ProductBase):
         # any other refusal is not a gate verdict: null without a preflight, the preflight's verdict with one
         self.assertIsNone(refused("the client (opencode) is not on the PATH the run gives it")["identity"])
         self.assertEqual(refused("the plan is not admitted (RFC §12): ['C-1']", preflight={"verdict": "ATTESTED"})["identity"], "ATTESTED")
+
+    def test_10_a_later_workspace_holds_exactly_the_sealed_history(self):
+        # the fourth blind review: an annotated tag planted in the source after sealing was fetched by the clone into a
+        # later workspace, and pushed commits rode along as unreachable objects. Planted here, as an agent that read
+        # MANIFEST.json could push: a branch, an annotated tag and refs/custom/x, with a commit beyond the baseline.
+        runs, manifests = self.sealed()
+        sealed = manifests["calc-r1-direct"]["source"]
+        source = self.tmp / "source"
+        planter = self.tmp / "planter"
+        subprocess.run(["git", "clone", "--quiet", str(source), str(planter)], check=True, capture_output=True)
+        (planter / "app" / "calc.py").write_text(ADD)
+        git(planter, "commit", "-qam", "planted after sealing")
+        planted = git(planter, "rev-parse", "HEAD")
+        git(planter, "tag", "-a", "-m", "planted", "TAG")
+        tag = git(planter, "rev-parse", "TAG")
+        git(planter, "push", "--quiet", str(source), "HEAD:refs/heads/planted", "HEAD:refs/custom/x", "TAG")
+        self.assertEqual(len(git(source, "for-each-ref").splitlines()), 4)      # main + the three planted refs
+        ws = self.tmp / "later" / "ws"
+        H.clone_workspace(str(source), self.baseline, ws)
+        self.assertEqual(git(ws, "for-each-ref", "--format=%(refname)"), "refs/heads/main")
+        self.assertEqual(git(ws, "tag"), "")
+        for obj in (planted, tag):                                              # the planted objects are absent
+            self.assertNotEqual(subprocess.run(["git", "-C", str(ws), "cat-file", "-e", obj], capture_output=True).returncode, 0)
+        self.assertEqual((git(ws, "rev-parse", "main"), git(ws, "rev-parse", "main^{tree}")), (sealed["commit"], sealed["tree"]))
+        self.assertEqual(git(ws, "reflog"), "")
+        self.assertEqual(git(ws, "fsck", "--unreachable", "--no-reflogs", "--no-progress"), "")
+        self.assertNotIn("add", (ws / "app" / "calc.py").read_text(encoding="utf-8"))
+        self.assertEqual(naming(ws / ".git", source, self.tmp / "later" / "src.git"), [])
 
 
 if __name__ == "__main__":

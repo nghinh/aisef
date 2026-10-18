@@ -17,9 +17,10 @@ directory, then only python's and git's, then /usr/bin:/bin — resolves `openco
 the client on PATH, app/run.client_on_path; the direct arm is handed it: one binary, its realpath and sha256 in every
 manifest's `client`); each run's bundle (and its evaluator, when it carries a plan) names the workload's commit as its
 plan baseline; every run's manifest is built, sealed and written to OUT/<run_id>/MANIFEST.json (once: an existing one
-is reused, never rewritten), checked and paired. Then, run by run: a fresh clone of the workload at its commit with no
-remote and no path to the source under its .git (harness.clone_workspace: via a bare copy deleted before the agent
-starts — an agent can push to any absolute path it independently knows; the workspace carries none), the arm, the
+is reused, never rewritten), checked and paired. Then, run by run: a fresh clone of the workload at its commit — that
+commit's history and nothing else — with no remote and no path to the source under its .git (harness.clone_workspace:
+via a bare copy deleted before the agent starts — an agent can push to any absolute path it independently knows; the
+workspace carries none), the arm, the
 candidate frozen (commit, tree, archive and file digests), the hidden evaluator on it, the leak
 scan over the arm's session streams, the usage read (direct: the preflight's ledger and the client's streams through
 app/client.Budget and app/usage; aisef: RUN.json), and OUT/<run_id>/RESULT.json — written for a failed arm too. A run
@@ -43,14 +44,17 @@ fingerprint) — never a verification of weights — and a router alias whose ba
 The residual of the workspace confinement, stated: OUT/<run_id>/MANIFEST.json (`source.repo`, absolute) and
 OUT/CAMPAIGN.json (the operator's bytes, `workload.repo` as written) name the workload repository and sit two and
 three directories above the direct arm's workspace OUT/<run_id>/arm/ws (the aisef arms' kernel clone lies deeper); an
-agent that reads them can `git push <that path> <a NEW ref>`. Harmless to the measurement: a push adds refs and
-objects, it cannot alter the sealed baseline commit — every later run clones that sha (source_identity binds commit,
-tree, archive and files digests; clone_workspace checks `main` out at it or refuses the arm, recorded), so an arm
-starts from exactly that tree or not at all, never from another; after sealing the harness only reads the source
-(baseline_problems' rev-parse of the sha, the bare copy) and never writes it. Measured (2026-10-18, throwaway repos):
-a ref pushed after sealing is not a branch of a later workspace (the copy's remote-tracking refs go with the remote)
-but its objects ride along unreferenced in that clone's object store — a channel between runs for an agent that plants
-and one that digs by sha, never a change to what an arm starts from, and the hidden evaluator is never in that
+agent that reads them can `git push <that path> <a NEW ref>` — a branch, a tag, any ref. Harmless to the measurement:
+a push adds refs and objects, it cannot alter the sealed baseline commit — every later run clones that sha
+(source_identity binds commit, tree, archive and files digests; clone_workspace checks `main` out at it or refuses the
+arm, recorded), so an arm starts from exactly that tree or not at all, never from another; after sealing the harness
+only reads the source (baseline_problems' rev-parse of the sha, the bare copy) and never writes it. And a later
+workspace holds exactly the sealed sha's history: no other ref, no tag, no reflog, no object `main` does not reach
+(clone_workspace: the clone without tags, every other ref deleted, the reflogs expired, `git gc --prune=now`, the refs
+asserted). The fourth blind review measured the earlier shape — a tag planted after sealing fetched by the clone, the
+pushed commits riding along unreachable; measured closed (2026-10-18, throwaway repos, test_10): a branch, an
+annotated tag and refs/custom/x pushed after sealing are absent from a later workspace, their objects too (`git
+cat-file -e` fails). No channel between runs through the workspace remains, and the hidden evaluator is never in that
 repository.
 
 An aisef arm's candidate is RUN.json's `final_main` only when its `delivery_verdict` is PASS (app/run.delivery: PASS,
