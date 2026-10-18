@@ -30,6 +30,10 @@ n=$(ls "$D"/out/*/RESULT.json | wc -l | tr -d ' '); [[ $n == 2 ]] || fail "RESUL
 [[ -f $D/out/w1-a-r1-direct/RESULT.json && -f $D/out/w1-a-r1-aisef/RESULT.json ]] || fail "the first two runs are not w1-a rep 1 direct, aisef"
 rows=$(grep -c '^{' "$D/summary.txt"); [[ $rows == 2 ]] || fail "summary rows $rows != 2"
 [[ ! -s $D/replay.txt ]] || fail "replay printed a difference: $(cat "$D/replay.txt")"
+# a partial campaign (2 of 18 results) refuses --adopt-owner before it looks for any owner file
+arc=0; adopt_out=$(nice -n 19 /opt/homebrew/bin/python3 -P -B "$T/e2_setup.py" "$D" --adopt-owner 2>&1) || arc=$?
+[[ $arc == 1 && $adopt_out == *"the campaign is partial (2 of 18 results)"* ]] || fail "--adopt-owner on a partial campaign: exit $arc, output: $adopt_out"
+echo "== $(date '+%F %T %z') --adopt-owner refused on the partial campaign (expected)"
 /opt/homebrew/bin/python3 -P -B - "$D" "$S/fakebin/opencode" <<'EOF' || fail "launch record"
 import json, pathlib, sys
 d, fake = pathlib.Path(sys.argv[1]), sys.argv[2]

@@ -119,9 +119,11 @@ How the owner's approval replaces a provisional one:
 
 1. The owner runs the lane's APPROVE.sh (`closure-evidence/v2/v2.1/e2/w1-a/APPROVE.sh human:<name>`,
    `.../e2/w2/APPROVE.sh human:<name>`): one `aisef bundle approve` per contract, written beside each bundle.
-2. `python3 -P -B e2_setup.py {rec['dir']} --adopt-owner` — between two invocations of run_e2.sh, never during one —
-   checks each owner file holds the same contracts and requirements, keeps the provisional copies under
-   `approved/provisional/`, replaces `approved/*.json`, and appends to this file.
+2. `python3 -P -B e2_setup.py {rec['dir']} --adopt-owner` — BEFORE the first run_e2.sh or AFTER the last run, never
+   in between (refused while the campaign is partial: the first launch seals all manifests, binding the provisional
+   files' sha256, and later arms must run on exactly the files their manifests name) — checks each owner file holds
+   the same contracts and requirements, keeps the provisional copies under `approved/provisional/`, replaces
+   `approved/*.json`, and appends to this file.
 3. `python3 -P -B validation/experiments/campaign.py replay --out {rec['dir']}/out` evaluates every recorded
    candidate again under the owner-approved evaluator (RESULT.json's evaluator_path is the replaced file). Nothing
    printed = every result replays.
@@ -135,7 +137,14 @@ launching — e2_setup.py uses the owner's files on its own when they exist at s
 def adopt_owner(d: pathlib.Path) -> None:
     from aisef2.app import bundle_cli
     rec = read(d / "SETUP.json")
-    lines = [f"\n## Owner's approvals adopted — {now()}\n"]
+    # the driver seals every manifest at the first launch and reuses them (bundle/evaluator sha256 bound then):
+    # adopting mid-campaign would make later arms run on files their manifests do not name. Before the first
+    # launch or after the last result only.
+    total, done = rec["campaign"]["runs"], len(list((d / "out").glob("*/RESULT.json"))) if (d / "out").exists() else 0
+    if 0 < done < total:
+        raise SystemExit(f"refused: the campaign is partial ({done} of {total} results) — adopt the owner's approvals "
+                         f"before the first launch or after the last run (then `campaign.py replay`); nothing replaced")
+    lines = [f"\n## Owner's approvals adopted — {now()} ({'before any run' if done == 0 else f'after all {done} runs'})\n"]
     keep = d / "approved" / "provisional"
     for name in rec["approved"]:                          # every check before any replacement
         wid, kind = name.rsplit("-", 1)

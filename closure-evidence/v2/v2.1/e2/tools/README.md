@@ -129,7 +129,8 @@ bundle as `approved.json`; this lane did not run it — `ls` of the four bundle 
 * **Before setup** (recommended): `e2_setup.py` finds `<lane>/<dir>/approved.json`, checks its contracts and
   requirements (ids and hashes) are those of the sealed bundle, and copies it — `APPROVALS.md` says `owner`. The
   sealed manifests then bind the owner-approved files (`bundle.sha256`, `evaluator.sha256`).
-* **After runs**: `e2_setup.py $D --adopt-owner` (between two invocations of `run_e2.sh`, never during one) checks
+* **After ALL runs** (or before the first; refused while the campaign is partial — the first launch seals all 18
+  manifests with the provisional files' sha256 and later arms must run on exactly those files): `e2_setup.py $D --adopt-owner` checks
   every owner file exists, holds the same contracts and requirements, lints READY; keeps the provisional copies under
   `D/approved/provisional/`; replaces `D/approved/*.json`; appends to `APPROVALS.md`; prints the replay command.
   `campaign.py replay --out D/out` then evaluates every recorded candidate under the owner-approved evaluator
