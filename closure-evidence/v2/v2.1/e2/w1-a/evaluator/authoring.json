@@ -1,0 +1,283 @@
+{
+ "format": "aisef-v2-authoring/1",
+ "name": "treesum-hidden",
+ "description": "W1-a (E2, greenfield): treesum — the HIDDEN evaluator. Twelve contracts no arm sees: edge cases, error handling, idempotence, exit codes and one hygiene check that a faithful implementation of docs/requirements.md must have; none of their inputs or expectations appears in the public task text or in the arms' bundle (the hidden windows are 15/25/45/60 s, the arms' 10/20/30 s).",
+ "requirements_document": {
+  "path": "docs/requirements.md"
+ },
+ "product_roots": [
+  "treesum",
+  "tests"
+ ],
+ "baseline": "HEAD",
+ "requirements": [
+  {"id": "R-1.2", "text": "file_sha256 takes a str or a pathlib.Path; a path that does not exist raises FileNotFoundError.", "source": "docs/requirements.md#1.2"},
+  {"id": "R-2.3", "text": "build raises NotADirectoryError for a root that exists and is not a directory, or does not exist.", "source": "docs/requirements.md#2.3"},
+  {"id": "R-3.2", "text": "loads ignores empty and whitespace-only lines, reads a final line without a newline like any other, and raises ValueError on a malformed line.", "source": "docs/requirements.md#3.2"},
+  {"id": "R-4.1", "text": "compare returns added, removed and changed, each a list of paths in ascending order.", "source": "docs/requirements.md#4.1"},
+  {"id": "R-5.2", "text": "build DIR prints the snapshot text, nested paths with / and entries in ascending path order, exit 0.", "source": "docs/requirements.md#5.2"},
+  {"id": "R-5.3", "text": "build DIR -o FILE creates or replaces FILE with nothing on standard output; a FILE inside DIR is not an entry of the snapshot.", "source": "docs/requirements.md#5.3"},
+  {"id": "R-5.4", "text": "verify prints one line per difference in ascending order of path and exits 1 when there is a difference.", "source": "docs/requirements.md#5.4"},
+  {"id": "R-5.5", "text": "Any other use exits 2 with a message on standard error and nothing on standard output.", "source": "docs/requirements.md#5.5"},
+  {"id": "R-HYG", "text": "The delivered tree holds no bytecode cache under the package: treesum/__pycache__ is not an entry of the tree.", "source": "baseline/.gitignore (__pycache__/) — hygiene, not a clause of docs/requirements.md; canary finding C-1"}
+ ],
+ "contracts": [
+  {
+   "id": "HC-01",
+   "requirement_ids": ["R-1.2"],
+   "subject": {"kind": "python_callable", "locator": "treesum.digest:file_sha256"},
+   "stimulus": {"args": ["<ws>/missing"]},
+   "observable": {"raises": "FileNotFoundError", "within_s": 15},
+   "polarity": "MUST_HOLD",
+   "subject_absence": "REQUIRES_SUBJECT",
+   "rationale": "error handling: a path that does not exist raises FileNotFoundError (1.2); an implementation that catches OSError and returns an empty or placeholder digest fails"
+  },
+  {
+   "id": "HC-02",
+   "requirement_ids": ["R-2.3"],
+   "subject": {"kind": "python_callable", "locator": "treesum.snapshot:build"},
+   "stimulus": {"args": ["<ws>/plain.txt"], "workspace": {"plain.txt": {"text": "just a file\n", "newline": "\n"}}},
+   "observable": {"raises": "NotADirectoryError", "within_s": 15},
+   "polarity": "MUST_HOLD",
+   "subject_absence": "REQUIRES_SUBJECT",
+   "rationale": "error handling: a root that is a file raises; os.walk and Path.rglob over a file silently yield nothing, so an implementation without the check returns {} instead"
+  },
+  {
+   "id": "HC-03",
+   "requirement_ids": ["R-3.2"],
+   "subject": {"kind": "python_callable", "locator": "treesum.snapshot:loads"},
+   "stimulus": {"args": ["\n2c8b08da5ce60398e1f19af0e5dccc744df274b826abe585eaba68c525434806  one.txt\n   \n27dd8ed44a83ff94d557f9fd0412ed5a8cbca69ea04922d88c01184a07300a5a  two.txt"]},
+   "observable": {
+    "returns": {
+     "one.txt": "2c8b08da5ce60398e1f19af0e5dccc744df274b826abe585eaba68c525434806",
+     "two.txt": "27dd8ed44a83ff94d557f9fd0412ed5a8cbca69ea04922d88c01184a07300a5a"
+    },
+    "within_s": 15
+   },
+   "polarity": "MUST_HOLD",
+   "subject_absence": "REQUIRES_SUBJECT",
+   "rationale": "edge case: a leading empty line, a whitespace-only line and a final line without a newline; a parser that splits on newline and parses every piece fails"
+  },
+  {
+   "id": "HC-04",
+   "requirement_ids": ["R-3.2"],
+   "subject": {"kind": "python_callable", "locator": "treesum.snapshot:loads"},
+   "stimulus": {"args": ["not-a-digest  one.txt\n"]},
+   "observable": {"raises": "ValueError", "within_s": 15},
+   "polarity": "MUST_HOLD",
+   "subject_absence": "REQUIRES_SUBJECT",
+   "rationale": "error handling: the digest field is not 64 lowercase hex characters; a parser that only splits on two spaces accepts it"
+  },
+  {
+   "id": "HC-05",
+   "requirement_ids": ["R-4.1"],
+   "subject": {"kind": "python_callable", "locator": "treesum.snapshot:compare"},
+   "stimulus": {
+    "args": [
+     {
+      "b.txt": "2c8b08da5ce60398e1f19af0e5dccc744df274b826abe585eaba68c525434806",
+      "a.txt": "27dd8ed44a83ff94d557f9fd0412ed5a8cbca69ea04922d88c01184a07300a5a",
+      "z.txt": "e6843a38061f575aed904235bae6ed9571bb039aa36a9f54a47b536d1e06e3ab",
+      "m.txt": "7d68bc1b419e0dde940d3c316a6750a3f16a0993b32509410407e2c175736e34"
+     },
+     {
+      "d.txt": "2cbd00100f5edce87aa72f04d5227476f3ad4a1b474acb36209ff256467fd715",
+      "a.txt": "27dd8ed44a83ff94d557f9fd0412ed5a8cbca69ea04922d88c01184a07300a5a",
+      "m.txt": "ca746b529ef681abf64217dd81011ad14d2928d621fc531ed8f42c2eea6eab1e",
+      "c.txt": "d3f0ff5c901707ff21b5fca337c97e263b8c32fad9b5fa80746b2fd2f76a4292",
+      "b.txt": "2088d0c4b41022d90f663fa8d8156cb525241b55d30ecdf922c38f94f7efda4c"
+     }
+    ]
+   },
+   "observable": {
+    "returns": {"added": ["c.txt", "d.txt"], "removed": ["z.txt"], "changed": ["b.txt", "m.txt"]},
+    "within_s": 15
+   },
+   "polarity": "MUST_HOLD",
+   "subject_absence": "REQUIRES_SUBJECT",
+   "rationale": "every category non-empty, inputs in scrambled key order, two entries per list where order shows: lists must be sorted, an unchanged entry (a.txt) appears nowhere"
+  },
+  {
+   "id": "HC-06",
+   "requirement_ids": ["R-5.2"],
+   "subject": {"kind": "cli_invocation", "locator": "treesum:__main__"},
+   "stimulus": {
+    "argv": ["build", "<ws>/proj"],
+    "workspace": {
+     "proj/z.txt": {"text": "zeta\n", "newline": "\n"},
+     "proj/a/m.txt": {"text": "mu\n", "newline": "\n"},
+     "proj/a/b/c.txt": {"text": "chi\n", "newline": "\n"}
+    }
+   },
+   "observable": {
+    "exit_code": 0,
+    "stdout": {
+     "text": "7d68bc1b419e0dde940d3c316a6750a3f16a0993b32509410407e2c175736e34  a/b/c.txt\ne6843a38061f575aed904235bae6ed9571bb039aa36a9f54a47b536d1e06e3ab  a/m.txt\n2088d0c4b41022d90f663fa8d8156cb525241b55d30ecdf922c38f94f7efda4c  z.txt\n",
+     "newline": "\n"
+    },
+    "within_s": 25
+   },
+   "polarity": "MUST_HOLD",
+   "subject_absence": "REQUIRES_SUBJECT",
+   "rationale": "nested directories two levels deep: relative paths joined with /, lines in plain string order of the whole path (a/b/c.txt before a/m.txt before z.txt), never directory-walk order"
+  },
+  {
+   "id": "HC-07",
+   "requirement_ids": ["R-5.3"],
+   "subject": {"kind": "cli_invocation", "locator": "treesum:__main__"},
+   "stimulus": {
+    "argv": ["build", "<ws>/proj", "-o", "<ws>/out.sum"],
+    "pre": [{"argv": ["build", "<ws>/proj", "-o", "<ws>/out.sum"]}],
+    "workspace": {
+     "proj/one.txt": {"text": "one\n", "newline": "\n"},
+     "proj/two.txt": {"text": "two\n", "newline": "\n"}
+    }
+   },
+   "observable": {
+    "exit_code": 0,
+    "files": {
+     "<ws>/out.sum": {
+      "text": "2c8b08da5ce60398e1f19af0e5dccc744df274b826abe585eaba68c525434806  one.txt\n27dd8ed44a83ff94d557f9fd0412ed5a8cbca69ea04922d88c01184a07300a5a  two.txt\n",
+      "newline": "\n"
+     }
+    },
+    "within_s": 25
+   },
+   "polarity": "MUST_HOLD",
+   "subject_absence": "REQUIRES_SUBJECT",
+   "rationale": "idempotence: the same build -o run twice leaves exactly one snapshot in FILE (5.3 replaces the previous content); an implementation that opens FILE in append mode doubles it. exits_files sees the file only: standard output is HC-13's"
+  },
+  {
+   "id": "HC-08",
+   "requirement_ids": ["R-5.4"],
+   "subject": {"kind": "cli_invocation", "locator": "treesum:__main__"},
+   "stimulus": {
+    "argv": ["verify", "<ws>/proj", "<ws>/snap.sum"],
+    "workspace": {
+     "proj/a.txt": {"text": "alpha-changed\n", "newline": "\n"},
+     "proj/b.txt": {"text": "beta\n", "newline": "\n"},
+     "proj/e.txt": {"text": "epsilon-changed\n", "newline": "\n"},
+     "proj/f.txt": {"text": "zeta\n", "newline": "\n"},
+     "snap.sum": {
+      "text": "b6a98d9ce9a2d9149288fa3df42d377c3e42737afdcdaf714e33c0a100b51060  a.txt\nae9a6306a205417afddd14316cc1d0d5e04a98f1be10865dce643925ee070ce2  c.txt\nd3f0ff5c901707ff21b5fca337c97e263b8c32fad9b5fa80746b2fd2f76a4292  e.txt\n157268265e4f35cc8a37f399a67d2399ec84c0db309403fda422ddaebc718c9e  g.txt\n",
+      "newline": "\n"
+     }
+    }
+   },
+   "observable": {
+    "exit_code": 1,
+    "stdout": {"text": "changed a.txt\nadded b.txt\nremoved c.txt\nchanged e.txt\nadded f.txt\nremoved g.txt\n", "newline": "\n"},
+    "within_s": 25
+   },
+   "polarity": "MUST_HOLD",
+   "subject_absence": "REQUIRES_SUBJECT",
+   "rationale": "exit code 1 with two changed (a.txt, e.txt), two added (b.txt, f.txt) and two removed (c.txt, g.txt) paths, interleaved: the path order a b c e f g alternates the kinds changed/added/removed/changed/added/removed, so no output grouped by kind — any of the six kind orders, each kind's lines in path order — and no sort of the whole lines equals it (the dry check enumerates all seven: hc08_orders in RESULT.json)"
+  },
+  {
+   "id": "HC-09",
+   "requirement_ids": ["R-5.5"],
+   "subject": {"kind": "cli_invocation", "locator": "treesum:__main__"},
+   "stimulus": {
+    "argv": ["verify", "<ws>/proj", "<ws>/absent.sum"],
+    "workspace": {"proj/a.txt": {"text": "lambda\n", "newline": "\n"}}
+   },
+   "observable": {
+    "exit_code": 2,
+    "stdout": {"text": "", "newline": "\n"},
+    "within_s": 25
+   },
+   "polarity": "MUST_HOLD",
+   "subject_absence": "REQUIRES_SUBJECT",
+   "rationale": "error handling: a FILE that cannot be read is a usage error — exit 2 and nothing on standard output; an uncaught FileNotFoundError gives a traceback and exit 1"
+  },
+  {
+   "id": "HC-12",
+   "requirement_ids": ["R-5.3"],
+   "subject": {"kind": "process_effect", "locator": "treesum.__main__:main"},
+   "stimulus": {
+    "scenario": [
+     {"step": "workspace", "files": {
+      "a.txt": {"text": "one\n", "newline": "\n"},
+      "b.txt": {"text": "two\n", "newline": "\n"}
+     }},
+     {"step": "subprocess", "argv": ["-m", "treesum", "build", "<ws>", "-o", "<ws>/snap.sum"]},
+     {"step": "subprocess", "argv": ["-m", "treesum", "verify", "<ws>", "<ws>/snap.sum"]},
+     {"step": "write", "path": "<ws>/b.txt", "text": "two-changed\n", "newline": "\n"},
+     {"step": "subprocess", "argv": ["-m", "treesum", "verify", "<ws>", "<ws>/snap.sum"], "expect_exit": 1}
+    ]
+   },
+   "observable": {
+    "files": {
+     "<ws>/snap.sum": {"line_count": 2},
+     "<ws>/a.txt": {"equals_before": true}
+    },
+    "within_s": 60
+   },
+   "polarity": "MUST_HOLD",
+   "subject_absence": "REQUIRES_SUBJECT",
+   "rationale": "end to end, with the snapshot file inside the directory: build excludes it (two lines, not three), verify right after exits 0 (the self-exclusion is applied on both sides), a changed file makes verify exit 1, and the tool leaves the tree's other files untouched"
+  },
+  {
+   "id": "HC-13",
+   "requirement_ids": ["R-5.3"],
+   "subject": {"kind": "cli_invocation", "locator": "treesum:__main__"},
+   "stimulus": {
+    "argv": ["build", "<ws>/proj", "-o", "<ws>/out.sum"],
+    "workspace": {
+     "proj/one.txt": {"text": "one\n", "newline": "\n"},
+     "proj/two.txt": {"text": "two\n", "newline": "\n"}
+    }
+   },
+   "observable": {
+    "exit_code": 0,
+    "stdout": {"text": "", "newline": "\n"},
+    "within_s": 25
+   },
+   "polarity": "MUST_HOLD",
+   "subject_absence": "REQUIRES_SUBJECT",
+   "rationale": "HC-07's sibling: build -o writes to FILE 'with nothing on standard output' (5.3), exit 0; an implementation that prints the text and also writes the file fails here (exits_files cannot see standard output)"
+  },
+  {
+   "id": "HC-14",
+   "requirement_ids": ["R-HYG"],
+   "subject": {"kind": "file_artifact", "locator": "path:treesum/__pycache__"},
+   "stimulus": {},
+   "observable": {"condition": "exists", "within_s": 45},
+   "polarity": "MUST_NOT_HOLD",
+   "subject_absence": "ABSENCE_IS_DECIDABLE",
+   "rationale": "hygiene: no bytecode cache is committed under the package (the baseline .gitignore lists __pycache__/; canary finding C-1 saw one in a delivered main). Holds at the baseline and must keep holding"
+  }
+ ],
+ "stories": {
+  "E": {
+   "depends_on": [],
+   "tests": ["tests/test_smoke.py"],
+   "criteria": [
+    {"id": "E-01", "contract": "HC-01", "role": "INTRODUCE", "depends_on": [], "why": "hidden: 1.2, a path that does not exist",
+     "facts": {"requirement": "R-1.2", "section": "§1", "clause": "1.2", "clause_text": "path may be a str or a pathlib.Path. A path that does not exist raises FileNotFoundError.", "subject": "treesum.digest:file_sha256"}},
+    {"id": "E-02", "contract": "HC-02", "role": "INTRODUCE", "depends_on": [], "why": "hidden: 2.3, a root that is a file",
+     "facts": {"requirement": "R-2.3", "section": "§2", "clause": "2.3", "clause_text": "A root that exists and is not a directory raises NotADirectoryError.", "subject": "treesum.snapshot:build"}},
+    {"id": "E-03", "contract": "HC-03", "role": "INTRODUCE", "depends_on": [], "why": "hidden: 3.2 tolerance",
+     "facts": {"requirement": "R-3.2", "section": "§3", "clause": "3.2", "clause_text": "Empty and whitespace-only lines are ignored; a final line without a newline is read like any other.", "subject": "treesum.snapshot:loads"}},
+    {"id": "E-04", "contract": "HC-04", "role": "INTRODUCE", "depends_on": [], "why": "hidden: 3.2 refusal",
+     "facts": {"requirement": "R-3.2", "section": "§3", "clause": "3.2", "clause_text": "A malformed line raises ValueError.", "subject": "treesum.snapshot:loads"}},
+    {"id": "E-05", "contract": "HC-05", "role": "INTRODUCE", "depends_on": [], "why": "hidden: 4.1 ordering over every category",
+     "facts": {"requirement": "R-4.1", "section": "§4", "clause": "4.1", "clause_text": "added, removed and changed, each a list of paths in ascending order.", "subject": "treesum.snapshot:compare"}},
+    {"id": "E-06", "contract": "HC-06", "role": "INTRODUCE", "depends_on": [], "why": "hidden: 5.2 nested paths and order",
+     "facts": {"requirement": "R-5.2", "section": "§5", "clause": "5.2", "clause_text": "build DIR writes dumps(build(DIR)) to standard output and exits 0.", "subject": "treesum:__main__ build"}},
+    {"id": "E-07", "contract": "HC-07", "role": "INTRODUCE", "depends_on": [], "why": "hidden: 5.3 replaces, never appends",
+     "facts": {"requirement": "R-5.3", "section": "§5", "clause": "5.3", "clause_text": "build DIR -o FILE writes the text to FILE, creating it or replacing its previous content.", "subject": "treesum:__main__ build -o"}},
+    {"id": "E-08", "contract": "HC-08", "role": "INTRODUCE", "depends_on": [], "why": "hidden: 5.4 differences in path order across kinds, exit 1",
+     "facts": {"requirement": "R-5.4", "section": "§5", "clause": "5.4", "clause_text": "verify prints one line per difference in ascending order of path and exits 1 when there is at least one.", "subject": "treesum:__main__ verify"}},
+    {"id": "E-09", "contract": "HC-09", "role": "INTRODUCE", "depends_on": [], "why": "hidden: 5.5 unreadable FILE",
+     "facts": {"requirement": "R-5.5", "section": "§5", "clause": "5.5", "clause_text": "A FILE that cannot be read exits 2 with a message on standard error and nothing on standard output.", "subject": "treesum:__main__ verify"}},
+    {"id": "E-12", "contract": "HC-12", "role": "INTRODUCE", "depends_on": [], "why": "hidden: 5.3/5.4 with FILE inside DIR, end to end",
+     "facts": {"requirement": "R-5.3", "section": "§5", "clause": "5.3", "clause_text": "When FILE lies inside DIR, FILE is not an entry of the snapshot.", "subject": "treesum.__main__:main"}},
+    {"id": "E-13", "contract": "HC-13", "role": "INTRODUCE", "depends_on": [], "why": "hidden: 5.3 nothing on standard output (HC-07's sibling)",
+     "facts": {"requirement": "R-5.3", "section": "§5", "clause": "5.3", "clause_text": "build DIR -o FILE writes the same text to FILE instead, with nothing on standard output, and exits 0.", "subject": "treesum:__main__ build -o"}},
+    {"id": "E-14", "contract": "HC-14", "role": "VERIFY", "depends_on": [], "why": "hidden hygiene: holds at the baseline (no cache) and must still hold in the delivered tree (canary C-1)",
+     "facts": {"requirement": "R-HYG", "section": "hygiene", "clause": "0", "clause_text": "No bytecode cache is committed under the package: treesum/__pycache__ is not an entry of the delivered tree (.gitignore lists __pycache__/).", "subject": "path:treesum/__pycache__"}}
+   ]
+  }
+ }
+}

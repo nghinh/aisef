@@ -1,0 +1,1 @@
+Implement docs/requirements.md in this repository: it is the whole specification. Work only inside this directory, use the Python standard library only, add your unit tests under tests/ and keep tests/test_smoke.py as it is. Do not run git commit; the harness commits your working tree when you are done.
