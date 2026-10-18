@@ -214,9 +214,13 @@ def direct_arm(manifest: Mapping, out: pathlib.Path, *, task: str, client_exe: s
     the workspace holds — that commit is the candidate. The client's own "done" is recorded, never trusted. The
     workspace (clone_workspace) has no remote and names no path to the source: a `git push origin` has nowhere to go
     and nothing under ws/.git tells the agent where the source is — an agent can push to any absolute path it
-    independently knows; the workspace carries none. `out` may hold the arm's preflight already (campaign.direct);
-    never a workspace or an ARM.json. `extra`: fields the caller records beside the arm's own (the configured endpoint,
-    the preflight's verdict, `identity`)."""
+    independently knows; the workspace carries none. The residual (campaign.py): the driver's OUT/<run_id>/MANIFEST.json
+    and OUT/CAMPAIGN.json, two and three directories above ws, name the workload repository; an agent that reads them
+    can push a NEW ref there, which cannot alter the sealed commit this arm and every later one start from
+    (source_identity binds commit, tree and digests; clone_workspace checks that sha out, or refuses) and is never read
+    back except to clone that sha — its objects may ride along unreferenced in a later workspace, never its tree. `out`
+    may hold the arm's preflight already (campaign.direct); never a workspace or an ARM.json. `extra`: fields the
+    caller records beside the arm's own (the configured endpoint, the preflight's verdict, `identity`)."""
     from aisef2.app import client
     if (manifest.get("pair") or {}).get("arm") != "direct":
         raise ValueError("direct_arm runs a manifest of arm direct")
