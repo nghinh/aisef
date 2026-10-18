@@ -206,7 +206,7 @@ def direct_arm(manifest: Mapping, out: pathlib.Path, *, task: str, client_exe: s
         subprocess.run(["git", "-C", str(ws), "-c", "user.name=harness", "-c", "user.email=harness@aisef",
                         "commit", "--quiet", "-m", "direct arm: the workspace as the client left it"], check=True)
     rec = {"arm": "direct", "manifest_sha256": manifest["manifest_sha256"], "candidate": git(ws, "rev-parse", "HEAD"),
-           "changed": changed, "self_reported": {"error": s.get("error"), "stopped": s.get("stopped")},
+           "changed": changed, "exit": s.get("exit"), "self_reported": {"error": s.get("error"), "stopped": s.get("stopped")},
            "wall_s": round(time.time() - started, 3)}
     (out / "ARM.json").write_text(json.dumps(rec, indent=1, sort_keys=True) + "\n", encoding="utf-8")
     return rec
