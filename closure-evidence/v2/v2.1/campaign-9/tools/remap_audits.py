@@ -18,9 +18,10 @@ is 'unmapped: site set changed (old n, new m)' even when the k-th new site's sta
 rule campaigns 4/5/6 applied (the k-th site whenever it existed), never looser: a changed site set is re-derived by a
 human. (5) the candidate is the k-th new site; require the same STATEMENT: the smallest ast statement of the text (the
 module, or the child script's constant parsed as its own module for SCRIPT/inner) whose lineno <= L <= end_lineno, L
-the mutant's line number; its lines lineno..end_lineno, stripped, must be equal old vs new (so a multi-line statement
-whose continuation line changed is caught; the earlier rounds compared the one line L); else 'unmapped: statement
-differs' with 'identical_statement_at_other_sites' = the new site indices whose statement equals the old one (an
+the mutant's line number; its lines lineno..end_lineno, stripped, must be equal old vs new, AND the mutant's offset
+inside the statement (L - lineno) must be the same (so a multi-line statement whose continuation line changed is
+caught, and two equal-text sites inside one statement are not interchangeable; the earlier rounds compared the one
+line L); else 'unmapped: statement differs' with 'identical_statement_at_other_sites' = the new site indices whose statement equals the old one (an
 ordinal shift the operator can see; never mapped to). (6) carried entry = E with index/mutant/source_sha256 of the new
 mutant, plus remapped_from = {index, mutant, source_sha256, base} of E, base the full commit the old text was found
 at (if E already has remapped_from, the earliest origin is kept as 'origin' and the hops are recorded in 'chain'; the
@@ -30,13 +31,14 @@ evaluated against ROOT's tree for the old text too (the Enum classes a module im
 acceptable while no imported Enum changed — all 35 Enum classes were measured identical across the 7 candidates and
 HEAD. OUT_JSON = {record, rule, tree, in, mapped, unchanged, unmapped: [{target, index, mutant, why, ...}], retired,
 entries: [carried + unchanged]}; in == mapped + unchanged + unmapped + retired, each (target, index) at most once; it
-is computed in full and checked first, then written with mode 'x' (never overwritten; on any failure no file is left
-behind)."""
+is computed in full and checked first, then written whole to OUT.part beside OUT and hard-linked to OUT (never
+overwritten: the link fails if OUT exists; a partial file never bears OUT's name)."""
 import argparse
 import ast
 import collections
 import importlib.util
 import json
+import os
 import pathlib
 import re
 import subprocess
@@ -73,11 +75,13 @@ def text_of(m, src, func):
 
 
 def statement(text, line):
-    """Stripped lines of the smallest statement of `text` (parsed as a module) spanning `line`; the line alone if none."""
+    """(offset of `line` inside, stripped lines of) the smallest statement of `text` (parsed as a module) spanning
+    `line`; the line alone if none. The offset pins WHERE in the statement the mutant sits: two sites of one
+    multi-line statement with equal text would otherwise be interchangeable (the second review's latent gap)."""
     spans = [(n.end_lineno - n.lineno, n.lineno, n.end_lineno) for n in ast.walk(ast.parse(text))
              if isinstance(n, ast.stmt) and n.lineno <= line <= n.end_lineno]
     _, lo, hi = min(spans) if spans else (0, line, line)
-    return [s.strip() for s in text.splitlines()[lo - 1:hi]]
+    return line - lo, [s.strip() for s in text.splitlines()[lo - 1:hi]]
 
 
 def main():
@@ -167,8 +171,13 @@ def main():
     assert out["in"] == out["mapped"] + out["unchanged"] + len(out["unmapped"]) + len(out["retired"])
     assert len(out["entries"]) == out["mapped"] + out["unchanged"]
     body = json.dumps(out, indent=1, ensure_ascii=False) + "\n"  # everything computed and checked before OUT exists
-    with open(a.out, "x", encoding="utf-8") as fh:
-        fh.write(body)
+    dst = pathlib.Path(a.out)
+    part = dst.with_name(dst.name + ".part")  # written whole beside OUT, then linked: a partial file never bears OUT's name
+    part.write_text(body, encoding="utf-8")
+    try:
+        os.link(part, dst)  # fails if OUT appeared meanwhile: never overwritten
+    finally:
+        part.unlink()
     why = collections.Counter(u["why"] for u in out["unmapped"])
     print(f"in {out['in']}: mapped {out['mapped']}, unchanged {out['unchanged']}, unmapped {len(out['unmapped'])}"
           f"{' (' + ', '.join(f'{n} {w}' for w, n in sorted(why.items())) + ')' if why else ''}, retired {len(out['retired'])}; "
