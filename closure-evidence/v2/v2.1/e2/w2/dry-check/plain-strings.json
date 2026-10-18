@@ -1,19 +1,25 @@
 {
- "evaluator_sha256": "0dda8a59d5a0b01654727244131934fcade9b6c2dd7d81be95d5750d4dbe4d93",
+ "evaluator_sha256": "07f5d210a28369210f282aa1de6f917bb620b6b0b9deb8bc4cd5622563407205",
  "strings": [
   "- target: cold start under 10 seconds",
+  "- target: tail latency under 900 ms",
   "Cold start took 7 seconds on the first boot.",
   "Cold start took 7 seconds uncited",
   "Peak memory: 12 GB (run_id host-inventory.a100.2026-08-29)",
   "Peak memory: 12 GB, run_id: w2-hidden-run-09",
   "Steady throughput was 1024 rps (run_id w2-hidden-run-07)",
   "Sustained ingest reached 1024 rps on the second node.",
+  "[\"w2-hidden-run-07\", \"w2-hidden-run-09\"]",
   "absent-notes.md",
+  "built output claims 4 gb",
   "bundled copy claims 4 gb",
   "claims.md",
   "cold start 99 seconds inside a fence",
+  "export const note = \"render budget 640 fps\";",
   "no-such-registry.json",
   "observed: cold start 7 seconds",
+  "packaged copy claims 4 gb",
+  "registry-list.json",
   "registry-w2.json",
   "scratch text with 4 gb",
   "skipme.txt",
@@ -23,6 +29,7 @@
   "{\"valid_runs\": \"w2-hidden-run-07\"}"
  ],
  "excluded_public_vocabulary": [
+  "RegistryError",
   "infrastructure",
   "report.json"
  ]

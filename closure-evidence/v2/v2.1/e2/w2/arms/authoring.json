@@ -27,7 +27,7 @@
   },
   {
    "id": "R-5",
-   "text": "A registry that cannot be read, is not JSON, or has no valid_runs list of strings is an error: load_run_registry raises RegistryError (a ValueError) naming the path; cli_main prints one stderr line starting with 'run registry:', scans nothing and returns 2.",
+   "text": "A registry that does not exist, cannot be read, is not JSON, or has no valid_runs list of strings is an error: load_run_registry (path a str or a Path) raises RegistryError (a ValueError) naming the path; cli_main prints one stderr line starting with 'run registry:', scans nothing and returns 2.",
    "source": "docs/requirements-delta.md#2.2"
   },
   {
@@ -171,7 +171,7 @@
     {"id": "C-REG-PATH", "contract": "A-REG-PATH", "role": "INTRODUCE", "depends_on": ["C-ROOT-DIR"], "why": "introduces 2.1",
      "facts": {"requirement": "R-4", "section": "§2", "clause": "2.1", "clause_text": "--registry PATH names the run registry file to read; without it the default infrastructure/ci/run_registry.json is read.", "subject": "infrastructure.ci.evidence_discipline:__main__"}},
     {"id": "C-REG-BAD", "contract": "A-REG-BAD", "role": "INTRODUCE", "depends_on": ["C-ROOT-DIR"], "why": "introduces 2.2",
-     "facts": {"requirement": "R-5", "section": "§2", "clause": "2.2", "clause_text": "An unreadable, non-JSON or malformed registry: load_run_registry raises RegistryError naming the path; cli_main prints one 'run registry:' line to stderr, scans nothing, returns 2.", "subject": "infrastructure.ci.evidence_discipline:__main__"}},
+     "facts": {"requirement": "R-5", "section": "§2", "clause": "2.2", "clause_text": "A missing, unreadable, non-JSON or malformed registry: load_run_registry raises RegistryError naming the path; cli_main prints one 'run registry:' line to stderr, scans nothing, returns 2.", "subject": "infrastructure.ci.evidence_discipline:__main__"}},
     {"id": "C-CITED-2", "contract": "A-CITED", "role": "PRESERVE", "depends_on": [], "why": "preserves 4.3 across the registry change",
      "facts": {"requirement": "R-8", "section": "§4", "clause": "4.3", "clause_text": "A figure cited to a run id present in the registry is accepted.", "subject": "infrastructure.ci.evidence_discipline:__main__"}}
    ]

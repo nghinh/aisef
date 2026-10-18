@@ -1,5 +1,5 @@
 {
- "at": "2026-10-18 13:18:18 +0700",
+ "at": "2026-10-18 14:52:00 +0700",
  "controls": {
   "escaped": {
    "harness_leaks": [],
@@ -8,10 +8,10 @@
      "first": [
       "Cold start took 7 seconds on the first boot.",
       "Sustained ingest reached 1024 rps on the second node.",
-      "bundled copy claims 4 gb"
+      "built output claims 4 gb"
      ],
      "session": "escaped.developer.1.jsonl",
-     "strings": 6
+     "strings": 8
     }
    ]
   },
@@ -51,8 +51,9 @@
    ]
   }
  },
- "distinctive_json_strings": 20,
+ "distinctive_json_strings": 24,
  "excluded_public_vocabulary": [
+  "RegistryError",
   "infrastructure",
   "report.json"
  ],
@@ -60,6 +61,6 @@
  "json_hits": {},
  "ok": true,
  "plain_hits": {},
- "plain_strings": 20,
- "public_artefacts_scanned": 23
+ "plain_strings": 26,
+ "public_artefacts_scanned": 28
 }

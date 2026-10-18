@@ -49,3 +49,50 @@
 2026-10-18 13:16:10  PYTHONPATH=<worktree> PY -m unittest tests/v2/test_v21_experiment.py -> Ran 5 tests in 3.998s OK (the harness is unchanged by this lane)
 2026-10-18 13:16     grep requirements_document in both bundles -> path docs/requirements-delta.md, sha256 7b2c0bd3fa548b519a56a52cf97d65d1e40ff4277deb4982e4e3cd1c4a94748f; "approvals": [] in both
 2026-10-18 13:18:18  README.md edited to name no hidden string; rm scratch/w2/dry; PY tools/dry_check.py -> exit 0 again (22 public artefacts incl. this README): json_hits {}, plain_hits {}, controls as before, both bundles READY on approved copies, baseline verdicts unchanged (hidden 4/10, arms 2/7). Records rewritten: dry-check/leaks.json, baseline.json, plain-strings.json
+
+# ---- lane W2-2 (blind review fixes), worktree wf_7d7d8519-94c-3, branch lane/e2-w2-2 from c6ddb83. PY = zsh scratchpad/w2b/py.sh =
+# nice -n 19 /opt/homebrew/bin/python3 -P -B with PYTHONPATH=<worktree>, PATH without ~/.opencode/bin and ~/.npm-global/bin (command -v
+# opencode: not found), TMPDIR=scratchpad/w2b/tmp. No network request, no opencode, no `aisef run`; campaign directories never touched.
+2026-10-18 14:38:01  git merge --ff-only lane/e2-w2 -> "Not possible to fast-forward" (the worktree was at 9e510736, the provider-lane merge, which
+                     c6ddb83 does not descend from); git checkout -b lane/e2-w2-2 c6ddb83 instead (the brief's base commit)
+2026-10-18 14:41:40  git -C ~/Downloads/projects/bread archive --format=tar 6fde318 -- <5 paths> | tar -x -C scratchpad/w2b/src (read-only use of bread);
+                     shasum -a 256: __init__.py x2 e3b0c442…, evidence_discipline.py 048af01c…, run_registry.json da2cdc40…, test_evidence_discipline.py e19514d3…
+                     bread facts re-checked: log -i --grep=aisef -> 0; log --format=%an | uniq -c -> 11 Claude Fable 5 / 407 Nghi Nguyen (418);
+                     log --format=%an -- infrastructure/ci/evidence_discipline.py -> 1 author (Nghi Nguyen); ls-tree 6fde318 -> AGENTS.md tracked; .claude/ present (untracked)
+2026-10-18 14:42     cp -R scratchpad/w2b/src/infrastructure baseline/source/ (same digests); baseline/docs/requirements-delta.md §2.2 edited (missing-registry case
+                     named; path a str or pathlib.Path) -> sha256 15ce18e526d5a5d47b1c61c637dce984a07db4299e22a36dc4b740ce06e3feb0 (was 7b2c0bd3…);
+                     init_repo.sh rewritten: cp from baseline/source/ after `shasum -a 256 -c --status` of the five recorded digests; bread no longer read
+2026-10-18 14:43:39  zsh init_repo.sh scratchpad/w2b/repo -> baseline ceae06eb5f67f2e6101503308d5bc7ec166b34f5 tree 303c535fef89a10574878cc05f516256ee9bb399
+                     zsh init_repo.sh scratchpad/w2b/repo-again -> the same commit and tree; zsh init_repo.sh scratchpad/w2b/repo -> "refused: … exists" (exit 2)
+                     control: cp -R w2 scratchpad/w2b/w2copy; printf '\n' >> w2copy/baseline/source/infrastructure/ci/run_registry.json; zsh w2copy/init_repo.sh repo-bad
+                     -> "refused: a file under baseline/source/ does not match its recorded sha256" (exit 2; repo-bad not created)
+                     git -C repo status --porcelain | wc -l -> 0; ls-files -s -> the five blobs equal bread's (e69de29b x2, e02e57e5, e1fa23e5, 09dd4f3c), all 100644
+2026-10-18 14:4x     hidden/authoring.json: H-DIR workspace + notes/c.ts (figure), notes/build/x.md, notes/dist/z.md, regex extended with the .ts finding;
+                     H-JSON stdout -> one anchored regex (?s)\A\s*\{.*"findings".*<figure>.*"accepted_targets".*"accepted_placeholders".*\}\s*\Z (a stream shape
+                     holds one key: cli_invocation._stream_shape_ok); new H-REG-LIST (process_effect expect_raises RegistryError on load_run_registry, registry a
+                     JSON list); new H-JSON-ZERO (--format json, zero findings, exit 0); HR-5 text + HC-REG-BAD clause_text name the missing case; criteria
+                     HC-REG-LIST (HS2) and HC-JSON-ZERO (HS3). A '.'-prefixed workspace directory is refused by cli_invocation._NAME -> not laid out (README §2).
+                     arms/authoring.json: R-5 text + C-REG-BAD clause_text alike. APPROVE.sh: 12 contract ids.
+2026-10-18 14:46:45  rm hidden/evaluator.json hidden/lint.json; PY -m aisef bundle seal hidden/authoring.json --repo repo --out hidden/evaluator.json -> exit 0;
+                     specs 12; to_approve 13 pairs (H-REG-MISSING: HR-5 + HR-5b); plan_hash 8e36e9374cec3d98d8087a6b03842cdb81bf4d8985274f62fc5ef6a93c63e54e
+2026-10-18 14:46:46  rm arms/bundle.json arms/lint.json; PY -m aisef bundle seal arms/authoring.json --repo repo --out arms/bundle.json -> exit 0; specs 7;
+                     to_approve 7; plan_hash 70d6602685fdf6de4923631dc57a7bf22dc7841ade398f1e72f6f34c7f117085
+2026-10-18 14:47:03  PY -m aisef bundle lint hidden/evaluator.json > hidden/lint.json -> exit 1, NOT_READY, "admission: not run: an unapproved contract does not
+                     compile"; to_approve 13; criteria_without_calibration []; every HR COVERED (2.2: HC-REG-BAD + HC-REG-LIST; 3.1-3.2: HC-JSON-ZERO)
+2026-10-18 14:47:04  PY -m aisef bundle lint arms/bundle.json > arms/lint.json -> exit 1, NOT_READY (same reason); to_approve 7; criteria_without_calibration []
+2026-10-18 14:47:04  PY tools/dry_check.py repo scratchpad/w2b/dry -> exit 0 (11 s): leaks_ok true, json_hits {}, plain_hits {}; controls positive 1/1, escaped 0/1
+                     (harness.leaks limit, unchanged), plain 0/1, negative 0/0; hidden: lint READY (approved copy), 12 EXECUTED, satisfied 4 (H-CITED H-TARGET
+                     H-REPORT H-STDLIB), not satisfied 8 (the INTRODUCE eight incl. H-REG-LIST, H-JSON-ZERO), unexpected []; arms: READY, 2/7, unexpected [].
+                     plain-strings held "expect_raises" (a step kind, 13 chars) -> leaks_w2._values now skips the "step" key (kernel vocabulary, not a secret)
+2026-10-18 14:47:45  PY -m unittest tests/v2/test_v21_experiment.py -> Ran 5 tests in 3.795s OK (PATH stripped; harness unchanged by this lane)
+2026-10-18 14:48:49  PY scratchpad/w2b/identity.py repo hidden/evaluator.json -> source_identity: commit ceae06eb…, tree 303c535f…, archive_sha256
+                     38f24754c81be8c49837dc727f9dc39e32b2bb9c56431dba14923ab74b1941c2, archive_size 71680, files_sha256
+                     1be0ca12083d0bc632962b003e0c9fe0945bff755010c27d2cf948a409e4027e, git 2.53.0; evaluator_identity: sha256 07f5d210…, contracts 12
+                     shasum -a 256: hidden/authoring.json df651420…, hidden/evaluator.json 07f5d210a28369210f282aa1de6f917bb620b6b0b9deb8bc4cd5622563407205,
+                     arms/authoring.json fbf29a03…, arms/bundle.json d8ef6dfa94122f6768e57da3d1145501cd4c6bfd7510eeeb267b1040cc97dd74; both bundles bind
+                     requirements_document sha256 15ce18e5…, plan.baseline ceae06eb…, "approvals": []
+2026-10-18 14:50     PROVENANCE.json and README.md rewritten (new shas, 12/13 counts, §7 blind-review fixes, wording: 'not produced by AISEF (…)', figures not
+                     claimed novel; no hidden string named)
+2026-10-18 14:51:59  rm scratchpad/w2b/dry; PY tools/dry_check.py repo scratchpad/w2b/dry -> exit 0 (11 s): distinctive 24, plain 26 (excluded RegistryError,
+                     infrastructure, report.json), 28 public artefacts scanned incl. README and the five baseline/source files; json_hits {}, plain_hits {};
+                     controls as above; hidden 4/12 READY, arms 2/7 READY, unexpected [] both. Records rewritten: dry-check/leaks.json, baseline.json, plain-strings.json

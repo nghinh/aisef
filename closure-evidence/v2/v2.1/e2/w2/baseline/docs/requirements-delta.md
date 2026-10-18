@@ -37,9 +37,10 @@ message to stderr that contains that path as given, scans nothing, and returns e
 2.1 `--registry PATH` names the run registry file to read. Without it the default
 `infrastructure/ci/run_registry.json` next to the linter is read, as today.
 
-2.2 A registry that cannot be read, is not JSON, or is not a JSON object whose `valid_runs`
-is a list of strings, is an error: `load_run_registry(path)` raises `RegistryError` (a
-subclass of `ValueError`, defined in the module) whose message names the path, and
+2.2 A registry that does not exist, cannot be read, is not JSON, or is not a JSON object
+whose `valid_runs` is a list of strings, is an error: `load_run_registry(path)` (`path` given
+as a `str` or a `pathlib.Path`) raises `RegistryError` (a subclass of `ValueError`, defined in
+the module) whose message names the path, and
 `cli_main` prints one line to stderr that starts with `run registry:` and contains that
 message, scans nothing, and returns exit code 2. (Today such a registry is silently treated
 as empty, so every figure is reported as uncited.)

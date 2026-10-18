@@ -263,7 +263,7 @@
   },
   "C-REG-BAD": {
    "clause": "2.2",
-   "clause_text": "An unreadable, non-JSON or malformed registry: load_run_registry raises RegistryError naming the path; cli_main prints one 'run registry:' line to stderr, scans nothing, returns 2.",
+   "clause_text": "A missing, unreadable, non-JSON or malformed registry: load_run_registry raises RegistryError naming the path; cli_main prints one 'run registry:' line to stderr, scans nothing, returns 2.",
    "requirement": "R-5",
    "section": "§2",
    "subject": "infrastructure.ci.evidence_discipline:__main__"
@@ -307,7 +307,7 @@
  "format": "aisef-v2-project/1",
  "name": "w2-evidence-linter",
  "plan": {
-  "baseline": "cd7d5aaee2c9760004c75cf3bf6beecd5f04c772",
+  "baseline": "ceae06eb5f67f2e6101503308d5bc7ec166b34f5",
   "id": "PLAN-w2-evidence-linter",
   "obligations": [
    {
@@ -391,7 +391,7 @@
     "story_id": "S3"
    }
   ],
-  "plan_hash": "d6c8b61321d408c793d0d45130016df6f132e50c3289c2ae78511e884f12c463",
+  "plan_hash": "70d6602685fdf6de4923631dc57a7bf22dc7841ade398f1e72f6f34c7f117085",
   "plan_quality_policy": {
    "max_fully_pre_satisfied_stories": null,
    "max_pre_satisfied_introduce_ratio": null,
@@ -422,9 +422,9 @@
   },
   {
    "id": "R-5",
-   "requirement_hash": "f9b2b57e9c8d73fcb03f2f2ae684a2305c2756b39f16709d606dde92a214c3eb",
+   "requirement_hash": "2682198462541845e4458a1a8fa484b57980d4800977aebb0e2082117b51255d",
    "source": "docs/requirements-delta.md#2.2",
-   "text": "A registry that cannot be read, is not JSON, or has no valid_runs list of strings is an error: load_run_registry raises RegistryError (a ValueError) naming the path; cli_main prints one stderr line starting with 'run registry:', scans nothing and returns 2."
+   "text": "A registry that does not exist, cannot be read, is not JSON, or has no valid_runs list of strings is an error: load_run_registry (path a str or a Path) raises RegistryError (a ValueError) naming the path; cli_main prints one stderr line starting with 'run registry:', scans nothing and returns 2."
   },
   {
    "id": "R-6",
@@ -447,7 +447,7 @@
  ],
  "requirements_document": {
   "path": "docs/requirements-delta.md",
-  "sha256": "7b2c0bd3fa548b519a56a52cf97d65d1e40ff4277deb4982e4e3cd1c4a94748f"
+  "sha256": "15ce18e526d5a5d47b1c61c637dce984a07db4299e22a36dc4b740ce06e3feb0"
  },
  "stories": {
   "S1": {

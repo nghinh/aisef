@@ -1,7 +1,7 @@
 {
  "approver": "human:w2-dry-check (technical, scratch only)",
- "at": "2026-10-18 13:18:18 +0700",
- "baseline": "cd7d5aaee2c9760004c75cf3bf6beecd5f04c772",
+ "at": "2026-10-18 14:52:00 +0700",
+ "baseline": "ceae06eb5f67f2e6101503308d5bc7ec166b34f5",
  "bundles": {
   "arms": {
    "admission": {
@@ -103,7 +103,7 @@
      "status": "EXECUTED"
     }
    ],
-   "sha256": "c0b52db9f23db556e2f378b4ee9cfa8e3c99e4a15d195607078f0f6454436e05"
+   "sha256": "d8ef6dfa94122f6768e57da3d1145501cd4c6bfd7510eeeb267b1040cc97dd74"
   },
   "hidden": {
    "admission": {
@@ -115,19 +115,32 @@
    "criteria_without_calibration": [],
    "evaluation": {
     "not_satisfied": [
+     "PPS-05181768b5305e7c5de79c1c3c1c809ba56c3008a003bd1183cf252ac19c52d1",
      "PPS-2df3d74ba577d2f31fe693108b8e43b0de65674ecb741d3d9687c4586376bacb",
-     "PPS-589d346e5494a2cdec30d6d9acc5c64e5fda5ca4ac157e68dec93bec74f7fbbf",
+     "PPS-4a3317f4e1417de5c964c16692c21937614da2ae6712879f3d7c1aeefb02df72",
      "PPS-7a98e544eb76332d5f539275c1f56e932d785887aa7023c5d0a1096c157facd1",
+     "PPS-81772fe38fc95a4100a53528105dd335c183c5c472718a4445702024757f799b",
+     "PPS-e297d978f1045737a173324dff22668f83fdcc7eeb6d3a3b0286c24db54492a5",
      "PPS-e5f80ed2742c2dc1a09051ccd0c9bb303fc5527cbb91305ee49f1a30fac99a41",
-     "PPS-f4889a79737e4ed4202fc622cf5d43f8644265d59e7d61c9de7eeed223d1780a",
-     "PPS-f5f097674077e0d489c5b66bcb7c66a7d282a9cac7805d3f25993b7f111125b0"
+     "PPS-f4889a79737e4ed4202fc622cf5d43f8644265d59e7d61c9de7eeed223d1780a"
     ],
     "satisfied": 4,
-    "total": 10
+    "total": 12
    },
    "lint_verdict": "READY",
    "ok": true,
    "rows": [
+    {
+     "as_expected": true,
+     "contract": "H-DIR",
+     "expected_at_baseline": "NOT_SATISFIED",
+     "roles": [
+      "INTRODUCE"
+     ],
+     "satisfaction": "UNSATISFIED",
+     "spec": "PPS-05181768b5305e7c5de79c1c3c1c809ba56c3008a003bd1183cf252ac19c52d1",
+     "status": "EXECUTED"
+    },
     {
      "as_expected": true,
      "contract": "H-REG-MISSING",
@@ -141,6 +154,17 @@
     },
     {
      "as_expected": true,
+     "contract": "H-JSON-ZERO",
+     "expected_at_baseline": "NOT_SATISFIED",
+     "roles": [
+      "INTRODUCE"
+     ],
+     "satisfaction": "UNSATISFIED",
+     "spec": "PPS-4a3317f4e1417de5c964c16692c21937614da2ae6712879f3d7c1aeefb02df72",
+     "status": "EXECUTED"
+    },
+    {
+     "as_expected": true,
      "contract": "H-CITED",
      "expected_at_baseline": "SATISFIED",
      "roles": [
@@ -148,17 +172,6 @@
      ],
      "satisfaction": "SATISFIED",
      "spec": "PPS-4be7ae7286b0df9162b25e360a6b02d5621bc8336d2fad1b37fc60aabca25701",
-     "status": "EXECUTED"
-    },
-    {
-     "as_expected": true,
-     "contract": "H-DIR",
-     "expected_at_baseline": "NOT_SATISFIED",
-     "roles": [
-      "INTRODUCE"
-     ],
-     "satisfaction": "UNSATISFIED",
-     "spec": "PPS-589d346e5494a2cdec30d6d9acc5c64e5fda5ca4ac157e68dec93bec74f7fbbf",
      "status": "EXECUTED"
     },
     {
@@ -196,6 +209,28 @@
     },
     {
      "as_expected": true,
+     "contract": "H-JSON",
+     "expected_at_baseline": "NOT_SATISFIED",
+     "roles": [
+      "INTRODUCE"
+     ],
+     "satisfaction": "UNSATISFIED",
+     "spec": "PPS-81772fe38fc95a4100a53528105dd335c183c5c472718a4445702024757f799b",
+     "status": "EXECUTED"
+    },
+    {
+     "as_expected": true,
+     "contract": "H-REG-LIST",
+     "expected_at_baseline": "NOT_SATISFIED",
+     "roles": [
+      "INTRODUCE"
+     ],
+     "satisfaction": "UNSATISFIED",
+     "spec": "PPS-e297d978f1045737a173324dff22668f83fdcc7eeb6d3a3b0286c24db54492a5",
+     "status": "EXECUTED"
+    },
+    {
+     "as_expected": true,
      "contract": "H-REG-BAD",
      "expected_at_baseline": "NOT_SATISFIED",
      "roles": [
@@ -226,20 +261,9 @@
      "satisfaction": "UNSATISFIED",
      "spec": "PPS-f4889a79737e4ed4202fc622cf5d43f8644265d59e7d61c9de7eeed223d1780a",
      "status": "EXECUTED"
-    },
-    {
-     "as_expected": true,
-     "contract": "H-JSON",
-     "expected_at_baseline": "NOT_SATISFIED",
-     "roles": [
-      "INTRODUCE"
-     ],
-     "satisfaction": "UNSATISFIED",
-     "spec": "PPS-f5f097674077e0d489c5b66bcb7c66a7d282a9cac7805d3f25993b7f111125b0",
-     "status": "EXECUTED"
     }
    ],
-   "sha256": "0dda8a59d5a0b01654727244131934fcade9b6c2dd7d81be95d5750d4dbe4d93"
+   "sha256": "07f5d210a28369210f282aa1de6f917bb620b6b0b9deb8bc4cd5622563407205"
   }
  },
  "ok": true

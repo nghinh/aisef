@@ -1,54 +1,63 @@
 {
  "workload": "W2 (brownfield) — E2 controlled campaign, docs/v2.1/EXPERIMENT-PLAN.md",
- "written_at": "2026-10-18 13:15 +0700 (system clock; every timestamp below is from `date`)",
+ "written_at": "2026-10-18 14:50 +0700 by lane W2-2 (revising the W2 record of 13:15 +0700 after the blind review; every timestamp below is from `date`)",
  "source": {
-  "repository": "/Users/nghinh/Downloads/projects/bread",
+  "repository": "/Users/nghinh/Downloads/projects/bread (read-only for this lane: git archive / git show only)",
   "what_it_is": "`bread` — realtime multilingual speech translation (Next.js web tier, Python realtime tier); a working project of the owner, not a toy",
   "commit": "6fde318ecac1e447f49d6b642707c78f17ddcb63",
   "commit_date": "2026-10-14 16:12:12 +0700",
-  "history": "418 commits since 2026-08-30; authors: Nghi Nguyen 407, 'Claude Fable 5' 11 (git log --format=%an | sort | uniq -c)",
-  "not_developed_by_aisef": {
+  "history": "418 commits since 2026-08-30; authors: Nghi Nguyen 407, 'Claude Fable 5' 11 (git log --format=%an | sort | uniq -c, re-checked 2026-10-18 14:41)",
+  "not_produced_by_aisef": {
    "markers_absent": [".aisef/", "AISEF-managed .opencode/ (none: no .opencode/ at all)", "closure-evidence/"],
-   "git_log_grep_aisef": "0 commits (git log -i --grep=aisef)",
+   "git_log_grep_aisef": "0 commits (git log -i --grep=aisef, re-checked 14:41)",
+   "linter_blame": "300/300 lines of infrastructure/ci/evidence_discipline.py blamed to Nghi Nguyen (git log --format=%an -- <file>: 1 author)",
+   "developed_with_coding_agents": "yes — 11/418 commits authored 'Claude Fable 5'; AGENTS.md tracked at 6fde318; .claude/ present (untracked). 'Not produced by AISEF' is the claim; 'hand-written' is not",
    "note": "_bmad-output/ and .claude/ exist (untracked at HEAD) — BMAD planning artefacts and the owner's own agent configuration; neither is AISEF"
   },
   "files_taken": {
-   "infrastructure/__init__.py": {"mode": "100644", "blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"},
-   "infrastructure/ci/__init__.py": {"mode": "100644", "blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"},
-   "infrastructure/ci/evidence_discipline.py": {"mode": "100644", "blob": "e02e57e5b15ecad2da8be83bc2859b33f65b6749", "lines": 300, "blame": "300/300 lines Nghi Nguyen; introduced by b386590 2026-09-01 'feat(ci): evidence-discipline linter with target/citation/placeholder grammar (story 10.8; FR-76)'"},
-   "infrastructure/ci/test_evidence_discipline.py": {"mode": "100644", "blob": "09dd4f3c6b254c1a3c1d4a801440cdef02d5cd31", "note": "pytest; 16 tests; unchanged since b386590"},
-   "infrastructure/ci/run_registry.json": {"mode": "100644", "blob": "e1fa23e595efd5c4d7d786b978724e91985620be", "note": "{description, valid_runs: 16 ids, notes: 13}; last changed at 6fde318"}
+   "infrastructure/__init__.py": {"mode": "100644", "blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391", "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", "bytes": 0},
+   "infrastructure/ci/__init__.py": {"mode": "100644", "blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391", "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", "bytes": 0},
+   "infrastructure/ci/evidence_discipline.py": {"mode": "100644", "blob": "e02e57e5b15ecad2da8be83bc2859b33f65b6749", "sha256": "048af01c3a1b040fbd99cf89a1711a96db2ba400a62b792f27486331d356dc9b", "bytes": 10649, "lines": 300, "blame": "300/300 lines Nghi Nguyen; introduced by b386590 2026-09-01 'feat(ci): evidence-discipline linter with target/citation/placeholder grammar (story 10.8; FR-76)'"},
+   "infrastructure/ci/test_evidence_discipline.py": {"mode": "100644", "blob": "09dd4f3c6b254c1a3c1d4a801440cdef02d5cd31", "sha256": "e19514d3c87ea42e696de1bd8fdecb555566d2b8b0409db85f37a14b9f1fb983", "bytes": 6002, "note": "pytest; 16 tests; unchanged since b386590; holds the figures '12 GB VRAM' (line 22) and 'Throughput: 1024 rps (benchmark.pending)' (line 134)"},
+   "infrastructure/ci/run_registry.json": {"mode": "100644", "blob": "e1fa23e595efd5c4d7d786b978724e91985620be", "sha256": "da2cdc40dc7f841e21c6e5cbdd012c8125bb370855659b8cb5a5552ec7c0bba8", "bytes": 31587, "note": "{description, valid_runs: 16 ids, notes: 13}; last changed at 6fde318"}
+  },
+  "committed_copy": {
+   "where": "closure-evidence/v2/v2.1/e2/w2/baseline/source/<path> (lane W2-2, 2026-10-18 14:41-14:42 +0700)",
+   "how": "git -C ~/Downloads/projects/bread archive --format=tar 6fde318ecac1e447f49d6b642707c78f17ddcb63 -- <the five paths> | tar -x; copied byte for byte; sha256 above = shasum -a 256 of the copies",
+   "why": "reproducibility from the evidence alone (blind review item 4): init_repo.sh builds the baseline from these files and no longer reads bread; it refuses only when a copy's digest differs from the five recorded in the script",
+   "blob_identity": "the reproduced baseline's blob ids for the five paths equal bread's at 6fde318 (git ls-files -s on both, 14:44): e69de29b, e69de29b, e02e57e5, 09dd4f3c, e1fa23e5"
   },
   "files_left_out": {
    "infrastructure/ci/behavioural-release-gate.sh": "a release gate of the whole project (runs tests/behaviour/... under uv); nothing of the linter",
    "everything else of bread": "the realtime tier (FastAPI, numpy, onnxruntime), the web tier, the monitoring stack, the corpora — none of it is what the task touches, and the probes run subjects with `python -I -S` (stdlib only)"
   },
-  "method": "git -C bread archive --format=tar 6fde318 -- <the five paths> | tar -x; then one commit (init_repo.sh)"
+  "method": "W2 (13:02): git -C bread archive | tar -x, then one commit. W2-2 (14:43): cp from baseline/source/ after shasum -a 256 -c, then the same one commit (init_repo.sh)"
  },
  "added_by_the_lane": {
-  "docs/requirements-delta.md": {"sha256": "7b2c0bd3fa548b519a56a52cf97d65d1e40ff4277deb4982e4e3cd1c4a94748f", "blob": "9d437b354319d87d6a17d0fa9222a9a65fb84e57", "role": "the public task; the bundles' requirements_document"},
+  "docs/requirements-delta.md": {"sha256": "15ce18e526d5a5d47b1c61c637dce984a07db4299e22a36dc4b740ce06e3feb0", "blob": "3f3b519696442b433e621ff2c9dda7e8a7b806a2", "role": "the public task; the bundles' requirements_document", "revision": "W2-2: §2.2 names the missing-registry case ('does not exist, cannot be read, is not JSON, or ...') and the path's type (str or pathlib.Path) — was 7b2c0bd3fa548b519a56a52cf97d65d1e40ff4277deb4982e4e3cd1c4a94748f"},
   "README.md": {"sha256": "349e392b161a90e3a2c827a01f1629b0f09d6594d091324aaad3879036f17203", "blob": "1ce4a484d6ecc9a38ba74107bf831ca0ace71316", "role": "three lines: what the tool is, how to run it and its tests, where the task is"},
   ".gitignore": {"sha256": "a8577ddcc59722792e17894a92880984e5e4bb2a956469af5cb444591d6ed9a2", "blob": "98ad65be6712143ebafe47bcead4d0d778ed9499", "role": "__pycache__/ *.py[cod] .pytest_cache/ .venv/ .DS_Store — so a delivered main carries no bytecode (canary finding C-1)"}
  },
  "baseline": {
-  "commit": "cd7d5aaee2c9760004c75cf3bf6beecd5f04c772",
-  "tree": "96aa0e8342776e5f700cc0b52f9ac4b3151aab60",
-  "archive_sha256": "d7c1e016e25bfd059150b7e2f372c62b2d461c173c378bee56fc37cfba5e908b",
+  "commit": "ceae06eb5f67f2e6101503308d5bc7ec166b34f5",
+  "tree": "303c535fef89a10574878cc05f516256ee9bb399",
+  "archive_sha256": "38f24754c81be8c49837dc727f9dc39e32b2bb9c56431dba14923ab74b1941c2",
   "archive_size": 71680,
-  "files_sha256": "635de23b6c414fbdac73598d6a01ce47587829824758c072f497a8869595df21",
+  "files_sha256": "1be0ca12083d0bc632962b003e0c9fe0945bff755010c27d2cf948a409e4027e",
   "git_version": "git version 2.53.0",
-  "identity_by": "validation/experiments/harness.py source_identity(repo, 'HEAD') on the reproduced repo (scratchpad/w2/repo), 2026-10-18 13:05 +0700",
+  "identity_by": "validation/experiments/harness.py source_identity(repo, 'HEAD') on the reproduced repo (scratchpad/w2b/repo), 2026-10-18 14:48 +0700",
   "author": "bread maintainers (filtered by the AISEF E2 W2 lane) <e2-w2@aisef.invalid>, dates fixed at 2026-10-18T06:00:00+00:00 (both author and committer)",
-  "reproduced_twice": "init_repo.sh into scratchpad/w2/repo (13:02:26 +0700) and scratchpad/w2/repo-again: both cd7d5aaee2c9760004c75cf3bf6beecd5f04c772 / tree 96aa0e83…; a third run into the existing directory was refused (exit 2)",
-  "clean": "git status --porcelain: 0 lines"
+  "reproduced_twice": "init_repo.sh into scratchpad/w2b/repo (14:43:39 +0700) and scratchpad/w2b/repo-again: both ceae06eb5f67f2e6101503308d5bc7ec166b34f5 / tree 303c535f…; a third run into the existing directory was refused (exit 2); a scratch copy of this directory with one byte appended to its run_registry.json copy was refused (exit 2, nothing created)",
+  "clean": "git status --porcelain: 0 lines",
+  "previous": "W2 (13:02): cd7d5aaee2c9760004c75cf3bf6beecd5f04c772 / tree 96aa0e83… / files_sha256 635de23b… — superseded because docs/requirements-delta.md changed (blind review item 3)"
  },
  "bundles": {
-  "arms": {"authoring_sha256": "306d3c22e5ecbef2732433cb79c2ec55ed23c0ba83cd7fabadda404585c6b740", "bundle_sha256": "c0b52db9f23db556e2f378b4ee9cfa8e3c99e4a15d195607078f0f6454436e05", "plan_hash": "d6c8b61321d408c793d0d45130016df6f132e50c3289c2ae78511e884f12c463", "contracts": 7, "specs": 7, "stories": ["S1", "S2", "S3"], "approvals": 0, "lint": "NOT_READY (to_approve 7; admission not run) — READY once approved (dry-check/baseline.json)"},
-  "hidden": {"authoring_sha256": "0e233871411f69ae02ad5058a366d6cdb8685b11069782bcba535bdc51c955ab", "evaluator_sha256": "0dda8a59d5a0b01654727244131934fcade9b6c2dd7d81be95d5750d4dbe4d93", "plan_hash": "92b9572ae566f11c42a99a5ddf6b28de974a380236e45b82c782785dc3e371af", "contracts": 10, "specs": 10, "stories": ["HS1", "HS2", "HS3"], "approvals": 0, "lint": "NOT_READY (to_approve 11 pairs over 10 contracts; admission not run) — READY once approved (dry-check/baseline.json)", "exposed_to_developer": false}
+  "arms": {"authoring_sha256": "fbf29a03f36666f7a82ef5406f7c1a2317af228318f3139171b731621e02c51e", "bundle_sha256": "d8ef6dfa94122f6768e57da3d1145501cd4c6bfd7510eeeb267b1040cc97dd74", "plan_hash": "70d6602685fdf6de4923631dc57a7bf22dc7841ade398f1e72f6f34c7f117085", "contracts": 7, "specs": 7, "approval_pairs": 7, "stories": ["S1", "S2", "S3"], "approvals": 0, "lint": "NOT_READY (to_approve 7; admission not run) — READY once approved (dry-check/baseline.json)", "sealed_at": "2026-10-18 14:46:46 +0700 against ceae06eb"},
+  "hidden": {"authoring_sha256": "df651420abe619d4571b74b2648710e20bfbb52cf9aabaa54d89740f5cdecfea", "evaluator_sha256": "07f5d210a28369210f282aa1de6f917bb620b6b0b9deb8bc4cd5622563407205", "plan_hash": "8e36e9374cec3d98d8087a6b03842cdb81bf4d8985274f62fc5ef6a93c63e54e", "contracts": 12, "specs": 12, "approval_pairs": 13, "stories": ["HS1", "HS2", "HS3"], "approvals": 0, "lint": "NOT_READY (to_approve 13 pairs over 12 contracts: H-REG-MISSING cites HR-5 and HR-5b; admission not run) — READY once approved (dry-check/baseline.json)", "exposed_to_developer": false, "sealed_at": "2026-10-18 14:46:45 +0700 against ceae06eb", "previous": "W2: 0dda8a59… (10 contracts, 11 pairs, plan 92b9572a…)"}
  },
  "tooling": {
-  "aisef_tree": "this worktree at 2ac9b80 (round-5 owner decision); aisef2/ untouched by this lane",
-  "python": "/opt/homebrew/bin/python3 3.14.7, run as `nice -n 19 python3 -P -B` with PYTHONPATH=<worktree>",
+  "aisef_tree": "worktree branch lane/e2-w2-2 from c6ddb83 (lane W2 on the round-5 owner decision 2ac9b80); aisef2/, tests/ and validation/v2/mutation.py untouched by this lane",
+  "python": "/opt/homebrew/bin/python3 3.14.7, run as `nice -n 19 python3 -P -B` with PYTHONPATH=<worktree>, PATH without ~/.opencode/bin and ~/.npm-global/bin, TMPDIR under the scratchpad (scratchpad/w2b/py.sh)",
   "commands": "dry-check/commands.log"
  }
 }

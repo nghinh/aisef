@@ -31,8 +31,9 @@ def _values(value):
         for v in value:
             yield from _values(v)
     elif isinstance(value, dict):
-        for v in value.values():
-            yield from _values(v)
+        for k, v in value.items():
+            if k != "step":            # a scenario step's kind (workspace, call, expect_raises) is the kernel's vocabulary, not a secret
+                yield from _values(v)
 
 
 def plain_strings(evaluator: dict) -> list[str]:

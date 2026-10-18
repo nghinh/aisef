@@ -110,7 +110,7 @@
    "contract": "A-REG-BAD",
    "contract_hash": "bf1c8cf81b07f0e4f483ab683594d9ba08cf4505b81c114e964716f037dea6d8",
    "requirement": "R-5",
-   "requirement_hash": "f9b2b57e9c8d73fcb03f2f2ae684a2305c2756b39f16709d606dde92a214c3eb"
+   "requirement_hash": "2682198462541845e4458a1a8fa484b57980d4800977aebb0e2082117b51255d"
   },
   {
    "contract": "A-JSON",

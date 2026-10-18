@@ -10,9 +10,9 @@ export PYTHONPATH=$W PYTHONDONTWRITEBYTECODE=1
 PY=(/opt/homebrew/bin/python3 -P -B -m aisef bundle approve)
 APPROVER=${1:-human:NAME}
 cd "$D"
-# the HIDDEN evaluator (10 contracts) — no arm ever sees this file or any approved-hidden-*.json
+# the HIDDEN evaluator (12 contracts, 13 contract-requirement pairs) — no arm ever sees this file or any approved-hidden-*.json
 IN=hidden/evaluator.json; n=0
-for c in H-DIR H-MISSING H-REG-OK H-REG-BAD H-REG-MISSING H-JSON H-CITED H-TARGET H-REPORT H-STDLIB; do
+for c in H-DIR H-MISSING H-REG-OK H-REG-BAD H-REG-MISSING H-REG-LIST H-JSON H-JSON-ZERO H-CITED H-TARGET H-REPORT H-STDLIB; do
   n=$((n+1)); OUT=hidden/approved-$n-$c.json
   $PY "$IN" --contract "$c" --approver "$APPROVER" --out "$OUT" > /dev/null; IN=$OUT
 done
