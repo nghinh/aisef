@@ -52,6 +52,14 @@ class Provider(http.server.BaseHTTPRequestHandler):
         pass
 
 
+def naming(directory: pathlib.Path, *paths: pathlib.Path | str) -> list[str]:
+    """The files under `directory` holding any of `paths` (as given or resolved): `grep -rlF`, independent of the
+    harness's own scan."""
+    needles = sorted({str(p) for p in paths} | {os.path.realpath(p) for p in paths})
+    p = subprocess.run(["grep", "-rlF", *(x for n in needles for x in ("-e", n)), str(directory)], capture_output=True, text=True)
+    return sorted(p.stdout.splitlines())
+
+
 @unittest.skipUnless(os.name == "posix", "the fake client is a script started by its shebang")
 class Campaign(ProductBase):
     def setUp(self) -> None:
@@ -146,9 +154,13 @@ class Campaign(ProductBase):
         self.assertEqual(direct["candidate_frozen"]["commit"], direct["candidate"])
         self.assertEqual(direct["configured_endpoint"], self.endpoint)                            # fix 4: in the record
         self.assertEqual(C.read_json(arm / "ARM.json")["configured_endpoint"], self.endpoint)     # and in ARM.json
+        self.assertEqual((direct["identity"], C.read_json(arm / "ARM.json")["identity"]), ("ATTESTED", "ATTESTED"))  # (B)
         self.assertEqual(H.git(arm / "ws", "remote"), "")                                         # fix 2: no remote
+        self.assertEqual(naming(arm / "ws" / ".git", self.tmp / "source"), [])                   # (A): no path to the source
+        self.assertFalse((arm / "src.git").exists())                                              # (A): the bare copy is gone
         self.assertFalse((self.out / "calc-r1-aisef" / "RESULT.json").exists())
         # 3. resumed: the aisef arm (aisef run as a subprocess on a fresh clone, the fake client, the loopback provider)
+        refs = git(self.tmp / "source", "for-each-ref")
         code, text = self.run_()
         self.assertEqual(code, 0, text + (self.out / "calc-r1-aisef" / "arm" / "run.stderr").read_text(encoding="utf-8", errors="replace"))
         aisef = C.read_json(self.out / "calc-r1-aisef" / "RESULT.json")
@@ -160,9 +172,16 @@ class Campaign(ProductBase):
         self.assertEqual(aisef["candidate"], aisef["aisef_run"]["final_main"])
         self.assertEqual(aisef["usage"]["cost"]["value"], None)
         self.assertEqual(aisef["usage"]["budget"]["spent"]["provider_requests"], 3 + 2)      # preflight 3, two sessions
-        self.assertTrue((self.out / "calc-r1-aisef" / "arm" / "run.anchor").exists())
-        self.assertTrue((self.out / "calc-r1-aisef" / "arm" / "run" / "sessions").is_dir())
-        self.assertEqual(H.git(self.out / "calc-r1-aisef" / "arm" / "ws", "remote"), "")
+        arm = self.out / "calc-r1-aisef" / "arm"
+        self.assertTrue((arm / "run.anchor").exists())
+        self.assertTrue((arm / "run" / "sessions").is_dir())
+        self.assertEqual((aisef["identity"], C.read_json(arm / "ARM.json")["identity"]), ("ATTESTED", "ATTESTED"))   # (B)
+        self.assertEqual(C.read_json(arm / "ARM.json")["candidate"], aisef["candidate"])
+        self.assertEqual(H.git(arm / "ws", "remote"), "")
+        self.assertEqual(naming(arm / "ws" / ".git", self.tmp / "source"), [])                   # (A), the aisef arm too
+        self.assertEqual(naming(arm / "run" / "repo" / ".git", self.tmp / "source"), [])         # nor the kernel's clone of ws
+        self.assertFalse((arm / "src.git").exists())
+        self.assertEqual(git(self.tmp / "source", "for-each-ref"), refs)                          # the source's refs unchanged
         self.assertNotIn("add", H.git(self.tmp / "source", "show", "main:app/calc.py"))     # the source is never written
         log = (self.out / "campaign.log").read_text(encoding="utf-8").splitlines()
         self.assertEqual([line.split()[1] for line in log], ["calc-r1-direct", "calc-r1-aisef"])
@@ -175,8 +194,8 @@ class Campaign(ProductBase):
         rows = {(r["workload"], r["arm"]): r for r in map(json.loads, text.splitlines())}
         self.assertEqual(set(rows), {("calc", "direct"), ("calc", "aisef")})
         for r in rows.values():
-            self.assertEqual((r["n"], r["satisfied_mean"], r["escaped_defects"], r["false_rollbacks"], r["cost"], r["valid"], r["failed"]),
-                             (1, 1.0, 0, 0, None, True, 0))
+            self.assertEqual((r["n"], r["satisfied_mean"], r["escaped_defects"], r["false_rollbacks"], r["cost"], r["valid"], r["failed"],
+                              r["refused_identity"]), (1, 1.0, 0, 0, None, True, 0, 0))
         self.assertEqual((rows["calc", "direct"]["requests"], rows["calc", "aisef"]["requests"]), (4, 5))
 
     def test_a_leaked_stimulus_invalidates_the_result_and_a_failed_arm_is_kept(self):
@@ -213,32 +232,51 @@ class Campaign(ProductBase):
         self.assertIsNone(rec["candidate"])
         self.assertIn("delivery_verdict='NOT_REACHED'", rec["error"])
         self.assertIn("stage='finished'", rec["error"])
+        self.assertEqual(rec["identity"], "ATTESTED")           # (B): the gate attested; the budget stopped the run
         res = C.record(run, manifests[run["run_id"]], rec, self.out)
-        self.assertEqual((res["candidate"], res["evaluation"], res["candidate_frozen"], res["aisef_run"]["final_main"]),
-                         (None, C.NO_EVALUATION, None, self.baseline))
+        self.assertEqual((res["candidate"], res["evaluation"], res["candidate_frozen"], res["aisef_run"]["final_main"], res["identity"]),
+                         (None, C.NO_EVALUATION, None, self.baseline, "ATTESTED"))
         self.assertIn("aisef run not delivered", res["error"])
         code, text = self.campaign("summary", "--out", str(self.out))
         row = json.loads(text)
-        self.assertEqual((row["n"], row["evaluated"], row["failed"], row["satisfied_mean"], row["escaped_defects"]), (1, 0, 1, None, 0))
-        # an identity stop: failure named, stage preflight — the same
+        self.assertEqual((row["n"], row["evaluated"], row["failed"], row["satisfied_mean"], row["escaped_defects"], row["refused_identity"]),
+                         (1, 0, 1, None, 0, 0))
+        # an identity stop: failure named, stage preflight — a failed arm with identity OPAQUE, whatever RUN.json's
+        # preflight.verdict says (the kernel raises IdentityStop for unaccounted requests after an ATTESTED verdict too)
         shutil.rmtree(arm)
         (arm / "run").mkdir(parents=True)
         (arm / "run" / "RUN.json").write_text(json.dumps({
-            "delivery_verdict": "NOT_REACHED", "final_main": self.baseline, "stage": "preflight",
+            "delivery_verdict": "NOT_REACHED", "final_main": self.baseline, "stage": "preflight", "preflight": {"verdict": "OPAQUE"},
             "failure": {"type": "IdentityStop", "detail": "the route is not attested: probe 0: served by 'x'", "stage": "preflight"}}))
         rec = C.aisef_record(run, manifests[run["run_id"]], arm, 1, 1.0)
-        self.assertEqual(rec["candidate"], None)
+        self.assertEqual((rec["candidate"], rec["identity"]), (None, "OPAQUE"))
         self.assertIn("IdentityStop", rec["error"])
-        # no RUN.json at all: failed too
+        (arm / "run" / "RUN.json").write_text(json.dumps({
+            "delivery_verdict": "NOT_REACHED", "final_main": self.baseline, "stage": "preflight", "preflight": {"verdict": "ATTESTED"},
+            "failure": {"type": "IdentityStop", "detail": "preflight requests unaccounted: ['x']", "stage": "preflight"}}))
+        self.assertEqual(C.aisef_record(run, manifests[run["run_id"]], arm, 1, 1.0)["identity"], "OPAQUE")
+        (self.out / run["run_id"] / "RESULT.json").unlink()
+        res = C.record(run, manifests[run["run_id"]], rec, self.out)
+        self.assertEqual(res["identity"], "OPAQUE")
+        code, text = self.campaign("summary", "--out", str(self.out))
+        self.assertEqual((json.loads(text)["failed"], json.loads(text)["refused_identity"]), (1, 1))
+        # no RUN.json at all: failed too, no gate sampled: identity null
         (arm / "run" / "RUN.json").unlink()
         rec = C.aisef_record(run, manifests[run["run_id"]], arm, 1, 1.0)
-        self.assertEqual((rec["candidate"], rec["error"]), (None, "aisef run left no RUN.json (exit 1)"))
+        self.assertEqual((rec["candidate"], rec["identity"], rec["error"]), (None, None, "aisef run left no RUN.json (exit 1)"))
 
-    def test_2_the_direct_arm_cannot_write_into_the_source(self):
+    def test_2_the_direct_arms_workspace_carries_no_path_to_the_source(self):
+        # (A) the second blind review: after `git remote remove origin` a clone made straight from the source still
+        # named it in .git/logs/HEAD — a `git push <that path>` from ws writes the source's refs. Pushing to the real
+        # path is not what is tested (it succeeds by construction when the path is known): the workspace names none.
         from aisef2.app import client, settings
         runs, manifests = self.sealed()
         source = self.tmp / "source"
         before = git(source, "for-each-ref")
+        ws = self.tmp / "straight"
+        subprocess.run(["git", "clone", "--quiet", str(source), str(ws)], check=True, capture_output=True)
+        git(ws, "remote", "remove", "origin")
+        self.assertIn(str(ws / ".git" / "logs" / "HEAD"), naming(ws / ".git", source))           # the refuted shape
         st = settings.load(SETTINGS)
         budget = client.Budget(st.budget, dict.fromkeys(client.Budget.KEYS, 0), self.tmp / "d" / "sessions",
                                requests=lambda: len(list((self.tmp / "d" / "sessions").glob("*.jsonl"))))
@@ -249,10 +287,23 @@ class Campaign(ProductBase):
         ws = self.tmp / "d" / "ws"
         self.assertTrue(arm["changed"])
         self.assertEqual(git(ws, "remote"), "")
-        push = subprocess.run(["git", "-C", str(ws), "push", "origin", "HEAD:refs/heads/x"], capture_output=True)
-        self.assertNotEqual(push.returncode, 0)
-        self.assertEqual(git(source, "for-each-ref"), before)
+        self.assertEqual(naming(ws / ".git", source), [])                       # no file under ws/.git names the source
+        self.assertFalse((self.tmp / "d" / "src.git").exists())                # the bare copy is gone
+        self.assertIn("(removed)", (ws / ".git" / "logs" / "HEAD").read_text(encoding="utf-8"))
+        self.assertEqual(git(ws, "rev-parse", "main~1"), self.baseline)          # the objects came through the bare copy
+        self.assertEqual(git(source, "for-each-ref"), before)                   # the source's refs unchanged after the arm
         self.assertNotIn("add", git(source, "show", "main:app/calc.py"))
+        # a workspace that names the source is refused, not handed to an agent: the scan runs after the bare copy goes
+        marked = self.tmp / "marked" / "ws"
+
+        def rmtree_and_mark(p):
+            shutil.rmtree(p)
+            (marked / ".git" / "note").write_text(f"clone: from {source}\n", encoding="utf-8")
+        with mock.patch.object(H, "shutil", mock.Mock(rmtree=rmtree_and_mark)):
+            with self.assertRaises(ValueError) as cm:
+                H.clone_workspace(str(source), self.baseline, marked)
+        self.assertIn(".git/note", str(cm.exception))
+        self.assertEqual(naming(marked / ".git", source), [str(marked / ".git" / "note")])
 
     def test_3_one_client_binary_across_the_arms(self):
         other = self.tmp / "other"
@@ -283,15 +334,18 @@ class Campaign(ProductBase):
         code, text = self.run_("--max-runs", "1")
         self.assertEqual(code, 3, text)
         res = C.read_json(self.out / "calc-r1-direct" / "RESULT.json")
-        self.assertEqual((res["candidate"], res["evaluation"]["total"], res["configured_endpoint"]), (None, None, "http://127.0.0.1:9/v1"))
+        self.assertEqual((res["candidate"], res["evaluation"]["total"], res["configured_endpoint"], res["identity"]),
+                         (None, None, "http://127.0.0.1:9/v1", "ENDPOINT_MISMATCH"))                                  # (B)
         self.assertIn(f"to http://127.0.0.1:9/v1, not to the settings' endpoint {self.endpoint}", res["error"])
+        self.assertTrue(res["error"].startswith("identity: ENDPOINT_MISMATCH"))
         arm = self.out / "calc-r1-direct" / "arm"
         self.assertEqual(C.read_json(arm / "ARM.json")["configured_endpoint"], "http://127.0.0.1:9/v1")
+        self.assertEqual(C.read_json(arm / "ARM.json")["identity"], "ENDPOINT_MISMATCH")
         self.assertFalse((arm / "sessions").exists())           # no session
         self.assertFalse((arm / "preflight").exists())          # and no request: the endpoint is checked first
         self.assertEqual(res["usage"]["budget"]["spent"]["provider_requests"], 0)
         code, text = self.campaign("summary", "--out", str(self.out))
-        self.assertEqual(json.loads(text)["failed"], 1)
+        self.assertEqual((json.loads(text)["failed"], json.loads(text)["refused_identity"]), (1, 1))
 
     def test_5_false_rollbacks_are_the_plans_measure(self):
         runs, manifests = self.sealed()
@@ -379,7 +433,7 @@ class Campaign(ProductBase):
         self.assertFalse((arm / "ws").exists())
         self.assertEqual(res["usage"]["budget"]["spent"]["provider_requests"], 2)      # what the gate spent is counted
         code, text = self.campaign("summary", "--out", str(self.out))
-        self.assertEqual(json.loads(text)["failed"], 1)
+        self.assertEqual((json.loads(text)["failed"], json.loads(text)["refused_identity"]), (1, 1))     # (B)
 
 
 if __name__ == "__main__":

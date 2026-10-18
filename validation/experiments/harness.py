@@ -27,7 +27,9 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import pathlib
+import shutil
 import subprocess
 import sys
 import tarfile
@@ -139,6 +141,29 @@ def source_identity(repo: pathlib.Path, commit: str) -> dict:
             "git_version": git(repo, "--version")}
 
 
+def clone_workspace(source: str, commit: str, ws: pathlib.Path) -> None:
+    """An arm's workspace: `main` at `commit`, no remote, and no file under ws/.git naming the source path. A clone
+    straight from the source leaves that path in .git/logs/HEAD after `git remote remove origin`, and `git push <path>`
+    writes the source's refs — so the source is cloned bare to <ws's parent>/src.git, the workspace from that copy, and
+    the copy deleted before any agent starts (its objects are in ws); the reflog's clone line names the deleted path
+    (`... (removed)`). Any file under ws/.git naming the source refuses the workspace. The residual: an agent can push
+    to any absolute path it independently knows; the workspace carries none."""
+    bare = ws.parent / "src.git"
+    subprocess.run(["git", "clone", "--quiet", "--bare", "--no-hardlinks", source, str(bare)], check=True, capture_output=True)
+    subprocess.run(["git", "clone", "--quiet", "--no-hardlinks", str(bare), str(ws)], check=True, capture_output=True)
+    git(ws, "checkout", "--quiet", "-B", "main", commit)
+    git(ws, "remote", "remove", "origin")
+    shutil.rmtree(bare)
+    for p in (ws / ".git" / "logs").rglob("*"):
+        if p.is_file() and f"clone: from {bare}".encode() in (text := p.read_bytes()):
+            p.write_bytes(text.replace(f"clone: from {bare}".encode(), f"clone: from {bare} (removed)".encode()))
+    names = {source.encode(), os.path.realpath(source).encode()}
+    hits = [str(p.relative_to(ws)) for p in (ws / ".git").rglob("*")
+            if p.is_file() and any(n in p.read_bytes() for n in names)]
+    if hits:
+        raise ValueError(f"{ws}: the source path {source} is named under .git: {hits}")
+
+
 def evaluator_identity(path: pathlib.Path) -> dict:
     """The hidden evaluator: an approved bundle whose contracts no arm sees; its digest binds the evaluation."""
     data = path.read_bytes()
@@ -186,21 +211,20 @@ def evaluate(candidate_repo: pathlib.Path, revision: str, evaluator: Mapping) ->
 def direct_arm(manifest: Mapping, out: pathlib.Path, *, task: str, client_exe: str, session_kw: dict,
                timeout_s: float, **extra) -> dict:
     """Arm `direct`: the client, once, on the public task, in a clone of the baseline; then the harness commits whatever
-    the workspace holds — that commit is the candidate. The client's own "done" is recorded, never trusted. The clone
-    keeps no remote: a `git push origin` the agent runs has nowhere to go (the source repository is never written).
-    `out` may hold the arm's preflight already (campaign.direct); never a workspace or an ARM.json. `extra`: fields
-    the caller records beside the arm's own (the configured endpoint, the preflight's verdict)."""
+    the workspace holds — that commit is the candidate. The client's own "done" is recorded, never trusted. The
+    workspace (clone_workspace) has no remote and names no path to the source: a `git push origin` has nowhere to go
+    and nothing under ws/.git tells the agent where the source is — an agent can push to any absolute path it
+    independently knows; the workspace carries none. `out` may hold the arm's preflight already (campaign.direct);
+    never a workspace or an ARM.json. `extra`: fields the caller records beside the arm's own (the configured endpoint,
+    the preflight's verdict, `identity`)."""
     from aisef2.app import client
     if (manifest.get("pair") or {}).get("arm") != "direct":
         raise ValueError("direct_arm runs a manifest of arm direct")
     if (out / "ws").exists() or (out / "ARM.json").exists():
         raise ValueError(f"{out} holds an arm already: an arm's directory is never reused")
     out.mkdir(parents=True, exist_ok=True)
-    src = manifest["source"]
     ws = out / "ws"
-    subprocess.run(["git", "clone", "--quiet", "--no-hardlinks", src["repo"], str(ws)], check=True, capture_output=True)
-    git(ws, "checkout", "--quiet", "-B", "main", src["commit"])
-    git(ws, "remote", "remove", "origin")
+    clone_workspace(manifest["source"]["repo"], manifest["source"]["commit"], ws)
     started = time.time()
     s = client.session("developer direct", task, str(ws), out / "sessions" / "direct.developer.1.jsonl", timeout_s,
                        exe=client_exe, **session_kw)

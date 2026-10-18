@@ -18,7 +18,9 @@ the client on PATH, app/run.client_on_path; the direct arm is handed it: one bin
 manifest's `client`); each run's bundle (and its evaluator, when it carries a plan) names the workload's commit as its
 plan baseline; every run's manifest is built, sealed and written to OUT/<run_id>/MANIFEST.json (once: an existing one
 is reused, never rewritten), checked and paired. Then, run by run: a fresh clone of the workload at its commit with no
-remote, the arm, the candidate frozen (commit, tree, archive and file digests), the hidden evaluator on it, the leak
+remote and no path to the source under its .git (harness.clone_workspace: via a bare copy deleted before the agent
+starts — an agent can push to any absolute path it independently knows; the workspace carries none), the arm, the
+candidate frozen (commit, tree, archive and file digests), the hidden evaluator on it, the leak
 scan over the arm's session streams, the usage read (direct: the preflight's ledger and the client's streams through
 app/client.Budget and app/usage; aisef: RUN.json), and OUT/<run_id>/RESULT.json — written for a failed arm too. A run
 whose RESULT.json exists is skipped (resume). The driver stops at OUT/STOP, at --max-runs, and (--stop-on-unknown)
@@ -28,7 +30,11 @@ in a temporary directory.
 Both arms sample one gate before any session: the client's configured endpoint for the settings' provider is the
 settings' endpoint, and the kernel's preflight (aisef2/app/preflight) attests the route — the aisef arms inside `aisef
 run` (app/run.execute, stage preflight), the direct arm here (<arm>/preflight/PREFLIGHT.json, its requests in the arm's
-budget). Refused at the gate, an arm is a failed one: candidate null, `identity: OPAQUE`, its record kept. So the
+budget). Refused at the gate, an arm is a failed one: candidate null, its record kept, and `identity` says where:
+ENDPOINT_MISMATCH (the client's configuration sends the provider elsewhere than the settings' endpoint; no request
+made), OPAQUE (the preflight did not attest — the direct arm's own call, or RUN.json failure.type IdentityStop at stage
+preflight); ATTESTED when the preflight attested (PREFLIGHT.json, RUN.json preflight.verdict), null when no gate was
+sampled. ARM.json and RESULT.json carry it; the summary counts `refused_identity` per workload x arm. So the
 manifests' model identity is `provider_reported` for every arm: what the gate measures is the provider's own report
 (the listing, the served model, one deployment fingerprint) — never a verification of weights — and a router alias
 whose backing model varies per request fails it.
@@ -64,6 +70,8 @@ from aisef2.app import preflight  # noqa: E402
 from validation.experiments import harness as H  # noqa: E402
 
 NO_EVALUATION = {"total": None, "satisfied": None, "not_satisfied": None}
+#: an arm's `identity` when the gate refused it: the client's configured endpoint, or the preflight (ATTESTED otherwise)
+REFUSED_IDENTITY = ("ENDPOINT_MISMATCH", "OPAQUE")
 #: the direct arm's gate (an offline test stubs it here; the kernel's own call is inside `aisef run`)
 preflight_run = preflight.run
 #: every manifest's model identity: the one gate both arms sample, and what it is not
@@ -229,20 +237,23 @@ def direct(run: dict, m: dict, arm_dir: pathlib.Path, a: argparse.Namespace) -> 
     """Arm direct behind the aisef arms' gate (app/run.execute, stage preflight): the client's configured endpoint for
     the settings' provider is the settings' endpoint, then the kernel's preflight attests the route — its ledger and
     PREFLIGHT.json under <arm>/preflight, its requests the base of the arm's budget and in its usage. Refused at
-    either, the arm is a failed one (candidate null, `identity: OPAQUE`, ARM.json says why) and no session starts.
-    Attested: harness.direct_arm — the client once on the public task, under the settings' route, the arms' PATH,
-    budget and turn cap; a session is one provider request (app/client), so the budget counts the streams it started
-    — with no journal, a requests() of 0 would read every session as unaccounted and stop it."""
+    either, the arm is a failed one (candidate null, `identity` ENDPOINT_MISMATCH or OPAQUE, ARM.json says why) and no
+    session starts. Attested (`identity: ATTESTED`): harness.direct_arm — the client once on the public task, under the
+    settings' route, the arms' PATH, budget and turn cap; a session is one provider request (app/client), so the budget
+    counts the streams it started — with no journal, a requests() of 0 would read every session as unaccounted and
+    stop it."""
     from aisef2.app import client, settings as S, usage as U
     st = S.read(run["settings_path"])
     sessions, started = arm_dir / "sessions", time.time()
     configured, config_key = client.configured_provider(st.provider)
     key = os.environ.get(st.api_key_env, "") if st.api_key_env else config_key
-    rec: dict = {"arm": "direct", "manifest_sha256": m["manifest_sha256"], "candidate": None, "configured_endpoint": configured}
+    rec: dict = {"arm": "direct", "manifest_sha256": m["manifest_sha256"], "candidate": None, "configured_endpoint": configured,
+                 "identity": None}
     pre = None
     if configured != st.endpoint:
-        rec["error"] = (f"the client's configuration sends provider {st.provider} to {configured}, not to the settings' "
-                        f"endpoint {st.endpoint}: no session started")
+        rec.update(identity="ENDPOINT_MISMATCH",
+                   error=f"identity: ENDPOINT_MISMATCH — the client's configuration sends provider {st.provider} to {configured}, "
+                         f"not to the settings' endpoint {st.endpoint}: no session started")
     else:
         try:
             pre = preflight_run(st.route, st.chat_probes, preflight.http_transport(st.endpoint, key), arm_dir / "preflight",
@@ -254,6 +265,8 @@ def direct(run: dict, m: dict, arm_dir: pathlib.Path, a: argparse.Namespace) -> 
             if pre["verdict"] != "ATTESTED" or pre["accounting"]["unaccounted"]:
                 rec.update(identity="OPAQUE", error="identity: OPAQUE — the route is not attested: " + "; ".join(
                     pre["problems"] + [f"preflight requests unaccounted: {pre['accounting']['unaccounted']}"] * bool(pre["accounting"]["unaccounted"])))
+            else:
+                rec["identity"] = "ATTESTED"
     budget = client.Budget(st.budget, pre["accounting"] if pre else dict.fromkeys(client.Budget.KEYS, 0), sessions,
                            requests=lambda: len(list(sessions.glob("*.jsonl"))) if sessions.is_dir() else 0)
     if "error" in rec:
@@ -264,7 +277,8 @@ def direct(run: dict, m: dict, arm_dir: pathlib.Path, a: argparse.Namespace) -> 
         kw = {"model": st.route, "env": env, "budget": budget, "turn_cap": st.max_turns_per_session,
               "secrets": tuple(v for v in (*(os.environ.get(n, "") for n in st.client_env), key) if len(v) >= 8)}
         rec.update(H.direct_arm(m, arm_dir, task=run["workload"]["task_text"], client_exe=a.client_exe, session_kw=kw,
-                                timeout_s=st.timeouts_s["developer"], configured_endpoint=configured, preflight=rec["preflight"]))
+                                timeout_s=st.timeouts_s["developer"], configured_endpoint=configured, preflight=rec["preflight"],
+                                identity=rec["identity"]))
     finished = time.time()
     n = len(list(sessions.glob("*.jsonl"))) if sessions.is_dir() else 0
     usage = U.usage(arm_dir, [{"type": "provider/request", "data": {}}] * n, st.prices, {"started": started, "finished": finished})
@@ -275,15 +289,15 @@ def direct(run: dict, m: dict, arm_dir: pathlib.Path, a: argparse.Namespace) -> 
 
 def aisef(run: dict, m: dict, arm_dir: pathlib.Path, a: argparse.Namespace) -> dict:
     """Arms aisef and aisef+: `aisef run` as a subprocess on a fresh clone at the baseline (the canaries' invocation,
-    closure-evidence/v2/v2.1/canary/*/run-tier*.sh) with no remote, under the arms' PATH; stdout, stderr and the exit
-    kept beside the run directory; the record from RUN.json (aisef_record)."""
+    closure-evidence/v2/v2.1/canary/*/run-tier*.sh) that carries no remote and no path to the source
+    (harness.clone_workspace; the kernel clones ws again: two hops from a session, none naming the source), under the
+    arms' PATH; stdout, stderr and the exit kept beside the run directory; the record from RUN.json (aisef_record),
+    written to ARM.json too."""
     if arm_dir.exists():
         raise ValueError(f"{arm_dir} exists: an arm's directory is never reused")
     arm_dir.mkdir(parents=True)
     ws = arm_dir / "ws"
-    subprocess.run(["git", "clone", "--quiet", "--no-hardlinks", m["source"]["repo"], str(ws)], check=True, capture_output=True)
-    H.git(ws, "checkout", "--quiet", "-B", "main", m["source"]["commit"])
-    H.git(ws, "remote", "remove", "origin")      # the kernel clones ws again; two hops from a session, none to the source
+    H.clone_workspace(m["source"]["repo"], m["source"]["commit"], ws)
     argv = [sys.executable, "-P", "-m", "aisef", "run", "--project", run["bundle_path"], "--settings", run["settings_path"],
             "--repo", str(ws), "--out", str(arm_dir / "run"), "--anchor-out", str(arm_dir / "run.anchor")]
     env = {**os.environ, "PYTHONPATH": str(ROOT), "PYTHONDONTWRITEBYTECODE": "1", "PATH": a.path}
@@ -292,7 +306,9 @@ def aisef(run: dict, m: dict, arm_dir: pathlib.Path, a: argparse.Namespace) -> d
         p = subprocess.run(argv, stdout=o, stderr=e, env=env, cwd=str(arm_dir))
     finished = time.time()
     (arm_dir / "exit.txt").write_text(f"{p.returncode}\n", encoding="utf-8")
-    return aisef_record(run, m, arm_dir, p.returncode, round(finished - started, 3))
+    rec = aisef_record(run, m, arm_dir, p.returncode, round(finished - started, 3))
+    write_once(arm_dir / "ARM.json", {k: str(v) if isinstance(v, pathlib.Path) else v for k, v in rec.items()})
+    return rec
 
 
 def aisef_record(run: dict, m: dict, arm_dir: pathlib.Path, exit_code: int | None, wall_s: float | None) -> dict:
@@ -300,17 +316,21 @@ def aisef_record(run: dict, m: dict, arm_dir: pathlib.Path, exit_code: int | Non
     `delivery_verdict` is PASS (app/run.delivery: PASS, FAIL, NOT_REACHED): the kernel clones before its gates and sets
     `final_main` to its clone's main whatever stopped the run — an identity stop, a budget stop, a refusal leave it at
     the baseline (closure-evidence/v2/v2.1/canary/tier-1/run/RUN.json: NOT_REACHED, final_main = baseline). That, or a
-    run that left no RUN.json, is a failed arm: candidate null, the evaluation not run, the failure in the record."""
+    run that left no RUN.json, is a failed arm: candidate null, the evaluation not run, the failure in the record.
+    `identity`: OPAQUE when the kernel's gate stopped the run (failure.type IdentityStop — raised after RUN.json's
+    `preflight` is set, so it wins over that verdict), else the preflight's verdict (ATTESTED), null without one."""
     from aisef2.app import lineage
     run_json = arm_dir / "run" / "RUN.json"
     rec = read_json(run_json) if run_json.exists() else {}
     verdict = rec.get("delivery_verdict")
+    pre_verdict = (rec.get("preflight") or {}).get("verdict")
     out = {"arm": run["arm"], "manifest_sha256": m["manifest_sha256"], "candidate": rec.get("final_main") if verdict == "PASS" else None,
+           "identity": "OPAQUE" if (rec.get("failure") or {}).get("type") == "IdentityStop" else pre_verdict,
            "exit": exit_code, "wall_s": wall_s, "sessions": arm_dir / "run" / "sessions", "repo": arm_dir / "run" / "repo",
            "journal": arm_dir / "run" / lineage.JOURNAL,
            "run": {**{k: rec.get(k) for k in ("delivery_verdict", "delivery_blocked_by", "story_outcomes", "final_main",
                                                 "failure", "budget_stop", "stage")},
-                   "preflight_verdict": (rec.get("preflight") or {}).get("verdict")},
+                   "preflight_verdict": pre_verdict},
            "usage": {"budget": rec.get("budget"), **(rec.get("usage") or {}), "source": "<out>/run/RUN.json usage and budget (app/run.execute)"}}
     if verdict != "PASS":
         out["error"] = (f"aisef run not delivered: delivery_verdict={verdict!r} stage={rec.get('stage')!r} "
@@ -481,7 +501,8 @@ def replay(a: argparse.Namespace) -> int:
 
 
 def summary(a: argparse.Namespace) -> int:
-    """One JSON row per workload x arm, from the RESULT.json records only."""
+    """One JSON row per workload x arm, from the RESULT.json records only (`refused_identity`: arms the gate refused,
+    identity ENDPOINT_MISMATCH or OPAQUE)."""
     groups: dict[tuple, list[dict]] = {}
     for res in results(pathlib.Path(a.out).resolve()):
         groups.setdefault((res["workload"], res["arm"]), []).append(res)
@@ -501,7 +522,8 @@ def summary(a: argparse.Namespace) -> int:
             "requests": sum(int(((r["usage"].get("budget") or {}).get("spent") or {}).get("provider_requests") or 0) for r in rs),
             "wall_s": round(sum(float(r["wall_s"] or 0) for r in rs), 3),
             "cost": None if any(c is None for c in costs) else round(sum(costs), 6),
-            "valid": all(r["valid"] for r in rs), "failed": sum(1 for r in rs if r.get("error"))}, sort_keys=True))
+            "valid": all(r["valid"] for r in rs), "failed": sum(1 for r in rs if r.get("error")),
+            "refused_identity": sum(1 for r in rs if r.get("identity") in REFUSED_IDENTITY)}, sort_keys=True))
     return 0
 
 
