@@ -1,0 +1,5 @@
+dry-run: 2026-10-18 15:36:32 +0700 PATH=/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/e2-dry/client:/opt/homebrew/opt/python@3.14/bin:/opt/homebrew/bin:/usr/bin:/bin opencode=/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/e2-dry/client/opencode provider=127.0.0.1:47311 AISEF_DRYRUN_WRONG='' NINEROUTER_API_KEY in env: False
+campaign: client /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/e2-dry/client/opencode sha256 1df208d66283aeb3987b008cb8377c2b498bbfb1d03f39c4274ff399b8bc18f1; arms' PATH /private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/e2-dry/client:/opt/homebrew/opt/python@3.14/bin:/opt/homebrew/bin:/usr/bin:/bin
+campaign: 6 manifests sealed and paired
+campaign: done (0 arms this invocation)
+dry-run: 2026-10-18 15:36:32 +0700 campaign.main exit 0

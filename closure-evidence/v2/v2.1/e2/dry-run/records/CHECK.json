@@ -1,0 +1,256 @@
+{
+ "at": "2026-10-18 15:29:11 +0700",
+ "ok": true,
+ "workloads": {
+  "w1-a": [
+   {
+    "arms": "3/13",
+    "commit": "07fb2dbfcc169b0562e4a3de97cd143a2e627df3",
+    "evaluator": "2/12",
+    "not_satisfied": {
+     "arms": [
+      "PPS-21bf8e6c1baa268538e44a312b0b15374b0fc7371ef07f2f697734493473a860",
+      "PPS-40a6557e1b6d1d88dbfcfa96e4b732de60cdae7867503182d00b296d3890bf55",
+      "PPS-483c39cb8835ce3eb520826badd6980f8fe436d9bfb106dabcbd788fd68cb8e6",
+      "PPS-5b19b626d046bcb51bbb3e8c617d0142aa0cb5786767e31b5e0be86d5d3df32d",
+      "PPS-5c5d2b78340d60fe8a9de6679bfaa0576cd7081f77a454d6a5d9554ef5eb9e4c",
+      "PPS-6bc4097df18675c25962842d85f1c65cf1969cadbe9bce4420d0ebcf52c9b030",
+      "PPS-ba894d8ce566d8cdf5f33cd7a91fd10aa9e75b78523ff118275a23f8e4bc2a66",
+      "PPS-d04c5fe15d9379f0204d4c41468b5e5f575afd7fd8785b606c1b326b2e82df19",
+      "PPS-e43cfefc95df333618cf2d6962fe4228705d755abfb25f0fee41e24387b6357b",
+      "PPS-f3e771b69fe545ab618d70aba365a39bfe431fd803dbac97a50f355ce5b57510"
+     ],
+     "evaluator": [
+      "PPS-442a82f47845201f18d8f991c7370f34e88bb3eabff902a15b5bec783ad8726f",
+      "PPS-584de2461c203c758908fcec9e4b7daad735363a3306b38e54e55fc2228a9acb",
+      "PPS-91c44b0a8bb57f2fb39e8de3fdddae2bb84b2819712ae74011c5a8d6d0cd1fe2",
+      "PPS-9a4b7e3f16f9bd9b065a4505951e52e1a212a6039a1aec720a9bf31cf96b4ac5",
+      "PPS-9e5f8fb326555781d7d845f4164a5a2763d3d96e035ad267de7964e3ca08770d",
+      "PPS-b4b7411e9850d2182ce236737fb7b06b663d3e7213d2b7f286582ddcadc791ac",
+      "PPS-c9a0cf087c64b5b7c34b78b01bf5016268387a37ea0b2d339f14c5ce0235fdcc",
+      "PPS-d1d827e49d199ac1262b6ec5335e1d8d7f679d5c911c43183b77da0fa9e00c16",
+      "PPS-d6a2f6e098d775e7efb7425c6ce02c4e045c14e8ed221adc900da053a762dfa1",
+      "PPS-ea652f9fa5b48326762d8d319cb5dcf985aecf73c9e96e6eb75bd5c80aee44a9"
+     ]
+    },
+    "story": "S1",
+    "tests_exit": 0,
+    "tests_tail": [
+     "OK"
+    ],
+    "variant": "reference"
+   },
+   {
+    "arms": "5/13",
+    "commit": "a41884d65b377bda942c69ae51e478c753316eb1",
+    "evaluator": "3/12",
+    "not_satisfied": {
+     "arms": [
+      "PPS-21bf8e6c1baa268538e44a312b0b15374b0fc7371ef07f2f697734493473a860",
+      "PPS-40a6557e1b6d1d88dbfcfa96e4b732de60cdae7867503182d00b296d3890bf55",
+      "PPS-5b19b626d046bcb51bbb3e8c617d0142aa0cb5786767e31b5e0be86d5d3df32d",
+      "PPS-5c5d2b78340d60fe8a9de6679bfaa0576cd7081f77a454d6a5d9554ef5eb9e4c",
+      "PPS-6bc4097df18675c25962842d85f1c65cf1969cadbe9bce4420d0ebcf52c9b030",
+      "PPS-ba894d8ce566d8cdf5f33cd7a91fd10aa9e75b78523ff118275a23f8e4bc2a66",
+      "PPS-d04c5fe15d9379f0204d4c41468b5e5f575afd7fd8785b606c1b326b2e82df19",
+      "PPS-f3e771b69fe545ab618d70aba365a39bfe431fd803dbac97a50f355ce5b57510"
+     ],
+     "evaluator": [
+      "PPS-442a82f47845201f18d8f991c7370f34e88bb3eabff902a15b5bec783ad8726f",
+      "PPS-584de2461c203c758908fcec9e4b7daad735363a3306b38e54e55fc2228a9acb",
+      "PPS-91c44b0a8bb57f2fb39e8de3fdddae2bb84b2819712ae74011c5a8d6d0cd1fe2",
+      "PPS-9e5f8fb326555781d7d845f4164a5a2763d3d96e035ad267de7964e3ca08770d",
+      "PPS-b4b7411e9850d2182ce236737fb7b06b663d3e7213d2b7f286582ddcadc791ac",
+      "PPS-c9a0cf087c64b5b7c34b78b01bf5016268387a37ea0b2d339f14c5ce0235fdcc",
+      "PPS-d1d827e49d199ac1262b6ec5335e1d8d7f679d5c911c43183b77da0fa9e00c16",
+      "PPS-d6a2f6e098d775e7efb7425c6ce02c4e045c14e8ed221adc900da053a762dfa1",
+      "PPS-ea652f9fa5b48326762d8d319cb5dcf985aecf73c9e96e6eb75bd5c80aee44a9"
+     ]
+    },
+    "story": "S2",
+    "tests_exit": 0,
+    "tests_tail": [
+     "OK"
+    ],
+    "variant": "reference"
+   },
+   {
+    "arms": "9/13",
+    "commit": "f575136ceba5b57a05acbc0d513f3d34984491de",
+    "evaluator": "6/12",
+    "not_satisfied": {
+     "arms": [
+      "PPS-5b19b626d046bcb51bbb3e8c617d0142aa0cb5786767e31b5e0be86d5d3df32d",
+      "PPS-6bc4097df18675c25962842d85f1c65cf1969cadbe9bce4420d0ebcf52c9b030",
+      "PPS-d04c5fe15d9379f0204d4c41468b5e5f575afd7fd8785b606c1b326b2e82df19",
+      "PPS-f3e771b69fe545ab618d70aba365a39bfe431fd803dbac97a50f355ce5b57510"
+     ],
+     "evaluator": [
+      "PPS-442a82f47845201f18d8f991c7370f34e88bb3eabff902a15b5bec783ad8726f",
+      "PPS-b4b7411e9850d2182ce236737fb7b06b663d3e7213d2b7f286582ddcadc791ac",
+      "PPS-c9a0cf087c64b5b7c34b78b01bf5016268387a37ea0b2d339f14c5ce0235fdcc",
+      "PPS-d1d827e49d199ac1262b6ec5335e1d8d7f679d5c911c43183b77da0fa9e00c16",
+      "PPS-d6a2f6e098d775e7efb7425c6ce02c4e045c14e8ed221adc900da053a762dfa1",
+      "PPS-ea652f9fa5b48326762d8d319cb5dcf985aecf73c9e96e6eb75bd5c80aee44a9"
+     ]
+    },
+    "story": "S3",
+    "tests_exit": 0,
+    "tests_tail": [
+     "OK"
+    ],
+    "variant": "reference"
+   },
+   {
+    "arms": "13/13",
+    "commit": "8c8a6a26d253ad7466ed39fa84393b32dbe82acd",
+    "evaluator": "12/12",
+    "not_satisfied": {
+     "arms": [],
+     "evaluator": []
+    },
+    "story": "S4",
+    "tests_exit": 0,
+    "tests_tail": [
+     "OK"
+    ],
+    "variant": "reference"
+   }
+  ],
+  "w2": [
+   {
+    "arms": "4/7",
+    "commit": "9c1c6714b1ec99d3019dfdd0f92754fedd411eed",
+    "evaluator": "6/12",
+    "not_satisfied": {
+     "arms": [
+      "PPS-70b70c71fd9d26633d261d98e787d85176114e743439aa07a85811280e3cd671",
+      "PPS-7e7b646b18ff4a7fb7dfcb697ac970c490ba1e579be4edddfdfb5f0726720982",
+      "PPS-ae45c155e838b0956c7e8479908573d94163bedda6421d07487448cc635cc766"
+     ],
+     "evaluator": [
+      "PPS-2df3d74ba577d2f31fe693108b8e43b0de65674ecb741d3d9687c4586376bacb",
+      "PPS-4a3317f4e1417de5c964c16692c21937614da2ae6712879f3d7c1aeefb02df72",
+      "PPS-7a98e544eb76332d5f539275c1f56e932d785887aa7023c5d0a1096c157facd1",
+      "PPS-81772fe38fc95a4100a53528105dd335c183c5c472718a4445702024757f799b",
+      "PPS-e297d978f1045737a173324dff22668f83fdcc7eeb6d3a3b0286c24db54492a5",
+      "PPS-e5f80ed2742c2dc1a09051ccd0c9bb303fc5527cbb91305ee49f1a30fac99a41"
+     ]
+    },
+    "story": "S1",
+    "tests_exit": 0,
+    "tests_tail": [
+     "OK"
+    ],
+    "variant": "reference"
+   },
+   {
+    "arms": "6/7",
+    "commit": "76de50acddaa6c0d6a9aed1c974ee44920002e58",
+    "evaluator": "10/12",
+    "not_satisfied": {
+     "arms": [
+      "PPS-70b70c71fd9d26633d261d98e787d85176114e743439aa07a85811280e3cd671"
+     ],
+     "evaluator": [
+      "PPS-4a3317f4e1417de5c964c16692c21937614da2ae6712879f3d7c1aeefb02df72",
+      "PPS-81772fe38fc95a4100a53528105dd335c183c5c472718a4445702024757f799b"
+     ]
+    },
+    "story": "S2",
+    "tests_exit": 0,
+    "tests_tail": [
+     "OK"
+    ],
+    "variant": "reference"
+   },
+   {
+    "arms": "7/7",
+    "commit": "5521081f3a71c958b6411e3b70a4986a97c4ff59",
+    "evaluator": "12/12",
+    "not_satisfied": {
+     "arms": [],
+     "evaluator": []
+    },
+    "story": "S3",
+    "tests_exit": 0,
+    "tests_tail": [
+     "OK"
+    ],
+    "variant": "reference"
+   },
+   {
+    "pytest_infrastructure_ci_exit": 0,
+    "tail": [
+     "26 passed in 0.11s"
+    ],
+    "variant": "reference"
+   },
+   {
+    "arms": "4/7",
+    "commit": "41c2eea64d8687fff336b5c59627ceb9ebb56ed6",
+    "evaluator": "6/12",
+    "not_satisfied": {
+     "arms": [
+      "PPS-70b70c71fd9d26633d261d98e787d85176114e743439aa07a85811280e3cd671",
+      "PPS-7e7b646b18ff4a7fb7dfcb697ac970c490ba1e579be4edddfdfb5f0726720982",
+      "PPS-ae45c155e838b0956c7e8479908573d94163bedda6421d07487448cc635cc766"
+     ],
+     "evaluator": [
+      "PPS-2df3d74ba577d2f31fe693108b8e43b0de65674ecb741d3d9687c4586376bacb",
+      "PPS-4a3317f4e1417de5c964c16692c21937614da2ae6712879f3d7c1aeefb02df72",
+      "PPS-7a98e544eb76332d5f539275c1f56e932d785887aa7023c5d0a1096c157facd1",
+      "PPS-81772fe38fc95a4100a53528105dd335c183c5c472718a4445702024757f799b",
+      "PPS-e297d978f1045737a173324dff22668f83fdcc7eeb6d3a3b0286c24db54492a5",
+      "PPS-e5f80ed2742c2dc1a09051ccd0c9bb303fc5527cbb91305ee49f1a30fac99a41"
+     ]
+    },
+    "story": "S1",
+    "tests_exit": 0,
+    "tests_tail": [
+     "OK"
+    ],
+    "variant": "wrong"
+   },
+   {
+    "arms": "6/7",
+    "commit": "b6d19477042f71ce616d39e32fe66baa3e06b85f",
+    "evaluator": "10/12",
+    "not_satisfied": {
+     "arms": [
+      "PPS-70b70c71fd9d26633d261d98e787d85176114e743439aa07a85811280e3cd671"
+     ],
+     "evaluator": [
+      "PPS-4a3317f4e1417de5c964c16692c21937614da2ae6712879f3d7c1aeefb02df72",
+      "PPS-81772fe38fc95a4100a53528105dd335c183c5c472718a4445702024757f799b"
+     ]
+    },
+    "story": "S2",
+    "tests_exit": 0,
+    "tests_tail": [
+     "OK"
+    ],
+    "variant": "wrong"
+   },
+   {
+    "arms": "6/7",
+    "commit": "b7a3420725dadcc3b771ca12279dcac0cbd2da41",
+    "evaluator": "11/12",
+    "not_satisfied": {
+     "arms": [
+      "PPS-70b70c71fd9d26633d261d98e787d85176114e743439aa07a85811280e3cd671"
+     ],
+     "evaluator": [
+      "PPS-81772fe38fc95a4100a53528105dd335c183c5c472718a4445702024757f799b"
+     ]
+    },
+    "story": "S3",
+    "tests_exit": 1,
+    "tests_tail": [
+     "FAILED (failures=1)"
+    ],
+    "variant": "wrong"
+   }
+  ]
+ }
+}

@@ -1,0 +1,25 @@
+{
+ "arm": "direct",
+ "candidate": "3cd847f74bcce369e7d11aff29951506624a8cb8",
+ "changed": true,
+ "configured_endpoint": "http://127.0.0.1:47311/v1",
+ "exit": 0,
+ "identity": "ATTESTED",
+ "manifest_sha256": "d78390440a10c94c9604bb1a25abdb011a26dfb544dd20a68e035d31ce4607e2",
+ "preflight": {
+  "accounting": {
+   "input_tokens": 27,
+   "output_tokens": 3,
+   "provider_requests": 4,
+   "turns": 0,
+   "unaccounted": []
+  },
+  "problems": [],
+  "verdict": "ATTESTED"
+ },
+ "self_reported": {
+  "error": null,
+  "stopped": null
+ },
+ "wall_s": 0.725
+}

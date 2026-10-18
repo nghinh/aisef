@@ -1,0 +1,114 @@
+{
+ "aisef_run": null,
+ "arm": "direct",
+ "candidate": "3cd847f74bcce369e7d11aff29951506624a8cb8",
+ "candidate_frozen": {
+  "archive_sha256": "6ee60498d9bde4066925f0465ef387e8129b775d4b64d00df6b6a48266735a8f",
+  "archive_size": 30720,
+  "commit": "3cd847f74bcce369e7d11aff29951506624a8cb8",
+  "files_sha256": "813defa98a3a1d396dcd1b33d2a143d8d784a75ac5a23647dfc70ca4e7e18a32",
+  "tree": "d8a5597d5b479e4feaafa8b433de8626046c7af3"
+ },
+ "candidate_repo": "w1-a-r1-direct/arm/ws",
+ "configured_endpoint": "http://127.0.0.1:47311/v1",
+ "error": null,
+ "escaped_defects": [],
+ "evaluation": {
+  "not_satisfied": [],
+  "satisfied": 12,
+  "total": 12
+ },
+ "evaluator_leaks": [],
+ "evaluator_path": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/e2-dry/approved/w1-a-evaluator.json",
+ "exit": 0,
+ "false_rollbacks": [],
+ "format": "aisef.experiment-result/1",
+ "identity": "ATTESTED",
+ "manifest_sha256": "d78390440a10c94c9604bb1a25abdb011a26dfb544dd20a68e035d31ce4607e2",
+ "preflight": {
+  "accounting": {
+   "input_tokens": 27,
+   "output_tokens": 3,
+   "provider_requests": 4,
+   "turns": 0,
+   "unaccounted": []
+  },
+  "problems": [],
+  "verdict": "ATTESTED"
+ },
+ "recorded_at": "2026-10-18T08:31:29+00:00",
+ "rep": 1,
+ "rollback": false,
+ "run_id": "w1-a-r1-direct",
+ "self_reported": {
+  "error": null,
+  "stopped": null
+ },
+ "usage": {
+  "budget": {
+   "limitation": "spend is what the client reports per finished step: an HTTP request that finishes no step (a client retry, a failed request, the one in flight when a stop is issued) is not in the telemetry, and a stop is issued at the first reading that shows a ceiling reached, so totals can pass a ceiling by the steps finished since the reading before",
+   "limits": {
+    "input_tokens": 30000000,
+    "output_tokens": 500000,
+    "provider_requests": 58,
+    "turns": 700
+   },
+   "preflight": {
+    "input_tokens": 27,
+    "output_tokens": 3,
+    "provider_requests": 4,
+    "turns": 0
+   },
+   "reached": null,
+   "spent": {
+    "input_tokens": 157,
+    "output_tokens": 13,
+    "provider_requests": 5,
+    "requests_recorded": 1,
+    "sessions_started": 1,
+    "turns": 1,
+    "unaccounted": []
+   }
+  },
+  "cost": {
+   "status": "unknown",
+   "value": null,
+   "why": "the settings give no price table"
+  },
+  "preflight": {
+   "input_tokens": 27,
+   "output_tokens": 3,
+   "provider_requests": 4,
+   "turns": 0,
+   "unaccounted": []
+  },
+  "provider_requests_journaled": 1,
+  "retries": {},
+  "sessions": [
+   {
+    "session": "direct.developer.1.jsonl",
+    "steps": 1,
+    "steps_without_tokens": 0,
+    "tokens": {
+     "cache_read": 10,
+     "cache_write": 0,
+     "input": 120,
+     "output": 7,
+     "reasoning": 3
+    }
+   }
+  ],
+  "source": "app/client.Budget over the preflight's ledger and the arm's session streams; app/usage.usage",
+  "tokens": {
+   "cache_read": 10,
+   "cache_write": 0,
+   "input": 120,
+   "output": 7,
+   "reasoning": 3
+  },
+  "wall_s": 0.87
+ },
+ "valid": true,
+ "wall_s": 0.725,
+ "workload": "w1-a"
+}

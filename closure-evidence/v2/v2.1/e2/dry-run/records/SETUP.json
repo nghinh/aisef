@@ -1,0 +1,69 @@
+{
+ "aisef_head": "b278ffa719369bdb4cbf15055cdccefe76c47051",
+ "approved": {
+  "w1-a-arms": {
+   "admitted": true,
+   "approved": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/e2-dry/approved/w1-a-arms.json",
+   "approved_sha256": "2817ea87104e4321361afabe654b1b7187f5f29523c560ba53405da74ddde4e3",
+   "approver": "human:dry-run-agent",
+   "contracts": 13,
+   "lint_verdict": "READY",
+   "source": "closure-evidence/v2/v2.1/e2/w1-a/arms/bundle.json",
+   "source_sha256": "80acc8509b0110b8ac72845d1331b47108d5e0d3b54a250da95307513364c254"
+  },
+  "w1-a-evaluator": {
+   "admitted": true,
+   "approved": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/e2-dry/approved/w1-a-evaluator.json",
+   "approved_sha256": "119ed59d60266c098d0b1252b592ff8aaa4d0752ccf00acc721e9933147d019d",
+   "approver": "human:dry-run-agent",
+   "contracts": 12,
+   "lint_verdict": "READY",
+   "source": "closure-evidence/v2/v2.1/e2/w1-a/evaluator/bundle.json",
+   "source_sha256": "d004a92b4671ea3ca0a31dac84e2d836ca1728327de55369aa7d4b8577070465"
+  },
+  "w2-arms": {
+   "admitted": true,
+   "approved": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/e2-dry/approved/w2-arms.json",
+   "approved_sha256": "22d7b4fe825d87f95f3c336b7775278441cdc4fd896643bc781648d3d2754c9c",
+   "approver": "human:dry-run-agent",
+   "contracts": 7,
+   "lint_verdict": "READY",
+   "source": "closure-evidence/v2/v2.1/e2/w2/arms/bundle.json",
+   "source_sha256": "d8ef6dfa94122f6768e57da3d1145501cd4c6bfd7510eeeb267b1040cc97dd74"
+  },
+  "w2-evaluator": {
+   "admitted": true,
+   "approved": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/e2-dry/approved/w2-evaluator.json",
+   "approved_sha256": "74f7c1251eb5a49664be292e3d87829c1608bbde787a183b98a9d6b1f34f7f46",
+   "approver": "human:dry-run-agent",
+   "contracts": 12,
+   "lint_verdict": "READY",
+   "source": "closure-evidence/v2/v2.1/e2/w2/hidden/evaluator.json",
+   "source_sha256": "07f5d210a28369210f282aa1de6f917bb620b6b0b9deb8bc4cd5622563407205"
+  }
+ },
+ "at": "2026-10-18 15:26:27 +0700",
+ "baselines": {
+  "w1-a": {
+   "commit": "e6901e56033d6a30d51e36404d82e4c8d758f99e",
+   "repo": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/e2-dry/base/w1-a",
+   "tree": "0f759f57e89b59283eac5670d1241274e97b4181"
+  },
+  "w2": {
+   "commit": "ceae06eb5f67f2e6101503308d5bc7ec166b34f5",
+   "repo": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/e2-dry/base/w2",
+   "tree": "303c535fef89a10574878cc05f516256ee9bb399"
+  }
+ },
+ "campaign": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/e2-dry/CAMPAIGN-offline.json",
+ "campaign_template_sha256": "4c049b9ae0ad6b24a8eae37e05f91eb4786d4fa9c24cb1015425d8d7c5c3bd45",
+ "client": {
+  "exe": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/e2-dry/client/opencode",
+  "sha256": "1df208d66283aeb3987b008cb8377c2b498bbfb1d03f39c4274ff399b8bc18f1",
+  "source": "tools/fake_opencode.py",
+  "source_sha256": "1df208d66283aeb3987b008cb8377c2b498bbfb1d03f39c4274ff399b8bc18f1"
+ },
+ "client_config": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/e2-dry/xdg/config/opencode/opencode.json",
+ "endpoint": "http://127.0.0.1:47311/v1",
+ "scratch": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/e2-dry"
+}

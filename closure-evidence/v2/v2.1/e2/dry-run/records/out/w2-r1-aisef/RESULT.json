@@ -1,0 +1,240 @@
+{
+ "aisef_run": {
+  "budget_stop": null,
+  "delivery_blocked_by": [
+   "1 of the plan's stories did not commit: ['S3']"
+  ],
+  "delivery_verdict": "FAIL",
+  "failure": null,
+  "final_main": "cc2be2877d9ad59184795af0072a2772186aa5e5",
+  "preflight_verdict": "ATTESTED",
+  "stage": "finished",
+  "story_outcomes": {
+   "S1": [
+    "COMMIT"
+   ],
+   "S2": [
+    "COMMIT"
+   ],
+   "S3": [
+    "RETRY",
+    "RETRY",
+    "ROLLBACK"
+   ]
+  }
+ },
+ "arm": "aisef",
+ "candidate": null,
+ "candidate_frozen": null,
+ "candidate_repo": "w2-r1-aisef/arm/run/repo",
+ "configured_endpoint": null,
+ "error": "aisef run not delivered: delivery_verdict='FAIL' stage='finished' failure=None blocked_by=[\"1 of the plan's stories did not commit: ['S3']\"]",
+ "escaped_defects": null,
+ "evaluation": {
+  "not_satisfied": null,
+  "satisfied": null,
+  "total": null
+ },
+ "evaluator_leaks": [],
+ "evaluator_path": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/e2-dry/approved/w2-evaluator.json",
+ "exit": 1,
+ "false_rollbacks": [
+  {
+   "candidates": [
+    {
+     "evaluation": {
+      "not_satisfied": [
+       "PPS-81772fe38fc95a4100a53528105dd335c183c5c472718a4445702024757f799b"
+      ],
+      "satisfied": 11,
+      "total": 12
+     },
+     "passes": false,
+     "present": true,
+     "sha": "fd40b2f4a421a2c804de28f5b4c1b5f20745ade6"
+    },
+    {
+     "evaluation": {
+      "not_satisfied": [
+       "PPS-81772fe38fc95a4100a53528105dd335c183c5c472718a4445702024757f799b"
+      ],
+      "satisfied": 11,
+      "total": 12
+     },
+     "passes": false,
+     "present": true,
+     "sha": "ff9252124f3a729f68944136d515e2bd6848a5ba"
+    },
+    {
+     "evaluation": {
+      "not_satisfied": [
+       "PPS-81772fe38fc95a4100a53528105dd335c183c5c472718a4445702024757f799b"
+      ],
+      "satisfied": 11,
+      "total": 12
+     },
+     "passes": false,
+     "present": true,
+     "sha": "90c30a98b34acbf9d8cf22cd1e5a6178a74e63fd"
+    }
+   ],
+   "false_rollback": false,
+   "outcomes": [
+    "RETRY",
+    "RETRY",
+    "ROLLBACK"
+   ],
+   "story": "S3"
+  }
+ ],
+ "format": "aisef.experiment-result/1",
+ "identity": "ATTESTED",
+ "manifest_sha256": "8f96ba68736068b53900259413b42d687e20c49f291be51bd2638a52e46b87f2",
+ "preflight": null,
+ "recorded_at": "2026-10-18T08:34:49+00:00",
+ "rep": 1,
+ "rollback": true,
+ "run_id": "w2-r1-aisef",
+ "self_reported": null,
+ "usage": {
+  "budget": {
+   "limitation": "spend is what the client reports per finished step: an HTTP request that finishes no step (a client retry, a failed request, the one in flight when a stop is issued) is not in the telemetry, and a stop is issued at the first reading that shows a ceiling reached, so totals can pass a ceiling by the steps finished since the reading before",
+   "limits": {
+    "input_tokens": 30000000,
+    "output_tokens": 500000,
+    "provider_requests": 58,
+    "turns": 700
+   },
+   "preflight": {
+    "input_tokens": 27,
+    "output_tokens": 3,
+    "provider_requests": 4,
+    "turns": 0
+   },
+   "reached": null,
+   "spent": {
+    "input_tokens": 937,
+    "output_tokens": 73,
+    "provider_requests": 11,
+    "requests_recorded": 7,
+    "sessions_started": 7,
+    "turns": 7,
+    "unaccounted": []
+   }
+  },
+  "cost": {
+   "status": "unknown",
+   "value": null,
+   "why": "the settings give no price table"
+  },
+  "preflight": {
+   "input_tokens": 27,
+   "output_tokens": 3,
+   "provider_requests": 4,
+   "turns": 0,
+   "unaccounted": []
+  },
+  "provider_requests_journaled": 7,
+  "retries": {
+   "S3": 2
+  },
+  "sessions": [
+   {
+    "session": "S1.developer.1.jsonl",
+    "steps": 1,
+    "steps_without_tokens": 0,
+    "tokens": {
+     "cache_read": 10,
+     "cache_write": 0,
+     "input": 120,
+     "output": 7,
+     "reasoning": 3
+    }
+   },
+   {
+    "session": "S1.reviewer.1.jsonl",
+    "steps": 1,
+    "steps_without_tokens": 0,
+    "tokens": {
+     "cache_read": 10,
+     "cache_write": 0,
+     "input": 120,
+     "output": 7,
+     "reasoning": 3
+    }
+   },
+   {
+    "session": "S2.developer.1.jsonl",
+    "steps": 1,
+    "steps_without_tokens": 0,
+    "tokens": {
+     "cache_read": 10,
+     "cache_write": 0,
+     "input": 120,
+     "output": 7,
+     "reasoning": 3
+    }
+   },
+   {
+    "session": "S2.reviewer.1.jsonl",
+    "steps": 1,
+    "steps_without_tokens": 0,
+    "tokens": {
+     "cache_read": 10,
+     "cache_write": 0,
+     "input": 120,
+     "output": 7,
+     "reasoning": 3
+    }
+   },
+   {
+    "session": "S3.developer.1.jsonl",
+    "steps": 1,
+    "steps_without_tokens": 0,
+    "tokens": {
+     "cache_read": 10,
+     "cache_write": 0,
+     "input": 120,
+     "output": 7,
+     "reasoning": 3
+    }
+   },
+   {
+    "session": "S3.developer.2.jsonl",
+    "steps": 1,
+    "steps_without_tokens": 0,
+    "tokens": {
+     "cache_read": 10,
+     "cache_write": 0,
+     "input": 120,
+     "output": 7,
+     "reasoning": 3
+    }
+   },
+   {
+    "session": "S3.developer.3.jsonl",
+    "steps": 1,
+    "steps_without_tokens": 0,
+    "tokens": {
+     "cache_read": 10,
+     "cache_write": 0,
+     "input": 120,
+     "output": 7,
+     "reasoning": 3
+    }
+   }
+  ],
+  "source": "<out>/run/RUN.json usage and budget (app/run.execute)",
+  "tokens": {
+   "cache_read": 70,
+   "cache_write": 0,
+   "input": 840,
+   "output": 49,
+   "reasoning": 21
+  },
+  "wall_s": 27.685
+ },
+ "valid": true,
+ "wall_s": 28.207,
+ "workload": "w2"
+}

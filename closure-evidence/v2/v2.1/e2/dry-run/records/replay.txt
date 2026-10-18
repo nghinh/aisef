@@ -1,0 +1,2 @@
+dry-run: 2026-10-18 15:36:07 +0700 PATH=/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/e2-dry/client:/opt/homebrew/opt/python@3.14/bin:/opt/homebrew/bin:/usr/bin:/bin opencode=/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/e2-dry/client/opencode provider=127.0.0.1:47311 AISEF_DRYRUN_WRONG='' NINEROUTER_API_KEY in env: False
+dry-run: 2026-10-18 15:36:31 +0700 campaign.main exit 0

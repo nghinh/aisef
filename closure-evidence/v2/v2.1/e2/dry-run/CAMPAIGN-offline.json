@@ -1,0 +1,94 @@
+{
+ "runs": [
+  {
+   "arm": "direct",
+   "bundle_path": "${SCRATCH}/approved/w1-a-arms.json",
+   "evaluator_path": "${SCRATCH}/approved/w1-a-evaluator.json",
+   "rep": 1,
+   "run_id": "w1-a-r1-direct",
+   "settings_path": "${REPO}/closure-evidence/v2/v2.1/e2/dry-run/settings-offline/arm-direct.json",
+   "workload": {
+    "commit": "e6901e56033d6a30d51e36404d82e4c8d758f99e",
+    "id": "w1-a",
+    "repo": "${SCRATCH}/base/w1-a",
+    "requirements_path": "docs/requirements.md",
+    "task_text": "Implement docs/requirements.md in this repository: it is the whole specification. Work only inside this directory, use the Python standard library only, add your unit tests under tests/ and keep tests/test_smoke.py as it is. Do not run git commit; the harness commits your working tree when you are done."
+   }
+  },
+  {
+   "arm": "aisef",
+   "bundle_path": "${SCRATCH}/approved/w1-a-arms.json",
+   "evaluator_path": "${SCRATCH}/approved/w1-a-evaluator.json",
+   "rep": 1,
+   "run_id": "w1-a-r1-aisef",
+   "settings_path": "${REPO}/closure-evidence/v2/v2.1/e2/dry-run/settings-offline/arm-aisef.json",
+   "workload": {
+    "commit": "e6901e56033d6a30d51e36404d82e4c8d758f99e",
+    "id": "w1-a",
+    "repo": "${SCRATCH}/base/w1-a",
+    "requirements_path": "docs/requirements.md",
+    "task_text": "Implement docs/requirements.md in this repository: it is the whole specification. Work only inside this directory, use the Python standard library only, add your unit tests under tests/ and keep tests/test_smoke.py as it is. Do not run git commit; the harness commits your working tree when you are done."
+   }
+  },
+  {
+   "arm": "aisef+",
+   "bundle_path": "${SCRATCH}/approved/w1-a-arms.json",
+   "evaluator_path": "${SCRATCH}/approved/w1-a-evaluator.json",
+   "rep": 1,
+   "run_id": "w1-a-r1-aisef-plus",
+   "settings_path": "${REPO}/closure-evidence/v2/v2.1/e2/dry-run/settings-offline/arm-aisef-plus.json",
+   "workload": {
+    "commit": "e6901e56033d6a30d51e36404d82e4c8d758f99e",
+    "id": "w1-a",
+    "repo": "${SCRATCH}/base/w1-a",
+    "requirements_path": "docs/requirements.md",
+    "task_text": "Implement docs/requirements.md in this repository: it is the whole specification. Work only inside this directory, use the Python standard library only, add your unit tests under tests/ and keep tests/test_smoke.py as it is. Do not run git commit; the harness commits your working tree when you are done."
+   }
+  },
+  {
+   "arm": "direct",
+   "bundle_path": "${SCRATCH}/approved/w2-arms.json",
+   "evaluator_path": "${SCRATCH}/approved/w2-evaluator.json",
+   "rep": 1,
+   "run_id": "w2-r1-direct",
+   "settings_path": "${REPO}/closure-evidence/v2/v2.1/e2/dry-run/settings-offline/arm-direct.json",
+   "workload": {
+    "commit": "ceae06eb5f67f2e6101503308d5bc7ec166b34f5",
+    "id": "w2",
+    "repo": "${SCRATCH}/base/w2",
+    "requirements_path": "docs/requirements-delta.md",
+    "task_text": "You are the developer of this repository. docs/requirements-delta.md in this repository is the authoritative specification: implement every change it asks for (sections 1, 2 and 3), keep what section 4 says must not change, and write the unit tests section 5 asks for, working only inside this directory (the project's own source: infrastructure). When you finish, each clause of docs/requirements-delta.md is verified independently against the requirements. Do not edit docs/requirements-delta.md. Do not run git commit; the harness commits your working tree."
+   }
+  },
+  {
+   "arm": "aisef",
+   "bundle_path": "${SCRATCH}/approved/w2-arms.json",
+   "evaluator_path": "${SCRATCH}/approved/w2-evaluator.json",
+   "rep": 1,
+   "run_id": "w2-r1-aisef",
+   "settings_path": "${REPO}/closure-evidence/v2/v2.1/e2/dry-run/settings-offline/arm-aisef.json",
+   "workload": {
+    "commit": "ceae06eb5f67f2e6101503308d5bc7ec166b34f5",
+    "id": "w2",
+    "repo": "${SCRATCH}/base/w2",
+    "requirements_path": "docs/requirements-delta.md",
+    "task_text": "You are the developer of this repository. docs/requirements-delta.md in this repository is the authoritative specification: implement every change it asks for (sections 1, 2 and 3), keep what section 4 says must not change, and write the unit tests section 5 asks for, working only inside this directory (the project's own source: infrastructure). When you finish, each clause of docs/requirements-delta.md is verified independently against the requirements. Do not edit docs/requirements-delta.md. Do not run git commit; the harness commits your working tree."
+   }
+  },
+  {
+   "arm": "aisef+",
+   "bundle_path": "${SCRATCH}/approved/w2-arms.json",
+   "evaluator_path": "${SCRATCH}/approved/w2-evaluator.json",
+   "rep": 1,
+   "run_id": "w2-r1-aisef-plus",
+   "settings_path": "${REPO}/closure-evidence/v2/v2.1/e2/dry-run/settings-offline/arm-aisef-plus.json",
+   "workload": {
+    "commit": "ceae06eb5f67f2e6101503308d5bc7ec166b34f5",
+    "id": "w2",
+    "repo": "${SCRATCH}/base/w2",
+    "requirements_path": "docs/requirements-delta.md",
+    "task_text": "You are the developer of this repository. docs/requirements-delta.md in this repository is the authoritative specification: implement every change it asks for (sections 1, 2 and 3), keep what section 4 says must not change, and write the unit tests section 5 asks for, working only inside this directory (the project's own source: infrastructure). When you finish, each clause of docs/requirements-delta.md is verified independently against the requirements. Do not edit docs/requirements-delta.md. Do not run git commit; the harness commits your working tree."
+   }
+  }
+ ]
+}
