@@ -80,7 +80,8 @@ còn giữ một approval chỉ vì `contract_hash` không đổi (chỉ thị 2
 theo quy tắc danh tính V2-007. Với từng contract, `migrate` đọc những thay đổi capability mà probe tự khai báo cho các
 `CAPABILITY_VERSION` nằm giữa bản phát hành của bundle (`bundle_cli.RELEASES`) và bản này (`CAPABILITY_CHANGES` trong
 module probe). Một thay đổi **chọn trúng** contract — theo lớp quan sát và `subject_absence`, không tên contract nào được
-viết cứng — thì approval của contract đó bị giữ lại khỏi ứng viên; nó vẫn nằm nguyên trong bundle gốc, làm lịch sử. Một
+viết cứng — thì approval của contract đó **không được mang sang ứng viên**: nó chỉ còn nằm nguyên trong bundle gốc, làm
+lịch sử, và không có hiệu lực trong ứng viên mới. Một
 `CAPABILITY_VERSION` được nâng mà không có bản khai báo đúng dạng cho nó là **đóng** (fail-closed): nó chọn mọi contract
 của probe đó (cũng vậy khi probe không khai báo phiên bản, hoặc không phải probe mà bản phát hành đã dùng). Điều này
 **không** phủ một thay đổi hành vi mà không nâng phiên bản: nó không bị thấy (D-2, bên dưới). Một obligation mà không bản phát
@@ -94,20 +95,21 @@ Báo cáo (JSON ra stdout; lưu bằng `>`):
 | `needs_owner_reapproval` | mỗi contract một lệnh `aisef bundle approve … --approver human:NAME --out …`, nối tiếp (lệnh sau đọc tệp lệnh trước ghi), với đường dẫn thật; `then` là `aisef bundle lint` cho tệp cuối. Chỉ còn `human:NAME` để người sở hữu thay bằng `human:` và tên mình: `approve` từ chối nguyên chuỗi `human:NAME` (không ghi tệp, mã thoát 2), nên dán nguyên văn không ký gì |
 | `candidate` | `bundle_digest` = sha256 JSON chuẩn tắc mà `load` gán cho project; `file_sha256` = sha256 byte của tệp vừa ghi; `plan_hash`, `approvals_kept`, `contracts_to_approve`, `loads` |
 | `approvals_kept_grounds` | căn cứ giữ từng nhóm approval: probe, lớp, `subject_absence`, các phiên bản capability đã đọc |
-| `approvals_withheld` | approval nào bị giữ lại, ai duyệt, lúc nào |
+| `approvals_withheld` | approval nào không được mang sang ứng viên (chỉ còn trong bundle gốc, làm lịch sử), ai duyệt, lúc nào |
 | `limits` | điều quy tắc **không** thấy (dưới đây) |
 
 Mã thoát 0 nghĩa là di trú đã xong. Nếu có contract bị chọn, ứng viên **chưa nạp được** (`candidate.loads: false`) và
 `aisef bundle lint candidate.json` báo `NOT_READY` (mã 1) cho tới khi người sở hữu duyệt lại đúng các contract đó. Công cụ
-không bao giờ tự ký hay chuyển approval.
+không bao giờ tự ký hay chuyển approval. Quy tắc, nói gọn: approval bị ảnh hưởng bởi thay đổi ngữ nghĩa chỉ được giữ làm
+lịch sử trong bundle gốc, không tiếp tục có hiệu lực trong bundle ứng viên mới.
 
-`aisef bundle seal … --keep-approvals-from OLD` áp cùng quy tắc: approval bị giữ lại vì thay đổi capability được nêu trong
-`approvals_withheld_semantic` và contract của nó nằm trong `to_approve`. Gọi `seal()` từ mã với `approvals` thì phải
+`aisef bundle seal … --keep-approvals-from OLD` áp cùng quy tắc: approval không được mang sang vì thay đổi capability (không
+có hiệu lực trong bundle mới) được nêu trong `approvals_withheld_semantic` và contract của nó nằm trong `to_approve`. Gọi `seal()` từ mã với `approvals` thì phải
 truyền cả `exposed` (`bundle_cli.exposure_of` của bundle gốc), nếu không nó bị từ chối.
 
 **Bundle LedgerLock 2.0.0 của kho** (`closure-evidence/v2/release/LEDGERLOCK-PROJECT.json`; đo lại trên `3e1e83a`, đầu ra
-vào thư mục ngoài repo, đầu vào không đổi): `migrate` thoát 0, giữ **53 trong 59** approval và giữ lại **sáu** contract —
-`BC-V22-S-10-a`, `S-10-b`, `S-10-c`, `S-12-a`, `S-12-b`, `S-12-c`; `lint` ứng viên báo `NOT_READY` với đúng sáu contract
+vào thư mục ngoài repo, đầu vào không đổi): `migrate` thoát 0, giữ **53 trong 59** approval và không mang sang approval của **sáu** contract —
+`BC-V22-S-10-a`, `S-10-b`, `S-10-c`, `S-12-a`, `S-12-b`, `S-12-c` (chúng chỉ còn trong bundle gốc, làm lịch sử); `lint` ứng viên báo `NOT_READY` với đúng sáu contract
 trong `to_approve` (`candidate.bundle_digest` `1010f0da…7417`, `file_sha256` `a21fa2c7…5f03`).
 - **Sáu, không phải bốn.** Chủ dự án đã nêu bốn (`S-10-a`, `S-12-a`, `S-12-b`, `S-12-c`). Cả sáu là `grep_count` với
   `REQUIRES_SUBJECT`, và bộ chọn chỉ thấy lớp quan sát cùng `subject_absence`, không thấy repo hay đường dẫn: PM-9 (một lựa
@@ -137,7 +139,7 @@ trong `to_approve` (`candidate.bundle_digest` `1010f0da…7417`, `file_sha256` `
   Đổi sau này tốn nhiều: đổi `CAPABILITY_VERSION` đổi spec id, hiệu chuẩn, bản ghi dẫn xuất và buộc đo lại ba probe (203 target,
   ≈ 4,4k mutant, ~8–9 giờ; `SCOPE-BEFORE-PIN.md` §5).
 - **PM-9 không được cửa sổ di trú.** 59 approval `human:owner` ở `closure-evidence/v2/cycle2/P5-CONTRACT-APPROVALS.json`
-  (2026-09-30) không bị cửa sổ sửa hay thu hồi; duyệt lại các contract bị giữ lại là việc của chủ dự án.
+  (2026-09-30) không bị cửa sổ sửa hay thu hồi; duyệt lại các contract mà approval không được mang sang là việc của chủ dự án.
 
 `migrate` đọc khai báo và **không chạy probe**: một thay đổi hành vi của probe mà không tăng `CAPABILITY_VERSION` và không
 khai báo thì không bị thấy, và contract của nó được giữ. Bộ chọn chọn mọi contract *có thể* gặp điều kiện (một lựa chọn
@@ -381,17 +383,17 @@ mới, journal mới, bắt đầu từ commit cuối đã xác nhận — công
 
 | Thay đổi | Ảnh hưởng | Việc cần làm |
 |---|---|---|
-| spec id (ba danh tính) | bundle 2.0.0 bị từ chối | `aisef bundle migrate`: ghi một ứng viên mới, không ký gì; rồi duyệt lại các contract nó giữ lại (§2) |
+| spec id (ba danh tính) | bundle 2.0.0 bị từ chối | `aisef bundle migrate`: ghi một ứng viên mới, không ký gì; rồi duyệt lại các contract mà nó không mang approval sang (§2) |
 | `<out>/probe-python` → `<out>/test-python` | script đọc đường dẫn cũ | đổi tên; probe chạy trên interpreter của aisef |
 | `--check` clone repo như lượt chạy thật | một khoá git không "inert" trong repo của bạn không còn làm `--check` báo sai lý do | không |
 | endpoint `http://` chỉ cho loopback (phân tích host thật) | `http://localhost.evil.example` bị từ chối | dùng https |
 | preflight không theo redirect | endpoint trả 3xx ⇒ OPAQUE | dùng URL cuối cùng |
 | phiên bản `2.1.0.dev0` | gate phát hành từ chối mọi bản dev | đúng chủ ý |
-| `file_artifact` `CAPABILITY_VERSION` 2 → 3 (PM-9) | spec id của mọi spec `file_artifact` đổi; bundle niêm phong trước cửa sổ bị từ chối khi nạp | `seal --keep-approvals-from`; bundle 2.0.0: `migrate` (approval của contract mà một thay đổi capability đã khai báo chọn trúng bị giữ lại, §2) |
+| `file_artifact` `CAPABILITY_VERSION` 2 → 3 (PM-9) | spec id của mọi spec `file_artifact` đổi; bundle niêm phong trước cửa sổ bị từ chối khi nạp | `seal --keep-approvals-from`; bundle 2.0.0: `migrate` (approval của contract mà một thay đổi capability đã khai báo chọn trúng không được mang sang ứng viên — chỉ còn làm lịch sử trong bundle gốc, §2) |
 | lựa chọn không có tệp nào là chủ thể vắng (PM-9) | `grep_count`/`python_imports` `REQUIRES_SUBJECT` trên thư mục không còn tệp được chọn: trước `SATISFIED` (hoặc `REFUTED`), nay `INDETERMINATE(PRECONDITION_ABSENT)` | đọc §8.1, §8.7; chủ dự án quyết duyệt lại |
 | `bundle continue` nghiêm hơn | journal mà `--verify` từ chối nay bị từ chối ở `continue`; `RUN.json` không đọc được không còn bị hạ xuống `RUN.started.json` | đọc mã `EVIDENCE_*` (§5) |
 | claim: bằng chứng của child không đọc được | trước bị coi chưa bắt đầu và bị thay thế; nay `UNREAD`, chỉ thay bằng sha256 do người vận hành nêu | không (đường thoát `--supersede-claim` còn) |
-| `migrate` và `seal --keep-approvals-from` không giữ approval chỉ vì `contract_hash` không đổi | trước giữ mọi approval còn buộc đúng hash; nay approval của contract mà một thay đổi capability đã khai báo chọn trúng bị giữ lại, và ứng viên chưa nạp được (`lint` `NOT_READY`) cho tới khi duyệt lại | §2; duyệt lại là việc của chủ dự án |
+| `migrate` và `seal --keep-approvals-from` không giữ approval chỉ vì `contract_hash` không đổi | trước giữ mọi approval còn buộc đúng hash; nay approval của contract mà một thay đổi capability đã khai báo chọn trúng không được mang sang ứng viên (chỉ còn làm lịch sử trong bundle gốc, không có hiệu lực trong ứng viên), và ứng viên chưa nạp được (`lint` `NOT_READY`) cho tới khi duyệt lại | §2; duyệt lại là việc của chủ dự án |
 | trạng thái `INDETERMINATE` của kiểm chứng finding | trước: probe chạy mà không quyết được vẫn mang trạng thái `NOT_REPRODUCED`; nay `INDETERMINATE`, và `NOT_REPRODUCED` chỉ cho `SATISFIED`; bản ghi cũ được đọc như đã viết | đọc `verification.status` (§8.3) |
 | regex của luồng `{"regex": r}` (`cli_invocation`) khớp trong một tiến trình con | trước: `re.search` trong chính tiến trình probe, không hạn chót (một mẫu như `(a+)+$` treo kernel); nay hết hạn / không khởi động được / chết ⇒ `UNRUNNABLE` (review: `UNVERIFIABLE`), không bao giờ `REFUTED` hay `NOT_REPRODUCED` | đơn giản hoá mẫu, hoặc nâng `timeouts_s.probe` có chủ đích (§8.3) |
 | `aisef run --parent` khi bằng chứng của dòng dõi có mà không đọc được | trước cửa sổ: một journal không đọc được bị đếm như "0 request đã biết"; ở đợt đầu của cửa sổ: chi phí unknown mà `--accept-unaccounted` chấp nhận; nay thoát 2 trước clone, admission và preflight, không cờ nào mở | khôi phục bằng chứng (§5) |
@@ -894,7 +896,7 @@ một exception, nay `UNRUNNABLE`. Mẫu `grep` của LedgerLock không có lư�
 
 | Nơi kho giữ | Gì | verdict có thể đổi | approval |
 |---|---|---|---|
-| `closure-evidence/v2/release/LEDGERLOCK-PROJECT.json` | bundle 2.0.0 của LedgerLock; 9 contract `file_artifact`: `BC-V22-S-10-a`, `S-12-a`, `S-12-b`, `S-12-c` (`grep_count`, `matches: 0`, `REQUIRES_SUBJECT`, `path:ledgerlock`, `.py`) thuộc lớp PM-9; `S-10-b`, `S-10-c` (một tệp, `matches: 1`) và `S-13-a/b/c` (`exists`) thì không thuộc lớp PM-9 | PM-9: chỉ khi `ledgerlock/` không chọn ra `.py` nào (hôm nay có). PM-11: `S-10-a/b/c`, `S-12-a/b` (neo `^`) chỉ khi một tệp `.py` được chọn có BOM đứng đầu (chưa đo) | `migrate` (đợt hai) mang 53 trong 59 approval theo luật danh tính và **giữ lại** approval của sáu contract (`S-10-a`, `S-10-b`, `S-10-c`, `S-12-a`, `S-12-b`, `S-12-c`) khỏi ứng viên — bộ chọn không thấy đường dẫn nên chọn cả `S-10-b`, `S-10-c` (§2); bundle gốc và approval của nó không bị sửa; duyệt lại là việc của chủ dự án |
+| `closure-evidence/v2/release/LEDGERLOCK-PROJECT.json` | bundle 2.0.0 của LedgerLock; 9 contract `file_artifact`: `BC-V22-S-10-a`, `S-12-a`, `S-12-b`, `S-12-c` (`grep_count`, `matches: 0`, `REQUIRES_SUBJECT`, `path:ledgerlock`, `.py`) thuộc lớp PM-9; `S-10-b`, `S-10-c` (một tệp, `matches: 1`) và `S-13-a/b/c` (`exists`) thì không thuộc lớp PM-9 | PM-9: chỉ khi `ledgerlock/` không chọn ra `.py` nào (hôm nay có). PM-11: `S-10-a/b/c`, `S-12-a/b` (neo `^`) chỉ khi một tệp `.py` được chọn có BOM đứng đầu (chưa đo) | `migrate` (đợt hai) mang 53 trong 59 approval theo luật danh tính và **không mang sang** approval của sáu contract (`S-10-a`, `S-10-b`, `S-10-c`, `S-12-a`, `S-12-b`, `S-12-c`): chúng chỉ còn trong bundle gốc, làm lịch sử, không có hiệu lực trong ứng viên — bộ chọn không thấy đường dẫn nên chọn cả `S-10-b`, `S-10-c` (§2); bundle gốc và approval của nó không bị sửa; duyệt lại là việc của chủ dự án |
 | `closure-evidence/v2/v2.1/P5-PLAN-V2.2-PROPOSAL.json`, `closure-evidence/v2/cycle2/P5-PLAN-V2.2-PROPOSAL.json`, `closure-evidence/v2/v2.1/PLAN-V2.2-CORRECTION-1.json` | cùng 4 contract và 5 contract không bị ảnh hưởng của kế hoạch PLAN-V2.2 | như trên | `closure-evidence/v2/cycle2/P5-CONTRACT-APPROVALS.json`: 59 approval `human:owner` (2026-09-30); `binds` nêu `proposal_digest`, `plan_hash`, baseline, bản ghi đề xuất và candidate: `proposal_digest` và `plan_hash` đổi khi spec id đổi (đề xuất và kế hoạch nêu 59 spec id PPS). `spec_id` của mỗi approval là mã tiêu chí `S-*`, không phải spec id PPS, và nằm ngoài bảy trường của digest approval, nên không đổi; cửa sổ không dựng lại và không di trú chúng sang digest mới |
 | `aisef2/app/examples/calc-3-stories.json` | `BC-STDLIB`: `python_imports` trên `path:app`, `matches: 0`, `REQUIRES_SUBJECT` (ví dụ sống) | chỉ khi `app/` không còn `.py` (canary 2b chạy mẫu này trên lựa chọn không rỗng: không bị ảnh hưởng) | ví dụ không mang approval của chủ dự án |
 | `docs/v2.1/drafts/LEDGERLOCK-BC-V22-S-10-a-r2.DRAFT.json` | bản nháp r2 của `BC-V22-S-10-a`: hai contract `python_imports` `REQUIRES_SUBJECT`, `matches: 0` | như trên | bản nháp chưa duyệt (B-04) |
@@ -909,5 +911,5 @@ Một `ContractApproval` buộc `requirement_hash` và `contract_hash`, không b
 `approved` cho contract mà quan sát của nó vừa đổi nghĩa nếu approval ấy còn trong bundle: `lint`/`explain` không có cơ chế
 đánh dấu approval cũ (có nên có không: backlog V21-61). Đợt hai thêm một cơ chế **ở lúc di trú, không ở lúc đọc**:
 `migrate` và `seal --keep-approvals-from` không còn mang approval của contract mà một thay đổi capability đã khai báo chọn
-trúng (§2). Duyệt lại (`aisef bundle approve`, trên digest mới) là **việc của chủ dự án**, không phải của bất kỳ lệnh nào ở
+trúng sang bundle mới (approval ấy chỉ còn làm lịch sử trong bundle gốc, §2). Duyệt lại (`aisef bundle approve`, trên digest mới) là **việc của chủ dự án**, không phải của bất kỳ lệnh nào ở
 đây: sáu contract của LedgerLock ở §2, vì chủ dự án đã giữ sáu (D-1, 2026-10-18).

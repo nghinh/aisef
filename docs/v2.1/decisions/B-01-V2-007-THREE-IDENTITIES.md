@@ -40,7 +40,8 @@ tính"); không có bản ghi phê duyệt nào được tạo. Không có gì �
 > `contract_hash`, không đổi" và "admit 9/9" **không còn đúng**. Từ chỉ thị 2026-10-15 mục 1 (`d1460fd`), `aisef bundle migrate`
 > không giữ một approval chỉ vì `contract_hash` không đổi: nó ghi một bundle **ứng viên mới**, chỉ mang approval nào mà contract
 > không bị một thay đổi capability đã khai báo (`CAPABILITY_CHANGES`) chọn trúng. Trên LedgerLock 2.0.0: giữ 53 trong 59 approval,
-> giữ lại **sáu** contract (`BC-V22-S-10-a`, `S-10-b`, `S-10-c`, `S-12-a`, `S-12-b`, `S-12-c`); ứng viên chưa nạp được (`lint`
+> không mang sang approval của **sáu** contract (`BC-V22-S-10-a`, `S-10-b`, `S-10-c`, `S-12-a`, `S-12-b`, `S-12-c`) — chúng chỉ
+> còn làm lịch sử trong bundle gốc; ứng viên chưa nạp được (`lint`
 > `NOT_READY`) cho tới khi chủ dự án duyệt lại sáu contract ấy, và admission thật chỉ chứng minh được sau khi hiệu chuẩn sinh lại
 > (USAGE-2.1 §1, §2). Chủ dự án đã giữ sáu ngày 2026-10-18 (D-1). Rủi ro "quên tăng `CAPABILITY_VERSION`" ở mục Tác động bảo mật đã xảy ra
 > với ba probe `cli_invocation`, `process_effect`, `python_callable_v2` (D-2): chủ dự án chấp nhận giới hạn ngày 2026-10-18, nên 50 trong 53
