@@ -17,10 +17,15 @@
    reference satisfies every contract of both bundles; the bare baseline satisfies exactly the hygiene check of the
    evaluator (HC-14, MUST_NOT_HOLD of an absent path) and the stdlib check of the arms (BC-STDLIB), every other
    contract INDETERMINATE or UNSATISFIED there.
+7. HC-08's refutation power, measured from its own fixture: the kinds (added/removed/changed) are derived from the
+   workspace and the snapshot text, the expected stdout must equal the path-ordered interleaving, and none of the six
+   kind-grouped orders (each kind's lines in path order) nor the whole-line sort may equal it.
 Everything observed is written to dry-check/RESULT.json; the exit status is 0 only if every expectation held."""
 from __future__ import annotations
 
 import filecmp
+import hashlib
+import itertools
 import json
 import os
 import pathlib
@@ -81,6 +86,24 @@ def canonical_texts(doc: dict) -> str:
 
 def text_hits(marks: list[str], text: str) -> list[str]:
     return [m for m in marks if m in text or m.replace('"', '\\"') in text]
+
+
+def hc08_orders(evaluator: dict) -> dict:
+    """HC-08's expected stdout against every kind-grouped order of the same lines, from the fixture itself."""
+    c = next(x for x in evaluator["contracts"] if x["id"] == "HC-08")
+    ws = c["stimulus"]["workspace"]
+    old = {p: d for d, p in (line.split("  ") for line in ws["snap.sum"]["text"].splitlines())}
+    new = {p.removeprefix("proj/"): hashlib.sha256(f["text"].encode("utf-8")).hexdigest()
+           for p, f in ws.items() if p.startswith("proj/")}
+    kind = ({p: "added" for p in set(new) - set(old)} | {p: "removed" for p in set(old) - set(new)}
+            | {p: "changed" for p in set(old) & set(new) if old[p] != new[p]})
+    expected = c["observable"]["stdout"]["text"]
+    orders = {" ".join(ks): "".join(f"{k} {p}\n" for k in ks for p in sorted(kind) if kind[p] == k)
+              for ks in itertools.permutations(("added", "removed", "changed"))}
+    orders["whole-line sort"] = "".join(sorted(f"{kind[p]} {p}\n" for p in kind))
+    return {"kinds_from_fixture": {p: kind[p] for p in sorted(kind)},
+            "path_order_from_fixture": "".join(f"{kind[p]} {p}\n" for p in sorted(kind)), "expected_stdout": expected,
+            "orders": {name: {"stdout": out, "equals_expected": out == expected} for name, out in orders.items()}}
 
 
 def approve_all(bundle_path: pathlib.Path, out_dir: pathlib.Path, stem: str) -> pathlib.Path:
@@ -213,6 +236,15 @@ def main(scratch: pathlib.Path) -> int:
     result["baseline_satisfied"] = {w: sorted(c for c, r in result[f"evaluate_{w}_baseline"]["by_contract"].items()
                                               if r["satisfaction"] == "SATISFIED") for w in ("arms", "evaluator")}
 
+    # 7. HC-08: the expected output is the path order, and no kind-grouped order coincides with it (measured)
+    result["hc08_orders"] = hc08_orders(evaluator)
+    counts = {k: list(result["hc08_orders"]["kinds_from_fixture"].values()).count(k) for k in ("added", "removed", "changed")}
+    expect(all(n >= 2 for n in counts.values()), f"HC-08: fewer than two paths of a kind ({counts})")
+    expect(result["hc08_orders"]["path_order_from_fixture"] == result["hc08_orders"]["expected_stdout"],
+           "HC-08: the expected stdout is not the fixture's path-ordered interleaving")
+    expect(not any(o["equals_expected"] for o in result["hc08_orders"]["orders"].values()),
+           "HC-08: a kind-grouped order equals the expected stdout (the contract cannot refute it)")
+
     result["problems"] = problems
     result["ok"] = not problems
     result["finished"] = time.strftime("%Y-%m-%d %H:%M:%S %z")
@@ -229,7 +261,10 @@ def main(scratch: pathlib.Path) -> int:
                "evaluator": {k: result[f"evaluate_evaluator_{k}"]["satisfied"] for k in ("reference", "baseline")},
                "arms": {k: result[f"evaluate_arms_{k}"]["satisfied"] for k in ("reference", "baseline")},
                "by_contract": {f"{w}_{k}": {c: r["satisfaction"] or r["status"] for c, r in result[f"evaluate_{w}_{k}"]["by_contract"].items()}
-                               for w in ("arms", "evaluator") for k in ("reference", "baseline")}}
+                               for w in ("arms", "evaluator") for k in ("reference", "baseline")},
+               "hc08_orders": {"kinds": result["hc08_orders"]["kinds_from_fixture"],
+                               "expected": result["hc08_orders"]["expected_stdout"],
+                               "equals_expected": {n: o["equals_expected"] for n, o in result["hc08_orders"]["orders"].items()}}}
     print(json.dumps(summary, indent=1))
     return 0 if result["ok"] else 1
 

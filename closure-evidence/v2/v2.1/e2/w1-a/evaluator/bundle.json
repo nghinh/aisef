@@ -244,18 +244,18 @@
    "subject_absence": "REQUIRES_SUBJECT"
   },
   {
-   "contract_hash": "ff082ff27f393cb3f6e522bbec0b45b13481cc0ea647673ac8dab61fede50d15",
+   "contract_hash": "8f4de0473bb85b6331e9d482fd87d736a41065d40f900f69f5499380be968bca",
    "id": "HC-08",
    "observable": {
     "exit_code": 1,
     "stdout": {
      "newline": "\n",
-     "text": "changed a.txt\nadded m.txt\nremoved z.txt\n"
+     "text": "changed a.txt\nadded b.txt\nremoved c.txt\nchanged e.txt\nadded f.txt\nremoved g.txt\n"
     },
     "within_s": 25
    },
    "polarity": "MUST_HOLD",
-   "rationale": "exit code 1 with one changed (a.txt), one added (m.txt) and one removed (z.txt) path: the lines in ascending order of PATH across the three kinds — the path order (a, m, z) interleaves the kinds (changed, added, removed), so output grouped by kind in any order fails",
+   "rationale": "exit code 1 with two changed (a.txt, e.txt), two added (b.txt, f.txt) and two removed (c.txt, g.txt) paths, interleaved: the path order a b c e f g alternates the kinds changed/added/removed/changed/added/removed, so no output grouped by kind — any of the six kind orders, each kind's lines in path order — and no sort of the whole lines equals it (the dry check enumerates all seven: hc08_orders in RESULT.json)",
    "requirement_ids": [
     "R-5.4"
    ],
@@ -270,13 +270,21 @@
       "newline": "\n",
       "text": "alpha-changed\n"
      },
-     "proj/m.txt": {
+     "proj/b.txt": {
       "newline": "\n",
-      "text": "mu\n"
+      "text": "beta\n"
+     },
+     "proj/e.txt": {
+      "newline": "\n",
+      "text": "epsilon-changed\n"
+     },
+     "proj/f.txt": {
+      "newline": "\n",
+      "text": "zeta\n"
      },
      "snap.sum": {
       "newline": "\n",
-      "text": "b6a98d9ce9a2d9149288fa3df42d377c3e42737afdcdaf714e33c0a100b51060  a.txt\n2088d0c4b41022d90f663fa8d8156cb525241b55d30ecdf922c38f94f7efda4c  z.txt\n"
+      "text": "b6a98d9ce9a2d9149288fa3df42d377c3e42737afdcdaf714e33c0a100b51060  a.txt\nae9a6306a205417afddd14316cc1d0d5e04a98f1be10865dce643925ee070ce2  c.txt\nd3f0ff5c901707ff21b5fca337c97e263b8c32fad9b5fa80746b2fd2f76a4292  e.txt\n157268265e4f35cc8a37f399a67d2399ec84c0db309403fda422ddaebc718c9e  g.txt\n"
      }
     }
    },
@@ -622,7 +630,7 @@
     "depends_on": [],
     "expected_parent": "UNSATISFIED_AT_PARENT",
     "ownership_rationale": "hidden: 5.4 differences in path order across kinds, exit 1",
-    "product_proof_spec_id": "PPS-6712bc9e69aa1ba5d989077dfd273354d896ede5552f7ea238a8e796ecba789c",
+    "product_proof_spec_id": "PPS-ea652f9fa5b48326762d8d319cb5dcf985aecf73c9e96e6eb75bd5c80aee44a9",
     "role": "INTRODUCE",
     "story_id": "E"
    },
@@ -663,7 +671,7 @@
     "story_id": "E"
    }
   ],
-  "plan_hash": "cba80e98ed29cd863f332bbde70409ea68935ed32cb39398c9fc7fdbd6a8fc9a",
+  "plan_hash": "d1278ede73aa39040d174ebc6b6d3d2365fd7a75dc1fed3abc7b5a2743cb4a80",
   "plan_quality_policy": {
    "max_fully_pre_satisfied_stories": null,
    "max_pre_satisfied_introduce_ratio": null,

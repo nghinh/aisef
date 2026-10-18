@@ -4,7 +4,9 @@ Lane W1-a of the E2 preparation (owner decision `../../round-5/OWNER-DECISION-20
 `docs/v2.1/EXPERIMENT-PLAN.md`, workload W1 "greenfield, never used in AISEF's development"). One of two independent
 designs; a judge picks. Written 2026-10-18 13:00–13:15 +07 on branch `lane/e2-w1-a` (3555699); the judge's verdict
 applied 2026-10-18 13:53–14:15 +07 on `lane/e2-w1-a-2` (W1-FIX: six defects, four grafts from lane W1-b, re-sealed,
-dry check re-run — §8). Offline throughout: no provider, no client, no network request, no `opencode`, no `aisef run`.
+dry check re-run — §5); HC-08's fixture corrected 2026-10-18 14:37–14:50 +07 on `lane/e2-w1-a-3` (W1-3: two paths per
+kind, the seven alternative orders enumerated and measured — §4, §5 item 8; the evaluator re-sealed, the arms' bundle
+untouched). Offline throughout: no provider, no client, no network request, no `opencode`, no `aisef run`.
 
 **What this is:** a public task (`baseline/docs/requirements.md`), a reproducible baseline repository
 (`init_repo.sh`), the one-line prompt of arm A (`direct-task.txt`), the arms' bundle for B/C (`arms/`, 13 contracts),
@@ -45,7 +47,7 @@ a story's named tests on its own clean interpreter, which is where 6.1 is enforc
 | `init_repo.sh DEST` | a clean git repository with one commit of `baseline/`, **reproducible** (fixed identity and dates, modes 0644, no user/system git config): commit `e6901e56033d6a30d51e36404d82e4c8d758f99e`, tree `0f759f57e89b59283eac5670d1241274e97b4181`; `harness.source_identity`: archive sha256 `c557e08b3c6307a5af8092002bc4231ad8ac7c2102eeaa1638c382eec0142c32` (20480 bytes), files sha256 `c01f60eeb379acc1ae83fa6db55d524908ee5df2185122fa188413a9f9169e68`. `docs/requirements.md` sha256 `630740d3ec0c1343444024726f30758ca0dd3406b3b66f83c8e5be00c10cf373` (the manifest's `workload.requirements_sha256`). Unchanged by W1-FIX |
 | `direct-task.txt` | the one-line prompt proposed for arm A `direct` (grafted from W1-b: implement `docs/requirements.md`, stdlib only, tests under `tests/`, keep `tests/test_smoke.py`, do not run `git commit` — the harness commits the working tree); the orchestrator fixes it in the manifest |
 | `arms/authoring.json`, `arms/bundle.json` | the arms' bundle (B `aisef`, C `aisef+`): authoring source and the sealed, unapproved bundle (`aisef bundle seal --repo <init_repo.sh output>`), **13 contracts**, 13 requirement clauses, plan `PLAN-treesum-arms`, plan hash `bb092751…`, baseline `e6901e56…`; file sha256 `80acc8509b0110b8ac72845d1331b47108d5e0d3b54a250da95307513364c254` |
-| `evaluator/authoring.json`, `evaluator/bundle.json` | the hidden evaluator: **12 contracts**, plan `PLAN-treesum-hidden`, plan hash `cba80e98…`, baseline `e6901e56…`, **approvals: none**; file sha256 `3d87c6323ce23b722bd737bd51d9e0dd5a33e1ec213532b7d3e786a322ba279c` |
+| `evaluator/authoring.json`, `evaluator/bundle.json` | the hidden evaluator: **12 contracts**, plan `PLAN-treesum-hidden`, plan hash `d1278ede…`, baseline `e6901e56…`, **approvals: none**; file sha256 `d004a92b4671ea3ca0a31dac84e2d836ca1728327de55369aa7d4b8577070465` (W1-3; the W1-FIX seal `3d87c632…`, plan hash `cba80e98…`, is void) |
 | `APPROVE.sh human:<name>` | the owner's `aisef bundle approve` commands for **both** bundles (arms first, then the evaluator), one contract per command, chained into new files; lints each (expected READY); never overwrites (below). Not run by the lane on the lane's files |
 | `dry-check/dry_check.py`, `dry-check/RESULT.json` | the offline dry check (§5) and what it observed, per contract |
 | `dry-check/reference/treesum/` | a reference implementation used by the dry check only, never given to an arm (the arms start from `baseline/`; this directory is not in it) |
@@ -118,7 +120,7 @@ which holds of an empty package and must keep holding) — `dry-check/RESULT.jso
 | HC-05 | python_callable `returns` | `compare` with every category non-empty, two entries where order shows, inputs in scrambled key order, one unchanged entry | 4.1 "each a list of paths in ascending order"; "changed: in both whose digests differ" | set differences sorted, as 4.1 says | lists in dict/iteration order; an unchanged entry in `changed`; a missing empty key |
 | HC-06 | cli_invocation `exits_streams` | `build DIR` over `z.txt`, `a/m.txt`, `a/b/c.txt` prints `a/b/c.txt`, `a/m.txt`, `z.txt` in that order, exit 0 | 2.1 (recursive, `/`), 3.1 (ascending path, plain string order), 5.2 | `dumps` sorts the full relative path as a string | walk order (`z.txt` before the subdirectory; or `a/m.txt` before `a/b/c.txt` by directory level); `os.sep` on Windows |
 | HC-07 | cli_invocation `exits_files` (+ `pre`) | `build DIR -o FILE` run twice (pre-step, then main): FILE holds exactly one snapshot, exit 0 | 5.3 "creating it, or replacing its previous content" | the file is opened for writing (truncating) each time | append mode (FILE holds two snapshots). `exits_files` sees FILE and the exit code only — standard output is HC-13's |
-| HC-08 | cli_invocation `exits_streams` | `verify` where `a.txt` changed, `m.txt` was added and `z.txt` removed prints `changed a.txt`, `added m.txt`, `removed z.txt` in that order, exit 1 | 5.4 "one line per difference, in ascending order of path", "exits 1 when there is at least one" | lines are sorted by path across the three kinds | lines grouped by kind: the path order (a, m, z) interleaves the kinds (changed, added, removed), so any grouping — `added/removed/changed`, `added/changed/removed`, alphabetical by kind — prints another order; exit 0 with output; missing word or extra formatting |
+| HC-08 | cli_invocation `exits_streams` | `verify` where `a.txt` and `e.txt` changed, `b.txt` and `f.txt` were added and `c.txt` and `g.txt` removed prints `changed a.txt`, `added b.txt`, `removed c.txt`, `changed e.txt`, `added f.txt`, `removed g.txt` in that order, exit 1 | 5.4 "one line per difference, in ascending order of path", "exits 1 when there is at least one" | lines are sorted by path across the three kinds | lines grouped by kind: the path order a b c e f g alternates the kinds changed/added/removed/changed/added/removed, so each of the six kind-grouped orders and the whole-line sort prints another order — all seven enumerated and measured, §5 item 8; exit 0 with output; missing word or extra formatting |
 | HC-09 | cli_invocation `exits_streams` | `verify DIR <missing FILE>`: exit 2, stdout empty | 5.5 "a FILE that cannot be read … exits 2 with a message on standard error and nothing on standard output" | the clause states the status and the empty stdout | an uncaught `FileNotFoundError` (traceback, exit 1) |
 | HC-12 | process_effect `scenario_files` | in one workspace: `build . -o ./snap.sum` exits 0; `verify . ./snap.sum` exits 0; the harness changes `b.txt`; `verify` exits 1; at the end `snap.sum` has **2** lines and `a.txt` is as it was | 5.3 "when FILE lies inside DIR, FILE is not an entry of the snapshot"; 5.4 "… it is ignored, as in 5.3"; 5.4 exit codes | the relative path of FILE under DIR is dropped on both sides, so the second invocation sees no `added snap.sum`; a changed file is a difference | the snapshot lists itself (3 lines); `verify` right after `build` exits 1; the tool rewrites files it reads |
 | HC-13 | cli_invocation `exits_streams` | `build DIR -o FILE` (once): exit 0 and stdout **empty** — HC-07's sibling | 5.3 "with nothing on standard output" | the text goes to FILE instead of stdout | printing the text as well as writing the file (HC-07 cannot see this: `exits_files` carries no stream) |
@@ -132,7 +134,12 @@ Every class used is calibrated in this release (`lint`: `criteria_without_calibr
 **Changes from the judged version (W1-FIX).** HC-01 (the empty file's digest, near-free) was swapped for 1.2's
 `FileNotFoundError`. HC-08's fixture was changed: the judged one (`a/m.txt` added, `old.txt` removed, `z.txt`
 changed) sorted the paths in the same order as a kind grouping (added, removed, changed), so it could not tell the
-two apart. HC-13 was added as HC-07's sibling because `exits_files` cannot carry stdout. HC-11 (`file_artifact
+two apart. The W1-FIX fixture (`a.txt` changed, `m.txt` added, `z.txt` removed) still had one path per kind, so
+exactly one of the six kind-grouped orders — changed, added, removed — coincided with the path order and this
+README's "any grouping fails" overclaimed; **W1-3** (`lane/e2-w1-a-3`) made it two paths per kind, interleaved
+(a changed, b added, c removed, e changed, f added, g removed): no kind grouping can put the two `changed` lines at
+positions 1 and 4, and the dry check now measures that over all seven alternatives (§5 item 8) instead of arguing
+it. HC-13 was added as HC-07's sibling because `exits_files` cannot carry stdout. HC-11 (`file_artifact
 python_imports` over `tests/`) was removed: its subject `path:tests` defeated the kernel's test-artefact rule by prefix
 (`_TEST_ARTEFACT` sees `/tests/` and `tests.`, not `path:tests`; W1-b hit the rule with `tests/`), and its `allowed:
 ["treesum"]` refuted a legitimate `from tests.helpers import …` — the hygiene check HC-14 (W1-b's C-1 graft) takes its
@@ -142,11 +149,13 @@ uncaught `FileNotFoundError`). Every hidden window was set to 15 / 25 / 45 / 60 
 
 ## 5. Dry check (offline; `dry-check/dry_check.py`, record `dry-check/RESULT.json`)
 
-Command, from the AISEF repository root at `3555699` plus this lane's changes, Python 3.14.7, git 2.53.0, `PATH`
-stripped of every directory holding an executable `opencode`, `HOME`/`XDG_*`/`TMPDIR` under a scratch directory,
-`NINEROUTER_API_KEY` unset, under `nice -n 19` — run twice, 2026-10-18: the first started 14:08:09 +07 (the seals
-written; its record was superseded), the second 14:09:22 → 14:10:00 +07 (the committed seals compared; `RESULT.json`
-is the second run):
+Command, from the AISEF repository root at `eb96b28` plus this lane's changes (W1-3; the W1-FIX runs of 14:08–14:10
++07 at `3555699` are superseded), Python 3.14.7, git 2.53.0, `PATH` stripped of every directory holding an executable
+`opencode` (`command -v opencode` → none), `HOME`/`XDG_*`/`TMPDIR` under a scratch directory (the overrides were
+honoured: the runner printed the scratch paths, nothing was written under them), `NINEROUTER_API_KEY` unset, under
+`nice -n 19` — run twice, 2026-10-18: the first 14:42:04 → 14:42:40 +07 (the evaluator's seal written after the stale
+W1-FIX one was removed; its record was superseded), the second 14:42:50 → 14:43:26 +07 (the committed seals compared;
+`RESULT.json` is the second run):
 
     nice -n 19 /opt/homebrew/bin/python3 -P -B closure-evidence/v2/v2.1/e2/w1-a/dry-check/dry_check.py <scratch>
 
@@ -157,7 +166,8 @@ Observed (`RESULT.json`, `"ok": true`, `"problems": []`, both runs):
    move).
 2. `aisef bundle seal … --repo <that repository>`: arms 13 specs, evaluator 12 specs, both with `approvals_kept: 0`;
    the committed `bundle.json` files equal a fresh seal byte for byte (`committed_bundle_matches_fresh_seal: true`,
-   second run). Arms plan hash `bb092751…`, evaluator `cba80e98…`.
+   second run). Arms plan hash `bb092751…` (unchanged: the arms' bundle is byte-identical to W1-FIX, sha256
+   `80acc850…`), evaluator `d1278ede…` (W1-3).
 3. `aisef bundle lint` on both committed bundles: exit 1, `NOT_READY`, `to_approve` 13 and 12, admission "not run: an
    unapproved contract does not compile", `criteria_without_calibration: []`, `criteria_without_contract: []`, no
    uncovered requirement, no stray criterion — **NOT_READY only for the missing approvals**, as expected.
@@ -178,7 +188,29 @@ Observed (`RESULT.json`, `"ok": true`, `"problems": []`, both runs):
    REQUIRES_SUBJECT), arms **1/13** (BC-STDLIB; the other twelve INDETERMINATE). What the arms add is what is measured.
 7. `APPROVE.sh`, on a **copy** of `arms/` and `evaluator/` in scratch with the dry-check approver: both chains written
    (13 + 12 files, `approved.json` linked), both lints `READY`; a second invocation refused (`approved-1.json exists`,
-   exit 2); the approver `nobody` refused (exit 2). Nothing was written beside the lane's files.
+   exit 2); the approver `nobody` refused (exit 2). Nothing was written beside the lane's files. Re-run in W1-3 on a
+   fresh copy of the re-sealed evaluator (14:46:00 → 14:46:11 +07, same environment as the dry check): the same
+   observations — 13 + 12 approvals, both lints `READY` (`admitted: true`), both refusals exit 2, `arms/` and
+   `evaluator/` of the lane still hold only `authoring.json` and `bundle.json`.
+8. HC-08's refutation power, measured from the fixture itself (`hc08_orders` in `RESULT.json`; W1-3): the kinds
+   derived from the workspace and the snapshot text are a changed, b added, c removed, e changed, f added, g removed
+   (two of each); the path-ordered interleaving equals the contract's expected stdout; and each of the seven
+   alternative orders differs from it:
+
+   | order (each kind's lines in path order) | stdout, as lines | equals expected |
+   |---|---|---|
+   | **expected = path order** | changed a, added b, removed c, changed e, added f, removed g | — |
+   | added removed changed | added b, added f, removed c, removed g, changed a, changed e | false |
+   | added changed removed | added b, added f, changed a, changed e, removed c, removed g | false |
+   | removed added changed | removed c, removed g, added b, added f, changed a, changed e | false |
+   | removed changed added | removed c, removed g, changed a, changed e, added b, added f | false |
+   | changed added removed | changed a, changed e, added b, added f, removed c, removed g | false |
+   | changed removed added | changed a, changed e, removed c, removed g, added b, added f | false |
+   | whole-line sort (`sorted(lines)`) | added b, added f, changed a, changed e, removed c, removed g | false |
+
+   The whole-line sort coincides with the alphabetical kind grouping (added, changed, removed), so seven rows cover
+   six distinct outputs. The reference is SATISFIED on HC-08 (item 6), so the expected text is also what a faithful
+   implementation prints; the dry check fails if any row were `true` or if a kind had fewer than two paths.
 
 The judged version's first dry run had added `tests/__init__.py` to the baseline (the earlier baseline sha `797940f7…`
 is void); W1-FIX changed nothing in `baseline/`.

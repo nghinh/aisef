@@ -1,5 +1,5 @@
 {
- "aisef_head": "3555699acfe11f4d4c5716902f60cd9810ceba26",
+ "aisef_head": "eb96b28d1a626c4baeee4414e723b5fac040c3f4",
  "baseline": {
   "clean": true,
   "commit": "e6901e56033d6a30d51e36404d82e4c8d758f99e",
@@ -18,7 +18,7 @@
    "commit": "e6901e56033d6a30d51e36404d82e4c8d758f99e",
    "files_sha256": "c01f60eeb379acc1ae83fa6db55d524908ee5df2185122fa188413a9f9169e68",
    "git_version": "git version 2.53.0",
-   "repo": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/w1a2/dry-2/base-1",
+   "repo": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/w1a3/dry/base-1",
    "tree": "0f759f57e89b59283eac5670d1241274e97b4181"
   }
  },
@@ -226,7 +226,7 @@
    }
   },
   "not_satisfied": [],
-  "revision": "b9f8c861a79312cc31bae308bd61bd806e6b74e6",
+  "revision": "41db72029d4cdee9035acd0abbcb26817796bfd7",
   "satisfied": 13,
   "specs": [
    {
@@ -381,11 +381,6 @@
    },
    {
     "satisfaction": "INDETERMINATE",
-    "spec": "PPS-6712bc9e69aa1ba5d989077dfd273354d896ede5552f7ea238a8e796ecba789c",
-    "status": "EXECUTED"
-   },
-   {
-    "satisfaction": "INDETERMINATE",
     "spec": "PPS-91c44b0a8bb57f2fb39e8de3fdddae2bb84b2819712ae74011c5a8d6d0cd1fe2",
     "status": "EXECUTED"
    },
@@ -422,6 +417,11 @@
    {
     "satisfaction": "INDETERMINATE",
     "spec": "PPS-d6a2f6e098d775e7efb7425c6ce02c4e045c14e8ed221adc900da053a762dfa1",
+    "status": "EXECUTED"
+   },
+   {
+    "satisfaction": "INDETERMINATE",
+    "spec": "PPS-ea652f9fa5b48326762d8d319cb5dcf985aecf73c9e96e6eb75bd5c80aee44a9",
     "status": "EXECUTED"
    }
   ],
@@ -479,7 +479,7 @@
    }
   },
   "not_satisfied": [],
-  "revision": "b9f8c861a79312cc31bae308bd61bd806e6b74e6",
+  "revision": "41db72029d4cdee9035acd0abbcb26817796bfd7",
   "satisfied": 12,
   "specs": [
    {
@@ -495,11 +495,6 @@
    {
     "satisfaction": "SATISFIED",
     "spec": "PPS-584de2461c203c758908fcec9e4b7daad735363a3306b38e54e55fc2228a9acb",
-    "status": "EXECUTED"
-   },
-   {
-    "satisfaction": "SATISFIED",
-    "spec": "PPS-6712bc9e69aa1ba5d989077dfd273354d896ede5552f7ea238a8e796ecba789c",
     "status": "EXECUTED"
    },
    {
@@ -541,11 +536,58 @@
     "satisfaction": "SATISFIED",
     "spec": "PPS-d6a2f6e098d775e7efb7425c6ce02c4e045c14e8ed221adc900da053a762dfa1",
     "status": "EXECUTED"
+   },
+   {
+    "satisfaction": "SATISFIED",
+    "spec": "PPS-ea652f9fa5b48326762d8d319cb5dcf985aecf73c9e96e6eb75bd5c80aee44a9",
+    "status": "EXECUTED"
    }
   ],
   "total": 12
  },
- "finished": "2026-10-18 14:10:00 +0700",
+ "finished": "2026-10-18 14:43:26 +0700",
+ "hc08_orders": {
+  "expected_stdout": "changed a.txt\nadded b.txt\nremoved c.txt\nchanged e.txt\nadded f.txt\nremoved g.txt\n",
+  "kinds_from_fixture": {
+   "a.txt": "changed",
+   "b.txt": "added",
+   "c.txt": "removed",
+   "e.txt": "changed",
+   "f.txt": "added",
+   "g.txt": "removed"
+  },
+  "orders": {
+   "added changed removed": {
+    "equals_expected": false,
+    "stdout": "added b.txt\nadded f.txt\nchanged a.txt\nchanged e.txt\nremoved c.txt\nremoved g.txt\n"
+   },
+   "added removed changed": {
+    "equals_expected": false,
+    "stdout": "added b.txt\nadded f.txt\nremoved c.txt\nremoved g.txt\nchanged a.txt\nchanged e.txt\n"
+   },
+   "changed added removed": {
+    "equals_expected": false,
+    "stdout": "changed a.txt\nchanged e.txt\nadded b.txt\nadded f.txt\nremoved c.txt\nremoved g.txt\n"
+   },
+   "changed removed added": {
+    "equals_expected": false,
+    "stdout": "changed a.txt\nchanged e.txt\nremoved c.txt\nremoved g.txt\nadded b.txt\nadded f.txt\n"
+   },
+   "removed added changed": {
+    "equals_expected": false,
+    "stdout": "removed c.txt\nremoved g.txt\nadded b.txt\nadded f.txt\nchanged a.txt\nchanged e.txt\n"
+   },
+   "removed changed added": {
+    "equals_expected": false,
+    "stdout": "removed c.txt\nremoved g.txt\nchanged a.txt\nchanged e.txt\nadded b.txt\nadded f.txt\n"
+   },
+   "whole-line sort": {
+    "equals_expected": false,
+    "stdout": "added b.txt\nadded f.txt\nchanged a.txt\nchanged e.txt\nremoved c.txt\nremoved g.txt\n"
+   }
+  },
+  "path_order_from_fixture": "changed a.txt\nadded b.txt\nremoved c.txt\nchanged e.txt\nadded f.txt\nremoved g.txt\n"
+ },
  "leaks": {
   "arms_distinctive_strings": 26,
   "evaluator_distinctive_strings": 23,
@@ -590,7 +632,7 @@
   },
   "approver": "human:w1a-dry-check",
   "exit": 0,
-  "file": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/w1a2/dry-2/arms.approved-13.json",
+  "file": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/w1a3/dry/arms.approved-13.json",
   "verdict": "READY"
  },
  "lint_arms_unapproved": {
@@ -612,7 +654,7 @@
   },
   "approver": "human:w1a-dry-check",
   "exit": 0,
-  "file": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/w1a2/dry-2/evaluator.approved-12.json",
+  "file": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/w1a3/dry/evaluator.approved-12.json",
   "verdict": "READY"
  },
  "lint_evaluator_unapproved": {
@@ -629,7 +671,7 @@
  "problems": [],
  "python": "3.14.7",
  "reference_candidate": {
-  "commit": "b9f8c861a79312cc31bae308bd61bd806e6b74e6",
+  "commit": "41db72029d4cdee9035acd0abbcb26817796bfd7",
   "files": [
    "treesum/__main__.py",
    "treesum/digest.py",
@@ -663,7 +705,7 @@
  },
  "seal_evaluator": {
   "approvals_kept": 0,
-  "bundle_sha256": "3d87c6323ce23b722bd737bd51d9e0dd5a33e1ec213532b7d3e786a322ba279c",
+  "bundle_sha256": "d004a92b4671ea3ca0a31dac84e2d836ca1728327de55369aa7d4b8577070465",
   "committed_bundle_matches_fresh_seal": true,
   "contracts": [
    "HC-01",
@@ -680,9 +722,9 @@
    "HC-14"
   ],
   "plan_baseline": "e6901e56033d6a30d51e36404d82e4c8d758f99e",
-  "plan_hash": "cba80e98ed29cd863f332bbde70409ea68935ed32cb39398c9fc7fdbd6a8fc9a",
+  "plan_hash": "d1278ede73aa39040d174ebc6b6d3d2365fd7a75dc1fed3abc7b5a2743cb4a80",
   "specs": 12,
   "to_approve": 12
  },
- "started": "2026-10-18 14:09:22 +0700"
+ "started": "2026-10-18 14:42:50 +0700"
 }
