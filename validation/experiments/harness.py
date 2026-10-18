@@ -184,19 +184,23 @@ def evaluate(candidate_repo: pathlib.Path, revision: str, evaluator: Mapping) ->
 
 
 def direct_arm(manifest: Mapping, out: pathlib.Path, *, task: str, client_exe: str, session_kw: dict,
-               timeout_s: float) -> dict:
+               timeout_s: float, **extra) -> dict:
     """Arm `direct`: the client, once, on the public task, in a clone of the baseline; then the harness commits whatever
-    the workspace holds — that commit is the candidate. The client's own "done" is recorded, never trusted."""
+    the workspace holds — that commit is the candidate. The client's own "done" is recorded, never trusted. The clone
+    keeps no remote: a `git push origin` the agent runs has nowhere to go (the source repository is never written).
+    `out` may hold the arm's preflight already (campaign.direct); never a workspace or an ARM.json. `extra`: fields
+    the caller records beside the arm's own (the configured endpoint, the preflight's verdict)."""
     from aisef2.app import client
     if (manifest.get("pair") or {}).get("arm") != "direct":
         raise ValueError("direct_arm runs a manifest of arm direct")
-    if out.exists():
-        raise ValueError(f"{out} exists: an arm's directory is never reused")
-    out.mkdir(parents=True)
+    if (out / "ws").exists() or (out / "ARM.json").exists():
+        raise ValueError(f"{out} holds an arm already: an arm's directory is never reused")
+    out.mkdir(parents=True, exist_ok=True)
     src = manifest["source"]
     ws = out / "ws"
     subprocess.run(["git", "clone", "--quiet", "--no-hardlinks", src["repo"], str(ws)], check=True, capture_output=True)
     git(ws, "checkout", "--quiet", "-B", "main", src["commit"])
+    git(ws, "remote", "remove", "origin")
     started = time.time()
     s = client.session("developer direct", task, str(ws), out / "sessions" / "direct.developer.1.jsonl", timeout_s,
                        exe=client_exe, **session_kw)
@@ -206,8 +210,8 @@ def direct_arm(manifest: Mapping, out: pathlib.Path, *, task: str, client_exe: s
         subprocess.run(["git", "-C", str(ws), "-c", "user.name=harness", "-c", "user.email=harness@aisef",
                         "commit", "--quiet", "-m", "direct arm: the workspace as the client left it"], check=True)
     rec = {"arm": "direct", "manifest_sha256": manifest["manifest_sha256"], "candidate": git(ws, "rev-parse", "HEAD"),
-           "changed": changed, "self_reported": {"error": s.get("error"), "stopped": s.get("stopped")},
-           "wall_s": round(time.time() - started, 3)}
+           "changed": changed, "exit": s.get("exit"), "self_reported": {"error": s.get("error"), "stopped": s.get("stopped")},
+           "wall_s": round(time.time() - started, 3), **extra}
     (out / "ARM.json").write_text(json.dumps(rec, indent=1, sort_keys=True) + "\n", encoding="utf-8")
     return rec
 
