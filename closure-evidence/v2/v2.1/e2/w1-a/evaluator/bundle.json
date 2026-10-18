@@ -1,0 +1,743 @@
+{
+ "approvals": [],
+ "contracts": [
+  {
+   "contract_hash": "4b3dbb902d2770e648ae502a591c6e70f61e28d38d207139f2b6d9a48c48ecdd",
+   "id": "HC-01",
+   "observable": {
+    "returns": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "within_s": 10
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "edge case: a file of zero bytes has the SHA-256 of the empty input; a reader that treats an empty read as an error, or hashes the path, fails",
+   "requirement_ids": [
+    "R-1.1"
+   ],
+   "stimulus": {
+    "args": [
+     "<ws>/empty.bin"
+    ],
+    "workspace": {
+     "empty.bin": {
+      "bytes_hex": ""
+     }
+    }
+   },
+   "subject": {
+    "kind": "python_callable",
+    "locator": "treesum.digest:file_sha256"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "c6e31da0b8fda375fa87e8cb9ee3a9ae9ccc2bf582df23b7df7be454a2c3c30c",
+   "id": "HC-02",
+   "observable": {
+    "raises": "NotADirectoryError",
+    "within_s": 10
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "error handling: a root that is a file raises; os.walk and Path.rglob over a file silently yield nothing, so an implementation without the check returns {} instead",
+   "requirement_ids": [
+    "R-2.3"
+   ],
+   "stimulus": {
+    "args": [
+     "<ws>/plain.txt"
+    ],
+    "workspace": {
+     "plain.txt": {
+      "newline": "\n",
+      "text": "just a file\n"
+     }
+    }
+   },
+   "subject": {
+    "kind": "python_callable",
+    "locator": "treesum.snapshot:build"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "7cd5f14ac48f23a22882f2b5de6096f953892c07b9f7812b6ce7d323396368d9",
+   "id": "HC-03",
+   "observable": {
+    "returns": {
+     "one.txt": "2c8b08da5ce60398e1f19af0e5dccc744df274b826abe585eaba68c525434806",
+     "two.txt": "27dd8ed44a83ff94d557f9fd0412ed5a8cbca69ea04922d88c01184a07300a5a"
+    },
+    "within_s": 10
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "edge case: a leading empty line, a whitespace-only line and a final line without a newline; a parser that splits on newline and parses every piece fails",
+   "requirement_ids": [
+    "R-3.2"
+   ],
+   "stimulus": {
+    "args": [
+     "\n2c8b08da5ce60398e1f19af0e5dccc744df274b826abe585eaba68c525434806  one.txt\n   \n27dd8ed44a83ff94d557f9fd0412ed5a8cbca69ea04922d88c01184a07300a5a  two.txt"
+    ]
+   },
+   "subject": {
+    "kind": "python_callable",
+    "locator": "treesum.snapshot:loads"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "a474ceee66e59e175c54ef1b80e26c710531492e62f42c43b6f529c818308d37",
+   "id": "HC-04",
+   "observable": {
+    "raises": "ValueError",
+    "within_s": 10
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "error handling: the digest field is not 64 lowercase hex characters; a parser that only splits on two spaces accepts it",
+   "requirement_ids": [
+    "R-3.2"
+   ],
+   "stimulus": {
+    "args": [
+     "not-a-digest  one.txt\n"
+    ]
+   },
+   "subject": {
+    "kind": "python_callable",
+    "locator": "treesum.snapshot:loads"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "4fecd1c49ef0a3f854470124f1d99c5e1d2f63f71d613987cd969300a2e96a12",
+   "id": "HC-05",
+   "observable": {
+    "returns": {
+     "added": [
+      "c.txt",
+      "d.txt"
+     ],
+     "changed": [
+      "b.txt",
+      "m.txt"
+     ],
+     "removed": [
+      "z.txt"
+     ]
+    },
+    "within_s": 10
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "every category non-empty, inputs in scrambled key order, two entries per list where order shows: lists must be sorted, an unchanged entry (a.txt) appears nowhere",
+   "requirement_ids": [
+    "R-4.1"
+   ],
+   "stimulus": {
+    "args": [
+     {
+      "a.txt": "27dd8ed44a83ff94d557f9fd0412ed5a8cbca69ea04922d88c01184a07300a5a",
+      "b.txt": "2c8b08da5ce60398e1f19af0e5dccc744df274b826abe585eaba68c525434806",
+      "m.txt": "7d68bc1b419e0dde940d3c316a6750a3f16a0993b32509410407e2c175736e34",
+      "z.txt": "e6843a38061f575aed904235bae6ed9571bb039aa36a9f54a47b536d1e06e3ab"
+     },
+     {
+      "a.txt": "27dd8ed44a83ff94d557f9fd0412ed5a8cbca69ea04922d88c01184a07300a5a",
+      "b.txt": "2088d0c4b41022d90f663fa8d8156cb525241b55d30ecdf922c38f94f7efda4c",
+      "c.txt": "d3f0ff5c901707ff21b5fca337c97e263b8c32fad9b5fa80746b2fd2f76a4292",
+      "d.txt": "2cbd00100f5edce87aa72f04d5227476f3ad4a1b474acb36209ff256467fd715",
+      "m.txt": "ca746b529ef681abf64217dd81011ad14d2928d621fc531ed8f42c2eea6eab1e"
+     }
+    ]
+   },
+   "subject": {
+    "kind": "python_callable",
+    "locator": "treesum.snapshot:compare"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "c4970118e988b382ad08b73a1d03d4c514828e9860387519a435e90f4d808e43",
+   "id": "HC-06",
+   "observable": {
+    "exit_code": 0,
+    "stdout": {
+     "newline": "\n",
+     "text": "7d68bc1b419e0dde940d3c316a6750a3f16a0993b32509410407e2c175736e34  a/b/c.txt\ne6843a38061f575aed904235bae6ed9571bb039aa36a9f54a47b536d1e06e3ab  a/m.txt\n2088d0c4b41022d90f663fa8d8156cb525241b55d30ecdf922c38f94f7efda4c  z.txt\n"
+    },
+    "within_s": 20
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "nested directories two levels deep: relative paths joined with /, lines in plain string order of the whole path (a/b/c.txt before a/m.txt before z.txt), never directory-walk order",
+   "requirement_ids": [
+    "R-5.2"
+   ],
+   "stimulus": {
+    "argv": [
+     "build",
+     "<ws>/proj"
+    ],
+    "workspace": {
+     "proj/a/b/c.txt": {
+      "newline": "\n",
+      "text": "chi\n"
+     },
+     "proj/a/m.txt": {
+      "newline": "\n",
+      "text": "mu\n"
+     },
+     "proj/z.txt": {
+      "newline": "\n",
+      "text": "zeta\n"
+     }
+    }
+   },
+   "subject": {
+    "kind": "cli_invocation",
+    "locator": "treesum:__main__"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "7453f432f257edf9322a110a27454e5e82048ae225f2fa3cfa3af5a889fd3493",
+   "id": "HC-07",
+   "observable": {
+    "exit_code": 0,
+    "files": {
+     "<ws>/out.sum": {
+      "newline": "\n",
+      "text": "2c8b08da5ce60398e1f19af0e5dccc744df274b826abe585eaba68c525434806  one.txt\n27dd8ed44a83ff94d557f9fd0412ed5a8cbca69ea04922d88c01184a07300a5a  two.txt\n"
+     }
+    },
+    "within_s": 20
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "idempotence: the same build -o run twice leaves exactly one snapshot in FILE (5.3 replaces the previous content); an implementation that opens FILE in append mode doubles it",
+   "requirement_ids": [
+    "R-5.3"
+   ],
+   "stimulus": {
+    "argv": [
+     "build",
+     "<ws>/proj",
+     "-o",
+     "<ws>/out.sum"
+    ],
+    "pre": [
+     {
+      "argv": [
+       "build",
+       "<ws>/proj",
+       "-o",
+       "<ws>/out.sum"
+      ]
+     }
+    ],
+    "workspace": {
+     "proj/one.txt": {
+      "newline": "\n",
+      "text": "one\n"
+     },
+     "proj/two.txt": {
+      "newline": "\n",
+      "text": "two\n"
+     }
+    }
+   },
+   "subject": {
+    "kind": "cli_invocation",
+    "locator": "treesum:__main__"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "e3965c0d4318d7ea2776ba24c49040738892b688b63e03bfb444e110c3ad0cac",
+   "id": "HC-08",
+   "observable": {
+    "exit_code": 1,
+    "stdout": {
+     "newline": "\n",
+     "text": "added a/m.txt\nremoved old.txt\nchanged z.txt\n"
+    },
+    "within_s": 20
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "exit code 1 with one added, one removed and one changed path, the lines in ascending order of PATH across the three kinds (not grouped by kind)",
+   "requirement_ids": [
+    "R-5.4"
+   ],
+   "stimulus": {
+    "argv": [
+     "verify",
+     "<ws>/proj",
+     "<ws>/snap.sum"
+    ],
+    "workspace": {
+     "proj/a/m.txt": {
+      "newline": "\n",
+      "text": "mu\n"
+     },
+     "proj/z.txt": {
+      "newline": "\n",
+      "text": "zeta-changed\n"
+     },
+     "snap.sum": {
+      "newline": "\n",
+      "text": "2088d0c4b41022d90f663fa8d8156cb525241b55d30ecdf922c38f94f7efda4c  z.txt\n32f7b637cf5ab87ba96679679e673901c339626b513a6b9d033d360302602080  old.txt\n"
+     }
+    }
+   },
+   "subject": {
+    "kind": "cli_invocation",
+    "locator": "treesum:__main__"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "8798dfac8f0bfcf372a0d456624231144925158e0e8c10521a77055e3416c758",
+   "id": "HC-09",
+   "observable": {
+    "exit_code": 2,
+    "stdout": {
+     "newline": "\n",
+     "text": ""
+    },
+    "within_s": 20
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "error handling: a FILE that cannot be read is a usage error — exit 2 and nothing on standard output; an uncaught FileNotFoundError gives a traceback and exit 1",
+   "requirement_ids": [
+    "R-5.5"
+   ],
+   "stimulus": {
+    "argv": [
+     "verify",
+     "<ws>/proj",
+     "<ws>/absent.sum"
+    ],
+    "workspace": {
+     "proj/a.txt": {
+      "newline": "\n",
+      "text": "lambda\n"
+     }
+    }
+   },
+   "subject": {
+    "kind": "cli_invocation",
+    "locator": "treesum:__main__"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "107b4b09106429adefe0d7101c5685bf93dc2e86b4d09c449ec77e9949f7cfd2",
+   "id": "HC-10",
+   "observable": {
+    "exit_code": 2,
+    "within_s": 20
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "exit code: an unknown subcommand exits 2, not 1 and not 0",
+   "requirement_ids": [
+    "R-5.5"
+   ],
+   "stimulus": {
+    "argv": [
+     "frobnicate"
+    ]
+   },
+   "subject": {
+    "kind": "cli_invocation",
+    "locator": "treesum:__main__"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "91818a78ff72800b8e5509099ec75d37288ae6544fa7fa4cd67132ea25eb16d5",
+   "id": "HC-11",
+   "observable": {
+    "matches": 0,
+    "within_s": 20
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "the tests the agent adds import nothing outside the standard library and treesum (no pytest): counted by syntax over every .py under tests/",
+   "requirement_ids": [
+    "R-6.1"
+   ],
+   "stimulus": {
+    "imports_outside": {
+     "allowed": [
+      "treesum"
+     ],
+     "stdlib": true
+    },
+    "suffixes": [
+     ".py"
+    ]
+   },
+   "subject": {
+    "kind": "file_artifact",
+    "locator": "path:tests"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "01aabba10cc1fd7559d8f0b353abda26869c473fac26df186aebf6293ad90ff4",
+   "id": "HC-12",
+   "observable": {
+    "files": {
+     "<ws>/a.txt": {
+      "equals_before": true
+     },
+     "<ws>/snap.sum": {
+      "line_count": 2
+     }
+    },
+    "within_s": 60
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "end to end, with the snapshot file inside the directory: build excludes it (two lines, not three), verify right after exits 0 (the self-exclusion is applied on both sides), a changed file makes verify exit 1, and the tool leaves the tree's other files untouched",
+   "requirement_ids": [
+    "R-5.3"
+   ],
+   "stimulus": {
+    "scenario": [
+     {
+      "files": {
+       "a.txt": {
+        "newline": "\n",
+        "text": "one\n"
+       },
+       "b.txt": {
+        "newline": "\n",
+        "text": "two\n"
+       }
+      },
+      "step": "workspace"
+     },
+     {
+      "argv": [
+       "-m",
+       "treesum",
+       "build",
+       "<ws>",
+       "-o",
+       "<ws>/snap.sum"
+      ],
+      "step": "subprocess"
+     },
+     {
+      "argv": [
+       "-m",
+       "treesum",
+       "verify",
+       "<ws>",
+       "<ws>/snap.sum"
+      ],
+      "step": "subprocess"
+     },
+     {
+      "newline": "\n",
+      "path": "<ws>/b.txt",
+      "step": "write",
+      "text": "two-changed\n"
+     },
+     {
+      "argv": [
+       "-m",
+       "treesum",
+       "verify",
+       "<ws>",
+       "<ws>/snap.sum"
+      ],
+      "expect_exit": 1,
+      "step": "subprocess"
+     }
+    ]
+   },
+   "subject": {
+    "kind": "process_effect",
+    "locator": "treesum.__main__:main"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  }
+ ],
+ "description": "W1-a (E2, greenfield): treesum — the HIDDEN evaluator. Twelve contracts no arm sees: edge cases, error handling, idempotence and exit codes that a faithful implementation of docs/requirements.md must have; none of their inputs or expectations appears in the public task text or in the arms' bundle.",
+ "facts": {
+  "E-01": {
+   "clause": "1.1",
+   "clause_text": "file_sha256 returns the SHA-256 of the file's bytes.",
+   "requirement": "R-1.1",
+   "section": "§1",
+   "subject": "treesum.digest:file_sha256"
+  },
+  "E-02": {
+   "clause": "2.3",
+   "clause_text": "A root that exists and is not a directory raises NotADirectoryError.",
+   "requirement": "R-2.3",
+   "section": "§2",
+   "subject": "treesum.snapshot:build"
+  },
+  "E-03": {
+   "clause": "3.2",
+   "clause_text": "Empty and whitespace-only lines are ignored; a final line without a newline is read like any other.",
+   "requirement": "R-3.2",
+   "section": "§3",
+   "subject": "treesum.snapshot:loads"
+  },
+  "E-04": {
+   "clause": "3.2",
+   "clause_text": "A malformed line raises ValueError.",
+   "requirement": "R-3.2",
+   "section": "§3",
+   "subject": "treesum.snapshot:loads"
+  },
+  "E-05": {
+   "clause": "4.1",
+   "clause_text": "added, removed and changed, each a list of paths in ascending order.",
+   "requirement": "R-4.1",
+   "section": "§4",
+   "subject": "treesum.snapshot:compare"
+  },
+  "E-06": {
+   "clause": "5.2",
+   "clause_text": "build DIR writes dumps(build(DIR)) to standard output and exits 0.",
+   "requirement": "R-5.2",
+   "section": "§5",
+   "subject": "treesum:__main__ build"
+  },
+  "E-07": {
+   "clause": "5.3",
+   "clause_text": "build DIR -o FILE writes the text to FILE, creating it or replacing its previous content.",
+   "requirement": "R-5.3",
+   "section": "§5",
+   "subject": "treesum:__main__ build -o"
+  },
+  "E-08": {
+   "clause": "5.4",
+   "clause_text": "verify prints one line per difference in ascending order of path and exits 1 when there is at least one.",
+   "requirement": "R-5.4",
+   "section": "§5",
+   "subject": "treesum:__main__ verify"
+  },
+  "E-09": {
+   "clause": "5.5",
+   "clause_text": "A FILE that cannot be read exits 2 with a message on standard error and nothing on standard output.",
+   "requirement": "R-5.5",
+   "section": "§5",
+   "subject": "treesum:__main__ verify"
+  },
+  "E-10": {
+   "clause": "5.5",
+   "clause_text": "An unknown subcommand exits 2.",
+   "requirement": "R-5.5",
+   "section": "§5",
+   "subject": "treesum:__main__"
+  },
+  "E-11": {
+   "clause": "6.1",
+   "clause_text": "Tests import nothing outside the standard library and treesum.",
+   "requirement": "R-6.1",
+   "section": "§6",
+   "subject": "tests/"
+  },
+  "E-12": {
+   "clause": "5.3",
+   "clause_text": "When FILE lies inside DIR, FILE is not an entry of the snapshot.",
+   "requirement": "R-5.3",
+   "section": "§5",
+   "subject": "treesum.__main__:main"
+  }
+ },
+ "format": "aisef-v2-project/1",
+ "name": "treesum-hidden",
+ "plan": {
+  "baseline": "e6901e56033d6a30d51e36404d82e4c8d758f99e",
+  "id": "PLAN-treesum-hidden",
+  "obligations": [
+   {
+    "criterion_id": "E-01",
+    "depends_on": [],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "hidden: 1.1 on an empty file",
+    "product_proof_spec_id": "PPS-22024682d69049cea7d54398c99ee85c775a1a195c9906c0cd9ad0334651e9cf",
+    "role": "INTRODUCE",
+    "story_id": "E"
+   },
+   {
+    "criterion_id": "E-02",
+    "depends_on": [],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "hidden: 2.3, a root that is a file",
+    "product_proof_spec_id": "PPS-1dc08ca482a7b8f0ec6e98c3da32933c9ae1b0d8fdd0fdde2fb9e1253100b07a",
+    "role": "INTRODUCE",
+    "story_id": "E"
+   },
+   {
+    "criterion_id": "E-03",
+    "depends_on": [],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "hidden: 3.2 tolerance",
+    "product_proof_spec_id": "PPS-c455643aa2e840c7fee25fcac8973ff7c1f92cd196f5b36f63afa1f2c914d4b7",
+    "role": "INTRODUCE",
+    "story_id": "E"
+   },
+   {
+    "criterion_id": "E-04",
+    "depends_on": [],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "hidden: 3.2 refusal",
+    "product_proof_spec_id": "PPS-3d40459d2286586bcf4e419bd3882ec2d9fa2e71889c3cfca708f01039568def",
+    "role": "INTRODUCE",
+    "story_id": "E"
+   },
+   {
+    "criterion_id": "E-05",
+    "depends_on": [],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "hidden: 4.1 ordering over every category",
+    "product_proof_spec_id": "PPS-b85d5c03d6f9205d3582f4e79ccdd5bc860e18175aff6c52f1abfeea01bcb6c3",
+    "role": "INTRODUCE",
+    "story_id": "E"
+   },
+   {
+    "criterion_id": "E-06",
+    "depends_on": [],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "hidden: 5.2 nested paths and order",
+    "product_proof_spec_id": "PPS-40c686e6193a3e136449de2462de3d6b50b7f62e4061711ed438d2d59b50c577",
+    "role": "INTRODUCE",
+    "story_id": "E"
+   },
+   {
+    "criterion_id": "E-07",
+    "depends_on": [],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "hidden: 5.3 replaces, never appends",
+    "product_proof_spec_id": "PPS-ade61a4b724b4438f84e8d134a59550f90a1d2b79504cf5c79ef3c8a4273689d",
+    "role": "INTRODUCE",
+    "story_id": "E"
+   },
+   {
+    "criterion_id": "E-08",
+    "depends_on": [],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "hidden: 5.4 differences and exit 1",
+    "product_proof_spec_id": "PPS-89067cfb923a64384f2722c847f8fd6252bdc49211adc90441b5c562049334ff",
+    "role": "INTRODUCE",
+    "story_id": "E"
+   },
+   {
+    "criterion_id": "E-09",
+    "depends_on": [],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "hidden: 5.5 unreadable FILE",
+    "product_proof_spec_id": "PPS-ecbba24d7b0d6ed5b978ef1a680cb5cfc242275fea6aacb4f364ed9dce64fe64",
+    "role": "INTRODUCE",
+    "story_id": "E"
+   },
+   {
+    "criterion_id": "E-10",
+    "depends_on": [],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "hidden: 5.5 unknown subcommand",
+    "product_proof_spec_id": "PPS-0741937565654371c49886efc5afb7360b6d547a3f21b67ccae31c953c8149fb",
+    "role": "INTRODUCE",
+    "story_id": "E"
+   },
+   {
+    "criterion_id": "E-11",
+    "depends_on": [],
+    "expected_parent": "UNCONSTRAINED",
+    "ownership_rationale": "hidden: 6.1 holds at the baseline (the smoke test) and must still hold with the tests added",
+    "product_proof_spec_id": "PPS-6a9d158c05258d52b2cdd0f51fa441d17eca3cc03658b3538256a879e14fa0ce",
+    "role": "VERIFY",
+    "story_id": "E"
+   },
+   {
+    "criterion_id": "E-12",
+    "depends_on": [],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "hidden: 5.3/5.4 with FILE inside DIR, end to end",
+    "product_proof_spec_id": "PPS-d1d827e49d199ac1262b6ec5335e1d8d7f679d5c911c43183b77da0fa9e00c16",
+    "role": "INTRODUCE",
+    "story_id": "E"
+   }
+  ],
+  "plan_hash": "9433f17023d622110d6566cc9811dcb429e28089c69cc06f45672ea5dd8496c4",
+  "plan_quality_policy": {
+   "max_fully_pre_satisfied_stories": null,
+   "max_pre_satisfied_introduce_ratio": null,
+   "max_unattributed_plan_drift": null
+  }
+ },
+ "product_roots": [
+  "tests",
+  "treesum"
+ ],
+ "requirements": [
+  {
+   "id": "R-1.1",
+   "requirement_hash": "ac1d33b209e9ee20f601be5cbc2d71ed46341fbd0fc59123305c090f0a03d0cf",
+   "source": "docs/requirements.md#1.1",
+   "text": "file_sha256 returns the SHA-256 of the file's bytes as 64 lowercase hex characters."
+  },
+  {
+   "id": "R-2.3",
+   "requirement_hash": "8f7956fc249496d6408dd2c4616e9375317aaec2acf8b2e3e0e8832311dda000",
+   "source": "docs/requirements.md#2.3",
+   "text": "build raises NotADirectoryError for a root that exists and is not a directory, or does not exist."
+  },
+  {
+   "id": "R-3.2",
+   "requirement_hash": "30f32fb6963377be214e8463bd720069647409f0649e072af9fda686d6c13f7b",
+   "source": "docs/requirements.md#3.2",
+   "text": "loads ignores empty and whitespace-only lines, reads a final line without a newline like any other, and raises ValueError on a malformed line."
+  },
+  {
+   "id": "R-4.1",
+   "requirement_hash": "e7fb1ea176af994117814f4740ac6a003547b05ce160ffd61e4dff6adf6b4c81",
+   "source": "docs/requirements.md#4.1",
+   "text": "compare returns added, removed and changed, each a list of paths in ascending order."
+  },
+  {
+   "id": "R-5.2",
+   "requirement_hash": "c02ad70597a6210b46b7cc34ffc07fa3558a81f1c6f915bf8e339c8d51e2acaa",
+   "source": "docs/requirements.md#5.2",
+   "text": "build DIR prints the snapshot text, nested paths with / and entries in ascending path order, exit 0."
+  },
+  {
+   "id": "R-5.3",
+   "requirement_hash": "d5d414484a93fedebad0db71ed7ef807b0dd374dcbe4580067b542be5aa94a75",
+   "source": "docs/requirements.md#5.3",
+   "text": "build DIR -o FILE creates or replaces FILE; a FILE inside DIR is not an entry of the snapshot."
+  },
+  {
+   "id": "R-5.4",
+   "requirement_hash": "3822c5fcf9c716a042f96d884f9b23be9cf74ac00fd21a514367597d11a93ccd",
+   "source": "docs/requirements.md#5.4",
+   "text": "verify prints one line per difference in ascending order of path and exits 1 when there is a difference."
+  },
+  {
+   "id": "R-5.5",
+   "requirement_hash": "52dd2051cbcb012f3b10851bc1f8dee8efd41e1a408f43fc40a3bbbceaec7372",
+   "source": "docs/requirements.md#5.5",
+   "text": "Any other use exits 2 with a message on standard error and nothing on standard output."
+  },
+  {
+   "id": "R-6.1",
+   "requirement_hash": "c01efdf0a36bcb6c0de4d0a5537dac49f5326ce7939ca3082a9730862b34c824",
+   "source": "docs/requirements.md#6.1",
+   "text": "Tests import nothing outside the standard library and treesum."
+  }
+ ],
+ "requirements_document": {
+  "path": "docs/requirements.md",
+  "sha256": "630740d3ec0c1343444024726f30758ca0dd3406b3b66f83c8e5be00c10cf373"
+ },
+ "stories": {
+  "E": {
+   "depends_on": [],
+   "tests": [
+    "tests/test_smoke.py"
+   ]
+  }
+ }
+}

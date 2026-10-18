@@ -1,0 +1,404 @@
+{
+ "format": "aisef-v2-authoring/1",
+ "name": "treesum-arms",
+ "description": "W1-a (E2, greenfield): treesum — the arms' bundle for B `aisef` and C `aisef+`. Four stories; every contract tests an example the public task text gives (docs/requirements.md); nothing of the hidden evaluator is here.",
+ "requirements_document": {
+  "path": "docs/requirements.md"
+ },
+ "product_roots": [
+  "treesum",
+  "tests"
+ ],
+ "baseline": "HEAD",
+ "requirements": [
+  {
+   "id": "R-0",
+   "text": "treesum uses the Python standard library only: no third-party dependency exists and none may be added.",
+   "source": "docs/requirements.md#preamble"
+  },
+  {
+   "id": "R-1.1",
+   "text": "treesum.digest.file_sha256(path) returns the SHA-256 of the file's bytes as 64 lowercase hexadecimal characters.",
+   "source": "docs/requirements.md#1.1"
+  },
+  {
+   "id": "R-2.1",
+   "text": "treesum.snapshot.build(root) returns a dict mapping every file under root, recursively, to its file_sha256, keyed by the path relative to root with / as separator.",
+   "source": "docs/requirements.md#2.1"
+  },
+  {
+   "id": "R-3.1",
+   "text": "treesum.snapshot.dumps(snapshot) returns one line per entry, `<sha256>  <path>`, each ended by a newline, in ascending order of path.",
+   "source": "docs/requirements.md#3.1"
+  },
+  {
+   "id": "R-3.2",
+   "text": "treesum.snapshot.loads(text) parses the snapshot text format back into a dict.",
+   "source": "docs/requirements.md#3.2"
+  },
+  {
+   "id": "R-4.1",
+   "text": "treesum.snapshot.compare(old, new) returns a dict with exactly the keys added, removed and changed, each a list of paths in ascending order.",
+   "source": "docs/requirements.md#4.1"
+  },
+  {
+   "id": "R-5.2",
+   "text": "python -m treesum build DIR writes dumps(build(DIR)) to standard output and exits 0.",
+   "source": "docs/requirements.md#5.2"
+  },
+  {
+   "id": "R-5.4",
+   "text": "python -m treesum verify DIR FILE prints one line per difference and exits 0 when there is no difference, 1 when there is at least one.",
+   "source": "docs/requirements.md#5.4"
+  }
+ ],
+ "contracts": [
+  {
+   "id": "BC-DIGEST",
+   "requirement_ids": ["R-1.1"],
+   "subject": {"kind": "python_callable", "locator": "treesum.digest:file_sha256"},
+   "stimulus": {
+    "args": ["<ws>/hello.txt"],
+    "workspace": {"hello.txt": {"text": "hello\n", "newline": "\n"}}
+   },
+   "observable": {"returns": "5891b5b522d5df086d0ff0b110fbd9d21bb4fc7163af34d08286a2e846f6be03", "within_s": 10},
+   "polarity": "MUST_HOLD",
+   "subject_absence": "REQUIRES_SUBJECT",
+   "rationale": "the example of 1.1: the six bytes `hello\\n`"
+  },
+  {
+   "id": "BC-BUILD",
+   "requirement_ids": ["R-2.1"],
+   "subject": {"kind": "python_callable", "locator": "treesum.snapshot:build"},
+   "stimulus": {
+    "args": ["<ws>"],
+    "workspace": {
+     "a.txt": {"text": "alpha\n", "newline": "\n"},
+     "b.txt": {"text": "beta\n", "newline": "\n"}
+    }
+   },
+   "observable": {
+    "returns": {
+     "a.txt": "b6a98d9ce9a2d9149288fa3df42d377c3e42737afdcdaf714e33c0a100b51060",
+     "b.txt": "f2c82decdd7181cf98945929a62598db7e6b477e11f6e0eb0ae97020eff151ad"
+    },
+    "within_s": 10
+   },
+   "polarity": "MUST_HOLD",
+   "subject_absence": "REQUIRES_SUBJECT",
+   "rationale": "two files in a flat directory: each key is the relative path, each value its digest"
+  },
+  {
+   "id": "BC-DUMPS",
+   "requirement_ids": ["R-3.1"],
+   "subject": {"kind": "python_callable", "locator": "treesum.snapshot:dumps"},
+   "stimulus": {
+    "args": [{
+     "b.txt": "f2c82decdd7181cf98945929a62598db7e6b477e11f6e0eb0ae97020eff151ad",
+     "a.txt": "b6a98d9ce9a2d9149288fa3df42d377c3e42737afdcdaf714e33c0a100b51060"
+    }]
+   },
+   "observable": {
+    "returns": "b6a98d9ce9a2d9149288fa3df42d377c3e42737afdcdaf714e33c0a100b51060  a.txt\nf2c82decdd7181cf98945929a62598db7e6b477e11f6e0eb0ae97020eff151ad  b.txt\n",
+    "within_s": 10
+   },
+   "polarity": "MUST_HOLD",
+   "subject_absence": "REQUIRES_SUBJECT",
+   "rationale": "the example of 3.1, handed in the reverse order: the text is sorted by path"
+  },
+  {
+   "id": "BC-LOADS",
+   "requirement_ids": ["R-3.2"],
+   "subject": {"kind": "python_callable", "locator": "treesum.snapshot:loads"},
+   "stimulus": {
+    "args": ["b6a98d9ce9a2d9149288fa3df42d377c3e42737afdcdaf714e33c0a100b51060  a.txt\nf2c82decdd7181cf98945929a62598db7e6b477e11f6e0eb0ae97020eff151ad  b.txt\n"]
+   },
+   "observable": {
+    "returns": {
+     "a.txt": "b6a98d9ce9a2d9149288fa3df42d377c3e42737afdcdaf714e33c0a100b51060",
+     "b.txt": "f2c82decdd7181cf98945929a62598db7e6b477e11f6e0eb0ae97020eff151ad"
+    },
+    "within_s": 10
+   },
+   "polarity": "MUST_HOLD",
+   "subject_absence": "REQUIRES_SUBJECT",
+   "rationale": "the example text of 3.1 parses back into its snapshot (3.3)"
+  },
+  {
+   "id": "BC-COMPARE",
+   "requirement_ids": ["R-4.1"],
+   "subject": {"kind": "python_callable", "locator": "treesum.snapshot:compare"},
+   "stimulus": {
+    "args": [
+     {
+      "a.txt": "b6a98d9ce9a2d9149288fa3df42d377c3e42737afdcdaf714e33c0a100b51060",
+      "b.txt": "f2c82decdd7181cf98945929a62598db7e6b477e11f6e0eb0ae97020eff151ad"
+     },
+     {
+      "a.txt": "b6a98d9ce9a2d9149288fa3df42d377c3e42737afdcdaf714e33c0a100b51060",
+      "b.txt": "ae9a6306a205417afddd14316cc1d0d5e04a98f1be10865dce643925ee070ce2",
+      "c.txt": "673953e0ad7fc53247f4feadc2c2d4506396840d1f8796526f48d47333ac7652"
+     }
+    ]
+   },
+   "observable": {
+    "returns": {"added": ["c.txt"], "removed": [], "changed": ["b.txt"]},
+    "within_s": 10
+   },
+   "polarity": "MUST_HOLD",
+   "subject_absence": "REQUIRES_SUBJECT",
+   "rationale": "one added, one changed, nothing removed: the empty list is still present (4.1)"
+  },
+  {
+   "id": "BC-CLI-BUILD",
+   "requirement_ids": ["R-5.2"],
+   "subject": {"kind": "cli_invocation", "locator": "treesum:__main__"},
+   "stimulus": {
+    "argv": ["build", "<ws>/proj"],
+    "workspace": {
+     "proj/a.txt": {"text": "alpha\n", "newline": "\n"},
+     "proj/b.txt": {"text": "beta\n", "newline": "\n"}
+    }
+   },
+   "observable": {
+    "exit_code": 0,
+    "stdout": {
+     "text": "b6a98d9ce9a2d9149288fa3df42d377c3e42737afdcdaf714e33c0a100b51060  a.txt\nf2c82decdd7181cf98945929a62598db7e6b477e11f6e0eb0ae97020eff151ad  b.txt\n",
+     "newline": "\n"
+    },
+    "within_s": 20
+   },
+   "polarity": "MUST_HOLD",
+   "subject_absence": "REQUIRES_SUBJECT",
+   "rationale": "5.2 on the two-file directory of BC-BUILD: the text of 3.1 on standard output, exit 0"
+  },
+  {
+   "id": "BC-CLI-VERIFY",
+   "requirement_ids": ["R-5.4"],
+   "subject": {"kind": "cli_invocation", "locator": "treesum:__main__"},
+   "stimulus": {
+    "argv": ["verify", "<ws>/proj", "<ws>/snap.sum"],
+    "workspace": {
+     "proj/a.txt": {"text": "alpha\n", "newline": "\n"},
+     "proj/b.txt": {"text": "beta\n", "newline": "\n"},
+     "snap.sum": {
+      "text": "b6a98d9ce9a2d9149288fa3df42d377c3e42737afdcdaf714e33c0a100b51060  a.txt\nf2c82decdd7181cf98945929a62598db7e6b477e11f6e0eb0ae97020eff151ad  b.txt\n",
+      "newline": "\n"
+     }
+    }
+   },
+   "observable": {
+    "exit_code": 0,
+    "stdout": {"text": "", "newline": "\n"},
+    "within_s": 20
+   },
+   "polarity": "MUST_HOLD",
+   "subject_absence": "REQUIRES_SUBJECT",
+   "rationale": "5.4 with a snapshot that matches the directory: nothing printed, exit 0"
+  },
+  {
+   "id": "BC-STDLIB",
+   "requirement_ids": ["R-0"],
+   "subject": {"kind": "file_artifact", "locator": "path:treesum"},
+   "stimulus": {"imports_outside": {"stdlib": true, "allowed": ["treesum"]}},
+   "observable": {"matches": 0, "within_s": 30},
+   "polarity": "MUST_HOLD",
+   "subject_absence": "REQUIRES_SUBJECT",
+   "rationale": "no import statement of the package names a module outside the standard library (preamble)"
+  }
+ ],
+ "stories": {
+  "S1": {
+   "depends_on": [],
+   "tests": ["tests/test_digest.py"],
+   "criteria": [
+    {
+     "id": "C-DIGEST",
+     "contract": "BC-DIGEST",
+     "role": "INTRODUCE",
+     "depends_on": [],
+     "why": "introduces 1.1",
+     "facts": {
+      "requirement": "R-1.1",
+      "section": "§1",
+      "clause": "1.1",
+      "clause_text": "treesum.digest.file_sha256(path) returns the SHA-256 of the file's bytes as 64 lowercase hexadecimal characters (a str).",
+      "subject": "treesum.digest:file_sha256"
+     }
+    },
+    {
+     "id": "C-STDLIB-1",
+     "contract": "BC-STDLIB",
+     "role": "PRESERVE",
+     "depends_on": [],
+     "why": "the package stays standard-library only from its first module on",
+     "facts": {
+      "requirement": "R-0",
+      "section": "preamble",
+      "clause": "0",
+      "clause_text": "standard library only: no third-party dependency exists and none may be added.",
+      "subject": "treesum/"
+     }
+    }
+   ]
+  },
+  "S2": {
+   "depends_on": ["S1"],
+   "tests": ["tests/test_build.py"],
+   "criteria": [
+    {
+     "id": "C-BUILD",
+     "contract": "BC-BUILD",
+     "role": "INTRODUCE",
+     "depends_on": ["C-DIGEST"],
+     "why": "introduces 2.1 on top of 1.1",
+     "facts": {
+      "requirement": "R-2.1",
+      "section": "§2",
+      "clause": "2.1",
+      "clause_text": "treesum.snapshot.build(root) returns a dict mapping every file under the directory root — recursively, at any depth — to its file_sha256; a key is the file's path relative to root, with / as the separator.",
+      "subject": "treesum.snapshot:build"
+     }
+    },
+    {
+     "id": "C-DIGEST-2",
+     "contract": "BC-DIGEST",
+     "role": "PRESERVE",
+     "depends_on": ["C-DIGEST"],
+     "why": "build reuses file_sha256: S1's behaviour must hold after S2",
+     "facts": {
+      "requirement": "R-1.1",
+      "section": "§1",
+      "clause": "1.1",
+      "clause_text": "treesum.digest.file_sha256(path) returns the SHA-256 of the file's bytes as 64 lowercase hexadecimal characters (a str).",
+      "subject": "treesum.digest:file_sha256"
+     }
+    }
+   ]
+  },
+  "S3": {
+   "depends_on": ["S2"],
+   "tests": ["tests/test_format.py"],
+   "criteria": [
+    {
+     "id": "C-DUMPS",
+     "contract": "BC-DUMPS",
+     "role": "INTRODUCE",
+     "depends_on": ["C-BUILD"],
+     "why": "introduces 3.1",
+     "facts": {
+      "requirement": "R-3.1",
+      "section": "§3",
+      "clause": "3.1",
+      "clause_text": "treesum.snapshot.dumps(snapshot) returns the snapshot as text: one line per entry, `<sha256>  <path>`, every line ended by a newline, entries in ascending order of path.",
+      "subject": "treesum.snapshot:dumps"
+     }
+    },
+    {
+     "id": "C-LOADS",
+     "contract": "BC-LOADS",
+     "role": "INTRODUCE",
+     "depends_on": ["C-BUILD"],
+     "why": "introduces 3.2",
+     "facts": {
+      "requirement": "R-3.2",
+      "section": "§3",
+      "clause": "3.2",
+      "clause_text": "treesum.snapshot.loads(text) parses that format back into a dict.",
+      "subject": "treesum.snapshot:loads"
+     }
+    },
+    {
+     "id": "C-COMPARE",
+     "contract": "BC-COMPARE",
+     "role": "INTRODUCE",
+     "depends_on": ["C-BUILD"],
+     "why": "introduces 4.1",
+     "facts": {
+      "requirement": "R-4.1",
+      "section": "§4",
+      "clause": "4.1",
+      "clause_text": "treesum.snapshot.compare(old, new) returns a dict with exactly the keys added, removed and changed, each a list of paths in ascending order.",
+      "subject": "treesum.snapshot:compare"
+     }
+    },
+    {
+     "id": "C-BUILD-3",
+     "contract": "BC-BUILD",
+     "role": "PRESERVE",
+     "depends_on": ["C-BUILD"],
+     "why": "the format and compare functions live beside build: S2's behaviour must hold after S3",
+     "facts": {
+      "requirement": "R-2.1",
+      "section": "§2",
+      "clause": "2.1",
+      "clause_text": "treesum.snapshot.build(root) returns a dict mapping every file under the directory root — recursively, at any depth — to its file_sha256; a key is the file's path relative to root, with / as the separator.",
+      "subject": "treesum.snapshot:build"
+     }
+    }
+   ]
+  },
+  "S4": {
+   "depends_on": ["S3"],
+   "tests": ["tests/test_cli.py"],
+   "criteria": [
+    {
+     "id": "C-CLI-BUILD",
+     "contract": "BC-CLI-BUILD",
+     "role": "INTRODUCE",
+     "depends_on": ["C-DUMPS"],
+     "why": "introduces 5.2",
+     "facts": {
+      "requirement": "R-5.2",
+      "section": "§5",
+      "clause": "5.2",
+      "clause_text": "python -m treesum build DIR writes dumps(build(DIR)) to standard output and exits 0.",
+      "subject": "treesum:__main__ build"
+     }
+    },
+    {
+     "id": "C-CLI-VERIFY",
+     "contract": "BC-CLI-VERIFY",
+     "role": "INTRODUCE",
+     "depends_on": ["C-LOADS", "C-COMPARE"],
+     "why": "introduces 5.4",
+     "facts": {
+      "requirement": "R-5.4",
+      "section": "§5",
+      "clause": "5.4",
+      "clause_text": "python -m treesum verify DIR FILE reads the snapshot in FILE, builds the current snapshot of DIR and prints one line per difference, in ascending order of path; it exits 0 when there is no difference (printing nothing) and 1 when there is at least one.",
+      "subject": "treesum:__main__ verify"
+     }
+    },
+    {
+     "id": "C-DUMPS-4",
+     "contract": "BC-DUMPS",
+     "role": "PRESERVE",
+     "depends_on": ["C-DUMPS"],
+     "why": "the command line prints dumps: S3's behaviour must hold after S4",
+     "facts": {
+      "requirement": "R-3.1",
+      "section": "§3",
+      "clause": "3.1",
+      "clause_text": "treesum.snapshot.dumps(snapshot) returns the snapshot as text: one line per entry, `<sha256>  <path>`, every line ended by a newline, entries in ascending order of path.",
+      "subject": "treesum.snapshot:dumps"
+     }
+    },
+    {
+     "id": "C-STDLIB-4",
+     "contract": "BC-STDLIB",
+     "role": "PRESERVE",
+     "depends_on": ["C-STDLIB-1"],
+     "why": "the command line adds modules: the package stays standard-library only",
+     "facts": {
+      "requirement": "R-0",
+      "section": "preamble",
+      "clause": "0",
+      "clause_text": "standard library only: no third-party dependency exists and none may be added.",
+      "subject": "treesum/"
+     }
+    }
+   ]
+  }
+ }
+}
