@@ -84,7 +84,10 @@ eight and pass the four. The arms' bundle behaves alike (7 EXECUTED; 2/7 SATISFI
 is `[A-Za-z0-9_][A-Za-z0-9._-]*` per segment (`cli_invocation.py` `_NAME`), so a `.`-prefixed directory of §1.2 cannot be
 laid out — that half of 1.2 is left to the developer's own tests (§5), not observed by the evaluator. A stream shape holds
 one key (`_stream_shape_ok`: `len(shape) != 1` is invalid), so H-JSON's figure sits inside the anchoring regex, not in a
-second `contains`.
+second `contains`. Two precisions of those regexes, stated (third blind review): H-JSON's `(?s)\A\s*\{…\}\s*\Z` pins *a JSON
+object from the first non-blank byte to the last*, not a single parse — a document printed twice would pass it — and
+H-JSON-ZERO's `"findings": []` assumes `json.dumps`'s default separators (`": "`), defensible under §3.1, which makes
+stdout "the same document `--report` writes", a `json.dumps(..., indent=2)` by §3.2.
 
 ## 3. Leak dry-check (`tools/dry_check.py`, records in `dry-check/`)
 

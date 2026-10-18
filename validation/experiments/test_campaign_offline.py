@@ -12,6 +12,7 @@ import io
 import json
 import os
 import pathlib
+import re
 import shutil
 import subprocess
 import sys
@@ -289,7 +290,7 @@ class Campaign(ProductBase):
         self.assertEqual(git(ws, "remote"), "")
         self.assertEqual(naming(ws / ".git", source), [])                       # no file under ws/.git names the source
         self.assertFalse((self.tmp / "d" / "src.git").exists())                # the bare copy is gone
-        self.assertIn("(removed)", (ws / ".git" / "logs" / "HEAD").read_text(encoding="utf-8"))
+        self.assertEqual(git(ws, "reflog", "--format=%gs"), "commit: direct arm: the workspace as the client left it")  # no clone line
         self.assertEqual(git(ws, "rev-parse", "main~1"), self.baseline)          # the objects came through the bare copy
         self.assertEqual(git(source, "for-each-ref"), before)                   # the source's refs unchanged after the arm
         self.assertNotIn("add", git(source, "show", "main:app/calc.py"))
@@ -434,6 +435,92 @@ class Campaign(ProductBase):
         self.assertEqual(res["usage"]["budget"]["spent"]["provider_requests"], 2)      # what the gate spent is counted
         code, text = self.campaign("summary", "--out", str(self.out))
         self.assertEqual((json.loads(text)["failed"], json.loads(text)["refused_identity"]), (1, 1))     # (B)
+
+    def test_8_an_error_after_an_attested_preflight_keeps_the_gate_in_the_record(self):
+        # third blind review (1): the clone (or the session) raising after an ATTESTED preflight lost the gate — no
+        # ARM.json, RESULT identity/preflight/configured_endpoint null. Now a failed arm with the gate and the spend.
+        def attested(route, chat_probes, transport, directory, served_model=None, listed_owner=None):
+            directory.mkdir(parents=True, exist_ok=False)
+            rec = {"observation": {"route": route}, "problems": [], "verdict": "ATTESTED",
+                   "accounting": {"provider_requests": 3, "turns": 0, "input_tokens": 9, "output_tokens": 1, "unaccounted": []}}
+            (directory / "PREFLIGHT.json").write_text(json.dumps(rec), encoding="utf-8")
+            return rec
+        with mock.patch.object(C, "preflight_run", attested), \
+                mock.patch.object(H, "clone_workspace", side_effect=OSError("no space left under ws")):
+            code, text = self.run_("--max-runs", "1")
+        self.assertEqual(code, 3, text)
+        self.assertIn("error=OSError: no space left under ws", text)
+        res = C.read_json(self.out / "calc-r1-direct" / "RESULT.json")
+        self.assertEqual((res["candidate"], res["evaluation"]["total"], res["identity"], res["preflight"]["verdict"],
+                          res["configured_endpoint"], res["error"]),
+                         (None, None, "ATTESTED", "ATTESTED", self.endpoint, "OSError: no space left under ws"))
+        self.assertEqual(res["usage"]["budget"]["spent"]["provider_requests"], 3)      # the gate's spend, no session
+        arm = self.out / "calc-r1-direct" / "arm"
+        rec = C.read_json(arm / "ARM.json")
+        self.assertEqual((rec["identity"], rec["preflight"]["verdict"], rec["configured_endpoint"], rec["error"], rec["candidate"],
+                          rec["usage"]["budget"]["spent"]["provider_requests"]),
+                         ("ATTESTED", "ATTESTED", self.endpoint, "OSError: no space left under ws", None, 3))
+        self.assertTrue((arm / "preflight" / "PREFLIGHT.json").exists())
+        self.assertFalse((arm / "sessions").exists())
+        self.assertFalse((arm / "ws").exists())
+        code, text = self.campaign("summary", "--out", str(self.out))
+        self.assertEqual((json.loads(text)["failed"], json.loads(text)["refused_identity"]), (1, 0))    # failed, not refused
+
+    def test_9_the_kernels_endpoint_refusal_is_an_endpoint_mismatch_too(self):
+        # third blind review (2): the kernel refuses at stage preflight (app/run.execute: RunRefused, before `preflight`
+        # is set) a client configured for another endpoint — the gate the direct arm names ENDPOINT_MISMATCH
+        from aisef2.app import run as kernel_run
+        source = pathlib.Path(kernel_run.__file__).read_text(encoding="utf-8")
+        self.assertIn(C.ENDPOINT_REFUSAL, re.sub(r'"\s+f?"', "", source))     # the kernel's words (adjacent literals joined)
+        runs, manifests = self.sealed()
+        run = runs[1]
+        arm = self.out / run["run_id"] / "arm"
+        (arm / "run").mkdir(parents=True)
+
+        def refused(detail: str, **more) -> dict:
+            (arm / "run" / "RUN.json").write_text(json.dumps({
+                "delivery_verdict": "NOT_REACHED", "final_main": None, "stage": "preflight", "story_outcomes": {},
+                "failure": {"type": "RunRefused", "detail": detail, "stage": "preflight"}, **more}), encoding="utf-8")
+            return C.aisef_record(run, manifests[run["run_id"]], arm, 2, 0.5)
+        rec = refused(f"the client's configuration sends provider fakeprov to http://127.0.0.1:9/v1, not to the attested endpoint {self.endpoint}")
+        self.assertEqual((rec["candidate"], rec["identity"], rec["run"]["preflight_verdict"]), (None, "ENDPOINT_MISMATCH", None))
+        self.assertIn("RunRefused", rec["error"])
+        res = C.record(run, manifests[run["run_id"]], rec, self.out)
+        self.assertEqual((res["identity"], res["candidate"], res["preflight"]), ("ENDPOINT_MISMATCH", None, None))
+        self.assertEqual(C.read_json(self.out / run["run_id"] / "RESULT.json")["identity"], "ENDPOINT_MISMATCH")
+        code, text = self.campaign("summary", "--out", str(self.out))
+        self.assertEqual((json.loads(text)["failed"], json.loads(text)["refused_identity"]), (1, 1))
+        # any other refusal is not a gate verdict: null without a preflight, the preflight's verdict with one
+        self.assertIsNone(refused("the client (opencode) is not on the PATH the run gives it")["identity"])
+        self.assertEqual(refused("the plan is not admitted (RFC §12): ['C-1']", preflight={"verdict": "ATTESTED"})["identity"], "ATTESTED")
+
+    def test_10_a_later_workspace_holds_exactly_the_sealed_history(self):
+        # the fourth blind review: an annotated tag planted in the source after sealing was fetched by the clone into a
+        # later workspace, and pushed commits rode along as unreachable objects. Planted here, as an agent that read
+        # MANIFEST.json could push: a branch, an annotated tag and refs/custom/x, with a commit beyond the baseline.
+        runs, manifests = self.sealed()
+        sealed = manifests["calc-r1-direct"]["source"]
+        source = self.tmp / "source"
+        planter = self.tmp / "planter"
+        subprocess.run(["git", "clone", "--quiet", str(source), str(planter)], check=True, capture_output=True)
+        (planter / "app" / "calc.py").write_text(ADD)
+        git(planter, "commit", "-qam", "planted after sealing")
+        planted = git(planter, "rev-parse", "HEAD")
+        git(planter, "tag", "-a", "-m", "planted", "TAG")
+        tag = git(planter, "rev-parse", "TAG")
+        git(planter, "push", "--quiet", str(source), "HEAD:refs/heads/planted", "HEAD:refs/custom/x", "TAG")
+        self.assertEqual(len(git(source, "for-each-ref").splitlines()), 4)      # main + the three planted refs
+        ws = self.tmp / "later" / "ws"
+        H.clone_workspace(str(source), self.baseline, ws)
+        self.assertEqual(git(ws, "for-each-ref", "--format=%(refname)"), "refs/heads/main")
+        self.assertEqual(git(ws, "tag"), "")
+        for obj in (planted, tag):                                              # the planted objects are absent
+            self.assertNotEqual(subprocess.run(["git", "-C", str(ws), "cat-file", "-e", obj], capture_output=True).returncode, 0)
+        self.assertEqual((git(ws, "rev-parse", "main"), git(ws, "rev-parse", "main^{tree}")), (sealed["commit"], sealed["tree"]))
+        self.assertEqual(git(ws, "reflog"), "")
+        self.assertEqual(git(ws, "fsck", "--unreachable", "--no-reflogs", "--no-progress"), "")
+        self.assertNotIn("add", (ws / "app" / "calc.py").read_text(encoding="utf-8"))
+        self.assertEqual(naming(ws / ".git", source, self.tmp / "later" / "src.git"), [])
 
 
 if __name__ == "__main__":

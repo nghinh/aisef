@@ -142,26 +142,33 @@ def source_identity(repo: pathlib.Path, commit: str) -> dict:
 
 
 def clone_workspace(source: str, commit: str, ws: pathlib.Path) -> None:
-    """An arm's workspace: `main` at `commit`, no remote, and no file under ws/.git naming the source path. A clone
-    straight from the source leaves that path in .git/logs/HEAD after `git remote remove origin`, and `git push <path>`
-    writes the source's refs — so the source is cloned bare to <ws's parent>/src.git, the workspace from that copy, and
-    the copy deleted before any agent starts (its objects are in ws); the reflog's clone line names the deleted path
-    (`... (removed)`). Any file under ws/.git naming the source refuses the workspace. The residual: an agent can push
-    to any absolute path it independently knows; the workspace carries none."""
+    """An arm's workspace: `main` at `commit` and exactly that commit's history — no other ref, no tag, no reflog, no
+    object `main` does not reach — no remote, and no file under ws/.git naming the source path. A clone straight from
+    the source leaves that path in .git/logs/HEAD after `git remote remove origin`, and `git push <path>` writes the
+    source's refs — so the source is cloned bare to <ws's parent>/src.git, the workspace from that copy without tags,
+    and the copy deleted before any agent starts. A local clone copies the whole object store (the fourth blind
+    review: a tag pushed to the source after sealing reached a later workspace as a ref, pushed commits as unreachable
+    objects), so every ref but refs/heads/main is deleted, the reflogs expired and `git gc --prune=now` drops the rest;
+    a workspace with any other ref, or a file under .git naming the source or the copy, is refused. The residual: an
+    agent can push to any absolute path it independently knows; the workspace carries none."""
     bare = ws.parent / "src.git"
     subprocess.run(["git", "clone", "--quiet", "--bare", "--no-hardlinks", source, str(bare)], check=True, capture_output=True)
-    subprocess.run(["git", "clone", "--quiet", "--no-hardlinks", str(bare), str(ws)], check=True, capture_output=True)
+    subprocess.run(["git", "clone", "--quiet", "--no-hardlinks", "--no-tags", str(bare), str(ws)], check=True, capture_output=True)
     git(ws, "checkout", "--quiet", "-B", "main", commit)
     git(ws, "remote", "remove", "origin")
     shutil.rmtree(bare)
-    for p in (ws / ".git" / "logs").rglob("*"):
-        if p.is_file() and f"clone: from {bare}".encode() in (text := p.read_bytes()):
-            p.write_bytes(text.replace(f"clone: from {bare}".encode(), f"clone: from {bare} (removed)".encode()))
-    names = {source.encode(), os.path.realpath(source).encode()}
+    for ref in git(ws, "for-each-ref", "--format=%(refname)").splitlines():
+        if ref != "refs/heads/main":
+            git(ws, "update-ref", "-d", ref)
+    git(ws, "reflog", "expire", "--expire=now", "--all")
+    git(ws, "gc", "--prune=now", "--quiet")
+    if (refs := git(ws, "for-each-ref", "--format=%(refname)")) != "refs/heads/main":
+        raise ValueError(f"{ws}: refs beside main after the clean: {refs.split()}")
+    names = {source.encode(), os.path.realpath(source).encode(), str(bare).encode()}
     hits = [str(p.relative_to(ws)) for p in (ws / ".git").rglob("*")
             if p.is_file() and any(n in p.read_bytes() for n in names)]
     if hits:
-        raise ValueError(f"{ws}: the source path {source} is named under .git: {hits}")
+        raise ValueError(f"{ws}: the source {source} or the copy is named under .git: {hits}")
 
 
 def evaluator_identity(path: pathlib.Path) -> dict:
@@ -214,9 +221,14 @@ def direct_arm(manifest: Mapping, out: pathlib.Path, *, task: str, client_exe: s
     the workspace holds — that commit is the candidate. The client's own "done" is recorded, never trusted. The
     workspace (clone_workspace) has no remote and names no path to the source: a `git push origin` has nowhere to go
     and nothing under ws/.git tells the agent where the source is — an agent can push to any absolute path it
-    independently knows; the workspace carries none. `out` may hold the arm's preflight already (campaign.direct);
-    never a workspace or an ARM.json. `extra`: fields the caller records beside the arm's own (the configured endpoint,
-    the preflight's verdict, `identity`)."""
+    independently knows; the workspace carries none. The residual (campaign.py): the driver's OUT/<run_id>/MANIFEST.json
+    and OUT/CAMPAIGN.json, two and three directories above ws, name the workload repository; an agent that reads them
+    can push a NEW ref there, which cannot alter the sealed commit this arm and every later one start from
+    (source_identity binds commit, tree and digests; clone_workspace checks that sha out, or refuses) and is never read
+    back except to clone that sha — and a later workspace holds that sha's history and nothing else (clone_workspace:
+    no other ref, no tag, no unreachable object), so nothing pushed reaches a later arm. `out`
+    may hold the arm's preflight already (campaign.direct); never a workspace or an ARM.json. `extra`: fields the
+    caller records beside the arm's own (the configured endpoint, the preflight's verdict, `identity`)."""
     from aisef2.app import client
     if (manifest.get("pair") or {}).get("arm") != "direct":
         raise ValueError("direct_arm runs a manifest of arm direct")
