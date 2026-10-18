@@ -1,0 +1,54 @@
+{
+ "workload": "W2 (brownfield) — E2 controlled campaign, docs/v2.1/EXPERIMENT-PLAN.md",
+ "written_at": "2026-10-18 13:15 +0700 (system clock; every timestamp below is from `date`)",
+ "source": {
+  "repository": "/Users/nghinh/Downloads/projects/bread",
+  "what_it_is": "`bread` — realtime multilingual speech translation (Next.js web tier, Python realtime tier); a working project of the owner, not a toy",
+  "commit": "6fde318ecac1e447f49d6b642707c78f17ddcb63",
+  "commit_date": "2026-10-14 16:12:12 +0700",
+  "history": "418 commits since 2026-08-30; authors: Nghi Nguyen 407, 'Claude Fable 5' 11 (git log --format=%an | sort | uniq -c)",
+  "not_developed_by_aisef": {
+   "markers_absent": [".aisef/", "AISEF-managed .opencode/ (none: no .opencode/ at all)", "closure-evidence/"],
+   "git_log_grep_aisef": "0 commits (git log -i --grep=aisef)",
+   "note": "_bmad-output/ and .claude/ exist (untracked at HEAD) — BMAD planning artefacts and the owner's own agent configuration; neither is AISEF"
+  },
+  "files_taken": {
+   "infrastructure/__init__.py": {"mode": "100644", "blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"},
+   "infrastructure/ci/__init__.py": {"mode": "100644", "blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"},
+   "infrastructure/ci/evidence_discipline.py": {"mode": "100644", "blob": "e02e57e5b15ecad2da8be83bc2859b33f65b6749", "lines": 300, "blame": "300/300 lines Nghi Nguyen; introduced by b386590 2026-09-01 'feat(ci): evidence-discipline linter with target/citation/placeholder grammar (story 10.8; FR-76)'"},
+   "infrastructure/ci/test_evidence_discipline.py": {"mode": "100644", "blob": "09dd4f3c6b254c1a3c1d4a801440cdef02d5cd31", "note": "pytest; 16 tests; unchanged since b386590"},
+   "infrastructure/ci/run_registry.json": {"mode": "100644", "blob": "e1fa23e595efd5c4d7d786b978724e91985620be", "note": "{description, valid_runs: 16 ids, notes: 13}; last changed at 6fde318"}
+  },
+  "files_left_out": {
+   "infrastructure/ci/behavioural-release-gate.sh": "a release gate of the whole project (runs tests/behaviour/... under uv); nothing of the linter",
+   "everything else of bread": "the realtime tier (FastAPI, numpy, onnxruntime), the web tier, the monitoring stack, the corpora — none of it is what the task touches, and the probes run subjects with `python -I -S` (stdlib only)"
+  },
+  "method": "git -C bread archive --format=tar 6fde318 -- <the five paths> | tar -x; then one commit (init_repo.sh)"
+ },
+ "added_by_the_lane": {
+  "docs/requirements-delta.md": {"sha256": "7b2c0bd3fa548b519a56a52cf97d65d1e40ff4277deb4982e4e3cd1c4a94748f", "blob": "9d437b354319d87d6a17d0fa9222a9a65fb84e57", "role": "the public task; the bundles' requirements_document"},
+  "README.md": {"sha256": "349e392b161a90e3a2c827a01f1629b0f09d6594d091324aaad3879036f17203", "blob": "1ce4a484d6ecc9a38ba74107bf831ca0ace71316", "role": "three lines: what the tool is, how to run it and its tests, where the task is"},
+  ".gitignore": {"sha256": "a8577ddcc59722792e17894a92880984e5e4bb2a956469af5cb444591d6ed9a2", "blob": "98ad65be6712143ebafe47bcead4d0d778ed9499", "role": "__pycache__/ *.py[cod] .pytest_cache/ .venv/ .DS_Store — so a delivered main carries no bytecode (canary finding C-1)"}
+ },
+ "baseline": {
+  "commit": "cd7d5aaee2c9760004c75cf3bf6beecd5f04c772",
+  "tree": "96aa0e8342776e5f700cc0b52f9ac4b3151aab60",
+  "archive_sha256": "d7c1e016e25bfd059150b7e2f372c62b2d461c173c378bee56fc37cfba5e908b",
+  "archive_size": 71680,
+  "files_sha256": "635de23b6c414fbdac73598d6a01ce47587829824758c072f497a8869595df21",
+  "git_version": "git version 2.53.0",
+  "identity_by": "validation/experiments/harness.py source_identity(repo, 'HEAD') on the reproduced repo (scratchpad/w2/repo), 2026-10-18 13:05 +0700",
+  "author": "bread maintainers (filtered by the AISEF E2 W2 lane) <e2-w2@aisef.invalid>, dates fixed at 2026-10-18T06:00:00+00:00 (both author and committer)",
+  "reproduced_twice": "init_repo.sh into scratchpad/w2/repo (13:02:26 +0700) and scratchpad/w2/repo-again: both cd7d5aaee2c9760004c75cf3bf6beecd5f04c772 / tree 96aa0e83…; a third run into the existing directory was refused (exit 2)",
+  "clean": "git status --porcelain: 0 lines"
+ },
+ "bundles": {
+  "arms": {"authoring_sha256": "306d3c22e5ecbef2732433cb79c2ec55ed23c0ba83cd7fabadda404585c6b740", "bundle_sha256": "c0b52db9f23db556e2f378b4ee9cfa8e3c99e4a15d195607078f0f6454436e05", "plan_hash": "d6c8b61321d408c793d0d45130016df6f132e50c3289c2ae78511e884f12c463", "contracts": 7, "specs": 7, "stories": ["S1", "S2", "S3"], "approvals": 0, "lint": "NOT_READY (to_approve 7; admission not run) — READY once approved (dry-check/baseline.json)"},
+  "hidden": {"authoring_sha256": "0e233871411f69ae02ad5058a366d6cdb8685b11069782bcba535bdc51c955ab", "evaluator_sha256": "0dda8a59d5a0b01654727244131934fcade9b6c2dd7d81be95d5750d4dbe4d93", "plan_hash": "92b9572ae566f11c42a99a5ddf6b28de974a380236e45b82c782785dc3e371af", "contracts": 10, "specs": 10, "stories": ["HS1", "HS2", "HS3"], "approvals": 0, "lint": "NOT_READY (to_approve 11 pairs over 10 contracts; admission not run) — READY once approved (dry-check/baseline.json)", "exposed_to_developer": false}
+ },
+ "tooling": {
+  "aisef_tree": "this worktree at 2ac9b80 (round-5 owner decision); aisef2/ untouched by this lane",
+  "python": "/opt/homebrew/bin/python3 3.14.7, run as `nice -n 19 python3 -P -B` with PYTHONPATH=<worktree>",
+  "commands": "dry-check/commands.log"
+ }
+}

@@ -1,0 +1,181 @@
+{
+ "admission": "not run: an unapproved contract does not compile (approve it, then lint again)",
+ "coverage": {
+  "criteria_citing_no_requirement_of_the_bundle": [],
+  "limit": "clauses are the ones the criteria's facts declare; AISEF does not parse the requirements document",
+  "requirements": {
+   "HR-1": {
+    "clauses": {
+     "1.1-1.2": [
+      "HC-DIR"
+     ]
+    },
+    "criteria": [
+     "HC-DIR"
+    ],
+    "status": "COVERED"
+   },
+   "HR-3": {
+    "clauses": {
+     "1.4": [
+      "HC-MISSING"
+     ]
+    },
+    "criteria": [
+     "HC-MISSING"
+    ],
+    "status": "COVERED"
+   },
+   "HR-4": {
+    "clauses": {
+     "2.1": [
+      "HC-REG-OK"
+     ]
+    },
+    "criteria": [
+     "HC-REG-OK"
+    ],
+    "status": "COVERED"
+   },
+   "HR-5": {
+    "clauses": {
+     "2.2": [
+      "HC-REG-BAD"
+     ]
+    },
+    "criteria": [
+     "HC-REG-BAD"
+    ],
+    "status": "COVERED"
+   },
+   "HR-5b": {
+    "clauses": {
+     "2.3": [
+      "HC-REG-MISSING"
+     ]
+    },
+    "criteria": [
+     "HC-REG-MISSING"
+    ],
+    "status": "COVERED"
+   },
+   "HR-6": {
+    "clauses": {
+     "3.1": [
+      "HC-JSON"
+     ]
+    },
+    "criteria": [
+     "HC-JSON"
+    ],
+    "status": "COVERED"
+   },
+   "HR-6b": {
+    "clauses": {
+     "3.2": [
+      "HC-REPORT"
+     ]
+    },
+    "criteria": [
+     "HC-REPORT"
+    ],
+    "status": "COVERED"
+   },
+   "HR-7": {
+    "clauses": {
+     "4.2": [
+      "HC-STDLIB"
+     ]
+    },
+    "criteria": [
+     "HC-STDLIB"
+    ],
+    "status": "COVERED"
+   },
+   "HR-8": {
+    "clauses": {
+     "4.3": [
+      "HC-CITED",
+      "HC-TARGET"
+     ]
+    },
+    "criteria": [
+     "HC-CITED",
+     "HC-TARGET"
+    ],
+    "status": "COVERED"
+   }
+  }
+ },
+ "criteria_without_calibration": [],
+ "criteria_without_contract": [],
+ "to_approve": [
+  {
+   "contract": "H-DIR",
+   "contract_hash": "0073a03b5be68f43fcc25c67b8a5c12ad632823fa411868ef089370c8dc7f37c",
+   "requirement": "HR-1",
+   "requirement_hash": "c56f84893647af0c1e06a5437a5da3bd27f5e83bec3d7c2ef5cc2111c47471ec"
+  },
+  {
+   "contract": "H-MISSING",
+   "contract_hash": "0fba79d00b9fc53b6741be0957313b6f4302a784298642e93026809f21171d6e",
+   "requirement": "HR-3",
+   "requirement_hash": "6e201db4c862a5360a3637cb3c0b41b5f14b0ca1e5f53caa99393db39f561d63"
+  },
+  {
+   "contract": "H-REG-OK",
+   "contract_hash": "1791d002f9c855150ecb7a49cea5f3d131297a128d2b87995c477bbf4cb9910e",
+   "requirement": "HR-4",
+   "requirement_hash": "b3d3ad61deb95420f8f88a635ab5e704a6e8dc06f838e9ae55325202116c9d9d"
+  },
+  {
+   "contract": "H-REG-BAD",
+   "contract_hash": "d65e7f6a640be568a6954e8b6a91f2ed0ddf07f8fe6a59ac6bccab73a923c81b",
+   "requirement": "HR-5",
+   "requirement_hash": "6243aac353c26af6b217cac003d419b197a0bed2b9f7c65efa1840370590847a"
+  },
+  {
+   "contract": "H-REG-MISSING",
+   "contract_hash": "9b2f93d1806c08fa51093b90be79ffa6bf04ef8116188b9c08610169b097c9e5",
+   "requirement": "HR-5",
+   "requirement_hash": "6243aac353c26af6b217cac003d419b197a0bed2b9f7c65efa1840370590847a"
+  },
+  {
+   "contract": "H-REG-MISSING",
+   "contract_hash": "9b2f93d1806c08fa51093b90be79ffa6bf04ef8116188b9c08610169b097c9e5",
+   "requirement": "HR-5b",
+   "requirement_hash": "ac464d70d0c4a1628ee3d25c8459a70e99e74df03f63b26f065ad599ea423e36"
+  },
+  {
+   "contract": "H-JSON",
+   "contract_hash": "db5dcf8af9965956bbac29b88cd3b6df3c00cb39e29ce894ef085b9306fc39b8",
+   "requirement": "HR-6",
+   "requirement_hash": "bbc8011cacea95279786877e24abc478644aac689c16b3c51c838751cc8dd243"
+  },
+  {
+   "contract": "H-CITED",
+   "contract_hash": "b8fe4598cf362b14280197fa8fe905e967c42ef0c92c030598c63097f509986c",
+   "requirement": "HR-8",
+   "requirement_hash": "cbc4d1f79eaabe09f635e3cbe6f3590eb443d155c3bdb26cd3a02e1aaf28286f"
+  },
+  {
+   "contract": "H-TARGET",
+   "contract_hash": "cbd4f26dffc574c670decb0a5e7ab26d201cbf3c82093e9d861a726ad43aeb56",
+   "requirement": "HR-8",
+   "requirement_hash": "cbc4d1f79eaabe09f635e3cbe6f3590eb443d155c3bdb26cd3a02e1aaf28286f"
+  },
+  {
+   "contract": "H-REPORT",
+   "contract_hash": "2fc86f146967dfded5f30a74655cbbb5790844d1ab75405ae576ce668abd5acd",
+   "requirement": "HR-6b",
+   "requirement_hash": "5d7fb3d99cb26a192d79f1d81bd4f0244f82b0e744d290a46fd1db63b1ba52f5"
+  },
+  {
+   "contract": "H-STDLIB",
+   "contract_hash": "c14dcf1bfa84cd23bfc540a8a2b4c0e9f14f5f0ffff472cc971e93e3d8266a98",
+   "requirement": "HR-7",
+   "requirement_hash": "26197263e40c82bc3486512624cd88e3d17c40c2bf476269bf02854bcd79b306"
+  }
+ ],
+ "verdict": "NOT_READY"
+}

@@ -1,0 +1,135 @@
+{
+ "admission": "not run: an unapproved contract does not compile (approve it, then lint again)",
+ "coverage": {
+  "criteria_citing_no_requirement_of_the_bundle": [],
+  "limit": "clauses are the ones the criteria's facts declare; AISEF does not parse the requirements document",
+  "requirements": {
+   "R-1": {
+    "clauses": {
+     "1.1-1.2": [
+      "C-ROOT-DIR"
+     ]
+    },
+    "criteria": [
+     "C-ROOT-DIR"
+    ],
+    "status": "COVERED"
+   },
+   "R-3": {
+    "clauses": {
+     "1.4": [
+      "C-ROOT-MISSING"
+     ]
+    },
+    "criteria": [
+     "C-ROOT-MISSING"
+    ],
+    "status": "COVERED"
+   },
+   "R-4": {
+    "clauses": {
+     "2.1": [
+      "C-REG-PATH"
+     ]
+    },
+    "criteria": [
+     "C-REG-PATH"
+    ],
+    "status": "COVERED"
+   },
+   "R-5": {
+    "clauses": {
+     "2.2": [
+      "C-REG-BAD"
+     ]
+    },
+    "criteria": [
+     "C-REG-BAD"
+    ],
+    "status": "COVERED"
+   },
+   "R-6": {
+    "clauses": {
+     "3.1": [
+      "C-JSON"
+     ]
+    },
+    "criteria": [
+     "C-JSON"
+    ],
+    "status": "COVERED"
+   },
+   "R-7": {
+    "clauses": {
+     "4.2": [
+      "C-STDLIB-1",
+      "C-STDLIB-3"
+     ]
+    },
+    "criteria": [
+     "C-STDLIB-1",
+     "C-STDLIB-3"
+    ],
+    "status": "COVERED"
+   },
+   "R-8": {
+    "clauses": {
+     "4.3": [
+      "C-CITED-2"
+     ]
+    },
+    "criteria": [
+     "C-CITED-2"
+    ],
+    "status": "COVERED"
+   }
+  }
+ },
+ "criteria_without_calibration": [],
+ "criteria_without_contract": [],
+ "to_approve": [
+  {
+   "contract": "A-ROOT-DIR",
+   "contract_hash": "47e566b3e1f0a139214e6c057cee9c8d7c0d9c0a2ff830f842a55cbc36373a5b",
+   "requirement": "R-1",
+   "requirement_hash": "190b791cfda99c6fa05df7fe4f42c8f8e79a4770e74ecbc88ead4bed038eeff1"
+  },
+  {
+   "contract": "A-ROOT-MISSING",
+   "contract_hash": "e48291759fd9df591c1fc69e23f81d3742f5c2f0bdd2b3dbdd1cf730e3bbecc1",
+   "requirement": "R-3",
+   "requirement_hash": "d208ec65a6e6547dc4b4b04e2cc75680e4f92c42f5f51f40e4e227c0b6fd3863"
+  },
+  {
+   "contract": "A-REG-PATH",
+   "contract_hash": "eeec1361eadbdbff564298c00ceb4d4ef81475578bf5beeee30ddb219616bc5d",
+   "requirement": "R-4",
+   "requirement_hash": "22e025c49508f9973445f4acd778f6eb3fb640639c6089765c789ad082c8a85d"
+  },
+  {
+   "contract": "A-REG-BAD",
+   "contract_hash": "bf1c8cf81b07f0e4f483ab683594d9ba08cf4505b81c114e964716f037dea6d8",
+   "requirement": "R-5",
+   "requirement_hash": "f9b2b57e9c8d73fcb03f2f2ae684a2305c2756b39f16709d606dde92a214c3eb"
+  },
+  {
+   "contract": "A-JSON",
+   "contract_hash": "381eebd61a29bb6d7a5a937f2bdf7549ac55f81a91c799b1a8dd4846e17192a0",
+   "requirement": "R-6",
+   "requirement_hash": "44638dbff2d988730c239304018665daaba895403c4bcabd2e228d6c6077cf42"
+  },
+  {
+   "contract": "A-STDLIB",
+   "contract_hash": "1cce7676ea3c3a063f39c8a6ee39b7ecd3362719a88ea3b46abc524fd66ff50b",
+   "requirement": "R-7",
+   "requirement_hash": "3a0564480f3317899b4b5f290169c94e100195e460993310cdeadc0791728836"
+  },
+  {
+   "contract": "A-CITED",
+   "contract_hash": "4fbb8a1a089b4c8607fd6a4d7102614015da3cdc7c27d2f5bf6670c03245fe45",
+   "requirement": "R-8",
+   "requirement_hash": "9d4bf98f9d193896612a54ff36c87ed1875d62cc432a51f9767b57af3fef2e1f"
+  }
+ ],
+ "verdict": "NOT_READY"
+}

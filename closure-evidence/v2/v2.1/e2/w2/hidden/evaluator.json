@@ -1,0 +1,623 @@
+{
+ "approvals": [],
+ "contracts": [
+  {
+   "contract_hash": "0073a03b5be68f43fcc25c67b8a5c12ad632823fa411868ef089370c8dc7f37c",
+   "id": "H-DIR",
+   "observable": {
+    "exit_code": 1,
+    "stdout": {
+     "regex": "(?s)\\A(?!.*(?:node_modules|skipme|4 gb)).*notes/a\\.md:1: '7 seconds'.*notes/b\\.md:1: '1024 rps'"
+    },
+    "within_s": 25
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "1.1-1.2 hidden: a directory root is walked in sorted order (a.md before b.md), node_modules and a .txt file are not scanned",
+   "requirement_ids": [
+    "HR-1"
+   ],
+   "stimulus": {
+    "argv": [
+     "--root",
+     "<ws>/notes"
+    ],
+    "workspace": {
+     "notes/a.md": {
+      "text": "Cold start took 7 seconds on the first boot.\n"
+     },
+     "notes/b.md": {
+      "text": "Sustained ingest reached 1024 rps on the second node.\n"
+     },
+     "notes/node_modules/pkg/vendored.md": {
+      "text": "bundled copy claims 4 gb\n"
+     },
+     "notes/skipme.txt": {
+      "text": "scratch text with 4 gb\n"
+     }
+    }
+   },
+   "subject": {
+    "kind": "cli_invocation",
+    "locator": "infrastructure.ci.evidence_discipline:__main__"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "0fba79d00b9fc53b6741be0957313b6f4302a784298642e93026809f21171d6e",
+   "id": "H-MISSING",
+   "observable": {
+    "exit_code": 2,
+    "stderr": {
+     "contains": [
+      "absent-notes.md"
+     ]
+    },
+    "within_s": 25
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "1.4 hidden: a root that does not exist is exit 2 with the path on stderr",
+   "requirement_ids": [
+    "HR-3"
+   ],
+   "stimulus": {
+    "argv": [
+     "--root",
+     "<ws>/absent-notes.md"
+    ]
+   },
+   "subject": {
+    "kind": "cli_invocation",
+    "locator": "infrastructure.ci.evidence_discipline:__main__"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "1791d002f9c855150ecb7a49cea5f3d131297a128d2b87995c477bbf4cb9910e",
+   "id": "H-REG-OK",
+   "observable": {
+    "exit_code": 0,
+    "within_s": 25
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "2.1 hidden: both citation forms against the named registry are accepted",
+   "requirement_ids": [
+    "HR-4"
+   ],
+   "stimulus": {
+    "argv": [
+     "--registry",
+     "<ws>/runs/registry-w2.json",
+     "--root",
+     "<ws>/claims.md"
+    ],
+    "workspace": {
+     "claims.md": {
+      "text": "Steady throughput was 1024 rps (run_id w2-hidden-run-07)\nPeak memory: 12 GB, run_id: w2-hidden-run-09\n"
+     },
+     "runs/registry-w2.json": {
+      "text": "{\"description\": \"w2 hidden\", \"valid_runs\": [\"w2-hidden-run-07\", \"w2-hidden-run-09\"]}\n"
+     }
+    }
+   },
+   "subject": {
+    "kind": "cli_invocation",
+    "locator": "infrastructure.ci.evidence_discipline:__main__"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "d65e7f6a640be568a6954e8b6a91f2ed0ddf07f8fe6a59ac6bccab73a923c81b",
+   "id": "H-REG-BAD",
+   "observable": {
+    "exit_code": 2,
+    "stderr": {
+     "contains": [
+      "run registry:",
+      "registry-w2.json"
+     ]
+    },
+    "within_s": 25
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "2.2 hidden: valid_runs that is a string, not a list, is a malformed registry: exit 2, the 'run registry:' line names the path",
+   "requirement_ids": [
+    "HR-5"
+   ],
+   "stimulus": {
+    "argv": [
+     "--registry",
+     "<ws>/runs/registry-w2.json",
+     "--root",
+     "<ws>/claims.md"
+    ],
+    "workspace": {
+     "claims.md": {
+      "text": "Steady throughput was 1024 rps (run_id w2-hidden-run-07)\n"
+     },
+     "runs/registry-w2.json": {
+      "text": "{\"valid_runs\": \"w2-hidden-run-07\"}\n"
+     }
+    }
+   },
+   "subject": {
+    "kind": "cli_invocation",
+    "locator": "infrastructure.ci.evidence_discipline:__main__"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "9b2f93d1806c08fa51093b90be79ffa6bf04ef8116188b9c08610169b097c9e5",
+   "id": "H-REG-MISSING",
+   "observable": {
+    "returns": 2,
+    "within_s": 25
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "2.2-2.3 hidden: a registry file that does not exist makes cli_main return 2 (no sys.exit, no silent empty registry)",
+   "requirement_ids": [
+    "HR-5",
+    "HR-5b"
+   ],
+   "stimulus": {
+    "scenario": [
+     {
+      "files": {
+       "claims.md": {
+        "text": "Cold start took 7 seconds uncited\n"
+       }
+      },
+      "step": "workspace"
+     },
+     {
+      "args": [
+       [
+        "--registry",
+        "<ws>/no-such-registry.json",
+        "--root",
+        "<ws>/claims.md"
+       ]
+      ],
+      "kwargs": {},
+      "step": "call"
+     }
+    ]
+   },
+   "subject": {
+    "kind": "process_effect",
+    "locator": "infrastructure.ci.evidence_discipline:cli_main"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "db5dcf8af9965956bbac29b88cd3b6df3c00cb39e29ce894ef085b9306fc39b8",
+   "id": "H-JSON",
+   "observable": {
+    "exit_code": 1,
+    "stdout": {
+     "contains": [
+      "\"findings\"",
+      "1024 rps",
+      "\"accepted_targets\"",
+      "\"accepted_placeholders\""
+     ]
+    },
+    "within_s": 25
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "3.1 hidden: --format json prints the report document on stdout; exit 1 as there is a finding",
+   "requirement_ids": [
+    "HR-6"
+   ],
+   "stimulus": {
+    "argv": [
+     "--format",
+     "json",
+     "--root",
+     "<ws>/claims.md"
+    ],
+    "workspace": {
+     "claims.md": {
+      "text": "Sustained ingest reached 1024 rps on the second node.\n"
+     }
+    }
+   },
+   "subject": {
+    "kind": "cli_invocation",
+    "locator": "infrastructure.ci.evidence_discipline:__main__"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "b8fe4598cf362b14280197fa8fe905e967c42ef0c92c030598c63097f509986c",
+   "id": "H-CITED",
+   "observable": {
+    "exit_code": 0,
+    "within_s": 25
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "4.3 hidden: a figure cited to a run id of the default registry is accepted (true at the baseline)",
+   "requirement_ids": [
+    "HR-8"
+   ],
+   "stimulus": {
+    "argv": [
+     "--root",
+     "<ws>/claims.md"
+    ],
+    "workspace": {
+     "claims.md": {
+      "text": "Peak memory: 12 GB (run_id host-inventory.a100.2026-08-29)\n"
+     }
+    }
+   },
+   "subject": {
+    "kind": "cli_invocation",
+    "locator": "infrastructure.ci.evidence_discipline:__main__"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "cbd4f26dffc574c670decb0a5e7ab26d201cbf3c82093e9d861a726ad43aeb56",
+   "id": "H-TARGET",
+   "observable": {
+    "exit_code": 1,
+    "stdout": {
+     "regex": "(?s)\\A(?!.*(?:claims\\.md:1:|claims\\.md:3:|99 seconds)).*claims\\.md:5: '7 seconds'"
+    },
+    "within_s": 25
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "4.3 hidden: the target: line and the fenced line are not reported, the observed: line is (true at the baseline)",
+   "requirement_ids": [
+    "HR-8"
+   ],
+   "stimulus": {
+    "argv": [
+     "--root",
+     "<ws>/claims.md"
+    ],
+    "workspace": {
+     "claims.md": {
+      "text": "target: cold start under 10 seconds\n```\ncold start 99 seconds inside a fence\n```\nobserved: cold start 7 seconds\n"
+     }
+    }
+   },
+   "subject": {
+    "kind": "cli_invocation",
+    "locator": "infrastructure.ci.evidence_discipline:__main__"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "2fc86f146967dfded5f30a74655cbbb5790844d1ab75405ae576ce668abd5acd",
+   "id": "H-REPORT",
+   "observable": {
+    "exit_code": 0,
+    "files": {
+     "<ws>/out/report.json": {
+      "text": "{\n  \"findings\": [],\n  \"accepted_targets\": 1,\n  \"accepted_placeholders\": 0\n}"
+     }
+    },
+    "within_s": 25
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "3.2 hidden: --report writes today's document byte for byte (true at the baseline)",
+   "requirement_ids": [
+    "HR-6b"
+   ],
+   "stimulus": {
+    "argv": [
+     "--root",
+     "<ws>/claims.md",
+     "--report",
+     "<ws>/out/report.json"
+    ],
+    "workspace": {
+     "claims.md": {
+      "text": "- target: cold start under 10 seconds\n"
+     }
+    }
+   },
+   "subject": {
+    "kind": "cli_invocation",
+    "locator": "infrastructure.ci.evidence_discipline:__main__"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "c14dcf1bfa84cd23bfc540a8a2b4c0e9f14f5f0ffff472cc971e93e3d8266a98",
+   "id": "H-STDLIB",
+   "observable": {
+    "matches": 0,
+    "within_s": 25
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "4.2 hidden: no import statement of the linter names a module outside the standard library (true at the baseline)",
+   "requirement_ids": [
+    "HR-7"
+   ],
+   "stimulus": {
+    "imports_outside": {
+     "allowed": [
+      "infrastructure"
+     ],
+     "stdlib": true
+    },
+    "suffixes": [
+     ".py"
+    ]
+   },
+   "subject": {
+    "kind": "file_artifact",
+    "locator": "path:infrastructure/ci/evidence_discipline.py"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  }
+ ],
+ "description": "E2 workload W2, the HIDDEN evaluator: ten contracts over the evidence-discipline linter after docs/requirements-delta.md, with data no arm is shown (different documents, run ids, file names and figures from the public examples). Never given to any arm; evaluated by AISEF's probes on each frozen candidate (validation/experiments/harness.py evaluate).",
+ "facts": {
+  "HC-CITED": {
+   "clause": "4.3",
+   "clause_text": "The citation, target:, observation-prefix, placeholder and fenced-code rules are unchanged.",
+   "requirement": "HR-8",
+   "section": "§4",
+   "subject": "infrastructure.ci.evidence_discipline:__main__"
+  },
+  "HC-DIR": {
+   "clause": "1.1-1.2",
+   "clause_text": "A --root that names a directory is walked recursively (.md, .ts, .tsx; sorted); '.'-prefixed, node_modules, build and dist directories are not entered.",
+   "requirement": "HR-1",
+   "section": "§1",
+   "subject": "infrastructure.ci.evidence_discipline:__main__"
+  },
+  "HC-JSON": {
+   "clause": "3.1",
+   "clause_text": "--format json prints to stdout exactly one JSON document, the same document --report writes; the exit code does not depend on --format.",
+   "requirement": "HR-6",
+   "section": "§3",
+   "subject": "infrastructure.ci.evidence_discipline:__main__"
+  },
+  "HC-MISSING": {
+   "clause": "1.4",
+   "clause_text": "A --root that names a path that does not exist: one stderr message containing the path, nothing scanned, exit code 2.",
+   "requirement": "HR-3",
+   "section": "§1",
+   "subject": "infrastructure.ci.evidence_discipline:__main__"
+  },
+  "HC-REG-BAD": {
+   "clause": "2.2",
+   "clause_text": "An unreadable, non-JSON or malformed registry: load_run_registry raises RegistryError naming the path; cli_main prints one 'run registry:' line to stderr, scans nothing, returns 2.",
+   "requirement": "HR-5",
+   "section": "§2",
+   "subject": "infrastructure.ci.evidence_discipline:__main__"
+  },
+  "HC-REG-MISSING": {
+   "clause": "2.3",
+   "clause_text": "cli_main(argv) returns its exit code (0, 1 or 2) and never calls sys.exit itself.",
+   "requirement": "HR-5b",
+   "section": "§2",
+   "subject": "infrastructure.ci.evidence_discipline:cli_main"
+  },
+  "HC-REG-OK": {
+   "clause": "2.1",
+   "clause_text": "--registry PATH names the run registry file to read; without it the default infrastructure/ci/run_registry.json is read.",
+   "requirement": "HR-4",
+   "section": "§2",
+   "subject": "infrastructure.ci.evidence_discipline:__main__"
+  },
+  "HC-REPORT": {
+   "clause": "3.2",
+   "clause_text": "--report keeps writing its document to the named file, byte-identical to today's output for the same scan.",
+   "requirement": "HR-6b",
+   "section": "§3",
+   "subject": "infrastructure.ci.evidence_discipline:__main__"
+  },
+  "HC-STDLIB": {
+   "clause": "4.2",
+   "clause_text": "infrastructure/ci/evidence_discipline.py imports nothing outside the Python standard library.",
+   "requirement": "HR-7",
+   "section": "§4",
+   "subject": "infrastructure/ci/evidence_discipline.py"
+  },
+  "HC-TARGET": {
+   "clause": "4.3",
+   "clause_text": "The citation, target:, observation-prefix, placeholder and fenced-code rules are unchanged.",
+   "requirement": "HR-8",
+   "section": "§4",
+   "subject": "infrastructure.ci.evidence_discipline:__main__"
+  }
+ },
+ "format": "aisef-v2-project/1",
+ "name": "w2-evidence-linter-hidden",
+ "plan": {
+  "baseline": "cd7d5aaee2c9760004c75cf3bf6beecd5f04c772",
+  "id": "PLAN-w2-evidence-linter-hidden",
+  "obligations": [
+   {
+    "criterion_id": "HC-DIR",
+    "depends_on": [],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "1.1-1.2",
+    "product_proof_spec_id": "PPS-589d346e5494a2cdec30d6d9acc5c64e5fda5ca4ac157e68dec93bec74f7fbbf",
+    "role": "INTRODUCE",
+    "story_id": "HS1"
+   },
+   {
+    "criterion_id": "HC-MISSING",
+    "depends_on": [],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "1.4",
+    "product_proof_spec_id": "PPS-f4889a79737e4ed4202fc622cf5d43f8644265d59e7d61c9de7eeed223d1780a",
+    "role": "INTRODUCE",
+    "story_id": "HS1"
+   },
+   {
+    "criterion_id": "HC-TARGET",
+    "depends_on": [],
+    "expected_parent": "SATISFIED_AT_PARENT",
+    "ownership_rationale": "4.3",
+    "product_proof_spec_id": "PPS-ea2a223e54a281eb37b716489e7cfd00bcc3d496da4706c8454098dd297573d8",
+    "role": "PRESERVE",
+    "story_id": "HS1"
+   },
+   {
+    "criterion_id": "HC-STDLIB",
+    "depends_on": [],
+    "expected_parent": "SATISFIED_AT_PARENT",
+    "ownership_rationale": "4.2",
+    "product_proof_spec_id": "PPS-76d7f44b44a2e89ccb1b92d903b10ffca60d09a91716d5161661602efb28100b",
+    "role": "PRESERVE",
+    "story_id": "HS1"
+   },
+   {
+    "criterion_id": "HC-REG-OK",
+    "depends_on": [
+     "HC-DIR"
+    ],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "2.1",
+    "product_proof_spec_id": "PPS-7a98e544eb76332d5f539275c1f56e932d785887aa7023c5d0a1096c157facd1",
+    "role": "INTRODUCE",
+    "story_id": "HS2"
+   },
+   {
+    "criterion_id": "HC-REG-BAD",
+    "depends_on": [
+     "HC-DIR"
+    ],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "2.2",
+    "product_proof_spec_id": "PPS-e5f80ed2742c2dc1a09051ccd0c9bb303fc5527cbb91305ee49f1a30fac99a41",
+    "role": "INTRODUCE",
+    "story_id": "HS2"
+   },
+   {
+    "criterion_id": "HC-REG-MISSING",
+    "depends_on": [
+     "HC-DIR"
+    ],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "2.2-2.3",
+    "product_proof_spec_id": "PPS-2df3d74ba577d2f31fe693108b8e43b0de65674ecb741d3d9687c4586376bacb",
+    "role": "INTRODUCE",
+    "story_id": "HS2"
+   },
+   {
+    "criterion_id": "HC-CITED",
+    "depends_on": [],
+    "expected_parent": "SATISFIED_AT_PARENT",
+    "ownership_rationale": "4.3",
+    "product_proof_spec_id": "PPS-4be7ae7286b0df9162b25e360a6b02d5621bc8336d2fad1b37fc60aabca25701",
+    "role": "PRESERVE",
+    "story_id": "HS2"
+   },
+   {
+    "criterion_id": "HC-JSON",
+    "depends_on": [
+     "HC-REG-OK"
+    ],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "3.1",
+    "product_proof_spec_id": "PPS-f5f097674077e0d489c5b66bcb7c66a7d282a9cac7805d3f25993b7f111125b0",
+    "role": "INTRODUCE",
+    "story_id": "HS3"
+   },
+   {
+    "criterion_id": "HC-REPORT",
+    "depends_on": [],
+    "expected_parent": "SATISFIED_AT_PARENT",
+    "ownership_rationale": "3.2",
+    "product_proof_spec_id": "PPS-81176d89a0bb563817ab3674f96c76899286c4d7ccc922ed4e2eedce51283c0c",
+    "role": "PRESERVE",
+    "story_id": "HS3"
+   }
+  ],
+  "plan_hash": "92b9572ae566f11c42a99a5ddf6b28de974a380236e45b82c782785dc3e371af",
+  "plan_quality_policy": {
+   "max_fully_pre_satisfied_stories": null,
+   "max_pre_satisfied_introduce_ratio": null,
+   "max_unattributed_plan_drift": null
+  }
+ },
+ "product_roots": [
+  "infrastructure"
+ ],
+ "requirements": [
+  {
+   "id": "HR-1",
+   "requirement_hash": "c56f84893647af0c1e06a5437a5da3bd27f5e83bec3d7c2ef5cc2111c47471ec",
+   "source": "docs/requirements-delta.md#1.1-1.2",
+   "text": "A --root that names a directory is walked recursively; every file under it ending in .md, .ts or .tsx is scanned in sorted path order; a directory whose name starts with '.' or is node_modules, build or dist is not entered."
+  },
+  {
+   "id": "HR-3",
+   "requirement_hash": "6e201db4c862a5360a3637cb3c0b41b5f14b0ca1e5f53caa99393db39f561d63",
+   "source": "docs/requirements-delta.md#1.4",
+   "text": "A --root that names a path that does not exist is an error: one stderr message containing that path, nothing scanned, exit code 2."
+  },
+  {
+   "id": "HR-4",
+   "requirement_hash": "b3d3ad61deb95420f8f88a635ab5e704a6e8dc06f838e9ae55325202116c9d9d",
+   "source": "docs/requirements-delta.md#2.1",
+   "text": "--registry PATH names the run registry to read; without it the default infrastructure/ci/run_registry.json is read."
+  },
+  {
+   "id": "HR-5",
+   "requirement_hash": "6243aac353c26af6b217cac003d419b197a0bed2b9f7c65efa1840370590847a",
+   "source": "docs/requirements-delta.md#2.2",
+   "text": "A registry that cannot be read, is not JSON, or has no valid_runs list of strings is an error: load_run_registry raises RegistryError (a ValueError) naming the path; cli_main prints one stderr line starting with 'run registry:', scans nothing and returns 2."
+  },
+  {
+   "id": "HR-5b",
+   "requirement_hash": "ac464d70d0c4a1628ee3d25c8459a70e99e74df03f63b26f065ad599ea423e36",
+   "source": "docs/requirements-delta.md#2.3",
+   "text": "cli_main(argv) returns its exit code (0, 1 or 2) and never calls sys.exit itself."
+  },
+  {
+   "id": "HR-6",
+   "requirement_hash": "bbc8011cacea95279786877e24abc478644aac689c16b3c51c838751cc8dd243",
+   "source": "docs/requirements-delta.md#3.1",
+   "text": "--format json prints to stdout exactly one JSON document, the same document --report writes (findings, accepted_targets, accepted_placeholders); the exit code does not depend on --format."
+  },
+  {
+   "id": "HR-6b",
+   "requirement_hash": "5d7fb3d99cb26a192d79f1d81bd4f0244f82b0e744d290a46fd1db63b1ba52f5",
+   "source": "docs/requirements-delta.md#3.2",
+   "text": "--report keeps writing its document to the named file, byte-identical to today's output for the same scan."
+  },
+  {
+   "id": "HR-7",
+   "requirement_hash": "26197263e40c82bc3486512624cd88e3d17c40c2bf476269bf02854bcd79b306",
+   "source": "docs/requirements-delta.md#4.2",
+   "text": "infrastructure/ci/evidence_discipline.py imports nothing outside the Python standard library."
+  },
+  {
+   "id": "HR-8",
+   "requirement_hash": "cbc4d1f79eaabe09f635e3cbe6f3590eb443d155c3bdb26cd3a02e1aaf28286f",
+   "source": "docs/requirements-delta.md#4.3",
+   "text": "The citation, target:, observation-prefix, placeholder and fenced-code rules are unchanged."
+  }
+ ],
+ "requirements_document": {
+  "path": "docs/requirements-delta.md",
+  "sha256": "7b2c0bd3fa548b519a56a52cf97d65d1e40ff4277deb4982e4e3cd1c4a94748f"
+ },
+ "stories": {
+  "HS1": {
+   "depends_on": [],
+   "tests": []
+  },
+  "HS2": {
+   "depends_on": [
+    "HS1"
+   ],
+   "tests": []
+  },
+  "HS3": {
+   "depends_on": [
+    "HS2"
+   ],
+   "tests": []
+  }
+ }
+}

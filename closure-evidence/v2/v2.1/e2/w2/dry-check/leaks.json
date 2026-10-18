@@ -1,0 +1,65 @@
+{
+ "at": "2026-10-18 13:18:18 +0700",
+ "controls": {
+  "escaped": {
+   "harness_leaks": [],
+   "leaks_w2": [
+    {
+     "first": [
+      "Cold start took 7 seconds on the first boot.",
+      "Sustained ingest reached 1024 rps on the second node.",
+      "bundled copy claims 4 gb"
+     ],
+     "session": "escaped.developer.1.jsonl",
+     "strings": 6
+    }
+   ]
+  },
+  "negative": {
+   "harness_leaks": [],
+   "leaks_w2": []
+  },
+  "plain": {
+   "harness_leaks": [],
+   "leaks_w2": [
+    {
+     "first": [
+      "- target: cold start under 10 seconds",
+      "absent-notes.md",
+      "target: cold start under 10 seconds"
+     ],
+     "session": "plain.developer.1.jsonl",
+     "strings": 3
+    }
+   ]
+  },
+  "positive": {
+   "harness_leaks": [
+    {
+     "session": "positive.developer.1.jsonl",
+     "strings": 1
+    }
+   ],
+   "leaks_w2": [
+    {
+     "first": [
+      "absent-notes.md"
+     ],
+     "session": "positive.developer.1.jsonl",
+     "strings": 1
+    }
+   ]
+  }
+ },
+ "distinctive_json_strings": 20,
+ "excluded_public_vocabulary": [
+  "infrastructure",
+  "report.json"
+ ],
+ "harness_leaks_limit": "the escaped control is NOT reported by harness.leaks",
+ "json_hits": {},
+ "ok": true,
+ "plain_hits": {},
+ "plain_strings": 20,
+ "public_artefacts_scanned": 23
+}

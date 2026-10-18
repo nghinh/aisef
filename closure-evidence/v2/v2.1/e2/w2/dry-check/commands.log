@@ -1,0 +1,51 @@
+# W2 lane — commands and their outputs, in order (timestamps from `date`, +0700). PY = nice -n 19 /opt/homebrew/bin/python3 -P -B
+# with PYTHONPATH=/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/wf_830a4f0d-db8-2 PYTHONDONTWRITEBYTECODE=1.
+# No network request, no opencode, no `aisef run` was made by this lane. The campaign directories were never touched.
+
+2026-10-18 12:44:32  git branch --show-current -> worktree-wf_830a4f0d-db8-2; HEAD 2ac9b80
+2026-10-18 12:4x     candidates: ls ~/Downloads/projects -> no todo-cli, no todo-oc (find /Users/nghinh -maxdepth 6 -name todo-cli|todo-oc: nothing;
+                     mdfind: nothing; ~/.Trash: nothing). ~/Downloads/projects/todo: 24 commits all authored "AI-SDLC", .aisef/ + .opencode/ +
+                     _bmad-output/ present, code commits are AISEF V1 story runs (STORY-01-02, STORY-02-01) -> not "NOT produced by AISEF".
+                     Python-file survey (scratch survey.py / survey2.py): bread/scripts 45 (numpy, soundfile...), bread/infrastructure 31,
+                     bread/packages/protocol: codegen.py stdlib but writes two levels above its own dir and shells out to ruff; vsp/scripts
+                     11 (no tests); goe/* FastAPI+Docker; orca Electron; deepseek-harness Node monorepo.
+                     Chosen: bread/infrastructure/ci (evidence_discipline.py 300 lines stdlib, pytest file, run_registry.json).
+2026-10-18 12:5x     git -C bread rev-parse HEAD -> 6fde318ecac1e447f49d6b642707c78f17ddcb63; git status --porcelain: only untracked
+                     (.claude/, .mcp.json, HANDOFF-PROMPT.md, _bmad-output/..., _bmad/); log --format=%an | uniq -c: 11 Claude Fable 5, 407 Nghi Nguyen;
+                     log -i --grep=aisef: none; blame evidence_discipline.py: 300 lines Nghi Nguyen; introduced b386590 2026-09-01.
+                     ls-files -s: infrastructure/__init__.py e69de29b, ci/__init__.py e69de29b, ci/evidence_discipline.py e02e57e5,
+                     ci/run_registry.json e1fa23e5, ci/test_evidence_discipline.py 09dd4f3c (all 100644).
+2026-10-18 13:01:01  git checkout -b lane/e2-w2 (from 2ac9b80); mkdir closure-evidence/v2/v2.1/e2/w2/{baseline/docs,arms,hidden,tools,dry-check}
+2026-10-18 13:02:26  zsh init_repo.sh scratchpad/w2/repo -> baseline cd7d5aaee2c9760004c75cf3bf6beecd5f04c772 tree 96aa0e8342776e5f700cc0b52f9ac4b3151aab60
+                     zsh init_repo.sh scratchpad/w2/repo-again -> the same commit and tree; zsh init_repo.sh scratchpad/w2/repo -> "refused: ... exists" (exit 2)
+                     git -C repo status --porcelain | wc -l -> 0; git log: 1 commit, author "bread maintainers (filtered by the AISEF E2 W2 lane)" 2026-10-18 06:00:00 +0000
+                     baseline linter measured (PY infrastructure/ci/evidence_discipline.py ...): --root docs/requirements-delta.md -> 3 findings (its own examples), exit 1;
+                     --root <dir with an uncited doc> -> exit 0 (nothing scanned); --root <missing file> -> exit 0; --format json -> argparse "unrecognized arguments", exit 2
+2026-10-18 13:05     PY scratch/identity.py (harness.source_identity on repo) -> archive_sha256 d7c1e016e25bfd059150b7e2f372c62b2d461c173c378bee56fc37cfba5e908b,
+                     archive_size 71680, files_sha256 635de23b6c414fbdac73598d6a01ce47587829824758c072f497a8869595df21, git version 2.53.0
+2026-10-18 13:07:56  PY -m aisef bundle seal arms/authoring.json --repo repo --out arms/bundle.json -> exit 0; specs 7; to_approve 7; plan_hash d6c8b613…
+2026-10-18 13:08     PY -m aisef bundle seal hidden/authoring.json --repo repo --out hidden/evaluator.json -> exit 0; specs 10 (first version)
+                     PY -m aisef bundle lint arms/bundle.json > arms/lint.json -> exit 1, NOT_READY, "admission: not run: an unapproved contract does not compile"
+                     PY -m aisef bundle lint hidden/evaluator.json > hidden/lint.json -> exit 1, NOT_READY (same reason); criteria_without_calibration []
+2026-10-18 13:08:37  PY tools/dry_check.py repo scratch/w2/dry -> exit 1: json_hits {w2/arms/authoring.json: 3} (three hidden stimulus/observable
+                     strings were byte-identical to public ones: within_s 30, the stdlib imports_outside stimulus, {"exit_code": 0, "within_s": 30});
+                     controls: positive NOT reported (the hidden stimulus held "\n": harness.leaks' quote-only escape misses it when nested in JSON);
+                     baseline verdicts already as expected (hidden 4/10 satisfied = the PRESERVE four; arms 2/7); both approved copies lint READY.
+                     Fix: hidden within_s 25, "suffixes": [".py"] on the stdlib stimulus, newline keys dropped, a plain-string scan added (tools/leaks_w2.py).
+2026-10-18 13:11:43  rm hidden/evaluator.json hidden/lint.json; seal again -> exit 0 (10 specs); lint -> NOT_READY (unapproved) as expected
+2026-10-18 13:12:14  PY tools/dry_check.py -> exit 1: json_hits {} ; plain_hits named public vocabulary only ("accepted_targets", "imports_outside",
+                     "run registry:", report.json) — the plain scan was too wide (dict keys and observable text). Fix: stimulus values only, and strings
+                     the task text or the baseline tree already hold are excluded and recorded; hidden file readme.md renamed vendored.md.
+2026-10-18 13:12     PY scratch/settings_check.py settings-B.json settings-C.json -> both LOAD (route 9router/mycombo; B review advisory/critical
+                     given False = 2.0.0 rule; C fix-loop/high); budget 58 req / 700 turns / 30M in / 0.5M out
+2026-10-18 13:13:40  rm hidden/evaluator.json hidden/lint.json; seal -> exit 0; lint -> exit 1 NOT_READY (unapproved; expected)
+2026-10-18 13:13:51  PY tools/dry_check.py repo scratch/w2/dry -> exit 0: leaks_ok true, json_hits {}, plain_hits {};
+                     controls positive harness 1 / w2 1; escaped harness 0 / w2 1 (LIMIT of harness.leaks, recorded); plain harness 0 / w2 1; negative 0 / 0;
+                     hidden: lint READY (approved copy), evaluation total 10 satisfied 4 (H-CITED H-TARGET H-REPORT H-STDLIB), not satisfied 6 (the INTRODUCE six), all EXECUTED;
+                     arms: lint READY, total 7 satisfied 2 (A-CITED A-STDLIB), not satisfied 5, all EXECUTED. Records: dry-check/leaks.json, baseline.json, plain-strings.json
+2026-10-18 13:14     shasum -a 256 of every artefact -> PROVENANCE.json / README.md
+2026-10-18 13:14:22  PY -m unittest tests/v2/test_v21_experiment.py (without PYTHONPATH) -> errors=1 in 0.000s: -P keeps the cwd off sys.path, the module
+                     did not import — an invocation error, not a test failure; re-run with PYTHONPATH below.
+2026-10-18 13:16:10  PYTHONPATH=<worktree> PY -m unittest tests/v2/test_v21_experiment.py -> Ran 5 tests in 3.998s OK (the harness is unchanged by this lane)
+2026-10-18 13:16     grep requirements_document in both bundles -> path docs/requirements-delta.md, sha256 7b2c0bd3fa548b519a56a52cf97d65d1e40ff4277deb4982e4e3cd1c4a94748f; "approvals": [] in both
+2026-10-18 13:18:18  README.md edited to name no hidden string; rm scratch/w2/dry; PY tools/dry_check.py -> exit 0 again (22 public artefacts incl. this README): json_hits {}, plain_hits {}, controls as before, both bundles READY on approved copies, baseline verdicts unchanged (hidden 4/10, arms 2/7). Records rewritten: dry-check/leaks.json, baseline.json, plain-strings.json

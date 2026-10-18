@@ -1,0 +1,476 @@
+{
+ "approvals": [],
+ "contracts": [
+  {
+   "contract_hash": "47e566b3e1f0a139214e6c057cee9c8d7c0d9c0a2ff830f842a55cbc36373a5b",
+   "id": "A-ROOT-DIR",
+   "observable": {
+    "exit_code": 1,
+    "stdout": {
+     "regex": "(?s)\\A(?!.*(?:node_modules|notes\\.txt|999 ms)).*docs/capacity\\.md:1: '128 streams'"
+    },
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "1.1-1.2 public example: a directory root is walked (capacity.md:1 reported), node_modules and a .txt file are not scanned",
+   "requirement_ids": [
+    "R-1"
+   ],
+   "stimulus": {
+    "argv": [
+     "--root",
+     "<ws>/docs"
+    ],
+    "workspace": {
+     "docs/capacity.md": {
+      "newline": "\n",
+      "text": "Documented capacity is 128 streams per node.\n"
+     },
+     "docs/node_modules/vendor.md": {
+      "newline": "\n",
+      "text": "vendor copy says 999 ms\n"
+     },
+     "docs/notes.txt": {
+      "newline": "\n",
+      "text": "a plain text file with 999 ms\n"
+     }
+    }
+   },
+   "subject": {
+    "kind": "cli_invocation",
+    "locator": "infrastructure.ci.evidence_discipline:__main__"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "e48291759fd9df591c1fc69e23f81d3742f5c2f0bdd2b3dbdd1cf730e3bbecc1",
+   "id": "A-ROOT-MISSING",
+   "observable": {
+    "exit_code": 2,
+    "stderr": {
+     "contains": [
+      "missing/README.md"
+     ]
+    },
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "1.4 public example: a root that does not exist is exit 2 with the path on stderr",
+   "requirement_ids": [
+    "R-3"
+   ],
+   "stimulus": {
+    "argv": [
+     "--root",
+     "<ws>/missing/README.md"
+    ]
+   },
+   "subject": {
+    "kind": "cli_invocation",
+    "locator": "infrastructure.ci.evidence_discipline:__main__"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "eeec1361eadbdbff564298c00ceb4d4ef81475578bf5beeee30ddb219616bc5d",
+   "id": "A-REG-PATH",
+   "observable": {
+    "exit_code": 0,
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "2.1 public example: a figure cited to a run id of the named registry is accepted",
+   "requirement_ids": [
+    "R-4"
+   ],
+   "stimulus": {
+    "argv": [
+     "--registry",
+     "<ws>/registry.json",
+     "--root",
+     "<ws>/doc.md"
+    ],
+    "workspace": {
+     "doc.md": {
+      "newline": "\n",
+      "text": "p95 first partial latency is 250 ms (run_id bench-001)\n"
+     },
+     "registry.json": {
+      "newline": "\n",
+      "text": "{\"valid_runs\": [\"bench-001\"]}\n"
+     }
+    }
+   },
+   "subject": {
+    "kind": "cli_invocation",
+    "locator": "infrastructure.ci.evidence_discipline:__main__"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "bf1c8cf81b07f0e4f483ab683594d9ba08cf4505b81c114e964716f037dea6d8",
+   "id": "A-REG-BAD",
+   "observable": {
+    "exit_code": 2,
+    "stderr": {
+     "contains": [
+      "run registry:"
+     ]
+    },
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "2.2 public example: a registry that is not JSON is exit 2 with a 'run registry:' line on stderr",
+   "requirement_ids": [
+    "R-5"
+   ],
+   "stimulus": {
+    "argv": [
+     "--registry",
+     "<ws>/registry.json",
+     "--root",
+     "<ws>/doc.md"
+    ],
+    "workspace": {
+     "doc.md": {
+      "newline": "\n",
+      "text": "p95 first partial latency is 250 ms (run_id bench-001)\n"
+     },
+     "registry.json": {
+      "newline": "\n",
+      "text": "not json\n"
+     }
+    }
+   },
+   "subject": {
+    "kind": "cli_invocation",
+    "locator": "infrastructure.ci.evidence_discipline:__main__"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "381eebd61a29bb6d7a5a937f2bdf7549ac55f81a91c799b1a8dd4846e17192a0",
+   "id": "A-JSON",
+   "observable": {
+    "exit_code": 1,
+    "stdout": {
+     "contains": [
+      "\"findings\"",
+      "250 ms",
+      "\"accepted_targets\"",
+      "\"accepted_placeholders\""
+     ]
+    },
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "3.1 public example: --format json prints the report document on stdout; exit 1 as there is a finding",
+   "requirement_ids": [
+    "R-6"
+   ],
+   "stimulus": {
+    "argv": [
+     "--format",
+     "json",
+     "--root",
+     "<ws>/doc.md"
+    ],
+    "workspace": {
+     "doc.md": {
+      "newline": "\n",
+      "text": "p95 first partial latency is 250 ms with no citation\n"
+     }
+    }
+   },
+   "subject": {
+    "kind": "cli_invocation",
+    "locator": "infrastructure.ci.evidence_discipline:__main__"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "1cce7676ea3c3a063f39c8a6ee39b7ecd3362719a88ea3b46abc524fd66ff50b",
+   "id": "A-STDLIB",
+   "observable": {
+    "matches": 0,
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "4.2: no import statement of the linter names a module outside the standard library",
+   "requirement_ids": [
+    "R-7"
+   ],
+   "stimulus": {
+    "imports_outside": {
+     "allowed": [
+      "infrastructure"
+     ],
+     "stdlib": true
+    }
+   },
+   "subject": {
+    "kind": "file_artifact",
+    "locator": "path:infrastructure/ci/evidence_discipline.py"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "4fbb8a1a089b4c8607fd6a4d7102614015da3cdc7c27d2f5bf6670c03245fe45",
+   "id": "A-CITED",
+   "observable": {
+    "exit_code": 0,
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "4.3: a figure cited to a run id of the default registry is accepted (true at the baseline, must stay true)",
+   "requirement_ids": [
+    "R-8"
+   ],
+   "stimulus": {
+    "argv": [
+     "--root",
+     "<ws>/doc.md"
+    ],
+    "workspace": {
+     "doc.md": {
+      "newline": "\n",
+      "text": "- p95 first partial latency 250 ms (run_id wave2-conc-2026-09-03)\n"
+     }
+    }
+   },
+   "subject": {
+    "kind": "cli_invocation",
+    "locator": "infrastructure.ci.evidence_discipline:__main__"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  }
+ ],
+ "description": "E2 workload W2 (brownfield): the evidence-discipline linter of bread@6fde318 plus the maintainers' requirements delta (directory roots, an explicit run registry with strict errors, JSON output). This is the arms' bundle: its contracts are the public examples of docs/requirements-delta.md; the hidden evaluator is a different bundle no arm sees.",
+ "facts": {
+  "C-CITED-2": {
+   "clause": "4.3",
+   "clause_text": "A figure cited to a run id present in the registry is accepted.",
+   "requirement": "R-8",
+   "section": "§4",
+   "subject": "infrastructure.ci.evidence_discipline:__main__"
+  },
+  "C-JSON": {
+   "clause": "3.1",
+   "clause_text": "--format json prints to stdout exactly one JSON document, the same document --report writes; the exit code does not depend on --format.",
+   "requirement": "R-6",
+   "section": "§3",
+   "subject": "infrastructure.ci.evidence_discipline:__main__"
+  },
+  "C-REG-BAD": {
+   "clause": "2.2",
+   "clause_text": "An unreadable, non-JSON or malformed registry: load_run_registry raises RegistryError naming the path; cli_main prints one 'run registry:' line to stderr, scans nothing, returns 2.",
+   "requirement": "R-5",
+   "section": "§2",
+   "subject": "infrastructure.ci.evidence_discipline:__main__"
+  },
+  "C-REG-PATH": {
+   "clause": "2.1",
+   "clause_text": "--registry PATH names the run registry file to read; without it the default infrastructure/ci/run_registry.json is read.",
+   "requirement": "R-4",
+   "section": "§2",
+   "subject": "infrastructure.ci.evidence_discipline:__main__"
+  },
+  "C-ROOT-DIR": {
+   "clause": "1.1-1.2",
+   "clause_text": "A --root that names a directory is walked recursively (.md, .ts, .tsx; sorted); '.'-prefixed, node_modules, build and dist directories are not entered.",
+   "requirement": "R-1",
+   "section": "§1",
+   "subject": "infrastructure.ci.evidence_discipline:__main__"
+  },
+  "C-ROOT-MISSING": {
+   "clause": "1.4",
+   "clause_text": "A --root that names a path that does not exist: one stderr message containing the path, nothing scanned, exit code 2.",
+   "requirement": "R-3",
+   "section": "§1",
+   "subject": "infrastructure.ci.evidence_discipline:__main__"
+  },
+  "C-STDLIB-1": {
+   "clause": "4.2",
+   "clause_text": "infrastructure/ci/evidence_discipline.py imports nothing outside the Python standard library.",
+   "requirement": "R-7",
+   "section": "§4",
+   "subject": "infrastructure/ci/evidence_discipline.py"
+  },
+  "C-STDLIB-3": {
+   "clause": "4.2",
+   "clause_text": "infrastructure/ci/evidence_discipline.py imports nothing outside the Python standard library.",
+   "requirement": "R-7",
+   "section": "§4",
+   "subject": "infrastructure/ci/evidence_discipline.py"
+  }
+ },
+ "format": "aisef-v2-project/1",
+ "name": "w2-evidence-linter",
+ "plan": {
+  "baseline": "cd7d5aaee2c9760004c75cf3bf6beecd5f04c772",
+  "id": "PLAN-w2-evidence-linter",
+  "obligations": [
+   {
+    "criterion_id": "C-ROOT-DIR",
+    "depends_on": [],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "introduces 1.1-1.2",
+    "product_proof_spec_id": "PPS-f25a5ba28fde7161c692092bb8c0f60348a0f8be076de262a34e7808f9c8265f",
+    "role": "INTRODUCE",
+    "story_id": "S1"
+   },
+   {
+    "criterion_id": "C-ROOT-MISSING",
+    "depends_on": [],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "introduces 1.4",
+    "product_proof_spec_id": "PPS-e58bade7656542835d4586735328ce4b2fc1f14aac22ee6cc802c0d3863ada09",
+    "role": "INTRODUCE",
+    "story_id": "S1"
+   },
+   {
+    "criterion_id": "C-STDLIB-1",
+    "depends_on": [],
+    "expected_parent": "SATISFIED_AT_PARENT",
+    "ownership_rationale": "preserves 4.2",
+    "product_proof_spec_id": "PPS-89bd2ddf97c026c7d219c4653c3b8fd0e66eab60262afb6e8be5e097895b8ebb",
+    "role": "PRESERVE",
+    "story_id": "S1"
+   },
+   {
+    "criterion_id": "C-REG-PATH",
+    "depends_on": [
+     "C-ROOT-DIR"
+    ],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "introduces 2.1",
+    "product_proof_spec_id": "PPS-7e7b646b18ff4a7fb7dfcb697ac970c490ba1e579be4edddfdfb5f0726720982",
+    "role": "INTRODUCE",
+    "story_id": "S2"
+   },
+   {
+    "criterion_id": "C-REG-BAD",
+    "depends_on": [
+     "C-ROOT-DIR"
+    ],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "introduces 2.2",
+    "product_proof_spec_id": "PPS-ae45c155e838b0956c7e8479908573d94163bedda6421d07487448cc635cc766",
+    "role": "INTRODUCE",
+    "story_id": "S2"
+   },
+   {
+    "criterion_id": "C-CITED-2",
+    "depends_on": [],
+    "expected_parent": "SATISFIED_AT_PARENT",
+    "ownership_rationale": "preserves 4.3 across the registry change",
+    "product_proof_spec_id": "PPS-bdfdc6435e1a9abf101625b62ef4ff746b78979dd07168b53d1f4b0f3cd46739",
+    "role": "PRESERVE",
+    "story_id": "S2"
+   },
+   {
+    "criterion_id": "C-JSON",
+    "depends_on": [
+     "C-REG-PATH"
+    ],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "introduces 3.1",
+    "product_proof_spec_id": "PPS-70b70c71fd9d26633d261d98e787d85176114e743439aa07a85811280e3cd671",
+    "role": "INTRODUCE",
+    "story_id": "S3"
+   },
+   {
+    "criterion_id": "C-STDLIB-3",
+    "depends_on": [
+     "C-STDLIB-1"
+    ],
+    "expected_parent": "SATISFIED_AT_PARENT",
+    "ownership_rationale": "preserves 4.2 after the last change",
+    "product_proof_spec_id": "PPS-89bd2ddf97c026c7d219c4653c3b8fd0e66eab60262afb6e8be5e097895b8ebb",
+    "role": "PRESERVE",
+    "story_id": "S3"
+   }
+  ],
+  "plan_hash": "d6c8b61321d408c793d0d45130016df6f132e50c3289c2ae78511e884f12c463",
+  "plan_quality_policy": {
+   "max_fully_pre_satisfied_stories": null,
+   "max_pre_satisfied_introduce_ratio": null,
+   "max_unattributed_plan_drift": null
+  }
+ },
+ "product_roots": [
+  "infrastructure"
+ ],
+ "requirements": [
+  {
+   "id": "R-1",
+   "requirement_hash": "190b791cfda99c6fa05df7fe4f42c8f8e79a4770e74ecbc88ead4bed038eeff1",
+   "source": "docs/requirements-delta.md#1.1-1.2",
+   "text": "A --root that names a directory is walked recursively; every file under it ending in .md, .ts or .tsx is scanned in sorted path order; a directory whose name starts with '.' or is node_modules, build or dist is not entered."
+  },
+  {
+   "id": "R-3",
+   "requirement_hash": "d208ec65a6e6547dc4b4b04e2cc75680e4f92c42f5f51f40e4e227c0b6fd3863",
+   "source": "docs/requirements-delta.md#1.4",
+   "text": "A --root that names a path that does not exist is an error: one stderr message containing that path, nothing scanned, exit code 2."
+  },
+  {
+   "id": "R-4",
+   "requirement_hash": "22e025c49508f9973445f4acd778f6eb3fb640639c6089765c789ad082c8a85d",
+   "source": "docs/requirements-delta.md#2.1",
+   "text": "--registry PATH names the run registry to read; without it the default infrastructure/ci/run_registry.json is read."
+  },
+  {
+   "id": "R-5",
+   "requirement_hash": "f9b2b57e9c8d73fcb03f2f2ae684a2305c2756b39f16709d606dde92a214c3eb",
+   "source": "docs/requirements-delta.md#2.2",
+   "text": "A registry that cannot be read, is not JSON, or has no valid_runs list of strings is an error: load_run_registry raises RegistryError (a ValueError) naming the path; cli_main prints one stderr line starting with 'run registry:', scans nothing and returns 2."
+  },
+  {
+   "id": "R-6",
+   "requirement_hash": "44638dbff2d988730c239304018665daaba895403c4bcabd2e228d6c6077cf42",
+   "source": "docs/requirements-delta.md#3.1",
+   "text": "--format json prints to stdout exactly one JSON document, the same document --report writes (findings, accepted_targets, accepted_placeholders); the exit code does not depend on --format."
+  },
+  {
+   "id": "R-7",
+   "requirement_hash": "3a0564480f3317899b4b5f290169c94e100195e460993310cdeadc0791728836",
+   "source": "docs/requirements-delta.md#4.2",
+   "text": "infrastructure/ci/evidence_discipline.py imports nothing outside the Python standard library."
+  },
+  {
+   "id": "R-8",
+   "requirement_hash": "9d4bf98f9d193896612a54ff36c87ed1875d62cc432a51f9767b57af3fef2e1f",
+   "source": "docs/requirements-delta.md#4.3",
+   "text": "The citation rules are unchanged: a figure cited to a run id present in the registry is accepted."
+  }
+ ],
+ "requirements_document": {
+  "path": "docs/requirements-delta.md",
+  "sha256": "7b2c0bd3fa548b519a56a52cf97d65d1e40ff4277deb4982e4e3cd1c4a94748f"
+ },
+ "stories": {
+  "S1": {
+   "depends_on": [],
+   "tests": [
+    "infrastructure/ci/test_delta_roots.py"
+   ]
+  },
+  "S2": {
+   "depends_on": [
+    "S1"
+   ],
+   "tests": [
+    "infrastructure/ci/test_delta_registry.py"
+   ]
+  },
+  "S3": {
+   "depends_on": [
+    "S2"
+   ],
+   "tests": [
+    "infrastructure/ci/test_delta_json.py"
+   ]
+  }
+ }
+}
