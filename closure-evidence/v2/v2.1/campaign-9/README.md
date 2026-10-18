@@ -168,3 +168,18 @@ mutant) mà closure kill tests có mã `aisef2/` đã đổi (`run.py`, `lineage
 `campaign-6/trace.json` phủ trên cùng byte (3 kill file, 0 chạm); 47 target không có mã đổi trong closure. Hai nhóm này,
 70 target / 907 mutant, đứng tạm cho tới read-set ở head cuối. Hạn mức thời gian: 13.859 → 15.173 mutant thêm khoảng 10 giờ-worker;
 tường vẫn do `run.py::execute` quyết định (≈ 27 giờ).
+
+## 8. Lượt chạy (bản ghi của người điều phối; mốc theo đồng hồ hệ thống, không phải dự kiến)
+
+| | |
+|---|---|
+| Khởi chạy | **2026-10-18 08:17:16 +07** (`01:17:16Z`, `campaign.started`); worker 1–4 bắt đầu 01:17:20Z … 01:17:37Z |
+| Snapshot của worker | `4ec961e706a1f7bda16d131037058c4fe9c2663f` (cả bốn `c3-w*.snapshot`); cây `aisef2/`, `tests/`, `validation/` giống từng byte `69b0ea9` (`git rev-parse <sha>:<tree>`: `717fab17…`, `4d5d1cf6…`, `10f6007a…`); manifest 9 `snapshot` = `4ec961e` (commit `77aa955`, `--check` PASS trước khi chạy) |
+| Hàng đợi | `queue.txt` / `queue.tsv` (commit `ff6309f`): 544 target / 15.173 mutant, dài-nhất-trước theo `T0-SWEEP-9.json`, **0 cặp (null, file) đoán**, cận trên 715,1 giờ-worker; bảng thứ tự `EXECUTION-ORDER-10.json` qua `--order` |
+| Lệnh | `heavy.sh campaign9 campaign3.sh C 4ec961e 4 closure-evidence/v2/v2.1/EXECUTION-ORDER-10.json` + `watchdog.sh C` + `sync9.sh C campaign-9/run` (`launch.cmd`); khoá máy `heavy.lock.d/owner` = `campaign9 42612 2026-10-18 08:17:16`; không worker cũ (`pgrep mutation.py run` = 0 trước khi chạy), không khoá cũ |
+| Công cụ (sha256, 16 hex đầu) — chạy từ bản chép trong scratch, **giống từng byte** bản đã commit | `campaign-3/tools/campaign3.sh` `7d006b18c0fa4cf1`, `qworker.sh` `8387648666818245`, `watchdog.sh` `ddc6c19deb5e0432`, `progress3.py` `be252afd44bf5535`, `make_queue3.py` `706986fe81b48c16` (chạy từ kho); `campaign-9/tools/heavy.sh`, `sync9.sh` (bản bền vững của hai script scratch) |
+| Worker | 4 (tối đa chủ dự án cho phép); mỗi worker: worktree detached tại snapshot, `env -i`, PATH không có `opencode`, HOME/XDG/TMPDIR riêng, `owned_run.py` bọc từng target; tên trong scratch `c3-w1..4` (script không đổi), đổi thành `c9-w1..4` khi nhập vào `mutation-workers/` như campaign 8 |
+| Đĩa | 38 GiB trước khi dựng worktree → 25 GiB sau 25 giây (≈ 3 GiB/worker); `campaign3.sh` từ chối < 15 GiB lúc khởi động; worker dừng trước target kế tiếp khi < 10; `watchdog.sh` tạo STOP khi < 12, SIGTERM `mutation.py run` của đúng campaign này khi < 6; không xoá gì theo mẫu đường dẫn hay độ nhàn rỗi; janitor cũ không chạy |
+| Bền vững | `sync9.sh` mirror thư mục campaign (trừ worktree/env của worker) sang `campaign-9/run/` trên đĩa thật mỗi 600 s; bản chép cuối nhập vào `results/` + `mutation-workers/` sau khi xong |
+| Dự báo lúc khởi chạy (chưa đo) | 715 giờ-worker cận trên × hệ số thực/cận trên của campaign 5 (0,17) ≈ 122 giờ-worker; tường do `run.py::execute` quyết: cận trên 258.367 s = 71,8 h × 0,475 (c5: 51,1 h → 24,3 h) ≈ 34 h ⇒ **≈ 30–36 giờ tường**, kết thúc khoảng 14:00–20:00 ngày 2026-10-19 (+07). Số 27 h ở §7 dựa trên T0-SWEEP-8; T0-SWEEP-9 đo `execute` chậm hơn (705,9 s/chuỗi) |
+| Quy tắc kết quả | TIMEOUT / INFRA / NOT_RUN là lớp riêng, không đếm là KILLED (`progress3.py`); hàng như vậy chạy lại một mình ở cùng snapshot như `c3b`; survivor mới kiểm toán theo vị trí (hai bản sao mù), không thêm test chỉ để đạt 100 % |
