@@ -1,0 +1,585 @@
+{
+ "record": "AISEF V2.1 - campaign 9: targets promoted from STANDS_PROVISIONAL to measured, by the orchestrator",
+ "rule": "a target whose kill tests' closure holds changed code of aisef2/ (other than aisef2/runtime/process_range.py, which campaign-6/trace.json covers on the same bytes) has no reach basis today; the runner contract (docs/v2.1/MUTATION-RUNNER-V2.md section 19) re-measures by default. Promoted rather than waiting for a reach record at the final head, to avoid a surprise second measurement (the blind reviewer's F-4).",
+ "targets": {
+  "aisef2/app/confine.py::KEYS": {
+   "mutants": 4,
+   "changed_code_in_the_kill_closure": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle_cli.py",
+    "aisef2/app/calibrations.py",
+    "aisef2/app/cli.py",
+    "aisef2/app/client.py",
+    "aisef2/app/diagnostics.py",
+    "aisef2/app/lineage.py",
+    "aisef2/app/review_ocr.py",
+    "aisef2/app/review_verify.py",
+    "aisef2/app/run.py",
+    "aisef2/app/verify.py",
+    "aisef2/probe/catalog.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/file_artifact.py",
+    "aisef2/probe/process_effect.py",
+    "aisef2/probe/python_callable_v2.py"
+   ]
+  },
+  "aisef2/app/confine.py::NETWORKS": {
+   "mutants": 2,
+   "changed_code_in_the_kill_closure": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle_cli.py",
+    "aisef2/app/calibrations.py",
+    "aisef2/app/cli.py",
+    "aisef2/app/client.py",
+    "aisef2/app/diagnostics.py",
+    "aisef2/app/lineage.py",
+    "aisef2/app/review_ocr.py",
+    "aisef2/app/review_verify.py",
+    "aisef2/app/run.py",
+    "aisef2/app/verify.py",
+    "aisef2/probe/catalog.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/file_artifact.py",
+    "aisef2/probe/process_effect.py",
+    "aisef2/probe/python_callable_v2.py"
+   ]
+  },
+  "aisef2/app/confine.py::SYSTEM": {
+   "mutants": 8,
+   "changed_code_in_the_kill_closure": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle_cli.py",
+    "aisef2/app/calibrations.py",
+    "aisef2/app/cli.py",
+    "aisef2/app/client.py",
+    "aisef2/app/diagnostics.py",
+    "aisef2/app/lineage.py",
+    "aisef2/app/review_ocr.py",
+    "aisef2/app/review_verify.py",
+    "aisef2/app/run.py",
+    "aisef2/app/verify.py",
+    "aisef2/probe/catalog.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/file_artifact.py",
+    "aisef2/probe/process_effect.py",
+    "aisef2/probe/python_callable_v2.py"
+   ]
+  },
+  "aisef2/app/confine.py::USERNS_REFUSED": {
+   "mutants": 1,
+   "changed_code_in_the_kill_closure": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle_cli.py",
+    "aisef2/app/calibrations.py",
+    "aisef2/app/cli.py",
+    "aisef2/app/client.py",
+    "aisef2/app/diagnostics.py",
+    "aisef2/app/lineage.py",
+    "aisef2/app/review_ocr.py",
+    "aisef2/app/review_verify.py",
+    "aisef2/app/run.py",
+    "aisef2/app/verify.py",
+    "aisef2/probe/catalog.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/file_artifact.py",
+    "aisef2/probe/process_effect.py",
+    "aisef2/probe/python_callable_v2.py"
+   ]
+  },
+  "aisef2/app/confine.py::_host_mounts": {
+   "mutants": 16,
+   "changed_code_in_the_kill_closure": [
+    "aisef2/app/client.py",
+    "aisef2/app/lineage.py"
+   ]
+  },
+  "aisef2/app/confine.py::_judge": {
+   "mutants": 182,
+   "changed_code_in_the_kill_closure": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle_cli.py",
+    "aisef2/app/calibrations.py",
+    "aisef2/app/cli.py",
+    "aisef2/app/client.py",
+    "aisef2/app/diagnostics.py",
+    "aisef2/app/lineage.py",
+    "aisef2/app/review_ocr.py",
+    "aisef2/app/review_verify.py",
+    "aisef2/app/run.py",
+    "aisef2/app/verify.py",
+    "aisef2/probe/catalog.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/file_artifact.py",
+    "aisef2/probe/process_effect.py",
+    "aisef2/probe/python_callable_v2.py"
+   ]
+  },
+  "aisef2/app/confine.py::_lines": {
+   "mutants": 4,
+   "changed_code_in_the_kill_closure": [
+    "aisef2/app/client.py",
+    "aisef2/app/lineage.py"
+   ]
+  },
+  "aisef2/app/confine.py::_link": {
+   "mutants": 4,
+   "changed_code_in_the_kill_closure": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle_cli.py",
+    "aisef2/app/calibrations.py",
+    "aisef2/app/cli.py",
+    "aisef2/app/client.py",
+    "aisef2/app/diagnostics.py",
+    "aisef2/app/lineage.py",
+    "aisef2/app/review_ocr.py",
+    "aisef2/app/review_verify.py",
+    "aisef2/app/run.py",
+    "aisef2/app/verify.py",
+    "aisef2/probe/catalog.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/file_artifact.py",
+    "aisef2/probe/process_effect.py",
+    "aisef2/probe/python_callable_v2.py"
+   ]
+  },
+  "aisef2/app/confine.py::_mounts": {
+   "mutants": 46,
+   "changed_code_in_the_kill_closure": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle_cli.py",
+    "aisef2/app/calibrations.py",
+    "aisef2/app/cli.py",
+    "aisef2/app/client.py",
+    "aisef2/app/diagnostics.py",
+    "aisef2/app/lineage.py",
+    "aisef2/app/review_ocr.py",
+    "aisef2/app/review_verify.py",
+    "aisef2/app/run.py",
+    "aisef2/app/verify.py",
+    "aisef2/probe/catalog.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/file_artifact.py",
+    "aisef2/probe/process_effect.py",
+    "aisef2/probe/python_callable_v2.py"
+   ]
+  },
+  "aisef2/app/confine.py::_probe": {
+   "mutants": 216,
+   "changed_code_in_the_kill_closure": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle_cli.py",
+    "aisef2/app/calibrations.py",
+    "aisef2/app/cli.py",
+    "aisef2/app/client.py",
+    "aisef2/app/diagnostics.py",
+    "aisef2/app/lineage.py",
+    "aisef2/app/review_ocr.py",
+    "aisef2/app/review_verify.py",
+    "aisef2/app/run.py",
+    "aisef2/app/verify.py",
+    "aisef2/probe/catalog.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/file_artifact.py",
+    "aisef2/probe/process_effect.py",
+    "aisef2/probe/python_callable_v2.py"
+   ]
+  },
+  "aisef2/app/confine.py::_sections": {
+   "mutants": 50,
+   "changed_code_in_the_kill_closure": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle_cli.py",
+    "aisef2/app/calibrations.py",
+    "aisef2/app/cli.py",
+    "aisef2/app/client.py",
+    "aisef2/app/diagnostics.py",
+    "aisef2/app/lineage.py",
+    "aisef2/app/review_ocr.py",
+    "aisef2/app/review_verify.py",
+    "aisef2/app/run.py",
+    "aisef2/app/verify.py",
+    "aisef2/probe/catalog.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/file_artifact.py",
+    "aisef2/probe/process_effect.py",
+    "aisef2/probe/python_callable_v2.py"
+   ]
+  },
+  "aisef2/app/confine.py::_survivors": {
+   "mutants": 8,
+   "changed_code_in_the_kill_closure": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle_cli.py",
+    "aisef2/app/calibrations.py",
+    "aisef2/app/cli.py",
+    "aisef2/app/client.py",
+    "aisef2/app/diagnostics.py",
+    "aisef2/app/lineage.py",
+    "aisef2/app/review_ocr.py",
+    "aisef2/app/review_verify.py",
+    "aisef2/app/run.py",
+    "aisef2/app/verify.py",
+    "aisef2/probe/catalog.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/file_artifact.py",
+    "aisef2/probe/process_effect.py",
+    "aisef2/probe/python_callable_v2.py"
+   ]
+  },
+  "aisef2/app/confine.py::_within": {
+   "mutants": 5,
+   "changed_code_in_the_kill_closure": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle_cli.py",
+    "aisef2/app/calibrations.py",
+    "aisef2/app/cli.py",
+    "aisef2/app/client.py",
+    "aisef2/app/diagnostics.py",
+    "aisef2/app/lineage.py",
+    "aisef2/app/review_ocr.py",
+    "aisef2/app/review_verify.py",
+    "aisef2/app/run.py",
+    "aisef2/app/verify.py",
+    "aisef2/probe/catalog.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/file_artifact.py",
+    "aisef2/probe/process_effect.py",
+    "aisef2/probe/python_callable_v2.py"
+   ]
+  },
+  "aisef2/app/confine.py::_worktree": {
+   "mutants": 44,
+   "changed_code_in_the_kill_closure": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle_cli.py",
+    "aisef2/app/calibrations.py",
+    "aisef2/app/cli.py",
+    "aisef2/app/client.py",
+    "aisef2/app/diagnostics.py",
+    "aisef2/app/lineage.py",
+    "aisef2/app/review_ocr.py",
+    "aisef2/app/review_verify.py",
+    "aisef2/app/run.py",
+    "aisef2/app/verify.py",
+    "aisef2/probe/catalog.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/file_artifact.py",
+    "aisef2/probe/process_effect.py",
+    "aisef2/probe/python_callable_v2.py"
+   ]
+  },
+  "aisef2/app/confine.py::argv": {
+   "mutants": 73,
+   "changed_code_in_the_kill_closure": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle_cli.py",
+    "aisef2/app/calibrations.py",
+    "aisef2/app/cli.py",
+    "aisef2/app/client.py",
+    "aisef2/app/diagnostics.py",
+    "aisef2/app/lineage.py",
+    "aisef2/app/review_ocr.py",
+    "aisef2/app/review_verify.py",
+    "aisef2/app/run.py",
+    "aisef2/app/verify.py",
+    "aisef2/probe/catalog.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/file_artifact.py",
+    "aisef2/probe/process_effect.py",
+    "aisef2/probe/python_callable_v2.py"
+   ]
+  },
+  "aisef2/app/confine.py::config_dir": {
+   "mutants": 13,
+   "changed_code_in_the_kill_closure": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle_cli.py",
+    "aisef2/app/calibrations.py",
+    "aisef2/app/cli.py",
+    "aisef2/app/client.py",
+    "aisef2/app/diagnostics.py",
+    "aisef2/app/lineage.py",
+    "aisef2/app/review_ocr.py",
+    "aisef2/app/review_verify.py",
+    "aisef2/app/run.py",
+    "aisef2/app/verify.py",
+    "aisef2/probe/catalog.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/file_artifact.py",
+    "aisef2/probe/process_effect.py",
+    "aisef2/probe/python_callable_v2.py"
+   ]
+  },
+  "aisef2/app/confine.py::git_dir": {
+   "mutants": 13,
+   "changed_code_in_the_kill_closure": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle_cli.py",
+    "aisef2/app/calibrations.py",
+    "aisef2/app/cli.py",
+    "aisef2/app/client.py",
+    "aisef2/app/diagnostics.py",
+    "aisef2/app/lineage.py",
+    "aisef2/app/review_ocr.py",
+    "aisef2/app/review_verify.py",
+    "aisef2/app/run.py",
+    "aisef2/app/verify.py",
+    "aisef2/probe/catalog.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/file_artifact.py",
+    "aisef2/probe/process_effect.py",
+    "aisef2/probe/python_callable_v2.py"
+   ]
+  },
+  "aisef2/app/confine.py::measure": {
+   "mutants": 60,
+   "changed_code_in_the_kill_closure": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle_cli.py",
+    "aisef2/app/calibrations.py",
+    "aisef2/app/cli.py",
+    "aisef2/app/client.py",
+    "aisef2/app/diagnostics.py",
+    "aisef2/app/lineage.py",
+    "aisef2/app/review_ocr.py",
+    "aisef2/app/review_verify.py",
+    "aisef2/app/run.py",
+    "aisef2/app/verify.py",
+    "aisef2/probe/catalog.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/file_artifact.py",
+    "aisef2/probe/process_effect.py",
+    "aisef2/probe/python_callable_v2.py"
+   ]
+  },
+  "aisef2/app/confine.py::namespaces": {
+   "mutants": 16,
+   "changed_code_in_the_kill_closure": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle_cli.py",
+    "aisef2/app/calibrations.py",
+    "aisef2/app/cli.py",
+    "aisef2/app/client.py",
+    "aisef2/app/diagnostics.py",
+    "aisef2/app/lineage.py",
+    "aisef2/app/review_ocr.py",
+    "aisef2/app/review_verify.py",
+    "aisef2/app/run.py",
+    "aisef2/app/verify.py",
+    "aisef2/probe/catalog.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/file_artifact.py",
+    "aisef2/probe/process_effect.py",
+    "aisef2/probe/python_callable_v2.py"
+   ]
+  },
+  "aisef2/app/confine.py::problem": {
+   "mutants": 45,
+   "changed_code_in_the_kill_closure": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle_cli.py",
+    "aisef2/app/calibrations.py",
+    "aisef2/app/cli.py",
+    "aisef2/app/client.py",
+    "aisef2/app/diagnostics.py",
+    "aisef2/app/lineage.py",
+    "aisef2/app/review_ocr.py",
+    "aisef2/app/review_verify.py",
+    "aisef2/app/run.py",
+    "aisef2/app/verify.py",
+    "aisef2/probe/catalog.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/file_artifact.py",
+    "aisef2/probe/process_effect.py",
+    "aisef2/probe/python_callable_v2.py"
+   ]
+  },
+  "aisef2/app/confine.py::targets": {
+   "mutants": 26,
+   "changed_code_in_the_kill_closure": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle_cli.py",
+    "aisef2/app/calibrations.py",
+    "aisef2/app/cli.py",
+    "aisef2/app/client.py",
+    "aisef2/app/diagnostics.py",
+    "aisef2/app/lineage.py",
+    "aisef2/app/review_ocr.py",
+    "aisef2/app/review_verify.py",
+    "aisef2/app/run.py",
+    "aisef2/app/verify.py",
+    "aisef2/probe/catalog.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/file_artifact.py",
+    "aisef2/probe/process_effect.py",
+    "aisef2/probe/python_callable_v2.py"
+   ]
+  },
+  "aisef2/app/confine.py::wrap": {
+   "mutants": 69,
+   "changed_code_in_the_kill_closure": [
+    "aisef2/app/adapters.py",
+    "aisef2/app/bundle_cli.py",
+    "aisef2/app/calibrations.py",
+    "aisef2/app/cli.py",
+    "aisef2/app/client.py",
+    "aisef2/app/diagnostics.py",
+    "aisef2/app/lineage.py",
+    "aisef2/app/review_ocr.py",
+    "aisef2/app/review_verify.py",
+    "aisef2/app/run.py",
+    "aisef2/app/verify.py",
+    "aisef2/probe/catalog.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/file_artifact.py",
+    "aisef2/probe/process_effect.py",
+    "aisef2/probe/python_callable_v2.py"
+   ]
+  },
+  "aisef2/orchestrate/story_runner.py::StoryResult.committed": {
+   "mutants": 3,
+   "changed_code_in_the_kill_closure": [
+    "aisef2/app/calibrations.py",
+    "aisef2/probe/catalog.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/file_artifact.py",
+    "aisef2/probe/process_effect.py",
+    "aisef2/probe/python_callable_v2.py",
+    "aisef2/runtime/process_range.py",
+    "validation/qualification/v21_conformance_ruling.py"
+   ]
+  },
+  "aisef2/orchestrate/story_runner.py::StoryResult.revision": {
+   "mutants": 1,
+   "changed_code_in_the_kill_closure": [
+    "aisef2/app/calibrations.py",
+    "aisef2/probe/catalog.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/file_artifact.py",
+    "aisef2/probe/process_effect.py",
+    "aisef2/probe/python_callable_v2.py",
+    "aisef2/runtime/process_range.py",
+    "validation/qualification/v21_conformance_ruling.py"
+   ]
+  },
+  "aisef2/orchestrate/story_runner.py::_Held.__call__": {
+   "mutants": 3,
+   "changed_code_in_the_kill_closure": [
+    "aisef2/app/calibrations.py",
+    "aisef2/probe/catalog.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/file_artifact.py",
+    "aisef2/probe/process_effect.py",
+    "aisef2/probe/python_callable_v2.py",
+    "aisef2/runtime/process_range.py",
+    "validation/qualification/v21_conformance_ruling.py"
+   ]
+  },
+  "aisef2/orchestrate/story_runner.py::_Held.__init__": {
+   "mutants": 6,
+   "changed_code_in_the_kill_closure": [
+    "aisef2/app/calibrations.py",
+    "aisef2/probe/catalog.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/file_artifact.py",
+    "aisef2/probe/process_effect.py",
+    "aisef2/probe/python_callable_v2.py",
+    "aisef2/runtime/process_range.py",
+    "validation/qualification/v21_conformance_ruling.py"
+   ]
+  },
+  "aisef2/orchestrate/story_runner.py::_Held.release": {
+   "mutants": 3,
+   "changed_code_in_the_kill_closure": [
+    "aisef2/app/calibrations.py",
+    "aisef2/probe/catalog.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/file_artifact.py",
+    "aisef2/probe/process_effect.py",
+    "aisef2/probe/python_callable_v2.py",
+    "aisef2/runtime/process_range.py",
+    "validation/qualification/v21_conformance_ruling.py"
+   ]
+  },
+  "aisef2/orchestrate/story_runner.py::_attempt": {
+   "mutants": 324,
+   "changed_code_in_the_kill_closure": [
+    "aisef2/app/calibrations.py",
+    "aisef2/probe/catalog.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/file_artifact.py",
+    "aisef2/probe/process_effect.py",
+    "aisef2/probe/python_callable_v2.py",
+    "aisef2/runtime/process_range.py",
+    "validation/qualification/v21_conformance_ruling.py"
+   ]
+  },
+  "aisef2/orchestrate/story_runner.py::_committed": {
+   "mutants": 6,
+   "changed_code_in_the_kill_closure": [
+    "aisef2/app/calibrations.py",
+    "aisef2/probe/catalog.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/file_artifact.py",
+    "aisef2/probe/process_effect.py",
+    "aisef2/probe/python_callable_v2.py",
+    "aisef2/runtime/process_range.py",
+    "validation/qualification/v21_conformance_ruling.py"
+   ]
+  },
+  "aisef2/orchestrate/story_runner.py::_fail": {
+   "mutants": 34,
+   "changed_code_in_the_kill_closure": [
+    "aisef2/app/calibrations.py",
+    "aisef2/probe/catalog.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/file_artifact.py",
+    "aisef2/probe/process_effect.py",
+    "aisef2/probe/python_callable_v2.py",
+    "aisef2/runtime/process_range.py",
+    "validation/qualification/v21_conformance_ruling.py"
+   ]
+  },
+  "aisef2/orchestrate/story_runner.py::_freeze_plan": {
+   "mutants": 9,
+   "changed_code_in_the_kill_closure": [
+    "aisef2/app/calibrations.py",
+    "aisef2/probe/catalog.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/file_artifact.py",
+    "aisef2/probe/process_effect.py",
+    "aisef2/probe/python_callable_v2.py",
+    "aisef2/runtime/process_range.py",
+    "validation/qualification/v21_conformance_ruling.py"
+   ]
+  },
+  "aisef2/orchestrate/story_runner.py::_probe": {
+   "mutants": 9,
+   "changed_code_in_the_kill_closure": [
+    "aisef2/app/calibrations.py",
+    "aisef2/probe/catalog.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/file_artifact.py",
+    "aisef2/probe/process_effect.py",
+    "aisef2/probe/python_callable_v2.py",
+    "aisef2/runtime/process_range.py",
+    "validation/qualification/v21_conformance_ruling.py"
+   ]
+  },
+  "aisef2/orchestrate/story_runner.py::run_story": {
+   "mutants": 11,
+   "changed_code_in_the_kill_closure": [
+    "aisef2/app/calibrations.py",
+    "aisef2/probe/catalog.py",
+    "aisef2/probe/cli_invocation.py",
+    "aisef2/probe/file_artifact.py",
+    "aisef2/probe/process_effect.py",
+    "aisef2/probe/python_callable_v2.py",
+    "aisef2/runtime/process_range.py",
+    "validation/qualification/v21_conformance_ruling.py"
+   ]
+  }
+ },
+ "count": 33,
+ "mutants": 1314
+}

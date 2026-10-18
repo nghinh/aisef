@@ -23,7 +23,7 @@ Câu hỏi: trong 614 target của registry `V21_TARGETS` ở snapshot, target n
 Đếm hai lần, hai đường độc lập, cùng kết quả: `tools/scope9.py` (trong tiến trình) và `tools/verify9.py` (tiến trình mới, duyệt registry theo
 thứ tự ngược, dựng lại vai trò chỉ từ `DELTA.json`); cả hai dùng `validation.v2.mutation.mutants` của runner, chỉ đọc. Lần thứ ba: đếm lại trên
 cây `2c9488d` (cây registry trước commit snapshot) cho 614 target / 16.080 mutant (chỉ `aisef2/app/calibrations.py` đổi giữa hai cây). Khớp
-với delta của snapshot cuối `5df323a` coi như một bảng: 511 đo lại / 103 đứng. Bốn bảng delta đều qua `v21_snapshot_delta.py --check`
+với delta của snapshot cuối `5df323a` coi như một bảng: 511 đo lại / 103 đứng. Bốn bảng delta qua `v21_snapshot_delta.py --check` **ở `69b0ea9`** (cây trước khi thêm `campaign-9/`; ở commit sau đó `--check` báo stale theo thiết kế vì `closure-evidence/v2` nằm trong COPY, §5.4)
 (tái dẫn xuất từng byte): PASS.
 
 **Không có bất đồng** giữa kết luận của công cụ delta và bản ghi kết quả đang đứng (`disagreements: []` trong `SCOPE.json`). Phép kiểm cho
@@ -55,7 +55,7 @@ và `standing` (bản ghi worker, digest/bộ kill/số mutant lúc đo so với
 | | SCOPE-BEFORE-PIN | ở đây | chênh |
 |---|---:|---:|---|
 | target phải đo lại | ≈ 509 | 511 | +2 = hai target của `lineage-r2` (`lineage.py::_recorded_spend` 48 mutant, `_evidence_gone` 58), đăng ký ở `2c9488d` sau lần đo 03:00 |
-| mutant phải đo lại | ≈ 13.751 | 13.859 | +106 của hai target đó, +2 chưa truy ra: bản đếm của tài liệu cho cùng 612 target là 15.972, bộ sinh của runner cho 15.974 |
+| mutant phải đo lại | ≈ 13.751 | 13.859 | +106 của hai target đó, +2 của `lineage.py::account_of` (86 → 88 mutant khi lane lineage-r2 đổi `lineage.py` sau cây `3e1e83a`; truy ra bằng cách đếm lại ở cây đó) |
 | tệp byte đổi | 457 target / 11.852 mutant | 459 / 11.960 | = 457 + 2 và 11.852 + 106 + 2 (cùng hai mutant) |
 | tệp không đổi, kill file đổi | 52 / 1.899 | 52 / 1.899 | khớp tuyệt đối |
 | còn nguyên | ≈ 103 | 103 / 2.221 | khớp (tài liệu: 15.972 − 13.751 = 2.221) |
@@ -123,7 +123,7 @@ T0 của snapshot đang chạy ở máy, chưa có bản ghi (dự kiến `T0-SW
 | | giờ-worker (cận trên) |
 |---|---:|
 | đúng quy tắc, `make_queue3.py` chạy nguyên văn trên `T0-SWEEP-8.json` (chạy thật vào scratch, khớp `ESTIMATE.json`): cặp (null, file) không có hàng tính trung vị 1,8 giây | 165,4 (1.594 trên 1.880 cặp là đoán) |
-| **theo tệp** (cặp không có hàng cho null này: giây của chính kill file đó trên null cũ của module, rồi trung vị theo file, rồi trung vị): 286 cặp có hàng, 1.371 + 1 từ null cũ, 222 đoán | **610,7** (trong đó 8,0 là đoán; 29 kill file mới chưa từng đo T0) |
+| **theo tệp** (cặp không có hàng cho null này: giây của chính kill file đó trên null cũ của module, rồi trung vị theo file, rồi trung vị): 286 cặp có hàng, 1.371 + 1 từ null cũ, 222 đoán | **610,7** (trong đó 8,0 là đoán; 28 kill file mới chưa từng đo T0) |
 
 Hiệu chuẩn bằng các campaign đã chạy (`queue.tsv` + dấu started/finished của worker; `ESTIMATE.json` `calibration`): chạy/cận trên = 0,12 (c3), 0,10 (c4), **0,17 (c5: 528 target, 13.566 mutant, cận trên 589,1 giờ-worker, chạy 100,3 giờ-worker, 24,3 giờ tường)**,
 0,36 / 0,21 / 0,25 (c6/c7/c8, nhỏ nên chi phí khởi động trội). Campaign 5 là campaign duy nhất cùng cỡ.
@@ -155,3 +155,16 @@ Hiệu chuẩn bằng các campaign đã chạy (`queue.tsv` + dấu started/fin
 
 Bốn bảng delta tái dẫn xuất bằng `python -P validation/qualification/v21_snapshot_delta.py --write closure-evidence/v2/v2.1/campaign-9/delta-from-<base> --base <sha đầy đủ> --head 69b0ea946922bcd209ffbf5a7bd943ad96080df7`
 (`<sha đầy đủ>` của `REQUALIFICATION-MANIFEST-N.json` `snapshot`, N = 5, 6, 7, 8). Mỗi bảng ~3,5 phút.
+
+## 7. Quyết định của người điều phối sau khi gộp: 33 target được đo ngay (PROMOTED.json)
+
+Người rà soát độc lập (F-4) chỉ ra 33 target đứng tạm (`aisef2/app/confine.py` 22, `aisef2/orchestrate/story_runner.py` 11; 1.314
+mutant) mà closure kill tests có mã `aisef2/` đã đổi (`run.py`, `lineage.py`, `bundle_cli.py`, các probe, `calibrations.py`,
+`catalog.py`, …) và chưa có bản ghi trace/reach nào phủ; hợp đồng của runner (`docs/v2.1/MUTATION-RUNNER-V2.md` mục 19)
+đo lại theo mặc định. Để cuối cùng không phải mở một lượt đo thứ hai sau read-set, **chúng được đo cùng campaign này**
+(`PROMOTED.json`), không chờ bản ghi reach. `targets.txt` giữ nguyên là cái các quy tắc của công cụ cho ra (511 target /
+13.859 mutant; `scope9.py` và `verify9.py` không đổi); **danh sách chạy thật là `targets-run.txt` = `targets.txt` + `PROMOTED.json`
+= 544 target / 15.173 mutant**. 23 target còn lại có mã đổi trong closure chỉ là `aisef2/runtime/process_range.py`, đã được
+`campaign-6/trace.json` phủ trên cùng byte (3 kill file, 0 chạm); 47 target không có mã đổi trong closure. Hai nhóm này,
+70 target / 907 mutant, đứng tạm cho tới read-set ở head cuối. Hạn mức thời gian: 13.859 → 15.173 mutant thêm khoảng 10 giờ-worker;
+tường vẫn do `run.py::execute` quyết định (≈ 27 giờ).
