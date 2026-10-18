@@ -1,0 +1,19 @@
+{
+ "format": "aisef-v2-run/1",
+ "client": "opencode",
+ "route": "9router/mycombo",
+ "provider": {
+  "name": "9router",
+  "endpoint": "https://9router.vnteki.com/v1",
+  "api_key_env": "NINEROUTER_API_KEY",
+  "served_model": "mycombo",
+  "listed_owner": null,
+  "model_limit": {"context": 200000, "output": 32768}
+ },
+ "client_env": [],
+ "budget": {"provider_requests": 58, "turns": 700, "input_tokens": 30000000, "output_tokens": 500000},
+ "max_turns_per_session": 80,
+ "limits": {"PLAN": 0, "DEVELOPER": 2, "REVIEW": 1, "SECURITY": 1, "INTEGRATION": 0, "ENVIRONMENT": 1, "PROVIDER": 1},
+ "timeouts_s": {"developer": 1800, "reviewer": 900, "tool": 600, "probe": 120},
+ "preflight": {"chat_probes": 2}
+}

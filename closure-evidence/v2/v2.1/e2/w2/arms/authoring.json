@@ -1,0 +1,190 @@
+{
+ "format": "aisef-v2-authoring/1",
+ "name": "w2-evidence-linter",
+ "description": "E2 workload W2 (brownfield): the evidence-discipline linter of bread@6fde318 plus the maintainers' requirements delta (directory roots, an explicit run registry with strict errors, JSON output). This is the arms' bundle: its contracts are the public examples of docs/requirements-delta.md; the hidden evaluator is a different bundle no arm sees.",
+ "requirements_document": {
+  "path": "docs/requirements-delta.md"
+ },
+ "product_roots": [
+  "infrastructure"
+ ],
+ "baseline": "HEAD",
+ "requirements": [
+  {
+   "id": "R-1",
+   "text": "A --root that names a directory is walked recursively; every file under it ending in .md, .ts or .tsx is scanned in sorted path order; a directory whose name starts with '.' or is node_modules, build or dist is not entered.",
+   "source": "docs/requirements-delta.md#1.1-1.2"
+  },
+  {
+   "id": "R-3",
+   "text": "A --root that names a path that does not exist is an error: one stderr message containing that path, nothing scanned, exit code 2.",
+   "source": "docs/requirements-delta.md#1.4"
+  },
+  {
+   "id": "R-4",
+   "text": "--registry PATH names the run registry to read; without it the default infrastructure/ci/run_registry.json is read.",
+   "source": "docs/requirements-delta.md#2.1"
+  },
+  {
+   "id": "R-5",
+   "text": "A registry that does not exist, cannot be read, is not JSON, or has no valid_runs list of strings is an error: load_run_registry (path a str or a Path) raises RegistryError (a ValueError) naming the path; cli_main prints one stderr line starting with 'run registry:', scans nothing and returns 2.",
+   "source": "docs/requirements-delta.md#2.2"
+  },
+  {
+   "id": "R-6",
+   "text": "--format json prints to stdout exactly one JSON document, the same document --report writes (findings, accepted_targets, accepted_placeholders); the exit code does not depend on --format.",
+   "source": "docs/requirements-delta.md#3.1"
+  },
+  {
+   "id": "R-7",
+   "text": "infrastructure/ci/evidence_discipline.py imports nothing outside the Python standard library.",
+   "source": "docs/requirements-delta.md#4.2"
+  },
+  {
+   "id": "R-8",
+   "text": "The citation rules are unchanged: a figure cited to a run id present in the registry is accepted.",
+   "source": "docs/requirements-delta.md#4.3"
+  }
+ ],
+ "contracts": [
+  {
+   "id": "A-ROOT-DIR",
+   "requirement_ids": ["R-1"],
+   "subject": {"kind": "cli_invocation", "locator": "infrastructure.ci.evidence_discipline:__main__"},
+   "stimulus": {
+    "argv": ["--root", "<ws>/docs"],
+    "workspace": {
+     "docs/capacity.md": {"text": "Documented capacity is 128 streams per node.\n", "newline": "\n"},
+     "docs/node_modules/vendor.md": {"text": "vendor copy says 999 ms\n", "newline": "\n"},
+     "docs/notes.txt": {"text": "a plain text file with 999 ms\n", "newline": "\n"}
+    }
+   },
+   "observable": {
+    "exit_code": 1,
+    "stdout": {"regex": "(?s)\\A(?!.*(?:node_modules|notes\\.txt|999 ms)).*docs/capacity\\.md:1: '128 streams'"},
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "subject_absence": "REQUIRES_SUBJECT",
+   "rationale": "1.1-1.2 public example: a directory root is walked (capacity.md:1 reported), node_modules and a .txt file are not scanned"
+  },
+  {
+   "id": "A-ROOT-MISSING",
+   "requirement_ids": ["R-3"],
+   "subject": {"kind": "cli_invocation", "locator": "infrastructure.ci.evidence_discipline:__main__"},
+   "stimulus": {"argv": ["--root", "<ws>/missing/README.md"]},
+   "observable": {"exit_code": 2, "stderr": {"contains": ["missing/README.md"]}, "within_s": 30},
+   "polarity": "MUST_HOLD",
+   "subject_absence": "REQUIRES_SUBJECT",
+   "rationale": "1.4 public example: a root that does not exist is exit 2 with the path on stderr"
+  },
+  {
+   "id": "A-REG-PATH",
+   "requirement_ids": ["R-4"],
+   "subject": {"kind": "cli_invocation", "locator": "infrastructure.ci.evidence_discipline:__main__"},
+   "stimulus": {
+    "argv": ["--registry", "<ws>/registry.json", "--root", "<ws>/doc.md"],
+    "workspace": {
+     "registry.json": {"text": "{\"valid_runs\": [\"bench-001\"]}\n", "newline": "\n"},
+     "doc.md": {"text": "p95 first partial latency is 250 ms (run_id bench-001)\n", "newline": "\n"}
+    }
+   },
+   "observable": {"exit_code": 0, "within_s": 30},
+   "polarity": "MUST_HOLD",
+   "subject_absence": "REQUIRES_SUBJECT",
+   "rationale": "2.1 public example: a figure cited to a run id of the named registry is accepted"
+  },
+  {
+   "id": "A-REG-BAD",
+   "requirement_ids": ["R-5"],
+   "subject": {"kind": "cli_invocation", "locator": "infrastructure.ci.evidence_discipline:__main__"},
+   "stimulus": {
+    "argv": ["--registry", "<ws>/registry.json", "--root", "<ws>/doc.md"],
+    "workspace": {
+     "registry.json": {"text": "not json\n", "newline": "\n"},
+     "doc.md": {"text": "p95 first partial latency is 250 ms (run_id bench-001)\n", "newline": "\n"}
+    }
+   },
+   "observable": {"exit_code": 2, "stderr": {"contains": ["run registry:"]}, "within_s": 30},
+   "polarity": "MUST_HOLD",
+   "subject_absence": "REQUIRES_SUBJECT",
+   "rationale": "2.2 public example: a registry that is not JSON is exit 2 with a 'run registry:' line on stderr"
+  },
+  {
+   "id": "A-JSON",
+   "requirement_ids": ["R-6"],
+   "subject": {"kind": "cli_invocation", "locator": "infrastructure.ci.evidence_discipline:__main__"},
+   "stimulus": {
+    "argv": ["--format", "json", "--root", "<ws>/doc.md"],
+    "workspace": {"doc.md": {"text": "p95 first partial latency is 250 ms with no citation\n", "newline": "\n"}}
+   },
+   "observable": {
+    "exit_code": 1,
+    "stdout": {"contains": ["\"findings\"", "250 ms", "\"accepted_targets\"", "\"accepted_placeholders\""]},
+    "within_s": 30
+   },
+   "polarity": "MUST_HOLD",
+   "subject_absence": "REQUIRES_SUBJECT",
+   "rationale": "3.1 public example: --format json prints the report document on stdout; exit 1 as there is a finding"
+  },
+  {
+   "id": "A-STDLIB",
+   "requirement_ids": ["R-7"],
+   "subject": {"kind": "file_artifact", "locator": "path:infrastructure/ci/evidence_discipline.py"},
+   "stimulus": {"imports_outside": {"stdlib": true, "allowed": ["infrastructure"]}},
+   "observable": {"matches": 0, "within_s": 30},
+   "polarity": "MUST_HOLD",
+   "subject_absence": "REQUIRES_SUBJECT",
+   "rationale": "4.2: no import statement of the linter names a module outside the standard library"
+  },
+  {
+   "id": "A-CITED",
+   "requirement_ids": ["R-8"],
+   "subject": {"kind": "cli_invocation", "locator": "infrastructure.ci.evidence_discipline:__main__"},
+   "stimulus": {
+    "argv": ["--root", "<ws>/doc.md"],
+    "workspace": {"doc.md": {"text": "- p95 first partial latency 250 ms (run_id wave2-conc-2026-09-03)\n", "newline": "\n"}}
+   },
+   "observable": {"exit_code": 0, "within_s": 30},
+   "polarity": "MUST_HOLD",
+   "subject_absence": "REQUIRES_SUBJECT",
+   "rationale": "4.3: a figure cited to a run id of the default registry is accepted (true at the baseline, must stay true)"
+  }
+ ],
+ "stories": {
+  "S1": {
+   "depends_on": [],
+   "tests": ["infrastructure/ci/test_delta_roots.py"],
+   "criteria": [
+    {"id": "C-ROOT-DIR", "contract": "A-ROOT-DIR", "role": "INTRODUCE", "depends_on": [], "why": "introduces 1.1-1.2",
+     "facts": {"requirement": "R-1", "section": "§1", "clause": "1.1-1.2", "clause_text": "A --root that names a directory is walked recursively (.md, .ts, .tsx; sorted); '.'-prefixed, node_modules, build and dist directories are not entered.", "subject": "infrastructure.ci.evidence_discipline:__main__"}},
+    {"id": "C-ROOT-MISSING", "contract": "A-ROOT-MISSING", "role": "INTRODUCE", "depends_on": [], "why": "introduces 1.4",
+     "facts": {"requirement": "R-3", "section": "§1", "clause": "1.4", "clause_text": "A --root that names a path that does not exist: one stderr message containing the path, nothing scanned, exit code 2.", "subject": "infrastructure.ci.evidence_discipline:__main__"}},
+    {"id": "C-STDLIB-1", "contract": "A-STDLIB", "role": "PRESERVE", "depends_on": [], "why": "preserves 4.2",
+     "facts": {"requirement": "R-7", "section": "§4", "clause": "4.2", "clause_text": "infrastructure/ci/evidence_discipline.py imports nothing outside the Python standard library.", "subject": "infrastructure/ci/evidence_discipline.py"}}
+   ]
+  },
+  "S2": {
+   "depends_on": ["S1"],
+   "tests": ["infrastructure/ci/test_delta_registry.py"],
+   "criteria": [
+    {"id": "C-REG-PATH", "contract": "A-REG-PATH", "role": "INTRODUCE", "depends_on": ["C-ROOT-DIR"], "why": "introduces 2.1",
+     "facts": {"requirement": "R-4", "section": "§2", "clause": "2.1", "clause_text": "--registry PATH names the run registry file to read; without it the default infrastructure/ci/run_registry.json is read.", "subject": "infrastructure.ci.evidence_discipline:__main__"}},
+    {"id": "C-REG-BAD", "contract": "A-REG-BAD", "role": "INTRODUCE", "depends_on": ["C-ROOT-DIR"], "why": "introduces 2.2",
+     "facts": {"requirement": "R-5", "section": "§2", "clause": "2.2", "clause_text": "A missing, unreadable, non-JSON or malformed registry: load_run_registry raises RegistryError naming the path; cli_main prints one 'run registry:' line to stderr, scans nothing, returns 2.", "subject": "infrastructure.ci.evidence_discipline:__main__"}},
+    {"id": "C-CITED-2", "contract": "A-CITED", "role": "PRESERVE", "depends_on": [], "why": "preserves 4.3 across the registry change",
+     "facts": {"requirement": "R-8", "section": "§4", "clause": "4.3", "clause_text": "A figure cited to a run id present in the registry is accepted.", "subject": "infrastructure.ci.evidence_discipline:__main__"}}
+   ]
+  },
+  "S3": {
+   "depends_on": ["S2"],
+   "tests": ["infrastructure/ci/test_delta_json.py"],
+   "criteria": [
+    {"id": "C-JSON", "contract": "A-JSON", "role": "INTRODUCE", "depends_on": ["C-REG-PATH"], "why": "introduces 3.1",
+     "facts": {"requirement": "R-6", "section": "§3", "clause": "3.1", "clause_text": "--format json prints to stdout exactly one JSON document, the same document --report writes; the exit code does not depend on --format.", "subject": "infrastructure.ci.evidence_discipline:__main__"}},
+    {"id": "C-STDLIB-3", "contract": "A-STDLIB", "role": "PRESERVE", "depends_on": ["C-STDLIB-1"], "why": "preserves 4.2 after the last change",
+     "facts": {"requirement": "R-7", "section": "§4", "clause": "4.2", "clause_text": "infrastructure/ci/evidence_discipline.py imports nothing outside the Python standard library.", "subject": "infrastructure/ci/evidence_discipline.py"}}
+   ]
+  }
+ }
+}

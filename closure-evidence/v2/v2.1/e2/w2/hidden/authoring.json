@@ -1,0 +1,293 @@
+{
+ "format": "aisef-v2-authoring/1",
+ "name": "w2-evidence-linter-hidden",
+ "description": "E2 workload W2, the HIDDEN evaluator: twelve contracts over the evidence-discipline linter after docs/requirements-delta.md, with data no arm is shown (different documents, run ids, file names and figures from the public examples). Never given to any arm; evaluated by AISEF's probes on each frozen candidate (validation/experiments/harness.py evaluate).",
+ "requirements_document": {
+  "path": "docs/requirements-delta.md"
+ },
+ "product_roots": [
+  "infrastructure"
+ ],
+ "baseline": "HEAD",
+ "requirements": [
+  {
+   "id": "HR-1",
+   "text": "A --root that names a directory is walked recursively; every file under it ending in .md, .ts or .tsx is scanned in sorted path order; a directory whose name starts with '.' or is node_modules, build or dist is not entered.",
+   "source": "docs/requirements-delta.md#1.1-1.2"
+  },
+  {
+   "id": "HR-3",
+   "text": "A --root that names a path that does not exist is an error: one stderr message containing that path, nothing scanned, exit code 2.",
+   "source": "docs/requirements-delta.md#1.4"
+  },
+  {
+   "id": "HR-4",
+   "text": "--registry PATH names the run registry to read; without it the default infrastructure/ci/run_registry.json is read.",
+   "source": "docs/requirements-delta.md#2.1"
+  },
+  {
+   "id": "HR-5",
+   "text": "A registry that does not exist, cannot be read, is not JSON, or has no valid_runs list of strings is an error: load_run_registry (path a str or a Path) raises RegistryError (a ValueError) naming the path; cli_main prints one stderr line starting with 'run registry:', scans nothing and returns 2.",
+   "source": "docs/requirements-delta.md#2.2"
+  },
+  {
+   "id": "HR-5b",
+   "text": "cli_main(argv) returns its exit code (0, 1 or 2) and never calls sys.exit itself.",
+   "source": "docs/requirements-delta.md#2.3"
+  },
+  {
+   "id": "HR-6",
+   "text": "--format json prints to stdout exactly one JSON document, the same document --report writes (findings, accepted_targets, accepted_placeholders); the exit code does not depend on --format.",
+   "source": "docs/requirements-delta.md#3.1"
+  },
+  {
+   "id": "HR-6b",
+   "text": "--report keeps writing its document to the named file, byte-identical to today's output for the same scan.",
+   "source": "docs/requirements-delta.md#3.2"
+  },
+  {
+   "id": "HR-7",
+   "text": "infrastructure/ci/evidence_discipline.py imports nothing outside the Python standard library.",
+   "source": "docs/requirements-delta.md#4.2"
+  },
+  {
+   "id": "HR-8",
+   "text": "The citation, target:, observation-prefix, placeholder and fenced-code rules are unchanged.",
+   "source": "docs/requirements-delta.md#4.3"
+  }
+ ],
+ "contracts": [
+  {
+   "id": "H-DIR",
+   "requirement_ids": ["HR-1"],
+   "subject": {"kind": "cli_invocation", "locator": "infrastructure.ci.evidence_discipline:__main__"},
+   "stimulus": {
+    "argv": ["--root", "<ws>/notes"],
+    "workspace": {
+     "notes/b.md": {"text": "Sustained ingest reached 1024 rps on the second node.\n"},
+     "notes/a.md": {"text": "Cold start took 7 seconds on the first boot.\n"},
+     "notes/c.ts": {"text": "export const note = \"render budget 640 fps\";\n"},
+     "notes/build/x.md": {"text": "built output claims 4 gb\n"},
+     "notes/dist/z.md": {"text": "packaged copy claims 4 gb\n"},
+     "notes/node_modules/pkg/vendored.md": {"text": "bundled copy claims 4 gb\n"},
+     "notes/skipme.txt": {"text": "scratch text with 4 gb\n"}
+    }
+   },
+   "observable": {
+    "exit_code": 1,
+    "stdout": {"regex": "(?s)\\A(?!.*(?:node_modules|skipme|4 gb)).*notes/a\\.md:1: '7 seconds'.*notes/b\\.md:1: '1024 rps'.*notes/c\\.ts:1: '640 fps'"},
+    "within_s": 25
+   },
+   "polarity": "MUST_HOLD",
+   "subject_absence": "REQUIRES_SUBJECT",
+   "rationale": "1.1-1.2 hidden: a directory root is walked in sorted order (a.md, b.md, then c.ts — a .ts file is scanned); build, dist, node_modules and a .txt file are not scanned (every excluded file carries the figure 4 gb, which must not appear). A '.'-prefixed directory cannot be named in a cli_invocation workspace (aisef2/probe/cli_invocation.py _NAME: a segment starts with [A-Za-z0-9_]), so that half of 1.2 is not observed here"
+  },
+  {
+   "id": "H-MISSING",
+   "requirement_ids": ["HR-3"],
+   "subject": {"kind": "cli_invocation", "locator": "infrastructure.ci.evidence_discipline:__main__"},
+   "stimulus": {"argv": ["--root", "<ws>/absent-notes.md"]},
+   "observable": {"exit_code": 2, "stderr": {"contains": ["absent-notes.md"]}, "within_s": 25},
+   "polarity": "MUST_HOLD",
+   "subject_absence": "REQUIRES_SUBJECT",
+   "rationale": "1.4 hidden: a root that does not exist is exit 2 with the path on stderr"
+  },
+  {
+   "id": "H-REG-OK",
+   "requirement_ids": ["HR-4"],
+   "subject": {"kind": "cli_invocation", "locator": "infrastructure.ci.evidence_discipline:__main__"},
+   "stimulus": {
+    "argv": ["--registry", "<ws>/runs/registry-w2.json", "--root", "<ws>/claims.md"],
+    "workspace": {
+     "runs/registry-w2.json": {"text": "{\"description\": \"w2 hidden\", \"valid_runs\": [\"w2-hidden-run-07\", \"w2-hidden-run-09\"]}\n"},
+     "claims.md": {"text": "Steady throughput was 1024 rps (run_id w2-hidden-run-07)\nPeak memory: 12 GB, run_id: w2-hidden-run-09\n"}
+    }
+   },
+   "observable": {"exit_code": 0, "within_s": 25},
+   "polarity": "MUST_HOLD",
+   "subject_absence": "REQUIRES_SUBJECT",
+   "rationale": "2.1 hidden: both citation forms against the named registry are accepted"
+  },
+  {
+   "id": "H-REG-BAD",
+   "requirement_ids": ["HR-5"],
+   "subject": {"kind": "cli_invocation", "locator": "infrastructure.ci.evidence_discipline:__main__"},
+   "stimulus": {
+    "argv": ["--registry", "<ws>/runs/registry-w2.json", "--root", "<ws>/claims.md"],
+    "workspace": {
+     "runs/registry-w2.json": {"text": "{\"valid_runs\": \"w2-hidden-run-07\"}\n"},
+     "claims.md": {"text": "Steady throughput was 1024 rps (run_id w2-hidden-run-07)\n"}
+    }
+   },
+   "observable": {"exit_code": 2, "stderr": {"contains": ["run registry:", "registry-w2.json"]}, "within_s": 25},
+   "polarity": "MUST_HOLD",
+   "subject_absence": "REQUIRES_SUBJECT",
+   "rationale": "2.2 hidden: valid_runs that is a string, not a list, is a malformed registry: exit 2, the 'run registry:' line names the path"
+  },
+  {
+   "id": "H-REG-MISSING",
+   "requirement_ids": ["HR-5", "HR-5b"],
+   "subject": {"kind": "process_effect", "locator": "infrastructure.ci.evidence_discipline:cli_main"},
+   "stimulus": {
+    "scenario": [
+     {"step": "workspace", "files": {"claims.md": {"text": "Cold start took 7 seconds uncited\n"}}},
+     {"step": "call", "args": [["--registry", "<ws>/no-such-registry.json", "--root", "<ws>/claims.md"]], "kwargs": {}}
+    ]
+   },
+   "observable": {"returns": 2, "within_s": 25},
+   "polarity": "MUST_HOLD",
+   "subject_absence": "REQUIRES_SUBJECT",
+   "rationale": "2.2-2.3 hidden: a registry file that does not exist makes cli_main return 2 (no sys.exit, no silent empty registry)"
+  },
+  {
+   "id": "H-REG-LIST",
+   "requirement_ids": ["HR-5"],
+   "subject": {"kind": "process_effect", "locator": "infrastructure.ci.evidence_discipline:load_run_registry"},
+   "stimulus": {
+    "scenario": [
+     {"step": "workspace", "files": {"registry-list.json": {"text": "[\"w2-hidden-run-07\", \"w2-hidden-run-09\"]\n"}}},
+     {"step": "expect_raises", "args": ["<ws>/registry-list.json"], "kwargs": {}, "exception": "RegistryError"}
+    ]
+   },
+   "observable": {"raises": true, "within_s": 25},
+   "polarity": "MUST_HOLD",
+   "subject_absence": "REQUIRES_SUBJECT",
+   "rationale": "2.2 hidden: a registry that is JSON but not a JSON object (a list) makes load_run_registry raise RegistryError, the type the delta names (a ValueError subclass; the path in its message is observed by H-REG-BAD's stderr). At the baseline the function returns an empty set, or raises AttributeError on a str path"
+  },
+  {
+   "id": "H-JSON",
+   "requirement_ids": ["HR-6"],
+   "subject": {"kind": "cli_invocation", "locator": "infrastructure.ci.evidence_discipline:__main__"},
+   "stimulus": {
+    "argv": ["--format", "json", "--root", "<ws>/claims.md"],
+    "workspace": {"claims.md": {"text": "Sustained ingest reached 1024 rps on the second node.\n"}}
+   },
+   "observable": {
+    "exit_code": 1,
+    "stdout": {"regex": "(?s)\\A\\s*\\{.*\"findings\".*1024 rps.*\"accepted_targets\".*\"accepted_placeholders\".*\\}\\s*\\Z"},
+    "within_s": 25
+   },
+   "polarity": "MUST_HOLD",
+   "subject_absence": "REQUIRES_SUBJECT",
+   "rationale": "3.1 hidden: --format json prints exactly one JSON document and nothing else on stdout (anchored: an object from the first non-blank byte to the last; a text report before or after it refutes) holding the report keys and the finding's figure; exit 1 as there is a finding. A stream shape holds one key, so the figure is in the regex, not a second contains"
+  },
+  {
+   "id": "H-JSON-ZERO",
+   "requirement_ids": ["HR-6"],
+   "subject": {"kind": "cli_invocation", "locator": "infrastructure.ci.evidence_discipline:__main__"},
+   "stimulus": {
+    "argv": ["--format", "json", "--root", "<ws>/claims.md"],
+    "workspace": {"claims.md": {"text": "- target: tail latency under 900 ms\n"}}
+   },
+   "observable": {
+    "exit_code": 0,
+    "stdout": {"regex": "(?s)\\A\\s*\\{.*\"findings\": \\[\\].*\"accepted_targets\": 1.*\\}\\s*\\Z"},
+    "within_s": 25
+   },
+   "polarity": "MUST_HOLD",
+   "subject_absence": "REQUIRES_SUBJECT",
+   "rationale": "3.1-3.2 hidden: with no finding, --format json still prints exactly one JSON document (findings empty, one accepted target) and the exit code is 0 — the exit code does not depend on --format"
+  },
+  {
+   "id": "H-CITED",
+   "requirement_ids": ["HR-8"],
+   "subject": {"kind": "cli_invocation", "locator": "infrastructure.ci.evidence_discipline:__main__"},
+   "stimulus": {
+    "argv": ["--root", "<ws>/claims.md"],
+    "workspace": {"claims.md": {"text": "Peak memory: 12 GB (run_id host-inventory.a100.2026-08-29)\n"}}
+   },
+   "observable": {"exit_code": 0, "within_s": 25},
+   "polarity": "MUST_HOLD",
+   "subject_absence": "REQUIRES_SUBJECT",
+   "rationale": "4.3 hidden: a figure cited to a run id of the default registry is accepted (true at the baseline)"
+  },
+  {
+   "id": "H-TARGET",
+   "requirement_ids": ["HR-8"],
+   "subject": {"kind": "cli_invocation", "locator": "infrastructure.ci.evidence_discipline:__main__"},
+   "stimulus": {
+    "argv": ["--root", "<ws>/claims.md"],
+    "workspace": {"claims.md": {"text": "target: cold start under 10 seconds\n```\ncold start 99 seconds inside a fence\n```\nobserved: cold start 7 seconds\n"}}
+   },
+   "observable": {
+    "exit_code": 1,
+    "stdout": {"regex": "(?s)\\A(?!.*(?:claims\\.md:1:|claims\\.md:3:|99 seconds)).*claims\\.md:5: '7 seconds'"},
+    "within_s": 25
+   },
+   "polarity": "MUST_HOLD",
+   "subject_absence": "REQUIRES_SUBJECT",
+   "rationale": "4.3 hidden: the target: line and the fenced line are not reported, the observed: line is (true at the baseline)"
+  },
+  {
+   "id": "H-REPORT",
+   "requirement_ids": ["HR-6b"],
+   "subject": {"kind": "cli_invocation", "locator": "infrastructure.ci.evidence_discipline:__main__"},
+   "stimulus": {
+    "argv": ["--root", "<ws>/claims.md", "--report", "<ws>/out/report.json"],
+    "workspace": {"claims.md": {"text": "- target: cold start under 10 seconds\n"}}
+   },
+   "observable": {
+    "exit_code": 0,
+    "files": {"<ws>/out/report.json": {"text": "{\n  \"findings\": [],\n  \"accepted_targets\": 1,\n  \"accepted_placeholders\": 0\n}"}},
+    "within_s": 25
+   },
+   "polarity": "MUST_HOLD",
+   "subject_absence": "REQUIRES_SUBJECT",
+   "rationale": "3.2 hidden: --report writes today's document byte for byte (true at the baseline)"
+  },
+  {
+   "id": "H-STDLIB",
+   "requirement_ids": ["HR-7"],
+   "subject": {"kind": "file_artifact", "locator": "path:infrastructure/ci/evidence_discipline.py"},
+   "stimulus": {"imports_outside": {"stdlib": true, "allowed": ["infrastructure"]}, "suffixes": [".py"]},
+   "observable": {"matches": 0, "within_s": 25},
+   "polarity": "MUST_HOLD",
+   "subject_absence": "REQUIRES_SUBJECT",
+   "rationale": "4.2 hidden: no import statement of the linter names a module outside the standard library (true at the baseline)"
+  }
+ ],
+ "stories": {
+  "HS1": {
+   "depends_on": [],
+   "tests": [],
+   "criteria": [
+    {"id": "HC-DIR", "contract": "H-DIR", "role": "INTRODUCE", "depends_on": [], "why": "1.1-1.2",
+     "facts": {"requirement": "HR-1", "section": "§1", "clause": "1.1-1.2", "clause_text": "A --root that names a directory is walked recursively (.md, .ts, .tsx; sorted); '.'-prefixed, node_modules, build and dist directories are not entered.", "subject": "infrastructure.ci.evidence_discipline:__main__"}},
+    {"id": "HC-MISSING", "contract": "H-MISSING", "role": "INTRODUCE", "depends_on": [], "why": "1.4",
+     "facts": {"requirement": "HR-3", "section": "§1", "clause": "1.4", "clause_text": "A --root that names a path that does not exist: one stderr message containing the path, nothing scanned, exit code 2.", "subject": "infrastructure.ci.evidence_discipline:__main__"}},
+    {"id": "HC-TARGET", "contract": "H-TARGET", "role": "PRESERVE", "depends_on": [], "why": "4.3",
+     "facts": {"requirement": "HR-8", "section": "§4", "clause": "4.3", "clause_text": "The citation, target:, observation-prefix, placeholder and fenced-code rules are unchanged.", "subject": "infrastructure.ci.evidence_discipline:__main__"}},
+    {"id": "HC-STDLIB", "contract": "H-STDLIB", "role": "PRESERVE", "depends_on": [], "why": "4.2",
+     "facts": {"requirement": "HR-7", "section": "§4", "clause": "4.2", "clause_text": "infrastructure/ci/evidence_discipline.py imports nothing outside the Python standard library.", "subject": "infrastructure/ci/evidence_discipline.py"}}
+   ]
+  },
+  "HS2": {
+   "depends_on": ["HS1"],
+   "tests": [],
+   "criteria": [
+    {"id": "HC-REG-OK", "contract": "H-REG-OK", "role": "INTRODUCE", "depends_on": ["HC-DIR"], "why": "2.1",
+     "facts": {"requirement": "HR-4", "section": "§2", "clause": "2.1", "clause_text": "--registry PATH names the run registry file to read; without it the default infrastructure/ci/run_registry.json is read.", "subject": "infrastructure.ci.evidence_discipline:__main__"}},
+    {"id": "HC-REG-BAD", "contract": "H-REG-BAD", "role": "INTRODUCE", "depends_on": ["HC-DIR"], "why": "2.2",
+     "facts": {"requirement": "HR-5", "section": "§2", "clause": "2.2", "clause_text": "A missing, unreadable, non-JSON or malformed registry: load_run_registry raises RegistryError naming the path; cli_main prints one 'run registry:' line to stderr, scans nothing, returns 2.", "subject": "infrastructure.ci.evidence_discipline:__main__"}},
+    {"id": "HC-REG-LIST", "contract": "H-REG-LIST", "role": "INTRODUCE", "depends_on": ["HC-DIR"], "why": "2.2",
+     "facts": {"requirement": "HR-5", "section": "§2", "clause": "2.2", "clause_text": "A registry that is not a JSON object whose valid_runs is a list of strings: load_run_registry(path) raises RegistryError (a ValueError subclass defined in the module).", "subject": "infrastructure.ci.evidence_discipline:load_run_registry"}},
+    {"id": "HC-REG-MISSING", "contract": "H-REG-MISSING", "role": "INTRODUCE", "depends_on": ["HC-DIR"], "why": "2.2-2.3",
+     "facts": {"requirement": "HR-5b", "section": "§2", "clause": "2.3", "clause_text": "cli_main(argv) returns its exit code (0, 1 or 2) and never calls sys.exit itself.", "subject": "infrastructure.ci.evidence_discipline:cli_main"}},
+    {"id": "HC-CITED", "contract": "H-CITED", "role": "PRESERVE", "depends_on": [], "why": "4.3",
+     "facts": {"requirement": "HR-8", "section": "§4", "clause": "4.3", "clause_text": "The citation, target:, observation-prefix, placeholder and fenced-code rules are unchanged.", "subject": "infrastructure.ci.evidence_discipline:__main__"}}
+   ]
+  },
+  "HS3": {
+   "depends_on": ["HS2"],
+   "tests": [],
+   "criteria": [
+    {"id": "HC-JSON", "contract": "H-JSON", "role": "INTRODUCE", "depends_on": ["HC-REG-OK"], "why": "3.1",
+     "facts": {"requirement": "HR-6", "section": "§3", "clause": "3.1", "clause_text": "--format json prints to stdout exactly one JSON document, the same document --report writes; the exit code does not depend on --format.", "subject": "infrastructure.ci.evidence_discipline:__main__"}},
+    {"id": "HC-JSON-ZERO", "contract": "H-JSON-ZERO", "role": "INTRODUCE", "depends_on": ["HC-JSON"], "why": "3.1-3.2",
+     "facts": {"requirement": "HR-6", "section": "§3", "clause": "3.1-3.2", "clause_text": "--format json with no finding: exactly one JSON document on stdout and exit code 0 — the exit code does not depend on --format.", "subject": "infrastructure.ci.evidence_discipline:__main__"}},
+    {"id": "HC-REPORT", "contract": "H-REPORT", "role": "PRESERVE", "depends_on": [], "why": "3.2",
+     "facts": {"requirement": "HR-6b", "section": "§3", "clause": "3.2", "clause_text": "--report keeps writing its document to the named file, byte-identical to today's output for the same scan.", "subject": "infrastructure.ci.evidence_discipline:__main__"}}
+   ]
+  }
+ }
+}
