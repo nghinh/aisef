@@ -1,0 +1,4253 @@
+{
+ "record": "AISEF V2.1 - campaign 9: the cost of targets.txt by the rule of campaign-3/tools/make_queue3.py",
+ "rule": "cost of a target = mutants x sum of the T0 seconds of its kill files on its null mutant: an upper bound (a killed mutant pays less)",
+ "sweep_records": [
+  "T0-SWEEP.json",
+  "T0-SWEEP-2.json",
+  "T0-SWEEP-3.json",
+  "T0-SWEEP-4.json",
+  "T0-SWEEP-5.json",
+  "T0-SWEEP-6.json",
+  "T0-SWEEP-7.json",
+  "T0-SWEEP-8.json"
+ ],
+ "t0_pairs_in_the_records": 489,
+ "median_file_seconds": {
+  "all_records": 2.54,
+  "latest_record": 1.78
+ },
+ "targets": 511,
+ "mutants": 13859,
+ "kill_file_pairs_of_the_targets": 1880,
+ "pairs_by_basis": {
+  "no row on this null mutant; the same file on an earlier null of the module": 1371,
+  "a kill file no record holds: the median": 222,
+  "a T0 row on this null mutant": 286,
+  "no row for the module; the median of the same file on other modules": 1
+ },
+ "upper_bound_worker_hours": {
+  "literal": 165.4,
+  "by_file": 610.7,
+  "by_file_of_which_guessed_at_the_median": 8.0
+ },
+ "kill_files_no_record_holds": {
+  "tests/v2/test_v21_fa_empty_selection.py": 2,
+  "tests/v2/test_v21_fa_grep_runpath.py": 5,
+  "tests/v2/test_v21_fa_grep_worker.py": 10,
+  "tests/v2/test_v21_fa_parser_limits.py": 1,
+  "tests/v2/test_v21_migrate_semantics.py": 25,
+  "tests/v2/test_v21_ocr_declared.py": 4,
+  "tests/v2/test_v21_ocr_gate.py": 4,
+  "tests/v2/test_v21_ocr_identity.py": 7,
+  "tests/v2/test_v21_ocr_preflight.py": 2,
+  "tests/v2/test_v21_pm6_host_faults.py": 4,
+  "tests/v2/test_v21_pm7_file_artifact_sources.py": 1,
+  "tests/v2/test_v21_pm8_diagnostics.py": 26,
+  "tests/v2/test_v21_pm8_diagnostics_run.py": 25,
+  "tests/v2/test_v21_probe_sources.py": 3,
+  "tests/v2/test_v21_pw_lineage_continue.py": 9,
+  "tests/v2/test_v21_pw_lineage_spend.py": 1,
+  "tests/v2/test_v21_pw_lineage_unread.py": 13,
+  "tests/v2/test_v21_r3_probe_namespace.py": 3,
+  "tests/v2/test_v21_r5_linear_text.py": 7,
+  "tests/v2/test_v21_r5_probe_model_data.py": 7,
+  "tests/v2/test_v21_r5_regex_isolation.py": 10,
+  "tests/v2/test_v21_r5_regex_worker.py": 13,
+  "tests/v2/test_v21_r5_review_deep_input.py": 10,
+  "tests/v2/test_v21_r5_review_indeterminate.py": 1,
+  "tests/v2/test_v21_r5_review_status.py": 1,
+  "tests/v2/test_v21_r5_window_boundary.py": 1,
+  "tests/v2/test_v21_x_lineage_gone.py": 6,
+  "tests/v2/test_v21_x_lineage_proof.py": 21
+ },
+ "literal_is": "make_queue3.py's rule on the latest record alone (T0-SWEEP-8.json, which is cumulative)",
+ "calibration": {
+  "campaign 3": {
+   "targets": 199,
+   "mutants": 7867,
+   "queue_bound_worker_hours": 480.8,
+   "wall_hours": 14.5,
+   "worker_hours_run": 58.1,
+   "run_over_bound": 0.121,
+   "longest_target": {
+    "target": "aisef2/app/run.py::execute",
+    "bound_hours": 51.1
+   }
+  },
+  "campaign 4": {
+   "targets": 28,
+   "mutants": 1378,
+   "queue_bound_worker_hours": 111.7,
+   "wall_hours": 2.8,
+   "worker_hours_run": 11.1,
+   "run_over_bound": 0.1,
+   "longest_target": {
+    "target": "aisef2/app/verify.py::verify",
+    "bound_hours": 21.6
+   }
+  },
+  "campaign 5": {
+   "targets": 528,
+   "mutants": 13566,
+   "queue_bound_worker_hours": 589.1,
+   "wall_hours": 24.3,
+   "worker_hours_run": 100.3,
+   "run_over_bound": 0.17,
+   "longest_target": {
+    "target": "aisef2/app/run.py::execute",
+    "bound_hours": 51.1
+   }
+  },
+  "campaign 6": {
+   "targets": 56,
+   "mutants": 1419,
+   "queue_bound_worker_hours": 11.9,
+   "wall_hours": 0.9,
+   "worker_hours_run": 4.3,
+   "run_over_bound": 0.358,
+   "longest_target": {
+    "target": "aisef2/app/review_ocr.py::findings",
+    "bound_hours": 3.0
+   }
+  },
+  "campaign 7": {
+   "targets": 3,
+   "mutants": 448,
+   "queue_bound_worker_hours": 3.6,
+   "wall_hours": 0.4,
+   "worker_hours_run": 0.8,
+   "run_over_bound": 0.209,
+   "longest_target": {
+    "target": "aisef2/app/confine.py::_probe",
+    "bound_hours": 2.0
+   }
+  },
+  "campaign 8": {
+   "targets": 12,
+   "mutants": 680,
+   "queue_bound_worker_hours": 4.3,
+   "wall_hours": 0.4,
+   "worker_hours_run": 1.1,
+   "run_over_bound": 0.254,
+   "longest_target": {
+    "target": "aisef2/app/confine.py::_probe",
+    "bound_hours": 2.0
+   }
+  }
+ },
+ "expected": {
+  "basis": "by_file upper bound x campaign 5's run/bound ratio (the only earlier campaign of this size)",
+  "run_over_bound": 0.17,
+  "worker_hours": 103.8,
+  "wall_hours_balanced_by_workers": {
+   "4": 26.0,
+   "5": 20.8
+  },
+  "longest_target_wall_hours_if_it_runs_as_in_campaign_5": 27.1,
+  "wall_hours_by_workers": {
+   "4": 27.1,
+   "5": 27.1
+  },
+  "longest_targets_by_file_bound_hours": {
+   "aisef2/app/run.py::execute": 57.1,
+   "aisef2/app/settings.py::load": 41.6,
+   "aisef2/app/verify.py::verify": 25.4,
+   "aisef2/app/bundle_cli.py::continue_from": 20.5,
+   "aisef2/app/adapters.py::Reviewer._ocr": 19.3,
+   "aisef2/app/bundle.py::shape_problems": 17.8,
+   "aisef2/app/bundle_cli.py::migrate": 16.9,
+   "aisef2/app/bundle_cli.py::seal": 15.4
+  },
+  "note": "the wall is bounded below by the longest target: in campaign 5 the longest (bound 51.1 h) ran 24.3 h, the campaign's wall"
+ },
+ "per_target": {
+  "aisef2/app/adapters.py::Developer.implement": {
+   "mutants": 52,
+   "kill_files": 6,
+   "chain_seconds_literal": 10.7,
+   "chain_seconds_by_file": 217.9,
+   "cost_seconds_literal": 555,
+   "cost_seconds_by_file": 11332
+  },
+  "aisef2/app/adapters.py::Reviewer.__init__": {
+   "mutants": 13,
+   "kill_files": 7,
+   "chain_seconds_literal": 12.5,
+   "chain_seconds_by_file": 195.0,
+   "cost_seconds_literal": 162,
+   "cost_seconds_by_file": 2535
+  },
+  "aisef2/app/adapters.py::Reviewer._model": {
+   "mutants": 25,
+   "kill_files": 7,
+   "chain_seconds_literal": 12.5,
+   "chain_seconds_by_file": 195.0,
+   "cost_seconds_literal": 312,
+   "cost_seconds_by_file": 4875
+  },
+  "aisef2/app/adapters.py::Reviewer._ocr": {
+   "mutants": 303,
+   "kill_files": 14,
+   "chain_seconds_literal": 24.9,
+   "chain_seconds_by_file": 229.1,
+   "cost_seconds_literal": 7551,
+   "cost_seconds_by_file": 69411
+  },
+  "aisef2/app/adapters.py::Reviewer._verify": {
+   "mutants": 10,
+   "kill_files": 7,
+   "chain_seconds_literal": 12.5,
+   "chain_seconds_by_file": 195.0,
+   "cost_seconds_literal": 125,
+   "cost_seconds_by_file": 1950
+  },
+  "aisef2/app/adapters.py::Reviewer.review": {
+   "mutants": 75,
+   "kill_files": 10,
+   "chain_seconds_literal": 17.8,
+   "chain_seconds_by_file": 221.8,
+   "cost_seconds_literal": 1335,
+   "cost_seconds_by_file": 16636
+  },
+  "aisef2/app/adapters.py::_bounded": {
+   "mutants": 10,
+   "kill_files": 5,
+   "chain_seconds_literal": 8.9,
+   "chain_seconds_by_file": 189.0,
+   "cost_seconds_literal": 89,
+   "cost_seconds_by_file": 1890
+  },
+  "aisef2/app/adapters.py::_braces": {
+   "mutants": 10,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 4.0,
+   "cost_seconds_literal": 36,
+   "cost_seconds_by_file": 40
+  },
+  "aisef2/app/adapters.py::_declared": {
+   "mutants": 15,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 153.0,
+   "cost_seconds_literal": 80,
+   "cost_seconds_by_file": 2295
+  },
+  "aisef2/app/adapters.py::_unchanged": {
+   "mutants": 16,
+   "kill_files": 5,
+   "chain_seconds_literal": 8.9,
+   "chain_seconds_by_file": 189.9,
+   "cost_seconds_literal": 142,
+   "cost_seconds_by_file": 3039
+  },
+  "aisef2/app/adapters.py::attempt_of": {
+   "mutants": 15,
+   "kill_files": 4,
+   "chain_seconds_literal": 7.1,
+   "chain_seconds_by_file": 188.5,
+   "cost_seconds_literal": 107,
+   "cost_seconds_by_file": 2827
+  },
+  "aisef2/app/adapters.py::tree_of": {
+   "mutants": 13,
+   "kill_files": 5,
+   "chain_seconds_literal": 8.9,
+   "chain_seconds_by_file": 189.9,
+   "cost_seconds_literal": 116,
+   "cost_seconds_by_file": 2469
+  },
+  "aisef2/app/bundle.py::Project.order": {
+   "mutants": 10,
+   "kill_files": 10,
+   "chain_seconds_literal": 561.2,
+   "chain_seconds_by_file": 561.2,
+   "cost_seconds_literal": 5612,
+   "cost_seconds_by_file": 5612
+  },
+  "aisef2/app/bundle.py::_HEX64": {
+   "mutants": 1,
+   "kill_files": 9,
+   "chain_seconds_literal": 560.6,
+   "chain_seconds_by_file": 560.6,
+   "cost_seconds_literal": 561,
+   "cost_seconds_by_file": 561
+  },
+  "aisef2/app/bundle.py::_strings": {
+   "mutants": 14,
+   "kill_files": 10,
+   "chain_seconds_literal": 561.0,
+   "chain_seconds_by_file": 561.0,
+   "cost_seconds_literal": 7854,
+   "cost_seconds_by_file": 7854
+  },
+  "aisef2/app/bundle.py::load": {
+   "mutants": 66,
+   "kill_files": 10,
+   "chain_seconds_literal": 585.8,
+   "chain_seconds_by_file": 585.8,
+   "cost_seconds_literal": 38663,
+   "cost_seconds_by_file": 38663
+  },
+  "aisef2/app/bundle.py::read": {
+   "mutants": 9,
+   "kill_files": 10,
+   "chain_seconds_literal": 561.0,
+   "chain_seconds_by_file": 561.0,
+   "cost_seconds_literal": 5049,
+   "cost_seconds_by_file": 5049
+  },
+  "aisef2/app/bundle.py::shape_problems": {
+   "mutants": 114,
+   "kill_files": 12,
+   "chain_seconds_literal": 563.0,
+   "chain_seconds_by_file": 563.0,
+   "cost_seconds_literal": 64180,
+   "cost_seconds_by_file": 64180
+  },
+  "aisef2/app/bundle_cli.py::APPROVAL_KEY": {
+   "mutants": 6,
+   "kill_files": 1,
+   "chain_seconds_literal": 1.8,
+   "chain_seconds_by_file": 2.5,
+   "cost_seconds_literal": 11,
+   "cost_seconds_by_file": 15
+  },
+  "aisef2/app/bundle_cli.py::AUTHORING_KEYS": {
+   "mutants": 9,
+   "kill_files": 5,
+   "chain_seconds_literal": 8.9,
+   "chain_seconds_by_file": 300.3,
+   "cost_seconds_literal": 80,
+   "cost_seconds_by_file": 2703
+  },
+  "aisef2/app/bundle_cli.py::CONTRACT_KEYS": {
+   "mutants": 8,
+   "kill_files": 5,
+   "chain_seconds_literal": 8.9,
+   "chain_seconds_by_file": 300.3,
+   "cost_seconds_literal": 71,
+   "cost_seconds_by_file": 2403
+  },
+  "aisef2/app/bundle_cli.py::CRITERION_KEYS": {
+   "mutants": 6,
+   "kill_files": 5,
+   "chain_seconds_literal": 8.9,
+   "chain_seconds_by_file": 300.3,
+   "cost_seconds_literal": 53,
+   "cost_seconds_by_file": 1802
+  },
+  "aisef2/app/bundle_cli.py::EXAMPLES": {
+   "mutants": 1,
+   "kill_files": 5,
+   "chain_seconds_literal": 8.9,
+   "chain_seconds_by_file": 300.3,
+   "cost_seconds_literal": 9,
+   "cost_seconds_by_file": 300
+  },
+  "aisef2/app/bundle_cli.py::JournalRefused.__init__": {
+   "mutants": 1,
+   "kill_files": 1,
+   "chain_seconds_literal": 1.8,
+   "chain_seconds_by_file": 2.5,
+   "cost_seconds_literal": 2,
+   "cost_seconds_by_file": 3
+  },
+  "aisef2/app/bundle_cli.py::LIMITS": {
+   "mutants": 3,
+   "kill_files": 1,
+   "chain_seconds_literal": 1.8,
+   "chain_seconds_by_file": 2.5,
+   "cost_seconds_literal": 5,
+   "cost_seconds_by_file": 8
+  },
+  "aisef2/app/bundle_cli.py::RELEASES": {
+   "mutants": 46,
+   "kill_files": 6,
+   "chain_seconds_literal": 10.7,
+   "chain_seconds_by_file": 302.9,
+   "cost_seconds_literal": 491,
+   "cost_seconds_by_file": 13932
+  },
+  "aisef2/app/bundle_cli.py::_INTEGRITY": {
+   "mutants": 2,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 231.3,
+   "cost_seconds_literal": 7,
+   "cost_seconds_by_file": 463
+  },
+  "aisef2/app/bundle_cli.py::_assess": {
+   "mutants": 125,
+   "kill_files": 1,
+   "chain_seconds_literal": 1.8,
+   "chain_seconds_by_file": 2.5,
+   "cost_seconds_literal": 222,
+   "cost_seconds_by_file": 318
+  },
+  "aisef2/app/bundle_cli.py::_authentic": {
+   "mutants": 39,
+   "kill_files": 1,
+   "chain_seconds_literal": 1.8,
+   "chain_seconds_by_file": 2.5,
+   "cost_seconds_literal": 69,
+   "cost_seconds_by_file": 99
+  },
+  "aisef2/app/bundle_cli.py::_binds": {
+   "mutants": 9,
+   "kill_files": 1,
+   "chain_seconds_literal": 1.8,
+   "chain_seconds_by_file": 2.5,
+   "cost_seconds_literal": 16,
+   "cost_seconds_by_file": 23
+  },
+  "aisef2/app/bundle_cli.py::_closed": {
+   "mutants": 11,
+   "kill_files": 7,
+   "chain_seconds_literal": 12.5,
+   "chain_seconds_by_file": 302.0,
+   "cost_seconds_literal": 137,
+   "cost_seconds_by_file": 3322
+  },
+  "aisef2/app/bundle_cli.py::_create": {
+   "mutants": 3,
+   "kill_files": 5,
+   "chain_seconds_literal": 8.9,
+   "chain_seconds_by_file": 300.3,
+   "cost_seconds_literal": 27,
+   "cost_seconds_by_file": 901
+  },
+  "aisef2/app/bundle_cli.py::_declared": {
+   "mutants": 60,
+   "kill_files": 1,
+   "chain_seconds_literal": 1.8,
+   "chain_seconds_by_file": 2.5,
+   "cost_seconds_literal": 107,
+   "cost_seconds_by_file": 152
+  },
+  "aisef2/app/bundle_cli.py::_earlier": {
+   "mutants": 7,
+   "kill_files": 5,
+   "chain_seconds_literal": 8.9,
+   "chain_seconds_by_file": 300.3,
+   "cost_seconds_literal": 62,
+   "cost_seconds_by_file": 2102
+  },
+  "aisef2/app/bundle_cli.py::_earliest": {
+   "mutants": 4,
+   "kill_files": 1,
+   "chain_seconds_literal": 1.8,
+   "chain_seconds_by_file": 2.5,
+   "cost_seconds_literal": 7,
+   "cost_seconds_by_file": 10
+  },
+  "aisef2/app/bundle_cli.py::_exposure": {
+   "mutants": 1,
+   "kill_files": 1,
+   "chain_seconds_literal": 1.8,
+   "chain_seconds_by_file": 2.5,
+   "cost_seconds_literal": 2,
+   "cost_seconds_by_file": 3
+  },
+  "aisef2/app/bundle_cli.py::_ground": {
+   "mutants": 60,
+   "kill_files": 1,
+   "chain_seconds_literal": 1.8,
+   "chain_seconds_by_file": 2.5,
+   "cost_seconds_literal": 107,
+   "cost_seconds_by_file": 152
+  },
+  "aisef2/app/bundle_cli.py::_grounds": {
+   "mutants": 7,
+   "kill_files": 1,
+   "chain_seconds_literal": 1.8,
+   "chain_seconds_by_file": 2.5,
+   "cost_seconds_literal": 12,
+   "cost_seconds_by_file": 18
+  },
+  "aisef2/app/bundle_cli.py::_group": {
+   "mutants": 19,
+   "kill_files": 1,
+   "chain_seconds_literal": 1.8,
+   "chain_seconds_by_file": 2.5,
+   "cost_seconds_literal": 34,
+   "cost_seconds_by_file": 48
+  },
+  "aisef2/app/bundle_cli.py::_journal": {
+   "mutants": 48,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 240.4,
+   "cost_seconds_literal": 256,
+   "cost_seconds_by_file": 11538
+  },
+  "aisef2/app/bundle_cli.py::_key": {
+   "mutants": 2,
+   "kill_files": 1,
+   "chain_seconds_literal": 1.8,
+   "chain_seconds_by_file": 2.5,
+   "cost_seconds_literal": 4,
+   "cost_seconds_by_file": 5
+  },
+  "aisef2/app/bundle_cli.py::_known": {
+   "mutants": 14,
+   "kill_files": 1,
+   "chain_seconds_literal": 1.8,
+   "chain_seconds_by_file": 2.5,
+   "cost_seconds_literal": 25,
+   "cost_seconds_by_file": 36
+  },
+  "aisef2/app/bundle_cli.py::_mint": {
+   "mutants": 13,
+   "kill_files": 5,
+   "chain_seconds_literal": 8.9,
+   "chain_seconds_by_file": 300.3,
+   "cost_seconds_literal": 116,
+   "cost_seconds_by_file": 3904
+  },
+  "aisef2/app/bundle_cli.py::_origins": {
+   "mutants": 8,
+   "kill_files": 1,
+   "chain_seconds_literal": 1.8,
+   "chain_seconds_by_file": 2.5,
+   "cost_seconds_literal": 14,
+   "cost_seconds_by_file": 20
+  },
+  "aisef2/app/bundle_cli.py::_read": {
+   "mutants": 7,
+   "kill_files": 6,
+   "chain_seconds_literal": 10.7,
+   "chain_seconds_by_file": 301.6,
+   "cost_seconds_literal": 75,
+   "cost_seconds_by_file": 2111
+  },
+  "aisef2/app/bundle_cli.py::_record": {
+   "mutants": 43,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 11.6,
+   "cost_seconds_literal": 153,
+   "cost_seconds_by_file": 500
+  },
+  "aisef2/app/bundle_cli.py::_refs": {
+   "mutants": 3,
+   "kill_files": 5,
+   "chain_seconds_literal": 8.9,
+   "chain_seconds_by_file": 300.3,
+   "cost_seconds_literal": 27,
+   "cost_seconds_by_file": 901
+  },
+  "aisef2/app/bundle_cli.py::_selected": {
+   "mutants": 4,
+   "kill_files": 1,
+   "chain_seconds_literal": 1.8,
+   "chain_seconds_by_file": 2.5,
+   "cost_seconds_literal": 7,
+   "cost_seconds_by_file": 10
+  },
+  "aisef2/app/bundle_cli.py::_shell_word": {
+   "mutants": 12,
+   "kill_files": 7,
+   "chain_seconds_literal": 12.5,
+   "chain_seconds_by_file": 306.1,
+   "cost_seconds_literal": 150,
+   "cost_seconds_by_file": 3674
+  },
+  "aisef2/app/bundle_cli.py::_spec_rows": {
+   "mutants": 38,
+   "kill_files": 6,
+   "chain_seconds_literal": 10.7,
+   "chain_seconds_by_file": 301.6,
+   "cost_seconds_literal": 406,
+   "cost_seconds_by_file": 11459
+  },
+  "aisef2/app/bundle_cli.py::_write_new": {
+   "mutants": 3,
+   "kill_files": 6,
+   "chain_seconds_literal": 10.7,
+   "chain_seconds_by_file": 301.6,
+   "cost_seconds_literal": 32,
+   "cost_seconds_by_file": 905
+  },
+  "aisef2/app/bundle_cli.py::approve": {
+   "mutants": 27,
+   "kill_files": 8,
+   "chain_seconds_literal": 14.2,
+   "chain_seconds_by_file": 304.5,
+   "cost_seconds_literal": 384,
+   "cost_seconds_by_file": 8222
+  },
+  "aisef2/app/bundle_cli.py::continue_from": {
+   "mutants": 217,
+   "kill_files": 12,
+   "chain_seconds_literal": 21.4,
+   "chain_seconds_by_file": 339.3,
+   "cost_seconds_literal": 4635,
+   "cost_seconds_by_file": 73630
+  },
+  "aisef2/app/bundle_cli.py::coverage": {
+   "mutants": 48,
+   "kill_files": 8,
+   "chain_seconds_literal": 14.2,
+   "chain_seconds_by_file": 306.7,
+   "cost_seconds_literal": 684,
+   "cost_seconds_by_file": 14719
+  },
+  "aisef2/app/bundle_cli.py::explain": {
+   "mutants": 34,
+   "kill_files": 7,
+   "chain_seconds_literal": 12.5,
+   "chain_seconds_by_file": 306.9,
+   "cost_seconds_literal": 424,
+   "cost_seconds_by_file": 10435
+  },
+  "aisef2/app/bundle_cli.py::exposure_of": {
+   "mutants": 14,
+   "kill_files": 1,
+   "chain_seconds_literal": 1.8,
+   "chain_seconds_by_file": 2.5,
+   "cost_seconds_literal": 25,
+   "cost_seconds_by_file": 36
+  },
+  "aisef2/app/bundle_cli.py::init": {
+   "mutants": 12,
+   "kill_files": 6,
+   "chain_seconds_literal": 10.7,
+   "chain_seconds_by_file": 300.7,
+   "cost_seconds_literal": 128,
+   "cost_seconds_by_file": 3608
+  },
+  "aisef2/app/bundle_cli.py::lint": {
+   "mutants": 57,
+   "kill_files": 6,
+   "chain_seconds_literal": 10.7,
+   "chain_seconds_by_file": 301.4,
+   "cost_seconds_literal": 609,
+   "cost_seconds_by_file": 17180
+  },
+  "aisef2/app/bundle_cli.py::main": {
+   "mutants": 169,
+   "kill_files": 11,
+   "chain_seconds_literal": 19.6,
+   "chain_seconds_by_file": 315.9,
+   "cost_seconds_literal": 3309,
+   "cost_seconds_by_file": 53394
+  },
+  "aisef2/app/bundle_cli.py::migrate": {
+   "mutants": 200,
+   "kill_files": 9,
+   "chain_seconds_literal": 16.0,
+   "chain_seconds_by_file": 305.0,
+   "cost_seconds_literal": 3204,
+   "cost_seconds_by_file": 61004
+  },
+  "aisef2/app/bundle_cli.py::seal": {
+   "mutants": 182,
+   "kill_files": 8,
+   "chain_seconds_literal": 14.2,
+   "chain_seconds_by_file": 305.3,
+   "cost_seconds_literal": 2592,
+   "cost_seconds_by_file": 55570
+  },
+  "aisef2/app/bundle_cli.py::unapproved": {
+   "mutants": 19,
+   "kill_files": 6,
+   "chain_seconds_literal": 10.7,
+   "chain_seconds_by_file": 301.6,
+   "cost_seconds_literal": 203,
+   "cost_seconds_by_file": 5730
+  },
+  "aisef2/app/bundle_cli.py::with_commands": {
+   "mutants": 40,
+   "kill_files": 1,
+   "chain_seconds_literal": 1.8,
+   "chain_seconds_by_file": 2.5,
+   "cost_seconds_literal": 71,
+   "cost_seconds_by_file": 102
+  },
+  "aisef2/app/cli.py::_parser": {
+   "mutants": 31,
+   "kill_files": 8,
+   "chain_seconds_literal": 14.2,
+   "chain_seconds_by_file": 268.0,
+   "cost_seconds_literal": 441,
+   "cost_seconds_by_file": 8307
+  },
+  "aisef2/app/cli.py::run": {
+   "mutants": 143,
+   "kill_files": 9,
+   "chain_seconds_literal": 16.0,
+   "chain_seconds_by_file": 313.6,
+   "cost_seconds_literal": 2291,
+   "cost_seconds_by_file": 44841
+  },
+  "aisef2/app/client.py::Budget.__init__": {
+   "mutants": 25,
+   "kill_files": 5,
+   "chain_seconds_literal": 8.9,
+   "chain_seconds_by_file": 67.1,
+   "cost_seconds_literal": 222,
+   "cost_seconds_by_file": 1678
+  },
+  "aisef2/app/client.py::Budget.account": {
+   "mutants": 19,
+   "kill_files": 5,
+   "chain_seconds_literal": 8.9,
+   "chain_seconds_by_file": 44.8,
+   "cost_seconds_literal": 169,
+   "cost_seconds_by_file": 851
+  },
+  "aisef2/app/client.py::Budget.reached": {
+   "mutants": 20,
+   "kill_files": 4,
+   "chain_seconds_literal": 7.1,
+   "chain_seconds_by_file": 64.6,
+   "cost_seconds_literal": 142,
+   "cost_seconds_by_file": 1292
+  },
+  "aisef2/app/client.py::Budget.spend": {
+   "mutants": 49,
+   "kill_files": 6,
+   "chain_seconds_literal": 10.7,
+   "chain_seconds_by_file": 67.5,
+   "cost_seconds_literal": 523,
+   "cost_seconds_by_file": 3308
+  },
+  "aisef2/app/client.py::environment": {
+   "mutants": 37,
+   "kill_files": 4,
+   "chain_seconds_literal": 7.1,
+   "chain_seconds_by_file": 64.6,
+   "cost_seconds_literal": 263,
+   "cost_seconds_by_file": 2390
+  },
+  "aisef2/app/client.py::events": {
+   "mutants": 8,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 10.6,
+   "cost_seconds_literal": 43,
+   "cost_seconds_by_file": 85
+  },
+  "aisef2/app/client.py::read_session": {
+   "mutants": 77,
+   "kill_files": 5,
+   "chain_seconds_literal": 8.9,
+   "chain_seconds_by_file": 66.4,
+   "cost_seconds_literal": 685,
+   "cost_seconds_by_file": 5111
+  },
+  "aisef2/app/client.py::redact": {
+   "mutants": 8,
+   "kill_files": 4,
+   "chain_seconds_literal": 7.1,
+   "chain_seconds_by_file": 42.2,
+   "cost_seconds_literal": 57,
+   "cost_seconds_by_file": 338
+  },
+  "aisef2/app/client.py::session": {
+   "mutants": 128,
+   "kill_files": 5,
+   "chain_seconds_literal": 8.9,
+   "chain_seconds_by_file": 84.3,
+   "cost_seconds_literal": 1139,
+   "cost_seconds_by_file": 10792
+  },
+  "aisef2/app/client.py::wait_within": {
+   "mutants": 23,
+   "kill_files": 5,
+   "chain_seconds_literal": 8.9,
+   "chain_seconds_by_file": 65.1,
+   "cost_seconds_literal": 205,
+   "cost_seconds_by_file": 1498
+  },
+  "aisef2/app/diagnostics.py::NOT_INSPECTED": {
+   "mutants": 1,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 5.1,
+   "cost_seconds_literal": 4,
+   "cost_seconds_by_file": 5
+  },
+  "aisef2/app/diagnostics.py::PERMISSIONS": {
+   "mutants": 4,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 5.1,
+   "cost_seconds_literal": 14,
+   "cost_seconds_by_file": 20
+  },
+  "aisef2/app/diagnostics.py::Sink.__init__": {
+   "mutants": 10,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 5.1,
+   "cost_seconds_literal": 36,
+   "cost_seconds_by_file": 51
+  },
+  "aisef2/app/diagnostics.py::Sink._document": {
+   "mutants": 103,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 5.1,
+   "cost_seconds_literal": 367,
+   "cost_seconds_by_file": 523
+  },
+  "aisef2/app/diagnostics.py::Sink._keep": {
+   "mutants": 17,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 5.1,
+   "cost_seconds_literal": 61,
+   "cost_seconds_by_file": 86
+  },
+  "aisef2/app/diagnostics.py::Sink.entries": {
+   "mutants": 3,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 5.1,
+   "cost_seconds_literal": 11,
+   "cost_seconds_by_file": 15
+  },
+  "aisef2/app/diagnostics.py::Sink.note": {
+   "mutants": 15,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 5.1,
+   "cost_seconds_literal": 53,
+   "cost_seconds_by_file": 76
+  },
+  "aisef2/app/diagnostics.py::Sink.report": {
+   "mutants": 26,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 28.0,
+   "cost_seconds_literal": 139,
+   "cost_seconds_by_file": 727
+  },
+  "aisef2/app/diagnostics.py::_NAME": {
+   "mutants": 1,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 5.1,
+   "cost_seconds_literal": 4,
+   "cost_seconds_by_file": 5
+  },
+  "aisef2/app/diagnostics.py::_identity": {
+   "mutants": 16,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 5.1,
+   "cost_seconds_literal": 57,
+   "cost_seconds_by_file": 81
+  },
+  "aisef2/app/diagnostics.py::_parsed": {
+   "mutants": 7,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 5.1,
+   "cost_seconds_literal": 25,
+   "cost_seconds_by_file": 36
+  },
+  "aisef2/app/diagnostics.py::_pre_state": {
+   "mutants": 14,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 5.1,
+   "cost_seconds_literal": 50,
+   "cost_seconds_by_file": 71
+  },
+  "aisef2/app/diagnostics.py::access_of": {
+   "mutants": 15,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 5.1,
+   "cost_seconds_literal": 53,
+   "cost_seconds_by_file": 76
+  },
+  "aisef2/app/diagnostics.py::artifact_problems": {
+   "mutants": 123,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 5.1,
+   "cost_seconds_literal": 438,
+   "cost_seconds_by_file": 625
+  },
+  "aisef2/app/diagnostics.py::tapped": {
+   "mutants": 14,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 5.1,
+   "cost_seconds_literal": 50,
+   "cost_seconds_by_file": 71
+  },
+  "aisef2/app/feedback.py::context_pack": {
+   "mutants": 205,
+   "kill_files": 5,
+   "chain_seconds_literal": 195.1,
+   "chain_seconds_by_file": 195.1,
+   "cost_seconds_literal": 39987,
+   "cost_seconds_by_file": 39987
+  },
+  "aisef2/app/feedback.py::retry_feedback": {
+   "mutants": 141,
+   "kill_files": 7,
+   "chain_seconds_literal": 189.5,
+   "chain_seconds_by_file": 189.5,
+   "cost_seconds_literal": 26722,
+   "cost_seconds_by_file": 26722
+  },
+  "aisef2/app/lineage.py::ANCHOR_LINE": {
+   "mutants": 1,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 270.3,
+   "cost_seconds_literal": 4,
+   "cost_seconds_by_file": 270
+  },
+  "aisef2/app/lineage.py::JOURNAL": {
+   "mutants": 3,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 270.3,
+   "cost_seconds_literal": 11,
+   "cost_seconds_by_file": 811
+  },
+  "aisef2/app/lineage.py::SPEND": {
+   "mutants": 4,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 270.3,
+   "cost_seconds_literal": 14,
+   "cost_seconds_by_file": 1081
+  },
+  "aisef2/app/lineage.py::_claimed_run": {
+   "mutants": 11,
+   "kill_files": 4,
+   "chain_seconds_literal": 7.1,
+   "chain_seconds_by_file": 301.4,
+   "cost_seconds_literal": 78,
+   "cost_seconds_by_file": 3315
+  },
+  "aisef2/app/lineage.py::_evidence_gone": {
+   "mutants": 58,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 5.1,
+   "cost_seconds_literal": 206,
+   "cost_seconds_by_file": 295
+  },
+  "aisef2/app/lineage.py::_git": {
+   "mutants": 1,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 270.3,
+   "cost_seconds_literal": 4,
+   "cost_seconds_by_file": 270
+  },
+  "aisef2/app/lineage.py::_gone": {
+   "mutants": 23,
+   "kill_files": 4,
+   "chain_seconds_literal": 7.1,
+   "chain_seconds_by_file": 299.6,
+   "cost_seconds_literal": 164,
+   "cost_seconds_by_file": 6890
+  },
+  "aisef2/app/lineage.py::_in_the_way": {
+   "mutants": 17,
+   "kill_files": 1,
+   "chain_seconds_literal": 1.8,
+   "chain_seconds_by_file": 2.5,
+   "cost_seconds_literal": 30,
+   "cost_seconds_by_file": 43
+  },
+  "aisef2/app/lineage.py::_is_a_directory": {
+   "mutants": 5,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 3.4,
+   "cost_seconds_literal": 27,
+   "cost_seconds_by_file": 17
+  },
+  "aisef2/app/lineage.py::_journal_mismatch": {
+   "mutants": 25,
+   "kill_files": 1,
+   "chain_seconds_literal": 1.8,
+   "chain_seconds_by_file": 2.5,
+   "cost_seconds_literal": 44,
+   "cost_seconds_by_file": 64
+  },
+  "aisef2/app/lineage.py::_look": {
+   "mutants": 2,
+   "kill_files": 8,
+   "chain_seconds_literal": 14.2,
+   "chain_seconds_by_file": 303.3,
+   "cost_seconds_literal": 28,
+   "cost_seconds_by_file": 607
+  },
+  "aisef2/app/lineage.py::_predecessor": {
+   "mutants": 42,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 31.5,
+   "cost_seconds_literal": 224,
+   "cost_seconds_by_file": 1325
+  },
+  "aisef2/app/lineage.py::_recorded_spend": {
+   "mutants": 48,
+   "kill_files": 1,
+   "chain_seconds_literal": 1.8,
+   "chain_seconds_by_file": 2.5,
+   "cost_seconds_literal": 85,
+   "cost_seconds_by_file": 122
+  },
+  "aisef2/app/lineage.py::_sha": {
+   "mutants": 1,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 270.3,
+   "cost_seconds_literal": 4,
+   "cost_seconds_by_file": 270
+  },
+  "aisef2/app/lineage.py::_without_a_journal": {
+   "mutants": 56,
+   "kill_files": 1,
+   "chain_seconds_literal": 1.8,
+   "chain_seconds_by_file": 2.5,
+   "cost_seconds_literal": 100,
+   "cost_seconds_by_file": 142
+  },
+  "aisef2/app/lineage.py::account_of": {
+   "mutants": 88,
+   "kill_files": 11,
+   "chain_seconds_literal": 19.6,
+   "chain_seconds_by_file": 310.9,
+   "cost_seconds_literal": 1723,
+   "cost_seconds_by_file": 27360
+  },
+  "aisef2/app/lineage.py::child_evidence": {
+   "mutants": 44,
+   "kill_files": 1,
+   "chain_seconds_literal": 1.8,
+   "chain_seconds_by_file": 2.5,
+   "cost_seconds_literal": 78,
+   "cost_seconds_by_file": 112
+  },
+  "aisef2/app/lineage.py::child_state": {
+   "mutants": 1,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 272.9,
+   "cost_seconds_literal": 5,
+   "cost_seconds_by_file": 273
+  },
+  "aisef2/app/lineage.py::claim": {
+   "mutants": 110,
+   "kill_files": 8,
+   "chain_seconds_literal": 14.2,
+   "chain_seconds_by_file": 305.5,
+   "cost_seconds_literal": 1566,
+   "cost_seconds_by_file": 33600
+  },
+  "aisef2/app/lineage.py::claim_unread": {
+   "mutants": 12,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 5.1,
+   "cost_seconds_literal": 43,
+   "cost_seconds_by_file": 61
+  },
+  "aisef2/app/lineage.py::claimant": {
+   "mutants": 7,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 270.3,
+   "cost_seconds_literal": 25,
+   "cost_seconds_by_file": 1892
+  },
+  "aisef2/app/lineage.py::claims": {
+   "mutants": 16,
+   "kill_files": 6,
+   "chain_seconds_literal": 10.7,
+   "chain_seconds_by_file": 276.2,
+   "cost_seconds_literal": 171,
+   "cost_seconds_by_file": 4419
+  },
+  "aisef2/app/lineage.py::continued_by": {
+   "mutants": 15,
+   "kill_files": 5,
+   "chain_seconds_literal": 8.9,
+   "chain_seconds_by_file": 301.8,
+   "cost_seconds_literal": 134,
+   "cost_seconds_by_file": 4527
+  },
+  "aisef2/app/lineage.py::events_of": {
+   "mutants": 4,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 270.7,
+   "cost_seconds_literal": 21,
+   "cost_seconds_by_file": 1083
+  },
+  "aisef2/app/lineage.py::is_file": {
+   "mutants": 5,
+   "kill_files": 1,
+   "chain_seconds_literal": 1.8,
+   "chain_seconds_by_file": 2.5,
+   "cost_seconds_literal": 9,
+   "cost_seconds_by_file": 13
+  },
+  "aisef2/app/lineage.py::lineage_account": {
+   "mutants": 72,
+   "kill_files": 8,
+   "chain_seconds_literal": 14.2,
+   "chain_seconds_by_file": 305.3,
+   "cost_seconds_literal": 1025,
+   "cost_seconds_by_file": 21979
+  },
+  "aisef2/app/lineage.py::not_there": {
+   "mutants": 5,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 5.1,
+   "cost_seconds_literal": 18,
+   "cost_seconds_by_file": 25
+  },
+  "aisef2/app/lineage.py::predecessor_of": {
+   "mutants": 1,
+   "kill_files": 5,
+   "chain_seconds_literal": 8.9,
+   "chain_seconds_by_file": 301.9,
+   "cost_seconds_literal": 9,
+   "cost_seconds_by_file": 302
+  },
+  "aisef2/app/lineage.py::process_started": {
+   "mutants": 25,
+   "kill_files": 4,
+   "chain_seconds_literal": 7.1,
+   "chain_seconds_by_file": 273.4,
+   "cost_seconds_literal": 178,
+   "cost_seconds_by_file": 6834
+  },
+  "aisef2/app/lineage.py::read_anchor": {
+   "mutants": 6,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 270.8,
+   "cost_seconds_literal": 32,
+   "cost_seconds_by_file": 1625
+  },
+  "aisef2/app/lineage.py::reconcile": {
+   "mutants": 148,
+   "kill_files": 5,
+   "chain_seconds_literal": 8.9,
+   "chain_seconds_by_file": 274.2,
+   "cost_seconds_literal": 1317,
+   "cost_seconds_by_file": 40588
+  },
+  "aisef2/app/lineage.py::unread_runs": {
+   "mutants": 7,
+   "kill_files": 1,
+   "chain_seconds_literal": 1.8,
+   "chain_seconds_by_file": 2.5,
+   "cost_seconds_literal": 12,
+   "cost_seconds_by_file": 18
+  },
+  "aisef2/app/lineage.py::usage_lineage": {
+   "mutants": 126,
+   "kill_files": 6,
+   "chain_seconds_literal": 10.7,
+   "chain_seconds_by_file": 275.7,
+   "cost_seconds_literal": 1346,
+   "cost_seconds_by_file": 34739
+  },
+  "aisef2/app/lineage.py::write_anchor": {
+   "mutants": 9,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 270.3,
+   "cost_seconds_literal": 32,
+   "cost_seconds_by_file": 2433
+  },
+  "aisef2/app/preflight.py::accounting": {
+   "mutants": 26,
+   "kill_files": 5,
+   "chain_seconds_literal": 66.1,
+   "chain_seconds_by_file": 66.1,
+   "cost_seconds_literal": 1719,
+   "cost_seconds_by_file": 1719
+  },
+  "aisef2/app/preflight.py::deployment": {
+   "mutants": 7,
+   "kill_files": 4,
+   "chain_seconds_literal": 43.6,
+   "chain_seconds_by_file": 43.6,
+   "cost_seconds_literal": 305,
+   "cost_seconds_by_file": 305
+  },
+  "aisef2/app/preflight.py::fingerprint_fields": {
+   "mutants": 22,
+   "kill_files": 6,
+   "chain_seconds_literal": 66.5,
+   "chain_seconds_by_file": 66.5,
+   "cost_seconds_literal": 1462,
+   "cost_seconds_by_file": 1462
+  },
+  "aisef2/app/preflight.py::http_transport": {
+   "mutants": 74,
+   "kill_files": 6,
+   "chain_seconds_literal": 44.4,
+   "chain_seconds_by_file": 44.4,
+   "cost_seconds_literal": 3285,
+   "cost_seconds_by_file": 3285
+  },
+  "aisef2/app/preflight.py::identity_problems": {
+   "mutants": 60,
+   "kill_files": 5,
+   "chain_seconds_literal": 44.5,
+   "chain_seconds_by_file": 44.5,
+   "cost_seconds_literal": 2667,
+   "cost_seconds_by_file": 2667
+  },
+  "aisef2/app/preflight.py::run": {
+   "mutants": 134,
+   "kill_files": 6,
+   "chain_seconds_literal": 67.0,
+   "chain_seconds_by_file": 67.0,
+   "cost_seconds_literal": 8975,
+   "cost_seconds_by_file": 8975
+  },
+  "aisef2/app/review_ocr.py::NOT_FULL": {
+   "mutants": 3,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 151.2,
+   "cost_seconds_literal": 16,
+   "cost_seconds_by_file": 454
+  },
+  "aisef2/app/review_ocr.py::NOT_REVIEWABLE": {
+   "mutants": 2,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 151.2,
+   "cost_seconds_literal": 11,
+   "cost_seconds_by_file": 302
+  },
+  "aisef2/app/review_ocr.py::OCR": {
+   "mutants": 8,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 151.2,
+   "cost_seconds_literal": 43,
+   "cost_seconds_by_file": 1210
+  },
+  "aisef2/app/review_ocr.py::REPRODUCER_FENCE": {
+   "mutants": 1,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 150.9,
+   "cost_seconds_literal": 4,
+   "cost_seconds_by_file": 151
+  },
+  "aisef2/app/review_ocr.py::SCRUB_PREFIXES": {
+   "mutants": 4,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 150.9,
+   "cost_seconds_literal": 14,
+   "cost_seconds_by_file": 604
+  },
+  "aisef2/app/review_ocr.py::TERMINAL": {
+   "mutants": 4,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 150.9,
+   "cost_seconds_literal": 14,
+   "cost_seconds_by_file": 604
+  },
+  "aisef2/app/review_ocr.py::VERSION_LINE": {
+   "mutants": 1,
+   "kill_files": 1,
+   "chain_seconds_literal": 1.8,
+   "chain_seconds_by_file": 2.5,
+   "cost_seconds_literal": 2,
+   "cost_seconds_by_file": 3
+  },
+  "aisef2/app/review_ocr.py::_FENCE_CLOSE": {
+   "mutants": 1,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 2.9,
+   "cost_seconds_literal": 4,
+   "cost_seconds_by_file": 3
+  },
+  "aisef2/app/review_ocr.py::_FENCE_OPEN": {
+   "mutants": 1,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 2.9,
+   "cost_seconds_literal": 4,
+   "cost_seconds_by_file": 3
+  },
+  "aisef2/app/review_ocr.py::_SPACE": {
+   "mutants": 1,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 2.9,
+   "cost_seconds_literal": 4,
+   "cost_seconds_by_file": 3
+  },
+  "aisef2/app/review_ocr.py::_fence": {
+   "mutants": 5,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 2.9,
+   "cost_seconds_literal": 18,
+   "cost_seconds_by_file": 14
+  },
+  "aisef2/app/review_ocr.py::argv": {
+   "mutants": 56,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 151.2,
+   "cost_seconds_literal": 299,
+   "cost_seconds_by_file": 8470
+  },
+  "aisef2/app/review_ocr.py::coverage": {
+   "mutants": 137,
+   "kill_files": 4,
+   "chain_seconds_literal": 7.1,
+   "chain_seconds_by_file": 154.4,
+   "cost_seconds_literal": 975,
+   "cost_seconds_by_file": 21147
+  },
+  "aisef2/app/review_ocr.py::declared": {
+   "mutants": 53,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 5.1,
+   "cost_seconds_literal": 189,
+   "cost_seconds_by_file": 269
+  },
+  "aisef2/app/review_ocr.py::environment": {
+   "mutants": 24,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 150.9,
+   "cost_seconds_literal": 85,
+   "cost_seconds_by_file": 3623
+  },
+  "aisef2/app/review_ocr.py::finding_id": {
+   "mutants": 13,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 151.2,
+   "cost_seconds_literal": 69,
+   "cost_seconds_by_file": 1966
+  },
+  "aisef2/app/review_ocr.py::findings": {
+   "mutants": 69,
+   "kill_files": 5,
+   "chain_seconds_literal": 8.9,
+   "chain_seconds_by_file": 154.7,
+   "cost_seconds_literal": 614,
+   "cost_seconds_by_file": 10673
+  },
+  "aisef2/app/review_ocr.py::item_id": {
+   "mutants": 12,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 151.2,
+   "cost_seconds_literal": 64,
+   "cost_seconds_by_file": 1815
+  },
+  "aisef2/app/review_ocr.py::pinned": {
+   "mutants": 14,
+   "kill_files": 4,
+   "chain_seconds_literal": 7.1,
+   "chain_seconds_by_file": 153.8,
+   "cost_seconds_literal": 100,
+   "cost_seconds_by_file": 2153
+  },
+  "aisef2/app/review_ocr.py::read_output": {
+   "mutants": 6,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 153.5,
+   "cost_seconds_literal": 32,
+   "cost_seconds_by_file": 921
+  },
+  "aisef2/app/review_ocr.py::reproducer_of": {
+   "mutants": 13,
+   "kill_files": 5,
+   "chain_seconds_literal": 8.9,
+   "chain_seconds_by_file": 156.3,
+   "cost_seconds_literal": 116,
+   "cost_seconds_by_file": 2032
+  },
+  "aisef2/app/review_ocr.py::scrubbed_names": {
+   "mutants": 2,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 150.9,
+   "cost_seconds_literal": 7,
+   "cost_seconds_by_file": 302
+  },
+  "aisef2/app/review_ocr.py::version_argv": {
+   "mutants": 4,
+   "kill_files": 1,
+   "chain_seconds_literal": 1.8,
+   "chain_seconds_by_file": 2.5,
+   "cost_seconds_literal": 7,
+   "cost_seconds_by_file": 10
+  },
+  "aisef2/app/review_ocr.py::version_environment": {
+   "mutants": 17,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 5.1,
+   "cost_seconds_literal": 61,
+   "cost_seconds_by_file": 86
+  },
+  "aisef2/app/review_verify.py::Artifact.__post_init__": {
+   "mutants": 7,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 6.1,
+   "cost_seconds_literal": 25,
+   "cost_seconds_by_file": 43
+  },
+  "aisef2/app/review_verify.py::POLICIES": {
+   "mutants": 2,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 165.1,
+   "cost_seconds_literal": 11,
+   "cost_seconds_by_file": 330
+  },
+  "aisef2/app/review_verify.py::REPRODUCER_KEYS": {
+   "mutants": 4,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 165.1,
+   "cost_seconds_literal": 21,
+   "cost_seconds_by_file": 660
+  },
+  "aisef2/app/review_verify.py::SEVERITIES": {
+   "mutants": 4,
+   "kill_files": 4,
+   "chain_seconds_literal": 7.1,
+   "chain_seconds_by_file": 166.1,
+   "cost_seconds_literal": 28,
+   "cost_seconds_by_file": 664
+  },
+  "aisef2/app/review_verify.py::Verification.evidence": {
+   "mutants": 5,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 165.1,
+   "cost_seconds_literal": 27,
+   "cost_seconds_by_file": 825
+  },
+  "aisef2/app/review_verify.py::_ARTIFACT_PATH": {
+   "mutants": 1,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 6.1,
+   "cost_seconds_literal": 4,
+   "cost_seconds_by_file": 6
+  },
+  "aisef2/app/review_verify.py::_NESTED_TOO_DEEP": {
+   "mutants": 2,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 4.0,
+   "cost_seconds_literal": 7,
+   "cost_seconds_by_file": 8
+  },
+  "aisef2/app/review_verify.py::_NUMBER": {
+   "mutants": 1,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 165.1,
+   "cost_seconds_literal": 5,
+   "cost_seconds_by_file": 165
+  },
+  "aisef2/app/review_verify.py::_SHA256": {
+   "mutants": 1,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 6.1,
+   "cost_seconds_literal": 4,
+   "cost_seconds_by_file": 6
+  },
+  "aisef2/app/review_verify.py::_approved_by_clause": {
+   "mutants": 22,
+   "kill_files": 4,
+   "chain_seconds_literal": 7.1,
+   "chain_seconds_by_file": 166.1,
+   "cost_seconds_literal": 157,
+   "cost_seconds_by_file": 3653
+  },
+  "aisef2/app/review_verify.py::_canon": {
+   "mutants": 7,
+   "kill_files": 5,
+   "chain_seconds_literal": 8.9,
+   "chain_seconds_by_file": 166.6,
+   "cost_seconds_literal": 62,
+   "cost_seconds_by_file": 1166
+  },
+  "aisef2/app/review_verify.py::_deeper_than": {
+   "mutants": 18,
+   "kill_files": 1,
+   "chain_seconds_literal": 1.8,
+   "chain_seconds_by_file": 2.5,
+   "cost_seconds_literal": 32,
+   "cost_seconds_by_file": 46
+  },
+  "aisef2/app/review_verify.py::_dumps": {
+   "mutants": 3,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 6.1,
+   "cost_seconds_literal": 11,
+   "cost_seconds_by_file": 18
+  },
+  "aisef2/app/review_verify.py::_fit": {
+   "mutants": 11,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 6.1,
+   "cost_seconds_literal": 39,
+   "cost_seconds_by_file": 67
+  },
+  "aisef2/app/review_verify.py::_scalars": {
+   "mutants": 7,
+   "kill_files": 4,
+   "chain_seconds_literal": 7.1,
+   "chain_seconds_by_file": 166.1,
+   "cost_seconds_literal": 50,
+   "cost_seconds_by_file": 1162
+  },
+  "aisef2/app/review_verify.py::_states": {
+   "mutants": 13,
+   "kill_files": 4,
+   "chain_seconds_literal": 7.1,
+   "chain_seconds_by_file": 166.1,
+   "cost_seconds_literal": 93,
+   "cost_seconds_by_file": 2159
+  },
+  "aisef2/app/review_verify.py::_stimulus": {
+   "mutants": 8,
+   "kill_files": 4,
+   "chain_seconds_literal": 7.1,
+   "chain_seconds_by_file": 166.1,
+   "cost_seconds_literal": 57,
+   "cost_seconds_by_file": 1328
+  },
+  "aisef2/app/review_verify.py::anchor": {
+   "mutants": 82,
+   "kill_files": 5,
+   "chain_seconds_literal": 8.9,
+   "chain_seconds_by_file": 166.9,
+   "cost_seconds_literal": 730,
+   "cost_seconds_by_file": 13687
+  },
+  "aisef2/app/review_verify.py::artifact_problems": {
+   "mutants": 92,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 6.1,
+   "cost_seconds_literal": 328,
+   "cost_seconds_by_file": 559
+  },
+  "aisef2/app/review_verify.py::artifact_stem": {
+   "mutants": 8,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 8.6,
+   "cost_seconds_literal": 43,
+   "cost_seconds_by_file": 69
+  },
+  "aisef2/app/review_verify.py::blocks": {
+   "mutants": 8,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 165.1,
+   "cost_seconds_literal": 43,
+   "cost_seconds_by_file": 1320
+  },
+  "aisef2/app/review_verify.py::bounded": {
+   "mutants": 9,
+   "kill_files": 1,
+   "chain_seconds_literal": 1.8,
+   "chain_seconds_by_file": 2.5,
+   "cost_seconds_literal": 16,
+   "cost_seconds_by_file": 23
+  },
+  "aisef2/app/review_verify.py::detail": {
+   "mutants": 96,
+   "kill_files": 5,
+   "chain_seconds_literal": 8.9,
+   "chain_seconds_by_file": 171.2,
+   "cost_seconds_literal": 854,
+   "cost_seconds_by_file": 16433
+  },
+  "aisef2/app/review_verify.py::preserve": {
+   "mutants": 36,
+   "kill_files": 4,
+   "chain_seconds_literal": 7.1,
+   "chain_seconds_by_file": 11.2,
+   "cost_seconds_literal": 256,
+   "cost_seconds_by_file": 402
+  },
+  "aisef2/app/review_verify.py::redacted": {
+   "mutants": 44,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 8.6,
+   "cost_seconds_literal": 235,
+   "cost_seconds_by_file": 379
+  },
+  "aisef2/app/review_verify.py::reproducer_contract": {
+   "mutants": 69,
+   "kill_files": 7,
+   "chain_seconds_literal": 12.5,
+   "chain_seconds_by_file": 172.0,
+   "cost_seconds_literal": 860,
+   "cost_seconds_by_file": 11867
+  },
+  "aisef2/app/review_verify.py::severity_of": {
+   "mutants": 5,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 165.1,
+   "cost_seconds_literal": 27,
+   "cost_seconds_by_file": 825
+  },
+  "aisef2/app/review_verify.py::verify": {
+   "mutants": 43,
+   "kill_files": 12,
+   "chain_seconds_literal": 21.4,
+   "chain_seconds_by_file": 181.2,
+   "cost_seconds_literal": 918,
+   "cost_seconds_by_file": 7793
+  },
+  "aisef2/app/run.py::OCR_CHECKS": {
+   "mutants": 19,
+   "kill_files": 1,
+   "chain_seconds_literal": 1.8,
+   "chain_seconds_by_file": 2.5,
+   "cost_seconds_literal": 34,
+   "cost_seconds_by_file": 48
+  },
+  "aisef2/app/run.py::_close": {
+   "mutants": 3,
+   "kill_files": 8,
+   "chain_seconds_literal": 14.2,
+   "chain_seconds_by_file": 497.2,
+   "cost_seconds_literal": 43,
+   "cost_seconds_by_file": 1492
+  },
+  "aisef2/app/run.py::_content_sha": {
+   "mutants": 10,
+   "kill_files": 9,
+   "chain_seconds_literal": 16.0,
+   "chain_seconds_by_file": 502.2,
+   "cost_seconds_literal": 160,
+   "cost_seconds_by_file": 5022
+  },
+  "aisef2/app/run.py::admit": {
+   "mutants": 15,
+   "kill_files": 9,
+   "chain_seconds_literal": 16.0,
+   "chain_seconds_by_file": 520.2,
+   "cost_seconds_literal": 240,
+   "cost_seconds_by_file": 7803
+  },
+  "aisef2/app/run.py::anchor_in": {
+   "mutants": 4,
+   "kill_files": 9,
+   "chain_seconds_literal": 16.0,
+   "chain_seconds_by_file": 502.2,
+   "cost_seconds_literal": 64,
+   "cost_seconds_by_file": 2009
+  },
+  "aisef2/app/run.py::anchor_of": {
+   "mutants": 7,
+   "kill_files": 9,
+   "chain_seconds_literal": 16.0,
+   "chain_seconds_by_file": 502.2,
+   "cost_seconds_literal": 112,
+   "cost_seconds_by_file": 3515
+  },
+  "aisef2/app/run.py::calibrations": {
+   "mutants": 11,
+   "kill_files": 8,
+   "chain_seconds_literal": 14.2,
+   "chain_seconds_by_file": 497.2,
+   "cost_seconds_literal": 157,
+   "cost_seconds_by_file": 5469
+  },
+  "aisef2/app/run.py::check_git": {
+   "mutants": 22,
+   "kill_files": 9,
+   "chain_seconds_literal": 16.0,
+   "chain_seconds_by_file": 520.2,
+   "cost_seconds_literal": 352,
+   "cost_seconds_by_file": 11444
+  },
+  "aisef2/app/run.py::check_repository": {
+   "mutants": 38,
+   "kill_files": 10,
+   "chain_seconds_literal": 17.8,
+   "chain_seconds_by_file": 525.2,
+   "cost_seconds_literal": 676,
+   "cost_seconds_by_file": 19956
+  },
+  "aisef2/app/run.py::client_on_path": {
+   "mutants": 3,
+   "kill_files": 9,
+   "chain_seconds_literal": 16.0,
+   "chain_seconds_by_file": 516.0,
+   "cost_seconds_literal": 48,
+   "cost_seconds_by_file": 1548
+  },
+  "aisef2/app/run.py::delivery": {
+   "mutants": 46,
+   "kill_files": 9,
+   "chain_seconds_literal": 16.0,
+   "chain_seconds_by_file": 520.2,
+   "cost_seconds_literal": 737,
+   "cost_seconds_by_file": 23929
+  },
+  "aisef2/app/run.py::evidence_manifest": {
+   "mutants": 27,
+   "kill_files": 12,
+   "chain_seconds_literal": 21.4,
+   "chain_seconds_by_file": 508.7,
+   "cost_seconds_literal": 577,
+   "cost_seconds_by_file": 13736
+  },
+  "aisef2/app/run.py::execute": {
+   "mutants": 366,
+   "kill_files": 18,
+   "chain_seconds_literal": 32.0,
+   "chain_seconds_by_file": 561.6,
+   "cost_seconds_literal": 11727,
+   "cost_seconds_by_file": 205531
+  },
+  "aisef2/app/run.py::kernel_digest": {
+   "mutants": 3,
+   "kill_files": 8,
+   "chain_seconds_literal": 14.2,
+   "chain_seconds_by_file": 497.2,
+   "cost_seconds_literal": 43,
+   "cost_seconds_by_file": 1492
+  },
+  "aisef2/app/run.py::layers_of": {
+   "mutants": 79,
+   "kill_files": 9,
+   "chain_seconds_literal": 16.0,
+   "chain_seconds_by_file": 501.7,
+   "cost_seconds_literal": 1266,
+   "cost_seconds_by_file": 39633
+  },
+  "aisef2/app/run.py::ocr_identity": {
+   "mutants": 95,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 5.1,
+   "cost_seconds_literal": 338,
+   "cost_seconds_by_file": 483
+  },
+  "aisef2/app/run.py::ocr_refusal": {
+   "mutants": 17,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 5.1,
+   "cost_seconds_literal": 61,
+   "cost_seconds_by_file": 86
+  },
+  "aisef2/app/run.py::outcomes_from": {
+   "mutants": 16,
+   "kill_files": 8,
+   "chain_seconds_literal": 14.2,
+   "chain_seconds_by_file": 497.2,
+   "cost_seconds_literal": 228,
+   "cost_seconds_by_file": 7956
+  },
+  "aisef2/app/run.py::probe_factories": {
+   "mutants": 2,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 5.1,
+   "cost_seconds_literal": 7,
+   "cost_seconds_by_file": 10
+  },
+  "aisef2/app/run.py::probe_interpreter": {
+   "mutants": 21,
+   "kill_files": 9,
+   "chain_seconds_literal": 16.0,
+   "chain_seconds_by_file": 520.2,
+   "cost_seconds_literal": 336,
+   "cost_seconds_by_file": 10924
+  },
+  "aisef2/app/run.py::productproof": {
+   "mutants": 62,
+   "kill_files": 9,
+   "chain_seconds_literal": 16.0,
+   "chain_seconds_by_file": 520.2,
+   "cost_seconds_literal": 993,
+   "cost_seconds_by_file": 32252
+  },
+  "aisef2/app/run.py::regression_tests": {
+   "mutants": 14,
+   "kill_files": 8,
+   "chain_seconds_literal": 14.2,
+   "chain_seconds_by_file": 497.2,
+   "cost_seconds_literal": 199,
+   "cost_seconds_by_file": 6961
+  },
+  "aisef2/app/run.py::runspec_of": {
+   "mutants": 51,
+   "kill_files": 9,
+   "chain_seconds_literal": 16.0,
+   "chain_seconds_by_file": 520.2,
+   "cost_seconds_literal": 817,
+   "cost_seconds_by_file": 26530
+  },
+  "aisef2/app/run.py::story_where": {
+   "mutants": 45,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 5.1,
+   "cost_seconds_literal": 160,
+   "cost_seconds_by_file": 229
+  },
+  "aisef2/app/run.py::unfinished": {
+   "mutants": 18,
+   "kill_files": 9,
+   "chain_seconds_literal": 16.0,
+   "chain_seconds_by_file": 501.7,
+   "cost_seconds_literal": 288,
+   "cost_seconds_by_file": 9030
+  },
+  "aisef2/app/settings.py::FINDERS": {
+   "mutants": 2,
+   "kill_files": 9,
+   "chain_seconds_literal": 515.2,
+   "chain_seconds_by_file": 515.2,
+   "cost_seconds_literal": 1030,
+   "cost_seconds_by_file": 1030
+  },
+  "aisef2/app/settings.py::LOOPBACK": {
+   "mutants": 3,
+   "kill_files": 9,
+   "chain_seconds_literal": 515.2,
+   "chain_seconds_by_file": 515.2,
+   "cost_seconds_literal": 1546,
+   "cost_seconds_by_file": 1546
+  },
+  "aisef2/app/settings.py::OCR_KEYS": {
+   "mutants": 4,
+   "kill_files": 9,
+   "chain_seconds_literal": 515.2,
+   "chain_seconds_by_file": 515.2,
+   "cost_seconds_literal": 2061,
+   "cost_seconds_by_file": 2061
+  },
+  "aisef2/app/settings.py::OPTIONAL": {
+   "mutants": 3,
+   "kill_files": 10,
+   "chain_seconds_literal": 535.1,
+   "chain_seconds_by_file": 535.1,
+   "cost_seconds_literal": 1605,
+   "cost_seconds_by_file": 1605
+  },
+  "aisef2/app/settings.py::REVIEW_ABSENT": {
+   "mutants": 9,
+   "kill_files": 11,
+   "chain_seconds_literal": 516.1,
+   "chain_seconds_by_file": 516.1,
+   "cost_seconds_literal": 4645,
+   "cost_seconds_by_file": 4645
+  },
+  "aisef2/app/settings.py::Settings.prices": {
+   "mutants": 2,
+   "kill_files": 9,
+   "chain_seconds_literal": 515.2,
+   "chain_seconds_by_file": 515.2,
+   "cost_seconds_literal": 1030,
+   "cost_seconds_by_file": 1030
+  },
+  "aisef2/app/settings.py::_count": {
+   "mutants": 7,
+   "kill_files": 10,
+   "chain_seconds_literal": 538.0,
+   "chain_seconds_by_file": 538.0,
+   "cost_seconds_literal": 3766,
+   "cost_seconds_by_file": 3766
+  },
+  "aisef2/app/settings.py::endpoint_problem": {
+   "mutants": 36,
+   "kill_files": 12,
+   "chain_seconds_literal": 516.6,
+   "chain_seconds_by_file": 516.6,
+   "cost_seconds_literal": 18596,
+   "cost_seconds_by_file": 18596
+  },
+  "aisef2/app/settings.py::load": {
+   "mutants": 268,
+   "kill_files": 12,
+   "chain_seconds_literal": 558.5,
+   "chain_seconds_by_file": 558.5,
+   "cost_seconds_literal": 149665,
+   "cost_seconds_by_file": 149665
+  },
+  "aisef2/app/settings.py::read": {
+   "mutants": 9,
+   "kill_files": 10,
+   "chain_seconds_literal": 515.7,
+   "chain_seconds_by_file": 515.7,
+   "cost_seconds_literal": 4641,
+   "cost_seconds_by_file": 4641
+  },
+  "aisef2/app/usage.py::CLASSES": {
+   "mutants": 5,
+   "kill_files": 3,
+   "chain_seconds_literal": 300.2,
+   "chain_seconds_by_file": 300.2,
+   "cost_seconds_literal": 1501,
+   "cost_seconds_by_file": 1501
+  },
+  "aisef2/app/usage.py::PRICE_KEYS": {
+   "mutants": 7,
+   "kill_files": 3,
+   "chain_seconds_literal": 300.2,
+   "chain_seconds_by_file": 300.2,
+   "cost_seconds_literal": 2102,
+   "cost_seconds_by_file": 2102
+  },
+  "aisef2/app/usage.py::_DATE": {
+   "mutants": 1,
+   "kill_files": 3,
+   "chain_seconds_literal": 300.2,
+   "chain_seconds_by_file": 300.2,
+   "cost_seconds_literal": 300,
+   "cost_seconds_by_file": 300
+  },
+  "aisef2/app/usage.py::_usd": {
+   "mutants": 10,
+   "kill_files": 3,
+   "chain_seconds_literal": 300.2,
+   "chain_seconds_by_file": 300.2,
+   "cost_seconds_literal": 3002,
+   "cost_seconds_by_file": 3002
+  },
+  "aisef2/app/usage.py::no_progress": {
+   "mutants": 35,
+   "kill_files": 8,
+   "chain_seconds_literal": 302.3,
+   "chain_seconds_by_file": 302.3,
+   "cost_seconds_literal": 10579,
+   "cost_seconds_by_file": 10579
+  },
+  "aisef2/app/usage.py::price_problem": {
+   "mutants": 45,
+   "kill_files": 4,
+   "chain_seconds_literal": 300.7,
+   "chain_seconds_by_file": 300.7,
+   "cost_seconds_literal": 13532,
+   "cost_seconds_by_file": 13532
+  },
+  "aisef2/app/usage.py::session_tokens": {
+   "mutants": 37,
+   "kill_files": 5,
+   "chain_seconds_literal": 302.6,
+   "chain_seconds_by_file": 302.6,
+   "cost_seconds_literal": 11195,
+   "cost_seconds_by_file": 11195
+  },
+  "aisef2/app/usage.py::usage": {
+   "mutants": 119,
+   "kill_files": 8,
+   "chain_seconds_literal": 330.9,
+   "chain_seconds_by_file": 330.9,
+   "cost_seconds_literal": 39371,
+   "cost_seconds_by_file": 39371
+  },
+  "aisef2/app/verify.py::_projection_refusal": {
+   "mutants": 9,
+   "kill_files": 1,
+   "chain_seconds_literal": 1.8,
+   "chain_seconds_by_file": 4.6,
+   "cost_seconds_literal": 16,
+   "cost_seconds_by_file": 41
+  },
+  "aisef2/app/verify.py::_runspec_problems": {
+   "mutants": 45,
+   "kill_files": 8,
+   "chain_seconds_literal": 14.2,
+   "chain_seconds_by_file": 345.9,
+   "cost_seconds_literal": 641,
+   "cost_seconds_by_file": 15566
+  },
+  "aisef2/app/verify.py::_spend": {
+   "mutants": 24,
+   "kill_files": 7,
+   "chain_seconds_literal": 12.5,
+   "chain_seconds_by_file": 345.2,
+   "cost_seconds_literal": 299,
+   "cost_seconds_by_file": 8284
+  },
+  "aisef2/app/verify.py::verify": {
+   "mutants": 211,
+   "kill_files": 17,
+   "chain_seconds_literal": 30.3,
+   "chain_seconds_by_file": 432.7,
+   "cost_seconds_literal": 6385,
+   "cost_seconds_by_file": 91295
+  },
+  "aisef2/orchestrate/review.py::_result": {
+   "mutants": 10,
+   "kill_files": 2,
+   "chain_seconds_literal": 23.2,
+   "chain_seconds_by_file": 23.2,
+   "cost_seconds_literal": 232,
+   "cost_seconds_by_file": 232
+  },
+  "aisef2/orchestrate/review.py::review": {
+   "mutants": 121,
+   "kill_files": 2,
+   "chain_seconds_literal": 23.2,
+   "chain_seconds_by_file": 23.2,
+   "cost_seconds_literal": 2813,
+   "cost_seconds_by_file": 2813
+  },
+  "aisef2/orchestrate/workspace.py::config_problems": {
+   "mutants": 34,
+   "kill_files": 4,
+   "chain_seconds_literal": 57.2,
+   "chain_seconds_by_file": 57.2,
+   "cost_seconds_literal": 1943,
+   "cost_seconds_by_file": 1943
+  },
+  "aisef2/plan/static_admission.py::_cycle": {
+   "mutants": 21,
+   "kill_files": 2,
+   "chain_seconds_literal": 1.6,
+   "chain_seconds_by_file": 1.6,
+   "cost_seconds_literal": 34,
+   "cost_seconds_by_file": 34
+  },
+  "aisef2/plan/static_admission.py::admit": {
+   "mutants": 21,
+   "kill_files": 2,
+   "chain_seconds_literal": 1.6,
+   "chain_seconds_by_file": 1.6,
+   "cost_seconds_literal": 34,
+   "cost_seconds_by_file": 34
+  },
+  "aisef2/plan/static_admission.py::check_contract_spec_integrity": {
+   "mutants": 13,
+   "kill_files": 2,
+   "chain_seconds_literal": 1.6,
+   "chain_seconds_by_file": 1.6,
+   "cost_seconds_literal": 21,
+   "cost_seconds_by_file": 21
+  },
+  "aisef2/plan/static_admission.py::check_contradictions": {
+   "mutants": 32,
+   "kill_files": 2,
+   "chain_seconds_literal": 1.6,
+   "chain_seconds_by_file": 1.6,
+   "cost_seconds_literal": 52,
+   "cost_seconds_by_file": 52
+  },
+  "aisef2/plan/static_admission.py::check_dependency_dag": {
+   "mutants": 9,
+   "kill_files": 2,
+   "chain_seconds_literal": 1.6,
+   "chain_seconds_by_file": 1.6,
+   "cost_seconds_literal": 15,
+   "cost_seconds_by_file": 15
+  },
+  "aisef2/plan/static_admission.py::check_ownership": {
+   "mutants": 20,
+   "kill_files": 3,
+   "chain_seconds_literal": 2.0,
+   "chain_seconds_by_file": 2.0,
+   "cost_seconds_literal": 40,
+   "cost_seconds_by_file": 40
+  },
+  "aisef2/plan/static_admission.py::check_plan_structure": {
+   "mutants": 8,
+   "kill_files": 2,
+   "chain_seconds_literal": 1.6,
+   "chain_seconds_by_file": 1.6,
+   "cost_seconds_literal": 13,
+   "cost_seconds_by_file": 13
+  },
+  "aisef2/plan/static_admission.py::check_probe_calibration": {
+   "mutants": 19,
+   "kill_files": 2,
+   "chain_seconds_literal": 1.6,
+   "chain_seconds_by_file": 1.6,
+   "cost_seconds_literal": 31,
+   "cost_seconds_by_file": 31
+  },
+  "aisef2/plan/static_admission.py::check_proof_capability": {
+   "mutants": 16,
+   "kill_files": 2,
+   "chain_seconds_literal": 1.6,
+   "chain_seconds_by_file": 1.6,
+   "cost_seconds_literal": 26,
+   "cost_seconds_by_file": 26
+  },
+  "aisef2/plan/static_admission.py::check_requirement_coverage": {
+   "mutants": 6,
+   "kill_files": 2,
+   "chain_seconds_literal": 1.6,
+   "chain_seconds_by_file": 1.6,
+   "cost_seconds_literal": 10,
+   "cost_seconds_by_file": 10
+  },
+  "aisef2/plan/static_admission.py::check_traceability": {
+   "mutants": 11,
+   "kill_files": 2,
+   "chain_seconds_literal": 1.6,
+   "chain_seconds_by_file": 1.6,
+   "cost_seconds_literal": 18,
+   "cost_seconds_by_file": 18
+  },
+  "aisef2/plan/static_admission.py::depends_on_story": {
+   "mutants": 12,
+   "kill_files": 2,
+   "chain_seconds_literal": 1.6,
+   "chain_seconds_by_file": 1.6,
+   "cost_seconds_literal": 20,
+   "cost_seconds_by_file": 20
+  },
+  "aisef2/plan/static_admission.py::story_graph": {
+   "mutants": 4,
+   "kill_files": 2,
+   "chain_seconds_literal": 1.6,
+   "chain_seconds_by_file": 1.6,
+   "cost_seconds_literal": 7,
+   "cost_seconds_by_file": 7
+  },
+  "aisef2/probe/calibration.py::calibrate": {
+   "mutants": 40,
+   "kill_files": 2,
+   "chain_seconds_literal": 1.6,
+   "chain_seconds_by_file": 1.6,
+   "cost_seconds_literal": 64,
+   "cost_seconds_by_file": 64
+  },
+  "aisef2/probe/calibration.py::calibration_for": {
+   "mutants": 9,
+   "kill_files": 2,
+   "chain_seconds_literal": 1.6,
+   "chain_seconds_by_file": 1.6,
+   "cost_seconds_literal": 14,
+   "cost_seconds_by_file": 14
+  },
+  "aisef2/probe/calibration.py::demonstrates_contrast": {
+   "mutants": 5,
+   "kill_files": 2,
+   "chain_seconds_literal": 1.6,
+   "chain_seconds_by_file": 1.6,
+   "cost_seconds_literal": 8,
+   "cost_seconds_by_file": 8
+  },
+  "aisef2/probe/calibration.py::executing": {
+   "mutants": 3,
+   "kill_files": 2,
+   "chain_seconds_literal": 1.6,
+   "chain_seconds_by_file": 1.6,
+   "cost_seconds_literal": 5,
+   "cost_seconds_by_file": 5
+  },
+  "aisef2/probe/catalog.py::CatalogEntry.capability_changes": {
+   "mutants": 2,
+   "kill_files": 1,
+   "chain_seconds_literal": 1.8,
+   "chain_seconds_by_file": 2.5,
+   "cost_seconds_literal": 4,
+   "cost_seconds_by_file": 5
+  },
+  "aisef2/probe/catalog.py::CatalogEntry.capability_version": {
+   "mutants": 2,
+   "kill_files": 1,
+   "chain_seconds_literal": 1.8,
+   "chain_seconds_by_file": 2.5,
+   "cost_seconds_literal": 4,
+   "cost_seconds_by_file": 5
+  },
+  "aisef2/probe/catalog.py::_capability": {
+   "mutants": 7,
+   "kill_files": 1,
+   "chain_seconds_literal": 1.8,
+   "chain_seconds_by_file": 2.5,
+   "cost_seconds_literal": 12,
+   "cost_seconds_by_file": 18
+  },
+  "aisef2/probe/cli_invocation.py::AGENT/flush": {
+   "mutants": 4,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 129.4,
+   "cost_seconds_literal": 21,
+   "cost_seconds_by_file": 518
+  },
+  "aisef2/probe/cli_invocation.py::AGENT/guarded": {
+   "mutants": 19,
+   "kill_files": 4,
+   "chain_seconds_literal": 7.1,
+   "chain_seconds_by_file": 152.3,
+   "cost_seconds_literal": 135,
+   "cost_seconds_by_file": 2893
+  },
+  "aisef2/probe/cli_invocation.py::AGENT/op_bye": {
+   "mutants": 1,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 129.4,
+   "cost_seconds_literal": 5,
+   "cost_seconds_by_file": 129
+  },
+  "aisef2/probe/cli_invocation.py::AGENT/op_call": {
+   "mutants": 38,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 129.4,
+   "cost_seconds_literal": 203,
+   "cost_seconds_by_file": 4919
+  },
+  "aisef2/probe/cli_invocation.py::AGENT/op_construct": {
+   "mutants": 13,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 129.4,
+   "cost_seconds_literal": 69,
+   "cost_seconds_by_file": 1683
+  },
+  "aisef2/probe/cli_invocation.py::AGENT/op_import": {
+   "mutants": 22,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 129.4,
+   "cost_seconds_literal": 117,
+   "cost_seconds_by_file": 2848
+  },
+  "aisef2/probe/cli_invocation.py::AGENT/op_invoke": {
+   "mutants": 36,
+   "kill_files": 4,
+   "chain_seconds_literal": 7.1,
+   "chain_seconds_by_file": 152.3,
+   "cost_seconds_literal": 256,
+   "cost_seconds_by_file": 5482
+  },
+  "aisef2/probe/cli_invocation.py::AGENT/op_resolve": {
+   "mutants": 16,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 129.4,
+   "cost_seconds_literal": 85,
+   "cost_seconds_by_file": 2071
+  },
+  "aisef2/probe/cli_invocation.py::AGENT/op_value": {
+   "mutants": 2,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 129.4,
+   "cost_seconds_literal": 11,
+   "cost_seconds_by_file": 259
+  },
+  "aisef2/probe/cli_invocation.py::AGENT/plain": {
+   "mutants": 4,
+   "kill_files": 4,
+   "chain_seconds_literal": 7.1,
+   "chain_seconds_by_file": 152.3,
+   "cost_seconds_literal": 28,
+   "cost_seconds_by_file": 609
+  },
+  "aisef2/probe/cli_invocation.py::AGENT/redirect": {
+   "mutants": 15,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 129.4,
+   "cost_seconds_literal": 80,
+   "cost_seconds_by_file": 1942
+  },
+  "aisef2/probe/cli_invocation.py::AGENT/send": {
+   "mutants": 2,
+   "kill_files": 5,
+   "chain_seconds_literal": 8.9,
+   "chain_seconds_by_file": 152.8,
+   "cost_seconds_literal": 18,
+   "cost_seconds_by_file": 306
+  },
+  "aisef2/probe/cli_invocation.py::AGENT/tagged": {
+   "mutants": 16,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 129.4,
+   "cost_seconds_literal": 85,
+   "cost_seconds_by_file": 2071
+  },
+  "aisef2/probe/cli_invocation.py::CLASSES": {
+   "mutants": 5,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 1.8,
+   "cost_seconds_literal": 18,
+   "cost_seconds_by_file": 9
+  },
+  "aisef2/probe/cli_invocation.py::CLASS_TABLE": {
+   "mutants": 212,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 1.8,
+   "cost_seconds_literal": 755,
+   "cost_seconds_by_file": 375
+  },
+  "aisef2/probe/cli_invocation.py::COMPARATORS": {
+   "mutants": 2,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 1.8,
+   "cost_seconds_literal": 7,
+   "cost_seconds_by_file": 4
+  },
+  "aisef2/probe/cli_invocation.py::CliInvocationProbe.__init__": {
+   "mutants": 4,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 129.4,
+   "cost_seconds_literal": 21,
+   "cost_seconds_by_file": 518
+  },
+  "aisef2/probe/cli_invocation.py::CliInvocationProbe._observe": {
+   "mutants": 18,
+   "kill_files": 5,
+   "chain_seconds_literal": 8.9,
+   "chain_seconds_by_file": 134.5,
+   "cost_seconds_literal": 160,
+   "cost_seconds_by_file": 2422
+  },
+  "aisef2/probe/cli_invocation.py::CliInvocationProbe._observe_equality": {
+   "mutants": 73,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 101.3,
+   "cost_seconds_literal": 390,
+   "cost_seconds_by_file": 7394
+  },
+  "aisef2/probe/cli_invocation.py::CliInvocationProbe._observe_in": {
+   "mutants": 57,
+   "kill_files": 6,
+   "chain_seconds_literal": 10.7,
+   "chain_seconds_by_file": 137.1,
+   "cost_seconds_literal": 609,
+   "cost_seconds_by_file": 7813
+  },
+  "aisef2/probe/cli_invocation.py::CliInvocationProbe.enforcement": {
+   "mutants": 3,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 1.8,
+   "cost_seconds_literal": 11,
+   "cost_seconds_by_file": 5
+  },
+  "aisef2/probe/cli_invocation.py::CliInvocationProbe.harness_preconditions": {
+   "mutants": 9,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 1.8,
+   "cost_seconds_literal": 32,
+   "cost_seconds_by_file": 16
+  },
+  "aisef2/probe/cli_invocation.py::CliInvocationProbe.observe": {
+   "mutants": 48,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 129.4,
+   "cost_seconds_literal": 256,
+   "cost_seconds_by_file": 6214
+  },
+  "aisef2/probe/cli_invocation.py::DIGEST": {
+   "mutants": 4,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 39.3,
+   "cost_seconds_literal": 14,
+   "cost_seconds_by_file": 157
+  },
+  "aisef2/probe/cli_invocation.py::FILE_SHAPES": {
+   "mutants": 4,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 1.8,
+   "cost_seconds_literal": 14,
+   "cost_seconds_by_file": 7
+  },
+  "aisef2/probe/cli_invocation.py::HARNESS/answer_to": {
+   "mutants": 12,
+   "kill_files": 4,
+   "chain_seconds_literal": 7.1,
+   "chain_seconds_by_file": 138.9,
+   "cost_seconds_literal": 85,
+   "cost_seconds_by_file": 1667
+  },
+  "aisef2/probe/cli_invocation.py::HARNESS/ask": {
+   "mutants": 4,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 129.4,
+   "cost_seconds_literal": 21,
+   "cost_seconds_by_file": 518
+  },
+  "aisef2/probe/cli_invocation.py::HARNESS/conclude": {
+   "mutants": 4,
+   "kill_files": 4,
+   "chain_seconds_literal": 7.1,
+   "chain_seconds_by_file": 133.3,
+   "cost_seconds_literal": 28,
+   "cost_seconds_by_file": 533
+  },
+  "aisef2/probe/cli_invocation.py::HARNESS/deadline": {
+   "mutants": 5,
+   "kill_files": 4,
+   "chain_seconds_literal": 7.1,
+   "chain_seconds_by_file": 138.9,
+   "cost_seconds_literal": 36,
+   "cost_seconds_by_file": 694
+  },
+  "aisef2/probe/cli_invocation.py::HARNESS/emit": {
+   "mutants": 10,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 129.4,
+   "cost_seconds_literal": 53,
+   "cost_seconds_by_file": 1294
+  },
+  "aisef2/probe/cli_invocation.py::HARNESS/ended": {
+   "mutants": 13,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 129.4,
+   "cost_seconds_literal": 69,
+   "cost_seconds_by_file": 1683
+  },
+  "aisef2/probe/cli_invocation.py::HARNESS/file_fact": {
+   "mutants": 8,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 129.4,
+   "cost_seconds_literal": 43,
+   "cost_seconds_by_file": 1036
+  },
+  "aisef2/probe/cli_invocation.py::HARNESS/finish": {
+   "mutants": 12,
+   "kill_files": 4,
+   "chain_seconds_literal": 7.1,
+   "chain_seconds_by_file": 138.9,
+   "cost_seconds_literal": 85,
+   "cost_seconds_by_file": 1667
+  },
+  "aisef2/probe/cli_invocation.py::HARNESS/inside": {
+   "mutants": 4,
+   "kill_files": 4,
+   "chain_seconds_literal": 7.1,
+   "chain_seconds_by_file": 138.9,
+   "cost_seconds_literal": 28,
+   "cost_seconds_by_file": 556
+  },
+  "aisef2/probe/cli_invocation.py::HARNESS/invoke": {
+   "mutants": 41,
+   "kill_files": 4,
+   "chain_seconds_literal": 7.1,
+   "chain_seconds_by_file": 138.9,
+   "cost_seconds_literal": 292,
+   "cost_seconds_by_file": 5694
+  },
+  "aisef2/probe/cli_invocation.py::HARNESS/main": {
+   "mutants": 127,
+   "kill_files": 7,
+   "chain_seconds_literal": 12.5,
+   "chain_seconds_by_file": 151.5,
+   "cost_seconds_literal": 1582,
+   "cost_seconds_by_file": 19247
+  },
+  "aisef2/probe/cli_invocation.py::HARNESS/resolve": {
+   "mutants": 14,
+   "kill_files": 4,
+   "chain_seconds_literal": 7.1,
+   "chain_seconds_by_file": 132.0,
+   "cost_seconds_literal": 100,
+   "cost_seconds_by_file": 1848
+  },
+  "aisef2/probe/cli_invocation.py::HARNESS/sha": {
+   "mutants": 3,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 129.4,
+   "cost_seconds_literal": 16,
+   "cost_seconds_by_file": 388
+  },
+  "aisef2/probe/cli_invocation.py::HARNESS/stream_fact": {
+   "mutants": 13,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 129.4,
+   "cost_seconds_literal": 69,
+   "cost_seconds_by_file": 1683
+  },
+  "aisef2/probe/cli_invocation.py::ON_DEADLINE": {
+   "mutants": 15,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 1.8,
+   "cost_seconds_literal": 53,
+   "cost_seconds_by_file": 27
+  },
+  "aisef2/probe/cli_invocation.py::PROBE_SOURCES": {
+   "mutants": 7,
+   "kill_files": 4,
+   "chain_seconds_literal": 7.1,
+   "chain_seconds_by_file": 132.0,
+   "cost_seconds_literal": 50,
+   "cost_seconds_by_file": 924
+  },
+  "aisef2/probe/cli_invocation.py::QUANTIFIERS": {
+   "mutants": 3,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 1.8,
+   "cost_seconds_literal": 11,
+   "cost_seconds_by_file": 5
+  },
+  "aisef2/probe/cli_invocation.py::REGEX_WORKER/found": {
+   "mutants": 3,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 5.1,
+   "cost_seconds_literal": 11,
+   "cost_seconds_by_file": 15
+  },
+  "aisef2/probe/cli_invocation.py::SEARCH_REASONS": {
+   "mutants": 6,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 5.1,
+   "cost_seconds_literal": 21,
+   "cost_seconds_by_file": 30
+  },
+  "aisef2/probe/cli_invocation.py::STREAM_SHAPES": {
+   "mutants": 5,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 1.8,
+   "cost_seconds_literal": 18,
+   "cost_seconds_by_file": 9
+  },
+  "aisef2/probe/cli_invocation.py::StreamSearchFailed.__init__": {
+   "mutants": 2,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 5.1,
+   "cost_seconds_literal": 7,
+   "cost_seconds_by_file": 10
+  },
+  "aisef2/probe/cli_invocation.py::_Later.settle": {
+   "mutants": 12,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 5.1,
+   "cost_seconds_literal": 43,
+   "cost_seconds_by_file": 61
+  },
+  "aisef2/probe/cli_invocation.py::_SEARCH_STOPPED": {
+   "mutants": 6,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 5.1,
+   "cost_seconds_literal": 21,
+   "cost_seconds_by_file": 30
+  },
+  "aisef2/probe/cli_invocation.py::_argv_ok": {
+   "mutants": 2,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 1.8,
+   "cost_seconds_literal": 7,
+   "cost_seconds_by_file": 4
+  },
+  "aisef2/probe/cli_invocation.py::_await": {
+   "mutants": 22,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 129.4,
+   "cost_seconds_literal": 117,
+   "cost_seconds_by_file": 2848
+  },
+  "aisef2/probe/cli_invocation.py::_bytes_of": {
+   "mutants": 11,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 1.8,
+   "cost_seconds_literal": 39,
+   "cost_seconds_by_file": 19
+  },
+  "aisef2/probe/cli_invocation.py::_child_env": {
+   "mutants": 26,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 1.8,
+   "cost_seconds_literal": 93,
+   "cost_seconds_by_file": 46
+  },
+  "aisef2/probe/cli_invocation.py::_compiles": {
+   "mutants": 7,
+   "kill_files": 1,
+   "chain_seconds_literal": 1.8,
+   "chain_seconds_by_file": 2.5,
+   "cost_seconds_literal": 12,
+   "cost_seconds_by_file": 18
+  },
+  "aisef2/probe/cli_invocation.py::_concluded": {
+   "mutants": 70,
+   "kill_files": 5,
+   "chain_seconds_literal": 8.9,
+   "chain_seconds_by_file": 134.5,
+   "cost_seconds_literal": 623,
+   "cost_seconds_by_file": 9417
+  },
+  "aisef2/probe/cli_invocation.py::_content_ok": {
+   "mutants": 28,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 1.8,
+   "cost_seconds_literal": 100,
+   "cost_seconds_by_file": 50
+  },
+  "aisef2/probe/cli_invocation.py::_deadline": {
+   "mutants": 10,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 129.4,
+   "cost_seconds_literal": 53,
+   "cost_seconds_by_file": 1294
+  },
+  "aisef2/probe/cli_invocation.py::_disposed": {
+   "mutants": 3,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 129.4,
+   "cost_seconds_literal": 16,
+   "cost_seconds_by_file": 388
+  },
+  "aisef2/probe/cli_invocation.py::_equal": {
+   "mutants": 13,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 4.3,
+   "cost_seconds_literal": 69,
+   "cost_seconds_by_file": 56
+  },
+  "aisef2/probe/cli_invocation.py::_equality_ok": {
+   "mutants": 24,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 1.8,
+   "cost_seconds_literal": 85,
+   "cost_seconds_by_file": 42
+  },
+  "aisef2/probe/cli_invocation.py::_equality_verdict": {
+   "mutants": 28,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 1.8,
+   "cost_seconds_literal": 100,
+   "cost_seconds_by_file": 50
+  },
+  "aisef2/probe/cli_invocation.py::_file_fact": {
+   "mutants": 7,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 1.8,
+   "cost_seconds_literal": 25,
+   "cost_seconds_by_file": 12
+  },
+  "aisef2/probe/cli_invocation.py::_file_matches": {
+   "mutants": 31,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 1.8,
+   "cost_seconds_literal": 110,
+   "cost_seconds_by_file": 55
+  },
+  "aisef2/probe/cli_invocation.py::_file_shape_ok": {
+   "mutants": 35,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 1.8,
+   "cost_seconds_literal": 125,
+   "cost_seconds_by_file": 62
+  },
+  "aisef2/probe/cli_invocation.py::_half_ok": {
+   "mutants": 6,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 1.8,
+   "cost_seconds_literal": 21,
+   "cost_seconds_by_file": 11
+  },
+  "aisef2/probe/cli_invocation.py::_harness_argv": {
+   "mutants": 20,
+   "kill_files": 4,
+   "chain_seconds_literal": 7.1,
+   "chain_seconds_by_file": 129.8,
+   "cost_seconds_literal": 142,
+   "cost_seconds_by_file": 2596
+  },
+  "aisef2/probe/cli_invocation.py::_harness_failure": {
+   "mutants": 27,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 129.4,
+   "cost_seconds_literal": 144,
+   "cost_seconds_by_file": 3495
+  },
+  "aisef2/probe/cli_invocation.py::_is_int": {
+   "mutants": 3,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 1.8,
+   "cost_seconds_literal": 11,
+   "cost_seconds_by_file": 5
+  },
+  "aisef2/probe/cli_invocation.py::_mac": {
+   "mutants": 3,
+   "kill_files": 4,
+   "chain_seconds_literal": 7.1,
+   "chain_seconds_by_file": 129.8,
+   "cost_seconds_literal": 21,
+   "cost_seconds_by_file": 389
+  },
+  "aisef2/probe/cli_invocation.py::_name_ok": {
+   "mutants": 3,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 1.8,
+   "cost_seconds_literal": 11,
+   "cost_seconds_by_file": 5
+  },
+  "aisef2/probe/cli_invocation.py::_no_result": {
+   "mutants": 20,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 129.4,
+   "cost_seconds_literal": 107,
+   "cost_seconds_by_file": 2589
+  },
+  "aisef2/probe/cli_invocation.py::_normalization_ok": {
+   "mutants": 15,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 1.8,
+   "cost_seconds_literal": 53,
+   "cost_seconds_by_file": 27
+  },
+  "aisef2/probe/cli_invocation.py::_normalize": {
+   "mutants": 7,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 1.8,
+   "cost_seconds_literal": 25,
+   "cost_seconds_by_file": 12
+  },
+  "aisef2/probe/cli_invocation.py::_preflight": {
+   "mutants": 18,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 129.4,
+   "cost_seconds_literal": 96,
+   "cost_seconds_by_file": 2330
+  },
+  "aisef2/probe/cli_invocation.py::_prepare": {
+   "mutants": 77,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 1.8,
+   "cost_seconds_literal": 274,
+   "cost_seconds_by_file": 136
+  },
+  "aisef2/probe/cli_invocation.py::_probe_digest": {
+   "mutants": 1,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 129.4,
+   "cost_seconds_literal": 5,
+   "cost_seconds_by_file": 129
+  },
+  "aisef2/probe/cli_invocation.py::_protocol": {
+   "mutants": 14,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 1.8,
+   "cost_seconds_literal": 50,
+   "cost_seconds_by_file": 25
+  },
+  "aisef2/probe/cli_invocation.py::_public": {
+   "mutants": 16,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 1.8,
+   "cost_seconds_literal": 57,
+   "cost_seconds_by_file": 28
+  },
+  "aisef2/probe/cli_invocation.py::_said": {
+   "mutants": 6,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 5.1,
+   "cost_seconds_literal": 21,
+   "cost_seconds_by_file": 30
+  },
+  "aisef2/probe/cli_invocation.py::_sha_file": {
+   "mutants": 12,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 1.8,
+   "cost_seconds_literal": 43,
+   "cost_seconds_by_file": 21
+  },
+  "aisef2/probe/cli_invocation.py::_silent": {
+   "mutants": 11,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 129.4,
+   "cost_seconds_literal": 59,
+   "cost_seconds_by_file": 1424
+  },
+  "aisef2/probe/cli_invocation.py::_stimulus_ok": {
+   "mutants": 37,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 1.8,
+   "cost_seconds_literal": 132,
+   "cost_seconds_by_file": 65
+  },
+  "aisef2/probe/cli_invocation.py::_stream_bytes": {
+   "mutants": 7,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 1.8,
+   "cost_seconds_literal": 25,
+   "cost_seconds_by_file": 12
+  },
+  "aisef2/probe/cli_invocation.py::_stream_fact": {
+   "mutants": 11,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 1.8,
+   "cost_seconds_literal": 39,
+   "cost_seconds_by_file": 19
+  },
+  "aisef2/probe/cli_invocation.py::_stream_matches": {
+   "mutants": 38,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 4.3,
+   "cost_seconds_literal": 203,
+   "cost_seconds_by_file": 164
+  },
+  "aisef2/probe/cli_invocation.py::_stream_shape_ok": {
+   "mutants": 42,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 4.3,
+   "cost_seconds_literal": 224,
+   "cost_seconds_by_file": 181
+  },
+  "aisef2/probe/cli_invocation.py::_streams_ok": {
+   "mutants": 6,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 4.3,
+   "cost_seconds_literal": 32,
+   "cost_seconds_by_file": 26
+  },
+  "aisef2/probe/cli_invocation.py::_substitute": {
+   "mutants": 8,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 1.8,
+   "cost_seconds_literal": 28,
+   "cost_seconds_by_file": 14
+  },
+  "aisef2/probe/cli_invocation.py::_watch": {
+   "mutants": 43,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 129.4,
+   "cost_seconds_literal": 230,
+   "cost_seconds_by_file": 5566
+  },
+  "aisef2/probe/cli_invocation.py::_ws_key_ok": {
+   "mutants": 3,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 1.8,
+   "cost_seconds_literal": 11,
+   "cost_seconds_by_file": 5
+  },
+  "aisef2/probe/cli_invocation.py::_ws_name": {
+   "mutants": 1,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 1.8,
+   "cost_seconds_literal": 4,
+   "cost_seconds_by_file": 2
+  },
+  "aisef2/probe/cli_invocation.py::observation_class": {
+   "mutants": 55,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 1.8,
+   "cost_seconds_literal": 196,
+   "cost_seconds_by_file": 97
+  },
+  "aisef2/probe/cli_invocation.py::search_in_worker": {
+   "mutants": 85,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 5.1,
+   "cost_seconds_literal": 303,
+   "cost_seconds_by_file": 432
+  },
+  "aisef2/probe/cli_invocation.py::spec_class": {
+   "mutants": 13,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 1.8,
+   "cost_seconds_literal": 46,
+   "cost_seconds_by_file": 23
+  },
+  "aisef2/probe/cli_invocation.py::verdict_of": {
+   "mutants": 44,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 4.3,
+   "cost_seconds_literal": 235,
+   "cost_seconds_by_file": 190
+  },
+  "aisef2/probe/file_artifact.py::CLASSES": {
+   "mutants": 4,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 6.5,
+   "cost_seconds_literal": 21,
+   "cost_seconds_by_file": 26
+  },
+  "aisef2/probe/file_artifact.py::DIGEST": {
+   "mutants": 4,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 6.5,
+   "cost_seconds_literal": 21,
+   "cost_seconds_by_file": 26
+  },
+  "aisef2/probe/file_artifact.py::FileArtifactProbe.__init__": {
+   "mutants": 5,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 6.5,
+   "cost_seconds_literal": 27,
+   "cost_seconds_by_file": 32
+  },
+  "aisef2/probe/file_artifact.py::FileArtifactProbe._reader": {
+   "mutants": 15,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 6.5,
+   "cost_seconds_literal": 80,
+   "cost_seconds_by_file": 97
+  },
+  "aisef2/probe/file_artifact.py::FileArtifactProbe.enforcement": {
+   "mutants": 3,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 6.5,
+   "cost_seconds_literal": 16,
+   "cost_seconds_by_file": 19
+  },
+  "aisef2/probe/file_artifact.py::FileArtifactProbe.harness_preconditions": {
+   "mutants": 9,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 6.5,
+   "cost_seconds_literal": 48,
+   "cost_seconds_by_file": 58
+  },
+  "aisef2/probe/file_artifact.py::FileArtifactProbe.observe": {
+   "mutants": 138,
+   "kill_files": 8,
+   "chain_seconds_literal": 14.2,
+   "chain_seconds_by_file": 18.3,
+   "cost_seconds_literal": 1965,
+   "cost_seconds_by_file": 2521
+  },
+  "aisef2/probe/file_artifact.py::GREP_WORKER/grep": {
+   "mutants": 36,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 7.1,
+   "cost_seconds_literal": 128,
+   "cost_seconds_by_file": 257
+  },
+  "aisef2/probe/file_artifact.py::GREP_WORKER/main": {
+   "mutants": 10,
+   "kill_files": 1,
+   "chain_seconds_literal": 1.8,
+   "chain_seconds_by_file": 2.5,
+   "cost_seconds_literal": 18,
+   "cost_seconds_by_file": 25
+  },
+  "aisef2/probe/file_artifact.py::MODES": {
+   "mutants": 4,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 6.5,
+   "cost_seconds_literal": 21,
+   "cost_seconds_by_file": 26
+  },
+  "aisef2/probe/file_artifact.py::NEWLINES": {
+   "mutants": 2,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 6.5,
+   "cost_seconds_literal": 11,
+   "cost_seconds_by_file": 13
+  },
+  "aisef2/probe/file_artifact.py::ON_DEADLINE": {
+   "mutants": 12,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 6.5,
+   "cost_seconds_literal": 64,
+   "cost_seconds_by_file": 78
+  },
+  "aisef2/probe/file_artifact.py::ObjectStore.__init__": {
+   "mutants": 10,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 6.5,
+   "cost_seconds_literal": 53,
+   "cost_seconds_by_file": 65
+  },
+  "aisef2/probe/file_artifact.py::ObjectStore._parse": {
+   "mutants": 18,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 6.5,
+   "cost_seconds_literal": 96,
+   "cost_seconds_by_file": 117
+  },
+  "aisef2/probe/file_artifact.py::ObjectStore.blob": {
+   "mutants": 3,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 6.5,
+   "cost_seconds_literal": 16,
+   "cost_seconds_by_file": 19
+  },
+  "aisef2/probe/file_artifact.py::ObjectStore.entries": {
+   "mutants": 5,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 6.5,
+   "cost_seconds_literal": 27,
+   "cost_seconds_by_file": 32
+  },
+  "aisef2/probe/file_artifact.py::ObjectStore.holds_revision": {
+   "mutants": 8,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 6.5,
+   "cost_seconds_literal": 43,
+   "cost_seconds_by_file": 52
+  },
+  "aisef2/probe/file_artifact.py::ObjectStore.lookup": {
+   "mutants": 6,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 6.5,
+   "cost_seconds_literal": 32,
+   "cost_seconds_by_file": 39
+  },
+  "aisef2/probe/file_artifact.py::ObjectStore.run": {
+   "mutants": 3,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 6.5,
+   "cost_seconds_literal": 16,
+   "cost_seconds_by_file": 19
+  },
+  "aisef2/probe/file_artifact.py::ObjectStore.walk": {
+   "mutants": 6,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 6.5,
+   "cost_seconds_literal": 32,
+   "cost_seconds_by_file": 39
+  },
+  "aisef2/probe/file_artifact.py::PROBE_SOURCES": {
+   "mutants": 6,
+   "kill_files": 4,
+   "chain_seconds_literal": 7.1,
+   "chain_seconds_by_file": 9.0,
+   "cost_seconds_literal": 43,
+   "cost_seconds_by_file": 54
+  },
+  "aisef2/probe/file_artifact.py::PlainTree._full": {
+   "mutants": 2,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 6.5,
+   "cost_seconds_literal": 11,
+   "cost_seconds_by_file": 13
+  },
+  "aisef2/probe/file_artifact.py::PlainTree._row": {
+   "mutants": 15,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 6.5,
+   "cost_seconds_literal": 80,
+   "cost_seconds_by_file": 97
+  },
+  "aisef2/probe/file_artifact.py::PlainTree.blob": {
+   "mutants": 1,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 6.5,
+   "cost_seconds_literal": 5,
+   "cost_seconds_by_file": 6
+  },
+  "aisef2/probe/file_artifact.py::PlainTree.entries": {
+   "mutants": 3,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 6.5,
+   "cost_seconds_literal": 16,
+   "cost_seconds_by_file": 19
+  },
+  "aisef2/probe/file_artifact.py::PlainTree.lookup": {
+   "mutants": 10,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 6.5,
+   "cost_seconds_literal": 53,
+   "cost_seconds_by_file": 65
+  },
+  "aisef2/probe/file_artifact.py::PlainTree.walk": {
+   "mutants": 7,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 6.5,
+   "cost_seconds_literal": 37,
+   "cost_seconds_by_file": 45
+  },
+  "aisef2/probe/file_artifact.py::WORKER_REASONS": {
+   "mutants": 6,
+   "kill_files": 1,
+   "chain_seconds_literal": 1.8,
+   "chain_seconds_by_file": 2.5,
+   "cost_seconds_literal": 11,
+   "cost_seconds_by_file": 15
+  },
+  "aisef2/probe/file_artifact.py::WorkerFailed.__init__": {
+   "mutants": 2,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 5.1,
+   "cost_seconds_literal": 7,
+   "cost_seconds_by_file": 10
+  },
+  "aisef2/probe/file_artifact.py::_HEX64": {
+   "mutants": 1,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 6.5,
+   "cost_seconds_literal": 5,
+   "cost_seconds_by_file": 6
+  },
+  "aisef2/probe/file_artifact.py::_MODULE_NAME": {
+   "mutants": 1,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 6.5,
+   "cost_seconds_literal": 5,
+   "cost_seconds_by_file": 6
+  },
+  "aisef2/probe/file_artifact.py::_capability_changes": {
+   "mutants": 54,
+   "kill_files": 1,
+   "chain_seconds_literal": 1.8,
+   "chain_seconds_by_file": 2.5,
+   "cost_seconds_literal": 96,
+   "cost_seconds_by_file": 137
+  },
+  "aisef2/probe/file_artifact.py::_compiles": {
+   "mutants": 13,
+   "kill_files": 4,
+   "chain_seconds_literal": 7.1,
+   "chain_seconds_by_file": 9.0,
+   "cost_seconds_literal": 93,
+   "cost_seconds_by_file": 117
+  },
+  "aisef2/probe/file_artifact.py::_probe_digest": {
+   "mutants": 1,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 6.5,
+   "cost_seconds_literal": 5,
+   "cost_seconds_by_file": 6
+  },
+  "aisef2/probe/file_artifact.py::_said": {
+   "mutants": 6,
+   "kill_files": 1,
+   "chain_seconds_literal": 1.8,
+   "chain_seconds_by_file": 2.5,
+   "cost_seconds_literal": 11,
+   "cost_seconds_by_file": 15
+  },
+  "aisef2/probe/file_artifact.py::_stopped": {
+   "mutants": 32,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 5.1,
+   "cost_seconds_literal": 114,
+   "cost_seconds_by_file": 163
+  },
+  "aisef2/probe/file_artifact.py::_worker_env": {
+   "mutants": 14,
+   "kill_files": 1,
+   "chain_seconds_literal": 1.8,
+   "chain_seconds_by_file": 2.5,
+   "cost_seconds_literal": 25,
+   "cost_seconds_by_file": 36
+  },
+  "aisef2/probe/file_artifact.py::_worker_facts": {
+   "mutants": 94,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 5.1,
+   "cost_seconds_literal": 335,
+   "cost_seconds_by_file": 478
+  },
+  "aisef2/probe/file_artifact.py::content_facts": {
+   "mutants": 12,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 6.5,
+   "cost_seconds_literal": 64,
+   "cost_seconds_by_file": 78
+  },
+  "aisef2/probe/file_artifact.py::entry": {
+   "mutants": 27,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 6.5,
+   "cost_seconds_literal": 144,
+   "cost_seconds_by_file": 175
+  },
+  "aisef2/probe/file_artifact.py::expected_sha256": {
+   "mutants": 10,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 6.5,
+   "cost_seconds_literal": 53,
+   "cost_seconds_by_file": 65
+  },
+  "aisef2/probe/file_artifact.py::facts_of": {
+   "mutants": 102,
+   "kill_files": 5,
+   "chain_seconds_literal": 8.9,
+   "chain_seconds_by_file": 10.6,
+   "cost_seconds_literal": 908,
+   "cost_seconds_by_file": 1086
+  },
+  "aisef2/probe/file_artifact.py::git_env": {
+   "mutants": 49,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 6.5,
+   "cost_seconds_literal": 262,
+   "cost_seconds_by_file": 318
+  },
+  "aisef2/probe/file_artifact.py::grep_facts": {
+   "mutants": 98,
+   "kill_files": 5,
+   "chain_seconds_literal": 8.9,
+   "chain_seconds_by_file": 11.6,
+   "cost_seconds_literal": 872,
+   "cost_seconds_by_file": 1133
+  },
+  "aisef2/probe/file_artifact.py::import_facts": {
+   "mutants": 70,
+   "kill_files": 5,
+   "chain_seconds_literal": 8.9,
+   "chain_seconds_by_file": 10.6,
+   "cost_seconds_literal": 623,
+   "cost_seconds_by_file": 745
+  },
+  "aisef2/probe/file_artifact.py::normalised": {
+   "mutants": 5,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 6.5,
+   "cost_seconds_literal": 27,
+   "cost_seconds_by_file": 32
+  },
+  "aisef2/probe/file_artifact.py::observation_class": {
+   "mutants": 94,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 6.5,
+   "cost_seconds_literal": 502,
+   "cost_seconds_by_file": 609
+  },
+  "aisef2/probe/file_artifact.py::read": {
+   "mutants": 3,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 6.5,
+   "cost_seconds_literal": 16,
+   "cost_seconds_by_file": 19
+  },
+  "aisef2/probe/file_artifact.py::refusal": {
+   "mutants": 29,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 6.5,
+   "cost_seconds_literal": 155,
+   "cost_seconds_by_file": 188
+  },
+  "aisef2/probe/file_artifact.py::run_git": {
+   "mutants": 8,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 6.5,
+   "cost_seconds_literal": 43,
+   "cost_seconds_by_file": 52
+  },
+  "aisef2/probe/file_artifact.py::selected": {
+   "mutants": 3,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 6.5,
+   "cost_seconds_literal": 16,
+   "cost_seconds_by_file": 19
+  },
+  "aisef2/probe/file_artifact.py::spec_class": {
+   "mutants": 12,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 6.5,
+   "cost_seconds_literal": 64,
+   "cost_seconds_by_file": 78
+  },
+  "aisef2/probe/file_artifact.py::verdict_of": {
+   "mutants": 20,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 6.5,
+   "cost_seconds_literal": 107,
+   "cost_seconds_by_file": 130
+  },
+  "aisef2/probe/file_artifact.py::window_of": {
+   "mutants": 8,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 6.5,
+   "cost_seconds_literal": 43,
+   "cost_seconds_by_file": 52
+  },
+  "aisef2/probe/process_effect.py::CLASSES": {
+   "mutants": 3,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 3.2,
+   "cost_seconds_literal": 11,
+   "cost_seconds_by_file": 10
+  },
+  "aisef2/probe/process_effect.py::CLASS_TABLE": {
+   "mutants": 118,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 3.2,
+   "cost_seconds_literal": 420,
+   "cost_seconds_by_file": 374
+  },
+  "aisef2/probe/process_effect.py::DIGEST": {
+   "mutants": 4,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 3.2,
+   "cost_seconds_literal": 14,
+   "cost_seconds_by_file": 13
+  },
+  "aisef2/probe/process_effect.py::FAULTED": {
+   "mutants": 2,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 10.7,
+   "cost_seconds_literal": 11,
+   "cost_seconds_by_file": 21
+  },
+  "aisef2/probe/process_effect.py::FAULTS": {
+   "mutants": 28,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 3.2,
+   "cost_seconds_literal": 100,
+   "cost_seconds_by_file": 89
+  },
+  "aisef2/probe/process_effect.py::FILE_SHAPES": {
+   "mutants": 6,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 3.2,
+   "cost_seconds_literal": 21,
+   "cost_seconds_by_file": 19
+  },
+  "aisef2/probe/process_effect.py::HARNESS/answer_to": {
+   "mutants": 12,
+   "kill_files": 4,
+   "chain_seconds_literal": 7.1,
+   "chain_seconds_by_file": 55.0,
+   "cost_seconds_literal": 85,
+   "cost_seconds_by_file": 660
+  },
+  "aisef2/probe/process_effect.py::HARNESS/answered": {
+   "mutants": 6,
+   "kill_files": 4,
+   "chain_seconds_literal": 7.1,
+   "chain_seconds_by_file": 55.0,
+   "cost_seconds_literal": 43,
+   "cost_seconds_by_file": 330
+  },
+  "aisef2/probe/process_effect.py::HARNESS/ask": {
+   "mutants": 4,
+   "kill_files": 4,
+   "chain_seconds_literal": 7.1,
+   "chain_seconds_by_file": 71.8,
+   "cost_seconds_literal": 28,
+   "cost_seconds_by_file": 287
+  },
+  "aisef2/probe/process_effect.py::HARNESS/count_lines": {
+   "mutants": 4,
+   "kill_files": 4,
+   "chain_seconds_literal": 7.1,
+   "chain_seconds_by_file": 55.0,
+   "cost_seconds_literal": 28,
+   "cost_seconds_by_file": 220
+  },
+  "aisef2/probe/process_effect.py::HARNESS/do_call": {
+   "mutants": 23,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 48.6,
+   "cost_seconds_literal": 123,
+   "cost_seconds_by_file": 1119
+  },
+  "aisef2/probe/process_effect.py::HARNESS/do_construct": {
+   "mutants": 21,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 48.6,
+   "cost_seconds_literal": 112,
+   "cost_seconds_by_file": 1021
+  },
+  "aisef2/probe/process_effect.py::HARNESS/do_edit": {
+   "mutants": 52,
+   "kill_files": 4,
+   "chain_seconds_literal": 7.1,
+   "chain_seconds_by_file": 55.0,
+   "cost_seconds_literal": 370,
+   "cost_seconds_by_file": 2859
+  },
+  "aisef2/probe/process_effect.py::HARNESS/do_expect": {
+   "mutants": 62,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 48.6,
+   "cost_seconds_literal": 331,
+   "cost_seconds_by_file": 3016
+  },
+  "aisef2/probe/process_effect.py::HARNESS/do_fault": {
+   "mutants": 4,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 48.6,
+   "cost_seconds_literal": 21,
+   "cost_seconds_by_file": 195
+  },
+  "aisef2/probe/process_effect.py::HARNESS/do_subprocess": {
+   "mutants": 41,
+   "kill_files": 4,
+   "chain_seconds_literal": 7.1,
+   "chain_seconds_by_file": 55.0,
+   "cost_seconds_literal": 292,
+   "cost_seconds_by_file": 2255
+  },
+  "aisef2/probe/process_effect.py::HARNESS/do_workspace": {
+   "mutants": 8,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 48.6,
+   "cost_seconds_literal": 43,
+   "cost_seconds_by_file": 389
+  },
+  "aisef2/probe/process_effect.py::HARNESS/do_write": {
+   "mutants": 16,
+   "kill_files": 4,
+   "chain_seconds_literal": 7.1,
+   "chain_seconds_by_file": 55.0,
+   "cost_seconds_literal": 114,
+   "cost_seconds_by_file": 880
+  },
+  "aisef2/probe/process_effect.py::HARNESS/emit": {
+   "mutants": 10,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 48.6,
+   "cost_seconds_literal": 53,
+   "cost_seconds_by_file": 486
+  },
+  "aisef2/probe/process_effect.py::HARNESS/ended": {
+   "mutants": 37,
+   "kill_files": 4,
+   "chain_seconds_literal": 7.1,
+   "chain_seconds_by_file": 55.0,
+   "cost_seconds_literal": 263,
+   "cost_seconds_by_file": 2035
+  },
+  "aisef2/probe/process_effect.py::HARNESS/file_fact": {
+   "mutants": 27,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 48.6,
+   "cost_seconds_literal": 144,
+   "cost_seconds_by_file": 1313
+  },
+  "aisef2/probe/process_effect.py::HARNESS/files_now": {
+   "mutants": 4,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 48.6,
+   "cost_seconds_literal": 21,
+   "cost_seconds_by_file": 195
+  },
+  "aisef2/probe/process_effect.py::HARNESS/finish": {
+   "mutants": 12,
+   "kill_files": 4,
+   "chain_seconds_literal": 7.1,
+   "chain_seconds_by_file": 55.0,
+   "cost_seconds_literal": 85,
+   "cost_seconds_by_file": 660
+  },
+  "aisef2/probe/process_effect.py::HARNESS/identity": {
+   "mutants": 9,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 48.6,
+   "cost_seconds_literal": 48,
+   "cost_seconds_by_file": 438
+  },
+  "aisef2/probe/process_effect.py::HARNESS/inside": {
+   "mutants": 4,
+   "kill_files": 4,
+   "chain_seconds_literal": 7.1,
+   "chain_seconds_by_file": 56.2,
+   "cost_seconds_literal": 28,
+   "cost_seconds_by_file": 225
+  },
+  "aisef2/probe/process_effect.py::HARNESS/main": {
+   "mutants": 160,
+   "kill_files": 5,
+   "chain_seconds_literal": 8.9,
+   "chain_seconds_by_file": 58.1,
+   "cost_seconds_literal": 1424,
+   "cost_seconds_by_file": 9291
+  },
+  "aisef2/probe/process_effect.py::HARNESS/reported": {
+   "mutants": 26,
+   "kill_files": 4,
+   "chain_seconds_literal": 7.1,
+   "chain_seconds_by_file": 56.2,
+   "cost_seconds_literal": 185,
+   "cost_seconds_by_file": 1461
+  },
+  "aisef2/probe/process_effect.py::HARNESS/resolve": {
+   "mutants": 14,
+   "kill_files": 4,
+   "chain_seconds_literal": 7.1,
+   "chain_seconds_by_file": 51.2,
+   "cost_seconds_literal": 100,
+   "cost_seconds_by_file": 717
+  },
+  "aisef2/probe/process_effect.py::HARNESS/row_of": {
+   "mutants": 9,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 48.6,
+   "cost_seconds_literal": 48,
+   "cost_seconds_by_file": 438
+  },
+  "aisef2/probe/process_effect.py::HARNESS/run": {
+   "mutants": 59,
+   "kill_files": 4,
+   "chain_seconds_literal": 7.1,
+   "chain_seconds_by_file": 56.2,
+   "cost_seconds_literal": 420,
+   "cost_seconds_by_file": 3316
+  },
+  "aisef2/probe/process_effect.py::HARNESS/same": {
+   "mutants": 7,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 48.6,
+   "cost_seconds_literal": 37,
+   "cost_seconds_by_file": 340
+  },
+  "aisef2/probe/process_effect.py::HARNESS/subject_call": {
+   "mutants": 38,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 48.6,
+   "cost_seconds_literal": 203,
+   "cost_seconds_by_file": 1848
+  },
+  "aisef2/probe/process_effect.py::HARNESS/unresolved": {
+   "mutants": 16,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 48.6,
+   "cost_seconds_literal": 85,
+   "cost_seconds_by_file": 778
+  },
+  "aisef2/probe/process_effect.py::HARNESS/unws": {
+   "mutants": 10,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 48.6,
+   "cost_seconds_literal": 53,
+   "cost_seconds_by_file": 486
+  },
+  "aisef2/probe/process_effect.py::ON_DEADLINE": {
+   "mutants": 9,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 3.2,
+   "cost_seconds_literal": 32,
+   "cost_seconds_by_file": 29
+  },
+  "aisef2/probe/process_effect.py::PROBE_SOURCES": {
+   "mutants": 8,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 5.7,
+   "cost_seconds_literal": 43,
+   "cost_seconds_by_file": 46
+  },
+  "aisef2/probe/process_effect.py::ProcessEffectProbe.__init__": {
+   "mutants": 4,
+   "kill_files": 4,
+   "chain_seconds_literal": 7.1,
+   "chain_seconds_by_file": 50.4,
+   "cost_seconds_literal": 28,
+   "cost_seconds_by_file": 202
+  },
+  "aisef2/probe/process_effect.py::ProcessEffectProbe._observe_in": {
+   "mutants": 38,
+   "kill_files": 5,
+   "chain_seconds_literal": 8.9,
+   "chain_seconds_by_file": 53.0,
+   "cost_seconds_literal": 338,
+   "cost_seconds_by_file": 2012
+  },
+  "aisef2/probe/process_effect.py::ProcessEffectProbe.enforcement": {
+   "mutants": 3,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 3.2,
+   "cost_seconds_literal": 11,
+   "cost_seconds_by_file": 10
+  },
+  "aisef2/probe/process_effect.py::ProcessEffectProbe.harness_preconditions": {
+   "mutants": 11,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 3.2,
+   "cost_seconds_literal": 39,
+   "cost_seconds_by_file": 35
+  },
+  "aisef2/probe/process_effect.py::ProcessEffectProbe.observe": {
+   "mutants": 54,
+   "kill_files": 4,
+   "chain_seconds_literal": 7.1,
+   "chain_seconds_by_file": 50.4,
+   "cost_seconds_literal": 384,
+   "cost_seconds_by_file": 2722
+  },
+  "aisef2/probe/process_effect.py::STEPS": {
+   "mutants": 67,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 3.2,
+   "cost_seconds_literal": 239,
+   "cost_seconds_by_file": 212
+  },
+  "aisef2/probe/process_effect.py::_CONTENT": {
+   "mutants": 3,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 3.2,
+   "cost_seconds_literal": 11,
+   "cost_seconds_by_file": 10
+  },
+  "aisef2/probe/process_effect.py::_FILE_HOLDS": {
+   "mutants": 19,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 3.2,
+   "cost_seconds_literal": 68,
+   "cost_seconds_by_file": 60
+  },
+  "aisef2/probe/process_effect.py::_FILE_SHAPE_OK": {
+   "mutants": 27,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 3.2,
+   "cost_seconds_literal": 96,
+   "cost_seconds_by_file": 86
+  },
+  "aisef2/probe/process_effect.py::_HOLDS": {
+   "mutants": 3,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 3.2,
+   "cost_seconds_literal": 11,
+   "cost_seconds_by_file": 10
+  },
+  "aisef2/probe/process_effect.py::_SHAPES": {
+   "mutants": 8,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 3.2,
+   "cost_seconds_literal": 28,
+   "cost_seconds_by_file": 25
+  },
+  "aisef2/probe/process_effect.py::_concluded": {
+   "mutants": 53,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 3.2,
+   "cost_seconds_literal": 189,
+   "cost_seconds_by_file": 168
+  },
+  "aisef2/probe/process_effect.py::_content_of": {
+   "mutants": 2,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 3.2,
+   "cost_seconds_literal": 7,
+   "cost_seconds_by_file": 6
+  },
+  "aisef2/probe/process_effect.py::_edit_ok": {
+   "mutants": 8,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 3.2,
+   "cost_seconds_literal": 28,
+   "cost_seconds_by_file": 25
+  },
+  "aisef2/probe/process_effect.py::_expect_ok": {
+   "mutants": 4,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 3.2,
+   "cost_seconds_literal": 14,
+   "cost_seconds_by_file": 13
+  },
+  "aisef2/probe/process_effect.py::_fault_ok": {
+   "mutants": 5,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 3.2,
+   "cost_seconds_literal": 18,
+   "cost_seconds_by_file": 16
+  },
+  "aisef2/probe/process_effect.py::_file_shape_ok": {
+   "mutants": 11,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 3.2,
+   "cost_seconds_literal": 39,
+   "cost_seconds_by_file": 35
+  },
+  "aisef2/probe/process_effect.py::_files_hold": {
+   "mutants": 15,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 3.2,
+   "cost_seconds_literal": 53,
+   "cost_seconds_by_file": 48
+  },
+  "aisef2/probe/process_effect.py::_flat_ok": {
+   "mutants": 3,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 3.2,
+   "cost_seconds_literal": 11,
+   "cost_seconds_by_file": 10
+  },
+  "aisef2/probe/process_effect.py::_harness_argv": {
+   "mutants": 20,
+   "kill_files": 4,
+   "chain_seconds_literal": 7.1,
+   "chain_seconds_by_file": 50.4,
+   "cost_seconds_literal": 142,
+   "cost_seconds_by_file": 1008
+  },
+  "aisef2/probe/process_effect.py::_ident_ok": {
+   "mutants": 3,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 3.2,
+   "cost_seconds_literal": 11,
+   "cost_seconds_by_file": 10
+  },
+  "aisef2/probe/process_effect.py::_identity": {
+   "mutants": 11,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 3.2,
+   "cost_seconds_literal": 39,
+   "cost_seconds_by_file": 35
+  },
+  "aisef2/probe/process_effect.py::_invocation_ok": {
+   "mutants": 10,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 3.2,
+   "cost_seconds_literal": 36,
+   "cost_seconds_by_file": 32
+  },
+  "aisef2/probe/process_effect.py::_jsonl_holds": {
+   "mutants": 8,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 3.2,
+   "cost_seconds_literal": 28,
+   "cost_seconds_by_file": 25
+  },
+  "aisef2/probe/process_effect.py::_observed_files": {
+   "mutants": 11,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 3.2,
+   "cost_seconds_literal": 39,
+   "cost_seconds_by_file": 35
+  },
+  "aisef2/probe/process_effect.py::_prepare": {
+   "mutants": 55,
+   "kill_files": 5,
+   "chain_seconds_literal": 8.9,
+   "chain_seconds_by_file": 58.0,
+   "cost_seconds_literal": 490,
+   "cost_seconds_by_file": 3188
+  },
+  "aisef2/probe/process_effect.py::_probe_digest": {
+   "mutants": 1,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 3.2,
+   "cost_seconds_literal": 4,
+   "cost_seconds_by_file": 3
+  },
+  "aisef2/probe/process_effect.py::_raises_hold": {
+   "mutants": 8,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 3.2,
+   "cost_seconds_literal": 28,
+   "cost_seconds_by_file": 25
+  },
+  "aisef2/probe/process_effect.py::_resolved": {
+   "mutants": 31,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 3.2,
+   "cost_seconds_literal": 110,
+   "cost_seconds_by_file": 98
+  },
+  "aisef2/probe/process_effect.py::_returns_hold": {
+   "mutants": 28,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 3.2,
+   "cost_seconds_literal": 100,
+   "cost_seconds_by_file": 89
+  },
+  "aisef2/probe/process_effect.py::_same": {
+   "mutants": 7,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 3.2,
+   "cost_seconds_literal": 25,
+   "cost_seconds_by_file": 22
+  },
+  "aisef2/probe/process_effect.py::_scenario_ok": {
+   "mutants": 28,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 3.2,
+   "cost_seconds_literal": 100,
+   "cost_seconds_by_file": 89
+  },
+  "aisef2/probe/process_effect.py::_step_ok": {
+   "mutants": 18,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 3.2,
+   "cost_seconds_literal": 64,
+   "cost_seconds_by_file": 57
+  },
+  "aisef2/probe/process_effect.py::_subprocess_ok": {
+   "mutants": 11,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 5.7,
+   "cost_seconds_literal": 59,
+   "cost_seconds_by_file": 63
+  },
+  "aisef2/probe/process_effect.py::_substitute": {
+   "mutants": 14,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 3.2,
+   "cost_seconds_literal": 50,
+   "cost_seconds_by_file": 44
+  },
+  "aisef2/probe/process_effect.py::_watch": {
+   "mutants": 44,
+   "kill_files": 5,
+   "chain_seconds_literal": 8.9,
+   "chain_seconds_by_file": 58.0,
+   "cost_seconds_literal": 392,
+   "cost_seconds_by_file": 2551
+  },
+  "aisef2/probe/process_effect.py::_workspace_ok": {
+   "mutants": 6,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 3.2,
+   "cost_seconds_literal": 21,
+   "cost_seconds_by_file": 19
+  },
+  "aisef2/probe/process_effect.py::_write_ok": {
+   "mutants": 7,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 3.2,
+   "cost_seconds_literal": 25,
+   "cost_seconds_by_file": 22
+  },
+  "aisef2/probe/process_effect.py::_ws_path_ok": {
+   "mutants": 3,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 3.2,
+   "cost_seconds_literal": 11,
+   "cost_seconds_by_file": 10
+  },
+  "aisef2/probe/process_effect.py::observation_class": {
+   "mutants": 74,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 3.2,
+   "cost_seconds_literal": 263,
+   "cost_seconds_by_file": 235
+  },
+  "aisef2/probe/process_effect.py::spec_class": {
+   "mutants": 13,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 3.2,
+   "cost_seconds_literal": 46,
+   "cost_seconds_by_file": 41
+  },
+  "aisef2/probe/process_effect.py::verdict_of": {
+   "mutants": 9,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 3.2,
+   "cost_seconds_literal": 32,
+   "cost_seconds_by_file": 29
+  },
+  "aisef2/probe/python_callable_v2.py::CLASSES": {
+   "mutants": 7,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 102.1,
+   "cost_seconds_literal": 25,
+   "cost_seconds_by_file": 715
+  },
+  "aisef2/probe/python_callable_v2.py::DIGEST": {
+   "mutants": 4,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 102.1,
+   "cost_seconds_literal": 14,
+   "cost_seconds_by_file": 408
+  },
+  "aisef2/probe/python_callable_v2.py::HARNESS/answer_to": {
+   "mutants": 12,
+   "kill_files": 4,
+   "chain_seconds_literal": 7.1,
+   "chain_seconds_by_file": 117.9,
+   "cost_seconds_literal": 85,
+   "cost_seconds_by_file": 1415
+  },
+  "aisef2/probe/python_callable_v2.py::HARNESS/answered": {
+   "mutants": 8,
+   "kill_files": 4,
+   "chain_seconds_literal": 7.1,
+   "chain_seconds_by_file": 117.9,
+   "cost_seconds_literal": 57,
+   "cost_seconds_by_file": 943
+  },
+  "aisef2/probe/python_callable_v2.py::HARNESS/ask": {
+   "mutants": 4,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 108.3,
+   "cost_seconds_literal": 21,
+   "cost_seconds_by_file": 433
+  },
+  "aisef2/probe/python_callable_v2.py::HARNESS/conclude": {
+   "mutants": 4,
+   "kill_files": 4,
+   "chain_seconds_literal": 7.1,
+   "chain_seconds_by_file": 117.9,
+   "cost_seconds_literal": 28,
+   "cost_seconds_by_file": 472
+  },
+  "aisef2/probe/python_callable_v2.py::HARNESS/deadline": {
+   "mutants": 5,
+   "kill_files": 4,
+   "chain_seconds_literal": 7.1,
+   "chain_seconds_by_file": 117.9,
+   "cost_seconds_literal": 36,
+   "cost_seconds_by_file": 590
+  },
+  "aisef2/probe/python_callable_v2.py::HARNESS/emit": {
+   "mutants": 10,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 108.3,
+   "cost_seconds_literal": 53,
+   "cost_seconds_by_file": 1083
+  },
+  "aisef2/probe/python_callable_v2.py::HARNESS/ended": {
+   "mutants": 31,
+   "kill_files": 5,
+   "chain_seconds_literal": 8.9,
+   "chain_seconds_by_file": 119.8,
+   "cost_seconds_literal": 276,
+   "cost_seconds_by_file": 3713
+  },
+  "aisef2/probe/python_callable_v2.py::HARNESS/finish": {
+   "mutants": 12,
+   "kill_files": 4,
+   "chain_seconds_literal": 7.1,
+   "chain_seconds_by_file": 117.9,
+   "cost_seconds_literal": 85,
+   "cost_seconds_by_file": 1415
+  },
+  "aisef2/probe/python_callable_v2.py::HARNESS/inside": {
+   "mutants": 5,
+   "kill_files": 4,
+   "chain_seconds_literal": 7.1,
+   "chain_seconds_by_file": 117.9,
+   "cost_seconds_literal": 36,
+   "cost_seconds_by_file": 590
+  },
+  "aisef2/probe/python_callable_v2.py::HARNESS/main": {
+   "mutants": 157,
+   "kill_files": 4,
+   "chain_seconds_literal": 7.1,
+   "chain_seconds_by_file": 117.8,
+   "cost_seconds_literal": 1118,
+   "cost_seconds_by_file": 18493
+  },
+  "aisef2/probe/python_callable_v2.py::HARNESS/value_of": {
+   "mutants": 19,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 108.3,
+   "cost_seconds_literal": 101,
+   "cost_seconds_by_file": 2058
+  },
+  "aisef2/probe/python_callable_v2.py::ON_DEADLINE": {
+   "mutants": 21,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 102.1,
+   "cost_seconds_literal": 75,
+   "cost_seconds_by_file": 2144
+  },
+  "aisef2/probe/python_callable_v2.py::PROBE_SOURCES": {
+   "mutants": 8,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 104.6,
+   "cost_seconds_literal": 43,
+   "cost_seconds_by_file": 837
+  },
+  "aisef2/probe/python_callable_v2.py::PythonCallableV2Probe.__init__": {
+   "mutants": 4,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 7.6,
+   "cost_seconds_literal": 14,
+   "cost_seconds_by_file": 30
+  },
+  "aisef2/probe/python_callable_v2.py::PythonCallableV2Probe.enforcement": {
+   "mutants": 3,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 102.1,
+   "cost_seconds_literal": 11,
+   "cost_seconds_by_file": 306
+  },
+  "aisef2/probe/python_callable_v2.py::PythonCallableV2Probe.observe": {
+   "mutants": 155,
+   "kill_files": 4,
+   "chain_seconds_literal": 7.1,
+   "chain_seconds_by_file": 110.9,
+   "cost_seconds_literal": 1104,
+   "cost_seconds_by_file": 17182
+  },
+  "aisef2/probe/python_callable_v2.py::_concluded": {
+   "mutants": 75,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 125.4,
+   "cost_seconds_literal": 400,
+   "cost_seconds_by_file": 9401
+  },
+  "aisef2/probe/python_callable_v2.py::_file_ok": {
+   "mutants": 15,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 102.1,
+   "cost_seconds_literal": 53,
+   "cost_seconds_by_file": 1531
+  },
+  "aisef2/probe/python_callable_v2.py::_harness_argv": {
+   "mutants": 16,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 30.9,
+   "cost_seconds_literal": 85,
+   "cost_seconds_by_file": 494
+  },
+  "aisef2/probe/python_callable_v2.py::_is_hex": {
+   "mutants": 3,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 102.1,
+   "cost_seconds_literal": 11,
+   "cost_seconds_by_file": 306
+  },
+  "aisef2/probe/python_callable_v2.py::_probe_digest": {
+   "mutants": 1,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 102.1,
+   "cost_seconds_literal": 4,
+   "cost_seconds_by_file": 102
+  },
+  "aisef2/probe/python_callable_v2.py::_substituted": {
+   "mutants": 9,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 102.1,
+   "cost_seconds_literal": 32,
+   "cost_seconds_by_file": 919
+  },
+  "aisef2/probe/python_callable_v2.py::_unsubstituted": {
+   "mutants": 20,
+   "kill_files": 3,
+   "chain_seconds_literal": 5.3,
+   "chain_seconds_by_file": 104.6,
+   "cost_seconds_literal": 107,
+   "cost_seconds_by_file": 2093
+  },
+  "aisef2/probe/python_callable_v2.py::_watch": {
+   "mutants": 42,
+   "kill_files": 4,
+   "chain_seconds_literal": 7.1,
+   "chain_seconds_by_file": 127.9,
+   "cost_seconds_literal": 299,
+   "cost_seconds_by_file": 5371
+  },
+  "aisef2/probe/python_callable_v2.py::_workspace_ok": {
+   "mutants": 4,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 102.1,
+   "cost_seconds_literal": 14,
+   "cost_seconds_by_file": 408
+  },
+  "aisef2/probe/python_callable_v2.py::_write_workspace": {
+   "mutants": 10,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 102.1,
+   "cost_seconds_literal": 36,
+   "cost_seconds_by_file": 1021
+  },
+  "aisef2/probe/python_callable_v2.py::observation_class": {
+   "mutants": 75,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 102.1,
+   "cost_seconds_literal": 267,
+   "cost_seconds_by_file": 7657
+  },
+  "aisef2/probe/python_callable_v2.py::spec_class": {
+   "mutants": 13,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 102.1,
+   "cost_seconds_literal": 46,
+   "cost_seconds_by_file": 1327
+  },
+  "aisef2/probe/python_callable_v2.py::verdict_of": {
+   "mutants": 47,
+   "kill_files": 2,
+   "chain_seconds_literal": 3.6,
+   "chain_seconds_by_file": 102.1,
+   "cost_seconds_literal": 167,
+   "cost_seconds_by_file": 4798
+  }
+ }
+}
