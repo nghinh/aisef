@@ -22,9 +22,19 @@
    "source": "docs/requirements.md#1.1"
   },
   {
+   "id": "R-1.2",
+   "text": "path may be a str or a pathlib.Path. A path that does not exist raises FileNotFoundError.",
+   "source": "docs/requirements.md#1.2"
+  },
+  {
    "id": "R-2.1",
    "text": "treesum.snapshot.build(root) returns a dict mapping every file under root, recursively, to its file_sha256, keyed by the path relative to root with / as separator.",
    "source": "docs/requirements.md#2.1"
+  },
+  {
+   "id": "R-2.3",
+   "text": "A root that does not exist, or that exists and is not a directory, raises NotADirectoryError.",
+   "source": "docs/requirements.md#2.3"
   },
   {
    "id": "R-3.1",
@@ -33,8 +43,13 @@
   },
   {
    "id": "R-3.2",
-   "text": "treesum.snapshot.loads(text) parses the snapshot text format back into a dict.",
+   "text": "treesum.snapshot.loads(text) parses the snapshot text format back into a dict. Empty lines and lines holding only whitespace are ignored; a final line without a newline is read like any other. A line that is not <64 lowercase hex characters>, two spaces, <a non-empty path> raises ValueError.",
    "source": "docs/requirements.md#3.2"
+  },
+  {
+   "id": "R-3.3",
+   "text": "loads(dumps(s)) == s for every snapshot s.",
+   "source": "docs/requirements.md#3.3"
   },
   {
    "id": "R-4.1",
@@ -47,9 +62,19 @@
    "source": "docs/requirements.md#5.2"
   },
   {
+   "id": "R-5.3",
+   "text": "python -m treesum build DIR -o FILE writes the same text to FILE instead — creating it, or replacing its previous content — with nothing on standard output, and exits 0. When FILE lies inside DIR, FILE is not an entry of the snapshot.",
+   "source": "docs/requirements.md#5.3"
+  },
+  {
    "id": "R-5.4",
    "text": "python -m treesum verify DIR FILE prints one line per difference and exits 0 when there is no difference, 1 when there is at least one.",
    "source": "docs/requirements.md#5.4"
+  },
+  {
+   "id": "R-5.5",
+   "text": "Any other use exits 2 with a message on standard error and nothing on standard output: an unknown or missing subcommand, missing or extra arguments, a DIR that is not a directory, a FILE that cannot be read or that does not parse.",
+   "source": "docs/requirements.md#5.5"
   }
  ],
  "contracts": [
@@ -205,12 +230,86 @@
    "polarity": "MUST_HOLD",
    "subject_absence": "REQUIRES_SUBJECT",
    "rationale": "no import statement of the package names a module outside the standard library (preamble)"
+  },
+  {
+   "id": "BC-DIGEST-MISSING",
+   "requirement_ids": ["R-1.2"],
+   "subject": {"kind": "python_callable", "locator": "treesum.digest:file_sha256"},
+   "stimulus": {"args": ["<ws>/absent.txt"]},
+   "observable": {"raises": "FileNotFoundError", "within_s": 10},
+   "polarity": "MUST_HOLD",
+   "subject_absence": "REQUIRES_SUBJECT",
+   "rationale": "1.2 on the simplest input: a path (a str) that does not exist raises FileNotFoundError"
+  },
+  {
+   "id": "BC-BUILD-MISSING",
+   "requirement_ids": ["R-2.3"],
+   "subject": {"kind": "python_callable", "locator": "treesum.snapshot:build"},
+   "stimulus": {"args": ["<ws>/nowhere"]},
+   "observable": {"raises": "NotADirectoryError", "within_s": 10},
+   "polarity": "MUST_HOLD",
+   "subject_absence": "REQUIRES_SUBJECT",
+   "rationale": "2.3 on the simplest input: a root that does not exist raises NotADirectoryError"
+  },
+  {
+   "id": "BC-ROUNDTRIP",
+   "requirement_ids": ["R-3.3"],
+   "subject": {"kind": "python_callable", "locator": "treesum.snapshot:loads"},
+   "stimulus": {
+    "args": ["b6a98d9ce9a2d9149288fa3df42d377c3e42737afdcdaf714e33c0a100b51060  a.txt\nf2c82decdd7181cf98945929a62598db7e6b477e11f6e0eb0ae97020eff151ad  b.txt\nae9a6306a205417afddd14316cc1d0d5e04a98f1be10865dce643925ee070ce2  sub/c.txt\n"]
+   },
+   "observable": {
+    "returns": {
+     "a.txt": "b6a98d9ce9a2d9149288fa3df42d377c3e42737afdcdaf714e33c0a100b51060",
+     "b.txt": "f2c82decdd7181cf98945929a62598db7e6b477e11f6e0eb0ae97020eff151ad",
+     "sub/c.txt": "ae9a6306a205417afddd14316cc1d0d5e04a98f1be10865dce643925ee070ce2"
+    },
+    "within_s": 10
+   },
+   "polarity": "MUST_HOLD",
+   "subject_absence": "REQUIRES_SUBJECT",
+   "rationale": "3.3 on one snapshot s of three entries (one nested path): the text is dumps(s) by 3.1, and loads of it is s"
+  },
+  {
+   "id": "BC-CLI-BUILD-OUT",
+   "requirement_ids": ["R-5.3"],
+   "subject": {"kind": "cli_invocation", "locator": "treesum:__main__"},
+   "stimulus": {
+    "argv": ["build", "<ws>/proj", "-o", "<ws>/snap.sum"],
+    "workspace": {
+     "proj/a.txt": {"text": "alpha\n", "newline": "\n"},
+     "proj/b.txt": {"text": "beta\n", "newline": "\n"}
+    }
+   },
+   "observable": {
+    "exit_code": 0,
+    "files": {
+     "<ws>/snap.sum": {
+      "text": "b6a98d9ce9a2d9149288fa3df42d377c3e42737afdcdaf714e33c0a100b51060  a.txt\nf2c82decdd7181cf98945929a62598db7e6b477e11f6e0eb0ae97020eff151ad  b.txt\n",
+      "newline": "\n"
+     }
+    },
+    "within_s": 20
+   },
+   "polarity": "MUST_HOLD",
+   "subject_absence": "REQUIRES_SUBJECT",
+   "rationale": "5.3 on the two-file directory of BC-BUILD: FILE holds the text of 3.1, exit 0"
+  },
+  {
+   "id": "BC-CLI-USAGE",
+   "requirement_ids": ["R-5.5"],
+   "subject": {"kind": "cli_invocation", "locator": "treesum:__main__"},
+   "stimulus": {"argv": []},
+   "observable": {"exit_code": 2, "within_s": 20},
+   "polarity": "MUST_HOLD",
+   "subject_absence": "REQUIRES_SUBJECT",
+   "rationale": "5.5 on the simplest misuse: python -m treesum with no arguments (a missing subcommand) exits 2"
   }
  ],
  "stories": {
   "S1": {
    "depends_on": [],
-   "tests": ["tests/test_digest.py"],
+   "tests": ["tests/test_digest.py", "tests/test_smoke.py"],
    "criteria": [
     {
      "id": "C-DIGEST",
@@ -223,6 +322,20 @@
       "section": "§1",
       "clause": "1.1",
       "clause_text": "treesum.digest.file_sha256(path) returns the SHA-256 of the file's bytes as 64 lowercase hexadecimal characters (a str).",
+      "subject": "treesum.digest:file_sha256"
+     }
+    },
+    {
+     "id": "C-DIGEST-MISSING",
+     "contract": "BC-DIGEST-MISSING",
+     "role": "INTRODUCE",
+     "depends_on": [],
+     "why": "introduces 1.2",
+     "facts": {
+      "requirement": "R-1.2",
+      "section": "§1",
+      "clause": "1.2",
+      "clause_text": "path may be a str or a pathlib.Path. A path that does not exist raises FileNotFoundError.",
       "subject": "treesum.digest:file_sha256"
      }
     },
@@ -244,7 +357,7 @@
   },
   "S2": {
    "depends_on": ["S1"],
-   "tests": ["tests/test_build.py"],
+   "tests": ["tests/test_build.py", "tests/test_smoke.py"],
    "criteria": [
     {
      "id": "C-BUILD",
@@ -257,6 +370,20 @@
       "section": "§2",
       "clause": "2.1",
       "clause_text": "treesum.snapshot.build(root) returns a dict mapping every file under the directory root — recursively, at any depth — to its file_sha256; a key is the file's path relative to root, with / as the separator.",
+      "subject": "treesum.snapshot:build"
+     }
+    },
+    {
+     "id": "C-BUILD-MISSING",
+     "contract": "BC-BUILD-MISSING",
+     "role": "INTRODUCE",
+     "depends_on": ["C-DIGEST"],
+     "why": "introduces 2.3",
+     "facts": {
+      "requirement": "R-2.3",
+      "section": "§2",
+      "clause": "2.3",
+      "clause_text": "A root that does not exist, or that exists and is not a directory, raises NotADirectoryError.",
       "subject": "treesum.snapshot:build"
      }
     },
@@ -278,7 +405,7 @@
   },
   "S3": {
    "depends_on": ["S2"],
-   "tests": ["tests/test_format.py"],
+   "tests": ["tests/test_format.py", "tests/test_smoke.py"],
    "criteria": [
     {
      "id": "C-DUMPS",
@@ -304,7 +431,21 @@
       "requirement": "R-3.2",
       "section": "§3",
       "clause": "3.2",
-      "clause_text": "treesum.snapshot.loads(text) parses that format back into a dict.",
+      "clause_text": "treesum.snapshot.loads(text) parses that format back into a dict. Empty lines and lines holding only whitespace are ignored; a final line without a newline is read like any other. A line that is not <64 lowercase hex characters>, two spaces, <a non-empty path> raises ValueError.",
+      "subject": "treesum.snapshot:loads"
+     }
+    },
+    {
+     "id": "C-ROUNDTRIP",
+     "contract": "BC-ROUNDTRIP",
+     "role": "INTRODUCE",
+     "depends_on": ["C-DUMPS", "C-LOADS"],
+     "why": "introduces 3.3: the two functions of §3 invert each other",
+     "facts": {
+      "requirement": "R-3.3",
+      "section": "§3",
+      "clause": "3.3",
+      "clause_text": "loads(dumps(s)) == s for every snapshot s.",
       "subject": "treesum.snapshot:loads"
      }
     },
@@ -340,7 +481,7 @@
   },
   "S4": {
    "depends_on": ["S3"],
-   "tests": ["tests/test_cli.py"],
+   "tests": ["tests/test_cli.py", "tests/test_smoke.py"],
    "criteria": [
     {
      "id": "C-CLI-BUILD",
@@ -354,6 +495,34 @@
       "clause": "5.2",
       "clause_text": "python -m treesum build DIR writes dumps(build(DIR)) to standard output and exits 0.",
       "subject": "treesum:__main__ build"
+     }
+    },
+    {
+     "id": "C-CLI-BUILD-OUT",
+     "contract": "BC-CLI-BUILD-OUT",
+     "role": "INTRODUCE",
+     "depends_on": ["C-DUMPS"],
+     "why": "introduces 5.3",
+     "facts": {
+      "requirement": "R-5.3",
+      "section": "§5",
+      "clause": "5.3",
+      "clause_text": "python -m treesum build DIR -o FILE writes the same text to FILE instead — creating it, or replacing its previous content — with nothing on standard output, and exits 0. When FILE lies inside DIR, FILE is not an entry of the snapshot.",
+      "subject": "treesum:__main__ build -o"
+     }
+    },
+    {
+     "id": "C-CLI-USAGE",
+     "contract": "BC-CLI-USAGE",
+     "role": "INTRODUCE",
+     "depends_on": [],
+     "why": "introduces 5.5",
+     "facts": {
+      "requirement": "R-5.5",
+      "section": "§5",
+      "clause": "5.5",
+      "clause_text": "Any other use exits 2 with a message on standard error and nothing on standard output: an unknown or missing subcommand, missing or extra arguments, a DIR that is not a directory, a FILE that cannot be read or that does not parse (3.2).",
+      "subject": "treesum:__main__"
      }
     },
     {

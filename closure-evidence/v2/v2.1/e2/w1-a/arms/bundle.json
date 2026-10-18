@@ -263,6 +263,142 @@
     "locator": "path:treesum"
    },
    "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "7d367f82aa518a92ada475ffb246c1752f781be50cbfb8a35fc9d151f9709e1d",
+   "id": "BC-DIGEST-MISSING",
+   "observable": {
+    "raises": "FileNotFoundError",
+    "within_s": 10
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "1.2 on the simplest input: a path (a str) that does not exist raises FileNotFoundError",
+   "requirement_ids": [
+    "R-1.2"
+   ],
+   "stimulus": {
+    "args": [
+     "<ws>/absent.txt"
+    ]
+   },
+   "subject": {
+    "kind": "python_callable",
+    "locator": "treesum.digest:file_sha256"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "fe8201bf50f009b87325725d3629676d510cf861a73492195a33d72e9140171d",
+   "id": "BC-BUILD-MISSING",
+   "observable": {
+    "raises": "NotADirectoryError",
+    "within_s": 10
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "2.3 on the simplest input: a root that does not exist raises NotADirectoryError",
+   "requirement_ids": [
+    "R-2.3"
+   ],
+   "stimulus": {
+    "args": [
+     "<ws>/nowhere"
+    ]
+   },
+   "subject": {
+    "kind": "python_callable",
+    "locator": "treesum.snapshot:build"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "dea81c50fd8d4ddcd9c311c0d7c591cf0c97d471060f8a9291da3c7cc3a21827",
+   "id": "BC-ROUNDTRIP",
+   "observable": {
+    "returns": {
+     "a.txt": "b6a98d9ce9a2d9149288fa3df42d377c3e42737afdcdaf714e33c0a100b51060",
+     "b.txt": "f2c82decdd7181cf98945929a62598db7e6b477e11f6e0eb0ae97020eff151ad",
+     "sub/c.txt": "ae9a6306a205417afddd14316cc1d0d5e04a98f1be10865dce643925ee070ce2"
+    },
+    "within_s": 10
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "3.3 on one snapshot s of three entries (one nested path): the text is dumps(s) by 3.1, and loads of it is s",
+   "requirement_ids": [
+    "R-3.3"
+   ],
+   "stimulus": {
+    "args": [
+     "b6a98d9ce9a2d9149288fa3df42d377c3e42737afdcdaf714e33c0a100b51060  a.txt\nf2c82decdd7181cf98945929a62598db7e6b477e11f6e0eb0ae97020eff151ad  b.txt\nae9a6306a205417afddd14316cc1d0d5e04a98f1be10865dce643925ee070ce2  sub/c.txt\n"
+    ]
+   },
+   "subject": {
+    "kind": "python_callable",
+    "locator": "treesum.snapshot:loads"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "b6d0b1c25f255f7fffa0b4ca0b8a4a3c0ab3b10b21efe54ec98984d84430c0be",
+   "id": "BC-CLI-BUILD-OUT",
+   "observable": {
+    "exit_code": 0,
+    "files": {
+     "<ws>/snap.sum": {
+      "newline": "\n",
+      "text": "b6a98d9ce9a2d9149288fa3df42d377c3e42737afdcdaf714e33c0a100b51060  a.txt\nf2c82decdd7181cf98945929a62598db7e6b477e11f6e0eb0ae97020eff151ad  b.txt\n"
+     }
+    },
+    "within_s": 20
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "5.3 on the two-file directory of BC-BUILD: FILE holds the text of 3.1, exit 0",
+   "requirement_ids": [
+    "R-5.3"
+   ],
+   "stimulus": {
+    "argv": [
+     "build",
+     "<ws>/proj",
+     "-o",
+     "<ws>/snap.sum"
+    ],
+    "workspace": {
+     "proj/a.txt": {
+      "newline": "\n",
+      "text": "alpha\n"
+     },
+     "proj/b.txt": {
+      "newline": "\n",
+      "text": "beta\n"
+     }
+    }
+   },
+   "subject": {
+    "kind": "cli_invocation",
+    "locator": "treesum:__main__"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "fdc918faee7adb198ceaa131b9738bd61ae402bdfe4dc1d5a263927cd8225914",
+   "id": "BC-CLI-USAGE",
+   "observable": {
+    "exit_code": 2,
+    "within_s": 20
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "5.5 on the simplest misuse: python -m treesum with no arguments (a missing subcommand) exits 2",
+   "requirement_ids": [
+    "R-5.5"
+   ],
+   "stimulus": {
+    "argv": []
+   },
+   "subject": {
+    "kind": "cli_invocation",
+    "locator": "treesum:__main__"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
   }
  ],
  "description": "W1-a (E2, greenfield): treesum — the arms' bundle for B `aisef` and C `aisef+`. Four stories; every contract tests an example the public task text gives (docs/requirements.md); nothing of the hidden evaluator is here.",
@@ -281,12 +417,33 @@
    "section": "§2",
    "subject": "treesum.snapshot:build"
   },
+  "C-BUILD-MISSING": {
+   "clause": "2.3",
+   "clause_text": "A root that does not exist, or that exists and is not a directory, raises NotADirectoryError.",
+   "requirement": "R-2.3",
+   "section": "§2",
+   "subject": "treesum.snapshot:build"
+  },
   "C-CLI-BUILD": {
    "clause": "5.2",
    "clause_text": "python -m treesum build DIR writes dumps(build(DIR)) to standard output and exits 0.",
    "requirement": "R-5.2",
    "section": "§5",
    "subject": "treesum:__main__ build"
+  },
+  "C-CLI-BUILD-OUT": {
+   "clause": "5.3",
+   "clause_text": "python -m treesum build DIR -o FILE writes the same text to FILE instead — creating it, or replacing its previous content — with nothing on standard output, and exits 0. When FILE lies inside DIR, FILE is not an entry of the snapshot.",
+   "requirement": "R-5.3",
+   "section": "§5",
+   "subject": "treesum:__main__ build -o"
+  },
+  "C-CLI-USAGE": {
+   "clause": "5.5",
+   "clause_text": "Any other use exits 2 with a message on standard error and nothing on standard output: an unknown or missing subcommand, missing or extra arguments, a DIR that is not a directory, a FILE that cannot be read or that does not parse (3.2).",
+   "requirement": "R-5.5",
+   "section": "§5",
+   "subject": "treesum:__main__"
   },
   "C-CLI-VERIFY": {
    "clause": "5.4",
@@ -316,6 +473,13 @@
    "section": "§1",
    "subject": "treesum.digest:file_sha256"
   },
+  "C-DIGEST-MISSING": {
+   "clause": "1.2",
+   "clause_text": "path may be a str or a pathlib.Path. A path that does not exist raises FileNotFoundError.",
+   "requirement": "R-1.2",
+   "section": "§1",
+   "subject": "treesum.digest:file_sha256"
+  },
   "C-DUMPS": {
    "clause": "3.1",
    "clause_text": "treesum.snapshot.dumps(snapshot) returns the snapshot as text: one line per entry, `<sha256>  <path>`, every line ended by a newline, entries in ascending order of path.",
@@ -332,8 +496,15 @@
   },
   "C-LOADS": {
    "clause": "3.2",
-   "clause_text": "treesum.snapshot.loads(text) parses that format back into a dict.",
+   "clause_text": "treesum.snapshot.loads(text) parses that format back into a dict. Empty lines and lines holding only whitespace are ignored; a final line without a newline is read like any other. A line that is not <64 lowercase hex characters>, two spaces, <a non-empty path> raises ValueError.",
    "requirement": "R-3.2",
+   "section": "§3",
+   "subject": "treesum.snapshot:loads"
+  },
+  "C-ROUNDTRIP": {
+   "clause": "3.3",
+   "clause_text": "loads(dumps(s)) == s for every snapshot s.",
+   "requirement": "R-3.3",
    "section": "§3",
    "subject": "treesum.snapshot:loads"
   },
@@ -368,6 +539,15 @@
     "story_id": "S1"
    },
    {
+    "criterion_id": "C-DIGEST-MISSING",
+    "depends_on": [],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "introduces 1.2",
+    "product_proof_spec_id": "PPS-f87ee3e9908e51e6a0a212c7ad3a17687f07bbd805c0c83da892c40401a96f81",
+    "role": "INTRODUCE",
+    "story_id": "S1"
+   },
+   {
     "criterion_id": "C-STDLIB-1",
     "depends_on": [],
     "expected_parent": "SATISFIED_AT_PARENT",
@@ -384,6 +564,17 @@
     "expected_parent": "UNSATISFIED_AT_PARENT",
     "ownership_rationale": "introduces 2.1 on top of 1.1",
     "product_proof_spec_id": "PPS-483c39cb8835ce3eb520826badd6980f8fe436d9bfb106dabcbd788fd68cb8e6",
+    "role": "INTRODUCE",
+    "story_id": "S2"
+   },
+   {
+    "criterion_id": "C-BUILD-MISSING",
+    "depends_on": [
+     "C-DIGEST"
+    ],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "introduces 2.3",
+    "product_proof_spec_id": "PPS-e43cfefc95df333618cf2d6962fe4228705d755abfb25f0fee41e24387b6357b",
     "role": "INTRODUCE",
     "story_id": "S2"
    },
@@ -421,6 +612,18 @@
     "story_id": "S3"
    },
    {
+    "criterion_id": "C-ROUNDTRIP",
+    "depends_on": [
+     "C-DUMPS",
+     "C-LOADS"
+    ],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "introduces 3.3: the two functions of §3 invert each other",
+    "product_proof_spec_id": "PPS-40a6557e1b6d1d88dbfcfa96e4b732de60cdae7867503182d00b296d3890bf55",
+    "role": "INTRODUCE",
+    "story_id": "S3"
+   },
+   {
     "criterion_id": "C-COMPARE",
     "depends_on": [
      "C-BUILD"
@@ -450,6 +653,26 @@
     "expected_parent": "UNSATISFIED_AT_PARENT",
     "ownership_rationale": "introduces 5.2",
     "product_proof_spec_id": "PPS-6bc4097df18675c25962842d85f1c65cf1969cadbe9bce4420d0ebcf52c9b030",
+    "role": "INTRODUCE",
+    "story_id": "S4"
+   },
+   {
+    "criterion_id": "C-CLI-BUILD-OUT",
+    "depends_on": [
+     "C-DUMPS"
+    ],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "introduces 5.3",
+    "product_proof_spec_id": "PPS-f3e771b69fe545ab618d70aba365a39bfe431fd803dbac97a50f355ce5b57510",
+    "role": "INTRODUCE",
+    "story_id": "S4"
+   },
+   {
+    "criterion_id": "C-CLI-USAGE",
+    "depends_on": [],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "introduces 5.5",
+    "product_proof_spec_id": "PPS-d04c5fe15d9379f0204d4c41468b5e5f575afd7fd8785b606c1b326b2e82df19",
     "role": "INTRODUCE",
     "story_id": "S4"
    },
@@ -488,7 +711,7 @@
     "story_id": "S4"
    }
   ],
-  "plan_hash": "0a141fded0575e783889d32898ea7d888b1692589fbc2710bdbaf43967c0c5a6",
+  "plan_hash": "bb09275139268f93cb668d61bf967d3bbdc40c734aea77d507770e127916bdfb",
   "plan_quality_policy": {
    "max_fully_pre_satisfied_stories": null,
    "max_pre_satisfied_introduce_ratio": null,
@@ -513,10 +736,22 @@
    "text": "treesum.digest.file_sha256(path) returns the SHA-256 of the file's bytes as 64 lowercase hexadecimal characters."
   },
   {
+   "id": "R-1.2",
+   "requirement_hash": "1d2c888cc040c73cfe36fcd592800bf5b1c7c1b4ebf3a4d00b3cf11605558925",
+   "source": "docs/requirements.md#1.2",
+   "text": "path may be a str or a pathlib.Path. A path that does not exist raises FileNotFoundError."
+  },
+  {
    "id": "R-2.1",
    "requirement_hash": "53093bf744af6d7ffd67d36e671d333a0ad0782e14440cf306c8fda633420fd7",
    "source": "docs/requirements.md#2.1",
    "text": "treesum.snapshot.build(root) returns a dict mapping every file under root, recursively, to its file_sha256, keyed by the path relative to root with / as separator."
+  },
+  {
+   "id": "R-2.3",
+   "requirement_hash": "778b89df070a675b98d8df3fd875e3ab16073870ef073c9c4013072f6473235d",
+   "source": "docs/requirements.md#2.3",
+   "text": "A root that does not exist, or that exists and is not a directory, raises NotADirectoryError."
   },
   {
    "id": "R-3.1",
@@ -526,9 +761,15 @@
   },
   {
    "id": "R-3.2",
-   "requirement_hash": "961b81b4436b09c12ae1a37e6b8b9918f65ca7400b12c9c0531e3bee5fd1fde7",
+   "requirement_hash": "ad190dd63355c181793fc213aaf4b8e2d921e3cbf21c54d8ec77b644269a8d80",
    "source": "docs/requirements.md#3.2",
-   "text": "treesum.snapshot.loads(text) parses the snapshot text format back into a dict."
+   "text": "treesum.snapshot.loads(text) parses the snapshot text format back into a dict. Empty lines and lines holding only whitespace are ignored; a final line without a newline is read like any other. A line that is not <64 lowercase hex characters>, two spaces, <a non-empty path> raises ValueError."
+  },
+  {
+   "id": "R-3.3",
+   "requirement_hash": "4cffbb65eb557e87d2c467b897ce66d6b258dc65f96364f75d09eb67383fa2a9",
+   "source": "docs/requirements.md#3.3",
+   "text": "loads(dumps(s)) == s for every snapshot s."
   },
   {
    "id": "R-4.1",
@@ -543,10 +784,22 @@
    "text": "python -m treesum build DIR writes dumps(build(DIR)) to standard output and exits 0."
   },
   {
+   "id": "R-5.3",
+   "requirement_hash": "9e8d8e7f04bfd358587305f65e9b3350b33eba20afdf82a54ecb4fe5c05ba830",
+   "source": "docs/requirements.md#5.3",
+   "text": "python -m treesum build DIR -o FILE writes the same text to FILE instead — creating it, or replacing its previous content — with nothing on standard output, and exits 0. When FILE lies inside DIR, FILE is not an entry of the snapshot."
+  },
+  {
    "id": "R-5.4",
    "requirement_hash": "3e2422ee8af90bff21fdbb69b283c9ecaa9d4b39558976548be7fa7b2e9bf99b",
    "source": "docs/requirements.md#5.4",
    "text": "python -m treesum verify DIR FILE prints one line per difference and exits 0 when there is no difference, 1 when there is at least one."
+  },
+  {
+   "id": "R-5.5",
+   "requirement_hash": "856a11b955a66507efc75745f3bbbb8f961fe1e67b1f59ae4c640bda1999a6c7",
+   "source": "docs/requirements.md#5.5",
+   "text": "Any other use exits 2 with a message on standard error and nothing on standard output: an unknown or missing subcommand, missing or extra arguments, a DIR that is not a directory, a FILE that cannot be read or that does not parse."
   }
  ],
  "requirements_document": {
@@ -557,7 +810,8 @@
   "S1": {
    "depends_on": [],
    "tests": [
-    "tests/test_digest.py"
+    "tests/test_digest.py",
+    "tests/test_smoke.py"
    ]
   },
   "S2": {
@@ -565,7 +819,8 @@
     "S1"
    ],
    "tests": [
-    "tests/test_build.py"
+    "tests/test_build.py",
+    "tests/test_smoke.py"
    ]
   },
   "S3": {
@@ -573,7 +828,8 @@
     "S2"
    ],
    "tests": [
-    "tests/test_format.py"
+    "tests/test_format.py",
+    "tests/test_smoke.py"
    ]
   },
   "S4": {
@@ -581,7 +837,8 @@
     "S3"
    ],
    "tests": [
-    "tests/test_cli.py"
+    "tests/test_cli.py",
+    "tests/test_smoke.py"
    ]
   }
  }

@@ -2,26 +2,21 @@
  "approvals": [],
  "contracts": [
   {
-   "contract_hash": "4b3dbb902d2770e648ae502a591c6e70f61e28d38d207139f2b6d9a48c48ecdd",
+   "contract_hash": "132c17d0a40ac77e72599601e2a0c6f6d17a321ba660540b9a8c23f2f7f71d70",
    "id": "HC-01",
    "observable": {
-    "returns": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "within_s": 10
+    "raises": "FileNotFoundError",
+    "within_s": 15
    },
    "polarity": "MUST_HOLD",
-   "rationale": "edge case: a file of zero bytes has the SHA-256 of the empty input; a reader that treats an empty read as an error, or hashes the path, fails",
+   "rationale": "error handling: a path that does not exist raises FileNotFoundError (1.2); an implementation that catches OSError and returns an empty or placeholder digest fails",
    "requirement_ids": [
-    "R-1.1"
+    "R-1.2"
    ],
    "stimulus": {
     "args": [
-     "<ws>/empty.bin"
-    ],
-    "workspace": {
-     "empty.bin": {
-      "bytes_hex": ""
-     }
-    }
+     "<ws>/missing"
+    ]
    },
    "subject": {
     "kind": "python_callable",
@@ -30,11 +25,11 @@
    "subject_absence": "REQUIRES_SUBJECT"
   },
   {
-   "contract_hash": "c6e31da0b8fda375fa87e8cb9ee3a9ae9ccc2bf582df23b7df7be454a2c3c30c",
+   "contract_hash": "85f7032af8e2769877107f4e19ee692c3ed411be6e1cb1410eef98ddf2bc8832",
    "id": "HC-02",
    "observable": {
     "raises": "NotADirectoryError",
-    "within_s": 10
+    "within_s": 15
    },
    "polarity": "MUST_HOLD",
    "rationale": "error handling: a root that is a file raises; os.walk and Path.rglob over a file silently yield nothing, so an implementation without the check returns {} instead",
@@ -59,14 +54,14 @@
    "subject_absence": "REQUIRES_SUBJECT"
   },
   {
-   "contract_hash": "7cd5f14ac48f23a22882f2b5de6096f953892c07b9f7812b6ce7d323396368d9",
+   "contract_hash": "d0cc952f7de62047e5976a9fbe10e506e7c52b28efd6cdee96b707465918ace0",
    "id": "HC-03",
    "observable": {
     "returns": {
      "one.txt": "2c8b08da5ce60398e1f19af0e5dccc744df274b826abe585eaba68c525434806",
      "two.txt": "27dd8ed44a83ff94d557f9fd0412ed5a8cbca69ea04922d88c01184a07300a5a"
     },
-    "within_s": 10
+    "within_s": 15
    },
    "polarity": "MUST_HOLD",
    "rationale": "edge case: a leading empty line, a whitespace-only line and a final line without a newline; a parser that splits on newline and parses every piece fails",
@@ -85,11 +80,11 @@
    "subject_absence": "REQUIRES_SUBJECT"
   },
   {
-   "contract_hash": "a474ceee66e59e175c54ef1b80e26c710531492e62f42c43b6f529c818308d37",
+   "contract_hash": "8830be724d356f352f04166b19bba45e8db35fd79f1e6ffa8aeffa58218e74a4",
    "id": "HC-04",
    "observable": {
     "raises": "ValueError",
-    "within_s": 10
+    "within_s": 15
    },
    "polarity": "MUST_HOLD",
    "rationale": "error handling: the digest field is not 64 lowercase hex characters; a parser that only splits on two spaces accepts it",
@@ -108,7 +103,7 @@
    "subject_absence": "REQUIRES_SUBJECT"
   },
   {
-   "contract_hash": "4fecd1c49ef0a3f854470124f1d99c5e1d2f63f71d613987cd969300a2e96a12",
+   "contract_hash": "0e1e34caeb7f9715568921d56b008a8088fcce22a7d0fcfc4922a215ce07af5b",
    "id": "HC-05",
    "observable": {
     "returns": {
@@ -124,7 +119,7 @@
       "z.txt"
      ]
     },
-    "within_s": 10
+    "within_s": 15
    },
    "polarity": "MUST_HOLD",
    "rationale": "every category non-empty, inputs in scrambled key order, two entries per list where order shows: lists must be sorted, an unchanged entry (a.txt) appears nowhere",
@@ -155,7 +150,7 @@
    "subject_absence": "REQUIRES_SUBJECT"
   },
   {
-   "contract_hash": "c4970118e988b382ad08b73a1d03d4c514828e9860387519a435e90f4d808e43",
+   "contract_hash": "919abfcd5208cad201ba7b09cd01e507d16fad5e681307e9be5f14922b0f6707",
    "id": "HC-06",
    "observable": {
     "exit_code": 0,
@@ -163,7 +158,7 @@
      "newline": "\n",
      "text": "7d68bc1b419e0dde940d3c316a6750a3f16a0993b32509410407e2c175736e34  a/b/c.txt\ne6843a38061f575aed904235bae6ed9571bb039aa36a9f54a47b536d1e06e3ab  a/m.txt\n2088d0c4b41022d90f663fa8d8156cb525241b55d30ecdf922c38f94f7efda4c  z.txt\n"
     },
-    "within_s": 20
+    "within_s": 25
    },
    "polarity": "MUST_HOLD",
    "rationale": "nested directories two levels deep: relative paths joined with /, lines in plain string order of the whole path (a/b/c.txt before a/m.txt before z.txt), never directory-walk order",
@@ -197,7 +192,7 @@
    "subject_absence": "REQUIRES_SUBJECT"
   },
   {
-   "contract_hash": "7453f432f257edf9322a110a27454e5e82048ae225f2fa3cfa3af5a889fd3493",
+   "contract_hash": "763696213aab68871f4f7b6a6a373a7391ad50e988cb139b5e5cc8149e630f4d",
    "id": "HC-07",
    "observable": {
     "exit_code": 0,
@@ -207,10 +202,10 @@
       "text": "2c8b08da5ce60398e1f19af0e5dccc744df274b826abe585eaba68c525434806  one.txt\n27dd8ed44a83ff94d557f9fd0412ed5a8cbca69ea04922d88c01184a07300a5a  two.txt\n"
      }
     },
-    "within_s": 20
+    "within_s": 25
    },
    "polarity": "MUST_HOLD",
-   "rationale": "idempotence: the same build -o run twice leaves exactly one snapshot in FILE (5.3 replaces the previous content); an implementation that opens FILE in append mode doubles it",
+   "rationale": "idempotence: the same build -o run twice leaves exactly one snapshot in FILE (5.3 replaces the previous content); an implementation that opens FILE in append mode doubles it. exits_files sees the file only: standard output is HC-13's",
    "requirement_ids": [
     "R-5.3"
    ],
@@ -249,18 +244,18 @@
    "subject_absence": "REQUIRES_SUBJECT"
   },
   {
-   "contract_hash": "e3965c0d4318d7ea2776ba24c49040738892b688b63e03bfb444e110c3ad0cac",
+   "contract_hash": "ff082ff27f393cb3f6e522bbec0b45b13481cc0ea647673ac8dab61fede50d15",
    "id": "HC-08",
    "observable": {
     "exit_code": 1,
     "stdout": {
      "newline": "\n",
-     "text": "added a/m.txt\nremoved old.txt\nchanged z.txt\n"
+     "text": "changed a.txt\nadded m.txt\nremoved z.txt\n"
     },
-    "within_s": 20
+    "within_s": 25
    },
    "polarity": "MUST_HOLD",
-   "rationale": "exit code 1 with one added, one removed and one changed path, the lines in ascending order of PATH across the three kinds (not grouped by kind)",
+   "rationale": "exit code 1 with one changed (a.txt), one added (m.txt) and one removed (z.txt) path: the lines in ascending order of PATH across the three kinds — the path order (a, m, z) interleaves the kinds (changed, added, removed), so output grouped by kind in any order fails",
    "requirement_ids": [
     "R-5.4"
    ],
@@ -271,17 +266,17 @@
      "<ws>/snap.sum"
     ],
     "workspace": {
-     "proj/a/m.txt": {
+     "proj/a.txt": {
+      "newline": "\n",
+      "text": "alpha-changed\n"
+     },
+     "proj/m.txt": {
       "newline": "\n",
       "text": "mu\n"
      },
-     "proj/z.txt": {
-      "newline": "\n",
-      "text": "zeta-changed\n"
-     },
      "snap.sum": {
       "newline": "\n",
-      "text": "2088d0c4b41022d90f663fa8d8156cb525241b55d30ecdf922c38f94f7efda4c  z.txt\n32f7b637cf5ab87ba96679679e673901c339626b513a6b9d033d360302602080  old.txt\n"
+      "text": "b6a98d9ce9a2d9149288fa3df42d377c3e42737afdcdaf714e33c0a100b51060  a.txt\n2088d0c4b41022d90f663fa8d8156cb525241b55d30ecdf922c38f94f7efda4c  z.txt\n"
      }
     }
    },
@@ -292,7 +287,7 @@
    "subject_absence": "REQUIRES_SUBJECT"
   },
   {
-   "contract_hash": "8798dfac8f0bfcf372a0d456624231144925158e0e8c10521a77055e3416c758",
+   "contract_hash": "e81e3e9d6e4f6bb06504e5007347c6de38b69276c53418a81c3c63fa337fa0f6",
    "id": "HC-09",
    "observable": {
     "exit_code": 2,
@@ -300,7 +295,7 @@
      "newline": "\n",
      "text": ""
     },
-    "within_s": 20
+    "within_s": 25
    },
    "polarity": "MUST_HOLD",
    "rationale": "error handling: a FILE that cannot be read is a usage error — exit 2 and nothing on standard output; an uncaught FileNotFoundError gives a traceback and exit 1",
@@ -323,58 +318,6 @@
    "subject": {
     "kind": "cli_invocation",
     "locator": "treesum:__main__"
-   },
-   "subject_absence": "REQUIRES_SUBJECT"
-  },
-  {
-   "contract_hash": "107b4b09106429adefe0d7101c5685bf93dc2e86b4d09c449ec77e9949f7cfd2",
-   "id": "HC-10",
-   "observable": {
-    "exit_code": 2,
-    "within_s": 20
-   },
-   "polarity": "MUST_HOLD",
-   "rationale": "exit code: an unknown subcommand exits 2, not 1 and not 0",
-   "requirement_ids": [
-    "R-5.5"
-   ],
-   "stimulus": {
-    "argv": [
-     "frobnicate"
-    ]
-   },
-   "subject": {
-    "kind": "cli_invocation",
-    "locator": "treesum:__main__"
-   },
-   "subject_absence": "REQUIRES_SUBJECT"
-  },
-  {
-   "contract_hash": "91818a78ff72800b8e5509099ec75d37288ae6544fa7fa4cd67132ea25eb16d5",
-   "id": "HC-11",
-   "observable": {
-    "matches": 0,
-    "within_s": 20
-   },
-   "polarity": "MUST_HOLD",
-   "rationale": "the tests the agent adds import nothing outside the standard library and treesum (no pytest): counted by syntax over every .py under tests/",
-   "requirement_ids": [
-    "R-6.1"
-   ],
-   "stimulus": {
-    "imports_outside": {
-     "allowed": [
-      "treesum"
-     ],
-     "stdlib": true
-    },
-    "suffixes": [
-     ".py"
-    ]
-   },
-   "subject": {
-    "kind": "file_artifact",
-    "locator": "path:tests"
    },
    "subject_absence": "REQUIRES_SUBJECT"
   },
@@ -457,14 +400,73 @@
     "locator": "treesum.__main__:main"
    },
    "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "f747e79e95170e5388e3a3cefdd8b5c2d6710b169c94fe6bc59c50678a274ac7",
+   "id": "HC-13",
+   "observable": {
+    "exit_code": 0,
+    "stdout": {
+     "newline": "\n",
+     "text": ""
+    },
+    "within_s": 25
+   },
+   "polarity": "MUST_HOLD",
+   "rationale": "HC-07's sibling: build -o writes to FILE 'with nothing on standard output' (5.3), exit 0; an implementation that prints the text and also writes the file fails here (exits_files cannot see standard output)",
+   "requirement_ids": [
+    "R-5.3"
+   ],
+   "stimulus": {
+    "argv": [
+     "build",
+     "<ws>/proj",
+     "-o",
+     "<ws>/out.sum"
+    ],
+    "workspace": {
+     "proj/one.txt": {
+      "newline": "\n",
+      "text": "one\n"
+     },
+     "proj/two.txt": {
+      "newline": "\n",
+      "text": "two\n"
+     }
+    }
+   },
+   "subject": {
+    "kind": "cli_invocation",
+    "locator": "treesum:__main__"
+   },
+   "subject_absence": "REQUIRES_SUBJECT"
+  },
+  {
+   "contract_hash": "9a657c19c201985fd08978c58dfd09b41a67814eaca0c404c08fd6525b86d60e",
+   "id": "HC-14",
+   "observable": {
+    "condition": "exists",
+    "within_s": 45
+   },
+   "polarity": "MUST_NOT_HOLD",
+   "rationale": "hygiene: no bytecode cache is committed under the package (the baseline .gitignore lists __pycache__/; canary finding C-1 saw one in a delivered main). Holds at the baseline and must keep holding",
+   "requirement_ids": [
+    "R-HYG"
+   ],
+   "stimulus": {},
+   "subject": {
+    "kind": "file_artifact",
+    "locator": "path:treesum/__pycache__"
+   },
+   "subject_absence": "ABSENCE_IS_DECIDABLE"
   }
  ],
- "description": "W1-a (E2, greenfield): treesum — the HIDDEN evaluator. Twelve contracts no arm sees: edge cases, error handling, idempotence and exit codes that a faithful implementation of docs/requirements.md must have; none of their inputs or expectations appears in the public task text or in the arms' bundle.",
+ "description": "W1-a (E2, greenfield): treesum — the HIDDEN evaluator. Twelve contracts no arm sees: edge cases, error handling, idempotence, exit codes and one hygiene check that a faithful implementation of docs/requirements.md must have; none of their inputs or expectations appears in the public task text or in the arms' bundle (the hidden windows are 15/25/45/60 s, the arms' 10/20/30 s).",
  "facts": {
   "E-01": {
-   "clause": "1.1",
-   "clause_text": "file_sha256 returns the SHA-256 of the file's bytes.",
-   "requirement": "R-1.1",
+   "clause": "1.2",
+   "clause_text": "path may be a str or a pathlib.Path. A path that does not exist raises FileNotFoundError.",
+   "requirement": "R-1.2",
    "section": "§1",
    "subject": "treesum.digest:file_sha256"
   },
@@ -524,26 +526,26 @@
    "section": "§5",
    "subject": "treesum:__main__ verify"
   },
-  "E-10": {
-   "clause": "5.5",
-   "clause_text": "An unknown subcommand exits 2.",
-   "requirement": "R-5.5",
-   "section": "§5",
-   "subject": "treesum:__main__"
-  },
-  "E-11": {
-   "clause": "6.1",
-   "clause_text": "Tests import nothing outside the standard library and treesum.",
-   "requirement": "R-6.1",
-   "section": "§6",
-   "subject": "tests/"
-  },
   "E-12": {
    "clause": "5.3",
    "clause_text": "When FILE lies inside DIR, FILE is not an entry of the snapshot.",
    "requirement": "R-5.3",
    "section": "§5",
    "subject": "treesum.__main__:main"
+  },
+  "E-13": {
+   "clause": "5.3",
+   "clause_text": "build DIR -o FILE writes the same text to FILE instead, with nothing on standard output, and exits 0.",
+   "requirement": "R-5.3",
+   "section": "§5",
+   "subject": "treesum:__main__ build -o"
+  },
+  "E-14": {
+   "clause": "0",
+   "clause_text": "No bytecode cache is committed under the package: treesum/__pycache__ is not an entry of the delivered tree (.gitignore lists __pycache__/).",
+   "requirement": "R-HYG",
+   "section": "hygiene",
+   "subject": "path:treesum/__pycache__"
   }
  },
  "format": "aisef-v2-project/1",
@@ -556,8 +558,8 @@
     "criterion_id": "E-01",
     "depends_on": [],
     "expected_parent": "UNSATISFIED_AT_PARENT",
-    "ownership_rationale": "hidden: 1.1 on an empty file",
-    "product_proof_spec_id": "PPS-22024682d69049cea7d54398c99ee85c775a1a195c9906c0cd9ad0334651e9cf",
+    "ownership_rationale": "hidden: 1.2, a path that does not exist",
+    "product_proof_spec_id": "PPS-27c813e7a6860babf6e2a94da75af770744d898091a5706d10d6f46733ccbde5",
     "role": "INTRODUCE",
     "story_id": "E"
    },
@@ -566,7 +568,7 @@
     "depends_on": [],
     "expected_parent": "UNSATISFIED_AT_PARENT",
     "ownership_rationale": "hidden: 2.3, a root that is a file",
-    "product_proof_spec_id": "PPS-1dc08ca482a7b8f0ec6e98c3da32933c9ae1b0d8fdd0fdde2fb9e1253100b07a",
+    "product_proof_spec_id": "PPS-9a4b7e3f16f9bd9b065a4505951e52e1a212a6039a1aec720a9bf31cf96b4ac5",
     "role": "INTRODUCE",
     "story_id": "E"
    },
@@ -575,7 +577,7 @@
     "depends_on": [],
     "expected_parent": "UNSATISFIED_AT_PARENT",
     "ownership_rationale": "hidden: 3.2 tolerance",
-    "product_proof_spec_id": "PPS-c455643aa2e840c7fee25fcac8973ff7c1f92cd196f5b36f63afa1f2c914d4b7",
+    "product_proof_spec_id": "PPS-584de2461c203c758908fcec9e4b7daad735363a3306b38e54e55fc2228a9acb",
     "role": "INTRODUCE",
     "story_id": "E"
    },
@@ -584,7 +586,7 @@
     "depends_on": [],
     "expected_parent": "UNSATISFIED_AT_PARENT",
     "ownership_rationale": "hidden: 3.2 refusal",
-    "product_proof_spec_id": "PPS-3d40459d2286586bcf4e419bd3882ec2d9fa2e71889c3cfca708f01039568def",
+    "product_proof_spec_id": "PPS-9e5f8fb326555781d7d845f4164a5a2763d3d96e035ad267de7964e3ca08770d",
     "role": "INTRODUCE",
     "story_id": "E"
    },
@@ -593,7 +595,7 @@
     "depends_on": [],
     "expected_parent": "UNSATISFIED_AT_PARENT",
     "ownership_rationale": "hidden: 4.1 ordering over every category",
-    "product_proof_spec_id": "PPS-b85d5c03d6f9205d3582f4e79ccdd5bc860e18175aff6c52f1abfeea01bcb6c3",
+    "product_proof_spec_id": "PPS-91c44b0a8bb57f2fb39e8de3fdddae2bb84b2819712ae74011c5a8d6d0cd1fe2",
     "role": "INTRODUCE",
     "story_id": "E"
    },
@@ -602,7 +604,7 @@
     "depends_on": [],
     "expected_parent": "UNSATISFIED_AT_PARENT",
     "ownership_rationale": "hidden: 5.2 nested paths and order",
-    "product_proof_spec_id": "PPS-40c686e6193a3e136449de2462de3d6b50b7f62e4061711ed438d2d59b50c577",
+    "product_proof_spec_id": "PPS-442a82f47845201f18d8f991c7370f34e88bb3eabff902a15b5bec783ad8726f",
     "role": "INTRODUCE",
     "story_id": "E"
    },
@@ -611,7 +613,7 @@
     "depends_on": [],
     "expected_parent": "UNSATISFIED_AT_PARENT",
     "ownership_rationale": "hidden: 5.3 replaces, never appends",
-    "product_proof_spec_id": "PPS-ade61a4b724b4438f84e8d134a59550f90a1d2b79504cf5c79ef3c8a4273689d",
+    "product_proof_spec_id": "PPS-c9a0cf087c64b5b7c34b78b01bf5016268387a37ea0b2d339f14c5ce0235fdcc",
     "role": "INTRODUCE",
     "story_id": "E"
    },
@@ -619,8 +621,8 @@
     "criterion_id": "E-08",
     "depends_on": [],
     "expected_parent": "UNSATISFIED_AT_PARENT",
-    "ownership_rationale": "hidden: 5.4 differences and exit 1",
-    "product_proof_spec_id": "PPS-89067cfb923a64384f2722c847f8fd6252bdc49211adc90441b5c562049334ff",
+    "ownership_rationale": "hidden: 5.4 differences in path order across kinds, exit 1",
+    "product_proof_spec_id": "PPS-6712bc9e69aa1ba5d989077dfd273354d896ede5552f7ea238a8e796ecba789c",
     "role": "INTRODUCE",
     "story_id": "E"
    },
@@ -629,26 +631,8 @@
     "depends_on": [],
     "expected_parent": "UNSATISFIED_AT_PARENT",
     "ownership_rationale": "hidden: 5.5 unreadable FILE",
-    "product_proof_spec_id": "PPS-ecbba24d7b0d6ed5b978ef1a680cb5cfc242275fea6aacb4f364ed9dce64fe64",
+    "product_proof_spec_id": "PPS-d6a2f6e098d775e7efb7425c6ce02c4e045c14e8ed221adc900da053a762dfa1",
     "role": "INTRODUCE",
-    "story_id": "E"
-   },
-   {
-    "criterion_id": "E-10",
-    "depends_on": [],
-    "expected_parent": "UNSATISFIED_AT_PARENT",
-    "ownership_rationale": "hidden: 5.5 unknown subcommand",
-    "product_proof_spec_id": "PPS-0741937565654371c49886efc5afb7360b6d547a3f21b67ccae31c953c8149fb",
-    "role": "INTRODUCE",
-    "story_id": "E"
-   },
-   {
-    "criterion_id": "E-11",
-    "depends_on": [],
-    "expected_parent": "UNCONSTRAINED",
-    "ownership_rationale": "hidden: 6.1 holds at the baseline (the smoke test) and must still hold with the tests added",
-    "product_proof_spec_id": "PPS-6a9d158c05258d52b2cdd0f51fa441d17eca3cc03658b3538256a879e14fa0ce",
-    "role": "VERIFY",
     "story_id": "E"
    },
    {
@@ -659,9 +643,27 @@
     "product_proof_spec_id": "PPS-d1d827e49d199ac1262b6ec5335e1d8d7f679d5c911c43183b77da0fa9e00c16",
     "role": "INTRODUCE",
     "story_id": "E"
+   },
+   {
+    "criterion_id": "E-13",
+    "depends_on": [],
+    "expected_parent": "UNSATISFIED_AT_PARENT",
+    "ownership_rationale": "hidden: 5.3 nothing on standard output (HC-07's sibling)",
+    "product_proof_spec_id": "PPS-b4b7411e9850d2182ce236737fb7b06b663d3e7213d2b7f286582ddcadc791ac",
+    "role": "INTRODUCE",
+    "story_id": "E"
+   },
+   {
+    "criterion_id": "E-14",
+    "depends_on": [],
+    "expected_parent": "UNCONSTRAINED",
+    "ownership_rationale": "hidden hygiene: holds at the baseline (no cache) and must still hold in the delivered tree (canary C-1)",
+    "product_proof_spec_id": "PPS-a2c4ffb4ba0ce9f987aea30e35fd8a026588f1b2042f90dadcf6c3a587255c7f",
+    "role": "VERIFY",
+    "story_id": "E"
    }
   ],
-  "plan_hash": "9433f17023d622110d6566cc9811dcb429e28089c69cc06f45672ea5dd8496c4",
+  "plan_hash": "cba80e98ed29cd863f332bbde70409ea68935ed32cb39398c9fc7fdbd6a8fc9a",
   "plan_quality_policy": {
    "max_fully_pre_satisfied_stories": null,
    "max_pre_satisfied_introduce_ratio": null,
@@ -674,10 +676,10 @@
  ],
  "requirements": [
   {
-   "id": "R-1.1",
-   "requirement_hash": "ac1d33b209e9ee20f601be5cbc2d71ed46341fbd0fc59123305c090f0a03d0cf",
-   "source": "docs/requirements.md#1.1",
-   "text": "file_sha256 returns the SHA-256 of the file's bytes as 64 lowercase hex characters."
+   "id": "R-1.2",
+   "requirement_hash": "1b9b20683dedaaf796d3859c329ff21d353498915e8eaf35737a334d084632b5",
+   "source": "docs/requirements.md#1.2",
+   "text": "file_sha256 takes a str or a pathlib.Path; a path that does not exist raises FileNotFoundError."
   },
   {
    "id": "R-2.3",
@@ -705,9 +707,9 @@
   },
   {
    "id": "R-5.3",
-   "requirement_hash": "d5d414484a93fedebad0db71ed7ef807b0dd374dcbe4580067b542be5aa94a75",
+   "requirement_hash": "121f87328edb31d21f2b982050d2a8a27c7c4546eab7bb4ff97c541a6540d7e2",
    "source": "docs/requirements.md#5.3",
-   "text": "build DIR -o FILE creates or replaces FILE; a FILE inside DIR is not an entry of the snapshot."
+   "text": "build DIR -o FILE creates or replaces FILE with nothing on standard output; a FILE inside DIR is not an entry of the snapshot."
   },
   {
    "id": "R-5.4",
@@ -722,10 +724,10 @@
    "text": "Any other use exits 2 with a message on standard error and nothing on standard output."
   },
   {
-   "id": "R-6.1",
-   "requirement_hash": "c01efdf0a36bcb6c0de4d0a5537dac49f5326ce7939ca3082a9730862b34c824",
-   "source": "docs/requirements.md#6.1",
-   "text": "Tests import nothing outside the standard library and treesum."
+   "id": "R-HYG",
+   "requirement_hash": "c3a8edd17722bcdd9bbedc6b4a0277e522d5596a7f1c428a135a1cfc4b4766f7",
+   "source": "baseline/.gitignore (__pycache__/) — hygiene, not a clause of docs/requirements.md; canary finding C-1",
+   "text": "The delivered tree holds no bytecode cache under the package: treesum/__pycache__ is not an entry of the tree."
   }
  ],
  "requirements_document": {

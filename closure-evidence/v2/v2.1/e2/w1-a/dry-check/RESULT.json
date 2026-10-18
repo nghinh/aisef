@@ -1,5 +1,5 @@
 {
- "aisef_head": "2ac9b80a714e7a5ed5a164ac7ac91329624d5b25",
+ "aisef_head": "3555699acfe11f4d4c5716902f60cd9810ceba26",
  "baseline": {
   "clean": true,
   "commit": "e6901e56033d6a30d51e36404d82e4c8d758f99e",
@@ -18,23 +18,86 @@
    "commit": "e6901e56033d6a30d51e36404d82e4c8d758f99e",
    "files_sha256": "c01f60eeb379acc1ae83fa6db55d524908ee5df2185122fa188413a9f9169e68",
    "git_version": "git version 2.53.0",
-   "repo": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/w1a/dry/base-1",
+   "repo": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/w1a2/dry-2/base-1",
    "tree": "0f759f57e89b59283eac5670d1241274e97b4181"
   }
  },
  "baseline_satisfied": {
-  "arms": 1,
-  "evaluator": 1
+  "arms": [
+   "BC-STDLIB"
+  ],
+  "evaluator": [
+   "HC-14"
+  ]
  },
  "evaluate_arms_baseline": {
+  "by_contract": {
+   "BC-BUILD": {
+    "satisfaction": "INDETERMINATE",
+    "status": "EXECUTED"
+   },
+   "BC-BUILD-MISSING": {
+    "satisfaction": "INDETERMINATE",
+    "status": "EXECUTED"
+   },
+   "BC-CLI-BUILD": {
+    "satisfaction": "INDETERMINATE",
+    "status": "EXECUTED"
+   },
+   "BC-CLI-BUILD-OUT": {
+    "satisfaction": "INDETERMINATE",
+    "status": "EXECUTED"
+   },
+   "BC-CLI-USAGE": {
+    "satisfaction": "INDETERMINATE",
+    "status": "EXECUTED"
+   },
+   "BC-CLI-VERIFY": {
+    "satisfaction": "INDETERMINATE",
+    "status": "EXECUTED"
+   },
+   "BC-COMPARE": {
+    "satisfaction": "INDETERMINATE",
+    "status": "EXECUTED"
+   },
+   "BC-DIGEST": {
+    "satisfaction": "INDETERMINATE",
+    "status": "EXECUTED"
+   },
+   "BC-DIGEST-MISSING": {
+    "satisfaction": "INDETERMINATE",
+    "status": "EXECUTED"
+   },
+   "BC-DUMPS": {
+    "satisfaction": "INDETERMINATE",
+    "status": "EXECUTED"
+   },
+   "BC-LOADS": {
+    "satisfaction": "INDETERMINATE",
+    "status": "EXECUTED"
+   },
+   "BC-ROUNDTRIP": {
+    "satisfaction": "INDETERMINATE",
+    "status": "EXECUTED"
+   },
+   "BC-STDLIB": {
+    "satisfaction": "SATISFIED",
+    "status": "EXECUTED"
+   }
+  },
   "not_satisfied": [
-   "PPS-21bf8e6c1baa268538e44a312b0b15374b0fc7371ef07f2f697734493473a860",
-   "PPS-483c39cb8835ce3eb520826badd6980f8fe436d9bfb106dabcbd788fd68cb8e6",
-   "PPS-5b19b626d046bcb51bbb3e8c617d0142aa0cb5786767e31b5e0be86d5d3df32d",
-   "PPS-5c5d2b78340d60fe8a9de6679bfaa0576cd7081f77a454d6a5d9554ef5eb9e4c",
-   "PPS-6bc4097df18675c25962842d85f1c65cf1969cadbe9bce4420d0ebcf52c9b030",
-   "PPS-8f5c1ddd25ecbd712ae8fe801edff10c8ff0989c3213b1373c3e72989f2bfe59",
-   "PPS-ba894d8ce566d8cdf5f33cd7a91fd10aa9e75b78523ff118275a23f8e4bc2a66"
+   "BC-BUILD",
+   "BC-BUILD-MISSING",
+   "BC-CLI-BUILD",
+   "BC-CLI-BUILD-OUT",
+   "BC-CLI-USAGE",
+   "BC-CLI-VERIFY",
+   "BC-COMPARE",
+   "BC-DIGEST",
+   "BC-DIGEST-MISSING",
+   "BC-DUMPS",
+   "BC-LOADS",
+   "BC-ROUNDTRIP"
   ],
   "revision": "e6901e56033d6a30d51e36404d82e4c8d758f99e",
   "satisfied": 1,
@@ -42,6 +105,11 @@
    {
     "satisfaction": "INDETERMINATE",
     "spec": "PPS-21bf8e6c1baa268538e44a312b0b15374b0fc7371ef07f2f697734493473a860",
+    "status": "EXECUTED"
+   },
+   {
+    "satisfaction": "INDETERMINATE",
+    "spec": "PPS-40a6557e1b6d1d88dbfcfa96e4b732de60cdae7867503182d00b296d3890bf55",
     "status": "EXECUTED"
    },
    {
@@ -75,21 +143,100 @@
     "status": "EXECUTED"
    },
    {
+    "satisfaction": "INDETERMINATE",
+    "spec": "PPS-d04c5fe15d9379f0204d4c41468b5e5f575afd7fd8785b606c1b326b2e82df19",
+    "status": "EXECUTED"
+   },
+   {
+    "satisfaction": "INDETERMINATE",
+    "spec": "PPS-e43cfefc95df333618cf2d6962fe4228705d755abfb25f0fee41e24387b6357b",
+    "status": "EXECUTED"
+   },
+   {
+    "satisfaction": "INDETERMINATE",
+    "spec": "PPS-f3e771b69fe545ab618d70aba365a39bfe431fd803dbac97a50f355ce5b57510",
+    "status": "EXECUTED"
+   },
+   {
+    "satisfaction": "INDETERMINATE",
+    "spec": "PPS-f87ee3e9908e51e6a0a212c7ad3a17687f07bbd805c0c83da892c40401a96f81",
+    "status": "EXECUTED"
+   },
+   {
     "satisfaction": "SATISFIED",
     "spec": "PPS-fe2af4663b1396e8edb14914978e0549f9426908f9742eab2c19172ab036150f",
     "status": "EXECUTED"
    }
   ],
-  "total": 8
+  "total": 13
  },
  "evaluate_arms_reference": {
+  "by_contract": {
+   "BC-BUILD": {
+    "satisfaction": "SATISFIED",
+    "status": "EXECUTED"
+   },
+   "BC-BUILD-MISSING": {
+    "satisfaction": "SATISFIED",
+    "status": "EXECUTED"
+   },
+   "BC-CLI-BUILD": {
+    "satisfaction": "SATISFIED",
+    "status": "EXECUTED"
+   },
+   "BC-CLI-BUILD-OUT": {
+    "satisfaction": "SATISFIED",
+    "status": "EXECUTED"
+   },
+   "BC-CLI-USAGE": {
+    "satisfaction": "SATISFIED",
+    "status": "EXECUTED"
+   },
+   "BC-CLI-VERIFY": {
+    "satisfaction": "SATISFIED",
+    "status": "EXECUTED"
+   },
+   "BC-COMPARE": {
+    "satisfaction": "SATISFIED",
+    "status": "EXECUTED"
+   },
+   "BC-DIGEST": {
+    "satisfaction": "SATISFIED",
+    "status": "EXECUTED"
+   },
+   "BC-DIGEST-MISSING": {
+    "satisfaction": "SATISFIED",
+    "status": "EXECUTED"
+   },
+   "BC-DUMPS": {
+    "satisfaction": "SATISFIED",
+    "status": "EXECUTED"
+   },
+   "BC-LOADS": {
+    "satisfaction": "SATISFIED",
+    "status": "EXECUTED"
+   },
+   "BC-ROUNDTRIP": {
+    "satisfaction": "SATISFIED",
+    "status": "EXECUTED"
+   },
+   "BC-STDLIB": {
+    "satisfaction": "SATISFIED",
+    "status": "EXECUTED"
+   }
+  },
   "not_satisfied": [],
-  "revision": "8fdd000a8eb920bb5a200d6ae89dcfdcd2558c89",
-  "satisfied": 8,
+  "revision": "b9f8c861a79312cc31bae308bd61bd806e6b74e6",
+  "satisfied": 13,
   "specs": [
    {
     "satisfaction": "SATISFIED",
     "spec": "PPS-21bf8e6c1baa268538e44a312b0b15374b0fc7371ef07f2f697734493473a860",
+    "status": "EXECUTED"
+   },
+   {
+    "satisfaction": "SATISFIED",
+    "spec": "PPS-40a6557e1b6d1d88dbfcfa96e4b732de60cdae7867503182d00b296d3890bf55",
     "status": "EXECUTED"
    },
    {
@@ -124,77 +271,147 @@
    },
    {
     "satisfaction": "SATISFIED",
+    "spec": "PPS-d04c5fe15d9379f0204d4c41468b5e5f575afd7fd8785b606c1b326b2e82df19",
+    "status": "EXECUTED"
+   },
+   {
+    "satisfaction": "SATISFIED",
+    "spec": "PPS-e43cfefc95df333618cf2d6962fe4228705d755abfb25f0fee41e24387b6357b",
+    "status": "EXECUTED"
+   },
+   {
+    "satisfaction": "SATISFIED",
+    "spec": "PPS-f3e771b69fe545ab618d70aba365a39bfe431fd803dbac97a50f355ce5b57510",
+    "status": "EXECUTED"
+   },
+   {
+    "satisfaction": "SATISFIED",
+    "spec": "PPS-f87ee3e9908e51e6a0a212c7ad3a17687f07bbd805c0c83da892c40401a96f81",
+    "status": "EXECUTED"
+   },
+   {
+    "satisfaction": "SATISFIED",
     "spec": "PPS-fe2af4663b1396e8edb14914978e0549f9426908f9742eab2c19172ab036150f",
     "status": "EXECUTED"
    }
   ],
-  "total": 8
+  "total": 13
  },
  "evaluate_evaluator_baseline": {
+  "by_contract": {
+   "HC-01": {
+    "satisfaction": "INDETERMINATE",
+    "status": "EXECUTED"
+   },
+   "HC-02": {
+    "satisfaction": "INDETERMINATE",
+    "status": "EXECUTED"
+   },
+   "HC-03": {
+    "satisfaction": "INDETERMINATE",
+    "status": "EXECUTED"
+   },
+   "HC-04": {
+    "satisfaction": "INDETERMINATE",
+    "status": "EXECUTED"
+   },
+   "HC-05": {
+    "satisfaction": "INDETERMINATE",
+    "status": "EXECUTED"
+   },
+   "HC-06": {
+    "satisfaction": "INDETERMINATE",
+    "status": "EXECUTED"
+   },
+   "HC-07": {
+    "satisfaction": "INDETERMINATE",
+    "status": "EXECUTED"
+   },
+   "HC-08": {
+    "satisfaction": "INDETERMINATE",
+    "status": "EXECUTED"
+   },
+   "HC-09": {
+    "satisfaction": "INDETERMINATE",
+    "status": "EXECUTED"
+   },
+   "HC-12": {
+    "satisfaction": "INDETERMINATE",
+    "status": "EXECUTED"
+   },
+   "HC-13": {
+    "satisfaction": "INDETERMINATE",
+    "status": "EXECUTED"
+   },
+   "HC-14": {
+    "satisfaction": "SATISFIED",
+    "status": "EXECUTED"
+   }
+  },
   "not_satisfied": [
-   "PPS-0741937565654371c49886efc5afb7360b6d547a3f21b67ccae31c953c8149fb",
-   "PPS-1dc08ca482a7b8f0ec6e98c3da32933c9ae1b0d8fdd0fdde2fb9e1253100b07a",
-   "PPS-22024682d69049cea7d54398c99ee85c775a1a195c9906c0cd9ad0334651e9cf",
-   "PPS-3d40459d2286586bcf4e419bd3882ec2d9fa2e71889c3cfca708f01039568def",
-   "PPS-40c686e6193a3e136449de2462de3d6b50b7f62e4061711ed438d2d59b50c577",
-   "PPS-89067cfb923a64384f2722c847f8fd6252bdc49211adc90441b5c562049334ff",
-   "PPS-ade61a4b724b4438f84e8d134a59550f90a1d2b79504cf5c79ef3c8a4273689d",
-   "PPS-b85d5c03d6f9205d3582f4e79ccdd5bc860e18175aff6c52f1abfeea01bcb6c3",
-   "PPS-c455643aa2e840c7fee25fcac8973ff7c1f92cd196f5b36f63afa1f2c914d4b7",
-   "PPS-d1d827e49d199ac1262b6ec5335e1d8d7f679d5c911c43183b77da0fa9e00c16",
-   "PPS-ecbba24d7b0d6ed5b978ef1a680cb5cfc242275fea6aacb4f364ed9dce64fe64"
+   "HC-01",
+   "HC-02",
+   "HC-03",
+   "HC-04",
+   "HC-05",
+   "HC-06",
+   "HC-07",
+   "HC-08",
+   "HC-09",
+   "HC-12",
+   "HC-13"
   ],
   "revision": "e6901e56033d6a30d51e36404d82e4c8d758f99e",
   "satisfied": 1,
   "specs": [
    {
     "satisfaction": "INDETERMINATE",
-    "spec": "PPS-0741937565654371c49886efc5afb7360b6d547a3f21b67ccae31c953c8149fb",
+    "spec": "PPS-27c813e7a6860babf6e2a94da75af770744d898091a5706d10d6f46733ccbde5",
     "status": "EXECUTED"
    },
    {
     "satisfaction": "INDETERMINATE",
-    "spec": "PPS-1dc08ca482a7b8f0ec6e98c3da32933c9ae1b0d8fdd0fdde2fb9e1253100b07a",
+    "spec": "PPS-442a82f47845201f18d8f991c7370f34e88bb3eabff902a15b5bec783ad8726f",
     "status": "EXECUTED"
    },
    {
     "satisfaction": "INDETERMINATE",
-    "spec": "PPS-22024682d69049cea7d54398c99ee85c775a1a195c9906c0cd9ad0334651e9cf",
+    "spec": "PPS-584de2461c203c758908fcec9e4b7daad735363a3306b38e54e55fc2228a9acb",
     "status": "EXECUTED"
    },
    {
     "satisfaction": "INDETERMINATE",
-    "spec": "PPS-3d40459d2286586bcf4e419bd3882ec2d9fa2e71889c3cfca708f01039568def",
+    "spec": "PPS-6712bc9e69aa1ba5d989077dfd273354d896ede5552f7ea238a8e796ecba789c",
     "status": "EXECUTED"
    },
    {
     "satisfaction": "INDETERMINATE",
-    "spec": "PPS-40c686e6193a3e136449de2462de3d6b50b7f62e4061711ed438d2d59b50c577",
+    "spec": "PPS-91c44b0a8bb57f2fb39e8de3fdddae2bb84b2819712ae74011c5a8d6d0cd1fe2",
+    "status": "EXECUTED"
+   },
+   {
+    "satisfaction": "INDETERMINATE",
+    "spec": "PPS-9a4b7e3f16f9bd9b065a4505951e52e1a212a6039a1aec720a9bf31cf96b4ac5",
+    "status": "EXECUTED"
+   },
+   {
+    "satisfaction": "INDETERMINATE",
+    "spec": "PPS-9e5f8fb326555781d7d845f4164a5a2763d3d96e035ad267de7964e3ca08770d",
     "status": "EXECUTED"
    },
    {
     "satisfaction": "SATISFIED",
-    "spec": "PPS-6a9d158c05258d52b2cdd0f51fa441d17eca3cc03658b3538256a879e14fa0ce",
+    "spec": "PPS-a2c4ffb4ba0ce9f987aea30e35fd8a026588f1b2042f90dadcf6c3a587255c7f",
     "status": "EXECUTED"
    },
    {
     "satisfaction": "INDETERMINATE",
-    "spec": "PPS-89067cfb923a64384f2722c847f8fd6252bdc49211adc90441b5c562049334ff",
+    "spec": "PPS-b4b7411e9850d2182ce236737fb7b06b663d3e7213d2b7f286582ddcadc791ac",
     "status": "EXECUTED"
    },
    {
     "satisfaction": "INDETERMINATE",
-    "spec": "PPS-ade61a4b724b4438f84e8d134a59550f90a1d2b79504cf5c79ef3c8a4273689d",
-    "status": "EXECUTED"
-   },
-   {
-    "satisfaction": "INDETERMINATE",
-    "spec": "PPS-b85d5c03d6f9205d3582f4e79ccdd5bc860e18175aff6c52f1abfeea01bcb6c3",
-    "status": "EXECUTED"
-   },
-   {
-    "satisfaction": "INDETERMINATE",
-    "spec": "PPS-c455643aa2e840c7fee25fcac8973ff7c1f92cd196f5b36f63afa1f2c914d4b7",
+    "spec": "PPS-c9a0cf087c64b5b7c34b78b01bf5016268387a37ea0b2d339f14c5ce0235fdcc",
     "status": "EXECUTED"
    },
    {
@@ -204,65 +421,115 @@
    },
    {
     "satisfaction": "INDETERMINATE",
-    "spec": "PPS-ecbba24d7b0d6ed5b978ef1a680cb5cfc242275fea6aacb4f364ed9dce64fe64",
+    "spec": "PPS-d6a2f6e098d775e7efb7425c6ce02c4e045c14e8ed221adc900da053a762dfa1",
     "status": "EXECUTED"
    }
   ],
   "total": 12
  },
  "evaluate_evaluator_reference": {
+  "by_contract": {
+   "HC-01": {
+    "satisfaction": "SATISFIED",
+    "status": "EXECUTED"
+   },
+   "HC-02": {
+    "satisfaction": "SATISFIED",
+    "status": "EXECUTED"
+   },
+   "HC-03": {
+    "satisfaction": "SATISFIED",
+    "status": "EXECUTED"
+   },
+   "HC-04": {
+    "satisfaction": "SATISFIED",
+    "status": "EXECUTED"
+   },
+   "HC-05": {
+    "satisfaction": "SATISFIED",
+    "status": "EXECUTED"
+   },
+   "HC-06": {
+    "satisfaction": "SATISFIED",
+    "status": "EXECUTED"
+   },
+   "HC-07": {
+    "satisfaction": "SATISFIED",
+    "status": "EXECUTED"
+   },
+   "HC-08": {
+    "satisfaction": "SATISFIED",
+    "status": "EXECUTED"
+   },
+   "HC-09": {
+    "satisfaction": "SATISFIED",
+    "status": "EXECUTED"
+   },
+   "HC-12": {
+    "satisfaction": "SATISFIED",
+    "status": "EXECUTED"
+   },
+   "HC-13": {
+    "satisfaction": "SATISFIED",
+    "status": "EXECUTED"
+   },
+   "HC-14": {
+    "satisfaction": "SATISFIED",
+    "status": "EXECUTED"
+   }
+  },
   "not_satisfied": [],
-  "revision": "8fdd000a8eb920bb5a200d6ae89dcfdcd2558c89",
+  "revision": "b9f8c861a79312cc31bae308bd61bd806e6b74e6",
   "satisfied": 12,
   "specs": [
    {
     "satisfaction": "SATISFIED",
-    "spec": "PPS-0741937565654371c49886efc5afb7360b6d547a3f21b67ccae31c953c8149fb",
+    "spec": "PPS-27c813e7a6860babf6e2a94da75af770744d898091a5706d10d6f46733ccbde5",
     "status": "EXECUTED"
    },
    {
     "satisfaction": "SATISFIED",
-    "spec": "PPS-1dc08ca482a7b8f0ec6e98c3da32933c9ae1b0d8fdd0fdde2fb9e1253100b07a",
+    "spec": "PPS-442a82f47845201f18d8f991c7370f34e88bb3eabff902a15b5bec783ad8726f",
     "status": "EXECUTED"
    },
    {
     "satisfaction": "SATISFIED",
-    "spec": "PPS-22024682d69049cea7d54398c99ee85c775a1a195c9906c0cd9ad0334651e9cf",
+    "spec": "PPS-584de2461c203c758908fcec9e4b7daad735363a3306b38e54e55fc2228a9acb",
     "status": "EXECUTED"
    },
    {
     "satisfaction": "SATISFIED",
-    "spec": "PPS-3d40459d2286586bcf4e419bd3882ec2d9fa2e71889c3cfca708f01039568def",
+    "spec": "PPS-6712bc9e69aa1ba5d989077dfd273354d896ede5552f7ea238a8e796ecba789c",
     "status": "EXECUTED"
    },
    {
     "satisfaction": "SATISFIED",
-    "spec": "PPS-40c686e6193a3e136449de2462de3d6b50b7f62e4061711ed438d2d59b50c577",
+    "spec": "PPS-91c44b0a8bb57f2fb39e8de3fdddae2bb84b2819712ae74011c5a8d6d0cd1fe2",
     "status": "EXECUTED"
    },
    {
     "satisfaction": "SATISFIED",
-    "spec": "PPS-6a9d158c05258d52b2cdd0f51fa441d17eca3cc03658b3538256a879e14fa0ce",
+    "spec": "PPS-9a4b7e3f16f9bd9b065a4505951e52e1a212a6039a1aec720a9bf31cf96b4ac5",
     "status": "EXECUTED"
    },
    {
     "satisfaction": "SATISFIED",
-    "spec": "PPS-89067cfb923a64384f2722c847f8fd6252bdc49211adc90441b5c562049334ff",
+    "spec": "PPS-9e5f8fb326555781d7d845f4164a5a2763d3d96e035ad267de7964e3ca08770d",
     "status": "EXECUTED"
    },
    {
     "satisfaction": "SATISFIED",
-    "spec": "PPS-ade61a4b724b4438f84e8d134a59550f90a1d2b79504cf5c79ef3c8a4273689d",
+    "spec": "PPS-a2c4ffb4ba0ce9f987aea30e35fd8a026588f1b2042f90dadcf6c3a587255c7f",
     "status": "EXECUTED"
    },
    {
     "satisfaction": "SATISFIED",
-    "spec": "PPS-b85d5c03d6f9205d3582f4e79ccdd5bc860e18175aff6c52f1abfeea01bcb6c3",
+    "spec": "PPS-b4b7411e9850d2182ce236737fb7b06b663d3e7213d2b7f286582ddcadc791ac",
     "status": "EXECUTED"
    },
    {
     "satisfaction": "SATISFIED",
-    "spec": "PPS-c455643aa2e840c7fee25fcac8973ff7c1f92cd196f5b36f63afa1f2c914d4b7",
+    "spec": "PPS-c9a0cf087c64b5b7c34b78b01bf5016268387a37ea0b2d339f14c5ce0235fdcc",
     "status": "EXECUTED"
    },
    {
@@ -272,27 +539,46 @@
    },
    {
     "satisfaction": "SATISFIED",
-    "spec": "PPS-ecbba24d7b0d6ed5b978ef1a680cb5cfc242275fea6aacb4f364ed9dce64fe64",
+    "spec": "PPS-d6a2f6e098d775e7efb7425c6ce02c4e045c14e8ed221adc900da053a762dfa1",
     "status": "EXECUTED"
    }
   ],
   "total": 12
  },
- "finished": "2026-10-18 13:04:54 +0700",
+ "finished": "2026-10-18 14:10:00 +0700",
  "leaks": {
-  "distinctive_strings": 24,
+  "arms_distinctive_strings": 26,
+  "evaluator_distinctive_strings": 23,
   "probe_kinds_evaluator": [
    "cli_invocation",
    "file_artifact",
    "process_effect",
    "python_callable"
   ],
-  "shared_canonical_parts": [],
+  "scanned": [
+   "arms/authoring.json",
+   "arms/bundle.json (canonical)",
+   "arms/bundle.json (raw)",
+   "baseline/.gitignore",
+   "baseline/README.md",
+   "baseline/docs/requirements.md",
+   "baseline/tests/__init__.py",
+   "baseline/tests/test_smoke.py",
+   "baseline/treesum/__init__.py",
+   "direct-task.txt"
+  ],
+  "shared_distinctive_strings": [],
   "text_hits": {
    "arms/authoring.json": [],
-   "arms/bundle.json": [],
+   "arms/bundle.json (canonical)": [],
+   "arms/bundle.json (raw)": [],
+   "baseline/.gitignore": [],
    "baseline/README.md": [],
-   "baseline/docs/requirements.md": []
+   "baseline/docs/requirements.md": [],
+   "baseline/tests/__init__.py": [],
+   "baseline/tests/test_smoke.py": [],
+   "baseline/treesum/__init__.py": [],
+   "direct-task.txt": []
   }
  },
  "lint_arms_technically_approved": {
@@ -304,7 +590,7 @@
   },
   "approver": "human:w1a-dry-check",
   "exit": 0,
-  "file": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/w1a/dry/arms.approved-8.json",
+  "file": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/w1a2/dry-2/arms.approved-13.json",
   "verdict": "READY"
  },
  "lint_arms_unapproved": {
@@ -312,7 +598,8 @@
   "criteria_without_calibration": [],
   "criteria_without_contract": [],
   "exit": 1,
-  "to_approve": 8,
+  "stray": [],
+  "to_approve": 13,
   "uncovered": [],
   "verdict": "NOT_READY"
  },
@@ -325,7 +612,7 @@
   },
   "approver": "human:w1a-dry-check",
   "exit": 0,
-  "file": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/w1a/dry/evaluator.approved-12.json",
+  "file": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/w1a2/dry-2/evaluator.approved-12.json",
   "verdict": "READY"
  },
  "lint_evaluator_unapproved": {
@@ -333,6 +620,7 @@
   "criteria_without_calibration": [],
   "criteria_without_contract": [],
   "exit": 1,
+  "stray": [],
   "to_approve": 12,
   "uncovered": [],
   "verdict": "NOT_READY"
@@ -341,7 +629,7 @@
  "problems": [],
  "python": "3.14.7",
  "reference_candidate": {
-  "commit": "8fdd000a8eb920bb5a200d6ae89dcfdcd2558c89",
+  "commit": "b9f8c861a79312cc31bae308bd61bd806e6b74e6",
   "files": [
    "treesum/__main__.py",
    "treesum/digest.py",
@@ -351,21 +639,50 @@
  },
  "seal_arms": {
   "approvals_kept": 0,
-  "bundle_sha256": "e07cd6b51bb3dc94ed90e841417d0c7b2c04cd0131233a513fb4cef06ad3a00a",
+  "bundle_sha256": "80acc8509b0110b8ac72845d1331b47108d5e0d3b54a250da95307513364c254",
   "committed_bundle_matches_fresh_seal": true,
+  "contracts": [
+   "BC-DIGEST",
+   "BC-BUILD",
+   "BC-DUMPS",
+   "BC-LOADS",
+   "BC-COMPARE",
+   "BC-CLI-BUILD",
+   "BC-CLI-VERIFY",
+   "BC-STDLIB",
+   "BC-DIGEST-MISSING",
+   "BC-BUILD-MISSING",
+   "BC-ROUNDTRIP",
+   "BC-CLI-BUILD-OUT",
+   "BC-CLI-USAGE"
+  ],
   "plan_baseline": "e6901e56033d6a30d51e36404d82e4c8d758f99e",
-  "plan_hash": "0a141fded0575e783889d32898ea7d888b1692589fbc2710bdbaf43967c0c5a6",
-  "specs": 8,
-  "to_approve": 8
+  "plan_hash": "bb09275139268f93cb668d61bf967d3bbdc40c734aea77d507770e127916bdfb",
+  "specs": 13,
+  "to_approve": 13
  },
  "seal_evaluator": {
   "approvals_kept": 0,
-  "bundle_sha256": "d5818db4c13c18625f129b251a5e864681c68eafe18f2aa9e2e7ce70929e069e",
+  "bundle_sha256": "3d87c6323ce23b722bd737bd51d9e0dd5a33e1ec213532b7d3e786a322ba279c",
   "committed_bundle_matches_fresh_seal": true,
+  "contracts": [
+   "HC-01",
+   "HC-02",
+   "HC-03",
+   "HC-04",
+   "HC-05",
+   "HC-06",
+   "HC-07",
+   "HC-08",
+   "HC-09",
+   "HC-12",
+   "HC-13",
+   "HC-14"
+  ],
   "plan_baseline": "e6901e56033d6a30d51e36404d82e4c8d758f99e",
-  "plan_hash": "9433f17023d622110d6566cc9811dcb429e28089c69cc06f45672ea5dd8496c4",
+  "plan_hash": "cba80e98ed29cd863f332bbde70409ea68935ed32cb39398c9fc7fdbd6a8fc9a",
   "specs": 12,
   "to_approve": 12
  },
- "started": "2026-10-18 13:04:23 +0700"
+ "started": "2026-10-18 14:09:22 +0700"
 }
