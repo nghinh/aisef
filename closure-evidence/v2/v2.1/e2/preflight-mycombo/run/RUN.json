@@ -1,0 +1,153 @@
+{
+ "admission": {
+  "admitted": true,
+  "engine_digest": "7668fc35709829d8324e914e0300b2b85221d9e83dedd32cd2c3996f761690c7",
+  "failed": [],
+  "result_digest": "c75e415edffcd8d110cc93b9e7d8aba4ebad7d8b817d0777f1ec721f28e7a3ea"
+ },
+ "budget": null,
+ "budget_stop": null,
+ "bundle_digest": "3daa296f33860a0a1b972c15630eee4af1a00b5797454d04fd2985fb858e2a67",
+ "delivery_blocked_by": [
+  "1 of the plan's stories did not commit: ['S1']"
+ ],
+ "delivery_verdict": "NOT_REACHED",
+ "failure": {
+  "detail": "the route is not attested: probe 0: served by 'MiniMax-M3', not 'mycombo' (an alias or a re-route); probe 1: served by 'MiniMax-M3', not 'mycombo' (an alias or a re-route); probe 2: served by 'MiniMax-M3', not 'mycombo' (an alias or a re-route)",
+  "stage": "preflight",
+  "type": "IdentityStop"
+ },
+ "final_main": "704b4e631ca15c646c6fb189cf0f83100102673d",
+ "finished": 1792302888.581355,
+ "format": "aisef-v2-run-record/1",
+ "generalization_claim": "NONE",
+ "journal": null,
+ "kernel_digest": "b28ff13adfae12178f831a2bac37c3df7abf3066f14374e5cb1155b675fe2f20",
+ "no_progress": [],
+ "plan_hash": "0abab4fbd9d57cef4ed5b10e154dc21781969e3cf9a411aa88f3d2fce2658fad",
+ "plan_quality_verdict": "NOT_CLAIMED",
+ "platform": {
+  "python": "3.14.7",
+  "system": "darwin"
+ },
+ "preflight": {
+  "accounting": {
+   "input_tokens": 6147,
+   "output_tokens": 6,
+   "provider_requests": 4,
+   "turns": 0,
+   "unaccounted": []
+  },
+  "observation": {
+   "declared_model": "mycombo",
+   "expected_listed_owner": "combo",
+   "expected_served_model": "mycombo",
+   "listing": {
+    "http": 200,
+    "id": "mycombo",
+    "listed": true,
+    "owned_by": "combo"
+   },
+   "probes": [
+    {
+     "http": 200,
+     "served_model": "MiniMax-M3",
+     "system_fingerprint": "NOT_EXPOSED"
+    },
+    {
+     "http": 200,
+     "served_model": "MiniMax-M3",
+     "system_fingerprint": "NOT_EXPOSED"
+    },
+    {
+     "http": 200,
+     "served_model": "MiniMax-M3",
+     "system_fingerprint": "NOT_EXPOSED"
+    }
+   ],
+   "route": "9router/mycombo"
+  },
+  "problems": [
+   "probe 0: served by 'MiniMax-M3', not 'mycombo' (an alias or a re-route)",
+   "probe 1: served by 'MiniMax-M3', not 'mycombo' (an alias or a re-route)",
+   "probe 2: served by 'MiniMax-M3', not 'mycombo' (an alias or a re-route)"
+  ],
+  "verdict": "OPAQUE"
+ },
+ "productproof": null,
+ "project": "calc",
+ "sessions": [],
+ "settings": {
+  "budget": {
+   "input_tokens": 30000000,
+   "output_tokens": 500000,
+   "provider_requests": 4,
+   "turns": 700
+  },
+  "client": "opencode",
+  "client_env": [
+   "NINEROUTER_API_KEY"
+  ],
+  "format": "aisef-v2-run/1",
+  "limits": {
+   "DEVELOPER": 2,
+   "ENVIRONMENT": 1,
+   "INTEGRATION": 0,
+   "PLAN": 0,
+   "PROVIDER": 1,
+   "REVIEW": 1,
+   "SECURITY": 1
+  },
+  "max_turns_per_session": 80,
+  "preflight": {
+   "chat_probes": 3
+  },
+  "provider": {
+   "api_key_env": "NINEROUTER_API_KEY",
+   "endpoint": "https://9router.vnteki.com/v1",
+   "listed_owner": "combo",
+   "model_limit": {
+    "context": 200000,
+    "output": 32768
+   },
+   "name": "9router",
+   "served_model": "mycombo"
+  },
+  "route": "9router/mycombo",
+  "timeouts_s": {
+   "developer": 1800,
+   "probe": 120,
+   "reviewer": 900,
+   "tool": 600
+  }
+ },
+ "stage": "preflight",
+ "started": 1792302878.692967,
+ "story_errors": [],
+ "story_outcomes": {},
+ "usage": {
+  "cost": {
+   "status": "unknown",
+   "value": null,
+   "why": "the settings give no price table"
+  },
+  "preflight": {
+   "input_tokens": 6147,
+   "output_tokens": 6,
+   "provider_requests": 4,
+   "turns": 0,
+   "unaccounted": []
+  },
+  "provider_requests_journaled": 0,
+  "retries": {},
+  "sessions": [],
+  "tokens": {
+   "cache_read": 0,
+   "cache_write": 0,
+   "input": 0,
+   "output": 0,
+   "reasoning": 0
+  },
+  "wall_s": 9.888
+ }
+}

@@ -1,0 +1,10 @@
+{
+ "provider": {
+  "9router": {
+   "options": {
+    "baseURL": "https://9router.vnteki.com/v1",
+    "apiKey": "{env:NINEROUTER_API_KEY}"
+   }
+  }
+ }
+}

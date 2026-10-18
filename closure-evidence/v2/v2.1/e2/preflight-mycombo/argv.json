@@ -1,0 +1,21 @@
+[
+ "nice",
+ "-n",
+ "19",
+ "/opt/homebrew/bin/python3",
+ "-P",
+ "-B",
+ "-m",
+ "aisef",
+ "run",
+ "--project",
+ "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/e2-pf/calc/approved.json",
+ "--settings",
+ "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/e2-pf/probe-settings.json",
+ "--repo",
+ "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/e2-pf/calc/repo",
+ "--out",
+ "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/e2-pf/preflight-mycombo/run",
+ "--anchor-out",
+ "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/e2-pf/preflight-mycombo/run.anchor"
+]

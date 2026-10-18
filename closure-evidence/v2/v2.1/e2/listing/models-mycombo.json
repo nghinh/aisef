@@ -1,0 +1,38 @@
+{
+ "http": "http 200 bytes 512468",
+ "models_listed": 1182,
+ "mycombo_rows": [
+  {
+   "id": "mycombo",
+   "object": "model",
+   "owned_by": "combo"
+  }
+ ],
+ "owned_by_values": {
+  "combo": 14,
+  "cx": 15,
+  "ds": 7,
+  "fm": 3,
+  "freellm": 415,
+  "gemini": 8,
+  "gemma4-26b": 1,
+  "gh": 46,
+  "kira-ai": 107,
+  "max": 8,
+  "minimax": 4,
+  "mt": 9,
+  "nvidia-gemma": 82,
+  "or": 462,
+  "tr": 1
+ },
+ "request": "GET https://9router.vnteki.com/v1/models (curl 8.7.1, bearer expanded inside curl from env NINEROUTER_API_KEY)",
+ "row_keys": {
+  "capabilities": 1168,
+  "context_length": 1168,
+  "id": 1182,
+  "max_completion_tokens": 1168,
+  "object": 1182,
+  "owned_by": 1182
+ },
+ "when": "2026-10-18 12:51:01 +0700"
+}
