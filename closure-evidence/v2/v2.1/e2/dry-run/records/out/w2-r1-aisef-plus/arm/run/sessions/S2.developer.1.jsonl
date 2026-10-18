@@ -1,0 +1,2 @@
+{"type": "text", "part": {"text": "wrote w2 S2 (wrong: S3)"}}
+{"type": "step_finish", "part": {"tokens": {"input": 120, "output": 7, "reasoning": 3, "cache": {"read": 10, "write": 0}}}}

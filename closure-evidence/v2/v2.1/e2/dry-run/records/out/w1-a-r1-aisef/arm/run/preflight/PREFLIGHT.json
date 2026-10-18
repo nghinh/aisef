@@ -1,0 +1,40 @@
+{
+ "accounting": {
+  "input_tokens": 27,
+  "output_tokens": 3,
+  "provider_requests": 4,
+  "turns": 0,
+  "unaccounted": []
+ },
+ "observation": {
+  "declared_model": "mycombo",
+  "expected_listed_owner": "combo",
+  "expected_served_model": "MiniMax-M3",
+  "listing": {
+   "http": 200,
+   "id": "mycombo",
+   "listed": true,
+   "owned_by": "combo"
+  },
+  "probes": [
+   {
+    "http": 200,
+    "served_model": "MiniMax-M3",
+    "system_fingerprint": "fp-dry-run"
+   },
+   {
+    "http": 200,
+    "served_model": "MiniMax-M3",
+    "system_fingerprint": "fp-dry-run"
+   },
+   {
+    "http": 200,
+    "served_model": "MiniMax-M3",
+    "system_fingerprint": "fp-dry-run"
+   }
+  ],
+  "route": "9router/mycombo"
+ },
+ "problems": [],
+ "verdict": "ATTESTED"
+}

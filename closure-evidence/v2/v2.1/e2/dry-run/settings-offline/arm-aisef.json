@@ -1,0 +1,45 @@
+{
+ "budget": {
+  "input_tokens": 30000000,
+  "output_tokens": 500000,
+  "provider_requests": 58,
+  "turns": 700
+ },
+ "client": "opencode",
+ "client_env": [
+  "AISEF_DRYRUN_KEY",
+  "AISEF_DRYRUN_WRONG"
+ ],
+ "format": "aisef-v2-run/1",
+ "limits": {
+  "DEVELOPER": 2,
+  "ENVIRONMENT": 1,
+  "INTEGRATION": 0,
+  "PLAN": 0,
+  "PROVIDER": 1,
+  "REVIEW": 1,
+  "SECURITY": 1
+ },
+ "max_turns_per_session": 80,
+ "preflight": {
+  "chat_probes": 3
+ },
+ "provider": {
+  "api_key_env": "AISEF_DRYRUN_KEY",
+  "endpoint": "http://127.0.0.1:47311/v1",
+  "listed_owner": "combo",
+  "model_limit": {
+   "context": 200000,
+   "output": 32768
+  },
+  "name": "9router",
+  "served_model": "MiniMax-M3"
+ },
+ "route": "9router/mycombo",
+ "timeouts_s": {
+  "developer": 1800,
+  "probe": 120,
+  "reviewer": 900,
+  "tool": 600
+ }
+}

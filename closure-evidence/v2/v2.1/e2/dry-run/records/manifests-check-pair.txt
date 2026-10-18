@@ -1,0 +1,11 @@
+check w1-a-r1-aisef: PASS  seal 1066bbe9684956da arm aisef pair w1-a:rep1
+check w1-a-r1-aisef-plus: PASS  seal 940eee0415867da5 arm aisef+ pair w1-a:rep1
+check w1-a-r1-direct: PASS  seal d78390440a10c94c arm direct pair w1-a:rep1
+check w2-r1-aisef: PASS  seal 8f96ba68736068b5 arm aisef pair w2:rep1
+check w2-r1-aisef-plus: PASS  seal 187503fb468cb14e arm aisef+ pair w2:rep1
+check w2-r1-direct: PASS  seal d84e62f1c23b13ef arm direct pair w2:rep1
+pair w1-a:rep1: w1-a-r1-aisef vs w1-a-r1-aisef-plus: PASS
+pair w1-a:rep1: w1-a-r1-aisef vs w1-a-r1-direct: PASS
+pair w2:rep1: w2-r1-aisef vs w2-r1-aisef-plus: PASS
+pair w2:rep1: w2-r1-aisef vs w2-r1-direct: PASS
+manifests: 6 checked, 4 pairings, all PASS

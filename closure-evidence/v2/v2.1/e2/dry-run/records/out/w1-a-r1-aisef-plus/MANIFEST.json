@@ -1,0 +1,110 @@
+{
+ "bundle": {
+  "sha256": "2817ea87104e4321361afabe654b1b7187f5f29523c560ba53405da74ddde4e3"
+ },
+ "client": {
+  "adapter_version": "aisef2.app.client",
+  "exe": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/e2-dry/client/opencode",
+  "name": "opencode",
+  "sha256": "1df208d66283aeb3987b008cb8377c2b498bbfb1d03f39c4274ff399b8bc18f1",
+  "version": "0.0.0-dry-run-fake"
+ },
+ "command": {
+  "argv": [
+   "/opt/homebrew/opt/python@3.14/bin/python3.14",
+   "-P",
+   "-m",
+   "aisef",
+   "run",
+   "--project",
+   "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/e2-dry/approved/w1-a-arms.json",
+   "--settings",
+   "/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/wf_9365a942-a61-2/closure-evidence/v2/v2.1/e2/dry-run/settings-offline/arm-aisef-plus.json",
+   "--repo",
+   "<ws>",
+   "--out",
+   "<out>/run",
+   "--anchor-out",
+   "<out>/run.anchor"
+  ],
+  "sha256": "3fd0060104f4a54e2e7eb6b2689033812160b9ed9d29a24c8daa4ae6579072b1"
+ },
+ "created_at": "2026-10-18T08:30:55+00:00",
+ "environment": {
+  "env_allowlist": [
+   "AISEF_DRYRUN_KEY",
+   "AISEF_DRYRUN_WRONG"
+  ],
+  "network": "provider",
+  "python": "3.14.7",
+  "system": "darwin"
+ },
+ "evaluator": {
+  "contracts": 12,
+  "exposed_to_developer": false,
+  "sha256": "119ed59d60266c098d0b1252b592ff8aaa4d0752ccf00acc721e9933147d019d"
+ },
+ "experiment_id": "w1-a-r1-aisef-plus",
+ "format": "aisef.experiment/1",
+ "limits": {
+  "budget": {
+   "input_tokens": 30000000,
+   "output_tokens": 500000,
+   "provider_requests": 58,
+   "turns": 700
+  },
+  "max_turns_per_session": 80,
+  "timeouts_s": {
+   "developer": 1800.0,
+   "probe": 120.0,
+   "reviewer": 900.0,
+   "tool": 600.0
+  }
+ },
+ "manifest_sha256": "940eee0415867da5ffdec7bb9dd652adf37d7148f22682f66633a80d97870937",
+ "model": {
+  "declared": "mycombo",
+  "identity_confidence": "provider_reported",
+  "reason": "every arm samples the kernel's preflight gate (aisef2/app/preflight: the route's model listed, every chat probe served by settings provider.served_model under one deployment fingerprint, or the arm is refused with candidate null) \u2014 the provider's own report, never a verification of weights; a router alias whose backing model varies per request fails it",
+  "route": "9router/mycombo"
+ },
+ "pair": {
+  "arm": "aisef+",
+  "pair_id": "w1-a:rep1"
+ },
+ "parent_experiment_id": null,
+ "policy": {
+  "note": "the settings without `review` (the arm's variable)",
+  "sha256": "d78157f3084c4ee4c399974ee15ed1ad611da948f8800013d02fd3db4040efae"
+ },
+ "source": {
+  "archive_sha256": "c557e08b3c6307a5af8092002bc4231ad8ac7c2102eeaa1638c382eec0142c32",
+  "archive_size": 20480,
+  "commit": "e6901e56033d6a30d51e36404d82e4c8d758f99e",
+  "files_sha256": "c01f60eeb379acc1ae83fa6db55d524908ee5df2185122fa188413a9f9169e68",
+  "git_version": "git version 2.53.0",
+  "repo": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/e2-dry/base/w1-a",
+  "tree": "0f759f57e89b59283eac5670d1241274e97b4181"
+ },
+ "stop_rule": {
+  "kind": "fixed_n",
+  "n": 6
+ },
+ "variable_under_test": {
+  "name": "orchestration",
+  "value": {
+   "arm": "aisef+",
+   "review": {
+    "finder": "model",
+    "min_severity": "high",
+    "policy": "fix-loop"
+   }
+  }
+ },
+ "workload": {
+  "id": "w1-a",
+  "requirements_path": "docs/requirements.md",
+  "requirements_sha256": "630740d3ec0c1343444024726f30758ca0dd3406b3b66f83c8e5be00c10cf373",
+  "task_sha256": "115f2662b19e7c71b382f7fd604c24d5291520b8637894d38523ca38b65df6a0"
+ }
+}
