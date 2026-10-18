@@ -2,8 +2,7 @@
 the same client, model, task and budget, run one after the other from a CAMPAIGN.json, every record under OUT.
 
     python -P validation/experiments/campaign.py run --campaign CAMPAIGN.json --out OUT --client-exe PATH
-            --client-version STR --identity {verified,provider_reported,unverified} --identity-reason STR
-            [--max-runs N] [--stop-on-unknown]            # --max-runs 0: seal and check every manifest, start nothing
+            --client-version STR [--max-runs N] [--stop-on-unknown]   # --max-runs 0: seal and check every manifest, start nothing
     python -P validation/experiments/campaign.py replay --out OUT        # every candidate evaluated again, offline
     python -P validation/experiments/campaign.py summary --out OUT       # one JSON row per workload x arm
 
@@ -13,26 +12,44 @@ to the file. The runs of one workload and rep are one pair (`pair_id`): their ma
 its settings' `review` (`variable_under_test.value`); everything else — client, route, source commit, evaluator, bundle,
 the settings without `review`, the budget — is sealed equal, or the campaign refuses to start (harness.pair_problems).
 
-Before any paid work every run's manifest is built, sealed and written to OUT/<run_id>/MANIFEST.json (once: an existing
-one is reused, never rewritten). Then, run by run: a fresh clone of the workload at its commit, the arm, the candidate
-frozen (commit, tree, archive and file digests), the hidden evaluator on it, the leak scan over the arm's session
-streams, the usage read (direct: the client's streams through app/client.Budget and app/usage; aisef: RUN.json), and
-OUT/<run_id>/RESULT.json — written for a failed arm too. A run whose RESULT.json exists is skipped (resume). The
-driver stops at OUT/STOP, at --max-runs, and (--stop-on-unknown) after an arm whose cost is not known and whose spend
-is unaccounted. Never the source repository itself; nothing only in a temporary directory.
+Before any paid work: --client-exe is a file named exactly `opencode`, and the PATH every arm's subprocess gets — its
+directory, then only python's and git's, then /usr/bin:/bin — resolves `opencode` to that same file (an aisef arm finds
+the client on PATH, app/run.client_on_path; the direct arm is handed it: one binary, its realpath and sha256 in every
+manifest's `client`); each run's bundle (and its evaluator, when it carries a plan) names the workload's commit as its
+plan baseline; every run's manifest is built, sealed and written to OUT/<run_id>/MANIFEST.json (once: an existing one
+is reused, never rewritten), checked and paired. Then, run by run: a fresh clone of the workload at its commit with no
+remote, the arm, the candidate frozen (commit, tree, archive and file digests), the hidden evaluator on it, the leak
+scan over the arm's session streams, the usage read (direct: the preflight's ledger and the client's streams through
+app/client.Budget and app/usage; aisef: RUN.json), and OUT/<run_id>/RESULT.json — written for a failed arm too. A run
+whose RESULT.json exists is skipped (resume). The driver stops at OUT/STOP, at --max-runs, and (--stop-on-unknown)
+after an arm whose cost is not known and whose spend is unaccounted. Never the source repository itself; nothing only
+in a temporary directory.
 
-Known limit, recorded not hidden: an aisef arm's preflight (aisef2/app/preflight) attests the route only when every
-probe is served by settings `provider.served_model` under one fingerprint — a router alias whose backing model varies
-per request is an identity stop there, kept as that run's RESULT.json (candidate null)."""
+Both arms sample one gate before any session: the client's configured endpoint for the settings' provider is the
+settings' endpoint, and the kernel's preflight (aisef2/app/preflight) attests the route — the aisef arms inside `aisef
+run` (app/run.execute, stage preflight), the direct arm here (<arm>/preflight/PREFLIGHT.json, its requests in the arm's
+budget). Refused at the gate, an arm is a failed one: candidate null, `identity: OPAQUE`, its record kept. So the
+manifests' model identity is `provider_reported` for every arm: what the gate measures is the provider's own report
+(the listing, the served model, one deployment fingerprint) — never a verification of weights — and a router alias
+whose backing model varies per request fails it.
+
+An aisef arm's candidate is RUN.json's `final_main` only when its `delivery_verdict` is PASS (app/run.delivery: PASS,
+FAIL or NOT_REACHED): the kernel clones before its gates and leaves `final_main` at the baseline after an identity
+stop, a budget stop or a refusal (closure-evidence/v2/v2.1/canary/tier-1/run/RUN.json) — that is a failed arm, not a
+candidate of 0/N. The plan's false rejection (EXPERIMENT-PLAN.md): for every story the run rolled back, the candidates
+the journal names for it are looked up in the arm's repository and, present, put to the hidden evaluator
+(`false_rollbacks` in RESULT.json and the summary)."""
 
 from __future__ import annotations
 
 import argparse
 import datetime
+import functools
 import json
 import os
 import pathlib
 import platform
+import shutil
 import subprocess
 import sys
 import tarfile
@@ -43,9 +60,42 @@ ROOT = pathlib.Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from aisef2.app import preflight  # noqa: E402
 from validation.experiments import harness as H  # noqa: E402
 
 NO_EVALUATION = {"total": None, "satisfied": None, "not_satisfied": None}
+#: the direct arm's gate (an offline test stubs it here; the kernel's own call is inside `aisef run`)
+preflight_run = preflight.run
+#: every manifest's model identity: the one gate both arms sample, and what it is not
+MODEL_IDENTITY = {
+    "identity_confidence": "provider_reported",
+    "reason": "every arm samples the kernel's preflight gate (aisef2/app/preflight: the route's model listed, every chat "
+              "probe served by settings provider.served_model under one deployment fingerprint, or the arm is refused with "
+              "candidate null) — the provider's own report, never a verification of weights; a router alias whose backing "
+              "model varies per request fails it"}
+
+
+def client_path(exe: str) -> tuple[str, str, str | None]:
+    """The client every arm runs and the PATH their subprocesses get: --client-exe's own directory first, then only what
+    python and git need, then /usr/bin:/bin — so the `opencode` an aisef arm finds on PATH (app/run.client_on_path) is
+    the file the direct arm is handed. (realpath, PATH, why it is refused | None)."""
+    p = pathlib.Path(exe)
+    real = os.path.realpath(exe)
+    path = os.pathsep.join([os.path.dirname(os.path.abspath(exe)), os.path.dirname(sys.executable),
+                            os.path.dirname(shutil.which("git") or "/usr/bin/git"), "/usr/bin", "/bin"])
+    if p.name != "opencode" or not p.is_file():
+        return real, path, f"--client-exe {exe} is a file whose basename is exactly 'opencode' (the name every arm resolves)"
+    found = shutil.which("opencode", path=path)
+    if not found or os.path.realpath(found) != real:
+        return real, path, f"`opencode` on the arms' PATH ({path}) resolves to {found}, not to --client-exe {real}"
+    return real, path, None
+
+
+@functools.lru_cache(maxsize=None)
+def client_identity(exe: str) -> dict:
+    """What binds the client across the pair (harness.pair_problems: `client` is not PAIR_FREE)."""
+    real = os.path.realpath(exe)
+    return {"exe": real, "sha256": H.sha(pathlib.Path(real).read_bytes())}
 
 
 def now() -> str:
@@ -97,8 +147,8 @@ def frozen(repo: pathlib.Path, sha: str) -> dict:
 
 
 def manifest(run: dict, n_runs: int, a: argparse.Namespace) -> dict:
-    """One run's sealed manifest: every KEYS field of harness (the client's version and the model's identity are the
-    operator's words, --client-version and --identity/--identity-reason: the driver never runs the client itself)."""
+    """One run's sealed manifest: every KEYS field of harness (the client's version is the operator's word,
+    --client-version: the driver never runs the client itself; its bytes are hashed, MODEL_IDENTITY is the gate's)."""
     from aisef2.app import settings as S
     st = S.read(run["settings_path"])
     w = run["workload"]
@@ -116,8 +166,8 @@ def manifest(run: dict, n_runs: int, a: argparse.Namespace) -> dict:
         "bundle": {"sha256": H.sha(pathlib.Path(run["bundle_path"]).read_bytes())},
         "policy": {"sha256": H.sha(H.canonical(policy)), "note": "the settings without `review` (the arm's variable)"},
         "command": {"argv": argv, "sha256": H.sha(H.canonical(argv))},
-        "client": {"name": st.client, "version": a.client_version, "adapter_version": "aisef2.app.client"},
-        "model": {"declared": st.model, "route": st.route, "identity_confidence": a.identity, "reason": a.identity_reason},
+        "client": {"name": st.client, "version": a.client_version, "adapter_version": "aisef2.app.client", **client_identity(a.client_exe)},
+        "model": {"declared": st.model, "route": st.route, **MODEL_IDENTITY},
         "environment": {"python": platform.python_version(), "system": platform.system().lower(), "network": "provider",
                         "env_allowlist": list(st.client_env)},
         "variable_under_test": {"name": "orchestration", "value": {"arm": run["arm"], "review": st.content.get("review")}},
@@ -133,10 +183,27 @@ def command(run: dict, a: argparse.Namespace) -> list[str]:
             "--repo", "<ws>", "--out", "<out>/run", "--anchor-out", "<out>/run.anchor"]
 
 
+def baseline_problems(run: dict) -> list[str]:
+    """The bundle starts from the workload's commit — its plan.baseline is that full sha — and so does the evaluator
+    when it carries a plan; else the run cannot start and no manifest of it is written."""
+    w = run["workload"]
+    full = H.git(w["repo"], "rev-parse", "--verify", f"{w['commit']}^{{commit}}")
+    out = []
+    for name in ("bundle_path", "evaluator_path"):
+        base = (read_json(run[name]).get("plan") or {}).get("baseline")
+        if (base is None and name == "bundle_path") or (base is not None and base != full):
+            out.append(f"{name} {run[name]}: plan.baseline {base} is not the workload's commit {full}")
+    return out
+
+
 def seal_all(runs: list[dict], out: pathlib.Path, a: argparse.Namespace) -> tuple[dict[str, dict], list[str]]:
     """Every run's manifest sealed and written (or reused), checked, and paired: the problems that forbid a start."""
     manifests, problems = {}, []
     for r in runs:
+        bad = baseline_problems(r)
+        if bad:
+            problems += [f"{r['run_id']}: {x}" for x in bad]
+            continue
         p = out / r["run_id"] / "MANIFEST.json"
         if p.exists():
             m = read_json(p)
@@ -148,7 +215,8 @@ def seal_all(runs: list[dict], out: pathlib.Path, a: argparse.Namespace) -> tupl
         problems += [f"{r['run_id']}: {x}" for x in H.check(m)]
     groups: dict[str, list[dict]] = {}
     for r in runs:
-        groups.setdefault(pair_id(r), []).append(r)
+        if r["run_id"] in manifests:
+            groups.setdefault(pair_id(r), []).append(r)
     for pid, members in groups.items():
         first = manifests[members[0]["run_id"]]
         for r in members[1:]:
@@ -158,61 +226,144 @@ def seal_all(runs: list[dict], out: pathlib.Path, a: argparse.Namespace) -> tupl
 
 
 def direct(run: dict, m: dict, arm_dir: pathlib.Path, a: argparse.Namespace) -> dict:
-    """Arm direct through harness.direct_arm: the client once on the public task, under the settings' route,
-    environment, budget and turn cap; a session is one provider request (app/client), so the budget counts the
-    streams it started — with no journal, a requests() of 0 would read every session as unaccounted and stop it."""
+    """Arm direct behind the aisef arms' gate (app/run.execute, stage preflight): the client's configured endpoint for
+    the settings' provider is the settings' endpoint, then the kernel's preflight attests the route — its ledger and
+    PREFLIGHT.json under <arm>/preflight, its requests the base of the arm's budget and in its usage. Refused at
+    either, the arm is a failed one (candidate null, `identity: OPAQUE`, ARM.json says why) and no session starts.
+    Attested: harness.direct_arm — the client once on the public task, under the settings' route, the arms' PATH,
+    budget and turn cap; a session is one provider request (app/client), so the budget counts the streams it started
+    — with no journal, a requests() of 0 would read every session as unaccounted and stop it."""
     from aisef2.app import client, settings as S, usage as U
     st = S.read(run["settings_path"])
-    sessions = arm_dir / "sessions"
-    budget = client.Budget(st.budget, dict.fromkeys(client.Budget.KEYS, 0), sessions,
+    sessions, started = arm_dir / "sessions", time.time()
+    configured, config_key = client.configured_provider(st.provider)
+    key = os.environ.get(st.api_key_env, "") if st.api_key_env else config_key
+    rec: dict = {"arm": "direct", "manifest_sha256": m["manifest_sha256"], "candidate": None, "configured_endpoint": configured}
+    pre = None
+    if configured != st.endpoint:
+        rec["error"] = (f"the client's configuration sends provider {st.provider} to {configured}, not to the settings' "
+                        f"endpoint {st.endpoint}: no session started")
+    else:
+        try:
+            pre = preflight_run(st.route, st.chat_probes, preflight.http_transport(st.endpoint, key), arm_dir / "preflight",
+                                st.served_model, st.listed_owner)
+        except preflight.IdentityStop as e:
+            rec.update(identity="OPAQUE", error=f"identity: OPAQUE — {e}")
+        else:
+            rec["preflight"] = {"verdict": pre["verdict"], "problems": pre["problems"], "accounting": pre["accounting"]}
+            if pre["verdict"] != "ATTESTED" or pre["accounting"]["unaccounted"]:
+                rec.update(identity="OPAQUE", error="identity: OPAQUE — the route is not attested: " + "; ".join(
+                    pre["problems"] + [f"preflight requests unaccounted: {pre['accounting']['unaccounted']}"] * bool(pre["accounting"]["unaccounted"])))
+    budget = client.Budget(st.budget, pre["accounting"] if pre else dict.fromkeys(client.Budget.KEYS, 0), sessions,
                            requests=lambda: len(list(sessions.glob("*.jsonl"))) if sessions.is_dir() else 0)
-    key = os.environ.get(st.api_key_env, "") if st.api_key_env else client.configured_provider(st.provider)[1]
-    kw = {"model": st.route, "env": client.environment(st.client_env, client.overlay(st.route, st.model_limit)),
-          "budget": budget, "turn_cap": st.max_turns_per_session,
-          "secrets": tuple(v for v in (*(os.environ.get(n, "") for n in st.client_env), key) if len(v) >= 8)}
-    started = time.time()
-    rec = H.direct_arm(m, arm_dir, task=run["workload"]["task_text"], client_exe=a.client_exe, session_kw=kw,
-                       timeout_s=st.timeouts_s["developer"])
+    if "error" in rec:
+        arm_dir.mkdir(parents=True, exist_ok=True)
+        write_once(arm_dir / "ARM.json", rec)
+    else:
+        env = {**client.environment(st.client_env, client.overlay(st.route, st.model_limit)), "PATH": a.path}
+        kw = {"model": st.route, "env": env, "budget": budget, "turn_cap": st.max_turns_per_session,
+              "secrets": tuple(v for v in (*(os.environ.get(n, "") for n in st.client_env), key) if len(v) >= 8)}
+        rec.update(H.direct_arm(m, arm_dir, task=run["workload"]["task_text"], client_exe=a.client_exe, session_kw=kw,
+                                timeout_s=st.timeouts_s["developer"], configured_endpoint=configured, preflight=rec["preflight"]))
     finished = time.time()
     n = len(list(sessions.glob("*.jsonl"))) if sessions.is_dir() else 0
     usage = U.usage(arm_dir, [{"type": "provider/request", "data": {}}] * n, st.prices, {"started": started, "finished": finished})
     return {**rec, "sessions": sessions, "repo": arm_dir / "ws",
-            "usage": {"budget": budget.account(), **usage, "source": "app/client.Budget over the arm's session streams; app/usage.usage"}}
+            "usage": {"budget": budget.account(), **usage,
+                      "source": "app/client.Budget over the preflight's ledger and the arm's session streams; app/usage.usage"}}
 
 
 def aisef(run: dict, m: dict, arm_dir: pathlib.Path, a: argparse.Namespace) -> dict:
     """Arms aisef and aisef+: `aisef run` as a subprocess on a fresh clone at the baseline (the canaries' invocation,
-    closure-evidence/v2/v2.1/canary/*/run-tier*.sh); stdout, stderr and the exit kept beside the run directory. The
-    candidate is the delivered main of the run's own clone (<out>/run/repo), as RUN.json's final_main names it."""
+    closure-evidence/v2/v2.1/canary/*/run-tier*.sh) with no remote, under the arms' PATH; stdout, stderr and the exit
+    kept beside the run directory; the record from RUN.json (aisef_record)."""
     if arm_dir.exists():
         raise ValueError(f"{arm_dir} exists: an arm's directory is never reused")
     arm_dir.mkdir(parents=True)
     ws = arm_dir / "ws"
     subprocess.run(["git", "clone", "--quiet", "--no-hardlinks", m["source"]["repo"], str(ws)], check=True, capture_output=True)
     H.git(ws, "checkout", "--quiet", "-B", "main", m["source"]["commit"])
+    H.git(ws, "remote", "remove", "origin")      # the kernel clones ws again; two hops from a session, none to the source
     argv = [sys.executable, "-P", "-m", "aisef", "run", "--project", run["bundle_path"], "--settings", run["settings_path"],
             "--repo", str(ws), "--out", str(arm_dir / "run"), "--anchor-out", str(arm_dir / "run.anchor")]
-    env = {**os.environ, "PYTHONPATH": str(ROOT), "PYTHONDONTWRITEBYTECODE": "1",
-           "PATH": os.pathsep.join([str(pathlib.Path(a.client_exe).resolve().parent), os.environ.get("PATH", "")])}
+    env = {**os.environ, "PYTHONPATH": str(ROOT), "PYTHONDONTWRITEBYTECODE": "1", "PATH": a.path}
     started = time.time()
     with (arm_dir / "run.stdout").open("wb") as o, (arm_dir / "run.stderr").open("wb") as e:
         p = subprocess.run(argv, stdout=o, stderr=e, env=env, cwd=str(arm_dir))
     finished = time.time()
     (arm_dir / "exit.txt").write_text(f"{p.returncode}\n", encoding="utf-8")
+    return aisef_record(run, m, arm_dir, p.returncode, round(finished - started, 3))
+
+
+def aisef_record(run: dict, m: dict, arm_dir: pathlib.Path, exit_code: int | None, wall_s: float | None) -> dict:
+    """An aisef arm's record from <arm>/run/RUN.json. The candidate is the run's `final_main` only when its
+    `delivery_verdict` is PASS (app/run.delivery: PASS, FAIL, NOT_REACHED): the kernel clones before its gates and sets
+    `final_main` to its clone's main whatever stopped the run — an identity stop, a budget stop, a refusal leave it at
+    the baseline (closure-evidence/v2/v2.1/canary/tier-1/run/RUN.json: NOT_REACHED, final_main = baseline). That, or a
+    run that left no RUN.json, is a failed arm: candidate null, the evaluation not run, the failure in the record."""
+    from aisef2.app import lineage
     run_json = arm_dir / "run" / "RUN.json"
     rec = read_json(run_json) if run_json.exists() else {}
-    repo = arm_dir / "run" / "repo"
-    candidate = rec.get("final_main") or (H.git(repo, "rev-parse", "main") if (repo / ".git").exists() else None)
-    return {"arm": run["arm"], "manifest_sha256": m["manifest_sha256"], "candidate": candidate, "exit": p.returncode,
-            "wall_s": round(finished - started, 3), "sessions": arm_dir / "run" / "sessions", "repo": repo,
-            "run": {k: rec.get(k) for k in ("delivery_verdict", "delivery_blocked_by", "story_outcomes", "final_main",
-                                              "failure", "budget_stop", "stage")},
-            "usage": {"budget": rec.get("budget"), **(rec.get("usage") or {}), "source": "<out>/run/RUN.json usage and budget (app/run.execute)"}}
+    verdict = rec.get("delivery_verdict")
+    out = {"arm": run["arm"], "manifest_sha256": m["manifest_sha256"], "candidate": rec.get("final_main") if verdict == "PASS" else None,
+           "exit": exit_code, "wall_s": wall_s, "sessions": arm_dir / "run" / "sessions", "repo": arm_dir / "run" / "repo",
+           "journal": arm_dir / "run" / lineage.JOURNAL,
+           "run": {**{k: rec.get(k) for k in ("delivery_verdict", "delivery_blocked_by", "story_outcomes", "final_main",
+                                                "failure", "budget_stop", "stage")},
+                   "preflight_verdict": (rec.get("preflight") or {}).get("verdict")},
+           "usage": {"budget": rec.get("budget"), **(rec.get("usage") or {}), "source": "<out>/run/RUN.json usage and budget (app/run.execute)"}}
+    if verdict != "PASS":
+        out["error"] = (f"aisef run not delivered: delivery_verdict={verdict!r} stage={rec.get('stage')!r} "
+                        f"failure={rec.get('failure')!r} blocked_by={rec.get('delivery_blocked_by')!r}" if rec
+                        else f"aisef run left no RUN.json (exit {exit_code})")[:2000]
+    return out
 
 
 def rollback(arm_rec: dict) -> bool:
     """An aisef arm whose RUN.json shows a story rolled back (story_outcomes, the journal's story/rollback)."""
     return any("ROLLBACK" in v for v in ((arm_rec.get("run") or {}).get("story_outcomes") or {}).values())
+
+
+def journal_events(path: pathlib.Path) -> list[dict]:
+    """The journal's rows, raw (format 3: one {"chain", "event"} per line); RUN.json's journal.sha256 binds the file
+    and `aisef run --verify` checks the chain — this reader only looks events up."""
+    return [json.loads(line)["event"] for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+
+
+def false_rollbacks(arm_rec: dict, evaluator: dict) -> list[dict]:
+    """EXPERIMENT-PLAN.md's false rejection, per story the run rolled back (RUN.json story_outcomes holding ROLLBACK):
+    the candidates the journal names for it — `proof/verified` rows' data.candidate, the only rows that carry the
+    candidate's sha (orchestrate/proof.prove); a story the developer or the admission failed names none, 'candidate not
+    in journal' — each looked up in the arm's repository (`git cat-file -e`: released worktrees leave the object until
+    a gc; gone, 'candidate object gone') and, present, put to the hidden evaluator (harness.evaluate). A story is a
+    false rollback when any candidate of it satisfies every hidden contract — all of them, not only the story's own:
+    simpler, and the evaluator is the workload's whole hidden truth."""
+    outcomes = (arm_rec.get("run") or {}).get("story_outcomes") or {}
+    rolled = sorted(s for s, v in outcomes.items() if "ROLLBACK" in v)
+    if not rolled:
+        return []
+    repo, journal = pathlib.Path(arm_rec["repo"]), pathlib.Path(arm_rec["journal"])
+    events = journal_events(journal) if journal.is_file() else []
+    out = []
+    for s in rolled:
+        shas = list(dict.fromkeys(e["data"]["candidate"] for e in events
+                                  if e["type"] == "proof/verified" and e["data"].get("story_id") == s and e["data"].get("candidate")))
+        row: dict = {"story": s, "outcomes": outcomes[s], "candidates": [], "false_rollback": False}
+        if not shas:
+            row["note"] = "candidate not in journal"
+        for sha in shas:
+            present = subprocess.run(["git", "-C", str(repo), "cat-file", "-e", f"{sha}^{{commit}}"], capture_output=True).returncode == 0
+            c: dict = {"sha": sha, "present": present, "evaluation": None}
+            if present:
+                ev = H.evaluate(repo, sha, evaluator)
+                c["evaluation"] = {k: ev[k] for k in ("total", "satisfied", "not_satisfied")}
+                c["passes"] = bool(ev["total"]) and not ev["not_satisfied"]
+                row["false_rollback"] = row["false_rollback"] or c["passes"]
+            else:
+                c["note"] = "candidate object gone"
+            row["candidates"].append(c)
+        out.append(row)
+    return out
 
 
 def unknown_spend(usage: dict) -> bool:
@@ -226,20 +377,23 @@ def record(run: dict, m: dict, arm_rec: dict, out: pathlib.Path, error: str | No
     with its wall time and raw exit, written once; one line to OUT/campaign.log."""
     evaluator = read_json(run["evaluator_path"])
     repo, candidate, sessions = arm_rec.get("repo"), arm_rec.get("candidate"), arm_rec.get("sessions")
-    evaluation, froze = None, None
-    if candidate and repo and (pathlib.Path(repo) / ".git").exists():
-        try:
+    error = error or arm_rec.get("error")
+    evaluation, froze, rolled = None, None, []
+    try:
+        if candidate and repo and (pathlib.Path(repo) / ".git").exists():
             froze = frozen(pathlib.Path(repo), candidate)
             evaluation = H.evaluate(pathlib.Path(repo), candidate, evaluator)
-        except Exception as e:  # noqa: BLE001 — a candidate that does not evaluate is recorded as such
-            error = f"{error + '; ' if error else ''}evaluate: {type(e).__name__}: {e}"[:2000]
+        rolled = false_rollbacks(arm_rec, evaluator)
+    except Exception as e:  # noqa: BLE001 — a candidate that does not evaluate is recorded as such
+        error = f"{error + '; ' if error else ''}evaluate: {type(e).__name__}: {e}"[:2000]
     leaked = H.leaks(pathlib.Path(sessions), evaluator) if sessions and pathlib.Path(sessions).is_dir() else []
     res = H.result(m, arm_rec, evaluation or NO_EVALUATION, arm_rec.get("usage") or {}, leaked)
     res.update(run_id=run["run_id"], workload=run["workload"]["id"], rep=run["rep"], exit=arm_rec.get("exit"),
                wall_s=arm_rec.get("wall_s"), candidate_frozen=froze, evaluator_path=run["evaluator_path"],
                candidate_repo=str(pathlib.Path(repo).resolve().relative_to(out.resolve())) if repo else None,
-               aisef_run=arm_rec.get("run"), rollback=rollback(arm_rec), self_reported=arm_rec.get("self_reported"),
-               error=error, recorded_at=now())
+               aisef_run=arm_rec.get("run"), rollback=rollback(arm_rec), false_rollbacks=rolled,
+               identity=arm_rec.get("identity"), configured_endpoint=arm_rec.get("configured_endpoint"),
+               preflight=arm_rec.get("preflight"), self_reported=arm_rec.get("self_reported"), error=error, recorded_at=now())
     write_once(out / run["run_id"] / "RESULT.json", res)
     ev = res["evaluation"]
     cost = (res["usage"].get("cost") or {}).get("value")
@@ -265,9 +419,11 @@ def run_campaign(a: argparse.Namespace) -> int:
             return 2
     else:
         copy.write_bytes(data)
-    if not pathlib.Path(a.client_exe).is_file():
-        print(f"refused: --client-exe {a.client_exe} is not a file", file=sys.stderr)
+    real, a.path, why = client_path(a.client_exe)
+    if why:
+        print(f"refused: {why}", file=sys.stderr)
         return 2
+    print(f"campaign: client {real} sha256 {client_identity(a.client_exe)['sha256']}; arms' PATH {a.path}")
     manifests, problems = seal_all(runs, out, a)
     for p in problems:
         print(f"FAIL  {p}")
@@ -340,8 +496,7 @@ def summary(a: argparse.Namespace) -> int:
             "workload": w, "arm": arm, "n": len(rs), "evaluated": len(ev),
             "satisfied_mean": round(sum(e["satisfied"] / e["total"] for e in ev) / len(ev), 4) if ev else None,
             "escaped_defects": sum(len(e["not_satisfied"]) for e in ev),
-            "false_rollbacks": sum(1 for r in rs if arm != "direct" and r["rollback"] and r["evaluation"]["total"]
-                                   and not r["evaluation"]["not_satisfied"]),
+            "false_rollbacks": sum(1 for r in rs for s in (r.get("false_rollbacks") or []) if s["false_rollback"]),
             "tokens": tokens,
             "requests": sum(int(((r["usage"].get("budget") or {}).get("spent") or {}).get("provider_requests") or 0) for r in rs),
             "wall_s": round(sum(float(r["wall_s"] or 0) for r in rs), 3),
@@ -356,10 +511,8 @@ def main(argv: list[str] | None = None) -> int:
     r = sub.add_parser("run", help="seal every manifest, then run the arms one after the other")
     r.add_argument("--campaign", required=True)
     r.add_argument("--out", required=True)
-    r.add_argument("--client-exe", required=True, help="the client binary (named opencode) every arm runs")
+    r.add_argument("--client-exe", required=True, help="the client binary, a file named exactly opencode, every arm runs")
     r.add_argument("--client-version", required=True, help="what `opencode --version` printed for the operator")
-    r.add_argument("--identity", required=True, choices=H.IDENTITY)
-    r.add_argument("--identity-reason", required=True)
     r.add_argument("--max-runs", type=int, default=10**9)
     r.add_argument("--stop-on-unknown", action="store_true")
     r.set_defaults(fn=run_campaign)
