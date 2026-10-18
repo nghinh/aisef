@@ -1,0 +1,44 @@
+{
+ "accounting": {
+  "input_tokens": 6147,
+  "output_tokens": 6,
+  "provider_requests": 4,
+  "turns": 0,
+  "unaccounted": []
+ },
+ "observation": {
+  "declared_model": "mycombo",
+  "expected_listed_owner": "combo",
+  "expected_served_model": "mycombo",
+  "listing": {
+   "http": 200,
+   "id": "mycombo",
+   "listed": true,
+   "owned_by": "combo"
+  },
+  "probes": [
+   {
+    "http": 200,
+    "served_model": "MiniMax-M3",
+    "system_fingerprint": "NOT_EXPOSED"
+   },
+   {
+    "http": 200,
+    "served_model": "MiniMax-M3",
+    "system_fingerprint": "NOT_EXPOSED"
+   },
+   {
+    "http": 200,
+    "served_model": "MiniMax-M3",
+    "system_fingerprint": "NOT_EXPOSED"
+   }
+  ],
+  "route": "9router/mycombo"
+ },
+ "problems": [
+  "probe 0: served by 'MiniMax-M3', not 'mycombo' (an alias or a re-route)",
+  "probe 1: served by 'MiniMax-M3', not 'mycombo' (an alias or a re-route)",
+  "probe 2: served by 'MiniMax-M3', not 'mycombo' (an alias or a re-route)"
+ ],
+ "verdict": "OPAQUE"
+}
