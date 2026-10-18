@@ -1,0 +1,242 @@
+{
+ "batch": "B03-continue_from",
+ "target": "aisef2/app/bundle_cli.py::continue_from",
+ "new": [
+  {
+   "target": "aisef2/app/bundle_cli.py::continue_from",
+   "index": 158,
+   "mutant": "L959 conditional negated",
+   "worker": "c3-w4"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::continue_from",
+   "index": 175,
+   "mutant": "L959 dict entry 0 dropped",
+   "worker": "c3-w4"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::continue_from",
+   "index": 179,
+   "mutant": "L965 string \" (a sessions directory, a session stream or the preflight's ledger that is gone comes back from such a copy); where that cannot be done this lineage cannot be continued (a run without --parent inherits nothing): \" emptied",
+   "worker": "c3-w4"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::continue_from",
+   "index": 191,
+   "mutant": "L958 element 1 dropped",
+   "worker": "c3-w4"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::continue_from",
+   "index": 193,
+   "mutant": "L958 element 3 dropped",
+   "worker": "c3-w4"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::continue_from",
+   "index": 194,
+   "mutant": "L958 element 4 dropped",
+   "worker": "c3-w4"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::continue_from",
+   "index": 195,
+   "mutant": "L959 string 'superseded' emptied",
+   "worker": "c3-w4"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::continue_from",
+   "index": 196,
+   "mutant": "L959 string 'superseded' emptied",
+   "worker": "c3-w4"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::continue_from",
+   "index": 197,
+   "mutant": "L959 True->False",
+   "worker": "c3-w4"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::continue_from",
+   "index": 208,
+   "mutant": "L967 string '; ' emptied",
+   "worker": "c3-w4"
+  }
+ ],
+ "covered": [
+  {
+   "target": "aisef2/app/bundle_cli.py::continue_from",
+   "index": 116,
+   "mutant": "L937 tuple() -> list()",
+   "worker": "c3-w4",
+   "class": "EQUIVALENT",
+   "group": "A01",
+   "grounds": "Proof from the code, unchanged since P2: Plan.__post_init__ (aisef2/plan/obligation.py:89-102) takes `tuple(self.obligations)` for a list or a tuple (:93), refuses an empty one or a non-PlanObligation (:94-95), REPLACES the field by the tuple (`object.__setattr__`, :96) and only then computes or compares plan_hash (:99-102). So `obligations=list(...)` and `tuple(...)` give the same frozen Plan: same field type, ==, plan_hash, plain(). `require_str_fields` (obligation.py:90; product/contract.py:172-176) reads only fields annotated exactly `str` (id, baseline; skip plan_hash); `obligations` is `tuple[PlanObligation, ...]`. In continue_from the local list `obligations` (L457-465) is not named after L466 and `new_plan` is read only by `plain(new_plan)` (L473). Differential at 289885e on T00a's two-story calc run (fake client): the whole continuation bundle and the whole report of the null mutant and of the mutant are deep-equal (no differing path).",
+   "consumers_checked": [
+    "aisef2/plan/obligation.py:89-110 (Plan.__post_init__, create, plan_hash)",
+    "aisef2/product/contract.py:47-70 (plain/canonical/digest/content_of), :172-176 (require_str_fields)",
+    "aisef2/app/bundle_cli.py:457-473 (the only uses of `obligations` and `new_plan`)",
+    "aisef2/app/bundle.py:143-148 `_plan` (the loader rebuilds the Plan from the stored tuple form)"
+   ],
+   "exceptions_checked": [
+    "empty list: refused identically (obligation.py:94) by both forms; cannot arise (one rebuilt obligation per plan obligation and a plan holds at least one)",
+    "an element that is not a PlanObligation: same refusal on both forms (:94), not reachable",
+    "a hash or identity of the Plan taken before __post_init__ replaced the field: none (frozen dataclass; nothing hashes before __post_init__ runs)",
+    "aliasing: `tuple(x)` of an exact tuple is the same object, `list(x)` a copy: the Plan holds an immutable tuple either way and the list is local"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "remapped_from": {
+    "index": 89,
+    "mutant": "L466 tuple() -> list()",
+    "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 89,
+     "mutant": "L429 tuple() -> list()",
+     "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+    },
+    "chain": [
+     {
+      "index": 89,
+      "mutant": "L429 tuple() -> list()",
+      "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+     },
+     {
+      "index": 89,
+      "mutant": "L466 tuple() -> list()",
+      "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::continue_from",
+   "index": 140,
+   "mutant": "L903 string '): a new project, not a continuation' emptied",
+   "worker": "c3-w4",
+   "class": "AUDITED",
+   "group": "T01-KERNEL-TAIL: an explanatory clause closing a refusal whose raise, cause phrase and objects are retained",
+   "grounds": "Conclusion holds; the sibling comparison of the carried grounds does not, and is corrected here. The mutant empties the second constant of the f-string at bundle_cli.py:428-430 (`'): a new project, not a continuation'`). Reproduced at the snapshot on a run whose RUN.json names another kernel: original '<run> ran another kernel (000000000000): a new project, not a continuation'; mutant '<run> ran another kernel (000000000000'. Raise site, class (BundleError), exit status 2 (main :576-578), the run directory, the cause phrase and the digest head are unchanged; T01b AnotherKernel (test_v21_kills3_T01b.py:182-196, 'Pins [172]') asserts exactly those: 'another kernel', the run's path, the recorded 12-hex head, and that the CURRENT kernel's head is not named (test_v21_continue_usage.py:200 asserts 'another kernel'). The removed tail restates the rule of the module docstring (:19) and of docs/v2.1/USAGE-2.1.md:99, which promise the REFUSAL, not its wording; it names no command, flag, path, id or limit and no override exists (`continue`'s options are bundle, --from-run, --out and --leave-out-unidentified, :533-537, the last about unidentified commits). Nothing in aisef2, aisef, validation, tests or docs matches or parses it. CORRECTION: the carried text says the explanatory tails 'that ARE tests in this function carry an instruction or a flag (L401 `run the bundle itself again`, L410, test:431 `continue the lineage from it`)'. At the snapshot only the flag is: T01b CommitsNothingIdentifies asserts '--leave-out-unidentified' (:270). 'run the bundle itself again' (L438) is asserted by no test: T01b NothingCommitted (:199-213) asserts the run path and 'committed no story', and the string mutant [119] is killed only because it removes that phrase with the tail; 'continue the lineage from it' is asserted at test_v21_continue_integrity.py:431 for lineage.py:161's RunRefused (the `execute` path), while for continue_from's L416 the tests assert only 'which began' (:427, :477). The project's practice is therefore: identifying elements are asserted, closing explanatory tails are not, whatever their wording; [115] survives only because the `{...[:12]}` interpolation makes the tail a constant of its own. In-process sweep with the mutant bound over the module (not only the kill set): the light modules (bundle_tools, identity, identity_bytes, review, experiment, context_pack, defects_*, kills_bundle_cli, kills3 A00-A24/R03/R04/T00a/T00b/T02a-T04a/T08a/T14a/T15a/T24a, tests/test_v21_bundle_dispatch): 31 modules, 326 tests, 0 failures, 0 errors; the heavy continue modules (kills3 T01a, T01b, TO1, T09b; continue_usage; continue_integrity with its real SIGKILL windows): 6 modules, 81 tests, 0 failures, 0 errors.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:576-578 main(): prints f'refused: {e}' to stderr and returns 2; the only caller of continue_from outside tests",
+    "aisef/cli/parser.py:424-426: `aisef bundle` hands argv to bundle_cli.main; nothing wraps or matches the message",
+    "git grep 'not a continuation|a new project|ran another kernel|another kernel' over aisef2, aisef, validation, tests, docs (closure-evidence aside): bundle_cli.py:19, 428-430, 451; tests/v2/test_v21_continue_usage.py:200; tests/v2/test_v21_kills3_T01b.py:182-196 (identifying elements); tests/v2/test_v21_kills3_T01a.py:269-290 (L451's 'not the bundle's'); tests/v2/test_c2_k_nowork_001.py:331 is a different producer (kn.check(): 'the kernel changed since the record')",
+    "docs/v2.1/USAGE-2.1.md:99 (the rule as a refusal), docs/v2.1/TRACEABILITY.md and docs/v2.1/research/TRACEABILITY.json 'contains' checks on bundle_cli.py (`def _create(`, `--leave-out-unidentified`, `sub.add_parser(\"continue\"`, `sub.add_parser(\"migrate\"`): none matches this text",
+    "validation/v21/cli_integration/run.sh:36-56 and e2e_guest.py: continue steps; no kernel refusal exercised or matched"
+   ],
+   "exceptions_checked": [
+    "a flag/command/path/id/limit in the tail that an operator needs: none, the tail is the rule; there is no override to name",
+    "a parser/classifier of the message (split at ':', startswith, regex on 'not a continuation'): none",
+    "the digest head moved or removed by the mutant: no, '({digest12}' is kept before the lost tail; an absent kernel_digest renders '(None' in both",
+    "an operator who has not read USAGE: loses the in-tool statement of the consequence (this is a new project); the cause phrase and exit status 2 stay and no wrong flag could be tried (stated residual, unchanged)",
+    "round 3: lineage.py/verify.py/run.py read RUN.json's kernel_digest nowhere new; the refusal's text is produced only here"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "remapped_from": {
+    "index": 115,
+    "mutant": "L429 string '): a new project, not a continuation' emptied",
+    "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 115,
+     "mutant": "L392 string '): a new project, not a continuation' emptied",
+     "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+    },
+    "chain": [
+     {
+      "index": 115,
+      "mutant": "L392 string '): a new project, not a continuation' emptied",
+      "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+     },
+     {
+      "index": 115,
+      "mutant": "L429 string '): a new project, not a continuation' emptied",
+      "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::continue_from",
+   "index": 152,
+   "mutant": "L937 string '-continued' emptied",
+   "worker": "c3-w4",
+   "class": "AUDITED",
+   "group": "T01-LABEL-PLANID: an id label inside an identity that is already distinct by hash",
+   "grounds": "Re-run at 289885e (diff on T00a's two-story run): the only paths of the continuation bundle that differ are /plan/id ('PLAN-calc2-continued' -> 'PLAN-calc2') and /plan/plan_hash (which binds the id); the report is identical. Everything derives from the stored bundle, so the id is consistent where it flows: plan/frozen (orchestrate/story_runner.py:138), plan/static-admitted (plan/static_admission.py:298), the 'no obligation in plan' texts (story_runner.py:153, story_admission.py:147) and PlanNotAdmitted (static_admission.py:308). The only 'once' rules on a plan id are per journal (journal/format3.py:168-169, projections/qualification_counters.py:34-36) and a continuation writes its own journal. Nothing compares plan ids across runs: the record carries plan_hash and `continues` {path, evidence_anchor, claim, account} but no plan id (run.py:352-360, 343-348), lineage.py and verify.py (L83-86, :131) name no plan id; `bundle migrate` (bundle_cli.py:128) already re-issues a plan with the SAME id and another hash, so the id is a label and the hash the identity. The child's plan_hash differs from the parent's irrespective of the suffix (new baseline and CARRIED obligations). No document or test pins the suffix.",
+   "consumers_checked": [
+    "git grep 'plan.id|plan_id|\"id\"' over aisef2, aisef, validation: story_runner.py:138,153; static_admission.py:67,298,308; story_admission.py:147; journal/event.py:200; journal/format3.py:147,168-169; qualification_counters.py:34-36 (every one inside one journal/run)",
+    "aisef2/app/run.py:343-360,371-384,502-503 (predecessor: record presence, anchor, claim, accounts; plan_hash only); aisef2/app/lineage.py and aisef2/app/verify.py (no plan id read)",
+    "aisef2/app/bundle.py:143-148 `_plan`, :162-202 `load` (id is any str; no PLAN-<name> rule at load); bundle_cli.py:128 (migrate keeps the id), :233 (seal sets PLAN-<name>)",
+    "round 3: review_verify.preserve names its artifact by story id and attempt (L408-440), run.evidence_manifest lists files by path: no plan id",
+    "validation/qualification/*.py emit plan.id of a fresh plan into their own records; none reads a continuation or keys by id",
+    "tests/v2/test_v21_continue_usage.py:133-170, test_v21_continue_integrity.py, T00a/T01a/T01b: assert stories, roles, baseline, outcomes, claims; no plan id and no hash literal"
+   ],
+   "exceptions_checked": [
+    "two plans of one lineage colliding in a once-per-run structure: structures are per journal and the child's journal is its own (second generation also continues)",
+    "a store keyed by plan id across runs (cohort, qualification, caches): none takes ids from a continuation",
+    "the child plan identical to the parent's: no, plan_hash differs by construction (shown by the differential: the hash differs under the mutant too)",
+    "continuing a continuation: the id would accumulate '-continued-continued' in the original and stay equal under the mutant; neither is read",
+    "a human tracing provenance from the id: a lost hint; provenance stays in RUN.json `continues`, the description (L474) and the CARRIED story"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "remapped_from": {
+    "index": 127,
+    "mutant": "L466 string '-continued' emptied",
+    "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 127,
+     "mutant": "L429 string '-continued' emptied",
+     "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+    },
+    "chain": [
+     {
+      "index": 127,
+      "mutant": "L429 string '-continued' emptied",
+      "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+     },
+     {
+      "index": 127,
+      "mutant": "L466 string '-continued' emptied",
+      "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::continue_from",
+   "index": 184,
+   "mutant": "L933 string 'carried: ' emptied",
+   "worker": "c3-w4",
+   "class": "AUDITED",
+   "group": "T01-LABEL-RATIONALE: the prose label of an ownership_rationale whose identifying elements (story, anchor, criterion) are retained and separately asserted",
+   "grounds": "Re-run at 289885e (diff on T00a's two-story run): out differs at exactly /plan/obligations[0]/ownership_rationale ('carried: S1 committed it in the run anchored 43acb11476ddcd6e (C-ADD)' -> 'S1 committed it in the run anchored ... (C-ADD)') and /plan/plan_hash; the report is identical. The field is prose for human review that no control path may read (plan/obligation.py:7-8; kernel_static_checks.py:55,167-176 flags attribute and getattr reads of it) and is hash-bound, so plan_hash follows its text and is recomputed from the stored plan at load. git grep for `ownership_rationale` / 'carried:' over aisef2, aisef, validation, tests, docs finds only the loader (bundle.py:146), the dumper (:158 via plain), the definition, the writer (bundle_cli.py:462), the static check and tests that read the rationale for its identifying elements; feedback.py, review_verify.py (`_approved_by_clause` L197-211 reads facts/specs/contracts), adapters.py and run.py build prompts and rows from facts, roles and specs, never from the plan's rationale, and `plain(plan)` appears only in bundle.dump. The fact the label stated (the obligation is carried) is carried in data: story_id == report['carried_as'] and role VERIFY (test_v21_continue_usage.py:142-143).",
+   "consumers_checked": [
+    "aisef2/app/bundle.py:143-148 (`_plan`: o['ownership_rationale'] into PlanObligation; no use of the text), :158 (plain(plan) out)",
+    "aisef2/plan/obligation.py:7-10, 37, 99-110",
+    "validation/v2/kernel_static_checks.py:55, 163-176 (NO_PROSE_CONTROL: attribute / getattr reads of text, rationale, ownership_rationale; subscript reads are not flagged and none exist)",
+    "aisef2/app/feedback.py, adapters.py, review_verify.py (round 3 added artifacts and a statement builder: L264-440 build from the finding, never from the plan's rationale), run.py:218-240 (delivery rows from spec/proof)",
+    "tests/v2/test_v21_kills3_T01b.py:306-319 and :329-350, tests/v2/test_v21_defects_bundlecli.py:164-183 (read the rationale as words: S1, the criterion, a >=12-hex prefix of the anchor, 'anchored <16 hex> (C-ADD)' / 'without a manifest'; they do not read the label and the mutant passes them)",
+    "tests/v2/test_v21_continue_usage.py:142-143 (the carried marking asserted in data)",
+    "docs/v2.1/USAGE-2.1.md:100-101 and ADR-V2.1: describe the CARRIED story and VERIFY obligations, never the rationale's wording"
+   ],
+   "exceptions_checked": [
+    "a reader detecting carried obligations by the 'carried:' prefix: none anywhere (grep 'carried:' finds bundle_cli.py:462 only); detection is by story_id and role",
+    "a continuation of a continuation: obligations of CARRIED are `done` of generation 2 and rebuilt at L459-463 with a fresh sentence (the previous text is replaced, never parsed)",
+    "a stored plan_hash compared with an independent value: recomputed from the stored plan at load; the report carries no hash, so no literal is pinned (the baseline sha is clock-dependent)",
+    "a prompt or report dumping plan obligations to a model or an operator: none of the prompt builders serialises them; the operator-visible output of continue is the report"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "remapped_from": {
+    "index": 157,
+    "mutant": "L462 string 'carried: ' emptied",
+    "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+   }
+  }
+ ]
+}

@@ -1,0 +1,164 @@
+{
+ "batch": "B05-seal",
+ "entries": [
+  {
+   "target": "aisef2/app/bundle_cli.py::seal",
+   "index": 7,
+   "mutant": "L510 tuple() -> list()",
+   "class": "EQUIVALENT",
+   "group": "g1: the `approvals` local is only truth-tested and iterated, never hashed/stored/returned",
+   "grounds": "L510 `approvals = tuple(approvals)` -> `list(approvals)`. The `approvals` local is read at exactly two sites after this line and nowhere else in seal (bundle_cli.py:510-589): L511 `if approvals and exposed is None` (a bool() test — an empty list and an empty tuple are both falsy, a non-empty one truthy) and L578 `for a in approvals` (iteration — same elements, same order). It is never hashed, never placed in a frozen dataclass, never serialised, never type-checked, never returned. tuple(it) and list(it) of one iterable are indistinguishable under bool() and for-iteration, including a one-shot generator (both materialise it fully). MEASURED (cwd=my tree, PATH stripped of opencode, HOME/TMPDIR under the copy, nice -n 19 python3 -P -B): migrate_semantics::SealKeepsTheSameRule 6/6 OK 0.14s (it passes approvals non-empty and, at :764, `approvals=iter(old['approvals'])`); bundle_tools+kills3_T02a 38/38 OK 16.6s; unmutated identical. EQUIVALENT.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:511 (truthiness of `approvals`)",
+    "aisef2/app/bundle_cli.py:578 `for a in approvals` (iteration; builds kept/dropped/withheld)",
+    "no other read of the `approvals` local anywhere in seal (bundle_cli.py:510-589)",
+    "registered kill files run against the mutant: migrate_semantics::SealKeepsTheSameRule (OK), test_v21_bundle_tools (OK), test_v21_kills3_T02a (OK)"
+   ],
+   "exceptions_checked": [
+    "a generator/iterator argument: tuple() and list() both consume it once — exercised by migrate_semantics:764 (iter(...)), which the mutant still refuses (exposed is None) identically",
+    "a non-iterable argument: both tuple(x) and list(x) raise TypeError at L510 (outside every try), propagating identically",
+    "order: list and tuple preserve the input order the same way"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::seal",
+   "index": 155,
+   "mutant": "L541 tuple() -> list()",
+   "class": "EQUIVALENT",
+   "group": "g2: a frozen-dataclass constructor re-normalizes list|tuple to a tuple before any observation or hash",
+   "grounds": "L541 `requirement_ids=tuple(c['requirement_ids'])` -> `list(...)`, passed to BehaviorContract.create (product/contract.py:149-153 -> cls(**content, contract_hash=_SEAL) -> __post_init__). __post_init__ at product/contract.py:123-127 does `ids = tuple(self.requirement_ids) if isinstance(self.requirement_ids,(list,tuple)) else None` then `object.__setattr__(self,'requirement_ids', ids)` — BEFORE contract_hash is minted at the end of __post_init__ (:144-145). A list and a tuple of the same ids both pass the isinstance check and both become the same tuple, so the stored field and contract_hash are byte-identical (contract_hash -> content_of -> plain(), :49-56, turns either into the same list for the canonical form anyway). A non-iterable c['requirement_ids'] makes original tuple(x) and mutant list(x) both raise TypeError at :541, caught at :545 as the identical BundleError('a requirement or contract does not hold: TypeError: ...'). A str input is re-tupled to the same value by both. MEASURED: SealKeepsTheSameRule 6/6 OK 0.07s; bundle_tools+T02a 38/38 OK 17.8s (these assert report['plan_hash']==bundle plan_hash at T02a:410-412 and re-seal parity at bundle_tools:131-133, which depend on contract_hash through the plan). EQUIVALENT.",
+   "consumers_checked": [
+    "aisef2/product/contract.py:123-127 (requirement_ids normalized to a tuple) and :144-145 (contract_hash minted after)",
+    "aisef2/product/contract.py:49-56 plain() (tuple and list render to the same canonical list)",
+    "aisef2/app/bundle_cli.py:545-546 (TypeError/ValueError/KeyError from construction -> one BundleError; type name identical for list and tuple)",
+    "registered kill files run against the mutant: SealKeepsTheSameRule (OK), test_v21_bundle_tools (OK, report plan_hash parity), test_v21_kills3_T02a (OK, report vs bundle plan_hash)"
+   ],
+   "exceptions_checked": [
+    "a str value for requirement_ids: tuple('x')/list('x') both re-tupled to ('x',)-shaped identical value (same latent behaviour in both)",
+    "a non-iterable value: both raise TypeError at :541 -> identical BundleError at :545",
+    "downstream identity: contract_hash, plan_hash, bundle digest all read the normalized tuple, not the argument"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::seal",
+   "index": 160,
+   "mutant": "L567 tuple() -> list()",
+   "class": "EQUIVALENT",
+   "group": "g2: a frozen-dataclass constructor re-normalizes list|tuple to a tuple before any observation or hash",
+   "grounds": "L567 `tuple(cr['depends_on'])` -> `list(...)`, the 6th positional arg of PlanObligation(...) (bundle_cli.py:566-567). PlanObligation.__post_init__ (plan/obligation.py:40-51) does `deps = tuple(self.depends_on) if isinstance(self.depends_on,(list,tuple)) else None` then `object.__setattr__(self,'depends_on', deps)` — the obligation is frozen with the SAME tuple whether a list or a tuple was passed, before it is read by Plan or hashed. The obligation then flows into Plan.create (:572) whose plan_hash (plan/obligation.py:104-105 -> content_of -> plain) renders depends_on identically. A non-iterable cr['depends_on'] makes tuple(x)/list(x) both raise TypeError at :567, caught at :568 as the identical BundleError('<where>: TypeError: ...'). MEASURED: SealKeepsTheSameRule 6/6 OK 0.20s; bundle_tools+T02a 38/38 OK 16.6s. EQUIVALENT.",
+   "consumers_checked": [
+    "aisef2/plan/obligation.py:48-50 (depends_on normalized to a tuple in __post_init__)",
+    "aisef2/plan/obligation.py:104-105 plan_hash (reads the normalized tuple via plain())",
+    "aisef2/app/bundle_cli.py:568-569 (construction error -> one BundleError, type name identical for list and tuple)",
+    "registered kill files run against the mutant: SealKeepsTheSameRule (OK), test_v21_bundle_tools (OK), test_v21_kills3_T02a (OK)"
+   ],
+   "exceptions_checked": [
+    "a non-iterable depends_on: both raise TypeError at :567 -> identical BundleError at :568",
+    "order of depends_on ids: preserved identically by list and tuple, then stored as a tuple",
+    "plan_hash dependence: it reads the normalized tuple, not the L567 argument"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::seal",
+   "index": 121,
+   "mutant": "L572 tuple() -> list()",
+   "class": "EQUIVALENT",
+   "group": "g2: a frozen-dataclass constructor re-normalizes list|tuple to a tuple before any observation or hash",
+   "grounds": "L572 `obligations=tuple(obligations)` -> `list(obligations)`, passed to Plan.create (bundle_cli.py:572-573 -> cls(**content, plan_hash=_SEAL) -> __post_init__). Plan.__post_init__ (plan/obligation.py:87-101) does `obligations = tuple(self.obligations) if isinstance(self.obligations,(list,tuple)) else None` then `object.__setattr__(self,'obligations', obligations)` — BEFORE plan_hash is minted (:98-99). `obligations` is always the locally-built list, so always iterable; a list and a tuple of it both become the same tuple, so the stored field and plan_hash are byte-identical. MEASURED: SealKeepsTheSameRule 6/6 OK 0.07s; bundle_tools+T02a 38/38 OK 17.1s (T02a:410-412 asserts the printed report['plan_hash'] equals the written bundle's plan['plan_hash'], which is derived from this very tuple). EQUIVALENT.",
+   "consumers_checked": [
+    "aisef2/plan/obligation.py:90-92 (obligations normalized to a tuple) and :98-99 (plan_hash minted after)",
+    "aisef2/app/bundle_cli.py:594 report['plan_hash']=plan.plan_hash; :1045 printed; T02a:410-412 asserts it equals the bundle's",
+    "registered kill files run against the mutant: SealKeepsTheSameRule (OK), test_v21_bundle_tools (OK), test_v21_kills3_T02a (OK)"
+   ],
+   "exceptions_checked": [
+    "`obligations` is a local list built at :549/:566, never a generator or non-iterable, so only the list-vs-tuple case can arise and both normalize to the same tuple",
+    "plan_hash/specs count: read from the normalized tuple / from `obligations` the list (specs at :594 uses the list before this line), unaffected"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::seal",
+   "index": 128,
+   "mutant": "L597 dict entry 1 dropped",
+   "class": "REFUTED",
+   "group": "g3: an identifying/provenance field of the withheld report row is dropped or its key emptied; observably different, pinned by no registered test though the sibling migrate row is",
+   "grounds": "L597 drops the `'requirement': a.requirement_id` pair from each row of report['approvals_withheld_semantic'] (bundle_cli.py:596-598). MEASURED observable difference (out/show_rows.py over the migrate_semantics era_bundle fixture, cwd=tree): unmutated row `{'approved_at':100.0,'approver':'human:fixture-owner','changes':<2>,'contract':'BC-GREP-DIR-REQ','requirement':'R-1'}` -> mutant `{'approved_at':100.0,'approver':'human:fixture-owner','changes':<2>,'contract':'BC-GREP-DIR-REQ'}` (no 'requirement'), for all 6 withheld rows. The report is returned to main (:1042-1045) and printed WHOLE as JSON to the operator; the row's documented job is to NAME the withheld approval (docstring :504-508; USAGE-2.1.md:104-106). requirement_id is half of what identifies a ContractApproval (APPROVAL_KEY :325 = contract_id, requirement_id, contract_hash, requirement_hash, approver, approved_at; approvals are per (contract,requirement)); when a withheld contract cites more than one requirement there is one withheld row per requirement and, without 'requirement', those rows are indistinguishable. MEASURED kill outcome: the only registered test producing non-empty withheld rows, migrate_semantics::SealKeepsTheSameRule, reads only r['contract'] (:749), row['approver'] and row['changes'][0]['version'] (:753-754) — never 'requirement' — so it is OK on the mutant (0.16s), and the full registered set is green on the unmutated snapshot (149 tests, 1023s); the campaign's SURVIVED is a true gap, not a runner artifact. NOT equivalent (the printed row differs), NOT AUDITED: the killing test is an ordinary structural assertion of the row's key set (the kind SealKeepsTheSameRule already makes on approver/changes at :754, and the registered suite already makes on the SIBLING migrate row at migrate_semantics:377-378, which pins given['approver'] and given['approved_at']), not a forbidden phrase-assertion. A reader (the operator) depends on the row naming the approval; a test is owed.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:1042-1045 main (prints the whole report incl. approvals_withheld_semantic as JSON, sort_keys)",
+    "tests/v2/test_v21_migrate_semantics.py:747-794 SealKeepsTheSameRule — the only registered test with non-empty withheld rows — reads r['contract'], row['approver'], row['changes'] only (never 'requirement'); measured OK on the mutant",
+    "grep approvals_withheld_semantic across aisef2/ aisef/ validation/ tests/ docs/: writer at bundle_cli.py:596; readers only migrate_semantics:749/753/788 (contract) ; docs prose only — no machine reads row['requirement']",
+    "aisef2/app/bundle_cli.py:325 APPROVAL_KEY (requirement_id is an identity-key component)"
+   ],
+   "exceptions_checked": [
+    "a machine consumer of the report's requirement field: none (grep above); the migrate path's own approvals_withheld (bundle_cli.py:421-423) is a different dict, not seal's report",
+    "redundancy via report['to_approve']: it lists (contract,requirement) needing approval but is a DIFFERENT list; the withheld row is the record of the OLD approval that lapsed and is what names it",
+    "the fixture's single-requirement case hides the ambiguity, but seal admits multi-requirement contracts — see owed test",
+    "REFUTED-by-measurement: ruled out — no registered kill file fails on the mutant (SealKeepsTheSameRule OK; full set green unmutated)"
+   ],
+   "refutation": "The operator reads the printed seal report to reconcile which handed-over approvals were not kept; report['approvals_withheld_semantic'] exists to name each withheld approval, and requirement_id is half its identity (APPROVAL_KEY). No registered test pins the row's field set, so dropping 'requirement' survives. Input: migrate_semantics era_bundle() (6 withheld rows), ideally plus a variant where one withheld contract cites two requirement_ids. Reader: bundle_cli.main :1045 (operator-facing). Test sketch: extend SealKeepsTheSameRule.test_an_approval_of_a_selected_contract_is_not_kept_and_is_named to assert, for each row r, set(r)=={'contract','requirement','approver','approved_at','changes'} and the BC-GREP-DIR-REQ row has r['requirement']=='R-1' (mirror the sibling guard at migrate_semantics:377-378). A real gap."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::seal",
+   "index": 150,
+   "mutant": "L597 string 'requirement' emptied",
+   "class": "REFUTED",
+   "group": "g3: an identifying/provenance field of the withheld report row is dropped or its key emptied; observably different, pinned by no registered test though the sibling migrate row is",
+   "grounds": "L597 changes the key literal 'requirement' to '' in each row of report['approvals_withheld_semantic']. MEASURED (out/show_rows.py): unmutated `{...,'requirement':'R-1'}` -> mutant `{'':'R-1','approved_at':100.0,'approver':...,'changes':<2>,'contract':'BC-GREP-DIR-REQ'}` — the requirement id is now under a blank key (and with main's sort_keys=True it prints first). An operator scanning the printed report for the requirement a lapsed approval covered finds no 'requirement' field; a script reading r['requirement'] gets KeyError. Same reasoning and same owed test as index 128. MEASURED kill outcome: SealKeepsTheSameRule OK on the mutant (0.11s) — it never reads 'requirement'; full registered set green unmutated. NOT equivalent (printed row differs), NOT AUDITED (the killing test is a structural key-set assertion, already made on the sibling migrate row at :377-378, not a forbidden phrase-assertion).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:1042-1045 main (prints report['approvals_withheld_semantic'] with sort_keys; '' sorts first)",
+    "tests/v2/test_v21_migrate_semantics.py SealKeepsTheSameRule (reads contract/approver/changes only; OK on mutant)",
+    "grep of readers of row['requirement'] on seal's report: none (writer bundle_cli.py:596 only)",
+    "aisef2/app/bundle_cli.py:325 APPROVAL_KEY (requirement_id identity component)"
+   ],
+   "exceptions_checked": [
+    "a second withheld-row key also emptied to '' (collision): not here — only 'requirement' is relabeled; the row keeps distinct keys",
+    "a reader indexing by position rather than key: none; rows are dicts read by name",
+    "REFUTED-by-measurement: ruled out (no registered kill file fails on the mutant)"
+   ],
+   "refutation": "Same as 128: the withheld row must name the approval, and the requirement is moved to a blank key, so no 'requirement' field is present. Closed by the same owed test (assert set(r)=={'contract','requirement','approver','approved_at','changes'}); the '' key makes the set assertion fail, killing this mutant."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::seal",
+   "index": 130,
+   "mutant": "L597 dict entry 3 dropped",
+   "class": "REFUTED",
+   "group": "g3: an identifying/provenance field of the withheld report row is dropped or its key emptied; observably different, pinned by no registered test though the sibling migrate row is",
+   "grounds": "L597/598 drops the `'approved_at': a.approved_at` pair from each withheld row. MEASURED (out/show_rows.py): unmutated `{'approved_at':100.0,...}` -> mutant `{'approver':'human:fixture-owner','changes':<2>,'contract':'BC-GREP-DIR-REQ','requirement':'R-1'}` (no 'approved_at'), all 6 rows. approved_at is the 'when' of the lapsed approval — an identity-key component (APPROVAL_KEY :325) and exactly the field the registered suite PINS on the sibling migrate row: migrate_semantics:377-378 asserts `given['approved_at']==100.0` for migrate's approvals_in_input (bundle_cli.py:421-423). The seal report's parallel field has no such guard, so dropping it survives. MEASURED kill outcome: SealKeepsTheSameRule OK on the mutant (0.08s) — it reads only contract/approver/changes; full registered set green unmutated. NOT equivalent (printed row differs), NOT AUDITED (the killing test is a structural assertion the suite already makes on the sibling).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:1042-1045 main (prints the row; the operator's 'when' of the lapsed approval)",
+    "tests/v2/test_v21_migrate_semantics.py:377-378 — the registered suite pins approved_at on the SIBLING migrate row (approvals_in_input), proving it is treated as load-bearing provenance; nothing pins seal's",
+    "grep of readers of seal-report row['approved_at']: none (writer bundle_cli.py:598); the other approved_at reads are migrate's L422 row and validation/qualification/p5_acceptance.py (a different artefact)",
+    "aisef2/app/bundle_cli.py:325 APPROVAL_KEY (approved_at identity-key component)"
+   ],
+   "exceptions_checked": [
+    "operator ACTION dependence: re-approval is driven by report['to_approve'] (no timestamps), so approved_at is provenance, not an action input — but it is identity-key provenance the sibling test pins, so a reader depends on the row carrying it",
+    "a machine consumer of seal-report approved_at: none",
+    "REFUTED-by-measurement: ruled out (no registered kill file fails on the mutant)"
+   ],
+   "refutation": "The withheld row documents who approved and WHEN; approved_at is an APPROVAL_KEY identity component and is pinned for the sibling migrate row (migrate_semantics:377-378) but not for seal's. Input: era_bundle() (6 withheld rows). Reader: bundle_cli.main :1045. Sketch: in SealKeepsTheSameRule assert each row's key set is {'contract','requirement','approver','approved_at','changes'} and the BC-GREP-DIR-REQ row has r['approved_at']==100.0 (mirroring :377-378). Kills 130 and 152. A real gap."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::seal",
+   "index": 152,
+   "mutant": "L598 string 'approved_at' emptied",
+   "class": "REFUTED",
+   "group": "g3: an identifying/provenance field of the withheld report row is dropped or its key emptied; observably different, pinned by no registered test though the sibling migrate row is",
+   "grounds": "L598 changes the key literal 'approved_at' to '' in each withheld row. MEASURED (out/show_rows.py): unmutated `{'approved_at':100.0,...}` -> mutant `{'':100.0,'approver':...,'changes':<2>,'contract':'BC-GREP-DIR-REQ','requirement':'R-1'}` — the timestamp is now under a blank key (sorts first under main's sort_keys). A reader of r['approved_at'] gets KeyError; the operator sees a blank-keyed number. Same reasoning and owed test as 130. MEASURED kill outcome: SealKeepsTheSameRule OK on the mutant (0.09s); full registered set green unmutated. NOT equivalent, NOT AUDITED (the structural key-set assertion that kills it is the kind already made on the sibling migrate row at :377-378).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:1042-1045 main (prints the row; '' sorts first)",
+    "tests/v2/test_v21_migrate_semantics.py:377-378 (sibling migrate row's approved_at is pinned; seal's is not)",
+    "grep of readers of seal-report row['approved_at']: none (writer bundle_cli.py:598 only)",
+    "aisef2/app/bundle_cli.py:325 APPROVAL_KEY"
+   ],
+   "exceptions_checked": [
+    "collision of two '' keys in the row: not here — only 'approved_at' is relabeled; no other key is ''",
+    "a reader tolerant of the key name: none; readers index by name",
+    "REFUTED-by-measurement: ruled out (no registered kill file fails on the mutant)"
+   ],
+   "refutation": "Same as 130: approved_at moved to a blank key, so no 'approved_at' field. Closed by the same owed test (key-set assertion on each withheld row); the '' key fails the set assertion, killing this mutant."
+  }
+ ],
+ "owed_tests": [
+  "migrate_semantics::SealKeepsTheSameRule.test_an_approval_of_a_selected_contract_is_not_kept_and_is_named (one test closes all four g3 mutants). Input: the existing era_bundle() fixture — seal(authoring(), approvals=old['approvals'], exposed=exposure_of(old)) yields 6 withheld rows. Reader: bundle_cli.main (bundle_cli.py:1045) prints report['approvals_withheld_semantic'] as JSON for the operator; each row names a withheld ContractApproval. Sketch: for each r in report['approvals_withheld_semantic'], assertEqual(set(r), {'contract','requirement','approver','approved_at','changes'}); and for the BC-GREP-DIR-REQ row assert r['requirement']=='R-1' and r['approved_at']==100.0 (mirrors the already-present sibling guard on the migrate row at migrate_semantics:377-378). This kills index 128 (no 'requirement'), 150 ('' key), 130 (no 'approved_at'), 152 ('' key). Optional strengthening: a withheld contract citing two requirement_ids, to show 'requirement' is the disambiguator between two otherwise-identical rows. No test is owed for the EQUIVALENT mutants (7,121,155,160): adding one would only re-assert list==tuple after the kernel's own normalization."
+ ],
+ "notes": "Snapshot 4ec961e706a1f7bda16d131037058c4fe9c2663f; bundle_cli.py source_sha256 e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8 (matches the covered entries). Measured 2026-10-18 20:41..21:11 +07. Tooling: git archive of the snapshot into a non-git tree; mutants rebuilt with validation.v2.mutation.mutants()[index] (desc asserted == the batch string); runs with cwd=tree, PATH stripped of both opencode dirs (/Users/nghinh/.opencode/bin, /Users/nghinh/.npm-global/bin), env -i, HOME/TMPDIR/XDG under the copy, PYTHONPATH=tree, nice -n 19 python3 -P -B -m unittest. No real opencode, no network (test probe subprocesses are offline python harnesses in the scratch tree). Registered kill files for the target: test_v21_bundle_tools, test_v21_identity, test_v21_review, test_v21_continue_usage, test_v21_continue_integrity, test_v21_kills3_A02, test_v21_kills3_T02a, test_v21_migrate_semantics; the full set is GREEN on the unmutated snapshot (149 tests, 1023s). identity and review do not call bundle_cli.seal (only a comment mentions 'sealed'), so a seal-body mutant cannot affect them. The one closure-evidence file a kill file reads (closure-evidence/v2/release/LEDGERLOCK-PROJECT.json) was added via git show. Per-mutant measurement: all 8 SURVIVE migrate_semantics::SealKeepsTheSameRule (the only registered test asserting seal's report and the only one producing non-empty withheld rows); the 4 tuple mutants additionally SURVIVE bundle_tools+T02a (38 tests, which assert report['plan_hash']==bundle plan_hash). No REFUTED-by-measurement: no registered kill file fails on any mutant, so the campaign's SURVIVED is confirmed. Decisions: 4 EQUIVALENT (list/tuple invisible — 7 by sole truth-test+iteration, 121/155/160 by the frozen-dataclass constructors re-normalizing list|tuple to a tuple before any hash/observation), 4 REFUTED (the withheld-report-row fields 'requirement' and 'approved_at' are dropped/relabeled observably; no test pins seal's row though the sibling migrate row's approver+approved_at are pinned at migrate_semantics:377-378; one key-set assertion closes all four). AUDITED was deliberately not used: the covered AUDITED entries [133],[157] rested on the killing test being a forbidden phrase-assertion on a diagnostic clause, which does not apply to a structured report field."
+}

@@ -1,0 +1,62 @@
+{
+ "batch": "B02-shape_problems",
+ "target": "aisef2/app/bundle.py::shape_problems",
+ "new": [],
+ "covered": [
+  {
+   "target": "aisef2/app/bundle.py::shape_problems",
+   "index": 107,
+   "mutant": "L99 string ')' emptied",
+   "worker": "c3-w2",
+   "class": "AUDITED",
+   "group": "L89 held-keys clause: [108] changes one punctuation character at the end of a human-read refusal; [114] (order) has its own consumers; [107], which loses the label and so misattributes the list, is killed.",
+   "grounds": "L89 closing ')' of the held-keys clause: the changed character is the last of the message (`... (it holds ['criteria', 'depends_on', 'tests']`). Every element (story id, rule, label, held keys in their own brackets) is intact and nothing follows it, so an unclosed '(' swallows nothing; decision, exit code and JSON path unchanged. Kill_check on the final file: SURVIVED (kc-final.json), as audited. I tried to refute with a consumer that appends text after, pairs parentheses or parses the clause: none exists.",
+   "consumers_checked": [
+    "aisef2/app/cli.py:92-93 prints `aisef run: refused: {e}` to stderr, returns 2; bundle.read (cli.py:72) precedes R.execute, so no run directory or record carries the text",
+    "aisef2/app/bundle_cli.py:538-539 prints `refused: {e}`, returns 2 (the :541-542 [:2000] handler is the generic one a BundleError never reaches)",
+    "aisef2/app/bundle_cli.py:331-333 puts str(e) into the lint JSON `problems`: reachable only through B.load(bundle), whose shape_problems (bundle.py:158) runs on the same object that :321 already passed; unapproved/coverage/_spec_rows do not mutate it",
+    "validation/experiments/harness.py:176 `bundle.load(evaluator)` unwrapped (a traceback, no embedding); bundle_cli.py:130/376/438 B.load(out) propagate the BundleError unwrapped to :538",
+    "grep of 'it holds', 'an object of exactly depends_on and tests', 'refused: ' over aisef2/ validation/ tests/ docs/ and closure-evidence/: only the producers (bundle.py:89,157; bundle_cli.py:156), tests that match by JSON-path prefix (test_v21_inputs.py BundleShape.refused), and campaign-2 check.out naming the survivor itself"
+   ],
+   "exceptions_checked": [
+    "an outer message that appends text after this one: both print sites append nothing and the re-embedding sites (bundle_cli.py:94-98 migrate, :188-195/:217 seal, :274, bundle.py:159-165 load) wrap kernel-object errors, none has shape_problems inside its try",
+    "a persisted copy (journal, RUN.json, anchor): none - the refusal precedes any run or output file",
+    "a reader that balances parentheses or regex-matches '\\(it holds .*\\)': none in tests/ or validation/; the contract documented for input errors is exit 2 + JSON path (docs/v2.1/TRACEABILITY.md R-P1-13, USAGE-2.1.md:43)",
+    "the closing character hiding an element: it is the last character and the held list's own brackets are intact"
+   ],
+   "source_sha256": "c0a52382157f3f780d4720dd1f8e9d75ac0ee33c75fcad6a5e494f19f2b88d3a",
+   "remapped_from": {
+    "index": 108,
+    "mutant": "L89 string ')' emptied",
+    "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+   }
+  },
+  {
+   "target": "aisef2/app/bundle.py::shape_problems",
+   "index": 113,
+   "mutant": "L99 sorted() -> list()",
+   "worker": "c3-w2",
+   "class": "AUDITED",
+   "group": "L89 held-keys clause: [114] changes the order of an intact list; [108] (closing character) has its own consumers; [107] is killed.",
+   "grounds": "L89 sorted(s) -> list(s): same key set, same clause, same position; only the order of the listed keys differs, and only for a story the author wrote out of alphabetical order. json.loads keeps document order, so the mutant's text is deterministic for a given file. Every writer builds a story with exactly {depends_on, tests} (bundle.dump bundle.py:149, seal bundle_cli.py:203, continue :431/:435) and writes sort_keys=True (:473, :537), so the clause is reachable only for a hand-written or foreign bundle. kill_check on the final file: SURVIVED (kc-final.json). Own attempt to refute: no consumer of the order found (below).",
+   "consumers_checked": [
+    "aisef2/app/cli.py:92-93 and aisef2/app/bundle_cli.py:538-539: the only readers of the text; both print it verbatim to stderr and return 2",
+    "tests/v2/test_s2_kills.py:704-718 pins sorted(keys) for the SIBLING refusal bundle.py:157 (load's top-level keys) by whole-string equality, docstring 'the keys in order': a different message with its own test; at BASE nothing pins the order of this clause (test_v21_inputs.py asserts the JSON path only, test_app_units.py:402-415 regexes load's own texts)",
+    "bundle_cli.py:156 `_closed` (sorted(obj), same house style) - sorted->list there is A04 [7], AUDITED and CONFIRMED by its reviewer; same reasoning, consistent",
+    "no comparer, hasher or recorder of a refusal text: a refused bundle never reaches Project.digest (bundle.py:190) nor any run record; docs/v2.1 promise exit 2 and the JSON path only"
+   ],
+   "exceptions_checked": [
+    "reproducibility of the diagnostic: for identical bytes the mutant's order is identical across runs and machines (no hash seed - the nondeterministic class is the set iteration on L68/L90, [15]/[45], handled in T24a)",
+    "two JSON-equal bundles with different key order refused with different texts: true of the mutant, read by nobody (the canonical identity, bundle.py:130, is computed only for an accepted bundle); the original makes the text a function of the key set, the mutant of the file layout",
+    "non-comparable keys making sorted() raise where list() does not: L87 evaluates sorted(s) on the same mapping first, so any TypeError is raised there in original and mutant alike (JSON keys are str)",
+    "a reader locating the offending key by position: the set identifies it, the final test pins that all three held keys are named inside the list, and for a tool-written bundle the order is sorted anyway"
+   ],
+   "source_sha256": "c0a52382157f3f780d4720dd1f8e9d75ac0ee33c75fcad6a5e494f19f2b88d3a",
+   "remapped_from": {
+    "index": 114,
+    "mutant": "L89 sorted() -> list()",
+    "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+   }
+  }
+ ]
+}

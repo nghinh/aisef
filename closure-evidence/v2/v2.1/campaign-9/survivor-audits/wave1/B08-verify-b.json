@@ -1,0 +1,297 @@
+{
+ "batch": "B08-verify",
+ "copy": "b",
+ "entries": [
+  {
+   "target": "aisef2/app/verify.py::verify",
+   "index": 176,
+   "mutant": "L197 string 'the run continued a lineage with spend no evidence accounts for (' emptied",
+   "class_before": "AUDITED (author draft)",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "mutant_view confirms the mutation is positional-correct at snapshot 4ec961e: verify.py L197-L199 builds ONE note inside `if accepted:` (L196), itself inside `if s is not None:` (L187) -- reached only for a run whose journal reconstructs, whose settings bind, and whose rec['continues']['accepted_unaccounted'] is non-empty. The note is two adjacent string literals concatenated; the mutant empties the FIRST, giving f\"{len(accepted)} listed in continues.accepted_unaccounted), accepted by name: its ceilings were enforced against the known part, and the lineage's total is not known\" (verified by mutant_view diff). The SECOND literal -- 'accepted by name', 'its ceilings were enforced against the known part', 'the lineage's total is not known' -- is UNCHANGED. notes.append still fires, list length unchanged; the verdict never depends on the note. The note reaches the operator only through cli._print (json.dumps with sort_keys over dict keys only; the note text and list order print verbatim); nothing parses it. MEASUREMENT on a COPY tree (PATH scrubbed of both opencode dirs /Users/nghinh/.opencode/bin and /Users/nghinh/.npm-global/bin -- `command -v opencode` = NO; HOME/TMPDIR/XDG under the copy): baseline unmutated x_lineage_proof 55 OK (136.5s); mutant x_lineage_proof 55 OK (143.0s). The sole reader (x_lineage_proof L1040) asserts any('accepted by name' in n for n in v['notes']), kept by the mutant, so it passes and the SURVIVED is explained with no appeal to environment or order. Independent git grep 'continued a lineage' over aisef2/validation/tests/docs -> verify.py L197 only (no other reader); 'accepted by name' as an assertion -> x_lineage_proof L1040 only (the rest are code comments client.py L87, lineage.py L89, and docstrings). What is lost is only the subject-framing and the opening '(' of the count; the surviving tail still states the money-safety condition and names the field, so the operator is not misled into anything false -- the same shape held AUDITED for sibling note mutant [132] and the ')'-tail mutants [136,163,187] in this batch.",
+   "consumers_checked": [
+    "aisef2/app/verify.py L197-L199 sole producer; L222-L223 the returned document ('notes' field) -- CONFIRMED at snapshot",
+    "aisef2/app/cli.py _print = json.dumps(doc, indent=1, sort_keys=True, default=str) and exit code from v['verdict'] only: note printed as a JSON string, nothing parsed -- CONFIRMED",
+    "tests/v2/test_v21_x_lineage_proof.py L1040: self.assertTrue(any('accepted by name' in n for n in v['notes']), v['notes']) -- the ONLY reader; 'accepted by name' is in the unmutated second literal. RAN: whole file 55 OK on the mutant",
+    "tests/v2/test_v21_continue_usage.py and test_v21_continue_integrity.py: reach the continuation path, do not assert this note's lost clause (continue_integrity ran 24 OK on the sibling EQUIVALENT mutant 149; author reports usage 10 OK, integrity 24 OK on 176)",
+    "git grep 'continued a lineage' over aisef2 validation tests docs: aisef2/app/verify.py L197 only -- no other reader (independently reproduced)",
+    "git grep 'accepted by name' over aisef2 validation tests: x_lineage_proof L1040 (kept), client.py L87 / lineage.py L89 (comments), x_lineage_proof L694/L719/L744 (docstrings), c2_orchestration_repair.py L672 (prose about a different ruling) -- none asserts verify's note text (independently reproduced)",
+    "docs/v2.1/USAGE-2.1.md and docs/v2/V2.1-BACKLOG.md: documented note contract is the phrase 'accepted by name' (kept); neither quotes the leading clause (author's cite; phrase is what the one reader asserts)"
+   ],
+   "exceptions_checked": [
+    "a reader matching the whole note or its start ('the run continued ...') by exact string / regex / startswith: git grep over aisef2 validation tests docs finds none; the only assertion is the substring 'accepted by name', kept",
+    "the mutant changing whether/how many notes are appended: no -- notes.append still fires, list length unchanged",
+    "the operator misled into a false reading: surviving tail still says 'accepted by name', ceilings enforced against the known part, total unknown, and names continues.accepted_unaccounted; nothing false, only subject-framing and the opening '(' lost",
+    "the dangling '(' swallowing following text: notes are separate list elements, cli prints each as its own JSON string, no join concatenates notes",
+    "a kill file flipping the mutant to killed: ran the sole note-reader file (x_lineage_proof) 55 OK on the mutant; baseline 55 OK -- no kill, SURVIVED confirmed"
+   ],
+   "refutation": "none -- tried to refute by running the sole reader file (x_lineage_proof, 55 tests) on the mutant: all OK. The lost clause is asserted by no test, no consumer, no document; the kept 'accepted by name' carries the documented contract. No test is owed (AUDITED, not REFUTED). Optional consistency choice (not a gap): a test could startswith-pin the full note the way test_v21_r3_detail_artifact L244 pins a closing paren; by the owner's rule a test is not added just to reach a number.",
+   "note": "New survivor; author's draft AUDITED is correct and well-supported. Measurement reproduced exactly (baseline 55 OK, mutant 55 OK). Snapshot lines in the draft (L195-L199, L1040) are already current. No consumer missed."
+  },
+  {
+   "target": "aisef2/app/verify.py::verify",
+   "index": 48,
+   "mutant": "L180 sorted() -> list()",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "REFRESHED cites to snapshot 4ec961e (carried grounds used stale L169/L167/L171). `differ` is built at L180 from outcomes = R.outcomes_from(events) (L178; run.py L392-L400, a dict filled with setdefault in journal order over story/commit|rollback|retry). Both list() and sorted() are deterministic functions of the journal; every key is a story_id str, so sorted() cannot raise on mixed types and list() is not an escape from an exception. The set of ids is identical; only the order inside the one f-string message (L182, `{differ}`) can differ, and only when two or more stories differ and the journal decided them non-alphabetically. `differ` is used only for truthiness (L181) and in that f-string (L182). Not provably EQUIVALENT (the problem text's byte order can change), but no reader depends on the order -> AUDITED. MEASUREMENT: mutant test_v21_verify 8 OK (76.2s), baseline suite green. The carried REVISION stands and is reconfirmed: test_app_units does NOT assert 'story outcomes' (independent grep: only verify.py L5/L182, usage.py L5, test_v21_verify L68, docs/v2/USAGE.md L96/L147); the one test of this problem is test_v21_verify L64-L68, which forges story_outcomes={'S1': ...} (a SINGLE differing story, so order is irrelevant) and asserts only the substring 'story outcomes'.",
+   "consumers_checked": [
+    "aisef2/app/verify.py L180-L182: the only uses of `differ` (built L180, truthiness L181, f-string L182) -- CONFIRMED",
+    "tests/v2/test_v21_verify.py L64-L68 RecordAlone.test_story_outcomes_that_are_not_the_journal_s_are_refuted: one differing story, asserts any('story outcomes' in p); kept by the mutant. RAN: 8 OK on the mutant",
+    "aisef2/app/cli.py: document printed with sort_keys on dict keys only; list order in the problem string kept as given, never read",
+    "git grep 'story outcomes' over aisef2 validation tests docs: verify.py L5 (docstring), L182 (producer), usage.py L5 (unrelated), test_v21_verify L68, docs/v2/USAGE.md L96/L147 (prose) -- no document promises an order (independently reproduced)"
+   ],
+   "exceptions_checked": [
+    "a mixed-type key making sorted() raise: story_id is a str in every format; no",
+    "a test/document promising alphabetical order: none at the snapshot (grep above); test_v21_verify forges one story so order cannot matter there",
+    "two verify documents compared across runs: the same journal gives the same order under either expression",
+    "round-3 path: after a projection refusal events == [], outcomes == {}, differ == [] under both expressions",
+    "a kill file flipping it: test_v21_verify 8 OK on the mutant"
+   ],
+   "refutation": "none -- test_v21_verify (the file that tests this problem) 8 OK on the mutant; no test asserts an order. No test is owed.",
+   "note": "Carried AUDITED reconfirmed; cites refreshed L169->L180, L167->L178, L171->L182. The carried REVISION (test_app_units does not assert 'story outcomes') independently reconfirmed."
+  },
+  {
+   "target": "aisef2/app/verify.py::verify",
+   "index": 106,
+   "mutant": "L134 string ' the run printed' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "REFRESHED cites (carried used stale L125-L126). Producer is L133-L134: `if expect_anchor is not None and anchor != expect_anchor: problems.append(f\"the evidence anchor is {anchor and anchor[:12]}, not the {expect_anchor[:12]} the run printed\")`. The mutant drops the trailing provenance clause ' the run printed', leaving 'the evidence anchor is <A12>, not the <E12>' (mutant_view confirmed). The two 12-hex tokens and their role order (directory anchor first, expected second after 'not the') survive; expect_anchor is a value the operator supplies via --expect-anchor, whose provenance is carried by cli.py help/refusal, not by this problem. MEASUREMENT: mutant test_v21_kills3_A22 7 OK (0.018s). The reader A22.TheAnchorsOfAMismatchAreTwoTokensInRoleOrder L165-L173 asserts HEX12.findall(v['problems'][0]) == [anchor[:12], expected[:12]] and len==1; ' the run printed' carries no hex, so the assertion is unchanged.",
+   "consumers_checked": [
+    "aisef2/app/verify.py L133-L134 sole producer -- CONFIRMED",
+    "tests/v2/test_v21_kills3_A22.py L159-L173 TheAnchorsOfAMismatchAreTwoTokensInRoleOrder: HEX12 tokens in role order, len==1. RAN: A22 7 OK on the mutant",
+    "aisef2/app/cli.py --expect-anchor help and format refusal carry the 'the run printed' phrase themselves (a different producer); pinned by test_v21_kills_cli.py",
+    "git grep -F 'the run printed' over tests validation docs: only DOCSTRINGS (test_v21_kills3_T14a L185, T23a L273, pw_lineage_continue L370, r3_detail_product L223), the cli help pin (test_v21_kills_cli L59, cli.py text), and B03-R3-E2E.md L106 (prose quoting the whole message) -- no code assertion on this problem's tail (independently reproduced)"
+   ],
+   "exceptions_checked": [
+    "a caller whose expect_anchor did not come from a run (phrase inaccurate rather than needed): the clause is dropped, no reader affected",
+    "the phrase being what tells which value is expected: carried by 'not the' and position, both kept",
+    "anchor None: first token prints 'None', sentence otherwise unchanged by this mutant",
+    "a reader matching the whole message by exact string/regex-with-tail: none in code or tests (only B03-R3-E2E.md L106 prose)",
+    "a kill file flipping it: A22 7 OK on the mutant"
+   ],
+   "refutation": "none -- A22 (the file pinning the anchor-mismatch problem) 7 OK on the mutant; the only whole-message occurrence is prose in B03-R3-E2E.md. No test is owed.",
+   "note": "Carried AUDITED reconfirmed; cites refreshed L125-L126 -> L133-L134. B03-R3-usage.md L137 independently lists this exact mutant as one of the 11 known survivors of verify's six campaign files."
+  },
+  {
+   "target": "aisef2/app/verify.py::verify",
+   "index": 132,
+   "mutant": "L111 string 'no ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "REFRESHED cites (carried used stale L101-L103). Producer is the except FileNotFoundError arm, L109-L111: notes.append(f\"no {R.MANIFEST}: a run of a release before 2.1 -- its record is bound by nothing but itself\"). The mutant empties the leading 'no ', giving '{EVIDENCE.json}: a run of a release before 2.1 -- ...' (mutant_view confirmed). In that arm stored is None, so the same document carries evidence_anchor None (L223); a reader cannot take the note for 'manifest present' because the kept clause says the record is bound by nothing and evidence_anchor is None. The file name and the release boundary survive -- the two things readers assert. MEASUREMENT: mutant test_v21_defects_verify 20 OK (77.0s). The carried REVISION stands: the branch is FileNotFoundError (not OSError), and the readers (A22.ARunWithoutAManifest L206-L212 asserts R.MANIFEST in note and '2.1' in note, with its docstring L201-L203 explicitly stating the 'bound by nothing' clause is deliberately NOT asserted; test_v21_defects_verify L120-L139 asserts '2.1' and len==1) assert the file and boundary, never the negation word.",
+   "consumers_checked": [
+    "aisef2/app/verify.py L109-L111 sole producer; L223 the document (notes, evidence_anchor) -- CONFIRMED",
+    "tests/v2/test_v21_kills3_A22.py L198-L212 ARunWithoutAManifestIsVerifiedWithANoteThatNamesTheFileAndTheReleaseBoundary: asserts R.MANIFEST in note, '2.1' in note; docstring says the record clause is not asserted. (A22 ran 7 OK on mutant 106 at this snapshot; the relevant class asserts only file+boundary)",
+    "tests/v2/test_v21_defects_verify.py L120-L139 test_only_an_absent_manifest_is_a_run_of_an_older_release: len(notes)==1 and '2.1' in notes[0] for a manifest-less copy, notes==[] for a directory/non-JSON manifest. RAN: defects_verify 20 OK on the mutant",
+    "aisef2/app/cli.py prints the note as JSON, exit 0 on VERIFIED; nothing parses it",
+    "git grep 'release before 2.1' / 'bound by nothing' over tests: only docstrings and the '2.1' substring assertions (independently reproduced)"
+   ],
+   "exceptions_checked": [
+    "a reader taking the note to mean EVIDENCE.json is present: contradicted by evidence_anchor None and the kept 'bound by nothing' clause",
+    "the consequence clause being the lost part: it is kept here (the sibling that empties it is a different mutant)",
+    "another note this could be mistaken for: the only other notes are the anchor-match note (L136-L138) and review_verify's 'review row' notes; none starts with the file name",
+    "a parser of notes: grep finds only length, '2.1', file-name and ==[] reads",
+    "a kill file flipping it: defects_verify 20 OK on the mutant"
+   ],
+   "refutation": "none -- defects_verify (20 tests, the fullest reader of this note) OK on the mutant; A22's reader asserts only file+'2.1'. No test is owed. (Weakest of the batch, as the carried grounds say, but held on the surviving file-name + boundary carriers.)",
+   "note": "Carried AUDITED reconfirmed; cites refreshed L101-L103 -> L109-L111. Branch is FileNotFoundError as the REVISION states."
+  },
+  {
+   "target": "aisef2/app/verify.py::verify",
+   "index": 136,
+   "mutant": "L117 string ')' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "REFRESHED cites (carried used stale L107-L109). Producer is the except OSError arm L115-L117: problems.append(f\"{R.MANIFEST} cannot be read ({type(e).__name__})\"); the mutant drops the closing ')', giving 'EVIDENCE.json cannot be read (IsADirectoryError' (mutant_view confirmed). File, kind and class survive in order, class last; the item is its own list element so the unbalanced '(' reaches nothing after it. MEASUREMENT: mutant test_v21_kills3_R01 8 OK (0.033s). The reader R01.TheManifestThatCannotBeUsedIsRefusedWithItsKindOfCause.test_a_manifest_that_cannot_be_read_names_the_file_and_the_class_of_the_failure (L154) asserts file, class-as-token and 'read' -- not the trailing ')'.",
+   "consumers_checked": [
+    "aisef2/app/verify.py L117 sole producer of this text -- CONFIRMED",
+    "tests/v2/test_v21_kills3_R01.py L140-L175 TheManifestThatCannotBeUsedIsRefusedWithItsKindOfCause: asserts file + class token + 'read', not the paren. RAN: R01 8 OK on the mutant",
+    "aisef2/app/cli.py: JSON dump, exit from verdict only",
+    "git grep 'cannot be read (' over aisef2: bundle.py, settings.py, review_ocr.py, verify.py L117/L127/L152, review_verify.py L480 (a DIFFERENT producer whose closing paren IS pinned by test_v21_r3_detail_artifact L244 -- not this one)"
+   ],
+   "exceptions_checked": [
+    "a consumer parsing '(<Class>)' or splitting on parens: none by grep",
+    "a join of problems with '; ' where '(' would swallow the next item: verify's list reaches cli as JSON and release_rehearsal as a list repr; no join concatenates its elements",
+    "the class followed by more text in the item: the f-string ends after the class",
+    "a kill file flipping it: R01 8 OK on the mutant"
+   ],
+   "refutation": "none -- R01 (the file pinning the unreadable-manifest problem) 8 OK on the mutant. A test is owed only as an optional consistency choice (an anchored regex ending in ')'), the precedent being test_v21_r3_detail_artifact L244 for review_verify's analogue; no reader depends on the character, so not owed.",
+   "note": "Carried AUDITED reconfirmed; cites refreshed L107-L109 -> L115-L117. The ANALOGUE with a pin (review_verify L480) is a different producer, correctly distinguished by the carried grounds."
+  },
+  {
+   "target": "aisef2/app/verify.py::verify",
+   "index": 163,
+   "mutant": "L103 string ')' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "REFRESHED cites (carried used stale L93-L95). Producer is the early-return except (OSError, ValueError) arm L102-L103: return {'verdict': 'REFUTED', 'problems': [f\"{out / 'RUN.json'}: no readable run record ({type(e).__name__})\"]}; the mutant drops the closing ')', giving '<path>/RUN.json: no readable run record (FileNotFoundError' (mutant_view confirmed). The path precedes and is delimited by ': no readable run record (', kept; class is the last datum; the document is {verdict REFUTED, problems:[one]} in both. MEASUREMENT: mutant test_v21_kills3_T22a 13 OK (11.9s). Readers T22a.NoReadableRunRecord (L152-L169, four arms) and A22.AnUnreadableRecordIsNamedByItsFileAndItsCause (L182-L195, docstring L178-L179 'Where in the sentence they stand is not asserted') assert the path as a delimited token and the class as a token -- never the ')'.",
+   "consumers_checked": [
+    "aisef2/app/verify.py L103 sole producer; git grep 'readable run record' over aisef2 validation tests docs -> verify.py L103 only (independently reproduced)",
+    "tests/v2/test_v21_kills3_T22a.py L134-L169 NoReadableRunRecord (absent / not-JSON / not-UTF-8 / not-a-file arms). RAN: T22a 13 OK on the mutant",
+    "tests/v2/test_v21_kills3_A22.py L176-L195 AnUnreadableRecordIsNamedByItsFileAndItsCause: path delimited, class as a token; order not asserted",
+    "aisef2/app/cli.py: printed as JSON, exit from verdict",
+    "release_acceptance.py reads RUN.json itself before verify() (a missing record raises there, not here)"
+   ],
+   "exceptions_checked": [
+    "a consumer parsing the class from '(<Class>)': none by grep",
+    "a record path containing '(': the path comes first, delimited by ': no readable run record (', kept",
+    "the verdict depending on the text: literal 'REFUTED' with a one-element list in both",
+    "round-3 additions: the early return precedes everything round 3 added",
+    "a kill file flipping it: T22a 13 OK on the mutant"
+   ],
+   "refutation": "none -- T22a (13 tests pinning this exact document) OK on the mutant; A22's reader asserts path+class as tokens only. No test is owed (optional consistency pin only).",
+   "note": "Carried AUDITED reconfirmed; cites refreshed L93-L95 -> L102-L103."
+  },
+  {
+   "target": "aisef2/app/verify.py::verify",
+   "index": 187,
+   "mutant": "L152 string ')' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "REFRESHED cites (carried used stale L140-L144). Producer is the except (OSError, KeyError, TypeError, ValueError) arm L150-L152: problems.append(f\"the journal RUN.json names cannot be read ({type(e).__name__})\"); the mutant drops the closing ')', giving 'the journal RUN.json names cannot be read (KeyError' (mutant_view confirmed). Subject, kind and class survive, class last; the next problem ('the journal is not the one RUN.json names (digest or length)', L153-L154, always appended because data==b'') is a separate list element, so the unbalanced '(' reaches nothing. MEASUREMENT: mutant test_v21_defects_verify 20 OK (79.7s) and test_v21_kills3_T22b 10 OK (23.9s). Readers T22b.JournalReferenceUnreadable (L80-L100, FileNotFoundError/KeyError/TypeError arms) and defects_verify.test_a_journal_reference_that_is_no_object_or_no_path_is_refuted (L143) assert the class once and 'journal' -- never the paren.",
+   "consumers_checked": [
+    "aisef2/app/verify.py L152 sole producer; git grep 'names cannot be read' over aisef2 validation tests docs -> verify.py L152 only (independently reproduced)",
+    "tests/v2/test_v21_kills3_T22b.py L80-L100 JournalReferenceUnreadable: class once + 'journal'. RAN: T22b 10 OK on the mutant",
+    "tests/v2/test_v21_defects_verify.py L143-L153 test_a_journal_reference_that_is_no_object_or_no_path_is_refuted (ValueError arm). RAN: defects_verify 20 OK on the mutant",
+    "aisef2/app/cli.py: JSON, exit from verdict",
+    "release_rehearsal.py / release_acceptance.py embed the list, read the verdict, parse no problem"
+   ],
+   "exceptions_checked": [
+    "the TypeError arm for a non-object journal reference: L145-L146 refuses a non-dict reference with its own problem before this try, so L152 is reached only for a dict with a missing/NUL/unopenable path; class is the last datum in every arm",
+    "a consumer parsing '(<Class>)': none by grep",
+    "the verdict depending on the text: 'REFUTED' if problems, with either text",
+    "round-3: with the journal unread, format3.reconstruct('') yields no events, _projection_refusal([]) returns None, events stays []; the added problems are separate elements",
+    "a kill file flipping it: T22b 10 OK and defects_verify 20 OK on the mutant"
+   ],
+   "refutation": "none -- T22b and defects_verify (the files pinning this problem) OK on the mutant. No test is owed (optional consistency pin only).",
+   "note": "Carried AUDITED reconfirmed; cites refreshed L140-L144 -> L150-L152."
+  },
+  {
+   "target": "aisef2/app/verify.py::verify",
+   "index": 118,
+   "mutant": "L201 dict entry 0 dropped",
+   "class_before": "EQUIVALENT",
+   "verdict": "CONFIRMED",
+   "class_after": "EQUIVALENT",
+   "grounds": "REFRESHED cites (carried used stale L183/L184/L256). `errors` is built at verify.py L201: [{'story': x, 'error': 'begun and never ended in the journal'} for x in refused] + list(rec.get('story_errors') or []); its only other mention is L202, the 5th arg of R.delivery. The mutant drops dict entry 0 ('story'), leaving {'error': ...} per refused entry (mutant_view confirmed) -- same list length. R.delivery (run.py L373-L389) reads `errors` ONLY at L387: ([f\"{len(errors)} stories were refused\"] if errors else []) -- len() and truthiness, no iteration, no subscript, no serialisation; verify discards the returned blocker list (verdict, _, committed at L202). The returned document (L222-L223) has no 'errors' field, and no problem/note interpolates `errors` or `refused`. Dead-field proof: the mutation cannot change any observable output on any input. MEASUREMENT: sibling EQUIVALENT mutant 149 (same L201 comprehension) ran test_v21_continue_integrity 24 OK, corroborating the path.",
+   "consumers_checked": [
+    "aisef2/app/verify.py L201-L202: every mention of `errors` (grep) -- CONFIRMED",
+    "aisef2/app/run.py L373-L389 delivery: L387 `len(errors)`/`if errors` the ONLY reads; no element subscripted (independently reproduced by reading the function)",
+    "callers of R.delivery (grep over aisef2 validation tests): run.py L657 (the run's own list), verify.py L202 (discards blocked), release_acceptance.py L131 (the RECORD's story_errors), test_app_units L444-L455 / T14b L175 / s2_kills / r3_usage_* (each its own list) -- none reads verify's synthesized list by element",
+    "the returned document keys verdict/problems/delivery_verdict/journal_events/evidence_anchor/notes (L222-L223): no 'errors' field"
+   ],
+   "exceptions_checked": [
+    "an element of `errors` read by key later in verify: none, `errors` is not used after L202",
+    "the list changing length: dropping a key leaves one dict per refused entry, length unchanged",
+    "the dropped 'story' id being the only place the refused id reaches the document: no errors field, no problem interpolates it",
+    "round-3: `refused` is rebound at L183 to R.unfinished(events) (it is also the projection tuple at L157); after a projection refusal events==[] so refused==[] and the mutated comprehension is empty",
+    "artifact_problems raising before L201: caught by the outer except (L220), L201 not reached under either text"
+   ],
+   "refutation": "none -- EQUIVALENT by a complete dead-field proof: the only reader (R.delivery) consumes `errors` by len/truthiness, verify discards the blocker list, no document field or problem/note carries it, and the mutant preserves list length. No test can distinguish the mutant.",
+   "note": "Carried EQUIVALENT reconfirmed; cites refreshed to L201/L202 and run.py L373-L389 (L387). The group proof [90] premise (read only by length/truthiness) holds at this snapshot."
+  },
+  {
+   "target": "aisef2/app/verify.py::verify",
+   "index": 119,
+   "mutant": "L201 dict entry 1 dropped",
+   "class_before": "EQUIVALENT",
+   "verdict": "CONFIRMED",
+   "class_after": "EQUIVALENT",
+   "grounds": "REFRESHED cites. Same chain as [118]: `errors` (verify.py L201) flows only into R.delivery (L202) which reads len()/if (run.py L387); verify discards the blocker list. The mutant drops dict entry 1 ('error'), leaving {'story': x} per refused entry (mutant_view confirmed) -- same length. The dropped text is read by nobody: verify's copy reaches no output; the one other occurrence of the literal, test_v21_kills3_T14b L174, is that test's OWN list handed to R.delivery (counted there, not read from verify). Dead-field proof.",
+   "consumers_checked": [
+    "aisef2/app/verify.py L201-L202 sole mentions of `errors` -- CONFIRMED",
+    "aisef2/app/run.py L387 `if errors`/`len(errors)` only",
+    "git grep 'never ended in the journal' over aisef2 validation tests docs: verify.py L201 and test_v21_kills3_T14b L174 (a test building its own `errors` for R.delivery, asserting verdict and bool(blocked)); verify.py L8 and A10 L225 use the prose 'begun and never ended'",
+    "tests/v2/test_v21_kills3_T14b.py (not registered for verify; targets delivery): a begun-and-never-ended story refuses delivery, asserted by verdict, not by the dict content"
+   ],
+   "exceptions_checked": [
+    "`errors` echoed into a problem or note: no append in verify (L103-L221) interpolates `errors`/`refused`; problems += found / notes += said carry review_verify texts only",
+    "the verdict effect of a never-ended story: carried by the element's PRESENCE, kept by the mutant (a different question, pinned by T14b through delivery)",
+    "a reader of the dropped text in test code: T14b L174 constructs it, does not read verify's",
+    "round-3: refused rebinding (L157 tuple, L183 list) and events==[] after a projection refusal make the mutated comprehension empty"
+   ],
+   "refutation": "none -- EQUIVALENT by the same dead-field proof as [118]; the literal T14b spells is its own input to delivery, not a read of verify's list.",
+   "note": "Carried EQUIVALENT reconfirmed; cites refreshed to L201/L202, run.py L387, T14b L174."
+  },
+  {
+   "target": "aisef2/app/verify.py::verify",
+   "index": 149,
+   "mutant": "L201 string 'story' emptied",
+   "class_before": "EQUIVALENT",
+   "verdict": "CONFIRMED",
+   "class_after": "EQUIVALENT",
+   "grounds": "REFRESHED cites. The first key becomes '' so each synthesized element is {'': x, 'error': 'begun and never ended in the journal'} (mutant_view confirmed). `errors` (verify.py L201) is read only by R.delivery as len()/if (run.py L387), blocker list discarded (L202); no element is subscripted. Keys '' and 'error' are distinct, so the dict keeps two entries and raises nothing, and even a collision would not change the list's length. Dead-field proof. MEASUREMENT: mutant test_v21_continue_integrity 24 OK (651.3s) -- the continuation path that reaches L201 is exercised and the mutant survives, confirming the proof empirically.",
+   "consumers_checked": [
+    "aisef2/app/verify.py L201-L202 sole mentions of `errors` -- CONFIRMED",
+    "aisef2/app/run.py L373-L389: len/truthiness only, no subscript of an element",
+    "callers of R.delivery (grep): verify.py L202 (discards blocked), release_acceptance L131 (record's list), run.py L657, unit tests with their own lists; the run's own story_errors (run.py) use key 'story' written by the RUN and read from RUN.json (e2e_guest reads 'error'), a different list",
+    "the returned document: no 'errors' field (L222-L223)"
+   ],
+   "exceptions_checked": [
+    "a reader indexing the element by 'story': none in verify or R.delivery; the 'story' readers are of the RECORD's story_errors",
+    "key collision dropping an entry: '' differs from 'error'; and a collision would not change the list length anyway",
+    "an exception from the empty key: '' is a valid dict key, no raise",
+    "round-3: refused rebinding and events==[] after a projection refusal make the mutated comprehension empty",
+    "a kill file flipping it: continue_integrity 24 OK on the mutant"
+   ],
+   "refutation": "none -- EQUIVALENT by dead-field proof; empirically continue_integrity 24 OK on the mutant.",
+   "note": "Carried EQUIVALENT reconfirmed and empirically measured; cites refreshed to L201/L202, run.py L387."
+  },
+  {
+   "target": "aisef2/app/verify.py::verify",
+   "index": 150,
+   "mutant": "L201 string 'error' emptied",
+   "class_before": "EQUIVALENT",
+   "verdict": "CONFIRMED",
+   "class_after": "EQUIVALENT",
+   "grounds": "REFRESHED cites. The second key becomes '' so each element is {'story': x, '': 'begun and never ended in the journal'} (mutant_view confirmed). Same single use of `errors` as [118]/[149] (verify.py L202; run.py L387 len/if), same discarded blocker list; keys 'story' and '' are distinct so the dict keeps two entries and raises nothing. Same list length. Dead-field proof (same path empirically survived via sibling 149 on continue_integrity 24 OK).",
+   "consumers_checked": [
+    "aisef2/app/verify.py L201-L202 sole mentions of `errors` -- CONFIRMED",
+    "aisef2/app/run.py L387 length and truthiness only",
+    "grep of get('error')/['error']/\"error\" readers over aisef2 validation tests: e2e_guest and record tests read the RECORD's story_errors (key 'error' written by run.py), never verify's synthesized list"
+   ],
+   "exceptions_checked": [
+    "a reader indexing by 'error': none in verify or R.delivery",
+    "the key distinguishing synthetic errors from the record's later: nothing in verify distinguishes them after L201 (L201-L202 consecutive)",
+    "an exception from the empty key: '' is valid, no raise",
+    "round-3: as [118] (refused rebinding, events==[] after a projection refusal)"
+   ],
+   "refutation": "none -- EQUIVALENT by the same dead-field proof; the continuation path survives (sibling 149 continue_integrity 24 OK).",
+   "note": "Carried EQUIVALENT reconfirmed; cites refreshed to L201/L202, run.py L387."
+  },
+  {
+   "target": "aisef2/app/verify.py::verify",
+   "index": 151,
+   "mutant": "L201 string 'begun and never ended in the journal' emptied",
+   "class_before": "EQUIVALENT",
+   "verdict": "CONFIRMED",
+   "class_after": "EQUIVALENT",
+   "grounds": "REFRESHED cites. The value of the 'error' entry becomes '' (mutant_view confirmed); each element is still a two-entry dict at the same list position, and `errors` (verify.py L201) is read only by len/truthiness (run.py L387) with its blocker list discarded (L202). The text is shown to nobody: no problem, note or document field of verify carries `errors`. Dead-field proof. The earlier 'quoted nowhere' is corrected: test_v21_kills3_T14b L174 spells the same literal for a list the test builds itself and hands to R.delivery (counted, not a read of verify's).",
+   "consumers_checked": [
+    "aisef2/app/verify.py L201-L202 sole mentions of `errors`; no problems/notes append interpolates it (L103-L221 read) -- CONFIRMED",
+    "aisef2/app/run.py L387",
+    "git grep 'begun and never ended in the journal' over aisef2 validation tests docs: verify.py L201 and test_v21_kills3_T14b L174 (test-built list into R.delivery, asserting verdict and bool(blocked))",
+    "no document asserts or quotes the text"
+   ],
+   "exceptions_checked": [
+    "the text reaching a problem or note: no append interpolates `errors`",
+    "the empty value changing element/list truthiness: the dict has two keys, the list is truthy by length, element truthiness not read",
+    "the verdict effect of a never-ended story: carried by element PRESENCE, kept; a different question (T14b pins it through delivery)",
+    "the text shown by the run (RUN.json story_errors): the run writes its own errors (run.py) and has no begun-and-never-ended error; verify never writes RUN.json"
+   ],
+   "refutation": "none -- EQUIVALENT by dead-field proof; T14b's occurrence is its own input to delivery, not a read of verify's list.",
+   "note": "Carried EQUIVALENT reconfirmed; cites refreshed to L201/L202, run.py L387, T14b L174."
+  }
+ ],
+ "owed_tests": [],
+ "notes": "Skeptic copy b, batch B08-verify, snapshot 4ec961e706a1f7bda16d131037058c4fe9c2663f. source_sha256 of aisef2/app/verify.py = 2555fdca1107d19f16cd0165da3dacfd2bcb112efec228a3045b4a573807b72b (independently recomputed; matches the batch's covered entries). 12 entries verified exactly once each: 1 new survivor (176) + 11 carried (48,106,118,119,132,136,149,150,151,163,187). ALL 12 CONFIRMED; no verdict changed, no test owed. mutant_view confirmed every mutation is positional-correct and matches its description at this snapshot. EQUIVALENT (118,119,149,150,151): dead-field proof -- `errors` (verify.py L201) flows only into R.delivery (L202), which reads it ONLY as len()/if at run.py L387 (no iteration, no subscript, no serialisation); verify discards the returned blocker list (verdict, _, committed); the returned document has no 'errors' field and no problem/note interpolates it; every mutation preserves the list length; every other R.delivery caller passes its OWN list. AUDITED (176,48,106,132,136,163,187): the surviving text carries the identifying content each reader asserts, and no reader/document depends on the lost part (independent git greps reproduced). MEASUREMENT on COPY trees, PATH scrubbed of both opencode dirs (/Users/nghinh/.opencode/bin, /Users/nghinh/.npm-global/bin; `command -v opencode` = NO during every run), HOME/TMPDIR/XDG under the copy, PYTHONPATH=copy-root (python -P strips cwd for `-m`, so PYTHONPATH is set explicitly; benign): baseline x_lineage_proof 55 OK; mutant 176 x_lineage_proof 55 OK; mutant 48 test_v21_verify 8 OK; 106 A22 7 OK; 132 defects_verify 20 OK; 136 R01 8 OK; 163 T22a 13 OK; 187 defects_verify 20 OK + T22b 10 OK; 149 continue_integrity 24 OK. No registered kill file fails on any mutant, so every SURVIVED is explained with no appeal to environment or order. Carried cites were stale (written against an earlier base 289885e / origin b5c2457) and are refreshed to this snapshot's lines per entry. HYGIENE: built my tree with git archive (read-only) of 4ec961e; never touched the running campaign dir (c9/camp, heavy.lock.d), never signalled a process, never created a STOP file, never ran mutation.py run or the real opencode, never edited the read-only v21 worktree (archive only). Removed only my own two trees (trees/B08-verify-b, trees/B08-verify-b-mut) at the end; other workers' trees (B01, B03, B04, B08-verify-a, B08-verify-author-mut) left untouched. Did not look at copy a's output."
+}

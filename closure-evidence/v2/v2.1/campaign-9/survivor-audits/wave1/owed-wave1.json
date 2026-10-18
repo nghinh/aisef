@@ -1,0 +1,130 @@
+{
+ "owed": [
+  {
+   "batch": "B03-continue_from",
+   "target": "aisef2/app/bundle_cli.py::continue_from",
+   "index": 175,
+   "verdicts": [
+    "REFUTED",
+    "CONFIRMED"
+   ]
+  },
+  {
+   "batch": "B03-continue_from",
+   "target": "aisef2/app/bundle_cli.py::continue_from",
+   "index": 158,
+   "verdicts": [
+    "REFUTED",
+    "CONFIRMED"
+   ]
+  },
+  {
+   "batch": "B03-continue_from",
+   "target": "aisef2/app/bundle_cli.py::continue_from",
+   "index": 193,
+   "verdicts": [
+    "REFUTED",
+    "CONFIRMED"
+   ]
+  },
+  {
+   "batch": "B03-continue_from",
+   "target": "aisef2/app/bundle_cli.py::continue_from",
+   "index": 196,
+   "verdicts": [
+    "REFUTED",
+    "CONFIRMED"
+   ]
+  },
+  {
+   "batch": "B03-continue_from",
+   "target": "aisef2/app/bundle_cli.py::continue_from",
+   "index": 179,
+   "verdicts": [
+    "REFUTED",
+    "CONFIRMED"
+   ]
+  },
+  {
+   "batch": "B03-continue_from",
+   "target": "aisef2/app/bundle_cli.py::continue_from",
+   "index": 191,
+   "verdicts": [
+    "REFUTED",
+    "CONFIRMED"
+   ]
+  },
+  {
+   "batch": "B03-continue_from",
+   "target": "aisef2/app/bundle_cli.py::continue_from",
+   "index": 197,
+   "verdicts": [
+    "REFUTED",
+    "CONFIRMED"
+   ]
+  },
+  {
+   "batch": "B03-continue_from",
+   "target": "aisef2/app/bundle_cli.py::continue_from",
+   "index": 194,
+   "verdicts": [
+    "REFUTED",
+    "CONFIRMED"
+   ]
+  },
+  {
+   "batch": "B03-continue_from",
+   "target": "aisef2/app/bundle_cli.py::continue_from",
+   "index": 195,
+   "verdicts": [
+    "REFUTED",
+    "CONFIRMED"
+   ]
+  },
+  {
+   "batch": "B05-seal",
+   "target": "aisef2/app/bundle_cli.py::seal",
+   "index": 150,
+   "verdicts": [
+    "CONFIRMED",
+    "CONFIRMED"
+   ]
+  },
+  {
+   "batch": "B05-seal",
+   "target": "aisef2/app/bundle_cli.py::seal",
+   "index": 130,
+   "verdicts": [
+    "CONFIRMED",
+    "CONFIRMED"
+   ]
+  },
+  {
+   "batch": "B05-seal",
+   "target": "aisef2/app/bundle_cli.py::seal",
+   "index": 128,
+   "verdicts": [
+    "CONFIRMED",
+    "CONFIRMED"
+   ]
+  },
+  {
+   "batch": "B05-seal",
+   "target": "aisef2/app/bundle_cli.py::seal",
+   "index": 152,
+   "verdicts": [
+    "CONFIRMED",
+    "CONFIRMED"
+   ]
+  },
+  {
+   "batch": "B07-execute",
+   "target": "aisef2/app/run.py::execute",
+   "index": 358,
+   "verdicts": [
+    "REFUTED",
+    "CONFIRMED"
+   ]
+  }
+ ]
+}

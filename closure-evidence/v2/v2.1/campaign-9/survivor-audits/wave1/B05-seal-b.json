@@ -1,0 +1,246 @@
+{
+ "batch": "B05-seal",
+ "copy": "b",
+ "entries": [
+  {
+   "target": "aisef2/app/bundle_cli.py::seal",
+   "index": 7,
+   "mutant": "L510 tuple() -> list()",
+   "class_before": "EQUIVALENT",
+   "verdict": "CONFIRMED",
+   "class_after": "EQUIVALENT",
+   "grounds": "mutant_view[7] confirms L510 `approvals = tuple(approvals)` -> `list(approvals)` in seal at this snapshot (bundle_cli.py source_sha256 e083e92a... verified). The `approvals` local is read only at L511 `if approvals and exposed is None` (bool test) and L578 `for a in approvals` (iteration), and nowhere else in seal (L502-599); it is never hashed, stored in a frozen dataclass, serialised, type-checked or returned (kept/dropped/withheld are built by iterating it, the bundle stores `kept`). list and tuple are indistinguishable under bool() and for-iteration; a generator/iterator arg is fully materialised by both at L510. No input distinguishes the mutant -> equivalent. MEASURED (cwd=tree, env -i, PATH stripped of both opencode dirs, HOME/TMPDIR/XDG under the copy, nice -n 19 python3 -P -B): SealKeepsTheSameRule 6/6 OK; bundle_tools+kills3_T02a 38/38 OK; unmutated baseline green. EQUIVALENT confirmed.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:511 (truthiness of approvals) and :578 (for a in approvals) — the only two reads in seal L502-599",
+    "no hash/store/serialise/return of the approvals local (bundle stores `kept`, built at :577-589)",
+    "registered kill files run: migrate_semantics::SealKeepsTheSameRule OK, test_v21_bundle_tools OK, test_v21_kills3_T02a OK"
+   ],
+   "exceptions_checked": [
+    "non-iterable arg: tuple(x)/list(x) both raise TypeError at L510 (outside every try) -> identical main handler L1082 'refused: TypeError: ...'",
+    "generator arg: both materialise once; SealKeepsTheSameRule exercises approvals=iter(old['approvals']) and refuses it identically (exposed is None)",
+    "order preserved identically by list and tuple"
+   ],
+   "refutation": "",
+   "note": "Author grounds accurate; cites already at this snapshot. Verified independently."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::seal",
+   "index": 155,
+   "mutant": "L541 tuple() -> list()",
+   "class_before": "EQUIVALENT",
+   "verdict": "CONFIRMED",
+   "class_after": "EQUIVALENT",
+   "grounds": "mutant_view[155] confirms L541 `requirement_ids=tuple(c['requirement_ids'])` -> `list(...)`, passed as a kwarg to BehaviorContract.create (contract.py:155 create -> cls(**content, contract_hash=_SEAL)). PROOF FROM CODE: BehaviorContract.__post_init__ (contract.py, verified lines) does `ids = tuple(self.requirement_ids) if isinstance(self.requirement_ids,(list,tuple)) else None` then `object.__setattr__(self,'requirement_ids', ids)` BEFORE contract_hash is minted (`if self.contract_hash is _SEAL: object.__setattr__(..., contract_hash(self))`). The argument is never read between L541 and __post_init__ (passed directly to create). A list and a tuple of the same ids both pass isinstance and both become the same stored tuple -> byte-identical contract_hash; plain() renders a tuple to a list anyway (contract.py:53-55). A non-iterable c['requirement_ids'] makes tuple(x)/list(x) both raise TypeError at L541, caught at L545-546 as the identical BundleError('a requirement or contract does not hold: TypeError: ...'). MEASURED: SealKeepsTheSameRule 6/6 OK; bundle_tools+T02a 38/38 OK (assert report['plan_hash']==bundle plan_hash, re-seal parity). EQUIVALENT.",
+   "consumers_checked": [
+    "aisef2/product/contract.py __post_init__ (requirement_ids normalized to tuple) then contract_hash minted; plain() renders tuple->list",
+    "aisef2/app/bundle_cli.py:545-546 (construction error -> one BundleError, type name identical for list/tuple)",
+    "registered kill files: SealKeepsTheSameRule OK, bundle_tools OK (plan_hash parity), kills3_T02a OK"
+   ],
+   "exceptions_checked": [
+    "str value: tuple('x')/list('x') re-tupled to the same value by __post_init__ (same latent behaviour both)",
+    "non-iterable: both raise TypeError at L541 -> identical BundleError at L545",
+    "downstream identity (contract_hash, plan_hash, bundle digest) reads the normalized tuple, not the L541 argument"
+   ],
+   "refutation": "",
+   "note": "Normalizer proof verified from contract.py __post_init__; cite refreshed (post_init normalizes before hash)."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::seal",
+   "index": 160,
+   "mutant": "L567 tuple() -> list()",
+   "class_before": "EQUIVALENT",
+   "verdict": "CONFIRMED",
+   "class_after": "EQUIVALENT",
+   "grounds": "mutant_view[160] confirms L567 `tuple(cr['depends_on'])` -> `list(...)`, the 6th positional arg of PlanObligation(...) (L566-567). PROOF FROM CODE: PlanObligation.__post_init__ (plan/obligation.py:48-50, verified) does `deps = tuple(self.depends_on) if isinstance(self.depends_on,(list,tuple)) else None` then `object.__setattr__(self,'depends_on', deps)` — the obligation is frozen with the same tuple whether a list or tuple was passed, before it is read by Plan or hashed; the arg is not read between L567 and __post_init__. plan_hash renders depends_on via plain() identically. A non-iterable makes tuple(x)/list(x) both raise TypeError at L567, caught at L568-569 as the identical BundleError('<where>: TypeError: ...'). MEASURED: SealKeepsTheSameRule 6/6 OK; bundle_tools+T02a 38/38 OK. EQUIVALENT.",
+   "consumers_checked": [
+    "aisef2/plan/obligation.py:48-50 (depends_on normalized to a tuple in __post_init__), plan_hash reads the normalized tuple via plain()",
+    "aisef2/app/bundle_cli.py:568-569 (construction error -> one BundleError; type name identical for list/tuple)",
+    "registered kill files: SealKeepsTheSameRule OK, bundle_tools OK, kills3_T02a OK"
+   ],
+   "exceptions_checked": [
+    "non-iterable depends_on: both raise TypeError at L567 -> identical BundleError at L568",
+    "order preserved identically, then stored as a tuple",
+    "plan_hash reads the normalized tuple, not the L567 argument"
+   ],
+   "refutation": "",
+   "note": "Normalizer proof verified from PlanObligation.__post_init__."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::seal",
+   "index": 121,
+   "mutant": "L572 tuple() -> list()",
+   "class_before": "EQUIVALENT",
+   "verdict": "CONFIRMED",
+   "class_after": "EQUIVALENT",
+   "grounds": "mutant_view[121] confirms L572 `obligations=tuple(obligations)` -> `list(obligations)`, passed to Plan.create (L572-573 -> cls(**content, plan_hash=_SEAL)). PROOF FROM CODE: Plan.__post_init__ (plan/obligation.py:90-92, verified) does `obligations = tuple(self.obligations) if isinstance(self.obligations,(list,tuple)) else None` then `object.__setattr__(self,'obligations', obligations)` BEFORE plan_hash is minted (:98-99). `obligations` is the locally-built list (always iterable); list and tuple of it both become the same stored tuple -> byte-identical plan_hash. The L594 `specs` read iterates the ORIGINAL local `obligations` list (built at :549/:566), not the L572 argument, so is unaffected. MEASURED: SealKeepsTheSameRule 6/6 OK; bundle_tools+T02a 38/38 OK (T02a asserts printed report['plan_hash']==written bundle plan_hash). EQUIVALENT.",
+   "consumers_checked": [
+    "aisef2/plan/obligation.py:90-92 (obligations normalized to a tuple) then :98-99 (plan_hash minted after)",
+    "aisef2/app/bundle_cli.py:594 report['plan_hash']=plan.plan_hash; :1045 printed; :594 specs iterates the local list (before L572)",
+    "registered kill files: SealKeepsTheSameRule OK, bundle_tools OK, kills3_T02a OK"
+   ],
+   "exceptions_checked": [
+    "`obligations` is a local list (built :549/:566), never a generator or non-iterable -> only list-vs-tuple arises, both normalize to the same tuple",
+    "report['specs'] (:594) computed from the local list, unaffected by L572"
+   ],
+   "refutation": "",
+   "note": "Normalizer proof verified from Plan.__post_init__."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::seal",
+   "index": 128,
+   "mutant": "L597 dict entry 1 dropped",
+   "class_before": "REFUTED",
+   "verdict": "CONFIRMED",
+   "class_after": "SURVIVED (test owed)",
+   "grounds": "mutant_view[128] + full-line extract confirm L597 drops `'requirement': a.requirement_id` from each row of report['approvals_withheld_semantic'] (L596-598). OBSERVABLE: the unmutated BC-GREP-DIR-REQ withheld row (era_bundle fixture, seal called as SealKeepsTheSameRule.seal) has keys {approved_at, approver, changes, contract, requirement} with requirement='R-1'; the mutant row loses 'requirement' (6 withheld rows). The report is returned to main and printed WHOLE as JSON (L1045, sort_keys) for the operator to reconcile lapsed approvals; requirement_id is half a ContractApproval's identity (APPROVAL_KEY :325) and, when a withheld contract cites >1 requirement, is the only field distinguishing the per-requirement rows. This is a structured identifying field read by the operator, not a free-text diagnostic -> a key-set assertion (allowed, not a forbidden phrase-assertion) kills it, so a test is owed. MEASURED kill outcome: the only test that reads this field, migrate_semantics::SealKeepsTheSameRule, reads r['contract'], row['approver'], row['changes'][0]['version'] only (never 'requirement') -> OK on the mutant (6/6). grep shows NO other test module reads approvals_withheld_semantic, so no non-registered test kills it: campaign SURVIVED confirmed, not a runner artifact.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:1045 main (prints the whole report incl. approvals_withheld_semantic as JSON, sort_keys=True)",
+    "grep approvals_withheld_semantic across tests/ aisef2/ aisef/ validation/ docs/: writer bundle_cli.py:596 and reader tests/v2/test_v21_migrate_semantics.py ONLY (lines 749/753/788 read 'contract'; 754 reads approver/changes; 773/794 assert == [])",
+    "tests/v2/test_v21_migrate_semantics.py:747-754 SealKeepsTheSameRule — only test with non-empty seal withheld rows — measured OK on the mutant",
+    "aisef2/app/bundle_cli.py:325 APPROVAL_KEY (requirement_id is an identity component)"
+   ],
+   "exceptions_checked": [
+    "a machine consumer of row['requirement'] on seal's report: none (grep); migrate's own approvals_withheld (a different dict) is unaffected",
+    "redundancy via report['to_approve']: a different list (contracts needing approval), not the record of the lapsed approval",
+    "REFUTED-by-measurement: ruled out — no registered or non-registered kill file fails on the mutant"
+   ],
+   "refutation": "Reader: bundle_cli.main (:1045) prints report['approvals_withheld_semantic'] as JSON for the operator; each row must name a withheld ContractApproval and requirement_id is half its identity (APPROVAL_KEY). No test pins seal's row field-set, so dropping 'requirement' survives. Input: migrate_semantics era_bundle() (6 withheld rows), ideally plus a withheld contract citing two requirement_ids. Test sketch: extend SealKeepsTheSameRule.test_an_approval_of_a_selected_contract_is_not_kept_and_is_named to assert, for each r, set(r)=={'contract','requirement','approver','approved_at','changes'} and the BC-GREP-DIR-REQ row has r['requirement']=='R-1' (mirrors the sibling provenance guard the suite already makes on the migrate row at migrate_semantics:378). A key-set assertion, not a phrase-assertion. A real gap.",
+   "note": "Author verdict CONFIRMED. REFUTED (test owed), not AUDITED: a structured identifying field, killable by an allowed key-set test, unlike the diagnostic clauses of covered [133]/[157]."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::seal",
+   "index": 150,
+   "mutant": "L597 string 'requirement' emptied",
+   "class_before": "REFUTED",
+   "verdict": "CONFIRMED",
+   "class_after": "SURVIVED (test owed)",
+   "grounds": "mutant_view[150] + full-line extract confirm L597 relabels the key literal 'requirement' to '' in each withheld row: unmutated {...,'requirement':'R-1'} -> mutant {'':'R-1','approved_at':...,'approver':...,'changes':...,'contract':...} (no key collision; '' sorts first under main's sort_keys). An operator scanning the printed report finds no 'requirement' field; a script reading r['requirement'] gets KeyError. Same materiality and same owed test as index 128. MEASURED: SealKeepsTheSameRule OK on the mutant (6/6; never reads 'requirement'); grep confirms no other reader of the field -> campaign SURVIVED confirmed. Structured field, allowed key-set test kills it -> test owed, not AUDITED.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:1045 main (prints report with sort_keys; '' sorts first)",
+    "tests/v2/test_v21_migrate_semantics.py SealKeepsTheSameRule (reads contract/approver/changes only; OK on mutant)",
+    "grep of readers of row['requirement'] on seal's report: none (writer bundle_cli.py:596 only)",
+    "aisef2/app/bundle_cli.py:325 APPROVAL_KEY"
+   ],
+   "exceptions_checked": [
+    "key collision from the '' relabel: none — only 'requirement' is relabeled, other keys stay distinct, row keeps 5 entries",
+    "a reader indexing by position: none; rows are dicts read by name",
+    "REFUTED-by-measurement: ruled out (no kill file fails)"
+   ],
+   "refutation": "Same as 128: the requirement id is moved to a blank key, so no 'requirement' field. Closed by the same owed test — assert set(r)=={'contract','requirement','approver','approved_at','changes'}; the '' key fails the set assertion, killing this mutant.",
+   "note": "Author verdict CONFIRMED."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::seal",
+   "index": 130,
+   "mutant": "L597 dict entry 3 dropped",
+   "class_before": "REFUTED",
+   "verdict": "CONFIRMED",
+   "class_after": "SURVIVED (test owed)",
+   "grounds": "mutant_view[130] + full-line extract confirm L597/598 drops `'approved_at': a.approved_at` from each withheld row: unmutated {'approved_at':100.0,...} -> mutant row without 'approved_at' (6 rows). approved_at is the 'when' of the lapsed approval, an APPROVAL_KEY identity component (:325), and is exactly the field the registered suite PINS on the SIBLING migrate row: migrate_semantics:378 asserts given['approved_at']==100.0 for the migrate report's approvals_in_input. The seal report's parallel field has no such guard, so dropping it survives. The report is printed whole for the operator (L1045). MEASURED: SealKeepsTheSameRule OK on the mutant (6/6; reads only contract/approver/changes); no other reader of the field -> campaign SURVIVED confirmed. Structured provenance field, allowed key-set/value test kills it -> test owed.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:1045 main (prints the row; the operator's 'when' of the lapsed approval)",
+    "tests/v2/test_v21_migrate_semantics.py:378 — the suite pins approved_at==100.0 on the SIBLING migrate row (approvals_in_input), proving it is load-bearing provenance; nothing pins seal's withheld row",
+    "grep of readers of seal-report row['approved_at']: none (writer bundle_cli.py:598; the only approved_at read in tests is the migrate sibling at :378)",
+    "aisef2/app/bundle_cli.py:325 APPROVAL_KEY (approved_at identity component)"
+   ],
+   "exceptions_checked": [
+    "operator ACTION dependence: re-approval is driven by report['to_approve'] (no timestamps), so approved_at is provenance — but identity-key provenance the sibling test pins, read by the operator",
+    "a machine consumer of seal-report approved_at: none",
+    "REFUTED-by-measurement: ruled out (no kill file fails)"
+   ],
+   "refutation": "The withheld row documents who approved and WHEN; approved_at is an APPROVAL_KEY identity component, pinned for the sibling migrate row (migrate_semantics:378) but not for seal's. Input: era_bundle() (6 withheld rows). Reader: bundle_cli.main (:1045). Sketch: in SealKeepsTheSameRule assert each row's key set is {'contract','requirement','approver','approved_at','changes'} and the BC-GREP-DIR-REQ row has r['approved_at']==100.0 (mirroring :378). Kills 130 and 152. A real gap.",
+   "note": "Author verdict CONFIRMED. Sibling pin at :378 directly supports the owed test for approved_at."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::seal",
+   "index": 152,
+   "mutant": "L598 string 'approved_at' emptied",
+   "class_before": "REFUTED",
+   "verdict": "CONFIRMED",
+   "class_after": "SURVIVED (test owed)",
+   "grounds": "mutant_view[152] + full-line extract confirm L598 relabels the key literal 'approved_at' to '' in each withheld row: unmutated {'approved_at':100.0,...} -> mutant {'':100.0,'approver':...,'changes':...,'contract':...,'requirement':...} (no collision; '' sorts first). A reader of r['approved_at'] gets KeyError; the operator sees a blank-keyed number. Same materiality and owed test as 130. MEASURED: SealKeepsTheSameRule OK on the mutant (6/6); no other reader -> campaign SURVIVED confirmed. Structured field, allowed key-set test kills it -> test owed.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:1045 main (prints the row; '' sorts first)",
+    "tests/v2/test_v21_migrate_semantics.py:378 (sibling migrate row's approved_at pinned; seal's is not)",
+    "grep of readers of seal-report row['approved_at']: none (writer bundle_cli.py:598 only)",
+    "aisef2/app/bundle_cli.py:325 APPROVAL_KEY"
+   ],
+   "exceptions_checked": [
+    "collision of two '' keys: none — only 'approved_at' is relabeled; row keeps 5 distinct keys",
+    "a reader tolerant of the key name: none; readers index by name",
+    "REFUTED-by-measurement: ruled out (no kill file fails)"
+   ],
+   "refutation": "Same as 130: approved_at moved to a blank key, so no 'approved_at' field. Closed by the same owed key-set assertion on each withheld row; the '' key fails the set assertion, killing this mutant.",
+   "note": "Author verdict CONFIRMED."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::seal",
+   "index": 117,
+   "mutant": "L568 element 0 dropped",
+   "class_before": "EQUIVALENT",
+   "verdict": "CONFIRMED",
+   "class_after": "EQUIVALENT",
+   "grounds": "CARRIED audit (remapped from base 289885e L229 / origin c4c1720 L217) re-verified at snapshot 4ec961e; author's line cites were stale and are REFRESHED here. mutant_view[117] confirms the mutant drops KeyError from the criterion try's except, now at bundle_cli.py:568 (`except (KeyError, TypeError, ValueError)` -> `except (TypeError, ValueError)`); try body L565-567. PROOF FROM CODE (dominance — no KeyError can reach the handler): (a) cr['role'],cr['id'],cr['depends_on'],cr['why'] are present because `_closed(cr, CRITERION_KEYS, where)` at L557 enforces cr's key set == CRITERION_KEYS=('id','contract','role','depends_on','why','facts') (L113; _closed L479-482 asserts sorted(obj)==sorted(keys)); (b) ObligationRole(cr['role']) is a plain 3-member Enum (arch/enums.py:62-65 INTRODUCE/PRESERVE/VERIFY, no _missing_/__new__/metaclass) -> a bad value ends in ValueError, never an escaping KeyError; (c) EXPECTED_AT_PARENT[role] has all three roles (plan/obligation.py:76-78), and role is always a valid member -> no KeyError; (d) tuple(cr['depends_on']) -> TypeError on non-iterable, not KeyError; (e) PlanObligation.__post_init__ raises PlanError (a ValueError subclass: PlanError<ContractError<ValueError) or TypeError, via getattr/strip/isinstance/tuple — no document-keyed subscript; (f) _mint (L452-461) reads validated attributes, not document text. So removing KeyError from the catch changes nothing; even an impossible escaping KeyError would hit main's generic handler (L1082) for the same exit-2. MEASURED: bundle_tools+kills3_T02a+SealKeepsTheSameRule 44/44 OK on the mutant.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:557 _closed(cr, CRITERION_KEYS); :113 CRITERION_KEYS; :479-482 _closed body; :570 facts[cr['id']] (outside the try)",
+    "aisef2/arch/enums.py:62-65 ObligationRole (plain Enum) ; aisef2/plan/obligation.py:76-78 EXPECTED_AT_PARENT (all 3 roles) ; :39-50 PlanObligation.__post_init__ (PlanError/TypeError) ; aisef2/app/bundle_cli.py:452-461 _mint",
+    "main handlers at bundle_cli.py:1079 ('refused: {e}') and :1082 ('refused: {Class}: {e}') — a stray KeyError would still exit 2; the KeyError branch is dead",
+    "registered kill files: bundle_tools OK, kills3_T02a OK (T02a:308-346 pins the criterion handler's path + cause class TypeError/ValueError/ContractError, which the mutant leaves intact), SealKeepsTheSameRule OK"
+   ],
+   "exceptions_checked": [
+    "a fourth ObligationRole member without an EXPECTED_AT_PARENT row would make the branch live, but that is a change to a frozen 3-member enum, not an input of seal",
+    "a Mapping subclass whose __getitem__ raises KeyError for a listed key: not JSON-shaped; main reads the document via json",
+    "odd/unhashable role values ([], {}, nan, inf, bytes, object): end in ValueError/TypeError, caught identically",
+    "round 3 changed no module in this path (plan/, product/, arch/ unchanged)"
+   ],
+   "refutation": "",
+   "note": "Carried grounds conclusion holds; stale cites (old L229-230 / T02a:309-345) refreshed to L568 / CRITERION_KEYS L113 / _closed L557 / EXPECTED_AT_PARENT 76-78 / T02a:308-346. Dominance proof re-derived independently."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::seal",
+   "index": 133,
+   "mutant": "L524 string ')' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "CARRIED audit (remapped from base 289885e L185 / origin c4c1720 L173) re-verified at 4ec961e; cites REFRESHED. mutant_view[133] confirms the mutant drops the final ')' from L524 `raise B.BundleError(f\"{repo}: not a git repository with a commit ({head.stderr.strip()[:200]})\")`. The raise is outside every try (inside `if head.returncode != 0:` L523, under `if baseline=='HEAD':` L519) and is printed verbatim by main L1079 ('refused: ' + message, exit 2). grep of the whole tree for 'not a git repository with a commit' shows the raise site is the ONLY occurrence — no machine parses it. What the operator needs (the repo path, the cause, git's own stderr excerpt) is intact; the ')' is the last character, following the excerpt, so dropping it changes no word and nothing after it. The only test that could kill it is a phrase/punctuation-assertion on the trailing bracket, which the owner's rule forbids. Not killed, not equivalent -> AUDITED. MEASURED: kills3_T02a 29/29 OK on the mutant; T02a:449-459 asserts the repo path stands_alone and why.stderr.strip()[:200] is in the message — the git reason, not the bracket.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:1079 main (prints 'refused: ' + message, exit 2)",
+    "grep 'not a git repository with a commit' over aisef2/ aisef/ validation/ tests/ docs/: the raise site L524 only",
+    "aisef2/orchestrate/workspace.py:63-70 git() synthesises the '(... not inert)' stderr that can feed the {head.stderr} excerpt",
+    "tests/v2/test_v21_kills3_T02a.py:449-459 (repo path stands_alone + git's stderr excerpt in message); no reader splits on ')' or matches the tail"
+   ],
+   "exceptions_checked": [
+    "excerpt truncated at 200 chars: the quote ends mid-word with or without ')'; the cut is visible from the word",
+    "workspace.git synthesised stderr ends in '(not inert)' -> under the mutant the line has one '(' more than ')', but it still names the same keys",
+    "a reader that splits stderr on ')' or matches the message tail: none found (grep)"
+   ],
+   "refutation": "",
+   "note": "Carried conclusion holds; cites refreshed (old L185/L576-578/T02a:447-459 -> L524/L1079/T02a:449-459). AUDITED correct: the lost char is punctuation in a free-text diagnostic, only killable by a forbidden phrase-assertion."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::seal",
+   "index": 157,
+   "mutant": "L560 string ' is not a contract of the document' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "CARRIED audit (remapped from base 289885e L221 / origin c4c1720 L209) re-verified at 4ec961e; cites REFRESHED. mutant_view[157] confirms the mutant empties the tail of L560 `raise B.BundleError(f\"{where}.contract: {cr['contract']!r} is not a contract of the document\")` -> `f\"{where}.contract: {cr['contract']!r}\"`. The raise is outside every try (after `contract = by_id.get(cr['contract'])` at L558; the try begins at L564) and is printed by main L1079 (exit 2). The locator '<path>.contract' + the repr-quoted offending id remain, so path + value still determine the cause; grep of the whole tree for 'is not a contract of the document' shows the raise site L560 is the ONLY occurrence — no code or document reads the phrase. Residual (left to the owner): the line becomes '<path>: <quoted id>' with no reason words, the same shape as L516 '$.format: <REQUIRED value>', a minor polarity ambiguity for a reader who does not know the tool; no machine is affected. The only killing test is a phrase-assertion on the reason clause, which the owner's rule forbids -> AUDITED. MEASURED: bundle_tools 9/9 OK on the mutant; bundle_tools:144-153 asserts only assertIn('$.stories.S1.criteria[0].contract', ...), not the phrase or even the id.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:1079 main (prints 'refused: <msg>', exit 2)",
+    "grep 'is not a contract of the document' over aisef2/ aisef/ validation/ tests/ docs/: the raise site L560 only",
+    "tests/v2/test_v21_bundle_tools.py:144-153 test_a_criterion_naming_an_absent_contract_or_a_closed_key_is_refused_with_its_path — asserts the path '$.stories.S1.criteria[0].contract' only",
+    "grep of callers of seal (bundle_cli.main + tests): all use the returned bundle/report or assert a path, none a message tail; L516 '$.format: <value>' is the shape-analogy source"
+   ],
+   "exceptions_checked": [
+    "a second list the id could be confused with: none; by_id is the only contract lookup (built from this document's contracts at L547)",
+    "id differing from a contract id by case or whitespace: repr keeps both visible",
+    "polarity ambiguity with L516 '$.format: <value>': considered; needs a human unfamiliar with the tool, no machine reads it",
+    "a consumer matching the phrase: none (grep)"
+   ],
+   "refutation": "",
+   "note": "Carried conclusion holds; cites refreshed (old L221/L504-543/L541 -> L560/L1079/bundle_tools:144-153). AUDITED correct: a free-text reason clause of a refusal whose locator + offending value are intact; only killable by a forbidden phrase-assertion."
+  }
+ ],
+ "notes": "Skeptic copy b, batch B05-seal, snapshot 4ec961e706a1f7bda16d131037058c4fe9c2663f. Did not look at copy a's output. bundle_cli.py source_sha256 e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8 verified == the covered entries' source_sha256. Measured 2026-10-18 22:00..22:14 +07. Tooling: git archive of the snapshot into a non-git tree (removed at end); mutants rebuilt with validation.v2.mutation.mutants()[index] with desc asserted == the batch string (mutant_view.py + a full-line extractor for the truncated dict mutants); runs with cwd=copy, env -i, PATH stripped of both opencode dirs (/Users/nghinh/.opencode/bin, /Users/nghinh/.npm-global/bin — verified opencode unreachable), HOME/TMPDIR/XDG under the copy, PYTHONPATH=copy, nice -n 19 /opt/homebrew/bin/python3 -P -B -m unittest. No real opencode, no network; never touched camp/ or heavy.lock.d; never ran mutation.py run or the full suite. Registered kill files for the target (validation.v2.mutation.V21_TARGETS): bundle_tools, identity, review, continue_usage, continue_integrity, kills3_A02, kills3_T02a, migrate_semantics. Unmutated baseline SealKeepsTheSameRule 6/6 OK. Per-mutant measurement: all 8 new mutants SURVIVE migrate_semantics::SealKeepsTheSameRule (the only class producing non-empty seal withheld rows and the only test reading approvals_withheld_semantic, per a tree-wide grep); the 4 tuple mutants additionally SURVIVE bundle_tools+kills3_T02a (38/38, plan_hash parity); the 3 carried mutants SURVIVE their registered kill files (117: bundle_tools+T02a+SealKeepsTheSameRule 44/44; 133: T02a 29/29; 157: bundle_tools 9/9). No REFUTED-by-measurement: no registered OR non-registered test fails on any mutant (grep confirms only migrate_semantics reads seal's withheld rows), so the campaign's SURVIVED is confirmed, not a runner artifact. VERDICTS: all 11 CONFIRMED. 4 EQUIVALENT (7 by sole truth-test+iteration; 121/155/160 by the frozen-dataclass constructors re-normalizing list|tuple to a tuple before any hash/observation — proven from contract.py and plan/obligation.py __post_init__, not only from passing tests). 4 REFUTED/test-owed (128/150/130/152: the withheld-report-row identity fields 'requirement' and 'approved_at' are dropped or relabeled observably; printed whole for the operator at L1045; no test pins seal's row though the suite pins the SIBLING migrate row's approved_at at migrate_semantics:378; one key-set assertion in SealKeepsTheSameRule closes all four). 2 carried AUDITED (133, 157: free-text diagnostic clauses, only killable by a forbidden phrase-assertion) and 1 carried EQUIVALENT (117, dominance). The carried entries' grounds carried stale line cites from base 289885e and were refreshed to this snapshot; conclusions unchanged. The REFUTED-vs-AUDITED line held exactly where the author drew it: a structured identifying field of a machine-readable report (killable by an allowed key-set test) is a test owed, while a free-text reason clause / punctuation of a refusal message is AUDITED."
+}

@@ -1,0 +1,63 @@
+{
+ "batch": "B06-run",
+ "target": "aisef2/app/cli.py::run",
+ "new": [],
+ "covered": [
+  {
+   "target": "aisef2/app/cli.py::run",
+   "index": 115,
+   "mutant": "L108 string ': ' emptied",
+   "worker": "c3-w2",
+   "class": "AUDITED",
+   "group": "an operator-read stderr line whose identifying elements are pinned elsewhere; only a connective separator is left",
+   "grounds": "cli.py:101-103 prints `aisef run: the anchor was NOT written to <path> (<ExceptionClass>: <text>); keep the printed one` to stderr when the copy of the anchor failed; the mutant glues the class to the exception's own text. Nothing parses the pair; the machine channels are the stdout document (`evidence_anchor`, no `anchor_written_to`) and exit status 2, both asserted by T23a. The operator still has: the requested path, the class (T23a asserts FileNotFoundError in the line), the OS text, and the instruction to keep the printed anchor.",
+   "consumers_checked": [
+    "aisef2/app/cli.py:101-103 (only producer); git grep -e 'anchor was NOT' / 'was NOT written' / 'keep the printed' over the repository: cli.py only",
+    "docs/v2.1/ANCHOR-THREAT-MODEL.md:52-54 (promises: message on stderr, exit 2, evidence unaffected, printed anchor usable)",
+    "tests/v2/test_v21_kills3_T23a.py AnchorCopy (:328-415): test_a_copy_that_cannot_be_written_exits_2_whatever_the_verdict_and_the_printed_anchor_stays, test_a_writer_that_refuses_the_anchor_is_also_only_the_copy_failing (path, 'not ... written', class word, 'printed')",
+    "aisef2/app/lineage.py:395-405 (write_anchor: ValueError for a non-anchor; os.open OSErrors), :408-413 (read_anchor)"
+   ],
+   "exceptions_checked": [
+    "OSError subclasses: str(e) starts with '[Errno N]' (POSIX) or '[WinError N]' (Windows): class and text stay distinguishable without the separator",
+    "ValueError whose text starts with a letter ('not an evidence anchor', 'embedded null byte'): the first needs an anchor that is not 64 hex (R.anchor_in always returns one), the second a NUL in argv (impossible from a command line); both are still handled as the copy failing (T23a test_a_writer_that_refuses...)",
+    "a script that greps the line for the class: none (e2e/rehearsal/smoke read stdout documents and exit codes; release_smoke keeps stderr_tail[-400:] as a field)"
+   ],
+   "source_sha256": "91b61117a8d4363c9604716398d0c781546d45b005eb6edf051036908e235979",
+   "remapped_from": {
+    "index": 108,
+    "mutant": "L102 string ': ' emptied",
+    "source_sha256": "555806041859c41be1cc47e6d95aecfbcb5cc5910cb0dd0835108e2be3ffd04e",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+   }
+  },
+  {
+   "target": "aisef2/app/cli.py::run",
+   "index": 121,
+   "mutant": "L88 string 'aisef-confine-' emptied",
+   "worker": "c3-w2",
+   "class": "AUDITED",
+   "group": "a temporary-directory name prefix: a breadcrumb for a human, read by no code",
+   "grounds": "`tempfile.TemporaryDirectory(prefix='aisef-confine-')` (cli.py:84) is created and removed by the `with` (cli.py:84-85) in `--check`; it holds `confinement/` (the measurement's `where`) and decides nothing: confine.measure derives everything from the `where` path it is given (confine.py:292-337 _worktree/measure, :346-... _probe, :460+ _within/_owned/_judge) and never from the directory's NAME. The mutant's name is mkdtemp's 8 random characters ([a-z0-9_], never '-') and the paths are absolute, so nothing a tool receives starts with '-'.",
+   "consumers_checked": [
+    "git grep 'aisef-confine' over the repository: cli.py:84 and confine.py:51,58,357 (MARK '@@aisef-confine ', probe file '.aisef-confine-probe-<nonce>': different strings, not the directory prefix)",
+    "aisef2/app/confine.py:292-337, :346-432 (where used as a path; the left-on-host files are reported by absolute path, :418-424)",
+    "validation/v2/destructive_authority.py:55-100 and cleanup_authority.py (path creators are recognised by `TemporaryDirectory(` in the source, not by a prefix; the mutation runner's own names are `aisef-mut-<worker>-<8>`, mutation.py:1488-1493)",
+    "tests/v2/test_v21_confine.py:806-834 (class Check patches confine.measure, never inspects `where`)"
+   ],
+   "exceptions_checked": [
+    "a cleanup glob or leak detector keyed on the prefix: none exists; a human reading a directory a killed `--check` left in TMPDIR loses the prefix, but what is inside still names its origin (confine.py:292-307: `confinement/` holds repo/, ws/, canary and written-<nonce>, :358-362)",
+    "a leading '-' in the name reaching git/bwrap: mkdtemp's alphabet has none and the paths are absolute",
+    "the document `--check` prints carries `where`-derived paths (rep['argv']); a reader keyed on the prefix text: none (the e2e script reads confinement.{bwrap, argv[0], problems})",
+    "non-Linux: cli.py creates the (empty) directory; measure raises Unavailable before making anything inside it (confine.py:326-327; wrap raises at :181)",
+    "sibling [115] (the 'confinement' sub-directory name) is behaviour and belongs to T23a"
+   ],
+   "source_sha256": "91b61117a8d4363c9604716398d0c781546d45b005eb6edf051036908e235979",
+   "remapped_from": {
+    "index": 114,
+    "mutant": "L84 string 'aisef-confine-' emptied",
+    "source_sha256": "555806041859c41be1cc47e6d95aecfbcb5cc5910cb0dd0835108e2be3ffd04e",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+   }
+  }
+ ]
+}

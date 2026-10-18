@@ -1,0 +1,311 @@
+{
+ "batch": "B04-migrate",
+ "target": "aisef2/app/bundle_cli.py::migrate",
+ "new": [
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 19,
+   "mutant": "L418 Or swapped",
+   "worker": "c3-w2"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 55,
+   "mutant": "L421 dict entry 5 dropped",
+   "worker": "c3-w2"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 58,
+   "mutant": "L424 dict entry 1 dropped",
+   "worker": "c3-w2"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 62,
+   "mutant": "L424 dict entry 5 dropped",
+   "worker": "c3-w2"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 63,
+   "mutant": "L424 dict entry 6 dropped",
+   "worker": "c3-w2"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 64,
+   "mutant": "L424 dict entry 7 dropped",
+   "worker": "c3-w2"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 67,
+   "mutant": "L430 dict entry 1 dropped",
+   "worker": "c3-w2"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 86,
+   "mutant": "L441 dict entry 2 dropped",
+   "worker": "c3-w2"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 103,
+   "mutant": "L417 element 0 dropped",
+   "worker": "c3-w2"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 104,
+   "mutant": "L417 element 1 dropped",
+   "worker": "c3-w2"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 110,
+   "mutant": "L422 string 'requirement_hash' emptied",
+   "worker": "c3-w2"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 115,
+   "mutant": "L424 string 'requirements' emptied",
+   "worker": "c3-w2"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 118,
+   "mutant": "L427 string 'polarity' emptied",
+   "worker": "c3-w2"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 119,
+   "mutant": "L428 string 'observable' emptied",
+   "worker": "c3-w2"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 120,
+   "mutant": "L428 string 'stimulus' emptied",
+   "worker": "c3-w2"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 124,
+   "mutant": "L429 sorted() -> list()",
+   "worker": "c3-w2"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 126,
+   "mutant": "L430 string 'requirements' emptied",
+   "worker": "c3-w2"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 128,
+   "mutant": "L431 sorted() -> list()",
+   "worker": "c3-w2"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 135,
+   "mutant": "L445 string 'plan_id' emptied",
+   "worker": "c3-w2"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 159,
+   "mutant": "L419 string \"the candidate's unapproved contracts \" emptied",
+   "worker": "c3-w2"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 160,
+   "mutant": "L419 string ' are not what the withheld approvals account for (' emptied",
+   "worker": "c3-w2"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 161,
+   "mutant": "L420 string ' withheld of ' emptied",
+   "worker": "c3-w2"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 162,
+   "mutant": "L420 string ')' emptied",
+   "worker": "c3-w2"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 181,
+   "mutant": "L417 string 'contract' emptied",
+   "worker": "c3-w2"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 182,
+   "mutant": "L417 string 'requirement' emptied",
+   "worker": "c3-w2"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 196,
+   "mutant": "L419 sorted() -> list()",
+   "worker": "c3-w2"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 198,
+   "mutant": "L420 string 'approvals' emptied",
+   "worker": "c3-w2"
+  }
+ ],
+ "covered": [
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 36,
+   "mutant": "L378 tuple() -> list()",
+   "worker": "c3-w2",
+   "class": "EQUIVALENT",
+   "group": "container handed to a callee that normalises it before any use (with [52])",
+   "grounds": "`approvals` occurs in migrate only at L96 (built from a generator inside the try, L93-99) and L104 (compile_spec(..., approvals=approvals, ...)); it is not returned, not in out (L129) nor report (L131-133). compile_spec (aisef2/product/compiler.py:59-61) passes it only to require_approved, whose first statement is `approvals = tuple(approvals)` (aisef2/product/approval.py:85) and whose only other use iterates it (:92). list(genexpr) and tuple(genexpr) drain the same generator at the same point inside the same try, so a load error is raised identically. Reproduced by me: (out, report)/exception of the mutant module == unmutated on 7 inputs (LedgerLock 2.0.0, its migrated output, unknown spec, no approvals, malformed approval, duplicated and reversed approvals) under 4 RELEASES tables (current-first/last, alias twice, empty); authority_limits.check, and old_path_audit's per-def capability footprint, are identical on the unparsed mutated source and the unparsed unmutated one.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py L87-L134 (only L96 and L104 name approvals)",
+    "aisef2/product/compiler.py:59-61 and aisef2/product/approval.py:82-96 (tuple() first, then one iteration)",
+    "validation/qualification/authority_limits.py (_held/_holds key on the `data[\"approvals\"]` read, _reloads on ast.GeneratorExp; list and tuple are neither DYNAMIC nor REACHES): check() on the mutated source == control",
+    "validation/v2/old_path_audit.py::_capabilities + tests/v2/test_no_dual_authority.py V2_1_ROWS (migrate's footprint is {calls: [compile_spec]}): identical for the mutant",
+    "tests/v2/test_v21_identity.py::Migrate, tests/v2/test_v21_authority_limits.py (read through behaviour/AST, none reads the container type)"
+   ],
+   "exceptions_checked": [
+    "a one-shot iterator consumed twice: L104 gets a materialised list/tuple",
+    "an in-place mutation of the container by a callee: require_approved copies to a tuple and only iterates; no append/sort/extend on approvals in migrate",
+    "hashing or dict-keying the container (a list is unhashable): none in migrate, compile_spec or require_approved",
+    "type dispatch on tuple vs list: none; the static checkers do not key on the wrapper call"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "remapped_from": {
+    "index": 25,
+    "mutant": "L97 tuple() -> list()",
+    "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 25,
+     "mutant": "L96 tuple() -> list()",
+     "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+    },
+    "chain": [
+     {
+      "index": 25,
+      "mutant": "L96 tuple() -> list()",
+      "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+     },
+     {
+      "index": 25,
+      "mutant": "L97 tuple() -> list()",
+      "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 96,
+   "mutant": "L402 tuple() -> list()",
+   "worker": "c3-w2",
+   "class": "EQUIVALENT",
+   "group": "container handed to a callee that normalises it before any use (with [25])",
+   "grounds": "Plan.__post_init__ (aisef2/plan/obligation.py:93) does tuple(self.obligations) when it is a list or tuple, refuses an empty one (:94-95) and stores the tuple with object.__setattr__ (:96) BEFORE plan_hash is computed (:99-100). require_str_fields (:90, aisef2/product/contract.py:172-176) checks only fields whose annotation is the string 'str'; `obligations` is not. plain() would pass a list through un-recursed (contract.py:55-57) but is only reached after :96 replaced it. At L127 the argument is non-empty (unknown was empty and plan.obligations is non-empty, because Plan refuses an empty one on load, L97). new_plan feeds only plain(new_plan) (L129), B.load(out) (L130) and new_plan.plan_hash (L132). Reproduced: mutant == unmutated on the 7 inputs and 4 RELEASES tables.",
+   "consumers_checked": [
+    "aisef2/plan/obligation.py:80-106 (Plan.__post_init__/create)",
+    "aisef2/product/contract.py:47-70 and 172-176 (plain, content_of, require_str_fields)",
+    "aisef2/app/bundle_cli.py L127-L134 (new_plan reaches plain(), B.load(out), plan_hash)",
+    "aisef2/app/bundle.py _plan/load (B.load(out) rebuilds the plan from JSON and re-checks plan_hash)",
+    "validation/qualification/authority_limits.py and old_path_audit footprint: identical on the mutated source"
+   ],
+   "exceptions_checked": [
+    "a list surviving into plan_hash: :96 stores the tuple first",
+    "an empty list: refused identically to an empty tuple at :94; unreachable here",
+    "aliasing: list(obligations) is a copy and migrate's local list is not mutated after L127",
+    "elements: dataclasses.replace(o, ...) gives PlanObligation instances, accepted at :94 in both cases"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "remapped_from": {
+    "index": 52,
+    "mutant": "L128 tuple() -> list()",
+    "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 52,
+     "mutant": "L127 tuple() -> list()",
+     "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+    },
+    "chain": [
+     {
+      "index": 52,
+      "mutant": "L127 tuple() -> list()",
+      "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+     },
+     {
+      "index": 52,
+      "mutant": "L128 tuple() -> list()",
+      "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 193,
+   "mutant": "L388 string 'contract ' emptied",
+   "worker": "c3-w2",
+   "class": "AUDITED",
+   "group": "A03",
+   "grounds": "Differs: `BC-X does not compile: ...` instead of `contract BC-X does not compile: ...`. The reader is the operator (`refused: ...` on stderr, exit 2). What it needs stays: the refused object's id (L106 {c.id}), the stage ('does not compile'; this loop compiles only contracts, never requirement, criterion or story ids) and the compiler's cause. Measured by me on the mutant: UnapprovedContract (approvals []) -> 'BC-... does not compile: contract BC-... is not approved: ...' (the cause repeats the label); CompileError (HTTP_ROUTE contract, no probe in this release) -> 'BC-V22-S-3.1-a does not compile: no probe declared for subject kind http_route', where the wrapper alone carries the id and 'does not compile' + 'subject kind' still mark it as a contract. Contract ids are any non-empty string (contract.py BehaviorContract.__post_init__), so the label is not redundant by validation, but the id plus the stage phrase is unambiguous. No code, test or document parses or compares the text. A test could only pin the noun before an identifier the mutant keeps: wording, not a contract. Consistent with T03b's final test for [81], which asserts the id, 'does not compile' and the cause and was reviewed to leave 'contract ' unpinned.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py main() L535-L541 (prints `refused: {e}`, returns 2; no parsing)",
+    "git grep 'does not compile' over aisef2, validation, tests, docs (not closure-evidence): bundle.py:172 and static_admission.py:112 are other functions' messages, pinned by tests/v2/test_s2_kills.py:720, tests/v2/p2/test_static_admission.py:160, tests/v2/test_app_units.py:405 for THEIR text; none reaches migrate",
+    "callers of migrate (validation/v21/context_gap.py:133,191; tests test_v21_context_pack.py:76, test_v21_review.py:44, test_v21_identity_bytes.py:45) use migrate()[0] on trusted bundles and never read a refusal text; tests/v2/test_v21_identity.py and tests/test_v21_bundle_dispatch.py assert exit codes and 'never overwrites' only",
+    "docs/v2.1/USAGE-2.1.md s.2 and s.6 (the refusal and the command, not the wording)",
+    "closure-evidence/v2/P10/LEDGERLOCK-REGRESSION.json (recorded static_admission/bundle messages, compared as whole records to their evidence commit, not migrate's text)"
+   ],
+   "exceptions_checked": [
+    "a cause that does not repeat the contract (CompileError): measured, id + stage + 'subject kind' remain",
+    "a contract id that looks like another kind of id: nothing but contracts reaches L106, 'does not compile' says what failed, and the id is the string to look up in $.contracts",
+    "a reader that parses a `contract <id>` prefix: none found (grep above)",
+    "the sibling label in B.load: another function and call path, pinned for its own text; the owner's rule is by reader, not by sibling precedent"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "remapped_from": {
+    "index": 80,
+    "mutant": "L107 string 'contract ' emptied",
+    "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 80,
+     "mutant": "L106 string 'contract ' emptied",
+     "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+    },
+    "chain": [
+     {
+      "index": 80,
+      "mutant": "L106 string 'contract ' emptied",
+      "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+     },
+     {
+      "index": 80,
+      "mutant": "L107 string 'contract ' emptied",
+      "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  }
+ ]
+}

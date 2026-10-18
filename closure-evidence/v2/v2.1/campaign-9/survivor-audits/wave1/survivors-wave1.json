@@ -1,0 +1,743 @@
+{
+ "completed_targets": [
+  "aisef2/app/adapters.py::Reviewer._ocr",
+  "aisef2/app/bundle.py::shape_problems",
+  "aisef2/app/bundle_cli.py::continue_from",
+  "aisef2/app/bundle_cli.py::migrate",
+  "aisef2/app/bundle_cli.py::seal",
+  "aisef2/app/cli.py::run",
+  "aisef2/app/run.py::execute",
+  "aisef2/app/settings.py::load",
+  "aisef2/app/verify.py::verify"
+ ],
+ "survivors": [
+  {
+   "target": "aisef2/app/adapters.py::Reviewer._ocr",
+   "index": 13,
+   "mutant": "L219 sorted() -> list()",
+   "worker": "c3-w2",
+   "covered_by_remapped_audit": true,
+   "audit_class": "AUDITED"
+  },
+  {
+   "target": "aisef2/app/adapters.py::Reviewer._ocr",
+   "index": 93,
+   "mutant": "L256 dict entry 2 dropped",
+   "worker": "c3-w2",
+   "covered_by_remapped_audit": false,
+   "audit_class": null
+  },
+  {
+   "target": "aisef2/app/adapters.py::Reviewer._ocr",
+   "index": 126,
+   "mutant": "L272 sorted() -> list()",
+   "worker": "c3-w2",
+   "covered_by_remapped_audit": false,
+   "audit_class": null
+  },
+  {
+   "target": "aisef2/app/adapters.py::Reviewer._ocr",
+   "index": 161,
+   "mutant": "L241 string 'ocr preview ' emptied",
+   "worker": "c3-w2",
+   "covered_by_remapped_audit": true,
+   "audit_class": "AUDITED"
+  },
+  {
+   "target": "aisef2/app/adapters.py::Reviewer._ocr",
+   "index": 164,
+   "mutant": "L246 True->False",
+   "worker": "c3-w2",
+   "covered_by_remapped_audit": true,
+   "audit_class": "AUDITED"
+  },
+  {
+   "target": "aisef2/app/adapters.py::Reviewer._ocr",
+   "index": 168,
+   "mutant": "L250 string 'ocr review ' emptied",
+   "worker": "c3-w2",
+   "covered_by_remapped_audit": true,
+   "audit_class": "AUDITED"
+  },
+  {
+   "target": "aisef2/app/adapters.py::Reviewer._ocr",
+   "index": 175,
+   "mutant": "L256 string 'reasoning' emptied",
+   "worker": "c3-w2",
+   "covered_by_remapped_audit": true,
+   "audit_class": "AUDITED"
+  },
+  {
+   "target": "aisef2/app/adapters.py::Reviewer._ocr",
+   "index": 276,
+   "mutant": "L286 string ')' emptied",
+   "worker": "c3-w2",
+   "covered_by_remapped_audit": true,
+   "audit_class": "AUDITED"
+  },
+  {
+   "target": "aisef2/app/adapters.py::Reviewer._ocr",
+   "index": 299,
+   "mutant": "L265 True->False",
+   "worker": "c3-w2",
+   "covered_by_remapped_audit": true,
+   "audit_class": "AUDITED"
+  },
+  {
+   "target": "aisef2/app/bundle.py::shape_problems",
+   "index": 107,
+   "mutant": "L99 string ')' emptied",
+   "worker": "c3-w2",
+   "covered_by_remapped_audit": true,
+   "audit_class": "AUDITED"
+  },
+  {
+   "target": "aisef2/app/bundle.py::shape_problems",
+   "index": 113,
+   "mutant": "L99 sorted() -> list()",
+   "worker": "c3-w2",
+   "covered_by_remapped_audit": true,
+   "audit_class": "AUDITED"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::continue_from",
+   "index": 116,
+   "mutant": "L937 tuple() -> list()",
+   "worker": "c3-w4",
+   "covered_by_remapped_audit": true,
+   "audit_class": "EQUIVALENT"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::continue_from",
+   "index": 140,
+   "mutant": "L903 string '): a new project, not a continuation' emptied",
+   "worker": "c3-w4",
+   "covered_by_remapped_audit": true,
+   "audit_class": "AUDITED"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::continue_from",
+   "index": 152,
+   "mutant": "L937 string '-continued' emptied",
+   "worker": "c3-w4",
+   "covered_by_remapped_audit": true,
+   "audit_class": "AUDITED"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::continue_from",
+   "index": 158,
+   "mutant": "L959 conditional negated",
+   "worker": "c3-w4",
+   "covered_by_remapped_audit": false,
+   "audit_class": null
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::continue_from",
+   "index": 175,
+   "mutant": "L959 dict entry 0 dropped",
+   "worker": "c3-w4",
+   "covered_by_remapped_audit": false,
+   "audit_class": null
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::continue_from",
+   "index": 179,
+   "mutant": "L965 string \" (a sessions directory, a session stream or the preflight's ledger that is gone comes back from such a copy); where that cannot be done this lineage cannot be continued (a run without --parent inherits nothing): \" emptied",
+   "worker": "c3-w4",
+   "covered_by_remapped_audit": false,
+   "audit_class": null
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::continue_from",
+   "index": 184,
+   "mutant": "L933 string 'carried: ' emptied",
+   "worker": "c3-w4",
+   "covered_by_remapped_audit": true,
+   "audit_class": "AUDITED"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::continue_from",
+   "index": 191,
+   "mutant": "L958 element 1 dropped",
+   "worker": "c3-w4",
+   "covered_by_remapped_audit": false,
+   "audit_class": null
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::continue_from",
+   "index": 193,
+   "mutant": "L958 element 3 dropped",
+   "worker": "c3-w4",
+   "covered_by_remapped_audit": false,
+   "audit_class": null
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::continue_from",
+   "index": 194,
+   "mutant": "L958 element 4 dropped",
+   "worker": "c3-w4",
+   "covered_by_remapped_audit": false,
+   "audit_class": null
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::continue_from",
+   "index": 195,
+   "mutant": "L959 string 'superseded' emptied",
+   "worker": "c3-w4",
+   "covered_by_remapped_audit": false,
+   "audit_class": null
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::continue_from",
+   "index": 196,
+   "mutant": "L959 string 'superseded' emptied",
+   "worker": "c3-w4",
+   "covered_by_remapped_audit": false,
+   "audit_class": null
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::continue_from",
+   "index": 197,
+   "mutant": "L959 True->False",
+   "worker": "c3-w4",
+   "covered_by_remapped_audit": false,
+   "audit_class": null
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::continue_from",
+   "index": 208,
+   "mutant": "L967 string '; ' emptied",
+   "worker": "c3-w4",
+   "covered_by_remapped_audit": false,
+   "audit_class": null
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 19,
+   "mutant": "L418 Or swapped",
+   "worker": "c3-w2",
+   "covered_by_remapped_audit": false,
+   "audit_class": null
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 36,
+   "mutant": "L378 tuple() -> list()",
+   "worker": "c3-w2",
+   "covered_by_remapped_audit": true,
+   "audit_class": "EQUIVALENT"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 55,
+   "mutant": "L421 dict entry 5 dropped",
+   "worker": "c3-w2",
+   "covered_by_remapped_audit": false,
+   "audit_class": null
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 58,
+   "mutant": "L424 dict entry 1 dropped",
+   "worker": "c3-w2",
+   "covered_by_remapped_audit": false,
+   "audit_class": null
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 62,
+   "mutant": "L424 dict entry 5 dropped",
+   "worker": "c3-w2",
+   "covered_by_remapped_audit": false,
+   "audit_class": null
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 63,
+   "mutant": "L424 dict entry 6 dropped",
+   "worker": "c3-w2",
+   "covered_by_remapped_audit": false,
+   "audit_class": null
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 64,
+   "mutant": "L424 dict entry 7 dropped",
+   "worker": "c3-w2",
+   "covered_by_remapped_audit": false,
+   "audit_class": null
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 67,
+   "mutant": "L430 dict entry 1 dropped",
+   "worker": "c3-w2",
+   "covered_by_remapped_audit": false,
+   "audit_class": null
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 86,
+   "mutant": "L441 dict entry 2 dropped",
+   "worker": "c3-w2",
+   "covered_by_remapped_audit": false,
+   "audit_class": null
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 96,
+   "mutant": "L402 tuple() -> list()",
+   "worker": "c3-w2",
+   "covered_by_remapped_audit": true,
+   "audit_class": "EQUIVALENT"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 103,
+   "mutant": "L417 element 0 dropped",
+   "worker": "c3-w2",
+   "covered_by_remapped_audit": false,
+   "audit_class": null
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 104,
+   "mutant": "L417 element 1 dropped",
+   "worker": "c3-w2",
+   "covered_by_remapped_audit": false,
+   "audit_class": null
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 110,
+   "mutant": "L422 string 'requirement_hash' emptied",
+   "worker": "c3-w2",
+   "covered_by_remapped_audit": false,
+   "audit_class": null
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 115,
+   "mutant": "L424 string 'requirements' emptied",
+   "worker": "c3-w2",
+   "covered_by_remapped_audit": false,
+   "audit_class": null
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 118,
+   "mutant": "L427 string 'polarity' emptied",
+   "worker": "c3-w2",
+   "covered_by_remapped_audit": false,
+   "audit_class": null
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 119,
+   "mutant": "L428 string 'observable' emptied",
+   "worker": "c3-w2",
+   "covered_by_remapped_audit": false,
+   "audit_class": null
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 120,
+   "mutant": "L428 string 'stimulus' emptied",
+   "worker": "c3-w2",
+   "covered_by_remapped_audit": false,
+   "audit_class": null
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 124,
+   "mutant": "L429 sorted() -> list()",
+   "worker": "c3-w2",
+   "covered_by_remapped_audit": false,
+   "audit_class": null
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 126,
+   "mutant": "L430 string 'requirements' emptied",
+   "worker": "c3-w2",
+   "covered_by_remapped_audit": false,
+   "audit_class": null
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 128,
+   "mutant": "L431 sorted() -> list()",
+   "worker": "c3-w2",
+   "covered_by_remapped_audit": false,
+   "audit_class": null
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 135,
+   "mutant": "L445 string 'plan_id' emptied",
+   "worker": "c3-w2",
+   "covered_by_remapped_audit": false,
+   "audit_class": null
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 159,
+   "mutant": "L419 string \"the candidate's unapproved contracts \" emptied",
+   "worker": "c3-w2",
+   "covered_by_remapped_audit": false,
+   "audit_class": null
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 160,
+   "mutant": "L419 string ' are not what the withheld approvals account for (' emptied",
+   "worker": "c3-w2",
+   "covered_by_remapped_audit": false,
+   "audit_class": null
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 161,
+   "mutant": "L420 string ' withheld of ' emptied",
+   "worker": "c3-w2",
+   "covered_by_remapped_audit": false,
+   "audit_class": null
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 162,
+   "mutant": "L420 string ')' emptied",
+   "worker": "c3-w2",
+   "covered_by_remapped_audit": false,
+   "audit_class": null
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 181,
+   "mutant": "L417 string 'contract' emptied",
+   "worker": "c3-w2",
+   "covered_by_remapped_audit": false,
+   "audit_class": null
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 182,
+   "mutant": "L417 string 'requirement' emptied",
+   "worker": "c3-w2",
+   "covered_by_remapped_audit": false,
+   "audit_class": null
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 193,
+   "mutant": "L388 string 'contract ' emptied",
+   "worker": "c3-w2",
+   "covered_by_remapped_audit": true,
+   "audit_class": "AUDITED"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 196,
+   "mutant": "L419 sorted() -> list()",
+   "worker": "c3-w2",
+   "covered_by_remapped_audit": false,
+   "audit_class": null
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate",
+   "index": 198,
+   "mutant": "L420 string 'approvals' emptied",
+   "worker": "c3-w2",
+   "covered_by_remapped_audit": false,
+   "audit_class": null
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::seal",
+   "index": 7,
+   "mutant": "L510 tuple() -> list()",
+   "worker": "c3-w4",
+   "covered_by_remapped_audit": false,
+   "audit_class": null
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::seal",
+   "index": 117,
+   "mutant": "L568 element 0 dropped",
+   "worker": "c3-w4",
+   "covered_by_remapped_audit": true,
+   "audit_class": "EQUIVALENT"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::seal",
+   "index": 121,
+   "mutant": "L572 tuple() -> list()",
+   "worker": "c3-w4",
+   "covered_by_remapped_audit": false,
+   "audit_class": null
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::seal",
+   "index": 128,
+   "mutant": "L597 dict entry 1 dropped",
+   "worker": "c3-w4",
+   "covered_by_remapped_audit": false,
+   "audit_class": null
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::seal",
+   "index": 130,
+   "mutant": "L597 dict entry 3 dropped",
+   "worker": "c3-w4",
+   "covered_by_remapped_audit": false,
+   "audit_class": null
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::seal",
+   "index": 133,
+   "mutant": "L524 string ')' emptied",
+   "worker": "c3-w4",
+   "covered_by_remapped_audit": true,
+   "audit_class": "AUDITED"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::seal",
+   "index": 150,
+   "mutant": "L597 string 'requirement' emptied",
+   "worker": "c3-w4",
+   "covered_by_remapped_audit": false,
+   "audit_class": null
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::seal",
+   "index": 152,
+   "mutant": "L598 string 'approved_at' emptied",
+   "worker": "c3-w4",
+   "covered_by_remapped_audit": false,
+   "audit_class": null
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::seal",
+   "index": 155,
+   "mutant": "L541 tuple() -> list()",
+   "worker": "c3-w4",
+   "covered_by_remapped_audit": false,
+   "audit_class": null
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::seal",
+   "index": 157,
+   "mutant": "L560 string ' is not a contract of the document' emptied",
+   "worker": "c3-w4",
+   "covered_by_remapped_audit": true,
+   "audit_class": "AUDITED"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::seal",
+   "index": 160,
+   "mutant": "L567 tuple() -> list()",
+   "worker": "c3-w4",
+   "covered_by_remapped_audit": false,
+   "audit_class": null
+  },
+  {
+   "target": "aisef2/app/cli.py::run",
+   "index": 115,
+   "mutant": "L108 string ': ' emptied",
+   "worker": "c3-w2",
+   "covered_by_remapped_audit": true,
+   "audit_class": "AUDITED"
+  },
+  {
+   "target": "aisef2/app/cli.py::run",
+   "index": 121,
+   "mutant": "L88 string 'aisef-confine-' emptied",
+   "worker": "c3-w2",
+   "covered_by_remapped_audit": true,
+   "audit_class": "AUDITED"
+  },
+  {
+   "target": "aisef2/app/run.py::execute",
+   "index": 17,
+   "mutant": "L491 dict entry 6 dropped",
+   "worker": "c3-w1",
+   "covered_by_remapped_audit": true,
+   "audit_class": "EQUIVALENT"
+  },
+  {
+   "target": "aisef2/app/run.py::execute",
+   "index": 45,
+   "mutant": "L492 string 'repository' emptied",
+   "worker": "c3-w1",
+   "covered_by_remapped_audit": true,
+   "audit_class": "EQUIVALENT"
+  },
+  {
+   "target": "aisef2/app/run.py::execute",
+   "index": 148,
+   "mutant": "L499 string '\\n' emptied",
+   "worker": "c3-w1",
+   "covered_by_remapped_audit": true,
+   "audit_class": "AUDITED"
+  },
+  {
+   "target": "aisef2/app/run.py::execute",
+   "index": 251,
+   "mutant": "L484 string '--parent ' emptied",
+   "worker": "c3-w1",
+   "covered_by_remapped_audit": false,
+   "audit_class": null
+  },
+  {
+   "target": "aisef2/app/run.py::execute",
+   "index": 253,
+   "mutant": "L486 string '--parent ' emptied",
+   "worker": "c3-w1",
+   "covered_by_remapped_audit": false,
+   "audit_class": null
+  },
+  {
+   "target": "aisef2/app/run.py::execute",
+   "index": 254,
+   "mutant": "L486 string ': ' emptied",
+   "worker": "c3-w1",
+   "covered_by_remapped_audit": false,
+   "audit_class": null
+  },
+  {
+   "target": "aisef2/app/run.py::execute",
+   "index": 257,
+   "mutant": "L499 True->False",
+   "worker": "c3-w1",
+   "covered_by_remapped_audit": true,
+   "audit_class": "AUDITED"
+  },
+  {
+   "target": "aisef2/app/run.py::execute",
+   "index": 263,
+   "mutant": "L530 string 'the lineage of ' emptied",
+   "worker": "c3-w1",
+   "covered_by_remapped_audit": false,
+   "audit_class": null
+  },
+  {
+   "target": "aisef2/app/run.py::execute",
+   "index": 296,
+   "mutant": "L677 string '\\n' emptied",
+   "worker": "c3-w1",
+   "covered_by_remapped_audit": true,
+   "audit_class": "AUDITED"
+  },
+  {
+   "target": "aisef2/app/run.py::execute",
+   "index": 345,
+   "mutant": "L677 True->False",
+   "worker": "c3-w1",
+   "covered_by_remapped_audit": true,
+   "audit_class": "AUDITED"
+  },
+  {
+   "target": "aisef2/app/run.py::execute",
+   "index": 358,
+   "mutant": "L542 string '; ' emptied",
+   "worker": "c3-w1",
+   "covered_by_remapped_audit": false,
+   "audit_class": null
+  },
+  {
+   "target": "aisef2/app/verify.py::verify",
+   "index": 48,
+   "mutant": "L180 sorted() -> list()",
+   "worker": "c3-w3",
+   "covered_by_remapped_audit": true,
+   "audit_class": "AUDITED"
+  },
+  {
+   "target": "aisef2/app/verify.py::verify",
+   "index": 106,
+   "mutant": "L134 string ' the run printed' emptied",
+   "worker": "c3-w3",
+   "covered_by_remapped_audit": true,
+   "audit_class": "AUDITED"
+  },
+  {
+   "target": "aisef2/app/verify.py::verify",
+   "index": 118,
+   "mutant": "L201 dict entry 0 dropped",
+   "worker": "c3-w3",
+   "covered_by_remapped_audit": true,
+   "audit_class": "EQUIVALENT"
+  },
+  {
+   "target": "aisef2/app/verify.py::verify",
+   "index": 119,
+   "mutant": "L201 dict entry 1 dropped",
+   "worker": "c3-w3",
+   "covered_by_remapped_audit": true,
+   "audit_class": "EQUIVALENT"
+  },
+  {
+   "target": "aisef2/app/verify.py::verify",
+   "index": 132,
+   "mutant": "L111 string 'no ' emptied",
+   "worker": "c3-w3",
+   "covered_by_remapped_audit": true,
+   "audit_class": "AUDITED"
+  },
+  {
+   "target": "aisef2/app/verify.py::verify",
+   "index": 136,
+   "mutant": "L117 string ')' emptied",
+   "worker": "c3-w3",
+   "covered_by_remapped_audit": true,
+   "audit_class": "AUDITED"
+  },
+  {
+   "target": "aisef2/app/verify.py::verify",
+   "index": 149,
+   "mutant": "L201 string 'story' emptied",
+   "worker": "c3-w3",
+   "covered_by_remapped_audit": true,
+   "audit_class": "EQUIVALENT"
+  },
+  {
+   "target": "aisef2/app/verify.py::verify",
+   "index": 150,
+   "mutant": "L201 string 'error' emptied",
+   "worker": "c3-w3",
+   "covered_by_remapped_audit": true,
+   "audit_class": "EQUIVALENT"
+  },
+  {
+   "target": "aisef2/app/verify.py::verify",
+   "index": 151,
+   "mutant": "L201 string 'begun and never ended in the journal' emptied",
+   "worker": "c3-w3",
+   "covered_by_remapped_audit": true,
+   "audit_class": "EQUIVALENT"
+  },
+  {
+   "target": "aisef2/app/verify.py::verify",
+   "index": 163,
+   "mutant": "L103 string ')' emptied",
+   "worker": "c3-w3",
+   "covered_by_remapped_audit": true,
+   "audit_class": "AUDITED"
+  },
+  {
+   "target": "aisef2/app/verify.py::verify",
+   "index": 176,
+   "mutant": "L197 string 'the run continued a lineage with spend no evidence accounts for (' emptied",
+   "worker": "c3-w3",
+   "covered_by_remapped_audit": false,
+   "audit_class": null
+  },
+  {
+   "target": "aisef2/app/verify.py::verify",
+   "index": 187,
+   "mutant": "L152 string ')' emptied",
+   "worker": "c3-w3",
+   "covered_by_remapped_audit": true,
+   "audit_class": "AUDITED"
+  }
+ ]
+}

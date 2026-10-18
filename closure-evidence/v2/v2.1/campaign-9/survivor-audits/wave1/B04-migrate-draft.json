@@ -1,0 +1,404 @@
+{
+ "batch": "B04-migrate",
+ "target": "aisef2/app/bundle_cli.py::migrate",
+ "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+ "measurement": "All 9 registered kill files pass clean on the unmutated snapshot tree (9/9 OK; full suite 89 tests across the 5 that call migrate). Each of the 27 new survivors was built into a copy (desc asserted against the batch), then the 5 kill files that call migrate and read its report or exercise its guard (test_v21_identity, test_v21_kills3_A03, test_v21_kills3_T03a, test_v21_kills3_T03b, test_v21_migrate_semantics) were run against it with PATH stripped of opencode and HOME/TMPDIR/XDG_* under scratch: all 27 SURVIVED (exit 0, OK). The other 4 registered kill files do not observe migrate here (test_v21_bundle_tools/continue_usage/continue_integrity never call migrate; test_v21_review calls it only for the candidate on a valid bundle, where the guard never fires and the report is unread); they were run in full against mutants 19 (guard) and 110 (a report key emptied to '') and both SURVIVED (51 tests OK each). No kill file fails on any mutant, so there is no REFUTED-by-measurement and the campaign's SURVIVED is confirmed for all 27.",
+ "entries": [
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate", "index": 103, "mutant": "L417 element 0 dropped",
+   "class": "EQUIVALENT", "group": "owed's second set is a comprehension over unapproved(data), which is empty whenever L417 runs",
+   "grounds": "L417 is `owed = {(cid,rid) for cid in exposed ...} | {(r['contract'], r['requirement']) for r in unapproved(data)}`; the mutant makes the second element `{(r['requirement'],) for r in unapproved(data)}`. PROOF the second comprehension is always over []: to reach L417 every contract in data['contracts'] must have compiled at L386 `current[c.id]=compile_spec(c,...,approvals=approvals,...)`; compile_spec (aisef2/product/compiler.py:60-61) calls require_approved first (aisef2/product/approval.py:82-96), which raises UnapprovedContract -- a ContractError, and ContractError(ValueError) (aisef2/product/contract.py:26) -- when any requirement a contract cites has no approval binding both current hashes; the except at L387 catches ValueError and re-raises MigrationError 'contract <id> does not compile' at L388. unapproved(data) (L602-613) returns the (contract,requirement) pairs with no binding approval using the identical predicate `not any(not binding_problems(a,r,c) ...)` over the same data['contracts'], data['requirements'] and data['approvals']. So unapproved(data) is non-empty IFF some contract failed require_approved IFF migrate already raised at L388; therefore at L417 unapproved(data)==[]. Measured: len(unapproved(data))==0 for LedgerLock 2.0.0 (59/59 approved), era_bundle() and the A03 fixture. The empty comprehension yields the empty set for both the original and the mutant, so owed is identical; the mutated element expression is never evaluated. Mutant SURVIVED the 5 kill files.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py L384-L388 compile_spec loop over every contract (the gate that forces unapproved(data)==[] at L417)",
+    "aisef2/product/compiler.py:60-61 compile_spec -> require_approved; aisef2/product/approval.py:82-96 require_approved; aisef2/product/contract.py:26 ContractError(ValueError) caught by L387",
+    "aisef2/app/bundle_cli.py:602-613 unapproved() uses the same binding_problems predicate over the same contracts/requirements/approvals",
+    "the only reader of owed is L418 (lacks != owed); owed unchanged => L418 unchanged"
+   ],
+   "exceptions_checked": [
+    "a one-element iterable producing one tuple: the iterable is empty at L417 (proved), so no tuple is produced",
+    "a contract whose approval is withheld but was present in data: it is still in unapproved(data) only if no approval binds it in data; a withheld-but-present approval still binds data, so it is not in unapproved(data) -- unrelated to the comprehension's emptiness, which depends only on data",
+    "requirements deduped by id at L376 vs unapproved's dict: both build {r['id']: Requirement(**r)} identically",
+    "a bundle with a truly unapproved contract: it raises at L388 and never reaches L417"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate", "index": 104, "mutant": "L417 element 1 dropped",
+   "class": "EQUIVALENT", "group": "owed's second set is a comprehension over unapproved(data), which is empty whenever L417 runs",
+   "grounds": "Same line as [103]; the mutant makes the second element `{(r['contract'],) for r in unapproved(data)}`. By the proof in [103], unapproved(data)==[] at L417, so the comprehension is empty for both original and mutant and owed is unchanged; the mutated tuple shape is never produced. Measured empty on LedgerLock, era_bundle, A03 fixture. Mutant SURVIVED the 5 kill files.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py L384-L388 (the compile gate), L417-L418 (owed, then the only read of owed)",
+    "aisef2/product/approval.py:82-96 require_approved vs aisef2/app/bundle_cli.py:602-613 unapproved -- identical predicate"
+   ],
+   "exceptions_checked": [
+    "a single-element tuple entering owed: never produced (empty iterable)",
+    "a bundle with an unapproved contract reaching L417: impossible (raises at L388)"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate", "index": 181, "mutant": "L417 string 'contract' emptied",
+   "class": "EQUIVALENT", "group": "owed's second set is a comprehension over unapproved(data), which is empty whenever L417 runs",
+   "grounds": "The mutant makes the second element `{(r[''], r['requirement']) for r in unapproved(data)}`. r[''] would raise KeyError('') because unapproved() rows have keys contract/requirement/contract_hash/requirement_hash and no '' key -- BUT the comprehension body only evaluates if unapproved(data) is non-empty, which by the proof in [103] never holds at L417 (any unapproved contract raises MigrationError at L388 first). So r[''] is never evaluated and owed is unchanged (empty second set). Measured: unapproved(data)==[] on LedgerLock/era_bundle/A03 fixture. Mutant SURVIVED the 5 kill files (no KeyError leaked).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py L384-L388 compile gate (forces unapproved(data)==[] at L417)",
+    "aisef2/app/bundle_cli.py:602-613 unapproved() row keys (contract, requirement, contract_hash, requirement_hash) -- '' is not among them, so the access would raise only if reached",
+    "main() L1071-L1083 would surface a raw KeyError as 'refused: KeyError: ...' exit 2, but it is never raised because the loop body never runs"
+   ],
+   "exceptions_checked": [
+    "KeyError('') escaping migrate as a non-MigrationError: body never executes on any reachable bundle",
+    "a bundle that reaches L417 with unapproved(data) non-empty: impossible (raises at L388)"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate", "index": 182, "mutant": "L417 string 'requirement' emptied",
+   "class": "EQUIVALENT", "group": "owed's second set is a comprehension over unapproved(data), which is empty whenever L417 runs",
+   "grounds": "The mutant makes the second element `{(r['contract'], r['']) for r in unapproved(data)}`; r[''] would KeyError. By the proof in [103] the comprehension iterates zero times at L417, so r[''] is never evaluated and owed is unchanged. Measured empty on LedgerLock/era_bundle/A03. Mutant SURVIVED the 5 kill files.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py L384-L388 compile gate; L417 owed; L418 the only read",
+    "aisef2/app/bundle_cli.py:602-613 unapproved() row keys ('' not present)"
+   ],
+   "exceptions_checked": [
+    "KeyError('') escaping migrate: body never runs on a reachable bundle",
+    "unapproved(data) non-empty at L417: impossible (raises at L388)"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate", "index": 55, "mutant": "L421 dict entry 5 dropped",
+   "class": "AUDITED", "group": "approvals_withheld row carries an extra echo of the withheld approval (requirement_hash) that no consumer, document or operator decision reads",
+   "grounds": "Drops `requirement_hash` from each row of `rows` (report['approvals_withheld'] and the per-contract report['semantic_changes'][].approvals_in_input). Observable: the operator-facing JSON printed by `aisef bundle migrate` loses the requirement_hash field of each withheld/echoed approval. No reader depends on it: grep over the 5 kill files and over aisef2/validation finds no read of approvals_withheld[].requirement_hash or approvals_in_input[].requirement_hash; migrate_semantics reads only approver/approved_at/contract_hash of approvals_in_input (L377-379) and approver/contract/why of approvals_withheld (L646-658); T03b compares the whole approvals_withheld list only for the A03 fixture where it is [] (L107); docs/v2.1/USAGE-2.1.md s.97 documents approvals_withheld as 'which approval, who approved, when' and does not name requirement_hash. The withheld approval is removed from the candidate but is unchanged in the input bundle the operator still holds, so requirement_hash is recoverable there. Mutant SURVIVED the 5 kill files.",
+   "consumers_checked": [
+    "tests/v2/test_v21_migrate_semantics.py L377-379 (approvals_in_input: approver/approved_at/contract_hash), L644-658 (approvals_withheld: contract/approver/why), L660-674 (approvals_kept_grounds, not rows)",
+    "tests/v2/test_v21_kills3_T03b.py L97/L107 (len==6; whole-list == [] only for the no-change A03 fixture)",
+    "tests/v2/test_v21_identity.py L159/L196 (approvals_withheld[].contract only)",
+    "aisef2/app/bundle_cli.py with_commands L341-363 (spreads report, reads needs_owner_reapproval only) and main L1071-1085 (prints report; no field read)",
+    "docs/v2.1/USAGE-2.1.md section on approvals_withheld (who/when, not requirement_hash)"
+   ],
+   "exceptions_checked": [
+    "requirement_hash as an identifying element a verifier reads: no reader found in code/tests/docs; the approval survives in the input bundle",
+    "a whole-report byte/equality comparison: none over a non-empty approvals_withheld (T03b uses the empty fixture; identity L214 hashes the candidate, which does not contain the report)",
+    "the candidate file digest: rows are report-only, not in candidate/out, so bundle_digest/file_sha256 are unaffected",
+    "duplicate-key collapse making a row stand for two approvals: rows iterate the full withheld list (duplicates preserved), so a dropped field is dropped uniformly"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate", "index": 110, "mutant": "L422 string 'requirement_hash' emptied",
+   "class": "AUDITED", "group": "approvals_withheld row carries an extra echo of the withheld approval (requirement_hash) that no consumer, document or operator decision reads",
+   "grounds": "Renames the `requirement_hash` key of each `rows` entry to '' (the value survives under ''). Observable: the operator JSON shows `\"\": <hash>` instead of `\"requirement_hash\": <hash>` in approvals_withheld / approvals_in_input -- a mislabelled informational field. Same reader analysis as [55]: no consumer/contract/doc/operator decision reads this key, and the '' key collides with nothing else in the row dict (one '' key only). The re-approval path depends on needs_owner_reapproval (contract + command), not on these echoes. Mutant SURVIVED the 5 kill files (including the full-9-file run against this mutant, 51 tests OK for the non-killer modules).",
+   "consumers_checked": [
+    "tests/v2/test_v21_migrate_semantics.py L377-379, L644-658; tests/v2/test_v21_kills3_T03b.py L97/L107; tests/v2/test_v21_identity.py L159",
+    "aisef2/app/bundle_cli.py main L1071-1085 (json.dumps(sort_keys=True) sorts dict keys; the '' key sorts first but no reader parses it)",
+    "all 4 non-killer kill files run in full against this exact mutant: SURVIVED (51 tests OK)"
+   ],
+   "exceptions_checked": [
+    "a reader keying on 'requirement_hash': none in code/tests/docs",
+    "the '' key colliding with another key in the same row dict: the row has one '' key only",
+    "json canonicalisation of the candidate: rows are report-only, not hashed"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate", "index": 58, "mutant": "L424 dict entry 1 dropped",
+   "class": "AUDITED", "group": "semantic_changes carries per-contract echoes of contract fields (requirements/polarity/observable/stimulus) that no consumer, document or operator decision reads",
+   "grounds": "Drops `requirements` (= list(by_id[cid].requirement_ids)) from each report['semantic_changes'] entry. Observable in the operator JSON. No reader: the only readers of semantic_changes entries are tests reading contract/class/subject/subject_absence/from/to/changes(ref)/approvals_in_input (migrate_semantics L326,366-379,651-656) and T03b L107 (whole list == [] for the A03 fixture only); none reads the entry's requirements. docs/v2.1/USAGE-2.1.md s.93 lists semantic_changes as class, from/to capability version, ref, when, verdict before/after, old approvals -- not requirements. The contract's requirement_ids are in the bundle the operator holds. Mutant SURVIVED the 5 kill files.",
+   "consumers_checked": [
+    "tests/v2/test_v21_migrate_semantics.py L326 (contract), L366-379 (probe/class/subject_absence/from/to/changes/approvals_in_input), L651-656 (class/subject_absence/from/subject)",
+    "tests/v2/test_v21_kills3_T03b.py L107 (semantic_changes == [] only, A03 fixture)",
+    "aisef2/app/bundle_cli.py with_commands (does not touch semantic_changes) and main (prints only)",
+    "repo-wide grep 'semantic_changes' in aisef2/validation: only the docstring (L69,75) and the construction site (L439)"
+   ],
+   "exceptions_checked": [
+    "requirements as an element a verifier reads: none found; derivable from the contract in the bundle",
+    "whole-report equality over a non-empty semantic_changes: none (T03b uses the empty A03 fixture)",
+    "candidate digest: semantic_changes is report-only"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate", "index": 115, "mutant": "L424 string 'requirements' emptied",
+   "class": "AUDITED", "group": "semantic_changes carries per-contract echoes of contract fields (requirements/polarity/observable/stimulus) that no consumer, document or operator decision reads",
+   "grounds": "Renames the `requirements` key of each semantic_changes entry to '' (value preserved). Same reader analysis as [58]; the '' key does not collide with another key in the entry. Mutant SURVIVED the 5 kill files.",
+   "consumers_checked": [
+    "tests/v2/test_v21_migrate_semantics.py L326,366-379,651-656 (never reads the entry's requirements key)",
+    "tests/v2/test_v21_kills3_T03b.py L107 (== [] for the A03 fixture)",
+    "docs/v2.1/USAGE-2.1.md s.93 (does not name requirements in semantic_changes)"
+   ],
+   "exceptions_checked": [
+    "a reader keying on 'requirements' in a semantic_changes entry: none",
+    "'' colliding with another key in the entry: one '' key only"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate", "index": 62, "mutant": "L424 dict entry 5 dropped",
+   "class": "AUDITED", "group": "semantic_changes carries per-contract echoes of contract fields (requirements/polarity/observable/stimulus) that no consumer, document or operator decision reads",
+   "grounds": "Drops `polarity` (= by_id[cid].polarity.value) from each semantic_changes entry. No reader: migrate_semantics reads class/subject_absence/subject/from/to/changes/approvals_in_input but never the entry's polarity (L326,366-379,651-656); T03b compares semantic_changes only when it is [] (A03 fixture, L107); docs s.93 does not list polarity. The contract's polarity is in the bundle. Mutant SURVIVED the 5 kill files.",
+   "consumers_checked": [
+    "tests/v2/test_v21_migrate_semantics.py L326,366-379,651-656 (no read of entry.polarity)",
+    "tests/v2/test_v21_kills3_T03b.py L107 (== [] A03 fixture)",
+    "repo-wide grep semantic_changes (docstring + construction only)"
+   ],
+   "exceptions_checked": [
+    "polarity as a verifier-read element: none; derivable from the contract",
+    "whole-report equality over a non-empty list: none"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate", "index": 118, "mutant": "L427 string 'polarity' emptied",
+   "class": "AUDITED", "group": "semantic_changes carries per-contract echoes of contract fields (requirements/polarity/observable/stimulus) that no consumer, document or operator decision reads",
+   "grounds": "Renames the `polarity` key of each semantic_changes entry to '' (value preserved). Same reader analysis as [62]; single '' key in the entry. Mutant SURVIVED the 5 kill files.",
+   "consumers_checked": [
+    "tests/v2/test_v21_migrate_semantics.py L326,366-379,651-656 (no read of entry.polarity)",
+    "tests/v2/test_v21_kills3_T03b.py L107 (== [] A03 fixture)",
+    "docs/v2.1/USAGE-2.1.md s.93"
+   ],
+   "exceptions_checked": [
+    "a reader keying on 'polarity' in a semantic_changes entry: none",
+    "'' collision within the entry: one only"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate", "index": 63, "mutant": "L424 dict entry 6 dropped",
+   "class": "AUDITED", "group": "semantic_changes carries per-contract echoes of contract fields (requirements/polarity/observable/stimulus) that no consumer, document or operator decision reads",
+   "grounds": "Drops `observable` (= by_id[cid].to_json()['observable']) from each semantic_changes entry. No reader (same analysis as [62]): the entry's observable is read by no test/doc/consumer; it echoes the contract, which the operator holds. Mutant SURVIVED the 5 kill files.",
+   "consumers_checked": [
+    "tests/v2/test_v21_migrate_semantics.py L326,366-379,651-656",
+    "tests/v2/test_v21_kills3_T03b.py L107 (== [] A03 fixture)",
+    "repo-wide grep semantic_changes (docstring + construction only)"
+   ],
+   "exceptions_checked": [
+    "observable as a verifier-read element: none; derivable from the contract",
+    "whole-report equality over a non-empty list: none"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate", "index": 119, "mutant": "L428 string 'observable' emptied",
+   "class": "AUDITED", "group": "semantic_changes carries per-contract echoes of contract fields (requirements/polarity/observable/stimulus) that no consumer, document or operator decision reads",
+   "grounds": "Renames the `observable` key of each semantic_changes entry to '' (value preserved). Same analysis as [63]; one '' key only. Mutant SURVIVED the 5 kill files.",
+   "consumers_checked": [
+    "tests/v2/test_v21_migrate_semantics.py L326,366-379,651-656",
+    "tests/v2/test_v21_kills3_T03b.py L107 (== [] A03 fixture)",
+    "docs/v2.1/USAGE-2.1.md s.93"
+   ],
+   "exceptions_checked": [
+    "a reader keying on 'observable': none",
+    "'' collision within the entry: one only"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate", "index": 64, "mutant": "L424 dict entry 7 dropped",
+   "class": "AUDITED", "group": "semantic_changes carries per-contract echoes of contract fields (requirements/polarity/observable/stimulus) that no consumer, document or operator decision reads",
+   "grounds": "Drops `stimulus` (= by_id[cid].to_json()['stimulus']) from each semantic_changes entry (the following key, approvals_in_input, is kept and IS read at L377-379, so this mutant removes only stimulus). No reader of the entry's stimulus (same analysis as [62]); derivable from the contract. Mutant SURVIVED the 5 kill files.",
+   "consumers_checked": [
+    "tests/v2/test_v21_migrate_semantics.py L377-379 (approvals_in_input kept, read), L326,366-371,651-656 (no read of entry.stimulus)",
+    "tests/v2/test_v21_kills3_T03b.py L107 (== [] A03 fixture)",
+    "repo-wide grep semantic_changes"
+   ],
+   "exceptions_checked": [
+    "stimulus as a verifier-read element: none; derivable from the contract",
+    "accidentally dropping approvals_in_input (which IS read): the mutant drops entry 7 (stimulus); approvals_in_input is the last entry and remains"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate", "index": 120, "mutant": "L428 string 'stimulus' emptied",
+   "class": "AUDITED", "group": "semantic_changes carries per-contract echoes of contract fields (requirements/polarity/observable/stimulus) that no consumer, document or operator decision reads",
+   "grounds": "Renames the `stimulus` key of each semantic_changes entry to '' (value preserved); approvals_in_input is unaffected and still read at L377-379. Same analysis as [64]; one '' key only. Mutant SURVIVED the 5 kill files.",
+   "consumers_checked": [
+    "tests/v2/test_v21_migrate_semantics.py L377-379 (approvals_in_input), L326,366-371,651-656 (no read of entry.stimulus)",
+    "tests/v2/test_v21_kills3_T03b.py L107 (== [] A03 fixture)",
+    "docs/v2.1/USAGE-2.1.md s.93"
+   ],
+   "exceptions_checked": [
+    "a reader keying on 'stimulus': none",
+    "'' collision within the entry: one only"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate", "index": 67, "mutant": "L430 dict entry 1 dropped",
+   "class": "AUDITED", "group": "needs_owner_reapproval row carries requirements (contract.requirement_ids) that no consumer, document or operator decision reads",
+   "grounds": "Drops `requirements` (= list(by_id[cid].requirement_ids)) from each `reapprove` row (report['needs_owner_reapproval']['contracts'][], after with_commands spreads it). Observable in the operator JSON of `aisef bundle migrate`. No reader: with_commands (L341-363) spreads the row and reads only row['contract'] (L355); migrate_semantics follow() reads contract/reads/writes/command (L151-161) and tests read {contract} sets and len (L327,715); no test/doc reads reapprove[].requirements; docs s.94 describes needs_owner_reapproval as one approve command per contract with paths, not the requirements field. The requirement_ids are in the contract in the bundle. Mutant SURVIVED the 5 kill files.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py with_commands L352-357 (reads row['contract'] only; spreads the rest)",
+    "tests/v2/test_v21_migrate_semantics.py follow L151-161, L327 ({contract}), L715 (len==6), L428-470 (reads/writes/command/reads-path)",
+    "tests/v2/test_v21_kills3_T03b.py L107 (needs_owner_reapproval == None for the A03 fixture) and L119 with_commands round-trip (compares the whole value but on the LedgerLock vs fresh() report where both carry the SAME reapprove rows -- the mutant changes both sides equally)",
+    "docs/v2.1/USAGE-2.1.md s.94"
+   ],
+   "exceptions_checked": [
+    "T03b L119 `expected = with_commands(migrate(fresh())[1], target)` compared to the printed report: both sides are produced by the same mutated code, so a dropped field is dropped on both and the equality still holds -- verified SURVIVED",
+    "requirements as a verifier-read element: none; derivable from the contract",
+    "candidate digest: reapprove is report-only"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate", "index": 126, "mutant": "L430 string 'requirements' emptied",
+   "class": "AUDITED", "group": "needs_owner_reapproval row carries requirements (contract.requirement_ids) that no consumer, document or operator decision reads",
+   "grounds": "Renames the `requirements` key of each reapprove row to '' (value preserved). Same reader analysis as [67]; with_commands reads only row['contract'], and T03b's with_commands round-trip (L119) compares two reports both produced by the mutated code. One '' key only. Mutant SURVIVED the 5 kill files.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py with_commands L352-357 (row['contract'] only)",
+    "tests/v2/test_v21_migrate_semantics.py follow L151-161, L327, L715",
+    "tests/v2/test_v21_kills3_T03b.py L107/L119",
+    "docs/v2.1/USAGE-2.1.md s.94"
+   ],
+   "exceptions_checked": [
+    "a reader keying on 'requirements' in a reapprove row: none",
+    "T03b L119 whole-value equality: both sides mutated equally, holds",
+    "'' collision within the row: one only"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate", "index": 86, "mutant": "L441 dict entry 2 dropped",
+   "class": "AUDITED", "group": "the candidate summary echoes new_plan.id as plan_id, which no consumer, document or operator decision reads",
+   "grounds": "Drops `plan_id` (= new_plan.id) from report['candidate'] (the summary block: bundle_digest, bundle_digest_is, plan_id, plan_hash, contracts, approvals_kept, contracts_to_approve, loads). Observable in the operator JSON. No reader: migrate_semantics reads report['candidate'].{contracts_to_approve, loads, bundle_digest} (L362-363,496,713) but never plan_id; repo-wide grep for report['candidate']['plan_id'] finds nothing (the ['plan_id'] hits in test_p6_stages/release_workload/journal/format3 read other objects, not migrate's report). The candidate's plan id is in the written candidate file out['plan']. The candidate bundle_digest hashes the candidate, not this summary, so it is unaffected. Mutant SURVIVED the 5 kill files.",
+   "consumers_checked": [
+    "tests/v2/test_v21_migrate_semantics.py L362-363 (contracts_to_approve, loads), L496 (loads), L713 (bundle_digest)",
+    "aisef2/app/bundle_cli.py main L1074-1078 (writes report['candidate']['file_sha256']; reads nothing from the summary)",
+    "repo-wide grep ['plan_id'] in aisef2/validation/tests: no read of migrate's report['candidate']['plan_id']"
+   ],
+   "exceptions_checked": [
+    "plan_id as an identifying element a verifier reads: none; present in the written candidate file out['plan']",
+    "report['candidate']['bundle_digest'] depending on plan_id: bundle_digest is sha256 of the candidate bundle, not of the summary block",
+    "main's file_sha256 write depending on plan_id: it only assigns a new key"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate", "index": 135, "mutant": "L445 string 'plan_id' emptied",
+   "class": "AUDITED", "group": "the candidate summary echoes new_plan.id as plan_id, which no consumer, document or operator decision reads",
+   "grounds": "Renames the `plan_id` key of report['candidate'] to '' (value = new_plan.id preserved). Same reader analysis as [86]; one '' key in the summary block. Mutant SURVIVED the 5 kill files.",
+   "consumers_checked": [
+    "tests/v2/test_v21_migrate_semantics.py L362-363,496,713 (candidate summary fields, never plan_id)",
+    "aisef2/app/bundle_cli.py main L1074-1078",
+    "repo-wide grep: no read of migrate's report['candidate']['plan_id']"
+   ],
+   "exceptions_checked": [
+    "a reader keying on 'plan_id' in the candidate summary: none",
+    "'' collision within the summary block: one only",
+    "bundle_digest / file_sha256: unaffected (hash the candidate, not the summary)"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate", "index": 124, "mutant": "L429 sorted() -> list()",
+   "class": "AUDITED", "group": "sorted()->list() reorders a report list; no consumer requires the canonical order and the output stays deterministic per bundle",
+   "grounds": "Changes `for cid, e in sorted(exposed.items())` to `list(exposed.items())` when building report['semantic_changes']. exposed is _selected(_assess(...)), whose key order follows contracts.items() = the order contracts appear in data['contracts'] (L377), not contract-id order; so sorted() imposes a canonical id order that list() drops. Observable: the semantic_changes list may be in a different (still deterministic for a given bundle) order. No consumer requires sortedness: every test reads {c['contract'] for c in semantic_changes} as a set (migrate_semantics L326,483,654; identity L196) or compares it to [] (T03b L107, A03 fixture); none asserts element order. semantic_changes is report-only and not in the candidate, so no digest is affected. Mutant SURVIVED the 5 kill files.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py L265-267 _selected / L219-262 _assess (exposed order = data['contracts'] order)",
+    "tests/v2/test_v21_migrate_semantics.py L326,483,654 ({contract} sets), L366-379 (indexes by contract id via a dict, order-independent)",
+    "tests/v2/test_v21_kills3_T03b.py L107 (== [] A03 fixture)",
+    "aisef2/app/bundle_cli.py main (prints with sort_keys=True, which sorts dict keys, not list elements)"
+   ],
+   "exceptions_checked": [
+    "an operator/verifier relying on a stable sorted order for diffing: output is still deterministic per bundle; no consumer or doc requires the sorted order specifically",
+    "candidate digest / file bytes: semantic_changes is report-only",
+    "non-determinism: exposed is a dict built in a deterministic order, so list() is deterministic too"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate", "index": 128, "mutant": "L431 sorted() -> list()",
+   "class": "AUDITED", "group": "sorted()->list() reorders a report list; no consumer requires the canonical order and the output stays deterministic per bundle",
+   "grounds": "Changes `for cid in sorted(exposed)` to `list(exposed)` when building report['needs_owner_reapproval']['contracts'] (reapprove). Reorders the reapprove rows (bundle-contract order instead of sorted id order). No consumer requires the order: with_commands chains the rows in whatever order they come (each command reads the file the previous wrote), and migrate_semantics follow() replays them in that order and asserts per-row printed['approved']==row['contract'] plus the final set; tests assert {contract} sets and len==6 (L327,715), never a specific order. reapprove is report-only. Mutant SURVIVED the 5 kill files.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py with_commands L351-357 (iterates todo['contracts'] in given order; the reads/writes chain works for any order)",
+    "tests/v2/test_v21_migrate_semantics.py follow L151-161 (order-agnostic), L327 ({contract}), L715 (len), T03b L119 (round-trip of the same code)",
+    "aisef2/app/bundle_cli.py main (sort_keys sorts dict keys, not list order)"
+   ],
+   "exceptions_checked": [
+    "the approve-command chain breaking under a different order: each command reads the previous command's output file by name; order only changes which contract is approved first, not correctness -- follow() confirms",
+    "a verifier requiring sorted reapprove order: none found; output stays deterministic per bundle",
+    "candidate digest: reapprove is report-only"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate", "index": 19, "mutant": "L418 Or swapped",
+   "class": "AUDITED", "group": "the L418 self-consistency guard: both disjuncts are held False by the construction above it on every reachable bundle, so weakening or->and is unobservable",
+   "grounds": "Changes the guard `if lacks != owed or len(candidate['approvals'])+len(withheld) != len(data['approvals'])` to `... and ...`. This is a defensive self-check that migrate's own bookkeeping reconciled; on valid input both disjuncts are False (so or and and agree). Disjunct A (lacks != owed): by the [103] proof unapproved(data)==[] at L417, so owed = {exposed contracts x their requirement_ids}; lacks = unapproved(candidate) which, by construction (candidate drops exactly the withheld approvals, whose contracts are the exposed/unbound ones), equals owed -- A is False. Disjunct B (count): candidate['approvals'] = [a for a in data['approvals'] if _key(a) not in dropped] and withheld iterates the full approvals tuple, so each withheld approval both removes its data approval and is counted -- B is False; measured on a crafted duplicate-approval bundle (an identical second approval of a withheld contract), migrate did NOT raise even in the ORIGINAL (withheld counted the duplicate, candidate dropped both: 2 kept + 7 withheld == 9 = len(data)), so duplicates do not make B fire. The mutant differs from the original only when exactly one disjunct is True, which requires migrate's construction to be internally inconsistent -- a state no shape-valid, kernel-loadable, all-contracts-compiled, plan-rebound bundle produces. Not provably EQUIVALENT (the two disjuncts guard independent failure modes and are not identically-valued by a single code fact), so AUDITED. No consumer depends: the guard only chooses raise(MigrationError) vs return, and no killer test reaches it with one disjunct True. Mutant SURVIVED all 9 kill files (5 killers + the 4 non-killers run in full against it, 51 tests OK).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py L415-417 (lacks, owed) and L402-412 (candidate, withheld, dropped) -- the construction that keeps both disjuncts False",
+    "callers of migrate: main L1071 (return -> write + print; MigrationError -> 'refused:' exit 2), validation/v21/context_gap.py:138 (uses the candidate on a trusted bundle), tests -- none feeds a bundle that makes exactly one disjunct True",
+    "tests/v2/test_v21_kills3_T03b.py tamper cases (KernelObjectsThatDoNotLoad etc.) raise MigrationError at L373/L381/L388/L400, never at L418",
+    "measured: duplicate-approval bundle does not fire the guard in the original; LedgerLock/era_bundle/A03 all return"
+   ],
+   "exceptions_checked": [
+    "a duplicate approval making B fire while A is False: measured -- B does not fire, because withheld iterates the full approvals tuple (the dup is counted and both dropped)",
+    "an unbound withheld approval that was the sole binder of some pair: 'unbound' means it does not bind, so removing it cannot change unapproved(candidate); A stays consistent",
+    "a bundle reaching L418 with unapproved(data) non-empty (which would decouple owed from lacks): impossible (raises at L388)",
+    "fault-injecting an inconsistent candidate to kill the mutant: would require editing migrate's internals, which the pinned-measurement rule forbids; no test is owed for a self-check unreachable by valid input"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate", "index": 159, "mutant": "L419 string \"the candidate's unapproved contracts \" emptied",
+   "class": "AUDITED", "group": "the L419-420 MigrationError text is only constructed when the L418 guard fires, which no reachable bundle does",
+   "grounds": "Empties the leading literal of the guard's MigrationError message. The message at L419-420 is built only when the L418 guard raises; by the analysis in [19] the guard never fires on any shape-valid, loadable, compiled, rebound bundle (both disjuncts False), so this text is never emitted to an operator. No test asserts this message (grep 'are not what the withheld'/'unapproved contracts' over tests finds only unrelated doc prose). Mutant SURVIVED the 5 kill files.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py L418-420 (the only site; reached only on guard fire)",
+    "main L1082-1083 would print 'refused: <MigrationError>' exit 2 IF it fired -- it never does on valid input",
+    "grep over tests/docs for the guard message text: no reader"
+   ],
+   "exceptions_checked": [
+    "an operator reading this refusal: the guard is a self-check unreachable by any valid bundle, so the text is never produced",
+    "a test pinning the message: none; the suite exercises other MigrationError messages (L388/L400) via their own paths, not this one"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate", "index": 160, "mutant": "L419 string ' are not what the withheld approvals account for (' emptied",
+   "class": "AUDITED", "group": "the L419-420 MigrationError text is only constructed when the L418 guard fires, which no reachable bundle does",
+   "grounds": "Empties the connective literal of the guard's message. Same as [159]: the message is constructed only on a guard fire that no reachable bundle causes; no test or doc reads it. Mutant SURVIVED the 5 kill files.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py L418-420 (reached only on guard fire)",
+    "grep over tests/docs for the message text: no reader"
+   ],
+   "exceptions_checked": [
+    "operator reading the refusal: guard unreachable by valid input",
+    "a test pinning the message: none"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate", "index": 161, "mutant": "L420 string ' withheld of ' emptied",
+   "class": "AUDITED", "group": "the L419-420 MigrationError text is only constructed when the L418 guard fires, which no reachable bundle does",
+   "grounds": "Empties the ' withheld of ' literal in the guard's message counts clause. Constructed only on a guard fire; unreachable on valid input; no reader. Mutant SURVIVED the 5 kill files.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py L418-420",
+    "grep over tests/docs for the message text: no reader"
+   ],
+   "exceptions_checked": [
+    "operator reading the refusal counts: guard unreachable",
+    "a test pinning the message: none"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate", "index": 162, "mutant": "L420 string ')' emptied",
+   "class": "AUDITED", "group": "the L419-420 MigrationError text is only constructed when the L418 guard fires, which no reachable bundle does",
+   "grounds": "Empties the trailing ')' of the guard's message. Constructed only on a guard fire; unreachable on valid input; no reader. Mutant SURVIVED the 5 kill files.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py L418-420",
+    "grep over tests/docs for the message text: no reader"
+   ],
+   "exceptions_checked": [
+    "operator reading the refusal: guard unreachable",
+    "a test pinning the message: none"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate", "index": 196, "mutant": "L419 sorted() -> list()",
+   "class": "AUDITED", "group": "the L419-420 MigrationError text is only constructed when the L418 guard fires, which no reachable bundle does",
+   "grounds": "Changes `sorted(lacks ^ owed)[:5]` to `list(lacks ^ owed)[:5]` inside the guard's message (affects only the order of the first 5 symmetric-difference pairs shown). The message is built only on a guard fire; unreachable on valid input (lacks ^ owed is empty when both disjuncts are False, so even the sorted/list argument is empty); no reader. Mutant SURVIVED the 5 kill files.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py L418-420 (reached only on guard fire; lacks ^ owed == set() when A is False)",
+    "grep over tests/docs for the message text: no reader"
+   ],
+   "exceptions_checked": [
+    "order of the shown pairs mattering to an operator: the message is never emitted on valid input, and lacks ^ owed is empty when the guard would not fire",
+    "a test pinning the message order: none"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::migrate", "index": 198, "mutant": "L420 string 'approvals' emptied",
+   "class": "AUDITED", "group": "the L419-420 MigrationError text is only constructed when the L418 guard fires, which no reachable bundle does",
+   "grounds": "Changes `len(data['approvals'])` to `len(data[''])` inside the guard's message f-string, which would raise KeyError('') (changing the exception type from MigrationError to KeyError) -- but only when the message is constructed, i.e. only on a guard fire. By [19] the guard never fires on a reachable bundle, so the f-string is never evaluated and no KeyError is produced. No test reaches the guard. Mutant SURVIVED the 5 kill files (no leaked KeyError).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py L418-420 (the f-string is evaluated only when the MigrationError is raised at the guard)",
+    "main L1079-1083 would catch a KeyError as 'refused: KeyError: ...' exit 2 IF it occurred -- it never does on valid input",
+    "grep over tests/docs: no reader of this message; no test fires the guard"
+   ],
+   "exceptions_checked": [
+    "KeyError('') replacing MigrationError and escaping with a different type: the f-string is never evaluated because the guard never fires on a reachable bundle",
+    "a test that fires the guard and would see the wrong exception type: none"
+   ]
+  }
+ ],
+ "owed_tests": [],
+ "notes": "27/27 new survivors confirmed SURVIVED against the registered kill files on the measured source (sha256 e083e92a...1e87690ba467658ca570c01f90bb796ff456f8). No REFUTED-by-measurement. Classes: 4 EQUIVALENT (103,104,181,182) and 23 AUDITED. The EQUIVALENT four rest on one code fact: reaching L417 requires every contract to have passed compile_spec->require_approved (ContractError is a ValueError, caught at L387 and re-raised at L388), and require_approved uses the same binding_problems predicate as unapproved(), so unapproved(data)==[] at L417 and the mutated comprehension over it is a no-op (measured empty on LedgerLock 59/59, era_bundle, A03). The AUDITED report-field mutants (55,58,62,63,64,67,86,110,115,118,119,120,126,135) each drop or mislabel one per-contract/per-approval ECHO field in the operator-facing report (requirement_hash of a withheld approval; requirements/polarity/observable/stimulus of a semantic change; requirements of a reapprove row; plan_id of the candidate summary); none is read by any of the 5 migrate-reading kill files, by with_commands/main, or by the USAGE-2.1 report shape, and each value is recoverable from the contract/approval in the bundle (which migrate never modifies) or from the written candidate file. 124/128 only reorder a report list (sorted->list); exposed follows bundle-contract order, so this drops a canonical ordering no consumer requires, and the output stays deterministic per bundle. 19 and 159/160/161/162/196/198 concern the L418 self-consistency guard and its refusal text: the guard's two disjuncts are held False by the construction above it on every shape-valid, loadable, compiled, rebound bundle (owed=exposed because unapproved(data)==[]; lacks=owed by construction; the count reconciles because withheld iterates the full approvals tuple -- a crafted duplicate-approval bundle was measured NOT to fire the guard in the original), so weakening or->and and all message-literal edits (including 198's KeyError-in-the-message) are unobservable on any reachable input. These are defensive-assertion mutants: killing them would need fault-injecting an inconsistent candidate (a code/test change the pinned-measurement rule forbids), so no test is owed. Harness: snapshot 4ec961e706a1f7bda16d131037058c4fe9c2663f archived to scratch (not a worktree); build_mutant.py builds each mutant from the pristine module into a copy and asserts the batch description; kill files run with env -i, PATH stripped of every opencode dir (verified), HOME/TMPDIR/XDG_DATA/STATE/CACHE under scratch, nice -19, one mutant at a time; the campaign dir, heavy.lock.d and the read-only worktree were never touched; no 'opencode', no network, no 'mutation.py run', no full suite."
+}

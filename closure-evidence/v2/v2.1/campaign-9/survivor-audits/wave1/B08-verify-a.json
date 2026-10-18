@@ -1,0 +1,303 @@
+{
+ "batch": "B08-verify",
+ "copy": "a",
+ "entries": [
+  {
+   "target": "aisef2/app/verify.py::verify",
+   "index": 176,
+   "mutant": "L197 string 'the run continued a lineage with spend no evidence accounts for (' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "mutant_view confirms the mutant at verify.py L197, inside `if accepted:` (L196), itself inside `if s is not None:` (L187): the lineage-continuation note is two adjacent literals (L197 first, L198-199 second). The mutant empties the substring 'the run continued a lineage with spend no evidence accounts for (' out of the FIRST literal, giving f\"{len(accepted)} listed in continues.accepted_unaccounted), accepted by name: its ceilings were enforced against the known part, and the lineage's total is not known\". The SECOND literal is unchanged: 'accepted by name', the field name continues.accepted_unaccounted, and 'the lineage's total is not known' all survive; what is lost is the subject-framing and the opening '(' (the count then prints without its '('). The note is reached only for a run whose journal reconstructs and binds settings and whose rec['continues']['accepted_unaccounted'] is non-empty (written by run.py L548 on `aisef run --parent --accept-unaccounted` over spend the evidence reads as sent-and-unanswered, ADR-8). notes.append still fires; the list length and the verdict are untouched (the note is never a problem). The note reaches the operator only through cli._print (cli.py L56-L57, json.dumps(doc, sort_keys=True) — sort_keys orders dict keys only, so the note string and the notes list order print verbatim) and the exit code is from v['verdict'] alone (cli.py L80); nothing parses it. The sole asserting reader, test_v21_x_lineage_proof.py L1040, asserts any('accepted by name' in n for n in v['notes']) — kept by the mutant. MEASUREMENT (my own COPY tree B08-verify-a-mut; PATH stripped of every dir holding an opencode binary, with an abort-guard `command -v opencode`; HOME/TMPDIR under the copy; NINEROUTER_API_KEY unset; nice -n 19 /opt/homebrew/bin/python3 -P -B -m unittest, one file at a time; each mutant built into a fresh copy with the source sha256 and the mutant description asserted at build): all 17 registered kill files pass (rc=0) on this mutant. The whole run's only nonzero rc was the BASELINE's first-run test_s2_kills and test_v21_r3_usage_boundary, both rc=0 on rerun (baseline-rerun.tsv) and rc=0 on every mutant — flaky, not a kill. So no registered kill file refutes this entry. Author draft grounds hold; AUDITED, no test owed.",
+   "consumers_checked": [
+    "aisef2/app/verify.py L197-L199 sole producer; L222-L223 the returned document ('notes' field)",
+    "aisef2/app/cli.py L56-L57 (_print = json.dumps(doc, indent=1, sort_keys=True, default=str)) and L77-L80 (exit 0 on VERIFIED else 1): operator sees the note as a JSON string; sort_keys orders dict keys only; note text and notes list order print as given; nothing parsed (draft's '(L59)' for the exit is actually L80)",
+    "tests/v2/test_v21_x_lineage_proof.py L1014-L1040 (NoFlagOpensAPaidSession): the ONLY reader of this note; L1038-9 assert (v['verdict'],v['problems'])==('VERIFIED',[]), L1040 asserts any('accepted by name' in n ...) — kept. Its L1018 assertIn('no evidence accounts for', text) reads text=self.refused_at_the_claim(...) which returns str(c.exception) for an R.RunRefused (helper L755-L775), i.e. run.py L545's refusal — a DIFFERENT producer, not this note (ran: 55 OK on the mutant)",
+    "tests/v2/test_v21_continue_usage.py (10 OK on the mutant) and tests/v2/test_v21_continue_integrity.py (on the mutant OK) do not assert this note",
+    "all v['notes'] readers across tests+validation (grep): x_lineage_proof L1040 (this note, 'accepted by name'); T22b L144-158 and A22 L210 and defects_verify L118/133-139 (the anchor-match and manifest-absent notes, not this one); r3_detail_product L199 / pm8_diagnostics_run L238 (notes==[] for runs not in this branch); r3_detail_failclosed L115 and pm8_diagnostics_run L344/362 (review_verify / probe notes); p9_reproduction (a different result structure). None asserts this note's leading clause",
+    "validation/qualification/v21_q5_compare.py L129/L215 and q5.py L862 (q5 observation notes, both sides same code) and validation/v21/cli_integration/e2e_guest.py L473 (records vj.get('notes') for a run WITH a manifest; no e2e scenario continues a lineage with accepted_unaccounted) — neither asserts this note's text",
+    "git grep 'continued a lineage': verify.py L197 only. 'no evidence accounts for': run.py L545 (RunRefused), cli.py L47 (help), verify.py L197, test docstrings and test_v21_x_lineage_proof L1018 (reads the refusal) and test_v21_kills_cli L63 (help pin) — no reader reads THIS note for that phrase",
+    "docs/v2.1/USAGE-2.1.md L821-L822 and docs/v2/V2.1-BACKLOG.md V21-79 (L130): the documented note contract is the phrase 'accepted by name' (kept); neither quotes the leading clause"
+   ],
+   "exceptions_checked": [
+    "a reader matching the whole note or its start ('the run continued ...') by exact string/regex/startswith: grep finds none; the only assertion is the substring 'accepted by name' (kept)",
+    "the mutant changing whether/how many notes are appended: no — notes.append still fires, list length unchanged",
+    "the operator misled into a false reading: the surviving tail still states 'accepted by name', 'its ceilings were enforced against the known part', 'the lineage's total is not known' and names continues.accepted_unaccounted; only the subject-framing and the opening '(' are lost (dangling ')' after the field name, nothing false)",
+    "the unbalanced '(' reaching another note/field: notes are separate list elements, each printed as its own JSON string; no join concatenates notes",
+    "round-3 paths: the note is reached only after the journal reconstructs, the six projections admit it and s is not None; otherwise events==[] and the branch is not entered — effect confined to this literal",
+    "an unregistered test module killing it: grep of notes readers finds none that asserts this note's lost clause"
+   ],
+   "refutation": "Tried to refute by (a) the full registered kill-file measurement (all 17 pass on the mutant), (b) a grep for any reader of the whole note or its leading clause across aisef2/validation/tests/docs (none; the one reader asserts 'accepted by name', kept), and (c) checking that test_v21_x_lineage_proof L1018's 'no evidence accounts for' reads the RunRefused (run.py L545), not this note (confirmed by the helper at L755-775, and empirically by 55 OK). No refutation found.",
+   "note": "Author draft is accurate; its line cites (verify.py L195-199, L187; run.py L545/L548; x_lineage_proof L1040/L1018) match this snapshot. One cite to correct: the CLI exit is at cli.py L80, not 'L59' (the draft's _print L56-57 is right). The optional full-note consistency test the draft notes is a choice, not a gap (owner rule: no test added to reach a number; nothing depends on the lost character range). AUDITED, owed_tests empty."
+  },
+  {
+   "target": "aisef2/app/verify.py::verify",
+   "index": 118,
+   "mutant": "L201 dict entry 0 dropped",
+   "class_before": "EQUIVALENT",
+   "verdict": "CONFIRMED",
+   "class_after": "EQUIVALENT",
+   "grounds": "mutant_view confirms the mutant at verify.py L201: `[{'story': x, 'error': ...} for x in refused]` -> `[{'error': ...} for x in refused]` (drops the 'story' key). `errors` is a local list read only by R.delivery (run.py L387: len/truthiness) whose blocker list verify discards (L202); the document (L222-223) has no errors field. The mutant yields one dict per refused entry — same list length, same truthiness — and the dict content is never read, serialised or interpolated into any problem/note. So verify()'s returned dict is identical for every input: a code-proof of equivalence, not sampling. MEASUREMENT (my own COPY tree B08-verify-a-mut; PATH stripped of every dir holding an opencode binary, with an abort-guard `command -v opencode`; HOME/TMPDIR under the copy; NINEROUTER_API_KEY unset; nice -n 19 /opt/homebrew/bin/python3 -P -B -m unittest, one file at a time; each mutant built into a fresh copy with the source sha256 and the mutant description asserted at build): all 17 registered kill files pass (rc=0) on this mutant. The whole run's only nonzero rc was the BASELINE's first-run test_s2_kills and test_v21_r3_usage_boundary, both rc=0 on rerun (baseline-rerun.tsv) and rc=0 on every mutant — flaky, not a kill. So no registered kill file refutes this entry.",
+   "consumers_checked": [
+    "aisef2/app/verify.py L201-L202: the only mentions of `errors` in the module; the document returned (L222-L223) has no errors field (keys verdict, problems, delivery_verdict, journal_events, evidence_anchor, notes)",
+    "aisef2/app/run.py R.delivery L373-L389: `errors` is read ONLY at L387 (`[f\"{len(errors)} stories were refused\"] if errors else []`) — len() and truthiness, no iteration, no subscript, no serialisation; it returns (verdict, blocked, committed) and verify L202 discards `blocked` (`verdict, _, committed`), so even len(errors) never reaches verify's output; errors affects only bool(errors)->blocked->verdict",
+    "callers of R.delivery (grep): verify.py L202; validation/qualification/release_acceptance.py L131-L132 passes the RECORD's story_errors (a different list); release_rehearsal and the unit tests each hand their own list"
+   ],
+   "exceptions_checked": [
+    "an element of `errors` read by key later in verify: none; `errors` is unused after L202",
+    "the list changing length or truthiness: unchanged — one dict per refused, with or without 'story'",
+    "the dropped 'story' id being the only place the refused id reaches output: the document has no errors field and no problem/note interpolates `errors` or `refused` (every append L103-L221 read)",
+    "the mutated literal raising: `{'error': ...}` is a valid dict, no raise — no divergence via the outer except L220",
+    "round-3: `refused` is also bound at L157 to the projection-refusal tuple but rebound at L183 to R.unfinished before L201; after a projection refusal events==[] so refused==[] and the comprehension is empty"
+   ],
+   "refutation": "Tried to refute by the full registered kill-file measurement (all 17 pass) and by searching for any reader of an `errors` element (none in verify or R.delivery). No refutation found; equivalence proven from the code.",
+   "note": "Carried grounds hold; line cites refreshed to this snapshot: `errors`/R.delivery call are L201-L202 (not L183-L184), the document keys are L222-L223 (not L204-L205). EQUIVALENT."
+  },
+  {
+   "target": "aisef2/app/verify.py::verify",
+   "index": 119,
+   "mutant": "L201 dict entry 1 dropped",
+   "class_before": "EQUIVALENT",
+   "verdict": "CONFIRMED",
+   "class_after": "EQUIVALENT",
+   "grounds": "mutant_view confirms verify.py L201: drops the 'error' key, leaving `[{'story': x} for x in refused]`. Same chain as [118]: `errors` flows only into R.delivery (L202), read by len/truthiness (run.py L387), blocker list discarded; one dict per refused, same length/truthiness; content never read. The dropped text ('begun and never ended in the journal') reaches no output. MEASUREMENT (my own COPY tree B08-verify-a-mut; PATH stripped of every dir holding an opencode binary, with an abort-guard `command -v opencode`; HOME/TMPDIR under the copy; NINEROUTER_API_KEY unset; nice -n 19 /opt/homebrew/bin/python3 -P -B -m unittest, one file at a time; each mutant built into a fresh copy with the source sha256 and the mutant description asserted at build): all 17 registered kill files pass (rc=0) on this mutant. The whole run's only nonzero rc was the BASELINE's first-run test_s2_kills and test_v21_r3_usage_boundary, both rc=0 on rerun (baseline-rerun.tsv) and rc=0 on every mutant — flaky, not a kill. So no registered kill file refutes this entry.",
+   "consumers_checked": [
+    "aisef2/app/verify.py L201-L202: the only mentions of `errors` in the module; the document returned (L222-L223) has no errors field (keys verdict, problems, delivery_verdict, journal_events, evidence_anchor, notes)",
+    "aisef2/app/run.py R.delivery L373-L389: `errors` is read ONLY at L387 (`[f\"{len(errors)} stories were refused\"] if errors else []`) — len() and truthiness, no iteration, no subscript, no serialisation; it returns (verdict, blocked, committed) and verify L202 discards `blocked` (`verdict, _, committed`), so even len(errors) never reaches verify's output; errors affects only bool(errors)->blocked->verdict",
+    "callers of R.delivery (grep): verify.py L202; validation/qualification/release_acceptance.py L131-L132 passes the RECORD's story_errors (a different list); release_rehearsal and the unit tests each hand their own list",
+    "git grep 'begun and never ended in the journal': verify.py L201 and tests/v2/test_v21_kills3_T14b.py L174 (a test builds its OWN errors list with the same literal and hands it to R.delivery, asserting the verdict and bool(blocked) — it does not read verify's list)"
+   ],
+   "exceptions_checked": [
+    "`errors` echoed into a problem or note: no append in verify.py L103-L221 interpolates `errors`/`refused`",
+    "the begun-and-never-ended story's effect on the verdict: carried by the element's PRESENCE, which the mutant keeps",
+    "a reader of the dropped text in test code: T14b L174 constructs it, does not read verify's",
+    "the list length/truthiness or a raise: unchanged; `{'story': x}` is a valid dict",
+    "round-3: `refused` rebinding (L157 tuple, L183 list) and events==[] after a projection refusal"
+   ],
+   "refutation": "Full registered kill-file measurement (all 17 pass) plus a grep showing the only other use of the dropped literal is T14b's own list (not a reader of verify's). No refutation; equivalence proven.",
+   "note": "Carried grounds hold; cites refreshed: `errors` at L201-L202 (not L183-L184). EQUIVALENT."
+  },
+  {
+   "target": "aisef2/app/verify.py::verify",
+   "index": 149,
+   "mutant": "L201 string 'story' emptied",
+   "class_before": "EQUIVALENT",
+   "verdict": "CONFIRMED",
+   "class_after": "EQUIVALENT",
+   "grounds": "mutant_view confirms verify.py L201: the first key becomes '' — `[{'': x, 'error': ...} for x in refused]`. Keys '' and 'error' are distinct, so each dict keeps two entries and raises nothing; the list length is unchanged. `errors` is read only by R.delivery as len/truthiness (run.py L387) with its blocker list discarded (verify L202); no element is subscripted; the document has no errors field. Same dead-field proof as [118]. MEASUREMENT (my own COPY tree B08-verify-a-mut; PATH stripped of every dir holding an opencode binary, with an abort-guard `command -v opencode`; HOME/TMPDIR under the copy; NINEROUTER_API_KEY unset; nice -n 19 /opt/homebrew/bin/python3 -P -B -m unittest, one file at a time; each mutant built into a fresh copy with the source sha256 and the mutant description asserted at build): all 17 registered kill files pass (rc=0) on this mutant. The whole run's only nonzero rc was the BASELINE's first-run test_s2_kills and test_v21_r3_usage_boundary, both rc=0 on rerun (baseline-rerun.tsv) and rc=0 on every mutant — flaky, not a kill. So no registered kill file refutes this entry.",
+   "consumers_checked": [
+    "aisef2/app/verify.py L201-L202: the only mentions of `errors` in the module; the document returned (L222-L223) has no errors field (keys verdict, problems, delivery_verdict, journal_events, evidence_anchor, notes)",
+    "aisef2/app/run.py R.delivery L373-L389: `errors` is read ONLY at L387 (`[f\"{len(errors)} stories were refused\"] if errors else []`) — len() and truthiness, no iteration, no subscript, no serialisation; it returns (verdict, blocked, committed) and verify L202 discards `blocked` (`verdict, _, committed`), so even len(errors) never reaches verify's output; errors affects only bool(errors)->blocked->verdict",
+    "callers of R.delivery (grep): verify.py L202; validation/qualification/release_acceptance.py L131-L132 passes the RECORD's story_errors (a different list); release_rehearsal and the unit tests each hand their own list",
+    "grep of story_errors readers (key 'story'): e2e_guest.py S3c and the run's record tests read the RECORD's story_errors (written by run.py), never verify's synthesised list"
+   ],
+   "exceptions_checked": [
+    "a reader indexing by key 'story' in verify or R.delivery: none",
+    "key collision dropping an entry: '' != 'error'; and a collision would not change the list length anyway",
+    "the document including `errors`: it does not (keys L222-L223)",
+    "round-3: `refused` rebinding and events==[] after a projection refusal make the comprehension empty"
+   ],
+   "refutation": "Full registered kill-file measurement (all 17 pass) plus a grep of 'story'-key readers (all read the record's story_errors, not verify's). No refutation; equivalence proven.",
+   "note": "Carried grounds hold; cites refreshed: `errors` at L201-L202. EQUIVALENT."
+  },
+  {
+   "target": "aisef2/app/verify.py::verify",
+   "index": 150,
+   "mutant": "L201 string 'error' emptied",
+   "class_before": "EQUIVALENT",
+   "verdict": "CONFIRMED",
+   "class_after": "EQUIVALENT",
+   "grounds": "mutant_view confirms verify.py L201: the second key becomes '' — `[{'story': x, '': ...} for x in refused]`. Keys 'story' and '' are distinct, two entries kept, no raise, list length unchanged. Same single use of `errors` as [118] (R.delivery len/truthiness, run.py L387; blocker list discarded, verify L202); content never read. MEASUREMENT (my own COPY tree B08-verify-a-mut; PATH stripped of every dir holding an opencode binary, with an abort-guard `command -v opencode`; HOME/TMPDIR under the copy; NINEROUTER_API_KEY unset; nice -n 19 /opt/homebrew/bin/python3 -P -B -m unittest, one file at a time; each mutant built into a fresh copy with the source sha256 and the mutant description asserted at build): all 17 registered kill files pass (rc=0) on this mutant. The whole run's only nonzero rc was the BASELINE's first-run test_s2_kills and test_v21_r3_usage_boundary, both rc=0 on rerun (baseline-rerun.tsv) and rc=0 on every mutant — flaky, not a kill. So no registered kill file refutes this entry.",
+   "consumers_checked": [
+    "aisef2/app/verify.py L201-L202: the only mentions of `errors` in the module; the document returned (L222-L223) has no errors field (keys verdict, problems, delivery_verdict, journal_events, evidence_anchor, notes)",
+    "aisef2/app/run.py R.delivery L373-L389: `errors` is read ONLY at L387 (`[f\"{len(errors)} stories were refused\"] if errors else []`) — len() and truthiness, no iteration, no subscript, no serialisation; it returns (verdict, blocked, committed) and verify L202 discards `blocked` (`verdict, _, committed`), so even len(errors) never reaches verify's output; errors affects only bool(errors)->blocked->verdict",
+    "callers of R.delivery (grep): verify.py L202; validation/qualification/release_acceptance.py L131-L132 passes the RECORD's story_errors (a different list); release_rehearsal and the unit tests each hand their own list",
+    "grep of ['error']/get('error') readers: e2e_guest.py L690 and the record tests read the RECORD's story_errors (key 'error' written by run.py), never verify's synthesised list"
+   ],
+   "exceptions_checked": [
+    "a reader indexing by 'error' in verify or R.delivery: none",
+    "the key distinguishing synthetic from record errors later: nothing in verify distinguishes them after L201 (L201-2 are consecutive)",
+    "a raise from the literal: none, '' is a valid key",
+    "round-3: as [118] (refused rebinding, events==[] after a projection refusal)"
+   ],
+   "refutation": "Full registered kill-file measurement (all 17 pass) plus a grep of 'error'-key readers (all read the record's story_errors). No refutation; equivalence proven.",
+   "note": "Carried grounds hold; cites refreshed: `errors` at L201-L202. EQUIVALENT."
+  },
+  {
+   "target": "aisef2/app/verify.py::verify",
+   "index": 151,
+   "mutant": "L201 string 'begun and never ended in the journal' emptied",
+   "class_before": "EQUIVALENT",
+   "verdict": "CONFIRMED",
+   "class_after": "EQUIVALENT",
+   "grounds": "mutant_view confirms verify.py L201: the 'error' value becomes '' — `[{'story': x, 'error': ''} for x in refused]`. Each element is still a two-entry dict in the same list; `errors` is read only by length/truthiness (run.py L387) with its blocker list discarded (verify L202). The text is shown to nobody: no problem, note or document field carries `errors`. MEASUREMENT (my own COPY tree B08-verify-a-mut; PATH stripped of every dir holding an opencode binary, with an abort-guard `command -v opencode`; HOME/TMPDIR under the copy; NINEROUTER_API_KEY unset; nice -n 19 /opt/homebrew/bin/python3 -P -B -m unittest, one file at a time; each mutant built into a fresh copy with the source sha256 and the mutant description asserted at build): all 17 registered kill files pass (rc=0) on this mutant. The whole run's only nonzero rc was the BASELINE's first-run test_s2_kills and test_v21_r3_usage_boundary, both rc=0 on rerun (baseline-rerun.tsv) and rc=0 on every mutant — flaky, not a kill. So no registered kill file refutes this entry.",
+   "consumers_checked": [
+    "aisef2/app/verify.py L201-L202: the only mentions of `errors` in the module; the document returned (L222-L223) has no errors field (keys verdict, problems, delivery_verdict, journal_events, evidence_anchor, notes)",
+    "aisef2/app/run.py R.delivery L373-L389: `errors` is read ONLY at L387 (`[f\"{len(errors)} stories were refused\"] if errors else []`) — len() and truthiness, no iteration, no subscript, no serialisation; it returns (verdict, blocked, committed) and verify L202 discards `blocked` (`verdict, _, committed`), so even len(errors) never reaches verify's output; errors affects only bool(errors)->blocked->verdict",
+    "callers of R.delivery (grep): verify.py L202; validation/qualification/release_acceptance.py L131-L132 passes the RECORD's story_errors (a different list); release_rehearsal and the unit tests each hand their own list",
+    "git grep 'begun and never ended in the journal': verify.py L201 and tests/v2/test_v21_kills3_T14b.py L174 (test-built list into R.delivery, asserting verdict and bool(blocked)); no reader of verify's value"
+   ],
+   "exceptions_checked": [
+    "the text reaching a problem or note: no append interpolates `errors`",
+    "the empty value changing an element's/list's truthiness: the dict still has two keys; the list is truthy by length; element truthiness is not read",
+    "the verdict effect of a never-ended story: kept (the element is still present); T14b L185+ pins it through verify",
+    "the run's RUN.json story_errors being affected: the run writes its own errors (run.py L473); verify never writes RUN.json and has no begun-and-never-ended record error"
+   ],
+   "refutation": "Full registered kill-file measurement (all 17 pass) plus a grep showing the only other use of the literal is T14b's own list. No refutation; equivalence proven.",
+   "note": "Carried grounds hold; cites refreshed: `errors` at L201-L202. EQUIVALENT."
+  },
+  {
+   "target": "aisef2/app/verify.py::verify",
+   "index": 48,
+   "mutant": "L180 sorted() -> list()",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "mutant_view confirms verify.py L180: `differ = sorted(s for s in outcomes if recorded.get(s) != outcomes[s])` -> `list(...)`. `outcomes = R.outcomes_from(events)` (L178; run.py L392-400) is a dict filled with setdefault in journal order; story_id keys are validated str (event.py / format3.validate), so sorted() cannot raise and list() is not a way around an exception. The SET of ids is identical; only the order inside the one f-string problem (L182: f\"the record's story outcomes are not the journal's for {differ}\") differs, and only when >=2 stories differ in non-alphabetical journal order. `differ` is used for truthiness (L181) and once in that f-string (L182). MEASUREMENT (my own COPY tree B08-verify-a-mut; PATH stripped of every dir holding an opencode binary, with an abort-guard `command -v opencode`; HOME/TMPDIR under the copy; NINEROUTER_API_KEY unset; nice -n 19 /opt/homebrew/bin/python3 -P -B -m unittest, one file at a time; each mutant built into a fresh copy with the source sha256 and the mutant description asserted at build): all 17 registered kill files pass (rc=0) on this mutant. The whole run's only nonzero rc was the BASELINE's first-run test_s2_kills and test_v21_r3_usage_boundary, both rc=0 on rerun (baseline-rerun.tsv) and rc=0 on every mutant — flaky, not a kill. So no registered kill file refutes this entry.",
+   "consumers_checked": [
+    "aisef2/app/verify.py L180-L182: the only uses of `differ` (sorted call L180, `if differ` L181, problem f-string L182)",
+    "aisef2/app/cli.py L56-L57 (json.dumps, sort_keys on dict keys only; the `[...]` list order inside the problem string prints as given) and L77-L80 (exit from v['verdict'])",
+    "validation/qualification/release_acceptance.py L128/L144 (reads v['verdict']) and release_rehearsal.py L124/L133/L153-154 (embeds v['problems'] as a list repr, never parsed)",
+    "tests: test_v21_verify.py L64-L68 test_story_outcomes_that_are_not_the_journal_s_are_refuted asserts any('story outcomes' in p for p in v['problems']) with ONE differing story (sorted==list for one element) — passes; tests/v2/test_app_units.py has no 'story outcomes'/'outcomes' assertion (only the module docstring L3)",
+    "git grep 'story outcomes': verify.py L5 (docstring) and L182 (producer), usage.py L5 (unrelated docstring), test_v21_verify.py L68; no document promises an order"
+   ],
+   "exceptions_checked": [
+    "set/hash order feeding `outcomes`: it is a dict in journal order, not a set",
+    "a mixed-type key making sorted() raise: story_id is validated str in every journal format, so no",
+    "two verify documents compared across runs/processes: the same journal gives the same order under either expression",
+    "a document or test promising alphabetical listing: none at the snapshot (grep), including the test_v21_r3_* files",
+    "round-3: after a projection refusal events==[], outcomes=={}, differ==[] under both expressions"
+   ],
+   "refutation": "Full registered kill-file measurement (all 17 pass, incl. test_v21_verify which is the one asserter of this problem) plus confirmation that test_app_units does not assert 'story outcomes'. No refutation found.",
+   "note": "Carried grounds hold; the internal REVISED note (test_app_units does not assert 'story outcomes') is correct. Line cites refreshed to this snapshot: outcomes L178 (not L167), differ=sorted L180 (not L169), `if differ` L181 (not L170), problem f-string L182 (not L171). AUDITED."
+  },
+  {
+   "target": "aisef2/app/verify.py::verify",
+   "index": 106,
+   "mutant": "L134 string ' the run printed' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "mutant_view confirms verify.py L134: `f'the evidence anchor is {anchor and anchor[:12]}, not the {expect_anchor[:12]} the run printed'` -> drops ' the run printed'. Lost is only that E is the value the operator supplied through --expect-anchor (whose help cli.py L40 and format refusal cli.py L74 carry the same provenance). The identifying elements survive in role order: the directory's anchor first, the expected one after 'not the'. Every program reader of this problem reads the substring 'evidence anchor' or a 12-hex prefix, never the clause. MEASUREMENT (my own COPY tree B08-verify-a-mut; PATH stripped of every dir holding an opencode binary, with an abort-guard `command -v opencode`; HOME/TMPDIR under the copy; NINEROUTER_API_KEY unset; nice -n 19 /opt/homebrew/bin/python3 -P -B -m unittest, one file at a time; each mutant built into a fresh copy with the source sha256 and the mutant description asserted at build): all 17 registered kill files pass (rc=0) on this mutant. The whole run's only nonzero rc was the BASELINE's first-run test_s2_kills and test_v21_r3_usage_boundary, both rc=0 on rerun (baseline-rerun.tsv) and rc=0 on every mutant — flaky, not a kill. So no registered kill file refutes this entry.",
+   "consumers_checked": [
+    "aisef2/app/verify.py L133-L134 sole producer (not L125-L126 as the carried grounds say)",
+    "aisef2/app/cli.py L40 (the --expect-anchor help) and L74 (its format refusal) carry the phrase themselves; tests/v2/test_v21_kills_cli.py L59 pins the help text",
+    "tests: test_v21_r3_detail_product.py L223-L229 ('evidence anchor' in p); test_v21_kills3_T22b/T14a/T23a and test_v21_verify assert 'anchor'/'evidence anchor' substrings or 12-hex prefixes — all kept by the mutant",
+    "docs/v2.1/decisions/B03-R3-E2E.md L106 quotes the whole message as prose (an example), not a reader; it would be an inaccurate quote under the mutant, nothing more",
+    "git grep 'the run printed': cli.py L8/L40/L74, bundle_cli.py L880/L1027/L1056, verify.py L10 (docstring)/L134, B03-R3-E2E.md L106, test help pins and docstrings — no code/test reads THIS problem for the clause"
+   ],
+   "exceptions_checked": [
+    "a caller whose expect_anchor did not come from a run (phrase would be inaccurate not needed): cli passes the operator's --expect-anchor; release_acceptance/release_rehearsal pass none",
+    "the phrase being what tells which value is the expected one: that is 'not the' + position, both kept",
+    "anchor being None: the first element prints None and the sentence is otherwise unchanged",
+    "a reader matching the whole message (exact string/regex with the tail): none in code or tests; the only whole-message quote is the prose of B03-R3-E2E.md L106"
+   ],
+   "refutation": "Full registered kill-file measurement (all 17 pass) plus a grep showing no code/test asserts ' the run printed' as part of this problem (only prose quotes it). No refutation found.",
+   "note": "Carried grounds hold; cites refreshed: producer verify.py L133-L134 (not L125-L126); --expect-anchor help cli.py L40 (not L37-38); format refusal cli.py L74 (not L69-70). AUDITED."
+  },
+  {
+   "target": "aisef2/app/verify.py::verify",
+   "index": 132,
+   "mutant": "L111 string 'no ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "mutant_view confirms verify.py L111 in the `except FileNotFoundError` branch (L109): f'no {R.MANIFEST}: a run of a release before 2.1 — its record is bound by nothing but itself' -> drops 'no '. In that branch stored is None, so the same document has evidence_anchor None (L223). The file (R.MANIFEST), the release boundary ('a run of a release before 2.1') and the consequence ('bound by nothing but itself') are all kept; only the negation WORD of the label is lost, and the absence is still carried by the consequence clause and by evidence_anchor None. MEASUREMENT (my own COPY tree B08-verify-a-mut; PATH stripped of every dir holding an opencode binary, with an abort-guard `command -v opencode`; HOME/TMPDIR under the copy; NINEROUTER_API_KEY unset; nice -n 19 /opt/homebrew/bin/python3 -P -B -m unittest, one file at a time; each mutant built into a fresh copy with the source sha256 and the mutant description asserted at build): all 17 registered kill files pass (rc=0) on this mutant. The whole run's only nonzero rc was the BASELINE's first-run test_s2_kills and test_v21_r3_usage_boundary, both rc=0 on rerun (baseline-rerun.tsv) and rc=0 on every mutant — flaky, not a kill. So no registered kill file refutes this entry.",
+   "consumers_checked": [
+    "aisef2/app/verify.py L109-L111 sole producer (the FileNotFoundError arm; not L101-L103 as the carried grounds say), L222-L223 the document (notes, evidence_anchor)",
+    "aisef2/app/cli.py L56-L57 prints it, exit 0 on VERIFIED (L80)",
+    "tests/v2/test_v21_kills3_A22.py L198-L211 (ARunWithoutAManifest...): (note,)=v['notes']; asserts R.MANIFEST in note and '2.1' in note; its docstring (L203-204) records that the 'bound by nothing' clause is deliberately NOT asserted (evidence_anchor None says it). tests/v2/test_v21_defects_verify.py L129-L139: len(v['notes'])==1 and '2.1' in v['notes'][0] for a manifest-less copy; notes==[] for a directory in its place or a present manifest",
+    "tests/v2/test_s2_kills, test_v21_r3_detail_product L199, test_v21_kills3_T22b L144-158: notes for a run WITH a manifest (not this branch)",
+    "docs/v2.1/USAGE-2.1.md and ANCHOR-THREAT-MODEL.md state the meaning, do not quote the note",
+    "git grep 'release before 2.1' / 'bound by nothing': verify.py L111, A22 L47/L202, defects_verify L14/L121/L129, r3 usage tests — prose/docstrings, not readers of the negation"
+   ],
+   "exceptions_checked": [
+    "a reader taking the note to say EVIDENCE.json is present: contradicted by evidence_anchor None and the FileNotFoundError branch it is emitted in",
+    "the consequence clause being the lost part: it is kept here (the sibling that empties it is a different mutant)",
+    "a 2.1+ run whose manifest was deleted: the release boundary stays, so the operator can still tell; unchanged",
+    "another note it could be mistaken for: the only other notes (anchor-match L136-138, review_verify rows) do not start with the file name",
+    "a parser of notes: grep of ['notes'] finds only length / '2.1' / file-name / equality-with-[] reads"
+   ],
+   "refutation": "Full registered kill-file measurement (all 17 pass, incl. A22 and defects_verify which read this note) plus a grep showing no reader asserts the 'no ' negation. No refutation found.",
+   "note": "Carried grounds hold; the internal REVISED (branch is FileNotFoundError, two tests read the note for file/boundary) is correct. Cites refreshed: producer L109-L111 (not L101-L103), document L222-L223 (not L205). AUDITED."
+  },
+  {
+   "target": "aisef2/app/verify.py::verify",
+   "index": 136,
+   "mutant": "L117 string ')' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "mutant_view confirms verify.py L117 (the `except OSError` arm): f'{R.MANIFEST} cannot be read ({type(e).__name__})' -> drops the closing ')', giving '...cannot be read (IsADirectoryError'. File, kind and class survive, the class last; the item is its own list element so the unbalanced '(' reaches nothing after it. test_v21_kills3_R01.py (TheManifestThatCannotBeUsedIsRefusedWithItsKindOfCause) asserts len(problems)==1, R.MANIFEST in problems[0], assertRegex(problem, r'\\b'+cls+r'\\b') (the \\b matches at end-of-string, so the missing paren is harmless) and 'read' in the kind — all pass. MEASUREMENT (my own COPY tree B08-verify-a-mut; PATH stripped of every dir holding an opencode binary, with an abort-guard `command -v opencode`; HOME/TMPDIR under the copy; NINEROUTER_API_KEY unset; nice -n 19 /opt/homebrew/bin/python3 -P -B -m unittest, one file at a time; each mutant built into a fresh copy with the source sha256 and the mutant description asserted at build): all 17 registered kill files pass (rc=0) on this mutant. The whole run's only nonzero rc was the BASELINE's first-run test_s2_kills and test_v21_r3_usage_boundary, both rc=0 on rerun (baseline-rerun.tsv) and rc=0 on every mutant — flaky, not a kill. So no registered kill file refutes this entry.",
+   "consumers_checked": [
+    "aisef2/app/verify.py L117 is the only producer of this text",
+    "aisef2/app/cli.py L56-L57 / L77-L80: JSON dump, exit from v['verdict'] only",
+    "release_acceptance.py L128/L144 (verdict only), release_rehearsal.py L133/L153-154 (problems as a list repr)",
+    "tests/v2/test_v21_kills3_R01.py L140-L175 (as above); test_v21_defects_verify.py L120-L139 reads R.MANIFEST and notes==[] for a directory-in-place, never this closing paren",
+    "git grep 'cannot be read (': many different producers (bundle_cli, settings, lineage, review_ocr, verify L117/L127/L152, review_verify L480) — each its own text; no reader of THIS message's paren"
+   ],
+   "exceptions_checked": [
+    "a consumer parsing the class out of '(<Class>)' or splitting on parentheses: grep finds none",
+    "a consumer joining problems with a separator where an unbalanced '(' could swallow the next item: verify's problems reach cli as separate JSON list elements and release_rehearsal as a list repr; no join concatenates them",
+    "the class name followed by more text in the item: the f-string ends right after the class, nothing follows",
+    "a test matching the trailing ')' (exact string/regex/endswith): none for this message at the snapshot",
+    "round-3: problems appended after this one (artifact_problems L172-177, the projection refusal) are separate elements; the unreadable manifest does not stop them"
+   ],
+   "refutation": "Full registered kill-file measurement (all 17 pass, incl. R01 which pins this message). No refutation found.",
+   "note": "Carried grounds hold; cite refreshed: producer at verify.py L115-L117 (the OSError arm; not L107-L109). AUDITED."
+  },
+  {
+   "target": "aisef2/app/verify.py::verify",
+   "index": 163,
+   "mutant": "L103 string ')' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "mutant_view confirms verify.py L103 (the early `except (OSError, ValueError)` return): f\"{out / 'RUN.json'}: no readable run record ({type(e).__name__})\" -> drops ')', giving '...no readable run record (FileNotFoundError'. The returned document is {'verdict':'REFUTED','problems':[one]} in both; the path precedes the text, delimited by ': no readable run record (' which is kept; the class is the last datum. test_v21_kills3_T22a.py (NoReadableRunRecord) asserts sorted(v)==['problems','verdict'], verdict REFUTED, len(problems)==1, str(out/'RUN.json') in problems[0] and the class name in problems[0] (absent/not JSON/not UTF-8/a directory) — all kept; test_v21_kills3_A22 pins the path+class as tokens. MEASUREMENT (my own COPY tree B08-verify-a-mut; PATH stripped of every dir holding an opencode binary, with an abort-guard `command -v opencode`; HOME/TMPDIR under the copy; NINEROUTER_API_KEY unset; nice -n 19 /opt/homebrew/bin/python3 -P -B -m unittest, one file at a time; each mutant built into a fresh copy with the source sha256 and the mutant description asserted at build): all 17 registered kill files pass (rc=0) on this mutant. The whole run's only nonzero rc was the BASELINE's first-run test_s2_kills and test_v21_r3_usage_boundary, both rc=0 on rerun (baseline-rerun.tsv) and rc=0 on every mutant — flaky, not a kill. So no registered kill file refutes this entry.",
+   "consumers_checked": [
+    "aisef2/app/verify.py L103 is the only producer (git grep 'readable run record': verify.py only)",
+    "aisef2/app/cli.py L77-L80: printed as JSON, exit 1 when verdict != VERIFIED",
+    "release_acceptance.py L127-L128 reads RUN.json itself before verify then v['verdict']; release_rehearsal embeds the problems list; e2e_guest never verifies a directory without a record",
+    "tests/v2/test_v21_kills3_T22a.py L133-L177 and test_v21_kills3_A22.py (an unreadable record named by file and cause) — both pass on the mutant",
+    "docs: no document quotes the text"
+   ],
+   "exceptions_checked": [
+    "a consumer parsing the class out of '(<Class>)' or splitting on parentheses: grep finds none",
+    "a consumer joining problems with a separator where an unbalanced '(' could swallow the next item: verify's problems reach cli as separate JSON list elements and release_rehearsal as a list repr; no join concatenates them",
+    "the class name followed by more text in the item: the f-string ends right after the class, nothing follows",
+    "a test matching the trailing ')' (exact string/regex/endswith): none for this message at the snapshot",
+    "a record path containing '(' making the cause ambiguous: the path comes first, delimited by ': no readable run record (', kept",
+    "round-3: this early return precedes everything round 3 added (the projection boundary and artifact_problems are not reached on this path)"
+   ],
+   "refutation": "Full registered kill-file measurement (all 17 pass, incl. T22a and A22 which pin this message — defects_verify, A22, T22a, T22b, R01 all rc=0). No refutation found.",
+   "note": "Carried grounds hold; cite refreshed: producer at verify.py L103 (not L93-L95). AUDITED."
+  },
+  {
+   "target": "aisef2/app/verify.py::verify",
+   "index": 187,
+   "mutant": "L152 string ')' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "mutant_view confirms verify.py L152 (the `except (OSError, KeyError, TypeError, ValueError)` arm of the journal reference): f'the journal RUN.json names cannot be read ({type(e).__name__})' -> drops ')', giving '...cannot be read (KeyError'. Subject, kind and class survive, the class last; the NEXT problem ('the journal is not the one RUN.json names (digest or length)', L153-154, always appended after this one because data is b'') is a separate list element, so the unbalanced '(' reaches no other text. test_v21_kills3_T22b.py (JournalReferenceUnreadable L80-L100) asserts, per FileNotFoundError/KeyError/TypeError, exactly one problem carrying the class and the word 'journal'; test_v21_defects_verify.py L143-L153 pins the ValueError arm (len([p for p in problems if 'ValueError' in p])==1) — both pass. MEASUREMENT (my own COPY tree B08-verify-a-mut; PATH stripped of every dir holding an opencode binary, with an abort-guard `command -v opencode`; HOME/TMPDIR under the copy; NINEROUTER_API_KEY unset; nice -n 19 /opt/homebrew/bin/python3 -P -B -m unittest, one file at a time; each mutant built into a fresh copy with the source sha256 and the mutant description asserted at build): all 17 registered kill files pass (rc=0) on this mutant. The whole run's only nonzero rc was the BASELINE's first-run test_s2_kills and test_v21_r3_usage_boundary, both rc=0 on rerun (baseline-rerun.tsv) and rc=0 on every mutant — flaky, not a kill. So no registered kill file refutes this entry.",
+   "consumers_checked": [
+    "aisef2/app/verify.py L152 is the only producer (git grep 'names cannot be read': verify.py only)",
+    "aisef2/app/cli.py L77-L80: JSON, exit from verdict",
+    "release_rehearsal.py L133/L153-154 and release_acceptance.py L144 read verdict / embed the list, no parse",
+    "tests/v2/test_v21_kills3_T22b.py L80-L100 and test_v21_defects_verify.py L143-L153 — assert the class once and 'journal'/'ValueError', never the parenthesis"
+   ],
+   "exceptions_checked": [
+    "a consumer parsing the class out of '(<Class>)' or splitting on parentheses: grep finds none",
+    "a consumer joining problems with a separator where an unbalanced '(' could swallow the next item: verify's problems reach cli as separate JSON list elements and release_rehearsal as a list repr; no join concatenates them",
+    "the class name followed by more text in the item: the f-string ends right after the class, nothing follows",
+    "a test matching the trailing ')' (exact string/regex/endswith): none for this message at the snapshot",
+    "the TypeError arm for a journal reference that is not an object: L145-146 refuses a non-dict reference with its own problem before this try, so L152 is reached only for a dict whose path is missing (KeyError), not a path (TypeError), has a NUL (ValueError) or cannot be opened (OSError); the class is the last datum in every arm",
+    "round-3: with the journal unread format3.reconstruct('') yields no events, _projection_refusal([]) is None, events stays [] and the added problems are separate elements"
+   ],
+   "refutation": "Full registered kill-file measurement (all 17 pass, incl. T22b and defects_verify which pin this message — defects_verify, A22, T22a, T22b, R01 all rc=0 on m187). No refutation found.",
+   "note": "Carried grounds hold; cite refreshed: producer at verify.py L148-L152 (not L140-L144). AUDITED."
+  }
+ ],
+ "notes": "Snapshot 4ec961e706a1f7bda16d131037058c4fe9c2663f; source_sha256 of aisef2/app/verify.py = 2555fdca1107d19f16cd0165da3dacfd2bcb112efec228a3045b4a573807b72b (matches the batch's covered entries and every build). SKEPTIC copy a; I did not look at copy b's output. All 12 entries CONFIRMED (grounds hold; stale line cites in the carried grounds refreshed to this snapshot). The five L201 `errors` mutants (118,119,149,150,151) are EQUIVALENT by a code-proof: `errors` (verify.py L201) flows only into R.delivery (L202), read there by len()/truthiness (run.py L387) with its blocker list discarded, and the returned document (L222-223) has no errors field — so verify()'s output is byte-identical for every input and each mutant preserves the list's length/truthiness. The seven string mutants (176,48,106,132,136,163,187) are AUDITED: each loses only non-identifying framing or a trailing ')', while the identifying content a reader needs (an id set, a substring, a path, a class as a token, 'accepted by name', the release boundary) survives and is what the one asserting reader checks; problems/notes are separate list elements printed as JSON (cli._print L56-57) with sort_keys over dict keys only, nothing parsed. MEASUREMENT: a fresh COPY tree per mutant (source sha256 + mutant description asserted at build), PATH stripped of both opencode dirs with a `command -v opencode` abort-guard, HOME/TMPDIR under the copy, NINEROUTER_API_KEY unset, nice -n 19 -P -B, one of the 17 registered kill files at a time: baseline 17/17, and every mutant 17/17 pass (rc=0). The run's ONLY nonzero rc was the baseline's first-run test_s2_kills and test_v21_r3_usage_boundary, both rc=0 on rerun and rc=0 on every mutant — flaky, not a kill; so no registered kill file refutes any entry, and the campaign's SURVIVED needs no environment/order explanation. I also scanned every v['notes'] reader and every R.delivery caller across tests+validation for a missed consumer and found none; and verified the 176 trap (test_v21_x_lineage_proof L1018 'no evidence accounts for' reads the R.RunRefused from run.py L545 via the helper at L755-775, not verify's note). owed_tests: empty — no reader depends on any lost content (AUDITED/EQUIVALENT, not REFUTED). Optional consistency tests (full-note / anchored-regex pins) are choices, not gaps, per the owner's rule. HARD RULES honoured: never touched the running campaign dir or heavy.lock.d, never killed/signalled a process, never ran opencode / the campaign tools / the full suite / mutation.py run; the read-only v21 worktree was read by git archive only and is unchanged (git status shows only the pre-existing closure-evidence/.../campaign-9/run/). Housekeeping: my mutant copy tree was removed by the measurement runner at the end; I removed my base tree B08-verify-a after writing this. A sibling audit worker shared the host during the runs and does not touch my tree."
+}

@@ -1,0 +1,339 @@
+{
+ "batch": "B03-continue_from",
+ "copy": "a",
+ "notes": "SKEPTIC copy a. Snapshot 4ec961e706a1f7bda16d131037058c4fe9c2663f; aisef2/app/bundle_cli.py sha256 e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8 (== every entry's source_sha256 and the batch's covered entries). Did NOT read the other copy's output. 2026-10-18 +07 (date): tree extracted 21:10; mutants generated/diffed 21:13-21:18; baseline + three mutant measurements 21:18-21:42; trees removed 21:41. Each of the 10 new mutants was regenerated from validation.v2.mutation.mutants('continue_from')[index] at the snapshot, unparsed and diffed, and matches its description exactly, incl. the two L959 'superseded' literals: [195] empties the GUARD (r.get('')), [196] the EMITTED key ({'': True}) — confirmed, not assumed. The 4 covered mutants were likewise regenerated at this snapshot: index->mutant holds (116=L937 tuple->list on the continuation Plan.create id=f'{plan.id}-continued'; 140=L903 kernel-tail; 152=L937 '-continued'; 184=L933 'carried: '), so the positional remap is sound. The one reader all verdicts turn on is confirmed: main() L1054-1061 'continue' branch prints json.dumps({'written': str(a.out), **report}, indent=1, sort_keys=True) at L1060 — the operator sees every report field; aisef/cli/parser hands argv to bundle_cli.main and matches nothing. Reader search was grep-complete over aisef2/aisef/validation/tests/docs: the ONLY readers of report['spend_by_run'] are x_lineage_proof:1076,1111 (row 'run'), 1096,1100,1124 and x_lineage_gone:310 (row 'exact' + top-level key presence); every per-row provider_requests/turns/input/output/unaccounted/recorded/superseded read in the suite is on lineage.lineage_account/account_of DIRECTLY or on the RUN.json record (rec['continues']['account'] at x_lineage_proof:1034; rec['lineage_usage'] at continue_integrity:443, T08b, T09b/c) — different producers, not the bundle report. report['run_parent_refused'] is read only for the needles 'no flag accepts it'/'is gone'/'faithful copy'/str(d) (x_lineage_gone:312-315, x_lineage_proof:1085-1086,1099), all BEFORE the mutated tail; 'without --parent' is pinned only on `aisef run`'s stderr via THE_REFUSAL (x_lineage_gone:68-69, asserted at :254,264,282,339,658), never on the report. MEASUREMENT (skeptic, this snapshot, one process per mutant, nice -n 19 /opt/homebrew/bin/python3 -P -B -m unittest tests.v2.test_v21_x_lineage_proof tests.v2.test_v21_x_lineage_gone -q, PATH stripped of /Users/nghinh/.opencode/bin and /Users/nghinh/.npm-global/bin — `which opencode` empty under it — fresh HOME/TMPDIR/XDG_* under the scratch, PYTHONPATH=copy root since -P drops cwd): UNMUTATED baseline = Ran 84 tests in 298.031s OK; [191] = Ran 84 in 349.841s OK; [208] = Ran 84 in 377.054s OK (the author never ran [208] — 'NOT RUN' — so this closes that gap); [158] = Ran 84 in 275.728s OK. These two modules are the ONLY ones that read the mutated report fields, so a kill could only come from them; all survive. I ran a SUBSET (the 2 report-reader modules, 84 tests), not the full 12-file registered set the author ran (236 tests) — justified because the reader search is grep-complete and no other module reads these fields; I did not re-run 193/194/175/195/196/197/179 (same groups/readers as a measured sibling + grep-complete analysis; the author measured all but 197/208). Campaign is RUNNING under m21/c9/camp and heavy.lock.d — not touched, no process signalled, repo worktree read-only (git archive/show); my trees under audit/trees/B03-continue_from-a* removed at the end; the other copies' and author's trees left alone. Net: 9 REFUTED (operator-read figure/status/identifying element that no test asserts — a test is owed, class SURVIVED (test owed)); [208] CONFIRMED AUDITED (the glued separator loses no identifying element — directories stay delimited and are listed apart in `unread`, which `next` points to); covered [116] CONFIRMED EQUIVALENT, [140]/[152]/[184] CONFIRMED AUDITED. I agree with the author's draft on all 10 new and all 4 covered; one correction to [194]'s grounds (the shape x_lineage_gone pins is at :182, exact True / recorded False / unread [] — I confirmed that line).",
+ "entries": [
+  {
+   "target": "aisef2/app/bundle_cli.py::continue_from",
+   "index": 191,
+   "mutant": "L958 element 1 dropped",
+   "class_before": "SURVIVED",
+   "verdict": "REFUTED",
+   "class_after": "SURVIVED (test owed)",
+   "grounds": "Mutant verified at the snapshot by regenerating mutants('continue_from')[191]: the key tuple at bundle_cli.py:958 becomes ('run','exact','unaccounted','recorded') — `*lineage.SPEND` (provider_requests/turns/input_tokens/output_tokens, lineage.py:117) dropped from EVERY spend_by_run row. The row is lineage.account_of's projection (its account row carries run/recorded/SPEND/unaccounted/unread/exact, lineage.py ~L550), so the mutant strips each row's per-run spend figures. No KeyError: the remaining four keys all exist in the account row (confirmed by the green run). Reader = the operator: main() L1060 prints the whole report (USAGE-2.1.md:309 promises spend_by_run; :290-291 the readable part stays attributed to its run). Grep-complete: no code re-reads the report; no test reads a counter of a report row (x_lineage_proof:1034 reads provider_requests on rec['continues']['account'] — the RUN.json record, not the report). MEASURED (skeptic): [191] over the two report-reader modules = Ran 84 tests OK (survived); baseline = Ran 84 OK. Survival genuine; a reader depends on the per-run figures and nothing asserts them.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:1054-1061 main() 'continue': prints json.dumps({'written', **report}, sort_keys=True) at L1060; reads no field of the report",
+    "aisef/cli/parser.py: `aisef bundle` hands argv to bundle_cli.main; nothing wraps, parses or matches the report",
+    "grep spend_by_run over aisef2/aisef/validation/tests/docs: writer bundle_cli.py:958; readers only x_lineage_proof.py:1076,1111 (row 'run'), 1096,1100 (row 'exact'), 1124 (top-level key presence) and x_lineage_gone.py:310 (row 'exact')",
+    "tests/v2/test_v21_x_lineage_proof.py:1034 reads provider_requests + superseded on rec['continues']['account']['runs'] (RUN.json record, run.py:524-528) — a different producer, not report['spend_by_run']",
+    "tests/v2/test_v21_kills3_T08b.py:32,74-85 and test_v21_continue_integrity.py:443 pin the counters/flags on rec['lineage_usage'] rows (lineage.usage_lineage) — another producer",
+    "docs/v2.1/USAGE-2.1.md:290-291,309 and REPORT.md:536 name spend_by_run and spend_by_run[].exact; no doc pins a row counter"
+   ],
+   "exceptions_checked": [
+    "a code/test reader of the row counters: none (the report is printed and returned, never re-read)",
+    "the dropped keys raising or changing exit status: no — the comprehension's remaining keys all exist; exit 0, `next` unchanged (confirmed by the 84-test green run)",
+    "spend.known / spend.total / top-level unaccounted/unread/run_parent_refused: untouched (the mutant only shortens the row key tuple)",
+    "figures recoverable elsewhere: only the lineage sum spend.known; with >1 row (a sibling or an ancestor) the per-run split cannot be recovered from the report",
+    "the top-level key-presence test (x_lineage_proof:1124): asserts {spend,spend_by_run,unaccounted,unread,run_parent_refused} present — not row sub-keys, so it passes"
+   ],
+   "refutation": "A test is owed (T-A; reader: the operator reading the printed per-run account, main L1060; fixture x_lineage_proof.Delivered's delivered run `first`): `_, report = continue_from(doc, first)`; `account = lineage.lineage_account(first)`; `KEYS=('run',*lineage.SPEND,'exact','unaccounted','recorded')`; `assertEqual(report['spend_by_run'], [{k:r[k] for k in KEYS} for r in account['runs']])`; and `for k in SPEND: assertEqual(sum(r[k] for r in report['spend_by_run']), report['spend']['known'][k])`. Kills [191] (counters gone), [193] ('unaccounted' gone), [194] ('recorded' gone). The gap is real: the rows' content has never been asserted — only their order and `exact`.",
+   "note": "Measured by me at this snapshot (84 tests OK on the two report-reader modules; baseline 84 OK). Agrees with the author's REFUTED and draft T-A sketch."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::continue_from",
+   "index": 193,
+   "mutant": "L958 element 3 dropped",
+   "class_before": "SURVIVED",
+   "verdict": "REFUTED",
+   "class_after": "SURVIVED (test owed)",
+   "grounds": "Regenerated at the snapshot: L958 tuple becomes ('run',*lineage.SPEND,'exact','recorded') — 'unaccounted' dropped from every row, so a row no longer carries its own list of unaccounted causes. Weaker than [191]: the TOP-LEVEL report['unaccounted'] (L960, lineage.py:775 flattening) keeps every text, and account_of/lineage_account texts that name their run (lineage.py basenames) can be re-attributed; what is genuinely lost per row are the run-less texts (client.Budget's 'N sessions started / M requests recorded'; the preflight's) which, with 2+ runs, cannot be put back on a row. The row is the account row's projection (L958) and nothing asserts the row contract. Reader = operator (main L1060). Not measured directly by me (same module/readers as [191], which I measured OK; grep shows no test reads a report row's 'unaccounted'); the author measured it Ran 236 OK.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:1060 main(): prints the report; reads no field",
+    "grep spend_by_run: readers only x_lineage_proof:1076,1096,1100,1111,1124 and x_lineage_gone:310 (row 'run'/'exact', top-level key presence) — no reader of a row's 'unaccounted'",
+    "aisef2/app/bundle_cli.py:960 top-level report['unaccounted'] (the flat list) — the authoritative field `next` points to; x_lineage_proof:1110 and x_lineage_gone read the top-level list, not per-row",
+    "aisef2/app/run.py:548 accepted_unaccounted records the FLAT list (the operator accepts the flat list via --accept-unaccounted), not the per-row",
+    "docs/v2.1/USAGE-2.1.md:290-291,309: name spend_by_run and the top-level unaccounted; no per-row-unaccounted contract"
+   ],
+   "exceptions_checked": [
+    "a reader of a row's 'unaccounted': none",
+    "texts recoverable from the top-level list: yes for texts beginning with a run basename, no for client.py/preflight run-less texts with 2+ runs — the residual the author discloses",
+    "exit/`next`/other keys: unchanged; remaining row keys exist (no KeyError)",
+    "is it rather AUDITED (benign)? considered: the per-row list is a reading aid and `next` sends the operator to the top-level `unread`/`unaccounted`; but the row IS operator-facing and the row contract is asserted nowhere, so a test is owed for the contract (owner rule: a status/identifying element an operator reads is not harmless). Kept REFUTED, weakest of the group, residual stated."
+   ],
+   "refutation": "Same owed test T-A as [191] (the row-contract assertEqual pins every row's 'unaccounted' as account_of's list). Reader: the operator; fixture: x_lineage_proof.Delivered's `first` (and the two-run lineage after continue_run()).",
+   "note": "Not re-measured by me (same readers as the measured [191]; author measured Ran 236 OK). Weakest REFUTED of R1; residual (top-level unaccounted keeps all texts) disclosed. Agrees with author."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::continue_from",
+   "index": 194,
+   "mutant": "L958 element 4 dropped",
+   "class_before": "SURVIVED",
+   "verdict": "REFUTED",
+   "class_after": "SURVIVED (test owed)",
+   "grounds": "Regenerated at the snapshot: L958 tuple becomes ('run',*lineage.SPEND,'exact','unaccounted') — per-row 'recorded' dropped (os.path.isfile(run/RUN.json), lineage.py ~L550). The top-level report['recorded'] (L948/L899) is the CONTINUED run's alone; for an ancestor or a superseded sibling the row is the only carrier of whether that run has a record. 'recorded' is not derivable from exact/unaccounted: x_lineage_gone:182 pins an account-row shape (exact True, recorded False, unread []) — I read that line and confirmed it — a run that is exact AND unrecorded exists. Reader = operator (main L1060). No test reads a report row's 'recorded' (the per-run 'recorded' reads are on lineage_account/usage rows, T08b:79, continue_integrity, not the report). Author measured Ran 236 OK; I did not re-measure (same module/readers as [191]).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:1060 main(): prints the report; no field read",
+    "aisef2/app/bundle_cli.py:948 top-level report['recorded'] — asserted by T01a:133,152, T01b:141,145,377, pw_lineage_continue:137,144,274 (the CONTINUED run only), distinct from the per-row key [194] drops",
+    "grep spend_by_run: no reader of a report row's 'recorded' (only row 'run'/'exact')",
+    "tests/v2/test_v21_x_lineage_gone.py:182 pins (exact True, recorded False, unread []) on lineage.account_of's row — proof recorded is independent of exact/unaccounted",
+    "tests/v2/test_v21_kills3_T08b.py:79-83 pins (recorded, superseded) on rec['lineage_usage'] rows — another producer"
+   ],
+   "exceptions_checked": [
+    "a reader of a report row's 'recorded': none",
+    "recorded derivable from the row's other fields: no (x_lineage_gone:182 shape exact True / recorded False)",
+    "top-level report['recorded'] standing in: only for the continued run, never for an ancestor or a superseded sibling",
+    "exit/`next`/other keys: unchanged; remaining keys exist (no KeyError)"
+   ],
+   "refutation": "Same owed test T-A as [191] (the row-contract assertEqual pins every row's 'recorded' as os.path.isfile(run/RUN.json) via account_of). Reader: the operator; fixture: a lineage with an unrecorded row (an ancestor or a superseded sibling, e.g. the T-B fixture).",
+   "note": "x_lineage_gone:182 correction confirmed (author cited :182; I read it — exact True, recorded False, unread []). Not re-measured by me; author Ran 236 OK. Agrees with author."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::continue_from",
+   "index": 158,
+   "mutant": "L959 conditional negated",
+   "class_before": "SURVIVED",
+   "verdict": "REFUTED",
+   "class_after": "SURVIVED (test owed)",
+   "grounds": "Regenerated at the snapshot: L959 becomes `{'superseded': True} if not r.get('superseded') else {}`. Chain runs (added via add(at), lineage.py:758, carry no 'superseded' key — account_of's row omits it) now gain superseded:True, and real siblings (added with superseded=True, lineage.py:767,774) lose it. So EVERY continuation's report — even the common claimless lineage — marks the run it continues as a superseded sibling. The marker is the ONLY report element distinguishing a superseded sibling (a refused/abandoned child whose preflight may have spent, counted in spend.known) from a chain run; it is a STATUS the operator reads (main L1060). No test reads it on the report and no document names the report key (grep: report[...]['superseded'] has zero readers; the superseded-per-row reads are all on lineage_account/usage, a different producer). MEASURED (skeptic): [158] over the two report-reader modules = Ran 84 tests OK (survived) — none reads the key, so even marking every row survives; baseline 84 OK.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:1060 main(): prints the report; no field read",
+    "grep superseded over aisef2/aisef/validation/tests/docs (closure-evidence aside): the report writer bundle_cli.py:959; the account producer lineage.py:758,767,774; the record producer usage_lineage lineage.py:803,811,813 — no reader of report[...]['superseded']",
+    "tests/v2/test_v21_continue_integrity.py:413-460 make superseded siblings and call continue_from (via continue_and_finish) but read rec['lineage_usage'] rows (:443), not the report",
+    "tests/v2/test_v21_kills3_T08b.py / T09b:324,337 / T09c:118,126 / pw_lineage_spend:114 read superseded on lineage_account/usage rows directly, not report['spend_by_run']",
+    "docs/v2.1/USAGE-2.1.md: no report 'superseded' key named; TRACEABILITY.md:641 and SANDBOX-LINUX.md:207 name superseded CLAIMS, not the row"
+   ],
+   "exceptions_checked": [
+    "a code/test reader of the report row's superseded key: none",
+    "a lineage without claims (the common case): still differs — chain rows carry superseded:True under the mutant; still unread",
+    "exit/`next`/sums: unchanged (the marker does not enter the sums, lineage.py:776)",
+    "the fact elsewhere in the report: already_continued_by names only the newest claim's child of the continued run (lineage.continued_by found[-1]); a sibling of an earlier claim or of an ancestor is otherwise a row with recorded:false/zeros that reads as a chain run",
+    "r.get('superseded') ever truthy on a chain row (would make the mutant benign there): no — account_of's row omits the key and lineage_account adds it only on siblings"
+   ],
+   "refutation": "A test is owed (T-B; reader: the operator telling the lineage proper from superseded siblings whose spend is counted — the reading T08b pins only on the record; fixture: a copy of `first` with a fabricated CONTINUED-BY.json naming a never-made child with a gone claimant, as continue_integrity.ClaimLifecycle.fabricate writes it): `_, report = continue_from(doc, d)`; `rows = report['spend_by_run']`; `assertEqual([(Path(r['run']).name, r.get('superseded')) for r in rows], [(d.name, None), ('never-made', True)])`; `assertEqual(set(rows[1]) - set(rows[0]), {'superseded'})`. Kills [158] (chain row True, sibling None), [175]/[195] (sibling None), [196] (key ''), [197] (sibling False).",
+   "note": "Measured by me at this snapshot (84 tests OK; baseline 84 OK). Agrees with author's REFUTED and T-B sketch."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::continue_from",
+   "index": 175,
+   "mutant": "L959 dict entry 0 dropped",
+   "class_before": "SURVIVED",
+   "verdict": "REFUTED",
+   "class_after": "SURVIVED (test owed)",
+   "grounds": "Regenerated at the snapshot: L959 becomes `{} if r.get('superseded') else {}` — the superseded marker is NEVER emitted, so a superseded sibling's row reads as a chain run that spent nothing (recorded:false, exact:true, zeros) while spend.known still includes whatever it spent. The marker is operator-read (main L1060) and is the only report element flagging a sibling. No reader exists (grep-complete, same as [158]). The difference needs a superseded sibling to be observed on the report; no kill file builds one and reads the report's rows, so it survives. Not re-measured by me (same module/readers as the measured [158]; author measured Ran 236 OK).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:1060 main(): prints the report; no field read",
+    "grep superseded: no reader of report[...]['superseded'] (only the bundle_cli writer and the lineage account/usage producers and their direct tests)",
+    "tests/v2/test_v21_continue_integrity.py:413-460 (ClaimLifecycle) read rec (RUN.json), not the report rows",
+    "tests/v2/test_v21_x_lineage_proof.py:1096,1100 read only row 'exact'; x_lineage_gone:310 row 'exact'"
+   ],
+   "exceptions_checked": [
+    "a reader of the key: none",
+    "a lineage without a superseded sibling: identical output (the key is only ever emitted when true) — so no kill file that lacks a sibling can distinguish it",
+    "exit/`next`/other keys/sums: unchanged"
+   ],
+   "refutation": "Same owed test T-B as [158] (the superseded-sibling fixture; asserts the sibling row carries superseded:true and chain rows carry no such key). Reader: the operator; fixture: continue_integrity.ClaimLifecycle.fabricate's gone-claimant CONTINUED-BY.json.",
+   "note": "Not re-measured by me (same readers as the measured [158]; author Ran 236 OK). Agrees with author."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::continue_from",
+   "index": 195,
+   "mutant": "L959 string 'superseded' emptied",
+   "class_before": "SURVIVED",
+   "verdict": "REFUTED",
+   "class_after": "SURVIVED (test owed)",
+   "grounds": "Regenerated at the snapshot and CONFIRMED to be the GUARD literal: L959 becomes `{'superseded': True} if r.get('') else {}`. account_of/lineage_account rows carry no '' key (their keys are run/recorded/SPEND/unaccounted/unread/exact, plus 'superseded' only on siblings), so r.get('') is always None — the guard is never true and the marker is never emitted; observationally identical to [175] (a superseded sibling reads as a chain run). Reader = operator (main L1060); no report reader of the marker (grep-complete). Not re-measured by me (same module/readers as the measured [158]; author measured Ran 236 OK).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:1060 main(): prints the report; no field read",
+    "grep superseded: no reader of the report key; account_of (lineage.py ~L550) and lineage_account emit no '' key",
+    "tests/v2/test_v21_continue_integrity.py / T08b / T09b/c: read lineage_account/usage rows, not the report"
+   ],
+   "exceptions_checked": [
+    "r.get('') hitting a real '' key in an account row: none (account_of's keys are fixed; lineage_account merges only {'superseded': True})",
+    "a reader of the report marker: none",
+    "lineage without a superseded sibling: identical output; exit/`next`/sums unchanged"
+   ],
+   "refutation": "Same owed test T-B as [158] (set(rows[1]) - set(rows[0]) == {'superseded'} fails: the marker is never emitted). Reader: the operator; fixture: the gone-claimant sibling.",
+   "note": "Guard-literal identity confirmed by regenerating the mutant (not assumed). Not re-measured by me; author Ran 236 OK. Agrees with author."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::continue_from",
+   "index": 196,
+   "mutant": "L959 string 'superseded' emptied",
+   "class_before": "SURVIVED",
+   "verdict": "REFUTED",
+   "class_after": "SURVIVED (test owed)",
+   "grounds": "Regenerated at the snapshot and CONFIRMED to be the EMITTED-KEY literal: L959 becomes `{'': True} if r.get('superseded') else {}`. A superseded sibling's row then carries `\"\": true` instead of `\"superseded\": true` — the fact under an empty key an operator cannot name and a key-reader cannot find. No key collision: account rows carry no '' key, so `{...} | {'': True}` adds a fresh harmless key. Operator-read (main L1060); no report reader of either 'superseded' or '' (grep-complete). Distinct from [175]/[195] (those drop the marker; this misnames it) and [197] (flips the value). Not re-measured by me (same module/readers as the measured [158]; author measured Ran 236 OK).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:1060 main(): prints the report; no field read; json.dumps renders `\"\": true` fine (exit 0)",
+    "grep superseded and grep for an empty-string report key: no reader of report[...]['superseded'] nor of report[...]['']",
+    "account_of/lineage_account (lineage.py): emit no '' key — no collision"
+   ],
+   "exceptions_checked": [
+    "an empty key breaking json.dumps/printing: no",
+    "a reader iterating row keys: the key set changes ({...,''} vs {...,'superseded'}); no such reader on the report",
+    "a reader of the misnamed fact: none"
+   ],
+   "refutation": "Same owed test T-B as [158] (set(rows[1]) - set(rows[0]) == {'superseded'} fails — the set difference is {''}). Reader: the operator; fixture: the gone-claimant sibling.",
+   "note": "Emitted-key-literal identity confirmed by regenerating the mutant. Not re-measured by me; author Ran 236 OK. Agrees with author."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::continue_from",
+   "index": 197,
+   "mutant": "L959 True->False",
+   "class_before": "SURVIVED",
+   "verdict": "REFUTED",
+   "class_after": "SURVIVED (test owed)",
+   "grounds": "Regenerated at the snapshot: L959 becomes `{'superseded': False} if r.get('superseded') else {}` — a superseded sibling's row says superseded:false (the opposite of the fact), and only superseded rows carry the key at all. A truthiness reader (`if r.get('superseded')`, which is exactly how L959 reads the account row) would class the sibling as a chain run. Operator-read (main L1060); no report reader (grep-complete). The author's draft noted [197] was 'RUNNING / unfinished' when written; I did not re-measure it either, but it survives by the same grep-complete reader analysis and the measured sibling [158]; the author's final notes report all ten reproduced OK.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:1060 main(): prints the report; no field read",
+    "grep superseded: no reader of the report key",
+    "tests/v2/*: the superseded reads are on lineage_account/usage rows, not the report"
+   ],
+   "exceptions_checked": [
+    "a reader testing key PRESENCE rather than value: would still find the key — but none exists on the report",
+    "a reader testing truthiness: would misclass the sibling — none exists on the report",
+    "exit/`next`/sums: unchanged"
+   ],
+   "refutation": "Same owed test T-B as [158] ([(name, r.get('superseded'))] expects ('never-made', True) but gets False). Reader: the operator; fixture: the gone-claimant sibling.",
+   "note": "Author's draft marked this 'RUNNING' (unmeasured). I did not re-measure it; it survives by the grep-complete reader analysis + the measured sibling [158] (same L959 group). Flagged as the one new mutant with NO completed measurement on either side's in-batch run that I verified — survival rests on analysis, not a green log I produced. Agrees with author's REFUTED."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::continue_from",
+   "index": 179,
+   "mutant": "L965 string \" (a sessions directory, a session stream or the preflight's ledger that is gone comes back from such a copy); where that cannot be done this lineage cannot be continued (a run without --parent inherits nothing): \" emptied",
+   "class_before": "SURVIVED",
+   "verdict": "REFUTED",
+   "class_after": "SURVIVED (test owed)",
+   "grounds": "Regenerated at the snapshot: the f-string run_parent_refused loses its whole tail after `{lineage.unread_runs(account)}`, so the text becomes `...faithful copy of the run directory at <unread_runs>` immediately `+ '; '.join(account['unread'])`. unread_runs (lineage.py:783) returns the absolute run dir(s); every unread cause begins with the run's basename — so the directory is rendered glued to its own basename (a path <dir><basename> that does not exist), AND the clause 'a run without --parent inherits nothing' (the one workaround, the consequence run.py:539 mirrors and USAGE-2.1.md:278-279,293-294 promises) is gone. The directory to restore is an identifying element the operator reads (main L1060; USAGE:293 'the refusal names the run directory to restore'). The report tests assert only the needles BEFORE the tail ('no flag accepts it','is gone','faithful copy', str(d) — x_lineage_gone:312-315, x_lineage_proof:1085-1086,1099): str(d) survives as a prefix-substring of the glued token, so assertIn passes; nothing on the REPORT asserts the delimiter or 'without --parent'. 'without --parent' is pinned only on `aisef run`'s stderr via THE_REFUSAL (x_lineage_gone:68-69, asserted :254/264/282/339/658) — a different producer (run.py). Author measured Ran 236 OK; I did not re-measure (the only report-reader modules are the two I ran for the siblings; this mutant touches only run_parent_refused, whose readers assert the pre-tail needles).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:1060 main(): prints run_parent_refused in the report; no match/parse",
+    "tests/v2/test_v21_x_lineage_gone.py:312-315 (report test): asserts 'no flag accepts it','is gone','faithful copy', str(d) — all before the lost tail",
+    "tests/v2/test_v21_x_lineage_proof.py:1085-1086,1099: asserts 'no flag accepts it','faithful copy', str(first) — before the tail",
+    "tests/v2/test_v21_x_lineage_gone.py:68-69 THE_REFUSAL (incl. 'without --parent') asserted at :254,264,282,339,658 on `aisef run`'s RunRefused text — not on the report",
+    "aisef2/app/run.py:536-542: run's own refusal with the mirror clause ('aisef run without --parent inherits nothing') — a different producer, unchanged by the mutant",
+    "aisef2/app/lineage.py:781-784 unread_runs: ', '.join of absolute run paths — the token the mutant leaves undelimited",
+    "docs/v2.1/USAGE-2.1.md:278-280,293-294,309-310: the refusal names the directory to restore and that without --parent a run inherits nothing; report carries run_parent_refused"
+   ],
+   "exceptions_checked": [
+    "a needle/regex of a test on the sentence: 'no flag accepts it','is gone','faithful copy', str(d) all still contained; none asserts a delimiter after the path or 'without --parent' on the report",
+    "empty unread (the common case): run_parent_refused is None — identical; the mutant shows only when there is unread evidence, which is exactly when the sentence is read",
+    "the directory recoverable elsewhere in the report: report['run'] (the continued run only) and spend_by_run[].run; the sentence itself now names a non-existent path",
+    "distinct from the AUDITED kernel-tail [140]: that tail 'names no command, flag, path, id or limit'; this one names the flag (the one workaround) and damages the identifying element's rendering — hence REFUTED, not AUDITED",
+    "distinct from [208]: [208] loses only the separator between causes (directories still delimited, listed apart in `unread`); this one glues the DIRECTORY itself"
+   ],
+   "refutation": "A test is owed (T-C, x_lineage_gone.Gone.test_bundle_continue_reports... or x_lineage_proof.BundleContinue; reader: the operator reading run_parent_refused for the directory to restore and the one remaining move): `text = report['run_parent_refused']`; `assertIn(f'run directory at {d} (', text)` (the directory stands delimited, not glued to a cause); `assertIn('without --parent', text)`. Kills [179]; with `endswith(': ' + '; '.join(report['unread'])[:1000])` on a two-cause lineage it also kills [208].",
+   "note": "Not re-measured by me; author measured Ran 236 OK and the pre-tail needle analysis is grep-complete. Agrees with author's REFUTED; correctly distinguished from AUDITED [140]/[208]."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::continue_from",
+   "index": 208,
+   "mutant": "L967 string '; ' emptied",
+   "class_before": "SURVIVED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "Regenerated at the snapshot: `'; '.join(account['unread'])[:1000]` becomes `''.join(...)[:1000]`. With one unread cause (every SHAPES case of x_lineage_gone, x_lineage_proof's spoil_ledger_of, and the common case) the text is byte-identical. With two causes (one run whose ledger AND a stream both fail, or two unread runs) the causes are concatenated with no separator in run_parent_refused — BUT every cause is still listed as its own item in report['unread'] (L960), the list `next` (L972) tells the operator to restore from, and the directories to restore stand before the tail, delimited by ' (a sessions directory...' (L965, unchanged). So no identifying element is lost: only the readability of a closing enumeration whose items are carried apart in data. Reader = operator (main L1060); no test or document pins the sentence's rendering of the joined causes (the asserted needles lie before the join; grep-complete). MEASURED (skeptic, this snapshot — the author's draft said 'NOT RUN'): [208] over the two report-reader modules = Ran 84 tests OK (survived); baseline 84 OK. The owner rule allows AUDITED here: the glued separator is neither a refusal, a status, nor an identifying element — those (the directories) are intact and separately listed.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:1060 main(): prints run_parent_refused; no parse",
+    "aisef2/app/bundle_cli.py:960 report['unread'] (the same causes as a list, uncut) and :972-975 report['next'] ('restore the evidence listed in `unread` first') — the authoritative, delimited carrier",
+    "tests/v2/test_v21_x_lineage_gone.py:303-317 and test_v21_x_lineage_proof.py:1078-1103: assert needles BEFORE the join; no test builds two unread causes and reads the sentence's join",
+    "aisef2/app/lineage.py:498-537 (a run gets two unread causes only from two read failures) — the condition the mutant needs to differ",
+    "aisef2/app/run.py:542,547: the same '; '.join in `aisef run`'s refusals — another producer, unchanged",
+    "no parser splitting the sentence on '; ' anywhere in aisef2/aisef/validation/tests"
+   ],
+   "exceptions_checked": [
+    "a parser splitting run_parent_refused on '; ': none (the list form is report['unread'])",
+    "an identifying element damaged by the glue: no — the directories are given by unread_runs before the tail (L965 unchanged) and by report['unread']'s items; only two cause-texts lose the separator between them",
+    "the common one-cause case: byte-identical output",
+    "the [:1000] cut hiding a cause: at most a two-byte boundary shift inside the cut; report['unread'] is uncut",
+    "should it be REFUTED like [179]? no — [179] glues the DIRECTORY and drops a flag; [208] loses only the separator between two causes that are each listed verbatim in `unread`, so no operator action turns on it"
+   ],
+   "refutation": "No test owed for a kill (benign). If the project ever wanted the sentence's rendering pinned, an `endswith(': ' + '; '.join(report['unread'])[:1000])` on a two-cause lineage (ledger + stream both unreadable on one run) would kill it — but that is a rendering nicety, not a reader-depended contract, so AUDITED stands.",
+   "note": "Measured by me at this snapshot (84 tests OK; baseline 84 OK) — closes the author's 'NOT RUN' gap. Agrees with author's AUDITED."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::continue_from",
+   "index": 116,
+   "mutant": "L937 tuple() -> list()",
+   "class_before": "EQUIVALENT",
+   "verdict": "CONFIRMED",
+   "class_after": "EQUIVALENT",
+   "grounds": "Carried EQUIVALENT audit; remap verified — regenerating mutants('continue_from')[116] at the snapshot gives `obligations=list(obligations)` in the continuation `Plan.create(id=f'{plan.id}-continued', baseline=baseline, obligations=..., ...)` at bundle_cli.py:937 (the other two Plan.create sites, migrate L402 and seal L572, are untouched). Code proof holds at the snapshot: Plan.__post_init__ (aisef2/plan/obligation.py:89-101) does `obligations = tuple(self.obligations) if isinstance(self.obligations, (list, tuple)) else None`, refuses empty/non-PlanObligation (:94-95), then `object.__setattr__(self,'obligations',obligations)` REPLACES the field with the tuple, and plan_hash is computed from content_of AFTER (:99-101, plan_hash). So list(...) and tuple(...) yield the same frozen Plan — same field type, ==, plan_hash, plain(). The local `obligations` is not named after L937 and new_plan is read only by plain(new_plan) (L944). No observable difference anywhere.",
+   "consumers_checked": [
+    "aisef2/plan/obligation.py:85-101 (Plan.__post_init__ normalises list|tuple to a tuple and seals the hash), create (classmethod), plan_hash/content_of",
+    "aisef2/app/bundle_cli.py:934-944 (the only uses of the local `obligations` and new_plan; new_plan read only by plain())",
+    "aisef2/app/bundle.py _plan (the loader rebuilds the Plan from the stored tuple form)",
+    "aisef2/plan/obligation.py:7-9 docstring: plan_hash binds every field; a plan whose hash does not match its content cannot be constructed"
+   ],
+   "exceptions_checked": [
+    "empty list: refused identically (:94) by both forms; cannot arise (a plan holds >=1 obligation)",
+    "a non-PlanObligation element: same refusal on both forms",
+    "a hash/identity taken before __post_init__ replaced the field: none (frozen dataclass; nothing hashes before __post_init__)",
+    "aliasing: the Plan holds an immutable tuple either way; the local list is never shared"
+   ],
+   "refutation": "None — EQUIVALENT by code proof (no observable difference; the field is normalised to a tuple and the hash computed after).",
+   "note": "Index->mutant remap confirmed at the snapshot; sha256 matches. Grounds hold. CONFIRMED EQUIVALENT."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::continue_from",
+   "index": 140,
+   "mutant": "L903 string '): a new project, not a continuation' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "Carried AUDITED audit; remap verified — regenerating [140] at the snapshot empties the tail of the kernel-mismatch refusal so it reads `f'{run_dir} ran another kernel ({str(rec.get(\"kernel_digest\"))[:12]}'` (the explanatory ': a new project, not a continuation' gone; raise site, BundleError, exit 2 via main, the run dir, the cause phrase 'another kernel' and the 12-hex digest head all kept). bundle_cli.py:901-903 is the raise. T01b.AnotherKernel (test_v21_kills3_T01b.py:307-319) asserts exactly the identifying elements — 'another kernel', str(moved), recorded[:12], and NOT the current kernel's head — never the removed tail. The tail restates the rule of the docstring and USAGE-2.1.md:99 (which promise the REFUSAL, not its wording) and names no command/flag/path/id/limit and no override exists. Grep over aisef2/aisef/validation/tests/docs finds no matcher/parser of 'not a continuation'. The carried grounds' own CORRECTION (the project asserts identifying elements, not closing explanatory tails) I re-checked and it holds at the snapshot.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:901-903 (the raise) and main() L1060 path (prints 'refused: {e}', exit 2) — the only caller outside tests",
+    "aisef/cli/parser.py: hands argv to bundle_cli.main; nothing matches the message",
+    "grep 'another kernel|not a continuation|a new project' over aisef2/aisef/validation/tests/docs: the writer bundle_cli.py:902-903 and the identifying-element asserters T01b:311-319, continue_usage:200 ('another kernel') — no matcher of the tail",
+    "docs/v2.1/USAGE-2.1.md:99 (the rule as a refusal, not its wording)"
+   ],
+   "exceptions_checked": [
+    "a flag/command/path/id/limit in the tail an operator needs: none (the tail is the rule; there is no override to name)",
+    "a parser/classifier of the message (split at ':', startswith, regex): none",
+    "the digest head moved/removed by the mutant: no — '({digest12}' is kept before the lost tail",
+    "the carried grounds' sibling-comparison CORRECTION: re-checked at the snapshot — identifying elements are asserted, closing explanatory tails are not"
+   ],
+   "refutation": "None for a kill (benign explanatory tail; the identifying elements are retained and separately asserted). AUDITED, not a test owed.",
+   "note": "Index->mutant remap confirmed at the snapshot; sha256 matches. Carried correction verified. CONFIRMED AUDITED."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::continue_from",
+   "index": 152,
+   "mutant": "L937 string '-continued' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "Carried AUDITED audit; remap verified — regenerating [152] at the snapshot gives `Plan.create(id=f'{plan.id}', ...)` at bundle_cli.py:937 (the '-continued' suffix emptied), only on the continuation site. The plan id is a label; the plan_hash is the identity (plan_hash binds every field, obligation.py:7-9). Nothing compares plan ids across runs: run.py reads obligation story_ids (:278,384), never plan.id; lineage.py and verify.py read no plan id; `bundle migrate` (bundle_cli.py:402) already re-issues a plan with the SAME id and a new hash, proving the id is a label. The child's plan_hash differs from the parent's regardless of the suffix (new baseline + CARRIED obligations). Per-run 'once' rules on a plan id are per journal (format3/qualification_counters) and a continuation writes its own journal. No document or test pins the suffix (grep).",
+   "consumers_checked": [
+    "aisef2/app/run.py:278,384 (reads obligation.story_id, not plan.id); lineage.py, verify.py (no plan id read)",
+    "aisef2/app/bundle_cli.py:402 migrate (id=plan.id, new hash), :572 seal (id=f'PLAN-{name}'), :937 continue (id=f'{plan.id}-continued') — the id is re-issued, the hash is the identity",
+    "aisef2/app/bundle.py _plan/load (id is any str; no PLAN-<name> rule at load)",
+    "grep plan.id/'plan_id' over aisef2/aisef/validation: all reads are within one journal/run (story_runner, static_admission, journal, qualification_counters)",
+    "tests/v2/test_v21_continue_usage.py, T00a/T01a/T01b: assert stories/roles/baseline/outcomes/claims; no plan id or hash literal"
+   ],
+   "exceptions_checked": [
+    "a store keyed by plan id across runs (cohort/qualification/caches): none takes ids from a continuation",
+    "two plans of one lineage colliding in a once-per-run structure: structures are per journal; the child's journal is its own",
+    "the child plan identical to the parent's: no — plan_hash differs by construction (new baseline + carried obligations)",
+    "a human tracing provenance from the id: a lost hint only; provenance stays in RUN.json `continues`, the description (L945) and the CARRIED story"
+   ],
+   "refutation": "None for a kill (the id is a label with no cross-run reader; the hash is the identity). AUDITED, not a test owed.",
+   "note": "Index->mutant remap confirmed; sha256 matches. Cross-run plan-id non-reading re-verified (run.py:278,384; migrate L402). CONFIRMED AUDITED."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::continue_from",
+   "index": 184,
+   "mutant": "L933 string 'carried: ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "Carried AUDITED audit; remap verified — regenerating [184] at the snapshot empties the 'carried: ' prefix of a carried obligation's ownership_rationale at bundle_cli.py:933 (`f'{o.story_id} committed it in the run anchored {anchor[:16]...} ({o.criterion_id})'`). ownership_rationale is prose for human review that no control path reads (obligation.py:7-8 'no control path reads it (invariant I)'; validation kernel_static_checks flags attribute/getattr reads of it, not subscript, and none exist). It is hash-bound, so plan_hash follows its text and is recomputed from the stored plan at load. The fact the label stated (the obligation is carried) is carried in DATA: story_id == report['carried_as'] and role VERIFY (continue_usage:142-143). The tests that read the rationale (T01b.CarriedStory:330-351, defects_bundlecli) read it for identifying WORDS — the story S1, the >=12-hex anchor, 'anchored <hex> (C-ADD)', the criterion — never the 'carried: ' label, so the mutant passes them.",
+   "consumers_checked": [
+    "aisef2/app/bundle.py _plan (o['ownership_rationale'] into PlanObligation; the text is not used), plain(plan) out",
+    "aisef2/plan/obligation.py:7-9,37 (ownership_rationale is prose; invariant I: no control path reads it)",
+    "validation/v2/kernel_static_checks.py (NO_PROSE_CONTROL: flags attribute/getattr reads of rationale/ownership_rationale; subscript reads are not flagged and none exist)",
+    "tests/v2/test_v21_kills3_T01b.py:330-351 (CarriedStory) and test_v21_defects_bundlecli.py: read the rationale's identifying words (S1, anchor hex, criterion), not the label",
+    "tests/v2/test_v21_continue_usage.py:142-143 (the carried marking asserted in data: story_id==carried_as, role VERIFY)",
+    "feedback.py/review_verify.py/adapters.py/run.py: build prompts and rows from facts/roles/specs, never from the plan's rationale"
+   ],
+   "exceptions_checked": [
+    "a reader detecting carried obligations by the 'carried:' prefix: none (grep 'carried:' finds bundle_cli.py:933 only); detection is by story_id and role",
+    "a prompt/report serialising the plan obligations to a model or operator: none (plain(plan) appears only in bundle.dump; continue's operator output is the report, which carries carried/carried_as, not the rationale)",
+    "a stored plan_hash compared with an independent value: recomputed from the stored plan at load; the report carries no plan hash",
+    "a continuation of a continuation: CARRIED obligations are rebuilt at L930-933 with a fresh sentence (the previous text is replaced, never parsed)"
+   ],
+   "refutation": "None for a kill (prose label; no control reader; the identifying words are retained and separately asserted, and the carried fact is in data). AUDITED, not a test owed.",
+   "note": "Index->mutant remap confirmed; sha256 matches. CONFIRMED AUDITED."
+  }
+ ]
+}

@@ -1,0 +1,337 @@
+{
+ "batch": "B07-execute",
+ "target": "aisef2/app/run.py::execute",
+ "new": [
+  {
+   "target": "aisef2/app/run.py::execute",
+   "index": 251,
+   "mutant": "L484 string '--parent ' emptied",
+   "worker": "c3-w1"
+  },
+  {
+   "target": "aisef2/app/run.py::execute",
+   "index": 253,
+   "mutant": "L486 string '--parent ' emptied",
+   "worker": "c3-w1"
+  },
+  {
+   "target": "aisef2/app/run.py::execute",
+   "index": 254,
+   "mutant": "L486 string ': ' emptied",
+   "worker": "c3-w1"
+  },
+  {
+   "target": "aisef2/app/run.py::execute",
+   "index": 263,
+   "mutant": "L530 string 'the lineage of ' emptied",
+   "worker": "c3-w1"
+  },
+  {
+   "target": "aisef2/app/run.py::execute",
+   "index": 358,
+   "mutant": "L542 string '; ' emptied",
+   "worker": "c3-w1"
+  }
+ ],
+ "covered": [
+  {
+   "target": "aisef2/app/run.py::execute",
+   "index": 17,
+   "mutant": "L491 dict entry 6 dropped",
+   "worker": "c3-w1",
+   "class": "EQUIVALENT",
+   "group": "T13-stage-dead-store: the record literal's initial `stage` (key, then value) is overwritten before any read",
+   "grounds": "Dominance proof re-derived at the snapshot. run.py:352-355 builds rec; :356-362 write RUN.started.json from the fixed key tuple at :357-358 (no 'stage'); :363-369 are plain assignments; :370 `try:`; its first statement is `if predecessor is not None:` (:371) whose body is `rec['stage']='claim'` (:372), else the first statement run is `rec['stage']='repository'` (:385). The only read of rec['stage'] in the product is `rec.get('stage')` at :499 inside the `finally` (:481), reachable only after the try was entered, and the RUN.json dump (:506, sort_keys=True). Dropping the key only changes the dict between :352 and :372/:385, where nothing reads it. The conclusion stands; the audit's sentence that no reader of a run record's stage exists outside run.py is no longer true (e2e_guest.py, below), and no line number it cites is the snapshot's (+6).",
+   "consumers_checked": [
+    "aisef2/app/run.py:356-362: the STARTED write reads rec only through the tuple (format, bundle_digest, project, plan_hash, started, kernel_digest, platform)",
+    "aisef2/app/run.py:499: the only product read of rec['stage'] (failure.stage); the value is also the top-level 'stage' of the RUN.json dumped at :506",
+    "aisef2/app/verify.py:185-188 reads rec['failure'] for its truthiness only; aisef2/app/usage.py:102 reads rec.get('started'/'finished') only; aisef2/app/cli.py:104-106 and validation/qualification/release_rehearsal.py:120-140 read named keys of the returned record, never 'stage' and never its key order",
+    "NEW since the audit: validation/v21/cli_integration/e2e_guest.py:615-617 (`rec.get('stage') == 'confinement'`), :624 and :774 (the stage as a fact; :868-891 compare() lists a fact that differs between two driver runs): readers of RUN.json's final stage, which this mutant does not change (every path through the try assigns it before the finally reads it)",
+    "grep of '\"stage\"' / ['stage'] over aisef2, validation, tests, bin, framework: the other hits are probe/range ledgers (process_range.py:446, :499; validation/v2/owned_run.py:59, p2_evidence.py:115-121; validation/v21/sandbox/linux_guest.py:304-306), not a run record",
+    "line coverage: L352-355 is executed by 19 test modules outside this target's kill set (release_acceptance, context_pack, defects_bundlecli, defects_lineageusage, defects_verify, T00a, T01a, T01b, T09a, T14a, T14b, T22a, T22b, TO1, r3_detail_model, r3_detail_failclosed, r3_usage_boundary, r3_detail_product, test_v21_review): the mutant run against all of them: SURVIVED"
+   ],
+   "exceptions_checked": [
+    "an exception between the literal and `try` (exclusive open :356, json.dumps :357-360, fsync :362): leaves execute before the try, so no finally and no RUN.json; the missing key is never seen",
+    "a path that reaches the finally without assigning: none; :371 holds no call, :372 and :385 are the first statements",
+    "an asynchronous KeyboardInterrupt delivered in the one-statement window after :370: the only observable difference (failure.stage None / '' instead of 'repository'); no argument of execute can inject it (no user callable runs there), so EQUIVALENT up to that, as written",
+    "in-memory key order of the returned record (the mutant appends 'stage' at the first assignment): RUN.json is dumped with sort_keys=True (:506) and every caller reads named keys",
+    "created by round 3: the e2e driver's readers of stage (named above) and the review-findings glob in evidence_manifest (does not read rec)"
+   ],
+   "source_sha256": "f17b8de373f61634ce4366c89be9aab570b0bef0a014ad2af4a26f29fbd7f201",
+   "remapped_from": {
+    "index": 18,
+    "mutant": "L352 dict entry 6 dropped",
+    "source_sha256": "bd31c90bd0d9ee0ac88e589a4b740220106e00795c148d2f4c7aeedbb9bf2b70",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 18,
+     "mutant": "L346 dict entry 6 dropped",
+     "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+    },
+    "chain": [
+     {
+      "index": 18,
+      "mutant": "L346 dict entry 6 dropped",
+      "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+     },
+     {
+      "index": 18,
+      "mutant": "L352 dict entry 6 dropped",
+      "source_sha256": "bd31c90bd0d9ee0ac88e589a4b740220106e00795c148d2f4c7aeedbb9bf2b70",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  },
+  {
+   "target": "aisef2/app/run.py::execute",
+   "index": 45,
+   "mutant": "L492 string 'repository' emptied",
+   "worker": "c3-w1",
+   "class": "EQUIVALENT",
+   "group": "T13-stage-dead-store: same store as 18, the value instead of the key",
+   "grounds": "Same store as 18, the value instead of the key. run.py:352-355 builds rec; :356-362 write RUN.started.json from the fixed key tuple at :357-358 (no 'stage'); :363-369 are plain assignments; :370 `try:`; its first statement is `if predecessor is not None:` (:371) whose body is `rec['stage']='claim'` (:372), else the first statement run is `rec['stage']='repository'` (:385). The only read of rec['stage'] in the product is `rec.get('stage')` at :499 inside the `finally` (:481), reachable only after the try was entered, and the RUN.json dump (:506, sort_keys=True). The value '' lives in rec['stage'] only from :353 to :372/:385, where it is overwritten before the single read (:499). It is never in RUN.started.json (tuple :357-358). Emptying it cannot reach failure.stage or the top-level 'stage' because every path through the try assigns first. The audit's 'no other reader of a run record's stage' is corrected by e2e_guest.py (below); the conclusion stands.",
+   "consumers_checked": [
+    "aisef2/app/run.py:356-362: the STARTED write reads rec only through the tuple (format, bundle_digest, project, plan_hash, started, kernel_digest, platform)",
+    "aisef2/app/run.py:499: the only product read of rec['stage'] (failure.stage); the value is also the top-level 'stage' of the RUN.json dumped at :506",
+    "aisef2/app/verify.py:185-188 reads rec['failure'] for its truthiness only; aisef2/app/usage.py:102 reads rec.get('started'/'finished') only; aisef2/app/cli.py:104-106 and validation/qualification/release_rehearsal.py:120-140 read named keys of the returned record, never 'stage' and never its key order",
+    "NEW since the audit: validation/v21/cli_integration/e2e_guest.py:615-617 (`rec.get('stage') == 'confinement'`), :624 and :774 (the stage as a fact; :868-891 compare() lists a fact that differs between two driver runs): readers of RUN.json's final stage, which this mutant does not change (every path through the try assigns it before the finally reads it)",
+    "grep of '\"stage\"' / ['stage'] over aisef2, validation, tests, bin, framework: the other hits are probe/range ledgers (process_range.py:446, :499; validation/v2/owned_run.py:59, p2_evidence.py:115-121; validation/v21/sandbox/linux_guest.py:304-306), not a run record",
+    "line coverage: L352-355 is executed by 19 test modules outside this target's kill set (release_acceptance, context_pack, defects_bundlecli, defects_lineageusage, defects_verify, T00a, T01a, T01b, T09a, T14a, T14b, T22a, T22b, TO1, r3_detail_model, r3_detail_failclosed, r3_usage_boundary, r3_detail_product, test_v21_review): the mutant run against all of them: SURVIVED"
+   ],
+   "exceptions_checked": [
+    "an exception between the literal and `try` (exclusive open :356, json.dumps :357-360, fsync :362): leaves execute before the try, so no finally and no RUN.json; the missing key is never seen",
+    "a path that reaches the finally without assigning: none; :371 holds no call, :372 and :385 are the first statements",
+    "an asynchronous KeyboardInterrupt delivered in the one-statement window after :370: the only observable difference (failure.stage None / '' instead of 'repository'); no argument of execute can inject it (no user callable runs there), so EQUIVALENT up to that, as written",
+    "in-memory key order of the returned record (the mutant appends 'stage' at the first assignment): RUN.json is dumped with sort_keys=True (:506) and every caller reads named keys",
+    "created by round 3: the e2e driver's readers of stage (named above) and the review-findings glob in evidence_manifest (does not read rec)",
+    "a downstream reader that treats '' differently from 'repository' (a stage filter, a resume point): none; e2e_guest.py:615 compares with 'confinement' only, and the final value is assigned"
+   ],
+   "source_sha256": "f17b8de373f61634ce4366c89be9aab570b0bef0a014ad2af4a26f29fbd7f201",
+   "remapped_from": {
+    "index": 45,
+    "mutant": "L353 string 'repository' emptied",
+    "source_sha256": "bd31c90bd0d9ee0ac88e589a4b740220106e00795c148d2f4c7aeedbb9bf2b70",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 45,
+     "mutant": "L347 string 'repository' emptied",
+     "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+    },
+    "chain": [
+     {
+      "index": 45,
+      "mutant": "L347 string 'repository' emptied",
+      "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+     },
+     {
+      "index": 45,
+      "mutant": "L353 string 'repository' emptied",
+      "source_sha256": "bd31c90bd0d9ee0ac88e589a4b740220106e00795c148d2f4c7aeedbb9bf2b70",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  },
+  {
+   "target": "aisef2/app/run.py::execute",
+   "index": 148,
+   "mutant": "L499 string '\\n' emptied",
+   "worker": "c3-w1",
+   "class": "AUDITED",
+   "group": "T13-eof-newline: the final newline of a JSON evidence file the run writes; every reader parses JSON or digests the bytes as written",
+   "grounds": "The file ends at the closing brace (run.py:356-360). Not EQUIVALENT: its bytes differ, so its entry in the manifest (run.py:298-302, a sha of the raw bytes) and the anchor value (run.py:313-315) differ for the same inputs. Nothing compares that value with one from another execution (the file also holds `started: clock()`, so the bytes are never reproducible across executions anyway): verify recomputes the manifest from the same bytes (verify.py:117-124) and every code reader json.loads the text. Completeness of this file is decided by parse, not by a trailing newline (one write call, then flush and fsync; a cut file does not parse, and a file cut after the brace is a whole JSON document either way).",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:322-331 predecessor_of: json.loads(read_text()), then doc.get('continues')",
+    "aisef2/app/bundle_cli.py:419-425 continue_from: json.loads(read_text()), then rec.get('bundle_digest'/'kernel_digest'/...)",
+    "aisef2/app/run.py:282-291 _content_sha (raw bytes for every file but RUN.json), :294-302 evidence_manifest (lists STARTED), :305-315 anchor_in/anchor_of; aisef2/app/verify.py:100-124 recomputes the manifest from the same bytes and compares as dicts",
+    "aisef2/app/run.py:346 (`(predecessor / STARTED).is_file()`), validation/v21/cli_integration/run.sh:49 and tests/v2/test_v21_continue_integrity.py:243: existence only",
+    "NEW since the audit: validation/v21/cli_integration/e2e_guest.py:492 and :555: a scripted session reads RUN.started.json as a canary and the control compares the client-reported sha256 with `sha(RUN.started.json bytes)` of the same file in the same run (equality of one file with itself, not across executions); :868-891 compare() lists anchors and journal sha as 'volatile'",
+    "docs: ANCHOR-THREAT-MODEL.md:3, ADR-V2.1.md:145, USAGE-2.1.md:131-133, REPORT.md:193 describe its role; none states a byte format; no RUN.started.json is committed (git ls-files)",
+    "line coverage: L357-360 is executed by the same 19 outside-kill-set modules as 18; the mutant run against all of them: SURVIVED"
+   ],
+   "exceptions_checked": [
+    "a line-oriented reader (splitlines / strip / count of b'\\n' / readline) of RUN.started.json: none (grep of STARTED / RUN.started.json over aisef2, validation, tests, docs, bin, framework, .github); verify.py:145 counts newlines of the journal, not of this file; round 3's LF-only reader (lineage.py:237, `block.split('\\n')`) reads git output",
+    "a stored or documented digest of RUN.started.json or of an anchor that a re-execution must reproduce: none",
+    "the single-line anchor file, which lineage.read_anchor does require newline-terminated (lineage.py:392-413): a different file, written by write_anchor",
+    "an end-of-file lint over run directories: none in tests/ or .githooks; no run directory is committed",
+    "created by round 3: the e2e driver's byte-sha comparison of this file with itself (above): independent of the trailing byte"
+   ],
+   "source_sha256": "f17b8de373f61634ce4366c89be9aab570b0bef0a014ad2af4a26f29fbd7f201",
+   "remapped_from": {
+    "index": 139,
+    "mutant": "L360 string '\\n' emptied",
+    "source_sha256": "bd31c90bd0d9ee0ac88e589a4b740220106e00795c148d2f4c7aeedbb9bf2b70",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 139,
+     "mutant": "L354 string '\\n' emptied",
+     "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+    },
+    "chain": [
+     {
+      "index": 139,
+      "mutant": "L354 string '\\n' emptied",
+      "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+     },
+     {
+      "index": 139,
+      "mutant": "L360 string '\\n' emptied",
+      "source_sha256": "bd31c90bd0d9ee0ac88e589a4b740220106e00795c148d2f4c7aeedbb9bf2b70",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  },
+  {
+   "target": "aisef2/app/run.py::execute",
+   "index": 257,
+   "mutant": "L499 True->False",
+   "worker": "c3-w1",
+   "class": "AUDITED",
+   "group": "T13-sortkeys-*: serialisation order of a JSON object that nobody reads in order",
+   "grounds": "With sort_keys=False the object is written in construction order (the seven copied keys, settings_sha256, continues; nested platform / continues in literal order; run.py:357-360) instead of alphabetical. Not EQUIVALENT: the bytes, this file's manifest entry and the anchor differ for the same inputs. Every reader json.loads into a dict and indexes by key (lineage.py:322-331, bundle_cli.py:419-425); the sha is recomputed from the same bytes (verify.py:117-124); the order is a deterministic function of the code (insertion order), so two runs of one release give one order. The digest inside the file (settings_sha256, run.py:359) has its own sort_keys and is another mutant. All keys are str, so sort_keys=True cannot be what raises.",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:322-331 predecessor_of: json.loads(read_text()), then doc.get('continues')",
+    "aisef2/app/bundle_cli.py:419-425 continue_from: json.loads(read_text()), then rec.get('bundle_digest'/'kernel_digest'/...)",
+    "aisef2/app/run.py:282-291 _content_sha (raw bytes for every file but RUN.json), :294-302 evidence_manifest (lists STARTED), :305-315 anchor_in/anchor_of; aisef2/app/verify.py:100-124 recomputes the manifest from the same bytes and compares as dicts",
+    "aisef2/app/run.py:346 (`(predecessor / STARTED).is_file()`), validation/v21/cli_integration/run.sh:49 and tests/v2/test_v21_continue_integrity.py:243: existence only",
+    "NEW since the audit: validation/v21/cli_integration/e2e_guest.py:492 and :555: a scripted session reads RUN.started.json as a canary and the control compares the client-reported sha256 with `sha(RUN.started.json bytes)` of the same file in the same run (equality of one file with itself, not across executions); :868-891 compare() lists anchors and journal sha as 'volatile'",
+    "docs: ANCHOR-THREAT-MODEL.md:3, ADR-V2.1.md:145, USAGE-2.1.md:131-133, REPORT.md:193 describe its role; none states a byte format; no RUN.started.json is committed (git ls-files)",
+    "line coverage: L357-360 is executed by the same 19 outside-kill-set modules as 18; the mutant run against all of them: SURVIVED"
+   ],
+   "exceptions_checked": [
+    "a cross-release or cross-run comparison of the file's bytes or of an anchor: none (no stored digest of RUN.started.json; docs anchors are of preserved directories; e2e_guest.py:868-891 treats anchors as volatile); the file holds a timestamp, so it never reproduces anyway",
+    "an order-dependent reader (first key, zip of keys, text diff): none found",
+    "sort_keys=True raising on mixed key types where False would not: every key at both levels is a str",
+    "the nested 'continues' dict later extended with claim / account (run.py:374, :378, :384): the file is written at :356-362, before those additions (the dict is shared, but the dump has run), and the mutant does not touch the in-memory dict",
+    "created by round 3: nothing (the manifest glob added at run.py:300 is of review-findings/)"
+   ],
+   "source_sha256": "f17b8de373f61634ce4366c89be9aab570b0bef0a014ad2af4a26f29fbd7f201",
+   "remapped_from": {
+    "index": 236,
+    "mutant": "L360 True->False",
+    "source_sha256": "bd31c90bd0d9ee0ac88e589a4b740220106e00795c148d2f4c7aeedbb9bf2b70",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 236,
+     "mutant": "L354 True->False",
+     "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+    },
+    "chain": [
+     {
+      "index": 236,
+      "mutant": "L354 True->False",
+      "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+     },
+     {
+      "index": 236,
+      "mutant": "L360 True->False",
+      "source_sha256": "bd31c90bd0d9ee0ac88e589a4b740220106e00795c148d2f4c7aeedbb9bf2b70",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  },
+  {
+   "target": "aisef2/app/run.py::execute",
+   "index": 296,
+   "mutant": "L677 string '\\n' emptied",
+   "worker": "c3-w1",
+   "class": "AUDITED",
+   "group": "T13-eof-newline: as 139, for EVIDENCE.json",
+   "grounds": "EVIDENCE.json ends at the closing brace. The anchor is unchanged: anchor_of (run.py:313-315) hashes the canonical compact JSON of the parsed manifest, anchor_in (:305-310) and verify (verify.py:100-124) json.loads the file first. The file is not in its own manifest (run.py:298-300), so no digest of its bytes exists anywhere. The doc line 'Anchor = sha256 of EVIDENCE.json' (TRACEABILITY.md:926) is already untrue of the original.",
+   "consumers_checked": [
+    "aisef2/app/run.py:305-310 anchor_in (json.loads of the file, then anchor_of :313-315: sha256 of the canonical compact sorted JSON of the parsed manifest); callers cli.py:95 and bundle_cli.py:456",
+    "aisef2/app/verify.py:100-124: json.loads; `stored != fresh` as dicts; the names it lists are sorted; the file is not in its own manifest (run.py:298-300)",
+    "tests that write the manifest compact, unsorted and without a newline and expect VERIFIED with the same anchor: tests/v2/test_app_units.py:638, test_s2_kills.py:559, test_v21_kills3_A22.py:67, test_v21_kills3_R01.py:83, test_v21_defects_verify.py:67, test_v21_defects_lineageusage.py:279",
+    "NEW since the audit: tests/v2/test_v21_r3_detail_product.py:224 and validation/v21/cli_integration/e2e_guest.py:714 re-write EVIDENCE.json with `json.dumps(R.evidence_manifest(d), indent=1, sort_keys=True) + '\\n'` in a copy and verify it (writers that mirror run.py:508; the anchor is of the canonical form, so any byte format gives the same anchor)",
+    "docs: ANCHOR-THREAT-MODEL.md:3 and ADR-V2.1.md:66-69 ('digest of the manifest'); docs/v2.1/TRACEABILITY.md:926 and docs/v2.1/research/TRACEABILITY.json:2517 say 'Anchor = sha256 of EVIDENCE.json', which is not true of the original either (the file is indent=1 plus a newline, the anchor is of the compact canonical form)",
+    "git ls-files: no EVIDENCE.json is committed; grep EVIDENCE.json / R.MANIFEST over aisef2, validation, tests, bin, framework, .github: json readers and writers only",
+    "line coverage: L508 is executed by the same 19 outside-kill-set modules; the mutant run against all of them: SURVIVED"
+   ],
+   "exceptions_checked": [
+    "a script or doc hashing the file's bytes as the anchor (sha256sum EVIDENCE.json): none in validation/, bin/, framework/, .github/, tests/; and it would already differ from the anchor in the original",
+    "the --anchor-out file (lineage.write_anchor / read_anchor demand one 64-hex line plus newline): a different file, not touched by this line",
+    "a line-oriented reader of EVIDENCE.json: none",
+    "a committed or linted copy of a run's EVIDENCE.json: none (docs/v2.1/evidence/*.out hold printed anchors, not the file)",
+    "created by round 3: the manifest now lists review-findings/*.json (run.py:300; a journal row binds each file by sha256) and the e2e driver re-writes the manifest in a copy (above); neither reads the trailing byte of the original"
+   ],
+   "source_sha256": "f17b8de373f61634ce4366c89be9aab570b0bef0a014ad2af4a26f29fbd7f201",
+   "remapped_from": {
+    "index": 269,
+    "mutant": "L508 string '\\n' emptied",
+    "source_sha256": "bd31c90bd0d9ee0ac88e589a4b740220106e00795c148d2f4c7aeedbb9bf2b70",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 269,
+     "mutant": "L502 string '\\n' emptied",
+     "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+    },
+    "chain": [
+     {
+      "index": 269,
+      "mutant": "L502 string '\\n' emptied",
+      "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+     },
+     {
+      "index": 269,
+      "mutant": "L508 string '\\n' emptied",
+      "source_sha256": "bd31c90bd0d9ee0ac88e589a4b740220106e00795c148d2f4c7aeedbb9bf2b70",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  },
+  {
+   "target": "aisef2/app/run.py::execute",
+   "index": 345,
+   "mutant": "L677 True->False",
+   "worker": "c3-w1",
+   "class": "AUDITED",
+   "group": "T13-sortkeys-*: serialisation order of a JSON object that nobody reads in order",
+   "grounds": "With sort_keys=False EVIDENCE.json is written in evidence_manifest's construction order (top level format, files; files as RUN.json, RUN.started.json, sorted journals, sorted sessions, sorted preflight, and now sorted review-findings; run.py:298-302) instead of alphabetical. The bytes differ; the anchor does not: anchor_of canonicalises the parsed manifest with sort_keys=True and compact separators (run.py:313-315), and verify compares `stored != fresh` as dicts and sorts the names it lists (verify.py:121-124). The file is not in its own manifest.",
+   "consumers_checked": [
+    "aisef2/app/run.py:305-310 anchor_in (json.loads of the file, then anchor_of :313-315: sha256 of the canonical compact sorted JSON of the parsed manifest); callers cli.py:95 and bundle_cli.py:456",
+    "aisef2/app/verify.py:100-124: json.loads; `stored != fresh` as dicts; the names it lists are sorted; the file is not in its own manifest (run.py:298-300)",
+    "tests that write the manifest compact, unsorted and without a newline and expect VERIFIED with the same anchor: tests/v2/test_app_units.py:638, test_s2_kills.py:559, test_v21_kills3_A22.py:67, test_v21_kills3_R01.py:83, test_v21_defects_verify.py:67, test_v21_defects_lineageusage.py:279",
+    "NEW since the audit: tests/v2/test_v21_r3_detail_product.py:224 and validation/v21/cli_integration/e2e_guest.py:714 re-write EVIDENCE.json with `json.dumps(R.evidence_manifest(d), indent=1, sort_keys=True) + '\\n'` in a copy and verify it (writers that mirror run.py:508; the anchor is of the canonical form, so any byte format gives the same anchor)",
+    "docs: ANCHOR-THREAT-MODEL.md:3 and ADR-V2.1.md:66-69 ('digest of the manifest'); docs/v2.1/TRACEABILITY.md:926 and docs/v2.1/research/TRACEABILITY.json:2517 say 'Anchor = sha256 of EVIDENCE.json', which is not true of the original either (the file is indent=1 plus a newline, the anchor is of the compact canonical form)",
+    "git ls-files: no EVIDENCE.json is committed; grep EVIDENCE.json / R.MANIFEST over aisef2, validation, tests, bin, framework, .github: json readers and writers only",
+    "line coverage: L508 is executed by the same 19 outside-kill-set modules; the mutant run against all of them: SURVIVED"
+   ],
+   "exceptions_checked": [
+    "an order-dependent reader of 'files' (first entry, zip with another list): none; verify iterates a set union and sorted lists (verify.py:122-123)",
+    "a stored anchor a re-execution must reproduce: none, and the anchor does not depend on the order anyway",
+    "a hash of the file's bytes: none, and it would already differ from the anchor in the original",
+    "a different Python's dict order changing what is written: the order is insertion order from sorted globs (run.py:298-300), deterministic",
+    "created by round 3: an older verifier meeting the new `review-findings/` names lists them as differing (docs/v2.1/decisions/B03-R3-detail.md \u00a73.3), still order-blind"
+   ],
+   "source_sha256": "f17b8de373f61634ce4366c89be9aab570b0bef0a014ad2af4a26f29fbd7f201",
+   "remapped_from": {
+    "index": 318,
+    "mutant": "L508 True->False",
+    "source_sha256": "bd31c90bd0d9ee0ac88e589a4b740220106e00795c148d2f4c7aeedbb9bf2b70",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 318,
+     "mutant": "L502 True->False",
+     "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+    },
+    "chain": [
+     {
+      "index": 318,
+      "mutant": "L502 True->False",
+      "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+     },
+     {
+      "index": 318,
+      "mutant": "L508 True->False",
+      "source_sha256": "bd31c90bd0d9ee0ac88e589a4b740220106e00795c148d2f4c7aeedbb9bf2b70",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  }
+ ]
+}

@@ -1,0 +1,275 @@
+{
+ "batch": "B07-execute",
+ "copy": "b",
+ "entries": [
+  {
+   "target": "aisef2/app/run.py::execute",
+   "index": 251,
+   "mutant": "L484 string '--parent ' emptied",
+   "class_before": "SURVIVED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "Mutant confirmed at the snapshot (run.py sha256 f17b8de3...): run.py:483-484, when the predecessor holds neither RUN.json nor RUN.started.json, execute raises RunRefused(f\"--parent {predecessor}: no run record there\"); the mutant drops '--parent ' -> f\"{predecessor}: no run record there\" (mutant_view diff shows exactly this). Not EQUIVALENT: for every triggering input the operator text loses the flag identifier. But the path (predecessor, absolutised at :476) and the cause ('no run record there') remain, and the only surfacing is cli.py:99 printing `aisef run: refused: {e}` to stderr with exit 2 (cli.py:98 catches RunRefused); nothing parses str(RunRefused). The recorded failure stores type+stage only (run.py:665-666, the finally's `failure={'type':..., 'stage': rec.get('stage')}`), never the message text. Measured SURVIVED on this tree, matching campaign-9.",
+   "consumers_checked": [
+    "aisef2/app/cli.py:98-99: the sole surfacing (print `aisef run: refused: {e}`, exit 2); it does not parse or split the message",
+    "tests/v2/test_v21_kills3_T13a.py:305-318 (test_a_directory_with_neither_record_is_refused_naming_it_before_anything_is_made): assertRegex(str(exc), re.escape(str(parent)) + r'.*no run record') — checks the path and 'no run record', never the '--parent ' prefix",
+    "tests/v2/test_v21_pw_lineage_unread.py:420-425 (test_a_predecessor_that_is_not_there_keeps_its_own_refusal): assertIn('no run record there', err) / assertNotIn('PermissionError', err) — the cause substring, never the prefix",
+    "tests/v2/test_v21_kills3_A13.py:1-6 (the audit-batch pin file) explicitly lists 'the --parent option name in the \"no run record\" refusal' as AUDITED (nothing reads it); it pins only the unaccounted refusal's scope word 'lineage', not this prefix",
+    "grep 'no run record' over tests/validation/docs: T13a:316, pw_lineage_unread:424/434, pw_lineage_continue:201/237/244/249, T01b:184/201, A13:5 — none asserts the '--parent ' prefix; no document fixes the wording (the unread-refusal/no-record text is in no committed file)",
+    "the recorded failure (run.py:665-666) is type+stage only"
+   ],
+   "exceptions_checked": [
+    "a test asserting the message begins with '--parent ' or names the flag: none (grep '--parent ' over tests finds only CLI usage/help text in test_v21_kills_cli.py and docstrings/test names)",
+    "a document fixing the no-record refusal's wording: none",
+    "the recorded failure carrying the message text: no (type+stage only)",
+    "a reader that parses which flag a refusal concerns: none (cli.py:99 only prints)"
+   ],
+   "refutation": "Ran the registered kill files that reach L484. tests.v2.test_v21_kills3_T13a (12 OK) and tests.v2.test_v21_pw_lineage_unread (39 OK, 0 skipped) PASS on the mutant AND on the unmutated copy (baseline T13a 12 OK, pw 39 OK). No kill. No unregistered test pins the prefix. SURVIVED confirmed; no refutation found.",
+   "note": "Author's draft reproduced exactly; grounds hold at the snapshot (cites refreshed to run.py:483-484/:665-666). Python 3.14.7, PATH stripped of opencode, HOME/TMPDIR under the copy."
+  },
+  {
+   "target": "aisef2/app/run.py::execute",
+   "index": 253,
+   "mutant": "L486 string '--parent ' emptied",
+   "class_before": "SURVIVED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "Mutant confirmed at the snapshot: run.py:485-486, when lineage.is_file(predecessor/'RUN.json') raises LineageRefused (a directory this process may not search), execute raises RunRefused(f\"--parent {predecessor}: {e}\"); the mutant drops '--parent ' -> f\"{predecessor}: {e}\". {e} is lineage.is_file's LineageRefused text (lineage.py:474-482): f\"{path} cannot be looked at ({type}: ...): restore the permissions of the run directory\", path = predecessor/'RUN.json'. Not EQUIVALENT: the operator text loses the flag identifier. But {e} itself repeats the predecessor path and carries the exception type, so path and cause remain; cli.py:99 prints it, nothing parses it; the recorded failure (run.py:665-666) is type+stage only. On Python 3.14 this path is still reached: lineage._look (lineage.py:458-471) does os.listdir which raises PermissionError -> LineageRefused regardless of 3.14's Path.is_file-returns-False change (verified: pw_lineage_unread:427-434 reaches it with PermissionError on 3.14). Measured SURVIVED.",
+   "consumers_checked": [
+    "aisef2/app/cli.py:98-99: prints `aisef run: refused: {e}`, exit 2 — sole surfacing, no parse",
+    "tests/v2/test_v21_pw_lineage_unread.py:411-417 (test_a_read_only_predecessor_is_refused_not_a_traceback, @POSIX_USER): assertRegex(err, r'^aisef run: refused: '), assertIn('PermissionError', err), assertNotIn('Traceback', err) — the CLI prefix and the cause (from {e}), never execute's '--parent ' prefix",
+    "tests/v2/test_v21_pw_lineage_unread.py:427-434 (test_a_predecessor_that_cannot_be_searched_is_refused_naming_the_cause, @POSIX_USER, 0o000): assertIn('PermissionError', err), assertNotIn('no run record there', err) — confirms L486 is reached on 3.14 as euid 501; neither assertion touches '--parent '",
+    "aisef2/app/lineage.py:474-482 is_file / :458-471 _look: the LineageRefused {e} embeds the path and the exception type",
+    "the recorded failure (run.py:665-666): type+stage only"
+   ],
+   "exceptions_checked": [
+    "a test on the '--parent ' prefix of the LineageRefused wrap: none",
+    "the @POSIX_USER permission tests being skipped (L486 never reached): no — 0 skips reported, euid is 501 (not root), and _look's os.listdir raises PermissionError on 3.14 too",
+    "a document fixing this wording: none",
+    "a reader parsing str(RunRefused): none (cli.py:99 only prints)"
+   ],
+   "refutation": "Ran tests.v2.test_v21_pw_lineage_unread (39 OK, 0 skipped) and tests.v2.test_v21_kills3_T13a (12 OK) on the mutant and the unmutated copy: all PASS (no kill). The @POSIX_USER tests ran (euid 501). SURVIVED confirmed; no refutation found.",
+   "note": "Author's draft reproduced; cites refreshed to run.py:485-486, lineage.py:458-482, run.py:665-666."
+  },
+  {
+   "target": "aisef2/app/run.py::execute",
+   "index": 254,
+   "mutant": "L486 string ': ' emptied",
+   "class_before": "SURVIVED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "Mutant confirmed at the snapshot: run.py:485-486 RunRefused(f\"--parent {predecessor}: {e}\") becomes f\"--parent {predecessor}{e}\" (mutant_view diff confirms) — the predecessor path abuts {e}, which itself begins with predecessor/'RUN.json' (lineage.py:474-480), so the operator reads '--parent /pred/pred/RUN.json cannot be looked at ...'. Not EQUIVALENT: the ': ' and the visual break are gone and the path reads doubled. But both path and cause ('PermissionError', 'restore the permissions') remain; cli.py:99 only prints, nothing splits on ': '. Measured SURVIVED.",
+   "consumers_checked": [
+    "aisef2/app/cli.py:98-99: prints the message, exit 2 — no split or parse on ': '",
+    "tests/v2/test_v21_pw_lineage_unread.py:411-417 and :427-434 (@POSIX_USER): assert the CLI prefix and 'PermissionError'; the dropped ': ' is not checked",
+    "tests/v2/test_v21_kills3_T13a.py (12 tests): the --parent admission/no-record paths; none inspects the ': ' of the wrap",
+    "grep over aisef2/validation/tests for a reader that splits a RunRefused message on ': ': none (cli.py:99 only prints)",
+    "the recorded failure (run.py:665-666): type+stage only"
+   ],
+   "exceptions_checked": [
+    "a test on the ': ' between the flag-path and the embedded cause: none",
+    "a reader that splits str(RunRefused) on ': ' to extract the path or the cause: none",
+    "the doubled predecessor path confusing a consumer: no consumer parses the message",
+    "a document fixing this wording: none"
+   ],
+   "refutation": "Ran tests.v2.test_v21_pw_lineage_unread (39 OK, 0 skipped) and tests.v2.test_v21_kills3_T13a (12 OK) on the mutant and the unmutated copy: all PASS (no kill). SURVIVED confirmed; no refutation found.",
+   "note": "Author's draft reproduced; cites refreshed to run.py:485-486 / lineage.py:474-480 / run.py:665-666."
+  },
+  {
+   "target": "aisef2/app/run.py::execute",
+   "index": 263,
+   "mutant": "L530 string 'the lineage of ' emptied",
+   "class_before": "SURVIVED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "Mutant confirmed at the snapshot: run.py:529-542, when inherited['unread'] is truthy, execute raises the long RunRefused opening f\"the lineage of {predecessor} has evidence that is there and cannot be read ...\"; the mutant opens f\"{predecessor} has evidence ...\" (mutant_view diff confirms). Not EQUIVALENT: the text loses the 'the lineage of ' opener. But {predecessor} and the whole body remain (the word 'lineage' still appears at run.py:539 'this lineage cannot be continued'). Surfaced only by cli.py:99; bundle_cli.py:961-967 builds its OWN run_parent_refused report ('... `aisef run --parent` starts no paid work (no flag accepts it) ...', its own '; '.join and [:1000]) and client.py:101 its own Budget string ('the lineage's evidence cannot be read, or is gone: ...'), so neither inherits this message; the recorded failure (run.py:665-666) is type+stage. The eight THE_REFUSAL needles x_lineage_gone checks (:68) do not include 'the lineage of'. Measured SURVIVED.",
+   "consumers_checked": [
+    "aisef2/app/cli.py:98-99: prints `aisef run: refused: {e}`, exit 2 — sole surfacing, no parse",
+    "tests/v2/test_v21_x_lineage_gone.py:68 THE_REFUSAL = ('cannot be read','not 0','Make it readable again','faithful copy','--accept-unaccounted does not cover it','without --parent','is gone','RUN.json records'), asserted `for needle in THE_REFUSAL: assertIn(needle, text)` at :254,:264,:282,:339,:658 — none is 'the lineage of'; all remain in the mutant",
+    "aisef2/app/bundle_cli.py:961-967: run_parent_refused built independently (own wording, own join); x_lineage_gone asserts that string separately, not execute's L530",
+    "aisef2/app/client.py:101: the Budget stop string is its own; asserted separately, not L530",
+    "grep 'the lineage of' over aisef2/validation/tests/docs: run.py:530 (this), run.py:545 (the unaccounted refusal — a different line/mutant), lineage.py docstring; docs/v2.1/evidence/*.out:294 show the L545 unaccounted message, NOT L530; the unread text 'has evidence that is there and cannot be read' is in no committed file",
+    "the recorded failure (run.py:665-666): type+stage only"
+   ],
+   "exceptions_checked": [
+    "a test or document pinning the 'the lineage of ' opener of the unread refusal: none (the unread message text is in no committed file)",
+    "the sibling L545 unaccounted refusal (which also opens 'the lineage of ' and whose text IS in docs/v2.1/evidence/*.out): a different line, not this mutant",
+    "a reader parsing the opener of str(RunRefused): none",
+    "bundle_cli/client reusing execute's message: no — each builds its own string"
+   ],
+   "refutation": "Ran tests.v2.test_v21_x_lineage_gone (29 OK) and tests.v2.test_v21_pw_lineage_unread (39 OK, 0 skipped) on the mutant and the unmutated copy: all PASS (baseline x_lineage_gone 29 OK). No kill, registered or not. SURVIVED confirmed; no refutation found.",
+   "note": "Author's draft reproduced; cites refreshed to run.py:529-542 / :665-666 and bundle_cli.py:961-967."
+  },
+  {
+   "target": "aisef2/app/run.py::execute",
+   "index": 358,
+   "mutant": "L542 string '; ' emptied",
+   "class_before": "SURVIVED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "Mutant confirmed at the snapshot: run.py:542 the unread refusal ends with f\"{'; '.join(inherited['unread'])[:1500]}\"; the mutant makes it f\"{''.join(inherited['unread'])[:1500]}\" (mutant_view diff confirms the change is in the trailing join). Not EQUIVALENT in general: with >=2 unread runs the operator-facing descriptions run together. But each description stays a substring, and the operator's actionable restore locations come from lineage.unread_runs(inherited) at run.py:536 (lineage.py:781-784, joined with ', ' — a different call), not from this list; surfaced only by cli.py:99. In every test the refusal is reached with exactly ONE unread entry, where '; '.join([x]) == ''.join([x]) == x, so the separator is never emitted and the mutant output is byte-identical. Measured SURVIVED.",
+   "consumers_checked": [
+    "aisef2/app/cli.py:98-99: prints the message, exit 2 — no parse; the descriptions remain substrings",
+    "tests/v2/test_v21_x_lineage_gone.py: every unread path asserts exactly one entry (assertEqual(len(got['unread']),1) at :192,:209,:396,:431,:451,:483,:518,:549,:559,:570,:634,:690) -> the join never uses a separator; THE_REFUSAL needles unaffected",
+    "aisef2/app/lineage.py:781-784 unread_runs: supplies the restore directories separately (run.py:536), so the operator's actionable info does not depend on this join even with >=2 unread runs",
+    "aisef2/app/run.py:545-547 sibling (unaccounted refusal) '; '.join IS protected against a dropped separator by tests/v2/test_v21_kills3_T13a.py:333-350 assertRegex(message, re.escape(unknown[0]) + r'\\W+' + re.escape(unknown[1])) (verified: that test sets up len(unaccounted)==2); the unread join at L542 has no such told-apart assertion",
+    "aisef2/app/bundle_cli.py:967 has its OWN '; '.join(account['unread'])[:1000] (a different line/target); client.py builds its own string; the recorded failure (run.py:665-666) is type+stage"
+   ],
+   "exceptions_checked": [
+    "a test with >=2 unread entries asserting they are told apart (as T13a:350 does for the unaccounted list): none for the unread list (every reaching test asserts len==1)",
+    "a reader of the joined string's structure: none (cli.py:99 only prints; bundle_cli/client build their own)",
+    "the [:1500] truncation interacting with the separator: both forms truncate identically, and with one entry are byte-identical",
+    "the operator's restore paths depending on the separator: no — lineage.unread_runs (run.py:536) supplies them separately"
+   ],
+   "refutation": "Ran tests.v2.test_v21_x_lineage_gone (29 OK) and tests.v2.test_v21_pw_lineage_unread (39 OK, 0 skipped) on the mutant and the unmutated copy: all PASS (byte-identical output since every reaching test has len(unread)==1). Parity gap considered: the unaccounted sibling (L547) HAS a told-apart test (T13a:350) and the unread list (L542) does not, so a 2-entry told-apart test would be natural. NOT owed (REFUTED withheld): the operator's actionable restore directories come from lineage.unread_runs at L536, independent of the L542 join, so no reader — automated or human-actionable — breaks when the separator is dropped. AUDITED stands.",
+   "note": "Author's draft reproduced and its parity observation re-verified (T13a:333-350 pins the unaccounted sibling's separator with len==2; no equivalent for the unread list). Agree AUDITED, not owed."
+  },
+  {
+   "target": "aisef2/app/run.py::execute",
+   "index": 17,
+   "mutant": "L491 dict entry 6 dropped",
+   "class_before": "EQUIVALENT",
+   "verdict": "REVISED",
+   "class_after": "EQUIVALENT",
+   "grounds": "CONCLUSION HOLDS (EQUIVALENT) but the carried dominance proof is corrected to this snapshot's control flow. Mutant confirmed: run.py:491-494 builds rec with 'stage':'repository' as the 6th (0-indexed) entry; the mutant drops the 'stage' key (mutant_view diff confirms). The STARTED write (run.py:495-499) reads rec only through the fixed tuple ('format','bundle_digest','project','plan_hash','started','kernel_digest','platform') + settings_sha256 + continues — no 'stage' — so RUN.started.json is unchanged. The try opens at run.py:509 and its FIRST executable statement is run.py:512 `rec['stage'] = 'ocr identity'` (L510-511 are comments); every subsequent stage assignment (:519 'claim', :549 'repository', :558 'admission', ...) follows. The only read of rec['stage'] in the product is run.py:666 `'stage': rec.get('stage')` inside the finally (run.py:648), reachable only after the try was entered, by which time L512 has unconditionally overwritten the key, and the RUN.json dump (run.py:675, sort_keys=True). So dropping the initial key only changes rec in the window run.py:491->:512, where nothing reads it: a dead store. (The carried grounds said the overwrite is the conditional :372 'claim' / :385 'repository' as the first try statement; at this snapshot the first try statement is the unconditional :512 'ocr identity', which dominates even the predecessor branch — the conclusion is thereby stronger, not weaker.) EQUIVALENT. Measured SURVIVED (kill file passes, confirming no observable change).",
+   "consumers_checked": [
+    "aisef2/app/run.py:495-499: the STARTED write reads rec only through the fixed tuple (no 'stage')",
+    "aisef2/app/run.py:666: the only product read of rec['stage'] (failure.stage), inside the finally; the value is also the top-level 'stage' of the RUN.json dumped at :675 (sort_keys=True)",
+    "aisef2/app/run.py:512 is the unconditional first try statement overwriting rec['stage'] before any read",
+    "aisef2/app/verify.py reads rec['failure'] truthiness and named keys; usage.py reads rec started/finished; cli.py and release_rehearsal read named keys, never 'stage' key order",
+    "validation/v21/cli_integration/e2e_guest.py:615-617 (rec.get('stage')=='confinement'), :624, :774, :868-891: readers of RUN.json's FINAL stage, which the mutant does not change (every path assigns stage before the finally reads it)",
+    "grep '\"stage\"' / ['stage'] over aisef2/validation/tests: the other hits are probe/range ledgers (process_range, owned_run, p2_evidence, linux_guest), not a run record's initial key"
+   ],
+   "exceptions_checked": [
+    "an exception between the literal (:491-494) and the try (:509) — the STARTED open/dumps/fsync at :495-501 and inits :502-508: leaves execute before the try, so no finally and no RUN.json; the missing key is never seen",
+    "a path that reaches the finally without assigning stage: none; :512 is the unconditional first statement of the try (:510-511 are comments)",
+    "an asynchronous KeyboardInterrupt delivered in the zero-statement window between `try:` (:509) and :512: the only observable difference (failure.stage None instead of 'repository'); no argument of execute can inject it, so EQUIVALENT up to that un-injectable caveat, as written",
+    "in-memory key order of the returned record (the mutant would re-add 'stage' at :512): RUN.json is dumped sort_keys=True (:675) and every caller reads named keys"
+   ],
+   "refutation": "Ran the registered kill file that pins failure.stage values: tests.v2.test_v21_kills3_T13a (12 OK) on the mutant and the unmutated copy — PASS on both (it asserts rec['failure']['stage']=='admission' at :300 and =='claim' at :351, both set along the path after :512, not from the dropped literal). No kill. The carried grounds' line numbers (run.py:352-385,:499,:506) and its 'first try statement is if predecessor...' structure are stale; corrected above. EQUIVALENT confirmed.",
+   "note": "REVISED: EQUIVALENT conclusion unchanged; dominance proof re-derived — overwrite is the unconditional run.py:512 'ocr identity', not the carried :372/:385 claim/repository. Cites refreshed to the snapshot."
+  },
+  {
+   "target": "aisef2/app/run.py::execute",
+   "index": 45,
+   "mutant": "L492 string 'repository' emptied",
+   "class_before": "EQUIVALENT",
+   "verdict": "REVISED",
+   "class_after": "EQUIVALENT",
+   "grounds": "CONCLUSION HOLDS (EQUIVALENT); same store as 17, the value instead of the key, proof corrected to this snapshot. Mutant confirmed: run.py:492 'stage':'repository' -> 'stage':'' (mutant_view diff confirms). The value '' lives in rec['stage'] only from run.py:492 until the try's first statement run.py:512 `rec['stage']='ocr identity'` overwrites it (L510-511 comments); the single product read is run.py:666 failure.stage inside the finally (:648), reached only after the try entered, i.e. after :512. It is never in RUN.started.json (the fixed tuple at :495-499 omits 'stage'). Emptying it cannot reach failure.stage or the top-level 'stage' of RUN.json (:675) because every path through the try assigns stage first (unconditional :512, then :519/:549/:558/...). (Carried grounds cited the conditional :372/:385 as the dominating assignment; at this snapshot the dominating assignment is the unconditional :512.) EQUIVALENT. Measured SURVIVED.",
+   "consumers_checked": [
+    "aisef2/app/run.py:495-499: the STARTED write omits 'stage' (fixed tuple), so '' never reaches RUN.started.json",
+    "aisef2/app/run.py:666: the only product read of rec['stage'] (failure.stage); run.py:512 overwrites '' with 'ocr identity' before the finally",
+    "aisef2/app/run.py:675: RUN.json's top-level 'stage' is the value at finish, assigned along the path, not the literal ''",
+    "validation/v21/cli_integration/e2e_guest.py:615: compares the FINAL stage with 'confinement' only; the final value is assigned, so '' is unobservable",
+    "verify.py / usage.py / cli.py / release_rehearsal: read failure truthiness / named keys, never treat '' vs 'repository' differently"
+   ],
+   "exceptions_checked": [
+    "an exception between :492 and :512 (STARTED write :495-501, inits :502-508): leaves execute before the try -> no finally, no RUN.json; '' never seen",
+    "a path reaching the finally without assigning stage: none (:512 unconditional first statement)",
+    "an async KeyboardInterrupt in the zero-statement window :509->:512: only then failure.stage=='' instead of 'repository'; not injectable by any execute argument — EQUIVALENT up to that caveat",
+    "a downstream reader that treats '' differently from 'repository' (a stage filter, a resume point): none; e2e_guest.py:615 compares the final value with 'confinement' only"
+   ],
+   "refutation": "Ran tests.v2.test_v21_kills3_T13a (12 OK) on the mutant and the unmutated copy — PASS on both (failure.stage assertions read values set after :512). No kill. Carried line numbers/structure stale; corrected. EQUIVALENT confirmed.",
+   "note": "REVISED: EQUIVALENT unchanged; dominating assignment corrected to the unconditional run.py:512; cites refreshed."
+  },
+  {
+   "target": "aisef2/app/run.py::execute",
+   "index": 148,
+   "mutant": "L499 string '\\n' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "Mutant confirmed at the snapshot: run.py:495-499 writes RUN.started.json as json.dumps(...,indent=1,sort_keys=True) + '\\n'; the mutant drops the trailing '\\n' (+ '') (mutant_view diff confirms). Not EQUIVALENT: the file's bytes differ, so its manifest entry (run.py:434 via _content_sha, which hashes RAW bytes for every file but RUN.json — run.py:413-422) and therefore the run's anchor (anchor_of, :445-447) differ for the same logical inputs. But nothing compares that value with one from another execution: RUN.started.json holds started=clock() (:496 via the tuple), so its bytes/sha/anchor are never reproducible across executions regardless of the mutant; verify recomputes the manifest from the SAME on-disk bytes (verify.py:108 parse, :125 fresh=evidence_manifest(out), :129 stored!=fresh as dicts) so stored==fresh within the run; every code reader json.loads the file. Completeness is decided by parse (one write then flush+fsync), not by a trailing newline. Measured SURVIVED.",
+   "consumers_checked": [
+    "aisef2/app/run.py:413-422 _content_sha: canonicalises ONLY RUN.json; RUN.started.json is hashed as RAW bytes -> its manifest sha (and the anchor) change with the trailing byte",
+    "aisef2/app/run.py:437-447 anchor_in/anchor_of: anchor = sha256 of the canonical compact sorted JSON of the PARSED manifest; verify.py:108,:123,:125,:129 recomputes from the same bytes and compares as dicts -> stored==fresh in-run",
+    "aisef2/app/lineage.py predecessor_of and bundle_cli.py continue_from: json.loads(read_text) then .get(...) — parse, not bytes/newline",
+    "run.py:483 ((predecessor/STARTED) via is_file), run.sh and test_v21_continue_integrity: existence only",
+    "validation/v21/cli_integration/e2e_guest.py:492,:555: a scripted session reads RUN.started.json as a canary and the control compares the client-reported sha256 with sha((s.out/'RUN.started.json').read_bytes()) of the SAME file in the SAME run (equality with itself, not across executions); :868-891 lists anchors/journal sha as volatile — and e2e_guest needs the real client, so it is not a mutation-campaign kill test",
+    "docs ANCHOR-THREAT-MODEL/ADR-V2.1/USAGE-2.1/REPORT describe the file's role; none states a byte format; git ls-files: no RUN.started.json committed"
+   ],
+   "exceptions_checked": [
+    "a line-oriented reader (splitlines/strip/count b'\\n'/readline) of RUN.started.json: none (verify.py counts newlines of the JOURNAL, not this file)",
+    "a stored or documented digest of RUN.started.json, or of an anchor, that a re-execution must reproduce: none (the file holds a timestamp; never reproducible)",
+    "the single-line --anchor-out/read_anchor file, which DOES require a trailing newline (lineage.write_anchor/read_anchor): a different file, written elsewhere, not this line",
+    "an end-of-file lint over run directories: none in tests/ or hooks; no run directory committed"
+   ],
+   "refutation": "Ran the registered kill files that write+verify a run: tests.v2.test_v21_verify (8 OK) and tests.v2.test_v21_continue_integrity (24 OK) on the mutant and the unmutated copy — PASS on both (continue_integrity exercises --parent, which records anchor_in(predecessor); still VERIFIED). No kill. SURVIVED confirmed.",
+   "note": "CONFIRMED: grounds substantively hold; run.py cites refreshed from the carried :356-360/:502-508 to :495-499/:413-447; e2e_guest cites (:492,:555) already current."
+  },
+  {
+   "target": "aisef2/app/run.py::execute",
+   "index": 257,
+   "mutant": "L499 True->False",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "Mutant confirmed at the snapshot: run.py:495-499 writes RUN.started.json with sort_keys=True; the mutant sets sort_keys=False (mutant_view diff confirms), so the object serialises in construction/insertion order instead of alphabetical. Not EQUIVALENT: the bytes, this file's manifest entry (RAW-byte _content_sha, run.py:413-422) and the anchor differ for the same inputs. But every reader json.loads into a dict and indexes by key (lineage.predecessor_of, bundle_cli.continue_from); the sha is recomputed from the same bytes (verify.py:108,:125,:129); the order is a deterministic function of the code, and the file holds started=clock() so its bytes/anchor are never reproducible across executions anyway. All keys are str, so sort_keys=True cannot be what raises. Measured SURVIVED.",
+   "consumers_checked": [
+    "aisef2/app/run.py:413-422 _content_sha (RAW bytes for RUN.started.json) / :437-447 anchor: order change moves the file's sha and the anchor, but both are recomputed in-run from the same bytes",
+    "aisef2/app/verify.py:108,:123,:125,:129: json.loads, anchor_of(parsed), stored!=fresh as dicts -> order-blind within the run",
+    "aisef2/app/lineage.py predecessor_of / bundle_cli.py continue_from: json.loads then .get(...) — order-independent",
+    "validation/v21/cli_integration/e2e_guest.py:492,:555: self-comparison of the file's sha within the same run (not across executions); :868-891 anchors volatile; needs the real client (not a campaign kill test)",
+    "docs: none states a byte/key order; git ls-files: no RUN.started.json committed"
+   ],
+   "exceptions_checked": [
+    "a cross-release or cross-run comparison of the file's bytes or of an anchor: none (the file holds a timestamp -> never reproducible)",
+    "an order-dependent reader (first key, zip of keys, text diff): none found",
+    "sort_keys=True raising on mixed key types where False would not: every key is a str",
+    "the nested 'continues' dict later extended with claim/account (run.py:521,:527): the file is written at :495-501, before those additions; the mutant does not touch the in-memory dict"
+   ],
+   "refutation": "Ran tests.v2.test_v21_verify (8 OK) and tests.v2.test_v21_continue_integrity (24 OK) on the mutant and the unmutated copy — PASS on both. No kill. SURVIVED confirmed.",
+   "note": "CONFIRMED: grounds hold; run.py cites refreshed to :495-499/:413-447; verify cites to :108-129."
+  },
+  {
+   "target": "aisef2/app/run.py::execute",
+   "index": 296,
+   "mutant": "L677 string '\\n' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "Mutant confirmed at the snapshot: run.py:677 (in the finally) writes EVIDENCE.json (MANIFEST) as json.dumps(evidence_manifest(out),indent=1,sort_keys=True) + '\\n'; the mutant drops the trailing '\\n' (mutant_view diff confirms). The anchor is UNCHANGED: anchor_of (run.py:445-447) hashes the canonical compact sorted JSON of the PARSED manifest, and anchor_in (:437-442) / verify (verify.py:108,:123) json.loads the file first. The file is not in its own manifest (run.py:425-434 lists RUN.json, RUN.started.json, journals, sessions, preflight, review-findings, diagnostics — not EVIDENCE.json), so no digest of its bytes exists anywhere. The doc line 'Anchor = sha256 of EVIDENCE.json' (TRACEABILITY.md:926) is already untrue of the original (the file is indent=1 + newline; the anchor is of the compact canonical form). Measured SURVIVED.",
+   "consumers_checked": [
+    "aisef2/app/run.py:437-447 anchor_in/anchor_of: json.loads the file then hashes the canonical compact sorted parsed manifest — byte format of EVIDENCE.json is irrelevant to the anchor",
+    "aisef2/app/verify.py:108 json.loads(MANIFEST); :123 anchor_of(stored); :125 fresh=evidence_manifest(out); :129 stored!=fresh as dicts; the file is not in its own manifest (run.py:425-434)",
+    "tests that write the manifest compact/unsorted/no-newline and still expect VERIFIED with the same anchor: test_app_units, test_s2_kills, test_v21_kills3_A22/R01, test_v21_defects_verify, test_v21_defects_lineageusage (prove the anchor is byte-format-independent)",
+    "validation/v21/cli_integration/e2e_guest.py:714 rebind(): re-writes EVIDENCE.json with json.dumps(R.evidence_manifest(d),indent=1,sort_keys=True)+'\\n' in a COPY and verifies — the anchor is of the canonical form, so any byte format gives the same anchor; needs the real client (not a campaign kill test)",
+    "git ls-files: no EVIDENCE.json committed; grep: json readers/writers only"
+   ],
+   "exceptions_checked": [
+    "a script or doc hashing the file's bytes as the anchor (sha256sum EVIDENCE.json): none, and it would already differ from the true anchor in the original",
+    "the --anchor-out file (write_anchor/read_anchor demand one 64-hex line + newline): a different file, not this line",
+    "a line-oriented reader of EVIDENCE.json: none",
+    "a committed or linted copy of a run's EVIDENCE.json: none (docs/v2.1/evidence/*.out hold printed anchors, not the file)"
+   ],
+   "refutation": "Ran tests.v2.test_v21_verify (8 OK) and tests.v2.test_v21_continue_integrity (24 OK) on the mutant and the unmutated copy — PASS on both. No kill. SURVIVED confirmed.",
+   "note": "CONFIRMED: grounds hold; the carried EVIDENCE write cite :508 is refreshed to run.py:677; e2e_guest cite :714 already current."
+  },
+  {
+   "target": "aisef2/app/run.py::execute",
+   "index": 345,
+   "mutant": "L677 True->False",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "Mutant confirmed at the snapshot: run.py:677 writes EVIDENCE.json with sort_keys=True; the mutant sets sort_keys=False (mutant_view diff confirms), so the manifest serialises in evidence_manifest's construction order (top level 'format','files'; files as RUN.json, RUN.started.json, sorted journals, sessions, preflight, review-findings, diagnostics — run.py:425-434) instead of alphabetical. The bytes differ; the anchor does NOT: anchor_of canonicalises the parsed manifest with sort_keys=True + compact separators (run.py:445-447), and verify compares stored!=fresh as dicts and sorts the names it lists (verify.py:129-131). The file is not in its own manifest. Measured SURVIVED.",
+   "consumers_checked": [
+    "aisef2/app/run.py:445-447 anchor_of: sort_keys=True + compact on the PARSED manifest -> the on-disk key order does not affect the anchor",
+    "aisef2/app/verify.py:108,:123,:125,:129-131: json.loads; stored!=fresh as dicts; the changed-names list is sorted; the file is not in its own manifest",
+    "tests that write the manifest unsorted and still expect VERIFIED: test_app_units, test_s2_kills, test_v21_kills3_A22/R01, test_v21_defects_verify, test_v21_defects_lineageusage",
+    "validation/v21/cli_integration/e2e_guest.py:714: re-writes the manifest sort_keys=True in a copy and verifies; anchor is canonical so order-blind; needs the real client",
+    "git ls-files: no EVIDENCE.json committed; readers json.loads"
+   ],
+   "exceptions_checked": [
+    "an order-dependent reader of 'files' (first entry, zip with another list): none; verify iterates a set union and sorted lists",
+    "a stored anchor a re-execution must reproduce: none, and the anchor does not depend on order anyway",
+    "a hash of the file's bytes: none, and it would already differ from the anchor in the original",
+    "a different Python's dict order changing what is written: the order is insertion order from sorted globs (run.py:425-434), deterministic"
+   ],
+   "refutation": "Ran tests.v2.test_v21_verify (8 OK) and tests.v2.test_v21_continue_integrity (24 OK) on the mutant and the unmutated copy — PASS on both. No kill. SURVIVED confirmed.",
+   "note": "CONFIRMED: grounds hold; the EVIDENCE write cite :508 refreshed to run.py:677; verify cites to :129-131."
+  }
+ ],
+ "notes": "SKEPTIC copy b, snapshot 4ec961e (run.py sha256 f17b8de373f61634...). 11 entries verified: 5 NEW survivors (251,253,254,263,358) + 6 CARRIED/covered (17,45,148,257,296,345). All 11 mutants reproduced at the stated positions via mutant_view and all measured SURVIVED. Measurement pinned (no code/test changed): built a COPY of each mutant with validation.v2.mutation.mutants()[index] (desc asserted equal), ran Python 3.14.7, nice -n 19, PATH stripped of every opencode dir, HOME=TMPDIR under the copy. Baseline on the unmutated copy: T13a 12 OK, pw_lineage_unread 39 OK (0 skipped, euid 501 so @POSIX_USER ran), x_lineage_gone 29 OK. Mutant runs (all OK = PASS, i.e. no kill): 251 T13a+pw; 253/254 pw+T13a; 263/358 x_lineage_gone+pw; 17/45 T13a (failure.stage assertions pass -> EQUIVALENT); 148/257/296/345 verify (8)+continue_integrity (24). VERDICTS: 251,253,254,263,358 CONFIRMED (AUDITED); 148,257,296,345 CONFIRMED (AUDITED); 17,45 REVISED (EQUIVALENT conclusion unchanged, but the carried dominance proof is corrected — at this snapshot the initial rec['stage'] is overwritten by the UNCONDITIONAL run.py:512 `rec['stage']='ocr identity'`, the first statement of the try, not the carried :372/:385 conditional claim/repository). owed_tests EMPTY: no REFUTED. The one parity gap (358: the unaccounted sibling L547 has a told-apart test, T13a:333-350 with len==2, the unread join L542 does not) is NOT owed — the operator's restore locations come from lineage.unread_runs at run.py:536, independent of the L542 join. The carried entries' grounds cite stale line numbers (old base ~run.py:346-508); all refreshed to this snapshot above. No unregistered kill found; every SURVIVED is real (mutant PASS), not a runner artifact."
+}

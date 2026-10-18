@@ -1,0 +1,195 @@
+{
+ "batch": "B05-seal",
+ "target": "aisef2/app/bundle_cli.py::seal",
+ "new": [
+  {
+   "target": "aisef2/app/bundle_cli.py::seal",
+   "index": 7,
+   "mutant": "L510 tuple() -> list()",
+   "worker": "c3-w4"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::seal",
+   "index": 121,
+   "mutant": "L572 tuple() -> list()",
+   "worker": "c3-w4"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::seal",
+   "index": 128,
+   "mutant": "L597 dict entry 1 dropped",
+   "worker": "c3-w4"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::seal",
+   "index": 130,
+   "mutant": "L597 dict entry 3 dropped",
+   "worker": "c3-w4"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::seal",
+   "index": 150,
+   "mutant": "L597 string 'requirement' emptied",
+   "worker": "c3-w4"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::seal",
+   "index": 152,
+   "mutant": "L598 string 'approved_at' emptied",
+   "worker": "c3-w4"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::seal",
+   "index": 155,
+   "mutant": "L541 tuple() -> list()",
+   "worker": "c3-w4"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::seal",
+   "index": 160,
+   "mutant": "L567 tuple() -> list()",
+   "worker": "c3-w4"
+  }
+ ],
+ "covered": [
+  {
+   "target": "aisef2/app/bundle_cli.py::seal",
+   "index": 117,
+   "mutant": "L568 element 0 dropped",
+   "worker": "c3-w4",
+   "class": "EQUIVALENT",
+   "group": "A02",
+   "grounds": "Conclusion holds (EQUIVALENT by dominance); the callers statement of the carried consumers is out of date. The mutant drops KeyError from `except (KeyError, TypeError, ValueError)` of the criterion try (bundle_cli.py:229-230). Own read of every operation of the try body :226-228 `ObligationRole(cr['role'])` and `PlanObligation(cr['id'], _mint(contract, ref).id, sid, role, EXPECTED_AT_PARENT[role], tuple(cr['depends_on']), cr['why'])`: (a) cr[...] keys: the exact key set is verified by `_closed(cr, CRITERION_KEYS, where)` at :218, outside the try (_closed :165-168); (b) ObligationRole is a plain Enum (arch/enums.py:62-65; no _missing_/__new__/metaclass in aisef2/): Enum.__new__ catches the value map's own KeyError and ends in ValueError (an unhashable value: TypeError caught, linear search, ValueError); (c) EXPECTED_AT_PARENT (plan/obligation.py:76-78) holds all three members and `role` is one; (d) _mint (:138-147) -> expectation_for (product/compiler.py:51-56, identity tests, CompileError) and ProductProofSpec.create (product/spec.py:40-58: sorted()/freeze() over the mapping's own keys, then json.dumps/encode: ValueError) look nothing up by a key that comes from the document; (e) PlanObligation.__post_init__ (obligation.py:39-51) only does getattr/strip/isinstance/tuple; `facts[cr['id']]` (:231) is outside the try. My own differential fuzz (not the carried battery): 30,000 documents (seeds 20261014, 7, 99 of 8,000 each and 5 of 6,000; one to three random edits of calc-3-stories' authoring document: replace by a pool of None/bool/numbers/nan/inf/surrogate/long/containers and the document's own strings, delete, add, duplicate, swap, wrap; ~41% sealed, ~55% BundleError, ~3% raw TypeError/ValueError outside the try): outcomes (result | exception class + message) of the unmutated seal and of [102] are identical in all 30,000, and the original raised the criterion handler's '$.stories.S.criteria[n]: KeyError ...' in none. CORRECTION: the carried consumers say the callers of seal 'all use the returned bundle/report or assertIn a path, none a message tail'; at the snapshot test_v21_kills3_T02a.py:309-345 (Pins seal [103, 104, 148]) asserts this very handler's output - the criterion path as an identifier of its own and the cause class 'TypeError' / 'ValueError' / 'ContractError' - which the mutant leaves intact (it removes only KeyError). In-process sweep with the mutant bound over the module (not only the kill set): the light modules (bundle_tools, identity, identity_bytes, review, experiment, context_pack, defects_*, kills_bundle_cli, kills3 A00-A24/R03/R04/T00a/T00b/T02a-T04a/T08a/T14a/T15a/T24a, tests/test_v21_bundle_dispatch): 31 modules, 326 tests, 0 failures, 0 errors.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:514-583 main (seal at :547-552; BundleError -> 'refused: <msg>' on stderr, exit 2 :576-578; any other KeyError/TypeError/ValueError -> :579-581 'refused: <Class>: <msg>', exit 2)",
+    "tests/v2/test_v21_kills3_T02a.py:309-345 (the criterion handler: path + cause class for TypeError/ValueError/ContractError, exit 2, nothing written) and :263-305 (the contract handler L206-207, a different `except`); T04a, A02, bundle_tools, T00a, continue_usage/integrity, test_v21_experiment: use the returned bundle/report or assert refusals' identifying words",
+    "aisef2/plan/obligation.py:39-51, 76-78; aisef2/arch/enums.py:62-65; aisef2/product/compiler.py:51-56; aisef2/product/spec.py:40-58; aisef2/product/contract.py:32-44",
+    "a KeyError that escaped seal would be caught by main :579-581 and exit 2 as well: only the message prefix would differ, and the branch is dead"
+   ],
+   "exceptions_checked": [
+    "a fourth ObligationRole member without an EXPECTED_AT_PARENT row: makes the branch live, but is a change to a frozen vocabulary (arch/enums.py header; tests/v2/test_migration_table_repo.py:43-44 pins the three rows), not an input of seal",
+    "a Mapping subclass whose __getitem__ raises KeyError for a key it listed: not JSON-shaped; main reads the document with json (bundle_cli._read) and the schema describes JSON",
+    "role values that are unhashable or odd ([], {}, [[]], {'a':1}, nan, inf, bytes, object, 10**30): all end ValueError/TypeError (fuzz pool)",
+    "_mint reading something keyed by document text: it reads attributes of a BehaviorContract already validated at :201-205 and ProbeRef from refs.get(kind) at :222 (outside the try)",
+    "round 3 changed no module in this path (plan/, product/, arch/, probe/ are byte-identical since c4c1720)"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "remapped_from": {
+    "index": 102,
+    "mutant": "L229 element 0 dropped",
+    "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 102,
+     "mutant": "L217 element 0 dropped",
+     "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+    },
+    "chain": [
+     {
+      "index": 102,
+      "mutant": "L217 element 0 dropped",
+      "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+     },
+     {
+      "index": 102,
+      "mutant": "L229 element 0 dropped",
+      "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::seal",
+   "index": 133,
+   "mutant": "L524 string ')' emptied",
+   "worker": "c3-w4",
+   "class": "AUDITED",
+   "group": "punctuation closing a quoted diagnostic at the end of a message nobody parses",
+   "grounds": "L185 is raised outside every try and never re-wrapped, so the `)` is the last character of the line main prints (L576-578). Re-measured at 289885e: non-git dir `<T>: not a git repository with a commit (fatal: not a git repository (or any of the parent directories): .git)` / mutant without the final `)`; missing dir `(fatal: cannot change to '<T>/nope': No such file or directory)`; git init without a commit `(fatal: Needed a single revision)`; a repository with a non-inert configuration key (B4, workspace.py:64-70): `(refused: the repository configuration at <H>/r names core.hookspath (n)` \u2014 the [:200] cut falls inside `(not inert)` and the outer `)` follows it. In every case the mutant equals the original minus the last character. What the operator needs is intact: the repository path, the cause, and git's own stderr excerpt; the excerpt is a quotation of git, so an unclosed bracket changes no word, and nothing follows it. T02a asserts the repo path stands alone and that `why.stderr.strip()[:200]` is in the message (T02a:447-459) \u2014 the git reason, not the bracket.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:576-578 main (prints 'refused: ' + message, exit 2)",
+    "git grep 'not a git repository with a commit' over the tree (excl. .git; closure-evidence holds only mutation records): the raise site only; aisef2/probe/file_artifact.py:559 matches b'not a git repository' in the stderr of its OWN git call, not in this message",
+    "aisef2/orchestrate/workspace.py:64-70 (git(): the synthesised stderr for a non-inert configuration, unchanged by round 3)",
+    "README.md:83, docs/v2/USAGE.md:79: promise only exit status 2 ('an input that does not hold')",
+    "tests/v2/test_v21_kills3_T02a.py:447-459 `RepositoryRefusals` (this refusal: path + git's reason); tests/v2/test_v21_bundle_tools.py:155-159 asserts the L182 'HEAD' refusal, another line"
+   ],
+   "exceptions_checked": [
+    "the excerpt truncated at 200 characters: the quote ends mid-word with or without `)`; the cut is visible from the word",
+    "workspace.git's synthesised stderr (L69-70) ends in `(not inert)`; under the mutant the line has one `(` more than `)` \u2014 it still names the same keys",
+    "a reader that splits stderr on `)` or matches the tail: none found"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "remapped_from": {
+    "index": 113,
+    "mutant": "L185 string ')' emptied",
+    "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 113,
+     "mutant": "L173 string ')' emptied",
+     "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+    },
+    "chain": [
+     {
+      "index": 113,
+      "mutant": "L173 string ')' emptied",
+      "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+     },
+     {
+      "index": 113,
+      "mutant": "L185 string ')' emptied",
+      "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::seal",
+   "index": 157,
+   "mutant": "L560 string ' is not a contract of the document' emptied",
+   "worker": "c3-w4",
+   "class": "AUDITED",
+   "group": "the lost text is the tail of a refusal whose locator and offending value are intact and whose cause is fixed by its single raise site",
+   "grounds": "Grounds restated by the reviewer (the implementer's 'only assertion that distinguishes it is the clause's wording' is circular, as the verifier said). (1) The locator '<criterion path>.contract' is raised from exactly one site, L209 (grep of bundle_cli.py for '.contract' and of aisef2/ for 'criteria['); the other refusals about the same criterion have other locators ('<path>' alone: _closed L206, L212, L218). So path + offending value already determine the cause class: nothing the lost phrase says is not said by the path 'contract' field refused with this id. (2) 'of the document' states the lookup domain; there is one (by_id from this document's `contracts`, L196); the approvals of --keep-approvals-from are read at L227, after this refusal. (3) The offending id is repr-quoted, so case and stray whitespace show. Residual, stated and left to the owner: the line is then '<path>: <'quoted'>' with no reason words, and the same function's L165 prints '$.format: <the REQUIRED value>' in the same shape, so a reader who does not know the tool can take the quote for the required value. No code or document reads or promises the text; the only test that could kill the mutant is a phrase-level assertion on the reason clause, which the owner's rule forbids. Not killed, not equivalent.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py main :504-543 (seal at :509-514; BundleError -> 'refused: <msg>' on stderr, exit 2; any other KeyError/TypeError/ValueError -> :541 'refused: <Class>: <msg>', exit 2)",
+    "grep of every *.py under aisef2/ validation/ tests/ aisef/ for seal( : callers are bundle_cli.main and the tests test_v21_bundle_tools, test_v21_continue_integrity, test_v21_continue_usage, test_v21_experiment (all use the returned bundle/report or assertIn a path, none a message tail)",
+    "tests/v2/test_v21_bundle_tools.py::Refusals.test_a_criterion_naming_an_absent_contract_or_a_closed_key_is_refused_with_its_path (:143-153) asserts the path '$.stories.S1.criteria[0].contract' only (not even the id)",
+    "grep -r of the whole tree for 'is not a contract of the document': the raise site and the campaign-2 check.out survivor list only; docs/v2.1/bundle-authoring.schema.json says the tool decides and quotes no message"
+   ],
+   "exceptions_checked": [
+    "a second list the id could be confused with (verifier's point 2): none, see (2)",
+    "id differing from a contract id by case or whitespace: repr keeps both visible",
+    "polarity ambiguity with L165 (above): considered; needs a reader who does not know the tool, and no machine reads it",
+    "a consumer matching the phrase: none (greps above)"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "remapped_from": {
+    "index": 133,
+    "mutant": "L221 string ' is not a contract of the document' emptied",
+    "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 133,
+     "mutant": "L209 string ' is not a contract of the document' emptied",
+     "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+    },
+    "chain": [
+     {
+      "index": 133,
+      "mutant": "L209 string ' is not a contract of the document' emptied",
+      "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+     },
+     {
+      "index": 133,
+      "mutant": "L221 string ' is not a contract of the document' emptied",
+      "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  }
+ ]
+}

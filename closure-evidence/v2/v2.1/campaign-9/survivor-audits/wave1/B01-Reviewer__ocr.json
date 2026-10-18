@@ -1,0 +1,357 @@
+{
+ "batch": "B01-Reviewer__ocr",
+ "target": "aisef2/app/adapters.py::Reviewer._ocr",
+ "new": [
+  {
+   "target": "aisef2/app/adapters.py::Reviewer._ocr",
+   "index": 93,
+   "mutant": "L256 dict entry 2 dropped",
+   "worker": "c3-w2"
+  },
+  {
+   "target": "aisef2/app/adapters.py::Reviewer._ocr",
+   "index": 126,
+   "mutant": "L272 sorted() -> list()",
+   "worker": "c3-w2"
+  }
+ ],
+ "covered": [
+  {
+   "target": "aisef2/app/adapters.py::Reviewer._ocr",
+   "index": 13,
+   "mutant": "L219 sorted() -> list()",
+   "worker": "c3-w2",
+   "class": "AUDITED",
+   "group": "ORDER: a list the record carries whose order no consumer reads",
+   "grounds": "`required` (adapters.py:197) goes to three places in code: review_ocr.coverage(output, ..., required=required, ...) (adapters.py:252-253), whose first statement is `required = sorted(set(required))` (review_ocr.py:80) - so `missing[:10]`, the excluded/absent lists and every reason (review_ocr.py:118-127) are derived from a copy sorted there and do not depend on the caller's order; review_ocr.findings(output, required) (adapters.py:261) which builds `set(required)` (review_ocr.py:144, membership for `in_scope`); and the session record (`\"required\": required`, adapters.py:250 -> self.sessions -> RUN.json `sessions`, run.py:488-497, only `text` stripped; EVIDENCE.json hashes RUN.json by its canonical JSON, run.py:278-301). The mutant yields git's own row order instead of the order of the decoded text. They coincide for every valid-UTF-8, CR-free path (tree order = full-path byte order = code-point order; measured). They differ where git's bytes and the decoded text disagree: an invalid UTF-8 byte (U+FFFD) and, new in this entry, a CR (the shared git helper's text mode turns it into LF). Then one list in RUN.json is ordered differently. Hence AUDITED, not EQUIVALENT. No code reads that order. The tests that read `s['required']` all compare to sorted(valid CR-free names) (a docstring even says 'required, sorted': test_v21_defects_ocr.py test_ordinary_rows_are_read_as_before), which git's own order satisfies, so they pass under the mutant.",
+   "consumers_checked": [
+    "aisef2/app/review_ocr.py:80 coverage() re-sorts its set copy; :118-127 reasons from that copy; :144 findings() builds set(required)",
+    "aisef2/app/adapters.py:250 (record), :252-253 (coverage call), :261 (findings call); no other use of `required` in the module (round 3's review()/preserve()/redacted() at :131-150 take the finding and the session's log name, not `required`)",
+    "aisef2/app/run.py:488-497 (RUN.json sessions: the dict minus `text`), :278-301 (_content_sha / evidence_manifest: digest of the written record); aisef2/app/verify.py never reads rec['sessions'] (git grep of \"sessions\" in aisef2: lineage.py:291/306 and usage.py:77 name the sessions DIRECTORY, verify.py:85 the budget's log directory)",
+    "validation/ readers of rec['sessions']: release_rehearsal.py:125-129 (len, story_id), release_smoke.py:220 (len), cli_integration/e2e_guest.py:422-478, :573-577, :650, :769, :784 (role, exit, turns, confinement, story_id), readback.py:25 and context_gap.py:65 (role): none reads `required`",
+    "tests that read s['required'] / row['required'] (value-pinned to sorted valid names, pass under the mutant): test_v21_defects_ocr.py:127-128,150,163; test_v21_defects_ocrz.py:90,98,104,110,118,124,142; test_v21_kills3_T10c.py:176,193,221; test_v21_kills3_A10.py:244; test_v21_kills3_T10d.py:163; test_v21_review_chain.py:387",
+    "docs/v2.1 incl. the round-3 B03-R3-*.md: sessions[].required is described nowhere (git grep 'sessions\\[\\]' in docs/v2.1: B03-R3-E2E.md:25,65 name sessions[].confinement, B03-R3-detail.md:39-40,126 sessions[].findings[])"
+   ],
+   "exceptions_checked": [
+    "an ordering option reaching git (diff.orderFile etc.): workspace.INERT_KEY has no diff.* key and the git environment drops GIT_DIFF_OPTS / GIT_EXTERNAL_DIFF (aisef2/orchestrate/workspace.py:34-45, unchanged since c4c1720); git(...) at :64-71 is the one call",
+    "invalid UTF-8 byte in a path under core.quotepath=false: git lists it by its byte, the helper decodes it to U+FFFD (workspace.py:71 errors=replace), so the decoded text orders differently from git's bytes ('app/\\x80.py' sorts before 'app/\u00e9.py' in git, after it as text). The mutant's list then differs from sorted(); no reader (below)",
+    "NEW (not in the earlier entry): a carriage return in a path. The helper reads stdout in text mode (workspace.py:71, universal newlines), so CR becomes LF ('app/a\\rb.py' reads as 'app/a\\nb.py'; the T10 tests name this defect: test_v21_defects_ocrz.py 'a name holding a carriage return'). git still lists the row by its 0x0D byte, so the mutant's order differs from sorted() for valid UTF-8 too. Measured on a scratch repo through aisef2.orchestrate.workspace.git and the adapter's own parsing (adapters.py:189-197): names {a\\nz, a\\rb, a\\x0bc, a\\tq, m}: mutant [a\\tq, a\\nz, a\\x0bc, a\\nb, m]; sorted() [a\\tq, a\\nb, a\\nz, a\\x0bc, m]. No reader depends on it; this does not change the class",
+    "names in git's order that are NOT in text order for valid, CR-free UTF-8: none (measured 19 tricky names - space, '-', '.', '_', uppercase, \u00e9, \u00e7/ dir, \u65e5\u672c, an astral emoji, U+2028, TAB, '!', '(', '~' - git order == sorted(); tree order compares a directory as 'name/', which is the full-path byte order, and UTF-8 byte order is code-point order)",
+    "a reader of the list in the new review-findings artifacts: preserve() writes the finding (verification, anchor), not the session record; findings carry `in_scope` (a bool) not the list (review_ocr.py:156)"
+   ],
+   "source_sha256": "1948ec85fb7c9c29b1e6f223bf69602f857837bf106c05008d15771528db1506",
+   "remapped_from": {
+    "index": 10,
+    "mutant": "L197 sorted() -> list()",
+    "source_sha256": "2ee59736532802d7287a6948c5eade35e75f0e65282eaf3327b18bb5d0339aa2",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 10,
+     "mutant": "L178 sorted() -> list()",
+     "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+    },
+    "chain": [
+     {
+      "index": 10,
+      "mutant": "L178 sorted() -> list()",
+      "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+     },
+     {
+      "index": 10,
+      "mutant": "L197 sorted() -> list()",
+      "source_sha256": "2ee59736532802d7287a6948c5eade35e75f0e65282eaf3327b18bb5d0339aa2",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  },
+  {
+   "target": "aisef2/app/adapters.py::Reviewer._ocr",
+   "index": 161,
+   "mutant": "L241 string 'ocr preview ' emptied",
+   "worker": "c3-w2",
+   "class": "AUDITED",
+   "group": "PROCESS-LABEL: the ProcessRange name of the preview and of the review process",
+   "grounds": "The label `ocr preview {story}` (adapters.py:219) is the ProcessRange name of the preview process. `name` is read in process_range.py only in five exception texts: :341 (already started), :359 (the target did not start), :445 (the anchor is reaped), :499 (not empty after ...: member command lines are listed, the preview's carries --preview), :522 (processes left the range). No code matches those texts; callers catch RangeError by class; the text reaches RUN.json story_errors as '<Class>: <text>' (run.py:473) and delivery() only counts the list. With this mutant the preview's text starts with the bare story id while the review's keeps 'ocr review <story>', so the two processes of a story stay distinguishable by label, and by the command lines of RangeNotEmpty/RangeEscaped.",
+   "consumers_checked": [
+    "aisef2/runtime/process_range.py:341, :359, :445, :499, :522: the only uses of `.name` (git grep '\\.name' in the module; the name is not given to the anchor, :343-353)",
+    "aisef2/app/adapters.py:303-315 (_bounded builds the ProcessRange directly; not a StoryScope resource, so no story/resource-* event carries it: story_scope.py takes `resource.name` of Resource objects)",
+    "aisef2/app/run.py:473 (story_errors: f'{type(e).__name__}: {e}'[:2000]); :242-256 delivery() counts them; aisef2/app/verify.py:183 (len only)",
+    "validation/v21/cli_integration/e2e_guest.py:655 (`error.split(':')[0]` = the class), :680 ('Range' in error), :690 ('RangeEscaped' in error); validation/qualification/release_acceptance.py:132, release_rehearsal.py:127 (pass the list on)",
+    "aisef2/orchestrate/security.py:42, aisef2/probe/*.py, aisef2/quality/test_execution.py:457 (catch RangeError by class)",
+    "git grep 'ocr preview' / 'ocr review' over aisef2, validation, scripts, tests, docs: adapters.py:219, :228 and a docstring of review_ocr.py:188 only"
+   ],
+   "exceptions_checked": [
+    "both labels lost at once: not one build (this mutant keeps 'ocr review S'; [159] keeps 'ocr preview S')",
+    "a registry or map keyed on the name: ProcessRange keeps none (its ledger holds stage/signal/at)",
+    "a RangeError at start (no command list): the story id stays; which of the two processes it was is told by preview.log vs ocr.log and by the stream existing only after the preview (adapters.py:224-226)",
+    "NEW in round 3: single-flight release (process_range.py:449-490) re-raises the same class with the same args to a waiting caller, so the label text is read by one more caller of the same exception, not by a new kind of reader; ProcessTableError (:60-65) is raised by _ps_table with the offending line, never a name",
+    "a consumer matching the prefix 'ocr ': none"
+   ],
+   "source_sha256": "1948ec85fb7c9c29b1e6f223bf69602f857837bf106c05008d15771528db1506",
+   "remapped_from": {
+    "index": 152,
+    "mutant": "L219 string 'ocr preview ' emptied",
+    "source_sha256": "2ee59736532802d7287a6948c5eade35e75f0e65282eaf3327b18bb5d0339aa2",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 144,
+     "mutant": "L200 string 'ocr preview ' emptied",
+     "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+    },
+    "chain": [
+     {
+      "index": 144,
+      "mutant": "L200 string 'ocr preview ' emptied",
+      "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+     },
+     {
+      "index": 152,
+      "mutant": "L219 string 'ocr preview ' emptied",
+      "source_sha256": "2ee59736532802d7287a6948c5eade35e75f0e65282eaf3327b18bb5d0339aa2",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  },
+  {
+   "target": "aisef2/app/adapters.py::Reviewer._ocr",
+   "index": 164,
+   "mutant": "L246 True->False",
+   "worker": "c3-w2",
+   "class": "AUDITED",
+   "group": "MKDIR-PARENTS: a directory whose parent the preceding statement has just created",
+   "grounds": "`log` is `self.logs / f'{story}.reviewer.{attempt}.jsonl'` (adapters.py:198), so `log.parent` is `self.logs` for every story id without a path separator, and its parent `self.logs.parent` has just been created by `(work / 'home').mkdir(parents=True)` (adapters.py:204-205, work = self.logs.parent / 'review' / ...). At L224 the single-level mkdir therefore cannot find a missing parent (run.py:433 gives logs = out/'sessions', whose parent `out` exists: out/work was made at run.py:430); exist_ok is unchanged. The two differ only for a story id holding a separator ('a/b': log.parent = sessions/a with sessions/ absent), which never reaches _ocr: story_runner.py:179 acquires `ws.scratch(f'scratch-{story_id}')` first, TemporaryDirectory(prefix='scratch-a/b-', dir=root) cannot create root/scratch-a/b-XXXX (no root/scratch-a), workspace.py:123-128 turns the OSError into ResourceUnavailable and no adapter is called.",
+   "consumers_checked": [
+    "aisef2/app/adapters.py:198, :204-205, :224",
+    "aisef2/app/run.py:430-433, :445 (the only construction of Reviewer; logs = out/'sessions')",
+    "aisef2/orchestrate/story_runner.py:179 (scratch before any adapter call; unchanged since c4c1720), :285 (review())",
+    "aisef2/orchestrate/workspace.py:123-128 (scratch: OSError -> ResourceUnavailable; unchanged)",
+    "aisef2/app/bundle.py:80-98 (no story-id format check: this guard is what excludes separators)"
+   ],
+   "exceptions_checked": [
+    "a story id with a path separator reaching _ocr ('a/b', 'a/'): refused at story_runner.py:179 first; an id without one (including '..' and, on POSIX, a backslash) has log.parent == self.logs, the case this entry proves",
+    "self.logs.parent missing: created at :205 with parents=True before :224",
+    "self.logs missing (the reviewer is the run's first session): the single-level mkdir creates it under the existing `out`",
+    "a direct call of _ocr with such an id (a test, not a run): the original creates sessions/a, the mutant raises; no caller does this (git grep 'Reviewer(' / '._ocr(' over aisef2, validation, scripts: run.py:445 and adapters.py:129 only)",
+    "NEW in round 3: review_verify.preserve() mkdirs <out>/review-findings with exist_ok only (review_verify.py:429, after this line) - a different directory, after this line"
+   ],
+   "source_sha256": "1948ec85fb7c9c29b1e6f223bf69602f857837bf106c05008d15771528db1506",
+   "remapped_from": {
+    "index": 155,
+    "mutant": "L224 True->False",
+    "source_sha256": "2ee59736532802d7287a6948c5eade35e75f0e65282eaf3327b18bb5d0339aa2",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 146,
+     "mutant": "L202 True->False",
+     "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+    },
+    "chain": [
+     {
+      "index": 146,
+      "mutant": "L202 True->False",
+      "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+     },
+     {
+      "index": 155,
+      "mutant": "L224 True->False",
+      "source_sha256": "2ee59736532802d7287a6948c5eade35e75f0e65282eaf3327b18bb5d0339aa2",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  },
+  {
+   "target": "aisef2/app/adapters.py::Reviewer._ocr",
+   "index": 168,
+   "mutant": "L250 string 'ocr review ' emptied",
+   "worker": "c3-w2",
+   "class": "AUDITED",
+   "group": "PROCESS-LABEL: the ProcessRange name of the preview and of the review process",
+   "grounds": "As [3] for the review process: `ocr review {story}` (adapters.py:228) becomes `{story}` in the same five exception texts (process_range.py:341, :359, :445, :499, :522); nothing parses them, no journal event carries the name, the preview keeps 'ocr preview <story>', and RangeNotEmpty/RangeEscaped still list each member's command line (the review's has no --preview).",
+   "consumers_checked": [
+    "aisef2/runtime/process_range.py:341, :359, :445, :499, :522: the only uses of `.name` (git grep '\\.name' in the module; the name is not given to the anchor, :343-353)",
+    "aisef2/app/adapters.py:303-315 (_bounded builds the ProcessRange directly; not a StoryScope resource, so no story/resource-* event carries it: story_scope.py takes `resource.name` of Resource objects)",
+    "aisef2/app/run.py:473 (story_errors: f'{type(e).__name__}: {e}'[:2000]); :242-256 delivery() counts them; aisef2/app/verify.py:183 (len only)",
+    "validation/v21/cli_integration/e2e_guest.py:655 (`error.split(':')[0]` = the class), :680 ('Range' in error), :690 ('RangeEscaped' in error); validation/qualification/release_acceptance.py:132, release_rehearsal.py:127 (pass the list on)",
+    "aisef2/orchestrate/security.py:42, aisef2/probe/*.py, aisef2/quality/test_execution.py:457 (catch RangeError by class)",
+    "git grep 'ocr preview' / 'ocr review' over aisef2, validation, scripts, tests, docs: adapters.py:219, :228 and a docstring of review_ocr.py:188 only"
+   ],
+   "exceptions_checked": [
+    "the two labels both lost: this mutant keeps the preview's",
+    "a stage ambiguity in a RangeError at start: ocr.log is opened 'x' per process (adapters.py:306, :227) and exists only after the preview finished; the stream exists from :225",
+    "a consumer matching the prefix 'ocr ': none (git grep \"'ocr \" / startswith over aisef2, validation)",
+    "NEW in round 3: single-flight release re-raises the same exception text to waiting callers (process_range.py:449-490); not a reader of the label"
+   ],
+   "source_sha256": "1948ec85fb7c9c29b1e6f223bf69602f857837bf106c05008d15771528db1506",
+   "remapped_from": {
+    "index": 159,
+    "mutant": "L228 string 'ocr review ' emptied",
+    "source_sha256": "2ee59736532802d7287a6948c5eade35e75f0e65282eaf3327b18bb5d0339aa2",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 150,
+     "mutant": "L206 string 'ocr review ' emptied",
+     "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+    },
+    "chain": [
+     {
+      "index": 150,
+      "mutant": "L206 string 'ocr review ' emptied",
+      "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+     },
+     {
+      "index": 159,
+      "mutant": "L228 string 'ocr review ' emptied",
+      "source_sha256": "2ee59736532802d7287a6948c5eade35e75f0e65282eaf3327b18bb5d0339aa2",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  },
+  {
+   "target": "aisef2/app/adapters.py::Reviewer._ocr",
+   "index": 175,
+   "mutant": "L256 string 'reasoning' emptied",
+   "worker": "c3-w2",
+   "class": "AUDITED",
+   "group": "REASONING: constant-0 token class every reader takes as int(tk.get('reasoning') or 0)",
+   "grounds": "As [1] with the constant 0 written under the key '' and `reasoning` absent: every reader asks for 'reasoning' by name and gets 0 (client.py:73, usage.py:64, release_smoke.py:291, c2_p9.py:425); none iterates the token object's keys, so '' is never seen ('' is a valid JSON key; json.loads accepts it). Same budget, usage account and --verify result; only the stream line's bytes differ.",
+   "consumers_checked": [
+    "aisef2/app/client.py:35-74, :87-102",
+    "aisef2/app/usage.py:47-71",
+    "aisef2/app/verify.py (usage through the same readers); aisef2/app/lineage.py:284-319",
+    "validation/qualification/release_smoke.py:281-297, c2_p9.py:398-427"
+   ],
+   "exceptions_checked": [
+    "a reader iterating tokens.items() or comparing the key set: none",
+    "client.redact on the line (client.py:180-192): replaces bytes of the secrets, independent of key names",
+    "the '' key shadowing another key: the object holds input, output, '', cache - no duplicate",
+    "json.dumps(sort_keys=True) with the '' key: sorts first, no error (all keys are str)"
+   ],
+   "source_sha256": "1948ec85fb7c9c29b1e6f223bf69602f857837bf106c05008d15771528db1506",
+   "remapped_from": {
+    "index": 166,
+    "mutant": "L234 string 'reasoning' emptied",
+    "source_sha256": "2ee59736532802d7287a6948c5eade35e75f0e65282eaf3327b18bb5d0339aa2",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 157,
+     "mutant": "L210 string 'reasoning' emptied",
+     "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+    },
+    "chain": [
+     {
+      "index": 157,
+      "mutant": "L210 string 'reasoning' emptied",
+      "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+     },
+     {
+      "index": 166,
+      "mutant": "L234 string 'reasoning' emptied",
+      "source_sha256": "2ee59736532802d7287a6948c5eade35e75f0e65282eaf3327b18bb5d0339aa2",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  },
+  {
+   "target": "aisef2/app/adapters.py::Reviewer._ocr",
+   "index": 276,
+   "mutant": "L286 string ')' emptied",
+   "worker": "c3-w2",
+   "class": "AUDITED",
+   "group": "DETAIL-PUNCT: punctuation of the coverage detail where every token stays intact and nothing follows it",
+   "grounds": "The mutant leaves the reasons group unclosed at the end of the string (adapters.py:261-262): the status and every reason stay intact and delimited ('; '), the 300-character cut is applied inside the parenthesis. Nothing is appended after it on any path that returns it: reasons exist iff the status is INDETERMINATE (review_ocr.py:134 COMPLETE iff no reasons; the early returns :84, :86 carry reasons); under fix-loop an INDETERMINATE review raises at adapters.py:259-260 (provider failures at :257-258 raise ProviderOutage) and never returns the detail; the returned detail then occurs only under advisory, where review_verify.blocks (review_verify.py:254-257) is false for every finding (it requires policy == 'fix-loop') and review_ocr.findings() sets blocking False (review_ocr.py:153), so Reviewer.review appends neither ', confirmed=N' nor (OCR path) ', parsed=...' (adapters.py:152-154). The detail is journaled as provider/result.detail as given (orchestrate/review.py:25, :40); T10d's own docstring names it the place that says why an advisory run committed on an incomplete review - it keeps every reason, apart, in order.",
+   "consumers_checked": [
+    "aisef2/app/adapters.py:152-154 (composition of the review's detail), :255-262",
+    "aisef2/app/review_verify.py:254-257 (blocks), aisef2/app/review_ocr.py:134, :153",
+    "aisef2/orchestrate/review.py:25, :40 (journaled as given)",
+    "aisef2/app/feedback.py:132-135 (the context pack reads only the DEVELOPER request's provider/result), :69-81 (retry feedback reads failure/observed, whose detail is 'review: <code>', story_runner.py:288, and the gate rows' statements)",
+    "aisef2/app/review_verify.py artifact_problems (reads gate/check rows only), aisef2/app/usage.py no_progress (failure/observed only); grep of 'provider/result' consumers: lineage.py:290 and repair/run_scope/sentinel read source_seqs, validation/v21/context_gap.py:106/:149 and e2e_guest.py:587 read the developer's result",
+    "tests/v2/test_v21_review_chain.py:368 and test_v21_kills_adapters.py:149-152, test_v21_kills3_A10.py:214, test_v21_kills3_T10d.py:196-217 (status as a word, reasons present in order and apart; none asserts the closing parenthesis; T10d asserts that a COMPLETE detail has no '(')"
+   ],
+   "exceptions_checked": [
+    "a suffix after the parenthesis: ', confirmed=N' needs fix-loop plus a returned INDETERMINATE, which is refused first (POLICIES holds exactly fix-loop and advisory); ', parsed=' is the model finder's",
+    "a reader tokenising the detail on parentheses: none",
+    "truncation at 300 characters swallowing the parenthesis: the cut precedes it",
+    "NEW in round 3: the artifacts (review-findings/*.json) and the statement carry findings, not this detail; NOT_PRESERVED (adapters.py:49-52) is raised from review(), a different string"
+   ],
+   "source_sha256": "1948ec85fb7c9c29b1e6f223bf69602f857837bf106c05008d15771528db1506",
+   "remapped_from": {
+    "index": 262,
+    "mutant": "L262 string ')' emptied",
+    "source_sha256": "2ee59736532802d7287a6948c5eade35e75f0e65282eaf3327b18bb5d0339aa2",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 254,
+     "mutant": "L238 string ')' emptied",
+     "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+    },
+    "chain": [
+     {
+      "index": 254,
+      "mutant": "L238 string ')' emptied",
+      "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+     },
+     {
+      "index": 262,
+      "mutant": "L262 string ')' emptied",
+      "source_sha256": "2ee59736532802d7287a6948c5eade35e75f0e65282eaf3327b18bb5d0339aa2",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  },
+  {
+   "target": "aisef2/app/adapters.py::Reviewer._ocr",
+   "index": 299,
+   "mutant": "L265 True->False",
+   "worker": "c3-w2",
+   "class": "AUDITED",
+   "group": "SORTKEYS: byte form of the stream's JSON lines",
+   "grounds": "Only the member order of the JSON objects written to the stream changes (adapters.py:242-243; the nested OCR documents keep OCR's order instead of sorted). Every reader parses each line with json.loads into a dict and reads named keys (client.events :35-49 -> client.read_session :52-74 and usage.session_tokens :47-65; c2_p9.py:417; release_smoke.py:289); none matches a line by prefix or key order (the only prefix test is line.startswith('{'), client.py:44, true for both). client.redact (client.py:180-192) replaces secret bytes in the raw file, a count independent of key order. EVIDENCE.json hashes the stream as written (run.py:278-301; only RUN.json is canonically re-serialised), so no digest is recomputed over another serialisation. sort_keys=True could only raise TypeError on a non-str key: the lines are literals plus json.loads output (str keys), so neither version can raise.",
+   "consumers_checked": [
+    "aisef2/app/client.py:35-74, :180-192",
+    "aisef2/app/usage.py:47-71",
+    "aisef2/app/run.py:278-301",
+    "aisef2/app/verify.py (events through the same readers; does not read review_ocr or the stream's documents), aisef2/app/lineage.py:284-319 (Budget.spend; stream NAMES at :306)",
+    "validation/qualification/c2_p9.py:398-427, release_smoke.py:281-297",
+    "tests/v2/test_v21_kills3_T10a.py:140-189 (json.loads each physical line; type/exit/document by name)",
+    "grep of ocr_preview / ocr_output / ocr_started over aisef2, validation, scripts, tests, docs: adapters.py and tests that parse"
+   ],
+   "exceptions_checked": [
+    "a reader matching a line by prefix such as startswith('{\"type\"'): none (client.py:44 tests '{' only)",
+    "a digest over a re-serialisation of the lines: none; review_verify.preserve names the stream by file name only (session=s['log'])",
+    "a secret split by key punctuation: a provider token holds none and redact works on the final bytes",
+    "NEW in round 3: client.events splits at LF only (client.py:43); the dumped lines contain no raw LF/U+2028 (ASCII-escaping json.dumps), key order does not move a record boundary"
+   ],
+   "source_sha256": "1948ec85fb7c9c29b1e6f223bf69602f857837bf106c05008d15771528db1506",
+   "remapped_from": {
+    "index": 285,
+    "mutant": "L243 True->False",
+    "source_sha256": "2ee59736532802d7287a6948c5eade35e75f0e65282eaf3327b18bb5d0339aa2",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 277,
+     "mutant": "L219 True->False",
+     "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+    },
+    "chain": [
+     {
+      "index": 277,
+      "mutant": "L219 True->False",
+      "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+     },
+     {
+      "index": 285,
+      "mutant": "L243 True->False",
+      "source_sha256": "2ee59736532802d7287a6948c5eade35e75f0e65282eaf3327b18bb5d0339aa2",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  }
+ ]
+}

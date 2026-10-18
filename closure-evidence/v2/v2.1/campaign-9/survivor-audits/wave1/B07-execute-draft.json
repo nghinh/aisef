@@ -1,0 +1,123 @@
+{
+ "batch": "B07-execute",
+ "entries": [
+  {
+   "target": "aisef2/app/run.py::execute",
+   "index": 251,
+   "mutant": "L484 string '--parent ' emptied",
+   "class": "AUDITED",
+   "group": "T13-refusal-identifier: the leading phrase of an operator-facing RunRefused ('--parent ', 'the lineage of ') is dropped; the refusal still names the predecessor path and the cause, no test/report/document pins the phrase, and the recorded failure stores type+stage only",
+   "grounds": "run.py:483-484: when the predecessor holds neither RUN.json nor RUN.started.json, execute raises RunRefused(f\"--parent {predecessor}: no run record there\"); the mutant makes it f\"{predecessor}: no run record there\". Not EQUIVALENT: for every triggering input the operator-facing text differs (the '--parent ' that says which flag the refusal is about is gone). But the path (predecessor, absolutised at :476) and the cause ('no run record there') remain, and the only surfacing is cli.py:99 printing `aisef run: refused: {e}` to stderr with exit 2 — nothing parses str(RunRefused). The recorded failure in RUN.json (the finally) carries type and stage, never the message text (tests/v2/test_v21_kills3_T13a.py:126 asserts failure.type=='RunRefused', :300 failure.stage). Measured SURVIVED (below).",
+   "consumers_checked": [
+    "aisef2/app/cli.py:98-99: catches RunRefused and prints `aisef run: refused: {e}` to stderr, exit 2 — the sole surfacing; it does not parse or split the message",
+    "tests/v2/test_v21_kills3_T13a.py:305-318 (test_a_directory_with_neither_record_is_refused_naming_it_before_anything_is_made): assertRegex(str(exc), re.escape(str(parent)) + r\".*no run record\") — checks the path and 'no run record', never the '--parent ' prefix; ran on the mutant: PASS (SURVIVED)",
+    "tests/v2/test_v21_pw_lineage_unread.py:421-424 and :426-434: assertIn('no run record there', err) / assertNotIn('no run record there', err) — the cause substring, never the prefix; ran on the mutant: PASS",
+    "the recorded failure: aisef2/app/run.py finally block stores rec['failure'] as type+stage (tests assert failure.type/.stage: test_v21_kills3_T13a.py:126,:300,:351; test_v21_x_lineage_gone.py:141), never the message string",
+    "grep 'no run record there' over aisef2, validation, tests, docs: only run.py:484 and the two test asserts above; no document fixes the wording",
+    "measurement: kill files tests.v2.test_v21_kills3_T13a (12 tests, OK) and tests.v2.test_v21_pw_lineage_unread (39 tests, 0 skipped, OK) both PASS on the mutant and on the unmutated tree (baseline) -> SURVIVED, matching campaign-9"
+   ],
+   "exceptions_checked": [
+    "a test asserting the message begins with '--parent ' or names the flag: none (grep assertIn/assertRegex '--parent ' over tests finds only CLI usage/help text in test_v21_kills_cli.py, not this message)",
+    "a document fixing the no-record refusal's wording: none (grep over docs/v2.1)",
+    "the recorded failure carrying the message text: no — RUN.json failure is type+stage only",
+    "a reader that parses which flag a refusal concerns: none"
+   ],
+   "source_sha256": "f17b8de373f61634ce4366c89be9aab570b0bef0a014ad2af4a26f29fbd7f201"
+  },
+  {
+   "target": "aisef2/app/run.py::execute",
+   "index": 253,
+   "mutant": "L486 string '--parent ' emptied",
+   "class": "AUDITED",
+   "group": "T13-refusal-identifier: the leading phrase of an operator-facing RunRefused ('--parent ', 'the lineage of ') is dropped; the refusal still names the predecessor path and the cause, no test/report/document pins the phrase, and the recorded failure stores type+stage only",
+   "grounds": "run.py:485-486: when lineage.is_file on the predecessor raises LineageRefused (a directory this process may not search), execute raises RunRefused(f\"--parent {predecessor}: {e}\"); the mutant makes it f\"{predecessor}: {e}\". {e} is lineage.is_file's LineageRefused text (lineage.py:479-480): f\"{path} cannot be looked at ({type}: ...): restore the permissions of the run directory\", where path = predecessor/'RUN.json'. Not EQUIVALENT: the operator text loses the '--parent ' flag identifier. But {e} itself repeats the predecessor path (it starts with predecessor/RUN.json) and carries the exception type, so the path and cause remain; cli.py:99 prints it, nothing parses it; the recorded failure is type+stage only. On 3.14 this path is still reached: lineage._look (lineage.py:458-466) does os.listdir which raises PermissionError -> LineageRefused regardless of 3.14's is_file-returns-False change. Measured SURVIVED (below).",
+   "consumers_checked": [
+    "aisef2/app/cli.py:98-99: prints `aisef run: refused: {e}` to stderr, exit 2 — sole surfacing, no parse",
+    "tests/v2/test_v21_pw_lineage_unread.py:410-417 (@POSIX_USER read-only 0o500) and :426-434 (@POSIX_USER unsearchable 0o000): assertRegex(err, r'^aisef run: refused: '), assertIn('PermissionError', err), assertNotIn('Traceback'/'no run record there', err) — they check the CLI prefix and the cause (from {e}), never execute's '--parent ' prefix; ran (0 skipped, euid 501) on the mutant: PASS",
+    "aisef2/app/lineage.py:474-482 is_file / :458-466 _look: the LineageRefused {e} embeds the path and the exception type — removing execute's own '--parent ' leaves both in the message",
+    "the recorded failure: type+stage only (not the message text)",
+    "grep 'cannot be looked at' / 'restore the permissions' over tests: only tests/v2/test_v21_defects_lineage2.py:147 (asserts lineage.account's 'recorded' flag, not this message)",
+    "measurement: kill files tests.v2.test_v21_pw_lineage_unread (39 tests, 0 skipped, OK) and tests.v2.test_v21_kills3_T13a (12 tests, OK) both PASS on the mutant and the unmutated tree -> SURVIVED"
+   ],
+   "exceptions_checked": [
+    "a test on the '--parent ' prefix of the LineageRefused wrap: none",
+    "the @POSIX_USER permission tests being skipped (which would mean L486 was never reached): no — 0 skips reported, euid is 501 (not root), and _look's os.listdir raises on 3.14 too",
+    "a document fixing this wording: none",
+    "a reader parsing str(RunRefused): none (cli.py:99 only prints)"
+   ],
+   "source_sha256": "f17b8de373f61634ce4366c89be9aab570b0bef0a014ad2af4a26f29fbd7f201"
+  },
+  {
+   "target": "aisef2/app/run.py::execute",
+   "index": 254,
+   "mutant": "L486 string ': ' emptied",
+   "class": "AUDITED",
+   "group": "T13-refusal-separator: a separator inside an operator-facing RunRefused (': ' between the flag-path and the embedded cause; '; ' between unread entries) is emptied; no consumer parses the message's internal structure and each piece is still present",
+   "grounds": "run.py:485-486: RunRefused(f\"--parent {predecessor}: {e}\") becomes f\"--parent {predecessor}{e}\" — the predecessor path abuts {e}, which itself begins with predecessor/'RUN.json' (lineage.py:479-480), so the operator reads '--parent /pred/pred/RUN.json cannot be looked at ...'. Not EQUIVALENT: the ': ' and the visual break between the flag-path and the cause are gone and the path reads doubled. But both the path and the cause ('PermissionError', 'restore the permissions') remain present; cli.py:99 only prints the string and nothing splits it on ': '. Measured SURVIVED (below).",
+   "consumers_checked": [
+    "aisef2/app/cli.py:98-99: prints the message, exit 2 — no split or parse on ': '",
+    "tests/v2/test_v21_pw_lineage_unread.py:410-417, :426-434 (@POSIX_USER): assert the CLI prefix and 'PermissionError'; the dropped ': ' is not checked; ran (0 skipped) on the mutant: PASS",
+    "tests/v2/test_v21_kills3_T13a.py (12 tests): the --parent admission/no-record paths; ran on the mutant: PASS",
+    "the recorded failure: type+stage only",
+    "grep over aisef2/validation/tests for a reader that splits a RunRefused message on ': ': none",
+    "measurement: tests.v2.test_v21_pw_lineage_unread (39, 0 skipped, OK) + tests.v2.test_v21_kills3_T13a (12, OK) PASS on mutant and unmutated tree -> SURVIVED"
+   ],
+   "exceptions_checked": [
+    "a test on the ': ' between the flag-path and the embedded cause: none",
+    "a reader that splits str(RunRefused) on ': ' to extract the path or the cause: none (cli.py:99 only prints)",
+    "the doubled predecessor path confusing a consumer: no consumer parses the message",
+    "a document fixing this wording: none"
+   ],
+   "source_sha256": "f17b8de373f61634ce4366c89be9aab570b0bef0a014ad2af4a26f29fbd7f201"
+  },
+  {
+   "target": "aisef2/app/run.py::execute",
+   "index": 263,
+   "mutant": "L530 string 'the lineage of ' emptied",
+   "class": "AUDITED",
+   "group": "T13-refusal-identifier: the leading phrase of an operator-facing RunRefused ('--parent ', 'the lineage of ') is dropped; the refusal still names the predecessor path and the cause, no test/report/document pins the phrase, and the recorded failure stores type+stage only",
+   "grounds": "run.py:529-542: when the inherited lineage account has an 'unread' part, execute raises the long RunRefused that opens f\"the lineage of {predecessor} has evidence that is there and cannot be read ...\"; the mutant opens f\"{predecessor} has evidence ...\". Not EQUIVALENT: the operator text loses the 'the lineage of ' opener. But {predecessor} and the whole body (cause, recovery instruction) remain. The message is surfaced only by cli.py:99; bundle_cli.py:961-964 builds its OWN run_parent_refused report string (different wording) and client.py:101 its own Budget-stop string, so neither inherits this message; the recorded failure is type+stage (x_lineage_gone:141 failure.stage=='claim'). The eight THE_REFUSAL needles the tests check (x_lineage_gone:68) do not include 'the lineage of'. Measured SURVIVED (below).",
+   "consumers_checked": [
+    "aisef2/app/cli.py:98-99: prints `aisef run: refused: {e}`, exit 2 — sole surfacing, no parse",
+    "tests/v2/test_v21_x_lineage_gone.py: THE_REFUSAL = ('cannot be read','not 0','Make it readable again','faithful copy','--accept-unaccounted does not cover it','without --parent','is gone','RUN.json records') (:68), asserted `for needle in THE_REFUSAL: assertIn(needle, text)` on the execute() refusal at :253-255 and :338-340 and on the CLI stderr at :299-304, plus assertIn(str(d)/str(self.first), text) — none is 'the lineage of'; all remain in the mutant; ran on the mutant: PASS",
+    "aisef2/app/bundle_cli.py:961-964: run_parent_refused is built independently ('... `aisef run --parent` starts no paid work (no flag accepts it) ...'), NOT from execute's L530; x_lineage_gone:312-315 asserts that bundle_cli string, not this one",
+    "aisef2/app/client.py:101: the Budget stop string ('the lineage\\'s evidence cannot be read, or is gone: ...') is its own; x_lineage_gone:297 asserts it, not L530",
+    "the recorded failure: type+stage only",
+    "grep 'the lineage of' over aisef2/validation/tests/docs: run.py:530 (this), run.py:545 (the unaccounted refusal — a different line/mutant), lineage.py:788 docstring; docs/v2.1/evidence/*.out:294 show the L545 unaccounted message, not L530",
+    "measurement: kill files tests.v2.test_v21_x_lineage_gone (29 tests, OK) and tests.v2.test_v21_pw_lineage_unread (39 tests, 0 skipped, OK) both PASS on the mutant and the unmutated tree -> SURVIVED"
+   ],
+   "exceptions_checked": [
+    "a test or document pinning the 'the lineage of ' opener of the unread refusal: none",
+    "the sibling L545 unaccounted refusal (which also opens 'the lineage of ' and whose text IS shown in docs/v2.1/evidence/*.out): a different line, not this mutant",
+    "a reader parsing the opener of str(RunRefused): none",
+    "bundle_cli/client reusing execute's message: no — each builds its own string"
+   ],
+   "source_sha256": "f17b8de373f61634ce4366c89be9aab570b0bef0a014ad2af4a26f29fbd7f201"
+  },
+  {
+   "target": "aisef2/app/run.py::execute",
+   "index": 358,
+   "mutant": "L542 string '; ' emptied",
+   "class": "AUDITED",
+   "group": "T13-refusal-separator: a separator inside an operator-facing RunRefused (': ' between the flag-path and the embedded cause; '; ' between unread entries) is emptied; no consumer parses the message's internal structure and each piece is still present",
+   "grounds": "run.py:542: the unread refusal ends with f\"{'; '.join(inherited['unread'])[:1500]}\"; the mutant makes it f\"{''.join(inherited['unread'])[:1500]}\" — the per-run unread descriptions are concatenated with no separator. Not EQUIVALENT in general: with two or more unread runs the operator-facing descriptions run together (observably different text). But each description is still present as a substring, and the operator's actionable restore locations come from lineage.unread_runs (L536, joined with ', ' — a different call), not from this list; the message is surfaced only by cli.py:99. In every test the refusal is reached with exactly ONE unread entry, where '; '.join([x]) == ''.join([x]) == x, so the separator is never emitted and the mutant output is identical. Measured SURVIVED (below).",
+   "consumers_checked": [
+    "aisef2/app/cli.py:98-99: prints the message, exit 2 — no parse; the descriptions remain substrings",
+    "tests/v2/test_v21_x_lineage_gone.py: all unread paths produce exactly one unread entry (assertEqual(len(got['unread']), 1, ...) at :192,:209,:396,:451,:483,:518,:549,:559,:570,:634,:690; refused() uses a single SHAPES damage; the continuation test has one unread ancestor) -> the join never uses a separator; THE_REFUSAL needles and assertIn(str(d)) unaffected; ran on the mutant: PASS",
+    "aisef2/app/lineage.py:781-784 unread_runs: supplies the restore directories separately (L536), so the operator's actionable info does not depend on this join even with >=2 unread runs",
+    "aisef2/app/run.py:545 sibling: the unaccounted refusal's '; '.join IS protected against a dropped separator (tests/v2/test_v21_kills3_T13a.py:333-350 assertRegex(message, re.escape(unknown[0]) + r'\\W+' + re.escape(unknown[1]))), but the unread join at L542 has no such told-apart assertion",
+    "bundle_cli.py / client.py build their own strings; the recorded failure is type+stage only",
+    "measurement: kill files tests.v2.test_v21_x_lineage_gone (29 tests, OK) and tests.v2.test_v21_pw_lineage_unread (39 tests, 0 skipped, OK) both PASS on the mutant and the unmutated tree -> SURVIVED"
+   ],
+   "exceptions_checked": [
+    "a test with >=2 unread entries asserting they are told apart (as T13a:350 does for the unaccounted list): none for the unread list (grep for len(unread)==2 reaching the execute refusal: none)",
+    "a reader of the joined string's structure: none (cli.py:99 only prints; bundle_cli/client build their own)",
+    "the [:1500] truncation interacting with the separator: both forms truncate identically, and with one entry are byte-identical",
+    "the operator's restore paths depending on the separator: no — lineage.unread_runs (L536) supplies them separately"
+   ],
+   "source_sha256": "f17b8de373f61634ce4366c89be9aab570b0bef0a014ad2af4a26f29fbd7f201"
+  }
+ ],
+ "owed_tests": [],
+ "notes": "All five NEW survivors are operator-facing RunRefused string edits in execute (run.py:484,486,530,542): a dropped leading identifier ('--parent ', 'the lineage of ') or a dropped internal separator (': ', '; '). In each the predecessor path and the cause survive, and the only surfacing is cli.py:99 printing str(RunRefused) to stderr (exit 2); nothing parses the string, and the recorded failure in RUN.json carries type+stage only, never the message text. bundle_cli.py:961-964 and client.py:101 build their own refusal/stop strings rather than reusing execute's. All five classed AUDITED (observable text differs, no named consumer/contract/document/operator-actionable field depends); none EQUIVALENT (each differs for some triggering input; 358 is byte-identical only because every test reaches the refusal with exactly one unread entry). Measurement (snapshot 4ec961e, Python 3.14.7, PATH stripped of opencode, HOME/TMPDIR under the copy): each mutant's reaching kill files PASS on both the mutant and the unmutated tree -> SURVIVED, matching campaign-9. Kill files run: 251,253,254 -> test_v21_kills3_T13a (12 OK) + test_v21_pw_lineage_unread (39 OK, 0 skipped, the @POSIX_USER L486 permission tests ran as euid 501); 263,358 -> test_v21_x_lineage_gone (29 OK) + test_v21_pw_lineage_unread (39 OK). Baseline on the unmutated copy: T13a 12 OK, x_lineage_gone 29 OK, pw_lineage_unread 39 OK. owed_tests empty: no REFUTED. The nearest thing to a gap is the L542 '; ' unread-list separator (358): its sibling unaccounted join at run.py:545 IS protected by a told-apart assertion (test_v21_kills3_T13a.py:333-350) while the unread join is not, and no test ever drives the unread refusal with >=2 entries; this is not owed because the operator's actionable restore locations come from lineage.unread_runs (L536), independent of the join, so no reader breaks."
+}
