@@ -1,0 +1,480 @@
+{
+ "batch": "W2-bundle_cli-3",
+ "snapshot": "4ec961e706a1f7bda16d131037058c4fe9c2663f",
+ "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+ "role": "skeptic",
+ "entries": [
+  {
+   "target": "aisef2/app/bundle_cli.py::main",
+   "index": 57,
+   "mutant": "L1001 string \"The project bundle's own tools (no run, no provider).\" emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "MV@4ec961e confirms the mutant empties exactly one help=/metavar=/description= of bundle_cli.main's argparse parser; it is printed only by `aisef bundle [SUB] --help`, which exits 0 regardless of the text. Grep of the full string over aisef2/aisef/tests/validation/docs: it appears only in bundle_cli.py (and the module docstring, in its own words) — no test, no other module, no non-docstring doc reads it. The sole test that runs `aisef bundle ... --help` is tests/v2/test_v21_kills3_A23, which asserts only the exit status (0 for --help, 2 for an unknown command); its FormatIds/ParentPointer pins are on cli.py's `aisef run` help, not bundle_cli. The only verbatim --help pin in the tree is `aisef run --help` (tests/v2/test_v21_kills_cli.py), a different parser (aisef2/app/cli.py). This is the top parser description= (first line of `aisef bundle --help`). Measured SURVIVED: test_v21_bundle_tools=9 OK, kills3_A23=2 OK with the mutant; baseline 189 OK.",
+   "refutation": "",
+   "note": "",
+   "consumers_checked": [
+    "grep full string: only bundle_cli.py:1001 and parser.py:188 comment + docstring/USAGE in own words; no test reader",
+    "kills3_A23 reads only exit status of `aisef bundle <sub> --help`; kills_cli pins `aisef run --help` (cli.py), not bundle_cli",
+    "measured: bundle_tools 9 OK, A23 2 OK with mutant (SURVIVED); baseline 189 OK"
+   ],
+   "exceptions_checked": [
+    "operator treating 'no run, no provider' as spend assurance: property of what the commands call (none reaches a provider), restated in docstring:1 and USAGE-2.1.md:3-4, not carried by this label"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::main",
+   "index": 60,
+   "mutant": "L1003 string \"write an example (authoring document + its repository's files) to start from\" emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "MV@4ec961e confirms the mutant empties exactly one help=/metavar=/description= of bundle_cli.main's argparse parser; it is printed only by `aisef bundle [SUB] --help`, which exits 0 regardless of the text. Grep of the full string over aisef2/aisef/tests/validation/docs: it appears only in bundle_cli.py (and the module docstring, in its own words) — no test, no other module, no non-docstring doc reads it. The sole test that runs `aisef bundle ... --help` is tests/v2/test_v21_kills3_A23, which asserts only the exit status (0 for --help, 2 for an unknown command); its FormatIds/ParentPointer pins are on cli.py's `aisef run` help, not bundle_cli. The only verbatim --help pin in the tree is `aisef run --help` (tests/v2/test_v21_kills_cli.py), a different parser (aisef2/app/cli.py). This is the init subcommand help. init() actually writes authoring.json + repo/ (bundle_cli.py:363-366), asserted by bundle_tools Outsider and kills_bundle_cli Init — the behaviour, not the help words. Measured SURVIVED: bundle_tools=9 OK, A23=2 OK; baseline 189 OK.",
+   "refutation": "",
+   "note": "",
+   "consumers_checked": [
+    "grep full string: only bundle_cli.py; no test reader",
+    "init effects asserted by bundle_tools/kills_bundle_cli (not the help text)",
+    "measured bundle_tools 9 OK, A23 2 OK (SURVIVED)"
+   ],
+   "exceptions_checked": [
+    "help promises both authoring doc and repo files while init wrote one: init() writes both; behaviour tested, help words are not"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::main",
+   "index": 62,
+   "mutant": "L1004 sorted() -> list()",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "MV@4ec961e: `choices=sorted(p.stem for p in EXAMPLES.glob('*.json'))` -> `choices=list(...)`. The accepted set is identical (argparse validates `value in choices`); only the order of the two names in the usage `{a,b}` metavar and the invalid-choice text can differ, and only on a filesystem that lists calc-3 before calc-1 (on this APFS tree no difference is observable). No test pins `aisef bundle init --help`. Measured SURVIVED: bundle_tools=9 OK, A23=2 OK; baseline 189 OK. Not EQUIVALENT (observable on a differently-ordering filesystem); AUDITED — no reader of the choice order.",
+   "refutation": "",
+   "note": "",
+   "consumers_checked": [
+    "argparse: order reaches only the {a,b} metavar / invalid-choice text, not validation; set identical under sorted()/list()",
+    "EXAMPLES = aisef2/app/examples/ holds calc-1-story.json, calc-3-stories.json (pyproject.toml package data)",
+    "no test compares the listing or pins `aisef bundle init --help`; measured bundle_tools 9 OK, A23 2 OK (SURVIVED)"
+   ],
+   "exceptions_checked": [
+    "not EQUIVALENT: Path.glob order is filesystem-dependent, so the --help choice order can differ elsewhere; still no reader depends on it"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::main",
+   "index": 64,
+   "mutant": "L1005 string 'a new directory' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "MV@4ec961e confirms the mutant empties exactly one help=/metavar=/description= of bundle_cli.main's argparse parser; it is printed only by `aisef bundle [SUB] --help`, which exits 0 regardless of the text. Grep of the full string over aisef2/aisef/tests/validation/docs: it appears only in bundle_cli.py (and the module docstring, in its own words) — no test, no other module, no non-docstring doc reads it. The sole test that runs `aisef bundle ... --help` is tests/v2/test_v21_kills3_A23, which asserts only the exit status (0 for --help, 2 for an unknown command); its FormatIds/ParentPointer pins are on cli.py's `aisef run` help, not bundle_cli. The only verbatim --help pin in the tree is `aisef run --help` (tests/v2/test_v21_kills_cli.py), a different parser (aisef2/app/cli.py). init --out help. The 'new directory' rule is enforced by init() (bundle_cli.py:359-362, refuses an existing dir) and asserted by kills_bundle_cli Init and bundle_tools Refusals — the exception message an operator sees, not this help. Measured SURVIVED: bundle_tools=9 OK, A23=2 OK; baseline 189 OK.",
+   "refutation": "",
+   "note": "",
+   "consumers_checked": [
+    "grep full string: only bundle_cli.py; no test reader",
+    "init() refusal of an existing dir asserted by kills_bundle_cli/bundle_tools",
+    "measured bundle_tools 9 OK, A23 2 OK (SURVIVED)"
+   ],
+   "exceptions_checked": [
+    "removing the help changes no refusal: the rule is init()'s; the line an operator who names an existing dir sees is the exception message, asserted"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::main",
+   "index": 65,
+   "mutant": "L1006 string 'derive every hash and spec id: the bundle, unapproved' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "MV@4ec961e confirms the mutant empties exactly one help=/metavar=/description= of bundle_cli.main's argparse parser; it is printed only by `aisef bundle [SUB] --help`, which exits 0 regardless of the text. Grep of the full string over aisef2/aisef/tests/validation/docs: it appears only in bundle_cli.py (and the module docstring, in its own words) — no test, no other module, no non-docstring doc reads it. The sole test that runs `aisef bundle ... --help` is tests/v2/test_v21_kills3_A23, which asserts only the exit status (0 for --help, 2 for an unknown command); its FormatIds/ParentPointer pins are on cli.py's `aisef run` help, not bundle_cli. The only verbatim --help pin in the tree is `aisef run --help` (tests/v2/test_v21_kills_cli.py), a different parser (aisef2/app/cli.py). seal subcommand help. 'unapproved' is a fact asserted through effects: seal() keeps only given approvals (bundle_cli.py:577-592, approvals=() unless --keep-approvals-from); bundle_tools Outsider asserts to_approve lists every contract and lint is NOT_READY after seal. Measured SURVIVED: bundle_tools=9 OK, A23=2 OK; baseline 189 OK.",
+   "refutation": "",
+   "note": "",
+   "consumers_checked": [
+    "grep full string: only bundle_cli.py; no test reader",
+    "seal mints no approval (no ContractApproval created in seal()); bundle_tools Outsider asserts to_approve",
+    "measured bundle_tools 9 OK, A23 2 OK (SURVIVED)"
+   ],
+   "exceptions_checked": [
+    "'unapproved' being false (seal approving something): no path in seal() creates an approval; Outsider asserts to_approve==every contract"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::main",
+   "index": 66,
+   "mutant": "L1008 string \"the project's repository: HEAD and the requirements document\" emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "MV@4ec961e confirms the mutant empties exactly one help=/metavar=/description= of bundle_cli.main's argparse parser; it is printed only by `aisef bundle [SUB] --help`, which exits 0 regardless of the text. Grep of the full string over aisef2/aisef/tests/validation/docs: it appears only in bundle_cli.py (and the module docstring, in its own words) — no test, no other module, no non-docstring doc reads it. The sole test that runs `aisef bundle ... --help` is tests/v2/test_v21_kills3_A23, which asserts only the exit status (0 for --help, 2 for an unknown command); its FormatIds/ParentPointer pins are on cli.py's `aisef run` help, not bundle_cli. The only verbatim --help pin in the tree is `aisef run --help` (tests/v2/test_v21_kills_cli.py), a different parser (aisef2/app/cli.py). seal --repo help. --repo's two jobs are enforced with their own refusals: baseline HEAD (bundle_cli.py:519-525, '$.baseline: HEAD is resolved in --repo, and none was given') and the requirements doc sha256 (:530-533); asserted by bundle_tools Refusals. Measured SURVIVED: bundle_tools=9 OK, A23=2 OK; baseline 189 OK.",
+   "refutation": "",
+   "note": "",
+   "consumers_checked": [
+    "grep full string: only bundle_cli.py; no test reader",
+    "both --repo jobs have their own tested refusals (seal():519-533); USAGE-2.1.md:24",
+    "measured bundle_tools 9 OK, A23 2 OK (SURVIVED)"
+   ],
+   "exceptions_checked": [
+    "--repo's requirements-document job has its own refusal naming path and repo (:530-533); the help is the carrier of neither"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::main",
+   "index": 67,
+   "mutant": "L1010 string 'an earlier bundle whose still-binding approvals stay, those of a contract a declared capability change evaluates differently excepted (named in the report)' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "MV@4ec961e confirms the mutant empties exactly one help=/metavar=/description= of bundle_cli.main's argparse parser; it is printed only by `aisef bundle [SUB] --help`, which exits 0 regardless of the text. Grep of the full string over aisef2/aisef/tests/validation/docs: it appears only in bundle_cli.py (and the module docstring, in its own words) — no test, no other module, no non-docstring doc reads it. The sole test that runs `aisef bundle ... --help` is tests/v2/test_v21_kills3_A23, which asserts only the exit status (0 for --help, 2 for an unknown command); its FormatIds/ParentPointer pins are on cli.py's `aisef run` help, not bundle_cli. The only verbatim --help pin in the tree is `aisef run --help` (tests/v2/test_v21_kills_cli.py), a different parser (aisef2/app/cli.py). This is the help= of seal's --keep-approvals-from (bundle_cli.py:1009-1011). The carry-over rule is enforced in seal()/exposure_of (approvals_withheld_semantic, :596-598) and IS asserted — I confirmed tests/v2/test_v21_migrate_semantics.py:749,753,773,788,794 assert report['approvals_withheld_semantic'] via its seal section (:744 seal(...,exposed=exposure_of(old))); also T00b and bundle_tools:127-132. Measured SURVIVED: test_v21_bundle_tools=9 OK, kills3_A23=2 OK with the mutant; baseline 189 OK. Author's draft measurement (bundle_tools 9 OK) reproduced.",
+   "refutation": "",
+   "note": "Verified the author's consumers_checked claim that migrate_semantics asserts approvals_withheld_semantic — it does (its seal section). CONFIRMED.",
+   "consumers_checked": [
+    "grep -F full string over snapshot: only bundle_cli.py:1010 (help=); no test/module/doc reader",
+    "only pinned --help is `aisef run` (kills_cli, cli.py); no `aisef bundle` help pinned; A23 reads exit status only",
+    "seal keep-approvals behaviour (approvals_withheld_semantic) asserted by migrate_semantics:749/753/773/788/794, T00b, bundle_tools:127-132; docstring:80-82; USAGE-2.1.md:104,154-155",
+    "measured: bundle_tools 9 OK, A23 2 OK with the mutant (SURVIVED); baseline 189 OK"
+   ],
+   "exceptions_checked": [
+    "operator relying on this help to know which approvals carry: docstring:80-82 and USAGE-2.1.md state the same rule; the report names the withheld ones (approvals_withheld_semantic), asserted by migrate_semantics",
+    "completion generator/docs build parsing `aisef bundle` help: none in the tree"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::main",
+   "index": 69,
+   "mutant": "L1013 string 'approve one contract as a named human' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "MV@4ec961e confirms the mutant empties exactly one help=/metavar=/description= of bundle_cli.main's argparse parser; it is printed only by `aisef bundle [SUB] --help`, which exits 0 regardless of the text. Grep of the full string over aisef2/aisef/tests/validation/docs: it appears only in bundle_cli.py (and the module docstring, in its own words) — no test, no other module, no non-docstring doc reads it. The sole test that runs `aisef bundle ... --help` is tests/v2/test_v21_kills3_A23, which asserts only the exit status (0 for --help, 2 for an unknown command); its FormatIds/ParentPointer pins are on cli.py's `aisef run` help, not bundle_cli. The only verbatim --help pin in the tree is `aisef run --help` (tests/v2/test_v21_kills_cli.py), a different parser (aisef2/app/cli.py). approve subcommand help. 'one contract' = required --contract (:1015); 'named human' enforced by the kernel ContractApproval (aisef2/product/approval.py refuses non-human) and approve() placeholder guard (:620-621); asserted by bundle_tools Refusals (non-human approver exit 2). Measured SURVIVED: bundle_tools=9 OK, A23=2 OK; baseline 189 OK.",
+   "refutation": "",
+   "note": "",
+   "consumers_checked": [
+    "grep full string: only bundle_cli.py; no test reader",
+    "--contract required=True (:1015); approve human rule tested by bundle_tools Refusals",
+    "measured bundle_tools 9 OK, A23 2 OK (SURVIVED)"
+   ],
+   "exceptions_checked": [
+    "'one contract' as a code-breakable rule: it is the required --contract; its required=False mutant is a separate index/batch"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::main",
+   "index": 72,
+   "mutant": "L1016 string 'human:<name> — the person approving' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "MV@4ec961e confirms the mutant empties exactly one help=/metavar=/description= of bundle_cli.main's argparse parser; it is printed only by `aisef bundle [SUB] --help`, which exits 0 regardless of the text. Grep of the full string over aisef2/aisef/tests/validation/docs: it appears only in bundle_cli.py (and the module docstring, in its own words) — no test, no other module, no non-docstring doc reads it. The sole test that runs `aisef bundle ... --help` is tests/v2/test_v21_kills3_A23, which asserts only the exit status (0 for --help, 2 for an unknown command); its FormatIds/ParentPointer pins are on cli.py's `aisef run` help, not bundle_cli. The only verbatim --help pin in the tree is `aisef run --help` (tests/v2/test_v21_kills_cli.py), a different parser (aisef2/app/cli.py). approve --approver help. The human:<name> form is enforced by the kernel (approval.py: 'approval authority belongs to a human identity (human:<name>)') and named in its refusal, asserted by bundle_tools Refusals; USAGE-2.1.md:30-32 and calc-1-story.json readme show the form. Measured SURVIVED: bundle_tools=9 OK, A23=2 OK; baseline 189 OK.",
+   "refutation": "",
+   "note": "",
+   "consumers_checked": [
+    "grep full string: only bundle_cli.py; no test reader",
+    "the form is enforced+named in the kernel refusal (tested); USAGE and the init-printed readme show it",
+    "measured bundle_tools 9 OK, A23 2 OK (SURVIVED)"
+   ],
+   "exceptions_checked": [
+    "help is the only pre-type statement of the form: USAGE and the readme show a full command with it, and the refusal names it; who may approve is the kernel's, not this string"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::main",
+   "index": 75,
+   "mutant": "L1018 string 'approvals, admission, calibration, clause coverage' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "MV@4ec961e confirms the mutant empties exactly one help=/metavar=/description= of bundle_cli.main's argparse parser; it is printed only by `aisef bundle [SUB] --help`, which exits 0 regardless of the text. Grep of the full string over aisef2/aisef/tests/validation/docs: it appears only in bundle_cli.py (and the module docstring, in its own words) — no test, no other module, no non-docstring doc reads it. The sole test that runs `aisef bundle ... --help` is tests/v2/test_v21_kills3_A23, which asserts only the exit status (0 for --help, 2 for an unknown command); its FormatIds/ParentPointer pins are on cli.py's `aisef run` help, not bundle_cli. The only verbatim --help pin in the tree is `aisef run --help` (tests/v2/test_v21_kills_cli.py), a different parser (aisef2/app/cli.py). lint subcommand help (list of what lint checks). Each item is carried by lint()'s report fields / READY, asserted by bundle_tools Outsider and defects_lint. Measured SURVIVED: bundle_tools=9 OK, defects_lint=10 OK, A23=2 OK; baseline 189 OK.",
+   "refutation": "",
+   "note": "",
+   "consumers_checked": [
+    "grep full string: only bundle_cli.py; no test reader",
+    "lint report fields (verdict, admission, coverage) asserted by bundle_tools Outsider + defects_lint",
+    "measured bundle_tools 9 OK, defects_lint 10 OK, A23 2 OK (SURVIVED)"
+   ],
+   "exceptions_checked": [
+    "each help word as a promise: approvals/admission/coverage are asserted by the report tests; criteria_without_calibration/_contract fields are a separate target's survivors, not this label"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::main",
+   "index": 77,
+   "mutant": "L1018 string 'each criterion, plainly' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "MV@4ec961e confirms the mutant empties exactly one help=/metavar=/description= of bundle_cli.main's argparse parser; it is printed only by `aisef bundle [SUB] --help`, which exits 0 regardless of the text. Grep of the full string over aisef2/aisef/tests/validation/docs: it appears only in bundle_cli.py (and the module docstring, in its own words) — no test, no other module, no non-docstring doc reads it. The sole test that runs `aisef bundle ... --help` is tests/v2/test_v21_kills3_A23, which asserts only the exit status (0 for --help, 2 for an unknown command); its FormatIds/ParentPointer pins are on cli.py's `aisef run` help, not bundle_cli. The only verbatim --help pin in the tree is `aisef run --help` (tests/v2/test_v21_kills_cli.py), a different parser (aisef2/app/cli.py). explain subcommand help. explain is a human-read report whose fields no program parses; bundle_tools reads explain rows for calibrated/approved only. Measured SURVIVED: bundle_tools=9 OK, A23=2 OK; baseline 189 OK.",
+   "refutation": "",
+   "note": "",
+   "consumers_checked": [
+    "grep full string: only bundle_cli.py; no test reader",
+    "explain field correctness is explain()'s own survivors, not this help label",
+    "measured bundle_tools 9 OK, A23 2 OK (SURVIVED)"
+   ],
+   "exceptions_checked": [
+    "the help's implied field list as a contract: parsed by no program, asserted by no test"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::main",
+   "index": 79,
+   "mutant": "L1020 string 'the stories a run did not commit, from what it did commit' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "MV@4ec961e confirms the mutant empties exactly one help=/metavar=/description= of bundle_cli.main's argparse parser; it is printed only by `aisef bundle [SUB] --help`, which exits 0 regardless of the text. Grep of the full string over aisef2/aisef/tests/validation/docs: it appears only in bundle_cli.py (and the module docstring, in its own words) — no test, no other module, no non-docstring doc reads it. The sole test that runs `aisef bundle ... --help` is tests/v2/test_v21_kills3_A23, which asserts only the exit status (0 for --help, 2 for an unknown command); its FormatIds/ParentPointer pins are on cli.py's `aisef run` help, not bundle_cli. The only verbatim --help pin in the tree is `aisef run --help` (tests/v2/test_v21_kills_cli.py), a different parser (aisef2/app/cli.py). continue subcommand help. Behaviour enforced in continue_from (journal story/commit events, refusal if none committed, :907-909). The carried audit's CORRECTION is accurate at the snapshot: four tests call main(['continue',...]) (T00a:282-320, defects_bundlecli:108, T01b, T04a:393) and JSON-parse/exit-check, none reads the help. Measured SURVIVED: bundle_tools=9 OK, pw_lineage_continue=36 OK, kills3_T00a=19 OK, A23=2 OK; baseline 189 OK.",
+   "refutation": "",
+   "note": "",
+   "consumers_checked": [
+    "grep full string: only bundle_cli.py:1020 + docstring:10; no test reader",
+    "tests calling main(['continue',...]) JSON-parse stdout or check exit; A23 reads exit status of `--help` only",
+    "measured bundle_tools 9 OK, pw_lineage_continue 36 OK, T00a 19 OK, A23 2 OK (SURVIVED)"
+   ],
+   "exceptions_checked": [
+    "'from what it did commit' as a rule: enforced by continue_from reading journal commit events and refusing a run that committed none (:908-909); the help only names it"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::main",
+   "index": 83,
+   "mutant": "L1025 string 'continue although main holds commits no journaled operation identifies (they are left out)' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "MV@4ec961e confirms the mutant empties exactly one help=/metavar=/description= of bundle_cli.main's argparse parser; it is printed only by `aisef bundle [SUB] --help`, which exits 0 regardless of the text. Grep of the full string over aisef2/aisef/tests/validation/docs: it appears only in bundle_cli.py (and the module docstring, in its own words) — no test, no other module, no non-docstring doc reads it. The sole test that runs `aisef bundle ... --help` is tests/v2/test_v21_kills3_A23, which asserts only the exit status (0 for --help, 2 for an unknown command); its FormatIds/ParentPointer pins are on cli.py's `aisef run` help, not bundle_cli. The only verbatim --help pin in the tree is `aisef run --help` (tests/v2/test_v21_kills_cli.py), a different parser (aisef2/app/cli.py). --leave-out-unidentified help. The flag's semantics are carried where the decision is taken and tested there: the refusal naming the flag (continue_from:916-919), the report members left_out_unidentified (:954) and in_flight (:968), and T00a:300-321 / T01b:262-272. TRACEABILITY contains-check is on the flag name (holds under the mutant). The carried audit notes a requirement test is cheap but, under the A23 rule, the semantics being tested elsewhere means no verbatim help test is owed. Measured SURVIVED: kills3_T00a=19 OK, pw_lineage_continue=36 OK, A23=2 OK; baseline 189 OK.",
+   "refutation": "",
+   "note": "",
+   "consumers_checked": [
+    "grep full string: only bundle_cli.py; no test reader of the help",
+    "flag semantics tested via the refusal (:916-919), report members (:954,:968), T00a/T01b",
+    "TRACEABILITY contains `--leave-out-unidentified` on the flag name, untouched by a help= change",
+    "measured T00a 19 OK, pw_lineage_continue 36 OK, A23 2 OK (SURVIVED)"
+   ],
+   "exceptions_checked": [
+    "operator passing the flag without reading the refusal: the flag name says what it does; the report records the override",
+    "help as the only statement of 'left out': no — the refusal says 'continue without them', report in_flight says 'left out of the continuation's baseline'"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::main",
+   "index": 84,
+   "mutant": "L1026 string 'SHA256' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "MV@4ec961e confirms the mutant empties exactly one help=/metavar=/description= of bundle_cli.main's argparse parser; it is printed only by `aisef bundle [SUB] --help`, which exits 0 regardless of the text. Grep of the full string over aisef2/aisef/tests/validation/docs: it appears only in bundle_cli.py (and the module docstring, in its own words) — no test, no other module, no non-docstring doc reads it. The sole test that runs `aisef bundle ... --help` is tests/v2/test_v21_kills3_A23, which asserts only the exit status (0 for --help, 2 for an unknown command); its FormatIds/ParentPointer pins are on cli.py's `aisef run` help, not bundle_cli. The only verbatim --help pin in the tree is `aisef run --help` (tests/v2/test_v21_kills_cli.py), a different parser (aisef2/app/cli.py). This is the metavar= of continue's --expect-anchor (`--expect-anchor SHA256` -> `--expect-anchor`); argparse accepts an empty metavar and it affects only --help rendering, not parsing or the 64-hex re.fullmatch gate (:1055, unmutated). The only `SHA256` metavar a test pins is `aisef run`'s, inside the `aisef run --help` verbatim pin (kills_cli), a different parser (cli.py) — I confirmed that pin reads `aisef run`, not `aisef bundle continue`. Measured SURVIVED: bundle_tools=9 OK, pw_lineage_continue=36 OK, A23=2 OK; baseline 189 OK.",
+   "refutation": "",
+   "note": "",
+   "consumers_checked": [
+    "argparse uses metavar only for usage/help formatting; a.expect_anchor and the re.fullmatch gate (:1055) are independent",
+    "the only pinned SHA256 metavar is `aisef run`'s (kills_cli, cli.py:39), a different parser; no `aisef bundle continue --help` pin",
+    "measured bundle_tools 9 OK, pw_lineage_continue 36 OK, A23 2 OK (SURVIVED); baseline 189 OK"
+   ],
+   "exceptions_checked": [
+    "operator reading the placeholder for the value shape: the option help= (idx 85) and USAGE-2.1.md say 64-hex; the re.fullmatch refusal fires regardless of the metavar",
+    "a future verbatim pin of `aisef bundle continue --help`: none; an order/placeholder test is the excluded verbatim-text test"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::main",
+   "index": 85,
+   "mutant": "L1027 string 'the evidence anchor the run printed, kept outside the run directory: refused when the run cannot show it (without it a continuation proves consistency, not authenticity)' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "MV@4ec961e confirms the mutant empties exactly one help=/metavar=/description= of bundle_cli.main's argparse parser; it is printed only by `aisef bundle [SUB] --help`, which exits 0 regardless of the text. Grep of the full string over aisef2/aisef/tests/validation/docs: it appears only in bundle_cli.py (and the module docstring, in its own words) — no test, no other module, no non-docstring doc reads it. The sole test that runs `aisef bundle ... --help` is tests/v2/test_v21_kills3_A23, which asserts only the exit status (0 for --help, 2 for an unknown command); its FormatIds/ParentPointer pins are on cli.py's `aisef run` help, not bundle_cli. The only verbatim --help pin in the tree is `aisef run --help` (tests/v2/test_v21_kills_cli.py), a different parser (aisef2/app/cli.py). help= of continue's --expect-anchor. The authenticity behaviour is enforced by continue_from (_authentic at :897-898, anchor_checked at :949 — I verified both line refs at the snapshot) and asserted by pw_lineage_continue (checked/reported, EVIDENCE_MISSING, EVIDENCE_MISMATCH). Grep of the FULL sentence: only bundle_cli.py:1028 + docstring:43; the fragment 'proves consistency, not authenticity' also recurs in validation/v21/cli_integration/e2e_guest.py:752, but that is a hand-written note citing verify.py's docstring, not a reader of this help (and e2e_guest is not referenced by tests/). Measured SURVIVED: bundle_tools=9 OK, pw_lineage_continue=36 OK, A23=2 OK; baseline 189 OK.",
+   "refutation": "",
+   "note": "Finer-grained grep found the idiom 'proves consistency, not authenticity' at e2e_guest.py:752; confirmed it is a separate note, not a reader of the help — the author's full-sentence grep is accurate.",
+   "consumers_checked": [
+    "grep -F full sentence: only bundle_cli.py:1028 (help=) and docstring:43; no test/module/non-docstring-doc reader",
+    "continue_from _authentic:897-898, anchor_checked:949 (verified at snapshot), asserted by pw_lineage_continue; USAGE-2.1.md:359-360,364,370",
+    "coincidental idiom reuse at e2e_guest.py:752 is its own note (cites verify.py docstring), not a reader; e2e_guest not imported by tests/",
+    "measured bundle_tools 9 OK, pw_lineage_continue 36 OK, A23 2 OK (SURVIVED)"
+   ],
+   "exceptions_checked": [
+    "operator needing the warning that without the anchor a continuation proves only consistency: USAGE-2.1.md:370 and docstring:43 state it; the report sets anchor_checked:false (:949), asserted by pw_lineage_continue",
+    "docs build/completion generator reading this help: none"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::main",
+   "index": 86,
+   "mutant": "L1029 string \"re-bind an earlier release's bundle to this release's spec ids; the approvals of a contract a declared capability change evaluates differently are withheld\" emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "MV@4ec961e confirms the mutant empties exactly one help=/metavar=/description= of bundle_cli.main's argparse parser; it is printed only by `aisef bundle [SUB] --help`, which exits 0 regardless of the text. Grep of the full string over aisef2/aisef/tests/validation/docs: it appears only in bundle_cli.py (and the module docstring, in its own words) — no test, no other module, no non-docstring doc reads it. The sole test that runs `aisef bundle ... --help` is tests/v2/test_v21_kills3_A23, which asserts only the exit status (0 for --help, 2 for an unknown command); its FormatIds/ParentPointer pins are on cli.py's `aisef run` help, not bundle_cli. The only verbatim --help pin in the tree is `aisef run --help` (tests/v2/test_v21_kills_cli.py), a different parser (aisef2/app/cli.py). This is the migrate subcommand help= (:1029-1030). The withhold-on-capability-change rule is enforced in migrate()/_assess (semantic_changes, approvals_withheld, :409-440) and asserted by migrate_semantics and identity (both migrate end to end). Measured SURVIVED: test_v21_migrate_semantics=51 OK, test_v21_identity=13 OK, kills3_A23=2 OK with the mutant; baseline 189 OK. Author's draft measurement (migrate_semantics 51 OK) reproduced, and strengthened with identity+A23.",
+   "refutation": "",
+   "note": "",
+   "consumers_checked": [
+    "grep -F tail over snapshot: only bundle_cli.py:1029-1030 (help=); docstring:73-80 states the rule in its own words; no test/doc reader",
+    "migrate withhold behaviour (semantic_changes/approvals_withheld) asserted by migrate_semantics + identity; USAGE-2.1.md:74",
+    "no `aisef bundle`/`aisef bundle migrate` help pin in tests/; A23 reads exit status only",
+    "measured migrate_semantics 51 OK, identity 13 OK, A23 2 OK with the mutant (SURVIVED); baseline 189 OK"
+   ],
+   "exceptions_checked": [
+    "operator learning migrate from this help only: USAGE-2.1.md:74 and docstring carry it; the report's semantic_changes/approvals_withheld/needs_owner_reapproval are the operator's actual guidance and are asserted",
+    "a program keyed on the subcommand summary: none; the subcommand name `migrate` (TRACEABILITY contains-check) is untouched by a help= change"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::main",
+   "index": 88,
+   "mutant": "L1032 string 'the migrated bundle (a new file; never the input)' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "MV@4ec961e confirms the mutant empties exactly one help=/metavar=/description= of bundle_cli.main's argparse parser; it is printed only by `aisef bundle [SUB] --help`, which exits 0 regardless of the text. Grep of the full string over aisef2/aisef/tests/validation/docs: it appears only in bundle_cli.py (and the module docstring, in its own words) — no test, no other module, no non-docstring doc reads it. The sole test that runs `aisef bundle ... --help` is tests/v2/test_v21_kills3_A23, which asserts only the exit status (0 for --help, 2 for an unknown command); its FormatIds/ParentPointer pins are on cli.py's `aisef run` help, not bundle_cli. The only verbatim --help pin in the tree is `aisef run --help` (tests/v2/test_v21_kills_cli.py), a different parser (aisef2/app/cli.py). migrate --out help. 'never the input / a new file' is enforced twice (main:1069-1070 out.exists() refusal and _create O_EXCL at :1072/:986-993) and asserted by identity Migrate (never overwrites, exit 2; exclusive write). Measured SURVIVED: migrate_semantics=51 OK, identity=13 OK, A23=2 OK; baseline 189 OK.",
+   "refutation": "",
+   "note": "",
+   "consumers_checked": [
+    "grep full string: only bundle_cli.py; no test reader",
+    "both guards (exists() refusal + exclusive _create) asserted by identity Migrate; USAGE-2.1.md:42-43",
+    "measured migrate_semantics 51 OK, identity 13 OK, A23 2 OK (SURVIVED)"
+   ],
+   "exceptions_checked": [
+    "help claiming 'never the input' while the tool could write it: both guards are asserted, so the claim cannot become false silently"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::main",
+   "index": 120,
+   "mutant": "L1084 True->False",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "MV@4ec961e: json.dumps(..., sort_keys=True) -> sort_keys=False on a printed report; only the MEMBER ORDER of the printed JSON changes. Every reader in the tree parses the report with json.loads and compares objects/keys/substrings (order-insensitive) — e.g. T03b:117-121 json.loads(stdout) then object-equality; no test does raw-string full-report comparison (grep: only `assertEqual(stdout,\"\")` empty-refusal cases). All keys reaching json.dumps are str (literals + str-keyed lookups), so sort_keys=True raises no TypeError either way — the only observable is member order. Not EQUIVALENT (stdout bytes differ); AUDITED — no program/human reader depends on order. Site: the final migrate report print (:1084). `mapping` is keyed by spec ids from the str-keyed `known`. Readers: bundle_dispatch substring '\"specs_rebound\": 59', identity Migrate (captures, no parse), T03b:121 object-equality. Measured SURVIVED: migrate_semantics=51 OK, identity=13 OK, kills3_T03b=11 OK; baseline 189 OK.",
+   "refutation": "",
+   "note": "",
+   "consumers_checked": [
+    "migrate report keys all str (literals + mapping keyed by spec ids from str-keyed known)",
+    "readers: bundle_dispatch substring, identity capture, T03b json.loads object-equality",
+    "measured migrate_semantics 51 OK, identity 13 OK, T03b 11 OK (SURVIVED)"
+   ],
+   "exceptions_checked": [
+    "mixed-type keys -> TypeError: none (all str), so no exit-code difference either way",
+    "a reader taking the first member / diffing two raw reports: none in the repo"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::main",
+   "index": 147,
+   "mutant": "L1045 True->False",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "MV@4ec961e: json.dumps(..., sort_keys=True) -> sort_keys=False on a printed report; only the MEMBER ORDER of the printed JSON changes. Every reader in the tree parses the report with json.loads and compares objects/keys/substrings (order-insensitive) — e.g. T03b:117-121 json.loads(stdout) then object-equality; no test does raw-string full-report comparison (grep: only `assertEqual(stdout,\"\")` empty-refusal cases). All keys reaching json.dumps are str (literals + str-keyed lookups), so sort_keys=True raises no TypeError either way — the only observable is member order. Not EQUIVALENT (stdout bytes differ); AUDITED — no program/human reader depends on order. Site: the seal report print (:1045). Report keys: plan_hash, specs, approvals_kept, approvals_dropped, to_approve — all str literals; contract/requirement ids appear as values, never keys. Reader: bundle_tools Tool.tool json.loads -> sealed['to_approve']. Measured SURVIVED: bundle_tools=9 OK; baseline 189 OK.",
+   "refutation": "",
+   "note": "",
+   "consumers_checked": [
+    "seal report keys all literal str; operator values (contract/requirement ids) are values, not keys",
+    "reader bundle_tools json.loads by key (order-insensitive)",
+    "measured bundle_tools 9 OK (SURVIVED)"
+   ],
+   "exceptions_checked": [
+    "an operator value as a dict key: none; insertion order deterministic"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::main",
+   "index": 152,
+   "mutant": "L1052 True->False",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "MV@4ec961e: json.dumps(..., sort_keys=True) -> sort_keys=False on a printed report; only the MEMBER ORDER of the printed JSON changes. Every reader in the tree parses the report with json.loads and compares objects/keys/substrings (order-insensitive) — e.g. T03b:117-121 json.loads(stdout) then object-equality; no test does raw-string full-report comparison (grep: only `assertEqual(stdout,\"\")` empty-refusal cases). All keys reaching json.dumps are str (literals + str-keyed lookups), so sort_keys=True raises no TypeError either way — the only observable is member order. Not EQUIVALENT (stdout bytes differ); AUDITED — no program/human reader depends on order. Site: the approve report print (:1051-1052). Report keys: written, approved, by, still_to_approve — all literal str (a.contract/a.approver are values). Reader: bundle_tools Outsider done['still_to_approve']. Measured SURVIVED: bundle_tools=9 OK; baseline 189 OK.",
+   "refutation": "",
+   "note": "",
+   "consumers_checked": [
+    "approve report keys all literal str; a.contract/a.approver are values",
+    "reader bundle_tools json.loads by key",
+    "measured bundle_tools 9 OK (SURVIVED)"
+   ],
+   "exceptions_checked": [
+    "mixed-type keys: none, all literals; determinism: fixed literal order"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::main",
+   "index": 155,
+   "mutant": "L1060 True->False",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "MV@4ec961e: json.dumps(..., sort_keys=True) -> sort_keys=False on a printed report; only the MEMBER ORDER of the printed JSON changes. Every reader in the tree parses the report with json.loads and compares objects/keys/substrings (order-insensitive) — e.g. T03b:117-121 json.loads(stdout) then object-equality; no test does raw-string full-report comparison (grep: only `assertEqual(stdout,\"\")` empty-refusal cases). All keys reaching json.dumps are str (literals + str-keyed lookups), so sort_keys=True raises no TypeError either way — the only observable is member order. Not EQUIVALENT (stdout bytes differ); AUDITED — no program/human reader depends on order. Site: the continue report print (:1060). Report dict is literal-keyed; spend.known keyed by lineage.SPEND (str), account dicts str-keyed, unaccounted is a list of str. Readers parse as objects: T00a:282-321, T01b:145-153, defects_bundlecli:105-135, and r3_client_readers pins the items' TEXT at lineage.reconcile (as objects), not order. Measured SURVIVED: pw_lineage_continue=36 OK, kills3_T00a=19 OK, continue_usage=10 OK; baseline 189 OK.",
+   "refutation": "",
+   "note": "",
+   "consumers_checked": [
+    "continue report keys all str (literals + lineage.SPEND + str-keyed account); unaccounted is list[str]",
+    "readers json.loads object-equality (T00a/T01b/defects_bundlecli); no order/first-member reader",
+    "measured pw_lineage_continue 36 OK, T00a 19 OK, continue_usage 10 OK (SURVIVED)"
+   ],
+   "exceptions_checked": [
+    "story ids/paths as dict keys: none (values/list items only)",
+    "a consumer taking the first printed member or diffing two reports across runs: none"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::main",
+   "index": 131,
+   "mutant": "L1056 string '--expect-anchor is the 64-hex evidence anchor the run printed' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "MV@4ec961e: p.error('--expect-anchor is the 64-hex...') -> p.error('') on a malformed --expect-anchor to `aisef bundle continue` (:1055-1056). An operator-facing argparse error to stderr + exit 2; the re.fullmatch gate (:1055) is unmutated so a non-64-hex value is still refused with exit 2 and the usage line (naming --expect-anchor) is still printed. I verified the only test reaching this path, pw_lineage_continue:417-423 `test_the_cli_takes_it_and_refuses_a_value_that_is_not_one`: the not-hex case is `assertRaises(SystemExit)` under `redirect_stderr(io.StringIO())` (text discarded); the `b*64` case tests the substantive EVIDENCE_MISMATCH refusal (a different message in _authentic). continue_integrity:621-627 exercises the identical cli.py check and asserts only exit 2. Sibling cli.py:74 holds the identical string. Measured SURVIVED: pw_lineage_continue=36 OK, continue_integrity=24 OK (265s) with the mutant; baseline 189 OK.",
+   "refutation": "",
+   "note": "",
+   "consumers_checked": [
+    "pw_lineage_continue:417-423 not-hex case: assertRaises(SystemExit) with stderr redirected to a discarded StringIO; text not asserted",
+    "the b*64 case asserts EVIDENCE_MISMATCH (the _authentic refusal), not the p.error; continue_integrity:621-627 asserts exit 2 only",
+    "grep -F string: bundle_cli.py:1056 and cli.py:74 only (two p.error call sites); no test/doc reads the text",
+    "re.fullmatch gate (:1055) unmutated -> exit-2 refusal of a non-64-hex value stands; measured pw_lineage_continue 36 OK, continue_integrity 24 OK (SURVIVED)"
+   ],
+   "exceptions_checked": [
+    "operator needing the rejection reason: argparse still prints the usage line naming --expect-anchor; the option help= (idx 85) and USAGE-2.1.md:364 give the 64-hex shape; EVIDENCE_MISSING/MISMATCH have their own tested messages",
+    "a verifier parsing argparse's error text: none; the identical sibling in cli.py is itself an accepted campaign-2 survivor",
+    "a non-verbatim substring test ('expect-anchor'/'64-hex'): the round excludes verbatim-text tests and the project's own test for this path discards the text, asserting only SystemExit"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::main",
+   "index": 141,
+   "mutant": "L1077 string 'file_sha256' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "MV@4ec961e confirms the mutant changes only L1077, inside the `except OSError:` arm of migrate's read-back (:1074-1077). This arm runs only if a.out.read_bytes() raises OSError immediately after the exclusive _create wrote the file at :1072 — a defensive I/O-failure guard. The success-path assignment at :1075 that every reader observes is unmutated; the None-on-failure fallback is undocumented (docstring:79, report prose:443 describe file_sha256 as the success value). No registered kill file, doc scenario, or operator misuse reaches the branch (no test monkeypatches read_bytes to raise); migrate's main try/except does not even catch a generic OSError, so the branch is purely the read-back guard. Not EQUIVALENT (observable inside the branch); AUDITED — unreachable in tests and a test would be artificial coverage of an I/O-failure guard, which the round forbids. Effect: `report['candidate']['file_sha256']=None` -> `report['candidate']['']=None` (the file_sha256 key would be absent under an OSError). Measured SURVIVED: migrate_semantics=51 OK (reads candidate.file_sha256 via the success path :1075, the OSError arm not exercised), kills3_T03b=11 OK; baseline 189 OK.",
+   "refutation": "",
+   "note": "",
+   "consumers_checked": [
+    "migrate_semantics:460-467 reads printed candidate.file_sha256 on the success path (file written+readable, :1075 runs, :1077 not); T00a:244/T03b:120 compute it the same way",
+    "candidate is always a dict (:441), so report['candidate'] exists; only its member key changes, and only on OSError",
+    "measured migrate_semantics 51 OK, T03b 11 OK with the mutant (SURVIVED); baseline 189 OK"
+   ],
+   "exceptions_checked": [
+    "a report reader after an OSError on read-back (file_sha256 absent): no test/operator/doc reaches the branch; the fallback None is undocumented; the tested contract (candidate.file_sha256 = file sha256) is the success path :1075, unmutated",
+    "forcing the branch via a read_bytes monkeypatch would kill it, but that covers an essentially-unreachable guard — forbidden by the round"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::main",
+   "index": 162,
+   "mutant": "L1077 string 'candidate' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "MV@4ec961e confirms the mutant changes only L1077, inside the `except OSError:` arm of migrate's read-back (:1074-1077). This arm runs only if a.out.read_bytes() raises OSError immediately after the exclusive _create wrote the file at :1072 — a defensive I/O-failure guard. The success-path assignment at :1075 that every reader observes is unmutated; the None-on-failure fallback is undocumented (docstring:79, report prose:443 describe file_sha256 as the success value). No registered kill file, doc scenario, or operator misuse reaches the branch (no test monkeypatches read_bytes to raise); migrate's main try/except does not even catch a generic OSError, so the branch is purely the read-back guard. Not EQUIVALENT (observable inside the branch); AUDITED — unreachable in tests and a test would be artificial coverage of an I/O-failure guard, which the round forbids. Effect: `report['candidate']['file_sha256']=None` -> `report['']['file_sha256']=None`; report[''] is a KeyError caught by `except (KeyError,TypeError,ValueError)` at :1081, printing 'refused: KeyError' and returning 2 — so under an OSError a successful migrate (exit 0) would instead refuse exit 2 (the candidate file already written at :1072). Observable only inside the OSError branch. Measured SURVIVED: migrate_semantics=51 OK, kills3_T03b=11 OK; baseline 189 OK.",
+   "refutation": "",
+   "note": "",
+   "consumers_checked": [
+    "same success-path readers as 141 (migrate_semantics:460-467, T00a:244, T03b:120) never reach :1077",
+    "the except at :1081-1083 catches KeyError -> exit 2; no test migrates with read_bytes forced to raise",
+    "measured migrate_semantics 51 OK, T03b 11 OK with the mutant (SURVIVED); baseline 189 OK"
+   ],
+   "exceptions_checked": [
+    "an operator whose migrate hits the OSError branch getting exit 2 instead of a written candidate with file_sha256=None: no test/doc/operator path reaches it; the write already happened at :1072",
+    "a read_bytes monkeypatch would kill it, but as with 141 it covers an unreachable I/O guard — forbidden by the round"
+   ]
+  }
+ ]
+}

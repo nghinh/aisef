@@ -1,0 +1,296 @@
+{
+ "batch": "W2-lineage-5",
+ "entries": [
+  {
+   "target": "aisef2/app/lineage.py::_predecessor",
+   "index": 30,
+   "mutant": "L696 string ' is not a run record (a JSON object)' emptied",
+   "class": "AUDITED",
+   "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa",
+   "group": "predecessor-diagnostic-text",
+   "grounds": "For a record that is valid JSON but not an object (e.g. '[1]'), damaged.append(f'{name} is not a run record (a JSON object)') (L696) becomes f'{name}', so the operator entry for that file drops from 'RUN.json is not a run record (a JSON object)' to just 'RUN.json'. Observable: the only text saying the record is JSON-but-not-an-object is gone; the file name survives and the run identity + remediation come from elsewhere (group). Exercised by x_lineage_proof record_not_text/'not an object' and defects_verify RunRecords, which assert predecessor_of path or unread-non-empty, never this phrase.",
+   "consumers_checked": [
+    "lineage.lineage_account (lineage.py:759-761) embeds `why` into the run's unaccounted/unread lists",
+    "client.Budget (client.py:94 inherited_unread, :101 wrap, :118-119/:129-130 reached/exceeded test only non-emptiness)",
+    "aisef run --parent claim-stage operator refusal + RUN.json continues.account",
+    "aisef run --verify (verify.py) -- names run paths via lineage.unread_runs (r['run']), not the why text"
+   ],
+   "exceptions_checked": [
+    "registered kill files test_v21_x_lineage_proof / test_v21_defects_verify / test_v21_kills3_T09c: assert run-name + total None + TEMPLATE needles, not this phrase -- measured PASS on the mutant AND unmutated (baseline)",
+    "grep tests/ docs/ validation/ for the phrase: none pin it (only hit 'is not a run record' is test_app_units.py:640, verify.py's '...of format {FORMAT}', a different string)",
+    "machine parse of unaccounted/unread text: none -- client.py / run.py:455 key on the fixed stop prefix; unread_runs keys on r['run'] basename"
+   ],
+   "kill_files_run": {
+    "test_v21_x_lineage_proof": "PASS",
+    "test_v21_defects_verify": "PASS",
+    "test_v21_kills3_T09c": "PASS"
+   },
+   "measured": "SURVIVED (all 3 registered kill files PASS on the mutant and unmutated)"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_predecessor",
+   "index": 31,
+   "mutant": "L677 string ' is not text (' emptied",
+   "class": "AUDITED",
+   "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa",
+   "group": "predecessor-diagnostic-text",
+   "grounds": "f'{name} is not text ({e.reason})' (L677) becomes f'{name}{e.reason})': for a non-UTF-8 record the entry runs the file name straight into the UnicodeDecodeError reason with a stray trailing ')': e.g. \"RUN.started.json'utf-8' codec can't decode byte 0xff in position 0: invalid start byte)\". The error DETAIL (e.reason) is preserved; the framing ' is not text (' is lost. Observable but the diagnostic detail survives. x_lineage_proof record_not_text drives this (NOT_TEXT bytes) and asserts only unread-non-empty + run name.",
+   "consumers_checked": [
+    "lineage.lineage_account (lineage.py:759-761) embeds `why` into the run's unaccounted/unread lists",
+    "client.Budget (client.py:94 inherited_unread, :101 wrap, :118-119/:129-130 reached/exceeded test only non-emptiness)",
+    "aisef run --parent claim-stage operator refusal + RUN.json continues.account",
+    "aisef run --verify (verify.py) -- names run paths via lineage.unread_runs (r['run']), not the why text"
+   ],
+   "exceptions_checked": [
+    "registered kill files test_v21_x_lineage_proof / test_v21_defects_verify / test_v21_kills3_T09c: assert run-name + total None + TEMPLATE needles, not this phrase -- measured PASS on the mutant AND unmutated (baseline)",
+    "grep tests/ docs/ validation/ for the phrase: none pin it (only hit 'is not a run record' is test_app_units.py:640, verify.py's '...of format {FORMAT}', a different string)",
+    "machine parse of unaccounted/unread text: none -- client.py / run.py:455 key on the fixed stop prefix; unread_runs keys on r['run'] basename"
+   ],
+   "kill_files_run": {
+    "test_v21_x_lineage_proof": "PASS",
+    "test_v21_defects_verify": "PASS",
+    "test_v21_kills3_T09c": "PASS"
+   },
+   "measured": "SURVIVED (all 3 registered kill files PASS on the mutant and unmutated)"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_predecessor",
+   "index": 32,
+   "mutant": "L677 string ')' emptied",
+   "class": "AUDITED",
+   "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa",
+   "group": "predecessor-diagnostic-text",
+   "grounds": "f'{name} is not text ({e.reason})' (L677) loses its trailing ')': 'RUN.started.json is not text (<reason>' -- one missing close paren; the whole phrase and the reason are otherwise intact. Observable (cosmetic). Same driver as [31]; no kill-file assertion on the text.",
+   "consumers_checked": [
+    "lineage.lineage_account (lineage.py:759-761) embeds `why` into the run's unaccounted/unread lists",
+    "client.Budget (client.py:94 inherited_unread, :101 wrap, :118-119/:129-130 reached/exceeded test only non-emptiness)",
+    "aisef run --parent claim-stage operator refusal + RUN.json continues.account",
+    "aisef run --verify (verify.py) -- names run paths via lineage.unread_runs (r['run']), not the why text"
+   ],
+   "exceptions_checked": [
+    "registered kill files test_v21_x_lineage_proof / test_v21_defects_verify / test_v21_kills3_T09c: assert run-name + total None + TEMPLATE needles, not this phrase -- measured PASS on the mutant AND unmutated (baseline)",
+    "grep tests/ docs/ validation/ for the phrase: none pin it (only hit 'is not a run record' is test_app_units.py:640, verify.py's '...of format {FORMAT}', a different string)",
+    "machine parse of unaccounted/unread text: none -- client.py / run.py:455 key on the fixed stop prefix; unread_runs keys on r['run'] basename"
+   ],
+   "kill_files_run": {
+    "test_v21_x_lineage_proof": "PASS",
+    "test_v21_defects_verify": "PASS",
+    "test_v21_kills3_T09c": "PASS"
+   },
+   "measured": "SURVIVED (all 3 registered kill files PASS on the mutant and unmutated)"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_predecessor",
+   "index": 33,
+   "mutant": "L690 string ' is cut or is not JSON' emptied",
+   "class": "AUDITED",
+   "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa",
+   "group": "predecessor-diagnostic-text",
+   "grounds": "For a truncated/garbled record (json.loads raises ValueError), damaged.append(f'{name} is cut or is not JSON') (L690) becomes f'{name}', dropping 'RUN.json is cut or is not JSON' to 'RUN.json' -- the only text saying it is a JSON-parse failure. Observable. Exercised by x_lineage_proof record_of_the_first_run_cut / 'cut' (b'{\"continues\": {\"pa'); the test asserts unread-non-empty + run name, not this phrase.",
+   "consumers_checked": [
+    "lineage.lineage_account (lineage.py:759-761) embeds `why` into the run's unaccounted/unread lists",
+    "client.Budget (client.py:94 inherited_unread, :101 wrap, :118-119/:129-130 reached/exceeded test only non-emptiness)",
+    "aisef run --parent claim-stage operator refusal + RUN.json continues.account",
+    "aisef run --verify (verify.py) -- names run paths via lineage.unread_runs (r['run']), not the why text"
+   ],
+   "exceptions_checked": [
+    "registered kill files test_v21_x_lineage_proof / test_v21_defects_verify / test_v21_kills3_T09c: assert run-name + total None + TEMPLATE needles, not this phrase -- measured PASS on the mutant AND unmutated (baseline)",
+    "grep tests/ docs/ validation/ for the phrase: none pin it (only hit 'is not a run record' is test_app_units.py:640, verify.py's '...of format {FORMAT}', a different string)",
+    "machine parse of unaccounted/unread text: none -- client.py / run.py:455 key on the fixed stop prefix; unread_runs keys on r['run'] basename"
+   ],
+   "kill_files_run": {
+    "test_v21_x_lineage_proof": "PASS",
+    "test_v21_defects_verify": "PASS",
+    "test_v21_kills3_T09c": "PASS"
+   },
+   "measured": "SURVIVED (all 3 registered kill files PASS on the mutant and unmutated)"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_predecessor",
+   "index": 35,
+   "mutant": "L698 string ' names the run it continues by something that is not a path' emptied",
+   "class": "AUDITED",
+   "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa",
+   "group": "predecessor-diagnostic-text",
+   "grounds": "When `continues` is present but not a Mapping-with-a-usable-path (e.g. continues.path is a NUL string, or continues is not a mapping), damaged.append(f'{name} names the run it continues by something that is not a path') (L698) becomes f'{name}', dropping the explanation to just 'RUN.json'. Observable. Exercised by x_lineage_proof record_names_a_path_with_a_nul and 'a predecessor that is no path'; asserts unread-non-empty + run name, not this phrase.",
+   "consumers_checked": [
+    "lineage.lineage_account (lineage.py:759-761) embeds `why` into the run's unaccounted/unread lists",
+    "client.Budget (client.py:94 inherited_unread, :101 wrap, :118-119/:129-130 reached/exceeded test only non-emptiness)",
+    "aisef run --parent claim-stage operator refusal + RUN.json continues.account",
+    "aisef run --verify (verify.py) -- names run paths via lineage.unread_runs (r['run']), not the why text"
+   ],
+   "exceptions_checked": [
+    "registered kill files test_v21_x_lineage_proof / test_v21_defects_verify / test_v21_kills3_T09c: assert run-name + total None + TEMPLATE needles, not this phrase -- measured PASS on the mutant AND unmutated (baseline)",
+    "grep tests/ docs/ validation/ for the phrase: none pin it (only hit 'is not a run record' is test_app_units.py:640, verify.py's '...of format {FORMAT}', a different string)",
+    "machine parse of unaccounted/unread text: none -- client.py / run.py:455 key on the fixed stop prefix; unread_runs keys on r['run'] basename"
+   ],
+   "kill_files_run": {
+    "test_v21_x_lineage_proof": "PASS",
+    "test_v21_defects_verify": "PASS",
+    "test_v21_kills3_T09c": "PASS"
+   },
+   "measured": "SURVIVED (all 3 registered kill files PASS on the mutant and unmutated)"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_predecessor",
+   "index": 36,
+   "mutant": "L701 string '; ' emptied",
+   "class": "AUDITED",
+   "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa",
+   "group": "predecessor-diagnostic-text",
+   "grounds": "why = \"'; '.join(damaged) or None\" (L701) becomes \"''.join(damaged) or None\". Observable only when BOTH records (RUN.started.json and RUN.json) are damaged, so `damaged` has two entries that then concatenate with no separator (e.g. 'RUN.started.json is cut or is not JSONRUN.json is cut or is not JSON'); with 0 or 1 damaged entry the output is identical, so this is NOT equivalent only because the two-damaged case is reachable (x_lineage_proof record_not_text / record_of_the_first_run_cut write both files). The value stays truthy (names present), so the `if why:` branch and every downstream non-emptiness check are unchanged; the client-side budget join at client.py:119 is its own '; ' and is unaffected. Only the operator's run-together text differs.",
+   "consumers_checked": [
+    "lineage.lineage_account (lineage.py:759-761) embeds `why` into the run's unaccounted/unread lists",
+    "client.Budget (client.py:94 inherited_unread, :101 wrap, :118-119/:129-130 reached/exceeded test only non-emptiness)",
+    "aisef run --parent claim-stage operator refusal + RUN.json continues.account",
+    "aisef run --verify (verify.py) -- names run paths via lineage.unread_runs (r['run']), not the why text"
+   ],
+   "exceptions_checked": [
+    "registered kill files test_v21_x_lineage_proof / test_v21_defects_verify / test_v21_kills3_T09c: assert run-name + total None + TEMPLATE needles, not this phrase -- measured PASS on the mutant AND unmutated (baseline)",
+    "grep tests/ docs/ validation/ for the phrase: none pin it (only hit 'is not a run record' is test_app_units.py:640, verify.py's '...of format {FORMAT}', a different string)",
+    "machine parse of unaccounted/unread text: none -- client.py / run.py:455 key on the fixed stop prefix; unread_runs keys on r['run'] basename"
+   ],
+   "kill_files_run": {
+    "test_v21_x_lineage_proof": "PASS",
+    "test_v21_defects_verify": "PASS",
+    "test_v21_kills3_T09c": "PASS"
+   },
+   "measured": "SURVIVED (all 3 registered kill files PASS on the mutant and unmutated)"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_predecessor",
+   "index": 37,
+   "mutant": "L681 string ' cannot be read (' emptied",
+   "class": "AUDITED",
+   "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa",
+   "group": "predecessor-diagnostic-text",
+   "grounds": "f'{name} cannot be read ({type(e).__name__}: {e.strerror or e})' (L681) becomes f'{name}{type(e).__name__}: {e.strerror or e})': for a permission/IO error the entry reads e.g. 'RUN.started.jsonPermissionError: Permission denied)' -- the ExcType and strerror are preserved, the framing ' cannot be read (' is lost with a stray trailing ')'. Observable; the error class+detail survive. Reached only on the non-not_there OSError branch (L680); x_lineage_proof stream_without_permission/locked drive OSErrors but assert via template needle 'cannot be read' which is the TEMPLATE's word (client.py:101), not this L681 phrase.",
+   "consumers_checked": [
+    "lineage.lineage_account (lineage.py:759-761) embeds `why` into the run's unaccounted/unread lists",
+    "client.Budget (client.py:94 inherited_unread, :101 wrap, :118-119/:129-130 reached/exceeded test only non-emptiness)",
+    "aisef run --parent claim-stage operator refusal + RUN.json continues.account",
+    "aisef run --verify (verify.py) -- names run paths via lineage.unread_runs (r['run']), not the why text"
+   ],
+   "exceptions_checked": [
+    "registered kill files test_v21_x_lineage_proof / test_v21_defects_verify / test_v21_kills3_T09c: assert run-name + total None + TEMPLATE needles, not this phrase -- measured PASS on the mutant AND unmutated (baseline)",
+    "grep tests/ docs/ validation/ for the phrase: none pin it (only hit 'is not a run record' is test_app_units.py:640, verify.py's '...of format {FORMAT}', a different string)",
+    "machine parse of unaccounted/unread text: none -- client.py / run.py:455 key on the fixed stop prefix; unread_runs keys on r['run'] basename"
+   ],
+   "kill_files_run": {
+    "test_v21_x_lineage_proof": "PASS",
+    "test_v21_defects_verify": "PASS",
+    "test_v21_kills3_T09c": "PASS"
+   },
+   "measured": "SURVIVED (all 3 registered kill files PASS on the mutant and unmutated)"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_predecessor",
+   "index": 38,
+   "mutant": "L681 string ': ' emptied",
+   "class": "AUDITED",
+   "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa",
+   "group": "predecessor-diagnostic-text",
+   "grounds": "Same line as [37]; the ': ' between ExcType and detail is emptied: '...cannot be read (PermissionErrorPermission denied)'. ExcType and strerror both still present, only the separator gone. Observable (cosmetic).",
+   "consumers_checked": [
+    "lineage.lineage_account (lineage.py:759-761) embeds `why` into the run's unaccounted/unread lists",
+    "client.Budget (client.py:94 inherited_unread, :101 wrap, :118-119/:129-130 reached/exceeded test only non-emptiness)",
+    "aisef run --parent claim-stage operator refusal + RUN.json continues.account",
+    "aisef run --verify (verify.py) -- names run paths via lineage.unread_runs (r['run']), not the why text"
+   ],
+   "exceptions_checked": [
+    "registered kill files test_v21_x_lineage_proof / test_v21_defects_verify / test_v21_kills3_T09c: assert run-name + total None + TEMPLATE needles, not this phrase -- measured PASS on the mutant AND unmutated (baseline)",
+    "grep tests/ docs/ validation/ for the phrase: none pin it (only hit 'is not a run record' is test_app_units.py:640, verify.py's '...of format {FORMAT}', a different string)",
+    "machine parse of unaccounted/unread text: none -- client.py / run.py:455 key on the fixed stop prefix; unread_runs keys on r['run'] basename"
+   ],
+   "kill_files_run": {
+    "test_v21_x_lineage_proof": "PASS",
+    "test_v21_defects_verify": "PASS",
+    "test_v21_kills3_T09c": "PASS"
+   },
+   "measured": "SURVIVED (all 3 registered kill files PASS on the mutant and unmutated)"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_predecessor",
+   "index": 39,
+   "mutant": "L681 string ')' emptied",
+   "class": "AUDITED",
+   "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa",
+   "group": "predecessor-diagnostic-text",
+   "grounds": "Same line as [37]; the trailing ')' is emptied: '...cannot be read (PermissionError: Permission denied' -- one missing close paren, the rest intact. Observable (cosmetic).",
+   "consumers_checked": [
+    "lineage.lineage_account (lineage.py:759-761) embeds `why` into the run's unaccounted/unread lists",
+    "client.Budget (client.py:94 inherited_unread, :101 wrap, :118-119/:129-130 reached/exceeded test only non-emptiness)",
+    "aisef run --parent claim-stage operator refusal + RUN.json continues.account",
+    "aisef run --verify (verify.py) -- names run paths via lineage.unread_runs (r['run']), not the why text"
+   ],
+   "exceptions_checked": [
+    "registered kill files test_v21_x_lineage_proof / test_v21_defects_verify / test_v21_kills3_T09c: assert run-name + total None + TEMPLATE needles, not this phrase -- measured PASS on the mutant AND unmutated (baseline)",
+    "grep tests/ docs/ validation/ for the phrase: none pin it (only hit 'is not a run record' is test_app_units.py:640, verify.py's '...of format {FORMAT}', a different string)",
+    "machine parse of unaccounted/unread text: none -- client.py / run.py:455 key on the fixed stop prefix; unread_runs keys on r['run'] basename"
+   ],
+   "kill_files_run": {
+    "test_v21_x_lineage_proof": "PASS",
+    "test_v21_defects_verify": "PASS",
+    "test_v21_kills3_T09c": "PASS"
+   },
+   "measured": "SURVIVED (all 3 registered kill files PASS on the mutant and unmutated)"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_predecessor",
+   "index": 40,
+   "mutant": "L681 Or swapped",
+   "class": "AUDITED",
+   "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa",
+   "group": "predecessor-diagnostic-text",
+   "grounds": "At L681 `e.strerror or e` becomes `e.strerror and e` (the 'or' operator swapped to 'and'). When e.strerror is a non-empty string (the usual OSError, e.g. EACCES 'Permission denied'), the original renders the strerror string while the mutant renders the exception object e -> str(e) = \"[Errno 13] Permission denied: '<path>'\" (a longer, different rendering); when strerror is None/'' the original renders str(e) and the mutant renders 'None'/''. Either way the detail inside 'cannot be read (<ExcType>: <detail>)' changes. Observable; the detail is arguably MORE informative under the mutant, and no consumer depends on which form it is. Same reach/assertions as [37-39].",
+   "consumers_checked": [
+    "lineage.lineage_account (lineage.py:759-761) embeds `why` into the run's unaccounted/unread lists",
+    "client.Budget (client.py:94 inherited_unread, :101 wrap, :118-119/:129-130 reached/exceeded test only non-emptiness)",
+    "aisef run --parent claim-stage operator refusal + RUN.json continues.account",
+    "aisef run --verify (verify.py) -- names run paths via lineage.unread_runs (r['run']), not the why text"
+   ],
+   "exceptions_checked": [
+    "registered kill files test_v21_x_lineage_proof / test_v21_defects_verify / test_v21_kills3_T09c: assert run-name + total None + TEMPLATE needles, not this phrase -- measured PASS on the mutant AND unmutated (baseline)",
+    "grep tests/ docs/ validation/ for the phrase: none pin it (only hit 'is not a run record' is test_app_units.py:640, verify.py's '...of format {FORMAT}', a different string)",
+    "machine parse of unaccounted/unread text: none -- client.py / run.py:455 key on the fixed stop prefix; unread_runs keys on r['run'] basename"
+   ],
+   "kill_files_run": {
+    "test_v21_x_lineage_proof": "PASS",
+    "test_v21_defects_verify": "PASS",
+    "test_v21_kills3_T09c": "PASS"
+   },
+   "measured": "SURVIVED (all 3 registered kill files PASS on the mutant and unmutated)"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_predecessor",
+   "index": 41,
+   "mutant": "L683 string ' is a link that leads nowhere' emptied",
+   "class": "AUDITED",
+   "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa",
+   "group": "predecessor-diagnostic-text",
+   "grounds": "When a record file is a dangling or looping symlink (OSError is not_there but os.path.lexists is true, L682), damaged.append(f'{name} is a link that leads nowhere') (L683) becomes f'{name}', dropping 'RUN.started.json is a link that leads nowhere' to 'RUN.started.json'. Observable: the only text saying the record is a broken link is gone (note this is _predecessor's own copy at L683; the identical phrase at L221 belongs to a DIFFERENT function and its test, pw_lineage_unread.py:477, pins L221's why, not this one). Exercised by x_lineage_proof records_are_links_to_nothing / records_are_links_that_loop; asserts unread-non-empty + run name, not this phrase.",
+   "consumers_checked": [
+    "lineage.lineage_account (lineage.py:759-761) embeds `why` into the run's unaccounted/unread lists",
+    "client.Budget (client.py:94 inherited_unread, :101 wrap, :118-119/:129-130 reached/exceeded test only non-emptiness)",
+    "aisef run --parent claim-stage operator refusal + RUN.json continues.account",
+    "aisef run --verify (verify.py) -- names run paths via lineage.unread_runs (r['run']), not the why text"
+   ],
+   "exceptions_checked": [
+    "registered kill files test_v21_x_lineage_proof / test_v21_defects_verify / test_v21_kills3_T09c: assert run-name + total None + TEMPLATE needles, not this phrase -- measured PASS on the mutant AND unmutated (baseline)",
+    "grep tests/ docs/ validation/ for the phrase: none pin it (only hit 'is not a run record' is test_app_units.py:640, verify.py's '...of format {FORMAT}', a different string)",
+    "machine parse of unaccounted/unread text: none -- client.py / run.py:455 key on the fixed stop prefix; unread_runs keys on r['run'] basename"
+   ],
+   "kill_files_run": {
+    "test_v21_x_lineage_proof": "PASS",
+    "test_v21_defects_verify": "PASS",
+    "test_v21_kills3_T09c": "PASS"
+   },
+   "measured": "SURVIVED (all 3 registered kill files PASS on the mutant and unmutated)"
+  }
+ ],
+ "group_reasoning": {
+  "predecessor-diagnostic-text": "_predecessor (aisef2/app/lineage.py:665-701) returns (predecessor_path, why); `why` = \"'; '.join(damaged) or None\" (L701), a free-text explanation of why the predecessor cannot be told, built from the `damaged` list (L677-698). The ONLY consumer of why ([1]) is lineage_account at lineage.py:759-761: `nxt, why = _predecessor(at); if why: unknown(runs[-1], f\"{at.name}: {why}: what it continued, and what the runs before it spent, is unknown\")`, which appends that text to the run's `unaccounted` and `unread` lists (unknown(), L719-722; collected L775-777). Those lists reach: (a) RUN.json `continues.account`; (b) client.Budget (client.py:94 inherited_unread, :89 inherited_unaccounted), where reached()/exceeded() (client.py:118-119, 129-130) test only the list's NON-EMPTINESS and prepend a fixed 'unaccounted: ', and client.py:101 wraps each entry as \"the lineage's evidence cannot be read, or is gone: {u}\"; (c) the `aisef run --parent` claim-stage operator refusal and `aisef run --verify` (verify.py, which names the run DIRECTORIES via lineage.unread_runs -> r['run'] basenames, L784, not the why text). No machine consumer substring-parses the why text: run.py:455 and client.py key on the fixed stop prefix ('max_'/'unaccounted'), unread_runs keys on r['run']. The two things the operator must act on are carried OUTSIDE why: which run (the `{at.name}` basename prefix the caller adds at L761, and the full path via unread_runs/the refusal template; test_v21_x_lineage_proof.py:975-982 pins the path str) and the remediation ('make it readable again, a faithful copy'; refusal template, client.py:101 / lineage.py:302,319,376; assert_what_to_do needles at x_lineage_proof.py:772-775 come from the TEMPLATE, not from why). predecessor_of (L705) uses only [0] and is unaffected. MEASUREMENT: the 3 registered kill files (test_v21_x_lineage_proof, test_v21_defects_verify, test_v21_kills3_T09c) each PASS on every one of these mutants and PASS unmutated (baseline OK); they assert only that unread/unaccounted is non-empty, that total is None, and that an entry contains the RUN NAME (assert_unread, x_lineage_proof.py:260-265; test_no_flag_opens_a_session..., :904-906) plus the template needles -- never the _predecessor damage-kind phrase. Hence every mutant SURVIVED by measurement, as campaign 9 recorded. These are operator-readable strings (owner rule: not 'harmless'); classified AUDITED, not EQUIVALENT (each changes the operator text), and not REFUTED (no test/doc/verifier/machine consumer and no operator ACTION depends on the exact phrase; the run identity and the remediation are carried elsewhere -- a test on the phrase would pin cosmetic text, which the owner rule forbids adding to reach a number)."
+ },
+ "owed_tests": [],
+ "notes": "All 11 new survivors of _predecessor are diagnostic-string / operator-text mutants with no test, doc, verifier or machine consumer depending on the exact phrase; measured SURVIVED against all 3 registered kill files (baseline OK). 0 EQUIVALENT, 11 AUDITED, 0 REFUTED, 0 owed tests. Matrix: out/matrix-results.txt. source_sha256=f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa"
+}

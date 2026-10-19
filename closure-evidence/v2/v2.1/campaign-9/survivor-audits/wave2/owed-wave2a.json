@@ -1,0 +1,347 @@
+{
+ "owed": [
+  {
+   "batch": "W2-bundle_cli-1",
+   "func": "_assess",
+   "index": 22,
+   "refutation": "Input: the 3 existing FailClosed fixtures (P1 L586, P2 L596, P3 L589). Reader: bundle_cli.main operator JSON via migrate"
+  },
+  {
+   "batch": "W2-bundle_cli-1",
+   "func": "_assess",
+   "index": 23,
+   "refutation": "See index 22: the same owed set/all-truthy assertion over the fail-closed change fails on the missing 'before'. Reader b"
+  },
+  {
+   "batch": "W2-bundle_cli-1",
+   "func": "_assess",
+   "index": 24,
+   "refutation": "See index 22: owed set/all-truthy assertion fails on the missing 'after'. Reader bundle_cli.main; input the P1/P2/P3 fix"
+  },
+  {
+   "batch": "W2-bundle_cli-1",
+   "func": "_assess",
+   "index": 38,
+   "refutation": "See index 22: set(c) >= {'when',...} fails when 'when' is relabelled to ''. Reader bundle_cli.main; input the P1/P2/P3 f"
+  },
+  {
+   "batch": "W2-bundle_cli-1",
+   "func": "_assess",
+   "index": 39,
+   "refutation": "See index 22: owed set-assertion fails on the missing 'before' key. Reader bundle_cli.main; input the P1/P2/P3 fixtures."
+  },
+  {
+   "batch": "W2-bundle_cli-1",
+   "func": "_assess",
+   "index": 40,
+   "refutation": "See index 22: owed set-assertion fails on the missing 'after' key. Reader bundle_cli.main; input the P1/P2/P3 fixtures."
+  },
+  {
+   "batch": "W2-bundle_cli-1",
+   "func": "_assess",
+   "index": 41,
+   "refutation": "Input: P1/P2/P3 FailClosed fixtures. Reader: bundle_cli.main via migrate L424-429. Sketch: all(c[k] for k in ('when','be"
+  },
+  {
+   "batch": "W2-bundle_cli-1",
+   "func": "_assess",
+   "index": 42,
+   "refutation": "See index 41: one all-truthy assertion over the fail-closed change fails on before=''. Reader bundle_cli.main; input the"
+  },
+  {
+   "batch": "W2-bundle_cli-1",
+   "func": "_assess",
+   "index": 43,
+   "refutation": "See index 41: all-truthy assertion over the fail-closed change fails on after=''. Reader bundle_cli.main; input the P1/P"
+  },
+  {
+   "batch": "W2-bundle_cli-1",
+   "func": "_assess",
+   "index": 57,
+   "refutation": "Input: test_a_probe_with_no_capability_version (P1). Reader: bundle_cli.main via migrate L424-429. Sketch: set(c) >= {'w"
+  },
+  {
+   "batch": "W2-bundle_cli-1",
+   "func": "_assess",
+   "index": 58,
+   "refutation": "Input: test_a_probe_with_no_capability_version (P1). Reader: bundle_cli.main. Sketch: assert c has 'summary', assertTrue"
+  },
+  {
+   "batch": "W2-bundle_cli-1",
+   "func": "_assess",
+   "index": 64,
+   "refutation": "See index 58: owed P1 presence/set assertion fails when 'summary' is relabelled to ''. Reader bundle_cli.main; input tes"
+  },
+  {
+   "batch": "W2-bundle_cli-1",
+   "func": "_assess",
+   "index": 65,
+   "refutation": "Input: test_a_probe_that_is_not_the_one_the_release_used (P2). Reader: bundle_cli.main. Sketch: set(c) >= {'when','befor"
+  },
+  {
+   "batch": "W2-bundle_cli-1",
+   "func": "_assess",
+   "index": 69,
+   "refutation": "Input: test_a_probe_with_no_capability_version (P1). Reader: bundle_cli.main. Sketch: assertIn('declares no capability v"
+  },
+  {
+   "batch": "W2-bundle_cli-1",
+   "func": "_assess",
+   "index": 86,
+   "refutation": "Input: test_an_undeclared_change (P3). Reader: bundle_cli.main. Sketch: set(c) >= {'when','before','after','summary'} fa"
+  },
+  {
+   "batch": "W2-bundle_cli-2",
+   "func": "_authentic",
+   "index": 3,
+   "refutation": "Owed T-CODE-MISMATCH empty-manifest subcase. Input: run_dir(manifest=True) with EVIDENCE.json overwritten b''; self.refu"
+  },
+  {
+   "batch": "W2-bundle_cli-2",
+   "func": "_authentic",
+   "index": 10,
+   "refutation": "Owed T-CODE-MISMATCH. Input: EVIDENCE.json b'' and subcase {'files':5}, expect_anchor='a'*64. Reader: operator reading `"
+  },
+  {
+   "batch": "W2-bundle_cli-2",
+   "func": "_authentic",
+   "index": 13,
+   "refutation": "Owed T-CODE-UNREAD-MANIFEST (@POSIX_USER). Input: run_dir(manifest=True); os.chmod(run/R.MANIFEST,0)+addCleanup; self.re"
+  },
+  {
+   "batch": "W2-bundle_cli-2",
+   "func": "_authentic",
+   "index": 19,
+   "refutation": "Owed T-CODE-UNREAD-EVIDENCE (@POSIX_USER). Input: run_dir(manifest=True); anchor=anchor_of(run); victim=run/'run'/'journ"
+  },
+  {
+   "batch": "W2-bundle_cli-2",
+   "func": "_authentic",
+   "index": 30,
+   "refutation": "Owed T-CHANGED-LIST case (a). Input: run_dir(manifest=True); anchor=anchor_of(run); victim journal; victim.write_bytes(r"
+  },
+  {
+   "batch": "W2-bundle_cli-2",
+   "func": "_authentic",
+   "index": 35,
+   "refutation": "Owed T-CHANGED-LIST case (b). Input: run_dir(manifest=True); anchor=anchor_of(run); delete one manifest file (e.g. RUN.s"
+  },
+  {
+   "batch": "W2-bundle_cli-2",
+   "func": "_authentic",
+   "index": 37,
+   "refutation": "Owed T-CHANGED-LIST case (a), assertNotIn arm. Input as [30]: tamper one file under a matching anchor. Reader: operator."
+  },
+  {
+   "batch": "W2-bundle_cli-4",
+   "func": "_ground",
+   "index": 10,
+   "refutation": "A test is owed (T-SA; reader: operator reading approvals_kept_grounds, printed at main:1084). Sketch: in TheLedgerLockBu"
+  },
+  {
+   "batch": "W2-bundle_cli-4",
+   "func": "_ground",
+   "index": 24,
+   "refutation": "A test is owed (T-SA; reader: operator reading approvals_kept_grounds at main:1084). Same sketch as [10]: assert each gr"
+  },
+  {
+   "batch": "W2-bundle_cli-4",
+   "func": "_ground",
+   "index": 21,
+   "refutation": "A test is owed (T-CUR-GROUND; reader: operator reading approvals_kept_grounds for a bundle already of this release, main"
+  },
+  {
+   "batch": "W2-bundle_cli-4",
+   "func": "_ground",
+   "index": 38,
+   "refutation": "A test is owed (T-CUR-GROUND). Sketch as [21]: assert 'no earlier release whose capability to compare' in ground['ground"
+  },
+  {
+   "batch": "W2-bundle_cli-4",
+   "func": "_ground",
+   "index": 36,
+   "refutation": "A test is owed (T-CUR-GROUND). Sketch as [21]: after [ground]=report['approvals_kept_grounds'] in WhatIsNotKept (:486-49"
+  },
+  {
+   "batch": "W2-bundle_cli-6",
+   "func": "_record",
+   "index": 33,
+   "refutation": "input: a run directory whose RUN.json holds valid JSON that is not an object, e.g. '[1, 2]' -> _record raises EVIDENCE_M"
+  },
+  {
+   "batch": "W2-bundle_cli-6",
+   "func": "_record",
+   "index": 40,
+   "refutation": "input: a run directory with a readable directory but RUN.json chmod 0o000 (POSIX non-root) -> _record's read_text raises"
+  },
+  {
+   "batch": "W2-bundle_cli-7",
+   "func": "_declared",
+   "index": 49,
+   "refutation": "input: file_artifact entry capability_changes={3:{'summary':'s','affects':({'classes':('grep_count',),'when':'w','before"
+  },
+  {
+   "batch": "W2-bundle_cli-7",
+   "func": "_declared",
+   "index": 50,
+   "refutation": "input: file_artifact entry capability_changes={3:{'summary':'s','affects':({'classes':('grep_count',),'when':'w','before"
+  },
+  {
+   "batch": "W2-bundle_cli-7",
+   "func": "_declared",
+   "index": 57,
+   "refutation": "input: identical to index 49 \u2014 file_artifact entry whose selector before is '' (or 3), else well formed -> pristine None"
+  },
+  {
+   "batch": "W2-bundle_cli-7",
+   "func": "_declared",
+   "index": 58,
+   "refutation": "input: identical to index 50 \u2014 file_artifact entry whose selector after is '' (or 3), else well formed -> pristine None,"
+  },
+  {
+   "batch": "W2-bundle_cli-8",
+   "func": "_group",
+   "index": 4,
+   "refutation": "Owed T-GROUNDS-ABSENCE. Input: committed LedgerLock 2.0.0 bundle (in fixture). Reader: operator + docs:96 + docstring L7"
+  },
+  {
+   "batch": "W2-bundle_cli-8",
+   "func": "_group",
+   "index": 5,
+   "refutation": "Owed T-GROUNDS-ABSENCE part (b). Input: LedgerLock fixture. Reader: operator + docs:96. Sketch: in test (L660) assert le"
+  },
+  {
+   "batch": "W2-bundle_cli-8",
+   "func": "_group",
+   "index": 6,
+   "refutation": "Owed T-GROUNDS-ABSENCE. Same input/reader/sketch as idx 4 (assert the 8 (probe,class,subject_absence) triples). MEASURED"
+  },
+  {
+   "batch": "W2-bundle_cli-8",
+   "func": "with_commands",
+   "index": 3,
+   "refutation": "REFUTES THE AUDIT. Killing test (unregistered for ::with_commands): tests/v2/test_v21_kills3_A03.py::UnknownSpecRefusal."
+  },
+  {
+   "batch": "W2-bundle_cli-8",
+   "func": "with_commands",
+   "index": 19,
+   "refutation": "Owed T-WC-DEFAULT-OUT. Input: migrate(self.before)[1]. Reader: docstring L343 'candidate.json when none is given' + the "
+  },
+  {
+   "batch": "W2-bundle_cli-8",
+   "func": "with_commands",
+   "index": 28,
+   "refutation": "Owed T-WC-APPROVED-INFIX. Input: migrate(self.before)[1] with explicit out. Reader: operator + docstring L344. Sketch: i"
+  },
+  {
+   "batch": "W2-bundle_cli-8",
+   "func": "with_commands",
+   "index": 34,
+   "refutation": "Owed T-WC-HOW-GUIDANCE. Input: migrate(self.before)[1]. Reader: operator reading needs_owner_reapproval['how']. Sketch: "
+  },
+  {
+   "batch": "W2-bundle_cli-9",
+   "func": "_known",
+   "index": 7,
+   "refutation": "A test is owed ONLY for case (a), targeted at the registered file migrate_semantics. Input: `with mock.patch.dict(bundle"
+  },
+  {
+   "batch": "W2-lineage-2",
+   "func": "_without_a_journal",
+   "index": 36,
+   "refutation": "Test owed. Input: RUN.json={'journal':{'path':JOURNAL,'lines':'5'}} (line count not int), no journal file. Reader: opera"
+  },
+  {
+   "batch": "W2-lineage-2",
+   "func": "_without_a_journal",
+   "index": 40,
+   "refutation": "Test owed. Input: RUN.json='[1, 2]' (valid JSON non-object), no journal file. Reader: operator via claim() refusal/conti"
+  },
+  {
+   "batch": "W2-lineage-2",
+   "func": "_without_a_journal",
+   "index": 47,
+   "refutation": "Test owed. Input (POSIX): RUN.json written then chmod 0o000, no journal file -> PermissionError on read_text. Reader: op"
+  },
+  {
+   "batch": "W2-lineage-2",
+   "func": "_without_a_journal",
+   "index": 51,
+   "refutation": "Test owed. Input: RUN.json='{\"journal\": {\"path\": \"run/jour' (cut JSON), no journal file. Reader: operator via claim() re"
+  },
+  {
+   "batch": "W2-lineage-3",
+   "func": "usage_lineage",
+   "index": 71,
+   "refutation": "input: clean lineage, own={'tokens':{...},'cost':{'value':x,'status':'known'},'sessions':[{'session':'S1.developer.1.jso"
+  },
+  {
+   "batch": "W2-lineage-3",
+   "func": "usage_lineage",
+   "index": 79,
+   "refutation": "input: usage_lineage reaching the except branch (predecessor with an unreadable sessions/*.jsonl, or mock events_of + un"
+  },
+  {
+   "batch": "W2-lineage-3",
+   "func": "usage_lineage",
+   "index": 80,
+   "refutation": "input: a predecessor with an unreadable session -> a blind row. reader: T08b ROW_KEYS / operator. sketch: reach the exce"
+  },
+  {
+   "batch": "W2-lineage-3",
+   "func": "usage_lineage",
+   "index": 97,
+   "refutation": "Same as 79: reach the except branch and assert set(blind_row)=={run,recorded,superseded,tokens,cost} (also kills 79,80,9"
+  },
+  {
+   "batch": "W2-lineage-3",
+   "func": "usage_lineage",
+   "index": 98,
+   "refutation": "input: a predecessor with an unreadable session -> a blind row. reader: T08b ROW_KEYS / operator. sketch: reach the exce"
+  },
+  {
+   "batch": "W2-lineage-3",
+   "func": "usage_lineage",
+   "index": 109,
+   "refutation": "input: clean lineage + a fully-tokened own session (steps=1,steps_without_tokens=0). reader: tokens_status (lineage.py:8"
+  },
+  {
+   "batch": "W2-lineage-3",
+   "func": "usage_lineage",
+   "index": 117,
+   "refutation": "input: a superseded sibling whose session file is unreadable -> a blind row. reader: operator / T08b per-row superseded "
+  },
+  {
+   "batch": "W2-lineage-6",
+   "func": "child_evidence",
+   "index": 34,
+   "refutation": "Input: existing torn_first_line fixture self.put_journal(a_journal()[:60]). Reader: operator reading claim()'s LineageRe"
+  },
+  {
+   "batch": "W2-lineage-7",
+   "func": "_journal_mismatch",
+   "index": 4,
+   "refutation": "Owed test sound. Input: sealed run (RUN.json names sha256 and lines=K) whose on-disk journal has newline count K but dif"
+  },
+  {
+   "batch": "W2-lineage-8",
+   "func": "claim_unread",
+   "index": 10,
+   "refutation": "A test is owed. Reader: tests/v2/test_v21_pw_lineage_continue.py::test_a_claim_that_cannot_be_read_is_reported_unread_wi"
+  },
+  {
+   "batch": "W2-lineage-9",
+   "func": "unread_runs",
+   "index": 3,
+   "refutation": "INPUT: account={'runs':[{'run':'/x/run1','unread':['r1..']},{'run':'/y/run2','unread':['r2..']}],'unread':['r1..','r2..'"
+  },
+  {
+   "batch": "W2-lineage-9",
+   "func": "not_there",
+   "index": 4,
+   "refutation": "INPUT: e=OSError(errno.EINVAL,'bad'); e.winerror=123 (and 21,1921), off-list errno. READER: lineage.not_there, thence ch"
+  }
+ ],
+ "undecided": []
+}

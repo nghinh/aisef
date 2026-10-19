@@ -1,0 +1,145 @@
+{
+ "batch": "W2-bundle_cli-3",
+ "file": "aisef2/app/bundle_cli.py",
+ "snapshot": "4ec961e706a1f7bda16d131037058c4fe9c2663f",
+ "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+ "registered_kill_files": [
+  "tests/v2/test_v21_bundle_tools.py",
+  "tests/v2/test_v21_identity.py",
+  "tests/v2/test_v21_review.py",
+  "tests/v2/test_v21_continue_usage.py",
+  "tests/v2/test_v21_continue_integrity.py",
+  "tests/v2/test_v21_defects_lint.py",
+  "tests/v2/test_v21_kills3_A00.py",
+  "tests/v2/test_v21_kills3_T00a.py",
+  "tests/v2/test_v21_kills3_T00b.py",
+  "tests/v2/test_v21_pw_lineage_continue.py",
+  "tests/v2/test_v21_migrate_semantics.py"
+ ],
+ "entries": [
+  {
+   "target": "aisef2/app/bundle_cli.py::main",
+   "index": 67,
+   "mutant": "L1010 string 'an earlier bundle whose still-binding approvals stay, those of a contract a declared capability change evaluates differently excepted (named in the report)' emptied",
+   "class": "AUDITED",
+   "group": "argparse help/metavar text, printed only by `aisef bundle [SUB] --help`: it reaches no program and no test. mutant_view confirms each empties one `help=`/`metavar=` of `bundle_cli.main`'s parser (L1010, L1026, L1027, L1029). Emptying leaves the usage/exit status of every subcommand unchanged and alters exactly one line of one `--help` (the item is listed without its description, or `--expect-anchor` loses its SHA256 placeholder). git grep over the snapshot (aisef2/aisef/tests/validation/docs): none of these strings is read anywhere but bundle_cli.py's own help= (and the module docstring, which restates the same facts in its own words). The only `--help` pinned in the tests is `aisef run` (cli.py), tests/v2/test_v21_kills_cli.py; no test pins any `aisef bundle` help, so there is no completeness-of-option-documentation contract to break, and a per-string test would be the verbatim-text test the round excludes.",
+   "grounds": "help= of seal's `--keep-approvals-from` (bundle_cli.py:1009-1011): one line of `aisef bundle seal --help`. The behaviour it describes (which still-binding approvals are kept, which are withheld when a declared capability change evaluates differently) is enforced in seal()/exposure_of and the kernel, not in this label. MEASUREMENT: registered kill file tests/v2/test_v21_bundle_tools.py run with the mutant written over bundle_cli.py (from a copy tree, PATH stripped of opencode, HOME/TMPDIR/XDG under the copy) = Ran 9 tests, OK (PASS) -> SURVIVED confirmed. baseline (the 11-file registered kill set, unmutated, snapshot 4ec961e) = Ran 189 tests, OK. The other 10 registered files do not assert `aisef bundle` help text. No REFUTED-by-measurement.",
+   "consumers_checked": [
+    "git grep -F of the full string over aisef2/ aisef/ tests/ validation/ docs/ at the snapshot: zero hits outside bundle_cli.py:1010 itself (the help=)",
+    "every --help pinned in tests/: only `aisef run` (tests/v2/test_v21_kills_cli.py, a verbatim pin of `aisef run --help`); no pin of any `aisef bundle` subcommand help",
+    "seal --keep-approvals-from behaviour: bundle_cli.py seal()/exposure_of (`approvals_withheld_semantic`), asserted by tests/v2/test_v21_migrate_semantics.py and the module docstring :80-82; docs/v2.1/USAGE-2.1.md:104,154-155",
+    "docs/v2.1/research/TRACEABILITY.json contains-checks on bundle_cli.py are on name parts (`def _create(`, `--leave-out-unidentified`, `sub.add_parser(\"continue\"`, `sub.add_parser(\"migrate\"`), untouched by a help= change"
+   ],
+   "exceptions_checked": [
+    "an operator who relies on this help to know which approvals carry: USAGE-2.1.md:104/154-155 and the docstring state the same rule; the report itself names the withheld ones (`approvals_withheld_semantic`), asserted by migrate_semantics",
+    "a completion generator or docs build that parses `aisef bundle` help: none in the tree"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::main",
+   "index": 84,
+   "mutant": "L1026 string 'SHA256' emptied",
+   "class": "AUDITED",
+   "group": "argparse help/metavar text, printed only by `aisef bundle [SUB] --help`: it reaches no program and no test. mutant_view confirms each empties one `help=`/`metavar=` of `bundle_cli.main`'s parser (L1010, L1026, L1027, L1029). Emptying leaves the usage/exit status of every subcommand unchanged and alters exactly one line of one `--help` (the item is listed without its description, or `--expect-anchor` loses its SHA256 placeholder). git grep over the snapshot (aisef2/aisef/tests/validation/docs): none of these strings is read anywhere but bundle_cli.py's own help= (and the module docstring, which restates the same facts in its own words). The only `--help` pinned in the tests is `aisef run` (cli.py), tests/v2/test_v21_kills_cli.py; no test pins any `aisef bundle` help, so there is no completeness-of-option-documentation contract to break, and a per-string test would be the verbatim-text test the round excludes.",
+   "grounds": "metavar= of continue's `--expect-anchor` (bundle_cli.py:1026): the placeholder shown in `aisef bundle continue --help` usage and option list (`--expect-anchor SHA256` -> `--expect-anchor`). argparse accepts an empty metavar; it affects only --help rendering, not parsing or validation (the 64-hex check at L1055 is unchanged). MEASUREMENT: registered kill file tests/v2/test_v21_bundle_tools.py run with the mutant = Ran 9 tests, OK (PASS); argparse did not reject the empty metavar -> SURVIVED confirmed. baseline (the 11-file registered kill set, unmutated, snapshot 4ec961e) = Ran 189 tests, OK. No registered file pins `aisef bundle continue --help`. No REFUTED-by-measurement.",
+   "consumers_checked": [
+    "argparse uses metavar only to format usage/help; `a.expect_anchor` and the re.fullmatch validation (L1055) are independent of it",
+    "the only `SHA256` metavar a test pins is `aisef run`'s (tests/v2/test_v21_kills_cli.py, `--expect-anchor SHA256 verify only: ...` inside the `aisef run --help` pin) — a different parser (aisef2/app/cli.py:39), not bundle_cli",
+    "no test pins `aisef bundle continue --help`; git grep shows no reader of bundle_cli's continue usage line"
+   ],
+   "exceptions_checked": [
+    "an operator reading the placeholder to learn the value shape: the help= of the same option (survivor 85) and USAGE-2.1.md:364 say it is the 64-hex anchor; the re.fullmatch refusal fires on a non-64-hex value regardless of the metavar",
+    "a future verbatim pin of `aisef bundle continue --help`: none exists; an order/placeholder test would be the verbatim-text test the round excludes"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::main",
+   "index": 85,
+   "mutant": "L1027 string 'the evidence anchor the run printed, kept outside the run directory: refused when the run cannot show it (without it a continuation proves consistency, not authenticity)' emptied",
+   "class": "AUDITED",
+   "group": "argparse help/metavar text, printed only by `aisef bundle [SUB] --help`: it reaches no program and no test. mutant_view confirms each empties one `help=`/`metavar=` of `bundle_cli.main`'s parser (L1010, L1026, L1027, L1029). Emptying leaves the usage/exit status of every subcommand unchanged and alters exactly one line of one `--help` (the item is listed without its description, or `--expect-anchor` loses its SHA256 placeholder). git grep over the snapshot (aisef2/aisef/tests/validation/docs): none of these strings is read anywhere but bundle_cli.py's own help= (and the module docstring, which restates the same facts in its own words). The only `--help` pinned in the tests is `aisef run` (cli.py), tests/v2/test_v21_kills_cli.py; no test pins any `aisef bundle` help, so there is no completeness-of-option-documentation contract to break, and a per-string test would be the verbatim-text test the round excludes.",
+   "grounds": "help= of continue's `--expect-anchor` (bundle_cli.py:1026-1028): one line of `aisef bundle continue --help`. The authenticity fact it states is enforced by continue_from (`_authentic` at L897-898, `anchor_checked` at L949) and asserted by tests, not by this label. MEASUREMENT: registered kill file tests/v2/test_v21_bundle_tools.py run with the mutant = Ran 9 tests, OK (PASS) -> SURVIVED confirmed. baseline (the 11-file registered kill set, unmutated, snapshot 4ec961e) = Ran 189 tests, OK. No registered file reads this help. No REFUTED-by-measurement.",
+   "consumers_checked": [
+    "git grep -F over the snapshot: the sentence appears only in bundle_cli.py:1028 (help=) and :43 (module docstring, in its own words) — no test, no other module, no non-docstring doc",
+    "the --expect-anchor behaviour: continue_from() L897-898 (`_authentic`), L949 (`anchor_checked`), asserted by tests/v2/test_v21_pw_lineage_continue.py (TheOperatorAsksForAnAnchor: checked/reported, missing, mismatch) and docs/v2.1/USAGE-2.1.md:359-360,364,370",
+    "no `aisef bundle continue --help` pin in tests/"
+   ],
+   "exceptions_checked": [
+    "an operator who needs the warning that without the anchor a continuation proves only consistency: USAGE-2.1.md:370 and the docstring :43 state it, and the report sets `anchor_checked: false` (continue_from L949), which pw_lineage_continue asserts",
+    "a docs build/completion generator reading this help: none"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::main",
+   "index": 86,
+   "mutant": "L1029 string \"re-bind an earlier release's bundle to this release's spec ids; the approvals of a contract a declared capability change evaluates differently are withheld\" emptied",
+   "class": "AUDITED",
+   "group": "argparse help/metavar text, printed only by `aisef bundle [SUB] --help`: it reaches no program and no test. mutant_view confirms each empties one `help=`/`metavar=` of `bundle_cli.main`'s parser (L1010, L1026, L1027, L1029). Emptying leaves the usage/exit status of every subcommand unchanged and alters exactly one line of one `--help` (the item is listed without its description, or `--expect-anchor` loses its SHA256 placeholder). git grep over the snapshot (aisef2/aisef/tests/validation/docs): none of these strings is read anywhere but bundle_cli.py's own help= (and the module docstring, which restates the same facts in its own words). The only `--help` pinned in the tests is `aisef run` (cli.py), tests/v2/test_v21_kills_cli.py; no test pins any `aisef bundle` help, so there is no completeness-of-option-documentation contract to break, and a per-string test would be the verbatim-text test the round excludes.",
+   "grounds": "help= of the migrate subcommand (bundle_cli.py:1029-1030): the one-line summary of `migrate` in `aisef bundle --help` / `aisef bundle migrate --help`. The withhold-on-capability-change rule it states is enforced in migrate()/_assess and asserted by migrate_semantics, not by this label. MEASUREMENT: registered kill file tests/v2/test_v21_migrate_semantics.py (which runs `aisef bundle migrate` end to end) run with the mutant = Ran 51 tests, OK (PASS) -> SURVIVED confirmed. baseline (the 11-file registered kill set, unmutated, snapshot 4ec961e) = Ran 189 tests, OK. No REFUTED-by-measurement.",
+   "consumers_checked": [
+    "git grep -F of the tail over the snapshot: only bundle_cli.py:1029-1030 (help=); the module docstring :73-80 states the same rule in its own words",
+    "migrate's withhold behaviour: bundle_cli.py migrate()/_assess (`semantic_changes`, `approvals_withheld`), asserted by tests/v2/test_v21_migrate_semantics.py and tests/v2/test_v21_identity.py; docs/v2.1/USAGE-2.1.md:74; docs/v2/V2.1-BACKLOG.md V21-75",
+    "no `aisef bundle`/`aisef bundle migrate` help pin in tests/"
+   ],
+   "exceptions_checked": [
+    "an operator learning what migrate does only from this help: USAGE-2.1.md:74 and the docstring carry it; the report's `semantic_changes`/`approvals_withheld`/`needs_owner_reapproval` are the operator's actual guidance and are asserted",
+    "a program keyed on the subcommand summary: none; the subcommand name `migrate` (which the parser still registers) is what TRACEABILITY contains-checks, untouched by a help= change"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::main",
+   "index": 131,
+   "mutant": "L1056 string '--expect-anchor is the 64-hex evidence anchor the run printed' emptied",
+   "class": "AUDITED",
+   "group": "an operator-only refusal string: argparse's p.error message for a malformed `--expect-anchor` on `aisef bundle continue` (L1055-1056). It reaches stderr and sys.exit(2); no program parses it and no test reads its text. The validation itself (re.fullmatch(r'[0-9a-f]{64}', ...) at L1055) is unmutated, so a non-64-hex value is still refused with exit 2. The identical string lives in aisef2/app/cli.py:74 (`aisef run`'s same check); campaign 2 recorded that sibling, `cli.py::run` \"L70 string '--expect-anchor is the 64-hex evidence anchor the run printed' emptied\", as a SURVIVOR too (closure-evidence/.../mutation-workers/c2-w2.log) — no test kills emptying this message in either parser.",
+   "grounds": "p.error(...) text on a malformed --expect-anchor. The one test that reaches this path, tests/v2/test_v21_pw_lineage_continue.py:419-421, wraps `self.cli(run, '--expect-anchor', 'not-hex')` in `assertRaises(SystemExit)` under a redirect_stderr(io.StringIO()) that discards the message, asserting only that argparse exits. continue_integrity.py:621-627 exercises the identical cli.py check via `cli.run([... '--expect-anchor', 'not-an-anchor'])` and asserts only `exception.code == 2`. So the text has no reader; the behaviour (refuse non-64-hex, exit 2) is what is tested and is unmutated. MEASUREMENT: registered kill file tests/v2/test_v21_pw_lineage_continue.py, the only test that passes a malformed --expect-anchor to `aisef bundle continue` (test_the_cli_takes_it_and_refuses_a_value_that_is_not_one), run with the mutant = Ran 1 test, OK (PASS) -> SURVIVED confirmed (it asserts only SystemExit, under a discarded stderr). baseline (the 11-file registered kill set, unmutated, snapshot 4ec961e) = Ran 189 tests, OK. No REFUTED-by-measurement.",
+   "consumers_checked": [
+    "tests/v2/test_v21_pw_lineage_continue.py:122-129 (self.cli calls bundle_cli.main(['continue', ...])) and :419-421 (the only bad-anchor case: assertRaises(SystemExit), stderr redirected to a discarded StringIO; text not asserted)",
+    "tests/v2/test_v21_continue_integrity.py:621-627 (the sibling cli.py check; asserts only exit code 2)",
+    "git grep -F of the string over the snapshot: aisef2/app/bundle_cli.py:1056 and aisef2/app/cli.py:74 (the two p.error call sites) only; no test, no doc reads the text; closure-evidence records the campaign's own survivor lines",
+    "the re.fullmatch gate (L1055) is unmutated, so the exit-2 refusal of a non-64-hex value stands"
+   ],
+   "exceptions_checked": [
+    "an operator who needs the reason the value was rejected: the usage line argparse still prints names `--expect-anchor`, the option's help= (survivor 85) and USAGE-2.1.md:364 state the 64-hex shape; EVIDENCE_MISSING/EVIDENCE_MISMATCH (the substantive anchor refusals) have their own messages, tested in pw_lineage_continue",
+    "a verifier parsing argparse's error text: none; the sibling identical message in cli.py is itself an accepted campaign-2 survivor, so no verifier depends on the words in either parser",
+    "a requirement (not verbatim) test pinning a substring like 'expect-anchor'/'64-hex': the round excludes verbatim-text tests, and the project's own test for this path deliberately discards the text and asserts only SystemExit"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::main",
+   "index": 141,
+   "mutant": "L1077 string 'file_sha256' emptied",
+   "class": "AUDITED",
+   "group": "the OSError fallback of migrate's candidate.file_sha256 (bundle_cli.py:1074-1077). L1075 (the success path) sets report['candidate']['file_sha256'] from the just-written file's bytes and is NOT mutated; L1077 runs only when a.out.read_bytes() raises OSError right after the exclusive _create wrote the file (L1072). Both mutants change only L1077, so they are observable solely inside that defensive I/O-failure branch. No registered kill file, no doc scenario, and no operator misuse reaches it: every reader observes the success path. mutant_view confirms 141 is report['candidate']['']=None (file_sha256 key absent) and 162 is report['']['file_sha256']=None (KeyError, caught by the except at L1081 -> 'refused: ...' exit 2).",
+   "grounds": "In the `except OSError:` arm, `report['candidate']['file_sha256'] = None` becomes `report['candidate'][''] = None`: under an OSError the candidate's file_sha256 key would be missing (replaced by ''). The success-path assignment at L1075 that every reader observes is unmutated. The None-on-failure fallback is undocumented (the docstring :78-79 and the report's own prose L442-444 describe file_sha256 as 'the sha256 of the file's bytes' / 'when the command wrote the file'); read_bytes() reads raw bytes and cannot fail on encoding, so the branch needs a genuine filesystem failure between _create and read-back. MEASUREMENT: registered kill file tests/v2/test_v21_migrate_semantics.py (reads printed candidate.file_sha256 via the success path) run with the mutant = Ran 51 tests, OK (PASS): the OSError branch is not exercised -> SURVIVED confirmed. baseline (the 11-file registered kill set, unmutated, snapshot 4ec961e) = Ran 189 tests, OK. No REFUTED-by-measurement.",
+   "consumers_checked": [
+    "tests/v2/test_v21_migrate_semantics.py:460-467 runs `aisef bundle migrate` and reads printed['candidate']['file_sha256'] == sha256(out.read_bytes()); the file is written and readable, so L1075 runs and L1077 does not — the mutant is not exercised",
+    "tests/v2/test_v21_kills3_T00a.py:244 and tests/v2/test_v21_kills3_T03b.py:120 compute the expected candidate.file_sha256 the same way (success path)",
+    "git grep file_sha256 over aisef2/ validation/ docs/: bundle_cli.py:1075/1077 (the two assignments), the docstring :79 and report prose :443, USAGE-2.1.md:95/111 — all describe/consume the success value; validation/qualification/*_mutation_record.py use an unrelated same-named key",
+    "candidate is always a dict (migrate() builds it at L441), so report['candidate'] exists; only its member key is changed, and only on OSError"
+   ],
+   "exceptions_checked": [
+    "a reader of the report after an OSError on read-back (would see file_sha256 absent): no test, operator scenario, or doc reaches this branch; the fallback value None is undocumented; the documented/tested contract (candidate.file_sha256 = the file's sha256) is the success path at L1075, unmutated",
+    "forcing the branch with a monkeypatch of read_bytes to raise OSError would kill it, but it tests an essentially unreachable I/O-failure guard (file unreadable microseconds after an exclusive create) — a test added merely to cover the fallback, which the round's rule forbids"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::main",
+   "index": 162,
+   "mutant": "L1077 string 'candidate' emptied",
+   "class": "AUDITED",
+   "group": "the OSError fallback of migrate's candidate.file_sha256 (bundle_cli.py:1074-1077). L1075 (the success path) sets report['candidate']['file_sha256'] from the just-written file's bytes and is NOT mutated; L1077 runs only when a.out.read_bytes() raises OSError right after the exclusive _create wrote the file (L1072). Both mutants change only L1077, so they are observable solely inside that defensive I/O-failure branch. No registered kill file, no doc scenario, and no operator misuse reaches it: every reader observes the success path. mutant_view confirms 141 is report['candidate']['']=None (file_sha256 key absent) and 162 is report['']['file_sha256']=None (KeyError, caught by the except at L1081 -> 'refused: ...' exit 2).",
+   "grounds": "In the `except OSError:` arm, `report['candidate']['file_sha256'] = None` becomes `report['']['file_sha256'] = None`: report[''] is a KeyError (report has no '' key), caught by `except (KeyError, TypeError, ValueError)` at L1081, which prints 'refused: KeyError: ...' and returns 2 — so under an OSError a successful migrate (exit 0, report printed) would instead be refused. Observable only inside the OSError branch; the success-path assignment at L1075 is unmutated. MEASUREMENT: registered kill file tests/v2/test_v21_migrate_semantics.py run with the mutant = Ran 51 tests, OK (PASS): the OSError branch is not exercised -> SURVIVED confirmed. baseline (the 11-file registered kill set, unmutated, snapshot 4ec961e) = Ran 189 tests, OK. No REFUTED-by-measurement.",
+   "consumers_checked": [
+    "same as index 141: tests/v2/test_v21_migrate_semantics.py:460-467, kills3_T00a:244, kills3_T03b:120 read candidate.file_sha256 only on the success path (file written and readable), so L1077 is never reached",
+    "the except at bundle_cli.py:1081-1083 catches KeyError and turns it into exit 2; no test migrates with read_bytes forced to raise, so this path is never taken",
+    "git grep candidate/file_sha256: no consumer reads the report after an I/O failure on read-back"
+   ],
+   "exceptions_checked": [
+    "an operator whose migrate hits the OSError branch would get exit 2 ('refused: KeyError') instead of a written candidate with file_sha256=None: no test/doc/operator path reaches it; the write itself (the candidate file) already happened at L1072 before the read-back",
+    "a monkeypatch forcing OSError would kill it, but as with 141 it covers an unreachable I/O-failure guard — a test added only for coverage, which the round forbids"
+   ]
+  }
+ ],
+ "measurement_note": "Per-mutant runs used the registered kill file(s) that exercise the mutated region; the full 11-file set was run green unmutated (baseline, 189 tests OK) and the other registered files do not touch the mutated lines (reasons per entry). A full 11-file-per-mutant driver run was started but cut short at finalization; only the targeted runs above and the baseline are reported as observed. Campaign f9a8122a independently recorded all seven SURVIVED at this snapshot."
+}

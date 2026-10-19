@@ -1,0 +1,512 @@
+{
+ "batch": "W2-bundle_cli-1",
+ "target": "aisef2/app/bundle_cli.py::_assess",
+ "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+ "measurement": "Snapshot 4ec961e. The one registered kill file for aisef2/app/bundle_cli.py::_assess (validation.v2.mutation.V21_TARGETS['aisef2/app/bundle_cli.py::_assess'] == ['tests/v2/test_v21_migrate_semantics.py'], computed by importing the module) PASSES clean on the unmutated snapshot tree (51 tests OK) and on the ast.unparse null mutant (51 OK, the T0 control). Each of the 28 new survivors was rebuilt with validation.v2.mutation.mutants(src,'_assess',enums)[index] (desc asserted == the batch string; _assess has 125 mutants, 0/28 index mismatches), written over aisef2/app/bundle_cli.py in a COPY of the tree, and test_v21_migrate_semantics run against it (env -i, PATH=/usr/bin:/bin stripped of opencode, HOME/TMPDIR/XDG_* under the copy, PYTHONPATH=tree, nice -n 19 python3 -P -B -m unittest): ALL 28 SURVIVED (rc 0, 51 tests OK each). No kill file fails on any mutant, so there is no REFUTED-by-measurement and the campaign's SURVIVED is confirmed for all 28. The one closure-evidence file the kill file reads (closure-evidence/v2/release/LEDGERLOCK-PROJECT.json) was added via git show. Observable differences were dumped per mutant by running migrate() under the kill file's own P1/P2/P3 fail-closed fixtures and printing semantic_changes[BC-EXISTS-REQ].changes/.consulted (observe_mut.py).",
+ "scope_note": "All 28 mutants touch ONLY the fail-closed output of _assess: the `every` template dict (L237-239) which is spread ({**every}) into the three fail-closed hit paths, those hits' own literals (L242 no-capability-version, L244 incomparable-probe, L252 no-well-formed-record), and the rec-is-None `consulted` row (L251). The declared-change hit (L256-257) and declared `consulted` (L255) are untouched by every mutant here. Fail-closed hits surface to the operator only through migrate()'s report['semantic_changes'][i] (L424-429 spreads **e, which carries changes + consulted) and seal()'s report['approvals_withheld_semantic'][].changes (L596-598); both are printed whole as JSON by main and parsed by no code. No code outside bundle_cli.py reads an individual hit or consulted field (grep of aisef2/ aisef/ validation/ for ['when']/['before']/['after']/['consulted']/['selectors']/.get('ref') finds only the construction sites L256-257 and the grounds reader L295, which reads how['consulted'] for KEPT contracts only). The L251 consulted row only ever occurs for an EXPOSED (withheld) contract (a version with no record both appends to consulted AND appends a hit, so the contract is exposed and never kept), so it reaches _grounds for no one; it appears only in the undocumented, test-unread report['semantic_changes'][i]['consulted'].",
+ "entries": [
+  {
+   "target": "aisef2/app/bundle_cli.py::_assess", "index": 20, "mutant": "L237 dict entry 0 dropped",
+   "class": "AUDITED",
+   "group": "fc-null-echo: a null-valued template key ('version':None / 'ref':None) of the fail-closed `every` dict (L237) that carries no information in a fail-closed hit and is pinned by no test (by value) and no truthiness assertion",
+   "grounds": "every = {'version':None,'ref':None,'when':...,'before':...,'after':...} (L237-239) is spread into every fail-closed hit. Dropping entry 0 removes 'version':None from `every`, so the no-capability-version hit (L242) and the incomparable hit (L244) lose their 'version' key; the no-record hit (L252) is unaffected because it sets 'version': version explicitly AFTER {**every}. MEASURED (observe_mut.py, P1): unmutated hit {'version':null,'ref':null,'when':'every use of the probe','before':...,'after':...,'summary':'probe.file_artifact declares no capability version'} -> mutant drops the 'version':null field. Observable in report['semantic_changes'][].changes (operator JSON). AUDITED, not REFUTED: 'version' in a fail-closed hit is the null sentinel (there is no single capability version for 'every use of the probe'); the migrate test pins per-change version only by VALUE on the declared path (test L371 {c['version'] for c in row['changes']}=={3}) and on the P3 explicit version (test L593 change['version']==3, which this mutant does not touch) — never by presence/value on a P1/P2 fail-closed hit; the truthiness guard the suite does make on change rows (test L373-375) covers summary/when/before/after, not version; USAGE-2.1.md:93 names a change's class/from-to/ref/when/before-after, not a per-change version. The version range is recoverable from the entry's from/to (L260). SURVIVED the kill file.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:242,244 (the two every-based fail-closed hits that lose 'version'); L252 hit keeps it (explicit 'version': version after **every); L260 entry-level from/to carries the version range",
+    "tests/v2/test_v21_migrate_semantics.py:371 (per-change version by VALUE, declared contract), :593 (P3 explicit version==3 — not this mutant), :373-375 (truthiness guard: summary/when/before/after, NOT version)",
+    "docs/v2.1/USAGE-2.1.md:93 (semantic_changes change fields: class/from-to/ref/when/before-after — no per-change version)",
+    "no code reader of a hit's 'version' (grep aisef2/ aisef/ validation/): construction only at L256; report printed whole by main and passed whole by seal L596-598",
+    "registered kill file tests/v2/test_v21_migrate_semantics.py run against the mutant: SURVIVED (51 OK)"
+   ],
+   "exceptions_checked": [
+    "the P3 no-record hit losing its version: it does not — 'version': version at L252 is set after {**every} and overrides, so change['version']==3 still holds (test L593 would still pass)",
+    "a stricter reading that owes a full key-set assertion set(change)=={version,ref,when,before,after,summary} on fail-closed hits: that WOULD kill this mutant and move it to REFUTED — flagged in notes as the dispute; the suite makes no such key-set assertion today and version is a null sentinel here",
+    "the '' collision (rename case): N/A, this is a drop"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_assess", "index": 21, "mutant": "L237 dict entry 1 dropped",
+   "class": "AUDITED",
+   "group": "fc-null-echo: a null-valued template key ('version':None / 'ref':None) of the fail-closed `every` dict (L237) that carries no information in a fail-closed hit and is pinned by no test (by value) and no truthiness assertion",
+   "grounds": "Drops 'ref':None from `every` (L237), so all three fail-closed hits (L242/L244/L252) lose their 'ref' key. MEASURED (P1): the hit loses 'ref':null. Observable in the operator JSON. AUDITED: 'ref' in a fail-closed hit is the null sentinel — a fail-closed change has no PM-selector, so ref is None; the suite reads 'ref' only on the DECLARED path by value (test L339 [h['ref'] for h in c['changes']], L340-342 ==['PM-9','PM-11'], L345 h['when'].startswith(h['ref']+':')), never on a fail-closed hit (where ref is null and 'when' is 'every use of the probe', which does not start with 'None:'); USAGE-2.1.md:93 names ref as '(PM-9, PM-11)', i.e. the selector's ref, which a fail-closed change does not have. No reader depends on the null placeholder. SURVIVED.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:242,244,252 (every-based fail-closed hits lose 'ref'); L256 declared hit sets 'ref': sel.get('ref') independently (untouched)",
+    "tests/v2/test_v21_migrate_semantics.py:339-345 (ref read by VALUE on declared selectors only; the startswith(ref+':') pairing is a declared-path assertion), :625 ([h['when'].split(':')[0] ...] declared)",
+    "docs/v2.1/USAGE-2.1.md:93 (ref described as the selector's PM-9/PM-11 — declared changes)",
+    "no code reader of a hit's 'ref' (grep): construction at L256 only",
+    "registered kill file run against the mutant: SURVIVED (51 OK)"
+   ],
+   "exceptions_checked": [
+    "a fail-closed hit whose ref is meaningful: none — ref is None on all three fail-closed paths (there is no selector)",
+    "the declared-path ref assertion (L339-345) reaching a fail-closed hit: it cannot — the fixtures that reach L339 (era_bundle, LedgerLock) are fully declared, and a fail-closed when does not start with 'None:'",
+    "a stricter full key-set assertion owing this: flagged in notes as the dispute (null sentinel)"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_assess", "index": 36, "mutant": "L237 string 'version' emptied",
+   "class": "AUDITED",
+   "group": "fc-null-echo: a null-valued template key ('version':None / 'ref':None) of the fail-closed `every` dict (L237) that carries no information in a fail-closed hit and is pinned by no test (by value) and no truthiness assertion",
+   "grounds": "Renames the 'version' key of `every` to '' (L237): every = {'':None,'ref':None,...}. MEASURED (P1): the hit becomes {'':null,'ref':null,'when':...,'before':...,'after':...,'summary':...} — the null value is relabelled to a '' key and the hit has no 'version' key (the single '' key collides with nothing else). Same reader analysis as index 20: no test/code/doc depends on a fail-closed hit carrying 'version'; the P3 explicit 'version': version (L252) still sets a real 'version' key there. AUDITED. SURVIVED.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:242,244 (hit now has a '' key instead of 'version'); L252 sets 'version': version after **every so the '' and a real 'version' both appear there (the P3 hit, test L593 still passes)",
+    "tests/v2/test_v21_migrate_semantics.py:371/593 (version by value — unaffected on the paths they test), :373-375 (truthiness: not version)",
+    "docs/v2.1/USAGE-2.1.md:93; no code reader of a hit 'version' key (grep)",
+    "registered kill file run against the mutant: SURVIVED (51 OK)"
+   ],
+   "exceptions_checked": [
+    "'' colliding with another key in the hit: no — only 'version' is relabelled; the other every keys and 'summary' are distinct",
+    "the P3 hit: it sets 'version': version explicitly, so a real 'version' key survives there alongside the '' key — test L593 still reads change['version']==3",
+    "a full key-set assertion owing this: dispute, flagged in notes"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_assess", "index": 37, "mutant": "L237 string 'ref' emptied",
+   "class": "AUDITED",
+   "group": "fc-null-echo: a null-valued template key ('version':None / 'ref':None) of the fail-closed `every` dict (L237) that carries no information in a fail-closed hit and is pinned by no test (by value) and no truthiness assertion",
+   "grounds": "Renames the 'ref' key of `every` to '' (L237): every = {'version':None,'':None,...}. MEASURED (P1): the hit shows {'version':null,'':null,...} — ref's null value under a '' key, no 'ref' key. Same analysis as index 21: ref is the null sentinel of a fail-closed hit; the suite reads ref only by value on declared selectors (L339-345). AUDITED. SURVIVED.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:242,244,252 (every-based hits now carry '' instead of 'ref'); L256 declared hit sets 'ref' independently",
+    "tests/v2/test_v21_migrate_semantics.py:339-345 (declared ref by value); no code reader of a hit 'ref' (grep)",
+    "docs/v2.1/USAGE-2.1.md:93 (ref = the selector's PM-9/PM-11)",
+    "registered kill file run against the mutant: SURVIVED (51 OK)"
+   ],
+   "exceptions_checked": [
+    "'' collision within the hit: only 'ref' is relabelled; one '' key",
+    "a declared hit losing ref: no — L256 builds its own 'ref': sel.get('ref'), not from `every`",
+    "a full key-set assertion owing this: dispute, flagged in notes"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_assess", "index": 22, "mutant": "L237 dict entry 2 dropped",
+   "class": "REFUTED",
+   "group": "fc-schema: a fail-closed hit's when/before/after — the per-change verdict explanation the operator reads, named by USAGE-2.1.md:93 and pinned truthy on the DECLARED sibling (test L373-375) but on no fail-closed hit — is dropped, renamed, or emptied",
+   "grounds": "Drops 'when':'every use of the probe' from `every` (L237-239), so all three fail-closed hits lose their 'when' key. MEASURED (P1): unmutated hit has 'when':'every use of the probe'; mutant has no 'when'. Observable in report['semantic_changes'][].changes (operator JSON; migrate L424-429) and seal's report['approvals_withheld_semantic'][].changes (L596-598). NOT equivalent, NOT a null sentinel (when carries the operator-facing text that says which uses of the probe the withholding covers). A reader depends: USAGE-2.1.md:93 names a change's `when` ('điều kiện của repo làm verdict khác (when)'), and test_v21_migrate_semantics L373-375 asserts assertTrue(change['when']) for EVERY change of a declared contract — the exact invariant a fail-closed hit's 'when' satisfies but is never run against. The killing test is the ordinary truthiness/presence assertion the suite already makes on the declared sibling (L373-375), applied to a fail-closed change — not a forbidden phrase-assertion. A test is owed. SURVIVED the kill file (the three fail-closed tests at L566-602 read only the withheld SET and, for P2/P3, change['summary'] — never change['when']).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:424-429 migrate (spreads **e: changes into report['semantic_changes'][i]); :596-598 seal (exposed[cid]['changes'] into approvals_withheld_semantic); main prints the whole report as JSON",
+    "tests/v2/test_v21_migrate_semantics.py:373-375 (for change in row['changes']: assertTrue(change[k]) for k in summary/when/before/after — DECLARED contract BC-GREP-DIR-REQ only), :566-602 (fail-closed tests read the withheld set and change['summary'] for P2/P3, never change['when'])",
+    "docs/v2.1/USAGE-2.1.md:93 (names `when` as a change field)",
+    "no code reader of a hit 'when' (grep aisef2/ aisef/ validation/): construction at L256 only",
+    "registered kill file run against the mutant: SURVIVED (51 OK)"
+   ],
+   "exceptions_checked": [
+    "REFUTED-by-measurement: ruled out — the kill file PASSES on the mutant (the truthiness guard L373-375 runs only on the declared BC-GREP-DIR-REQ, never on a fail-closed change)",
+    "a declared hit losing 'when': no — the declared hit builds 'when': sel['when'] at L256, independent of `every`",
+    "when being generic boilerplate (same for every fail-closed contract): true, but it is still the operator-facing explanation, doc-named and sibling-pinned-truthy; a stricter owner could instead call it AUDITED (flagged in notes)"
+   ],
+   "refutation": "The operator reads report['semantic_changes'][].changes[].when to see which uses of the probe a fail-closed withholding covers. Every change row is designed to carry a truthy when/before/after (the `every` template exists for exactly this), and test L373-375 pins that for declared changes but no test drives a fail-closed change through it. Input: the existing P1/P2/P3 fixtures (test_a_probe_with_no_capability_version, test_a_probe_that_is_not_the_one_the_release_used, test_an_undeclared_change). Reader: bundle_cli.main (operator JSON) via migrate L424-429. Sketch: in each fail-closed test, take the single change c and assert set(c) >= {'when','before','after','summary'} and all(c[k] for k in ('when','before','after','summary')), mirroring L373-375. Kills 22/23/24/38/39/40/41/42/43/57/65/86 (and, with 'summary', 58/64). A real gap: the fail-closed rows are exactly the ones an operator sees when something is wrong and must re-approve."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_assess", "index": 23, "mutant": "L237 dict entry 3 dropped",
+   "class": "REFUTED",
+   "group": "fc-schema: a fail-closed hit's when/before/after — the per-change verdict explanation the operator reads, named by USAGE-2.1.md:93 and pinned truthy on the DECLARED sibling (test L373-375) but on no fail-closed hit — is dropped, renamed, or emptied",
+   "grounds": "Drops 'before':'as the earlier release evaluated it' from `every` (L238), so all three fail-closed hits lose 'before'. MEASURED (P1): the hit loses the 'before' field. Observable in the operator JSON. Same reader analysis as index 22: USAGE-2.1.md:93 names the change's verdict before/after ('verdict trước/sau'), and test L373-375 asserts assertTrue(change['before']) for every declared change; no fail-closed change is run through it. Ordinary truthiness/presence assertion owed. SURVIVED.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:424-429, :596-598 (report construction); main prints whole",
+    "tests/v2/test_v21_migrate_semantics.py:373-375 (assertTrue(change['before']) declared), :566-602 (fail-closed read set/summary only)",
+    "docs/v2.1/USAGE-2.1.md:93 (verdict before/after)",
+    "no code reader of a hit 'before' (grep: only process_effect/qualification 'before', unrelated)",
+    "registered kill file run against the mutant: SURVIVED (51 OK)"
+   ],
+   "exceptions_checked": [
+    "REFUTED-by-measurement: ruled out (kill file PASSES on the mutant)",
+    "declared hit losing 'before': no — L257 builds 'before': sel['before'] independently",
+    "boilerplate argument (same text every time): acknowledged; owner may prefer AUDITED (notes)"
+   ],
+   "refutation": "See group fc-schema (index 22): one owed assertion over the fail-closed change (set + all-truthy of when/before/after/summary) closes this. Reader bundle_cli.main; input the P1/P2/P3 fixtures."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_assess", "index": 24, "mutant": "L237 dict entry 4 dropped",
+   "class": "REFUTED",
+   "group": "fc-schema: a fail-closed hit's when/before/after — the per-change verdict explanation the operator reads, named by USAGE-2.1.md:93 and pinned truthy on the DECLARED sibling (test L373-375) but on no fail-closed hit — is dropped, renamed, or emptied",
+   "grounds": "Drops 'after':'as this release evaluates it: the difference is not declared, so it is not ruled out' from `every` (L239), so all three fail-closed hits lose 'after' — the sentence that states WHY the difference is not ruled out, the most load-bearing of the three explanations. MEASURED (P1): the hit loses 'after'. Observable in the operator JSON. USAGE-2.1.md:93 names the verdict after; test L373-375 asserts assertTrue(change['after']) for every declared change; no fail-closed change is run through it. Ordinary assertion owed. SURVIVED.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:424-429, :596-598; main prints whole",
+    "tests/v2/test_v21_migrate_semantics.py:373-375 (assertTrue(change['after']) declared), :566-602 (fail-closed read set/summary only), :261 (pm9['after'] asserts words on the DECLARED record's after, not a fail-closed hit)",
+    "docs/v2.1/USAGE-2.1.md:93 (verdict after)",
+    "no code reader of a hit 'after' (grep)",
+    "registered kill file run against the mutant: SURVIVED (51 OK)"
+   ],
+   "exceptions_checked": [
+    "REFUTED-by-measurement: ruled out (kill file PASSES on the mutant)",
+    "declared hit losing 'after': no — L257 builds 'after': sel['after'] independently",
+    "test L261 (pm9['after']) catching this: no — it reads the DECLARED CAPABILITY_CHANGES record's after (fa.CAPABILITY_CHANGES[3]['affects'][0]['after']), not a hit from `every`"
+   ],
+   "refutation": "See group fc-schema (index 22). The 'after' text is the fail-closed explanation ('...the difference is not declared, so it is not ruled out'); one owed assertion over the fail-closed change closes it. Reader bundle_cli.main; input the P1/P2/P3 fixtures."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_assess", "index": 38, "mutant": "L237 string 'when' emptied",
+   "class": "REFUTED",
+   "group": "fc-schema: a fail-closed hit's when/before/after — the per-change verdict explanation the operator reads, named by USAGE-2.1.md:93 and pinned truthy on the DECLARED sibling (test L373-375) but on no fail-closed hit — is dropped, renamed, or emptied",
+   "grounds": "Renames the 'when' key of `every` to '' (L237): MEASURED (P1) the hit shows {'version':null,'ref':null,'':'every use of the probe','before':...,'after':...,'summary':...} — the when text under a '' key, no 'when' key. change['when'] raises KeyError. Same reader as index 22 (doc-named, sibling-pinned truthy L373-375). An ordinary set/presence assertion over the fail-closed change kills it. SURVIVED.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:424-429, :596-598; main prints whole (sort_keys sends '' first, no parser)",
+    "tests/v2/test_v21_migrate_semantics.py:373-375 (declared change['when']), :566-602 (fail-closed read set/summary only)",
+    "docs/v2.1/USAGE-2.1.md:93 (names when)",
+    "registered kill file run against the mutant: SURVIVED (51 OK)"
+   ],
+   "exceptions_checked": [
+    "'' collision in the hit: only 'when' relabelled; one '' key",
+    "REFUTED-by-measurement: ruled out (kill file PASSES on the mutant)",
+    "declared hit: builds 'when' at L256, unaffected"
+   ],
+   "refutation": "See group fc-schema (index 22): the set assertion set(c) >= {'when','before','after','summary'} fails when 'when' is relabelled to '' — one owed test closes it with 22/39/40 etc. Reader bundle_cli.main; input the P1/P2/P3 fixtures."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_assess", "index": 39, "mutant": "L238 string 'before' emptied",
+   "class": "REFUTED",
+   "group": "fc-schema: a fail-closed hit's when/before/after — the per-change verdict explanation the operator reads, named by USAGE-2.1.md:93 and pinned truthy on the DECLARED sibling (test L373-375) but on no fail-closed hit — is dropped, renamed, or emptied",
+   "grounds": "Renames the 'before' key of `every` to '' (L238): the before text moves under a '' key, no 'before' key; change['before'] raises KeyError. MEASURED analogous to index 38. Doc-named (USAGE:93), sibling-pinned truthy (L373-375). Ordinary presence/set assertion owed. SURVIVED.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:424-429, :596-598; main prints whole",
+    "tests/v2/test_v21_migrate_semantics.py:373-375 (declared change['before']), :566-602 (fail-closed set/summary only)",
+    "docs/v2.1/USAGE-2.1.md:93 (verdict before/after)",
+    "registered kill file run against the mutant: SURVIVED (51 OK)"
+   ],
+   "exceptions_checked": [
+    "'' collision: one '' key only",
+    "REFUTED-by-measurement: ruled out (kill file PASSES)",
+    "declared hit builds 'before' at L257, unaffected"
+   ],
+   "refutation": "See group fc-schema (index 22). One owed set/truthiness assertion over the fail-closed change closes it. Reader bundle_cli.main; input the P1/P2/P3 fixtures."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_assess", "index": 40, "mutant": "L239 string 'after' emptied",
+   "class": "REFUTED",
+   "group": "fc-schema: a fail-closed hit's when/before/after — the per-change verdict explanation the operator reads, named by USAGE-2.1.md:93 and pinned truthy on the DECLARED sibling (test L373-375) but on no fail-closed hit — is dropped, renamed, or emptied",
+   "grounds": "Renames the 'after' key of `every` to '' (L239): the after text moves under a '' key, no 'after' key; change['after'] raises KeyError. Doc-named (USAGE:93), sibling-pinned truthy (L373-375). Ordinary presence/set assertion owed. SURVIVED.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:424-429, :596-598; main prints whole",
+    "tests/v2/test_v21_migrate_semantics.py:373-375 (declared change['after']), :566-602 (fail-closed set/summary only)",
+    "docs/v2.1/USAGE-2.1.md:93 (verdict after)",
+    "registered kill file run against the mutant: SURVIVED (51 OK)"
+   ],
+   "exceptions_checked": [
+    "'' collision: one '' key only",
+    "REFUTED-by-measurement: ruled out (kill file PASSES)",
+    "declared hit builds 'after' at L257, unaffected"
+   ],
+   "refutation": "See group fc-schema (index 22). One owed set/truthiness assertion over the fail-closed change closes it. Reader bundle_cli.main; input the P1/P2/P3 fixtures."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_assess", "index": 41, "mutant": "L237 string 'every use of the probe' emptied",
+   "class": "REFUTED",
+   "group": "fc-schema: a fail-closed hit's when/before/after — the per-change verdict explanation the operator reads, named by USAGE-2.1.md:93 and pinned truthy on the DECLARED sibling (test L373-375) but on no fail-closed hit — is dropped, renamed, or emptied",
+   "grounds": "Empties the VALUE of `every['when']` to '' (L237): MEASURED (P1) the hit shows 'when':'' — a present key with a FALSY value. assertTrue(change['when']) (the L373-375 guard) would FAIL on this fail-closed change, which is the ordinary truthiness assertion the suite already makes on declared changes but never on a fail-closed one. Observable (the operator sees an empty 'when'). REFUTED by that owed truthiness assertion. SURVIVED (no fail-closed test reads change['when']).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:424-429, :596-598; main prints whole",
+    "tests/v2/test_v21_migrate_semantics.py:373-375 (assertTrue(change['when']) declared — would fail on '' if run on a fail-closed change), :566-602 (fail-closed read set/summary only)",
+    "docs/v2.1/USAGE-2.1.md:93 (names when)",
+    "registered kill file run against the mutant: SURVIVED (51 OK)"
+   ],
+   "exceptions_checked": [
+    "REFUTED-by-measurement: ruled out (kill file PASSES — the truthiness guard runs only on BC-GREP-DIR-REQ, a declared contract)",
+    "declared 'when' emptied: no — declared hit builds 'when': sel['when'] at L256, not from `every`",
+    "the key still present: yes, so only a truthiness (not presence) assertion kills it — still the L373-375 kind, not a phrase-assertion"
+   ],
+   "refutation": "The L373-375 pattern assertTrue(change['when']) is exactly the owed assertion; applied to a fail-closed change it fails when 'when' is ''. Reader bundle_cli.main; input the P1/P2/P3 fixtures. Closed with 42/43 by one truthiness assertion."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_assess", "index": 42, "mutant": "L238 string 'as the earlier release evaluated it' emptied",
+   "class": "REFUTED",
+   "group": "fc-schema: a fail-closed hit's when/before/after — the per-change verdict explanation the operator reads, named by USAGE-2.1.md:93 and pinned truthy on the DECLARED sibling (test L373-375) but on no fail-closed hit — is dropped, renamed, or emptied",
+   "grounds": "Empties the VALUE of `every['before']` to '' (L238): the fail-closed hit's 'before' becomes falsy. assertTrue(change['before']) (L373-375) would fail on a fail-closed change. Observable (empty 'before' in the operator JSON). REFUTED by the owed truthiness assertion. SURVIVED.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:424-429, :596-598; main prints whole",
+    "tests/v2/test_v21_migrate_semantics.py:373-375 (assertTrue(change['before']) declared), :566-602 (fail-closed read set/summary only)",
+    "docs/v2.1/USAGE-2.1.md:93",
+    "registered kill file run against the mutant: SURVIVED (51 OK)"
+   ],
+   "exceptions_checked": [
+    "REFUTED-by-measurement: ruled out (kill file PASSES)",
+    "declared 'before' emptied: no — built at L257",
+    "a phrase vs truthiness kill: a truthiness assertion (not a phrase-assertion) kills the '' value"
+   ],
+   "refutation": "See index 41 / group fc-schema (22): one truthiness assertion over the fail-closed change closes 41/42/43. Reader bundle_cli.main; input the P1/P2/P3 fixtures."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_assess", "index": 43, "mutant": "L239 string 'as this release evaluates it: the difference is not declared, so it is not ruled out' emptied",
+   "class": "REFUTED",
+   "group": "fc-schema: a fail-closed hit's when/before/after — the per-change verdict explanation the operator reads, named by USAGE-2.1.md:93 and pinned truthy on the DECLARED sibling (test L373-375) but on no fail-closed hit — is dropped, renamed, or emptied",
+   "grounds": "Empties the VALUE of `every['after']` to '' (L239): MEASURED (P1) the hit shows 'after':'' — the sentence stating why the difference is not ruled out is gone, replaced by an empty string. assertTrue(change['after']) (L373-375) would fail on a fail-closed change. Observable. REFUTED by the owed truthiness assertion. SURVIVED.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:424-429, :596-598; main prints whole",
+    "tests/v2/test_v21_migrate_semantics.py:373-375 (assertTrue(change['after']) declared), :566-602 (fail-closed read set/summary only)",
+    "docs/v2.1/USAGE-2.1.md:93 (verdict after)",
+    "registered kill file run against the mutant: SURVIVED (51 OK)"
+   ],
+   "exceptions_checked": [
+    "REFUTED-by-measurement: ruled out (kill file PASSES)",
+    "declared 'after' emptied: no — built at L257",
+    "test L261 (pm9['after']) catching this: no — it reads the declared CAPABILITY_CHANGES record, not the fail-closed hit"
+   ],
+   "refutation": "See index 41 / group fc-schema (22). One truthiness assertion over the fail-closed change closes 41/42/43. Reader bundle_cli.main; input the P1/P2/P3 fixtures."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_assess", "index": 57, "mutant": "L242 dict entry 0 dropped",
+   "class": "REFUTED",
+   "group": "fc-schema: a fail-closed hit's when/before/after — the per-change verdict explanation the operator reads, named by USAGE-2.1.md:93 and pinned truthy on the DECLARED sibling (test L373-375) but on no fail-closed hit — is dropped, renamed, or emptied",
+   "grounds": "Drops {**every} (entry 0) from the no-capability-version hit (L242): MEASURED (P1) the hit collapses to {'summary':'probe.file_artifact declares no capability version'} — it loses version(null)/ref(null)/when/before/after all at once. The summary (reason) survives, but when/before/after are gone. Those are doc-named (USAGE:93) and pinned truthy on the declared sibling (L373-375); a fail-closed change is never run through that guard. The REFUTED driver is the lost when/before/after (version/ref are null sentinels, see 20/21). Ordinary set/truthiness assertion over the fail-closed change (P1) kills it. SURVIVED (test_a_probe_with_no_capability_version L586-587 reads the withheld SET only).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:424-429, :596-598; main prints whole",
+    "tests/v2/test_v21_migrate_semantics.py:586-587 (P1 reads the withheld set only), :373-375 (declared truthiness guard — never run on P1)",
+    "docs/v2.1/USAGE-2.1.md:93 (when/before/after named)",
+    "registered kill file run against the mutant: SURVIVED (51 OK)"
+   ],
+   "exceptions_checked": [
+    "REFUTED-by-measurement: ruled out (kill file PASSES on the mutant)",
+    "the summary (reason) also lost: no — the mutant drops {**every}, keeping 'summary' (so the contract is still exposed and its reason printed); the loss is when/before/after + the null version/ref",
+    "the contract no longer exposed (changes empty): no — hits=[{summary:...}] is still a non-empty hit, so the contract is withheld (test_a_probe_with_no_capability_version still passes)"
+   ],
+   "refutation": "See group fc-schema (index 22): the owed set/truthiness assertion over the P1 fail-closed change (set(c) >= {'when','before','after','summary'} and all-truthy) fails when {**every} is dropped. Reader bundle_cli.main; input test_a_probe_with_no_capability_version (P1)."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_assess", "index": 65, "mutant": "L244 dict entry 0 dropped",
+   "class": "REFUTED",
+   "group": "fc-schema: a fail-closed hit's when/before/after — the per-change verdict explanation the operator reads, named by USAGE-2.1.md:93 and pinned truthy on the DECLARED sibling (test L373-375) but on no fail-closed hit — is dropped, renamed, or emptied",
+   "grounds": "Drops {**every} (entry 0) from the incomparable-probe hit (L244): MEASURED (P2) the hit collapses to {'summary':'the release evaluated this contract with probe.file_artifact_of_the_past and this one with probe.file_artifact: their capabilities are not comparable'} — losing version(null)/ref(null)/when/before/after. summary survives (test L602 assertIn('not comparable', change['summary']) still passes). The lost when/before/after are doc-named and sibling-pinned truthy (L373-375), run on no fail-closed change. Ordinary set/truthiness assertion over the P2 change owed. SURVIVED.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:424-429, :596-598; main prints whole",
+    "tests/v2/test_v21_migrate_semantics.py:596-602 (P2 reads the withheld set and change['summary'] — 'not comparable' survives, so SURVIVED), :373-375 (declared truthiness guard — never run on P2)",
+    "docs/v2.1/USAGE-2.1.md:93",
+    "registered kill file run against the mutant: SURVIVED (51 OK)"
+   ],
+   "exceptions_checked": [
+    "REFUTED-by-measurement: ruled out (kill file PASSES — L602 reads only change['summary'], which survives)",
+    "summary lost: no — {**every} drop keeps 'summary'",
+    "contract no longer exposed: no — hits is still non-empty"
+   ],
+   "refutation": "See group fc-schema (index 22). The owed set/truthiness assertion over the P2 fail-closed change (test_a_probe_that_is_not_the_one_the_release_used) fails when {**every} is dropped. Reader bundle_cli.main."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_assess", "index": 86, "mutant": "L252 dict entry 0 dropped",
+   "class": "REFUTED",
+   "group": "fc-schema: a fail-closed hit's when/before/after — the per-change verdict explanation the operator reads, named by USAGE-2.1.md:93 and pinned truthy on the DECLARED sibling (test L373-375) but on no fail-closed hit — is dropped, renamed, or emptied",
+   "grounds": "Drops {**every} (entry 0) from the no-well-formed-record hit (L252): MEASURED (P3) the hit becomes {'version':3,'summary':'probe.file_artifact capability 3 declares no well formed record of what it changed (CAPABILITY_CHANGES)'} — losing ref(null)/when/before/after. version (explicit) and summary survive (tests L593 change['version']==3 and L594 assertIn('no well formed record', change['summary']) still pass). The lost when/before/after are doc-named and sibling-pinned truthy (L373-375); a fail-closed change is never run through that guard. Ordinary set/truthiness assertion over the P3 change owed. SURVIVED.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:424-429, :596-598; main prints whole",
+    "tests/v2/test_v21_migrate_semantics.py:589-594 (P3 reads change['version']==3 and 'no well formed record' in change['summary'] — both survive), :373-375 (declared truthiness guard — never run on P3)",
+    "docs/v2.1/USAGE-2.1.md:93",
+    "registered kill file run against the mutant: SURVIVED (51 OK)"
+   ],
+   "exceptions_checked": [
+    "REFUTED-by-measurement: ruled out (kill file PASSES — L593/L594 read version and summary, both kept)",
+    "version lost: no — L252 sets 'version': version explicitly after {**every}, so change['version']==3 survives the drop",
+    "summary lost: no — 'summary' is the other explicit key, kept"
+   ],
+   "refutation": "See group fc-schema (index 22). The owed set/truthiness assertion over the P3 fail-closed change (test_an_undeclared_change) fails when {**every} is dropped (no 'when'/'before'/'after'). Reader bundle_cli.main."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_assess", "index": 58, "mutant": "L242 dict entry 1 dropped",
+   "class": "REFUTED",
+   "group": "fc-summary: the fail-closed hit's `summary` — the one field that states WHY the contract is withheld — is dropped, relabelled, or (P1 only) gutted; P2 and P3 summaries are phrase-pinned (test L602/L594), P1's is pinned by no test",
+   "grounds": "Drops entry 1 ('summary': f'{entry.probe_id} declares no capability version') from the no-capability-version hit (L242): MEASURED (P1) the hit becomes {**every} = {'version':null,'ref':null,'when':'every use of the probe','before':...,'after':...} with NO 'summary' key — the specific reason ('declares no capability version') is gone; only the generic every boilerplate remains. Observable in the operator JSON. A reader depends: the summary is the reason field (migrate L373-375 asserts assertTrue(change['summary']) for declared changes; the fail-closed P2/P3 summaries are phrase-pinned at L602/L594). P1's summary is pinned by no test, so dropping it survives. The killing test is the ordinary presence/truthiness assertion on the fail-closed change (set >= {..,'summary'} / assertTrue(change['summary'])) — the kind the suite makes on the sibling — not a forbidden phrase-assertion. A test is owed. SURVIVED.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:424-429, :596-598; main prints whole (the contract is still exposed: hits=[{**every}] is non-empty)",
+    "tests/v2/test_v21_migrate_semantics.py:586-587 (P1 reads the withheld set only — never change['summary']), :373-375 (declared assertTrue(change['summary'])), :594/:602 (P3/P2 summary phrase-pinned — the sibling gap)",
+    "docs/v2.1/USAGE-2.1.md:93 (the change row's purpose: name why each contract is withheld)",
+    "registered kill file run against the mutant: SURVIVED (51 OK)"
+   ],
+   "exceptions_checked": [
+    "REFUTED-by-measurement: ruled out (kill file PASSES — P1 reads the withheld set only)",
+    "the contract dropping out of the withheld set: no — the hit {**every} is non-empty, so BC-* stays exposed (test_a_probe_with_no_capability_version still passes)",
+    "the every boilerplate standing in for the reason: it explains fail-closed generically but does not say 'no capability version' — the specific cause is lost",
+    "a phrase vs structural kill: a presence/truthiness assertion (structural) kills it, not a phrase-assertion"
+   ],
+   "refutation": "The operator reads change['summary'] to see the specific fail-closed cause. The suite phrase-pins the P2 ('not comparable', L602) and P3 ('no well formed record', L594) summaries but not P1's. Input: test_a_probe_with_no_capability_version (P1). Reader: bundle_cli.main via migrate L424-429. Sketch: assert the P1 change has a 'summary' key, assertTrue it, and assertIn('declares no capability version', change['summary']) (mirroring L594/L602). Kills 58/64/69. A real gap: P1 is the only fail-closed path whose reason text no test pins."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_assess", "index": 64, "mutant": "L242 string 'summary' emptied",
+   "class": "REFUTED",
+   "group": "fc-summary: the fail-closed hit's `summary` — the one field that states WHY the contract is withheld — is dropped, relabelled, or (P1 only) gutted; P2 and P3 summaries are phrase-pinned (test L602/L594), P1's is pinned by no test",
+   "grounds": "Renames the 'summary' key of the no-capability-version hit to '' (L242): MEASURED (P1) the hit shows {...every..., '':'probe.file_artifact declares no capability version'} — the reason text under a '' key, no 'summary' key; change['summary'] raises KeyError. Same reader analysis as index 58. An ordinary presence/set assertion over the P1 fail-closed change kills it. SURVIVED.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:424-429, :596-598; main prints whole (sort_keys sends '' first; no parser)",
+    "tests/v2/test_v21_migrate_semantics.py:586-587 (P1 reads set only), :373-375 (declared change['summary']), :594/:602 (P3/P2 phrase-pinned sibling)",
+    "docs/v2.1/USAGE-2.1.md:93",
+    "registered kill file run against the mutant: SURVIVED (51 OK)"
+   ],
+   "exceptions_checked": [
+    "'' collision in the hit: one '' key only (summary relabelled; the every keys are distinct)",
+    "REFUTED-by-measurement: ruled out (kill file PASSES)",
+    "contract no longer exposed: no — the hit is non-empty"
+   ],
+   "refutation": "See index 58 / group fc-summary: the owed P1 assertion (presence + truthiness + phrase of change['summary']) fails when 'summary' is relabelled to ''. Reader bundle_cli.main; input test_a_probe_with_no_capability_version."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_assess", "index": 69, "mutant": "L242 string ' declares no capability version' emptied",
+   "class": "REFUTED",
+   "group": "fc-summary: the fail-closed hit's `summary` — the one field that states WHY the contract is withheld — is dropped, relabelled, or (P1 only) gutted; P2 and P3 summaries are phrase-pinned (test L602/L594), P1's is pinned by no test",
+   "grounds": "Truncates the P1 summary f-string from f'{entry.probe_id} declares no capability version' to f'{entry.probe_id}' (L242): MEASURED (P1) the hit's summary becomes just 'probe.file_artifact' — the reason clause is entirely removed, leaving only the probe id. The summary stays truthy, so a bare assertTrue would not catch it; but the P2/P3 fail-closed summaries ARE phrase-pinned (L602 'not comparable', L594 'no well formed record'), and P1 is the only fail-closed path whose reason phrase no test pins — this mutant exploits exactly that gap. The owed test is the SAME phrase-assertion the suite already makes on the P2/P3 siblings (assertIn(<cause phrase>, change['summary'])), not a finer or novel phrase-assertion. A test is owed. SURVIVED.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:424-429, :596-598; main prints whole",
+    "tests/v2/test_v21_migrate_semantics.py:586-587 (P1 reads the withheld set only, never change['summary'] content), :594 (P3 assertIn 'no well formed record'), :602 (P2 assertIn 'not comparable') — the pinned siblings P1 lacks",
+    "docs/v2.1/USAGE-2.1.md:93 (the change names why the contract is withheld)",
+    "registered kill file run against the mutant: SURVIVED (51 OK)"
+   ],
+   "exceptions_checked": [
+    "a forbidden phrase-assertion: no — the P2/P3 siblings already make this exact kind of summary phrase-assertion (L594/L602), so mirroring it for P1 is the established pattern, not a brittle novel pin",
+    "the every when/before/after standing in: they explain fail-closed generically but never say 'no capability version'; the specific cause is lost",
+    "REFUTED-by-measurement: ruled out (kill file PASSES — no test reads the P1 summary content)"
+   ],
+   "refutation": "The P1 summary 'probe.file_artifact declares no capability version' is gutted to 'probe.file_artifact'. The suite pins the P2/P3 fail-closed cause phrases (L602/L594) but not P1's. Input: test_a_probe_with_no_capability_version (P1). Reader: bundle_cli.main via migrate L424-429. Sketch: assertIn('declares no capability version', change['summary']) (mirror L594/L602). Kills 69; the presence/truthiness half of the same owed test kills 58/64."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_assess", "index": 80, "mutant": "L244 string 'the release evaluated this contract with ' emptied",
+   "class": "AUDITED",
+   "group": "fc-summary-prose: a non-cause fragment of the incomparable/no-record summary string is emptied; the cause phrase the suite pins (test L602 'not comparable' / L594 'no well formed record') survives, and both probe ids / the version remain, so only a finer forbidden phrase-assertion on the exact wording could kill it",
+   "grounds": "Empties the lead-in 'the release evaluated this contract with ' from the incomparable-probe summary (L244): MEASURED (P2) the summary becomes 'probe.file_artifact_of_the_past and this one with probe.file_artifact: their capabilities are not comparable'. Observable (the lead-in clause is gone). AUDITED, not REFUTED: the cause phrase 'not comparable' that test L602 pins survives, and both probe ids (what the release used vs this release) remain as substrings joined by ' and this one with '; killing this mutant would need a phrase-assertion on the exact lead-in wording, which is finer than the suite's own summary assertion (L602) and which the owner's rule treats as not owed (a diagnostic-clause phrase-assertion, cf. B05-seal [133]/[157]). No code/doc reads the summary text. SURVIVED.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:424-429, :596-598; main prints whole; no code parses the summary (grep)",
+    "tests/v2/test_v21_migrate_semantics.py:596-602 (P2 asserts 'not comparable' in change['summary'] — survives; reads nothing else of the text)",
+    "docs/v2.1/USAGE-2.1.md:93 (does not quote the summary wording)",
+    "registered kill file run against the mutant: SURVIVED (51 OK)"
+   ],
+   "exceptions_checked": [
+    "the two probe ids becoming indistinguishable: no — ' and this one with ' still separates them (this mutant drops only the lead-in)",
+    "a reader of the summary's structure: none (cli prints str only)",
+    "whether the lost lead-in is the cause: no — the cause is 'their capabilities are not comparable', which remains (and is pinned at L602)"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_assess", "index": 81, "mutant": "L244 string ' and this one with ' emptied",
+   "class": "AUDITED",
+   "group": "fc-summary-prose: a non-cause fragment of the incomparable/no-record summary string is emptied; the cause phrase the suite pins (test L602 'not comparable' / L594 'no well formed record') survives, and both probe ids / the version remain, so only a finer forbidden phrase-assertion on the exact wording could kill it",
+   "grounds": "Empties the separator ' and this one with ' from the incomparable-probe summary (L244): MEASURED (P2) the summary becomes 'the release evaluated this contract with probe.file_artifact_of_the_pastprobe.file_artifact: their capabilities are not comparable' — the two probe ids run together. Observable and the most degrading of the summary edits (the reader cannot cleanly tell the two probe ids apart). AUDITED, matching the execute precedent (B07, index 254/358): a dropped separator between two identifiers that both remain as substrings, with the cause phrase ('not comparable', pinned at L602) intact and no consumer parsing the string. Killing it needs a phrase/told-apart assertion on the exact separator — finer than the suite's L602 assertion. No code/doc reads the text. SURVIVED.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:424-429, :596-598; main prints whole; no code splits the summary (grep)",
+    "tests/v2/test_v21_migrate_semantics.py:596-602 (asserts 'not comparable' — survives)",
+    "aisef2/app/run.py sibling precedent: the '; '.join unaccounted refusal IS told-apart (B07 notes), but this incomparable summary has no such told-apart assertion",
+    "registered kill file run against the mutant: SURVIVED (51 OK)"
+   ],
+   "exceptions_checked": [
+    "a told-apart assertion like run.execute's unaccounted list (assertRegex id1 \\W+ id2): none for this summary — and the execute precedent classed the analogous separator drop AUDITED",
+    "a machine reading the two probe ids out of the summary: none (cli prints str only); the two ids are elsewhere in the kernel objects if ever needed",
+    "the cause lost: no — 'their capabilities are not comparable' remains and is pinned (L602)"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_assess", "index": 113, "mutant": "L252 string ' capability ' emptied",
+   "class": "AUDITED",
+   "group": "fc-summary-prose: a non-cause fragment of the incomparable/no-record summary string is emptied; the cause phrase the suite pins (test L602 'not comparable' / L594 'no well formed record') survives, and both probe ids / the version remain, so only a finer forbidden phrase-assertion on the exact wording could kill it",
+   "grounds": "Empties ' capability ' from the no-well-formed-record summary (L252): MEASURED (P3) the summary becomes 'probe.file_artifact3 declares no well formed record of what it changed (CAPABILITY_CHANGES)' — the probe id and the version run together. Observable. AUDITED: the cause phrase 'no well formed record' that test L594 pins survives, the version is also present as change['version']==3 (pinned at L593) and in the consulted row, and the only kill is a phrase-assertion on the exact ' capability ' spacing — finer than L594 and a diagnostic-clause phrase-assertion the owner's rule does not owe. No code/doc reads the summary text. SURVIVED.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:424-429, :596-598; main prints whole; no code parses the summary (grep)",
+    "tests/v2/test_v21_migrate_semantics.py:589-594 (P3 asserts change['version']==3 and 'no well formed record' in change['summary'] — both survive)",
+    "docs/v2.1/USAGE-2.1.md:93 (does not quote this wording)",
+    "registered kill file run against the mutant: SURVIVED (51 OK)"
+   ],
+   "exceptions_checked": [
+    "the version becoming unreadable: it is still a separate structured field change['version']==3 (L593) and in consulted; only the summary's prose runs 'file_artifact3' together",
+    "a reader parsing the summary for the version: none (cli prints str only; version is its own field)",
+    "the cause lost: no — 'no well formed record ... (CAPABILITY_CHANGES)' remains and is pinned (L594)"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_assess", "index": 83, "mutant": "L251 dict entry 0 dropped",
+   "class": "AUDITED",
+   "group": "fc-consulted: a field of the rec-is-None `consulted` row (L251) which surfaces ONLY in the undocumented, test-unread report['semantic_changes'][i]['consulted'] of an exposed contract; the documented and test-pinned consulted is the DECLARED row (L255) in approvals_kept_grounds of a KEPT contract",
+   "grounds": "Drops entry 0 ('version': version) from the rec-is-None consulted row (L251): MEASURED (P3) report['semantic_changes'][BC-EXISTS-REQ]['consulted'][1] becomes {'summary':None,'selectors':None} — losing its version (3). Observable in the operator JSON, but no reader depends: a version with no record ALSO appends a hit (L252), so the contract is exposed and never kept, so this consulted row never reaches _grounds/_ground (L295, kept contracts only); it appears only in semantic_changes[i]['consulted'], which USAGE-2.1.md does not name (s.93 lists semantic_changes without consulted; s.96 names consulted only for approvals_kept_grounds) and which no test reads (the consulted assertions at L391-392 and L671 read approvals_kept_grounds of KEPT contracts, i.e. the DECLARED row L255). The undeclared version is also stated in the sibling hit's summary ('capability 3 declares no well formed record'). AUDITED. SURVIVED.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:248-259 (a rec-None version appends BOTH a consulted row L251 AND a hit L252 -> the contract is exposed), :295 (_ground reads how['consulted'] for KEPT contracts only -> never this row), :424-429 (semantic_changes[i]['consulted'] via **e)",
+    "tests/v2/test_v21_migrate_semantics.py:391-392 (consulted version/selectors/summary read on approvals_kept_grounds['exists'] — the DECLARED row L255), :671 (consulted version on approvals_kept_grounds, LedgerLock) — both KEPT contracts, declared records; L589-594 (P3) reads ['changes'] only, never ['consulted']",
+    "docs/v2.1/USAGE-2.1.md:96 (consulted = the capability versions read, in approvals_kept_grounds) — not in semantic_changes (:93)",
+    "registered kill file run against the mutant: SURVIVED (51 OK)"
+   ],
+   "exceptions_checked": [
+    "this consulted row reaching approvals_kept_grounds: impossible — a rec-None version exposes the contract (a hit is appended), so it is withheld, not kept; _grounds iterates kept only",
+    "a test reading semantic_changes[i]['consulted']: none (grep) — only approvals_kept_grounds consulted is read",
+    "the version being otherwise lost: it is also in the sibling hit's summary ('capability 3') and the hit's explicit change['version']==3"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_assess", "index": 84, "mutant": "L251 dict entry 1 dropped",
+   "class": "AUDITED",
+   "group": "fc-consulted: a field of the rec-is-None `consulted` row (L251) which surfaces ONLY in the undocumented, test-unread report['semantic_changes'][i]['consulted'] of an exposed contract; the documented and test-pinned consulted is the DECLARED row (L255) in approvals_kept_grounds of a KEPT contract",
+   "grounds": "Drops entry 1 ('summary': None) from the rec-is-None consulted row (L251): MEASURED (P3) the row becomes {'version':3,'selectors':None} — losing its null 'summary'. This is a null sentinel (the declared row L255 carries a real summary; the rec-None row carries None because there is no record to summarise). Same reach analysis as index 83: this row surfaces only in the undocumented, unread semantic_changes[i]['consulted']. AUDITED. SURVIVED.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:251 (rec-None row), :295 (grounds reads consulted for kept only — never this row)",
+    "tests/v2/test_v21_migrate_semantics.py:392 (all(c['summary'] for c in exists['consulted']) — DECLARED kept rows, which have truthy summaries; this rec-None summary is None and lives in semantic_changes, unread)",
+    "docs/v2.1/USAGE-2.1.md:96 (consulted in grounds only)",
+    "registered kill file run against the mutant: SURVIVED (51 OK)"
+   ],
+   "exceptions_checked": [
+    "L392 all(c['summary'] ...) catching a null-summary consulted row: it runs on approvals_kept_grounds (declared, truthy summaries); if it ever ran on this rec-None row it would fail UNMUTATED (summary is None), so it is not the owed assertion for this field",
+    "this row reaching grounds: impossible (the contract is exposed)",
+    "a reader of semantic_changes consulted summary: none"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_assess", "index": 85, "mutant": "L251 dict entry 2 dropped",
+   "class": "AUDITED",
+   "group": "fc-consulted: a field of the rec-is-None `consulted` row (L251) which surfaces ONLY in the undocumented, test-unread report['semantic_changes'][i]['consulted'] of an exposed contract; the documented and test-pinned consulted is the DECLARED row (L255) in approvals_kept_grounds of a KEPT contract",
+   "grounds": "Drops entry 2 ('selectors': None) from the rec-is-None consulted row (L251): MEASURED (P3) the row becomes {'version':3,'summary':None} — losing its null 'selectors'. Null sentinel (the declared row L255 carries len(rec['affects']); the rec-None row carries None). Same reach analysis as index 83. AUDITED. SURVIVED.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:251 (rec-None row), :295 (grounds, kept only)",
+    "tests/v2/test_v21_migrate_semantics.py:391 ([(c['version'], c['selectors']) ...] on approvals_kept_grounds['exists'] == [(2,0),(3,2)] — DECLARED kept rows; never this rec-None row)",
+    "docs/v2.1/USAGE-2.1.md:96",
+    "registered kill file run against the mutant: SURVIVED (51 OK)"
+   ],
+   "exceptions_checked": [
+    "L391 reading selectors catching this: it reads approvals_kept_grounds (kept, declared), never semantic_changes consulted of an exposed contract",
+    "this row reaching grounds: impossible (exposed)",
+    "selectors=None carrying information: no — it is the null placeholder for 'no record, so no selector count'"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_assess", "index": 99, "mutant": "L251 string 'version' emptied",
+   "class": "AUDITED",
+   "group": "fc-consulted: a field of the rec-is-None `consulted` row (L251) which surfaces ONLY in the undocumented, test-unread report['semantic_changes'][i]['consulted'] of an exposed contract; the documented and test-pinned consulted is the DECLARED row (L255) in approvals_kept_grounds of a KEPT contract",
+   "grounds": "Renames the 'version' key of the rec-is-None consulted row to '' (L251): MEASURED (P3) the row becomes {'':3,'summary':None,'selectors':None} — version under a '' key. Same reach analysis as index 83: this row appears only in the undocumented, unread semantic_changes[i]['consulted']; the version is redundant with the sibling hit (change['version']==3, pinned L593) and its summary. AUDITED. SURVIVED.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:251 (rec-None row), :295 (grounds, kept only)",
+    "tests/v2/test_v21_migrate_semantics.py:391/671 (consulted version read on approvals_kept_grounds — DECLARED, kept), :593 (change['version']==3 — the sibling that IS pinned)",
+    "docs/v2.1/USAGE-2.1.md:96",
+    "registered kill file run against the mutant: SURVIVED (51 OK)"
+   ],
+   "exceptions_checked": [
+    "'' collision in the row: one '' key only",
+    "this row reaching grounds: impossible (exposed)",
+    "version lost from the report entirely: no — change['version']==3 in the sibling hit (pinned L593)"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_assess", "index": 100, "mutant": "L251 string 'summary' emptied",
+   "class": "AUDITED",
+   "group": "fc-consulted: a field of the rec-is-None `consulted` row (L251) which surfaces ONLY in the undocumented, test-unread report['semantic_changes'][i]['consulted'] of an exposed contract; the documented and test-pinned consulted is the DECLARED row (L255) in approvals_kept_grounds of a KEPT contract",
+   "grounds": "Renames the 'summary' key of the rec-is-None consulted row to '' (L251): MEASURED (P3) the row becomes {'version':3,'':None,'selectors':None} — the null summary under a '' key. Null-valued field, in the undocumented, unread semantic_changes consulted. AUDITED. SURVIVED.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:251 (rec-None row), :295 (grounds, kept only)",
+    "tests/v2/test_v21_migrate_semantics.py:392 (all(c['summary']) on declared kept rows; never this row)",
+    "docs/v2.1/USAGE-2.1.md:96",
+    "registered kill file run against the mutant: SURVIVED (51 OK)"
+   ],
+   "exceptions_checked": [
+    "'' collision: one '' key only",
+    "this row reaching grounds / L392: impossible (exposed) and L392 reads kept/declared rows with truthy summaries",
+    "summary=None carrying meaning: no — it is the 'no record to summarise' placeholder"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_assess", "index": 101, "mutant": "L251 string 'selectors' emptied",
+   "class": "AUDITED",
+   "group": "fc-consulted: a field of the rec-is-None `consulted` row (L251) which surfaces ONLY in the undocumented, test-unread report['semantic_changes'][i]['consulted'] of an exposed contract; the documented and test-pinned consulted is the DECLARED row (L255) in approvals_kept_grounds of a KEPT contract",
+   "grounds": "Renames the 'selectors' key of the rec-is-None consulted row to '' (L251): MEASURED (P3) the row becomes {'version':3,'summary':None,'':None} — the null selectors under a '' key. Null-valued field, in the undocumented, unread semantic_changes consulted. AUDITED. SURVIVED.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:251 (rec-None row), :295 (grounds, kept only)",
+    "tests/v2/test_v21_migrate_semantics.py:391 ([(c['version'], c['selectors'])] on declared kept rows; never this row)",
+    "docs/v2.1/USAGE-2.1.md:96",
+    "registered kill file run against the mutant: SURVIVED (51 OK)"
+   ],
+   "exceptions_checked": [
+    "'' collision: one '' key only",
+    "this row reaching grounds / L391: impossible (exposed); L391 reads kept/declared rows",
+    "selectors=None carrying meaning: no — null placeholder"
+   ]
+  }
+ ],
+ "owed_tests": [
+  "fc-schema + fc-summary (closes 22,23,24,38,39,40,41,42,43,57,58,64,65,69,86). ONE assertion added to each of the three existing fail-closed tests of test_v21_migrate_semantics.py — FailClosed.test_a_probe_with_no_capability_version (P1, L586-587), FailClosed.test_a_probe_that_is_not_the_one_the_release_used (P2, L596-602), FailClosed.test_an_undeclared_change_is_said_in_the_report_as_such (P3, L589-594). For the single change c of the fail-closed contract, assert set(c) >= {'when','before','after','summary'} and all(c[k] for k in ('when','before','after','summary')), mirroring the DECLARED-path guard at L373-375; and for P1 add assertIn('declares no capability version', c['summary']) mirroring the already-present P2 'not comparable' (L602) and P3 'no well formed record' (L594) phrase pins. Input: the existing P1/P2/P3 fixtures (no new fixture). Reader: bundle_cli.main prints report['semantic_changes'] (built at L424-429, spreading _assess's changes) as operator JSON, and seal prints the same changes in approvals_withheld_semantic (L596-598). This is a real gap, not padding: the fail-closed change rows are exactly the ones an operator reads when a probe declares no version / is incomparable / has a malformed record and must decide re-approval, and the suite pins the row schema only for the declared sibling.",
+  "(optional, not owed) A stricter schema pin set(c)=={'version','ref','when','before','after','summary'} on the fail-closed change would additionally cover the null-sentinel keys (indices 20,21,36,37) — see the dispute note. Not owed here because version/ref are null in a fail-closed hit and the suite pins them only by value on the declared path.",
+  "(optional, not owed) A pin on report['semantic_changes'][i]['consulted'] for an undeclared version would cover indices 83,84,85,99,100,101, but that consulted row (rec-is-None) is undocumented in semantic_changes (USAGE §93 omits it), unread by any test, never reaches approvals_kept_grounds, and its version is redundant with the sibling hit — adding such a test would be closer to 'a test merely to reach a number'."
+ ],
+ "notes": "Author role, blind. Measured 2026-10-19 ~18:25..18:55 +07 on snapshot 4ec961e706a1f7bda16d131037058c4fe9c2663f; aisef2/app/bundle_cli.py source_sha256 e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8 (matches the committed snapshot blob; the ast.unparse null mutant and all 28 mutants were measured against this module). Tooling: git archive of the snapshot (aisef2 aisef tests validation docs pyproject.toml) into a non-git tree, plus closure-evidence/v2/release/LEDGERLOCK-PROJECT.json via git show (the one closure-evidence file the kill file reads). Mutants rebuilt with validation.v2.mutation.mutants(src,'_assess',enums)[index] (desc asserted == the batch string). Runs: cwd=tree copy, env -i, PATH=/usr/bin:/bin (no opencode on PATH — the two opencode dirs are absent), HOME/TMPDIR/XDG_* under the copy, PYTHONPATH=tree, LANG/LC_ALL=C, nice -n 19 python3 -P -B -m unittest tests.v2.test_v21_migrate_semantics -q. No real opencode, no network (the one probe test runs file_artifact over a scratch directory, offline). The repository worktree at .claude/worktrees/v21 was never modified (read via git show/git archive only). Tree removed at end.\n\nMeasurement result: baseline (original module) 51 OK; null (ast.unparse, unmutated) 51 OK; all 28 mutants SURVIVED (51 OK each). The single registered kill file for this target is tests/v2/test_v21_migrate_semantics.py (V21_TARGETS['aisef2/app/bundle_cli.py::_assess'] == that, confirmed by import). No kill file fails on any mutant => no REFUTED-by-measurement; the campaign's SURVIVED is confirmed for all 28.\n\nClass counts: 13 AUDITED, 15 REFUTED, 0 EQUIVALENT (every mutant changes the report JSON observably; none is normalized or unreachable). Five positional groups; no two entries share a mutant description (all distinct L-prefixes), so the §16 positional-audit concern does not arise within the batch.\n\nCalibration against wave-1 (same module/report): REFUTED follows B05-seal's criterion — a fail-closed change-row field (when/before/after; and the P1 summary reason) is operator-facing, named by USAGE-2.1.md:93, and pinned on the DECLARED sibling (assertTrue at L373-375) or on the fail-closed P2/P3 sibling (phrase at L602/L594) but NOT on the path the mutant touches, and the killing test is the ORDINARY set/truthiness/phrase assertion the suite already makes on that sibling, not a forbidden phrase-assertion. AUDITED follows B04-migrate (null sentinels / redundant echoes no reader-doc-decision depends on: fail-closed version/ref, and the rec-None consulted row that only surfaces in the undocumented, unread semantic_changes[].consulted) and B07-execute (message-content edits where the sibling-pinned cause phrase survives and only a finer forbidden phrase-assertion could kill: 80/81/113).\n\nDISPUTE ZONE (round-3 rule, flagged for the two blind copies / owner, as wave-1 README models): (1) indices 20,21,36,37 drop/relabel the null-sentinel keys 'version'/'ref' of fail-closed hits. I called them AUDITED (null, no value a reader uses; the suite pins version/ref only by value on the declared path). The owner's round-3 rule ('a status or identifying element the operator reads is worth pinning') could instead owe a FULL key-set assertion set(c)=={'version','ref','when','before','after','summary'} on fail-closed hits, moving these four to REFUTED. (2) The whole fc-schema group (when/before/after) is generic boilerplate identical for every fail-closed contract; a reading that treats only contract-SPECIFIC fields as reader-depended (closer to B07-execute's message prose) would move the 12 fc-schema REFUTED to AUDITED. I took the stricter (round-3) reading for the text-bearing when/before/after/summary and the laxer (B04 null-echo) reading for the valueless version/ref/consulted-null fields; a reconciler who wants a single rule should decide which of the two the owner prefers for operator-only-visible report fields (wave-1 left this explicitly to the owner)."
+}

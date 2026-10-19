@@ -1,0 +1,135 @@
+{
+ "batch": "W2-bundle_cli-2",
+ "file": "aisef2/app/bundle_cli.py",
+ "targets": [
+  "aisef2/app/bundle_cli.py::_authentic"
+ ],
+ "new": [
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 3,
+   "mutant": "L811 Or swapped"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 9,
+   "mutant": "L825 sorted() -> list()"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 10,
+   "mutant": "L812 string 'EVIDENCE_MISMATCH' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 13,
+   "mutant": "L807 string 'EVIDENCE_UNREADABLE' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 14,
+   "mutant": "L812 string ' is not an evidence manifest: the expected anchor ' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 15,
+   "mutant": "L813 string ' cannot be reproduced from it' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 16,
+   "mutant": "L816 string ': the evidence anchor is ' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 17,
+   "mutant": "L816 string ', not the ' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 18,
+   "mutant": "L817 string ' expected: this is not the run that printed it, or its evidence was rewritten' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 19,
+   "mutant": "L822 string 'EVIDENCE_UNREADABLE' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 20,
+   "mutant": "L827 string ': the evidence manifest does not match the run directory: ' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 21,
+   "mutant": "L828 string ' \u2014 evidence was changed after the run wrote it' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 24,
+   "mutant": "L807 string ' cannot be read (' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 25,
+   "mutant": "L807 string ': ' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 26,
+   "mutant": "L808 string '): restore read access to it and run the command again' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 27,
+   "mutant": "L811 string 'files' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 28,
+   "mutant": "L822 string ': an evidence file cannot be read (' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 29,
+   "mutant": "L822 string '): ' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 30,
+   "mutant": "L826 NotEq->Eq"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 31,
+   "mutant": "L803 string ' has no ' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 32,
+   "mutant": "L803 string ': nothing binds its evidence to an anchor, so the expected anchor ' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 33,
+   "mutant": "L804 string ' cannot be checked \u2014 a run killed before its record has none; without --expect-anchor a continuation proves consistency only' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 34,
+   "mutant": "L808 Or swapped"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 35,
+   "mutant": "L825 string 'files' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 37,
+   "mutant": "L826 string 'files' emptied"
+  }
+ ],
+ "carried": []
+}

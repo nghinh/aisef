@@ -1,0 +1,65 @@
+{
+ "batch": "W2-bundle_cli-5",
+ "file": "aisef2/app/bundle_cli.py",
+ "targets": [
+  "aisef2/app/bundle_cli.py::_journal"
+ ],
+ "new": [
+  {
+   "target": "aisef2/app/bundle_cli.py::_journal",
+   "index": 5,
+   "mutant": "L840 Or swapped"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_journal",
+   "index": 24,
+   "mutant": "L851 string ' is not the journal ' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_journal",
+   "index": 28,
+   "mutant": "L870 string ' \u2014 no kernel wrote it, and nothing is carried from it; `aisef run --verify` refuses it the same way' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_journal",
+   "index": 29,
+   "mutant": "L847 string ' cannot be read (' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_journal",
+   "index": 30,
+   "mutant": "L847 string ': ' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_journal",
+   "index": 38,
+   "mutant": "L847 Or swapped"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_journal",
+   "index": 40,
+   "mutant": "L861 string ' \u2014 its hash chain or sequence is broken: the journal is not the one that was written; restore it from a faithful copy' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_journal",
+   "index": 42,
+   "mutant": "L868 string \" violates the control projections the kernel's writer enforces: \" emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_journal",
+   "index": 45,
+   "mutant": "L869 string ': ' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_journal",
+   "index": 46,
+   "mutant": "L860 string ': ' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_journal",
+   "index": 47,
+   "mutant": "L860 string ': ' emptied"
+  }
+ ],
+ "carried": []
+}

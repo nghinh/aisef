@@ -1,0 +1,83 @@
+{
+ "batch": "W2-lineage-8",
+ "file": "aisef2/app/lineage.py",
+ "targets": [
+  "aisef2/app/lineage.py::_is_a_directory",
+  "aisef2/app/lineage.py::account_of",
+  "aisef2/app/lineage.py::claim_unread",
+  "aisef2/app/lineage.py::is_file"
+ ],
+ "new": [
+  {
+   "target": "aisef2/app/lineage.py::claim_unread",
+   "index": 8,
+   "mutant": "L375 string ': ' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::claim_unread",
+   "index": 9,
+   "mutant": "L375 string ')' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::claim_unread",
+   "index": 10,
+   "mutant": "L375 Or swapped"
+  },
+  {
+   "target": "aisef2/app/lineage.py::claim_unread",
+   "index": 11,
+   "mutant": "L375 string 'strerror' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::is_file",
+   "index": 1,
+   "mutant": "L481 string ' cannot be looked at (' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::is_file",
+   "index": 2,
+   "mutant": "L481 string ': ' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::is_file",
+   "index": 3,
+   "mutant": "L481 string '): restore the permissions of the run directory' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::is_file",
+   "index": 4,
+   "mutant": "L481 Or swapped"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_is_a_directory",
+   "index": 1,
+   "mutant": "L660 returns None"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_is_a_directory",
+   "index": 2,
+   "mutant": "L662 returns None"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_is_a_directory",
+   "index": 4,
+   "mutant": "L662 False->True"
+  },
+  {
+   "target": "aisef2/app/lineage.py::account_of",
+   "index": 55,
+   "mutant": "L502 dict entry 0 dropped"
+  },
+  {
+   "target": "aisef2/app/lineage.py::account_of",
+   "index": 69,
+   "mutant": "L502 string 'unaccounted' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::account_of",
+   "index": 71,
+   "mutant": "L503 string '): what the preflight spent is unknown' emptied"
+  }
+ ],
+ "carried": []
+}

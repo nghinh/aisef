@@ -1,0 +1,72 @@
+{
+ "batch": "W2-lineage-5",
+ "role": "skeptic",
+ "snapshot": "4ec961e706a1f7bda16d131037058c4fe9c2663f",
+ "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa",
+ "source_sha256_verified": true,
+ "date": "Mon Oct 19 20:34-21:35 +07 2026",
+ "measurement": {
+  "baseline_unmutated": {"test_v21_x_lineage_proof": "PASS", "test_v21_defects_verify": "PASS", "test_v21_kills3_T09c": "PASS"},
+  "per_mutant_registered": "all 11 (idx 30,31,32,33,35,36,37,38,39,40,41): test_v21_x_lineage_proof PASS, test_v21_defects_verify PASS, test_v21_kills3_T09c PASS => SURVIVED (matches campaign-9 record and the author's draft)",
+  "extra_unregistered_lineage_modules_run": "idx 36,40,41 x {test_v21_x_lineage_gone, test_v21_kills3_T09a, test_v21_kills3_T13a, test_v21_kills3_T14a, test_v21_pw_lineage_unread, test_v21_defects_lineage2}: ALL PASS (no unregistered killer among the behavioral/relative-phrase mutants)",
+  "how": "nice -n 19 /opt/homebrew/bin/python3 -P -B -m unittest tests.v2.<name> -q; PATH stripped of ~/.opencode/bin and ~/.npm-global/bin (the only two dirs with an opencode exe); HOME/TMPDIR/XDG_* under the copy tree; PYTHONPATH=copy root (because -P drops cwd)."
+ },
+ "entries": [
+  {"target": "aisef2/app/lineage.py::_predecessor", "index": 30, "mutant": "L696 string ' is not a run record (a JSON object)' emptied",
+   "class_before": "AUDITED", "verdict": "CONFIRMED", "class_after": "AUDITED",
+   "grounds": "mutant_view diff matches: damaged.append(f'{name} is not a run record (a JSON object)') (L696) -> f'{name}'. Driver x_lineage_proof.test_a_record_of_the_chain_that_cannot_be_read (L267-280) writes b'[1]' ('not an object') to BOTH r2/RUN.started.json and r2/RUN.json and asserts assert_unread(got,'run2') (L260-265): unaccounted non-empty, unread non-empty, total None, and the run NAME present. The run name reaches unread via lineage_account's L761 prefix f'{at.name}: {why}: ...', NOT via _predecessor's phrase, so emptying the phrase leaves 'run2' present. grep tests/: the only 'is not a run record' hit is test_app_units.py:640, verify.py's '...of format {FORMAT}', a different string; zero hits for the full '(a JSON object)' phrase. Consumers verified (lineage_account L759-761; client.Budget L94/101/118-119/129-130 non-emptiness; run.py:455 fixed prefix; unread_runs r['run']).",
+   "refutation": "", "note": "Measured SURVIVED (registered x3 PASS, baseline PASS). AUDITED is right: operator-visible string, not equivalent (text changes), no test/doc/verifier/machine/operator-action depends on the phrase."},
+
+  {"target": "aisef2/app/lineage.py::_predecessor", "index": 31, "mutant": "L677 string ' is not text (' emptied",
+   "class_before": "AUDITED", "verdict": "CONFIRMED", "class_after": "AUDITED",
+   "grounds": "Diff matches: f'{name} is not text ({e.reason})' -> f'{name}{e.reason})' (name run into the UnicodeDecodeError reason, stray trailing ')'). e.reason (the detail) survives. Drivers: test_a_record_of_the_chain... ('not text' b'\\xff\\xfe\\x00\\x01' on r2, asserts 'run2') and test_the_records_of_the_first_run... (NOT_TEXT on r1, asserts 'run1'). Needle is the run name (lineage_account L761 prefix), not the phrase. grep tests/: zero hits for 'is not text ('.",
+   "refutation": "", "note": "Measured SURVIVED (registered x3 PASS). The identical phrase at lineage.py:186 is child_evidence's (a different function), not pinned for _predecessor."},
+
+  {"target": "aisef2/app/lineage.py::_predecessor", "index": 32, "mutant": "L677 string ')' emptied",
+   "class_before": "AUDITED", "verdict": "CONFIRMED", "class_after": "AUDITED",
+   "grounds": "Diff matches: f'{name} is not text ({e.reason})' -> f'{name} is not text ({e.reason}' (missing close paren). Cosmetic; phrase and reason intact. Same driver/assertions as idx 31 (run-name needle). No test asserts the paren.",
+   "refutation": "", "note": "Measured SURVIVED (registered x3 PASS)."},
+
+  {"target": "aisef2/app/lineage.py::_predecessor", "index": 33, "mutant": "L690 string ' is cut or is not JSON' emptied",
+   "class_before": "AUDITED", "verdict": "CONFIRMED", "class_after": "AUDITED",
+   "grounds": "Diff matches: damaged.append(f'{name} is cut or is not JSON') (L690) -> f'{name}'. Driver 'cut' (b'{\"continues\": {\"pa') in test_a_record_of_the_chain... and Hand.record_of_the_first_run_cut (L807); asserts the run name, not the phrase. grep tests/docs/validation: zero hits for 'is cut or is not JSON' (phrase is _predecessor-exclusive).",
+   "refutation": "", "note": "Measured SURVIVED (registered x3 PASS)."},
+
+  {"target": "aisef2/app/lineage.py::_predecessor", "index": 35, "mutant": "L698 string ' names the run it continues by something that is not a path' emptied",
+   "class_before": "AUDITED", "verdict": "CONFIRMED", "class_after": "AUDITED",
+   "grounds": "Diff matches: damaged.append(f'{name} names the run it continues by something that is not a path') (L698) -> f'{name}'. Drivers 'a predecessor that is no path' (continues.path=7, L269) and Hand.record_names_a_path_with_a_nul (L865); assert the run name. grep tests/docs/validation: zero hits for the phrase (exclusive to _predecessor).",
+   "refutation": "", "note": "Measured SURVIVED (registered x3 PASS)."},
+
+  {"target": "aisef2/app/lineage.py::_predecessor", "index": 36, "mutant": "L701 string '; ' emptied",
+   "class_before": "AUDITED", "verdict": "CONFIRMED", "class_after": "AUDITED",
+   "grounds": "Diff matches: \"'; '.join(damaged)\" -> \"''.join(damaged)\". NOT equivalent: the two-damaged case is reachable (test_a_record_of_the_chain... writes the damage to BOTH STARTED and RUN.json, so damaged has 2 entries that then concatenate with no separator, e.g. 'RUN.started.jsonRUN.json'). Value stays truthy and non-empty (names present), so 'if why:', total=None and every downstream non-emptiness check are unchanged; client.py:119 budget join is its own '; ' and unaffected. Only the operator's run-together text differs. assert_unread checks only the run-name substring, which survives. Verified: ran registered x3 AND 6 unregistered lineage modules (x_lineage_gone, kills3_T09a/T13a/T14a, pw_lineage_unread, defects_lineage2) on this mutant -> all PASS.",
+   "refutation": "", "note": "Measured SURVIVED. Behavioral (separator) but no assertion/consumer depends on the separator; AUDITED, not EQUIVALENT."},
+
+  {"target": "aisef2/app/lineage.py::_predecessor", "index": 37, "mutant": "L681 string ' cannot be read (' emptied",
+   "class_before": "AUDITED", "verdict": "REVISED", "class_after": "AUDITED",
+   "grounds": "Conclusion (AUDITED/SURVIVED/no owed test) holds and is measured; the draft's grounds mis-cite the driver and the needle, corrected here. Diff matches: f'{name} cannot be read ({type(e).__name__}: {e.strerror or e})' -> f'{name}{type(e).__name__}: {e.strerror or e})' (framing ' cannot be read (' lost, stray trailing ')'; ExcType + strerror preserved). CORRECTION: the test that actually reaches _predecessor's L681 is x_lineage_proof.test_records_that_the_system_will_not_let_this_process_read_are_unknown (L282-287, @POSIX_USER; runs here, euid 501), which locks BOTH r2 RUN records 0o000 -> non-not_there OSError -> L681, and asserts assert_unread(got,'PermissionError') (L287) -- the needle is the EXCEPTION CLASS NAME type(e).__name__, which the mutant does NOT touch, so 'PermissionError' still appears -> PASS. The draft instead cited stream_without_permission (L790), which locks a SESSION stream (sessions/S1.developer.1.jsonl) read by client.Budget, not a RUN record -- it never reaches _predecessor's L681; and it attributed survival to client.py:101's 'cannot be read' template word, whereas the real surviving needle is the preserved ExcType name.",
+   "refutation": "", "note": "Measured SURVIVED (registered x3 PASS, baseline PASS). The L681 branch IS exercised by a registered test; it survives because the asserted needle is the ExcType name, preserved by the mutant."},
+
+  {"target": "aisef2/app/lineage.py::_predecessor", "index": 38, "mutant": "L681 string ': ' emptied",
+   "class_before": "AUDITED", "verdict": "REVISED", "class_after": "AUDITED",
+   "grounds": "Diff matches: ': ' between ExcType and detail emptied -> '...cannot be read (PermissionErrorPermission denied)'. ExcType and strerror both still present. Same driver correction as idx 37: reached by x_lineage_proof.test_records_that_the_system_will_not_let_this_process_read_are_unknown (L282-287), asserting 'PermissionError' (ExcType name), which the mutant preserves -> PASS. (Draft said 'Same line as [37]', inheriting [37]'s mis-cited driver/needle.)",
+   "refutation": "", "note": "Measured SURVIVED (registered x3 PASS). Cosmetic separator; no assertion/consumer depends on it."},
+
+  {"target": "aisef2/app/lineage.py::_predecessor", "index": 39, "mutant": "L681 string ')' emptied",
+   "class_before": "AUDITED", "verdict": "REVISED", "class_after": "AUDITED",
+   "grounds": "Diff matches: trailing ')' emptied -> '...cannot be read (PermissionError: Permission denied'. Rest intact. Same driver correction as idx 37: reached by x_lineage_proof.test_records_that_the_system_will_not_let_this_process_read_are_unknown (L282-287), needle 'PermissionError' preserved -> PASS. (Draft said 'Same as [37]'.)",
+   "refutation": "", "note": "Measured SURVIVED (registered x3 PASS). Cosmetic missing paren."},
+
+  {"target": "aisef2/app/lineage.py::_predecessor", "index": 40, "mutant": "L681 Or swapped",
+   "class_before": "AUDITED", "verdict": "REVISED", "class_after": "AUDITED",
+   "grounds": "Diff matches: 'e.strerror or e' -> 'e.strerror and e'. Semantics correct in the draft: when strerror is a non-empty string (the usual OSError), original renders strerror; mutant renders e -> str(e) = '[Errno 13] Permission denied: ...'; when strerror is None/'' original renders str(e), mutant renders 'None'/''. Either way the detail inside 'cannot be read (<ExcType>: <detail>)' changes; no consumer depends on which. CORRECTION (same as idx 37): the driver is x_lineage_proof.test_records_that_the_system_will_not_let_this_process_read_are_unknown (L282-287), NOT stream_without_permission; and the asserted needle is 'PermissionError' = type(e).__name__, which is left of the mutated operand and therefore preserved -> PASS (also for strerror non-empty, str(e) still contains 'Permission denied').",
+   "refutation": "", "note": "Measured SURVIVED (registered x3 PASS; plus 6 unregistered lineage modules PASS). type(e).__name__ is untouched by the or->and swap, so every needle on the ExcType survives."},
+
+  {"target": "aisef2/app/lineage.py::_predecessor", "index": 41, "mutant": "L683 string ' is a link that leads nowhere' emptied",
+   "class_before": "AUDITED", "verdict": "CONFIRMED", "class_after": "AUDITED",
+   "grounds": "Diff matches: damaged.append(f'{name} is a link that leads nowhere') (L683) -> f'{name}'. Drivers Hand.records_are_links_to_nothing / records_are_links_that_loop (L886-887); assert the run name. The draft's key point verified: the identical phrase at lineage.py:221 belongs to a DIFFERENT function (child_evidence) and its test, test_v21_pw_lineage_unread.py:472 (test_the_cause_says_what_stands_where_the_journal_should_be -> lineage.child_evidence, L465-467), pins L221's why, NOT _predecessor's L683. Ran test_v21_pw_lineage_unread against this mutant -> PASS (child_evidence L221 is unmutated).",
+   "refutation": "", "note": "Measured SURVIVED (registered x3 PASS; plus 6 unregistered lineage modules incl. pw_lineage_unread PASS)."}
+ ],
+ "summary": {"CONFIRMED": 7, "REVISED": 4, "REFUTED": 0, "NOT_DECIDED": 0, "class_after": {"AUDITED": 11, "EQUIVALENT": 0, "SURVIVED_test_owed": 0}, "owed_tests": []},
+ "notes": "Source sha256 matches f342996...48aa. All 11 mutant descriptions match the mutant_view diffs at the snapshot; all line numbers (L677/L681/L683/L690/L696/L698/L701) confirmed. Registered kill files for _predecessor = {test_v21_x_lineage_proof, test_v21_defects_verify, test_v21_kills3_T09c} (computed from validation/v2/mutation.py V21_TARGETS). Baseline green; all 11 mutants SURVIVED the registered set (matches the campaign record). No test asserts any of the four _predecessor-exclusive emptied phrases (grep tests/ = 0). The ONLY correction: idx 37-40 grounds mis-identify the L681 driver/needle -- the branch IS exercised (test_records_that_the_system_will_not_let_this_process_read_are_unknown, a registered test) and survives because the asserted needle is the preserved ExcType name 'PermissionError', not because of stream_without_permission (a session-stream case that never reaches _predecessor) or client.py:101's template. Conclusions unchanged: 0 EQUIVALENT, 0 REFUTED, 0 owed tests -- adding a test on cosmetic/diagnostic phrases would pin operator text to reach a number, which the owner rule forbids."
+}

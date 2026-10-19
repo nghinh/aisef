@@ -1,0 +1,100 @@
+{
+ "batch": "W2-bundle_cli-4",
+ "file": "aisef2/app/bundle_cli.py",
+ "targets": [
+  "aisef2/app/bundle_cli.py::_ground"
+ ],
+ "new": [
+  {
+   "target": "aisef2/app/bundle_cli.py::_ground",
+   "index": 10,
+   "mutant": "L294 dict entry 2 dropped"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_ground",
+   "index": 16,
+   "mutant": "L290 dict entry 1 dropped"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_ground",
+   "index": 17,
+   "mutant": "L290 dict entry 2 dropped"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_ground",
+   "index": 19,
+   "mutant": "L290 dict entry 4 dropped"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_ground",
+   "index": 20,
+   "mutant": "L290 dict entry 5 dropped"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_ground",
+   "index": 21,
+   "mutant": "L290 dict entry 6 dropped"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_ground",
+   "index": 24,
+   "mutant": "L294 string 'subject_absence' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_ground",
+   "index": 31,
+   "mutant": "L290 string 'class' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_ground",
+   "index": 32,
+   "mutant": "L290 string 'subject_absence' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_ground",
+   "index": 34,
+   "mutant": "L290 string 'to' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_ground",
+   "index": 35,
+   "mutant": "L291 string 'consulted' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_ground",
+   "index": 36,
+   "mutant": "L291 string 'ground' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_ground",
+   "index": 38,
+   "mutant": "L291 string \"the plan names this release's own spec ids for these contracts: there is no earlier release whose capability to compare\" emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_ground",
+   "index": 51,
+   "mutant": "L296 string 'capability ' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_ground",
+   "index": 52,
+   "mutant": "L296 string ' to ' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_ground",
+   "index": 53,
+   "mutant": "L296 string ': ' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_ground",
+   "index": 55,
+   "mutant": "L297 string ' under ' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_ground",
+   "index": 56,
+   "mutant": "L298 string 'the probe is at capability ' emptied"
+  }
+ ],
+ "carried": []
+}

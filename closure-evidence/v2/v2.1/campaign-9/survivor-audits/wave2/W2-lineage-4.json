@@ -1,0 +1,75 @@
+{
+ "batch": "W2-lineage-4",
+ "file": "aisef2/app/lineage.py",
+ "targets": [
+  "aisef2/app/lineage.py::lineage_account"
+ ],
+ "new": [
+  {
+   "target": "aisef2/app/lineage.py::lineage_account",
+   "index": 3,
+   "mutant": "L734 returns None"
+  },
+  {
+   "target": "aisef2/app/lineage.py::lineage_account",
+   "index": 22,
+   "mutant": "L725 string \"The account of a run of the chain: the predecessor asked for, and each run a record names as the one it\\n        continues. It existed \u2014 `aisef run --parent` refuses a parent with no run record \u2014 so a directory that is not\\n        there, is a file, or is a link that leads nowhere is evidence gone, not a run that spent nothing: unknown. (A\\n        superseded child a claim names is not asked: a claim whose child's directory is not there is UNBEGUN, as the claim\\n        lifecycle has always decided it, and it spent nothing there.)\" emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::lineage_account",
+   "index": 24,
+   "mutant": "L737 string \"The claims on `where`; a directory that cannot be listed hides the runs it superseded: what they spent is\\n        unknown, listed on `holder`'s account \u2014 never raised out of the account, never a known 0.\" emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::lineage_account",
+   "index": 26,
+   "mutant": "L746 string 'The run a claim file names. A claim that names none (an object without `run`) is a claim of nothing; one that\\n        cannot be read names a run that is not known: its spend is unknown, listed \u2014 not passed over.' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::lineage_account",
+   "index": 37,
+   "mutant": "L769 dict entry 0 dropped"
+  },
+  {
+   "target": "aisef2/app/lineage.py::lineage_account",
+   "index": 38,
+   "mutant": "L769 dict entry 1 dropped"
+  },
+  {
+   "target": "aisef2/app/lineage.py::lineage_account",
+   "index": 54,
+   "mutant": "L769 string 'unaccounted' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::lineage_account",
+   "index": 55,
+   "mutant": "L769 string 'unread' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::lineage_account",
+   "index": 62,
+   "mutant": "L761 string ': ' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::lineage_account",
+   "index": 63,
+   "mutant": "L761 string ': what it continued, and what the runs before it spent, is unknown' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::lineage_account",
+   "index": 66,
+   "mutant": "L742 string ': what the runs it superseded spent is unknown' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::lineage_account",
+   "index": 69,
+   "mutant": "L751 string ' cannot be read (' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::lineage_account",
+   "index": 70,
+   "mutant": "L751 string '): the run it names, and what that run spent, is unknown' emptied"
+  }
+ ],
+ "carried": []
+}

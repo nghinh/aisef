@@ -1,0 +1,150 @@
+{
+ "batch": "W2-bundle_cli-1",
+ "file": "aisef2/app/bundle_cli.py",
+ "targets": [
+  "aisef2/app/bundle_cli.py::_assess"
+ ],
+ "new": [
+  {
+   "target": "aisef2/app/bundle_cli.py::_assess",
+   "index": 20,
+   "mutant": "L237 dict entry 0 dropped"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_assess",
+   "index": 21,
+   "mutant": "L237 dict entry 1 dropped"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_assess",
+   "index": 22,
+   "mutant": "L237 dict entry 2 dropped"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_assess",
+   "index": 23,
+   "mutant": "L237 dict entry 3 dropped"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_assess",
+   "index": 24,
+   "mutant": "L237 dict entry 4 dropped"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_assess",
+   "index": 36,
+   "mutant": "L237 string 'version' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_assess",
+   "index": 37,
+   "mutant": "L237 string 'ref' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_assess",
+   "index": 38,
+   "mutant": "L237 string 'when' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_assess",
+   "index": 39,
+   "mutant": "L238 string 'before' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_assess",
+   "index": 40,
+   "mutant": "L239 string 'after' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_assess",
+   "index": 41,
+   "mutant": "L237 string 'every use of the probe' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_assess",
+   "index": 42,
+   "mutant": "L238 string 'as the earlier release evaluated it' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_assess",
+   "index": 43,
+   "mutant": "L239 string 'as this release evaluates it: the difference is not declared, so it is not ruled out' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_assess",
+   "index": 57,
+   "mutant": "L242 dict entry 0 dropped"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_assess",
+   "index": 58,
+   "mutant": "L242 dict entry 1 dropped"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_assess",
+   "index": 64,
+   "mutant": "L242 string 'summary' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_assess",
+   "index": 65,
+   "mutant": "L244 dict entry 0 dropped"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_assess",
+   "index": 69,
+   "mutant": "L242 string ' declares no capability version' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_assess",
+   "index": 80,
+   "mutant": "L244 string 'the release evaluated this contract with ' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_assess",
+   "index": 81,
+   "mutant": "L244 string ' and this one with ' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_assess",
+   "index": 83,
+   "mutant": "L251 dict entry 0 dropped"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_assess",
+   "index": 84,
+   "mutant": "L251 dict entry 1 dropped"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_assess",
+   "index": 85,
+   "mutant": "L251 dict entry 2 dropped"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_assess",
+   "index": 86,
+   "mutant": "L252 dict entry 0 dropped"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_assess",
+   "index": 99,
+   "mutant": "L251 string 'version' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_assess",
+   "index": 100,
+   "mutant": "L251 string 'summary' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_assess",
+   "index": 101,
+   "mutant": "L251 string 'selectors' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_assess",
+   "index": 113,
+   "mutant": "L252 string ' capability ' emptied"
+  }
+ ],
+ "carried": []
+}

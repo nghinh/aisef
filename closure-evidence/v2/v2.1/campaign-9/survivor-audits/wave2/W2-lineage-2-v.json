@@ -1,0 +1,290 @@
+{
+ "batch": "W2-lineage-2",
+ "snapshot": "4ec961e706a1f7bda16d131037058c4fe9c2663f",
+ "role": "skeptic",
+ "verified_on": "2026-10-19 (date: Mon Oct 19 20:12 +07 2026)",
+ "method": "Independent tree from git archive 4ec961e (aisef2 aisef tests validation docs pyproject.toml). Each of the 15 mutants rebuilt from a pristine lineage.py via validation.v2.mutation.mutants(src,'_without_a_journal',_enum_members(src,'.'))[INDEX], desc asserted == the batch entry (mkmutant.py; no build failed, so all 15 index->desc pins hold), written over aisef2/app/lineage.py in a run-COPY tree, and the one REGISTERED kill file (mutation.py:1046 -> tests/v2/test_v21_pw_lineage_unread.py) run one mutant at a time from the copy root: env -i PATH stripped of /Users/nghinh/.opencode/bin and /Users/nghinh/.npm-global/bin, HOME/TMPDIR under the run tree, PYTHONPATH=<run root>, nice -n 19 /opt/homebrew/bin/python3 -P -B -m unittest tests.v2.test_v21_pw_lineage_unread -q. Baseline 39 OK; each mutant 39 OK == SURVIVED, matching the campaign and the author. Actual `why` strings per branch captured by calling lineage.child_evidence on crafted children for baseline and the subject-erasing mutants.",
+ "measurement_result": "baseline 39 OK; 36,37,40,41,42,44,45,47,48,49,50,51,52,53,55 each 39 OK (SURVIVED). No mutant killed by the registered file; grep found no UNregistered test asserting the detail content of any _without_a_journal branch (the 'cannot be read (' / 'is there and is not a record' hits in tests/ are OCR-preflight, bundle-file-read, account-spend, and x_lineage journal-side paths or docstrings, not this function). So every verdict stands on the measured SURVIVED.",
+ "summary": "All 15 author entries CONFIRMED on independent remeasurement; no REVISED, no NOT_DECIDED, no change to any class. The 4 REFUTED (36,40,47,51) are genuine subject-erasing survivors (RUN.json vanishes from an operator-read string, misdirecting to the journal) on branches L252/L243/L239/L241 that have no content test; the L251 sibling is the only content-tested branch. The 11 AUDITED keep the distinguishing content (42,45 redundant L251 prefix/tail on the content-tested branch; 37,41,44,48,49,50,52,53 cosmetic space/separator/connective losses with subject intact; 55 a MORE-informative OSError rendering). The 4 REFUTED collapse to one owed test (symmetric extension of the existing L251 content test).",
+ "entries": [
+  {
+   "target": "aisef2/app/lineage.py::_without_a_journal", "index": 36,
+   "mutant": "L252 string \"RUN.json's journal is not a journal record (no line count) and \" emptied",
+   "class_before": "REFUTED", "verdict": "REFUTED", "class_after": "SURVIVED (test owed)",
+   "grounds": "VERIFIED. mutant_view diff + source lineage.py:252 confirm the branch and the whole-subject deletion; mutated return is f'{JOURNAL.name} {what}'. Captured mutated why (idx36, crafted child RUN.json={'journal':'run/x'}) = 'aisef-run.jsonl is not there' == baseline-of-mutant-40 'aisef-run.jsonl is not there' BYTE-IDENTICAL, so the operator cannot tell the L252 no-line-count cause from the L243 not-a-dict cause, and the only named artifact (the journal) is not the faulty one (RUN.json's journal entry). Registered kill file: baseline 39 OK, m36 39 OK (SURVIVED) — the UnreadContract tests (test_v21_pw_lineage_unread.py:140-181) assert only STATE==UNREAD / continued_by UNREAD / assertTrue(sup['unread']); the one content test (line 577 test_the_cause_says_what_the_record_says_and_what_is_not_there) exercises self.names(5) -> the L251 branch only. No content test on L252.",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:317-318 — claim() LineageRefused embeds the detail: '...whose evidence exists and cannot be read ({unread}): it may have begun (UNREAD)...' (verified at the snapshot)",
+    "aisef2/app/lineage.py:311,331 — state,unread=child_evidence(held); supersedes['unread']=unread written durably to CONTINUED-BY.{n+1}.json (line 332)",
+    "aisef2/app/bundle_cli.py:896,950 — continue_from report: held['why']=lineage.child_evidence(child)[1] on UNREAD, surfaced as 'already_continued_by' (verified)"
+   ],
+   "exceptions_checked": [
+    "git grep 'is not a journal record' / 'no line count' over tests/ docs/ validation/: no reader pins the phrase (only the branch's own source and mutation.py)",
+    "detail is free prose, never parsed; every decision keys on the STATE (first tuple element), preserved by the mutant",
+    "truthiness: mutated detail 'aisef-run.jsonl is not there' is non-empty, so assertTrue(sup['unread']) still holds — not killed that way; account 'unread' (run.py:527-542 / verify.py / lineage_account) is a DIFFERENT field (a list of unreconciled spend), not this (state,detail) tuple"
+   ],
+   "refutation": "Test owed. Input: child with RUN.json={'journal':{'path':JOURNAL,'lines':'5'}} (line count not int) and no journal file (variant line_count_is_no_number / journal_entry_is_no_record). Reader: operator via claim() refusal (lineage.py:317) / continue_from report 'why' (bundle_cli.py:896) / CONTINUED-BY.{n}.json 'unread' (lineage.py:331). Sketch: extend RecordThatNamesAJournalOfEvents.test_the_cause... (or a sibling on the same fixture): state,why=lineage.child_evidence(self.child); assertEqual(state,lineage.UNREAD); assertIn('RUN.json',why); assertRegex(why,r'journal record|no line count'); assertIn('is not there',why). Kills 36 (and 37).",
+   "note": "Author grounds reproduced in full, including the byte-identical-to-40 claim (measured). Verdict REFUTED (a real coverage gap), not EQUIVALENT: the operator-read string observably loses the faulty artifact's name."
+  },
+  {
+   "target": "aisef2/app/lineage.py::_without_a_journal", "index": 40,
+   "mutant": "L243 string 'RUN.json is there and is not a record (a JSON object) and ' emptied",
+   "class_before": "REFUTED", "verdict": "REFUTED", "class_after": "SURVIVED (test owed)",
+   "grounds": "VERIFIED. lineage.py:243 (not-isinstance-dict branch); mutated return f'{JOURNAL.name} {what}'. Captured mutated why (idx40, RUN.json='[1, 2]') = 'aisef-run.jsonl is not there' — identical to mutant 36's output; the distinguishing cause ('RUN.json is a JSON non-object') is wholly lost, only the journal is named. Baseline 39 OK, m40 39 OK (SURVIVED): variant 'the record is JSON and no object' (test line 570/552) reaches the branch through UnreadContract, which asserts STATE + truthiness only; no content test on L243.",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:317-318 — claim() refusal embeds the detail; operator loses that RUN.json (not the journal) is the problem",
+    "aisef2/app/lineage.py:331 — supersedes['unread'] in CONTINUED-BY.{n}.json",
+    "aisef2/app/bundle_cli.py:896 — continue_from report held['why']"
+   ],
+   "exceptions_checked": [
+    "git grep 'a JSON object' over tests/ docs/: hits are other modules (preflight/cohort/settings/fixtures), none is lineage._without_a_journal",
+    "detail free prose, never parsed; STATE preserved",
+    "truthiness preserved ('aisef-run.jsonl is not there')"
+   ],
+   "refutation": "Test owed. Input: child with RUN.json='[1, 2]' (valid JSON, not an object) and no journal file. Reader: operator via claim() refusal / continue_from 'why' / CONTINUED-BY 'unread'. Sketch: for the not-a-dict case assertIn('RUN.json',why); assertRegex(why,r'not a record|JSON object'); assertIn('is not there',why). Kills 40 (and 41).",
+   "note": "Confirmed. Same subject-erasing pattern as 36; output collapses to the journal-only pointer."
+  },
+  {
+   "target": "aisef2/app/lineage.py::_without_a_journal", "index": 47,
+   "mutant": "L239 string 'RUN.json cannot be read (' emptied",
+   "class_before": "REFUTED", "verdict": "REFUTED", "class_after": "SURVIVED (test owed)",
+   "grounds": "VERIFIED. lineage.py:239 (non-not_there OSError branch, reached by record_without_read chmod 0o000 -> PermissionError [POSIX] and record_is_a_directory -> IsADirectoryError). mutant_view diff confirms mutated return = f'{type(e).__name__}: {e.strerror or e}) and {JOURNAL.name} {what}' — by inspection this yields e.g. 'PermissionError: Permission denied) and aisef-run.jsonl is not there'; the string no longer contains 'RUN.json' at all, so the only named file is the journal, misdirecting the operator (and the outer claim() remedy 'make it readable again (its permissions...)' then reads as about the journal). Baseline 39 OK, m47 39 OK (SURVIVED): no content test on this branch. (I could not interpolate the exact PermissionError text without chmod, but the f-string shape alone drops 'RUN.json'; the SURVIVED is measured.)",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:317-318 — claim() refusal embeds the detail; operator misdirected to the journal",
+    "aisef2/app/lineage.py:331 — supersedes['unread'] in CONTINUED-BY.{n}.json",
+    "aisef2/app/bundle_cli.py:896 — continue_from report held['why']",
+    "tests/v2/test_v21_pw_lineage_unread.py:230-237 test_the_refusal_says... pins 'PermissionError' + JOURNAL.name for the JOURNAL-unreadable child_evidence path (class ChildThatCannotBeRead, whose variants all PUT a journal, so they do NOT reach _without_a_journal), NOT this RUN.json branch — verified it does not kill m47"
+   ],
+   "exceptions_checked": [
+    "git grep 'RUN.json cannot be read' over tests/ docs/: no hit; the 'cannot be read (' hits in tests/ are OCR-preflight/bundle-file/x_lineage paths, verified not on _without_a_journal",
+    "detail free prose, never parsed; STATE preserved",
+    "surviving exception type is not enough: it does not name RUN.json and the only named artifact is the journal"
+   ],
+   "refutation": "Test owed. Input (POSIX): child with RUN.json written then chmod 0o000, no journal file -> PermissionError on read_text. Reader: operator via claim() refusal / continue_from 'why'. Sketch: @POSIX_USER: state,why=lineage.child_evidence(self.child); assertEqual(state,lineage.UNREAD); assertIn('RUN.json',why); assertIn('cannot be read',why); assertIn('PermissionError',why); assertIn('is not there',why). Kills 47 (and incidentally tightens 48,49,50,55).",
+   "note": "Confirmed. The author correctly distinguished the ChildThatCannotBeRead JOURNAL-unreadable test from this RUN.json branch; the former never reaches _without_a_journal."
+  },
+  {
+   "target": "aisef2/app/lineage.py::_without_a_journal", "index": 51,
+   "mutant": "L241 string 'RUN.json is there and is not a record (' emptied",
+   "class_before": "REFUTED", "verdict": "REFUTED", "class_after": "SURVIVED (test owed)",
+   "grounds": "VERIFIED. lineage.py:241 (ValueError branch, reached by record_cut cut-JSON -> JSONDecodeError and record_not_text b'\\xff\\xfe\\x00' -> UnicodeDecodeError, a ValueError subclass). Captured mutated why (idx51, RUN.json='{\"journal\": {\"path\": \"run/jour') = 'JSONDecodeError) and aisef-run.jsonl is not there' — 'RUN.json' is gone, only the journal is named, and 'JSONDecodeError) and ...' reads as if the journal is the malformed JSON. Baseline 39 OK, m51 39 OK (SURVIVED): no content test on L241.",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:317-318 — claim() refusal embeds the detail; operator misdirected",
+    "aisef2/app/lineage.py:331 — supersedes['unread'] in CONTINUED-BY.{n}.json",
+    "aisef2/app/bundle_cli.py:896 — continue_from report held['why']"
+   ],
+   "exceptions_checked": [
+    "git grep 'is there and is not a record' over tests/ docs/: no hit (only the branch source and mutation.py)",
+    "detail free prose, never parsed; STATE preserved",
+    "truthiness preserved (type name + journal text remain)"
+   ],
+   "refutation": "Test owed. Input: child with RUN.json='{\"journal\": {\"path\": \"run/jour' (cut JSON) and no journal file. Reader: operator via claim() refusal / continue_from 'why'. Sketch: state,why=lineage.child_evidence(self.child); assertEqual(state,lineage.UNREAD); assertIn('RUN.json',why); assertIn('is not a record',why); assertIn('is not there',why). Kills 51 (and tightens 52,53).",
+   "note": "Confirmed and measured ('JSONDecodeError) and aisef-run.jsonl is not there')."
+  },
+  {
+   "target": "aisef2/app/lineage.py::_without_a_journal", "index": 42,
+   "mutant": "L251 string 'RUN.json records a journal of ' emptied",
+   "class_before": "AUDITED", "verdict": "CONFIRMED", "class_after": "AUDITED",
+   "grounds": "VERIFIED. lineage.py:251 (lines int>0 branch). Captured mutated why (idx42, lines=5, journal absent) = '5 lines and aisef-run.jsonl is not there: the run began'. The prefix 'RUN.json records a journal of ' is lost, but '5 lines' + ': the run began' are unique to this branch (no other says 'the run began' or carries a line count), and the faulty artifact HERE is the journal (aisef-run.jsonl is not there), which IS correctly named — RUN.json is a VALID record on this branch, so there is no misdirection. The sole content test (line 577) pins '5 lines'/JOURNAL.name/'is not there' — all survive -> m42 39 OK (SURVIVED). The lost prefix is redundant with the surviving tokens; pinning it would add an assertion for text '5 lines'/'the run began' already carries.",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:317-318 — claim() refusal embeds the detail; operator still reads '5 lines ... the run began'",
+    "aisef2/app/lineage.py:331 — supersedes['unread'] in CONTINUED-BY.{n}.json",
+    "aisef2/app/bundle_cli.py:896 — continue_from report held['why']",
+    "tests/v2/test_v21_pw_lineage_unread.py:577-584 — pins '5 lines'/JOURNAL.name/'is not there', all preserved"
+   ],
+   "exceptions_checked": [
+    "git grep 'records a journal of' over tests/ docs/: no hit pins the prefix",
+    "detail free prose, never parsed; STATE preserved; truthiness preserved",
+    "this is the ONE content-tested branch; the lost text is redundant with the three pinned tokens, not an uncovered gap"
+   ],
+   "refutation": "",
+   "note": "AUDITED upheld. Note it DOES drop 'RUN.json' like the REFUTED four, but the distinction is principled: on L251 the journal is the genuinely-faulty artifact and is named, and the branch is content-tested with surviving distinguishers; on L239/L241/L243/L252 RUN.json is the fault and is erased with no coverage."
+  },
+  {
+   "target": "aisef2/app/lineage.py::_without_a_journal", "index": 45,
+   "mutant": "L251 string ': the run began' emptied",
+   "class_before": "AUDITED", "verdict": "CONFIRMED", "class_after": "AUDITED",
+   "grounds": "VERIFIED. lineage.py:251; mutated return drops the trailing ': the run began' -> 'RUN.json records a journal of 5 lines and aisef-run.jsonl is not there' (mutant_view diff). 'RUN.json records a journal of 5 lines' already states the record names a journal of events (the run began — the round-2 semantic). The content test's '5 lines'/JOURNAL.name/'is not there' all survive -> m45 39 OK (SURVIVED). The tail is a redundant restatement; no reader depends on the literal ': the run began'.",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:317-318 — 'records a journal of 5 lines' still conveys the run began",
+    "aisef2/app/lineage.py:331 — supersedes['unread']",
+    "aisef2/app/bundle_cli.py:896 — continue_from 'why'",
+    "tests/v2/test_v21_pw_lineage_unread.py:577-584 — pinned tokens survive"
+   ],
+   "exceptions_checked": [
+    "git grep 'the run began' over tests/ docs/: hits are USAGE.md and other tests' phrases ('refused before the run began'), none pins this detail's tail",
+    "detail free prose, never parsed; STATE + truthiness preserved",
+    "distinguishing content ('records a journal of 5 lines') intact"
+   ],
+   "refutation": "",
+   "note": "AUDITED upheld; subject RUN.json kept, only redundant gloss lost."
+  },
+  {
+   "target": "aisef2/app/lineage.py::_without_a_journal", "index": 37,
+   "mutant": "L252 string ' ' emptied",
+   "class_before": "AUDITED", "verdict": "CONFIRMED", "class_after": "AUDITED",
+   "grounds": "VERIFIED. lineage.py:252; the space between {JOURNAL.name} and {what} emptied -> '...no line count) and aisef-run.jsonlis not there' (mutant_view diff). The full subject ('RUN.json's journal is not a journal record (no line count)') + JOURNAL.name + {what} all survive; only the separating space is gone (readable, meaning recoverable). m37 39 OK (SURVIVED); this branch has no content test anyway.",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:317-318 — claim() refusal; meaning fully recoverable",
+    "aisef2/app/lineage.py:331 — supersedes['unread']",
+    "aisef2/app/bundle_cli.py:896 — continue_from 'why'"
+   ],
+   "exceptions_checked": [
+    "no test/doc asserts the space between JOURNAL.name and {what}",
+    "detail free prose, never parsed; STATE + truthiness preserved",
+    "owner rule: a test pinning one space would be adding an assertion merely to reach a number"
+   ],
+   "refutation": "",
+   "note": "Cosmetic; subject intact (distinct from subject-erasing 36 on the same line)."
+  },
+  {
+   "target": "aisef2/app/lineage.py::_without_a_journal", "index": 41,
+   "mutant": "L243 string ' ' emptied",
+   "class_before": "AUDITED", "verdict": "CONFIRMED", "class_after": "AUDITED",
+   "grounds": "VERIFIED. lineage.py:243; space between {JOURNAL.name} and {what} emptied -> 'RUN.json is there and is not a record (a JSON object) and aisef-run.jsonlis not there' (mutant_view diff). Subject phrase + JOURNAL.name + {what} survive. m41 39 OK (SURVIVED). No reader depends on the space.",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:317-318 — refusal embeds the detail",
+    "aisef2/app/lineage.py:331 — supersedes['unread']",
+    "aisef2/app/bundle_cli.py:896 — continue_from 'why'"
+   ],
+   "exceptions_checked": [
+    "no test/doc asserts the space",
+    "free prose, never parsed; STATE + truthiness preserved",
+    "owner rule: pinning one space == a test merely to reach a number"
+   ],
+   "refutation": "",
+   "note": "Cosmetic; subject intact (distinct from 40)."
+  },
+  {
+   "target": "aisef2/app/lineage.py::_without_a_journal", "index": 44,
+   "mutant": "L251 string ' ' emptied",
+   "class_before": "AUDITED", "verdict": "CONFIRMED", "class_after": "AUDITED",
+   "grounds": "VERIFIED. lineage.py:251; space between {JOURNAL.name} and {what} emptied. Captured mutated why (idx44) = 'RUN.json records a journal of 5 lines and aisef-run.jsonlis not there: the run began'. The content test's three assertIn tokens all remain substrings: '5 lines' present; JOURNAL.name 'aisef-run.jsonl' present in 'aisef-run.jsonlis'; 'is not there' present as a CONTIGUOUS substring of 'jsonlis not there' (verified) — so the content test PASSES, m44 39 OK (SURVIVED). Only the inter-token space is lost.",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:317-318 — refusal embeds the detail",
+    "aisef2/app/lineage.py:331 — supersedes['unread']",
+    "aisef2/app/bundle_cli.py:896 — continue_from 'why'",
+    "tests/v2/test_v21_pw_lineage_unread.py:577-584 — its three assertIn checks are substring and all survive (measured)"
+   ],
+   "exceptions_checked": [
+    "no test/doc asserts the space; the content test's assertIn are substring and survive",
+    "free prose, never parsed; STATE + truthiness preserved",
+    "owner rule: pinning the space would be a test merely to reach a number"
+   ],
+   "refutation": "",
+   "note": "AUDITED upheld; the subtle substring-survival claim ('is not there' inside 'jsonlis not there') verified empirically."
+  },
+  {
+   "target": "aisef2/app/lineage.py::_without_a_journal", "index": 50,
+   "mutant": "L239 string ' ' emptied",
+   "class_before": "AUDITED", "verdict": "CONFIRMED", "class_after": "AUDITED",
+   "grounds": "VERIFIED. lineage.py:239; space between {JOURNAL.name} and {what} emptied -> 'RUN.json cannot be read (PermissionError: Permission denied) and aisef-run.jsonlis not there' (by inspection of diff). Subject phrase, exception type, strerror, JOURNAL.name, {what} all survive. m50 39 OK (SURVIVED). No reader depends on the space.",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:317-318 — refusal embeds the detail",
+    "aisef2/app/lineage.py:331 — supersedes['unread']",
+    "aisef2/app/bundle_cli.py:896 — continue_from 'why'"
+   ],
+   "exceptions_checked": [
+    "no test/doc asserts the space",
+    "free prose, never parsed; STATE + truthiness preserved",
+    "owner rule: pinning one space == a test merely to reach a number"
+   ],
+   "refutation": "",
+   "note": "Cosmetic; subject 'RUN.json cannot be read' intact (distinct from subject-erasing 47)."
+  },
+  {
+   "target": "aisef2/app/lineage.py::_without_a_journal", "index": 53,
+   "mutant": "L241 string ' ' emptied",
+   "class_before": "AUDITED", "verdict": "CONFIRMED", "class_after": "AUDITED",
+   "grounds": "VERIFIED. lineage.py:241; space between {JOURNAL.name} and {what} emptied -> 'RUN.json is there and is not a record (JSONDecodeError) and aisef-run.jsonlis not there' (diff). Subject phrase + exception type + JOURNAL.name + {what} survive. m53 39 OK (SURVIVED). No reader depends on the space.",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:317-318 — refusal embeds the detail",
+    "aisef2/app/lineage.py:331 — supersedes['unread']",
+    "aisef2/app/bundle_cli.py:896 — continue_from 'why'"
+   ],
+   "exceptions_checked": [
+    "no test/doc asserts the space",
+    "free prose, never parsed; STATE + truthiness preserved",
+    "owner rule: pinning one space == a test merely to reach a number"
+   ],
+   "refutation": "",
+   "note": "Cosmetic; subject intact (distinct from 51)."
+  },
+  {
+   "target": "aisef2/app/lineage.py::_without_a_journal", "index": 48,
+   "mutant": "L239 string ': ' emptied",
+   "class_before": "AUDITED", "verdict": "CONFIRMED", "class_after": "AUDITED",
+   "grounds": "VERIFIED. lineage.py:239; the ': ' between {type(e).__name__} and {e.strerror or e} emptied -> 'RUN.json cannot be read (PermissionErrorPermission denied) and aisef-run.jsonl is not there' (diff). Subject phrase, exception type and strerror all survive; only the ': ' separator is lost so the two run together but both are present and readable. m48 39 OK (SURVIVED).",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:317-318 — type and strerror both still shown",
+    "aisef2/app/lineage.py:331 — supersedes['unread']",
+    "aisef2/app/bundle_cli.py:896 — continue_from 'why'"
+   ],
+   "exceptions_checked": [
+    "no test/doc asserts the ': ' separator between the exception type and strerror",
+    "free prose, never parsed; STATE + truthiness preserved; both tokens survive",
+    "owner rule: pinning the separator would be a test merely to reach a number"
+   ],
+   "refutation": "",
+   "note": "Cosmetic separator loss; subject + type + message intact."
+  },
+  {
+   "target": "aisef2/app/lineage.py::_without_a_journal", "index": 49,
+   "mutant": "L239 string ') and ' emptied",
+   "class_before": "AUDITED", "verdict": "CONFIRMED", "class_after": "AUDITED",
+   "grounds": "VERIFIED. lineage.py:239; the ') and ' joining the embedded OSError to the journal clause emptied -> 'RUN.json cannot be read (PermissionError: Permission deniedaisef-run.jsonl is not there' (diff). Subject phrase, exception type and strerror survive, and the journal clause follows; only the ') and ' connective is lost so strerror runs into the journal name. Both clauses present; the fault (RUN.json cannot be read) stated. m49 39 OK (SURVIVED).",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:317-318 — subject + both clauses present",
+    "aisef2/app/lineage.py:331 — supersedes['unread']",
+    "aisef2/app/bundle_cli.py:896 — continue_from 'why'"
+   ],
+   "exceptions_checked": [
+    "no test/doc asserts the ') and ' connective",
+    "free prose, never parsed; STATE + truthiness preserved; subject 'RUN.json cannot be read' intact (distinct from subject-erasing 47)",
+    "owner rule: pinning the connective would be a test merely to reach a number"
+   ],
+   "refutation": "",
+   "note": "Cosmetic connective loss; subject intact."
+  },
+  {
+   "target": "aisef2/app/lineage.py::_without_a_journal", "index": 52,
+   "mutant": "L241 string ') and ' emptied",
+   "class_before": "AUDITED", "verdict": "CONFIRMED", "class_after": "AUDITED",
+   "grounds": "VERIFIED. lineage.py:241; the ') and ' joining the exception type to the journal clause emptied -> 'RUN.json is there and is not a record (JSONDecodeErroraisef-run.jsonl is not there' (diff). Subject phrase and exception type survive and the journal clause follows; only ') and ' is lost. Both clauses present; subject intact (distinct from subject-erasing 51). m52 39 OK (SURVIVED).",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:317-318 — subject + both clauses present",
+    "aisef2/app/lineage.py:331 — supersedes['unread']",
+    "aisef2/app/bundle_cli.py:896 — continue_from 'why'"
+   ],
+   "exceptions_checked": [
+    "no test/doc asserts the ') and ' connective",
+    "free prose, never parsed; STATE + truthiness preserved; subject intact",
+    "owner rule: pinning the connective would be a test merely to reach a number"
+   ],
+   "refutation": "",
+   "note": "Cosmetic connective loss; subject intact."
+  },
+  {
+   "target": "aisef2/app/lineage.py::_without_a_journal", "index": 55,
+   "mutant": "L239 Or swapped",
+   "class_before": "AUDITED", "verdict": "CONFIRMED", "class_after": "AUDITED",
+   "grounds": "VERIFIED. lineage.py:239; `{e.strerror or e}` -> `{e.strerror and e}` (mutant_view diff). For the reachable OSErrors on this read_text path (PermissionError/EACCES, IsADirectoryError/EISDIR), e.strerror is a truthy string, so `or` yields strerror ('Permission denied') while `and` yields `e` (str(e), which adds the errno and the RUN.json PATH). The result is observably different but MORE informative and still names RUN.json + the fault + the exception type. m55 39 OK (SURVIVED): no test asserts the strerror-vs-str(e) rendering. Edge case the author flagged is sound: only if e.strerror were falsy would `and` yield that falsy value instead of str(e), and read_text's EACCES/EISDIR always populate strerror in CPython, so it is not reached; the detail stays non-empty via the surrounding literal regardless.",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:317-318 — both renderings carry 'Permission denied' and name RUN.json",
+    "aisef2/app/lineage.py:331 — supersedes['unread']",
+    "aisef2/app/bundle_cli.py:896 — continue_from 'why'",
+    "tests/v2/test_v21_pw_lineage_unread.py:230-237 test_the_refusal_says... (the JOURNAL-unreadable child_evidence branch, not this one) asserts the exception TYPE 'PermissionError', which both renderings preserve"
+   ],
+   "exceptions_checked": [
+    "no test/doc asserts that the message shows strerror rather than str(e) for this branch",
+    "free prose, never parsed; STATE + truthiness preserved (str(e) non-empty for the reachable errors)",
+    "the falsy-strerror case that would change the value is not reachable on this read_text path"
+   ],
+   "refutation": "",
+   "note": "AUDITED upheld (a more-informative rendering, not a loss). The author's own owed test for 47 ('RUN.json'+'cannot be read'+'PermissionError') would also kill 55 incidentally, but 55 standing alone misleads no reader, so it owes no test of its own."
+  }
+ ],
+ "owed_tests": [
+  "ONE test owed (consolidates REFUTED 36,40,47,51): extend tests/v2/test_v21_pw_lineage_unread.py::RecordThatNamesAJournalOfEvents.test_the_cause_says_what_the_record_says_and_what_is_not_there (or add siblings on the same fixture via record()/names()) so that, for each of the four _without_a_journal branches that today reach UNREAD with an unasserted detail, the detail NAMES the faulty artifact RUN.json and its cause: (a) RUN.json chmod 0o000 [POSIX] -> assertIn('RUN.json',why); assertIn('cannot be read',why); assertIn('PermissionError',why) [kills 47]; (b) RUN.json='{\"journal\": {\"path\": \"run/jour' -> assertIn('RUN.json',why); assertIn('is not a record',why) [kills 51]; (c) RUN.json='[1, 2]' -> assertIn('RUN.json',why); assertRegex(why,r'not a record|JSON object') [kills 40]; (d) RUN.json={'journal':{'path':JOURNAL,'lines':'5'}} -> assertIn('RUN.json',why); assertRegex(why,r'journal record|no line count') [kills 36]. Each also assertEqual(state,lineage.UNREAD); assertIn('is not there',why). These assert content the operator relies on (claim() refusal lineage.py:317, continue_from report 'why' bundle_cli.py:896, CONTINUED-BY.{n}.json 'unread' lineage.py:331) to know which artifact to repair — the symmetric completion of the coverage the L251 branch already has, not padding."
+ ],
+ "notes": "15/15 author entries CONFIRMED on independent remeasurement; 0 REVISED, 0 REFUTED-against-author, 0 NOT_DECIDED. Measurement reproduced exactly (baseline 39 OK; all 15 mutants 39 OK == SURVIVED via the sole registered kill file tests/v2/test_v21_pw_lineage_unread.py, mutation.py:1046). All 15 index->mutant descriptions pinned (mkmutant.py asserted desc==batch entry for each; no build failed). All 15 mutate only the second element (detail prose) of the (state,detail) tuple; the first element (STATE) and all control flow are untouched, so continued_by/supersession/every STATE assertion pass -> SURVIVED. The three consumers the author named are the real and only readers of THIS detail string (lineage.py:317-318 claim refusal, lineage.py:331 supersedes['unread'] in CONTINUED-BY, bundle_cli.py:896/950 continue_from report 'why'); the account-level 'unread' in run.py:527-542 / verify.py:89-93 / lineage_account (lineage.py:721,769,777) is a DIFFERENT field (a list of unreconciled spend), not this tuple, so it is correctly NOT listed. No unregistered test asserts any REFUTED branch's detail content (grep over tests/: the 'cannot be read (' and 'is there and is not a record' hits are OCR-preflight, bundle-file-read, x_lineage journal-side, and account-spend paths or docstrings). 4 REFUTED (test owed): subject-erasing survivors where RUN.json vanishes from an operator-read string and only the journal is named, on branches with no content test; 36 and 40 collapse to the SAME bytes ('aisef-run.jsonl is not there'), measured. 11 AUDITED: distinguishing content survives (42,45 redundant L251 prefix/tail on the content-tested branch; 37,41,44,48,49,50,52,53 cosmetic space/separator/connective, subject intact; 55 a more-informative OSError rendering). The four REFUTED collapse to one owed test. No EQUIVALENT used (every mutant changes the operator-read string observably, so none is provably equivalent). No code or tests changed; measurement pinned."
+}

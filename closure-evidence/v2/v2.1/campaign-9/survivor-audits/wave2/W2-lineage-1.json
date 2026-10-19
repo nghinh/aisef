@@ -1,0 +1,261 @@
+{
+ "batch": "W2-lineage-1",
+ "file": "aisef2/app/lineage.py",
+ "targets": [
+  "aisef2/app/lineage.py::claim"
+ ],
+ "new": [
+  {
+   "target": "aisef2/app/lineage.py::claim",
+   "index": 68,
+   "mutant": "L340 element 1 dropped"
+  },
+  {
+   "target": "aisef2/app/lineage.py::claim",
+   "index": 74,
+   "mutant": "L317 string ' is claimed by ' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::claim",
+   "index": 75,
+   "mutant": "L317 string ' (' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::claim",
+   "index": 76,
+   "mutant": "L317 string '), whose evidence exists and cannot be read (' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::claim",
+   "index": 78,
+   "mutant": "L322 string ' (recorded; the run is still refused while that evidence does not read, because what the child spent is not known)' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::claim",
+   "index": 91,
+   "mutant": "L341 string ' cannot be claimed: ' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::claim",
+   "index": 92,
+   "mutant": "L341 string ' cannot be created (' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::claim",
+   "index": 93,
+   "mutant": "L341 string ': ' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::claim",
+   "index": 94,
+   "mutant": "L342 string ') \u2014 the claim is a file in that directory: ' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::claim",
+   "index": 103,
+   "mutant": "L340 string 'EDQUOT' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::claim",
+   "index": 104,
+   "mutant": "L342 Or swapped"
+  },
+  {
+   "target": "aisef2/app/lineage.py::claim",
+   "index": 107,
+   "mutant": "L301 Or swapped"
+  }
+ ],
+ "carried": [
+  {
+   "target": "aisef2/app/lineage.py::claim",
+   "index": 70,
+   "mutant": "L347 string '\\n' emptied",
+   "class": "AUDITED",
+   "group": "T09-AUDIT-CLAIM-BYTES: the claim file's bytes are only parsed as JSON or hashed as read; nothing re-derives or compares them",
+   "grounds": "The claim file is written at lineage.py:179 as `json.dumps(doc, sort_keys=True) + \"\\n\"`; the mutant drops only the trailing newline. Every reader parses it as JSON or hashes the bytes it read: claim() L147-153 (read_bytes -> json.loads; `_sha(data)` at L163, L168, L169 is the digest of the bytes on disk), continued_by L191 and lineage_account L346/L355 via _claimed_run (read_text -> json.loads, whitespace-insensitive). The claim file is outside the evidence manifest: run.py:294-304 evidence_manifest lists RUN.json, RUN.started.json, run/journals/*.jsonl, sessions/*.jsonl, preflight/* and, new in round 3, review-findings/*.json (L298-300); CONTINUED-BY*.json is none of these, and tests/v2/test_v21_kills3_T14a.py ManifestMembers (L136-170, NOT_MEMBERS holds CONTINUED-BY.json) pins it. The dict, not the file, goes into rec['continues']['claim'] (run.py:374); RUN.json is dumped with sort_keys (run.py:506) and its digest is of the canonical JSON (_content_sha, run.py:283-291). verify.py never opens a claim file (L84: lineage_account only). Differential run at the snapshot (original module vs the mutant, claim lifecycle: refusal, supersede by digest, second generation, torn / non-object / run-not-a-string claims, dangling links, anchors written and read): only `ends_with_newline` differs; the parsed content, the refusal text, the supersede flow, continued_by and lineage_account are identical. Residual, accepted: a human `cat` runs on to the prompt.",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:85-92 claims() (exists / glob, never reads)",
+    "aisef2/app/lineage.py:147-153 claim() (read_bytes -> json.loads; `_sha(data)` L163/L168/L169 over the bytes read)",
+    "aisef2/app/lineage.py:191 continued_by and :346, :355 lineage_account (read_text -> _claimed_run -> json.loads)",
+    "aisef2/app/run.py:374 (the returned dict is recorded), :283-291 _content_sha (canonical JSON for RUN.json only), :294-304 evidence_manifest (explicit list; claim not in it), :506 RUN.json write",
+    "aisef2/app/verify.py:80-86 (_spend -> lineage_account only), :164 review_verify.artifact_problems (reads review-findings/ only)",
+    "aisef2/app/bundle_cli.py:414 continued_by",
+    "tests: test_v21_continue_integrity.py ClaimLifecycle (L399-470: fabricate() writes its own claim, digests come from p.read_bytes()); test_v21_kills3_T09a.py sha() L58-59 hashes read_bytes(); T14a ManifestMembers L136-170",
+    "docs/v2.1/USAGE-2.1.md:125-131 (names the sha256 of the claim, no byte format); TRACEABILITY.md:640-641 (predecessor's evidence byte-identical but for the added claim)",
+    "validation/v21/cli_integration/*.sh|py (round 3 added e2e_guest.py / e2e_linux.sh): none names CONTINUED-BY or reads a claim"
+   ],
+   "exceptions_checked": [
+    "a line-oriented reader of a claim file: none (claims() callers are the four JSON / bytes readers above)",
+    "something appending to or concatenating claim files: nothing appends; the file is created O_EXCL once, 0o444",
+    "an expected digest derived independently of the file's bytes (re-serialising rec['continues']['claim']): none; sha is always taken from bytes read; tests hash read_bytes()",
+    "the evidence manifest or anchor binding the claim's bytes: not a member (now also checked against the review-findings addition of round 3)",
+    "Windows text mode: the bytes are read back and hashed as written; json.loads tolerates either ending"
+   ],
+   "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa",
+   "remapped_from": {
+    "index": 54,
+    "mutant": "L179 string '\\n' emptied",
+    "source_sha256": "85122bfb4d22125eeba871d91e8a848babb3fbaf41eb574dc20eb3869f4494f9",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 54,
+     "mutant": "L179 string '\\n' emptied",
+     "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+    },
+    "chain": [
+     {
+      "index": 54,
+      "mutant": "L179 string '\\n' emptied",
+      "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+     },
+     {
+      "index": 54,
+      "mutant": "L179 string '\\n' emptied",
+      "source_sha256": "85122bfb4d22125eeba871d91e8a848babb3fbaf41eb574dc20eb3869f4494f9",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  },
+  {
+   "target": "aisef2/app/lineage.py::claim",
+   "index": 84,
+   "mutant": "L328 string ')' emptied",
+   "class": "AUDITED",
+   "group": "T09-AUDIT-CLAIM-WORDING: connective punctuation of a refusal whose identifying elements (the flag, the 64-hex digest) are intact",
+   "grounds": "The conclusion holds; one consumer is misattributed in the carried text. CORRECTION: it says cli.py compares the named digest by equality; cli.py only forwards the flag (cli.py:67-68, :91 -> run.py:374), and the comparison is `supersede == _sha(data)` at lineage.py:163 inside claim() itself. Mutant: it drops the final ')' of the f-string at lineage.py:168 (same line): the refusal ends '... (an operator may name it: --supersede-claim <64 hex>' with the parenthesis unclosed. The flag and the digest are intact, and the digest is now the last token. The recovery instruction is held as a contract by tests/v2/test_v21_kills3_T09b.py:148-183 (ClaimRefusalText): it extracts the digest with `--supersede-claim\\s+([0-9a-f]{64})(?![0-9a-f])` (L166), compares it with sha256 of the claim's bytes (L168) and supersedes with the extracted value (L169); the class docstring says 'the connecting words are not the contract'. The comparison that makes a copied digest work is `supersede == _sha(data)` (lineage.py:163): a copied trailing ')' would not match, so the mutant is the safer form for an operator copying the last token. The only producer of the text is lineage.py:166-168; its readers are run.py:373-376 (RunRefused(str(e)), recorded as rec['failure']['detail'][:2000] at run.py:498, of which verify.py:185 reads only the truthiness) and cli.py:92-93 (printed on stderr).",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:164-168 (only producer); grep '--supersede-claim' / 'an operator may name' over aisef2, aisef, validation, bin, tests, docs/v2.1: lineage.py:168, cli.py:46-48 (help) and :67-68, tests T09b:166, test_v21_kills_cli.py (help text), T23a (argv), USAGE-2.1.md:131 (flag described, no text)",
+    "aisef2/app/run.py:373-376 (RunRefused(str(e)) from None) -> run.py:498 (failure detail, truncated to 2000 chars, the digest being the TAIL) -> verify.py:185 (rec.get('failure') truthiness only)",
+    "aisef2/app/cli.py:92-93 (`aisef run: refused: {e}`)",
+    "tests/v2/test_v21_kills3_T09b.py:148-183 (regex + supersede with the extracted digest), test_v21_continue_integrity.py:466 and test_v21_kills3_R03.py:92 (assertIn 'not superseded without evidence'), test_v21_kills3_T09a.py:275-298 (sha(first) named directly)",
+    "lineage.py:163 `supersede == _sha(data)` (equality, so only the exact 64 hex works)"
+   ],
+   "exceptions_checked": [
+    "a script taking the message's last token as the digest: the mutant is the better form (no trailing ')')",
+    "a regex expecting ')' after the digest: none in the repository (T09b's pattern has only a negative lookahead for hex)",
+    "an unbalanced '(' confusing a reader: cosmetic; no identifying element (path, claim file name, held run, reason, flag, digest) is lost",
+    "truncation at [:2000] of the recorded detail: the digest is the tail, so a long message loses the digest in both forms; the mutant is one character shorter, never worse",
+    "a NEW reader added by round 3: none (grep over aisef2/validation/tests/docs)"
+   ],
+   "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa",
+   "remapped_from": {
+    "index": 63,
+    "mutant": "L168 string ')' emptied",
+    "source_sha256": "85122bfb4d22125eeba871d91e8a848babb3fbaf41eb574dc20eb3869f4494f9",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 63,
+     "mutant": "L168 string ')' emptied",
+     "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+    },
+    "chain": [
+     {
+      "index": 63,
+      "mutant": "L168 string ')' emptied",
+      "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+     },
+     {
+      "index": 63,
+      "mutant": "L168 string ')' emptied",
+      "source_sha256": "85122bfb4d22125eeba871d91e8a848babb3fbaf41eb574dc20eb3869f4494f9",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  },
+  {
+   "target": "aisef2/app/lineage.py::claim",
+   "index": 88,
+   "mutant": "L335 string 'O_NOFOLLOW' emptied",
+   "class": "EQUIVALENT",
+   "group": "T09-EQ-NOFOLLOW: O_NOFOLLOW beside O_CREAT|O_EXCL; O_EXCL already refuses a final-component symbolic link",
+   "grounds": "Equivalence holds. lineage.py:173-174 opens `O_WRONLY | O_CREAT | O_EXCL | getattr(os, \"O_NOFOLLOW\", 0)`; the mutant's `getattr(os, \"\", 0)` is 0. O_NOFOLLOW governs only the final path component, and O_CREAT|O_EXCL already refuses a final component that exists, a symbolic link included, with EEXIST whatever it points at (POSIX open(); macOS open(2); Linux open(2): \"symbolic links are not followed: if pathname is a symbolic link, then open() fails\"; Linux build_open_flags ORs O_NOFOLLOW in for O_CREAT|O_EXCL itself - recalled, not readable on this host). Re-measured here on macOS / Python 3.14.7: dangling, to-file, to-dir, looping, regular-file and directory final components all give EEXIST (FileExistsError) with and without the flag; an intermediate symlinked directory is followed either way (the flag does not govern it). Where os has no O_NOFOLLOW (Windows) the original is already 0. The only handler is `except FileExistsError` (L175-177). Differential run at the snapshot (original module vs the mutant, claim lifecycle: refusal, supersede by digest, second generation, torn / non-object / run-not-a-string claims, dangling links, anchors written and read): identical on every observable, dangling links included.",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:173-177 (os.open; FileExistsError -> LineageRefused; no other OSError handled)",
+    "tests/v2/test_v21_continue_integrity.py L171-179 the `Os` shim (delegates __getattr__; the mutant's getattr(shim, '', 0) -> AttributeError -> 0 and reaches real open identically) and ClaimLifecycle.test_two_runs_at_once_one_claims_and_the_other_spends_nothing",
+    "docs/v2.1/TRACEABILITY.md:386, :640 (claim O_EXCL by generation: names O_EXCL, not O_NOFOLLOW)",
+    "grep NOFOLLOW over aisef2 aisef validation tests bin docs: lineage.py:174, :401 and docs naming it as the mechanism of the ANCHOR file (ANCHOR-THREAT-MODEL.md:49, REPORT.md:234); nothing asserts the flag's presence"
+   ],
+   "exceptions_checked": [
+    "error class when a link is planted (EEXIST vs ELOOP): EEXIST for dangling / to-file / to-dir / loop links with and without the flag (measured); the `except FileExistsError` is what every state gives",
+    "an intermediate symlinked directory: O_NOFOLLOW does not govern it; measured followed either way",
+    "Windows: the flag is absent from os, both values are 0",
+    "a link at a later generation that dangles: fails earlier at the read (L147-151), identically in both forms",
+    "a network or FUSE filesystem where O_EXCL is emulated: not an input this code has (the claim lives in a run directory of the operator's local disk)"
+   ],
+   "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa",
+   "remapped_from": {
+    "index": 65,
+    "mutant": "L174 string 'O_NOFOLLOW' emptied",
+    "source_sha256": "85122bfb4d22125eeba871d91e8a848babb3fbaf41eb574dc20eb3869f4494f9",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 65,
+     "mutant": "L174 string 'O_NOFOLLOW' emptied",
+     "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+    },
+    "chain": [
+     {
+      "index": 65,
+      "mutant": "L174 string 'O_NOFOLLOW' emptied",
+      "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+     },
+     {
+      "index": 65,
+      "mutant": "L174 string 'O_NOFOLLOW' emptied",
+      "source_sha256": "85122bfb4d22125eeba871d91e8a848babb3fbaf41eb574dc20eb3869f4494f9",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  },
+  {
+   "target": "aisef2/app/lineage.py::claim",
+   "index": 106,
+   "mutant": "L347 True->False",
+   "class": "AUDITED",
+   "group": "T09-AUDIT-CLAIM-BYTES: the claim file's bytes are only parsed as JSON or hashed as read; nothing re-derives or compares them",
+   "grounds": "The mutant at lineage.py:179 is `json.dumps(doc, sort_keys=False)`: the key order of the file becomes the insertion order fixed at L172 (run, claimed, claimant, supersedes) and of the nested dicts (L169-170) instead of alphabetical. Bytes are deterministic in both forms; json.loads and every dict comparison are order-insensitive; every digest is of the bytes on disk (L148 -> L163/L168/L169; tests hash read_bytes()). The dict returned (L182) is the same object in both forms and is what run.py:374 records; RUN.json is dumped with sort_keys (run.py:506) and bound by the canonical-JSON digest (_content_sha, run.py:283-291). The claim file is not a member of the evidence manifest (run.py:294-304: RUN.json, RUN.started.json, journals, sessions, preflight and, new in round 3, review-findings/*.json; tests/v2/test_v21_kills3_T14a.py ManifestMembers pins CONTINUED-BY.json as a non-member). No document states a canonical byte form of a claim and nothing re-serialises one. Differential run at the snapshot (original module vs the mutant, claim lifecycle: refusal, supersede by digest, second generation, torn / non-object / run-not-a-string claims, dangling links, anchors written and read): only `keys_sorted` differs.",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:147-153, :191, :346, :355 (json.loads / hash of the bytes read)",
+    "aisef2/app/run.py:374 (returned dict recorded), :283-304 (canonical JSON for RUN.json, explicit manifest list), :506",
+    "aisef2/app/verify.py (no reference to claim files; lineage_account only, L84)",
+    "tests/v2/test_v21_continue_integrity.py, test_v21_kills3_T09a/T09b/T09c.py, test_v21_kills_lineage.py, test_v21_kills3_R03.py (none compares bytes of a production claim; fixtures write their own claims, some without sort_keys: test_v21_continue_integrity.py:441-447, test_v21_defects_verify.py:336)",
+    "docs/v2.1/USAGE-2.1.md:125-131, ADR-V2.1.md:144 (no byte form)"
+   ],
+   "exceptions_checked": [
+    "a verifier re-serialising a claim to compare bytes or digest: none (no sort_keys / json.dumps next to claim() or _sha in verify.py or validation/)",
+    "cross-host byte reproducibility of a claim: insertion order is code-fixed, no dependence on hash ordering",
+    "a human diff / operator copying the digest: both forms deterministic; the digest named in the refusal is of the file as written",
+    "the manifest or anchor binding the claim's bytes: not a member"
+   ],
+   "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa",
+   "remapped_from": {
+    "index": 72,
+    "mutant": "L179 True->False",
+    "source_sha256": "85122bfb4d22125eeba871d91e8a848babb3fbaf41eb574dc20eb3869f4494f9",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 72,
+     "mutant": "L179 True->False",
+     "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+    },
+    "chain": [
+     {
+      "index": 72,
+      "mutant": "L179 True->False",
+      "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+     },
+     {
+      "index": 72,
+      "mutant": "L179 True->False",
+      "source_sha256": "85122bfb4d22125eeba871d91e8a848babb3fbaf41eb574dc20eb3869f4494f9",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  }
+ ]
+}

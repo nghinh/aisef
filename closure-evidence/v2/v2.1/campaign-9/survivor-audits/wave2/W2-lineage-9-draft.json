@@ -1,0 +1,203 @@
+{
+ "batch": "W2-lineage-9",
+ "file": "aisef2/app/lineage.py",
+ "snapshot": "4ec961e706a1f7bda16d131037058c4fe9c2663f",
+ "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa",
+ "role": "author",
+ "date": "Mon Oct 19 19:30-20:10 +07 2026 (date(1))",
+ "registered_kill_files": {
+  "aisef2/app/lineage.py::claims": ["tests/v2/test_v21_continue_usage.py", "tests/v2/test_v21_continue_integrity.py", "tests/v2/test_v21_kills_lineage.py", "tests/v2/test_v21_kills3_T09b.py", "tests/v2/test_v21_pw_lineage_unread.py", "tests/v2/test_v21_x_lineage_proof.py"],
+  "aisef2/app/lineage.py::_in_the_way": ["tests/v2/test_v21_pw_lineage_unread.py"],
+  "aisef2/app/lineage.py::unread_runs": ["tests/v2/test_v21_x_lineage_proof.py"],
+  "aisef2/app/lineage.py::_claimed_run": ["tests/v2/test_v21_continue_usage.py", "tests/v2/test_v21_continue_integrity.py", "tests/v2/test_v21_defects_verify.py", "tests/v2/test_v21_x_lineage_proof.py"],
+  "aisef2/app/lineage.py::not_there": ["tests/v2/test_v21_pw_lineage_unread.py", "tests/v2/test_v21_pw_lineage_continue.py"]
+ },
+ "measurement": "Built each mutant into a COPY of the tree (validation.v2.mutation.mutants[INDEX], desc asserted == the entry), wrote it over aisef2/app/lineage.py, ran the reaching registered kill file(s) from the copy's root: env -i, PATH stripped of every dir with an executable opencode (verified 0 opencode on the clean PATH), HOME/TMPDIR/XDG under the copy, `nice -n 19 /opt/homebrew/bin/python3 -P -B -m unittest -q`. python 3.14.7 / darwin. Baselines (unmutated) PASS: pw_lineage_unread 39/0, kills3_T09b 14/0, pw_lineage_continue 36/0, x_lineage_proof 55/0, defects_verify 20/0. Live-oracle controls FAIL (oracles not vacuous): claims[0] 'L162 returns None' -> pw_lineage_unread FAILED 83/39; _in_the_way[15] ' is a link that leads nowhere (' emptied -> pw_lineage_unread FAILED 3; not_there[0] 'L455 returns None' -> pw_lineage_unread FAILED 80/48. Every new survivor's registered-file run below is PASS (SURVIVED) and is explained per entry. Note: kills3_T09b is registered for `claims` but its `claims` tests pin only generation naming/order [2,3,5,8,9] (L102-145) and the claim() refusal, never the claims() OSError 'cannot be listed' branch (L153-156); the reaching oracle for [13]/[14]/[15] is pw_lineage_unread RefusalsAreStructuredNotRaw (L297-331), which asserts only 'PermissionError' in str(exc) plus str(pred)/CLAIM.",
+ "entries": [
+  {
+   "target": "aisef2/app/lineage.py::claims",
+   "index": 13,
+   "mutant": "L154 string ': ' emptied",
+   "class": "AUDITED",
+   "group": "G-CLAIMS-LISTED-REFUSAL-TEXT: wording/connective/interpolation inside the one LineageRefused `claims` raises when `_look` cannot list the predecessor (lineage.py:153-156). The three identifying elements survive on every mutant of the group — the predecessor path `{predecessor}`, the error class `{type(e).__name__}`, and the system cause `{e.strerror or e}`. The sole oracle that reaches this branch, pw_lineage_unread RefusalsAreStructuredNotRaw / AListingThatTheSystemRefuses (L306-331), asserts only `'PermissionError' in str(c.exception)` (the class) and, in the claim()-adjacent test, str(pred) and CLAIM; it does not assert the connectives, the explanatory tail, or the remediation. T09b docstring states the contract directly: 'Identifiers stand apart so the operator can lift each of them; the connecting words are not the contract.'",
+   "grounds": "`: ` emptied turns `({type(e).__name__}: {e.strerror or e})` into `({type(e).__name__}{e.strerror or e})`, so for the only reachable cause (a listdir refusal) the parenthetical reads 'PermissionErrorPermission denied' instead of 'PermissionError: Permission denied' — the class token and the strerror text are both still present, only run together. MEASURE: claims[13] vs tests.v2.test_v21_pw_lineage_unread = PASS 39/0 (SURVIVED). The oracle asserts the class token as a substring and is tolerant of a dropped ': ' between it and the strerror; control claims[0] FAILED the same file 83/39, so the PASS is not vacuous. No consumer parses the message (all stringify).",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:153-156 (the only producer of 'its claims cannot be listed'); grep 'cannot be listed' across aisef2/validation/tests/docs: the only hits that touch this refusal are this line and the stringifying catchers below",
+    "aisef2/app/bundle_cli.py:886-888 (continued_by -> claims; `except lineage.LineageRefused as e: raise JournalRefused(\"EVIDENCE_UNREADABLE\", str(e))` — stringified into the continue report, never parsed)",
+    "aisef2/app/lineage.py:740-743 (account walk `listed()`: `except LineageRefused as e: unknown(holder, f\"{e}: ...\")` — stringified into the account's unknown note, never parsed)",
+    "aisef2/app/run.py:485, :522 (`except lineage.LineageRefused as e: raise RunRefused(str(e))` — stringified)",
+    "tests/v2/test_v21_pw_lineage_unread.py:306-331 (the only oracle on this branch: asserts 'PermissionError' and str(pred)/CLAIM, never the ': ' connective)"
+   ],
+   "exceptions_checked": [
+    "an operator reading str(e): sees 'PermissionErrorPermission denied' — both the class and the strerror are present, only the ': ' separator between them is gone (cosmetic run-together)",
+    "a verifier/parser splitting on ': ': none in aisef2/validation/tests/docs reads this refusal structurally",
+    "a strerror-less OSError: `{e.strerror or e}` becomes str(e); the ': ' drop does not change which value is shown (that is mutant [15])"
+   ],
+   "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa"
+  },
+  {
+   "target": "aisef2/app/lineage.py::claims",
+   "index": 14,
+   "mutant": "L154 string '): a lineage cannot be known from a directory this process may not list and search — restore its permissions (nothing was taken or released)' emptied",
+   "class": "AUDITED",
+   "group": "G-CLAIMS-LISTED-REFUSAL-TEXT: wording/connective/interpolation inside the one LineageRefused `claims` raises when `_look` cannot list the predecessor (lineage.py:153-156). The three identifying elements survive on every mutant of the group — the predecessor path `{predecessor}`, the error class `{type(e).__name__}`, and the system cause `{e.strerror or e}`. The sole oracle that reaches this branch, pw_lineage_unread RefusalsAreStructuredNotRaw / AListingThatTheSystemRefuses (L306-331), asserts only `'PermissionError' in str(exc)` (the class) and, in the claim()-adjacent test, str(pred) and CLAIM; it does not assert the connectives, the explanatory tail, or the remediation. T09b docstring states the contract directly: 'Identifiers stand apart so the operator can lift each of them; the connecting words are not the contract.'",
+   "grounds": "This empties the whole trailing clause AND the closing ')': the message becomes '{predecessor}: its claims cannot be listed ({type(e).__name__}: {e.strerror or e}' (unbalanced '(' at the end), losing the explanation 'a lineage cannot be known from a directory this process may not list and search', the remediation 'restore its permissions', and the reassurance 'nothing was taken or released'. The predecessor, the phrase 'cannot be listed', the class and the strerror all remain. MEASURE: claims[14] vs tests.v2.test_v21_pw_lineage_unread = PASS 39/0 (SURVIVED): the oracle asserts only 'PermissionError'/str(pred)/CLAIM and never the remediation. The 'nothing was taken' assertions in that file (L625, L644) are on claim()'s refusals (lineage.py:303, :345), not this claims() message; grep confirms the claims() ':156' wording is pinned by no test.",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:153-156 (producer); the emptied words appear only here (grep 'a lineage cannot be known', 'nothing was taken or released' over aisef2/validation/tests/docs -> lineage.py:156 only, plus lineage.py:303 which is a different refusal text)",
+    "aisef2/app/bundle_cli.py:886-888 and lineage.py:740-743 and run.py:485,:522 (every catcher stringifies str(e) into a report/note/RunRefused; none parses it)",
+    "tests/v2/test_v21_pw_lineage_unread.py:306-331 (claims()-refusal oracle: class + str(pred) + CLAIM only); L620-644 'nothing was taken' asserts claim()'s message (lineage.py:341-345), a different function",
+    "docs/v2.1: grep 'cannot be listed'/'restore its permissions'/'nothing was taken or released' in docs -> no doc reproduces or depends on this claims() wording (REPORT.md/USAGE-2.1 name `claims`/`unread_runs` as targets, not the text)"
+   ],
+   "exceptions_checked": [
+    "an operator reading the refusal: loses the 'restore its permissions' remediation and the 'nothing was taken or released' reassurance, and the message ends on an unbalanced '('; it still names the predecessor, says the claims 'cannot be listed', and carries the PermissionError+strerror, so the refused action and its cause are identified",
+    "a parser depending on the closing ')': none in the repository",
+    "the lineage-safety reassurance as a pinned contract: no test/doc asserts it for claims() (only for claim(), L625/L644 against lineage.py:345)"
+   ],
+   "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa"
+  },
+  {
+   "target": "aisef2/app/lineage.py::claims",
+   "index": 15,
+   "mutant": "L154 Or swapped",
+   "class": "AUDITED",
+   "group": "G-CLAIMS-LISTED-REFUSAL-TEXT: wording/connective/interpolation inside the one LineageRefused `claims` raises when `_look` cannot list the predecessor (lineage.py:153-156). The three identifying elements survive on every mutant of the group — the predecessor path `{predecessor}`, the error class `{type(e).__name__}`, and the system cause `{e.strerror or e}`. The sole oracle that reaches this branch, pw_lineage_unread RefusalsAreStructuredNotRaw / AListingThatTheSystemRefuses (L306-331), asserts only `'PermissionError' in str(exc)` (the class) and, in the claim()-adjacent test, str(pred) and CLAIM; it does not assert the connectives, the explanatory tail, or the remediation. T09b docstring states the contract directly: 'Identifiers stand apart so the operator can lift each of them; the connecting words are not the contract.'",
+   "grounds": "`{e.strerror or e}` becomes `{e.strerror and e}`. For the only reachable cause (listdir OSError with a non-empty strerror, e.g. EACCES) the original interpolates the strerror string 'Permission denied' and the mutant interpolates the exception object e, whose str() is '[Errno 13] Permission denied: ...' — a SUPERSET that still contains the strerror; the class token 'PermissionError' (from type(e).__name__, a separate interpolation) is unchanged. Only for a strerror-less OSError (strerror None/'' — rare) do they diverge in content: original shows str(e), mutant shows '' / 'None'. MEASURE: claims[15] vs tests.v2.test_v21_pw_lineage_unread = PASS 39/0 (SURVIVED): the oracle asserts the class token, which `and` does not touch, and the real OSErrors the file raises all carry a strerror so no information is lost.",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:154 (producer; `e.strerror or e` with e an OSError from os.listdir via _look:462-466)",
+    "aisef2/app/bundle_cli.py:886-888, lineage.py:740-743, run.py:485,:522 (stringify str(e); none inspects the strerror field or parses the parenthetical)",
+    "tests/v2/test_v21_pw_lineage_unread.py:306-331 (asserts 'PermissionError', the class token, not the strerror vs exception value)"
+   ],
+   "exceptions_checked": [
+    "a normal OSError (strerror present): mutant shows str(e) which contains the strerror and more; no loss to an operator",
+    "a strerror-less OSError: mutant shows '' or 'None' instead of str(e) — a real content loss, but no OSError the kill files raise is strerror-less, and no consumer branches on this value",
+    "the class token: unaffected (a separate `{type(e).__name__}` interpolation), so every PermissionError-substring oracle still passes"
+   ],
+   "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_in_the_way",
+   "index": 10,
+   "mutant": "L222 element 1 dropped",
+   "class": "EQUIVALENT",
+   "group": "G-INWAY-DEAD-VALUEERROR: the `except (OSError, ValueError)` at lineage.py:222 loses its ValueError arm.",
+   "grounds": "PROOF from the code that the dropped ValueError arm never fires given _in_the_way's single caller. (1) `_in_the_way` is called from exactly one site, child_evidence:202, inside `if text is None` (grep '_in_the_way(' over aisef2/validation/tests -> lineage.py:202 only; no test calls it directly). (2) child_evidence sets `text = None` only at lineage.py:188-190 (the `except OSError as e: ... not_there(e)` arm); if `(child / JOURNAL)` held an embedded NUL, `read_text()` would raise ValueError, caught at child_evidence:191-192 (`except ValueError: return UNBEGUN, None`) BEFORE _in_the_way is reached. (3) So when _in_the_way runs, `child / JOURNAL` is NUL-free; every `here` it builds is a prefix of that path (child, then child/'run', child/'run'/'journals', child/'run'/'journals'/'aisef-run.jsonl' — JOURNAL = run/journals/aisef-run.jsonl, a NUL-free constant, lineage.py:115), hence NUL-free. (4) os.lstat/os.stat raise ValueError ONLY on an embedded NUL in the path (measured on 3.14.7/darwin: os.lstat('x\\x00y') -> ValueError 'embedded null character'; os.lstat('/no/such/path') -> OSError errno 2); every other failure is OSError. Therefore no ValueError can arise inside the try at lineage.py:215-221, and the removed arm is dead. MEASURE: _in_the_way[10] vs tests.v2.test_v21_pw_lineage_unread = PASS 39/0 (equivalent); control _in_the_way[15] FAILED the same file (3), so the file's _in_the_way oracle is live.",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:202 (sole caller, child_evidence, under `text is None`); lineage.py:188-192 (text=None only on OSError+not_there; a NUL path is caught by child_evidence's own `except ValueError` first)",
+    "aisef2/app/lineage.py:215-221 (try body: os.lstat / os.stat only; stat.S_ISLNK does not raise)",
+    "grep '_in_the_way(' over aisef2/validation/tests: lineage.py:202 only (no direct test call that could pass a NUL path past child_evidence)",
+    "tests/v2/test_v21_pw_lineage_unread.py:465-479 (drives the OSError paths of _in_the_way via child_evidence: dangling link, link in place of directory, file in place; never a NUL)"
+   ],
+   "exceptions_checked": [
+    "a NUL in the journal path: child_evidence:191-192 returns UNBEGUN before _in_the_way is called, so the arm is unreachable from the only caller",
+    "os.lstat/os.stat raising ValueError for a non-NUL reason: none on CPython (ENAMETOOLONG etc. are OSError); confirmed on 3.14.7/darwin",
+    "a future second caller of _in_the_way passing a NUL path directly: none exists at this snapshot; this is an equivalence under the current call graph"
+   ],
+   "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_in_the_way",
+   "index": 16,
+   "mutant": "L221 string ')' emptied",
+   "class": "AUDITED",
+   "group": "G-INWAY-PAREN: the closing ')' of the 'link that leads nowhere' reason at lineage.py:221.",
+   "grounds": "`f\"{here} is a link that leads nowhere ({type(e).__name__})\"` becomes `f\"{here} is a link that leads nowhere ({type(e).__name__}\"` — the reason now ends on an unbalanced '(' + class, e.g. '... (FileNotFoundError'. The path `{here}`, the phrase 'is a link that leads nowhere', and the class token all survive. This reason is returned from _in_the_way to child_evidence (L203-204) as the UNREAD `why`. MEASURE: _in_the_way[16] vs tests.v2.test_v21_pw_lineage_unread = PASS 39/0 (SURVIVED): the oracle (L477) is `assertRegex(why, r'link that leads nowhere|is not a directory')`, which matches the surviving phrase and ignores the paren; control _in_the_way[15] (the phrase itself) FAILED, so the oracle is live. No consumer parses the `why`.",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:221 (producer) -> :203-204 child_evidence returns (UNREAD, way); the `why` flows to the account's `unread` list (lineage.py:331, :721, :777) and into operator messages (run.py:536, verify.py:92, bundle_cli.py:965) as free text, never parsed",
+    "tests/v2/test_v21_pw_lineage_unread.py:465-479 (asserts the regex 'link that leads nowhere|is not a directory' and str(child) in why — the paren is not in the regex)",
+    "grep 'leads nowhere (' over aisef2/validation/tests/docs: lineage.py:221 only (a separate 'leads nowhere' without the paren at :683, :727-733 is a different message)"
+   ],
+   "exceptions_checked": [
+    "an operator reading the UNREAD why: sees '... (FileNotFoundError' with no closing paren — cosmetic; the path and the 'link that leads nowhere' diagnosis are intact",
+    "a verifier matching on balanced parens: none; the only oracle uses a phrase regex",
+    "the sibling _in_the_way[15] (whole phrase emptied) is a different mutant and is killed by this same file (measured FAILED 3)"
+   ],
+   "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa"
+  },
+  {
+   "target": "aisef2/app/lineage.py::unread_runs",
+   "index": 2,
+   "mutant": "L784 string 'the runs named below' emptied",
+   "class": "AUDITED",
+   "group": "G-UNREAD-RUNS-JOIN: the single expression at lineage.py:784, `', '.join(dict.fromkeys(r['run'] for r in account['runs'] if r['unread'])) or 'the runs named below'`. SHARED FINDING: the sole registered kill file for this target, tests/v2/test_v21_x_lineage_proof.py, never calls unread_runs (grep -c unread_runs = 0), so NO mutation of this line can be killed by the registered set — every unread_runs survivor is explained by that registration gap. The real readers are the three operator refusal messages (run.py:536, verify.py:92, bundle_cli.py:965, each guarded by `if ...['unread']`) and the exact-equality assertions in the UNregistered tests/v2/test_v21_x_lineage_gone.py:217,329,639.",
+   "grounds": "The fallback branch is emptied: when the join is empty the function returns '' instead of 'the runs named below'. PROOF the fallback is unreachable in production and untested: account-level `unread` is the flat concat of per-run `r['unread']` (lineage.py:777 `\"unread\": [u for r in runs for u in r['unread']]`), so `account['unread']` is non-empty IFF some run has a non-empty `r['unread']` IFF the join over `if r['unread']` is non-empty; and all three production callers invoke unread_runs only under `if account['unread']`/`if not account['unread']` guards (run.py:529-536, verify.py:89-93, bundle_cli.py:961-965). Hence the join is always non-empty where production calls it, and the `or 'the runs named below'` fallback never fires. No test calls unread_runs on an all-read account (x_lineage_gone only ever has exactly one unread run: assertEqual(unread_runs(got), str(d)) with len(unread)==1). MEASURE: unread_runs[2] vs tests.v2.test_v21_x_lineage_proof = PASS 55/0 (SURVIVED) — vacuous, the file never calls the function.",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:784 (producer) and :777 (account['unread'] = flat concat of r['unread'])",
+    "aisef2/app/run.py:529-536, aisef2/app/verify.py:89-93, aisef2/app/bundle_cli.py:961-965 (the three callers; each only calls unread_runs when account['unread'] is non-empty -> join non-empty -> fallback dead)",
+    "tests/v2/test_v21_x_lineage_gone.py:217,329,639 (assertEqual(unread_runs(...), str(d)/str(first)); each case has exactly one unread run, join non-empty; this file is NOT in the registered set for unread_runs)",
+    "tests/v2/test_v21_x_lineage_proof.py (the sole registered kill file): grep -c unread_runs = 0, confirmed it never invokes the function"
+   ],
+   "exceptions_checked": [
+    "a direct caller passing an account with unread entries but no run flagged `unread`: would see '' instead of 'the runs named below' — but such an account is inconsistent with lineage.py:777 and is produced by nothing; no production path and no test constructs it",
+    "the operator seeing the fallback: never, because production calls are guarded so the join is always non-empty there",
+    "a doc/contract pinning 'the runs named below': none (grep over docs finds only an unrelated 'named below' in context_pack_mutants.py)"
+   ],
+   "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa"
+  },
+  {
+   "target": "aisef2/app/lineage.py::unread_runs",
+   "index": 3,
+   "mutant": "L784 string ', ' emptied",
+   "class": "REFUTED",
+   "group": "G-UNREAD-RUNS-JOIN: the single expression at lineage.py:784, `', '.join(dict.fromkeys(r['run'] for r in account['runs'] if r['unread'])) or 'the runs named below'`. SHARED FINDING: the sole registered kill file for this target, tests/v2/test_v21_x_lineage_proof.py, never calls unread_runs (grep -c unread_runs = 0), so NO mutation of this line can be killed by the registered set — every unread_runs survivor is explained by that registration gap. The real readers are the three operator refusal messages (run.py:536, verify.py:92, bundle_cli.py:965, each guarded by `if ...['unread']`) and the exact-equality assertions in the UNregistered tests/v2/test_v21_x_lineage_gone.py:217,329,639.",
+   "grounds": "`', '.join(...)` becomes `''.join(...)`: the separator between distinct unread run directories is removed. With >=2 unread runs the function concatenates their full paths into one string, e.g. '/tmp/a/run1/tmp/b/run2' instead of '/tmp/a/run1, /tmp/b/run2'. This is reachable: a lineage chain whose runs are one `runs` entry each (lineage.py:708-777), >=2 of them having lost evidence, and `dict.fromkeys` keeps them distinct by path. The result is read by an operator in three refusal messages that tell them which run directory to restore (run.py:530-536 'a faithful copy of the run directory at {unread_runs(inherited)}', verify.py:90-93, bundle_cli.py:962-965); with the separator gone the operator cannot tell the two restore targets apart — a merged, unusable path. This is exactly the contract T09b states ('identifiers stand apart so the operator can lift each of them'). MEASURE: unread_runs[3] vs tests.v2.test_v21_x_lineage_proof = PASS 55/0 (SURVIVED), vacuous (the file never calls unread_runs); x_lineage_gone, which does call it, only tests the single-run case (join of one element — unaffected by the separator), so nothing anywhere exercises >=2 runs. A test is owed.",
+   "refutation": "INPUT: an account with two distinct unread runs, e.g. account = {'runs': [{'run': '/x/run1', 'unread': ['run1/... is not there']}, {'run': '/y/run2', 'unread': ['run2/... cannot be read']}], 'unread': ['run1/...', 'run2/...'], ...}. READER: lineage.unread_runs (and, end-to-end, the operator refusal message in run.py:536 / verify.py:92 / bundle_cli.py:965 that embeds it). SKETCH: assertEqual(lineage.unread_runs(account), '/x/run1, /y/run2') — or, reader-level, build a lineage whose two ancestor runs both lost their sessions, drive verify()/bundle continue, and assert both run-directory paths appear separated (assertIn('/x/run1', msg) and assertIn('/y/run2', msg) and ', ' between them). Unmutated this passes; the `''.join` mutant yields '/x/run1/y/run2' and fails. (Pairs naturally with the registration gap: register test_v21_x_lineage_gone.py — and the new two-run case — for ::unread_runs so the sole registered file actually calls the function.)",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:784 (producer); dict.fromkeys preserves order and distinctness by run path, so >=2 distinct unread runs give >=2 join elements",
+    "aisef2/app/run.py:530-536 (operator: '... a faithful copy of the run directory at {unread_runs(inherited)} ...'), aisef2/app/verify.py:90-93, aisef2/app/bundle_cli.py:962-965 (same, in the continue report's run_parent_refused)",
+    "tests/v2/test_v21_x_lineage_gone.py:217,329,639 (exact-equality, but every case is a single unread run -> one join element -> the separator is never exercised; also not registered for unread_runs)",
+    "tests/v2/test_v21_x_lineage_proof.py (sole registered kill file): never calls unread_runs (grep -c = 0)"
+   ],
+   "exceptions_checked": [
+    "the single-unread-run case (what x_lineage_gone tests): one join element, '', '.join == ''.join, no observable difference — this is why x_lineage_gone would not catch it even if registered",
+    "deduped identical paths: dict.fromkeys collapses to one element, no separator needed",
+    ">=2 distinct unread runs (the real gap): the operator's restore-target list is merged into one unparseable path; no test covers it"
+   ],
+   "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_claimed_run",
+   "index": 8,
+   "mutant": "L135 string 'not a claim' emptied",
+   "class": "AUDITED",
+   "group": "G-CLAIMED-RUN-MSG: the text of the ValueError _claimed_run raises for a file that parses but is no claim (lineage.py:134-135).",
+   "grounds": "`raise ValueError('not a claim')` becomes `raise ValueError('')` for a doc that is valid JSON but not a claim object (not a dict, or `run` not a str, or a NUL in `run`). The ValueError CLASS and the raise itself are unchanged; only the detail string is emptied. Of the three callers, two use only the occurrence/class, not the text: continued_by (lineage.py:359-361 `except (OSError, ValueError): return UNREADABLE_CLAIM, None`) and the account-walk sibling_of (lineage.py:748-751 `except (OSError, ValueError) as e: unknown(holder, f\"...({type(e).__name__}): ...\")` — type name only). The one caller that surfaces the text is claim_unread (lineage.py:373-377 `...({type(e).__name__}: {getattr(e,'strerror',None) or e})...`), whose output becomes the operator-facing `why` field of a bundle continue report (bundle_cli.py:893). For a 'not a claim' doc the mutant turns 'ValueError: not a claim' into 'ValueError: ' there — the class token and the claim file name `{path.name}` and the remediation sentence survive; only the reason phrase is lost. MEASURE: _claimed_run[8] vs tests.v2.test_v21_x_lineage_proof = PASS 55/0 (SURVIVED): the file DOES reach this branch — test_an_older_claim_generation_that_cannot_be_read feeds `{\"run\": 7}` (L318) which raises the 'not a claim' ValueError — but it reaches it through the account walk (sibling_of), whose message uses only type(e).__name__, and asserts only assert_unread(got, 'CONTINUED-BY.json'); no test drives claim_unread with a 'not a claim' doc (x_lineage_proof:526 drives claim_unread only through a LINK = OSError).",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:135 (producer); callers at :359 (continued_by), :373 (claim_unread), :749 (sibling_of)",
+    "aisef2/app/lineage.py:359-361 continued_by: maps any OSError/ValueError to the UNREADABLE_CLAIM marker; text unused",
+    "aisef2/app/lineage.py:748-751 sibling_of (account walk): `unknown(holder, f\"...({type(e).__name__}): ...\")` — class only, text unused",
+    "aisef2/app/lineage.py:373-377 claim_unread: `{getattr(e,'strerror',None) or e}` -> for a ValueError (no strerror) interpolates str(e) = the emptied text; output = bundle_cli.py:893 continue report `why` (operator-facing, not parsed)",
+    "tests/v2/test_v21_x_lineage_proof.py:317-329 (feeds {\"run\": 7}/[1] -> 'not a claim' ValueError via the account walk; asserts 'CONTINUED-BY.json' in unread, class-only path) and :513-526 (claim_unread asserts 'cannot be read' via a LINK, an OSError, not this branch)",
+    "grep 'not a claim' over tests/: no test asserts the phrase (the hits are unrelated 'not a claim about ...' prose in other modules/docs)"
+   ],
+   "exceptions_checked": [
+    "an operator reading the bundle continue `why`: for a valid-JSON-but-not-a-claim newest claim, sees '{name} cannot be read (ValueError: ): make it readable again ...' — loses the 'not a claim' reason but keeps the class, the file name and the remediation",
+    "continued_by / sibling_of: unaffected (class/occurrence only)",
+    "a torn/non-text claim: raises a DIFFERENT ValueError (json.JSONDecodeError / its own message) from json.loads, untouched by this mutant; so the two are still told apart by their own text",
+    "a verifier parsing `why` for 'not a claim': none in the repository"
+   ],
+   "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa"
+  },
+  {
+   "target": "aisef2/app/lineage.py::not_there",
+   "index": 4,
+   "mutant": "L455 string 'winerror' emptied",
+   "class": "REFUTED",
+   "group": "G-NOT-THERE-WINERROR: the Windows arm of `not_there` (lineage.py:453-455).",
+   "grounds": "`getattr(e, 'winerror', None) in _NOT_THERE_WINERROR` becomes `getattr(e, '', None) in _NOT_THERE_WINERROR`. `getattr(e, '', None)` can never find an attribute named '' and always returns None, so the Windows arm degenerates to `None in (21, 123, 1921)` = always False — the winerror classification is disabled. POSIX: equivalent, because `getattr(e, 'winerror', None)` is already None on a POSIX OSError (measured 3.14.7/darwin: both getattr calls return None), so `not_there` reduces to `e.errno in _NOT_THERE` with and without the mutant. WINDOWS: observably different — an OSError whose winerror is 21 (drive not ready), 123 (invalid name) or 1921 (unresolvable reparse point) but whose mapped errno is NOT in _NOT_THERE (e.g. winerror 123 -> errno EINVAL) is classified 'nothing there' by the original and 'a refusal to look' by the mutant. not_there's consumers then diverge on Windows: child_evidence:188-190 (UNBEGUN vs UNREAD), _look:462-466 (swallow-as-absent vs re-raise), _without_a_journal:? (UNBEGUN vs UNREAD). The behaviour is a deliberate, documented contract (lineage.py:449-450 constant + the _NOT_THERE docstring naming the three Windows cases) and the project treats Windows as a real target. MEASURE: not_there[4] vs tests.v2.test_v21_pw_lineage_unread = PASS 39/0 and vs tests.v2.test_v21_pw_lineage_continue = PASS 36/0 (SURVIVED) — correct on POSIX (equivalent there); control not_there[0] FAILED pw_lineage_unread 80/48, so the file's not_there oracle is live for the POSIX arm. The Windows arm is pinned by NO test (grep 'winerror'/_NOT_THERE_WINERROR over aisef2/validation/tests -> lineage.py:450,455 only). A test is owed.",
+   "refutation": "INPUT: e = OSError(errno.EINVAL, 'The filename, directory name, or volume label syntax is incorrect'); e.winerror = 123  (OSError.winerror IS assignable on a POSIX build — measured on 3.14.7/darwin, `e.winerror = 21` then getattr returns 21 — so the test runs cross-platform, not Windows-only). READER: lineage.not_there, and through it child_evidence / _look / _without_a_journal which rely on it to tell 'nothing at that path' from 'a refusal to look'. SKETCH: self.assertTrue(lineage.not_there(e)) for each winerror in (21, 123, 1921) with an errno NOT in lineage._NOT_THERE; and a negative control self.assertFalse(lineage.not_there(OSError(errno.EACCES, 'x'))) with winerror 5. Unmutated this passes (the winerror arm catches it); the `getattr(e, '')` mutant returns None -> False and fails. This also kills the sibling errno-arm mutants ([2]/[3] In->NotIn) if extended to assert errno classification.",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:453-455 (producer) and :449-450 (_NOT_THERE / _NOT_THERE_WINERROR constants + docstring naming the Windows cases)",
+    "aisef2/app/lineage.py:188-190 child_evidence (not_there decides text=None/UNBEGUN vs the UNREAD 'cannot be read' message)",
+    "aisef2/app/lineage.py:462-466 _look (`if not not_there(e): raise` — on Windows a winerror-21/123/1921 would be swallowed as absent by the original, re-raised by the mutant)",
+    "aisef2/app/lineage.py _without_a_journal (RUN.json read: not_there(e) -> UNBEGUN vs the UNREAD 'RUN.json cannot be read' message)",
+    "grep 'winerror' / '_NOT_THERE_WINERROR' over aisef2/validation/tests/docs: lineage.py:450,455 only — no test or doc asserts the Windows classification; the campaign ran on POSIX so the arm is dead at measurement time"
+   ],
+   "exceptions_checked": [
+    "POSIX (the measurement platform): equivalent — getattr(e,'winerror',None) and getattr(e,'',None) are both None, so not_there == `e.errno in _NOT_THERE` either way; this is why the two registered kill files PASS and the campaign's SURVIVED is correct on POSIX",
+    "Windows with winerror mapped into _NOT_THERE anyway (e.g. ERROR_FILE_NOT_FOUND 2 -> ENOENT): the errno arm still catches it, so those cases do not diverge; only the three winerror-only codes (21/123/1921) with an off-list errno diverge",
+    "the owed test is NOT a number-padding test: it covers a disabled, documented Windows contract with zero existing coverage, which is a real gap per the audit rule"
+   ],
+   "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa"
+  }
+ ]
+}

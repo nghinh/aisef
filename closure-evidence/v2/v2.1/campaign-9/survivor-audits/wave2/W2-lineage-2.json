@@ -1,0 +1,85 @@
+{
+ "batch": "W2-lineage-2",
+ "file": "aisef2/app/lineage.py",
+ "targets": [
+  "aisef2/app/lineage.py::_without_a_journal"
+ ],
+ "new": [
+  {
+   "target": "aisef2/app/lineage.py::_without_a_journal",
+   "index": 36,
+   "mutant": "L252 string \"RUN.json's journal is not a journal record (no line count) and \" emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_without_a_journal",
+   "index": 37,
+   "mutant": "L252 string ' ' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_without_a_journal",
+   "index": 40,
+   "mutant": "L243 string 'RUN.json is there and is not a record (a JSON object) and ' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_without_a_journal",
+   "index": 41,
+   "mutant": "L243 string ' ' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_without_a_journal",
+   "index": 42,
+   "mutant": "L251 string 'RUN.json records a journal of ' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_without_a_journal",
+   "index": 44,
+   "mutant": "L251 string ' ' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_without_a_journal",
+   "index": 45,
+   "mutant": "L251 string ': the run began' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_without_a_journal",
+   "index": 47,
+   "mutant": "L239 string 'RUN.json cannot be read (' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_without_a_journal",
+   "index": 48,
+   "mutant": "L239 string ': ' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_without_a_journal",
+   "index": 49,
+   "mutant": "L239 string ') and ' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_without_a_journal",
+   "index": 50,
+   "mutant": "L239 string ' ' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_without_a_journal",
+   "index": 51,
+   "mutant": "L241 string 'RUN.json is there and is not a record (' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_without_a_journal",
+   "index": 52,
+   "mutant": "L241 string ') and ' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_without_a_journal",
+   "index": 53,
+   "mutant": "L241 string ' ' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_without_a_journal",
+   "index": 55,
+   "mutant": "L239 Or swapped"
+  }
+ ],
+ "carried": []
+}

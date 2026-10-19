@@ -1,0 +1,288 @@
+{
+ "batch": "W2-lineage-7",
+ "snapshot": "4ec961e706a1f7bda16d131037058c4fe9c2663f",
+ "file": "aisef2/app/lineage.py",
+ "targets": [
+  "aisef2/app/lineage.py::_journal_mismatch",
+  "aisef2/app/lineage.py::_evidence_gone"
+ ],
+ "role": "author",
+ "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa",
+ "measured_on": "/private/tmp/claude-501/-Users-nghinh-Downloads-projects-ai-sdlc/845c9f11-719f-4f92-a0ed-4f4a07d6e27b/scratchpad/m21/c9/audit2/out",
+ "method": "Author tree from `git archive 4ec961e706a1f7bda16d131037058c4fe9c2663f`. Each mutant built from a pristine copy of lineage.py via validation.v2.mutation.mutants(src, func, _enum_members(src,'.'))[INDEX] (desc asserted == the batch entry by gen_mutant.py -I), written over aisef2/app/lineage.py in a run-copy tree, then the target's REGISTERED kill file(s) run one mutant at a time from the copy root: nice -n 19 /opt/homebrew/bin/python3 -P -B -m unittest tests.v2.<name> -q; env PATH stripped of every dir holding an `opencode` executable (/Users/nghinh/.opencode/bin, /Users/nghinh/.npm-global/bin), HOME/TMPDIR/XDG under the tree. _journal_mismatch -> test_v21_x_lineage_proof; _evidence_gone -> test_v21_x_lineage_gone + test_v21_x_lineage_proof.",
+ "kill_files": {
+  "aisef2/app/lineage.py::_journal_mismatch": [
+   "tests/v2/test_v21_x_lineage_proof.py"
+  ],
+  "aisef2/app/lineage.py::_evidence_gone": [
+   "tests/v2/test_v21_x_lineage_gone.py",
+   "tests/v2/test_v21_x_lineage_proof.py"
+  ]
+ },
+ "baseline": "unmutated: test_v21_x_lineage_proof 55 tests OK (71.6s); test_v21_x_lineage_gone 29 tests OK (67.9s); PATH clean of opencode.",
+ "positive_controls": "[2] L570 returns None -> test_v21_x_lineage_proof=FAILED (failures=7); [27] L631 string ': RUN.json records that the run spent ' emptied -> test_v21_x_lineage_gone=FAILED (failures=31); [46] L644 string ' answered, ' emptied -> test_v21_x_lineage_gone=FAILED (failures=6)",
+ "measurement_result": "All 12 new survivors measured SURVIVED (kill file OK). None REFUTED-by-measurement. [4] (And->Or) SURVIVED and is REFUTED-by-reasoning: a lines-match/digest-differs journal flips its truthiness and NO oracle exercises that input (all three CUTS change the newline count, measured 7->0/3/6). The other 11 change only the displayed cause string; account_of and every downstream decision key on None-vs-string truthiness, which they preserve.",
+ "entries": [
+  {
+   "target": "aisef2/app/lineage.py::_journal_mismatch",
+   "index": 4,
+   "mutant": "L568 And swapped",
+   "class": "REFUTED",
+   "group": "G-JM-TRUTH: L568 is the gate that returns None only when the journal AGREES with RUN.json on BOTH digest AND line count; `account_of` keys on the None-vs-string result (lineage.py:527). A mutant that lets EITHER match satisfy the gate stops flagging a class of real mismatches.",
+   "grounds": "L568 `if _sha(data)==named['sha256'] and lines==named.get('lines'): return None` -> `or`. The `or` returns None (no mismatch) whenever EITHER the digest OR the line count matches. The digest-matches/lines-differ case cannot occur (a sha256 match implies identical bytes, identical newline count), but the lines-match/digest-differs case is real and uncovered: a journal altered or replaced in place keeping its newline count (measured: flip one non-newline mid byte -> newlines==K True, digest_differs True). On that input the original returns a truthy string ('N lines on disk, N recorded; digest differs') and the mutant returns None -> account_of treats the corrupted journal as the run's reconciled, exact spend. The three kill-file cuts all change the newline count (measured K=7 -> 0 / 3 / 6), so none exercises the discriminating input; measured test_v21_x_lineage_proof=OK (SURVIVED). REFUTED.",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:527-532 (account_of): `bad = _journal_mismatch(run_dir) if got is not None else None`; `if bad:` (TRUTHINESS) appends `f\"{run_dir.name}: its journal is not the one RUN.json names ({bad}): the provider requests it recorded are unknown spend\"` to BOTH unaccounted and unread. The outer wrapper, not `bad`, supplies the substrings the oracle checks.",
+    "aisef2/app/client.py:117-130 (Budget.reached/exceeded): `if spent[\"unaccounted\"]:` membership drives the stop; the strings are only displayed via `\"unaccounted: \" + \"; \".join(...)`.",
+    "aisef2/app/run.py:529 (`if inherited[\"unread\"]:` -> RunRefused), verify.py:89 (`if inherited[\"unread\"]:` -> REFUTED), bundle_cli.py:961 (`None if not account[\"unread\"]`): all key on TRUTHINESS/membership, then display `\"; \".join(...)[:N]`; `lineage.unread_runs(...)` supplies the restore path, never parsed from `bad`.",
+    "tests/v2/test_v21_x_lineage_proof.py JournalReadsAndIsNotTheNamed.test_each_is_unknown_spend_listed_with_its_cause: the ONLY oracle that drives `_journal_mismatch` into its non-None branch; asserts len(unread)==1, `\"RUN.json\" in unread[0]`, `\"unknown\" in unread[0]` (both from the lineage.py:529-530 wrapper), exact is False. test_controls_... pins the None cases (intact journal; no record / record with no digest).",
+    "docs/v2.1 (REPORT.md:304, USAGE-2.1.md:776): name `_journal_mismatch` and describe it as 'digest and line count'; neither pins the wording ' lines on disk, ' / ' recorded' / '; digest differs'."
+   ],
+   "exceptions_checked": [
+    "an existing test driving a lines-match/digest-differs journal: none (all three CUTS in JournalReadsAndIsNotTheNamed change the newline count; measured 7 -> 0,3,6)",
+    "a sibling guard recomputing the digest in account_of: none — `_journal_mismatch`'s truthiness is the sole determinant of whether a readable-but-mismatched journal is flagged unread/unaccounted",
+    "digest-matches/lines-differ (the other `or` discriminator): impossible without a sha256 collision, so it owes no test"
+   ],
+   "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa",
+   "refutation": "Input: a sealed run (RUN.json names the journal's sha256 and lines=K) whose on-disk journal has the SAME newline count K but different bytes (e.g. the intact journal with one non-newline byte flipped; or a journal of K lines with different content than the sha256 names). Reader: account_of at lineage.py:527-532 -> `aisef run --parent` refusal (run.py:529), verify REFUTED (verify.py:89), Budget stop (client.py:118), bundle continue refusal (bundle_cli.py:961) — every one of which fires only because `bad` is truthy. With `or`, `_journal_mismatch` returns None and the replaced journal is counted as the run's true, exact spend. Sketch: in JournalReadsAndIsNotTheNamed add CUTS['a byte replaced in a line'] = lambda d: d[:i] + bytes([d[i]^1]) + d[i+1:] for an i whose byte is not b'\\n'; reuse test_each_is_unknown_spend_listed_with_its_cause's asserts (len(unread)==1, 'RUN.json' in unread[0], exact is False). FAILS on `or` (returns None -> unread empty), PASSES unmutated (returns the '; digest differs' string). This single input also raises coverage of [12],[16],[17],[21],[22] if it additionally asserts the cause text names the matching line count and differing digest."
+  },
+  {
+   "target": "aisef2/app/lineage.py::_journal_mismatch",
+   "index": 12,
+   "mutant": "L570 conditional negated",
+   "class": "AUDITED",
+   "group": "G-JM-CAUSE: L570 builds the human-readable cause string that account_of embeds for display inside its own 'its journal is not the one RUN.json names ({bad}): ...' wrapper. Every mutant here leaves the return a NON-EMPTY string, so the None-vs-string truthiness that account_of / Budget / run / verify / bundle continue key on is unchanged; and the suffix selection only ever matters in the lines-match/digest-differs case, which no oracle reaches. No test, doc, or operator contract pins the altered fragment (grep of tests/ docs/ for ' lines on disk', '; digest differs', ' recorded', 'lines on disk' is empty).",
+   "grounds": "L570 suffix `('' if lines != named.get('lines') else '; digest differs')` -> `('' if not lines != named.get('lines') ...)` = `('' if lines == named.get('lines') ...)`: swaps which case gets '; digest differs'. The prefix `f\"{lines} lines on disk, {named.get('lines')} recorded\"` is always non-empty, so the return stays truthy and account_of is unaffected. The suffix differs only when the return is reached, i.e. not (digest and lines) both match; the '; digest differs' clarifier then lands on the wrong case — display only. Measured SURVIVED [test_v21_x_lineage_proof=OK].",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:527-532 (account_of): `bad = _journal_mismatch(run_dir) if got is not None else None`; `if bad:` (TRUTHINESS) appends `f\"{run_dir.name}: its journal is not the one RUN.json names ({bad}): the provider requests it recorded are unknown spend\"` to BOTH unaccounted and unread. The outer wrapper, not `bad`, supplies the substrings the oracle checks.",
+    "aisef2/app/client.py:117-130 (Budget.reached/exceeded): `if spent[\"unaccounted\"]:` membership drives the stop; the strings are only displayed via `\"unaccounted: \" + \"; \".join(...)`.",
+    "aisef2/app/run.py:529 (`if inherited[\"unread\"]:` -> RunRefused), verify.py:89 (`if inherited[\"unread\"]:` -> REFUTED), bundle_cli.py:961 (`None if not account[\"unread\"]`): all key on TRUTHINESS/membership, then display `\"; \".join(...)[:N]`; `lineage.unread_runs(...)` supplies the restore path, never parsed from `bad`.",
+    "tests/v2/test_v21_x_lineage_proof.py JournalReadsAndIsNotTheNamed.test_each_is_unknown_spend_listed_with_its_cause: the ONLY oracle that drives `_journal_mismatch` into its non-None branch; asserts len(unread)==1, `\"RUN.json\" in unread[0]`, `\"unknown\" in unread[0]` (both from the lineage.py:529-530 wrapper), exact is False. test_controls_... pins the None cases (intact journal; no record / record with no digest).",
+    "docs/v2.1 (REPORT.md:304, USAGE-2.1.md:776): name `_journal_mismatch` and describe it as 'digest and line count'; neither pins the wording ' lines on disk, ' / ' recorded' / '; digest differs'."
+   ],
+   "exceptions_checked": [
+    "a test asserting '; digest differs': none (the journal oracle checks only truthiness + the wrapper's 'RUN.json'/'unknown')",
+    "truthiness: the return is a non-empty string in every branch, so `if bad:` is unchanged",
+    "logically identical to mutant [16] (`not (a != b)` == `a == b`); both merely swap the suffix mapping"
+   ],
+   "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_journal_mismatch",
+   "index": 14,
+   "mutant": "L570 string ' lines on disk, ' emptied",
+   "class": "AUDITED",
+   "group": "G-JM-CAUSE: L570 builds the human-readable cause string that account_of embeds for display inside its own 'its journal is not the one RUN.json names ({bad}): ...' wrapper. Every mutant here leaves the return a NON-EMPTY string, so the None-vs-string truthiness that account_of / Budget / run / verify / bundle continue key on is unchanged; and the suffix selection only ever matters in the lines-match/digest-differs case, which no oracle reaches. No test, doc, or operator contract pins the altered fragment (grep of tests/ docs/ for ' lines on disk', '; digest differs', ' recorded', 'lines on disk' is empty).",
+   "grounds": "L570 `f\"{lines} lines on disk, {named.get('lines')} recorded\"` -> `f\"{lines}{named.get('lines')} recorded\"`: the label between the two counts is dropped, running them together (e.g. '7' and '3' -> '73 recorded'). Return still non-empty -> truthiness unchanged; the outer wrapper already states the actionable fact (journal != RUN.json's). Display only. Measured SURVIVED [test_v21_x_lineage_proof=OK].",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:527-532 (account_of): `bad = _journal_mismatch(run_dir) if got is not None else None`; `if bad:` (TRUTHINESS) appends `f\"{run_dir.name}: its journal is not the one RUN.json names ({bad}): the provider requests it recorded are unknown spend\"` to BOTH unaccounted and unread. The outer wrapper, not `bad`, supplies the substrings the oracle checks.",
+    "aisef2/app/client.py:117-130 (Budget.reached/exceeded): `if spent[\"unaccounted\"]:` membership drives the stop; the strings are only displayed via `\"unaccounted: \" + \"; \".join(...)`.",
+    "aisef2/app/run.py:529 (`if inherited[\"unread\"]:` -> RunRefused), verify.py:89 (`if inherited[\"unread\"]:` -> REFUTED), bundle_cli.py:961 (`None if not account[\"unread\"]`): all key on TRUTHINESS/membership, then display `\"; \".join(...)[:N]`; `lineage.unread_runs(...)` supplies the restore path, never parsed from `bad`.",
+    "tests/v2/test_v21_x_lineage_proof.py JournalReadsAndIsNotTheNamed.test_each_is_unknown_spend_listed_with_its_cause: the ONLY oracle that drives `_journal_mismatch` into its non-None branch; asserts len(unread)==1, `\"RUN.json\" in unread[0]`, `\"unknown\" in unread[0]` (both from the lineage.py:529-530 wrapper), exact is False. test_controls_... pins the None cases (intact journal; no record / record with no digest).",
+    "docs/v2.1 (REPORT.md:304, USAGE-2.1.md:776): name `_journal_mismatch` and describe it as 'digest and line count'; neither pins the wording ' lines on disk, ' / ' recorded' / '; digest differs'."
+   ],
+   "exceptions_checked": [
+    "a test asserting 'lines on disk': none (grep empty)",
+    "the two counts merge into one ambiguous number: legibility only; the outer 'its journal is not the one RUN.json names' wrapper carries the actionable finding",
+    "truthiness unchanged"
+   ],
+   "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_journal_mismatch",
+   "index": 15,
+   "mutant": "L570 string ' recorded' emptied",
+   "class": "AUDITED",
+   "group": "G-JM-CAUSE: L570 builds the human-readable cause string that account_of embeds for display inside its own 'its journal is not the one RUN.json names ({bad}): ...' wrapper. Every mutant here leaves the return a NON-EMPTY string, so the None-vs-string truthiness that account_of / Budget / run / verify / bundle continue key on is unchanged; and the suffix selection only ever matters in the lines-match/digest-differs case, which no oracle reaches. No test, doc, or operator contract pins the altered fragment (grep of tests/ docs/ for ' lines on disk', '; digest differs', ' recorded', 'lines on disk' is empty).",
+   "grounds": "L570 drops the ' recorded' label: `f\"{lines} lines on disk, {named.get('lines')}\"` -> '7 lines on disk, 3'. The recorded count is still shown; only its label is gone. Return non-empty -> truthiness unchanged. Display only. Measured SURVIVED [test_v21_x_lineage_proof=OK].",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:527-532 (account_of): `bad = _journal_mismatch(run_dir) if got is not None else None`; `if bad:` (TRUTHINESS) appends `f\"{run_dir.name}: its journal is not the one RUN.json names ({bad}): the provider requests it recorded are unknown spend\"` to BOTH unaccounted and unread. The outer wrapper, not `bad`, supplies the substrings the oracle checks.",
+    "aisef2/app/client.py:117-130 (Budget.reached/exceeded): `if spent[\"unaccounted\"]:` membership drives the stop; the strings are only displayed via `\"unaccounted: \" + \"; \".join(...)`.",
+    "aisef2/app/run.py:529 (`if inherited[\"unread\"]:` -> RunRefused), verify.py:89 (`if inherited[\"unread\"]:` -> REFUTED), bundle_cli.py:961 (`None if not account[\"unread\"]`): all key on TRUTHINESS/membership, then display `\"; \".join(...)[:N]`; `lineage.unread_runs(...)` supplies the restore path, never parsed from `bad`.",
+    "tests/v2/test_v21_x_lineage_proof.py JournalReadsAndIsNotTheNamed.test_each_is_unknown_spend_listed_with_its_cause: the ONLY oracle that drives `_journal_mismatch` into its non-None branch; asserts len(unread)==1, `\"RUN.json\" in unread[0]`, `\"unknown\" in unread[0]` (both from the lineage.py:529-530 wrapper), exact is False. test_controls_... pins the None cases (intact journal; no record / record with no digest).",
+    "docs/v2.1 (REPORT.md:304, USAGE-2.1.md:776): name `_journal_mismatch` and describe it as 'digest and line count'; neither pins the wording ' lines on disk, ' / ' recorded' / '; digest differs'."
+   ],
+   "exceptions_checked": [
+    "a test asserting ' recorded' in the journal cause: none (grep empty; the ' recorded' hits are unrelated files)",
+    "truthiness unchanged",
+    "actionable fact preserved by the account_of wrapper"
+   ],
+   "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_journal_mismatch",
+   "index": 16,
+   "mutant": "L570 NotEq->Eq",
+   "class": "AUDITED",
+   "group": "G-JM-CAUSE: L570 builds the human-readable cause string that account_of embeds for display inside its own 'its journal is not the one RUN.json names ({bad}): ...' wrapper. Every mutant here leaves the return a NON-EMPTY string, so the None-vs-string truthiness that account_of / Budget / run / verify / bundle continue key on is unchanged; and the suffix selection only ever matters in the lines-match/digest-differs case, which no oracle reaches. No test, doc, or operator contract pins the altered fragment (grep of tests/ docs/ for ' lines on disk', '; digest differs', ' recorded', 'lines on disk' is empty).",
+   "grounds": "L570 suffix condition `lines != named.get('lines')` -> `lines == named.get('lines')`: identical in effect to mutant [12] (swaps the '; digest differs' mapping). Prefix always non-empty -> truthiness unchanged; suffix is display only and only reached off the agree-path. Measured SURVIVED [test_v21_x_lineage_proof=OK].",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:527-532 (account_of): `bad = _journal_mismatch(run_dir) if got is not None else None`; `if bad:` (TRUTHINESS) appends `f\"{run_dir.name}: its journal is not the one RUN.json names ({bad}): the provider requests it recorded are unknown spend\"` to BOTH unaccounted and unread. The outer wrapper, not `bad`, supplies the substrings the oracle checks.",
+    "aisef2/app/client.py:117-130 (Budget.reached/exceeded): `if spent[\"unaccounted\"]:` membership drives the stop; the strings are only displayed via `\"unaccounted: \" + \"; \".join(...)`.",
+    "aisef2/app/run.py:529 (`if inherited[\"unread\"]:` -> RunRefused), verify.py:89 (`if inherited[\"unread\"]:` -> REFUTED), bundle_cli.py:961 (`None if not account[\"unread\"]`): all key on TRUTHINESS/membership, then display `\"; \".join(...)[:N]`; `lineage.unread_runs(...)` supplies the restore path, never parsed from `bad`.",
+    "tests/v2/test_v21_x_lineage_proof.py JournalReadsAndIsNotTheNamed.test_each_is_unknown_spend_listed_with_its_cause: the ONLY oracle that drives `_journal_mismatch` into its non-None branch; asserts len(unread)==1, `\"RUN.json\" in unread[0]`, `\"unknown\" in unread[0]` (both from the lineage.py:529-530 wrapper), exact is False. test_controls_... pins the None cases (intact journal; no record / record with no digest).",
+    "docs/v2.1 (REPORT.md:304, USAGE-2.1.md:776): name `_journal_mismatch` and describe it as 'digest and line count'; neither pins the wording ' lines on disk, ' / ' recorded' / '; digest differs'."
+   ],
+   "exceptions_checked": [
+    "a test asserting the suffix text: none",
+    "truthiness unchanged (non-empty prefix)",
+    "same observable output as [12]; neither is killed because no oracle asserts the suffix"
+   ],
+   "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_journal_mismatch",
+   "index": 17,
+   "mutant": "L570 string '; digest differs' emptied",
+   "class": "AUDITED",
+   "group": "G-JM-CAUSE: L570 builds the human-readable cause string that account_of embeds for display inside its own 'its journal is not the one RUN.json names ({bad}): ...' wrapper. Every mutant here leaves the return a NON-EMPTY string, so the None-vs-string truthiness that account_of / Budget / run / verify / bundle continue key on is unchanged; and the suffix selection only ever matters in the lines-match/digest-differs case, which no oracle reaches. No test, doc, or operator contract pins the altered fragment (grep of tests/ docs/ for ' lines on disk', '; digest differs', ' recorded', 'lines on disk' is empty).",
+   "grounds": "L570 `else '; digest differs'` -> `else ''`: the suffix is now '' in both branches. The clarifier that distinguishes a lines-match/digest-differs journal from a lines-differ one is gone. That case is never reached by any oracle; the return (the prefix) stays non-empty -> truthiness unchanged. Display only. Measured SURVIVED [test_v21_x_lineage_proof=OK].",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:527-532 (account_of): `bad = _journal_mismatch(run_dir) if got is not None else None`; `if bad:` (TRUTHINESS) appends `f\"{run_dir.name}: its journal is not the one RUN.json names ({bad}): the provider requests it recorded are unknown spend\"` to BOTH unaccounted and unread. The outer wrapper, not `bad`, supplies the substrings the oracle checks.",
+    "aisef2/app/client.py:117-130 (Budget.reached/exceeded): `if spent[\"unaccounted\"]:` membership drives the stop; the strings are only displayed via `\"unaccounted: \" + \"; \".join(...)`.",
+    "aisef2/app/run.py:529 (`if inherited[\"unread\"]:` -> RunRefused), verify.py:89 (`if inherited[\"unread\"]:` -> REFUTED), bundle_cli.py:961 (`None if not account[\"unread\"]`): all key on TRUTHINESS/membership, then display `\"; \".join(...)[:N]`; `lineage.unread_runs(...)` supplies the restore path, never parsed from `bad`.",
+    "tests/v2/test_v21_x_lineage_proof.py JournalReadsAndIsNotTheNamed.test_each_is_unknown_spend_listed_with_its_cause: the ONLY oracle that drives `_journal_mismatch` into its non-None branch; asserts len(unread)==1, `\"RUN.json\" in unread[0]`, `\"unknown\" in unread[0]` (both from the lineage.py:529-530 wrapper), exact is False. test_controls_... pins the None cases (intact journal; no record / record with no digest).",
+    "docs/v2.1 (REPORT.md:304, USAGE-2.1.md:776): name `_journal_mismatch` and describe it as 'digest and line count'; neither pins the wording ' lines on disk, ' / ' recorded' / '; digest differs'."
+   ],
+   "exceptions_checked": [
+    "a test asserting '; digest differs': none (grep empty)",
+    "the only case where the suffix was non-empty (lines match, digest differs) is the same uncovered input [4] exposes; absent any oracle there, dropping the clarifier is unobserved",
+    "truthiness unchanged"
+   ],
+   "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_journal_mismatch",
+   "index": 21,
+   "mutant": "L570 string 'lines' emptied",
+   "class": "AUDITED",
+   "group": "G-JM-CAUSE: L570 builds the human-readable cause string that account_of embeds for display inside its own 'its journal is not the one RUN.json names ({bad}): ...' wrapper. Every mutant here leaves the return a NON-EMPTY string, so the None-vs-string truthiness that account_of / Budget / run / verify / bundle continue key on is unchanged; and the suffix selection only ever matters in the lines-match/digest-differs case, which no oracle reaches. No test, doc, or operator contract pins the altered fragment (grep of tests/ docs/ for ' lines on disk', '; digest differs', ' recorded', 'lines on disk' is empty).",
+   "grounds": "L570 FIRST occurrence: the displayed recorded count `{named.get('lines')}` -> `{named.get('')}` = None, so the message reads '7 lines on disk, None recorded...'. The on-disk count and the mismatch statement remain; only the recorded figure is blanked to None. Return non-empty -> truthiness unchanged. Display only; no consumer reads the figure (account_of embeds the whole string, Budget/run/verify/bundle join it for display). Measured SURVIVED [test_v21_x_lineage_proof=OK].",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:527-532 (account_of): `bad = _journal_mismatch(run_dir) if got is not None else None`; `if bad:` (TRUTHINESS) appends `f\"{run_dir.name}: its journal is not the one RUN.json names ({bad}): the provider requests it recorded are unknown spend\"` to BOTH unaccounted and unread. The outer wrapper, not `bad`, supplies the substrings the oracle checks.",
+    "aisef2/app/client.py:117-130 (Budget.reached/exceeded): `if spent[\"unaccounted\"]:` membership drives the stop; the strings are only displayed via `\"unaccounted: \" + \"; \".join(...)`.",
+    "aisef2/app/run.py:529 (`if inherited[\"unread\"]:` -> RunRefused), verify.py:89 (`if inherited[\"unread\"]:` -> REFUTED), bundle_cli.py:961 (`None if not account[\"unread\"]`): all key on TRUTHINESS/membership, then display `\"; \".join(...)[:N]`; `lineage.unread_runs(...)` supplies the restore path, never parsed from `bad`.",
+    "tests/v2/test_v21_x_lineage_proof.py JournalReadsAndIsNotTheNamed.test_each_is_unknown_spend_listed_with_its_cause: the ONLY oracle that drives `_journal_mismatch` into its non-None branch; asserts len(unread)==1, `\"RUN.json\" in unread[0]`, `\"unknown\" in unread[0]` (both from the lineage.py:529-530 wrapper), exact is False. test_controls_... pins the None cases (intact journal; no record / record with no digest).",
+    "docs/v2.1 (REPORT.md:304, USAGE-2.1.md:776): name `_journal_mismatch` and describe it as 'digest and line count'; neither pins the wording ' lines on disk, ' / ' recorded' / '; digest differs'."
+   ],
+   "exceptions_checked": [
+    "a test asserting the recorded line count: none",
+    "named.get('') is None (RUN.json's journal dict has no '' key), so the figure is blanked, not crashed; return stays a string",
+    "truthiness unchanged; the actionable 'journal != RUN.json' fact is in the account_of wrapper"
+   ],
+   "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_journal_mismatch",
+   "index": 22,
+   "mutant": "L570 string 'lines' emptied",
+   "class": "AUDITED",
+   "group": "G-JM-CAUSE: L570 builds the human-readable cause string that account_of embeds for display inside its own 'its journal is not the one RUN.json names ({bad}): ...' wrapper. Every mutant here leaves the return a NON-EMPTY string, so the None-vs-string truthiness that account_of / Budget / run / verify / bundle continue key on is unchanged; and the suffix selection only ever matters in the lines-match/digest-differs case, which no oracle reaches. No test, doc, or operator contract pins the altered fragment (grep of tests/ docs/ for ' lines on disk', '; digest differs', ' recorded', 'lines on disk' is empty).",
+   "grounds": "L570 SECOND occurrence: the suffix CONDITION `lines != named.get('lines')` -> `lines != named.get('')` = `lines != None` = always True, so the suffix is always '' (the '; digest differs' clarifier never appends). Return (prefix) non-empty -> truthiness unchanged; the clarifier only ever applied on the uncovered lines-match case. Display only. Measured SURVIVED [test_v21_x_lineage_proof=OK].",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:527-532 (account_of): `bad = _journal_mismatch(run_dir) if got is not None else None`; `if bad:` (TRUTHINESS) appends `f\"{run_dir.name}: its journal is not the one RUN.json names ({bad}): the provider requests it recorded are unknown spend\"` to BOTH unaccounted and unread. The outer wrapper, not `bad`, supplies the substrings the oracle checks.",
+    "aisef2/app/client.py:117-130 (Budget.reached/exceeded): `if spent[\"unaccounted\"]:` membership drives the stop; the strings are only displayed via `\"unaccounted: \" + \"; \".join(...)`.",
+    "aisef2/app/run.py:529 (`if inherited[\"unread\"]:` -> RunRefused), verify.py:89 (`if inherited[\"unread\"]:` -> REFUTED), bundle_cli.py:961 (`None if not account[\"unread\"]`): all key on TRUTHINESS/membership, then display `\"; \".join(...)[:N]`; `lineage.unread_runs(...)` supplies the restore path, never parsed from `bad`.",
+    "tests/v2/test_v21_x_lineage_proof.py JournalReadsAndIsNotTheNamed.test_each_is_unknown_spend_listed_with_its_cause: the ONLY oracle that drives `_journal_mismatch` into its non-None branch; asserts len(unread)==1, `\"RUN.json\" in unread[0]`, `\"unknown\" in unread[0]` (both from the lineage.py:529-530 wrapper), exact is False. test_controls_... pins the None cases (intact journal; no record / record with no digest).",
+    "docs/v2.1 (REPORT.md:304, USAGE-2.1.md:776): name `_journal_mismatch` and describe it as 'digest and line count'; neither pins the wording ' lines on disk, ' / ' recorded' / '; digest differs'."
+   ],
+   "exceptions_checked": [
+    "a test asserting '; digest differs': none",
+    "effect is identical to [17] (suffix always ''), reached via the condition rather than the literal",
+    "truthiness unchanged"
+   ],
+   "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_evidence_gone",
+   "index": 22,
+   "mutant": "L647 string ': the journal records provider requests as answered that no session stream stands for (' emptied",
+   "class": "AUDITED",
+   "group": "G-EG-CAUSE: each mutant empties a connective/explanatory fragment (or the lacking-list separator) in the cause string _evidence_gone returns; account_of appends it verbatim and keys only on its TRUTHINESS (lineage.py:534 `if gone:`). Every mutant leaves the return a non-empty string, so truthiness — and thus every refusal / REFUTED / Budget-stop decision — is unchanged. On each branch the only substrings any oracle asserts ('is not an account of what the run spent' in the why; 'RUN.json records' + '(the evidence shows N)' in the recorded branch; the '<story> <role>: n answered, m streams' join in the no-record branch) are preserved; no doc pins the emptied fragments (grep empty).",
+   "grounds": "L647 (no-record branch): the opening literal is emptied, so `f\"{run_dir.name}: the journal records ... stands for ({join}) and no record...\"` -> `f\"{run_dir.name}{join}) and no record...\"`: the run name abuts the lacking join and a stray ')' remains. The join content (e.g. 'S1 developer: 1 answered, 0 streams; S1 reviewer: 1 answered, 0 streams') and the tail ('...no record names what the run spent...is unknown...') are intact; return non-empty -> truthiness unchanged. test_a_real_run_killed_before_its_record_... asserts the join (`said`) and 'is gone' (from the run.py refusal wrapper), neither of which this literal supplies. Measured SURVIVED [test_v21_x_lineage_gone=OK, test_v21_x_lineage_proof=OK].",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:534-537 (account_of): `gone = None if unread else _evidence_gone(...)`; `if gone:` (TRUTHINESS) appends `gone` verbatim to unaccounted and unread.",
+    "aisef2/app/client.py:117-130 (Budget.reached/exceeded): `if spent[\"unaccounted\"]:` membership; strings only joined for display.",
+    "aisef2/app/run.py:529 / verify.py:89 / bundle_cli.py:961: TRUTHINESS/membership of unread drives refusal/REFUTED; strings displayed via join, `unread_runs` supplies the path.",
+    "aisef2/app/lineage.py:808-810 (usage_lineage): a run's cost.status = 'partial: ' + '; '.join(acct['unaccounted'])[:300] when unaccounted — the _evidence_gone string is displayed (sliced), never parsed; test_each_shape_makes_the_cost_unknown asserts 'RUN.json records' in cost.status (recorded branch), which none of these mutants remove.",
+    "tests/v2/test_v21_x_lineage_gone.py: the recorded-branch message is pinned by `test_each_shape_...` (assertIn 'RUN.json records', 'is not there') and `test_a_counter_the_record_holds_...` / line 519 (per-counter '(the evidence shows N)'); the why-branch by `test_a_budget_that_is_not_an_account_...` (assertIn 'is not an account of what the run spent'); the no-record branch by `test_a_real_run_killed_before_its_record_...` (assertIn the lacking join content + 'is gone' from the refusal wrapper).",
+    "docs/v2.1: no document pins 'no session stream stands for', 'cannot be compared with what its evidence shows', or the ', ' list separator."
+   ],
+   "exceptions_checked": [
+    "a test asserting 'the journal records provider requests as answered that no session stream stands for': none (grep empty)",
+    "the asserted `said` (the lacking join) is contiguous and preserved; 'is gone'/str(run) come from run.py's RunRefused, not from `gone`",
+    "truthiness unchanged (return still a non-empty string)"
+   ],
+   "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_evidence_gone",
+   "index": 24,
+   "mutant": "L625 string ': ' emptied",
+   "class": "AUDITED",
+   "group": "G-EG-CAUSE: each mutant empties a connective/explanatory fragment (or the lacking-list separator) in the cause string _evidence_gone returns; account_of appends it verbatim and keys only on its TRUTHINESS (lineage.py:534 `if gone:`). Every mutant leaves the return a non-empty string, so truthiness — and thus every refusal / REFUTED / Budget-stop decision — is unchanged. On each branch the only substrings any oracle asserts ('is not an account of what the run spent' in the why; 'RUN.json records' + '(the evidence shows N)' in the recorded branch; the '<story> <role>: n answered, m streams' join in the no-record branch) are preserved; no doc pins the emptied fragments (grep empty).",
+   "grounds": "L625 (why branch): `f\"{run_dir.name}: {why}: what the run spent cannot be compared...\"` -> `f\"{run_dir.name}{why}: ...\"`: the separator between the run name and `why` is dropped, so the name abuts 'RUN.json's budget is not an account...'. `why` and the tail are intact; return non-empty -> truthiness unchanged. test_a_budget_that_is_not_an_account_... asserts only 'is not an account of what the run spent' (inside `why`), which is preserved. Display only. Measured SURVIVED [test_v21_x_lineage_gone=OK, test_v21_x_lineage_proof=OK].",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:534-537 (account_of): `gone = None if unread else _evidence_gone(...)`; `if gone:` (TRUTHINESS) appends `gone` verbatim to unaccounted and unread.",
+    "aisef2/app/client.py:117-130 (Budget.reached/exceeded): `if spent[\"unaccounted\"]:` membership; strings only joined for display.",
+    "aisef2/app/run.py:529 / verify.py:89 / bundle_cli.py:961: TRUTHINESS/membership of unread drives refusal/REFUTED; strings displayed via join, `unread_runs` supplies the path.",
+    "aisef2/app/lineage.py:808-810 (usage_lineage): a run's cost.status = 'partial: ' + '; '.join(acct['unaccounted'])[:300] when unaccounted — the _evidence_gone string is displayed (sliced), never parsed; test_each_shape_makes_the_cost_unknown asserts 'RUN.json records' in cost.status (recorded branch), which none of these mutants remove.",
+    "tests/v2/test_v21_x_lineage_gone.py: the recorded-branch message is pinned by `test_each_shape_...` (assertIn 'RUN.json records', 'is not there') and `test_a_counter_the_record_holds_...` / line 519 (per-counter '(the evidence shows N)'); the why-branch by `test_a_budget_that_is_not_an_account_...` (assertIn 'is not an account of what the run spent'); the no-record branch by `test_a_real_run_killed_before_its_record_...` (assertIn the lacking join content + 'is gone' from the refusal wrapper).",
+    "docs/v2.1: no document pins 'no session stream stands for', 'cannot be compared with what its evidence shows', or the ', ' list separator."
+   ],
+   "exceptions_checked": [
+    "a test asserting the ': ' separator or the run-name boundary: none",
+    "the run name merges with 'RUN.json' ('runRUN.json's budget...'): a cosmetic smudge, not a wrong artifact — 'RUN.json's budget is not an account' is intact",
+    "truthiness unchanged"
+   ],
+   "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_evidence_gone",
+   "index": 25,
+   "mutant": "L625 string ': what the run spent cannot be compared with what its evidence shows, so it is unknown' emptied",
+   "class": "AUDITED",
+   "group": "G-EG-CAUSE: each mutant empties a connective/explanatory fragment (or the lacking-list separator) in the cause string _evidence_gone returns; account_of appends it verbatim and keys only on its TRUTHINESS (lineage.py:534 `if gone:`). Every mutant leaves the return a non-empty string, so truthiness — and thus every refusal / REFUTED / Budget-stop decision — is unchanged. On each branch the only substrings any oracle asserts ('is not an account of what the run spent' in the why; 'RUN.json records' + '(the evidence shows N)' in the recorded branch; the '<story> <role>: n answered, m streams' join in the no-record branch) are preserved; no doc pins the emptied fragments (grep empty).",
+   "grounds": "L625 (why branch): the explanatory tail is emptied: `f\"{run_dir.name}: {why}: <tail>\"` -> `f\"{run_dir.name}: {why}\"`. `why` ('RUN.json's budget is not an account of what the run spent (four counts, the inherited share within)') already states the actionable fault; the dropped tail only restates that it is therefore unknown. Return non-empty -> truthiness unchanged. test_a_budget_that_is_not_an_account_... asserts 'is not an account of what the run spent' (in `why`), preserved. Display only. Measured SURVIVED [test_v21_x_lineage_gone=OK, test_v21_x_lineage_proof=OK].",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:534-537 (account_of): `gone = None if unread else _evidence_gone(...)`; `if gone:` (TRUTHINESS) appends `gone` verbatim to unaccounted and unread.",
+    "aisef2/app/client.py:117-130 (Budget.reached/exceeded): `if spent[\"unaccounted\"]:` membership; strings only joined for display.",
+    "aisef2/app/run.py:529 / verify.py:89 / bundle_cli.py:961: TRUTHINESS/membership of unread drives refusal/REFUTED; strings displayed via join, `unread_runs` supplies the path.",
+    "aisef2/app/lineage.py:808-810 (usage_lineage): a run's cost.status = 'partial: ' + '; '.join(acct['unaccounted'])[:300] when unaccounted — the _evidence_gone string is displayed (sliced), never parsed; test_each_shape_makes_the_cost_unknown asserts 'RUN.json records' in cost.status (recorded branch), which none of these mutants remove.",
+    "tests/v2/test_v21_x_lineage_gone.py: the recorded-branch message is pinned by `test_each_shape_...` (assertIn 'RUN.json records', 'is not there') and `test_a_counter_the_record_holds_...` / line 519 (per-counter '(the evidence shows N)'); the why-branch by `test_a_budget_that_is_not_an_account_...` (assertIn 'is not an account of what the run spent'); the no-record branch by `test_a_real_run_killed_before_its_record_...` (assertIn the lacking join content + 'is gone' from the refusal wrapper).",
+    "docs/v2.1: no document pins 'no session stream stands for', 'cannot be compared with what its evidence shows', or the ', ' list separator."
+   ],
+   "exceptions_checked": [
+    "a test asserting 'cannot be compared with what its evidence shows': none (grep empty)",
+    "the actionable content ('is not an account of what the run spent') is in `why`, not the tail",
+    "truthiness unchanged"
+   ],
+   "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_evidence_gone",
+   "index": 49,
+   "mutant": "L631 string ', ' emptied",
+   "class": "AUDITED",
+   "group": "G-EG-CAUSE: each mutant empties a connective/explanatory fragment (or the lacking-list separator) in the cause string _evidence_gone returns; account_of appends it verbatim and keys only on its TRUTHINESS (lineage.py:534 `if gone:`). Every mutant leaves the return a non-empty string, so truthiness — and thus every refusal / REFUTED / Budget-stop decision — is unchanged. On each branch the only substrings any oracle asserts ('is not an account of what the run spent' in the why; 'RUN.json records' + '(the evidence shows N)' in the recorded branch; the '<story> <role>: n answered, m streams' join in the no-record branch) are preserved; no doc pins the emptied fragments (grep empty).",
+   "grounds": "L631 (recorded branch): the lacking-list join `', '.join(lacking)` -> `''.join(lacking)`. When >=2 counters lack, their items (e.g. 'turns 1 (the evidence shows 0)', 'input_tokens 7 (the evidence shows 0)') are concatenated with no separator instead of ', '. Each item stays a contiguous substring, and the lead 'RUN.json records that the run spent ' is unchanged, so return is non-empty -> truthiness unchanged; the multi-counter oracle (test_a_counter_the_record_holds_and_the_evidence_does_not_is_gone, line ~397) uses assertIn per counter and is separator-tolerant. Single-counter messages are byte-identical. Display only. Measured SURVIVED [test_v21_x_lineage_gone=OK, test_v21_x_lineage_proof=OK].",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:534-537 (account_of): `gone = None if unread else _evidence_gone(...)`; `if gone:` (TRUTHINESS) appends `gone` verbatim to unaccounted and unread.",
+    "aisef2/app/client.py:117-130 (Budget.reached/exceeded): `if spent[\"unaccounted\"]:` membership; strings only joined for display.",
+    "aisef2/app/run.py:529 / verify.py:89 / bundle_cli.py:961: TRUTHINESS/membership of unread drives refusal/REFUTED; strings displayed via join, `unread_runs` supplies the path.",
+    "aisef2/app/lineage.py:808-810 (usage_lineage): a run's cost.status = 'partial: ' + '; '.join(acct['unaccounted'])[:300] when unaccounted — the _evidence_gone string is displayed (sliced), never parsed; test_each_shape_makes_the_cost_unknown asserts 'RUN.json records' in cost.status (recorded branch), which none of these mutants remove.",
+    "tests/v2/test_v21_x_lineage_gone.py: the recorded-branch message is pinned by `test_each_shape_...` (assertIn 'RUN.json records', 'is not there') and `test_a_counter_the_record_holds_...` / line 519 (per-counter '(the evidence shows N)'); the why-branch by `test_a_budget_that_is_not_an_account_...` (assertIn 'is not an account of what the run spent'); the no-record branch by `test_a_real_run_killed_before_its_record_...` (assertIn the lacking join content + 'is gone' from the refusal wrapper).",
+    "docs/v2.1: no document pins 'no session stream stands for', 'cannot be compared with what its evidence shows', or the ', ' list separator."
+   ],
+   "exceptions_checked": [
+    "a test asserting the ', ' separator between counters: none — the multi-counter test asserts each counter as an independent substring",
+    "no consumer splits/parses the list; Budget/run/verify/bundle join the whole account for display",
+    "truthiness unchanged; single-counter output is unchanged"
+   ],
+   "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa"
+  }
+ ],
+ "owed_tests": [
+  "tests/v2/test_v21_x_lineage_proof.py::JournalReadsAndIsNotTheNamed — the three CUTS ('no bytes', 'cut at a line', 'cut in a line') all change the journal's newline count (measured K=7 -> 0, 3, 6), so the suite never drives _journal_mismatch with a journal whose line count MATCHES RUN.json but whose digest differs. That is the only input where L568's `and` differs from `or` (mutant [4]). Add CUTS['a byte replaced in a line'] = lambda d: d[:i] + bytes([d[i]^1]) + d[i+1:] with i the first offset whose byte is not b'\\n' (so newline count is preserved, digest changes), and reuse the existing asserts: len(got['unread'])==1, 'RUN.json' in got['unread'][0], got['exact'] is False, and assert_unread(lineage_account(r1),'run1'). It FAILS on [4] (`or` returns None -> unread empty) and PASSES unmutated (returns 'K lines on disk, K recorded; digest differs'). Reader that relies on it: account_of (lineage.py:527) -> `aisef run --parent` refusal (run.py:529), verify REFUTED (verify.py:89), Budget stop (client.py:118), bundle continue refusal (bundle_cli.py:961); without the guard a journal replaced in place at equal line count is counted as the run's exact spend. If the same test also asserts the cause names the matching line count and the differing digest (assertIn('digest differs', got['unread'][0])), it additionally kills [12],[16],[17],[21],[22]; asserting ' lines on disk, '/' recorded' kills [14],[15],[21]."
+ ],
+ "notes": "Positional audit per MUTATION-RUNNER-V2 section 16. 1 REFUTED ([4]), 11 AUDITED. All string/suffix mutants are display-only: the single load-bearing output of both functions is None vs a non-empty string, and account_of / Budget / run / verify / bundle_continue key on that membership, never on the cause text. The AUDITED cause fragments differ from the lineage-2 REFUTED pattern (which made two distinct causes byte-identical and pointed the operator at the wrong artifact): here the actionable identifier is preserved or supplied by account_of's own wrapper, so no reader is misdirected. carried: none."
+}

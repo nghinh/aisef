@@ -1,0 +1,71 @@
+{
+ "batch": "W2-lineage-7",
+ "file": "aisef2/app/lineage.py",
+ "targets": [
+  "aisef2/app/lineage.py::_evidence_gone",
+  "aisef2/app/lineage.py::_journal_mismatch"
+ ],
+ "new": [
+  {
+   "target": "aisef2/app/lineage.py::_journal_mismatch",
+   "index": 4,
+   "mutant": "L568 And swapped"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_journal_mismatch",
+   "index": 12,
+   "mutant": "L570 conditional negated"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_journal_mismatch",
+   "index": 14,
+   "mutant": "L570 string ' lines on disk, ' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_journal_mismatch",
+   "index": 15,
+   "mutant": "L570 string ' recorded' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_journal_mismatch",
+   "index": 16,
+   "mutant": "L570 NotEq->Eq"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_journal_mismatch",
+   "index": 17,
+   "mutant": "L570 string '; digest differs' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_journal_mismatch",
+   "index": 21,
+   "mutant": "L570 string 'lines' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_journal_mismatch",
+   "index": 22,
+   "mutant": "L570 string 'lines' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_evidence_gone",
+   "index": 22,
+   "mutant": "L647 string ': the journal records provider requests as answered that no session stream stands for (' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_evidence_gone",
+   "index": 24,
+   "mutant": "L625 string ': ' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_evidence_gone",
+   "index": 25,
+   "mutant": "L625 string ': what the run spent cannot be compared with what its evidence shows, so it is unknown' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_evidence_gone",
+   "index": 49,
+   "mutant": "L631 string ', ' emptied"
+  }
+ ],
+ "carried": []
+}

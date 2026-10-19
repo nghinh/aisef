@@ -1,0 +1,403 @@
+{
+ "batch": "W2-bundle_cli-2",
+ "role": "skeptic",
+ "file": "aisef2/app/bundle_cli.py",
+ "target": "aisef2/app/bundle_cli.py::_authentic",
+ "snapshot": "4ec961e706a1f7bda16d131037058c4fe9c2663f",
+ "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+ "measurement": {
+  "source_sha256_match": true,
+  "kill_file": "tests/v2/test_v21_pw_lineage_continue.py (sole registered V21_TARGETS entry, re-confirmed)",
+  "baseline_unmutated": "36 tests OK",
+  "all_25_mutants": "each 36 tests OK, exit 0 => SURVIVED (independently reproduced: env -i, PATH stripped of /Users/nghinh/.opencode/bin and /Users/nghinh/.npm-global/bin, fresh HOME/TMPDIR/XDG under the copy, PYTHONPATH=copy root)",
+  "reachability": "AST scan of all tests/: the ONLY test routing expect_anchor into continue_from/_authentic is the registered kill file (continue_from(...,expect_anchor=) only at test_v21_pw_lineage_continue.py:378; the only module with both the 'continue' CLI command and --expect-anchor is that same file). continue_from calls _authentic only when expect_anchor is not None (bundle_cli.py:897-898). No unregistered test reaches the function; none refutes the measurement.",
+  "mutant_view": "mutant_view.py diffs for all 25 indices match each entry's 'mutant' string verbatim; indices map 1:1 (39 mutants total for _authentic)."
+ },
+ "entries": [
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 3,
+   "mutant": "L811 Or swapped",
+   "class_before": "REFUTED",
+   "verdict": "CONFIRMED",
+   "class_after": "SURVIVED (test owed)",
+   "grounds": "mutant_view diff = `not isinstance(stored,dict) or ...` -> `... and (not isinstance(stored.get('files',{}),dict))` at L811, verbatim. Independently reproduced SURVIVED: kill file 36 tests OK / exit 0 on the mutant (baseline 36 OK). I reproduced the branch logic directly: for stored=None (empty EVIDENCE.json: json.loads('') -> ValueError -> L809-810 stored=None), JSON null, a JSON array, or a JSON int, the `and` evaluates stored.get and raises AttributeError (\"'NoneType'/'list'/'int' object has no attribute 'get'\"); pristine refuses JournalRefused('EVIDENCE_MISMATCH'). For {'files':5} the `and` short-circuits False, skips the L812 guard and defers to the L815/816 anchor mismatch (same code EVIDENCE_MISMATCH) -- exactly as the author states. main (bundle_cli.py:1078-1083) catches only B.BundleError and (KeyError,TypeError,ValueError); AttributeError is neither (JournalRefused subclasses B.BundleError, L134) so it escapes `aisef bundle continue` as an uncaught traceback -- the 'refused not a traceback' contract the kill file guards for a sibling path (L455-465).",
+   "refutation": "Owed test stands (T-CODE-MISMATCH empty-manifest subcase). Input: a run with manifest=True whose EVIDENCE.json is overwritten with b''; call self.refused(run, expect_anchor='a'*64). Reader: the operator (a clean `refused: ...` exit 2, not a Python traceback) and main's B.BundleError contract. Sketch: self.assertRaises(bundle.BundleError) (via self.refused) -- pristine returns JournalRefused('EVIDENCE_MISMATCH'); the mutant raises AttributeError which is not a BundleError, so self.refused errors -> KILLED. Verified feasible: run_dir/refused/anchor_of helpers exist (kill file L92-120).",
+   "note": "Keystone REFUTED. The empty-manifest subcase of the single owed test kills both [3] and [10].",
+   "consumers_checked": [
+    "bundle_cli.py:897-898 continue_from calls _authentic only when expect_anchor is not None (confirmed)",
+    "bundle_cli.py:1078-1083 main except clauses = B.BundleError, then (KeyError,TypeError,ValueError) (confirmed verbatim)"
+   ],
+   "exceptions_checked": [
+    "AST scan of tests/: no test feeds a non-object manifest through continue_from(expect_anchor=) -> branch reached by no test (confirmed)"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 9,
+   "mutant": "L825 sorted() -> list()",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "mutant_view: `changed = sorted(...)` -> `list(...)` over the same generator. Independently reproduced SURVIVED: kill file 36 tests OK / exit 0 on the mutant. Same keys (same SET of changed files), set-iteration order instead of sorted; {changed[:5]} may list the same files in a different order or a different 5 of N>5. Code EVIDENCE_MISMATCH and the sentence unchanged. The owed T-CHANGED-LIST ([30]/[35]/[37]) asserts set membership (assertIn/assertNotIn), which is order-independent, so it does NOT kill [9] -- correctly AUDITED, not folded into the REFUTED group.",
+   "refutation": "",
+   "note": "Genuinely order-only; no test/doc pins order; verify.py:132 twin does not pin order either. AUDITED is the correct separation from [30]/[35]/[37].",
+   "consumers_checked": [
+    "bundle_cli.py:827 only use is {changed[:5]} (confirmed)",
+    "verify.py:130-132 twin does not pin order (confirmed)"
+   ],
+   "exceptions_checked": [
+    "no test/doc pins order or first-5; the owed set-membership test does not kill this"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 10,
+   "mutant": "L812 string 'EVIDENCE_MISMATCH' emptied",
+   "class_before": "REFUTED",
+   "verdict": "CONFIRMED",
+   "class_after": "SURVIVED (test owed)",
+   "grounds": "mutant_view diff = JournalRefused('EVIDENCE_MISMATCH',...) -> JournalRefused('',...) at L812, verbatim. Independently reproduced SURVIVED: kill file 36 tests OK / exit 0 on the mutant (baseline 36 OK). The code is the operator's failure-class signal: module docstring L25-40 states each failure is told apart by JournalRefused.code 'in the text of refused:'; JournalRefused.__init__ (L138-140) sets str=f'{code}: {message}' and self.code=code; main prints `refused: {code}: {message}` (L1079). The L811 guard fires (pristine code EVIDENCE_MISMATCH) for any non-dict stored or a dict whose 'files' is a non-dict ({'files':5}); the kill file's anchor class feeds only well-formed manifests (run_dir(manifest=True) writes json.dumps(R.evidence_manifest(run)), L110-111), so this branch is unreached.",
+   "refutation": "Owed test stands (T-CODE-MISMATCH). Input: EVIDENCE.json = b'' and a second subcase {'files':5}, under expect_anchor='a'*64. Reader: the operator reading `refused: {code}:` on stderr (bundle_cli.py:1079). Sketch: assertEqual(err.code,'EVIDENCE_MISMATCH'); assertIn(R.MANIFEST,str(err)). Pristine gives EVIDENCE_MISMATCH for both; the mutant gives ''. Both subcases kill [10]; the empty subcase also kills [3].",
+   "note": "git grep over aisef2/ confirms no product reader of JournalRefused.code (bundle_cli.py:30 is docstring; preflight.py:57 .code is urllib HTTP). Only the operator and the kill file read it.",
+   "consumers_checked": [
+    "bundle_cli.py:1079 main prints refused: {code}: {message} (confirmed)",
+    "module docstring L25-40: code tells failures apart, per-code operator action (confirmed)"
+   ],
+   "exceptions_checked": [
+    "no non-test reader of JournalRefused.code (git grep) -- confirmed",
+    "_authentic raises before _write_new, exit 2, nothing written"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 13,
+   "mutant": "L807 string 'EVIDENCE_UNREADABLE' emptied",
+   "class_before": "REFUTED",
+   "verdict": "CONFIRMED",
+   "class_after": "SURVIVED (test owed)",
+   "grounds": "mutant_view diff = JournalRefused('EVIDENCE_UNREADABLE',...) -> JournalRefused('',...) at L807, verbatim. Independently reproduced SURVIVED: kill file 36 tests OK / exit 0 on the mutant (baseline 36 OK). Branch: EVIDENCE.json present but read fails with an OSError that is not not_there (L801-802; lineage.not_there L453-455 checks errno in _NOT_THERE, so EACCES/permission is not 'not there'). No test reaches L807 under expect_anchor (POSIX_USER tests chmod the run dir or claim/journal, not EVIDENCE.json under --expect-anchor); AST scan confirms only the kill file reaches _authentic and it never makes the manifest unreadable.",
+   "refutation": "Owed test stands (T-CODE-UNREAD-MANIFEST, @POSIX_USER). Input: run_dir(manifest=True); os.chmod(run/R.MANIFEST,0); addCleanup chmod 0o644; self.refused(run, expect_anchor='a'*64). Reader: operator via `refused: {code}:`. Sketch: assertEqual(err.code,'EVIDENCE_UNREADABLE'); assertIn('PermissionError',str(err)). Verified reachable: chmod-000 read raises PermissionError (OSError, EACCES) -> not_there False -> L807.",
+   "note": "A message assert in the same owed test would also kill [24]/[25]/[26]/[34] (same branch); the author keeps those AUDITED (code owed here, prose not independently owed) -- consistent with 'never add a test merely to reach a number'.",
+   "consumers_checked": [
+    "lineage.not_there L453-455 (confirmed)",
+    "bundle_cli.py:1079 (confirmed)"
+   ],
+   "exceptions_checked": [
+    "branch reached by no test (AST scan) -- confirmed"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 14,
+   "mutant": "L812 string ' is not an evidence manifest: the expected anchor ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "mutant_view: f'{run_dir / R.MANIFEST}{expect[:12]} cannot be reproduced from it'. Independently reproduced SURVIVED: kill file 36 tests OK / exit 0 on the mutant. Branch reached by no test (AST scan: only kill file reaches _authentic, feeds only well-formed manifests); the code is owed separately via [10] (need not assert prose); path (incl. filename) and expect[:12] retained.",
+   "refutation": "",
+   "note": "A message assert in the [10] owed test could kill [14]; kept AUDITED (code owed, prose not independently owed).",
+   "exceptions_checked": [
+    "branch untested; path and expect[:12] retained"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 15,
+   "mutant": "L813 string ' cannot be reproduced from it' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "mutant_view: f'{run_dir / R.MANIFEST} is not an evidence manifest: the expected anchor {expect[:12]}'. Independently reproduced SURVIVED: kill file 36 tests OK / exit 0 on the mutant. Branch untested; code owed via [10]; path, 'is not an evidence manifest' and expect[:12] retained; only trailing clause lost.",
+   "refutation": "",
+   "note": "NOT-A-MANIFEST-PROSE; untested branch."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 16,
+   "mutant": "L816 string ': the evidence anchor is ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "mutant_view: f'{run_dir}{anchor[:12]}, not the {expect[:12]} expected: ...' (run_dir abuts anchor[:12]). Independently reproduced SURVIVED: kill file 36 tests OK / exit 0 on the mutant. Both ids and the code EVIDENCE_MISMATCH are retained; concatenation keeps anchor[:12] and 'b'*12 as contiguous substrings, so the kill file's asserts (L393 code, L394 anchor[:12], L395 'b'*12, L418 code-in-stderr) still pass. Only connective prose lost.",
+   "refutation": "",
+   "note": "Operator reads the line, but the action-determining code and both ids survive; no test/doc pins _authentic's connective prose (only producer reaching it is the kill file, which asserts code+ids only).",
+   "consumers_checked": [
+    "test_v21_pw_lineage_continue.py:390-396 test_a_different_anchor (code, anchor[:12], 'b'*12) and :411-418 CLI (confirmed)"
+   ],
+   "exceptions_checked": [
+    "no test/doc asserts the prose between the ids or the explanatory tail (AST scan: only the kill file reaches _authentic)"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 17,
+   "mutant": "L816 string ', not the ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "mutant_view: f'{run_dir}: the evidence anchor is {anchor[:12]}{expect[:12]} expected: ...' (the two 12-char ids become adjacent). Independently reproduced SURVIVED: kill file 36 tests OK / exit 0 on the mutant. anchor[:12] and 'b'*12 remain contiguous substrings; code retained; kill file asserts hold.",
+   "refutation": "",
+   "note": "Same ANCHOR-MISMATCH-PROSE group; ids+code retained.",
+   "exceptions_checked": [
+    "adjacency of the two ids does not break assertIn(anchor[:12]) or assertIn('b'*12) -- verified"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 18,
+   "mutant": "L817 string ' expected: this is not the run that printed it, or its evidence was rewritten' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "mutant_view: f'{run_dir}: the evidence anchor is {anchor[:12]}, not the {expect[:12]}'. Independently reproduced SURVIVED: kill file 36 tests OK / exit 0 on the mutant. Only the explanatory tail is lost; both ids, 'the evidence anchor is ... not the', and the code are retained.",
+   "refutation": "",
+   "note": "Explanatory tail only; kill file asserts code+ids."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 19,
+   "mutant": "L822 string 'EVIDENCE_UNREADABLE' emptied",
+   "class_before": "REFUTED",
+   "verdict": "CONFIRMED",
+   "class_after": "SURVIVED (test owed)",
+   "grounds": "mutant_view diff = JournalRefused('EVIDENCE_UNREADABLE',...) -> JournalRefused('',...) at L822, verbatim. Independently reproduced SURVIVED: kill file 36 tests OK / exit 0 on the mutant (baseline 36 OK). Branch: a valid manifest with a matching stored anchor (L811 False, L815 False), then R.evidence_manifest(run_dir) (run.py:425-434: RUN.json, STARTED, journals/*.jsonl, sessions, preflight, review, diagnostics via _content_sha which p.read_bytes()) hits an unreadable file (L821 OSError). No test makes an evidence file unreadable while the stored anchor still matches; happy-path test leaves all files readable.",
+   "refutation": "Owed test stands (T-CODE-UNREAD-EVIDENCE, @POSIX_USER). Input: run_dir(manifest=True); anchor=anchor_of(run); victim=run/'run'/'journals'/'aisef-run.jsonl' (confirmed in the manifest via evidence_manifest's journals glob); os.chmod(victim,0); addCleanup; self.refused(run, expect_anchor=anchor). Reader: operator via `refused: {code}:`. Sketch: assertEqual(err.code,'EVIDENCE_UNREADABLE'); assertIn(victim.name,str(err)) (L822-823 interpolate {e.filename}). Reachable: anchor_of(stored) is computed before the read and still equals expect; the recompute reads the chmod-000 journal -> PermissionError -> L821.",
+   "note": "A message assert would also kill [28]/[29] (same branch); kept AUDITED (code owed here).",
+   "consumers_checked": [
+    "run.py:425-434 evidence_manifest includes journals/*.jsonl (confirmed)",
+    "run.py:413-422 _content_sha reads bytes (confirmed)"
+   ],
+   "exceptions_checked": [
+    "branch reached by no test (AST scan) -- confirmed"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 20,
+   "mutant": "L827 string ': the evidence manifest does not match the run directory: ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "mutant_view: f'{run_dir}{changed[:5]} - evidence was changed after the run wrote it'. Independently reproduced SURVIVED: kill file 36 tests OK / exit 0 on the mutant. Code EVIDENCE_MISMATCH, run_dir, changed[:5] and the trailing sentence retained; test_evidence_changed (L397-404) asserts only err.code.",
+   "refutation": "",
+   "note": "Which-files content is a separate matter (see [30]/[35]/[37]); this entry is the sentence prose only.",
+   "consumers_checked": [
+    "test_v21_pw_lineage_continue.py:397-404 asserts only code (confirmed)"
+   ],
+   "exceptions_checked": [
+    "no test/doc asserts the full sentence of this refusal"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 21,
+   "mutant": "L828 string ' - evidence was changed after the run wrote it' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "mutant_view: f'{run_dir}: the evidence manifest does not match the run directory: {changed[:5]}'. Independently reproduced SURVIVED: kill file 36 tests OK / exit 0 on the mutant. Code, the 'does not match the run directory' phrase and changed[:5] retained; only the trailing clause lost.",
+   "refutation": "",
+   "note": "FINAL-MISMATCH-PROSE; code+list retained."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 24,
+   "mutant": "L807 string ' cannot be read (' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "mutant_view: f'{run_dir / R.MANIFEST}{type(e).__name__}: {e.strerror or e}): restore read access...'. Independently reproduced SURVIVED: kill file 36 tests OK / exit 0 on the mutant. Branch untested (L807 unreached under expect_anchor); code owed via [13]; path, exception type/strerror and the 'restore read access' remediation retained.",
+   "refutation": "",
+   "note": "code owed via [13]; a message assert there would also kill this.",
+   "exceptions_checked": [
+    "branch untested; path, type name and strerror retained"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 25,
+   "mutant": "L807 string ': ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "mutant_view: f'...({type(e).__name__}{e.strerror or e}): restore...'. Independently reproduced SURVIVED: kill file 36 tests OK / exit 0 on the mutant. Only the ': ' between the exception type and its strerror lost; both, the path and the remediation retained; branch untested; code owed via [13].",
+   "refutation": "",
+   "note": "MANIFEST-UNREADABLE-PROSE; punctuation only."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 26,
+   "mutant": "L808 string '): restore read access to it and run the command again' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "mutant_view: f'{run_dir / R.MANIFEST} cannot be read ({type(e).__name__}: {e.strerror or e}' (unbalanced '(' swallows nothing). Independently reproduced SURVIVED: kill file 36 tests OK / exit 0 on the mutant. The remediation clause is lost; path, 'cannot be read', exception type/strerror retained; branch untested; code owed via [13]. The kill file's 'what to do' regex (L206-212) is on _journal's message, not this one -- verified the untested branch has no test/doc pinning the remediation for _authentic.",
+   "refutation": "",
+   "note": "Strongest prose candidate (loses operator remediation), but the branch is unreached and its code is already owed via [13]; a message assert in the [13] owed test would kill it. AUDITED is consistent with the batch's code-vs-prose line and 'never add a test merely to reach a number'.",
+   "exceptions_checked": [
+    "no test/doc asserts _authentic's remediation phrase; kill file L206-212 regex is on _journal (confirmed by reachability scan)"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 27,
+   "mutant": "L811 string 'files' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "mutant_view: `not isinstance(stored.get('files',{}),dict)` -> `stored.get('',{})`. Independently reproduced SURVIVED: kill file 36 tests OK / exit 0 on the mutant. I verified the only differing input is a dict whose 'files' is a non-dict and which has no '' key ({'files':5}): pristine raises at L812 ('is not an evidence manifest'), the mutant skips the guard and raises at L816 ('the evidence anchor is X, not Y') -- SAME code EVIDENCE_MISMATCH, different message. Valid manifest and dict-with-no-'files' both read {} -> no change; non-dict stored short-circuits at L811's first operand -> no change. No test feeds dict-with-non-dict-'files' via continue_from.",
+   "refutation": "",
+   "note": "Not EQUIVALENT (message differs on one input) but same code in every reachable case; authentication can never pass (anchor_of({'files':5}) is a valid hash that cannot equal expect) -- confirmed. Which EVIDENCE_MISMATCH message is read by no test/doc.",
+   "exceptions_checked": [
+    "anchor cannot coincide with expect (run.py:445-447) -- no reachable case authenticates a bad run",
+    "which message produced is read by no test/doc"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 28,
+   "mutant": "L822 string ': an evidence file cannot be read (' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "mutant_view: f'{run_dir}{type(e).__name__}): {e.filename}'. Independently reproduced SURVIVED: kill file 36 tests OK / exit 0 on the mutant. Branch untested (L822 unreached under a matching anchor); code owed via [19]; run_dir, exception type and e.filename retained.",
+   "refutation": "",
+   "note": "code owed via [19]; a message assert there would also kill this.",
+   "exceptions_checked": [
+    "branch untested; run_dir, type name and e.filename retained"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 29,
+   "mutant": "L822 string '): ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "mutant_view: f'{run_dir}: an evidence file cannot be read ({type(e).__name__}{e.filename}'. Independently reproduced SURVIVED: kill file 36 tests OK / exit 0 on the mutant. Only '): ' between the type and the filename lost; both retained; branch untested; code owed via [19].",
+   "refutation": "",
+   "note": "EVIDENCE-FILE-UNREADABLE-PROSE; punctuation only."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 30,
+   "mutant": "L826 NotEq->Eq",
+   "class_before": "REFUTED",
+   "verdict": "CONFIRMED",
+   "class_after": "SURVIVED (test owed)",
+   "grounds": "mutant_view diff = `... if stored.get('files',{}).get(k) != fresh['files'].get(k)` -> `== ` at L826, verbatim. Independently reproduced SURVIVED: kill file 36 tests OK / exit 0 on the mutant (baseline 36 OK). The filter inverts: `changed` lists the UNCHANGED files instead of the changed ones; still entered only under stored!=fresh (L824) so the refusal still fires with code EVIDENCE_MISMATCH and the 'evidence was changed' sentence, but {changed[:5]} names the wrong files -- the files the operator is told to restore. I verified the set semantics: tampering one evidence file makes it the sole member of pristine `changed` and omits it from the mutant's (which lists every untouched file, RUN.json sorting first into changed[:5]).",
+   "refutation": "Owed test stands (T-CHANGED-LIST case (a)). Input: run_dir(manifest=True); anchor=anchor_of(run); victim journal; victim.write_bytes(victim.read_bytes()+b'x'); self.refused(run, expect_anchor=anchor). Reader: the operator reading which evidence to restore -- the twin of verify.py:132's per-file REFUTED detail pinned by B03-R3-E2E.md:106 S4 ('the file named'). Sketch: assertIn(victim.relative_to(run).as_posix(),str(err)); assertNotIn('RUN.json',str(err)). Either assert kills [30].",
+   "note": "Does not kill [9] (order-only). Author's which-files framing confirmed.",
+   "consumers_checked": [
+    "bundle_cli.py:827 the only use of `changed` is {changed[:5]} in the message (confirmed)",
+    "verify.py:130-132 twin builds its own changed list, pinned by E2E S4 -- a separate producer (confirmed)"
+   ],
+   "exceptions_checked": [
+    "test_evidence_changed L397-404 asserts only err.code, not the list (confirmed)"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 31,
+   "mutant": "L803 string ' has no ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "mutant_view: f'{run_dir}{R.MANIFEST}: nothing binds...' (run_dir abuts EVIDENCE.json). Independently reproduced SURVIVED: kill file 36 tests OK / exit 0 on the mutant. R.MANIFEST=='EVIDENCE.json' (run.py:80) remains a substring and the code EVIDENCE_MISSING is unchanged, so test_a_run_with_no_manifest (L382-388: assertEqual code EVIDENCE_MISSING, assertIn R.MANIFEST) still passes. Only ' has no ' connective lost.",
+   "refutation": "",
+   "note": "Concatenation keeps 'EVIDENCE.json' as a clean substring -- verified; assertIn(R.MANIFEST) still holds.",
+   "consumers_checked": [
+    "test_v21_pw_lineage_continue.py:382-388 (confirmed)"
+   ],
+   "exceptions_checked": [
+    "no test asserts the prose around R.MANIFEST"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 32,
+   "mutant": "L803 string ': nothing binds its evidence to an anchor, so the expected anchor ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "mutant_view: f'{run_dir} has no {R.MANIFEST}{expect[:12]} cannot be checked -- ...'. Independently reproduced SURVIVED: kill file 36 tests OK / exit 0 on the mutant. R.MANIFEST and code EVIDENCE_MISSING retained; the kill file asserts only those.",
+   "refutation": "",
+   "note": "NO-MANIFEST-PROSE; code+filename retained."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 33,
+   "mutant": "L804 string ' cannot be checked - a run killed before its record has none; without --expect-anchor a continuation proves consistency only' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "mutant_view: f'{run_dir} has no {R.MANIFEST}: nothing binds its evidence to an anchor, so the expected anchor {expect[:12]}'. Independently reproduced SURVIVED: kill file 36 tests OK / exit 0 on the mutant. R.MANIFEST, the 'nothing binds...anchor' phrase and the code retained; only the trailing explanation lost.",
+   "refutation": "",
+   "note": "Trailing explanation only."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 34,
+   "mutant": "L808 Or swapped",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "mutant_view: `e.strerror or e` -> `e.strerror and e`. Independently reproduced SURVIVED: kill file 36 tests OK / exit 0 on the mutant. Shows the exception repr `e` when strerror is truthy, or the falsy strerror when empty -- a different rendering of the same OSError; type(e).__name__ and the rest of the sentence retained; branch untested; code owed via [13].",
+   "refutation": "",
+   "note": "Ceiling: when e.strerror is None the mutant prints 'None'; no consumer reads it. AUDITED."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 35,
+   "mutant": "L825 string 'files' emptied",
+   "class_before": "REFUTED",
+   "verdict": "CONFIRMED",
+   "class_after": "SURVIVED (test owed)",
+   "grounds": "mutant_view diff = `set(stored.get('files',{}))` -> `set(stored.get('',{}))` at L825, verbatim. Independently reproduced SURVIVED: kill file 36 tests OK / exit 0 on the mutant (baseline 36 OK). The union loses stored's keys (stored.get('',{})=={} ); the L826 filter still uses 'files', so a file present in the stored manifest but DELETED from the directory drops out of `changed` and is never named, though its deletion is why stored!=fresh. Code and sentence retained; the named-file list is incomplete.",
+   "refutation": "Owed test stands (T-CHANGED-LIST case (b)). Input: run_dir(manifest=True); anchor=anchor_of(run); delete one file named in the manifest (e.g. RUN.started.json -- _authentic runs before _record/_journal so deletion causes no earlier refusal; anchor still matches; recompute simply omits it, no OSError); self.refused(run, expect_anchor=anchor). Reader: the operator. Sketch: assertIn(deleted.relative_to(run).as_posix(),str(err)) -- pristine names it, mutant omits it -> KILLED.",
+   "note": "Real gap verified by set semantics (deleted key absent from mutant union).",
+   "consumers_checked": [
+    "bundle_cli.py:825-828 (confirmed)"
+   ],
+   "exceptions_checked": [
+    "changed can become [] when a deletion is the only change (names nothing) -- confirmed"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 37,
+   "mutant": "L826 string 'files' emptied",
+   "class_before": "REFUTED",
+   "verdict": "CONFIRMED",
+   "class_after": "SURVIVED (test owed)",
+   "grounds": "mutant_view diff = filter `stored.get('files',{}).get(k)` -> `stored.get('',{}).get(k)` at L826, verbatim. Independently reproduced SURVIVED: kill file 36 tests OK / exit 0 on the mutant (baseline 36 OK). The filter's stored side becomes {}.get(k)==None for every k, so `None != fresh['files'].get(k)` is True for every current file (non-None hash) and False for deleted-only keys: `changed` over-names ~every current file and omits deletions, instead of the one tampered file. Code and sentence retained.",
+   "refutation": "Owed test stands (T-CHANGED-LIST case (a), the assertNotIn arm). Input as [30]: tamper one file under a matching anchor. Reader: the operator. Sketch: assertNotIn('RUN.json',str(err)) -- pristine names only the tampered file (RUN.json absent), the mutant names every current file including RUN.json (which sorts first into changed[:5]) -> KILLED. assertIn(victim) passes under both and does not kill [37].",
+   "note": "Real gap verified by filter semantics.",
+   "consumers_checked": [
+    "bundle_cli.py:825-828 (confirmed)"
+   ],
+   "exceptions_checked": [
+    "list is no longer a subset of really-changed files -- a 1-byte tamper reads as 'everything changed' (confirmed)"
+   ]
+  }
+ ],
+ "summary": {
+  "total_entries": 25,
+  "verdict_CONFIRMED": 25,
+  "verdict_other": 0,
+  "class_after_AUDITED": 18,
+  "class_after_test_owed": 7,
+  "class_after_EQUIVALENT": 0,
+  "refuted_indexes": [
+   3,
+   10,
+   13,
+   19,
+   30,
+   35,
+   37
+  ],
+  "disposition": "The author's draft is confirmed in full: 25/25 SURVIVED reproduced; mutant strings match mutant_view verbatim; source_sha256 matches; only the registered kill file reaches _authentic (no unregistered test kills any mutant); all named consumers/producers/docs are real and as described (immaterial line-number drift only). 7 REFUTED (test owed) and 18 AUDITED stand; 0 EQUIVALENT (correct -- every mutant observably differs and no operator-read code/id was called harmless)."
+ }
+}

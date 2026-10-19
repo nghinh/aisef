@@ -1,0 +1,76 @@
+{
+ "batch": "W2-bundle_cli-8",
+ "file": "aisef2/app/bundle_cli.py",
+ "targets": [
+  "aisef2/app/bundle_cli.py::_group",
+  "aisef2/app/bundle_cli.py::with_commands"
+ ],
+ "new": [
+  {
+   "target": "aisef2/app/bundle_cli.py::_group",
+   "index": 3,
+   "mutant": "L282 returns None"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_group",
+   "index": 4,
+   "mutant": "L283 element 0 dropped"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_group",
+   "index": 5,
+   "mutant": "L283 element 1 dropped"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_group",
+   "index": 6,
+   "mutant": "L283 element 2 dropped"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_group",
+   "index": 7,
+   "mutant": "L283 element 3 dropped"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_group",
+   "index": 8,
+   "mutant": "L283 element 4 dropped"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_group",
+   "index": 9,
+   "mutant": "L283 element 5 dropped"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_group",
+   "index": 10,
+   "mutant": "L282 string 'current' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::with_commands",
+   "index": 3,
+   "mutant": "L349 returns None"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::with_commands",
+   "index": 15,
+   "mutant": "L358 dict entry 0 dropped"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::with_commands",
+   "index": 19,
+   "mutant": "L350 string 'candidate.json' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::with_commands",
+   "index": 28,
+   "mutant": "L353 string '.approved-' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::with_commands",
+   "index": 34,
+   "mutant": "L361 string ' by `human:` and your name (`approve` refuses the placeholder); run them in order, each reads what the one before wrote; `then` lints the last.' emptied"
+  }
+ ],
+ "carried": []
+}

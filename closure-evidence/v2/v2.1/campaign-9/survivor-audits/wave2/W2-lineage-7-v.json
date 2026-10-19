@@ -1,0 +1,182 @@
+{
+ "batch": "W2-lineage-7",
+ "snapshot": "4ec961e706a1f7bda16d131037058c4fe9c2663f",
+ "file": "aisef2/app/lineage.py",
+ "role": "skeptic",
+ "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa",
+ "verified_on": "2026-10-19 (date: Mon Oct 19 20:50 +07 2026)",
+ "method": "Skeptic tree from git archive 4ec961e...; source_sha256 of aisef2/app/lineage.py recomputed = f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa (matches). Each mutant built in a pristine run-copy via validation.v2.mutation.mutants(src, func, _enum_members(src,'.'))[INDEX] with desc asserted == the batch entry (same mechanism as mutant_view.py: target.split('::') -> (rel, func)), written over aisef2/app/lineage.py, then the REGISTERED kill file(s) run from the copy root: env -i PATH=/usr/bin:/bin (opencode dirs /Users/nghinh/.opencode/bin and /Users/nghinh/.npm-global/bin stripped) HOME/TMPDIR/XDG under the copy, nice -n 19 /opt/homebrew/bin/python3 -P -B -W ignore -m unittest tests.v2.<name> -q. Registered kill files reconfirmed from V21_TARGETS: _journal_mismatch -> [test_v21_x_lineage_proof]; _evidence_gone -> [test_v21_x_lineage_gone, test_v21_x_lineage_proof]. Baseline unmutated: proof 55 tests OK; gone 29 tests OK.",
+ "independent_measurements": "ALL 12 re-measured SURVIVED, matching the author. _journal_mismatch on test_v21_x_lineage_proof: [4]=OK, [12]=OK, [14]=OK, [15]=OK, [16]=OK, [17]=OK, [21]=OK, [22]=OK. _evidence_gone on test_v21_x_lineage_gone: [22]=OK, [24]=OK, [25]=OK, [49]=OK. Positive controls reproduced live: [2] (L570 returns None) -> proof FAILED (failures=7); [27] (L631 ': RUN.json records that the run spent ' emptied) -> gone FAILED (failures=31). So both branch oracles are live and every SURVIVED is a coverage/display gap, not a dead oracle.",
+ "cite_correction": "All 8 _journal_mismatch entries name the driving test class 'JournalReadsAndIsNotTheNamed'; the real class at the snapshot is 'JournalThatIsNotTheOneTheRecordNames' (tests/v2/test_v21_x_lineage_proof.py:577), whose test_each_is_unknown_spend_listed_with_its_cause is at line 586 (not the same-named method at line 399, which is in class JournalThatIsThere and drives the UNREAD-journal branch, not _journal_mismatch). The CUTS, the asserts (len(unread)==1, 'RUN.json' in unread[0], 'unknown' in unread[0], exact is False), and test_controls... are all cited correctly; only the class NAME is wrong. Cite refresh only; no conclusion changes.",
+ "entries": [
+  {
+   "target": "aisef2/app/lineage.py::_journal_mismatch",
+   "index": 4,
+   "mutant": "L568 And swapped",
+   "class_before": "REFUTED",
+   "verdict": "CONFIRMED",
+   "class_after": "SURVIVED (test owed)",
+   "grounds": "Mutant verified at the snapshot: lineage.py:568 `if _sha(data)==named['sha256'] and lines==named.get('lines')` -> `or` (mutant_view [4] = 'L568 And swapped'). Re-measured: proof kill file OK = SURVIVED; positive control [2] FAILED (failures=7) so the journal-mismatch branch oracle is live. The gap is real and precise: for all three existing CUTS lines != recorded, so BOTH disjuncts are False and `and`/`or` return the same string — only the lines-match/digest-differs input makes exactly one disjunct true, where original returns a truthy '; digest differs' string and the mutant returns None. Confirmed the three CUTS give newline counts {no bytes:0, cut at a line:3, cut in a line:<=6} and never the recorded count (>=7 for a 3-request sealed journal), so that input is uncovered. account_of (lineage.py:527) keys on `if bad:` truthiness, so None vs string flips every downstream decision.",
+   "refutation": "Owed test is sound. Input: a sealed run (RUN.json names journal sha256 and lines=K) whose on-disk journal has the SAME newline count K but different bytes (flip one non-newline byte). Original _journal_mismatch returns 'K lines on disk, K recorded; digest differs' (truthy); mutant returns None. Reader: account_of lineage.py:527-532 -> `if bad:` appends to unread/unaccounted -> `aisef run --parent` refusal (run.py:529), verify REFUTED (verify.py:89), Budget stop (client.py:118), bundle continue refusal (bundle_cli.py:961). Sketch (author's, correct): in JournalThatIsNotTheOneTheRecordNames add CUTS['a byte replaced in a line'] = lambda d: d[:i] + bytes([d[i]^1]) + d[i+1:] for the first i whose byte != b'\\n', reuse the existing asserts (len(unread)==1, 'RUN.json' in unread[0], exact is False). FAILS on `or` (returns None -> unread empty), PASSES unmutated.",
+   "consumers_checked": [
+    "lineage.py:527-532 account_of: `bad = _journal_mismatch(run_dir) if got is not None else None`; `if bad:` (TRUTHINESS) wraps bad in 'its journal is not the one RUN.json names ({bad}): the provider requests it recorded are unknown spend' into unaccounted AND unread. Verified.",
+    "client.py:118/129 Budget.reached/exceeded: `if spent['unaccounted']:` membership drives the stop, text only '; '.join(...) for display. Verified.",
+    "run.py:529 `if inherited['unread']:` -> RunRefused (own wrapper text); verify.py:89 `if inherited is not None and inherited['unread']:` -> cannot/REFUTED; bundle_cli.py:961 `None if not account['unread'] else <own text>`. All truthiness/membership; 'is gone'/'not known' phrasing is their own, not bad. Verified.",
+    "docs/v2.1 REPORT.md:304 names _journal_mismatch; USAGE-2.1.md:776 describes it as 'digest và số dòng' (digest and line count); neither pins the cause wording. Verified."
+   ],
+   "exceptions_checked": [
+    "an existing test driving lines-match/digest-differs: none (CUTS give 0/3/<=6, recorded>=7). Verified by computation.",
+    "digest-matches/lines-differ: impossible without a sha256 collision (identical bytes => identical newline count), owes no test.",
+    "a sibling guard recomputing the digest in account_of: none; _journal_mismatch truthiness is the sole determinant."
+   ],
+   "note": "CONFIRMED by independent measurement + reasoning. Cite refresh: the driving test class is JournalThatIsNotTheOneTheRecordNames (test_v21_x_lineage_proof.py:577), not 'JournalReadsAndIsNotTheNamed'; its test_each_is_unknown_spend_listed_with_its_cause is line 586. REFUTED stands: a test is genuinely owed."
+  },
+  {
+   "target": "aisef2/app/lineage.py::_journal_mismatch",
+   "index": 12,
+   "mutant": "L570 conditional negated",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "Verified at snapshot: lineage.py:570 suffix `('' if lines != named.get('lines') else '; digest differs')` -> `('' if not lines != named.get('lines') else ...)` (mutant_view [12]). Re-measured proof = OK (SURVIVED, 55 tests). The prefix f'{lines} lines on disk, ...' is always non-empty, so the return stays truthy and account_of's `if bad:` is unchanged; the suffix selection only matters on the lines-match/digest-differs input that no oracle reaches (same input as [4]). Display only.",
+   "refutation": "No test owed beyond [4]'s. The only oracle driving the non-None branch asserts truthiness + the account_of wrapper substrings ('RUN.json','unknown'), never the suffix; grep of tests/ docs/ for 'digest differs'/'lines on disk' finds no oracle. [4]'s owed test, if it also assertIn('digest differs', unread[0]), would additionally kill this.",
+   "consumers_checked": ["lineage.py:527-532 account_of (truthiness, wrapper supplies substrings) — verified", "client.py:118, run.py:529, verify.py:89, bundle_cli.py:961, usage_lineage lineage.py:808-810: all truthiness/membership, text joined/sliced for display — verified"],
+   "exceptions_checked": ["a test asserting '; digest differs': none (grep empty)", "truthiness unchanged (non-empty prefix)", "logically identical observable to [16] (not(a!=b) == a==b)"],
+   "note": "CONFIRMED. Cite refresh: class is JournalThatIsNotTheOneTheRecordNames (line 577/586)."
+  },
+  {
+   "target": "aisef2/app/lineage.py::_journal_mismatch",
+   "index": 14,
+   "mutant": "L570 string ' lines on disk, ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "Verified at snapshot: lineage.py:570 f'{lines} lines on disk, {named.get(\\'lines\\')} recorded' -> f'{lines}{named.get(\\'lines\\')} recorded' (mutant_view [14], the label dropped, running the two counts together). Re-measured proof = OK (SURVIVED). Return non-empty -> truthiness unchanged; the actionable 'its journal is not the one RUN.json names' is in account_of's own wrapper. Display only.",
+   "refutation": "No test owed. grep tests/ for 'lines on disk' is empty; the sole non-None-branch oracle asserts only truthiness + wrapper substrings. [4]'s owed test asserting ' lines on disk, '/' recorded' would kill this.",
+   "consumers_checked": ["lineage.py:527-532 account_of (truthiness) — verified", "client/run/verify/bundle/usage: truthiness/membership, display-only — verified"],
+   "exceptions_checked": ["a test asserting 'lines on disk': none (grep empty)", "truthiness unchanged", "two counts merge into one ambiguous number: legibility only"],
+   "note": "CONFIRMED. Cite refresh: class is JournalThatIsNotTheOneTheRecordNames (line 577/586)."
+  },
+  {
+   "target": "aisef2/app/lineage.py::_journal_mismatch",
+   "index": 15,
+   "mutant": "L570 string ' recorded' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "Verified at snapshot: lineage.py:570 drops the ' recorded' label -> f'{lines} lines on disk, {named.get(\\'lines\\')}' (mutant_view [15]). Re-measured proof = OK (SURVIVED). The recorded count is still shown; only its label is gone. Return non-empty -> truthiness unchanged. Display only.",
+   "refutation": "No test owed. grep tests/ for ' recorded' in the journal-mismatch cause is empty (the one ' recorded' hit at proof:721 is the UNREAD-journal wrapper 'the provider requests it recorded are unknown spend', a different account_of string). Sole oracle asserts truthiness + wrapper substrings.",
+   "consumers_checked": ["lineage.py:527-532 account_of (truthiness) — verified", "client/run/verify/bundle/usage: display-only — verified"],
+   "exceptions_checked": ["a test asserting ' recorded' in the journal cause: none", "truthiness unchanged", "actionable fact preserved by the account_of wrapper"],
+   "note": "CONFIRMED. Cite refresh: class is JournalThatIsNotTheOneTheRecordNames (line 577/586)."
+  },
+  {
+   "target": "aisef2/app/lineage.py::_journal_mismatch",
+   "index": 16,
+   "mutant": "L570 NotEq->Eq",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "Verified at snapshot: lineage.py:570 suffix condition `lines != named.get('lines')` -> `lines == named.get('lines')` (mutant_view [16]). Re-measured proof = OK (SURVIVED). Same observable as [12]: swaps which case gets '; digest differs'; prefix always non-empty -> truthiness unchanged; suffix reached only off the agree-path. Display only.",
+   "refutation": "No test owed. No oracle asserts the suffix (grep empty). Same uncovered input as [4]/[12].",
+   "consumers_checked": ["lineage.py:527-532 account_of (truthiness) — verified", "client/run/verify/bundle/usage: display-only — verified"],
+   "exceptions_checked": ["a test asserting the suffix: none", "truthiness unchanged (non-empty prefix)", "same observable output as [12]"],
+   "note": "CONFIRMED. Cite refresh: class is JournalThatIsNotTheOneTheRecordNames (line 577/586)."
+  },
+  {
+   "target": "aisef2/app/lineage.py::_journal_mismatch",
+   "index": 17,
+   "mutant": "L570 string '; digest differs' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "Verified at snapshot: lineage.py:570 `else '; digest differs'` -> `else ''` (mutant_view [17]); the suffix is now '' in both branches. Re-measured proof = OK (SURVIVED). The clarifier distinguishing lines-match/digest-differs is gone, but that case is never reached by any oracle and the prefix stays non-empty -> truthiness unchanged. Display only.",
+   "refutation": "No test owed. grep 'digest differs' finds only unrelated files (D-035 tree digest, kernel digest, SHAPE-changed); none is this cause. The only non-empty-suffix case is the same uncovered input [4] exposes.",
+   "consumers_checked": ["lineage.py:527-532 account_of (truthiness) — verified", "client/run/verify/bundle/usage: display-only — verified"],
+   "exceptions_checked": ["a test asserting '; digest differs': none (grep empty)", "truthiness unchanged", "the only non-empty-suffix case is the uncovered [4] input"],
+   "note": "CONFIRMED. Cite refresh: class is JournalThatIsNotTheOneTheRecordNames (line 577/586)."
+  },
+  {
+   "target": "aisef2/app/lineage.py::_journal_mismatch",
+   "index": 21,
+   "mutant": "L570 string 'lines' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "Verified at snapshot: lineage.py:570 FIRST occurrence, the displayed recorded count `{named.get('lines')}` -> `{named.get('')}` = None (mutant_view [21]): message reads '7 lines on disk, None recorded...'. Re-measured proof = OK (SURVIVED). named.get('') is None (no '' key), so the figure is blanked, not crashed; return stays a non-empty string -> truthiness unchanged. Display only; no consumer reads the figure.",
+   "refutation": "No test owed. No oracle asserts the recorded count; the sole non-None-branch oracle asserts truthiness + wrapper substrings only.",
+   "consumers_checked": ["lineage.py:527-532 account_of (truthiness) — verified", "client/run/verify/bundle/usage: display-only — verified"],
+   "exceptions_checked": ["a test asserting the recorded line count: none", "named.get('') is None (blanked, not crashed); return stays a string", "truthiness unchanged"],
+   "note": "CONFIRMED. Cite refresh: class is JournalThatIsNotTheOneTheRecordNames (line 577/586)."
+  },
+  {
+   "target": "aisef2/app/lineage.py::_journal_mismatch",
+   "index": 22,
+   "mutant": "L570 string 'lines' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "Verified at snapshot: lineage.py:570 SECOND occurrence, the suffix CONDITION `lines != named.get('lines')` -> `lines != named.get('')` = `lines != None` = always True (mutant_view [22]), so the suffix is always '' ('; digest differs' never appends). Re-measured proof = OK (SURVIVED). Prefix non-empty -> truthiness unchanged; the clarifier applied only on the uncovered lines-match case. Display only; effect identical to [17] reached via the condition.",
+   "refutation": "No test owed. No oracle asserts '; digest differs' (grep empty). Same uncovered input as [4].",
+   "consumers_checked": ["lineage.py:527-532 account_of (truthiness) — verified", "client/run/verify/bundle/usage: display-only — verified"],
+   "exceptions_checked": ["a test asserting '; digest differs': none", "effect identical to [17] (suffix always '')", "truthiness unchanged"],
+   "note": "CONFIRMED. Cite refresh: class is JournalThatIsNotTheOneTheRecordNames (line 577/586). Batch lists [21] and [22] under the same label 'L570 string lines emptied'; mutant_view confirms they are distinct sites (display figure vs suffix condition)."
+  },
+  {
+   "target": "aisef2/app/lineage.py::_evidence_gone",
+   "index": 22,
+   "mutant": "L647 string ': the journal records provider requests as answered that no session stream stands for (' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "Verified at snapshot: lineage.py:647 (no-record branch) opening literal (incl. the ' (') emptied -> f'{run_dir.name}{\\'; \\'.join(lacking)}) and no record names...' (mutant_view [22]). Re-measured gone = OK, proof = OK (SURVIVED). The join content and the tail are intact, so the return is non-empty -> truthiness (account_of lineage.py:534 `if gone:`) unchanged. Display only.",
+   "refutation": "No test owed. test_a_real_run_killed_before_its_record_... (gone:175-198) drives this branch and asserts assertIn(said, unread[0]) with said='S1 developer: 1 answered, 0 streams; S1 reviewer: 1 answered, 0 streams' (= the '; '.join(lacking), which is contiguous and preserved) plus 'is gone'/str(e) from run.py's RunRefused wrapper (not from gone). grep tests/ docs/ for 'no session stream stands for' finds no oracle. All preserved -> survives correctly.",
+   "consumers_checked": ["lineage.py:534-537 account_of: `gone = None if unread else _evidence_gone(...)`; `if gone:` appends gone verbatim to unaccounted+unread (truthiness) — verified", "client.py:118/129, run.py:529, verify.py:89, bundle_cli.py:961 truthiness/membership — verified", "lineage.py:808-810 usage_lineage: cost.status = 'partial: ' + '; '.join(unaccounted)[:300], displayed/sliced never parsed — verified"],
+   "exceptions_checked": ["a test asserting the emptied literal: none (grep empty)", "the asserted 'said' (the join) is contiguous and preserved", "'is gone'/str(run) come from run.py RunRefused, not gone"],
+   "note": "CONFIRMED by independent gone+proof measurement. Author's consumer/oracle map is accurate."
+  },
+  {
+   "target": "aisef2/app/lineage.py::_evidence_gone",
+   "index": 24,
+   "mutant": "L625 string ': ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "Verified at snapshot: lineage.py:625 (why branch) the ': ' between run_dir.name and why emptied -> f'{run_dir.name}{why}: what the run spent cannot...' (mutant_view [24]). Re-measured gone = OK, proof = OK (SURVIVED). why and the tail intact; return non-empty -> truthiness unchanged. Display only (name abuts 'RUN.json's budget...').",
+   "refutation": "No test owed. test_a_budget_that_is_not_an_account_... (gone:435-457) asserts only assertIn('is not an account of what the run spent', unread[0]) (inside why) + len==1 + exact False — none of which touches the ': ' separator. grep finds no oracle for the boundary.",
+   "consumers_checked": ["lineage.py:534-537 account_of (truthiness) — verified", "client/run/verify/bundle/usage: display-only — verified"],
+   "exceptions_checked": ["a test asserting the ': ' separator or run-name boundary: none", "'is not an account of what the run spent' (in why) preserved", "truthiness unchanged"],
+   "note": "CONFIRMED by independent gone+proof measurement."
+  },
+  {
+   "target": "aisef2/app/lineage.py::_evidence_gone",
+   "index": 25,
+   "mutant": "L625 string ': what the run spent cannot be compared with what its evidence shows, so it is unknown' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "Verified at snapshot: lineage.py:625 (why branch) the explanatory tail emptied -> f'{run_dir.name}: {why}' (mutant_view [25]). Re-measured gone = OK, proof = OK (SURVIVED). why already states the actionable fault; dropping the tail leaves the return non-empty -> truthiness unchanged. Display only.",
+   "refutation": "No test owed. grep tests/ docs/ for 'cannot be compared with what its evidence shows' is empty. test_a_budget_that_is_not_an_account_... asserts 'is not an account of what the run spent' (in why), preserved.",
+   "consumers_checked": ["lineage.py:534-537 account_of (truthiness) — verified", "client/run/verify/bundle/usage: display-only — verified"],
+   "exceptions_checked": ["a test asserting the tail: none (grep empty)", "actionable content is in why, not the tail", "truthiness unchanged"],
+   "note": "CONFIRMED by independent gone+proof measurement."
+  },
+  {
+   "target": "aisef2/app/lineage.py::_evidence_gone",
+   "index": 49,
+   "mutant": "L631 string ', ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "Verified at snapshot: lineage.py:631 (recorded branch) `', '.join(lacking)` -> `''.join(lacking)` (mutant_view [49]). Re-measured gone = OK, proof = OK (SURVIVED). With >=2 lacking counters the items concatenate with no separator, but each item stays a contiguous substring and 'RUN.json records that the run spent ' is unchanged -> return non-empty, truthiness unchanged; single-counter messages are byte-identical. Display only.",
+   "refutation": "No test owed. The multi-counter oracle test_a_counter_the_record_holds_and_the_evidence_does_not_is_gone (gone:392-401) asserts each counter independently (assertIn 'turns 1 (the evidence shows 0)', etc.) and assertNotIn 'provider_requests 3' — separator-tolerant, all still hold under ''.join. Verified each needle remains a contiguous substring. Line 519 single-counter assert is unaffected. No consumer splits/parses the list.",
+   "consumers_checked": ["lineage.py:534-537 account_of (truthiness) — verified", "client/run/verify/bundle/usage: display-only — verified"],
+   "exceptions_checked": ["a test asserting the ', ' separator between counters: none — multi-counter test uses per-counter assertIn", "no consumer splits/parses the list", "single-counter output unchanged; truthiness unchanged"],
+   "note": "CONFIRMED by independent gone+proof measurement."
+  }
+ ],
+ "owed_tests": [
+  "tests/v2/test_v21_x_lineage_proof.py::JournalThatIsNotTheOneTheRecordNames (NOT 'JournalReadsAndIsNotTheNamed' as the author wrote) — the three CUTS ('no bytes','cut at a line','cut in a line') give newline counts 0/3/<=6, never the recorded line count K (>=7 for a 3-request sealed journal), so the suite never drives _journal_mismatch with a journal whose line count MATCHES RUN.json but whose digest differs — the only input where L568's `and` differs from `or` (mutant [4]). Add CUTS['a byte replaced in a line'] = lambda d: d[:i] + bytes([d[i]^1]) + d[i+1:] with i the first offset whose byte != b'\\n' (newline count preserved, digest changed), and reuse the existing asserts: len(got['unread'])==1, 'RUN.json' in got['unread'][0], got['exact'] is False, assert_unread(lineage_account(r1),'run1'). FAILS on [4] (`or` -> None -> unread empty), PASSES unmutated. Reader: account_of (lineage.py:527) -> `aisef run --parent` refusal (run.py:529), verify REFUTED (verify.py:89), Budget stop (client.py:118), bundle continue refusal (bundle_cli.py:961). If the same test also asserts assertIn('digest differs', got['unread'][0]) it additionally kills [12],[16],[17],[22]; asserting ' lines on disk, '/' recorded'/the recorded count kills [14],[15],[21]."
+ ],
+ "notes": "Positional skeptic audit per MUTATION-RUNNER-V2 section 16, every entry verified exactly once. source_sha256 reconfirmed (f342996...). All 12 mutants independently rebuilt and re-run against their REGISTERED kill files; all 12 SURVIVED, matching the author. Positive controls [2] (proof, failures=7) and [27] (gone, failures=31) reproduced live, so neither oracle is dead. Verdicts: [4] CONFIRMED REFUTED (a test is genuinely owed — the lines-match/digest-differs input is uncovered); the other 11 CONFIRMED AUDITED (display/connective-only; the single load-bearing output of both functions is None vs a non-empty string, and account_of (lineage.py:527/534), Budget, run, verify, bundle continue, usage_lineage all key on that truthiness/membership, never on the cause text). One cite correction across the 8 _journal_mismatch entries: the driving test class is JournalThatIsNotTheOneTheRecordNames (line 577/586), not 'JournalReadsAndIsNotTheNamed'; method/CUTS/asserts cited correctly — conclusions unaffected. No unregistered test kills any mutant (grep of every emptied/altered fragment across tests/ and docs/ returns no oracle). carried: none (batch 'carried' is empty)."
+}

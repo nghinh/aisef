@@ -1,0 +1,139 @@
+{
+ "batch": "W2-bundle_cli-9",
+ "snapshot": "4ec961e706a1f7bda16d131037058c4fe9c2663f",
+ "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+ "registered_kill_file": "tests/v2/test_v21_migrate_semantics.py",
+ "kill_file_baseline": "unmutated copy: Ran 51 tests OK (closure-evidence/v2/release/LEDGERLOCK-PROJECT.json added via git show)",
+ "entries": [
+  {
+   "target": "aisef2/app/bundle_cli.py::exposure_of",
+   "index": 1,
+   "mutant": "L494 element 0 dropped",
+   "class": "AUDITED",
+   "group": "A04-EXPOSURE-LOAD-EXCEPT: exposure_of's except tuple turns a malformed keep-approvals-from bundle into a BundleError; dropping one class re-routes that exception to main's own identical except -> same exit 2 'refused', only the message wording changes. Shared with [2],[3]; consumers/exceptions per entry.",
+   "grounds": "exposure_of (bundle_cli.py:491-495) wraps `{c['id']: BehaviorContract.from_json(c) for c in old['contracts']}` and `B._plan(old['plan'])` in `except (KeyError, TypeError, ValueError) as e` -> `raise B.BundleError('the bundle to keep approvals from does not load: ...')`. Dropping element 0 (KeyError) means a KeyError inside the try (old missing 'contracts'/'plan', a contract missing 'id') is no longer wrapped here; it propagates to the sole consumer, main, whose own `except (KeyError, TypeError, ValueError)` at bundle_cli.py:1079-1081 prints `refused: {type(e).__name__}: {e}`[:2000] and returns 2. Preserved under the mutant: exit 2, the 'refused' prefix, the exception class name and message, and 'nothing written' (the raise is before _write_new at L1044). Changed: the cause-label prefix is lost and the [:2000] cut now applies. RAN the registered kill file tests.v2.test_v21_migrate_semantics against this mutant: SURVIVED (51 tests OK). Its TheOldBundleMustBeOne.test_a_bundle_to_keep_approvals_from_that_does_not_load (L798-807) feeds old={'approvals': []} (no 'contracts') -> KeyError and asserts only code==2 + 'refused' in err + new.json absent, all of which hold under the mutant. Not EQUIVALENT: KeyError, TypeError, ValueError are not mutually subclassed (unlike the carried _read[2] UnicodeDecodeError<=ValueError case), so the stderr message observably changes; AUDITED because exit code and refusal survive and no reader pins the wording.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:1039-1043 (seal --keep-approvals-from) and :1043 (migrate) — the only code callers of exposure_of (grep over aisef2/ validation/ tests/); both run inside main's try (L1034)",
+    "aisef2/app/bundle_cli.py:1077-1081 main: `except B.BundleError -> refused:{e}, return 2` then `except (KeyError, TypeError, ValueError) -> refused:{type(e).__name__}: {e}`[:2000], return 2 — a KeyError escaping exposure_of lands in the second arm, still exit 2",
+    "tests/v2/test_v21_migrate_semantics.py:798-807 (malformed old -> KeyError -> asserts code 2 + 'refused' only: SURVIVES); :745,778 and tests/v2/test_v21_kills3_T02a.py:370-382 and tests/v2/test_v21_bundle_tools.py:127 all call exposure_of with a well-formed old bundle, so the except arm is never reached"
+   ],
+   "exceptions_checked": [
+    "a programmatic library caller of exposure_of that catches B.BundleError to tell a malformed keep-approvals-from bundle from other KeyErrors: none in the repo (only main + tests; tests pass valid bundles); owner decision whether exposure_of is a public API required to raise BundleError on malformed input",
+    "a test or document pinning the phrase 'the bundle to keep approvals from does not load': the only occurrence is bundle_cli.py:495 (grep over aisef2/ validation/ tests/ docs/)",
+    "a KeyError raised after _write_new leaving a half-written file: the except covers load only (L491-495), before any write"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::exposure_of",
+   "index": 2,
+   "mutant": "L494 element 1 dropped",
+   "class": "AUDITED",
+   "group": "A04-EXPOSURE-LOAD-EXCEPT (see [1])",
+   "grounds": "Same as [1] for TypeError. A TypeError inside the try (e.g. old['contracts'] is not iterable, or a contract entry c is not subscriptable so c['id'] raises TypeError) is no longer wrapped by exposure_of; it propagates to main's `except (KeyError, TypeError, ValueError)` (bundle_cli.py:1079-1081) -> `refused: TypeError: ...`[:2000], exit 2. Exit code, the 'refused' prefix, the class name + message and 'nothing written' are preserved; only the cause label and the [:2000] cut change. RAN tests.v2.test_v21_migrate_semantics against the mutant: SURVIVED (51 OK).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:1039-1043 (seal CLI) / :1043 (migrate) — sole callers, inside main's try",
+    "aisef2/app/bundle_cli.py:1079-1081 main's `except (KeyError, TypeError, ValueError)` catches the escaping TypeError -> exit 2",
+    "tests/v2/test_v21_migrate_semantics.py:798-807 (code 2 + 'refused' only); other exposure_of callers (L745,778; T02a; bundle_tools:127) pass well-formed old bundles"
+   ],
+   "exceptions_checked": [
+    "a caller distinguishing a TypeError-raising malformed old bundle by catching BundleError: none in repo",
+    "a test/doc pinning the cause-label wording: none (grep); only bundle_cli.py:495"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::exposure_of",
+   "index": 3,
+   "mutant": "L494 element 2 dropped",
+   "class": "AUDITED",
+   "group": "A04-EXPOSURE-LOAD-EXCEPT (see [1])",
+   "grounds": "Same as [1] for ValueError. A ValueError from BehaviorContract.from_json / B._plan (or a BundleError, which is a ValueError: `class BundleError(ValueError)` at aisef2/app/bundle.py:43, MRO = BundleError, ValueError, Exception, BaseException, object — printed) escapes exposure_of and is caught by main: a BundleError by the `except B.BundleError` arm (bundle_cli.py:1077, `refused:{e}`), a non-BundleError ValueError by the `except (KeyError, TypeError, ValueError)` arm (L1079). Either way exit 2 and 'refused'; only the cause-label wording (and, in the second arm, the [:2000] cut) changes. RAN tests.v2.test_v21_migrate_semantics against the mutant: SURVIVED (51 OK).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:1039-1043 / :1043 — sole callers, inside main's try",
+    "aisef2/app/bundle_cli.py:1077 `except B.BundleError` (catches an escaping BundleError, which is a ValueError) and :1079 `except (KeyError, TypeError, ValueError)` (catches a plain ValueError) — both exit 2",
+    "aisef2/app/bundle.py:43 `class BundleError(ValueError)`; tests/v2/test_v21_migrate_semantics.py:798-807 asserts code 2 + 'refused' only"
+   ],
+   "exceptions_checked": [
+    "a caller that catches BundleError specifically (not ValueError) and would now receive a bare ValueError from exposure_of: none in repo; from_json/_plan ValueErrors are BundleError or bubble to main regardless",
+    "a test/doc pinning the wording: none (grep); only bundle_cli.py:495"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::exposure_of",
+   "index": 12,
+   "mutant": "L495 string 'the bundle to keep approvals from does not load: ' emptied",
+   "class": "AUDITED",
+   "group": "T04-EXPOSURE-MESSAGE: a refusal (bundle_cli.py:495) an operator reads on stderr; the cause label is dropped but the exception class name and message stay, and exit 2 is unchanged.",
+   "grounds": "The BundleError text becomes `f'{type(e).__name__}: {e}'` (e.g. `KeyError: 'contracts'`): the generic cause label 'the bundle to keep approvals from does not load: ' is lost, but the class name and the underlying message remain, main still prints `refused: <that>` and returns 2 (bundle_cli.py:1077-1081). The operator still sees that the keep-approvals-from bundle is what failed to load (the command named it on the command line) and why (the kernel class + detail). RAN tests.v2.test_v21_migrate_semantics against the mutant: SURVIVED (51 OK). No program reads the string; no test/doc pins the phrase (the only occurrence is bundle_cli.py:495).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:1077-1081 main prints `refused: {e}` to stderr, exit 2 — the sole reader of the text",
+    "tests/v2/test_v21_migrate_semantics.py:798-807 and tests/v2/test_v21_kills3_T02a.py:385-389: a non-loading keep-approvals-from bundle -> exit 2 + 'refused' in err asserted; the specific phrase is not asserted",
+    "grep 'to keep approvals from does not load' over aisef2/ validation/ tests/ docs/: only bundle_cli.py:495"
+   ],
+   "exceptions_checked": [
+    "a saved/golden refusal compared byte for byte: none (docs/v2.1/evidence has no migrate/seal transcript)",
+    "a parser that reads the cause label to classify the refusal: none; readers key on exit 2",
+    "an operator needing to know WHICH input failed: the keep-approvals-from path is named on the command line and the class+message remain"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::exposure_of",
+   "index": 13,
+   "mutant": "L495 string ': ' emptied",
+   "class": "AUDITED",
+   "group": "T04-EXPOSURE-MESSAGE (see [12])",
+   "grounds": "`...does not load: {type(e).__name__}{e}`: the separator between the class name and the message is removed, so e.g. `KeyError'contracts'` renders run together instead of `KeyError: 'contracts'`. Every token (path/cause label, class name, message) is still present and exit 2 is unchanged (bundle_cli.py:1077-1081). Cosmetic spacing only. RAN tests.v2.test_v21_migrate_semantics against the mutant: SURVIVED (51 OK).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:1077-1081 main prints `refused: {e}` to stderr, exit 2 — the sole reader",
+    "tests/v2/test_v21_migrate_semantics.py:798-807 (code 2 + 'refused' only); no assertion on the ': ' between class name and message",
+    "grep over aisef2/ validation/ tests/ docs/: no parser splits this refusal on ': '"
+   ],
+   "exceptions_checked": [
+    "a reader that splits the message on ': ' to recover the class name: none (the class name is already available as type(e).__name__ in the other refusal arm, and no code parses this text)",
+    "a golden refusal compared byte for byte: none"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_known",
+   "index": 7,
+   "mutant": "L168 And swapped",
+   "class": "REFUTED",
+   "group": "T05-FIRST-ATTRIBUTION: _known's guard `and old not in known` keeps the release attribution of a migrated/kept approval; swapping it to `or` fabricates a cross-release provenance and breaks the documented 'first attribution' invariant.",
+   "grounds": "mutant_view: `if old is not None and old not in known:` -> `if old is not None or old not in known:` (bundle_cli.py:168, inside the per-release loop that sets `known[old], origin[old] = s.id, name`). The function docstring (L160-162) states 'an id two releases compile keeps the first attribution', and `origin` is the release a kept/migrated contract is attributed to. Two reachable behaviour changes the guard exists to prevent: (a) when a release's probe is byte-identical to the current active probe, `_earlier(s, release).id == s.id`, so `old` is already in `known` as a current id — the original keeps origin[old]='current', the mutant (`or`, since `old is not None` is True) OVERWRITES it to the release name; (b) with two RELEASES entries both compiling a spec to the same `old` id, the original keeps the first release (the `and old not in known` guard), the mutant overwrites with the later one. MEASURED (demo_known.py, run under tests.v2 import): a release R whose probes equal catalog.active() plus migrate(era_bundle(release=None)) (plan names this release's own spec ids) gives, ORIGINAL, one correct ground `{'release':'current'}, probe None, 'the plan names this release's own spec ids ... there is no earlier release whose capability to compare'` over all 8 contracts; MUTANT fabricates 5 grounds `{'release':'R', ...}` 'the probe is at capability N, the release's ... version did not move' — a false claim that the approvals were carried across a comparison with R (ARCHITECTURE-EXCEPTION-V2-007 identity rule). `origin` feeds report['approvals_kept_grounds'][].from.release/.ground, report['semantic_changes'][].from.release and report['mapping'][].from_release (migrate bundle_cli.py:397,407,438). RAN the registered kill file tests.v2.test_v21_migrate_semantics against the mutant: SURVIVED (51 OK) — because at this snapshot RELEASES has one entry ('2.0.0') and every 2.0.0 probe digest differs from current, so on LedgerLock and every fixture `old != s.id` and the overwrite never fires (verified: migrate(LedgerLock) report byte-identical orig vs mutant). The existing test test_a_bundle_already_of_this_release_loses_nothing (test_v21_migrate_semantics.py:489-497) already pins `[ground]=report['approvals_kept_grounds']` == a single {'release':'current'} group, but only under real RELEASES where the overwrite cannot arise. Not EQUIVALENT (observable, demonstrated); REFUTED because the owner (and the function's own docstring) depend on correct attribution and no test exercises the condition.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:183 _origins (known,origin=_known(specs)); reads origin[o.product_proof_spec_id] at :189 -> _earliest -> the release each contract is assessed from",
+    "aisef2/app/bundle_cli.py:389 migrate (known,origin=_known(current)); origin read at :397 into report['mapping'][old]['from_release']",
+    "aisef2/app/bundle_cli.py:407-408,438 _assess/_selected/_grounds consume _origins -> report['approvals_kept_grounds'], ['semantic_changes'], ['needs_owner_reapproval'] (owner-facing; the ground is the security justification for carrying an approval)",
+    "tests/v2/test_v21_migrate_semantics.py:489-497 (pins the exact {'release':'current'} ground but under real RELEASES), :499-505 (release_with uses digest=HEX/compiler f*64 != current, so old != s.id, overwrite not triggered); the kill file never sets a release probe equal to current nor adds a second release"
+   ],
+   "exceptions_checked": [
+    "the None branch (old is None): `_earlier` returns None only when the release has no probe for a kind; RELEASES['2.0.0'] holds all four SubjectKinds, so with shipped data old is never None and the mutant's `known[None]=...` pollution is unreachable now (it would arise for a release missing a kind's probe)",
+    "LedgerLock / all current fixtures: measured identical report orig vs mutant (every 2.0.0 probe digest differs from current => old != s.id); the gap is a release whose probe equals current, or >=2 releases compiling one spec to the same id — both constructible in a test, neither shipped",
+    "a non-migrate reader of _known: none (only _origins and migrate, grep over aisef2/)"
+   ],
+   "refutation": "A test is owed. Input: `with mock.patch.dict(bundle_cli.RELEASES, {'R': {'compiler_digest': bundle_cli.COMPILER_DIGEST, 'probes': {k:(e.probe_id,e.probe_digest,e.capability_version) for k,e in catalog.active().items()}}}): out, report = bundle_cli.migrate(era_bundle(release=None))`. Reader: report['approvals_kept_grounds']. Assert it is a single group with from=={'release':'current'}, probe is None, 'no earlier release whose capability to compare', covering all contracts (i.e. a spec whose `old` equals its current id keeps 'current' attribution, not 'R'). Under the `or` mutant this becomes >=2 'release R' grounds and `[ground] = report['approvals_kept_grounds']` raises ValueError. Complementary case for the docstring invariant: two RELEASES entries R1 (earlier) and R2 both compiling a given spec to the same old id, a bundle whose plan names that old id; assert report['mapping'][old]['from_release'] == 'R1' (first attribution); the mutant gives 'R2'."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_grounds",
+   "index": 3,
+   "mutant": "L306 sorted() -> list()",
+   "class": "AUDITED",
+   "group": "T03a-order-of-an-id-list: `sorted(kept)` -> `list(kept)` only reorders rows of report['approvals_kept_grounds'] and the ids within each row; the set of groups, their membership and their ground text are unchanged (cf. carried lint[4][5], except kept is a set so list() is non-deterministic).",
+   "grounds": "bundle_cli.py:306 `keys = {name: _group(...) for name in sorted(kept)}` -> `for name in list(kept)`. `kept` is a set[str] (bundle_cli.py:432 `{ap['contract_id'] for ap in candidate['approvals']}`), so `list(kept)` is hash-randomised (non-deterministic across processes). Effect: the insertion order of `keys` changes, which changes (i) the row order of the returned list (`dict.fromkeys(keys.values())`) and (ii) the order of ids in each row's `contracts` list; the representative chosen by `next(n for n in keys if keys[n]==key)` also changes, but all members of a group share probe/class/subject_absence/release/versions (the group key) and hence the same `consulted` and ground text, so `_ground` is identical regardless of representative. MEASURED on migrate(LedgerLock): orig vs mutant give the same 8 groups with identical membership and ground text (group-set-as-frozensets equal: True; whole report equal after canonicalising grounds order: True); only the row order and within-row id order differ, and 3 in-process runs reproduced a stable-but-reordered output. RAN the registered kill file tests.v2.test_v21_migrate_semantics against the mutant: SURVIVED (51 OK). Observable (so not EQUIVALENT), but no consumer depends on the order; AUDITED.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:438 migrate sets report['approvals_kept_grounds']=_grounds(kept, assessed, by_id); _grounds has no other caller (grep aisef2/ validation/ tests/)",
+    "tests/v2/test_v21_migrate_semantics.py reads grounds only order-insensitively: :386 `sorted(c for r in rows for c in r['contracts'])`, :389 `{(r['probe'],r['class']):r}`, :490 `[ground]=rows` (single group), :661-673 `sum(len(r['contracts']))`, `{r['probe'] for r in rows}`, per-row field checks and a probe->count map",
+    "aisef2/app/bundle_cli.py:1045 main prints json.dumps(report, indent=1, sort_keys=True): sort_keys orders dict keys, never list elements; the report is not hashed (only candidate['bundle_digest'] at :441 hashes the bundle, not the report)",
+    "docs/v2.1/USAGE-2.1.md:96 and docs/v2.1/REPORT.md:284 name approvals_kept_grounds without promising an order; no committed migrate/seal transcript exists (docs/v2.1/evidence has none)"
+   ],
+   "exceptions_checked": [
+    "an operator or script diffing two migrate runs of the same bundle: under the mutant the grounds rows and within-row ids reorder run-to-run (hash-randomised), unlike the carried lint[4][5] whose list() stays deterministic (it sorts a plan-ordered list) — but no code/test/doc consumes that order and the set of groups, membership and ground text is identical",
+    "a positional or whole-list consumer of approvals_kept_grounds (element [0], == a fixed-order list): none in tests/validation (grep); no golden pins it",
+    "a byte-stable/reproducible migrate report contract: none; the report is advisory and unhashed"
+   ]
+  }
+ ],
+ "owed_tests": [
+  "aisef2/app/bundle_cli.py::_known [7] (and->or): tests/v2/test_v21_migrate_semantics.py — migrate(era_bundle(release=None)) with RELEASES patched to include a release 'R' whose probes equal catalog.active() (compiler_digest=bundle_cli.COMPILER_DIGEST); assert report['approvals_kept_grounds'] is the single {'release':'current'}/probe None/'no earlier release whose capability to compare' group over all contracts (mutant gives >=2 'release R' grounds, so `[ground] = ...` raises). Complementary: two RELEASES entries both compiling one spec to the same old id; assert report['mapping'][old]['from_release'] is the earliest release (first attribution), which the mutant overwrites with the later."
+ ],
+ "notes": "All 7 new survivors SURVIVE the registered kill file tests.v2.test_v21_migrate_semantics (baseline 51 OK; each mutant 51 OK), confirming the campaign's SURVIVED. 5 AUDITED (exposure_of 1,2,3 except-drops re-routed to main's own exit-2 'refused' with only message wording changing; exposure_of 12,13 operator-read refusal strings; _grounds 3 report-order only, group set identical). 1 REFUTED: _known 7 (and->or) fabricates a false cross-release provenance in report['approvals_kept_grounds']/.from_release (demonstrated with a release whose probe equals current) and breaks the docstring's 'first attribution' invariant; it survives only because shipped RELEASES has one entry whose probe digests all differ from current, so no fixture triggers the overwrite. Kill-file run needed closure-evidence/v2/release/LEDGERLOCK-PROJECT.json (added via `git show 4ec961e:... >`); env ran nice -19 /opt/homebrew/bin/python3 -P -B with PATH stripped of every dir holding an opencode binary and HOME/TMPDIR/XDG_* under the run tree. No code or test was changed (measurement pinned)."
+}

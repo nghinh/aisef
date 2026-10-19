@@ -1,0 +1,249 @@
+{
+ "batch": "W2-bundle_cli-8",
+ "snapshot": "4ec961e706a1f7bda16d131037058c4fe9c2663f",
+ "file": "aisef2/app/bundle_cli.py",
+ "targets": [
+  "aisef2/app/bundle_cli.py::_group",
+  "aisef2/app/bundle_cli.py::with_commands"
+ ],
+ "role": "author",
+ "measured_on": "2026-10-19 (date: Mon Oct 19 19:04 +0700 2026)",
+ "method": "Author tree from git archive@4ec961e706a1f7bda16d131037058c4fe9c2663f (aisef2 aisef tests validation docs pyproject.toml) + closure-evidence/v2/release/LEDGERLOCK-PROJECT.json via git show. Per mutant: validation.v2.mutation.mutants(pristine_src, func, _enum_members(pristine_src, Path('.')))[INDEX]; desc asserted == the batch entry's mutant; mutated module written over aisef2/app/bundle_cli.py in a run-copy; env PATH without ~/.opencode/bin or ~/.npm-global/bin (the two dirs with an executable opencode), HOME/TMPDIR under the tree, PYTHONPATH=run-copy; nice -n 19 /opt/homebrew/bin/python3 -P -B -m unittest tests.v2.test_v21_migrate_semantics -q, one mutant at a time; module restored to pristine between mutants. Baseline unmutated: 51 OK.",
+ "kill_files": [
+  "tests/v2/test_v21_migrate_semantics.py"
+ ],
+ "measurement_result": "All 13 new survivors -> 51 tests OK (the sole registered kill file PASSES) == SURVIVED by measurement; no REFUTED-by-measurement. Matches campaign 9.",
+ "entries": [
+  {
+   "target": "aisef2/app/bundle_cli.py::_group",
+   "index": 3,
+   "mutant": "L282 returns None",
+   "class": "EQUIVALENT",
+   "group": "bundle_cli._group how-is-None branch (L282): the 1-tuple it returns is used by its sole consumer _grounds (L306-307) only as a dict grouping key and to pick a representative; it is never emitted, and _ground(None, key) (L288-291) ignores `key` entirely on the None branch, hard-coding from={'release':'current'}.",
+   "grounds": "At L281-282 `if how is None: return ('current',)` -> `return None`. _group's only caller is _grounds (grep '_group(' over aisef2/ validation/ tests/: def L277 + call L306 only). _grounds does keys={name:_group(...)}; groups by dict.fromkeys(keys.values()); for each key emits _ground(assessed.get(repr), key) plus the contract list. None and ('current',) are both 1-length sentinels; neither can equal any non-None how's 6-tuple, so the partition {how-None contracts} | {per-6-tuple groups} is byte-identical. For the None group _ground is called with how=None and returns the fixed 'current' dict WITHOUT reading key, so the emitted row (from={'release':'current'}, probe=None, contracts=[...]) is unchanged. MEASURED: ran the sole registered kill file tests/v2/test_v21_migrate_semantics (baseline 51 OK) against the mutant -> 51 OK == SURVIVED; test_a_bundle_already_of_this_release_loses_nothing (L484-496) exercises the all-None path and still sees [ground] with from={'release':'current'}, probe=None, len(contracts)=len(CONTRACTS).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:306-307 _grounds -- uses the return value only as a grouping key and representative selector, never emits it",
+    "aisef2/app/bundle_cli.py:288-291 _ground -- the how-is-None branch returns a constant dict and does not read `key`",
+    "tests/v2/test_v21_migrate_semantics.py:484-496 test_a_bundle_already_of_this_release_loses_nothing -- the only all-None-group test; asserts the emitted from/probe/contracts, all produced by _ground not _group"
+   ],
+   "exceptions_checked": [
+    "the literal 'current' that appears in the report comes from _ground L290 ({'release':'current'}), NOT from _group -- so _group's sentinel string is never surfaced",
+    "no 1-tuple equals a 6-tuple, so no group ever merges across the None / non-None boundary"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_group",
+   "index": 10,
+   "mutant": "L282 string 'current' emptied",
+   "class": "EQUIVALENT",
+   "group": "bundle_cli._group how-is-None branch (L282): the 1-tuple it returns is used by its sole consumer _grounds (L306-307) only as a dict grouping key and to pick a representative; it is never emitted, and _ground(None, key) (L288-291) ignores `key` entirely on the None branch, hard-coding from={'release':'current'}.",
+   "grounds": "At L282 `return ('current',)` -> `return ('',)`. Same argument as index 3: the returned 1-tuple is only a grouping key in _grounds; ('',) still never collides with any 6-tuple, all how-None contracts still map to one identical sentinel, and _ground(None,key) ignores key and hard-codes from={'release':'current'} (L290). The string 'current' is emitted only by _ground, never by _group, so emptying _group's copy changes no output byte. MEASURED: kill file tests/v2/test_v21_migrate_semantics against the mutant -> 51 OK == SURVIVED; test_a_bundle_already_of_this_release_loses_nothing still passes (its asserted from={'release':'current'} is _ground's).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:306-307 _grounds -- value used only for equality-grouping; the sentinel's text is irrelevant to grouping",
+    "aisef2/app/bundle_cli.py:290 _ground -- supplies the emitted 'current' string independently"
+   ],
+   "exceptions_checked": [
+    "grep ''current'' in approvals_kept_grounds: the only emitter is _ground L290, pinned by test L491 (ground['from']=={'release':'current'}); _group's sentinel is dead w.r.t. output"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_group",
+   "index": 7,
+   "mutant": "L283 element 3 dropped",
+   "class": "EQUIVALENT",
+   "group": "bundle_cli._group grouping-key fields that are functionally constant or determined at snapshot 4ec961e: RELEASES has the single entry '2.0.0' (L121-126) so every assessed contract's from.release=='2.0.0' and from.capability_version==1; to.capability_version is a function of the subject kind, hence of the probe (element 0, retained). Dropping a field that is constant across all groups, or determined by a retained field, leaves the equivalence relation -- and so the partition and every emitted row -- unchanged.",
+   "grounds": "Drops how['from']['release'] (element 3) from the 6-tuple key. _assess (L218-262) sets from.release = `name` = origins.get(cid); _origins (L178-189) returns a RELEASES name or 'current'; RELEASES has exactly one entry '2.0.0' (L121). Contracts with origin 'current' are skipped by _assess (L230 continue) so they take the None branch, never this 6-tuple. Hence for EVERY contract reaching this line from.release=='2.0.0' -- a constant. A constant field never discriminates any pair, so the partition is identical; and the representative's emitted from.release is '2.0.0' with or without it in the key. MEASURED (facts): pristine migrate of the committed LedgerLock 2.0.0 bundle shows from.release=='2.0.0' on all 8 ground rows; kill file -> 51 OK == SURVIVED.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:306-307 _grounds -- grouping key only",
+    "aisef2/app/bundle_cli.py:283 key[2] reader in _ground is UNAFFECTED (element 3 is after position 2, so key[2] still = subject_absence)",
+    "tests/v2/test_v21_migrate_semantics.py:657 test_the_ground_of_the_53_kept... -- per-probe counts {fa:3,cli:10,proc:34,py:6} unchanged under the mutant"
+   ],
+   "exceptions_checked": [
+    "if RELEASES listed >=2 releases AND two same-(probe,class,subject_absence,from_cap,to_cap) contracts had different origins, this drop would wrongly merge them -- not possible at this snapshot (single release '2.0.0')"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_group",
+   "index": 8,
+   "mutant": "L283 element 4 dropped",
+   "class": "EQUIVALENT",
+   "group": "bundle_cli._group grouping-key fields that are functionally constant or determined at snapshot 4ec961e: RELEASES has the single entry '2.0.0' (L121-126) so every assessed contract's from.release=='2.0.0' and from.capability_version==1; to.capability_version is a function of the subject kind, hence of the probe (element 0, retained). Dropping a field that is constant across all groups, or determined by a retained field, leaves the equivalence relation -- and so the partition and every emitted row -- unchanged.",
+   "grounds": "Drops how['from']['capability_version'] (base, element 4). _assess L233 base = then[2] if then else 1, then = RELEASES['2.0.0']['probes'][kind]; for all four kinds the release tuple's [2] is 1 (L123-126), and every kind is listed so the `else 1` default is not taken. Hence base==1 for every assessed contract -- a constant -- so dropping it changes no equivalence class. key[2] (subject_absence) unaffected (element 4 is after position 2). MEASURED: pristine LedgerLock grounds show from.capability_version==1 on all 8 rows; kill file -> 51 OK == SURVIVED.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:306-307 _grounds -- grouping key only",
+    "aisef2/app/bundle_cli.py:283 _ground key[2] -- unaffected; from.capability_version in the row comes from how['from'], not the key",
+    "tests/v2/test_v21_migrate_semantics.py:657,383 -- from.capability_version asserted ==1 via how['from'], still correct"
+   ],
+   "exceptions_checked": [
+    "base would vary only if a release recorded a non-1 base version for a kind, or the kind were unlisted (-> default 1); at this snapshot all four kinds record base 1 under the sole release"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_group",
+   "index": 9,
+   "mutant": "L283 element 5 dropped",
+   "class": "EQUIVALENT",
+   "group": "bundle_cli._group grouping-key fields that are functionally constant or determined at snapshot 4ec961e: RELEASES has the single entry '2.0.0' (L121-126) so every assessed contract's from.release=='2.0.0' and from.capability_version==1; to.capability_version is a function of the subject kind, hence of the probe (element 0, retained). Dropping a field that is constant across all groups, or determined by a retained field, leaves the equivalence relation -- and so the partition and every emitted row -- unchanged.",
+   "grounds": "Drops how['to']['capability_version'] (top, element 5). _assess L235 top = entry.capability_version, entry = catalog.active()[c.subject.kind]; probe (element 0, retained) = entry.probe_id. The four active kinds map to four distinct probe_ids (file_artifact / python_callable_v2 / cli_invocation / process_effect), so equal probe => equal kind => equal entry => equal top. top is thus functionally determined by the retained `probe`, so dropping it from the key merges nothing; the representative's emitted to.capability_version is unchanged. MEASURED: pristine LedgerLock grounds show to.capability_version 3 for file_artifact and 1 for the other three probes, constant within each probe; kill file -> 51 OK == SURVIVED.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:306-307 _grounds -- grouping key only",
+    "aisef2/app/bundle_cli.py:283 _ground key[2] -- unaffected; to in the row comes from how['to']",
+    "tests/v2/test_v21_migrate_semantics.py:657 -- 'did not move' rows (to_cap==1) and the fa consulted [2,3] (to_cap==3) still produced correctly"
+   ],
+   "exceptions_checked": [
+    "if two distinct active kinds shared a probe_id but differed in capability_version, this drop could merge them; the active catalog maps each of the 4 kinds to a distinct probe_id, so that cannot occur"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_group",
+   "index": 4,
+   "mutant": "L283 element 0 dropped",
+   "class": "REFUTED",
+   "group": "bundle_cli._group: dropping any element at or before position 2 shifts key[2], which _ground (L289) emits as the 'subject_absence' field of every assessed approvals_kept_grounds row. With element<=2 dropped, key[2] becomes from.release ('2.0.0'), so the documented grounds field is replaced by the release string. That field is documented (docs/v2.1/USAGE-2.1.md:96, module docstring L72 & L278) and printed to the operator, but NO test asserts subject_absence inside approvals_kept_grounds, so the sole kill file does not kill it.",
+   "refutation": "Owed: T-GROUNDS-ABSENCE. Input: the committed LedgerLock 2.0.0 bundle already loaded by the fixture (TheLedgerLockBundle, tests/v2/test_v21_migrate_semantics.py:638-641). Reader: the operator reading approvals_kept_grounds[*]['subject_absence'] (documented docs/v2.1/USAGE-2.1.md:96 and docstring L72/L278). Sketch: in test_the_ground_of_the_53_kept_approvals_is_read_not_counted (L657) add assertions that (a) {(r['probe'],r['class'],r['subject_absence']) for r in rows} equals the 8 known triples -- e.g. (probe.file_artifact,'exists','ABSENCE_IS_DECIDABLE') and (probe.process_effect,'scenario_files','REQUIRES_SUBJECT') -- so subject_absence is never the release '2.0.0' (kills idx 4 and 6); and (b) len(rows)==8 keyed by (probe,class), so merging the three process_effect classes / three cli_invocation classes into one row is caught (kills idx 5). Measured proof the mutants need killing: under each of idx 4/5/6 the emitted {subject_absence for r in rows} == {'2.0.0'} (vs {'ABSENCE_IS_DECIDABLE','REQUIRES_SUBJECT'} pristine); idx 5 additionally drops the row count 8 -> 4.",
+   "grounds": "Drops how['probe'] (element 0): key becomes (class, subject_absence, '2.0.0', 1, to_cap), so key[2]=='2.0.0'. _ground L289 emits 'subject_absence': key[2], so every assessed grounds row reports subject_absence=='2.0.0' instead of the true absence. MEASURED: mutated migrate of the LedgerLock bundle -> emitted subject_absence set == {'2.0.0'} (pristine {'ABSENCE_IS_DECIDABLE','REQUIRES_SUBJECT'}); row count stays 8 and per-probe counts unchanged (fa to_cap=3 vs py to_cap=1 keep the two 'exists' rows apart). Kill file -> 51 OK == SURVIVED, because no test reads grounds subject_absence. Observable, documented, operator-read -> a test is owed.",
+   "consumers_checked": [
+    "docs/v2.1/USAGE-2.1.md:96 -- documents approvals_kept_grounds as 'probe, lop, subject_absence, cac phien ban capability' (names subject_absence as a reported field)",
+    "aisef2/app/bundle_cli.py:72 & :278 docstrings -- 'the probe, the class, the contract's subject_absence ...'",
+    "aisef2/app/bundle_cli.py:1079 main -> print(json.dumps({...**report})) -- the operator reads the field in the migrate report",
+    "tests/v2/test_v21_migrate_semantics.py:657,383 -- read approvals_kept_grounds but do NOT assert subject_absence (gap)"
+   ],
+   "exceptions_checked": [
+    "git grep over aisef2/ validation/ tests/ for a code reader of approvals_kept_grounds[*]['subject_absence']: none (only the producer, the two grounds tests which skip the field, and the docs) -- so no code consumer, but a document + the operator depend on it",
+    "the subject_absence asserted at test L368/L652 reads report['semantic_changes'], a different code path (migrate L427), not _group/_ground"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_group",
+   "index": 5,
+   "mutant": "L283 element 1 dropped",
+   "class": "REFUTED",
+   "group": "bundle_cli._group: dropping any element at or before position 2 shifts key[2], which _ground (L289) emits as the 'subject_absence' field of every assessed approvals_kept_grounds row. With element<=2 dropped, key[2] becomes from.release ('2.0.0'), so the documented grounds field is replaced by the release string. That field is documented (docs/v2.1/USAGE-2.1.md:96, module docstring L72 & L278) and printed to the operator, but NO test asserts subject_absence inside approvals_kept_grounds, so the sole kill file does not kill it.",
+   "refutation": "Owed: T-GROUNDS-ABSENCE. Input: the committed LedgerLock 2.0.0 bundle already loaded by the fixture (TheLedgerLockBundle, tests/v2/test_v21_migrate_semantics.py:638-641). Reader: the operator reading approvals_kept_grounds[*]['subject_absence'] (documented docs/v2.1/USAGE-2.1.md:96 and docstring L72/L278). Sketch: in test_the_ground_of_the_53_kept_approvals_is_read_not_counted (L657) add assertions that (a) {(r['probe'],r['class'],r['subject_absence']) for r in rows} equals the 8 known triples -- e.g. (probe.file_artifact,'exists','ABSENCE_IS_DECIDABLE') and (probe.process_effect,'scenario_files','REQUIRES_SUBJECT') -- so subject_absence is never the release '2.0.0' (kills idx 4 and 6); and (b) len(rows)==8 keyed by (probe,class), so merging the three process_effect classes / three cli_invocation classes into one row is caught (kills idx 5). Measured proof the mutants need killing: under each of idx 4/5/6 the emitted {subject_absence for r in rows} == {'2.0.0'} (vs {'ABSENCE_IS_DECIDABLE','REQUIRES_SUBJECT'} pristine); idx 5 additionally drops the row count 8 -> 4.",
+   "grounds": "Drops how['class'] (element 1): key becomes (probe, subject_absence, '2.0.0', 1, to_cap), key[2]=='2.0.0'. Two observable defects: (1) every assessed grounds row reports subject_absence=='2.0.0'; (2) the key no longer separates classes, so within a probe the per-class rows collapse. MEASURED: mutated LedgerLock migrate -> emitted subject_absence set == {'2.0.0'}, and the ground-row count drops 8 -> 4 (process_effect's scenario_files/raises/returns merge to one row, cli_invocation's equality/exits_files/exits merge to one). Per-probe counts (summed across classes) stay {fa:3,cli:10,proc:34,py:6}, which is all the kill file checks, so it -> 51 OK == SURVIVED. The lost per-class breakdown and the corrupted subject_absence are both operator-read and documented -> a test is owed.",
+   "consumers_checked": [
+    "docs/v2.1/USAGE-2.1.md:96 -- names subject_absence (and 'lop'/class) as grounds fields",
+    "aisef2/app/bundle_cli.py:72 & :278 docstrings; :1079 operator print",
+    "tests/v2/test_v21_migrate_semantics.py:657 -- checks per-PROBE counts and the set of probes, but neither the row count nor per-class subject_absence (gap)"
+   ],
+   "exceptions_checked": [
+    "the per-probe totals are preserved under class-collapse, so the one count assertion the kill file has cannot see it",
+    "test L383 (small fixture) indexes by[(probe,class)] but only for (fa,'exists') and (py,'returns'); those keys survive the collapse there, so it does not catch idx 5 either"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_group",
+   "index": 6,
+   "mutant": "L283 element 2 dropped",
+   "class": "REFUTED",
+   "group": "bundle_cli._group: dropping any element at or before position 2 shifts key[2], which _ground (L289) emits as the 'subject_absence' field of every assessed approvals_kept_grounds row. With element<=2 dropped, key[2] becomes from.release ('2.0.0'), so the documented grounds field is replaced by the release string. That field is documented (docs/v2.1/USAGE-2.1.md:96, module docstring L72 & L278) and printed to the operator, but NO test asserts subject_absence inside approvals_kept_grounds, so the sole kill file does not kill it.",
+   "refutation": "Owed: T-GROUNDS-ABSENCE. Input: the committed LedgerLock 2.0.0 bundle already loaded by the fixture (TheLedgerLockBundle, tests/v2/test_v21_migrate_semantics.py:638-641). Reader: the operator reading approvals_kept_grounds[*]['subject_absence'] (documented docs/v2.1/USAGE-2.1.md:96 and docstring L72/L278). Sketch: in test_the_ground_of_the_53_kept_approvals_is_read_not_counted (L657) add assertions that (a) {(r['probe'],r['class'],r['subject_absence']) for r in rows} equals the 8 known triples -- e.g. (probe.file_artifact,'exists','ABSENCE_IS_DECIDABLE') and (probe.process_effect,'scenario_files','REQUIRES_SUBJECT') -- so subject_absence is never the release '2.0.0' (kills idx 4 and 6); and (b) len(rows)==8 keyed by (probe,class), so merging the three process_effect classes / three cli_invocation classes into one row is caught (kills idx 5). Measured proof the mutants need killing: under each of idx 4/5/6 the emitted {subject_absence for r in rows} == {'2.0.0'} (vs {'ABSENCE_IS_DECIDABLE','REQUIRES_SUBJECT'} pristine); idx 5 additionally drops the row count 8 -> 4.",
+   "grounds": "Drops how['subject_absence'] (contracts[name].subject_absence.value, element 2): key becomes (probe, class, '2.0.0', 1, to_cap), key[2]=='2.0.0'. _ground L289 emits 'subject_absence': key[2]=='2.0.0' for every assessed row, i.e. the field it is named after is replaced by the release string. MEASURED: mutated LedgerLock migrate -> emitted subject_absence set == {'2.0.0'} (pristine {'ABSENCE_IS_DECIDABLE','REQUIRES_SUBJECT'}); row count stays 8, per-probe counts unchanged. Kill file -> 51 OK == SURVIVED (no test reads grounds subject_absence). Observable, documented, operator-read -> a test is owed.",
+   "consumers_checked": [
+    "docs/v2.1/USAGE-2.1.md:96 -- names subject_absence as a reported grounds field",
+    "aisef2/app/bundle_cli.py:72,:278 docstrings; :1079 operator print of the report",
+    "tests/v2/test_v21_migrate_semantics.py:657,383 -- read grounds but never assert subject_absence (gap)"
+   ],
+   "exceptions_checked": [
+    "subject_absence is ALSO emitted in report['semantic_changes'] (migrate L427, pinned by L368/L652) -- a different code path unaffected by this mutant, so those tests stay green",
+    "within a (probe,class) the kept LedgerLock contracts share one subject_absence, so dropping it from the key merges no rows (count stays 8); the corruption is purely in the emitted value"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::with_commands",
+   "index": 3,
+   "mutant": "L349 returns None",
+   "class": "REFUTED",
+   "group": "bundle_cli.with_commands no-reapproval branch (L348-349): returns None instead of dict(report); the CLI then indexes report['candidate'] (L1075) and spreads {**report} (L1079).",
+   "refutation": "Owed: T-MIGRATE-NO-REAPPROVAL. Input: a format-2.0.0 bundle whose migrate yields needs_owner_reapproval None -- the existing era_bundle(release=None) already used by test_a_bundle_already_of_this_release_loses_nothing (L484) -- fed through the CLI: run_main('migrate', <that bundle written to a temp file>, '--out', out). Reader: main() L1073-1079 and the operator. Sketch: assert (code, err) == (0, '') and printed['needs_owner_reapproval'] is None and 'file_sha256' in printed['candidate']. Under the mutant with_commands returns None, L1075 report['candidate'] raises TypeError, caught at L1081-1083 -> stderr 'refused: TypeError: ...' and exit 2 (the output file was already created at L1072), so the assertion fails. Kills idx 3.",
+   "grounds": "L348-349 `if todo is None: return dict(report)` -> `return None`. The dict(report) copy is what the CLI keeps operating on: L1075 report['candidate']['file_sha256']=... and L1079 print(json.dumps({'written':..., **report})). migrate (L440) sets needs_owner_reapproval to None whenever nothing needs reapproval (e.g. a bundle already of this release); such a bundle still migrates (test_a_bundle_already... L484-496, test_a_release_already... L498). MEASURED (facts): with todo=None, with_commands returns NoneType under the mutant and the CLI's next op report['candidate'] raises TypeError 'NoneType object is not subscriptable'; main catches it (L1081) -> exit 2 'refused'. The reapproval-present path (LedgerLock, 6 contracts) is unaffected -- that is why the kill file, which only ever calls with_commands on reapproval-present reports (L427,445,696), -> 51 OK == SURVIVED.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:1073-1075 main -- report = with_commands(report, a.out); report['candidate']['file_sha256']=...  (requires a dict even when todo is None)",
+    "aisef2/app/bundle_cli.py:1079 main -- print(json.dumps({'written':str(a.out), **report})) (None would raise on **)",
+    "tests/v2/test_v21_migrate_semantics.py:427,445,696 -- every with_commands call passes a reapproval-present report; none exercises the todo-None branch",
+    "aisef2/app/bundle_cli.py:1057-1060 continue_from path -- does NOT call with_commands, so unaffected"
+   ],
+   "exceptions_checked": [
+    "the todo-None branch is reachable from the CLI `migrate` command only (the sole with_commands caller, L1073); no test runs `migrate` on a no-reapproval bundle, so the gap is real",
+    "the direct-call tests test_a_bundle_already... / test_a_release_already... use migrate() and never with_commands, so they cannot catch this"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::with_commands",
+   "index": 15,
+   "mutant": "L358 dict entry 0 dropped",
+   "class": "EQUIVALENT",
+   "group": "bundle_cli.with_commands return dict (L358): the leading **todo spread, whose only key is overwritten.",
+   "grounds": "L358 `{**todo, 'contracts': rows, 'then':..., 'how':...}` -> `{'contracts': rows, 'then':..., 'how':...}` (drops **todo). todo = report['needs_owner_reapproval']; migrate is the sole producer of that field (grep 'needs_owner_reapproval' : set only at bundle_cli.py L440 to exactly {'contracts': reapprove}, else None). So when the L358 branch is reached (todo not None) todo has the single key 'contracts', which **todo would contribute and which is then overwritten by 'contracts': rows. Dropping **todo therefore removes only a key that is set again on the same line -> identical dict. MEASURED (facts): pristine and mutant both yield needs_owner_reapproval keys == ['contracts','how','then'] with identical values; kill file -> 51 OK == SURVIVED.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:440 migrate -- the only producer of needs_owner_reapproval; value is {'contracts': reapprove} (one key) or None",
+    "tests/v2/test_v21_migrate_semantics.py:427-433 -- asserts how (contains 'nothing was signed') and then; both are the explicit L358-363 keys, unaffected"
+   ],
+   "exceptions_checked": [
+    "if with_commands were applied to its OWN output (todo would then carry 'then'/'how') or to some other report whose needs_owner_reapproval had extra keys, **todo would matter -- but no reachable path re-applies with_commands, and migrate is the sole producer with exactly {'contracts':...}"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::with_commands",
+   "index": 19,
+   "mutant": "L350 string 'candidate.json' emptied",
+   "class": "REFUTED",
+   "group": "bundle_cli.with_commands out=None default (L350): `out or pathlib.Path('candidate.json')` -> `pathlib.Path('')`; the documented default output name for the no-out call.",
+   "refutation": "Owed: T-WC-DEFAULT-OUT. Input: migrate(self.before)[1] (a reapproval-present report; self.before is the small fixture bundle). Reader: the docstring contract at L343 ('candidate.json when none is given') and any caller using the out=None default (the function signature invites it). Sketch: call bundle_cli.with_commands(report) with NO out argument and assert report['needs_owner_reapproval']['contracts'][0]['reads'] == 'candidate.json' (and no exception). Under the mutant first = Path('') = Path('.'), and the first loop iteration does Path('.').with_name(...) which raises ValueError \"PosixPath('.') has an empty name\" -- so the assertion (and the call) fail. Kills idx 19.",
+   "grounds": "L350 `first = out or pathlib.Path('candidate.json')` -> `pathlib.Path('')`. Only matters when out is falsy (None). The migrate CLI always passes a.out (argparse --out required=True, L1032), and every test call passes an explicit path (tests L243,119,427,445,696), so no current caller/test hits the default -- which is exactly why the kill file -> 51 OK == SURVIVED. But the default is a documented, signature-level feature (docstring L343; docs/v2.1/USAGE-2.1.md:74 uses 'candidate.json' as the canonical out). MEASURED (facts): with_commands(report, None) under the mutant raises ValueError \"PosixPath('.') has an empty name\" (pristine: reads[0]=='candidate.json'). An untested, documented code path whose mutant breaks it -> a test is owed.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:343 docstring -- 'the first reads the candidate (out, the file it is written to; candidate.json when none is given)'",
+    "aisef2/app/bundle_cli.py:341 signature -- out: pathlib.Path | None = None (the no-out call is a supported shape)",
+    "aisef2/app/bundle_cli.py:1073 main -- passes a.out (required=True L1032), never None, so the CLI never exercises the default",
+    "tests/v2/*.py with_commands(...) call sites -- all pass an explicit out (grep 'with_commands(')"
+   ],
+   "exceptions_checked": [
+    "if --out were optional or any caller relied on the default, the empty string would silently (then loudly, via ValueError) break the printed command chain; at this snapshot no caller does, so this is a coverage gap on a documented default rather than a live-path break"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::with_commands",
+   "index": 28,
+   "mutant": "L353 string '.approved-' emptied",
+   "class": "REFUTED",
+   "group": "bundle_cli.with_commands chain filename (L353): `f'{stem}.approved-{n}{suffix}'` -> `f'{stem}{n}{suffix}'`; the documented, operator-facing name of each file a printed approve command writes.",
+   "refutation": "Owed: T-WC-APPROVED-INFIX. Input: migrate(self.before)[1] with an explicit out (e.g. Path(t)/'candidate.json'). Reader: the operator who runs the printed commands and sees the written/read file names, and the docstring L344 ('<stem>.approved-N<suffix>, beside it'). Sketch: in test_the_printed_commands_name_the_candidate_and_chain (L420) add assert rows[0]['writes'].endswith('.approved-1.json') (or regex r'candidate\\.approved-\\d+\\.json$' on each writes). Under the mutant writes are candidate1.json, candidate2.json, ... so the assertion fails. Kills idx 28.",
+   "grounds": "L353 drops the '.approved-' infix so chained files become <stem><n><suffix>. MEASURED (facts): pristine writes = candidate.approved-1.json, candidate.approved-2.json, ..., then = '...lint .../candidate.approved-6.json'; mutant writes = candidate1.json, candidate2.json, ..., then candidate6.json. The files stay distinct and still chain (reads[k]==writes[k-1]), which is ALL the kill file checks (L429-433: 'nothing was signed', chaining, distinct writes, then==lint of last), so it -> 51 OK == SURVIVED. The '.approved-N' scheme is documented (docstring L344) and the file names are read by the operator, so dropping the label is not harmless -> a test is owed to pin it.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:344 docstring -- documents '<stem>.approved-N<suffix>, beside it'",
+    "the operator -- runs the printed `approve ... --out <name>` commands and sees reads/writes; docs/v2.1/USAGE-2.1.md:94 documents the chain with 'duong dan that' (real paths)",
+    "tests/v2/test_v21_migrate_semantics.py:420-437 -- asserts chaining and distinctness but NOT the '.approved-' infix (gap)"
+   ],
+   "exceptions_checked": [
+    "no code re-derives or parses the '.approved-' infix: the chain uses the here/nxt Path values directly (L351-357), so mechanically the mutant still produces a valid, distinct, chained set -- the loss is the documented/human-meaningful label only",
+    "new names do not collide with the input (candidate.json vs candidate1.json), so the distinctness assertion the kill file has cannot catch it"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::with_commands",
+   "index": 34,
+   "mutant": "L361 string ' by `human:` and your name (`approve` refuses the placeholder); run them in order, each reads what the one before wrote; `then` lints the last.' emptied",
+   "class": "REFUTED",
+   "group": "bundle_cli.with_commands operator 'how' instruction (L360-363): the procedural tail of the needs_owner_reapproval 'how' string is emptied, truncating it mid-sentence at 'Replace human:NAME'.",
+   "refutation": "Owed: T-WC-HOW-GUIDANCE. Input: migrate(self.before)[1] (reapproval-present). Reader: the operator reading report['needs_owner_reapproval']['how'] -- the only place that tells them how to use the printed commands. Sketch: strengthen the L429 assertion from just 'nothing was signed' to also require the procedural guidance, e.g. assert all(s in how for s in ('refuses the placeholder', 'run them in order', 'lints the last')). Under the mutant how ends at '...Replace human:NAME' so those substrings are absent and the assertion fails. Kills idx 34.",
+   "grounds": "L360-363 emptying the tail leaves how == 'nothing was signed. Each command writes a new file: the one it reads and one more approval, by the human named in --approver, who has read the contract and the change above. Replace human:NAME'. MEASURED (facts): pristine how ends '...run them in order, each reads what the one before wrote; `then` lints the last.'; mutant how truncates at 'Replace human:NAME'. The sole kill-file assertion on how is assertIn('nothing was signed', how) (L429), which is at the start and survives, so the kill file -> 51 OK == SURVIVED. The 'how' field is purely operator-facing guidance (it instructs replacing the placeholder, running in order, linting last); per the owner rule a string read by an operator is not harmless -> a test is owed to pin it.",
+   "consumers_checked": [
+    "the operator -- report['needs_owner_reapproval']['how'] is the human instruction for the reapproval procedure; printed at main L1079",
+    "docs/v2.1/USAGE-2.1.md:94 -- documents the same procedure (placeholder human:NAME, chaining, then=lint of last)",
+    "tests/v2/test_v21_migrate_semantics.py:429 -- asserts only 'nothing was signed' in how (gap for the procedural tail)"
+   ],
+   "exceptions_checked": [
+    "no code reads/parses 'how'; it is operator prose only -- but the owner rule treats an operator-read string as load-bearing, and the preserved 'nothing was signed' head does not carry the procedure the tail states",
+    "the placeholder-refusal behaviour itself is pinned by test_a_printed_command_pasted_as_it_is_signs_nothing (L439); but that tests `approve`, not the 'how' text that advertises it"
+   ]
+  }
+ ],
+ "owed_tests": [
+  "T-GROUNDS-ABSENCE (tests/v2/test_v21_migrate_semantics.TheLedgerLockBundle, extend test_the_ground_of_the_53_kept_approvals_is_read_not_counted, L657): input = the committed LedgerLock 2.0.0 bundle (already in the fixture). Reader = operator + docs/v2.1/USAGE-2.1.md:96 + docstring L72/L278. Assert (a) {(r['probe'],r['class'],r['subject_absence']) for r in rows} == the 8 known triples so subject_absence is never the release '2.0.0' (kills _group idx 4 and 6); (b) len(rows)==8 keyed by (probe,class), so the process_effect/cli_invocation per-class rows are not merged (kills _group idx 5).",
+  "T-MIGRATE-NO-REAPPROVAL (tests/v2/test_v21_migrate_semantics, new CLI test): input = a format-2.0.0 bundle that migrates to needs_owner_reapproval None (era_bundle(release=None), as in test_a_bundle_already..., written to a temp file). Reader = main() L1073-1079 + operator. run_main('migrate', src, '--out', out) must give (code,err)==(0,'') with printed['needs_owner_reapproval'] is None and 'file_sha256' in printed['candidate'] (kills with_commands idx 3; under it the CLI exits 2 'refused: TypeError').",
+  "T-WC-DEFAULT-OUT (tests/v2/test_v21_migrate_semantics, new): input = migrate(self.before)[1]. Reader = docstring L343 default. Call bundle_cli.with_commands(report) with no out; assert contracts[0]['reads']=='candidate.json' and no exception (kills with_commands idx 19; under it it raises ValueError on Path('').with_name).",
+  "T-WC-APPROVED-INFIX (tests/v2/test_v21_migrate_semantics, extend test_the_printed_commands_name_the_candidate_and_chain, L420): input = migrate(self.before)[1] with explicit out. Reader = operator + docstring L344. Assert each row['writes'] matches r'\\.approved-\\d+\\.<suffix>$' (kills with_commands idx 28; under it writes are <stem><n><suffix>).",
+  "T-WC-HOW-GUIDANCE (tests/v2/test_v21_migrate_semantics, extend L429): input = migrate(self.before)[1]. Reader = operator reading the 'how' field. Assert how contains 'refuses the placeholder' and 'run them in order' and 'lints the last' (kills with_commands idx 34; under it how truncates at 'Replace human:NAME')."
+ ],
+ "notes": "Target bundle_cli.py::_group (8 new survivors, idx 3-10) and ::with_commands (5 new survivors, idx 3/15/19/28/34); batch 'carried' is empty. Sole registered kill file for BOTH targets at this snapshot is tests/v2/test_v21_migrate_semantics.py (validation/v2/mutation.py _V21_R5B_NEW L1182-1183; V21_TARGETS confirmed). Measurement: author tree from git archive@4ec961e; closure-evidence/v2/release/LEDGERLOCK-PROJECT.json added via git show (the kill file's LedgerLock fixture reads it); each mutant built from a pristine copy via validation.v2.mutation.mutants(src, func, _enum_members(src,'.'))[INDEX] with desc asserted == the batch entry's mutant string, written over aisef2/app/bundle_cli.py in a run-copy; PATH stripped of both dirs holding an executable opencode (~/.opencode/bin, ~/.npm-global/bin), HOME/TMPDIR under the tree, PYTHONPATH=run-copy, nice -n 19 /opt/homebrew/bin/python3 -P -B -m unittest tests.v2.test_v21_migrate_semantics -q, one mutant at a time. Baseline unmutated: 51 tests OK. RESULT: all 13 mutants -> 51 OK == SURVIVED by measurement, matching the campaign; NONE is REFUTED-by-measurement (the sole kill file does not exercise grounds subject_absence, the per-class row count, the with_commands todo-None / out=None paths, the chain filename infix, or the 'how' tail). Classification: 6 EQUIVALENT (proven from code) + 7 REFUTED (real test gaps, each with an owed test). _group: idx 3 & 10 EQUIVALENT (None-branch sentinel is a grouping key only, never emitted; _ground ignores it); idx 7 & 8 EQUIVALENT (from.release=='2.0.0' and from.capability_version==1 are constants -- RELEASES has the single entry '2.0.0'); idx 9 EQUIVALENT (to.capability_version is a function of the retained probe); idx 4/5/6 REFUTED (dropping element<=2 makes _ground emit from.release as the documented 'subject_absence' grounds field; idx 5 also collapses the per-class rows 8->4). with_commands: idx 15 EQUIVALENT (the **todo spread's only key 'contracts' is overwritten; migrate L440 is the sole producer with exactly {'contracts':...}); idx 3 REFUTED (returns None on the no-reapproval branch -> the CLI's report['candidate'] index raises, exit 2); idx 19 REFUTED (documented out=None default 'candidate.json', untested -- mutant raises ValueError on Path('')); idx 28 REFUTED (documented '.approved-N' chain filename infix); idx 34 REFUTED (operator 'how' instruction tail). No code or tests were changed; closure-evidence was not modified (only LEDGERLOCK-PROJECT.json copied read-only into the run tree). Facts timestamped via date: 2026-10-19 ~19:04 +0700."
+}

@@ -1,0 +1,198 @@
+{
+ "batch": "W2-lineage-9",
+ "file": "aisef2/app/lineage.py",
+ "targets": [
+  "aisef2/app/lineage.py::_claimed_run",
+  "aisef2/app/lineage.py::_in_the_way",
+  "aisef2/app/lineage.py::claims",
+  "aisef2/app/lineage.py::not_there",
+  "aisef2/app/lineage.py::read_anchor",
+  "aisef2/app/lineage.py::unread_runs",
+  "aisef2/app/lineage.py::write_anchor"
+ ],
+ "new": [
+  {
+   "target": "aisef2/app/lineage.py::claims",
+   "index": 13,
+   "mutant": "L154 string ': ' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::claims",
+   "index": 14,
+   "mutant": "L154 string '): a lineage cannot be known from a directory this process may not list and search \u2014 restore its permissions (nothing was taken or released)' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::claims",
+   "index": 15,
+   "mutant": "L154 Or swapped"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_in_the_way",
+   "index": 10,
+   "mutant": "L222 element 1 dropped"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_in_the_way",
+   "index": 16,
+   "mutant": "L221 string ')' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::unread_runs",
+   "index": 2,
+   "mutant": "L784 string 'the runs named below' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::unread_runs",
+   "index": 3,
+   "mutant": "L784 string ', ' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_claimed_run",
+   "index": 8,
+   "mutant": "L135 string 'not a claim' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::not_there",
+   "index": 4,
+   "mutant": "L455 string 'winerror' emptied"
+  }
+ ],
+ "carried": [
+  {
+   "target": "aisef2/app/lineage.py::write_anchor",
+   "index": 5,
+   "mutant": "L838 string 'not an evidence anchor: ' emptied",
+   "class": "AUDITED",
+   "group": "T09-AUDIT-ANCHOR-MSG: explanatory wording of a ValueError whose class and identifying element are kept",
+   "grounds": "The mutant changes the ValueError at lineage.py:400 from `f\"not an evidence anchor: {anchor!r}\"` to `f\"{anchor!r}\"`: the value (repr) is kept. Validation precedes os.open (L399-401), so no file is made. The only product caller, cli.py:99, passes R.anchor_in(a.out) (run.py:305-311), which is anchor_of(...) = a sha256 hexdigest (run.py:313-316, :77-78) or None, which `if anchor and a.anchor_out is not None` (cli.py:97) skips: the branch is unreachable from the CLI. Its handler (cli.py:101-103) prints `ValueError: <message>` on stderr, exits 2, and the printed anchor stays usable, so even a future reachable case loses only the prefix wording. Differential run at the snapshot (original module vs the mutant, claim lifecycle: refusal, supersede by digest, second generation, torn / non-object / run-not-a-string claims, dangling links, anchors written and read): only the text for None / '' / 'zz' / 64 upper-case letters differs (class, no file made: same).",
+   "consumers_checked": [
+    "aisef2/app/cli.py:95-109 (the only caller; handler L101-103 formats type(e).__name__ and e)",
+    "aisef2/app/run.py:305-316 (anchor_in / anchor_of: _sha hexdigest or None)",
+    "tests/v2/test_v21_continue_integrity.py:569, 594-604 (valid anchors; FileExistsError / PermissionError; no test of the ValueError text); tests/v2/test_v21_kills3_T09c.py:297, T23a.py:347-408 (valid anchors, and a mock of write_anchor)",
+    "tests/v2/test_v21_kills3_T23a.py:394: `mock.patch.object(lineage, \"write_anchor\", side_effect=ValueError(\"not an evidence anchor: 'x'\"))` - a second occurrence of the text, supplied by the test to drive cli.py's handler; the production message is never produced there and the test asserts only exit 2, the document with the anchor, and the `not ... written` line naming the path (copy_failure_line L335-346)",
+    "docs/v2.1/ANCHOR-THREAT-MODEL.md:47-57 (names the refusals, not the text)"
+   ],
+   "exceptions_checked": [
+    "anchor None or '': the message becomes 'None' / \"''\" (still the value; measured)",
+    "a direct caller (operator script): gets ValueError carrying the value",
+    "someone parsing the message: nothing in aisef2, validation, bin or docs does; the only other occurrence of the words is the T23a mock above",
+    "a NUL-containing path: ValueError('open: embedded null character in path') from os.open, after the validation; not this mutant"
+   ],
+   "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa",
+   "remapped_from": {
+    "index": 5,
+    "mutant": "L400 string 'not an evidence anchor: ' emptied",
+    "source_sha256": "85122bfb4d22125eeba871d91e8a848babb3fbaf41eb574dc20eb3869f4494f9",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 5,
+     "mutant": "L399 string 'not an evidence anchor: ' emptied",
+     "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+    },
+    "chain": [
+     {
+      "index": 5,
+      "mutant": "L399 string 'not an evidence anchor: ' emptied",
+      "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+     },
+     {
+      "index": 5,
+      "mutant": "L400 string 'not an evidence anchor: ' emptied",
+      "source_sha256": "85122bfb4d22125eeba871d91e8a848babb3fbaf41eb574dc20eb3869f4494f9",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  },
+  {
+   "target": "aisef2/app/lineage.py::write_anchor",
+   "index": 6,
+   "mutant": "L839 string 'O_NOFOLLOW' emptied",
+   "class": "EQUIVALENT",
+   "group": "T09-EQ-NOFOLLOW: O_NOFOLLOW beside O_CREAT|O_EXCL; O_EXCL already refuses a final-component symbolic link",
+   "grounds": "Equivalence holds on the same proof as claim [65]: lineage.py:401 opens `O_WRONLY | O_CREAT | O_EXCL | getattr(os, \"O_NOFOLLOW\", 0)`; O_CREAT|O_EXCL refuses an existing final component, a symbolic link included, with EEXIST (POSIX; macOS open(2); Linux open(2); Linux ORs O_NOFOLLOW in itself), O_NOFOLLOW governs only that component, and the mutant's flag value equals what Windows already gets. Re-measured on macOS / Python 3.14.7: EEXIST with and without the flag for dangling, to-file, to-dir, looping, regular and directory targets; an intermediate symlinked directory is followed either way. The documented promise (ANCHOR-THREAT-MODEL.md:49-50, REPORT.md:234: a symlink, even one pointing nowhere, is refused) is behavioural and is held by O_EXCL; the docs name O_NOFOLLOW as the mechanism but nothing observable depends on it. cli.py:65-66 also refuses an existing or dangling path with os.path.lexists before the run. Differential run at the snapshot (original module vs the mutant, claim lifecycle: refusal, supersede by digest, second generation, torn / non-object / run-not-a-string claims, dangling links, anchors written and read): identical on every observable (dangling link refused with FileExistsError in both).",
+   "consumers_checked": [
+    "tests/v2/test_v21_continue_integrity.py AnchorThreatModel.test_the_anchor_file_is_new_exact_and_never_through_a_link (L590-610: FileExistsError for an existing path and for a dangling link; passes on the mutant)",
+    "docs/v2.1/ANCHOR-THREAT-MODEL.md:49-50 and REPORT.md:234 (the mechanism as documented)",
+    "aisef2/app/cli.py:65-66 (lexists refusal before the run) and :99-103 (OSError / ValueError handler after)",
+    "grep NOFOLLOW over aisef2 aisef validation tests bin: lineage.py:174, :401 only; no test or check asserts the flag"
+   ],
+   "exceptions_checked": [
+    "error class for a planted link (ELOOP vs EEXIST): measured EEXIST with and without the flag (macOS 3.14.7); the existing test asserts FileExistsError on Linux CI with the flag, the class O_EXCL alone gives (Linux, recalled from the order in fs/namei.c do_open - not readable here: the O_EXCL check precedes the ELOOP of may_open)",
+    "an intermediate symlinked directory: not governed by O_NOFOLLOW, measured followed either way",
+    "Windows: the flag is absent, both values 0",
+    "a document or check that asserts the flag by name: none (docs only describe it)"
+   ],
+   "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa",
+   "remapped_from": {
+    "index": 6,
+    "mutant": "L401 string 'O_NOFOLLOW' emptied",
+    "source_sha256": "85122bfb4d22125eeba871d91e8a848babb3fbaf41eb574dc20eb3869f4494f9",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 6,
+     "mutant": "L400 string 'O_NOFOLLOW' emptied",
+     "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+    },
+    "chain": [
+     {
+      "index": 6,
+      "mutant": "L400 string 'O_NOFOLLOW' emptied",
+      "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+     },
+     {
+      "index": 6,
+      "mutant": "L401 string 'O_NOFOLLOW' emptied",
+      "source_sha256": "85122bfb4d22125eeba871d91e8a848babb3fbaf41eb574dc20eb3869f4494f9",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  },
+  {
+   "target": "aisef2/app/lineage.py::read_anchor",
+   "index": 5,
+   "mutant": "L850 string ' is not a complete evidence anchor file' emptied",
+   "class": "AUDITED",
+   "group": "T09-AUDIT-ANCHOR-MSG: explanatory wording of a ValueError whose class and identifying element are kept",
+   "grounds": "The mutant changes the text of the ValueError at lineage.py:412 from `f\"{path} is not a complete evidence anchor file\"` to `f\"{path}\"`: class and identifying element (the path) are kept. No product code calls read_anchor (cli.py:99 calls write_anchor; --expect-anchor is a 64-hex string checked by regex at cli.py:69-70 and compared in verify.py, never read from a file). Callers are tests, which assert the class and, in T09c, that the refusal names the file: tests/v2/test_v21_continue_integrity.py:605-610, tests/v2/test_v21_kills3_T09c.py:276-298 (`assertIn(str(p), str(c.exception))`, held by the mutant). The docs (ANCHOR-THREAT-MODEL.md:51-52, REPORT.md:234-235) promise the refusal and its trigger, not its wording. Differential run at the snapshot (original module vs the mutant, claim lifecycle: refusal, supersede by digest, second generation, torn / non-object / run-not-a-string claims, dangling links, anchors written and read): only the text of the refusal of an incomplete anchor file differs. CORRECTION to the written grounds: the ValueError at L412 is not the only ValueError read_anchor can raise - a path containing a NUL gives ValueError('embedded null byte') from open() at L410 (measured); that one is untouched by the mutant and keeps its own text, so a script that prints the exception still tells the two apart.",
+   "consumers_checked": [
+    "grep read_anchor over aisef2 aisef validation tests docs bin: tests/v2/test_v21_continue_integrity.py:569,582,587,609-610; tests/v2/test_v21_kills3_T09c.py:276-298; tests/v2/test_v21_kills3_T23a.py:368 (reads back a written anchor, success path); docs ANCHOR-THREAT-MODEL.md:51 and REPORT.md:235 (state that it refuses); validation/v2/mutation.py:647,804 (target tables)",
+    "aisef2/app/cli.py:69-70 (anchor given on the command line, no file read) and :99-103 (write side, handler prints type and text of write_anchor's errors only)",
+    "grep 'complete evidence anchor' over aisef2 aisef validation tests docs bin: lineage.py:412 only",
+    "validation/v21/cli_integration/e2e_guest.py:462-466 reads anchor.txt with read_text().strip(), not read_anchor"
+   ],
+   "exceptions_checked": [
+    "an operator script printing str(e): sees the bare path for an incomplete anchor file (the residual the audit accepted); the path still identifies the refused file and the class says it is a refusal",
+    "a script splitting the message on ' is not': none in the repository",
+    "the non-ASCII case (sibling mutant [4], whose effect is a LookupError instead of the refusal) is a different mutant and is held by T09c",
+    "a second ValueError source in read_anchor: the NUL path above (not this mutant)"
+   ],
+   "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa",
+   "remapped_from": {
+    "index": 5,
+    "mutant": "L412 string ' is not a complete evidence anchor file' emptied",
+    "source_sha256": "85122bfb4d22125eeba871d91e8a848babb3fbaf41eb574dc20eb3869f4494f9",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 5,
+     "mutant": "L411 string ' is not a complete evidence anchor file' emptied",
+     "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+    },
+    "chain": [
+     {
+      "index": 5,
+      "mutant": "L411 string ' is not a complete evidence anchor file' emptied",
+      "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+     },
+     {
+      "index": 5,
+      "mutant": "L412 string ' is not a complete evidence anchor file' emptied",
+      "source_sha256": "85122bfb4d22125eeba871d91e8a848babb3fbaf41eb574dc20eb3869f4494f9",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  }
+ ]
+}

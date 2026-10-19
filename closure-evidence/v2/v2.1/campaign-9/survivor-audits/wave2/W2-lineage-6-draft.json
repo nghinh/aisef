@@ -1,0 +1,225 @@
+{
+ "batch": "W2-lineage-6",
+ "snapshot": "4ec961e706a1f7bda16d131037058c4fe9c2663f",
+ "file": "aisef2/app/lineage.py",
+ "target": "aisef2/app/lineage.py::child_evidence",
+ "role": "author",
+ "measured_on": "2026-10-19 (date: Mon Oct 19 19:25 +0700 2026)",
+ "method": "Author tree from `git archive 4ec961e`. For each mutant: built from a pristine copy of aisef2/app/lineage.py via validation.v2.mutation.mutants(src, 'child_evidence', _enum_members(src, pathlib.Path('.')))[INDEX], desc asserted == the batch entry, written over aisef2/app/lineage.py in a run-copy tree, then the one REGISTERED kill file run one mutant at a time from the copy root: nice -n 19 /opt/homebrew/bin/python3 -P -B -m unittest tests.v2.test_v21_pw_lineage_unread -q, under env -i with PATH=/usr/bin:/bin (stripped of /Users/nghinh/.opencode/bin and /Users/nghinh/.npm-global/bin, the two dirs holding an opencode executable), HOME and TMPDIR under the run tree, PYTHONPATH=<run root> (needed because -P keeps cwd off sys.path). Actual operator `why` strings per branch captured by calling lineage.child_evidence on crafted children (not_text, journal-path-is-a-directory, not-a-journal, torn-first-line) for baseline and each mutant.",
+ "kill_files": [
+  "tests/v2/test_v21_pw_lineage_unread.py"
+ ],
+ "measurement_result": "Baseline 39 tests OK. Each of the 10 mutants: 39 tests OK == SURVIVED by measurement, matching the campaign. No REFUTED-by-measurement. All 10 mutate only the second element of the (state, detail) tuple (the UNREAD `why` prose); the first element and all control flow are untouched, so every STATE assertion (test_the_state_is_unread_and_never_unbegun) and the truthiness assertion (sup['unread'] in test_the_operator_may_supersede_by_the_claims_sha256_and_only_by_it) pass unchanged. The one content test, ChildThatCannotBeRead.test_the_refusal_says_what_could_not_be_read_and_what_the_operator_may_do, pins 'PermissionError'+JOURNAL.name through claim()'s refusal for the journal-locked L189 case only; every mutant either preserves that token (37/38/39/40 keep type(e).__name__='PermissionError') or is on another branch, so none is killed. Every mutant keeps the detail non-empty, so truthiness holds.",
+ "entries": [
+  {
+   "target": "aisef2/app/lineage.py::child_evidence",
+   "index": 34,
+   "mutant": "L200 string ' holds bytes and no complete event (a first line that was cut)' emptied",
+   "class": "REFUTED",
+   "group": "cause-erased: the whole descriptive phrase is deleted so the UNREAD detail is only {JOURNAL.name}; unlike the label-only mutants (35/37/41) no interpolated diagnostic survives to name the cause, and the readers' generic 'cannot be read' wrapper then misdescribes a journal that in fact reads but was cut.",
+   "grounds": "L200, the 'holds bytes and no complete event' branch (reconstruct succeeds, events==[]: a torn/truncated first line). Measured on the torn_first_line fixture (self.put_journal(a_journal()[:60])): baseline why='aisef-run.jsonl holds bytes and no complete event (a first line that was cut)'; mutant why='aisef-run.jsonl' — the entire cause is gone, the detail collapses to the bare journal name. The operator then reads in claim()'s refusal '...cannot be read (aisef-run.jsonl): it may have begun (UNREAD)...', which says nothing about WHY and is in fact misleading here: this journal opens, decodes as text and reconstructs — it is not unreadable, it was cut mid-write, so the run truly began and the operator should continue from it, not restore permissions/encoding. The detail can no longer be told apart from the L186/L189/L197 causes. Kill file: baseline 39 OK, mutant 39 OK (SURVIVED); no test asserts this branch's detail. The campaign SURVIVED is explained by that coverage gap — the sibling L189 case has a 'PermissionError' content test, L200 has none (an asymmetric gap).",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:311,318-324 — claim(): `state, unread = child_evidence(held)`; on UNREAD-and-not-asserted raises LineageRefused embedding the detail verbatim: f\"{predecessor} is claimed by {held} ({path.name}), whose evidence exists and cannot be read ({unread}): it may have begun (UNREAD)...\". The operator reads {unread}.",
+    "aisef2/app/lineage.py:331 — supersedes = {..., **({'unread': unread} if state==UNREAD else {})}, written durably to CONTINUED-BY.{n+1}.json (0o444); a verifier/operator reads the record's 'unread'.",
+    "aisef2/app/bundle_cli.py:896 — continue_from: held = {'run': child, 'state': state, **({'why': lineage.child_evidence(child)[1]} if state==UNREAD else {})}, returned in the operator report.",
+    "aisef2/app/lineage.py:518-523 — account_of/spend: `state, why = child_evidence(run_dir)`; UNREAD and _is_a_directory(run_dir) appends to `unaccounted`: f\"{run_dir.name}: its journal evidence is there and cannot be read ({why}): the provider requests it recorded are unknown spend\"; read by an operator reviewing spend."
+   ],
+   "exceptions_checked": [
+    "No test pins this branch's detail content: the registered kill file tests/v2/test_v21_pw_lineage_unread.py's UnreadContract tests assert only STATE==UNREAD (test_the_state_is_unread_and_never_unbegun) and that sup['unread'] is truthy (test_the_operator_may_supersede_by_the_claims_sha256_and_only_by_it); the one content test, ChildThatCannotBeRead.test_the_refusal_says_what_could_not_be_read_and_what_the_operator_may_do (line 231-237), pins 'PermissionError'+JOURNAL.name for the journal-locked L189 case via claim()'s refusal; line 580-586 pins '5 lines'/JOURNAL.name/'is not there'/'holds no bytes' for _without_a_journal — not these branches. grep of tests/ docs/ validation/ for the branch phrases finds no reader that pins them.",
+    "Never machine-parsed: every decision (BEGUN/ENDED_UNBEGUN/UNBEGUN/UNREAD, supersession, continue-vs-refuse) keys on STATE, the first tuple element, which all 10 mutants leave untouched (measured: state==UNREAD unchanged on every mutant).",
+    "Truthiness preserved: the mutated why is still non-empty (the f-string still interpolates {JOURNAL.name}), so sup['unread'] stays truthy and the continue_from/account_of embeds stay non-empty.",
+    "No test pins this branch's detail content: the registered kill file tests/v2/test_v21_pw_lineage_unread.py's UnreadContract tests assert only STATE==UNREAD (test_the_state_is_unread_and_never_unbegun) and that sup['unread'] is truthy (test_the_operator_may_supersede_by_the_claims_sha256_and_only_by_it); the one content test, ChildThatCannotBeRead.test_the_refusal_says_what_could_not_be_read_and_what_the_operator_may_do (line 231-237), pins 'PermissionError'+JOURNAL.name for the journal-locked L189 case via claim()'s refusal; line 580-586 pins '5 lines'/JOURNAL.name/'is not there'/'holds no bytes' for _without_a_journal — not these branches. grep of tests/ docs/ validation/ for the branch phrases finds no reader that pins the L200 phrase 'holds bytes and no complete event' / 'a first line that was cut' (they appear only in the source and the mutant descriptions).",
+    "Not killed by truthiness or state either: measured state==UNREAD and why non-empty ('aisef-run.jsonl'), so the generic contract assertions still pass — the SURVIVED is a genuine content-coverage gap, not a flaky pass."
+   ],
+   "refutation": "Input: a child whose journal run/journals/aisef-run.jsonl holds a torn first line and no complete event — the test's existing variant `torn_first_line`: self.put_journal(a_journal()[:60]). Reader: the operator reading claim()'s LineageRefused `({unread})` (lineage.py:318-324), continue_from's report 'why' (bundle_cli.py:896), the CONTINUED-BY.{n}.json 'unread' record (lineage.py:331), and the spend 'unaccounted' line (lineage.py:519-523). Sketch: in ChildThatCannotBeRead add a content test (sibling to test_the_refusal_says_what_could_not_be_read...) that builds the torn-first-line child and asserts state,why = lineage.child_evidence(child); self.assertEqual(state, lineage.UNREAD); self.assertIn(lineage.JOURNAL.name, why); self.assertRegex(why, r'holds bytes|complete event|first line'). Baseline why contains 'no complete event' (PASS); mutant-34 why='aisef-run.jsonl' lacks it (FAIL) — kills index 34. It pins content the reader relies on to tell a cut journal (continue from it) from an unreadable one (restore it); it is the symmetric completion of the coverage the L189 case already has, not padding."
+  },
+  {
+   "target": "aisef2/app/lineage.py::child_evidence",
+   "index": 35,
+   "mutant": "L186 string ' is not text (' emptied",
+   "class": "AUDITED",
+   "group": "label-emptied-diagnostic-survives: the friendly label is deleted but the branch's unique interpolated diagnostic ({e.reason} / {type(e).__name__} / {e}) remains, so the cause is still distinguishable; AUDITED per the owner rule (no consumer/operator keys on the literal label) and the W2-lineage-2 precedent (a connective/label loss that keeps distinguishing content => AUDITED).",
+   "grounds": "L186, the UnicodeDecodeError branch. Measured on the not_text fixture (b'\\xff\\xfe\\x00 not text'): baseline why='aisef-run.jsonl is not text (invalid start byte)'; mutant why='aisef-run.jsonlinvalid start byte)'. The label ' is not text (' and its leading space are gone (the name is jammed to e.reason and a stray ')' trails), but e.reason='invalid start byte' — a decode-specific phrase unique to this branch — survives and names the cause; the readers' wrapper supplies 'cannot be read'. Kill file: baseline 39 OK, mutant 39 OK (SURVIVED).",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:311,318-324 — claim(): `state, unread = child_evidence(held)`; on UNREAD-and-not-asserted raises LineageRefused embedding the detail verbatim: f\"{predecessor} is claimed by {held} ({path.name}), whose evidence exists and cannot be read ({unread}): it may have begun (UNREAD)...\". The operator reads {unread}.",
+    "aisef2/app/lineage.py:331 — supersedes = {..., **({'unread': unread} if state==UNREAD else {})}, written durably to CONTINUED-BY.{n+1}.json (0o444); a verifier/operator reads the record's 'unread'.",
+    "aisef2/app/bundle_cli.py:896 — continue_from: held = {'run': child, 'state': state, **({'why': lineage.child_evidence(child)[1]} if state==UNREAD else {})}, returned in the operator report.",
+    "aisef2/app/lineage.py:518-523 — account_of/spend: `state, why = child_evidence(run_dir)`; UNREAD and _is_a_directory(run_dir) appends to `unaccounted`: f\"{run_dir.name}: its journal evidence is there and cannot be read ({why}): the provider requests it recorded are unknown spend\"; read by an operator reviewing spend."
+   ],
+   "exceptions_checked": [
+    "No test pins this branch's detail content: the registered kill file tests/v2/test_v21_pw_lineage_unread.py's UnreadContract tests assert only STATE==UNREAD (test_the_state_is_unread_and_never_unbegun) and that sup['unread'] is truthy (test_the_operator_may_supersede_by_the_claims_sha256_and_only_by_it); the one content test, ChildThatCannotBeRead.test_the_refusal_says_what_could_not_be_read_and_what_the_operator_may_do (line 231-237), pins 'PermissionError'+JOURNAL.name for the journal-locked L189 case via claim()'s refusal; line 580-586 pins '5 lines'/JOURNAL.name/'is not there'/'holds no bytes' for _without_a_journal — not these branches. grep of tests/ docs/ validation/ for the branch phrases finds no reader that pins them.",
+    "Never machine-parsed: every decision (BEGUN/ENDED_UNBEGUN/UNBEGUN/UNREAD, supersession, continue-vs-refuse) keys on STATE, the first tuple element, which all 10 mutants leave untouched (measured: state==UNREAD unchanged on every mutant).",
+    "Truthiness preserved: the mutated why is still non-empty (the f-string still interpolates {JOURNAL.name}), so sup['unread'] stays truthy and the continue_from/account_of embeds stay non-empty.",
+    "The lost label is redundant with the readers' own wrappers: claim() (C1) says 'evidence exists and cannot be read ({unread})' and account_of (C4) 'its journal evidence is there and cannot be read ({why})', so losing the in-detail label does not remove the unreadability from the operator's view; the interpolated diagnostic that remains is unique to this branch and still names the cause.",
+    "e.reason ('invalid start byte') is not byte-identical to any other branch's output, so a reader still distinguishes it from L189/L197/L200; no decision or test keys on the literal label 'is not text'."
+   ]
+  },
+  {
+   "target": "aisef2/app/lineage.py::child_evidence",
+   "index": 36,
+   "mutant": "L186 string ')' emptied",
+   "class": "AUDITED",
+   "group": "delimiter-only: a parenthesis or the ': ' type/strerror separator is deleted; the output is cosmetically unbalanced or run-together but fully legible and every token of the cause survives. AUDITED.",
+   "grounds": "L186 trailing ')' emptied. Measured: baseline '...is not text (invalid start byte)'; mutant '...is not text (invalid start byte' — one unbalanced close-paren; every word of the cause is intact. Kill file baseline 39 OK / mutant 39 OK (SURVIVED).",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:311,318-324 — claim(): `state, unread = child_evidence(held)`; on UNREAD-and-not-asserted raises LineageRefused embedding the detail verbatim: f\"{predecessor} is claimed by {held} ({path.name}), whose evidence exists and cannot be read ({unread}): it may have begun (UNREAD)...\". The operator reads {unread}.",
+    "aisef2/app/lineage.py:331 — supersedes = {..., **({'unread': unread} if state==UNREAD else {})}, written durably to CONTINUED-BY.{n+1}.json (0o444); a verifier/operator reads the record's 'unread'.",
+    "aisef2/app/bundle_cli.py:896 — continue_from: held = {'run': child, 'state': state, **({'why': lineage.child_evidence(child)[1]} if state==UNREAD else {})}, returned in the operator report.",
+    "aisef2/app/lineage.py:518-523 — account_of/spend: `state, why = child_evidence(run_dir)`; UNREAD and _is_a_directory(run_dir) appends to `unaccounted`: f\"{run_dir.name}: its journal evidence is there and cannot be read ({why}): the provider requests it recorded are unknown spend\"; read by an operator reviewing spend."
+   ],
+   "exceptions_checked": [
+    "No test pins this branch's detail content: the registered kill file tests/v2/test_v21_pw_lineage_unread.py's UnreadContract tests assert only STATE==UNREAD (test_the_state_is_unread_and_never_unbegun) and that sup['unread'] is truthy (test_the_operator_may_supersede_by_the_claims_sha256_and_only_by_it); the one content test, ChildThatCannotBeRead.test_the_refusal_says_what_could_not_be_read_and_what_the_operator_may_do (line 231-237), pins 'PermissionError'+JOURNAL.name for the journal-locked L189 case via claim()'s refusal; line 580-586 pins '5 lines'/JOURNAL.name/'is not there'/'holds no bytes' for _without_a_journal — not these branches. grep of tests/ docs/ validation/ for the branch phrases finds no reader that pins them.",
+    "Never machine-parsed: every decision (BEGUN/ENDED_UNBEGUN/UNBEGUN/UNREAD, supersession, continue-vs-refuse) keys on STATE, the first tuple element, which all 10 mutants leave untouched (measured: state==UNREAD unchanged on every mutant).",
+    "Truthiness preserved: the mutated why is still non-empty (the f-string still interpolates {JOURNAL.name}), so sup['unread'] stays truthy and the continue_from/account_of embeds stay non-empty.",
+    "Only a closing delimiter is lost; no reader parses the parenthesis, and the cause text is unchanged."
+   ]
+  },
+  {
+   "target": "aisef2/app/lineage.py::child_evidence",
+   "index": 37,
+   "mutant": "L189 string ' cannot be read (' emptied",
+   "class": "AUDITED",
+   "group": "label-emptied-diagnostic-survives: the friendly label is deleted but the branch's unique interpolated diagnostic ({e.reason} / {type(e).__name__} / {e}) remains, so the cause is still distinguishable; AUDITED per the owner rule (no consumer/operator keys on the literal label) and the W2-lineage-2 precedent (a connective/label loss that keeps distinguishing content => AUDITED).",
+   "grounds": "L189, the OSError-that-is-not-not_there branch. Measured on a child whose journal path is a directory (IsADirectoryError): baseline why='aisef-run.jsonl cannot be read (IsADirectoryError: Is a directory)'; mutant why='aisef-run.jsonlIsADirectoryError: Is a directory)'. The label is gone, but type(e).__name__='IsADirectoryError' and e.strerror='Is a directory' survive and name the exact OS condition — more precisely than the prose label. Kill file baseline 39 OK / mutant 39 OK (SURVIVED); the registered content test asserts 'PermissionError' appears in claim()'s refusal via type(e).__name__, which this mutant preserves (hence it passes).",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:311,318-324 — claim(): `state, unread = child_evidence(held)`; on UNREAD-and-not-asserted raises LineageRefused embedding the detail verbatim: f\"{predecessor} is claimed by {held} ({path.name}), whose evidence exists and cannot be read ({unread}): it may have begun (UNREAD)...\". The operator reads {unread}.",
+    "aisef2/app/lineage.py:331 — supersedes = {..., **({'unread': unread} if state==UNREAD else {})}, written durably to CONTINUED-BY.{n+1}.json (0o444); a verifier/operator reads the record's 'unread'.",
+    "aisef2/app/bundle_cli.py:896 — continue_from: held = {'run': child, 'state': state, **({'why': lineage.child_evidence(child)[1]} if state==UNREAD else {})}, returned in the operator report.",
+    "aisef2/app/lineage.py:518-523 — account_of/spend: `state, why = child_evidence(run_dir)`; UNREAD and _is_a_directory(run_dir) appends to `unaccounted`: f\"{run_dir.name}: its journal evidence is there and cannot be read ({why}): the provider requests it recorded are unknown spend\"; read by an operator reviewing spend."
+   ],
+   "exceptions_checked": [
+    "No test pins this branch's detail content: the registered kill file tests/v2/test_v21_pw_lineage_unread.py's UnreadContract tests assert only STATE==UNREAD (test_the_state_is_unread_and_never_unbegun) and that sup['unread'] is truthy (test_the_operator_may_supersede_by_the_claims_sha256_and_only_by_it); the one content test, ChildThatCannotBeRead.test_the_refusal_says_what_could_not_be_read_and_what_the_operator_may_do (line 231-237), pins 'PermissionError'+JOURNAL.name for the journal-locked L189 case via claim()'s refusal; line 580-586 pins '5 lines'/JOURNAL.name/'is not there'/'holds no bytes' for _without_a_journal — not these branches. grep of tests/ docs/ validation/ for the branch phrases finds no reader that pins them.",
+    "Never machine-parsed: every decision (BEGUN/ENDED_UNBEGUN/UNBEGUN/UNREAD, supersession, continue-vs-refuse) keys on STATE, the first tuple element, which all 10 mutants leave untouched (measured: state==UNREAD unchanged on every mutant).",
+    "Truthiness preserved: the mutated why is still non-empty (the f-string still interpolates {JOURNAL.name}), so sup['unread'] stays truthy and the continue_from/account_of embeds stay non-empty.",
+    "The lost label is redundant with the readers' own wrappers: claim() (C1) says 'evidence exists and cannot be read ({unread})' and account_of (C4) 'its journal evidence is there and cannot be read ({why})', so losing the in-detail label does not remove the unreadability from the operator's view; the interpolated diagnostic that remains is unique to this branch and still names the cause.",
+    "type(e).__name__ (IsADirectoryError / PermissionError / NotADirectoryError / ...) is the non-redundant distinguishing content and is kept; the registered content test (line 235-236) keys on that token, not on the deleted label."
+   ]
+  },
+  {
+   "target": "aisef2/app/lineage.py::child_evidence",
+   "index": 38,
+   "mutant": "L189 string ': ' emptied",
+   "class": "AUDITED",
+   "group": "delimiter-only: a parenthesis or the ': ' type/strerror separator is deleted; the output is cosmetically unbalanced or run-together but fully legible and every token of the cause survives. AUDITED.",
+   "grounds": "L189 the ': ' between type(e).__name__ and e.strerror emptied. Measured: mutant 'aisef-run.jsonl cannot be read (IsADirectoryErrorIs a directory)' — type and strerror run together; both tokens and 'cannot be read' survive. SURVIVED (baseline 39 / mutant 39 OK).",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:311,318-324 — claim(): `state, unread = child_evidence(held)`; on UNREAD-and-not-asserted raises LineageRefused embedding the detail verbatim: f\"{predecessor} is claimed by {held} ({path.name}), whose evidence exists and cannot be read ({unread}): it may have begun (UNREAD)...\". The operator reads {unread}.",
+    "aisef2/app/lineage.py:331 — supersedes = {..., **({'unread': unread} if state==UNREAD else {})}, written durably to CONTINUED-BY.{n+1}.json (0o444); a verifier/operator reads the record's 'unread'.",
+    "aisef2/app/bundle_cli.py:896 — continue_from: held = {'run': child, 'state': state, **({'why': lineage.child_evidence(child)[1]} if state==UNREAD else {})}, returned in the operator report.",
+    "aisef2/app/lineage.py:518-523 — account_of/spend: `state, why = child_evidence(run_dir)`; UNREAD and _is_a_directory(run_dir) appends to `unaccounted`: f\"{run_dir.name}: its journal evidence is there and cannot be read ({why}): the provider requests it recorded are unknown spend\"; read by an operator reviewing spend."
+   ],
+   "exceptions_checked": [
+    "No test pins this branch's detail content: the registered kill file tests/v2/test_v21_pw_lineage_unread.py's UnreadContract tests assert only STATE==UNREAD (test_the_state_is_unread_and_never_unbegun) and that sup['unread'] is truthy (test_the_operator_may_supersede_by_the_claims_sha256_and_only_by_it); the one content test, ChildThatCannotBeRead.test_the_refusal_says_what_could_not_be_read_and_what_the_operator_may_do (line 231-237), pins 'PermissionError'+JOURNAL.name for the journal-locked L189 case via claim()'s refusal; line 580-586 pins '5 lines'/JOURNAL.name/'is not there'/'holds no bytes' for _without_a_journal — not these branches. grep of tests/ docs/ validation/ for the branch phrases finds no reader that pins them.",
+    "Never machine-parsed: every decision (BEGUN/ENDED_UNBEGUN/UNBEGUN/UNREAD, supersession, continue-vs-refuse) keys on STATE, the first tuple element, which all 10 mutants leave untouched (measured: state==UNREAD unchanged on every mutant).",
+    "Truthiness preserved: the mutated why is still non-empty (the f-string still interpolates {JOURNAL.name}), so sup['unread'] stays truthy and the continue_from/account_of embeds stay non-empty.",
+    "Only the ': ' separator is lost; both the exception type and strerror remain, and the registered 'PermissionError' substring test still matches."
+   ]
+  },
+  {
+   "target": "aisef2/app/lineage.py::child_evidence",
+   "index": 39,
+   "mutant": "L189 string ')' emptied",
+   "class": "AUDITED",
+   "group": "delimiter-only: a parenthesis or the ': ' type/strerror separator is deleted; the output is cosmetically unbalanced or run-together but fully legible and every token of the cause survives. AUDITED.",
+   "grounds": "L189 trailing ')' emptied. Measured: mutant '...cannot be read (IsADirectoryError: Is a directory' — one unbalanced paren; the cause is intact. SURVIVED (39/39).",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:311,318-324 — claim(): `state, unread = child_evidence(held)`; on UNREAD-and-not-asserted raises LineageRefused embedding the detail verbatim: f\"{predecessor} is claimed by {held} ({path.name}), whose evidence exists and cannot be read ({unread}): it may have begun (UNREAD)...\". The operator reads {unread}.",
+    "aisef2/app/lineage.py:331 — supersedes = {..., **({'unread': unread} if state==UNREAD else {})}, written durably to CONTINUED-BY.{n+1}.json (0o444); a verifier/operator reads the record's 'unread'.",
+    "aisef2/app/bundle_cli.py:896 — continue_from: held = {'run': child, 'state': state, **({'why': lineage.child_evidence(child)[1]} if state==UNREAD else {})}, returned in the operator report.",
+    "aisef2/app/lineage.py:518-523 — account_of/spend: `state, why = child_evidence(run_dir)`; UNREAD and _is_a_directory(run_dir) appends to `unaccounted`: f\"{run_dir.name}: its journal evidence is there and cannot be read ({why}): the provider requests it recorded are unknown spend\"; read by an operator reviewing spend."
+   ],
+   "exceptions_checked": [
+    "No test pins this branch's detail content: the registered kill file tests/v2/test_v21_pw_lineage_unread.py's UnreadContract tests assert only STATE==UNREAD (test_the_state_is_unread_and_never_unbegun) and that sup['unread'] is truthy (test_the_operator_may_supersede_by_the_claims_sha256_and_only_by_it); the one content test, ChildThatCannotBeRead.test_the_refusal_says_what_could_not_be_read_and_what_the_operator_may_do (line 231-237), pins 'PermissionError'+JOURNAL.name for the journal-locked L189 case via claim()'s refusal; line 580-586 pins '5 lines'/JOURNAL.name/'is not there'/'holds no bytes' for _without_a_journal — not these branches. grep of tests/ docs/ validation/ for the branch phrases finds no reader that pins them.",
+    "Never machine-parsed: every decision (BEGUN/ENDED_UNBEGUN/UNBEGUN/UNREAD, supersession, continue-vs-refuse) keys on STATE, the first tuple element, which all 10 mutants leave untouched (measured: state==UNREAD unchanged on every mutant).",
+    "Truthiness preserved: the mutated why is still non-empty (the f-string still interpolates {JOURNAL.name}), so sup['unread'] stays truthy and the continue_from/account_of embeds stay non-empty.",
+    "Only a closing delimiter is lost; no reader parses the parenthesis."
+   ]
+  },
+  {
+   "target": "aisef2/app/lineage.py::child_evidence",
+   "index": 40,
+   "mutant": "L189 Or swapped",
+   "class": "AUDITED",
+   "group": "richer-rendering: `e.strerror or e` -> `e.strerror and e` renders the OSError differently but not less informatively (the W2-lineage-2 index-55 precedent); no reader depends on which of strerror / str(e) shows.",
+   "grounds": "L189 `e.strerror or e` -> `e.strerror and e`. A real OS-raised OSError on this branch (IsADirectoryError / PermissionError / NotADirectoryError / ENAMETOOLONG / EIO) always has a truthy strerror, so `and` returns e and the detail renders str(e) instead of e.strerror. Measured (dir in the journal's place): baseline '...cannot be read (IsADirectoryError: Is a directory)'; mutant '...cannot be read (IsADirectoryError: [Errno 21] Is a directory: <path>)' — MORE informative (errno + path), never less. The only way to get less (literal 'None') needs strerror falsy, which does not occur for OS-raised errors here. SURVIVED (39/39).",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:311,318-324 — claim(): `state, unread = child_evidence(held)`; on UNREAD-and-not-asserted raises LineageRefused embedding the detail verbatim: f\"{predecessor} is claimed by {held} ({path.name}), whose evidence exists and cannot be read ({unread}): it may have begun (UNREAD)...\". The operator reads {unread}.",
+    "aisef2/app/lineage.py:331 — supersedes = {..., **({'unread': unread} if state==UNREAD else {})}, written durably to CONTINUED-BY.{n+1}.json (0o444); a verifier/operator reads the record's 'unread'.",
+    "aisef2/app/bundle_cli.py:896 — continue_from: held = {'run': child, 'state': state, **({'why': lineage.child_evidence(child)[1]} if state==UNREAD else {})}, returned in the operator report.",
+    "aisef2/app/lineage.py:518-523 — account_of/spend: `state, why = child_evidence(run_dir)`; UNREAD and _is_a_directory(run_dir) appends to `unaccounted`: f\"{run_dir.name}: its journal evidence is there and cannot be read ({why}): the provider requests it recorded are unknown spend\"; read by an operator reviewing spend."
+   ],
+   "exceptions_checked": [
+    "No test pins this branch's detail content: the registered kill file tests/v2/test_v21_pw_lineage_unread.py's UnreadContract tests assert only STATE==UNREAD (test_the_state_is_unread_and_never_unbegun) and that sup['unread'] is truthy (test_the_operator_may_supersede_by_the_claims_sha256_and_only_by_it); the one content test, ChildThatCannotBeRead.test_the_refusal_says_what_could_not_be_read_and_what_the_operator_may_do (line 231-237), pins 'PermissionError'+JOURNAL.name for the journal-locked L189 case via claim()'s refusal; line 580-586 pins '5 lines'/JOURNAL.name/'is not there'/'holds no bytes' for _without_a_journal — not these branches. grep of tests/ docs/ validation/ for the branch phrases finds no reader that pins them.",
+    "Never machine-parsed: every decision (BEGUN/ENDED_UNBEGUN/UNBEGUN/UNREAD, supersession, continue-vs-refuse) keys on STATE, the first tuple element, which all 10 mutants leave untouched (measured: state==UNREAD unchanged on every mutant).",
+    "Truthiness preserved: the mutated why is still non-empty (the f-string still interpolates {JOURNAL.name}), so sup['unread'] stays truthy and the continue_from/account_of embeds stay non-empty.",
+    "strerror is always populated by the OS on this branch, so the mutant's str(e) is a superset (errno + path + strerror); the readers show free prose and do not parse it, so a richer-but-equivalent rendering misleads no one.",
+    "This matches the W2-lineage-2 index-55 ruling (an or->and OSError rendering, AUDITED)."
+   ]
+  },
+  {
+   "target": "aisef2/app/lineage.py::child_evidence",
+   "index": 41,
+   "mutant": "L197 string ' does not reconstruct (' emptied",
+   "class": "AUDITED",
+   "group": "label-emptied-diagnostic-survives: the friendly label is deleted but the branch's unique interpolated diagnostic ({e.reason} / {type(e).__name__} / {e}) remains, so the cause is still distinguishable; AUDITED per the owner rule (no consumer/operator keys on the literal label) and the W2-lineage-2 precedent (a connective/label loss that keeps distinguishing content => AUDITED).",
+   "grounds": "L197, the reconstruct-raises branch (the whole f-string is sliced [:300]). Measured on a not-a-journal fixture: baseline why='aisef-run.jsonl does not reconstruct (JournalError: line 0 is not JSON)'; mutant why='aisef-run.jsonlJournalError: line 0 is not JSON)'. The label is gone, but type(e).__name__='JournalError' and str(e)='line 0 is not JSON' survive and name the parse failure; the [:300] slice is untouched; the readers' wrapper supplies 'cannot be read'. SURVIVED (39/39).",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:311,318-324 — claim(): `state, unread = child_evidence(held)`; on UNREAD-and-not-asserted raises LineageRefused embedding the detail verbatim: f\"{predecessor} is claimed by {held} ({path.name}), whose evidence exists and cannot be read ({unread}): it may have begun (UNREAD)...\". The operator reads {unread}.",
+    "aisef2/app/lineage.py:331 — supersedes = {..., **({'unread': unread} if state==UNREAD else {})}, written durably to CONTINUED-BY.{n+1}.json (0o444); a verifier/operator reads the record's 'unread'.",
+    "aisef2/app/bundle_cli.py:896 — continue_from: held = {'run': child, 'state': state, **({'why': lineage.child_evidence(child)[1]} if state==UNREAD else {})}, returned in the operator report.",
+    "aisef2/app/lineage.py:518-523 — account_of/spend: `state, why = child_evidence(run_dir)`; UNREAD and _is_a_directory(run_dir) appends to `unaccounted`: f\"{run_dir.name}: its journal evidence is there and cannot be read ({why}): the provider requests it recorded are unknown spend\"; read by an operator reviewing spend."
+   ],
+   "exceptions_checked": [
+    "No test pins this branch's detail content: the registered kill file tests/v2/test_v21_pw_lineage_unread.py's UnreadContract tests assert only STATE==UNREAD (test_the_state_is_unread_and_never_unbegun) and that sup['unread'] is truthy (test_the_operator_may_supersede_by_the_claims_sha256_and_only_by_it); the one content test, ChildThatCannotBeRead.test_the_refusal_says_what_could_not_be_read_and_what_the_operator_may_do (line 231-237), pins 'PermissionError'+JOURNAL.name for the journal-locked L189 case via claim()'s refusal; line 580-586 pins '5 lines'/JOURNAL.name/'is not there'/'holds no bytes' for _without_a_journal — not these branches. grep of tests/ docs/ validation/ for the branch phrases finds no reader that pins them.",
+    "Never machine-parsed: every decision (BEGUN/ENDED_UNBEGUN/UNBEGUN/UNREAD, supersession, continue-vs-refuse) keys on STATE, the first tuple element, which all 10 mutants leave untouched (measured: state==UNREAD unchanged on every mutant).",
+    "Truthiness preserved: the mutated why is still non-empty (the f-string still interpolates {JOURNAL.name}), so sup['unread'] stays truthy and the continue_from/account_of embeds stay non-empty.",
+    "The lost label is redundant with the readers' own wrappers: claim() (C1) says 'evidence exists and cannot be read ({unread})' and account_of (C4) 'its journal evidence is there and cannot be read ({why})', so losing the in-detail label does not remove the unreadability from the operator's view; the interpolated diagnostic that remains is unique to this branch and still names the cause.",
+    "the JournalError type and its message are the distinguishing content and are kept; they are unique to the reconstruct branch, so a reader is not misdirected."
+   ]
+  },
+  {
+   "target": "aisef2/app/lineage.py::child_evidence",
+   "index": 42,
+   "mutant": "L197 string ': ' emptied",
+   "class": "AUDITED",
+   "group": "delimiter-only: a parenthesis or the ': ' type/strerror separator is deleted; the output is cosmetically unbalanced or run-together but fully legible and every token of the cause survives. AUDITED.",
+   "grounds": "L197 the ': ' between type(e).__name__ and {e} emptied. Measured: mutant 'aisef-run.jsonl does not reconstruct (JournalErrorline 0 is not JSON)' — type and message run together; both survive, 'does not reconstruct' intact. SURVIVED (39/39).",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:311,318-324 — claim(): `state, unread = child_evidence(held)`; on UNREAD-and-not-asserted raises LineageRefused embedding the detail verbatim: f\"{predecessor} is claimed by {held} ({path.name}), whose evidence exists and cannot be read ({unread}): it may have begun (UNREAD)...\". The operator reads {unread}.",
+    "aisef2/app/lineage.py:331 — supersedes = {..., **({'unread': unread} if state==UNREAD else {})}, written durably to CONTINUED-BY.{n+1}.json (0o444); a verifier/operator reads the record's 'unread'.",
+    "aisef2/app/bundle_cli.py:896 — continue_from: held = {'run': child, 'state': state, **({'why': lineage.child_evidence(child)[1]} if state==UNREAD else {})}, returned in the operator report.",
+    "aisef2/app/lineage.py:518-523 — account_of/spend: `state, why = child_evidence(run_dir)`; UNREAD and _is_a_directory(run_dir) appends to `unaccounted`: f\"{run_dir.name}: its journal evidence is there and cannot be read ({why}): the provider requests it recorded are unknown spend\"; read by an operator reviewing spend."
+   ],
+   "exceptions_checked": [
+    "No test pins this branch's detail content: the registered kill file tests/v2/test_v21_pw_lineage_unread.py's UnreadContract tests assert only STATE==UNREAD (test_the_state_is_unread_and_never_unbegun) and that sup['unread'] is truthy (test_the_operator_may_supersede_by_the_claims_sha256_and_only_by_it); the one content test, ChildThatCannotBeRead.test_the_refusal_says_what_could_not_be_read_and_what_the_operator_may_do (line 231-237), pins 'PermissionError'+JOURNAL.name for the journal-locked L189 case via claim()'s refusal; line 580-586 pins '5 lines'/JOURNAL.name/'is not there'/'holds no bytes' for _without_a_journal — not these branches. grep of tests/ docs/ validation/ for the branch phrases finds no reader that pins them.",
+    "Never machine-parsed: every decision (BEGUN/ENDED_UNBEGUN/UNBEGUN/UNREAD, supersession, continue-vs-refuse) keys on STATE, the first tuple element, which all 10 mutants leave untouched (measured: state==UNREAD unchanged on every mutant).",
+    "Truthiness preserved: the mutated why is still non-empty (the f-string still interpolates {JOURNAL.name}), so sup['unread'] stays truthy and the continue_from/account_of embeds stay non-empty.",
+    "Only the separator is lost; the exception type and message remain within the [:300] slice."
+   ]
+  },
+  {
+   "target": "aisef2/app/lineage.py::child_evidence",
+   "index": 43,
+   "mutant": "L197 string ')' emptied",
+   "class": "AUDITED",
+   "group": "delimiter-only: a parenthesis or the ': ' type/strerror separator is deleted; the output is cosmetically unbalanced or run-together but fully legible and every token of the cause survives. AUDITED.",
+   "grounds": "L197 trailing ')' emptied (inside the [:300] slice). Measured: mutant '...does not reconstruct (JournalError: line 0 is not JSON' — one unbalanced paren; the cause is intact. SURVIVED (39/39).",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:311,318-324 — claim(): `state, unread = child_evidence(held)`; on UNREAD-and-not-asserted raises LineageRefused embedding the detail verbatim: f\"{predecessor} is claimed by {held} ({path.name}), whose evidence exists and cannot be read ({unread}): it may have begun (UNREAD)...\". The operator reads {unread}.",
+    "aisef2/app/lineage.py:331 — supersedes = {..., **({'unread': unread} if state==UNREAD else {})}, written durably to CONTINUED-BY.{n+1}.json (0o444); a verifier/operator reads the record's 'unread'.",
+    "aisef2/app/bundle_cli.py:896 — continue_from: held = {'run': child, 'state': state, **({'why': lineage.child_evidence(child)[1]} if state==UNREAD else {})}, returned in the operator report.",
+    "aisef2/app/lineage.py:518-523 — account_of/spend: `state, why = child_evidence(run_dir)`; UNREAD and _is_a_directory(run_dir) appends to `unaccounted`: f\"{run_dir.name}: its journal evidence is there and cannot be read ({why}): the provider requests it recorded are unknown spend\"; read by an operator reviewing spend."
+   ],
+   "exceptions_checked": [
+    "No test pins this branch's detail content: the registered kill file tests/v2/test_v21_pw_lineage_unread.py's UnreadContract tests assert only STATE==UNREAD (test_the_state_is_unread_and_never_unbegun) and that sup['unread'] is truthy (test_the_operator_may_supersede_by_the_claims_sha256_and_only_by_it); the one content test, ChildThatCannotBeRead.test_the_refusal_says_what_could_not_be_read_and_what_the_operator_may_do (line 231-237), pins 'PermissionError'+JOURNAL.name for the journal-locked L189 case via claim()'s refusal; line 580-586 pins '5 lines'/JOURNAL.name/'is not there'/'holds no bytes' for _without_a_journal — not these branches. grep of tests/ docs/ validation/ for the branch phrases finds no reader that pins them.",
+    "Never machine-parsed: every decision (BEGUN/ENDED_UNBEGUN/UNBEGUN/UNREAD, supersession, continue-vs-refuse) keys on STATE, the first tuple element, which all 10 mutants leave untouched (measured: state==UNREAD unchanged on every mutant).",
+    "Truthiness preserved: the mutated why is still non-empty (the f-string still interpolates {JOURNAL.name}), so sup['unread'] stays truthy and the continue_from/account_of embeds stay non-empty.",
+    "Only a closing delimiter is lost; no reader parses the parenthesis."
+   ]
+  }
+ ],
+ "owed_tests": [
+  "tests/v2/test_v21_pw_lineage_unread.py — add ONE content test (a sibling of ChildThatCannotBeRead.test_the_refusal_says_what_could_not_be_read_and_what_the_operator_may_do) for the L200 'holds bytes and no complete event' branch, the only new survivor whose detail loses its entire cause. Input: the existing torn_first_line fixture, self.put_journal(a_journal()[:60]). Reader: the operator reading claim()'s LineageRefused ({unread}) at lineage.py:318-324, continue_from's report 'why' at bundle_cli.py:896, the CONTINUED-BY.{n}.json 'unread' record at lineage.py:331, and the spend 'unaccounted' line at lineage.py:519-523. Assertions: state,why = lineage.child_evidence(child); self.assertEqual(state, lineage.UNREAD); self.assertIn(lineage.JOURNAL.name, why); self.assertRegex(why, r'holds bytes|complete event|first line'). This kills index 34 (baseline why has 'no complete event'; mutant why is 'aisef-run.jsonl'). It is the symmetric completion of the content coverage the L189 case already has (the 'PermissionError' assertion at line 235-236); the L186/L189/L197 label mutants (35/37/41) are NOT owed tests because each keeps a unique interpolated diagnostic (e.reason / type(e).__name__ / str(e)) that still names the cause — adding tests for them would be reaching for a number."
+ ],
+ "notes": "Target aisef2/app/lineage.py::child_evidence; snapshot 4ec961e. All 10 NEW survivors mutate only the UNREAD detail — the second element of the (state, detail) tuple — on child_evidence's four 'evidence there and unreadable' branches: L186 (UnicodeDecodeError), L189 (OSError not not_there), L197 (reconstruct raises), L200 (bytes but no complete event). Nine empty a string fragment; one (index 40) swaps `or`->`and` in the embedded OSError rendering. None changes the STATE (first element), the branch taken, or any value a decision keys on, so child_state(), continued_by(), claim()'s supersession, continue_from and the spend accounting all decide unchanged — which is why they survived. The ONE registered kill file (V21_TARGETS['...::child_evidence'] = ['tests/v2/test_v21_pw_lineage_unread.py']) was RUN against each mutant one at a time from a run-copy tree (PATH stripped of the two dirs holding an opencode executable, HOME/TMPDIR under the tree, PYTHONPATH=run root): baseline 39 OK; each mutant 39 OK => all SURVIVE by measurement, matching the campaign; NO REFUTED-by-measurement. Actual operator `why` strings were captured by calling child_evidence on crafted children for baseline and each mutant. Classification follows the owner rule ('a string read by an operator or a verifier is not harmless') and the W2-lineage-2 precedent (whole-cause loss with an uncovered symmetric sibling => REFUTED; redundant connective/label/space, or a not-less-informative rendering => AUDITED): 1 REFUTED (34) — the only mutant whose detail loses every word of the cause and collapses to the bare journal name 'aisef-run.jsonl', which the readers' generic 'cannot be read' wrapper then misdescribes (a torn/cut journal that in fact reads is not unreadable: the operator should continue from it, not restore it); 9 AUDITED (35,37,41 empty a label but keep the branch's unique interpolated diagnostic; 36,38,39,42,43 drop a paren or ': ' separator; 40 renders the OSError via str(e), errno and path included, never less). The four readers of the detail, confirmed by grep: claim()'s refusal (lineage.py:311,318-324), the supersedes 'unread' record in CONTINUED-BY.{n}.json (lineage.py:331), continue_from's report 'why' (bundle_cli.py:896), and account_of's spend 'unaccounted' line (lineage.py:518-523); the detail is never machine-parsed — every decision keys on the STATE, which every mutant preserves."
+}

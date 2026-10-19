@@ -1,0 +1,403 @@
+{
+ "batch": "W2-lineage-1",
+ "target": "aisef2/app/lineage.py::claim",
+ "snapshot": "4ec961e706a1f7bda16d131037058c4fe9c2663f",
+ "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa",
+ "role": "skeptic",
+ "verified_at": "Mon Oct 19 20:49:29 +07 2026",
+ "measurement": "Measured in a COPY tree (PATH stripped of both opencode dirs; HOME/TMPDIR/XDG sandboxed; nice -n 19 python3 -P -B -m unittest). Baselines unmutated PASS: pw_lineage_unread 39, kills3_R03 5, kills3_T09a 18, kills3_T09b 14, continue_integrity 24, continue_usage 10, defects_verify 20, x_lineage_proof 55. Positive control: sibling [108] 'L343 free space on its volume emptied' FAILS pw (assertIn 'free space'), so the oracle is live.",
+ "entries": [
+  {
+   "target": "aisef2/app/lineage.py::claim",
+   "index": 91,
+   "mutant": "L341 string ' cannot be claimed: ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "At L341 ' cannot be claimed: ' is emptied -> '{predecessor}{target.name} cannot be created (...'. Verified via mutant_view at the snapshot. predecessor and target.name abut but both survive as substrings; 'cannot be created', the error class+strerror, the remediation ternary, 'Not from a copy', 'nothing was taken' all remain. pw asserts 'No space left on device'/'free space'/'restore write access'/'nothing was taken'/'[Nn]ot from a copy' — never 'cannot be claimed'. mutant[91] PASSES pw (39) -> SURVIVED; connective only. Measured in a COPY tree (PATH stripped of both opencode dirs; HOME/TMPDIR/XDG sandboxed; nice -n 19 python3 -P -B -m unittest). Baselines unmutated PASS: pw_lineage_unread 39, kills3_R03 5, kills3_T09a 18, kills3_T09b 14, continue_integrity 24, continue_usage 10, defects_verify 20, x_lineage_proof 55. Positive control: sibling [108] 'L343 free space on its volume emptied' FAILS pw (assertIn 'free space'), so the oracle is live.",
+   "consumers_checked": [
+    "aisef2/app/lineage.py L339-345 (the only producer: the unwritable-predecessor OSError refusal)",
+    "aisef2/app/run.py:521 is the sole production caller (`rec[\"continues\"][\"claim\"]=lineage.claim(...)`); :522-523 `except lineage.LineageRefused as e: raise RunRefused(str(e)) from None` — stringified, never parsed",
+    "aisef2/app/cli.py:98-99 `print(f\"aisef run: refused: {e}\", file=sys.stderr)` — operator stderr, not parsed",
+    "aisef2/app/run.py:665 records the RunRefused as `failure={\"type\":..., \"detail\": str(failure)[:2000]}`; aisef2/app/verify.py:203 reads only `rec.get(\"failure\")` truthiness, never the detail string",
+    "aisef2/app/bundle_cli.py:886-888/893 wraps `continued_by`/`claims`/`claim_unread` refusals as JournalRefused(\"EVIDENCE_UNREADABLE\"); claim() is never called there",
+    "tests/v2/test_v21_pw_lineage_unread.py TheClaimsRefusalsSayWhatToDo L626-655 is the only text oracle on this branch: the ENOSPC test (injected OSError(ENOSPC,'No space left on device')) asserts 'No space left on device', 'free space', NOT 'restore write access', NOT 'writable copy', 'nothing was taken'; the EACCES test asserts 'restore write access', NOT 'writable copy', regex '[Nn]ot from a copy' — none asserts a dropped connective",
+    "grep over tests/ aisef2/ aisef/ validation/ docs/ at the snapshot: no reader outside lineage.py references the dropped OSERR/UNREAD fragments; the only 'cannot be created' hits are an unrelated probe message ('the evaluation directory cannot be created'); only tests/v2/test_v21_pw_lineage_unread.py pins 'restore write access'"
+   ],
+   "exceptions_checked": [
+    "a test/regex/doc asserting the dropped fragment: none (grep over tests/aisef2/aisef/validation/docs)",
+    "an identifier merged past recovery: the abutting identifiers (predecessor, target.name, class, strerror) each remain as substrings; pw asserts them as substrings, not as delimited tokens, on this branch",
+    "a NEW round-3 reader: none; the round-3 manifest additions (review-findings, diagnostics) do not read this text"
+   ],
+   "refutation": "none — no reader depends on the dropped connective; pw (the sole text oracle on this branch) passes",
+   "note": "Connective/explanatory text on the unwritable-predecessor OSError refusal (L339-345); every identifier and the remediation survive. Mutant maps exactly at the snapshot."
+  },
+  {
+   "target": "aisef2/app/lineage.py::claim",
+   "index": 92,
+   "mutant": "L341 string ' cannot be created (' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "At L341 ' cannot be created (' is emptied -> '{target.name}{type(e).__name__}: {strerror}) — ...'; a '(' is lost so a ')' is later unbalanced (cosmetic). target.name, class, strerror, remediation, tail all survive. pw PASSES (39). grep: 'cannot be created' outside lineage.py is only the unrelated probe message. Connective only. Measured in a COPY tree (PATH stripped of both opencode dirs; HOME/TMPDIR/XDG sandboxed; nice -n 19 python3 -P -B -m unittest). Baselines unmutated PASS: pw_lineage_unread 39, kills3_R03 5, kills3_T09a 18, kills3_T09b 14, continue_integrity 24, continue_usage 10, defects_verify 20, x_lineage_proof 55. Positive control: sibling [108] 'L343 free space on its volume emptied' FAILS pw (assertIn 'free space'), so the oracle is live.",
+   "consumers_checked": [
+    "aisef2/app/lineage.py L339-345 (the only producer: the unwritable-predecessor OSError refusal)",
+    "aisef2/app/run.py:521 is the sole production caller (`rec[\"continues\"][\"claim\"]=lineage.claim(...)`); :522-523 `except lineage.LineageRefused as e: raise RunRefused(str(e)) from None` — stringified, never parsed",
+    "aisef2/app/cli.py:98-99 `print(f\"aisef run: refused: {e}\", file=sys.stderr)` — operator stderr, not parsed",
+    "aisef2/app/run.py:665 records the RunRefused as `failure={\"type\":..., \"detail\": str(failure)[:2000]}`; aisef2/app/verify.py:203 reads only `rec.get(\"failure\")` truthiness, never the detail string",
+    "aisef2/app/bundle_cli.py:886-888/893 wraps `continued_by`/`claims`/`claim_unread` refusals as JournalRefused(\"EVIDENCE_UNREADABLE\"); claim() is never called there",
+    "tests/v2/test_v21_pw_lineage_unread.py TheClaimsRefusalsSayWhatToDo L626-655 is the only text oracle on this branch: the ENOSPC test (injected OSError(ENOSPC,'No space left on device')) asserts 'No space left on device', 'free space', NOT 'restore write access', NOT 'writable copy', 'nothing was taken'; the EACCES test asserts 'restore write access', NOT 'writable copy', regex '[Nn]ot from a copy' — none asserts a dropped connective",
+    "grep over tests/ aisef2/ aisef/ validation/ docs/ at the snapshot: no reader outside lineage.py references the dropped OSERR/UNREAD fragments; the only 'cannot be created' hits are an unrelated probe message ('the evaluation directory cannot be created'); only tests/v2/test_v21_pw_lineage_unread.py pins 'restore write access'"
+   ],
+   "exceptions_checked": [
+    "a test/regex/doc asserting the dropped fragment: none (grep over tests/aisef2/aisef/validation/docs)",
+    "an identifier merged past recovery: the abutting identifiers (predecessor, target.name, class, strerror) each remain as substrings; pw asserts them as substrings, not as delimited tokens, on this branch",
+    "a NEW round-3 reader: none; the round-3 manifest additions (review-findings, diagnostics) do not read this text"
+   ],
+   "refutation": "none — no reader depends on the dropped connective; pw (the sole text oracle on this branch) passes",
+   "note": "Connective/explanatory text on the unwritable-predecessor OSError refusal (L339-345); every identifier and the remediation survive. Mutant maps exactly at the snapshot."
+  },
+  {
+   "target": "aisef2/app/lineage.py::claim",
+   "index": 93,
+   "mutant": "L341 string ': ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "At L341 the ': ' between the class and its message is emptied -> '({type(e).__name__}{strerror})', rendering '(OSErrorNo space left on device)'. assertIn('No space left on device') still holds (substring); 'free space', 'nothing was taken' intact. pw PASSES (39). No reader parses 'Class: message'. Connective only. Measured in a COPY tree (PATH stripped of both opencode dirs; HOME/TMPDIR/XDG sandboxed; nice -n 19 python3 -P -B -m unittest). Baselines unmutated PASS: pw_lineage_unread 39, kills3_R03 5, kills3_T09a 18, kills3_T09b 14, continue_integrity 24, continue_usage 10, defects_verify 20, x_lineage_proof 55. Positive control: sibling [108] 'L343 free space on its volume emptied' FAILS pw (assertIn 'free space'), so the oracle is live.",
+   "consumers_checked": [
+    "aisef2/app/lineage.py L339-345 (the only producer: the unwritable-predecessor OSError refusal)",
+    "aisef2/app/run.py:521 is the sole production caller (`rec[\"continues\"][\"claim\"]=lineage.claim(...)`); :522-523 `except lineage.LineageRefused as e: raise RunRefused(str(e)) from None` — stringified, never parsed",
+    "aisef2/app/cli.py:98-99 `print(f\"aisef run: refused: {e}\", file=sys.stderr)` — operator stderr, not parsed",
+    "aisef2/app/run.py:665 records the RunRefused as `failure={\"type\":..., \"detail\": str(failure)[:2000]}`; aisef2/app/verify.py:203 reads only `rec.get(\"failure\")` truthiness, never the detail string",
+    "aisef2/app/bundle_cli.py:886-888/893 wraps `continued_by`/`claims`/`claim_unread` refusals as JournalRefused(\"EVIDENCE_UNREADABLE\"); claim() is never called there",
+    "tests/v2/test_v21_pw_lineage_unread.py TheClaimsRefusalsSayWhatToDo L626-655 is the only text oracle on this branch: the ENOSPC test (injected OSError(ENOSPC,'No space left on device')) asserts 'No space left on device', 'free space', NOT 'restore write access', NOT 'writable copy', 'nothing was taken'; the EACCES test asserts 'restore write access', NOT 'writable copy', regex '[Nn]ot from a copy' — none asserts a dropped connective",
+    "grep over tests/ aisef2/ aisef/ validation/ docs/ at the snapshot: no reader outside lineage.py references the dropped OSERR/UNREAD fragments; the only 'cannot be created' hits are an unrelated probe message ('the evaluation directory cannot be created'); only tests/v2/test_v21_pw_lineage_unread.py pins 'restore write access'"
+   ],
+   "exceptions_checked": [
+    "a test/regex/doc asserting the dropped fragment: none (grep over tests/aisef2/aisef/validation/docs)",
+    "an identifier merged past recovery: the abutting identifiers (predecessor, target.name, class, strerror) each remain as substrings; pw asserts them as substrings, not as delimited tokens, on this branch",
+    "a NEW round-3 reader: none; the round-3 manifest additions (review-findings, diagnostics) do not read this text"
+   ],
+   "refutation": "none — no reader depends on the dropped connective; pw (the sole text oracle on this branch) passes",
+   "note": "Connective/explanatory text on the unwritable-predecessor OSError refusal (L339-345); every identifier and the remediation survive. Mutant maps exactly at the snapshot."
+  },
+  {
+   "target": "aisef2/app/lineage.py::claim",
+   "index": 94,
+   "mutant": "L342 string ') — the claim is a file in that directory: ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "At L342 ') — the claim is a file in that directory: ' is emptied -> '{strerror}{remediation} and run again...'; the strerror abuts the remediation but both survive. pw asserts 'No space left on device','free space','nothing was taken' (ENOSPC) and 'restore write access','[Nn]ot from a copy' (EACCES) — not this clause. pw PASSES (39). Connective only. Measured in a COPY tree (PATH stripped of both opencode dirs; HOME/TMPDIR/XDG sandboxed; nice -n 19 python3 -P -B -m unittest). Baselines unmutated PASS: pw_lineage_unread 39, kills3_R03 5, kills3_T09a 18, kills3_T09b 14, continue_integrity 24, continue_usage 10, defects_verify 20, x_lineage_proof 55. Positive control: sibling [108] 'L343 free space on its volume emptied' FAILS pw (assertIn 'free space'), so the oracle is live.",
+   "consumers_checked": [
+    "aisef2/app/lineage.py L339-345 (the only producer: the unwritable-predecessor OSError refusal)",
+    "aisef2/app/run.py:521 is the sole production caller (`rec[\"continues\"][\"claim\"]=lineage.claim(...)`); :522-523 `except lineage.LineageRefused as e: raise RunRefused(str(e)) from None` — stringified, never parsed",
+    "aisef2/app/cli.py:98-99 `print(f\"aisef run: refused: {e}\", file=sys.stderr)` — operator stderr, not parsed",
+    "aisef2/app/run.py:665 records the RunRefused as `failure={\"type\":..., \"detail\": str(failure)[:2000]}`; aisef2/app/verify.py:203 reads only `rec.get(\"failure\")` truthiness, never the detail string",
+    "aisef2/app/bundle_cli.py:886-888/893 wraps `continued_by`/`claims`/`claim_unread` refusals as JournalRefused(\"EVIDENCE_UNREADABLE\"); claim() is never called there",
+    "tests/v2/test_v21_pw_lineage_unread.py TheClaimsRefusalsSayWhatToDo L626-655 is the only text oracle on this branch: the ENOSPC test (injected OSError(ENOSPC,'No space left on device')) asserts 'No space left on device', 'free space', NOT 'restore write access', NOT 'writable copy', 'nothing was taken'; the EACCES test asserts 'restore write access', NOT 'writable copy', regex '[Nn]ot from a copy' — none asserts a dropped connective",
+    "grep over tests/ aisef2/ aisef/ validation/ docs/ at the snapshot: no reader outside lineage.py references the dropped OSERR/UNREAD fragments; the only 'cannot be created' hits are an unrelated probe message ('the evaluation directory cannot be created'); only tests/v2/test_v21_pw_lineage_unread.py pins 'restore write access'"
+   ],
+   "exceptions_checked": [
+    "a test/regex/doc asserting the dropped fragment: none (grep over tests/aisef2/aisef/validation/docs)",
+    "an identifier merged past recovery: the abutting identifiers (predecessor, target.name, class, strerror) each remain as substrings; pw asserts them as substrings, not as delimited tokens, on this branch",
+    "a NEW round-3 reader: none; the round-3 manifest additions (review-findings, diagnostics) do not read this text"
+   ],
+   "refutation": "none — no reader depends on the dropped connective; pw (the sole text oracle on this branch) passes",
+   "note": "Connective/explanatory text on the unwritable-predecessor OSError refusal (L339-345); every identifier and the remediation survive. Mutant maps exactly at the snapshot."
+  },
+  {
+   "target": "aisef2/app/lineage.py::claim",
+   "index": 74,
+   "mutant": "L317 string ' is claimed by ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "At L317 ' is claimed by ' is emptied -> '{predecessor}{held} ({path.name}), whose evidence...'. predecessor and held abut, both survive; '(UNREAD)', the cause {unread}, '--supersede-claim {sha}' all remain. mutant[74] PASSES pw (39). Measured in a COPY tree (PATH stripped of both opencode dirs; HOME/TMPDIR/XDG sandboxed; nice -n 19 python3 -P -B -m unittest). Baselines unmutated PASS: pw_lineage_unread 39, kills3_R03 5, kills3_T09a 18, kills3_T09b 14, continue_integrity 24, continue_usage 10, defects_verify 20, x_lineage_proof 55. Positive control: sibling [108] 'L343 free space on its volume emptied' FAILS pw (assertIn 'free space'), so the oracle is live.",
+   "consumers_checked": [
+    "aisef2/app/lineage.py L317-323 (the only producer: the UNREAD-claim refusal)",
+    "aisef2/app/run.py:521 is the sole production caller (`rec[\"continues\"][\"claim\"]=lineage.claim(...)`); :522-523 `except lineage.LineageRefused as e: raise RunRefused(str(e)) from None` — stringified, never parsed",
+    "aisef2/app/cli.py:98-99 `print(f\"aisef run: refused: {e}\", file=sys.stderr)` — operator stderr, not parsed",
+    "aisef2/app/run.py:665 records the RunRefused as `failure={\"type\":..., \"detail\": str(failure)[:2000]}`; aisef2/app/verify.py:203 reads only `rec.get(\"failure\")` truthiness, never the detail string",
+    "aisef2/app/bundle_cli.py:886-888/893 wraps `continued_by`/`claims`/`claim_unread` refusals as JournalRefused(\"EVIDENCE_UNREADABLE\"); claim() is never called there",
+    "tests/v2/test_v21_pw_lineage_unread.py UnreadContract L154-156 asserts assertIn('UNREAD'), assertIn(str(child)) (=`held`) and assertIn('--supersede-claim {sha256}'); L235-237 asserts the cause ({unread}: 'PermissionError', JOURNAL name) and regex restore|read access|inspect; the CLI tests L389-391 assert the same identifiers — all preserved by these mutants",
+    "grep over tests/ aisef2/ aisef/ validation/ docs/ at the snapshot: no reader outside lineage.py references the dropped OSERR/UNREAD fragments; the only 'cannot be created' hits are an unrelated probe message ('the evaluation directory cannot be created'); only tests/v2/test_v21_pw_lineage_unread.py pins 'restore write access'"
+   ],
+   "exceptions_checked": [
+    "a test/regex/doc asserting the dropped fragment: none (grep)",
+    "an identifier merged past recovery: predecessor/held/path.name/{unread} each remain as substrings; pw asserts the child path, the cause and the sha, not delimited tokens, on this branch",
+    "the sha lost (for [78]): it precedes the emptied parenthetical; pw and the supersede-claim regex find it"
+   ],
+   "refutation": "none — UNREAD, the child path, the cause, and the --supersede-claim sha256 all survive; pw passes",
+   "note": "Connective/explanatory text on the UNREAD-claim refusal (L317-323); identifiers and the supersede command survive. Mutant maps exactly at the snapshot."
+  },
+  {
+   "target": "aisef2/app/lineage.py::claim",
+   "index": 75,
+   "mutant": "L317 string ' (' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "At L317 ' (' before the claim-file name is emptied -> '{held}{path.name}), whose evidence...'; held and path.name abut, both survive. UNREAD, cause, supersede flag+sha remain. mutant[75] PASSES pw (39). Measured in a COPY tree (PATH stripped of both opencode dirs; HOME/TMPDIR/XDG sandboxed; nice -n 19 python3 -P -B -m unittest). Baselines unmutated PASS: pw_lineage_unread 39, kills3_R03 5, kills3_T09a 18, kills3_T09b 14, continue_integrity 24, continue_usage 10, defects_verify 20, x_lineage_proof 55. Positive control: sibling [108] 'L343 free space on its volume emptied' FAILS pw (assertIn 'free space'), so the oracle is live.",
+   "consumers_checked": [
+    "aisef2/app/lineage.py L317-323 (the only producer: the UNREAD-claim refusal)",
+    "aisef2/app/run.py:521 is the sole production caller (`rec[\"continues\"][\"claim\"]=lineage.claim(...)`); :522-523 `except lineage.LineageRefused as e: raise RunRefused(str(e)) from None` — stringified, never parsed",
+    "aisef2/app/cli.py:98-99 `print(f\"aisef run: refused: {e}\", file=sys.stderr)` — operator stderr, not parsed",
+    "aisef2/app/run.py:665 records the RunRefused as `failure={\"type\":..., \"detail\": str(failure)[:2000]}`; aisef2/app/verify.py:203 reads only `rec.get(\"failure\")` truthiness, never the detail string",
+    "aisef2/app/bundle_cli.py:886-888/893 wraps `continued_by`/`claims`/`claim_unread` refusals as JournalRefused(\"EVIDENCE_UNREADABLE\"); claim() is never called there",
+    "tests/v2/test_v21_pw_lineage_unread.py UnreadContract L154-156 asserts assertIn('UNREAD'), assertIn(str(child)) (=`held`) and assertIn('--supersede-claim {sha256}'); L235-237 asserts the cause ({unread}: 'PermissionError', JOURNAL name) and regex restore|read access|inspect; the CLI tests L389-391 assert the same identifiers — all preserved by these mutants",
+    "grep over tests/ aisef2/ aisef/ validation/ docs/ at the snapshot: no reader outside lineage.py references the dropped OSERR/UNREAD fragments; the only 'cannot be created' hits are an unrelated probe message ('the evaluation directory cannot be created'); only tests/v2/test_v21_pw_lineage_unread.py pins 'restore write access'"
+   ],
+   "exceptions_checked": [
+    "a test/regex/doc asserting the dropped fragment: none (grep)",
+    "an identifier merged past recovery: predecessor/held/path.name/{unread} each remain as substrings; pw asserts the child path, the cause and the sha, not delimited tokens, on this branch",
+    "the sha lost (for [78]): it precedes the emptied parenthetical; pw and the supersede-claim regex find it"
+   ],
+   "refutation": "none — UNREAD, the child path, the cause, and the --supersede-claim sha256 all survive; pw passes",
+   "note": "Connective/explanatory text on the UNREAD-claim refusal (L317-323); identifiers and the supersede command survive. Mutant maps exactly at the snapshot."
+  },
+  {
+   "target": "aisef2/app/lineage.py::claim",
+   "index": 76,
+   "mutant": "L317 string '), whose evidence exists and cannot be read (' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "At L317 the descriptive phrase is emptied -> '({path.name}{unread}): it may have begun (UNREAD)...'; the machine cause {unread} (names the file and PermissionError) and '(UNREAD)' and the supersede flag+sha remain. pw asserts 'UNREAD', the child path, the cause, and the sha — mutant[76] PASSES pw (39). Measured in a COPY tree (PATH stripped of both opencode dirs; HOME/TMPDIR/XDG sandboxed; nice -n 19 python3 -P -B -m unittest). Baselines unmutated PASS: pw_lineage_unread 39, kills3_R03 5, kills3_T09a 18, kills3_T09b 14, continue_integrity 24, continue_usage 10, defects_verify 20, x_lineage_proof 55. Positive control: sibling [108] 'L343 free space on its volume emptied' FAILS pw (assertIn 'free space'), so the oracle is live.",
+   "consumers_checked": [
+    "aisef2/app/lineage.py L317-323 (the only producer: the UNREAD-claim refusal)",
+    "aisef2/app/run.py:521 is the sole production caller (`rec[\"continues\"][\"claim\"]=lineage.claim(...)`); :522-523 `except lineage.LineageRefused as e: raise RunRefused(str(e)) from None` — stringified, never parsed",
+    "aisef2/app/cli.py:98-99 `print(f\"aisef run: refused: {e}\", file=sys.stderr)` — operator stderr, not parsed",
+    "aisef2/app/run.py:665 records the RunRefused as `failure={\"type\":..., \"detail\": str(failure)[:2000]}`; aisef2/app/verify.py:203 reads only `rec.get(\"failure\")` truthiness, never the detail string",
+    "aisef2/app/bundle_cli.py:886-888/893 wraps `continued_by`/`claims`/`claim_unread` refusals as JournalRefused(\"EVIDENCE_UNREADABLE\"); claim() is never called there",
+    "tests/v2/test_v21_pw_lineage_unread.py UnreadContract L154-156 asserts assertIn('UNREAD'), assertIn(str(child)) (=`held`) and assertIn('--supersede-claim {sha256}'); L235-237 asserts the cause ({unread}: 'PermissionError', JOURNAL name) and regex restore|read access|inspect; the CLI tests L389-391 assert the same identifiers — all preserved by these mutants",
+    "grep over tests/ aisef2/ aisef/ validation/ docs/ at the snapshot: no reader outside lineage.py references the dropped OSERR/UNREAD fragments; the only 'cannot be created' hits are an unrelated probe message ('the evaluation directory cannot be created'); only tests/v2/test_v21_pw_lineage_unread.py pins 'restore write access'"
+   ],
+   "exceptions_checked": [
+    "a test/regex/doc asserting the dropped fragment: none (grep)",
+    "an identifier merged past recovery: predecessor/held/path.name/{unread} each remain as substrings; pw asserts the child path, the cause and the sha, not delimited tokens, on this branch",
+    "the sha lost (for [78]): it precedes the emptied parenthetical; pw and the supersede-claim regex find it"
+   ],
+   "refutation": "none — UNREAD, the child path, the cause, and the --supersede-claim sha256 all survive; pw passes",
+   "note": "Connective/explanatory text on the UNREAD-claim refusal (L317-323); identifiers and the supersede command survive. Mutant maps exactly at the snapshot."
+  },
+  {
+   "target": "aisef2/app/lineage.py::claim",
+   "index": 78,
+   "mutant": "L322 string ' (recorded; the run is still refused while that evidence does not read, because what the child spent is not known)' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "At L322 the trailing parenthetical AFTER '--supersede-claim {_sha(data)}' is emptied; the flag and the 64-hex digest (the only machine token lifted) are untouched and precede the cut. pw's assertIn('--supersede-claim {sha}') and the T09b-style regex '--supersede-claim\\s+([0-9a-f]{64})(?![0-9a-f])' both still match. mutant[78] PASSES pw (39). Measured in a COPY tree (PATH stripped of both opencode dirs; HOME/TMPDIR/XDG sandboxed; nice -n 19 python3 -P -B -m unittest). Baselines unmutated PASS: pw_lineage_unread 39, kills3_R03 5, kills3_T09a 18, kills3_T09b 14, continue_integrity 24, continue_usage 10, defects_verify 20, x_lineage_proof 55. Positive control: sibling [108] 'L343 free space on its volume emptied' FAILS pw (assertIn 'free space'), so the oracle is live.",
+   "consumers_checked": [
+    "aisef2/app/lineage.py L317-323 (the only producer: the UNREAD-claim refusal)",
+    "aisef2/app/run.py:521 is the sole production caller (`rec[\"continues\"][\"claim\"]=lineage.claim(...)`); :522-523 `except lineage.LineageRefused as e: raise RunRefused(str(e)) from None` — stringified, never parsed",
+    "aisef2/app/cli.py:98-99 `print(f\"aisef run: refused: {e}\", file=sys.stderr)` — operator stderr, not parsed",
+    "aisef2/app/run.py:665 records the RunRefused as `failure={\"type\":..., \"detail\": str(failure)[:2000]}`; aisef2/app/verify.py:203 reads only `rec.get(\"failure\")` truthiness, never the detail string",
+    "aisef2/app/bundle_cli.py:886-888/893 wraps `continued_by`/`claims`/`claim_unread` refusals as JournalRefused(\"EVIDENCE_UNREADABLE\"); claim() is never called there",
+    "tests/v2/test_v21_pw_lineage_unread.py UnreadContract L154-156 asserts assertIn('UNREAD'), assertIn(str(child)) (=`held`) and assertIn('--supersede-claim {sha256}'); L235-237 asserts the cause ({unread}: 'PermissionError', JOURNAL name) and regex restore|read access|inspect; the CLI tests L389-391 assert the same identifiers — all preserved by these mutants",
+    "grep over tests/ aisef2/ aisef/ validation/ docs/ at the snapshot: no reader outside lineage.py references the dropped OSERR/UNREAD fragments; the only 'cannot be created' hits are an unrelated probe message ('the evaluation directory cannot be created'); only tests/v2/test_v21_pw_lineage_unread.py pins 'restore write access'"
+   ],
+   "exceptions_checked": [
+    "a test/regex/doc asserting the dropped fragment: none (grep)",
+    "an identifier merged past recovery: predecessor/held/path.name/{unread} each remain as substrings; pw asserts the child path, the cause and the sha, not delimited tokens, on this branch",
+    "the sha lost (for [78]): it precedes the emptied parenthetical; pw and the supersede-claim regex find it"
+   ],
+   "refutation": "none — UNREAD, the child path, the cause, and the --supersede-claim sha256 all survive; pw passes",
+   "note": "Connective/explanatory text on the UNREAD-claim refusal (L317-323); identifiers and the supersede command survive. Mutant maps exactly at the snapshot."
+  },
+  {
+   "target": "aisef2/app/lineage.py::claim",
+   "index": 68,
+   "mutant": "L340 element 1 dropped",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "At L340 `full = e.errno in (errno.ENOSPC, getattr(errno,'EDQUOT',None))` becomes `(errno.ENOSPC,)` (mutant_view confirmed). For ENOSPC full stays True ('free space'); for EACCES full stays False ('restore write access'). The ONLY observable difference is on errno==EDQUOT (disk-quota), where the remediation flips from 'free space on its volume' to 'restore write access to it'. No test injects EDQUOT (EDQUOT=69 exists on this host, so the branch is reachable on a quota'd FS). mutant[68] PASSES pw (39). Measured in a COPY tree (PATH stripped of both opencode dirs; HOME/TMPDIR/XDG sandboxed; nice -n 19 python3 -P -B -m unittest). Baselines unmutated PASS: pw_lineage_unread 39, kills3_R03 5, kills3_T09a 18, kills3_T09b 14, continue_integrity 24, continue_usage 10, defects_verify 20, x_lineage_proof 55. Positive control: sibling [108] 'L343 free space on its volume emptied' FAILS pw (assertIn 'free space'), so the oracle is live.",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:340 sets `full`; read only at L343 (remediation ternary); `full` is not returned, recorded or branched on elsewhere",
+    "tests/v2/test_v21_pw_lineage_unread.py L628-645 (ENOSPC: full=True -> 'free space', NOT 'restore write access') and L647-655 (EACCES: full=False -> 'restore write access') are the only assertions on the ternary; both pass in both forms because ENOSPC stays in the tuple and EACCES is in neither",
+    "aisef2/app/run.py:521 is the sole production caller (`rec[\"continues\"][\"claim\"]=lineage.claim(...)`); :522-523 `except lineage.LineageRefused as e: raise RunRefused(str(e)) from None` — stringified, never parsed",
+    "aisef2/app/cli.py:98-99 `print(f\"aisef run: refused: {e}\", file=sys.stderr)` — operator stderr, not parsed",
+    "aisef2/app/run.py:665 records the RunRefused as `failure={\"type\":..., \"detail\": str(failure)[:2000]}`; aisef2/app/verify.py:203 reads only `rec.get(\"failure\")` truthiness, never the detail string",
+    "grep 'EDQUOT' over tests/aisef2/aisef/validation/docs: only aisef2/app/lineage.py; no test injects EDQUOT; this host has errno.EDQUOT=69, so the difference is live here, not merely theoretical"
+   ],
+   "exceptions_checked": [
+    "an EDQUOT test or fixture: none (grep)",
+    "a consumer reading `full` or the chosen phrase programmatically: none; the phrase is operator-facing text only",
+    "None matching a real errno (for [103]'s (ENOSPC,None)): e.errno from os.open is a positive int, never None"
+   ],
+   "refutation": "A test IS cheaply writable (the pw file already mocks lineage.os.open to raise OSError(ENOSPC,...); an EDQUOT case would assert 'free space on its volume' / NOT 'restore write access' and would kill [68]). Not owed under the round-3 rule 'never add a test merely to reach a number': the branch is an unexercised, platform-conditional remediation HINT, and the identifying cause (the OSError class + strerror 'Disc quota exceeded') is preserved so the operator can still diagnose and act.",
+   "note": "CLOSEST CALL of the batch. On EDQUOT the mutant's remediation ('restore write access to it') is actively WRONG (the operator has write access; the quota is the issue) — I do not accept the author's 'advisory and plausible' framing. AUDITED stands only because the error cause/strerror survives and no reader/test depends on the hint; flagged for owner visibility."
+  },
+  {
+   "target": "aisef2/app/lineage.py::claim",
+   "index": 103,
+   "mutant": "L340 string 'EDQUOT' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "At L340 `getattr(errno,'EDQUOT',None)` becomes `getattr(errno,'',None)`=None, so the tuple is `(errno.ENOSPC, None)` (mutant_view confirmed). Since e.errno is a positive int, membership matches ENOSPC only — behaviourally identical to [68]. On platforms without errno.EDQUOT the ORIGINAL tuple is already `(ENOSPC, None)`, so [103] is EQUIVALENT there; on this host EDQUOT=69 exists, so it is observably different on an EDQUOT error — AUDITED (not EQUIVALENT) is the correct conservative call. mutant[103] PASSES pw (39). Measured in a COPY tree (PATH stripped of both opencode dirs; HOME/TMPDIR/XDG sandboxed; nice -n 19 python3 -P -B -m unittest). Baselines unmutated PASS: pw_lineage_unread 39, kills3_R03 5, kills3_T09a 18, kills3_T09b 14, continue_integrity 24, continue_usage 10, defects_verify 20, x_lineage_proof 55. Positive control: sibling [108] 'L343 free space on its volume emptied' FAILS pw (assertIn 'free space'), so the oracle is live.",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:340 sets `full`; read only at L343 (remediation ternary); `full` is not returned, recorded or branched on elsewhere",
+    "tests/v2/test_v21_pw_lineage_unread.py L628-645 (ENOSPC: full=True -> 'free space', NOT 'restore write access') and L647-655 (EACCES: full=False -> 'restore write access') are the only assertions on the ternary; both pass in both forms because ENOSPC stays in the tuple and EACCES is in neither",
+    "aisef2/app/run.py:521 is the sole production caller (`rec[\"continues\"][\"claim\"]=lineage.claim(...)`); :522-523 `except lineage.LineageRefused as e: raise RunRefused(str(e)) from None` — stringified, never parsed",
+    "aisef2/app/cli.py:98-99 `print(f\"aisef run: refused: {e}\", file=sys.stderr)` — operator stderr, not parsed",
+    "aisef2/app/run.py:665 records the RunRefused as `failure={\"type\":..., \"detail\": str(failure)[:2000]}`; aisef2/app/verify.py:203 reads only `rec.get(\"failure\")` truthiness, never the detail string",
+    "grep 'EDQUOT' over tests/aisef2/aisef/validation/docs: only aisef2/app/lineage.py; no test injects EDQUOT; this host has errno.EDQUOT=69, so the difference is live here, not merely theoretical"
+   ],
+   "exceptions_checked": [
+    "an EDQUOT test or fixture: none (grep)",
+    "a consumer reading `full` or the chosen phrase programmatically: none; the phrase is operator-facing text only",
+    "None matching a real errno (for [103]'s (ENOSPC,None)): e.errno from os.open is a positive int, never None"
+   ],
+   "refutation": "Same as [68]: an EDQUOT-injecting pw case would kill it, but is not owed under the round-3 rule given the unexercised platform-conditional branch and the preserved cause/strerror.",
+   "note": "Same EDQUOT remediation degradation as [68]; EQUIVALENT only on EDQUOT-less platforms, AUDITED here (EDQUOT=69)."
+  },
+  {
+   "target": "aisef2/app/lineage.py::claim",
+   "index": 104,
+   "mutant": "L342 Or swapped",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "At L342 `{e.strerror or e}` becomes `{e.strerror and e}` in the unwritable-predecessor refusal (mutant_view confirmed). For a real/injected OSError the strerror is truthy, so `strerror and e` evaluates to `e` and renders str(e) — a SUPERSET, e.g. '[Errno 28] No space left on device' which still contains 'No space left on device'. pw's assertIn('No space left on device') (ENOSPC) still holds; the EACCES test asserts only 'restore write access'/'Not from a copy' (unaffected). mutant[104] PASSES pw (39). Only a hand-built OSError with strerror=None would degrade ('None' vs the original ''), which os.open on a real FS never produces and the original already renders '' there. Measured in a COPY tree (PATH stripped of both opencode dirs; HOME/TMPDIR/XDG sandboxed; nice -n 19 python3 -P -B -m unittest). Baselines unmutated PASS: pw_lineage_unread 39, kills3_R03 5, kills3_T09a 18, kills3_T09b 14, continue_integrity 24, continue_usage 10, defects_verify 20, x_lineage_proof 55. Positive control: sibling [108] 'L343 free space on its volume emptied' FAILS pw (assertIn 'free space'), so the oracle is live.",
+   "consumers_checked": [
+    "aisef2/app/lineage.py L339-345 (the only producer: the unwritable-predecessor OSError refusal)",
+    "aisef2/app/run.py:521 is the sole production caller (`rec[\"continues\"][\"claim\"]=lineage.claim(...)`); :522-523 `except lineage.LineageRefused as e: raise RunRefused(str(e)) from None` — stringified, never parsed",
+    "aisef2/app/cli.py:98-99 `print(f\"aisef run: refused: {e}\", file=sys.stderr)` — operator stderr, not parsed",
+    "aisef2/app/run.py:665 records the RunRefused as `failure={\"type\":..., \"detail\": str(failure)[:2000]}`; aisef2/app/verify.py:203 reads only `rec.get(\"failure\")` truthiness, never the detail string",
+    "aisef2/app/bundle_cli.py:886-888/893 wraps `continued_by`/`claims`/`claim_unread` refusals as JournalRefused(\"EVIDENCE_UNREADABLE\"); claim() is never called there",
+    "tests/v2/test_v21_pw_lineage_unread.py TheClaimsRefusalsSayWhatToDo L626-655 is the only text oracle on this branch: the ENOSPC test (injected OSError(ENOSPC,'No space left on device')) asserts 'No space left on device', 'free space', NOT 'restore write access', NOT 'writable copy', 'nothing was taken'; the EACCES test asserts 'restore write access', NOT 'writable copy', regex '[Nn]ot from a copy' — none asserts a dropped connective",
+    "grep over tests/ aisef2/ aisef/ validation/ docs/ at the snapshot: no reader outside lineage.py references the dropped OSERR/UNREAD fragments; the only 'cannot be created' hits are an unrelated probe message ('the evaluation directory cannot be created'); only tests/v2/test_v21_pw_lineage_unread.py pins 'restore write access'"
+   ],
+   "exceptions_checked": [
+    "a reader parsing the error-detail substring: none; run.py/cli.py stringify, verify reads truthiness",
+    "pw asserting the exact detail format: no — it asserts 'No space left on device' as a substring, which str(e) (the superset) still contains",
+    "the strerror=None degradation: os.open on a real FS always sets strerror; no input reaches it; the original already renders '' there so neither form is depended on"
+   ],
+   "refutation": "none — the mutant renders a superset of the original strerror; every substring assertion still holds",
+   "note": "`or`->`and` on the OSError strerror; renders str(e) (superset) for real errors; no consumer parses it."
+  },
+  {
+   "target": "aisef2/app/lineage.py::claim",
+   "index": 107,
+   "mutant": "L301 Or swapped",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "At L301 `{e.strerror or e}` becomes `{e.strerror and e}` in the claim-cannot-be-read refusal L300-303 (mutant_view confirmed). The type name `{type(e).__name__}` (R03's `cause` identifier) and 'not superseded without evidence' and 'readable again' and 'nothing was taken' are all OUTSIDE the swap and intact. R03 assert_identified checks pred/claim-file/error-class as delimited tokens (unaffected); pw test_a_claim_that_cannot_be_read asserts 'PermissionError' (the type name), regex 'readable again', 'nothing was taken' (all unaffected). mutant[107] PASSES R03 (5) and pw (39). Measured in a COPY tree (PATH stripped of both opencode dirs; HOME/TMPDIR/XDG sandboxed; nice -n 19 python3 -P -B -m unittest). Baselines unmutated PASS: pw_lineage_unread 39, kills3_R03 5, kills3_T09a 18, kills3_T09b 14, continue_integrity 24, continue_usage 10, defects_verify 20, x_lineage_proof 55. Positive control: sibling [108] 'L343 free space on its volume emptied' FAILS pw (assertIn 'free space'), so the oracle is live.",
+   "consumers_checked": [
+    "aisef2/app/lineage.py L300-303 (the only producer: the claim-cannot-be-read refusal)",
+    "tests/v2/test_v21_kills3_R03.py assert_identified on pred/file/cause + assertIn('not superseded without evidence')",
+    "tests/v2/test_v21_pw_lineage_unread.py L617-626 (PermissionError + 'readable again' + 'nothing was taken')",
+    "aisef2/app/run.py:521 is the sole production caller (`rec[\"continues\"][\"claim\"]=lineage.claim(...)`); :522-523 `except lineage.LineageRefused as e: raise RunRefused(str(e)) from None` — stringified, never parsed",
+    "aisef2/app/cli.py:98-99 `print(f\"aisef run: refused: {e}\", file=sys.stderr)` — operator stderr, not parsed",
+    "aisef2/app/run.py:665 records the RunRefused as `failure={\"type\":..., \"detail\": str(failure)[:2000]}`; aisef2/app/verify.py:203 reads only `rec.get(\"failure\")` truthiness, never the detail string",
+    "aisef2/app/bundle_cli.py:886-888/893 wraps `continued_by`/`claims`/`claim_unread` refusals as JournalRefused(\"EVIDENCE_UNREADABLE\"); claim() is never called there"
+   ],
+   "exceptions_checked": [
+    "R03's delimited `cause` identifier broken: no — `cause`=type(e).__name__, rendered by `{type(e).__name__}` outside the swap",
+    "'not superseded without evidence'/'readable again'/'nothing was taken' lost: no — all outside the swap",
+    "the strerror=None degradation: read_bytes on a real FS always sets strerror; no input reaches it"
+   ],
+   "refutation": "none — the type name and the retained guidance text are outside the swap; R03 and pw pass",
+   "note": "`or`->`and` on the cannot-be-read strerror; identifiers (type name, guidance) survive; superset for real errors."
+  },
+  {
+   "target": "aisef2/app/lineage.py::claim",
+   "index": 70,
+   "mutant": "L347 string '\\n' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "REMAPPED/POSITIONAL: at the snapshot index 70 is the claim-file write at L347 `f.write(json.dumps(doc, sort_keys=True) + '\\n')` and the mutant drops the trailing newline -> '' (mutant_view confirmed). The carried grounds hold; their line cites are stale (they name L179 and readers at L147-153/163/168/169/191/346/355 from base 289885ef) and are REFRESHED here to the snapshot: the write is L347; readers are claim() L298 read_bytes -> L305 json.loads with `_sha(data)` at L315/L322/L328/L329 (the digest of the bytes on disk), continued_by L353-362 (read_text -> _claimed_run -> json.loads, whitespace-insensitive), lineage_account/_claimed_run. The returned dict (not the file) goes into rec['continues']['claim'] (run.py:521); RUN.json is canonical JSON (sort_keys, run.py:496-499/675) and its digest is _content_sha (run.py:413-422). The claim file is NOT in evidence_manifest (run.py:425-434 lists RUN.json, STARTED, journals, sessions, preflight, review-findings and diagnostics — CONTINUED-BY excluded); tests/v2/test_v21_kills3_T14a.py:154-156 pins CONTINUED-BY.json in NOT_MEMBERS. No test pins the claim's exact bytes/newline: continue_integrity L417-422 does a before==after read_bytes self-comparison, L437/L472 and T09a sha() hash read_bytes() and the code recomputes _sha from the SAME on-disk bytes, L423/L507 json.loads. GOLD STANDARD: mutant[70] PASSES continue_integrity (24) AND T09a (18). Measured in a COPY tree (PATH stripped of both opencode dirs; HOME/TMPDIR/XDG sandboxed; nice -n 19 python3 -P -B -m unittest). Baselines unmutated PASS: pw_lineage_unread 39, kills3_R03 5, kills3_T09a 18, kills3_T09b 14, continue_integrity 24, continue_usage 10, defects_verify 20, x_lineage_proof 55. Positive control: sibling [108] 'L343 free space on its volume emptied' FAILS pw (assertIn 'free space'), so the oracle is live.",
+   "consumers_checked": [
+    "aisef2/app/lineage.py L298->L305 (read_bytes->json.loads), _sha(data) L315/L322/L328/L329; L347 the write",
+    "aisef2/app/lineage.py L353-362 continued_by (read_text->_claimed_run->json.loads); lineage_account (L708+)",
+    "aisef2/app/run.py:521 (returned dict recorded), :413-422 _content_sha (canonical JSON for RUN.json), :425-434 evidence_manifest (claim excluded), :496-499/:675 RUN.json write (sort_keys)",
+    "aisef2/app/verify.py: no claim-file open (lineage_account L86 only)",
+    "tests/v2/test_v21_kills3_T09a.py:59 sha()=hash(read_bytes), L269-273 before==after read_bytes; tests/v2/test_v21_continue_integrity.py L417-422/437/472/507; T14a:154-156 NOT_MEMBERS"
+   ],
+   "exceptions_checked": [
+    "a line-oriented reader of a claim file: none; all readers json.loads or hash bytes-as-read",
+    "an expected digest derived independently of the file's bytes: none; every digest (code and tests) is of read_bytes",
+    "the manifest/anchor binding the claim's bytes: not a member (checked incl. round-3 review-findings/diagnostics)",
+    "Windows text mode: bytes are read back and hashed as written; json.loads tolerates either ending"
+   ],
+   "refutation": "none — every reader parses JSON or hashes bytes-as-read; continue_integrity + T09a pass on the mutant",
+   "note": "Carried T09-AUDIT-CLAIM-BYTES, remapped index 54->70. Conclusion holds at the snapshot; lineage.py line cites refreshed (179->347 etc.). Verified by the heavy ClaimLifecycle differential, not just reasoning."
+  },
+  {
+   "target": "aisef2/app/lineage.py::claim",
+   "index": 84,
+   "mutant": "L328 string ')' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "REMAPPED/POSITIONAL: at the snapshot index 84 drops the final ')' of the ALIVE/not-begun refusal f-string at L328 -> the message ends '...--supersede-claim <64 hex>' unclosed (mutant_view confirmed). The carried grounds (including their own CORRECTION that cli.py only FORWARDS the flag and the equality check is `supersede == _sha(data)` inside claim()) hold; the lineage.py cites are stale and REFRESHED: the equality is L315 `asserted = supersede is not None and supersede == _sha(data)`; the producer is L326-328; cli.py forwarding is cli.py:49-50/71/97 (`supersede_claim` passed through). The recovery contract is tests/v2/test_v21_kills3_T09b.py ClaimRefusalText (class L148, regex L166 `--supersede-claim\\s+([0-9a-f]{64})(?![0-9a-f])`, compare to sha256 L168, supersede L169) — the negative lookahead matches whether or not a ')' follows, so the mutant is the SAFER form for an operator copying the last token; the equality L315 means a copied ')' would never match. GOLD STANDARD: mutant[84] PASSES T09b (14). Measured in a COPY tree (PATH stripped of both opencode dirs; HOME/TMPDIR/XDG sandboxed; nice -n 19 python3 -P -B -m unittest). Baselines unmutated PASS: pw_lineage_unread 39, kills3_R03 5, kills3_T09a 18, kills3_T09b 14, continue_integrity 24, continue_usage 10, defects_verify 20, x_lineage_proof 55. Positive control: sibling [108] 'L343 free space on its volume emptied' FAILS pw (assertIn 'free space'), so the oracle is live.",
+   "consumers_checked": [
+    "aisef2/app/lineage.py L326-328 (only producer); L315 `supersede == _sha(data)` (exact-64-hex equality)",
+    "aisef2/app/cli.py:49-50/71/97 forwards --supersede-claim (never parses the digest)",
+    "aisef2/app/run.py:521 is the sole production caller (`rec[\"continues\"][\"claim\"]=lineage.claim(...)`); :522-523 `except lineage.LineageRefused as e: raise RunRefused(str(e)) from None` — stringified, never parsed",
+    "aisef2/app/run.py:665 failure.detail=str(failure)[:2000] (the digest is the TAIL -> a very long path loses it in BOTH forms; the mutant is 1 char shorter, never worse); verify.py:203 truthiness only",
+    "tests/v2/test_v21_kills3_T09b.py L148-183 ClaimRefusalText (regex+assert_identified+supersede with extracted sha)"
+   ],
+   "exceptions_checked": [
+    "a script taking the message's last token as the digest: the mutant is the better form (no trailing ')')",
+    "a regex expecting ')' after the digest: none (T09b has only a negative lookahead for hex)",
+    "an identifying element lost: none — pred, held, claim-file name, reason, flag and 64-hex digest all intact",
+    "a NEW round-3 reader: none"
+   ],
+   "refutation": "none — identifiers and the --supersede-claim sha256 are intact; the extraction regex matches either way; T09b passes",
+   "note": "Carried T09-AUDIT-CLAIM-WORDING, remapped index 63->84. The author's cli.py correction is valid; lineage.py cites refreshed (168->328, 163->315). T09b's own line cites happened not to drift."
+  },
+  {
+   "target": "aisef2/app/lineage.py::claim",
+   "index": 88,
+   "mutant": "L335 string 'O_NOFOLLOW' emptied",
+   "class_before": "EQUIVALENT",
+   "verdict": "CONFIRMED",
+   "class_after": "EQUIVALENT",
+   "grounds": "REMAPPED/POSITIONAL: at the snapshot index 88 turns `getattr(os,'O_NOFOLLOW',0)` into `getattr(os,'',0)`=0 at L335 `os.open(target, O_WRONLY|O_CREAT|O_EXCL|...,0o444)` (mutant_view confirmed). Equivalence re-proved: O_NOFOLLOW governs only the FINAL path component, and O_CREAT|O_EXCL already refuses a final component that exists (a symbolic link included) with EEXIST. Re-measured on this host (macOS, Python 3.14, O_NOFOLLOW=256): for dangling / to-file / to-dir / self-loop symlinks and for a regular file and a directory, os.open with O_WRONLY|O_CREAT|O_EXCL gives FileExistsError(EEXIST) WITH and WITHOUT O_NOFOLLOW — identical, so the O_EXCL check wins before any ELOOP. An intermediate symlinked directory is followed either way (the flag does not govern it). The only handler is `except FileExistsError` (L336). On platforms lacking O_NOFOLLOW the original is already 0. GOLD STANDARD: mutant[88] PASSES continue_integrity (24). Measured in a COPY tree (PATH stripped of both opencode dirs; HOME/TMPDIR/XDG sandboxed; nice -n 19 python3 -P -B -m unittest). Baselines unmutated PASS: pw_lineage_unread 39, kills3_R03 5, kills3_T09a 18, kills3_T09b 14, continue_integrity 24, continue_usage 10, defects_verify 20, x_lineage_proof 55. Positive control: sibling [108] 'L343 free space on its volume emptied' FAILS pw (assertIn 'free space'), so the oracle is live.",
+   "consumers_checked": [
+    "aisef2/app/lineage.py L335-345 (os.open; FileExistsError->LineageRefused L336-338; OSError->L339-345; no other handler)",
+    "tests/v2/test_v21_continue_integrity.py (ClaimLifecycle drives real claim/supersede; the `Os` shim delegates, so getattr(shim,'',0)->0 vs ->256, both EEXIST) — PASSES",
+    "grep NOFOLLOW over aisef2/aisef/validation/tests/bin/docs: lineage.py:335/anchor and docs name it as a mechanism; nothing asserts the flag's presence"
+   ],
+   "exceptions_checked": [
+    "error class when a link is planted (EEXIST vs ELOOP): EEXIST for dangling/to-file/to-dir/loop links with AND without the flag (measured on this host) — the `except FileExistsError` is what every state gives",
+    "an intermediate symlinked directory: not governed by O_NOFOLLOW; followed either way (measured)",
+    "Windows: O_NOFOLLOW absent from os, both values 0",
+    "a later-generation dangling link: fails earlier at the read (L298), identically in both forms"
+   ],
+   "refutation": "none — O_EXCL alone refuses every final-component case with EEXIST (measured); the flag adds nothing reachable here; proven equivalent",
+   "note": "Carried T09-EQ-NOFOLLOW, remapped index 65->88. EQUIVALENT re-proved by direct os.open measurement on this host plus the heavy continue_integrity differential."
+  },
+  {
+   "target": "aisef2/app/lineage.py::claim",
+   "index": 106,
+   "mutant": "L347 True->False",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "REMAPPED/POSITIONAL: at the snapshot index 106 is `json.dumps(doc, sort_keys=False)` at L347 (mutant_view confirmed): the file's key order becomes the insertion order fixed at L333 (run, claimed, claimant, supersedes) instead of alphabetical. Bytes stay deterministic in both forms; json.loads and dict comparisons are order-insensitive; every digest (code L315/L322/L328/L329 and tests) is of the bytes on disk. The returned dict (L333) is what run.py:521 records; RUN.json is canonical (sort_keys) and bound by _content_sha. Same group and the same consumers/exceptions as [70]: the claim file is not a manifest member (run.py:425-434; T14a:154-156); no reader re-serialises or key-order-compares a production claim. GOLD STANDARD: mutant[106] PASSES continue_integrity (24) AND T09a (18). Measured in a COPY tree (PATH stripped of both opencode dirs; HOME/TMPDIR/XDG sandboxed; nice -n 19 python3 -P -B -m unittest). Baselines unmutated PASS: pw_lineage_unread 39, kills3_R03 5, kills3_T09a 18, kills3_T09b 14, continue_integrity 24, continue_usage 10, defects_verify 20, x_lineage_proof 55. Positive control: sibling [108] 'L343 free space on its volume emptied' FAILS pw (assertIn 'free space'), so the oracle is live.",
+   "consumers_checked": [
+    "aisef2/app/lineage.py L298/L305/L315/L322/L328/L329 (json.loads / hash of bytes read), L353-362 continued_by",
+    "aisef2/app/run.py:521 (returned dict recorded), :413-422 _content_sha, :425-434 evidence_manifest (claim excluded)",
+    "aisef2/app/verify.py: no claim-file open (lineage_account only)",
+    "tests: continue_integrity L417-422/437/472/507, T09a sha()/before==after, T14a:154-156; fixtures that write their own claims (continue_integrity L451 fabricate, T09a L264) do so WITHOUT sort_keys and still pass, confirming order-insensitivity"
+   ],
+   "exceptions_checked": [
+    "a verifier re-serialising a claim to compare bytes/digest: none",
+    "cross-host byte reproducibility of a claim: insertion order is code-fixed (L333), no dependence on hash ordering",
+    "the manifest/anchor binding the claim's bytes: not a member"
+   ],
+   "refutation": "none — readers are order-insensitive and every digest is of bytes-as-read; continue_integrity + T09a pass",
+   "note": "Carried T09-AUDIT-CLAIM-BYTES, remapped index 72->106. Conclusion holds; line cite refreshed (179->347). Verified by the heavy ClaimLifecycle differential."
+  }
+ ],
+ "owed_tests": [],
+ "notes": "All 16 entries verified exactly once (12 NEW draft + 4 CARRIED). Verdicts: 16 CONFIRMED, 0 REVISED, 0 REFUTED, 0 NOT_DECIDED; 0 tests owed. Source sha256 matches f342996d. Every mutant was confirmed via mutant_view to map exactly to its stated (line, function) at the snapshot. All 12 NEW survivors alter only operator-facing refusal TEXT (connectives on the OSError-create and UNREAD branches, two `or`->`and` strerror swaps that render a superset) or, for [68]/[103], the EDQUOT remediation hint; no production consumer parses a claim() refusal (run.py:521-523 wraps RunRefused(str(e)); cli.py:98-99 prints; run.py:665 records str(failure)[:2000]; verify.py:203 reads only failure truthiness). The 4 CARRIED entries hold at the new snapshot with their lineage.py line cites refreshed (the file grew ~170 lines since base 289885ef); the byte mutants [70]/[106] and the EQUIVALENT [88] were re-verified by the heavy continue_integrity differential (24 tests) plus T09a, and [88]'s equivalence by direct os.open symlink measurement (O_EXCL yields EEXIST with and without O_NOFOLLOW). The one close call is [68]/[103]: on EDQUOT (errno 69, present on this host) the mutant's remediation is actively wrong, not merely vaguer, but the error cause/strerror survives and the branch is unexercised/platform-conditional, so AUDITED stands and no test is owed under the round-3 rule — flagged for owner visibility. No test or doc outside lineage.py references any dropped fragment (grep)."
+}

@@ -1,0 +1,98 @@
+{
+  "batch": "W2-bundle_cli-7",
+  "snapshot": "4ec961e706a1f7bda16d131037058c4fe9c2663f",
+  "file": "aisef2/app/bundle_cli.py",
+  "target": "aisef2/app/bundle_cli.py::_declared",
+  "role": "skeptic",
+  "verified_on": "2026-10-19 (date: Mon Oct 19 20:09 +07 2026)",
+  "method": "Skeptic tree from git archive@4ec961e; a COPY tree for mutated runs; the one closure-evidence file the kill file reads (closure-evidence/v2/release/LEDGERLOCK-PROJECT.json, 149726 bytes) added read-only via git show. Env for every run: env -i PATH=/usr/bin:/bin (opencode unreachable), HOME/TMPDIR/XDG under the tree, LANG/LC_ALL=C, PYTHONPATH=tree; nice -n 19 /opt/homebrew/bin/python3 -P -B. (1) mutant_view.py showed each of the 8 as a diff: every line/function/mutation matches the batch. (2) validation.v2.mutation.mutants(src,'_declared',_enum_members(src,tree)) rebuilt each mutant; desc==entry asserted for all 8. (3) BEHAVIORAL harness: for pristine and each mutant, _declared called directly on 11 crafted file_artifact records (good; before/after empty & non-str; when non-str; ref empty; affects as a list; classes/subject_absence as a list; a list element inside a classes tuple) in a fresh subprocess, results compared. (4) Registered kill file tests/v2/test_v21_migrate_semantics.py (the ONE in V21_TARGETS['...::_declared'], confirmed at runtime) run unmutated and against each mutant.",
+  "measurement_result": "Baseline unmutated: 51 tests OK. Each of the 8 mutants against the registered kill file: 51 tests OK == SURVIVED, matching the campaign. Behavioral harness (pristine -> mutant): 18 & 20 identical on all 11 cases; 30 differs only on affects-as-list (REC->None); 54 differs only on classes-list and subject_absence-list (REC->None), class-list-element unaffected (None both); 49 & 57 differ on before-empty and before-non-str (None->REC); 50 & 58 differ on after-empty and after-non-str (None->REC); when-non-str and ref-empty stay None under every mutant.",
+  "verdicts_summary": "All 8 CONFIRMED. The author's draft is correct in every classification, line cite, consumer, and exception. 18/20 EQUIVALENT by proof (verified identical on all inputs); 30/54 AUDITED (observable only on a list-typed member no in-tree declaration produces; fail-closed; SURVIVED); 49/50/57/58 SURVIVED (test owed) — fail-OPEN acceptance of a malformed before/after, read into the operator migrate report and the approval carry-over, with the sibling strings when/ref pinned but before/after not. No existing test anywhere exercises an empty/non-text before/after (grep across tests/ = none; only test_v21_migrate_semantics.py calls bundle_cli._declared directly), so the gap is real.",
+  "entries": [
+    {
+      "target": "aisef2/app/bundle_cli.py::_declared",
+      "index": 18,
+      "mutant": "L210 returns None",
+      "class_before": "EQUIVALENT",
+      "verdict": "CONFIRMED",
+      "class_after": "EQUIVALENT",
+      "grounds": "mutant_view confirms: well_formed's first (structure) guard `return False` (bundle_cli.py:210) -> `return None`. well_formed is defined at L207 and its return is read in EXACTLY one place (grep across aisef2/ aisef/ validation/ tests/ docs/ = only L207 def and L216 use; the other 'well_formed' hits are unrelated 'well_formed_plan'/'a well formed block'): L216 `return rec if all(well_formed(sel) for sel in rec['affects']) else None`. all() coerces to bool; None and False are both falsy and the only truthy return (L213-214 `return all(...)`, True when the collection-key generator is empty or all-true) is untouched, so _declared's return is byte-identical for every input. The -> bool annotation is not enforced and _assess (sole caller, L249-259) reads only `rec is None` vs the mapping (L250, L255). Behavioral harness: all 11 cases identical to pristine. Registered kill file: 51 OK (SURVIVED).",
+      "refutation": "n/a (not test-owed): EQUIVALENT proven from the code and confirmed empirically — no input makes mutant 18 differ from pristine."
+    },
+    {
+      "target": "aisef2/app/bundle_cli.py::_declared",
+      "index": 20,
+      "mutant": "L212 returns None",
+      "class_before": "EQUIVALENT",
+      "verdict": "CONFIRMED",
+      "class_after": "EQUIVALENT",
+      "grounds": "mutant_view confirms: well_formed's second (non-empty-str) guard `return False` (bundle_cli.py:212) -> `return None`. Same single-consumer proof as index 18: the sentinel is swallowed by all() at L216 (None and False both falsy), so _declared's return is identical for every input. Behavioral harness: all 11 cases identical to pristine — in particular before/after empty & non-str still return None (the None sentinel does not leak past all()). Registered kill file: 51 OK (SURVIVED).",
+      "refutation": "n/a (not test-owed): EQUIVALENT by proof, confirmed empirically."
+    },
+    {
+      "target": "aisef2/app/bundle_cli.py::_declared",
+      "index": 30,
+      "mutant": "L203 element 1 dropped",
+      "class_before": "AUDITED",
+      "verdict": "CONFIRMED",
+      "class_after": "AUDITED",
+      "grounds": "mutant_view confirms: the top-level guard `not isinstance(rec['affects'], (tuple, list))` (bundle_cli.py:202-203) loses `list` -> `(tuple,)`, so a LIST-typed affects is rejected (None, L204) where pristine accepted it. Observable (harness: affects-as-list pristine REC -> mutant None; only that one case differs), so NOT equivalent. Direction is fail-closed: _declared None -> _assess (L250-253) withholds every contract of the probe, the safe side (docstring L225-227). No in-tree declaration uses a list affects: file_artifact is the only probe with CAPABILITY_CHANGES (grep aisef2/probe/ = only file_artifact.py + catalog.py reader code), and its affects are tuples (file_artifact.py:227 `()`, L232/L247 a 2-tuple of selector dicts). No test builds a list affects: in test_v21_migrate_semantics.py the 'a list' case (L249) is `capability_changes` itself being a list (caught at L201, a different site), not affects; `good` (L219) uses a tuple. The docstring 'affects lists selectors' (file_artifact.py:214) is English. Registered kill file: 51 OK (SURVIVED); test_every_probe (L181-194) and test_the_six_come_out (L613-625, _exposure on the real LedgerLock record) pass on the tuple record.",
+      "refutation": "n/a (not test-owed): observable only on a list-typed affects that no probe/test/doc produces, and the narrowing fails CLOSED (withholds, the safe side). Killing it would require a test pinning tuple|list leniency nothing depends on — forbidden by the owner rule (never add a test to reach a number)."
+    },
+    {
+      "target": "aisef2/app/bundle_cli.py::_declared",
+      "index": 49,
+      "mutant": "L211 element 1 dropped",
+      "class_before": "SURVIVED (test owed)",
+      "verdict": "CONFIRMED",
+      "class_after": "SURVIVED (test owed)",
+      "grounds": "mutant_view confirms: the non-empty-str guard `all(isinstance(sel[k], str) and sel[k] for k in ('when','before','after','ref') if k in sel)` (bundle_cli.py:211) loses element 1 `'before'` -> `('when','after','ref')`, so a selector's `before` is no longer required to be a non-empty str. `before` is a REQUIRED key (first guard, L208 `{'when','before','after'} <= set(sel)`), always present but now unvalidated (L213 checks only classes/subject_absence). Behavioral harness: before='' and before=3 are ACCEPTED (None->REC) where pristine returns None; after still validated (after='' / after=3 stay None). This flips _declared from fail-closed to fail-OPEN: _assess takes the selective branch (L255-259) instead of the every-contract catch-all (L250-253), so FEWER approvals are withheld in `aisef bundle migrate` / `seal --keep-approvals-from`, AND the malformed `before` is read at L257 `'before': sel['before']` into the change hit, which flows to _exposure/_selected (L265-274) and into the operator migrate report `semantic_changes[].changes[].before` (L424-429 `**e`). The kill file pins the SIBLING strings when (L239 non-text) and ref (L240 empty, L241 non-text) as rejected-to-None but has NO empty/non-text `before` case (L217-251) — a real symmetric coverage gap. Registered kill file: 51 OK (SURVIVED). No test anywhere exercises a malformed before/after (grep tests/ = none; only test_v21_migrate_semantics.py calls bundle_cli._declared directly).",
+      "refutation": "input: file_artifact entry, capability_changes={3:{'summary':'s','affects':({'classes':('grep_count',),'when':'w','before':'','after':'a'},)}} (before empty; before=3 works equally) -> pristine _declared(e,3) returns None (fail-closed), mutant returns the record (verified). reader: _assess -> _exposure (the migrate/seal approval carry-over, bundle_cli.py:249-274: with the record accepted, contracts the selector does not name are no longer withheld, their approvals carried over) AND the operator, who reads the change's `before` printed in `semantic_changes` (L424-429). sketch: in tests/v2/test_v21_migrate_semantics.py::Declarations.test_a_record_the_reader_cannot_take_is_none_and_never_nothing_changed add to `cases` (L220-242), mirroring 'a when that is not text' (L239): 'a before that is empty': {3: {**good, 'affects': ({**good['affects'][0], 'before': ''},)}} and 'a before that is not text': {3: {**good, 'affects': ({**good['affects'][0], 'before': 3},)}}; the existing assertIsNone loop (L246-248) then kills index 49 and index 57. VERIFIED: pristine returns None on both inputs (loop passes unmutated), mutant returns the record (loop fails -> killed)."
+    },
+    {
+      "target": "aisef2/app/bundle_cli.py::_declared",
+      "index": 50,
+      "mutant": "L211 element 2 dropped",
+      "class_before": "SURVIVED (test owed)",
+      "verdict": "CONFIRMED",
+      "class_after": "SURVIVED (test owed)",
+      "grounds": "mutant_view confirms: same guard (L211) loses element 2 `'after'` -> `('when','before','ref')`, so a selector's `after` (a required key per L208, always present) is no longer required to be a non-empty str. Behavioral harness: after='' and after=3 ACCEPTED (None->REC) where pristine returns None; before still validated. Same fail-OPEN consequence as index 49 but for `after`: _assess selective branch, fewer approvals withheld, and the bad `after` read at L257 `'after': sel['after']` into the change hit -> _exposure/migrate/seal and the operator report (L424-429). Kill file pins when (L239) and ref (L240-241), no empty/non-text `after` case. Registered kill file: 51 OK (SURVIVED).",
+      "refutation": "input: file_artifact entry, capability_changes={3:{'summary':'s','affects':({'classes':('grep_count',),'when':'w','before':'b','after':''},)}} (after empty; after=3 works too) -> pristine returns None, mutant returns the record (verified). reader: _assess -> _exposure (migrate/seal approval carry-over, L249-274) and the operator reading the change's `after` in semantic_changes (L424-429). sketch: add to the same test's `cases` (L220-242): 'an after that is empty': {3: {**good, 'affects': ({**good['affects'][0], 'after': ''},)}} and 'an after that is not text': {3: {**good, 'affects': ({**good['affects'][0], 'after': 3},)}}; the assertIsNone loop (L246-248) then kills index 50 and index 58. VERIFIED: pristine None on both, mutant returns the record."
+    },
+    {
+      "target": "aisef2/app/bundle_cli.py::_declared",
+      "index": 54,
+      "mutant": "L213 element 1 dropped",
+      "class_before": "AUDITED",
+      "verdict": "CONFIRMED",
+      "class_after": "AUDITED",
+      "grounds": "mutant_view confirms: the collection-key check `isinstance(sel[k], (tuple, list))` (bundle_cli.py:213, for k in classes/subject_absence) loses `list` -> `(tuple,)`, so a selector whose classes (or subject_absence) is a LIST is rejected (well_formed False -> _declared None) where pristine accepted it. Observable (harness: classes-as-list and subject_absence-as-list pristine REC -> mutant None), so NOT equivalent; the top-level affects=list site (L203) is different and still accepts a list here. Direction fail-closed (safe, as index 30). No in-tree declaration uses a list classes/subject_absence: file_artifact declares them as tuples (file_artifact.py:232 classes=('grep_count','python_imports'), subject_absence=('REQUIRES_SUBJECT',); L239 classes tuple). The kill file's 'a class that is a list (unhashable)' case (L232-233) is a list ELEMENT inside a classes TUPLE, which this check passes and the element check (L213 `all(isinstance(x,str) ...)`) then rejects — unaffected by the mutant (harness: class-list-element None both). Registered kill file: 51 OK (SURVIVED); test_every_probe (L181-194) and test_the_six_come_out (L613-625) pass on the real tuple record.",
+      "refutation": "n/a (not test-owed): observable only on a list-typed classes/subject_absence that no probe/test/doc produces, and the narrowing fails CLOSED. Killing it would require pinning tuple|list leniency nothing needs — forbidden by the owner rule."
+    },
+    {
+      "target": "aisef2/app/bundle_cli.py::_declared",
+      "index": 57,
+      "mutant": "L211 string 'before' emptied",
+      "class_before": "SURVIVED (test owed)",
+      "verdict": "CONFIRMED",
+      "class_after": "SURVIVED (test owed)",
+      "grounds": "mutant_view confirms: L211 replaces the literal `'before'` with `''` -> `('when','','after','ref')`. `before` is no longer in the iterated keys (unvalidated), and the stray `''` entry is inert: `'' in sel` is never true for a selector that reached L211, because a selector with a '' key fails the first guard (L208-209 `set(sel) <= {classes,subject_absence,when,before,after,ref}`). So the mutation reduces exactly to index 49 (before not required to be a non-empty str). Behavioral harness: before='' and before=3 ACCEPTED (None->REC), identical column to index 49; after still validated. Same fail-OPEN consequence, same unpinned sibling gap. Registered kill file: 51 OK (SURVIVED).",
+      "refutation": "input: identical to index 49 — file_artifact entry whose selector `before` is '' (or 3), else well formed -> pristine None, mutant returns the record (verified). reader: _assess -> _exposure (migrate/seal carry-over) and the operator reading `before` in semantic_changes. sketch: the 'a before that is empty' / 'a before that is not text' case added to test_a_record_the_reader_cannot_take_is_none_and_never_nothing_changed (L217-251, assertIsNone loop L246-248) kills both index 49 and index 57 — no second test needed. VERIFIED."
+    },
+    {
+      "target": "aisef2/app/bundle_cli.py::_declared",
+      "index": 58,
+      "mutant": "L211 string 'after' emptied",
+      "class_before": "SURVIVED (test owed)",
+      "verdict": "CONFIRMED",
+      "class_after": "SURVIVED (test owed)",
+      "grounds": "mutant_view confirms: L211 replaces the literal `'after'` with `''` -> `('when','before','','ref')`. Identical in effect to index 50: `after` unvalidated, and the stray `''` key is inert (a '' key fails the first guard L208-209). Behavioral harness: after='' and after=3 ACCEPTED (None->REC), identical column to index 50; before still validated. Same fail-OPEN consequence and unpinned sibling gap. Registered kill file: 51 OK (SURVIVED).",
+      "refutation": "input: identical to index 50 — file_artifact entry whose selector `after` is '' (or 3), else well formed -> pristine None, mutant returns the record (verified). reader: _assess -> _exposure (migrate/seal carry-over) and the operator reading `after` in semantic_changes. sketch: the 'an after that is empty' / 'an after that is not text' case added to the same test (L217-251) kills both index 50 and index 58 — no second test needed. VERIFIED."
+    }
+  ],
+  "owed_tests": [
+    "tests/v2/test_v21_migrate_semantics.py::Declarations.test_a_record_the_reader_cannot_take_is_none_and_never_nothing_changed — add to `cases` (L220-242): 'a before that is empty': {3: {**good, 'affects': ({**good['affects'][0], 'before': ''},)}} and 'a before that is not text': {3: {**good, 'affects': ({**good['affects'][0], 'before': 3},)}}; the assertIsNone loop (L246-248) kills index 49 and index 57. (Verified: pristine None, mutants return the record.)",
+    "tests/v2/test_v21_migrate_semantics.py::Declarations.test_a_record_the_reader_cannot_take_is_none_and_never_nothing_changed — add 'an after that is empty': {3: {**good, 'affects': ({**good['affects'][0], 'after': ''},)}} and 'an after that is not text': {3: {**good, 'affects': ({**good['affects'][0], 'after': 3},)}}; kills index 50 and index 58. (Verified.)"
+  ],
+  "notes": "SKEPTIC confirms the author's draft in full: all 8 verdicts CONFIRMED, no REVISED/REFUTED/NOT_DECIDED. Independently re-ran mutant_view (8/8 line+function+mutation match the batch), rebuilt each mutant via validation.v2.mutation and asserted desc==entry, ran a direct behavioral harness on _declared over 11 crafted records, and ran the ONE registered kill file (tests/v2/test_v21_migrate_semantics.py, confirmed via V21_TARGETS at runtime) unmutated (51 OK) and against each mutant (51 OK each == SURVIVED, matching the campaign). 18/20 EQUIVALENT: well_formed's early-return sentinel False->None, swallowed by the only reader `all(well_formed(...))` (L216); single use proven by grep; harness shows byte-identical returns on all inputs. 30/54 AUDITED: narrow the deliberate tuple|list leniency to tuple-only for a list-typed affects (30) or classes/subject_absence (54); observable only on a list member no in-tree declaration produces (file_artifact uses tuples), fail-closed (safe); the kill file's list-element-in-a-tuple case is a different site and unaffected; owing a test would pin leniency nothing needs. 49/57 (before) and 50/58 (after) SURVIVED (test owed): they stop requiring a required descriptive string to be a non-empty str, flipping _declared to fail-OPEN on a malformed record (verified: before/after '' or non-str accepted where pristine returns None); the value is read by both the migrate/seal approval carry-over (_exposure, L249-274) and the operator's semantic_changes report (L424-429 carries before/after via `**e`), and the sibling strings when/ref are deliberately pinned while before/after are not — a real symmetric gap; two added cases kill all four, and I verified the pristine returns None (loop passes unmutated) and each mutant returns the record (loop fails -> killed). Added one read-only file the kill file needs (closure-evidence/v2/release/LEDGERLOCK-PROJECT.json) via git show; no code or test changed; repo worktree untouched; skeptic + copy trees removed. carried: none."
+}

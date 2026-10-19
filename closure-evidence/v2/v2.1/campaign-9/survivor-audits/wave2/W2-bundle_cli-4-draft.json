@@ -1,0 +1,435 @@
+{
+ "batch": "W2-bundle_cli-4",
+ "file": "aisef2/app/bundle_cli.py",
+ "snapshot": "4ec961e706a1f7bda16d131037058c4fe9c2663f",
+ "target": "aisef2/app/bundle_cli.py::_ground",
+ "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+ "role": "author",
+ "entries": [
+  {
+   "target": "aisef2/app/bundle_cli.py::_ground",
+   "index": 16,
+   "mutant": "L290 dict entry 1 dropped",
+   "class": "AUDITED",
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "group": "CUR-NULL",
+   "group_text": "CUR-NULL: the how-is-None 'current' row (bundle_cli.py:289-292, a contract this release's own plan names, no earlier release to compare) carries class=None, subject_absence=None, to=None, consulted=[] by design; this mutant drops that field's key or empties its name. The row stays identified as 'current' by probe=None and from={'release':'current'}, both printed and both pinned (test_v21_migrate_semantics.py:491 `(ground['from'], ground['probe'], len(ground['contracts']))` == ({'release':'current'}, None, len(CONTRACTS))); no datum is lost because the field held None/[].",
+   "grounds": "Drops `class` (=None) from the current row: json now omits \"class\": null. The row is still identified current by probe=None + from={'release':'current'} (pinned :491); class is None here regardless and redundant with probe=None. MEASURED: Ran 51 tests in ~1s, OK -> SURVIVED (baseline unmutated: 51 tests OK).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:287-299 _ground (289-292 the how-is-None 'current' row; 293-299 the assessed row, 296-297 the then!=now ground, 298-299 the then==now 'did not move' ground); :302-308 _grounds builds each row {**_ground(how,key), 'contracts':[...]}; :438 report['approvals_kept_grounds']",
+    "aisef2/app/bundle_cli.py:1071-1084 main migrate: print(json.dumps({'written':str(a.out), **report}, indent=1, sort_keys=True)) to stdout -- the operator's only view; with_commands (:341-364) touches only needs_owner_reapproval, never the grounds; nothing in the module or kernel re-reads the grounds",
+    "aisef/cli/parser.py:424-426 routes `aisef bundle ...` to bundle_cli.main; nothing wraps or parses the report",
+    "git grep approvals_kept_grounds over aisef2/aisef/validation/tests/docs: writer bundle_cli.py:438; readers tests/v2/test_v21_migrate_semantics.py:384,490,661 only; validation/v21/context_gap.py:138 does `cand,_ = migrate(...)` (discards the report); docs USAGE-2.1.md:96 and REPORT.md:284",
+    "the only test that reaches the None branch: test_v21_migrate_semantics.py WhatIsNotKept.test_a_bundle_already_of_this_release_loses_nothing:490-495, which reads this row's from, probe and len(contracts) only (measured: mutants 21/36/38 survive, so this row is absent from WhatMigrateWithholds -- its `for r in rows: assertTrue(r['ground'] and r['contracts'])` at :398-399 never sees a current row)"
+   ],
+   "exceptions_checked": [
+    "a code reader of a grounds row: none (the report is printed and returned, never re-read; with_commands and context_gap do not touch it)",
+    "a test that reads this field of the current row: none (WhatIsNotKept reads only from/probe/contracts; the LedgerLock and WhatMigrateWithholds grounds data carry no current row)",
+    "a datum lost: none -- the field held None (class/subject_absence/to) or [] (consulted); probe=None + from={'release':'current'} still mark the row current",
+    "the dropped/renamed key raising or changing exit: no -- json.dumps simply omits an absent key (or emits a '' key), exit 0",
+    "a report-schema validator requiring uniform row keys: none (no schema check of the migrate report anywhere)",
+    "class recoverable: probe=None already marks the current row (pinned), so the null class adds nothing"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_ground",
+   "index": 17,
+   "mutant": "L290 dict entry 2 dropped",
+   "class": "AUDITED",
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "group": "CUR-NULL",
+   "group_text": "CUR-NULL: the how-is-None 'current' row (bundle_cli.py:289-292, a contract this release's own plan names, no earlier release to compare) carries class=None, subject_absence=None, to=None, consulted=[] by design; this mutant drops that field's key or empties its name. The row stays identified as 'current' by probe=None and from={'release':'current'}, both printed and both pinned (test_v21_migrate_semantics.py:491 `(ground['from'], ground['probe'], len(ground['contracts']))` == ({'release':'current'}, None, len(CONTRACTS))); no datum is lost because the field held None/[].",
+   "grounds": "Drops `subject_absence` (=None) from the current row: json omits \"subject_absence\": null. None here by design (nothing to compare); the row stays current via probe=None + from. MEASURED: Ran 51 tests in ~1s, OK -> SURVIVED (baseline unmutated: 51 tests OK).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:287-299 _ground (289-292 the how-is-None 'current' row; 293-299 the assessed row, 296-297 the then!=now ground, 298-299 the then==now 'did not move' ground); :302-308 _grounds builds each row {**_ground(how,key), 'contracts':[...]}; :438 report['approvals_kept_grounds']",
+    "aisef2/app/bundle_cli.py:1071-1084 main migrate: print(json.dumps({'written':str(a.out), **report}, indent=1, sort_keys=True)) to stdout -- the operator's only view; with_commands (:341-364) touches only needs_owner_reapproval, never the grounds; nothing in the module or kernel re-reads the grounds",
+    "aisef/cli/parser.py:424-426 routes `aisef bundle ...` to bundle_cli.main; nothing wraps or parses the report",
+    "git grep approvals_kept_grounds over aisef2/aisef/validation/tests/docs: writer bundle_cli.py:438; readers tests/v2/test_v21_migrate_semantics.py:384,490,661 only; validation/v21/context_gap.py:138 does `cand,_ = migrate(...)` (discards the report); docs USAGE-2.1.md:96 and REPORT.md:284",
+    "the only test that reaches the None branch: test_v21_migrate_semantics.py WhatIsNotKept.test_a_bundle_already_of_this_release_loses_nothing:490-495, which reads this row's from, probe and len(contracts) only (measured: mutants 21/36/38 survive, so this row is absent from WhatMigrateWithholds -- its `for r in rows: assertTrue(r['ground'] and r['contracts'])` at :398-399 never sees a current row)"
+   ],
+   "exceptions_checked": [
+    "a code reader of a grounds row: none (the report is printed and returned, never re-read; with_commands and context_gap do not touch it)",
+    "a test that reads this field of the current row: none (WhatIsNotKept reads only from/probe/contracts; the LedgerLock and WhatMigrateWithholds grounds data carry no current row)",
+    "a datum lost: none -- the field held None (class/subject_absence/to) or [] (consulted); probe=None + from={'release':'current'} still mark the row current",
+    "the dropped/renamed key raising or changing exit: no -- json.dumps simply omits an absent key (or emits a '' key), exit 0",
+    "a report-schema validator requiring uniform row keys: none (no schema check of the migrate report anywhere)"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_ground",
+   "index": 19,
+   "mutant": "L290 dict entry 4 dropped",
+   "class": "AUDITED",
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "group": "CUR-NULL",
+   "group_text": "CUR-NULL: the how-is-None 'current' row (bundle_cli.py:289-292, a contract this release's own plan names, no earlier release to compare) carries class=None, subject_absence=None, to=None, consulted=[] by design; this mutant drops that field's key or empties its name. The row stays identified as 'current' by probe=None and from={'release':'current'}, both printed and both pinned (test_v21_migrate_semantics.py:491 `(ground['from'], ground['probe'], len(ground['contracts']))` == ({'release':'current'}, None, len(CONTRACTS))); no datum is lost because the field held None/[].",
+   "grounds": "Drops `to` (=None) from the current row: json omits \"to\": null. The current row has no 'to' version (no earlier release); from={'release':'current'} (pinned) is the carrier of 'current'. MEASURED: Ran 51 tests in ~1s, OK -> SURVIVED (baseline unmutated: 51 tests OK).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:287-299 _ground (289-292 the how-is-None 'current' row; 293-299 the assessed row, 296-297 the then!=now ground, 298-299 the then==now 'did not move' ground); :302-308 _grounds builds each row {**_ground(how,key), 'contracts':[...]}; :438 report['approvals_kept_grounds']",
+    "aisef2/app/bundle_cli.py:1071-1084 main migrate: print(json.dumps({'written':str(a.out), **report}, indent=1, sort_keys=True)) to stdout -- the operator's only view; with_commands (:341-364) touches only needs_owner_reapproval, never the grounds; nothing in the module or kernel re-reads the grounds",
+    "aisef/cli/parser.py:424-426 routes `aisef bundle ...` to bundle_cli.main; nothing wraps or parses the report",
+    "git grep approvals_kept_grounds over aisef2/aisef/validation/tests/docs: writer bundle_cli.py:438; readers tests/v2/test_v21_migrate_semantics.py:384,490,661 only; validation/v21/context_gap.py:138 does `cand,_ = migrate(...)` (discards the report); docs USAGE-2.1.md:96 and REPORT.md:284",
+    "the only test that reaches the None branch: test_v21_migrate_semantics.py WhatIsNotKept.test_a_bundle_already_of_this_release_loses_nothing:490-495, which reads this row's from, probe and len(contracts) only (measured: mutants 21/36/38 survive, so this row is absent from WhatMigrateWithholds -- its `for r in rows: assertTrue(r['ground'] and r['contracts'])` at :398-399 never sees a current row)"
+   ],
+   "exceptions_checked": [
+    "a code reader of a grounds row: none (the report is printed and returned, never re-read; with_commands and context_gap do not touch it)",
+    "a test that reads this field of the current row: none (WhatIsNotKept reads only from/probe/contracts; the LedgerLock and WhatMigrateWithholds grounds data carry no current row)",
+    "a datum lost: none -- the field held None (class/subject_absence/to) or [] (consulted); probe=None + from={'release':'current'} still mark the row current",
+    "the dropped/renamed key raising or changing exit: no -- json.dumps simply omits an absent key (or emits a '' key), exit 0",
+    "a report-schema validator requiring uniform row keys: none (no schema check of the migrate report anywhere)"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_ground",
+   "index": 20,
+   "mutant": "L290 dict entry 5 dropped",
+   "class": "AUDITED",
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "group": "CUR-NULL",
+   "group_text": "CUR-NULL: the how-is-None 'current' row (bundle_cli.py:289-292, a contract this release's own plan names, no earlier release to compare) carries class=None, subject_absence=None, to=None, consulted=[] by design; this mutant drops that field's key or empties its name. The row stays identified as 'current' by probe=None and from={'release':'current'}, both printed and both pinned (test_v21_migrate_semantics.py:491 `(ground['from'], ground['probe'], len(ground['contracts']))` == ({'release':'current'}, None, len(CONTRACTS))); no datum is lost because the field held None/[].",
+   "grounds": "Drops `consulted` (=[]) from the current row: json omits \"consulted\": []. Empty by design (no version was read); no reader iterates a current row's consulted (LedgerLock/WhatMigrateWithholds data carry no current row). MEASURED: Ran 51 tests in ~1s, OK -> SURVIVED (baseline unmutated: 51 tests OK).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:287-299 _ground (289-292 the how-is-None 'current' row; 293-299 the assessed row, 296-297 the then!=now ground, 298-299 the then==now 'did not move' ground); :302-308 _grounds builds each row {**_ground(how,key), 'contracts':[...]}; :438 report['approvals_kept_grounds']",
+    "aisef2/app/bundle_cli.py:1071-1084 main migrate: print(json.dumps({'written':str(a.out), **report}, indent=1, sort_keys=True)) to stdout -- the operator's only view; with_commands (:341-364) touches only needs_owner_reapproval, never the grounds; nothing in the module or kernel re-reads the grounds",
+    "aisef/cli/parser.py:424-426 routes `aisef bundle ...` to bundle_cli.main; nothing wraps or parses the report",
+    "git grep approvals_kept_grounds over aisef2/aisef/validation/tests/docs: writer bundle_cli.py:438; readers tests/v2/test_v21_migrate_semantics.py:384,490,661 only; validation/v21/context_gap.py:138 does `cand,_ = migrate(...)` (discards the report); docs USAGE-2.1.md:96 and REPORT.md:284",
+    "the only test that reaches the None branch: test_v21_migrate_semantics.py WhatIsNotKept.test_a_bundle_already_of_this_release_loses_nothing:490-495, which reads this row's from, probe and len(contracts) only (measured: mutants 21/36/38 survive, so this row is absent from WhatMigrateWithholds -- its `for r in rows: assertTrue(r['ground'] and r['contracts'])` at :398-399 never sees a current row)"
+   ],
+   "exceptions_checked": [
+    "a code reader of a grounds row: none (the report is printed and returned, never re-read; with_commands and context_gap do not touch it)",
+    "a test that reads this field of the current row: none (WhatIsNotKept reads only from/probe/contracts; the LedgerLock and WhatMigrateWithholds grounds data carry no current row)",
+    "a datum lost: none -- the field held None (class/subject_absence/to) or [] (consulted); probe=None + from={'release':'current'} still mark the row current",
+    "the dropped/renamed key raising or changing exit: no -- json.dumps simply omits an absent key (or emits a '' key), exit 0",
+    "a report-schema validator requiring uniform row keys: none (no schema check of the migrate report anywhere)",
+    "a consumer summing/iterating consulted over data that includes a current row: none (the two tests that iterate consulted, :392 and :667, run on bundles with no current row)"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_ground",
+   "index": 31,
+   "mutant": "L290 string 'class' emptied",
+   "class": "AUDITED",
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "group": "CUR-NULL",
+   "group_text": "CUR-NULL: the how-is-None 'current' row (bundle_cli.py:289-292, a contract this release's own plan names, no earlier release to compare) carries class=None, subject_absence=None, to=None, consulted=[] by design; this mutant drops that field's key or empties its name. The row stays identified as 'current' by probe=None and from={'release':'current'}, both printed and both pinned (test_v21_migrate_semantics.py:491 `(ground['from'], ground['probe'], len(ground['contracts']))` == ({'release':'current'}, None, len(CONTRACTS))); no datum is lost because the field held None/[].",
+   "grounds": "Renames the current row's `class` key to '' (value stays None): json shows \"\": null and no \"class\". No datum (None); row still current via probe=None + from. MEASURED: Ran 51 tests in ~1s, OK -> SURVIVED (baseline unmutated: 51 tests OK).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:287-299 _ground (289-292 the how-is-None 'current' row; 293-299 the assessed row, 296-297 the then!=now ground, 298-299 the then==now 'did not move' ground); :302-308 _grounds builds each row {**_ground(how,key), 'contracts':[...]}; :438 report['approvals_kept_grounds']",
+    "aisef2/app/bundle_cli.py:1071-1084 main migrate: print(json.dumps({'written':str(a.out), **report}, indent=1, sort_keys=True)) to stdout -- the operator's only view; with_commands (:341-364) touches only needs_owner_reapproval, never the grounds; nothing in the module or kernel re-reads the grounds",
+    "aisef/cli/parser.py:424-426 routes `aisef bundle ...` to bundle_cli.main; nothing wraps or parses the report",
+    "git grep approvals_kept_grounds over aisef2/aisef/validation/tests/docs: writer bundle_cli.py:438; readers tests/v2/test_v21_migrate_semantics.py:384,490,661 only; validation/v21/context_gap.py:138 does `cand,_ = migrate(...)` (discards the report); docs USAGE-2.1.md:96 and REPORT.md:284",
+    "the only test that reaches the None branch: test_v21_migrate_semantics.py WhatIsNotKept.test_a_bundle_already_of_this_release_loses_nothing:490-495, which reads this row's from, probe and len(contracts) only (measured: mutants 21/36/38 survive, so this row is absent from WhatMigrateWithholds -- its `for r in rows: assertTrue(r['ground'] and r['contracts'])` at :398-399 never sees a current row)"
+   ],
+   "exceptions_checked": [
+    "a code reader of a grounds row: none (the report is printed and returned, never re-read; with_commands and context_gap do not touch it)",
+    "a test that reads this field of the current row: none (WhatIsNotKept reads only from/probe/contracts; the LedgerLock and WhatMigrateWithholds grounds data carry no current row)",
+    "a datum lost: none -- the field held None (class/subject_absence/to) or [] (consulted); probe=None + from={'release':'current'} still mark the row current",
+    "the dropped/renamed key raising or changing exit: no -- json.dumps simply omits an absent key (or emits a '' key), exit 0",
+    "a report-schema validator requiring uniform row keys: none (no schema check of the migrate report anywhere)",
+    "the stray '' key colliding with another '' key in this row: no -- only this key is emptied in the None branch"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_ground",
+   "index": 32,
+   "mutant": "L290 string 'subject_absence' emptied",
+   "class": "AUDITED",
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "group": "CUR-NULL",
+   "group_text": "CUR-NULL: the how-is-None 'current' row (bundle_cli.py:289-292, a contract this release's own plan names, no earlier release to compare) carries class=None, subject_absence=None, to=None, consulted=[] by design; this mutant drops that field's key or empties its name. The row stays identified as 'current' by probe=None and from={'release':'current'}, both printed and both pinned (test_v21_migrate_semantics.py:491 `(ground['from'], ground['probe'], len(ground['contracts']))` == ({'release':'current'}, None, len(CONTRACTS))); no datum is lost because the field held None/[].",
+   "grounds": "Renames the current row's `subject_absence` key to '' (value stays None): json shows \"\": null. No datum (None). MEASURED: Ran 51 tests in ~1s, OK -> SURVIVED (baseline unmutated: 51 tests OK).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:287-299 _ground (289-292 the how-is-None 'current' row; 293-299 the assessed row, 296-297 the then!=now ground, 298-299 the then==now 'did not move' ground); :302-308 _grounds builds each row {**_ground(how,key), 'contracts':[...]}; :438 report['approvals_kept_grounds']",
+    "aisef2/app/bundle_cli.py:1071-1084 main migrate: print(json.dumps({'written':str(a.out), **report}, indent=1, sort_keys=True)) to stdout -- the operator's only view; with_commands (:341-364) touches only needs_owner_reapproval, never the grounds; nothing in the module or kernel re-reads the grounds",
+    "aisef/cli/parser.py:424-426 routes `aisef bundle ...` to bundle_cli.main; nothing wraps or parses the report",
+    "git grep approvals_kept_grounds over aisef2/aisef/validation/tests/docs: writer bundle_cli.py:438; readers tests/v2/test_v21_migrate_semantics.py:384,490,661 only; validation/v21/context_gap.py:138 does `cand,_ = migrate(...)` (discards the report); docs USAGE-2.1.md:96 and REPORT.md:284",
+    "the only test that reaches the None branch: test_v21_migrate_semantics.py WhatIsNotKept.test_a_bundle_already_of_this_release_loses_nothing:490-495, which reads this row's from, probe and len(contracts) only (measured: mutants 21/36/38 survive, so this row is absent from WhatMigrateWithholds -- its `for r in rows: assertTrue(r['ground'] and r['contracts'])` at :398-399 never sees a current row)"
+   ],
+   "exceptions_checked": [
+    "a code reader of a grounds row: none (the report is printed and returned, never re-read; with_commands and context_gap do not touch it)",
+    "a test that reads this field of the current row: none (WhatIsNotKept reads only from/probe/contracts; the LedgerLock and WhatMigrateWithholds grounds data carry no current row)",
+    "a datum lost: none -- the field held None (class/subject_absence/to) or [] (consulted); probe=None + from={'release':'current'} still mark the row current",
+    "the dropped/renamed key raising or changing exit: no -- json.dumps simply omits an absent key (or emits a '' key), exit 0",
+    "a report-schema validator requiring uniform row keys: none (no schema check of the migrate report anywhere)"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_ground",
+   "index": 34,
+   "mutant": "L290 string 'to' emptied",
+   "class": "AUDITED",
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "group": "CUR-NULL",
+   "group_text": "CUR-NULL: the how-is-None 'current' row (bundle_cli.py:289-292, a contract this release's own plan names, no earlier release to compare) carries class=None, subject_absence=None, to=None, consulted=[] by design; this mutant drops that field's key or empties its name. The row stays identified as 'current' by probe=None and from={'release':'current'}, both printed and both pinned (test_v21_migrate_semantics.py:491 `(ground['from'], ground['probe'], len(ground['contracts']))` == ({'release':'current'}, None, len(CONTRACTS))); no datum is lost because the field held None/[].",
+   "grounds": "Renames the current row's `to` key to '' (value stays None): json shows \"\": null. No datum (None); 'current' carried by from. MEASURED: Ran 51 tests in ~1s, OK -> SURVIVED (baseline unmutated: 51 tests OK).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:287-299 _ground (289-292 the how-is-None 'current' row; 293-299 the assessed row, 296-297 the then!=now ground, 298-299 the then==now 'did not move' ground); :302-308 _grounds builds each row {**_ground(how,key), 'contracts':[...]}; :438 report['approvals_kept_grounds']",
+    "aisef2/app/bundle_cli.py:1071-1084 main migrate: print(json.dumps({'written':str(a.out), **report}, indent=1, sort_keys=True)) to stdout -- the operator's only view; with_commands (:341-364) touches only needs_owner_reapproval, never the grounds; nothing in the module or kernel re-reads the grounds",
+    "aisef/cli/parser.py:424-426 routes `aisef bundle ...` to bundle_cli.main; nothing wraps or parses the report",
+    "git grep approvals_kept_grounds over aisef2/aisef/validation/tests/docs: writer bundle_cli.py:438; readers tests/v2/test_v21_migrate_semantics.py:384,490,661 only; validation/v21/context_gap.py:138 does `cand,_ = migrate(...)` (discards the report); docs USAGE-2.1.md:96 and REPORT.md:284",
+    "the only test that reaches the None branch: test_v21_migrate_semantics.py WhatIsNotKept.test_a_bundle_already_of_this_release_loses_nothing:490-495, which reads this row's from, probe and len(contracts) only (measured: mutants 21/36/38 survive, so this row is absent from WhatMigrateWithholds -- its `for r in rows: assertTrue(r['ground'] and r['contracts'])` at :398-399 never sees a current row)"
+   ],
+   "exceptions_checked": [
+    "a code reader of a grounds row: none (the report is printed and returned, never re-read; with_commands and context_gap do not touch it)",
+    "a test that reads this field of the current row: none (WhatIsNotKept reads only from/probe/contracts; the LedgerLock and WhatMigrateWithholds grounds data carry no current row)",
+    "a datum lost: none -- the field held None (class/subject_absence/to) or [] (consulted); probe=None + from={'release':'current'} still mark the row current",
+    "the dropped/renamed key raising or changing exit: no -- json.dumps simply omits an absent key (or emits a '' key), exit 0",
+    "a report-schema validator requiring uniform row keys: none (no schema check of the migrate report anywhere)"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_ground",
+   "index": 35,
+   "mutant": "L291 string 'consulted' emptied",
+   "class": "AUDITED",
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "group": "CUR-NULL",
+   "group_text": "CUR-NULL: the how-is-None 'current' row (bundle_cli.py:289-292, a contract this release's own plan names, no earlier release to compare) carries class=None, subject_absence=None, to=None, consulted=[] by design; this mutant drops that field's key or empties its name. The row stays identified as 'current' by probe=None and from={'release':'current'}, both printed and both pinned (test_v21_migrate_semantics.py:491 `(ground['from'], ground['probe'], len(ground['contracts']))` == ({'release':'current'}, None, len(CONTRACTS))); no datum is lost because the field held None/[].",
+   "grounds": "Renames the current row's `consulted` key to '' (value stays []): json shows \"\": []. No datum (empty). MEASURED: Ran 51 tests in ~1s, OK -> SURVIVED (baseline unmutated: 51 tests OK).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:287-299 _ground (289-292 the how-is-None 'current' row; 293-299 the assessed row, 296-297 the then!=now ground, 298-299 the then==now 'did not move' ground); :302-308 _grounds builds each row {**_ground(how,key), 'contracts':[...]}; :438 report['approvals_kept_grounds']",
+    "aisef2/app/bundle_cli.py:1071-1084 main migrate: print(json.dumps({'written':str(a.out), **report}, indent=1, sort_keys=True)) to stdout -- the operator's only view; with_commands (:341-364) touches only needs_owner_reapproval, never the grounds; nothing in the module or kernel re-reads the grounds",
+    "aisef/cli/parser.py:424-426 routes `aisef bundle ...` to bundle_cli.main; nothing wraps or parses the report",
+    "git grep approvals_kept_grounds over aisef2/aisef/validation/tests/docs: writer bundle_cli.py:438; readers tests/v2/test_v21_migrate_semantics.py:384,490,661 only; validation/v21/context_gap.py:138 does `cand,_ = migrate(...)` (discards the report); docs USAGE-2.1.md:96 and REPORT.md:284",
+    "the only test that reaches the None branch: test_v21_migrate_semantics.py WhatIsNotKept.test_a_bundle_already_of_this_release_loses_nothing:490-495, which reads this row's from, probe and len(contracts) only (measured: mutants 21/36/38 survive, so this row is absent from WhatMigrateWithholds -- its `for r in rows: assertTrue(r['ground'] and r['contracts'])` at :398-399 never sees a current row)"
+   ],
+   "exceptions_checked": [
+    "a code reader of a grounds row: none (the report is printed and returned, never re-read; with_commands and context_gap do not touch it)",
+    "a test that reads this field of the current row: none (WhatIsNotKept reads only from/probe/contracts; the LedgerLock and WhatMigrateWithholds grounds data carry no current row)",
+    "a datum lost: none -- the field held None (class/subject_absence/to) or [] (consulted); probe=None + from={'release':'current'} still mark the row current",
+    "the dropped/renamed key raising or changing exit: no -- json.dumps simply omits an absent key (or emits a '' key), exit 0",
+    "a report-schema validator requiring uniform row keys: none (no schema check of the migrate report anywhere)"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_ground",
+   "index": 51,
+   "mutant": "L296 string 'capability ' emptied",
+   "class": "AUDITED",
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "group": "GROUND-PROSE",
+   "group_text": "GROUND-PROSE: a prose/label fragment of the assessed row's `ground` sentence (bundle_cli.py:296-299) emptied. The sentence restates data the row already carries in its own structured fields -- then/now in from['capability_version'] and to['capability_version'], the change count in consulted, class in `class`, subject_absence in `subject_absence` -- and the substrings the tests pin ('none selects class exists' :393; 'did not move' :397,:669) survive, so the operator's data is intact; only the rendering of the explanation degrades.",
+   "grounds": "Ground becomes '{then} to {now}: ...' (drops the label word 'capability'). then/now are also in from/to (pinned :389-391); the pinned substring 'none selects class exists' (:393) is intact. MEASURED: Ran 51 tests in ~1s, OK -> SURVIVED (baseline unmutated: 51 tests OK).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:287-299 _ground (289-292 the how-is-None 'current' row; 293-299 the assessed row, 296-297 the then!=now ground, 298-299 the then==now 'did not move' ground); :302-308 _grounds builds each row {**_ground(how,key), 'contracts':[...]}; :438 report['approvals_kept_grounds']",
+    "aisef2/app/bundle_cli.py:1071-1084 main migrate: print(json.dumps({'written':str(a.out), **report}, indent=1, sort_keys=True)) to stdout -- the operator's only view; with_commands (:341-364) touches only needs_owner_reapproval, never the grounds; nothing in the module or kernel re-reads the grounds",
+    "aisef/cli/parser.py:424-426 routes `aisef bundle ...` to bundle_cli.main; nothing wraps or parses the report",
+    "git grep approvals_kept_grounds over aisef2/aisef/validation/tests/docs: writer bundle_cli.py:438; readers tests/v2/test_v21_migrate_semantics.py:384,490,661 only; validation/v21/context_gap.py:138 does `cand,_ = migrate(...)` (discards the report); docs USAGE-2.1.md:96 and REPORT.md:284",
+    "the two tests that read an assessed row's ground: test_v21_migrate_semantics.py:393 assertIn('none selects class exists', exists['ground']) (then!=now) and :397,:669 assertIn('did not move', r['ground']) (then==now); both pin a substring the mutant leaves intact",
+    "the fields that carry the same data, pinned: :389-391 (exists['from'], exists['to']), :392 consulted versions/selectors, :667-671 (LedgerLock rows' from/to capability_version==1, consulted==[])"
+   ],
+   "exceptions_checked": [
+    "a reader of the ground's exact wording: none; the pinned substring survives and from/to carry the versions",
+    "a datum lost: none -- versions in from/to, count in consulted, class/subject_absence in their fields"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_ground",
+   "index": 52,
+   "mutant": "L296 string ' to ' emptied",
+   "class": "AUDITED",
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "group": "GROUND-PROSE",
+   "group_text": "GROUND-PROSE: a prose/label fragment of the assessed row's `ground` sentence (bundle_cli.py:296-299) emptied. The sentence restates data the row already carries in its own structured fields -- then/now in from['capability_version'] and to['capability_version'], the change count in consulted, class in `class`, subject_absence in `subject_absence` -- and the substrings the tests pin ('none selects class exists' :393; 'did not move' :397,:669) survive, so the operator's data is intact; only the rendering of the explanation degrades.",
+   "grounds": "Ground becomes 'capability {then}{now}: ...' -- 'capability 1 to 3' renders as the misleading 'capability 13'. The authoritative versions are the structured from['capability_version']/to['capability_version'] (pinned :389-391, unaffected); 'none selects class exists' (:393) intact. MEASURED: Ran 51 tests in ~1s, OK -> SURVIVED (baseline unmutated: 51 tests OK).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:287-299 _ground (289-292 the how-is-None 'current' row; 293-299 the assessed row, 296-297 the then!=now ground, 298-299 the then==now 'did not move' ground); :302-308 _grounds builds each row {**_ground(how,key), 'contracts':[...]}; :438 report['approvals_kept_grounds']",
+    "aisef2/app/bundle_cli.py:1071-1084 main migrate: print(json.dumps({'written':str(a.out), **report}, indent=1, sort_keys=True)) to stdout -- the operator's only view; with_commands (:341-364) touches only needs_owner_reapproval, never the grounds; nothing in the module or kernel re-reads the grounds",
+    "aisef/cli/parser.py:424-426 routes `aisef bundle ...` to bundle_cli.main; nothing wraps or parses the report",
+    "git grep approvals_kept_grounds over aisef2/aisef/validation/tests/docs: writer bundle_cli.py:438; readers tests/v2/test_v21_migrate_semantics.py:384,490,661 only; validation/v21/context_gap.py:138 does `cand,_ = migrate(...)` (discards the report); docs USAGE-2.1.md:96 and REPORT.md:284",
+    "the two tests that read an assessed row's ground: test_v21_migrate_semantics.py:393 assertIn('none selects class exists', exists['ground']) (then!=now) and :397,:669 assertIn('did not move', r['ground']) (then==now); both pin a substring the mutant leaves intact",
+    "the fields that carry the same data, pinned: :389-391 (exists['from'], exists['to']), :392 consulted versions/selectors, :667-671 (LedgerLock rows' from/to capability_version==1, consulted==[])"
+   ],
+   "exceptions_checked": [
+    "the versions recoverable: yes -- from/to fields, pinned, unchanged; the ground is explanatory prose, the fields are the data",
+    "misleading text a reader acts on: the operator's version data is the from/to fields; no code reads the sentence"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_ground",
+   "index": 53,
+   "mutant": "L296 string ': ' emptied",
+   "class": "AUDITED",
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "group": "GROUND-PROSE",
+   "group_text": "GROUND-PROSE: a prose/label fragment of the assessed row's `ground` sentence (bundle_cli.py:296-299) emptied. The sentence restates data the row already carries in its own structured fields -- then/now in from['capability_version'] and to['capability_version'], the change count in consulted, class in `class`, subject_absence in `subject_absence` -- and the substrings the tests pin ('none selects class exists' :393; 'did not move' :397,:669) survive, so the operator's data is intact; only the rendering of the explanation degrades.",
+   "grounds": "Ground becomes 'capability {then} to {now}{len} declared change(s) ...' -- 'now' and the change count run together. Count recoverable from consulted (pinned :392 [(2,0),(3,2)]), versions from from/to; 'none selects class exists' (:393) intact. MEASURED: Ran 51 tests in ~1s, OK -> SURVIVED (baseline unmutated: 51 tests OK).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:287-299 _ground (289-292 the how-is-None 'current' row; 293-299 the assessed row, 296-297 the then!=now ground, 298-299 the then==now 'did not move' ground); :302-308 _grounds builds each row {**_ground(how,key), 'contracts':[...]}; :438 report['approvals_kept_grounds']",
+    "aisef2/app/bundle_cli.py:1071-1084 main migrate: print(json.dumps({'written':str(a.out), **report}, indent=1, sort_keys=True)) to stdout -- the operator's only view; with_commands (:341-364) touches only needs_owner_reapproval, never the grounds; nothing in the module or kernel re-reads the grounds",
+    "aisef/cli/parser.py:424-426 routes `aisef bundle ...` to bundle_cli.main; nothing wraps or parses the report",
+    "git grep approvals_kept_grounds over aisef2/aisef/validation/tests/docs: writer bundle_cli.py:438; readers tests/v2/test_v21_migrate_semantics.py:384,490,661 only; validation/v21/context_gap.py:138 does `cand,_ = migrate(...)` (discards the report); docs USAGE-2.1.md:96 and REPORT.md:284",
+    "the two tests that read an assessed row's ground: test_v21_migrate_semantics.py:393 assertIn('none selects class exists', exists['ground']) (then!=now) and :397,:669 assertIn('did not move', r['ground']) (then==now); both pin a substring the mutant leaves intact",
+    "the fields that carry the same data, pinned: :389-391 (exists['from'], exists['to']), :392 consulted versions/selectors, :667-671 (LedgerLock rows' from/to capability_version==1, consulted==[])"
+   ],
+   "exceptions_checked": [
+    "the count recoverable: yes -- len(consulted), consulted pinned at :392",
+    "a datum lost: none"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_ground",
+   "index": 55,
+   "mutant": "L297 string ' under ' emptied",
+   "class": "AUDITED",
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "group": "GROUND-PROSE",
+   "group_text": "GROUND-PROSE: a prose/label fragment of the assessed row's `ground` sentence (bundle_cli.py:296-299) emptied. The sentence restates data the row already carries in its own structured fields -- then/now in from['capability_version'] and to['capability_version'], the change count in consulted, class in `class`, subject_absence in `subject_absence` -- and the substrings the tests pin ('none selects class exists' :393; 'did not move' :397,:669) survive, so the operator's data is intact; only the rendering of the explanation degrades.",
+   "grounds": "Ground becomes '... none selects class {class}{subject_absence}' -- class and absence concatenated ('existsREQUIRES_SUBJECT'). 'none selects class exists' is still a prefix (:393 passes); class is in the `class` field and subject_absence in the `subject_absence` field of the same assessed row (both present under this if-branch, only the string tail is mangled). MEASURED: Ran 51 tests in ~1s, OK -> SURVIVED (baseline unmutated: 51 tests OK).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:287-299 _ground (289-292 the how-is-None 'current' row; 293-299 the assessed row, 296-297 the then!=now ground, 298-299 the then==now 'did not move' ground); :302-308 _grounds builds each row {**_ground(how,key), 'contracts':[...]}; :438 report['approvals_kept_grounds']",
+    "aisef2/app/bundle_cli.py:1071-1084 main migrate: print(json.dumps({'written':str(a.out), **report}, indent=1, sort_keys=True)) to stdout -- the operator's only view; with_commands (:341-364) touches only needs_owner_reapproval, never the grounds; nothing in the module or kernel re-reads the grounds",
+    "aisef/cli/parser.py:424-426 routes `aisef bundle ...` to bundle_cli.main; nothing wraps or parses the report",
+    "git grep approvals_kept_grounds over aisef2/aisef/validation/tests/docs: writer bundle_cli.py:438; readers tests/v2/test_v21_migrate_semantics.py:384,490,661 only; validation/v21/context_gap.py:138 does `cand,_ = migrate(...)` (discards the report); docs USAGE-2.1.md:96 and REPORT.md:284",
+    "the two tests that read an assessed row's ground: test_v21_migrate_semantics.py:393 assertIn('none selects class exists', exists['ground']) (then!=now) and :397,:669 assertIn('did not move', r['ground']) (then==now); both pin a substring the mutant leaves intact",
+    "the fields that carry the same data, pinned: :389-391 (exists['from'], exists['to']), :392 consulted versions/selectors, :667-671 (LedgerLock rows' from/to capability_version==1, consulted==[])"
+   ],
+   "exceptions_checked": [
+    "subject_absence recoverable: yes -- the assessed row's subject_absence field (:294) is intact here (this mutant touches the string, not the field)",
+    "class recoverable: yes -- the `class` field, read by the test's `by` key at :388"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_ground",
+   "index": 56,
+   "mutant": "L298 string 'the probe is at capability ' emptied",
+   "class": "AUDITED",
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "group": "GROUND-PROSE",
+   "group_text": "GROUND-PROSE: a prose/label fragment of the assessed row's `ground` sentence (bundle_cli.py:296-299) emptied. The sentence restates data the row already carries in its own structured fields -- then/now in from['capability_version'] and to['capability_version'], the change count in consulted, class in `class`, subject_absence in `subject_absence` -- and the substrings the tests pin ('none selects class exists' :393; 'did not move' :397,:669) survive, so the operator's data is intact; only the rendering of the explanation degrades.",
+   "grounds": "The then==now ('did not move') ground loses its lead-in: '{now}, the release's, and no change is declared for it: its version did not move ...'. 'did not move' (pinned :397,:669) intact; now is also in to['capability_version'] (pinned :667). An explanatory lead-in, like the AUDITED continue_from kernel-tail clauses. MEASURED: Ran 51 tests in ~1s, OK -> SURVIVED (baseline unmutated: 51 tests OK).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:287-299 _ground (289-292 the how-is-None 'current' row; 293-299 the assessed row, 296-297 the then!=now ground, 298-299 the then==now 'did not move' ground); :302-308 _grounds builds each row {**_ground(how,key), 'contracts':[...]}; :438 report['approvals_kept_grounds']",
+    "aisef2/app/bundle_cli.py:1071-1084 main migrate: print(json.dumps({'written':str(a.out), **report}, indent=1, sort_keys=True)) to stdout -- the operator's only view; with_commands (:341-364) touches only needs_owner_reapproval, never the grounds; nothing in the module or kernel re-reads the grounds",
+    "aisef/cli/parser.py:424-426 routes `aisef bundle ...` to bundle_cli.main; nothing wraps or parses the report",
+    "git grep approvals_kept_grounds over aisef2/aisef/validation/tests/docs: writer bundle_cli.py:438; readers tests/v2/test_v21_migrate_semantics.py:384,490,661 only; validation/v21/context_gap.py:138 does `cand,_ = migrate(...)` (discards the report); docs USAGE-2.1.md:96 and REPORT.md:284",
+    "the two tests that read an assessed row's ground: test_v21_migrate_semantics.py:393 assertIn('none selects class exists', exists['ground']) (then!=now) and :397,:669 assertIn('did not move', r['ground']) (then==now); both pin a substring the mutant leaves intact",
+    "the fields that carry the same data, pinned: :389-391 (exists['from'], exists['to']), :392 consulted versions/selectors, :667-671 (LedgerLock rows' from/to capability_version==1, consulted==[])"
+   ],
+   "exceptions_checked": [
+    "the version recoverable: yes -- to['capability_version'] (pinned :667 ==1)",
+    "the pinned substring removed: no -- 'did not move' survives"
+   ]
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_ground",
+   "index": 10,
+   "mutant": "L294 dict entry 2 dropped",
+   "class": "REFUTED",
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "group": "SA-FIELD",
+   "group_text": "SA-FIELD: the assessed row's `subject_absence` (bundle_cli.py:294, = key[2] = contracts[name].subject_absence.value) is a GROUP KEY of _group (:276-284): two kept contracts share a grounds row iff probe, class, subject_absence and the versions match, so the field is what tells the operator why two otherwise-identical rows are separate. It is documented (USAGE-2.1.md:96 lists subject_absence among the grounds' fields) and appears for kept contracts ONLY here (semantic_changes carries it for WITHHELD contracts). No test reads it from a grounds row: test_v21_migrate_semantics.py pins subject_absence only on semantic_changes rows (:368, :652), never on a grounds row. On a then==now ('did not move') row the ground sentence (:298-299) does not restate it, so once the field is gone the value is carried by nothing.",
+   "grounds": "Drops `subject_absence` from EVERY assessed grounds row (:294, both ternary arms). On a then!=now row the value survives in the ground prose ('under {key[2]}'); on a then==now row (:298-299) the prose does not name it, so the absence a kept contract was grouped under is carried by nothing and shown nowhere (the LedgerLock bundle has three such rows). Documented field (USAGE-2.1.md:96), unpinned on grounds rows. MEASURED: Ran 51 tests in ~1s, OK -> SURVIVED (baseline unmutated: 51 tests OK).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:287-299 _ground (289-292 the how-is-None 'current' row; 293-299 the assessed row, 296-297 the then!=now ground, 298-299 the then==now 'did not move' ground); :302-308 _grounds builds each row {**_ground(how,key), 'contracts':[...]}; :438 report['approvals_kept_grounds']",
+    "aisef2/app/bundle_cli.py:1071-1084 main migrate: print(json.dumps({'written':str(a.out), **report}, indent=1, sort_keys=True)) to stdout -- the operator's only view; with_commands (:341-364) touches only needs_owner_reapproval, never the grounds; nothing in the module or kernel re-reads the grounds",
+    "aisef/cli/parser.py:424-426 routes `aisef bundle ...` to bundle_cli.main; nothing wraps or parses the report",
+    "git grep approvals_kept_grounds over aisef2/aisef/validation/tests/docs: writer bundle_cli.py:438; readers tests/v2/test_v21_migrate_semantics.py:384,490,661 only; validation/v21/context_gap.py:138 does `cand,_ = migrate(...)` (discards the report); docs USAGE-2.1.md:96 and REPORT.md:284",
+    "tests that read subject_absence: test_v21_migrate_semantics.py:368 (semantic_changes row) and :652 (LedgerLock semantic_changes row) -- both on semantic_changes, not approvals_kept_grounds; the grounds tests at :384-399 and :660-674 never read a row's subject_absence",
+    "the then!=now ground only: :296-297 renders '... under {key[2]}', so an assessed row with a moved version still shows the value in prose; the then==now row (:298-299) does not, and the LedgerLock bundle has three such rows (test:667-669)"
+   ],
+   "exceptions_checked": [
+    "the value recoverable on a did-not-move row: no -- the :298-299 ground omits it and semantic_changes carries absence for WITHHELD contracts only",
+    "a test reading a grounds row's subject_absence: none (:368,:652 read semantic_changes rows)"
+   ],
+   "refutation": "A test is owed (T-SA; reader: the operator reading approvals_kept_grounds, printed by main :1084). In test_v21_migrate_semantics.py TheLedgerLockBundle.test_the_ground_of_the_53_kept_approvals_is_read_not_counted (:660): `by_probe = {r['probe']: r for r in rows}`; for the three then==now rows (:667) assert each row's `subject_absence` equals the shared absence of its `contracts` (e.g. `self.assertEqual(r['subject_absence'], contract(r['contracts'][0]).subject_absence.value)` and that it is not None); and in WhatMigrateWithholds.test_the_report_gives_the_ground... (:381) assert exists['subject_absence'] and unmoved['subject_absence'] are the fixture contracts' absence. Kills [10] (the key absent) and [24] (the value under ''). The gap is real: subject_absence is a grounds group key, documented at USAGE-2.1.md:96, and no test has ever read it from a grounds row (only from semantic_changes at :368,:652)."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_ground",
+   "index": 24,
+   "mutant": "L294 string 'subject_absence' emptied",
+   "class": "REFUTED",
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "group": "SA-FIELD",
+   "group_text": "SA-FIELD: the assessed row's `subject_absence` (bundle_cli.py:294, = key[2] = contracts[name].subject_absence.value) is a GROUP KEY of _group (:276-284): two kept contracts share a grounds row iff probe, class, subject_absence and the versions match, so the field is what tells the operator why two otherwise-identical rows are separate. It is documented (USAGE-2.1.md:96 lists subject_absence among the grounds' fields) and appears for kept contracts ONLY here (semantic_changes carries it for WITHHELD contracts). No test reads it from a grounds row: test_v21_migrate_semantics.py pins subject_absence only on semantic_changes rows (:368, :652), never on a grounds row. On a then==now ('did not move') row the ground sentence (:298-299) does not restate it, so once the field is gone the value is carried by nothing.",
+   "grounds": "Renames `subject_absence` to '' in every assessed row: the value key[2] prints under \"\" instead of under the documented key. A reader (or the operator) scanning for subject_absence no longer finds it; this is the round-3 label dispute on an operator-visible report field, kept as owed. Same real gap as [10]: subject_absence on a grounds row is unpinned. MEASURED: Ran 51 tests in ~1s, OK -> SURVIVED (baseline unmutated: 51 tests OK).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:287-299 _ground (289-292 the how-is-None 'current' row; 293-299 the assessed row, 296-297 the then!=now ground, 298-299 the then==now 'did not move' ground); :302-308 _grounds builds each row {**_ground(how,key), 'contracts':[...]}; :438 report['approvals_kept_grounds']",
+    "aisef2/app/bundle_cli.py:1071-1084 main migrate: print(json.dumps({'written':str(a.out), **report}, indent=1, sort_keys=True)) to stdout -- the operator's only view; with_commands (:341-364) touches only needs_owner_reapproval, never the grounds; nothing in the module or kernel re-reads the grounds",
+    "aisef/cli/parser.py:424-426 routes `aisef bundle ...` to bundle_cli.main; nothing wraps or parses the report",
+    "git grep approvals_kept_grounds over aisef2/aisef/validation/tests/docs: writer bundle_cli.py:438; readers tests/v2/test_v21_migrate_semantics.py:384,490,661 only; validation/v21/context_gap.py:138 does `cand,_ = migrate(...)` (discards the report); docs USAGE-2.1.md:96 and REPORT.md:284",
+    "tests that read subject_absence: test_v21_migrate_semantics.py:368 (semantic_changes row) and :652 (LedgerLock semantic_changes row) -- both on semantic_changes, not approvals_kept_grounds; the grounds tests at :384-399 and :660-674 never read a row's subject_absence",
+    "the then!=now ground only: :296-297 renders '... under {key[2]}', so an assessed row with a moved version still shows the value in prose; the then==now row (:298-299) does not, and the LedgerLock bundle has three such rows (test:667-669)"
+   ],
+   "exceptions_checked": [
+    "the value visible under '' in the printed json: yes, but not under the documented 'subject_absence' key (USAGE-2.1.md:96)",
+    "a test reading subject_absence from a grounds row: none"
+   ],
+   "refutation": "A test is owed (T-SA; reader: the operator reading approvals_kept_grounds, printed by main :1084). In test_v21_migrate_semantics.py TheLedgerLockBundle.test_the_ground_of_the_53_kept_approvals_is_read_not_counted (:660): `by_probe = {r['probe']: r for r in rows}`; for the three then==now rows (:667) assert each row's `subject_absence` equals the shared absence of its `contracts` (e.g. `self.assertEqual(r['subject_absence'], contract(r['contracts'][0]).subject_absence.value)` and that it is not None); and in WhatMigrateWithholds.test_the_report_gives_the_ground... (:381) assert exists['subject_absence'] and unmoved['subject_absence'] are the fixture contracts' absence. Kills [10] (the key absent) and [24] (the value under ''). The gap is real: subject_absence is a grounds group key, documented at USAGE-2.1.md:96, and no test has ever read it from a grounds row (only from semantic_changes at :368,:652)."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_ground",
+   "index": 21,
+   "mutant": "L290 dict entry 6 dropped",
+   "class": "REFUTED",
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "group": "CUR-GROUND",
+   "group_text": "CUR-GROUND: the how-is-None 'current' row's `ground` (bundle_cli.py:290-292) is the sole statement of why a contract this release's own plan names is kept with nothing compared ('the plan names this release's own spec ids for these contracts: there is no earlier release whose capability to compare'). It is the payload the approvals_kept_grounds report exists to give (the _grounds docstring, :304-306: 'so that the owner sees what \"no change selects it\" was read from'; documented USAGE-2.1.md:96, REPORT.md:284) and it is recoverable from nothing else (probe=None marks the row current but carries no reasoning). No test asserts it: WhatIsNotKept:490-495 reads only from/probe/contracts, and the current row never reaches WhatMigrateWithholds' `for r in rows: assertTrue(r['ground'])` (measured: 21/36/38 survive).",
+   "grounds": "Drops the current row's `ground`: the row prints with no explanation at all of why a contract this release's own plan names is kept. The payload the report exists to give (USAGE-2.1.md:96, REPORT.md:284, _grounds docstring :304-306) is gone and is recoverable from nothing (probe=None marks the row current but carries no reasoning). MEASURED: Ran 51 tests in ~1s, OK -> SURVIVED (baseline unmutated: 51 tests OK).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:287-299 _ground (289-292 the how-is-None 'current' row; 293-299 the assessed row, 296-297 the then!=now ground, 298-299 the then==now 'did not move' ground); :302-308 _grounds builds each row {**_ground(how,key), 'contracts':[...]}; :438 report['approvals_kept_grounds']",
+    "aisef2/app/bundle_cli.py:1071-1084 main migrate: print(json.dumps({'written':str(a.out), **report}, indent=1, sort_keys=True)) to stdout -- the operator's only view; with_commands (:341-364) touches only needs_owner_reapproval, never the grounds; nothing in the module or kernel re-reads the grounds",
+    "aisef/cli/parser.py:424-426 routes `aisef bundle ...` to bundle_cli.main; nothing wraps or parses the report",
+    "git grep approvals_kept_grounds over aisef2/aisef/validation/tests/docs: writer bundle_cli.py:438; readers tests/v2/test_v21_migrate_semantics.py:384,490,661 only; validation/v21/context_gap.py:138 does `cand,_ = migrate(...)` (discards the report); docs USAGE-2.1.md:96 and REPORT.md:284",
+    "the only reader of a current row: test_v21_migrate_semantics.py WhatIsNotKept:490-495 -- reads from, probe, len(contracts); never ground",
+    "the pinned grounds text is the ASSESSED branch only: :393 'none selects class exists', :397/:669 'did not move' -- both on then!=now / then==now rows, neither on the None row"
+   ],
+   "exceptions_checked": [
+    "the text recoverable: no -- it is the only statement of this reason; from/probe/consulted carry none of it",
+    "WhatMigrateWithholds' `assertTrue(r['ground'])` (:398) catching it: no -- the current row is absent from that test's data (measured: 21 survives)"
+   ],
+   "refutation": "A test is owed (T-CUR-GROUND; reader: the operator reading approvals_kept_grounds for a bundle already of this release, printed by main :1084). In test_v21_migrate_semantics.py WhatIsNotKept.test_a_bundle_already_of_this_release_loses_nothing (:487, doc=era_bundle(release=None)): after `[ground] = report['approvals_kept_grounds']`, assert `'no earlier release whose capability to compare' in ground['ground']` (and `ground['ground']` is truthy and under the key 'ground'). Kills [21] (key absent -> KeyError), [38] (empty string) and [36] (text under '' not 'ground'). The gap is real: the current row's ground -- the sole reason-for-keeping of a contract with no earlier release -- is asserted by no test, while the assessed rows' ground substrings are pinned at :393/:397/:669."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_ground",
+   "index": 38,
+   "mutant": "L291 string \"the plan names this release's own spec ids for these contracts: there is no earlier release whose capability to compare\" emptied",
+   "class": "REFUTED",
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "group": "CUR-GROUND",
+   "group_text": "CUR-GROUND: the how-is-None 'current' row's `ground` (bundle_cli.py:290-292) is the sole statement of why a contract this release's own plan names is kept with nothing compared ('the plan names this release's own spec ids for these contracts: there is no earlier release whose capability to compare'). It is the payload the approvals_kept_grounds report exists to give (the _grounds docstring, :304-306: 'so that the owner sees what \"no change selects it\" was read from'; documented USAGE-2.1.md:96, REPORT.md:284) and it is recoverable from nothing else (probe=None marks the row current but carries no reasoning). No test asserts it: WhatIsNotKept:490-495 reads only from/probe/contracts, and the current row never reaches WhatMigrateWithholds' `for r in rows: assertTrue(r['ground'])` (measured: 21/36/38 survive).",
+   "grounds": "Empties the current row's `ground` to '': the field is present but the explanation is gone. Same real gap as [21]: the current row's reason-for-keeping is unasserted. MEASURED: Ran 51 tests in ~1s, OK -> SURVIVED (baseline unmutated: 51 tests OK).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:287-299 _ground (289-292 the how-is-None 'current' row; 293-299 the assessed row, 296-297 the then!=now ground, 298-299 the then==now 'did not move' ground); :302-308 _grounds builds each row {**_ground(how,key), 'contracts':[...]}; :438 report['approvals_kept_grounds']",
+    "aisef2/app/bundle_cli.py:1071-1084 main migrate: print(json.dumps({'written':str(a.out), **report}, indent=1, sort_keys=True)) to stdout -- the operator's only view; with_commands (:341-364) touches only needs_owner_reapproval, never the grounds; nothing in the module or kernel re-reads the grounds",
+    "aisef/cli/parser.py:424-426 routes `aisef bundle ...` to bundle_cli.main; nothing wraps or parses the report",
+    "git grep approvals_kept_grounds over aisef2/aisef/validation/tests/docs: writer bundle_cli.py:438; readers tests/v2/test_v21_migrate_semantics.py:384,490,661 only; validation/v21/context_gap.py:138 does `cand,_ = migrate(...)` (discards the report); docs USAGE-2.1.md:96 and REPORT.md:284",
+    "the only reader of a current row: test_v21_migrate_semantics.py WhatIsNotKept:490-495 -- reads from, probe, len(contracts); never ground",
+    "the pinned grounds text is the ASSESSED branch only: :393 'none selects class exists', :397/:669 'did not move' -- both on then!=now / then==now rows, neither on the None row"
+   ],
+   "exceptions_checked": [
+    "the text recoverable: no",
+    "a test asserting a non-empty current-row ground: none"
+   ],
+   "refutation": "A test is owed (T-CUR-GROUND; reader: the operator reading approvals_kept_grounds for a bundle already of this release, printed by main :1084). In test_v21_migrate_semantics.py WhatIsNotKept.test_a_bundle_already_of_this_release_loses_nothing (:487, doc=era_bundle(release=None)): after `[ground] = report['approvals_kept_grounds']`, assert `'no earlier release whose capability to compare' in ground['ground']` (and `ground['ground']` is truthy and under the key 'ground'). Kills [21] (key absent -> KeyError), [38] (empty string) and [36] (text under '' not 'ground'). The gap is real: the current row's ground -- the sole reason-for-keeping of a contract with no earlier release -- is asserted by no test, while the assessed rows' ground substrings are pinned at :393/:397/:669."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_ground",
+   "index": 36,
+   "mutant": "L291 string 'ground' emptied",
+   "class": "REFUTED",
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "group": "CUR-GROUND",
+   "group_text": "CUR-GROUND: the how-is-None 'current' row's `ground` (bundle_cli.py:290-292) is the sole statement of why a contract this release's own plan names is kept with nothing compared ('the plan names this release's own spec ids for these contracts: there is no earlier release whose capability to compare'). It is the payload the approvals_kept_grounds report exists to give (the _grounds docstring, :304-306: 'so that the owner sees what \"no change selects it\" was read from'; documented USAGE-2.1.md:96, REPORT.md:284) and it is recoverable from nothing else (probe=None marks the row current but carries no reasoning). No test asserts it: WhatIsNotKept:490-495 reads only from/probe/contracts, and the current row never reaches WhatMigrateWithholds' `for r in rows: assertTrue(r['ground'])` (measured: 21/36/38 survive).",
+   "grounds": "Renames the current row's `ground` key to '': the explanation text prints under \"\" instead of the documented 'ground' key. A human still sees the sentence in the printed json, but the documented field 'ground' is absent (round-3 label dispute on an operator-visible report field, kept as owed). Same real gap as [21]/[38]. MEASURED: Ran 51 tests in ~1s, OK -> SURVIVED (baseline unmutated: 51 tests OK).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:287-299 _ground (289-292 the how-is-None 'current' row; 293-299 the assessed row, 296-297 the then!=now ground, 298-299 the then==now 'did not move' ground); :302-308 _grounds builds each row {**_ground(how,key), 'contracts':[...]}; :438 report['approvals_kept_grounds']",
+    "aisef2/app/bundle_cli.py:1071-1084 main migrate: print(json.dumps({'written':str(a.out), **report}, indent=1, sort_keys=True)) to stdout -- the operator's only view; with_commands (:341-364) touches only needs_owner_reapproval, never the grounds; nothing in the module or kernel re-reads the grounds",
+    "aisef/cli/parser.py:424-426 routes `aisef bundle ...` to bundle_cli.main; nothing wraps or parses the report",
+    "git grep approvals_kept_grounds over aisef2/aisef/validation/tests/docs: writer bundle_cli.py:438; readers tests/v2/test_v21_migrate_semantics.py:384,490,661 only; validation/v21/context_gap.py:138 does `cand,_ = migrate(...)` (discards the report); docs USAGE-2.1.md:96 and REPORT.md:284",
+    "the only reader of a current row: test_v21_migrate_semantics.py WhatIsNotKept:490-495 -- reads from, probe, len(contracts); never ground",
+    "the pinned grounds text is the ASSESSED branch only: :393 'none selects class exists', :397/:669 'did not move' -- both on then!=now / then==now rows, neither on the None row"
+   ],
+   "exceptions_checked": [
+    "the text visible under '' : yes, but not under the documented 'ground' key (USAGE-2.1.md:96)",
+    "a test reading the current row's ground under the key 'ground': none"
+   ],
+   "refutation": "A test is owed (T-CUR-GROUND; reader: the operator reading approvals_kept_grounds for a bundle already of this release, printed by main :1084). In test_v21_migrate_semantics.py WhatIsNotKept.test_a_bundle_already_of_this_release_loses_nothing (:487, doc=era_bundle(release=None)): after `[ground] = report['approvals_kept_grounds']`, assert `'no earlier release whose capability to compare' in ground['ground']` (and `ground['ground']` is truthy and under the key 'ground'). Kills [21] (key absent -> KeyError), [38] (empty string) and [36] (text under '' not 'ground'). The gap is real: the current row's ground -- the sole reason-for-keeping of a contract with no earlier release -- is asserted by no test, while the assessed rows' ground substrings are pinned at :393/:397/:669."
+  }
+ ],
+ "owed_tests": [
+  "T-SA (kills [10],[24]): tests/v2/test_v21_migrate_semantics.py -- assert each approvals_kept_grounds row's `subject_absence` equals the shared subject_absence of its contracts (and is not None), on a then==now row (LedgerLock's three non-fa probes, :667) and in WhatMigrateWithholds (exists, unmoved); reader: the operator reading the printed migrate report; input: the fixtures already in the test.",
+  "T-CUR-GROUND (kills [21],[36],[38]): tests/v2/test_v21_migrate_semantics.py WhatIsNotKept.test_a_bundle_already_of_this_release_loses_nothing -- after `[ground] = report['approvals_kept_grounds']`, assert `ground['ground']` is truthy and contains 'no earlier release whose capability to compare'; reader: the operator reading the current-row ground; input: era_bundle(release=None), already built in that test."
+ ],
+ "notes": "Kill-file run (the one registered file of V21_TARGETS['aisef2/app/bundle_cli.py::_ground'], validation/v2/mutation.py:1182-1183 -> tests/v2/test_v21_migrate_semantics.py): a fresh `cp -R` of the tree at 4ec961e (aisef2 aisef tests validation docs pyproject.toml) + closure-evidence/v2/release/LEDGERLOCK-PROJECT.json (git show, ledgerlock_candidate.py reads it at import); the mutated module is validation.v2.mutation.mutants(src,'_ground',_enum_members(...))[index] written over aisef2/app/bundle_cli.py; `nice -n 19 /opt/homebrew/bin/python3 -P -B -m unittest tests.v2.test_v21_migrate_semantics -q`, env -i PATH=/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin (the two dirs holding an executable opencode stripped), HOME/TMPDIR under the copy, PYTHONPATH=<copy root> (-P drops cwd). Unmutated tree: Ran 51 tests, OK. Every one of the 18 mutants: Ran 51 tests, OK -> SURVIVED, so none is REFUTED-by-measurement; the REFUTED entries below are by reasoning (the reader is the operator reading the printed report; no test pins the field). | Classes: 13 AUDITED, 5 REFUTED, 0 EQUIVALENT (no mutant here is a no-op: every one changes the printed json). Groups kept consumers/exceptions per entry (owner rule, never lump). The two REFUTED groups are by reasoning, not measurement (all 18 SURVIVED the sole registered kill file) -- each names a reader (the operator) and the field/text the report promises but no test pins. Note the deliberate asymmetry: the same field name is AUDITED on the current (None) row, where it holds None/[] (16,17,19,20,31,32,34,35), and REFUTED on an assessed row, where subject_absence is real data (10,24); likewise ground prose fragments on an assessed row are AUDITED (data in from/to/consulted/class/subject_absence fields, 51-56) while the whole current-row ground is REFUTED (the only carrier of its reason, 21,36,38)."
+}

@@ -1,0 +1,119 @@
+{
+ "batch": "W2-lineage-3",
+ "file": "aisef2/app/lineage.py",
+ "targets": [
+  "aisef2/app/lineage.py::usage_lineage"
+ ],
+ "new": [
+  {
+   "target": "aisef2/app/lineage.py::usage_lineage",
+   "index": 56,
+   "mutant": "L802 True->False"
+  },
+  {
+   "target": "aisef2/app/lineage.py::usage_lineage",
+   "index": 71,
+   "mutant": "L819 not removed"
+  },
+  {
+   "target": "aisef2/app/lineage.py::usage_lineage",
+   "index": 75,
+   "mutant": "L799 dict entry 0 dropped"
+  },
+  {
+   "target": "aisef2/app/lineage.py::usage_lineage",
+   "index": 79,
+   "mutant": "L803 dict entry 1 dropped"
+  },
+  {
+   "target": "aisef2/app/lineage.py::usage_lineage",
+   "index": 80,
+   "mutant": "L803 dict entry 2 dropped"
+  },
+  {
+   "target": "aisef2/app/lineage.py::usage_lineage",
+   "index": 97,
+   "mutant": "L803 string 'recorded' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::usage_lineage",
+   "index": 98,
+   "mutant": "L803 string 'superseded' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::usage_lineage",
+   "index": 109,
+   "mutant": "L819 string 'steps' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::usage_lineage",
+   "index": 117,
+   "mutant": "L803 string 'superseded' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::usage_lineage",
+   "index": 119,
+   "mutant": "L805 string ': ' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::usage_lineage",
+   "index": 120,
+   "mutant": "L805 string ')' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::usage_lineage",
+   "index": 124,
+   "mutant": "L805 Or swapped"
+  },
+  {
+   "target": "aisef2/app/lineage.py::usage_lineage",
+   "index": 125,
+   "mutant": "L805 string 'strerror' emptied"
+  }
+ ],
+ "carried": [
+  {
+   "target": "aisef2/app/lineage.py::usage_lineage",
+   "index": 92,
+   "mutant": "L799 string 'seq' emptied",
+   "class": "EQUIVALENT",
+   "group": "T08-UL-EQ-SEQ: indexes 41 and 60 change only the `seq` entry (its presence / its key) of the temporary event dicts built at lineage.py:313 and handed to usage.usage.",
+   "grounds": "Same chain as [41]: the value of e.seq is stored under the key '' instead of 'seq' in the dicts built at lineage.py:373 and handed to usage.usage, which reads only 'type' and 'data' (usage.py:99-100), never enumerates a dict, and returns no event (usage.py:113-115). The key '' does not collide with 'type' or 'data'. Measured: usage.usage touches only 'type' and 'data' (tracking dict), and usage_lineage's results are identical for the original and the mutant over a lineage run with no events and with 22 events of 11 types, unpriced and priced.",
+   "consumers_checked": [
+    "aisef2/app/usage.py:99-100 (reads), :113-115 (return value)",
+    "aisef2/app/lineage.py:373-387 (use of `u`: u['cost'], u['tokens'])",
+    "aisef2/app/run.py:503 (sole caller of usage_lineage); aisef2/app/verify.py:196 re-derives `usage` from verify's own events (verify.py:151), not from lineage"
+   ],
+   "exceptions_checked": [
+    "a reader that enumerates the event dict (json.dumps, dict(e), e.items()) on usage.usage's path: none; the dicts are not serialised or stored",
+    "the key '' colliding with another key: the dict has only 'type' and 'data' besides it",
+    "usage.usage later reading `seq`: the mutant would then raise KeyError on the lineage tests' path, so the change would be caught where it is made"
+   ],
+   "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa",
+   "remapped_from": {
+    "index": 60,
+    "mutant": "L373 string 'seq' emptied",
+    "source_sha256": "85122bfb4d22125eeba871d91e8a848babb3fbaf41eb574dc20eb3869f4494f9",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 60,
+     "mutant": "L372 string 'seq' emptied",
+     "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+    },
+    "chain": [
+     {
+      "index": 60,
+      "mutant": "L372 string 'seq' emptied",
+      "base": "b5c24575600ffc7b28441802dcb168bc9829f920"
+     },
+     {
+      "index": 60,
+      "mutant": "L373 string 'seq' emptied",
+      "source_sha256": "85122bfb4d22125eeba871d91e8a848babb3fbaf41eb574dc20eb3869f4494f9",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  }
+ ]
+}

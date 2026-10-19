@@ -1,0 +1,289 @@
+{
+ "batch": "W2-lineage-4",
+ "file": "aisef2/app/lineage.py",
+ "target": "aisef2/app/lineage.py::lineage_account",
+ "snapshot": "4ec961e706a1f7bda16d131037058c4fe9c2663f",
+ "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa",
+ "role": "skeptic",
+ "when": "Mon Oct 19 21:10 +07 2026",
+ "source_sha256_check": "PASS: shasum -a 256 aisef2/app/lineage.py == f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa (matches the draft and the git blob at 4ec961e).",
+ "mutant_check": "PASS: mutation.mutants(src,'lineage_account',enums)[i][0] matches each entry's mutant text for all 13 indices (3,22,24,26,37,38,54,55,62,63,66,69,70); 72 mutants total; line numbers map (add def L724/doc L725, listed L736/doc L737, sibling_of L745/doc L746, return L734, holder-fallback L769, predecessor-why L761, listed-refused L742, sibling_of-read L751).",
+ "measurement": "Independent re-measurement in a COPY of the git-archive tree at 4ec961e. Env: PATH stripped of the two dirs holding an executable opencode (/Users/nghinh/.opencode/bin, /Users/nghinh/.npm-global/bin -> command -v opencode == NONE), HOME/TMPDIR under the run tree, PYTHONPATH=copy-root, nice -n 19 /opt/homebrew/bin/python3 -P -B -m unittest, module restored from pristine between mutants. Baselines GREEN: x_lineage_proof 55, pw_lineage_unread 39, pw_lineage_spend 4, defects_lineage2 11, defects_verify 20, kills3_T09b 14, kills3_T09c 15. RESULTS: all 13 mutants PASS (survive) on pw_lineage_unread, defects_lineage2, kills3_T09b, kills3_T09c (registered) AND on pw_lineage_spend (NOT registered) = 65 runs; x_lineage_proof (registered) PASS on 37/62/63/66/69/70 (the fallback + all 5 message mutants, where the needle asserts live) = 6 runs; defects_verify (registered) PASS on 37/69 = 2 runs. 0 FAIL/kill. NOTE: an initial x_lineage_proof pass under `env -i` (fully empty environment) produced spurious ERRORS (not assertion FAILs) on 63/66/69 while 62/70 were OK; re-run with the author's env model (inherit env, override only PATH/HOME/TMPDIR/PYTHONPATH) -> all OK, 0 error headers. The env-i ERRORS were my harness artifact (empty LANG/LC_*/USER breaks x_lineage_proof's chmod/symlink/locale-sensitive fixtures), not a kill; the lighter files are unaffected by env-i and their passes are valid. continue_usage/continue_integrity (registered, 61s/277s) not re-run: by code reading they assert account['unaccounted']==[] on clean continues (continue_usage:153) or compare account_of-sourced unaccounted (continue_integrity:284,293-302), so they never execute the mutated walk lines 742/751/761 or the L769 fallback with observable effect; consistent with the author's idx-37/69 spot-check.",
+ "entries": [
+  {
+   "target": "aisef2/app/lineage.py::lineage_account",
+   "index": 3,
+   "mutant": "L734 returns None",
+   "class_before": "EQUIVALENT",
+   "verdict": "CONFIRMED",
+   "class_after": "EQUIVALENT",
+   "grounds": "add() (def L724, return L734) is called at exactly three bare-expression-statement sites -- L758 add(at), L767 add(pathlib.Path(sibling),superseded=True), L774 add(pathlib.Path(sibling),superseded=True); the only other 'add(' tokens in the function body are seen.add(...) (set method, L757/766/773), not the closure. None binds the return. The appended account reaches the result through runs.append(account_of(path)|extra) (L730) and runs[-1] in unknown(runs[-1],...) (L732/761); the dict (L775-778) aggregates over `runs`, never over add()'s return. So `return None` vs `return runs[-1]` is unobservable -- a proof from the code. Measurement: PASS on all files run (incl. x_lineage_proof is not among the 6 x-proof mutants I re-ran, but pw_lineage_unread/defects_lineage2/kills3_T09b/kills3_T09c/pw_lineage_spend all PASS on idx 3; author's full run PASS).",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:758,767,774 (the three add() call sites; all bare statements, return discarded)",
+    "aisef2/app/lineage.py:730,732,761 (runs.append / unknown(runs[-1]) use runs[-1] directly, not add()'s return)",
+    "aisef2/app/lineage.py:775-778 (result aggregates over `runs`)"
+   ],
+   "exceptions_checked": [
+    "a binding `x = add(...)`: grep of the function body -> none",
+    "the return feeding the dict/`runs`: it does not"
+   ],
+   "note": "Author grounds accurate; cites refreshed to the snapshot (def L724, return L734)."
+  },
+  {
+   "target": "aisef2/app/lineage.py::lineage_account",
+   "index": 22,
+   "mutant": "L725 string \"The account of a run of the chain: ... it spent nothing there.)\" emptied",
+   "class_before": "EQUIVALENT",
+   "verdict": "CONFIRMED",
+   "class_after": "EQUIVALENT",
+   "grounds": "Empties the docstring of the nested closure add() (def L724, doc L725). add is local to lineage_account, never returned/assigned to any module-or-object name/stored on any object (the function returns a dict literal at L777-778), so no reference to add escapes and add.__doc__ is unreachable by any consumer. Tree-wide grep for introspection: inspect.getsource only on OTHER functions (p6_evidence.py:286 story_runner.run_story, p6_evidence.py:662 & freeze_conformance.py:692 pc._watch, plus unrelated tests/* targets); ast.get_docstring only on a module top docstring (gen_migration_table.py:136, not a registered kill file); the __doc__ reads found are argparse descriptions / factory.__doc__ / estimate.__doc__ on other modules -- none touch lineage.py's nested defs. The module-level docstring used by any CLI is a different, unmutated string. Not operator-read. Measurement: PASS (pw_lineage_unread/defects_lineage2/kills3_T09b/kills3_T09c/pw_lineage_spend on idx 22).",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:724-725 (add is a local closure; function returns a dict literal, not add)",
+    "validation/v2/p6_evidence.py:286,662 ; validation/v2/freeze_conformance.py:692 (inspect.getsource on OTHER functions)",
+    "validation/v2/gen_migration_table.py:136 (ast.get_docstring -- module top docstring only; not registered)"
+   ],
+   "exceptions_checked": [
+    "inspect.getsource/getdoc(lineage_account) or its nested defs + docstring check: none in repo",
+    "a docstring-coverage lint over nested defs: none in the tree",
+    "add escaping lineage_account: it does not"
+   ],
+   "note": "Author grounds accurate; distinct from operator-visible strings (rightly NOT lumped with 62/63/66/69/70)."
+  },
+  {
+   "target": "aisef2/app/lineage.py::lineage_account",
+   "index": 24,
+   "mutant": "L737 string \"The claims on `where`; ... never a known 0.\" emptied",
+   "class_before": "EQUIVALENT",
+   "verdict": "CONFIRMED",
+   "class_after": "EQUIVALENT",
+   "grounds": "Empties the docstring of the nested closure listed() (def L736, doc L737). listed is local to lineage_account, never returned/assigned/stored; called only at L763,770; listed.__doc__ unreachable by any consumer (same tree-wide introspection grep as idx 22: no getsource/getdoc/get_docstring/__doc__ reader targets lineage.py's nested defs). Not operator-read. Measurement: PASS on idx 24 across the files run.",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:736-737 (listed is a local closure; not returned/exported)",
+    "validation/v2/p6_evidence.py:286,662 ; freeze_conformance.py:692 (getsource on OTHER functions)",
+    "validation/v2/gen_migration_table.py:136 (ast.get_docstring -- module top docstring only)"
+   ],
+   "exceptions_checked": [
+    "inspect.getsource/getdoc on listed or lineage_account: none",
+    "a docstring-coverage lint over nested defs: none",
+    "listed escaping lineage_account: it does not"
+   ],
+   "note": "Author grounds accurate; cites refreshed (def L736, doc L737)."
+  },
+  {
+   "target": "aisef2/app/lineage.py::lineage_account",
+   "index": 26,
+   "mutant": "L746 string 'The run a claim file names. ... not passed over.' emptied",
+   "class_before": "EQUIVALENT",
+   "verdict": "CONFIRMED",
+   "class_after": "EQUIVALENT",
+   "grounds": "Empties the docstring of the nested closure sibling_of() (def L745, doc L746). sibling_of is local to lineage_account, never returned/assigned/stored; called only at L764,771; sibling_of.__doc__ unreachable (same introspection grep). Not operator-read. Measurement: PASS on idx 26 across the files run.",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:745-746 (sibling_of is a local closure; not returned/exported)",
+    "validation/v2/p6_evidence.py:286,662 ; freeze_conformance.py:692 (getsource on OTHER functions)",
+    "validation/v2/gen_migration_table.py:136 (ast.get_docstring -- module top docstring only)"
+   ],
+   "exceptions_checked": [
+    "inspect.getsource/getdoc on sibling_of or lineage_account: none",
+    "a docstring-coverage lint over nested defs: none",
+    "sibling_of escaping lineage_account: it does not"
+   ],
+   "note": "Author grounds accurate; cites refreshed (def L745, doc L746)."
+  },
+  {
+   "target": "aisef2/app/lineage.py::lineage_account",
+   "index": 37,
+   "mutant": "L769 dict entry 0 dropped",
+   "class_before": "AUDITED",
+   "verdict": "REVISED",
+   "class_after": "AUDITED",
+   "grounds": "CORRECTED GROUNDS. Mutant: holder = runs[0] if runs else {'unread': []} (drops 'unaccounted'). holder['unaccounted'] is read only inside unknown() (L720-722) via the final siblings loop L770-774 (listed/sibling_of errors on the fallback holder). The else-dict is used ONLY when `runs` is empty. The author's condition is INCOMPLETE: `runs` is empty iff (a) predecessor is None [then at=None, the L756 while is skipped], OR (b) child is not None AND key(child)==key(predecessor) [then key(predecessor) is pre-seeded in `seen`]. Neither occurs at any caller: run.py:524 calls lineage_account only inside `if predecessor is not None:` (L518) and passes out (a fresh run dir, != predecessor) -> rules out BOTH (a) and (b); verify.py:86 passes pathlib.Path(c['path']) (non-None) and out (!=) -> rules out both; bundle_cli.py:947 passes run_dir (non-None) with child=None -> seen=set(), the first while iteration adds, so runs is non-empty (the author's 'child=None so never empty' is only true because run_dir is non-None). run.py:518's `if predecessor is not None` guard -- the load-bearing fact that rules out case (a) -- was not cited by the author. So the else-branch is dead for every caller; when it is never reached the mutant has no effect; if it were reached AND a final listed()/sibling_of() hit a LineageRefused/unreadable claim, unknown() would KeyError on the missing 'unaccounted' key (a real behavioural difference -> not EQUIVALENT, correctly AUDITED). Measurement: PASS on x_lineage_proof, defects_verify, pw_lineage_unread, defects_lineage2, kills3_T09b, kills3_T09c, pw_lineage_spend (no test constructs runs-empty).",
+   "consumers_checked": [
+    "aisef2/app/run.py:518 (`if predecessor is not None:` guard) ,524 (lineage_account(predecessor,out)) -- predecessor non-None, out!=predecessor",
+    "aisef2/app/verify.py:86 (lineage_account(Path(c['path']),out) -- non-None, out!=)",
+    "aisef2/app/bundle_cli.py:947 (lineage_account(run_dir) -- run_dir non-None, child=None => seen empty => runs non-empty)",
+    "aisef2/app/lineage.py:720-722 unknown() (reads holder['unaccounted'] by bracket -> KeyError if absent)",
+    "aisef2/app/lineage.py:755-756,769,770-774 (`runs` empty only via predecessor=None OR key(child)==key(predecessor); else-holder consumed only by the final siblings loop)",
+    "aisef2/app/run.py:529-547 ; verify.py:86-93 ; bundle_cli.py:958-972 (downstream read `runs`-aggregated unaccounted/unread, not the else-holder)"
+   ],
+   "exceptions_checked": [
+    "a caller passing predecessor=None: none (run.py guarded; verify/bundle_cli construct non-None paths)",
+    "a caller passing child whose realpath==predecessor's: none (out/next are fresh dirs; bundle_cli passes child=None)",
+    "a test making `runs` empty: none across registered + non-registered (pw_lineage_spend) consumers",
+    "else-holder contents reaching the result: no -- L775-778 aggregate over `runs` (empty), the else-holder is not in `runs`"
+   ],
+   "note": "REVISED because the author's 'runs empty iff key(child)==key(predecessor)' omits the predecessor=None case and mis-attributes bundle_cli's safety to child=None rather than run_dir!=None; the conclusion (dead else-branch, latent KeyError only there, AUDITED, SURVIVED) is correct and is secured by run.py:518's uncited `if predecessor is not None` guard."
+  },
+  {
+   "target": "aisef2/app/lineage.py::lineage_account",
+   "index": 38,
+   "mutant": "L769 dict entry 1 dropped",
+   "class_before": "AUDITED",
+   "verdict": "REVISED",
+   "class_after": "AUDITED",
+   "grounds": "CORRECTED GROUNDS (as idx 37). Mutant: holder = runs[0] if runs else {'unaccounted': []} (drops 'unread'). holder['unread'] is read only inside unknown() (L720-722) via the final siblings loop. Same reachability proof: the else-branch is entered only when `runs` is empty, which needs predecessor is None OR (child is not None AND key(child)==key(predecessor)); no caller does either (run.py:518 guard + out!=predecessor; verify.py:86 non-None + out!=; bundle_cli.py:947 run_dir non-None, child=None). Dead branch; if reached with a listed/sibling error, unknown() KeyErrors on 'unread' -> real difference, AUDITED. Measurement: PASS on all files run (incl. pw_lineage_spend, non-registered).",
+   "consumers_checked": [
+    "aisef2/app/run.py:518,524 ; verify.py:86 ; bundle_cli.py:947 (callers; none reach the else-branch -- see idx 37)",
+    "aisef2/app/lineage.py:720-722 unknown() (reads holder['unread'] by bracket -> KeyError if absent)",
+    "aisef2/app/lineage.py:755-756,769,770-774 (runs-empty condition; else-holder consumed only by the final siblings loop)"
+   ],
+   "exceptions_checked": [
+    "a caller passing predecessor=None: none",
+    "a caller passing child whose realpath==predecessor's: none",
+    "a test making `runs` empty: none (registered + pw_lineage_spend)",
+    "else-holder reaching the result: no (L775-778 aggregate over `runs`)"
+   ],
+   "note": "REVISED for the same grounds gap as idx 37; conclusion (AUDITED, SURVIVED) correct."
+  },
+  {
+   "target": "aisef2/app/lineage.py::lineage_account",
+   "index": 54,
+   "mutant": "L769 string 'unaccounted' emptied",
+   "class_before": "AUDITED",
+   "verdict": "REVISED",
+   "class_after": "AUDITED",
+   "grounds": "CORRECTED GROUNDS (as idx 37). Mutant: else-dict becomes {'': [], 'unread': []}, so holder['unaccounted'] is absent (KeyError in unknown() at L721). Same dead-branch reachability proof (predecessor=None OR key(child)==key(predecessor); no caller does either; run.py:518 guard uncited by author). Dead branch; latent KeyError only there -> AUDITED. Measurement: PASS on all files run.",
+   "consumers_checked": [
+    "aisef2/app/run.py:518,524 ; verify.py:86 ; bundle_cli.py:947 (none reach the else-branch)",
+    "aisef2/app/lineage.py:720-722 unknown() (holder['unaccounted'] bracket read -> KeyError if key renamed to '')",
+    "aisef2/app/lineage.py:755-756,769,770-774"
+   ],
+   "exceptions_checked": [
+    "predecessor=None at a caller: none",
+    "key(child)==key(predecessor) at a caller: none",
+    "a test making `runs` empty: none (registered + pw_lineage_spend)",
+    "else-holder reaching the result: no"
+   ],
+   "note": "REVISED for the grounds gap; conclusion (AUDITED, SURVIVED) correct."
+  },
+  {
+   "target": "aisef2/app/lineage.py::lineage_account",
+   "index": 55,
+   "mutant": "L769 string 'unread' emptied",
+   "class_before": "AUDITED",
+   "verdict": "REVISED",
+   "class_after": "AUDITED",
+   "grounds": "CORRECTED GROUNDS (as idx 37). Mutant: else-dict becomes {'unaccounted': [], '': []}, so holder['unread'] is absent (KeyError in unknown() at L722). Same dead-branch reachability proof; no caller reaches the else-branch (run.py:518 guard + out!=predecessor; verify.py:86; bundle_cli.py:947 run_dir non-None). Dead branch; latent KeyError only there -> AUDITED. Measurement: PASS on all files run.",
+   "consumers_checked": [
+    "aisef2/app/run.py:518,524 ; verify.py:86 ; bundle_cli.py:947 (none reach the else-branch)",
+    "aisef2/app/lineage.py:720-722 unknown() (holder['unread'] bracket read -> KeyError if key renamed to '')",
+    "aisef2/app/lineage.py:755-756,769,770-774"
+   ],
+   "exceptions_checked": [
+    "predecessor=None at a caller: none",
+    "key(child)==key(predecessor) at a caller: none",
+    "a test making `runs` empty: none (registered + pw_lineage_spend)",
+    "else-holder reaching the result: no"
+   ],
+   "note": "REVISED for the grounds gap; conclusion (AUDITED, SURVIVED) correct."
+  },
+  {
+   "target": "aisef2/app/lineage.py::lineage_account",
+   "index": 62,
+   "mutant": "L761 string ': ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "Predecessor-why message (L759-761, fired when _predecessor(at) returns a why). Drops the ': ' between {at.name} and {why}: f'{at.name}{why}: ...'. at.name stays a prefix substring. Exercised by x_lineage_proof:629-634 (a record naming its predecessor by a NUL string -> _predecessor returns a why; at=r2, at.name='run2'); assert_unread(...,'run2') (x_lineage_proof:260) only needs 'run2' as a substring of some unread entry -> survives. Operator-visible (surfaced by run.py:538 '; '.join(inherited['unread'])[:1500], verify.py:93, bundle_cli.py:967) so correctly AUDITED not EQUIVALENT; but run.py:529/543 and verify.py:88 branch on list truthiness, not text, and unread_runs (L782-784) uses r['run'] not the message. Measurement: idx 62 PASS on x_lineage_proof (55 OK), pw_lineage_unread, defects_lineage2, kills3_T09b, kills3_T09c, pw_lineage_spend.",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:759-761 (producer)",
+    "tests/v2/test_v21_x_lineage_proof.py:629-634 assert_unread(...,'run2') -- 'run2'=at.name survives the mash",
+    "aisef2/app/run.py:529-547 ; verify.py:86-93 ; bundle_cli.py:958-972 (surfacing; decisions key on list truthiness)",
+    "aisef2/app/lineage.py:782-784 unread_runs (reads r['run'], not the message)"
+   ],
+   "exceptions_checked": [
+    "a test asserting the exact separator/suffix text: none (grep: the suffix substrings occur only at the source line)",
+    "a decision keyed on the message text: none",
+    "the identifier dropping out of the entry: no -- at.name stays in the prefix"
+   ],
+   "note": "Author grounds confirmed; cite refreshed to x_lineage_proof:629-634."
+  },
+  {
+   "target": "aisef2/app/lineage.py::lineage_account",
+   "index": 63,
+   "mutant": "L761 string ': what it continued, and what the runs before it spent, is unknown' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "Same L761 message; drops the trailing consequence clause -> f'{at.name}: {why}'. at.name ('run2') and {why} intact. x_lineage_proof:634 assert_unread(...,'run2') survives. grep: the dropped clause appears only at L761. Operator-visible (run.py:538/verify.py:93/bundle_cli.py:967) -> AUDITED; decisions key on list truthiness (run.py:529/543, verify.py:88). Measurement: idx 63 PASS on x_lineage_proof (55 OK, 0 errors, faithful env), plus pw_lineage_unread/defects_lineage2/kills3_T09b/kills3_T09c/pw_lineage_spend.",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:761 (producer)",
+    "tests/v2/test_v21_x_lineage_proof.py:634 assert_unread(...,'run2') -- needle in prefix",
+    "aisef2/app/run.py:529-547 ; verify.py:86-93 ; bundle_cli.py:958-972 (surfacing)",
+    "aisef2/app/lineage.py:782-784 unread_runs (reads r['run'])"
+   ],
+   "exceptions_checked": [
+    "a test asserting the suffix text: none",
+    "a decision keyed on message text: none",
+    "the identifier dropping out: no"
+   ],
+   "note": "Author grounds confirmed."
+  },
+  {
+   "target": "aisef2/app/lineage.py::lineage_account",
+   "index": 66,
+   "mutant": "L742 string ': what the runs it superseded spent is unknown' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "listed()'s LineageRefused handler (L741-742, fired when claims(where) raises). Drops the suffix -> f'{e}'. {e} is the LineageRefused from claims() at lineage.py:154-156 == '{predecessor}: its claims cannot be listed ({cls}: {err}): a lineage cannot be known from a directory this process may not list and search -- restore its permissions (nothing was taken or released)'. It contains 'its claims cannot be listed', so 'claim' survives in {e}. Exercised by pw_lineage_unread:357-360 (self.locked(self.pred,0o300); got=lineage_account(self.pred); assertTrue(any('claim' in u for u in got['unaccounted']))) -> PASS. Operator-visible -> AUDITED; decisions key on truthiness. Measurement: idx 66 PASS on pw_lineage_unread (39 OK) AND on x_lineage_proof (55 OK, faithful env), plus defects_lineage2/kills3_T09b/kills3_T09c/pw_lineage_spend.",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:741-742 (producer) ; 146-156 (claims() -> LineageRefused text contains 'claims')",
+    "tests/v2/test_v21_pw_lineage_unread.py:357-360 (asserts truthiness + 'claim' substring, both inside {e})",
+    "aisef2/app/run.py:529-547 ; verify.py:86-93 ; bundle_cli.py:958-972 (surfacing)",
+    "aisef2/app/lineage.py:782-784 unread_runs (reads r['run'])"
+   ],
+   "exceptions_checked": [
+    "a test asserting the dropped suffix text: none (grep)",
+    "a decision keyed on message text: none",
+    "'claim' dropping out of the entry: no -- it is inside {e} ('its claims cannot be listed')"
+   ],
+   "note": "Author grounds confirmed; verified the LineageRefused message at lineage.py:154 carries 'claims'."
+  },
+  {
+   "target": "aisef2/app/lineage.py::lineage_account",
+   "index": 69,
+   "mutant": "L751 string ' cannot be read (' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "sibling_of()'s handler (L748-752, fired when a claim file read/parse raises OSError/ValueError). Empties ' cannot be read (' -> f'{path.parent.name}/{path.name}{type(e).__name__}): ...' (e.g. 'run1/CONTINUED-BY.jsonOSError): ...'). The identifier 'run1/CONTINUED-BY.json' (parent.name/name) survives as a prefix. Exercised by x_lineage_proof:497-500 (a first-generation claim that is a link to nowhere) assert_unread(...,'run1/CONTINUED-BY.json') and :641 (NUL-named claim) assert_unread(...,'CONTINUED-BY.json') -- both needles are prefix substrings, survive. CRITICAL CHECK: 'cannot be read' is asserted on a lineage_account result at x_lineage_proof:200 and pw_lineage_spend:115, but in BOTH the 'cannot be read' entry comes from account_of (the run's JOURNAL made not-text: x_lineage_proof:195 (r1/JOURNAL)=NOT_TEXT; pw_lineage_spend:107 put_journal(not text)), NOT from sibling_of/L751 (claim-file read failure); x_lineage_proof:409's 'cannot be read' is on account_of(run) (line 406), not lineage_account. So mutant 69 does not touch those entries. Operator-visible -> AUDITED. Measurement: idx 69 PASS on x_lineage_proof (55 OK, 0 errors, faithful env), defects_verify (20 OK), pw_lineage_unread, defects_lineage2, kills3_T09b, kills3_T09c, AND pw_lineage_spend (NOT registered, 4 OK -- the non-registered 'cannot be read' assertion at :115 is account_of-sourced and survives).",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:748-752 (producer)",
+    "tests/v2/test_v21_x_lineage_proof.py:500,641 assert_unread(...,'run1/CONTINUED-BY.json' / 'CONTINUED-BY.json') -- needles in the surviving prefix",
+    "tests/v2/test_v21_x_lineage_proof.py:200,409 ('cannot be read' on account_of-sourced entries, not sibling_of)",
+    "tests/v2/test_v21_pw_lineage_spend.py:115 (NON-registered; 'cannot be read'+child.name is account_of-sourced, verified by companion :76 on account_of directly)",
+    "aisef2/app/run.py:529-547 ; verify.py:86-93 ; bundle_cli.py:958-972 (surfacing; truthiness decisions)",
+    "aisef2/app/lineage.py:782-784 unread_runs (reads r['run'])"
+   ],
+   "exceptions_checked": [
+    "a test asserting 'cannot be read' on a sibling_of (claim-file) entry of a lineage_account result: none -- the lineage_account 'cannot be read' asserts all trace to account_of's JOURNAL message",
+    "a non-registered test killing it: none -- pw_lineage_spend PASS",
+    "a decision keyed on message text: none ; identifier dropping out: no (run1/CONTINUED-BY.json stays)"
+   ],
+   "note": "Author grounds confirmed; the key risk (a 'cannot be read' assertion on the mutated sibling_of message) was chased down -- all such asserts are on account_of, not L751; and the non-registered pw_lineage_spend does not refute."
+  },
+  {
+   "target": "aisef2/app/lineage.py::lineage_account",
+   "index": 70,
+   "mutant": "L751 string '): the run it names, and what that run spent, is unknown' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "Same L751 message; drops the closing ') ...consequence' -> f'{path.parent.name}/{path.name} cannot be read ({type(e).__name__}' (keeps 'run1/CONTINUED-BY.json cannot be read (OSError', loses ')' + the clause). Identifier, 'cannot be read', and the exception class all remain; assert_unread needles (file name, exception class) survive (x_lineage_proof:500,641). Operator-visible -> AUDITED; decisions key on truthiness. Measurement: idx 70 PASS on x_lineage_proof (55 OK), pw_lineage_unread, defects_lineage2, kills3_T09b, kills3_T09c, pw_lineage_spend.",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:748-752 (producer)",
+    "tests/v2/test_v21_x_lineage_proof.py:500,641 assert_unread -- needles survive",
+    "aisef2/app/run.py:529-547 ; verify.py:86-93 ; bundle_cli.py:958-972 (surfacing)",
+    "aisef2/app/lineage.py:782-784 unread_runs (reads r['run'])"
+   ],
+   "exceptions_checked": [
+    "a test asserting the dropped suffix text: none",
+    "a decision keyed on message text: none",
+    "the identifier dropping out: no"
+   ],
+   "note": "Author grounds confirmed."
+  }
+ ],
+ "owed_tests": [],
+ "notes": "13/13 verified at snapshot 4ec961e (source_sha256 f342996d... matches). Mutant text matches the mutation tool for every index. Verdicts: 9 CONFIRMED (3 add()-return-discarded EQUIVALENT; 22/24/26 nested-closure docstrings EQUIVALENT; 62/63/66/69/70 operator-visible message edits AUDITED), 4 REVISED (37/38/54/55 L769 else-dict -- AUDITED stands, grounds corrected). 0 REFUTED, 0 NOT_DECIDED, 0 tests owed. The REVISION on 37/38/54/55: the author's 'runs empty iff key(child)==key(predecessor)' omits the predecessor=None case and attributes bundle_cli's safety to child=None rather than run_dir!=None; the dead-branch conclusion is nonetheless correct and is secured by run.py:518's `if predecessor is not None` guard (which the author did not cite) plus out!=predecessor at run.py/verify.py and run_dir!=None at bundle_cli.py. Independent re-measurement: 0 kills across 5 registered kill files run on all 13 (pw_lineage_unread, defects_lineage2, kills3_T09b, kills3_T09c; x_lineage_proof on 37/62/63/66/69/70; defects_verify on 37/69) plus the NON-registered pw_lineage_spend on all 13; continue_usage/continue_integrity not re-run (do not reach the mutated lines/branch by code reading; author spot-checked). A one-off env-i (empty-environment) harness artifact produced spurious x_lineage_proof ERRORS on 63/66/69 that vanished under the author's env model -- not kills. HARD RULES honoured: no real opencode (command -v opencode==NONE after PATH strip), no network, repo worktree untouched (git archive at 4ec961e only), nice -n 19 python3 -P -B, one mutant at a time, module restored from pristine between mutants, HOME/TMPDIR under the run tree; no code or tests changed."
+}

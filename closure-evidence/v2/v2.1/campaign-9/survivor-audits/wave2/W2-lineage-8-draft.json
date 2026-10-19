@@ -1,0 +1,373 @@
+{
+ "batch": "W2-lineage-8",
+ "file": "aisef2/app/lineage.py",
+ "snapshot": "4ec961e706a1f7bda16d131037058c4fe9c2663f",
+ "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa",
+ "role": "author",
+ "summary": {
+  "AUDITED": 10,
+  "EQUIVALENT": 3,
+  "REFUTED": 1
+ },
+ "new": [
+  {
+   "target": "aisef2/app/lineage.py::claim_unread",
+   "index": 8,
+   "mutant": "L375 string ': ' emptied",
+   "class": "AUDITED",
+   "group": "g-cu-msg: L375 builds claim_unread's UNREAD cause string, printed to the operator as bundle_cli.continue_from report['already_continued_by']['why'] (bundle_cli.py:893, L950) and documented as the cause (lineage.py:139-140, docstring L365-367). The only program reader, test_v21_pw_lineage_continue.py:481-484/495, pins exactly three scaffolding substrings — lineage.CLAIM (the `{path.name}` prefix), 'cannot be read', 'aisef run --parent' — and, for the permission case, 'PermissionError' (`type(e).__name__`). Every mutant in this group keeps all four, so it SURVIVES; the lost bytes are punctuation (8,9) or a strerror-vs-str(e) swap that keeps the cause (11). x_lineage_proof.py:526 only `assertIn('cannot be read', ...)`.",
+   "grounds": "L375 empties the ': ' between `{type(e).__name__}` and `{getattr(e,'strerror',None) or e}` in the cause parenthetical. MEASURED (measure_msgs.py, cwd=tree): original 'CONTINUED-BY.json cannot be read (IsADirectoryError: Is a directory): make it readable...' -> mutant '...(IsADirectoryErrorIs a directory): make it readable...'; the type name and the cause text both remain, only the separator is gone. CLAIM, 'cannot be read', 'aisef run --parent', 'PermissionError' all survive. Observable to the operator (a cosmetic join) but no consumer, contract, document or named operator check depends on the ': ' separator. NOT EQUIVALENT (the printed string differs); AUDITED.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:893 (held['why']=claim_unread(run_dir)) and L950 (report['already_continued_by']=held, returned and printed whole as JSON by bundle continue) — the sole operator consumer",
+    "tests/v2/test_v21_pw_lineage_continue.py:481-484 assertIn(lineage.CLAIM, why)/assertIn('cannot be read', why)/assertIn('aisef run --parent', why); L495 assertIn('PermissionError', why) — never asserts the cause body",
+    "tests/v2/test_v21_x_lineage_proof.py:526 assertIn('cannot be read', claim_unread(r1) or '') — substring only",
+    "git grep claim_unread over aisef2/ aisef/ validation/ tests/ docs/: producer lineage.py:365; readers bundle_cli.py:893 and the two tests above; docs/mutation listings are prose"
+   ],
+   "exceptions_checked": [
+    "a reader matching the whole message or the ' : ' separator: none in code or tests at the snapshot",
+    "the cause being lost: it is not — type name and cause text are adjacent, only unseparated",
+    "REFUTED-by-measurement: ruled out — pw_lineage_continue 36 tests OK and x_lineage_proof 55 tests OK on the mutant (kill_runs)"
+   ],
+   "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa",
+   "kill_runs": [
+    "tests.v2.test_v21_pw_lineage_continue=PASS(36 OK)",
+    "tests.v2.test_v21_x_lineage_proof=PASS(55 OK)"
+   ]
+  },
+  {
+   "target": "aisef2/app/lineage.py::claim_unread",
+   "index": 9,
+   "mutant": "L375 string ')' emptied",
+   "class": "AUDITED",
+   "group": "g-cu-msg: L375 builds claim_unread's UNREAD cause string, printed to the operator as bundle_cli.continue_from report['already_continued_by']['why'] (bundle_cli.py:893, L950) and documented as the cause (lineage.py:139-140, docstring L365-367). The only program reader, test_v21_pw_lineage_continue.py:481-484/495, pins exactly three scaffolding substrings — lineage.CLAIM (the `{path.name}` prefix), 'cannot be read', 'aisef run --parent' — and, for the permission case, 'PermissionError' (`type(e).__name__`). Every mutant in this group keeps all four, so it SURVIVES; the lost bytes are punctuation (8,9) or a strerror-vs-str(e) swap that keeps the cause (11). x_lineage_proof.py:526 only `assertIn('cannot be read', ...)`.",
+   "grounds": "L375 empties the ')' that closes the cause parenthetical. MEASURED: '...cannot be read (IsADirectoryError: Is a directory): make it readable...' -> '...(IsADirectoryError: Is a directory: make it readable...' (an unbalanced paren). Type name and cause survive; the four pinned substrings survive. Observable (a missing ')') but nothing depends on the paren. AUDITED.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:893 (held['why']=claim_unread(run_dir)) and L950 (report['already_continued_by']=held, returned and printed whole as JSON by bundle continue) — the sole operator consumer",
+    "tests/v2/test_v21_pw_lineage_continue.py:481-484 assertIn(lineage.CLAIM, why)/assertIn('cannot be read', why)/assertIn('aisef run --parent', why); L495 assertIn('PermissionError', why) — never asserts the cause body",
+    "tests/v2/test_v21_x_lineage_proof.py:526 assertIn('cannot be read', claim_unread(r1) or '') — substring only",
+    "git grep claim_unread over aisef2/ aisef/ validation/ tests/ docs/: producer lineage.py:365; readers bundle_cli.py:893 and the two tests above; docs/mutation listings are prose"
+   ],
+   "exceptions_checked": [
+    "a reader requiring balanced parens or the exact message: none at the snapshot",
+    "the cause being lost: not — the whole '(type: cause' is intact, only the trailing ')' is gone",
+    "REFUTED-by-measurement: ruled out — pw_lineage_continue 36 OK, x_lineage_proof 55 OK on the mutant"
+   ],
+   "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa",
+   "kill_runs": [
+    "tests.v2.test_v21_pw_lineage_continue=PASS(36 OK)",
+    "tests.v2.test_v21_x_lineage_proof=PASS(55 OK)"
+   ]
+  },
+  {
+   "target": "aisef2/app/lineage.py::claim_unread",
+   "index": 11,
+   "mutant": "L375 string 'strerror' emptied",
+   "class": "AUDITED",
+   "group": "g-cu-msg: L375 builds claim_unread's UNREAD cause string, printed to the operator as bundle_cli.continue_from report['already_continued_by']['why'] (bundle_cli.py:893, L950) and documented as the cause (lineage.py:139-140, docstring L365-367). The only program reader, test_v21_pw_lineage_continue.py:481-484/495, pins exactly three scaffolding substrings — lineage.CLAIM (the `{path.name}` prefix), 'cannot be read', 'aisef run --parent' — and, for the permission case, 'PermissionError' (`type(e).__name__`). Every mutant in this group keeps all four, so it SURVIVES; the lost bytes are punctuation (8,9) or a strerror-vs-str(e) swap that keeps the cause (11). x_lineage_proof.py:526 only `assertIn('cannot be read', ...)`.",
+   "grounds": "L375 changes `getattr(e, 'strerror', None)` to `getattr(e, '', None)`, which is always None, so `None or e` yields `e` and the parenthetical shows str(e) instead of e.strerror. MEASURED: OSError case 'IsADirectoryError: Is a directory' -> 'IsADirectoryError: [Errno 21] Is a directory: <path>' (the cause is still shown, in fact fuller); ValueError cases ('not a claim', JSON errors) are IDENTICAL to the original (ValueError has no strerror, so original already used e). The cause is never lost. The four pinned substrings survive. Observable only as strerror-vs-str(e) for OSError; no reader depends on which form. AUDITED.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:893 (held['why']=claim_unread(run_dir)) and L950 (report['already_continued_by']=held, returned and printed whole as JSON by bundle continue) — the sole operator consumer",
+    "tests/v2/test_v21_pw_lineage_continue.py:481-484 assertIn(lineage.CLAIM, why)/assertIn('cannot be read', why)/assertIn('aisef run --parent', why); L495 assertIn('PermissionError', why) — never asserts the cause body",
+    "tests/v2/test_v21_x_lineage_proof.py:526 assertIn('cannot be read', claim_unread(r1) or '') — substring only",
+    "git grep claim_unread over aisef2/ aisef/ validation/ tests/ docs/: producer lineage.py:365; readers bundle_cli.py:893 and the two tests above; docs/mutation listings are prose"
+   ],
+   "exceptions_checked": [
+    "a reader that parses e.strerror specifically: none; the operator reads free text and str(e) carries the cause",
+    "the ValueError branch: identical to the original (proven and measured)",
+    "the OSError strerror being None (so original showed e too): then mutant == original",
+    "REFUTED-by-measurement: ruled out — pw_lineage_continue 36 OK, x_lineage_proof 55 OK on the mutant"
+   ],
+   "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa",
+   "kill_runs": [
+    "tests.v2.test_v21_pw_lineage_continue=PASS(36 OK)",
+    "tests.v2.test_v21_x_lineage_proof=PASS(55 OK)"
+   ]
+  },
+  {
+   "target": "aisef2/app/lineage.py::claim_unread",
+   "index": 10,
+   "mutant": "L375 Or swapped",
+   "class": "REFUTED",
+   "group": "g-cu-10: the or->and swap at L375 destroys the cause for the ValueError family of UNREAD claims, which no registered test pins (pw_lineage_continue checks only the scaffolding substrings).",
+   "grounds": "L375 changes `getattr(e, 'strerror', None) or e` to `... and e`. `claim_unread` catches BOTH OSError and ValueError (from `_claimed_run`, lineage.py:358-361; `_claimed_run` raises ValueError for a claim that parses but is no claim, lineage.py:333-338, and json.loads raises JSONDecodeError (a ValueError) for a torn/empty claim). For a ValueError, `getattr(e,'strerror',None)` is None, so original `None or e` = e (the cause text) but mutant `None and e` = None. MEASURED (measure_msgs.py): claim body '[]' (not a claim) -> original '(ValueError: not a claim)', mutant '(ValueError: None)'; torn body '{not json' -> original '(JSONDecodeError: Expecting property name ... (char 1))', mutant '(JSONDecodeError: None)'. The cause — claim_unread's documented purpose (docstring L365: 'Why ... cannot be read (the cause ...)') and what the operator reads in the bundle-continue report to decide what to fix — is replaced by the literal 'None' for every malformed/non-object/torn/empty claim. (For OSError the swap keeps the cause via str(e), so this is a ValueError-family degradation only; the type name and 'cannot be read' always survive, which is why it SURVIVES.) NOT EQUIVALENT (the printed cause differs); NOT AUDITED (the operator depends on the cause, and an unaffected sibling datum — the OSError strerror — is exactly what the function promises). MEASURED kill outcome: pw_lineage_continue test_a_claim_that_cannot_be_read_is_reported_unread_with_its_cause... (L467-485) drives exactly these bodies ({\"run\": \"/x/y (cut), '' (empty), '[1]' (no claim), a directory) but asserts only CLAIM / 'cannot be read' / 'aisef run --parent' — never the cause — so it is OK on the mutant (36 OK); x_lineage_proof L526 asserts only the substring (55 OK). The campaign's SURVIVED is a true test gap, not a runner artifact.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:893 held['why']=claim_unread(run_dir) -> L950 report['already_continued_by'] -> printed whole to the operator by `aisef bundle continue`",
+    "aisef2/app/lineage.py:365-367 docstring: claim_unread returns 'the cause'; lineage.py:139-140 '#: a report states it UNREAD with the cause (claim_unread)'",
+    "tests/v2/test_v21_pw_lineage_continue.py:467-485 (the ValueError bodies) asserts CLAIM/'cannot be read'/'aisef run --parent' only; L495 asserts 'PermissionError' (OSError case, unaffected) — none assert the cause body",
+    "tests/v2/test_v21_x_lineage_proof.py:526 assertIn('cannot be read', ...) only",
+    "git grep claim_unread over aisef2/ validation/ tests/ docs/: no other reader of the cause text"
+   ],
+   "exceptions_checked": [
+    "REFUTED-by-measurement: ruled out — no registered kill file FAILS on the mutant (pw_lineage_continue 36 OK, x_lineage_proof 55 OK); the gap is that none assert the cause",
+    "the OSError case (permission/IO, the common cause): not degraded — `strerror and e` = e = str(e), which carries the cause; this is why the mutant is not EQUIVALENT-to-broken, only partial",
+    "the type name carrying enough: 'ValueError'/'JSONDecodeError' without the message ('not a claim', the JSON position) does not tell the operator what is wrong with the claim",
+    "whether the owner prefers operator-only-visible content classified AUDITED: the wave-1 report (survivor-audits/wave1/README.md) flags this as an open owner decision and kept such cases owed under the round-3 rule; this entry follows that strict reading"
+   ],
+   "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa",
+   "kill_runs": [
+    "tests.v2.test_v21_pw_lineage_continue=PASS(36 OK)",
+    "tests.v2.test_v21_x_lineage_proof=PASS(55 OK)"
+   ],
+   "refutation": "The operator reads report['already_continued_by']['why'] from `aisef bundle continue` to learn why the newest claim cannot be read; for a claim that is there but malformed (torn by a kill, empty, valid JSON that is not a claim), the cause is a ValueError/JSONDecodeError whose message IS the reason, and the or->and swap replaces it with 'None'. No registered test asserts the cause body. Input: the bodies already in tests/v2/test_v21_pw_lineage_continue.py::test_a_claim_that_cannot_be_read_is_reported_unread_with_its_cause...: '{\"run\": \"/x/y' (cut), '' (empty), '[1]' (JSON and no claim). Reader: that test, on report['already_continued_by']['why'] (operator-facing). Sketch: for the '[1]' body assert \"not a claim\" in why; for the cut/empty bodies assert the message is not of the form '(ValueError: None)'/'(JSONDecodeError: None)' — i.e. the exception's own str() appears after the type name (mirror the existing 'PermissionError' assertion at L495, which already pins the OSError cause's type). A real gap."
+  },
+  {
+   "target": "aisef2/app/lineage.py::is_file",
+   "index": 1,
+   "mutant": "L481 string ' cannot be looked at (' emptied",
+   "class": "AUDITED",
+   "group": "g-if-msg: L481 builds is_file's LineageRefused message raised when `_look(path)` hits an OSError (a component the system will not let this process search). run.py:482-486 turns it into `--parent {predecessor}: {e}` with exit 2. The except is OSError-only, so e always carries a strerror and `type(e).__name__` is a separate f-string field. The sole program reader, test_v21_pw_lineage_unread.py:428-436 (test_a_predecessor_that_cannot_be_searched_is_refused_naming_the_cause), asserts 'PermissionError' in err and NOT 'no run record there'. Every mutant keeps `type(e).__name__` and so keeps 'PermissionError' -> SURVIVES.",
+   "grounds": "L481 empties ' cannot be looked at (' so the message becomes `{path}{type(e).__name__}: {e.strerror or e}): restore ...`. MEASURED (measure2.py): original '<path> cannot be looked at (PermissionError: Permission denied): restore the permissions of the run directory' -> mutant '<path>PermissionError: Permission denied): restore the permissions of the run directory'. The path, type name and strerror all survive; only the connecting phrase is gone. 'PermissionError' survives -> test L428-436 passes. Observable, operator-facing, but no reader depends on the phrase. AUDITED.",
+   "consumers_checked": [
+    "aisef2/app/run.py:482-486: recorded=is_file(predecessor/'RUN.json'); is_file(predecessor/STARTED); LineageRefused -> RunRefused(f'--parent {predecessor}: {e}') exit 2 (the operator reads it)",
+    "tests/v2/test_v21_pw_lineage_unread.py:428-436 asserts 'PermissionError' in err and assertNotIn('no run record there'); never asserts the emptied prose",
+    "git grep is_file over aisef2/ aisef/ validation/ docs/: lineage.is_file readers are only run.py:482-483; aisef/control/approvals.py:127 and aisef/harness/tools.py:513 are Path.is_file() (unrelated); docs/FAILURE-TAXONOMY.md is prose about a different is_file()"
+   ],
+   "exceptions_checked": [
+    "a reader matching 'cannot be looked at': none in code or tests at the snapshot",
+    "the cause being lost: not — type name + strerror remain",
+    "REFUTED-by-measurement: ruled out — pw_lineage_unread 39 tests OK on the mutant"
+   ],
+   "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa",
+   "kill_runs": [
+    "tests.v2.test_v21_pw_lineage_unread=PASS(39 OK)"
+   ]
+  },
+  {
+   "target": "aisef2/app/lineage.py::is_file",
+   "index": 2,
+   "mutant": "L481 string ': ' emptied",
+   "class": "AUDITED",
+   "group": "g-if-msg: L481 builds is_file's LineageRefused message raised when `_look(path)` hits an OSError (a component the system will not let this process search). run.py:482-486 turns it into `--parent {predecessor}: {e}` with exit 2. The except is OSError-only, so e always carries a strerror and `type(e).__name__` is a separate f-string field. The sole program reader, test_v21_pw_lineage_unread.py:428-436 (test_a_predecessor_that_cannot_be_searched_is_refused_naming_the_cause), asserts 'PermissionError' in err and NOT 'no run record there'. Every mutant keeps `type(e).__name__` and so keeps 'PermissionError' -> SURVIVES.",
+   "grounds": "L481 empties the ': ' between `{type(e).__name__}` and `{e.strerror or e}`. MEASURED: '(PermissionError: Permission denied)' -> '(PermissionErrorPermission denied)'. Type name and strerror both present (joined); 'PermissionError' survives -> test passes. Cosmetic separator loss. AUDITED.",
+   "consumers_checked": [
+    "aisef2/app/run.py:482-486: recorded=is_file(predecessor/'RUN.json'); is_file(predecessor/STARTED); LineageRefused -> RunRefused(f'--parent {predecessor}: {e}') exit 2 (the operator reads it)",
+    "tests/v2/test_v21_pw_lineage_unread.py:428-436 asserts 'PermissionError' in err and assertNotIn('no run record there'); never asserts the emptied prose",
+    "git grep is_file over aisef2/ aisef/ validation/ docs/: lineage.is_file readers are only run.py:482-483; aisef/control/approvals.py:127 and aisef/harness/tools.py:513 are Path.is_file() (unrelated); docs/FAILURE-TAXONOMY.md is prose about a different is_file()"
+   ],
+   "exceptions_checked": [
+    "a reader matching the ': ' separator: none",
+    "the cause being lost: not — only the separator is gone",
+    "REFUTED-by-measurement: ruled out — pw_lineage_unread 39 OK on the mutant"
+   ],
+   "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa",
+   "kill_runs": [
+    "tests.v2.test_v21_pw_lineage_unread=PASS(39 OK)"
+   ]
+  },
+  {
+   "target": "aisef2/app/lineage.py::is_file",
+   "index": 3,
+   "mutant": "L481 string '): restore the permissions of the run directory' emptied",
+   "class": "AUDITED",
+   "group": "g-if-msg: L481 builds is_file's LineageRefused message raised when `_look(path)` hits an OSError (a component the system will not let this process search). run.py:482-486 turns it into `--parent {predecessor}: {e}` with exit 2. The except is OSError-only, so e always carries a strerror and `type(e).__name__` is a separate f-string field. The sole program reader, test_v21_pw_lineage_unread.py:428-436 (test_a_predecessor_that_cannot_be_searched_is_refused_naming_the_cause), asserts 'PermissionError' in err and NOT 'no run record there'. Every mutant keeps `type(e).__name__` and so keeps 'PermissionError' -> SURVIVES.",
+   "grounds": "L481 empties the closing paren and the remediation clause, so the message ends at `...{e.strerror or e}`. MEASURED: '...(PermissionError: Permission denied): restore the permissions of the run directory' -> '...(PermissionError: Permission denied'. The run name, type name and strerror (what names the cause) survive; the lost bytes are the remediation hint (prose) and the ')'. 'PermissionError' survives -> test passes. No test or machine reader matches the remediation clause. AUDITED.",
+   "consumers_checked": [
+    "aisef2/app/run.py:482-486: recorded=is_file(predecessor/'RUN.json'); is_file(predecessor/STARTED); LineageRefused -> RunRefused(f'--parent {predecessor}: {e}') exit 2 (the operator reads it)",
+    "tests/v2/test_v21_pw_lineage_unread.py:428-436 asserts 'PermissionError' in err and assertNotIn('no run record there'); never asserts the emptied prose",
+    "git grep is_file over aisef2/ aisef/ validation/ docs/: lineage.is_file readers are only run.py:482-483; aisef/control/approvals.py:127 and aisef/harness/tools.py:513 are Path.is_file() (unrelated); docs/FAILURE-TAXONOMY.md is prose about a different is_file()"
+   ],
+   "exceptions_checked": [
+    "a reader matching 'restore the permissions of the run directory': none in code or tests at the snapshot",
+    "the cause/identity being lost: not — path + type + strerror remain; only the advice and ')' are gone",
+    "an operator who relies on the remediation text: it is advice, not an identifier; the same advice is in run.py's own refusals (run.py:531-538, bundle_cli report L966-972)",
+    "REFUTED-by-measurement: ruled out — pw_lineage_unread 39 OK on the mutant"
+   ],
+   "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa",
+   "kill_runs": [
+    "tests.v2.test_v21_pw_lineage_unread=PASS(39 OK)"
+   ]
+  },
+  {
+   "target": "aisef2/app/lineage.py::is_file",
+   "index": 4,
+   "mutant": "L481 Or swapped",
+   "class": "AUDITED",
+   "group": "g-if-msg: L481 builds is_file's LineageRefused message raised when `_look(path)` hits an OSError (a component the system will not let this process search). run.py:482-486 turns it into `--parent {predecessor}: {e}` with exit 2. The except is OSError-only, so e always carries a strerror and `type(e).__name__` is a separate f-string field. The sole program reader, test_v21_pw_lineage_unread.py:428-436 (test_a_predecessor_that_cannot_be_searched_is_refused_naming_the_cause), asserts 'PermissionError' in err and NOT 'no run record there'. Every mutant keeps `type(e).__name__` and so keeps 'PermissionError' -> SURVIVES.",
+   "grounds": "L481 changes `{e.strerror or e}` to `{e.strerror and e}`. Unlike claim_unread, is_file's except is OSError-only, and an OSError from os.listdir always has a truthy strerror, so `strerror and e` = e = str(e), which CONTAINS the strerror. MEASURED: '(PermissionError: Permission denied)' -> '(PermissionError: [Errno 13] Permission denied: <path>)' — the cause is still shown, in fact fuller. 'PermissionError' (type field) is unaffected -> test passes. Observable (strerror vs str(e)) but the cause is never lost; no reader depends on the form. AUDITED. (Contrast claim_unread#10, REFUTED, which also catches ValueError, where `and` yields None and loses the cause.)",
+   "consumers_checked": [
+    "aisef2/app/run.py:482-486: recorded=is_file(predecessor/'RUN.json'); is_file(predecessor/STARTED); LineageRefused -> RunRefused(f'--parent {predecessor}: {e}') exit 2 (the operator reads it)",
+    "tests/v2/test_v21_pw_lineage_unread.py:428-436 asserts 'PermissionError' in err and assertNotIn('no run record there'); never asserts the emptied prose",
+    "git grep is_file over aisef2/ aisef/ validation/ docs/: lineage.is_file readers are only run.py:482-483; aisef/control/approvals.py:127 and aisef/harness/tools.py:513 are Path.is_file() (unrelated); docs/FAILURE-TAXONOMY.md is prose about a different is_file()"
+   ],
+   "exceptions_checked": [
+    "a reader parsing e.strerror specifically: none; str(e) carries the cause",
+    "an OSError whose strerror is None/empty: then `strerror and e` yields that falsy value; os.listdir's OSError sets strerror, so unreached by the tested/real paths",
+    "the except catching ValueError (which would have no strerror): it does not — OSError only (L479); the NUL-name ValueError is handled inside _look (L470-471), never reaching L481",
+    "REFUTED-by-measurement: ruled out — pw_lineage_unread 39 OK on the mutant"
+   ],
+   "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa",
+   "kill_runs": [
+    "tests.v2.test_v21_pw_lineage_unread=PASS(39 OK)"
+   ]
+  },
+  {
+   "target": "aisef2/app/lineage.py::_is_a_directory",
+   "index": 2,
+   "mutant": "L662 returns None",
+   "class": "EQUIVALENT",
+   "group": "g-dir: _is_a_directory (L656-663) is read only for truthiness at lineage.py:522 (`state==UNREAD and _is_a_directory(run_dir)`) and :731 (`not extra and not _is_a_directory(path)`); nothing compares it with `is`, serialises it, or does arithmetic. Both sites decide whether to append an 'unknown spend' string.",
+   "grounds": "L662 is the `except ValueError` branch (a NUL-byte name); the mutant returns None where the original returns False. MEASURED (measure2.py): _is_a_directory(Path('x\\0y')) is False originally, None on the mutant; every other input is unchanged. Both values are falsy, and both consumers use the result only in a boolean position (L522 `and`, L731 `not`): `X and None` behaves as `X and False`, and `not None` == `not False` == True. There is no `is False`, no serialisation, no arithmetic anywhere (grep). So no observable difference in any reachable use — EQUIVALENT, proven from the code (the bool-typed value is only ever truthiness-tested, and None and False are both falsy).",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:522 `if state == UNREAD and _is_a_directory(run_dir):` — truthiness, gates appending the journal-unread message",
+    "aisef2/app/lineage.py:731 `if not extra and not _is_a_directory(path):` (lineage_account.add) — truthiness, gates appending 'the lineage names this run and its directory is not there'",
+    "git grep _is_a_directory over aisef2/ aisef/ validation/ tests/ docs/: only these two call sites; USAGE-2.1.md:789 is prose (registered-not-measured list); tests reference unrelated 'is_a_directory' helper names"
+   ],
+   "exceptions_checked": [
+    "a consumer distinguishing None from False (is False, ==False, json, a count): none at the snapshot",
+    "the return annotation `-> bool`: not enforced at runtime; no caller type-checks",
+    "REFUTED-by-measurement: moot for an equivalent mutant; still measured — kills3_A09 3 OK, defects_lineage2 11 OK on the mutant"
+   ],
+   "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa",
+   "kill_runs": [
+    "tests.v2.test_v21_kills3_A09=PASS(3 OK)",
+    "tests.v2.test_v21_defects_lineage2=PASS(11 OK)"
+   ]
+  },
+  {
+   "target": "aisef2/app/lineage.py::_is_a_directory",
+   "index": 1,
+   "mutant": "L660 returns None",
+   "class": "AUDITED",
+   "group": "g-dir: _is_a_directory (L656-663) is read only for truthiness at lineage.py:522 (`state==UNREAD and _is_a_directory(run_dir)`) and :731 (`not extra and not _is_a_directory(path)`); nothing compares it with `is`, serialises it, or does arithmetic. Both sites decide whether to append an 'unknown spend' string.",
+   "grounds": "L660 is the `except OSError` branch; the mutant returns None where the original returns `not not_there(e)`. MEASURED (measure2.py): for an absent path (os.stat raises FileNotFoundError, not_there True) original False -> mutant None — both falsy, no difference; for a path whose parent lacks search (os.stat raises PermissionError, not_there False) original True -> mutant None — a REAL truthiness flip (True->falsy). So the mutant is observable only when os.stat itself raises a non-absence OSError, i.e. a directory in the run's path prefix is unsearchable. In that sub-case L522 would SKIP the journal-unread append and L731 would ADD a spurious 'directory not there' — but by the time either site is reached, the run's own reads (events_of/_look at L492/L499/L507, child_evidence at L519) have already resolved the same unsearchable prefix as unreadable and listed the unknown, so no consumer's contract turns on this one boolean, and no registered test constructs that prefix-unsearchable state (the permission tests lock the run dir itself or its sessions/ledger, where os.stat of the run dir still SUCCEEDS via the try branch — L660 is not reached). Observable in isolation but unrelied-upon and not reached by any consumer/test; AUDITED, not EQUIVALENT (the True->None flip is a genuine difference).",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:522 `if state == UNREAD and _is_a_directory(run_dir):` — truthiness, gates appending the journal-unread message",
+    "aisef2/app/lineage.py:731 `if not extra and not _is_a_directory(path):` (lineage_account.add) — truthiness, gates appending 'the lineage names this run and its directory is not there'",
+    "git grep _is_a_directory over aisef2/ aisef/ validation/ tests/ docs/: only these two call sites; USAGE-2.1.md:789 is prose (registered-not-measured list); tests reference unrelated 'is_a_directory' helper names",
+    "aisef2/app/lineage.py:492/499/507 (events_of, _look ledger, _look sessions) and :519 child_evidence: the reads that already classify an unsearchable run as unreadable before L522",
+    "tests/v2/test_v21_defects_lineage2.py:135-146 (test_an_unsearchable_run_directory_is_listed) locks the run dir 0o600/0o000 -> os.stat(run_dir) SUCCEEDS (needs parent search, not the dir's own bits), so _is_a_directory takes the try branch, not L660"
+   ],
+   "exceptions_checked": [
+    "the absence sub-case (the common one): no difference (False and None both falsy)",
+    "a run whose PARENT directory is unsearchable so os.stat(run_dir) raises EACCES while state==UNREAD: exotic; the surrounding reads already list the unknown, and no registered test builds it",
+    "a consumer that needs True specifically (not merely truthy) at L522/L731: none — both are plain boolean gates",
+    "REFUTED-by-measurement: ruled out — kills3_A09 3 OK, defects_lineage2 11 OK, x_lineage_proof 55 OK on the mutant (the last locks run files 0o000 and asserts P1/P4 unknown-spend)"
+   ],
+   "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa",
+   "kill_runs": [
+    "tests.v2.test_v21_kills3_A09=PASS(3 OK)",
+    "tests.v2.test_v21_defects_lineage2=PASS(11 OK)",
+    "tests.v2.test_v21_x_lineage_proof=PASS(55 OK)"
+   ]
+  },
+  {
+   "target": "aisef2/app/lineage.py::_is_a_directory",
+   "index": 4,
+   "mutant": "L662 False->True",
+   "class": "AUDITED",
+   "group": "g-dir: _is_a_directory (L656-663) is read only for truthiness at lineage.py:522 (`state==UNREAD and _is_a_directory(run_dir)`) and :731 (`not extra and not _is_a_directory(path)`); nothing compares it with `is`, serialises it, or does arithmetic. Both sites decide whether to append an 'unknown spend' string.",
+   "grounds": "L662 is the `except ValueError` (NUL-byte name) branch; the mutant returns True where the original returns False. MEASURED (measure2.py): _is_a_directory(Path('x\\0y')) is False originally, True on the mutant; all other inputs unchanged. This is observable only for a path containing a NUL byte. No consumer ever feeds one: L522's run_dir is a real filesystem path; L731's path is a run the lineage names, and the one place a claim could carry a NUL run name, _claimed_run (lineage.py:334-337), rejects '\\0' with ValueError BEFORE any Path is built (so it becomes UNREADABLE_CLAIM, never a path passed to _is_a_directory). So the flip (which at L731 would suppress the 'directory not there' unknown for a NUL path) is unreachable through the consumers. Observable in isolation, no consumer/contract/test depends on it; AUDITED.",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:522 `if state == UNREAD and _is_a_directory(run_dir):` — truthiness, gates appending the journal-unread message",
+    "aisef2/app/lineage.py:731 `if not extra and not _is_a_directory(path):` (lineage_account.add) — truthiness, gates appending 'the lineage names this run and its directory is not there'",
+    "git grep _is_a_directory over aisef2/ aisef/ validation/ tests/ docs/: only these two call sites; USAGE-2.1.md:789 is prose (registered-not-measured list); tests reference unrelated 'is_a_directory' helper names",
+    "aisef2/app/lineage.py:334-337 _claimed_run raises ValueError on a '\\0' in the run name, so a NUL claim yields UNREADABLE_CLAIM, never a Path to _is_a_directory"
+   ],
+   "exceptions_checked": [
+    "a reachable NUL-byte path at L522 or L731: none (run_dir is real; claim run names with NUL are rejected upstream)",
+    "a predecessor path from a record carrying a NUL: pathlib/os raise ValueError when such a record is read/resolved well before _is_a_directory; no test exercises it",
+    "REFUTED-by-measurement: ruled out — kills3_A09 3 OK, defects_lineage2 11 OK, x_lineage_proof 55 OK on the mutant"
+   ],
+   "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa",
+   "kill_runs": [
+    "tests.v2.test_v21_kills3_A09=PASS(3 OK)",
+    "tests.v2.test_v21_defects_lineage2=PASS(11 OK)",
+    "tests.v2.test_v21_x_lineage_proof=PASS(55 OK)"
+   ]
+  },
+  {
+   "target": "aisef2/app/lineage.py::account_of",
+   "index": 55,
+   "mutant": "L502 dict entry 0 dropped",
+   "class": "EQUIVALENT",
+   "group": "g-ao-pre: L502 builds the fallback `pre` ONLY in the `except Exception` branch taken when the preflight ledger does not read (lineage.py:500-504). In that branch the original sets pre['unaccounted']=[] (empty). pre is read in exactly three places: client.Budget(huge, pre, ...) (L508) and the sessions-except rebuild (L511-512), both of which read only the four SPEND keys; and L515 `for n in pre.get('unaccounted') or []`. Since the original's unaccounted is [], `[] or []` == `None or []` == [], so these mutants cannot change any output.",
+   "grounds": "L502 drops `| {'unaccounted': []}`, so the fallback pre has the 4 SPEND keys and no 'unaccounted'. This line runs only when the preflight ledger is unreadable. MEASURED (measure3.py, run1 with a 0o000 LEDGER): account_of's return is BYTE-IDENTICAL to the original — same unread, unaccounted, exact=False, and all four counters 0. Reason: Budget reads only the SPEND keys (all present); L515 `pre.get('unaccounted') or []` yields [] whether the key is absent (mutant -> None->[]) or [] (original). No other code reads pre. EQUIVALENT, proven from the code and measured.",
+   "consumers_checked": [
+    "aisef2/app/client.py:81-86 Budget.__init__ validates/reads only base[k] for k in KEYS (the 4 SPEND keys); never base['unaccounted'] or base['']",
+    "aisef2/app/lineage.py:511-512 the sessions-except rebuild reads pre[k] for k in SPEND and pre['provider_requests'] — all present in both mutants",
+    "aisef2/app/lineage.py:515 `for n in pre.get('unaccounted') or []` — the only read of pre['unaccounted']; yields [] under original ([]) and under both mutants (None)",
+    "account_of return (L548-549): unread/unaccounted flow to run.py:529-542 (RunRefused), bundle_cli.py:960-972 (report), verify.py:89-93, client.py:101 — all operator-facing, and MEASURED identical to the original here"
+   ],
+   "exceptions_checked": [
+    "Budget raising on a missing key: it reads only base[k] for k in KEYS, all present; no ValueError (L82 check passes)",
+    "L515 seeing a different value: [] either way, so no preflight-request entries added in this branch in either",
+    "any reader of pre outside account_of: none (pre is local)",
+    "REFUTED-by-measurement: moot (equivalent); measured anyway — 7 fast kill files all OK (defects_verify 20, defects_lineage2 11, kills3_A09 3, kills3_T09a 18, kills3_R03 5, pw_lineage_unread 39, pw_lineage_spend 4)"
+   ],
+   "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa",
+   "kill_runs": [
+    "tests.v2.test_v21_defects_verify=PASS(20 OK)",
+    "tests.v2.test_v21_defects_lineage2=PASS(11 OK)",
+    "tests.v2.test_v21_kills3_A09=PASS(3 OK)",
+    "tests.v2.test_v21_kills3_T09a=PASS(18 OK)",
+    "tests.v2.test_v21_kills3_R03=PASS(5 OK)",
+    "tests.v2.test_v21_pw_lineage_unread=PASS(39 OK)",
+    "tests.v2.test_v21_pw_lineage_spend=PASS(4 OK)"
+   ]
+  },
+  {
+   "target": "aisef2/app/lineage.py::account_of",
+   "index": 69,
+   "mutant": "L502 string 'unaccounted' emptied",
+   "class": "EQUIVALENT",
+   "group": "g-ao-pre: L502 builds the fallback `pre` ONLY in the `except Exception` branch taken when the preflight ledger does not read (lineage.py:500-504). In that branch the original sets pre['unaccounted']=[] (empty). pre is read in exactly three places: client.Budget(huge, pre, ...) (L508) and the sessions-except rebuild (L511-512), both of which read only the four SPEND keys; and L515 `for n in pre.get('unaccounted') or []`. Since the original's unaccounted is [], `[] or []` == `None or []` == [], so these mutants cannot change any output.",
+   "grounds": "L502 changes `{'unaccounted': []}` to `{'': []}`, so the fallback pre has the 4 SPEND keys plus an inert '' key and no 'unaccounted'. MEASURED (measure3.py): account_of's return is BYTE-IDENTICAL to the original. The '' key is never read (Budget reads KEYS; L511-512 reads SPEND; L515 reads .get('unaccounted')); L515 yields [] in both. EQUIVALENT, proven and measured.",
+   "consumers_checked": [
+    "aisef2/app/client.py:81-86 Budget.__init__ validates/reads only base[k] for k in KEYS (the 4 SPEND keys); never base['unaccounted'] or base['']",
+    "aisef2/app/lineage.py:511-512 the sessions-except rebuild reads pre[k] for k in SPEND and pre['provider_requests'] — all present in both mutants",
+    "aisef2/app/lineage.py:515 `for n in pre.get('unaccounted') or []` — the only read of pre['unaccounted']; yields [] under original ([]) and under both mutants (None)",
+    "account_of return (L548-549): unread/unaccounted flow to run.py:529-542 (RunRefused), bundle_cli.py:960-972 (report), verify.py:89-93, client.py:101 — all operator-facing, and MEASURED identical to the original here"
+   ],
+   "exceptions_checked": [
+    "anything iterating pre's keys: none (Budget, L511-512, L515 read named keys only), so the '' key is dead",
+    "L515 reading pre['unaccounted']: absent -> None -> [], same as original []",
+    "REFUTED-by-measurement: moot (equivalent); measured anyway — 7 fast kill files all OK"
+   ],
+   "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa",
+   "kill_runs": [
+    "tests.v2.test_v21_defects_verify=PASS(20 OK)",
+    "tests.v2.test_v21_defects_lineage2=PASS(11 OK)",
+    "tests.v2.test_v21_kills3_A09=PASS(3 OK)",
+    "tests.v2.test_v21_kills3_T09a=PASS(18 OK)",
+    "tests.v2.test_v21_kills3_R03=PASS(5 OK)",
+    "tests.v2.test_v21_pw_lineage_unread=PASS(39 OK)",
+    "tests.v2.test_v21_pw_lineage_spend=PASS(4 OK)"
+   ]
+  },
+  {
+   "target": "aisef2/app/lineage.py::account_of",
+   "index": 71,
+   "mutant": "L503 string '): what the preflight spent is unknown' emptied",
+   "class": "AUDITED",
+   "group": "g-ao-71: L503 is the operator-facing `unread` message for an unreadable preflight ledger; the identifying tokens survive and the sole structural reader asserts only 'ledger'.",
+   "grounds": "L503 empties the trailing '): what the preflight spent is unknown', so the appended unread/unaccounted string becomes `{run_dir.name}: the preflight's ledger does not read ({type(e).__name__}`. MEASURED (measure3.py, run1 with a 0o000 LEDGER): original 'run1: the preflight's ledger does not read (PermissionError): what the preflight spent is unknown' -> mutant 'run1: the preflight's ledger does not read (PermissionError' (an unbalanced paren, no tail). The run name, the phrase 'the preflight's ledger does not read', and the exception type all survive; only the explanatory clause and ')' are lost. The string flows to run.py:542 (RunRefused), bundle_cli.py:967 (report), verify.py:93, client.py:101 — all operator-facing joins, no machine parse. The only structural test of this branch, defects_lineage2 test_a_ledger_behind_a_directory_that_cannot_be_traversed_is_listed, asserts via assert_listed(cause='ledger') that 'ledger' is in a line (L96-99) — 'ledger' survives, so it passes. No test or reader matches the emptied clause. Observable, operator-facing, but unrelied-upon; AUDITED (analogous to the wave-1 B08 verify clause-emptied AUDITEDs).",
+   "consumers_checked": [
+    "aisef2/app/run.py:529-542 RunRefused joining inherited['unread'] (operator, exit 2 on `aisef run --parent`)",
+    "aisef2/app/bundle_cli.py:960-972 report['unread'] / run_parent_refused join (operator, bundle continue)",
+    "aisef2/app/verify.py:89-93 'cannot be read now ...: '+'; '.join(inherited['unread']) (operator)",
+    "aisef2/app/client.py:100-101 'the lineage's evidence cannot be read, or is gone: {u}' for u in inherited_unread (operator)",
+    "tests/v2/test_v21_defects_lineage2.py:96-99,148-152 assert_listed(cause='ledger') — asserts 'ledger' in a line, which the mutant keeps",
+    "git grep 'what the preflight spent is unknown' / 'preflight\\'s ledger does not read' over aisef2/ validation/ tests/ docs/: producer lineage.py:503 only; no reader matches the clause"
+   ],
+   "exceptions_checked": [
+    "a test or machine reader matching 'what the preflight spent is unknown': none at the snapshot",
+    "the identity being lost: not — run name, 'the preflight's ledger does not read', and the exception type all survive; an operator still learns which run and that its ledger is unreadable",
+    "an operator who needs the 'spent is unknown' clause: it restates what 'does not read' + the unread list already convey (run.py:531-538 and bundle_cli L963-972 say the same in their own prose)",
+    "REFUTED-by-measurement: ruled out — defects_lineage2 11 OK (incl. the ledger-unreadable test), x_lineage_proof 55 OK, x_lineage_gone OK, plus the 7 fast files OK on the mutant"
+   ],
+   "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa",
+   "kill_runs": [
+    "tests.v2.test_v21_defects_verify=PASS(20 OK)",
+    "tests.v2.test_v21_defects_lineage2=PASS(11 OK)",
+    "tests.v2.test_v21_kills3_A09=PASS(3 OK)",
+    "tests.v2.test_v21_kills3_T09a=PASS(18 OK)",
+    "tests.v2.test_v21_kills3_R03=PASS(5 OK)",
+    "tests.v2.test_v21_pw_lineage_unread=PASS(39 OK)",
+    "tests.v2.test_v21_pw_lineage_spend=PASS(4 OK)",
+    "tests.v2.test_v21_x_lineage_proof=PASS(55 OK)",
+    "tests.v2.test_v21_x_lineage_gone=PASS(29 OK)"
+   ]
+  }
+ ],
+ "carried": []
+}

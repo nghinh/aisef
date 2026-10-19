@@ -1,0 +1,151 @@
+{
+ "batch": "W2-lineage-6",
+ "snapshot": "4ec961e706a1f7bda16d131037058c4fe9c2663f",
+ "file": "aisef2/app/lineage.py",
+ "target": "aisef2/app/lineage.py::child_evidence",
+ "role": "skeptic",
+ "verified_on": "2026-10-19 (date: Mon Oct 19 20:xx +0700 2026)",
+ "method": "Skeptic tree from git archive 4ec961e; run-copy with HOME/TMPDIR under the tree and PATH=/usr/bin:/bin (no opencode: the only opencode is /Users/nghinh/.opencode/bin/opencode, absent from /usr/bin:/bin). mutant_view.py confirmed every diff at line/function. child_evidence was called directly on the kill file's own fixtures (not_text, not_a_journal, broken_chain, torn_first_line, journal_is_a_directory, journal_locked) for baseline and for each of the 10 mutants (built via validation.v2.mutation.mutants(src,'child_evidence',_enum_members(src,'.'))[idx], desc asserted == the batch entry). The registered kill file tests/v2/test_v21_pw_lineage_unread.py was run one mutant at a time; the two non-registered account_of consumers tests/v2/test_v21_pw_lineage_spend.py and tests/v2/test_v21_x_lineage_gone.py were also run against the mutants that reach their branches.",
+ "measurement_result": "Baseline registered kill file: 39 OK (euid 501, non-root, so @POSIX_USER tests ran). Each of the 10 mutants against the registered kill file: 39 OK == SURVIVED, reproducing the campaign; no REFUTED-by-measurement. pw_lineage_spend.py: 4 OK baseline and 4 OK on every one of the 10 mutants. x_lineage_gone.py: 29 OK baseline and 29 OK on mutants 35/36 (the only our-branch exercise it has, P.NOT_TEXT=b'\\xff\\xfe\\x00 not text\\n' -> L186, asserting only the wrapper 'cannot be read'). So no registered OR non-registered test kills any of the 10. Branch map measured: not_text->L186, not_a_journal/broken_chain->L197, torn_first_line->L200 (reconstruct succeeds, events==[]), journal_is_a_directory/journal_locked->L189. Every mutant left state==UNREAD and why non-empty.",
+ "entries": [
+  {
+   "target": "aisef2/app/lineage.py::child_evidence",
+   "index": 34,
+   "mutant": "L200 string ' holds bytes and no complete event (a first line that was cut)' emptied",
+   "class_before": "REFUTED",
+   "verdict": "CONFIRMED",
+   "class_after": "SURVIVED (test owed)",
+   "grounds": "Diff and branch verified. torn_first_line (self.put_journal(a_journal()[:60])) reaches L200 (measured: baseline state=UNREAD why='aisef-run.jsonl holds bytes and no complete event (a first line that was cut)'); mutant-34 why='aisef-run.jsonl' — the entire descriptive phrase is gone, the detail collapses to the bare JOURNAL.name, state unchanged. Unlike the L186/L189/L197 label mutants (35/37/41) there is no surviving interpolated diagnostic — the only interpolation on L200 is {JOURNAL.name}, so emptying the literal erases 100% of the cause. claim()'s refusal (lineage.py:311,317-323) then reads '...whose evidence exists and cannot be read (aisef-run.jsonl): it may have begun (UNREAD)...', which names no cause and misdescribes a journal that in fact opens, decodes as text and reconstructs (it was cut mid-write: the run began, continue from it — not restore permissions/encoding). No test asserts this branch's detail (confirmed by grep and by running the registered kill file + both account_of consumers: all survive). Asymmetric gap with the sibling L189 case, which HAS a 'PermissionError' content test (kill file line 235-236) and L200 has none.",
+   "refutation": "Input: the existing torn_first_line fixture self.put_journal(a_journal()[:60]). Reader: operator reading claim()'s LineageRefused ({unread}) at lineage.py:317-323, continue_from's report 'why' at bundle_cli.py:896, the CONTINUED-BY.{n}.json 'unread' record at lineage.py:331, and account_of's 'unaccounted' line at lineage.py:518,523. Sketch: add a content sibling of ChildThatCannotBeRead.test_the_refusal_says_what_could_not_be_read... building the torn-first-line child: state,why = lineage.child_evidence(child); self.assertEqual(state, lineage.UNREAD); self.assertIn(lineage.JOURNAL.name, why); self.assertRegex(why, r'holds bytes|complete event|first line'). VERIFIED to kill: baseline why matches the regex (PASS), mutant-34 why='aisef-run.jsonl' does not (FAIL). It pins the content a reader uses to tell a cut journal (continue from it) from an unreadable one (restore it) — the symmetric completion of the L189 coverage, not padding.",
+   "consumers_checked": [
+    "lineage.py:311 state,unread=child_evidence(held); 317-323 LineageRefused embeds ({unread}) verbatim (refreshed: refusal starts at 317, author said 318-324) — REAL.",
+    "lineage.py:329-331 supersedes = {..., **({'unread': unread} if state==UNREAD else {})} -> CONTINUED-BY.{n+1}.json 0o444 — REAL.",
+    "bundle_cli.py:896 continue_from held={'run':child,'state':state,**({'why':lineage.child_evidence(...)[1]} if state==UNREAD else {})} — REAL.",
+    "lineage.py:518 state,why=child_evidence(run_dir); 523 unaccounted/unread embed ({why}) (author said 518-523; refined 518,523,551) — REAL. No missed reader of the detail: continued_by (lineage.py:362) reads only element [0]."
+   ],
+   "exceptions_checked": [
+    "No test pins the L200 phrase (grep of tests/docs/validation: only source + mutant descriptions).",
+    "Registered kill file 39/39 OK on mutant-34; pw_lineage_spend 4/4 OK (its torn-first-line case asserts the result is [] — no why); not killed by state (UNREAD) or truthiness ('aisef-run.jsonl' truthy)."
+   ],
+   "note": "Author's REFUTED upheld. Grounds measured-exact; the torn->L200 branch and the collapse-to-bare-name are reproduced, and the owed-test sketch is verified to kill. The one test owed in this batch."
+  },
+  {
+   "target": "aisef2/app/lineage.py::child_evidence",
+   "index": 35,
+   "mutant": "L186 string ' is not text (' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "L186 (UnicodeDecodeError) verified. Measured on not_text (b'\\xff\\xfe\\x00 not text'): baseline why='aisef-run.jsonl is not text (invalid start byte)'; mutant why='aisef-run.jsonlinvalid start byte)'. The label and its leading space are gone (name jammed to e.reason, stray ')' trails) but e.reason='invalid start byte' — a decode-specific phrase unique to this branch — survives and names the cause; the readers' wrapper supplies 'cannot be read'. Registered kill file 39/39 OK; pw_lineage_spend 4/4 OK; x_lineage_gone 29/29 OK (its line-481 P.NOT_TEXT case asserts only the wrapper 'cannot be read').",
+   "refutation": "n/a — AUDITED, no test owed. A unique interpolated diagnostic (e.reason) survives and names the cause; no consumer or test keys on the deleted literal label, which is redundant with the readers' own 'cannot be read' wrappers.",
+   "consumers_checked": ["same four detail readers as index 34 (claim 311/317-323, supersedes 331, bundle_cli 896, account_of 518/523) — all REAL and accurate."],
+   "exceptions_checked": ["No test pins 'is not text'; every decision keys on state (UNREAD, unchanged); why stays truthy. e.reason not byte-identical to any other branch's output, so still distinguishable."],
+   "note": "Author's AUDITED upheld; measured why matches the draft exactly."
+  },
+  {
+   "target": "aisef2/app/lineage.py::child_evidence",
+   "index": 36,
+   "mutant": "L186 string ')' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "L186 trailing ')' emptied. Measured: baseline '...is not text (invalid start byte)'; mutant 'aisef-run.jsonl is not text (invalid start byte' — one unbalanced close-paren, every word of the cause intact. Registered kill file 39/39 OK; pw_lineage_spend 4/4 OK; x_lineage_gone 29/29 OK.",
+   "refutation": "n/a — AUDITED, no test owed. Only a closing delimiter is lost; no reader parses the parenthesis and the cause text is unchanged.",
+   "consumers_checked": ["same four detail readers — REAL."],
+   "exceptions_checked": ["No reader parses the paren; state UNREAD unchanged, why truthy."],
+   "note": "Author's AUDITED upheld; delimiter-only, measured-exact."
+  },
+  {
+   "target": "aisef2/app/lineage.py::child_evidence",
+   "index": 37,
+   "mutant": "L189 string ' cannot be read (' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "L189 (OSError not not_there) verified. Measured on journal_is_a_directory (IsADirectoryError): baseline why='aisef-run.jsonl cannot be read (IsADirectoryError: Is a directory)'; mutant why='aisef-run.jsonlIsADirectoryError: Is a directory)'. Label gone, but type(e).__name__ and e.strerror survive and name the exact OS condition. For the journal-locked (PermissionError) case the mutant why='aisef-run.jsonlPermissionError: Permission denied)' still contains 'PermissionError', so the registered content test (line 235-236) passes — measured 39/39 OK; pw_lineage_spend 4/4 OK (its PermissionError assertion still matches).",
+   "refutation": "n/a — AUDITED, no test owed. type(e).__name__ (the non-redundant distinguishing content the content test keys on) is kept; the deleted label is redundant with the readers' 'cannot be read' wrappers.",
+   "consumers_checked": ["same four detail readers — REAL."],
+   "exceptions_checked": ["Registered content test keys on 'PermissionError' (type token), not the label; state UNREAD unchanged, why truthy."],
+   "note": "Author's AUDITED upheld; the 'PermissionError' token that keeps the kill file green is preserved — measured."
+  },
+  {
+   "target": "aisef2/app/lineage.py::child_evidence",
+   "index": 38,
+   "mutant": "L189 string ': ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "L189 ': ' between type(e).__name__ and e.strerror emptied. Measured (locked journal): mutant 'aisef-run.jsonl cannot be read (PermissionErrorPermission denied)' — type and strerror run together, both tokens and 'cannot be read' survive, 'PermissionError' still a substring. Registered kill file 39/39 OK; pw_lineage_spend 4/4 OK.",
+   "refutation": "n/a — AUDITED, no test owed. Only the separator is lost; the exception type and strerror remain and the registered 'PermissionError' substring test still matches.",
+   "consumers_checked": ["same four detail readers — REAL."],
+   "exceptions_checked": ["'PermissionError' substring preserved; state UNREAD unchanged, why truthy."],
+   "note": "Author's AUDITED upheld; measured-exact."
+  },
+  {
+   "target": "aisef2/app/lineage.py::child_evidence",
+   "index": 39,
+   "mutant": "L189 string ')' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "L189 trailing ')' emptied. Measured (locked journal): '...cannot be read (PermissionError: Permission denied' — one unbalanced paren, cause intact, 'PermissionError' present. Registered kill file 39/39 OK; pw_lineage_spend 4/4 OK.",
+   "refutation": "n/a — AUDITED, no test owed. Only a closing delimiter is lost; no reader parses the parenthesis.",
+   "consumers_checked": ["same four detail readers — REAL."],
+   "exceptions_checked": ["'PermissionError' preserved; state UNREAD unchanged, why truthy."],
+   "note": "Author's AUDITED upheld; delimiter-only, measured-exact."
+  },
+  {
+   "target": "aisef2/app/lineage.py::child_evidence",
+   "index": 40,
+   "mutant": "L189 Or swapped",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "L189 `e.strerror or e` -> `e.strerror and e`. Measured (journal_is_a_directory): baseline '...cannot be read (IsADirectoryError: Is a directory)'; mutant '...cannot be read (IsADirectoryError: [Errno 21] Is a directory: <path>)' — MORE informative (errno + path via str(e)), never less. journal_locked likewise renders '...(PermissionError: [Errno 13] Permission denied: <path>)', so 'PermissionError' is still present and the content test passes. For OS-raised OSError on this branch strerror is always truthy, so `and` returns e and str(e) is a superset; the literal 'None' case needs a falsy strerror, which the OS does not produce here. Registered kill file 39/39 OK; pw_lineage_spend 4/4 OK. Matches the W2-lineage-2 index-55 ruling (an or->and OSError rendering, CONFIRMED AUDITED — verified in W2-lineage-2-v.json).",
+   "refutation": "n/a — AUDITED, no test owed. strerror is always populated by the OS here, so str(e) is a richer-but-equivalent rendering (errno+path+strerror); the readers show free prose and parse none of it.",
+   "consumers_checked": ["same four detail readers — REAL. The L189 str(e) is NOT [:300]-truncated (that slice is only on L197), so the full path appears in account_of's unaccounted line; no reader depends on length and no test asserts it."],
+   "exceptions_checked": ["No decision/test keys on strerror-vs-str(e); state UNREAD unchanged, why truthy; 'PermissionError' token preserved."],
+   "note": "Author's AUDITED upheld; the richer str(e) rendering (errno+absolute path) is verbose but strictly more informative and unparsed — precedent-consistent with W2-lineage-2 index-55."
+  },
+  {
+   "target": "aisef2/app/lineage.py::child_evidence",
+   "index": 41,
+   "mutant": "L197 string ' does not reconstruct (' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "L197 (reconstruct raises; whole f-string [:300]) verified. Measured on not_a_journal: baseline why='aisef-run.jsonl does not reconstruct (JournalError: line 0 is not JSON)'; mutant why='aisef-run.jsonlJournalError: line 0 is not JSON)'. Label gone, but type(e).__name__='JournalError' and str(e)='line 0 is not JSON' survive and name the parse failure; the [:300] slice is untouched. Also measured on broken_chain (another L197 case): mutant keeps 'JournalError: line 1: the chain does not link...'. Registered kill file 39/39 OK; pw_lineage_spend 4/4 OK (its not-a-journal and broken-chain cases assert only the wrapper 'cannot be read').",
+   "refutation": "n/a — AUDITED, no test owed. The JournalError type and its message (unique to the reconstruct branch) survive and name the cause; the deleted label is redundant with the readers' 'cannot be read' wrappers.",
+   "consumers_checked": ["same four detail readers — REAL."],
+   "exceptions_checked": ["No test pins 'does not reconstruct' in child_evidence's detail (the test_app_run / test_s2_kills 'the journal does not reconstruct' strings are OTHER functions' output, not child_evidence); state UNREAD unchanged, why truthy."],
+   "note": "Author's AUDITED upheld; measured-exact on two distinct L197 inputs."
+  },
+  {
+   "target": "aisef2/app/lineage.py::child_evidence",
+   "index": 42,
+   "mutant": "L197 string ': ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "L197 ': ' between type(e).__name__ and {e} emptied. Measured on not_a_journal: mutant 'aisef-run.jsonl does not reconstruct (JournalErrorline 0 is not JSON)' — type and message run together, both survive, 'does not reconstruct' intact, within the [:300] slice. Registered kill file 39/39 OK; pw_lineage_spend 4/4 OK.",
+   "refutation": "n/a — AUDITED, no test owed. Only the separator is lost; the exception type and message remain.",
+   "consumers_checked": ["same four detail readers — REAL."],
+   "exceptions_checked": ["No reader parses the separator; state UNREAD unchanged, why truthy."],
+   "note": "Author's AUDITED upheld; delimiter-only, measured-exact."
+  },
+  {
+   "target": "aisef2/app/lineage.py::child_evidence",
+   "index": 43,
+   "mutant": "L197 string ')' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "L197 trailing ')' emptied (inside the [:300] slice). Measured on not_a_journal: mutant '...does not reconstruct (JournalError: line 0 is not JSON' — one unbalanced paren, cause intact. Registered kill file 39/39 OK; pw_lineage_spend 4/4 OK.",
+   "refutation": "n/a — AUDITED, no test owed. Only a closing delimiter is lost; no reader parses the parenthesis.",
+   "consumers_checked": ["same four detail readers — REAL."],
+   "exceptions_checked": ["No reader parses the paren; state UNREAD unchanged, why truthy."],
+   "note": "Author's AUDITED upheld; delimiter-only, measured-exact."
+  }
+ ],
+ "notes": "All 10 entries CONFIRMED: every mutant is exactly as the draft says (line, function, measured why at snapshot 4ec961e), the four named detail-readers are real and accurately cited (minor line refresh: claim refusal 317-323 not 318-324; account_of 518/523/551), no reader of the detail was missed (continued_by reads only element [0]), and the measurement reproduces the campaign — 39/39 SURVIVED on the registered kill file for every mutant. I additionally ran the two NON-registered account_of consumers that reach these branches (pw_lineage_spend 4/4, x_lineage_gone 29/29 on the L186 mutants): neither kills any mutant, because their content assertions key only on the account_of wrapper ('cannot be read'/'unknown'/run.name) or the surviving 'PermissionError' token, never on the deleted label/delimiter/phrase. So no unregistered test refutes any audit. The one REFUTED (index 34) is upheld with a verified kill: it is the only mutant whose detail loses the entire cause and collapses to the bare journal name, which the readers' generic wrapper then misdescribes for a torn-but-readable journal; the owed-test sketch (torn_first_line fixture, assertRegex why r'holds bytes|complete event|first line') was run and does kill mutant-34 while passing baseline. The 9 AUDITED are upheld: 35/37/41 keep a unique interpolated diagnostic (e.reason / type(e).__name__ / str(e)); 36/38/39/42/43 drop only a paren or ': '; 40 renders str(e) (errno+path, strerror always truthy here) — precedent-consistent with W2-lineage-2 index-55 (CONFIRMED AUDITED). No EQUIVALENT claimed, none owed beyond index 34."
+}

@@ -1,0 +1,534 @@
+{
+ "batch": "W2-bundle_cli-2",
+ "file": "aisef2/app/bundle_cli.py",
+ "target": "aisef2/app/bundle_cli.py::_authentic",
+ "snapshot": "4ec961e706a1f7bda16d131037058c4fe9c2663f",
+ "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+ "procedure": "Kill-file run of the sole registered kill file V21_TARGETS['aisef2/app/bundle_cli.py::_authentic'] == ['tests/v2/test_v21_pw_lineage_continue.py'] (one process, `-m unittest tests.v2.test_v21_pw_lineage_continue -q`, `nice -n 19 /opt/homebrew/bin/python3 -P -B`, PATH stripped of /Users/nghinh/.opencode/bin and /Users/nghinh/.npm-global/bin -- the two dirs holding an executable opencode -- env -i with fresh HOME/TMPDIR/XDG_* under the copy, PYTHONPATH=<copy root> since -P drops cwd; the mutated module is validation.v2.mutation.mutants(src,'_authentic',_enum_members(src,'.'))[index] written over aisef2/app/bundle_cli.py of a `cp -R` of the snapshot 4ec961e706a1 tree). Unmutated tree: 36 tests OK in ~5.4s.",
+ "kill_files": [
+  "tests/v2/test_v21_pw_lineage_continue.py"
+ ],
+ "entries": [
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 10,
+   "mutant": "L812 string 'EVIDENCE_MISMATCH' emptied",
+   "class": "REFUTED",
+   "group": "AUTHENTIC-CODE: the JournalRefused machine code (1st arg) emptied to '' on a branch the sole kill file never reaches; the code is the operator's failure-class signal (printed as `refused: {code}:`; docstring L25-39 maps each code to an action) and the only structured token told-apart in the CLI line",
+   "grounds": "L812 raises JournalRefused('EVIDENCE_MISMATCH', ...) when the stored manifest is not a dict or its 'files' is not a dict (L811). Emptied, the operator's line becomes `refused: : ...` -- demonstrated at the snapshot: an empty EVIDENCE.json and `{\"files\":5}` both give code='' under the mutant vs 'EVIDENCE_MISMATCH' pristine. No test reaches L811-813 via continue_from: the kill file's anchor class uses only well-formed manifests (L378 happy, L392 wrong-anchor, L400 evidence-changed, L384 no-manifest). verify.py:121's twin is pinned by T22b:107-112, a different producer. MEASURED: SURVIVED -- 36 tests OK, exit 0, Ran in 5.354s (kill file unchanged, as at campaign 9).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:898 -- continue_from calls _authentic(run_dir, expect_anchor) before anything is written (L896-905, _write_new at L1058); reached ONLY under `aisef bundle continue --expect-anchor` (main L1055-1061; docs/v2/V2.1-BACKLOG.md V21-54 states `_authentic` is called only with --expect-anchor)",
+    "aisef2/app/bundle_cli.py:1078-1079 -- main catches B.BundleError and prints `refused: {e}` to stderr, returns 2; JournalRefused.__init__ (L137-140) sets str(self)=f'{code}: {message}' and self.code=code, so the operator's line is `refused: {code}: {message}` (module docstring L25-39: each failure told apart by JournalRefused.code 'in the text of refused:', with a per-code operator action)",
+    ".code / refusal-text readers: `git grep '\\.code'` over aisef2/ aisef/ validation/ finds NO product reader of a JournalRefused.code (bundle_cli.py:30 is the docstring; story_runner/merge .code are FailureCode; preflight/server_identity .code are urllib HTTP codes); the code value is read only by the operator via the CLI line and by the kill file (test_v21_pw_lineage_continue.py:393,403 err.code=='EVIDENCE_MISMATCH'; :418 'EVIDENCE_MISMATCH' in stderr; :178,186,199,259 err.code=='EVIDENCE_UNREADABLE'; :463 regex '^refused: EVIDENCE_UNREADABLE: '; :388 'EVIDENCE_MISSING')",
+    "twin producer aisef2/app/verify.py:121,132,134 (the `aisef run --verify` path) emits the same three sentences and is separately pinned -- tests/v2/test_v21_kills3_T22b.py:107-112 (corrupt manifest named), :133 (wrong anchor), :142,:154-155 (forged), and docs/v2.1/decisions/B03-R3-E2E.md:106 S4 ('wrong anchor REFUTED ... the file named'); none of those tests call continue_from/_authentic (they call verify(...)), so _authentic's own branches are reached by no test but the kill file above"
+   ],
+   "exceptions_checked": [
+    "a non-test code reader of the refusal text or of JournalRefused.code: none (grep above)",
+    "exit status / written bundle: _authentic raises before _write_new, so a mutant that still raises a BundleError keeps exit 2 and writes nothing"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "refutation": "A test is owed (T-CODE-MISMATCH, in test_v21_pw_lineage_continue.TheOperatorAsksForAnAnchor; reader: the operator reading `refused: {code}:` on stderr, bundle_cli.py:1079): `run=self.run_dir(self.delivered(),manifest=True); (run/R.MANIFEST).write_text('',encoding='utf-8'); err=self.refused(run,expect_anchor='a'*64); self.assertEqual(err.code,'EVIDENCE_MISMATCH'); self.assertIn(R.MANIFEST,str(err))`, plus a second subcase `(run/R.MANIFEST).write_text('{\"files\": 5}')`. Demonstrated at the snapshot: pristine gives code 'EVIDENCE_MISMATCH' for both; this mutant gives code ''. Kills [10]; the empty-manifest subcase also kills [3] (it raises AttributeError, not a refusal). Reachable: a truncated/empty/non-object EVIDENCE.json (json.loads ValueError -> L809-810 stored=None), or a dict whose 'files' is not a dict."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 13,
+   "mutant": "L807 string 'EVIDENCE_UNREADABLE' emptied",
+   "class": "REFUTED",
+   "group": "AUTHENTIC-CODE: the JournalRefused machine code (1st arg) emptied to '' on a branch the sole kill file never reaches; the code is the operator's failure-class signal (printed as `refused: {code}:`; docstring L25-39 maps each code to an action) and the only structured token told-apart in the CLI line",
+   "grounds": "L807 raises JournalRefused('EVIDENCE_UNREADABLE', ...) when EVIDENCE.json is present but the read fails with an OSError that is not 'not there' (L802 lineage.not_there false): permission, a directory in its place, an I/O error. Emptied -> `refused: : ...`; demonstrated: pristine chmod-000 EVIDENCE.json under --expect-anchor gives 'EVIDENCE_UNREADABLE', the mutant ''. No test reaches L807 (the POSIX_USER tests chmod the run dir L460 or the journal/claim L439,491 -- not EVIDENCE.json under --expect-anchor). MEASURED: SURVIVED -- 36 tests OK, exit 0, Ran in 5.095s (kill file unchanged, as at campaign 9).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:898 -- continue_from calls _authentic(run_dir, expect_anchor) before anything is written (L896-905, _write_new at L1058); reached ONLY under `aisef bundle continue --expect-anchor` (main L1055-1061; docs/v2/V2.1-BACKLOG.md V21-54 states `_authentic` is called only with --expect-anchor)",
+    "aisef2/app/bundle_cli.py:1078-1079 -- main catches B.BundleError and prints `refused: {e}` to stderr, returns 2; JournalRefused.__init__ (L137-140) sets str(self)=f'{code}: {message}' and self.code=code, so the operator's line is `refused: {code}: {message}` (module docstring L25-39: each failure told apart by JournalRefused.code 'in the text of refused:', with a per-code operator action)",
+    ".code / refusal-text readers: `git grep '\\.code'` over aisef2/ aisef/ validation/ finds NO product reader of a JournalRefused.code (bundle_cli.py:30 is the docstring; story_runner/merge .code are FailureCode; preflight/server_identity .code are urllib HTTP codes); the code value is read only by the operator via the CLI line and by the kill file (test_v21_pw_lineage_continue.py:393,403 err.code=='EVIDENCE_MISMATCH'; :418 'EVIDENCE_MISMATCH' in stderr; :178,186,199,259 err.code=='EVIDENCE_UNREADABLE'; :463 regex '^refused: EVIDENCE_UNREADABLE: '; :388 'EVIDENCE_MISSING')",
+    "twin producer aisef2/app/verify.py:121,132,134 (the `aisef run --verify` path) emits the same three sentences and is separately pinned -- tests/v2/test_v21_kills3_T22b.py:107-112 (corrupt manifest named), :133 (wrong anchor), :142,:154-155 (forged), and docs/v2.1/decisions/B03-R3-E2E.md:106 S4 ('wrong anchor REFUTED ... the file named'); none of those tests call continue_from/_authentic (they call verify(...)), so _authentic's own branches are reached by no test but the kill file above"
+   ],
+   "exceptions_checked": [
+    "a non-test code reader of the refusal text or of JournalRefused.code: none (grep above)",
+    "exit status / written bundle: _authentic raises before _write_new, so a mutant that still raises a BundleError keeps exit 2 and writes nothing"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "refutation": "A test is owed (T-CODE-UNREAD-MANIFEST, @POSIX_USER; reader: the operator via `refused: {code}:`): `run=self.run_dir(self.delivered(),manifest=True); os.chmod(run/R.MANIFEST,0); self.addCleanup(os.chmod,run/R.MANIFEST,0o644); err=self.refused(run,expect_anchor='a'*64); self.assertEqual(err.code,'EVIDENCE_UNREADABLE'); self.assertIn('PermissionError',str(err))`. Kills [13]; with a message assert also [24]/[25]/[26]/[34]."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 19,
+   "mutant": "L822 string 'EVIDENCE_UNREADABLE' emptied",
+   "class": "REFUTED",
+   "group": "AUTHENTIC-CODE: the JournalRefused machine code (1st arg) emptied to '' on a branch the sole kill file never reaches; the code is the operator's failure-class signal (printed as `refused: {code}:`; docstring L25-39 maps each code to an action) and the only structured token told-apart in the CLI line",
+   "grounds": "L822 raises JournalRefused('EVIDENCE_UNREADABLE', ...) when, after the stored manifest is valid and its anchor matches expect (L811 false, L815 false), R.evidence_manifest(run_dir) (run.py:425-434, _content_sha of RUN.json/STARTED/journals/sessions/preflight/review/diagnostics) hits an unreadable file (L821 OSError). Emptied -> `refused: : ...`. No test reaches L822: the happy-path test (L378) passes the correct anchor but leaves every evidence file readable, so evidence_manifest succeeds; no test makes an evidence file unreadable while keeping a matching stored anchor. MEASURED: SURVIVED -- 36 tests OK, exit 0, Ran in 5.813s (kill file unchanged, as at campaign 9).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:898 -- continue_from calls _authentic(run_dir, expect_anchor) before anything is written (L896-905, _write_new at L1058); reached ONLY under `aisef bundle continue --expect-anchor` (main L1055-1061; docs/v2/V2.1-BACKLOG.md V21-54 states `_authentic` is called only with --expect-anchor)",
+    "aisef2/app/bundle_cli.py:1078-1079 -- main catches B.BundleError and prints `refused: {e}` to stderr, returns 2; JournalRefused.__init__ (L137-140) sets str(self)=f'{code}: {message}' and self.code=code, so the operator's line is `refused: {code}: {message}` (module docstring L25-39: each failure told apart by JournalRefused.code 'in the text of refused:', with a per-code operator action)",
+    ".code / refusal-text readers: `git grep '\\.code'` over aisef2/ aisef/ validation/ finds NO product reader of a JournalRefused.code (bundle_cli.py:30 is the docstring; story_runner/merge .code are FailureCode; preflight/server_identity .code are urllib HTTP codes); the code value is read only by the operator via the CLI line and by the kill file (test_v21_pw_lineage_continue.py:393,403 err.code=='EVIDENCE_MISMATCH'; :418 'EVIDENCE_MISMATCH' in stderr; :178,186,199,259 err.code=='EVIDENCE_UNREADABLE'; :463 regex '^refused: EVIDENCE_UNREADABLE: '; :388 'EVIDENCE_MISSING')",
+    "twin producer aisef2/app/verify.py:121,132,134 (the `aisef run --verify` path) emits the same three sentences and is separately pinned -- tests/v2/test_v21_kills3_T22b.py:107-112 (corrupt manifest named), :133 (wrong anchor), :142,:154-155 (forged), and docs/v2.1/decisions/B03-R3-E2E.md:106 S4 ('wrong anchor REFUTED ... the file named'); none of those tests call continue_from/_authentic (they call verify(...)), so _authentic's own branches are reached by no test but the kill file above"
+   ],
+   "exceptions_checked": [
+    "a non-test code reader of the refusal text or of JournalRefused.code: none (grep above)",
+    "exit status / written bundle: _authentic raises before _write_new, so a mutant that still raises a BundleError keeps exit 2 and writes nothing"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "refutation": "A test is owed (T-CODE-UNREAD-EVIDENCE, @POSIX_USER; reader: the operator via `refused: {code}:`): `run=self.run_dir(self.delivered(),manifest=True); anchor=self.anchor_of(run); victim=run/'run'/'journals'/'aisef-run.jsonl'; os.chmod(victim,0); self.addCleanup(os.chmod,victim,0o644); err=self.refused(run,expect_anchor=anchor); self.assertEqual(err.code,'EVIDENCE_UNREADABLE'); self.assertIn(victim.name,str(err))` (L822-823 interpolate {e.filename}). Kills [19]; with a message assert also [28]/[29]."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 3,
+   "mutant": "L811 Or swapped",
+   "class": "REFUTED",
+   "group": "AUTHENTIC-NOTADICT-GUARD: the L811 short-circuit `not isinstance(stored,dict) or ...` that protects stored.get(...) when stored is not a dict",
+   "grounds": "Swapped to `and`, the second operand `not isinstance(stored.get('files',{}),dict)` is evaluated when stored is not a dict. For stored=None (an empty/truncated/non-object EVIDENCE.json: json.loads ValueError -> L809-810, or JSON null/array/str) `stored.get` raises AttributeError -- demonstrated at the snapshot: an empty EVIDENCE.json gives AttributeError(\"'NoneType' object has no attribute 'get'\") under the mutant vs JournalRefused('EVIDENCE_MISMATCH') pristine. main (L1078-1082) catches B.BundleError and (KeyError,TypeError,ValueError); AttributeError is none, so it escapes `aisef bundle continue` as an uncaught traceback -- the exact 'refused not a traceback' failure the kill file guards (test name L456). For a dict whose 'files' is a non-dict the `and` short-circuits false and skips the L812 guard, deferring to the L816 anchor mismatch (same code). No test feeds a non-object manifest. MEASURED: SURVIVED -- 36 tests OK, exit 0, Ran in 5.406s (kill file unchanged, as at campaign 9).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:898 -- continue_from calls _authentic(run_dir, expect_anchor) before anything is written (L896-905, _write_new at L1058); reached ONLY under `aisef bundle continue --expect-anchor` (main L1055-1061; docs/v2/V2.1-BACKLOG.md V21-54 states `_authentic` is called only with --expect-anchor)",
+    "aisef2/app/bundle_cli.py:1078-1079 -- main catches B.BundleError and prints `refused: {e}` to stderr, returns 2; JournalRefused.__init__ (L137-140) sets str(self)=f'{code}: {message}' and self.code=code, so the operator's line is `refused: {code}: {message}` (module docstring L25-39: each failure told apart by JournalRefused.code 'in the text of refused:', with a per-code operator action)",
+    ".code / refusal-text readers: `git grep '\\.code'` over aisef2/ aisef/ validation/ finds NO product reader of a JournalRefused.code (bundle_cli.py:30 is the docstring; story_runner/merge .code are FailureCode; preflight/server_identity .code are urllib HTTP codes); the code value is read only by the operator via the CLI line and by the kill file (test_v21_pw_lineage_continue.py:393,403 err.code=='EVIDENCE_MISMATCH'; :418 'EVIDENCE_MISMATCH' in stderr; :178,186,199,259 err.code=='EVIDENCE_UNREADABLE'; :463 regex '^refused: EVIDENCE_UNREADABLE: '; :388 'EVIDENCE_MISSING')",
+    "twin producer aisef2/app/verify.py:121,132,134 (the `aisef run --verify` path) emits the same three sentences and is separately pinned -- tests/v2/test_v21_kills3_T22b.py:107-112 (corrupt manifest named), :133 (wrong anchor), :142,:154-155 (forged), and docs/v2.1/decisions/B03-R3-E2E.md:106 S4 ('wrong anchor REFUTED ... the file named'); none of those tests call continue_from/_authentic (they call verify(...)), so _authentic's own branches are reached by no test but the kill file above"
+   ],
+   "exceptions_checked": [
+    "a non-test code reader of the refusal text or of JournalRefused.code: none (grep above)",
+    "exit status / written bundle: _authentic raises before _write_new, so a mutant that still raises a BundleError keeps exit 2 and writes nothing",
+    "main's except clauses turn it into the traceback: AttributeError is not B.BundleError nor (KeyError,TypeError,ValueError) (bundle_cli.py:1078-1082), so exit is a crash, not the refused-with-2 contract"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "refutation": "A test is owed -- the T-CODE-MISMATCH empty-manifest subcase above: self.refused(run, expect_anchor='a'*64) on a run whose EVIDENCE.json is b'' must return a JournalRefused('EVIDENCE_MISMATCH'); the mutant raises AttributeError and fails self.refused (which expects the typed refusal). reader: the operator (a clean `refused: ...` exit 2, not a Python traceback) and main's BundleError contract."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 30,
+   "mutant": "L826 NotEq->Eq",
+   "class": "REFUTED",
+   "group": "AUTHENTIC-CHANGED-LIST: the content of `changed` (L825-826), interpolated as {changed[:5]} into the L827 EVIDENCE_MISMATCH refusal -- the files the operator is told to restore; the twin of `aisef run --verify`'s per-file REFUTED detail that the E2E pins (verify.py:132; B03-R3-E2E.md S4 'the file named'). Per entry: 30 names the UNCHANGED files, 35 drops DELETED files, 37 names ~every current file. The code (EVIDENCE_MISMATCH) and the sentence are retained; only which files are named changes, and _authentic's list is pinned by no test or document",
+   "grounds": "`!=`->`==` inverts the filter: `changed` lists the keys where stored==fresh (the UNCHANGED files) instead of the changed ones; reached only when stored!=fresh, so the refusal still fires with code EVIDENCE_MISMATCH and the sentence 'evidence was changed after the run wrote it', but the file list names the wrong files. No test reads the list (test_evidence_changed L403 asserts only err.code). MEASURED: SURVIVED -- 36 tests OK, exit 0, Ran in 5.852s (kill file unchanged, as at campaign 9).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:898 -- continue_from calls _authentic(run_dir, expect_anchor) before anything is written (L896-905, _write_new at L1058); reached ONLY under `aisef bundle continue --expect-anchor` (main L1055-1061; docs/v2/V2.1-BACKLOG.md V21-54 states `_authentic` is called only with --expect-anchor)",
+    "aisef2/app/bundle_cli.py:1078-1079 -- main catches B.BundleError and prints `refused: {e}` to stderr, returns 2; JournalRefused.__init__ (L137-140) sets str(self)=f'{code}: {message}' and self.code=code, so the operator's line is `refused: {code}: {message}` (module docstring L25-39: each failure told apart by JournalRefused.code 'in the text of refused:', with a per-code operator action)",
+    ".code / refusal-text readers: `git grep '\\.code'` over aisef2/ aisef/ validation/ finds NO product reader of a JournalRefused.code (bundle_cli.py:30 is the docstring; story_runner/merge .code are FailureCode; preflight/server_identity .code are urllib HTTP codes); the code value is read only by the operator via the CLI line and by the kill file (test_v21_pw_lineage_continue.py:393,403 err.code=='EVIDENCE_MISMATCH'; :418 'EVIDENCE_MISMATCH' in stderr; :178,186,199,259 err.code=='EVIDENCE_UNREADABLE'; :463 regex '^refused: EVIDENCE_UNREADABLE: '; :388 'EVIDENCE_MISSING')",
+    "twin producer aisef2/app/verify.py:121,132,134 (the `aisef run --verify` path) emits the same three sentences and is separately pinned -- tests/v2/test_v21_kills3_T22b.py:107-112 (corrupt manifest named), :133 (wrong anchor), :142,:154-155 (forged), and docs/v2.1/decisions/B03-R3-E2E.md:106 S4 ('wrong anchor REFUTED ... the file named'); none of those tests call continue_from/_authentic (they call verify(...)), so _authentic's own branches are reached by no test but the kill file above"
+   ],
+   "exceptions_checked": [
+    "a non-test code reader of the refusal text or of JournalRefused.code: none (grep above)",
+    "exit status / written bundle: _authentic raises before _write_new, so a mutant that still raises a BundleError keeps exit 2 and writes nothing",
+    "the refusal still firing: yes -- the block is entered only under stored!=fresh (L824); the code and sentence are unchanged; only {changed[:5]} is wrong",
+    "verify.py:132's twin list is the pinned producer (T22b/E2E); _authentic's is read by no test or document"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "refutation": "A test is owed (T-CHANGED-LIST, test_v21_pw_lineage_continue.TheOperatorAsksForAnAnchor; reader: the operator reading which evidence to restore in `refused: EVIDENCE_MISMATCH: ...: [files] -- evidence was changed...`, the twin of verify's per-file REFUTED pinned by B03-R3-E2E.md:106 S4). Case (a) tamper one file: `run=self.run_dir(self.delivered(),manifest=True); anchor=self.anchor_of(run); victim=run/'run'/'journals'/'aisef-run.jsonl'; victim.write_bytes(victim.read_bytes()+b'x'); err=self.refused(run,expect_anchor=anchor); self.assertIn(victim.relative_to(run).as_posix(),str(err)); self.assertNotIn('RUN.json',str(err))` -- kills [30] (names the untouched, not the tampered) and [37] (names RUN.json and every other file too). Case (b) delete one file named in the manifest and assertIn its path -- kills [35] (a deleted file drops out of the union). [9] is not killed (same set, only order) and stays AUDITED."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 35,
+   "mutant": "L825 string 'files' emptied",
+   "class": "REFUTED",
+   "group": "AUTHENTIC-CHANGED-LIST: the content of `changed` (L825-826), interpolated as {changed[:5]} into the L827 EVIDENCE_MISMATCH refusal -- the files the operator is told to restore; the twin of `aisef run --verify`'s per-file REFUTED detail that the E2E pins (verify.py:132; B03-R3-E2E.md S4 'the file named'). Per entry: 30 names the UNCHANGED files, 35 drops DELETED files, 37 names ~every current file. The code (EVIDENCE_MISMATCH) and the sentence are retained; only which files are named changes, and _authentic's list is pinned by no test or document",
+   "grounds": "In `set(stored.get('files',{}))` (L825) the key becomes '' -> stored.get('',{}) is {} (no '' key) -> the union over which `changed` is built is just fresh's keys; L826 still filters with 'files', so a file present in the stored manifest but DELETED from the directory (in stored, absent from fresh) drops out of `changed` and is never named, though its deletion is exactly why stored!=fresh. Code and sentence unchanged; the list is incomplete. MEASURED: SURVIVED -- 36 tests OK, exit 0, Ran in 6.158s (kill file unchanged, as at campaign 9).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:898 -- continue_from calls _authentic(run_dir, expect_anchor) before anything is written (L896-905, _write_new at L1058); reached ONLY under `aisef bundle continue --expect-anchor` (main L1055-1061; docs/v2/V2.1-BACKLOG.md V21-54 states `_authentic` is called only with --expect-anchor)",
+    "aisef2/app/bundle_cli.py:1078-1079 -- main catches B.BundleError and prints `refused: {e}` to stderr, returns 2; JournalRefused.__init__ (L137-140) sets str(self)=f'{code}: {message}' and self.code=code, so the operator's line is `refused: {code}: {message}` (module docstring L25-39: each failure told apart by JournalRefused.code 'in the text of refused:', with a per-code operator action)",
+    ".code / refusal-text readers: `git grep '\\.code'` over aisef2/ aisef/ validation/ finds NO product reader of a JournalRefused.code (bundle_cli.py:30 is the docstring; story_runner/merge .code are FailureCode; preflight/server_identity .code are urllib HTTP codes); the code value is read only by the operator via the CLI line and by the kill file (test_v21_pw_lineage_continue.py:393,403 err.code=='EVIDENCE_MISMATCH'; :418 'EVIDENCE_MISMATCH' in stderr; :178,186,199,259 err.code=='EVIDENCE_UNREADABLE'; :463 regex '^refused: EVIDENCE_UNREADABLE: '; :388 'EVIDENCE_MISSING')",
+    "twin producer aisef2/app/verify.py:121,132,134 (the `aisef run --verify` path) emits the same three sentences and is separately pinned -- tests/v2/test_v21_kills3_T22b.py:107-112 (corrupt manifest named), :133 (wrong anchor), :142,:154-155 (forged), and docs/v2.1/decisions/B03-R3-E2E.md:106 S4 ('wrong anchor REFUTED ... the file named'); none of those tests call continue_from/_authentic (they call verify(...)), so _authentic's own branches are reached by no test but the kill file above"
+   ],
+   "exceptions_checked": [
+    "a non-test code reader of the refusal text or of JournalRefused.code: none (grep above)",
+    "exit status / written bundle: _authentic raises before _write_new, so a mutant that still raises a BundleError keeps exit 2 and writes nothing",
+    "the refusal still firing: yes (stored!=fresh when a file is deleted: fresh['files'] lacks the key)",
+    "changed becoming empty when a deletion is the only change -> message '...: [] -- evidence was changed', naming nothing"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "refutation": "A test is owed (T-CHANGED-LIST, test_v21_pw_lineage_continue.TheOperatorAsksForAnAnchor; reader: the operator reading which evidence to restore in `refused: EVIDENCE_MISMATCH: ...: [files] -- evidence was changed...`, the twin of verify's per-file REFUTED pinned by B03-R3-E2E.md:106 S4). Case (a) tamper one file: `run=self.run_dir(self.delivered(),manifest=True); anchor=self.anchor_of(run); victim=run/'run'/'journals'/'aisef-run.jsonl'; victim.write_bytes(victim.read_bytes()+b'x'); err=self.refused(run,expect_anchor=anchor); self.assertIn(victim.relative_to(run).as_posix(),str(err)); self.assertNotIn('RUN.json',str(err))` -- kills [30] (names the untouched, not the tampered) and [37] (names RUN.json and every other file too). Case (b) delete one file named in the manifest and assertIn its path -- kills [35] (a deleted file drops out of the union). [9] is not killed (same set, only order) and stays AUDITED."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 37,
+   "mutant": "L826 string 'files' emptied",
+   "class": "REFUTED",
+   "group": "AUTHENTIC-CHANGED-LIST: the content of `changed` (L825-826), interpolated as {changed[:5]} into the L827 EVIDENCE_MISMATCH refusal -- the files the operator is told to restore; the twin of `aisef run --verify`'s per-file REFUTED detail that the E2E pins (verify.py:132; B03-R3-E2E.md S4 'the file named'). Per entry: 30 names the UNCHANGED files, 35 drops DELETED files, 37 names ~every current file. The code (EVIDENCE_MISMATCH) and the sentence are retained; only which files are named changes, and _authentic's list is pinned by no test or document",
+   "grounds": "In the filter `stored.get('files',{}).get(k)` (L826) the key becomes '' -> stored.get('',{}).get(k) is {}.get(k)==None for every k, so the predicate `None != fresh['files'].get(k)` is true for every current file (non-None hash) and false for keys only in stored (deleted files): `changed` lists ~every file in the directory and omits deletions, rather than the one tampered file. Code and sentence unchanged; the list over-names. MEASURED: SURVIVED -- 36 tests OK, exit 0, Ran in 5.146s (kill file unchanged, as at campaign 9).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:898 -- continue_from calls _authentic(run_dir, expect_anchor) before anything is written (L896-905, _write_new at L1058); reached ONLY under `aisef bundle continue --expect-anchor` (main L1055-1061; docs/v2/V2.1-BACKLOG.md V21-54 states `_authentic` is called only with --expect-anchor)",
+    "aisef2/app/bundle_cli.py:1078-1079 -- main catches B.BundleError and prints `refused: {e}` to stderr, returns 2; JournalRefused.__init__ (L137-140) sets str(self)=f'{code}: {message}' and self.code=code, so the operator's line is `refused: {code}: {message}` (module docstring L25-39: each failure told apart by JournalRefused.code 'in the text of refused:', with a per-code operator action)",
+    ".code / refusal-text readers: `git grep '\\.code'` over aisef2/ aisef/ validation/ finds NO product reader of a JournalRefused.code (bundle_cli.py:30 is the docstring; story_runner/merge .code are FailureCode; preflight/server_identity .code are urllib HTTP codes); the code value is read only by the operator via the CLI line and by the kill file (test_v21_pw_lineage_continue.py:393,403 err.code=='EVIDENCE_MISMATCH'; :418 'EVIDENCE_MISMATCH' in stderr; :178,186,199,259 err.code=='EVIDENCE_UNREADABLE'; :463 regex '^refused: EVIDENCE_UNREADABLE: '; :388 'EVIDENCE_MISSING')",
+    "twin producer aisef2/app/verify.py:121,132,134 (the `aisef run --verify` path) emits the same three sentences and is separately pinned -- tests/v2/test_v21_kills3_T22b.py:107-112 (corrupt manifest named), :133 (wrong anchor), :142,:154-155 (forged), and docs/v2.1/decisions/B03-R3-E2E.md:106 S4 ('wrong anchor REFUTED ... the file named'); none of those tests call continue_from/_authentic (they call verify(...)), so _authentic's own branches are reached by no test but the kill file above"
+   ],
+   "exceptions_checked": [
+    "a non-test code reader of the refusal text or of JournalRefused.code: none (grep above)",
+    "exit status / written bundle: _authentic raises before _write_new, so a mutant that still raises a BundleError keeps exit 2 and writes nothing",
+    "the refusal still firing: yes",
+    "the list still being a subset of real files: no -- it lists every current file, so a one-byte tamper reads as 'everything changed'"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "refutation": "A test is owed (T-CHANGED-LIST, test_v21_pw_lineage_continue.TheOperatorAsksForAnAnchor; reader: the operator reading which evidence to restore in `refused: EVIDENCE_MISMATCH: ...: [files] -- evidence was changed...`, the twin of verify's per-file REFUTED pinned by B03-R3-E2E.md:106 S4). Case (a) tamper one file: `run=self.run_dir(self.delivered(),manifest=True); anchor=self.anchor_of(run); victim=run/'run'/'journals'/'aisef-run.jsonl'; victim.write_bytes(victim.read_bytes()+b'x'); err=self.refused(run,expect_anchor=anchor); self.assertIn(victim.relative_to(run).as_posix(),str(err)); self.assertNotIn('RUN.json',str(err))` -- kills [30] (names the untouched, not the tampered) and [37] (names RUN.json and every other file too). Case (b) delete one file named in the manifest and assertIn its path -- kills [35] (a deleted file drops out of the union). [9] is not killed (same set, only order) and stays AUDITED."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 16,
+   "mutant": "L816 string ': the evidence anchor is ' emptied",
+   "class": "AUDITED",
+   "group": "ANCHOR-MISMATCH-PROSE: connective prose of the L816-817 anchor-mismatch refusal; the code EVIDENCE_MISMATCH and both interpolated ids {anchor[:12]} and {expect[:12]} -- the elements the kill file pins (L394-396 assertIn(anchor[:12]) + assertIn('b'*12); L418 'EVIDENCE_MISMATCH') -- are retained",
+   "grounds": "Message becomes f'{run_dir}{anchor[:12]}, not the {expect[:12]} expected: this is not the run that printed it, or its evidence was rewritten'; both ids, ', not the ... expected', and the tail are retained, so the kill file's id+code asserts hold. MEASURED: SURVIVED -- 36 tests OK, exit 0, Ran in 4.925s (kill file unchanged, as at campaign 9).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:898 -- continue_from calls _authentic(run_dir, expect_anchor) before anything is written (L896-905, _write_new at L1058); reached ONLY under `aisef bundle continue --expect-anchor` (main L1055-1061; docs/v2/V2.1-BACKLOG.md V21-54 states `_authentic` is called only with --expect-anchor)",
+    "aisef2/app/bundle_cli.py:1078-1079 -- main catches B.BundleError and prints `refused: {e}` to stderr, returns 2; JournalRefused.__init__ (L137-140) sets str(self)=f'{code}: {message}' and self.code=code, so the operator's line is `refused: {code}: {message}` (module docstring L25-39: each failure told apart by JournalRefused.code 'in the text of refused:', with a per-code operator action)",
+    ".code / refusal-text readers: `git grep '\\.code'` over aisef2/ aisef/ validation/ finds NO product reader of a JournalRefused.code (bundle_cli.py:30 is the docstring; story_runner/merge .code are FailureCode; preflight/server_identity .code are urllib HTTP codes); the code value is read only by the operator via the CLI line and by the kill file (test_v21_pw_lineage_continue.py:393,403 err.code=='EVIDENCE_MISMATCH'; :418 'EVIDENCE_MISMATCH' in stderr; :178,186,199,259 err.code=='EVIDENCE_UNREADABLE'; :463 regex '^refused: EVIDENCE_UNREADABLE: '; :388 'EVIDENCE_MISSING')",
+    "twin producer aisef2/app/verify.py:121,132,134 (the `aisef run --verify` path) emits the same three sentences and is separately pinned -- tests/v2/test_v21_kills3_T22b.py:107-112 (corrupt manifest named), :133 (wrong anchor), :142,:154-155 (forged), and docs/v2.1/decisions/B03-R3-E2E.md:106 S4 ('wrong anchor REFUTED ... the file named'); none of those tests call continue_from/_authentic (they call verify(...)), so _authentic's own branches are reached by no test but the kill file above",
+    "test_v21_pw_lineage_continue.py:391-396 (test_a_different_anchor: err.code, anchor[:12], 'b'*12 in str) and :412-419 (CLI: 'EVIDENCE_MISMATCH' in stderr)"
+   ],
+   "exceptions_checked": [
+    "a test/doc asserting the prose between the ids, or the 'this is not the run that printed it / rewritten' tail: none",
+    "the two ids and the code (the pinned elements) are retained in each"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 17,
+   "mutant": "L816 string ', not the ' emptied",
+   "class": "AUDITED",
+   "group": "ANCHOR-MISMATCH-PROSE: connective prose of the L816-817 anchor-mismatch refusal; the code EVIDENCE_MISMATCH and both interpolated ids {anchor[:12]} and {expect[:12]} -- the elements the kill file pins (L394-396 assertIn(anchor[:12]) + assertIn('b'*12); L418 'EVIDENCE_MISMATCH') -- are retained",
+   "grounds": "Message becomes f'{run_dir}: the evidence anchor is {anchor[:12]}{expect[:12]} expected: ...'; both ids are retained (now adjacent), the id+code asserts hold. MEASURED: SURVIVED -- 36 tests OK, exit 0, Ran in 5.784s (kill file unchanged, as at campaign 9).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:898 -- continue_from calls _authentic(run_dir, expect_anchor) before anything is written (L896-905, _write_new at L1058); reached ONLY under `aisef bundle continue --expect-anchor` (main L1055-1061; docs/v2/V2.1-BACKLOG.md V21-54 states `_authentic` is called only with --expect-anchor)",
+    "aisef2/app/bundle_cli.py:1078-1079 -- main catches B.BundleError and prints `refused: {e}` to stderr, returns 2; JournalRefused.__init__ (L137-140) sets str(self)=f'{code}: {message}' and self.code=code, so the operator's line is `refused: {code}: {message}` (module docstring L25-39: each failure told apart by JournalRefused.code 'in the text of refused:', with a per-code operator action)",
+    ".code / refusal-text readers: `git grep '\\.code'` over aisef2/ aisef/ validation/ finds NO product reader of a JournalRefused.code (bundle_cli.py:30 is the docstring; story_runner/merge .code are FailureCode; preflight/server_identity .code are urllib HTTP codes); the code value is read only by the operator via the CLI line and by the kill file (test_v21_pw_lineage_continue.py:393,403 err.code=='EVIDENCE_MISMATCH'; :418 'EVIDENCE_MISMATCH' in stderr; :178,186,199,259 err.code=='EVIDENCE_UNREADABLE'; :463 regex '^refused: EVIDENCE_UNREADABLE: '; :388 'EVIDENCE_MISSING')",
+    "twin producer aisef2/app/verify.py:121,132,134 (the `aisef run --verify` path) emits the same three sentences and is separately pinned -- tests/v2/test_v21_kills3_T22b.py:107-112 (corrupt manifest named), :133 (wrong anchor), :142,:154-155 (forged), and docs/v2.1/decisions/B03-R3-E2E.md:106 S4 ('wrong anchor REFUTED ... the file named'); none of those tests call continue_from/_authentic (they call verify(...)), so _authentic's own branches are reached by no test but the kill file above",
+    "test_v21_pw_lineage_continue.py:391-396 (test_a_different_anchor: err.code, anchor[:12], 'b'*12 in str) and :412-419 (CLI: 'EVIDENCE_MISMATCH' in stderr)"
+   ],
+   "exceptions_checked": [
+    "a test/doc asserting the prose between the ids, or the 'this is not the run that printed it / rewritten' tail: none",
+    "the two ids and the code (the pinned elements) are retained in each"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 18,
+   "mutant": "L817 string ' expected: this is not the run that printed it, or its evidence was rewritten' emptied",
+   "class": "AUDITED",
+   "group": "ANCHOR-MISMATCH-PROSE: connective prose of the L816-817 anchor-mismatch refusal; the code EVIDENCE_MISMATCH and both interpolated ids {anchor[:12]} and {expect[:12]} -- the elements the kill file pins (L394-396 assertIn(anchor[:12]) + assertIn('b'*12); L418 'EVIDENCE_MISMATCH') -- are retained",
+   "grounds": "Message becomes f'{run_dir}: the evidence anchor is {anchor[:12]}, not the {expect[:12]}'; both ids and 'the evidence anchor is ... not the' are retained; only the explanatory tail is lost. MEASURED: SURVIVED -- 36 tests OK, exit 0, Ran in 6.894s (kill file unchanged, as at campaign 9).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:898 -- continue_from calls _authentic(run_dir, expect_anchor) before anything is written (L896-905, _write_new at L1058); reached ONLY under `aisef bundle continue --expect-anchor` (main L1055-1061; docs/v2/V2.1-BACKLOG.md V21-54 states `_authentic` is called only with --expect-anchor)",
+    "aisef2/app/bundle_cli.py:1078-1079 -- main catches B.BundleError and prints `refused: {e}` to stderr, returns 2; JournalRefused.__init__ (L137-140) sets str(self)=f'{code}: {message}' and self.code=code, so the operator's line is `refused: {code}: {message}` (module docstring L25-39: each failure told apart by JournalRefused.code 'in the text of refused:', with a per-code operator action)",
+    ".code / refusal-text readers: `git grep '\\.code'` over aisef2/ aisef/ validation/ finds NO product reader of a JournalRefused.code (bundle_cli.py:30 is the docstring; story_runner/merge .code are FailureCode; preflight/server_identity .code are urllib HTTP codes); the code value is read only by the operator via the CLI line and by the kill file (test_v21_pw_lineage_continue.py:393,403 err.code=='EVIDENCE_MISMATCH'; :418 'EVIDENCE_MISMATCH' in stderr; :178,186,199,259 err.code=='EVIDENCE_UNREADABLE'; :463 regex '^refused: EVIDENCE_UNREADABLE: '; :388 'EVIDENCE_MISSING')",
+    "twin producer aisef2/app/verify.py:121,132,134 (the `aisef run --verify` path) emits the same three sentences and is separately pinned -- tests/v2/test_v21_kills3_T22b.py:107-112 (corrupt manifest named), :133 (wrong anchor), :142,:154-155 (forged), and docs/v2.1/decisions/B03-R3-E2E.md:106 S4 ('wrong anchor REFUTED ... the file named'); none of those tests call continue_from/_authentic (they call verify(...)), so _authentic's own branches are reached by no test but the kill file above",
+    "test_v21_pw_lineage_continue.py:391-396 (test_a_different_anchor: err.code, anchor[:12], 'b'*12 in str) and :412-419 (CLI: 'EVIDENCE_MISMATCH' in stderr)"
+   ],
+   "exceptions_checked": [
+    "a test/doc asserting the prose between the ids, or the 'this is not the run that printed it / rewritten' tail: none",
+    "the two ids and the code (the pinned elements) are retained in each"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 31,
+   "mutant": "L803 string ' has no ' emptied",
+   "class": "AUDITED",
+   "group": "NO-MANIFEST-PROSE: prose of the L803-805 EVIDENCE_MISSING refusal (manifest not there); the code EVIDENCE_MISSING (not mutated here) and the interpolated {R.MANIFEST} -- the elements the kill file pins (L388 err.code=='EVIDENCE_MISSING', L389 assertIn(R.MANIFEST)) -- are retained",
+   "grounds": "Message becomes f'{run_dir}{R.MANIFEST}: nothing binds its evidence to an anchor, ...'; run_dir abuts the filename but the 'EVIDENCE.json' substring that assertIn(R.MANIFEST) checks is present, and the code is unchanged. MEASURED: SURVIVED -- 36 tests OK, exit 0, Ran in 5.443s (kill file unchanged, as at campaign 9).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:898 -- continue_from calls _authentic(run_dir, expect_anchor) before anything is written (L896-905, _write_new at L1058); reached ONLY under `aisef bundle continue --expect-anchor` (main L1055-1061; docs/v2/V2.1-BACKLOG.md V21-54 states `_authentic` is called only with --expect-anchor)",
+    "aisef2/app/bundle_cli.py:1078-1079 -- main catches B.BundleError and prints `refused: {e}` to stderr, returns 2; JournalRefused.__init__ (L137-140) sets str(self)=f'{code}: {message}' and self.code=code, so the operator's line is `refused: {code}: {message}` (module docstring L25-39: each failure told apart by JournalRefused.code 'in the text of refused:', with a per-code operator action)",
+    ".code / refusal-text readers: `git grep '\\.code'` over aisef2/ aisef/ validation/ finds NO product reader of a JournalRefused.code (bundle_cli.py:30 is the docstring; story_runner/merge .code are FailureCode; preflight/server_identity .code are urllib HTTP codes); the code value is read only by the operator via the CLI line and by the kill file (test_v21_pw_lineage_continue.py:393,403 err.code=='EVIDENCE_MISMATCH'; :418 'EVIDENCE_MISMATCH' in stderr; :178,186,199,259 err.code=='EVIDENCE_UNREADABLE'; :463 regex '^refused: EVIDENCE_UNREADABLE: '; :388 'EVIDENCE_MISSING')",
+    "twin producer aisef2/app/verify.py:121,132,134 (the `aisef run --verify` path) emits the same three sentences and is separately pinned -- tests/v2/test_v21_kills3_T22b.py:107-112 (corrupt manifest named), :133 (wrong anchor), :142,:154-155 (forged), and docs/v2.1/decisions/B03-R3-E2E.md:106 S4 ('wrong anchor REFUTED ... the file named'); none of those tests call continue_from/_authentic (they call verify(...)), so _authentic's own branches are reached by no test but the kill file above",
+    "test_v21_pw_lineage_continue.py:383-389 (test_a_run_with_no_manifest: err.code=='EVIDENCE_MISSING', R.MANIFEST in str)"
+   ],
+   "exceptions_checked": [
+    "a test/doc asserting the prose around R.MANIFEST: none; the code and the 'EVIDENCE.json' substring are retained (R.MANIFEST=='EVIDENCE.json', run.py:80)"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 32,
+   "mutant": "L803 string ': nothing binds its evidence to an anchor, so the expected anchor ' emptied",
+   "class": "AUDITED",
+   "group": "NO-MANIFEST-PROSE: prose of the L803-805 EVIDENCE_MISSING refusal (manifest not there); the code EVIDENCE_MISSING (not mutated here) and the interpolated {R.MANIFEST} -- the elements the kill file pins (L388 err.code=='EVIDENCE_MISSING', L389 assertIn(R.MANIFEST)) -- are retained",
+   "grounds": "Message becomes f'{run_dir} has no {R.MANIFEST}{expect[:12]} cannot be checked -- ...'; R.MANIFEST and the code are retained. MEASURED: SURVIVED -- 36 tests OK, exit 0, Ran in 5.398s (kill file unchanged, as at campaign 9).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:898 -- continue_from calls _authentic(run_dir, expect_anchor) before anything is written (L896-905, _write_new at L1058); reached ONLY under `aisef bundle continue --expect-anchor` (main L1055-1061; docs/v2/V2.1-BACKLOG.md V21-54 states `_authentic` is called only with --expect-anchor)",
+    "aisef2/app/bundle_cli.py:1078-1079 -- main catches B.BundleError and prints `refused: {e}` to stderr, returns 2; JournalRefused.__init__ (L137-140) sets str(self)=f'{code}: {message}' and self.code=code, so the operator's line is `refused: {code}: {message}` (module docstring L25-39: each failure told apart by JournalRefused.code 'in the text of refused:', with a per-code operator action)",
+    ".code / refusal-text readers: `git grep '\\.code'` over aisef2/ aisef/ validation/ finds NO product reader of a JournalRefused.code (bundle_cli.py:30 is the docstring; story_runner/merge .code are FailureCode; preflight/server_identity .code are urllib HTTP codes); the code value is read only by the operator via the CLI line and by the kill file (test_v21_pw_lineage_continue.py:393,403 err.code=='EVIDENCE_MISMATCH'; :418 'EVIDENCE_MISMATCH' in stderr; :178,186,199,259 err.code=='EVIDENCE_UNREADABLE'; :463 regex '^refused: EVIDENCE_UNREADABLE: '; :388 'EVIDENCE_MISSING')",
+    "twin producer aisef2/app/verify.py:121,132,134 (the `aisef run --verify` path) emits the same three sentences and is separately pinned -- tests/v2/test_v21_kills3_T22b.py:107-112 (corrupt manifest named), :133 (wrong anchor), :142,:154-155 (forged), and docs/v2.1/decisions/B03-R3-E2E.md:106 S4 ('wrong anchor REFUTED ... the file named'); none of those tests call continue_from/_authentic (they call verify(...)), so _authentic's own branches are reached by no test but the kill file above",
+    "test_v21_pw_lineage_continue.py:383-389 (test_a_run_with_no_manifest: err.code=='EVIDENCE_MISSING', R.MANIFEST in str)"
+   ],
+   "exceptions_checked": [
+    "a test/doc asserting the prose around R.MANIFEST: none; the code and the 'EVIDENCE.json' substring are retained (R.MANIFEST=='EVIDENCE.json', run.py:80)"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 33,
+   "mutant": "L804 string ' cannot be checked — a run killed before its record has none; without --expect-anchor a continuation proves consistency only' emptied",
+   "class": "AUDITED",
+   "group": "NO-MANIFEST-PROSE: prose of the L803-805 EVIDENCE_MISSING refusal (manifest not there); the code EVIDENCE_MISSING (not mutated here) and the interpolated {R.MANIFEST} -- the elements the kill file pins (L388 err.code=='EVIDENCE_MISSING', L389 assertIn(R.MANIFEST)) -- are retained",
+   "grounds": "Message becomes f'{run_dir} has no {R.MANIFEST}: nothing binds its evidence to an anchor, so the expected anchor {expect[:12]}'; R.MANIFEST, the 'nothing binds...anchor' phrase, and the code are retained; only the trailing explanation is lost. MEASURED: SURVIVED -- 36 tests OK, exit 0, Ran in 5.365s (kill file unchanged, as at campaign 9).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:898 -- continue_from calls _authentic(run_dir, expect_anchor) before anything is written (L896-905, _write_new at L1058); reached ONLY under `aisef bundle continue --expect-anchor` (main L1055-1061; docs/v2/V2.1-BACKLOG.md V21-54 states `_authentic` is called only with --expect-anchor)",
+    "aisef2/app/bundle_cli.py:1078-1079 -- main catches B.BundleError and prints `refused: {e}` to stderr, returns 2; JournalRefused.__init__ (L137-140) sets str(self)=f'{code}: {message}' and self.code=code, so the operator's line is `refused: {code}: {message}` (module docstring L25-39: each failure told apart by JournalRefused.code 'in the text of refused:', with a per-code operator action)",
+    ".code / refusal-text readers: `git grep '\\.code'` over aisef2/ aisef/ validation/ finds NO product reader of a JournalRefused.code (bundle_cli.py:30 is the docstring; story_runner/merge .code are FailureCode; preflight/server_identity .code are urllib HTTP codes); the code value is read only by the operator via the CLI line and by the kill file (test_v21_pw_lineage_continue.py:393,403 err.code=='EVIDENCE_MISMATCH'; :418 'EVIDENCE_MISMATCH' in stderr; :178,186,199,259 err.code=='EVIDENCE_UNREADABLE'; :463 regex '^refused: EVIDENCE_UNREADABLE: '; :388 'EVIDENCE_MISSING')",
+    "twin producer aisef2/app/verify.py:121,132,134 (the `aisef run --verify` path) emits the same three sentences and is separately pinned -- tests/v2/test_v21_kills3_T22b.py:107-112 (corrupt manifest named), :133 (wrong anchor), :142,:154-155 (forged), and docs/v2.1/decisions/B03-R3-E2E.md:106 S4 ('wrong anchor REFUTED ... the file named'); none of those tests call continue_from/_authentic (they call verify(...)), so _authentic's own branches are reached by no test but the kill file above",
+    "test_v21_pw_lineage_continue.py:383-389 (test_a_run_with_no_manifest: err.code=='EVIDENCE_MISSING', R.MANIFEST in str)"
+   ],
+   "exceptions_checked": [
+    "a test/doc asserting the prose around R.MANIFEST: none; the code and the 'EVIDENCE.json' substring are retained (R.MANIFEST=='EVIDENCE.json', run.py:80)"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 20,
+   "mutant": "L827 string ': the evidence manifest does not match the run directory: ' emptied",
+   "class": "AUDITED",
+   "group": "FINAL-MISMATCH-PROSE: prose of the L827-828 EVIDENCE_MISMATCH refusal (evidence changed); the code and the {changed[:5]} list are retained, and the one test on this branch (test_evidence_changed L403) asserts only err.code",
+   "grounds": "Message becomes f'{run_dir}{changed[:5]} -- evidence was changed after the run wrote it'; the code, run_dir, changed[:5] and 'evidence was changed after the run wrote it' are retained. MEASURED: SURVIVED -- 36 tests OK, exit 0, Ran in 5.545s (kill file unchanged, as at campaign 9).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:898 -- continue_from calls _authentic(run_dir, expect_anchor) before anything is written (L896-905, _write_new at L1058); reached ONLY under `aisef bundle continue --expect-anchor` (main L1055-1061; docs/v2/V2.1-BACKLOG.md V21-54 states `_authentic` is called only with --expect-anchor)",
+    "aisef2/app/bundle_cli.py:1078-1079 -- main catches B.BundleError and prints `refused: {e}` to stderr, returns 2; JournalRefused.__init__ (L137-140) sets str(self)=f'{code}: {message}' and self.code=code, so the operator's line is `refused: {code}: {message}` (module docstring L25-39: each failure told apart by JournalRefused.code 'in the text of refused:', with a per-code operator action)",
+    ".code / refusal-text readers: `git grep '\\.code'` over aisef2/ aisef/ validation/ finds NO product reader of a JournalRefused.code (bundle_cli.py:30 is the docstring; story_runner/merge .code are FailureCode; preflight/server_identity .code are urllib HTTP codes); the code value is read only by the operator via the CLI line and by the kill file (test_v21_pw_lineage_continue.py:393,403 err.code=='EVIDENCE_MISMATCH'; :418 'EVIDENCE_MISMATCH' in stderr; :178,186,199,259 err.code=='EVIDENCE_UNREADABLE'; :463 regex '^refused: EVIDENCE_UNREADABLE: '; :388 'EVIDENCE_MISSING')",
+    "twin producer aisef2/app/verify.py:121,132,134 (the `aisef run --verify` path) emits the same three sentences and is separately pinned -- tests/v2/test_v21_kills3_T22b.py:107-112 (corrupt manifest named), :133 (wrong anchor), :142,:154-155 (forged), and docs/v2.1/decisions/B03-R3-E2E.md:106 S4 ('wrong anchor REFUTED ... the file named'); none of those tests call continue_from/_authentic (they call verify(...)), so _authentic's own branches are reached by no test but the kill file above",
+    "test_v21_pw_lineage_continue.py:397-404 (test_evidence_changed: asserts only err.code=='EVIDENCE_MISMATCH')"
+   ],
+   "exceptions_checked": [
+    "a test/doc asserting the full sentence of this refusal: none",
+    "the code and the changed-file list are retained (which-files is a separate matter -- see [30]/[35]/[37])"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 21,
+   "mutant": "L828 string ' — evidence was changed after the run wrote it' emptied",
+   "class": "AUDITED",
+   "group": "FINAL-MISMATCH-PROSE: prose of the L827-828 EVIDENCE_MISMATCH refusal (evidence changed); the code and the {changed[:5]} list are retained, and the one test on this branch (test_evidence_changed L403) asserts only err.code",
+   "grounds": "Message becomes f'{run_dir}: the evidence manifest does not match the run directory: {changed[:5]}'; the code, the 'does not match the run directory' phrase and changed[:5] are retained; only the trailing clause is lost. MEASURED: SURVIVED -- 36 tests OK, exit 0, Ran in 5.974s (kill file unchanged, as at campaign 9).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:898 -- continue_from calls _authentic(run_dir, expect_anchor) before anything is written (L896-905, _write_new at L1058); reached ONLY under `aisef bundle continue --expect-anchor` (main L1055-1061; docs/v2/V2.1-BACKLOG.md V21-54 states `_authentic` is called only with --expect-anchor)",
+    "aisef2/app/bundle_cli.py:1078-1079 -- main catches B.BundleError and prints `refused: {e}` to stderr, returns 2; JournalRefused.__init__ (L137-140) sets str(self)=f'{code}: {message}' and self.code=code, so the operator's line is `refused: {code}: {message}` (module docstring L25-39: each failure told apart by JournalRefused.code 'in the text of refused:', with a per-code operator action)",
+    ".code / refusal-text readers: `git grep '\\.code'` over aisef2/ aisef/ validation/ finds NO product reader of a JournalRefused.code (bundle_cli.py:30 is the docstring; story_runner/merge .code are FailureCode; preflight/server_identity .code are urllib HTTP codes); the code value is read only by the operator via the CLI line and by the kill file (test_v21_pw_lineage_continue.py:393,403 err.code=='EVIDENCE_MISMATCH'; :418 'EVIDENCE_MISMATCH' in stderr; :178,186,199,259 err.code=='EVIDENCE_UNREADABLE'; :463 regex '^refused: EVIDENCE_UNREADABLE: '; :388 'EVIDENCE_MISSING')",
+    "twin producer aisef2/app/verify.py:121,132,134 (the `aisef run --verify` path) emits the same three sentences and is separately pinned -- tests/v2/test_v21_kills3_T22b.py:107-112 (corrupt manifest named), :133 (wrong anchor), :142,:154-155 (forged), and docs/v2.1/decisions/B03-R3-E2E.md:106 S4 ('wrong anchor REFUTED ... the file named'); none of those tests call continue_from/_authentic (they call verify(...)), so _authentic's own branches are reached by no test but the kill file above",
+    "test_v21_pw_lineage_continue.py:397-404 (test_evidence_changed: asserts only err.code=='EVIDENCE_MISMATCH')"
+   ],
+   "exceptions_checked": [
+    "a test/doc asserting the full sentence of this refusal: none",
+    "the code and the changed-file list are retained (which-files is a separate matter -- see [30]/[35]/[37])"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 14,
+   "mutant": "L812 string ' is not an evidence manifest: the expected anchor ' emptied",
+   "class": "AUDITED",
+   "group": "NOT-A-MANIFEST-PROSE: prose of the L812-813 refusal (stored is not an evidence manifest); the code EVIDENCE_MISMATCH (owed separately via [10]), the interpolated {run_dir/R.MANIFEST} and {expect[:12]} are retained; the branch is reached by no test, so nothing reads this prose",
+   "grounds": "Message becomes f'{run_dir / R.MANIFEST}{expect[:12]} cannot be reproduced from it'; the code, the path (incl. the filename) and expect[:12] and 'cannot be reproduced from it' are retained; only the 'is not an evidence manifest' label is lost. MEASURED: SURVIVED -- 36 tests OK, exit 0, Ran in 5.289s (kill file unchanged, as at campaign 9).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:898 -- continue_from calls _authentic(run_dir, expect_anchor) before anything is written (L896-905, _write_new at L1058); reached ONLY under `aisef bundle continue --expect-anchor` (main L1055-1061; docs/v2/V2.1-BACKLOG.md V21-54 states `_authentic` is called only with --expect-anchor)",
+    "aisef2/app/bundle_cli.py:1078-1079 -- main catches B.BundleError and prints `refused: {e}` to stderr, returns 2; JournalRefused.__init__ (L137-140) sets str(self)=f'{code}: {message}' and self.code=code, so the operator's line is `refused: {code}: {message}` (module docstring L25-39: each failure told apart by JournalRefused.code 'in the text of refused:', with a per-code operator action)",
+    ".code / refusal-text readers: `git grep '\\.code'` over aisef2/ aisef/ validation/ finds NO product reader of a JournalRefused.code (bundle_cli.py:30 is the docstring; story_runner/merge .code are FailureCode; preflight/server_identity .code are urllib HTTP codes); the code value is read only by the operator via the CLI line and by the kill file (test_v21_pw_lineage_continue.py:393,403 err.code=='EVIDENCE_MISMATCH'; :418 'EVIDENCE_MISMATCH' in stderr; :178,186,199,259 err.code=='EVIDENCE_UNREADABLE'; :463 regex '^refused: EVIDENCE_UNREADABLE: '; :388 'EVIDENCE_MISSING')",
+    "twin producer aisef2/app/verify.py:121,132,134 (the `aisef run --verify` path) emits the same three sentences and is separately pinned -- tests/v2/test_v21_kills3_T22b.py:107-112 (corrupt manifest named), :133 (wrong anchor), :142,:154-155 (forged), and docs/v2.1/decisions/B03-R3-E2E.md:106 S4 ('wrong anchor REFUTED ... the file named'); none of those tests call continue_from/_authentic (they call verify(...)), so _authentic's own branches are reached by no test but the kill file above"
+   ],
+   "exceptions_checked": [
+    "a consumer of this message: none (the branch is untested; its code is owed via [10], which need not assert the prose)",
+    "path and expect[:12] are retained"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 15,
+   "mutant": "L813 string ' cannot be reproduced from it' emptied",
+   "class": "AUDITED",
+   "group": "NOT-A-MANIFEST-PROSE: prose of the L812-813 refusal (stored is not an evidence manifest); the code EVIDENCE_MISMATCH (owed separately via [10]), the interpolated {run_dir/R.MANIFEST} and {expect[:12]} are retained; the branch is reached by no test, so nothing reads this prose",
+   "grounds": "Message becomes f'{run_dir / R.MANIFEST} is not an evidence manifest: the expected anchor {expect[:12]}'; the code, the path, 'is not an evidence manifest' and expect[:12] are retained; only the trailing clause is lost. MEASURED: SURVIVED -- 36 tests OK, exit 0, Ran in 5.670s (kill file unchanged, as at campaign 9).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:898 -- continue_from calls _authentic(run_dir, expect_anchor) before anything is written (L896-905, _write_new at L1058); reached ONLY under `aisef bundle continue --expect-anchor` (main L1055-1061; docs/v2/V2.1-BACKLOG.md V21-54 states `_authentic` is called only with --expect-anchor)",
+    "aisef2/app/bundle_cli.py:1078-1079 -- main catches B.BundleError and prints `refused: {e}` to stderr, returns 2; JournalRefused.__init__ (L137-140) sets str(self)=f'{code}: {message}' and self.code=code, so the operator's line is `refused: {code}: {message}` (module docstring L25-39: each failure told apart by JournalRefused.code 'in the text of refused:', with a per-code operator action)",
+    ".code / refusal-text readers: `git grep '\\.code'` over aisef2/ aisef/ validation/ finds NO product reader of a JournalRefused.code (bundle_cli.py:30 is the docstring; story_runner/merge .code are FailureCode; preflight/server_identity .code are urllib HTTP codes); the code value is read only by the operator via the CLI line and by the kill file (test_v21_pw_lineage_continue.py:393,403 err.code=='EVIDENCE_MISMATCH'; :418 'EVIDENCE_MISMATCH' in stderr; :178,186,199,259 err.code=='EVIDENCE_UNREADABLE'; :463 regex '^refused: EVIDENCE_UNREADABLE: '; :388 'EVIDENCE_MISSING')",
+    "twin producer aisef2/app/verify.py:121,132,134 (the `aisef run --verify` path) emits the same three sentences and is separately pinned -- tests/v2/test_v21_kills3_T22b.py:107-112 (corrupt manifest named), :133 (wrong anchor), :142,:154-155 (forged), and docs/v2.1/decisions/B03-R3-E2E.md:106 S4 ('wrong anchor REFUTED ... the file named'); none of those tests call continue_from/_authentic (they call verify(...)), so _authentic's own branches are reached by no test but the kill file above"
+   ],
+   "exceptions_checked": [
+    "a consumer of this message: none (the branch is untested; its code is owed via [10], which need not assert the prose)",
+    "path and expect[:12] are retained"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 24,
+   "mutant": "L807 string ' cannot be read (' emptied",
+   "class": "AUDITED",
+   "group": "MANIFEST-UNREADABLE-PROSE: prose/representation of the L807-808 EVIDENCE_UNREADABLE refusal (manifest unreadable); the code (owed via [13]), the path {run_dir/R.MANIFEST} and the OSError's {type(e).__name__} are retained; the branch is reached by no test",
+   "grounds": "Message becomes f'{run_dir / R.MANIFEST}{type(e).__name__}: {e.strerror or e}): restore read access to it and run the command again'; the path, the exception type/strerror and the 'restore read access' remediation are retained; only the 'cannot be read (' label is lost. MEASURED: SURVIVED -- 36 tests OK, exit 0, Ran in 5.450s (kill file unchanged, as at campaign 9).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:898 -- continue_from calls _authentic(run_dir, expect_anchor) before anything is written (L896-905, _write_new at L1058); reached ONLY under `aisef bundle continue --expect-anchor` (main L1055-1061; docs/v2/V2.1-BACKLOG.md V21-54 states `_authentic` is called only with --expect-anchor)",
+    "aisef2/app/bundle_cli.py:1078-1079 -- main catches B.BundleError and prints `refused: {e}` to stderr, returns 2; JournalRefused.__init__ (L137-140) sets str(self)=f'{code}: {message}' and self.code=code, so the operator's line is `refused: {code}: {message}` (module docstring L25-39: each failure told apart by JournalRefused.code 'in the text of refused:', with a per-code operator action)",
+    ".code / refusal-text readers: `git grep '\\.code'` over aisef2/ aisef/ validation/ finds NO product reader of a JournalRefused.code (bundle_cli.py:30 is the docstring; story_runner/merge .code are FailureCode; preflight/server_identity .code are urllib HTTP codes); the code value is read only by the operator via the CLI line and by the kill file (test_v21_pw_lineage_continue.py:393,403 err.code=='EVIDENCE_MISMATCH'; :418 'EVIDENCE_MISMATCH' in stderr; :178,186,199,259 err.code=='EVIDENCE_UNREADABLE'; :463 regex '^refused: EVIDENCE_UNREADABLE: '; :388 'EVIDENCE_MISSING')",
+    "twin producer aisef2/app/verify.py:121,132,134 (the `aisef run --verify` path) emits the same three sentences and is separately pinned -- tests/v2/test_v21_kills3_T22b.py:107-112 (corrupt manifest named), :133 (wrong anchor), :142,:154-155 (forged), and docs/v2.1/decisions/B03-R3-E2E.md:106 S4 ('wrong anchor REFUTED ... the file named'); none of those tests call continue_from/_authentic (they call verify(...)), so _authentic's own branches are reached by no test but the kill file above"
+   ],
+   "exceptions_checked": [
+    "a consumer of this message: none (branch untested; code owed via [13])",
+    "the path, the exception type name, and (for [24]/[25]) the strerror are retained"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 25,
+   "mutant": "L807 string ': ' emptied",
+   "class": "AUDITED",
+   "group": "MANIFEST-UNREADABLE-PROSE: prose/representation of the L807-808 EVIDENCE_UNREADABLE refusal (manifest unreadable); the code (owed via [13]), the path {run_dir/R.MANIFEST} and the OSError's {type(e).__name__} are retained; the branch is reached by no test",
+   "grounds": "Message becomes f'...({type(e).__name__}{e.strerror or e}): restore...'; only the ': ' between the exception type and its strerror is lost; both, and the remediation, are retained. MEASURED: SURVIVED -- 36 tests OK, exit 0, Ran in 5.922s (kill file unchanged, as at campaign 9).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:898 -- continue_from calls _authentic(run_dir, expect_anchor) before anything is written (L896-905, _write_new at L1058); reached ONLY under `aisef bundle continue --expect-anchor` (main L1055-1061; docs/v2/V2.1-BACKLOG.md V21-54 states `_authentic` is called only with --expect-anchor)",
+    "aisef2/app/bundle_cli.py:1078-1079 -- main catches B.BundleError and prints `refused: {e}` to stderr, returns 2; JournalRefused.__init__ (L137-140) sets str(self)=f'{code}: {message}' and self.code=code, so the operator's line is `refused: {code}: {message}` (module docstring L25-39: each failure told apart by JournalRefused.code 'in the text of refused:', with a per-code operator action)",
+    ".code / refusal-text readers: `git grep '\\.code'` over aisef2/ aisef/ validation/ finds NO product reader of a JournalRefused.code (bundle_cli.py:30 is the docstring; story_runner/merge .code are FailureCode; preflight/server_identity .code are urllib HTTP codes); the code value is read only by the operator via the CLI line and by the kill file (test_v21_pw_lineage_continue.py:393,403 err.code=='EVIDENCE_MISMATCH'; :418 'EVIDENCE_MISMATCH' in stderr; :178,186,199,259 err.code=='EVIDENCE_UNREADABLE'; :463 regex '^refused: EVIDENCE_UNREADABLE: '; :388 'EVIDENCE_MISSING')",
+    "twin producer aisef2/app/verify.py:121,132,134 (the `aisef run --verify` path) emits the same three sentences and is separately pinned -- tests/v2/test_v21_kills3_T22b.py:107-112 (corrupt manifest named), :133 (wrong anchor), :142,:154-155 (forged), and docs/v2.1/decisions/B03-R3-E2E.md:106 S4 ('wrong anchor REFUTED ... the file named'); none of those tests call continue_from/_authentic (they call verify(...)), so _authentic's own branches are reached by no test but the kill file above"
+   ],
+   "exceptions_checked": [
+    "a consumer of this message: none (branch untested; code owed via [13])",
+    "the path, the exception type name, and (for [24]/[25]) the strerror are retained"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 26,
+   "mutant": "L808 string '): restore read access to it and run the command again' emptied",
+   "class": "AUDITED",
+   "group": "MANIFEST-UNREADABLE-PROSE: prose/representation of the L807-808 EVIDENCE_UNREADABLE refusal (manifest unreadable); the code (owed via [13]), the path {run_dir/R.MANIFEST} and the OSError's {type(e).__name__} are retained; the branch is reached by no test",
+   "grounds": "Message becomes f'{run_dir / R.MANIFEST} cannot be read ({type(e).__name__}: {e.strerror or e}'; the path, 'cannot be read' and the OSError are retained; only the remediation clause is lost (the unbalanced '(' swallows nothing -- nothing follows). The operator still sees the file, that it cannot be read, and the error; the action (restore read access) is already implied and the EVIDENCE_UNREADABLE code is owed via [13]. MEASURED: SURVIVED -- 36 tests OK, exit 0, Ran in 5.548s (kill file unchanged, as at campaign 9).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:898 -- continue_from calls _authentic(run_dir, expect_anchor) before anything is written (L896-905, _write_new at L1058); reached ONLY under `aisef bundle continue --expect-anchor` (main L1055-1061; docs/v2/V2.1-BACKLOG.md V21-54 states `_authentic` is called only with --expect-anchor)",
+    "aisef2/app/bundle_cli.py:1078-1079 -- main catches B.BundleError and prints `refused: {e}` to stderr, returns 2; JournalRefused.__init__ (L137-140) sets str(self)=f'{code}: {message}' and self.code=code, so the operator's line is `refused: {code}: {message}` (module docstring L25-39: each failure told apart by JournalRefused.code 'in the text of refused:', with a per-code operator action)",
+    ".code / refusal-text readers: `git grep '\\.code'` over aisef2/ aisef/ validation/ finds NO product reader of a JournalRefused.code (bundle_cli.py:30 is the docstring; story_runner/merge .code are FailureCode; preflight/server_identity .code are urllib HTTP codes); the code value is read only by the operator via the CLI line and by the kill file (test_v21_pw_lineage_continue.py:393,403 err.code=='EVIDENCE_MISMATCH'; :418 'EVIDENCE_MISMATCH' in stderr; :178,186,199,259 err.code=='EVIDENCE_UNREADABLE'; :463 regex '^refused: EVIDENCE_UNREADABLE: '; :388 'EVIDENCE_MISSING')",
+    "twin producer aisef2/app/verify.py:121,132,134 (the `aisef run --verify` path) emits the same three sentences and is separately pinned -- tests/v2/test_v21_kills3_T22b.py:107-112 (corrupt manifest named), :133 (wrong anchor), :142,:154-155 (forged), and docs/v2.1/decisions/B03-R3-E2E.md:106 S4 ('wrong anchor REFUTED ... the file named'); none of those tests call continue_from/_authentic (they call verify(...)), so _authentic's own branches are reached by no test but the kill file above"
+   ],
+   "exceptions_checked": [
+    "a consumer of this message: none (branch untested; code owed via [13])",
+    "the path, the exception type name, and (for [24]/[25]) the strerror are retained",
+    "a test/doc asserting the remediation phrase for _authentic: none (the kill file's 'what to do' regex L206-212 is on _journal's message, not this one)"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 34,
+   "mutant": "L808 Or swapped",
+   "class": "AUDITED",
+   "group": "MANIFEST-UNREADABLE-PROSE: prose/representation of the L807-808 EVIDENCE_UNREADABLE refusal (manifest unreadable); the code (owed via [13]), the path {run_dir/R.MANIFEST} and the OSError's {type(e).__name__} are retained; the branch is reached by no test",
+   "grounds": "`e.strerror or e` -> `e.strerror and e`: the message shows the exception repr `e` when strerror is truthy (e.g. '[Errno 13] Permission denied: /path' instead of 'Permission denied'), or the falsy strerror when strerror is empty -- a different rendering of the same OSError; {type(e).__name__} and the rest of the sentence are retained. Branch untested. MEASURED: SURVIVED -- 36 tests OK, exit 0, Ran in 6.044s (kill file unchanged, as at campaign 9).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:898 -- continue_from calls _authentic(run_dir, expect_anchor) before anything is written (L896-905, _write_new at L1058); reached ONLY under `aisef bundle continue --expect-anchor` (main L1055-1061; docs/v2/V2.1-BACKLOG.md V21-54 states `_authentic` is called only with --expect-anchor)",
+    "aisef2/app/bundle_cli.py:1078-1079 -- main catches B.BundleError and prints `refused: {e}` to stderr, returns 2; JournalRefused.__init__ (L137-140) sets str(self)=f'{code}: {message}' and self.code=code, so the operator's line is `refused: {code}: {message}` (module docstring L25-39: each failure told apart by JournalRefused.code 'in the text of refused:', with a per-code operator action)",
+    ".code / refusal-text readers: `git grep '\\.code'` over aisef2/ aisef/ validation/ finds NO product reader of a JournalRefused.code (bundle_cli.py:30 is the docstring; story_runner/merge .code are FailureCode; preflight/server_identity .code are urllib HTTP codes); the code value is read only by the operator via the CLI line and by the kill file (test_v21_pw_lineage_continue.py:393,403 err.code=='EVIDENCE_MISMATCH'; :418 'EVIDENCE_MISMATCH' in stderr; :178,186,199,259 err.code=='EVIDENCE_UNREADABLE'; :463 regex '^refused: EVIDENCE_UNREADABLE: '; :388 'EVIDENCE_MISSING')",
+    "twin producer aisef2/app/verify.py:121,132,134 (the `aisef run --verify` path) emits the same three sentences and is separately pinned -- tests/v2/test_v21_kills3_T22b.py:107-112 (corrupt manifest named), :133 (wrong anchor), :142,:154-155 (forged), and docs/v2.1/decisions/B03-R3-E2E.md:106 S4 ('wrong anchor REFUTED ... the file named'); none of those tests call continue_from/_authentic (they call verify(...)), so _authentic's own branches are reached by no test but the kill file above"
+   ],
+   "exceptions_checked": [
+    "a consumer of this message: none (branch untested; code owed via [13])",
+    "the path, the exception type name, and (for [24]/[25]) the strerror are retained",
+    "ceiling: when e.strerror is None the mutant prints 'None' where the original prints the exception repr -- a worse but still non-fatal diagnostic; no consumer reads it"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 28,
+   "mutant": "L822 string ': an evidence file cannot be read (' emptied",
+   "class": "AUDITED",
+   "group": "EVIDENCE-FILE-UNREADABLE-PROSE: prose/punctuation of the L822-823 EVIDENCE_UNREADABLE refusal (an evidence file unreadable during the fresh recompute); the code (owed via [19]), {run_dir}, {type(e).__name__} and {e.filename} are retained; the branch is reached by no test",
+   "grounds": "Message becomes f'{run_dir}{type(e).__name__}): {e.filename}'; run_dir, the exception type and the filename are retained; only the 'an evidence file cannot be read (' label is lost. MEASURED: SURVIVED -- 36 tests OK, exit 0, Ran in 5.397s (kill file unchanged, as at campaign 9).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:898 -- continue_from calls _authentic(run_dir, expect_anchor) before anything is written (L896-905, _write_new at L1058); reached ONLY under `aisef bundle continue --expect-anchor` (main L1055-1061; docs/v2/V2.1-BACKLOG.md V21-54 states `_authentic` is called only with --expect-anchor)",
+    "aisef2/app/bundle_cli.py:1078-1079 -- main catches B.BundleError and prints `refused: {e}` to stderr, returns 2; JournalRefused.__init__ (L137-140) sets str(self)=f'{code}: {message}' and self.code=code, so the operator's line is `refused: {code}: {message}` (module docstring L25-39: each failure told apart by JournalRefused.code 'in the text of refused:', with a per-code operator action)",
+    ".code / refusal-text readers: `git grep '\\.code'` over aisef2/ aisef/ validation/ finds NO product reader of a JournalRefused.code (bundle_cli.py:30 is the docstring; story_runner/merge .code are FailureCode; preflight/server_identity .code are urllib HTTP codes); the code value is read only by the operator via the CLI line and by the kill file (test_v21_pw_lineage_continue.py:393,403 err.code=='EVIDENCE_MISMATCH'; :418 'EVIDENCE_MISMATCH' in stderr; :178,186,199,259 err.code=='EVIDENCE_UNREADABLE'; :463 regex '^refused: EVIDENCE_UNREADABLE: '; :388 'EVIDENCE_MISSING')",
+    "twin producer aisef2/app/verify.py:121,132,134 (the `aisef run --verify` path) emits the same three sentences and is separately pinned -- tests/v2/test_v21_kills3_T22b.py:107-112 (corrupt manifest named), :133 (wrong anchor), :142,:154-155 (forged), and docs/v2.1/decisions/B03-R3-E2E.md:106 S4 ('wrong anchor REFUTED ... the file named'); none of those tests call continue_from/_authentic (they call verify(...)), so _authentic's own branches are reached by no test but the kill file above"
+   ],
+   "exceptions_checked": [
+    "a consumer of this message: none (branch untested; code owed via [19])",
+    "run_dir, the exception type and e.filename are retained"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 29,
+   "mutant": "L822 string '): ' emptied",
+   "class": "AUDITED",
+   "group": "EVIDENCE-FILE-UNREADABLE-PROSE: prose/punctuation of the L822-823 EVIDENCE_UNREADABLE refusal (an evidence file unreadable during the fresh recompute); the code (owed via [19]), {run_dir}, {type(e).__name__} and {e.filename} are retained; the branch is reached by no test",
+   "grounds": "Message becomes f'{run_dir}: an evidence file cannot be read ({type(e).__name__}{e.filename}'; only the '): ' between the exception type and the filename is lost; both are retained. MEASURED: SURVIVED -- 36 tests OK, exit 0, Ran in 5.119s (kill file unchanged, as at campaign 9).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:898 -- continue_from calls _authentic(run_dir, expect_anchor) before anything is written (L896-905, _write_new at L1058); reached ONLY under `aisef bundle continue --expect-anchor` (main L1055-1061; docs/v2/V2.1-BACKLOG.md V21-54 states `_authentic` is called only with --expect-anchor)",
+    "aisef2/app/bundle_cli.py:1078-1079 -- main catches B.BundleError and prints `refused: {e}` to stderr, returns 2; JournalRefused.__init__ (L137-140) sets str(self)=f'{code}: {message}' and self.code=code, so the operator's line is `refused: {code}: {message}` (module docstring L25-39: each failure told apart by JournalRefused.code 'in the text of refused:', with a per-code operator action)",
+    ".code / refusal-text readers: `git grep '\\.code'` over aisef2/ aisef/ validation/ finds NO product reader of a JournalRefused.code (bundle_cli.py:30 is the docstring; story_runner/merge .code are FailureCode; preflight/server_identity .code are urllib HTTP codes); the code value is read only by the operator via the CLI line and by the kill file (test_v21_pw_lineage_continue.py:393,403 err.code=='EVIDENCE_MISMATCH'; :418 'EVIDENCE_MISMATCH' in stderr; :178,186,199,259 err.code=='EVIDENCE_UNREADABLE'; :463 regex '^refused: EVIDENCE_UNREADABLE: '; :388 'EVIDENCE_MISSING')",
+    "twin producer aisef2/app/verify.py:121,132,134 (the `aisef run --verify` path) emits the same three sentences and is separately pinned -- tests/v2/test_v21_kills3_T22b.py:107-112 (corrupt manifest named), :133 (wrong anchor), :142,:154-155 (forged), and docs/v2.1/decisions/B03-R3-E2E.md:106 S4 ('wrong anchor REFUTED ... the file named'); none of those tests call continue_from/_authentic (they call verify(...)), so _authentic's own branches are reached by no test but the kill file above"
+   ],
+   "exceptions_checked": [
+    "a consumer of this message: none (branch untested; code owed via [19])",
+    "run_dir, the exception type and e.filename are retained"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 27,
+   "mutant": "L811 string 'files' emptied",
+   "class": "AUDITED",
+   "group": "GUARD-KEY: the L811 shape guard reads key '' instead of 'files'; the code EVIDENCE_MISMATCH is preserved in every reachable case",
+   "grounds": "`not isinstance(stored.get('files',{}),dict)` -> `stored.get('',{})`. For a valid manifest (files a dict) and for a dict with no 'files' key, both read {} -> no change. For stored not a dict, L811's first operand short-circuits -> no change (demonstrated: empty EVIDENCE.json -> EVIDENCE_MISMATCH both). The ONLY differing input is a dict whose 'files' is a non-dict (and has no '' key): the original raises at L812 ('is not an evidence manifest'); the mutant skips the guard and raises at L816 ('the evidence anchor is X, not Y') -- same code EVIDENCE_MISMATCH, different message (demonstrated: `{\"files\":5}` -> EVIDENCE_MISMATCH under both). No test exercises a dict-with-non-dict-'files' manifest via continue_from. MEASURED: SURVIVED -- 36 tests OK, exit 0, Ran in 5.977s (kill file unchanged, as at campaign 9).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:898 -- continue_from calls _authentic(run_dir, expect_anchor) before anything is written (L896-905, _write_new at L1058); reached ONLY under `aisef bundle continue --expect-anchor` (main L1055-1061; docs/v2/V2.1-BACKLOG.md V21-54 states `_authentic` is called only with --expect-anchor)",
+    "aisef2/app/bundle_cli.py:1078-1079 -- main catches B.BundleError and prints `refused: {e}` to stderr, returns 2; JournalRefused.__init__ (L137-140) sets str(self)=f'{code}: {message}' and self.code=code, so the operator's line is `refused: {code}: {message}` (module docstring L25-39: each failure told apart by JournalRefused.code 'in the text of refused:', with a per-code operator action)",
+    ".code / refusal-text readers: `git grep '\\.code'` over aisef2/ aisef/ validation/ finds NO product reader of a JournalRefused.code (bundle_cli.py:30 is the docstring; story_runner/merge .code are FailureCode; preflight/server_identity .code are urllib HTTP codes); the code value is read only by the operator via the CLI line and by the kill file (test_v21_pw_lineage_continue.py:393,403 err.code=='EVIDENCE_MISMATCH'; :418 'EVIDENCE_MISMATCH' in stderr; :178,186,199,259 err.code=='EVIDENCE_UNREADABLE'; :463 regex '^refused: EVIDENCE_UNREADABLE: '; :388 'EVIDENCE_MISSING')",
+    "twin producer aisef2/app/verify.py:121,132,134 (the `aisef run --verify` path) emits the same three sentences and is separately pinned -- tests/v2/test_v21_kills3_T22b.py:107-112 (corrupt manifest named), :133 (wrong anchor), :142,:154-155 (forged), and docs/v2.1/decisions/B03-R3-E2E.md:106 S4 ('wrong anchor REFUTED ... the file named'); none of those tests call continue_from/_authentic (they call verify(...)), so _authentic's own branches are reached by no test but the kill file above"
+   ],
+   "exceptions_checked": [
+    "a non-test code reader of the refusal text or of JournalRefused.code: none (grep above)",
+    "exit status / written bundle: _authentic raises before _write_new, so a mutant that still raises a BundleError keeps exit 2 and writes nothing",
+    "the mutant failing to authenticate / accepting a bad run: no -- anchor_of({'files':5}) (run.py:445-447) is the 64-hex of the canonical JSON, which cannot equal the operator's expect; a coincidental match would defer to the L824 stored!=fresh compare; in no reachable case does authentication pass",
+    "which EVIDENCE_MISMATCH message is produced is read by no test or document"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_authentic",
+   "index": 9,
+   "mutant": "L825 sorted() -> list()",
+   "class": "AUDITED",
+   "group": "CHANGED-LIST-ORDER: sorted()->list() changes only the ORDER (and, with >5 changed, which 5 are shown) of the {changed[:5]} diagnostic; the SET of changed files is identical",
+   "grounds": "`changed = sorted(...)` -> `list(...)` over the same generator: the same keys, in set-iteration (hash) order instead of sorted; {changed[:5]} in the L827 message may list the same files in a different order, or a different 5 of N when more than five changed. The code EVIDENCE_MISMATCH, the sentence and the set of named files are unchanged. No consumer reads the list (test_evidence_changed L403 asserts only err.code). MEASURED: SURVIVED -- 36 tests OK, exit 0, Ran in 4.997s (kill file unchanged, as at campaign 9).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:898 -- continue_from calls _authentic(run_dir, expect_anchor) before anything is written (L896-905, _write_new at L1058); reached ONLY under `aisef bundle continue --expect-anchor` (main L1055-1061; docs/v2/V2.1-BACKLOG.md V21-54 states `_authentic` is called only with --expect-anchor)",
+    "aisef2/app/bundle_cli.py:1078-1079 -- main catches B.BundleError and prints `refused: {e}` to stderr, returns 2; JournalRefused.__init__ (L137-140) sets str(self)=f'{code}: {message}' and self.code=code, so the operator's line is `refused: {code}: {message}` (module docstring L25-39: each failure told apart by JournalRefused.code 'in the text of refused:', with a per-code operator action)",
+    ".code / refusal-text readers: `git grep '\\.code'` over aisef2/ aisef/ validation/ finds NO product reader of a JournalRefused.code (bundle_cli.py:30 is the docstring; story_runner/merge .code are FailureCode; preflight/server_identity .code are urllib HTTP codes); the code value is read only by the operator via the CLI line and by the kill file (test_v21_pw_lineage_continue.py:393,403 err.code=='EVIDENCE_MISMATCH'; :418 'EVIDENCE_MISMATCH' in stderr; :178,186,199,259 err.code=='EVIDENCE_UNREADABLE'; :463 regex '^refused: EVIDENCE_UNREADABLE: '; :388 'EVIDENCE_MISSING')",
+    "twin producer aisef2/app/verify.py:121,132,134 (the `aisef run --verify` path) emits the same three sentences and is separately pinned -- tests/v2/test_v21_kills3_T22b.py:107-112 (corrupt manifest named), :133 (wrong anchor), :142,:154-155 (forged), and docs/v2.1/decisions/B03-R3-E2E.md:106 S4 ('wrong anchor REFUTED ... the file named'); none of those tests call continue_from/_authentic (they call verify(...)), so _authentic's own branches are reached by no test but the kill file above"
+   ],
+   "exceptions_checked": [
+    "a test/doc pinning the order or the first-5 of _authentic's changed list: none",
+    "verify.py:132's twin list (pinned by the E2E, 'the file named') does not pin order either",
+    "this is order-only: the owed T-CHANGED-LIST ([30]/[35]/[37]) asserts set membership and does not kill this mutant"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8"
+  }
+ ],
+ "owed_tests": [
+  "T-CODE-MISMATCH (test_v21_pw_lineage_continue.TheOperatorAsksForAnAnchor): a corrupt/non-object EVIDENCE.json (b'' and {\"files\":5}) under --expect-anchor must refuse EVIDENCE_MISMATCH (not '' and not an AttributeError traceback). Kills [10] and [3].",
+  "T-CODE-UNREAD-MANIFEST (@POSIX_USER): EVIDENCE.json present but chmod-000 under --expect-anchor must refuse EVIDENCE_UNREADABLE. Kills [13].",
+  "T-CODE-UNREAD-EVIDENCE (@POSIX_USER): a matching stored anchor but one evidence file chmod-000 during the recompute must refuse EVIDENCE_UNREADABLE and name the file. Kills [19].",
+  "T-CHANGED-LIST: with a matching anchor, (a) tamper one evidence file and assert the refusal names it and not an untouched file; (b) delete one manifest file and assert the refusal names it. Kills [30]/[35]/[37]; does not kill [9] (order-only)."
+ ],
+ "summary": {
+  "new_survivors": 25,
+  "REFUTED": 7,
+  "AUDITED": 18,
+  "EQUIVALENT": 0,
+  "refuted_indexes": [
+   3,
+   10,
+   13,
+   19,
+   30,
+   35,
+   37
+  ],
+  "measurement": "25/25 SURVIVED the sole registered kill file (36 tests OK, exit 0 each); no REFUTED-by-measurement; the campaign's SURVIVED stands."
+ }
+}

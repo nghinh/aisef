@@ -1,0 +1,777 @@
+{
+ "batch": "W2-bundle_cli-3",
+ "file": "aisef2/app/bundle_cli.py",
+ "targets": [
+  "aisef2/app/bundle_cli.py::main"
+ ],
+ "new": [
+  {
+   "target": "aisef2/app/bundle_cli.py::main",
+   "index": 67,
+   "mutant": "L1010 string 'an earlier bundle whose still-binding approvals stay, those of a contract a declared capability change evaluates differently excepted (named in the report)' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::main",
+   "index": 84,
+   "mutant": "L1026 string 'SHA256' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::main",
+   "index": 85,
+   "mutant": "L1027 string 'the evidence anchor the run printed, kept outside the run directory: refused when the run cannot show it (without it a continuation proves consistency, not authenticity)' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::main",
+   "index": 86,
+   "mutant": "L1029 string \"re-bind an earlier release's bundle to this release's spec ids; the approvals of a contract a declared capability change evaluates differently are withheld\" emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::main",
+   "index": 131,
+   "mutant": "L1056 string '--expect-anchor is the 64-hex evidence anchor the run printed' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::main",
+   "index": 141,
+   "mutant": "L1077 string 'file_sha256' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::main",
+   "index": 162,
+   "mutant": "L1077 string 'candidate' emptied"
+  }
+ ],
+ "carried": [
+  {
+   "target": "aisef2/app/bundle_cli.py::main",
+   "index": 57,
+   "mutant": "L1001 string \"The project bundle's own tools (no run, no provider).\" emptied",
+   "class": "AUDITED",
+   "group": "argparse help/description text, printed only by `aisef bundle [SUB] --help`. I executed each mutant (module source from validation.v2.mutation.mutants, exec'd) and ran `--help` of the top parser and of every subparser, plus an invalid --example and an empty argv, against the unmutated module: exit codes and stderr are identical and exactly one line of one --help stdout differs (the described item is listed without its description). No program parses it; the reader is the operator at the terminal. The codebase does not promise completeness of option documentation either (seal's `authoring`, `--out`, approve's `--contract`, continue's `--from-run` have no help at all), so there is no 'every option is documented' contract to test; a per-string test would be the verbatim-text test the round excludes.",
+   "grounds": "description= of the top parser: the first line of `aisef bundle --help`; nothing reads it.",
+   "consumers_checked": [
+    "git grep of the exact string over the whole tree incl. closure-evidence: only bundle_cli.py itself and the campaign's own 'unaudited survivor' lines in closure-evidence/v2/v2.1/campaign-2/results/check.out",
+    "every --help in tests/: tests/test_cli.py:95 (V1 build_parser, the V1 `bundle` verb has its own help at aisef/cli/parser.py:189) and tests/v2/test_v21_kills_cli.py (a verbatim pin of `aisef run --help` only; none exists for `aisef bundle`)",
+    "docs/v2.1/research/TRACEABILITY.json 'contains' checks on bundle_cli.py: only `def _create(`, `--leave-out-unidentified`, `sub.add_parser(\"continue\"`, `sub.add_parser(\"migrate\"` - source-text checks on the name part, which a `help=` change does not touch",
+    "aisef/cli/parser.py:188 is a comment restating the phrase and :424-426 dispatches `bundle` argv straight to bundle_cli.main (V1's parser is not even built), so `aisef --help` never shows this string",
+    "bundle_cli.py:1 docstring and docs/v2.1/USAGE-2.1.md:3-4 state 'no provider' in their own words"
+   ],
+   "exceptions_checked": [
+    "an operator treating 'no run, no provider' as a spend assurance: it is a property of what the commands call (none reaches a provider), not of this label; the assurance is repeated in the docstring and USAGE-2.1.md:3-4"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "remapped_from": {
+    "index": 55,
+    "mutant": "L515 string \"The project bundle's own tools (no run, no provider).\" emptied",
+    "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 55,
+     "mutant": "L477 string \"The project bundle's own tools (no run, no provider).\" emptied",
+     "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+    },
+    "chain": [
+     {
+      "index": 55,
+      "mutant": "L477 string \"The project bundle's own tools (no run, no provider).\" emptied",
+      "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+     },
+     {
+      "index": 55,
+      "mutant": "L515 string \"The project bundle's own tools (no run, no provider).\" emptied",
+      "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::main",
+   "index": 60,
+   "mutant": "L1003 string \"write an example (authoring document + its repository's files) to start from\" emptied",
+   "class": "AUDITED",
+   "group": "argparse help/description text, printed only by `aisef bundle [SUB] --help`. I executed each mutant (module source from validation.v2.mutation.mutants, exec'd) and ran `--help` of the top parser and of every subparser, plus an invalid --example and an empty argv, against the unmutated module: exit codes and stderr are identical and exactly one line of one --help stdout differs (the described item is listed without its description). No program parses it; the reader is the operator at the terminal. The codebase does not promise completeness of option documentation either (seal's `authoring`, `--out`, approve's `--contract`, continue's `--from-run` have no help at all), so there is no 'every option is documented' contract to test; a per-string test would be the verbatim-text test the round excludes.",
+   "grounds": "help of the init subcommand: one line of `aisef bundle --help`; the behaviour is asserted through its effects.",
+   "consumers_checked": [
+    "git grep of the exact string over the whole tree incl. closure-evidence: only bundle_cli.py itself and the campaign's own 'unaudited survivor' lines in closure-evidence/v2/v2.1/campaign-2/results/check.out",
+    "every --help in tests/: tests/test_cli.py:95 (V1 build_parser, the V1 `bundle` verb has its own help at aisef/cli/parser.py:189) and tests/v2/test_v21_kills_cli.py (a verbatim pin of `aisef run --help` only; none exists for `aisef bundle`)",
+    "docs/v2.1/research/TRACEABILITY.json 'contains' checks on bundle_cli.py: only `def _create(`, `--leave-out-unidentified`, `sub.add_parser(\"continue\"`, `sub.add_parser(\"migrate\"` - source-text checks on the name part, which a `help=` change does not touch",
+    "init() writes authoring.json and repo/ (bundle_cli.py:363-366); tests/v2/test_v21_bundle_tools.py Outsider.test_each_example_from_init_to_a_ready_check seals and lints exactly what init wrote; tests/v2/test_v21_kills_bundle_cli.py Init asserts authoring.json is a file and repo/ holds .py files",
+    "aisef2/app/examples/*.json `readme`, printed by init as `next` (L507): the operator's actual next steps"
+   ],
+   "exceptions_checked": [
+    "a help that promises both authoring document and repository files while init wrote one: init() writes both and the two tests fail if either is missing"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "remapped_from": {
+    "index": 58,
+    "mutant": "L517 string \"write an example (authoring document + its repository's files) to start from\" emptied",
+    "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 58,
+     "mutant": "L479 string \"write an example (authoring document + its repository's files) to start from\" emptied",
+     "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+    },
+    "chain": [
+     {
+      "index": 58,
+      "mutant": "L479 string \"write an example (authoring document + its repository's files) to start from\" emptied",
+      "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+     },
+     {
+      "index": 58,
+      "mutant": "L517 string \"write an example (authoring document + its repository's files) to start from\" emptied",
+      "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::main",
+   "index": 62,
+   "mutant": "L1004 sorted() -> list()",
+   "class": "AUDITED",
+   "group": "display-order of two names; no reader; see grounds",
+   "grounds": "choices of --example listed in directory-listing order instead of sorted order: the accepted set is identical; only the order of the two names in the usage metavar and in argparse's invalid-choice text can differ.",
+   "consumers_checked": [
+    "argparse validates `value in choices`: same set under sorted() and list(); order reaches only the `{a,b}` metavar and the 'invalid choice (choose from ...)' text",
+    "aisef2/app/examples/ holds exactly calc-1-story.json and calc-3-stories.json (pyproject.toml:54 package data); docs/v2.1/USAGE-2.1.md:9 and the examples' readme write the names out",
+    "tests: no test or script compares the listing or pins `aisef bundle init --help` (the one help pin in the repo is for `aisef run`, tests/v2/test_v21_kills_cli.py)"
+   ],
+   "exceptions_checked": [
+    "EQUIVALENT is not provable: Path.glob follows the filesystem's listing order. On this machine (APFS) the battery shows no difference at all (measured), so the text differs only on a filesystem that lists calc-3-stories first",
+    "a future verbatim pin of `aisef bundle init --help`: would be filesystem-dependent without sorted(); none exists and an order-only test needs a stub EXAMPLES, not written (no reader of the order)"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "remapped_from": {
+    "index": 60,
+    "mutant": "L518 sorted() -> list()",
+    "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 60,
+     "mutant": "L480 sorted() -> list()",
+     "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+    },
+    "chain": [
+     {
+      "index": 60,
+      "mutant": "L480 sorted() -> list()",
+      "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+     },
+     {
+      "index": 60,
+      "mutant": "L518 sorted() -> list()",
+      "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::main",
+   "index": 64,
+   "mutant": "L1005 string 'a new directory' emptied",
+   "class": "AUDITED",
+   "group": "argparse help/description text, printed only by `aisef bundle [SUB] --help`. I executed each mutant (module source from validation.v2.mutation.mutants, exec'd) and ran `--help` of the top parser and of every subparser, plus an invalid --example and an empty argv, against the unmutated module: exit codes and stderr are identical and exactly one line of one --help stdout differs (the described item is listed without its description). No program parses it; the reader is the operator at the terminal. The codebase does not promise completeness of option documentation either (seal's `authoring`, `--out`, approve's `--contract`, continue's `--from-run` have no help at all), so there is no 'every option is documented' contract to test; a per-string test would be the verbatim-text test the round excludes.",
+   "grounds": "help of init --out; documents a rule init() enforces itself.",
+   "consumers_checked": [
+    "git grep of the exact string over the whole tree incl. closure-evidence: only bundle_cli.py itself and the campaign's own 'unaudited survivor' lines in closure-evidence/v2/v2.1/campaign-2/results/check.out",
+    "every --help in tests/: tests/test_cli.py:95 (V1 build_parser, the V1 `bundle` verb has its own help at aisef/cli/parser.py:189) and tests/v2/test_v21_kills_cli.py (a verbatim pin of `aisef run --help` only; none exists for `aisef bundle`)",
+    "docs/v2.1/research/TRACEABILITY.json 'contains' checks on bundle_cli.py: only `def _create(`, `--leave-out-unidentified`, `sub.add_parser(\"continue\"`, `sub.add_parser(\"migrate\"` - source-text checks on the name part, which a `help=` change does not touch",
+    "bundle_cli.py:359-362 init() refuses an existing directory ('exists: init writes a new directory and never into one'); asserted by tests/v2/test_v21_kills_bundle_cli.py Init.test_init_makes_a_nested_new_directory_and_refuses_an_existing_one_saying_why and tests/v2/test_v21_bundle_tools.py Refusals.test_no_tool_overwrites_a_file"
+   ],
+   "exceptions_checked": [
+    "removing the help changes no refusal: the rule is init()'s and the line an operator who names an existing directory sees is the exception message, asserted"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "remapped_from": {
+    "index": 62,
+    "mutant": "L519 string 'a new directory' emptied",
+    "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 62,
+     "mutant": "L481 string 'a new directory' emptied",
+     "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+    },
+    "chain": [
+     {
+      "index": 62,
+      "mutant": "L481 string 'a new directory' emptied",
+      "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+     },
+     {
+      "index": 62,
+      "mutant": "L519 string 'a new directory' emptied",
+      "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::main",
+   "index": 65,
+   "mutant": "L1006 string 'derive every hash and spec id: the bundle, unapproved' emptied",
+   "class": "AUDITED",
+   "group": "argparse help/description text, printed only by `aisef bundle [SUB] --help`. I executed each mutant (module source from validation.v2.mutation.mutants, exec'd) and ran `--help` of the top parser and of every subparser, plus an invalid --example and an empty argv, against the unmutated module: exit codes and stderr are identical and exactly one line of one --help stdout differs (the described item is listed without its description). No program parses it; the reader is the operator at the terminal. The codebase does not promise completeness of option documentation either (seal's `authoring`, `--out`, approve's `--contract`, continue's `--from-run` have no help at all), so there is no 'every option is documented' contract to test; a per-string test would be the verbatim-text test the round excludes.",
+   "grounds": "help of the seal subcommand; 'unapproved' is a fact asserted through effects.",
+   "consumers_checked": [
+    "git grep of the exact string over the whole tree incl. closure-evidence: only bundle_cli.py itself and the campaign's own 'unaudited survivor' lines in closure-evidence/v2/v2.1/campaign-2/results/check.out",
+    "every --help in tests/: tests/test_cli.py:95 (V1 build_parser, the V1 `bundle` verb has its own help at aisef/cli/parser.py:189) and tests/v2/test_v21_kills_cli.py (a verbatim pin of `aisef run --help` only; none exists for `aisef bundle`)",
+    "docs/v2.1/research/TRACEABILITY.json 'contains' checks on bundle_cli.py: only `def _create(`, `--leave-out-unidentified`, `sub.add_parser(\"continue\"`, `sub.add_parser(\"migrate\"` - source-text checks on the name part, which a `help=` change does not touch",
+    "tests/v2/test_v21_bundle_tools.py Outsider.test_each_example_from_init_to_a_ready_check: right after seal to_approve lists every contract and lint is NOT_READY; Outsider.test_seal_derives_what_the_kernel_compiles",
+    "bundle_cli.py:226-240 seal keeps only the approvals it is given (approvals=() unless --keep-approvals-from)"
+   ],
+   "exceptions_checked": [
+    "'unapproved' being false, i.e. seal approving something: no path in seal() creates a ContractApproval, and the Outsider test asserts to_approve == every contract"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "remapped_from": {
+    "index": 63,
+    "mutant": "L520 string 'derive every hash and spec id: the bundle, unapproved' emptied",
+    "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 63,
+     "mutant": "L482 string 'derive every hash and spec id: the bundle, unapproved' emptied",
+     "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+    },
+    "chain": [
+     {
+      "index": 63,
+      "mutant": "L482 string 'derive every hash and spec id: the bundle, unapproved' emptied",
+      "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+     },
+     {
+      "index": 63,
+      "mutant": "L520 string 'derive every hash and spec id: the bundle, unapproved' emptied",
+      "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::main",
+   "index": 66,
+   "mutant": "L1008 string \"the project's repository: HEAD and the requirements document\" emptied",
+   "class": "AUDITED",
+   "group": "argparse help/description text, printed only by `aisef bundle [SUB] --help`. I executed each mutant (module source from validation.v2.mutation.mutants, exec'd) and ran `--help` of the top parser and of every subparser, plus an invalid --example and an empty argv, against the unmutated module: exit codes and stderr are identical and exactly one line of one --help stdout differs (the described item is listed without its description). No program parses it; the reader is the operator at the terminal. The codebase does not promise completeness of option documentation either (seal's `authoring`, `--out`, approve's `--contract`, continue's `--from-run` have no help at all), so there is no 'every option is documented' contract to test; a per-string test would be the verbatim-text test the round excludes.",
+   "grounds": "help of seal --repo; the operator who omits or misuses --repo gets a refusal that names the thing.",
+   "consumers_checked": [
+    "git grep of the exact string over the whole tree incl. closure-evidence: only bundle_cli.py itself and the campaign's own 'unaudited survivor' lines in closure-evidence/v2/v2.1/campaign-2/results/check.out",
+    "every --help in tests/: tests/test_cli.py:95 (V1 build_parser, the V1 `bundle` verb has its own help at aisef/cli/parser.py:189) and tests/v2/test_v21_kills_cli.py (a verbatim pin of `aisef run --help` only; none exists for `aisef bundle`)",
+    "docs/v2.1/research/TRACEABILITY.json 'contains' checks on bundle_cli.py: only `def _create(`, `--leave-out-unidentified`, `sub.add_parser(\"continue\"`, `sub.add_parser(\"migrate\"` - source-text checks on the name part, which a `help=` change does not touch",
+    "bundle_cli.py:170 '$.baseline: HEAD is resolved in --repo, and none was given' (asserted by Refusals.test_without_a_repository_head_cannot_be_resolved); :182 '$.requirements_document.path: ... is not in {repo} at ...' for the second job of --repo",
+    "docs/v2.1/USAGE-2.1.md:24 (seal ... --repo calc/repo)"
+   ],
+   "exceptions_checked": [
+    "--repo's second job (the requirements document's sha256 at the baseline, L179-183) has its own refusal naming path and repo: the help is not the carrier of either"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "remapped_from": {
+    "index": 64,
+    "mutant": "L522 string \"the project's repository: HEAD and the requirements document\" emptied",
+    "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 64,
+     "mutant": "L484 string \"the project's repository: HEAD and the requirements document\" emptied",
+     "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+    },
+    "chain": [
+     {
+      "index": 64,
+      "mutant": "L484 string \"the project's repository: HEAD and the requirements document\" emptied",
+      "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+     },
+     {
+      "index": 64,
+      "mutant": "L522 string \"the project's repository: HEAD and the requirements document\" emptied",
+      "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::main",
+   "index": 69,
+   "mutant": "L1013 string 'approve one contract as a named human' emptied",
+   "class": "AUDITED",
+   "group": "argparse help/description text, printed only by `aisef bundle [SUB] --help`. I executed each mutant (module source from validation.v2.mutation.mutants, exec'd) and ran `--help` of the top parser and of every subparser, plus an invalid --example and an empty argv, against the unmutated module: exit codes and stderr are identical and exactly one line of one --help stdout differs (the described item is listed without its description). No program parses it; the reader is the operator at the terminal. The codebase does not promise completeness of option documentation either (seal's `authoring`, `--out`, approve's `--contract`, continue's `--from-run` have no help at all), so there is no 'every option is documented' contract to test; a per-string test would be the verbatim-text test the round excludes.",
+   "grounds": "help of the approve subcommand; 'one contract' and 'named human' are enforced and asserted elsewhere.",
+   "consumers_checked": [
+    "git grep of the exact string over the whole tree incl. closure-evidence: only bundle_cli.py itself and the campaign's own 'unaudited survivor' lines in closure-evidence/v2/v2.1/campaign-2/results/check.out",
+    "every --help in tests/: tests/test_cli.py:95 (V1 build_parser, the V1 `bundle` verb has its own help at aisef/cli/parser.py:189) and tests/v2/test_v21_kills_cli.py (a verbatim pin of `aisef run --help` only; none exists for `aisef bundle`)",
+    "docs/v2.1/research/TRACEABILITY.json 'contains' checks on bundle_cli.py: only `def _create(`, `--leave-out-unidentified`, `sub.add_parser(\"continue\"`, `sub.add_parser(\"migrate\"` - source-text checks on the name part, which a `help=` change does not touch",
+    "--contract is required=True (L489) and approve() approves exactly that contract's cited requirements (L257-275); aisef2/product/approval.py:61-65 refuses a non-human approver; tests/v2/test_v21_bundle_tools.py Refusals.test_an_approver_that_is_not_a_human_identity_is_refused (exit 2, 'human' in the refusal, no output file)",
+    "docs/v2.1/USAGE-2.1.md:30-32"
+   ],
+   "exceptions_checked": [
+    "'one contract' as a rule the help states and the code could break: it is the required --contract; its required=False mutant is [68], another batch"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "remapped_from": {
+    "index": 67,
+    "mutant": "L525 string 'approve one contract as a named human' emptied",
+    "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 67,
+     "mutant": "L487 string 'approve one contract as a named human' emptied",
+     "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+    },
+    "chain": [
+     {
+      "index": 67,
+      "mutant": "L487 string 'approve one contract as a named human' emptied",
+      "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+     },
+     {
+      "index": 67,
+      "mutant": "L525 string 'approve one contract as a named human' emptied",
+      "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::main",
+   "index": 72,
+   "mutant": "L1016 string 'human:<name> \u2014 the person approving' emptied",
+   "class": "AUDITED",
+   "group": "argparse help/description text, printed only by `aisef bundle [SUB] --help`. I executed each mutant (module source from validation.v2.mutation.mutants, exec'd) and ran `--help` of the top parser and of every subparser, plus an invalid --example and an empty argv, against the unmutated module: exit codes and stderr are identical and exactly one line of one --help stdout differs (the described item is listed without its description). No program parses it; the reader is the operator at the terminal. The codebase does not promise completeness of option documentation either (seal's `authoring`, `--out`, approve's `--contract`, continue's `--from-run` have no help at all), so there is no 'every option is documented' contract to test; a per-string test would be the verbatim-text test the round excludes.",
+   "grounds": "help of approve --approver: advance notice of the human:<name> form; the form is enforced by the kernel and named in its refusal.",
+   "consumers_checked": [
+    "git grep of the exact string over the whole tree incl. closure-evidence: only bundle_cli.py itself and the campaign's own 'unaudited survivor' lines in closure-evidence/v2/v2.1/campaign-2/results/check.out",
+    "every --help in tests/: tests/test_cli.py:95 (V1 build_parser, the V1 `bundle` verb has its own help at aisef/cli/parser.py:189) and tests/v2/test_v21_kills_cli.py (a verbatim pin of `aisef run --help` only; none exists for `aisef bundle`)",
+    "docs/v2.1/research/TRACEABILITY.json 'contains' checks on bundle_cli.py: only `def _create(`, `--leave-out-unidentified`, `sub.add_parser(\"continue\"`, `sub.add_parser(\"migrate\"` - source-text checks on the name part, which a `help=` change does not touch",
+    "aisef2/product/approval.py:61-63: the ContractError an operator typing agent:dev sees reads 'approval authority belongs to a human identity (human:<name>), not ...'; approve() turns it into a BundleError (L270-274) and main prints it; asserted by Refusals.test_an_approver_that_is_not_a_human_identity_is_refused",
+    "docs/v2.1/USAGE-2.1.md:30-32 and aisef2/app/examples/calc-1-story.json readme (a full command with human:<you>, printed by init as `next`)"
+   ],
+   "exceptions_checked": [
+    "help is the only place the form is shown before the operator types it: but USAGE and the readme init prints both show a full command with the form, and the refusal names it with the same spelling; who may approve is the kernel's decision and is not in this string"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "remapped_from": {
+    "index": 70,
+    "mutant": "L528 string 'human:<name> \u2014 the person approving' emptied",
+    "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 70,
+     "mutant": "L490 string 'human:<name> \u2014 the person approving' emptied",
+     "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+    },
+    "chain": [
+     {
+      "index": 70,
+      "mutant": "L490 string 'human:<name> \u2014 the person approving' emptied",
+      "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+     },
+     {
+      "index": 70,
+      "mutant": "L528 string 'human:<name> \u2014 the person approving' emptied",
+      "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::main",
+   "index": 75,
+   "mutant": "L1018 string 'approvals, admission, calibration, clause coverage' emptied",
+   "class": "AUDITED",
+   "group": "argparse help/description text, printed only by `aisef bundle [SUB] --help`. I executed each mutant (module source from validation.v2.mutation.mutants, exec'd) and ran `--help` of the top parser and of every subparser, plus an invalid --example and an empty argv, against the unmutated module: exit codes and stderr are identical and exactly one line of one --help stdout differs (the described item is listed without its description). No program parses it; the reader is the operator at the terminal. The codebase does not promise completeness of option documentation either (seal's `authoring`, `--out`, approve's `--contract`, continue's `--from-run` have no help at all), so there is no 'every option is documented' contract to test; a per-string test would be the verbatim-text test the round excludes.",
+   "grounds": "help of lint: a list of what lint checks; each item is carried by lint()'s report fields or by READY itself.",
+   "consumers_checked": [
+    "git grep of the exact string over the whole tree incl. closure-evidence: only bundle_cli.py itself and the campaign's own 'unaudited survivor' lines in closure-evidence/v2/v2.1/campaign-2/results/check.out",
+    "every --help in tests/: tests/test_cli.py:95 (V1 build_parser, the V1 `bundle` verb has its own help at aisef/cli/parser.py:189) and tests/v2/test_v21_kills_cli.py (a verbatim pin of `aisef run --help` only; none exists for `aisef bundle`)",
+    "docs/v2.1/research/TRACEABILITY.json 'contains' checks on bundle_cli.py: only `def _create(`, `--leave-out-unidentified`, `sub.add_parser(\"continue\"`, `sub.add_parser(\"migrate\"` - source-text checks on the name part, which a `help=` change does not touch",
+    "tests/v2/test_v21_bundle_tools.py Outsider (verdict, admission.admitted, coverage statuses) and Refusals.test_an_uncovered_requirement_is_named_where_admission_refuses_it",
+    "docs/v2.1/USAGE-2.1.md:34-36 lists the same checks; bundle_cli.py:7 docstring"
+   ],
+   "exceptions_checked": [
+    "each word of the help as a promise: approvals, admission and coverage are asserted by the tests above; the `criteria_without_calibration` and `criteria_without_contract` report fields are asserted by NO test (git grep: only the source and committed evidence .out files) - a survivor of target `lint`, not of this label"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "remapped_from": {
+    "index": 73,
+    "mutant": "L530 string 'approvals, admission, calibration, clause coverage' emptied",
+    "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 73,
+     "mutant": "L492 string 'approvals, admission, calibration, clause coverage' emptied",
+     "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+    },
+    "chain": [
+     {
+      "index": 73,
+      "mutant": "L492 string 'approvals, admission, calibration, clause coverage' emptied",
+      "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+     },
+     {
+      "index": 73,
+      "mutant": "L530 string 'approvals, admission, calibration, clause coverage' emptied",
+      "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::main",
+   "index": 77,
+   "mutant": "L1018 string 'each criterion, plainly' emptied",
+   "class": "AUDITED",
+   "group": "argparse help/description text, printed only by `aisef bundle [SUB] --help`. I executed each mutant (module source from validation.v2.mutation.mutants, exec'd) and ran `--help` of the top parser and of every subparser, plus an invalid --example and an empty argv, against the unmutated module: exit codes and stderr are identical and exactly one line of one --help stdout differs (the described item is listed without its description). No program parses it; the reader is the operator at the terminal. The codebase does not promise completeness of option documentation either (seal's `authoring`, `--out`, approve's `--contract`, continue's `--from-run` have no help at all), so there is no 'every option is documented' contract to test; a per-string test would be the verbatim-text test the round excludes.",
+   "grounds": "help of explain; explain is a human-read report whose fields no program parses.",
+   "consumers_checked": [
+    "git grep of the exact string over the whole tree incl. closure-evidence: only bundle_cli.py itself and the campaign's own 'unaudited survivor' lines in closure-evidence/v2/v2.1/campaign-2/results/check.out",
+    "every --help in tests/: tests/test_cli.py:95 (V1 build_parser, the V1 `bundle` verb has its own help at aisef/cli/parser.py:189) and tests/v2/test_v21_kills_cli.py (a verbatim pin of `aisef run --help` only; none exists for `aisef bundle`)",
+    "docs/v2.1/research/TRACEABILITY.json 'contains' checks on bundle_cli.py: only `def _create(`, `--leave-out-unidentified`, `sub.add_parser(\"continue\"`, `sub.add_parser(\"migrate\"` - source-text checks on the name part, which a `help=` change does not touch",
+    "tests/v2/test_v21_bundle_tools.py Tool.tool/Outsider read explain's rows for calibrated/approved only; docs/v2.1/USAGE-2.1.md:26-28; bundle_cli.py:8 docstring"
+   ],
+   "exceptions_checked": [
+    "the help's implied field list as a contract: asserted by no test and parsed by no program; the correctness of the fields is explain()'s own survivors, not this label"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "remapped_from": {
+    "index": 75,
+    "mutant": "L530 string 'each criterion, plainly' emptied",
+    "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 75,
+     "mutant": "L492 string 'each criterion, plainly' emptied",
+     "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+    },
+    "chain": [
+     {
+      "index": 75,
+      "mutant": "L492 string 'each criterion, plainly' emptied",
+      "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+     },
+     {
+      "index": 75,
+      "mutant": "L530 string 'each criterion, plainly' emptied",
+      "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::main",
+   "index": 79,
+   "mutant": "L1020 string 'the stories a run did not commit, from what it did commit' emptied",
+   "class": "AUDITED",
+   "group": "argparse help/description text, printed only by `aisef bundle [SUB] --help`. I executed each mutant (module source from validation.v2.mutation.mutants, exec'd) and ran `--help` of the top parser and of every subparser, plus an invalid --example and an empty argv, against the unmutated module: exit codes and stderr are identical and exactly one line of one --help stdout differs (the described item is listed without its description). No program parses it; the reader is the operator at the terminal. The codebase does not promise completeness of option documentation either (seal's `authoring`, `--out`, approve's `--contract`, continue's `--from-run` have no help at all), so there is no 'every option is documented' contract to test; a per-string test would be the verbatim-text test the round excludes.",
+   "grounds": "Conclusion holds; one statement of the carried consumers is false at the snapshot and one is incomplete. The mutant is bundle_cli.py:532 `sub.add_parser('continue', help='')`. Executed here (module source from validation.v2.mutation exec'd, `--help` of the top parser and of every subparser, an empty argv and an invalid --example, against the unmutated module): exit codes and stderr are identical, and exactly one line of one --help stdout differs: `aisef bundle --help` lists `continue` without 'the stories a run did not commit, from what it did commit'. No program parses it; the reader is the operator at the terminal. The same sentence is in the module docstring (:10), USAGE-2.1.md section 5 and the behaviour is asserted at continue_from. The codebase does not promise completeness of option documentation (seal's `authoring`, `--out`, approve's `--contract`, continue's `--from-run` have no help at all) and the A23 batch ruled the other help strings of the CLIs audited, not tested ('no reader or contract depends on their words', test_v21_kills3_A23.py:3-8). CORRECTION: the carried consumers say 'no test calls main([\"continue\", ...])'. At the snapshot four do - test_v21_kills3_T00a.py:282-320, test_v21_defects_bundlecli.py:108, test_v21_kills3_T01b.py (`self.cli(\"continue\"...)`), test_v21_kills3_T04a.py:393 (a bad bundle) - and test_v21_kills3_A23.py:70-76 runs `bundle_cli.main(['continue', '--help'])` for the exit status; none reads the help text, and the mutant passes all of them. In-process sweep with the mutant bound over the module (not only the kill set): the light modules (bundle_tools, identity, identity_bytes, review, experiment, context_pack, defects_*, kills_bundle_cli, kills3 A00-A24/R03/R04/T00a/T00b/T02a-T04a/T08a/T14a/T15a/T24a, tests/test_v21_bundle_dispatch): 31 modules, 326 tests, 0 failures, 0 errors.",
+   "consumers_checked": [
+    "git grep of the exact string: only bundle_cli.py (:10 docstring, :532) in the product tree; closure-evidence holds the mutation records that quote it",
+    "every --help in tests/: tests/test_cli.py:95 (V1 build_parser; the V1 `bundle` verb has its own help at aisef/cli/parser.py:189), tests/v2/test_v21_kills_cli.py (a verbatim pin of `aisef run --help` only), tests/v2/test_v21_kills3_A23.py:70-76 (exit status of `aisef bundle <sub> --help` for the subcommands `aisef run --parent`'s help names; text not read)",
+    "docs/v2.1/research/TRACEABILITY.json 'contains' checks on bundle_cli.py: `sub.add_parser(\"continue\"` is on the name part and is untouched by a help= change",
+    "tests that call main(['continue', ...]): T00a:282-320, test_v21_defects_bundlecli.py:108, T01b, T04a:393 - JSON-parse the stdout or check the exit status, none the help",
+    "docs/v2.1/USAGE-2.1.md:90-101 (section 5)"
+   ],
+   "exceptions_checked": [
+    "'from what it did commit' (journal truth) as a rule: enforced by continue_from reading the journal's story/commit events (:436) and refusing a run that committed none (:437-438); the help only names it",
+    "parent/option help of `aisef run` that points at `aisef bundle continue` (cli.py `--parent`): pinned by A23 to name the command and the command to exist; that help is not this one"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "remapped_from": {
+    "index": 77,
+    "mutant": "L532 string 'the stories a run did not commit, from what it did commit' emptied",
+    "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 77,
+     "mutant": "L494 string 'the stories a run did not commit, from what it did commit' emptied",
+     "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+    },
+    "chain": [
+     {
+      "index": 77,
+      "mutant": "L494 string 'the stories a run did not commit, from what it did commit' emptied",
+      "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+     },
+     {
+      "index": 77,
+      "mutant": "L532 string 'the stories a run did not commit, from what it did commit' emptied",
+      "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::main",
+   "index": 83,
+   "mutant": "L1025 string 'continue although main holds commits no journaled operation identifies (they are left out)' emptied",
+   "class": "AUDITED",
+   "group": "argparse help/description text, printed only by `aisef bundle [SUB] --help`. I executed each mutant (module source from validation.v2.mutation.mutants, exec'd) and ran `--help` of the top parser and of every subparser, plus an invalid --example and an empty argv, against the unmutated module: exit codes and stderr are identical and exactly one line of one --help stdout differs (the described item is listed without its description). No program parses it; the reader is the operator at the terminal. The codebase does not promise completeness of option documentation either (seal's `authoring`, `--out`, approve's `--contract`, continue's `--from-run` have no help at all), so there is no 'every option is documented' contract to test; a per-string test would be the verbatim-text test the round excludes.",
+   "grounds": "Per mutant: help of `--leave-out-unidentified` (L536-537) emptied. Run at 289885e: exit codes and stderr identical; the only stdout difference is that `aisef bundle continue --help` lists the flag without its two description lines. No program parses it. The semantics the line states are carried where a decision is taken and are tested there: the refusal that names the flag and what it does (L445-448 'inspect them, then --leave-out-unidentified to continue without them'; T00a:308-310 and T01b:270 assert the flag is named), the report member `left_out_unidentified` (L482; T00a:315) and `in_flight` (continue_usage.py:183), and docs/v2.1/USAGE-2.1.md:117-118. Contains no identifying element of its own (no command, flag, id). CORRECTION to the grounds: the claim that the codebase promises no option documentation is true of `aisef bundle` only. `aisef run`'s help IS pinned whole, override flags included (tests/v2/test_v21_kills_cli.py:48-66, B-03b 2a4c673: `--accept-unaccounted ... start although the lineage has spend no evidence accounts for (recorded)`), and A23 (kills3) later made the rule: audited unless the help names an element another part of the product defines. This help names none, so the conclusion stands under A23 \u2014 but it is the one string of this batch where a requirement test is cheap and on a precedent.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:515-541, 536-537; main L561 (the flag's only reader: `a.leave_out_unidentified`)",
+    "aisef2/app/bundle_cli.py:445-448 (refusal naming the flag), :482 (report member), :409 (docstring)",
+    "tests/v2/test_v21_kills3_T00a.py:300-321, test_v21_kills3_T01b.py:262-272, test_v21_continue_usage.py:172-185 (the override and its record)",
+    "tests/v2/test_v21_kills_cli.py:35-66 and test_v21_kills3_A23.py:1-12 (the precedent and the rule for `aisef run`'s parser)",
+    "docs/v2.1/research/TRACEABILITY.json row 28 ref 0: `contains` `--leave-out-unidentified` in bundle_cli.py (holds under the mutant: the flag and the refusal still name it)",
+    "docs/v2.1/USAGE-2.1.md:117-118"
+   ],
+   "exceptions_checked": [
+    "a program that reads the help (completion generator, docs build): none",
+    "an operator who passes the flag without reading the refusal: the flag name says what it does; the report records the override",
+    "the help as the only statement of 'they are left out': no, the refusal says 'continue without them', the report `in_flight` says 'left out of the continuation's baseline', USAGE says the commits are not recognised and are refused unless named",
+    "a completeness contract for options: none for bundle (see above)"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "remapped_from": {
+    "index": 81,
+    "mutant": "L537 string 'continue although main holds commits no journaled operation identifies (they are left out)' emptied",
+    "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 81,
+     "mutant": "L499 string 'continue although main holds commits no journaled operation identifies (they are left out)' emptied",
+     "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+    },
+    "chain": [
+     {
+      "index": 81,
+      "mutant": "L499 string 'continue although main holds commits no journaled operation identifies (they are left out)' emptied",
+      "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+     },
+     {
+      "index": 81,
+      "mutant": "L537 string 'continue although main holds commits no journaled operation identifies (they are left out)' emptied",
+      "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::main",
+   "index": 88,
+   "mutant": "L1032 string 'the migrated bundle (a new file; never the input)' emptied",
+   "class": "AUDITED",
+   "group": "argparse help/description text, printed only by `aisef bundle [SUB] --help`. I executed each mutant (module source from validation.v2.mutation.mutants, exec'd) and ran `--help` of the top parser and of every subparser, plus an invalid --example and an empty argv, against the unmutated module: exit codes and stderr are identical and exactly one line of one --help stdout differs (the described item is listed without its description). No program parses it; the reader is the operator at the terminal. The codebase does not promise completeness of option documentation either (seal's `authoring`, `--out`, approve's `--contract`, continue's `--from-run` have no help at all), so there is no 'every option is documented' contract to test; a per-string test would be the verbatim-text test the round excludes.",
+   "grounds": "help of migrate --out: documents 'a new file; never the input', which is enforced twice and asserted.",
+   "consumers_checked": [
+    "git grep of the exact string over the whole tree incl. closure-evidence: only bundle_cli.py itself and the campaign's own 'unaudited survivor' lines in closure-evidence/v2/v2.1/campaign-2/results/check.out",
+    "every --help in tests/: tests/test_cli.py:95 (V1 build_parser, the V1 `bundle` verb has its own help at aisef/cli/parser.py:189) and tests/v2/test_v21_kills_cli.py (a verbatim pin of `aisef run --help` only; none exists for `aisef bundle`)",
+    "docs/v2.1/research/TRACEABILITY.json 'contains' checks on bundle_cli.py: only `def _create(`, `--leave-out-unidentified`, `sub.add_parser(\"continue\"`, `sub.add_parser(\"migrate\"` - source-text checks on the name part, which a `help=` change does not touch",
+    "bundle_cli.py:534-535 exists() refusal and :462-469 the exclusive create (_create, O_EXCL); tests/v2/test_v21_identity.py Migrate.test_the_command_writes_a_new_file_and_never_the_input ('never overwrites' in stderr, exit 2) and test_the_write_is_exclusive_so_a_file_that_appears_after_the_check_is_never_replaced",
+    "docs/v2.1/USAGE-2.1.md:42-43 (every aisef bundle command writes a new file)"
+   ],
+   "exceptions_checked": [
+    "the help claiming 'never the input' while the tool could write it: both guards are asserted, so the claim cannot become false silently"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "remapped_from": {
+    "index": 84,
+    "mutant": "L540 string 'the migrated bundle (a new file; never the input)' emptied",
+    "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 84,
+     "mutant": "L502 string 'the migrated bundle (a new file; never the input)' emptied",
+     "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+    },
+    "chain": [
+     {
+      "index": 84,
+      "mutant": "L502 string 'the migrated bundle (a new file; never the input)' emptied",
+      "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+     },
+     {
+      "index": 84,
+      "mutant": "L540 string 'the migrated bundle (a new file; never the input)' emptied",
+      "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::main",
+   "index": 120,
+   "mutant": "L1084 True->False",
+   "class": "AUDITED",
+   "group": "sort_keys of a printed report: only the order of one JSON object's members in stdout changes. I executed the unmutated and the mutated main on the real command and compared: same exit status, same stderr, the parsed stdout object is equal (apart from `written`, which differs only because my two runs wrote to different file names), the text differs in member order. The other effect of sort_keys=True - a TypeError on mixed-type keys, which is what [142] is about - cannot arise here: every dict reaching json.dumps has str keys (code literals, spec ids taken from str-keyed lookups) and list orders come from lists/tuples, never a set.",
+   "grounds": "member order of the migrate report in stdout; the report is read by key or substring.",
+   "consumers_checked": [
+    "tests/test_v21_bundle_dispatch.py:24 matches the substring '\"specs_rebound\": 59' (order independent); tests/v2/test_v21_identity.py Migrate captures stdout and never parses it",
+    "validation/v21/cli_integration/run.sh prints into a human log; the committed docs/v2.1/evidence/cli-integration-*.out are checked by substring only (TRACEABILITY.json contains-checks)",
+    "bundle_cli.py:131-133 the report's literals and `mapping` (keys: spec ids found in the str-keyed `known`, L117-122; an unknown id is refused before the print, L124-126)"
+   ],
+   "exceptions_checked": [
+    "mixed-type keys: every key is a str literal or a spec id; the keys are all str, so no TypeError either way",
+    "hash-order dependence of insertion order: mapping is filled iterating plan.obligations (a tuple): the text is deterministic under both settings",
+    "a human diffing successive evidence outputs: they are compared by eye, never by a program; order is the only change"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "remapped_from": {
+    "index": 110,
+    "mutant": "L582 True->False",
+    "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 110,
+     "mutant": "L544 True->False",
+     "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+    },
+    "chain": [
+     {
+      "index": 110,
+      "mutant": "L544 True->False",
+      "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+     },
+     {
+      "index": 110,
+      "mutant": "L582 True->False",
+      "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::main",
+   "index": 147,
+   "mutant": "L1045 True->False",
+   "class": "AUDITED",
+   "group": "sort_keys of a printed report: only the order of one JSON object's members in stdout changes. I executed the unmutated and the mutated main on the real command and compared: same exit status, same stderr, the parsed stdout object is equal (apart from `written`, which differs only because my two runs wrote to different file names), the text differs in member order. The other effect of sort_keys=True - a TypeError on mixed-type keys, which is what [142] is about - cannot arise here: every dict reaching json.dumps has str keys (code literals, spec ids taken from str-keyed lookups) and list orders come from lists/tuples, never a set.",
+   "grounds": "member order of the seal report in stdout; read through json.loads.",
+   "consumers_checked": [
+    "tests/v2/test_v21_bundle_tools.py Tool.tool json.loads -> sealed['to_approve'] (Outsider, Refusals)",
+    "docs/v2.1/TRACEABILITY.md:338 mechanical checks match '\"verdict\": \"READY\"' and the coverage limit sentence in a committed lint .out - not seal's text",
+    "bundle_cli.py:238-240 the report: plan_hash, specs (a count), approvals_kept (a count), approvals_dropped (list of str), to_approve (rows of unapproved(): four literal keys)"
+   ],
+   "exceptions_checked": [
+    "an operator value as a dict key: none (contract and requirement ids appear as values inside list items); insertion order deterministic"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "remapped_from": {
+    "index": 132,
+    "mutant": "L551 True->False",
+    "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 132,
+     "mutant": "L513 True->False",
+     "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+    },
+    "chain": [
+     {
+      "index": 132,
+      "mutant": "L513 True->False",
+      "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+     },
+     {
+      "index": 132,
+      "mutant": "L551 True->False",
+      "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::main",
+   "index": 152,
+   "mutant": "L1052 True->False",
+   "class": "AUDITED",
+   "group": "sort_keys of a printed report: only the order of one JSON object's members in stdout changes. I executed the unmutated and the mutated main on the real command and compared: same exit status, same stderr, the parsed stdout object is equal (apart from `written`, which differs only because my two runs wrote to different file names), the text differs in member order. The other effect of sort_keys=True - a TypeError on mixed-type keys, which is what [142] is about - cannot arise here: every dict reaching json.dumps has str keys (code literals, spec ids taken from str-keyed lookups) and list orders come from lists/tuples, never a set.",
+   "grounds": "member order of the approve report in stdout; read by key.",
+   "consumers_checked": [
+    "tests/v2/test_v21_bundle_tools.py Outsider (done['still_to_approve'] == []) via Tool.tool's json.loads",
+    "validation/v21/cli_integration/run.sh (human log)",
+    "bundle_cli.py:519-520 the report: written, approved (a.contract), by (a.approver) - operator values are values, never keys - and still_to_approve (four literal keys per row)"
+   ],
+   "exceptions_checked": [
+    "mixed-type keys: none, all literals; determinism: a fixed literal order"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "remapped_from": {
+    "index": 137,
+    "mutant": "L558 True->False",
+    "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 137,
+     "mutant": "L520 True->False",
+     "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+    },
+    "chain": [
+     {
+      "index": 137,
+      "mutant": "L520 True->False",
+      "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+     },
+     {
+      "index": 137,
+      "mutant": "L558 True->False",
+      "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::main",
+   "index": 155,
+   "mutant": "L1060 True->False",
+   "class": "AUDITED",
+   "group": "sort_keys of a printed report: only the order of one JSON object's members in stdout changes. I executed the unmutated and the mutated main on the real command and compared: same exit status, same stderr, the parsed stdout object is equal (apart from `written`, which differs only because my two runs wrote to different file names), the text differs in member order. The other effect of sort_keys=True - a TypeError on mixed-type keys, which is what [142] is about - cannot arise here: every dict reaching json.dumps has str keys (code literals, spec ids taken from str-keyed lookups) and list orders come from lists/tuples, never a set.",
+   "grounds": "Per mutant: `sort_keys=True` -> False on the printed continue report (L563). Run at 289885e through `main continue` on T00a's two-story run, null vs mutant: exit 0 and empty stderr in both, the continuation file is byte-identical, the parsed stdout object is equal, only the member order of the printed text differs (null alphabetical: already_continued_by, baseline, carried ...; mutant insertion order: written, carried, carried_as, baseline, run ...). The original's other effect, a TypeError for mixed-type keys, cannot arise: every dict that reaches json.dumps here has str keys (the report literal L477-489; lineage.reconcile items and cut_event L225-255 are str-keyed literals; `already_continued_by` L478; `unaccounted` is a list of str, lineage.py:296-319, client.py:91-96). CORRECTION to the grounds: tests DO read this stdout now, as parsed objects, so they are blind to member order: test_v21_kills3_T00a.py:282-321 (json.loads(stdout) compared with the report object), test_v21_kills3_T01b.py:145-153, test_v21_defects_bundlecli.py:105-135 (parses `next`).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:477-489 (the report literal), :560-564 (the print); lineage.py:204-256 (reconcile items), :284-319 (account_of)",
+    "tests/v2/test_v21_kills3_T00a.py:282-321, test_v21_kills3_T01b.py:145-153,168-179, test_v21_defects_bundlecli.py:105-135: json.loads of stdout, object equality (order-insensitive)",
+    "validation/v21/cli_integration/run.sh:50,56 and docs/v2.1/evidence/cli-integration-*.out: a human log; tests/test_v21_traceability.py:96,118 'contains' check on one line of an old .out ('commit: b72e51e'), not regenerated and not about order",
+    "validation/v21/cli_integration/e2e_guest.py:343-349 (seal/approve/lint only), readback.py (run1 context pack)",
+    "round 3: tests/v2/test_v21_r3_client_readers.py:115-124 names `aisef bundle continue`'s items as operator-read \u2014 their TEXT is pinned at lineage.reconcile, as objects"
+   ],
+   "exceptions_checked": [
+    "story ids or paths as dict keys: none (values and list items only)",
+    "a consumer that takes the first member of the printed object (head -n, jq '.[0]'): none in the repo",
+    "a diff of two printed reports across runs: none; the report holds run paths and shas, which differ per run anyway"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "remapped_from": {
+    "index": 139,
+    "mutant": "L563 True->False",
+    "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 139,
+     "mutant": "L525 True->False",
+     "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+    },
+    "chain": [
+     {
+      "index": 139,
+      "mutant": "L525 True->False",
+      "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+     },
+     {
+      "index": 139,
+      "mutant": "L563 True->False",
+      "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  }
+ ]
+}

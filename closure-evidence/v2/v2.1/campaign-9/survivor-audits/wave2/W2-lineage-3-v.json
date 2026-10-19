@@ -1,0 +1,229 @@
+{
+ "batch": "W2-lineage-3",
+ "file": "aisef2/app/lineage.py",
+ "target": "aisef2/app/lineage.py::usage_lineage",
+ "snapshot": "4ec961e706a1f7bda16d131037058c4fe9c2663f",
+ "source_sha256": "f342996d2b6ea138084effdc12eac0b7309095444b2a44199bd25287f8df48aa",
+ "role": "skeptic",
+ "when": "Mon Oct 19 20:45:32 +07 2026",
+ "measurement": "Source sha256 of aisef2/app/lineage.py matches the batch (f342996d...). All 13 new + carried [92] rendered via mutant_view and validation/v2/mutation.py:mutants(); each descriptor matches the batch. Registered kill files (validation/v2/mutation.py:806) = test_v21_kills3_{A08,T08a,T08b}: BASELINE 20 OK; mutants 56,71,75,92,119,124 each 20 OK (SURVIVE) in a stripped-PATH env (no opencode on PATH), HOME/TMPDIR under the run tree, nice -n 19 python3 -P -B. Except branch confirmed REACHABLE and NON-crashing by a hermetic mock probe (mock lineage_account + a chmod 0o000 session). own_blind refutation and 117 superseded-blind-row divergence confirmed by probe. No repo edits; git archive only.",
+ "entries": [
+  {
+   "target": "aisef2/app/lineage.py::usage_lineage", "index": 56, "mutant": "L802 True->False",
+   "class_before": "EQUIVALENT", "verdict": "REVISED", "class_after": "EQUIVALENT",
+   "grounds": "Conclusion holds (no reachable input distinguishes it) but the author's proof is overstated and must be corrected. VERIFIED core: account['runs'] entries ARE account_of(path) outputs (lineage.py:730 `runs.append(account_of(path) | extra)`); account_of records ANY session-read failure into unaccounted (lineage.py:506-515: Budget.spend raises -> unread.append -> unaccounted = list(spent['unaccounted']) + unread + ...); usage.usage's session read and account_of's Budget.spend both read each session via client.events->log.read_bytes (usage.py:51->client.py:44; client.py:98 read_session->:57 events->:44). So a session failure that sets blind also makes that run's unaccounted non-empty -> any(a['unaccounted']) True -> exact False regardless of blind. CORRECTIONS: (1) 'the sole trigger is read_bytes failing' is incomplete -- usage.usage also raises at usage.py:109 (prices['currency'/'source'/'effective_date'] KeyError); this is UNREACHABLE because run.py:670 computes own via usage.usage(out, events, settings.prices, rec) BEFORE usage_lineage (run.py:672) with the SAME settings.prices, so a malformed prices fails own first and usage_lineage is never called. (2) 'blind can never change any output' is too strong: MEASURED -- a mock-decoupled account (empty unaccounted + an unreadable session) flips tokens_status baseline 'lower bound' -> mutant 56 'known'. But account_of cannot emit that state (coupling invariant, lineage.py:506-515), so no account_of-producible account distinguishes it. EQUIVALENT rests on that coupling invariant + the sole-caller prices guarantee.",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:820 (sole read of blind, inside exact; `not blind` is the FIRST and-term -> short-circuits the rest when True)",
+    "aisef2/app/lineage.py:730 (account['runs'][i] = account_of(path)|extra); :506-515 (account_of couples a session-read failure into unaccounted/unread)",
+    "aisef2/app/usage.py:51/109 (two raise paths of usage.usage); aisef2/app/run.py:670,672 (own computed with the same prices first -> :109 unreachable)"
+   ],
+   "exceptions_checked": [
+    "usage.py:109 prices KeyError: unreachable via the sole caller (own validated first, run.py:670)",
+    "usage.usage L99 e['type'] / L100 e['data'] KeyError: events are built at lineage.py:799 with both keys present (unmutated), and Event.data is enforced a Mapping (event.py:66) so dict(e.data) at L799 cannot raise",
+    "mock-decoupled account (empty unaccounted + unreadable session): distinguishes the mutant (measured) but account_of never produces it"
+   ],
+   "refutation": "N/A (EQUIVALENT on every account_of-producible account). The only distinguishing input is a hand-made account that violates account_of's contract (blind run with empty unaccounted); not a legitimate kill.",
+   "note": "Measured: kill files 20 OK on mutant and baseline. Author's EQUIVALENT conclusion stands; grounds completed (prices raise path unreachable; equivalence rests on the account_of coupling invariant, verified at lineage.py:506-515)."
+  },
+  {
+   "target": "aisef2/app/lineage.py::usage_lineage", "index": 71, "mutant": "L819 not removed",
+   "class_before": "SURVIVED (test owed)", "verdict": "CONFIRMED", "class_after": "SURVIVED (test owed)",
+   "grounds": "Mutant is `not x.get('steps')` -> `+x.get('steps')` in own_blind (lineage.py:819), confirmed via mutant_view. own_blind -> exact (L820) -> tokens_status (L823), operator-visible in RUN.json lineage_usage.tokens_status. own = rec['usage'] = usage.usage output, which always carries 'sessions' with 'steps'/'steps_without_tokens' (usage.py:84,113; run.py:670,672). The 3 registered kill files pass `own` with NO 'sessions' (A08:114 own={tokens,cost}; T08a:328 own={tokens:{},cost}; T08b:30-31 OWN no sessions) so own_blind = any(... over []) == False and the mutant is invisible. MEASURED (probe, own with a 'sessions' list): fully-tokened session (steps=1,swt=0) -> baseline 'known', mutant 71 'lower bound'; no-steps session (steps=0,swt=0) -> baseline 'lower bound', mutant 71 'known' (flips the other way); swt>0 short-circuits truthy in both.",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:819->820 (own_blind -> exact), :823 (exact -> tokens_status)",
+    "aisef2/app/run.py:670,672 (own = usage.usage output, always has 'sessions')",
+    "tests: A08:114, T08a:328, T08b:30-31 (all pass own with no 'sessions' -> the uncovered clause)"
+   ],
+   "exceptions_checked": [
+    "own with no 'sessions': any over [] -> False in both (the registered blind spot)",
+    "a session with steps_without_tokens>0: `or` short-circuits truthy in both -> the mutated clause never decides"
+   ],
+   "refutation": "input: a clean lineage (no predecessors unaccounted/blind) with own={'tokens':{...},'cost':{'value':x,'status':'known'},'sessions':[{'session':'S1.developer.1.jsonl','steps':1,'steps_without_tokens':0}]}. reader: tokens_status (lineage.py:820-823), operator via RUN.json lineage_usage.tokens_status. sketch: assert usage_lineage(...)['tokens_status']=='known'; mutant 71 yields 'lower bound'. Add an own-sessions case to tests/v2/test_v21_kills3_T08b.py; one fully-tokened-own-session case kills BOTH 71 and 109.",
+   "note": "CONFIRMED. Measured divergence reproduced."
+  },
+  {
+   "target": "aisef2/app/lineage.py::usage_lineage", "index": 75, "mutant": "L799 dict entry 0 dropped",
+   "class_before": "EQUIVALENT", "verdict": "CONFIRMED", "class_after": "EQUIVALENT",
+   "grounds": "Mutant drops `'seq': e.seq` at lineage.py:799, leaving {'type':e.type,'data':dict(e.data)} (mutant_view). usage.usage (usage.py:74-115) reads events ONLY at :99 (e['type']) and :100 (e['data'].get('story_id')); it never reads 'seq', never enumerates/serialises the dicts, and returns computed totals (usage.py:113-115), not the event dicts. lineage.py then uses only u['cost'] (:807) and u['tokens'] (:811-812). No observable difference. Event.data is enforced a Mapping (event.py:66) so dict(e.data) is safe.",
+   "consumers_checked": [
+    "aisef2/app/usage.py:99 (e['type']), :100 (e['data']) -- the only event reads inside usage.usage; :113-115 return totals",
+    "aisef2/app/lineage.py:807,811-812 (uses u['cost'],u['tokens'])"
+   ],
+   "exceptions_checked": [
+    "a reader enumerating/serialising the event dict on usage.usage's path: none",
+    "usage.usage reading 'seq': it does not (full read of usage.py:74-115)"
+   ],
+   "refutation": "N/A (EQUIVALENT).",
+   "note": "CONFIRMED. Survives kill files (20 OK). Minor cite correction: the author's 'usage.py:130' is inside no_progress(), not usage.usage -- harmless; usage.usage reads events only at :99-100."
+  },
+  {
+   "target": "aisef2/app/lineage.py::usage_lineage", "index": 79, "mutant": "L803 dict entry 1 dropped",
+   "class_before": "SURVIVED (test owed)", "verdict": "REVISED", "class_after": "SURVIVED (test owed)",
+   "grounds": "Conclusion (a test is owed) holds, but the author's GROUNDS are FALSE: this does NOT crash. Mutant drops the blind row's 'recorded' entry (except branch, lineage.py:803). The author claims `all(e['recorded'] for e in entries)` (L821) raises KeyError. It does NOT: exact = `not blind and ... and all(e['recorded'] ...)` (L820-821) evaluates left-to-right and `blind` is True whenever the except branch (L802) built the row, so `not blind` is False and Python SHORT-CIRCUITS before all() is ever reached. all(e['recorded']...) only runs when blind is False -- i.e. when NO except-branch row exists -- so the key-less blind row is never iterated. MEASURED (probe, except branch via a chmod 0o000 session): RAISED: no; the returned blind row simply lacks 'recorded' (keys = run,superseded,tokens,cost). Real defect: the operator-visible blind row in RUN.json lineage_usage.runs[] silently loses its 'recorded' key -- same defect class as 80/98 (a declared uniform key missing on the except branch), NOT a crash.",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:820-821 (exact: `not blind` short-circuits; blind always True when an except-branch row exists -> all() never evaluates the key-less row)",
+    "operator: RUN.json lineage_usage.runs[].recorded; tests/v2/test_v21_kills3_T08b.py:32,82 (ROW_KEYS uniform-row invariant, exercised on NORMAL rows only)"
+   ],
+   "exceptions_checked": [
+    "the author's KeyError->run.py:670-674->rec['usage']={'error'}: refuted by measurement (no raise); rec['usage']/lineage_usage are unaffected",
+    "any OTHER read of e['recorded']: none that reaches a blind row (L811/L813 write 'recorded' on normal/own rows)"
+   ],
+   "refutation": "input: usage_lineage reaching the except branch (a predecessor whose sessions/*.jsonl exists but is unreadable, or mock events_of + an unreadable session). reader: T08b ROW_KEYS uniform-row invariant / operator reading RUN.json lineage_usage.runs[]. sketch: reach the except branch and assert set(blind_row) == {run,recorded,superseded,tokens,cost}. The author's 'assert usage_lineage returns without raising / rec['usage'] has no error / lineage_usage present' does NOT kill this mutant (those all already hold -- no crash); the SAME uniform-row-keys test kills 79, 97, 80 and 98. Add to tests/v2/test_v21_kills3_T08b.py RowsSayWhatEachRunIs.",
+   "note": "REVISED: author's crash story is wrong (short-circuit on `not blind`); still test-owed but via the uniform-row-keys invariant, same owed test as 80/97/98."
+  },
+  {
+   "target": "aisef2/app/lineage.py::usage_lineage", "index": 80, "mutant": "L803 dict entry 2 dropped",
+   "class_before": "SURVIVED (test owed)", "verdict": "CONFIRMED", "class_after": "SURVIVED (test owed)",
+   "grounds": "Mutant drops the blind row's 'superseded' entry (except branch, lineage.py:803; mutant_view). No code in usage_lineage reads e['superseded'] (L815 cost, L822 tokens over all rows), so NO crash -- MEASURED (probe): RAISED: no, blind row keys = run,recorded,tokens,cost. The operator-visible blind row in RUN.json lineage_usage.runs[] loses 'superseded', violating T08b's ROW_KEYS uniform-row invariant (test_v21_kills3_T08b.py:32,82), which is exercised on NORMAL rows only. Operator-visible (docs/v2.1/evidence/cli-integration-b72e51e.out).",
+   "consumers_checked": [
+    "operator: RUN.json lineage_usage.runs[].superseded; tests/v2/test_v21_kills3_T08b.py:32,74-84 (ROW_KEYS, normal rows only)",
+    "aisef2/app/lineage.py:815,822 (usage_lineage reads only cost/tokens from a row -> no crash)"
+   ],
+   "exceptions_checked": [
+    "a code reader of lineage_usage.runs[].superseded: none",
+    "the blind row built under the registered tests: never (they point runs at readable sessions -> normal path)"
+   ],
+   "refutation": "input: a predecessor with an unreadable session -> a blind row. reader: T08b ROW_KEYS / operator. sketch: reach the except branch and assert set(blind_row) == {run,recorded,superseded,tokens,cost}. Same owed test kills 79,97,80,98. Add to T08b RowsSayWhatEachRunIs.",
+   "note": "CONFIRMED (measured: no crash, key missing)."
+  },
+  {
+   "target": "aisef2/app/lineage.py::usage_lineage", "index": 92, "mutant": "L799 string 'seq' emptied",
+   "class_before": "EQUIVALENT", "verdict": "CONFIRMED", "class_after": "EQUIVALENT",
+   "grounds": "Carried audit, remapped by position to lineage.py:799. Mutant renames key 'seq'->'' in the event dicts: {'':e.seq,'type':e.type,'data':dict(e.data)} (mutant_view). Same proof as [75]: usage.usage reads events only at usage.py:99 (e['type']) and :100 (e['data']) -- never 'seq' or '' -- and returns totals (:113-115), not the dicts; '' does not collide with 'type'/'data'. lineage uses only u['cost'],u['tokens'] (lineage.py:807,811-812).",
+   "consumers_checked": [
+    "aisef2/app/usage.py:99-100 (reads), :113-115 (return value totals)",
+    "aisef2/app/lineage.py:807,811-812 (use of u); run.py:672 (sole caller)",
+    "aisef2/app/verify.py:214 (verify re-derives usage from ITS OWN events, not from lineage's dicts)"
+   ],
+   "exceptions_checked": [
+    "'' colliding with 'type'/'data': no (distinct keys)",
+    "usage.usage reading 'seq': it does not"
+   ],
+   "refutation": "N/A (EQUIVALENT).",
+   "note": "CONFIRMED with refreshed cites to the snapshot: build at lineage.py:799 (not :313/:373-387), usage reads usage.py:99-100, uses lineage.py:807,811-812, caller run.py:672 (not :503), verify.py:214 (not :196/:151). Survives the registered kill files at the snapshot (20 OK)."
+  },
+  {
+   "target": "aisef2/app/lineage.py::usage_lineage", "index": 97, "mutant": "L803 string 'recorded' emptied",
+   "class_before": "SURVIVED (test owed)", "verdict": "REVISED", "class_after": "SURVIVED (test owed)",
+   "grounds": "Conclusion (test owed) holds; the author's crash GROUNDS are FALSE. Mutant empties the KEY 'recorded'->'' in the blind row (except branch, lineage.py:803; mutant_view: {'run':...,'':acct['recorded'],'superseded':...}). The author claims L821 `all(e['recorded']...)` raises KeyError on the '' key. It does NOT -- same short-circuit as [79]: `not blind` (L820) is False whenever the except branch built the row, so all() is never evaluated. MEASURED (probe): RAISED: no; blind row keys = '',run,superseded,tokens,cost (has '', lacks 'recorded'). Real defect: the operator-visible blind row gains '' and loses 'recorded' -- same class as 79/80/98.",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:820-821 (short-circuit on `not blind`)",
+    "operator: RUN.json lineage_usage.runs[].recorded; tests/v2/test_v21_kills3_T08b.py:32,82 (ROW_KEYS, normal rows only)"
+   ],
+   "exceptions_checked": [
+    "the '' key making e['recorded'] succeed: irrelevant -- all() is never reached (short-circuit)",
+    "the author's KeyError->rec['usage']={'error'}: refuted by measurement (no raise)"
+   ],
+   "refutation": "Same as 79: reach the except branch and assert set(blind_row) == {run,recorded,superseded,tokens,cost} (also kills 79,80,98). The author's 'returns without raising / no error / lineage_usage present' does NOT kill it (all already hold). Add to T08b.",
+   "note": "REVISED: no crash (short-circuit). Still test-owed via the uniform-row-keys invariant."
+  },
+  {
+   "target": "aisef2/app/lineage.py::usage_lineage", "index": 98, "mutant": "L803 string 'superseded' emptied",
+   "class_before": "SURVIVED (test owed)", "verdict": "CONFIRMED", "class_after": "SURVIVED (test owed)",
+   "grounds": "Mutant empties the KEY 'superseded'->'' in the blind row (except branch, lineage.py:803; mutant_view: {'run':...,'recorded':...,'':bool(acct.get('superseded'))}). No code reads a row's 'superseded' -> NO crash -- MEASURED (probe): RAISED: no, blind row keys = '',run,recorded,tokens,cost (has '', lacks 'superseded'). Breaks T08b ROW_KEYS uniform-row invariant on the except branch (normal rows only). Author's KEY-vs-VALUE distinction from [117] is correct (98 empties the dict KEY; 117 empties the acct.get() lookup key).",
+   "consumers_checked": [
+    "operator: RUN.json lineage_usage.runs[].superseded; tests/v2/test_v21_kills3_T08b.py:32,74-84 (ROW_KEYS, normal rows only)",
+    "aisef2/app/lineage.py:815,822 (no row 'superseded' read -> no crash)"
+   ],
+   "exceptions_checked": [
+    "a code reader of a row's 'superseded': none",
+    "the blind row built under the registered tests: never"
+   ],
+   "refutation": "input: a predecessor with an unreadable session -> a blind row. reader: T08b ROW_KEYS / operator. sketch: reach the except branch and assert set(blind_row) == {run,recorded,superseded,tokens,cost}. Same owed test kills 79,97,80,98. Add to T08b.",
+   "note": "CONFIRMED (measured: no crash, '' key)."
+  },
+  {
+   "target": "aisef2/app/lineage.py::usage_lineage", "index": 109, "mutant": "L819 string 'steps' emptied",
+   "class_before": "SURVIVED (test owed)", "verdict": "CONFIRMED", "class_after": "SURVIVED (test owed)",
+   "grounds": "Mutant: `not x.get('steps')` -> `not x.get('')` in own_blind (lineage.py:819; mutant_view). x.get('') is None for every session row -> `not None` == True -> own_blind = any(swt or True ...) == True whenever this run has >=1 own session. MEASURED (probe): fully-tokened own session -> baseline 'known', mutant 109 'lower bound'; no-steps and swt>0 both 'lower bound' in both. Same consumer chain and operator/doc contract as [71]. Registered kill files pass own with no 'sessions' (invisible).",
+   "consumers_checked": [
+    "aisef2/app/lineage.py:819->820 (own_blind -> exact), :823 (tokens_status)",
+    "aisef2/app/run.py:670,672 (own = usage.usage output, always has 'sessions')"
+   ],
+   "exceptions_checked": [
+    "own with no 'sessions': any over [] -> False in both (registered blind spot)",
+    "own sessions all with steps_without_tokens>0: own_blind True in both (short-circuit)"
+   ],
+   "refutation": "input: clean lineage + a fully-tokened own session (steps=1,steps_without_tokens=0). reader: tokens_status (lineage.py:820-823), operator via RUN.json. sketch: assert tokens_status=='known'; mutant 109 yields 'lower bound'. One fully-tokened-own-session T08b case kills BOTH 71 and 109.",
+   "note": "CONFIRMED. Measured divergence reproduced."
+  },
+  {
+   "target": "aisef2/app/lineage.py::usage_lineage", "index": 117, "mutant": "L803 string 'superseded' emptied",
+   "class_before": "SURVIVED (test owed)", "verdict": "CONFIRMED", "class_after": "SURVIVED (test owed)",
+   "grounds": "Mutant: `bool(acct.get('superseded'))` -> `bool(acct.get(''))` in the blind row (except branch, lineage.py:803; mutant_view). acct.get('') is None -> bool(None) == False ALWAYS, so a blind row's 'superseded' is forced False. The key stays (no crash). MEASURED (probe, a superseded-and-blind sibling acct['superseded']=True): baseline blind_row superseded=True, mutant 117 False. No code decides on a row's 'superseded' (L822 sums all rows regardless), so the reader is the operator / T08b per-row superseded invariant (test_v21_kills3_T08b.py:74-84), pinned on normal rows only. Distinct from [98] (which empties the dict KEY).",
+   "consumers_checked": [
+    "operator / T08b per-row superseded invariant (tests/v2/test_v21_kills3_T08b.py:74-84, normal rows only)",
+    "aisef2/app/lineage.py:767,774 (superseded siblings added to account['runs'] -> can appear as a blind row); :822 (total ignores superseded)"
+   ],
+   "exceptions_checked": [
+    "a non-superseded blind run: acct.get('superseded') already falsy -> mutant == original (no difference)",
+    "a superseded run that is NOT blind: the normal-path row (L811) is unmutated"
+   ],
+   "refutation": "input: a superseded sibling whose session file is unreadable -> a blind row. reader: operator / T08b per-row superseded invariant. sketch: reach the except branch for a superseded sibling and assert blind_row['superseded'] is True; mutant 117 gives False. Add to T08b.",
+   "note": "CONFIRMED (measured: True->False for a superseded blind row)."
+  },
+  {
+   "target": "aisef2/app/lineage.py::usage_lineage", "index": 119, "mutant": "L805 string ': ' emptied",
+   "class_before": "AUDITED", "verdict": "CONFIRMED", "class_after": "AUDITED",
+   "grounds": "Mutant empties the f-string literal ': ' between the exception type and its message in the blind row's cost.status (lineage.py:804-805; mutant_view: `({type(e).__name__}{getattr(...)...})`). MEASURED (probe, PermissionError): status = 'unknown: its evidence cannot be read (PermissionErrorPermission denied)'. The load-bearing tags 'unknown:' and 'its evidence cannot be read' are unchanged -- the only parts any reader keys on (the UNREGISTERED tests assert only the substring 'cannot be read', test_v21_x_lineage_proof.py:241,995). No code parses the parenthetical. Observable but no named consumer depends on the ': ' separator.",
+   "consumers_checked": [
+    "operator: RUN.json lineage_usage.runs[].cost.status (diagnostic text)",
+    "tests/v2/test_v21_x_lineage_proof.py:241,995 (assert 'cannot be read' substring only -> survive)",
+    "no code parses the status string"
+   ],
+   "exceptions_checked": [
+    "a reader asserting the exact status text: none ('cannot be read'/'unknown' both unchanged)"
+   ],
+   "refutation": "N/A (AUDITED: observable diagnostic-detail change, load-bearing tags intact, no reader depends).",
+   "note": "CONFIRMED. Except branch reachable (measured) but no reader keys on the detail."
+  },
+  {
+   "target": "aisef2/app/lineage.py::usage_lineage", "index": 120, "mutant": "L805 string ')' emptied",
+   "class_before": "AUDITED", "verdict": "CONFIRMED", "class_after": "AUDITED",
+   "grounds": "Mutant empties the closing ')' literal of the parenthetical in the blind row's cost.status (lineage.py:805; mutant_view). MEASURED (probe, PermissionError): status = 'unknown: its evidence cannot be read (PermissionError: Permission denied' (no closing paren). 'unknown:'/'cannot be read' unchanged; no consumer parses the message.",
+   "consumers_checked": [
+    "operator: RUN.json lineage_usage.runs[].cost.status",
+    "tests/v2/test_v21_x_lineage_proof.py:241,995 (assert 'cannot be read' substring only -> survive)",
+    "no code parses the status string"
+   ],
+   "exceptions_checked": [
+    "a reader asserting balanced parentheses or exact text: none"
+   ],
+   "refutation": "N/A (AUDITED).",
+   "note": "CONFIRMED (measured)."
+  },
+  {
+   "target": "aisef2/app/lineage.py::usage_lineage", "index": 124, "mutant": "L805 Or swapped",
+   "class_before": "AUDITED", "verdict": "REVISED", "class_after": "AUDITED",
+   "grounds": "Conclusion (AUDITED) holds, but the author MISDESCRIBED the mutation. It is NOT an operand swap (`e or getattr(...)`); mutant_view and mutants() show the OPERATOR is swapped or->and: `getattr(e,'strerror',None) or e` -> `getattr(e,'strerror',None) and e` (lineage.py:805). CONSEQUENCES: for a truthy strerror (the reachable PermissionError), `strerror and e` == e -> status shows str(e) -- MEASURED: 'unknown: its evidence cannot be read (PermissionError: [Errno 13] Permission denied: \\'/...full path...\\')', [:300]-truncated. The author's claim 'for an exception with no truthy strerror the two are identical (both show str(e))' is WRONG: with `and`, a falsy/None strerror makes `None and e` == None -> the status renders the literal 'None' ('(SomeError: None)'), NOT str(e). In every case 'unknown:'/'cannot be read' survive and no reader keys on the detail -> AUDITED stands; the path added is the operator's own run path in the operator's own RUN.json (no cross-trust leak), truncated to [:300].",
+   "consumers_checked": [
+    "operator: RUN.json lineage_usage.runs[].cost.status text",
+    "tests/v2/test_v21_x_lineage_proof.py:241,995 (assert 'cannot be read' substring only -> survive)",
+    "no code parses the status message"
+   ],
+   "exceptions_checked": [
+    "exceptions with NO truthy strerror: mutant shows 'None' (NOT str(e)); author's 'mutant==original' is wrong -- but still has 'cannot be read'",
+    "the reachable trigger is PermissionError (truthy strerror) -> shows str(e); 'cannot be read' always survives"
+   ],
+   "refutation": "N/A (AUDITED). Observable diagnostic-detail change (str(e)/None vs strerror), load-bearing tags intact, no reader depends.",
+   "note": "REVISED: mutation is or->and (operator), not an operand swap; no-strerror case yields 'None', not str(e). AUDITED conclusion unchanged."
+  },
+  {
+   "target": "aisef2/app/lineage.py::usage_lineage", "index": 125, "mutant": "L805 string 'strerror' emptied",
+   "class_before": "AUDITED", "verdict": "REVISED", "class_after": "AUDITED",
+   "grounds": "Mutant: `getattr(e,'strerror',None)` -> `getattr(e,'',None)` (lineage.py:805; mutant_view). getattr(e,'',None) is None (no attribute named '') -> `None or e` == e -> status shows str(e) for EVERY exception. MEASURED (probe, PermissionError): 'unknown: its evidence cannot be read (PermissionError: [Errno 13] Permission denied: \\'/...\\')' -- same as 124 FOR THIS case. Own grounds CONFIRMED. CORRECTION: the author's 'byte-for-byte the same observable effect as index 124 for every exception' is FALSE -- 125 always shows str(e); 124 (or->and) shows 'None' for a no-strerror exception. They coincide only for a truthy-strerror exception (the reachable PermissionError). 'unknown:'/'cannot be read' always survive; no reader keys on the detail -> AUDITED.",
+   "consumers_checked": [
+    "operator: RUN.json lineage_usage.runs[].cost.status text",
+    "tests/v2/test_v21_x_lineage_proof.py:241,995 (assert 'cannot be read' substring only -> survive)",
+    "no code parses the status message"
+   ],
+   "exceptions_checked": [
+    "an exception with an attribute literally named '': none -> getattr returns None -> falls back to e (str(e))",
+    "difference from 124: for a no-strerror exception, 125 shows str(e) while 124 shows 'None' -- not 'byte-for-byte the same'"
+   ],
+   "refutation": "N/A (AUDITED).",
+   "note": "REVISED: own grounds hold (always str(e)); the '==124 for every exception' cross-reference is false (they differ for no-strerror exceptions). AUDITED unchanged."
+  }
+ ],
+ "notes": "14 entries verified exactly once at snapshot 4ec961e (source sha256 f342996d... matches). Every mutant descriptor matches mutant_view/mutants(). Verdicts: 3 CONFIRMED-EQUIVALENT-family [75 EQUIVALENT; 92 carried EQUIVALENT (cites refreshed)], 1 REVISED-EQUIVALENT [56], 5 CONFIRMED test-owed [71,80,98,109,117], 2 REVISED test-owed [79,97], 2 CONFIRMED AUDITED [119,120], 2 REVISED AUDITED [124,125]. BIGGEST CORRECTION: the author's crash story for 79 and 97 is FALSE. `exact = not blind and ... and all(e['recorded'] for e in entries)` (lineage.py:820-821) short-circuits at `not blind` (blind is True whenever the except branch built the key-less row), so all() is never evaluated -> no KeyError -> usage_lineage does NOT raise and lineage_usage is NOT dropped (MEASURED: RAISED: no). 79/97 are the SAME defect class as 80/98 -- the operator-visible blind row silently loses a declared uniform key (or gains '') -- all four killed by ONE owed test: reach the except branch and assert set(blind_row)=={run,recorded,superseded,tokens,cost} (T08b's ROW_KEYS invariant, currently exercised on normal rows only). The author's proposed register of test_v21_x_lineage_proof.py::test_a_stream_of_the_lineage_that_cannot_be_read... does NOT kill 79/97 (its 'no error / lineage_usage present' assertions already pass on the mutant). OTHER corrections: 56 EQUIVALENT rests on the account_of coupling invariant (lineage.py:506-515, verified) plus the sole-caller prices guarantee (run.py:670 computes own first with the same settings.prices, so usage.usage's prices KeyError at usage.py:109 is unreachable) -- a mock-decoupled account flips tokens_status (measured) but account_of cannot emit it; 124 is operator swap or->and (not operand swap) and renders 'None' for a no-strerror exception; 125 differs from 124 for no-strerror exceptions. Measurement reproduced: baseline 20 OK; mutants 56,71,75,92,119,124 each 20 OK (survive) on the registered kill files in a stripped-PATH env (no opencode), HOME/TMPDIR under the run tree, nice -n 19 python3 -P -B. Root cause of survival confirmed: the 3 registered kill files exercise only usage_lineage's normal (readable) path and pass own with no 'sessions', so the except branch (lineage.py:801-806) and the own-session clause (L819) are never reached. HARD RULES honoured: no real opencode (verified NONE on stripped PATH), no network, repo worktree untouched (git archive only), nice -n 19 python3 -P -B, only the three named kill files run against mutants plus hermetic mock probes to build distinguishing inputs; no code or tests changed."
+}

@@ -1,0 +1,633 @@
+{
+ "batch": "W2-bundle_cli-9",
+ "file": "aisef2/app/bundle_cli.py",
+ "targets": [
+  "aisef2/app/bundle_cli.py::_closed",
+  "aisef2/app/bundle_cli.py::_grounds",
+  "aisef2/app/bundle_cli.py::_known",
+  "aisef2/app/bundle_cli.py::_read",
+  "aisef2/app/bundle_cli.py::_write_new",
+  "aisef2/app/bundle_cli.py::approve",
+  "aisef2/app/bundle_cli.py::coverage",
+  "aisef2/app/bundle_cli.py::explain",
+  "aisef2/app/bundle_cli.py::exposure_of",
+  "aisef2/app/bundle_cli.py::lint"
+ ],
+ "new": [
+  {
+   "target": "aisef2/app/bundle_cli.py::exposure_of",
+   "index": 1,
+   "mutant": "L494 element 0 dropped"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::exposure_of",
+   "index": 2,
+   "mutant": "L494 element 1 dropped"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::exposure_of",
+   "index": 3,
+   "mutant": "L494 element 2 dropped"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::exposure_of",
+   "index": 12,
+   "mutant": "L495 string 'the bundle to keep approvals from does not load: ' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::exposure_of",
+   "index": 13,
+   "mutant": "L495 string ': ' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_known",
+   "index": 7,
+   "mutant": "L168 And swapped"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_grounds",
+   "index": 3,
+   "mutant": "L306 sorted() -> list()"
+  }
+ ],
+ "carried": [
+  {
+   "target": "aisef2/app/bundle_cli.py::explain",
+   "index": 3,
+   "mutant": "L739 dict entry 0 dropped",
+   "class": "AUDITED",
+   "group": "T04-EXPLAIN-REPORT: informational fields of a report a human reads; no program reads them.",
+   "grounds": "Writer: explain L352; reader: none. main prints json.dumps(report, sort_keys=True) (L531-533). The dropped `project` is bundle['name']; rows the approver decides on are unchanged (reproduced: only the top-level keys differ). Not in explain's docstring, the module docstring or USAGE-2.1.md \u00a71 (only the command line), not required, not decision-bearing, not integrity-bearing (the bundle's identity is its digest, which explain does not print). A wide sweep of 8 modules incl. T04a is green with the mutant; T04a's file and mine both SURVIVE it.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:528-533 main (input gate on the bundle's format and keys, not on the output)",
+    "git grep '.explain(' and 'bundle explain' over aisef2/ validation/ tests/ docs/: only main, the examples' readme and USAGE-2.1.md:28",
+    "validation/v21/cli_integration/run.sh: explain is not run; tests/v2/test_v21_bundle_tools.py:72 and T04a read ['stories'] rows only"
+   ],
+   "exceptions_checked": [
+    "a script reading `.project` from the CLI JSON: none in the repo, and no document makes it public; owner decision if the report's top-level keys are meant to be public",
+    "a saved report that must say which bundle it explains: the rows name contract and criterion ids and the bundle was named on the command line"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "remapped_from": {
+    "index": 3,
+    "mutant": "L389 dict entry 0 dropped",
+    "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 3,
+     "mutant": "L352 dict entry 0 dropped",
+     "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+    },
+    "chain": [
+     {
+      "index": 3,
+      "mutant": "L352 dict entry 0 dropped",
+      "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+     },
+     {
+      "index": 3,
+      "mutant": "L389 dict entry 0 dropped",
+      "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::explain",
+   "index": 5,
+   "mutant": "L739 string 'project' emptied",
+   "class": "AUDITED",
+   "group": "T04-EXPLAIN-REPORT (see [3])",
+   "grounds": "The name is still printed, under the key '' (sort_keys puts it first): `{\"\": \"calc\", \"stories\": {...}}`; rows unchanged. A reader of `.project` would break; none exists. kill_check on the final file and T04a's file: SURVIVED; sweep green.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:531-533 main; tests/v2/test_v21_bundle_tools.py:72 (rows only); T04a ExplainEntries (selects keys by name)",
+    "git grep of the repo for a parser of explain's output: none"
+   ],
+   "exceptions_checked": [
+    "a key-sorted diff of two explain outputs: none exists",
+    "a consumer indexing by 'project': none; see [3] for the owner decision"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "remapped_from": {
+    "index": 5,
+    "mutant": "L389 string 'project' emptied",
+    "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 5,
+     "mutant": "L352 string 'project' emptied",
+     "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+    },
+    "chain": [
+     {
+      "index": 5,
+      "mutant": "L352 string 'project' emptied",
+      "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+     },
+     {
+      "index": 5,
+      "mutant": "L389 string 'project' emptied",
+      "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::explain",
+   "index": 31,
+   "mutant": "L735 string 'story' emptied",
+   "class": "AUDITED",
+   "group": "T04-EXPLAIN-REPORT: a report entry that gains a redundant key equal to its group key; no field lost, changed or misleading",
+   "grounds": "`{k: v for k, v in row.items() if k != 'story'}` becomes `k != ''`: no key is ever '', so each entry keeps its `story`, the key of the group it sits under (row['story'] = o.story_id at :300 and out.setdefault(row['story'], ...) at :385 are the same value by construction). I re-ran the implementer's differential (diff.py explain) on calc-3-stories, sealed and fully approved: the outputs differ only by an added `story` key in each of the 5 entries, mutant entry == {**original entry, 'story': group} for all 10 (sealed + approved); every other field, entry order, story order and `project` are identical. The key set before: approved, calibrated, class, clause, clause_text, contract, criterion, polarity, probe, requirement, role, spec, subject; after: the same plus story. No later literal key of the entry collides with `story`, so nothing is overwritten. Output only grows by data the reader already has one level up.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:565-571 (main): json.dumps(report, indent=1, sort_keys=True, default=str) printed for the approver; USAGE-2.1.md:28 (`aisef bundle explain` before approving): the reader is a person; exit code is 0 either way",
+    "tests that read explain's entries, by single key: test_v21_kills3_T04a.py::ExplainEntries (fields() picks keys with .get), test_v21_defects_bundlecli.py::CriterionWithoutAContract (e['criterion'], e['contract'], e['approved']), test_v21_bundle_tools.py:70-74 (r['calibrated'], r['approved']); none compares a whole entry or its key set",
+    "validation/v21/cli_integration/*.py|sh: no explain reader (readback.py reads journal events); docs/v2.1/evidence/cli-integration-*.out are snapshots compared by no test with live output (tests/test_v21_traceability.py cites a file for another record)",
+    "docs/v2.1/bundle-authoring.schema.json: the schema of the authoring document, not of explain's report; no document closes explain's entry key set (its docstring lists fields and does not list spec or subject either)"
+   ],
+   "exceptions_checked": [
+    "an exact key-set or whole-entry equality on an explain entry: none in tests, validation or docs",
+    "a flattening or table renderer printing every key of an entry, or `f(story=s, **entry)` / `dict(story=s, **entry)` which would raise TypeError on the duplicate: none (main only dumps JSON)",
+    "a consumer that wants `story` inside an entry: it is absent in the original, so none can exist; the mutant adds, never removes, data",
+    "a row without `story` (then `k != 'story'` would differ): every row is built with `story` at :300"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "remapped_from": {
+    "index": 31,
+    "mutant": "L385 string 'story' emptied",
+    "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+   }
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_closed",
+   "index": 7,
+   "mutant": "L481 sorted() -> list()",
+   "class": "AUDITED",
+   "group": "T04-CLOSED-MESSAGE: one refusal (bundle_cli.py:156) read by the operator on stderr; each of [7], [9], [10] changes one presentational element while the path, the expected keys and the held keys (or the type name) stay whole.",
+   "grounds": "`held` is only interpolated into the BundleError text (L155-156). list(obj) lists the same key set in the document's own order instead of alphabetical; L154 evaluates sorted(obj) first, so an unorderable key raises in both versions. Reproduced for a criterion with keys in non-alphabetical document order: original `(it holds ['contract', 'depends_on', 'facts', 'id', 'role', 'spec', 'zzz'])`, mutant `(it holds ['zzz', 'spec', 'role', 'id', 'facts', 'depends_on', 'contract'])`; the non-object branch (type name) is byte-identical. The expected list beside it is printed in declaration order, so sorting the held list gives no positional comparability; the sibling bundle.py:88-89 happens to sort its held list, a house style, not a stated contract. kill_check on the final file and on T04a's file: SURVIVED.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:538-540: main catches B.BundleError and prints `refused: {e}` to stderr, exit 2 (the only reader of the text; the [:2000] cut at L542 belongs to the other arm)",
+    "aisef2/app/bundle_cli.py:184-195: the contract-level call (L188) runs inside seal's try; its `except (KeyError, TypeError, ValueError)` (BundleError is a ValueError) re-embeds the text in `a requirement or contract does not hold: BundleError: ...` with no cut",
+    "tests/v2/test_v21_bundle_tools.py:143-153 (Refusals) and tests/v2/test_v21_kills3_T04a.py ClosedKeySets: assertIn of the path, 'spec' and the type names 'list'/'int' only; run by me against this mutant: SURVIVED",
+    "grep -e 'it holds' -e 'object of exactly' over aisef2/ validation/ tests/ docs/ closure-evidence/: only the sibling messages in aisef2/app/bundle.py:67-89,157, bundle_cli.py itself and the survivor lists; no golden or recorded refusal"
+   ],
+   "exceptions_checked": [
+    "a recorded or golden refusal compared byte for byte: none (grep above, incl. docs/v2.1/evidence/*.out)",
+    "a cut that lets order decide which keys survive: BundleError is printed whole (L538-540) and seal's wrapper does not cut",
+    "keys on which sorted() raises but list() does not: L154 already sorts every Mapping before L155, and JSON object keys are str"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "remapped_from": {
+    "index": 7,
+    "mutant": "L167 sorted() -> list()",
+    "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 7,
+     "mutant": "L155 sorted() -> list()",
+     "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+    },
+    "chain": [
+     {
+      "index": 7,
+      "mutant": "L155 sorted() -> list()",
+      "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+     },
+     {
+      "index": 7,
+      "mutant": "L167 sorted() -> list()",
+      "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_closed",
+   "index": 9,
+   "mutant": "L482 string ' (it holds ' emptied",
+   "class": "AUDITED",
+   "group": "T04-CLOSED-MESSAGE (see [7])",
+   "grounds": "Only the second label ' (it holds ' is emptied; ': an object of exactly ' stays, so the first list is still labelled as what the object must hold and the second (every key the object has, sorted, the keys it shares with the first list included) can only be what it holds. Reproduced: Mapping `...exactly ['id', ..., 'facts']['contract', ..., 'zzz'])`; non-object `...exactly ['id', ..., 'facts']str)`. Path, reason, expected keys and held keys / type name are all present in the same positions; what is lost is a redundant label, leaving two bracketed lists adjacent and a stray ')'. It is the audited mutant closest to the line: pinning it means pinning the word 'holds' or the whitespace between two lists, both wording. kill_check on the final file and T04a's file: SURVIVED.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:538-540: main catches B.BundleError and prints `refused: {e}` to stderr, exit 2 (the only reader of the text; the [:2000] cut at L542 belongs to the other arm)",
+    "aisef2/app/bundle_cli.py:184-195: the contract-level call (L188) runs inside seal's try; its `except (KeyError, TypeError, ValueError)` (BundleError is a ValueError) re-embeds the text in `a requirement or contract does not hold: BundleError: ...` with no cut",
+    "tests/v2/test_v21_bundle_tools.py:143-153 (Refusals) and tests/v2/test_v21_kills3_T04a.py ClosedKeySets: assertIn of the path, 'spec' and the type names 'list'/'int' only; run by me against this mutant: SURVIVED",
+    "grep -e 'it holds' -e 'object of exactly' over aisef2/ validation/ tests/ docs/ closure-evidence/: only the sibling messages in aisef2/app/bundle.py:67-89,157, bundle_cli.py itself and the survivor lists; no golden or recorded refusal"
+   ],
+   "exceptions_checked": [
+    "a reader who needs the label to tell held from missing/extra: the second list is the whole key set, not a difference, so the label is not what distinguishes them; the reader derives missing/extra from the two lists either way",
+    "non-object criterion (held = type name): renders `]str)`; the type name is still the last token and still names what was found (reproduced)",
+    "a parser of the held list: none (grep above)"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "remapped_from": {
+    "index": 9,
+    "mutant": "L168 string ' (it holds ' emptied",
+    "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 9,
+     "mutant": "L156 string ' (it holds ' emptied",
+     "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+    },
+    "chain": [
+     {
+      "index": 9,
+      "mutant": "L156 string ' (it holds ' emptied",
+      "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+     },
+     {
+      "index": 9,
+      "mutant": "L168 string ' (it holds ' emptied",
+      "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_closed",
+   "index": 10,
+   "mutant": "L482 string ')' emptied",
+   "class": "AUDITED",
+   "group": "T04-CLOSED-MESSAGE (see [7])",
+   "grounds": "`(it holds [...]` without the closing parenthesis: the ')' is the last character of the message; every word, the path, both lists and the label are intact (reproduced for Mapping and non-object). kill_check on the final file and T04a's file: SURVIVED.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:538-540: main catches B.BundleError and prints `refused: {e}` to stderr, exit 2 (the only reader of the text; the [:2000] cut at L542 belongs to the other arm)",
+    "aisef2/app/bundle_cli.py:194-195: the wrapper interpolates the text last in its f-string; nothing follows it",
+    "tests: no assertion on the end of the message (assertIn of path / key names only)"
+   ],
+   "exceptions_checked": [
+    "text appended after the message so an unclosed '(' swallows it: main prints it last (L539), the wrapper interpolates it last",
+    "a parser that balances parentheses over refusals: none in aisef2/, validation/, tests/"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "remapped_from": {
+    "index": 10,
+    "mutant": "L168 string ')' emptied",
+    "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 10,
+     "mutant": "L156 string ')' emptied",
+     "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+    },
+    "chain": [
+     {
+      "index": 10,
+      "mutant": "L156 string ')' emptied",
+      "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+     },
+     {
+      "index": 10,
+      "mutant": "L168 string ')' emptied",
+      "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::lint",
+   "index": 4,
+   "mutant": "L708 sorted() -> list()",
+   "class": "AUDITED",
+   "group": "T03a-order-of-an-id-list: [4] and [5] differ only in which diagnostic list; each has its own writer line and consumers below",
+   "grounds": "sorted() -> list() changes only the order of the ids inside one list: the key, the set of ids, the verdict and the exit code are the same, and both orders are deterministic (plan order is in the sealed bundle). The implementer's test pinned the order by comparing with sorted(ids); no document, docstring or consumer promises it, and explain (the other report) uses plan order. The content of the list is still asserted, order-insensitively, by the tests kept (see test).",
+   "consumers_checked": [
+    "git grep criteria_without_calibration over aisef/, aisef2/, validation/, tests/, docs/, closure-evidence/: the writer is aisef2/app/bundle_cli.py:324; no reader anywhere in code",
+    "aisef2/app/bundle_cli.py::lint `ready` (L335-336) reads to_approve, admission, uncovered and the stray list; it does not read this list",
+    "aisef2/app/bundle_cli.py::main prints json.dumps(report, indent=1, sort_keys=True): sort_keys orders dict keys, never list elements; the exit code comes from report['verdict']; aisef/cli/parser.py:425 only forwards the return code",
+    "docs/v2.1/evidence/cli-integration-{1899bb0,4fd070a,7797061,b72e51e,c9c736f}.out (the only places the key is printed): the value is [] in all five, so an order is not observable in any committed transcript; tests/test_v21_traceability.py reads one of them only for 'commit: b72e51e'",
+    "docs/v2.1/USAGE-2.1.md and ADR-V2.1.md: neither names the key nor promises an order"
+   ],
+   "exceptions_checked": [
+    "an operator or script diffing two lint outputs: plan order is part of the sealed bundle, so both plan order and sorted order are deterministic functions of it; the diff is identical under either",
+    "a consumer that takes element [0] or compares the list positionally: none exists in aisef/, aisef2/, validation/, tests/ (grep) or docs",
+    "a committed transcript with two or more ids: none (all five show []); the only place the order is visible is the unmigrated LedgerLock bundle (67 ids, plan order != sorted order, asserted by the implementer's precondition and passing), seen by a human only",
+    "a test that compares the whole lint report to a fixed dict: tests/v2/test_v21_bundle_tools.py reads verdict, admission, coverage and to_approve keys only"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "remapped_from": {
+    "index": 4,
+    "mutant": "L358 sorted() -> list()",
+    "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 4,
+     "mutant": "L324 sorted() -> list()",
+     "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+    },
+    "chain": [
+     {
+      "index": 4,
+      "mutant": "L324 sorted() -> list()",
+      "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+     },
+     {
+      "index": 4,
+      "mutant": "L358 sorted() -> list()",
+      "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::lint",
+   "index": 5,
+   "mutant": "L709 sorted() -> list()",
+   "class": "AUDITED",
+   "group": "T03a-order-of-an-id-list",
+   "grounds": "sorted() -> list() changes only the order of the ids inside one list: the key, the set of ids, the verdict and the exit code are the same, and both orders are deterministic (plan order is in the sealed bundle). The implementer's test pinned the order by comparing with sorted(ids); no document, docstring or consumer promises it, and explain (the other report) uses plan order. The content of the list is still asserted, order-insensitively, by the tests kept (see test).",
+   "consumers_checked": [
+    "git grep criteria_without_contract over aisef/, aisef2/, validation/, tests/, docs/, closure-evidence/: the writer is aisef2/app/bundle_cli.py:325; no reader anywhere in code",
+    "aisef2/app/bundle_cli.py::lint `ready` (L335-336) reads to_approve, admission, uncovered and the stray list; it does not read this list",
+    "aisef2/app/bundle_cli.py::main prints json.dumps(report, indent=1, sort_keys=True): sort_keys orders dict keys, never list elements; the exit code comes from report['verdict']; aisef/cli/parser.py:425 only forwards the return code",
+    "docs/v2.1/evidence/cli-integration-{1899bb0,4fd070a,7797061,b72e51e,c9c736f}.out (the only places the key is printed): the value is [] in all five, so an order is not observable in any committed transcript; tests/test_v21_traceability.py reads one of them only for 'commit: b72e51e'",
+    "docs/v2.1/USAGE-2.1.md and ADR-V2.1.md: neither names the key nor promises an order"
+   ],
+   "exceptions_checked": [
+    "an operator or script diffing two lint outputs: plan order is part of the sealed bundle, so both plan order and sorted order are deterministic functions of it; the diff is identical under either",
+    "a consumer that takes element [0] or compares the list positionally: none exists in aisef/, aisef2/, validation/, tests/ (grep) or docs",
+    "a committed transcript with two or more ids: none (all five show []); the only place the order is visible is the unmigrated LedgerLock bundle (67 ids, plan order != sorted order, asserted by the implementer's precondition and passing), seen by a human only",
+    "a test that compares the whole lint report to a fixed dict: tests/v2/test_v21_bundle_tools.py reads verdict, admission, coverage and to_approve keys only"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "remapped_from": {
+    "index": 5,
+    "mutant": "L359 sorted() -> list()",
+    "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 5,
+     "mutant": "L325 sorted() -> list()",
+     "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+    },
+    "chain": [
+     {
+      "index": 5,
+      "mutant": "L325 sorted() -> list()",
+      "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+     },
+     {
+      "index": 5,
+      "mutant": "L359 sorted() -> list()",
+      "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_read",
+   "index": 2,
+   "mutant": "L982 element 1 dropped",
+   "class": "EQUIVALENT",
+   "group": "A04",
+   "grounds": "bundle_cli.py:458 `except (OSError, UnicodeDecodeError, ValueError)`: a tuple matches an exception iff it is an instance of one listed class. UnicodeDecodeError.__mro__ = (UnicodeDecodeError, UnicodeError, ValueError, Exception, BaseException, object) (printed by me), so everything the dropped element matches ValueError matches too, and ValueError stays. The handler (L459) uses only `path` and `type(e).__name__`, the runtime class, so a non-UTF-8 file still reports `(UnicodeDecodeError)`. Nothing in the module rebinds UnicodeDecodeError or ValueError (grep: the only occurrence is L458). The list element is redundant, not wrong.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:455-459 _read: handler reads path and type(e).__name__ only",
+    "aisef2/app/bundle_cli.py:358, 507, 510, 511, 517, 523, 528, 536: the eight call sites receive a dict or the same BundleError"
+   ],
+   "exceptions_checked": [
+    "a UnicodeDecodeError that is not a ValueError: impossible by inheritance",
+    "a module-level rebinding of either name: none (grep)"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "remapped_from": {
+    "index": 2,
+    "mutant": "L496 element 1 dropped",
+    "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 2,
+     "mutant": "L458 element 1 dropped",
+     "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+    },
+    "chain": [
+     {
+      "index": 2,
+      "mutant": "L458 element 1 dropped",
+      "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+     },
+     {
+      "index": 2,
+      "mutant": "L496 element 1 dropped",
+      "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_read",
+   "index": 6,
+   "mutant": "L983 string ')' emptied",
+   "class": "AUDITED",
+   "group": "A04",
+   "grounds": "`<path>: cannot be read as JSON (JSONDecodeError` without the closing ')'; the path, the cause label and the exception's class name stay whole tokens. kill_check on the final file: SURVIVED; T04a's `UnreadableDocument` (path not run into a word, 'JSONDecodeError' in the text) also survives it.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:538-540: main catches B.BundleError and prints `refused: {e}` to stderr, exit 2 (the only reader of the text; the [:2000] cut at L542 belongs to the other arm)",
+    "tests/v2/test_v21_identity.py:182-183 and tests/test_v21_bundle_dispatch.py:25-28: migrate of a missing input file -> exit status 2 (through _read, L536), text not asserted",
+    "aisef2/app/bundle_cli.py:358, 507: init reads the packaged example through _read; reaches this text only with a broken wheel"
+   ],
+   "exceptions_checked": [
+    "a caller that appends to the message: none of the eight _read call sites wraps it",
+    "a parser that balances parentheses: none"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "remapped_from": {
+    "index": 6,
+    "mutant": "L497 string ')' emptied",
+    "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 6,
+     "mutant": "L459 string ')' emptied",
+     "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+    },
+    "chain": [
+     {
+      "index": 6,
+      "mutant": "L459 string ')' emptied",
+      "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+     },
+     {
+      "index": 6,
+      "mutant": "L497 string ')' emptied",
+      "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_write_new",
+   "index": 0,
+   "mutant": "L997 string '\\n' emptied",
+   "class": "AUDITED",
+   "group": "T04-WRITE-NEW-FORM: byte form of a file written by init/seal/approve/continue; every reader parses JSON or hashes a canonical re-serialisation.",
+   "grounds": "Re-run end to end at 289885e on both shipped examples (init -> git commit -> seal -> approve per contract -> lint -> explain; time.time and the git dates frozen; null mutant vs mutant): Project.digest, plan_hash, the lint verdict and stdout, the explain stdout and the seal stdout are identical; the files differ only in their last byte (`}` for `}\\n`), and the parsed JSON is equal. Every reader of a file `_write_new` writes parses JSON or hashes a canonical re-serialisation: `_read` (bundle_cli.py:493-497, json.loads), `bundle.read` (bundle.py:205-216, json.loads) reached by `aisef run` through aisef2/app/cli.py:72, and the digest `sha256(_canonical(dict(data)))` (bundle.py:139-140 sort_keys, :200). The bundle file is never hashed as bytes: `run.evidence_manifest` (run.py:294-302) lists RUN.json, the journals, the sessions, the preflight files and the review-findings artifacts, and the bundle is not copied into the run directory (run.py:1-30). The byte pin that exists is on migrate's OWN write (bundle_cli.py:575, tests/v2/test_v21_identity.py:186-197), not on `_write_new`.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:403 (init), :550 (seal), :556 (approve), :562 (continue): the only callers of `_write_new` (git grep over aisef, aisef2, validation, tests)",
+    "aisef2/app/bundle_cli.py:493-497 `_read`; aisef2/app/bundle.py:205-216 `read`, :139-140 `_canonical`, :200 digest; aisef2/app/cli.py:72",
+    "aisef2/app/run.py:282-302 `_content_sha` / `evidence_manifest` (no bundle file among the hashed files); run.py:1-30 (run directory layout)",
+    "tests/v2/test_v21_identity.py:186-197 (byte pin of migrate's write, L575); tests/v2/test_v21_kills3_T04a.py:405-422 `WrittenFiles` (pins [2] ensure_ascii=False through raw bytes; not the final newline)",
+    "validation/v21/cli_integration/run.sh:23-27 and e2e_guest.py:343-349 (seal/approve outputs go on only as --project / `lint` input)",
+    "docs/v2.1/USAGE-2.1.md section 1 and the schema docs/v2.1/bundle-authoring.schema.json: no statement about a final newline or key order"
+   ],
+   "exceptions_checked": [
+    "a line-oriented reader of a bundle file: none; the .jsonl journals/sessions (the round-3 LF-only readers: client.events, lineage.reconcile, process_range) are not written here",
+    "a tool that appends to a bundle file: every output goes through `_create` (exclusive create, L500-507)",
+    "git diff `\\ No newline at end of file`, Windows `\\r\\n` translation of the text-mode write: cosmetic, no reader (kernel_digest and `_content_sha` normalise or hash other files)",
+    "round 3's new artifact writer (review_verify.preserve, L420-422) also ends in `\\n` but is a different writer: not reached from here"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "remapped_from": {
+    "index": 0,
+    "mutant": "L511 string '\\n' emptied",
+    "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 0,
+     "mutant": "L473 string '\\n' emptied",
+     "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+    },
+    "chain": [
+     {
+      "index": 0,
+      "mutant": "L473 string '\\n' emptied",
+      "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+     },
+     {
+      "index": 0,
+      "mutant": "L511 string '\\n' emptied",
+      "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_write_new",
+   "index": 1,
+   "mutant": "L997 True->False",
+   "class": "AUDITED",
+   "group": "T04-WRITE-NEW-FORM (see [0])",
+   "grounds": "sort_keys=False writes the keys in insertion order (init: the example's authoring order; seal: `B.dump`'s fixed order, facts/stories in criteria/story order; approve and continue keep the order of the file they read). Re-run at 289885e on both shipped examples: digest, plan_hash, lint stdout, explain stdout identical; parsed bundle equal; init's authoring.json differs only in key order (both examples have alphabetical story ids S1 / S1,S2,S3, and seal iterates `authoring['stories']` in file order, bundle_cli.py:213, so the plan is the same). The one data-dependent difference I could construct: calc-3's criteria renamed so their authoring order is not alphabetical -> lint's `coverage.requirements[R].criteria` list is in authoring order under the mutant (['C90-C-ADD', ..., 'C86-C-ADD-3']) and sorted under the original (the same set, same verdict NOT_READY, same digest); `coverage` appends criteria in facts order (bundle_cli.py:318-327, 345-347) whereas the sibling lists `criteria_without_*` are sorted (L358-359). That is a report-only list order. Everything the kernel hashes is order-free: `freeze` sorts mapping keys (product/contract.py:32-44, :37) so a contract's nested stimulus/observable arrive sorted whatever the file; canonical/digest sort_keys (contract.py:60-65; bundle.py:139-140); Project.order() sorts (bundle.py:124-136) and the run iterates it (run.py:456) and looks stories/facts up by key (run.py:462,173; feedback.py:82; review_verify.py:202-208).",
+   "consumers_checked": [
+    "aisef2/app/bundle.py:124-136 `order`, :139-140, :151-159 `dump`, :189-193 (facts/stories rebuilt in file order), :200 digest",
+    "aisef2/product/contract.py:32-44 `freeze`, :60-65 `canonical`/`digest`; aisef2/product/spec.py:46 (probe_input frozen = sorted)",
+    "aisef2/app/bundle_cli.py:213 (seal iterates stories in file order), :312-349 `coverage`, :352-371 `lint`, :374-389 `explain` (rows from plan obligations, a tuple), :468-472 / :487 continue_from stories and `remaining`",
+    "aisef2/app/run.py:456,462,173; aisef2/app/feedback.py:82,114; aisef2/app/review_verify.py:197-211 (all by key or plan order)",
+    "tests/v2/test_v21_kills_bundle_cli.py Coverage (in-memory dict, not tied to the writer); tests/v2/test_v21_kills3_T00a.py (members of a bundle in any order are accepted)",
+    "git grep for iteration over `.stories` / `.facts` / `.contracts` / `.requirements` of a Project or bundle outside bundle.py/bundle_cli.py (aisef2/): feedback.py, review_verify.py, run.py only"
+   ],
+   "exceptions_checked": [
+    "init's authoring.json feeding seal's plan order: a future example with non-alphabetical story ids would seal to a different, equally valid plan; none ships, and no hash of a sealed example is recorded",
+    "nested dict order of a contract reaching a probe: `freeze` sorts at BehaviorContract construction (contract.py:37, :144), so file order is gone before a probe sees it",
+    "a tool or test diffing two bundle files: none; a consumer of lint's criteria-list order: only the operator (no code reads it; `ready` uses statuses and `to_approve`, L368-370)",
+    "TypeError from sort_keys on mixed-type keys (the original's other effect): every key of a bundle is a str (shape_problems, bundle.py:90-95)"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "remapped_from": {
+    "index": 1,
+    "mutant": "L511 True->False",
+    "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 1,
+     "mutant": "L473 True->False",
+     "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+    },
+    "chain": [
+     {
+      "index": 1,
+      "mutant": "L473 True->False",
+      "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+     },
+     {
+      "index": 1,
+      "mutant": "L511 True->False",
+      "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::coverage",
+   "index": 11,
+   "mutant": "L680 string 'clause -> criteria. Every clause of a bundle that loads is a string; one that is not (a missing one beside\\n        \"1.1\", a number, a list: `load` refuses it and lint says so) must not make this report unprintable, so it is\\n        keyed as it is while the keys hash and order (json.dumps(sort_keys=True) orders them), else by its JSON text.' emptied",
+   "class": "EQUIVALENT",
+   "group": "R04",
+   "grounds": "The mutant empties the docstring of the closure `by_clause` (bundle_cli.py:329-343; body statement at L330-332). Proof from the code: by_clause is created per call of coverage, named once by its call at L346 and never returned, stored, passed or inspected; coverage returns the report dict (L345-349). Re-ran the AST probe at 289885e: exactly one Name node `by_clause` in coverage (L346, Load); none of locals/vars/globals/dir/getattr/eval/exec/help/__doc__/_getframe/f_locals/inspect inside coverage; no `__doc__`, inspect, pydoc or frame use anywhere in bundle_cli.py. A docstring has no effect on behaviour; the only observable is `by_clause.__doc__`, which no code can reach (a local of a running call). The behaviour the docstring describes (a non-string clause keyed by its JSON text, no TypeError) is code in by_clause's body and is pinned by tests/v2/test_v21_defects_lint.py:124 and tests/v2/test_v21_kills_bundle_cli.py:31; the mutant leaves the body untouched.",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:312-349 (coverage) and :352-371 (lint, its only caller)",
+    "grep __doc__, get_docstring, getdoc, pydoc, inspect, doctest, co_consts, __code__ over aisef2, aisef, validation, tests: module docstrings as CLI help; validation/v2/gen_migration_table.py (get_docstring of a v1 module), aisef2/quality/relevance.py:151 (code objects of the project under test, no docstring read), tests/v2/test_p6_orchestration.py:205 (bytecode shape of the product under test); none reads a docstring of bundle_cli.py",
+    "pyproject.toml:60-68: ruff select F, B, E9 (no docstring rule); validation/v2/kernel_static_checks.py:68-71 RULES (11, none about docstrings)",
+    "aisef2/app/run.py:81-88 kernel_digest hashes every .py byte, so every mutant changes it; no kill-set test pins a literal digest (tests/v2/test_v21_identity_bytes.py is NOT_KILL_FILES)"
+   ],
+   "exceptions_checked": [
+    "help()/pydoc/doc generator reaching a closure: a closure is not reachable from the module or an object",
+    "a check that every function carries a non-empty docstring: none",
+    "python -OO strips docstrings in production anyway, so no behaviour can depend on them",
+    "kernel_digest: changed by this mutant like by any source edit; that is identity of bytes, not behaviour, and applies to every mutant of every target"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "remapped_from": {
+    "index": 11,
+    "mutant": "L330 string 'clause -> criteria. Every clause of a bundle that loads is a string; one that is not (a missing one beside\\n        \"1.1\", a number, a list: `load` refuses it and lint says so) must not make this report unprintable, so it is\\n        keyed as it is while the keys hash and order (json.dumps(sort_keys=True) orders them), else by its JSON text.' emptied",
+    "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+   }
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::approve",
+   "index": 18,
+   "mutant": "L625 string ' in the bundle' emptied",
+   "class": "AUDITED",
+   "group": "A04",
+   "grounds": "`no contract 'BC-NOPE'`: a complete statement with the cause and the id; only ' in the bundle' is lost. approve looks in one place, the file named as its first argument (L517 `_read(a.bundle)`), and the original does not name that file either ('the bundle' is generic), so no identifying element is lost. kill_check on the final file and T04a's file: SURVIVED, by design (the [14] test pins id + cause, not the place).",
+   "consumers_checked": [
+    "aisef2/app/bundle_cli.py:538-540: main catches B.BundleError and prints `refused: {e}` to stderr, exit 2 (the only reader of the text; the [:2000] cut at L542 belongs to the other arm)",
+    "aisef2/app/bundle_cli.py:263 and the companion test above (id + cause + exit 2 + no file)",
+    "grep ' in the bundle' over aisef2/ validation/ tests/ docs/: bundle.py sibling messages only; none quotes this refusal"
+   ],
+   "exceptions_checked": [
+    "a programmatic caller holding several bundles that needs to know which: neither version names it",
+    "the phrase distinguishing this refusal from [20]'s: [20] says 'a requirement of the bundle', this one is distinguished by 'no contract'"
+   ],
+   "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+   "remapped_from": {
+    "index": 15,
+    "mutant": "L275 string ' in the bundle' emptied",
+    "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+    "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f",
+    "origin": {
+     "index": 15,
+     "mutant": "L263 string ' in the bundle' emptied",
+     "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+    },
+    "chain": [
+     {
+      "index": 15,
+      "mutant": "L263 string ' in the bundle' emptied",
+      "base": "c4c1720070f9017ae49a5b1369a468e2bb6411aa"
+     },
+     {
+      "index": 15,
+      "mutant": "L275 string ' in the bundle' emptied",
+      "source_sha256": "b54fc64147895e46d4d060ebd4f43435ffb7cbbb602cbd85bda41459268ac11a",
+      "base": "289885ef1bb8c6e1b8503f3b7760464390e7916f"
+     }
+    ]
+   }
+  }
+ ]
+}

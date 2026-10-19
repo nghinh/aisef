@@ -1,0 +1,50 @@
+{
+ "batch": "W2-bundle_cli-7",
+ "file": "aisef2/app/bundle_cli.py",
+ "targets": [
+  "aisef2/app/bundle_cli.py::_declared"
+ ],
+ "new": [
+  {
+   "target": "aisef2/app/bundle_cli.py::_declared",
+   "index": 18,
+   "mutant": "L210 returns None"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_declared",
+   "index": 20,
+   "mutant": "L212 returns None"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_declared",
+   "index": 30,
+   "mutant": "L203 element 1 dropped"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_declared",
+   "index": 49,
+   "mutant": "L211 element 1 dropped"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_declared",
+   "index": 50,
+   "mutant": "L211 element 2 dropped"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_declared",
+   "index": 54,
+   "mutant": "L213 element 1 dropped"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_declared",
+   "index": 57,
+   "mutant": "L211 string 'before' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_declared",
+   "index": 58,
+   "mutant": "L211 string 'after' emptied"
+  }
+ ],
+ "carried": []
+}

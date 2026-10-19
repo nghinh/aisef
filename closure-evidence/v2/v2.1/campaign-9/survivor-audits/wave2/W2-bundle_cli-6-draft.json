@@ -1,0 +1,100 @@
+{
+  "batch": "W2-bundle_cli-6",
+  "snapshot": "4ec961e706a1f7bda16d131037058c4fe9c2663f",
+  "file": "aisef2/app/bundle_cli.py",
+  "target": "aisef2/app/bundle_cli.py::_record",
+  "role": "author",
+  "measured_on": "2026-10-19 (date: Mon Oct 19 18:25 +07 2026)",
+  "method": "Author tree from git archive@4ec961e. Each mutant built from a pristine copy via validation.v2.mutation.mutants(src,'_record',enums)[INDEX], desc asserted == batch entry, written over aisef2/app/bundle_cli.py in a run-copy, then the two REGISTERED kill files run together, one mutant at a time: env -i PATH(stripped of both dirs holding an executable opencode: ~/.opencode/bin, ~/.npm-global/bin) HOME/TMPDIR under the tree, PYTHONPATH=runcopy, nice -n 19 python3 -P -B -W ignore -m unittest tests.v2.test_v21_pw_lineage_continue tests.v2.test_v21_kills3_T01b -q. Baseline unmutated: 51 tests OK.",
+  "kill_files": ["tests/v2/test_v21_pw_lineage_continue.py", "tests/v2/test_v21_kills3_T01b.py"],
+  "measurement_result": "All 8 mutants: 51 tests OK (both kill files PASS) == SURVIVED by measurement. No REFUTED-by-measurement. The registered kill files pin only JournalRefused.code and the invariant tokens 'no run record'/'RUN.json'/'PermissionError'/R.STARTED, all preserved by every mutant.",
+  "entries": [
+    {
+      "target": "aisef2/app/bundle_cli.py::_record",
+      "index": 24,
+      "mutant": "L791 string ' is there) — nothing identifies the run; run the bundle itself again' emptied",
+      "class": "AUDITED",
+      "group": "bundle_cli._record refusal-message strings (operator-only body)",
+      "grounds": "EVIDENCE_MISSING raise, line 791. Mutated str(err) = 'EVIDENCE_MISSING: <dir>: no run record (neither RUN.json nor RUN.started.json' — the code and the identifying phrase 'no run record' plus both file names survive; only the remedy tail 'run the bundle itself again' is lost. Kill-file run: 51 OK (SURVIVED). Reached by kills3_T01b RecordOfTheRun.test_a_run_with_no_readable_record_is_refused_by_name ('neither record' case) and test_the_command_refuses_a_directory_that_is_no_run_with_status_2 ('an empty directory'), and pw_lineage_continue TheRecordItself.test_no_run_record_is_told_apart_missing_from_cut; all assert code==EVIDENCE_MISSING and 'no run record' in str and the dir path — every one preserved. The remedy tail is redundant with the preserved code and the operator table in the module docstring (line 30ff); grep found no test/doc pinning 'run the bundle itself again' or 'nothing identifies the run'.",
+      "consumers_checked": ["operator via print(f'refused: {e}') at aisef2/app/bundle_cli.py:1079 and str(err)", "tests/v2/test_v21_kills3_T01b.py::RecordOfTheRun (asserts code + 'no run record' + dir path — preserved)", "tests/v2/test_v21_pw_lineage_continue.py::TheRecordItself.test_no_run_record_is_told_apart_missing_from_cut", "aisef2/app/run.py:243 verifier checks only the 'refused:' prefix", "grep tests/ docs/ aisef2/ validation/ for 'run the bundle itself again' / 'nothing identifies the run' — no pin"],
+      "exceptions_checked": ["the operator reads the body, but the lost remedy tail is not load-bearing: EVIDENCE_MISSING + 'no run record (neither RUN.json nor RUN.started.json' still fully identify the failure; no consumer/contract/doc depends on the tail"]
+    },
+    {
+      "target": "aisef2/app/bundle_cli.py::_record",
+      "index": 30,
+      "mutant": "L789 string ' cut: not JSON) — nothing identifies the run; run the bundle itself again' emptied",
+      "class": "AUDITED",
+      "group": "bundle_cli._record refusal-message strings (operator-only body)",
+      "grounds": "EVIDENCE_MALFORMED raise, cut branch, line 789. Mutated str(err) = 'EVIDENCE_MALFORMED: <dir>: no run record (<joined cut names>' — code, 'no run record' and the cut file name(s) survive; lost are the reason-tag 'cut: not JSON' (redundant with the MALFORMED code, which IS pinned) and the remedy. Kill-file run: 51 OK (SURVIVED). Reached by kills3_T01b test_a_run_with_no_readable_record (cut cases: 'the started record torn', 'both records torn', 'the record torn and no started record') + test_the_command_refuses_a_directory ('a torn started record') + pw_lineage_continue test_no_run_record_is_told_apart (cut half); all assert code==EVIDENCE_MALFORMED and 'no run record' and R.STARTED — preserved. grep found no pin of 'cut: not JSON'.",
+      "consumers_checked": ["operator via bundle_cli.py:1079 / str(err)", "tests/v2/test_v21_kills3_T01b.py::RecordOfTheRun.test_a_run_with_no_readable_record_is_refused_by_name (asserts code + 'no run record' + R.STARTED — preserved)", "tests/v2/test_v21_pw_lineage_continue.py::TheRecordItself.test_no_run_record_is_told_apart_missing_from_cut", "aisef2/app/run.py:243 (prefix only)", "grep 'cut: not JSON' — no pin"],
+      "exceptions_checked": ["operator reads the body; the MALFORMED-vs-MISSING distinction that matters is carried by JournalRefused.code (preserved and pinned), so the dropped reason-tag/remedy is redundant; no consumer/contract/doc depends on it"]
+    },
+    {
+      "target": "aisef2/app/bundle_cli.py::_record",
+      "index": 33,
+      "mutant": "L783 string ' is not a run record (a JSON object): restore it from a faithful copy of the run directory — nothing was written' emptied",
+      "class": "REFUTED",
+      "group": "bundle_cli._record refusal-message strings (operator-only body)",
+      "grounds": "EVIDENCE_MALFORMED raise, valid-JSON-not-an-object branch, line 783. Mutated str(err) collapses to 'EVIDENCE_MALFORMED: <dir>/RUN.json' — the ENTIRE operator sentence is gone: no 'is not a run record', no remedy 'restore from a faithful copy', no safety assurance 'nothing was written'. Kill-file run: 51 OK (SURVIVED) because the only test on this path, pw_lineage_continue TheRecordItself.test_a_record_that_is_valid_json_and_no_record_is_malformed_not_a_kill, asserts ONLY code_of(run)==EVIDENCE_MALFORMED. The SIBLING not-text path (UnicodeDecodeError, lines 768-771) deliberately pins its sentence via test_a_record_that_is_not_text_is_damage ('not text' + regex 'restore|faithful copy' + 'nothing was written') and kills3_T01b test_a_record_that_is_not_text — so this not-a-dict path is an uncovered symmetric gap in operator guidance, which the owner rule treats as not harmless. A test is owed.",
+      "consumers_checked": ["operator via bundle_cli.py:1079 / str(err) — stranded with a bare code+path, no sentence", "tests/v2/test_v21_pw_lineage_continue.py::TheRecordItself.test_a_record_that_is_valid_json_and_no_record_is_malformed_not_a_kill (asserts code only)", "sibling pin tests/v2/test_v21_pw_lineage_continue.py::TheRecordItself.test_a_record_that_is_not_text_is_damage_and_is_not_replaced_by_the_started_record + tests/v2/test_v21_kills3_T01b.py::RecordOfTheRun.test_a_record_that_is_not_text_is_damage", "grep 'is not a run record (a JSON object)' — only lineage.py:696 (different site) and verify.py (different message); not this path"],
+      "exceptions_checked": ["JournalRefused.code (EVIDENCE_MALFORMED) survives as the operator's primary signal per the module docstring (line 30), but the human sentence — pinned on the sibling not-text path — is entirely emptied and unpinned here, so the gap is real, not a redundancy"],
+      "refutation": "input: a run directory whose RUN.json holds valid JSON that is not an object, e.g. '[1, 2]' (STARTED irrelevant) -> _record raises EVIDENCE_MALFORMED at line 783; this is exactly the existing test's setup. reader: the operator, via str(err) printed as 'refused: {e}' (bundle_cli.py:1079). sketch: in tests/v2/test_v21_pw_lineage_continue.py::TheRecordItself.test_a_record_that_is_valid_json_and_no_record_is_malformed_not_a_kill, capture err=self.refused(run) and add assertIn('is not a run record', str(err)); assertRegex(str(err), r'restore|faithful copy'); assertIn('nothing was written', str(err)) — mirroring the sibling not-text test."
+    },
+    {
+      "target": "aisef2/app/bundle_cli.py::_record",
+      "index": 38,
+      "mutant": "L775 string ' cannot be read (' emptied",
+      "class": "AUDITED",
+      "group": "bundle_cli._record refusal-message strings (operator-only body)",
+      "grounds": "EVIDENCE_UNREADABLE raise, line 775. Emptying the connective ' cannot be read (' yields str(err) = '...RUN.json' + '{type}: {strerror}): restore read access ... nothing was written' — the file, exception type, strerror, full remedy and the 'nothing was written' assurance ALL survive; only the connective phrase and its grammar are lost. Kill-file run: 51 OK (SURVIVED). Reached by pw_lineage_continue TheRecordItself.test_a_record_that_cannot_be_read_is_not_demoted_to_the_started_record (asserts code==EVIDENCE_UNREADABLE + 'RUN.json' + 'PermissionError' — all preserved). grep: 'cannot be read' is not pinned for this path and its sense survives via 'PermissionError'+'restore read access'.",
+      "consumers_checked": ["operator via bundle_cli.py:1079 / str(err)", "tests/v2/test_v21_pw_lineage_continue.py::TheRecordItself.test_a_record_that_cannot_be_read_is_not_demoted_to_the_started_record (asserts code + 'RUN.json' + 'PermissionError' — preserved)", "aisef2/app/run.py:243 (prefix only)", "grep 'cannot be read' — no pin tied to _record L775"],
+      "exceptions_checked": ["observable (connective dropped, grammar degraded) but not EQUIVALENT; the UNREADABLE guidance and assurance remain intact, so no operator/consumer dependency is broken"]
+    },
+    {
+      "target": "aisef2/app/bundle_cli.py::_record",
+      "index": 39,
+      "mutant": "L775 string ': ' emptied",
+      "class": "AUDITED",
+      "group": "bundle_cli._record refusal-message strings (operator-only body)",
+      "grounds": "EVIDENCE_UNREADABLE raise, line 775. Emptying the ': ' separator between {type(e).__name__} and {e.strerror or e} yields '...PermissionErrorPermission denied): restore ...'. The kill test asserts assertIn('PermissionError', str(err)), and 'PermissionError' is still a substring of 'PermissionErrorPermission denied', so it passes. Kill-file run: 51 OK (SURVIVED). All remedy/assurance text preserved. Reached by the same test as index 38.",
+      "consumers_checked": ["operator via bundle_cli.py:1079 / str(err)", "tests/v2/test_v21_pw_lineage_continue.py::TheRecordItself.test_a_record_that_cannot_be_read_is_not_demoted_to_the_started_record (assertIn 'PermissionError' still holds as a substring)", "aisef2/app/run.py:243 (prefix only)"],
+      "exceptions_checked": ["observable (two tokens run together) but not EQUIVALENT; the information (type name + strerror + guidance) is wholly preserved, and no consumer depends on the separator"]
+    },
+    {
+      "target": "aisef2/app/bundle_cli.py::_record",
+      "index": 40,
+      "mutant": "L776 string '): restore read access to it (or a faithful copy of the run directory) and run the command again — the run is never modified and nothing was written' emptied",
+      "class": "REFUTED",
+      "group": "bundle_cli._record refusal-message strings (operator-only body)",
+      "grounds": "EVIDENCE_UNREADABLE raise, line 776. Mutated str(err) = '...RUN.json cannot be read (PermissionError: Permission denied' — the file, type and strerror survive, but the WHOLE remedy AND the safety assurance 'the run is never modified and nothing was written' are emptied. Kill-file run: 51 OK (SURVIVED) because the only test reaching _record's record-unreadable path, pw_lineage_continue TheRecordItself.test_a_record_that_cannot_be_read_is_not_demoted_to_the_started_record, asserts only code + 'RUN.json' + 'PermissionError'. The SIBLING journal-unreadable path (_journal, lines 847-850) pins exactly this assurance via test_the_text_says_nothing_was_changed_and_what_to_do (regex 'read access|restore|copy' + 'never modif|nothing was (written|changed)'). The record-unreadable path has no such pin — a real, symmetric coverage gap on operator-facing damage assurance. A test is owed. (Note: pw_lineage_continue test_a_run_directory_that_cannot_be_searched asserts 'restore|permissions' but its chmod-the-directory setup fails earlier in continue_from at lineage.continued_by, line 887-889, so it never reaches _record and does not guard this string.)",
+      "consumers_checked": ["operator via bundle_cli.py:1079 / str(err) — loses what-to-do and the 'nothing was written / run never modified' assurance", "tests/v2/test_v21_pw_lineage_continue.py::TheRecordItself.test_a_record_that_cannot_be_read_is_not_demoted_to_the_started_record (asserts code + 'RUN.json' + 'PermissionError' only)", "sibling pin tests/v2/test_v21_pw_lineage_continue.py::TheJournalCannotBeRead.test_the_text_says_nothing_was_changed_and_what_to_do (journal path, _journal L847-850)", "grep 'restore read access' / 'nothing was written' — not pinned for this _record path"],
+      "exceptions_checked": ["code EVIDENCE_UNREADABLE + 'RUN.json' + 'PermissionError' survive, but the remedy+assurance clause (explicitly pinned on the journal-unreadable sibling) is gone and unpinned here; the directory-unreadable test that looks relevant short-circuits in lineage before _record, so it is not a guard"],
+      "refutation": "input: a run directory with a readable directory but RUN.json chmod 0o000 (POSIX, non-root) -> _record's read_text raises PermissionError, lineage.not_there is False, so EVIDENCE_UNREADABLE is raised at lines 775-776; this is exactly test_a_record_that_cannot_be_read_is_not_demoted_to_the_started_record's setup. reader: the operator, via str(err) printed as 'refused: {e}' (bundle_cli.py:1079). sketch: in that test add assertRegex(str(err), r'restore|read access|faithful copy') and assertRegex(str(err), r'never modif|nothing was (written|changed)') — the same two assertions the journal-unreadable sibling test already makes."
+    },
+    {
+      "target": "aisef2/app/bundle_cli.py::_record",
+      "index": 41,
+      "mutant": "L776 Or swapped (e.strerror or e -> e.strerror and e)",
+      "class": "AUDITED",
+      "group": "bundle_cli._record refusal-message strings (operator-only body)",
+      "grounds": "EVIDENCE_UNREADABLE raise, line 776. 'e.strerror or e' picks strerror when truthy else the exception; 'e.strerror and e' picks the exception when strerror is truthy else strerror. For a typical PermissionError (strerror='Permission denied') the original interpolates 'Permission denied' and the mutant interpolates str(e)='[Errno 13] Permission denied: <path>' — different detail text, but both convey the same error and path, and the exception TYPE NAME ('PermissionError'), the remedy and the assurance are untouched. Kill-file run: 51 OK (SURVIVED); the kill test asserts 'PermissionError' (from type(e).__name__, independent of this swap) and 'RUN.json' — both preserved. Not EQUIVALENT (strerror != str(e); on the rare None-strerror OSError the mutant would render 'None'), but observable only in which rendering of the same OSError is shown.",
+      "consumers_checked": ["operator via bundle_cli.py:1079 / str(err)", "tests/v2/test_v21_pw_lineage_continue.py::TheRecordItself.test_a_record_that_cannot_be_read_is_not_demoted_to_the_started_record (asserts 'PermissionError' type name + 'RUN.json' + code — all unaffected)", "aisef2/app/run.py:243 (prefix only)"],
+      "exceptions_checked": ["observable detail-rendering change, so not EQUIVALENT; but no consumer/contract/doc depends on whether strerror or str(e) is shown, and the UNREADABLE code + type name + guidance are preserved"]
+    },
+    {
+      "target": "aisef2/app/bundle_cli.py::_record",
+      "index": 42,
+      "mutant": "L789 string ' and ' emptied (' and '.join(cut) -> ''.join(cut))",
+      "class": "AUDITED",
+      "group": "bundle_cli._record refusal-message strings (operator-only body)",
+      "grounds": "EVIDENCE_MALFORMED cut branch, line 789. The join separator only matters when cut has >=2 names (both RUN.json and RUN.started.json present and both unparseable JSON): 'RUN.jsonRUN.started.json' vs 'RUN.json and RUN.started.json'. Exercised by kills3_T01b test_a_run_with_no_readable_record 'both records torn' case, which passed (asserts only 'no run record' + code). Both file names are still named; only the cosmetic separator is lost. Kill-file run: 51 OK (SURVIVED). Not EQUIVALENT (a 2-element cut yields different bytes) but no consumer depends on the separator.",
+      "consumers_checked": ["operator via bundle_cli.py:1079 / str(err)", "tests/v2/test_v21_kills3_T01b.py::RecordOfTheRun.test_a_run_with_no_readable_record_is_refused_by_name ('both records torn' -> cut has 2 elements; asserts 'no run record' + R.STARTED + code — preserved)", "aisef2/app/run.py:243 (prefix only)"],
+      "exceptions_checked": ["observable only when two records are simultaneously cut (so not EQUIVALENT), and then only as run-together file names; both names remain present and no consumer/contract/doc depends on the ' and ' separator"]
+    }
+  ],
+  "owed_tests": [
+    "tests/v2/test_v21_pw_lineage_continue.py::TheRecordItself.test_a_record_that_is_valid_json_and_no_record_is_malformed_not_a_kill — currently asserts only code_of==EVIDENCE_MALFORMED; add message assertions on the refusal (input RUN.json='[1, 2]'): assertIn('is not a run record', str(err)), assertRegex(str(err), r'restore|faithful copy'), assertIn('nothing was written', str(err)). Kills _record index 33 (L783 sentence emptied).",
+    "tests/v2/test_v21_pw_lineage_continue.py::TheRecordItself.test_a_record_that_cannot_be_read_is_not_demoted_to_the_started_record — currently asserts code + 'RUN.json' + 'PermissionError'; add the remedy+assurance checks the journal-unreadable sibling already pins (input RUN.json chmod 0o000): assertRegex(str(err), r'restore|read access|faithful copy'), assertRegex(str(err), r'never modif|nothing was (written|changed)'). Kills _record index 40 (L776 remedy+assurance emptied)."
+  ],
+  "notes": "Target bundle_cli.py::_record. All 8 NEW survivors are operator-facing refusal-message-string mutations inside JournalRefused(code, message) raises; none changes the error code (first arg), control flow, or the returned (rec, recorded). The message body's only reader is the operator (print(f'refused: {e}') at bundle_cli.py:1079 / str(err) in tests); failures are told apart by JournalRefused.code (module docstring line 30), preserved by every mutant, and the verifier (run.py:243) checks only the 'refused:' prefix. Both registered kill files were RUN against each mutant one at a time (baseline 51 OK; each mutant 51 OK) -> all SURVIVE by measurement, matching the campaign; no REFUTED-by-measurement. Per the owner rule 'a string read by an operator is not harmless': 33 and 40 are REFUTED because they empty a complete operator sentence (33: collapses to a bare code+path; 40: deletes the 'nothing was written / run never modified' safety assurance) on paths whose SIBLINGS (not-text L768-771; journal-unreadable _journal L847-850) deliberately pin the analogous text — a real symmetric coverage gap, a test owed. The remaining 6 are AUDITED: 24/30 drop only a redundant remedy/reason-tag while 'no run record'+files+code survive (all pinned); 38/39 drop a connective/separator with all info preserved ('PermissionError' survives as a substring); 41 swaps which rendering of the same OSError is shown; 42 changes a join separator observable only when two records are simultaneously cut. carried: none. No code or tests were changed; closure-evidence was not modified."
+}

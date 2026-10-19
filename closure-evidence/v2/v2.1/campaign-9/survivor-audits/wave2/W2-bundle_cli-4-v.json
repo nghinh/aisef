@@ -1,0 +1,162 @@
+{
+ "batch": "W2-bundle_cli-4",
+ "file": "aisef2/app/bundle_cli.py",
+ "snapshot": "4ec961e706a1f7bda16d131037058c4fe9c2663f",
+ "target": "aisef2/app/bundle_cli.py::_ground",
+ "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+ "role": "skeptic",
+ "verified_at": "2026-10-19 20:08 +0700",
+ "method": "git archive 4ec961e -> tree; source_sha256 recomputed e083e92a… (match). mutant_view.py for all 18 -> every DESC matches the entry's mutant exactly. Fresh run copy + closure-evidence/v2/release/LEDGERLOCK-PROJECT.json; env -i, PATH=/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin (both opencode dirs /Users/nghinh/.opencode/bin and /Users/nghinh/.npm-global/bin stripped), HOME/TMPDIR/XDG under the tree, PYTHONPATH=runroot, nice -n 19 python3 -P -B -m unittest tests.v2.test_v21_migrate_semantics -q. Baseline unmutated = Ran 51 tests OK. All 18 mutants = Ran 51 tests OK -> SURVIVED (reproduces the author). Registered kill set V21_TARGETS['aisef2/app/bundle_cli.py::_ground'] = ['tests/v2/test_v21_migrate_semantics.py'] (sole file). grep across aisef2/aisef/validation/tests/docs: approvals_kept_grounds written at bundle_cli.py:438, read only by test_v21_migrate_semantics.py:384,490,661; no other test module reads the grounds or _ground; with_commands:347-363 touches only needs_owner_reapproval; context_gap.py:138 discards the report; parser.py:424-426 routes bundle->main; USAGE-2.1.md:96 and REPORT.md:284 document the field. subject_absence is _group group key (bundle_cli.py:283); on a grounds row it is read by NO test (:368 and :652 read semantic_changes rows, confirmed via the enclosing loops at :366 and :651). Pinned grounds substrings: 'none selects class exists' :393, 'did not move' :397/:669; structured from/to :389-390, consulted :391-392. Current (None) row reached only by WhatIsNotKept :490-491, which reads from/probe/len(contracts) only.",
+ "entries": [
+  {
+   "target": "aisef2/app/bundle_cli.py::_ground", "index": 16, "mutant": "L290 dict entry 1 dropped",
+   "class_before": "AUDITED", "verdict": "CONFIRMED", "class_after": "AUDITED",
+   "grounds": "mutant_view: drops {'class': None} from the None (current) row dict -> correct (L290, entry 1, 0-based). Reproduced SURVIVED (51 OK). Value is None; the only reader of a current row (WhatIsNotKept:490-491) reads from/probe/len(contracts), never class; no other consumer touches grounds. Observable (key gone from printed json) so not EQUIVALENT; no consumer/contract depends (MUTATION-RUNNER-V2 §16) so AUDITED stands.",
+   "consumers_checked": ["bundle_cli.py:438 writer; main:1084 prints report; with_commands:347 only needs_owner_reapproval; context_gap.py:138 discards report", "test_v21_migrate_semantics.py:490-491 (only current-row reader) reads from/probe/contracts"],
+   "exceptions_checked": ["a reader of the current row's class: none", "a datum lost: none (value None)", "a schema validator requiring uniform keys: none (grep)"],
+   "refutation": "", "note": "class_before=AUDITED upheld."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_ground", "index": 17, "mutant": "L290 dict entry 2 dropped",
+   "class_before": "AUDITED", "verdict": "CONFIRMED", "class_after": "AUDITED",
+   "grounds": "mutant_view: drops {'subject_absence': None} from the current row -> correct. Reproduced SURVIVED. On the current row subject_absence is None by design (nothing to compare); not read by WhatIsNotKept:490-491. Asymmetry with [10]/[24] is correct: here the value is None, on an assessed row it is real data.",
+   "consumers_checked": ["same current-row reader WhatIsNotKept:490-491 (from/probe/contracts only)", "subject_absence read only on semantic_changes rows (:368,:652)"],
+   "exceptions_checked": ["a reader of the current row's subject_absence: none", "a datum lost: none (None)"],
+   "refutation": "", "note": "class_before=AUDITED upheld."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_ground", "index": 19, "mutant": "L290 dict entry 4 dropped",
+   "class_before": "AUDITED", "verdict": "CONFIRMED", "class_after": "AUDITED",
+   "grounds": "mutant_view: drops {'to': None} from the current row -> correct. Reproduced SURVIVED. 'current' is carried by from={'release':'current'} (pinned :491); to is None here (no earlier release). Not read by the current-row reader.",
+   "consumers_checked": ["WhatIsNotKept:490-491 reads ground['from'], not ground['to']", "to read only on assessed rows (:389-390 from/to, :668)"],
+   "exceptions_checked": ["a reader of the current row's to: none", "a datum lost: none (None); current carried by from"],
+   "refutation": "", "note": "class_before=AUDITED upheld."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_ground", "index": 20, "mutant": "L290 dict entry 5 dropped",
+   "class_before": "AUDITED", "verdict": "CONFIRMED", "class_after": "AUDITED",
+   "grounds": "mutant_view: drops {'consulted': []} from the current row -> correct. Reproduced SURVIVED. [] by design; the two tests iterating consulted (:391-392, :671) run on assessed rows (there is no current row in those fixtures), confirmed by measurement. Not read by WhatIsNotKept.",
+   "consumers_checked": [":391-392 and :671 iterate consulted on assessed-row data (no current row present)", "WhatIsNotKept:490-491 does not read consulted"],
+   "exceptions_checked": ["a consumer iterating a current row's consulted: none", "a datum lost: none ([])"],
+   "refutation": "", "note": "class_before=AUDITED upheld."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_ground", "index": 31, "mutant": "L290 string 'class' emptied",
+   "class_before": "AUDITED", "verdict": "CONFIRMED", "class_after": "AUDITED",
+   "grounds": "mutant_view: renames the current row's 'class' key to '' (value stays None) -> correct, single key, no '' collision (only this key emptied). Reproduced SURVIVED. The emptied string is a key LABEL over a None value, so no real datum is hidden; the round-3 label-dispute rule the author applies to [24]/[36] is correctly NOT triggered here (those labels sit over real data). No consumer reads it.",
+   "consumers_checked": ["WhatIsNotKept:490-491 reads from/probe/contracts (keys intact)", "no schema validator over the migrate report (grep)"],
+   "exceptions_checked": ["'' key colliding with another '' in this row: no (one key emptied)", "a datum lost: none (None under the label)"],
+   "refutation": "", "note": "Same round-3 boundary as [24]/[36] but value is None, so AUDITED (label over null) is the defensible, internally-consistent call; upheld."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_ground", "index": 32, "mutant": "L290 string 'subject_absence' emptied",
+   "class_before": "AUDITED", "verdict": "CONFIRMED", "class_after": "AUDITED",
+   "grounds": "mutant_view: renames the current row's 'subject_absence' key to '' (value None) -> correct. Reproduced SURVIVED. Label over a None value; contrast [24] where the same rename on an assessed row hides real data (ABSENCE_IS_DECIDABLE/REQUIRES_SUBJECT) and is owed. No consumer reads the current-row subject_absence.",
+   "consumers_checked": ["WhatIsNotKept:490-491 (from/probe/contracts)", "subject_absence read only on semantic_changes (:368,:652)"],
+   "exceptions_checked": ["a reader of the current row's subject_absence: none", "a datum lost: none (None)"],
+   "refutation": "", "note": "class_before=AUDITED upheld (value None, not the real-data case of [24])."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_ground", "index": 34, "mutant": "L290 string 'to' emptied",
+   "class_before": "AUDITED", "verdict": "CONFIRMED", "class_after": "AUDITED",
+   "grounds": "mutant_view: renames the current row's 'to' key to '' (value None) -> correct. Reproduced SURVIVED. Label over None; 'current' carried by from (pinned :491). No reader.",
+   "consumers_checked": ["WhatIsNotKept:490-491 reads from, not to"],
+   "exceptions_checked": ["a reader of the current row's to: none", "a datum lost: none (None)"],
+   "refutation": "", "note": "class_before=AUDITED upheld."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_ground", "index": 35, "mutant": "L291 string 'consulted' emptied",
+   "class_before": "AUDITED", "verdict": "CONFIRMED", "class_after": "AUDITED",
+   "grounds": "mutant_view: renames the current row's 'consulted' key (L291) to '' (value []) -> correct. Reproduced SURVIVED. Label over an empty list; consulted iterated only on assessed-row data (:391-392,:671). No reader of a current-row consulted.",
+   "consumers_checked": [":391-392,:671 iterate consulted on assessed rows (no current row)", "WhatIsNotKept:490-491 does not read consulted"],
+   "exceptions_checked": ["a consumer iterating a current row's consulted: none", "a datum lost: none ([])"],
+   "refutation": "", "note": "class_before=AUDITED upheld."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_ground", "index": 51, "mutant": "L296 string 'capability ' emptied",
+   "class_before": "AUDITED", "verdict": "CONFIRMED", "class_after": "AUDITED",
+   "grounds": "mutant_view: assessed then!=now ground loses the leading label 'capability ' -> 'f\"{then} to {now}: ...\"' (L296). Reproduced SURVIVED. Pinned substring 'none selects class exists' (:393) survives; then/now authoritative in from/to['capability_version'] (pinned :389-390). Explanatory prose only; no test pins the exact wording.",
+   "consumers_checked": ["test:393 assertIn('none selects class exists', exists['ground']) survives", "versions in from/to pinned :389-390"],
+   "exceptions_checked": ["a reader of the ground's exact wording: none", "a datum lost: none (versions in from/to)"],
+   "refutation": "", "note": "class_before=AUDITED upheld; a test pinning the prose would restate from/to (barred by §16 'never add a test merely to reach a number')."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_ground", "index": 52, "mutant": "L296 string ' to ' emptied",
+   "class_before": "AUDITED", "verdict": "CONFIRMED", "class_after": "AUDITED",
+   "grounds": "mutant_view: ' to ' removed -> 'capability {then}{now}: ...' (L296); for a 1->3 move renders the misleading 'capability 13'. Reproduced SURVIVED. The authoritative versions are the structured from/to['capability_version'] (pinned :389-390, unaffected); 'none selects class exists' (:393) intact. Weakest of the prose group (misleading render) but the data is pinned structurally, so no test is owed beyond that.",
+   "consumers_checked": ["from/to pinned :389-390 carry the versions", "test:393 substring intact"],
+   "exceptions_checked": ["versions recoverable: yes (from/to fields, pinned)", "a reader acting on the sentence's number: none (no code reads the ground)"],
+   "refutation": "", "note": "class_before=AUDITED upheld; author honestly flagged the 'capability 13' misread."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_ground", "index": 53, "mutant": "L296 string ': ' emptied",
+   "class_before": "AUDITED", "verdict": "CONFIRMED", "class_after": "AUDITED",
+   "grounds": "mutant_view: ': ' removed -> '{now}{len(consulted)}' run together (L296). Reproduced SURVIVED. Count recoverable from consulted (pinned :391 [(2,0),(3,2)] -> len 2); versions from from/to; 'none selects class exists' (:393) intact.",
+   "consumers_checked": ["consulted pinned :391-392", "test:393 substring intact"],
+   "exceptions_checked": ["count recoverable: yes (len(consulted), pinned)", "a datum lost: none"],
+   "refutation": "", "note": "class_before=AUDITED upheld."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_ground", "index": 55, "mutant": "L297 string ' under ' emptied",
+   "class_before": "AUDITED", "verdict": "CONFIRMED", "class_after": "AUDITED",
+   "grounds": "mutant_view: ' under ' removed from the then!=now tail -> '...none selects class {class}{key[2]}' (e.g. 'existsABSENCE_IS_DECIDABLE') (L297). Reproduced SURVIVED. 'none selects class exists' is still a prefix so :393 passes; this mutant touches the STRING, not the subject_absence FIELD (intact, L294), and class is pinned as the :387 group key. The subject_absence field being unpinned is the separate gap of [10]/[24], not newly owed here.",
+   "consumers_checked": ["test:393 assertIn passes (prefix)", "class pinned via by-key :387-388; subject_absence field intact at L294"],
+   "exceptions_checked": ["subject_absence recoverable: yes (field intact; string, not field, mutated)", "class recoverable: yes (:387 group key)"],
+   "refutation": "", "note": "class_before=AUDITED upheld; distinct from [10]/[24] (field survives)."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_ground", "index": 56, "mutant": "L298 string 'the probe is at capability ' emptied",
+   "class_before": "AUDITED", "verdict": "CONFIRMED", "class_after": "AUDITED",
+   "grounds": "mutant_view: the then==now ('did not move') ground loses its lead-in 'the probe is at capability ' (L298). Reproduced SURVIVED. 'did not move' (pinned :397/:669) survives; now is in to['capability_version'] (pinned :668==1). Lead-in prose only.",
+   "consumers_checked": ["test:397/:669 assertIn('did not move', ...) survive", "to['capability_version'] pinned :668"],
+   "exceptions_checked": ["the version recoverable: yes (to['capability_version'])", "the pinned substring removed: no ('did not move' survives)"],
+   "refutation": "", "note": "class_before=AUDITED upheld."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_ground", "index": 10, "mutant": "L294 dict entry 2 dropped",
+   "class_before": "REFUTED", "verdict": "REVISED", "class_after": "SURVIVED (test owed)",
+   "grounds": "mutant_view: drops {'subject_absence': key[2]} from the ASSESSED-row dict (L294, entry 2) -> correct. Reproduced SURVIVED (51 OK) against the sole registered kill file. Confirmed real gap: subject_absence on an assessed grounds row is real data (measured on LedgerLock: ABSENCE_IS_DECIDABLE / REQUIRES_SUBJECT), a _group group key (bundle_cli.py:283), documented USAGE-2.1.md:96, and read by NO grounds test (:368 and :652 read semantic_changes rows -- confirmed via the enclosing loops at :366 and :651 -- never a grounds row). On a then==now row the ground prose (:298-299) does not restate key[2], so the dropped field is the sole carrier. CORRECTION of the author's cite: the LedgerLock bundle does NOT have 'three' such rows -- it has SEVEN then==now grounds rows (python_callable_v2/exists; process_effect x3: scenario_files/raises/returns; cli_invocation x3: equality/exits_files/exits) plus one then!=now row (file_artifact/exists) = 8 grounds rows (measured by running migrate on the snapshot fixture). The gap stands and is wider than stated.",
+   "consumers_checked": ["bundle_cli.py:283 _group (subject_absence = 3rd group-key element)", "USAGE-2.1.md:96 documents subject_absence as a grounds field", "grounds tests :384-399,:490-491,:660-674 never read a grounds row's subject_absence", ":368 (loop :366 semantic_changes) and :652 (loop :651 semantic_changes) read subject_absence off semantic_changes only"],
+   "exceptions_checked": ["value recoverable on a did-not-move row: no (prose omits it; semantic_changes carries absence for WITHHELD contracts only)", "a test reading a grounds row's subject_absence: none"],
+   "refutation": "A test is owed (T-SA; reader: the operator reading approvals_kept_grounds, printed at main:1084). Sketch: in TheLedgerLockBundle.test_the_ground_of_the_53_kept_approvals_is_read_not_counted (:660), over the SEVEN non-fa (then==now) rows assert r['subject_absence'] == contract(r['contracts'][0]).subject_absence.value and is not None; and in WhatMigrateWithholds.test_the_report_gives_the_ground (:381-399) assert exists['subject_absence'] and unmoved['subject_absence'] equal the fixture contracts' absence. Input: the fixtures already in the test. Kills [10] (key absent) and [24] (value under '').",
+   "note": "Conclusion (test owed) upheld; grounds corrected: three -> seven then==now rows."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_ground", "index": 24, "mutant": "L294 string 'subject_absence' emptied",
+   "class_before": "REFUTED", "verdict": "REVISED", "class_after": "SURVIVED (test owed)",
+   "grounds": "mutant_view: renames the ASSESSED row's 'subject_absence' key to '' (value key[2] stays) (L294) -> correct. Reproduced SURVIVED. Same real gap as [10]: the value (real data: ABSENCE_IS_DECIDABLE/REQUIRES_SUBJECT) now prints under '' rather than the documented key (USAGE-2.1.md:96); operator-visible report field label over real data -> owed per the round-3 rule (correctly applied here, unlike the None-valued current-row labels [31]/[32]/[34]/[35]). CORRECTION: same as [10] -- the LedgerLock bundle has SEVEN then==now grounds rows, not three.",
+   "consumers_checked": ["bundle_cli.py:283 group key; USAGE-2.1.md:96 documents the field", "no grounds test reads subject_absence (:368,:652 are semantic_changes)"],
+   "exceptions_checked": ["value visible under '' but not under the documented key: yes", "a test reading subject_absence from a grounds row: none"],
+   "refutation": "A test is owed (T-SA; reader: operator reading approvals_kept_grounds at main:1084). Same sketch as [10]: assert each grounds row's subject_absence under the key 'subject_absence' equals its contracts' absence (seven LedgerLock then==now rows + WhatMigrateWithholds exists/unmoved). Kills [24] (value under '') and [10] (key absent).",
+   "note": "Conclusion (test owed) upheld; grounds corrected three -> seven. Round-3 label rule correctly applied (real data), contrast [31]/[32]/[34]/[35] (null)."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_ground", "index": 21, "mutant": "L290 dict entry 6 dropped",
+   "class_before": "REFUTED", "verdict": "CONFIRMED", "class_after": "SURVIVED (test owed)",
+   "grounds": "mutant_view: drops {'ground': '...'} from the current (None) row (L290, entry 6) -> correct; resulting dict ends at 'consulted': []. Reproduced SURVIVED. Real gap: the current row's ground is the SOLE statement of why a contract this release's own plan names is kept with nothing compared ('...there is no earlier release whose capability to compare'); probe=None + from only mark the row current and carry no reasoning. It is the payload the report exists to give (_grounds docstring :302-306; USAGE-2.1.md:96; REPORT.md:284) and is asserted by no test: WhatIsNotKept:490-491 reads from/probe/contracts only (measured: survives), and no current row reaches WhatMigrateWithholds' :399 assertTrue(r['ground']) (measured: survives).",
+   "consumers_checked": ["bundle_cli.py:290-292 the only writer of this text; _grounds docstring :304-306", "WhatIsNotKept:490-491 (sole current-row reader) never reads ground", "pinned grounds text is the ASSESSED branch only (:393/:397/:669)"],
+   "exceptions_checked": ["text recoverable: no (sole carrier; from/probe/consulted carry none of it)", "WhatMigrateWithholds :399 assertTrue(r['ground']) catching it: no (no current row in that fixture; measured survives)"],
+   "refutation": "A test is owed (T-CUR-GROUND; reader: the operator reading approvals_kept_grounds for a bundle already of this release, main:1084). Sketch: in WhatIsNotKept.test_a_bundle_already_of_this_release_loses_nothing (:486-491, doc=era_bundle(release=None)), after [ground]=report['approvals_kept_grounds'] assert ground['ground'] is truthy and 'no earlier release whose capability to compare' in ground['ground']. Input: era_bundle(release=None), already built. Kills [21] (KeyError), [38] (empty string), [36] (text under '' not 'ground').",
+   "note": "class_before=REFUTED upheld; grounds hold."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_ground", "index": 38, "mutant": "L291 string \"the plan names this release's own spec ids for these contracts: there is no earlier release whose capability to compare\" emptied",
+   "class_before": "REFUTED", "verdict": "CONFIRMED", "class_after": "SURVIVED (test owed)",
+   "grounds": "mutant_view: empties the current row's ground VALUE to '' (key 'ground' present) (L291) -> correct. Reproduced SURVIVED. Same real gap as [21]: the sole reason-for-keeping of a contract with no earlier release is now absent, asserted by no test.",
+   "consumers_checked": ["bundle_cli.py:290-292 writer; WhatIsNotKept:490-491 never reads ground", ":399 assertTrue(r['ground']) sees no current row (measured survives)"],
+   "exceptions_checked": ["text recoverable: no", "a test asserting a non-empty current-row ground: none"],
+   "refutation": "A test is owed (T-CUR-GROUND). Sketch as [21]: assert 'no earlier release whose capability to compare' in ground['ground'] in WhatIsNotKept (:486-491). Kills [38] (empty string), [21] (key absent), [36] (key renamed).",
+   "note": "class_before=REFUTED upheld."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_ground", "index": 36, "mutant": "L291 string 'ground' emptied",
+   "class_before": "REFUTED", "verdict": "CONFIRMED", "class_after": "SURVIVED (test owed)",
+   "grounds": "mutant_view: renames the current row's 'ground' key to '' (reason text stays as the value) (L291) -> correct. Reproduced SURVIVED. The reason text prints under '' instead of the documented 'ground' key (USAGE-2.1.md:96) -- operator-visible report field label over REAL data, owed per the round-3 rule (same basis the author uses, correctly). No test reads the current row's ground under any key.",
+   "consumers_checked": ["bundle_cli.py:290-292 writer; USAGE-2.1.md:96 documents 'ground'", "WhatIsNotKept:490-491 never reads ground; :399 sees no current row (measured survives)"],
+   "exceptions_checked": ["text visible under '' but not the documented 'ground' key: yes", "a test reading the current row's ground under 'ground': none"],
+   "refutation": "A test is owed (T-CUR-GROUND). Sketch as [21]: after [ground]=report['approvals_kept_grounds'] in WhatIsNotKept (:486-491), assert ground['ground'] is truthy and contains 'no earlier release whose capability to compare'. Kills [36] (KeyError on ground['ground']), and also [21]/[38].",
+   "note": "class_before=REFUTED upheld; round-3 label rule correctly applied (real data), consistent with [24]."
+  }
+ ],
+ "notes": "All 18 mutant descriptions match mutant_view exactly; source_sha256 e083e92a… matches. Baseline + all 18 reproduced: Ran 51 tests OK -> SURVIVED, against the sole registered kill file tests/v2/test_v21_migrate_semantics.py (V21_TARGETS). No other test module reads approvals_kept_grounds or _ground (grep). 0 EQUIVALENT confirmed (every mutant observably changes the printed json; none provable no-op). Verdicts: 13 CONFIRMED-AUDITED (16,17,19,20,31,32,34,35,51,52,53,55,56), 3 CONFIRMED test-owed (21,38,36), 2 REVISED test-owed (10,24). The ONE substantive correction: the author states the LedgerLock bundle has 'three' then==now grounds rows in [10]/[24]; measured it has SEVEN (plus one then!=now; 8 rows total) -- the subject_absence gap is wider than stated, conclusion unchanged. The author's AUDITED/REFUTED asymmetry is sound and verified: current-row fields holding None/[] are AUDITED (label/key over no datum, no reader), the current-row ground and assessed-row subject_absence are test-owed (real data / sole-carrier, unpinned, documented). The round-3 label-dispute rule is correctly applied to the real-data labels ([24] subject_absence, [36] ground) and correctly withheld from the null-valued current-row labels ([31],[32],[34],[35])."
+}

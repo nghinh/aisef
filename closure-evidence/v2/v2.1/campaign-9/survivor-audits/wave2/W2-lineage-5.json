@@ -1,0 +1,65 @@
+{
+ "batch": "W2-lineage-5",
+ "file": "aisef2/app/lineage.py",
+ "targets": [
+  "aisef2/app/lineage.py::_predecessor"
+ ],
+ "new": [
+  {
+   "target": "aisef2/app/lineage.py::_predecessor",
+   "index": 30,
+   "mutant": "L696 string ' is not a run record (a JSON object)' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_predecessor",
+   "index": 31,
+   "mutant": "L677 string ' is not text (' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_predecessor",
+   "index": 32,
+   "mutant": "L677 string ')' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_predecessor",
+   "index": 33,
+   "mutant": "L690 string ' is cut or is not JSON' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_predecessor",
+   "index": 35,
+   "mutant": "L698 string ' names the run it continues by something that is not a path' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_predecessor",
+   "index": 36,
+   "mutant": "L701 string '; ' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_predecessor",
+   "index": 37,
+   "mutant": "L681 string ' cannot be read (' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_predecessor",
+   "index": 38,
+   "mutant": "L681 string ': ' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_predecessor",
+   "index": 39,
+   "mutant": "L681 string ')' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_predecessor",
+   "index": 40,
+   "mutant": "L681 Or swapped"
+  },
+  {
+   "target": "aisef2/app/lineage.py::_predecessor",
+   "index": 41,
+   "mutant": "L683 string ' is a link that leads nowhere' emptied"
+  }
+ ],
+ "carried": []
+}

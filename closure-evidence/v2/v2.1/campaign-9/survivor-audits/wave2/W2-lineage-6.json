@@ -1,0 +1,60 @@
+{
+ "batch": "W2-lineage-6",
+ "file": "aisef2/app/lineage.py",
+ "targets": [
+  "aisef2/app/lineage.py::child_evidence"
+ ],
+ "new": [
+  {
+   "target": "aisef2/app/lineage.py::child_evidence",
+   "index": 34,
+   "mutant": "L200 string ' holds bytes and no complete event (a first line that was cut)' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::child_evidence",
+   "index": 35,
+   "mutant": "L186 string ' is not text (' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::child_evidence",
+   "index": 36,
+   "mutant": "L186 string ')' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::child_evidence",
+   "index": 37,
+   "mutant": "L189 string ' cannot be read (' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::child_evidence",
+   "index": 38,
+   "mutant": "L189 string ': ' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::child_evidence",
+   "index": 39,
+   "mutant": "L189 string ')' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::child_evidence",
+   "index": 40,
+   "mutant": "L189 Or swapped"
+  },
+  {
+   "target": "aisef2/app/lineage.py::child_evidence",
+   "index": 41,
+   "mutant": "L197 string ' does not reconstruct (' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::child_evidence",
+   "index": 42,
+   "mutant": "L197 string ': ' emptied"
+  },
+  {
+   "target": "aisef2/app/lineage.py::child_evidence",
+   "index": 43,
+   "mutant": "L197 string ')' emptied"
+  }
+ ],
+ "carried": []
+}

@@ -1,0 +1,50 @@
+{
+ "batch": "W2-bundle_cli-6",
+ "file": "aisef2/app/bundle_cli.py",
+ "targets": [
+  "aisef2/app/bundle_cli.py::_record"
+ ],
+ "new": [
+  {
+   "target": "aisef2/app/bundle_cli.py::_record",
+   "index": 24,
+   "mutant": "L791 string ' is there) \u2014 nothing identifies the run; run the bundle itself again' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_record",
+   "index": 30,
+   "mutant": "L789 string ' cut: not JSON) \u2014 nothing identifies the run; run the bundle itself again' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_record",
+   "index": 33,
+   "mutant": "L783 string ' is not a run record (a JSON object): restore it from a faithful copy of the run directory \u2014 nothing was written' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_record",
+   "index": 38,
+   "mutant": "L775 string ' cannot be read (' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_record",
+   "index": 39,
+   "mutant": "L775 string ': ' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_record",
+   "index": 40,
+   "mutant": "L776 string '): restore read access to it (or a faithful copy of the run directory) and run the command again \u2014 the run is never modified and nothing was written' emptied"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_record",
+   "index": 41,
+   "mutant": "L776 Or swapped"
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_record",
+   "index": 42,
+   "mutant": "L789 string ' and ' emptied"
+  }
+ ],
+ "carried": []
+}

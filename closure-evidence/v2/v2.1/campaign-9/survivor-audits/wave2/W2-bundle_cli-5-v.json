@@ -1,0 +1,132 @@
+{
+ "batch": "W2-bundle_cli-5",
+ "role": "skeptic",
+ "snapshot": "4ec961e706a1f7bda16d131037058c4fe9c2663f",
+ "source_sha256": "e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8",
+ "date": "Mon Oct 19 2026 (+07)",
+ "entries": [
+  {
+   "target": "aisef2/app/bundle_cli.py::_journal",
+   "index": 5,
+   "mutant": "L840 Or swapped",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "mutant_view + the mutation harness give desc=='L840 Or swapped' at [5]: `if not isinstance(path,str) or not path:` -> `... and (not path):` at L840 (verified def _journal L831, guard L840 at the snapshot). The mutant raises a STRICT SUBSET of the inputs the original raises, so no forged record that the original refuses can slip through: reproduced in an isolated harness (orig module vs the index-5 mutant), path=='' -> orig EVIDENCE_MISSING / mutant EVIDENCE_UNREADABLE; path=5 (truthy non-str) -> orig EVIDENCE_MISSING / mutant TypeError (`run_dir / 5`, uncaught in _journal, caught by main's `except (KeyError, TypeError, ValueError)` L1081-1082 -> `refused: TypeError...` exit 2); path=None and journal=None -> EVIDENCE_MISSING under BOTH; absent 'x.jsonl' -> EVIDENCE_UNREADABLE under both. The mutant never printed '(NO RAISE -> would proceed)': every branch refuses with exit 2 and nothing written. The only test of this arm (pw_lineage_continue:405-409 test_a_record_that_names_no_journal_is_missing_evidence, journal_ref=None -> path=None) feeds the non-distinguishing input, so it cannot and does not kill it. The divergent inputs (path=='' / a non-str path) are not produced by the writer: run.py:706 `_journal_info` sets path = `path.relative_to(path.parents[2]).as_posix()` (non-empty POSIX str); the killed-run fallback bundle_cli.py:786 sets rec['journal']={'path':'run/journals/aisef-run.jsonl'} (non-empty str). MEASURED on a COPY tree (PATH stripped of /Users/nghinh/.opencode/bin and /Users/nghinh/.npm-global/bin, HOME/TMPDIR/XDG under the tree, env -i; baseline unmutated pw_lineage_continue 36 OK 8.83s / kills3_T01b 15 OK): pw_lineage_continue 36 OK 7.67s -> SURVIVED reconfirmed. Observable difference exists (code/message on forged inputs) so NOT equivalent; no reader depends on the specific code for forged inputs so no test owed -> AUDITED.",
+   "refutation": "",
+   "note": "Grounds cites refreshed: author wrote 'bundle_cli.py:789' (actual L786) and 'run.py:704-706' (func def L700, path line L706) -- small drift, argument unchanged. Author's 'IsADirectoryError' for path=='' holds only when run_dir EXISTS as a directory; in my non-existent run_dir it was FileNotFoundError, but the CODE is EVIDENCE_UNREADABLE either way, so the conclusion is intact. All truthy non-str JSON values (int/float/bool/list/dict) raise TypeError on `run_dir / path`; no non-str path proceeds to a write."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_journal",
+   "index": 24,
+   "mutant": "L851 string ' is not the journal ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "mutant_view confirms at L851 (EVIDENCE_INTEGRITY digest/length arm): `{where} is not the journal {run_dir / 'RUN.json'} names (...)` -> `{where}{run_dir / 'RUN.json'} names (...)`. Code EVIDENCE_INTEGRITY, the RUN.json path (the whole `{run_dir / 'RUN.json'}` substring, hence 'RUN.json'), and `(its digest or length differs)` all survive. Registered consumers verified by reading + measurement: pw_lineage_continue:309-320 asserts code EVIDENCE_INTEGRITY, assertIn('RUN.json') and assertRegex(`digest|length`) -- all intact; :322-326 asserts code only; kills3_T01b:248-257 (RECORD='RUN.json' confirmed L40) asserts code EVIDENCE_INTEGRITY and assertIn(str(moved/'RUN.json')) -- that path is emitted contiguously in the mutant, so assertIn passes. Grep of tests/docs for 'is not the journal': only docstrings (pw_lineage_continue:16, x_lineage_proof:578), never an assertion. MEASURED (COPY tree, stripped PATH, env -i): pw_lineage_continue 36 OK 6.77s AND kills3_T01b 15 OK 12.96s on the mutant -> SURVIVED reconfirmed, both registered discriminating kill files PASS.",
+   "refutation": "",
+   "note": "I did NOT re-run test_v21_continue_integrity (the author reported it INFRA/SIGTERM here). It drives only valid journals through _journal (success path) and never reaches the L851 integrity branch, so it cannot discriminate this mutant; the arm is fully exercised by pw_lineage_continue + kills3_T01b, both measured PASS. Author cite 'assertIn(str(moved / 'RUN.json'))' confirmed (RECORD='RUN.json', kills3_T01b L40)."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_journal",
+   "index": 28,
+   "mutant": "L870 string ' — no kernel wrote it, and nothing is carried from it; `aisef run --verify` refuses it the same way' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "mutant_view confirms at L868-871 (EVIDENCE_PROJECTION arm): the trailing suffix appended after `...{why}`[:480] is emptied (`+ ' — no kernel wrote it...'` -> `+ ''`). The head `f\"{where} violates the control projections the kernel's writer enforces: {pid} refuses {kind} at seq {seq}: {why}\"[:480]` -- carrying code EVIDENCE_PROJECTION and the word-for-word pinned `{pid} refuses {kind} at seq {seq}` -- is byte-identical. Registered consumers: pw_lineage_continue:331-337 assertIn(f'{pid} refuses {kind} at seq {seq}') (substring in the untouched head) and :345-351 assertIn('EVIDENCE_PROJECTION') + assertRegex(`^refused: `) + exit 2 + no out file + dir unchanged -- all survive. Grep of tests/docs for 'no kernel wrote it' / 'refuses it the same way': NONE. MEASURED (COPY tree): pw_lineage_continue 36 OK 7.19s -> SURVIVED reconfirmed. Observable operator-text loss but no reader/verifier depends on the suffix; the load-bearing code + finding are pinned -> AUDITED.",
+   "refutation": "",
+   "note": "USAGE-2.1.md:358 paraphrases EVIDENCE_PROJECTION in Vietnamese ('không kernel nào viết ra nó') -- a paraphrase of the gist, not the emptied English literal; no doc quotes the literal."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_journal",
+   "index": 29,
+   "mutant": "L847 string ' cannot be read (' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "mutant_view confirms at L847 (EVIDENCE_UNREADABLE arm): ` cannot be read (` between `{where}` and `{type(e).__name__}` emptied -> `f'{where}{type(e).__name__}: {e.strerror or e}): ...'`. Code EVIDENCE_UNREADABLE, the path `{where}`, the class `{type(e).__name__}` and the whole remediation tail (`restore read access ... the run is never modified and nothing was written`) all survive. Registered consumers verified: pw_lineage_continue:173-180 (PermissionError via chmod 000) asserts code + assertIn('PermissionError') + assertIn(JOURNAL path); :182-187 (unlink) asserts code + assertIn('FileNotFoundError'); :205-211 asserts the remediation-tail regexes (`read access|restore|copy`, `never modif|nothing was ...`) -- all intact. CRITICAL skeptic check: every `assertIn('cannot be read'...)` in tests/ targets OTHER functions -- kills_bundle.py:55-60 is `bundle.read()` (a BUNDLE file, message shape `{path}: cannot be read (` with a colon after path, NOT _journal's `{where} cannot be read (`); ocr_preflight.py:207-220 and ocr_identity.py:146-148 are the OCR provider; x_lineage_proof's 'cannot be read' matches (200/241/409/522/526/595/724/995/1142/1152/1180) are all the LINEAGE subsystem (lineage.claim/claim_unread/lineage_account cost status), and x_lineage_proof's own continue_from calls (L1057-1109) are happy-path (read doc/report, no refusal assertion, zero `.code`/`EVIDENCE_` assertions). MEASURED (COPY tree): pw_lineage_continue 36 OK 6.67s -> SURVIVED reconfirmed.",
+   "refutation": "",
+   "note": "The author listed only kills_bundle/ocr_preflight/ocr_identity for the 'cannot be read (' grep; the fuller grep also hits docstrings (pw_lineage_continue:14, pw_lineage_spend:17, kills3_T09b:300, kills3_R01:142, defects_verify:4/122) and lineage-subsystem assertions in x_lineage_proof -- none reach _journal's L847, so the conclusion stands. No production code reads JournalRefused.code (grep `\\.code` over aisef2/ aisef/ validation/: bundle_cli:30 is the docstring, preflight:57 is an HTTPError .code, p10_contracts:875/c2_p10_cohort:74 are other exception types)."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_journal",
+   "index": 30,
+   "mutant": "L847 string ': ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "mutant_view confirms at L847: the `: ` between `{type(e).__name__}` and `{e.strerror or e}` emptied -> `({type(e).__name__}{e.strerror or e})`. The class name and strerror run together inside the parenthetical; code EVIDENCE_UNREADABLE, path `{where}`, class name and remediation tail all remain. assertIn('PermissionError')/assertIn('FileNotFoundError') are substring checks that still match the class token even with no `: ` after it (pw_lineage_continue:173-180, :182-187); the remediation-tail regexes (:205-211) are untouched. MEASURED (COPY tree): pw_lineage_continue 36 OK 6.33s -> SURVIVED reconfirmed. No programmatic reader splits the parenthetical on `: ` (nothing parses the message; .code not read by production). -> AUDITED.",
+   "refutation": "",
+   "note": "Distinct position from index 29 on the same L847 (29 empties the words ' cannot be read (', 30 empties the ': ' inside the parenthetical); both verified by their own mutant_view diffs."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_journal",
+   "index": 38,
+   "mutant": "L847 Or swapped",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "mutant_view confirms at L847: `{e.strerror or e}` -> `{e.strerror and e}` inside the EVIDENCE_UNREADABLE f-string. The detail text changes (truthy strerror: orig renders strerror, mutant renders the full exception `e`; falsy strerror: mutant renders the falsy strerror i.e. ''/None). The discriminating tokens are OUTSIDE the swap: code EVIDENCE_UNREADABLE, the leading path `{where}`, the class `{type(e).__name__}` (before the swapped expr), and the remediation tail. Registered tests assert only the class name + path + remediation (pw_lineage_continue:173-180/182-187/205-211), all outside the swap; PermissionError/FileNotFoundError both have truthy strerror so assertIn('PermissionError') matches the class token regardless. MEASURED (COPY tree): pw_lineage_continue 36 OK 6.69s -> SURVIVED reconfirmed.",
+   "refutation": "",
+   "note": "For an OSError with a falsy strerror the mutant drops the detail (renders ''/None), but the path + class + remediation remain in the message head; no test or consumer depends on the parenthetical detail string. No reader distinguishes strerror from str(e)."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_journal",
+   "index": 40,
+   "mutant": "L861 string ' — its hash chain or sequence is broken: the journal is not the one that was written; restore it from a faithful copy' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "mutant_view confirms at L858-864 (reconstruct arm): the BROKEN branch of the ternary is emptied (`(' — its hash chain...' if broken else ' — what is there...')` -> `('' if broken else ' — what is there...')`). Only the EVIDENCE_INTEGRITY (broken chain/seq) case loses its explanatory+remediation tail; the head `f\"{where}: {type(e).__name__}: {e}\"[:400]` is unchanged, and `{e}` carries the reader's own words ('the chain does not link'/'seq == index', the `_INTEGRITY` needles L145). pw_lineage_continue:295-300 assertIn('chain') and :302-307 assertIn('seq') both match via `{e}` in the untouched head (not the emptied suffix); :281-291 exercises the ELSE/malformed branch which the mutant does not touch. MEASURED (COPY tree): pw_lineage_continue 36 OK 7.60s -> SURVIVED reconfirmed. Grep of tests/docs for 'its hash chain or sequence is broken': NONE.",
+   "refutation": "",
+   "note": "This is the only entry where the mutant drops a remediation phrase ('restore it from a faithful copy') for a branch (reconstruct-INTEGRITY) that no test pins remediation on. Still AUDITED not test-owed: the operator's decision is driven by the EVIDENCE_INTEGRITY code (documented L30-36 / USAGE-2.1.md:357) plus the reader's `{e}` ('the chain does not link'), both pinned and intact; the dropped suffix duplicates the code's documented meaning and no reader depends on it. Pinning this prose would be adding a test to reach a number (owner's rule forbids)."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_journal",
+   "index": 42,
+   "mutant": "L868 string \" violates the control projections the kernel's writer enforces: \" emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "mutant_view confirms at L868 (EVIDENCE_PROJECTION arm): the preamble ` violates the control projections the kernel's writer enforces: ` between `{where}` and `{pid}` emptied -> `f'{where}{pid} refuses {kind} at seq {seq}: {why}'`. Code EVIDENCE_PROJECTION and the word-for-word pinned `{pid} refuses {kind} at seq {seq}` remain (now directly after the path, and EARLIER in the string so well within [:480]); the suffix is unchanged. pw_lineage_continue:331-337 assertIn(f'{pid} refuses {kind} at seq {seq}') (substring intact), :339-343 (code), :345-351 assertIn('EVIDENCE_PROJECTION') -- all survive. Grep of tests/docs for 'violates the control projections': NONE as an assertion (shared with verify.py:162 source, but no test compares them). MEASURED (COPY tree): pw_lineage_continue 36 OK 6.78s -> SURVIVED reconfirmed.",
+   "refutation": "",
+   "note": "The equivalence 'aisef run --verify refuses it the same way' (vs verify.py:162) is not a pinned contract in tests/ -- no test asserts the two message texts are equal, so emptying this preamble breaks no cross-message invariant that any test guards."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_journal",
+   "index": 45,
+   "mutant": "L869 string ': ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "mutant_view confirms at L869 (EVIDENCE_PROJECTION arm): the `: ` between `at seq {seq}` and `{why}` emptied -> `...at seq {seq}{why}`. The pinned substring `{pid} refuses {kind} at seq {seq}` ENDS at `{seq}` and is unaffected (now followed directly by `{why}`); code EVIDENCE_PROJECTION and the suffix remain. pw_lineage_continue:331-337 assertIn(f'{pid} refuses {kind} at seq {seq}') stops at `{seq}`, so the asserted substring is still contiguous -- passes; :345-351 assertIn('EVIDENCE_PROJECTION') passes. MEASURED (COPY tree): pw_lineage_continue 36 OK 7.86s -> SURVIVED reconfirmed. No reader splits the finding from `{why}` on this `: `.",
+   "refutation": "",
+   "note": "The test's assertIn deliberately stops at `{seq}` (comment in pw_lineage_continue:337: 'the verifier's own finding, word for word'), so the `: ` before `{why}` is outside the pinned contract."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_journal",
+   "index": 46,
+   "mutant": "L860 string ': ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "mutant_view confirms at L860 (reconstruct arm): the FIRST `: ` of `f\"{where}: {type(e).__name__}: {e}\"` emptied -> `f'{where}{type(e).__name__}: {e}'` (path runs into the class). Code (INTEGRITY/MALFORMED), class name, `{e}` and the ternary suffix all remain; the head is 2 chars SHORTER so `{e}` sits even further within [:400]. pw_lineage_continue:281-291 assertRegex(`not (a )?journal|not JSON|not a stored event|UTF-8|canonical`) matches via the else-branch suffix 'what is there is not a journal...' (untouched) and/or `{e}`; :295-300/:302-307 assertIn('chain')/('seq') via `{e}` -- all survive. MEASURED (COPY tree): pw_lineage_continue 36 OK 8.18s -> SURVIVED reconfirmed.",
+   "refutation": "",
+   "note": "Distinct position from index 47 on the same L860: 46 = first colon (`{where}: ` -> `{where}`), 47 = second colon (`{type}: {e}` -> `{type}{e}`). Both verified by separate mutant_view diffs; both PASS."
+  },
+  {
+   "target": "aisef2/app/bundle_cli.py::_journal",
+   "index": 47,
+   "mutant": "L860 string ': ' emptied",
+   "class_before": "AUDITED",
+   "verdict": "CONFIRMED",
+   "class_after": "AUDITED",
+   "grounds": "mutant_view confirms at L860 (reconstruct arm): the SECOND `: ` of `f\"{where}: {type(e).__name__}: {e}\"` emptied -> `f'{where}: {type(e).__name__}{e}'` (class name runs into the reader's message). Code, path, class and `{e}` remain. pw_lineage_continue:281-291 assertRegex of the not-a-journal reasons matches inside `{e}` (which still follows the class with no `: `) and/or the else suffix; :295-300/:302-307 assertIn('chain')/('seq') via `{e}` -- all survive. MEASURED (COPY tree): pw_lineage_continue 36 OK 8.36s -> SURVIVED reconfirmed.",
+   "refutation": "",
+   "note": "A `: ` delimiter between the exception class and its message is not depended on by any reader -- the text is operator prose with no parser, and .code (not the text) is the only field read, and only by tests (via getattr), never by production."
+  }
+ ],
+ "owed_tests": [],
+ "notes": "Skeptic verification of W2-bundle_cli-5 (11 new survivors of aisef2/app/bundle_cli.py::_journal, carried=[]). Snapshot 4ec961e; aisef2/app/bundle_cli.py LF-sha256 e083e92a1facedf002fddd579f1e87690ba467658ca570c01f90bb796ff456f8 (verified == the digest the draft and campaign record). ALL 11 verdicts CONFIRMED, class_after=AUDITED (author had all AUDITED). Every mutant's desc was reproduced exactly via mutant_view.py AND the mutation harness (m.mutants(src,'_journal',enums)[i][0]==the entry's mutant string, asserted) -- lines/function/snapshot all verified; indices 46/47 correctly distinguished (first vs second colon on L860). Consumers verified real and as described: _journal is called only by continue_from (L905); its JournalRefused (subclass of B.BundleError, L134) reaches the operator only through main's `except B.BundleError -> print(f'refused: {e}') -> return 2` (L1078-1079); a non-str path's TypeError (index 5) is caught by main's `except (KeyError,TypeError,ValueError)` (L1081-1082); JournalRefused.__init__ composes `f'{code}: {message}'` and stores .code (L138-140); NO production code reads .code (grep over aisef2/ aisef/ validation/: only the docstring L30 + unrelated .code on other exception types). No registered kill file kills any mutant and no UNREGISTERED test does either: grep of every emptied phrase over tests/ docs/ found only docstrings / sibling-function messages / lineage-subsystem assertions, never an assertion on _journal's emptied text; x_lineage_proof/continue_usage/defects_bundlecli reach continue_from only on the happy path or assert post-conditions. USAGE-2.1.md:353-361 is a Vietnamese paraphrase table of the EVIDENCE_* codes, quoting none of the emptied English literals. MEASUREMENT (pinned code+tests, one mutant at a time on a COPY tree; env -i, PATH stripped of /Users/nghinh/.opencode/bin + /Users/nghinh/.npm-global/bin, HOME/TMPDIR/XDG under the tree; mutation finished, real opencode never invoked, repo worktree untouched -- git archive only): baseline unmutated pw_lineage_continue 36 OK 8.83s, kills3_T01b 15 OK 11.47s. All 11 mutants: pw_lineage_continue 36 OK (6.3-8.4s each); index 24 ALSO kills3_T01b 15 OK -> SURVIVED reconfirmed for all 11, module restored to sha e083e92a. Index 5 additionally reproduced in an isolated orig-vs-mutant harness: the mutant raises a strict subset of the original's refusals (path=='' -> EVIDENCE_UNREADABLE, non-str path -> TypeError->exit 2, path=None -> EVIDENCE_MISSING both), never 'proceeds', so no forged record slips past the guard and the writer never produces the divergent inputs. test_v21_continue_integrity NOT re-run (author reported INFRA/SIGTERM on index 24; it drives only valid journals through _journal's success path and cannot discriminate any of these error-arm mutants -- those arms are fully covered by the two kill files I measured PASS). No EQUIVALENT (every edit is observable in the operator text or, for index 5, in the code/exception on a forged record -- the author correctly avoided calling operator-read strings 'harmless'); no REFUTED/test-owed (no reader/verifier depends on any emptied prose; the load-bearing code + discriminating tokens -- path, error class, `{pid} refuses {kind} at seq {seq}` word-for-word, `chain`/`seq` from the reader's `{e}`, `digest|length`+RUN.json, the remediation-tail regex -- are all pinned by the kill files and all survive). Minor cite refreshes only (index 5: L786 not 789, run.py L700/706 not 704-706; IsADirectoryError holds for an existing run dir) -- none change a verdict. Author trees (W2-bundle_cli-5-skeptic, -run, out/mutsrc) removed at end."
+}
