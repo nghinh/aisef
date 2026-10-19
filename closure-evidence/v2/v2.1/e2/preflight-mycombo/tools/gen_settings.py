@@ -6,7 +6,6 @@ import copy
 import hashlib
 import json
 import pathlib
-import sys
 
 W = pathlib.Path("/Users/nghinh/Downloads/projects/ai-sdlc/.claude/worktrees/wf_830a4f0d-db8-1")
 S = pathlib.Path(__file__).resolve().parent

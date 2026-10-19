@@ -29,7 +29,6 @@ import json
 import os
 import pathlib
 import shutil
-import socket
 import subprocess
 import sys
 import threading
@@ -254,7 +253,7 @@ def campaign(scratch: pathlib.Path, args: list[str]) -> None:
     try:
         srv = http.server.ThreadingHTTPServer(("127.0.0.1", PORT), Provider)
     except OSError as e:
-        raise SystemExit(f"cannot bind the loopback provider to 127.0.0.1:{PORT}: {e}")
+        raise SystemExit(f"cannot bind the loopback provider to 127.0.0.1:{PORT}: {e}") from e
     threading.Thread(target=srv.serve_forever, daemon=True).start()
     print(f"dry-run: {now()} PATH={os.environ['PATH']} opencode={found} provider=127.0.0.1:{PORT} "
           f"{WRONG_ENV}={os.environ.get(WRONG_ENV, '')!r} NINEROUTER_API_KEY in env: {'NINEROUTER_API_KEY' in os.environ}")

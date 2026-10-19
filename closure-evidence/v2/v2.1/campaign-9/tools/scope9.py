@@ -227,7 +227,7 @@ for rec in sweeps:   # T0-SWEEP.json (1), -2 ... -8: a later record wins
     for (mod, nul, f), sec in t0_rows(rec).items():
         t0[(mod, nul, f)] = sec
         same_module_file[(mod, f)] = sec
-for (mod, nul, f), sec in t0.items():
+for (_mod, _nul, f), sec in t0.items():
     same_file[f].append(sec)
 median = statistics.median(t0.values())
 median_last = statistics.median(last_record.values())
